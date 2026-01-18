@@ -146,6 +146,7 @@ if (class_exists('\Nexus\Core\TenantContext')) {
 
     <!-- Mobile Sheets CSS (base styles always load, CSS handles desktop hiding) -->
     <link rel="stylesheet" href="/assets/css/mobile-sheets.min.css?v=<?= $cssVersion ?>">
+    <link rel="stylesheet" href="/assets/css/pwa-install-modal.css?v=<?= $cssVersion ?>">
 
     <!-- Social Interactions CSS -->
     <link rel="stylesheet" href="/assets/css/social-interactions.min.css?v=<?= $cssVersion ?>">

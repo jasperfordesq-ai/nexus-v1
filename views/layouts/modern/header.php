@@ -137,6 +137,7 @@ try {
     <!-- Mobile-only CSS -->
     <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/nexus-mobile.min.css?v=<?= $cssVersionTimestamp ?>" media="(max-width: 768px)">
     <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/mobile-sheets.min.css?v=<?= $cssVersionTimestamp ?>">
+    <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/pwa-install-modal.css?v=<?= $cssVersionTimestamp ?>">
 
     <!-- Social Interactions CSS -->
     <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/social-interactions.min.css?v=<?= $cssVersionTimestamp ?>">

@@ -42,6 +42,7 @@ module.exports = {
         'httpdocs/assets/css/strategic-plan.css',
         'httpdocs/assets/css/federation-realtime.css',
         'httpdocs/assets/css/compose-multidraw.css',
+        'httpdocs/assets/css/pwa-install-modal.css',
     ],
 
     // Output directory for purged CSS
