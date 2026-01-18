@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Admin Modal Test</title>
+    <script>
+        // Test if AdminModal is defined
+        window.addEventListener('DOMContentLoaded', function() {
+            console.log('=== ADMIN MODAL TEST ===');
+            console.log('AdminModal defined?', typeof AdminModal !== 'undefined');
+            console.log('AdminToast defined?', typeof AdminToast !== 'undefined');
+
+            if (typeof AdminModal !== 'undefined') {
+                console.log('AdminModal.open:', typeof AdminModal.open);
+                console.log('AdminModal.close:', typeof AdminModal.close);
+                console.log('AdminModal.confirm:', typeof AdminModal.confirm);
+            }
+
+            if (typeof AdminToast !== 'undefined') {
+                console.log('AdminToast.success:', typeof AdminToast.success);
+                console.log('AdminToast.error:', typeof AdminToast.error);
+            }
+        });
+    </script>
+</head>
+<body>
+    <h1>Check Browser Console</h1>
+    <p>Open developer tools and check console for AdminModal/AdminToast status</p>
+</body>
+</html>

@@ -1,0 +1,19 @@
+# Block directory listing
+Options -Indexes
+
+# Redirect directory access to home page (instead of 403 error)
+DirectoryIndex disabled
+RewriteEngine On
+RewriteCond %{REQUEST_FILENAME} -d
+RewriteRule ^.*$ / [R=301,L]
+
+# Allow direct file access for images, videos, and documents
+<FilesMatch "\.(jpg|jpeg|png|gif|webp|svg|pdf|doc|docx|mp4|mov|avi|apk)$">
+    Order Allow,Deny
+    Allow from all
+</FilesMatch>
+
+# Force download for certain file types
+<FilesMatch "\.(pdf|doc|docx|apk)$">
+    Header set Content-Disposition "attachment"
+</FilesMatch>

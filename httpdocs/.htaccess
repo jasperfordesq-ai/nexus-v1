@@ -1,0 +1,179 @@
+# Minimalist Router (Emergency Fix)
+RewriteEngine On
+RewriteBase /
+
+# PHP Settings for Video Uploads (100MB max)
+<IfModule mod_php.c>
+    php_value upload_max_filesize 100M
+    php_value post_max_size 105M
+    php_value max_execution_time 300
+    php_value max_input_time 300
+    php_value memory_limit 256M
+</IfModule>
+
+# APK MIME Type - Force Download
+<FilesMatch "\.apk$">
+    ForceType application/vnd.android.package-archive
+    Header set Content-Disposition "attachment"
+</FilesMatch>
+
+# Gzip Compression (EXCLUDE download.php to prevent binary corruption)
+<IfModule mod_deflate.c>
+    # Disable compression for download.php
+    SetEnvIfNoCase Request_URI "download\.php" no-gzip=1
+
+    AddOutputFilterByType DEFLATE text/html text/plain text/xml text/css text/javascript
+    AddOutputFilterByType DEFLATE application/javascript application/x-javascript application/json
+    AddOutputFilterByType DEFLATE application/xml application/xhtml+xml
+    AddOutputFilterByType DEFLATE image/svg+xml
+    AddOutputFilterByType DEFLATE application/manifest+json
+    AddOutputFilterByType DEFLATE application/font-woff application/font-woff2
+    AddOutputFilterByType DEFLATE font/woff font/woff2 font/opentype
+</IfModule>
+
+# ============================================
+# WEBP AUTO-SERVING (Lighthouse: Save 2,655 KiB)
+# ============================================
+# Serve WebP images automatically when:
+# 1. Browser supports WebP (Accept header contains image/webp)
+# 2. WebP version of the file exists (image.webp for image.jpg)
+<IfModule mod_rewrite.c>
+    RewriteCond %{HTTP_ACCEPT} image/webp
+    RewriteCond %{REQUEST_URI} ^(.+)\.(jpe?g|png)$ [NC]
+    RewriteCond %{DOCUMENT_ROOT}%1.webp -f
+    RewriteRule ^(.+)\.(jpe?g|png)$ $1.webp [T=image/webp,L]
+</IfModule>
+
+# Add Vary header for proper caching of WebP
+<IfModule mod_headers.c>
+    <FilesMatch "\.(jpe?g|png)$">
+        Header append Vary Accept
+    </FilesMatch>
+</IfModule>
+
+# ============================================
+# BROWSER CACHING (Lighthouse: Save 1,324 KiB)
+# ============================================
+<IfModule mod_expires.c>
+    ExpiresActive On
+    ExpiresDefault "access plus 1 month"
+
+    # HTML (no cache - always fresh)
+    ExpiresByType text/html "access plus 0 seconds"
+
+    # CSS and JavaScript (1 year - with cache busting via ?v=)
+    ExpiresByType text/css "access plus 1 year"
+    ExpiresByType text/javascript "access plus 1 year"
+    ExpiresByType application/javascript "access plus 1 year"
+    ExpiresByType application/x-javascript "access plus 1 year"
+
+    # Images (1 year)
+    ExpiresByType image/jpeg "access plus 1 year"
+    ExpiresByType image/jpg "access plus 1 year"
+    ExpiresByType image/png "access plus 1 year"
+    ExpiresByType image/gif "access plus 1 year"
+    ExpiresByType image/webp "access plus 1 year"
+    ExpiresByType image/svg+xml "access plus 1 year"
+    ExpiresByType image/x-icon "access plus 1 year"
+
+    # Fonts (1 year)
+    ExpiresByType font/ttf "access plus 1 year"
+    ExpiresByType font/otf "access plus 1 year"
+    ExpiresByType font/woff "access plus 1 year"
+    ExpiresByType font/woff2 "access plus 1 year"
+    ExpiresByType application/font-woff "access plus 1 year"
+    ExpiresByType application/font-woff2 "access plus 1 year"
+
+    # Manifests
+    ExpiresByType application/manifest+json "access plus 1 week"
+</IfModule>
+
+# Cache-Control Headers for Immutable Assets
+<IfModule mod_headers.c>
+    # CSS and JavaScript (immutable with cache busting)
+    <FilesMatch "\.(css|js)$">
+        Header set Cache-Control "public, max-age=31536000, immutable"
+    </FilesMatch>
+
+    # Images (immutable)
+    <FilesMatch "\.(jpg|jpeg|png|gif|webp|svg|ico)$">
+        Header set Cache-Control "public, max-age=31536000, immutable"
+    </FilesMatch>
+
+    # Fonts (immutable)
+    <FilesMatch "\.(ttf|otf|woff|woff2|eot)$">
+        Header set Cache-Control "public, max-age=31536000, immutable"
+    </FilesMatch>
+
+    # HTML/PHP (no cache)
+    <FilesMatch "\.(html|php)$">
+        Header set Cache-Control "no-cache, no-store, must-revalidate"
+        Header set Pragma "no-cache"
+        Header set Expires "0"
+    </FilesMatch>
+
+    # Security Headers
+    Header always set X-Content-Type-Options "nosniff"
+    Header always set X-Frame-Options "SAMEORIGIN"
+    Header always set X-XSS-Protection "1; mode=block"
+    Header always set Referrer-Policy "strict-origin-when-cross-origin"
+
+    # HSTS (only on HTTPS)
+    Header always set Strict-Transport-Security "max-age=31536000; includeSubDomains" env=HTTPS
+</IfModule>
+
+# 1. HTTPS and WWW Redirect - COMPLETELY DISABLED FOR CLOUDFLARE
+# Let Cloudflare handle ALL redirects (HTTPS + WWW removal)
+# This prevents redirect loops when behind Cloudflare proxy
+
+# DO NOT UNCOMMENT - These will conflict with Cloudflare:
+# RewriteCond %{HTTP_HOST} ^www\.(.+)$ [NC]
+# RewriteRule ^ https://%1%{REQUEST_URI} [R=301,L]
+# RewriteCond %{HTTPS} off
+# RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [R=301,L]
+
+# 2. Allow .well-known directory for ACME/SSL certificate validation
+RewriteCond %{REQUEST_URI} ^/\.well-known/ [NC]
+RewriteRule ^ - [L]
+
+# Security: Block Common CMS/Attack Patterns (Return 403 Forbidden)
+# WordPress
+RewriteCond %{REQUEST_URI} wp-login\.php [NC,OR]
+RewriteCond %{REQUEST_URI} wp-admin [NC,OR]
+RewriteCond %{REQUEST_URI} wp-includes [NC,OR]
+RewriteCond %{REQUEST_URI} wp-content [NC,OR]
+RewriteCond %{REQUEST_URI} xmlrpc\.php [NC,OR]
+# PHPMyAdmin
+RewriteCond %{REQUEST_URI} phpmyadmin [NC,OR]
+RewriteCond %{REQUEST_URI} pma [NC,OR]
+RewriteCond %{REQUEST_URI} myadmin [NC,OR]
+# Common Admin Panels
+RewriteCond %{REQUEST_URI} administrator [NC,OR]
+RewriteCond %{REQUEST_URI} admin\.php [NC,OR]
+# Config Files
+RewriteCond %{REQUEST_URI} \.env [NC,OR]
+RewriteCond %{REQUEST_URI} config\.php [NC,OR]
+RewriteCond %{REQUEST_URI} \.git [NC,OR]
+# SQL Injection Attempts
+RewriteCond %{QUERY_STRING} union.*select [NC,OR]
+RewriteCond %{QUERY_STRING} concat.*\( [NC,OR]
+# Shell/Backdoor
+RewriteCond %{REQUEST_URI} shell\.php [NC,OR]
+RewriteCond %{REQUEST_URI} c99\.php [NC,OR]
+RewriteCond %{REQUEST_URI} r57\.php [NC]
+RewriteRule ^.*$ - [F,L]
+
+# 3. Allow download.php and emergency files to execute directly
+RewriteCond %{REQUEST_URI} download\.php [NC,OR]
+RewriteCond %{REQUEST_URI} emergency- [NC]
+RewriteRule ^ - [L]
+
+# 3.5. API Routes - Route directly to index.php without redirects
+# CRITICAL: Must preserve POST method and prevent 301 redirects
+RewriteCond %{REQUEST_URI} ^/api/ [NC]
+RewriteRule ^ index.php [QSA,L]
+
+# 4. Route Everything else to index.php
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^ index.php [QSA,L]

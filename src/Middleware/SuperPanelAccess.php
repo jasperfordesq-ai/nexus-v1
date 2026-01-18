@@ -1,0 +1,339 @@
+<?php
+
+namespace Nexus\Middleware;
+
+use Nexus\Core\Database;
+use Nexus\Core\TenantContext;
+
+/**
+ * SuperPanelAccess Middleware
+ *
+ * Gatekeeper for the Super Admin Panel (Infrastructure Management)
+ *
+ * ACCESS RULES:
+ * - Master Tenant (id=1) + is_tenant_super_admin: GLOBAL access (sees all tenants)
+ * - Regional Tenant (allows_subtenants=1) + is_tenant_super_admin: SUBTREE access (sees own + descendants)
+ * - Standard Tenant (allows_subtenants=0): NO Super Panel access (uses Platform Admin only)
+ *
+ * KEY CONCEPT: Same panel, different data based on user's tenant position in hierarchy.
+ */
+class SuperPanelAccess
+{
+    private static ?array $currentAccess = null;
+
+    /**
+     * Main gatekeeper - call at start of any Super Admin route
+     */
+    public static function handle(): void
+    {
+        if (!self::check()) {
+            self::denyAccess();
+        }
+    }
+
+    /**
+     * Check if current user can access Super Admin Panel
+     */
+    public static function check(): bool
+    {
+        $access = self::getAccess();
+        return $access['granted'];
+    }
+
+    /**
+     * Get full access context for current user
+     * Cached per request for performance
+     */
+    public static function getAccess(): array
+    {
+        if (self::$currentAccess !== null) {
+            return self::$currentAccess;
+        }
+
+        // Default: no access
+        self::$currentAccess = [
+            'granted' => false,
+            'level' => 'none',
+            'user_id' => null,
+            'tenant_id' => null,
+            'tenant_name' => null,
+            'tenant_path' => null,
+            'tenant_depth' => null,
+            'scope' => 'none',
+            'can_create_tenants' => false,
+            'max_depth' => 0,
+            'reason' => 'Not authenticated'
+        ];
+
+        // Must be logged in
+        if (empty($_SESSION['user_id'])) {
+            return self::$currentAccess;
+        }
+
+        // Get user + their tenant info
+        $user = Database::query("
+            SELECT
+                u.id as user_id,
+                u.tenant_id,
+                u.role,
+                u.is_super_admin,
+                u.is_tenant_super_admin,
+                t.name as tenant_name,
+                t.path as tenant_path,
+                t.depth as tenant_depth,
+                t.allows_subtenants,
+                t.max_depth
+            FROM users u
+            JOIN tenants t ON u.tenant_id = t.id
+            WHERE u.id = ?
+        ", [$_SESSION['user_id']])->fetch(\PDO::FETCH_ASSOC);
+
+        if (!$user) {
+            self::$currentAccess['reason'] = 'User not found';
+            return self::$currentAccess;
+        }
+
+        // RULE 1: Must have tenant_super_admin flag OR is_super_admin (legacy)
+        if (!$user['is_tenant_super_admin'] && !$user['is_super_admin']) {
+            self::$currentAccess['reason'] = 'Not a Super Admin for any tenant';
+            return self::$currentAccess;
+        }
+
+        // RULE 2: Their tenant must allow sub-tenants OR be Master
+        $isMaster = ((int)$user['tenant_id'] === 1);
+
+        if (!$isMaster && !$user['allows_subtenants']) {
+            self::$currentAccess['reason'] = 'Tenant does not have sub-tenant capability';
+            return self::$currentAccess;
+        }
+
+        // ACCESS GRANTED - determine scope
+        self::$currentAccess = [
+            'granted' => true,
+            'level' => $isMaster ? 'master' : 'regional',
+            'user_id' => (int)$user['user_id'],
+            'tenant_id' => (int)$user['tenant_id'],
+            'tenant_name' => $user['tenant_name'],
+            'tenant_path' => $user['tenant_path'],
+            'tenant_depth' => (int)$user['tenant_depth'],
+            'scope' => $isMaster ? 'global' : 'subtree',
+            'can_create_tenants' => (bool)$user['allows_subtenants'],
+            'max_depth' => (int)$user['max_depth'],
+            'reason' => 'Access granted'
+        ];
+
+        return self::$currentAccess;
+    }
+
+    /**
+     * Check if current user can view/manage a specific tenant
+     */
+    public static function canAccessTenant(int $targetTenantId): bool
+    {
+        $access = self::getAccess();
+
+        if (!$access['granted']) {
+            return false;
+        }
+
+        // Master sees all
+        if ($access['level'] === 'master') {
+            return true;
+        }
+
+        // Own tenant is always accessible
+        if ($targetTenantId === $access['tenant_id']) {
+            return true;
+        }
+
+        // Regional: check if target is in their subtree
+        $target = Database::query(
+            "SELECT path FROM tenants WHERE id = ?",
+            [$targetTenantId]
+        )->fetch(\PDO::FETCH_ASSOC);
+
+        if (!$target) {
+            return false;
+        }
+
+        // Target's path must START WITH user's tenant path
+        // e.g., user path /2/, target path /2/5/ = YES
+        // e.g., user path /2/, target path /3/ = NO
+        return str_starts_with($target['path'], $access['tenant_path']);
+    }
+
+    /**
+     * Check if current user can MANAGE (edit/delete) a specific tenant
+     * (Cannot manage own tenant, only view it)
+     */
+    public static function canManageTenant(int $targetTenantId): bool
+    {
+        $access = self::getAccess();
+
+        if (!$access['granted']) {
+            return false;
+        }
+
+        // Cannot manage own tenant (only view) - unless god
+        if ($targetTenantId === $access['tenant_id']) {
+            // God can manage users in their own tenant
+            return !empty($_SESSION['is_god']);
+        }
+
+        // Master can manage everything except Master itself (unless god)
+        if ($access['level'] === 'master') {
+            if ($targetTenantId === 1) {
+                return !empty($_SESSION['is_god']); // God can manage Master tenant
+            }
+            return true;
+        }
+
+        // Regional: can only manage descendants
+        return self::canAccessTenant($targetTenantId);
+    }
+
+    /**
+     * Check if current user can CREATE a sub-tenant under given parent
+     */
+    public static function canCreateSubtenantUnder(int $parentTenantId): array
+    {
+        $access = self::getAccess();
+
+        if (!$access['granted']) {
+            return ['allowed' => false, 'reason' => 'No Super Admin access'];
+        }
+
+        // First, can they even see this parent tenant?
+        if (!self::canAccessTenant($parentTenantId)) {
+            return ['allowed' => false, 'reason' => 'Parent tenant not in your scope'];
+        }
+
+        // Get parent tenant info
+        $parent = Database::query("
+            SELECT id, name, path, depth, allows_subtenants, max_depth
+            FROM tenants WHERE id = ?
+        ", [$parentTenantId])->fetch(\PDO::FETCH_ASSOC);
+
+        if (!$parent) {
+            return ['allowed' => false, 'reason' => 'Parent tenant not found'];
+        }
+
+        // Parent must allow sub-tenants
+        if (!$parent['allows_subtenants']) {
+            return ['allowed' => false, 'reason' => "'{$parent['name']}' cannot have sub-tenants"];
+        }
+
+        // Check depth limit
+        $newDepth = (int)$parent['depth'] + 1;
+        $maxDepth = (int)$parent['max_depth'];
+        if ($maxDepth > 0 && $newDepth > $maxDepth) {
+            return ['allowed' => false, 'reason' => 'Maximum hierarchy depth reached'];
+        }
+
+        return [
+            'allowed' => true,
+            'reason' => 'OK',
+            'new_depth' => $newDepth,
+            'parent_path' => $parent['path']
+        ];
+    }
+
+    /**
+     * Get the scope SQL clause for tenant filtering
+     * Use this in all Super Admin queries
+     *
+     * @param string $tableAlias Table alias (e.g., 't' for 't.id')
+     * @return array ['sql' => string, 'params' => array]
+     */
+    public static function getScopeClause(string $tableAlias = 't'): array
+    {
+        $access = self::getAccess();
+
+        if (!$access['granted']) {
+            // Return impossible condition if no access
+            return [
+                'sql' => "1 = 0",
+                'params' => []
+            ];
+        }
+
+        // Master: no restriction
+        if ($access['level'] === 'master') {
+            return [
+                'sql' => "1 = 1",
+                'params' => []
+            ];
+        }
+
+        // Regional: restrict to subtree using path LIKE
+        return [
+            'sql' => "{$tableAlias}.path LIKE ?",
+            'params' => [$access['tenant_path'] . '%']
+        ];
+    }
+
+    /**
+     * Reset cached access (useful for testing)
+     */
+    public static function reset(): void
+    {
+        self::$currentAccess = null;
+    }
+
+    /**
+     * Deny access and exit
+     */
+    private static function denyAccess(): void
+    {
+        $access = self::getAccess();
+
+        http_response_code(403);
+
+        error_log(sprintf(
+            "SuperPanel ACCESS DENIED: user=%s, tenant=%s, reason=%s, ip=%s",
+            $_SESSION['user_id'] ?? 'none',
+            $_SESSION['tenant_id'] ?? 'none',
+            $access['reason'],
+            $_SERVER['REMOTE_ADDR'] ?? 'unknown'
+        ));
+
+        if (self::isApiRequest()) {
+            header('Content-Type: application/json');
+            echo json_encode([
+                'error' => 'Access Denied',
+                'message' => 'You do not have Super Admin Panel access',
+                'reason' => $access['reason'],
+                'code' => 'SUPER_PANEL_ACCESS_DENIED'
+            ]);
+        } else {
+            // Redirect to appropriate page or show error
+            if (file_exists(__DIR__ . '/../../views/errors/403-super-panel.php')) {
+                include __DIR__ . '/../../views/errors/403-super-panel.php';
+            } else {
+                echo '<!DOCTYPE html><html><head><title>Access Denied</title></head><body>';
+                echo '<h1>403 - Access Denied</h1>';
+                echo '<p>You do not have permission to access the Super Admin Panel.</p>';
+                echo '<p>Reason: ' . htmlspecialchars($access['reason']) . '</p>';
+                echo '<p><a href="' . TenantContext::getBasePath() . '/admin">Return to Platform Admin</a></p>';
+                echo '</body></html>';
+            }
+        }
+
+        exit;
+    }
+
+    /**
+     * Check if current request is an API request
+     */
+    private static function isApiRequest(): bool
+    {
+        $acceptHeader = $_SERVER['HTTP_ACCEPT'] ?? '';
+        $contentType = $_SERVER['CONTENT_TYPE'] ?? '';
+        $uri = $_SERVER['REQUEST_URI'] ?? '';
+
+        return str_contains($acceptHeader, 'application/json')
+            || str_contains($contentType, 'application/json')
+            || str_starts_with($uri, '/api/')
+            || str_starts_with($uri, '/super-admin/api/');
+    }
+}

@@ -1,0 +1,35 @@
+/* MOBILE RESET SYSTEM */
+/* Ensures mobile elements render properly */
+
+@media (max-width: 900px) {
+
+    /* 1. Body padding to prevent footer overlap */
+    body {
+        padding-bottom: 120px;
+        position: static;
+        overflow-y: auto;
+    }
+
+    /* 2. Sticky footer visibility */
+    .mobile-action-bar {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        width: 100%;
+        height: auto;
+        min-height: 80px;
+        display: flex;
+        z-index: var(--z-fixed, 1200);
+        background: #ffffff;
+        border-top: 1px solid rgba(0, 0, 0, 0.1);
+        transform: none;
+        visibility: visible;
+        opacity: 1;
+    }
+
+    [data-theme="dark"] .mobile-action-bar {
+        background: #1e293b;
+        border-top-color: rgba(255, 255, 255, 0.1);
+    }
+}

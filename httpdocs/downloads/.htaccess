@@ -1,0 +1,9 @@
+# Force correct MIME type and download for APK files
+<FilesMatch "\.apk$">
+    ForceType application/vnd.android.package-archive
+    Header set Content-Disposition "attachment"
+    Header set X-Content-Type-Options "nosniff"
+</FilesMatch>
+
+# Prevent directory listing
+Options -Indexes

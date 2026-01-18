@@ -1,0 +1,246 @@
+/* ========================================
+   PREMIUM GLASSMORPHISM DROPDOWN BUTTONS
+   Extracted from header.php for better maintainability
+   ======================================== */
+
+/* Premium Dropdown Trigger Styling */
+.premium-dropdown-trigger {
+    position: relative !important;
+    display: inline-block !important;
+    background: linear-gradient(135deg,
+        rgba(99, 102, 241, 0.15) 0%,
+        rgba(139, 92, 246, 0.12) 100%) !important;
+    backdrop-filter: blur(16px) saturate(160%) !important;
+    -webkit-backdrop-filter: blur(16px) saturate(160%) !important;
+    border: 1px solid rgba(139, 92, 246, 0.25) !important;
+    border-radius: 8px !important;
+    padding: 8px 16px !important;
+    font-weight: 600 !important;
+    color: rgba(255, 255, 255, 0.95) !important;
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.15) !important;
+    box-shadow:
+        0 2px 12px rgba(99, 102, 241, 0.12),
+        0 4px 20px rgba(139, 92, 246, 0.08),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1) !important;
+    transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    overflow: visible !important;
+}
+
+/* Shimmer overlay effect - fixed positioning */
+.premium-dropdown-trigger::before {
+    content: '' !important;
+    position: absolute !important;
+    top: 0 !important;
+    left: -100% !important;
+    width: 100% !important;
+    height: 100% !important;
+    background: linear-gradient(90deg,
+        transparent,
+        rgba(255, 255, 255, 0.12),
+        transparent) !important;
+    transition: left 0.6s ease !important;
+    pointer-events: none !important;
+    border-radius: 8px !important;
+}
+
+.premium-dropdown-trigger:hover::before {
+    left: 100% !important;
+}
+
+/* Hover state - enhanced glow */
+.premium-dropdown-trigger:hover {
+    background: linear-gradient(135deg,
+        rgba(99, 102, 241, 0.22) 0%,
+        rgba(139, 92, 246, 0.18) 100%) !important;
+    border-color: rgba(139, 92, 246, 0.35) !important;
+    box-shadow:
+        0 4px 20px rgba(99, 102, 241, 0.2),
+        0 6px 32px rgba(139, 92, 246, 0.15),
+        0 0 0 3px rgba(99, 102, 241, 0.08),
+        inset 0 1px 0 rgba(255, 255, 255, 0.15) !important;
+    transform: translateY(-1px) !important;
+    color: #fff !important;
+}
+
+/* Active/Open state */
+.premium-dropdown:hover .premium-dropdown-trigger,
+.premium-dropdown-trigger:active {
+    background: linear-gradient(135deg,
+        rgba(99, 102, 241, 0.28) 0%,
+        rgba(139, 92, 246, 0.24) 100%) !important;
+    border-color: rgba(139, 92, 246, 0.45) !important;
+    box-shadow:
+        0 6px 28px rgba(99, 102, 241, 0.25),
+        0 8px 40px rgba(139, 92, 246, 0.2),
+        0 0 0 4px rgba(99, 102, 241, 0.1),
+        inset 0 1px 0 rgba(255, 255, 255, 0.2) !important;
+    transform: translateY(-2px) scale(1.02) !important;
+}
+
+/* Premium Dropdown Container */
+.premium-dropdown {
+    position: relative !important;
+    display: inline-block !important;
+}
+
+/* Hide dropdown menu by default */
+.premium-dropdown .premium-dropdown-menu {
+    display: none !important;
+    position: absolute !important;
+    top: 100% !important;
+    left: 0 !important;
+}
+
+/* Show dropdown menu on hover */
+.premium-dropdown:hover .premium-dropdown-menu {
+    display: block !important;
+}
+
+/* Premium Dropdown Menu Styling */
+.premium-dropdown-menu {
+    background: linear-gradient(135deg,
+        rgba(30, 41, 59, 0.98) 0%,
+        rgba(51, 65, 85, 0.96) 100%) !important;
+    backdrop-filter: blur(28px) saturate(180%) !important;
+    -webkit-backdrop-filter: blur(28px) saturate(180%) !important;
+    border: 1px solid rgba(139, 92, 246, 0.2) !important;
+    border-radius: 12px !important;
+    box-shadow:
+        0 8px 32px rgba(0, 0, 0, 0.3),
+        0 12px 48px rgba(99, 102, 241, 0.15),
+        0 0 0 1px rgba(255, 255, 255, 0.05),
+        inset 0 1px 0 rgba(255, 255, 255, 0.08) !important;
+    margin-top: 12px !important;
+    padding: 8px 0 !important;
+    min-width: 200px !important;
+    z-index: 9999 !important;
+}
+
+/* Dropdown menu items */
+.premium-dropdown-menu a {
+    color: rgba(255, 255, 255, 0.9) !important;
+    padding: 10px 18px !important;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    position: relative !important;
+    overflow: hidden !important;
+}
+
+.premium-dropdown-menu a::before {
+    content: '' !important;
+    position: absolute !important;
+    left: 0 !important;
+    top: 0 !important;
+    height: 100% !important;
+    width: 3px !important;
+    background: linear-gradient(180deg,
+        rgba(99, 102, 241, 0.8),
+        rgba(139, 92, 246, 0.8)) !important;
+    transform: scaleY(0) !important;
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+.premium-dropdown-menu a:hover::before {
+    transform: scaleY(1) !important;
+}
+
+.premium-dropdown-menu a:hover {
+    background: linear-gradient(90deg,
+        rgba(99, 102, 241, 0.15) 0%,
+        rgba(139, 92, 246, 0.08) 100%) !important;
+    color: #fff !important;
+    padding-left: 24px !important;
+    text-shadow: 0 2px 8px rgba(99, 102, 241, 0.3) !important;
+}
+
+/* Arrow styling for dropdown triggers */
+.premium-dropdown-trigger .htb-arrow {
+    display: inline-block !important;
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    margin-left: 4px !important;
+}
+
+.premium-dropdown:hover .premium-dropdown-trigger .htb-arrow {
+    transform: rotate(180deg) !important;
+}
+
+/* Focus state for accessibility */
+.premium-dropdown-trigger:focus {
+    outline: none !important;
+    box-shadow:
+        0 6px 28px rgba(99, 102, 241, 0.25),
+        0 8px 40px rgba(139, 92, 246, 0.2),
+        0 0 0 4px rgba(99, 102, 241, 0.15),
+        inset 0 1px 0 rgba(255, 255, 255, 0.2) !important;
+}
+
+/* ========================================
+   LIGHT MODE PREMIUM DROPDOWN
+   ======================================== */
+[data-theme="light"] .premium-dropdown-trigger {
+    background: linear-gradient(135deg,
+        rgba(99, 102, 241, 0.1) 0%,
+        rgba(139, 92, 246, 0.08) 100%) !important;
+    border: 1px solid rgba(99, 102, 241, 0.2) !important;
+    color: #4f46e5 !important;
+    text-shadow: none !important;
+    box-shadow:
+        0 2px 12px rgba(99, 102, 241, 0.1),
+        inset 0 1px 0 rgba(255, 255, 255, 0.5) !important;
+}
+
+[data-theme="light"] .premium-dropdown-trigger:hover {
+    background: linear-gradient(135deg,
+        rgba(99, 102, 241, 0.15) 0%,
+        rgba(139, 92, 246, 0.12) 100%) !important;
+    border-color: rgba(99, 102, 241, 0.3) !important;
+    color: #4338ca !important;
+}
+
+[data-theme="light"] .premium-dropdown:hover .premium-dropdown-trigger,
+[data-theme="light"] .premium-dropdown-trigger:active {
+    background: linear-gradient(135deg,
+        rgba(99, 102, 241, 0.2) 0%,
+        rgba(139, 92, 246, 0.15) 100%) !important;
+    border-color: rgba(99, 102, 241, 0.4) !important;
+    color: #4338ca !important;
+}
+
+[data-theme="light"] .premium-dropdown-menu {
+    background: rgba(255, 255, 255, 0.98) !important;
+    border: 1px solid rgba(99, 102, 241, 0.15) !important;
+    box-shadow:
+        0 8px 32px rgba(0, 0, 0, 0.1),
+        0 12px 48px rgba(99, 102, 241, 0.08) !important;
+}
+
+[data-theme="light"] .premium-dropdown-menu a {
+    color: #374151 !important;
+}
+
+[data-theme="light"] .premium-dropdown-menu a:hover {
+    background: linear-gradient(90deg,
+        rgba(99, 102, 241, 0.1) 0%,
+        rgba(139, 92, 246, 0.05) 100%) !important;
+    color: #4f46e5 !important;
+    text-shadow: none !important;
+}
+
+/* ========================================
+   LIGHT MODE BRAND LOGO IN NAVBAR
+   ======================================== */
+[data-theme="light"] .nexus-navbar > a[href][style*="color: white"],
+[data-theme="light"] .nexus-navbar > a[href][style*="color:white"] {
+    color: #1f2937 !important;
+}
+
+/* Mobile adjustments */
+@media (max-width: 768px) {
+    .premium-dropdown-trigger {
+        padding: 6px 12px !important;
+        font-size: 14px !important;
+    }
+
+    .premium-dropdown-menu {
+        margin-top: 8px !important;
+    }
+}

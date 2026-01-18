@@ -1,0 +1,33 @@
+/**
+ * Scroll Fix - Proper Implementation
+ * Ensures page scrolling works correctly
+ */
+
+/* Allow scrolling on html */
+html {
+    overflow-y: scroll;
+    overflow-x: hidden;
+    height: auto;
+}
+
+/* Body scroll behavior */
+body {
+    overflow-y: visible;
+    overflow-x: hidden;
+    position: relative;
+    height: auto;
+    max-height: none;
+}
+
+/* Reset overflow when modals/drawers are open - handled by JS */
+body.drawer-open,
+body.modal-open,
+body.fds-sheet-open {
+    overflow: hidden;
+}
+
+/* Sidebar positioning */
+.home-sidebar-column {
+    position: relative;
+    top: auto;
+}

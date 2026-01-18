@@ -1,0 +1,17 @@
+<?php
+// Federated Event Detail - View Dispatcher
+$layout = layout();
+$modernView = __DIR__ . '/../modern/federation/event-detail.php';
+
+if (($layout === 'modern' || $layout === 'high-contrast') && file_exists($modernView)) {
+    require $modernView;
+    return;
+}
+
+if (file_exists($modernView)) {
+    require $modernView;
+    return;
+}
+
+http_response_code(500);
+echo "Federated event detail view not found";

@@ -1,0 +1,96 @@
+# Dependencies
+/node_modules
+/vendor
+
+# Environment files
+.env
+.env.local
+.env.*.local
+.env.testing
+
+# Build outputs
+/public/build
+/public/hot
+/public/storage
+
+# Caches
+/cache
+/.phpunit.cache
+/.vscode
+.snapshots
+
+# Logs
+/logs
+*.log
+
+# Temporary files
+*.tmp
+*.temp
+nul
+debug_output.html
+
+# IDE
+.idea
+.vscode
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Uploaded files (if not needed in git)
+/uploads
+
+# Database
+*.sqlite
+*.sqlite-journal
+database.sqlite
+
+# Compiled assets
+/public/css
+/public/js
+/public/mix-manifest.json
+
+# Test files in root (should be in tests/)
+test-*.php
+test_*.php
+diagnose-*.php
+debug-*.php
+verify-*.php
+
+# Documentation in root (should be in docs/)
+/*.md
+
+# SQL scripts in root (should be in scripts/sql/)
+/*.sql
+
+# Archives
+*.zip
+*.tar
+*.tar.gz
+*.rar
+
+# Firebase credentials
+firebase-service-account.json
+
+# Backup files
+*.bak
+*.backup
+/backups/
+
+# Export files
+/exports/
+
+# PDF files (large binaries)
+*.pdf
+
+# AI agent/assistant local config
+.agent/
+.claude/settings.local.json
+
+# Temp files with unusual names
+C?temp*
+*tempcivicone_dirs.txt
+*tempmodern_dirs.txt

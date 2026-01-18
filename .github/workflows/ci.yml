@@ -1,0 +1,374 @@
+name: CI Pipeline
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+
+env:
+  PHP_VERSION: '8.1'
+  NODE_VERSION: '18'
+
+jobs:
+  # ─────────────────────────────────────────────────────────────────
+  # Stage 1: Code Quality
+  # ─────────────────────────────────────────────────────────────────
+  lint:
+    name: Code Quality
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ env.PHP_VERSION }}
+          tools: phpcs, phpstan
+          extensions: pdo_mysql, mbstring, xml, zip
+
+      - name: Cache Composer Dependencies
+        uses: actions/cache@v3
+        with:
+          path: vendor
+          key: composer-${{ hashFiles('composer.lock') }}
+          restore-keys: composer-
+
+      - name: Install Dependencies
+        run: composer install --no-interaction --prefer-dist
+
+      - name: PHP Syntax Check
+        run: find src -name "*.php" -exec php -l {} \; | grep -v "No syntax errors"
+
+      - name: PHP CodeSniffer (PSR-12)
+        run: vendor/bin/phpcs --standard=PSR12 --extensions=php src/ --ignore=*/vendor/* || true
+
+      - name: PHPStan Static Analysis
+        run: vendor/bin/phpstan analyse src --level=5 --memory-limit=512M || true
+
+  # ─────────────────────────────────────────────────────────────────
+  # Stage 2: Security Scanning
+  # ─────────────────────────────────────────────────────────────────
+  security:
+    name: Security Scan
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ env.PHP_VERSION }}
+
+      - name: Install Dependencies
+        run: composer install --no-interaction --prefer-dist
+
+      - name: Check for Secrets in Code
+        uses: trufflesecurity/trufflehog@main
+        with:
+          path: ./
+          extra_args: --only-verified
+        continue-on-error: true
+
+      - name: Composer Dependency Audit
+        run: composer audit || true
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: NPM Audit
+        run: npm audit --production || true
+
+  # ─────────────────────────────────────────────────────────────────
+  # Stage 3: Unit Tests
+  # ─────────────────────────────────────────────────────────────────
+  test-unit:
+    name: Unit Tests
+    runs-on: ubuntu-latest
+    needs: [lint]
+
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: testing
+          MYSQL_DATABASE: nexus_test
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=3
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ env.PHP_VERSION }}
+          extensions: pdo_mysql, mbstring, xml, zip
+          coverage: xdebug
+
+      - name: Cache Composer Dependencies
+        uses: actions/cache@v3
+        with:
+          path: vendor
+          key: composer-${{ hashFiles('composer.lock') }}
+
+      - name: Install Dependencies
+        run: composer install --no-interaction --prefer-dist
+
+      - name: Create Test Environment
+        run: |
+          cp .env.example .env.testing || true
+          echo "DB_HOST=127.0.0.1" >> .env.testing
+          echo "DB_DATABASE=nexus_test" >> .env.testing
+          echo "DB_USERNAME=root" >> .env.testing
+          echo "DB_PASSWORD=testing" >> .env.testing
+
+      - name: Run Unit Tests
+        run: vendor/bin/phpunit --testsuite=Unit --coverage-clover=coverage.xml
+        env:
+          DB_HOST: 127.0.0.1
+          DB_DATABASE: nexus_test
+          DB_USERNAME: root
+          DB_PASSWORD: testing
+
+      - name: Upload Coverage Report
+        uses: codecov/codecov-action@v3
+        with:
+          files: ./coverage.xml
+          fail_ci_if_error: false
+
+  # ─────────────────────────────────────────────────────────────────
+  # Stage 4: Integration Tests
+  # ─────────────────────────────────────────────────────────────────
+  test-integration:
+    name: Integration Tests
+    runs-on: ubuntu-latest
+    needs: [test-unit]
+
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: testing
+          MYSQL_DATABASE: nexus_test
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=3
+
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd="redis-cli ping"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ env.PHP_VERSION }}
+          extensions: pdo_mysql, mbstring, xml, zip, redis
+
+      - name: Install Dependencies
+        run: composer install --no-interaction
+
+      - name: Run Integration Tests
+        run: vendor/bin/phpunit --testsuite=Integration
+        env:
+          DB_HOST: 127.0.0.1
+          DB_DATABASE: nexus_test
+          DB_USERNAME: root
+          DB_PASSWORD: testing
+          REDIS_HOST: 127.0.0.1
+
+  # ─────────────────────────────────────────────────────────────────
+  # Stage 5: Build Assets
+  # ─────────────────────────────────────────────────────────────────
+  build:
+    name: Build Assets
+    runs-on: ubuntu-latest
+    needs: [lint]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install Node Dependencies
+        run: npm ci || npm install
+
+      - name: Build Production Assets
+        run: npm run build || echo "No build script defined"
+
+      - name: Upload Build Artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: build-assets
+          path: httpdocs/assets/dist/
+          if-no-files-found: ignore
+
+  # ─────────────────────────────────────────────────────────────────
+  # Stage 6: Build Docker Image
+  # ─────────────────────────────────────────────────────────────────
+  docker-build:
+    name: Build Docker Image
+    runs-on: ubuntu-latest
+    needs: [test-unit, security, build]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login to Container Registry
+        if: github.event_name != 'pull_request'
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ghcr.io/${{ github.repository }}
+          tags: |
+            type=ref,event=branch
+            type=sha,prefix=
+            type=raw,value=latest,enable=${{ github.ref == 'refs/heads/main' }}
+
+      - name: Build and Push
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./docker/Dockerfile
+          push: ${{ github.event_name != 'pull_request' }}
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  # ─────────────────────────────────────────────────────────────────
+  # Stage 7: Deploy to Staging
+  # ─────────────────────────────────────────────────────────────────
+  deploy-staging:
+    name: Deploy to Staging
+    runs-on: ubuntu-latest
+    needs: [test-unit, test-integration, docker-build]
+    if: github.ref == 'refs/heads/develop' && github.event_name == 'push'
+    environment:
+      name: staging
+      url: https://staging.nexus.example.com
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Deploy to Staging Server
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.STAGING_HOST }}
+          username: ${{ secrets.STAGING_USER }}
+          key: ${{ secrets.STAGING_SSH_KEY }}
+          script: |
+            cd /var/www/staging
+            git pull origin develop
+            composer install --no-dev --optimize-autoloader
+            php scripts/migrations/run_all.php
+            php scripts/cache/clear.php || true
+
+      - name: Run Smoke Tests
+        run: |
+          sleep 10
+          curl -f ${{ vars.STAGING_URL }}/health || echo "Health check endpoint not available"
+
+      - name: Notify Slack
+        if: always()
+        uses: slackapi/slack-github-action@v1
+        with:
+          payload: |
+            {
+              "text": "Staging deployment ${{ job.status }}: ${{ github.sha }}"
+            }
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK }}
+        continue-on-error: true
+
+  # ─────────────────────────────────────────────────────────────────
+  # Stage 8: Deploy to Production
+  # ─────────────────────────────────────────────────────────────────
+  deploy-production:
+    name: Deploy to Production
+    runs-on: ubuntu-latest
+    needs: [test-unit, test-integration, docker-build]
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    environment:
+      name: production
+      url: https://nexus.example.com
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Create Release Tag
+        id: tag
+        run: |
+          VERSION=$(date +%Y%m%d%H%M%S)
+          echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
+          git tag "release-$VERSION"
+          git push origin "release-$VERSION" || true
+
+      - name: Deploy to Production Server
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.PROD_HOST }}
+          username: ${{ secrets.PROD_USER }}
+          key: ${{ secrets.PROD_SSH_KEY }}
+          script: |
+            cd /var/www/production
+
+            # Backup current version
+            cp -r current "backup-$(date +%Y%m%d%H%M%S)" || true
+
+            # Deploy new version
+            git fetch origin
+            git checkout main
+            git pull origin main
+            composer install --no-dev --optimize-autoloader
+            php scripts/migrations/run_all.php
+            php scripts/cache/clear.php || true
+
+            # Health check
+            curl -f http://localhost/health || echo "Health check failed"
+
+      - name: Notify Team
+        if: always()
+        uses: slackapi/slack-github-action@v1
+        with:
+          payload: |
+            {
+              "text": "Production deployment ${{ job.status }}: release-${{ steps.tag.outputs.VERSION }}"
+            }
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK }}
+        continue-on-error: true

@@ -1,0 +1,68 @@
+/* Branding / Skin System
+   Provides theme customization via CSS variables */
+
+/* Default (Government Blue) */
+:root {
+    --skin-primary: #002d72;
+    --skin-secondary: #007b5f;
+    --skin-accent: #facc15;
+    --skin-text-on-primary: #ffffff;
+}
+
+/* County Cork (Red & White) */
+body.skin-cork {
+    --skin-primary: #b91c1c;
+    --skin-secondary: #000000;
+    --skin-accent: #ffffff;
+    --skin-text-on-primary: #ffffff;
+}
+
+/* County Clare (Blue & Yellow) */
+body.skin-clare {
+    --skin-primary: #1e3a8a;
+    --skin-secondary: #fbbf24;
+    --skin-accent: #3b82f6;
+    --skin-text-on-primary: #ffffff;
+}
+
+/* County Galway (Maroon & White) */
+body.skin-galway {
+    --skin-primary: #831843;
+    --skin-secondary: #ffffff;
+    --skin-accent: #be185d;
+    --skin-text-on-primary: #ffffff;
+}
+
+/* Connect Torfaen (Purple & Clean) */
+body.skin-torfaen {
+    --skin-primary: #96206d;
+    --skin-secondary: #4a4a4a;
+    --skin-accent: #b44b8e;
+    --skin-text-on-primary: #ffffff;
+    --civic-brand: #96206d;
+    --civic-brand-hover: #7a1a59;
+}
+
+/* Torfaen Skin Overrides */
+body.skin-torfaen .civic-card,
+body.skin-torfaen .btn-primary,
+body.skin-torfaen .civic-btn,
+body.skin-torfaen .civic-input {
+    border-radius: 5px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+/* Component Appliers - Use increased specificity instead of !important */
+html body header {
+    background-color: #ffffff;
+}
+
+html body .btn-primary {
+    background-color: var(--skin-primary);
+    border-color: var(--skin-primary);
+    color: var(--skin-text-on-primary);
+}
+
+html body .hero-section {
+    border-bottom: 4px solid var(--skin-secondary);
+}

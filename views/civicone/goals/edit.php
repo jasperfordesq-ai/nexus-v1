@@ -1,0 +1,628 @@
+<?php
+// Goal Edit View - Modern Holographic Glassmorphism Edition
+require __DIR__ . '/../../layouts/civicone/header.php';
+?>
+
+<!-- Offline Banner -->
+<div class="holo-offline-banner" id="offlineBanner">
+    <i class="fa-solid fa-wifi-slash"></i>
+    <span>No internet connection</span>
+</div>
+
+<style>
+/* ============================================
+   GOALS EDIT - Holographic Glassmorphism
+   Pink/Rose Theme (#db2777)
+   ============================================ */
+
+.holo-goal-page {
+    min-height: 100vh;
+    padding: 180px 20px 60px;
+    position: relative;
+    overflow: hidden;
+    background: linear-gradient(135deg, #fdf2f8 0%, #fce7f3 50%, #fbcfe8 100%);
+}
+
+[data-theme="dark"] .holo-goal-page {
+    background: linear-gradient(135deg, #1a0a14 0%, #2d1024 50%, #1f0d18 100%);
+}
+
+/* Floating Orbs */
+.holo-orb {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(60px);
+    opacity: 0.5;
+    pointer-events: none;
+    animation: floatOrb 20s ease-in-out infinite;
+}
+
+.holo-orb-1 {
+    width: 400px;
+    height: 400px;
+    background: radial-gradient(circle, rgba(219, 39, 119, 0.4) 0%, transparent 70%);
+    top: -100px;
+    left: -100px;
+    animation-delay: 0s;
+}
+
+.holo-orb-2 {
+    width: 350px;
+    height: 350px;
+    background: radial-gradient(circle, rgba(244, 114, 182, 0.35) 0%, transparent 70%);
+    top: 40%;
+    right: -80px;
+    animation-delay: -7s;
+}
+
+.holo-orb-3 {
+    width: 300px;
+    height: 300px;
+    background: radial-gradient(circle, rgba(168, 85, 247, 0.3) 0%, transparent 70%);
+    bottom: -50px;
+    left: 30%;
+    animation-delay: -14s;
+}
+
+[data-theme="dark"] .holo-orb-1 {
+    background: radial-gradient(circle, rgba(219, 39, 119, 0.3) 0%, transparent 70%);
+}
+
+[data-theme="dark"] .holo-orb-2 {
+    background: radial-gradient(circle, rgba(244, 114, 182, 0.25) 0%, transparent 70%);
+}
+
+[data-theme="dark"] .holo-orb-3 {
+    background: radial-gradient(circle, rgba(168, 85, 247, 0.2) 0%, transparent 70%);
+}
+
+@keyframes floatOrb {
+    0%, 100% { transform: translate(0, 0) scale(1); }
+    33% { transform: translate(30px, -30px) scale(1.05); }
+    66% { transform: translate(-20px, 20px) scale(0.95); }
+}
+
+/* Glass Card */
+.holo-glass-card {
+    position: relative;
+    max-width: 600px;
+    margin: 0 auto;
+    background: rgba(255, 255, 255, 0.7);
+    backdrop-filter: blur(40px) saturate(180%);
+    -webkit-backdrop-filter: blur(40px) saturate(180%);
+    border-radius: 28px;
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    padding: 48px;
+    box-shadow:
+        0 25px 50px -12px rgba(0, 0, 0, 0.1),
+        0 0 0 1px rgba(255, 255, 255, 0.3) inset;
+    overflow: hidden;
+}
+
+[data-theme="dark"] .holo-glass-card {
+    background: rgba(24, 24, 27, 0.6);
+    border-color: rgba(255, 255, 255, 0.1);
+    box-shadow:
+        0 25px 50px -12px rgba(0, 0, 0, 0.4),
+        0 0 0 1px rgba(255, 255, 255, 0.05) inset;
+}
+
+/* Shimmer Effect */
+.holo-glass-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(255, 255, 255, 0.1),
+        transparent
+    );
+    animation: shimmer 8s ease-in-out infinite;
+    pointer-events: none;
+}
+
+@keyframes shimmer {
+    0%, 100% { left: -100%; }
+    50% { left: 100%; }
+}
+
+/* Iridescent Top Edge */
+.holo-glass-card::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(90deg,
+        transparent,
+        rgba(219, 39, 119, 0.6),
+        rgba(168, 85, 247, 0.6),
+        rgba(244, 114, 182, 0.6),
+        transparent
+    );
+}
+
+/* Header */
+.holo-header {
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+.holo-header-icon {
+    width: 72px;
+    height: 72px;
+    margin: 0 auto 20px;
+    background: linear-gradient(135deg, #db2777 0%, #be185d 100%);
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.8rem;
+    color: white;
+    box-shadow: 0 10px 30px rgba(219, 39, 119, 0.3);
+}
+
+.holo-title {
+    font-size: 2rem;
+    font-weight: 800;
+    margin: 0 0 10px;
+    background: linear-gradient(135deg, #be185d 0%, #db2777 50%, #ec4899 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    letter-spacing: -0.02em;
+}
+
+[data-theme="dark"] .holo-title {
+    background: linear-gradient(135deg, #f472b6 0%, #ec4899 50%, #ffffff 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+}
+
+.holo-subtitle {
+    font-size: 1rem;
+    color: #64748b;
+    margin: 0;
+}
+
+[data-theme="dark"] .holo-subtitle {
+    color: rgba(255, 255, 255, 0.6);
+}
+
+/* Form Styles */
+.holo-form-group {
+    margin-bottom: 24px;
+}
+
+.holo-label {
+    display: block;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #334155;
+    margin-bottom: 10px;
+    padding-left: 4px;
+}
+
+[data-theme="dark"] .holo-label {
+    color: rgba(255, 255, 255, 0.9);
+}
+
+.holo-input {
+    width: 100%;
+    padding: 16px 20px;
+    border-radius: 16px;
+    border: 2px solid rgba(219, 39, 119, 0.15);
+    background: rgba(255, 255, 255, 0.6);
+    color: #1e293b;
+    font-size: 1rem;
+    font-family: inherit;
+    transition: all 0.3s ease;
+    box-sizing: border-box;
+}
+
+.holo-input:focus {
+    outline: none;
+    border-color: #db2777;
+    background: rgba(255, 255, 255, 0.9);
+    box-shadow: 0 0 0 4px rgba(219, 39, 119, 0.1);
+}
+
+.holo-input::placeholder {
+    color: #94a3b8;
+}
+
+[data-theme="dark"] .holo-input {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(255, 255, 255, 0.1);
+    color: #f8fafc;
+}
+
+[data-theme="dark"] .holo-input:focus {
+    background: rgba(255, 255, 255, 0.12);
+    border-color: #f472b6;
+    box-shadow: 0 0 0 4px rgba(244, 114, 182, 0.15);
+}
+
+[data-theme="dark"] .holo-input::placeholder {
+    color: rgba(255, 255, 255, 0.4);
+}
+
+textarea.holo-input {
+    resize: vertical;
+    min-height: 120px;
+    line-height: 1.6;
+}
+
+/* Date Input Fix */
+.holo-input[type="date"] {
+    color-scheme: light;
+}
+
+[data-theme="dark"] .holo-input[type="date"] {
+    color-scheme: dark;
+}
+
+/* Goal Buddy Card */
+.holo-buddy-card {
+    background: linear-gradient(135deg, rgba(34, 197, 94, 0.1) 0%, rgba(16, 185, 129, 0.1) 100%);
+    border: 2px solid rgba(34, 197, 94, 0.25);
+    border-radius: 18px;
+    padding: 20px 24px;
+    margin-bottom: 30px;
+    transition: all 0.3s ease;
+}
+
+.holo-buddy-card:hover {
+    border-color: rgba(34, 197, 94, 0.4);
+}
+
+[data-theme="dark"] .holo-buddy-card {
+    background: linear-gradient(135deg, rgba(34, 197, 94, 0.12) 0%, rgba(16, 185, 129, 0.08) 100%);
+    border-color: rgba(34, 197, 94, 0.2);
+}
+
+.holo-buddy-label {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    cursor: pointer;
+    margin: 0;
+}
+
+.holo-checkbox {
+    width: 24px;
+    height: 24px;
+    margin-top: 2px;
+    accent-color: #22c55e;
+    cursor: pointer;
+    flex-shrink: 0;
+}
+
+.holo-buddy-content {
+    flex: 1;
+}
+
+.holo-buddy-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: #15803d;
+    margin-bottom: 6px;
+}
+
+.holo-buddy-title i {
+    font-size: 1rem;
+}
+
+[data-theme="dark"] .holo-buddy-title {
+    color: #86efac;
+}
+
+.holo-buddy-desc {
+    font-size: 0.9rem;
+    color: #166534;
+    line-height: 1.5;
+}
+
+[data-theme="dark"] .holo-buddy-desc {
+    color: rgba(134, 239, 172, 0.8);
+}
+
+/* Buttons */
+.holo-actions {
+    display: flex;
+    gap: 12px;
+    margin-top: 32px;
+}
+
+.holo-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 16px 28px;
+    border-radius: 50px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    border: none;
+    font-family: inherit;
+    min-height: 48px;
+}
+
+.holo-btn-primary {
+    flex: 2;
+    background: linear-gradient(135deg, #db2777 0%, #be185d 100%);
+    color: white;
+    box-shadow: 0 8px 24px rgba(219, 39, 119, 0.35);
+}
+
+.holo-btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 32px rgba(219, 39, 119, 0.45);
+}
+
+.holo-btn-primary:active {
+    transform: scale(0.98);
+}
+
+.holo-btn-secondary {
+    flex: 1;
+    background: rgba(255, 255, 255, 0.5);
+    color: #64748b;
+    border: 2px solid rgba(100, 116, 139, 0.2);
+}
+
+.holo-btn-secondary:hover {
+    background: rgba(255, 255, 255, 0.8);
+    color: #475569;
+}
+
+[data-theme="dark"] .holo-btn-secondary {
+    background: rgba(255, 255, 255, 0.08);
+    color: rgba(255, 255, 255, 0.6);
+    border-color: rgba(255, 255, 255, 0.1);
+}
+
+[data-theme="dark"] .holo-btn-secondary:hover {
+    background: rgba(255, 255, 255, 0.12);
+    color: rgba(255, 255, 255, 0.8);
+}
+
+/* Danger Zone */
+.holo-danger-zone {
+    margin-top: 40px;
+    padding-top: 30px;
+    border-top: 2px solid rgba(239, 68, 68, 0.15);
+}
+
+[data-theme="dark"] .holo-danger-zone {
+    border-top-color: rgba(239, 68, 68, 0.2);
+}
+
+.holo-danger-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #dc2626;
+    margin-bottom: 16px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+[data-theme="dark"] .holo-danger-label {
+    color: #f87171;
+}
+
+.holo-btn-danger {
+    width: 100%;
+    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+    color: white;
+    box-shadow: 0 6px 20px rgba(239, 68, 68, 0.3);
+}
+
+.holo-btn-danger:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 28px rgba(239, 68, 68, 0.4);
+}
+
+.holo-btn-danger:active {
+    transform: scale(0.98);
+}
+
+/* Offline Banner */
+.holo-offline-banner {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 10001;
+    padding: 14px 20px;
+    background: linear-gradient(135deg, #ef4444, #dc2626);
+    color: white;
+    font-size: 0.95rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    transform: translateY(-100%);
+    transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.holo-offline-banner.visible {
+    transform: translateY(0);
+}
+
+/* Mobile Responsive */
+@media (max-width: 900px) {
+    .holo-goal-page {
+        padding: 20px 16px 120px;
+    }
+
+    .holo-glass-card {
+        padding: 32px 24px;
+        border-radius: 24px;
+    }
+
+    .holo-title {
+        font-size: 1.7rem;
+    }
+
+    .holo-header-icon {
+        width: 64px;
+        height: 64px;
+        font-size: 1.5rem;
+    }
+
+    .holo-actions {
+        flex-direction: column;
+    }
+
+    .holo-btn-primary,
+    .holo-btn-secondary {
+        flex: none;
+        width: 100%;
+    }
+}
+</style>
+
+<div class="holo-goal-page">
+    <!-- Floating Orbs -->
+    <div class="holo-orb holo-orb-1"></div>
+    <div class="holo-orb holo-orb-2"></div>
+    <div class="holo-orb holo-orb-3"></div>
+
+    <div class="holo-glass-card">
+        <div class="holo-header">
+            <div class="holo-header-icon">
+                <i class="fa-solid fa-pen-to-square"></i>
+            </div>
+            <h1 class="holo-title">Edit Goal</h1>
+            <p class="holo-subtitle">Update your commitment.</p>
+        </div>
+
+        <form action="<?= \Nexus\Core\TenantContext::getBasePath() ?>/goals/<?= $goal['id'] ?>/update" method="POST">
+            <?= \Nexus\Core\Csrf::input() ?>
+
+            <!-- Title -->
+            <div class="holo-form-group">
+                <label class="holo-label">Goal Title</label>
+                <input type="text" name="title" class="holo-input" required
+                       value="<?= htmlspecialchars($goal['title']) ?>">
+            </div>
+
+            <!-- Description -->
+            <div class="holo-form-group">
+                <label class="holo-label">Description</label>
+                <textarea name="description" class="holo-input" rows="4" required><?= htmlspecialchars($goal['description']) ?></textarea>
+            </div>
+
+            <!-- Target Date -->
+            <div class="holo-form-group">
+                <label class="holo-label">Target Date</label>
+                <input type="date" name="deadline" class="holo-input" value="<?= $goal['deadline'] ?>">
+            </div>
+
+            <!-- Goal Buddy Card -->
+            <div class="holo-buddy-card">
+                <label class="holo-buddy-label">
+                    <input type="checkbox" name="is_public" value="1" class="holo-checkbox" <?= $goal['is_public'] ? 'checked' : '' ?>>
+                    <div class="holo-buddy-content">
+                        <div class="holo-buddy-title">
+                            <i class="fa-solid fa-user-group"></i>
+                            Public Goal
+                        </div>
+                        <div class="holo-buddy-desc">
+                            Allow others to see this goal and offer to be your Goal Buddy.
+                        </div>
+                    </div>
+                </label>
+            </div>
+
+            <div class="holo-actions">
+                <button type="submit" class="holo-btn holo-btn-primary">
+                    <i class="fa-solid fa-check"></i>
+                    Save Changes
+                </button>
+                <a href="<?= \Nexus\Core\TenantContext::getBasePath() ?>/goals/<?= $goal['id'] ?>" class="holo-btn holo-btn-secondary">
+                    Cancel
+                </a>
+            </div>
+        </form>
+
+        <!-- Danger Zone -->
+        <div class="holo-danger-zone">
+            <div class="holo-danger-label">
+                <i class="fa-solid fa-triangle-exclamation"></i>
+                Danger Zone
+            </div>
+            <form action="<?= \Nexus\Core\TenantContext::getBasePath() ?>/goals/<?= $goal['id'] ?>/delete" method="POST"
+                  onsubmit="return confirm('Are you sure you want to delete this goal? This action cannot be undone.');">
+                <?= \Nexus\Core\Csrf::input() ?>
+                <button type="submit" class="holo-btn holo-btn-danger">
+                    <i class="fa-solid fa-trash-can"></i>
+                    Delete Goal
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+// Offline Detection
+(function() {
+    const banner = document.getElementById('offlineBanner');
+    if (!banner) return;
+
+    function handleOffline() {
+        banner.classList.add('visible');
+        if (navigator.vibrate) navigator.vibrate(100);
+    }
+
+    function handleOnline() {
+        banner.classList.remove('visible');
+    }
+
+    window.addEventListener('online', handleOnline);
+    window.addEventListener('offline', handleOffline);
+
+    if (!navigator.onLine) handleOffline();
+})();
+
+// Form Offline Protection
+document.querySelectorAll('form').forEach(form => {
+    form.addEventListener('submit', function(e) {
+        if (!navigator.onLine) {
+            e.preventDefault();
+            alert('You are offline. Please connect to the internet to submit.');
+        }
+    });
+});
+
+// Button Touch Feedback
+document.querySelectorAll('.holo-btn').forEach(btn => {
+    btn.addEventListener('pointerdown', function() {
+        this.style.transform = 'scale(0.97)';
+    });
+    btn.addEventListener('pointerup', function() {
+        this.style.transform = '';
+    });
+    btn.addEventListener('pointerleave', function() {
+        this.style.transform = '';
+    });
+});
+</script>
+
+<?php require __DIR__ . '/../../layouts/civicone/footer.php'; ?>

@@ -1,0 +1,239 @@
+/**
+ * Mobile Tooltips System
+ * Improves UX for icon-only buttons on mobile
+ * Lightweight, accessible implementation
+ */
+
+/* ============================================
+   TOOLTIP BASE
+   ============================================ */
+
+[data-tooltip] {
+    position: relative;
+}
+
+[data-tooltip]::before,
+[data-tooltip]::after {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity var(--transition-fast), transform var(--transition-fast);
+    z-index: var(--z-tooltip);
+}
+
+/* Tooltip bubble */
+[data-tooltip]::before {
+    content: attr(data-tooltip);
+    bottom: calc(100% + 8px);
+    left: 50%;
+    transform: translateX(-50%) translateY(4px);
+    padding: var(--space-2) var(--space-3);
+    background: rgba(0, 0, 0, 0.9);
+    color: white;
+    font-size: var(--font-size-xs);
+    font-weight: var(--font-weight-medium);
+    border-radius: var(--radius-md);
+    white-space: nowrap;
+    backdrop-filter: blur(8px);
+    box-shadow: var(--shadow-lg);
+}
+
+[data-theme="dark"] [data-tooltip]::before {
+    background: rgba(255, 255, 255, 0.95);
+    color: var(--color-gray-900);
+}
+
+/* Tooltip arrow */
+[data-tooltip]::after {
+    content: '';
+    bottom: calc(100% + 2px);
+    left: 50%;
+    transform: translateX(-50%) translateY(4px);
+    border: 6px solid transparent;
+    border-top-color: rgba(0, 0, 0, 0.9);
+}
+
+[data-theme="dark"] [data-tooltip]::after {
+    border-top-color: rgba(255, 255, 255, 0.95);
+}
+
+/* Show on hover (desktop) and long-press (mobile) */
+[data-tooltip]:hover::before,
+[data-tooltip]:hover::after,
+[data-tooltip].show-tooltip::before,
+[data-tooltip].show-tooltip::after {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+}
+
+/* ============================================
+   MOBILE-SPECIFIC IMPROVEMENTS
+   ============================================ */
+
+@media (max-width: 768px) {
+    /* Show tooltip on tap for mobile */
+    [data-tooltip].tapped::before,
+    [data-tooltip].tapped::after {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0);
+    }
+
+    /* Auto-hide after 2 seconds */
+    [data-tooltip].tapped {
+        animation: tooltip-auto-hide 2s forwards;
+    }
+
+    @keyframes tooltip-auto-hide {
+        0%, 90% {
+            /* Keep tooltip visible */
+        }
+        100% {
+            /* Tooltip will be hidden by removing class */
+        }
+    }
+
+    /* Composer action buttons with visible labels */
+    .feed-action-btn {
+        position: relative;
+        display: flex;
+        align-items: center;
+        gap: var(--space-2);
+        padding: var(--space-2) var(--space-3);
+        min-height: 44px; /* Touch target */
+        -webkit-tap-highlight-color: transparent;
+    }
+
+    /* Keep icon visible */
+    .feed-action-btn .icon {
+        width: 20px;
+        height: 20px;
+        flex-shrink: 0;
+    }
+
+    /* Show label on mobile - OVERRIDE previous hide */
+    .feed-action-btn span {
+        display: inline !important;
+        font-size: var(--font-size-sm);
+        font-weight: var(--font-weight-medium);
+    }
+
+    /* Compact mode: Show label only for active/focused buttons */
+    .composer-actions.compact .feed-action-btn span {
+        display: none !important;
+    }
+
+    .composer-actions.compact .feed-action-btn.active span,
+    .composer-actions.compact .feed-action-btn:focus span {
+        display: inline !important;
+    }
+
+    /* Add data-tooltip for compact mode */
+    .composer-actions.compact .feed-action-btn[data-tooltip]::before {
+        display: block;
+    }
+}
+
+/* ============================================
+   TOOLTIP POSITIONS
+   ============================================ */
+
+/* Bottom tooltip */
+[data-tooltip-pos="bottom"]::before {
+    bottom: auto;
+    top: calc(100% + 8px);
+    transform: translateX(-50%) translateY(-4px);
+}
+
+[data-tooltip-pos="bottom"]::after {
+    bottom: auto;
+    top: calc(100% + 2px);
+    transform: translateX(-50%) translateY(-4px);
+    border-top-color: transparent;
+    border-bottom-color: rgba(0, 0, 0, 0.9);
+}
+
+[data-theme="dark"] [data-tooltip-pos="bottom"]::after {
+    border-bottom-color: rgba(255, 255, 255, 0.95);
+}
+
+[data-tooltip-pos="bottom"]:hover::before,
+[data-tooltip-pos="bottom"]:hover::after,
+[data-tooltip-pos="bottom"].show-tooltip::before,
+[data-tooltip-pos="bottom"].show-tooltip::after {
+    transform: translateX(-50%) translateY(0);
+}
+
+/* Left tooltip */
+[data-tooltip-pos="left"]::before {
+    bottom: 50%;
+    left: auto;
+    right: calc(100% + 8px);
+    transform: translateY(50%) translateX(4px);
+}
+
+[data-tooltip-pos="left"]::after {
+    bottom: 50%;
+    left: auto;
+    right: calc(100% + 2px);
+    transform: translateY(50%) translateX(4px);
+    border-top-color: transparent;
+    border-left-color: rgba(0, 0, 0, 0.9);
+}
+
+[data-theme="dark"] [data-tooltip-pos="left"]::after {
+    border-left-color: rgba(255, 255, 255, 0.95);
+}
+
+/* Right tooltip */
+[data-tooltip-pos="right"]::before {
+    bottom: 50%;
+    left: calc(100% + 8px);
+    right: auto;
+    transform: translateY(50%) translateX(-4px);
+}
+
+[data-tooltip-pos="right"]::after {
+    bottom: 50%;
+    left: calc(100% + 2px);
+    right: auto;
+    transform: translateY(50%) translateX(-4px);
+    border-top-color: transparent;
+    border-right-color: rgba(0, 0, 0, 0.9);
+}
+
+[data-theme="dark"] [data-tooltip-pos="right"]::after {
+    border-right-color: rgba(255, 255, 255, 0.95);
+}
+
+/* ============================================
+   ACCESSIBILITY
+   ============================================ */
+
+/* Don't show tooltips for touch-only devices during hover */
+@media (hover: none) {
+    [data-tooltip]:hover::before,
+    [data-tooltip]:hover::after {
+        opacity: 0;
+    }
+}
+
+/* Respect reduced motion */
+@media (prefers-reduced-motion: reduce) {
+    [data-tooltip]::before,
+    [data-tooltip]::after {
+        transition: none;
+    }
+}
+
+/* Screen reader only text */
+.tooltip-sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border-width: 0;
+}

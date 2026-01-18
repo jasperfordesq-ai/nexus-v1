@@ -1,0 +1,39 @@
+{
+  "name": "nexus-mobile",
+  "version": "1.0.0",
+  "description": "Project NEXUS - Native Mobile App Wrapper",
+  "main": "index.js",
+  "scripts": {
+    "build:android": "npx cap sync android && cd android && ./gradlew assembleDebug",
+    "build:android:release": "npx cap sync android && cd android && ./gradlew assembleRelease",
+    "build:apk": "npm run build:android && npm run copy:apk",
+    "copy:apk": "node scripts/copy-apk.js",
+    "open:android": "npx cap open android",
+    "open:ios": "npx cap open ios",
+    "sync": "npx cap sync",
+    "add:android": "npx cap add android",
+    "add:ios": "npx cap add ios"
+  },
+  "dependencies": {
+    "@capawesome/capacitor-badge": "^6.0.0",
+    "@capacitor/android": "^6.0.0",
+    "@capacitor/app": "^6.0.0",
+    "@capacitor/core": "^6.0.0",
+    "@capacitor/haptics": "^6.0.0",
+    "@capacitor/ios": "^6.0.0",
+    "@capacitor/keyboard": "^6.0.0",
+    "@capacitor/push-notifications": "^6.0.5",
+    "@capacitor/splash-screen": "^6.0.0",
+    "@capacitor/status-bar": "^6.0.0",
+    "capacitor-native-biometric": "^4.2.2",
+    "@capacitor/preferences": "^6.0.0",
+    "@capacitor/network": "^6.0.0"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "^6.0.0",
+    "typescript": "^5.9.3"
+  },
+  "author": "Project NEXUS",
+  "license": "UNLICENSED",
+  "private": true
+}

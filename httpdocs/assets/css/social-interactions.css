@@ -1,0 +1,285 @@
+/**
+ * Social Interactions CSS
+ * Extracted from views/civicone/partials/social_interactions.php
+ * Created: 2026-01-18
+ *
+ * Prefix: civic-social- for social interaction components
+ * Provides like, comment, and share functionality styling
+ */
+
+/* Social Interactions - CivicOne Style */
+.civic-social-interactions {
+    margin-top: 24px;
+    border-top: 1px solid var(--civic-border);
+    padding-top: 20px;
+}
+
+.civic-social-stats {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 0;
+    font-size: 0.9375rem;
+    color: var(--civic-text-secondary);
+    border-bottom: 1px solid var(--civic-border);
+}
+
+.civic-social-stats-left {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.civic-social-stats-right {
+    cursor: pointer;
+}
+
+.civic-social-stats-right:hover {
+    text-decoration: underline;
+    color: var(--civic-brand);
+}
+
+.civic-social-actions {
+    display: flex;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--civic-border);
+}
+
+.civic-social-btn {
+    flex: 1;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: 0.9375rem;
+    font-weight: 600;
+    color: var(--civic-text-secondary);
+    background: transparent;
+    border: none;
+}
+
+.civic-social-btn:hover {
+    background: var(--civic-bg-page);
+}
+
+.civic-social-btn:focus {
+    outline: 3px solid var(--civic-brand);
+    outline-offset: -3px;
+}
+
+.civic-social-btn.liked {
+    color: #D4351C;
+}
+
+.civic-social-btn.liked .dashicons {
+    color: #D4351C;
+}
+
+/* Comments Section */
+.civic-social-comments {
+    display: none;
+    padding: 16px 0;
+}
+
+.civic-social-comments.active {
+    display: block;
+}
+
+.civic-comment-form {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 16px;
+}
+
+.civic-comment-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+    flex-shrink: 0;
+}
+
+.civic-comment-input-wrap {
+    flex: 1;
+    position: relative;
+}
+
+.civic-comment-input {
+    width: 100%;
+    padding: 12px 48px 12px 16px;
+    border: 1px solid var(--civic-border);
+    background: var(--civic-bg-card);
+    border-radius: 24px;
+    font-size: 0.9375rem;
+    color: var(--civic-text-main);
+    outline: none;
+}
+
+.civic-comment-input:focus {
+    border-color: var(--civic-brand);
+    outline: 3px solid var(--civic-brand);
+    outline-offset: 2px;
+}
+
+.civic-comment-submit {
+    position: absolute;
+    right: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--civic-brand);
+    cursor: pointer;
+    background: none;
+    border: none;
+    padding: 8px;
+    border-radius: 50%;
+}
+
+.civic-comment-submit:hover {
+    background: var(--civic-bg-page);
+}
+
+.civic-comments-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.civic-comment-item {
+    display: flex;
+    gap: 12px;
+}
+
+.civic-comment-bubble {
+    background: var(--civic-bg-page);
+    padding: 12px 16px;
+    border-radius: 18px;
+    border: 1px solid var(--civic-border);
+    flex: 1;
+}
+
+.civic-comment-author {
+    font-weight: 700;
+    font-size: 0.875rem;
+    color: var(--civic-text-main);
+    margin-bottom: 4px;
+}
+
+.civic-comment-text {
+    font-size: 0.9375rem;
+    color: var(--civic-text-main);
+    line-height: 1.5;
+}
+
+.civic-comment-time {
+    font-size: 0.75rem;
+    color: var(--civic-text-muted);
+    margin-top: 4px;
+}
+
+.civic-social-toast {
+    position: fixed;
+    bottom: 30px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--civic-brand);
+    color: #fff;
+    padding: 14px 28px;
+    border-radius: 8px;
+    font-weight: 600;
+    z-index: 10000;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+}
+
+.civic-social-toast.show {
+    opacity: 1;
+    visibility: visible;
+    bottom: 50px;
+}
+
+/* Share Modal */
+.civic-share-modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0,0,0,0.5);
+    z-index: 10000;
+    align-items: center;
+    justify-content: center;
+}
+
+.civic-share-modal.active {
+    display: flex;
+}
+
+.civic-share-content {
+    background: var(--civic-bg-card);
+    border-radius: 12px;
+    padding: 24px;
+    max-width: 400px;
+    width: 90%;
+}
+
+.civic-share-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    margin-bottom: 16px;
+    color: var(--civic-text-main);
+}
+
+.civic-share-options {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.civic-share-option {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    background: var(--civic-bg-page);
+    border: 1px solid var(--civic-border);
+    border-radius: 8px;
+    cursor: pointer;
+    color: var(--civic-text-main);
+    text-decoration: none;
+    font-weight: 600;
+    transition: all 0.2s;
+}
+
+.civic-share-option:hover {
+    background: var(--civic-brand);
+    color: #fff;
+    border-color: var(--civic-brand);
+}
+
+.civic-share-close {
+    margin-top: 16px;
+    width: 100%;
+    padding: 12px;
+    background: var(--civic-bg-page);
+    border: 1px solid var(--civic-border);
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    color: var(--civic-text-secondary);
+}
+
+.civic-share-close:hover {
+    background: var(--civic-border);
+}
+
+@media (max-width: 600px) {
+    .civic-social-btn span:not(.dashicons) {
+        display: none;
+    }
+}

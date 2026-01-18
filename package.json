@@ -1,0 +1,27 @@
+{
+  "scripts": {
+    "build:css": "node scripts/build-css.js",
+    "build:css:core": "node scripts/build-core-css.js",
+    "build:images": "node scripts/optimize-images.js",
+    "minify:css": "node scripts/minify-css.js",
+    "minify:js": "node scripts/minify-js.js",
+    "minify:php": "php scripts/minify.php",
+    "lint:css": "stylelint \"httpdocs/assets/css/**/*.css\" --ignore-pattern \"**/*.min.css\" --ignore-pattern \"**/_archived/**\"",
+    "lint:css:fix": "stylelint \"httpdocs/assets/css/**/*.css\" --ignore-pattern \"**/*.min.css\" --ignore-pattern \"**/_archived/**\" --fix",
+    "build": "npm run minify:css && npm run minify:js && npm run build:css:core && npm run build:images"
+  },
+  "devDependencies": {
+    "cssnano": "^7.1.2",
+    "postcss": "^8.5.6",
+    "postcss-cli": "^11.0.1",
+    "purgecss": "^7.0.2",
+    "sharp": "^0.34.5",
+    "stylelint": "^16.26.1",
+    "stylelint-config-standard": "^36.0.1",
+    "terser": "^5.44.1"
+  },
+  "dependencies": {
+    "@capacitor/cli": "^8.0.0",
+    "@capacitor/core": "^8.0.0"
+  }
+}

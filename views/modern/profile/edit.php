@@ -1,0 +1,330 @@
+<?php
+// Phoenix View: Edit Profile
+$hero_title = 'Profile Settings';
+$hero_subtitle = 'Manage your public identity and account preferences';
+$hero_gradient = 'htb-hero-gradient-teal';
+$hero_type = 'Account';
+$hideHero = true;
+
+// Get TinyMCE API key from .env
+$tinymceApiKey = 'no-api-key';
+$envPath = dirname(__DIR__, 3) . '/.env';
+if (file_exists($envPath)) {
+    $envLines = file($envPath, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+    foreach ($envLines as $line) {
+        if (strpos($line, 'TINYMCE_API_KEY=') === 0) {
+            $tinymceApiKey = trim(substr($line, 16), '"\'');
+            break;
+        }
+    }
+}
+
+require dirname(__DIR__, 2) . '/layouts/modern/header.php';
+?>
+
+<!-- PROFILE EDIT GLASSMORPHISM -->
+<style>
+/* Animated Background */
+.edit-glass-bg {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: -1;
+    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 25%, #e2e8f0 50%, #f1f5f9 75%, #f8fafc 100%);
+}
+
+.edit-glass-bg::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background:
+        radial-gradient(ellipse at 25% 30%, rgba(16, 185, 129, 0.12) 0%, transparent 50%),
+        radial-gradient(ellipse at 75% 25%, rgba(6, 182, 212, 0.1) 0%, transparent 45%),
+        radial-gradient(ellipse at 50% 80%, rgba(99, 102, 241, 0.08) 0%, transparent 50%);
+    animation: editFloat 20s ease-in-out infinite;
+}
+
+[data-theme="dark"] .edit-glass-bg {
+    background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%);
+}
+
+[data-theme="dark"] .edit-glass-bg::before {
+    background:
+        radial-gradient(ellipse at 25% 30%, rgba(16, 185, 129, 0.2) 0%, transparent 50%),
+        radial-gradient(ellipse at 75% 25%, rgba(6, 182, 212, 0.15) 0%, transparent 45%);
+}
+
+@keyframes editFloat {
+    0%, 100% { transform: translate(0, 0) scale(1); }
+    50% { transform: translate(-1%, 1%) scale(1.02); }
+}
+
+/* Glass Cards */
+.edit-container .htb-card {
+    background: linear-gradient(135deg,
+        rgba(255, 255, 255, 0.85) 0%,
+        rgba(255, 255, 255, 0.7) 100%);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    border-radius: 20px;
+    box-shadow: 0 8px 32px rgba(31, 38, 135, 0.1);
+}
+
+[data-theme="dark"] .edit-container .htb-card {
+    background: linear-gradient(135deg,
+        rgba(30, 41, 59, 0.85) 0%,
+        rgba(30, 41, 59, 0.7) 100%);
+    border-color: rgba(255, 255, 255, 0.1);
+}
+
+[data-theme="dark"] .edit-container h3,
+[data-theme="dark"] .edit-container label {
+    color: #f1f5f9 !important;
+}
+
+[data-theme="dark"] .edit-container .htb-form-control {
+    background: rgba(15, 23, 42, 0.5);
+    border-color: rgba(255, 255, 255, 0.1);
+    color: #f1f5f9;
+}
+
+/* Dark Mode: Back to Profile Link */
+[data-theme="dark"] .edit-container a[href*="/profile/"][style*="background: rgba(0,0,0,0.2)"] {
+    background: rgba(255, 255, 255, 0.1) !important;
+    color: #e2e8f0 !important;
+}
+
+/* Dark Mode: Paragraph text colors */
+[data-theme="dark"] .edit-container p {
+    color: #94a3b8 !important;
+}
+
+[data-theme="dark"] .edit-container p span {
+    color: #64748b !important;
+}
+
+/* Dark Mode: Account Status Box */
+[data-theme="dark"] .edit-container span[style*="color: #6b7280"] {
+    color: #94a3b8 !important;
+}
+
+[data-theme="dark"] .edit-container span[style*="color: #374151"] {
+    color: #e2e8f0 !important;
+}
+
+[data-theme="dark"] .edit-container span[style*="background: #f3f4f6"] {
+    background: rgba(51, 65, 85, 0.6) !important;
+    color: #e2e8f0 !important;
+}
+
+/* Dark Mode: Avatar border */
+[data-theme="dark"] .edit-container img[id="avatar-preview"] {
+    border-color: rgba(51, 65, 85, 0.8) !important;
+}
+
+/* Dark Mode: Section header borders */
+[data-theme="dark"] .edit-container h3[style*="border-bottom: 1px solid #f3f4f6"] {
+    border-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+/* Dark Mode: Disabled email input */
+[data-theme="dark"] .edit-container input[disabled] {
+    background: rgba(15, 23, 42, 0.6) !important;
+    border-color: rgba(255, 255, 255, 0.05) !important;
+    color: #64748b !important;
+}
+
+/* Dark Mode: Bottom Action Bar */
+[data-theme="dark"] .edit-container div[style*="background: white"][style*="border-radius: 12px"] {
+    background: rgba(30, 41, 59, 0.85) !important;
+    border-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+[data-theme="dark"] .edit-container a[style*="color: #6b7280"] {
+    color: #94a3b8 !important;
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 768px) {
+    .edit-container {
+        padding: 100px 16px 40px 16px !important;
+    }
+
+    .edit-container > form > div {
+        flex-direction: column;
+    }
+
+    .edit-container .htb-card-body {
+        padding: 20px !important;
+    }
+
+    .edit-container input[type="text"],
+    .edit-container input[type="email"],
+    .edit-container input[type="tel"],
+    .edit-container textarea {
+        font-size: 16px !important; /* Prevents iOS zoom */
+    }
+}
+</style>
+
+<div class="edit-glass-bg"></div>
+
+<div class="htb-container edit-container" style="padding: 120px 24px 40px 24px; position: relative; z-index: 20; max-width: 1100px;">
+
+    <!-- Top Action Bar -->
+    <div style="margin-bottom: 30px;">
+        <a href="/profile/<?= $user['id'] ?>" style="text-decoration: none; color: white; display: inline-flex; align-items: center; gap: 5px; background: rgba(0,0,0,0.2); padding: 8px 16px; border-radius: 20px; backdrop-filter: blur(4px); font-weight: 600; font-size: 0.9rem; transition: background 0.2s;">
+            &larr; Back to Profile
+        </a>
+    </div>
+
+    <form action="<?= \Nexus\Core\TenantContext::getBasePath() ?>/profile/update" method="POST" enctype="multipart/form-data">
+        <?= Nexus\Core\Csrf::input() ?>
+        <input type="hidden" name="user_id" value="<?= $user['id'] ?>">
+
+        <!-- Flex Container for Responsive Layout -->
+        <div style="display: flex; flex-wrap: wrap; gap: 30px; align-items: flex-start;">
+
+            <!-- COLUMN 1: Avatar & Identity (Width: 300px min, grows slightly) -->
+            <div style="flex: 1 1 300px; min-width: 280px; display: flex; flex-direction: column; gap: 20px;">
+
+                <!-- Box 1: Avatar -->
+                <div class="htb-card">
+                    <div class="htb-card-body" style="text-align: center; padding: 30px;">
+                        <h3 style="margin-top: 0; font-size: 1.1rem; color: #111827; margin-bottom: 20px;">Profile Photo</h3>
+
+                        <div style="margin: 0 auto 20px auto; position: relative; width: 140px; height: 140px;">
+                            <img id="avatar-preview" src="<?= $user['avatar_url'] ?: '/assets/img/defaults/default_avatar.webp' ?>" loading="lazy"
+                                style="width: 140px; height: 140px; border-radius: 50%; object-fit: cover; border: 4px solid #f3f4f6; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+
+                            <label for="avatar" style="position: absolute; bottom: 5px; right: 5px; background: #2563eb; color: white; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; border: 3px solid white; box-shadow: 0 2px 4px rgba(0,0,0,0.1); transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'">
+                                📷
+                            </label>
+                            <input type="file" name="avatar" id="avatar" accept="image/*" style="display: none;" onchange="const max=2*1024*1024; if(this.files[0].size > max) { alert('File too large (Max 2MB)'); this.value=''; return; } document.getElementById('avatar-preview').src = window.URL.createObjectURL(this.files[0])">
+                        </div>
+
+                        <p style="font-size: 0.8rem; color: #6b7280; margin-bottom: 0; line-height: 1.4;">
+                            Tap the camera to update.<br>
+                            <span style="color: #9ca3af;">Max 2MB (JPG, PNG)</span>
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Box 2: Status -->
+                <div class="htb-card">
+                    <div class="htb-card-body">
+                        <h3 style="margin-top: 0; font-size: 1.1rem; color: #111827; margin-bottom: 15px;">Account Status</h3>
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                            <span style="color: #6b7280; font-size: 0.9rem;">Type</span>
+                            <span style="font-weight: 700; color: #374151; background: #f3f4f6; padding: 2px 8px; border-radius: 4px; font-size: 0.85rem;"><?= ucfirst($user['role']) ?></span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <span style="color: #6b7280; font-size: 0.9rem;">Member Since</span>
+                            <span style="font-weight: 600; color: #374151; font-size: 0.9rem;"><?= date('M Y', strtotime($user['created_at'])) ?></span>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- COLUMN 2: Details Form (Width: 500px min, grows to fill) -->
+            <div style="flex: 2 1 400px; min-width: 300px; display: flex; flex-direction: column; gap: 25px;">
+
+                <!-- Box 3: Basic Info -->
+                <div class="htb-card">
+                    <div class="htb-card-body" style="padding: 30px;">
+                        <h3 style="margin-top: 0; margin-bottom: 25px; font-size: 1.25rem; color: #111827; border-bottom: 1px solid #f3f4f6; padding-bottom: 15px;">Basic Information</h3>
+
+                        <div style="margin-bottom: 25px; display: flex; gap: 15px;">
+                            <div style="flex: 1;">
+                                <label style="display: block; font-weight: 600; margin-bottom: 8px; font-size: 0.9rem; color: #374151;">First Name</label>
+                                <input type="text" name="first_name" value="<?= htmlspecialchars($user['first_name'] ?? '') ?>" required class="htb-form-control" style="width: 100%; padding: 12px 15px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 1rem;">
+                            </div>
+                            <div style="flex: 1;">
+                                <label style="display: block; font-weight: 600; margin-bottom: 8px; font-size: 0.9rem; color: #374151;">Last Name</label>
+                                <input type="text" name="last_name" value="<?= htmlspecialchars($user['last_name'] ?? '') ?>" required class="htb-form-control" style="width: 100%; padding: 12px 15px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 1rem;">
+                            </div>
+                        </div>
+
+                        <div style="margin-bottom: 25px;">
+                            <label style="display: block; font-weight: 600; margin-bottom: 8px; font-size: 0.9rem; color: #374151;">Email Address</label>
+                            <div style="position: relative;">
+                                <input type="email" value="<?= htmlspecialchars($user['email']) ?>" disabled class="htb-form-control" style="width: 100%; padding: 12px 15px; border: 1px solid #e5e7eb; border-radius: 8px; background: #f9fafb; color: #6b7280; cursor: not-allowed;">
+                                <span style="position: absolute; right: 12px; top: 12px; font-size: 1.2rem; color: #9ca3af;" title="Cannot be changed">🔒</span>
+                            </div>
+                        </div>
+
+                        <div style="margin-bottom: 0;">
+                            <label style="display: block; font-weight: 600; margin-bottom: 8px; font-size: 0.9rem; color: #374151;">Location / Area</label>
+                            <input type="text" name="location" value="<?= htmlspecialchars($user['location'] ?? '') ?>" placeholder="Start typing your town or city (not full address)..." class="htb-form-control mapbox-location-input-v2" style="width: 100%; padding: 12px 15px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 1rem;">
+                            <input type="hidden" name="latitude" value="<?= htmlspecialchars($user['latitude'] ?? '') ?>">
+                            <input type="hidden" name="longitude" value="<?= htmlspecialchars($user['longitude'] ?? '') ?>">
+                        </div>
+
+                        <div style="margin-top: 25px;">
+                            <label style="display: block; font-weight: 600; margin-bottom: 8px; font-size: 0.9rem; color: #374151;">Phone Number</label>
+                            <input type="tel" name="phone" value="<?= htmlspecialchars($user['phone'] ?? '') ?>" placeholder="+1 555-0123" class="htb-form-control" style="width: 100%; padding: 12px 15px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 1rem;">
+                            <p style="font-size: 0.8rem; color: #6b7280; margin-top: 5px;">Only visible to administrators.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Box 4: Bio/About -->
+                <div class="htb-card">
+                    <div class="htb-card-body" style="padding: 30px;">
+                        <h3 style="margin-top: 0; margin-bottom: 25px; font-size: 1.25rem; color: #111827; border-bottom: 1px solid #f3f4f6; padding-bottom: 15px;">About You</h3>
+
+                        <div style="margin-bottom: 0;">
+                            <label style="display: block; font-weight: 600; margin-bottom: 8px; font-size: 0.9rem; color: #374151;">Bio / Introduction</label>
+                            <textarea name="bio" id="bio-editor" rows="6" class="htb-form-control" style="width: 100%; padding: 12px 15px; border: 1px solid #d1d5db; border-radius: 8px; resize: vertical; line-height: 1.6; font-family: inherit; font-size: 0.95rem;" placeholder="Share your interests, skills, or what you're looking for in the TimeBank..."><?= htmlspecialchars($user['bio'] ?? '') ?></textarea>
+                        </div>
+
+                        <!-- TinyMCE for Bio -->
+                        <script src="https://cdn.tiny.cloud/1/<?= htmlspecialchars($tinymceApiKey) ?>/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script>
+                        <script>
+                        tinymce.init({
+                            selector: '#bio-editor',
+                            height: 220,
+                            menubar: false,
+                            statusbar: false,
+                            plugins: ['link', 'lists', 'emoticons'],
+                            toolbar: 'bold italic | bullist numlist | link emoticons',
+                            content_style: `
+                                body {
+                                    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+                                    font-size: 15px;
+                                    line-height: 1.6;
+                                    color: #374151;
+                                    padding: 10px;
+                                }
+                            `,
+                            placeholder: 'Share your interests, skills, or what you\'re looking for...',
+                            branding: false,
+                            promotion: false
+                        });
+                        </script>
+                    </div>
+                </div>
+
+                <!-- Bottom Action Bar (Save + Back) -->
+                <div style="background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); display: flex; justify-content: flex-end; align-items: center; gap: 15px; border: 1px solid #f3f4f6;">
+                    <a href="/profile/<?= $user['id'] ?>" style="text-decoration: none; color: #6b7280; font-weight: 600; font-size: 0.95rem;">Cancel</a>
+                    <button type="submit" class="htb-btn htb-btn-primary" style="padding: 12px 32px; font-size: 1rem; font-weight: 600; box-shadow: 0 4px 10px rgba(37, 99, 235, 0.2);">
+                        Save Profile
+                    </button>
+                </div>
+
+            </div>
+        </div>
+    </form>
+
+    <div style="height: 50px;"></div>
+</div>
+
+<?php require dirname(__DIR__, 2) . '/layouts/modern/footer.php'; ?>

@@ -1,0 +1,7 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(\"C:/xampp/mysql/bin/mysql.exe\" -u root -e \"SHOW TABLES LIKE ''federation%'';\" truth_)"
+    ]
+  }
+}

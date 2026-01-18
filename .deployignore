@@ -1,0 +1,54 @@
+# Development & IDE
+.git/
+.github/
+.vscode/
+.idea/
+*.log
+
+# Dependencies (install on server)
+node_modules/
+vendor/
+
+# Environment (create on server)
+.env
+.env.*
+firebase-service-account.json
+
+# Testing
+tests/
+test_target/
+phpunit.xml
+.phpunit.cache/
+.snapshots/
+
+# Local data
+backups/
+exports/
+database.sqlite
+
+# Docker (not needed for Plesk)
+docker/
+docker-compose*.yml
+Dockerfile
+
+# Mobile app source
+capacitor/
+
+# Build tools (not needed on server)
+purgecss.config.js
+
+# Temp files
+*.tmp
+*.temp
+nul
+debug_output.html
+C:temp*
+*.zip
+
+# Documentation (optional to exclude)
+*.md
+!httpdocs/README.md
+
+# OS files
+Thumbs.db
+.DS_Store
