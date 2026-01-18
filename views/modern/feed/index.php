@@ -1406,7 +1406,8 @@ try {
     }
 
     // Toggle Comment Section
-    function toggleCommentSection(type, id) {
+    // Use window assignment (not function declaration) so mobile-sheets.php can intercept
+    window.toggleCommentSection = function(type, id) {
         const section = document.getElementById(`comments-section-${type}-${id}`);
         if (!section) return;
 
@@ -1418,7 +1419,7 @@ try {
         } else {
             section.style.display = 'none';
         }
-    }
+    };
 
     // Fetch Comments
     function fetchComments(type, id) {

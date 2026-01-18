@@ -921,7 +921,8 @@ $basePath = \Nexus\Core\TenantContext::getBasePath();
             }
         }
 
-        function toggleCommentSection(type, id, unused) {
+        // Use window assignment (not function declaration) so mobile-sheets.php can intercept
+        window.toggleCommentSection = function(type, id, unused) {
             const section = document.getElementById(`comments-section-${type}-${id}`);
             if (!section) {
                 console.error('Comments section not found:', `comments-section-${type}-${id}`);
@@ -939,7 +940,7 @@ $basePath = \Nexus\Core\TenantContext::getBasePath();
             } else {
                 section.style.display = 'none';
             }
-        }
+        };
 
         // Enhanced comment system state
         let availableReactions = [];

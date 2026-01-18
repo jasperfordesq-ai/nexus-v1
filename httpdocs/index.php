@@ -5,6 +5,89 @@
  * ----------------------------------
  */
 
+// ===========================================
+// MAINTENANCE MODE & ERROR HANDLING
+// ===========================================
+
+// Check for manual maintenance mode (.maintenance file)
+if (file_exists(__DIR__ . '/../.maintenance')) {
+    // Allow admin IPs through (add your IP here)
+    $allowedIPs = ['127.0.0.1', '::1']; // Add your IP: e.g., '123.45.67.89'
+    if (!in_array($_SERVER['REMOTE_ADDR'] ?? '', $allowedIPs)) {
+        http_response_code(503);
+        header('Retry-After: 300'); // Tell browsers to retry in 5 minutes
+        include __DIR__ . '/maintenance.html';
+        exit;
+    }
+}
+
+// Global error handler - catch fatal errors and show maintenance page + email alert
+register_shutdown_function(function() {
+    $error = error_get_last();
+    if ($error && in_array($error['type'], [E_ERROR, E_PARSE, E_CORE_ERROR, E_COMPILE_ERROR])) {
+        // Log the error
+        $errorMsg = sprintf(
+            "[%s] FATAL ERROR on %s\nType: %d\nMessage: %s\nFile: %s\nLine: %d\nURL: %s\nIP: %s\nUser Agent: %s",
+            date('Y-m-d H:i:s'),
+            $_SERVER['HTTP_HOST'] ?? 'unknown',
+            $error['type'],
+            $error['message'],
+            $error['file'],
+            $error['line'],
+            $_SERVER['REQUEST_URI'] ?? 'unknown',
+            $_SERVER['REMOTE_ADDR'] ?? 'unknown',
+            $_SERVER['HTTP_USER_AGENT'] ?? 'unknown'
+        );
+
+        // Write to error log
+        error_log($errorMsg);
+
+        // Send email alert (non-blocking)
+        $to = 'jasper.esq@gmail.com';
+        $subject = '[NEXUS ALERT] Site Error on ' . ($_SERVER['HTTP_HOST'] ?? 'project-nexus.ie');
+        $headers = "From: alerts@project-nexus.ie\r\nContent-Type: text/plain; charset=UTF-8";
+        @mail($to, $subject, $errorMsg, $headers);
+
+        // Show maintenance page if not already sent headers
+        if (!headers_sent()) {
+            http_response_code(500);
+            if (file_exists(__DIR__ . '/maintenance.html')) {
+                include __DIR__ . '/maintenance.html';
+                exit;
+            }
+        }
+    }
+});
+
+// Set custom error handler for non-fatal errors
+set_error_handler(function($errno, $errstr, $errfile, $errline) {
+    // Only email for serious errors (not notices/warnings)
+    if (in_array($errno, [E_USER_ERROR, E_RECOVERABLE_ERROR])) {
+        $errorMsg = sprintf(
+            "[%s] ERROR on %s\nType: %d\nMessage: %s\nFile: %s\nLine: %d\nURL: %s",
+            date('Y-m-d H:i:s'),
+            $_SERVER['HTTP_HOST'] ?? 'unknown',
+            $errno,
+            $errstr,
+            $errfile,
+            $errline,
+            $_SERVER['REQUEST_URI'] ?? 'unknown'
+        );
+
+        $to = 'jasper.esq@gmail.com';
+        $subject = '[NEXUS WARNING] Error on ' . ($_SERVER['HTTP_HOST'] ?? 'project-nexus.ie');
+        $headers = "From: alerts@project-nexus.ie\r\nContent-Type: text/plain; charset=UTF-8";
+        @mail($to, $subject, $errorMsg, $headers);
+    }
+
+    // Let PHP handle it normally too
+    return false;
+}, E_ALL);
+
+// ===========================================
+// END MAINTENANCE MODE & ERROR HANDLING
+// ===========================================
+
 // 0. FILE DOWNLOAD BYPASS - Removed
 // Downloads now handled by standalone download.php for clean binary transfer
 // The old download bypass is removed because index.php has output buffering/session
