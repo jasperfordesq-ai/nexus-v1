@@ -260,7 +260,6 @@ body {
     border-bottom: 1px solid var(--md-border);
     overflow-x: auto;
     overflow-y: hidden;
-    -webkit-overflow-scrolling: touch;
     scrollbar-width: none;
     flex-shrink: 0;
     scroll-behavior: smooth;
@@ -346,7 +345,6 @@ body {
     flex: 1;
     overflow-y: auto;
     overflow-x: hidden;
-    -webkit-overflow-scrolling: touch;
     overscroll-behavior-y: contain;
     padding-bottom: calc(20px + var(--safe-bottom));
 }
@@ -1381,7 +1379,6 @@ body {
     overflow-y: auto;
     z-index: 1000;
     display: none;
-    -webkit-overflow-scrolling: touch;
 }
 
 .md-location-suggestions.visible {

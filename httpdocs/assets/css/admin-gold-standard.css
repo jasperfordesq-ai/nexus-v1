@@ -1383,6 +1383,7 @@
     position: fixed;
     inset: 0;
     background: rgba(0, 0, 0, 0.7);
+    -webkit-backdrop-filter: var(--admin-blur-sm);
     backdrop-filter: var(--admin-blur-sm);
     z-index: var(--admin-z-modal-backdrop);
     display: flex;
@@ -1486,6 +1487,7 @@
     gap: var(--admin-space-md);
     padding: var(--admin-space-md) var(--admin-space-lg);
     background: var(--admin-glass-dark);
+    -webkit-backdrop-filter: var(--admin-blur-lg);
     backdrop-filter: var(--admin-blur-lg);
     border: 1px solid var(--admin-border);
     border-radius: var(--admin-radius-lg);

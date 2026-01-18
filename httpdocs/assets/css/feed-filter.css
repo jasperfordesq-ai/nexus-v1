@@ -186,7 +186,6 @@
     flex: 1;
     overflow-x: auto;
     overflow-y: hidden;
-    -webkit-overflow-scrolling: touch;
     scrollbar-width: thin;
     scrollbar-color: var(--ff-pill-bg) transparent;
     margin: -8px 0;
@@ -250,6 +249,7 @@
     transition: all var(--ff-transition);
     min-height: 32px;
     -webkit-tap-highlight-color: transparent;
+    -webkit-user-select: none;
     user-select: none;
 }
 
@@ -576,7 +576,6 @@
         flex: 1;
         min-width: 0;
         overflow-x: auto !important;
-        -webkit-overflow-scrolling: touch;
     }
 
     .feed-filter-pills {

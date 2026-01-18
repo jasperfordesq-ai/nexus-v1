@@ -635,7 +635,6 @@ input.invalid {
     overflow-x: auto;
     scroll-snap-type: x mandatory;
     scroll-behavior: smooth;
-    -webkit-overflow-scrolling: touch;
     gap: 16px;
     padding: 8px 0;
     margin: 0 -16px;

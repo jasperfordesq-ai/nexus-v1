@@ -122,7 +122,6 @@
     padding: 16px;
     overflow-y: auto;
     max-height: calc(90vh - 100px);
-    -webkit-overflow-scrolling: touch;
 }
 
 /* ============================================
