@@ -57,13 +57,24 @@ try {
     <meta charset="UTF-8">
     <!-- CRITICAL: Inline scroll fix - cannot be overridden -->
     <style id="scroll-fix-inline">
-        html, html:root, html[data-theme], html[data-layout] {
+        html,
+        html:root,
+        html[data-theme],
+        html[data-layout] {
             overflow-y: scroll !important;
             overflow-x: hidden !important;
         }
-        body, body.drawer-open, body.modal-open, body.fds-sheet-open,
-        body.keyboard-open, body.mobile-menu-open, body.menu-open,
-        html body, html[data-theme] body, html[data-layout] body {
+
+        body,
+        body.drawer-open,
+        body.modal-open,
+        body.fds-sheet-open,
+        body.keyboard-open,
+        body.mobile-menu-open,
+        body.menu-open,
+        html body,
+        html[data-theme] body,
+        html[data-layout] body {
             overflow: visible !important;
             overflow-y: visible !important;
             overflow-x: hidden !important;
@@ -111,13 +122,13 @@ try {
 
     <!-- Page-specific CSS -->
     <?php if ($isHome): ?>
-    <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/post-box-home.min.css?v=<?= $cssVersionTimestamp ?>">
-    <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/feed-filter.min.css?v=<?= $cssVersionTimestamp ?>">
+        <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/post-box-home.min.css?v=<?= $cssVersionTimestamp ?>">
+        <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/feed-filter.min.css?v=<?= $cssVersionTimestamp ?>">
     <?php endif; ?>
 
     <!-- Dashboard CSS (loaded when on dashboard page) -->
     <?php if (strpos($normPath, '/dashboard') !== false): ?>
-    <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/dashboard.min.css?v=<?= $cssVersionTimestamp ?>">
+        <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/dashboard.min.css?v=<?= $cssVersionTimestamp ?>">
     <?php endif; ?>
     <!-- Consolidated polish files (replaces nexus-10x-polish + nexus-ux-polish) -->
     <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/nexus-polish.min.css?v=<?= $cssVersionTimestamp ?>" media="print" onload="this.media='all'">
@@ -135,15 +146,25 @@ try {
 
     <!-- Font Awesome - Single file faster than multiple requests -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous" media="print" onload="this.media='all'">
-    <noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous"></noscript>
+    <noscript>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous">
+    </noscript>
     <!-- Dashicons - WordPress icons (via unpkg CDN) - Async loaded -->
     <link rel="stylesheet" href="https://unpkg.com/@icon/dashicons@0.9.0/dashicons.css" crossorigin="anonymous" media="print" onload="this.media='all'">
-    <noscript><link rel="stylesheet" href="https://unpkg.com/@icon/dashicons@0.9.0/dashicons.css" crossorigin="anonymous"></noscript>
+    <noscript>
+        <link rel="stylesheet" href="https://unpkg.com/@icon/dashicons@0.9.0/dashicons.css" crossorigin="anonymous">
+    </noscript>
 
     <!-- Google Fonts - Loaded async to prevent render blocking -->
     <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap">
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
-    <noscript><link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet"></noscript>
+    <noscript>
+        <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    </noscript>
+    <!-- Noscript Fallbacks: Ensure content visibility without JS (CSS Audit 2026-01) -->
+    <noscript>
+        <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/noscript-fallbacks.css">
+    </noscript>
 
     <?php
     // PRIORITY: Load page-specific CSS if needed
@@ -469,7 +490,7 @@ try {
                             if ($isAllowedSocial):
                                 $rootPath = \Nexus\Core\TenantContext::getBasePath();
                                 if (empty($rootPath)) $rootPath = '/';
-                                
+
                             ?>
                                 </a>
                             <?php endif; ?>
@@ -508,39 +529,39 @@ try {
                         }
                     }
                     if ($hasFederationUtilBar): ?>
-                    <div class="htb-dropdown">
-                        <button class="util-link" style="font-weight:700; color:#8b5cf6;">
-                            <i class="fa-solid fa-globe" style="margin-right: 4px;"></i>Partner Communities <span class="htb-arrow">▾</span>
-                        </button>
-                        <div class="htb-dropdown-content" style="min-width: 220px;">
-                            <a href="<?= Nexus\Core\TenantContext::getBasePath() ?>/federation" style="font-weight: 600; color: #8b5cf6;">
-                                <i class="fa-solid fa-house" style="margin-right: 6px;"></i>Partner Communities Hub
-                            </a>
-                            <div style="border-top:1px solid #e5e7eb; margin:5px 0;"></div>
-                            <a href="<?= Nexus\Core\TenantContext::getBasePath() ?>/federation/members">
-                                <i class="fa-solid fa-user-group" style="margin-right: 6px; color: #8b5cf6;"></i>Members
-                            </a>
-                            <a href="<?= Nexus\Core\TenantContext::getBasePath() ?>/federation/listings">
-                                <i class="fa-solid fa-hand-holding-heart" style="margin-right: 6px; color: #ec4899;"></i>Listings
-                            </a>
-                            <a href="<?= Nexus\Core\TenantContext::getBasePath() ?>/federation/events">
-                                <i class="fa-solid fa-calendar-days" style="margin-right: 6px; color: #f59e0b;"></i>Events
-                            </a>
-                            <a href="<?= Nexus\Core\TenantContext::getBasePath() ?>/federation/groups">
-                                <i class="fa-solid fa-users" style="margin-right: 6px; color: #6366f1;"></i>Groups
-                            </a>
-                            <a href="<?= Nexus\Core\TenantContext::getBasePath() ?>/federation/messages">
-                                <i class="fa-solid fa-envelope" style="margin-right: 6px; color: #3b82f6;"></i>Messages
-                            </a>
-                            <a href="<?= Nexus\Core\TenantContext::getBasePath() ?>/federation/transactions">
-                                <i class="fa-solid fa-coins" style="margin-right: 6px; color: #10b981;"></i>Transactions
-                            </a>
-                            <div style="border-top:1px solid #e5e7eb; margin:5px 0;"></div>
-                            <a href="<?= Nexus\Core\TenantContext::getBasePath() ?>/settings?section=federation">
-                                <i class="fa-solid fa-sliders" style="margin-right: 6px; color: #6b7280;"></i>Settings
-                            </a>
+                        <div class="htb-dropdown">
+                            <button class="util-link" style="font-weight:700; color:#8b5cf6;">
+                                <i class="fa-solid fa-globe" style="margin-right: 4px;"></i>Partner Communities <span class="htb-arrow">▾</span>
+                            </button>
+                            <div class="htb-dropdown-content" style="min-width: 220px;">
+                                <a href="<?= Nexus\Core\TenantContext::getBasePath() ?>/federation" style="font-weight: 600; color: #8b5cf6;">
+                                    <i class="fa-solid fa-house" style="margin-right: 6px;"></i>Partner Communities Hub
+                                </a>
+                                <div style="border-top:1px solid #e5e7eb; margin:5px 0;"></div>
+                                <a href="<?= Nexus\Core\TenantContext::getBasePath() ?>/federation/members">
+                                    <i class="fa-solid fa-user-group" style="margin-right: 6px; color: #8b5cf6;"></i>Members
+                                </a>
+                                <a href="<?= Nexus\Core\TenantContext::getBasePath() ?>/federation/listings">
+                                    <i class="fa-solid fa-hand-holding-heart" style="margin-right: 6px; color: #ec4899;"></i>Listings
+                                </a>
+                                <a href="<?= Nexus\Core\TenantContext::getBasePath() ?>/federation/events">
+                                    <i class="fa-solid fa-calendar-days" style="margin-right: 6px; color: #f59e0b;"></i>Events
+                                </a>
+                                <a href="<?= Nexus\Core\TenantContext::getBasePath() ?>/federation/groups">
+                                    <i class="fa-solid fa-users" style="margin-right: 6px; color: #6366f1;"></i>Groups
+                                </a>
+                                <a href="<?= Nexus\Core\TenantContext::getBasePath() ?>/federation/messages">
+                                    <i class="fa-solid fa-envelope" style="margin-right: 6px; color: #3b82f6;"></i>Messages
+                                </a>
+                                <a href="<?= Nexus\Core\TenantContext::getBasePath() ?>/federation/transactions">
+                                    <i class="fa-solid fa-coins" style="margin-right: 6px; color: #10b981;"></i>Transactions
+                                </a>
+                                <div style="border-top:1px solid #e5e7eb; margin:5px 0;"></div>
+                                <a href="<?= Nexus\Core\TenantContext::getBasePath() ?>/settings?section=federation">
+                                    <i class="fa-solid fa-sliders" style="margin-right: 6px; color: #6b7280;"></i>Settings
+                                </a>
+                            </div>
                         </div>
-                    </div>
                     <?php endif; ?>
                 <?php endif; ?>
 
@@ -725,6 +746,7 @@ try {
                     text-decoration: none !important;
                     transition: all 0.25s ease !important;
                 }
+
                 /* Primary word - gradient text for modern look */
                 .nexus-brand-link .brand-primary {
                     background: linear-gradient(135deg, #a5b4fc 0%, #818cf8 50%, #6366f1 100%);
@@ -733,6 +755,7 @@ try {
                     background-clip: text;
                     font-weight: 900;
                 }
+
                 /* Secondary word - complementary warm tone */
                 .nexus-brand-link .brand-secondary {
                     background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
@@ -741,21 +764,25 @@ try {
                     background-clip: text;
                     font-weight: 700;
                 }
+
                 .nexus-brand-link:hover {
                     transform: translateY(-1px);
                 }
+
                 .nexus-brand-link:hover .brand-primary {
                     background: linear-gradient(135deg, #c7d2fe 0%, #a5b4fc 50%, #818cf8 100%);
                     -webkit-background-clip: text;
                     background-clip: text;
                     filter: drop-shadow(0 2px 8px rgba(99, 102, 241, 0.4));
                 }
+
                 .nexus-brand-link:hover .brand-secondary {
                     background: linear-gradient(135deg, #fcd34d 0%, #fbbf24 100%);
                     -webkit-background-clip: text;
                     background-clip: text;
                     filter: drop-shadow(0 2px 8px rgba(251, 191, 36, 0.4));
                 }
+
                 /* Light mode - deeper colors for contrast */
                 [data-theme="light"] .nexus-brand-link .brand-primary {
                     background: linear-gradient(135deg, #4f46e5 0%, #4338ca 100%);
@@ -763,17 +790,20 @@ try {
                     -webkit-text-fill-color: transparent;
                     background-clip: text;
                 }
+
                 [data-theme="light"] .nexus-brand-link .brand-secondary {
                     background: linear-gradient(135deg, #d97706 0%, #b45309 100%);
                     -webkit-background-clip: text;
                     -webkit-text-fill-color: transparent;
                     background-clip: text;
                 }
+
                 [data-theme="light"] .nexus-brand-link:hover .brand-primary {
                     background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
                     -webkit-background-clip: text;
                     background-clip: text;
                 }
+
                 [data-theme="light"] .nexus-brand-link:hover .brand-secondary {
                     background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
                     -webkit-background-clip: text;
@@ -1129,14 +1159,14 @@ try {
             <?php if (isset($_SESSION['user_id'])):
                 $mUser = \Nexus\Models\User::findById($_SESSION['user_id']);
                 if ($mUser): ?>
-                <div style="display:flex; align-items:center; gap:15px;">
-                    <img src="<?= $mUser['avatar_url'] ?: '/assets/img/defaults/default_avatar.webp' ?>" style="width:50px; height:50px; border-radius:12px; object-fit:cover; border:2px solid white;" onerror="this.src='/assets/img/defaults/default_avatar.webp'">
-                    <div>
-                        <div style="font-size:1.1rem; font-weight:700; line-height:1.2;"><?= htmlspecialchars($mUser['name'] ?? '') ?></div>
-                        <a href="<?= Nexus\Core\TenantContext::getBasePath() ?>/profile/<?= $_SESSION['user_id'] ?>" style="color:rgba(255,255,255,0.9); font-size:0.85rem; text-decoration:none;">View Profile</a>
+                    <div style="display:flex; align-items:center; gap:15px;">
+                        <img src="<?= $mUser['avatar_url'] ?: '/assets/img/defaults/default_avatar.webp' ?>" style="width:50px; height:50px; border-radius:12px; object-fit:cover; border:2px solid white;" onerror="this.src='/assets/img/defaults/default_avatar.webp'">
+                        <div>
+                            <div style="font-size:1.1rem; font-weight:700; line-height:1.2;"><?= htmlspecialchars($mUser['name'] ?? '') ?></div>
+                            <a href="<?= Nexus\Core\TenantContext::getBasePath() ?>/profile/<?= $_SESSION['user_id'] ?>" style="color:rgba(255,255,255,0.9); font-size:0.85rem; text-decoration:none;">View Profile</a>
+                        </div>
                     </div>
-                </div>
-            <?php endif; ?>
+                <?php endif; ?>
             <?php else: ?>
                 <div>
                     <h2 style="margin:0; font-size:1.5rem;">Hello!</h2>

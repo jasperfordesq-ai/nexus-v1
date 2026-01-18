@@ -42,6 +42,7 @@ Thumbs.db
 
 # Uploaded files (if not needed in git)
 /uploads
+/httpdocs/uploads/
 
 # Database
 *.sqlite

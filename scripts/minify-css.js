@@ -27,7 +27,7 @@ function minifyCSS(css) {
 }
 
 // CSS files to minify
-// Updated 2026-01-17: Consolidated polish files, using v2 nav only
+// Updated 2026-01-18: Added civicone theme files
 const cssFiles = [
     // Core framework
     'nexus-phoenix.css',
@@ -47,6 +47,18 @@ const cssFiles = [
     'nexus-interactions.css',
     // Navigation (v2 only)
     'nexus-native-nav-v2.css',
+    // CivicOne theme
+    'nexus-civicone.css',
+    'civicone-mobile.css',
+    'civicone-native.css',
+    'civicone-drawer.css',
+    // Extracted component CSS
+    'feed-filter.css',
+    'dashboard.css',
+    'mobile-sheets.css',
+    'social-interactions.css',
+    'federation-realtime.css',
+    'compose-multidraw.css',
 ];
 
 const cssDir = path.join(__dirname, '../httpdocs/assets/css');

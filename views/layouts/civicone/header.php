@@ -40,13 +40,24 @@ if (class_exists('\Nexus\Core\TenantContext')) {
     <meta charset="UTF-8">
     <!-- CRITICAL: Inline scroll fix - cannot be overridden -->
     <style id="scroll-fix-inline">
-        html, html:root, html[data-theme], html[data-layout] {
+        html,
+        html:root,
+        html[data-theme],
+        html[data-layout] {
             overflow-y: scroll !important;
             overflow-x: hidden !important;
         }
-        body, body.drawer-open, body.modal-open, body.fds-sheet-open,
-        body.keyboard-open, body.mobile-menu-open, body.menu-open,
-        html body, html[data-theme] body, html[data-layout] body {
+
+        body,
+        body.drawer-open,
+        body.modal-open,
+        body.fds-sheet-open,
+        body.keyboard-open,
+        body.mobile-menu-open,
+        body.menu-open,
+        html body,
+        html[data-theme] body,
+        html[data-layout] body {
             overflow: visible !important;
             overflow-y: visible !important;
             overflow-x: hidden !important;
@@ -127,10 +138,10 @@ if (class_exists('\Nexus\Core\TenantContext')) {
 
     <!-- Page-specific Component CSS -->
     <?php if ($isHome): ?>
-    <link rel="stylesheet" href="/assets/css/feed-filter.min.css?v=<?= $cssVersion ?>">
+        <link rel="stylesheet" href="/assets/css/feed-filter.min.css?v=<?= $cssVersion ?>">
     <?php endif; ?>
     <?php if (strpos($normPath, '/dashboard') !== false): ?>
-    <link rel="stylesheet" href="/assets/css/dashboard.min.css?v=<?= $cssVersion ?>">
+        <link rel="stylesheet" href="/assets/css/dashboard.min.css?v=<?= $cssVersion ?>">
     <?php endif; ?>
 
     <!-- Mobile Sheets CSS (base styles always load, CSS handles desktop hiding) -->
@@ -143,10 +154,18 @@ if (class_exists('\Nexus\Core\TenantContext')) {
     <link rel="stylesheet" href="/assets/css/scroll-fix-emergency.min.css?v=<?= $cssVersion ?>">
     <!-- FONT AWESOME (Icons for mobile nav, buttons, etc.) - Async loaded -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous" media="print" onload="this.media='all'">
-    <noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous"></noscript>
+    <noscript>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous">
+    </noscript>
     <!-- DASHICONS (WordPress icons - via unpkg CDN) - Async loaded -->
     <link rel="stylesheet" href="https://unpkg.com/@icon/dashicons@0.9.0/dashicons.css" crossorigin="anonymous" media="print" onload="this.media='all'">
-    <noscript><link rel="stylesheet" href="https://unpkg.com/@icon/dashicons@0.9.0/dashicons.css" crossorigin="anonymous"></noscript>
+    <noscript>
+        <link rel="stylesheet" href="https://unpkg.com/@icon/dashicons@0.9.0/dashicons.css" crossorigin="anonymous">
+    </noscript>
+    <!-- Noscript Fallbacks: Ensure content visibility without JS (CSS Audit 2026-01) -->
+    <noscript>
+        <link rel="stylesheet" href="/assets/css/noscript-fallbacks.css">
+    </noscript>
 
     <?php
     // Page-specific CSS (additionalCSS support - matches Modern layout)
