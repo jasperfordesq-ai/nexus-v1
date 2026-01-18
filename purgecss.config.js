@@ -198,6 +198,9 @@ module.exports = {
             /^rarity/,
             /^showcase/,
             /^confetti/,
+            /^hero-/,
+            /^activity-/,
+            /^cta-/,
 
             // Compose multidraw
             /^md-/,

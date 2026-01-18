@@ -26,9 +26,9 @@ $currentStreak = $streaks['login']['current'] ?? 0;
 $xpRank = $rankings['xp'] ?? '-';
 ?>
 
-<div class="achievements-wrapper">
+<div class="achievements-wrapper" role="main" aria-label="Achievements Dashboard">
     <!-- Navigation Pills -->
-    <div class="achievements-nav">
+    <nav class="achievements-nav" aria-label="Achievement sections">
         <a href="<?= $basePath ?>/achievements" class="nav-pill active">
             <i class="fa-solid fa-gauge-high"></i> Dashboard
         </a>
@@ -47,7 +47,7 @@ $xpRank = $rankings['xp'] ?? '-';
         <a href="<?= $basePath ?>/achievements/seasons" class="nav-pill">
             <i class="fa-solid fa-trophy"></i> Seasons
         </a>
-    </div>
+    </nav>
 
     <!-- Hero Stats Banner -->
     <div class="hero-stats-banner">
@@ -156,9 +156,11 @@ $xpRank = $rankings['xp'] ?? '-';
                     <?php if ($badges['total_earned'] >= $badges['total_available']): ?>
                     <div class="empty-icon">🎉</div>
                     <p>You've unlocked all available badges!</p>
+                    <a href="<?= $basePath ?>/achievements/badges" class="cta-btn">View Collection <i class="fa-solid fa-arrow-right"></i></a>
                     <?php else: ?>
                     <div class="empty-icon">🎯</div>
                     <p>Keep participating to unlock your next badge!</p>
+                    <a href="<?= $basePath ?>/achievements/challenges" class="cta-btn">View Challenges <i class="fa-solid fa-arrow-right"></i></a>
                     <?php endif; ?>
                 </div>
                 <?php endif; ?>
@@ -326,6 +328,7 @@ $xpRank = $rankings['xp'] ?? '-';
                 <div class="empty-state compact">
                     <div class="empty-icon">🎖️</div>
                     <p>Earn your first badge!</p>
+                    <a href="<?= $basePath ?>/achievements/challenges" class="cta-btn">Start a Challenge <i class="fa-solid fa-arrow-right"></i></a>
                 </div>
                 <?php endif; ?>
             </div>
@@ -354,6 +357,7 @@ $xpRank = $rankings['xp'] ?? '-';
                 <div class="empty-state compact">
                     <div class="empty-icon">📈</div>
                     <p>No recent activity</p>
+                    <a href="<?= $basePath ?>/listings" class="cta-btn">Browse Listings <i class="fa-solid fa-arrow-right"></i></a>
                 </div>
                 <?php endif; ?>
             </div>
