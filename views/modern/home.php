@@ -1338,7 +1338,8 @@ if (class_exists($dbClass)) {
 // Add home feed CSS - standard load (minified version)
 $cssVersion = '2.5.0';
 $additionalCSS = '
-<link rel="stylesheet" href="/assets/css/nexus-home.min.css?v=' . $cssVersion . '">';
+<link rel="stylesheet" href="/assets/css/nexus-home.min.css?v=' . $cssVersion . '">
+<link rel="stylesheet" href="/assets/css/sidebar.css?v=' . $cssVersion . '">';
 require __DIR__ . '/../layouts/modern/header.php';
 ?>
 
@@ -1676,37 +1677,37 @@ require __DIR__ . '/../layouts/modern/header.php';
                  1. YOUR ACTIVITY (Logged In) - Instagram Style Profile Card
                  ============================================ -->
             <?php if ($isLoggedIn && $sidebarData['stats']): ?>
-            <div class="sidebar-card" style="overflow:visible;">
-                <div style="background:linear-gradient(135deg,#6366f1 0%,#8b5cf6 50%,#ec4899 100%);padding:20px;text-align:center;border-radius:20px 20px 0 0;margin:-1px -1px 0 -1px;">
+            <div class="sidebar-card sidebar-profile-card">
+                <div class="sidebar-profile-header">
                     <?= webp_avatar($_SESSION['user_avatar'] ?? null, $_SESSION['user_name'] ?? 'Member', 70) ?>
-                    <h4 style="color:white;margin:10px 0 2px;font-size:16px;"><?= htmlspecialchars($_SESSION['user_name'] ?? 'Member') ?></h4>
-                    <p style="color:rgba(255,255,255,0.8);font-size:12px;margin:0;">@<?= htmlspecialchars($_SESSION['username'] ?? 'member') ?></p>
+                    <h4><?= htmlspecialchars($_SESSION['user_name'] ?? 'Member') ?></h4>
+                    <p>@<?= htmlspecialchars($_SESSION['username'] ?? 'member') ?></p>
                 </div>
-                <div class="sidebar-card-body" style="padding-top:16px;">
-                    <div style="display:flex;justify-content:space-around;text-align:center;margin-bottom:12px;">
-                        <a href="<?= $basePath ?>/profile" style="text-decoration:none;flex:1;">
-                            <span style="display:block;font-size:22px;font-weight:800;background:linear-gradient(135deg,#6366f1,#ec4899);-webkit-background-clip:text;-webkit-text-fill-color:transparent;"><?= (int)($sidebarData['stats']['total_listings'] ?? 0) ?></span>
-                            <span class="sidebar-text-muted" style="font-size:11px;text-transform:uppercase;letter-spacing:0.5px;">Listings</span>
+                <div class="sidebar-card-body sidebar-profile-body">
+                    <div class="sidebar-stats-row">
+                        <a href="<?= $basePath ?>/profile" class="sidebar-stat-link">
+                            <span class="sidebar-stat-value gradient"><?= (int)($sidebarData['stats']['total_listings'] ?? 0) ?></span>
+                            <span class="sidebar-text-muted sidebar-stat-label">Listings</span>
                         </a>
-                        <div class="sidebar-divider" style="width:1px;"></div>
-                        <a href="<?= $basePath ?>/wallet" style="text-decoration:none;flex:1;">
-                            <span style="display:block;font-size:22px;font-weight:800;color:#10b981;"><?= number_format((float)($sidebarData['stats']['hours_given'] ?? 0), 1) ?></span>
-                            <span class="sidebar-text-muted" style="font-size:11px;text-transform:uppercase;letter-spacing:0.5px;">Given</span>
+                        <div class="sidebar-divider"></div>
+                        <a href="<?= $basePath ?>/wallet" class="sidebar-stat-link">
+                            <span class="sidebar-stat-value green"><?= number_format((float)($sidebarData['stats']['hours_given'] ?? 0), 1) ?></span>
+                            <span class="sidebar-text-muted sidebar-stat-label">Given</span>
                         </a>
-                        <div class="sidebar-divider" style="width:1px;"></div>
-                        <a href="<?= $basePath ?>/wallet" style="text-decoration:none;flex:1;">
-                            <span style="display:block;font-size:22px;font-weight:800;color:#f59e0b;"><?= number_format((float)($sidebarData['stats']['hours_received'] ?? 0), 1) ?></span>
-                            <span class="sidebar-text-muted" style="font-size:11px;text-transform:uppercase;letter-spacing:0.5px;">Received</span>
+                        <div class="sidebar-divider"></div>
+                        <a href="<?= $basePath ?>/wallet" class="sidebar-stat-link">
+                            <span class="sidebar-stat-value orange"><?= number_format((float)($sidebarData['stats']['hours_received'] ?? 0), 1) ?></span>
+                            <span class="sidebar-text-muted sidebar-stat-label">Received</span>
                         </a>
                     </div>
-                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
-                        <a href="<?= $basePath ?>/listings?user=me&type=offer" style="text-decoration:none;display:flex;align-items:center;gap:8px;padding:10px 12px;background:linear-gradient(135deg,rgba(16,185,129,0.1),rgba(5,150,105,0.05));border-radius:10px;">
-                            <i class="fa-solid fa-hand-holding-heart" style="color:#10b981;"></i>
-                            <span class="sidebar-text-dark" style="font-size:13px;"><strong><?= (int)($sidebarData['stats']['offers'] ?? 0) ?></strong> Offers</span>
+                    <div class="sidebar-mini-grid">
+                        <a href="<?= $basePath ?>/listings?user=me&type=offer" class="sidebar-mini-stat offers">
+                            <i class="fa-solid fa-hand-holding-heart green"></i>
+                            <span class="sidebar-text-dark"><strong><?= (int)($sidebarData['stats']['offers'] ?? 0) ?></strong> Offers</span>
                         </a>
-                        <a href="<?= $basePath ?>/listings?user=me&type=request" style="text-decoration:none;display:flex;align-items:center;gap:8px;padding:10px 12px;background:linear-gradient(135deg,rgba(249,115,22,0.1),rgba(234,88,12,0.05));border-radius:10px;">
-                            <i class="fa-solid fa-hand" style="color:#f97316;"></i>
-                            <span class="sidebar-text-dark" style="font-size:13px;"><strong><?= (int)($sidebarData['stats']['requests'] ?? 0) ?></strong> Requests</span>
+                        <a href="<?= $basePath ?>/listings?user=me&type=request" class="sidebar-mini-stat requests">
+                            <i class="fa-solid fa-hand orange"></i>
+                            <span class="sidebar-text-dark"><strong><?= (int)($sidebarData['stats']['requests'] ?? 0) ?></strong> Requests</span>
                         </a>
                     </div>
                 </div>
@@ -1718,9 +1719,9 @@ require __DIR__ . '/../layouts/modern/header.php';
                  ============================================ -->
             <?php if ($isLoggedIn && !empty($sidebarData['friends'])): ?>
             <div class="sidebar-card">
-                <div class="sidebar-card-header" style="display:flex;justify-content:space-between;align-items:center;">
-                    <h3 style="margin:0;"><i class="fa-solid fa-user-group"></i> Friends</h3>
-                    <a href="<?= $basePath ?>/connections" style="font-size:12px;color:#6366f1;text-decoration:none;">See All</a>
+                <div class="sidebar-card-header sidebar-header-flex">
+                    <h3><i class="fa-solid fa-user-group"></i> Friends</h3>
+                    <a href="<?= $basePath ?>/connections" class="sidebar-see-all">See All</a>
                 </div>
                 <div class="sidebar-card-body">
                     <?php foreach ($sidebarData['friends'] as $friend):
@@ -1730,18 +1731,18 @@ require __DIR__ . '/../layouts/modern/header.php';
                         $isOnline = !empty($friend['last_active_at']) && strtotime($friend['last_active_at']) > strtotime('-5 minutes');
                         $isRecent = !empty($friend['last_active_at']) && strtotime($friend['last_active_at']) > strtotime('-24 hours');
                     ?>
-                        <a href="<?= $basePath ?>/profile/<?= $friend['id'] ?>" class="sidebar-hover-item" style="display:flex;align-items:center;gap:12px;padding:10px;margin:-4px -8px;border-radius:12px;text-decoration:none;transition:background 0.2s;">
-                            <div style="position:relative;">
+                        <a href="<?= $basePath ?>/profile/<?= $friend['id'] ?>" class="sidebar-member-item">
+                            <div class="sidebar-avatar-wrapper">
                                 <?= webp_avatar($friend['avatar_url'] ?: null, $friendName, 44) ?>
                                 <?php if ($isOnline): ?>
-                                    <span class="sidebar-online-dot" style="position:absolute;bottom:2px;right:2px;width:12px;height:12px;background:#10b981;border-radius:50%;" title="Online now"></span>
+                                    <span class="sidebar-online-dot online" title="Online now"></span>
                                 <?php elseif ($isRecent): ?>
-                                    <span class="sidebar-online-dot" style="position:absolute;bottom:2px;right:2px;width:12px;height:12px;background:#f59e0b;border-radius:50%;" title="Active today"></span>
+                                    <span class="sidebar-online-dot recent" title="Active today"></span>
                                 <?php endif; ?>
                             </div>
-                            <div style="flex:1;min-width:0;">
-                                <span class="sidebar-text-dark" style="display:block;font-weight:600;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;"><?= htmlspecialchars($friendName) ?></span>
-                                <span class="sidebar-text-muted" style="font-size:12px;"><?= htmlspecialchars($friend['location'] ?: 'Community Member') ?></span>
+                            <div class="sidebar-member-info">
+                                <span class="sidebar-member-name"><?= htmlspecialchars($friendName) ?></span>
+                                <span class="sidebar-member-location"><?= htmlspecialchars($friend['location'] ?: 'Community Member') ?></span>
                             </div>
                         </a>
                     <?php endforeach; ?>
@@ -1758,26 +1759,26 @@ require __DIR__ . '/../layouts/modern/header.php';
                     <h3><i class="fa-solid fa-heart-pulse"></i> Community Pulse</h3>
                 </div>
                 <div class="sidebar-card-body">
-                    <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px;">
-                        <a href="<?= $basePath ?>/members" style="text-decoration:none;text-align:center;padding:12px 8px;background:linear-gradient(135deg,rgba(99,102,241,0.1),rgba(139,92,246,0.05));border-radius:12px;transition:transform 0.2s;" onmouseover="this.style.transform='scale(1.02)'" onmouseout="this.style.transform='scale(1)'">
-                            <i class="fa-solid fa-users" style="font-size:18px;color:#6366f1;display:block;margin-bottom:6px;"></i>
-                            <span style="font-size:20px;font-weight:800;color:#6366f1;display:block;"><?= number_format((int)($sidebarData['community']['members'] ?? 0)) ?></span>
-                            <span class="sidebar-text-muted" style="font-size:10px;text-transform:uppercase;letter-spacing:0.5px;">Members</span>
+                    <div class="sidebar-pulse-grid">
+                        <a href="<?= $basePath ?>/members" class="sidebar-pulse-item members">
+                            <i class="fa-solid fa-users indigo"></i>
+                            <span class="sidebar-pulse-value indigo"><?= number_format((int)($sidebarData['community']['members'] ?? 0)) ?></span>
+                            <span class="sidebar-pulse-label">Members</span>
                         </a>
-                        <a href="<?= $basePath ?>/listings" style="text-decoration:none;text-align:center;padding:12px 8px;background:linear-gradient(135deg,rgba(16,185,129,0.1),rgba(5,150,105,0.05));border-radius:12px;transition:transform 0.2s;" onmouseover="this.style.transform='scale(1.02)'" onmouseout="this.style.transform='scale(1)'">
-                            <i class="fa-solid fa-hand-holding-heart" style="font-size:18px;color:#10b981;display:block;margin-bottom:6px;"></i>
-                            <span style="font-size:20px;font-weight:800;color:#10b981;display:block;"><?= number_format((int)($sidebarData['community']['listings'] ?? 0)) ?></span>
-                            <span class="sidebar-text-muted" style="font-size:10px;text-transform:uppercase;letter-spacing:0.5px;">Listings</span>
+                        <a href="<?= $basePath ?>/listings" class="sidebar-pulse-item listings">
+                            <i class="fa-solid fa-hand-holding-heart green"></i>
+                            <span class="sidebar-pulse-value green"><?= number_format((int)($sidebarData['community']['listings'] ?? 0)) ?></span>
+                            <span class="sidebar-pulse-label">Listings</span>
                         </a>
-                        <a href="<?= $basePath ?>/events" style="text-decoration:none;text-align:center;padding:12px 8px;background:linear-gradient(135deg,rgba(236,72,153,0.1),rgba(219,39,119,0.05));border-radius:12px;transition:transform 0.2s;" onmouseover="this.style.transform='scale(1.02)'" onmouseout="this.style.transform='scale(1)'">
-                            <i class="fa-solid fa-calendar" style="font-size:18px;color:#ec4899;display:block;margin-bottom:6px;"></i>
-                            <span style="font-size:20px;font-weight:800;color:#ec4899;display:block;"><?= number_format((int)($sidebarData['community']['events'] ?? 0)) ?></span>
-                            <span class="sidebar-text-muted" style="font-size:10px;text-transform:uppercase;letter-spacing:0.5px;">Events</span>
+                        <a href="<?= $basePath ?>/events" class="sidebar-pulse-item events">
+                            <i class="fa-solid fa-calendar pink"></i>
+                            <span class="sidebar-pulse-value pink"><?= number_format((int)($sidebarData['community']['events'] ?? 0)) ?></span>
+                            <span class="sidebar-pulse-label">Events</span>
                         </a>
-                        <a href="<?= $basePath ?>/groups" style="text-decoration:none;text-align:center;padding:12px 8px;background:linear-gradient(135deg,rgba(245,158,11,0.1),rgba(217,119,6,0.05));border-radius:12px;transition:transform 0.2s;" onmouseover="this.style.transform='scale(1.02)'" onmouseout="this.style.transform='scale(1)'">
-                            <i class="fa-solid fa-users-rectangle" style="font-size:18px;color:#f59e0b;display:block;margin-bottom:6px;"></i>
-                            <span style="font-size:20px;font-weight:800;color:#f59e0b;display:block;"><?= number_format((int)($sidebarData['community']['groups_count'] ?? 0)) ?></span>
-                            <span class="sidebar-text-muted" style="font-size:10px;text-transform:uppercase;letter-spacing:0.5px;">Groups</span>
+                        <a href="<?= $basePath ?>/groups" class="sidebar-pulse-item groups">
+                            <i class="fa-solid fa-users-rectangle amber"></i>
+                            <span class="sidebar-pulse-value amber"><?= number_format((int)($sidebarData['community']['groups_count'] ?? 0)) ?></span>
+                            <span class="sidebar-pulse-label">Groups</span>
                         </a>
                     </div>
                 </div>
@@ -1789,21 +1790,21 @@ require __DIR__ . '/../layouts/modern/header.php';
                  ============================================ -->
             <?php if ($isLoggedIn && !empty($sidebarData['recommended'])): ?>
             <div class="sidebar-card">
-                <div class="sidebar-card-header" style="display:flex;justify-content:space-between;align-items:center;">
-                    <h3 style="margin:0;"><i class="fa-solid fa-sparkles"></i> Suggested For You</h3>
-                    <a href="<?= $basePath ?>/listings" style="font-size:12px;color:#6366f1;text-decoration:none;">See All</a>
+                <div class="sidebar-card-header sidebar-header-flex">
+                    <h3><i class="fa-solid fa-sparkles"></i> Suggested For You</h3>
+                    <a href="<?= $basePath ?>/listings" class="sidebar-see-all">See All</a>
                 </div>
                 <div class="sidebar-card-body">
                     <?php foreach ($sidebarData['recommended'] as $listing): ?>
-                        <a href="<?= $basePath ?>/listings/<?= $listing['id'] ?>" class="sidebar-hover-item" style="display:flex;align-items:center;gap:12px;padding:10px;margin:-4px -8px;border-radius:12px;text-decoration:none;transition:background 0.2s;">
-                            <div style="width:44px;height:44px;border-radius:12px;background:<?= $listing['type'] === 'offer' ? 'linear-gradient(135deg,#10b981,#059669)' : 'linear-gradient(135deg,#f97316,#ea580c)' ?>;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
-                                <i class="fa-solid <?= $listing['type'] === 'offer' ? 'fa-hand-holding-heart' : 'fa-hand' ?>" style="color:white;font-size:16px;"></i>
+                        <a href="<?= $basePath ?>/listings/<?= $listing['id'] ?>" class="sidebar-listing-item">
+                            <div class="sidebar-listing-icon <?= $listing['type'] === 'offer' ? 'offer' : 'request' ?>">
+                                <i class="fa-solid <?= $listing['type'] === 'offer' ? 'fa-hand-holding-heart' : 'fa-hand' ?>"></i>
                             </div>
-                            <div style="flex:1;min-width:0;">
-                                <span class="sidebar-text-dark" style="display:block;font-weight:600;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;"><?= htmlspecialchars($listing['title']) ?></span>
-                                <span class="sidebar-text-muted" style="font-size:12px;">by <?= htmlspecialchars($listing['owner_name'] ?? 'Member') ?></span>
+                            <div class="sidebar-listing-info">
+                                <span class="sidebar-listing-title"><?= htmlspecialchars($listing['title']) ?></span>
+                                <span class="sidebar-listing-author">by <?= htmlspecialchars($listing['owner_name'] ?? 'Member') ?></span>
                             </div>
-                            <span style="padding:4px 10px;border-radius:20px;font-size:10px;font-weight:600;text-transform:uppercase;background:<?= $listing['type'] === 'offer' ? 'rgba(16,185,129,0.1)' : 'rgba(249,115,22,0.1)' ?>;color:<?= $listing['type'] === 'offer' ? '#10b981' : '#f97316' ?>;"><?= $listing['type'] ?></span>
+                            <span class="sidebar-listing-badge <?= $listing['type'] === 'offer' ? 'offer' : 'request' ?>"><?= $listing['type'] ?></span>
                         </a>
                     <?php endforeach; ?>
                 </div>
@@ -1815,26 +1816,20 @@ require __DIR__ . '/../layouts/modern/header.php';
                  ============================================ -->
             <?php if (!empty($sidebarData['trending'])): ?>
             <div class="sidebar-card">
-                <div class="sidebar-card-header" style="display:flex;justify-content:space-between;align-items:center;">
-                    <h3 style="margin:0;"><i class="fa-solid fa-fire"></i> Top Categories</h3>
-                    <a href="<?= $basePath ?>/listings" style="font-size:12px;color:#6366f1;text-decoration:none;">All Listings</a>
+                <div class="sidebar-card-header sidebar-header-flex">
+                    <h3><i class="fa-solid fa-fire"></i> Top Categories</h3>
+                    <a href="<?= $basePath ?>/listings" class="sidebar-see-all">All Listings</a>
                 </div>
                 <div class="sidebar-card-body">
-                    <div style="display:flex;flex-wrap:wrap;gap:8px;">
-                        <?php foreach ($sidebarData['trending'] as $index => $cat):
-                            $colors = ['#6366f1', '#ec4899', '#10b981', '#f59e0b', '#8b5cf6', '#06b6d4', '#ef4444', '#84cc16'];
-                            $color = $cat['color'] ? '#' . ltrim($cat['color'], '#') : $colors[$index % count($colors)];
-                            // Ensure color is a valid hex
-                            if (!preg_match('/^#[0-9A-Fa-f]{6}$/', $color)) {
-                                $color = $colors[$index % count($colors)];
-                            }
+                    <div class="sidebar-tags">
+                        <?php
+                        $colorClasses = ['color-indigo', 'color-pink', 'color-green', 'color-amber', 'color-violet', 'color-cyan', 'color-red', 'color-lime'];
+                        foreach ($sidebarData['trending'] as $index => $cat):
+                            $colorClass = $colorClasses[$index % count($colorClasses)];
                         ?>
-                            <a href="<?= $basePath ?>/listings?cat=<?= (int)$cat['id'] ?>"
-                               style="display:inline-flex;align-items:center;gap:6px;padding:8px 14px;background:<?= $color ?>15;border-radius:20px;text-decoration:none;transition:all 0.2s;border:1px solid <?= $color ?>30;"
-                               onmouseover="this.style.background='<?= $color ?>25';this.style.transform='translateY(-1px)'"
-                               onmouseout="this.style.background='<?= $color ?>15';this.style.transform='translateY(0)'">
-                                <span style="font-size:13px;font-weight:500;color:<?= $color ?>;"><?= htmlspecialchars($cat['name']) ?></span>
-                                <span style="font-size:11px;font-weight:600;color:<?= $color ?>;opacity:0.7;">(<?= (int)$cat['listing_count'] ?>)</span>
+                            <a href="<?= $basePath ?>/listings?cat=<?= (int)$cat['id'] ?>" class="sidebar-tag <?= $colorClass ?>">
+                                <span class="sidebar-tag-name"><?= htmlspecialchars($cat['name']) ?></span>
+                                <span class="sidebar-tag-count">(<?= (int)$cat['listing_count'] ?>)</span>
                             </a>
                         <?php endforeach; ?>
                     </div>
@@ -1847,15 +1842,15 @@ require __DIR__ . '/../layouts/modern/header.php';
                  ============================================ -->
             <?php if (!empty($sidebarData['members'])): ?>
             <div class="sidebar-card">
-                <div class="sidebar-card-header" style="display:flex;justify-content:space-between;align-items:center;">
-                    <h3 style="margin:0;"><i class="fa-solid fa-user-plus"></i> People You May Know</h3>
-                    <div style="display:flex;align-items:center;gap:8px;">
+                <div class="sidebar-card-header sidebar-header-flex">
+                    <h3><i class="fa-solid fa-user-plus"></i> People You May Know</h3>
+                    <div class="sidebar-header-actions">
                         <?php if (!empty($sidebarData['communityRankActive'])): ?>
-                        <span style="display:inline-flex;align-items:center;gap:4px;background:linear-gradient(135deg,rgba(16,185,129,0.15),rgba(6,182,212,0.15));border:1px solid rgba(16,185,129,0.3);border-radius:12px;padding:2px 8px;font-size:10px;color:#10b981;" title="Members ranked by CommunityRank algorithm">
-                            <i class="fa-solid fa-diagram-project" style="font-size:9px;"></i> CR
+                        <span class="sidebar-cr-badge" title="Members ranked by CommunityRank algorithm">
+                            <i class="fa-solid fa-diagram-project"></i> CR
                         </span>
                         <?php endif; ?>
-                        <a href="<?= $basePath ?>/members" style="font-size:12px;color:#6366f1;text-decoration:none;">See All</a>
+                        <a href="<?= $basePath ?>/members" class="sidebar-see-all">See All</a>
                     </div>
                 </div>
                 <div class="sidebar-card-body">
@@ -1871,20 +1866,20 @@ require __DIR__ . '/../layouts/modern/header.php';
                         // Fallback to last_login_at for "recently active" indicator (within 24h)
                         $isRecentlyActive = !$isOnline && $member['last_login_at'] && (strtotime($member['last_login_at']) > strtotime('-1 day'));
                     ?>
-                        <div class="sidebar-border-light" style="display:flex;align-items:center;gap:12px;padding:8px 0;border-bottom:1px solid;">
-                            <div style="position:relative;">
+                        <div class="sidebar-member-row">
+                            <div class="sidebar-avatar-wrapper">
                                 <?= webp_avatar($member['avatar_url'] ?: null, $memberName, 48) ?>
                                 <?php if ($isOnline): ?>
-                                    <span class="sidebar-online-dot" style="position:absolute;bottom:2px;right:2px;width:12px;height:12px;background:#10b981;border:2px solid var(--bg-card, white);border-radius:50%;" title="Online now"></span>
+                                    <span class="sidebar-online-dot online" title="Online now"></span>
                                 <?php elseif ($isRecentlyActive): ?>
-                                    <span class="sidebar-online-dot" style="position:absolute;bottom:2px;right:2px;width:12px;height:12px;background:#f59e0b;border:2px solid var(--bg-card, white);border-radius:50%;" title="Active today"></span>
+                                    <span class="sidebar-online-dot recent" title="Active today"></span>
                                 <?php endif; ?>
                             </div>
-                            <div style="flex:1;min-width:0;">
-                                <a href="<?= $basePath ?>/profile/<?= $member['id'] ?>" class="sidebar-text-dark" style="display:block;font-weight:600;font-size:14px;text-decoration:none;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;"><?= htmlspecialchars($memberName) ?></a>
-                                <span class="sidebar-text-muted" style="font-size:12px;"><?= htmlspecialchars($member['location'] ?: 'Community Member') ?></span>
+                            <div class="sidebar-member-info">
+                                <a href="<?= $basePath ?>/profile/<?= $member['id'] ?>" class="sidebar-member-name"><?= htmlspecialchars($memberName) ?></a>
+                                <span class="sidebar-member-location"><?= htmlspecialchars($member['location'] ?: 'Community Member') ?></span>
                             </div>
-                            <a href="<?= $basePath ?>/profile/<?= $member['id'] ?>" style="padding:6px 14px;background:linear-gradient(135deg,#6366f1,#8b5cf6);color:white;border-radius:8px;font-size:12px;font-weight:600;text-decoration:none;transition:opacity 0.2s;" onmouseover="this.style.opacity='0.9'" onmouseout="this.style.opacity='1'">View</a>
+                            <a href="<?= $basePath ?>/profile/<?= $member['id'] ?>" class="sidebar-btn-view">View</a>
                         </div>
                     <?php endforeach; ?>
                 </div>
@@ -1896,26 +1891,26 @@ require __DIR__ . '/../layouts/modern/header.php';
                  ============================================ -->
             <?php if (!empty($sidebarData['events'])): ?>
             <div class="sidebar-card">
-                <div class="sidebar-card-header" style="display:flex;justify-content:space-between;align-items:center;">
-                    <h3 style="margin:0;"><i class="fa-solid fa-calendar-days"></i> Upcoming Events</h3>
-                    <a href="<?= $basePath ?>/events" style="font-size:12px;color:#6366f1;text-decoration:none;">See All</a>
+                <div class="sidebar-card-header sidebar-header-flex">
+                    <h3><i class="fa-solid fa-calendar-days"></i> Upcoming Events</h3>
+                    <a href="<?= $basePath ?>/events" class="sidebar-see-all">See All</a>
                 </div>
                 <div class="sidebar-card-body">
                     <?php foreach ($sidebarData['events'] as $event):
                         $eventDate = new DateTime($event['start_time']);
                     ?>
-                        <a href="<?= $basePath ?>/events/<?= $event['id'] ?>" class="sidebar-hover-item" style="display:flex;gap:12px;padding:10px;margin:-4px -8px;border-radius:12px;text-decoration:none;transition:background 0.2s;">
-                            <div style="width:50px;padding:8px;background:linear-gradient(135deg,#6366f1,#8b5cf6);border-radius:12px;text-align:center;color:white;flex-shrink:0;">
-                                <span style="display:block;font-size:10px;font-weight:600;text-transform:uppercase;opacity:0.9;"><?= $eventDate->format('M') ?></span>
-                                <span style="display:block;font-size:22px;font-weight:800;line-height:1;"><?= $eventDate->format('j') ?></span>
+                        <a href="<?= $basePath ?>/events/<?= $event['id'] ?>" class="sidebar-event-item">
+                            <div class="sidebar-event-date">
+                                <span class="sidebar-event-month"><?= $eventDate->format('M') ?></span>
+                                <span class="sidebar-event-day"><?= $eventDate->format('j') ?></span>
                             </div>
-                            <div style="flex:1;min-width:0;">
-                                <span class="sidebar-text-dark" style="display:block;font-weight:600;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;"><?= htmlspecialchars($event['title']) ?></span>
-                                <span class="sidebar-text-muted" style="display:flex;align-items:center;gap:4px;font-size:12px;margin-top:4px;">
+                            <div class="sidebar-event-info">
+                                <span class="sidebar-event-title"><?= htmlspecialchars($event['title']) ?></span>
+                                <span class="sidebar-event-meta">
                                     <i class="fa-regular fa-clock"></i> <?= $eventDate->format('g:i A') ?>
                                 </span>
                                 <?php if (!empty($event['location'])): ?>
-                                <span class="sidebar-text-muted" style="display:flex;align-items:center;gap:4px;font-size:12px;">
+                                <span class="sidebar-event-meta">
                                     <i class="fa-solid fa-location-dot"></i> <?= htmlspecialchars(mb_strimwidth($event['location'], 0, 25, '...')) ?>
                                 </span>
                                 <?php endif; ?>
@@ -1931,23 +1926,23 @@ require __DIR__ . '/../layouts/modern/header.php';
                  ============================================ -->
             <?php if (!empty($sidebarData['groups'])): ?>
             <div class="sidebar-card">
-                <div class="sidebar-card-header" style="display:flex;justify-content:space-between;align-items:center;">
-                    <h3 style="margin:0;"><i class="fa-solid fa-users-rectangle"></i> Popular Groups</h3>
-                    <a href="<?= $basePath ?>/groups" style="font-size:12px;color:#6366f1;text-decoration:none;">See All</a>
+                <div class="sidebar-card-header sidebar-header-flex">
+                    <h3><i class="fa-solid fa-users-rectangle"></i> Popular Groups</h3>
+                    <a href="<?= $basePath ?>/groups" class="sidebar-see-all">See All</a>
                 </div>
                 <div class="sidebar-card-body">
                     <?php foreach ($sidebarData['groups'] as $group): ?>
-                        <a href="<?= $basePath ?>/groups/<?= $group['id'] ?>" class="sidebar-hover-item" style="display:flex;align-items:center;gap:12px;padding:10px;margin:-4px -8px;border-radius:12px;text-decoration:none;transition:background 0.2s;">
-                            <div style="width:48px;height:48px;border-radius:12px;background:linear-gradient(135deg,#f59e0b,#d97706);display:flex;align-items:center;justify-content:center;flex-shrink:0;overflow:hidden;">
+                        <a href="<?= $basePath ?>/groups/<?= $group['id'] ?>" class="sidebar-group-item">
+                            <div class="sidebar-group-icon">
                                 <?php if (!empty($group['cover_image'])): ?>
-                                    <img src="<?= htmlspecialchars($group['cover_image']) ?>" loading="lazy" style="width:100%;height:100%;object-fit:cover;">
+                                    <img src="<?= htmlspecialchars($group['cover_image']) ?>" loading="lazy" alt="">
                                 <?php else: ?>
-                                    <i class="fa-solid fa-users" style="color:white;font-size:18px;"></i>
+                                    <i class="fa-solid fa-users"></i>
                                 <?php endif; ?>
                             </div>
-                            <div style="flex:1;min-width:0;">
-                                <span class="sidebar-text-dark" style="display:block;font-weight:600;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;"><?= htmlspecialchars($group['name']) ?></span>
-                                <span class="sidebar-text-muted" style="font-size:12px;"><?= htmlspecialchars(mb_strimwidth($group['description'] ?? 'Community Group', 0, 30, '...')) ?></span>
+                            <div class="sidebar-group-info">
+                                <span class="sidebar-group-name"><?= htmlspecialchars($group['name']) ?></span>
+                                <span class="sidebar-group-desc"><?= htmlspecialchars(mb_strimwidth($group['description'] ?? 'Community Group', 0, 30, '...')) ?></span>
                             </div>
                         </a>
                     <?php endforeach; ?>
@@ -1964,46 +1959,35 @@ require __DIR__ . '/../layouts/modern/header.php';
                 </div>
                 <div class="sidebar-card-body">
                     <?php if ($isLoggedIn): ?>
-                    <a href="<?= $basePath ?>/compose?type=listing" style="display:flex;align-items:center;gap:12px;padding:14px 16px;background:linear-gradient(135deg,#6366f1,#8b5cf6);border-radius:14px;text-decoration:none;margin-bottom:10px;transition:transform 0.2s,box-shadow 0.2s;" onmouseover="this.style.transform='translateY(-2px)';this.style.boxShadow='0 8px 20px rgba(99,102,241,0.3)'" onmouseout="this.style.transform='translateY(0)';this.style.boxShadow='none'">
-                        <i class="fa-solid fa-plus-circle" style="color:white;font-size:22px;"></i>
+                    <a href="<?= $basePath ?>/compose?type=listing" class="sidebar-cta-primary">
+                        <i class="fa-solid fa-plus-circle"></i>
                         <div>
-                            <span style="display:block;font-weight:700;color:white;font-size:15px;">Create New Listing</span>
-                            <span style="font-size:12px;color:rgba(255,255,255,0.8);">Share your skills with the community</span>
+                            <span class="sidebar-cta-primary-text">Create New Listing</span>
+                            <span class="sidebar-cta-primary-sub">Share your skills with the community</span>
                         </div>
                     </a>
                     <?php endif; ?>
-                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
-                        <a href="<?= $basePath ?>/compose?type=event" style="text-decoration:none;display:flex;flex-direction:column;align-items:center;gap:6px;padding:14px 8px;background:linear-gradient(135deg,rgba(236,72,153,0.1),rgba(219,39,119,0.05));border-radius:12px;transition:transform 0.2s;" onmouseover="this.style.transform='scale(1.02)'" onmouseout="this.style.transform='scale(1)'">
-                            <i class="fa-solid fa-calendar-plus" style="font-size:20px;color:#ec4899;"></i>
-                            <span class="sidebar-text-dark" style="font-size:12px;font-weight:600;">Host Event</span>
+                    <div class="sidebar-action-grid">
+                        <a href="<?= $basePath ?>/compose?type=event" class="sidebar-action-item pink">
+                            <i class="fa-solid fa-calendar-plus pink"></i>
+                            <span class="sidebar-action-label">Host Event</span>
                         </a>
-                        <a href="<?= $basePath ?>/compose?type=poll" style="text-decoration:none;display:flex;flex-direction:column;align-items:center;gap:6px;padding:14px 8px;background:linear-gradient(135deg,rgba(99,102,241,0.1),rgba(139,92,246,0.05));border-radius:12px;transition:transform 0.2s;" onmouseover="this.style.transform='scale(1.02)'" onmouseout="this.style.transform='scale(1)'">
-                            <i class="fa-solid fa-square-poll-vertical" style="font-size:20px;color:#6366f1;"></i>
-                            <span class="sidebar-text-dark" style="font-size:12px;font-weight:600;">Create Poll</span>
+                        <a href="<?= $basePath ?>/compose?type=poll" class="sidebar-action-item indigo">
+                            <i class="fa-solid fa-square-poll-vertical indigo"></i>
+                            <span class="sidebar-action-label">Create Poll</span>
                         </a>
-                        <a href="<?= $basePath ?>/compose?type=goal" style="text-decoration:none;display:flex;flex-direction:column;align-items:center;gap:6px;padding:14px 8px;background:linear-gradient(135deg,rgba(245,158,11,0.1),rgba(217,119,6,0.05));border-radius:12px;transition:transform 0.2s;" onmouseover="this.style.transform='scale(1.02)'" onmouseout="this.style.transform='scale(1)'">
-                            <i class="fa-solid fa-bullseye" style="font-size:20px;color:#f59e0b;"></i>
-                            <span class="sidebar-text-dark" style="font-size:12px;font-weight:600;">Set Goal</span>
+                        <a href="<?= $basePath ?>/compose?type=goal" class="sidebar-action-item amber">
+                            <i class="fa-solid fa-bullseye amber"></i>
+                            <span class="sidebar-action-label">Set Goal</span>
                         </a>
-                        <a href="<?= $basePath ?>/groups" style="text-decoration:none;display:flex;flex-direction:column;align-items:center;gap:6px;padding:14px 8px;background:linear-gradient(135deg,rgba(16,185,129,0.1),rgba(5,150,105,0.05));border-radius:12px;transition:transform 0.2s;" onmouseover="this.style.transform='scale(1.02)'" onmouseout="this.style.transform='scale(1)'">
-                            <i class="fa-solid fa-users-rectangle" style="font-size:20px;color:#10b981;"></i>
-                            <span class="sidebar-text-dark" style="font-size:12px;font-weight:600;">Groups</span>
+                        <a href="<?= $basePath ?>/groups" class="sidebar-action-item green">
+                            <i class="fa-solid fa-users-rectangle green"></i>
+                            <span class="sidebar-action-label">Groups</span>
                         </a>
                     </div>
                 </div>
             </div>
 
-            <!-- ============================================
-                 FOOTER - App Download / Social
-                 ============================================ -->
-            <div style="text-align:center;padding:16px;color:#94a3b8;font-size:11px;">
-                <p style="margin:0 0 8px;">© <?= date('Y') ?> Community Timebank</p>
-                <div style="display:flex;justify-content:center;gap:12px;">
-                    <a href="#" style="color:#94a3b8;"><i class="fa-brands fa-facebook" style="font-size:16px;"></i></a>
-                    <a href="#" style="color:#94a3b8;"><i class="fa-brands fa-twitter" style="font-size:16px;"></i></a>
-                    <a href="#" style="color:#94a3b8;"><i class="fa-brands fa-instagram" style="font-size:16px;"></i></a>
-                </div>
-            </div>
         </aside>
     </div> <!-- /.home-two-column-grid -->
 
@@ -2023,834 +2007,14 @@ require __DIR__ . '/../layouts/modern/header.php';
 require __DIR__ . '/../layouts/modern/footer.php';
 ?>
 
+<!-- Home Feed Configuration -->
 <script>
-    const IS_LOGGED_IN = <?= json_encode($isLoggedIn) ?>;
-    const BASE_URL = "<?= \Nexus\Core\TenantContext::getBasePath() ?>";
-
-    // ============================================
-    // FACEBOOK-STYLE FEED MENU FUNCTIONS
-    // ============================================
-
-    // Toggle 3-dot menu dropdown
-    function toggleFeedItemMenu(btn) {
-        event.stopPropagation();
-        const dropdown = btn.nextElementSibling;
-        if (!dropdown) return;
-
-        const isOpen = dropdown.classList.contains('show');
-        closeFeedMenus();
-
-        if (!isOpen) {
-            dropdown.classList.add('show');
-            document.addEventListener('click', closeFeedMenusOnOutsideClick);
-        }
-    }
-
-    function closeFeedMenus() {
-        document.querySelectorAll('.feed-item-menu-dropdown.show').forEach(d => {
-            d.classList.remove('show');
-        });
-        document.removeEventListener('click', closeFeedMenusOnOutsideClick);
-    }
-
-    function closeFeedMenusOnOutsideClick(e) {
-        if (!e.target.closest('.feed-item-menu-container')) {
-            closeFeedMenus();
-        }
-    }
-
-    // Hide post function
-    function hidePost(postId) {
-        if (!IS_LOGGED_IN) {
-            window.location.href = BASE_URL + '/login';
-            return;
-        }
-
-        fetch(BASE_URL + '/api/feed/hide', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            credentials: 'include',
-            body: JSON.stringify({ post_id: postId })
-        })
-        .then(r => r.json())
-        .then(data => {
-            if (data.success) {
-                // Fade out the post
-                const card = event.target.closest('.fb-card');
-                if (card) {
-                    card.style.transition = 'opacity 0.3s, transform 0.3s';
-                    card.style.opacity = '0';
-                    card.style.transform = 'scale(0.95)';
-                    setTimeout(() => card.remove(), 300);
-                }
-                showFeedToast('Post hidden. You won\'t see this anymore.');
-            } else {
-                showFeedToast(data.error || 'Could not hide post', 'error');
-            }
-        })
-        .catch(() => showFeedToast('Could not hide post', 'error'));
-    }
-
-    // Mute user function
-    function muteUser(userId) {
-        if (!IS_LOGGED_IN) {
-            window.location.href = BASE_URL + '/login';
-            return;
-        }
-
-        fetch(BASE_URL + '/api/feed/mute', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            credentials: 'include',
-            body: JSON.stringify({ user_id: userId })
-        })
-        .then(r => r.json())
-        .then(data => {
-            if (data.success) {
-                showFeedToast('User muted. You\'ll see fewer of their posts.');
-            } else {
-                showFeedToast(data.error || 'Could not mute user', 'error');
-            }
-        })
-        .catch(() => showFeedToast('Could not mute user', 'error'));
-    }
-
-    // Report post function
-    function reportPost(postId) {
-        if (!IS_LOGGED_IN) {
-            window.location.href = BASE_URL + '/login';
-            return;
-        }
-
-        if (confirm('Are you sure you want to report this post?')) {
-            fetch(BASE_URL + '/api/feed/report', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                credentials: 'include',
-                body: JSON.stringify({ post_id: postId, target_type: 'post' })
-            })
-            .then(r => r.json())
-            .then(data => {
-                if (data.success) {
-                    showFeedToast('Thanks for letting us know. We\'ll review this post.');
-                } else {
-                    showFeedToast(data.error || 'Could not submit report', 'error');
-                }
-            })
-            .catch(() => showFeedToast('Could not submit report', 'error'));
-        }
-    }
-
-    // Simple toast notification
-    function showFeedToast(message, type = 'success') {
-        // Use NexusMobile toast if available
-        if (window.NexusMobile && NexusMobile.showToast) {
-            NexusMobile.showToast(message, type);
-            return;
-        }
-
-        // Fallback toast
-        const existing = document.querySelector('.feed-toast');
-        if (existing) existing.remove();
-
-        const toast = document.createElement('div');
-        toast.className = 'feed-toast';
-        toast.style.cssText = `
-            position: fixed;
-            bottom: 100px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: ${type === 'error' ? '#ef4444' : '#1e293b'};
-            color: white;
-            padding: 12px 20px;
-            border-radius: 8px;
-            font-size: 14px;
-            font-weight: 500;
-            z-index: 10000;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-            animation: toastSlide 0.3s ease;
-        `;
-        toast.textContent = message;
-        document.body.appendChild(toast);
-
-        setTimeout(() => {
-            toast.style.opacity = '0';
-            setTimeout(() => toast.remove(), 300);
-        }, 3000);
-    }
-
-    // Ensure SocialInteractions is configured (belt and suspenders)
+    window.HomeFeed = {
+        isLoggedIn: <?= json_encode($isLoggedIn) ?>,
+        baseUrl: "<?= \Nexus\Core\TenantContext::getBasePath() ?>"
+    };
+    // Configure SocialInteractions
     window.SocialInteractions = window.SocialInteractions || {};
     window.SocialInteractions.isLoggedIn = <?= $isLoggedIn ? 'true' : 'false' ?>;
-    console.log('Home.php SocialInteractions config:', window.SocialInteractions);
-
-    // ============================================
-    // SKELETON LOADER - Show shimmer then reveal content
-    // ============================================
-    document.addEventListener('DOMContentLoaded', function() {
-        const skeleton = document.getElementById('skeletonLoader');
-        const feed = document.getElementById('feedContainer');
-
-        console.log('[SKELETON LOADER] Elements found:', { skeleton: !!skeleton, feed: !!feed });
-
-        if (!skeleton || !feed) {
-            console.error('[SKELETON LOADER] Missing elements!');
-            return;
-        }
-
-        // Brief shimmer effect then reveal real content
-        setTimeout(function() {
-            console.log('[SKELETON LOADER] Hiding skeleton and showing feed');
-            skeleton.classList.add('hidden');
-            feed.classList.add('loaded');
-        }, 400); // Brief delay for perceived performance
-    });
-
-    // ============================================
-    // Pull-to-refresh feature has been permanently removed
-
-    // Feed Filter Function
-    function filterFeed(filterType) {
-        console.log('[FilterFeed] Filtering by:', filterType);
-
-        // Update button states
-        document.querySelectorAll('.feed-filter-btn').forEach(btn => {
-            btn.classList.remove('active');
-        });
-        document.querySelector(`.feed-filter-btn[data-filter="${filterType}"]`)?.classList.add('active');
-
-        // Get all feed items - use fb-card which is the main feed card class
-        const feedItems = document.querySelectorAll('.fb-card[data-feed-type]');
-        let visibleCount = 0;
-
-        feedItems.forEach(item => {
-            if (filterType === 'all') {
-                item.style.display = '';
-                visibleCount++;
-                return;
-            }
-
-            // Get item type from data attribute
-            const itemType = item.dataset.feedType;
-
-            if (itemType === filterType) {
-                item.style.display = '';
-                visibleCount++;
-            } else {
-                item.style.display = 'none';
-            }
-        });
-
-        console.log('[FilterFeed] Visible items:', visibleCount, 'of', feedItems.length);
-
-        // Haptic feedback
-        if (navigator.vibrate) navigator.vibrate(10);
-    }
-
-    // ============================================
-    // UNIVERSAL FEED FILTER INTEGRATION
-    // Connect FeedFilter component to server-side ranked queries
-    // ============================================
-    if (typeof FeedFilter !== 'undefined') {
-        // Track previous state to detect changes that require reload
-        let previousAlgo = FeedFilter.getActiveFilter().algorithmMode;
-        let previousLocation = FeedFilter.getActiveFilter().locationMode;
-        let previousRadius = FeedFilter.getActiveFilter().radius;
-
-        FeedFilter.onFilterChange(function(state) {
-            // Check if algo, location mode, or radius changed - these require server reload
-            const needsReload = (
-                state.algorithmMode !== previousAlgo ||
-                state.locationMode !== previousLocation ||
-                (state.locationMode === 'nearby' && state.radius !== previousRadius)
-            );
-
-            if (needsReload) {
-                // These changes affect server-side queries, need full page reload
-                // URL is already updated by FeedFilter component
-                console.log('[FeedFilter] Server-side change detected, reloading...');
-                window.location.reload();
-                return;
-            }
-
-            // Update tracking
-            previousAlgo = state.algorithmMode;
-            previousLocation = state.locationMode;
-            previousRadius = state.radius;
-
-            // Map new filter names to legacy filterFeed names
-            const filterMap = {
-                'all': 'all',
-                'listings': 'listings',
-                'events': 'events',
-                'goals': 'goals',
-                'polls': 'polls',
-                'volunteering': 'volunteering',
-                'groups': 'groups',
-                'resources': 'resources'
-            };
-
-            const legacyFilter = filterMap[state.filter] || 'all';
-
-            // Call the existing filterFeed function for client-side filtering
-            filterFeed(legacyFilter);
-
-            // Handle sub-filters (offers/requests for listings)
-            if (state.filter === 'listings' && state.subFilter) {
-                const feedItems = document.querySelectorAll('[data-feed-type="listings"], .feed-listing');
-                feedItems.forEach(item => {
-                    if (state.subFilter === 'all') {
-                        item.style.display = '';
-                    } else {
-                        const listingType = item.dataset.listingType ||
-                            (item.querySelector('.listing-type-offer') ? 'offers' :
-                             item.querySelector('.listing-type-request') ? 'requests' : null);
-
-                        if (listingType === state.subFilter) {
-                            item.style.display = '';
-                        } else if (listingType) {
-                            item.style.display = 'none';
-                        }
-                    }
-                });
-            }
-        });
-    }
-
-    // ============================================
-    // SOCIAL INTERACTION FUNCTIONS
-    // Now provided by shared library: /assets/js/social-interactions.js
-    // Functions available globally: toggleLike, toggleCommentSection,
-    // fetchComments, submitComment, repostToFeed, deletePost, showToast,
-    // toggleReaction, showReplyForm, submitReply, editComment, deleteComment
-    // ============================================
-
-    // Focus Composer (page-specific) - scrolls to and focuses the textarea
-    function focusComposer() {
-        const composer = document.getElementById('composer-input');
-        if (composer) {
-            composer.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            setTimeout(() => composer.focus(), 300);
-        }
-    }
-
-    // Image preview (page-specific)
-    function previewImage(input) {
-        if (input.files && input.files[0]) {
-            var reader = new FileReader();
-            reader.onload = function(e) {
-                document.getElementById('image-preview-img').src = e.target.result;
-                document.getElementById('image-preview-area').style.display = 'block';
-
-                // Hide video preview if showing (can only have image OR video)
-                const videoArea = document.getElementById('video-preview-area');
-                const videoPlayer = document.getElementById('video-preview-player');
-                const videoInput = document.getElementById('post-video-input');
-                if (videoArea) {
-                    videoArea.style.display = 'none';
-                    if (videoPlayer && videoPlayer.src) {
-                        URL.revokeObjectURL(videoPlayer.src);
-                        videoPlayer.src = '';
-                    }
-                    if (videoInput) videoInput.value = '';
-                }
-            }
-            reader.readAsDataURL(input.files[0]);
-        }
-    }
-
-    function removeImage() {
-        document.getElementById('post-image-input').value = '';
-        document.getElementById('image-preview-area').style.display = 'none';
-    }
-
-    // ============================================
-    // VIDEO PREVIEW & UPLOAD
-    // ============================================
-    function previewVideo(input) {
-        if (input.files && input.files[0]) {
-            const file = input.files[0];
-            const maxSize = 100 * 1024 * 1024; // 100MB limit
-
-            if (file.size > maxSize) {
-                showToast('Video must be less than 100MB');
-                input.value = '';
-                return;
-            }
-
-            const videoPlayer = document.getElementById('video-preview-player');
-            const videoArea = document.getElementById('video-preview-area');
-
-            // Create object URL for preview
-            const videoURL = URL.createObjectURL(file);
-            videoPlayer.src = videoURL;
-            videoArea.style.display = 'block';
-
-            // Hide image preview if showing
-            document.getElementById('image-preview-area').style.display = 'none';
-            document.getElementById('post-image-input').value = '';
-        }
-    }
-
-    function removeVideo() {
-        const videoPlayer = document.getElementById('video-preview-player');
-        const videoArea = document.getElementById('video-preview-area');
-
-        // Revoke the object URL to free memory
-        if (videoPlayer.src) {
-            URL.revokeObjectURL(videoPlayer.src);
-        }
-
-        videoPlayer.src = '';
-        document.getElementById('post-video-input').value = '';
-        videoArea.style.display = 'none';
-    }
-
-    // ============================================
-    // EMOJI PICKER
-    // ============================================
-    const emojiData = {
-        smileys: ['😀', '😃', '😄', '😁', '😆', '😅', '🤣', '😂', '🙂', '🙃', '😉', '😊', '😇', '🥰', '😍', '🤩', '😘', '😗', '😚', '😙', '🥲', '😋', '😛', '😜', '🤪', '😝', '🤑', '🤗', '🤭', '🤫', '🤔', '🤐', '🤨', '😐', '😑', '😶', '😏', '😒', '🙄', '😬', '🤥', '😌', '😔', '😪', '🤤', '😴', '😷', '🤒', '🤕', '🤢', '🤮', '🤧', '🥵', '🥶', '🥴', '😵', '🤯', '🤠', '🥳', '🥸', '😎', '🤓', '🧐'],
-        people: ['👋', '🤚', '🖐️', '✋', '🖖', '👌', '🤌', '🤏', '✌️', '🤞', '🤟', '🤘', '🤙', '👈', '👉', '👆', '🖕', '👇', '👍', '👎', '✊', '👊', '🤛', '🤜', '👏', '🙌', '👐', '🤲', '🤝', '🙏', '💪', '🦾', '🦿', '🦵', '🦶', '👂', '🦻', '👃', '🧠', '🫀', '🫁', '🦷', '🦴', '👀', '👁️', '👅', '👄', '👶', '🧒', '👦', '👧', '🧑', '👱', '👨', '🧔', '👩', '🧓', '👴', '👵'],
-        nature: ['🐶', '🐱', '🐭', '🐹', '🐰', '🦊', '🐻', '🐼', '🐨', '🐯', '🦁', '🐮', '🐷', '🐽', '🐸', '🐵', '🙈', '🙉', '🙊', '🐒', '🐔', '🐧', '🐦', '🐤', '🐣', '🐥', '🦆', '🦅', '🦉', '🦇', '🐺', '🐗', '🐴', '🦄', '🐝', '🐛', '🦋', '🐌', '🐞', '🐜', '🦟', '🦗', '🌸', '💐', '🌷', '🌹', '🥀', '🌺', '🌻', '🌼', '🌱', '🌲', '🌳', '🌴', '🌵', '🌾', '🌿', '☘️', '🍀', '🍁', '🍂', '🍃'],
-        food: ['🍕', '🍔', '🍟', '🌭', '🍿', '🧂', '🥓', '🥚', '🍳', '🧇', '🥞', '🧈', '🍞', '🥐', '🥖', '🥨', '🧀', '🥗', '🥙', '🥪', '🌮', '🌯', '🫔', '🥫', '🍝', '🍜', '🍲', '🍛', '🍣', '🍱', '🥟', '🦪', '🍤', '🍙', '🍚', '🍘', '🍥', '🥠', '🥮', '🍢', '🍡', '🍧', '🍨', '🍦', '🥧', '🧁', '🍰', '🎂', '🍮', '🍭', '🍬', '🍫', '🍩', '🍪', '🌰', '🥜', '🍯', '🥛', '🍼', '☕', '🍵', '🧃', '🥤', '🧋'],
-        activities: ['⚽', '🏀', '🏈', '⚾', '🥎', '🎾', '🏐', '🏉', '🥏', '🎱', '🪀', '🏓', '🏸', '🏒', '🏑', '🥍', '🏏', '🪃', '🥅', '⛳', '🪁', '🏹', '🎣', '🤿', '🥊', '🥋', '🎽', '🛹', '🛼', '🛷', '⛸️', '🥌', '🎿', '⛷️', '🏂', '🪂', '🏋️', '🤼', '🤸', '🤺', '⛹️', '🤾', '🏌️', '🏇', '🧘', '🏄', '🏊', '🤽', '🚣', '🧗', '🚵', '🚴', '🏆', '🥇', '🥈', '🥉', '🏅', '🎖️', '🏵️', '🎗️', '🎫', '🎟️', '🎪', '🎭'],
-        travel: ['🚗', '🚕', '🚙', '🚌', '🚎', '🏎️', '🚓', '🚑', '🚒', '🚐', '🛻', '🚚', '🚛', '🚜', '🦯', '🦽', '🦼', '🛴', '🚲', '🛵', '🏍️', '🛺', '🚨', '🚔', '🚍', '🚘', '🚖', '🚡', '🚠', '🚟', '🚃', '🚋', '🚞', '🚝', '🚄', '🚅', '🚈', '🚂', '🚆', '🚇', '🚊', '🚉', '✈️', '🛫', '🛬', '🛩️', '💺', '🛰️', '🚀', '🛸', '🚁', '🛶', '⛵', '🚤', '🛥️', '🛳️', '⛴️', '🚢', '⚓', '🪝', '⛽', '🚧', '🚦', '🚥'],
-        objects: ['💡', '🔦', '🏮', '🪔', '📱', '📲', '💻', '🖥️', '🖨️', '⌨️', '🖱️', '🖲️', '💽', '💾', '💿', '📀', '📼', '📷', '📸', '📹', '🎥', '📽️', '🎞️', '📞', '☎️', '📟', '📠', '📺', '📻', '🎙️', '🎚️', '🎛️', '🧭', '⏱️', '⏲️', '⏰', '🕰️', '⌛', '⏳', '📡', '🔋', '🔌', '💰', '🪙', '💴', '💵', '💶', '💷', '💸', '💳', '🧾', '💎', '⚖️', '🪜', '🧰', '🪛', '🔧', '🔨', '⚒️', '🛠️', '⛏️', '🪚', '🔩', '⚙️'],
-        symbols: ['❤️', '🧡', '💛', '💚', '💙', '💜', '🖤', '🤍', '🤎', '💔', '❣️', '💕', '💞', '💓', '💗', '💖', '💘', '💝', '💟', '☮️', '✝️', '☪️', '🕉️', '☸️', '✡️', '🔯', '🕎', '☯️', '☦️', '🛐', '⛎', '♈', '♉', '♊', '♋', '♌', '♍', '♎', '♏', '♐', '♑', '♒', '♓', '🆔', '⚛️', '🉑', '☢️', '☣️', '📴', '📳', '🈶', '🈚', '🈸', '🈺', '🈷️', '✴️', '🆚', '💮', '🉐', '㊙️', '㊗️', '🈴', '🈵', '🈹']
-    };
-
-    let currentEmojiCategory = 'smileys';
-
-    function toggleEmojiPicker() {
-        const picker = document.getElementById('emoji-picker-container');
-        const isVisible = picker.style.display !== 'none';
-
-        if (isVisible) {
-            picker.style.display = 'none';
-        } else {
-            picker.style.display = 'block';
-            renderEmojis(currentEmojiCategory);
-        }
-    }
-
-    function renderEmojis(category) {
-        const grid = document.getElementById('emoji-grid');
-        const emojis = emojiData[category] || [];
-
-        grid.innerHTML = emojis.map(emoji =>
-            `<button type="button" class="emoji-item" onclick="insertEmoji('${emoji}')">${emoji}</button>`
-        ).join('');
-
-        // Update active tab
-        document.querySelectorAll('.emoji-tab').forEach(tab => {
-            tab.classList.toggle('active', tab.dataset.category === category);
-        });
-
-        currentEmojiCategory = category;
-    }
-
-    function insertEmoji(emoji) {
-        const textarea = document.getElementById('composer-input');
-        if (!textarea) return;
-
-        const start = textarea.selectionStart;
-        const end = textarea.selectionEnd;
-        const text = textarea.value;
-
-        textarea.value = text.substring(0, start) + emoji + text.substring(end);
-        textarea.selectionStart = textarea.selectionEnd = start + emoji.length;
-        textarea.focus();
-
-        // Close the picker after inserting emoji
-        const picker = document.getElementById('emoji-picker-container');
-        if (picker) {
-            picker.style.display = 'none';
-        }
-    }
-
-    // Initialize emoji tab clicks
-    document.addEventListener('DOMContentLoaded', function() {
-        document.querySelectorAll('.emoji-tab').forEach(tab => {
-            tab.addEventListener('click', function() {
-                renderEmojis(this.dataset.category);
-            });
-        });
-
-        // Close emoji picker when clicking outside
-        document.addEventListener('click', function(e) {
-            const picker = document.getElementById('emoji-picker-container');
-            const btn = document.getElementById('emoji-picker-btn');
-            if (picker && !picker.contains(e.target) && e.target !== btn && !btn.contains(e.target)) {
-                picker.style.display = 'none';
-            }
-        });
-    });
-
-    // ============================================
-    // POST TYPE SWITCHING (Multi-Module Composer)
-    // ============================================
-    const postTypeConfig = {
-        post: {
-            submitText: 'Post',
-            icon: 'fa-paper-plane',
-            action: ''  // Submit to same page
-        },
-        listing: {
-            submitText: 'Create Listing',
-            icon: 'fa-hand-holding-heart',
-            action: ''  // Submit to same page, handled by multi-module backend
-        },
-        event: {
-            submitText: 'Create Event',
-            icon: 'fa-calendar-plus',
-            action: ''
-        },
-        goal: {
-            submitText: 'Create Goal',
-            icon: 'fa-bullseye',
-            action: ''
-        },
-        poll: {
-            submitText: 'Create Poll',
-            icon: 'fa-chart-bar',
-            action: ''
-        }
-    };
-
-    function switchPostType(type) {
-        const config = postTypeConfig[type];
-        if (!config) return;
-
-        // Update active tab
-        document.querySelectorAll('.composer-type-tab').forEach(tab => {
-            tab.classList.toggle('active', tab.dataset.type === type);
-        });
-
-        // Update hidden input
-        const typeInput = document.getElementById('post-type-input');
-        if (typeInput) typeInput.value = type;
-
-        // Update submit button
-        const submitText = document.getElementById('submit-btn-text');
-        const submitIcon = document.getElementById('submit-btn-icon');
-        if (submitText) submitText.textContent = config.submitText;
-        if (submitIcon) submitIcon.className = 'fa-solid ' + config.icon;
-
-        // Show/hide fields
-        document.querySelectorAll('.composer-fields-inline').forEach(field => {
-            field.style.display = 'none';
-        });
-        const fieldsEl = document.getElementById('fields-' + type);
-        if (fieldsEl) fieldsEl.style.display = 'block';
-
-        // Update form action (all handled by same page now)
-        const form = document.getElementById('composer-form');
-        if (form) {
-            form.action = config.action || '';
-        }
-
-        // Update required fields
-        updateRequiredFields(type);
-    }
-
-    function updateRequiredFields(type) {
-        // Remove required from all hidden fields
-        document.querySelectorAll('.composer-fields-inline').forEach(container => {
-            if (container.style.display === 'none') {
-                container.querySelectorAll('input, textarea, select').forEach(el => {
-                    el.required = false;
-                });
-            }
-        });
-
-        // Add required to visible fields based on type
-        const fieldsEl = document.getElementById('fields-' + type);
-        if (!fieldsEl) return;
-
-        switch(type) {
-            case 'post':
-                setRequired(fieldsEl, 'textarea[name="content"]', true);
-                break;
-            case 'listing':
-                setRequired(fieldsEl, 'input[name="listing_title"]', true);
-                setRequired(fieldsEl, 'select[name="listing_category_id"]', true);
-                setRequired(fieldsEl, 'textarea[name="listing_description"]', true);
-                break;
-            case 'event':
-                setRequired(fieldsEl, 'input[name="event_title"]', true);
-                setRequired(fieldsEl, 'input[name="event_start_date"]', true);
-                setRequired(fieldsEl, 'input[name="event_start_time"]', true);
-                setRequired(fieldsEl, 'textarea[name="event_description"]', true);
-                break;
-            case 'goal':
-                setRequired(fieldsEl, 'input[name="goal_title"]', true);
-                break;
-            case 'poll':
-                setRequired(fieldsEl, 'input[name="poll_question"]', true);
-                // First two poll options are required
-                const pollOptions = fieldsEl.querySelectorAll('input[name="poll_options[]"]');
-                if (pollOptions[0]) pollOptions[0].required = true;
-                if (pollOptions[1]) pollOptions[1].required = true;
-                break;
-        }
-    }
-
-    function setRequired(container, selector, required) {
-        const el = container.querySelector(selector);
-        if (el) el.required = required;
-    }
-
-    // Poll option management
-    let pollOptionCount = 2;
-
-    function addPollOption() {
-        if (pollOptionCount >= 10) {
-            showToast('Maximum 10 options allowed');
-            return;
-        }
-        pollOptionCount++;
-
-        const container = document.getElementById('poll-options-container');
-        const optionDiv = document.createElement('div');
-        optionDiv.className = 'composer-poll-option';
-        optionDiv.innerHTML = `
-            <input type="text" name="poll_options[]" class="composer-input-inline" placeholder="Option ${pollOptionCount}" style="padding-right: 40px;">
-            <button type="button" class="remove-option-btn" onclick="removePollOption(this)">
-                <i class="fa-solid fa-times"></i>
-            </button>
-        `;
-        container.appendChild(optionDiv);
-    }
-
-    function removePollOption(btn) {
-        if (pollOptionCount <= 2) {
-            showToast('Minimum 2 options required');
-            return;
-        }
-        btn.closest('.composer-poll-option').remove();
-        pollOptionCount--;
-
-        // Re-number placeholders
-        const options = document.querySelectorAll('#poll-options-container input[name="poll_options[]"]');
-        options.forEach((input, idx) => {
-            input.placeholder = `Option ${idx + 1}`;
-        });
-    }
-
-    // Listing attribute filtering based on category
-    function filterListingAttributes() {
-        const categorySelect = document.querySelector('select[name="listing_category_id"]');
-        const typeInputs = document.querySelectorAll('input[name="listing_type"]');
-        if (!categorySelect) return;
-
-        const selectedCat = categorySelect.value;
-        const selectedType = Array.from(typeInputs).find(i => i.checked)?.value || 'offer';
-
-        document.querySelectorAll('.composer-attribute-item').forEach(item => {
-            const itemCat = item.getAttribute('data-category-id');
-            const itemType = item.getAttribute('data-target-type');
-
-            const catMatch = itemCat === 'global' || itemCat == selectedCat || !selectedCat;
-            const typeMatch = itemType === 'any' || itemType === selectedType;
-
-            item.style.display = (catMatch && typeMatch) ? 'flex' : 'none';
-
-            // Uncheck hidden items
-            if (item.style.display === 'none') {
-                const checkbox = item.querySelector('input');
-                if (checkbox) checkbox.checked = false;
-            }
-        });
-    }
-
-    // Initialize on load
-    document.addEventListener('DOMContentLoaded', function() {
-        updateRequiredFields('post');
-
-        // Set up attribute filtering
-        const catSelect = document.querySelector('select[name="listing_category_id"]');
-        const typeInputs = document.querySelectorAll('input[name="listing_type"]');
-
-        if (catSelect) {
-            catSelect.addEventListener('change', filterListingAttributes);
-        }
-        typeInputs.forEach(input => {
-            input.addEventListener('change', filterListingAttributes);
-        });
-
-        // Initial filter
-        filterListingAttributes();
-    });
-
-    // ============================================
-    // OFFLINE INDICATOR - Connection Status
-    // ============================================
-    (function initOfflineIndicator() {
-        const banner = document.getElementById('offlineBanner');
-        if (!banner) return;
-
-        let wasOffline = false;
-
-        function handleOffline() {
-            wasOffline = true;
-            banner.classList.add('visible');
-            if (navigator.vibrate) navigator.vibrate(100);
-        }
-
-        function handleOnline() {
-            banner.classList.remove('visible');
-            if (wasOffline) {
-                showToast('Connection restored');
-                wasOffline = false;
-            }
-        }
-
-        window.addEventListener('online', handleOnline);
-        window.addEventListener('offline', handleOffline);
-
-        // Initial check
-        if (!navigator.onLine) {
-            handleOffline();
-        }
-    })();
-
-    // ============================================
-    // BUTTON PRESS STATES - Native Touch Feel
-    // ============================================
-    document.addEventListener('DOMContentLoaded', function() {
-        // Add press states to all action buttons
-        document.querySelectorAll('.fb-action-btn, .nexus-smart-btn, .fds-btn-primary, .fds-btn-secondary').forEach(btn => {
-            btn.addEventListener('pointerdown', function(e) {
-                this.classList.add('pressing');
-            });
-
-            btn.addEventListener('pointerup', function(e) {
-                this.classList.remove('pressing');
-            });
-
-            btn.addEventListener('pointerleave', function(e) {
-                this.classList.remove('pressing');
-            });
-
-            btn.addEventListener('pointercancel', function(e) {
-                this.classList.remove('pressing');
-            });
-        });
-    });
-
-    // ============================================
-    // INFINITE SCROLL PAGINATION
-    // ============================================
-    (function initInfiniteScroll() {
-        const sentinel = document.getElementById('feedSentinel');
-        const endMessage = document.getElementById('feedEndMessage');
-        const feedContainer = document.getElementById('feedContainer');
-
-        if (!sentinel || !feedContainer) return;
-
-        let currentPage = 1;
-        let isLoading = false;
-        let hasMore = true;
-        const ITEMS_PER_PAGE = 15;
-
-        // Calculate if we should enable infinite scroll (if we have enough items)
-        const initialItems = feedContainer.querySelectorAll('.fb-card').length;
-        if (initialItems < ITEMS_PER_PAGE) {
-            // Not enough items for pagination, show end message
-            endMessage.style.display = 'block';
-            return;
-        }
-
-        // Show sentinel
-        sentinel.style.display = 'flex';
-
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting && !isLoading && hasMore) {
-                    loadMoreFeed();
-                }
-            });
-        }, { rootMargin: '200px' });
-
-        observer.observe(sentinel);
-
-        async function loadMoreFeed() {
-            isLoading = true;
-            sentinel.style.display = 'flex';
-            currentPage++;
-
-            try {
-                const formData = new FormData();
-                formData.append('action', 'load_more_feed');
-                formData.append('page', currentPage);
-
-                // Pass filter parameters for EdgeRank & location filtering
-                if (typeof FeedFilter !== 'undefined') {
-                    const filterState = FeedFilter.getActiveFilter();
-                    formData.append('algo', filterState.algorithmMode || 'ranked');
-                    formData.append('location', filterState.locationMode || 'global');
-                    formData.append('radius', filterState.radius || 500);
-                } else {
-                    // Fallback: read from URL params
-                    const urlParams = new URLSearchParams(window.location.search);
-                    formData.append('algo', urlParams.get('algo') || 'ranked');
-                    formData.append('location', urlParams.get('location') || 'global');
-                    formData.append('radius', urlParams.get('radius') || '500');
-                }
-
-                const response = await fetch(window.location.href, {
-                    method: 'POST',
-                    body: formData
-                });
-
-                const data = await response.json();
-
-                if (data.html && data.html.trim()) {
-                    // Insert new items before sentinel
-                    sentinel.insertAdjacentHTML('beforebegin', data.html);
-                } else {
-                    hasMore = false;
-                }
-
-                if (!hasMore || (data.items && data.items.length < ITEMS_PER_PAGE)) {
-                    hasMore = false;
-                    sentinel.style.display = 'none';
-                    endMessage.style.display = 'block';
-                    observer.disconnect();
-                }
-            } catch (err) {
-                console.error('Feed load error:', err);
-                hasMore = false;
-                sentinel.style.display = 'none';
-                endMessage.innerHTML = '<i class="fa-solid fa-exclamation-circle"></i> Failed to load more';
-                endMessage.style.display = 'block';
-            } finally {
-                isLoading = false;
-            }
-        }
-    })();
-
-    // ============================================
-    // DYNAMIC THEME COLOR FOR STATUS BAR
-    // ============================================
-    (function initDynamicThemeColor() {
-        const themeColorMeta = document.querySelector('meta[name="theme-color"]');
-        if (!themeColorMeta) return;
-
-        function updateThemeColor() {
-            const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
-            themeColorMeta.setAttribute('content', isDark ? '#0f172a' : '#ffffff');
-        }
-
-        // Watch for theme changes
-        const observer = new MutationObserver(updateThemeColor);
-        observer.observe(document.documentElement, {
-            attributes: true,
-            attributeFilter: ['data-theme']
-        });
-
-        // Initial check
-        updateThemeColor();
-    })();
 </script>
+<script src="/assets/js/home-feed.js?v=<?= $cssVersion ?>"></script>

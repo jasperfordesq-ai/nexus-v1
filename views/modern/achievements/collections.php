@@ -12,21 +12,22 @@ $additionalCSS = '<link rel="stylesheet" href="/assets/css/achievements.min.css?
 require dirname(__DIR__, 2) . '/layouts/modern/header.php';
 ?>
 
-<div class="collections-wrapper">
-    <div class="collections-nav">
+<div class="collections-wrapper" role="main" aria-label="Badge Collections">
+    <nav class="collections-nav" aria-label="Achievement sections">
         <a href="<?= $basePath ?>/achievements" class="nav-pill">Dashboard</a>
         <a href="<?= $basePath ?>/achievements/badges" class="nav-pill">All Badges</a>
         <a href="<?= $basePath ?>/achievements/challenges" class="nav-pill">Challenges</a>
         <a href="<?= $basePath ?>/achievements/collections" class="nav-pill active">Collections</a>
         <a href="<?= $basePath ?>/achievements/shop" class="nav-pill">XP Shop</a>
         <a href="<?= $basePath ?>/achievements/seasons" class="nav-pill">Seasons</a>
-    </div>
+    </nav>
 
     <?php if (empty($collections)): ?>
     <div class="empty-state">
         <div class="empty-state-icon">📚</div>
         <h3>No Collections Available</h3>
         <p>Badge collections will appear here once they're set up.</p>
+        <a href="<?= $basePath ?>/achievements/badges" class="cta-btn">View All Badges <i class="fa-solid fa-arrow-right"></i></a>
     </div>
     <?php else: ?>
     <div class="collections-grid">
@@ -46,9 +47,9 @@ require dirname(__DIR__, 2) . '/layouts/modern/header.php';
                     <div class="collection-progress-text">
                         <?= $collection['earned_count'] ?> / <?= $collection['total_count'] ?>
                     </div>
-                    <div class="collection-reward">
+                    <div class="collection-reward <?= $collection['is_completed'] ? 'claimed' : '' ?>">
                         <?php if ($collection['is_completed']): ?>
-                            <i class="fa-solid fa-check-circle" style="color: #10b981;"></i> +<?= $collection['bonus_xp'] ?> XP Claimed
+                            <i class="fa-solid fa-check-circle"></i> +<?= $collection['bonus_xp'] ?> XP Claimed
                         <?php else: ?>
                             <i class="fa-solid fa-gift"></i> +<?= $collection['bonus_xp'] ?> XP Bonus
                         <?php endif; ?>
@@ -56,7 +57,7 @@ require dirname(__DIR__, 2) . '/layouts/modern/header.php';
                 </div>
             </div>
 
-            <div class="progress-bar">
+            <div class="progress-bar" role="progressbar" aria-valuenow="<?= $collection['progress_percent'] ?>" aria-valuemin="0" aria-valuemax="100" aria-label="Collection progress">
                 <div class="progress-fill" style="width: <?= $collection['progress_percent'] ?>%"></div>
             </div>
 

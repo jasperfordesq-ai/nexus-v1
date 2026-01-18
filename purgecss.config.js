@@ -44,6 +44,7 @@ module.exports = {
         'httpdocs/assets/css/compose-multidraw.css',
         'httpdocs/assets/css/pwa-install-modal.css',
         'httpdocs/assets/css/achievements.css',
+        'httpdocs/assets/css/sidebar.css',
     ],
 
     // Output directory for purged CSS

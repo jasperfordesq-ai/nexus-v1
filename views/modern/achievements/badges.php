@@ -16,13 +16,18 @@ $newBadge = isset($_GET['new_badge']) ? true : false;
 $showcaseUpdated = isset($_GET['showcase_updated']);
 ?>
 
-<div class="badges-wrapper">
-    <a href="<?= $basePath ?>/achievements" class="back-link">
-        <i class="fa-solid fa-arrow-left"></i> Back to Dashboard
-    </a>
+<div class="badges-wrapper" role="main" aria-label="Badge Collection">
+    <nav class="collections-nav" aria-label="Achievement sections">
+        <a href="<?= $basePath ?>/achievements" class="nav-pill">Dashboard</a>
+        <a href="<?= $basePath ?>/achievements/badges" class="nav-pill active">All Badges</a>
+        <a href="<?= $basePath ?>/achievements/challenges" class="nav-pill">Challenges</a>
+        <a href="<?= $basePath ?>/achievements/collections" class="nav-pill">Collections</a>
+        <a href="<?= $basePath ?>/achievements/shop" class="nav-pill">XP Shop</a>
+        <a href="<?= $basePath ?>/achievements/seasons" class="nav-pill">Seasons</a>
+    </nav>
 
     <?php if ($showcaseUpdated): ?>
-    <div class="success-toast">
+    <div class="success-toast" id="successToast" role="alert">
         <i class="fa-solid fa-check-circle"></i>
         <span>Badge showcase updated! These badges will appear on your profile.</span>
     </div>
@@ -51,7 +56,7 @@ $showcaseUpdated = isset($_GET['showcase_updated']);
                     <?php endif; ?>
                 <?php endfor; ?>
             </div>
-            <button type="submit" id="save-showcase" class="nexus-btn nexus-btn-primary" style="margin-top: 16px; display: none;">
+            <button type="submit" id="save-showcase" class="nexus-btn nexus-btn-primary showcase-save-btn">
                 <i class="fa-solid fa-save"></i> Save Showcase
             </button>
         </form>
@@ -132,6 +137,18 @@ $showcaseUpdated = isset($_GET['showcase_updated']);
 <?php endif; ?>
 
 <script>
+// Auto-dismiss success toast after 4 seconds
+(function() {
+    const toast = document.getElementById('successToast');
+    if (toast) {
+        setTimeout(() => {
+            toast.style.opacity = '0';
+            toast.style.transform = 'translateY(-20px)';
+            setTimeout(() => toast.remove(), 300);
+        }, 4000);
+    }
+})();
+
 // Showcase management
 function toggleShowcase(btn, key, name, icon) {
     const form = document.getElementById('showcase-form');

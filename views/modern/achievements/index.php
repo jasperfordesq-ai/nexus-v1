@@ -53,7 +53,7 @@ $xpRank = $rankings['xp'] ?? '-';
     <div class="hero-stats-banner">
         <div class="hero-stat-card level-card">
             <div class="hero-stat-icon">
-                <div class="level-ring" style="--progress: <?= $xp['progress'] ?? 0 ?>%">
+                <div class="level-ring" style="--progress: <?= $xp['progress'] ?? 0 ?>">
                     <span class="level-number"><?= $xp['level'] ?? 1 ?></span>
                 </div>
             </div>

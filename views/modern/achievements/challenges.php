@@ -12,21 +12,22 @@ $additionalCSS = '<link rel="stylesheet" href="/assets/css/achievements.min.css?
 require dirname(__DIR__, 2) . '/layouts/modern/header.php';
 ?>
 
-<div class="challenges-wrapper">
-    <div class="challenges-nav">
+<div class="challenges-wrapper" role="main" aria-label="Challenges">
+    <nav class="challenges-nav" aria-label="Achievement sections">
         <a href="<?= $basePath ?>/achievements" class="nav-pill">Dashboard</a>
         <a href="<?= $basePath ?>/achievements/badges" class="nav-pill">All Badges</a>
         <a href="<?= $basePath ?>/achievements/challenges" class="nav-pill active">Challenges</a>
         <a href="<?= $basePath ?>/achievements/collections" class="nav-pill">Collections</a>
         <a href="<?= $basePath ?>/achievements/shop" class="nav-pill">XP Shop</a>
         <a href="<?= $basePath ?>/achievements/seasons" class="nav-pill">Seasons</a>
-    </div>
+    </nav>
 
     <?php if (empty($challenges)): ?>
     <div class="empty-state">
         <div class="empty-state-icon">🎯</div>
         <h3>No Active Challenges</h3>
         <p>Check back soon for new challenges to complete!</p>
+        <a href="<?= $basePath ?>/achievements" class="cta-btn">Back to Dashboard <i class="fa-solid fa-arrow-right"></i></a>
     </div>
     <?php else: ?>
     <div class="challenges-grid">
@@ -50,7 +51,7 @@ require dirname(__DIR__, 2) . '/layouts/modern/header.php';
             <p class="challenge-desc"><?= htmlspecialchars($challenge['description']) ?></p>
 
             <div class="challenge-progress">
-                <div class="progress-bar">
+                <div class="progress-bar" role="progressbar" aria-valuenow="<?= $challenge['progress_percent'] ?>" aria-valuemin="0" aria-valuemax="100" aria-label="Challenge progress">
                     <div class="progress-fill" style="width: <?= $challenge['progress_percent'] ?>%"></div>
                 </div>
                 <div class="progress-text">

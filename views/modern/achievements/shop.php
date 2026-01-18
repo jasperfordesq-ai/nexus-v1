@@ -12,15 +12,15 @@ $additionalCSS = '<link rel="stylesheet" href="/assets/css/achievements.min.css?
 require dirname(__DIR__, 2) . '/layouts/modern/header.php';
 ?>
 
-<div class="shop-wrapper">
-    <div class="collections-nav">
+<div class="shop-wrapper" role="main" aria-label="XP Shop">
+    <nav class="collections-nav" aria-label="Achievement sections">
         <a href="<?= $basePath ?>/achievements" class="nav-pill">Dashboard</a>
         <a href="<?= $basePath ?>/achievements/badges" class="nav-pill">All Badges</a>
         <a href="<?= $basePath ?>/achievements/challenges" class="nav-pill">Challenges</a>
         <a href="<?= $basePath ?>/achievements/collections" class="nav-pill">Collections</a>
         <a href="<?= $basePath ?>/achievements/shop" class="nav-pill active">XP Shop</a>
         <a href="<?= $basePath ?>/achievements/seasons" class="nav-pill">Seasons</a>
-    </div>
+    </nav>
 
     <div class="xp-balance-card">
         <div class="xp-balance-info">
@@ -37,14 +37,15 @@ require dirname(__DIR__, 2) . '/layouts/modern/header.php';
         <div class="empty-state-icon"><i class="fa-solid fa-store"></i></div>
         <h3>Shop Coming Soon</h3>
         <p>Exciting rewards will be available here. Keep earning XP!</p>
+        <a href="<?= $basePath ?>/achievements/challenges" class="cta-btn">Earn More XP <i class="fa-solid fa-arrow-right"></i></a>
     </div>
     <?php else: ?>
 
-    <div class="shop-categories">
-        <button class="category-btn active" data-category="all">All Items</button>
-        <button class="category-btn" data-category="boost">Boosts</button>
-        <button class="category-btn" data-category="feature">Features</button>
-        <button class="category-btn" data-category="cosmetic">Cosmetics</button>
+    <div class="shop-categories" role="group" aria-label="Filter by category">
+        <button class="category-btn active" data-category="all" aria-pressed="true">All Items</button>
+        <button class="category-btn" data-category="boost" aria-pressed="false">Boosts</button>
+        <button class="category-btn" data-category="feature" aria-pressed="false">Features</button>
+        <button class="category-btn" data-category="cosmetic" aria-pressed="false">Cosmetics</button>
     </div>
 
     <div class="shop-grid">
@@ -91,10 +92,10 @@ require dirname(__DIR__, 2) . '/layouts/modern/header.php';
 </div>
 
 <!-- Purchase Confirmation Modal -->
-<div class="purchase-modal" id="purchaseModal">
+<div class="purchase-modal" id="purchaseModal" role="dialog" aria-modal="true" aria-labelledby="purchaseModalTitle">
     <div class="modal-content">
         <div class="modal-icon" id="modalIcon"></div>
-        <h3 class="modal-title">Confirm Purchase</h3>
+        <h3 class="modal-title" id="purchaseModalTitle">Confirm Purchase</h3>
         <p class="modal-message">
             Purchase <strong id="modalItemName"></strong> for <strong id="modalItemCost"></strong> XP?
         </p>
@@ -106,10 +107,10 @@ require dirname(__DIR__, 2) . '/layouts/modern/header.php';
 </div>
 
 <!-- Success Modal -->
-<div class="purchase-modal" id="successModal">
+<div class="purchase-modal" id="successModal" role="dialog" aria-modal="true" aria-labelledby="successModalTitle">
     <div class="modal-content">
         <div class="modal-icon" id="successIcon"></div>
-        <h3 class="modal-title" id="successTitle">Purchase Complete!</h3>
+        <h3 class="modal-title" id="successModalTitle">Purchase Complete!</h3>
         <p class="modal-message" id="successMessage"></p>
         <div class="modal-buttons">
             <button class="modal-btn confirm" onclick="closeSuccessModal()">Awesome!</button>
@@ -121,8 +122,12 @@ require dirname(__DIR__, 2) . '/layouts/modern/header.php';
 // Category filtering
 document.querySelectorAll('.category-btn').forEach(btn => {
     btn.addEventListener('click', function() {
-        document.querySelectorAll('.category-btn').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.category-btn').forEach(b => {
+            b.classList.remove('active');
+            b.setAttribute('aria-pressed', 'false');
+        });
         this.classList.add('active');
+        this.setAttribute('aria-pressed', 'true');
 
         const category = this.dataset.category;
         document.querySelectorAll('.shop-item').forEach(item => {
@@ -175,8 +180,8 @@ document.getElementById('confirmBtn').addEventListener('click', async function()
         closeModal();
 
         if (result.success) {
-            document.getElementById('successIcon').innerHTML = '<i class="fa-solid fa-check-circle" style="color: #10b981;"></i>';
-            document.getElementById('successTitle').textContent = 'Purchase Complete!';
+            document.getElementById('successIcon').innerHTML = '<i class="fa-solid fa-check-circle shop-icon-success"></i>';
+            document.getElementById('successModalTitle').textContent = 'Purchase Complete!';
             document.getElementById('successMessage').textContent = result.message || 'Your item has been added to your account.';
             document.getElementById('successModal').classList.add('active');
 
@@ -185,15 +190,15 @@ document.getElementById('confirmBtn').addEventListener('click', async function()
                 showConfetti();
             }
         } else {
-            document.getElementById('successIcon').innerHTML = '<i class="fa-solid fa-times-circle" style="color: #ef4444;"></i>';
-            document.getElementById('successTitle').textContent = 'Purchase Failed';
+            document.getElementById('successIcon').innerHTML = '<i class="fa-solid fa-times-circle shop-icon-error"></i>';
+            document.getElementById('successModalTitle').textContent = 'Purchase Failed';
             document.getElementById('successMessage').textContent = result.error || 'Something went wrong. Please try again.';
             document.getElementById('successModal').classList.add('active');
         }
     } catch (error) {
         closeModal();
-        document.getElementById('successIcon').innerHTML = '<i class="fa-solid fa-times-circle" style="color: #ef4444;"></i>';
-        document.getElementById('successTitle').textContent = 'Error';
+        document.getElementById('successIcon').innerHTML = '<i class="fa-solid fa-times-circle shop-icon-error"></i>';
+        document.getElementById('successModalTitle').textContent = 'Error';
         document.getElementById('successMessage').textContent = 'Failed to process purchase. Please try again.';
         document.getElementById('successModal').classList.add('active');
     }
@@ -209,6 +214,16 @@ document.querySelectorAll('.purchase-modal').forEach(modal => {
             this.classList.remove('active');
         }
     });
+});
+
+// Close modals on Escape key
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+        document.querySelectorAll('.purchase-modal.active').forEach(modal => {
+            modal.classList.remove('active');
+        });
+        currentItemId = null;
+    }
 });
 </script>
 

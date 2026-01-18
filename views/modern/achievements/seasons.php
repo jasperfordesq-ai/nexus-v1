@@ -19,28 +19,29 @@ $daysRemaining = $seasonData['days_remaining'] ?? 0;
 $isEndingSoon = $seasonData['is_ending_soon'] ?? false;
 ?>
 
-<div class="seasons-wrapper">
-    <div class="collections-nav">
+<div class="seasons-wrapper" role="main" aria-label="Leaderboard Seasons">
+    <nav class="collections-nav" aria-label="Achievement sections">
         <a href="<?= $basePath ?>/achievements" class="nav-pill">Dashboard</a>
         <a href="<?= $basePath ?>/achievements/badges" class="nav-pill">All Badges</a>
         <a href="<?= $basePath ?>/achievements/challenges" class="nav-pill">Challenges</a>
         <a href="<?= $basePath ?>/achievements/collections" class="nav-pill">Collections</a>
         <a href="<?= $basePath ?>/achievements/shop" class="nav-pill">XP Shop</a>
         <a href="<?= $basePath ?>/achievements/seasons" class="nav-pill active">Seasons</a>
-    </div>
+    </nav>
 
     <?php if (!$season): ?>
     <div class="empty-state">
         <div class="empty-state-icon"><i class="fa-solid fa-trophy"></i></div>
         <h3>No Active Season</h3>
         <p>Leaderboard seasons will appear here once they're set up.</p>
+        <a href="<?= $basePath ?>/achievements" class="cta-btn">Back to Dashboard <i class="fa-solid fa-arrow-right"></i></a>
     </div>
     <?php else: ?>
 
     <div class="season-header">
         <div class="season-title-row">
             <div class="season-name">
-                <i class="fa-solid fa-trophy" style="color: #fbbf24;"></i>
+                <i class="fa-solid fa-trophy season-trophy-icon"></i>
                 <?= htmlspecialchars($season['name']) ?>
                 <?php if ($isEndingSoon): ?>
                     <span class="season-badge ending-soon">
@@ -69,7 +70,7 @@ $isEndingSoon = $seasonData['is_ending_soon'] ?? false;
             <div class="user-rank-info">
                 <h4>Your Current Position</h4>
                 <div class="user-rank-xp">
-                    <i class="fa-solid fa-star" style="color: #fbbf24;"></i>
+                    <i class="fa-solid fa-star xp-star-icon"></i>
                     <?= number_format($userRank['season_xp']) ?> XP this season
                 </div>
             </div>
@@ -98,7 +99,7 @@ $isEndingSoon = $seasonData['is_ending_soon'] ?? false;
                     <?php if (!empty($entry['photo'])): ?>
                         <img src="<?= htmlspecialchars($entry['photo']) ?>" loading="lazy" alt="" class="user-avatar">
                     <?php else: ?>
-                        <div class="user-avatar" style="display: flex; align-items: center; justify-content: center; background: #4f46e5; color: white; font-weight: 600;">
+                        <div class="user-avatar user-avatar-fallback">
                             <?= strtoupper(substr($entry['first_name'] ?? '?', 0, 1)) ?>
                         </div>
                     <?php endif; ?>
@@ -106,7 +107,7 @@ $isEndingSoon = $seasonData['is_ending_soon'] ?? false;
                         <div class="user-name">
                             <?= htmlspecialchars(($entry['first_name'] ?? '') . ' ' . ($entry['last_name'] ?? '')) ?>
                             <?php if ($isCurrentUser): ?>
-                                <span style="color: #3b82f6; font-size: 12px;">(You)</span>
+                                <span class="current-user-tag">(You)</span>
                             <?php endif; ?>
                         </div>
                         <div class="user-level">Level <?= $entry['level'] ?? 1 ?></div>
@@ -123,7 +124,7 @@ $isEndingSoon = $seasonData['is_ending_soon'] ?? false;
 
                 <?php if (isset($rewards[1])): ?>
                 <div class="reward-tier gold">
-                    <div class="tier-icon"><i class="fa-solid fa-crown" style="color: #fbbf24;"></i></div>
+                    <div class="tier-icon"><i class="fa-solid fa-crown tier-icon-gold"></i></div>
                     <div class="tier-details">
                         <div class="tier-name">1st Place</div>
                         <div class="tier-reward">
@@ -138,7 +139,7 @@ $isEndingSoon = $seasonData['is_ending_soon'] ?? false;
 
                 <?php if (isset($rewards[2])): ?>
                 <div class="reward-tier silver">
-                    <div class="tier-icon"><i class="fa-solid fa-medal" style="color: #9ca3af;"></i></div>
+                    <div class="tier-icon"><i class="fa-solid fa-medal tier-icon-silver"></i></div>
                     <div class="tier-details">
                         <div class="tier-name">2nd Place</div>
                         <div class="tier-reward">+<?= $rewards[2]['xp'] ?? 300 ?> XP</div>
@@ -148,7 +149,7 @@ $isEndingSoon = $seasonData['is_ending_soon'] ?? false;
 
                 <?php if (isset($rewards[3])): ?>
                 <div class="reward-tier bronze">
-                    <div class="tier-icon"><i class="fa-solid fa-medal" style="color: #d97706;"></i></div>
+                    <div class="tier-icon"><i class="fa-solid fa-medal tier-icon-bronze"></i></div>
                     <div class="tier-details">
                         <div class="tier-name">3rd Place</div>
                         <div class="tier-reward">+<?= $rewards[3]['xp'] ?? 200 ?> XP</div>
@@ -158,7 +159,7 @@ $isEndingSoon = $seasonData['is_ending_soon'] ?? false;
 
                 <?php if (isset($rewards['top10'])): ?>
                 <div class="reward-tier">
-                    <div class="tier-icon"><i class="fa-solid fa-award" style="color: #6b7280;"></i></div>
+                    <div class="tier-icon"><i class="fa-solid fa-award tier-icon-default"></i></div>
                     <div class="tier-details">
                         <div class="tier-name">Top 10</div>
                         <div class="tier-reward">+<?= $rewards['top10']['xp'] ?? 100 ?> XP</div>
@@ -168,7 +169,7 @@ $isEndingSoon = $seasonData['is_ending_soon'] ?? false;
 
                 <?php if (isset($rewards['participant'])): ?>
                 <div class="reward-tier">
-                    <div class="tier-icon"><i class="fa-solid fa-star" style="color: #9ca3af;"></i></div>
+                    <div class="tier-icon"><i class="fa-solid fa-star tier-icon-silver"></i></div>
                     <div class="tier-details">
                         <div class="tier-name">All Participants</div>
                         <div class="tier-reward">+<?= $rewards['participant']['xp'] ?? 25 ?> XP</div>
