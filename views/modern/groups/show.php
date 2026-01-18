@@ -4271,8 +4271,18 @@ function clearGroupPostImage() {
     }
 }
 
+// Debounce tracking for group likes
+const groupLikeDebounce = {};
+
 // Toggle like
 async function toggleGroupLike(btn, postId) {
+    // Debounce: prevent rapid clicks (500ms cooldown)
+    if (groupLikeDebounce[postId]) {
+        return;
+    }
+    groupLikeDebounce[postId] = true;
+    setTimeout(() => { delete groupLikeDebounce[postId]; }, 500);
+
     try {
         const response = await fetch(BASE_PATH + '/api/social/like', {
             method: 'POST',
@@ -4285,8 +4295,9 @@ async function toggleGroupLike(btn, postId) {
 
         const data = await response.json();
 
-        if (data.success) {
-            const isLiked = data.action === 'liked';
+        // API returns {status: 'liked'/'unliked', likes_count: N}
+        if (data.status === 'liked' || data.status === 'unliked') {
+            const isLiked = data.status === 'liked';
             const icon = btn.querySelector('i');
             const span = btn.querySelector('span');
             const count = data.likes_count || 0;

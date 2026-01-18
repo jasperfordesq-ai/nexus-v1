@@ -154,18 +154,13 @@ class SocialApiController
      */
     public function like()
     {
-        error_log("SocialAPI like() called - Session: " . json_encode($_SESSION ?? []));
-
         $userId = $this->getUserId();
         $tenantId = $this->getTenantId();
 
         $targetType = $this->getInput('target_type', '');
         $targetId = (int)$this->getInput('target_id', 0);
 
-        error_log("SocialAPI like() - userId: $userId, tenantId: $tenantId, type: $targetType, id: $targetId");
-
         if (empty($targetType) || $targetId <= 0) {
-            error_log("SocialAPI like() - Invalid target, returning 400");
             $this->jsonResponse(['error' => 'Invalid target'], 400);
         }
 

@@ -203,31 +203,32 @@
     // ============================================
 
     function revertLikeUI(icon, btn, wasLiked) {
-        // Check if using new pill-style (has feed-action-pill class)
-        const isPillStyle = btn.classList.contains('feed-action-pill');
+        // Check if using CSS-class-based styling (pill or feed-action buttons)
+        const usesCssClasses = btn.classList.contains('feed-action-pill') || btn.classList.contains('feed-action-btn');
 
         if (wasLiked) {
             icon.classList.remove("fa-regular");
             icon.classList.add("fa-solid");
             btn.classList.add("liked");
-            if (!isPillStyle) {
-                // Only set inline styles for non-pill buttons
+            if (!usesCssClasses) {
+                // Only set inline styles for legacy buttons
                 btn.style.color = getColor('liked');
                 btn.style.fontWeight = "600";
             }
-            // Pill style buttons use CSS classes - no inline style needed
         } else {
             icon.classList.remove("fa-solid");
             icon.classList.add("fa-regular");
             btn.classList.remove("liked");
-            if (!isPillStyle) {
-                // Only set inline styles for non-pill buttons
+            if (!usesCssClasses) {
+                // Only set inline styles for legacy buttons
                 btn.style.color = getColor('unliked');
                 btn.style.fontWeight = "normal";
             }
-            // Pill style buttons use CSS classes - no inline style needed
         }
     }
+
+    // Debounce tracking for like buttons
+    SocialInteractions._likeDebounce = {};
 
     /**
      * Toggle like on content
@@ -245,10 +246,21 @@
         const icon = btn.querySelector("i");
         if (!icon) return;
 
+        // Debounce: prevent rapid clicks (500ms cooldown)
+        const debounceKey = type + '-' + id;
+        if (SocialInteractions._likeDebounce[debounceKey]) {
+            return; // Ignore click if within debounce period
+        }
+        SocialInteractions._likeDebounce[debounceKey] = true;
+        setTimeout(function() {
+            delete SocialInteractions._likeDebounce[debounceKey];
+        }, 500);
+
         const isLiked = icon.classList.contains("fa-solid");
         const cfg = SocialInteractions.config;
-        // Check if using new pill-style (has feed-action-pill class)
-        const isPillStyle = btn.classList.contains('feed-action-pill');
+        // Check if using CSS-class-based styling (pill or feed-action buttons)
+        // These button types use CSS classes for styling, not inline styles
+        const usesCssClasses = btn.classList.contains('feed-action-pill') || btn.classList.contains('feed-action-btn');
 
         // Ripple effect
         if (cfg.enableRipple) {
@@ -262,23 +274,21 @@
             icon.classList.remove("fa-solid");
             icon.classList.add("fa-regular");
             btn.classList.remove("liked");
-            if (!isPillStyle) {
-                // Only set inline styles for non-pill buttons
+            if (!usesCssClasses) {
+                // Only set inline styles for legacy buttons that don't use CSS classes
                 btn.style.color = getColor('unliked');
                 btn.style.fontWeight = "normal";
             }
-            // Pill style buttons use CSS classes - no inline style needed
         } else {
             // Like action
             icon.classList.remove("fa-regular");
             icon.classList.add("fa-solid");
             btn.classList.add("liked");
-            if (!isPillStyle) {
-                // Only set inline styles for non-pill buttons
+            if (!usesCssClasses) {
+                // Only set inline styles for legacy buttons that don't use CSS classes
                 btn.style.color = getColor('liked');
                 btn.style.fontWeight = "600";
             }
-            // Pill style buttons use CSS classes - no inline style needed
 
             // Heart burst animation
             SocialInteractions.createHeartBurst(btn);

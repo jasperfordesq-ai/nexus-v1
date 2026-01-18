@@ -42,11 +42,22 @@ register_shutdown_function(function() {
         // Write to error log
         error_log($errorMsg);
 
-        // Send email alert (non-blocking)
-        $to = 'jasper.esq@gmail.com';
-        $subject = '[NEXUS ALERT] Site Error on ' . ($_SERVER['HTTP_HOST'] ?? 'project-nexus.ie');
-        $headers = "From: alerts@project-nexus.ie\r\nContent-Type: text/plain; charset=UTF-8";
-        @mail($to, $subject, $errorMsg, $headers);
+        // Send email alert using the app's Mailer (Gmail API or SMTP)
+        try {
+            $mailerFile = __DIR__ . '/../src/Core/Mailer.php';
+            if (file_exists($mailerFile)) {
+                require_once $mailerFile;
+                $mailer = new \Nexus\Core\Mailer();
+                $mailer->send(
+                    'jasper.ford.esq@gmail.com',
+                    '[NEXUS ALERT] Site Error on ' . ($_SERVER['HTTP_HOST'] ?? 'project-nexus.ie'),
+                    nl2br(htmlspecialchars($errorMsg)),
+                    'jasper@hour-timebank.ie'
+                );
+            }
+        } catch (\Throwable $e) {
+            error_log('Failed to send error alert email: ' . $e->getMessage());
+        }
 
         // Show maintenance page if not already sent headers
         if (!headers_sent()) {
@@ -74,10 +85,22 @@ set_error_handler(function($errno, $errstr, $errfile, $errline) {
             $_SERVER['REQUEST_URI'] ?? 'unknown'
         );
 
-        $to = 'jasper.esq@gmail.com';
-        $subject = '[NEXUS WARNING] Error on ' . ($_SERVER['HTTP_HOST'] ?? 'project-nexus.ie');
-        $headers = "From: alerts@project-nexus.ie\r\nContent-Type: text/plain; charset=UTF-8";
-        @mail($to, $subject, $errorMsg, $headers);
+        // Send email alert using the app's Mailer (Gmail API or SMTP)
+        try {
+            $mailerFile = __DIR__ . '/../src/Core/Mailer.php';
+            if (file_exists($mailerFile)) {
+                require_once $mailerFile;
+                $mailer = new \Nexus\Core\Mailer();
+                $mailer->send(
+                    'jasper.ford.esq@gmail.com',
+                    '[NEXUS WARNING] Error on ' . ($_SERVER['HTTP_HOST'] ?? 'project-nexus.ie'),
+                    nl2br(htmlspecialchars($errorMsg)),
+                    'jasper@hour-timebank.ie'
+                );
+            }
+        } catch (\Throwable $e) {
+            error_log('Failed to send error alert email: ' . $e->getMessage());
+        }
     }
 
     // Let PHP handle it normally too

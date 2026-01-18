@@ -145,14 +145,16 @@ $basePath = class_exists('\Nexus\Core\TenantContext') ? \Nexus\Core\TenantContex
 
             listEl.innerHTML = '<div style="text-align: center; padding: 20px; color: var(--feed-text-muted);"><i class="fa-solid fa-spinner fa-spin"></i></div>';
 
-            const formData = new FormData();
-            formData.append('action', 'fetch_comments');
-            formData.append('target_type', targetType);
-            formData.append('target_id', targetId);
+            const apiBase = (window.BASE_URL || window.BASE_PATH || '') + '/api/social';
 
-            fetch(window.location.href, {
+            fetch(apiBase + '/comments', {
                     method: 'POST',
-                    body: formData
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        action: 'fetch',
+                        target_type: targetType,
+                        target_id: targetId
+                    })
                 })
                 .then(r => r.json())
                 .then(data => {
@@ -223,14 +225,15 @@ $basePath = class_exists('\Nexus\Core\TenantContext') ? \Nexus\Core\TenantContex
         window.toggleMobileCommentLike = function(commentId, btn) {
             haptic.light();
 
-            const formData = new FormData();
-            formData.append('action', 'toggle_reaction');
-            formData.append('comment_id', commentId);
-            formData.append('emoji', '❤️');
+            const apiBase = (window.BASE_URL || window.BASE_PATH || '') + '/api/social';
 
-            fetch(window.location.href, {
+            fetch(apiBase + '/reaction', {
                     method: 'POST',
-                    body: formData
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        comment_id: commentId,
+                        emoji: '❤️'
+                    })
                 })
                 .then(r => r.json())
                 .then(data => {
@@ -282,16 +285,17 @@ $basePath = class_exists('\Nexus\Core\TenantContext') ? \Nexus\Core\TenantContex
 
             haptic.medium();
 
-            const formData = new FormData();
-            formData.append('action', 'reply_comment');
-            formData.append('target_type', targetType);
-            formData.append('target_id', targetId);
-            formData.append('parent_id', parentCommentId);
-            formData.append('content', content);
+            const apiBase = (window.BASE_URL || window.BASE_PATH || '') + '/api/social';
 
-            fetch(window.location.href, {
+            fetch(apiBase + '/reply', {
                     method: 'POST',
-                    body: formData
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        target_type: targetType,
+                        target_id: targetId,
+                        parent_id: parentCommentId,
+                        content: content
+                    })
                 })
                 .then(r => r.json())
                 .then(data => {
@@ -311,19 +315,21 @@ $basePath = class_exists('\Nexus\Core\TenantContext') ? \Nexus\Core\TenantContex
 
             haptic.medium();
 
-            const formData = new FormData();
-            formData.append('action', 'submit_comment');
-            formData.append('target_type', currentCommentTarget.type);
-            formData.append('target_id', currentCommentTarget.id);
-            formData.append('content', content);
+            const apiBase = (window.BASE_URL || window.BASE_PATH || '') + '/api/social';
 
             // Disable send button
             const sendBtn = document.getElementById('mobileCommentSend');
             if (sendBtn) sendBtn.disabled = true;
 
-            fetch(window.location.href, {
+            fetch(apiBase + '/comments', {
                     method: 'POST',
-                    body: formData
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        action: 'submit',
+                        target_type: currentCommentTarget.type,
+                        target_id: currentCommentTarget.id,
+                        content: content
+                    })
                 })
                 .then(r => r.json())
                 .then(data => {

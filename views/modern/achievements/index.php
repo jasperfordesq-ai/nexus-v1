@@ -6,13 +6,12 @@ $hType = 'Gamification';
 
 $basePath = \Nexus\Core\TenantContext::getBasePath();
 
-// Achievements styles are defined inline below - no external CSS needed
-$cssVersion = time();
+// Load achievements CSS
+$additionalCSS = '<link rel="stylesheet" href="/assets/css/achievements.min.css?v=' . time() . '">';
 
 require dirname(__DIR__, 2) . '/layouts/modern/header.php';
 
 // Due to EXTR_SKIP in View::render(), $data remains the full array passed to render()
-// The dashboard data is nested under $data['data'] key
 $dashboardData = $data['data'] ?? $data;
 $xp = $dashboardData['xp'] ?? ['total' => 0, 'level' => 1, 'progress' => 0, 'xp_for_next' => 100, 'xp_in_level' => 0];
 $badges = $dashboardData['badges'] ?? ['earned' => [], 'total_earned' => 0, 'total_available' => 0, 'progress' => []];
@@ -20,255 +19,350 @@ $streaks = $dashboardData['streaks'] ?? [];
 $rankings = $dashboardData['rankings'] ?? [];
 $stats = $dashboardData['stats'] ?? [];
 $recentXP = $dashboardData['recent_xp'] ?? [];
+
+// Calculate totals for hero banner
+$totalBadges = $badges['total_earned'] ?? 0;
+$currentStreak = $streaks['login']['current'] ?? 0;
+$xpRank = $rankings['xp'] ?? '-';
 ?>
 
 <div class="achievements-wrapper">
-    <div class="achievements-grid">
+    <!-- Navigation Pills -->
+    <div class="achievements-nav">
+        <a href="<?= $basePath ?>/achievements" class="nav-pill active">
+            <i class="fa-solid fa-gauge-high"></i> Dashboard
+        </a>
+        <a href="<?= $basePath ?>/achievements/badges" class="nav-pill">
+            <i class="fa-solid fa-medal"></i> Badges
+        </a>
+        <a href="<?= $basePath ?>/achievements/challenges" class="nav-pill">
+            <i class="fa-solid fa-bullseye"></i> Challenges
+        </a>
+        <a href="<?= $basePath ?>/achievements/collections" class="nav-pill">
+            <i class="fa-solid fa-layer-group"></i> Collections
+        </a>
+        <a href="<?= $basePath ?>/achievements/shop" class="nav-pill">
+            <i class="fa-solid fa-store"></i> Shop
+        </a>
+        <a href="<?= $basePath ?>/achievements/seasons" class="nav-pill">
+            <i class="fa-solid fa-trophy"></i> Seasons
+        </a>
+    </div>
 
-        <!-- Level & XP Card -->
-        <div class="achievement-card">
-            <div class="card-header">
-                <span class="icon">⭐</span>
-                <h3>Level & Experience</h3>
+    <!-- Hero Stats Banner -->
+    <div class="hero-stats-banner">
+        <div class="hero-stat-card level-card">
+            <div class="hero-stat-icon">
+                <div class="level-ring" style="--progress: <?= $xp['progress'] ?? 0 ?>%">
+                    <span class="level-number"><?= $xp['level'] ?? 1 ?></span>
+                </div>
             </div>
-
-            <div class="level-display">
-                <div class="level-circle">
-                    <span class="level-num"><?= $xp['level'] ?? 1 ?></span>
-                    <span class="level-label">Level</span>
-                </div>
-                <div class="level-info">
-                    <h4>Experience Points</h4>
-                    <div class="xp-display">
-                        <?= number_format($xp['total'] ?? 0) ?> <span>XP</span>
-                    </div>
-                    <div class="progress-bar-container">
-                        <div class="progress-bar-fill" style="width: <?= $xp['progress'] ?? 0 ?>%"></div>
-                    </div>
-                    <div class="progress-text">
-                        <?php $currentLevel = $xp['level'] ?? 1; ?>
-                        <?php if ($currentLevel < 10): ?>
-                            <?= number_format($xp['xp_in_level'] ?? 0) ?> / <?= number_format(($xp['xp_for_next'] ?? 100) - ($levelThresholds[$currentLevel] ?? 0)) ?> XP to Level <?= $currentLevel + 1 ?>
-                        <?php else: ?>
-                            Maximum Level Reached!
-                        <?php endif; ?>
-                    </div>
-                </div>
+            <div class="hero-stat-info">
+                <div class="hero-stat-value"><?= number_format($xp['total'] ?? 0) ?></div>
+                <div class="hero-stat-label">Total XP</div>
             </div>
         </div>
 
-        <!-- Streaks Card -->
-        <div class="achievement-card">
-            <div class="card-header">
-                <span class="icon">🔥</span>
-                <h3>Streaks</h3>
+        <div class="hero-stat-card">
+            <div class="hero-stat-icon badges-icon">
+                <i class="fa-solid fa-award"></i>
             </div>
-
-            <div class="streaks-grid">
-                <?php
-                $streakTypes = [
-                    'login' => ['icon' => '📅', 'label' => 'Login'],
-                    'activity' => ['icon' => '⚡', 'label' => 'Activity'],
-                    'giving' => ['icon' => '🎁', 'label' => 'Giving'],
-                    'volunteer' => ['icon' => '🤝', 'label' => 'Volunteer'],
-                ];
-                foreach ($streakTypes as $type => $info):
-                    $streak = $streaks[$type] ?? ['current' => 0, 'longest' => 0];
-                ?>
-                <div class="streak-item">
-                    <div class="streak-icon"><?= $info['icon'] ?></div>
-                    <div class="streak-count"><?= $streak['current'] ?></div>
-                    <div class="streak-label"><?= $info['label'] ?> Streak</div>
-                    <div class="streak-best">Best: <?= $streak['longest'] ?> days</div>
-                </div>
-                <?php endforeach; ?>
+            <div class="hero-stat-info">
+                <div class="hero-stat-value"><?= $totalBadges ?></div>
+                <div class="hero-stat-label">Badges Earned</div>
             </div>
         </div>
 
-        <!-- Rankings Card -->
-        <div class="achievement-card">
-            <div class="card-header">
-                <span class="icon">🏆</span>
-                <h3>Leaderboard Rankings</h3>
+        <div class="hero-stat-card">
+            <div class="hero-stat-icon streak-icon">
+                <i class="fa-solid fa-fire"></i>
             </div>
-
-            <div class="rankings-grid">
-                <?php
-                $rankLabels = [
-                    'xp' => 'XP Rank',
-                    'badges' => 'Badges Rank',
-                    'vol_hours' => 'Volunteer Rank',
-                    'credits_earned' => 'Earner Rank',
-                ];
-                foreach ($rankLabels as $key => $label):
-                    $rank = $rankings[$key] ?? '-';
-                ?>
-                <div class="rank-item">
-                    <div class="rank-position">#<?= $rank ?></div>
-                    <div class="rank-label"><?= $label ?></div>
-                </div>
-                <?php endforeach; ?>
+            <div class="hero-stat-info">
+                <div class="hero-stat-value"><?= $currentStreak ?></div>
+                <div class="hero-stat-label">Day Streak</div>
             </div>
-
-            <a href="<?= $basePath ?>/leaderboard" class="view-all-link">
-                View Leaderboards <i class="fa-solid fa-arrow-right"></i>
-            </a>
         </div>
 
-        <!-- Badge Progress Card -->
-        <div class="achievement-card two-thirds">
-            <div class="card-header">
-                <span class="icon">🎯</span>
-                <h3>Next Badges to Unlock</h3>
+        <div class="hero-stat-card">
+            <div class="hero-stat-icon rank-icon">
+                <i class="fa-solid fa-ranking-star"></i>
             </div>
+            <div class="hero-stat-info">
+                <div class="hero-stat-value">#<?= $xpRank ?></div>
+                <div class="hero-stat-label">Global Rank</div>
+            </div>
+        </div>
+    </div>
 
-            <?php if (!empty($badges['progress'])): ?>
-            <div class="badge-progress-list">
-                <?php foreach ($badges['progress'] as $prog): ?>
-                <div class="badge-progress-item">
-                    <div class="badge-icon"><?= $prog['badge']['icon'] ?></div>
-                    <div class="badge-info">
-                        <div class="badge-name"><?= htmlspecialchars($prog['badge']['name']) ?></div>
-                        <div class="badge-desc"><?= ucfirst($prog['badge']['msg'] ?? '') ?></div>
-                        <div class="progress-mini">
-                            <div class="progress-mini-fill" style="width: <?= $prog['percent'] ?>%"></div>
+    <!-- Main Content Grid -->
+    <div class="achievements-grid-v2">
+
+        <!-- Left Column -->
+        <div class="achievements-column-main">
+
+            <!-- XP Progress Card -->
+            <div class="achievement-card xp-card">
+                <div class="card-header">
+                    <span class="icon">⭐</span>
+                    <h3>Level Progress</h3>
+                    <span class="level-badge">Lvl <?= $xp['level'] ?? 1 ?></span>
+                </div>
+                <div class="xp-progress-section">
+                    <div class="xp-bar-wrapper">
+                        <div class="xp-bar-track">
+                            <div class="xp-bar-fill" style="width: <?= $xp['progress'] ?? 0 ?>%">
+                                <div class="xp-bar-glow"></div>
+                            </div>
                         </div>
-                        <div class="progress-label"><?= $prog['current'] ?> / <?= $prog['target'] ?> (<?= $prog['percent'] ?>%)</div>
+                        <div class="xp-bar-labels">
+                            <span>Lvl <?= $xp['level'] ?? 1 ?></span>
+                            <span class="xp-current"><?= number_format($xp['xp_in_level'] ?? 0) ?> / <?= number_format($xp['xp_for_next'] ?? 100) ?> XP</span>
+                            <span>Lvl <?= ($xp['level'] ?? 1) + 1 ?></span>
+                        </div>
+                    </div>
+                    <?php if (($xp['level'] ?? 1) < 10): ?>
+                    <p class="xp-hint">Earn <?= number_format(($xp['xp_for_next'] ?? 100) - ($xp['xp_in_level'] ?? 0)) ?> more XP to reach Level <?= ($xp['level'] ?? 1) + 1 ?></p>
+                    <?php else: ?>
+                    <p class="xp-hint xp-max">Maximum Level Achieved!</p>
+                    <?php endif; ?>
+                </div>
+            </div>
+
+            <!-- Badge Progress Card -->
+            <div class="achievement-card">
+                <div class="card-header">
+                    <span class="icon">🎯</span>
+                    <h3>Next Badges to Unlock</h3>
+                </div>
+
+                <?php if (!empty($badges['progress'])): ?>
+                <div class="badge-progress-list">
+                    <?php foreach (array_slice($badges['progress'], 0, 4) as $prog): ?>
+                    <div class="badge-progress-item">
+                        <div class="badge-icon"><?= $prog['badge']['icon'] ?></div>
+                        <div class="badge-info">
+                            <div class="badge-name"><?= htmlspecialchars($prog['badge']['name']) ?></div>
+                            <div class="badge-desc"><?= ucfirst($prog['badge']['msg'] ?? '') ?></div>
+                            <div class="progress-mini">
+                                <div class="progress-mini-fill" style="width: <?= $prog['percent'] ?>%"></div>
+                            </div>
+                            <div class="progress-label"><?= $prog['current'] ?> / <?= $prog['target'] ?> (<?= $prog['percent'] ?>%)</div>
+                        </div>
+                    </div>
+                    <?php endforeach; ?>
+                </div>
+                <?php else: ?>
+                <div class="empty-state compact">
+                    <?php if ($badges['total_earned'] >= $badges['total_available']): ?>
+                    <div class="empty-icon">🎉</div>
+                    <p>You've unlocked all available badges!</p>
+                    <?php else: ?>
+                    <div class="empty-icon">🎯</div>
+                    <p>Keep participating to unlock your next badge!</p>
+                    <?php endif; ?>
+                </div>
+                <?php endif; ?>
+
+                <a href="<?= $basePath ?>/achievements/badges" class="view-all-link">
+                    View All Badges <i class="fa-solid fa-arrow-right"></i>
+                </a>
+            </div>
+
+            <!-- Stats Summary Card -->
+            <div class="achievement-card">
+                <div class="card-header">
+                    <span class="icon">📊</span>
+                    <h3>Activity Stats</h3>
+                </div>
+
+                <div class="stats-grid">
+                    <div class="stat-item">
+                        <div class="stat-icon"><i class="fa-solid fa-hands-helping"></i></div>
+                        <div class="stat-value"><?= number_format($stats['vol'] ?? 0) ?></div>
+                        <div class="stat-label">Volunteer Hours</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-icon"><i class="fa-solid fa-coins"></i></div>
+                        <div class="stat-value"><?= number_format($stats['earn'] ?? 0) ?></div>
+                        <div class="stat-label">Credits Earned</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-icon"><i class="fa-solid fa-shopping-cart"></i></div>
+                        <div class="stat-value"><?= number_format($stats['spend'] ?? 0) ?></div>
+                        <div class="stat-label">Credits Spent</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-icon"><i class="fa-solid fa-exchange-alt"></i></div>
+                        <div class="stat-value"><?= number_format($stats['transaction'] ?? 0) ?></div>
+                        <div class="stat-label">Transactions</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-icon"><i class="fa-solid fa-user-friends"></i></div>
+                        <div class="stat-value"><?= number_format($stats['connection'] ?? 0) ?></div>
+                        <div class="stat-label">Connections</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-icon"><i class="fa-solid fa-star"></i></div>
+                        <div class="stat-value"><?= number_format($stats['review_given'] ?? 0) ?></div>
+                        <div class="stat-label">Reviews</div>
                     </div>
                 </div>
-                <?php endforeach; ?>
             </div>
-            <?php else: ?>
-            <?php if ($badges['total_earned'] >= $badges['total_available']): ?>
-            <p style="color: #10b981; text-align: center; padding: 20px;">You've unlocked all available badges! Amazing!</p>
-            <?php else: ?>
-            <p style="color: #6b7280; text-align: center; padding: 20px;">Keep participating to unlock your next badge!</p>
-            <?php endif; ?>
-            <?php endif; ?>
-
-            <a href="<?= $basePath ?>/achievements/badges" class="view-all-link">
-                View All Badges <i class="fa-solid fa-arrow-right"></i>
-            </a>
         </div>
 
-        <!-- Earned Badges Card -->
-        <div class="achievement-card">
-            <div class="card-header">
-                <span class="icon">🏅</span>
-                <h3>Earned Badges (<?= $badges['total_earned'] ?>)</h3>
-            </div>
+        <!-- Right Column -->
+        <div class="achievements-column-side">
 
-            <?php if (!empty($badges['earned'])): ?>
-            <div class="badges-earned-grid">
-                <?php foreach (array_slice($badges['earned'], 0, 8) as $badge):
-                    // Determine rarity based on badge type or default to common
-                    $rarity = $badge['rarity'] ?? 'common';
-                    $rarityPercent = match($rarity) {
-                        'legendary' => 1,
-                        'epic' => 5,
-                        'rare' => 15,
-                        'uncommon' => 35,
-                        default => 60
-                    };
-                ?>
-                <div class="badge-earned"
-                     onclick="openBadgeModal(this)"
-                     data-badge-name="<?= htmlspecialchars($badge['name']) ?>"
-                     data-badge-icon="<?= htmlspecialchars($badge['icon']) ?>"
-                     data-badge-desc="<?= htmlspecialchars($badge['description'] ?? 'Earning this achievement') ?>"
-                     data-badge-date="<?= date('F j, Y', strtotime($badge['awarded_at'])) ?>"
-                     data-badge-rarity="<?= ucfirst($rarity) ?>"
-                     data-badge-percent="<?= $rarityPercent ?>"
-                     tabindex="0"
-                     role="button"
-                     aria-label="View details for <?= htmlspecialchars($badge['name']) ?> badge">
-                    <span class="badge-icon"><?= $badge['icon'] ?></span>
-                    <span class="badge-name"><?= htmlspecialchars($badge['name']) ?></span>
+            <!-- Streaks Card -->
+            <div class="achievement-card streaks-card">
+                <div class="card-header">
+                    <span class="icon">🔥</span>
+                    <h3>Streaks</h3>
                 </div>
-                <?php endforeach; ?>
-            </div>
-            <?php if (count($badges['earned']) > 8): ?>
-            <a href="<?= $basePath ?>/achievements/badges" class="view-all-link">
-                +<?= count($badges['earned']) - 8 ?> more badges <i class="fa-solid fa-arrow-right"></i>
-            </a>
-            <?php endif; ?>
-            <?php else: ?>
-            <p style="color: #6b7280; text-align: center; padding: 20px;">Start participating to earn your first badge!</p>
-            <?php endif; ?>
-        </div>
 
-        <!-- Recent XP Card -->
-        <div class="achievement-card">
-            <div class="card-header">
-                <span class="icon">📈</span>
-                <h3>Recent XP Activity</h3>
-            </div>
-
-            <?php if (!empty($recentXP)): ?>
-            <div class="xp-log">
-                <?php foreach ($recentXP as $log): ?>
-                <div class="xp-log-item">
-                    <div>
-                        <div class="xp-action"><?= htmlspecialchars($log['description'] ?: ucwords(str_replace('_', ' ', $log['action']))) ?></div>
-                        <div class="xp-date"><?= date('M j, g:i a', strtotime($log['created_at'])) ?></div>
+                <div class="streaks-list">
+                    <?php
+                    $streakTypes = [
+                        'login' => ['icon' => '📅', 'label' => 'Login', 'color' => '#6366f1'],
+                        'activity' => ['icon' => '⚡', 'label' => 'Activity', 'color' => '#f59e0b'],
+                        'giving' => ['icon' => '🎁', 'label' => 'Giving', 'color' => '#10b981'],
+                        'volunteer' => ['icon' => '🤝', 'label' => 'Volunteer', 'color' => '#ec4899'],
+                    ];
+                    foreach ($streakTypes as $type => $info):
+                        $streak = $streaks[$type] ?? ['current' => 0, 'longest' => 0];
+                        $isActive = $streak['current'] > 0;
+                    ?>
+                    <div class="streak-row <?= $isActive ? 'active' : '' ?>">
+                        <div class="streak-icon-wrap" style="--streak-color: <?= $info['color'] ?>">
+                            <?= $info['icon'] ?>
+                        </div>
+                        <div class="streak-details">
+                            <div class="streak-name"><?= $info['label'] ?></div>
+                            <div class="streak-meta">Best: <?= $streak['longest'] ?> days</div>
+                        </div>
+                        <div class="streak-value <?= $isActive ? 'active' : '' ?>">
+                            <?= $streak['current'] ?>
+                            <span>days</span>
+                        </div>
                     </div>
-                    <div class="xp-amount">+<?= $log['xp_amount'] ?> XP</div>
+                    <?php endforeach; ?>
                 </div>
-                <?php endforeach; ?>
             </div>
-            <?php else: ?>
-            <p style="color: #6b7280; text-align: center; padding: 20px;">No XP activity yet. Start participating!</p>
-            <?php endif; ?>
+
+            <!-- Rankings Card -->
+            <div class="achievement-card rankings-card">
+                <div class="card-header">
+                    <span class="icon">🏆</span>
+                    <h3>Your Rankings</h3>
+                </div>
+
+                <div class="rankings-list">
+                    <?php
+                    $rankData = [
+                        'xp' => ['icon' => 'fa-bolt', 'label' => 'XP', 'color' => '#6366f1'],
+                        'badges' => ['icon' => 'fa-medal', 'label' => 'Badges', 'color' => '#f59e0b'],
+                        'vol_hours' => ['icon' => 'fa-hands-helping', 'label' => 'Volunteer', 'color' => '#10b981'],
+                        'credits_earned' => ['icon' => 'fa-coins', 'label' => 'Earnings', 'color' => '#ec4899'],
+                    ];
+                    foreach ($rankData as $key => $info):
+                        $rank = $rankings[$key] ?? '-';
+                    ?>
+                    <div class="rank-row">
+                        <div class="rank-icon-wrap" style="--rank-color: <?= $info['color'] ?>">
+                            <i class="fa-solid <?= $info['icon'] ?>"></i>
+                        </div>
+                        <div class="rank-label"><?= $info['label'] ?></div>
+                        <div class="rank-value">#<?= $rank ?></div>
+                    </div>
+                    <?php endforeach; ?>
+                </div>
+
+                <a href="<?= $basePath ?>/leaderboard" class="view-all-link">
+                    View Leaderboards <i class="fa-solid fa-arrow-right"></i>
+                </a>
+            </div>
+
+            <!-- Earned Badges Card -->
+            <div class="achievement-card">
+                <div class="card-header">
+                    <span class="icon">🏅</span>
+                    <h3>Recent Badges</h3>
+                    <span class="badge-count"><?= $badges['total_earned'] ?></span>
+                </div>
+
+                <?php if (!empty($badges['earned'])): ?>
+                <div class="badges-showcase">
+                    <?php foreach (array_slice($badges['earned'], 0, 6) as $badge):
+                        $rarity = $badge['rarity'] ?? 'common';
+                        $rarityPercent = match($rarity) {
+                            'legendary' => 1,
+                            'epic' => 5,
+                            'rare' => 15,
+                            'uncommon' => 35,
+                            default => 60
+                        };
+                    ?>
+                    <div class="badge-showcase-item rarity-<?= $rarity ?>"
+                         onclick="openBadgeModal(this)"
+                         data-badge-name="<?= htmlspecialchars($badge['name']) ?>"
+                         data-badge-icon="<?= htmlspecialchars($badge['icon']) ?>"
+                         data-badge-desc="<?= htmlspecialchars($badge['description'] ?? 'Earning this achievement') ?>"
+                         data-badge-date="<?= date('F j, Y', strtotime($badge['awarded_at'])) ?>"
+                         data-badge-rarity="<?= ucfirst($rarity) ?>"
+                         data-badge-percent="<?= $rarityPercent ?>"
+                         tabindex="0"
+                         role="button"
+                         aria-label="View <?= htmlspecialchars($badge['name']) ?>">
+                        <span class="badge-emoji"><?= $badge['icon'] ?></span>
+                    </div>
+                    <?php endforeach; ?>
+                </div>
+                <?php if (count($badges['earned']) > 6): ?>
+                <a href="<?= $basePath ?>/achievements/badges" class="view-all-link">
+                    +<?= count($badges['earned']) - 6 ?> more <i class="fa-solid fa-arrow-right"></i>
+                </a>
+                <?php endif; ?>
+                <?php else: ?>
+                <div class="empty-state compact">
+                    <div class="empty-icon">🎖️</div>
+                    <p>Earn your first badge!</p>
+                </div>
+                <?php endif; ?>
+            </div>
+
+            <!-- Recent XP Card -->
+            <div class="achievement-card">
+                <div class="card-header">
+                    <span class="icon">📈</span>
+                    <h3>Recent Activity</h3>
+                </div>
+
+                <?php if (!empty($recentXP)): ?>
+                <div class="activity-feed">
+                    <?php foreach (array_slice($recentXP, 0, 5) as $log): ?>
+                    <div class="activity-item">
+                        <div class="activity-dot"></div>
+                        <div class="activity-content">
+                            <div class="activity-text"><?= htmlspecialchars($log['description'] ?: ucwords(str_replace('_', ' ', $log['action']))) ?></div>
+                            <div class="activity-time"><?= date('M j, g:i a', strtotime($log['created_at'])) ?></div>
+                        </div>
+                        <div class="activity-xp">+<?= $log['xp_amount'] ?></div>
+                    </div>
+                    <?php endforeach; ?>
+                </div>
+                <?php else: ?>
+                <div class="empty-state compact">
+                    <div class="empty-icon">📈</div>
+                    <p>No recent activity</p>
+                </div>
+                <?php endif; ?>
+            </div>
+
         </div>
-
-        <!-- Stats Summary Card -->
-        <div class="achievement-card full-width">
-            <div class="card-header">
-                <span class="icon">📊</span>
-                <h3>Your Activity Stats</h3>
-            </div>
-
-            <div class="stats-summary">
-                <div class="stat-item">
-                    <div class="stat-value"><?= number_format($stats['vol'] ?? 0) ?></div>
-                    <div class="stat-label">Volunteer Hours</div>
-                </div>
-                <div class="stat-item">
-                    <div class="stat-value"><?= number_format($stats['earn'] ?? 0) ?></div>
-                    <div class="stat-label">Credits Earned</div>
-                </div>
-                <div class="stat-item">
-                    <div class="stat-value"><?= number_format($stats['spend'] ?? 0) ?></div>
-                    <div class="stat-label">Credits Spent</div>
-                </div>
-                <div class="stat-item">
-                    <div class="stat-value"><?= number_format($stats['transaction'] ?? 0) ?></div>
-                    <div class="stat-label">Transactions</div>
-                </div>
-                <div class="stat-item">
-                    <div class="stat-value"><?= number_format($stats['connection'] ?? 0) ?></div>
-                    <div class="stat-label">Connections</div>
-                </div>
-                <div class="stat-item">
-                    <div class="stat-value"><?= number_format($stats['review_given'] ?? 0) ?></div>
-                    <div class="stat-label">Reviews Given</div>
-                </div>
-                <div class="stat-item">
-                    <div class="stat-value"><?= number_format($stats['event_attend'] ?? 0) ?></div>
-                    <div class="stat-label">Events Attended</div>
-                </div>
-                <div class="stat-item">
-                    <div class="stat-value"><?= number_format($stats['post'] ?? 0) ?></div>
-                    <div class="stat-label">Posts Created</div>
-                </div>
-            </div>
-        </div>
-
     </div>
 </div>
 
 <!-- Badge Detail Modal/Drawer -->
-
 <div id="badgeModal" class="badge-modal-overlay" onclick="closeBadgeModalOnBackdrop(event)">
     <div class="badge-modal-content">
         <div class="badge-modal-handle"></div>
@@ -310,7 +404,6 @@ $recentXP = $dashboardData['recent_xp'] ?? [];
 // Badge Modal Functions
 function openBadgeModal(element) {
     const modal = document.getElementById('badgeModal');
-    const header = document.getElementById('badgeModalHeader');
     const icon = document.getElementById('badgeModalIcon');
     const name = document.getElementById('badgeModalName');
     const desc = document.getElementById('badgeModalDesc');
@@ -319,7 +412,6 @@ function openBadgeModal(element) {
     const rarityText = document.getElementById('badgeModalRarityText');
     const rarityBar = document.getElementById('badgeModalRarityBar');
 
-    // Get data from clicked element
     const badgeName = element.dataset.badgeName || 'Badge';
     const badgeIcon = element.dataset.badgeIcon || '🏆';
     const badgeDesc = element.dataset.badgeDesc || 'earning this achievement';
@@ -327,18 +419,15 @@ function openBadgeModal(element) {
     const badgeRarity = element.dataset.badgeRarity || 'Common';
     const badgePercent = parseFloat(element.dataset.badgePercent) || 100;
 
-    // Populate modal
     icon.textContent = badgeIcon;
     name.textContent = badgeName;
     desc.textContent = badgeDesc.charAt(0).toUpperCase() + badgeDesc.slice(1);
     date.textContent = badgeDate;
 
-    // Set rarity tag
     const rarityLower = badgeRarity.toLowerCase();
     rarityTag.className = 'badge-rarity-tag ' + rarityLower;
     rarityTag.innerHTML = getRarityIcon(rarityLower) + ' ' + badgeRarity;
 
-    // Set rarity text
     if (badgePercent <= 1) {
         rarityText.textContent = `Only ${badgePercent.toFixed(1)}% of members have this badge`;
     } else if (badgePercent <= 5) {
@@ -351,35 +440,23 @@ function openBadgeModal(element) {
         rarityText.textContent = `A common achievement (${badgePercent.toFixed(0)}% have it)`;
     }
 
-    // Set rarity bar
     rarityBar.className = 'badge-rarity-fill ' + rarityLower;
     rarityBar.style.width = '0%';
 
-    // Show modal and hide navbar
     modal.classList.add('visible');
     document.body.style.overflow = 'hidden';
 
-    // Hide navbar and bottom tab bar while drawer is open
     const navbar = document.querySelector('.nexus-navbar');
-    if (navbar) {
-        navbar.style.display = 'none';
-    }
+    if (navbar) navbar.style.display = 'none';
     const mobileTabBar = document.querySelector('.mobile-tab-bar');
-    if (mobileTabBar) {
-        mobileTabBar.style.display = 'none';
-    }
+    if (mobileTabBar) mobileTabBar.style.display = 'none';
 
-    // Animate rarity bar
     setTimeout(() => {
-        // Invert percentage for visual (rarer = less fill = more impressive)
         const fillWidth = Math.max(5, 100 - badgePercent);
         rarityBar.style.width = fillWidth + '%';
     }, 100);
 
-    // Haptic feedback on mobile
-    if (navigator.vibrate) {
-        navigator.vibrate(10);
-    }
+    if (navigator.vibrate) navigator.vibrate(10);
 }
 
 function getRarityIcon(rarity) {
@@ -396,17 +473,11 @@ function closeBadgeModal() {
     const modal = document.getElementById('badgeModal');
     const content = modal.querySelector('.badge-modal-content');
 
-    // Restore navbar and bottom tab bar visibility
     const navbar = document.querySelector('.nexus-navbar');
-    if (navbar) {
-        navbar.style.display = '';
-    }
+    if (navbar) navbar.style.display = '';
     const mobileTabBar = document.querySelector('.mobile-tab-bar');
-    if (mobileTabBar) {
-        mobileTabBar.style.display = '';
-    }
+    if (mobileTabBar) mobileTabBar.style.display = '';
 
-    // On mobile, animate drawer closing
     if (window.innerWidth <= 640) {
         content.classList.add('closing');
         setTimeout(() => {
@@ -421,23 +492,17 @@ function closeBadgeModal() {
 }
 
 function closeBadgeModalOnBackdrop(event) {
-    if (event.target === event.currentTarget) {
-        closeBadgeModal();
-    }
+    if (event.target === event.currentTarget) closeBadgeModal();
 }
 
-// Close on Escape key
 document.addEventListener('keydown', function(e) {
     if (e.key === 'Escape') {
         const badgeModal = document.getElementById('badgeModal');
-        if (badgeModal && badgeModal.classList.contains('visible')) {
-            closeBadgeModal();
-        }
+        if (badgeModal && badgeModal.classList.contains('visible')) closeBadgeModal();
     }
 });
 
-// Handle keyboard activation for badges
-document.querySelectorAll('.badge-earned').forEach(badge => {
+document.querySelectorAll('.badge-showcase-item').forEach(badge => {
     badge.addEventListener('keydown', function(e) {
         if (e.key === 'Enter' || e.key === ' ') {
             e.preventDefault();

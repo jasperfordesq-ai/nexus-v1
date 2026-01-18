@@ -267,7 +267,7 @@
 
         // Show notification prompt UI
         showPermissionPrompt() {
-            if (Notification.permission !== 'default') return;
+            if (!('Notification' in window) || Notification.permission !== 'default') return;
 
             const prompt = document.createElement('div');
             prompt.className = 'nexus-notification-prompt';
@@ -821,6 +821,7 @@
         // Auto-subscribe if permission granted but not yet subscribed
         // This handles cases where previous subscription failed (CSRF, network, etc.)
         if (document.body.classList.contains('logged-in') &&
+            'Notification' in window &&
             Notification.permission === 'granted' &&
             CONFIG.vapidPublicKey) {
             try {
@@ -844,6 +845,7 @@
 
         // Show notification prompt if appropriate
         if (document.body.classList.contains('logged-in') &&
+            'Notification' in window &&
             Notification.permission === 'default' &&
             !sessionStorage.getItem('nexus-notification-prompt-dismissed')) {
             setTimeout(() => {

@@ -84,18 +84,18 @@ class Mailer
         return $values;
     }
 
-    public function send($to, $subject, $body)
+    public function send($to, $subject, $body, $cc = null)
     {
         if ($this->useGmailApi) {
-            return $this->sendViaGmailApi($to, $subject, $body);
+            return $this->sendViaGmailApi($to, $subject, $body, $cc);
         }
-        return $this->sendViaSmtp($to, $subject, $body);
+        return $this->sendViaSmtp($to, $subject, $body, $cc);
     }
 
     /**
      * Send email via Gmail API using OAuth 2.0
      */
-    private function sendViaGmailApi($to, $subject, $body)
+    private function sendViaGmailApi($to, $subject, $body, $cc = null)
     {
         try {
             // Get access token (refresh if needed)
@@ -105,7 +105,7 @@ class Mailer
             }
 
             // Build RFC 2822 formatted email
-            $rawEmail = $this->buildRawEmail($to, $subject, $body);
+            $rawEmail = $this->buildRawEmail($to, $subject, $body, $cc);
 
             // Base64url encode
             $encodedEmail = $this->base64urlEncode($rawEmail);
@@ -222,7 +222,7 @@ class Mailer
     /**
      * Build RFC 2822 formatted raw email with HTML support
      */
-    private function buildRawEmail($to, $subject, $body)
+    private function buildRawEmail($to, $subject, $body, $cc = null)
     {
         $boundary = 'boundary_' . md5(uniqid(time()));
 
@@ -235,6 +235,9 @@ class Mailer
         $headers = [];
         $headers[] = 'From: ' . $this->fromName . ' <' . $this->fromEmail . '>';
         $headers[] = 'To: ' . $to;
+        if ($cc) {
+            $headers[] = 'Cc: ' . $cc;
+        }
         $headers[] = 'Subject: =?UTF-8?B?' . base64_encode($subject) . '?=';
         $headers[] = 'MIME-Version: 1.0';
         $headers[] = 'Content-Type: multipart/alternative; boundary="' . $boundary . '"';
@@ -264,12 +267,12 @@ class Mailer
     /**
      * Send email via SMTP (original method)
      */
-    private function sendViaSmtp($to, $subject, $body)
+    private function sendViaSmtp($to, $subject, $body, $cc = null)
     {
         try {
             $this->connect();
             $this->auth();
-            $this->sendData($to, $subject, $body);
+            $this->sendData($to, $subject, $body, $cc);
             $this->quit();
             return true;
         } catch (\Exception $e) {
@@ -315,12 +318,17 @@ class Mailer
         $this->read();
     }
 
-    private function sendData($to, $subject, $body)
+    private function sendData($to, $subject, $body, $cc = null)
     {
         $this->write("MAIL FROM: <{$this->fromEmail}>");
         $this->read();
         $this->write("RCPT TO: <$to>");
         $this->read();
+        // Add CC recipient to SMTP envelope
+        if ($cc) {
+            $this->write("RCPT TO: <$cc>");
+            $this->read();
+        }
         $this->write("DATA");
         $this->read();
 
@@ -329,6 +337,9 @@ class Mailer
         $headers .= "Content-Type: text/html; charset=UTF-8\r\n";
         $headers .= "From: {$this->fromName} <{$this->fromEmail}>\r\n";
         $headers .= "To: $to\r\n";
+        if ($cc) {
+            $headers .= "Cc: $cc\r\n";
+        }
         $headers .= "Subject: $subject\r\n";
 
         $this->write($headers . "\r\n" . $body . "\r\n.");

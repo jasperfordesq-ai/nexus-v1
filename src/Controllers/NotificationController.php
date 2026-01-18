@@ -65,8 +65,6 @@ class NotificationController
         $raw = file_get_contents('php://input');
         $input = json_decode($raw, true);
 
-        // Debug Log
-        error_log("MarkRead Triggered. User: $userId. Payload: " . $raw);
 
         if (!$input && !empty($_POST)) {
             $input = $_POST;
@@ -78,7 +76,6 @@ class NotificationController
             exit;
         } elseif (isset($input['all']) && ($input['all'] === true || $input['all'] === 'true')) {
             Notification::markAllRead($userId);
-            error_log("MarkAllRead Executed for User: $userId");
             echo json_encode(['success' => true]);
             exit;
         }

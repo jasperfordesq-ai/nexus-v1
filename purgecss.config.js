@@ -43,6 +43,7 @@ module.exports = {
         'httpdocs/assets/css/federation-realtime.css',
         'httpdocs/assets/css/compose-multidraw.css',
         'httpdocs/assets/css/pwa-install-modal.css',
+        'httpdocs/assets/css/achievements.css',
     ],
 
     // Output directory for purged CSS
@@ -179,6 +180,24 @@ module.exports = {
             /^badge/,
             /^profile-/,
             /^holo-/,
+
+            // Achievement/Gamification pages
+            /^achievement/,
+            /^challenge/,
+            /^collection/,
+            /^season/,
+            /^shop-/,
+            /^xp-/,
+            /^streak/,
+            /^rank/,
+            /^level/,
+            /^progress/,
+            /^leaderboard/,
+            /^reward/,
+            /^tier/,
+            /^rarity/,
+            /^showcase/,
+            /^confetti/,
 
             // Compose multidraw
             /^md-/,
