@@ -130,6 +130,11 @@ try {
     <?php if (strpos($normPath, '/dashboard') !== false): ?>
         <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/dashboard.min.css?v=<?= $cssVersionTimestamp ?>">
     <?php endif; ?>
+
+    <!-- Nexus Score CSS (loaded when on nexus-score pages) -->
+    <?php if (strpos($normPath, '/nexus-score') !== false || strpos($normPath, '/score') !== false): ?>
+        <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/nexus-score.css?v=<?= $cssVersionTimestamp ?>">
+    <?php endif; ?>
     <!-- Consolidated polish files (replaces nexus-10x-polish + nexus-ux-polish) -->
     <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/nexus-polish.min.css?v=<?= $cssVersionTimestamp ?>" media="print" onload="this.media='all'">
     <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/nexus-interactions.min.css?v=<?= $cssVersionTimestamp ?>" media="print" onload="this.media='all'">

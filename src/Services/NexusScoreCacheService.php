@@ -231,6 +231,12 @@ class NexusScoreCacheService
             $stmt->execute([$tenantId, $limit]);
             $topUsers = $stmt->fetchAll(\PDO::FETCH_ASSOC);
 
+            // Convert tier names to full tier objects
+            foreach ($topUsers as &$user) {
+                $user['tier'] = $this->scoreService->calculateTier($user['score']);
+            }
+            unset($user);
+
             // Get community stats
             $statsStmt = $this->db->prepare("
                 SELECT
@@ -290,7 +296,7 @@ class NexusScoreCacheService
                         'name' => trim($user['first_name'] . ' ' . $user['last_name']),
                         'avatar_url' => $user['avatar_url'],
                         'score' => $scoreData['total_score'],
-                        'tier' => $scoreData['tier']['name']
+                        'tier' => $scoreData['tier']
                     ];
                     $totalScore += $scoreData['total_score'];
                 } catch (\Exception $e) {

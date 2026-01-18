@@ -45,6 +45,7 @@ module.exports = {
         'httpdocs/assets/css/pwa-install-modal.css',
         'httpdocs/assets/css/achievements.css',
         'httpdocs/assets/css/sidebar.css',
+        'httpdocs/assets/css/nexus-score.css',
     ],
 
     // Output directory for purged CSS

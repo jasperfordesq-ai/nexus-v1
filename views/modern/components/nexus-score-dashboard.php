@@ -1,7 +1,7 @@
 <?php
 /**
  * Nexus Score Dashboard Component
- * Visual display of user's 1000-point Nexus Score with glassmorphism design
+ * Visual display of user's 1000-point Nexus Score
  *
  * @var array $scoreData - Score data from NexusScoreService
  * @var bool $isPublic - Whether this is public profile view or private dashboard
@@ -16,350 +16,28 @@ $insights = $scoreData['insights'] ?? [];
 $nextMilestone = $scoreData['next_milestone'] ?? null;
 ?>
 
-<style>
-.nexus-score-container {
-    --score-primary: <?php echo $tier['color']; ?>;
-    --score-glow: <?php echo $tier['color']; ?>80;
-    padding: 0;
-    margin: 0;
-}
+<?php
+// Determine tier key for data attribute
+$tierKey = strtolower(str_replace(' ', '-', $tier['name'] ?? 'novice'));
+$isHighScore = $total >= 700;
+?>
+<div class="nexus-score-container" data-tier="<?php echo $tierKey; ?>" style="--score-percentage: <?php echo $percentage; ?>; --score-primary: <?php echo $tier['color']; ?>; --score-glow: <?php echo $tier['color']; ?>80;">
 
-.score-hero-card {
-    background: linear-gradient(135deg, rgba(15, 23, 42, 0.95), rgba(30, 41, 59, 0.9));
-    backdrop-filter: blur(20px);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 24px;
-    padding: 3rem;
-    margin-bottom: 2rem;
-    position: relative;
-    overflow: hidden;
-}
-
-.score-hero-card::before {
-    content: '';
-    position: absolute;
-    top: -50%;
-    right: -50%;
-    width: 200%;
-    height: 200%;
-    background: radial-gradient(circle, var(--score-glow) 0%, transparent 70%);
-    animation: pulse-glow 3s ease-in-out infinite;
-    pointer-events: none;
-}
-
-@keyframes pulse-glow {
-    0%, 100% { opacity: 0.3; }
-    50% { opacity: 0.6; }
-}
-
-.score-hero-content {
-    position: relative;
-    z-index: 1;
-    display: grid;
-    grid-template-columns: auto 1fr;
-    gap: 2rem;
-    align-items: center;
-}
-
-.score-circle-container {
-    position: relative;
-    width: 200px;
-    height: 200px;
-}
-
-.score-circle {
-    width: 100%;
-    height: 100%;
-    transform: rotate(-90deg);
-}
-
-.score-circle-bg {
-    fill: none;
-    stroke: rgba(255, 255, 255, 0.1);
-    stroke-width: 12;
-}
-
-.score-circle-fill {
-    fill: none;
-    stroke: var(--score-primary);
-    stroke-width: 12;
-    stroke-linecap: round;
-    stroke-dasharray: 565.48; /* 2 * PI * 90 */
-    stroke-dashoffset: 565.48;
-    animation: fillScore 2s ease-out forwards;
-    filter: drop-shadow(0 0 10px var(--score-glow));
-}
-
-@keyframes fillScore {
-    to {
-        stroke-dashoffset: calc(565.48 - (565.48 * var(--score-percentage) / 100));
-    }
-}
-
-.score-circle-text {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    text-align: center;
-}
-
-.score-value {
-    font-size: 3rem;
-    font-weight: 700;
-    color: var(--score-primary);
-    line-height: 1;
-    text-shadow: 0 0 20px var(--score-glow);
-}
-
-.score-max {
-    font-size: 1.5rem;
-    color: rgba(255, 255, 255, 0.5);
-    font-weight: 300;
-}
-
-.score-details {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-}
-
-.tier-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.75rem;
-    background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05));
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    border-radius: 16px;
-    padding: 0.75rem 1.5rem;
-    font-size: 1.5rem;
-    font-weight: 600;
-    color: var(--score-primary);
-    width: fit-content;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-}
-
-.tier-icon {
-    font-size: 2rem;
-}
-
-.percentile-stat {
-    font-size: 1rem;
-    color: rgba(255, 255, 255, 0.7);
-    margin-top: 0.5rem;
-}
-
-.percentile-value {
-    color: #10b981;
-    font-weight: 700;
-    font-size: 1.25rem;
-}
-
-.score-breakdown-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 1.5rem;
-    margin-bottom: 2rem;
-}
-
-.category-card {
-    background: linear-gradient(135deg, rgba(15, 23, 42, 0.9), rgba(30, 41, 59, 0.8));
-    backdrop-filter: blur(16px);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 16px;
-    padding: 1.5rem;
-    transition: all 0.3s ease;
-}
-
-.category-card:hover {
-    transform: translateY(-4px);
-    border-color: rgba(255, 255, 255, 0.2);
-    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
-}
-
-.category-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 1rem;
-}
-
-.category-name {
-    font-size: 1.125rem;
-    font-weight: 600;
-    color: #f1f5f9;
-}
-
-.category-score {
-    font-size: 1.5rem;
-    font-weight: 700;
-    color: #6366f1;
-}
-
-.category-score-max {
-    font-size: 0.875rem;
-    color: rgba(255, 255, 255, 0.5);
-    margin-left: 0.25rem;
-}
-
-.category-progress {
-    width: 100%;
-    height: 8px;
-    background: rgba(255, 255, 255, 0.1);
-    border-radius: 4px;
-    overflow: hidden;
-    margin-bottom: 1rem;
-}
-
-.category-progress-fill {
-    height: 100%;
-    background: linear-gradient(90deg, #6366f1, #8b5cf6);
-    border-radius: 4px;
-    transition: width 1s ease-out;
-    box-shadow: 0 0 10px rgba(99, 102, 241, 0.5);
-}
-
-.category-details {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 0.75rem;
-    font-size: 0.875rem;
-}
-
-.detail-item {
-    display: flex;
-    justify-content: space-between;
-    color: rgba(255, 255, 255, 0.7);
-}
-
-.detail-value {
-    color: #06b6d4;
-    font-weight: 600;
-}
-
-.insights-section {
-    margin-bottom: 2rem;
-}
-
-.insights-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 1rem;
-}
-
-.insight-card {
-    background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(139, 92, 246, 0.1));
-    border: 1px solid rgba(99, 102, 241, 0.3);
-    border-radius: 12px;
-    padding: 1.25rem;
-    display: flex;
-    gap: 1rem;
-}
-
-.insight-card.improvement {
-    background: linear-gradient(135deg, rgba(245, 158, 11, 0.1), rgba(251, 191, 36, 0.1));
-    border-color: rgba(245, 158, 11, 0.3);
-}
-
-.insight-card.suggestion {
-    background: linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(6, 182, 212, 0.1));
-    border-color: rgba(16, 185, 129, 0.3);
-}
-
-.insight-icon {
-    font-size: 2rem;
-    flex-shrink: 0;
-}
-
-.insight-content h4 {
-    font-size: 1rem;
-    font-weight: 600;
-    color: #f1f5f9;
-    margin: 0 0 0.5rem 0;
-}
-
-.insight-content p {
-    font-size: 0.875rem;
-    color: rgba(255, 255, 255, 0.7);
-    margin: 0;
-}
-
-.milestone-card {
-    background: linear-gradient(135deg, rgba(16, 185, 129, 0.2), rgba(5, 150, 105, 0.2));
-    border: 1px solid rgba(16, 185, 129, 0.4);
-    border-radius: 16px;
-    padding: 1.5rem;
-    margin-bottom: 2rem;
-}
-
-.milestone-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 1rem;
-}
-
-.milestone-title {
-    font-size: 1.25rem;
-    font-weight: 600;
-    color: #10b981;
-}
-
-.milestone-remaining {
-    font-size: 1.5rem;
-    font-weight: 700;
-    color: #10b981;
-}
-
-.milestone-progress-bar {
-    width: 100%;
-    height: 12px;
-    background: rgba(255, 255, 255, 0.1);
-    border-radius: 6px;
-    overflow: hidden;
-    margin-bottom: 0.75rem;
-}
-
-.milestone-progress-fill {
-    height: 100%;
-    background: linear-gradient(90deg, #10b981, #06b6d4);
-    border-radius: 6px;
-    transition: width 1s ease-out;
-    box-shadow: 0 0 15px rgba(16, 185, 129, 0.6);
-}
-
-.milestone-reward {
-    color: rgba(255, 255, 255, 0.8);
-    font-size: 0.875rem;
-}
-
-.milestone-reward-icon {
-    color: #fbbf24;
-    margin-right: 0.5rem;
-}
-
-@media (max-width: 768px) {
-    .score-hero-content {
-        grid-template-columns: 1fr;
-        text-align: center;
-    }
-
-    .score-circle-container {
-        margin: 0 auto;
-    }
-
-    .tier-badge {
-        margin: 0 auto;
-    }
-
-    .score-breakdown-grid,
-    .insights-grid {
-        grid-template-columns: 1fr;
-    }
-}
-</style>
-
-<div class="nexus-score-container" style="--score-percentage: <?php echo $percentage; ?>">
+<?php if ($isHighScore && !$isPublic): ?>
+<!-- Celebration confetti for high scores -->
+<div class="score-celebration" id="scoreCelebration">
+    <?php for ($i = 1; $i <= 20; $i++): ?>
+    <div class="confetti"></div>
+    <?php endfor; ?>
+</div>
+<script>
+// Auto-remove confetti after animation
+setTimeout(function() {
+    var celebration = document.getElementById('scoreCelebration');
+    if (celebration) celebration.remove();
+}, 5000);
+</script>
+<?php endif; ?>
     <!-- Hero Score Card -->
     <div class="score-hero-card">
         <div class="score-hero-content">
@@ -375,7 +53,7 @@ $nextMilestone = $scoreData['next_milestone'] ?? null;
             </div>
 
             <div class="score-details">
-                <div class="tier-badge">
+                <div class="tier-badge" style="--score-primary: <?php echo $tier['color']; ?>;">
                     <span class="tier-icon"><?php echo $tier['icon']; ?></span>
                     <span><?php echo $tier['name']; ?> Tier</span>
                 </div>
@@ -387,7 +65,7 @@ $nextMilestone = $scoreData['next_milestone'] ?? null;
                 </div>
 
                 <?php if (!$isPublic): ?>
-                <p style="color: rgba(255, 255, 255, 0.6); font-size: 0.875rem; margin-top: 0.5rem;">
+                <p class="score-encourage-text">
                     Keep engaging with the community to increase your score and unlock rewards.
                 </p>
                 <?php endif; ?>
@@ -419,7 +97,7 @@ $nextMilestone = $scoreData['next_milestone'] ?? null;
     <?php if ($insights && !$isPublic): ?>
     <!-- Insights Section -->
     <div class="insights-section">
-        <h3 style="color: #f1f5f9; font-size: 1.5rem; margin-bottom: 1rem;">💡 Your Insights</h3>
+        <h3>💡 Your Insights</h3>
         <div class="insights-grid">
             <?php foreach ($insights as $insight): ?>
             <div class="insight-card <?php echo $insight['type']; ?>">
@@ -435,8 +113,8 @@ $nextMilestone = $scoreData['next_milestone'] ?? null;
     <?php endif; ?>
 
     <!-- Score Breakdown -->
-    <div>
-        <h3 style="color: #f1f5f9; font-size: 1.5rem; margin-bottom: 1rem;">📊 Score Breakdown</h3>
+    <div class="score-breakdown-section">
+        <h3>📊 Score Breakdown</h3>
         <div class="score-breakdown-grid">
             <?php
             $categories = [
@@ -450,8 +128,9 @@ $nextMilestone = $scoreData['next_milestone'] ?? null;
 
             foreach ($categories as $key => $cat):
                 $data = $breakdown[$key] ?? ['score' => 0, 'max' => 100, 'percentage' => 0, 'details' => []];
+                $catPercentage = isset($data['percentage']) ? $data['percentage'] : round(($data['score'] / $data['max']) * 100, 1);
             ?>
-            <div class="category-card">
+            <div class="category-card" data-category="<?php echo $key; ?>">
                 <div class="category-header">
                     <div class="category-name"><?php echo $cat['name']; ?></div>
                     <div class="category-score">
@@ -461,7 +140,7 @@ $nextMilestone = $scoreData['next_milestone'] ?? null;
                 </div>
 
                 <div class="category-progress">
-                    <div class="category-progress-fill" style="width: <?php echo isset($data['percentage']) ? $data['percentage'] : round(($data['score'] / $data['max']) * 100, 1); ?>%; background: linear-gradient(90deg, <?php echo $cat['color']; ?>, <?php echo $cat['color']; ?>cc);"></div>
+                    <div class="category-progress-fill" style="width: <?php echo $catPercentage; ?>%; background: linear-gradient(90deg, <?php echo $cat['color']; ?>, <?php echo $cat['color']; ?>cc);"></div>
                 </div>
 
                 <?php if (!$isPublic && !empty($data['details'])): ?>
@@ -471,8 +150,8 @@ $nextMilestone = $scoreData['next_milestone'] ?? null;
                     $count = 0;
                     foreach ($data['details'] as $detailKey => $detailValue):
                         if ($count >= 4) break;
-                        if (strpos($detailKey, '_score') !== false) continue; // Skip score sub-values
-                        if (is_array($detailValue)) continue; // Skip array values
+                        if (strpos($detailKey, '_score') !== false) continue;
+                        if (is_array($detailValue)) continue;
                         $count++;
                         $label = ucwords(str_replace('_', ' ', $detailKey));
                     ?>
