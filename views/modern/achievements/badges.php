@@ -34,8 +34,8 @@ $showcaseUpdated = isset($_GET['showcase_updated']);
     <?php endif; ?>
 
     <!-- Badge Showcase Section -->
-    <div class="showcase-section">
-        <h2><i class="fa-solid fa-star"></i> Badge Showcase</h2>
+    <section class="showcase-section" aria-labelledby="showcase-heading">
+        <h2 id="showcase-heading"><i class="fa-solid fa-star"></i> Badge Showcase</h2>
         <p>Pin up to 3 badges to display on your profile. Click any earned badge below to add/remove it.</p>
 
         <form id="showcase-form" action="<?= $basePath ?>/achievements/showcase" method="POST">
@@ -60,7 +60,7 @@ $showcaseUpdated = isset($_GET['showcase_updated']);
                 <i class="fa-solid fa-save"></i> Save Showcase
             </button>
         </form>
-    </div>
+    </section>
 
     <!-- Progress Bar -->
     <div class="badges-progress-bar">
@@ -120,7 +120,9 @@ $showcaseUpdated = isset($_GET['showcase_updated']);
                 <?php endif; ?>
 
                 <?php if ($badge['earned']): ?>
-                <button type="button" class="pin-btn <?= !empty($badge['showcased']) ? 'pinned' : '' ?>" onclick="toggleShowcase(this, '<?= htmlspecialchars($badge['key']) ?>', '<?= htmlspecialchars($badge['name']) ?>', '<?= htmlspecialchars($badge['icon']) ?>')">
+                <button type="button" class="pin-btn <?= !empty($badge['showcased']) ? 'pinned' : '' ?>"
+                        onclick="toggleShowcase(this, '<?= htmlspecialchars($badge['key']) ?>', '<?= htmlspecialchars($badge['name']) ?>', '<?= htmlspecialchars($badge['icon']) ?>')"
+                        aria-label="<?= !empty($badge['showcased']) ? 'Remove from showcase' : 'Add to showcase' ?>">
                     <?= !empty($badge['showcased']) ? '<i class="fa-solid fa-star"></i> Pinned' : '<i class="fa-regular fa-star"></i> Pin' ?>
                 </button>
                 <?php endif; ?>
@@ -137,7 +139,7 @@ $showcaseUpdated = isset($_GET['showcase_updated']);
 <?php endif; ?>
 
 <script>
-// Auto-dismiss success toast after 4 seconds
+// Auto-dismiss success toast
 (function() {
     const toast = document.getElementById('successToast');
     if (toast) {
@@ -166,6 +168,7 @@ function toggleShowcase(btn, key, name, icon) {
         slot.removeAttribute('data-key');
         btn.classList.remove('pinned');
         btn.innerHTML = '<i class="fa-regular fa-star"></i> Pin';
+        btn.setAttribute('aria-label', 'Add to showcase');
     } else {
         // Find empty slot
         let emptySlot = null;
@@ -191,6 +194,7 @@ function toggleShowcase(btn, key, name, icon) {
         `;
         btn.classList.add('pinned');
         btn.innerHTML = '<i class="fa-solid fa-star"></i> Pinned';
+        btn.setAttribute('aria-label', 'Remove from showcase');
     }
 
     saveBtn.style.display = 'inline-flex';
