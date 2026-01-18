@@ -211,25 +211,42 @@
 
                 // Always validate tokens after recovery (even if no recovery was needed)
                 // This catches expired tokens that weren't properly cleared
-                if (this.getToken()) {
-                    const remaining = this.getTokenTimeRemaining();
+                const currentToken = this.getToken();
+                const currentRefresh = this.getRefreshToken();
+                const remaining = this.getTokenTimeRemaining();
 
+                console.log('[NexusAuth] Post-recovery token state:', {
+                    hasToken: !!currentToken,
+                    hasRefresh: !!currentRefresh,
+                    remaining: remaining,
+                    needsRefresh: this.tokenNeedsRefresh()
+                });
+
+                if (currentToken) {
                     if (remaining <= 0) {
                         // Token is expired - try to refresh
                         console.log('[NexusAuth] Token expired, attempting refresh...');
                         const refreshed = await this.refreshAccessToken();
 
                         if (!refreshed) {
-                            // Refresh failed - clear only tokens, preserve user data
-                            // The heartbeat will handle full logout if session is truly invalid
-                            console.log('[NexusAuth] Token refresh failed, clearing tokens only');
-                            await this.clearTokens();
+                            // Refresh failed - but DON'T clear tokens if we still have a refresh token
+                            // The user might just be offline temporarily
+                            if (!this.getRefreshToken()) {
+                                console.log('[NexusAuth] Token refresh failed and no refresh token, clearing tokens');
+                                await this.clearTokens();
+                            } else {
+                                console.log('[NexusAuth] Token refresh failed but keeping refresh token for later retry');
+                            }
                         }
                     } else if (this.tokenNeedsRefresh()) {
                         // Token is close to expiry - refresh proactively
                         console.log('[NexusAuth] Token needs refresh, refreshing...');
                         await this.refreshAccessToken();
                     }
+                } else if (currentRefresh) {
+                    // No access token but have refresh token - try to get new access token
+                    console.log('[NexusAuth] No access token but have refresh token, attempting refresh...');
+                    await this.refreshAccessToken();
                 }
             } catch (e) {
                 console.error('[NexusAuth] Error recovering auth state:', e);
@@ -392,9 +409,12 @@
                     'X-Requested-With': 'XMLHttpRequest'
                 };
 
-                // Add mobile app header for Capacitor apps
+                // Add mobile indicators for proper platform detection
                 if (this.isNativeApp()) {
                     headers['X-Capacitor-App'] = 'true';
+                }
+                if (this.isMobileDevice()) {
+                    headers['X-Nexus-Mobile'] = 'true';
                 }
 
                 // Include Bearer token if available for token status check
@@ -520,14 +540,22 @@
             // PRIMARY: Check for valid tokens in localStorage (most reliable)
             const token = this.getToken();
             const refreshToken = this.getRefreshToken();
+            const remaining = this.getTokenTimeRemaining();
 
-            // If we have both tokens and access token isn't obviously expired, we're logged in
-            if (token && refreshToken) {
-                const remaining = this.getTokenTimeRemaining();
-                // If we have time remaining OR we have a refresh token to get new access token
-                if (remaining > 0 || refreshToken) {
-                    return true;
-                }
+            console.log('[NexusAuth] isLoggedIn check:', {
+                hasToken: !!token,
+                hasRefreshToken: !!refreshToken,
+                tokenTimeRemaining: remaining
+            });
+
+            // If we have a refresh token, we can always get a new access token
+            if (refreshToken) {
+                return true;
+            }
+
+            // If we have a valid access token, we're logged in
+            if (token && remaining > 0) {
+                return true;
             }
 
             // Safety check: ensure document.body exists before checking DOM
@@ -905,13 +933,24 @@
 
             this.refreshPromise = (async () => {
                 try {
+                    // Build headers with mobile indicators for correct token expiry
+                    const headers = {
+                        'Content-Type': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest'
+                    };
+
+                    // Add mobile indicators so server returns correct expiry
+                    if (this.isNativeApp()) {
+                        headers['X-Capacitor-App'] = 'true';
+                    }
+                    if (this.isMobileDevice()) {
+                        headers['X-Nexus-Mobile'] = 'true';
+                    }
+
                     const response = await fetch(this.config.refreshTokenEndpoint, {
                         method: 'POST',
                         credentials: 'include',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'X-Requested-With': 'XMLHttpRequest'
-                        },
+                        headers: headers,
                         body: JSON.stringify({ refresh_token: refreshToken })
                     });
 
@@ -920,8 +959,10 @@
 
                         if (data.access_token) {
                             this.setToken(data.access_token);
-                            this.setTokenExpiry(data.expires_in || 3600);
-                            console.log('[NexusAuth] Access token refreshed successfully');
+                            // Use server-provided expiry, with platform-appropriate fallback
+                            const defaultExpiry = this.isMobileDevice() ? 31536000 : 7200;
+                            this.setTokenExpiry(data.expires_in || defaultExpiry);
+                            console.log('[NexusAuth] Access token refreshed, expires_in:', data.expires_in || defaultExpiry);
                         }
 
                         // Update refresh token if a new one was provided
@@ -933,12 +974,16 @@
                         return true;
                     } else if (response.status === 401) {
                         // Refresh token is invalid/expired
-                        // DON'T immediately clear auth - let the heartbeat handle logout
-                        // This prevents race conditions where concurrent requests all try to clear auth
-                        console.log('[NexusAuth] Refresh token expired/invalid');
-                        // Clear only the tokens, not the full auth state
-                        // Heartbeat will handle the full logout after multiple failures
-                        await this.clearTokens();
+                        // Log detailed info for debugging
+                        console.log('[NexusAuth] Refresh token rejected (401)');
+                        try {
+                            const errorData = await response.json();
+                            console.log('[NexusAuth] Refresh error details:', errorData);
+                        } catch (e) {}
+
+                        // DON'T clear tokens immediately - the user might need to re-login
+                        // but we shouldn't force logout silently
+                        console.log('[NexusAuth] NOT clearing tokens - user may need to re-login manually');
                         return false;
                     } else {
                         console.log('[NexusAuth] Token refresh failed:', response.status);
@@ -1067,13 +1112,15 @@
             }
 
             // Store token expiry time
-            // Server sends platform-appropriate expiry (7 days mobile, 2 hours desktop)
+            // Server sends platform-appropriate expiry (1 year mobile, 2 hours desktop)
             if (response.expires_in) {
                 this.setTokenExpiry(response.expires_in);
+                console.log('[NexusAuth] Token expiry set from server:', response.expires_in, 'seconds (~' + Math.round(response.expires_in / 86400) + ' days)');
             } else {
                 // Default based on platform if not specified
-                const defaultExpiry = this.isMobileDevice() ? 604800 : 7200; // 7 days or 2 hours
+                const defaultExpiry = this.isMobileDevice() ? 31536000 : 7200; // 1 year or 2 hours
                 this.setTokenExpiry(defaultExpiry);
+                console.log('[NexusAuth] Token expiry set to default:', defaultExpiry, 'seconds');
             }
 
             if (response.user) {

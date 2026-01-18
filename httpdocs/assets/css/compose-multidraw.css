@@ -98,6 +98,7 @@ body {
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
     overflow: hidden;
 }
 
@@ -289,6 +290,7 @@ body {
     scroll-snap-align: start;
     -webkit-tap-highlight-color: transparent;
     touch-action: manipulation;
+    -webkit-user-select: none;
     user-select: none;
 }
 

@@ -717,14 +717,24 @@ html {
             <div class="contact-form-card">
                 <h2>✉️ Send Us a Message</h2>
 
-                <?php if (isset($_GET['sent'])): ?>
+                <?php if (!empty($_SESSION['flash_success'])): ?>
                     <div class="success-message">
                         <span class="success-icon">✅</span>
-                        <span><strong>Success!</strong> Your message has been sent. We'll get back to you soon.</span>
+                        <span><?= htmlspecialchars($_SESSION['flash_success']) ?></span>
                     </div>
+                    <?php unset($_SESSION['flash_success']); ?>
+                <?php endif; ?>
+
+                <?php if (!empty($_SESSION['flash_error'])): ?>
+                    <div class="error-message" style="background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.3); color: #dc2626; padding: 1rem; border-radius: 12px; margin-bottom: 1.5rem;">
+                        <span>❌</span>
+                        <span><?= htmlspecialchars($_SESSION['flash_error']) ?></span>
+                    </div>
+                    <?php unset($_SESSION['flash_error']); ?>
                 <?php endif; ?>
 
                 <form action="<?= \Nexus\Core\TenantContext::getBasePath() ?>/contact/send" method="POST">
+                    <?= \Nexus\Core\Csrf::input() ?>
                     <div class="form-group">
                         <label for="name">Your Name</label>
                         <input type="text" id="name" name="name" required placeholder="John Doe">

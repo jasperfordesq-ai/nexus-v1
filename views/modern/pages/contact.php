@@ -235,7 +235,47 @@ if (class_exists('Nexus\Core\TenantContext')) {
         font-size: 2rem;
     }
 }
+
+#contact-wrapper .contact-alert {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 1rem 1.25rem;
+    border-radius: 12px;
+    margin-bottom: 1.5rem;
+    font-weight: 500;
+}
+
+#contact-wrapper .contact-alert-success {
+    background: rgba(5, 150, 105, 0.15);
+    border: 1px solid rgba(5, 150, 105, 0.3);
+    color: #059669;
+}
+
+[data-theme="dark"] #contact-wrapper .contact-alert-success {
+    background: rgba(5, 150, 105, 0.2);
+    color: #34d399;
+}
+
+#contact-wrapper .contact-alert-error {
+    background: rgba(239, 68, 68, 0.15);
+    border: 1px solid rgba(239, 68, 68, 0.3);
+    color: #dc2626;
+}
+
+[data-theme="dark"] #contact-wrapper .contact-alert-error {
+    background: rgba(239, 68, 68, 0.2);
+    color: #f87171;
+}
 </style>
+
+<?php
+// Flash messages
+$flashSuccess = $_SESSION['flash_success'] ?? null;
+$flashError = $_SESSION['flash_error'] ?? null;
+$formData = $_SESSION['contact_form_data'] ?? [];
+unset($_SESSION['flash_success'], $_SESSION['flash_error'], $_SESSION['contact_form_data']);
+?>
 
 <div id="contact-wrapper">
     <div class="contact-inner">
@@ -244,6 +284,20 @@ if (class_exists('Nexus\Core\TenantContext')) {
             <h1>Contact Us</h1>
             <p>We'd love to hear from you! Whether you have questions, feedback, or just want to say hello.</p>
         </div>
+
+        <?php if ($flashSuccess): ?>
+        <div class="contact-alert contact-alert-success">
+            <i class="fa-solid fa-check-circle"></i>
+            <span><?= htmlspecialchars($flashSuccess) ?></span>
+        </div>
+        <?php endif; ?>
+
+        <?php if ($flashError): ?>
+        <div class="contact-alert contact-alert-error">
+            <i class="fa-solid fa-exclamation-circle"></i>
+            <span><?= htmlspecialchars($flashError) ?></span>
+        </div>
+        <?php endif; ?>
 
         <div class="contact-grid">
 
@@ -257,28 +311,29 @@ if (class_exists('Nexus\Core\TenantContext')) {
                     <div class="form-group">
                         <label for="name">Your Name</label>
                         <input type="text" name="name" id="name" required
-                               value="<?= isset($_SESSION['user_name']) ? htmlspecialchars($_SESSION['user_name']) : '' ?>">
+                               value="<?= htmlspecialchars($formData['name'] ?? $_SESSION['user_name'] ?? '') ?>">
                     </div>
 
                     <div class="form-group">
                         <label for="email">Email Address</label>
                         <input type="email" name="email" id="email" required
-                               value="<?= isset($_SESSION['user_email']) ? htmlspecialchars($_SESSION['user_email']) : '' ?>">
+                               value="<?= htmlspecialchars($formData['email'] ?? $_SESSION['user_email'] ?? '') ?>">
                     </div>
 
                     <div class="form-group">
                         <label for="subject">Subject</label>
+                        <?php $selectedSubject = $formData['subject'] ?? 'General Inquiry'; ?>
                         <select name="subject" id="subject">
-                            <option value="General Inquiry">General Inquiry</option>
-                            <option value="Support">Support</option>
-                            <option value="Partnership">Partnership</option>
-                            <option value="Feedback">Feedback</option>
+                            <option value="General Inquiry" <?= $selectedSubject === 'General Inquiry' ? 'selected' : '' ?>>General Inquiry</option>
+                            <option value="Support" <?= $selectedSubject === 'Support' ? 'selected' : '' ?>>Support</option>
+                            <option value="Partnership" <?= $selectedSubject === 'Partnership' ? 'selected' : '' ?>>Partnership</option>
+                            <option value="Feedback" <?= $selectedSubject === 'Feedback' ? 'selected' : '' ?>>Feedback</option>
                         </select>
                     </div>
 
                     <div class="form-group">
                         <label for="message">Message</label>
-                        <textarea name="message" id="message" rows="5" required></textarea>
+                        <textarea name="message" id="message" rows="5" required><?= htmlspecialchars($formData['message'] ?? '') ?></textarea>
                     </div>
 
                     <button type="submit" class="submit-btn">

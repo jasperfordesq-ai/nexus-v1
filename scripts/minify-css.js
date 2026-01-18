@@ -59,6 +59,8 @@ const cssFiles = [
     'social-interactions.css',
     'federation-realtime.css',
     'compose-multidraw.css',
+    // Bundled CSS
+    'civicone-bundle-compiled.css',
 ];
 
 const cssDir = path.join(__dirname, '../httpdocs/assets/css');

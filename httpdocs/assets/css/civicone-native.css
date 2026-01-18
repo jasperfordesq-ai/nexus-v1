@@ -268,6 +268,7 @@
     z-index: 9999;
     opacity: 0;
     visibility: hidden;
+    -webkit-backdrop-filter: blur(4px);
     backdrop-filter: blur(4px);
 }
 
@@ -305,6 +306,7 @@ body.dark-mode .civic-bottom-sheet {
     inset: 0;
     background: rgba(0, 0, 0, 0.5);
     opacity: 0;
+    -webkit-backdrop-filter: blur(4px);
     backdrop-filter: blur(4px);
 }
 

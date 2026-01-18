@@ -89,12 +89,19 @@ class AuthController
             $_SESSION['user_role'] = $user['role'];
             $_SESSION['is_logged_in'] = true;
 
+            // Detect if this is a mobile request for platform-appropriate token expiry
+            $isMobile = TokenService::isMobileRequest();
+
             // Generate secure tokens for mobile app
             $accessToken = TokenService::generateToken((int)$user['id'], (int)$user['tenant_id'], [
                 'role' => $user['role'],
                 'email' => $user['email']
-            ]);
-            $refreshToken = TokenService::generateRefreshToken((int)$user['id'], (int)$user['tenant_id']);
+            ], $isMobile);
+            $refreshToken = TokenService::generateRefreshToken((int)$user['id'], (int)$user['tenant_id'], $isMobile);
+
+            // Get the actual expiry time based on platform (mobile = 1 year, web = 2 hours)
+            $accessTokenExpiry = TokenService::getAccessTokenExpiry($isMobile);
+            $refreshTokenExpiry = TokenService::getRefreshTokenExpiry($isMobile);
 
             return $this->jsonResponse([
                 'success' => true,
@@ -110,7 +117,9 @@ class AuthController
                 'access_token' => $accessToken,
                 'refresh_token' => $refreshToken,
                 'token_type' => 'Bearer',
-                'expires_in' => 3600, // 1 hour
+                'expires_in' => $accessTokenExpiry, // Platform-aware: 1 year mobile, 2 hours web
+                'refresh_expires_in' => $refreshTokenExpiry, // Platform-aware: 5 years mobile, 2 years web
+                'is_mobile' => $isMobile, // Let client know what mode was detected
                 // Legacy token for backwards compatibility
                 'token' => $accessToken,
                 'config' => json_decode($user['configuration'] ?? '{"modules": {"events": true, "polls": true, "goals": true, "volunteering": true, "resources": true}}', true)
@@ -406,31 +415,40 @@ class AuthController
             return $this->jsonResponse(['error' => 'Account suspended'], 403);
         }
 
-        // Generate new tokens
+        // Detect if this is a mobile request for platform-appropriate token expiry
+        $isMobile = TokenService::isMobileRequest();
+
+        // Generate new tokens with platform-appropriate expiry
         $newAccessToken = TokenService::generateToken((int)$userId, (int)$tenantId, [
             'role' => $user['role'],
             'email' => $user['email']
-        ]);
+        ], $isMobile);
 
-        // Only generate new refresh token if current one is close to expiring (< 7 days)
+        // Get expiry times for response
+        $accessTokenExpiry = TokenService::getAccessTokenExpiry($isMobile);
+        $refreshTokenExpiry = TokenService::getRefreshTokenExpiry($isMobile);
+
+        // Only generate new refresh token if current one is close to expiring (< 30 days)
         $refreshTimeRemaining = TokenService::getTimeRemaining($refreshToken);
         $newRefreshToken = null;
 
-        if ($refreshTimeRemaining < 604800) { // 7 days
-            $newRefreshToken = TokenService::generateRefreshToken((int)$userId, (int)$tenantId);
+        if ($refreshTimeRemaining < 2592000) { // 30 days
+            $newRefreshToken = TokenService::generateRefreshToken((int)$userId, (int)$tenantId, $isMobile);
         }
 
         $response = [
             'success' => true,
             'access_token' => $newAccessToken,
             'token_type' => 'Bearer',
-            'expires_in' => 3600,
+            'expires_in' => $accessTokenExpiry, // Platform-aware: 1 year mobile, 2 hours web
+            'is_mobile' => $isMobile,
             // Legacy compatibility
             'token' => $newAccessToken
         ];
 
         if ($newRefreshToken) {
             $response['refresh_token'] = $newRefreshToken;
+            $response['refresh_expires_in'] = $refreshTokenExpiry;
         }
 
         return $this->jsonResponse($response);

@@ -393,6 +393,161 @@ if (document.readyState === 'loading') {
 } else {
     checkBiometricSupport();
 }
+
+/**
+ * CAPACITOR APP LOGIN INTERCEPTOR
+ * For Capacitor mobile apps, we intercept the form submission and use the API endpoint
+ * instead of traditional form POST. This ensures tokens are properly generated and stored.
+ */
+function isCapacitorApp() {
+    // Check multiple indicators
+    const hasCapacitor = typeof Capacitor !== 'undefined';
+    const isNative = hasCapacitor && Capacitor.isNativePlatform && Capacitor.isNativePlatform();
+    const hasCapacitorBridge = typeof window.Capacitor !== 'undefined' && window.Capacitor.Plugins;
+
+    console.log('[Login] Capacitor check:', { hasCapacitor, isNative, hasCapacitorBridge });
+
+    return isNative || hasCapacitorBridge;
+}
+
+function isMobileDevice() {
+    const ua = navigator.userAgent || '';
+    return /Mobile|Android|iPhone|iPad|iPod|webOS|BlackBerry|IEMobile|Opera Mini/i.test(ua);
+}
+
+function shouldUseApiLogin() {
+    // Use API login for Capacitor apps OR any mobile device for better token handling
+    const isCapacitor = isCapacitorApp();
+    const isMobile = isMobileDevice();
+
+    console.log('[Login] Platform detection:', { isCapacitor, isMobile });
+
+    // Always use API for mobile to ensure proper token storage
+    return isCapacitor || isMobile;
+}
+
+function setupCapacitorLoginInterceptor() {
+    const useApiLogin = shouldUseApiLogin();
+
+    if (!useApiLogin) {
+        console.log('[Login] Desktop web browser, using traditional form login');
+        return;
+    }
+
+    console.log('[Login] Mobile/Capacitor detected - intercepting login form for API-based login');
+
+    const loginForm = document.querySelector('form[action*="login"]');
+    if (!loginForm) {
+        console.log('[Login] No login form found');
+        return;
+    }
+
+    // Mark the form as intercepted to prevent double handling
+    if (loginForm.dataset.intercepted) {
+        console.log('[Login] Form already intercepted');
+        return;
+    }
+    loginForm.dataset.intercepted = 'true';
+
+    loginForm.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+
+        const submitBtn = loginForm.querySelector('button[type="submit"]');
+        const originalBtnText = submitBtn ? submitBtn.innerHTML : '';
+
+        try {
+            if (submitBtn) {
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = 'Signing in...';
+            }
+
+            const email = loginForm.querySelector('input[name="email"]').value;
+            const password = loginForm.querySelector('input[name="password"]').value;
+
+            console.log('[Login] Calling API login...');
+
+            // Determine headers based on platform
+            const headers = {
+                'Content-Type': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest'
+            };
+
+            // Add mobile indicators
+            if (isCapacitorApp()) {
+                headers['X-Capacitor-App'] = 'true';
+            }
+            if (isMobileDevice()) {
+                headers['X-Nexus-Mobile'] = 'true';
+            }
+
+            const response = await fetch('/api/auth/login', {
+                method: 'POST',
+                headers: headers,
+                credentials: 'include',
+                body: JSON.stringify({ email, password })
+            });
+
+            const data = await response.json();
+
+            if (response.ok && data.success) {
+                console.log('[Login] API login successful, storing tokens...');
+                console.log('[Login] Token expires_in:', data.expires_in, 'seconds (~' + Math.round(data.expires_in / 86400) + ' days)');
+                console.log('[Login] Is mobile detected:', data.is_mobile);
+
+                // Store tokens using NexusAuth handler
+                if (window.NexusAuth) {
+                    await NexusAuth.onLoginSuccess(data);
+                    console.log('[Login] Tokens stored via NexusAuth');
+                } else {
+                    // Fallback: store directly
+                    localStorage.setItem('nexus_auth_token', data.access_token);
+                    localStorage.setItem('nexus_auth_token_refresh', data.refresh_token);
+                    localStorage.setItem('nexus_token_expiry', (Date.now() + data.expires_in * 1000).toString());
+                    localStorage.setItem('nexus_user_data', JSON.stringify(data.user));
+
+                    // Also store in Capacitor Preferences if available
+                    if (Capacitor.Plugins.Preferences) {
+                        await Capacitor.Plugins.Preferences.set({ key: 'nexus_auth_token', value: data.access_token });
+                        await Capacitor.Plugins.Preferences.set({ key: 'nexus_refresh_token', value: data.refresh_token });
+                        await Capacitor.Plugins.Preferences.set({ key: 'nexus_token_expiry', value: (Date.now() + data.expires_in * 1000).toString() });
+                        await Capacitor.Plugins.Preferences.set({ key: 'nexus_user_data', value: JSON.stringify(data.user) });
+                    }
+                    console.log('[Login] Tokens stored directly (NexusAuth not available)');
+                }
+
+                // Redirect to home
+                const basePath = '<?= Nexus\Core\TenantContext::getBasePath() ?>';
+                window.location.href = basePath + '/home';
+
+            } else {
+                // Show error
+                const errorMsg = data.error || 'Login failed. Please check your credentials.';
+                alert(errorMsg);
+
+                if (submitBtn) {
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = originalBtnText;
+                }
+            }
+        } catch (error) {
+            console.error('[Login] API login error:', error);
+            alert('Login failed. Please try again.');
+
+            if (submitBtn) {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = originalBtnText;
+            }
+        }
+    });
+}
+
+// Initialize Capacitor login interceptor
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', setupCapacitorLoginInterceptor);
+} else {
+    setupCapacitorLoginInterceptor();
+}
 </script>
 
 <?php

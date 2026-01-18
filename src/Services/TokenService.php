@@ -24,10 +24,11 @@ class TokenService
 {
     // Token expiration times
     // Desktop/Web: Short-lived access tokens (2 hours) for security
-    // Mobile: Longer access tokens (7 days) + 30-day refresh for "install and forget" experience
+    // Mobile: Very long access tokens (1 year) for "install and forget" experience - users stay logged in indefinitely
     private const ACCESS_TOKEN_EXPIRY_WEB = 7200;           // 2 hours (desktop/web)
-    private const ACCESS_TOKEN_EXPIRY_MOBILE = 604800;      // 7 days (mobile - like Facebook/Instagram)
-    private const REFRESH_TOKEN_EXPIRY = 2592000;           // 30 days (both platforms)
+    private const ACCESS_TOKEN_EXPIRY_MOBILE = 31536000;    // 1 year (mobile - stay logged in indefinitely)
+    private const REFRESH_TOKEN_EXPIRY = 63072000;          // 2 years (allows indefinite login with periodic refresh)
+    private const REFRESH_TOKEN_EXPIRY_MOBILE = 157680000;  // 5 years (mobile - essentially indefinite)
 
     // Algorithm identifier
     private const ALGORITHM = 'HS256';
@@ -112,22 +113,37 @@ class TokenService
     }
 
     /**
+     * Get the appropriate refresh token expiry based on platform
+     */
+    public static function getRefreshTokenExpiry(bool $isMobile = null): int
+    {
+        if ($isMobile === null) {
+            $isMobile = self::isMobileRequest();
+        }
+
+        return $isMobile ? self::REFRESH_TOKEN_EXPIRY_MOBILE : self::REFRESH_TOKEN_EXPIRY;
+    }
+
+    /**
      * Generate a refresh token for a user
      * Refresh tokens have longer expiry and can be used to get new access tokens
      *
      * @param int $userId
      * @param int $tenantId
+     * @param bool|null $isMobile Force mobile/web mode (null = auto-detect)
      * @return string The signed refresh token
      */
-    public static function generateRefreshToken(int $userId, int $tenantId): string
+    public static function generateRefreshToken(int $userId, int $tenantId, ?bool $isMobile = null): string
     {
+        $expiry = self::getRefreshTokenExpiry($isMobile);
+
         return self::createToken([
             'user_id' => $userId,
             'tenant_id' => $tenantId,
             'type' => 'refresh',
             // Add a unique identifier for this refresh token (for revocation)
             'jti' => bin2hex(random_bytes(16))
-        ], self::REFRESH_TOKEN_EXPIRY);
+        ], $expiry);
     }
 
     /**
