@@ -119,36 +119,9 @@ $hero_type = "Welcome to " . $tenantName;
 // No need for hardcoded tenant-specific SEO here anymore!
 
 // ---------------------------------------------------------
-// PUBLIC SECTOR DEMO: Mock Data (for demo purposes only)
+// PUBLIC SECTOR DEMO: Mock Data - REMOVED
 // ---------------------------------------------------------
-$slug = \Nexus\Core\TenantContext::get()['slug'] ?? '';
-if ($slug === 'public-sector-demo') {
-    // MOCK DATA FOR DEMO LAYOUT PARITY
-    if (empty($featuredGroups)) {
-        $featuredGroups = [
-            ['id' => 1, 'name' => 'Elder Care Support', 'description' => 'Connecting volunteers with isolated seniors for companionship and errands.', 'image_url' => '/assets/img/placeholders/community.webp', 'member_count' => 128],
-            ['id' => 2, 'name' => 'Youth Mentorship', 'description' => 'After-school support and skill sharing for local youth.', 'image_url' => '/assets/img/placeholders/abstract.webp', 'member_count' => 85],
-            ['id' => 3, 'name' => 'Green Space Initiative', 'description' => 'Community gardening and urban re-wilding projects.', 'image_url' => '/assets/img/placeholders/geometric.webp', 'member_count' => 240]
-        ];
-    }
-    if (empty($listings)) {
-        $listings = [
-            ['title' => 'Graphic Design for Non-Profit', 'type' => 'offer', 'author_name' => 'Sarah Jenkins', 'author_location' => 'Cork', 'description' => 'I can help design flyers and social media assets for your cause.', 'created_at_human' => '2 hours ago'],
-            ['title' => 'Community Transport Driver', 'type' => 'request', 'author_name' => 'Age Action', 'author_location' => 'Dublin', 'description' => 'Looking for drivers to help seniors get to appointments.', 'created_at_human' => '5 hours ago'],
-            ['title' => 'IT Support Workshop', 'type' => 'offer', 'author_name' => 'Tech4Good', 'author_location' => 'Galway', 'description' => 'Hosting a free digital literacy workshop next Tuesday.', 'created_at_human' => '1 day ago']
-        ];
-    }
-    if (empty($hubs)) {
-        $hubs = $featuredGroups; // Reuse for demo
-    }
-    if (empty($members)) {
-        $members = [
-            ['id' => 1, 'name' => 'Dr. Emily Chen', 'role' => 'organisation', 'location' => 'HSE Coordinator', 'avatar_url' => '/assets/img/defaults/default_avatar.webp'],
-            ['id' => 2, 'name' => 'Liam O\'Connor', 'role' => 'member', 'location' => 'Volunteer', 'avatar_url' => '/assets/img/defaults/default_avatar.webp'],
-            ['id' => 3, 'name' => 'Civic Trust', 'role' => 'organisation', 'location' => 'Partner', 'avatar_url' => '/assets/img/defaults/default_avatar.webp']
-        ];
-    }
-}
+// Mock data removed - was causing confusion on new tenants.
 
 // ---------------------------------------------------------
 // 3. BACKEND ACTIONS
@@ -1274,51 +1247,8 @@ if (class_exists($dbClass)) {
             // Reviews table may not exist - silently skip
         }
 
-        // --- H. DEMO MOCK DATA (If Empty) ---
-        // Only show if feed is empty OR explicitly in Public Sector Demo
-        if (empty($feedItems) || (\Nexus\Core\TenantContext::get()['slug'] ?? '') === 'public-sector-demo') {
-            // Mock Poll
-            $feedItems[] = [
-                'type' => 'poll',
-                'id' => 999,
-                'user_id' => 1,
-                'author_name' => 'Community Admin',
-                'author_avatar' => '/assets/img/defaults/default_avatar.webp',
-                'title' => 'Where should we plant the new community garden?',
-                'body' => 'We have three locations proposed by the council.',
-                'created_at' => date('Y-m-d H:i:s', strtotime('-2 hours')),
-                'likes_count' => 5,
-                'extra_1' => 'poll',
-                'extra_2' => 45
-            ];
-            // Mock Goal
-            $feedItems[] = [
-                'type' => 'goal',
-                'id' => 888,
-                'user_id' => 2,
-                'author_name' => 'Green Team',
-                'author_avatar' => '/assets/img/defaults/default_avatar.webp',
-                'title' => 'Plant 500 Trees by December',
-                'body' => 'We are 60% of the way there! Join us this Saturday.',
-                'created_at' => date('Y-m-d H:i:s', strtotime('-5 hours')),
-                'likes_count' => 12,
-                'extra_2' => date('Y-12-31')
-            ];
-            // Mock Volunteering
-            $feedItems[] = [
-                'type' => 'volunteering',
-                'id' => 777,
-                'user_id' => 3,
-                'author_name' => 'Elder Care Alliance',
-                'author_avatar' => '/assets/img/defaults/default_avatar.webp',
-                'title' => 'Drivers Needed for Weekend Meals',
-                'body' => 'Earn 2 Time Credits per hour. Must have own vehicle.',
-                'created_at' => date('Y-m-d H:i:s', strtotime('-1 day')),
-                'likes_count' => 8,
-                'extra_1' => 'Community Center',
-                'extra_2' => 2
-            ];
-        }
+        // --- H. DEMO MOCK DATA - REMOVED ---
+        // Mock data removed - was causing confusion on new tenants.
 
         // --- G. SORT AGGREGATED FEED ---
         usort($feedItems, function ($a, $b) {
@@ -1335,10 +1265,11 @@ if (class_exists($dbClass)) {
 }
 
 // 5. LOAD MODERN HEADER
-// Add home feed CSS - standard load (minified version)
-$cssVersion = '2.5.0';
+// Add home feed CSS - standard load
+$cssVersion = '2.5.1';
 $additionalCSS = '
-<link rel="stylesheet" href="/assets/css/nexus-home.min.css?v=' . $cssVersion . '">
+<link rel="stylesheet" href="/assets/css/nexus-home.css?v=' . $cssVersion . '">
+<link rel="stylesheet" href="/assets/css/feed-empty-state.css?v=' . $cssVersion . '">
 <link rel="stylesheet" href="/assets/css/sidebar.css?v=' . $cssVersion . '">';
 require __DIR__ . '/../layouts/modern/header.php';
 ?>
@@ -1439,16 +1370,33 @@ require __DIR__ . '/../layouts/modern/header.php';
             </div>
         <?php else: ?>
             <?php if (!empty($errorMsg)): ?>
-            <div class="fb-card feed-state-card error">
-                <div class="feed-state-icon">⚠️</div>
-                <h3 class="feed-item-title feed-state-title error">Feed Error</h3>
-                <p class="feed-state-text"><?= htmlspecialchars($errorMsg) ?></p>
+            <div class="feed-empty-state error-state">
+                <div class="feed-empty-icon error"><i class="fa-solid fa-triangle-exclamation"></i></div>
+                <h3 class="feed-empty-title">Something went wrong</h3>
+                <p class="feed-empty-text"><?= htmlspecialchars($errorMsg) ?></p>
             </div>
             <?php else: ?>
-            <div class="fb-card feed-state-card">
-                <div class="feed-state-icon">👋</div>
-                <h3 class="feed-item-title feed-state-title">Welcome to the Feed</h3>
-                <p class="feed-state-text">Be the first to post something!</p>
+            <div class="feed-empty-state">
+                <div class="feed-empty-icon"><i class="fa-solid fa-seedling"></i></div>
+                <h3 class="feed-empty-title">This community is just getting started!</h3>
+                <p class="feed-empty-text">Be the first to share something with the community.</p>
+                <div class="feed-empty-actions">
+                    <?php if ($isLoggedIn): ?>
+                    <a href="<?= \Nexus\Core\TenantContext::getBasePath() ?>/compose" class="feed-empty-btn primary">
+                        <i class="fa-solid fa-plus"></i> Create Post
+                    </a>
+                    <a href="<?= \Nexus\Core\TenantContext::getBasePath() ?>/compose?type=listing" class="feed-empty-btn secondary">
+                        <i class="fa-solid fa-hand-holding-heart"></i> Add Listing
+                    </a>
+                    <?php else: ?>
+                    <a href="<?= \Nexus\Core\TenantContext::getBasePath() ?>/register" class="feed-empty-btn primary">
+                        <i class="fa-solid fa-user-plus"></i> Join Community
+                    </a>
+                    <a href="<?= \Nexus\Core\TenantContext::getBasePath() ?>/login" class="feed-empty-btn secondary">
+                        <i class="fa-solid fa-right-to-bracket"></i> Log In
+                    </a>
+                    <?php endif; ?>
+                </div>
             </div>
             <?php endif; ?>
         <?php endif; ?>

@@ -494,11 +494,6 @@ if ($tenantSlug === 'public-sector-demo') {
     $router->add('POST', '/home', 'Nexus\Controllers\HomeController@index'); // Support Feed Post
 }
 
-// Post Box Home (Modern Layout Demo)
-$router->add('GET', '/post-box', function() {
-    require __DIR__ . '/../views/modern/post-box-home.php';
-});
-
 // Compose - Full-page multi-form for creating content (mobile-optimized)
 $router->add('GET', '/compose', 'Nexus\Controllers\ComposeController@index');
 $router->add('POST', '/compose', 'Nexus\Controllers\ComposeController@store');
