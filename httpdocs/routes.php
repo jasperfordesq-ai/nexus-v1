@@ -105,6 +105,11 @@ $router->add('GET', '/check-session', function() {
     exit;
 });
 
+$router->add('GET', '/check-username', function() {
+    require __DIR__ . '/check-username.php';
+    exit;
+});
+
 $router->add('GET', '/view-error-log', function() {
     require __DIR__ . '/view-error-log.php';
     exit;
