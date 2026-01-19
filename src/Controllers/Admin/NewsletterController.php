@@ -506,7 +506,8 @@ class NewsletterController
 
         try {
             $mailer = new \Nexus\Core\Mailer();
-            $html = NewsletterService::renderEmail($newsletter, $tenantName);
+            // Pass user as recipient so personalization tokens get replaced
+            $html = NewsletterService::renderEmail($newsletter, $tenantName, null, $user);
             $subject = "[TEST] " . $newsletter['subject'];
 
             $success = $mailer->send($user['email'], $subject, $html);

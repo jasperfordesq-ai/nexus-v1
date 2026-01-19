@@ -432,7 +432,8 @@ class CronController
         header('Content-Type: text/plain');
         ob_start();
         $status = 'success';
-        $processed = 0;
+        $totalSent = 0;
+        $totalFailed = 0;
 
         try {
             echo "Processing newsletter queue...\n";
@@ -442,16 +443,40 @@ class CronController
             $pending = Database::query($sql)->fetchAll();
 
             foreach ($pending as $row) {
-                $newsletter = \Nexus\Models\Newsletter::find($row['newsletter_id']);
+                $newsletter = \Nexus\Models\Newsletter::findById($row['newsletter_id']);
                 if ($newsletter && $newsletter['status'] === 'sending') {
                     \Nexus\Core\TenantContext::setById($newsletter['tenant_id']);
-                    $sent = NewsletterService::processQueue($row['newsletter_id'], 100);
-                    echo "Newsletter {$row['newsletter_id']}: Sent $sent emails.\n";
-                    $processed++;
+
+                    // Process ALL pending items for this newsletter (loop until done)
+                    $batchSize = 100;
+                    $batchCount = 0;
+                    $newsletterSent = 0;
+                    $newsletterFailed = 0;
+
+                    do {
+                        $result = NewsletterService::processQueue($row['newsletter_id'], $batchSize);
+                        $batchSent = $result['sent'] ?? 0;
+                        $batchFailed = $result['failed'] ?? 0;
+                        $newsletterSent += $batchSent;
+                        $newsletterFailed += $batchFailed;
+                        $batchCount++;
+
+                        // Check if there are more pending
+                        $stats = \Nexus\Models\Newsletter::getQueueStats($row['newsletter_id']);
+                        $morePending = ($stats['pending'] ?? 0) > 0;
+
+                        if ($batchSent > 0) {
+                            echo "   Batch $batchCount: Sent $batchSent, Failed $batchFailed\n";
+                        }
+                    } while ($morePending && $batchSent > 0);
+
+                    echo "Newsletter {$row['newsletter_id']}: Total sent $newsletterSent, failed $newsletterFailed\n";
+                    $totalSent += $newsletterSent;
+                    $totalFailed += $newsletterFailed;
                 }
             }
 
-            echo "Processed $processed newsletter queues.\n";
+            echo "Complete: Sent $totalSent emails, $totalFailed failed.\n";
             echo "Done.\n";
         } catch (\Exception $e) {
             echo "Error: " . $e->getMessage() . "\n";
@@ -687,11 +712,27 @@ class CronController
         }
 
         foreach ($pending as $row) {
-            $newsletter = \Nexus\Models\Newsletter::find($row['newsletter_id']);
+            $newsletter = \Nexus\Models\Newsletter::findById($row['newsletter_id']);
             if ($newsletter && $newsletter['status'] === 'sending') {
                 \Nexus\Core\TenantContext::setById($newsletter['tenant_id']);
-                $sent = NewsletterService::processQueue($row['newsletter_id'], 50);
-                echo "   Newsletter {$row['newsletter_id']}: Sent $sent emails.\n";
+
+                // Process ALL pending items for this newsletter
+                $batchSize = 50;
+                $newsletterSent = 0;
+                $newsletterFailed = 0;
+
+                do {
+                    $result = NewsletterService::processQueue($row['newsletter_id'], $batchSize);
+                    $batchSent = $result['sent'] ?? 0;
+                    $batchFailed = $result['failed'] ?? 0;
+                    $newsletterSent += $batchSent;
+                    $newsletterFailed += $batchFailed;
+
+                    $stats = \Nexus\Models\Newsletter::getQueueStats($row['newsletter_id']);
+                    $morePending = ($stats['pending'] ?? 0) > 0;
+                } while ($morePending && $batchSent > 0);
+
+                echo "   Newsletter {$row['newsletter_id']}: Sent $newsletterSent, failed $newsletterFailed\n";
             }
         }
     }

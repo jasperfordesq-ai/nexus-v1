@@ -1002,15 +1002,14 @@ HTML;
     {
         try {
             $tenantId = TenantContext::getId();
-            $db = \Nexus\Core\Database::getInstance();
 
             // Get member count
-            $memberCount = $db->query("SELECT COUNT(*) as count FROM users WHERE tenant_id = ? AND is_approved = 1", [$tenantId])->fetch()['count'] ?? 0;
+            $memberCount = \Nexus\Core\Database::query("SELECT COUNT(*) as count FROM users WHERE tenant_id = ? AND is_approved = 1", [$tenantId])->fetch()['count'] ?? 0;
 
             // Get listing count (if table exists)
             $listingCount = 0;
             try {
-                $listingCount = $db->query("SELECT COUNT(*) as count FROM listings WHERE tenant_id = ?", [$tenantId])->fetch()['count'] ?? 0;
+                $listingCount = \Nexus\Core\Database::query("SELECT COUNT(*) as count FROM listings WHERE tenant_id = ?", [$tenantId])->fetch()['count'] ?? 0;
             } catch (\Exception $e) {
                 // Table may not exist
             }
@@ -1018,7 +1017,7 @@ HTML;
             // Get exchange count (if table exists)
             $exchangeCount = 0;
             try {
-                $exchangeCount = $db->query("SELECT COUNT(*) as count FROM exchanges WHERE tenant_id = ?", [$tenantId])->fetch()['count'] ?? 0;
+                $exchangeCount = \Nexus\Core\Database::query("SELECT COUNT(*) as count FROM exchanges WHERE tenant_id = ?", [$tenantId])->fetch()['count'] ?? 0;
             } catch (\Exception $e) {
                 // Table may not exist
             }
