@@ -333,6 +333,9 @@ if (class_exists('\Nexus\Core\TenantContext')) {
             });
         })();
     </script>
+
+    <!-- Global Multi-Tab Scroll Fix -->
+    <script src="/assets/js/global-scroll-fix.js?v=<?= $cssVersion ?>"></script>
 </head>
 
 <body class="nexus-skin-civicone <?= $skinClass ?> <?= $isHome ? 'nexus-home-page' : '' ?> <?= isset($_SESSION['user_id']) ? 'logged-in' : '' ?> <?= ((!empty($_SESSION['user_role']) && $_SESSION['user_role'] === 'admin') || !empty($_SESSION['is_super_admin'])) ? 'user-is-admin' : '' ?> <?= $bodyClass ?? '' ?>">

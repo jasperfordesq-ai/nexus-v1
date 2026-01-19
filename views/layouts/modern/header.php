@@ -522,6 +522,9 @@ try {
             window.addEventListener('pageshow', cleanupMessagesClasses);
         })();
     </script>
+
+    <!-- Global Multi-Tab Scroll Fix -->
+    <script src="<?= $assetBase ?>/assets/js/global-scroll-fix.js?v=<?= $cssVersionTimestamp ?>"></script>
 </head>
 
 <body class="nexus-skin-modern <?= $isHome ? 'nexus-home-page' : '' ?> <?= isset($_SESSION['user_id']) ? 'logged-in' : '' ?> <?= ((!empty($_SESSION['user_role']) && $_SESSION['user_role'] === 'admin') || !empty($_SESSION['is_super_admin'])) ? 'user-is-admin' : '' ?> <?= $bodyClass ?? '' ?>">

@@ -10,7 +10,7 @@
  */
 
 return [
-    'version' => '2026.01.19.007', // Update this with each deployment
-    'timestamp' => 1768842706, // Unix timestamp of last deployment
-    'description' => 'Clean up conflicting scroll fixes - consolidate to ONE simple solution'
+    'version' => '2026.01.19.008', // Update this with each deployment
+    'timestamp' => 1768843467, // Unix timestamp of last deployment
+    'description' => 'Add global scroll fix for multi-tab mouse wheel issue site-wide'
 ];
