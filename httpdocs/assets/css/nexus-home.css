@@ -54,13 +54,24 @@
     padding: 14px 16px;
 }
 
-/* Quick action icon colors */
-.compose-quick-btn .icon-indigo { color: #6366f1; }
-.compose-quick-btn .icon-green { color: #10b981; }
-.compose-quick-btn .icon-pink { color: #ec4899; }
-.compose-quick-btn .icon-blue { color: #3b82f6; }
-.compose-quick-btn .icon-amber { color: #f59e0b; }
-.compose-quick-btn .icon-white { color: #fff; }
+/* Quick action icon colors - reset background to prevent conflicts with generic .icon-* classes */
+.compose-quick-btn .icon-indigo,
+.compose-quick-btn .icon-green,
+.compose-quick-btn .icon-pink,
+.compose-quick-btn .icon-blue,
+.compose-quick-btn .icon-amber,
+.compose-quick-btn .icon-white {
+    background: none !important;
+    -webkit-background-clip: unset !important;
+    -webkit-text-fill-color: unset !important;
+    background-clip: unset !important;
+}
+.compose-quick-btn .icon-indigo { color: #6366f1 !important; }
+.compose-quick-btn .icon-green { color: #10b981 !important; }
+.compose-quick-btn .icon-pink { color: #ec4899 !important; }
+.compose-quick-btn .icon-blue { color: #3b82f6 !important; }
+.compose-quick-btn .icon-amber { color: #f59e0b !important; }
+.compose-quick-btn .icon-white { color: #fff !important; }
 
 /* Guest avatar placeholder */
 .composer-avatar-guest {

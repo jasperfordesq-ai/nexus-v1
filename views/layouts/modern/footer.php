@@ -16,6 +16,8 @@ if (class_exists('Nexus\Core\TenantContext')) {
     }
 }
 $footerBasePath = Nexus\Core\TenantContext::getBasePath();
+$tSlug = $t['slug'] ?? '';
+$isHourTimebank = ($tSlug === 'hour-timebank' || $tSlug === 'hour_timebank');
 ?>
 
 <style>
@@ -412,7 +414,9 @@ $footerBasePath = Nexus\Core\TenantContext::getBasePath();
                 <h4>Support</h4>
                 <nav class="nexus-footer-links">
                     <a href="<?= $footerBasePath ?>/help"><i class="fa-solid fa-chevron-right"></i> Help Center</a>
-                    <a href="<?= $footerBasePath ?>/faq"><i class="fa-solid fa-chevron-right"></i> FAQ</a>
+                    <?php if ($isHourTimebank): ?>
+                        <a href="<?= $footerBasePath ?>/faq"><i class="fa-solid fa-chevron-right"></i> FAQ</a>
+                    <?php endif; ?>
                     <a href="<?= $footerBasePath ?>/contact"><i class="fa-solid fa-chevron-right"></i> Contact Us</a>
                     <a href="<?= $footerBasePath ?>/mobile-download"><i class="fa-solid fa-chevron-right"></i> Get the App</a>
                     <a href="https://project-nexus.canny.io/" target="_blank" rel="noopener"><i class="fa-solid fa-bug"></i> Report Bug / Request Feature</a>

@@ -4,7 +4,7 @@ $hTitle = 'Our Story';
 $hSubtitle = 'Building a resilient and equitable society based on mutual respect.';
 $hGradient = 'htb-hero-gradient-hub';
 
-require __DIR__ . '/../..' . '/layouts/modern/header.php';
+require __DIR__ . '/../layouts/modern/header.php';
 ?>
 
 <div class="htb-container htb-container-full" style="margin-top: -80px; position: relative; z-index: 20;">
@@ -122,4 +122,4 @@ require __DIR__ . '/../..' . '/layouts/modern/header.php';
 
 </div>
 
-<?php require __DIR__ . '/../..' . '/layouts/modern/footer.php'; ?>
+<?php require __DIR__ . '/../layouts/modern/footer.php'; ?>

@@ -389,6 +389,7 @@ $router->add('POST', '/api/push/unregister-device', 'Nexus\Controllers\Api\PushA
 $router->add('POST', '/api/auth/heartbeat', 'Nexus\Controllers\Api\AuthController@heartbeat');
 $router->add('GET', '/api/auth/check-session', 'Nexus\Controllers\Api\AuthController@checkSession');
 $router->add('POST', '/api/auth/refresh-session', 'Nexus\Controllers\Api\AuthController@refreshSession');
+$router->add('POST', '/api/auth/restore-session', 'Nexus\Controllers\Api\AuthController@restoreSession');
 
 // Token-based Auth API (for mobile apps - more reliable than session cookies)
 $router->add('POST', '/api/auth/login', 'Nexus\Controllers\Api\AuthController@login');

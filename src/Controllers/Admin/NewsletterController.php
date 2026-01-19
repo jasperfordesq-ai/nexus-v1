@@ -74,13 +74,22 @@ class NewsletterController
             // Groups table might not exist
         }
 
+        // Get saved templates for dropdown
+        $savedTemplates = [];
+        try {
+            $savedTemplates = NewsletterTemplate::getAll(true, true);
+        } catch (\Exception $e) {
+            // Templates table might not exist
+        }
+
         View::render('admin/newsletters/form', [
             'pageTitle' => 'Create Newsletter',
             'newsletter' => null,
             'audienceCounts' => $audienceCounts,
             'eligibleCount' => $audienceCounts['all_members'],
             'segments' => $segments,
-            'groups' => $groups
+            'groups' => $groups,
+            'savedTemplates' => $savedTemplates
         ]);
     }
 

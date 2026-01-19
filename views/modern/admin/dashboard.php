@@ -1993,10 +1993,10 @@ window.AdminTour = {
     }
 };
 
-// Initialize tour on page load
-document.addEventListener('DOMContentLoaded', function() {
-    AdminTour.init();
-});
+// Tour disabled - uncomment to re-enable
+// document.addEventListener('DOMContentLoaded', function() {
+//     AdminTour.init();
+// });
 
 // Close tour on Escape
 document.addEventListener('keydown', function(e) {

@@ -8,6 +8,20 @@ use Nexus\Core\SEO;
 class PageController
 {
     /**
+     * Check if current tenant is hour-timebank (tenant 2).
+     * If not, return 404 and exit.
+     */
+    private function requireHourTimebank(): void
+    {
+        $tenant = \Nexus\Core\TenantContext::get()['slug'] ?? '';
+        if ($tenant !== 'hour-timebank' && $tenant !== 'hour_timebank') {
+            http_response_code(404);
+            View::render('errors/404');
+            exit;
+        }
+    }
+
+    /**
      * Helper to get tenant-specific overrides for Hero/SEO
      */
     private function getTenantOverrides(string $page): array
@@ -113,6 +127,7 @@ class PageController
 
     public function faq()
     {
+        $this->requireHourTimebank();
         SEO::setTitle('Frequently Asked Questions');
         SEO::setDescription('Answers to common questions about timebanking.');
 
@@ -199,6 +214,7 @@ class PageController
 
     public function ourStory()
     {
+        $this->requireHourTimebank();
         SEO::setTitle('Our Story');
 
         View::render('pages/about-story', $this->getTenantOverrides('our-story'));
@@ -206,6 +222,7 @@ class PageController
 
     public function partner()
     {
+        $this->requireHourTimebank();
         SEO::setTitle('Partner With Us');
 
         View::render('pages/partner', $this->getTenantOverrides('partner'));
@@ -213,6 +230,7 @@ class PageController
 
     public function socialPrescribing()
     {
+        $this->requireHourTimebank();
         SEO::setTitle('Social Prescribing');
 
         View::render('pages/social-prescribing', $this->getTenantOverrides('social-prescribing'));
@@ -220,6 +238,7 @@ class PageController
 
     public function timebankingGuide()
     {
+        $this->requireHourTimebank();
         SEO::setTitle('Timebanking Guide');
 
         View::render('pages/timebanking-guide', $this->getTenantOverrides('timebanking-guide'));
@@ -227,6 +246,7 @@ class PageController
 
     public function impactSummary()
     {
+        $this->requireHourTimebank();
         SEO::setTitle('Impact Summary');
 
         View::render('pages/impact-summary', $this->getTenantOverrides('impact-summary'));
@@ -234,6 +254,7 @@ class PageController
 
     public function impactReport()
     {
+        $this->requireHourTimebank();
         SEO::setTitle('Impact Report');
 
         View::render('pages/impact-report', $this->getTenantOverrides('impact-report'));
@@ -241,6 +262,7 @@ class PageController
 
     public function strategicPlan()
     {
+        $this->requireHourTimebank();
         SEO::setTitle('Strategic Plan 2026-2030');
 
         View::render('pages/strategic-plan', $this->getTenantOverrides('strategic-plan'));

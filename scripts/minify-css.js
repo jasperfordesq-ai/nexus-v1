@@ -61,6 +61,8 @@ const cssFiles = [
     'compose-multidraw.css',
     // Bundled CSS
     'civicone-bundle-compiled.css',
+    // Admin area (combined)
+    'admin-gold-standard.css',
 ];
 
 const cssDir = path.join(__dirname, '../httpdocs/assets/css');

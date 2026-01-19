@@ -331,6 +331,70 @@ class AuthController
     }
 
     /**
+     * Restore session from Bearer token
+     * Mobile apps should call this on page load if they have tokens but no session
+     * This bridges the gap between token-based auth and PHP session-based pages
+     */
+    public function restoreSession()
+    {
+        if (session_status() == PHP_SESSION_NONE) {
+            session_start();
+        }
+
+        // Check Bearer token
+        $authHeader = $_SERVER['HTTP_AUTHORIZATION'] ?? $_SERVER['REDIRECT_HTTP_AUTHORIZATION'] ?? '';
+        if (empty($authHeader) || !preg_match('/Bearer\s+(.+)$/i', $authHeader, $matches)) {
+            return $this->jsonResponse(['error' => 'Bearer token required'], 400);
+        }
+
+        $token = $matches[1];
+        $payload = TokenService::validateToken($token);
+
+        if (!$payload || ($payload['type'] ?? 'access') !== 'access') {
+            return $this->jsonResponse(['error' => 'Invalid or expired token'], 401);
+        }
+
+        $userId = $payload['user_id'] ?? null;
+        $tenantId = $payload['tenant_id'] ?? null;
+
+        if (!$userId) {
+            return $this->jsonResponse(['error' => 'Invalid token payload'], 401);
+        }
+
+        // Fetch user data to populate session
+        $db = Database::getConnection();
+        $stmt = $db->prepare("SELECT id, first_name, last_name, email, role, avatar_url, tenant_id, is_super_admin FROM users WHERE id = ?");
+        $stmt->execute([$userId]);
+        $user = $stmt->fetch();
+
+        if (!$user) {
+            return $this->jsonResponse(['error' => 'User not found'], 401);
+        }
+
+        // Restore full session (same as regular login)
+        $_SESSION['user_id'] = $user['id'];
+        $_SESSION['user_name'] = $user['first_name'] . ' ' . $user['last_name'];
+        $_SESSION['user_email'] = $user['email'];
+        $_SESSION['user_role'] = $user['role'] ?? 'member';
+        $_SESSION['role'] = $user['role'] ?? 'member';
+        $_SESSION['is_super_admin'] = $user['is_super_admin'] ?? 0;
+        $_SESSION['tenant_id'] = $user['tenant_id'];
+        $_SESSION['user_avatar'] = $user['avatar_url'] ?? '/assets/img/defaults/default_avatar.png';
+        $_SESSION['is_logged_in'] = true;
+
+        // Set is_admin flag
+        $adminRoles = ['admin', 'super_admin', 'tenant_admin'];
+        $_SESSION['is_admin'] = in_array($user['role'], $adminRoles) ? 1 : 0;
+
+        return $this->jsonResponse([
+            'success' => true,
+            'message' => 'Session restored from token',
+            'user_id' => $user['id'],
+            'session_id' => session_id()
+        ]);
+    }
+
+    /**
      * Refresh session - extends session lifetime
      * Mobile apps should call this when coming to foreground
      */

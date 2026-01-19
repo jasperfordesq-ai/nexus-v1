@@ -177,6 +177,8 @@
             }
         }
         $basePath = Nexus\Core\TenantContext::getBasePath();
+        $tSlug = $t['slug'] ?? '';
+        $isHourTimebank = ($tSlug === 'hour-timebank' || $tSlug === 'hour_timebank');
         ?>
 
         <div class="civic-footer-grid">
@@ -230,8 +232,10 @@
                 <h4>About</h4>
                 <ul>
                     <li><a href="<?= $basePath ?>/how-it-works">How It Works</a></li>
-                    <li><a href="<?= $basePath ?>/our-story">Our Story</a></li>
-                    <li><a href="<?= $basePath ?>/faq">FAQ</a></li>
+                    <?php if ($isHourTimebank): ?>
+                        <li><a href="<?= $basePath ?>/our-story">Our Story</a></li>
+                        <li><a href="<?= $basePath ?>/faq">FAQ</a></li>
+                    <?php endif; ?>
                     <li><a href="<?= $basePath ?>/contact">Contact Us</a></li>
                 </ul>
             </div>
@@ -241,8 +245,10 @@
                 <h4>Support</h4>
                 <ul>
                     <li><a href="<?= $basePath ?>/help">Help Center</a></li>
-                    <li><a href="<?= $basePath ?>/timebanking-guide">Timebanking Guide</a></li>
-                    <li><a href="<?= $basePath ?>/partner">Partner With Us</a></li>
+                    <?php if ($isHourTimebank): ?>
+                        <li><a href="<?= $basePath ?>/timebanking-guide">Timebanking Guide</a></li>
+                        <li><a href="<?= $basePath ?>/partner">Partner With Us</a></li>
+                    <?php endif; ?>
                 </ul>
             </div>
         </div>

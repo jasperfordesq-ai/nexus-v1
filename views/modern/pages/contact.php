@@ -12,11 +12,14 @@ $basePath = class_exists('\Nexus\Core\TenantContext') ? \Nexus\Core\TenantContex
 // Get tenant info
 $tenantName = 'This Community';
 $tenantEmail = '';
+$tSlug = '';
 if (class_exists('Nexus\Core\TenantContext')) {
     $t = Nexus\Core\TenantContext::get();
     $tenantName = $t['name'] ?? 'This Community';
     $tenantEmail = $t['contact_email'] ?? $t['email'] ?? '';
+    $tSlug = $t['slug'] ?? '';
 }
+$isHourTimebank = ($tSlug === 'hour-timebank' || $tSlug === 'hour_timebank');
 ?>
 
 <style>
@@ -361,6 +364,7 @@ unset($_SESSION['flash_success'], $_SESSION['flash_error'], $_SESSION['contact_f
                     </div>
                 </div>
 
+                <?php if ($isHourTimebank): ?>
                 <div class="info-item">
                     <div class="info-icon"><i class="fa-solid fa-question-circle"></i></div>
                     <div class="info-content">
@@ -368,6 +372,7 @@ unset($_SESSION['flash_success'], $_SESSION['flash_error'], $_SESSION['contact_f
                         <p>Check our <a href="<?= $basePath ?>/faq" style="color: var(--contact-theme);">FAQ</a> for quick answers to common questions.</p>
                     </div>
                 </div>
+                <?php endif; ?>
 
                 <div class="info-item">
                     <div class="info-icon"><i class="fa-solid fa-heart"></i></div>

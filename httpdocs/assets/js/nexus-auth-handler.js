@@ -69,6 +69,12 @@
                 return;
             }
 
+            // For mobile devices, ensure the PHP session is in sync with our tokens
+            // This bridges the gap between token auth and PHP session-based pages
+            if (this.isMobileDevice()) {
+                await this.ensureSessionSync();
+            }
+
             this.setupActivityTracking();
             this.startHeartbeat();
             this.startTokenRefreshTimer();
@@ -78,6 +84,85 @@
 
             const platform = this.isMobileDevice() ? 'mobile' : 'desktop';
             console.log('[NexusAuth] Auth handler initialized for ' + platform + ' platform');
+        },
+
+        /**
+         * Ensure PHP session is in sync with our tokens
+         * Calls the restore-session endpoint to create/restore PHP session from Bearer token
+         * This is critical for mobile apps where session cookies may not work reliably
+         */
+        ensureSessionSync: async function() {
+            const token = this.getToken();
+            if (!token) {
+                console.log('[NexusAuth] No token for session sync');
+                return;
+            }
+
+            // Check if we already synced this session (avoid reload loops)
+            const lastSync = sessionStorage.getItem('nexus_session_synced');
+            const syncTime = lastSync ? parseInt(lastSync, 10) : 0;
+            const fiveMinutesAgo = Date.now() - (5 * 60 * 1000);
+
+            // Check if page shows us as not logged in (look for login links or missing user elements)
+            const pageShowsLoggedOut = !document.body.classList.contains('logged-in') &&
+                                       !document.querySelector('[data-user-id]') &&
+                                       (document.querySelector('a[href*="/login"]') || document.querySelector('.login-btn'));
+
+            // Only sync if page shows logged out OR we haven't synced recently
+            if (!pageShowsLoggedOut && syncTime > fiveMinutesAgo) {
+                console.log('[NexusAuth] Session sync not needed (recently synced or page shows logged in)');
+                return;
+            }
+
+            try {
+                console.log('[NexusAuth] Syncing PHP session with token...');
+
+                const headers = {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + token,
+                    'X-Requested-With': 'XMLHttpRequest'
+                };
+
+                if (this.isNativeApp()) {
+                    headers['X-Capacitor-App'] = 'true';
+                }
+                if (this.isMobileDevice()) {
+                    headers['X-Nexus-Mobile'] = 'true';
+                }
+
+                const response = await fetch('/api/auth/restore-session', {
+                    method: 'POST',
+                    credentials: 'include',
+                    headers: headers
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    console.log('[NexusAuth] Session synced successfully:', data);
+
+                    // Mark that we synced
+                    sessionStorage.setItem('nexus_session_synced', Date.now().toString());
+
+                    // If page was showing logged out, reload to get logged-in view
+                    if (pageShowsLoggedOut) {
+                        console.log('[NexusAuth] Page showed logged out, reloading to refresh...');
+                        window.location.reload();
+                    }
+                } else {
+                    console.log('[NexusAuth] Session sync failed:', response.status);
+                    // If token is invalid, try to refresh it
+                    if (response.status === 401) {
+                        const refreshed = await this.refreshAccessToken();
+                        if (refreshed) {
+                            // Retry session sync with new token (but mark to prevent loop)
+                            sessionStorage.setItem('nexus_session_synced', Date.now().toString());
+                            await this.ensureSessionSync();
+                        }
+                    }
+                }
+            } catch (e) {
+                console.error('[NexusAuth] Session sync error:', e);
+            }
         },
 
         /**

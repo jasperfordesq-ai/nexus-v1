@@ -12,6 +12,8 @@ $hType = $hero_type ?? 'Legal';
 require __DIR__ . '/../../layouts/civicone/header.php';
 
 $basePath = \Nexus\Core\TenantContext::getBasePath();
+$tSlug = \Nexus\Core\TenantContext::get()['slug'] ?? '';
+$isHourTimebank = ($tSlug === 'hour-timebank' || $tSlug === 'hour_timebank');
 
 // Get tenant info
 $tenantFooter = '';
@@ -419,6 +421,7 @@ body.dark-mode .civic-legal-guidelines-header {
                 <span class="dashicons dashicons-arrow-right-alt2 civic-legal-card-arrow" aria-hidden="true"></span>
             </a>
 
+            <?php if ($isHourTimebank): ?>
             <a href="<?= $basePath ?>/faq" class="civic-legal-card">
                 <div class="civic-legal-card-icon faq">
                     <span class="dashicons dashicons-format-chat" aria-hidden="true"></span>
@@ -440,6 +443,7 @@ body.dark-mode .civic-legal-guidelines-header {
                 </div>
                 <span class="dashicons dashicons-arrow-right-alt2 civic-legal-card-arrow" aria-hidden="true"></span>
             </a>
+            <?php endif; ?>
 
             <a href="<?= $basePath ?>/contact" class="civic-legal-card">
                 <div class="civic-legal-card-icon contact">

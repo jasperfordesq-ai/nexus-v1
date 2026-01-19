@@ -8,12 +8,6 @@
     </div><!-- /.admin-gold-content -->
 </div><!-- /.admin-gold-wrapper -->
 
-<!-- Keyboard Shortcuts Hint -->
-<div class="admin-keyboard-hint">
-    <span><kbd>Ctrl</kbd><kbd>K</kbd> Search</span>
-    <span><kbd>?</kbd> Help</span>
-</div>
-
 <!-- Admin Toast Container -->
 <div class="admin-toast-container" id="adminToastContainer"></div>
 

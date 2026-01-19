@@ -953,7 +953,8 @@ try {
                     </div>
                 <?php endif; ?>
 
-            <?php endif; // END: if (!empty($mainMenus)) else block ?>
+            <?php endif; // END: if (!empty($mainMenus)) else block
+            */ ?>
 
             <?php
             // File-based custom pages + Database-driven pages (Page Builder)
@@ -1032,7 +1033,7 @@ try {
                         <a href="<?= \Nexus\Core\TenantContext::getBasePath() ?>/help"><i class="fa-solid fa-life-ring" style="margin-right:10px; width:16px; text-align:center; color:#f97316;"></i>Help Center</a>
                     </div>
                 </div>
-            <?php endif; */ ?>
+            <?php endif; ?>
 
                 <!-- Collapsible Search Container -->
                 <div class="collapsible-search-container" style="margin-left: 15px; display: flex; align-items: center;">

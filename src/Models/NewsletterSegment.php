@@ -728,6 +728,16 @@ class NewsletterSegment
                         ['field' => 'profile_type', 'operator' => 'equals', 'value' => 'individual']
                     ]
                 ]
+            ],
+            [
+                'name' => 'Never Logged In',
+                'description' => 'Members who have never logged in to the app - perfect for re-engagement campaigns',
+                'rules' => [
+                    'match' => 'all',
+                    'conditions' => [
+                        ['field' => 'login_recency', 'operator' => 'equals', 'value' => 'never']
+                    ]
+                ]
             ]
         ];
 
@@ -802,6 +812,11 @@ class NewsletterSegment
      */
     private static function buildLoginRecencyCondition($operator, $value, &$params)
     {
+        // Special case: never logged in
+        if ($operator === 'equals' && $value === 'never') {
+            return "last_login_at IS NULL";
+        }
+
         $loginField = "COALESCE(last_login_at, created_at)";
         $daysSinceLogin = "DATEDIFF(NOW(), $loginField)";
 
@@ -1147,8 +1162,8 @@ class NewsletterSegment
             'login_recency' => [
                 'label' => 'Last Login',
                 'type' => 'number',
-                'operators' => ['newer_than_days', 'older_than_days'],
-                'placeholder' => 'Days',
+                'operators' => ['newer_than_days', 'older_than_days', 'equals'],
+                'placeholder' => 'Days (or "never")',
                 'category' => 'engagement'
             ],
             'transaction_count' => [

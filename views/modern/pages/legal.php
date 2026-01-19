@@ -18,6 +18,8 @@ if (class_exists('\Nexus\Core\SEO')) {
 require __DIR__ . '/../../layouts/modern/header.php';
 
 $basePath = class_exists('\Nexus\Core\TenantContext') ? \Nexus\Core\TenantContext::getBasePath() : '';
+$tSlug = class_exists('\Nexus\Core\TenantContext') ? (\Nexus\Core\TenantContext::get()['slug'] ?? '') : '';
+$isHourTimebank = ($tSlug === 'hour-timebank' || $tSlug === 'hour_timebank');
 
 // Get tenant info
 $tenantFooter = '';
@@ -724,10 +726,12 @@ if (class_exists('Nexus\Core\TenantContext')) {
                 </div>
 
                 <div class="legal-quick-grid">
+                    <?php if ($isHourTimebank): ?>
                     <a href="<?= $basePath ?>/faq" class="legal-quick-card">
                         <i class="fa-solid fa-circle-question"></i>
                         <span>FAQ</span>
                     </a>
+                    <?php endif; ?>
                     <a href="<?= $basePath ?>/help" class="legal-quick-card">
                         <i class="fa-solid fa-life-ring"></i>
                         <span>Help Center</span>

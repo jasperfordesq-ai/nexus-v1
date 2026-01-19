@@ -1,5 +1,13 @@
 <?php
 // CivicOne View: Impact Report
+// Tenant-specific: Hour Timebank only
+$tSlug = \Nexus\Core\TenantContext::get()['slug'] ?? '';
+if ($tSlug !== 'hour-timebank' && $tSlug !== 'hour_timebank') {
+    http_response_code(404);
+    \Nexus\Core\View::render('errors/404');
+    exit;
+}
+
 $pageTitle = 'Social Impact Report';
 require dirname(__DIR__, 2) . '/layouts/civicone/header.php';
 ?>

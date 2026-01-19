@@ -770,6 +770,9 @@ HTML;
      */
     public static function personalizeContent(string $content, array $recipient): string
     {
+        $appUrl = rtrim(\Nexus\Core\Env::get('APP_URL') ?? '', '/');
+        $basePath = \Nexus\Core\TenantContext::getBasePath();
+
         $tokens = [
             '{{first_name}}' => $recipient['first_name'] ?? $recipient['name'] ?? 'there',
             '{{last_name}}' => $recipient['last_name'] ?? '',
@@ -778,7 +781,8 @@ HTML;
             '{{date}}' => date('F j, Y'),
             '{{year}}' => date('Y'),
             '{{month}}' => date('F'),
-            '{{day}}' => date('l')
+            '{{day}}' => date('l'),
+            '{{app_url}}' => $appUrl . $basePath
         ];
 
         foreach ($tokens as $token => $value) {

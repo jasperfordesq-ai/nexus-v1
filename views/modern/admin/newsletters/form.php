@@ -20,6 +20,7 @@ $groups = $groups ?? [];
 $counties = $counties ?? \Nexus\Models\NewsletterSegment::getIrishCounties();
 $towns = $towns ?? \Nexus\Models\NewsletterSegment::getIrishTowns();
 $audienceCounts = $audienceCounts ?? ['all_members' => 0, 'subscribers_only' => 0, 'both' => 0];
+$savedTemplates = $savedTemplates ?? \Nexus\Models\NewsletterTemplate::getAll(true, true);
 
 // Admin page configuration
 $adminPageTitle = $isEdit ? 'Edit Newsletter' : 'Create Newsletter';
@@ -1539,8 +1540,37 @@ require dirname(__DIR__) . '/partials/admin-header.php';
                     <div class="form-group">
                         <label class="form-label">
                             <i class="fa-solid fa-wand-magic-sparkles" style="color: #c4b5fd; margin-right: 6px;"></i>
-                            Start with a Professional Template
+                            Start with a Template
                         </label>
+
+                        <?php if (!empty($savedTemplates)): ?>
+                        <!-- Saved Templates Dropdown -->
+                        <div style="margin-bottom: 16px;">
+                            <select id="template-selector" onchange="loadSavedTemplate(this.value)" class="form-input" style="max-width: 400px;">
+                                <option value="">-- Choose from Template Library --</option>
+                                <?php
+                                $starterTemplates = array_filter($savedTemplates, fn($t) => $t['category'] === 'starter');
+                                $customTemplates = array_filter($savedTemplates, fn($t) => $t['category'] !== 'starter');
+                                ?>
+                                <?php if (!empty($starterTemplates)): ?>
+                                <optgroup label="Starter Templates">
+                                    <?php foreach ($starterTemplates as $t): ?>
+                                    <option value="<?= $t['id'] ?>"><?= htmlspecialchars($t['name']) ?></option>
+                                    <?php endforeach; ?>
+                                </optgroup>
+                                <?php endif; ?>
+                                <?php if (!empty($customTemplates)): ?>
+                                <optgroup label="Your Templates">
+                                    <?php foreach ($customTemplates as $t): ?>
+                                    <option value="<?= $t['id'] ?>"><?= htmlspecialchars($t['name']) ?></option>
+                                    <?php endforeach; ?>
+                                </optgroup>
+                                <?php endif; ?>
+                            </select>
+                        </div>
+                        <?php endif; ?>
+
+                        <!-- Quick Template Buttons -->
                         <div class="template-grid">
                             <button type="button" onclick="applyTemplate('blank')" class="template-btn active" data-template="blank">
                                 <i class="fa-solid fa-file"></i> Blank
@@ -2049,10 +2079,95 @@ function applyTemplate(type) {
         if (btn.dataset.template === type) btn.classList.add('active');
     });
 
+    // Reset the dropdown when clicking quick templates
+    const dropdown = document.getElementById('template-selector');
+    if (dropdown) dropdown.value = '';
+
     // Template content would be inserted here
     if (typeof tinymce !== 'undefined' && tinymce.get('content-editor')) {
         // Could fetch template content from server
     }
+}
+
+// Load saved template from library
+function loadSavedTemplate(templateId) {
+    if (!templateId) return;
+
+    // Clear quick template selection
+    document.querySelectorAll('.template-btn').forEach(btn => btn.classList.remove('active'));
+
+    // Fetch template data from server
+    const url = '<?= $basePath ?>/admin/newsletters/load-template/' + templateId;
+    console.log('Loading template from:', url);
+
+    fetch(url)
+        .then(response => {
+            console.log('Response status:', response.status);
+            return response.json();
+        })
+        .then(data => {
+            console.log('Template data received:', data);
+            if (data.success && data.template) {
+                // Fill in subject
+                const subjectField = document.getElementById('subject');
+                if (subjectField && data.template.subject) {
+                    subjectField.value = data.template.subject;
+                    console.log('Subject set:', data.template.subject);
+                }
+
+                // Fill in preview text
+                const previewField = document.getElementById('preview_text');
+                if (previewField && data.template.preview_text) {
+                    previewField.value = data.template.preview_text;
+                    console.log('Preview text set');
+                }
+
+                // Fill in content - try both TinyMCE and textarea
+                const contentField = document.getElementById('content-editor');
+                const content = data.template.content || '';
+                console.log('Content to set:', content.substring(0, 100) + '...');
+
+                // Always set the textarea value first (for form submission)
+                if (contentField) {
+                    contentField.value = content;
+                    console.log('Content set via textarea');
+                }
+
+                // Then try TinyMCE if available
+                try {
+                    if (typeof tinymce !== 'undefined' && tinymce.get('content-editor')) {
+                        tinymce.get('content-editor').setContent(content);
+                        console.log('Content set via TinyMCE');
+                    }
+                } catch (e) {
+                    console.log('TinyMCE setContent failed:', e);
+                }
+
+                // Update preview if visible
+                if (typeof previewVisible !== 'undefined' && previewVisible) updatePreview();
+
+                // Show success feedback
+                showToast('Template loaded successfully', 'success');
+            } else {
+                console.error('Template load failed:', data);
+                showToast(data.error || 'Failed to load template', 'error');
+            }
+        })
+        .catch(error => {
+            console.error('Error loading template:', error);
+            showToast('Failed to load template: ' + error.message, 'error');
+        });
+}
+
+// Simple toast notification
+function showToast(message, type = 'info') {
+    const toast = document.createElement('div');
+    toast.className = 'toast-notification toast-' + type;
+    toast.innerHTML = '<i class="fa-solid fa-' + (type === 'success' ? 'check-circle' : 'exclamation-circle') + '"></i> ' + message;
+    toast.style.cssText = 'position: fixed; bottom: 20px; right: 20px; padding: 12px 20px; border-radius: 8px; color: white; font-size: 14px; z-index: 9999; animation: slideIn 0.3s ease;';
+    toast.style.background = type === 'success' ? 'linear-gradient(135deg, #10b981, #059669)' : 'linear-gradient(135deg, #ef4444, #dc2626)';
+    document.body.appendChild(toast);
+    setTimeout(() => toast.remove(), 3000);
 }
 
 // Preview panel

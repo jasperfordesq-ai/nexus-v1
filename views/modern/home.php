@@ -25,7 +25,8 @@ $feedSubFilter = $_GET['subfilter'] ?? null;  // Sub-filter (e.g., offers/reques
 if ($isLoggedIn && empty($_SESSION['user_avatar'])) {
     try {
         $userRow = \Nexus\Core\Database::query("SELECT avatar_url FROM users WHERE id = ?", [$userId])->fetch(\PDO::FETCH_ASSOC);
-        $_SESSION['user_avatar'] = $userRow['avatar_url'] ?? '/assets/img/defaults/default_avatar.webp';
+        $avatarUrl = !empty($userRow['avatar_url']) ? trim($userRow['avatar_url']) : '';
+        $_SESSION['user_avatar'] = $avatarUrl ?: '/assets/img/defaults/default_avatar.webp';
     } catch (\Exception $e) {
         $_SESSION['user_avatar'] = '/assets/img/defaults/default_avatar.webp';
     }

@@ -24,6 +24,12 @@ class ImageHelper
         string $class = '',
         array $attributes = []
     ): string {
+        // Ensure we have a valid path - fallback to default if empty
+        $imagePath = trim($imagePath);
+        if (empty($imagePath)) {
+            $imagePath = '/assets/img/defaults/default_avatar.png';
+        }
+
         // Convert path to WebP
         $webpPath = self::getWebPPath($imagePath);
 
@@ -228,8 +234,10 @@ class ImageHelper
         string $userName = 'User',
         int $size = 40
     ): string {
-        // Use default avatar if none provided
-        if (empty($avatarPath)) {
+        // Use default avatar if none provided or path is invalid
+        // Trim and check for empty/whitespace-only paths
+        $avatarPath = is_string($avatarPath) ? trim($avatarPath) : '';
+        if (empty($avatarPath) || $avatarPath === 'null' || $avatarPath === 'undefined') {
             $avatarPath = '/assets/img/defaults/default_avatar.png';
         }
 
