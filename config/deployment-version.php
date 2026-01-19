@@ -10,7 +10,7 @@
  */
 
 return [
-    'version' => '2026.01.19.002', // Update this with each deployment
-    'timestamp' => 1768841230, // Unix timestamp of last deployment
-    'description' => 'Federation scroll fix - force cache refresh for all users'
+    'version' => '2026.01.19.003', // Update this with each deployment
+    'timestamp' => 1768841339, // Unix timestamp of last deployment
+    'description' => 'Fix htaccess cache settings to honor query string versions'
 ];
