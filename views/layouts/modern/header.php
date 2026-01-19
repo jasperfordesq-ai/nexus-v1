@@ -10,8 +10,11 @@ header('Pragma: no-cache');
 header('Expires: 0');
 
 // Generate a dynamic CSS version for cache busting
-// This ensures CSS is reloaded when themes change
-$cssVersionTimestamp = time();
+// Uses deployment version file to force cache refresh on all users after deploy
+$deploymentVersion = file_exists(__DIR__ . '/../../config/deployment-version.php')
+    ? require __DIR__ . '/../../config/deployment-version.php'
+    : ['version' => time()];
+$cssVersionTimestamp = $deploymentVersion['version'] ?? time();
 
 require_once __DIR__ . '/../onboarding_check.php';
 $mode = $_COOKIE['nexus_mode'] ?? 'dark';

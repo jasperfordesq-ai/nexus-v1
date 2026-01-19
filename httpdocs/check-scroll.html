@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Scroll Diagnostic</title>
+    <style>
+        body {
+            font-family: monospace;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .diagnostic {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .issue {
+            color: red;
+            font-weight: bold;
+        }
+        .ok {
+            color: green;
+        }
+        pre {
+            background: #f0f0f0;
+            padding: 10px;
+            border-radius: 4px;
+            overflow-x: auto;
+        }
+    </style>
+</head>
+<body>
+    <h1>Scroll Diagnostic Tool</h1>
+
+    <div class="diagnostic">
+        <h2>Body Element Analysis</h2>
+        <div id="bodyInfo"></div>
+    </div>
+
+    <div class="diagnostic">
+        <h2>HTML Element Analysis</h2>
+        <div id="htmlInfo"></div>
+    </div>
+
+    <div class="diagnostic">
+        <h2>Scroll Issues Detected</h2>
+        <div id="scrollIssues"></div>
+    </div>
+
+    <script>
+        function analyzeElement(el, name) {
+            const computed = window.getComputedStyle(el);
+            const info = {
+                classes: el.className,
+                overflow: computed.overflow,
+                overflowX: computed.overflowX,
+                overflowY: computed.overflowY,
+                position: computed.position,
+                height: computed.height,
+                maxHeight: computed.maxHeight,
+                width: computed.width,
+                touchAction: computed.touchAction
+            };
+
+            let html = `<h3>${name}</h3>`;
+            html += `<pre>${JSON.stringify(info, null, 2)}</pre>`;
+
+            return { html, info };
+        }
+
+        // Analyze body
+        const bodyResult = analyzeElement(document.body, 'BODY');
+        document.getElementById('bodyInfo').innerHTML = bodyResult.html;
+
+        // Analyze html
+        const htmlResult = analyzeElement(document.documentElement, 'HTML');
+        document.getElementById('htmlInfo').innerHTML = htmlResult.html;
+
+        // Detect issues
+        let issues = [];
+
+        if (bodyResult.info.overflow === 'hidden') {
+            issues.push('<span class="issue">❌ Body has overflow:hidden</span>');
+        }
+        if (bodyResult.info.position === 'fixed') {
+            issues.push('<span class="issue">❌ Body has position:fixed (scroll killer!)</span>');
+        }
+        if (bodyResult.info.classes.includes('mobile-menu-open')) {
+            issues.push('<span class="issue">❌ Body has mobile-menu-open class</span>');
+        }
+        if (bodyResult.info.classes.includes('mobile-notifications-open')) {
+            issues.push('<span class="issue">❌ Body has mobile-notifications-open class</span>');
+        }
+        if (htmlResult.info.overflow === 'hidden') {
+            issues.push('<span class="issue">❌ HTML has overflow:hidden</span>');
+        }
+
+        if (issues.length === 0) {
+            issues.push('<span class="ok">✓ No obvious scroll-blocking CSS detected on body/html</span>');
+        }
+
+        document.getElementById('scrollIssues').innerHTML = issues.join('<br>');
+
+        // Try to fix
+        setTimeout(() => {
+            document.body.classList.remove('mobile-menu-open', 'mobile-notifications-open');
+            document.body.style.overflow = '';
+            document.body.style.position = '';
+            document.body.style.width = '';
+            document.documentElement.style.overflow = '';
+            console.log('Attempted cleanup...');
+        }, 1000);
+    </script>
+
+    <div style="height: 2000px; padding: 20px; background: linear-gradient(to bottom, #fff, #ddd);">
+        <p>This is a tall section to test scrolling. If you can scroll down, scrolling works!</p>
+        <p style="margin-top: 1800px;">If you can see this, scrolling works!</p>
+    </div>
+</body>
+</html>

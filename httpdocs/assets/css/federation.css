@@ -1,6 +1,22 @@
 /* Federation Module CSS - Restored from Git History */
 /* Generated: 2026-01-19 */
+/* CACHE BUSTER: 1768841027 - Force browser to reload this CSS */
 
+/* CRITICAL FIX: Ensure body/html can always scroll on federation pages */
+body, html {
+    overflow: visible !important;
+    position: static !important;
+    height: auto !important;
+    max-height: none !important;
+}
+
+/* Allow scroll even if mobile-menu-open class is stuck */
+body.mobile-menu-open:not(:has(#mobileMenu.active)),
+body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
+    overflow: visible !important;
+    position: static !important;
+    width: auto !important;
+}
 
 /* =============================================
    Source: views/modern/federation/hub.php

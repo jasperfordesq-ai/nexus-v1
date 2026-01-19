@@ -113,8 +113,11 @@ if (class_exists('\Nexus\Core\TenantContext')) {
     }
     ?>
     <?php
-    // Dynamic CSS version for cache busting - ensures CSS is reloaded when themes change
-    $cssVersion = time();
+    // Dynamic CSS version for cache busting - uses deployment version to force refresh on all users
+    $deploymentVersion = file_exists(__DIR__ . '/../../config/deployment-version.php')
+        ? require __DIR__ . '/../../config/deployment-version.php'
+        : ['version' => time()];
+    $cssVersion = $deploymentVersion['version'] ?? time();
     ?>
     <!-- Updated 2026-01-17: All CSS now uses minified versions where available -->
     <!-- DESIGN TOKENS (Shared variables - must load first) -->
