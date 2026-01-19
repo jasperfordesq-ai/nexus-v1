@@ -443,7 +443,7 @@ $accentColor = '#14b8a6'; // Teal for volunteering
         return `
             <div style="margin-left: ${indent}px; padding: 12px; background: rgba(100,116,139,0.05); border-radius: 12px; margin-bottom: 10px;" id="comment-${c.id}">
                 <div style="display: flex; gap: 12px;">
-                    <img src="${c.author_avatar}" style="width: ${depth loading="lazy"> 0 ? 28 : 36}px; height: ${depth > 0 ? 28 : 36}px; border-radius: 50%; object-fit: cover; flex-shrink: 0;">
+                    <img src="${c.author_avatar}" loading="lazy" style="width: ${depth > 0 ? 28 : 36}px; height: ${depth > 0 ? 28 : 36}px; border-radius: 50%; object-fit: cover; flex-shrink: 0;">
                     <div style="flex: 1;">
                         <div style="font-weight: 600; font-size: 0.9rem; color: var(--htb-text-main);">
                             ${escapeHtml(c.author_name)}${isEdited}

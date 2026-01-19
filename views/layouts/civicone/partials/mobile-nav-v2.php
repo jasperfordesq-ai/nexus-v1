@@ -103,6 +103,43 @@ window.closeMobileNotifications = function() {
         document.body.classList.remove('mobile-notifications-open');
     }
 };
+
+// CRITICAL FIX: Ensure scroll is never locked
+// Run immediately on script load AND on DOM ready
+(function() {
+    function unlockScroll() {
+        document.body.classList.remove('mobile-menu-open', 'mobile-notifications-open');
+        document.body.style.position = '';
+        document.body.style.overflow = '';
+        document.body.style.width = '';
+    }
+
+    // Run immediately
+    unlockScroll();
+
+    // Run on DOM ready
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', unlockScroll);
+    } else {
+        unlockScroll();
+    }
+
+    // Also clean up on page visibility change (when returning to tab)
+    document.addEventListener('visibilitychange', function() {
+        if (!document.hidden) {
+            // Check if menus are actually open, if not, remove the classes
+            const menuOpen = document.getElementById('mobileMenu')?.classList.contains('active');
+            const notifOpen = document.getElementById('mobileNotifications')?.classList.contains('active');
+
+            if (!menuOpen) {
+                document.body.classList.remove('mobile-menu-open');
+            }
+            if (!notifOpen) {
+                document.body.classList.remove('mobile-notifications-open');
+            }
+        }
+    });
+})();
 </script>
 <style>
 /* FIX: Remove transform from html that breaks position:fixed */
