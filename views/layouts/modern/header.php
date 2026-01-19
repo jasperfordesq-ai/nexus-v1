@@ -161,9 +161,18 @@ try {
     <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/feed-item.min.css?v=<?= $cssVersionTimestamp ?>">
     <?php endif; ?>
 
+    <!-- Shared Components CSS (achievement showcase, leaderboard, score widgets, org UI) -->
+    <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/components.min.css?v=<?= $cssVersionTimestamp ?>">
+
+    <!-- Shared Partials CSS (federation nav, impersonation banner, skeleton feed) -->
+    <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/partials.min.css?v=<?= $cssVersionTimestamp ?>">
+
     <!-- Feed Page CSS (for /feed route) -->
     <?php if (strpos($normPath, '/feed') !== false): ?>
     <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/feed-page.min.css?v=<?= $cssVersionTimestamp ?>">
+    <?php endif; ?>
+    <?php if (preg_match('/\/feed\/\d+$/', $normPath) || preg_match('/\/post\/\d+$/', $normPath)): ?>
+    <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/feed-show.min.css?v=<?= $cssVersionTimestamp ?>">
     <?php endif; ?>
 
     <!-- Profile Edit CSS -->
@@ -1167,92 +1176,6 @@ try {
 
     <!-- Admin Impersonation Banner -->
     <?php require __DIR__ . '/../../modern/partials/impersonation-banner.php'; ?>
-
-    <div class="app-drawer" id="appDrawer">
-        <div class="drawer-header">
-            <?php if (isset($_SESSION['user_id'])):
-                $mUser = \Nexus\Models\User::findById($_SESSION['user_id']);
-                if ($mUser): ?>
-                    <div style="display:flex; align-items:center; gap:15px;">
-                        <img src="<?= $mUser['avatar_url'] ?: '/assets/img/defaults/default_avatar.webp' ?>" style="width:50px; height:50px; border-radius:12px; object-fit:cover; border:2px solid white;" onerror="this.src='/assets/img/defaults/default_avatar.webp'">
-                        <div>
-                            <div style="font-size:1.1rem; font-weight:700; line-height:1.2;"><?= htmlspecialchars($mUser['name'] ?? '') ?></div>
-                            <a href="<?= Nexus\Core\TenantContext::getBasePath() ?>/profile/<?= $_SESSION['user_id'] ?>" style="color:rgba(255,255,255,0.9); font-size:0.85rem; text-decoration:none;">View Profile</a>
-                        </div>
-                    </div>
-                <?php endif; ?>
-            <?php else: ?>
-                <div>
-                    <h2 style="margin:0; font-size:1.5rem;">Hello!</h2>
-                    <p style="margin:0; opacity:0.9;">Welcome to the community.</p>
-                </div>
-            <?php endif; ?>
-            <button class="drawer-close" onclick="closeAppDrawer()" aria-label="Close Menu"><span class="dashicons dashicons-no-alt"></span></button>
-        </div>
-        <div class="drawer-body">
-            <?php if (!isset($_SESSION['user_id'])): ?>
-                <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:20px;">
-                    <a href="<?= Nexus\Core\TenantContext::getBasePath() ?>/login" style="background:#4f46e5; color:white; padding:12px; border-radius:10px; text-align:center; font-weight:700; text-decoration:none;">Log In</a>
-                    <a href="<?= Nexus\Core\TenantContext::getBasePath() ?>/register" style="background:#f3f4f6; color:#111827; padding:12px; border-radius:10px; text-align:center; font-weight:700; text-decoration:none;">Sign Up</a>
-                </div>
-            <?php endif; ?>
-
-            <div class="app-group-title">Menu</div>
-            <a href="<?= Nexus\Core\TenantContext::getBasePath() ?>/" class="app-item">
-                <div class="app-icon icon-red"><span class="dashicons dashicons-format-status"></span></div>
-                <div><span class="app-label">Feed</span></div>
-            </a>
-            <a href="<?= Nexus\Core\TenantContext::getBasePath() ?>/listings" class="app-item">
-                <div class="app-icon icon-blue"><span class="dashicons dashicons-list-view"></span></div>
-                <div><span class="app-label">Offers & Requests</span></div>
-            </a>
-            <?php if (Nexus\Core\TenantContext::hasFeature('volunteering')): ?>
-                <a href="<?= Nexus\Core\TenantContext::getBasePath() ?>/volunteering" class="app-item">
-                    <div class="app-icon icon-teal"><span class="dashicons dashicons-heart"></span></div>
-                    <div><span class="app-label">Volunteering</span></div>
-                </a>
-            <?php endif; ?>
-            <a href="<?= Nexus\Core\TenantContext::getBasePath() ?>/community-groups" class="app-item">
-                <div class="app-icon icon-indigo"><span class="dashicons dashicons-groups"></span></div>
-                <div><span class="app-label">Groups</span></div>
-            </a>
-            <a href="<?= Nexus\Core\TenantContext::getBasePath() ?>/groups" class="app-item">
-                <div class="app-icon icon-purple"><span class="dashicons dashicons-location"></span></div>
-                <div><span class="app-label">Local Hubs</span></div>
-            </a>
-            <a href="<?= Nexus\Core\TenantContext::getBasePath() ?>/members" class="app-item" data-turbo="false">
-                <div class="app-icon icon-orange"><span class="dashicons dashicons-admin-users"></span></div>
-                <div><span class="app-label">People</span></div>
-            </a>
-            <div class="app-group-title">Explore</div>
-            <?php if (Nexus\Core\TenantContext::hasFeature('events')): ?>
-                <a href="<?= Nexus\Core\TenantContext::getBasePath() ?>/events" class="app-item">
-                    <div class="app-icon icon-green"><span class="dashicons dashicons-calendar-alt"></span></div>
-                    <div><span class="app-label">Events</span></div>
-                </a>
-            <?php endif; ?>
-            <?php if (Nexus\Core\TenantContext::hasFeature('resources')): ?>
-                <a href="<?= Nexus\Core\TenantContext::getBasePath() ?>/resources" class="app-item">
-                    <div class="app-icon icon-cyan"><span class="dashicons dashicons-book"></span></div>
-                    <div><span class="app-label">Resources</span></div>
-                </a>
-            <?php endif; ?>
-            <div class="app-group-title">Create</div>
-            <a href="<?= Nexus\Core\TenantContext::getBasePath() ?>/compose?tab=listing" class="app-item">
-                <div class="app-icon icon-emerald"><span class="dashicons dashicons-plus"></span></div>
-                <div><span class="app-label">New Listing</span></div>
-            </a>
-        </div>
-        <div class="drawer-footer">
-            <button onclick="toggleMode()" style="background:none; border:none; cursor:pointer; color:inherit; font-weight:600; display:flex; align-items:center; gap:6px;">
-                <i class="fa-solid <?= $mode === 'dark' ? 'fa-moon' : 'fa-sun' ?> mode-toggle-icon" style="color: <?= $mode === 'dark' ? '#6366f1' : '#f59e0b' ?>;"></i>
-                <span class="mode-toggle-text"><?= $mode === 'dark' ? 'Light Mode' : 'Dark Mode' ?></span>
-            </button>
-            <?php if (isset($_SESSION['user_id'])): ?>
-                <a href="<?= Nexus\Core\TenantContext::getBasePath() ?>/logout" style="color:#dc2626; text-decoration:none; font-weight:600;">Sign Out</a>
-            <?php endif; ?>
-        </div>
-    </div>
 
     <!-- ================================
          NEW NATIVE DRAWER (Gesture-Enabled)

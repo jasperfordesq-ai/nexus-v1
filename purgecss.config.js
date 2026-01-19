@@ -66,6 +66,10 @@ module.exports = {
         'httpdocs/assets/css/listings-index.css',
         'httpdocs/assets/css/listings-show.css',
         'httpdocs/assets/css/listings-create.css',
+        // Phase 1: Components, partials, feed-show (2026-01-19)
+        'httpdocs/assets/css/components.css',
+        'httpdocs/assets/css/partials.css',
+        'httpdocs/assets/css/feed-show.css',
     ],
 
     // Output directory for purged CSS

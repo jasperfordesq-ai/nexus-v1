@@ -93,21 +93,6 @@
     }
 })();
 
-// --- INLINE SCRIPT: DRAWER & THEME ---
-function openAppDrawer() {
-    if (document.getElementById('appDrawer')) {
-        document.getElementById('appDrawer').classList.add('active');
-        document.body.style.overflow = 'hidden';
-    }
-}
-
-function closeAppDrawer() {
-    if (document.getElementById('appDrawer')) {
-        document.getElementById('appDrawer').classList.remove('active');
-        document.body.style.overflow = '';
-    }
-}
-
 // Mode Switcher (Light/Dark)
 function toggleMode() {
     const current = document.documentElement.getAttribute('data-theme');

@@ -268,9 +268,13 @@ html[data-layout] { transform: none !important; }
                 <i class="fa-solid fa-hand-holding-heart"></i>
                 Listings
             </a>
-            <a href="<?= $base ?>/groups" class="mobile-menu-item" onclick="closeMobileMenu()">
+            <a href="<?= $base ?>/community-groups" class="mobile-menu-item" onclick="closeMobileMenu()">
                 <i class="fa-solid fa-users"></i>
-                Groups
+                Community Groups
+            </a>
+            <a href="<?= $base ?>/groups" class="mobile-menu-item" onclick="closeMobileMenu()">
+                <i class="fa-solid fa-map-pin"></i>
+                Local Hubs
             </a>
             <a href="<?= $base ?>/members" class="mobile-menu-item" onclick="closeMobileMenu()">
                 <i class="fa-solid fa-user-group"></i>
@@ -313,10 +317,54 @@ html[data-layout] { transform: none !important; }
                 <i class="fa-solid fa-medal"></i>
                 Achievements
             </a>
+            <a href="<?= $base ?>/matches" class="mobile-menu-item" onclick="closeMobileMenu()">
+                <i class="fa-solid fa-wand-magic-sparkles"></i>
+                Smart Matching
+            </a>
             <a href="<?= $base ?>/ai" class="mobile-menu-item" style="background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(139, 92, 246, 0.1)); font-weight:600;" onclick="closeMobileMenu()">
                 <i class="fa-solid fa-robot"></i>
                 AI Assistant
             </a>
+        </div>
+
+        <!-- About Section -->
+        <div class="mobile-menu-section">
+            <div class="mobile-menu-section-title">About</div>
+            <?php if (\Nexus\Core\TenantContext::hasFeature('blog')): ?>
+            <a href="<?= $base ?>/news" class="mobile-menu-item" onclick="closeMobileMenu()">
+                <i class="fa-solid fa-newspaper"></i>
+                Latest News
+            </a>
+            <?php endif; ?>
+            <?php
+            // Custom pages for About section
+            $mobilePages = \Nexus\Core\TenantContext::getCustomPages('modern');
+            $aboutPageNames = ['about us', 'our story', 'about story', 'timebanking guide', 'partner with us', 'partner', 'social prescribing', 'timebanking faqs', 'timebanking faq', 'faq', 'impact summary', 'impact report', 'strategic plan'];
+            $pageIcons = [
+                'about us' => 'fa-solid fa-heart',
+                'our story' => 'fa-solid fa-heart',
+                'about story' => 'fa-solid fa-heart',
+                'timebanking guide' => 'fa-solid fa-book-open',
+                'partner' => 'fa-solid fa-handshake',
+                'partner with us' => 'fa-solid fa-handshake',
+                'social prescribing' => 'fa-solid fa-hand-holding-medical',
+                'faq' => 'fa-solid fa-circle-question',
+                'timebanking faq' => 'fa-solid fa-circle-question',
+                'timebanking faqs' => 'fa-solid fa-circle-question',
+                'impact summary' => 'fa-solid fa-leaf',
+                'impact report' => 'fa-solid fa-file-contract',
+                'strategic plan' => 'fa-solid fa-route',
+            ];
+            foreach ($mobilePages as $page):
+                $pageName = strtolower($page['name']);
+                if (!in_array($pageName, $aboutPageNames)) continue;
+                $icon = $pageIcons[$pageName] ?? 'fa-solid fa-file-lines';
+            ?>
+            <a href="<?= htmlspecialchars($page['url']) ?>" class="mobile-menu-item" onclick="closeMobileMenu()">
+                <i class="<?= $icon ?>"></i>
+                <?= htmlspecialchars($page['name']) ?>
+            </a>
+            <?php endforeach; ?>
         </div>
 
         <?php if ($isLoggedIn && ((!empty($_SESSION['user_role']) && $_SESSION['user_role'] === 'admin') || !empty($_SESSION['is_super_admin']))): ?>
@@ -391,11 +439,20 @@ html[data-layout] { transform: none !important; }
         <?php endif; ?>
 
 
-        <!-- Help Center -->
+        <!-- Help & Support -->
         <div class="mobile-menu-section">
+            <div class="mobile-menu-section-title">Help & Support</div>
             <a href="<?= $base ?>/help" class="mobile-menu-item" onclick="closeMobileMenu()">
-                <i class="fa-solid fa-circle-question" style="color: #6366f1;"></i>
+                <i class="fa-solid fa-circle-question" style="color: #f97316;"></i>
                 Help Center
+            </a>
+            <a href="<?= $base ?>/contact" class="mobile-menu-item" onclick="closeMobileMenu()">
+                <i class="fa-solid fa-envelope" style="color: #3b82f6;"></i>
+                Contact Us
+            </a>
+            <a href="<?= $base ?>/accessibility" class="mobile-menu-item" onclick="closeMobileMenu()">
+                <i class="fa-solid fa-universal-access" style="color: #10b981;"></i>
+                Accessibility
             </a>
         </div>
     </div>
