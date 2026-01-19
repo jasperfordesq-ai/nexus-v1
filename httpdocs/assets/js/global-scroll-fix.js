@@ -21,30 +21,18 @@
             document.body.classList.remove('mobile-notifications-open');
         }
 
-        // Force scroll styles - aggressive approach for multi-tab issue
+        // Only fix if actually broken - don't interfere with normal scroll
         const computed = getComputedStyle(document.body);
 
-        if (computed.position === 'fixed') {
-            document.body.style.position = 'static';
-        }
-        if (computed.overflow === 'hidden' || computed.overflowY === 'hidden') {
-            document.body.style.overflowY = 'auto';
-        }
-        if (computed.overflow === 'visible' || computed.overflowY === 'visible') {
-            document.body.style.overflowY = 'auto';
+        // Only fix position if it's stuck as fixed
+        if (computed.position === 'fixed' && !menuOpen && !notifOpen) {
+            document.body.style.position = '';
         }
 
-        // Also check html element
-        const htmlComputed = getComputedStyle(document.documentElement);
-        if (htmlComputed.overflow === 'hidden' || htmlComputed.overflowY === 'hidden') {
-            document.documentElement.style.overflowY = 'scroll';
+        // Only fix overflow if it's actually preventing scroll
+        if ((computed.overflowY === 'hidden' || computed.overflowY === 'visible') && !menuOpen && !notifOpen) {
+            document.body.style.overflowY = '';
         }
-
-        console.log('[SCROLL FIX] Scroll re-enabled', {
-            bodyOverflow: getComputedStyle(document.body).overflowY,
-            bodyPosition: getComputedStyle(document.body).position,
-            htmlOverflow: getComputedStyle(document.documentElement).overflowY
-        });
     }
 
     // Run on tab visibility change
@@ -64,28 +52,10 @@
         }
     });
 
-    // Initial cleanup
+    // Initial cleanup only - NO continuous monitoring
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', enableScroll);
     } else {
         enableScroll();
     }
-
-    // Continuous monitor - check every 2 seconds if scroll is still working
-    // This catches issues that occur after page load
-    setInterval(function() {
-        if (!document.hidden) {  // Only when tab is visible
-            const bodyOverflow = getComputedStyle(document.body).overflowY;
-            const bodyPosition = getComputedStyle(document.body).position;
-
-            // If we detect scroll-blocking state, fix it
-            if (bodyOverflow === 'hidden' || bodyOverflow === 'visible' || bodyPosition === 'fixed') {
-                console.warn('[SCROLL FIX] Detected scroll-blocking state, fixing...', {
-                    bodyOverflow,
-                    bodyPosition
-                });
-                enableScroll();
-            }
-        }
-    }, 2000);
 })();
