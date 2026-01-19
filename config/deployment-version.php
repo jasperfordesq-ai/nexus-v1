@@ -10,7 +10,7 @@
  */
 
 return [
-    'version' => '2026.01.19.011', // Update this with each deployment
-    'timestamp' => 1768844181, // Unix timestamp of last deployment
-    'description' => 'Fix username display in mobile app navigation'
+    'version' => '2026.01.19.012', // Update this with each deployment
+    'timestamp' => 1768844371, // Unix timestamp of last deployment
+    'description' => 'CRITICAL: Add aggressive scroll monitoring and auto-fix for multi-tab issue'
 ];
