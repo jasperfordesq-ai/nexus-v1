@@ -54,7 +54,7 @@
         html.css-loaded body {
             opacity: 1 !important;
             visibility: visible !important;
-            overflow: visible !important;
+            overflow-y: auto !important; /* NOT visible - visible breaks mouse wheel scroll */
             transition: opacity 0.15s ease-in;
         }
 

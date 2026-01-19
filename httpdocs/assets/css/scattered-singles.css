@@ -5439,16 +5439,8 @@ a.leaderboard-row {
         --ob-pink: #ec4899;
     }
 
-    html, body {
-        width: 100%;
-        height: 100%;
-        overflow: hidden;
-        font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-        background: var(--ob-bg);
-        color: var(--ob-text);
-        -webkit-font-smoothing: antialiased;
-        -moz-osx-font-smoothing: grayscale;
-    }
+    /* REMOVED: Global overflow:hidden was breaking page scroll on all pages
+       The overflow:hidden is now only applied via .onboarding-backdrop which is position:fixed */
 
     /* ============================================
        LOCKED OVERLAY STRUCTURE

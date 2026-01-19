@@ -58,30 +58,38 @@ try {
 
 <head>
     <meta charset="UTF-8">
-    <!-- CRITICAL: Inline scroll fix - cannot be overridden -->
+    <!-- CRITICAL: Inline scroll fix - ensures mouse wheel scrolling works -->
     <style id="scroll-fix-inline">
+        /* HTML: Always show scrollbar, allow vertical scroll */
         html,
         html:root,
         html[data-theme],
         html[data-layout] {
             overflow-y: scroll !important;
             overflow-x: hidden !important;
+            height: auto !important;
         }
 
+        /* BODY: Use overflow-y: auto (NOT visible - visible breaks mouse wheel scroll!) */
         body,
+        html body,
+        html[data-theme] body,
+        html[data-layout] body {
+            overflow-y: auto !important;
+            overflow-x: hidden !important;
+            position: static !important;
+            height: auto !important;
+        }
+
+        /* Modal/drawer states: Lock scroll ONLY when actually open */
         body.drawer-open,
         body.modal-open,
         body.fds-sheet-open,
         body.keyboard-open,
         body.mobile-menu-open,
-        body.menu-open,
-        html body,
-        html[data-theme] body,
-        html[data-layout] body {
-            overflow: visible !important;
-            overflow-y: visible !important;
-            overflow-x: hidden !important;
-            position: relative !important;
+        body.menu-open {
+            overflow: hidden !important;
+            overflow-y: hidden !important;
         }
     </style>
     <meta name="csrf-token" content="<?= \Nexus\Core\Csrf::generate() ?>">
@@ -523,8 +531,6 @@ try {
         })();
     </script>
 
-    <!-- Global Multi-Tab Scroll Fix -->
-    <script src="<?= $assetBase ?>/assets/js/global-scroll-fix.js?v=<?= $cssVersionTimestamp ?>"></script>
 </head>
 
 <body class="nexus-skin-modern <?= $isHome ? 'nexus-home-page' : '' ?> <?= isset($_SESSION['user_id']) ? 'logged-in' : '' ?> <?= ((!empty($_SESSION['user_role']) && $_SESSION['user_role'] === 'admin') || !empty($_SESSION['is_super_admin'])) ? 'user-is-admin' : '' ?> <?= $bodyClass ?? '' ?>">
