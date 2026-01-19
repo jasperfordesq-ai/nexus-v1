@@ -131,8 +131,6 @@ if (class_exists('\Nexus\Core\TenantContext')) {
     <link rel="stylesheet" href="/assets/css/civicone-mobile.min.css?v=<?= $cssVersion ?>">
     <!-- NATIVE EXPERIENCE (Animations, Gestures, Haptics) -->
     <link rel="stylesheet" href="/assets/css/civicone-native.min.css?v=<?= $cssVersion ?>">
-    <!-- NATIVE DRAWER MENU (Slide-in, Animated Hamburger) -->
-    <link rel="stylesheet" href="/assets/css/civicone-drawer.min.css?v=<?= $cssVersion ?>">
     <!-- MOBILE NAV V2 (Tab Bar, Fullscreen Menu, Notifications Sheet) -->
     <link rel="stylesheet" href="/assets/css/nexus-native-nav-v2.min.css?v=<?= $cssVersion ?>">
 
@@ -780,8 +778,9 @@ if (class_exists('\Nexus\Core\TenantContext')) {
             /* Hide non-essential utility links on very small screens if needed, 
                but keeping them for now as per "crowded" fix */
 
+            /* Hamburger hidden - mobile nav v2 has Menu in bottom tab bar */
             #civic-menu-toggle {
-                display: block;
+                display: none !important;
             }
 
             /* Mobile Search Button */
@@ -859,8 +858,8 @@ if (class_exists('\Nexus\Core\TenantContext')) {
                 color: #F3F4F6;
             }
 
-            /* Mobile nav styles now handled by civicone-drawer.css */
-            /* Notification drawer styles now handled by civicone-drawer.css */
+            /* Mobile nav now handled by mobile-nav-v2 */
+            /* Notification drawer styles now handled by mobile-nav-v2 */
 
             .civic-nav-link,
             .civic-dropdown-trigger {
@@ -963,9 +962,6 @@ if (class_exists('\Nexus\Core\TenantContext')) {
 
     <!-- Skip Link for Accessibility (WCAG 2.4.1) -->
     <a href="#main-content" class="skip-link">Skip to main content</a>
-
-    <!-- Mobile Drawer Backdrop (tap to close) -->
-    <div class="civic-drawer-backdrop" id="civic-drawer-backdrop" aria-hidden="true"></div>
 
     <!-- Experimental Layout Notice Banner - Integrated into utility bar flow -->
     <div class="civic-experimental-banner" role="status" aria-live="polite">
@@ -1375,8 +1371,8 @@ if (class_exists('\Nexus\Core\TenantContext')) {
                 <span class="dashicons dashicons-search" aria-hidden="true"></span>
             </button>
 
-            <!-- Mobile Toggle -->
-            <button id="civic-menu-toggle" aria-label="Toggle Navigation" aria-expanded="false" aria-controls="civic-main-nav">
+            <!-- Mobile Menu Button -->
+            <button id="civic-menu-toggle" aria-label="Open Menu" onclick="if(typeof openMobileMenu==='function'){openMobileMenu();}">
                 <span class="civic-hamburger"></span>
             </button>
 
@@ -1564,147 +1560,7 @@ if (class_exists('\Nexus\Core\TenantContext')) {
         </div>
     </header>
 
-    <!-- Mobile Drawer Nav - OUTSIDE header to escape z-index stacking context -->
-    <nav id="civic-main-nav" aria-label="Main navigation" aria-hidden="true">
-        <!-- Drawer Header with Close Button -->
-        <div class="civic-drawer-header">
-            <span class="civic-drawer-title"><?= htmlspecialchars(\Nexus\Core\TenantContext::get()['name'] ?? 'Menu') ?></span>
-            <button id="civic-drawer-close" class="civic-drawer-close" aria-label="Close menu">
-                <span aria-hidden="true">✕</span>
-            </button>
-        </div>
-
-        <!-- Drawer Content (Scrollable) -->
-        <div class="civic-drawer-content">
-            <!-- Mobile Search -->
-            <div class="civic-mobile-search">
-                <form action="<?= \Nexus\Core\TenantContext::getBasePath() ?>/search" method="GET">
-                    <label for="drawer-search-input" class="visually-hidden">Search</label>
-                    <input type="text" id="drawer-search-input" name="q" placeholder="Search..." autocomplete="off">
-                    <button type="submit" aria-label="Search">
-                        <span class="dashicons dashicons-search" aria-hidden="true"></span>
-                    </button>
-                </form>
-            </div>
-
-            <!-- Primary Navigation Links - SYNCHRONIZED WITH BOTTOM NAV -->
-            <?php
-            $drawerPrimaryItems = \Nexus\Config\Navigation::getPrimaryItems();
-            foreach ($drawerPrimaryItems as $key => $item):
-                if (!($item['show_drawer'] ?? true)) continue;
-                if (!\Nexus\Config\Navigation::shouldShow($item)) continue;
-            ?>
-                <a href="<?= htmlspecialchars($item['url']) ?>" class="civic-nav-link">
-                    <span class="dashicons <?= htmlspecialchars($item['dashicon'] ?? $item['icon']) ?>" style="margin-right:10px;" aria-hidden="true"></span> <?= htmlspecialchars($item['label']) ?>
-                </a>
-            <?php endforeach; ?>
-
-            <!-- Divider -->
-            <div style="height:1px; background:var(--civic-border, #e5e7eb); margin:10px 0;"></div>
-
-            <!-- Create Links (Logged In) - SYNCHRONIZED -->
-            <?php if (isset($_SESSION['user_id'])):
-                $createItems = \Nexus\Config\Navigation::getCreateItems();
-                foreach ($createItems as $createItem):
-            ?>
-                    <a href="<?= htmlspecialchars($createItem['url']) ?>" class="civic-nav-link" style="color:<?= htmlspecialchars($createItem['color']) ?>;">
-                        <span class="dashicons <?= htmlspecialchars($createItem['icon']) ?>" style="margin-right:10px;" aria-hidden="true"></span> <?= htmlspecialchars($createItem['label']) ?>
-                    </a>
-            <?php endforeach;
-            endif; ?>
-
-            <!-- Divider -->
-            <div style="height:1px; background:var(--civic-border, #e5e7eb); margin:10px 0;"></div>
-
-            <!-- Account & Info Links - SYNCHRONIZED -->
-            <?php
-            $utilityItems = \Nexus\Config\Navigation::getUtilityItems();
-            foreach ($utilityItems as $key => $utilItem):
-                if (!\Nexus\Config\Navigation::shouldShow($utilItem)) continue;
-                $itemStyle = $utilItem['style'] ?? '';
-            ?>
-                <a href="<?= htmlspecialchars($utilItem['url']) ?>" class="civic-nav-link" <?= $itemStyle ? 'style="' . htmlspecialchars($itemStyle) . '"' : '' ?>>
-                    <span class="dashicons <?= htmlspecialchars($utilItem['icon']) ?>" style="margin-right:10px;" aria-hidden="true"></span> <?= htmlspecialchars($utilItem['label']) ?>
-                </a>
-            <?php endforeach; ?>
-
-            <!-- Messages Link (Mobile Drawer) -->
-            <?php if (isset($_SESSION['user_id'])): ?>
-                <a href="<?= \Nexus\Core\TenantContext::getBasePath() ?>/messages" class="civic-nav-link">
-                    <span class="dashicons dashicons-email" style="margin-right:10px;" aria-hidden="true"></span> Messages
-                </a>
-            <?php endif; ?>
-
-            <!-- Divider -->
-            <div style="height:1px; background:var(--civic-border, #e5e7eb); margin:10px 0;"></div>
-
-            <!-- Theme Toggle (Dark Mode) -->
-            <button id="civic-drawer-theme-toggle" class="civic-nav-link" style="width:100%; text-align:left; border:none; background:transparent; cursor:pointer;">
-                <span class="dashicons dashicons-lightbulb" style="margin-right:10px;" aria-hidden="true"></span> Toggle Dark Mode
-            </button>
-
-            <!-- Interface/Layout Switcher - Available for all logged-in users on mobile -->
-            <?php
-            $currentSlugForDrawer = \Nexus\Core\TenantContext::get()['slug'] ?? '';
-            if (isset($_SESSION['user_id']) && $currentSlugForDrawer !== 'public-sector-demo'):
-            ?>
-                <div style="height:1px; background:var(--civic-border, #e5e7eb); margin:10px 0;"></div>
-                <div style="padding:10px 20px; font-weight:600; color:var(--civic-text-muted, #6b7280); font-size:0.85rem; text-transform:uppercase; letter-spacing:0.5px;">
-                    Layout Theme
-                </div>
-                <?php
-                // Use LayoutHelper for consistent layout detection
-                $currentLayout = \Nexus\Services\LayoutHelper::get();
-                $tIdDrawer = \Nexus\Core\TenantContext::getId();
-                $isAllowedSocialDrawer = ($tIdDrawer == 1) || ($currentSlugForDrawer === 'hour-timebank' || $currentSlugForDrawer === 'hour_timebank');
-                ?>
-                <a href="?layout=modern" class="civic-nav-link" style="<?= $currentLayout === 'modern' ? 'color:var(--civic-brand, #00796B); font-weight:700; background: rgba(0, 121, 107, 0.1);' : '' ?>">
-                    <span class="dashicons dashicons-laptop" style="margin-right:10px;" aria-hidden="true"></span> Modern UI
-                    <?php if ($currentLayout === 'modern'): ?>
-                        <span style="margin-left:auto; color: var(--civic-brand, #00796B);">✓</span>
-                    <?php endif; ?>
-                </a>
-                <a href="?layout=civicone" class="civic-nav-link" style="<?= $currentLayout === 'civicone' ? 'color:var(--civic-brand, #00796B); font-weight:700; background: rgba(0, 121, 107, 0.1);' : '' ?>">
-                    <span class="dashicons dashicons-universal-access-alt" style="margin-right:10px;" aria-hidden="true"></span> Accessible UI
-                    <?php if ($currentLayout === 'civicone'): ?>
-                        <span style="margin-left:auto; color: var(--civic-brand, #00796B);">✓</span>
-                    <?php endif; ?>
-                </a>
-                <?php if ($isAllowedSocialDrawer):
-                    $rootPathDrawer = \Nexus\Core\TenantContext::getBasePath();
-                    if (empty($rootPathDrawer)) $rootPathDrawer = '/';
-                ?>
-                <?php endif; ?>
-            <?php endif; ?>
-        </div>
-
-        <!-- Drawer Footer - Auth Actions -->
-        <div class="civic-drawer-user">
-            <?php if (isset($_SESSION['user_id'])): ?>
-                <div class="civic-drawer-user-info">
-                    <img src="<?= \Nexus\Core\TenantContext::getBasePath() ?>/profile/avatar/<?= $_SESSION['user_id'] ?>" alt="" class="civic-drawer-avatar">
-                    <div>
-                        <div class="civic-drawer-user-name"><?= htmlspecialchars($_SESSION['user_name'] ?? 'Member') ?></div>
-                        <div class="civic-drawer-user-email"><?= htmlspecialchars($_SESSION['user_email'] ?? '') ?></div>
-                    </div>
-                </div>
-                <div class="civic-drawer-actions">
-                    <a href="<?= \Nexus\Core\TenantContext::getBasePath() ?>/profile/<?= $_SESSION['user_id'] ?>" style="background:var(--civic-brand, #00796B); color:white;">Profile</a>
-                    <a href="<?= \Nexus\Core\TenantContext::getBasePath() ?>/logout" style="background:#dc2626; color:white;">Sign Out</a>
-                </div>
-            <?php else: ?>
-                <div class="civic-drawer-actions">
-                    <a href="<?= \Nexus\Core\TenantContext::getBasePath() ?>/login" style="background:var(--civic-brand, #00796B); color:white;">Sign In</a>
-                    <a href="<?= \Nexus\Core\TenantContext::getBasePath() ?>/register" style="background:#059669; color:white;">Join Now</a>
-                </div>
-            <?php endif; ?>
-        </div>
-
-        <!-- Focus trap element -->
-        <span class="civic-drawer-focus-trap" tabindex="0"></span>
-    </nav>
-
-    <!-- CivicOne Hero - MadeOpen Community Style -->
+        <!-- CivicOne Hero - MadeOpen Community Style -->
     <?php
     // Resolve variables (Contract)
     $heroTitle = $hTitle ?? $pageTitle ?? 'Project NEXUS';
@@ -1844,7 +1700,7 @@ if (class_exists('\Nexus\Core\TenantContext')) {
                     drawerThemeToggle.addEventListener('click', toggleTheme);
                 }
 
-                // Mobile Menu Toggle - REMOVED: Now handled by civicone-drawer.js
+                // Mobile Menu Toggle - Now handled by mobile-nav-v2.php
                 // The drawer script provides full accessibility support including:
                 // - Close button handling
                 // - Backdrop click to close
@@ -1860,15 +1716,9 @@ if (class_exists('\Nexus\Core\TenantContext')) {
                     mobileSearchToggle.addEventListener('click', function() {
                         var isExpanded = this.getAttribute('aria-expanded') === 'true';
 
-                        // Close mobile drawer if open (handled by drawer.js but we sync state here)
-                        var mobileNav = document.getElementById('civic-main-nav');
-                        var menuToggle = document.getElementById('civic-menu-toggle');
-                        var backdrop = document.getElementById('civic-drawer-backdrop');
-                        if (mobileNav && mobileNav.classList.contains('active')) {
-                            mobileNav.classList.remove('active');
-                            if (menuToggle) menuToggle.setAttribute('aria-expanded', 'false');
-                            if (backdrop) backdrop.classList.remove('active');
-                            document.body.classList.remove('drawer-open');
+                        // Close mobile menu if open
+                        if (typeof closeMobileMenu === 'function') {
+                            closeMobileMenu();
                         }
 
                         if (isExpanded) {
@@ -2048,16 +1898,13 @@ if (class_exists('\Nexus\Core\TenantContext')) {
             document.addEventListener('DOMContentLoaded', function() {
                 const megaBtn = document.getElementById('civic-mega-trigger');
                 const megaMenu = document.getElementById('civic-mega-menu');
-                const mobileNav = document.getElementById('civic-main-nav');
-                const mobileToggle = document.getElementById('civic-menu-toggle');
 
                 if (megaBtn && megaMenu) {
                     megaBtn.addEventListener('click', function(e) {
                         e.stopPropagation();
-                        // Close mobile config if open
-                        if (mobileNav) {
-                            mobileNav.classList.remove('active');
-                            mobileNav.style.display = 'none'; // Re-hide
+                        // Close mobile menu if open
+                        if (typeof closeMobileMenu === 'function') {
+                            closeMobileMenu();
                         }
 
                         this.classList.toggle('active');
@@ -2072,9 +1919,6 @@ if (class_exists('\Nexus\Core\TenantContext')) {
                         }
                     });
                 }
-
-                // Mobile Nav Toggle - REMOVED: Now handled by civicone-drawer.js
-                // The drawer.js properly manages visibility via CSS classes
             });
         </script>
 

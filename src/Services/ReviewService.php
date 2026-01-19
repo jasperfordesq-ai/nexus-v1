@@ -42,8 +42,8 @@ class ReviewService
             }
 
             // Get tenant IDs for both users
-            $reviewer = $db->query("SELECT tenant_id FROM users WHERE id = ?", [$reviewerId])->fetch(\PDO::FETCH_ASSOC);
-            $receiver = $db->query("SELECT tenant_id FROM users WHERE id = ?", [$receiverId])->fetch(\PDO::FETCH_ASSOC);
+            $reviewer = Database::query("SELECT tenant_id FROM users WHERE id = ?", [$reviewerId])->fetch(\PDO::FETCH_ASSOC);
+            $receiver = Database::query("SELECT tenant_id FROM users WHERE id = ?", [$receiverId])->fetch(\PDO::FETCH_ASSOC);
 
             if (!$reviewer || !$receiver) {
                 return ['success' => false, 'error' => 'Invalid user'];
@@ -57,7 +57,7 @@ class ReviewService
 
             // Check if review already exists for this transaction
             if ($transactionId) {
-                $existing = $db->query(
+                $existing = Database::query(
                     "SELECT id FROM reviews WHERE transaction_id = ? AND reviewer_id = ?",
                     [$transactionId, $reviewerId]
                 )->fetch();
@@ -67,7 +67,7 @@ class ReviewService
             }
 
             if ($federationTransactionId) {
-                $existing = $db->query(
+                $existing = Database::query(
                     "SELECT id FROM reviews WHERE federation_transaction_id = ? AND reviewer_id = ?",
                     [$federationTransactionId, $reviewerId]
                 )->fetch();
@@ -78,7 +78,7 @@ class ReviewService
 
             // Validate transaction belongs to these users
             if ($federationTransactionId) {
-                $transaction = $db->query(
+                $transaction = Database::query(
                     "SELECT * FROM federation_transactions WHERE id = ?",
                     [$federationTransactionId]
                 )->fetch(\PDO::FETCH_ASSOC);
@@ -143,7 +143,7 @@ class ReviewService
             if ($federationTransactionId) {
                 $isSender = ($transaction['sender_user_id'] == $reviewerId);
                 $column = $isSender ? 'sender_reviewed' : 'receiver_reviewed';
-                $db->query(
+                Database::query(
                     "UPDATE federation_transactions SET {$column} = 1 WHERE id = ?",
                     [$federationTransactionId]
                 );
@@ -187,7 +187,7 @@ class ReviewService
             $db = Database::getInstance();
 
             // Get user info
-            $user = $db->query("SELECT tenant_id FROM users WHERE id = ?", [$userId])->fetch(\PDO::FETCH_ASSOC);
+            $user = Database::query("SELECT tenant_id FROM users WHERE id = ?", [$userId])->fetch(\PDO::FETCH_ASSOC);
             if (!$user) {
                 return ['reviews' => [], 'stats' => null];
             }
@@ -197,7 +197,7 @@ class ReviewService
 
             // Check federation settings if cross-tenant
             if (!$isSameTenant && $viewerTenantId) {
-                $settings = $db->query(
+                $settings = Database::query(
                     "SELECT show_reviews_federated FROM federation_user_settings WHERE user_id = ?",
                     [$userId]
                 )->fetch(\PDO::FETCH_ASSOC);
@@ -242,7 +242,7 @@ class ReviewService
 
             $reviewQuery .= " ORDER BY r.created_at DESC LIMIT ? OFFSET ?";
 
-            $reviews = $db->query($reviewQuery, [
+            $reviews = Database::query($reviewQuery, [
                 $viewerTenantId ?? 0,
                 $viewerTenantId ?? 0,
                 $userId,
@@ -274,7 +274,7 @@ class ReviewService
                 );
             }
 
-            $stats = $db->query($statsQuery, [$userId])->fetch(\PDO::FETCH_ASSOC);
+            $stats = Database::query($statsQuery, [$userId])->fetch(\PDO::FETCH_ASSOC);
 
             return [
                 'reviews' => $reviews,
@@ -309,10 +309,8 @@ class ReviewService
     public static function canReviewTransaction(int $userId, int $federationTransactionId): array
     {
         try {
-            $db = Database::getInstance();
-
             // Get transaction
-            $transaction = $db->query(
+            $transaction = Database::query(
                 "SELECT * FROM federation_transactions WHERE id = ?",
                 [$federationTransactionId]
             )->fetch(\PDO::FETCH_ASSOC);
@@ -422,7 +420,7 @@ class ReviewService
             $db = Database::getInstance();
 
             // Get review stats
-            $reviewStats = $db->query("
+            $reviewStats = Database::query("
                 SELECT
                     COUNT(*) as review_count,
                     COALESCE(AVG(rating), 0) as avg_rating,
@@ -432,7 +430,7 @@ class ReviewService
             ", [$userId])->fetch(\PDO::FETCH_ASSOC);
 
             // Get transaction stats
-            $transactionStats = $db->query("
+            $transactionStats = Database::query("
                 SELECT COUNT(*) as transaction_count
                 FROM federation_transactions
                 WHERE (sender_user_id = ? OR receiver_user_id = ?)

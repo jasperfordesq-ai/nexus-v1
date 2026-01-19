@@ -1518,6 +1518,318 @@
     font-weight: 600;
 }
 
+/* =================================================================
+   BADGE ACCORDION WITH PREVIEW
+   ================================================================= */
+
+/* Accordion Header - Always Visible */
+.badge-accordion-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    cursor: pointer;
+    padding: 0;
+    margin: 0;
+    border: none;
+    background: none;
+    width: 100%;
+    text-align: left;
+}
+
+.badge-accordion-header:hover {
+    opacity: 0.85;
+}
+
+.badge-accordion-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex: 1;
+    min-width: 0;
+}
+
+.badge-accordion-left h3 {
+    margin: 0;
+    padding: 0;
+    border: none;
+    white-space: nowrap;
+}
+
+/* Preview Icons - Shown in Collapsed State */
+.badge-preview-icons {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-left: 12px;
+    flex-shrink: 0;
+}
+
+.badge-preview-icon {
+    width: 32px;
+    height: 32px;
+    background: rgba(168, 85, 247, 0.1);
+    border: 1px solid rgba(168, 85, 247, 0.2);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.1rem;
+    transition: transform 0.2s ease;
+}
+
+.badge-preview-icon.locked {
+    background: rgba(0, 0, 0, 0.03);
+    border-color: rgba(0, 0, 0, 0.1);
+    filter: grayscale(100%);
+    opacity: 0.5;
+}
+
+.badge-preview-more {
+    width: 32px;
+    height: 32px;
+    background: rgba(99, 102, 241, 0.1);
+    border: 1px solid rgba(99, 102, 241, 0.2);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.7rem;
+    font-weight: 600;
+    color: #6366f1;
+}
+
+/* Mobile-only preview count - hidden by default */
+.badge-preview-count {
+    display: none;
+}
+
+/* Accordion Toggle Icon */
+.badge-accordion-toggle {
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    background: rgba(99, 102, 241, 0.1);
+    color: #6366f1;
+    transition: all 0.3s ease;
+    flex-shrink: 0;
+    margin-left: 12px;
+}
+
+.badge-accordion-toggle i {
+    transition: transform 0.3s ease;
+}
+
+.badge-category.accordion-open .badge-accordion-toggle {
+    background: rgba(99, 102, 241, 0.2);
+}
+
+.badge-category.accordion-open .badge-accordion-toggle i {
+    transform: rotate(180deg);
+}
+
+/* Accordion Content - Collapsible */
+.badge-accordion-content {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.4s ease, padding 0.3s ease, opacity 0.3s ease;
+    opacity: 0;
+}
+
+.badge-category.accordion-open .badge-accordion-content {
+    max-height: 2000px;
+    opacity: 1;
+    padding-top: 20px;
+}
+
+/* Hide preview when expanded */
+.badge-category.accordion-open .badge-preview-icons {
+    display: none;
+}
+
+/* Desktop: Accordions open by default */
+@media (min-width: 769px) {
+    .badge-category.accordion-desktop-open .badge-accordion-content {
+        max-height: 2000px;
+        opacity: 1;
+        padding-top: 20px;
+    }
+
+    .badge-category.accordion-desktop-open .badge-preview-icons {
+        display: none;
+    }
+
+    .badge-category.accordion-desktop-open .badge-accordion-toggle i {
+        transform: rotate(180deg);
+    }
+
+    .badge-preview-icon {
+        width: 36px;
+        height: 36px;
+        font-size: 1.25rem;
+    }
+
+    .badge-preview-more {
+        width: 36px;
+        height: 36px;
+        font-size: 0.75rem;
+    }
+}
+
+/* Mobile: Accordions closed by default, smaller preview */
+@media (max-width: 768px) {
+    .badge-category {
+        padding: 16px;
+        margin-bottom: 16px;
+    }
+
+    .badge-accordion-header {
+        padding: 4px 0;
+    }
+
+    .badge-accordion-left h3 {
+        font-size: 1rem;
+    }
+
+    .badge-preview-icons {
+        gap: 4px;
+        margin-left: 8px;
+    }
+
+    .badge-preview-icon {
+        width: 28px;
+        height: 28px;
+        font-size: 0.95rem;
+        border-radius: 6px;
+    }
+
+    .badge-preview-more {
+        width: 28px;
+        height: 28px;
+        font-size: 0.65rem;
+        border-radius: 6px;
+    }
+
+    .badge-accordion-toggle {
+        width: 28px;
+        height: 28px;
+        margin-left: 8px;
+    }
+
+    /* Smaller badge grid on mobile when expanded */
+    .badge-category.accordion-open .badges-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 12px;
+    }
+
+    .badge-category.accordion-open .badge-item {
+        padding: 12px 8px;
+    }
+
+    .badge-category.accordion-open .badge-item .badge-icon {
+        font-size: 2rem;
+        margin-bottom: 8px;
+    }
+
+    .badge-category.accordion-open .badge-item .badge-name {
+        font-size: 0.8rem;
+    }
+
+    .badge-category.accordion-open .badge-item .badge-desc {
+        font-size: 0.7rem;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+
+    .badge-category.accordion-open .badge-item .pin-btn {
+        padding: 3px 8px;
+        font-size: 0.7rem;
+    }
+}
+
+/* Extra small mobile */
+@media (max-width: 480px) {
+    .badge-preview-icons {
+        display: none;
+    }
+
+    .badge-accordion-left {
+        flex-wrap: wrap;
+    }
+
+    /* Show mini preview count instead */
+    .badge-preview-count {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        font-size: 0.75rem;
+        color: #6b7280;
+        margin-left: 8px;
+    }
+
+    .badge-preview-count .preview-dots {
+        display: flex;
+        gap: 3px;
+    }
+
+    .badge-preview-count .preview-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: rgba(168, 85, 247, 0.4);
+    }
+
+    .badge-preview-count .preview-dot.earned {
+        background: #a855f7;
+    }
+
+    .badge-category.accordion-open .badge-preview-count {
+        display: none;
+    }
+}
+
+/* Dark theme support */
+[data-theme="dark"] .badge-preview-icon {
+    background: rgba(168, 85, 247, 0.15);
+    border-color: rgba(168, 85, 247, 0.3);
+}
+
+[data-theme="dark"] .badge-preview-icon.locked {
+    background: rgba(255, 255, 255, 0.05);
+    border-color: rgba(255, 255, 255, 0.1);
+}
+
+[data-theme="dark"] .badge-preview-more {
+    background: rgba(99, 102, 241, 0.15);
+    border-color: rgba(99, 102, 241, 0.3);
+    color: #a5b4fc;
+}
+
+[data-theme="dark"] .badge-accordion-toggle {
+    background: rgba(99, 102, 241, 0.15);
+    color: #a5b4fc;
+}
+
+[data-theme="dark"] .badge-category.accordion-open .badge-accordion-toggle {
+    background: rgba(99, 102, 241, 0.25);
+}
+
+[data-theme="dark"] .badge-preview-count {
+    color: #94a3b8;
+}
+
+[data-theme="dark"] .badge-preview-count .preview-dot {
+    background: rgba(168, 85, 247, 0.5);
+}
+
+[data-theme="dark"] .badge-preview-count .preview-dot.earned {
+    background: #a855f7;
+}
+
 .badges-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));

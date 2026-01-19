@@ -47,8 +47,7 @@ class FederationReviewController
         $transaction = $canReview['transaction'];
 
         // Get receiver's timebank name
-        $db = Database::getInstance();
-        $tenantResult = $db->query(
+        $tenantResult = Database::query(
             "SELECT name FROM tenants WHERE id = ?",
             [$receiver['tenant_id'] ?? 0]
         )->fetch(\PDO::FETCH_ASSOC);
@@ -153,8 +152,7 @@ class FederationReviewController
         $transaction = $canReview['transaction'];
 
         // Get receiver's timebank name
-        $db = Database::getInstance();
-        $tenantResult = $db->query(
+        $tenantResult = Database::query(
             "SELECT name FROM tenants WHERE id = ?",
             [$receiver['tenant_id'] ?? 0]
         )->fetch(\PDO::FETCH_ASSOC);
@@ -194,8 +192,7 @@ class FederationReviewController
     {
         $viewerTenantId = null;
         if (isset($_SESSION['user_id'])) {
-            $db = Database::getInstance();
-            $viewer = $db->query(
+            $viewer = Database::query(
                 "SELECT tenant_id FROM users WHERE id = ?",
                 [$_SESSION['user_id']]
             )->fetch(\PDO::FETCH_ASSOC);

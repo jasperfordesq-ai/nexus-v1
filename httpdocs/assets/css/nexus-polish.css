@@ -312,19 +312,7 @@ i:hover,
     transition: all 0.3s ease;
 }
 
-.nexus-brand-link .brand-primary::after {
-    content: '';
-    position: absolute;
-    left: 0;
-    right: 0;
-    bottom: -3px;
-    height: 3px;
-    background: linear-gradient(90deg, #ef4444, #f97316);
-    border-radius: 2px;
-    transform: scaleX(1);
-    transform-origin: left;
-    transition: all 0.3s var(--ease-smooth);
-}
+/* Red underline removed - clean brand styling */
 
 .nexus-brand-link .brand-secondary {
     opacity: 0.65;
@@ -352,10 +340,7 @@ i:hover,
     text-shadow: 0 4px 20px rgba(255, 255, 255, 0.15);
 }
 
-.nexus-brand-link:hover .brand-primary::after {
-    transform: scaleX(1.05);
-    box-shadow: 0 2px 8px rgba(239, 68, 68, 0.4);
-}
+/* Red underline hover removed */
 
 .nexus-brand-link:hover .brand-secondary {
     opacity: 0.85;
@@ -537,9 +522,7 @@ button,
     text-shadow: 0 4px 20px rgba(15, 23, 42, 0.1);
 }
 
-[data-theme="light"] .nexus-brand-link .brand-primary::after {
-    background: linear-gradient(90deg, #dc2626, #ea580c);
-}
+/* Light mode red underline removed */
 
 [data-theme="light"] .nav-link {
     color: rgba(15, 23, 42, 0.8);

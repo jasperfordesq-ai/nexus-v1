@@ -28,26 +28,3 @@ $error = $error ?? 'Unable to submit review';
     </div>
 </div>
 
-<style>
-.federation-review-error {
-    min-height: calc(100vh - 200px);
-    display: flex;
-    align-items: center;
-    background: var(--bg-secondary, #f8f9fa);
-}
-
-.error-card {
-    background: white;
-    padding: 3rem;
-    border-radius: 16px;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.1);
-}
-
-[data-theme="dark"] .federation-review-error {
-    background: var(--bg-primary, #1a1a1a);
-}
-
-[data-theme="dark"] .error-card {
-    background: var(--bg-secondary, #2d2d2d);
-}
-</style>

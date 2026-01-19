@@ -126,8 +126,9 @@ html[data-layout] { transform: none !important; }
         transform: translateX(-100%) !important;
     }
 
-    /* Hide header hamburger menu button - we have Menu in bottom tab bar */
-    .nexus-menu-btn {
+    /* Hide header hamburger menu buttons - we have Menu in bottom tab bar */
+    .nexus-menu-btn,
+    #civic-menu-toggle {
         display: none !important;
     }
 

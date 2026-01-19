@@ -52,7 +52,6 @@ const PRECACHE_ASSETS = [
   '/assets/css/nexus-shared-transitions.css',
   '/assets/css/civicone-mobile.css',
   '/assets/css/civicone-native.css',
-  '/assets/css/civicone-drawer.css',
 
   // Core JavaScript
   '/assets/js/nexus-ui.js',
@@ -67,7 +66,6 @@ const PRECACHE_ASSETS = [
   '/assets/js/notifications.js',
   '/assets/js/civicone-mobile.js',
   '/assets/js/civicone-native.js',
-  '/assets/js/civicone-drawer.js',
   '/assets/js/civicone-pwa.js',
   '/assets/js/civicone-webauthn.js',
 

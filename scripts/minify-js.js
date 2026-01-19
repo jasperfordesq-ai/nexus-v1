@@ -13,7 +13,7 @@ const path = require('path');
 const { minify } = require('terser');
 
 // JS files to minify (largest files first based on analysis)
-// Updated 2026-01-17: Removed deprecated files (fds-mobile, nexus-native-nav v1, old polish)
+// Updated 2026-01-19: Added groups-edit-overlay.js
 const jsFiles = [
     'social-interactions.js',
     'nexus-mobile.js',
@@ -34,7 +34,6 @@ const jsFiles = [
     'nexus-mapbox.js',
     'nexus-native-features.js',
     'notifications.js',
-    'civicone-drawer.js',
     'civicone-mobile.js',
     'nexus-transitions.js',
     'nexus-loading-fix.js',
@@ -44,6 +43,8 @@ const jsFiles = [
     'nexus-instant-load.js',
     'pusher-client.js',
     'jGravity.js',
+    'groups-edit-overlay.js',
+    'federation-review-form.js',
 ];
 
 const jsDir = path.join(__dirname, '../httpdocs/assets/js');

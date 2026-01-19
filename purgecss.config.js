@@ -70,6 +70,32 @@ module.exports = {
         'httpdocs/assets/css/components.css',
         'httpdocs/assets/css/partials.css',
         'httpdocs/assets/css/feed-show.css',
+        // Phase 2: Federation module (2026-01-19)
+        'httpdocs/assets/css/federation.css',
+        // Phase 3: Volunteering module (2026-01-19)
+        'httpdocs/assets/css/volunteering.css',
+        // Phase 4: Groups module (2026-01-19)
+        'httpdocs/assets/css/groups.css',
+        // Phase 5: Goals module (2026-01-19)
+        'httpdocs/assets/css/goals.css',
+        // Phase 6: Polls module (2026-01-19)
+        'httpdocs/assets/css/polls.css',
+        // Phase 7: Resources module (2026-01-19)
+        'httpdocs/assets/css/resources.css',
+        // Phase 8: Matches module (2026-01-19)
+        'httpdocs/assets/css/matches.css',
+        // Phase 9: Organizations module (2026-01-19)
+        'httpdocs/assets/css/organizations.css',
+        // Phase 10: Help module (2026-01-19)
+        'httpdocs/assets/css/help.css',
+        // Phase 11: Wallet module (2026-01-19)
+        'httpdocs/assets/css/wallet.css',
+        // Phase 12: Federation reviews (2026-01-19)
+        'httpdocs/assets/css/federation-reviews.css',
+        // Phase 13: Static pages bundle (2026-01-19)
+        'httpdocs/assets/css/static-pages.css',
+        // Phase 14: Scattered singles bundle (2026-01-19)
+        'httpdocs/assets/css/scattered-singles.css',
     ],
 
     // Output directory for purged CSS
@@ -182,6 +208,33 @@ module.exports = {
 
             // Keep all fed- prefixed classes (federation)
             /^fed-/,
+
+            // Keep all vol- prefixed classes (volunteering)
+            /^vol-/,
+
+            // Keep all group- prefixed classes (groups module)
+            /^group-/,
+
+            // Keep all goal- prefixed classes (goals module)
+            /^goal-/,
+
+            // Keep all poll- prefixed classes (polls module)
+            /^poll-/,
+
+            // Keep all resource- prefixed classes (resources module)
+            /^resource-/,
+
+            // Keep all match- prefixed classes (matches module)
+            /^match-/,
+
+            // Keep all org- prefixed classes (organizations module)
+            /^org-/,
+
+            // Keep all help- prefixed classes (help module)
+            /^help-/,
+
+            // Keep all wallet- prefixed classes (wallet module)
+            /^wallet-/,
 
             // Keep all glass- prefixed classes
             /^glass-/,

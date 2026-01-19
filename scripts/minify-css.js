@@ -27,7 +27,7 @@ function minifyCSS(css) {
 }
 
 // CSS files to minify
-// Updated 2026-01-18: Added civicone theme files
+// Updated 2026-01-19: Added Phase 1-14 extracted files
 const cssFiles = [
     // Core framework
     'nexus-phoenix.css',
@@ -51,7 +51,6 @@ const cssFiles = [
     'nexus-civicone.css',
     'civicone-mobile.css',
     'civicone-native.css',
-    'civicone-drawer.css',
     // Extracted component CSS
     'feed-filter.css',
     'dashboard.css',
@@ -63,6 +62,67 @@ const cssFiles = [
     'civicone-bundle-compiled.css',
     // Admin area (combined)
     'admin-gold-standard.css',
+    // Gamification/Achievements
+    'achievements.css',
+    // Profile page
+    'profile-holographic.css',
+    // Footer
+    'nexus-modern-footer.css',
+    // Auth pages
+    'auth.css',
+    // Post components
+    'post-card.css',
+    'feed-item.css',
+    'feed-page.css',
+    'feed-show.css',
+    // Profile
+    'profile-edit.css',
+    // Messages
+    'messages-index.css',
+    'messages-thread.css',
+    // Notifications
+    'notifications.css',
+    // Groups
+    'groups-show.css',
+    'groups.css',
+    // Events
+    'events-index.css',
+    'events-calendar.css',
+    'events-create.css',
+    'events-show.css',
+    // Blog
+    'blog-index.css',
+    'blog-show.css',
+    // Listings
+    'listings-index.css',
+    'listings-show.css',
+    'listings-create.css',
+    // Phase 1: Components, partials
+    'components.css',
+    'partials.css',
+    // Phase 2: Federation module
+    'federation.css',
+    'federation-reviews.css',
+    // Phase 3: Volunteering module
+    'volunteering.css',
+    // Phase 5: Goals module
+    'goals.css',
+    // Phase 6: Polls module
+    'polls.css',
+    // Phase 7: Resources module
+    'resources.css',
+    // Phase 8: Matches module
+    'matches.css',
+    // Phase 9: Organizations module
+    'organizations.css',
+    // Phase 10: Help module
+    'help.css',
+    // Phase 11: Wallet module
+    'wallet.css',
+    // Phase 13: Static pages
+    'static-pages.css',
+    // Phase 14: Scattered singles
+    'scattered-singles.css',
 ];
 
 const cssDir = path.join(__dirname, '../httpdocs/assets/css');

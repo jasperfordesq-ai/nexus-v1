@@ -395,7 +395,6 @@ if (file_exists($envPath)) {
 <script src="/assets/js/nexus-mobile.min.js?v=<?= $jsVersion ?>" defer></script>
 <script src="/assets/js/civicone-mobile.min.js?v=<?= $jsVersion ?>" defer></script>
 <script src="/assets/js/civicone-native.min.js?v=<?= $jsVersion ?>" defer></script>
-<script src="/assets/js/civicone-drawer.min.js?v=<?= $jsVersion ?>" defer></script>
 <script src="/assets/js/civicone-pwa.min.js?v=<?= $jsVersion ?>" defer></script>
 <script src="/assets/js/civicone-webauthn.min.js?v=<?= $jsVersion ?>" defer></script>
 <!-- Skeleton Hydration - Remove loading states after content loads -->

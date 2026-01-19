@@ -76,58 +76,99 @@ $showcaseUpdated = isset($_GET['showcase_updated']);
         </div>
     </div>
 
-    <!-- Badge Categories -->
+    <!-- Badge Categories with Accordion -->
     <?php foreach ($badgesByCategory as $type => $category): ?>
     <?php
         $earnedInCategory = count(array_filter($category['badges'], fn($b) => $b['earned']));
         $totalInCategory = count($category['badges']);
+        // Get first 4 badges for preview (prioritize earned)
+        $earnedBadges = array_filter($category['badges'], fn($b) => $b['earned']);
+        $lockedBadges = array_filter($category['badges'], fn($b) => !$b['earned']);
+        $previewBadges = array_slice(array_merge(array_values($earnedBadges), array_values($lockedBadges)), 0, 4);
+        $remainingCount = max(0, count($category['badges']) - 4);
     ?>
-    <div class="badge-category">
-        <h3>
-            <?= htmlspecialchars($category['name']) ?>
-            <span class="count"><?= $earnedInCategory ?> / <?= $totalInCategory ?></span>
-        </h3>
+    <div class="badge-category accordion-desktop-open" data-category="<?= htmlspecialchars($type) ?>">
+        <!-- Accordion Header with Preview -->
+        <button type="button" class="badge-accordion-header" aria-expanded="true" aria-controls="badges-<?= htmlspecialchars($type) ?>">
+            <div class="badge-accordion-left">
+                <h3>
+                    <?= htmlspecialchars($category['name']) ?>
+                    <span class="count"><?= $earnedInCategory ?> / <?= $totalInCategory ?></span>
+                </h3>
 
-        <div class="badges-grid">
-            <?php foreach ($category['badges'] as $badge): ?>
-            <div class="badge-item <?= $badge['earned'] ? 'earned' : 'locked' ?>"
-                 data-key="<?= htmlspecialchars($badge['key']) ?>"
-                 data-name="<?= htmlspecialchars($badge['name']) ?>"
-                 data-icon="<?= htmlspecialchars($badge['icon']) ?>">
+                <!-- Preview Icons (visible when collapsed) -->
+                <div class="badge-preview-icons" aria-hidden="true">
+                    <?php foreach ($previewBadges as $previewBadge): ?>
+                    <span class="badge-preview-icon <?= $previewBadge['earned'] ? '' : 'locked' ?>" title="<?= htmlspecialchars($previewBadge['name']) ?>">
+                        <?= $previewBadge['icon'] ?>
+                    </span>
+                    <?php endforeach; ?>
+                    <?php if ($remainingCount > 0): ?>
+                    <span class="badge-preview-more">+<?= $remainingCount ?></span>
+                    <?php endif; ?>
+                </div>
 
-                <?php if ($badge['earned']): ?>
-                <span class="earned-check"><i class="fa-solid fa-check"></i></span>
-                <?php endif; ?>
-
-                <?php if (!empty($badge['showcased'])): ?>
-                <span class="showcase-star"><i class="fa-solid fa-star"></i></span>
-                <?php endif; ?>
-
-                <span class="badge-icon"><?= $badge['icon'] ?></span>
-                <div class="badge-name"><?= htmlspecialchars($badge['name']) ?></div>
-                <div class="badge-desc"><?= ucfirst($badge['msg'] ?? '') ?></div>
-
-                <?php if ($badge['rarity']): ?>
-                <span class="badge-rarity rarity-<?= strtolower($badge['rarity']['label']) ?>">
-                    <?= $badge['rarity']['label'] ?> (<?= $badge['rarity']['percent'] ?>%)
+                <!-- Mobile: Mini preview count (for extra small screens) -->
+                <span class="badge-preview-count" aria-hidden="true">
+                    <span class="preview-dots">
+                        <?php for ($i = 0; $i < min(4, $earnedInCategory); $i++): ?>
+                        <span class="preview-dot earned"></span>
+                        <?php endfor; ?>
+                        <?php for ($i = 0; $i < min(4 - min(4, $earnedInCategory), $totalInCategory - $earnedInCategory); $i++): ?>
+                        <span class="preview-dot"></span>
+                        <?php endfor; ?>
+                    </span>
                 </span>
-                <?php elseif ($badge['earned']): ?>
-                <span class="badge-rarity rarity-legendary">First!</span>
-                <?php endif; ?>
-
-                <?php if (!$badge['earned'] && $badge['threshold'] > 0): ?>
-                <div class="badge-threshold">Requires: <?= $badge['threshold'] ?></div>
-                <?php endif; ?>
-
-                <?php if ($badge['earned']): ?>
-                <button type="button" class="pin-btn <?= !empty($badge['showcased']) ? 'pinned' : '' ?>"
-                        onclick="toggleShowcase(this, '<?= htmlspecialchars($badge['key']) ?>', '<?= htmlspecialchars($badge['name']) ?>', '<?= htmlspecialchars($badge['icon']) ?>')"
-                        aria-label="<?= !empty($badge['showcased']) ? 'Remove from showcase' : 'Add to showcase' ?>">
-                    <?= !empty($badge['showcased']) ? '<i class="fa-solid fa-star"></i> Pinned' : '<i class="fa-regular fa-star"></i> Pin' ?>
-                </button>
-                <?php endif; ?>
             </div>
-            <?php endforeach; ?>
+
+            <span class="badge-accordion-toggle" aria-hidden="true">
+                <i class="fa-solid fa-chevron-down"></i>
+            </span>
+        </button>
+
+        <!-- Accordion Content -->
+        <div class="badge-accordion-content" id="badges-<?= htmlspecialchars($type) ?>">
+            <div class="badges-grid">
+                <?php foreach ($category['badges'] as $badge): ?>
+                <div class="badge-item <?= $badge['earned'] ? 'earned' : 'locked' ?>"
+                     data-key="<?= htmlspecialchars($badge['key']) ?>"
+                     data-name="<?= htmlspecialchars($badge['name']) ?>"
+                     data-icon="<?= htmlspecialchars($badge['icon']) ?>">
+
+                    <?php if ($badge['earned']): ?>
+                    <span class="earned-check"><i class="fa-solid fa-check"></i></span>
+                    <?php endif; ?>
+
+                    <?php if (!empty($badge['showcased'])): ?>
+                    <span class="showcase-star"><i class="fa-solid fa-star"></i></span>
+                    <?php endif; ?>
+
+                    <span class="badge-icon"><?= $badge['icon'] ?></span>
+                    <div class="badge-name"><?= htmlspecialchars($badge['name']) ?></div>
+                    <div class="badge-desc"><?= ucfirst($badge['msg'] ?? '') ?></div>
+
+                    <?php if ($badge['rarity']): ?>
+                    <span class="badge-rarity rarity-<?= strtolower($badge['rarity']['label']) ?>">
+                        <?= $badge['rarity']['label'] ?> (<?= $badge['rarity']['percent'] ?>%)
+                    </span>
+                    <?php elseif ($badge['earned']): ?>
+                    <span class="badge-rarity rarity-legendary">First!</span>
+                    <?php endif; ?>
+
+                    <?php if (!$badge['earned'] && $badge['threshold'] > 0): ?>
+                    <div class="badge-threshold">Requires: <?= $badge['threshold'] ?></div>
+                    <?php endif; ?>
+
+                    <?php if ($badge['earned']): ?>
+                    <button type="button" class="pin-btn <?= !empty($badge['showcased']) ? 'pinned' : '' ?>"
+                            onclick="event.stopPropagation(); toggleShowcase(this, '<?= htmlspecialchars($badge['key']) ?>', '<?= htmlspecialchars($badge['name']) ?>', '<?= htmlspecialchars($badge['icon']) ?>')"
+                            aria-label="<?= !empty($badge['showcased']) ? 'Remove from showcase' : 'Add to showcase' ?>">
+                        <?= !empty($badge['showcased']) ? '<i class="fa-solid fa-star"></i> Pinned' : '<i class="fa-regular fa-star"></i> Pin' ?>
+                    </button>
+                    <?php endif; ?>
+                </div>
+                <?php endforeach; ?>
+            </div>
         </div>
     </div>
     <?php endforeach; ?>
@@ -149,6 +190,68 @@ $showcaseUpdated = isset($_GET['showcase_updated']);
             setTimeout(() => toast.remove(), 300);
         }, 4000);
     }
+})();
+
+// Badge Accordion functionality
+(function() {
+    const isMobile = window.innerWidth <= 768;
+    const categories = document.querySelectorAll('.badge-category');
+
+    // Initialize accordions based on screen size
+    categories.forEach(category => {
+        const header = category.querySelector('.badge-accordion-header');
+        const content = category.querySelector('.badge-accordion-content');
+
+        if (!header || !content) return;
+
+        // On mobile, start collapsed; on desktop, start expanded
+        if (isMobile) {
+            category.classList.remove('accordion-desktop-open');
+            category.classList.remove('accordion-open');
+            header.setAttribute('aria-expanded', 'false');
+        } else {
+            category.classList.add('accordion-open');
+            header.setAttribute('aria-expanded', 'true');
+        }
+
+        // Toggle on click
+        header.addEventListener('click', function(e) {
+            // Don't toggle if clicking a button inside
+            if (e.target.closest('.pin-btn')) return;
+
+            const isOpen = category.classList.contains('accordion-open');
+
+            if (isOpen) {
+                category.classList.remove('accordion-open');
+                category.classList.remove('accordion-desktop-open');
+                header.setAttribute('aria-expanded', 'false');
+            } else {
+                category.classList.add('accordion-open');
+                header.setAttribute('aria-expanded', 'true');
+            }
+        });
+
+        // Keyboard accessibility
+        header.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                header.click();
+            }
+        });
+    });
+
+    // Handle window resize
+    let resizeTimeout;
+    window.addEventListener('resize', function() {
+        clearTimeout(resizeTimeout);
+        resizeTimeout = setTimeout(() => {
+            const nowMobile = window.innerWidth <= 768;
+            // Only auto-adjust if crossing the breakpoint
+            if (nowMobile !== isMobile) {
+                location.reload(); // Simple approach - reload to reset state
+            }
+        }, 250);
+    });
 })();
 
 // Showcase management

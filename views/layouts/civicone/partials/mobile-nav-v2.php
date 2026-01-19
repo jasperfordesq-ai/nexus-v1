@@ -105,7 +105,13 @@ window.closeMobileNotifications = function() {
 };
 </script>
 <style>
-/* CRITICAL: Hide ALL legacy navigation on mobile including drawer */
+/* FIX: Remove transform from html that breaks position:fixed */
+html[data-layout] { transform: none !important; }
+
+/* Hide on desktop by default */
+.mobile-tab-bar { display: none; }
+
+/* CRITICAL: Hide ALL legacy navigation on mobile including drawer AND header hamburger */
 @media (max-width: 1024px) {
     .nexus-native-nav,
     .nexus-native-nav-inner,
@@ -119,9 +125,14 @@ window.closeMobileNotifications = function() {
         pointer-events: none !important;
         transform: translateX(-100%) !important;
     }
-}
 
-@media (max-width: 1024px) {
+    /* Hide header hamburger menu buttons - we have Menu in bottom tab bar */
+    .nexus-menu-btn,
+    #civic-menu-toggle {
+        display: none !important;
+    }
+
+    /* Show mobile tab bar */
     .mobile-tab-bar {
         display: flex !important;
         visibility: visible !important;
@@ -145,100 +156,49 @@ window.closeMobileNotifications = function() {
         padding-bottom: 90px !important;
     }
     /* Ensure menu button looks like other tab items */
-    .mobile-tab-item[type="button"] {
+    .mobile-tab-item[type="button"],
+    button.mobile-tab-item {
         background: none;
         border: none;
         cursor: pointer;
         padding: 0;
         margin: 0;
+        font-family: inherit;
+        outline: none;
+        -webkit-appearance: none;
+        appearance: none;
     }
 }
 </style>
+<!-- Mobile Bottom Tab Bar -->
 <nav class="mobile-tab-bar" id="mobileTabBar" role="navigation" aria-label="Mobile navigation">
     <div class="mobile-tab-bar-inner">
-        <?php
-        // MenuManager Integration - Mobile Tab Bar
-        $tabMenus = \Nexus\Core\MenuManager::getMenu('mobile-tabs', 'modern');
-
-        if (!empty($tabMenus)):
-            foreach ($tabMenus as $tabMenu):
-                foreach ($tabMenu['items'] as $tabItem):
-                    // Determine if this tab is active
-                    $isActive = false;
-                    $tabPath = parse_url($tabItem['url'], PHP_URL_PATH);
-                    if ($tabPath === '/' || $tabPath === '') {
-                        $isActive = $isHomeActiveTab;
-                    } elseif (strpos($tabPath, '/listings') !== false) {
-                        $isActive = $isListingsActiveTab;
-                    } elseif (strpos($tabPath, '/messages') !== false) {
-                        $isActive = $isMessagesActiveTab;
-                    } elseif (strpos($tabPath, '/profile') !== false || strpos($tabPath, '/dashboard') !== false) {
-                        $isActive = $isProfileActiveTab;
-                    }
-
-                    $activeClass = $isActive ? ' active' : '';
-                    $ariaCurrent = $isActive ? ' aria-current="page"' : '';
-
-                    // Special handling for create button
-                    $isCreateTab = stripos($tabItem['label'], 'create') !== false;
-                    $cssClass = $tabItem['css_class'] ?? 'mobile-tab-item';
-                    if ($isCreateTab) {
-                        $cssClass .= ' create-btn';
-                    }
-        ?>
-        <a href="<?= htmlspecialchars($tabItem['url']) ?>" class="<?= htmlspecialchars($cssClass . $activeClass) ?>" aria-label="<?= htmlspecialchars($tabItem['label']) ?>"<?= $ariaCurrent ?>>
-            <?php if (!empty($tabItem['icon'])): ?>
-                <?php if ($isCreateTab): ?>
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="create-icon" aria-hidden="true"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
-                <?php elseif (stripos($tabItem['label'], 'profile') !== false && $isLoggedIn): ?>
-                    <img src="<?= htmlspecialchars($userAvatar) ?>" alt="" class="mobile-tab-avatar" aria-hidden="true">
-                <?php else: ?>
-                    <i class="<?= htmlspecialchars($tabItem['icon']) ?>" aria-hidden="true"></i>
-                <?php endif; ?>
-            <?php endif; ?>
-            <?php if (stripos($tabItem['label'], 'messages') !== false && $msgCount > 0): ?>
-            <span class="mobile-tab-badge" aria-hidden="true"><?= $msgCount > 99 ? '99+' : $msgCount ?></span>
-            <?php endif; ?>
-            <span><?= htmlspecialchars($tabItem['label']) ?></span>
-        </a>
-        <?php
-                endforeach;
-            endforeach;
-        else:
-            // Fallback to hardcoded tabs
-        ?>
-        <a href="<?= $base ?>/" class="mobile-tab-item <?= $isHomeActiveTab ? 'active' : '' ?>" aria-label="Home"<?= $isHomeActiveTab ? ' aria-current="page"' : '' ?>>
+        <a href="<?= $base ?>/" class="mobile-tab-item<?= $isHomeActiveTab ? ' active' : '' ?>" aria-label="Home"<?= $isHomeActiveTab ? ' aria-current="page"' : '' ?>>
             <i class="fa-solid fa-house" aria-hidden="true"></i>
             <span>Home</span>
         </a>
-        <a href="<?= $base ?>/listings" class="mobile-tab-item <?= $isListingsActiveTab ? 'active' : '' ?>" aria-label="Listings"<?= $isListingsActiveTab ? ' aria-current="page"' : '' ?>>
+        <a href="<?= $base ?>/listings" class="mobile-tab-item<?= $isListingsActiveTab ? ' active' : '' ?>" aria-label="Listings"<?= $isListingsActiveTab ? ' aria-current="page"' : '' ?>>
             <i class="fa-solid fa-hand-holding-heart" aria-hidden="true"></i>
             <span>Listings</span>
         </a>
         <a href="<?= $base ?>/compose" class="mobile-tab-item create-btn" aria-label="Create">
-            <i class="fa-solid fa-plus-circle" aria-hidden="true"></i>
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="create-icon" aria-hidden="true"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
             <span>Create</span>
         </a>
-        <a href="<?= $base ?>/messages" class="mobile-tab-item <?= $isMessagesActiveTab ? 'active' : '' ?>" aria-label="Messages"<?= $isMessagesActiveTab ? ' aria-current="page"' : '' ?>>
+        <a href="<?= $base ?>/messages" class="mobile-tab-item<?= $isMessagesActiveTab ? ' active' : '' ?>" aria-label="Messages"<?= $isMessagesActiveTab ? ' aria-current="page"' : '' ?>>
             <i class="fa-solid fa-envelope" aria-hidden="true"></i>
+            <?php if ($msgCount > 0): ?>
+            <span class="mobile-tab-badge" aria-hidden="true"><?= $msgCount > 99 ? '99+' : $msgCount ?></span>
+            <?php endif; ?>
             <span>Messages</span>
         </a>
-        <?php if ($isLoggedIn): ?>
-        <a href="<?= $base ?>/profile/<?= $userId ?>" class="mobile-tab-item <?= $isProfileActiveTab ? 'active' : '' ?>" aria-label="Profile"<?= $isProfileActiveTab ? ' aria-current="page"' : '' ?>>
-            <?php if (!empty($userAvatar)): ?>
-                <img src="<?= htmlspecialchars($userAvatar) ?>" alt="Profile" class="mobile-tab-avatar" aria-hidden="true">
-            <?php else: ?>
-                <i class="fa-solid fa-user" aria-hidden="true"></i>
+        <button type="button" class="mobile-tab-item" aria-label="Menu<?= ($notifCount > 0) ? ', ' . $notifCount . ' notifications' : '' ?>" onclick="openMobileMenu()">
+            <i class="fa-solid fa-bars" aria-hidden="true"></i>
+            <?php if ($notifCount > 0): ?>
+            <span class="mobile-tab-badge" aria-hidden="true"><?= $notifCount > 99 ? '99+' : $notifCount ?></span>
             <?php endif; ?>
-            <span>Profile</span>
-        </a>
-        <?php else: ?>
-        <a href="<?= $base ?>/login" class="mobile-tab-item" aria-label="Sign In">
-            <i class="fa-solid fa-user" aria-hidden="true"></i>
-            <span>Sign In</span>
-        </a>
-        <?php endif; ?>
-        <?php endif; ?>
+            <span>Menu</span>
+        </button>
     </div>
 </nav>
 
@@ -298,113 +258,115 @@ window.closeMobileNotifications = function() {
 
     <!-- Menu Body -->
     <div class="mobile-menu-body">
-        <!-- Main Navigation - MenuManager Integration -->
-        <?php
-        // Get menu from MenuManager database
-        $mobileMenus = \Nexus\Core\MenuManager::getMenu('header-main', 'modern');
-
-        if (!empty($mobileMenus)):
-            foreach ($mobileMenus as $menu):
-                // Separate main items from dropdown children
-                $mainItems = [];
-                $exploreChildren = [];
-
-                foreach ($menu['items'] as $item) {
-                    if ($item['type'] === 'dropdown' && !empty($item['children'])) {
-                        // This is the Explore dropdown - extract its children
-                        $exploreChildren = $item['children'];
-                    } else {
-                        // Regular main nav item
-                        $mainItems[] = $item;
-                    }
-                }
-        ?>
-
-        <!-- Main Navigation Section -->
-        <?php if (!empty($mainItems)): ?>
+        <!-- Main Navigation -->
         <div class="mobile-menu-section">
-            <div class="mobile-menu-section-title">Main Navigation</div>
-            <?php foreach ($mainItems as $item): ?>
-            <a href="<?= htmlspecialchars($item['url']) ?>" class="mobile-menu-item" onclick="closeMobileMenu()">
-                <?php if (!empty($item['icon'])): ?>
-                <i class="<?= htmlspecialchars($item['icon']) ?>"></i>
-                <?php endif; ?>
-                <?= htmlspecialchars($item['label']) ?>
+            <div class="mobile-menu-section-title">Navigate</div>
+            <a href="<?= $base ?>/" class="mobile-menu-item" onclick="closeMobileMenu()">
+                <i class="fa-solid fa-house"></i>
+                Home
             </a>
-            <?php endforeach; ?>
+            <a href="<?= $base ?>/listings" class="mobile-menu-item" onclick="closeMobileMenu()">
+                <i class="fa-solid fa-hand-holding-heart"></i>
+                Listings
+            </a>
+            <a href="<?= $base ?>/community-groups" class="mobile-menu-item" onclick="closeMobileMenu()">
+                <i class="fa-solid fa-users"></i>
+                Community Groups
+            </a>
+            <a href="<?= $base ?>/groups" class="mobile-menu-item" onclick="closeMobileMenu()">
+                <i class="fa-solid fa-map-pin"></i>
+                Local Hubs
+            </a>
+            <a href="<?= $base ?>/members" class="mobile-menu-item" onclick="closeMobileMenu()">
+                <i class="fa-solid fa-user-group"></i>
+                Members
+            </a>
+            <?php if (\Nexus\Core\TenantContext::hasFeature('events')): ?>
+            <a href="<?= $base ?>/events" class="mobile-menu-item" onclick="closeMobileMenu()">
+                <i class="fa-solid fa-calendar-days"></i>
+                Events
+            </a>
+            <?php endif; ?>
+            <?php if (\Nexus\Core\TenantContext::hasFeature('volunteering')): ?>
+            <a href="<?= $base ?>/volunteering" class="mobile-menu-item" onclick="closeMobileMenu()">
+                <i class="fa-solid fa-hands-helping"></i>
+                Volunteering
+            </a>
+            <?php endif; ?>
         </div>
-        <?php endif; ?>
 
         <!-- Explore Section -->
-        <?php if (!empty($exploreChildren)): ?>
         <div class="mobile-menu-section">
             <div class="mobile-menu-section-title">Explore</div>
-            <?php foreach ($exploreChildren as $item):
-                $itemStyle = '';
-                // Check for special highlighting (AI Assistant, Get App)
-                if (stripos($item['label'], 'AI') !== false || stripos($item['label'], 'Assistant') !== false) {
-                    $itemStyle = ' style="background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(139, 92, 246, 0.1)); font-weight:600;"';
-                }
-            ?>
-            <a href="<?= htmlspecialchars($item['url']) ?>" class="mobile-menu-item"<?= $itemStyle ?> onclick="closeMobileMenu()">
-                <?php if (!empty($item['icon'])): ?>
-                <i class="<?= htmlspecialchars($item['icon']) ?>"></i>
-                <?php endif; ?>
-                <?= htmlspecialchars($item['label']) ?>
+            <?php if (\Nexus\Core\TenantContext::hasFeature('polls')): ?>
+            <a href="<?= $base ?>/polls" class="mobile-menu-item" onclick="closeMobileMenu()">
+                <i class="fa-solid fa-square-poll-vertical"></i>
+                Polls
             </a>
-            <?php endforeach; ?>
+            <?php endif; ?>
+            <?php if (\Nexus\Core\TenantContext::hasFeature('goals')): ?>
+            <a href="<?= $base ?>/goals" class="mobile-menu-item" onclick="closeMobileMenu()">
+                <i class="fa-solid fa-bullseye"></i>
+                Goals
+            </a>
+            <?php endif; ?>
+            <a href="<?= $base ?>/leaderboard" class="mobile-menu-item" onclick="closeMobileMenu()">
+                <i class="fa-solid fa-trophy"></i>
+                Leaderboards
+            </a>
+            <a href="<?= $base ?>/achievements" class="mobile-menu-item" onclick="closeMobileMenu()">
+                <i class="fa-solid fa-medal"></i>
+                Achievements
+            </a>
+            <a href="<?= $base ?>/matches" class="mobile-menu-item" onclick="closeMobileMenu()">
+                <i class="fa-solid fa-wand-magic-sparkles"></i>
+                Smart Matching
+            </a>
+            <a href="<?= $base ?>/ai" class="mobile-menu-item" style="background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(139, 92, 246, 0.1)); font-weight:600;" onclick="closeMobileMenu()">
+                <i class="fa-solid fa-robot"></i>
+                AI Assistant
+            </a>
         </div>
-        <?php endif; ?>
 
-        <?php
-            endforeach;
-        else:
-            // Fallback to Navigation class if MenuManager has no menus
-            $navFile = __DIR__ . '/../../civicone/config/navigation.php';
-            if (file_exists($navFile)) {
-                require_once $navFile;
-            }
-
-            // Check if Navigation class exists
-            if (class_exists('\Nexus\Config\Navigation')) {
-                $mainNavItems = \Nexus\Config\Navigation::getMainNavItems();
-                $exploreItems = \Nexus\Config\Navigation::getExploreItems();
-            } else {
-                // Ultimate fallback - hardcoded items
-                $mainNavItems = [
-                    ['label' => 'News Feed', 'url' => $base . '/', 'icon' => 'fa-solid fa-newspaper'],
-                    ['label' => 'Listings', 'url' => $base . '/listings', 'icon' => 'fa-solid fa-hand-holding-heart'],
-                    ['label' => 'Groups', 'url' => $base . '/groups', 'icon' => 'fa-solid fa-users'],
-                ];
-                $exploreItems = [
-                    ['label' => 'Events', 'url' => $base . '/events', 'icon' => 'fa-solid fa-calendar'],
-                    ['label' => 'Members', 'url' => $base . '/members', 'icon' => 'fa-solid fa-user-group'],
-                ];
-            }
-        ?>
+        <!-- About Section -->
         <div class="mobile-menu-section">
-            <div class="mobile-menu-section-title">Main Navigation</div>
-            <?php foreach ($mainNavItems as $key => $item):
-                if (class_exists('\Nexus\Config\Navigation') && !\Nexus\Config\Navigation::shouldShow($item)) continue;
+            <div class="mobile-menu-section-title">About</div>
+            <?php if (\Nexus\Core\TenantContext::hasFeature('blog')): ?>
+            <a href="<?= $base ?>/news" class="mobile-menu-item" onclick="closeMobileMenu()">
+                <i class="fa-solid fa-newspaper"></i>
+                Latest News
+            </a>
+            <?php endif; ?>
+            <?php
+            // Custom pages for About section
+            $mobilePages = \Nexus\Core\TenantContext::getCustomPages('modern');
+            $aboutPageNames = ['about us', 'our story', 'about story', 'timebanking guide', 'partner with us', 'partner', 'social prescribing', 'timebanking faqs', 'timebanking faq', 'faq', 'impact summary', 'impact report', 'strategic plan'];
+            $pageIcons = [
+                'about us' => 'fa-solid fa-heart',
+                'our story' => 'fa-solid fa-heart',
+                'about story' => 'fa-solid fa-heart',
+                'timebanking guide' => 'fa-solid fa-book-open',
+                'partner' => 'fa-solid fa-handshake',
+                'partner with us' => 'fa-solid fa-handshake',
+                'social prescribing' => 'fa-solid fa-hand-holding-medical',
+                'faq' => 'fa-solid fa-circle-question',
+                'timebanking faq' => 'fa-solid fa-circle-question',
+                'timebanking faqs' => 'fa-solid fa-circle-question',
+                'impact summary' => 'fa-solid fa-leaf',
+                'impact report' => 'fa-solid fa-file-contract',
+                'strategic plan' => 'fa-solid fa-route',
+            ];
+            foreach ($mobilePages as $page):
+                $pageName = strtolower($page['name']);
+                if (!in_array($pageName, $aboutPageNames)) continue;
+                $icon = $pageIcons[$pageName] ?? 'fa-solid fa-file-lines';
             ?>
-            <a href="<?= htmlspecialchars($item['url']) ?>" class="mobile-menu-item" onclick="closeMobileMenu()">
-                <i class="<?= htmlspecialchars($item['icon']) ?>"></i>
-                <?= htmlspecialchars($item['label']) ?>
+            <a href="<?= htmlspecialchars($page['url']) ?>" class="mobile-menu-item" onclick="closeMobileMenu()">
+                <i class="<?= $icon ?>"></i>
+                <?= htmlspecialchars($page['name']) ?>
             </a>
             <?php endforeach; ?>
         </div>
-        <div class="mobile-menu-section">
-            <div class="mobile-menu-section-title">Explore</div>
-            <?php foreach ($exploreItems as $key => $item):
-                if (class_exists('\Nexus\Config\Navigation') && !\Nexus\Config\Navigation::shouldShow($item)) continue;
-            ?>
-            <a href="<?= htmlspecialchars($item['url']) ?>" class="mobile-menu-item" onclick="closeMobileMenu()">
-                <i class="<?= htmlspecialchars($item['icon']) ?>"></i>
-                <?= htmlspecialchars($item['label']) ?>
-            </a>
-            <?php endforeach; ?>
-        </div>
-        <?php endif; ?>
 
         <?php if ($isLoggedIn && ((!empty($_SESSION['user_role']) && $_SESSION['user_role'] === 'admin') || !empty($_SESSION['is_super_admin']))): ?>
         <!-- Admin Section -->
@@ -455,77 +417,43 @@ window.closeMobileNotifications = function() {
             <?php endif; ?>
         </div>
 
-        <!-- Utility Bar Items - MenuManager Integration -->
-        <?php
-        // Try to get utility menu from MenuManager
-        $utilityMenus = \Nexus\Core\MenuManager::getMenu('header-secondary', 'modern');
-        $hasUtilityMenu = !empty($utilityMenus);
-
-        if ($hasUtilityMenu):
-            foreach ($utilityMenus as $utilMenu):
-        ?>
+        <!-- Your Account -->
         <div class="mobile-menu-section">
             <div class="mobile-menu-section-title">Your Account</div>
-            <?php foreach ($utilMenu['items'] as $utilItem):
-                // Resolve {user_id} placeholder
-                $utilUrl = $utilItem['url'];
-                if (strpos($utilUrl, '{user_id}') !== false) {
-                    $utilUrl = str_replace('{user_id}', $userId ?? '', $utilUrl);
-                }
-
-                // Determine color
-                $itemColor = '';
-                if (stripos($utilItem['label'], 'admin') !== false) {
-                    $itemColor = ' style="color: #ea580c;"';
-                } elseif (stripos($utilItem['label'], 'sign out') !== false || stripos($utilItem['label'], 'logout') !== false) {
-                    $itemColor = ' style="color: #ef4444;"';
-                }
-            ?>
-            <a href="<?= htmlspecialchars($utilUrl) ?>" class="mobile-menu-item" onclick="closeMobileMenu()">
-                <?php if (!empty($utilItem['icon'])): ?>
-                <i class="<?= htmlspecialchars($utilItem['icon']) ?>"<?= $itemColor ?>></i>
-                <?php endif; ?>
-                <?= htmlspecialchars($utilItem['label']) ?>
+            <a href="<?= $base ?>/profile/<?= $userId ?>" class="mobile-menu-item" onclick="closeMobileMenu()">
+                <i class="fa-solid fa-user"></i>
+                Profile
             </a>
-            <?php endforeach; ?>
-        </div>
-        <?php
-            endforeach;
-        else:
-            // Fallback to Navigation class
-            if (class_exists('\Nexus\Config\Navigation')) {
-                $utilityItems = \Nexus\Config\Navigation::getUtilityItems();
-            } else {
-                $utilityItems = [
-                    ['label' => 'Profile', 'url' => $base . '/profile/' . $userId, 'icon' => 'fa-solid fa-user'],
-                    ['label' => 'Settings', 'url' => $base . '/settings', 'icon' => 'fa-solid fa-gear'],
-                    ['label' => 'Logout', 'url' => $base . '/logout', 'icon' => 'fa-solid fa-arrow-right-from-bracket', 'color' => '#ef4444'],
-                ];
-            }
-        ?>
-        <div class="mobile-menu-section">
-            <div class="mobile-menu-section-title">Your Account</div>
-            <?php foreach ($utilityItems as $key => $item):
-                if (class_exists('\Nexus\Config\Navigation') && !\Nexus\Config\Navigation::shouldShow($item)) continue;
-                if ($item['is_icon_button'] ?? false) continue;
-                $itemColor = isset($item['color']) ? ' style="color: ' . htmlspecialchars($item['color']) . ';"' : '';
-            ?>
-            <a href="<?= htmlspecialchars($item['url']) ?>" class="mobile-menu-item" onclick="closeMobileMenu()">
-                <i class="<?= htmlspecialchars($item['icon']) ?>"<?= $itemColor ?>></i>
-                <?= htmlspecialchars($item['label']) ?>
+            <a href="<?= $base ?>/dashboard" class="mobile-menu-item" onclick="closeMobileMenu()">
+                <i class="fa-solid fa-gauge-high"></i>
+                Dashboard
             </a>
-            <?php endforeach; ?>
+            <a href="<?= $base ?>/wallet" class="mobile-menu-item" onclick="closeMobileMenu()">
+                <i class="fa-solid fa-wallet"></i>
+                Wallet
+            </a>
+            <a href="<?= $base ?>/settings" class="mobile-menu-item" onclick="closeMobileMenu()">
+                <i class="fa-solid fa-gear"></i>
+                Settings
+            </a>
         </div>
         <?php endif; ?>
-        <?php endif; ?>
 
 
-        <!-- New App Beta -->
+        <!-- Help & Support -->
         <div class="mobile-menu-section">
-            <a href="?view=mobile" class="mobile-menu-item" style="background: linear-gradient(135deg, rgba(236, 72, 153, 0.1), rgba(219, 39, 119, 0.1)); border: 1px solid rgba(236, 72, 153, 0.2); border-radius: 12px; margin: 8px 16px;">
-                <i class="fa-solid fa-mobile-screen-button" style="color: #ec4899;"></i>
-                New App
-                <span style="background: linear-gradient(135deg, #ec4899, #db2777); color: white; font-size: 9px; font-weight: 700; padding: 2px 6px; border-radius: 4px; text-transform: uppercase; margin-left: auto;">Beta</span>
+            <div class="mobile-menu-section-title">Help & Support</div>
+            <a href="<?= $base ?>/help" class="mobile-menu-item" onclick="closeMobileMenu()">
+                <i class="fa-solid fa-circle-question" style="color: #f97316;"></i>
+                Help Center
+            </a>
+            <a href="<?= $base ?>/contact" class="mobile-menu-item" onclick="closeMobileMenu()">
+                <i class="fa-solid fa-envelope" style="color: #3b82f6;"></i>
+                Contact Us
+            </a>
+            <a href="<?= $base ?>/accessibility" class="mobile-menu-item" onclick="closeMobileMenu()">
+                <i class="fa-solid fa-universal-access" style="color: #10b981;"></i>
+                Accessibility
             </a>
         </div>
     </div>

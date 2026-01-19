@@ -531,7 +531,7 @@ $basePath = \Nexus\Core\TenantContext::getBasePath();
             </div>
         </div>
 
-        <!-- Showcased Badges -->
+        <!-- Showcased Badges with Accordion -->
         <?php if (!empty($showcasedBadges)): ?>
             <?php
             // Get badge definitions for descriptions (for showcased badges)
@@ -543,42 +543,55 @@ $basePath = \Nexus\Core\TenantContext::getBasePath();
                 }
                 $badgeRarityStats = \Nexus\Models\UserBadge::getBadgeRarityStats();
             }
+            $featuredPreview = array_slice($showcasedBadges, 0, 3);
             ?>
             <div class="glass-divider"></div>
-            <div class="badges-section">
-                <h3>
-                    <i class="fa-solid fa-star"></i>
-                    Featured Badges
-                </h3>
-                <div class="badges-grid featured">
-                    <?php foreach ($showcasedBadges as $badge):
-                        $badgeKey = $badge['badge_key'] ?? '';
-                        $badgeDesc = $badgeDescMap[$badgeKey] ?? 'earning this achievement';
-                        $rarityInfo = $badgeRarityStats[$badgeKey] ?? null;
-                        $rarityLabel = $rarityInfo['label'] ?? 'Common';
-                        $rarityPercent = $rarityInfo['percent'] ?? 100;
-                    ?>
-                        <div class="featured-badge badge-clickable"
-                             data-badge-name="<?= htmlspecialchars($badge['name']) ?>"
-                             data-badge-icon="<?= htmlspecialchars($badge['icon']) ?>"
-                             data-badge-desc="<?= htmlspecialchars($badgeDesc) ?>"
-                             data-badge-date="<?= date('F j, Y', strtotime($badge['awarded_at'])) ?>"
-                             data-badge-rarity="<?= htmlspecialchars($rarityLabel) ?>"
-                             data-badge-percent="<?= htmlspecialchars($rarityPercent) ?>"
-                             data-badge-featured="true"
-                             onclick="openBadgeModal(this)"
-                             role="button"
-                             tabindex="0"
-                             title="Tap for details">
-                            <span class="badge-icon"><?= $badge['icon'] ?></span>
-                            <span class="badge-name"><?= htmlspecialchars($badge['name']) ?></span>
-                        </div>
-                    <?php endforeach; ?>
+            <div class="badges-section badges-accordion featured" data-accordion="featured-badges">
+                <button type="button" class="badges-accordion-header" aria-expanded="false" aria-controls="featured-badges-content">
+                    <h3>
+                        <i class="fa-solid fa-star"></i>
+                        Featured Badges (<?= count($showcasedBadges) ?>)
+                    </h3>
+                    <div class="badges-preview" aria-hidden="true">
+                        <?php foreach ($featuredPreview as $previewBadge): ?>
+                        <span class="badge-preview-pill" title="<?= htmlspecialchars($previewBadge['name']) ?>"><?= $previewBadge['icon'] ?></span>
+                        <?php endforeach; ?>
+                    </div>
+                    <span class="badges-accordion-toggle" aria-hidden="true">
+                        <i class="fa-solid fa-chevron-down"></i>
+                    </span>
+                </button>
+                <div class="badges-accordion-content" id="featured-badges-content">
+                    <div class="badges-grid featured">
+                        <?php foreach ($showcasedBadges as $badge):
+                            $badgeKey = $badge['badge_key'] ?? '';
+                            $badgeDesc = $badgeDescMap[$badgeKey] ?? 'earning this achievement';
+                            $rarityInfo = $badgeRarityStats[$badgeKey] ?? null;
+                            $rarityLabel = $rarityInfo['label'] ?? 'Common';
+                            $rarityPercent = $rarityInfo['percent'] ?? 100;
+                        ?>
+                            <div class="featured-badge badge-clickable"
+                                 data-badge-name="<?= htmlspecialchars($badge['name']) ?>"
+                                 data-badge-icon="<?= htmlspecialchars($badge['icon']) ?>"
+                                 data-badge-desc="<?= htmlspecialchars($badgeDesc) ?>"
+                                 data-badge-date="<?= date('F j, Y', strtotime($badge['awarded_at'])) ?>"
+                                 data-badge-rarity="<?= htmlspecialchars($rarityLabel) ?>"
+                                 data-badge-percent="<?= htmlspecialchars($rarityPercent) ?>"
+                                 data-badge-featured="true"
+                                 onclick="openBadgeModal(this)"
+                                 role="button"
+                                 tabindex="0"
+                                 title="Tap for details">
+                                <span class="badge-icon"><?= $badge['icon'] ?></span>
+                                <span class="badge-name"><?= htmlspecialchars($badge['name']) ?></span>
+                            </div>
+                        <?php endforeach; ?>
+                    </div>
                 </div>
             </div>
         <?php endif; ?>
 
-        <!-- All Badges -->
+        <!-- All Badges with Accordion -->
         <?php if (!empty($badges)): ?>
             <?php
             // Get badge definitions for descriptions (if not already loaded by showcased badges)
@@ -590,36 +603,53 @@ $basePath = \Nexus\Core\TenantContext::getBasePath();
                 }
                 $badgeRarityStats = \Nexus\Models\UserBadge::getBadgeRarityStats();
             }
+            $badgesPreview = array_slice($badges, 0, 4);
+            $badgesRemaining = max(0, count($badges) - 4);
             ?>
             <div class="glass-divider"></div>
-            <div class="badges-section">
-                <h3>
-                    <i class="fa-solid fa-trophy"></i>
-                    Achievements (<?= count($badges) ?>)
-                </h3>
-                <div class="badges-grid">
-                    <?php foreach ($badges as $badge):
-                        $badgeKey = $badge['badge_key'] ?? '';
-                        $badgeDesc = $badgeDescMap[$badgeKey] ?? 'earning this achievement';
-                        $rarityInfo = $badgeRarityStats[$badgeKey] ?? null;
-                        $rarityLabel = $rarityInfo['label'] ?? 'Common';
-                        $rarityPercent = $rarityInfo['percent'] ?? 100;
-                    ?>
-                        <div class="glass-badge badge-clickable"
-                             data-badge-name="<?= htmlspecialchars($badge['name']) ?>"
-                             data-badge-icon="<?= htmlspecialchars($badge['icon']) ?>"
-                             data-badge-desc="<?= htmlspecialchars($badgeDesc) ?>"
-                             data-badge-date="<?= date('F j, Y', strtotime($badge['awarded_at'])) ?>"
-                             data-badge-rarity="<?= htmlspecialchars($rarityLabel) ?>"
-                             data-badge-percent="<?= htmlspecialchars($rarityPercent) ?>"
-                             onclick="openBadgeModal(this)"
-                             role="button"
-                             tabindex="0"
-                             title="Tap for details">
-                            <span class="badge-icon"><?= $badge['icon'] ?></span>
-                            <span class="badge-name"><?= htmlspecialchars($badge['name']) ?></span>
-                        </div>
-                    <?php endforeach; ?>
+            <div class="badges-section badges-accordion" data-accordion="all-badges">
+                <button type="button" class="badges-accordion-header" aria-expanded="false" aria-controls="all-badges-content">
+                    <h3>
+                        <i class="fa-solid fa-trophy"></i>
+                        Achievements (<?= count($badges) ?>)
+                    </h3>
+                    <div class="badges-preview" aria-hidden="true">
+                        <?php foreach ($badgesPreview as $previewBadge): ?>
+                        <span class="badge-preview-pill" title="<?= htmlspecialchars($previewBadge['name']) ?>"><?= $previewBadge['icon'] ?></span>
+                        <?php endforeach; ?>
+                        <?php if ($badgesRemaining > 0): ?>
+                        <span class="badge-preview-count">+<?= $badgesRemaining ?></span>
+                        <?php endif; ?>
+                    </div>
+                    <span class="badges-accordion-toggle" aria-hidden="true">
+                        <i class="fa-solid fa-chevron-down"></i>
+                    </span>
+                </button>
+                <div class="badges-accordion-content" id="all-badges-content">
+                    <div class="badges-grid">
+                        <?php foreach ($badges as $badge):
+                            $badgeKey = $badge['badge_key'] ?? '';
+                            $badgeDesc = $badgeDescMap[$badgeKey] ?? 'earning this achievement';
+                            $rarityInfo = $badgeRarityStats[$badgeKey] ?? null;
+                            $rarityLabel = $rarityInfo['label'] ?? 'Common';
+                            $rarityPercent = $rarityInfo['percent'] ?? 100;
+                        ?>
+                            <div class="glass-badge badge-clickable"
+                                 data-badge-name="<?= htmlspecialchars($badge['name']) ?>"
+                                 data-badge-icon="<?= htmlspecialchars($badge['icon']) ?>"
+                                 data-badge-desc="<?= htmlspecialchars($badgeDesc) ?>"
+                                 data-badge-date="<?= date('F j, Y', strtotime($badge['awarded_at'])) ?>"
+                                 data-badge-rarity="<?= htmlspecialchars($rarityLabel) ?>"
+                                 data-badge-percent="<?= htmlspecialchars($rarityPercent) ?>"
+                                 onclick="openBadgeModal(this)"
+                                 role="button"
+                                 tabindex="0"
+                                 title="Tap for details">
+                                <span class="badge-icon"><?= $badge['icon'] ?></span>
+                                <span class="badge-name"><?= htmlspecialchars($badge['name']) ?></span>
+                            </div>
+                        <?php endforeach; ?>
+                    </div>
                 </div>
             </div>
         <?php endif; ?>
@@ -1827,6 +1857,25 @@ document.addEventListener('keydown', function(e) {
     }
 });
 
+// Safety: restore scroll if modal somehow gets stuck
+(function() {
+    // Check periodically if body overflow is stuck
+    setInterval(function() {
+        const modal = document.getElementById('badgeModal');
+        if (document.body.style.overflow === 'hidden' && modal && !modal.classList.contains('visible')) {
+            document.body.style.overflow = '';
+        }
+    }, 2000);
+
+    // Also restore on any touch/click if modal not visible
+    document.addEventListener('touchstart', function() {
+        const modal = document.getElementById('badgeModal');
+        if (document.body.style.overflow === 'hidden' && modal && !modal.classList.contains('visible')) {
+            document.body.style.overflow = '';
+        }
+    }, { passive: true });
+})();
+
 // Handle keyboard activation for badges
 document.querySelectorAll('.badge-clickable').forEach(badge => {
     badge.addEventListener('keydown', function(e) {
@@ -1836,6 +1885,42 @@ document.querySelectorAll('.badge-clickable').forEach(badge => {
         }
     });
 });
+
+// Profile Badges Accordion
+(function() {
+    const accordions = document.querySelectorAll('.badges-accordion');
+
+    accordions.forEach(accordion => {
+        const header = accordion.querySelector('.badges-accordion-header');
+        if (!header) return;
+
+        // Start collapsed on all screen sizes
+        accordion.classList.remove('open');
+        header.setAttribute('aria-expanded', 'false');
+
+        // Toggle on click
+        header.addEventListener('click', function(e) {
+            e.preventDefault();
+            const isOpen = accordion.classList.contains('open');
+
+            if (isOpen) {
+                accordion.classList.remove('open');
+                header.setAttribute('aria-expanded', 'false');
+            } else {
+                accordion.classList.add('open');
+                header.setAttribute('aria-expanded', 'true');
+            }
+        });
+
+        // Keyboard accessibility
+        header.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                header.click();
+            }
+        });
+    });
+})();
 </script>
 </main>
 

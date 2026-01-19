@@ -1163,6 +1163,287 @@ h2.profile-display-name {
 }
 
 /* ============================================
+   PROFILE BADGES ACCORDION WITH PREVIEW
+   ============================================ */
+
+/* Accordion wrapper for badges section */
+.badges-section.badges-accordion {
+    margin-top: 24px;
+}
+
+/* Accordion Header */
+.badges-accordion-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    padding: 0;
+    margin: 0 0 16px 0;
+    background: none;
+    border: none;
+    cursor: pointer;
+    text-align: left;
+}
+
+.badges-accordion-header:hover {
+    opacity: 0.85;
+}
+
+.badges-accordion-header h3 {
+    margin: 0;
+    font-size: 1.15rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #1f2937;
+}
+
+[data-theme="dark"] .badges-accordion-header h3 {
+    color: #f1f5f9;
+}
+
+/* Preview badges shown when collapsed */
+.badges-preview {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-left: auto;
+    margin-right: 12px;
+}
+
+.badge-preview-pill {
+    width: 36px;
+    height: 36px;
+    background: rgba(168, 85, 247, 0.1);
+    border: 1px solid rgba(168, 85, 247, 0.25);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.1rem;
+}
+
+.badges-section.featured .badge-preview-pill {
+    background: rgba(245, 158, 11, 0.1);
+    border-color: rgba(245, 158, 11, 0.25);
+}
+
+.badge-preview-count {
+    width: 36px;
+    height: 36px;
+    background: rgba(99, 102, 241, 0.1);
+    border: 1px solid rgba(99, 102, 241, 0.2);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: #6366f1;
+}
+
+/* Toggle chevron */
+.badges-accordion-toggle {
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    background: rgba(99, 102, 241, 0.1);
+    color: #6366f1;
+    transition: all 0.3s ease;
+    flex-shrink: 0;
+}
+
+.badges-accordion-toggle i {
+    transition: transform 0.3s ease;
+}
+
+.badges-accordion.open .badges-accordion-toggle i {
+    transform: rotate(180deg);
+}
+
+/* Collapsible content */
+.badges-accordion-content {
+    display: grid;
+    grid-template-rows: 0fr;
+    opacity: 0;
+    transition: grid-template-rows 0.3s ease, opacity 0.3s ease;
+}
+
+.badges-accordion-content > * {
+    overflow: hidden;
+}
+
+.badges-accordion.open .badges-accordion-content {
+    grid-template-rows: 1fr;
+    opacity: 1;
+}
+
+/* Reduced motion preference */
+@media (prefers-reduced-motion: reduce) {
+    .badges-accordion-content {
+        transition: none;
+    }
+}
+
+/* Hide preview when open */
+.badges-accordion.open .badges-preview {
+    display: none;
+}
+
+/* Desktop: larger preview pills */
+@media (min-width: 769px) {
+    .badge-preview-pill {
+        width: 40px;
+        height: 40px;
+        font-size: 1.2rem;
+    }
+
+    .badge-preview-count {
+        width: 40px;
+        height: 40px;
+        font-size: 0.75rem;
+    }
+}
+
+/* Mobile: start collapsed, compact layout */
+@media (max-width: 768px) {
+    .badges-section.badges-accordion {
+        margin-top: 16px;
+    }
+
+    .badges-accordion-header {
+        margin-bottom: 0;
+        padding: 8px 0;
+    }
+
+    .badges-accordion-header h3 {
+        font-size: 1rem;
+    }
+
+    .badge-preview-pill {
+        width: 30px;
+        height: 30px;
+        font-size: 0.95rem;
+        border-radius: 8px;
+    }
+
+    .badge-preview-count {
+        width: 30px;
+        height: 30px;
+        font-size: 0.65rem;
+        border-radius: 8px;
+    }
+
+    .badges-accordion-toggle {
+        width: 28px;
+        height: 28px;
+    }
+
+    /* Compact badge grid when open */
+    .badges-accordion.open .badges-grid {
+        gap: 8px;
+    }
+
+    .badges-accordion.open .featured-badge {
+        padding: 10px 14px;
+        border-radius: 10px;
+    }
+
+    .badges-accordion.open .featured-badge .badge-icon {
+        font-size: 1.6rem;
+    }
+
+    .badges-accordion.open .featured-badge .badge-name {
+        font-size: 0.75rem;
+    }
+
+    .badges-accordion.open .glass-badge {
+        padding: 8px 12px;
+        border-radius: 10px;
+        gap: 6px;
+    }
+
+    .badges-accordion.open .glass-badge .badge-icon {
+        font-size: 1.1rem;
+    }
+
+    .badges-accordion.open .glass-badge .badge-name {
+        font-size: 0.8rem;
+    }
+
+    /* Padding for accordion content */
+    .badges-accordion.open .badges-accordion-content {
+        padding-top: 12px;
+    }
+}
+
+/* Extra small mobile */
+@media (max-width: 480px) {
+    .badges-preview {
+        gap: 4px;
+    }
+
+    .badge-preview-pill {
+        width: 26px;
+        height: 26px;
+        font-size: 0.85rem;
+    }
+
+    .badge-preview-count {
+        width: 26px;
+        height: 26px;
+        font-size: 0.6rem;
+    }
+
+    /* Even more compact badges */
+    .badges-accordion.open .featured-badge {
+        padding: 8px 10px;
+    }
+
+    .badges-accordion.open .featured-badge .badge-icon {
+        font-size: 1.4rem;
+    }
+
+    .badges-accordion.open .glass-badge {
+        padding: 6px 10px;
+    }
+
+    .badges-accordion.open .glass-badge .badge-icon {
+        font-size: 1rem;
+    }
+
+    .badges-accordion.open .glass-badge .badge-name {
+        font-size: 0.75rem;
+    }
+}
+
+/* Dark theme */
+[data-theme="dark"] .badge-preview-pill {
+    background: rgba(168, 85, 247, 0.15);
+    border-color: rgba(168, 85, 247, 0.3);
+}
+
+[data-theme="dark"] .badges-section.featured .badge-preview-pill {
+    background: rgba(245, 158, 11, 0.15);
+    border-color: rgba(245, 158, 11, 0.3);
+}
+
+[data-theme="dark"] .badge-preview-count {
+    background: rgba(99, 102, 241, 0.15);
+    border-color: rgba(99, 102, 241, 0.3);
+    color: #a5b4fc;
+}
+
+[data-theme="dark"] .badges-accordion-toggle {
+    background: rgba(99, 102, 241, 0.15);
+    color: #a5b4fc;
+}
+
+/* ============================================
    ICON COLORS
    ============================================ */
 .glass-info-badge i.fa-location-dot {
