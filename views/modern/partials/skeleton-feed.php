@@ -27,66 +27,6 @@
     <?php endfor; ?>
 </div>
 
-<style>
-.skeleton-feed-container {
-    display: flex;
-    flex-direction: column;
-    gap: 1.5rem;
-    padding: 1rem 0;
-    animation: fadeInUp 0.5s cubic-bezier(0.4, 0.0, 0.2, 1);
-}
-
-.skeleton-feed-card {
-    background: rgba(255, 255, 255, 0.05);
-    backdrop-filter: blur(10px);
-    border: 1px solid rgba(99, 102, 241, 0.1);
-    border-radius: 16px;
-    padding: 1.5rem;
-    animation: fadeInUp 0.4s cubic-bezier(0.4, 0.0, 0.2, 1) backwards;
-}
-
-.skeleton-feed-header {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    margin-bottom: 1rem;
-}
-
-.skeleton-feed-author {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-}
-
-.skeleton-feed-content {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    margin-bottom: 12px;
-}
-
-.skeleton-feed-actions {
-    display: flex;
-    gap: 1rem;
-    margin-top: 1rem;
-    padding-top: 1rem;
-    border-top: 1px solid rgba(99, 102, 241, 0.1);
-}
-
-/* Hide skeleton when content loads */
-.skeleton-feed-container.hidden {
-    animation: fadeOut 0.3s cubic-bezier(0.4, 0.0, 0.2, 1) forwards;
-}
-
-@keyframes fadeOut {
-    to {
-        opacity: 0;
-        transform: translateY(-10px);
-    }
-}
-</style>
-
 <script>
 // Auto-hide skeleton when real content loads
 document.addEventListener('DOMContentLoaded', function() {

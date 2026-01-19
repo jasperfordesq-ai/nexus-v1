@@ -168,7 +168,12 @@ RewriteCond %{REQUEST_URI} download\.php [NC,OR]
 RewriteCond %{REQUEST_URI} emergency- [NC]
 RewriteRule ^ - [L]
 
-# 3.5. API Routes - Route directly to index.php without redirects
+# 3.5. Pass Authorization header to PHP (Apache often strips it)
+# This is CRITICAL for Bearer token authentication in mobile apps
+RewriteCond %{HTTP:Authorization} ^(.*)
+RewriteRule .* - [e=HTTP_AUTHORIZATION:%1]
+
+# 3.6. API Routes - Route directly to index.php without redirects
 # CRITICAL: Must preserve POST method and prevent 301 redirects
 RewriteCond %{REQUEST_URI} ^/api/ [NC]
 RewriteRule ^ index.php [QSA,L]

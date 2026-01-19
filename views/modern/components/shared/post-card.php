@@ -170,37 +170,4 @@ if ($currentUserId) {
     <?php endif; ?>
 </article>
 
-<style>
-.post-card {
-    padding: 20px;
-    margin-bottom: 20px;
-}
-
-.post-action-btn:hover {
-    background: rgba(99, 102, 241, 0.1);
-    color: #6366f1;
-}
-
-.post-action-btn.like-btn.active {
-    color: #ef4444;
-}
-
-.post-action-btn.like-btn:hover {
-    color: #ef4444;
-}
-
-.post-delete-btn:hover {
-    background: rgba(239, 68, 68, 0.1);
-    color: #ef4444;
-}
-
-@media (max-width: 600px) {
-    .post-card {
-        padding: 16px;
-    }
-
-    .post-action-btn span:not(.like-count) {
-        display: none;
-    }
-}
-</style>
+<!-- Post Card CSS now loaded via header.php: post-card.min.css -->

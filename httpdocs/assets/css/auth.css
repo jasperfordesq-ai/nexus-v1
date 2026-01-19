@@ -1,0 +1,656 @@
+/**
+ * Authentication Pages CSS
+ * Consolidated from views/modern/auth/{login,register,reset_password}.php
+ * Created: 2026-01-19
+ *
+ * Prefix: auth- for authentication-specific classes
+ * Provides unified styling for login, register, and password reset pages
+ */
+
+/* ========================================
+   AUTH WRAPPER & CARD
+   ======================================== */
+
+.auth-wrapper {
+    width: 100%;
+    max-width: 450px;
+    margin: 0 auto;
+    padding: 0 15px;
+    box-sizing: border-box;
+}
+
+/* Register page needs wider card */
+.auth-wrapper.auth-wrapper-wide {
+    max-width: 600px;
+}
+
+.auth-card {
+    margin-top: 0;
+    position: relative;
+    z-index: 10;
+    background: white;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+.auth-card-body {
+    padding: 40px;
+}
+
+/* Desktop spacing for no-hero layout */
+@media (min-width: 601px) {
+    .auth-wrapper {
+        padding-top: 140px;
+    }
+}
+
+@media (max-width: 600px) {
+    .auth-wrapper {
+        padding-top: 120px;
+        padding-left: 10px;
+        padding-right: 10px;
+    }
+
+    .auth-card-body {
+        padding: 25px !important;
+    }
+}
+
+/* ========================================
+   AUTH HEADINGS & MESSAGES
+   ======================================== */
+
+.auth-heading {
+    margin-top: 0;
+    margin-bottom: 25px;
+    font-weight: 800;
+    color: #0f172a;
+    text-align: center;
+}
+
+.auth-intro-text {
+    text-align: center;
+    margin-bottom: 25px;
+    color: var(--htb-text-main, #1f2937);
+}
+
+.auth-message {
+    padding: 12px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    text-align: center;
+    font-size: 0.9rem;
+}
+
+.auth-message-success {
+    background: #f0fdf4;
+    color: #15803d;
+    font-weight: 600;
+    border: 1px solid #bbf7d0;
+}
+
+.auth-message-error {
+    background: #fef2f2;
+    color: #b91c1c;
+    border: 1px solid #fecaca;
+}
+
+/* ========================================
+   FORM ELEMENTS
+   ======================================== */
+
+.form-row {
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
+}
+
+.form-group {
+    margin-bottom: 20px;
+    width: 100%;
+}
+
+.flex-1 {
+    flex: 1;
+    min-width: 240px;
+}
+
+.form-label {
+    display: block;
+    font-weight: 700;
+    margin-bottom: 8px;
+    color: var(--htb-text-main, #1f2937);
+    font-size: 1rem;
+}
+
+.form-input {
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+    padding: 12px;
+    border: 2px solid #e5e7eb;
+    border-radius: 8px;
+    font-size: 1rem;
+    transition: border-color 0.2s;
+}
+
+.form-input:focus {
+    outline: none;
+    border-color: #4f46e5 !important;
+}
+
+.form-note {
+    font-size: 0.8rem;
+    color: #6b7280;
+    margin-top: 6px;
+}
+
+/* Password field row with forgot link */
+.form-label-row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 8px;
+}
+
+.form-label-row .form-label {
+    margin-bottom: 0;
+}
+
+.forgot-password-link {
+    font-size: 0.85rem;
+    color: #4f46e5;
+    text-decoration: none;
+}
+
+.forgot-password-link:hover {
+    text-decoration: underline;
+}
+
+/* ========================================
+   PASSWORD STRENGTH
+   ======================================== */
+
+.password-rules {
+    margin-top: 12px;
+    font-size: 0.85rem;
+    color: #6b7280;
+    background: #f9fafb;
+    padding: 12px;
+    border-radius: 6px;
+}
+
+.rules-title {
+    font-weight: 700;
+    margin-bottom: 6px;
+}
+
+.password-match-status {
+    margin-top: 8px;
+    font-size: 0.85rem;
+}
+
+/* ========================================
+   AUTH BUTTONS
+   ======================================== */
+
+.auth-submit-btn {
+    width: 100%;
+    font-size: 1.05rem;
+    padding: 14px;
+    background: linear-gradient(135deg, #4f46e5, #7c3aed);
+    border: none;
+    color: white;
+    font-weight: 700;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: opacity 0.2s;
+}
+
+.auth-submit-btn:hover {
+    opacity: 0.95;
+}
+
+.auth-submit-btn:disabled,
+.auth-submit-btn.disabled {
+    opacity: 0.5;
+    pointer-events: none;
+    cursor: not-allowed;
+}
+
+/* Register button variant */
+.auth-submit-btn.auth-submit-btn-create {
+    background: var(--htb-gradient-create, linear-gradient(135deg, #6366f1 0%, #a855f7 100%));
+}
+
+/* ========================================
+   BIOMETRIC LOGIN
+   ======================================== */
+
+.biometric-login-container {
+    margin-bottom: 25px;
+}
+
+.biometric-btn {
+    width: 100%;
+    padding: 14px;
+    background: linear-gradient(135deg, #6366f1, #8b5cf6);
+    color: white;
+    font-weight: 700;
+    border: none;
+    border-radius: 8px;
+    font-size: 1.05rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
+
+.biometric-divider {
+    text-align: center;
+    margin: 15px 0;
+    color: #94a3b8;
+    font-size: 0.9rem;
+}
+
+.biometric-promo {
+    margin-bottom: 20px;
+    padding: 14px 16px;
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.08), rgba(139, 92, 246, 0.08));
+    border-radius: 10px;
+    border: 1px solid rgba(99, 102, 241, 0.2);
+}
+
+.biometric-promo-inner {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.biometric-promo-icon {
+    width: 40px;
+    height: 40px;
+    background: linear-gradient(135deg, #6366f1, #8b5cf6);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.biometric-promo-text {
+    flex: 1;
+}
+
+.biometric-promo-title {
+    font-weight: 700;
+    font-size: 0.9rem;
+    color: #4f46e5;
+    margin-bottom: 2px;
+}
+
+.biometric-promo-subtitle {
+    font-size: 0.8rem;
+    color: #64748b;
+}
+
+.biometric-promo-badge {
+    background: rgba(99, 102, 241, 0.1);
+    color: #6366f1;
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
+/* ========================================
+   AUTH FOOTER LINKS
+   ======================================== */
+
+.auth-footer-link {
+    margin-top: 25px;
+    text-align: center;
+    font-size: 0.95rem;
+    color: #64748b;
+}
+
+.auth-footer-link a,
+.auth-login-link a {
+    color: #4f46e5;
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.auth-footer-link a:hover,
+.auth-login-link a:hover {
+    text-decoration: underline;
+}
+
+.auth-login-link {
+    margin-top: 25px;
+    text-align: center;
+    font-size: 0.95rem;
+    color: var(--htb-text-muted, #6b7280);
+}
+
+/* ========================================
+   GDPR & DATA NOTICE
+   ======================================== */
+
+.gdpr-consent-label {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    color: #374151;
+}
+
+.gdpr-consent-label input[type="checkbox"] {
+    margin-top: 4px;
+    transform: scale(1.2);
+}
+
+.gdpr-consent-label a {
+    color: #6366f1;
+    text-decoration: underline;
+}
+
+.data-protection-notice {
+    font-size: 0.8rem;
+    color: #6b7280;
+    line-height: 1.5;
+    margin-bottom: 20px;
+    background: #f9fafb;
+    padding: 15px;
+    border-radius: 8px;
+}
+
+.data-protection-notice p {
+    margin: 5px 0;
+}
+
+.data-protection-notice p:first-child {
+    margin-top: 0;
+    font-weight: bold;
+    color: #374151;
+}
+
+.data-protection-notice p:last-child {
+    margin-bottom: 0;
+}
+
+.data-protection-notice ul {
+    padding-left: 20px;
+    margin: 5px 0;
+}
+
+.data-protection-notice a {
+    color: #6366f1;
+    text-decoration: underline;
+}
+
+/* ========================================
+   MOBILE RESPONSIVENESS
+   ======================================== */
+
+@media (max-width: 600px) {
+    .form-row {
+        gap: 0;
+    }
+
+    .form-group {
+        margin-bottom: 15px;
+    }
+
+    .auth-card-body {
+        padding: 25px;
+    }
+}
+
+/* ========================================
+   DARK MODE
+   ======================================== */
+
+[data-theme="dark"] .auth-card {
+    background: rgba(30, 41, 59, 0.85);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+}
+
+/* Headings */
+[data-theme="dark"] .auth-heading {
+    color: #f1f5f9;
+}
+
+[data-theme="dark"] .auth-intro-text {
+    color: #e2e8f0;
+}
+
+/* Messages */
+[data-theme="dark"] .auth-message-success {
+    background: rgba(22, 163, 74, 0.15);
+    border-color: rgba(34, 197, 94, 0.3);
+    color: #4ade80;
+}
+
+[data-theme="dark"] .auth-message-error {
+    background: rgba(185, 28, 28, 0.15);
+    border-color: rgba(239, 68, 68, 0.3);
+    color: #f87171;
+}
+
+/* Biometric promo */
+[data-theme="dark"] .biometric-promo {
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.15), rgba(139, 92, 246, 0.15));
+    border-color: rgba(99, 102, 241, 0.3);
+}
+
+[data-theme="dark"] .biometric-promo-title {
+    color: #a5b4fc;
+}
+
+[data-theme="dark"] .biometric-promo-subtitle {
+    color: #94a3b8;
+}
+
+[data-theme="dark"] .biometric-divider {
+    color: #64748b;
+}
+
+/* Form labels */
+[data-theme="dark"] .form-label {
+    color: #e2e8f0;
+}
+
+/* Form inputs */
+[data-theme="dark"] .form-input {
+    background: rgba(15, 23, 42, 0.6);
+    border-color: rgba(255, 255, 255, 0.15);
+    color: #f1f5f9;
+}
+
+[data-theme="dark"] .form-input::placeholder {
+    color: #64748b;
+}
+
+[data-theme="dark"] .form-input:focus {
+    border-color: #6366f1 !important;
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+}
+
+[data-theme="dark"] .form-note {
+    color: #94a3b8;
+}
+
+/* Password rules */
+[data-theme="dark"] .password-rules {
+    background: rgba(15, 23, 42, 0.6);
+    color: #94a3b8;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+[data-theme="dark"] .rules-title {
+    color: #e2e8f0;
+}
+
+/* Password match status */
+[data-theme="dark"] .password-match-status {
+    color: #94a3b8;
+}
+
+/* Forgot password link */
+[data-theme="dark"] .forgot-password-link {
+    color: #818cf8;
+}
+
+/* Footer links */
+[data-theme="dark"] .auth-footer-link,
+[data-theme="dark"] .auth-login-link {
+    color: #94a3b8;
+}
+
+[data-theme="dark"] .auth-footer-link a,
+[data-theme="dark"] .auth-login-link a {
+    color: #818cf8;
+}
+
+/* GDPR */
+[data-theme="dark"] .gdpr-consent-label {
+    color: #e2e8f0;
+}
+
+/* Data protection notice */
+[data-theme="dark"] .data-protection-notice {
+    background: rgba(15, 23, 42, 0.6);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+[data-theme="dark"] .data-protection-notice p:first-child {
+    color: #e2e8f0;
+}
+
+[data-theme="dark"] .data-protection-notice p,
+[data-theme="dark"] .data-protection-notice li {
+    color: #94a3b8;
+}
+
+/* Select dropdown */
+[data-theme="dark"] select.form-input {
+    background: rgba(15, 23, 42, 0.6);
+    color: #f1f5f9;
+}
+
+[data-theme="dark"] select.form-input option {
+    background: #1e293b;
+    color: #f1f5f9;
+}
+
+/* ========================================
+   LEGACY INLINE STYLE DARK MODE OVERRIDES
+   (For backwards compatibility during transition)
+   ======================================== */
+
+/* Sign In heading - inline style override */
+[data-theme="dark"] .auth-card h2[style*="color:#0f172a"] {
+    color: #f1f5f9 !important;
+}
+
+/* Success message - inline style override */
+[data-theme="dark"] .auth-card div[style*="background:#f0fdf4"] {
+    background: rgba(22, 163, 74, 0.15) !important;
+    border-color: rgba(34, 197, 94, 0.3) !important;
+    color: #4ade80 !important;
+}
+
+/* Error message - inline style override */
+[data-theme="dark"] .auth-card div[style*="background:#fef2f2"] {
+    background: rgba(185, 28, 28, 0.15) !important;
+    border-color: rgba(239, 68, 68, 0.3) !important;
+    color: #f87171 !important;
+}
+
+/* Biometric promo box - inline style override */
+[data-theme="dark"] #biometric-promo {
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.15), rgba(139, 92, 246, 0.15)) !important;
+    border-color: rgba(99, 102, 241, 0.3) !important;
+}
+
+[data-theme="dark"] #biometric-promo div[style*="color:#4f46e5"] {
+    color: #a5b4fc !important;
+}
+
+[data-theme="dark"] #biometric-promo div[style*="color:#64748b"] {
+    color: #94a3b8 !important;
+}
+
+/* Divider text ("or") - inline style override */
+[data-theme="dark"] #biometric-login-container div[style*="color:#94a3b8"] {
+    color: #64748b !important;
+}
+
+/* Form labels - inline style override */
+[data-theme="dark"] .auth-card label[style*="color:#334155"] {
+    color: #e2e8f0 !important;
+}
+
+/* Form inputs - inline style override */
+[data-theme="dark"] .auth-card input[type="email"],
+[data-theme="dark"] .auth-card input[type="password"],
+[data-theme="dark"] .auth-card input[type="text"],
+[data-theme="dark"] .auth-card input[type="tel"] {
+    background: rgba(15, 23, 42, 0.6) !important;
+    border-color: rgba(255, 255, 255, 0.15) !important;
+    color: #f1f5f9 !important;
+}
+
+[data-theme="dark"] .auth-card input::placeholder {
+    color: #64748b !important;
+}
+
+[data-theme="dark"] .auth-card input:focus {
+    border-color: #6366f1 !important;
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+}
+
+/* Links - inline style override */
+[data-theme="dark"] .auth-card a[style*="color:#4f46e5"] {
+    color: #818cf8 !important;
+}
+
+/* Bottom text - inline style override */
+[data-theme="dark"] .auth-card div[style*="color:#64748b"] {
+    color: #94a3b8 !important;
+}
+
+[data-theme="dark"] .auth-card div[style*="color:#64748b"] a {
+    color: #818cf8 !important;
+}
+
+/* Intro text - inline style override */
+[data-theme="dark"] .auth-card-body div[style*="color: var(--htb-text-main)"] {
+    color: #e2e8f0 !important;
+}
+
+/* GDPR consent label - inline style override */
+[data-theme="dark"] label[style*="color: #374151"] {
+    color: #e2e8f0 !important;
+}
+
+/* Data Protection Notice Box - inline style override */
+[data-theme="dark"] div[style*="background: #f9fafb"][style*="border-radius: 8px"] {
+    background: rgba(15, 23, 42, 0.6) !important;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+[data-theme="dark"] div[style*="background: #f9fafb"] p[style*="color: #374151"] {
+    color: #e2e8f0 !important;
+}
+
+[data-theme="dark"] div[style*="background: #f9fafb"] p,
+[data-theme="dark"] div[style*="background: #f9fafb"] li {
+    color: #94a3b8 !important;
+}

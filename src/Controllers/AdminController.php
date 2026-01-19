@@ -975,6 +975,121 @@ class AdminController
         }
     }
 
+    /**
+     * Regenerate all minified CSS files (AJAX endpoint)
+     */
+    public function regenerateMinifiedCSS()
+    {
+        $this->checkAdmin();
+
+        // Only Super Admins can run this
+        if (empty($_SESSION['is_super_admin'])) {
+            header('Content-Type: application/json');
+            echo json_encode(['success' => false, 'message' => 'Super Admin access required']);
+            return;
+        }
+
+        header('Content-Type: application/json');
+
+        try {
+            $cssDir = ROOT_DIR . '/httpdocs/assets/css';
+            $results = [];
+            $errors = [];
+
+            // Get all CSS files (excluding already minified ones)
+            $cssFiles = glob($cssDir . '/*.css');
+
+            foreach ($cssFiles as $file) {
+                $filename = basename($file);
+
+                // Skip already minified files
+                if (strpos($filename, '.min.css') !== false) {
+                    continue;
+                }
+
+                // Skip purged directory files
+                if (strpos($file, '/purged/') !== false) {
+                    continue;
+                }
+
+                $minFile = str_replace('.css', '.min.css', $file);
+                $content = file_get_contents($file);
+
+                if ($content === false) {
+                    $errors[] = "Could not read: $filename";
+                    continue;
+                }
+
+                // Minify CSS
+                $minified = $this->minifyCSS($content);
+
+                // Write minified file
+                if (file_put_contents($minFile, $minified) !== false) {
+                    $originalSize = strlen($content);
+                    $minifiedSize = strlen($minified);
+                    $savings = $originalSize > 0 ? round((1 - $minifiedSize / $originalSize) * 100, 1) : 0;
+                    $results[] = [
+                        'file' => $filename,
+                        'original' => $this->formatBytes($originalSize),
+                        'minified' => $this->formatBytes($minifiedSize),
+                        'savings' => $savings . '%'
+                    ];
+                } else {
+                    $errors[] = "Could not write: " . basename($minFile);
+                }
+            }
+
+            echo json_encode([
+                'success' => true,
+                'message' => 'Regenerated ' . count($results) . ' CSS files',
+                'files' => $results,
+                'errors' => $errors
+            ]);
+
+        } catch (\Exception $e) {
+            echo json_encode(['success' => false, 'message' => 'Error: ' . $e->getMessage()]);
+        }
+    }
+
+    /**
+     * Minify CSS content
+     */
+    private function minifyCSS($css)
+    {
+        // Remove comments
+        $css = preg_replace('!/\*[^*]*\*+([^/][^*]*\*+)*/!', '', $css);
+
+        // Remove whitespace
+        $css = str_replace(["\r\n", "\r", "\n", "\t"], '', $css);
+
+        // Remove extra spaces
+        $css = preg_replace('/\s+/', ' ', $css);
+
+        // Remove spaces around special characters
+        $css = preg_replace('/\s*([{}:;,>+~])\s*/', '$1', $css);
+
+        // Remove trailing semicolons before closing braces
+        $css = str_replace(';}', '}', $css);
+
+        // Remove leading zeros from decimals
+        $css = preg_replace('/(:|\s)0\.(\d+)/', '$1.$2', $css);
+
+        return trim($css);
+    }
+
+    /**
+     * Format bytes to human readable
+     */
+    private function formatBytes($bytes, $precision = 1)
+    {
+        $units = ['B', 'KB', 'MB', 'GB'];
+        $bytes = max($bytes, 0);
+        $pow = floor(($bytes ? log($bytes) : 0) / log(1024));
+        $pow = min($pow, count($units) - 1);
+        $bytes /= pow(1024, $pow);
+        return round($bytes, $precision) . ' ' . $units[$pow];
+    }
+
     // =============================================
     // NATIVE APP MANAGEMENT
     // =============================================

@@ -12,6 +12,7 @@ $isLoggedIn = !empty($_SESSION['user_id']);
 $userId = $_SESSION['user_id'] ?? 0;
 $tenantId = class_exists('\Nexus\Core\TenantContext') ? \Nexus\Core\TenantContext::get()['id'] : ($_SESSION['current_tenant_id'] ?? 1);
 
+
 // ---------------------------------------------------------
 // 1b. FEED FILTER PARAMETERS (From UniversalFeedFilter)
 // ---------------------------------------------------------
@@ -1283,6 +1284,7 @@ require __DIR__ . '/../layouts/modern/header.php';
 </div>
 
 <!-- Pull to Refresh removed -->
+
 
 <!-- Main content wrapper (main tag opened in header.php) -->
 <div class="htb-container htb-container-full home-feed-wrapper">

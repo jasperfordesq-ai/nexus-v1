@@ -5,7 +5,7 @@
 $layout = \Nexus\Services\LayoutHelper::get(); // Get current layout
 
 // 1. Header Selection
-else ($layout === 'civicone') {
+if ($layout === 'civicone') {
     require __DIR__ . '/../../layouts/civicone/header.php';
     echo '<div class="civicone-wrapper" style="padding-top: 40px;">';
 } else {
@@ -126,168 +126,11 @@ else ($layout === 'civicone') {
     </div>
 </div>
 
-<style>
-    /* Scoped Refactor Styles */
-    .auth-wrapper {
-        width: 100%;
-        max-width: 500px;
-        margin: 0 auto;
-        padding: 0 15px;
-        box-sizing: border-box;
-    }
-
-    .auth-card {
-        margin-top: 0;
-        position: relative;
-        z-index: 10;
-        background: white;
-        border-radius: 12px;
-        overflow: hidden;
-        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-    }
-
-    .auth-card-body {
-        padding: 50px;
-    }
-
-    /* Desktop spacing for no-hero layout */
-    @media (min-width: 601px) {
-        .auth-wrapper {
-            padding-top: 140px;
-        }
-    }
-
-    .form-group {
-        margin-bottom: 20px;
-        width: 100%;
-    }
-
-    .form-label {
-        display: block;
-        font-weight: 700;
-        margin-bottom: 8px;
-        color: var(--htb-text-main, #1f2937);
-        font-size: 1rem;
-    }
-
-    .form-input {
-        width: 100%;
-        max-width: 100%;
-        box-sizing: border-box;
-        padding: 12px;
-        border: 2px solid #e5e7eb;
-        border-radius: 8px;
-        font-size: 1rem;
-        transition: border-color 0.2s;
-    }
-
-    .form-input:focus {
-        outline: none;
-        border-color: #4f46e5 !important;
-    }
-
-    .password-rules {
-        margin-top: 12px;
-        font-size: 0.85rem;
-        color: #6b7280;
-        background: #f9fafb;
-        padding: 12px;
-        border-radius: 6px;
-    }
-
-    .rules-title {
-        font-weight: 700;
-        margin-bottom: 6px;
-    }
-
-    .password-match-status {
-        margin-top: 8px;
-        font-size: 0.85rem;
-    }
-
-    .auth-submit-btn {
-        width: 100%;
-        font-size: 1.1rem;
-        padding: 14px;
-        background: var(--htb-gradient-brand, linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%));
-        border: none;
-        color: white;
-        border-radius: 8px;
-        margin-top: 10px;
-        opacity: 0.5;
-        pointer-events: none;
-        cursor: not-allowed;
-    }
-
-    /* Mobile Responsiveness */
-    @media (max-width: 600px) {
-        .auth-wrapper {
-            padding-top: 120px;
-            padding-left: 10px;
-            padding-right: 10px;
-        }
-
-        .auth-card-body {
-            padding: 25px !important;
-        }
-    }
-
-    /* Reset negative margin for Social/Civic layouts */
-    
-
-    /* ========================================
-       DARK MODE FOR RESET PASSWORD
-       ======================================== */
-
-    [data-theme="dark"] .auth-card {
-        background: rgba(30, 41, 59, 0.85);
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
-    }
-
-    [data-theme="dark"] .auth-card-body div[style*="color: var(--htb-text-main)"] {
-        color: #e2e8f0 !important;
-    }
-
-    [data-theme="dark"] .form-label {
-        color: #e2e8f0;
-    }
-
-    [data-theme="dark"] .form-input {
-        background: rgba(15, 23, 42, 0.6);
-        border-color: rgba(255, 255, 255, 0.15);
-        color: #f1f5f9;
-    }
-
-    [data-theme="dark"] .form-input::placeholder {
-        color: #64748b;
-    }
-
-    [data-theme="dark"] .form-input:focus {
-        border-color: #6366f1 !important;
-        box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
-    }
-
-    /* Password Rules */
-    [data-theme="dark"] .password-rules {
-        background: rgba(15, 23, 42, 0.6);
-        color: #94a3b8;
-        border: 1px solid rgba(255, 255, 255, 0.1);
-    }
-
-    [data-theme="dark"] .rules-title {
-        color: #e2e8f0;
-    }
-
-    /* Password Match Status */
-    [data-theme="dark"] .password-match-status {
-        color: #94a3b8;
-    }
-</style>
+<!-- Auth CSS now loaded via header.php: auth.min.css -->
 
 <?php
 // Close Wrappers & Include Footer
-else ($layout === 'civicone') {
+if ($layout === 'civicone') {
     echo '</div>'; // Close civicone-wrapper
     require __DIR__ . '/../../layouts/civicone/footer.php';
 } else {

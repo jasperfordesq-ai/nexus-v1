@@ -220,8 +220,18 @@ $userId = $_SESSION['user_id'] ?? null;
             </a>
         </div>
 
-        <div class="mega-menu-divider"></div>
+    </div>
+</div>
 
+<!-- About Mega Menu -->
+<div class="mega-menu-wrapper">
+    <button class="mega-menu-trigger" aria-label="About Menu" aria-expanded="false">
+        <i class="fa-solid fa-circle-info"></i>
+        <span>About</span>
+        <span class="arrow">▾</span>
+    </button>
+
+    <div class="mega-menu-dropdown">
         <!-- About Section -->
         <div class="mega-menu-section">
             <div class="mega-menu-section-title">
@@ -231,7 +241,7 @@ $userId = $_SESSION['user_id'] ?? null;
 
             <?php if (\Nexus\Core\TenantContext::hasFeature('blog')): ?>
             <a href="<?= $basePath ?>/news" class="mega-menu-item">
-                <div class="mega-menu-item-icon" style="background: rgba(99, 102, 241, 0.18) !important; color: #6366f1 !important;">
+                <div class="mega-menu-item-icon" style="background: rgba(99, 102, 241, 0.18); color: #6366f1;">
                     <i class="fa-solid fa-newspaper"></i>
                 </div>
                 <div class="mega-menu-item-content">
@@ -245,7 +255,7 @@ $userId = $_SESSION['user_id'] ?? null;
             // Custom file-based pages with intelligent icon/color mapping
             $customPages = \Nexus\Core\TenantContext::getCustomPages('modern');
 
-            // Pages to exclude from mega menu
+            // Pages to exclude from About menu
             $excludedPages = [
                 'about',
                 'privacy',
@@ -253,12 +263,19 @@ $userId = $_SESSION['user_id'] ?? null;
                 'privacy policy',
                 'terms of service',
                 'terms and conditions',
-                'help',  // Already in Help & Support section
+                'help',
+                'contact',
+                'contact us',
+                'accessibility',
                 'how it works',
                 'mobile download',
+                // Impact pages handled separately
+                'impact summary',
+                'impact report',
+                'strategic plan',
             ];
 
-            // Custom display order (pages will appear in this order, unmapped pages appear after)
+            // Custom display order
             $pageOrder = [
                 'about us',
                 'our story',
@@ -270,17 +287,9 @@ $userId = $_SESSION['user_id'] ?? null;
                 'timebanking faqs',
                 'timebanking faq',
                 'faq',
-                'impact summary',
-                'impact report',
-                'strategic plan',
-                'contact us',
-                'contact',
-                'help',
-                'how it works',
-                'mobile download',
             ];
 
-            // Icon and color mapping for common page types
+            // Icon and color mapping
             $pageIconMap = [
                 'about us' => ['icon' => 'fa-solid fa-heart', 'color' => '#ec4899', 'desc' => 'Our story & mission'],
                 'our story' => ['icon' => 'fa-solid fa-heart', 'color' => '#ec4899', 'desc' => 'Learn about our journey'],
@@ -292,14 +301,6 @@ $userId = $_SESSION['user_id'] ?? null;
                 'faq' => ['icon' => 'fa-solid fa-circle-question', 'color' => '#06b6d4', 'desc' => 'Frequently asked questions'],
                 'timebanking faq' => ['icon' => 'fa-solid fa-circle-question', 'color' => '#06b6d4', 'desc' => 'Frequently asked questions'],
                 'timebanking faqs' => ['icon' => 'fa-solid fa-circle-question', 'color' => '#06b6d4', 'desc' => 'Frequently asked questions'],
-                'impact summary' => ['icon' => 'fa-solid fa-leaf', 'color' => '#059669', 'desc' => 'Our community impact'],
-                'impact report' => ['icon' => 'fa-solid fa-file-contract', 'color' => '#2563eb', 'desc' => 'Detailed impact data'],
-                'strategic plan' => ['icon' => 'fa-solid fa-route', 'color' => '#7c3aed', 'desc' => 'Our roadmap forward'],
-                'contact' => ['icon' => 'fa-solid fa-envelope', 'color' => '#3b82f6', 'desc' => 'Get in touch with us'],
-                'contact us' => ['icon' => 'fa-solid fa-envelope', 'color' => '#3b82f6', 'desc' => 'Get in touch with us'],
-                'help' => ['icon' => 'fa-solid fa-life-ring', 'color' => '#f97316', 'desc' => 'Get support & answers'],
-                'how it works' => ['icon' => 'fa-solid fa-circle-info', 'color' => '#3b82f6', 'desc' => 'Learn how to use timebanking'],
-                'mobile download' => ['icon' => 'fa-solid fa-mobile-screen-button', 'color' => '#6366f1', 'desc' => 'Download our mobile app'],
             ];
 
             // Sort pages according to custom order
@@ -308,44 +309,21 @@ $userId = $_SESSION['user_id'] ?? null;
                 $bName = strtolower($b['name']);
                 $aPos = array_search($aName, $pageOrder);
                 $bPos = array_search($bName, $pageOrder);
-
-                // If neither is in order array, maintain original order
                 if ($aPos === false && $bPos === false) return 0;
-                // If only a is in order array, it comes first
                 if ($aPos !== false && $bPos === false) return -1;
-                // If only b is in order array, it comes first
                 if ($aPos === false && $bPos !== false) return 1;
-                // Both in order array, sort by position
                 return $aPos - $bPos;
             });
 
-            $impactHeaderShown = false;
             foreach ($customPages as $page):
                 $pageName = strtolower($page['name']);
-
-                // Skip excluded pages
-                if (in_array($pageName, $excludedPages)) {
-                    continue;
-                }
-
-                // Show OUR IMPACT section header before Impact Summary
-                if (!$impactHeaderShown && in_array($pageName, ['impact summary', 'impact report', 'strategic plan'])) {
-                    $impactHeaderShown = true;
-                    ?>
-                    <div style="border-top: 1px solid rgba(226, 232, 240, 0.1); margin: 8px 0;"></div>
-                    <div style="padding: 8px 16px; font-size: 0.75rem; font-weight: 700; color: #9ca3af; text-transform: uppercase; letter-spacing: 0.5px;">
-                        <i class="fa-solid fa-chart-line" style="margin-right: 8px;"></i>OUR IMPACT
-                    </div>
-                    <?php
-                }
+                if (in_array($pageName, $excludedPages)) continue;
 
                 $pageData = $pageIconMap[$pageName] ?? [
                     'icon' => 'fa-solid fa-file-lines',
                     'color' => '#64748b',
                     'desc' => null
                 ];
-
-                // Convert hex color to rgba for background
                 $color = $pageData['color'];
                 $r = hexdec(substr($color, 1, 2));
                 $g = hexdec(substr($color, 3, 2));
@@ -353,7 +331,7 @@ $userId = $_SESSION['user_id'] ?? null;
                 $bgColor = "rgba($r, $g, $b, 0.15)";
             ?>
             <a href="<?= htmlspecialchars($page['url']) ?>" class="mega-menu-item">
-                <div class="mega-menu-item-icon" style="background: <?= $bgColor ?> !important; color: <?= $color ?> !important;">
+                <div class="mega-menu-item-icon" style="background: <?= $bgColor ?>; color: <?= $color ?>;">
                     <i class="<?= $pageData['icon'] ?>"></i>
                 </div>
                 <div class="mega-menu-item-content">
@@ -366,9 +344,55 @@ $userId = $_SESSION['user_id'] ?? null;
             <?php endforeach; ?>
         </div>
 
+        <?php
+        // Check if any impact pages exist
+        $impactPages = array_filter($customPages, function($p) {
+            return in_array(strtolower($p['name']), ['impact summary', 'impact report', 'strategic plan']);
+        });
+        if (!empty($impactPages)):
+        ?>
         <div class="mega-menu-divider"></div>
 
-        <!-- Help Section -->
+        <!-- Our Impact Section -->
+        <div class="mega-menu-section">
+            <div class="mega-menu-section-title">
+                <i class="fa-solid fa-chart-line"></i>
+                OUR IMPACT
+            </div>
+
+            <?php
+            $impactIconMap = [
+                'impact summary' => ['icon' => 'fa-solid fa-leaf', 'color' => '#059669', 'desc' => 'Our community impact'],
+                'impact report' => ['icon' => 'fa-solid fa-file-contract', 'color' => '#2563eb', 'desc' => 'Detailed impact data'],
+                'strategic plan' => ['icon' => 'fa-solid fa-route', 'color' => '#7c3aed', 'desc' => 'Our roadmap forward'],
+            ];
+            foreach ($impactPages as $page):
+                $pageName = strtolower($page['name']);
+                $pageData = $impactIconMap[$pageName] ?? ['icon' => 'fa-solid fa-file-lines', 'color' => '#64748b', 'desc' => null];
+                $color = $pageData['color'];
+                $r = hexdec(substr($color, 1, 2));
+                $g = hexdec(substr($color, 3, 2));
+                $b = hexdec(substr($color, 5, 2));
+                $bgColor = "rgba($r, $g, $b, 0.15)";
+            ?>
+            <a href="<?= htmlspecialchars($page['url']) ?>" class="mega-menu-item">
+                <div class="mega-menu-item-icon" style="background: <?= $bgColor ?>; color: <?= $color ?>;">
+                    <i class="<?= $pageData['icon'] ?>"></i>
+                </div>
+                <div class="mega-menu-item-content">
+                    <span class="mega-menu-item-label"><?= htmlspecialchars($page['name']) ?></span>
+                    <?php if (!empty($pageData['desc'])): ?>
+                    <span class="mega-menu-item-desc"><?= $pageData['desc'] ?></span>
+                    <?php endif; ?>
+                </div>
+            </a>
+            <?php endforeach; ?>
+        </div>
+        <?php endif; ?>
+
+        <div class="mega-menu-divider"></div>
+
+        <!-- Help & Support Section -->
         <div class="mega-menu-section">
             <div class="mega-menu-section-title">
                 <i class="fa-solid fa-life-ring"></i>
@@ -376,12 +400,32 @@ $userId = $_SESSION['user_id'] ?? null;
             </div>
 
             <a href="<?= $basePath ?>/help" class="mega-menu-item">
-                <div class="mega-menu-item-icon" style="background: rgba(249, 115, 22, 0.2) !important; color: #f97316 !important;">
+                <div class="mega-menu-item-icon" style="background: rgba(249, 115, 22, 0.2); color: #f97316;">
                     <i class="fa-solid fa-circle-question"></i>
                 </div>
                 <div class="mega-menu-item-content">
                     <span class="mega-menu-item-label">Help Center</span>
                     <span class="mega-menu-item-desc">Get support & answers</span>
+                </div>
+            </a>
+
+            <a href="<?= $basePath ?>/contact" class="mega-menu-item">
+                <div class="mega-menu-item-icon" style="background: rgba(59, 130, 246, 0.2); color: #3b82f6;">
+                    <i class="fa-solid fa-envelope"></i>
+                </div>
+                <div class="mega-menu-item-content">
+                    <span class="mega-menu-item-label">Contact Us</span>
+                    <span class="mega-menu-item-desc">Get in touch with us</span>
+                </div>
+            </a>
+
+            <a href="<?= $basePath ?>/accessibility" class="mega-menu-item">
+                <div class="mega-menu-item-icon" style="background: rgba(16, 185, 129, 0.2); color: #10b981;">
+                    <i class="fa-solid fa-universal-access"></i>
+                </div>
+                <div class="mega-menu-item-content">
+                    <span class="mega-menu-item-label">Accessibility</span>
+                    <span class="mega-menu-item-desc">Our accessibility commitment</span>
                 </div>
             </a>
         </div>

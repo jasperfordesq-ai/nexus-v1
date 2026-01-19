@@ -398,6 +398,11 @@ $router->add('POST', '/api/auth/refresh-token', 'Nexus\Controllers\Api\AuthContr
 $router->add('POST', '/api/auth/validate-token', 'Nexus\Controllers\Api\AuthController@validateToken');
 $router->add('GET', '/api/auth/validate-token', 'Nexus\Controllers\Api\AuthController@validateToken');
 
+// Mobile App API (version checking, updates)
+$router->add('POST', '/api/app/check-version', 'Nexus\Controllers\Api\AppController@checkVersion');
+$router->add('GET', '/api/app/version', 'Nexus\Controllers\Api\AppController@version');
+$router->add('POST', '/api/app/log', 'Nexus\Controllers\Api\AppController@log');
+
 // Pusher Realtime API (WebSocket authentication)
 $router->add('POST', '/api/pusher/auth', 'Nexus\Controllers\Api\PusherAuthController@auth');
 $router->add('GET', '/api/pusher/config', 'Nexus\Controllers\Api\PusherAuthController@config');
@@ -1119,6 +1124,7 @@ $router->add('GET', '/admin/settings', 'Nexus\Controllers\AdminController@settin
 $router->add('POST', '/admin/settings/update', 'Nexus\Controllers\AdminController@saveSettings');
 $router->add('POST', '/admin/settings/save-tenant', 'Nexus\Controllers\AdminController@saveTenantSettings');
 $router->add('POST', '/admin/settings/test-gmail', 'Nexus\Controllers\AdminController@testGmailConnection');
+$router->add('POST', '/admin/settings/regenerate-css', 'Nexus\Controllers\AdminController@regenerateMinifiedCSS');
 
 // Image Optimization Settings
 $router->add('GET', '/admin/image-settings', 'Nexus\Controllers\AdminController@imageSettings');

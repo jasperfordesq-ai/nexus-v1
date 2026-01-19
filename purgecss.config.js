@@ -46,6 +46,26 @@ module.exports = {
         'httpdocs/assets/css/achievements.css',
         'httpdocs/assets/css/sidebar.css',
         'httpdocs/assets/css/nexus-score.css',
+        // Extracted from PHP files (2026-01-19)
+        'httpdocs/assets/css/nexus-modern-footer.css',
+        'httpdocs/assets/css/auth.css',
+        'httpdocs/assets/css/post-card.css',
+        'httpdocs/assets/css/feed-item.css',
+        'httpdocs/assets/css/feed-page.css',
+        'httpdocs/assets/css/profile-edit.css',
+        'httpdocs/assets/css/messages-index.css',
+        'httpdocs/assets/css/messages-thread.css',
+        'httpdocs/assets/css/notifications.css',
+        'httpdocs/assets/css/groups-show.css',
+        'httpdocs/assets/css/events-index.css',
+        'httpdocs/assets/css/events-calendar.css',
+        'httpdocs/assets/css/events-create.css',
+        'httpdocs/assets/css/events-show.css',
+        'httpdocs/assets/css/blog-index.css',
+        'httpdocs/assets/css/blog-show.css',
+        'httpdocs/assets/css/listings-index.css',
+        'httpdocs/assets/css/listings-show.css',
+        'httpdocs/assets/css/listings-create.css',
     ],
 
     // Output directory for purged CSS
@@ -250,6 +270,12 @@ module.exports = {
             /^message-/,
             /^post-/,
             /^create-/,
+
+            // Auth pages
+            /^auth-/,
+            /^biometric-/,
+            /^gdpr-/,
+            /^data-protection/,
 
             // Modern theme - effects
             /^gradient/,

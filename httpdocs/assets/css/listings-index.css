@@ -1,0 +1,1892 @@
+            /* ===================================
+           GLASSMORPHISM LISTINGS INDEX
+           ================================= */
+
+            /* Animated Gradient Background */
+            #listings-index-glass-wrapper::before {
+                content: '';
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                z-index: -1;
+                pointer-events: none;
+            }
+
+            [data-theme="light"] #listings-index-glass-wrapper::before {
+                background: linear-gradient(135deg,
+                        rgba(99, 102, 241, 0.08) 0%,
+                        rgba(139, 92, 246, 0.08) 25%,
+                        rgba(236, 72, 153, 0.08) 50%,
+                        rgba(59, 130, 246, 0.08) 75%,
+                        rgba(16, 185, 129, 0.08) 100%);
+                background-size: 400% 400%;
+                animation: gradientShift 15s ease infinite;
+            }
+
+            [data-theme="dark"] #listings-index-glass-wrapper::before {
+                background: radial-gradient(circle at 20% 30%,
+                        rgba(99, 102, 241, 0.15) 0%, transparent 50%),
+                    radial-gradient(circle at 80% 70%,
+                        rgba(236, 72, 153, 0.12) 0%, transparent 50%);
+            }
+
+            @keyframes gradientShift {
+
+                0%,
+                100% {
+                    background-position: 0% 50%;
+                }
+
+                50% {
+                    background-position: 100% 50%;
+                }
+            }
+
+            /* Glass Search Card - Light Mode */
+            #listings-index-glass-wrapper .glass-search-card {
+                margin-top: 30px !important;
+                position: relative;
+                z-index: 10;
+                padding: 25px;
+                border-radius: 20px;
+                background: linear-gradient(135deg,
+                        rgba(255, 255, 255, 0.75),
+                        rgba(255, 255, 255, 0.6));
+                backdrop-filter: blur(20px) saturate(120%);
+                -webkit-backdrop-filter: blur(20px) saturate(120%);
+                border: 1px solid rgba(255, 255, 255, 0.3);
+                box-shadow: 0 8px 32px rgba(31, 38, 135, 0.15),
+                    inset 0 0 0 1px rgba(255, 255, 255, 0.4);
+                transition: all 0.3s ease;
+            }
+
+            /* Dark Mode Search Card */
+            [data-theme="dark"] #listings-index-glass-wrapper .glass-search-card {
+                background: linear-gradient(135deg,
+                        rgba(15, 23, 42, 0.6),
+                        rgba(30, 41, 59, 0.5));
+                backdrop-filter: blur(24px) saturate(150%);
+                -webkit-backdrop-filter: blur(24px) saturate(150%);
+                border: 1px solid rgba(255, 255, 255, 0.15);
+                box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5),
+                    0 0 80px rgba(0, 200, 255, 0.1),
+                    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+            }
+
+            /* Glass Search Input - Light Mode */
+            #listings-index-glass-wrapper .glass-search-input {
+                width: 100%;
+                padding: 16px 20px 16px 50px;
+                border: 2px solid rgba(255, 255, 255, 0.4);
+                border-radius: 16px;
+                font-size: 1.05rem;
+                background: rgba(255, 255, 255, 0.6);
+                backdrop-filter: blur(10px);
+                -webkit-backdrop-filter: blur(10px);
+                box-shadow: 0 4px 12px rgba(31, 38, 135, 0.1),
+                    inset 0 1px 0 rgba(255, 255, 255, 0.6);
+                transition: all 0.3s ease;
+                box-sizing: border-box;
+                color: var(--htb-text-main);
+            }
+
+            #listings-index-glass-wrapper .glass-search-input:focus {
+                border-color: rgba(99, 102, 241, 0.6);
+                box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.15),
+                    0 8px 24px rgba(99, 102, 241, 0.2);
+                outline: none;
+                background: rgba(255, 255, 255, 0.8);
+            }
+
+            /* Dark Mode Search Input */
+            [data-theme="dark"] #listings-index-glass-wrapper .glass-search-input {
+                background: rgba(15, 23, 42, 0.7);
+                border: 2px solid rgba(255, 255, 255, 0.2);
+                color: #f8fafc;
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3),
+                    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+            }
+
+            [data-theme="dark"] #listings-index-glass-wrapper .glass-search-input::placeholder {
+                color: #cbd5e1;
+            }
+
+            [data-theme="dark"] #listings-index-glass-wrapper .glass-search-input:focus {
+                border-color: rgba(99, 102, 241, 0.5);
+                box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.2),
+                    0 8px 24px rgba(99, 102, 241, 0.3);
+                background: rgba(15, 23, 42, 0.85);
+            }
+
+            /* Glass Badges - Offers (Green) */
+            #listings-index-glass-wrapper .glass-badge-offer {
+                background: linear-gradient(135deg,
+                        rgba(236, 253, 245, 0.8),
+                        rgba(209, 250, 229, 0.7));
+                backdrop-filter: blur(10px);
+                -webkit-backdrop-filter: blur(10px);
+                color: #059669;
+                text-decoration: none;
+                padding: 6px 14px;
+                border-radius: 12px;
+                font-weight: 600;
+                font-size: 0.85rem;
+                border: 1px solid rgba(16, 185, 129, 0.3);
+                box-shadow: 0 2px 8px rgba(16, 185, 129, 0.15);
+                transition: all 0.3s ease;
+            }
+
+            #listings-index-glass-wrapper .glass-badge-offer:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 4px 16px rgba(16, 185, 129, 0.25),
+                    0 0 24px rgba(16, 185, 129, 0.2);
+                border-color: rgba(16, 185, 129, 0.5);
+            }
+
+            [data-theme="dark"] #listings-index-glass-wrapper .glass-badge-offer {
+                background: linear-gradient(135deg,
+                        rgba(16, 185, 129, 0.25),
+                        rgba(5, 150, 105, 0.2));
+                color: #6ee7b7;
+                border: 1px solid rgba(16, 185, 129, 0.4);
+                box-shadow: 0 2px 8px rgba(16, 185, 129, 0.2),
+                    0 0 16px rgba(16, 185, 129, 0.1);
+            }
+
+            [data-theme="dark"] #listings-index-glass-wrapper .glass-badge-offer:hover {
+                box-shadow: 0 4px 16px rgba(16, 185, 129, 0.35),
+                    0 0 32px rgba(16, 185, 129, 0.25);
+            }
+
+            /* Glass Badges - Requests (Orange) */
+            #listings-index-glass-wrapper .glass-badge-request {
+                background: linear-gradient(135deg,
+                        rgba(255, 247, 237, 0.8),
+                        rgba(255, 237, 213, 0.7));
+                backdrop-filter: blur(10px);
+                -webkit-backdrop-filter: blur(10px);
+                color: #ea580c;
+                text-decoration: none;
+                padding: 6px 14px;
+                border-radius: 12px;
+                font-weight: 600;
+                font-size: 0.85rem;
+                border: 1px solid rgba(249, 115, 22, 0.3);
+                box-shadow: 0 2px 8px rgba(249, 115, 22, 0.15);
+                transition: all 0.3s ease;
+            }
+
+            #listings-index-glass-wrapper .glass-badge-request:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 4px 16px rgba(249, 115, 22, 0.25),
+                    0 0 24px rgba(249, 115, 22, 0.2);
+                border-color: rgba(249, 115, 22, 0.5);
+            }
+
+            [data-theme="dark"] #listings-index-glass-wrapper .glass-badge-request {
+                background: linear-gradient(135deg,
+                        rgba(249, 115, 22, 0.25),
+                        rgba(234, 88, 12, 0.2));
+                color: #fdba74;
+                border: 1px solid rgba(249, 115, 22, 0.4);
+                box-shadow: 0 2px 8px rgba(249, 115, 22, 0.2),
+                    0 0 16px rgba(249, 115, 22, 0.1);
+            }
+
+            [data-theme="dark"] #listings-index-glass-wrapper .glass-badge-request:hover {
+                box-shadow: 0 4px 16px rgba(249, 115, 22, 0.35),
+                    0 0 32px rgba(249, 115, 22, 0.25);
+            }
+
+            /* Glass Badge - All (Blue/Purple) */
+            #listings-index-glass-wrapper .glass-badge-all {
+                background: linear-gradient(135deg,
+                        rgba(238, 242, 255, 0.8),
+                        rgba(224, 231, 255, 0.7));
+                backdrop-filter: blur(10px);
+                -webkit-backdrop-filter: blur(10px);
+                color: #6366f1;
+                text-decoration: none;
+                padding: 6px 14px;
+                border-radius: 12px;
+                font-weight: 600;
+                font-size: 0.85rem;
+                border: 1px solid rgba(99, 102, 241, 0.3);
+                box-shadow: 0 2px 8px rgba(99, 102, 241, 0.15);
+                transition: all 0.3s ease;
+            }
+
+            #listings-index-glass-wrapper .glass-badge-all:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 4px 16px rgba(99, 102, 241, 0.25);
+            }
+
+            [data-theme="dark"] #listings-index-glass-wrapper .glass-badge-all {
+                background: linear-gradient(135deg,
+                        rgba(99, 102, 241, 0.25),
+                        rgba(139, 92, 246, 0.2));
+                color: #a5b4fc;
+                border: 1px solid rgba(99, 102, 241, 0.4);
+            }
+
+            /* Active State for Filter Badges */
+            #listings-index-glass-wrapper .glass-badge-all.active,
+            #listings-index-glass-wrapper .glass-badge-offer.active,
+            #listings-index-glass-wrapper .glass-badge-request.active {
+                transform: scale(1.05);
+                box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+            }
+
+            #listings-index-glass-wrapper .glass-badge-all.active {
+                background: linear-gradient(135deg, #6366f1, #8b5cf6);
+                color: white;
+                border-color: #6366f1;
+            }
+
+            #listings-index-glass-wrapper .glass-badge-offer.active {
+                background: linear-gradient(135deg, #10b981, #059669);
+                color: white;
+                border-color: #10b981;
+            }
+
+            #listings-index-glass-wrapper .glass-badge-request.active {
+                background: linear-gradient(135deg, #f97316, #ea580c);
+                color: white;
+                border-color: #f97316;
+            }
+
+            /* Category Filter Chips */
+            #listings-index-glass-wrapper .category-filter-chip:hover {
+                transform: translateY(-1px);
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            }
+
+            /* Glass Listing Cards - Light Mode - MOBILE OPTIMIZED */
+            #listings-index-glass-wrapper .glass-listing-card {
+                position: relative;
+                display: block;
+                background: linear-gradient(135deg,
+                        rgba(255, 255, 255, 0.75),
+                        rgba(255, 255, 255, 0.6));
+                backdrop-filter: blur(20px) saturate(120%);
+                -webkit-backdrop-filter: blur(20px) saturate(120%);
+                border: 1px solid rgba(255, 255, 255, 0.3);
+                border-radius: 20px;
+                box-shadow: 0 8px 32px rgba(31, 38, 135, 0.12),
+                    inset 0 1px 0 rgba(255, 255, 255, 0.5);
+                transition: all 0.3s ease;
+                overflow: hidden;
+                text-decoration: none;
+                color: inherit;
+                -webkit-tap-highlight-color: transparent;
+                cursor: pointer;
+            }
+
+            #listings-index-glass-wrapper .glass-listing-card:hover {
+                transform: translateY(-8px);
+                box-shadow: 0 16px 48px rgba(31, 38, 135, 0.2),
+                    0 0 0 1px rgba(99, 102, 241, 0.2),
+                    inset 0 1px 0 rgba(255, 255, 255, 0.6);
+            }
+
+            #listings-index-glass-wrapper .glass-listing-card:active {
+                transform: scale(0.98);
+            }
+
+            /* Dark Mode Listing Cards */
+            [data-theme="dark"] #listings-index-glass-wrapper .glass-listing-card {
+                background: linear-gradient(135deg,
+                        rgba(15, 23, 42, 0.6),
+                        rgba(30, 41, 59, 0.5));
+                backdrop-filter: blur(24px) saturate(150%);
+                -webkit-backdrop-filter: blur(24px) saturate(150%);
+                border: 1px solid rgba(255, 255, 255, 0.15);
+                box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5),
+                    0 0 60px rgba(0, 200, 255, 0.08),
+                    inset 0 1px 0 rgba(255, 255, 255, 0.08);
+            }
+
+            [data-theme="dark"] #listings-index-glass-wrapper .glass-listing-card:hover {
+                transform: translateY(-8px);
+                box-shadow: 0 16px 48px rgba(0, 0, 0, 0.7),
+                    0 0 0 1px rgba(99, 102, 241, 0.25),
+                    0 0 80px rgba(236, 72, 153, 0.15),
+                    inset 0 1px 0 rgba(255, 255, 255, 0.12);
+            }
+
+            /* Card Body with proper touch targets */
+            #listings-index-glass-wrapper .glass-listing-card .htb-card-body {
+                padding: 20px;
+            }
+
+            /* Card Title - ensure proper sizing */
+            #listings-index-glass-wrapper .glass-listing-card .card-title {
+                font-size: 1.15rem;
+                font-weight: 700;
+                margin: 0 0 10px;
+                line-height: 1.4;
+                color: var(--htb-text-main);
+            }
+
+            /* Card Footer with author info */
+            #listings-index-glass-wrapper .glass-listing-card .card-footer {
+                border-top: 1px solid rgba(0, 0, 0, 0.06);
+                padding-top: 15px;
+                margin-top: 15px;
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+            }
+
+            #listings-index-glass-wrapper .glass-listing-card .card-author {
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                text-decoration: none;
+                color: inherit;
+                position: relative;
+                z-index: 2;
+            }
+
+            #listings-index-glass-wrapper .glass-listing-card .card-author img {
+                width: 36px;
+                height: 36px;
+                border-radius: 50%;
+                object-fit: cover;
+                border: 2px solid rgba(255, 255, 255, 0.8);
+            }
+
+            #listings-index-glass-wrapper .glass-listing-card .card-view-btn {
+                display: inline-flex;
+                align-items: center;
+                gap: 6px;
+                padding: 8px 16px;
+                background: linear-gradient(135deg, #6366f1, #8b5cf6);
+                color: white;
+                border-radius: 10px;
+                font-weight: 600;
+                font-size: 0.85rem;
+                text-decoration: none;
+            }
+
+            /* Glass Empty State */
+            #listings-index-glass-wrapper .glass-empty-state {
+                grid-column: 1/-1;
+                text-align: center;
+                padding: 60px;
+                background: linear-gradient(135deg,
+                        rgba(255, 255, 255, 0.7),
+                        rgba(255, 255, 255, 0.5));
+                backdrop-filter: blur(20px);
+                -webkit-backdrop-filter: blur(20px);
+                border: 1px solid rgba(255, 255, 255, 0.3);
+                border-radius: 20px;
+                box-shadow: 0 8px 32px rgba(31, 38, 135, 0.12);
+            }
+
+            [data-theme="dark"] #listings-index-glass-wrapper .glass-empty-state {
+                background: linear-gradient(135deg,
+                        rgba(15, 23, 42, 0.6),
+                        rgba(30, 41, 59, 0.5));
+                border: 1px solid rgba(255, 255, 255, 0.15);
+                box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+            }
+
+            /* Spinner Glass Container */
+            #listings-index-glass-wrapper .spinner {
+                width: 24px;
+                height: 24px;
+                border: 3px solid rgba(255, 255, 255, 0.3);
+                border-top-color: var(--htb-brand-blue);
+                border-radius: 50%;
+                animation: spin 0.8s linear infinite;
+            }
+
+            [data-theme="dark"] #listings-index-glass-wrapper .spinner {
+                border-color: rgba(255, 255, 255, 0.2);
+                border-top-color: #818cf8;
+            }
+
+            @keyframes spin {
+                to {
+                    transform: rotate(360deg);
+                }
+            }
+
+            /* Responsive Layout */
+            #listings-index-glass-wrapper .listings-filter-grid {
+                display: grid;
+                grid-template-columns: 1fr;
+                gap: 15px;
+                margin: 0;
+                align-items: center;
+            }
+
+            @media (min-width: 640px) {
+                #listings-index-glass-wrapper .listings-filter-grid {
+                    grid-template-columns: 1fr auto auto auto;
+                }
+            }
+
+            @media (min-width: 900px) {
+                #listings-index-glass-wrapper .glass-search-card {
+                    margin-top: 40px !important;
+                }
+            }
+
+            /* Mobile Performance Optimization */
+            @media (max-width: 900px) {
+
+                #listings-index-glass-wrapper .glass-search-card,
+                #listings-index-glass-wrapper .glass-listing-card {
+                    backdrop-filter: blur(12px) saturate(120%);
+                    -webkit-backdrop-filter: blur(12px) saturate(120%);
+                }
+            }
+
+            @media (max-width: 768px) {
+
+                /* Mobile grid - single column for easy tapping */
+                #listings-index-glass-wrapper #listings-grid {
+                    grid-template-columns: 1fr !important;
+                    gap: 16px !important;
+                    padding: 0 4px;
+                }
+
+                /* Card touch optimization */
+                #listings-index-glass-wrapper .glass-listing-card {
+                    border-radius: 16px;
+                    min-height: 120px;
+                }
+
+                #listings-index-glass-wrapper .glass-listing-card:hover {
+                    transform: none;
+                }
+
+                #listings-index-glass-wrapper .glass-listing-card:active {
+                    transform: scale(0.98);
+                    background: rgba(99, 102, 241, 0.05);
+                }
+
+                /* Smaller card header on mobile */
+                #listings-index-glass-wrapper .glass-listing-card .card-header-img {
+                    height: 140px !important;
+                }
+
+                #listings-index-glass-wrapper .glass-listing-card .htb-card-body {
+                    padding: 16px;
+                }
+
+                #listings-index-glass-wrapper .glass-listing-card .card-title {
+                    font-size: 1.1rem;
+                }
+
+                #listings-index-glass-wrapper .glass-listing-card .card-footer {
+                    padding-top: 12px;
+                    margin-top: 12px;
+                }
+
+                /* Larger touch target for view button */
+                #listings-index-glass-wrapper .glass-listing-card .card-view-btn {
+                    padding: 10px 18px;
+                    font-size: 0.9rem;
+                }
+
+                /* Container padding */
+                .htb-container-full {
+                    padding-bottom: 100px;
+                    max-width: 100vw;
+                    overflow-x: hidden;
+                }
+
+                #listings-index-glass-wrapper {
+                    padding-top: 0 !important;
+                    margin-top: 0 !important;
+                    max-width: 100%;
+                    overflow-x: hidden;
+                }
+            }
+
+            @media (max-width: 640px) {
+
+                #listings-index-glass-wrapper .glass-search-card,
+                #listings-index-glass-wrapper .glass-listing-card {
+                    backdrop-filter: blur(8px) saturate(110%);
+                    -webkit-backdrop-filter: blur(8px) saturate(110%);
+                }
+
+                #listings-index-glass-wrapper .glass-listing-card:hover {
+                    transform: none;
+                }
+
+                /* Even more compact on small screens */
+                #listings-index-glass-wrapper .glass-listing-card .card-header-img {
+                    height: 120px !important;
+                }
+
+                #listings-index-glass-wrapper .glass-listing-card .htb-card-body {
+                    padding: 14px;
+                }
+
+                #listings-index-glass-wrapper .glass-listing-card .card-title {
+                    font-size: 1rem;
+                }
+
+                #listings-index-glass-wrapper .glass-listing-card .card-desc {
+                    font-size: 0.9rem;
+                    -webkit-line-clamp: 2;
+                    display: -webkit-box;
+                    -webkit-box-orient: vertical;
+                    overflow: hidden;
+                }
+
+                #listings-index-glass-wrapper .glass-listing-card .card-author span {
+                    font-size: 0.85rem;
+                }
+            }
+
+            @media (max-width: 480px) {
+                #listings-index-glass-wrapper #listings-grid {
+                    gap: 12px !important;
+                }
+
+                #listings-index-glass-wrapper .glass-listing-card {
+                    border-radius: 14px;
+                }
+
+                #listings-index-glass-wrapper .glass-listing-card .htb-card-body {
+                    padding: 12px;
+                }
+            }
+
+            /* Fallback for unsupported browsers */
+            @supports not (backdrop-filter: blur(10px)) {
+
+                #listings-index-glass-wrapper .glass-search-card,
+                #listings-index-glass-wrapper .glass-listing-card {
+                    background: rgba(255, 255, 255, 0.95);
+                }
+
+                [data-theme="dark"] #listings-index-glass-wrapper .glass-search-card,
+                [data-theme="dark"] #listings-index-glass-wrapper .glass-listing-card {
+                    background: rgba(15, 23, 42, 0.95);
+                }
+            }
+
+            /* ===================================
+               HERO SECTION
+               ================================= */
+            .nexus-welcome-hero {
+                background: linear-gradient(135deg,
+                    rgba(16, 185, 129, 0.12) 0%,
+                    rgba(59, 130, 246, 0.12) 50%,
+                    rgba(139, 92, 246, 0.08) 100%);
+                backdrop-filter: blur(30px) saturate(150%);
+                -webkit-backdrop-filter: blur(30px) saturate(150%);
+                border: 2px solid rgba(255, 255, 255, 0.5);
+                border-radius: 20px;
+                padding: 28px 24px;
+                margin-bottom: 20px;
+                text-align: center;
+                box-shadow: 0 12px 40px rgba(16, 185, 129, 0.15),
+                            inset 0 2px 0 rgba(255, 255, 255, 0.6);
+            }
+
+            [data-theme="dark"] .nexus-welcome-hero {
+                background: linear-gradient(135deg,
+                    rgba(16, 185, 129, 0.20) 0%,
+                    rgba(59, 130, 246, 0.20) 50%,
+                    rgba(139, 92, 246, 0.15) 100%);
+                border: 2px solid rgba(255, 255, 255, 0.2);
+                box-shadow: 0 12px 40px rgba(16, 185, 129, 0.25),
+                            0 0 60px rgba(16, 185, 129, 0.15),
+                            inset 0 2px 0 rgba(255, 255, 255, 0.15);
+            }
+
+            .nexus-welcome-title {
+                font-size: 1.75rem;
+                font-weight: 800;
+                background: linear-gradient(90deg, #10b981, #3b82f6, #8b5cf6);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                background-clip: text;
+                margin: 0 0 8px 0;
+                line-height: 1.2;
+                filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
+            }
+
+            [data-theme="dark"] .nexus-welcome-title {
+                background: linear-gradient(90deg, #34d399, #60a5fa, #a78bfa);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                background-clip: text;
+            }
+
+            .nexus-welcome-subtitle {
+                font-size: 0.95rem;
+                color: #64748b;
+                margin: 0;
+                line-height: 1.5;
+                max-width: 500px;
+                margin-left: auto;
+                margin-right: auto;
+            }
+
+            [data-theme="dark"] .nexus-welcome-subtitle {
+                color: #cbd5e1;
+            }
+
+            /* ============================================
+           GOLD STANDARD - Native App Features
+           ============================================ */
+
+            /* Skeleton Loaders */
+            .listings-skeleton {
+                display: grid;
+                grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+                gap: 30px;
+                margin-top: 40px;
+            }
+
+            .skeleton-card {
+                background: linear-gradient(135deg, rgba(255, 255, 255, 0.7), rgba(255, 255, 255, 0.5));
+                backdrop-filter: blur(20px);
+                -webkit-backdrop-filter: blur(20px);
+                border: 1px solid rgba(255, 255, 255, 0.3);
+                border-radius: 20px;
+                overflow: hidden;
+            }
+
+            [data-theme="dark"] .skeleton-card {
+                background: linear-gradient(135deg, rgba(15, 23, 42, 0.6), rgba(30, 41, 59, 0.5));
+                border-color: rgba(255, 255, 255, 0.15);
+            }
+
+            .skeleton-image {
+                height: 180px;
+                background: linear-gradient(90deg, #e5e7eb 25%, #f3f4f6 50%, #e5e7eb 75%);
+                background-size: 200% 100%;
+                animation: skeleton-shimmer 1.5s infinite;
+            }
+
+            [data-theme="dark"] .skeleton-image {
+                background: linear-gradient(90deg, #1e293b 25%, #334155 50%, #1e293b 75%);
+                background-size: 200% 100%;
+            }
+
+            .skeleton-body {
+                padding: 20px;
+            }
+
+            .skeleton-line {
+                height: 12px;
+                border-radius: 6px;
+                background: linear-gradient(90deg, #e5e7eb 25%, #f3f4f6 50%, #e5e7eb 75%);
+                background-size: 200% 100%;
+                animation: skeleton-shimmer 1.5s infinite;
+                margin-bottom: 10px;
+            }
+
+            [data-theme="dark"] .skeleton-line {
+                background: linear-gradient(90deg, #1e293b 25%, #334155 50%, #1e293b 75%);
+                background-size: 200% 100%;
+            }
+
+            .skeleton-line-short {
+                width: 40%;
+            }
+
+            .skeleton-line-medium {
+                width: 70%;
+            }
+
+            .skeleton-line-full {
+                width: 100%;
+            }
+
+            .skeleton-avatar {
+                width: 36px;
+                height: 36px;
+                border-radius: 50%;
+                background: linear-gradient(90deg, #e5e7eb 25%, #f3f4f6 50%, #e5e7eb 75%);
+                background-size: 200% 100%;
+                animation: skeleton-shimmer 1.5s infinite;
+            }
+
+            [data-theme="dark"] .skeleton-avatar {
+                background: linear-gradient(90deg, #1e293b 25%, #334155 50%, #1e293b 75%);
+                background-size: 200% 100%;
+            }
+
+            @keyframes skeleton-shimmer {
+                0% {
+                    background-position: 200% 0;
+                }
+
+                100% {
+                    background-position: -200% 0;
+                }
+            }
+
+            .listings-skeleton.hidden {
+                display: none;
+            }
+
+            #listings-grid.loading {
+                opacity: 0;
+            }
+
+            #listings-grid.loaded {
+                opacity: 1;
+                animation: fadeInUp 0.3s ease;
+            }
+
+            @keyframes fadeInUp {
+                from {
+                    opacity: 0;
+                    transform: translateY(10px);
+                }
+
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+
+            /* Pull to Refresh removed */
+
+            /* Button Active/Press States */
+            .glass-listing-card {
+                transition: transform 0.15s ease, box-shadow 0.3s ease !important;
+            }
+
+            .glass-listing-card:active,
+            .glass-listing-card.pressing {
+                transform: scale(0.97) !important;
+            }
+
+            .nexus-smart-btn,
+            .quick-action-btn,
+            .card-view-btn {
+                position: relative;
+                overflow: hidden;
+                transition: transform 0.1s ease, box-shadow 0.2s ease !important;
+                -webkit-tap-highlight-color: transparent;
+            }
+
+            .nexus-smart-btn:active,
+            .quick-action-btn:active,
+            .card-view-btn:active {
+                transform: scale(0.95) !important;
+            }
+
+            /* Ripple Effect */
+            .nexus-smart-btn::before,
+            .quick-action-btn::before {
+                content: '';
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                width: 0;
+                height: 0;
+                background: rgba(255, 255, 255, 0.3);
+                border-radius: 50%;
+                transform: translate(-50%, -50%);
+                opacity: 0;
+                pointer-events: none;
+            }
+
+            .nexus-smart-btn.rippling::before,
+            .quick-action-btn.rippling::before {
+                animation: buttonRipple 0.6s ease-out forwards;
+            }
+
+            @keyframes buttonRipple {
+                0% {
+                    width: 0;
+                    height: 0;
+                    opacity: 0.5;
+                }
+
+                100% {
+                    width: 300px;
+                    height: 300px;
+                    opacity: 0;
+                }
+            }
+
+            /* Offline Banner */
+            .offline-banner {
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                z-index: 10001;
+                padding: 10px 16px;
+                background: linear-gradient(135deg, #ef4444, #dc2626);
+                color: white;
+                font-size: 13px;
+                font-weight: 600;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                gap: 8px;
+                transform: translateY(-100%);
+                transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            }
+
+            .offline-banner.visible {
+                transform: translateY(0);
+            }
+
+            /* Touch Targets - Ensure 44px minimum */
+            .glass-badge-offer,
+            .glass-badge-request {
+                min-height: 44px;
+                display: inline-flex;
+                align-items: center;
+            }
+
+            .glass-search-input {
+                min-height: 52px;
+                font-size: 16px !important;
+                /* Prevent iOS zoom */
+            }
+
+            #search-nearby-btn,
+            .quick-action-btn {
+                min-height: 44px;
+            }
+
+            /* Focus Visible */
+            .glass-listing-card:focus-visible,
+            .nexus-smart-btn:focus-visible,
+            .glass-search-input:focus-visible,
+            button:focus-visible,
+            a:focus-visible {
+                outline: 3px solid rgba(99, 102, 241, 0.5);
+                outline-offset: 2px;
+            }
+
+            /* Smooth Scroll */
+            html {
+                scroll-behavior: smooth;
+            }
+
+            #listings-index-glass-wrapper {
+                -webkit-overflow-scrolling: touch;
+                max-width: 100%;
+                overflow-x: hidden;
+            }
+
+            /* Infinite Scroll Loader */
+            .infinite-loader {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                padding: 30px 20px;
+                gap: 10px;
+                color: #6b7280;
+                font-size: 14px;
+                grid-column: 1 / -1;
+            }
+
+            .infinite-loader i {
+                font-size: 20px;
+                color: #6366f1;
+                animation: spin 1s linear infinite;
+            }
+
+            .feed-end-message {
+                text-align: center;
+                padding: 30px 20px;
+                color: #9ca3af;
+                font-size: 14px;
+                grid-column: 1 / -1;
+            }
+
+            /* Mobile-specific improvements */
+            @media (max-width: 768px) {
+                .listings-skeleton {
+                    grid-template-columns: 1fr !important;
+                    gap: 16px !important;
+                }
+
+                .skeleton-image {
+                    height: 140px;
+                }
+
+                .glass-search-input {
+                    font-size: 16px !important;
+                }
+
+                /* Larger touch targets on mobile */
+                .nexus-smart-btn {
+                    min-height: 48px;
+                    padding: 14px 20px;
+                }
+
+                #search-nearby-btn {
+                    min-height: 48px;
+                }
+            }
+
+            /* Compact Quick Actions Bar */
+            #listings-index-glass-wrapper .quick-actions-bar {
+                margin: 50px 0 20px 0;
+                display: flex;
+                gap: 12px;
+                justify-content: center;
+                flex-wrap: wrap;
+            }
+
+            #listings-index-glass-wrapper .quick-action-btn {
+                background: linear-gradient(135deg,
+                        rgba(255, 255, 255, 0.75),
+                        rgba(255, 255, 255, 0.6));
+                backdrop-filter: blur(16px) saturate(120%);
+                -webkit-backdrop-filter: blur(16px) saturate(120%);
+                border: 2px solid rgba(255, 255, 255, 0.3);
+                border-radius: 14px;
+                padding: 14px 20px;
+                text-decoration: none;
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                transition: all 0.3s ease;
+                box-shadow: 0 4px 12px rgba(31, 38, 135, 0.1),
+                    inset 0 1px 0 rgba(255, 255, 255, 0.4);
+                position: relative;
+                overflow: hidden;
+            }
+
+            #listings-index-glass-wrapper .quick-action-btn::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: linear-gradient(135deg, rgba(99, 102, 241, 0.08), rgba(139, 92, 246, 0.08));
+                opacity: 0;
+                transition: opacity 0.3s ease;
+            }
+
+            #listings-index-glass-wrapper .quick-action-btn:hover::before {
+                opacity: 1;
+            }
+
+            #listings-index-glass-wrapper .quick-action-btn:hover {
+                transform: translateY(-3px);
+                border-color: rgba(99, 102, 241, 0.4);
+                box-shadow: 0 8px 20px rgba(99, 102, 241, 0.15),
+                    0 0 0 1px rgba(99, 102, 241, 0.15),
+                    inset 0 1px 0 rgba(255, 255, 255, 0.5);
+            }
+
+            [data-theme="dark"] #listings-index-glass-wrapper .quick-action-btn {
+                background: linear-gradient(135deg,
+                        rgba(15, 23, 42, 0.6),
+                        rgba(30, 41, 59, 0.5));
+                border: 2px solid rgba(255, 255, 255, 0.12);
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3),
+                    inset 0 1px 0 rgba(255, 255, 255, 0.06);
+            }
+
+            [data-theme="dark"] #listings-index-glass-wrapper .quick-action-btn:hover {
+                border-color: rgba(99, 102, 241, 0.3);
+                box-shadow: 0 8px 20px rgba(99, 102, 241, 0.25),
+                    0 0 0 1px rgba(99, 102, 241, 0.2),
+                    0 0 30px rgba(236, 72, 153, 0.12);
+            }
+
+            #listings-index-glass-wrapper .quick-action-icon {
+                font-size: 1.5rem;
+                line-height: 1;
+            }
+
+            #listings-index-glass-wrapper .quick-action-text {
+                font-size: 0.95rem;
+                font-weight: 700;
+                color: var(--htb-text-main);
+                position: relative;
+                z-index: 1;
+            }
+
+            @media (max-width: 768px) {
+                #listings-index-glass-wrapper .quick-actions-bar {
+                    flex-direction: column;
+                    align-items: stretch;
+                }
+
+                #listings-index-glass-wrapper .quick-action-btn {
+                    justify-content: center;
+                }
+            }
+
+            /* SEO Description Text */
+            #listings-index-glass-wrapper .seo-description {
+                text-align: center;
+                max-width: 600px;
+                margin: 0 auto 20px auto;
+                font-size: 1.05rem;
+                line-height: 1.6;
+                color: var(--htb-text-main);
+                font-weight: 500;
+            }
+
+            /* ===================================
+           NEXUS WELCOME HERO - Gold Standard
+           =================================== */
+            #listings-index-glass-wrapper .nexus-welcome-hero {
+                background: linear-gradient(135deg,
+                        rgba(99, 102, 241, 0.12) 0%,
+                        rgba(139, 92, 246, 0.12) 50%,
+                        rgba(236, 72, 153, 0.08) 100%);
+                backdrop-filter: blur(20px);
+                -webkit-backdrop-filter: blur(20px);
+                border: 1px solid rgba(255, 255, 255, 0.4);
+                border-radius: 20px;
+                padding: 28px 24px;
+                margin-bottom: 30px;
+                text-align: center;
+                box-shadow: 0 8px 32px rgba(99, 102, 241, 0.1);
+            }
+
+            [data-theme="dark"] #listings-index-glass-wrapper .nexus-welcome-hero {
+                background: linear-gradient(135deg,
+                        rgba(99, 102, 241, 0.15) 0%,
+                        rgba(139, 92, 246, 0.15) 50%,
+                        rgba(236, 72, 153, 0.1) 100%);
+                border-color: rgba(255, 255, 255, 0.1);
+            }
+
+            #listings-index-glass-wrapper .nexus-welcome-title {
+                font-size: 1.75rem;
+                font-weight: 800;
+                background: linear-gradient(135deg, #4f46e5, #7c3aed, #db2777);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                background-clip: text;
+                margin: 0 0 8px 0;
+                line-height: 1.2;
+            }
+
+            #listings-index-glass-wrapper .nexus-welcome-subtitle {
+                font-size: 0.95rem;
+                color: var(--htb-text-muted);
+                margin: 0 0 20px 0;
+                line-height: 1.5;
+                max-width: 500px;
+                margin-left: auto;
+                margin-right: auto;
+            }
+
+            #listings-index-glass-wrapper .nexus-smart-buttons {
+                display: flex;
+                gap: 10px;
+                justify-content: center;
+                flex-wrap: wrap;
+            }
+
+            #listings-index-glass-wrapper .nexus-smart-btn {
+                display: inline-flex;
+                align-items: center;
+                gap: 8px;
+                padding: 12px 20px;
+                border-radius: 12px;
+                font-weight: 600;
+                font-size: 0.9rem;
+                text-decoration: none;
+                transition: all 0.2s ease;
+                border: 2px solid transparent;
+            }
+
+            #listings-index-glass-wrapper .nexus-smart-btn i {
+                font-size: 1rem;
+            }
+
+            #listings-index-glass-wrapper .nexus-smart-btn-primary {
+                background: linear-gradient(135deg, #6366f1, #8b5cf6);
+                color: white;
+                box-shadow: 0 4px 14px rgba(99, 102, 241, 0.35);
+            }
+
+            #listings-index-glass-wrapper .nexus-smart-btn-primary:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 6px 20px rgba(99, 102, 241, 0.45);
+            }
+
+            #listings-index-glass-wrapper .nexus-smart-btn-secondary {
+                background: linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(52, 211, 153, 0.1));
+                color: #059669;
+                border-color: rgba(16, 185, 129, 0.3);
+            }
+
+            [data-theme="dark"] #listings-index-glass-wrapper .nexus-smart-btn-secondary {
+                background: linear-gradient(135deg, rgba(16, 185, 129, 0.2), rgba(52, 211, 153, 0.15));
+                color: #6ee7b7;
+                border-color: rgba(16, 185, 129, 0.4);
+            }
+
+            #listings-index-glass-wrapper .nexus-smart-btn-secondary:hover {
+                background: linear-gradient(135deg, #10b981, #34d399);
+                color: white;
+                border-color: transparent;
+                transform: translateY(-2px);
+            }
+
+            #listings-index-glass-wrapper .nexus-smart-btn-tertiary {
+                background: linear-gradient(135deg, rgba(249, 115, 22, 0.1), rgba(251, 146, 60, 0.1));
+                color: #ea580c;
+                border-color: rgba(249, 115, 22, 0.3);
+            }
+
+            [data-theme="dark"] #listings-index-glass-wrapper .nexus-smart-btn-tertiary {
+                background: linear-gradient(135deg, rgba(249, 115, 22, 0.2), rgba(251, 146, 60, 0.15));
+                color: #fdba74;
+                border-color: rgba(249, 115, 22, 0.4);
+            }
+
+            #listings-index-glass-wrapper .nexus-smart-btn-tertiary:hover {
+                background: linear-gradient(135deg, #f97316, #fb923c);
+                color: white;
+                border-color: transparent;
+                transform: translateY(-2px);
+            }
+
+            #listings-index-glass-wrapper .nexus-smart-btn-outline {
+                background: rgba(255, 255, 255, 0.5);
+                color: var(--htb-text-main);
+                border-color: rgba(99, 102, 241, 0.3);
+            }
+
+            [data-theme="dark"] #listings-index-glass-wrapper .nexus-smart-btn-outline {
+                background: rgba(15, 23, 42, 0.5);
+                border-color: rgba(99, 102, 241, 0.4);
+            }
+
+            #listings-index-glass-wrapper .nexus-smart-btn-outline:hover {
+                background: linear-gradient(135deg, #6366f1, #8b5cf6);
+                color: white;
+                border-color: transparent;
+                transform: translateY(-2px);
+            }
+
+            @media (max-width: 640px) {
+                #listings-index-glass-wrapper .nexus-welcome-hero {
+                    padding: 20px 16px;
+                    border-radius: 16px;
+                }
+
+                #listings-index-glass-wrapper .nexus-welcome-title {
+                    font-size: 1.35rem;
+                }
+
+                #listings-index-glass-wrapper .nexus-smart-buttons {
+                    gap: 8px;
+                }
+
+                #listings-index-glass-wrapper .nexus-smart-btn {
+                    padding: 10px 14px;
+                    font-size: 0.8rem;
+                }
+            }
+
+            /* ===================================
+           CREATE LISTING POST BOX (Facebook-style)
+           =================================== */
+            .listings-create-post {
+                position: relative;
+                background: linear-gradient(165deg,
+                        rgba(255, 255, 255, 0.98) 0%,
+                        rgba(248, 250, 252, 0.95) 100%);
+                backdrop-filter: blur(24px);
+                -webkit-backdrop-filter: blur(24px);
+                border: 1px solid rgba(255, 255, 255, 0.9);
+                border-radius: 20px;
+                box-shadow:
+                    0 8px 32px rgba(16, 185, 129, 0.1),
+                    0 2px 8px rgba(0, 0, 0, 0.04),
+                    inset 0 1px 0 rgba(255, 255, 255, 1);
+                margin: 30px 0 20px 0;
+                overflow: hidden;
+                transition: all 0.3s ease;
+                max-width: 100%;
+                box-sizing: border-box;
+            }
+
+            .listings-create-post::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                height: 4px;
+                background: linear-gradient(90deg, #10b981, #059669, #f97316, #ea580c, #10b981);
+                background-size: 300% 100%;
+                animation: gradientFlow 6s ease infinite;
+            }
+
+            @keyframes gradientFlow {
+
+                0%,
+                100% {
+                    background-position: 0% 50%;
+                }
+
+                50% {
+                    background-position: 100% 50%;
+                }
+            }
+
+            .listings-create-post:hover {
+                box-shadow:
+                    0 12px 40px rgba(16, 185, 129, 0.15),
+                    0 4px 12px rgba(0, 0, 0, 0.05),
+                    inset 0 1px 0 rgba(255, 255, 255, 1);
+            }
+
+            [data-theme="dark"] .listings-create-post {
+                background: linear-gradient(165deg,
+                        rgba(30, 41, 59, 0.98) 0%,
+                        rgba(15, 23, 42, 0.95) 100%);
+                border-color: rgba(16, 185, 129, 0.25);
+                box-shadow:
+                    0 8px 32px rgba(0, 0, 0, 0.4),
+                    0 2px 8px rgba(0, 0, 0, 0.2),
+                    inset 0 1px 0 rgba(255, 255, 255, 0.08);
+            }
+
+            /* Compose Prompt Link */
+            .compose-prompt-link {
+                display: block;
+                text-decoration: none;
+                color: inherit;
+            }
+
+            .compose-prompt {
+                display: flex;
+                align-items: center;
+                gap: 12px;
+                padding: 8px 0;
+                max-width: 100%;
+                overflow: hidden;
+            }
+
+            .composer-avatar-ring {
+                position: relative;
+                padding: 3px;
+                border-radius: 50%;
+                background: linear-gradient(135deg, #10b981, #059669, #f97316);
+                background-size: 200% 200%;
+                animation: holographicShimmer 6s ease infinite;
+                flex-shrink: 0;
+            }
+
+            @keyframes holographicShimmer {
+
+                0%,
+                100% {
+                    background-position: 0% 50%;
+                }
+
+                50% {
+                    background-position: 100% 50%;
+                }
+            }
+
+            .composer-avatar-ring img {
+                display: block;
+                width: 44px;
+                height: 44px;
+                border-radius: 50%;
+                object-fit: cover;
+                background: #fff;
+                border: 2px solid #fff;
+            }
+
+            .composer-avatar-ring.guest {
+                padding: 0;
+                background: transparent;
+            }
+
+            .compose-prompt-input {
+                flex: 1;
+                min-width: 0;
+                padding: 12px 16px;
+                background: rgba(243, 244, 246, 0.6);
+                border-radius: 24px;
+                font-size: 15px;
+                color: #6b7280;
+                cursor: pointer;
+                transition: all 0.2s ease;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+            }
+
+            .compose-prompt-input:hover {
+                background: rgba(243, 244, 246, 0.9);
+            }
+
+            [data-theme="dark"] .compose-prompt-input {
+                background: rgba(51, 65, 85, 0.5);
+                color: #94a3b8;
+            }
+
+            [data-theme="dark"] .compose-prompt-input:hover {
+                background: rgba(51, 65, 85, 0.7);
+            }
+
+            /* Quick Action Buttons */
+            .compose-quick-actions {
+                display: flex;
+                gap: 8px;
+                margin-top: 12px;
+                padding-top: 12px;
+                border-top: 1px solid rgba(0, 0, 0, 0.06);
+                justify-content: center;
+                flex-wrap: wrap;
+                max-width: 100%;
+            }
+
+            [data-theme="dark"] .compose-quick-actions {
+                border-top-color: rgba(255, 255, 255, 0.08);
+            }
+
+            .compose-quick-btn {
+                display: inline-flex;
+                align-items: center;
+                gap: 6px;
+                padding: 10px 16px;
+                background: rgba(243, 244, 246, 0.6);
+                border-radius: 12px;
+                font-size: 13px;
+                font-weight: 600;
+                color: var(--htb-text-main, #1f2937);
+                text-decoration: none;
+                transition: all 0.2s ease;
+                border: 1px solid transparent;
+            }
+
+            .compose-quick-btn:hover {
+                background: rgba(243, 244, 246, 0.9);
+                transform: translateY(-1px);
+            }
+
+            .compose-quick-btn.highlight {
+                background: linear-gradient(135deg, #10b981, #059669);
+                color: white;
+            }
+
+            .compose-quick-btn.highlight:hover {
+                box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+            }
+
+            [data-theme="dark"] .compose-quick-btn {
+                background: rgba(51, 65, 85, 0.5);
+                color: #e2e8f0;
+            }
+
+            [data-theme="dark"] .compose-quick-btn:hover {
+                background: rgba(51, 65, 85, 0.7);
+            }
+
+            .compose-quick-btn i {
+                font-size: 14px;
+            }
+
+            /* Mobile Responsive */
+            @media (max-width: 768px) {
+                .listings-create-post {
+                    margin: 16px 0;
+                    border-radius: 16px;
+                }
+
+                .compose-prompt-input {
+                    font-size: 14px;
+                    padding: 10px 14px;
+                }
+
+                .composer-avatar-ring img {
+                    width: 40px;
+                    height: 40px;
+                }
+
+                .compose-quick-actions {
+                    gap: 6px;
+                }
+
+                .compose-quick-btn {
+                    padding: 8px 12px;
+                    font-size: 12px;
+                }
+
+                .compose-quick-btn span {
+                    display: inline;
+                }
+            }
+
+            @media (max-width: 480px) {
+                .compose-quick-btn span {
+                    display: none;
+                }
+
+                .compose-quick-btn {
+                    padding: 10px 12px;
+                }
+
+                .compose-quick-btn i {
+                    font-size: 16px;
+                }
+            }
+
+            /* ===================================
+           OPTIMIZED SEARCH CARD
+           =================================== */
+            .glass-search-card {
+                margin-top: 0 !important;
+                padding: 16px !important;
+                max-width: 100%;
+                box-sizing: border-box;
+                overflow: hidden;
+            }
+
+            .search-card-inner {
+                display: flex;
+                flex-direction: column;
+                gap: 12px;
+                max-width: 100%;
+                overflow: hidden;
+            }
+
+            /* Search Row */
+            .search-row {
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                max-width: 100%;
+            }
+
+            .search-input-wrapper {
+                flex: 1;
+                position: relative;
+                min-width: 0;
+            }
+
+            .search-input-wrapper .search-icon {
+                position: absolute;
+                left: 14px;
+                top: 50%;
+                transform: translateY(-50%);
+                color: #9ca3af;
+                font-size: 14px;
+                pointer-events: none;
+            }
+
+            .search-input-wrapper .glass-search-input {
+                width: 100%;
+                padding: 12px 40px 12px 40px;
+                border-radius: 12px;
+                font-size: 14px;
+                min-height: 44px;
+            }
+
+            .search-input-wrapper .spinner {
+                position: absolute;
+                right: 12px;
+                top: 50%;
+                transform: translateY(-50%);
+            }
+
+            .listings-count-badge {
+                background: linear-gradient(135deg, #6366f1, #8b5cf6);
+                color: white;
+                font-size: 12px;
+                font-weight: 700;
+                padding: 6px 12px;
+                border-radius: 20px;
+                white-space: nowrap;
+                min-width: 36px;
+                text-align: center;
+            }
+
+            /* Filter Pills Row - Horizontally Scrollable */
+            .filter-pills-row {
+                display: flex;
+                gap: 8px;
+                overflow-x: auto;
+                overflow-y: hidden;
+                padding: 4px 0;
+                scrollbar-width: none;
+                -webkit-overflow-scrolling: touch;
+                max-width: 100%;
+            }
+
+            .filter-pills-row::-webkit-scrollbar {
+                display: none;
+            }
+
+            .filter-pill {
+                display: inline-flex;
+                align-items: center;
+                gap: 5px;
+                padding: 8px 14px;
+                border-radius: 20px;
+                font-size: 13px;
+                font-weight: 600;
+                text-decoration: none;
+                white-space: nowrap;
+                transition: all 0.2s ease;
+                background: rgba(243, 244, 246, 0.8);
+                color: #6b7280;
+                border: 1px solid transparent;
+                flex-shrink: 0;
+            }
+
+            .filter-pill:hover {
+                background: rgba(99, 102, 241, 0.1);
+                color: #6366f1;
+            }
+
+            .filter-pill.active {
+                background: linear-gradient(135deg, #6366f1, #8b5cf6);
+                color: white;
+            }
+
+            .filter-pill.offer:hover {
+                color: #10b981;
+                background: rgba(16, 185, 129, 0.1);
+            }
+
+            .filter-pill.offer.active {
+                background: linear-gradient(135deg, #10b981, #059669);
+            }
+
+            .filter-pill.request:hover {
+                color: #f97316;
+                background: rgba(249, 115, 22, 0.1);
+            }
+
+            .filter-pill.request.active {
+                background: linear-gradient(135deg, #f97316, #ea580c);
+            }
+
+            .filter-pill.category {
+                background: rgba(139, 92, 246, 0.08);
+                color: #8b5cf6;
+            }
+
+            .filter-pill.category:hover {
+                background: rgba(139, 92, 246, 0.15);
+            }
+
+            .filter-pill.category.active {
+                background: linear-gradient(135deg, #8b5cf6, #a855f7);
+                color: white;
+            }
+
+            .filter-pill.clear {
+                background: rgba(239, 68, 68, 0.1);
+                color: #ef4444;
+            }
+
+            .filter-pill.clear:hover {
+                background: rgba(239, 68, 68, 0.2);
+            }
+
+            .filter-pill i {
+                font-size: 12px;
+            }
+
+            .pill-count {
+                font-size: 10px;
+                opacity: 0.8;
+                margin-left: 2px;
+            }
+
+            [data-theme="dark"] .filter-pill {
+                background: rgba(51, 65, 85, 0.6);
+                color: #cbd5e1;
+            }
+
+            [data-theme="dark"] .filter-pill:hover {
+                background: rgba(99, 102, 241, 0.2);
+                color: #a5b4fc;
+            }
+
+            [data-theme="dark"] .filter-pill.category {
+                background: rgba(139, 92, 246, 0.15);
+                color: #c4b5fd;
+            }
+
+            /* Nearby Section - Collapsible */
+            .nearby-section {
+                border-top: 1px solid rgba(128, 128, 128, 0.1);
+                padding-top: 12px;
+                margin-top: 4px;
+            }
+
+            .nearby-toggle {
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                width: 100%;
+                padding: 10px 12px;
+                background: rgba(6, 182, 212, 0.08);
+                border: 1px solid rgba(6, 182, 212, 0.2);
+                border-radius: 10px;
+                color: #0891b2;
+                font-size: 13px;
+                font-weight: 600;
+                cursor: pointer;
+                transition: all 0.2s ease;
+            }
+
+            .nearby-toggle:hover {
+                background: rgba(6, 182, 212, 0.15);
+            }
+
+            .nearby-toggle .toggle-icon {
+                margin-left: auto;
+                font-size: 11px;
+                transition: transform 0.2s ease;
+            }
+
+            .nearby-toggle.expanded .toggle-icon {
+                transform: rotate(180deg);
+            }
+
+            [data-theme="dark"] .nearby-toggle {
+                background: rgba(6, 182, 212, 0.15);
+                border-color: rgba(6, 182, 212, 0.3);
+                color: #67e8f9;
+            }
+
+            .nearby-content {
+                overflow: hidden;
+                transition: max-height 0.3s ease, opacity 0.2s ease, padding 0.3s ease;
+                max-height: 200px;
+                opacity: 1;
+                padding-top: 12px;
+            }
+
+            .nearby-content.collapsed {
+                max-height: 0;
+                opacity: 0;
+                padding-top: 0;
+            }
+
+            .nearby-controls {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 10px;
+                align-items: center;
+            }
+
+            .location-info {
+                display: flex;
+                align-items: center;
+                gap: 6px;
+                font-size: 12px;
+                color: var(--htb-text-muted);
+                flex-basis: 100%;
+            }
+
+            .location-info i {
+                color: #10b981;
+            }
+
+            .radius-control {
+                flex: 1;
+                min-width: 140px;
+            }
+
+            .radius-control label {
+                display: block;
+                font-size: 12px;
+                font-weight: 600;
+                color: var(--htb-text-muted);
+                margin-bottom: 4px;
+            }
+
+            .radius-control input[type="range"] {
+                width: 100%;
+                height: 4px;
+                border-radius: 2px;
+                accent-color: #06b6d4;
+                cursor: pointer;
+            }
+
+            .nearby-buttons {
+                display: flex;
+                gap: 6px;
+            }
+
+            .btn-nearby-search {
+                background: linear-gradient(135deg, #10b981, #059669);
+                color: white;
+                border: none;
+                padding: 8px 14px;
+                border-radius: 8px;
+                font-size: 12px;
+                font-weight: 600;
+                cursor: pointer;
+                display: flex;
+                align-items: center;
+                gap: 5px;
+                transition: all 0.2s ease;
+            }
+
+            .btn-nearby-search:hover {
+                transform: translateY(-1px);
+                box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+            }
+
+            .btn-nearby-clear {
+                background: transparent;
+                border: 1px solid rgba(128, 128, 128, 0.3);
+                color: var(--htb-text-muted);
+                padding: 8px 12px;
+                border-radius: 8px;
+                font-size: 12px;
+                font-weight: 600;
+                cursor: pointer;
+            }
+
+            .location-status {
+                flex-basis: 100%;
+                font-size: 12px;
+                color: var(--htb-text-muted);
+                margin-top: 4px;
+            }
+
+            /* Nearby Notice */
+            .nearby-notice {
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                padding: 10px 12px;
+                border-radius: 8px;
+                font-size: 12px;
+            }
+
+            .nearby-notice.warning {
+                background: rgba(245, 158, 11, 0.1);
+                color: #b45309;
+            }
+
+            .nearby-notice.info {
+                background: rgba(99, 102, 241, 0.1);
+                color: #4f46e5;
+            }
+
+            .nearby-notice span {
+                flex: 1;
+            }
+
+            .nearby-notice a {
+                background: currentColor;
+                color: white;
+                padding: 5px 10px;
+                border-radius: 6px;
+                text-decoration: none;
+                font-weight: 600;
+                font-size: 11px;
+            }
+
+            .nearby-notice.warning a {
+                background: #f59e0b;
+            }
+
+            .nearby-notice.info a {
+                background: #6366f1;
+            }
+
+            [data-theme="dark"] .nearby-notice.warning {
+                background: rgba(245, 158, 11, 0.15);
+                color: #fbbf24;
+            }
+
+            [data-theme="dark"] .nearby-notice.info {
+                background: rgba(99, 102, 241, 0.15);
+                color: #a5b4fc;
+            }
+
+            /* Mobile optimizations */
+            @media (max-width: 768px) {
+                .listings-create-post {
+                    margin: 16px 0 12px 0 !important;
+                    border-radius: 16px !important;
+                }
+
+                .glass-search-card {
+                    padding: 12px !important;
+                    border-radius: 14px !important;
+                    margin-top: 0 !important;
+                }
+
+                .search-row {
+                    gap: 8px;
+                }
+
+                .search-input-wrapper .glass-search-input {
+                    padding: 10px 36px 10px 36px;
+                    font-size: 14px;
+                }
+
+                .listings-count-badge {
+                    padding: 5px 10px;
+                    font-size: 11px;
+                }
+
+                .filter-pill {
+                    padding: 7px 12px;
+                    font-size: 12px;
+                }
+
+                .nearby-controls {
+                    flex-direction: column;
+                    align-items: stretch;
+                }
+
+                .nearby-buttons {
+                    justify-content: stretch;
+                }
+
+                .btn-nearby-search,
+                .btn-nearby-clear {
+                    flex: 1;
+                    justify-content: center;
+                }
+            }
+
+            @media (max-width: 480px) {
+                .search-input-wrapper .search-icon {
+                    left: 12px;
+                    font-size: 13px;
+                }
+
+                .search-input-wrapper .glass-search-input {
+                    padding-left: 34px;
+                }
+
+                .filter-pill span:not(.pill-count) {
+                    display: none;
+                }
+
+                .filter-pill {
+                    padding: 8px 10px;
+                }
+
+                .filter-pill i {
+                    font-size: 14px;
+                }
+
+                .filter-pill.category span:not(.pill-count) {
+                    display: inline;
+                }
+            }

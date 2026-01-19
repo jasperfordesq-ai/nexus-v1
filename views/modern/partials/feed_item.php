@@ -162,9 +162,9 @@ if ($type === 'listing') {
                     // Show group location if from group, otherwise author's location
                     $displayLocation = $groupLocation ?: $authorLocation ?: $location;
                     if ($displayLocation): ?>
-                        · <i class="fa-solid fa-location-dot" style="font-size:11px; margin-right:2px;"></i> <?= htmlspecialchars($displayLocation) ?>
+                        · <i class="fa-solid fa-location-dot feed-meta-icon"></i> <?= htmlspecialchars($displayLocation) ?>
                     <?php endif; ?>
-                    · <i class="fa-solid fa-globe" style="font-size:11px;" title="Public"></i>
+                    · <i class="fa-solid fa-globe feed-meta-globe" title="Public"></i>
                 </div>
                 <?php if (!empty($recommendationBadges)): ?>
                 <div class="feed-recommendation-badges">
@@ -257,7 +257,7 @@ if ($type === 'listing') {
             }
             ?>
             <?php if ($titleLink): ?>
-                <a href="<?= $titleLink ?>" class="feed-item-title-link" style="text-decoration: none; color: inherit; display: block;">
+                <a href="<?= $titleLink ?>" class="feed-item-title-link">
                     <div class="feed-item-title"><?= htmlspecialchars($item['title']) ?></div>
                 </a>
             <?php else: ?>
@@ -456,7 +456,7 @@ if ($type === 'listing') {
             // Display User's Caption (if any)
             $content = preg_replace_callback('/(https?:\/\/[^\s]+)/', function($m) {
                 $url = html_entity_decode($m[1], ENT_QUOTES, 'UTF-8');
-                return '<a href="' . htmlspecialchars($url, ENT_QUOTES, 'UTF-8') . '" target="_blank" rel="noopener" style="color:#4f46e5; text-decoration:underline;">' . $m[1] . '</a>';
+                return '<a href="' . htmlspecialchars($url, ENT_QUOTES, 'UTF-8') . '" target="_blank" rel="noopener" class="feed-inline-link">' . $m[1] . '</a>';
             }, $content);
             if (!empty(trim($content))) {
                 echo nl2br($content);
@@ -467,7 +467,7 @@ if ($type === 'listing') {
                 $parentContent = htmlspecialchars($sharedData['content'] ?? '');
                 $parentContent = preg_replace_callback('/(https?:\/\/[^\s]+)/', function($m) {
                     $url = html_entity_decode($m[1], ENT_QUOTES, 'UTF-8');
-                    return '<a href="' . htmlspecialchars($url, ENT_QUOTES, 'UTF-8') . '" target="_blank" rel="noopener" style="color:#4f46e5; text-decoration:underline;">' . $m[1] . '</a>';
+                    return '<a href="' . htmlspecialchars($url, ENT_QUOTES, 'UTF-8') . '" target="_blank" rel="noopener" class="feed-inline-link">' . $m[1] . '</a>';
                 }, $parentContent);
 
                 // Check if this is a group post
@@ -482,29 +482,29 @@ if ($type === 'listing') {
                     $groupImg = $sharedData['group_image'] ?? '/assets/img/defaults/default_group.png';
                     $groupLoc = $sharedData['group_location'] ?? '';
                     echo '
-                    <a href="' . $groupLink . '" class="feed-shared-group-banner" style="display: flex; align-items: center; gap: 10px; padding: 10px 12px; background: linear-gradient(135deg, rgba(99,102,241,0.08), rgba(168,85,247,0.08)); border-bottom: 1px solid var(--feed-border, #e5e7eb); text-decoration: none; transition: background 0.2s;">
-                        <img src="' . htmlspecialchars($groupImg) . '" style="width: 32px; height: 32px; border-radius: 8px; object-fit: cover; border: 1px solid rgba(99,102,241,0.2);" alt="" loading="lazy">
-                        <div style="flex: 1; min-width: 0;">
-                            <div style="font-weight: 600; font-size: 13px; color: var(--feed-text-primary, #111); display: flex; align-items: center; gap: 6px;">
-                                <i class="fa-solid fa-users" style="color: #6366f1; font-size: 11px;"></i>
+                    <a href="' . $groupLink . '" class="feed-shared-group-banner">
+                        <img src="' . htmlspecialchars($groupImg) . '" class="feed-shared-group-banner-img" alt="" loading="lazy">
+                        <div class="feed-shared-group-banner-info">
+                            <div class="feed-shared-group-banner-name">
+                                <i class="fa-solid fa-users"></i>
                                 ' . htmlspecialchars($sharedData['group_name']) . '
                             </div>';
                     if ($groupLoc) {
                         echo '
-                            <div style="font-size: 11px; color: var(--feed-text-muted, #6b7280); margin-top: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
-                                <i class="fa-solid fa-location-dot" style="margin-right: 3px;"></i>' . htmlspecialchars($groupLoc) . '
+                            <div class="feed-shared-group-banner-location">
+                                <i class="fa-solid fa-location-dot"></i>' . htmlspecialchars($groupLoc) . '
                             </div>';
                     }
                     echo '
                         </div>
-                        <i class="fa-solid fa-chevron-right" style="color: var(--feed-text-muted, #9ca3af); font-size: 12px;"></i>
+                        <i class="fa-solid fa-chevron-right feed-shared-group-banner-arrow"></i>
                     </a>';
                 }
 
                 echo '
                     <div class="feed-shared-header">
                         <img src="' . htmlspecialchars($sharedData['avatar']) . '" class="feed-shared-avatar" loading="lazy">
-                        <div style="flex-grow:1;">
+                        <div class="feed-shared-header-info">
                             <div class="feed-shared-author">' . htmlspecialchars($sharedData['author']) . ' <span class="feed-shared-label">• ' . $sharedData['label'] . '</span></div>
                             <div class="feed-shared-time">' . $sharedData['time'] . '</div>
                         </div>
@@ -519,16 +519,16 @@ if ($type === 'listing') {
                 }
 
                 if (!empty($sharedData['image'])) {
-                    echo '<div style="border-top: 1px solid var(--feed-border);"><img src="' . htmlspecialchars($sharedData['image']) . '" style="width: 100%; display: block;" loading="lazy"></div>';
+                    echo '<div class="feed-shared-image-container"><img src="' . htmlspecialchars($sharedData['image']) . '" class="feed-shared-image" loading="lazy"></div>';
                 }
                 echo '</div>';
             } else {
                 // Error Fallback - show debug info
                 echo '
-                <div style="margin-top: 12px; padding: 12px; background: #fef2f2; border: 1px solid #fecaca; border-radius: 8px; color: #991b1b; font-size: 13px;">
-                    <i class="fa-solid fa-triangle-exclamation" style="margin-right: 6px;"></i> 
-                    <strong>Shared content not found</strong><br>
-                    <small style="color:#6b7280;">Type: ' . htmlspecialchars($parentType) . ' | ID: ' . $parentId . ($shareError ? ' | Error: ' . htmlspecialchars($shareError) : '') . '</small>
+                <div class="feed-error-fallback">
+                    <i class="fa-solid fa-triangle-exclamation"></i>
+                    <strong>Shared content not found</strong>
+                    <small>Type: ' . htmlspecialchars($parentType) . ' | ID: ' . $parentId . ($shareError ? ' | Error: ' . htmlspecialchars($shareError) : '') . '</small>
                 </div>';
             }
         } else {
@@ -537,7 +537,7 @@ if ($type === 'listing') {
             if ($type !== 'review') {
                 $content = preg_replace_callback('/(https?:\/\/[^\s]+)/', function($m) {
                     $url = html_entity_decode($m[1], ENT_QUOTES, 'UTF-8');
-                    return '<a href="' . htmlspecialchars($url, ENT_QUOTES, 'UTF-8') . '" target="_blank" rel="noopener" style="color:#4f46e5; text-decoration:underline;">' . $m[1] . '</a>';
+                    return '<a href="' . htmlspecialchars($url, ENT_QUOTES, 'UTF-8') . '" target="_blank" rel="noopener" class="feed-inline-link">' . $m[1] . '</a>';
                 }, $content);
                 echo nl2br($content);
             }
@@ -546,27 +546,21 @@ if ($type === 'listing') {
         // Logic for Viewing Original Listing/Event
         if ($type === 'listing') {
             $link = \Nexus\Core\TenantContext::getBasePath() . '/listings/' . $postId;
-            echo '<div style="margin-top:10px;"><a href="' . $link . '" style="color:#4f46e5; font-weight:600;">View Original Listing &rarr;</a></div>';
+            echo '<div class="feed-view-link"><a href="' . $link . '">View Original Listing &rarr;</a></div>';
         }
         ?>
 
         <!-- RICH MEDIA: Post Image -->
         <?php if ($type === 'post' && $postImage): ?>
-            <div style="overflow: hidden; border-radius: 12px; margin-top: 12px; border: 1px solid #e5e7eb; aspect-ratio: 16/9; background: #f3f4f6;">
-                <?= webp_image($postImage, 'Post image', '', ['style' => 'width: 100%; height: 100%; object-fit: cover; display: block;']) ?>
+            <div class="feed-media-container">
+                <?= webp_image($postImage, 'Post image', '', []) ?>
             </div>
         <?php endif; ?>
 
         <!-- RICH MEDIA: Post Video -->
         <?php if ($type === 'post' && $postVideo): ?>
-            <div style="overflow: hidden; border-radius: 12px; margin-top: 12px; border: 1px solid var(--border-color, #e5e7eb); background: #000;">
-                <video
-                    controls
-                    preload="metadata"
-                    playsinline
-                    style="width: 100%; max-height: 500px; display: block;"
-                    poster=""
-                >
+            <div class="feed-video-container">
+                <video controls preload="metadata" playsinline poster="">
                     <source src="<?= htmlspecialchars($postVideo) ?>" type="video/mp4">
                     <source src="<?= htmlspecialchars($postVideo) ?>" type="video/webm">
                     <source src="<?= htmlspecialchars($postVideo) ?>" type="video/ogg">
@@ -581,9 +575,9 @@ if ($type === 'listing') {
                     <div class="feed-event-month"><?= date('M', strtotime($eventStart)) ?></div>
                     <div class="feed-event-day"><?= date('d', strtotime($eventStart)) ?></div>
                 </div>
-                <div>
-                    <div style="font-weight: 600; color: var(--feed-text-primary);"><?= date('l, F j @ g:i A', strtotime($eventStart)) ?></div>
-                    <div style="font-size: 13px; color: var(--feed-text-secondary);"><?= htmlspecialchars($location ?? 'Online') ?></div>
+                <div class="feed-event-date-info">
+                    <div class="feed-event-date-title"><?= date('l, F j @ g:i A', strtotime($eventStart)) ?></div>
+                    <div class="feed-event-date-location"><?= htmlspecialchars($location ?? 'Online') ?></div>
                 </div>
             </div>
         <?php endif; ?>
@@ -604,20 +598,20 @@ if ($type === 'listing') {
         ?>
         <?php if ($listingImage): ?>
             <!-- Listing Image -->
-            <div class="feed-listing-image-container" style="position: relative; overflow: hidden; border-radius: 12px; margin: 0 0 12px 0; border: 1px solid var(--feed-border, #e5e7eb); aspect-ratio: 16/9; background: var(--feed-bg-secondary, #f3f4f6);">
-                <a href="<?= $basePath ?>/listings/<?= $postId ?>" style="display: block; width: 100%; height: 100%;">
-                    <?= webp_image($listingImage, htmlspecialchars($item['title'] ?? 'Listing image'), 'loaded', ['style' => 'width: 100%; height: 100%; object-fit: cover; display: block;', isset($isFirstFeedItem) && $isFirstFeedItem ? 'fetchpriority' : 'loading' => isset($isFirstFeedItem) && $isFirstFeedItem ? 'high' : 'lazy']) ?>
+            <div class="feed-listing-image-container">
+                <a href="<?= $basePath ?>/listings/<?= $postId ?>">
+                    <?= webp_image($listingImage, htmlspecialchars($item['title'] ?? 'Listing image'), 'loaded', [isset($isFirstFeedItem) && $isFirstFeedItem ? 'fetchpriority' : 'loading' => isset($isFirstFeedItem) && $isFirstFeedItem ? 'high' : 'lazy']) ?>
                 </a>
                 <!-- Type badge overlay -->
-                <div style="position: absolute; top: 12px; left: 12px; background: <?= $lType === 'offer' ? 'linear-gradient(135deg, #10b981, #059669)' : 'linear-gradient(135deg, #f59e0b, #d97706)' ?>; color: white; padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; box-shadow: 0 2px 8px rgba(0,0,0,0.15);">
-                    <i class="fa-solid <?= $icon ?>" style="margin-right: 4px;"></i>
+                <div class="feed-listing-badge-overlay <?= $lType === 'offer' ? 'offer' : 'request' ?>">
+                    <i class="fa-solid <?= $icon ?>"></i>
                     <?= ucfirst($lType) ?>
                 </div>
             </div>
         <?php else: ?>
             <!-- Listing Banner (no image) -->
             <div class="feed-listing-banner <?= $listingClass ?>">
-                <div style="text-align: center; z-index: 1;">
+                <div class="feed-listing-banner-content">
                     <i class="fa-solid <?= $icon ?> feed-listing-icon"></i>
                     <div class="feed-listing-category"><?= htmlspecialchars($item['extra_1'] ?? '') ?></div>
                 </div>
@@ -626,65 +620,62 @@ if ($type === 'listing') {
     <?php endif; ?>
 
     <?php if ($type === 'goal'): ?>
-        <div class="feed-section-box" style="display: flex; align-items: center; justify-content: space-between;">
+        <div class="feed-section-box feed-goal-box">
             <div>
-                <div style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 700; color: var(--feed-text-muted); margin-bottom: 2px;">Target</div>
-                <div style="font-size: 14px; font-weight: 600; color: var(--feed-text-primary);"><?= !empty($item['extra_2']) ? date('M j, Y', strtotime($item['extra_2'])) : 'No Deadline' ?></div>
+                <div class="feed-goal-label">Target</div>
+                <div class="feed-goal-value"><?= !empty($item['extra_2']) ? date('M j, Y', strtotime($item['extra_2'])) : 'No Deadline' ?></div>
             </div>
-            <a href="<?= \Nexus\Core\TenantContext::getBasePath() ?>/goals/<?= $postId ?>" class="fds-btn-secondary" style="text-decoration: none; font-size:13px;">View Goal</a>
+            <a href="<?= \Nexus\Core\TenantContext::getBasePath() ?>/goals/<?= $postId ?>" class="fds-btn-secondary">View Goal</a>
         </div>
     <?php endif; ?>
 
     <?php if ($type === 'poll'): ?>
         <div class="feed-section-box">
-            <div style="font-size: 13px; color: var(--feed-text-secondary); margin-bottom: 10px;"><?= $item['extra_2'] ?? 0 ?> votes · <?= ucfirst($item['extra_1'] ?? 'Poll') ?></div>
-            <a href="<?= \Nexus\Core\TenantContext::getBasePath() ?>/polls/<?= $postId ?>" class="fds-btn-primary" style="text-decoration: none; width: 100%; display: block; text-align: center;">Vote Now</a>
+            <div class="feed-poll-meta"><?= $item['extra_2'] ?? 0 ?> votes · <?= ucfirst($item['extra_1'] ?? 'Poll') ?></div>
+            <a href="<?= \Nexus\Core\TenantContext::getBasePath() ?>/polls/<?= $postId ?>" class="fds-btn-primary feed-poll-btn">Vote Now</a>
         </div>
     <?php endif; ?>
 
     <?php if ($type === 'resource'): ?>
-        <div class="feed-section-box" style="display: flex; align-items: center; gap: 16px;">
-            <div style="width: 48px; height: 48px; background: var(--feed-bg-card); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 24px; color: var(--feed-text-muted); border: 1px solid var(--feed-border);">
+        <div class="feed-section-box feed-resource-box">
+            <div class="feed-resource-icon">
                 <i class="fa-regular fa-file"></i>
             </div>
-            <div style="flex-grow: 1;">
-                <div style="font-weight: 600; color: var(--feed-text-primary);"><?= htmlspecialchars($item['title'] ?? 'Resource') ?></div>
-                <div style="font-size: 13px; color: var(--feed-text-secondary);"><?= strtoupper($item['extra_1'] ?? 'FILE') ?> · <?= $item['extra_3'] ?? 0 ?> downloads</div>
+            <div class="feed-resource-info">
+                <div class="feed-resource-title"><?= htmlspecialchars($item['title'] ?? 'Resource') ?></div>
+                <div class="feed-resource-meta"><?= strtoupper($item['extra_1'] ?? 'FILE') ?> · <?= $item['extra_3'] ?? 0 ?> downloads</div>
             </div>
-            <a href="<?= \Nexus\Core\TenantContext::getBasePath() ?>/download.php?id=<?= $postId ?>" class="fds-btn-primary" style="text-decoration: none;"><i class="fa-solid fa-download"></i></a>
+            <a href="<?= \Nexus\Core\TenantContext::getBasePath() ?>/download.php?id=<?= $postId ?>" class="fds-btn-primary"><i class="fa-solid fa-download"></i></a>
         </div>
     <?php endif; ?>
 
     <?php if ($type === 'volunteering'): ?>
         <div class="feed-section-box feed-volunteer-box">
-            <div style="display:flex; justify-content:space-between; align-items:flex-start;">
-                <div style="font-size: 13px; color: #1e40af; font-weight:600; margin-bottom: 6px; text-transform:uppercase; letter-spacing:0.5px;">Volunteer Opportunity</div>
-                <div style="background:var(--feed-bg-card); color:#3b82f6; padding:2px 8px; border-radius:12px; font-weight:700; font-size:0.8rem; border:1px solid #dbeafe;"><?= $item['extra_2'] ?? 0 ?> Credits</div>
+            <div class="feed-volunteer-header">
+                <div class="feed-volunteer-label">Volunteer Opportunity</div>
+                <div class="feed-volunteer-credits"><?= $item['extra_2'] ?? 0 ?> Credits</div>
             </div>
-
-            <div class="feed-item-title" style="margin-bottom: 5px;"><?= htmlspecialchars($item['title'] ?? 'Opp') ?></div>
-            <div style="font-size: 0.9rem; color: var(--feed-text-secondary); margin-bottom: 10px; display:flex; gap:6px; align-items:center;">
+            <div class="feed-item-title"><?= htmlspecialchars($item['title'] ?? 'Opp') ?></div>
+            <div class="feed-volunteer-location">
                 <i class="fas fa-map-marker-alt"></i> <?= htmlspecialchars($item['extra_1'] ?? 'Remote') ?>
             </div>
-            <a href="<?= \Nexus\Core\TenantContext::getBasePath() ?>/volunteering/<?= $postId ?>" class="fds-btn-secondary" style="text-decoration: none; display:block; text-align:center; background:var(--feed-bg-card);">I'm Interested</a>
+            <a href="<?= \Nexus\Core\TenantContext::getBasePath() ?>/volunteering/<?= $postId ?>" class="fds-btn-secondary feed-section-cta">I'm Interested</a>
         </div>
     <?php endif; ?>
 
     <?php if ($type === 'event'): ?>
         <div class="feed-section-box feed-event-box">
-            <div style="display:flex; justify-content:space-between; align-items:flex-start;">
-                <div style="font-size: 13px; color: #be185d; font-weight:600; margin-bottom: 6px; text-transform:uppercase; letter-spacing:0.5px;">Upcoming Event</div>
-                <div style="background:var(--feed-bg-card); color:#be185d; padding:2px 8px; border-radius:12px; font-weight:700; font-size:0.8rem; border:1px solid #fbcfe8;">
+            <div class="feed-event-header">
+                <div class="feed-event-label">Upcoming Event</div>
+                <div class="feed-event-date-badge">
                     <?= !empty($item['extra_2']) ? date('M j', strtotime($item['extra_2'])) : 'TBD' ?>
                 </div>
             </div>
-
-            <div class="feed-item-title" style="margin-bottom: 5px;"><?= htmlspecialchars($item['title'] ?? 'Event') ?></div>
-            <div style="font-size: 0.9rem; color: var(--feed-text-secondary); margin-bottom: 10px; display:flex; gap:6px; align-items:center;">
-                <i class="fas fa-map-pin" style="color:#9d174d;"></i> <?= htmlspecialchars($item['extra_1'] ?? 'TBD') ?>
+            <div class="feed-item-title"><?= htmlspecialchars($item['title'] ?? 'Event') ?></div>
+            <div class="feed-event-location">
+                <i class="fas fa-map-pin"></i> <?= htmlspecialchars($item['extra_1'] ?? 'TBD') ?>
             </div>
-
-            <a href="<?= \Nexus\Core\TenantContext::getBasePath() ?>/events/<?= $postId ?>" class="fds-btn-secondary" style="text-decoration: none; display:block; text-align:center; background:var(--feed-bg-card);">RSVP Now</a>
+            <a href="<?= \Nexus\Core\TenantContext::getBasePath() ?>/events/<?= $postId ?>" class="fds-btn-secondary feed-section-cta">RSVP Now</a>
         </div>
     <?php endif; ?>
 
@@ -696,36 +687,36 @@ if ($type === 'listing') {
         $receiverAvatar = $item['extra_4'] ?? '/assets/img/defaults/default_avatar.webp';
         if (empty($receiverAvatar)) $receiverAvatar = '/assets/img/defaults/default_avatar.webp';
         ?>
-        <div class="feed-section-box feed-review-box" style="background: linear-gradient(135deg, rgba(251,191,36,0.08), rgba(245,158,11,0.05)); border: 1px solid rgba(251,191,36,0.2); border-radius: 12px; padding: 16px;">
+        <div class="feed-section-box feed-review-box">
             <!-- Review Header with Receiver Info -->
-            <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px;">
-                <a href="<?= $basePath ?>/profile/<?= (int)$receiverId ?>" style="flex-shrink: 0;">
-                    <img src="<?= htmlspecialchars($receiverAvatar) ?>" loading="lazy" alt="<?= htmlspecialchars($receiverName) ?>" style="width: 48px; height: 48px; border-radius: 50%; object-fit: cover; border: 2px solid rgba(251,191,36,0.3);">
+            <div class="feed-review-header">
+                <a href="<?= $basePath ?>/profile/<?= (int)$receiverId ?>">
+                    <img src="<?= htmlspecialchars($receiverAvatar) ?>" loading="lazy" alt="<?= htmlspecialchars($receiverName) ?>" class="feed-review-avatar">
                 </a>
-                <div style="flex: 1; min-width: 0;">
-                    <div style="font-size: 13px; color: var(--feed-text-muted); margin-bottom: 2px;">Review for</div>
-                    <a href="<?= $basePath ?>/profile/<?= (int)$receiverId ?>" style="font-weight: 700; font-size: 16px; color: var(--feed-text-primary); text-decoration: none;"><?= htmlspecialchars($receiverName) ?></a>
+                <div class="feed-review-info">
+                    <div class="feed-review-for">Review for</div>
+                    <a href="<?= $basePath ?>/profile/<?= (int)$receiverId ?>" class="feed-review-name"><?= htmlspecialchars($receiverName) ?></a>
                 </div>
                 <!-- Star Rating -->
-                <div style="display: flex; align-items: center; gap: 2px; background: linear-gradient(135deg, #fbbf24, #f59e0b); padding: 6px 12px; border-radius: 20px;">
+                <div class="feed-review-stars">
                     <?php for ($i = 1; $i <= 5; $i++): ?>
-                        <i class="fa-solid fa-star" style="font-size: 12px; color: <?= $i <= $reviewRating ? '#fff' : 'rgba(255,255,255,0.3)' ?>;"></i>
+                        <i class="fa-solid fa-star <?= $i > $reviewRating ? 'inactive' : '' ?>"></i>
                     <?php endfor; ?>
-                    <span style="margin-left: 4px; font-weight: 700; color: #fff; font-size: 13px;"><?= $reviewRating ?>/5</span>
+                    <span class="feed-review-stars-value"><?= $reviewRating ?>/5</span>
                 </div>
             </div>
 
             <!-- Review Comment (already shown in body, but can emphasize here) -->
             <?php if (!empty($item['body'])): ?>
-            <div style="background: var(--feed-bg-card, #fff); border-radius: 10px; padding: 12px 14px; margin-top: 8px; border-left: 3px solid #fbbf24;">
-                <i class="fa-solid fa-quote-left" style="color: #fbbf24; font-size: 14px; margin-right: 6px;"></i>
-                <span style="font-style: italic; color: var(--feed-text-secondary);"><?= htmlspecialchars(mb_substr($item['body'], 0, 200)) ?><?= mb_strlen($item['body']) > 200 ? '...' : '' ?></span>
+            <div class="feed-review-quote">
+                <i class="fa-solid fa-quote-left"></i>
+                <span><?= htmlspecialchars(mb_substr($item['body'], 0, 200)) ?><?= mb_strlen($item['body']) > 200 ? '...' : '' ?></span>
             </div>
             <?php endif; ?>
 
             <!-- Action Button -->
-            <div style="margin-top: 12px; text-align: center;">
-                <a href="<?= $basePath ?>/profile/<?= (int)$receiverId ?>" class="fds-btn-secondary" style="text-decoration: none; display: inline-flex; align-items: center; gap: 6px; background: var(--feed-bg-card); border: 1px solid rgba(251,191,36,0.3);">
+            <div class="feed-review-action">
+                <a href="<?= $basePath ?>/profile/<?= (int)$receiverId ?>" class="fds-btn-secondary">
                     <i class="fa-solid fa-user"></i> View Profile
                 </a>
             </div>
@@ -771,7 +762,7 @@ if ($type === 'listing') {
         </button>
         <?php if ($type === 'listing' && $authorUserId && $authorUserId != ($userId ?? 0)): ?>
             <!-- Message button for listings (contact the seller/requester) -->
-            <a href="<?= $basePath ?>/messages/thread/<?= $authorUserId ?>" class="feed-action-btn" aria-label="Message" style="text-decoration: none;">
+            <a href="<?= $basePath ?>/messages/thread/<?= $authorUserId ?>" class="feed-action-btn feed-action-link" aria-label="Message">
                 <i class="fa-regular fa-envelope"></i>
                 <span>Message</span>
             </a>
@@ -785,11 +776,11 @@ if ($type === 'listing') {
 
     <div id="comments-section-<?= $socialTargetType ?>-<?= $socialTargetId ?>" class="feed-comments-section" style="display:none;">
         <?php if ($isLoggedIn ?? false): ?>
-            <div style="display: flex; gap: 8px; margin-bottom: 12px;">
-                <img src="<?= $_SESSION['user_avatar'] ?? '/assets/img/defaults/default_avatar.webp' ?>" loading="lazy" class="feed-shared-avatar" style="flex-shrink: 0;">
-                <div style="flex-grow: 1; position: relative;">
+            <div class="feed-comment-composer">
+                <img src="<?= $_SESSION['user_avatar'] ?? '/assets/img/defaults/default_avatar.webp' ?>" loading="lazy" class="feed-shared-avatar feed-comment-avatar">
+                <div class="feed-comment-input-wrapper">
                     <input type="text" class="feed-comment-input" placeholder="Write a comment..." onkeydown="if(event.key === 'Enter') submitComment(this, '<?= $socialTargetType ?>', <?= $socialTargetId ?>)">
-                    <i class="fa-regular fa-paper-plane" style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); color: var(--feed-text-muted); cursor: pointer;" onclick="submitComment(this.previousElementSibling, '<?= $socialTargetType ?>', <?= $socialTargetId ?>)"></i>
+                    <i class="fa-regular fa-paper-plane feed-comment-submit" onclick="submitComment(this.previousElementSibling, '<?= $socialTargetType ?>', <?= $socialTargetId ?>)"></i>
                 </div>
             </div>
         <?php endif; ?>

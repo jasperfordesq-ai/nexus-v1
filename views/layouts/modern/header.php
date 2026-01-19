@@ -147,6 +147,84 @@ try {
     <!-- Social Interactions CSS -->
     <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/social-interactions.min.css?v=<?= $cssVersionTimestamp ?>">
 
+    <!-- Footer CSS -->
+    <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/nexus-modern-footer.min.css?v=<?= $cssVersionTimestamp ?>">
+
+    <!-- Auth Pages CSS (conditional) -->
+    <?php if (preg_match('/\/(login|register|password)/', $normPath)): ?>
+    <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/auth.min.css?v=<?= $cssVersionTimestamp ?>">
+    <?php endif; ?>
+
+    <!-- Post Card CSS (conditional for feed/profile/post pages) -->
+    <?php if ($isHome || strpos($normPath, '/profile') !== false || strpos($normPath, '/post') !== false): ?>
+    <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/post-card.min.css?v=<?= $cssVersionTimestamp ?>">
+    <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/feed-item.min.css?v=<?= $cssVersionTimestamp ?>">
+    <?php endif; ?>
+
+    <!-- Feed Page CSS (for /feed route) -->
+    <?php if (strpos($normPath, '/feed') !== false): ?>
+    <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/feed-page.min.css?v=<?= $cssVersionTimestamp ?>">
+    <?php endif; ?>
+
+    <!-- Profile Edit CSS -->
+    <?php if (strpos($normPath, '/profile/edit') !== false): ?>
+    <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/profile-edit.min.css?v=<?= $cssVersionTimestamp ?>">
+    <?php endif; ?>
+
+    <!-- Messages CSS (conditional) -->
+    <?php if (strpos($normPath, '/messages') !== false): ?>
+    <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/messages-index.min.css?v=<?= $cssVersionTimestamp ?>">
+    <?php if (strpos($normPath, '/messages/thread') !== false): ?>
+    <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/messages-thread.min.css?v=<?= $cssVersionTimestamp ?>">
+    <?php endif; ?>
+    <?php endif; ?>
+
+    <!-- Notifications CSS -->
+    <?php if (strpos($normPath, '/notifications') !== false): ?>
+    <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/notifications.min.css?v=<?= $cssVersionTimestamp ?>">
+    <?php endif; ?>
+
+    <!-- Groups CSS -->
+    <?php if (preg_match('/\/groups\/\d+$/', $normPath)): ?>
+    <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/groups-show.min.css?v=<?= $cssVersionTimestamp ?>">
+    <?php endif; ?>
+
+    <!-- Events CSS -->
+    <?php if ($normPath === '/events' || preg_match('/\/events$/', $normPath)): ?>
+    <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/events-index.min.css?v=<?= $cssVersionTimestamp ?>">
+    <?php endif; ?>
+    <?php if (strpos($normPath, '/events/calendar') !== false): ?>
+    <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/events-calendar.min.css?v=<?= $cssVersionTimestamp ?>">
+    <?php endif; ?>
+    <?php if (strpos($normPath, '/events/create') !== false): ?>
+    <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/events-create.min.css?v=<?= $cssVersionTimestamp ?>">
+    <?php endif; ?>
+    <?php if (preg_match('/\/events\/\d+$/', $normPath)): ?>
+    <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/events-show.min.css?v=<?= $cssVersionTimestamp ?>">
+    <?php endif; ?>
+
+    <!-- Blog/News CSS -->
+    <?php if ($normPath === '/news' || $normPath === '/blog' || preg_match('/\/(news|blog)$/', $normPath)): ?>
+    <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/blog-index.min.css?v=<?= $cssVersionTimestamp ?>">
+    <?php endif; ?>
+    <?php if (preg_match('/\/(news|blog)\/[^\/]+$/', $normPath) && !preg_match('/\/(news|blog)\/(create|edit)/', $normPath)): ?>
+    <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/blog-show.min.css?v=<?= $cssVersionTimestamp ?>">
+    <?php endif; ?>
+
+    <!-- Listings CSS -->
+    <?php if ($normPath === '/listings' || preg_match('/\/listings$/', $normPath)): ?>
+    <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/listings-index.min.css?v=<?= $cssVersionTimestamp ?>">
+    <?php endif; ?>
+    <?php if (strpos($normPath, '/listings/create') !== false): ?>
+    <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/listings-create.min.css?v=<?= $cssVersionTimestamp ?>">
+    <?php endif; ?>
+    <?php if (preg_match('/\/listings\/\d+$/', $normPath)): ?>
+    <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/listings-show.min.css?v=<?= $cssVersionTimestamp ?>">
+    <?php endif; ?>
+
+    <!-- Performance Patch - GPU-optimized animations -->
+    <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/nexus-performance-patch.min.css?v=<?= $cssVersionTimestamp ?>">
+
     <!-- Emergency Scroll Fix - MUST be last to override all other styles -->
     <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/scroll-fix-emergency.min.css?v=<?= $cssVersionTimestamp ?>">
 
@@ -1378,8 +1456,108 @@ try {
                     </div>
                 </a>
 
+                <?php if (Nexus\Core\TenantContext::hasFeature('goals')): ?>
+                    <a href="<?= Nexus\Core\TenantContext::getBasePath() ?>/goals" class="nexus-drawer-item">
+                        <div class="nexus-drawer-item-icon icon-amber">
+                            <i class="fa-solid fa-bullseye"></i>
+                        </div>
+                        <div class="nexus-drawer-item-text">
+                            <span class="nexus-drawer-item-label">Goals</span>
+                            <span class="nexus-drawer-item-desc">Set & track goals</span>
+                        </div>
+                    </a>
+                <?php endif; ?>
+
+                <?php if (Nexus\Core\TenantContext::hasFeature('polls')): ?>
+                    <a href="<?= Nexus\Core\TenantContext::getBasePath() ?>/polls" class="nexus-drawer-item">
+                        <div class="nexus-drawer-item-icon icon-cyan">
+                            <i class="fa-solid fa-square-poll-vertical"></i>
+                        </div>
+                        <div class="nexus-drawer-item-text">
+                            <span class="nexus-drawer-item-label">Polls</span>
+                            <span class="nexus-drawer-item-desc">Vote & share opinions</span>
+                        </div>
+                    </a>
+                <?php endif; ?>
+
+                <a href="<?= Nexus\Core\TenantContext::getBasePath() ?>/matches" class="nexus-drawer-item">
+                    <div class="nexus-drawer-item-icon icon-pink">
+                        <i class="fa-solid fa-wand-magic-sparkles"></i>
+                    </div>
+                    <div class="nexus-drawer-item-text">
+                        <span class="nexus-drawer-item-label">Smart Matching</span>
+                        <span class="nexus-drawer-item-desc">AI-powered connections</span>
+                    </div>
+                </a>
+            </div>
+
+            <!-- About Section -->
+            <div class="nexus-drawer-group">
+                <h4 class="nexus-drawer-group-title">About</h4>
+
+                <?php
+                // Load custom pages for About section
+                $mobileCustomPages = \Nexus\Core\TenantContext::getCustomPages('modern');
+                $mobileAboutPages = ['about us', 'our story', 'about story', 'timebanking guide', 'partner with us', 'partner', 'social prescribing', 'timebanking faqs', 'timebanking faq', 'faq'];
+                $mobileImpactPages = ['impact summary', 'impact report', 'strategic plan'];
+
+                $mobilePageIcons = [
+                    'about us' => ['icon' => 'fa-solid fa-heart', 'class' => 'icon-pink'],
+                    'our story' => ['icon' => 'fa-solid fa-heart', 'class' => 'icon-pink'],
+                    'about story' => ['icon' => 'fa-solid fa-heart', 'class' => 'icon-pink'],
+                    'timebanking guide' => ['icon' => 'fa-solid fa-book-open', 'class' => 'icon-purple'],
+                    'partner' => ['icon' => 'fa-solid fa-handshake', 'class' => 'icon-amber'],
+                    'partner with us' => ['icon' => 'fa-solid fa-handshake', 'class' => 'icon-amber'],
+                    'social prescribing' => ['icon' => 'fa-solid fa-hand-holding-medical', 'class' => 'icon-teal'],
+                    'faq' => ['icon' => 'fa-solid fa-circle-question', 'class' => 'icon-cyan'],
+                    'timebanking faq' => ['icon' => 'fa-solid fa-circle-question', 'class' => 'icon-cyan'],
+                    'timebanking faqs' => ['icon' => 'fa-solid fa-circle-question', 'class' => 'icon-cyan'],
+                    'impact summary' => ['icon' => 'fa-solid fa-leaf', 'class' => 'icon-emerald'],
+                    'impact report' => ['icon' => 'fa-solid fa-file-contract', 'class' => 'icon-blue'],
+                    'strategic plan' => ['icon' => 'fa-solid fa-route', 'class' => 'icon-purple'],
+                ];
+
+                foreach ($mobileCustomPages as $page):
+                    $pageName = strtolower($page['name']);
+                    if (!in_array($pageName, $mobileAboutPages)) continue;
+                    $iconData = $mobilePageIcons[$pageName] ?? ['icon' => 'fa-solid fa-file-lines', 'class' => 'icon-slate'];
+                ?>
+                    <a href="<?= htmlspecialchars($page['url']) ?>" class="nexus-drawer-item">
+                        <div class="nexus-drawer-item-icon <?= $iconData['class'] ?>">
+                            <i class="<?= $iconData['icon'] ?>"></i>
+                        </div>
+                        <div class="nexus-drawer-item-text">
+                            <span class="nexus-drawer-item-label"><?= htmlspecialchars($page['name']) ?></span>
+                        </div>
+                    </a>
+                <?php endforeach; ?>
+
+                <?php
+                // Impact pages
+                $hasImpact = false;
+                foreach ($mobileCustomPages as $page):
+                    $pageName = strtolower($page['name']);
+                    if (!in_array($pageName, $mobileImpactPages)) continue;
+                    $hasImpact = true;
+                    $iconData = $mobilePageIcons[$pageName] ?? ['icon' => 'fa-solid fa-file-lines', 'class' => 'icon-slate'];
+                ?>
+                    <a href="<?= htmlspecialchars($page['url']) ?>" class="nexus-drawer-item">
+                        <div class="nexus-drawer-item-icon <?= $iconData['class'] ?>">
+                            <i class="<?= $iconData['icon'] ?>"></i>
+                        </div>
+                        <div class="nexus-drawer-item-text">
+                            <span class="nexus-drawer-item-label"><?= htmlspecialchars($page['name']) ?></span>
+                        </div>
+                    </a>
+                <?php endforeach; ?>
+            </div>
+
+            <!-- Help & Support Section -->
+            <div class="nexus-drawer-group">
+                <h4 class="nexus-drawer-group-title">Help & Support</h4>
+
                 <a href="<?= Nexus\Core\TenantContext::getBasePath() ?>/help" class="nexus-drawer-item">
-                    <div class="nexus-drawer-item-icon icon-teal">
+                    <div class="nexus-drawer-item-icon icon-orange">
                         <i class="fa-solid fa-circle-question"></i>
                     </div>
                     <div class="nexus-drawer-item-text">
@@ -1389,12 +1567,22 @@ try {
                 </a>
 
                 <a href="<?= Nexus\Core\TenantContext::getBasePath() ?>/contact" class="nexus-drawer-item">
-                    <div class="nexus-drawer-item-icon icon-sky">
+                    <div class="nexus-drawer-item-icon icon-blue">
                         <i class="fa-solid fa-envelope"></i>
                     </div>
                     <div class="nexus-drawer-item-text">
                         <span class="nexus-drawer-item-label">Contact Us</span>
                         <span class="nexus-drawer-item-desc">Get in touch</span>
+                    </div>
+                </a>
+
+                <a href="<?= Nexus\Core\TenantContext::getBasePath() ?>/accessibility" class="nexus-drawer-item">
+                    <div class="nexus-drawer-item-icon icon-emerald">
+                        <i class="fa-solid fa-universal-access"></i>
+                    </div>
+                    <div class="nexus-drawer-item-text">
+                        <span class="nexus-drawer-item-label">Accessibility</span>
+                        <span class="nexus-drawer-item-desc">Our commitment</span>
                     </div>
                 </a>
             </div>

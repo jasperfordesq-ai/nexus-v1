@@ -268,6 +268,23 @@ if (!isset($configJson)) {
                 </div>
             </div>
         </div>
+
+        <div class="settings-module settings-module-cyan">
+            <div class="settings-module-icon">
+                <i class="fa-solid fa-file-zipper"></i>
+            </div>
+            <div class="settings-module-content">
+                <h5 class="settings-module-title">Regenerate Minified CSS</h5>
+                <p class="settings-module-desc">Regenerate all .min.css files from source CSS files. Use after CSS changes.</p>
+                <div style="margin-top: 1rem;">
+                    <button type="button" onclick="regenerateMinifiedCSS()" class="admin-btn admin-btn-primary" id="css-minify-btn">
+                        <i class="fa-solid fa-compress"></i> Regenerate All CSS
+                    </button>
+                    <span id="css-minify-result" style="margin-left: 10px;"></span>
+                    <p class="settings-hint" style="margin-top: 0.75rem;">Minifies all CSS files in /assets/css/ directory.</p>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 
@@ -440,6 +457,39 @@ if (!isset($configJson)) {
 <?php endif; ?>
 
 <script>
+function regenerateMinifiedCSS() {
+    var btn = document.getElementById('css-minify-btn');
+    var resultSpan = document.getElementById('css-minify-result');
+
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Processing...';
+    resultSpan.innerHTML = '';
+
+    fetch('<?= $basePath ?>/admin/settings/regenerate-css', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-Token': document.querySelector('input[name="_csrf"]').value
+        }
+    })
+    .then(function(response) { return response.json(); })
+    .then(function(data) {
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fa-solid fa-compress"></i> Regenerate All CSS';
+
+        if (data.success) {
+            resultSpan.innerHTML = '<span style="color: #22c55e;"><i class="fa-solid fa-check"></i> ' + data.message + '</span>';
+        } else {
+            resultSpan.innerHTML = '<span style="color: #ef4444;"><i class="fa-solid fa-times"></i> ' + data.message + '</span>';
+        }
+    })
+    .catch(function(error) {
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fa-solid fa-compress"></i> Regenerate All CSS';
+        resultSpan.innerHTML = '<span style="color: #ef4444;"><i class="fa-solid fa-times"></i> Error: ' + error.message + '</span>';
+    });
+}
+
 function toggleEmailProvider() {
     var provider = document.getElementById('email_provider').value;
     var gmailSettings = document.getElementById('gmail_api_settings');
