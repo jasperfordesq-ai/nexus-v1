@@ -957,83 +957,12 @@ try {
             */ ?>
 
             <?php
-            // File-based custom pages + Database-driven pages (Page Builder)
-            // This section ALWAYS renders, regardless of MenuManager status
-            $customPages = Nexus\Core\TenantContext::getCustomPages('modern');
-            $dbPagesAbout = \Nexus\Core\MenuGenerator::getMenuPages('about');
+            // Database-driven pages (Page Builder) - shown as top-level nav links
             $dbPagesMain = \Nexus\Core\MenuGenerator::getMenuPages('main');
-            $hasBlog = Nexus\Core\TenantContext::hasFeature('blog');
-            $tSlug = \Nexus\Core\TenantContext::get()['slug'] ?? '';
-            $isHourTimebank = ($tSlug === 'hour-timebank' || $tSlug === 'hour_timebank');
-
-            // Main nav items from Page Builder (shown as top-level links)
             foreach ($dbPagesMain as $mainPage):
             ?>
                 <a href="<?= htmlspecialchars($mainPage['url']) ?>" class="nav-link"><i class="fa-solid fa-file-lines" style="margin-right:6px; opacity:0.7;"></i><?= htmlspecialchars($mainPage['title']) ?></a>
-            <?php endforeach;
-
-            // About dropdown (includes file-based pages + database pages marked for About menu)
-            $hasAboutContent = !empty($customPages) || !empty($dbPagesAbout) || $hasBlog;
-            if ($hasAboutContent && !$isHourTimebank):
-            ?>
-                <div class="htb-dropdown premium-dropdown">
-                    <a href="#" class="nav-link premium-dropdown-trigger"><i class="fa-solid fa-circle-info" style="margin-right:6px;"></i>About <span class="htb-arrow">▾</span></a>
-                    <div class="htb-dropdown-content premium-dropdown-menu">
-                        <?php if ($hasBlog): ?>
-                            <a href="<?= Nexus\Core\TenantContext::getBasePath() ?>/news" style="font-weight: 500;"><i class="fa-solid fa-newspaper" style="margin-right:10px; width:16px; text-align:center; color:#6366f1;"></i>Community News</a>
-                            <?php if (!empty($customPages) || !empty($dbPagesAbout)): ?><div style="border-top: 1px solid #e5e7eb; margin: 5px 0;"></div><?php endif; ?>
-                        <?php endif; ?>
-                        <?php foreach ($customPages as $page): ?>
-                            <a href="<?= htmlspecialchars($page['url']) ?>"><i class="fa-solid fa-file-lines" style="margin-right:10px; width:16px; text-align:center; color:#64748b;"></i><?= htmlspecialchars($page['name']) ?></a>
-                        <?php endforeach; ?>
-                        <?php if (!empty($customPages) && !empty($dbPagesAbout)): ?>
-                            <div style="border-top: 1px solid #e5e7eb; margin: 5px 0;"></div>
-                        <?php endif; ?>
-                        <?php foreach ($dbPagesAbout as $dbPage): ?>
-                            <a href="<?= htmlspecialchars($dbPage['url']) ?>"><i class="fa-solid fa-file-lines" style="margin-right:10px; width:16px; text-align:center; color:#8b5cf6;"></i><?= htmlspecialchars($dbPage['title']) ?></a>
-                        <?php endforeach; ?>
-                    </div>
-                </div>
-            <?php endif; ?>
-
-            <?php if ($isHourTimebank): ?>
-                <?php
-                // Main nav items from Page Builder for Hour Timebank
-                foreach ($dbPagesMain as $mainPage):
-                ?>
-                    <a href="<?= htmlspecialchars($mainPage['url']) ?>" class="nav-link"><i class="fa-solid fa-file-lines" style="margin-right:6px; opacity:0.7;"></i><?= htmlspecialchars($mainPage['title']) ?></a>
-                <?php endforeach; ?>
-
-                <div class="htb-dropdown premium-dropdown">
-                    <a href="#" class="nav-link premium-dropdown-trigger"><i class="fa-solid fa-circle-info" style="margin-right:6px;"></i>About ▾</a>
-                    <div class="htb-dropdown-content premium-dropdown-menu">
-                        <?php if (\Nexus\Core\TenantContext::hasFeature('blog')): ?>
-                            <a href="<?= \Nexus\Core\TenantContext::getBasePath() ?>/blog"><i class="fa-solid fa-newspaper" style="margin-right:10px; width:16px; text-align:center; color:#6366f1;"></i>Latest News</a>
-                            <div style="border-top:1px solid #e5e7eb; margin:5px 0;"></div>
-                        <?php endif; ?>
-                        <a href="<?= \Nexus\Core\TenantContext::getBasePath() ?>/our-story"><i class="fa-solid fa-heart" style="margin-right:10px; width:16px; text-align:center; color:#ec4899;"></i>About Us</a>
-                        <a href="<?= \Nexus\Core\TenantContext::getBasePath() ?>/timebanking-guide"><i class="fa-solid fa-book-open" style="margin-right:10px; width:16px; text-align:center; color:#8b5cf6;"></i>Timebanking Guide</a>
-                        <a href="<?= \Nexus\Core\TenantContext::getBasePath() ?>/partner"><i class="fa-solid fa-handshake" style="margin-right:10px; width:16px; text-align:center; color:#f59e0b;"></i>Partner With Us</a>
-                        <a href="<?= \Nexus\Core\TenantContext::getBasePath() ?>/social-prescribing"><i class="fa-solid fa-hand-holding-medical" style="margin-right:10px; width:16px; text-align:center; color:#14b8a6;"></i>Social Prescribing</a>
-                        <a href="<?= \Nexus\Core\TenantContext::getBasePath() ?>/faq"><i class="fa-solid fa-circle-question" style="margin-right:10px; width:16px; text-align:center; color:#06b6d4;"></i>Timebanking FAQ's</a>
-                        <?php if (!empty($dbPagesAbout)): ?>
-                            <div style="border-top:1px solid #e5e7eb; margin:8px 0;"></div>
-                            <div style="padding: 4px 16px; font-size: 0.75rem; font-weight: 700; color: #9ca3af; text-transform: uppercase; letter-spacing: 0.5px;"><i class="fa-solid fa-file-lines" style="margin-right:8px;"></i>Custom Pages</div>
-                            <?php foreach ($dbPagesAbout as $dbPage): ?>
-                                <a href="<?= htmlspecialchars($dbPage['url']) ?>"><i class="fa-solid fa-file-lines" style="margin-right:10px; width:16px; text-align:center; color:#8b5cf6;"></i><?= htmlspecialchars($dbPage['title']) ?></a>
-                            <?php endforeach; ?>
-                        <?php endif; ?>
-                        <div style="border-top:1px solid #e5e7eb; margin:8px 0;"></div>
-                        <div style="padding: 4px 16px; font-size: 0.75rem; font-weight: 700; color: #9ca3af; text-transform: uppercase; letter-spacing: 0.5px;"><i class="fa-solid fa-chart-line" style="margin-right:8px;"></i>Our Impact</div>
-                        <a href="<?= \Nexus\Core\TenantContext::getBasePath() ?>/impact-summary" style="color:#059669; font-weight:500;"><i class="fa-solid fa-leaf" style="margin-right:10px; width:16px; text-align:center;"></i>Impact Summary</a>
-                        <a href="<?= \Nexus\Core\TenantContext::getBasePath() ?>/impact-report" style="color:#2563eb; font-weight:500;"><i class="fa-solid fa-file-contract" style="margin-right:10px; width:16px; text-align:center;"></i>Impact Report</a>
-                        <a href="<?= \Nexus\Core\TenantContext::getBasePath() ?>/strategic-plan" style="color:#7c3aed; font-weight:500;"><i class="fa-solid fa-route" style="margin-right:10px; width:16px; text-align:center;"></i>Strategic Plan</a>
-                        <div style="border-top:1px solid #e5e7eb; margin:8px 0;"></div>
-                        <a href="<?= \Nexus\Core\TenantContext::getBasePath() ?>/contact"><i class="fa-solid fa-envelope" style="margin-right:10px; width:16px; text-align:center; color:#3b82f6;"></i>Contact Us</a>
-                        <a href="<?= \Nexus\Core\TenantContext::getBasePath() ?>/help"><i class="fa-solid fa-life-ring" style="margin-right:10px; width:16px; text-align:center; color:#f97316;"></i>Help Center</a>
-                    </div>
-                </div>
-            <?php endif; ?>
+            <?php endforeach; ?>
 
                 <!-- Collapsible Search Container -->
                 <div class="collapsible-search-container" style="margin-left: 15px; display: flex; align-items: center;">
