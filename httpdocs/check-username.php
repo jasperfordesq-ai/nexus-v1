@@ -3,10 +3,8 @@
  * Simple Username Diagnostic
  */
 
-// Start session
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
+// Load the application bootstrap
+require_once __DIR__ . '/../bootstrap.php';
 
 header('Content-Type: text/html; charset=utf-8');
 
@@ -27,16 +25,14 @@ echo "\n";
 // If logged in, fetch user data from database
 if (!empty($_SESSION['user_id'])) {
     try {
-        // Load database config
-        require_once __DIR__ . '/../config/database.php';
-
         $userId = (int)$_SESSION['user_id'];
 
-        // Simple PDO query
-        $db = \Nexus\Core\Database::getInstance();
-        $stmt = $db->prepare("SELECT id, first_name, last_name, email, profile_type, organization_name, role, avatar_url, tenant_id FROM users WHERE id = ?");
-        $stmt->execute([$userId]);
-        $user = $stmt->fetch(PDO::FETCH_ASSOC);
+        // Use the Database class from the framework
+        $stmt = \Nexus\Core\Database::query(
+            "SELECT id, first_name, last_name, email, profile_type, organization_name, role, avatar_url, tenant_id FROM users WHERE id = ?",
+            [$userId]
+        );
+        $user = $stmt->fetch();
 
         if ($user) {
             echo "=== DATABASE USER RECORD ===\n";

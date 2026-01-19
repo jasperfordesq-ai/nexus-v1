@@ -12,9 +12,9 @@ html {
 
 /* Body scroll behavior */
 body {
-    overflow-y: visible;
+    overflow-y: auto;
     overflow-x: hidden;
-    position: relative;
+    position: static;
     height: auto;
     max-height: none;
 }

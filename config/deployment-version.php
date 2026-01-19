@@ -10,7 +10,7 @@
  */
 
 return [
-    'version' => '2026.01.19.009', // Update this with each deployment
-    'timestamp' => 1768843731, // Unix timestamp of last deployment
-    'description' => 'CRITICAL: Fix overflow:visible bug blocking scroll on all pages'
+    'version' => '2026.01.19.010', // Update this with each deployment
+    'timestamp' => 1768843906, // Unix timestamp of last deployment
+    'description' => 'Fix overflow-y:visible bug in scroll-fix-emergency.css'
 ];
