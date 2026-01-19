@@ -213,7 +213,7 @@
     color: #1e293b;
     font-size: 1rem;
     font-family: inherit;
-    transition: all 0.3s ease;
+    transition: all 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
     box-sizing: border-box;
 }
 
@@ -266,7 +266,7 @@ textarea.holo-input {
     border-radius: 18px;
     padding: 20px 24px;
     margin-bottom: 30px;
-    transition: all 0.3s ease;
+    transition: all 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
 }
 
 .holo-buddy-card:hover {
@@ -345,7 +345,7 @@ textarea.holo-input {
     font-size: 1rem;
     font-weight: 600;
     cursor: pointer;
-    transition: all 0.3s ease;
+    transition: all 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
     text-decoration: none;
     border: none;
     font-family: inherit;
@@ -476,7 +476,7 @@ textarea.holo-input {
     .htb-btn:active,
     button:active {
         transform: scale(0.96) !important;
-        transition: transform 0.1s ease !important;
+        transition: transform 0.1s cubic-bezier(0.4, 0.0, 0.2, 1) !important;
     }
 
     /* Touch Targets - WCAG 2.1 AA (44px minimum) */
@@ -742,7 +742,7 @@ textarea.holo-input {
     color: #1e293b;
     font-size: 1rem;
     font-family: inherit;
-    transition: all 0.3s ease;
+    transition: all 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
     box-sizing: border-box;
 }
 
@@ -795,7 +795,7 @@ textarea.holo-input {
     border-radius: 18px;
     padding: 20px 24px;
     margin-bottom: 30px;
-    transition: all 0.3s ease;
+    transition: all 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
 }
 
 .holo-buddy-card:hover {
@@ -873,7 +873,7 @@ textarea.holo-input {
     font-size: 1rem;
     font-weight: 600;
     cursor: pointer;
-    transition: all 0.3s ease;
+    transition: all 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
     text-decoration: none;
     border: none;
     font-family: inherit;
@@ -1063,7 +1063,7 @@ textarea.holo-input {
         .quick-action-btn:active,
         button:active {
             transform: scale(0.96) !important;
-            transition: transform 0.1s ease !important;
+            transition: transform 0.1s cubic-bezier(0.4, 0.0, 0.2, 1) !important;
         }
 
         /* Touch Targets - WCAG 2.1 AA (44px minimum) */
@@ -1211,7 +1211,7 @@ textarea.holo-input {
             display: flex;
             align-items: center;
             gap: 10px;
-            transition: all 0.3s ease;
+            transition: all 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
             box-shadow: 0 4px 12px rgba(31, 38, 135, 0.1),
                         inset 0 1px 0 rgba(255, 255, 255, 0.4);
             position: relative;
@@ -1300,7 +1300,7 @@ textarea.holo-input {
             border: 1px solid rgba(255, 255, 255, 0.3);
             box-shadow: 0 8px 32px rgba(31, 38, 135, 0.15),
                         inset 0 0 0 1px rgba(255, 255, 255, 0.4);
-            transition: all 0.3s ease;
+            transition: all 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
         }
 
         [data-theme="dark"] #goals-glass-wrapper .glass-info-card {
@@ -1325,7 +1325,7 @@ textarea.holo-input {
             font-size: 1rem;
             font-weight: 700;
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: all 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
             box-shadow: 0 4px 16px rgba(132, 204, 22, 0.3),
                         inset 0 1px 0 rgba(255, 255, 255, 0.2);
             text-decoration: none;
@@ -1368,7 +1368,7 @@ textarea.holo-input {
             border-radius: 20px;
             box-shadow: 0 8px 32px rgba(31, 38, 135, 0.12),
                         inset 0 1px 0 rgba(255, 255, 255, 0.5);
-            transition: all 0.3s ease;
+            transition: all 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
             overflow: hidden;
             display: flex;
             flex-direction: column;
@@ -1576,7 +1576,7 @@ textarea.holo-input {
             align-items: center;
             justify-content: center;
             min-height: 320px;
-            transition: all 0.3s ease;
+            transition: all 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
         }
 
         #goals-glass-wrapper .glass-create-card:hover {
@@ -1833,7 +1833,7 @@ textarea.holo-input {
     .glass-pill-btn:active,
     button:active {
         transform: scale(0.96) !important;
-        transition: transform 0.1s ease !important;
+        transition: transform 0.1s cubic-bezier(0.4, 0.0, 0.2, 1) !important;
     }
 
     /* Touch Targets - WCAG 2.1 AA (44px minimum) */
@@ -2095,7 +2095,7 @@ textarea.holo-input {
         flex-direction: column;
         /* Nested Blur not always needed if background is solid enough, but consistent here */
         backdrop-filter: blur(10px);
-        transition: all 0.3s ease;
+        transition: all 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
     }
 
     /* Status: Matched (Blue) */

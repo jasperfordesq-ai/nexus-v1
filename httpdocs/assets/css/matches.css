@@ -181,7 +181,7 @@
     font-weight: 600;
     font-size: 0.95rem;
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: all 0.2s cubic-bezier(0.4, 0.0, 0.2, 1);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -476,7 +476,7 @@
     font-weight: 600;
     font-size: 0.9rem;
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: all 0.2s cubic-bezier(0.4, 0.0, 0.2, 1);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -556,7 +556,7 @@
     border-radius: 12px;
     font-weight: 600;
     text-decoration: none;
-    transition: all 0.2s ease;
+    transition: all 0.2s cubic-bezier(0.4, 0.0, 0.2, 1);
 }
 
 .matches-empty-btn:hover {
@@ -592,7 +592,7 @@
     border-radius: 10px;
     font-weight: 600;
     text-decoration: none;
-    transition: all 0.2s ease;
+    transition: all 0.2s cubic-bezier(0.4, 0.0, 0.2, 1);
     display: flex;
     align-items: center;
     gap: 6px;
@@ -735,7 +735,7 @@
     text-decoration: none;
     font-weight: 600;
     margin-bottom: 24px;
-    transition: all 0.2s;
+    transition: all 0.2s cubic-bezier(0.4, 0.0, 0.2, 1);
 }
 
 .hot-back-link:hover {
@@ -916,7 +916,7 @@
     font-weight: 600;
     font-size: 0.9rem;
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: all 0.2s cubic-bezier(0.4, 0.0, 0.2, 1);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -1004,7 +1004,7 @@
     border-radius: 12px;
     font-weight: 600;
     text-decoration: none;
-    transition: all 0.2s ease;
+    transition: all 0.2s cubic-bezier(0.4, 0.0, 0.2, 1);
 }
 
 .hot-empty-btn:hover {
@@ -1103,7 +1103,7 @@
     text-decoration: none;
     font-weight: 600;
     margin-bottom: 24px;
-    transition: all 0.2s;
+    transition: all 0.2s cubic-bezier(0.4, 0.0, 0.2, 1);
 }
 
 .mutual-back-link:hover {
@@ -1339,7 +1339,7 @@
     font-weight: 600;
     font-size: 0.9rem;
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: all 0.2s cubic-bezier(0.4, 0.0, 0.2, 1);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -1427,7 +1427,7 @@
     border-radius: 12px;
     font-weight: 600;
     text-decoration: none;
-    transition: all 0.2s ease;
+    transition: all 0.2s cubic-bezier(0.4, 0.0, 0.2, 1);
 }
 
 .mutual-empty-btn:hover {
@@ -1663,7 +1663,7 @@
     background: white;
     color: #1e293b;
     cursor: pointer;
-    transition: all 0.2s;
+    transition: all 0.2s cubic-bezier(0.4, 0.0, 0.2, 1);
     -webkit-appearance: none;
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%236366f1' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
     background-repeat: no-repeat;
@@ -1692,7 +1692,7 @@
     background: rgba(99, 102, 241, 0.05);
     border-radius: 12px;
     margin-bottom: 12px;
-    transition: all 0.2s;
+    transition: all 0.2s cubic-bezier(0.4, 0.0, 0.2, 1);
 }
 
 .prefs-toggle:hover {
@@ -1791,7 +1791,7 @@
     border: 2px solid transparent;
     border-radius: 10px;
     cursor: pointer;
-    transition: all 0.2s;
+    transition: all 0.2s cubic-bezier(0.4, 0.0, 0.2, 1);
     font-weight: 500;
     font-size: 0.9rem;
     color: #475569;
@@ -1825,7 +1825,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: all 0.2s;
+    transition: all 0.2s cubic-bezier(0.4, 0.0, 0.2, 1);
     flex-shrink: 0;
 }
 
@@ -1852,7 +1852,7 @@
     font-size: 1.1rem;
     font-weight: 700;
     cursor: pointer;
-    transition: all 0.3s;
+    transition: all 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -1877,7 +1877,7 @@
     font-weight: 600;
     text-decoration: none;
     margin-bottom: 24px;
-    transition: all 0.2s;
+    transition: all 0.2s cubic-bezier(0.4, 0.0, 0.2, 1);
 }
 
 .prefs-back:hover {

@@ -96,6 +96,10 @@ module.exports = {
         'httpdocs/assets/css/static-pages.css',
         // Phase 14: Scattered singles bundle (2026-01-19)
         'httpdocs/assets/css/scattered-singles.css',
+        // Polish enhancements (2026-01-19)
+        'httpdocs/assets/css/loading-skeletons.css',
+        'httpdocs/assets/css/micro-interactions.css',
+        'httpdocs/assets/css/modal-polish.css',
     ],
 
     // Output directory for purged CSS
