@@ -76,6 +76,10 @@
     <link rel="stylesheet" href="/assets/css/nexus-native-nav-v2.min.css?v=<?= $cssVersion ?>">
     <link rel="stylesheet" href="/assets/css/nexus-polish.min.css?v=<?= $cssVersion ?>">
     <link rel="stylesheet" href="/assets/css/nexus-interactions.min.css?v=<?= $cssVersion ?>">
+    <!-- Visual Polish Enhancements (loading states, micro-interactions, modals) -->
+    <link rel="stylesheet" href="/assets/css/loading-skeletons.min.css?v=<?= $cssVersion ?>">
+    <link rel="stylesheet" href="/assets/css/micro-interactions.min.css?v=<?= $cssVersion ?>">
+    <link rel="stylesheet" href="/assets/css/modal-polish.min.css?v=<?= $cssVersion ?>">
     <link rel="stylesheet" href="/assets/css/nexus-shared-transitions.min.css?v=<?= $cssVersion ?>">
     <link rel="stylesheet" href="/assets/css/post-box-home.min.css?v=<?= $cssVersion ?>">
 

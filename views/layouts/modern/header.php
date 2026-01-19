@@ -138,6 +138,10 @@ try {
     <!-- Consolidated polish files (replaces nexus-10x-polish + nexus-ux-polish) -->
     <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/nexus-polish.min.css?v=<?= $cssVersionTimestamp ?>" media="print" onload="this.media='all'">
     <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/nexus-interactions.min.css?v=<?= $cssVersionTimestamp ?>" media="print" onload="this.media='all'">
+    <!-- Visual Polish Enhancements (loading states, micro-interactions, modals) -->
+    <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/loading-skeletons.min.css?v=<?= $cssVersionTimestamp ?>" media="print" onload="this.media='all'">
+    <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/micro-interactions.min.css?v=<?= $cssVersionTimestamp ?>" media="print" onload="this.media='all'">
+    <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/modal-polish.min.css?v=<?= $cssVersionTimestamp ?>" media="print" onload="this.media='all'">
 
     <!-- Mobile-only CSS -->
     <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/nexus-mobile.min.css?v=<?= $cssVersionTimestamp ?>" media="(max-width: 768px)">

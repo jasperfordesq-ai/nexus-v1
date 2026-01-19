@@ -206,6 +206,8 @@ $jsVersion = '2.5.13';
 <script src="/assets/js/nexus-mobile.min.js?v=<?= $jsVersion ?>" defer></script>
 <script src="/assets/js/nexus-capacitor-bridge.min.js?v=<?= $jsVersion ?>" defer></script>
 <script src="/assets/js/nexus-shared-transitions.min.js?v=<?= $jsVersion ?>" defer></script>
+<!-- Visual Polish Helpers - Auto-apply micro-interactions and provide utility functions -->
+<script src="/assets/js/polish-helpers.min.js?v=<?= $jsVersion ?>" defer></script>
 <!-- 2026-01-17: Removed old polish JS (nexus-10x-polish, nexus-ux-polish, nexus-native-nav v1) -->
 <!-- CSS consolidated into nexus-polish.css and nexus-interactions.css -->
 <?php
