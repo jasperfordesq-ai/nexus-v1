@@ -100,6 +100,68 @@ module.exports = {
         'httpdocs/assets/css/loading-skeletons.css',
         'httpdocs/assets/css/micro-interactions.css',
         'httpdocs/assets/css/modal-polish.css',
+        // Responsive enhancements (2026-01-19)
+        'httpdocs/assets/css/responsive-forms.css',
+        'httpdocs/assets/css/responsive-tables.css',
+        // Admin sidebar (2026-01-19)
+        'httpdocs/assets/css/admin-sidebar.css',
+        // CivicOne footer (extracted 2026-01-19)
+        'httpdocs/assets/css/civicone-footer.css',
+        // Header extracted styles (2026-01-19)
+        'httpdocs/assets/css/nexus-header-extracted.css',
+        // Notification drawer (shared component 2026-01-19)
+        'httpdocs/assets/css/notification-drawer.css',
+        // Feed action pills (extracted from footer.php 2026-01-19)
+        'httpdocs/assets/css/feed-action-pills.css',
+        // AI Chat Widget (extracted from partials 2026-01-19)
+        'httpdocs/assets/css/ai-chat-widget.css',
+        // Accessibility enhancements (2026-01-19)
+        'httpdocs/assets/css/accessibility.css',
+        // CivicOne dashboard (enhanced 2026-01-19)
+        'httpdocs/assets/css/civicone-dashboard.css',
+        // CivicOne achievements module (extracted 2026-01-19)
+        'httpdocs/assets/css/civicone-achievements.css',
+        // CivicOne theme files
+        'httpdocs/assets/css/civicone-mobile.css',
+        'httpdocs/assets/css/civicone-native.css',
+        // Admin gold standard
+        'httpdocs/assets/css/admin-gold-standard.css',
+        // Admin federation module (created 2026-01-19)
+        'httpdocs/assets/css/admin-federation.css',
+        // Feed components
+        'httpdocs/assets/css/feed-empty-state.css',
+        // Empty states unified system (2026-01-19)
+        'httpdocs/assets/css/empty-states.css',
+        // Image lazy loading (2026-01-19)
+        'httpdocs/assets/css/image-lazy-load.css',
+        // Hover micro-interactions (2026-01-19)
+        'httpdocs/assets/css/hover-interactions.css',
+        // Focus rings (2026-01-19)
+        'httpdocs/assets/css/focus-rings.css',
+        // Groups overlay
+        'httpdocs/assets/css/groups-edit-overlay.css',
+        // CivicOne header (extracted 2026-01-19)
+        'httpdocs/assets/css/civicone-header.css',
+        // CivicOne events module (WCAG 2.1 AA 2026-01-19)
+        'httpdocs/assets/css/civicone-events.css',
+        // CivicOne profile module (WCAG 2.1 AA 2026-01-19)
+        'httpdocs/assets/css/civicone-profile.css',
+        // CivicOne groups module (WCAG 2.1 AA 2026-01-19)
+        'httpdocs/assets/css/civicone-groups.css',
+        // CivicOne volunteering module (WCAG 2.1 AA 2026-01-19)
+        'httpdocs/assets/css/civicone-volunteering.css',
+        // CivicOne mini modules - polls, goals, resources (WCAG 2.1 AA 2026-01-19)
+        'httpdocs/assets/css/civicone-mini-modules.css',
+        // CivicOne messages & notifications (WCAG 2.1 AA 2026-01-19)
+        'httpdocs/assets/css/civicone-messages.css',
+        // CivicOne wallet & insights (WCAG 2.1 AA 2026-01-19)
+        'httpdocs/assets/css/civicone-wallet.css',
+        // CivicOne blog module (WCAG 2.1 AA 2026-01-19)
+        'httpdocs/assets/css/civicone-blog.css',
+        // CivicOne help & settings (WCAG 2.1 AA 2026-01-19)
+        'httpdocs/assets/css/civicone-help.css',
+        // CivicOne matches & connections (WCAG 2.1 AA 2026-01-19)
+        'httpdocs/assets/css/civicone-matches.css',
     ],
 
     // Output directory for purged CSS
@@ -243,6 +305,11 @@ module.exports = {
             // Keep all glass- prefixed classes
             /^glass-/,
 
+            // Keep all admin-sidebar prefixed classes
+            /^admin-sidebar/,
+            /^admin-layout/,
+            /^admin-main-content/,
+
             // Home page feed classes
             /^feed-/,
             /^composer-/,
@@ -331,6 +398,10 @@ module.exports = {
             /^message-/,
             /^post-/,
             /^create-/,
+            /^send-/,
+            /^recipient-/,
+            /^amount-/,
+            /^quick-/,
 
             // Auth pages
             /^auth-/,
@@ -363,6 +434,9 @@ module.exports = {
 
             // Keep all skeleton classes
             /skeleton/,
+
+            // Keep all lazy loading classes
+            /^lazy-/,
 
             // Keep all toast classes
             /toast/,

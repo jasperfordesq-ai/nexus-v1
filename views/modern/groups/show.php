@@ -251,9 +251,35 @@ if ($currentUserId && !$isMember) {
 
                     <!-- Feed Posts Container -->
                     <div id="groupFeedPosts" class="group-feed-posts">
-                        <div class="feed-loading">
-                            <i class="fa-solid fa-spinner fa-spin"></i>
-                            <span>Loading posts...</span>
+                        <!-- Feed Loading Skeleton -->
+                        <div class="feed-loading-skeleton">
+                            <div class="feed-skeleton skeleton">
+                                <div class="feed-skeleton-header">
+                                    <div class="skeleton skeleton-avatar"></div>
+                                    <div style="flex: 1;">
+                                        <div class="skeleton skeleton-text" style="width: 40%;"></div>
+                                        <div class="skeleton skeleton-text small" style="width: 25%;"></div>
+                                    </div>
+                                </div>
+                                <div class="feed-skeleton-content">
+                                    <div class="skeleton skeleton-text"></div>
+                                    <div class="skeleton skeleton-text" style="width: 85%;"></div>
+                                    <div class="skeleton skeleton-text" style="width: 60%;"></div>
+                                </div>
+                            </div>
+                            <div class="feed-skeleton skeleton">
+                                <div class="feed-skeleton-header">
+                                    <div class="skeleton skeleton-avatar"></div>
+                                    <div style="flex: 1;">
+                                        <div class="skeleton skeleton-text" style="width: 35%;"></div>
+                                        <div class="skeleton skeleton-text small" style="width: 20%;"></div>
+                                    </div>
+                                </div>
+                                <div class="feed-skeleton-content">
+                                    <div class="skeleton skeleton-text"></div>
+                                    <div class="skeleton skeleton-text" style="width: 90%;"></div>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
@@ -1136,7 +1162,7 @@ async function loadGroupFeed(groupId, loadMore = false) {
     const loadMoreBtn = document.getElementById('groupFeedLoadMore');
 
     if (!loadMore) {
-        container.innerHTML = '<div class="feed-loading"><i class="fa-solid fa-spinner fa-spin"></i><span>Loading posts...</span></div>';
+        // Skeleton is already shown in HTML, just reset offset
         groupFeedOffset = 0;
     }
 

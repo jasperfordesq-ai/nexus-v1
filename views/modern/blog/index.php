@@ -32,6 +32,23 @@ $basePath = \Nexus\Core\TenantContext::getBasePath();
             <div class="news-hero-divider"></div>
         </section>
 
+        <!-- Skeleton Loader -->
+        <div class="news-skeleton-grid skeleton-container" id="newsSkeleton" aria-label="Loading news">
+            <?php for ($i = 0; $i < 6; $i++): ?>
+            <div class="news-card-skeleton">
+                <div class="skeleton skeleton-image"></div>
+                <div class="skeleton-body">
+                    <div class="skeleton skeleton-date"></div>
+                    <div class="skeleton skeleton-title"></div>
+                    <div class="skeleton skeleton-title"></div>
+                    <div class="skeleton skeleton-excerpt"></div>
+                    <div class="skeleton skeleton-excerpt"></div>
+                    <div class="skeleton skeleton-btn"></div>
+                </div>
+            </div>
+            <?php endfor; ?>
+        </div>
+
         <?php if (empty($posts)): ?>
             <!-- Empty State -->
             <div class="news-empty-state">
@@ -42,7 +59,6 @@ $basePath = \Nexus\Core\TenantContext::getBasePath();
                 <p class="news-empty-text">Check back soon for the latest news and announcements.</p>
             </div>
         <?php else: ?>
-            <!-- News Grid -->
             <!-- News Grid -->
             <div class="news-grid" id="news-grid-container">
                 <?php require __DIR__ . '/partials/feed-items.php'; ?>
@@ -61,6 +77,22 @@ $basePath = \Nexus\Core\TenantContext::getBasePath();
     // ============================================
     // GOLD STANDARD - Native App Features
     // ============================================
+
+    // Skeleton Loader Transition
+    (function initSkeletonLoader() {
+        const skeleton = document.getElementById('newsSkeleton');
+        const grid = document.getElementById('news-grid-container');
+        const emptyState = document.querySelector('.news-empty-state');
+
+        if (!skeleton) return;
+
+        // Hide skeleton and show content after short delay
+        setTimeout(function() {
+            skeleton.classList.add('hidden');
+            if (grid) grid.classList.add('content-loaded');
+            if (emptyState) emptyState.classList.add('content-loaded');
+        }, 300);
+    })();
 
     // Offline Indicator
     (function initOfflineIndicator() {

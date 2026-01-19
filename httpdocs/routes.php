@@ -1459,6 +1459,7 @@ $router->add('GET', '/admin/cron-jobs/api/stats', 'Nexus\Controllers\Admin\CronJ
 // Admin Listings
 $router->add('GET', '/admin/listings', 'Nexus\Controllers\Admin\ListingController@index');
 $router->add('POST', '/admin/listings/delete/{id}', 'Nexus\Controllers\Admin\ListingController@delete');
+$router->add('POST', '/admin/listings/approve/{id}', 'Nexus\Controllers\Admin\ListingController@approve');
 
 // Admin SEO
 $router->add('GET', '/admin/seo', 'Nexus\Controllers\Admin\SeoController@index');
@@ -1501,6 +1502,7 @@ $router->add('POST', '/admin/newsletters/send-test/{id}', 'Nexus\Controllers\Adm
 $router->add('POST', '/admin/newsletters/delete', 'Nexus\Controllers\Admin\NewsletterController@delete');
 $router->add('GET', '/admin/newsletters/duplicate/{id}', 'Nexus\Controllers\Admin\NewsletterController@duplicate');
 $router->add('GET', '/admin/newsletters/stats/{id}', 'Nexus\Controllers\Admin\NewsletterController@stats');
+$router->add('GET', '/admin/newsletters/activity/{id}', 'Nexus\Controllers\Admin\NewsletterController@activity');
 $router->add('GET', '/admin/newsletters/analytics', 'Nexus\Controllers\Admin\NewsletterController@analytics');
 $router->add('POST', '/admin/newsletters/select-winner/{id}', 'Nexus\Controllers\Admin\NewsletterController@selectWinner');
 

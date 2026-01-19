@@ -1,36 +1,38 @@
 <?php
-// CivicOne View: Message Thread (Chat)
+// CivicOne View: Message Thread (Chat) - WCAG 2.1 AA Compliant
+// CSS extracted to civicone-messages.css
 $pageTitle = 'Chat with ' . $otherUser['name'];
 require dirname(__DIR__, 2) . '/layouts/civicone/header.php';
 ?>
 
 <div class="civic-container">
 
-    <div style="margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 4px solid var(--skin-primary, #00796B); padding-bottom: 10px;">
-        <h1 style="margin: 0; text-transform: uppercase;">
-            <a href="<?= Nexus\Core\TenantContext::getBasePath() ?>/messages" style="text-decoration: none; color: inherit;">&larr;</a>
+    <div class="civic-thread-header">
+        <h1>
+            <a href="<?= Nexus\Core\TenantContext::getBasePath() ?>/messages"
+               class="civic-thread-back"
+               aria-label="Back to inbox">&larr;</a>
             <?= htmlspecialchars($otherUser['name']) ?>
         </h1>
-        <a href="<?= Nexus\Core\TenantContext::getBasePath() ?>/messages" class="civic-btn" style="background: #ccc; color: #333; font-size: 0.9rem; padding: 5px 15px;">Inbox</a>
+        <a href="<?= Nexus\Core\TenantContext::getBasePath() ?>/messages" class="civic-btn civic-inbox-btn">Inbox</a>
     </div>
 
-    <div class="civic-card civic-chat-container" style="display: flex; flex-direction: column; height: 70vh;">
+    <div class="civic-card civic-chat-container" role="log" aria-label="Message conversation with <?= htmlspecialchars($otherUser['name']) ?>">
 
         <!-- Messages Area -->
-        <div id="chat-messages" style="flex: 1; overflow-y: auto; padding: 20px; background: #fafafa; border-bottom: 1px solid #eee;">
+        <div id="chat-messages" class="civic-chat-messages">
             <?php foreach ($messages as $msg):
                 $isMe = $msg['sender_id'] == $_SESSION['user_id'];
-                $align = $isMe ? 'flex-end' : 'flex-start';
-                $bg = $isMe ? 'var(--skin-primary)' : '#e5e7eb';
-                $color = $isMe ? '#fff' : '#1f2937';
+                $wrapperClass = $isMe ? 'civic-chat-bubble-wrapper civic-chat-bubble-wrapper--sent' : 'civic-chat-bubble-wrapper civic-chat-bubble-wrapper--received';
+                $bubbleClass = $isMe ? 'civic-chat-bubble civic-chat-bubble--sent' : 'civic-chat-bubble civic-chat-bubble--received';
             ?>
-                <div style="display: flex; justify-content: <?= $align ?>; margin-bottom: 15px;">
-                    <div style="max-width: 70%; padding: 10px 15px; border-radius: 12px; background: <?= $bg ?>; color: <?= $color ?>; position: relative;">
-                        <div style="font-weight: bold; font-size: 0.8rem; margin-bottom: 4px; opacity: 0.8;">
+                <div class="<?= $wrapperClass ?>">
+                    <div class="<?= $bubbleClass ?>">
+                        <div class="civic-chat-sender">
                             <?= $isMe ? 'You' : htmlspecialchars($otherUser['name']) ?>
-                            <span style="font-weight: normal; margin-left: 5px; opacity: 0.7;"><?= date('H:i', strtotime($msg['created_at'])) ?></span>
+                            <time class="civic-chat-time" datetime="<?= $msg['created_at'] ?>"><?= date('H:i', strtotime($msg['created_at'])) ?></time>
                         </div>
-                        <div style="word-wrap: break-word; line-height: 1.4;">
+                        <div class="civic-chat-text">
                             <?= nl2br(htmlspecialchars($msg['body'])) ?>
                         </div>
                     </div>
@@ -39,15 +41,14 @@ require dirname(__DIR__, 2) . '/layouts/civicone/header.php';
         </div>
 
         <!-- Reply Form -->
-        <div style="padding: 20px; background: #fff;">
-            <form action="<?= Nexus\Core\TenantContext::getBasePath() ?>/messages/store" method="POST">
+        <div class="civic-chat-reply">
+            <form action="<?= Nexus\Core\TenantContext::getBasePath() ?>/messages/store" method="POST" class="civic-chat-reply-form">
                 <?= Nexus\Core\Csrf::input() ?>
                 <input type="hidden" name="receiver_id" value="<?= $otherUser['id'] ?>">
 
-                <div style="display: flex; gap: 10px;">
-                    <textarea name="body" rows="2" placeholder="Write a message..." required class="civic-input" style="flex: 1; resize: none; border: 2px solid #ddd;"></textarea>
-                    <button type="submit" class="civic-btn" style="padding: 0 30px;">Send</button>
-                </div>
+                <label for="message-body" class="visually-hidden">Write a message</label>
+                <textarea name="body" id="message-body" rows="2" placeholder="Write a message..." required class="civic-input civic-chat-textarea"></textarea>
+                <button type="submit" class="civic-btn civic-chat-send">Send</button>
             </form>
         </div>
 
@@ -62,19 +63,5 @@ require dirname(__DIR__, 2) . '/layouts/civicone/header.php';
         chatBox.scrollTop = chatBox.scrollHeight;
     });
 </script>
-
-<style>
-    /* Mobile chat fixes */
-    @media (max-width: 600px) {
-        .civic-chat-container {
-            height: calc(100vh - 200px) !important;
-            max-height: calc(100vh - 200px) !important;
-            margin-bottom: calc(70px + env(safe-area-inset-bottom, 0px));
-        }
-        .civic-chat-container textarea {
-            min-height: 44px;
-        }
-    }
-</style>
 
 <?php require dirname(__DIR__, 2) . '/layouts/civicone/footer.php'; ?>

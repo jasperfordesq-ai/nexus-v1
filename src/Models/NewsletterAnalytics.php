@@ -634,6 +634,79 @@ class NewsletterAnalytics
     }
 
     /**
+     * Get all activity for a newsletter with pagination
+     */
+    public static function getAllActivity($newsletterId, $limit = 50, $offset = 0, $type = null)
+    {
+        $tenantId = TenantContext::getId();
+
+        if ($type === 'open') {
+            $activity = Database::query(
+                "SELECT 'open' as type, email, opened_at as timestamp, NULL as url
+                 FROM newsletter_opens
+                 WHERE tenant_id = ? AND newsletter_id = ?
+                 ORDER BY timestamp DESC
+                 LIMIT ? OFFSET ?",
+                [$tenantId, $newsletterId, $limit, $offset]
+            )->fetchAll();
+        } elseif ($type === 'click') {
+            $activity = Database::query(
+                "SELECT 'click' as type, email, clicked_at as timestamp, url
+                 FROM newsletter_clicks
+                 WHERE tenant_id = ? AND newsletter_id = ?
+                 ORDER BY timestamp DESC
+                 LIMIT ? OFFSET ?",
+                [$tenantId, $newsletterId, $limit, $offset]
+            )->fetchAll();
+        } else {
+            $activity = Database::query(
+                "(SELECT 'open' as type, email, opened_at as timestamp, NULL as url
+                  FROM newsletter_opens WHERE tenant_id = ? AND newsletter_id = ?)
+                 UNION ALL
+                 (SELECT 'click' as type, email, clicked_at as timestamp, url
+                  FROM newsletter_clicks WHERE tenant_id = ? AND newsletter_id = ?)
+                 ORDER BY timestamp DESC
+                 LIMIT ? OFFSET ?",
+                [$tenantId, $newsletterId, $tenantId, $newsletterId, $limit, $offset]
+            )->fetchAll();
+        }
+
+        return $activity;
+    }
+
+    /**
+     * Count total activity for a newsletter
+     */
+    public static function countAllActivity($newsletterId, $type = null)
+    {
+        $tenantId = TenantContext::getId();
+
+        if ($type === 'open') {
+            $result = Database::query(
+                "SELECT COUNT(*) as count FROM newsletter_opens WHERE tenant_id = ? AND newsletter_id = ?",
+                [$tenantId, $newsletterId]
+            )->fetch();
+        } elseif ($type === 'click') {
+            $result = Database::query(
+                "SELECT COUNT(*) as count FROM newsletter_clicks WHERE tenant_id = ? AND newsletter_id = ?",
+                [$tenantId, $newsletterId]
+            )->fetch();
+        } else {
+            $opens = Database::query(
+                "SELECT COUNT(*) as count FROM newsletter_opens WHERE tenant_id = ? AND newsletter_id = ?",
+                [$tenantId, $newsletterId]
+            )->fetch();
+            $clicks = Database::query(
+                "SELECT COUNT(*) as count FROM newsletter_clicks WHERE tenant_id = ? AND newsletter_id = ?",
+                [$tenantId, $newsletterId]
+            )->fetch();
+            return ($opens['count'] ?? 0) + ($clicks['count'] ?? 0);
+        }
+
+        return $result['count'] ?? 0;
+    }
+
+    /**
      * Get send time heatmap data for visualization
      * Returns a matrix of day vs hour engagement
      */

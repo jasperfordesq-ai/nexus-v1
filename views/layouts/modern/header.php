@@ -58,42 +58,11 @@ try {
 
 <head>
     <meta charset="UTF-8">
-    <!-- CRITICAL: Inline scroll fix - ensures mouse wheel scrolling works -->
-    <style id="scroll-fix-inline">
-        /* HTML: Always show scrollbar, allow vertical scroll */
-        html,
-        html:root,
-        html[data-theme],
-        html[data-layout] {
-            overflow-y: scroll !important;
-            overflow-x: hidden !important;
-            height: auto !important;
-        }
-
-        /* BODY: Use overflow-y: auto (NOT visible - visible breaks mouse wheel scroll!) */
-        body,
-        html body,
-        html[data-theme] body,
-        html[data-layout] body {
-            overflow-y: auto !important;
-            overflow-x: hidden !important;
-            position: static !important;
-            height: auto !important;
-        }
-
-        /* Modal/drawer states: Lock scroll ONLY when actually open */
-        body.drawer-open,
-        body.modal-open,
-        body.fds-sheet-open,
-        body.keyboard-open,
-        body.mobile-menu-open,
-        body.menu-open {
-            overflow: hidden !important;
-            overflow-y: hidden !important;
-        }
-    </style>
+    <!-- Critical scroll/layout styles - loaded first to prevent FOUC -->
+    <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/nexus-header-extracted.css?v=<?= $cssVersionTimestamp ?>">
     <meta name="csrf-token" content="<?= \Nexus\Core\Csrf::generate() ?>">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="color-scheme" content="<?= $mode === 'dark' ? 'dark' : 'light' ?>">
     <?= \Nexus\Core\SEO::render() ?>
 
     <!-- PWA Meta Tags -->
@@ -120,6 +89,8 @@ try {
 
     <!-- DESIGN TOKENS (Shared variables - must load first) -->
     <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/design-tokens.min.css?v=<?= $cssVersionTimestamp ?>">
+    <!-- Theme Transitions - Smooth dark/light mode switching -->
+    <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/theme-transitions.min.css?v=<?= $cssVersionTimestamp ?>">
     <!-- Base CSS - CSS variables, tokens, and global resets -->
     <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/nexus-phoenix.min.css?v=<?= $cssVersionTimestamp ?>">
     <!-- Core CSS Bundle - layout isolation and framework styles -->
@@ -149,10 +120,43 @@ try {
     <!-- Consolidated polish files (replaces nexus-10x-polish + nexus-ux-polish) -->
     <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/nexus-polish.min.css?v=<?= $cssVersionTimestamp ?>" media="print" onload="this.media='all'">
     <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/nexus-interactions.min.css?v=<?= $cssVersionTimestamp ?>" media="print" onload="this.media='all'">
-    <!-- Visual Polish Enhancements (loading states, micro-interactions, modals) -->
-    <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/loading-skeletons.min.css?v=<?= $cssVersionTimestamp ?>" media="print" onload="this.media='all'">
-    <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/micro-interactions.min.css?v=<?= $cssVersionTimestamp ?>" media="print" onload="this.media='all'">
-    <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/modal-polish.min.css?v=<?= $cssVersionTimestamp ?>" media="print" onload="this.media='all'">
+
+    <!-- Visual Polish Bundle (loading states, empty states, lazy loading, hover, focus) -->
+    <!-- Combines 7 files: loading-skeletons, empty-states, image-lazy-load, hover-interactions, focus-rings, micro-interactions, modal-polish -->
+    <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/bundles/polish.min.css?v=<?= $cssVersionTimestamp ?>" media="print" onload="this.media='all'">
+    <!-- Toast Notifications - Slide-in animations, stacking, auto-dismiss -->
+    <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/toast-notifications.min.css?v=<?= $cssVersionTimestamp ?>" media="print" onload="this.media='all'">
+    <!-- Page Transitions - Smooth fade/slide between pages -->
+    <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/page-transitions.min.css?v=<?= $cssVersionTimestamp ?>" media="print" onload="this.media='all'">
+    <!-- Pull-to-Refresh - Native iOS/Android style (mobile only) -->
+    <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/pull-to-refresh.min.css?v=<?= $cssVersionTimestamp ?>" media="print" onload="this.media='all'">
+    <!-- Button Ripple Effects - Material-style touch feedback -->
+    <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/button-ripple.min.css?v=<?= $cssVersionTimestamp ?>" media="print" onload="this.media='all'">
+    <!-- Card Hover States - Lift/glow effects on interactive cards -->
+    <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/card-hover-states.min.css?v=<?= $cssVersionTimestamp ?>" media="print" onload="this.media='all'">
+    <!-- Form Validation - Shake on error, checkmark on success -->
+    <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/form-validation.min.css?v=<?= $cssVersionTimestamp ?>" media="print" onload="this.media='all'">
+    <!-- Avatar Placeholders - Shimmer loading, initials fallback -->
+    <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/avatar-placeholders.min.css?v=<?= $cssVersionTimestamp ?>" media="print" onload="this.media='all'">
+    <!-- Scroll Progress - Top bar showing page scroll position -->
+    <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/scroll-progress.min.css?v=<?= $cssVersionTimestamp ?>" media="print" onload="this.media='all'">
+    <!-- FAB Polish - Floating action button animations -->
+    <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/fab-polish.min.css?v=<?= $cssVersionTimestamp ?>" media="print" onload="this.media='all'">
+    <!-- Badge Animations - Pop effect when count changes -->
+    <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/badge-animations.min.css?v=<?= $cssVersionTimestamp ?>" media="print" onload="this.media='all'">
+    <!-- Error States - Friendly error pages with animations -->
+    <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/error-states.min.css?v=<?= $cssVersionTimestamp ?>" media="print" onload="this.media='all'">
+
+    <!-- Enhancements Bundle (responsive, accessibility, extracted components) -->
+    <!-- Combines 5 files: responsive-forms, responsive-tables, accessibility, feed-action-pills, ai-chat-widget -->
+    <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/bundles/enhancements.min.css?v=<?= $cssVersionTimestamp ?>" media="print" onload="this.media='all'">
+    <!-- Noscript fallbacks for async-loaded bundles -->
+    <noscript>
+        <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/bundles/polish.min.css?v=<?= $cssVersionTimestamp ?>">
+        <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/bundles/enhancements.min.css?v=<?= $cssVersionTimestamp ?>">
+        <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/nexus-polish.min.css?v=<?= $cssVersionTimestamp ?>">
+        <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/nexus-interactions.min.css?v=<?= $cssVersionTimestamp ?>">
+    </noscript>
 
     <!-- Mobile-only CSS -->
     <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/nexus-mobile.min.css?v=<?= $cssVersionTimestamp ?>" media="(max-width: 768px)">
@@ -246,8 +250,8 @@ try {
     <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/listings-show.min.css?v=<?= $cssVersionTimestamp ?>">
     <?php endif; ?>
 
-    <!-- Federation CSS (all /federation/* routes) -->
-    <?php if (strpos($normPath, '/federation') !== false): ?>
+    <!-- Federation CSS (all /federation/* and /transactions/* routes) -->
+    <?php if (strpos($normPath, '/federation') !== false || strpos($normPath, '/transactions') !== false): ?>
     <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/federation.min.css?v=<?= $cssVersionTimestamp ?>">
     <?php endif; ?>
 
@@ -350,39 +354,8 @@ try {
     <?php
     // Note: Custom Layout Builder CSS removed 2026-01-17
     // The getCustomLayoutCSS() method was never implemented
+    // Note: Layout stability + offline banner styles moved to nexus-header-extracted.css (2026-01-19)
     ?>
-
-    <style>
-        /* --- LAYOUT STABILITY LOCK --- */
-        /* Prevent JavaScript from causing layout shifts during page load */
-        html[data-layout-stable] * {
-            transition-duration: 0ms !important;
-            animation-duration: 0ms !important;
-        }
-
-        /* --- OFFLINE BANNER FIX --- */
-        /* Hide by default, only show after delay via JS */
-        .offline-banner,
-        #offlineBanner {
-            display: none !important;
-        }
-
-        .offline-banner.verified-offline,
-        #offlineBanner.verified-offline {
-            display: flex !important;
-        }
-
-        /* Always hide on desktop (unreliable navigator.onLine) */
-        @media (min-width: 769px) {
-
-            .offline-banner,
-            #offlineBanner,
-            .offline-banner.verified-offline,
-            #offlineBanner.verified-offline {
-                display: none !important;
-            }
-        }
-    </style>
 
     <!-- 🛑 ERROR TRAP: Catch any JavaScript errors before page reload -->
     <script>
@@ -888,82 +861,7 @@ try {
             <a href="<?= Nexus\Core\TenantContext::getBasePath() ?: '/' ?>" class="nexus-brand-link" aria-label="<?= htmlspecialchars($tName) ?> - Go to homepage">
                 <span class="brand-primary"><?= htmlspecialchars($tFirst) ?></span><?php if ($tRest): ?><span class="brand-secondary"><?= htmlspecialchars($tRest) ?></span><?php endif; ?>
             </a>
-            <style>
-                .nexus-brand-link {
-                    display: inline-flex !important;
-                    align-items: baseline !important;
-                    gap: 0.3em !important;
-                    font-size: clamp(1.15rem, 2.5vw, 1.5rem) !important;
-                    font-weight: 800 !important;
-                    letter-spacing: -0.5px !important;
-                    text-transform: uppercase !important;
-                    text-decoration: none !important;
-                    transition: all 0.25s ease !important;
-                }
-
-                /* Primary word - gradient text for modern look */
-                .nexus-brand-link .brand-primary {
-                    background: linear-gradient(135deg, #a5b4fc 0%, #818cf8 50%, #6366f1 100%);
-                    -webkit-background-clip: text;
-                    -webkit-text-fill-color: transparent;
-                    background-clip: text;
-                    font-weight: 900;
-                }
-
-                /* Secondary word - complementary warm tone */
-                .nexus-brand-link .brand-secondary {
-                    background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
-                    -webkit-background-clip: text;
-                    -webkit-text-fill-color: transparent;
-                    background-clip: text;
-                    font-weight: 700;
-                }
-
-                .nexus-brand-link:hover {
-                    transform: translateY(-1px);
-                }
-
-                .nexus-brand-link:hover .brand-primary {
-                    background: linear-gradient(135deg, #c7d2fe 0%, #a5b4fc 50%, #818cf8 100%);
-                    -webkit-background-clip: text;
-                    background-clip: text;
-                    filter: drop-shadow(0 2px 8px rgba(99, 102, 241, 0.4));
-                }
-
-                .nexus-brand-link:hover .brand-secondary {
-                    background: linear-gradient(135deg, #fcd34d 0%, #fbbf24 100%);
-                    -webkit-background-clip: text;
-                    background-clip: text;
-                    filter: drop-shadow(0 2px 8px rgba(251, 191, 36, 0.4));
-                }
-
-                /* Light mode - deeper colors for contrast */
-                [data-theme="light"] .nexus-brand-link .brand-primary {
-                    background: linear-gradient(135deg, #4f46e5 0%, #4338ca 100%);
-                    -webkit-background-clip: text;
-                    -webkit-text-fill-color: transparent;
-                    background-clip: text;
-                }
-
-                [data-theme="light"] .nexus-brand-link .brand-secondary {
-                    background: linear-gradient(135deg, #d97706 0%, #b45309 100%);
-                    -webkit-background-clip: text;
-                    -webkit-text-fill-color: transparent;
-                    background-clip: text;
-                }
-
-                [data-theme="light"] .nexus-brand-link:hover .brand-primary {
-                    background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
-                    -webkit-background-clip: text;
-                    background-clip: text;
-                }
-
-                [data-theme="light"] .nexus-brand-link:hover .brand-secondary {
-                    background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
-                    -webkit-background-clip: text;
-                    background-clip: text;
-                }
-            </style>
+            <!-- Brand link styles moved to nexus-header-extracted.css -->
 
             <div class="desktop-only" style="display: flex; align-items: center; gap: 8px;">
                 <?php
@@ -1160,78 +1058,7 @@ try {
                     <span></span>
                 </button>
             </div>
-            <style>
-                .nexus-mobile-actions {
-                    display: none;
-                    align-items: center;
-                    gap: 4px;
-                }
-
-                .nexus-notif-btn {
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    width: 40px;
-                    height: 40px;
-                    border: none;
-                    background: transparent;
-                    color: #fff;
-                    font-size: 1.1rem;
-                    cursor: pointer;
-                    border-radius: 50%;
-                    position: relative;
-                    transition: background-color 0.2s ease;
-                }
-
-                .nexus-notif-btn:hover,
-                .nexus-notif-btn:focus {
-                    background: rgba(255, 255, 255, 0.1);
-                }
-
-                .nexus-notif-badge {
-                    position: absolute;
-                    top: 2px;
-                    right: 2px;
-                    min-width: 16px;
-                    height: 16px;
-                    background: #ff3b30;
-                    color: white;
-                    font-size: 10px;
-                    font-weight: 600;
-                    border-radius: 8px;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    padding: 0 4px;
-                }
-
-                @media (max-width: 1024px) {
-                    .nexus-mobile-actions {
-                        display: flex;
-                    }
-
-                    /* Hide standalone menu button when wrapped */
-                    .nexus-navbar>.nexus-menu-btn {
-                        display: none !important;
-                    }
-                }
-
-                /* Light mode mobile notification button */
-                [data-theme="light"] .nexus-notif-btn {
-                    color: #374151 !important;
-                }
-
-                [data-theme="light"] .nexus-notif-btn:hover,
-                [data-theme="light"] .nexus-notif-btn:focus {
-                    background: rgba(99, 102, 241, 0.1) !important;
-                    color: #4f46e5 !important;
-                }
-
-                /* Light mode mobile menu button (hamburger) */
-                [data-theme="light"] .nexus-menu-btn span {
-                    background: #374151 !important;
-                }
-            </style>
+            <!-- Mobile actions styles moved to nexus-header-extracted.css -->
         </header>
     <?php endif; ?>
 

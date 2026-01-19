@@ -225,21 +225,30 @@ require __DIR__ . '/../../layouts/modern/header.php';
             </div>
         </div>
 
-        <!-- Skeleton Loaders (hidden since we server-render listings) -->
-        <div class="listings-skeleton hidden" id="listingsSkeleton" aria-label="Loading listings">
+        <!-- Skeleton Loaders -->
+        <div class="listings-skeleton-grid skeleton-container" id="listingsSkeleton" aria-label="Loading listings">
             <?php for ($i = 0; $i < 6; $i++): ?>
-                <div class="skeleton-card">
-                    <div class="skeleton-image"></div>
-                    <div class="skeleton-body">
-                        <div class="skeleton-line skeleton-line-short"></div>
-                        <div class="skeleton-line skeleton-line-full" style="height: 16px;"></div>
-                        <div class="skeleton-line skeleton-line-medium"></div>
-                        <div style="display: flex; align-items: center; gap: 10px; margin-top: 15px;">
-                            <div class="skeleton-avatar"></div>
-                            <div class="skeleton-line skeleton-line-short" style="margin-bottom: 0;"></div>
+            <div class="listing-card-skeleton">
+                <div class="skeleton-image">
+                    <div class="skeleton skeleton-badge"></div>
+                </div>
+                <div class="skeleton-body">
+                    <div class="skeleton-meta">
+                        <div class="skeleton skeleton-category"></div>
+                        <div class="skeleton skeleton-date"></div>
+                    </div>
+                    <div class="skeleton skeleton-title"></div>
+                    <div class="skeleton skeleton-desc"></div>
+                    <div class="skeleton skeleton-desc"></div>
+                    <div class="skeleton-footer">
+                        <div class="skeleton-author">
+                            <div class="skeleton skeleton-avatar small"></div>
+                            <div class="skeleton skeleton-text" style="width: 80px; height: 14px; margin: 0;"></div>
                         </div>
+                        <div class="skeleton skeleton-view-btn"></div>
                     </div>
                 </div>
+            </div>
             <?php endfor; ?>
         </div>
 
@@ -573,9 +582,8 @@ require __DIR__ . '/../../layouts/modern/header.php';
             if (skeleton && grid) {
                 setTimeout(function() {
                     skeleton.classList.add('hidden');
-                    grid.classList.remove('loading');
-                    grid.classList.add('loaded');
-                }, 400);
+                    grid.classList.add('content-loaded');
+                }, 300);
             }
         });
 

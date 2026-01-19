@@ -644,6 +644,46 @@ class NewsletterController
     }
 
     /**
+     * View all activity (opens/clicks) for a newsletter
+     */
+    public function activity($id)
+    {
+        $this->checkAdmin();
+
+        $newsletter = Newsletter::findById($id);
+        if (!$newsletter) {
+            http_response_code(404);
+            echo "Newsletter not found";
+            exit;
+        }
+
+        $page = (int)($_GET['page'] ?? 1);
+        $type = $_GET['type'] ?? null; // 'open', 'click', or null for all
+        $limit = 50;
+        $offset = ($page - 1) * $limit;
+
+        // Validate type
+        if ($type && !in_array($type, ['open', 'click'])) {
+            $type = null;
+        }
+
+        $activity = NewsletterAnalytics::getAllActivity($id, $limit, $offset, $type);
+        $totalCount = NewsletterAnalytics::countAllActivity($id, $type);
+        $totalPages = ceil($totalCount / $limit);
+
+        View::render('admin/newsletters/activity', [
+            'pageTitle' => 'Newsletter Activity',
+            'newsletter' => $newsletter,
+            'activity' => $activity,
+            'page' => $page,
+            'totalPages' => $totalPages,
+            'totalCount' => $totalCount,
+            'type' => $type,
+            'limit' => $limit
+        ]);
+    }
+
+    /**
      * Aggregate analytics dashboard across all newsletters
      */
     public function analytics()

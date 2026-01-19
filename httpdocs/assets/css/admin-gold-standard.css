@@ -1624,8 +1624,86 @@
 /* ============================================================================
    RESPONSIVE VISIBILITY
    ============================================================================ */
+
+/* Generic responsive utilities (used by admin tables) */
+.hide-mobile { display: table-cell; }
+.hide-tablet { display: table-cell; }
+
+@media (max-width: 1024px) {
+    .hide-tablet { display: none !important; }
+}
+
 @media (max-width: 767px) {
     .admin-hide-mobile { display: none !important; }
+    .hide-mobile { display: none !important; }
+
+    /* Admin table mobile improvements */
+    .admin-table th,
+    .admin-table td {
+        padding: 12px 8px;
+        font-size: 0.8125rem;
+    }
+
+    .admin-action-buttons {
+        flex-direction: column;
+        gap: 6px;
+    }
+
+    .admin-action-buttons .admin-btn {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .admin-user-cell {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+    }
+
+    .admin-user-avatar,
+    .admin-user-avatar-placeholder {
+        width: 40px !important;
+        height: 40px !important;
+    }
+
+    .admin-card-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+    }
+
+    .admin-page-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 16px;
+    }
+
+    .admin-page-header-actions {
+        width: 100%;
+        flex-wrap: wrap;
+    }
+}
+
+/* Extra small screens */
+@media (max-width: 480px) {
+    .admin-table th,
+    .admin-table td {
+        padding: 10px 6px;
+        font-size: 0.75rem;
+    }
+
+    .admin-btn-sm {
+        padding: 6px 10px;
+        font-size: 0.7rem;
+    }
+
+    .admin-action-buttons .admin-btn span {
+        display: none;
+    }
+
+    .admin-action-buttons .admin-btn i {
+        margin-right: 0;
+    }
 }
 
 @media (min-width: 768px) {
@@ -1673,7 +1751,7 @@
     min-height: 100vh;
     -webkit-font-smoothing: antialiased;
     position: relative;
-    padding: 1rem;
+    padding: 0;
 }
 
 .admin-gold-bg {
@@ -1710,18 +1788,19 @@
     50% { transform: translate(30px, -30px); }
 }
 
-/* Top Bar */
+/* Top Bar - Fixed at top for sidebar layout */
 .admin-header-bar {
-    position: relative;
-    z-index: 10;
-    background: rgba(15, 23, 42, 0.9);
-    border: 1px solid rgba(99, 102, 241, 0.3);
-    border-radius: 12px;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 200;
+    background: rgba(15, 23, 42, 0.95);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-bottom: 1px solid rgba(99, 102, 241, 0.2);
     padding: 0.75rem 1rem;
-    margin-bottom: 1rem;
-    max-width: 1600px;
-    margin-left: auto;
-    margin-right: auto;
+    height: 60px;
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -2111,6 +2190,7 @@
     z-index: 5;
     max-width: 1600px;
     margin: 0 auto;
+    padding: 1rem;
 }
 
 /* Glass cards */
@@ -2813,4 +2893,27 @@
 .admin-live-section .admin-search-section-title i {
     margin-right: 0.4rem;
     color: #818cf8;
+}
+
+/* ============================================================================
+   SIDEBAR LAYOUT ADJUSTMENTS
+   ============================================================================ */
+
+/* Hide old navigation elements when sidebar is active */
+.admin-layout .admin-smart-nav,
+.admin-layout .admin-mobile-menu {
+    display: none !important;
+}
+
+/* Mobile menu button visibility for sidebar */
+@media (max-width: 1024px) {
+    .admin-layout .admin-mobile-menu-btn {
+        display: flex !important;
+    }
+}
+
+@media (min-width: 1025px) {
+    .admin-layout .admin-mobile-menu-btn {
+        display: none !important;
+    }
 }

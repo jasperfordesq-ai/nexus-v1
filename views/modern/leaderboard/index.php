@@ -53,10 +53,12 @@ $basePath = \Nexus\Core\TenantContext::getBasePath();
         <!-- Leaderboard Table -->
         <div class="leaderboard-table">
             <?php if (empty($leaderboard)): ?>
-                <div class="empty-state">
-                    <div class="empty-state-icon">🏆</div>
-                    <p>No data yet for this leaderboard.</p>
-                    <p style="font-size: 0.875rem;">Be the first to climb the ranks!</p>
+                <div class="empty-state empty-state--glass">
+                    <div class="empty-state__icon empty-state__icon--warning">
+                        <span class="emoji">🏆</span>
+                    </div>
+                    <h3 class="empty-state__title">No Rankings Yet</h3>
+                    <p class="empty-state__text">Be the first to climb the ranks and earn your place on the leaderboard!</p>
                 </div>
             <?php else: ?>
                 <?php foreach ($leaderboard as $entry): ?>

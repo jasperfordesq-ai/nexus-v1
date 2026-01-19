@@ -1,0 +1,342 @@
+/**
+ * Focus Ring Improvements
+ * Enhanced keyboard navigation visibility
+ * Version: 1.0 - 2026-01-19
+ *
+ * Uses :focus-visible for keyboard-only focus styles
+ * Maintains accessibility while avoiding mouse-click focus rings
+ */
+
+/* ==============================================
+   CSS CUSTOM PROPERTIES
+   ============================================== */
+:root {
+    --focus-ring-color: rgba(99, 102, 241, 0.6);
+    --focus-ring-color-strong: rgba(99, 102, 241, 0.8);
+    --focus-ring-offset: 2px;
+    --focus-ring-width: 3px;
+    --focus-ring-transition: 150ms ease;
+}
+
+[data-theme="dark"] {
+    --focus-ring-color: rgba(129, 140, 248, 0.6);
+    --focus-ring-color-strong: rgba(129, 140, 248, 0.8);
+}
+
+/* ==============================================
+   REMOVE DEFAULT OUTLINES
+   Replace with custom focus styles
+   ============================================== */
+*:focus {
+    outline: none;
+}
+
+/* ==============================================
+   KEYBOARD-ONLY FOCUS (:focus-visible)
+   Only shows for keyboard navigation
+   ============================================== */
+
+/* Standard focus ring for most elements */
+a:focus-visible,
+button:focus-visible,
+[role="button"]:focus-visible,
+[tabindex]:focus-visible:not([tabindex="-1"]) {
+    outline: var(--focus-ring-width) solid var(--focus-ring-color);
+    outline-offset: var(--focus-ring-offset);
+    border-radius: 4px;
+}
+
+/* ==============================================
+   BUTTONS - Glow ring effect
+   ============================================== */
+.btn:focus-visible,
+.glass-btn:focus-visible,
+.glass-btn-primary:focus-visible,
+.glass-btn-secondary:focus-visible,
+.nexus-smart-btn:focus-visible,
+.htb-btn:focus-visible,
+[class*="btn-"]:focus-visible {
+    outline: none;
+    box-shadow:
+        0 0 0 var(--focus-ring-offset) var(--focus-ring-color-strong),
+        0 0 0 calc(var(--focus-ring-offset) + var(--focus-ring-width)) var(--focus-ring-color);
+}
+
+/* ==============================================
+   FORM INPUTS - Inner glow
+   ============================================== */
+input:focus-visible:not([type="checkbox"]):not([type="radio"]),
+textarea:focus-visible,
+select:focus-visible,
+.glass-input:focus-visible,
+.glass-select:focus-visible,
+.glass-search-input:focus-visible {
+    outline: none;
+    border-color: var(--focus-ring-color-strong);
+    box-shadow:
+        0 0 0 var(--focus-ring-width) var(--focus-ring-color),
+        inset 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+/* ==============================================
+   CHECKBOXES & RADIOS
+   ============================================== */
+input[type="checkbox"]:focus-visible,
+input[type="radio"]:focus-visible {
+    outline: var(--focus-ring-width) solid var(--focus-ring-color);
+    outline-offset: var(--focus-ring-offset);
+}
+
+/* Custom checkbox/radio styling */
+.checkbox-custom:focus-visible + label::before,
+.radio-custom:focus-visible + label::before {
+    box-shadow: 0 0 0 var(--focus-ring-width) var(--focus-ring-color);
+}
+
+/* ==============================================
+   CARDS - Subtle border highlight
+   ============================================== */
+.glass-card:focus-visible,
+.glass-event-card:focus-visible,
+.member-card:focus-visible,
+.holo-card:focus-visible,
+[class*="-card"]:focus-visible {
+    outline: none;
+    box-shadow:
+        0 0 0 var(--focus-ring-width) var(--focus-ring-color),
+        0 8px 32px rgba(0, 0, 0, 0.1);
+}
+
+/* ==============================================
+   NAVIGATION LINKS
+   ============================================== */
+.nav-link:focus-visible,
+.menu-item:focus-visible,
+.dropdown-item:focus-visible,
+.sidebar-link:focus-visible {
+    outline: none;
+    background-color: rgba(99, 102, 241, 0.1);
+    box-shadow: inset 3px 0 0 var(--focus-ring-color-strong);
+}
+
+[data-theme="dark"] .nav-link:focus-visible,
+[data-theme="dark"] .menu-item:focus-visible,
+[data-theme="dark"] .dropdown-item:focus-visible,
+[data-theme="dark"] .sidebar-link:focus-visible {
+    background-color: rgba(99, 102, 241, 0.15);
+}
+
+/* ==============================================
+   TABS
+   ============================================== */
+.holo-tab-btn:focus-visible,
+.filter-tab:focus-visible,
+.nav-tab:focus-visible,
+[role="tab"]:focus-visible {
+    outline: none;
+    box-shadow: inset 0 -3px 0 var(--focus-ring-color-strong);
+    background-color: rgba(99, 102, 241, 0.05);
+}
+
+/* ==============================================
+   LIST ITEMS
+   ============================================== */
+.notif-item:focus-visible,
+.message-item:focus-visible,
+.list-item:focus-visible,
+[role="listitem"]:focus-visible,
+[role="option"]:focus-visible {
+    outline: none;
+    background-color: rgba(99, 102, 241, 0.08);
+    box-shadow: inset 3px 0 0 var(--focus-ring-color-strong);
+}
+
+/* ==============================================
+   AVATARS & IMAGES
+   ============================================== */
+.avatar:focus-visible,
+.member-avatar:focus-visible,
+.user-avatar:focus-visible,
+img[tabindex]:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 var(--focus-ring-width) var(--focus-ring-color-strong);
+    border-radius: 50%;
+}
+
+/* ==============================================
+   ICONS & ICON BUTTONS
+   ============================================== */
+.icon-btn:focus-visible,
+.action-icon:focus-visible,
+[class*="icon-"]:focus-visible:not(i) {
+    outline: none;
+    background-color: rgba(99, 102, 241, 0.15);
+    border-radius: 50%;
+    box-shadow: 0 0 0 var(--focus-ring-width) var(--focus-ring-color);
+}
+
+/* ==============================================
+   FAB (Floating Action Button)
+   ============================================== */
+.fab:focus-visible,
+.floating-action-btn:focus-visible,
+[class*="-fab"]:focus-visible {
+    outline: none;
+    box-shadow:
+        0 0 0 var(--focus-ring-width) var(--focus-ring-color-strong),
+        0 8px 24px rgba(99, 102, 241, 0.4);
+}
+
+/* ==============================================
+   MODAL & DIALOG
+   ============================================== */
+.modal:focus-visible,
+.dialog:focus-visible,
+[role="dialog"]:focus-visible {
+    outline: none;
+}
+
+.modal-close:focus-visible,
+.dialog-close:focus-visible {
+    outline: none;
+    background-color: rgba(99, 102, 241, 0.15);
+    box-shadow: 0 0 0 var(--focus-ring-width) var(--focus-ring-color);
+}
+
+/* ==============================================
+   SKIP LINK (Accessibility)
+   ============================================== */
+.skip-link:focus-visible,
+.skip-to-content:focus-visible {
+    position: fixed;
+    top: 10px;
+    left: 10px;
+    z-index: 99999;
+    padding: 12px 24px;
+    background: #6366f1;
+    color: white;
+    font-weight: 600;
+    border-radius: 8px;
+    box-shadow: 0 4px 20px rgba(99, 102, 241, 0.4);
+    outline: none;
+    text-decoration: none;
+}
+
+/* ==============================================
+   SWITCH / TOGGLE
+   ============================================== */
+.switch:focus-visible,
+.toggle:focus-visible,
+[role="switch"]:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 var(--focus-ring-width) var(--focus-ring-color);
+}
+
+/* ==============================================
+   SEARCH INPUT
+   ============================================== */
+.search-input:focus-visible,
+[type="search"]:focus-visible {
+    outline: none;
+    border-color: var(--focus-ring-color-strong);
+    box-shadow:
+        0 0 0 var(--focus-ring-width) var(--focus-ring-color),
+        0 4px 12px rgba(99, 102, 241, 0.15);
+}
+
+/* ==============================================
+   DROPDOWN TRIGGER
+   ============================================== */
+.dropdown-trigger:focus-visible,
+.dropdown-toggle:focus-visible,
+[aria-haspopup]:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 var(--focus-ring-width) var(--focus-ring-color);
+}
+
+/* ==============================================
+   SLIDER / RANGE
+   ============================================== */
+input[type="range"]:focus-visible {
+    outline: none;
+}
+
+input[type="range"]:focus-visible::-webkit-slider-thumb {
+    box-shadow: 0 0 0 var(--focus-ring-width) var(--focus-ring-color);
+}
+
+input[type="range"]:focus-visible::-moz-range-thumb {
+    box-shadow: 0 0 0 var(--focus-ring-width) var(--focus-ring-color);
+}
+
+/* ==============================================
+   DATE/TIME PICKERS
+   ============================================== */
+input[type="date"]:focus-visible,
+input[type="time"]:focus-visible,
+input[type="datetime-local"]:focus-visible {
+    outline: none;
+    border-color: var(--focus-ring-color-strong);
+    box-shadow: 0 0 0 var(--focus-ring-width) var(--focus-ring-color);
+}
+
+/* ==============================================
+   FILE INPUT
+   ============================================== */
+input[type="file"]:focus-visible {
+    outline: var(--focus-ring-width) solid var(--focus-ring-color);
+    outline-offset: var(--focus-ring-offset);
+}
+
+/* ==============================================
+   SOCIAL ACTION BUTTONS
+   ============================================== */
+.like-btn:focus-visible,
+.comment-btn:focus-visible,
+.share-btn:focus-visible,
+.post-action-btn:focus-visible {
+    outline: none;
+    background-color: rgba(99, 102, 241, 0.1);
+    border-radius: 8px;
+    box-shadow: 0 0 0 2px var(--focus-ring-color);
+}
+
+/* ==============================================
+   ACCORDION / COLLAPSIBLE
+   ============================================== */
+.accordion-header:focus-visible,
+.collapsible-trigger:focus-visible,
+[aria-expanded]:focus-visible {
+    outline: none;
+    background-color: rgba(99, 102, 241, 0.05);
+    box-shadow: inset 0 0 0 2px var(--focus-ring-color);
+}
+
+/* ==============================================
+   HIGH CONTRAST MODE
+   ============================================== */
+@media (forced-colors: active) {
+    *:focus-visible {
+        outline: 3px solid CanvasText !important;
+        outline-offset: 2px !important;
+    }
+}
+
+/* ==============================================
+   REDUCED MOTION
+   ============================================== */
+@media (prefers-reduced-motion: reduce) {
+    *:focus-visible {
+        transition: none;
+    }
+}
+
+/* ==============================================
+   PRINT - Hide focus styles
+   ============================================== */
+@media print {
+    *:focus-visible {
+        outline: none !important;
+        box-shadow: none !important;
+    }
+}

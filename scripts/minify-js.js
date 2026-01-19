@@ -45,6 +45,16 @@ const jsFiles = [
     'jGravity.js',
     'groups-edit-overlay.js',
     'federation-review-form.js',
+    'toast-notifications.js',
+    'page-transitions.js',
+    'pull-to-refresh.js',
+    'button-ripple.js',
+    'form-validation.js',
+    'avatar-placeholders.js',
+    'scroll-progress.js',
+    'fab-polish.js',
+    'badge-animations.js',
+    'error-states.js',
 ];
 
 const jsDir = path.join(__dirname, '../httpdocs/assets/js');

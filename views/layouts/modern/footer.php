@@ -208,6 +208,28 @@ $jsVersion = '2.5.13';
 <script src="/assets/js/nexus-shared-transitions.min.js?v=<?= $jsVersion ?>" defer></script>
 <!-- Visual Polish Helpers - Auto-apply micro-interactions and provide utility functions -->
 <script src="/assets/js/polish-helpers.min.js?v=<?= $jsVersion ?>" defer></script>
+<!-- Toast Notifications - Slide-in animations, stacking, auto-dismiss -->
+<script src="/assets/js/toast-notifications.min.js?v=<?= $jsVersion ?>" defer></script>
+<!-- Page Transitions - Smooth fade/slide between pages -->
+<script src="/assets/js/page-transitions.min.js?v=<?= $jsVersion ?>" defer></script>
+<!-- Pull-to-Refresh - Native iOS/Android style (mobile only) -->
+<script src="/assets/js/pull-to-refresh.min.js?v=<?= $jsVersion ?>" defer></script>
+<!-- Button Ripple Effects - Material-style touch feedback -->
+<script src="/assets/js/button-ripple.min.js?v=<?= $jsVersion ?>" defer></script>
+<!-- Form Validation - Shake on error, checkmark on success -->
+<script src="/assets/js/form-validation.min.js?v=<?= $jsVersion ?>" defer></script>
+<!-- Avatar Placeholders - Shimmer loading, initials fallback -->
+<script src="/assets/js/avatar-placeholders.min.js?v=<?= $jsVersion ?>" defer></script>
+<!-- Scroll Progress - Top bar showing page scroll position -->
+<script src="/assets/js/scroll-progress.min.js?v=<?= $jsVersion ?>" defer></script>
+<!-- FAB Polish - Floating action button animations -->
+<script src="/assets/js/fab-polish.min.js?v=<?= $jsVersion ?>" defer></script>
+<!-- Badge Animations - Pop effect when count changes -->
+<script src="/assets/js/badge-animations.min.js?v=<?= $jsVersion ?>" defer></script>
+<!-- Error States - Friendly error pages, offline detection -->
+<script src="/assets/js/error-states.min.js?v=<?= $jsVersion ?>" defer></script>
+<!-- Image Lazy Loading - Progressive blur-up effect (2026-01-19) -->
+<script src="/assets/js/image-lazy-load.min.js?v=<?= $jsVersion ?>" defer></script>
 <!-- 2026-01-17: Removed old polish JS (nexus-10x-polish, nexus-ux-polish, nexus-native-nav v1) -->
 <!-- CSS consolidated into nexus-polish.css and nexus-interactions.css -->
 <?php
@@ -317,82 +339,7 @@ if (file_exists($envPath)) {
         </div>
     </div>
 
-    <style>
-        @keyframes slideUp {
-            from {
-                transform: translateY(100%);
-            }
-
-            to {
-                transform: translateY(0);
-            }
-        }
-
-        /* Feed Action Pill Button Styles - High specificity to override any other button styles */
-        .feed-action-pill,
-        button.feed-action-pill,
-        .fb-card .feed-action-pill,
-        .fb-card button.feed-action-pill {
-            display: flex !important;
-            align-items: center !important;
-            gap: 6px !important;
-            padding: 8px 14px !important;
-            border-radius: 10px !important;
-            border: none !important;
-            cursor: pointer !important;
-            font-weight: 600 !important;
-            font-size: 0.9rem !important;
-            transition: all 0.2s ease !important;
-            background: rgba(100, 116, 139, 0.1) !important;
-            color: var(--text-main, #374151) !important;
-            -webkit-tap-highlight-color: transparent !important;
-            backdrop-filter: none !important;
-            -webkit-backdrop-filter: none !important;
-        }
-
-        .feed-action-pill.liked,
-        button.feed-action-pill.liked,
-        .fb-card .feed-action-pill.liked,
-        .fb-card button.feed-action-pill.liked {
-            background: linear-gradient(135deg, #ec4899, #f43f5e) !important;
-            color: #fff !important;
-        }
-
-        .feed-action-pill:hover:not(.liked),
-        button.feed-action-pill:hover:not(.liked),
-        .fb-card .feed-action-pill:hover:not(.liked),
-        .fb-card button.feed-action-pill:hover:not(.liked) {
-            background: rgba(100, 116, 139, 0.15) !important;
-            transform: none !important;
-        }
-
-        .feed-action-pill:active,
-        button.feed-action-pill:active {
-            transform: scale(0.96) !important;
-        }
-
-        /* Dark mode support for feed action pills */
-        [data-theme="dark"] .feed-action-pill,
-        [data-theme="dark"] button.feed-action-pill,
-        [data-theme="dark"] .fb-card .feed-action-pill,
-        [data-theme="dark"] .fb-card button.feed-action-pill {
-            background: rgba(148, 163, 184, 0.15) !important;
-            color: #e2e8f0 !important;
-        }
-
-        [data-theme="dark"] .feed-action-pill:hover:not(.liked),
-        [data-theme="dark"] button.feed-action-pill:hover:not(.liked),
-        [data-theme="dark"] .fb-card .feed-action-pill:hover:not(.liked) {
-            background: rgba(148, 163, 184, 0.25) !important;
-        }
-
-        [data-theme="dark"] .feed-action-pill.liked,
-        [data-theme="dark"] button.feed-action-pill.liked,
-        [data-theme="dark"] .fb-card .feed-action-pill.liked {
-            background: linear-gradient(135deg, #ec4899, #f43f5e) !important;
-            color: #fff !important;
-        }
-    </style>
+    <!-- Feed action pills CSS now loaded via header.php: feed-action-pills.css -->
 
     <script>
         (function() {

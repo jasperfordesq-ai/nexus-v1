@@ -201,6 +201,7 @@
    DARK THEME OVERRIDES
    ========================================== */
 [data-theme="dark"] {
+    /* Inverted gray scale for dark mode */
     --color-gray-50: #111827;
     --color-gray-100: #1f2937;
     --color-gray-200: #374151;
@@ -212,9 +213,70 @@
     --color-gray-800: #f3f4f6;
     --color-gray-900: #f9fafb;
 
-    /* Adjust glassmorphism for dark mode */
+    /* Glassmorphism for dark mode */
     --glass-bg-light: rgba(30, 41, 59, 0.7);
     --glass-border-light: rgba(255, 255, 255, 0.1);
+
+    /* Semantic background hierarchy */
+    --bg-base: #0f172a;
+    --bg-elevated: #1e293b;
+    --bg-surface: #334155;
+    --bg-hover: #475569;
+
+    /* Semantic text hierarchy */
+    --text-primary: #f8fafc;
+    --text-secondary: #cbd5e1;
+    --text-muted: #94a3b8;
+    --text-disabled: #64748b;
+
+    /* Semantic border colors */
+    --border-default: rgba(255, 255, 255, 0.1);
+    --border-subtle: rgba(255, 255, 255, 0.05);
+    --border-strong: rgba(255, 255, 255, 0.2);
+
+    /* Enhanced glassmorphism */
+    --glass-bg: rgba(30, 41, 59, 0.8);
+    --glass-bg-heavy: rgba(15, 23, 42, 0.9);
+    --glass-border: rgba(255, 255, 255, 0.08);
+    --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+
+    /* Surface overlays */
+    --overlay-light: rgba(255, 255, 255, 0.05);
+    --overlay-medium: rgba(255, 255, 255, 0.1);
+    --overlay-heavy: rgba(255, 255, 255, 0.15);
+
+    /* Primary color adjustments */
+    --color-primary-hover: #818cf8;
+    --color-primary-active: #a5b4fc;
+}
+
+/* Light theme semantic tokens (explicit defaults) */
+:root {
+    --bg-base: #f9fafb;
+    --bg-elevated: #ffffff;
+    --bg-surface: #f3f4f6;
+    --bg-hover: #e5e7eb;
+
+    --text-primary: #111827;
+    --text-secondary: #4b5563;
+    --text-muted: #6b7280;
+    --text-disabled: #9ca3af;
+
+    --border-default: rgba(0, 0, 0, 0.1);
+    --border-subtle: rgba(0, 0, 0, 0.05);
+    --border-strong: rgba(0, 0, 0, 0.2);
+
+    --glass-bg: rgba(255, 255, 255, 0.8);
+    --glass-bg-heavy: rgba(255, 255, 255, 0.95);
+    --glass-border: rgba(0, 0, 0, 0.08);
+    --glass-shadow: 0 8px 32px rgba(31, 38, 135, 0.15);
+
+    --overlay-light: rgba(0, 0, 0, 0.03);
+    --overlay-medium: rgba(0, 0, 0, 0.06);
+    --overlay-heavy: rgba(0, 0, 0, 0.1);
+
+    --color-primary-hover: #4f46e5;
+    --color-primary-active: #4338ca;
 }
 
 /* ==========================================

@@ -1,5 +1,6 @@
 <?php
-// CivicOne View: Volunteering Index - MadeOpen Style
+// CivicOne View: Volunteering Index - WCAG 2.1 AA Compliant
+// CSS extracted to civicone-volunteering.css
 $hTitle = "Volunteer Opportunities";
 $hSubtitle = "Connect with local organizations and make a difference in your community";
 $hType = "Community Impact";
@@ -108,52 +109,5 @@ require __DIR__ . '/../../layouts/civicone/header.php';
         <?php endforeach; ?>
     </div>
 <?php endif; ?>
-
-<style>
-    /* Action bar layout */
-    .civic-action-bar {
-        display: flex;
-        gap: 12px;
-        justify-content: flex-end;
-        flex-wrap: wrap;
-        margin-bottom: 24px;
-    }
-
-    /* Opportunities grid */
-    .civic-opportunities-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
-        gap: 24px;
-        margin-bottom: 40px;
-    }
-
-    @media (max-width: 600px) {
-        .civic-opportunities-grid {
-            grid-template-columns: 1fr;
-        }
-
-        .civic-action-bar {
-            justify-content: stretch;
-        }
-
-        .civic-action-bar .civic-btn {
-            flex: 1;
-            text-align: center;
-        }
-    }
-
-    /* Tags with icons */
-    .civic-tags .civic-tag {
-        display: inline-flex;
-        align-items: center;
-        gap: 4px;
-    }
-
-    .civic-tags .dashicons {
-        font-size: 14px;
-        width: 14px;
-        height: 14px;
-    }
-</style>
 
 <?php require __DIR__ . '/../../layouts/civicone/footer.php'; ?>

@@ -1,5 +1,6 @@
 <?php
-// CivicOne View: Notifications
+// CivicOne View: Notifications - WCAG 2.1 AA Compliant
+// CSS extracted to civicone-messages.css
 $hTitle = 'Notifications';
 $hSubtitle = 'Stay updated on your community activity';
 $hType = 'Dashboard';
@@ -9,14 +10,14 @@ $basePath = \Nexus\Core\TenantContext::getBasePath();
 ?>
 
 <!-- Action Bar -->
-<div class="civic-action-bar" style="margin-bottom: 24px;">
+<div class="civic-action-bar">
     <a href="<?= $basePath ?>/dashboard" class="civic-btn civic-btn--outline">
         <span class="dashicons dashicons-arrow-left-alt2" aria-hidden="true"></span>
         Back to Dashboard
     </a>
 
     <?php if (!empty($notifications)): ?>
-        <form action="<?= $basePath ?>/notifications/mark-all-read" method="POST" style="display: inline;">
+        <form action="<?= $basePath ?>/notifications/mark-all-read" method="POST" class="civic-action-form">
             <?= \Nexus\Core\Csrf::input() ?>
             <button type="submit" class="civic-btn civic-btn--outline">
                 <span class="dashicons dashicons-yes-alt" aria-hidden="true"></span>
@@ -77,7 +78,7 @@ $basePath = \Nexus\Core\TenantContext::getBasePath();
                         </a>
                     <?php endif; ?>
                     <?php if ($isUnread): ?>
-                        <form action="<?= $basePath ?>/notifications/mark-read" method="POST" style="display: inline;">
+                        <form action="<?= $basePath ?>/notifications/mark-read" method="POST" class="civic-action-form">
                             <?= \Nexus\Core\Csrf::input() ?>
                             <input type="hidden" name="id" value="<?= $notif['id'] ?>">
                             <button type="submit" class="civic-btn civic-btn--sm civic-btn--outline" title="Mark as read">
@@ -117,98 +118,5 @@ $basePath = \Nexus\Core\TenantContext::getBasePath();
     <?php endif; ?>
 
 <?php endif; ?>
-
-<style>
-    .civic-notifications-list {
-        display: flex;
-        flex-direction: column;
-        gap: 12px;
-    }
-
-    .civic-notification-card {
-        display: flex;
-        align-items: flex-start;
-        gap: 16px;
-        padding: 20px;
-        background: var(--civic-bg-card);
-        border: 1px solid var(--civic-border);
-        border-radius: 12px;
-        transition: all 0.2s ease;
-    }
-
-    .civic-notification-card:hover {
-        box-shadow: var(--civic-shadow);
-    }
-
-    .civic-notification--unread {
-        background: #F0F9FF;
-        border-left: 4px solid var(--civic-brand);
-    }
-
-    body.dark-mode .civic-notification--unread {
-        background: #1E3A5F;
-    }
-
-    .civic-notification-icon {
-        flex-shrink: 0;
-        width: 44px;
-        height: 44px;
-        background: var(--civic-bg-page);
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: var(--civic-brand);
-    }
-
-    .civic-notification-icon .dashicons {
-        font-size: 20px;
-        width: 20px;
-        height: 20px;
-    }
-
-    .civic-notification-content {
-        flex: 1;
-        min-width: 0;
-    }
-
-    .civic-notification-message {
-        margin: 0 0 4px 0;
-        font-size: 15px;
-        color: var(--civic-text-main);
-        line-height: 1.5;
-    }
-
-    .civic-notification--unread .civic-notification-message {
-        font-weight: 600;
-    }
-
-    .civic-notification-time {
-        font-size: 13px;
-        color: var(--civic-text-muted);
-    }
-
-    .civic-notification-actions {
-        display: flex;
-        gap: 8px;
-        flex-shrink: 0;
-    }
-
-    @media (max-width: 600px) {
-        .civic-notification-card {
-            flex-wrap: wrap;
-        }
-
-        .civic-notification-actions {
-            width: 100%;
-            margin-top: 12px;
-        }
-
-        .civic-notification-actions .civic-btn {
-            flex: 1;
-            justify-content: center;
-        }
-    }
-</style>
 
 <?php require __DIR__ . '/../../layouts/civicone/footer.php'; ?>

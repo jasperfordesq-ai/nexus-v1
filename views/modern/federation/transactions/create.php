@@ -1,5 +1,5 @@
 <?php
-// Federation Transaction Create - Glassmorphism 2025
+// Federation Transaction Create - Modern Theme
 $pageTitle = $pageTitle ?? "Send Hours";
 $hideHero = true;
 
@@ -16,6 +16,7 @@ $balance = $balance ?? 0;
 $recipientName = $recipient['name'] ?? 'Unknown';
 $fallbackAvatar = 'https://ui-avatars.com/api/?name=' . urlencode($recipientName) . '&background=8b5cf6&color=fff&size=200';
 $recipientAvatar = !empty($recipient['avatar_url']) ? $recipient['avatar_url'] : $fallbackAvatar;
+$hasInsufficientBalance = $balance < 0.5;
 ?>
 
 <!-- Offline Banner -->
@@ -27,7 +28,7 @@ $recipientAvatar = !empty($recipient['avatar_url']) ? $recipient['avatar_url'] :
 <div class="htb-container-full">
     <div id="fed-send-wrapper">
 
-<!-- Back Link -->
+        <!-- Back Link -->
         <a href="<?= $basePath ?>/federation/members<?= $recipient ? '/' . $recipient['id'] : '' ?>" class="back-link">
             <i class="fa-solid fa-arrow-left"></i>
             Back
@@ -36,7 +37,7 @@ $recipientAvatar = !empty($recipient['avatar_url']) ? $recipient['avatar_url'] :
         <div class="send-card">
             <div class="send-header">
                 <h1>
-                    <i class="fa-solid fa-paper-plane" style="margin-right: 8px;"></i>
+                    <i class="fa-solid fa-paper-plane"></i>
                     Send Hours
                 </h1>
                 <p class="balance-display">
@@ -80,11 +81,11 @@ $recipientAvatar = !empty($recipient['avatar_url']) ? $recipient['avatar_url'] :
                                    step="0.5"
                                    value="<?= min(1, $balance) ?>"
                                    required
-                                   <?= $balance < 0.5 ? 'disabled' : '' ?>>
+                                   <?= $hasInsufficientBalance ? 'disabled' : '' ?>>
                             <span class="amount-suffix">hours</span>
                         </div>
-                        <?php if ($balance < 0.5): ?>
-                        <div class="alert alert-warning" style="margin-top: 0.5rem; padding: 0.75rem; border-radius: 8px; background: rgba(245, 158, 11, 0.2); border: 1px solid rgba(245, 158, 11, 0.4); color: #fbbf24;">
+                        <?php if ($hasInsufficientBalance): ?>
+                        <div class="send-balance-alert">
                             <i class="fa-solid fa-exclamation-triangle"></i>
                             Insufficient balance. You need at least 0.5 hours to send a transaction.
                         </div>
@@ -106,7 +107,10 @@ $recipientAvatar = !empty($recipient['avatar_url']) ? $recipient['avatar_url'] :
                                   maxlength="500"></textarea>
                     </div>
 
-                    <button type="submit" class="send-btn" id="send-btn" <?= $balance < 0.5 ? 'disabled style="opacity: 0.5; cursor: not-allowed;"' : '' ?>>
+                    <button type="submit"
+                            class="send-btn<?= $hasInsufficientBalance ? ' send-btn-disabled' : '' ?>"
+                            id="send-btn"
+                            <?= $hasInsufficientBalance ? 'disabled' : '' ?>>
                         <i class="fa-solid fa-paper-plane"></i>
                         Send Hours
                     </button>
@@ -124,11 +128,9 @@ $recipientAvatar = !empty($recipient['avatar_url']) ? $recipient['avatar_url'] :
                     <div class="no-recipient-icon">
                         <i class="fa-solid fa-user-slash"></i>
                     </div>
-                    <h3 style="color: var(--htb-text-main); margin: 0 0 10px 0;">No Recipient Selected</h3>
-                    <p style="color: var(--htb-text-muted); margin: 0 0 20px 0;">
-                        Please select a federated member to send hours to.
-                    </p>
-                    <a href="<?= $basePath ?>/federation/members" class="send-btn" style="display: inline-flex; width: auto; padding: 12px 24px;">
+                    <h3>No Recipient Selected</h3>
+                    <p>Please select a federated member to send hours to.</p>
+                    <a href="<?= $basePath ?>/federation/members" class="send-btn">
                         <i class="fa-solid fa-users"></i>
                         Browse Members
                     </a>
@@ -139,25 +141,6 @@ $recipientAvatar = !empty($recipient['avatar_url']) ? $recipient['avatar_url'] :
     </div>
 </div>
 
-<script>
-function setAmount(val) {
-    document.getElementById('amount-input').value = val;
-}
-
-document.querySelector('form')?.addEventListener('submit', function(e) {
-    const btn = document.getElementById('send-btn');
-    btn.disabled = true;
-    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Processing...';
-});
-
-// Offline indicator
-(function() {
-    const banner = document.getElementById('offlineBanner');
-    if (!banner) return;
-    window.addEventListener('online', () => banner.classList.remove('visible'));
-    window.addEventListener('offline', () => banner.classList.add('visible'));
-    if (!navigator.onLine) banner.classList.add('visible');
-})();
-</script>
+<script src="/assets/js/federation-send.js?v=<?= time() ?>"></script>
 
 <?php require dirname(dirname(dirname(__DIR__))) . '/layouts/modern/footer.php'; ?>

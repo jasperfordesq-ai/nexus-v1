@@ -413,646 +413,53 @@ if (class_exists('\Nexus\Core\TenantContext')) {
         const mtBasePath = NEXUS_BASE; // Compatibility alias
     </script>
 
-    <style>
-        /* CSS Variables & Theming */
-        :root {
-            --civic-header-height: auto;
-        }
-
-        /* 1. Utility Bar Styles - WCAG 2.1 AA Compliant */
-        .civic-utility-bar {
-            background-color: #f3f4f6;
-            border-bottom: 1px solid #e5e7eb;
-            padding: 8px 0;
-            font-size: 0.9rem;
-            color: #1f2937;
-            /* Darker for 7:1+ contrast on #f3f4f6 */
-        }
-
-        .civic-utility-wrapper {
-            display: flex;
-            justify-content: flex-end;
-            align-items: center;
-            gap: 20px;
-        }
-
-        .civic-utility-link {
-            color: inherit;
-            text-decoration: none;
-            font-weight: 500;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-        }
-
-        .civic-utility-link:hover {
-            text-decoration: underline;
-            color: #000;
-        }
-
-        /* 2. Main Header Styles - SINGLE AUTHORITATIVE DEFINITION */
-        .civic-header {
-            background-color: #ffffff;
-            padding: 16px 0 84px 0;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-            border-bottom: 4px solid var(--civic-brand, #2563EB);
-            position: relative;
-            z-index: 50;
-            margin-bottom: 0;
-        }
-
-        .civic-header-wrapper {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-
-        /* Logo */
-        .civic-logo {
-            font-size: 1.5rem;
-            font-weight: 800;
-            color: var(--civic-brand, #00796B);
-            text-decoration: none;
-            letter-spacing: -0.02em;
-        }
-
-        /* Navigation */
-        #civic-main-nav {
-            display: flex;
-            align-items: center;
-            gap: 25px;
-        }
-
-        .civic-nav-link {
-            text-decoration: none;
-            color: var(--civic-text-main, #111827);
-            font-weight: 600;
-            font-size: 1.05rem;
-            padding: 8px 12px;
-            border-radius: 6px;
-            transition: background-color 0.2s;
-        }
-
-        .civic-nav-link:hover {
-            background-color: #f3f4f6;
-            color: var(--civic-brand, #00796B);
-        }
-
-        /* Dropdowns */
-        .civic-dropdown {
-            position: relative;
-            display: inline-block;
-        }
-
-        .civic-dropdown-trigger {
-            background: none;
-            border: none;
-            font-family: inherit;
-            font-size: 1.05rem;
-            font-weight: 600;
-            color: var(--civic-text-main, #111827);
-            cursor: pointer;
-            padding: 8px 12px;
-            border-radius: 6px;
-        }
-
-        .civic-dropdown-trigger:hover {
-            background-color: #f3f4f6;
-            color: var(--civic-brand, #00796B);
-        }
-
-        .civic-dropdown-content {
-            display: none;
-            position: absolute;
-            top: 100%;
-            left: 0;
-            background-color: #fff;
-            min-width: 220px;
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-            border: 1px solid #e5e7eb;
-            border-radius: 8px;
-            padding: 8px 0;
-            z-index: 100;
-            margin-top: 5px;
-        }
-
-        /* FIX: Bridge gap for hover stability */
-        .civic-dropdown-content::before {
-            content: '';
-            position: absolute;
-            top: -10px;
-            left: 0;
-            width: 100%;
-            height: 10px;
-            background: transparent;
-        }
-
-        .civic-dropdown-content a {
-            display: block;
-            padding: 10px 16px;
-            color: #374151;
-            text-decoration: none;
-            font-weight: 500;
-        }
-
-        .civic-dropdown-content a:hover {
-            background-color: #f9fafb;
-            color: var(--civic-brand, #00796B);
-        }
-
-        /* MEGA MENU STYLES */
-        .civic-menu-btn {
-            background: none;
-            border: 1px solid #e5e7eb;
-            color: #111827;
-            font-weight: 700;
-            cursor: pointer;
-            padding: 10px 20px;
-            border-radius: 6px;
-            font-size: 1rem;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            transition: all 0.2s;
-        }
-
-        .civic-menu-btn:hover,
-        .civic-menu-btn.active {
-            background-color: var(--civic-brand, #00796B);
-            color: white;
-            border-color: var(--civic-brand, #00796B);
-        }
-
-        .civic-mega-menu {
-            display: none;
-            position: absolute;
-            top: 100%;
-            left: 0;
-            width: 100%;
-            background: white;
-            border-top: 1px solid #e5e7eb;
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
-            padding: 40px 0;
-            z-index: 900;
-        }
-
-        .civic-mega-menu.active {
-            display: block;
-        }
-
-        .civic-mega-grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 40px;
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 20px;
-        }
-
-        .civic-mega-col h3 {
-            font-size: 0.9rem;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            color: #374151;
-            /* Darkened for WCAG AA 4.5:1 contrast */
-            margin-bottom: 20px;
-            font-weight: 700;
-        }
-
-        .civic-mega-col a {
-            display: block;
-            text-decoration: none;
-            color: #111827;
-            font-size: 1.1rem;
-            font-weight: 600;
-            margin-bottom: 12px;
-            transition: color 0.2s;
-        }
-
-        .civic-mega-col a:hover {
-            color: var(--civic-brand, #00796B);
-            padding-left: 5px;
-        }
-
-        /* Dark Mode Mega Menu */
-        body.dark-mode .civic-mega-menu {
-            background: #1f2937;
-            border-top-color: #374151;
-        }
-
-        body.dark-mode .civic-menu-btn {
-            border-color: #374151;
-            color: #e5e7eb;
-        }
-
-        body.dark-mode .civic-menu-btn:hover {
-            border-color: var(--civic-brand);
-            color: white;
-        }
-
-        body.dark-mode .civic-mega-col h3 {
-            color: #9CA3AF;
-        }
-
-        body.dark-mode .civic-mega-col a {
-            color: #e5e7eb;
-        }
-
-        body.dark-mode .civic-mega-col a:hover {
-            color: var(--civic-brand);
-        }
-
-        /* Mobile Toggle */
-        #civic-menu-toggle {
-            display: none;
-            background: none;
-            border: 2px solid transparent;
-            cursor: pointer;
-            padding: 8px;
-            border-radius: 4px;
-        }
-
-        /* Mobile Search Button - Hidden on Desktop */
-        .civic-mobile-search-btn {
-            display: none;
-        }
-
-        .civic-mobile-search-bar {
-            display: none;
-        }
-
-        .civic-hamburger {
-            display: block;
-            width: 24px;
-            height: 2px;
-            background: #111827;
-            position: relative;
-            transition: all 0.3s;
-        }
-
-        .civic-hamburger::before,
-        .civic-hamburger::after {
-            content: '';
-            position: absolute;
-            width: 24px;
-            height: 2px;
-            background: #111827;
-            left: 0;
-            transition: all 0.3s;
-        }
-
-        .civic-hamburger::before {
-            top: -8px;
-        }
-
-        .civic-hamburger::after {
-            top: 8px;
-        }
-
-        /* Dark Mode Overrides */
-        body.dark-mode .civic-utility-bar {
-            background-color: #1f2937;
-            border-bottom-color: #374151;
-            color: #e5e7eb;
-        }
-
-        body.dark-mode .civic-header {
-            background-color: #111827;
-            border-bottom: 1px solid #374151;
-        }
-
-        body.dark-mode .civic-logo {
-            color: #fff;
-        }
-
-        /* White logo in dark mode */
-        body.dark-mode .civic-nav-link,
-        body.dark-mode .civic-dropdown-trigger {
-            color: #e5e7eb;
-        }
-
-        body.dark-mode .civic-nav-link:hover,
-        body.dark-mode .civic-dropdown-trigger:hover {
-            background-color: #374151;
-            color: #fff;
-        }
-
-        body.dark-mode .civic-dropdown-content {
-            background-color: #1f2937;
-            border-color: #374151;
-        }
-
-        body.dark-mode .civic-dropdown-content a {
-            color: #d1d5db;
-        }
-
-        body.dark-mode .civic-dropdown-content a:hover {
-            background-color: #374151;
-            color: #fff;
-        }
-
-        body.dark-mode .civic-hamburger,
-        body.dark-mode .civic-hamburger::before,
-        body.dark-mode .civic-hamburger::after {
-            background: #fff;
-        }
-
-
-        /* Responsive Design */
-        @media (max-width: 1024px) {
-            .civic-nav-link {
-                font-size: 0.95rem;
-            }
-
-            #civic-main-nav {
-                gap: 15px;
-            }
-        }
-
-        @media (max-width: 768px) {
-            .civic-search-container {
-                display: none;
-            }
-
-            /* Hide Utility Bar on mobile - links moved to drawer menu */
-            .civic-utility-bar {
-                display: none !important;
-            }
-
-            .civic-arrow {
-                display: none;
-            }
-
-            .civic-utility-wrapper {
-                justify-content: space-between;
-            }
-
-            /* Hide non-essential utility links on very small screens if needed, 
-               but keeping them for now as per "crowded" fix */
-
-            /* Hamburger hidden - mobile nav v2 has Menu in bottom tab bar */
-            #civic-menu-toggle {
-                display: none !important;
-            }
-
-            /* Mobile Search Button */
-            .civic-mobile-search-btn {
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                background: none;
-                border: none;
-                padding: 8px;
-                margin-right: 10px;
-                cursor: pointer;
-                color: var(--civic-text-main, #1F2937);
-                min-width: 44px;
-                min-height: 44px;
-            }
-
-            .civic-mobile-search-btn .dashicons {
-                font-size: 24px;
-                width: 24px;
-                height: 24px;
-            }
-
-            /* Mobile Search Bar (expandable) */
-            .civic-mobile-search-bar {
-                display: none;
-                position: absolute;
-                top: 100%;
-                left: 0;
-                right: 0;
-                background: #fff;
-                padding: 15px 20px;
-                border-top: 1px solid #e5e7eb;
-                border-bottom: 1px solid #e5e7eb;
-                box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-                z-index: 999;
-            }
-
-            .civic-mobile-search-bar.active {
-                display: block;
-            }
-
-            .civic-mobile-search-bar form {
-                display: flex;
-                gap: 10px;
-            }
-
-            .civic-mobile-search-bar input {
-                flex: 1;
-                padding: 12px 15px;
-                border: 2px solid #e5e7eb;
-                border-radius: 6px;
-                font-size: 16px;
-            }
-
-            .civic-mobile-search-bar button {
-                padding: 12px 20px;
-                background: var(--civic-brand, #00796B);
-                color: white;
-                border: none;
-                border-radius: 6px;
-                font-weight: 600;
-                cursor: pointer;
-                min-width: 44px;
-            }
-
-            body.dark-mode .civic-mobile-search-bar {
-                background: #1F2937;
-                border-color: #374151;
-            }
-
-            body.dark-mode .civic-mobile-search-bar input {
-                background: #374151;
-                border-color: #4B5563;
-                color: #F3F4F6;
-            }
-
-            /* Mobile nav now handled by mobile-nav-v2 */
-            /* Notification drawer styles now handled by mobile-nav-v2 */
-
-            .civic-nav-link,
-            .civic-dropdown-trigger {
-                width: 100%;
-                text-align: left;
-                padding: 15px 20px;
-                border-radius: 0;
-                border-bottom: 1px solid #f3f4f6;
-            }
-
-            body.dark-mode .civic-nav-link,
-            body.dark-mode .civic-dropdown-trigger {
-                border-bottom-color: #374151;
-            }
-
-            .civic-dropdown {
-                width: 100%;
-            }
-
-            .civic-dropdown-content {
-                position: static;
-                width: 100%;
-                box-shadow: none;
-                border: none;
-                background-color: #f9fafb;
-                padding-left: 20px;
-            }
-
-            /* On mobile, show Theme switcher only for admins via body class */
-            body:not(.user-is-admin) .civic-interface-switcher {
-                display: none !important;
-            }
-
-            body.dark-mode .civic-dropdown-content {
-                background-color: #111827;
-            }
-        }
-    </style>
-
-    <style>
-        /* WCAG 2.1 AA Skip Link - High visibility focus state */
-        .skip-link {
-            position: absolute;
-            top: -50px;
-            left: 10px;
-            background: #1e40af;
-            color: #ffffff;
-            padding: 12px 20px;
-            z-index: 10001;
-            font-weight: 700;
-            font-size: 1rem;
-            text-decoration: none;
-            border-radius: 0 0 8px 8px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-            transition: top 0.15s ease-in-out;
-        }
-
-        .skip-link:focus {
-            top: 0;
-            outline: 3px solid #fbbf24;
-            outline-offset: 2px;
-        }
-
-        /* Visually hidden but accessible */
-        .visually-hidden,
-        .sr-only {
-            position: absolute !important;
-            width: 1px !important;
-            height: 1px !important;
-            padding: 0 !important;
-            margin: -1px !important;
-            overflow: hidden !important;
-            clip: rect(0, 0, 0, 0) !important;
-            white-space: nowrap !important;
-            border: 0 !important;
-        }
-
-        /* WCAG 2.1 AA Focus States - Universal */
-        :focus-visible {
-            outline: 3px solid var(--civic-brand, #00796B) !important;
-            outline-offset: 2px !important;
-        }
-
-        /* High contrast focus for buttons and links */
-        .civic-btn:focus-visible,
-        .civic-nav-link:focus-visible,
-        .civic-dropdown-trigger:focus-visible,
-        .civic-utility-link:focus-visible,
-        .civic-menu-btn:focus-visible {
-            outline: 3px solid #1e40af !important;
-            outline-offset: 2px !important;
-            background-color: rgba(30, 64, 175, 0.1);
-        }
-
-        /* Focus ring for dark mode */
-        body.dark-mode :focus-visible {
-            outline-color: #60a5fa !important;
-        }
-    </style>
+    <!-- CivicOne Header CSS (Extracted per CLAUDE.md) -->
+    <link rel="stylesheet" href="/assets/css/civicone-header.css?v=<?= $cssVersion ?>">
+    <!-- CivicOne Events CSS (WCAG 2.1 AA 2026-01-19) -->
+    <link rel="stylesheet" href="/assets/css/civicone-events.css?v=<?= $cssVersion ?>">
+    <!-- CivicOne Profile CSS (WCAG 2.1 AA 2026-01-19) -->
+    <link rel="stylesheet" href="/assets/css/civicone-profile.css?v=<?= $cssVersion ?>">
+    <!-- CivicOne Groups CSS (WCAG 2.1 AA 2026-01-19) -->
+    <link rel="stylesheet" href="/assets/css/civicone-groups.css?v=<?= $cssVersion ?>">
+    <!-- CivicOne Volunteering CSS (WCAG 2.1 AA 2026-01-19) -->
+    <link rel="stylesheet" href="/assets/css/civicone-volunteering.css?v=<?= $cssVersion ?>">
+    <!-- CivicOne Mini Modules CSS (Polls, Goals, Resources - WCAG 2.1 AA 2026-01-19) -->
+    <link rel="stylesheet" href="/assets/css/civicone-mini-modules.css?v=<?= $cssVersion ?>">
+    <!-- CivicOne Messages & Notifications CSS (WCAG 2.1 AA 2026-01-19) -->
+    <link rel="stylesheet" href="/assets/css/civicone-messages.css?v=<?= $cssVersion ?>">
+    <!-- CivicOne Wallet & Insights CSS (WCAG 2.1 AA 2026-01-19) -->
+    <link rel="stylesheet" href="/assets/css/civicone-wallet.css?v=<?= $cssVersion ?>">
+    <!-- CivicOne Blog CSS (WCAG 2.1 AA 2026-01-19) -->
+    <link rel="stylesheet" href="/assets/css/civicone-blog.css?v=<?= $cssVersion ?>">
+    <!-- CivicOne Help & Settings CSS (WCAG 2.1 AA 2026-01-19) -->
+    <link rel="stylesheet" href="/assets/css/civicone-help.css?v=<?= $cssVersion ?>">
+    <!-- CivicOne Matches & Connections CSS (WCAG 2.1 AA 2026-01-19) -->
+    <link rel="stylesheet" href="/assets/css/civicone-matches.css?v=<?= $cssVersion ?>">
 
     <!-- Skip Link for Accessibility (WCAG 2.4.1) -->
     <a href="#main-content" class="skip-link">Skip to main content</a>
 
-    <!-- Experimental Layout Notice Banner - Integrated into utility bar flow -->
+    <!-- Accessible Layout Notice Banner - Premium Design -->
     <div class="civic-experimental-banner" role="status" aria-live="polite">
-        <div class="civic-container" style="display: flex; align-items: center; justify-content: center; gap: 12px; flex-wrap: wrap;">
-            <span class="civic-experimental-badge">BETA</span>
-            <span class="civic-experimental-text">
-                <strong>Accessible Layout (Experimental)</strong> — WCAG 2.1 AA compliant version
-            </span>
+        <div class="civic-container civic-banner-content">
+            <div class="civic-banner-content">
+                <span class="civic-experimental-badge">
+                    <i class="fa-solid fa-universal-access" aria-hidden="true"></i>
+                    ACCESSIBLE Experimental in Development
+                </span>
+                <span class="civic-experimental-text">
+                    <strong>WCAG 2.1 AA Compliant</strong> — High contrast, keyboard-friendly design
+                </span>
+            </div>
             <a href="?layout=modern" class="civic-experimental-switch">
-                <span aria-hidden="true">←</span> Switch to Modern Layout
+                <i class="fa-solid fa-sparkles" aria-hidden="true"></i>
+                Switch to Modern
             </a>
         </div>
     </div>
-    <style>
-        /* Experimental Layout Banner - WCAG 2.1 AA Compliant */
-        .civic-experimental-banner {
-            background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%);
-            color: #ffffff;
-            padding: 8px 16px;
-            font-size: 0.85rem;
-            text-align: center;
-            border-bottom: 2px solid #5b21b6;
-        }
-
-        .civic-experimental-badge {
-            background: rgba(255, 255, 255, 0.2);
-            color: #ffffff;
-            padding: 2px 8px;
-            border-radius: 4px;
-            font-weight: 700;
-            font-size: 0.75rem;
-            letter-spacing: 0.05em;
-        }
-
-        .civic-experimental-text {
-            color: #ffffff;
-        }
-
-        .civic-experimental-switch {
-            background: rgba(255, 255, 255, 0.15);
-            color: #ffffff;
-            padding: 4px 12px;
-            border-radius: 4px;
-            text-decoration: none;
-            font-weight: 600;
-            transition: background 0.2s;
-        }
-
-        .civic-experimental-switch:hover {
-            background: rgba(255, 255, 255, 0.3);
-            text-decoration: underline;
-        }
-
-        .civic-experimental-switch:focus {
-            outline: 3px solid #ffffff;
-            outline-offset: 2px;
-        }
-
-        /* Dark mode adjustments */
-        body.dark-mode .civic-experimental-banner {
-            background: linear-gradient(135deg, #581c87 0%, #4c1d95 100%);
-            border-bottom-color: #3b0764;
-        }
-
-        /* Mobile: Stack vertically */
-        @media (max-width: 600px) {
-            .civic-experimental-banner .civic-container {
-                flex-direction: column;
-                gap: 6px;
-            }
-
-            .civic-experimental-text {
-                font-size: 0.8rem;
-            }
-        }
-    </style>
 
     <!-- 1. Utility Bar (Top Row) - WCAG 2.1 AA Compliant -->
-    <nav class="civic-utility-bar" aria-label="Utility navigation" style="position: relative; z-index: 2000;">
+    <nav class="civic-utility-bar" aria-label="Utility navigation">
         <div class="civic-container civic-utility-wrapper">
 
             <!-- Platform Dropdown - Public to everyone -->
@@ -1060,11 +467,11 @@ if (class_exists('\Nexus\Core\TenantContext')) {
             $showPlatform = true; // Made public to everyone
             if ($showPlatform):
             ?>
-                <div class="civic-dropdown" style="display:inline-block; margin-right: auto;">
-                    <button class="civic-utility-link" style="background:none; border:none; cursor:pointer; font-size:0.9rem; padding:0; font-weight:700; text-transform:uppercase;" aria-haspopup="menu" aria-expanded="false" aria-controls="platform-dropdown-menu">
+                <div class="civic-dropdown civic-dropdown--left">
+                    <button class="civic-utility-link civic-utility-btn civic-utility-btn--uppercase" aria-haspopup="menu" aria-expanded="false" aria-controls="platform-dropdown-menu">
                         Platform <span class="civic-arrow" aria-hidden="true">▾</span>
                     </button>
-                    <div class="civic-dropdown-content" id="platform-dropdown-menu" role="menu" style="min-width:200px; left:0; right:auto;">
+                    <div class="civic-dropdown-content" id="platform-dropdown-menu" role="menu">
                         <?php
                         $tenants = [];
                         try {
@@ -1095,7 +502,7 @@ if (class_exists('\Nexus\Core\TenantContext')) {
             </style>
 
             <!-- Dark Mode Toggle -->
-            <button id="civic-theme-toggle" class="civic-utility-link" style="background:none; border:none; cursor:pointer;" aria-label="Toggle High Contrast">
+            <button id="civic-theme-toggle" class="civic-utility-link civic-utility-btn" aria-label="Toggle High Contrast">
                 <span class="icon">◑</span> Contrast
             </button>
 
@@ -1108,11 +515,11 @@ if (class_exists('\Nexus\Core\TenantContext')) {
             }
             if ($currentSlug !== 'public-sector-demo'):
             ?>
-                <div class="civic-dropdown civic-interface-switcher" style="display:inline-block;">
-                    <button class="civic-utility-link" style="background:none; border:none; cursor:pointer; font-size:0.9rem; padding:0; font-weight:700;" aria-haspopup="menu" aria-expanded="false" aria-controls="interface-dropdown-menu">
+                <div class="civic-dropdown civic-dropdown--right civic-interface-switcher">
+                    <button class="civic-utility-link civic-utility-btn" aria-haspopup="menu" aria-expanded="false" aria-controls="interface-dropdown-menu">
                         Layout <span class="civic-arrow" aria-hidden="true">▾</span>
                     </button>
-                    <div class="civic-dropdown-content" id="interface-dropdown-menu" role="menu" style="min-width:200px; right:0; left:auto;">
+                    <div class="civic-dropdown-content" id="interface-dropdown-menu" role="menu">
                         <?php
                         // Use LayoutHelper for consistent layout detection
                         $lay = \Nexus\Services\LayoutHelper::get();
@@ -1151,34 +558,95 @@ if (class_exists('\Nexus\Core\TenantContext')) {
             <!-- Auth / User Links -->
             <?php if (isset($_SESSION['user_id'])): ?>
 
-                <!-- Create Dropdown - SYNCHRONIZED -->
-                <div class="civic-dropdown" style="display:inline-block;">
-                    <button class="civic-utility-link" style="background:none; border:none; cursor:pointer; font-size:0.9rem; padding:0; color:#10b981; font-weight:700;" aria-haspopup="menu" aria-expanded="false" aria-controls="utility-create-dropdown-menu">
+                <!-- Create Dropdown - SYNCHRONIZED WITH MODERN (uses /compose?tab= URLs) -->
+                <div class="civic-dropdown civic-dropdown--right">
+                    <button class="civic-utility-link civic-utility-btn civic-utility-btn--create" aria-haspopup="menu" aria-expanded="false" aria-controls="utility-create-dropdown-menu">
                         + Create <span class="civic-arrow" aria-hidden="true">▾</span>
                     </button>
-                    <div class="civic-dropdown-content" id="utility-create-dropdown-menu" role="menu" style="min-width:180px; right:0; left:auto;">
-                        <?php
-                        $utilCreateItems = \Nexus\Config\Navigation::getCreateItems();
-                        $firstItem = true;
-                        foreach ($utilCreateItems as $createKey => $createItem):
-                            // Add separator before events and volunteering
-                            if (!$firstItem && in_array($createKey, ['event', 'volunteering'])):
-                        ?>
-                                <hr style="margin:5px 0; border:0; border-top:1px solid #efefef;" role="separator">
-                            <?php
-                            endif;
-                            $firstItem = false;
-                            ?>
-                            <a href="<?= htmlspecialchars($createItem['url']) ?>" role="menuitem" style="color:<?= htmlspecialchars($createItem['color']) ?>;">
-                                <span class="dashicons <?= htmlspecialchars($createItem['icon']) ?>" style="margin-right:5px;" aria-hidden="true"></span> <?= htmlspecialchars($createItem['label']) ?>
-                            </a>
-                        <?php endforeach; ?>
+                    <div class="civic-dropdown-content" id="utility-create-dropdown-menu" role="menu">
+                        <a href="<?= Nexus\Core\TenantContext::getBasePath() ?>/compose?tab=post" role="menuitem">📝 New Post</a>
+                        <a href="<?= Nexus\Core\TenantContext::getBasePath() ?>/compose?tab=listing" role="menuitem">🎁 New Listing</a>
+                        <?php if (Nexus\Core\TenantContext::hasFeature('events')): ?>
+                            <a href="<?= Nexus\Core\TenantContext::getBasePath() ?>/compose?tab=event" role="menuitem">📅 New Event</a>
+                        <?php endif; ?>
+                        <?php if (Nexus\Core\TenantContext::hasFeature('volunteering')): ?>
+                            <a href="<?= Nexus\Core\TenantContext::getBasePath() ?>/compose?tab=volunteer" role="menuitem">🤝 Volunteer Opp</a>
+                        <?php endif; ?>
+                        <?php if (Nexus\Core\TenantContext::hasFeature('polls')): ?>
+                            <a href="<?= Nexus\Core\TenantContext::getBasePath() ?>/compose?tab=poll" role="menuitem">📊 New Poll</a>
+                        <?php endif; ?>
+                        <?php if (Nexus\Core\TenantContext::hasFeature('goals')): ?>
+                            <a href="<?= Nexus\Core\TenantContext::getBasePath() ?>/compose?tab=goal" role="menuitem">🎯 New Goal</a>
+                        <?php endif; ?>
                     </div>
                 </div>
 
-                <!-- Admin Link (Single Link - Matches Modern Header) -->
-                <?php if (!empty($_SESSION['is_super_admin']) || ($_SESSION['user_role'] ?? '') === 'admin'): ?>
-                    <a href="<?= \Nexus\Core\TenantContext::getBasePath() ?>/admin" class="civic-utility-link" style="color:#ea580c; font-weight:700;">Admin</a>
+                <?php
+                // Federation Dropdown - SYNCHRONIZED WITH MODERN
+                $hasFederationUtilBar = false;
+                if (class_exists('\Nexus\Services\FederationFeatureService')) {
+                    try {
+                        $hasFederationUtilBar = \Nexus\Services\FederationFeatureService::isTenantFederationEnabled();
+                    } catch (\Exception $e) {
+                        $hasFederationUtilBar = false;
+                    }
+                }
+                if ($hasFederationUtilBar): ?>
+                    <div class="civic-dropdown civic-dropdown--right">
+                        <button class="civic-utility-link civic-utility-btn civic-utility-btn--federation" aria-haspopup="menu" aria-expanded="false">
+                            <i class="fa-solid fa-globe civic-menu-icon"></i>Partner Communities <span class="civic-arrow" aria-hidden="true">▾</span>
+                        </button>
+                        <div class="civic-dropdown-content" role="menu">
+                            <a href="<?= Nexus\Core\TenantContext::getBasePath() ?>/federation" role="menuitem">
+                                <span class="civic-menu-icon civic-menu-icon--purple"><i class="fa-solid fa-house"></i></span>Partner Communities Hub
+                            </a>
+                            <div class="civic-dropdown-separator" role="separator"></div>
+                            <a href="<?= Nexus\Core\TenantContext::getBasePath() ?>/federation/members" role="menuitem">
+                                <span class="civic-menu-icon civic-menu-icon--purple"><i class="fa-solid fa-user-group"></i></span>Members
+                            </a>
+                            <a href="<?= Nexus\Core\TenantContext::getBasePath() ?>/federation/listings" role="menuitem">
+                                <span class="civic-menu-icon civic-menu-icon--pink"><i class="fa-solid fa-hand-holding-heart"></i></span>Listings
+                            </a>
+                            <a href="<?= Nexus\Core\TenantContext::getBasePath() ?>/federation/events" role="menuitem">
+                                <span class="civic-menu-icon civic-menu-icon--amber"><i class="fa-solid fa-calendar-days"></i></span>Events
+                            </a>
+                            <a href="<?= Nexus\Core\TenantContext::getBasePath() ?>/federation/groups" role="menuitem">
+                                <span class="civic-menu-icon civic-menu-icon--indigo"><i class="fa-solid fa-users"></i></span>Groups
+                            </a>
+                            <a href="<?= Nexus\Core\TenantContext::getBasePath() ?>/federation/messages" role="menuitem">
+                                <span class="civic-menu-icon civic-menu-icon--blue"><i class="fa-solid fa-envelope"></i></span>Messages
+                            </a>
+                            <a href="<?= Nexus\Core\TenantContext::getBasePath() ?>/federation/transactions" role="menuitem">
+                                <span class="civic-menu-icon civic-menu-icon--green"><i class="fa-solid fa-coins"></i></span>Transactions
+                            </a>
+                            <div class="civic-dropdown-separator" role="separator"></div>
+                            <a href="<?= Nexus\Core\TenantContext::getBasePath() ?>/settings?section=federation" role="menuitem">
+                                <span class="civic-menu-icon civic-menu-icon--gray"><i class="fa-solid fa-sliders"></i></span>Settings
+                            </a>
+                        </div>
+                    </div>
+                <?php endif; ?>
+
+                <?php if ((!empty($_SESSION['user_role']) && $_SESSION['user_role'] === 'newsletter_admin')): ?>
+                    <!-- Newsletter Admin - Limited Access (Matches Modern) -->
+                    <div class="civic-dropdown civic-dropdown--right">
+                        <button class="civic-utility-link civic-utility-btn civic-utility-btn--newsletter" aria-haspopup="menu" aria-expanded="false">
+                            Newsletter <span class="civic-arrow" aria-hidden="true">▾</span>
+                        </button>
+                        <div class="civic-dropdown-content" role="menu">
+                            <a href="<?= Nexus\Core\TenantContext::getBasePath() ?>/admin/newsletters" role="menuitem">All Newsletters</a>
+                            <a href="<?= Nexus\Core\TenantContext::getBasePath() ?>/admin/newsletters/create" role="menuitem">Create Newsletter</a>
+                            <div class="civic-dropdown-separator" role="separator"></div>
+                            <a href="<?= Nexus\Core\TenantContext::getBasePath() ?>/admin/newsletters/subscribers" role="menuitem">Subscribers</a>
+                            <a href="<?= Nexus\Core\TenantContext::getBasePath() ?>/admin/newsletters/segments" role="menuitem">Segments</a>
+                        </div>
+                    </div>
+                <?php elseif ((!empty($_SESSION['user_role']) && $_SESSION['user_role'] === 'admin') || !empty($_SESSION['is_super_admin'])): ?>
+                    <!-- Admin Links (Matches Modern Header) -->
+                    <a href="<?= \Nexus\Core\TenantContext::getBasePath() ?>/admin" class="civic-utility-link civic-utility-btn civic-utility-btn--admin">Admin</a>
+                    <a href="<?= \Nexus\Core\TenantContext::getBasePath() ?>/admin/group-ranking" class="civic-utility-link civic-utility-btn civic-utility-btn--ranking" title="Smart Group Ranking">
+                        <i class="fa-solid fa-chart-line"></i> Ranking
+                    </a>
                 <?php endif; ?>
 
                 <?php
@@ -1204,31 +672,29 @@ if (class_exists('\Nexus\Core\TenantContext')) {
                 ?>
 
                 <!-- Messages Icon (Matches Modern) -->
-                <a href="<?= \Nexus\Core\TenantContext::getBasePath() ?>/messages" class="civic-utility-link nexus-header-icon-btn" title="Messages" style="position:relative;">
+                <a href="<?= \Nexus\Core\TenantContext::getBasePath() ?>/messages" class="civic-utility-link nexus-header-icon-btn badge-container" title="Messages">
                     <span class="dashicons dashicons-email" aria-hidden="true"></span>
                     <?php if ($msgUnread > 0): ?>
-                        <span class="nexus-header-icon-badge" style="position:absolute; top:-6px; right:-6px; background:#ef4444; color:#fff; font-size:10px; font-weight:700; padding:2px 5px; border-radius:10px; min-width:14px; text-align:center;"><?= $msgUnread > 99 ? '99+' : $msgUnread ?></span>
+                        <span class="badge badge--danger badge--sm notification-badge"><?= $msgUnread > 99 ? '99+' : $msgUnread ?></span>
                     <?php endif; ?>
                 </a>
 
                 <!-- Notifications Bell (triggers drawer - Matches Modern) -->
-                <button class="civic-utility-link nexus-header-icon-btn" title="Notifications" onclick="window.nexusNotifDrawer.open()" style="background:none; border:none; cursor:pointer; position:relative;">
+                <button class="civic-utility-link nexus-header-icon-btn badge-container" title="Notifications" onclick="window.nexusNotifDrawer.open()" style="background:none; border:none; cursor:pointer;">
                     <span class="dashicons dashicons-bell" aria-hidden="true"></span>
                     <?php if ($nUnread > 0): ?>
-                        <span id="nexus-bell-badge" class="nexus-header-icon-badge" style="position:absolute; top:-6px; right:-6px; background:#ef4444; color:#fff; font-size:10px; font-weight:700; padding:2px 5px; border-radius:10px; min-width:14px; text-align:center;"><?= $nUnread > 99 ? '99+' : $nUnread ?></span>
+                        <span id="nexus-bell-badge" class="badge badge--danger badge--sm notification-badge"><?= $nUnread > 99 ? '99+' : $nUnread ?></span>
                     <?php endif; ?>
                 </button>
 
                 <!-- User Avatar Dropdown (Premium - Matches Modern) -->
-                <div class="civic-dropdown civic-user-dropdown desktop-only-dd">
-                    <button class="civic-utility-link" style="padding: 4px 12px; display: flex; align-items: center; gap: 8px; background:none; border:none; cursor:pointer;" aria-haspopup="menu" aria-expanded="false">
-                        <img src="<?= $_SESSION['user_avatar'] ?? '/assets/img/defaults/default_avatar.webp' ?>"
-                            alt="Profile"
-                            style="width: 28px; height: 28px; border-radius: 50%; object-fit: cover;">
-                        <span style="font-weight: 600;"><?= htmlspecialchars(explode(' ', $_SESSION['user_name'] ?? 'User')[0]) ?></span>
+                <div class="civic-dropdown civic-dropdown--right civic-user-dropdown desktop-only-dd">
+                    <button class="civic-utility-link civic-user-avatar-btn" aria-haspopup="menu" aria-expanded="false">
+                        <img src="<?= $_SESSION['user_avatar'] ?? '/assets/img/defaults/default_avatar.webp' ?>" alt="Profile">
+                        <span><?= htmlspecialchars(explode(' ', $_SESSION['user_name'] ?? 'User')[0]) ?></span>
                         <span class="civic-arrow" aria-hidden="true">▾</span>
                     </button>
-                    <div class="civic-dropdown-content" role="menu" style="min-width: 220px; right:0; left:auto;">
+                    <div class="civic-dropdown-content" role="menu">
                         <a href="<?= \Nexus\Core\TenantContext::getBasePath() ?>/profile/<?= $_SESSION['user_id'] ?>" role="menuitem">
                             <i class="fa-solid fa-user" style="margin-right: 10px; width: 16px; text-align: center; color: var(--civic-brand, #00796B);"></i>My Profile
                         </a>
@@ -1320,63 +786,115 @@ if (class_exists('\Nexus\Core\TenantContext')) {
                 ?>
             </a>
 
-            <!-- Search Bar (WCAG 2.1 AA Accessible) -->
-            <div class="civic-search-container" role="search" style="flex-grow:1; margin:0 30px; max-width:500px;">
-                <form action="<?= \Nexus\Core\TenantContext::getBasePath() ?>/search" method="GET" style="display:flex; width:100%;" role="search">
-                    <label for="site-search" class="visually-hidden">Search the site</label>
-                    <input type="search" id="site-search" name="q" placeholder="Search..." aria-label="Search content" autocomplete="off"
-                        style="width:100%; padding:12px 16px; border:2px solid #6b7280; border-radius:6px 0 0 6px; font-size:1rem; color:#1f2937;">
-                    <button type="submit" aria-label="Submit search" style="background:var(--civic-brand, #00796B); color:white; border:none; padding:0 20px; border-radius:0 6px 6px 0; font-weight:600; cursor:pointer; min-width:80px;">
-                        <span aria-hidden="true">Search</span>
-                    </button>
-                </form>
-            </div>
+            <!-- Desktop Navigation - ACCESSIBLE VERSION (2026-01-19) -->
+            <!-- WCAG 2.1 AA: Core links visible + single hamburger Menu for all other navigation -->
+            <nav id="civic-main-nav" class="civic-desktop-nav" aria-label="Main navigation">
+                <?php
+                $basePath = \Nexus\Core\TenantContext::getBasePath();
+                $isLoggedIn = isset($_SESSION['user_id']);
+                ?>
 
-            <!-- Wallet Link (Desktop) -->
-            <a href="<?= Nexus\Core\TenantContext::getBasePath() ?>/wallet" class="civic-utility-link" style="background: var(--civic-brand, #00796B); color: white; padding: 8px 16px; border-radius: 20px; font-weight: 700; text-decoration: none; margin-right: 15px; display: none;">
-                <span class="dashicons dashicons-wallet" style="margin-right:5px;"></span> Wallet
-            </a>
-            <style>
-                @media(min-width: 900px) {
-                    a[href*="/wallet"] {
-                        display: inline-flex !important;
-                    }
-                }
-            </style>
+                <!-- Core Navigation Links - Always visible -->
+                <a href="<?= $basePath ?>/" class="civic-nav-link" data-nav-match="/">Feed</a>
+                <a href="<?= $basePath ?>/listings" class="civic-nav-link" data-nav-match="listings">Listings</a>
+                <?php if (Nexus\Core\TenantContext::hasFeature('volunteering')): ?>
+                    <a href="<?= $basePath ?>/volunteering" class="civic-nav-link" data-nav-match="volunteering">Volunteering</a>
+                <?php endif; ?>
 
-            <!-- Create Dropdown (Desktop) -->
-            <div class="civic-dropdown" style="display:none;">
-                <button class="civic-dropdown-trigger" style="background: #fff; border: 2px solid var(--civic-brand, #00796B); color: var(--civic-brand, #00796B); border-radius: 20px; padding: 6px 16px; display: inline-flex; align-items: center; gap: 5px;" aria-haspopup="menu" aria-expanded="false" aria-controls="header-create-dropdown-menu">
-                    <span class="dashicons dashicons-plus" aria-hidden="true"></span> Create
+                <?php
+                // Database-driven pages (Page Builder)
+                $dbPagesMain = \Nexus\Core\MenuGenerator::getMenuPages('main');
+                foreach ($dbPagesMain as $mainPage):
+                ?>
+                    <a href="<?= htmlspecialchars($mainPage['url']) ?>" class="civic-nav-link"><?= htmlspecialchars($mainPage['title']) ?></a>
+                <?php endforeach; ?>
+
+                <!-- Single Menu Button - Opens combined mega menu -->
+                <button id="civic-mega-menu-btn" class="civic-menu-btn" aria-haspopup="dialog" aria-expanded="false" aria-controls="civic-mega-menu">
+                    Menu <span class="civic-arrow" aria-hidden="true">▾</span>
                 </button>
-                <div class="civic-dropdown-content" id="header-create-dropdown-menu" role="menu" style="right:0; left:auto; min-width:200px;">
-                    <a href="<?= Nexus\Core\TenantContext::getBasePath() ?>/listings/create?type=offer" role="menuitem">
-                        <span class="dashicons dashicons-plus-alt" style="color:#059669; margin-right:5px;" aria-hidden="true"></span> New Offer
-                    </a>
-                    <a href="<?= Nexus\Core\TenantContext::getBasePath() ?>/listings/create?type=request" role="menuitem">
-                        <span class="dashicons dashicons-sos" style="color:#d97706; margin-right:5px;" aria-hidden="true"></span> New Request
-                    </a>
-                    <?php if (Nexus\Core\TenantContext::hasFeature('events')): ?>
-                        <div style="border-top:1px solid #eee; margin:5px 0;" role="separator"></div>
-                        <a href="<?= Nexus\Core\TenantContext::getBasePath() ?>/events/create" role="menuitem">
-                            <span class="dashicons dashicons-calendar-alt" style="color:#4f46e5; margin-right:5px;" aria-hidden="true"></span> New Event
-                        </a>
-                    <?php endif; ?>
-                    <?php if (Nexus\Core\TenantContext::hasFeature('volunteering') && (empty($_SESSION['user_role']) || $_SESSION['user_role'] === 'admin' || !empty($_SESSION['is_org_admin']))): ?>
-                        <div style="border-top:1px solid #eee; margin:5px 0;" role="separator"></div>
-                        <a href="<?= Nexus\Core\TenantContext::getBasePath() ?>/volunteering/opportunities/create" role="menuitem">
-                            <span class="dashicons dashicons-heart" style="color:#be185d; margin-right:5px;" aria-hidden="true"></span> Volunteer Opp
-                        </a>
-                    <?php endif; ?>
+            </nav>
+
+            <!-- Combined Mega Menu - All links organized in columns -->
+            <div id="civic-mega-menu" class="civic-mega-menu" role="dialog" aria-labelledby="civic-mega-menu-btn" aria-modal="false">
+                <div class="civic-mega-grid">
+                    <!-- Column 1: Community -->
+                    <div class="civic-mega-col">
+                        <h3>Community</h3>
+                        <?php if (\Nexus\Core\TenantContext::hasFeature('events')): ?>
+                        <a href="<?= $basePath ?>/events">Events</a>
+                        <?php endif; ?>
+                        <a href="<?= $basePath ?>/members">Members</a>
+                        <a href="<?= $basePath ?>/community-groups">Community Groups</a>
+                        <a href="<?= $basePath ?>/groups">Local Hubs</a>
+                    </div>
+
+                    <!-- Column 2: Explore -->
+                    <div class="civic-mega-col">
+                        <h3>Explore</h3>
+                        <?php if ($isLoggedIn): ?>
+                        <a href="<?= $basePath ?>/compose">Create New</a>
+                        <?php endif; ?>
+                        <?php if (\Nexus\Core\TenantContext::hasFeature('goals')): ?>
+                        <a href="<?= $basePath ?>/goals">Goals</a>
+                        <?php endif; ?>
+                        <?php if (\Nexus\Core\TenantContext::hasFeature('polls')): ?>
+                        <a href="<?= $basePath ?>/polls">Polls</a>
+                        <?php endif; ?>
+                        <?php if (\Nexus\Core\TenantContext::hasFeature('resources')): ?>
+                        <a href="<?= $basePath ?>/resources">Resources</a>
+                        <?php endif; ?>
+                        <a href="<?= $basePath ?>/leaderboard">Leaderboards</a>
+                        <a href="<?= $basePath ?>/achievements">Achievements</a>
+                    </div>
+
+                    <!-- Column 3: Tools & Features -->
+                    <div class="civic-mega-col">
+                        <h3>Tools</h3>
+                        <?php if ($isLoggedIn): ?>
+                        <a href="<?= $basePath ?>/nexus-score">My Nexus Score</a>
+                        <?php endif; ?>
+                        <a href="<?= $basePath ?>/matches">Smart Matching</a>
+                        <a href="<?= $basePath ?>/ai">AI Assistant</a>
+                        <a href="<?= $basePath ?>/mobile-download">Get Mobile App</a>
+                    </div>
+
+                    <!-- Column 4: About & Help -->
+                    <div class="civic-mega-col">
+                        <h3>About</h3>
+                        <?php if (\Nexus\Core\TenantContext::hasFeature('blog')): ?>
+                        <a href="<?= $basePath ?>/news">Latest News</a>
+                        <?php endif; ?>
+                        <?php
+                        // Custom file-based pages
+                        $customPages = \Nexus\Core\TenantContext::getCustomPages('civicone');
+                        if (empty($customPages)) {
+                            $customPages = \Nexus\Core\TenantContext::getCustomPages('modern');
+                        }
+                        $excludedPages = ['about', 'privacy', 'terms', 'privacy policy', 'terms of service',
+                            'terms and conditions', 'help', 'contact', 'contact us', 'accessibility',
+                            'how it works', 'mobile download'];
+                        foreach ($customPages as $page):
+                            $pageName = strtolower($page['name']);
+                            if (in_array($pageName, $excludedPages)) continue;
+                        ?>
+                        <a href="<?= htmlspecialchars($page['url']) ?>"><?= htmlspecialchars($page['name']) ?></a>
+                        <?php endforeach; ?>
+                        <a href="<?= $basePath ?>/help">Help Center</a>
+                        <a href="<?= $basePath ?>/contact">Contact Us</a>
+                        <a href="<?= $basePath ?>/accessibility">Accessibility</a>
+                    </div>
                 </div>
             </div>
-            <style>
-                @media(min-width: 900px) {
-                    .civic-header .civic-dropdown {
-                        display: inline-block !important;
-                    }
-                }
-            </style>
+
+            <!-- Desktop Search - Simple accessible design -->
+            <div class="civic-search-container civic-desktop-search" role="search">
+                <form action="<?= $basePath ?>/search" method="GET" class="civic-search-form">
+                    <label for="civicSearchInput" class="visually-hidden">Search</label>
+                    <input type="search" name="q" id="civicSearchInput" placeholder="Search..." aria-label="Search content" autocomplete="off">
+                    <button type="submit" aria-label="Submit search">Search</button>
+                </form>
+            </div>
 
             <!-- Mobile Search Toggle -->
             <button id="civic-mobile-search-toggle" class="civic-mobile-search-btn" aria-label="Open search" aria-expanded="false">
@@ -1387,177 +905,6 @@ if (class_exists('\Nexus\Core\TenantContext')) {
             <button id="civic-menu-toggle" aria-label="Open Menu" onclick="if(typeof openMobileMenu==='function'){openMobileMenu();}">
                 <span class="civic-hamburger"></span>
             </button>
-
-            <!-- Desktop Mega Menu Trigger (Hidden on Master) -->
-            <?php if (\Nexus\Core\TenantContext::getId() != 1): ?>
-                <div id="civic-desktop-menu" style="margin-left: 20px;">
-                    <button id="civic-mega-trigger" class="civic-menu-btn" aria-expanded="false" aria-controls="civic-mega-menu" aria-label="Open main menu">
-                        <span style="font-size: 1.2rem;" aria-hidden="true">☰</span> Menu
-                    </button>
-                </div>
-            <?php endif; ?>
-
-            <!-- Mega Menu Overlay -->
-            <div id="civic-mega-menu" class="civic-mega-menu">
-                <div class="civic-mega-grid">
-                    <!-- Col 1: Explore -->
-                    <div class="civic-mega-col">
-                        <h3>Explore</h3>
-                        <a href="<?= \Nexus\Core\TenantContext::getBasePath() ?>/listings">Offers & Requests</a>
-                        <a href="<?= \Nexus\Core\TenantContext::getBasePath() ?>/groups">Local Hubs</a>
-                        <a href="<?= \Nexus\Core\TenantContext::getBasePath() ?>/members">Community Members</a>
-                        <a href="<?= \Nexus\Core\TenantContext::getBasePath() ?>/">Activity Feed</a>
-                    </div>
-
-                    <!-- Col 2: Participate -->
-                    <div class="civic-mega-col">
-                        <h3>Participate</h3>
-                        <?php if (Nexus\Core\TenantContext::hasFeature('volunteering')): ?>
-                            <a href="<?= Nexus\Core\TenantContext::getBasePath() ?>/volunteering">Volunteering</a>
-                        <?php endif; ?>
-                        <?php if (Nexus\Core\TenantContext::hasFeature('events')): ?>
-                            <a href="<?= Nexus\Core\TenantContext::getBasePath() ?>/events">Events</a>
-                        <?php endif; ?>
-                        <?php if (Nexus\Core\TenantContext::hasFeature('polls')): ?>
-                            <a href="<?= Nexus\Core\TenantContext::getBasePath() ?>/polls">Polls</a>
-                        <?php endif; ?>
-                        <?php if (Nexus\Core\TenantContext::hasFeature('goals')): ?>
-                            <a href="<?= Nexus\Core\TenantContext::getBasePath() ?>/goals">Goal Buddies</a>
-                        <?php endif; ?>
-                    </div>
-
-                    <!-- Col 3: About (Modified logic for Hour Timebank) -->
-                    <div class="civic-mega-col">
-                        <h3>About</h3>
-                        <?php
-                        // Determine Tenant for Custom Logic
-                        $tSlug = \Nexus\Core\TenantContext::get()['slug'] ?? '';
-                        $isHourTimebank = ($tSlug === 'hour-timebank' || $tSlug === 'hour_timebank');
-
-                        if ($isHourTimebank) {
-                            // --- EXPLICIT LOGIC FOR HOUR TIMEBANK ---
-                            echo '<!-- HTB-STRICT-MENU-ACTIVE -->'; // Debug Marker
-
-                            // Latest News
-                            if (\Nexus\Core\TenantContext::hasFeature('blog')) {
-                                echo '<a href="' . \Nexus\Core\TenantContext::getBasePath() . '/blog">Latest News</a>';
-                                echo '<div style="border-top:1px solid #e5e7eb; margin:10px 0;"></div>';
-                            }
-
-                            // Core Links
-                            echo '<a href="' . \Nexus\Core\TenantContext::getBasePath() . '/our-story">About Us</a>';
-                            echo '<a href="' . \Nexus\Core\TenantContext::getBasePath() . '/timebanking-guide">Timebanking Guide</a>';
-
-                            // Partner & Social
-                            echo '<a href="' . \Nexus\Core\TenantContext::getBasePath() . '/partner">Partner With Us</a>';
-                            echo '<a href="' . \Nexus\Core\TenantContext::getBasePath() . '/social-prescribing">Social Prescribing</a>';
-                            echo '<a href="' . \Nexus\Core\TenantContext::getBasePath() . '/faq">Timebanking FAQ\'s</a>';
-
-                            // Our Impact (Colored)
-                            echo '<div style="border-top:1px solid #e5e7eb; margin:12px 0;"></div>';
-                            echo '<div style="padding: 0 0 8px 0; font-size: 0.8rem; font-weight: 700; color: #9ca3af; text-transform: uppercase; letter-spacing: 0.5px;">Our Impact</div>';
-
-                            echo '<a href="' . \Nexus\Core\TenantContext::getBasePath() . '/impact-summary" style="color:#059669 !important;">Impact Summary</a>';
-                            echo '<a href="' . \Nexus\Core\TenantContext::getBasePath() . '/impact-report" style="color:#2563eb !important;">Impact Report</a>';
-                            echo '<a href="' . \Nexus\Core\TenantContext::getBasePath() . '/strategic-plan" style="color:#7c3aed !important;">Strategic Plan</a>';
-
-                            // Contact
-                            echo '<div style="border-top:1px solid #e5e7eb; margin:12px 0;"></div>';
-                            echo '<a href="' . \Nexus\Core\TenantContext::getBasePath() . '/contact">Contact Us</a>';
-                            echo '<a href="' . \Nexus\Core\TenantContext::getBasePath() . '/help">Help Center</a>';
-                        } else {
-                            // --- DEFAULT LOGIC (Other Tenants) ---
-                            $customCivicPages = Nexus\Core\TenantContext::getCustomPages('civicone');
-                            if (empty($customCivicPages)) $customCivicPages = Nexus\Core\TenantContext::getCustomPages('modern');
-
-                            // Intelligent Deduplication Array
-                            $shownPages = [];
-
-                            // 1. Render Custom Pages
-                            foreach ($customCivicPages as $page) {
-                                $pNameNorm = strtolower(trim($page['name']));
-                                $pUrl = $page['url'];
-
-                                if ($pNameNorm == 'about') continue;
-                                $shownPages[$pNameNorm] = true;
-                                echo '<a href="' . htmlspecialchars($page['url']) . '">' . htmlspecialchars($page['name']) . '</a>';
-                            }
-
-                            // 2. Render Standard Pages
-
-                            // PUBLIC SECTOR DEMO NAV OVERRIDE
-                            $tSlug = \Nexus\Core\TenantContext::get()['slug'] ?? '';
-                            if ($tSlug === 'public-sector-demo') {
-                                $uri = $_SERVER['REQUEST_URI'] ?? '';
-
-                                $actHome = ($uri == '/public-sector-demo' || $uri == '/public-sector-demo/') ? 'active' : '';
-                                $actComp = (strpos($uri, 'compliance') !== false) ? 'active' : '';
-                                $actHSE = (strpos($uri, 'hse-case-study') !== false) ? 'active' : '';
-                                $actCouncil = (strpos($uri, 'council-case-study') !== false) ? 'active' : '';
-                                $actSpecs = (strpos($uri, 'technical-specs') !== false) ? 'active' : '';
-
-                                echo '<a href="' . \Nexus\Core\TenantContext::getBasePath() . '/" class="civic-nav-link ' . $actHome . '" style="color:#002d72; font-weight:bold;">Demo Home</a>';
-                                echo '<a href="' . \Nexus\Core\TenantContext::getBasePath() . '/compliance" class="civic-nav-link ' . $actComp . '">Compliance</a>';
-                                echo '<a href="' . \Nexus\Core\TenantContext::getBasePath() . '/hse-case-study" class="civic-nav-link ' . $actHSE . '" style="color:#007b5f;">HSE Case Study</a>';
-                                echo '<a href="' . \Nexus\Core\TenantContext::getBasePath() . '/council-case-study" class="civic-nav-link ' . $actCouncil . '" style="color:#002d72;">Council Case Study</a>';
-                                echo '<a href="' . \Nexus\Core\TenantContext::getBasePath() . '/technical-specs" class="civic-nav-link ' . $actSpecs . '">Technical Specs</a>';
-                                echo '<div style="border-top:1px solid #e5e7eb; margin:10px 0;"></div>';
-                            }
-
-                            $standardPages = [
-                                'How it Works' => '/how-it-works',
-                                'Timebanking Guide' => '/timebanking-guide',
-                                'Partner With Us' => '/partner',
-                                'FAQ' => '/faq',
-                                'Contact Us' => '/contact',
-                                'Help Center' => '/help'
-                            ];
-
-                            // PUBLIC SECTOR DEMO: Override to remove generic pages
-                            if ($tSlug === 'public-sector-demo') {
-                                $standardPages = [
-                                    'Contact Us' => '/contact'
-                                    // User removed FAQ, Partner, Guide, How it Works
-                                ];
-                            }
-
-
-                            foreach ($standardPages as $label => $url) {
-                                $labelNorm = strtolower($label);
-                                if (isset($shownPages[$labelNorm])) continue;
-                                if ($labelNorm == 'contact us' && isset($shownPages['contact'])) continue;
-
-                                echo '<a href="' . \Nexus\Core\TenantContext::getBasePath() . $url . '">' . $label . '</a>';
-                            }
-                        }
-                        ?>
-                    </div>
-
-                    <!-- Col 4: Resources + My Account -->
-                    <div class="civic-mega-col">
-                        <h3>Resources</h3>
-                        <?php if (Nexus\Core\TenantContext::hasFeature('resources')): ?>
-                            <a href="<?= Nexus\Core\TenantContext::getBasePath() ?>/resources">Resources</a>
-                        <?php endif; ?>
-
-                        <!-- Fixed Blog Link (Globally use /blog if using standard logic, or respect configured slug) -->
-                        <?php if (Nexus\Core\TenantContext::hasFeature('blog') && !$isHourTimebank): ?>
-                            <a href="<?= Nexus\Core\TenantContext::getBasePath() ?>/blog">Community News</a>
-                        <?php endif; ?>
-
-                        <h3 style="margin-top:20px;">My Account</h3>
-                        <?php if (isset($_SESSION['user_id'])): ?>
-                            <a href="<?= \Nexus\Core\TenantContext::getBasePath() ?>/wallet" style="color:var(--civic-brand);">My Wallet</a>
-                            <a href="<?= \Nexus\Core\TenantContext::getBasePath() ?>/dashboard">Dashboard</a>
-                            <a href="<?= \Nexus\Core\TenantContext::getBasePath() ?>/profile/edit">Edit Profile</a>
-                            <a href="<?= \Nexus\Core\TenantContext::getBasePath() ?>/settings">Settings</a>
-                        <?php else: ?>
-                            <a href="<?= \Nexus\Core\TenantContext::getBasePath() ?>/login">Sign In</a>
-                            <a href="<?= \Nexus\Core\TenantContext::getBasePath() ?>/register">Join Now</a>
-                        <?php endif; ?>
-                    </div>
-                </div>
-            </div>
         </div>
 
         <!-- Mobile Search Bar (Expandable) -->
@@ -1712,6 +1059,36 @@ if (class_exists('\Nexus\Core\TenantContext')) {
                     drawerThemeToggle.addEventListener('click', toggleTheme);
                 }
 
+                // ===========================================
+                // CURRENT PAGE DETECTION - Highlight active nav
+                // ===========================================
+                (function() {
+                    var currentPath = window.location.pathname;
+                    var navLinks = document.querySelectorAll('.civic-nav-link[data-nav-match]');
+
+                    navLinks.forEach(function(link) {
+                        var matchPath = link.getAttribute('data-nav-match');
+
+                        // Check for exact match or section match
+                        var isActive = false;
+
+                        if (matchPath === '/') {
+                            // Home page - exact match only
+                            isActive = (currentPath === '/' || currentPath === NEXUS_BASE + '/');
+                        } else {
+                            // Section match - starts with the path segment
+                            var pathSegment = '/' + matchPath;
+                            var fullPath = NEXUS_BASE + pathSegment;
+                            isActive = currentPath === fullPath || currentPath.startsWith(fullPath + '/');
+                        }
+
+                        if (isActive) {
+                            link.classList.add('active');
+                            link.setAttribute('aria-current', 'page');
+                        }
+                    });
+                })();
+
                 // Mobile Menu Toggle - Now handled by mobile-nav-v2.php
                 // The drawer script provides full accessibility support including:
                 // - Close button handling
@@ -1719,6 +1096,90 @@ if (class_exists('\Nexus\Core\TenantContext')) {
                 // - Escape key to close
                 // - Focus trapping
                 // - Swipe gestures
+
+                // ===========================================
+                // MEGA MENU TOGGLE - WCAG 2.1 AA Compliant
+                // ===========================================
+                var megaMenuBtn = document.getElementById('civic-mega-menu-btn');
+                var megaMenu = document.getElementById('civic-mega-menu');
+
+                if (megaMenuBtn && megaMenu) {
+                    // Toggle mega menu on click
+                    megaMenuBtn.addEventListener('click', function(e) {
+                        e.stopPropagation();
+                        var isExpanded = this.getAttribute('aria-expanded') === 'true';
+
+                        if (isExpanded) {
+                            closeMegaMenu();
+                        } else {
+                            openMegaMenu();
+                        }
+                    });
+
+                    // Open mega menu
+                    function openMegaMenu() {
+                        megaMenuBtn.setAttribute('aria-expanded', 'true');
+                        megaMenuBtn.classList.add('active');
+                        megaMenu.classList.add('active');
+                        megaMenu.style.display = 'block';
+
+                        // Focus first link in mega menu
+                        var firstLink = megaMenu.querySelector('a');
+                        if (firstLink) {
+                            setTimeout(function() { firstLink.focus(); }, 50);
+                        }
+                    }
+
+                    // Close mega menu
+                    function closeMegaMenu() {
+                        megaMenuBtn.setAttribute('aria-expanded', 'false');
+                        megaMenuBtn.classList.remove('active');
+                        megaMenu.classList.remove('active');
+                        megaMenu.style.display = 'none';
+                    }
+
+                    // Close on Escape key
+                    document.addEventListener('keydown', function(e) {
+                        if (e.key === 'Escape' && megaMenu.classList.contains('active')) {
+                            closeMegaMenu();
+                            megaMenuBtn.focus();
+                        }
+                    });
+
+                    // Close when clicking outside
+                    document.addEventListener('click', function(e) {
+                        if (!megaMenu.contains(e.target) && !megaMenuBtn.contains(e.target)) {
+                            if (megaMenu.classList.contains('active')) {
+                                closeMegaMenu();
+                            }
+                        }
+                    });
+
+                    // Keyboard navigation within mega menu
+                    megaMenu.addEventListener('keydown', function(e) {
+                        var links = megaMenu.querySelectorAll('a');
+                        var currentIndex = Array.from(links).indexOf(document.activeElement);
+
+                        if (e.key === 'ArrowDown') {
+                            e.preventDefault();
+                            if (currentIndex < links.length - 1) {
+                                links[currentIndex + 1].focus();
+                            }
+                        } else if (e.key === 'ArrowUp') {
+                            e.preventDefault();
+                            if (currentIndex > 0) {
+                                links[currentIndex - 1].focus();
+                            } else {
+                                megaMenuBtn.focus();
+                            }
+                        } else if (e.key === 'Tab' && e.shiftKey && currentIndex === 0) {
+                            // Shift+Tab on first link - close menu and focus button
+                            e.preventDefault();
+                            closeMegaMenu();
+                            megaMenuBtn.focus();
+                        }
+                    });
+                }
 
                 // Mobile Search Toggle
                 var mobileSearchToggle = document.getElementById('civic-mobile-search-toggle');
@@ -1744,6 +1205,46 @@ if (class_exists('\Nexus\Core\TenantContext')) {
                             if (searchInput) searchInput.focus();
                         }
                     });
+                }
+
+                // ===========================================
+                // Desktop Collapsible Search - Synced with Modern
+                // ===========================================
+                var searchToggleBtn = document.getElementById('civicSearchToggleBtn');
+                var collapsibleSearch = document.getElementById('civicCollapsibleSearch');
+                var searchInput = document.getElementById('civicSearchInput');
+                var searchCloseBtn = document.getElementById('civicSearchCloseBtn');
+
+                if (searchToggleBtn && collapsibleSearch) {
+                    // Open search
+                    searchToggleBtn.addEventListener('click', function() {
+                        collapsibleSearch.classList.add('active');
+                        searchToggleBtn.style.display = 'none';
+                        searchToggleBtn.setAttribute('aria-expanded', 'true');
+                        if (searchInput) searchInput.focus();
+                    });
+
+                    // Close search
+                    if (searchCloseBtn) {
+                        searchCloseBtn.addEventListener('click', function() {
+                            collapsibleSearch.classList.remove('active');
+                            searchToggleBtn.style.display = '';
+                            searchToggleBtn.setAttribute('aria-expanded', 'false');
+                            searchToggleBtn.focus();
+                        });
+                    }
+
+                    // Close on Escape key
+                    if (searchInput) {
+                        searchInput.addEventListener('keydown', function(e) {
+                            if (e.key === 'Escape') {
+                                collapsibleSearch.classList.remove('active');
+                                searchToggleBtn.style.display = '';
+                                searchToggleBtn.setAttribute('aria-expanded', 'false');
+                                searchToggleBtn.focus();
+                            }
+                        });
+                    }
                 }
 
                 // ===========================================
@@ -1902,35 +1403,6 @@ if (class_exists('\Nexus\Core\TenantContext')) {
                         closeAllDropdowns(null);
                     }
                 });
-            });
-        </script>
-
-        <script>
-            // Mega Menu Logic
-            document.addEventListener('DOMContentLoaded', function() {
-                const megaBtn = document.getElementById('civic-mega-trigger');
-                const megaMenu = document.getElementById('civic-mega-menu');
-
-                if (megaBtn && megaMenu) {
-                    megaBtn.addEventListener('click', function(e) {
-                        e.stopPropagation();
-                        // Close mobile menu if open
-                        if (typeof closeMobileMenu === 'function') {
-                            closeMobileMenu();
-                        }
-
-                        this.classList.toggle('active');
-                        megaMenu.classList.toggle('active');
-                    });
-
-                    // Close when clicking outside
-                    document.addEventListener('click', function(e) {
-                        if (!megaMenu.contains(e.target) && !megaBtn.contains(e.target)) {
-                            megaMenu.classList.remove('active');
-                            megaBtn.classList.remove('active');
-                        }
-                    });
-                }
             });
         </script>
 

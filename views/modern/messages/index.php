@@ -225,10 +225,37 @@ window.closeNewMessage = function() {
                 </div>
             </div>
 
-            <!-- Loading State -->
+            <!-- Loading State (Skeleton) -->
             <div class="holo-chat-loading" id="holoChatLoading" style="display: none;">
-                <div class="holo-chat-spinner"></div>
-                <p>Loading conversation...</p>
+                <div class="message-skeleton">
+                    <div class="message-skeleton-bubble">
+                        <div class="skeleton skeleton-avatar"></div>
+                        <div class="message-skeleton-content">
+                            <div class="skeleton message-skeleton-line long"></div>
+                            <div class="skeleton message-skeleton-time"></div>
+                        </div>
+                    </div>
+                    <div class="message-skeleton-bubble sent">
+                        <div class="message-skeleton-content">
+                            <div class="skeleton message-skeleton-line medium"></div>
+                            <div class="skeleton message-skeleton-time"></div>
+                        </div>
+                    </div>
+                    <div class="message-skeleton-bubble">
+                        <div class="skeleton skeleton-avatar"></div>
+                        <div class="message-skeleton-content">
+                            <div class="skeleton message-skeleton-line short"></div>
+                            <div class="skeleton message-skeleton-time"></div>
+                        </div>
+                    </div>
+                    <div class="message-skeleton-bubble sent">
+                        <div class="message-skeleton-content">
+                            <div class="skeleton message-skeleton-line long"></div>
+                            <div class="skeleton message-skeleton-line medium"></div>
+                            <div class="skeleton message-skeleton-time"></div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>

@@ -1,7 +1,8 @@
 <?php
 /**
- * Admin Gold Standard Header Component
+ * Admin Gold Standard Header Component - Modern Theme
  * STANDALONE admin interface - does NOT use main site header/footer
+ * Uses shared navigation configuration from views/partials/admin/
  */
 
 if (session_status() === PHP_SESSION_NONE) {
@@ -9,6 +10,9 @@ if (session_status() === PHP_SESSION_NONE) {
 }
 
 use Nexus\Core\TenantContext;
+
+// Include shared navigation configuration
+require_once dirname(__DIR__, 3) . '/partials/admin/admin-navigation-config.php';
 
 $basePath = TenantContext::getBasePath();
 $currentPath = $_SERVER['REQUEST_URI'] ?? '';
@@ -23,340 +27,9 @@ $adminPageIcon = $adminPageIcon ?? 'fa-satellite-dish';
 // Check if user is super admin
 $isSuperAdmin = !empty($_SESSION['is_super_admin']);
 
-/**
- * Admin Navigation Structure - REORGANIZED & INTELLIGENT
- * Grouped logically with mega-menu support for complex sections
- */
-$adminModules = [
-    'dashboard' => [
-        'label' => 'Dashboard',
-        'icon' => 'fa-gauge-high',
-        'url' => '/admin',
-        'single' => true,
-    ],
-
-    // === CORE OPERATIONS ===
-    'users' => [
-        'label' => 'Users',
-        'icon' => 'fa-users',
-        'items' => [
-            ['label' => 'All Users', 'url' => '/admin/users', 'icon' => 'fa-users', 'desc' => 'Manage all platform users'],
-            ['label' => 'Pending Approvals', 'url' => '/admin/users?filter=pending', 'icon' => 'fa-user-clock', 'desc' => 'Review pending user accounts'],
-        ],
-    ],
-
-    'listings' => [
-        'label' => 'Listings',
-        'icon' => 'fa-rectangle-list',
-        'items' => [
-            ['label' => 'All Listings', 'url' => '/admin/listings', 'icon' => 'fa-list', 'desc' => 'View all listings'],
-            ['label' => 'Pending Review', 'url' => '/admin/listings?status=pending', 'icon' => 'fa-clock', 'desc' => 'Approve new listings'],
-        ],
-    ],
-
-    // === COMMUNITY (REORGANIZED & SPLIT) ===
-    'community' => [
-        'label' => 'Community',
-        'icon' => 'fa-people-group',
-        'mega' => true, // Enable mega-menu for complex section
-        'columns' => [
-            [
-                'title' => 'Groups',
-                'items' => [
-                    ['label' => 'All Groups', 'url' => '/admin/groups', 'icon' => 'fa-users-rectangle'],
-                    ['label' => 'Group Types', 'url' => '/admin/group-types', 'icon' => 'fa-layer-group'],
-                    ['label' => 'Group Ranking', 'url' => '/admin/group-ranking', 'icon' => 'fa-star'],
-                    ['label' => 'Group Analytics', 'url' => '/admin/groups/analytics', 'icon' => 'fa-chart-bar'],
-                ],
-            ],
-            [
-                'title' => 'Organizations',
-                'items' => [
-                    ['label' => 'All Organizations', 'url' => '/admin/volunteering/organizations', 'icon' => 'fa-building'],
-                    ['label' => 'Pending Approvals', 'url' => '/admin/volunteering/approvals', 'icon' => 'fa-hands-helping'],
-                ],
-            ],
-            [
-                'title' => 'Smart Systems',
-                'items' => [
-                    ['label' => 'Smart Matching', 'url' => '/admin/smart-match-users', 'icon' => 'fa-users-between-lines'],
-                    ['label' => 'Recommendations', 'url' => '/admin/groups/recommendations', 'icon' => 'fa-sparkles'],
-                    ['label' => 'Match Monitoring', 'url' => '/admin/smart-match-monitoring', 'icon' => 'fa-chart-line'],
-                    ['label' => 'Geocoding', 'url' => '/admin/geocode-groups', 'icon' => 'fa-map-location-dot'],
-                    ['label' => 'Locations', 'url' => '/admin/group-locations', 'icon' => 'fa-location-dot'],
-                ],
-            ],
-        ],
-    ],
-
-    // === CONTENT ===
-    'content' => [
-        'label' => 'Content',
-        'icon' => 'fa-newspaper',
-        'items' => [
-            ['label' => 'Blog Posts', 'url' => '/admin/blog', 'icon' => 'fa-blog'],
-            ['label' => 'Pages', 'url' => '/admin/pages', 'icon' => 'fa-file-lines'],
-            ['label' => 'Menus', 'url' => '/admin/menus', 'icon' => 'fa-bars'],
-            ['label' => 'Categories', 'url' => '/admin/categories', 'icon' => 'fa-folder'],
-            ['label' => 'Attributes', 'url' => '/admin/attributes', 'icon' => 'fa-tags'],
-        ],
-    ],
-
-    // === ENGAGEMENT ===
-    'engagement' => [
-        'label' => 'Engagement',
-        'icon' => 'fa-trophy',
-        'items' => [
-            ['label' => 'Gamification Hub', 'url' => '/admin/gamification', 'icon' => 'fa-gamepad'],
-            ['label' => 'Campaigns', 'url' => '/admin/gamification/campaigns', 'icon' => 'fa-bullhorn'],
-            ['label' => 'Custom Badges', 'url' => '/admin/custom-badges', 'icon' => 'fa-medal'],
-            ['label' => 'Analytics', 'url' => '/admin/gamification/analytics', 'icon' => 'fa-chart-bar'],
-        ],
-    ],
-
-    // === MARKETING & COMMUNICATION ===
-    'marketing' => [
-        'label' => 'Marketing',
-        'icon' => 'fa-megaphone',
-        'items' => [
-            ['label' => 'Newsletters', 'url' => '/admin/newsletters', 'icon' => 'fa-envelopes-bulk'],
-            ['label' => 'Subscribers', 'url' => '/admin/newsletters/subscribers', 'icon' => 'fa-user-plus'],
-            ['label' => 'Segments', 'url' => '/admin/newsletters/segments', 'icon' => 'fa-layer-group'],
-            ['label' => 'Templates', 'url' => '/admin/newsletters/templates', 'icon' => 'fa-palette'],
-        ],
-    ],
-
-    // === ADVANCED (MEGA MENU) ===
-    'advanced' => [
-        'label' => 'Advanced',
-        'icon' => 'fa-wand-magic-sparkles',
-        'mega' => true,
-        'columns' => [
-            [
-                'title' => 'AI & Automation',
-                'items' => [
-                    ['label' => 'AI Settings', 'url' => '/admin/ai-settings', 'icon' => 'fa-microchip'],
-                    ['label' => 'Smart Matching', 'url' => '/admin/smart-matching', 'icon' => 'fa-wand-magic-sparkles'],
-                    ['label' => 'Feed Algorithm', 'url' => '/admin/feed-algorithm', 'icon' => 'fa-rss'],
-                    ['label' => 'Algorithm Settings', 'url' => '/admin/algorithm-settings', 'icon' => 'fa-scale-balanced'],
-                ],
-            ],
-            [
-                'title' => 'SEO & Optimization',
-                'items' => [
-                    ['label' => 'SEO Overview', 'url' => '/admin/seo', 'icon' => 'fa-chart-line'],
-                    ['label' => 'SEO Audit', 'url' => '/admin/seo/audit', 'icon' => 'fa-clipboard-check'],
-                    ['label' => 'Bulk Edit', 'url' => '/admin/seo/bulk/listing', 'icon' => 'fa-pen-to-square'],
-                    ['label' => 'Redirects', 'url' => '/admin/seo/redirects', 'icon' => 'fa-arrow-right-arrow-left'],
-                    ['label' => '404 Error Tracking', 'url' => '/admin/404-errors', 'icon' => 'fa-exclamation-triangle', 'badge' => 'NEW'],
-                ],
-            ],
-        ],
-    ],
-
-    // === FINANCIAL ===
-    'financial' => [
-        'label' => 'Financial',
-        'icon' => 'fa-coins',
-        'items' => [
-            ['label' => 'Timebanking', 'url' => '/admin/timebanking', 'icon' => 'fa-clock-rotate-left'],
-            ['label' => 'Fraud Alerts', 'url' => '/admin/timebanking/alerts', 'icon' => 'fa-triangle-exclamation'],
-            ['label' => 'Org Wallets', 'url' => '/admin/timebanking/org-wallets', 'icon' => 'fa-wallet'],
-            ['label' => 'Plans & Pricing', 'url' => '/admin/plans', 'icon' => 'fa-credit-card'],
-            ['label' => 'Subscriptions', 'url' => '/admin/plans/subscriptions', 'icon' => 'fa-users'],
-        ],
-    ],
-
-    // === ENTERPRISE (MEGA MENU) ===
-    'enterprise' => [
-        'label' => 'Enterprise',
-        'icon' => 'fa-building-shield',
-        'mega' => true,
-        'columns' => [
-            [
-                'title' => 'Overview',
-                'items' => [
-                    ['label' => 'Enterprise Dashboard', 'url' => '/admin/enterprise', 'icon' => 'fa-building-shield'],
-                    ['label' => 'Roles & Permissions', 'url' => '/admin/enterprise/roles', 'icon' => 'fa-user-tag'],
-                    ['label' => 'Permission Browser', 'url' => '/admin/enterprise/permissions', 'icon' => 'fa-key'],
-                    ['label' => 'Permissions Audit', 'url' => '/admin/enterprise/audit/permissions', 'icon' => 'fa-clipboard-list'],
-                ],
-            ],
-            [
-                'title' => 'GDPR Compliance',
-                'items' => [
-                    ['label' => 'GDPR Dashboard', 'url' => '/admin/enterprise/gdpr', 'icon' => 'fa-user-shield'],
-                    ['label' => 'Data Requests', 'url' => '/admin/enterprise/gdpr/requests', 'icon' => 'fa-file-contract'],
-                    ['label' => 'Consent Records', 'url' => '/admin/enterprise/gdpr/consents', 'icon' => 'fa-check-double'],
-                    ['label' => 'Data Breaches', 'url' => '/admin/enterprise/gdpr/breaches', 'icon' => 'fa-triangle-exclamation'],
-                    ['label' => 'GDPR Audit Log', 'url' => '/admin/enterprise/gdpr/audit', 'icon' => 'fa-scroll'],
-                ],
-            ],
-            [
-                'title' => 'System Health',
-                'items' => [
-                    ['label' => 'Monitoring Dashboard', 'url' => '/admin/enterprise/monitoring', 'icon' => 'fa-heart-pulse'],
-                    ['label' => 'Health Check', 'url' => '/admin/enterprise/monitoring/health', 'icon' => 'fa-stethoscope'],
-                    ['label' => 'Requirements', 'url' => '/admin/enterprise/monitoring/requirements', 'icon' => 'fa-list-check'],
-                    ['label' => 'Error Logs', 'url' => '/admin/enterprise/monitoring/logs', 'icon' => 'fa-file-lines'],
-                ],
-            ],
-            [
-                'title' => 'Configuration',
-                'items' => [
-                    ['label' => 'System Config', 'url' => '/admin/enterprise/config', 'icon' => 'fa-gears'],
-                    ['label' => 'Feature Flags', 'url' => '/admin/enterprise/config#features', 'icon' => 'fa-toggle-on'],
-                    ['label' => 'Secrets Vault', 'url' => '/admin/enterprise/config/secrets', 'icon' => 'fa-vault'],
-                ],
-            ],
-        ],
-    ],
-
-    // === PARTNER TIMEBANKS (Federation) ===
-    // Only shown if federation is enabled for this tenant
-    'federation' => [
-        'label' => 'Partner Timebanks',
-        'icon' => 'fa-globe',
-        'items' => [
-            ['label' => 'Settings', 'url' => '/admin/federation', 'icon' => 'fa-sliders'],
-            ['label' => 'Partnerships', 'url' => '/admin/federation/partnerships', 'icon' => 'fa-handshake'],
-            ['label' => 'Discover', 'url' => '/admin/federation/directory', 'icon' => 'fa-compass'],
-            ['label' => 'My Listing', 'url' => '/admin/federation/directory/profile', 'icon' => 'fa-user-edit'],
-            ['label' => 'Analytics', 'url' => '/admin/federation/analytics', 'icon' => 'fa-chart-line'],
-            ['label' => 'API Keys', 'url' => '/admin/federation/api-keys', 'icon' => 'fa-key'],
-            ['label' => 'Data Management', 'url' => '/admin/federation/data', 'icon' => 'fa-database'],
-        ],
-        'condition' => 'federation', // Will be checked against FederationFeatureService
-    ],
-
-    // === SYSTEM ===
-    'system' => [
-        'label' => 'System',
-        'icon' => 'fa-gear',
-        'items' => [
-            ['label' => 'Settings', 'url' => '/admin/settings', 'icon' => 'fa-sliders'],
-            ['label' => 'Seed Generator', 'url' => '/admin/seed-generator', 'icon' => 'fa-seedling', 'desc' => 'Generate database seeding scripts'],
-            ['label' => 'Blog Restore', 'url' => '/admin/blog-restore', 'icon' => 'fa-rotate-left', 'desc' => 'Import/Export blog posts', 'badge' => 'NEW'],
-            ['label' => 'Cron Jobs', 'url' => '/admin/cron-jobs', 'icon' => 'fa-clock'],
-            ['label' => 'Activity Log', 'url' => '/admin/activity-log', 'icon' => 'fa-list-ul'],
-            ['label' => 'API Test Runner', 'url' => '/admin/tests', 'icon' => 'fa-flask', 'desc' => 'Run automated API tests'],
-            ['label' => 'Native App', 'url' => '/admin/native-app', 'icon' => 'fa-mobile-screen'],
-            ['label' => 'WebP Converter', 'url' => '/admin/webp-converter', 'icon' => 'fa-image', 'desc' => 'Convert images to WebP format'],
-        ],
-    ],
-
-    // === DELIVERABILITY TRACKING ===
-    'deliverability' => [
-        'label' => 'Deliverability',
-        'icon' => 'fa-tasks-alt',
-        'items' => [
-            ['label' => 'Dashboard', 'url' => '/admin/deliverability', 'icon' => 'fa-gauge-high'],
-            ['label' => 'All Deliverables', 'url' => '/admin/deliverability/list', 'icon' => 'fa-list'],
-            ['label' => 'Create New', 'url' => '/admin/deliverability/create', 'icon' => 'fa-plus'],
-            ['label' => 'Analytics', 'url' => '/admin/deliverability/analytics', 'icon' => 'fa-chart-line'],
-        ],
-    ],
-];
-
-// Filter modules based on conditions
-$adminModules = array_filter($adminModules, function($module) {
-    if (!isset($module['condition'])) {
-        return true; // No condition, always show
-    }
-
-    // Check federation condition
-    if ($module['condition'] === 'federation') {
-        return \Nexus\Services\FederationFeatureService::isTenantFederationEnabled();
-    }
-
-    return true;
-});
-
-if (!function_exists('isAdminNavActive')) {
-    function isAdminNavActive($itemUrl, $currentPath, $basePath) {
-        $fullUrl = $basePath . $itemUrl;
-        $currentClean = strtok($currentPath, '?');
-        if ($currentClean === $fullUrl) return true;
-        if ($itemUrl === '/admin') return $currentClean === $fullUrl;
-        return strpos($currentClean, $fullUrl) === 0;
-    }
-}
-
-if (!function_exists('getActiveAdminModule')) {
-    function getActiveAdminModule($modules, $currentPath, $basePath) {
-        foreach ($modules as $key => $module) {
-            if (isset($module['single']) && $module['single']) {
-                if (isAdminNavActive($module['url'], $currentPath, $basePath)) return $key;
-            } elseif (isset($module['mega']) && $module['mega']) {
-                // Check mega menu columns
-                foreach ($module['columns'] as $column) {
-                    foreach ($column['items'] as $item) {
-                        if (isAdminNavActive($item['url'], $currentPath, $basePath)) return $key;
-                    }
-                }
-            } elseif (isset($module['items'])) {
-                foreach ($module['items'] as $item) {
-                    if (isAdminNavActive($item['url'], $currentPath, $basePath)) return $key;
-                }
-            }
-        }
-        return 'dashboard';
-    }
-}
-
-if (!function_exists('generateAdminBreadcrumbs')) {
-    function generateAdminBreadcrumbs($modules, $currentPath, $basePath, $pageTitle = '') {
-        $breadcrumbs = [['label' => 'Admin', 'url' => $basePath . '/admin', 'icon' => 'fa-gauge-high']];
-        $currentClean = strtok($currentPath, '?');
-
-        // Find matching module and item
-        foreach ($modules as $key => $module) {
-            if (isset($module['single']) && $module['single']) {
-                if (isAdminNavActive($module['url'], $currentPath, $basePath)) {
-                    if ($module['url'] !== '/admin') {
-                        $breadcrumbs[] = ['label' => $module['label'], 'url' => $basePath . $module['url'], 'icon' => $module['icon']];
-                    }
-                    break;
-                }
-            } elseif (isset($module['mega']) && $module['mega']) {
-                // Check mega menu columns
-                foreach ($module['columns'] as $column) {
-                    foreach ($column['items'] as $item) {
-                        if (isAdminNavActive($item['url'], $currentPath, $basePath)) {
-                            // Add module
-                            $breadcrumbs[] = ['label' => $module['label'], 'url' => null, 'icon' => $module['icon']];
-                            // Add column title if meaningful
-                            if (!empty($column['title'])) {
-                                $breadcrumbs[] = ['label' => $column['title'], 'url' => null, 'icon' => $item['icon']];
-                            }
-                            // Add item
-                            $breadcrumbs[] = ['label' => $item['label'], 'url' => $basePath . $item['url'], 'icon' => $item['icon']];
-                            break 3;
-                        }
-                    }
-                }
-            } elseif (isset($module['items'])) {
-                foreach ($module['items'] as $item) {
-                    if (isAdminNavActive($item['url'], $currentPath, $basePath)) {
-                        // Add module
-                        $breadcrumbs[] = ['label' => $module['label'], 'url' => null, 'icon' => $module['icon']];
-                        // Add item if different from current
-                        $breadcrumbs[] = ['label' => $item['label'], 'url' => $basePath . $item['url'], 'icon' => $item['icon']];
-                        break 2;
-                    }
-                }
-            }
-        }
-
-        // Check for edit/create pages
-        if (preg_match('/\/(edit|create)(?:\/(\d+))?$/', $currentClean, $matches)) {
-            $action = $matches[1];
-            $breadcrumbs[] = ['label' => ucfirst($action), 'url' => null, 'icon' => $action === 'edit' ? 'fa-pen' : 'fa-plus'];
-        }
-
-        return $breadcrumbs;
-    }
-}
+// Get admin navigation modules from shared config
+$adminModules = getAdminNavigationModules();
+$adminModules = filterAdminModules($adminModules);
 
 $activeModule = getActiveAdminModule($adminModules, $currentPath, $basePath);
 $adminBreadcrumbs = generateAdminBreadcrumbs($adminModules, $currentPath, $basePath, $adminPageTitle);
@@ -381,69 +54,17 @@ $adminBreadcrumbs = generateAdminBreadcrumbs($adminModules, $currentPath, $baseP
 
     <!-- Admin CSS (combined) -->
     <link rel="stylesheet" href="/assets/css/admin-gold-standard.min.css?v=<?= time() ?>">
+    <!-- Admin Sidebar CSS -->
+    <link rel="stylesheet" href="/assets/css/admin-sidebar.css?v=<?= time() ?>">
 </head>
 <body style="background:#0a0e1a;margin:0">
 <div class="admin-gold-wrapper">
     <div class="admin-gold-bg"></div>
 
-    <!-- Top Bar -->
-    <div class="admin-header-bar">
-        <!-- Mobile Menu Toggle -->
-        <button type="button" class="admin-mobile-menu-btn" id="adminMobileBtn" aria-label="Toggle Menu">
-            <i class="fa-solid fa-bars"></i>
-        </button>
-
-        <div class="admin-header-brand">
-            <div class="admin-header-brand-icon">
-                <i class="fa-solid <?= htmlspecialchars($adminPageIcon) ?>"></i>
-            </div>
-            <div class="admin-header-brand-text">
-                <span class="admin-header-title">NEXUS Admin</span>
-                <span class="admin-header-subtitle"><?= htmlspecialchars($adminPageSubtitle) ?></span>
-            </div>
-        </div>
-        <div class="admin-header-actions">
-            <!-- Global Search -->
-            <div class="admin-search-wrapper">
-                <button type="button" class="admin-search-trigger" id="adminSearchTrigger" title="Search (Ctrl+K)">
-                    <i class="fa-solid fa-magnifying-glass"></i>
-                    <span class="admin-search-label">Search...</span>
-                    <kbd class="admin-search-kbd">Ctrl+K</kbd>
-                </button>
-            </div>
-
-            <!-- Super Admin Button (only for super admins) -->
-            <?php if ($isSuperAdmin): ?>
-            <a href="<?= $basePath ?>/super-admin" class="admin-super-admin-btn" title="Platform Master - Manage All Tenants">
-                <i class="fa-solid fa-crown"></i>
-                <span>Super Admin</span>
-            </a>
-            <?php endif; ?>
-
-            <!-- Notifications Bell -->
-            <?php
-            $unreadNotifications = 0;
-            try {
-                $unreadNotifications = \Nexus\Core\Database::query(
-                    "SELECT COUNT(*) as c FROM notifications WHERE user_id = ? AND is_read = 0 AND deleted_at IS NULL",
-                    [$_SESSION['user_id'] ?? 0]
-                )->fetch()['c'] ?? 0;
-            } catch (\Exception $e) { /* Table may not exist */ }
-            ?>
-            <a href="<?= $basePath ?>/notifications" class="admin-notif-bell" title="Notifications">
-                <i class="fa-solid fa-bell"></i>
-                <?php if ($unreadNotifications > 0): ?>
-                <span class="admin-notif-badge"><?= $unreadNotifications > 99 ? '99+' : $unreadNotifications ?></span>
-                <?php endif; ?>
-            </a>
-
-            <a href="<?= $basePath ?>/" class="admin-back-link">
-                <i class="fa-solid fa-arrow-left"></i>
-                <span>Back to Site</span>
-            </a>
-            <div class="admin-header-avatar"><?= htmlspecialchars($userInitials) ?></div>
-        </div>
-    </div>
+    <!-- Mobile Menu Toggle (floating) -->
+    <button type="button" class="admin-mobile-menu-btn" id="adminMobileBtn" aria-label="Toggle Menu">
+        <i class="fa-solid fa-bars"></i>
+    </button>
 
     <!-- Search Modal -->
     <div class="admin-search-modal" id="adminSearchModal">
@@ -523,190 +144,21 @@ $adminBreadcrumbs = generateAdminBreadcrumbs($adminModules, $currentPath, $baseP
         </div>
     </div>
 
-    <!-- Navigation -->
-    <nav role="navigation" aria-label="Main navigation" class="admin-smart-nav">
-        <div class="admin-nav-scroll">
-            <?php foreach ($adminModules as $moduleKey => $module): ?>
-                <?php if (isset($module['single']) && $module['single']): ?>
-                    <!-- Single link navigation item -->
-                    <a href="<?= $basePath . $module['url'] ?>" class="admin-nav-tab <?= $activeModule === $moduleKey ? 'active' : '' ?>">
-                        <i class="fa-solid <?= $module['icon'] ?>"></i>
-                        <span><?= $module['label'] ?></span>
-                    </a>
-                <?php elseif (isset($module['mega']) && $module['mega']): ?>
-                    <!-- Mega menu navigation item -->
-                    <div class="admin-nav-dropdown admin-nav-mega-dropdown" data-dropdown="<?= $moduleKey ?>">
-                        <button type="button" class="admin-nav-tab <?= $activeModule === $moduleKey ? 'active' : '' ?>">
-                            <i class="fa-solid <?= $module['icon'] ?>"></i>
-                            <span><?= $module['label'] ?></span>
-                            <i class="fa-solid fa-chevron-down chevron"></i>
-                        </button>
-                        <div class="admin-mega-menu">
-                            <div class="admin-mega-menu-columns">
-                                <?php foreach ($module['columns'] as $column): ?>
-                                    <div class="admin-mega-column">
-                                        <?php if (!empty($column['title'])): ?>
-                                            <div class="admin-mega-column-title">
-                                                <?= htmlspecialchars($column['title']) ?>
-                                            </div>
-                                        <?php endif; ?>
-                                        <div class="admin-mega-column-items">
-                                            <?php foreach ($column['items'] as $item): ?>
-                                                <a href="<?= $basePath . $item['url'] ?>" class="admin-mega-item <?= isAdminNavActive($item['url'], $currentPath, $basePath) ? 'active' : '' ?>">
-                                                    <i class="fa-solid <?= $item['icon'] ?>"></i>
-                                                    <span><?= htmlspecialchars($item['label']) ?></span>
-                                                </a>
-                                            <?php endforeach; ?>
-                                        </div>
-                                    </div>
-                                <?php endforeach; ?>
-                            </div>
-                        </div>
-                    </div>
-                <?php else: ?>
-                    <!-- Standard dropdown navigation item -->
-                    <div class="admin-nav-dropdown" data-dropdown="<?= $moduleKey ?>">
-                        <button type="button" class="admin-nav-tab <?= $activeModule === $moduleKey ? 'active' : '' ?>">
-                            <i class="fa-solid <?= $module['icon'] ?>"></i>
-                            <span><?= $module['label'] ?></span>
-                            <i class="fa-solid fa-chevron-down chevron"></i>
-                        </button>
-                        <div class="admin-dropdown-menu">
-                            <?php foreach ($module['items'] as $item): ?>
-                                <a href="<?= $basePath . $item['url'] ?>" class="<?= isAdminNavActive($item['url'], $currentPath, $basePath) ? 'active' : '' ?>">
-                                    <i class="fa-solid <?= $item['icon'] ?>"></i>
-                                    <?= htmlspecialchars($item['label']) ?>
-                                </a>
-                            <?php endforeach; ?>
-                        </div>
-                    </div>
-                <?php endif; ?>
-            <?php endforeach; ?>
-        </div>
-    </nav>
+<!-- Sidebar Layout -->
+<div class="admin-layout">
+    <?php require dirname(__DIR__, 3) . '/partials/admin/admin-sidebar.php'; ?>
 
-    <!-- Mobile Menu (simple flat link list) -->
-    <div id="adminNavScroll" class="admin-mobile-menu">
-        <?php foreach ($adminModules as $moduleKey => $module): ?>
-            <?php if (isset($module['single']) && $module['single']): ?>
-                <!-- Single link -->
-                <a href="<?= $basePath . $module['url'] ?>" class="admin-mobile-link <?= $activeModule === $moduleKey ? 'active' : '' ?>">
-                    <i class="fa-solid <?= $module['icon'] ?>"></i>
-                    <span><?= $module['label'] ?></span>
-                </a>
-            <?php elseif (isset($module['mega']) && $module['mega']): ?>
-                <!-- Category header -->
-                <div class="admin-mobile-category">
-                    <i class="fa-solid <?= $module['icon'] ?>"></i>
-                    <span><?= $module['label'] ?></span>
-                </div>
-                <!-- Flat list of items from mega menu -->
-                <?php foreach ($module['columns'] as $column): ?>
-                    <?php foreach ($column['items'] as $item): ?>
-                        <a href="<?= $basePath . $item['url'] ?>" class="admin-mobile-link <?= isAdminNavActive($item['url'], $currentPath, $basePath) ? 'active' : '' ?>">
-                            <i class="fa-solid <?= $item['icon'] ?>"></i>
-                            <span><?= htmlspecialchars($item['label']) ?></span>
-                        </a>
-                    <?php endforeach; ?>
-                <?php endforeach; ?>
-            <?php else: ?>
-                <!-- Category header -->
-                <div class="admin-mobile-category">
-                    <i class="fa-solid <?= $module['icon'] ?>"></i>
-                    <span><?= $module['label'] ?></span>
-                </div>
-                <!-- Flat list of items -->
-                <?php foreach ($module['items'] as $item): ?>
-                    <a href="<?= $basePath . $item['url'] ?>" class="admin-mobile-link <?= isAdminNavActive($item['url'], $currentPath, $basePath) ? 'active' : '' ?>">
-                        <i class="fa-solid <?= $item['icon'] ?>"></i>
-                        <span><?= htmlspecialchars($item['label']) ?></span>
-                    </a>
-                <?php endforeach; ?>
-            <?php endif; ?>
-        <?php endforeach; ?>
-    </div>
+    <!-- Main Content Area -->
+    <main class="admin-main-content">
+        <div class="admin-gold-content">
 
-    <!-- Content area starts here -->
-    <div class="admin-gold-content">
+    <?php // Include breadcrumbs component ?>
+    <?php require __DIR__ . '/admin-breadcrumbs.php'; ?>
 
-    <?php if (count($adminBreadcrumbs) > 1): ?>
-    <!-- Breadcrumb Navigation -->
-    <nav role="navigation" aria-label="Main navigation" class="admin-breadcrumb" aria-label="Breadcrumb">
-        <?php foreach ($adminBreadcrumbs as $index => $crumb): ?>
-            <?php $isLast = $index === count($adminBreadcrumbs) - 1; ?>
-            <?php if ($index > 0): ?>
-                <span class="admin-breadcrumb-separator"><i class="fa-solid fa-chevron-right"></i></span>
-            <?php endif; ?>
-            <?php if ($crumb['url'] && !$isLast): ?>
-                <a href="<?= htmlspecialchars($crumb['url']) ?>" class="admin-breadcrumb-item">
-                    <i class="fa-solid <?= htmlspecialchars($crumb['icon']) ?>"></i>
-                    <span><?= htmlspecialchars($crumb['label']) ?></span>
-                </a>
-            <?php else: ?>
-                <span class="admin-breadcrumb-item <?= $isLast ? 'current' : '' ?>">
-                    <i class="fa-solid <?= htmlspecialchars($crumb['icon']) ?>"></i>
-                    <span><?= htmlspecialchars($crumb['label']) ?></span>
-                </span>
-            <?php endif; ?>
-        <?php endforeach; ?>
-    </nav>
-    <?php endif; ?>
+<!-- Admin Sidebar JS -->
+<script src="/assets/js/admin-sidebar.js?v=<?= time() ?>"></script>
 
 <script>
-// MOBILE MENU - Final working version
-document.addEventListener('DOMContentLoaded', function() {
-    var mobileBtn = document.getElementById('adminMobileBtn');
-    var mobileMenu = document.getElementById('adminNavScroll');
-    var mobileBtnIcon = mobileBtn ? mobileBtn.querySelector('i') : null;
-
-    console.log('Mobile menu JS loaded');
-    console.log('Button:', mobileBtn);
-    console.log('Menu:', mobileMenu);
-
-    if (!mobileBtn || !mobileMenu) {
-        console.log('MISSING ELEMENTS!');
-        return;
-    }
-
-    function openMenu() {
-        console.log('OPEN called');
-        mobileMenu.classList.add('open');
-        console.log('Classes now:', mobileMenu.className);
-        document.body.style.overflow = 'hidden';
-        if (mobileBtnIcon) mobileBtnIcon.className = 'fa-solid fa-times';
-    }
-
-    function closeMenu() {
-        mobileMenu.classList.remove('open');
-        document.body.style.overflow = '';
-        if (mobileBtnIcon) mobileBtnIcon.className = 'fa-solid fa-bars';
-    }
-
-    // Toggle menu
-    mobileBtn.addEventListener('click', function(e) {
-        e.preventDefault();
-        if (mobileMenu.classList.contains('open')) {
-            closeMenu();
-        } else {
-            openMenu();
-        }
-    });
-
-    // Close when clicking a link
-    mobileMenu.querySelectorAll('a').forEach(function(link) {
-        link.addEventListener('click', closeMenu);
-    });
-
-    // Close on ESC key
-    document.addEventListener('keydown', function(e) {
-        if (e.key === 'Escape' && mobileMenu.classList.contains('open')) {
-            closeMenu();
-        }
-    });
-
-    // REMOVED - No outside click handler, it causes the issue
-});
-
 // Admin Search Modal & Keyboard Shortcuts with AJAX Live Search
 (function() {
     var searchModal = document.getElementById('adminSearchModal');
@@ -1103,9 +555,13 @@ document.addEventListener('DOMContentLoaded', function() {
 })();
 </script>
 
-<?php require __DIR__ . '/admin-modals.php'; ?>
-<?php require __DIR__ . '/admin-bulk-actions.php'; ?>
-<?php require __DIR__ . '/admin-export.php'; ?>
-<?php require __DIR__ . '/admin-validation.php'; ?>
-<?php require __DIR__ . '/admin-realtime.php'; ?>
+<?php
+// Include shared admin partials
+$sharedAdminPartials = dirname(__DIR__, 3) . '/partials/admin';
+require $sharedAdminPartials . '/admin-modals.php';
+require $sharedAdminPartials . '/admin-bulk-actions.php';
+require $sharedAdminPartials . '/admin-export.php';
+require $sharedAdminPartials . '/admin-validation.php';
+require $sharedAdminPartials . '/admin-realtime.php';
+?>
 

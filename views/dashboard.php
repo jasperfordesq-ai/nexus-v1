@@ -41,7 +41,7 @@ require __DIR__ . '/layouts/header.php';
         Notifications
         <?php
         $uCount = \Nexus\Models\Notification::countUnread($_SESSION['user_id']);
-        if ($uCount > 0) echo "<span style='background:red; color:white; padding:2px 6px; border-radius:10px; font-size:10px;'>$uCount</span>";
+        if ($uCount > 0) echo "<span class='badge badge--danger badge--sm'>$uCount</span>";
         ?>
     </a>
 </div>

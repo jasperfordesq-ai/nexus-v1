@@ -1703,6 +1703,63 @@ html {
     background: rgba(239, 68, 68, 0.3);
 }
 
+/* Mobile Table - Convert to cards */
+@media (max-width: 768px) {
+    .holo-table thead {
+        display: none;
+    }
+
+    .holo-table,
+    .holo-table tbody,
+    .holo-table tr,
+    .holo-table td {
+        display: block;
+    }
+
+    .holo-table tr {
+        margin-bottom: 16px;
+        padding: 16px;
+        background: rgba(255, 255, 255, 0.03);
+        border-radius: 12px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .holo-table td {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px 0;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .holo-table td:last-child {
+        border-bottom: none;
+        padding-top: 16px;
+        justify-content: flex-start;
+    }
+
+    .holo-table td::before {
+        content: attr(data-label);
+        font-weight: 600;
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        color: rgba(255, 255, 255, 0.5);
+        flex-shrink: 0;
+        margin-right: 16px;
+    }
+
+    .holo-action-btns {
+        flex-wrap: wrap;
+        width: 100%;
+    }
+
+    .holo-action-btn {
+        flex: 1;
+        text-align: center;
+        min-width: 100px;
+    }
+}
+
 /* Empty State */
 .holo-empty {
     text-align: center;

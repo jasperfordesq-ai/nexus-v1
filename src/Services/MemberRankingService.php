@@ -314,6 +314,8 @@ class MemberRankingService
 
             FROM users u
             WHERE u.tenant_id = ?
+              AND u.avatar_url IS NOT NULL
+              AND u.avatar_url != ''
         ";
 
         $params = [$tenantId];

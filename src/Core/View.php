@@ -32,6 +32,12 @@ class View
         // Get the current active layout from LayoutHelper
         $activeLayout = LayoutHelper::get();
 
+        // Admin views always use Modern layout (Modern is the admin source of truth)
+        // This ensures consistent admin experience regardless of user's site layout preference
+        if (strpos($viewPath, 'admin/') === 0) {
+            $activeLayout = 'modern';
+        }
+
         // Build view paths - ISOLATED per layout (no cross-layout fallbacks)
         $viewPaths = [];
 

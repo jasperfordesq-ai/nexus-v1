@@ -27,10 +27,12 @@ function minifyCSS(css) {
 }
 
 // CSS files to minify
-// Updated 2026-01-19: Added Phase 1-14 extracted files
+// Updated 2026-01-19: Added Phase 1-14 extracted files, theme transitions
 const cssFiles = [
     // Core framework
     'nexus-phoenix.css',
+    // Theme system
+    'theme-transitions.css',
     'nexus-mobile.css',
     'nexus-shared-transitions.css',
     'post-box-home.css',
@@ -123,6 +125,60 @@ const cssFiles = [
     'static-pages.css',
     // Phase 14: Scattered singles
     'scattered-singles.css',
+    // Polish enhancements
+    'loading-skeletons.css',
+    'micro-interactions.css',
+    'modal-polish.css',
+    // Responsive enhancements
+    'responsive-forms.css',
+    'responsive-tables.css',
+    // Admin sidebar
+    'admin-sidebar.css',
+    // CivicOne components
+    'civicone-footer.css',
+    'civicone-dashboard.css',
+    'civicone-achievements.css',
+    // Header extracted styles
+    'nexus-header-extracted.css',
+    // Shared components
+    'notification-drawer.css',
+    'feed-action-pills.css',
+    'feed-empty-state.css',
+    'groups-edit-overlay.css',
+    // Accessibility
+    'accessibility.css',
+    // AI Chat Widget (extracted from partials 2026-01-19)
+    'ai-chat-widget.css',
+    // Empty states unified system (2026-01-19)
+    'empty-states.css',
+    // Image lazy loading (2026-01-19)
+    'image-lazy-load.css',
+    // Hover micro-interactions (2026-01-19)
+    'hover-interactions.css',
+    // Focus rings (2026-01-19)
+    'focus-rings.css',
+    // Toast notifications (2026-01-19)
+    'toast-notifications.css',
+    // Page transitions (2026-01-19)
+    'page-transitions.css',
+    // Pull-to-refresh (2026-01-19)
+    'pull-to-refresh.css',
+    // Button ripple effects (2026-01-19)
+    'button-ripple.css',
+    // Card hover states (2026-01-19)
+    'card-hover-states.css',
+    // Form validation animations (2026-01-19)
+    'form-validation.css',
+    // Avatar placeholders (2026-01-19)
+    'avatar-placeholders.css',
+    // Scroll progress indicator (2026-01-19)
+    'scroll-progress.css',
+    // FAB polish (2026-01-19)
+    'fab-polish.css',
+    // Badge animations (2026-01-19)
+    'badge-animations.css',
+    // Error states (2026-01-19)
+    'error-states.css',
 ];
 
 const cssDir = path.join(__dirname, '../httpdocs/assets/css');

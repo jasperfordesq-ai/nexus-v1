@@ -1,137 +1,17 @@
-<?php require __DIR__ . '/../../layouts/civicone/header.php'; ?>
-
-<style>
-/* Wallet User Search Autocomplete */
-.civic-user-search-wrapper {
-    position: relative;
-}
-
-.civic-user-results {
-    position: absolute;
-    top: 100%;
-    left: 0;
-    right: 0;
-    background: white;
-    border: 1px solid #E5E7EB;
-    border-top: none;
-    border-radius: 0 0 8px 8px;
-    max-height: 250px;
-    overflow-y: auto;
-    z-index: 100;
-    display: none;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-}
-
-.civic-user-results.show {
-    display: block;
-}
-
-.civic-user-result {
-    display: flex;
-    align-items: center;
-    padding: 12px;
-    cursor: pointer;
-    transition: background 0.15s;
-    gap: 12px;
-    border-bottom: 1px solid #F3F4F6;
-}
-
-.civic-user-result:last-child {
-    border-bottom: none;
-}
-
-.civic-user-result:hover,
-.civic-user-result.selected {
-    background: #F9FAFB;
-}
-
-.civic-user-avatar {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    background: var(--civic-brand, #1D70B8);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: white;
-    font-weight: 600;
-    font-size: 16px;
-    flex-shrink: 0;
-    overflow: hidden;
-}
-
-.civic-user-avatar img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-}
-
-.civic-user-info {
-    flex: 1;
-    min-width: 0;
-}
-
-.civic-user-name {
-    font-weight: 600;
-    color: #1F2937;
-}
-
-.civic-user-username {
-    font-size: 0.85em;
-    color: #6B7280;
-}
-
-.civic-user-no-results {
-    padding: 16px;
-    text-align: center;
-    color: #9CA3AF;
-}
-
-/* Selected user chip */
-.civic-selected-user {
-    display: none;
-    align-items: center;
-    gap: 12px;
-    padding: 12px;
-    background: #F0F9FF;
-    border: 2px solid var(--civic-brand, #1D70B8);
-    border-radius: 8px;
-    margin-bottom: 16px;
-}
-
-.civic-selected-user.show {
-    display: flex;
-}
-
-.civic-selected-clear {
-    width: 32px;
-    height: 32px;
-    border-radius: 50%;
-    background: transparent;
-    border: none;
-    color: #6B7280;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: all 0.15s;
-    margin-left: auto;
-}
-
-.civic-selected-clear:hover {
-    background: #FEE2E2;
-    color: #DC2626;
-}
-</style>
+<?php
+// CivicOne View: Wallet - WCAG 2.1 AA Compliant
+// CSS extracted to civicone-wallet.css
+require __DIR__ . '/../../layouts/civicone/header.php';
+?>
 
 <div class="civic-container">
     <h1>Your Wallet</h1>
 
     <div class="civic-grid">
         <!-- Balance Card -->
-        <div class="civic-card" style="border-left: 10px solid var(--civic-brand);">
+        <div class="civic-card civic-balance-card">
             <h3>Current Balance</h3>
-            <p style="font-size: 4em; font-weight: bold; margin: 20px 0; color: var(--civic-brand);">
+            <p class="civic-balance-amount">
                 <?= number_format($user['balance'] ?? 0) ?>
             </p>
             <p><strong>Time Credits</strong> available to spend.</p>
@@ -176,36 +56,39 @@
         </div>
     </div>
 
-    <h2 style="margin-top: 40px; border-top: 2px solid #E5E7EB; padding-top: 20px;">Recent Activity</h2>
+    <h2 class="civic-wallet-history-header">Recent Activity</h2>
     <?php if (empty($transactions)): ?>
         <p>No transactions yet.</p>
     <?php else: ?>
         <!-- Desktop Table View -->
-        <div class="wallet-table-wrapper" style="overflow-x: auto; -webkit-overflow-scrolling: touch;">
-            <table class="wallet-table-desktop" style="width: 100%; border-collapse: collapse; margin-top: 20px; min-width: 500px;" aria-label="Transaction history">
+        <div class="wallet-table-wrapper">
+            <table class="wallet-table-desktop" aria-label="Transaction history">
                 <caption class="visually-hidden">Your recent time credit transactions</caption>
                 <thead>
-                    <tr style="background: #DEE0E2; text-align: left;">
-                        <th scope="col" style="padding: 12px; border: 1px solid #E5E7EB;">Date</th>
-                        <th scope="col" style="padding: 12px; border: 1px solid #E5E7EB;">Description</th>
-                        <th scope="col" style="padding: 12px; border: 1px solid #E5E7EB;">Participants</th>
-                        <th scope="col" style="padding: 12px; border: 1px solid #E5E7EB;">Amount</th>
+                    <tr>
+                        <th scope="col">Date</th>
+                        <th scope="col">Description</th>
+                        <th scope="col">Participants</th>
+                        <th scope="col">Amount</th>
                     </tr>
                 </thead>
                 <tbody>
-                    <?php foreach ($transactions as $t): ?>
-                        <tr style="border-bottom: 1px solid #E5E7EB;">
-                            <td style="padding: 12px;"><?= htmlspecialchars($t['created_at']) ?></td>
-                            <td style="padding: 12px;"><?= htmlspecialchars($t['description']) ?></td>
-                            <td style="padding: 12px;">
-                                <?php if ($t['sender_id'] == $_SESSION['user_id']): ?>
+                    <?php foreach ($transactions as $t):
+                        $isOutgoing = $t['sender_id'] == $_SESSION['user_id'];
+                        $amountClass = $isOutgoing ? 'amount-negative' : 'amount-positive';
+                    ?>
+                        <tr>
+                            <td><?= htmlspecialchars($t['created_at']) ?></td>
+                            <td><?= htmlspecialchars($t['description']) ?></td>
+                            <td>
+                                <?php if ($isOutgoing): ?>
                                     To: <?= htmlspecialchars($t['receiver_name']) ?>
                                 <?php else: ?>
                                     From: <?= htmlspecialchars($t['sender_name']) ?>
                                 <?php endif; ?>
                             </td>
-                            <td style="padding: 12px; font-weight: bold; color: <?= $t['sender_id'] == $_SESSION['user_id'] ? '#D32F2F' : '#00796B' ?>;">
-                                <?= $t['sender_id'] == $_SESSION['user_id'] ? '-' : '+' ?><?= $t['amount'] ?>
+                            <td class="<?= $amountClass ?>">
+                                <?= $isOutgoing ? '-' : '+' ?><?= $t['amount'] ?>
                             </td>
                         </tr>
                     <?php endforeach; ?>
@@ -214,18 +97,21 @@
         </div>
 
         <!-- Mobile Card View -->
-        <div class="wallet-cards-mobile" style="display: none;">
-            <?php foreach ($transactions as $t): ?>
-                <div class="civic-card" style="margin-bottom: 12px; padding: 16px;">
-                    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px;">
-                        <span style="font-size: 0.85em; color: var(--civic-text-muted);"><?= htmlspecialchars(date('M j, Y', strtotime($t['created_at']))) ?></span>
-                        <span style="font-weight: bold; font-size: 1.25em; color: <?= $t['sender_id'] == $_SESSION['user_id'] ? '#D32F2F' : '#00796B' ?>;">
-                            <?= $t['sender_id'] == $_SESSION['user_id'] ? '-' : '+' ?><?= $t['amount'] ?>
+        <div class="wallet-cards-mobile">
+            <?php foreach ($transactions as $t):
+                $isOutgoing = $t['sender_id'] == $_SESSION['user_id'];
+                $amountClass = $isOutgoing ? 'wallet-card-amount negative' : 'wallet-card-amount positive';
+            ?>
+                <div class="civic-card wallet-card-item">
+                    <div class="wallet-card-header">
+                        <time class="wallet-card-date" datetime="<?= $t['created_at'] ?>"><?= htmlspecialchars(date('M j, Y', strtotime($t['created_at']))) ?></time>
+                        <span class="<?= $amountClass ?>">
+                            <?= $isOutgoing ? '-' : '+' ?><?= $t['amount'] ?>
                         </span>
                     </div>
-                    <p style="font-weight: 600; margin: 0 0 4px 0;"><?= htmlspecialchars($t['description']) ?></p>
-                    <p style="font-size: 0.9em; color: var(--civic-text-secondary); margin: 0;">
-                        <?php if ($t['sender_id'] == $_SESSION['user_id']): ?>
+                    <p class="wallet-card-description"><?= htmlspecialchars($t['description']) ?></p>
+                    <p class="wallet-card-participant">
+                        <?php if ($isOutgoing): ?>
                             To: <?= htmlspecialchars($t['receiver_name']) ?>
                         <?php else: ?>
                             From: <?= htmlspecialchars($t['sender_name']) ?>
@@ -234,13 +120,6 @@
                 </div>
             <?php endforeach; ?>
         </div>
-
-        <style>
-            @media (max-width: 600px) {
-                .wallet-table-wrapper { display: none !important; }
-                .wallet-cards-mobile { display: block !important; }
-            }
-        </style>
     <?php endif; ?>
 </div>
 

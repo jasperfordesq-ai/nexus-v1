@@ -1,6 +1,92 @@
 /* Federation Module CSS - Restored from Git History */
 /* Generated: 2026-01-19 */
+/* WCAG 2.1 AA Enhancements: 2026-01-19 */
 /* CACHE BUSTER: 1768841027 - Force browser to reload this CSS */
+
+/* ============================================
+   WCAG 2.1 AA - Focus States & Touch Targets
+   ============================================ */
+
+/* Focus Ring Variables */
+:root {
+    --fed-focus-ring: #FFDD00;           /* GOV.UK focus - high visibility */
+    --fed-focus-text: #0B0C0C;
+    --fed-focus-offset: 3px;
+    --fed-touch-min: 44px;
+}
+
+/* Global Focus Styles for Federation */
+#federation-hub-wrapper a:focus,
+#fed-dashboard-wrapper a:focus,
+#fed-transactions-wrapper a:focus,
+.fed-nav a:focus,
+.dash-action-btn:focus,
+.dash-mini-card:focus {
+    outline: 3px solid var(--fed-focus-ring);
+    outline-offset: var(--fed-focus-offset);
+    background-color: var(--fed-focus-ring) !important;
+    color: var(--fed-focus-text) !important;
+}
+
+/* Buttons Focus States */
+#federation-hub-wrapper button:focus,
+#fed-dashboard-wrapper button:focus,
+#fed-transactions-wrapper button:focus,
+.find-members-btn:focus,
+.review-btn:focus {
+    outline: 3px solid var(--fed-focus-ring);
+    outline-offset: var(--fed-focus-offset);
+}
+
+/* Form Inputs Focus States */
+#federation-hub-wrapper input:focus,
+#federation-hub-wrapper textarea:focus,
+#federation-hub-wrapper select:focus {
+    outline: 3px solid var(--fed-focus-ring);
+    outline-offset: 0;
+    border-color: #0B0C0C !important;
+}
+
+/* Touch Target Minimums - WCAG 2.5.5 */
+.dash-action-btn,
+.dash-mini-card,
+.fed-nav a,
+.review-btn,
+.find-members-btn,
+.back-link {
+    min-height: var(--fed-touch-min);
+}
+
+.transaction-actions .review-btn {
+    min-height: var(--fed-touch-min);
+    padding: 10px 16px;
+}
+
+/* High Contrast Mode Support */
+@media (prefers-contrast: high) {
+    .transaction-card,
+    .stat-card,
+    .dash-stat-card,
+    .dash-mini-card {
+        border-width: 2px;
+    }
+
+    .fed-nav a,
+    .dash-action-btn {
+        border: 2px solid currentColor;
+    }
+}
+
+/* Reduced Motion Support */
+@media (prefers-reduced-motion: reduce) {
+    .offline-banner,
+    .fed-hero,
+    .dash-action-btn,
+    .transaction-card {
+        animation: none !important;
+        transition: none !important;
+    }
+}
 
 /* CRITICAL FIX: Ensure body/html can always scroll on federation pages */
 html {
@@ -10117,6 +10203,53 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
                 .send-form {
                     padding: 20px;
                 }
+            }
+
+            /* Send Header Icon */
+            .send-header h1 i {
+                margin-right: 8px;
+            }
+
+            /* Insufficient Balance Alert */
+            .send-balance-alert {
+                margin-top: 0.5rem;
+                padding: 0.75rem;
+                border-radius: 8px;
+                background: rgba(245, 158, 11, 0.2);
+                border: 1px solid rgba(245, 158, 11, 0.4);
+                color: #fbbf24;
+                font-size: 0.9rem;
+                display: flex;
+                align-items: center;
+                gap: 8px;
+            }
+
+            [data-theme="dark"] .send-balance-alert {
+                background: rgba(245, 158, 11, 0.15);
+                color: #fcd34d;
+            }
+
+            /* No Recipient State */
+            .no-recipient h3 {
+                color: var(--htb-text-main);
+                margin: 0 0 10px 0;
+            }
+
+            .no-recipient p {
+                color: var(--htb-text-muted);
+                margin: 0 0 20px 0;
+            }
+
+            .no-recipient .send-btn {
+                display: inline-flex;
+                width: auto;
+                padding: 12px 24px;
+            }
+
+            /* Send Button Disabled State */
+            .send-btn.send-btn-disabled {
+                opacity: 0.5;
+                cursor: not-allowed;
             }
 
 /* =============================================

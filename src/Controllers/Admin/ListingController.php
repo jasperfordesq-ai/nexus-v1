@@ -34,10 +34,9 @@ class ListingController
         $limit = 20;
         $offset = ($page - 1) * $limit;
         $tenantIdFilter = $_GET['tenant_id'] ?? null;
+        $statusFilter = $_GET['status'] ?? null;
 
         // 2a. Fetch Tenants for Filter
-        // We need to fetch all tenants for the dropdown
-        // Assuming Tenant model exists and has all() method
         $tenants = [];
         try {
             $tenants = Database::query("SELECT id, name FROM tenants ORDER BY name ASC")->fetchAll();
@@ -45,71 +44,101 @@ class ListingController
             $tenants = [];
         }
 
-        // 2b. Unified Query
-        // We select minimal common fields: id, title, created_at, user_id, tenant_id, and a static 'type'
-        // Note: Event uses start_time as date; Vol uses created_by as user_id.
-        $sql = "
-            SELECT combined_content.*, t.name as tenant_name, u.name as author_name FROM (
-                SELECT id, tenant_id, user_id, title, description, created_at, 'listing' as content_type FROM listings
-                UNION ALL
-                SELECT id, tenant_id, user_id, title, description, start_time as created_at, 'event' as content_type FROM events
-                UNION ALL
-                SELECT id, tenant_id, user_id, question as title, description, created_at, 'poll' as content_type FROM polls
-                UNION ALL
-                SELECT id, tenant_id, user_id, title, description, created_at, 'goal' as content_type FROM goals
-                UNION ALL
-                SELECT id, tenant_id, user_id, title, description, created_at, 'resource' as content_type FROM resources
-                UNION ALL
-                SELECT id, tenant_id, created_by as user_id, title, description, created_at, 'volunteer' as content_type FROM vol_opportunities
-            ) AS combined_content
-            LEFT JOIN tenants t ON combined_content.tenant_id = t.id
-            LEFT JOIN users u ON combined_content.user_id = u.id
-        ";
-
-        // Apply Filter to the Outer Query
+        // 2b. Build Query based on status filter
+        // When filtering by status, we only query listings table (other content types don't have status)
         $params = [];
-        if ($tenantIdFilter && is_numeric($tenantIdFilter)) {
-            $sql .= " WHERE combined_content.tenant_id = ?";
-            $params[] = $tenantIdFilter;
-        }
 
-        $sql .= " ORDER BY combined_content.created_at DESC LIMIT $limit OFFSET $offset";
+        if ($statusFilter === 'pending') {
+            // Pending Review: Only listings with status = 'pending' or NULL (not yet approved)
+            $sql = "
+                SELECT l.id, l.tenant_id, l.user_id, l.title, l.description, l.created_at,
+                       l.status, 'listing' as content_type,
+                       t.name as tenant_name, u.name as author_name
+                FROM listings l
+                LEFT JOIN tenants t ON l.tenant_id = t.id
+                LEFT JOIN users u ON l.user_id = u.id
+                WHERE (l.status = 'pending' OR l.status IS NULL OR l.status = '')
+            ";
+
+            if ($tenantIdFilter && is_numeric($tenantIdFilter)) {
+                $sql .= " AND l.tenant_id = ?";
+                $params[] = $tenantIdFilter;
+            }
+
+            $sql .= " ORDER BY l.created_at DESC LIMIT $limit OFFSET $offset";
+
+            // Count for pending only
+            $countSql = "SELECT COUNT(*) as c FROM listings WHERE (status = 'pending' OR status IS NULL OR status = '')";
+            if ($tenantIdFilter && is_numeric($tenantIdFilter)) {
+                $countSql .= " AND tenant_id = ?";
+            }
+        } else {
+            // Default: Unified Query for all content types
+            $sql = "
+                SELECT combined_content.*, t.name as tenant_name, u.name as author_name FROM (
+                    SELECT id, tenant_id, user_id, title, description, created_at, status, 'listing' as content_type FROM listings
+                    UNION ALL
+                    SELECT id, tenant_id, user_id, title, description, start_time as created_at, 'active' as status, 'event' as content_type FROM events
+                    UNION ALL
+                    SELECT id, tenant_id, user_id, question as title, description, created_at, 'active' as status, 'poll' as content_type FROM polls
+                    UNION ALL
+                    SELECT id, tenant_id, user_id, title, description, created_at, 'active' as status, 'goal' as content_type FROM goals
+                    UNION ALL
+                    SELECT id, tenant_id, user_id, title, description, created_at, 'active' as status, 'resource' as content_type FROM resources
+                    UNION ALL
+                    SELECT id, tenant_id, created_by as user_id, title, description, created_at, 'active' as status, 'volunteer' as content_type FROM vol_opportunities
+                ) AS combined_content
+                LEFT JOIN tenants t ON combined_content.tenant_id = t.id
+                LEFT JOIN users u ON combined_content.user_id = u.id
+            ";
+
+            if ($tenantIdFilter && is_numeric($tenantIdFilter)) {
+                $sql .= " WHERE combined_content.tenant_id = ?";
+                $params[] = $tenantIdFilter;
+            }
+
+            $sql .= " ORDER BY combined_content.created_at DESC LIMIT $limit OFFSET $offset";
+            $countSql = null; // Use sum of all tables
+        }
 
         // Query: Fetch Data
         try {
             $listings = Database::query($sql, $params)->fetchAll();
-            // No post-processing needed now that we have explicit aliases
         } catch (\PDOException $e) {
-            // Fallback for missing tables during dev
             $listings = [];
-            error_log("Admin Directory Union Query Failed: " . $e->getMessage());
+            error_log("Admin Directory Query Failed: " . $e->getMessage());
         }
 
-        // 3. Count Total (Simplified estimation or separate count queries)
-        // Calculating true total for UNION is expensive/complex without a wrapper.
-        // For now, we'll fetch a rough count or just a static 'many'.
-        // Let's do a quick separate sums query.
+        // 3. Count Total
         $total = 0;
         try {
-            $total += Database::query("SELECT COUNT(*) as c FROM listings")->fetch()['c'];
-            $total += Database::query("SELECT COUNT(*) as c FROM events")->fetch()['c'];
-            $total += Database::query("SELECT COUNT(*) as c FROM polls")->fetch()['c'];
-            $total += Database::query("SELECT COUNT(*) as c FROM goals")->fetch()['c'];
-            $total += Database::query("SELECT COUNT(*) as c FROM resources")->fetch()['c'];
-            $total += Database::query("SELECT COUNT(*) as c FROM vol_opportunities")->fetch()['c'];
+            if ($statusFilter === 'pending') {
+                $countParams = ($tenantIdFilter && is_numeric($tenantIdFilter)) ? [$tenantIdFilter] : [];
+                $total = Database::query($countSql, $countParams)->fetch()['c'];
+            } else {
+                $total += Database::query("SELECT COUNT(*) as c FROM listings")->fetch()['c'];
+                $total += Database::query("SELECT COUNT(*) as c FROM events")->fetch()['c'];
+                $total += Database::query("SELECT COUNT(*) as c FROM polls")->fetch()['c'];
+                $total += Database::query("SELECT COUNT(*) as c FROM goals")->fetch()['c'];
+                $total += Database::query("SELECT COUNT(*) as c FROM resources")->fetch()['c'];
+                $total += Database::query("SELECT COUNT(*) as c FROM vol_opportunities")->fetch()['c'];
+            }
         } catch (\Throwable $e) {
         }
 
         $totalPages = ceil($total / $limit);
 
-        // 4. Render View (Gold Standard - standalone admin)
+        // 4. Render View
+        $pageTitle = $statusFilter === 'pending' ? 'Pending Review' : 'Global Content Directory';
+
         View::render('admin/listings/index', [
             'listings' => $listings,
             'currentPage' => $page,
             'totalPages' => $totalPages,
-            'pageTitle' => 'Global Content Directory',
+            'pageTitle' => $pageTitle,
             'tenants' => $tenants,
-            'currentTenantId' => $tenantIdFilter
+            'currentTenantId' => $tenantIdFilter,
+            'currentStatus' => $statusFilter
         ]);
     }
 
@@ -163,6 +192,27 @@ class ListingController
     {
         $this->requireAdmin();
         header("Location: /listings/edit/$id");
+        exit;
+    }
+
+    /**
+     * Approve a pending listing.
+     */
+    public function approve($id)
+    {
+        $this->requireAdmin();
+
+        $tenantId = \Nexus\Core\TenantContext::getId();
+
+        // Update status to 'active'
+        Database::query(
+            "UPDATE listings SET status = 'active' WHERE id = ? AND tenant_id = ?",
+            [$id, $tenantId]
+        );
+
+        // Redirect back to pending review
+        $redirect = $_SERVER['HTTP_REFERER'] ?? '/admin/listings?status=pending';
+        header("Location: $redirect");
         exit;
     }
 }

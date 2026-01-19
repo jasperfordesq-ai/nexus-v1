@@ -73,14 +73,12 @@ $communityAverage = $leaderboardData['community_average'] ?? 450;
         // Show real leaderboard data or empty state
         if (empty($leaders)):
         ?>
-            <div style="text-align: center; padding: 3rem 1rem; color: rgba(255, 255, 255, 0.6);">
-                <div style="font-size: 3rem; margin-bottom: 1rem;">🏆</div>
-                <div style="font-size: 1.25rem; font-weight: 600; margin-bottom: 0.5rem;">
-                    No Rankings Yet
+            <div class="empty-state empty-state--compact">
+                <div class="empty-state__icon empty-state__icon--warning">
+                    <span class="emoji">🏆</span>
                 </div>
-                <div style="font-size: 0.95rem;">
-                    Be the first to earn points and climb the leaderboard!
-                </div>
+                <h3 class="empty-state__title">No Rankings Yet</h3>
+                <p class="empty-state__text">Be the first to earn points and climb the leaderboard!</p>
             </div>
         <?php
         else:

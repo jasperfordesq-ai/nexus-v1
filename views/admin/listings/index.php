@@ -1,21 +1,33 @@
 <?php
 // Admin Listings Index View
-
-// But some do. Let's assume render() does NOT include them automatically if it's a partial render, 
-// Let's assume standard View behavior: This file is the $content.
-
+$isPending = ($currentStatus ?? '') === 'pending';
 ?>
 
 <div class="fds-feed-container" style="max-width: 1200px; margin: 20px auto;">
 
     <!-- Title -->
-    <div class="fds-surface fb-card p-4 mb-4" style="display: flex; justify-content: space-between; align-items: center;">
+    <div class="fds-surface fb-card p-4 mb-4" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
         <div>
-            <h1 style="font-size: 24px; font-weight: 700; margin: 0;">Global Content Directory</h1>
-            <p style="color: var(--text-muted); margin: 5px 0 0;">Manage marketplace, events, polls, and more across all tenants.</p>
+            <h1 style="font-size: 24px; font-weight: 700; margin: 0;"><?= htmlspecialchars($pageTitle ?? 'Global Content Directory') ?></h1>
+            <p style="color: var(--text-muted); margin: 5px 0 0;">
+                <?= $isPending ? 'Review and approve pending listings.' : 'Manage marketplace, events, polls, and more across all tenants.' ?>
+            </p>
         </div>
-        <div>
+        <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+            <!-- Status Filter Tabs -->
+            <div style="display: flex; gap: 4px; background: rgba(99, 102, 241, 0.1); padding: 4px; border-radius: 8px;">
+                <a href="/admin/listings" style="padding: 6px 12px; border-radius: 6px; font-size: 13px; font-weight: 500; text-decoration: none; <?= !$isPending ? 'background: #6366f1; color: white;' : 'color: var(--text-muted);' ?>">
+                    All Content
+                </a>
+                <a href="/admin/listings?status=pending" style="padding: 6px 12px; border-radius: 6px; font-size: 13px; font-weight: 500; text-decoration: none; <?= $isPending ? 'background: #f59e0b; color: white;' : 'color: var(--text-muted);' ?>">
+                    <i class="fa-solid fa-clock" style="margin-right: 4px;"></i> Pending Review
+                </a>
+            </div>
+            <!-- Tenant Filter -->
             <form method="GET" action="" style="display: inline-block;">
+                <?php if ($isPending): ?>
+                    <input type="hidden" name="status" value="pending">
+                <?php endif; ?>
                 <select name="tenant_id" onchange="this.form.submit()" style="padding: 6px 10px; border: 1px solid var(--border-color); border-radius: 6px; background: var(--surface); color: var(--text-main); font-size: 13px;">
                     <option value="">All Tenants</option>
                     <?php foreach ($tenants as $tenant): ?>
@@ -25,7 +37,6 @@
                     <?php endforeach; ?>
                 </select>
             </form>
-            <span class="nexus-badge" style="background: var(--primary-color); color: white; margin-left: 10px;">Admin Access</span>
         </div>
     </div>
 
@@ -107,6 +118,13 @@
                             </td>
                             <td style="padding: 12px 16px; text-align: right;">
                                 <div style="display: flex; gap: 8px; justify-content: flex-end;">
+                                    <?php if ($isPending && $row['content_type'] === 'listing'): ?>
+                                        <form method="POST" action="/admin/listings/approve/<?= $row['id'] ?>" style="margin: 0;">
+                                            <button type="submit" class="fds-btn-primary" style="background: #10b981; border-color: #10b981; padding: 4px 10px; font-size: 13px;">
+                                                <i class="fa-solid fa-check" style="margin-right: 4px;"></i> Approve
+                                            </button>
+                                        </form>
+                                    <?php endif; ?>
                                     <a href="<?= $editUrl ?>" class="fds-btn-secondary" style="padding: 4px 10px; font-size: 13px; text-decoration: none;">Edit</a>
                                     <form method="POST" action="/admin/listings/delete/<?= $row['id'] ?>?type=<?= $row['content_type'] ?>" onsubmit="return confirm('Are you sure you want to delete this item?');" style="margin: 0;">
                                         <button type="submit" class="fds-btn-primary" style="background: #ef4444; border-color: #ef4444; padding: 4px 10px; font-size: 13px;">Delete</button>
@@ -122,9 +140,15 @@
 
     <!-- Pagination -->
     <?php if ($totalPages > 1): ?>
+        <?php
+        $paginationParams = [];
+        if ($isPending) $paginationParams['status'] = 'pending';
+        if (!empty($currentTenantId)) $paginationParams['tenant_id'] = $currentTenantId;
+        $baseQuery = !empty($paginationParams) ? '&' . http_build_query($paginationParams) : '';
+        ?>
         <div style="margin-top: 20px; display: flex; justify-content: center; gap: 10px;">
             <?php for ($i = 1; $i <= $totalPages; $i++): ?>
-                <a href="?page=<?= $i ?>" class="fds-btn-secondary" style="<?= $i == $currentPage ? 'background: var(--primary-color); color: white;' : '' ?>">
+                <a href="?page=<?= $i ?><?= $baseQuery ?>" class="fds-btn-secondary" style="<?= $i == $currentPage ? 'background: var(--primary-color); color: white;' : '' ?>">
                     <?= $i ?>
                 </a>
             <?php endfor; ?>

@@ -2075,6 +2075,36 @@ function escapeHtml(text) {
     div.textContent = text || '';
     return div.innerHTML;
 }
+
+// Mobile FAB for compose
+if (IS_LOGGED_IN && window.innerWidth <= 768) {
+    document.addEventListener('DOMContentLoaded', function() {
+        // Create mobile compose FAB
+        if (typeof FAB !== 'undefined') {
+            FAB.create({
+                icon: 'pen',
+                color: 'primary',
+                position: 'bottom-right',
+                onClick: function() {
+                    toggleComposer(true);
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                }
+            });
+        } else {
+            // Fallback if FAB module not loaded
+            const fab = document.createElement('button');
+            fab.className = 'fab fab-animate-in';
+            fab.innerHTML = '<span class="dashicons dashicons-edit" style="font-size: 24px; width: 24px; height: 24px;"></span>';
+            fab.setAttribute('aria-label', 'Create post');
+            fab.style.cssText = 'position:fixed; bottom:80px; right:16px; width:56px; height:56px; border-radius:16px; background:linear-gradient(135deg, #6366f1, #8b5cf6); color:white; border:none; box-shadow:0 4px 12px rgba(99,102,241,0.4); display:flex; align-items:center; justify-content:center; z-index:1000; cursor:pointer;';
+            fab.addEventListener('click', function() {
+                toggleComposer(true);
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            });
+            document.body.appendChild(fab);
+        }
+    });
+}
 </script>
 
 <?php require dirname(__DIR__, 2) . '/layouts/civicone/footer.php'; ?>

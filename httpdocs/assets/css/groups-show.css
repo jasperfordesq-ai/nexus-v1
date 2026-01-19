@@ -2285,6 +2285,27 @@ html {
     display: block;
 }
 
+/* Feed Loading Skeleton */
+.feed-loading-skeleton {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.feed-loading-skeleton .feed-skeleton {
+    padding: 20px;
+    background: linear-gradient(135deg, rgba(255,255,255,0.9), rgba(255,255,255,0.7));
+    backdrop-filter: blur(20px);
+    border-radius: 20px;
+    border: 1px solid rgba(255,255,255,0.5);
+    box-shadow: 0 8px 32px rgba(99, 102, 241, 0.08);
+}
+
+[data-theme="dark"] .feed-loading-skeleton .feed-skeleton {
+    background: linear-gradient(135deg, rgba(30,41,59,0.9), rgba(15,23,42,0.7));
+    border-color: rgba(255,255,255,0.1);
+}
+
 /* Feed Post Card - Full Holographic Glassmorphism */
 .group-feed-post {
     background: linear-gradient(135deg,

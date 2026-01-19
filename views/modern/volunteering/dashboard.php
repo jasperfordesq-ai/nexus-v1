@@ -290,15 +290,15 @@ require __DIR__ . '/../../layouts/modern/header.php';
                             <tbody>
                                 <?php foreach ($pendingLogs as $log): ?>
                                     <tr>
-                                        <td class="holo-table-primary"><?= htmlspecialchars($log['first_name'] . ' ' . $log['last_name']) ?></td>
-                                        <td>
+                                        <td data-label="Volunteer" class="holo-table-primary"><?= htmlspecialchars($log['first_name'] . ' ' . $log['last_name']) ?></td>
+                                        <td data-label="Activity">
                                             <div class="holo-table-primary"><?= htmlspecialchars($log['opp_title'] ?? 'General') ?></div>
                                             <div class="holo-table-secondary"><?= htmlspecialchars($log['org_name']) ?></div>
                                         </td>
-                                        <td><?= date('M d', strtotime($log['date_logged'])) ?></td>
-                                        <td><span style="color: #818cf8; font-weight: 700;"><?= $log['hours'] ?>h</span></td>
-                                        <td style="max-width: 200px;"><?= htmlspecialchars($log['description']) ?></td>
-                                        <td>
+                                        <td data-label="Date"><?= date('M d', strtotime($log['date_logged'])) ?></td>
+                                        <td data-label="Hours"><span style="color: #818cf8; font-weight: 700;"><?= $log['hours'] ?>h</span></td>
+                                        <td data-label="Description" style="max-width: 200px;"><?= htmlspecialchars($log['description']) ?></td>
+                                        <td data-label="">
                                             <div class="holo-action-btns">
                                                 <form action="<?= Nexus\Core\TenantContext::getBasePath() ?>/volunteering/verify-hours" method="POST" style="display:inline;">
                                                     <?= \Nexus\Core\Csrf::input() ?>
@@ -355,10 +355,10 @@ require __DIR__ . '/../../layouts/modern/header.php';
                             <tbody>
                                 <?php foreach ($myOpps as $opp): ?>
                                     <tr>
-                                        <td class="holo-table-primary"><?= htmlspecialchars($opp['title']) ?></td>
-                                        <td><?= htmlspecialchars($opp['org_name']) ?></td>
-                                        <td><?= date('M d', strtotime($opp['created_at'])) ?></td>
-                                        <td>
+                                        <td data-label="Title" class="holo-table-primary"><?= htmlspecialchars($opp['title']) ?></td>
+                                        <td data-label="Organisation"><?= htmlspecialchars($opp['org_name']) ?></td>
+                                        <td data-label="Posted"><?= date('M d', strtotime($opp['created_at'])) ?></td>
+                                        <td data-label="">
                                             <a href="<?= Nexus\Core\TenantContext::getBasePath() ?>/volunteering/<?= $opp['id'] ?>" class="holo-table-link" style="margin-right: 16px;">
                                                 <i class="fa-solid fa-eye"></i> View
                                             </a>
@@ -412,11 +412,11 @@ require __DIR__ . '/../../layouts/modern/header.php';
                                     };
                                     ?>
                                     <tr>
-                                        <td>
+                                        <td data-label="Volunteer">
                                             <div class="holo-table-primary"><?= htmlspecialchars($app['user_name']) ?></div>
                                             <div class="holo-table-secondary"><?= htmlspecialchars($app['user_email']) ?></div>
                                         </td>
-                                        <td>
+                                        <td data-label="Opportunity">
                                             <div class="holo-table-primary"><?= htmlspecialchars($app['opp_title']) ?></div>
                                             <?php if (!empty($app['shift_start'])): ?>
                                                 <div class="holo-table-shift">
@@ -425,12 +425,12 @@ require __DIR__ . '/../../layouts/modern/header.php';
                                                 </div>
                                             <?php endif; ?>
                                         </td>
-                                        <td>
+                                        <td data-label="Status">
                                             <span class="holo-status <?= $statusClass ?>"><?= $app['status'] ?></span>
                                         </td>
-                                        <td style="max-width: 200px;"><?= htmlspecialchars($app['message'] ?? '-') ?></td>
-                                        <td><?= date('M d', strtotime($app['created_at'])) ?></td>
-                                        <td>
+                                        <td data-label="Message" style="max-width: 200px;"><?= htmlspecialchars($app['message'] ?? '-') ?></td>
+                                        <td data-label="Date"><?= date('M d', strtotime($app['created_at'])) ?></td>
+                                        <td data-label="">
                                             <?php if ($app['status'] == 'pending'): ?>
                                                 <div class="holo-action-btns">
                                                     <form action="<?= Nexus\Core\TenantContext::getBasePath() ?>/volunteering/app/update" method="POST" style="display:inline;">

@@ -1,0 +1,490 @@
+/**
+ * Hover Micro-Interactions
+ * Subtle, delightful hover effects for UI elements
+ * Version: 1.0 - 2026-01-19
+ *
+ * Design principles:
+ * - Subtle (not distracting)
+ * - Fast (< 200ms transitions)
+ * - Consistent across components
+ * - Respects reduced motion
+ */
+
+/* ==============================================
+   BASE TRANSITION TIMING
+   ============================================== */
+:root {
+    --hover-fast: 150ms;
+    --hover-normal: 200ms;
+    --hover-ease: cubic-bezier(0.4, 0, 0.2, 1);
+    --hover-bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* ==============================================
+   BUTTON HOVER - Lift Effect
+   ============================================== */
+.btn,
+.glass-btn,
+.glass-btn-primary,
+.glass-btn-secondary,
+.nexus-smart-btn,
+.htb-btn,
+.civic-btn,
+[class*="btn-primary"],
+[class*="btn-secondary"] {
+    transition: transform var(--hover-fast) var(--hover-ease),
+                box-shadow var(--hover-fast) var(--hover-ease),
+                background-color var(--hover-fast) var(--hover-ease);
+}
+
+.btn:hover,
+.glass-btn:hover,
+.glass-btn-primary:hover,
+.glass-btn-secondary:hover,
+.nexus-smart-btn:hover,
+.htb-btn:hover,
+.civic-btn:hover,
+[class*="btn-primary"]:hover,
+[class*="btn-secondary"]:hover {
+    transform: translateY(-2px);
+}
+
+.btn:active,
+.glass-btn:active,
+.glass-btn-primary:active,
+.glass-btn-secondary:active,
+.nexus-smart-btn:active,
+.htb-btn:active,
+.civic-btn:active,
+[class*="btn-primary"]:active,
+[class*="btn-secondary"]:active {
+    transform: translateY(0);
+    transition-duration: 50ms;
+}
+
+/* ==============================================
+   CARD HOVER - Subtle Lift
+   ============================================== */
+.glass-card,
+.glass-event-card,
+.glass-listing-card,
+.member-card,
+.feed-post,
+.group-feed-post,
+.holo-card,
+.nexus-card,
+[class*="-card"]:not(.skeleton-card) {
+    transition: transform var(--hover-normal) var(--hover-ease),
+                box-shadow var(--hover-normal) var(--hover-ease);
+}
+
+.glass-card:hover,
+.glass-event-card:hover,
+.glass-listing-card:hover,
+.member-card:hover,
+.holo-card:hover,
+.nexus-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.12),
+                0 4px 12px rgba(99, 102, 241, 0.08);
+}
+
+[data-theme="dark"] .glass-card:hover,
+[data-theme="dark"] .glass-event-card:hover,
+[data-theme="dark"] .glass-listing-card:hover,
+[data-theme="dark"] .member-card:hover,
+[data-theme="dark"] .holo-card:hover,
+[data-theme="dark"] .nexus-card:hover {
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4),
+                0 4px 12px rgba(99, 102, 241, 0.15);
+}
+
+/* ==============================================
+   LINK HOVER - Underline Animation
+   ============================================== */
+.hover-underline {
+    position: relative;
+    text-decoration: none;
+}
+
+.hover-underline::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    width: 0;
+    height: 2px;
+    background: currentColor;
+    transition: width var(--hover-normal) var(--hover-ease);
+}
+
+.hover-underline:hover::after {
+    width: 100%;
+}
+
+/* ==============================================
+   ICON HOVER - Scale & Color
+   ============================================== */
+.icon-hover,
+.notif-icon,
+.nav-icon,
+.action-icon {
+    transition: transform var(--hover-fast) var(--hover-bounce),
+                color var(--hover-fast) var(--hover-ease);
+}
+
+.icon-hover:hover,
+.notif-icon:hover,
+.nav-icon:hover,
+.action-icon:hover {
+    transform: scale(1.1);
+}
+
+/* Heart icon special animation */
+.like-btn:hover .fa-heart,
+.heart-icon:hover {
+    transform: scale(1.2);
+    color: #ef4444;
+}
+
+/* ==============================================
+   AVATAR HOVER - Ring Effect
+   ============================================== */
+.avatar-hover,
+.member-avatar,
+.user-avatar,
+.feed-post-avatar {
+    transition: transform var(--hover-fast) var(--hover-ease),
+                box-shadow var(--hover-fast) var(--hover-ease);
+}
+
+.avatar-hover:hover,
+.member-avatar:hover,
+.user-avatar:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.3);
+}
+
+/* ==============================================
+   LIST ITEM HOVER - Background Shift
+   ============================================== */
+.list-item-hover,
+.notif-item,
+.message-item,
+.search-result-item,
+.dropdown-item {
+    transition: background-color var(--hover-fast) var(--hover-ease),
+                transform var(--hover-fast) var(--hover-ease);
+}
+
+.list-item-hover:hover,
+.notif-item:hover,
+.message-item:hover,
+.search-result-item:hover,
+.dropdown-item:hover {
+    background-color: rgba(99, 102, 241, 0.05);
+}
+
+[data-theme="dark"] .list-item-hover:hover,
+[data-theme="dark"] .notif-item:hover,
+[data-theme="dark"] .message-item:hover,
+[data-theme="dark"] .search-result-item:hover,
+[data-theme="dark"] .dropdown-item:hover {
+    background-color: rgba(99, 102, 241, 0.1);
+}
+
+/* ==============================================
+   TAB HOVER - Indicator Slide
+   ============================================== */
+.tab-hover,
+.holo-tab-btn,
+.filter-tab,
+.nav-tab {
+    position: relative;
+    transition: color var(--hover-fast) var(--hover-ease);
+}
+
+.tab-hover::after,
+.holo-tab-btn::after,
+.filter-tab::after,
+.nav-tab::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    width: 0;
+    height: 2px;
+    background: linear-gradient(90deg, #6366f1, #8b5cf6);
+    transition: width var(--hover-normal) var(--hover-ease),
+                left var(--hover-normal) var(--hover-ease);
+    border-radius: 2px;
+}
+
+.tab-hover:hover::after,
+.holo-tab-btn:hover::after,
+.filter-tab:hover::after,
+.nav-tab:hover::after {
+    width: 100%;
+    left: 0;
+}
+
+.tab-hover.active::after,
+.holo-tab-btn.active::after,
+.filter-tab.active::after,
+.nav-tab.active::after {
+    width: 100%;
+    left: 0;
+}
+
+/* ==============================================
+   INPUT FOCUS - Glow Effect
+   ============================================== */
+input:not([type="checkbox"]):not([type="radio"]),
+textarea,
+select,
+.glass-input,
+.glass-select,
+.glass-search-input {
+    transition: border-color var(--hover-fast) var(--hover-ease),
+                box-shadow var(--hover-fast) var(--hover-ease);
+}
+
+input:not([type="checkbox"]):not([type="radio"]):focus,
+textarea:focus,
+select:focus,
+.glass-input:focus,
+.glass-select:focus,
+.glass-search-input:focus {
+    border-color: rgba(99, 102, 241, 0.5);
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+    outline: none;
+}
+
+[data-theme="dark"] input:not([type="checkbox"]):not([type="radio"]):focus,
+[data-theme="dark"] textarea:focus,
+[data-theme="dark"] select:focus,
+[data-theme="dark"] .glass-input:focus,
+[data-theme="dark"] .glass-select:focus,
+[data-theme="dark"] .glass-search-input:focus {
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.25);
+}
+
+/* ==============================================
+   BADGE/CHIP HOVER
+   ============================================== */
+.badge-hover,
+.chip,
+.tag,
+.filter-chip {
+    transition: transform var(--hover-fast) var(--hover-bounce),
+                background-color var(--hover-fast) var(--hover-ease);
+}
+
+.badge-hover:hover,
+.chip:hover,
+.tag:hover,
+.filter-chip:hover {
+    transform: scale(1.05);
+}
+
+/* ==============================================
+   FAB HOVER - Scale & Shadow
+   ============================================== */
+.fab,
+.floating-action-btn,
+[class*="-fab"] {
+    transition: transform var(--hover-fast) var(--hover-bounce),
+                box-shadow var(--hover-fast) var(--hover-ease);
+}
+
+.fab:hover,
+.floating-action-btn:hover,
+[class*="-fab"]:hover {
+    transform: scale(1.1);
+    box-shadow: 0 8px 24px rgba(99, 102, 241, 0.4);
+}
+
+.fab:active,
+.floating-action-btn:active,
+[class*="-fab"]:active {
+    transform: scale(0.95);
+}
+
+/* ==============================================
+   IMAGE HOVER - Zoom Effect
+   ============================================== */
+.img-zoom-hover {
+    overflow: hidden;
+}
+
+.img-zoom-hover img {
+    transition: transform var(--hover-normal) var(--hover-ease);
+}
+
+.img-zoom-hover:hover img {
+    transform: scale(1.05);
+}
+
+/* Gallery thumbnail hover */
+.gallery-thumb:hover img,
+.image-grid-item:hover img {
+    transform: scale(1.08);
+}
+
+/* ==============================================
+   MENU ITEM HOVER - Slide Indicator
+   ============================================== */
+.menu-item-hover {
+    position: relative;
+    transition: padding-left var(--hover-fast) var(--hover-ease),
+                color var(--hover-fast) var(--hover-ease);
+}
+
+.menu-item-hover::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 3px;
+    height: 0;
+    background: linear-gradient(180deg, #6366f1, #8b5cf6);
+    border-radius: 3px;
+    transition: height var(--hover-fast) var(--hover-ease);
+}
+
+.menu-item-hover:hover {
+    padding-left: 12px;
+    color: #6366f1;
+}
+
+.menu-item-hover:hover::before {
+    height: 60%;
+}
+
+/* ==============================================
+   TOGGLE/SWITCH HOVER
+   ============================================== */
+.toggle-hover,
+.switch {
+    transition: background-color var(--hover-fast) var(--hover-ease);
+}
+
+.toggle-hover:hover,
+.switch:hover {
+    filter: brightness(1.1);
+}
+
+/* ==============================================
+   RIPPLE EFFECT (Optional - Add via JS)
+   ============================================== */
+.ripple-hover {
+    position: relative;
+    overflow: hidden;
+}
+
+.ripple-hover::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    transition: width 0.4s ease, height 0.4s ease, opacity 0.4s ease;
+    opacity: 0;
+}
+
+.ripple-hover:active::after {
+    width: 200%;
+    height: 200%;
+    opacity: 1;
+    transition: 0s;
+}
+
+/* ==============================================
+   SOCIAL ACTIONS HOVER
+   ============================================== */
+.social-action,
+.post-action-btn,
+.comment-action {
+    transition: transform var(--hover-fast) var(--hover-bounce),
+                color var(--hover-fast) var(--hover-ease),
+                background-color var(--hover-fast) var(--hover-ease);
+}
+
+.social-action:hover,
+.post-action-btn:hover,
+.comment-action:hover {
+    transform: scale(1.1);
+}
+
+/* Like action */
+.like-action:hover {
+    color: #ef4444;
+}
+
+/* Comment action */
+.comment-action-btn:hover {
+    color: #3b82f6;
+}
+
+/* Share action */
+.share-action:hover {
+    color: #10b981;
+}
+
+/* ==============================================
+   MOBILE - Disable hover on touch
+   ============================================== */
+@media (hover: none) and (pointer: coarse) {
+    /* Remove hover transforms on mobile */
+    .btn:hover,
+    .glass-btn:hover,
+    .glass-card:hover,
+    .member-card:hover,
+    .fab:hover {
+        transform: none;
+    }
+
+    /* Keep active states */
+    .btn:active,
+    .glass-btn:active,
+    .fab:active {
+        transform: scale(0.95);
+    }
+}
+
+/* ==============================================
+   REDUCED MOTION
+   ============================================== */
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        transition-duration: 0.01ms !important;
+        animation-duration: 0.01ms !important;
+    }
+
+    .btn:hover,
+    .glass-card:hover,
+    .member-card:hover,
+    .fab:hover,
+    .avatar-hover:hover,
+    .icon-hover:hover {
+        transform: none;
+    }
+}
+
+/* ==============================================
+   PRINT - Remove all effects
+   ============================================== */
+@media print {
+    * {
+        transition: none !important;
+        transform: none !important;
+        box-shadow: none !important;
+    }
+}

@@ -392,7 +392,8 @@ class User
     public static function count()
     {
         $tenantId = TenantContext::getId();
-        $sql = "SELECT COUNT(*) as total FROM users WHERE tenant_id = ?";
+        // Only count users with avatars (hidden from directory without avatar)
+        $sql = "SELECT COUNT(*) as total FROM users WHERE tenant_id = ? AND avatar_url IS NOT NULL AND avatar_url != ''";
         return Database::query($sql, [$tenantId])->fetch()['total'];
     }
 
@@ -528,6 +529,8 @@ class User
             FROM users u
             LEFT JOIN listings l ON u.id = l.user_id AND l.status = 'active'
             WHERE u.tenant_id = ?
+            AND u.avatar_url IS NOT NULL
+            AND u.avatar_url != ''
             AND (
                 u.first_name LIKE ? OR
                 u.last_name LIKE ? OR

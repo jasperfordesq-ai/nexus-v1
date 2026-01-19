@@ -1,0 +1,937 @@
+/**
+ * Admin Federation CSS
+ * Styles for admin/federation views
+ * Created 2026-01-19 for civicone theme compliance
+ */
+
+/* ============================================
+   FEDERATION STATUS HEADER
+   ============================================ */
+.fed-status-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1.5rem;
+    background: linear-gradient(135deg, rgba(139, 92, 246, 0.15), rgba(99, 102, 241, 0.1));
+    border: 1px solid rgba(139, 92, 246, 0.2);
+    border-radius: 16px;
+    margin-bottom: 1.5rem;
+}
+
+.fed-status-info {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.fed-status-icon {
+    width: 56px;
+    height: 56px;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+}
+
+.fed-status-icon.enabled {
+    background: linear-gradient(135deg, #10b981, #059669);
+    color: white;
+}
+
+.fed-status-icon.disabled {
+    background: linear-gradient(135deg, #6b7280, #4b5563);
+    color: white;
+}
+
+.fed-status-text h2 {
+    font-size: 1.25rem;
+    font-weight: 700;
+    margin: 0 0 4px;
+    color: var(--admin-text, #fff);
+}
+
+.fed-status-text p {
+    font-size: 0.9rem;
+    color: var(--admin-text-muted, rgba(255,255,255,0.6));
+    margin: 0;
+}
+
+.fed-status-toggle {
+    padding: 12px 24px;
+    border-radius: 10px;
+    font-weight: 600;
+    font-size: 0.95rem;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.fed-status-toggle.disable {
+    background: rgba(239, 68, 68, 0.15);
+    color: #ef4444;
+    border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+.fed-status-toggle.disable:hover {
+    background: rgba(239, 68, 68, 0.25);
+}
+
+.fed-status-toggle.enable {
+    background: linear-gradient(135deg, #10b981, #059669);
+    color: white;
+}
+
+.fed-status-toggle.enable:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+}
+
+/* ============================================
+   STATS GRID
+   ============================================ */
+.fed-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.fed-stat-card {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(139, 92, 246, 0.15);
+    border-radius: 14px;
+    padding: 1.25rem;
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+}
+
+.fed-stat-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.25rem;
+    flex-shrink: 0;
+}
+
+.fed-stat-icon.purple { background: linear-gradient(135deg, rgba(139, 92, 246, 0.2), rgba(99, 102, 241, 0.1)); color: #8b5cf6; }
+.fed-stat-icon.green { background: linear-gradient(135deg, rgba(16, 185, 129, 0.2), rgba(5, 150, 105, 0.1)); color: #10b981; }
+.fed-stat-icon.blue { background: linear-gradient(135deg, rgba(59, 130, 246, 0.2), rgba(37, 99, 235, 0.1)); color: #3b82f6; }
+.fed-stat-icon.amber { background: linear-gradient(135deg, rgba(245, 158, 11, 0.2), rgba(217, 119, 6, 0.1)); color: #f59e0b; }
+.fed-stat-icon.pink { background: linear-gradient(135deg, rgba(236, 72, 153, 0.2), rgba(219, 39, 119, 0.1)); color: #ec4899; }
+.fed-stat-icon.teal { background: linear-gradient(135deg, rgba(20, 184, 166, 0.2), rgba(13, 148, 136, 0.1)); color: #14b8a6; }
+
+.fed-stat-content {
+    flex: 1;
+}
+
+.fed-stat-value {
+    font-size: 1.75rem;
+    font-weight: 800;
+    color: var(--admin-text, #fff);
+    line-height: 1.2;
+}
+
+.fed-stat-label {
+    font-size: 0.85rem;
+    color: var(--admin-text-muted, rgba(255,255,255,0.6));
+    margin-top: 2px;
+}
+
+.fed-stat-change {
+    font-size: 0.75rem;
+    margin-top: 4px;
+}
+
+.fed-stat-change.positive { color: #10b981; }
+.fed-stat-change.negative { color: #ef4444; }
+
+/* ============================================
+   ADMIN CARDS (Federation-specific)
+   ============================================ */
+.fed-admin-card {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(139, 92, 246, 0.1);
+    border-radius: 16px;
+    overflow: hidden;
+    margin-bottom: 1.5rem;
+}
+
+.fed-admin-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem 1.25rem;
+    border-bottom: 1px solid rgba(139, 92, 246, 0.1);
+}
+
+.fed-admin-card-title {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--admin-text, #fff);
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.fed-admin-card-title i {
+    color: #8b5cf6;
+}
+
+.fed-admin-card-body {
+    padding: 1.25rem;
+}
+
+/* ============================================
+   TOGGLE LIST (Feature switches)
+   ============================================ */
+.admin-toggle-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.admin-toggle-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem;
+    background: var(--admin-bg-secondary, rgba(255,255,255,0.05));
+    border-radius: 8px;
+}
+
+.admin-toggle-info {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.admin-toggle-icon {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--admin-bg, rgba(0,0,0,0.2));
+    border-radius: 8px;
+    color: var(--admin-primary, #8b5cf6);
+}
+
+.admin-toggle-title {
+    font-weight: 600;
+    color: var(--admin-text, #fff);
+}
+
+.admin-toggle-desc {
+    font-size: 0.9rem;
+    color: var(--admin-text-muted, rgba(255,255,255,0.6));
+}
+
+/* Switch toggle control */
+.admin-switch {
+    position: relative;
+    display: inline-block;
+    width: 50px;
+    height: 26px;
+}
+
+.admin-switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.admin-switch-slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #555;
+    transition: 0.3s;
+    border-radius: 26px;
+}
+
+.admin-switch-slider:before {
+    position: absolute;
+    content: "";
+    height: 20px;
+    width: 20px;
+    left: 3px;
+    bottom: 3px;
+    background-color: white;
+    transition: 0.3s;
+    border-radius: 50%;
+}
+
+.admin-switch input:checked + .admin-switch-slider {
+    background-color: var(--admin-success, #10b981);
+}
+
+.admin-switch input:checked + .admin-switch-slider:before {
+    transform: translateX(24px);
+}
+
+/* ============================================
+   PARTNERSHIP CARDS
+   ============================================ */
+.partnership-request-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1.25rem;
+    background: var(--admin-bg-secondary, rgba(255,255,255,0.05));
+    border-radius: 8px;
+    margin-bottom: 0.75rem;
+    border-left: 4px solid var(--admin-warning, #f59e0b);
+}
+
+.partnership-request-card:last-child {
+    margin-bottom: 0;
+}
+
+.partnership-request-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 0.5rem;
+}
+
+.partnership-request-meta {
+    display: flex;
+    gap: 1.5rem;
+    font-size: 0.9rem;
+    color: var(--admin-text-muted, rgba(255,255,255,0.6));
+}
+
+.partnership-request-meta i {
+    margin-right: 0.25rem;
+}
+
+.partnership-request-actions {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+/* Partnership Grid */
+.fed-partnership-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 12px;
+}
+
+.fed-partnership-card {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(139, 92, 246, 0.1);
+    border-radius: 12px;
+    padding: 16px;
+    text-align: center;
+    transition: all 0.2s ease;
+}
+
+.fed-partnership-card:hover {
+    border-color: rgba(139, 92, 246, 0.3);
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.fed-partnership-logo {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    margin: 0 auto 10px;
+    background: linear-gradient(135deg, rgba(139, 92, 246, 0.2), rgba(99, 102, 241, 0.1));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    color: #8b5cf6;
+}
+
+.fed-partnership-name {
+    font-weight: 600;
+    color: var(--admin-text, #fff);
+    font-size: 0.9rem;
+    margin-bottom: 4px;
+}
+
+.fed-partnership-status {
+    font-size: 0.75rem;
+    padding: 2px 8px;
+    border-radius: 100px;
+    display: inline-block;
+}
+
+.fed-partnership-status.active {
+    background: rgba(16, 185, 129, 0.2);
+    color: #10b981;
+}
+
+.fed-partnership-status.pending {
+    background: rgba(245, 158, 11, 0.2);
+    color: #f59e0b;
+}
+
+/* ============================================
+   USER ADOPTION
+   ============================================ */
+.fed-adoption-bar {
+    height: 12px;
+    background: rgba(139, 92, 246, 0.1);
+    border-radius: 6px;
+    overflow: hidden;
+    margin: 1rem 0;
+}
+
+.fed-adoption-fill {
+    height: 100%;
+    background: linear-gradient(135deg, #8b5cf6, #6366f1);
+    border-radius: 6px;
+    transition: width 0.5s ease;
+}
+
+.fed-adoption-stats {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.85rem;
+    color: var(--admin-text-muted, rgba(255,255,255,0.6));
+}
+
+.fed-adoption-stats strong {
+    color: #8b5cf6;
+}
+
+/* ============================================
+   ACTIVITY LOG
+   ============================================ */
+.fed-activity-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    max-height: 350px;
+    overflow-y: auto;
+}
+
+.fed-activity-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 12px;
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 10px;
+    border-left: 3px solid #8b5cf6;
+}
+
+.fed-activity-item.warning { border-left-color: #f59e0b; }
+.fed-activity-item.critical { border-left-color: #ef4444; }
+
+.fed-activity-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    background: rgba(139, 92, 246, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #8b5cf6;
+    flex-shrink: 0;
+}
+
+.fed-activity-content {
+    flex: 1;
+    min-width: 0;
+}
+
+.fed-activity-action {
+    font-weight: 600;
+    color: var(--admin-text, #fff);
+    font-size: 0.9rem;
+}
+
+.fed-activity-meta {
+    font-size: 0.8rem;
+    color: var(--admin-text-muted, rgba(255,255,255,0.5));
+    margin-top: 2px;
+}
+
+.fed-activity-time {
+    font-size: 0.75rem;
+    color: var(--admin-text-muted, rgba(255,255,255,0.4));
+    white-space: nowrap;
+}
+
+/* ============================================
+   TOP USERS
+   ============================================ */
+.fed-top-users {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.fed-top-user {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 12px;
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 10px;
+}
+
+.fed-top-user-rank {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, rgba(139, 92, 246, 0.2), rgba(99, 102, 241, 0.1));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: #8b5cf6;
+}
+
+.fed-top-user-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    object-fit: cover;
+    background: linear-gradient(135deg, #8b5cf6, #6366f1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: 600;
+}
+
+.fed-top-user-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.fed-top-user-name {
+    font-weight: 600;
+    color: var(--admin-text, #fff);
+    font-size: 0.9rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.fed-top-user-stats {
+    font-size: 0.8rem;
+    color: var(--admin-text-muted, rgba(255,255,255,0.5));
+}
+
+.fed-top-user-badge {
+    padding: 4px 10px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    border-radius: 100px;
+    text-transform: uppercase;
+}
+
+.fed-top-user-badge.discovery { background: rgba(59, 130, 246, 0.2); color: #3b82f6; }
+.fed-top-user-badge.social { background: rgba(16, 185, 129, 0.2); color: #10b981; }
+.fed-top-user-badge.economic { background: rgba(139, 92, 246, 0.2); color: #8b5cf6; }
+
+/* ============================================
+   QUICK ACTIONS
+   ============================================ */
+.fed-quick-actions {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-bottom: 1.5rem;
+}
+
+.fed-quick-action {
+    padding: 10px 16px;
+    background: rgba(139, 92, 246, 0.1);
+    border: 1px solid rgba(139, 92, 246, 0.2);
+    border-radius: 10px;
+    color: #a78bfa;
+    font-size: 0.9rem;
+    font-weight: 500;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.2s ease;
+}
+
+.fed-quick-action:hover {
+    background: rgba(139, 92, 246, 0.2);
+    border-color: rgba(139, 92, 246, 0.4);
+    color: #c4b5fd;
+}
+
+/* ============================================
+   EMPTY STATE
+   ============================================ */
+.fed-empty-state {
+    text-align: center;
+    padding: 2rem;
+    color: var(--admin-text-muted, rgba(255,255,255,0.5));
+}
+
+.fed-empty-state i {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+    color: rgba(139, 92, 246, 0.3);
+    display: block;
+}
+
+/* ============================================
+   ADMIN MODALS
+   ============================================ */
+.admin-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.admin-modal-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0,0,0,0.5);
+}
+
+.admin-modal-content {
+    position: relative;
+    background: var(--admin-bg, #1a1a2e);
+    border-radius: 12px;
+    max-width: 500px;
+    width: 90%;
+    max-height: 80vh;
+    overflow: auto;
+    border: 1px solid rgba(139, 92, 246, 0.2);
+}
+
+.admin-modal-header {
+    padding: 1rem 1.5rem;
+    border-bottom: 1px solid var(--admin-border, rgba(255,255,255,0.1));
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.admin-modal-header h3 {
+    margin: 0;
+    color: var(--admin-text, #fff);
+}
+
+.admin-modal-body {
+    padding: 1.5rem;
+}
+
+.admin-modal-footer {
+    padding: 1rem 1.5rem;
+    border-top: 1px solid var(--admin-border, rgba(255,255,255,0.1));
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.5rem;
+}
+
+/* ============================================
+   GRID LAYOUTS
+   ============================================ */
+.fed-grid-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+}
+
+.fed-admin-dashboard {
+    display: grid;
+    gap: 1.5rem;
+}
+
+/* ============================================
+   ANALYTICS SPECIFIC
+   ============================================ */
+.analytics-date-filter {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+}
+
+.analytics-date-btn {
+    padding: 0.5rem 1rem;
+    border: 1px solid rgba(99, 102, 241, 0.2);
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 8px;
+    font-size: 0.875rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    color: rgba(255, 255, 255, 0.7);
+    text-decoration: none;
+}
+
+.analytics-date-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: rgba(139, 92, 246, 0.4);
+    color: #fff;
+}
+
+.analytics-date-btn.active {
+    background: linear-gradient(135deg, #6366f1, #8b5cf6);
+    color: white;
+    border-color: transparent;
+}
+
+.chart-container {
+    position: relative;
+    height: 300px;
+    width: 100%;
+}
+
+.chart-placeholder {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 300px;
+    color: rgba(255, 255, 255, 0.5);
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 12px;
+    border: 1px dashed rgba(99, 102, 241, 0.2);
+}
+
+.chart-placeholder i {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    background: linear-gradient(135deg, #6366f1, #8b5cf6);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.analytics-metric-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+}
+
+.analytics-metric {
+    display: flex;
+    flex-direction: column;
+    padding: 1rem;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(99, 102, 241, 0.1);
+    border-radius: 10px;
+    transition: all 0.2s;
+}
+
+.analytics-metric:hover {
+    background: rgba(255, 255, 255, 0.05);
+    border-color: rgba(99, 102, 241, 0.2);
+}
+
+.analytics-metric-value {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #fff;
+}
+
+.analytics-metric-label {
+    font-size: 0.75rem;
+    color: rgba(255, 255, 255, 0.5);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.analytics-metric.positive .analytics-metric-value {
+    color: #22c55e;
+}
+
+.analytics-metric.negative .analytics-metric-value {
+    color: #ef4444;
+}
+
+.partner-activity-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.partner-activity-item {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.75rem;
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 10px;
+}
+
+/* ============================================
+   DIRECTORY STYLES
+   ============================================ */
+.fed-directory-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1rem;
+}
+
+.fed-directory-card {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(139, 92, 246, 0.1);
+    border-radius: 14px;
+    padding: 1.5rem;
+    transition: all 0.2s ease;
+}
+
+.fed-directory-card:hover {
+    border-color: rgba(139, 92, 246, 0.3);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+}
+
+.fed-directory-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.fed-directory-logo {
+    width: 56px;
+    height: 56px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, rgba(139, 92, 246, 0.2), rgba(99, 102, 241, 0.1));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 1.25rem;
+    color: #8b5cf6;
+    flex-shrink: 0;
+}
+
+.fed-directory-info h3 {
+    margin: 0 0 4px;
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--admin-text, #fff);
+}
+
+.fed-directory-info p {
+    margin: 0;
+    font-size: 0.85rem;
+    color: var(--admin-text-muted, rgba(255,255,255,0.5));
+}
+
+.fed-directory-stats {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1rem;
+    padding: 0.75rem;
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 8px;
+}
+
+.fed-directory-stat {
+    text-align: center;
+    flex: 1;
+}
+
+.fed-directory-stat-value {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #8b5cf6;
+}
+
+.fed-directory-stat-label {
+    font-size: 0.7rem;
+    color: var(--admin-text-muted, rgba(255,255,255,0.5));
+    text-transform: uppercase;
+}
+
+/* ============================================
+   RESPONSIVE
+   ============================================ */
+@media (max-width: 900px) {
+    .fed-grid-2 {
+        grid-template-columns: 1fr;
+    }
+
+    .partnership-request-card {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+    }
+
+    .partnership-request-actions {
+        width: 100%;
+    }
+}
+
+@media (max-width: 600px) {
+    .fed-status-header {
+        flex-direction: column;
+        text-align: center;
+        gap: 1rem;
+    }
+
+    .fed-status-info {
+        flex-direction: column;
+    }
+
+    .fed-stats-grid {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .fed-quick-actions {
+        justify-content: center;
+    }
+
+    .fed-directory-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* ============================================
+   ACCESSIBILITY - Focus states
+   ============================================ */
+.admin-switch input:focus + .admin-switch-slider {
+    box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.4);
+}
+
+.fed-quick-action:focus,
+.analytics-date-btn:focus,
+.fed-status-toggle:focus {
+    outline: 2px solid #8b5cf6;
+    outline-offset: 2px;
+}
+
+.admin-modal-content:focus {
+    outline: none;
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+    .fed-stat-card,
+    .fed-admin-card,
+    .partnership-request-card {
+        border-width: 2px;
+    }
+
+    .admin-switch-slider {
+        border: 2px solid currentColor;
+    }
+}

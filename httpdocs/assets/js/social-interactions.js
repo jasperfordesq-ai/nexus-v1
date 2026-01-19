@@ -105,11 +105,20 @@
 
     /**
      * Show toast notification
+     * Uses the modern Toast system if available, falls back to basic snackbar
      */
-    SocialInteractions.showToast = function(message) {
+    SocialInteractions.showToast = function(message, type) {
+        type = type || 'success';
+
+        // Use modern Toast system if available
+        if (typeof Toast !== 'undefined' && Toast[type]) {
+            Toast[type](message);
+            return;
+        }
+
+        // Fallback to basic snackbar
         let toast = document.getElementById("snackbar") || document.getElementById("toast");
         if (!toast) {
-            // Create toast element if it doesn't exist
             toast = document.createElement('div');
             toast.id = 'snackbar';
             toast.style.cssText = `
@@ -140,6 +149,13 @@
             toast.style.visibility = "hidden";
             toast.style.opacity = "0";
         }, SocialInteractions.config.toastDuration);
+    };
+
+    /**
+     * Show error toast
+     */
+    SocialInteractions.showError = function(message) {
+        SocialInteractions.showToast(message, 'error');
     };
 
     // ============================================
@@ -336,15 +352,21 @@
                     const word = count === 1 ? 'Like' : 'Likes';
                     labelEl.textContent = count > 0 ? count + ' ' + word : word;
                 }
+                // Show toast feedback for like action
+                if (data.status === 'liked') {
+                    SocialInteractions.showToast('Liked!', 'success');
+                }
             } else {
                 // Revert UI on failure
                 revertLikeUI(icon, btn, isLiked);
+                SocialInteractions.showError('Failed to update like');
                 console.error('Like failed:', data);
             }
         })
         .catch(err => {
             // Revert UI on error
             revertLikeUI(icon, btn, isLiked);
+            SocialInteractions.showError('Connection error. Please try again.');
             console.error('Like error:', err);
         });
     };
@@ -586,15 +608,15 @@
                 input.focus();
                 // Refresh comments to show the new comment
                 SocialInteractions.fetchComments(type, id);
-                SocialInteractions.showToast("Comment posted!");
+                SocialInteractions.showToast("Comment posted!", 'success');
             } else {
-                alert('Error: ' + (data.error || data.message || 'Unknown error'));
+                SocialInteractions.showError(data.error || data.message || 'Failed to post comment');
             }
         })
         .catch(err => {
             input.disabled = false;
             console.error('Submit comment error:', err);
-            alert('Failed to post comment. Please try again.');
+            SocialInteractions.showError('Failed to post comment. Please try again.');
         });
     };
 
@@ -692,9 +714,9 @@
                     SocialInteractions.state.currentCommentTargetType,
                     SocialInteractions.state.currentCommentTargetId
                 );
-                SocialInteractions.showToast("Reply posted!");
+                SocialInteractions.showToast("Reply posted!", 'success');
             } else if (data.error) {
-                alert(data.error);
+                SocialInteractions.showError(data.error);
             }
         });
     };
@@ -725,9 +747,9 @@
                     SocialInteractions.state.currentCommentTargetType,
                     SocialInteractions.state.currentCommentTargetId
                 );
-                SocialInteractions.showToast("Comment updated!");
+                SocialInteractions.showToast("Comment updated!", 'success');
             } else if (data.error) {
-                alert(data.error);
+                SocialInteractions.showError(data.error);
             }
         });
     };
@@ -756,9 +778,9 @@
                     SocialInteractions.state.currentCommentTargetType,
                     SocialInteractions.state.currentCommentTargetId
                 );
-                SocialInteractions.showToast("Comment deleted!");
+                SocialInteractions.showToast("Comment deleted!", 'success');
             } else if (data.error) {
-                alert(data.error);
+                SocialInteractions.showError(data.error);
             }
         });
     };
@@ -797,15 +819,15 @@
         .then(res => res.json())
         .then(data => {
             if (data.status === 'success') {
-                SocialInteractions.showToast("Shared to your feed!");
+                SocialInteractions.showToast("Shared to your feed!", 'success');
                 setTimeout(() => location.reload(), 1000);
             } else {
-                alert("Share failed: " + (data.error || 'Unknown error'));
+                SocialInteractions.showError("Share failed: " + (data.error || 'Unknown error'));
             }
         })
         .catch(err => {
             console.error('Share error:', err);
-            alert("Share failed. Please try again.");
+            SocialInteractions.showError("Share failed. Please try again.");
         });
     };
 
@@ -836,10 +858,10 @@
         .then(res => res.json())
         .then(data => {
             if (data.status === 'deleted' || data.status === 'success') {
-                SocialInteractions.showToast("Post deleted!");
+                SocialInteractions.showToast("Post deleted!", 'success');
                 setTimeout(() => location.reload(), 500);
             } else if (data.error) {
-                alert("Delete failed: " + data.error);
+                SocialInteractions.showError("Delete failed: " + data.error);
             }
         });
     };
@@ -1506,19 +1528,19 @@
         .then(res => res.json())
         .then(data => {
             if (data.status === 'success') {
-                SocialInteractions.showToast("Post created!");
+                SocialInteractions.showToast("Post created!", 'success');
                 if (callback) callback(null, data);
                 else setTimeout(() => location.reload(), 500);
             } else {
                 const error = data.error || 'Failed to create post.';
                 if (callback) callback(error);
-                else alert(error);
+                else SocialInteractions.showError(error);
             }
         })
         .catch(err => {
             const error = err.message || 'Network error';
             if (callback) callback(error);
-            else alert('Failed to create post. Please try again.');
+            else SocialInteractions.showError('Failed to create post. Please try again.');
         });
     };
 

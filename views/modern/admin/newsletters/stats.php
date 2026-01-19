@@ -927,7 +927,12 @@ require dirname(__DIR__) . '/partials/admin-header.php';
         <?php if (!empty($analytics['recent_activity'])): ?>
         <!-- Recent Activity -->
         <div class="glass-card">
-            <h3 class="section-title">Recent Activity</h3>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                <h3 class="section-title" style="margin: 0;">Recent Activity</h3>
+                <a href="<?= $basePath ?>/admin/newsletters/activity/<?= $newsletter['id'] ?>" class="btn-action" style="padding: 6px 12px; font-size: 0.8rem;">
+                    <i class="fa-solid fa-list"></i> View All Activity
+                </a>
+            </div>
 
             <div class="activity-scroll">
                 <table class="data-table">

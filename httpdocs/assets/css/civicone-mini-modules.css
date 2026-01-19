@@ -1,0 +1,339 @@
+/* ============================================
+   CIVICONE MINI MODULES
+   Polls, Goals, Resources - WCAG 2.1 AA Compliant
+   ============================================ */
+
+/* --------------------------------------------
+   WCAG AA Design Tokens
+   -------------------------------------------- */
+:root {
+    /* Text Colors (4.5:1+ contrast on white) */
+    --civic-mini-text-primary: #111827;      /* 12.6:1 */
+    --civic-mini-text-secondary: #374151;    /* 8.5:1 */
+    --civic-mini-text-muted: #4B5563;        /* 7.0:1 */
+
+    /* Focus Ring */
+    --civic-mini-focus-ring: #FFDD00;        /* GOV.UK focus */
+    --civic-mini-focus-text: #0B0C0C;
+    --civic-mini-focus-offset: 3px;
+
+    /* Touch Target */
+    --civic-mini-touch-min: 44px;
+
+    /* Borders */
+    --civic-mini-border: #0B0C0C;
+    --civic-mini-border-light: #E5E7EB;
+}
+
+/* Dark mode tokens */
+[data-theme="dark"] {
+    --civic-mini-text-primary: #F9FAFB;
+    --civic-mini-text-secondary: #E5E7EB;
+    --civic-mini-text-muted: #D1D5DB;
+    --civic-mini-border: #E5E7EB;
+    --civic-mini-border-light: #374151;
+}
+
+
+/* --------------------------------------------
+   Common Module Header
+   -------------------------------------------- */
+.civic-module-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 4px solid var(--civic-mini-border);
+    padding-bottom: 10px;
+    margin-bottom: 30px;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.civic-module-header h2 {
+    margin: 0;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--civic-mini-text-primary);
+}
+
+@media (max-width: 600px) {
+    .civic-module-header {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .civic-module-header .civic-btn {
+        text-align: center;
+    }
+}
+
+
+/* --------------------------------------------
+   Module Grid
+   -------------------------------------------- */
+.civic-module-grid {
+    display: grid;
+    gap: 20px;
+}
+
+.civic-module-grid--cards {
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+}
+
+
+/* --------------------------------------------
+   Empty State
+   -------------------------------------------- */
+.civic-module-empty {
+    text-align: center;
+    padding: 40px;
+}
+
+.civic-module-empty-icon {
+    font-size: 2.5rem;
+    margin-bottom: 10px;
+}
+
+.civic-module-empty-title {
+    font-size: 1.5rem;
+    margin-bottom: 10px;
+    color: var(--civic-mini-text-primary);
+}
+
+.civic-module-empty-text {
+    margin-bottom: 20px;
+    color: var(--civic-mini-text-secondary);
+}
+
+
+/* --------------------------------------------
+   Polls Module
+   -------------------------------------------- */
+.civic-poll-card {
+    background: var(--civic-bg-card, #fff);
+    border: 2px solid var(--civic-mini-border);
+    padding: 24px;
+}
+
+[data-theme="dark"] .civic-poll-card {
+    background: #1F2937;
+}
+
+.civic-poll-card h3 {
+    margin-top: 0;
+    color: var(--civic-mini-text-primary);
+}
+
+.civic-poll-status {
+    margin-bottom: 16px;
+    color: var(--civic-mini-text-secondary);
+}
+
+.civic-poll-status strong {
+    color: var(--civic-mini-text-primary);
+}
+
+.civic-poll-card .civic-btn {
+    min-height: var(--civic-mini-touch-min);
+}
+
+.civic-poll-card .civic-btn:focus {
+    outline: 3px solid var(--civic-mini-focus-ring);
+    outline-offset: 2px;
+}
+
+
+/* --------------------------------------------
+   Goals Module
+   -------------------------------------------- */
+.civic-goal-card {
+    background: var(--civic-bg-card, #fff);
+    border: 2px solid var(--civic-mini-border);
+    padding: 24px;
+}
+
+[data-theme="dark"] .civic-goal-card {
+    background: #1F2937;
+}
+
+.civic-goal-card h3 {
+    margin-top: 0;
+    color: var(--civic-mini-text-primary);
+}
+
+.civic-goal-progress-bar {
+    background: #eee;
+    height: 12px;
+    border-radius: 6px;
+    margin: 15px 0;
+    border: 1px solid #999;
+    overflow: hidden;
+}
+
+[data-theme="dark"] .civic-goal-progress-bar {
+    background: #374151;
+    border-color: #4B5563;
+}
+
+.civic-goal-progress-fill {
+    background: var(--civic-mini-border);
+    height: 100%;
+    transition: width 0.3s ease;
+}
+
+[data-theme="dark"] .civic-goal-progress-fill {
+    background: #5EEAD4;
+}
+
+.civic-goal-percent {
+    font-weight: 600;
+    color: var(--civic-mini-text-primary);
+    margin-bottom: 16px;
+}
+
+.civic-goal-btn-outline {
+    background: white;
+    color: var(--civic-mini-border);
+    border: 2px solid var(--civic-mini-border);
+    min-height: var(--civic-mini-touch-min);
+    padding: 10px 20px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+[data-theme="dark"] .civic-goal-btn-outline {
+    background: #1F2937;
+    color: #F9FAFB;
+}
+
+.civic-goal-btn-outline:hover {
+    background: var(--civic-mini-border);
+    color: white;
+}
+
+.civic-goal-btn-outline:focus {
+    outline: 3px solid var(--civic-mini-focus-ring);
+    outline-offset: 2px;
+}
+
+
+/* --------------------------------------------
+   Resources Module
+   -------------------------------------------- */
+.civic-resource-card {
+    background: var(--civic-bg-card, #fff);
+    border: 2px solid var(--civic-mini-border);
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+[data-theme="dark"] .civic-resource-card {
+    background: #1F2937;
+}
+
+.civic-resource-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 10px;
+}
+
+.civic-resource-icon {
+    font-size: 2.5rem;
+}
+
+.civic-resource-size {
+    background: var(--civic-mini-border);
+    color: #fff;
+    padding: 4px 10px;
+    font-weight: bold;
+    border-radius: 4px;
+    font-size: 0.8rem;
+}
+
+[data-theme="dark"] .civic-resource-size {
+    background: #4B5563;
+}
+
+.civic-resource-card h3 {
+    margin: 0 0 10px;
+    font-size: 1.3rem;
+    color: var(--civic-mini-text-primary);
+}
+
+.civic-resource-description {
+    font-size: 1rem;
+    line-height: 1.5;
+    margin-bottom: 10px;
+    color: var(--civic-mini-text-secondary);
+}
+
+.civic-resource-meta {
+    font-size: 0.85rem;
+    border-top: 1px solid var(--civic-mini-border-light);
+    padding-top: 10px;
+    margin-top: auto;
+    margin-bottom: 15px;
+    color: var(--civic-mini-text-muted);
+}
+
+.civic-resource-meta strong {
+    color: var(--civic-mini-text-primary);
+}
+
+.civic-resource-download {
+    width: 100%;
+    display: block;
+    text-align: center;
+    min-height: var(--civic-mini-touch-min);
+}
+
+.civic-resource-download:focus {
+    outline: 3px solid var(--civic-mini-focus-ring);
+    outline-offset: 2px;
+}
+
+
+/* --------------------------------------------
+   Focus States - WCAG Compliant
+   -------------------------------------------- */
+.civic-poll-card a:focus,
+.civic-goal-card a:focus,
+.civic-resource-card a:focus {
+    outline: 3px solid var(--civic-mini-focus-ring);
+    outline-offset: 2px;
+}
+
+
+/* --------------------------------------------
+   High Contrast Mode Support
+   -------------------------------------------- */
+@media (prefers-contrast: high) {
+    .civic-poll-card,
+    .civic-goal-card,
+    .civic-resource-card {
+        border-width: 3px;
+    }
+
+    .civic-goal-progress-bar {
+        border-width: 2px;
+    }
+
+    .civic-goal-btn-outline {
+        border-width: 3px;
+    }
+}
+
+
+/* --------------------------------------------
+   Reduced Motion Support
+   -------------------------------------------- */
+@media (prefers-reduced-motion: reduce) {
+    .civic-goal-progress-fill,
+    .civic-goal-btn-outline {
+        transition: none;
+    }
+}

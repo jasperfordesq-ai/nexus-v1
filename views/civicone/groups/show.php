@@ -1,5 +1,6 @@
 <?php
-// CivicOne Group Details View
+// CivicOne Group Details View - WCAG 2.1 AA Compliant
+// CSS extracted to civicone-groups.css
 $pageTitle = htmlspecialchars($group['name']) . ' - Nexus TimeBank';
 require __DIR__ . '/../../layouts/civicone/header.php';
 
@@ -9,131 +10,6 @@ function get_avatar_civic($url)
     return $url ?: ''; // Empty returns trigger SVG fallback
 }
 ?>
-
-<style>
-    /* Tab System Styling */
-    .civic-tab-nav {
-        display: flex;
-        border-bottom: 2px solid #e5e7eb;
-        margin-bottom: 30px;
-        gap: 20px;
-    }
-
-    .civic-tab-link {
-        padding: 12px 16px;
-        font-weight: 600;
-        color: var(--civic-text-muted, #6b7280);
-        text-decoration: none;
-        border-bottom: 3px solid transparent;
-        transition: all 0.2s;
-        cursor: pointer;
-        font-size: 1rem;
-    }
-
-    .civic-tab-link:hover {
-        color: var(--civic-text-main, #111827);
-    }
-
-    .civic-tab-link.active {
-        color: var(--civic-brand, #00796B);
-        border-bottom-color: var(--civic-brand, #00796B);
-    }
-
-    .civic-tab-pane {
-        display: none;
-        animation: fadeIn 0.3s ease-in-out;
-    }
-
-    .civic-tab-pane.active {
-        display: block;
-    }
-
-    /* Hero / Header Styling */
-    .civic-group-header {
-        background: #ffffff;
-        border-radius: 8px;
-        overflow: hidden;
-        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-        margin-bottom: 30px;
-        border: 1px solid #e5e7eb;
-    }
-
-    .civic-group-cover {
-        height: 200px;
-        background: linear-gradient(135deg, var(--civic-brand) 0%, #004d40 100%);
-        position: relative;
-    }
-
-    .civic-group-info {
-        padding: 20px 30px;
-    }
-
-    @keyframes fadeIn {
-        from {
-            opacity: 0;
-            transform: translateY(5px);
-        }
-
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
-    }
-
-    /* Mobile Responsive Styles */
-    .civic-group-content-grid {
-        display: grid;
-        grid-template-columns: 1fr 300px;
-        gap: 30px;
-        align-items: start;
-    }
-
-    @media (max-width: 900px) {
-        .civic-group-content-grid {
-            grid-template-columns: 1fr;
-        }
-        .civic-group-content-grid aside {
-            order: -1;
-        }
-    }
-
-    @media (max-width: 600px) {
-        .civic-tab-nav {
-            overflow-x: auto;
-            -webkit-overflow-scrolling: touch;
-            scrollbar-width: none;
-            -ms-overflow-style: none;
-            gap: 0;
-        }
-        .civic-tab-nav::-webkit-scrollbar {
-            display: none;
-        }
-        .civic-tab-link {
-            white-space: nowrap;
-            padding: 12px 14px;
-            flex-shrink: 0;
-        }
-        .civic-group-info {
-            padding: 16px !important;
-        }
-        .civic-group-info > div:first-child h1 {
-            font-size: 1.5rem !important;
-        }
-        .civic-group-header-content {
-            flex-direction: column;
-            align-items: stretch !important;
-            gap: 16px !important;
-        }
-        .civic-group-header-content > div:last-child {
-            width: 100%;
-        }
-        .civic-group-header-content .civic-btn {
-            width: 100%;
-            text-align: center;
-            justify-content: center;
-        }
-    }
-</style>
 
 <div class="civic-container" style="max-width: 1200px; margin: 0 auto; padding: 20px;">
 

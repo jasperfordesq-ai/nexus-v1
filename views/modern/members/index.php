@@ -121,6 +121,20 @@ $basePath = Nexus\Core\TenantContext::getBasePath();
             <h2>Community Members</h2>
         </div>
 
+        <!-- Members Grid Skeleton (shown during search/loading) -->
+        <div id="members-skeleton" class="members-grid" style="display: none;" aria-label="Loading members">
+            <?php for ($i = 0; $i < 6; $i++): ?>
+            <div class="member-card-skeleton">
+                <div class="skeleton skeleton-avatar"></div>
+                <div class="skeleton skeleton-name"></div>
+                <div class="skeleton skeleton-location"></div>
+                <div class="skeleton skeleton-bio"></div>
+                <div class="skeleton skeleton-bio"></div>
+                <div class="skeleton skeleton-button"></div>
+            </div>
+            <?php endfor; ?>
+        </div>
+
         <!-- Members Grid -->
         <div id="members-grid" class="members-grid">
             <?php if (!empty($members)): ?>
@@ -241,6 +255,7 @@ function render_glass_member_card($member, $basePath, $orgRoles = [])
     document.addEventListener('DOMContentLoaded', function() {
         const searchInput = document.getElementById('member-search');
         const grid = document.getElementById('members-grid');
+        const skeleton = document.getElementById('members-skeleton');
         const countLabel = document.getElementById('members-count');
         const spinner = document.getElementById('search-spinner');
         const nearbyBtn = document.getElementById('nearby-btn');
@@ -304,6 +319,12 @@ function render_glass_member_card($member, $basePath, $orgRoles = [])
             spinner.style.display = 'block';
             updateLocationStatus('detecting', 'Finding nearby members...');
 
+            // Show skeleton during nearby search
+            if (skeleton) {
+                skeleton.style.display = 'grid';
+                grid.style.display = 'none';
+            }
+
             const url = window.location.pathname + '?filter=nearby&radius=' + radius;
 
             fetch(url, {
@@ -333,11 +354,21 @@ function render_glass_member_card($member, $basePath, $orgRoles = [])
                         updateLocationStatus('success', 'No nearby members with coordinates');
                     }
                     spinner.style.display = 'none';
+                    // Hide skeleton, show grid
+                    if (skeleton) {
+                        skeleton.style.display = 'none';
+                        grid.style.display = 'grid';
+                    }
                 })
                 .catch(err => {
                     console.error('Nearby fetch error:', err);
                     spinner.style.display = 'none';
                     updateLocationStatus('error', 'Connection error');
+                    // Hide skeleton on error
+                    if (skeleton) {
+                        skeleton.style.display = 'none';
+                        grid.style.display = 'grid';
+                    }
                     // Show helpful error in grid
                     grid.innerHTML = `
                 <div class="glass-empty-state">
@@ -356,6 +387,12 @@ function render_glass_member_card($member, $basePath, $orgRoles = [])
             const url = query.length > 0 ?
                 window.location.pathname + '?q=' + encodeURIComponent(query) :
                 window.location.pathname;
+
+            // Show skeleton, hide grid during search
+            if (skeleton) {
+                skeleton.style.display = 'grid';
+                grid.style.display = 'none';
+            }
 
             fetch(url, {
                     headers: {
@@ -378,10 +415,20 @@ function render_glass_member_card($member, $basePath, $orgRoles = [])
                     renderGrid(data.data);
                     countLabel.textContent = `Showing ${data.data.length} members`;
                     spinner.style.display = 'none';
+                    // Hide skeleton, show grid
+                    if (skeleton) {
+                        skeleton.style.display = 'none';
+                        grid.style.display = 'grid';
+                    }
                 })
                 .catch(err => {
                     console.error(err);
                     spinner.style.display = 'none';
+                    // Hide skeleton on error too
+                    if (skeleton) {
+                        skeleton.style.display = 'none';
+                        grid.style.display = 'grid';
+                    }
                 });
         }
 

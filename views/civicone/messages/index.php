@@ -1,51 +1,53 @@
 <?php
-// CivicOne View: Messages Inbox
+// CivicOne View: Messages Inbox - WCAG 2.1 AA Compliant
+// CSS extracted to civicone-messages.css
 $pageTitle = 'My Messages';
 require dirname(__DIR__, 2) . '/layouts/civicone/header.php';
 ?>
 
 <div class="civic-container">
 
-    <div style="margin-bottom: 30px; border-bottom: 4px solid var(--skin-primary, #00796B); padding-bottom: 10px;">
-        <h1 style="margin: 0; text-transform: uppercase;">Inbox</h1>
+    <div class="civic-msg-header">
+        <h1>Inbox</h1>
     </div>
 
     <div class="civic-card">
         <?php if (empty($threads)): ?>
-            <div style="text-align: center; padding: 40px; color: var(--civic-text-secondary, #4B5563);">
-                <p style="font-size: 1.2rem;">You have no messages yet.</p>
-                <div style="margin-top: 20px;">
+            <div class="civic-msg-empty">
+                <p>You have no messages yet.</p>
+                <div>
                     <a href="<?= Nexus\Core\TenantContext::getBasePath() ?>/listings" class="civic-btn">Browse Listings</a>
                 </div>
             </div>
         <?php else: ?>
-            <ul style="list-style: none; padding: 0; margin: 0;">
+            <ul class="civic-thread-list" role="list">
                 <?php foreach ($threads as $thread):
                     // Check if this message is unread (receiver is current user and not read)
                     $isUnread = ($thread['receiver_id'] == ($_SESSION['user_id'] ?? 0) && !$thread['is_read']);
-                    $bgColor = $isUnread ? '#f0fdf4' : 'transparent';
-                    $fontWeight = $isUnread ? 'bold' : 'normal';
+                    $itemClass = $isUnread ? 'civic-thread-item civic-thread-item--unread' : 'civic-thread-item';
+                    $nameClass = $isUnread ? 'civic-thread-name civic-thread-name--unread' : 'civic-thread-name';
+                    $previewClass = $isUnread ? 'civic-thread-preview civic-thread-preview--unread' : 'civic-thread-preview';
                 ?>
-                    <li style="border-bottom: 1px solid #eee; background-color: <?= $bgColor ?>;">
-                        <a href="<?= Nexus\Core\TenantContext::getBasePath() ?>/messages/<?= $thread['other_user_id'] ?>" style="display: block; padding: 20px; text-decoration: none; color: inherit; transition: background 0.2s;">
-                            <div style="display: flex; justify-content: space-between; align-items: center;">
-                                <div>
-                                    <div style="font-size: 1.1rem; color: var(--skin-primary); font-weight: <?= $fontWeight ?>;">
+                    <li class="<?= $itemClass ?>" role="listitem">
+                        <a href="<?= Nexus\Core\TenantContext::getBasePath() ?>/messages/<?= $thread['other_user_id'] ?>"
+                           class="civic-thread-link"
+                           aria-label="Message thread with <?= htmlspecialchars($thread['other_user_name']) ?><?= $isUnread ? ' (unread)' : '' ?>">
+                            <div class="civic-thread-content">
+                                <div class="civic-thread-info">
+                                    <div class="<?= $nameClass ?>">
                                         <?= htmlspecialchars($thread['other_user_name']) ?>
                                     </div>
-                                    <div style="color: var(--civic-text-secondary, #4B5563); margin-top: 5px; font-weight: <?= $fontWeight ?>;">
+                                    <div class="<?= $previewClass ?>">
                                         <?= htmlspecialchars(mb_strimwidth($thread['body'], 0, 60, "...")) ?>
                                     </div>
                                 </div>
-                                <div style="text-align: right; min-width: 100px;">
+                                <div class="civic-thread-meta">
                                     <?php if ($isUnread): ?>
-                                        <span style="background: var(--skin-primary); color: white; border-radius: 50%; padding: 4px 8px; font-size: 0.8rem; margin-right: 10px;">
-                                            New
-                                        </span>
+                                        <span class="civic-thread-badge" aria-label="New message">New</span>
                                     <?php endif; ?>
-                                    <span style="font-size: 0.9rem; color: #999;">
+                                    <time class="civic-thread-date" datetime="<?= $thread['created_at'] ?>">
                                         <?= date('M j', strtotime($thread['created_at'])) ?>
-                                    </span>
+                                    </time>
                                 </div>
                             </div>
                         </a>

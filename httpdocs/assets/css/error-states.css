@@ -1,0 +1,631 @@
+/**
+ * Error State Polish
+ * Friendly error pages with animations
+ * Version: 1.0 - 2026-01-19
+ *
+ * Features:
+ * - Animated error illustrations
+ * - Friendly error messages
+ * - 404, 500, and general error states
+ * - Connection/offline states
+ * - Dark mode support
+ */
+
+/* ==========================================================================
+   Animations
+   ========================================================================== */
+
+@keyframes error-float {
+    0%, 100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-10px);
+    }
+}
+
+@keyframes error-shake {
+    0%, 100% { transform: rotate(0deg); }
+    25% { transform: rotate(-5deg); }
+    75% { transform: rotate(5deg); }
+}
+
+@keyframes error-pulse {
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.5;
+    }
+}
+
+@keyframes error-bounce {
+    0%, 100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-20px);
+    }
+}
+
+@keyframes error-slide-up {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes error-fade-in {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes error-spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+@keyframes error-glitch {
+    0% { transform: translate(0); }
+    20% { transform: translate(-2px, 2px); }
+    40% { transform: translate(-2px, -2px); }
+    60% { transform: translate(2px, 2px); }
+    80% { transform: translate(2px, -2px); }
+    100% { transform: translate(0); }
+}
+
+/* ==========================================================================
+   Error Page Container
+   ========================================================================== */
+
+.error-page {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 60vh;
+    padding: 2rem;
+    text-align: center;
+    animation: error-fade-in 0.5s ease-out;
+}
+
+.error-page-content {
+    max-width: 500px;
+    animation: error-slide-up 0.6s ease-out;
+    animation-delay: 0.1s;
+    animation-fill-mode: both;
+}
+
+/* ==========================================================================
+   Error Illustration
+   ========================================================================== */
+
+.error-illustration {
+    width: 200px;
+    height: 200px;
+    margin: 0 auto 2rem;
+    position: relative;
+}
+
+/* Floating animation for illustration */
+.error-illustration--float {
+    animation: error-float 3s ease-in-out infinite;
+}
+
+/* Glitch effect for 500 errors */
+.error-illustration--glitch {
+    animation: error-glitch 0.5s ease-in-out infinite;
+}
+
+/* Error icon circle */
+.error-icon-circle {
+    width: 120px;
+    height: 120px;
+    margin: 0 auto 1.5rem;
+    background: linear-gradient(135deg, rgba(239, 68, 68, 0.1), rgba(239, 68, 68, 0.2));
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    animation: error-float 3s ease-in-out infinite;
+}
+
+.error-icon-circle i {
+    font-size: 48px;
+    color: #ef4444;
+}
+
+/* Warning variant */
+.error-icon-circle--warning {
+    background: linear-gradient(135deg, rgba(245, 158, 11, 0.1), rgba(245, 158, 11, 0.2));
+}
+
+.error-icon-circle--warning i {
+    color: #f59e0b;
+}
+
+/* Info variant */
+.error-icon-circle--info {
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(59, 130, 246, 0.2));
+}
+
+.error-icon-circle--info i {
+    color: #3b82f6;
+}
+
+/* ==========================================================================
+   Error Code Display
+   ========================================================================== */
+
+.error-code {
+    font-size: 6rem;
+    font-weight: 800;
+    line-height: 1;
+    background: linear-gradient(135deg, #ef4444, #f97316);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 1rem;
+    animation: error-slide-up 0.5s ease-out;
+}
+
+/* 404 specific - Ghost effect */
+.error-code--404 {
+    position: relative;
+}
+
+.error-code--404::before {
+    content: '404';
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    background: linear-gradient(135deg, #3b82f6, #6366f1);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    opacity: 0.3;
+    z-index: -1;
+}
+
+/* 500 specific - Glitch effect */
+.error-code--500 {
+    animation: error-glitch 0.3s ease-in-out infinite;
+}
+
+/* ==========================================================================
+   Error Title & Message
+   ========================================================================== */
+
+.error-title {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: #111827;
+    margin-bottom: 0.75rem;
+    animation: error-slide-up 0.6s ease-out;
+    animation-delay: 0.15s;
+    animation-fill-mode: both;
+}
+
+.error-message {
+    font-size: 1rem;
+    color: #6b7280;
+    line-height: 1.6;
+    margin-bottom: 2rem;
+    animation: error-slide-up 0.6s ease-out;
+    animation-delay: 0.2s;
+    animation-fill-mode: both;
+}
+
+/* ==========================================================================
+   Error Actions
+   ========================================================================== */
+
+.error-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    justify-content: center;
+    animation: error-slide-up 0.6s ease-out;
+    animation-delay: 0.25s;
+    animation-fill-mode: both;
+}
+
+.error-btn {
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.2s ease;
+}
+
+.error-btn--primary {
+    background: linear-gradient(135deg, #6366f1, #8b5cf6);
+    color: white;
+}
+
+.error-btn--primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4);
+}
+
+.error-btn--secondary {
+    background: #f3f4f6;
+    color: #374151;
+}
+
+.error-btn--secondary:hover {
+    background: #e5e7eb;
+}
+
+/* ==========================================================================
+   Inline Error States
+   ========================================================================== */
+
+/* Empty state / No results */
+.empty-state,
+.no-results {
+    padding: 3rem 1.5rem;
+    text-align: center;
+    animation: error-fade-in 0.3s ease-out;
+}
+
+.empty-state-icon {
+    width: 80px;
+    height: 80px;
+    margin: 0 auto 1.5rem;
+    background: linear-gradient(135deg, #f3f4f6, #e5e7eb);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    animation: error-float 3s ease-in-out infinite;
+}
+
+.empty-state-icon i {
+    font-size: 32px;
+    color: #9ca3af;
+}
+
+.empty-state-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #374151;
+    margin-bottom: 0.5rem;
+}
+
+.empty-state-message {
+    font-size: 0.9375rem;
+    color: #6b7280;
+    margin-bottom: 1.5rem;
+}
+
+/* ==========================================================================
+   Connection/Offline States
+   ========================================================================== */
+
+.offline-banner {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 1rem;
+    background: linear-gradient(135deg, #fef3c7, #fde68a);
+    color: #92400e;
+    text-align: center;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    z-index: 9999;
+    animation: error-slide-up 0.3s ease-out;
+    border-top: 1px solid rgba(146, 64, 14, 0.2);
+}
+
+.offline-banner i {
+    font-size: 1.25rem;
+    animation: error-pulse 2s ease-in-out infinite;
+}
+
+.offline-banner--error {
+    background: linear-gradient(135deg, #fee2e2, #fecaca);
+    color: #991b1b;
+    border-top-color: rgba(153, 27, 27, 0.2);
+}
+
+.online-toast {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 0.75rem 1.5rem;
+    background: #22c55e;
+    color: white;
+    border-radius: 8px;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    z-index: 9999;
+    animation: error-slide-up 0.3s ease-out;
+    box-shadow: 0 4px 12px rgba(34, 197, 94, 0.3);
+}
+
+/* ==========================================================================
+   Loading Error State
+   ========================================================================== */
+
+.load-error {
+    padding: 2rem;
+    text-align: center;
+    border: 1px dashed #e5e7eb;
+    border-radius: 12px;
+    background: #fafafa;
+}
+
+.load-error-icon {
+    width: 48px;
+    height: 48px;
+    margin: 0 auto 1rem;
+    color: #ef4444;
+}
+
+.load-error-icon i {
+    font-size: 48px;
+}
+
+.load-error-message {
+    font-size: 0.9375rem;
+    color: #6b7280;
+    margin-bottom: 1rem;
+}
+
+.load-error-retry {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    background: white;
+    border: 1px solid #e5e7eb;
+    border-radius: 6px;
+    color: #374151;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.load-error-retry:hover {
+    background: #f9fafb;
+    border-color: #d1d5db;
+}
+
+.load-error-retry.loading i {
+    animation: error-spin 1s linear infinite;
+}
+
+/* ==========================================================================
+   Permission Denied
+   ========================================================================== */
+
+.permission-denied {
+    padding: 3rem;
+    text-align: center;
+    background: linear-gradient(135deg, #fef2f2, #fee2e2);
+    border-radius: 12px;
+    border: 1px solid rgba(239, 68, 68, 0.2);
+}
+
+.permission-denied-icon {
+    width: 64px;
+    height: 64px;
+    margin: 0 auto 1.5rem;
+    background: rgba(239, 68, 68, 0.1);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.permission-denied-icon i {
+    font-size: 28px;
+    color: #ef4444;
+}
+
+/* ==========================================================================
+   Session Expired
+   ========================================================================== */
+
+.session-expired {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10000;
+    animation: error-fade-in 0.3s ease-out;
+}
+
+.session-expired-modal {
+    background: white;
+    border-radius: 16px;
+    padding: 2rem;
+    max-width: 400px;
+    text-align: center;
+    animation: error-slide-up 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* ==========================================================================
+   Maintenance Mode
+   ========================================================================== */
+
+.maintenance-page {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #f0f9ff, #e0f2fe);
+    padding: 2rem;
+}
+
+.maintenance-icon {
+    width: 120px;
+    height: 120px;
+    margin-bottom: 2rem;
+    animation: error-bounce 2s ease-in-out infinite;
+}
+
+.maintenance-icon i {
+    font-size: 80px;
+    color: #3b82f6;
+}
+
+/* ==========================================================================
+   Mobile Adjustments
+   ========================================================================== */
+
+@media (max-width: 640px) {
+    .error-code {
+        font-size: 4rem;
+    }
+
+    .error-title {
+        font-size: 1.5rem;
+    }
+
+    .error-actions {
+        flex-direction: column;
+    }
+
+    .error-btn {
+        width: 100%;
+        text-align: center;
+    }
+
+    .offline-banner {
+        padding: 0.875rem;
+        font-size: 0.875rem;
+    }
+}
+
+/* ==========================================================================
+   Dark Mode
+   ========================================================================== */
+
+[data-theme="dark"] .error-title {
+    color: #f3f4f6;
+}
+
+[data-theme="dark"] .error-message {
+    color: #9ca3af;
+}
+
+[data-theme="dark"] .error-btn--secondary {
+    background: #374151;
+    color: #e5e7eb;
+}
+
+[data-theme="dark"] .error-btn--secondary:hover {
+    background: #4b5563;
+}
+
+[data-theme="dark"] .empty-state-icon {
+    background: linear-gradient(135deg, #374151, #1f2937);
+}
+
+[data-theme="dark"] .empty-state-icon i {
+    color: #6b7280;
+}
+
+[data-theme="dark"] .empty-state-title {
+    color: #e5e7eb;
+}
+
+[data-theme="dark"] .empty-state-message {
+    color: #9ca3af;
+}
+
+[data-theme="dark"] .load-error {
+    background: #1f2937;
+    border-color: #374151;
+}
+
+[data-theme="dark"] .load-error-retry {
+    background: #374151;
+    border-color: #4b5563;
+    color: #e5e7eb;
+}
+
+[data-theme="dark"] .permission-denied {
+    background: linear-gradient(135deg, #1f1818, #2d1f1f);
+    border-color: rgba(239, 68, 68, 0.3);
+}
+
+[data-theme="dark"] .session-expired-modal {
+    background: #1f2937;
+}
+
+[data-theme="dark"] .offline-banner {
+    background: linear-gradient(135deg, #422006, #78350f);
+    color: #fde68a;
+    border-top-color: rgba(253, 230, 138, 0.2);
+}
+
+[data-theme="dark"] .offline-banner--error {
+    background: linear-gradient(135deg, #450a0a, #7f1d1d);
+    color: #fecaca;
+}
+
+[data-theme="dark"] .maintenance-page {
+    background: linear-gradient(135deg, #0f172a, #1e293b);
+}
+
+/* ==========================================================================
+   Reduced Motion
+   ========================================================================== */
+
+@media (prefers-reduced-motion: reduce) {
+    .error-illustration--float,
+    .error-illustration--glitch,
+    .error-icon-circle,
+    .empty-state-icon,
+    .maintenance-icon,
+    .error-code--500 {
+        animation: none;
+    }
+
+    .error-page,
+    .error-page-content,
+    .error-code,
+    .error-title,
+    .error-message,
+    .error-actions,
+    .offline-banner,
+    .online-toast,
+    .session-expired,
+    .session-expired-modal {
+        animation: none;
+    }
+
+    .offline-banner i {
+        animation: none;
+    }
+}
+
+/* ==========================================================================
+   Print - Hide interactive elements
+   ========================================================================== */
+
+@media print {
+    .error-actions,
+    .load-error-retry,
+    .offline-banner,
+    .online-toast {
+        display: none !important;
+    }
+}

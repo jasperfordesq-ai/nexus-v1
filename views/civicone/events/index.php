@@ -1,5 +1,6 @@
 <?php
 // CivicOne View: Events Index
+// WCAG 2.1 AA Compliant - External CSS in civicone-events.css
 $heroTitle = "Community Events";
 $heroSub = "Connect, learn, and celebrate with your neighbors.";
 $heroType = 'Gatherings';
@@ -16,31 +17,20 @@ require dirname(__DIR__, 2) . '/layouts/civicone/header.php';
     require dirname(__DIR__, 2) . '/layouts/civicone/partials/breadcrumb.php';
     ?>
 
-    <div class="civic-events-header" style="display: flex; justify-content: space-between; align-items: center; border-bottom: 4px solid #000; padding-bottom: 10px; margin-bottom: 30px; flex-wrap: wrap; gap: 12px;">
-        <h2 style="margin: 0; text-transform: uppercase; letter-spacing: 1px;">Upcoming Gatherings</h2>
-        <a href="<?= Nexus\Core\TenantContext::getBasePath() ?>/events/create" class="civic-btn" style="padding: 10px 20px;">+ Host Event</a>
+    <div class="civic-events-header">
+        <h2>Upcoming Gatherings</h2>
+        <a href="<?= Nexus\Core\TenantContext::getBasePath() ?>/events/create" class="civic-btn">+ Host Event</a>
     </div>
 
-    <style>
-        @media (max-width: 600px) {
-            .civic-events-header {
-                flex-direction: column;
-                align-items: stretch !important;
-            }
-            .civic-events-header .civic-btn {
-                text-align: center;
-            }
-        }
-    </style>
-
     <?php if (empty($events)): ?>
-        <div class="civic-card" style="text-align: center; padding: 40px;">
-            <p style="font-size: 1.5rem; margin-bottom: 10px;">📅 No upcoming events.</p>
-            <p style="margin-bottom: 20px;">Be the first to host a gathering!</p>
+        <div class="civic-card civic-empty-state">
+            <p class="civic-empty-icon" aria-hidden="true">📅</p>
+            <p class="civic-empty-title">No upcoming events.</p>
+            <p class="civic-empty-text">Be the first to host a gathering!</p>
             <a href="<?= Nexus\Core\TenantContext::getBasePath() ?>/events/create" class="civic-btn">Create Event</a>
         </div>
     <?php else: ?>
-        <div style="display: grid; gap: 20px;">
+        <div class="civic-events-grid" role="list">
             <?php foreach ($events as $ev): ?>
                 <?php
                 $date = strtotime($ev['start_time']);
@@ -48,37 +38,38 @@ require dirname(__DIR__, 2) . '/layouts/civicone/header.php';
                 $day = date('d', $date);
                 $time = date('g:i A', $date);
                 ?>
-                <div class="civic-card">
-                    <div style="display: flex; gap: 20px; align-items: flex-start; flex-wrap: wrap;">
+                <article class="civic-card" role="listitem">
+                    <div class="civic-event-card-layout">
 
                         <!-- Date Box (High Contrast) -->
-                        <div style="background: #000; color: #fff; padding: 15px; text-align: center; min-width: 80px; border-radius: 4px;">
-                            <div style="font-size: 1rem; text-transform: uppercase; font-weight: bold;"><?= $month ?></div>
-                            <div style="font-size: 2rem; font-weight: 900; line-height: 1;"><?= $day ?></div>
+                        <div class="civic-event-date-box" aria-hidden="true">
+                            <div class="civic-event-date-month"><?= $month ?></div>
+                            <div class="civic-event-date-day"><?= $day ?></div>
                         </div>
 
                         <!-- Content -->
-                        <div style="flex: 1; min-width: 250px;">
-                            <h3 style="margin: 0 0 5px 0; font-size: 1.5rem;">
+                        <div class="civic-event-content">
+                            <h3>
                                 <a href="<?= Nexus\Core\TenantContext::getBasePath() ?>/events/<?= $ev['id'] ?>"
-                                   aria-label="View event: <?= htmlspecialchars($ev['title']) ?> on <?= date('F j, Y', strtotime($ev['start_time'])) ?> at <?= htmlspecialchars($ev['location']) ?>"
-                                   style="color: #000; text-decoration: underline;">
+                                   aria-label="View event: <?= htmlspecialchars($ev['title']) ?> on <?= date('F j, Y', strtotime($ev['start_time'])) ?> at <?= htmlspecialchars($ev['location']) ?>">
                                     <?= htmlspecialchars($ev['title']) ?>
                                 </a>
                             </h3>
 
-                            <div style="font-weight: bold; margin-bottom: 10px; font-size: 1.1rem;">
-                                ⏰ <?= $time ?> &nbsp;|&nbsp; 📍 <?= htmlspecialchars($ev['location']) ?>
+                            <div class="civic-event-meta">
+                                <span aria-label="Time">⏰ <?= $time ?></span>
+                                <span aria-hidden="true"> | </span>
+                                <span aria-label="Location">📍 <?= htmlspecialchars($ev['location']) ?></span>
                             </div>
 
-                            <p style="font-size: 1.1rem; line-height: 1.5; margin-bottom: 10px;">
+                            <p class="civic-event-description">
                                 <?= substr(htmlspecialchars($ev['description']), 0, 150) ?>...
                             </p>
 
-                            <div style="font-size: 0.95rem; font-style: italic;">
+                            <div class="civic-event-host">
                                 Hosted by <?= htmlspecialchars($ev['organizer_name']) ?>
                                 <?php if ($ev['attendee_count'] > 0): ?>
-                                    <span style="font-style: normal; font-weight: bold; background: #eee; padding: 2px 6px; margin-left: 10px; border: 1px solid #999;">
+                                    <span class="civic-event-attendees" aria-label="<?= $ev['attendee_count'] ?> people attending">
                                         <?= $ev['attendee_count'] ?> Going
                                     </span>
                                 <?php endif; ?>
@@ -86,14 +77,13 @@ require dirname(__DIR__, 2) . '/layouts/civicone/header.php';
                         </div>
 
                         <!-- Action -->
-                        <div style="align-self: center;">
+                        <div class="civic-event-action">
                             <a href="<?= Nexus\Core\TenantContext::getBasePath() ?>/events/<?= $ev['id'] ?>"
                                class="civic-btn"
-                               aria-label="View details and RSVP for <?= htmlspecialchars($ev['title']) ?>"
-                               style="white-space: nowrap;">View & RSVP</a>
+                               aria-label="View details and RSVP for <?= htmlspecialchars($ev['title']) ?>">View & RSVP</a>
                         </div>
                     </div>
-                </div>
+                </article>
             <?php endforeach; ?>
         </div>
     <?php endif; ?>

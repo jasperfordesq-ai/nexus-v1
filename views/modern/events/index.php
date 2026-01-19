@@ -102,8 +102,36 @@ $base = Nexus\Core\TenantContext::getBasePath();
         <h2>Upcoming Events</h2>
     </div>
 
+    <!-- Skeleton Loader (shown during initial load / AJAX) -->
+    <div class="events-skeleton-grid skeleton-container" id="eventsSkeleton" aria-label="Loading events">
+        <?php for ($i = 0; $i < 6; $i++): ?>
+        <div class="event-card-skeleton">
+            <div class="skeleton-date-header">
+                <div class="skeleton skeleton-date-box"></div>
+                <div class="skeleton-time-location">
+                    <div class="skeleton skeleton-text" style="width: 60px; height: 14px;"></div>
+                    <div class="skeleton skeleton-text" style="width: 120px; height: 12px;"></div>
+                </div>
+            </div>
+            <div class="skeleton-body">
+                <div class="skeleton skeleton-title"></div>
+                <div class="skeleton skeleton-desc"></div>
+                <div class="skeleton skeleton-desc"></div>
+                <div class="skeleton-host">
+                    <div class="skeleton skeleton-avatar small"></div>
+                    <div class="skeleton skeleton-text" style="width: 100px; height: 14px; margin: 0;"></div>
+                </div>
+            </div>
+            <div class="skeleton-footer">
+                <div class="skeleton skeleton-text" style="width: 80px; height: 14px; margin: 0;"></div>
+                <div class="skeleton skeleton-text" style="width: 50px; height: 14px; margin: 0;"></div>
+            </div>
+        </div>
+        <?php endfor; ?>
+    </div>
+
     <!-- Events Grid -->
-    <div class="events-grid">
+    <div class="events-grid" id="eventsGrid">
         <?php if (!empty($events)): ?>
             <?php foreach ($events as $ev): ?>
                 <?php
@@ -171,6 +199,19 @@ $base = Nexus\Core\TenantContext::getBasePath();
 // ============================================
 // GOLD STANDARD - Native App Features
 // ============================================
+
+// Skeleton Loader Transition
+(function initSkeletonLoader() {
+    const skeleton = document.getElementById('eventsSkeleton');
+    const grid = document.getElementById('eventsGrid');
+    if (!skeleton || !grid) return;
+
+    // Hide skeleton and show content after short delay for smooth transition
+    setTimeout(function() {
+        skeleton.classList.add('hidden');
+        grid.classList.add('content-loaded');
+    }, 300);
+})();
 
 // Offline Indicator
 (function initOfflineIndicator() {

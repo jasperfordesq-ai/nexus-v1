@@ -93,14 +93,29 @@
     }
 })();
 
-// Mode Switcher (Light/Dark)
+// Mode Switcher (Light/Dark) with smooth transitions
 function toggleMode() {
     const current = document.documentElement.getAttribute('data-theme');
     const next = current === 'dark' ? 'light' : 'dark';
+    const html = document.documentElement;
 
-    // Apply mode instantly without reload
-    document.documentElement.setAttribute('data-theme', next);
+    // Add transitioning class for smooth color transitions
+    html.classList.add('theme-transitioning');
+
+    // Apply the new theme
+    html.setAttribute('data-theme', next);
     document.cookie = "nexus_mode=" + next + ";path=/;max-age=31536000";
+
+    // Update color-scheme meta for native elements
+    const colorSchemeMeta = document.querySelector('meta[name="color-scheme"]');
+    if (colorSchemeMeta) {
+        colorSchemeMeta.content = next === 'dark' ? 'dark' : 'light';
+    }
+
+    // Remove transitioning class after animation completes
+    setTimeout(function() {
+        html.classList.remove('theme-transitioning');
+    }, 350);
 
     // Update header mode switcher
     const modeIconContainer = document.getElementById('modeIconContainer');
