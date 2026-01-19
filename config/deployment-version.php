@@ -10,7 +10,7 @@
  */
 
 return [
-    'version' => '2026.01.19.010', // Update this with each deployment
-    'timestamp' => 1768843906, // Unix timestamp of last deployment
-    'description' => 'Fix overflow-y:visible bug in scroll-fix-emergency.css'
+    'version' => '2026.01.19.011', // Update this with each deployment
+    'timestamp' => 1768844181, // Unix timestamp of last deployment
+    'description' => 'Fix username display in mobile app navigation'
 ];
