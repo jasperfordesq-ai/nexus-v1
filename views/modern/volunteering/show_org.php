@@ -7,6 +7,7 @@ if (session_status() === PHP_SESSION_NONE) session_start();
 $isLoggedIn = !empty($_SESSION['user_id']);
 $userId = $_SESSION['user_id'] ?? 0;
 $base = \Nexus\Core\TenantContext::getBasePath();
+$assetBase = ''; // Assets always at root
 $hasTimebanking = \Nexus\Core\TenantContext::hasFeature('wallet');
 
 // Set variables for the utility bar
@@ -39,25 +40,22 @@ require __DIR__ . '/../../layouts/header.php';
 
 <div class="org-profile-container">
 
-    <!-- Include shared utility bar -->
-    <?php include __DIR__ . '/../organizations/_org-utility-bar.php'; ?>
-
     <!-- Hero Banner -->
     <div class="org-hero-banner">
         <div class="org-hero-pattern"></div>
     </div>
 
-    <!-- Profile Card -->
-    <div class="org-profile-card">
+    <!-- Profile Card - Premium Glassmorphism -->
+    <div class="org-profile-card" data-aos="fade-up" data-aos-duration="800">
         <div class="org-profile-content">
-            <div class="org-profile-logo">
+            <div class="org-profile-logo" data-aos="zoom-in" data-aos-delay="200">
                 <?php if (!empty($org['logo_url'])): ?>
                     <img src="<?= htmlspecialchars($org['logo_url']) ?>" loading="lazy" alt="<?= htmlspecialchars($org['name']) ?>">
                 <?php else: ?>
                     <i class="fa-solid fa-building"></i>
                 <?php endif; ?>
             </div>
-            <div class="org-profile-info">
+            <div class="org-profile-info" data-aos="fade-left" data-aos-delay="300">
                 <h1 class="org-profile-name"><?= htmlspecialchars($org['name']) ?></h1>
 
                 <span class="org-profile-status <?= ($org['status'] ?? 'active') === 'active' ? 'active' : 'pending' ?>">
@@ -129,26 +127,26 @@ require __DIR__ . '/../../layouts/header.php';
         </div>
     </div>
 
-    <!-- Stats Grid -->
+    <!-- Stats Grid - Holographic Cards -->
     <div class="org-stats-grid">
-        <div class="org-stat-card">
+        <div class="org-stat-card" data-aos="fade-up" data-aos-delay="100">
             <div class="org-stat-icon">
                 <i class="fa-solid fa-hand-holding-heart"></i>
             </div>
-            <div class="org-stat-value"><?= count($opportunities) ?></div>
+            <div class="org-stat-value" data-count="<?= count($opportunities) ?>">0</div>
             <div class="org-stat-label">Opportunities</div>
         </div>
         <?php if ($hasTimebanking && $memberCount > 0): ?>
-            <div class="org-stat-card">
+            <div class="org-stat-card" data-aos="fade-up" data-aos-delay="200">
                 <div class="org-stat-icon">
                     <i class="fa-solid fa-users"></i>
                 </div>
-                <div class="org-stat-value"><?= $memberCount ?></div>
+                <div class="org-stat-value" data-count="<?= $memberCount ?>">0</div>
                 <div class="org-stat-label">Members</div>
             </div>
         <?php endif; ?>
         <?php if (!empty($org['created_at'])): ?>
-            <div class="org-stat-card">
+            <div class="org-stat-card" data-aos="fade-up" data-aos-delay="300">
                 <div class="org-stat-icon">
                     <i class="fa-solid fa-calendar"></i>
                 </div>
@@ -174,8 +172,8 @@ require __DIR__ . '/../../layouts/header.php';
 
         <?php if (!empty($opportunities)): ?>
             <div class="org-opps-grid">
-                <?php foreach ($opportunities as $opp): ?>
-                    <a href="<?= $base ?>/volunteering/<?= $opp['id'] ?>" class="org-opp-card">
+                <?php $delay = 100; foreach ($opportunities as $opp): ?>
+                    <a href="<?= $base ?>/volunteering/<?= $opp['id'] ?>" class="org-opp-card" data-aos="fade-up" data-aos-delay="<?= $delay ?>"><?php $delay += 100; ?>
                         <div class="org-opp-header">
                             <div class="org-opp-icon">
                                 <i class="fa-solid fa-hands-helping"></i>
@@ -222,5 +220,12 @@ require __DIR__ . '/../../layouts/header.php';
     </div>
 
 </div>
+
+<!-- AOS Library for Scroll Animations -->
+<link rel="stylesheet" href="https://unpkg.com/aos@2.3.4/dist/aos.css">
+<script src="https://unpkg.com/aos@2.3.4/dist/aos.js"></script>
+
+<!-- Organization Profile Micro-interactions -->
+<script src="<?= $assetBase ?>/assets/js/org-profile.js"></script>
 
 <?php require __DIR__ . '/../../layouts/footer.php'; ?>

@@ -92,7 +92,7 @@ window.openMobileNotifications = function() {
     const sheet = document.getElementById('mobileNotifications');
     if (sheet) {
         sheet.classList.add('active');
-        document.body.classList.add('mobile-menu-open');
+        document.body.classList.add('mobile-notifications-open');
     }
 };
 
@@ -100,7 +100,7 @@ window.closeMobileNotifications = function() {
     const sheet = document.getElementById('mobileNotifications');
     if (sheet) {
         sheet.classList.remove('active');
-        document.body.classList.remove('mobile-menu-open');
+        document.body.classList.remove('mobile-notifications-open');
     }
 };
 </script>
@@ -562,22 +562,22 @@ const Haptics = {
     // Enhance with haptic feedback
     window.openMobileMenu = function() {
         Haptics.light();
-        originalOpenMenu();
+        if (originalOpenMenu) originalOpenMenu();
     };
 
     window.closeMobileMenu = function() {
         Haptics.light();
-        originalCloseMenu();
+        if (originalCloseMenu) originalCloseMenu();
     };
 
     window.openMobileNotifications = function() {
         Haptics.light();
-        originalOpenNotif();
+        if (originalOpenNotif) originalOpenNotif();
     };
 
     window.closeMobileNotifications = function() {
         Haptics.light();
-        originalCloseNotif();
+        if (originalCloseNotif) originalCloseNotif();
     };
 })();
 

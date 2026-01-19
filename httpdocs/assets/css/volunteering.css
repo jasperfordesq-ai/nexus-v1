@@ -4965,6 +4965,11 @@ html {
    ORGANIZATION PROFILE - ENHANCED GLASSMORPHISM
    ============================================ */
 
+/* ============================================
+   ORGANIZATION PROFILE - PREMIUM HOLOGRAPHIC GLASSMORPHISM
+   Gold Standard FDS Design System
+   ============================================ */
+
 .org-profile-bg {
     position: fixed;
     top: 0;
@@ -4972,7 +4977,11 @@ html {
     right: 0;
     bottom: 0;
     z-index: -1;
-    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 25%, #e2e8f0 50%, #f1f5f9 75%, #f8fafc 100%);
+    background:
+        linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 25%, #bae6fd 50%, #e0f2fe 75%, #f0f9ff 100%),
+        radial-gradient(ellipse at 10% 10%, rgba(16, 185, 129, 0.08), transparent 40%),
+        radial-gradient(ellipse at 90% 90%, rgba(99, 102, 241, 0.08), transparent 40%);
+    background-blend-mode: soft-light, normal, normal;
 }
 
 .org-profile-bg::before {
@@ -4983,25 +4992,63 @@ html {
     width: 200%;
     height: 200%;
     background:
-        radial-gradient(ellipse at 25% 30%, rgba(20, 184, 166, 0.12) 0%, transparent 50%),
-        radial-gradient(ellipse at 75% 25%, rgba(79, 70, 229, 0.1) 0%, transparent 45%),
-        radial-gradient(ellipse at 50% 80%, rgba(16, 185, 129, 0.08) 0%, transparent 50%);
-    animation: orgProfileFloat 20s ease-in-out infinite;
+        radial-gradient(circle at 20% 30%, rgba(16, 185, 129, 0.18) 0%, transparent 35%),
+        radial-gradient(circle at 80% 20%, rgba(99, 102, 241, 0.15) 0%, transparent 38%),
+        radial-gradient(circle at 50% 85%, rgba(14, 165, 233, 0.12) 0%, transparent 40%),
+        radial-gradient(circle at 10% 70%, rgba(168, 85, 247, 0.08) 0%, transparent 30%);
+    animation: orgProfileHolographicFloat 25s ease-in-out infinite;
+    filter: blur(60px);
+}
+
+.org-profile-bg::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image:
+        repeating-linear-gradient(90deg, rgba(255,255,255,0.03) 0px, transparent 1px, transparent 80px, rgba(255,255,255,0.03) 81px),
+        repeating-linear-gradient(0deg, rgba(255,255,255,0.03) 0px, transparent 1px, transparent 80px, rgba(255,255,255,0.03) 81px);
+    opacity: 0.4;
 }
 
 [data-theme="dark"] .org-profile-bg {
-    background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%);
+    background:
+        linear-gradient(135deg, #0a0e1a 0%, #0f172a 25%, #1e293b 50%, #0f172a 75%, #0a0e1a 100%),
+        radial-gradient(ellipse at 10% 10%, rgba(16, 185, 129, 0.12), transparent 40%),
+        radial-gradient(ellipse at 90% 90%, rgba(99, 102, 241, 0.12), transparent 40%);
 }
 
 [data-theme="dark"] .org-profile-bg::before {
     background:
-        radial-gradient(ellipse at 25% 30%, rgba(20, 184, 166, 0.2) 0%, transparent 50%),
-        radial-gradient(ellipse at 75% 25%, rgba(79, 70, 229, 0.15) 0%, transparent 45%);
+        radial-gradient(circle at 20% 30%, rgba(16, 185, 129, 0.25) 0%, transparent 35%),
+        radial-gradient(circle at 80% 20%, rgba(99, 102, 241, 0.22) 0%, transparent 38%),
+        radial-gradient(circle at 50% 85%, rgba(14, 165, 233, 0.18) 0%, transparent 40%),
+        radial-gradient(circle at 10% 70%, rgba(168, 85, 247, 0.12) 0%, transparent 30%);
 }
 
-@keyframes orgProfileFloat {
-    0%, 100% { transform: translate(0, 0) scale(1); }
-    50% { transform: translate(-1%, 1%) scale(1.02); }
+[data-theme="dark"] .org-profile-bg::after {
+    background-image:
+        repeating-linear-gradient(90deg, rgba(255,255,255,0.01) 0px, transparent 1px, transparent 80px, rgba(255,255,255,0.01) 81px),
+        repeating-linear-gradient(0deg, rgba(255,255,255,0.01) 0px, transparent 1px, transparent 80px, rgba(255,255,255,0.01) 81px);
+    opacity: 0.2;
+}
+
+@keyframes orgProfileHolographicFloat {
+    0%, 100% {
+        transform: translate(0, 0) scale(1) rotate(0deg);
+        filter: blur(60px) hue-rotate(0deg);
+    }
+    25% {
+        transform: translate(2%, -1%) scale(1.03) rotate(1deg);
+        filter: blur(65px) hue-rotate(10deg);
+    }
+    50% {
+        transform: translate(-1%, 2%) scale(1.05) rotate(-1deg);
+        filter: blur(70px) hue-rotate(20deg);
+    }
+    75% {
+        transform: translate(-2%, -1%) scale(1.03) rotate(1deg);
+        filter: blur(65px) hue-rotate(10deg);
+    }
 }
 
 .org-profile-container {
@@ -5012,15 +5059,25 @@ html {
     z-index: 20;
 }
 
-/* Hero Banner */
+/* Hero Banner - Holographic */
 .org-hero-banner {
     position: relative;
-    height: 200px;
-    background: linear-gradient(135deg, #10b981 0%, #059669 50%, #047857 100%);
-    border-radius: 20px;
-    margin-bottom: -60px;
+    height: 240px;
+    background:
+        linear-gradient(135deg,
+            rgba(16, 185, 129, 0.95) 0%,
+            rgba(5, 150, 105, 0.92) 30%,
+            rgba(6, 182, 212, 0.90) 60%,
+            rgba(99, 102, 241, 0.88) 100%
+        );
+    border-radius: 24px;
+    margin-bottom: -80px;
     overflow: hidden;
-    box-shadow: 0 8px 32px rgba(16, 185, 129, 0.25);
+    box-shadow:
+        0 20px 60px rgba(16, 185, 129, 0.35),
+        0 8px 24px rgba(99, 102, 241, 0.25),
+        inset 0 1px 0 rgba(255, 255, 255, 0.2);
+    animation: orgHeroPulse 8s ease-in-out infinite;
 }
 
 .org-hero-banner::before {
@@ -5028,73 +5085,285 @@ html {
     position: absolute;
     inset: 0;
     background:
-        radial-gradient(ellipse at 30% 20%, rgba(255, 255, 255, 0.15) 0%, transparent 50%),
-        radial-gradient(ellipse at 70% 80%, rgba(255, 255, 255, 0.1) 0%, transparent 50%);
+        radial-gradient(ellipse 800px 400px at 25% 20%, rgba(255, 255, 255, 0.25) 0%, transparent 40%),
+        radial-gradient(ellipse 600px 300px at 75% 80%, rgba(255, 255, 255, 0.18) 0%, transparent 45%),
+        radial-gradient(circle at 50% 50%, rgba(99, 102, 241, 0.15) 0%, transparent 50%);
+    animation: orgHeroShimmer 6s ease-in-out infinite alternate;
+}
+
+.org-hero-banner::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+        120deg,
+        transparent 0%,
+        transparent 40%,
+        rgba(255, 255, 255, 0.1) 45%,
+        rgba(255, 255, 255, 0.3) 50%,
+        rgba(255, 255, 255, 0.1) 55%,
+        transparent 60%,
+        transparent 100%
+    );
+    background-size: 200% 100%;
+    animation: orgHeroSweep 8s ease-in-out infinite;
 }
 
 .org-hero-pattern {
     position: absolute;
     inset: 0;
-    opacity: 0.1;
+    opacity: 0.04;
     background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+    mix-blend-mode: overlay;
+    animation: orgHeroPatternDrift 30s linear infinite;
 }
 
-/* Profile Card - overlaps hero */
+@keyframes orgHeroPulse {
+    0%, 100% {
+        transform: scale(1);
+        filter: brightness(1) saturate(1);
+    }
+    50% {
+        transform: scale(1.02);
+        filter: brightness(1.08) saturate(1.1);
+    }
+}
+
+@keyframes orgHeroShimmer {
+    0% { opacity: 0.8; }
+    100% { opacity: 1; }
+}
+
+@keyframes orgHeroSweep {
+    0% { background-position: -200% 0; }
+    100% { background-position: 200% 0; }
+}
+
+@keyframes orgHeroPatternDrift {
+    0% { transform: translate(0, 0); }
+    100% { transform: translate(60px, 60px); }
+}
+
+/* Profile Card - Premium Glassmorphism overlaps hero */
 .org-profile-card {
     position: relative;
     z-index: 10;
-    background: linear-gradient(135deg,
-        rgba(255, 255, 255, 0.95) 0%,
-        rgba(255, 255, 255, 0.85) 100%);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
+    background:
+        linear-gradient(135deg,
+            rgba(255, 255, 255, 0.98) 0%,
+            rgba(255, 255, 255, 0.92) 50%,
+            rgba(255, 255, 255, 0.95) 100%
+        );
+    backdrop-filter: blur(30px) saturate(180%);
+    -webkit-backdrop-filter: blur(30px) saturate(180%);
     border: 1px solid rgba(255, 255, 255, 0.6);
-    border-radius: 20px;
-    padding: 24px;
-    margin: 0 20px 24px 20px;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    border-radius: 24px;
+    padding: 32px;
+    margin: 0 20px 32px 20px;
+    box-shadow:
+        0 20px 60px rgba(0, 0, 0, 0.12),
+        0 8px 24px rgba(16, 185, 129, 0.08),
+        0 4px 12px rgba(99, 102, 241, 0.06),
+        inset 0 1px 0 rgba(255, 255, 255, 0.9),
+        inset 0 -1px 0 rgba(0, 0, 0, 0.02);
+    animation: orgCardFloat 4s ease-in-out infinite;
+}
+
+.org-profile-card::before {
+    content: '';
+    position: absolute;
+    inset: -2px;
+    border-radius: 26px;
+    background: linear-gradient(
+        135deg,
+        rgba(16, 185, 129, 0.4),
+        rgba(99, 102, 241, 0.4),
+        rgba(14, 165, 233, 0.4)
+    );
+    z-index: -1;
+    animation: orgCardBorderRotate 8s linear infinite;
+    opacity: 0.5;
+}
+
+.org-profile-card::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 24px;
+    background:
+        radial-gradient(circle at 30% 20%, rgba(16, 185, 129, 0.06) 0%, transparent 50%),
+        radial-gradient(circle at 70% 80%, rgba(99, 102, 241, 0.06) 0%, transparent 50%);
+    pointer-events: none;
+    opacity: 0;
+    animation: orgCardInnerGlow 6s ease-in-out infinite;
+    z-index: 0;
 }
 
 [data-theme="dark"] .org-profile-card {
-    background: linear-gradient(135deg,
-        rgba(30, 41, 59, 0.95) 0%,
-        rgba(30, 41, 59, 0.85) 100%);
+    background:
+        linear-gradient(135deg,
+            rgba(30, 41, 59, 0.98) 0%,
+            rgba(30, 41, 59, 0.92) 50%,
+            rgba(30, 41, 59, 0.95) 100%
+        );
     border-color: rgba(255, 255, 255, 0.1);
+    box-shadow:
+        0 20px 60px rgba(0, 0, 0, 0.4),
+        0 8px 24px rgba(16, 185, 129, 0.15),
+        0 4px 12px rgba(99, 102, 241, 0.12),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1),
+        inset 0 -1px 0 rgba(0, 0, 0, 0.2);
+}
+
+[data-theme="dark"] .org-profile-card::before {
+    background: linear-gradient(
+        135deg,
+        rgba(16, 185, 129, 0.6),
+        rgba(99, 102, 241, 0.6),
+        rgba(14, 165, 233, 0.6)
+    );
+    opacity: 0.7;
+}
+
+@keyframes orgCardFloat {
+    0%, 100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-4px);
+    }
+}
+
+@keyframes orgCardBorderRotate {
+    0% {
+        filter: hue-rotate(0deg);
+    }
+    100% {
+        filter: hue-rotate(360deg);
+    }
+}
+
+@keyframes orgCardInnerGlow {
+    0%, 100% {
+        opacity: 0;
+    }
+    50% {
+        opacity: 1;
+    }
 }
 
 .org-profile-content {
     display: flex;
     gap: 24px;
     align-items: flex-start;
+    position: relative;
+    z-index: 1;
 }
 
-/* Large Logo */
+/* Large Logo - Holographic */
 .org-profile-logo {
-    width: 120px;
-    height: 120px;
-    border-radius: 20px;
-    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    position: relative;
+    width: 140px;
+    height: 140px;
+    border-radius: 28px;
+    background:
+        linear-gradient(135deg,
+            rgba(16, 185, 129, 0.95) 0%,
+            rgba(5, 150, 105, 0.92) 30%,
+            rgba(6, 182, 212, 0.90) 70%,
+            rgba(99, 102, 241, 0.88) 100%
+        );
     display: flex;
     align-items: center;
     justify-content: center;
     color: white;
-    font-size: 3rem;
-    font-weight: 700;
+    font-size: 3.5rem;
+    font-weight: 800;
     flex-shrink: 0;
-    box-shadow: 0 8px 24px rgba(16, 185, 129, 0.35);
+    box-shadow:
+        0 20px 50px rgba(16, 185, 129, 0.4),
+        0 10px 25px rgba(99, 102, 241, 0.3),
+        0 5px 15px rgba(14, 165, 233, 0.2),
+        inset 0 2px 0 rgba(255, 255, 255, 0.3),
+        inset 0 -2px 0 rgba(0, 0, 0, 0.1);
     overflow: hidden;
-    border: 4px solid white;
-    margin-top: -60px;
+    border: 5px solid white;
+    margin-top: -80px;
+    animation: orgLogoFloat 3s ease-in-out infinite;
+    transform-style: preserve-3d;
+}
+
+.org-profile-logo::before {
+    content: '';
+    position: absolute;
+    inset: -50%;
+    background: conic-gradient(
+        from 0deg at 50% 50%,
+        rgba(255, 255, 255, 0) 0deg,
+        rgba(255, 255, 255, 0.3) 90deg,
+        rgba(255, 255, 255, 0) 180deg,
+        rgba(255, 255, 255, 0.3) 270deg,
+        rgba(255, 255, 255, 0) 360deg
+    );
+    animation: orgLogoSparkle 4s linear infinite;
+}
+
+.org-profile-logo::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 28px;
+    background:
+        radial-gradient(circle at 30% 20%, rgba(255, 255, 255, 0.3) 0%, transparent 50%),
+        radial-gradient(circle at 70% 80%, rgba(255, 255, 255, 0.2) 0%, transparent 50%);
+    mix-blend-mode: overlay;
+    animation: orgLogoGleam 5s ease-in-out infinite;
 }
 
 [data-theme="dark"] .org-profile-logo {
-    border-color: rgba(30, 41, 59, 0.9);
+    border-color: rgba(30, 41, 59, 0.95);
+    box-shadow:
+        0 20px 50px rgba(16, 185, 129, 0.5),
+        0 10px 25px rgba(99, 102, 241, 0.4),
+        0 5px 15px rgba(14, 165, 233, 0.3),
+        inset 0 2px 0 rgba(255, 255, 255, 0.2),
+        inset 0 -2px 0 rgba(0, 0, 0, 0.3);
 }
 
 .org-profile-logo img {
     width: 100%;
     height: 100%;
     object-fit: cover;
+    position: relative;
+    z-index: 1;
+    border-radius: 23px;
+}
+
+@keyframes orgLogoFloat {
+    0%, 100% {
+        transform: translateY(0) scale(1);
+    }
+    50% {
+        transform: translateY(-6px) scale(1.03);
+    }
+}
+
+@keyframes orgLogoSparkle {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+@keyframes orgLogoGleam {
+    0%, 100% {
+        opacity: 0.6;
+    }
+    50% {
+        opacity: 1;
+    }
 }
 
 /* Profile Info */
@@ -5269,28 +5538,62 @@ html {
 }
 
 .org-stat-card {
-    background: linear-gradient(135deg,
-        rgba(255, 255, 255, 0.9) 0%,
-        rgba(255, 255, 255, 0.7) 100%);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
+    position: relative;
+    background:
+        linear-gradient(135deg,
+            rgba(255, 255, 255, 0.95) 0%,
+            rgba(255, 255, 255, 0.85) 50%,
+            rgba(255, 255, 255, 0.9) 100%
+        );
+    backdrop-filter: blur(20px) saturate(160%);
+    -webkit-backdrop-filter: blur(20px) saturate(160%);
     border: 1px solid rgba(255, 255, 255, 0.6);
-    border-radius: 16px;
-    padding: 20px;
+    border-radius: 18px;
+    padding: 24px 20px;
     text-align: center;
-    transition: all 0.2s ease;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    overflow: hidden;
+}
+
+.org-stat-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+        radial-gradient(circle at 50% 0%, rgba(16, 185, 129, 0.08) 0%, transparent 60%),
+        radial-gradient(circle at 50% 100%, rgba(99, 102, 241, 0.08) 0%, transparent 60%);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    z-index: 0;
 }
 
 .org-stat-card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+    transform: translateY(-6px) scale(1.02);
+    box-shadow:
+        0 16px 40px rgba(0, 0, 0, 0.12),
+        0 8px 20px rgba(16, 185, 129, 0.15),
+        0 4px 10px rgba(99, 102, 241, 0.1);
+}
+
+.org-stat-card:hover::before {
+    opacity: 1;
 }
 
 [data-theme="dark"] .org-stat-card {
-    background: linear-gradient(135deg,
-        rgba(30, 41, 59, 0.9) 0%,
-        rgba(30, 41, 59, 0.7) 100%);
+    background:
+        linear-gradient(135deg,
+            rgba(30, 41, 59, 0.95) 0%,
+            rgba(30, 41, 59, 0.85) 50%,
+            rgba(30, 41, 59, 0.9) 100%
+        );
     border-color: rgba(255, 255, 255, 0.1);
+}
+
+[data-theme="dark"] .org-stat-card:hover {
+    box-shadow:
+        0 16px 40px rgba(0, 0, 0, 0.4),
+        0 8px 20px rgba(16, 185, 129, 0.25),
+        0 4px 10px rgba(99, 102, 241, 0.2);
 }
 
 .org-stat-icon {
@@ -5304,6 +5607,8 @@ html {
     justify-content: center;
     color: #10b981;
     font-size: 1.25rem;
+    position: relative;
+    z-index: 1;
 }
 
 .org-stat-value {
@@ -5311,6 +5616,8 @@ html {
     font-weight: 800;
     color: #111827;
     margin-bottom: 4px;
+    position: relative;
+    z-index: 1;
 }
 
 [data-theme="dark"] .org-stat-value {
@@ -5321,6 +5628,8 @@ html {
     font-size: 0.85rem;
     color: #6b7280;
     font-weight: 500;
+    position: relative;
+    z-index: 1;
 }
 
 [data-theme="dark"] .org-stat-label {
@@ -5396,35 +5705,87 @@ html {
 }
 
 .org-opp-card {
-    background: linear-gradient(135deg,
-        rgba(255, 255, 255, 0.95) 0%,
-        rgba(255, 255, 255, 0.85) 100%);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
+    position: relative;
+    background:
+        linear-gradient(135deg,
+            rgba(255, 255, 255, 0.98) 0%,
+            rgba(255, 255, 255, 0.92) 50%,
+            rgba(255, 255, 255, 0.95) 100%
+        );
+    backdrop-filter: blur(25px) saturate(170%);
+    -webkit-backdrop-filter: blur(25px) saturate(170%);
     border: 1px solid rgba(255, 255, 255, 0.6);
-    border-radius: 16px;
-    padding: 20px;
+    border-radius: 20px;
+    padding: 24px;
     text-decoration: none;
     display: flex;
     flex-direction: column;
-    transition: all 0.25s ease;
+    transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+    overflow: hidden;
+}
+
+.org-opp-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+        radial-gradient(circle at 0% 0%, rgba(16, 185, 129, 0.08) 0%, transparent 50%),
+        radial-gradient(circle at 100% 100%, rgba(99, 102, 241, 0.08) 0%, transparent 50%);
+    opacity: 0;
+    transition: opacity 0.35s ease;
+    z-index: 0;
+}
+
+.org-opp-card::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(255, 255, 255, 0.3),
+        transparent
+    );
+    transition: left 0.5s ease;
+    z-index: 0;
 }
 
 .org-opp-card:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.12);
-    border-color: rgba(16, 185, 129, 0.3);
+    transform: translateY(-8px) scale(1.02);
+    box-shadow:
+        0 20px 60px rgba(0, 0, 0, 0.15),
+        0 10px 30px rgba(16, 185, 129, 0.2),
+        0 5px 15px rgba(99, 102, 241, 0.15);
+    border-color: rgba(16, 185, 129, 0.4);
+}
+
+.org-opp-card:hover::before {
+    opacity: 1;
+}
+
+.org-opp-card:hover::after {
+    left: 100%;
 }
 
 [data-theme="dark"] .org-opp-card {
-    background: linear-gradient(135deg,
-        rgba(30, 41, 59, 0.95) 0%,
-        rgba(30, 41, 59, 0.85) 100%);
+    background:
+        linear-gradient(135deg,
+            rgba(30, 41, 59, 0.98) 0%,
+            rgba(30, 41, 59, 0.92) 50%,
+            rgba(30, 41, 59, 0.95) 100%
+        );
     border-color: rgba(255, 255, 255, 0.1);
 }
 
 [data-theme="dark"] .org-opp-card:hover {
-    border-color: rgba(16, 185, 129, 0.4);
+    border-color: rgba(16, 185, 129, 0.5);
+    box-shadow:
+        0 20px 60px rgba(0, 0, 0, 0.5),
+        0 10px 30px rgba(16, 185, 129, 0.3),
+        0 5px 15px rgba(99, 102, 241, 0.25);
 }
 
 .org-opp-header {
@@ -5432,6 +5793,8 @@ html {
     align-items: flex-start;
     gap: 14px;
     margin-bottom: 12px;
+    position: relative;
+    z-index: 1;
 }
 
 .org-opp-icon {
@@ -5485,6 +5848,8 @@ html {
     -webkit-box-orient: vertical;
     overflow: hidden;
     flex: 1;
+    position: relative;
+    z-index: 1;
 }
 
 [data-theme="dark"] .org-opp-desc {
@@ -5497,6 +5862,8 @@ html {
     gap: 12px;
     padding-top: 12px;
     border-top: 1px solid rgba(0, 0, 0, 0.05);
+    position: relative;
+    z-index: 1;
 }
 
 [data-theme="dark"] .org-opp-footer {
@@ -5568,6 +5935,56 @@ html {
 
 [data-theme="dark"] .org-empty-desc {
     color: #94a3b8;
+}
+
+/* ============================================
+   MICRO-INTERACTIONS & EFFECTS
+   ============================================ */
+
+/* Card Ripple Effect */
+.card-ripple {
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(16, 185, 129, 0.3), transparent);
+    transform: scale(0);
+    animation: rippleEffect 0.6s ease-out;
+    pointer-events: none;
+    z-index: 100;
+}
+
+@keyframes rippleEffect {
+    to {
+        transform: scale(20);
+        opacity: 0;
+    }
+}
+
+/* Mouse Tracking Shine Effect */
+.org-profile-card {
+    --mouse-x: 50%;
+    --mouse-y: 50%;
+}
+
+.org-profile-card:hover::after {
+    background:
+        radial-gradient(circle 200px at var(--mouse-x) var(--mouse-y), rgba(16, 185, 129, 0.1) 0%, transparent 50%),
+        radial-gradient(circle 150px at var(--mouse-x) var(--mouse-y), rgba(99, 102, 241, 0.1) 0%, transparent 50%);
+}
+
+/* Counter Animation State */
+.org-stat-value.animated {
+    animation: counterPulse 0.5s ease-out;
+}
+
+@keyframes counterPulse {
+    0%, 100% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.15);
+    }
 }
 
 /* Mobile */

@@ -803,6 +803,17 @@ body.mobile-menu-open {
     pointer-events: auto;
 }
 
+/* Hide bottom nav when notification sheet is active */
+@media (max-width: 1024px) {
+    body.mobile-notifications-open .mobile-tab-bar,
+    body.mobile-notifications-open #mobileTabBar {
+        transform: translateY(100%) !important;
+        opacity: 0 !important;
+        pointer-events: none !important;
+        transition: transform 0.3s ease, opacity 0.3s ease !important;
+    }
+}
+
 .mobile-notification-backdrop {
     position: absolute;
     inset: 0;
