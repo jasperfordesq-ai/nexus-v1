@@ -448,7 +448,8 @@ class CronController
                     \Nexus\Core\TenantContext::setById($newsletter['tenant_id']);
 
                     // Process ALL pending items for this newsletter (loop until done)
-                    $batchSize = 100;
+                    // Use smaller batches and pauses to avoid overwhelming the server
+                    $batchSize = 25; // Smaller batches for stability
                     $batchCount = 0;
                     $newsletterSent = 0;
                     $newsletterFailed = 0;
@@ -467,6 +468,12 @@ class CronController
 
                         if ($batchSent > 0) {
                             echo "   Batch $batchCount: Sent $batchSent, Failed $batchFailed\n";
+                            ob_flush();
+                            flush();
+                            // Pause between batches to prevent server overload
+                            if ($morePending) {
+                                sleep(2);
+                            }
                         }
                     } while ($morePending && $batchSent > 0);
 
@@ -717,7 +724,8 @@ class CronController
                 \Nexus\Core\TenantContext::setById($newsletter['tenant_id']);
 
                 // Process ALL pending items for this newsletter
-                $batchSize = 50;
+                // Smaller batches with pauses for stability
+                $batchSize = 25;
                 $newsletterSent = 0;
                 $newsletterFailed = 0;
 
@@ -730,6 +738,11 @@ class CronController
 
                     $stats = \Nexus\Models\Newsletter::getQueueStats($row['newsletter_id']);
                     $morePending = ($stats['pending'] ?? 0) > 0;
+
+                    // Pause between batches to prevent server overload
+                    if ($morePending && $batchSent > 0) {
+                        sleep(2);
+                    }
                 } while ($morePending && $batchSent > 0);
 
                 echo "   Newsletter {$row['newsletter_id']}: Sent $newsletterSent, failed $newsletterFailed\n";

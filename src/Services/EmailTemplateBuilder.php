@@ -1014,10 +1014,10 @@ HTML;
                 // Table may not exist
             }
 
-            // Get exchange count (if table exists)
+            // Get transaction count (exchanges)
             $exchangeCount = 0;
             try {
-                $exchangeCount = \Nexus\Core\Database::query("SELECT COUNT(*) as count FROM exchanges WHERE tenant_id = ?", [$tenantId])->fetch()['count'] ?? 0;
+                $exchangeCount = \Nexus\Core\Database::query("SELECT COUNT(*) as count FROM transactions WHERE tenant_id = ?", [$tenantId])->fetch()['count'] ?? 0;
             } catch (\Exception $e) {
                 // Table may not exist
             }
