@@ -329,11 +329,13 @@ button.mobile-tab-item,
     visibility: visible;
 }
 
-/* Prevent body scroll when menu is open */
-body.mobile-menu-open {
-    overflow: hidden;
-    position: fixed;
-    width: 100%;
+/* Prevent body scroll when menu is open - MOBILE ONLY */
+@media (max-width: 1024px) {
+    body.mobile-menu-open {
+        overflow: hidden;
+        position: fixed;
+        width: 100%;
+    }
 }
 
 /* Menu Header - Enhanced Full-Screen Design */

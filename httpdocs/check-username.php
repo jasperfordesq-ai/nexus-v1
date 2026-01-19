@@ -1,22 +1,12 @@
 <?php
 /**
- * Username Diagnostic Tool
- * Script to diagnose username display issue on mobile
+ * Simple Username Diagnostic
  */
 
 // Start session
-session_start();
-
-// Load configuration
-require_once __DIR__ . '/../config/database.php';
-require_once __DIR__ . '/../vendor/autoload.php';
-
-// Use classes
-use Nexus\Core\Database;
-use Nexus\Core\TenantContext;
-
-// Initialize tenant context
-TenantContext::initialize();
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 
 header('Content-Type: text/html; charset=utf-8');
 
@@ -37,9 +27,16 @@ echo "\n";
 // If logged in, fetch user data from database
 if (!empty($_SESSION['user_id'])) {
     try {
+        // Load database config
+        require_once __DIR__ . '/../config/database.php';
+
         $userId = (int)$_SESSION['user_id'];
-        $stmt = Database::query("SELECT * FROM users WHERE id = ?", [$userId]);
-        $user = $stmt->fetch();
+
+        // Simple PDO query
+        $db = \Nexus\Core\Database::getInstance();
+        $stmt = $db->prepare("SELECT id, first_name, last_name, email, profile_type, organization_name, role, avatar_url, tenant_id FROM users WHERE id = ?");
+        $stmt->execute([$userId]);
+        $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
         if ($user) {
             echo "=== DATABASE USER RECORD ===\n";
@@ -50,6 +47,7 @@ if (!empty($_SESSION['user_id'])) {
             echo "Profile Type: " . ($user['profile_type'] ?? 'individual') . "\n";
             echo "Organization Name: '" . ($user['organization_name'] ?? 'NULL') . "'\n";
             echo "Role: " . ($user['role'] ?? 'member') . "\n";
+            echo "Tenant ID: " . $user['tenant_id'] . "\n";
             echo "\n";
 
             echo "=== COMPUTED VALUES ===\n";
@@ -70,13 +68,13 @@ if (!empty($_SESSION['user_id'])) {
             if (empty($firstName) && empty($lastName)) {
                 echo "<span class='error'>❌ PROBLEM FOUND: Both first_name and last_name are EMPTY!</span>\n";
                 echo "   This is why you see 'User' or 'Guest' in the mobile app.\n\n";
-                echo "   <strong>Solution: Go to Settings and update your name</strong>\n";
+                echo "   <strong>Solution: Update your profile at /settings</strong>\n";
             } elseif (empty($firstName)) {
                 echo "<span class='warning'>⚠️  WARNING: first_name is empty</span>\n";
             } elseif (empty($lastName)) {
                 echo "<span class='warning'>⚠️  WARNING: last_name is empty</span>\n";
             } else {
-                echo "<span class='success'>✓ first_name and last_name are populated</span>\n";
+                echo "<span class='success'>✓ first_name and last_name are populated in DB</span>\n";
             }
 
             // Check session vs database
@@ -84,9 +82,9 @@ if (!empty($_SESSION['user_id'])) {
 
             if ($fullName !== $sessionName) {
                 echo "<span class='warning'>⚠️  SESSION MISMATCH!</span>\n";
-                echo "   Session: '" . $sessionName . "'\n";
-                echo "   Database: '" . $fullName . "'\n";
-                echo "   <strong>Solution: Log out and log back in</strong>\n";
+                echo "   Session name: '" . $sessionName . "'\n";
+                echo "   Database name: '" . $fullName . "'\n\n";
+                echo "   <strong>Solution: Log out and log back in to refresh session</strong>\n";
             } else {
                 if (!empty($fullName)) {
                     echo "<span class='success'>✓ Session matches database</span>\n";
@@ -98,6 +96,7 @@ if (!empty($_SESSION['user_id'])) {
         }
     } catch (Exception $e) {
         echo "<span class='error'>ERROR: " . htmlspecialchars($e->getMessage()) . "</span>\n";
+        echo "Stack trace:\n" . htmlspecialchars($e->getTraceAsString()) . "\n";
     }
 } else {
     echo "<span class='warning'>NOT LOGGED IN - Please log in first</span>\n";

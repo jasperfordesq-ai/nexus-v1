@@ -207,9 +207,9 @@
                 hideStyles.remove();
             }
 
-            // NUCLEAR: Force clear any scroll-blocking styles
-            document.documentElement.style.cssText = 'overflow: scroll !important; height: auto !important;';
-            document.body.style.cssText = 'overflow: visible !important; height: auto !important; position: relative !important;';
+            // CRITICAL: Force clear any scroll-blocking styles AND enable scrolling
+            document.documentElement.style.cssText = 'overflow-y: scroll !important; overflow-x: hidden !important; height: 100% !important;';
+            document.body.style.cssText = 'overflow-y: auto !important; overflow-x: hidden !important; height: auto !important; position: static !important;';
 
             // Remove any scroll-blocking event listeners
             document.body.onwheel = null;
