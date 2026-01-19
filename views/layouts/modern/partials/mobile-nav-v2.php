@@ -11,8 +11,18 @@ $userName = $_SESSION['user_name'] ?? 'Guest';
 $userAvatar = $_SESSION['user_avatar'] ?? '/assets/img/defaults/default_avatar.webp';
 $userId = $_SESSION['user_id'] ?? null;
 $userRole = $_SESSION['user_role'] ?? '';
-$userBalance = $_SESSION['user_balance'] ?? 0;
 $isAdmin = ($userRole === 'admin') || !empty($_SESSION['is_super_admin']);
+
+// Get user balance fresh from database (balances change frequently)
+$userBalance = 0;
+if ($isLoggedIn && $userId) {
+    try {
+        $userData = \Nexus\Models\User::findById($userId);
+        $userBalance = $userData['balance'] ?? 0;
+    } catch (\Exception $e) {
+        $userBalance = 0;
+    }
+}
 
 // Get notifications count
 $notifCount = 0;
