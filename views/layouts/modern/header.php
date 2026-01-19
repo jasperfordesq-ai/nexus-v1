@@ -241,7 +241,6 @@ try {
     <!-- Federation CSS (all /federation/* routes) -->
     <?php if (strpos($normPath, '/federation') !== false): ?>
     <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/federation.min.css?v=<?= $cssVersionTimestamp ?>">
-    <script src="<?= $assetBase ?>/assets/js/force-scroll-fix.js?v=<?= $cssVersionTimestamp ?>"></script>
     <?php endif; ?>
 
     <!-- Volunteering CSS (all /volunteering/* routes) -->

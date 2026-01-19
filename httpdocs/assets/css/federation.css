@@ -3,17 +3,24 @@
 /* CACHE BUSTER: 1768841027 - Force browser to reload this CSS */
 
 /* CRITICAL FIX: Ensure body/html can always scroll on federation pages */
-body, html {
-    overflow: visible !important;
-    position: static !important;
-    height: auto !important;
-    max-height: none !important;
+html {
+    overflow-y: scroll !important;
+    overflow-x: hidden !important;
+    height: 100% !important;
 }
 
-/* Allow scroll even if mobile-menu-open class is stuck */
+body {
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    position: static !important;
+    height: auto !important;
+    min-height: 100% !important;
+}
+
+/* Remove scroll-lock classes if menus aren't actually open */
 body.mobile-menu-open:not(:has(#mobileMenu.active)),
 body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
-    overflow: visible !important;
+    overflow-y: auto !important;
     position: static !important;
     width: auto !important;
 }
@@ -10769,47 +10776,3 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
 }
 
 [data-theme="dark"] .pending-card {
-    background: var(--bg-secondary, #2d2d2d);
-}
-
-[data-theme="dark"] .empty-state {
-    background: var(--bg-secondary, #2d2d2d);
-}
-
-/* ============================================
-   CRITICAL SCROLL FIX - MUST BE AT END
-   This MUST be the last rule to override everything
-   ============================================ */
-
-/* Force scrolling to work on federation pages - override ALL conflicting rules */
-html, body {
-    overflow: visible !important;
-    overflow-x: hidden !important;
-    overflow-y: auto !important;
-    position: static !important;
-    height: auto !important;
-    max-height: none !important;
-    width: 100% !important;
-}
-
-/* Remove scroll lock from body classes */
-body.mobile-menu-open,
-body.mobile-notifications-open {
-    overflow: visible !important;
-    overflow-y: auto !important;
-    position: static !important;
-    width: auto !important;
-    height: auto !important;
-}
-
-/* Ensure main container is scrollable */
-.htb-container-full,
-#federation-hub-wrapper,
-#federation-glass-wrapper,
-#fed-dashboard-wrapper {
-    position: relative !important;
-    height: auto !important;
-    min-height: auto !important;
-    max-height: none !important;
-    overflow: visible !important;
-}

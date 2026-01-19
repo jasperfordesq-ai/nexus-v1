@@ -10,7 +10,7 @@
  */
 
 return [
-    'version' => '2026.01.19.006', // Update this with each deployment
-    'timestamp' => 1768841730, // Unix timestamp of last deployment
-    'description' => 'Fix scroll freeze when switching between multiple tabs'
+    'version' => '2026.01.19.007', // Update this with each deployment
+    'timestamp' => 1768842706, // Unix timestamp of last deployment
+    'description' => 'Clean up conflicting scroll fixes - consolidate to ONE simple solution'
 ];
