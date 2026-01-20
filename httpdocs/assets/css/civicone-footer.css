@@ -1,14 +1,14 @@
 /**
  * CivicOne Footer Styles
  * Extracted from views/layouts/civicone/footer.php
- * 2026-01-19
+ * Updated 2026-01-20: GOV.UK design tokens
  */
 
 .civic-footer {
     background: var(--civic-bg-footer);
     color: var(--civic-footer-text, #E5E7EB);
-    padding: 64px 0 32px;
-    margin-top: 80px;
+    padding: var(--civicone-spacing-9, 60px) 0 var(--civicone-spacing-7, 40px);
+    margin-top: var(--civicone-spacing-9, 60px);
 }
 
 .civic-footer a {
@@ -24,8 +24,8 @@
 .civic-footer-grid {
     display: grid;
     grid-template-columns: 2fr 1fr 1fr 1fr;
-    gap: 48px;
-    margin-bottom: 48px;
+    gap: var(--civicone-spacing-8, 50px);
+    margin-bottom: var(--civicone-spacing-8, 50px);
 }
 
 .civic-footer-brand {
@@ -49,7 +49,7 @@
 
 .civic-footer-social {
     display: flex;
-    gap: 12px;
+    gap: var(--civicone-spacing-3, 15px);
 }
 
 .civic-footer-social a {

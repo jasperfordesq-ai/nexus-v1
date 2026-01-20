@@ -17,6 +17,7 @@ $deploymentVersion = file_exists(__DIR__ . '/../../config/deployment-version.php
 $cssVersionTimestamp = $deploymentVersion['version'] ?? time();
 
 require_once __DIR__ . '/../onboarding_check.php';
+require_once __DIR__ . '/../consent_check.php';
 $mode = $_COOKIE['nexus_mode'] ?? 'dark';
 $hTitle = $hero_title ?? $pageTitle ?? 'Project NEXUS';
 $hSubtitle = $hero_subtitle ?? $pageSubtitle ?? 'Welcome to the future.';
@@ -162,6 +163,14 @@ try {
     <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/nexus-mobile.min.css?v=<?= $cssVersionTimestamp ?>" media="(max-width: 768px)">
     <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/mobile-sheets.min.css?v=<?= $cssVersionTimestamp ?>">
     <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/pwa-install-modal.css?v=<?= $cssVersionTimestamp ?>">
+    <!-- Native app page enter animations (Capacitor only - uses .is-native class) -->
+    <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/native-page-enter.css?v=<?= $cssVersionTimestamp ?>">
+    <!-- Native app form inputs (mobile/native only - desktop unchanged) -->
+    <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/native-form-inputs.css?v=<?= $cssVersionTimestamp ?>">
+    <!-- Mobile select bottom sheet (mobile/native only) -->
+    <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/mobile-select-sheet.css?v=<?= $cssVersionTimestamp ?>">
+    <!-- Mobile search overlay (mobile/native only) -->
+    <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/mobile-search-overlay.css?v=<?= $cssVersionTimestamp ?>">
 
     <!-- Social Interactions CSS -->
     <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/social-interactions.min.css?v=<?= $cssVersionTimestamp ?>">

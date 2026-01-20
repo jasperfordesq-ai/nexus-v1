@@ -82,7 +82,7 @@ if (!empty($notifSettings)) {
                             <div class="civic-balance-label">Current Balance</div>
                             <div class="civic-balance-amount"><?= htmlspecialchars($user['balance']) ?> Hours</div>
                         </div>
-                        <a href="<?= $basePath ?>/wallet" class="civic-balance-btn">Manage Wallet</a>
+                        <a href="<?= $basePath ?>/wallet" class="civic-button civic-button--secondary" role="button">Manage Wallet</a>
                     </div>
                 </div>
 
@@ -174,7 +174,7 @@ if (!empty($notifSettings)) {
                             <div class="civic-empty-state">
                                 <div class="civic-empty-icon"><i class="fa-solid fa-calendar-xmark" aria-hidden="true"></i></div>
                                 <p class="civic-empty-text">No upcoming events.</p>
-                                <a href="<?= $basePath ?>/events" class="civic-empty-link">Explore Events</a>
+                                <a href="<?= $basePath ?>/events" class="civic-button civic-button--start" role="button">Explore Events</a>
                             </div>
                         <?php else: ?>
                             <ul role="list">
@@ -222,7 +222,7 @@ if (!empty($notifSettings)) {
                             <div class="civic-empty-icon">🔥</div>
                             <p class="civic-empty-text">No hot matches yet.</p>
                             <p class="civic-empty-subtext">Create listings to find compatible members nearby.</p>
-                            <a href="<?= $basePath ?>/listings/create" class="civic-empty-link">Create a Listing</a>
+                            <a href="<?= $basePath ?>/listings/create" class="civic-button civic-button--start" role="button">Create a Listing</a>
                         </div>
                     <?php else: ?>
                         <ul role="list" class="civic-matches-list">
@@ -278,7 +278,7 @@ if (!empty($notifSettings)) {
                         <div class="civic-empty-state">
                             <div class="civic-empty-icon"><i class="fa-solid fa-user-group" aria-hidden="true"></i></div>
                             <p class="civic-empty-text">You haven't joined any hubs yet.</p>
-                            <a href="<?= $basePath ?>/groups" class="civic-empty-link">Join a Hub</a>
+                            <a href="<?= $basePath ?>/groups" class="civic-button civic-button--start" role="button">Join a Hub</a>
                         </div>
                     <?php else: ?>
                         <ul role="list">
@@ -300,15 +300,15 @@ if (!empty($notifSettings)) {
                 <!-- Quick Actions -->
                 <div class="civic-dash-card">
                     <div class="civic-quick-actions">
-                        <a href="<?= $basePath ?>/achievements" class="civic-action-btn civic-action-btn-score">
+                        <a href="<?= $basePath ?>/achievements" class="civic-button civic-button--secondary" role="button">
                             <i class="fa-solid fa-trophy" aria-hidden="true"></i>
                             View Achievements
                         </a>
-                        <a href="<?= $basePath ?>/listings/create" class="civic-action-btn civic-action-btn-primary">
+                        <a href="<?= $basePath ?>/listings/create" class="civic-button" role="button">
                             <i class="fa-solid fa-plus" aria-hidden="true"></i>
                             Post Offer or Request
                         </a>
-                        <a href="<?= $basePath ?>/groups" class="civic-action-btn civic-action-btn-secondary">
+                        <a href="<?= $basePath ?>/groups" class="civic-button civic-button--secondary" role="button">
                             <i class="fa-solid fa-users" aria-hidden="true"></i>
                             Browse Hubs
                         </a>
@@ -326,15 +326,15 @@ if (!empty($notifSettings)) {
                     All Notifications
                 </h2>
                 <div class="civic-notif-actions">
-                    <button type="button" onclick="openEventsModal()" class="civic-btn-secondary">
+                    <button type="button" onclick="openEventsModal()" class="civic-button civic-button--secondary">
                         <i class="fa-solid fa-list-ul" aria-hidden="true"></i>
                         <span class="btn-label">Events</span>
                     </button>
-                    <button type="button" onclick="toggleNotifSettings()" class="civic-btn-secondary">
+                    <button type="button" onclick="toggleNotifSettings()" class="civic-button civic-button--secondary">
                         <i class="fa-solid fa-gear" aria-hidden="true"></i>
                         <span class="btn-label">Settings</span>
                     </button>
-                    <button type="button" onclick="window.nexusNotifications.markAllRead(this)" class="civic-btn-secondary">
+                    <button type="button" onclick="window.nexusNotifications.markAllRead(this)" class="civic-button civic-button--secondary">
                         <i class="fa-solid fa-check-double" aria-hidden="true"></i>
                         <span class="btn-label">Mark All Read</span>
                     </button>
@@ -345,7 +345,7 @@ if (!empty($notifSettings)) {
             <dialog id="events-modal" class="civic-modal" aria-labelledby="events-modal-title">
                 <div class="civic-modal-header">
                     <h3 id="events-modal-title">Notification Triggers</h3>
-                    <button type="button" onclick="document.getElementById('events-modal').close()" class="civic-modal-close" aria-label="Close">
+                    <button type="button" onclick="document.getElementById('events-modal').close()" class="civic-button civic-button--secondary" aria-label="Close">
                         <i class="fa-solid fa-times" aria-hidden="true"></i>
                     </button>
                 </div>
@@ -372,7 +372,7 @@ if (!empty($notifSettings)) {
                     </div>
                 </div>
                 <div class="civic-modal-footer">
-                    <button type="button" onclick="document.getElementById('events-modal').close()" class="civic-btn-primary">Got it</button>
+                    <button type="button" onclick="document.getElementById('events-modal').close()" class="civic-button">Got it</button>
                 </div>
             </dialog>
 
@@ -442,14 +442,14 @@ if (!empty($notifSettings)) {
                             </div>
                             <div class="civic-notif-item-actions">
                                 <?php if ($n['link']): ?>
-                                    <a href="<?= htmlspecialchars($n['link']) ?>" onclick="window.nexusNotifications.markOneRead(<?= $n['id'] ?>)" class="civic-btn-primary civic-btn-sm">View</a>
+                                    <a href="<?= htmlspecialchars($n['link']) ?>" onclick="window.nexusNotifications.markOneRead(<?= $n['id'] ?>)" class="civic-button" role="button">View</a>
                                 <?php endif; ?>
                                 <?php if (!$n['is_read']): ?>
-                                    <button type="button" onclick="window.nexusNotifications.markOneRead(<?= $n['id'] ?>); this.closest('li').classList.add('read'); this.closest('li').classList.remove('unread'); this.remove();" class="civic-btn-secondary civic-btn-sm">
+                                    <button type="button" onclick="window.nexusNotifications.markOneRead(<?= $n['id'] ?>); this.closest('li').classList.add('read'); this.closest('li').classList.remove('unread'); this.remove();" class="civic-button civic-button--secondary">
                                         <i class="fa-solid fa-check" aria-hidden="true"></i> Mark Read
                                     </button>
                                 <?php endif; ?>
-                                <button type="button" onclick="deleteNotificationDashboard(<?= $n['id'] ?>)" class="civic-btn-danger civic-btn-sm" aria-label="Delete notification">
+                                <button type="button" onclick="deleteNotificationDashboard(<?= $n['id'] ?>)" class="civic-button civic-button--warning" aria-label="Delete notification">
                                     <i class="fa-solid fa-trash" aria-hidden="true"></i>
                                 </button>
                             </div>
@@ -468,7 +468,7 @@ if (!empty($notifSettings)) {
                     <i class="fa-solid fa-users" aria-hidden="true"></i>
                     My Hubs
                 </h2>
-                <a href="<?= $basePath ?>/groups" class="civic-btn-primary">
+                <a href="<?= $basePath ?>/groups" class="civic-button" role="button">
                     <i class="fa-solid fa-compass" aria-hidden="true"></i> Browse All Hubs
                 </a>
             </div>
@@ -477,7 +477,7 @@ if (!empty($notifSettings)) {
                     <div class="civic-empty-icon"><i class="fa-solid fa-user-group" aria-hidden="true"></i></div>
                     <h3>No hubs joined</h3>
                     <p class="civic-empty-text">Join a hub to connect with your community.</p>
-                    <a href="<?= $basePath ?>/groups" class="civic-btn-primary">Browse Hubs</a>
+                    <a href="<?= $basePath ?>/groups" class="civic-button" role="button">Browse Hubs</a>
                 </div>
             <?php else: ?>
                 <div class="civic-hubs-grid">
@@ -490,7 +490,7 @@ if (!empty($notifSettings)) {
                                     <i class="fa-solid fa-users" aria-hidden="true"></i>
                                     <?= $grp['member_count'] ?? 0 ?> members
                                 </span>
-                                <a href="<?= $basePath ?>/groups/<?= $grp['id'] ?>" class="civic-btn-primary civic-btn-sm">Enter Hub</a>
+                                <a href="<?= $basePath ?>/groups/<?= $grp['id'] ?>" class="civic-button" role="button">Enter Hub</a>
                             </div>
                         </article>
                     <?php endforeach; ?>
@@ -525,7 +525,7 @@ if (!empty($notifSettings)) {
             </div>
 
             <div class="civic-listings-actions">
-                <a href="<?= $basePath ?>/compose?type=listing" class="civic-btn-primary">
+                <a href="<?= $basePath ?>/compose?type=listing" class="civic-button" role="button">
                     <i class="fa-solid fa-plus" aria-hidden="true"></i> Post New Listing
                 </a>
             </div>
@@ -558,10 +558,10 @@ if (!empty($notifSettings)) {
                                     <a href="<?= $basePath ?>/listings/<?= $listing['id'] ?>"><?= htmlspecialchars($listing['title']) ?></a>
                                 </h3>
                                 <div class="civic-listing-card-actions">
-                                    <a href="<?= $basePath ?>/listings/<?= $listing['id'] ?>" class="civic-btn-secondary civic-btn-sm">
+                                    <a href="<?= $basePath ?>/listings/<?= $listing['id'] ?>" class="civic-button civic-button--secondary" role="button">
                                         <i class="fa-solid fa-eye" aria-hidden="true"></i> View
                                     </a>
-                                    <button type="button" onclick="deleteListing(<?= $listing['id'] ?>)" class="civic-btn-danger civic-btn-sm">
+                                    <button type="button" onclick="deleteListing(<?= $listing['id'] ?>)" class="civic-button civic-button--warning">
                                         <i class="fa-solid fa-trash" aria-hidden="true"></i> Delete
                                     </button>
                                 </div>
@@ -608,6 +608,9 @@ if (!empty($notifSettings)) {
 
                         <div class="civic-form-group">
                             <label for="dashUserSearch" class="civic-label">Recipient</label>
+                            <div id="dashUserSearch-hint" class="civic-hint">
+                                Search by name or username
+                            </div>
 
                             <!-- Selected User Chip -->
                             <div id="dashSelectedUser" class="civic-selected-user" hidden>
@@ -625,22 +628,42 @@ if (!empty($notifSettings)) {
 
                             <!-- Search Input -->
                             <div id="dashSearchWrapper" class="civic-search-wrapper">
-                                <input type="text" id="dashUserSearch" placeholder="Search by name or username..." autocomplete="off" class="civic-input">
+                                <input type="text"
+                                       id="dashUserSearch"
+                                       class="civic-input"
+                                       autocomplete="off"
+                                       aria-describedby="dashUserSearch-hint">
                                 <div id="dashUserResults" class="civic-search-results" hidden></div>
                             </div>
                         </div>
 
                         <div class="civic-form-group">
-                            <label for="transfer-amount" class="civic-label">Amount</label>
-                            <input type="number" id="transfer-amount" name="amount" min="1" required placeholder="0" class="civic-input">
+                            <label for="transfer-amount" class="civic-label">Amount (credits)</label>
+                            <div id="transfer-amount-hint" class="civic-hint">
+                                Minimum transfer is 1 credit (1 hour of service)
+                            </div>
+                            <input type="number"
+                                   id="transfer-amount"
+                                   name="amount"
+                                   class="civic-input civic-input--width-5"
+                                   min="1"
+                                   required
+                                   aria-describedby="transfer-amount-hint">
                         </div>
 
                         <div class="civic-form-group">
-                            <label for="transfer-desc" class="civic-label">Description (Optional)</label>
-                            <textarea id="transfer-desc" name="description" rows="2" placeholder="What is this for?" class="civic-textarea"></textarea>
+                            <label for="transfer-desc" class="civic-label">Description (optional)</label>
+                            <div id="transfer-desc-hint" class="civic-hint">
+                                What is this transfer for?
+                            </div>
+                            <textarea id="transfer-desc"
+                                      name="description"
+                                      class="civic-textarea"
+                                      rows="3"
+                                      aria-describedby="transfer-desc-hint"></textarea>
                         </div>
 
-                        <button type="submit" id="transfer-btn" class="civic-btn-primary civic-btn-full">
+                        <button type="submit" id="transfer-btn" class="civic-button civic-button--full-width">
                             <i class="fa-solid fa-paper-plane" aria-hidden="true"></i> Send Credits
                         </button>
                     </form>
@@ -714,7 +737,7 @@ if (!empty($notifSettings)) {
                         <i class="fa-solid fa-calendar-star" aria-hidden="true"></i>
                         Hosting
                     </h2>
-                    <a href="<?= $basePath ?>/events/create" class="civic-btn-primary civic-btn-sm">
+                    <a href="<?= $basePath ?>/events/create" class="civic-button" role="button">
                         <i class="fa-solid fa-plus" aria-hidden="true"></i> Create Event
                     </a>
                 </div>
@@ -744,10 +767,10 @@ if (!empty($notifSettings)) {
                                 <?= htmlspecialchars($e['location'] ?? 'TBA') ?>
                             </div>
                             <div class="civic-event-hosted-actions">
-                                <a href="<?= $basePath ?>/events/<?= $e['id'] ?>/edit" class="civic-btn-secondary civic-btn-sm">
+                                <a href="<?= $basePath ?>/events/<?= $e['id'] ?>/edit" class="civic-button civic-button--secondary" role="button">
                                     <i class="fa-solid fa-pen" aria-hidden="true"></i> Edit
                                 </a>
-                                <a href="<?= $basePath ?>/events/<?= $e['id'] ?>" class="civic-btn-secondary civic-btn-sm">
+                                <a href="<?= $basePath ?>/events/<?= $e['id'] ?>" class="civic-button civic-button--secondary" role="button">
                                     <i class="fa-solid fa-users" aria-hidden="true"></i> Manage
                                 </a>
                             </div>
@@ -769,7 +792,7 @@ if (!empty($notifSettings)) {
                     <div class="civic-empty-state">
                         <div class="civic-empty-icon"><i class="fa-solid fa-calendar-plus" aria-hidden="true"></i></div>
                         <p class="civic-empty-text">You are not attending any upcoming events.</p>
-                        <a href="<?= $basePath ?>/events" class="civic-empty-link">Browse Events</a>
+                        <a href="<?= $basePath ?>/events" class="civic-button civic-button--start" role="button">Browse Events</a>
                     </div>
                 <?php else: ?>
                     <ul role="list" class="civic-events-list">
@@ -801,7 +824,7 @@ if (!empty($notifSettings)) {
         <div class="civic-dash-card">
             <div class="civic-empty-state civic-empty-large">
                 <p>This section is under construction or linked elsewhere.</p>
-                <a href="?tab=overview" class="civic-btn-primary">Back to Dashboard</a>
+                <a href="?tab=overview" class="civic-button" role="button">Back to Dashboard</a>
             </div>
         </div>
     <?php endif; ?>

@@ -230,16 +230,144 @@ class EnterpriseController
 
     /**
      * GET /admin/enterprise/gdpr/consents
-     * Manage consent types
+     * Manage consent types with full statistics
      */
     public function gdprConsents(): void
     {
-        $consentTypes = $this->gdprService->getConsentTypes();
+        $tenantId = $this->getTenantId();
 
-        // Force modern layout
+        // Get consent types with granted/denied counts
+        $consentTypes = Database::query(
+            "SELECT ct.*,
+                    COALESCE(granted.cnt, 0) as granted_count,
+                    COALESCE(denied.cnt, 0) as denied_count
+             FROM consent_types ct
+             LEFT JOIN (
+                 SELECT consent_type, COUNT(*) as cnt
+                 FROM user_consents
+                 WHERE tenant_id = ? AND consent_given = 1
+                 GROUP BY consent_type
+             ) granted ON ct.slug = granted.consent_type
+             LEFT JOIN (
+                 SELECT consent_type, COUNT(*) as cnt
+                 FROM user_consents
+                 WHERE tenant_id = ? AND consent_given = 0
+                 GROUP BY consent_type
+             ) denied ON ct.slug = denied.consent_type
+             WHERE ct.is_active = TRUE
+             ORDER BY ct.display_order, ct.name",
+            [$tenantId, $tenantId]
+        )->fetchAll();
+
+        // Calculate dashboard stats
+        $totalConsents = Database::query(
+            "SELECT COUNT(*) as cnt FROM user_consents WHERE tenant_id = ?",
+            [$tenantId]
+        )->fetch()['cnt'] ?? 0;
+
+        $totalGranted = Database::query(
+            "SELECT COUNT(*) as cnt FROM user_consents WHERE tenant_id = ? AND consent_given = 1",
+            [$tenantId]
+        )->fetch()['cnt'] ?? 0;
+
+        $usersWithConsent = Database::query(
+            "SELECT COUNT(DISTINCT user_id) as cnt FROM user_consents WHERE tenant_id = ? AND consent_given = 1",
+            [$tenantId]
+        )->fetch()['cnt'] ?? 0;
+
+        // Pending re-consent: users with outdated consent versions for required consents
+        $pendingReconsent = Database::query(
+            "SELECT COUNT(DISTINCT uc.user_id) as cnt
+             FROM user_consents uc
+             JOIN consent_types ct ON uc.consent_type = ct.slug
+             WHERE uc.tenant_id = ?
+               AND ct.is_required = 1
+               AND uc.consent_given = 1
+               AND uc.consent_version != ct.current_version",
+            [$tenantId]
+        )->fetch()['cnt'] ?? 0;
+
+        $stats = [
+            'total_consents' => (int) $totalConsents,
+            'consent_rate' => $totalConsents > 0 ? round(($totalGranted / $totalConsents) * 100, 1) : 0,
+            'users_with_consent' => (int) $usersWithConsent,
+            'pending_reconsent' => (int) $pendingReconsent
+        ];
+
+        // Get paginated consent records with filtering
+        $page = max(1, (int) ($_GET['page'] ?? 1));
+        $perPage = 25;
+        $offset = ($page - 1) * $perPage;
+        $selectedType = $_GET['type'] ?? null;
+        $filters = array_filter([
+            'search' => $_GET['search'] ?? null,
+            'status' => $_GET['status'] ?? null,
+            'period' => $_GET['period'] ?? null,
+            'type' => $selectedType
+        ]);
+
+        $whereClause = "uc.tenant_id = ?";
+        $params = [$tenantId];
+
+        if (!empty($filters['search'])) {
+            $whereClause .= " AND (u.email LIKE ? OR u.first_name LIKE ? OR u.last_name LIKE ?)";
+            $searchTerm = '%' . $filters['search'] . '%';
+            $params = array_merge($params, [$searchTerm, $searchTerm, $searchTerm]);
+        }
+        if (!empty($filters['status'])) {
+            if ($filters['status'] === 'granted') {
+                $whereClause .= " AND uc.consent_given = 1";
+            } elseif ($filters['status'] === 'denied') {
+                $whereClause .= " AND uc.consent_given = 0 AND uc.withdrawn_at IS NULL";
+            } elseif ($filters['status'] === 'withdrawn') {
+                $whereClause .= " AND uc.withdrawn_at IS NOT NULL";
+            }
+        }
+        if ($selectedType) {
+            $whereClause .= " AND uc.consent_type = ?";
+            $params[] = $selectedType;
+        }
+
+        $totalCount = Database::query(
+            "SELECT COUNT(*) as cnt FROM user_consents uc
+             LEFT JOIN users u ON uc.user_id = u.id
+             WHERE {$whereClause}",
+            $params
+        )->fetch()['cnt'] ?? 0;
+
+        $consents = Database::query(
+            "SELECT uc.*, u.email, CONCAT(u.first_name, ' ', u.last_name) as username,
+                    ct.name as consent_type_name, uc.consent_given as granted
+             FROM user_consents uc
+             LEFT JOIN users u ON uc.user_id = u.id
+             LEFT JOIN consent_types ct ON uc.consent_type = ct.slug
+             WHERE {$whereClause}
+             ORDER BY uc.created_at DESC
+             LIMIT {$perPage} OFFSET {$offset}",
+            $params
+        )->fetchAll();
+
+        $selectedTypeName = null;
+        if ($selectedType) {
+            foreach ($consentTypes as $ct) {
+                if ($ct['slug'] === $selectedType) {
+                    $selectedTypeName = $ct['name'];
+                    break;
+                }
+            }
+        }
 
         View::render('admin/enterprise/gdpr/consents', [
             'consentTypes' => $consentTypes,
+            'stats' => $stats,
+            'consents' => $consents,
+            'selectedType' => $selectedType,
+            'selectedTypeName' => $selectedTypeName,
+            'filters' => $filters,
+            'totalCount' => (int) $totalCount,
+            'totalPages' => (int) ceil($totalCount / $perPage),
+            'pageCurrent' => $page,
+            'offset' => $offset,
             'title' => 'Consent Management',
         ]);
     }
@@ -1046,6 +1174,65 @@ class EnterpriseController
             http_response_code(500);
             echo json_encode(['error' => $e->getMessage()]);
         }
+    }
+
+    /**
+     * POST /admin/enterprise/gdpr/consents/backfill
+     * Backfill consent records for existing users who don't have them
+     * This creates records with consent_given=0, prompting users to accept on next login
+     */
+    public function gdprBackfillConsents(): void
+    {
+        \Nexus\Core\Csrf::verifyOrDie();
+
+        $consentType = $_POST['consent_type'] ?? '';
+
+        if (empty($consentType)) {
+            $_SESSION['flash_error'] = 'Please select a consent type to backfill.';
+            header('Location: ' . TenantContext::getBasePath() . '/admin/enterprise/gdpr/consents');
+            exit;
+        }
+
+        try {
+            $consentTypes = $this->gdprService->getConsentTypes();
+
+            $selectedType = null;
+            foreach ($consentTypes as $ct) {
+                if ($ct['slug'] === $consentType) {
+                    $selectedType = $ct;
+                    break;
+                }
+            }
+
+            if (!$selectedType) {
+                throw new \Exception('Invalid consent type: ' . $consentType);
+            }
+
+            $count = $this->gdprService->backfillConsentsForExistingUsers(
+                $selectedType['slug'],
+                $selectedType['current_version'],
+                $selectedType['current_text']
+            );
+
+            $this->logger->info("Consent backfill completed", [
+                'consent_type' => $consentType,
+                'users_affected' => $count,
+                'admin_id' => $this->getCurrentUserId()
+            ]);
+
+            if ($count > 0) {
+                $_SESSION['flash_success'] = "Successfully created consent records for {$count} users. They will be prompted to accept on their next login.";
+            } else {
+                $_SESSION['flash_info'] = "No users found without consent records for this type. All users already have records.";
+            }
+
+        } catch (\Exception $e) {
+            $this->logger->error("Consent backfill failed", ['error' => $e->getMessage()]);
+            $_SESSION['flash_error'] = 'Backfill failed: ' . $e->getMessage();
+        }
+
+        header('Location: ' . TenantContext::getBasePath() . '/admin/enterprise/gdpr/consents');
+        exit;
     }
 
     /**

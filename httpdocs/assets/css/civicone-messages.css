@@ -92,8 +92,12 @@
 }
 
 .civic-thread-back:focus {
-    outline: 3px solid var(--civic-msg-focus-ring);
-    outline-offset: var(--civic-msg-focus-offset);
+    /* GOV.UK Focus Pattern */
+    outline: 3px solid var(--govuk-focus-colour, #ffdd00);
+    outline-offset: 0;
+    background-color: var(--govuk-focus-colour, #ffdd00);
+    color: var(--govuk-focus-text-colour, #0b0c0c);
+    box-shadow: 0 -2px var(--govuk-focus-colour, #ffdd00), 0 4px var(--govuk-focus-text-colour, #0b0c0c);
 }
 
 .civic-inbox-btn {
@@ -155,8 +159,12 @@
 }
 
 .civic-thread-link:focus {
-    outline: 3px solid var(--civic-msg-focus-ring);
-    outline-offset: -3px;
+    /* GOV.UK Focus Pattern */
+    outline: 3px solid var(--govuk-focus-colour, #ffdd00);
+    outline-offset: 0;
+    background-color: var(--govuk-focus-colour, #ffdd00);
+    color: var(--govuk-focus-text-colour, #0b0c0c);
+    box-shadow: 0 -2px var(--govuk-focus-colour, #ffdd00), 0 4px var(--govuk-focus-text-colour, #0b0c0c);
     position: relative;
     z-index: 1;
 }
@@ -314,8 +322,12 @@
 }
 
 .civic-chat-textarea:focus {
-    outline: 3px solid var(--civic-msg-focus-ring);
-    outline-offset: 2px;
+    /* GOV.UK Focus Pattern */
+    outline: 3px solid var(--govuk-focus-colour, #ffdd00);
+    outline-offset: 0;
+    background-color: var(--govuk-focus-colour, #ffdd00);
+    color: var(--govuk-focus-text-colour, #0b0c0c);
+    box-shadow: 0 -2px var(--govuk-focus-colour, #ffdd00), 0 4px var(--govuk-focus-text-colour, #0b0c0c);
     border-color: var(--skin-primary);
 }
 
@@ -408,8 +420,12 @@
 }
 
 .civic-notification-actions .civic-btn:focus {
-    outline: 3px solid var(--civic-msg-focus-ring);
-    outline-offset: 2px;
+    /* GOV.UK Focus Pattern */
+    outline: 3px solid var(--govuk-focus-colour, #ffdd00);
+    outline-offset: 0;
+    background-color: var(--govuk-focus-colour, #ffdd00);
+    color: var(--govuk-focus-text-colour, #0b0c0c);
+    box-shadow: 0 -2px var(--govuk-focus-colour, #ffdd00), 0 4px var(--govuk-focus-text-colour, #0b0c0c);
 }
 
 
@@ -429,8 +445,12 @@
 }
 
 .civic-action-bar .civic-btn:focus {
-    outline: 3px solid var(--civic-msg-focus-ring);
-    outline-offset: 2px;
+    /* GOV.UK Focus Pattern */
+    outline: 3px solid var(--govuk-focus-colour, #ffdd00);
+    outline-offset: 0;
+    background-color: var(--govuk-focus-colour, #ffdd00);
+    color: var(--govuk-focus-text-colour, #0b0c0c);
+    box-shadow: 0 -2px var(--govuk-focus-colour, #ffdd00), 0 4px var(--govuk-focus-text-colour, #0b0c0c);
 }
 
 
@@ -468,8 +488,12 @@
 }
 
 .civic-pagination-btn:focus {
-    outline: 3px solid var(--civic-msg-focus-ring);
-    outline-offset: 2px;
+    /* GOV.UK Focus Pattern */
+    outline: 3px solid var(--govuk-focus-colour, #ffdd00);
+    outline-offset: 0;
+    background-color: var(--govuk-focus-colour, #ffdd00);
+    color: var(--govuk-focus-text-colour, #0b0c0c);
+    box-shadow: 0 -2px var(--govuk-focus-colour, #ffdd00), 0 4px var(--govuk-focus-text-colour, #0b0c0c);
 }
 
 .civic-pagination-current {
@@ -525,8 +549,12 @@
 }
 
 .civic-empty-state .civic-btn:focus {
-    outline: 3px solid var(--civic-msg-focus-ring);
-    outline-offset: 2px;
+    /* GOV.UK Focus Pattern */
+    outline: 3px solid var(--govuk-focus-colour, #ffdd00);
+    outline-offset: 0;
+    background-color: var(--govuk-focus-colour, #ffdd00);
+    color: var(--govuk-focus-text-colour, #0b0c0c);
+    box-shadow: 0 -2px var(--govuk-focus-colour, #ffdd00), 0 4px var(--govuk-focus-text-colour, #0b0c0c);
 }
 
 
@@ -583,8 +611,12 @@
 .civic-thread-list a:focus,
 .civic-notification-card a:focus,
 .civic-pagination a:focus {
-    outline: 3px solid var(--civic-msg-focus-ring);
-    outline-offset: 2px;
+    /* GOV.UK Focus Pattern */
+    outline: 3px solid var(--govuk-focus-colour, #ffdd00);
+    outline-offset: 0;
+    background-color: var(--govuk-focus-colour, #ffdd00);
+    color: var(--govuk-focus-text-colour, #0b0c0c);
+    box-shadow: 0 -2px var(--govuk-focus-colour, #ffdd00), 0 4px var(--govuk-focus-text-colour, #0b0c0c);
 }
 
 

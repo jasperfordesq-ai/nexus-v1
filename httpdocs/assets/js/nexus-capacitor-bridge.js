@@ -524,6 +524,77 @@
     }
 
     // ============================================
+    // AUTO HAPTIC FEEDBACK ON INTERACTIVE ELEMENTS
+    // ============================================
+    function initAutoHaptics() {
+        // Only enable in native app
+        if (!Environment.isCapacitor()) return;
+
+        // Selectors for interactive elements that should have haptic feedback
+        const interactiveSelectors = [
+            'button',
+            '.btn',
+            '.glass-btn',
+            '[role="button"]',
+            '.nexus-bottom-nav-item',
+            '.nexus-native-nav-item',
+            '.civic-bottom-nav-item',
+            '.fab',
+            '.nexus-fab',
+            '.card-action',
+            '.nav-link',
+            '.dropdown-item',
+            '.list-group-item-action',
+            'input[type="submit"]',
+            'input[type="button"]',
+            '.toggle-switch',
+            '.checkbox-label',
+            '.radio-label'
+        ].join(', ');
+
+        // Use touchstart for immediate feedback (before click fires)
+        document.addEventListener('touchstart', (e) => {
+            const target = e.target.closest(interactiveSelectors);
+            if (!target) return;
+
+            // Skip if element has data-no-haptic attribute
+            if (target.hasAttribute('data-no-haptic')) return;
+
+            // Determine haptic type based on element
+            let hapticType = 'light';
+
+            // Stronger feedback for primary actions
+            if (target.classList.contains('btn-primary') ||
+                target.classList.contains('glass-btn-primary') ||
+                target.classList.contains('fab') ||
+                target.classList.contains('nexus-fab')) {
+                hapticType = 'medium';
+            }
+
+            // Selection feedback for toggles/checkboxes
+            if (target.classList.contains('toggle-switch') ||
+                target.classList.contains('checkbox-label') ||
+                target.classList.contains('radio-label')) {
+                NativeHaptics.selection();
+                return;
+            }
+
+            // Trigger haptic
+            NativeHaptics.impact(hapticType);
+        }, { passive: true });
+
+        // Success haptic on form submit
+        document.addEventListener('submit', (e) => {
+            // Only on successful validation (form will submit)
+            if (e.target.checkValidity()) {
+                NativeHaptics.notification('success');
+            }
+        }, { passive: true });
+
+        console.log('[NEXUS] Auto-haptics initialized for interactive elements');
+    }
+
+    // ============================================
     // INITIALIZE
     // ============================================
     function init() {
@@ -537,6 +608,9 @@
 
         // Initialize network monitoring
         NativeNetwork.init();
+
+        // Initialize auto-haptics for interactive elements
+        initAutoHaptics();
 
         // Hide splash screen if in native app
         if (Environment.isCapacitor()) {

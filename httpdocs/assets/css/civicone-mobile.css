@@ -52,9 +52,11 @@
 }
 
 .civic-bottom-nav-item:focus-visible {
-    outline: 3px solid var(--civic-focus, #FBBF24);
-    outline-offset: -3px;
-    background: rgba(251, 191, 36, 0.1);
+    /* GOV.UK Focus Pattern */
+    outline: 3px solid var(--govuk-focus-colour, #ffdd00);
+    outline-offset: 0;
+    background-color: var(--govuk-focus-colour, #ffdd00);
+    color: var(--govuk-focus-text-colour, #0b0c0c);
 }
 
 .civic-bottom-nav-item svg,
@@ -241,8 +243,10 @@ body.dark-mode .civic-bottom-nav-item.active {
 }
 
 .civic-fab:focus-visible {
-    outline: 3px solid var(--civic-focus, #FBBF24);
-    outline-offset: 3px;
+    /* GOV.UK Focus Pattern */
+    outline: 3px solid var(--govuk-focus-colour, #ffdd00);
+    outline-offset: 0;
+    box-shadow: 0 0 0 3px var(--govuk-focus-text-colour, #0b0c0c), 0 0 0 6px var(--govuk-focus-colour, #ffdd00);
 }
 
 .civic-fab svg {
@@ -1011,8 +1015,10 @@ body.is-offline .civic-header {
 }
 
 .civic-pwa-btn-install:focus-visible {
-    outline: 3px solid var(--civic-focus, #FBBF24);
-    outline-offset: 2px;
+    /* GOV.UK Focus Pattern */
+    outline: 3px solid var(--govuk-focus-colour, #ffdd00);
+    outline-offset: 0;
+    box-shadow: 0 -2px var(--govuk-focus-colour, #ffdd00), 0 4px var(--govuk-focus-text-colour, #0b0c0c);
 }
 
 .civic-pwa-btn-dismiss {
@@ -1036,8 +1042,11 @@ body.is-offline .civic-header {
 }
 
 .civic-pwa-btn-dismiss:focus-visible {
-    outline: 3px solid var(--civic-focus, #FBBF24);
-    outline-offset: 2px;
+    /* GOV.UK Focus Pattern */
+    outline: 3px solid var(--govuk-focus-colour, #ffdd00);
+    outline-offset: 0;
+    background-color: var(--govuk-focus-colour, #ffdd00);
+    color: var(--govuk-focus-text-colour, #0b0c0c);
 }
 
 .civic-pwa-btn-dismiss svg {
@@ -1112,8 +1121,10 @@ body.is-offline .civic-header {
 }
 
 .civic-update-btn:focus-visible {
-    outline: 3px solid var(--civic-focus, #FBBF24);
-    outline-offset: 2px;
+    /* GOV.UK Focus Pattern */
+    outline: 3px solid var(--govuk-focus-colour, #ffdd00);
+    outline-offset: 0;
+    box-shadow: 0 -2px var(--govuk-focus-colour, #ffdd00), 0 4px var(--govuk-focus-text-colour, #0b0c0c);
 }
 
 
@@ -1260,8 +1271,10 @@ body.is-offline .civic-header {
 }
 
 .civic-webauthn-modal-actions .civic-btn:focus-visible {
-    outline: 3px solid var(--civic-focus, #FBBF24);
-    outline-offset: 2px;
+    /* GOV.UK Focus Pattern */
+    outline: 3px solid var(--govuk-focus-colour, #ffdd00);
+    outline-offset: 0;
+    box-shadow: 0 -2px var(--govuk-focus-colour, #ffdd00), 0 4px var(--govuk-focus-text-colour, #0b0c0c);
 }
 
 
@@ -1348,8 +1361,12 @@ body.is-offline .civic-header {
 }
 
 .civic-biometric-btn:focus-visible {
-    outline: 3px solid var(--civic-focus, #FBBF24);
-    outline-offset: 2px;
+    /* GOV.UK Focus Pattern */
+    outline: 3px solid var(--govuk-focus-colour, #ffdd00);
+    outline-offset: 0;
+    background-color: var(--govuk-focus-colour, #ffdd00);
+    color: var(--govuk-focus-text-colour, #0b0c0c);
+    box-shadow: 0 -2px var(--govuk-focus-colour, #ffdd00), 0 4px var(--govuk-focus-text-colour, #0b0c0c);
 }
 
 .civic-biometric-btn svg {

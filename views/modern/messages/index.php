@@ -357,7 +357,6 @@ window.closeNewMessage = function() {
     <!-- Search -->
     <div class="messages-search">
         <div class="messages-search-wrap">
-            <i class="fa-solid fa-search"></i>
             <input type="text" class="messages-search-input" placeholder="Search conversations..." id="searchInput">
         </div>
     </div>

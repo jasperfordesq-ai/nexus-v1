@@ -1,0 +1,403 @@
+/**
+ * CivicOne GOV.UK Button Components
+ * WCAG 2.1 AA Compliant Buttons
+ * Based on GOV.UK Design System v5.x
+ *
+ * Reference: https://design-system.service.gov.uk/components/button/
+ * See: docs/CIVICONE_WCAG21AA_SOURCE_OF_TRUTH.md
+ *
+ * GOV.UK Button Specifications:
+ * - Primary: Green (#00703c) with white text
+ * - Secondary: Grey (#f3f2f1) with black text
+ * - Warning: Red (#d4351c) with white text
+ * - Minimum touch target: 44x44px
+ * - Bottom shadow for 3D effect
+ * - Focus: Yellow background + black text
+ */
+
+/* ===========================================
+   GOV.UK Button Tokens
+   =========================================== */
+:root {
+    /* Primary button (green) */
+    --govuk-button-background: #00703c;
+    --govuk-button-background-hover: #005a30;
+    --govuk-button-shadow: #002d18;
+
+    /* Secondary button (grey) */
+    --govuk-button-secondary-background: #f3f2f1;
+    --govuk-button-secondary-background-hover: #dbdad9;
+    --govuk-button-secondary-shadow: #929191;
+    --govuk-button-secondary-text: #0b0c0c;
+
+    /* Warning button (red) */
+    --govuk-button-warning-background: #d4351c;
+    --govuk-button-warning-background-hover: #aa2a16;
+    --govuk-button-warning-shadow: #55150b;
+
+    /* Inverse button (for dark backgrounds) */
+    --govuk-button-inverse-background: #ffffff;
+    --govuk-button-inverse-background-hover: #e8e8e8;
+    --govuk-button-inverse-shadow: #595959;
+
+    /* Button text colors */
+    --govuk-button-text: #ffffff;
+
+    /* CivicOne aliases */
+    --civicone-button-primary: var(--govuk-button-background);
+    --civicone-button-primary-hover: var(--govuk-button-background-hover);
+    --civicone-button-secondary: var(--govuk-button-secondary-background);
+    --civicone-button-secondary-hover: var(--govuk-button-secondary-background-hover);
+    --civicone-button-warning: var(--govuk-button-warning-background);
+    --civicone-button-warning-hover: var(--govuk-button-warning-background-hover);
+}
+
+/* ===========================================
+   Base Button Styles
+   =========================================== */
+.civic-button,
+[data-layout="civicone"] .govuk-button,
+.civicone .govuk-button {
+    /* Typography */
+    font-family: var(--civicone-font-family, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif);
+    font-size: 1rem; /* 16px mobile */
+    font-weight: 700;
+    line-height: 1.1875;
+    text-decoration: none;
+    text-align: center;
+
+    /* Layout */
+    display: inline-block;
+    position: relative;
+    min-height: 44px; /* WCAG touch target */
+    min-width: 44px;
+    margin-top: 0;
+    margin-right: 0;
+    margin-left: 0;
+    margin-bottom: 22px; /* GOV.UK: 22px bottom margin */
+    padding: 8px 10px 7px;
+
+    /* Appearance */
+    border: 2px solid transparent;
+    border-radius: 0; /* GOV.UK: No border radius */
+    box-shadow: 0 2px 0 var(--govuk-button-shadow);
+    cursor: pointer;
+
+    /* Colors - Primary default */
+    background-color: var(--govuk-button-background);
+    color: var(--govuk-button-text);
+
+    /* Prevent text selection */
+    -webkit-user-select: none;
+    user-select: none;
+
+    /* Smooth transitions */
+    transition: background-color 0.1s, box-shadow 0.1s;
+}
+
+@media (min-width: 40.0625em) {
+    .civic-button,
+    [data-layout="civicone"] .govuk-button,
+    .civicone .govuk-button {
+        font-size: 1.1875rem; /* 19px desktop */
+        padding: 8px 14px 7px;
+        margin-bottom: 32px;
+    }
+}
+
+/* Hover state */
+.civic-button:hover,
+[data-layout="civicone"] .govuk-button:hover,
+.civicone .govuk-button:hover {
+    background-color: var(--govuk-button-background-hover);
+    color: var(--govuk-button-text);
+    text-decoration: none;
+}
+
+/* Active/pressed state - button moves down */
+.civic-button:active,
+[data-layout="civicone"] .govuk-button:active,
+.civicone .govuk-button:active {
+    top: 2px;
+    box-shadow: none;
+}
+
+/* Focus state - GOV.UK yellow */
+.civic-button:focus,
+.civic-button:focus-visible,
+[data-layout="civicone"] .govuk-button:focus,
+[data-layout="civicone"] .govuk-button:focus-visible,
+.civicone .govuk-button:focus,
+.civicone .govuk-button:focus-visible {
+    outline: 3px solid transparent;
+    background-color: var(--govuk-focus-colour, #ffdd00);
+    box-shadow: 0 2px 0 var(--govuk-focus-text-colour, #0b0c0c);
+    color: var(--govuk-focus-text-colour, #0b0c0c);
+}
+
+/* Disabled state */
+.civic-button:disabled,
+.civic-button[disabled],
+.civic-button--disabled,
+[data-layout="civicone"] .govuk-button:disabled,
+.civicone .govuk-button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
+/* ===========================================
+   Secondary Button (Grey)
+   =========================================== */
+.civic-button--secondary,
+[data-layout="civicone"] .govuk-button--secondary,
+.civicone .govuk-button--secondary {
+    background-color: var(--govuk-button-secondary-background);
+    box-shadow: 0 2px 0 var(--govuk-button-secondary-shadow);
+    color: var(--govuk-button-secondary-text);
+}
+
+.civic-button--secondary:hover,
+[data-layout="civicone"] .govuk-button--secondary:hover,
+.civicone .govuk-button--secondary:hover {
+    background-color: var(--govuk-button-secondary-background-hover);
+    color: var(--govuk-button-secondary-text);
+}
+
+.civic-button--secondary:focus,
+.civic-button--secondary:focus-visible,
+[data-layout="civicone"] .govuk-button--secondary:focus,
+.civicone .govuk-button--secondary:focus {
+    background-color: var(--govuk-focus-colour, #ffdd00);
+    color: var(--govuk-focus-text-colour, #0b0c0c);
+}
+
+/* ===========================================
+   Warning Button (Red)
+   =========================================== */
+.civic-button--warning,
+[data-layout="civicone"] .govuk-button--warning,
+.civicone .govuk-button--warning {
+    background-color: var(--govuk-button-warning-background);
+    box-shadow: 0 2px 0 var(--govuk-button-warning-shadow);
+    color: var(--govuk-button-text);
+}
+
+.civic-button--warning:hover,
+[data-layout="civicone"] .govuk-button--warning:hover,
+.civicone .govuk-button--warning:hover {
+    background-color: var(--govuk-button-warning-background-hover);
+    color: var(--govuk-button-text);
+}
+
+.civic-button--warning:focus,
+.civic-button--warning:focus-visible,
+[data-layout="civicone"] .govuk-button--warning:focus,
+.civicone .govuk-button--warning:focus {
+    background-color: var(--govuk-focus-colour, #ffdd00);
+    color: var(--govuk-focus-text-colour, #0b0c0c);
+}
+
+/* ===========================================
+   Inverse Button (for dark backgrounds)
+   =========================================== */
+.civic-button--inverse,
+[data-layout="civicone"] .govuk-button--inverse,
+.civicone .govuk-button--inverse {
+    background-color: var(--govuk-button-inverse-background);
+    box-shadow: 0 2px 0 var(--govuk-button-inverse-shadow);
+    color: var(--govuk-button-secondary-text);
+}
+
+.civic-button--inverse:hover,
+[data-layout="civicone"] .govuk-button--inverse:hover,
+.civicone .govuk-button--inverse:hover {
+    background-color: var(--govuk-button-inverse-background-hover);
+    color: var(--govuk-button-secondary-text);
+}
+
+/* ===========================================
+   Start Button (Large with arrow)
+   =========================================== */
+.civic-button--start,
+[data-layout="civicone"] .govuk-button--start,
+.civicone .govuk-button--start {
+    font-size: 1.125rem; /* 18px mobile */
+    font-weight: 700;
+    padding: 10px 16px 7px;
+    min-height: 52px;
+}
+
+@media (min-width: 40.0625em) {
+    .civic-button--start,
+    [data-layout="civicone"] .govuk-button--start,
+    .civicone .govuk-button--start {
+        font-size: 1.5rem; /* 24px desktop */
+        padding: 12px 20px 9px;
+        min-height: 56px;
+    }
+}
+
+/* Arrow icon for start button */
+.civic-button--start::after,
+[data-layout="civicone"] .govuk-button--start::after,
+.civicone .govuk-button--start::after {
+    content: "";
+    display: inline-block;
+    width: 17px;
+    height: 17px;
+    margin-left: 10px;
+    vertical-align: middle;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='17' height='17' viewBox='0 0 33 40'%3E%3Cpath fill='%23fff' d='M0 0h13l20 20-20 20H0l20-20z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: contain;
+}
+
+.civic-button--start:focus::after,
+[data-layout="civicone"] .govuk-button--start:focus::after,
+.civicone .govuk-button--start:focus::after {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='17' height='17' viewBox='0 0 33 40'%3E%3Cpath fill='%230b0c0c' d='M0 0h13l20 20-20 20H0l20-20z'/%3E%3C/svg%3E");
+}
+
+/* ===========================================
+   Button Group (side by side)
+   =========================================== */
+.civic-button-group,
+[data-layout="civicone"] .govuk-button-group,
+.civicone .govuk-button-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--civicone-spacing-3, 15px);
+    margin-bottom: var(--civicone-spacing-4, 20px);
+    align-items: baseline;
+}
+
+.civic-button-group .civic-button,
+[data-layout="civicone"] .govuk-button-group .govuk-button,
+.civicone .govuk-button-group .govuk-button {
+    margin-bottom: var(--civicone-spacing-2, 10px);
+}
+
+/* ===========================================
+   Link styled as button
+   =========================================== */
+a.civic-button,
+[data-layout="civicone"] a.govuk-button,
+.civicone a.govuk-button {
+    text-decoration: none;
+}
+
+a.civic-button:visited,
+[data-layout="civicone"] a.govuk-button:visited,
+.civicone a.govuk-button:visited {
+    color: var(--govuk-button-text);
+}
+
+a.civic-button--secondary:visited,
+[data-layout="civicone"] a.govuk-button--secondary:visited,
+.civicone a.govuk-button--secondary:visited {
+    color: var(--govuk-button-secondary-text);
+}
+
+/* ===========================================
+   Small Button Variant
+   =========================================== */
+.civic-button--small {
+    font-size: 0.875rem;
+    padding: 6px 10px 5px;
+    min-height: 36px;
+    margin-bottom: var(--civicone-spacing-2, 10px);
+}
+
+@media (min-width: 40.0625em) {
+    .civic-button--small {
+        font-size: 1rem;
+    }
+}
+
+/* ===========================================
+   Full Width Button
+   =========================================== */
+.civic-button--full-width {
+    width: 100%;
+    text-align: center;
+}
+
+/* ===========================================
+   Icon Buttons
+   =========================================== */
+.civic-button--icon {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.civic-button--icon svg,
+.civic-button--icon i {
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
+}
+
+/* ===========================================
+   Loading State
+   =========================================== */
+.civic-button--loading {
+    position: relative;
+    color: transparent !important;
+    pointer-events: none;
+}
+
+.civic-button--loading::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 20px;
+    height: 20px;
+    margin: -10px 0 0 -10px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-top-color: #ffffff;
+    border-radius: 50%;
+    animation: civic-button-spin 0.8s linear infinite;
+}
+
+.civic-button--secondary.civic-button--loading::after {
+    border-color: rgba(11, 12, 12, 0.3);
+    border-top-color: #0b0c0c;
+}
+
+@keyframes civic-button-spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* ===========================================
+   Dark Mode Adjustments
+   =========================================== */
+body.dark-mode .civic-button--secondary,
+body.dark-mode [data-layout="civicone"] .govuk-button--secondary {
+    background-color: #383f43;
+    color: #ffffff;
+    box-shadow: 0 2px 0 #1d1d1d;
+}
+
+body.dark-mode .civic-button--secondary:hover,
+body.dark-mode [data-layout="civicone"] .govuk-button--secondary:hover {
+    background-color: #4a5157;
+}
+
+/* ===========================================
+   Print Styles
+   =========================================== */
+@media print {
+    .civic-button,
+    [data-layout="civicone"] .govuk-button {
+        background-color: transparent !important;
+        color: #000000 !important;
+        border: 2px solid #000000;
+        box-shadow: none;
+    }
+}

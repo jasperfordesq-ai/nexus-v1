@@ -122,8 +122,12 @@
 }
 
 .civic-user-result:focus {
-    outline: 3px solid var(--civic-wallet-focus-ring);
-    outline-offset: -3px;
+    /* GOV.UK Focus Pattern */
+    outline: 3px solid var(--govuk-focus-colour, #ffdd00);
+    outline-offset: 0;
+    background-color: var(--govuk-focus-colour, #ffdd00);
+    color: var(--govuk-focus-text-colour, #0b0c0c);
+    box-shadow: 0 -2px var(--govuk-focus-colour, #ffdd00), 0 4px var(--govuk-focus-text-colour, #0b0c0c);
 }
 
 .civic-user-avatar {
@@ -213,8 +217,12 @@
 }
 
 .civic-selected-clear:focus {
-    outline: 3px solid var(--civic-wallet-focus-ring);
-    outline-offset: 2px;
+    /* GOV.UK Focus Pattern */
+    outline: 3px solid var(--govuk-focus-colour, #ffdd00);
+    outline-offset: 0;
+    background-color: var(--govuk-focus-colour, #ffdd00);
+    color: var(--govuk-focus-text-colour, #0b0c0c);
+    box-shadow: 0 -2px var(--govuk-focus-colour, #ffdd00), 0 4px var(--govuk-focus-text-colour, #0b0c0c);
 }
 
 
@@ -479,8 +487,12 @@
 }
 
 .insights-nav-link:focus {
-    outline: 3px solid var(--civic-wallet-focus-ring);
-    outline-offset: 2px;
+    /* GOV.UK Focus Pattern */
+    outline: 3px solid var(--govuk-focus-colour, #ffdd00);
+    outline-offset: 0;
+    background-color: var(--govuk-focus-colour, #ffdd00);
+    color: var(--govuk-focus-text-colour, #0b0c0c);
+    box-shadow: 0 -2px var(--govuk-focus-colour, #ffdd00), 0 4px var(--govuk-focus-text-colour, #0b0c0c);
 }
 
 [data-theme="dark"] .insights-nav-link {
@@ -832,8 +844,12 @@
    -------------------------------------------- */
 .civic-wallet-form .civic-input:focus,
 .civic-wallet-form .civic-btn:focus {
-    outline: 3px solid var(--civic-wallet-focus-ring);
-    outline-offset: 2px;
+    /* GOV.UK Focus Pattern */
+    outline: 3px solid var(--govuk-focus-colour, #ffdd00);
+    outline-offset: 0;
+    background-color: var(--govuk-focus-colour, #ffdd00);
+    color: var(--govuk-focus-text-colour, #0b0c0c);
+    box-shadow: 0 -2px var(--govuk-focus-colour, #ffdd00), 0 4px var(--govuk-focus-text-colour, #0b0c0c);
 }
 
 .civic-wallet-form .civic-btn {

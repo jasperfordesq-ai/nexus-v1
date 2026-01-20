@@ -784,6 +784,13 @@ $router->add('POST', '/goals/{id}/delete', 'Nexus\Controllers\GoalController@des
 
 
 // --------------------------------------------------------------------------
+// GDPR CONSENT RE-ACCEPTANCE (User-facing)
+// --------------------------------------------------------------------------
+$router->add('GET', '/consent-required', 'Nexus\Controllers\ConsentController@required');
+$router->add('POST', '/consent/accept', 'Nexus\Controllers\ConsentController@accept');
+$router->add('GET', '/consent/decline', 'Nexus\Controllers\ConsentController@decline');
+
+// --------------------------------------------------------------------------
 // 8. MEMBERS & PROFILES
 // --------------------------------------------------------------------------
 $router->add('GET', '/settings', 'Nexus\Controllers\SettingsController@index'); // Route for /settings
@@ -1607,6 +1614,7 @@ $router->add('POST', '/admin/enterprise/gdpr/requests/{id}/generate-export', 'Ne
 $router->add('POST', '/admin/enterprise/gdpr/requests/bulk-process', 'Nexus\Controllers\Admin\EnterpriseController@gdprBulkProcess');
 $router->add('GET', '/admin/enterprise/gdpr/consents', 'Nexus\Controllers\Admin\EnterpriseController@gdprConsents');
 $router->add('POST', '/admin/enterprise/gdpr/consents/types', 'Nexus\Controllers\Admin\EnterpriseController@gdprConsentTypeStore');
+$router->add('POST', '/admin/enterprise/gdpr/consents/backfill', 'Nexus\Controllers\Admin\EnterpriseController@gdprBackfillConsents');
 $router->add('GET', '/admin/enterprise/gdpr/consents/{id}', 'Nexus\Controllers\Admin\EnterpriseController@gdprConsentDetail');
 $router->add('GET', '/admin/enterprise/gdpr/consents/export', 'Nexus\Controllers\Admin\EnterpriseController@gdprConsentsExport');
 $router->add('GET', '/admin/enterprise/gdpr/breaches', 'Nexus\Controllers\Admin\EnterpriseController@gdprBreaches');

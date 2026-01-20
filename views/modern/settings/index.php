@@ -1405,6 +1405,41 @@ require dirname(__DIR__, 2) . '/layouts/header.php';
                 </label>
             </div>
 
+            <div class="settings-divider"></div>
+
+            <h4 style="margin: 0 0 16px 0; font-weight: 700; color: rgb(var(--settings-text));">
+                <i class="fa-solid fa-robot" style="margin-right: 8px; color: rgb(var(--settings-primary));"></i>
+                AI Assistant
+            </h4>
+
+            <div class="settings-toggle-row">
+                <div class="settings-toggle-info">
+                    <h4>AI Button Pulse Animation</h4>
+                    <p>Show a pulsing animation on the AI assistant button to draw attention.</p>
+                </div>
+                <label class="settings-toggle">
+                    <input type="checkbox" name="ai_pulse_enabled" value="1"
+                           <?= ($_COOKIE['ai_pulse_enabled'] ?? '0') === '1' ? 'checked' : '' ?>
+                           onchange="setAiPulse(this.checked)">
+                    <span class="settings-toggle-slider"></span>
+                </label>
+            </div>
+
+            <script>
+                function setAiPulse(enabled) {
+                    document.cookie = `ai_pulse_enabled=${enabled ? '1' : '0'};path=/;max-age=31536000`;
+                    // Update the widget immediately if it exists
+                    const widget = document.getElementById('ai-chat-widget');
+                    if (widget) {
+                        if (enabled) {
+                            widget.classList.add('pulse-enabled');
+                        } else {
+                            widget.classList.remove('pulse-enabled');
+                        }
+                    }
+                }
+            </script>
+
         <?php elseif ($section === 'organizations'): ?>
             <!-- ORGANIZATIONS SETTINGS -->
             <div class="settings-section-header">

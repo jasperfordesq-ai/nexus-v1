@@ -45,8 +45,12 @@
 }
 
 .civic-dash-tab:focus {
-    outline: 3px solid var(--civic-brand, #2563eb);
-    outline-offset: 2px;
+    /* GOV.UK Focus Pattern */
+    outline: 3px solid var(--govuk-focus-colour, #ffdd00);
+    outline-offset: 0;
+    background-color: var(--govuk-focus-colour, #ffdd00);
+    color: var(--govuk-focus-text-colour, #0b0c0c);
+    box-shadow: 0 -2px var(--govuk-focus-colour, #ffdd00), 0 4px var(--govuk-focus-text-colour, #0b0c0c);
 }
 
 .civic-dash-tab.active {
@@ -109,27 +113,64 @@
     line-height: 1.2;
 }
 
-.civic-balance-btn {
+/* ============================================
+   GOV.UK BUTTON DASHBOARD POLISH
+   ============================================ */
+
+/* Dashboard-Wide Button Icon Improvements */
+.civic-button i,
+.civic-button svg {
+    vertical-align: middle;
+}
+
+/* Ensure buttons with icons align properly */
+.civic-button i + span,
+.civic-button span + i {
+    margin-left: 0;
+}
+
+/* Dashboard Card Header Buttons */
+.civic-dash-card-header .civic-button {
+    margin-bottom: 0;
+    font-size: 0.875rem;
+    padding: 6px 12px 5px;
+    min-height: 38px;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.civic-dash-card-header .civic-button i {
+    font-size: 16px;
+}
+
+/* Balance Card - White button on gradient background */
+.civic-balance-card .civic-button--secondary {
     background: #ffffff;
     color: var(--civic-brand, #2563eb);
-    border: none;
+    border-color: #ffffff;
+    box-shadow: 0 2px 0 rgba(0, 0, 0, 0.12);
+    margin-bottom: 0; /* Remove default GOV.UK margin in card */
     font-weight: 700;
-    padding: 12px 24px;
-    border-radius: 10px;
-    text-decoration: none;
-    display: inline-block;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
-.civic-balance-btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+.civic-balance-card .civic-button--secondary:hover {
+    background: #f8fafc;
+    border-color: #f8fafc;
+    box-shadow: 0 3px 0 rgba(0, 0, 0, 0.15);
+    color: var(--civic-brand, #2563eb);
 }
 
-.civic-balance-btn:focus {
-    outline: 3px solid #ffffff;
-    outline-offset: 2px;
+.civic-balance-card .civic-button--secondary:active {
+    top: 2px;
+    box-shadow: none;
+}
+
+.civic-balance-card .civic-button--secondary:focus {
+    outline: 3px solid transparent;
+    background: var(--govuk-focus-colour, #ffdd00);
+    color: var(--govuk-focus-text-colour, #0b0c0c);
+    box-shadow: 0 2px 0 var(--govuk-focus-text-colour, #0b0c0c);
 }
 
 /* Dashboard Cards */
@@ -349,51 +390,23 @@
     padding: 16px;
 }
 
-.civic-action-btn {
+/* Quick Actions - Full width GOV.UK buttons with icon spacing */
+.civic-quick-actions .civic-button {
+    width: 100%;
+    justify-content: center;
     display: flex;
     align-items: center;
-    justify-content: center;
-    gap: 8px;
-    padding: 12px 20px;
-    border-radius: 10px;
-    text-decoration: none;
-    font-weight: 700;
-    font-size: 0.9rem;
-    transition: all 0.2s ease;
-    border: none;
-    cursor: pointer;
+    gap: 10px;
+    margin-bottom: 10px; /* Reduced from default 22px */
 }
 
-.civic-action-btn:focus {
-    outline: 3px solid var(--civic-brand, #2563eb);
-    outline-offset: 2px;
+.civic-quick-actions .civic-button:last-child {
+    margin-bottom: 0;
 }
 
-.civic-action-btn-primary {
-    background: var(--civic-brand, #2563eb);
-    color: #ffffff;
-}
-
-.civic-action-btn-primary:hover {
-    background: #1d4ed8;
-}
-
-.civic-action-btn-secondary {
-    background: #f1f5f9;
-    color: #334155;
-}
-
-.civic-action-btn-secondary:hover {
-    background: #e2e8f0;
-}
-
-.civic-action-btn-score {
-    background: linear-gradient(135deg, #10b981, #06b6d4);
-    color: #ffffff;
-}
-
-.civic-action-btn-score:hover {
-    background: linear-gradient(135deg, #059669, #0891b2);
+.civic-quick-actions .civic-button i {
+    font-size: 18px;
+    flex-shrink: 0;
 }
 
 /* Empty States */
@@ -414,14 +427,30 @@
     margin-bottom: 8px;
 }
 
-.civic-empty-link {
-    color: var(--civic-brand, #2563eb);
-    text-decoration: none;
-    font-weight: 600;
+/* Empty State - GOV.UK Start Button */
+.civic-empty-state .civic-button--start {
+    margin-top: 16px;
+    margin-bottom: 0;
 }
 
-.civic-empty-link:hover {
-    text-decoration: underline;
+.civic-empty-large {
+    padding: 60px 20px;
+}
+
+.civic-empty-large h3 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--govuk-text-colour, #0b0c0c);
+    margin: 16px 0 8px;
+}
+
+.civic-empty-large .civic-empty-text {
+    color: var(--govuk-secondary-text-colour, #505a5f);
+    margin-bottom: 20px;
+}
+
+.civic-empty-large .civic-button {
+    margin-bottom: 0;
 }
 
 /* Listings Section */
@@ -696,84 +725,57 @@
     flex-wrap: wrap;
 }
 
-.civic-btn-secondary {
+/* Notification Actions - Compact GOV.UK Buttons */
+.civic-notif-actions {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.civic-notif-actions .civic-button {
+    font-size: 0.875rem;
+    padding: 6px 12px 5px;
+    min-height: 40px;
+    margin-bottom: 0;
     display: inline-flex;
     align-items: center;
     gap: 6px;
-    padding: 8px 12px;
-    background: #f1f5f9;
-    color: #475569;
-    border: 1px solid #cbd5e1;
-    border-radius: 8px;
-    font-size: 0.85rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.15s ease;
-    text-decoration: none;
 }
 
-.civic-btn-secondary:hover {
-    background: #e2e8f0;
+.civic-notif-actions .civic-button i {
+    font-size: 16px;
 }
 
-.civic-btn-secondary:focus {
-    outline: 3px solid var(--civic-brand, #2563eb);
-    outline-offset: 2px;
+.civic-notif-actions .btn-label {
+    display: inline;
 }
 
-.civic-btn-primary {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    padding: 8px 16px;
-    background: var(--civic-brand, #2563eb);
-    color: #ffffff;
-    border: none;
-    border-radius: 8px;
-    font-size: 0.85rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.15s ease;
-    text-decoration: none;
+/* Notification Item Actions */
+.civic-notif-item-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 12px;
 }
 
-.civic-btn-primary:hover {
-    background: #1d4ed8;
+.civic-notif-item-actions .civic-button {
+    font-size: 0.875rem;
+    padding: 6px 12px 5px;
+    min-height: 36px;
+    margin-bottom: 0;
+    flex: 0 0 auto;
 }
 
-.civic-btn-primary:focus {
-    outline: 3px solid var(--civic-brand, #2563eb);
-    outline-offset: 2px;
+.civic-notif-item-actions .civic-button i {
+    margin-right: 4px;
 }
 
-.civic-btn-danger {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    padding: 8px 12px;
-    background: #fef2f2;
-    color: #ef4444;
-    border: 1px solid #fecaca;
-    border-radius: 8px;
-    font-size: 0.85rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.15s ease;
-    text-decoration: none;
-}
-
-.civic-btn-danger:hover {
-    background: #fee2e2;
-}
-
-.civic-btn-sm {
-    padding: 6px 10px;
-    font-size: 0.8rem;
-}
-
-.civic-btn-full {
+/* Full-Width Button Utility */
+.civic-button--full-width {
     width: 100%;
     justify-content: center;
+    display: flex;
+    align-items: center;
+    gap: 8px;
 }
 
 /* Modal */
@@ -806,22 +808,22 @@
     font-weight: 700;
 }
 
+/* Modal Close - Compact GOV.UK Button */
 .civic-modal-close {
-    background: #f1f5f9;
-    border: none;
-    cursor: pointer;
     font-size: 1.2rem;
-    color: #64748b;
-    width: 32px;
-    height: 32px;
-    border-radius: 8px;
+    width: 40px;
+    height: 40px;
+    min-width: 40px;
+    min-height: 40px;
     display: flex;
     align-items: center;
     justify-content: center;
+    padding: 0 !important;
+    margin-bottom: 0;
 }
 
-.civic-modal-close:hover {
-    background: #e2e8f0;
+.civic-modal-close i {
+    font-size: 20px;
 }
 
 .civic-modal-body {
@@ -900,8 +902,12 @@
 }
 
 .civic-select:focus {
-    outline: 3px solid var(--civic-brand, #2563eb);
-    outline-offset: 2px;
+    /* GOV.UK Focus Pattern */
+    outline: 3px solid var(--govuk-focus-colour, #ffdd00);
+    outline-offset: 0;
+    background-color: var(--govuk-focus-colour, #ffdd00);
+    color: var(--govuk-focus-text-colour, #0b0c0c);
+    box-shadow: 0 -2px var(--govuk-focus-colour, #ffdd00), 0 4px var(--govuk-focus-text-colour, #0b0c0c);
 }
 
 .civic-select-sm {
@@ -1013,6 +1019,13 @@
     border-top: 1px solid #f1f5f9;
 }
 
+.civic-hub-card-footer .civic-button {
+    font-size: 0.875rem;
+    padding: 6px 14px 5px;
+    min-height: 38px;
+    margin-bottom: 0;
+}
+
 .civic-hub-card-members {
     font-size: 0.85rem;
     color: #64748b;
@@ -1051,6 +1064,18 @@
 
 .civic-listings-actions {
     padding: 0 20px 16px;
+}
+
+.civic-listings-actions .civic-button {
+    font-size: 1rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 16px;
+}
+
+.civic-listings-actions .civic-button i {
+    font-size: 18px;
 }
 
 .civic-listing-card {
@@ -1134,10 +1159,20 @@
     border-top: 1px solid #f1f5f9;
 }
 
-.civic-listing-card-actions .civic-btn-secondary,
-.civic-listing-card-actions .civic-btn-danger {
+.civic-listing-card-actions .civic-button {
     flex: 1;
     justify-content: center;
+    font-size: 0.875rem;
+    padding: 6px 12px 5px;
+    min-height: 38px;
+    margin-bottom: 0;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.civic-listing-card-actions .civic-button i {
+    font-size: 16px;
 }
 
 /* ============================================
@@ -1196,39 +1231,47 @@
     opacity: 0.8;
 }
 
-/* Transfer Form */
+/* Transfer Form - GOV.UK Pattern Support */
 .civic-transfer-form {
     padding: 16px 20px;
 }
 
 .civic-form-group {
-    margin-bottom: 16px;
+    margin-bottom: 20px;
 }
 
 .civic-label {
     display: block;
-    font-size: 0.85rem;
+    font-size: 1rem;
     font-weight: 600;
-    color: #64748b;
+    color: var(--govuk-text-colour, #0b0c0c);
     margin-bottom: 6px;
+}
+
+.civic-hint {
+    display: block;
+    font-size: 0.9rem;
+    color: var(--govuk-secondary-text-colour, #505a5f);
+    margin-bottom: 8px;
+    line-height: 1.4;
 }
 
 .civic-input,
 .civic-textarea {
     width: 100%;
-    padding: 12px;
-    border: 1px solid #cbd5e1;
-    border-radius: 8px;
-    font-size: 16px;
-    transition: border-color 0.15s ease;
+    padding: 10px;
+    border: 2px solid var(--govuk-input-border-colour, #0b0c0c);
+    border-radius: 0;
+    font-size: 1rem;
+    transition: all 0.15s ease;
+    font-family: inherit;
 }
 
-.civic-input:focus,
-.civic-textarea:focus {
-    outline: none;
-    border-color: var(--civic-brand, #2563eb);
-    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+.civic-input--width-5 {
+    max-width: 10ex;
 }
+
+/* GOV.UK form inputs already have focus styles from civicone-govuk-forms.css */
 
 /* Selected User Chip */
 .civic-selected-user {
@@ -1533,6 +1576,20 @@
 .civic-event-hosted-actions {
     display: flex;
     gap: 10px;
+}
+
+.civic-event-hosted-actions .civic-button {
+    font-size: 0.875rem;
+    padding: 6px 12px 5px;
+    min-height: 38px;
+    margin-bottom: 0;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.civic-event-hosted-actions .civic-button i {
+    font-size: 16px;
 }
 
 /* Attending Events */

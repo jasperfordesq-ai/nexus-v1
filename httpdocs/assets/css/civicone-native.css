@@ -2,6 +2,7 @@
  * CivicOne Native Experience CSS
  * Advanced animations and native-feel interactions
  * WCAG 2.1 AA Compliant
+ * Updated 2026-01-20: GOV.UK design tokens
  */
 
 /* ===========================================
@@ -362,6 +363,15 @@ body.dark-mode .civic-bottom-sheet {
     line-height: 1;
 }
 
+.nexus-share-close:focus {
+    /* GOV.UK Focus Pattern */
+    outline: 3px solid var(--govuk-focus-colour, #ffdd00);
+    outline-offset: 0;
+    background-color: var(--govuk-focus-colour, #ffdd00);
+    color: var(--govuk-focus-text-colour, #0b0c0c);
+    box-shadow: 0 -2px var(--govuk-focus-colour, #ffdd00), 0 4px var(--govuk-focus-text-colour, #0b0c0c);
+}
+
 .nexus-share-options {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
@@ -399,6 +409,15 @@ body.dark-mode .civic-bottom-sheet {
 
 .nexus-share-option:hover {
     background: var(--civic-border, #e5e7eb);
+}
+
+.nexus-share-option:focus {
+    /* GOV.UK Focus Pattern */
+    outline: 3px solid var(--govuk-focus-colour, #ffdd00);
+    outline-offset: 0;
+    background-color: var(--govuk-focus-colour, #ffdd00);
+    color: var(--govuk-focus-text-colour, #0b0c0c);
+    box-shadow: 0 -2px var(--govuk-focus-colour, #ffdd00), 0 4px var(--govuk-focus-text-colour, #0b0c0c);
 }
 
 .nexus-share-option i {
@@ -507,6 +526,22 @@ body.dark-mode .civic-bottom-sheet {
 /* ===========================================
    9. FORM INPUT ANIMATIONS
    =========================================== */
+
+/* GOV.UK Focus Pattern for form inputs */
+.civic-input:focus,
+input[type="text"]:focus,
+input[type="email"]:focus,
+input[type="password"]:focus,
+input[type="tel"]:focus,
+select:focus,
+textarea:focus {
+    /* GOV.UK Focus Pattern */
+    outline: 3px solid var(--govuk-focus-colour, #ffdd00);
+    outline-offset: 0;
+    background-color: var(--govuk-focus-colour, #ffdd00);
+    color: var(--govuk-focus-text-colour, #0b0c0c);
+    box-shadow: inset 0 0 0 2px var(--govuk-focus-text-colour, #0b0c0c);
+}
 
 @media (prefers-reduced-motion: no-preference) {
     .civic-input,
@@ -719,6 +754,15 @@ input.invalid {
 
 .civic-context-menu button:active {
     background: var(--civic-border, #e5e7eb);
+}
+
+.civic-context-menu button:focus {
+    /* GOV.UK Focus Pattern */
+    outline: 3px solid var(--govuk-focus-colour, #ffdd00);
+    outline-offset: 0;
+    background-color: var(--govuk-focus-colour, #ffdd00);
+    color: var(--govuk-focus-text-colour, #0b0c0c);
+    box-shadow: 0 -2px var(--govuk-focus-colour, #ffdd00), 0 4px var(--govuk-focus-text-colour, #0b0c0c);
 }
 
 .civic-context-menu button svg {

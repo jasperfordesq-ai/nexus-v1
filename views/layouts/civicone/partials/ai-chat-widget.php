@@ -28,9 +28,8 @@ if (strpos($currentPath, '/ai') === 0) return;
 $basePath = Nexus\Core\TenantContext::getBasePath();
 
 // Check if user has AI pulse animation enabled (defaults to false)
-// Note: This setting is stored in federation settings but not readily available here
-// without controller support. Defaulting to false for now.
-$aiPulseEnabled = false;
+// Read from cookie - user can enable in Settings > Appearance
+$aiPulseEnabled = isset($_COOKIE['ai_pulse_enabled']) && $_COOKIE['ai_pulse_enabled'] === '1';
 ?>
 
 <!-- AI Chat Widget -->
@@ -53,7 +52,6 @@ $aiPulseEnabled = false;
                 <line x1="6" y1="6" x2="18" y2="18"></line>
             </svg>
         </span>
-        <span class="ai-fab-pulse"></span>
     </button>
 
     <!-- Chat Panel -->

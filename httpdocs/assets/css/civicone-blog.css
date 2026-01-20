@@ -1,6 +1,7 @@
 /* ============================================
    CIVICONE BLOG MODULE
    News & Blog - WCAG 2.1 AA Compliant
+   Updated 2026-01-20: GOV.UK design tokens
    ============================================ */
 
 /* --------------------------------------------
@@ -127,8 +128,12 @@
 #news-holo-wrapper .news-btn:focus-visible,
 #news-holo-wrapper .news-card:focus-visible,
 #news-holo-wrapper a:focus-visible {
-    outline: 3px solid var(--civic-blog-focus-ring);
-    outline-offset: var(--civic-blog-focus-offset);
+    /* GOV.UK Focus Pattern */
+    outline: 3px solid var(--govuk-focus-colour, #ffdd00);
+    outline-offset: 0;
+    background-color: var(--govuk-focus-colour, #ffdd00);
+    color: var(--govuk-focus-text-colour, #0b0c0c);
+    box-shadow: 0 -2px var(--govuk-focus-colour, #ffdd00), 0 4px var(--govuk-focus-text-colour, #0b0c0c);
 }
 
 
@@ -545,8 +550,12 @@
 }
 
 .news-btn:focus {
-    outline: 3px solid var(--civic-blog-focus-ring);
-    outline-offset: 2px;
+    /* GOV.UK Focus Pattern */
+    outline: 3px solid var(--govuk-focus-colour, #ffdd00);
+    outline-offset: 0;
+    background-color: var(--govuk-focus-colour, #ffdd00);
+    color: var(--govuk-focus-text-colour, #0b0c0c);
+    box-shadow: 0 -2px var(--govuk-focus-colour, #ffdd00), 0 4px var(--govuk-focus-text-colour, #0b0c0c);
 }
 
 .news-btn i {
@@ -753,8 +762,12 @@
 
 .civic-article-back:focus,
 .civic-article-share:focus {
-    outline: 3px solid var(--civic-blog-focus-ring);
-    outline-offset: 2px;
+    /* GOV.UK Focus Pattern */
+    outline: 3px solid var(--govuk-focus-colour, #ffdd00);
+    outline-offset: 0;
+    background-color: var(--govuk-focus-colour, #ffdd00);
+    color: var(--govuk-focus-text-colour, #0b0c0c);
+    box-shadow: 0 -2px var(--govuk-focus-colour, #ffdd00), 0 4px var(--govuk-focus-text-colour, #0b0c0c);
 }
 
 

@@ -205,6 +205,8 @@ $jsVersion = '2.5.13';
 <script src="/assets/js/nexus-native.min.js?v=<?= $jsVersion ?>" defer></script>
 <script src="/assets/js/nexus-mobile.min.js?v=<?= $jsVersion ?>" defer></script>
 <script src="/assets/js/nexus-capacitor-bridge.min.js?v=<?= $jsVersion ?>" defer></script>
+<script src="/assets/js/mobile-select-sheet.js?v=<?= $jsVersion ?>" defer></script>
+<script src="/assets/js/mobile-search-overlay.js?v=<?= $jsVersion ?>" defer></script>
 <script src="/assets/js/nexus-shared-transitions.min.js?v=<?= $jsVersion ?>" defer></script>
 <!-- Visual Polish Helpers - Auto-apply micro-interactions and provide utility functions -->
 <script src="/assets/js/polish-helpers.min.js?v=<?= $jsVersion ?>" defer></script>

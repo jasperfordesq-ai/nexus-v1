@@ -675,6 +675,161 @@ class GdprService
     }
 
     /**
+     * Check if user has accepted the current version of a specific consent
+     *
+     * @param int $userId
+     * @param string $consentType
+     * @return bool
+     */
+    public function hasCurrentVersionConsent(int $userId, string $consentType): bool
+    {
+        $result = $this->query(
+            "SELECT uc.consent_version, ct.current_version
+             FROM user_consents uc
+             JOIN consent_types ct ON uc.consent_type = ct.slug
+             WHERE uc.user_id = ? AND uc.consent_type = ? AND uc.tenant_id = ?
+               AND uc.consent_given = 1
+             ORDER BY uc.created_at DESC LIMIT 1",
+            [$userId, $consentType, $this->tenantId]
+        )->fetch();
+
+        if (!$result) {
+            return false;
+        }
+
+        return version_compare($result['consent_version'], $result['current_version'], '>=');
+    }
+
+    /**
+     * Get all required consents that user has not accepted at current version
+     *
+     * @param int $userId
+     * @return array Array of consent types needing re-acceptance
+     */
+    public function getOutdatedRequiredConsents(int $userId): array
+    {
+        // Get all required consent types
+        $requiredTypes = $this->query(
+            "SELECT slug, name, description, current_version, current_text, category
+             FROM consent_types
+             WHERE is_required = TRUE AND is_active = TRUE"
+        )->fetchAll();
+
+        $outdated = [];
+
+        foreach ($requiredTypes as $type) {
+            // Check user's consent for this type
+            $userConsent = $this->query(
+                "SELECT consent_version, consent_given
+                 FROM user_consents
+                 WHERE user_id = ? AND consent_type = ? AND tenant_id = ?
+                   AND consent_given = 1
+                 ORDER BY created_at DESC LIMIT 1",
+                [$userId, $type['slug'], $this->tenantId]
+            )->fetch();
+
+            // If no consent or version mismatch, add to outdated list
+            if (!$userConsent) {
+                $type['reason'] = 'never_accepted';
+                $outdated[] = $type;
+            } elseif (version_compare($userConsent['consent_version'], $type['current_version'], '<')) {
+                $type['reason'] = 'version_outdated';
+                $type['user_version'] = $userConsent['consent_version'];
+                $outdated[] = $type;
+            }
+        }
+
+        return $outdated;
+    }
+
+    /**
+     * Check if user needs to re-accept any required consents
+     *
+     * @param int $userId
+     * @return bool
+     */
+    public function needsReConsent(int $userId): bool
+    {
+        return !empty($this->getOutdatedRequiredConsents($userId));
+    }
+
+    /**
+     * Accept multiple consents at once (for re-consent page)
+     *
+     * @param int $userId
+     * @param array $consentSlugs Array of consent type slugs
+     * @return array Results for each consent
+     */
+    public function acceptMultipleConsents(int $userId, array $consentSlugs): array
+    {
+        $results = [];
+
+        foreach ($consentSlugs as $slug) {
+            try {
+                $results[$slug] = $this->updateUserConsent($userId, $slug, true);
+            } catch (\Exception $e) {
+                $results[$slug] = ['error' => $e->getMessage()];
+            }
+        }
+
+        return $results;
+    }
+
+    /**
+     * Backfill consent records for existing users
+     * Creates consent records with consent_given=0 for users who don't have records
+     * These users will be prompted to accept on next login
+     *
+     * @param string $consentType
+     * @param string $version
+     * @param string $consentText
+     * @return int Number of users backfilled
+     */
+    public function backfillConsentsForExistingUsers(string $consentType, string $version, string $consentText): int
+    {
+        // Find users without this consent type
+        $usersWithoutConsent = $this->query(
+            "SELECT u.id
+             FROM users u
+             LEFT JOIN user_consents uc ON u.id = uc.user_id
+               AND uc.consent_type = ? AND uc.tenant_id = ?
+             WHERE u.tenant_id = ? AND uc.id IS NULL
+               AND u.deleted_at IS NULL",
+            [$consentType, $this->tenantId, $this->tenantId]
+        )->fetchAll();
+
+        $count = 0;
+        $consentHash = hash('sha256', $consentText);
+
+        foreach ($usersWithoutConsent as $user) {
+            // Create a consent record with consent_given=0 (needs to accept)
+            $this->query(
+                "INSERT INTO user_consents
+                 (user_id, tenant_id, consent_type, consent_given, consent_text,
+                  consent_version, consent_hash, source, created_at)
+                 VALUES (?, ?, ?, 0, ?, ?, ?, 'backfill', NOW())",
+                [
+                    $user['id'],
+                    $this->tenantId,
+                    $consentType,
+                    $consentText,
+                    $version,
+                    $consentHash
+                ]
+            );
+            $count++;
+        }
+
+        $this->logger->info("Backfilled consent records", [
+            'consent_type' => $consentType,
+            'users_count' => $count,
+            'tenant_id' => $this->tenantId
+        ]);
+
+        return $count;
+    }
+
+    /**
      * Get all consent types
      */
     public function getConsentTypes(): array

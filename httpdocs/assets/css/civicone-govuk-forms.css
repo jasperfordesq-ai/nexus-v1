@@ -1,0 +1,700 @@
+/**
+ * CivicOne GOV.UK Form Components
+ * WCAG 2.1 AA Compliant Form Inputs
+ * Based on GOV.UK Design System v5.x
+ *
+ * Reference: https://design-system.service.gov.uk/components/
+ * See: docs/CIVICONE_WCAG21AA_SOURCE_OF_TRUTH.md
+ *
+ * GOV.UK Form Specifications:
+ * - 2px black border on inputs
+ * - 3px yellow focus outline
+ * - 5px red left border on error
+ * - Minimum 44px height for touch targets
+ * - Clear labels above inputs
+ * - Hint text in grey
+ * - Error messages in red with icon
+ */
+
+/* ===========================================
+   GOV.UK Form Tokens
+   =========================================== */
+:root {
+    /* Input colors */
+    --govuk-input-border: #0b0c0c;
+    --govuk-input-border-width: 2px;
+    --govuk-input-background: #ffffff;
+
+    /* Error colors */
+    --govuk-error-colour: #d4351c;
+    --govuk-error-border-width: 5px;
+
+    /* Hint text */
+    --govuk-hint-colour: #505a5f;
+
+    /* CivicOne aliases */
+    --civicone-input-border: var(--govuk-input-border);
+    --civicone-input-bg: var(--govuk-input-background);
+    --civicone-error: var(--govuk-error-colour);
+    --civicone-hint: var(--govuk-hint-colour);
+}
+
+/* ===========================================
+   Form Group Container
+   =========================================== */
+.civic-form-group,
+[data-layout="civicone"] .govuk-form-group,
+.civicone .govuk-form-group {
+    margin-bottom: var(--civicone-spacing-6, 30px);
+}
+
+/* Error state - red left border */
+.civic-form-group--error,
+[data-layout="civicone"] .govuk-form-group--error,
+.civicone .govuk-form-group--error {
+    padding-left: var(--civicone-spacing-3, 15px);
+    border-left: var(--govuk-error-border-width) solid var(--govuk-error-colour);
+}
+
+/* ===========================================
+   Labels
+   =========================================== */
+.civic-label,
+[data-layout="civicone"] .govuk-label,
+.civicone .govuk-label {
+    display: block;
+    font-family: var(--civicone-font-family, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif);
+    font-size: 1rem;
+    font-weight: 700;
+    line-height: 1.25;
+    color: var(--civicone-text, #0b0c0c);
+    margin-bottom: var(--civicone-spacing-1, 5px);
+}
+
+@media (min-width: 40.0625em) {
+    .civic-label,
+    [data-layout="civicone"] .govuk-label,
+    .civicone .govuk-label {
+        font-size: 1.1875rem;
+    }
+}
+
+/* Large label (for page headings that are also labels) */
+.civic-label--l,
+[data-layout="civicone"] .govuk-label--l,
+.civicone .govuk-label--l {
+    font-size: 1.5rem;
+    margin-bottom: var(--civicone-spacing-2, 10px);
+}
+
+@media (min-width: 40.0625em) {
+    .civic-label--l,
+    [data-layout="civicone"] .govuk-label--l,
+    .civicone .govuk-label--l {
+        font-size: 2.25rem;
+    }
+}
+
+/* Extra large label */
+.civic-label--xl,
+[data-layout="civicone"] .govuk-label--xl,
+.civicone .govuk-label--xl {
+    font-size: 2rem;
+    margin-bottom: var(--civicone-spacing-3, 15px);
+}
+
+@media (min-width: 40.0625em) {
+    .civic-label--xl,
+    [data-layout="civicone"] .govuk-label--xl,
+    .civicone .govuk-label--xl {
+        font-size: 3rem;
+    }
+}
+
+/* ===========================================
+   Hint Text
+   =========================================== */
+.civic-hint,
+[data-layout="civicone"] .govuk-hint,
+.civicone .govuk-hint {
+    display: block;
+    font-family: var(--civicone-font-family, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif);
+    font-size: 1rem;
+    font-weight: 400;
+    line-height: 1.25;
+    color: var(--civicone-hint, #505a5f);
+    margin-bottom: var(--civicone-spacing-3, 15px);
+}
+
+@media (min-width: 40.0625em) {
+    .civic-hint,
+    [data-layout="civicone"] .govuk-hint,
+    .civicone .govuk-hint {
+        font-size: 1.1875rem;
+    }
+}
+
+/* ===========================================
+   Error Messages
+   =========================================== */
+.civic-error-message,
+[data-layout="civicone"] .govuk-error-message,
+.civicone .govuk-error-message {
+    display: block;
+    font-family: var(--civicone-font-family, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif);
+    font-size: 1rem;
+    font-weight: 700;
+    line-height: 1.25;
+    color: var(--civicone-error, #d4351c);
+    margin-bottom: var(--civicone-spacing-3, 15px);
+}
+
+@media (min-width: 40.0625em) {
+    .civic-error-message,
+    [data-layout="civicone"] .govuk-error-message,
+    .civicone .govuk-error-message {
+        font-size: 1.1875rem;
+    }
+}
+
+/* Visually hidden prefix for screen readers */
+.civic-error-message::before,
+[data-layout="civicone"] .govuk-error-message::before,
+.civicone .govuk-error-message::before {
+    content: "Error: ";
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+/* ===========================================
+   Text Input
+   =========================================== */
+.civic-input,
+[data-layout="civicone"] .govuk-input,
+.civicone .govuk-input {
+    font-family: var(--civicone-font-family, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif);
+    font-size: 1rem;
+    font-weight: 400;
+    line-height: 1.25;
+    box-sizing: border-box;
+    width: 100%;
+    height: 44px; /* WCAG touch target */
+    padding: var(--civicone-spacing-1, 5px) var(--civicone-spacing-2, 10px);
+    border: var(--govuk-input-border-width) solid var(--civicone-input-border);
+    border-radius: 0; /* GOV.UK: No border radius */
+    background-color: var(--civicone-input-bg);
+    color: var(--civicone-text, #0b0c0c);
+    appearance: none;
+}
+
+@media (min-width: 40.0625em) {
+    .civic-input,
+    [data-layout="civicone"] .govuk-input,
+    .civicone .govuk-input {
+        font-size: 1.1875rem;
+        height: 50px;
+    }
+}
+
+/* Focus state */
+.civic-input:focus,
+.civic-input:focus-visible,
+[data-layout="civicone"] .govuk-input:focus,
+.civicone .govuk-input:focus {
+    outline: 3px solid var(--govuk-focus-colour, #ffdd00);
+    outline-offset: 0;
+    box-shadow: inset 0 0 0 2px var(--civicone-input-border);
+}
+
+/* Error state */
+.civic-input--error,
+[data-layout="civicone"] .govuk-input--error,
+.civicone .govuk-input--error {
+    border-color: var(--civicone-error);
+}
+
+.civic-input--error:focus,
+[data-layout="civicone"] .govuk-input--error:focus,
+.civicone .govuk-input--error:focus {
+    border-color: var(--civicone-input-border);
+}
+
+/* Width variants */
+.civic-input--width-2 { max-width: 5.4ex; }
+.civic-input--width-3 { max-width: 7.2ex; }
+.civic-input--width-4 { max-width: 9ex; }
+.civic-input--width-5 { max-width: 10.8ex; }
+.civic-input--width-10 { max-width: 23ex; }
+.civic-input--width-20 { max-width: 41ex; }
+.civic-input--width-30 { max-width: 59ex; }
+
+/* Two-thirds and one-half width */
+.civic-input--two-thirds { max-width: 66.66%; }
+.civic-input--one-half { max-width: 50%; }
+.civic-input--one-third { max-width: 33.33%; }
+.civic-input--one-quarter { max-width: 25%; }
+
+/* ===========================================
+   Textarea
+   =========================================== */
+.civic-textarea,
+[data-layout="civicone"] .govuk-textarea,
+.civicone .govuk-textarea {
+    font-family: var(--civicone-font-family, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif);
+    font-size: 1rem;
+    font-weight: 400;
+    line-height: 1.25;
+    box-sizing: border-box;
+    width: 100%;
+    min-height: 150px;
+    padding: var(--civicone-spacing-1, 5px) var(--civicone-spacing-2, 10px);
+    border: var(--govuk-input-border-width) solid var(--civicone-input-border);
+    border-radius: 0;
+    background-color: var(--civicone-input-bg);
+    color: var(--civicone-text, #0b0c0c);
+    resize: vertical;
+    appearance: none;
+}
+
+@media (min-width: 40.0625em) {
+    .civic-textarea,
+    [data-layout="civicone"] .govuk-textarea,
+    .civicone .govuk-textarea {
+        font-size: 1.1875rem;
+    }
+}
+
+.civic-textarea:focus,
+.civic-textarea:focus-visible,
+[data-layout="civicone"] .govuk-textarea:focus,
+.civicone .govuk-textarea:focus {
+    outline: 3px solid var(--govuk-focus-colour, #ffdd00);
+    outline-offset: 0;
+    box-shadow: inset 0 0 0 2px var(--civicone-input-border);
+}
+
+.civic-textarea--error,
+[data-layout="civicone"] .govuk-textarea--error,
+.civicone .govuk-textarea--error {
+    border-color: var(--civicone-error);
+}
+
+/* ===========================================
+   Select Dropdown
+   =========================================== */
+.civic-select,
+[data-layout="civicone"] .govuk-select,
+.civicone .govuk-select {
+    font-family: var(--civicone-font-family, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif);
+    font-size: 1rem;
+    font-weight: 400;
+    line-height: 1.25;
+    box-sizing: border-box;
+    width: 100%;
+    max-width: 100%;
+    height: 44px;
+    padding: var(--civicone-spacing-1, 5px) var(--civicone-spacing-6, 30px) var(--civicone-spacing-1, 5px) var(--civicone-spacing-2, 10px);
+    border: var(--govuk-input-border-width) solid var(--civicone-input-border);
+    border-radius: 0;
+    background-color: var(--civicone-input-bg);
+    color: var(--civicone-text, #0b0c0c);
+    cursor: pointer;
+    appearance: none;
+    /* Custom dropdown arrow */
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 20 20'%3E%3Cpath fill='%230b0c0c' d='M10 14L4 8h12z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 8px center;
+    background-size: 16px;
+}
+
+@media (min-width: 40.0625em) {
+    .civic-select,
+    [data-layout="civicone"] .govuk-select,
+    .civicone .govuk-select {
+        font-size: 1.1875rem;
+        height: 50px;
+    }
+}
+
+.civic-select:focus,
+.civic-select:focus-visible,
+[data-layout="civicone"] .govuk-select:focus,
+.civicone .govuk-select:focus {
+    outline: 3px solid var(--govuk-focus-colour, #ffdd00);
+    outline-offset: 0;
+    box-shadow: inset 0 0 0 2px var(--civicone-input-border);
+}
+
+.civic-select--error,
+[data-layout="civicone"] .govuk-select--error,
+.civicone .govuk-select--error {
+    border-color: var(--civicone-error);
+}
+
+/* ===========================================
+   Checkboxes
+   =========================================== */
+.civic-checkboxes,
+[data-layout="civicone"] .govuk-checkboxes,
+.civicone .govuk-checkboxes {
+    margin-bottom: var(--civicone-spacing-4, 20px);
+}
+
+.civic-checkboxes__item,
+[data-layout="civicone"] .govuk-checkboxes__item,
+.civicone .govuk-checkboxes__item {
+    display: flex;
+    align-items: flex-start;
+    margin-bottom: var(--civicone-spacing-2, 10px);
+    min-height: 44px;
+}
+
+.civic-checkboxes__input,
+[data-layout="civicone"] .govuk-checkboxes__input,
+.civicone .govuk-checkboxes__input {
+    position: absolute;
+    width: 44px;
+    height: 44px;
+    margin: 0;
+    opacity: 0;
+    cursor: pointer;
+}
+
+.civic-checkboxes__label,
+[data-layout="civicone"] .govuk-checkboxes__label,
+.civicone .govuk-checkboxes__label {
+    display: inline-block;
+    padding-left: 56px;
+    padding-top: 10px;
+    padding-bottom: 8px;
+    font-size: 1rem;
+    line-height: 1.25;
+    cursor: pointer;
+    position: relative;
+}
+
+@media (min-width: 40.0625em) {
+    .civic-checkboxes__label,
+    [data-layout="civicone"] .govuk-checkboxes__label,
+    .civicone .govuk-checkboxes__label {
+        font-size: 1.1875rem;
+    }
+}
+
+/* Custom checkbox box */
+.civic-checkboxes__label::before,
+[data-layout="civicone"] .govuk-checkboxes__label::before,
+.civicone .govuk-checkboxes__label::before {
+    content: "";
+    position: absolute;
+    top: 2px;
+    left: 0;
+    width: 40px;
+    height: 40px;
+    border: 2px solid var(--civicone-input-border);
+    background: var(--civicone-input-bg);
+}
+
+/* Checkmark */
+.civic-checkboxes__label::after,
+[data-layout="civicone"] .govuk-checkboxes__label::after,
+.civicone .govuk-checkboxes__label::after {
+    content: "";
+    position: absolute;
+    top: 13px;
+    left: 9px;
+    width: 23px;
+    height: 12px;
+    border: solid var(--civicone-text, #0b0c0c);
+    border-width: 0 0 5px 5px;
+    transform: rotate(-45deg);
+    opacity: 0;
+}
+
+/* Checked state */
+.civic-checkboxes__input:checked + .civic-checkboxes__label::after,
+[data-layout="civicone"] .govuk-checkboxes__input:checked + .govuk-checkboxes__label::after,
+.civicone .govuk-checkboxes__input:checked + .govuk-checkboxes__label::after {
+    opacity: 1;
+}
+
+/* Focus state */
+.civic-checkboxes__input:focus + .civic-checkboxes__label::before,
+[data-layout="civicone"] .govuk-checkboxes__input:focus + .govuk-checkboxes__label::before,
+.civicone .govuk-checkboxes__input:focus + .govuk-checkboxes__label::before {
+    outline: 3px solid var(--govuk-focus-colour, #ffdd00);
+    outline-offset: 0;
+    box-shadow: inset 0 0 0 2px var(--civicone-input-border);
+}
+
+/* ===========================================
+   Radio Buttons
+   =========================================== */
+.civic-radios,
+[data-layout="civicone"] .govuk-radios,
+.civicone .govuk-radios {
+    margin-bottom: var(--civicone-spacing-4, 20px);
+}
+
+.civic-radios__item,
+[data-layout="civicone"] .govuk-radios__item,
+.civicone .govuk-radios__item {
+    display: flex;
+    align-items: flex-start;
+    margin-bottom: var(--civicone-spacing-2, 10px);
+    min-height: 44px;
+}
+
+.civic-radios__input,
+[data-layout="civicone"] .govuk-radios__input,
+.civicone .govuk-radios__input {
+    position: absolute;
+    width: 44px;
+    height: 44px;
+    margin: 0;
+    opacity: 0;
+    cursor: pointer;
+}
+
+.civic-radios__label,
+[data-layout="civicone"] .govuk-radios__label,
+.civicone .govuk-radios__label {
+    display: inline-block;
+    padding-left: 56px;
+    padding-top: 10px;
+    padding-bottom: 8px;
+    font-size: 1rem;
+    line-height: 1.25;
+    cursor: pointer;
+    position: relative;
+}
+
+@media (min-width: 40.0625em) {
+    .civic-radios__label,
+    [data-layout="civicone"] .govuk-radios__label,
+    .civicone .govuk-radios__label {
+        font-size: 1.1875rem;
+    }
+}
+
+/* Custom radio circle */
+.civic-radios__label::before,
+[data-layout="civicone"] .govuk-radios__label::before,
+.civicone .govuk-radios__label::before {
+    content: "";
+    position: absolute;
+    top: 2px;
+    left: 0;
+    width: 40px;
+    height: 40px;
+    border: 2px solid var(--civicone-input-border);
+    border-radius: 50%;
+    background: var(--civicone-input-bg);
+}
+
+/* Inner dot */
+.civic-radios__label::after,
+[data-layout="civicone"] .govuk-radios__label::after,
+.civicone .govuk-radios__label::after {
+    content: "";
+    position: absolute;
+    top: 12px;
+    left: 10px;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: var(--civicone-text, #0b0c0c);
+    opacity: 0;
+}
+
+/* Selected state */
+.civic-radios__input:checked + .civic-radios__label::after,
+[data-layout="civicone"] .govuk-radios__input:checked + .govuk-radios__label::after,
+.civicone .govuk-radios__input:checked + .govuk-radios__label::after {
+    opacity: 1;
+}
+
+/* Focus state */
+.civic-radios__input:focus + .civic-radios__label::before,
+[data-layout="civicone"] .govuk-radios__input:focus + .govuk-radios__label::before,
+.civicone .govuk-radios__input:focus + .govuk-radios__label::before {
+    outline: 3px solid var(--govuk-focus-colour, #ffdd00);
+    outline-offset: 0;
+    box-shadow: inset 0 0 0 2px var(--civicone-input-border);
+}
+
+/* ===========================================
+   Fieldset & Legend
+   =========================================== */
+.civic-fieldset,
+[data-layout="civicone"] .govuk-fieldset,
+.civicone .govuk-fieldset {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    min-width: 0;
+}
+
+.civic-fieldset__legend,
+[data-layout="civicone"] .govuk-fieldset__legend,
+.civicone .govuk-fieldset__legend {
+    font-family: var(--civicone-font-family, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif);
+    font-size: 1rem;
+    font-weight: 700;
+    line-height: 1.25;
+    color: var(--civicone-text, #0b0c0c);
+    margin-bottom: var(--civicone-spacing-2, 10px);
+    padding: 0;
+}
+
+@media (min-width: 40.0625em) {
+    .civic-fieldset__legend,
+    [data-layout="civicone"] .govuk-fieldset__legend,
+    .civicone .govuk-fieldset__legend {
+        font-size: 1.1875rem;
+    }
+}
+
+.civic-fieldset__legend--l,
+[data-layout="civicone"] .govuk-fieldset__legend--l,
+.civicone .govuk-fieldset__legend--l {
+    font-size: 1.5rem;
+    margin-bottom: var(--civicone-spacing-3, 15px);
+}
+
+@media (min-width: 40.0625em) {
+    .civic-fieldset__legend--l,
+    [data-layout="civicone"] .govuk-fieldset__legend--l,
+    .civicone .govuk-fieldset__legend--l {
+        font-size: 2.25rem;
+    }
+}
+
+/* ===========================================
+   Character Count
+   =========================================== */
+.civic-character-count__message,
+[data-layout="civicone"] .govuk-character-count__message,
+.civicone .govuk-character-count__message {
+    font-size: 1rem;
+    color: var(--civicone-hint, #505a5f);
+    margin-top: var(--civicone-spacing-1, 5px);
+}
+
+.civic-character-count__message--error,
+[data-layout="civicone"] .govuk-character-count__message--error,
+.civicone .govuk-character-count__message--error {
+    color: var(--civicone-error, #d4351c);
+    font-weight: 700;
+}
+
+/* ===========================================
+   Error Summary (top of form)
+   =========================================== */
+.civic-error-summary,
+[data-layout="civicone"] .govuk-error-summary,
+.civicone .govuk-error-summary {
+    padding: var(--civicone-spacing-4, 20px);
+    margin-bottom: var(--civicone-spacing-6, 30px);
+    border: 5px solid var(--civicone-error, #d4351c);
+    background-color: var(--civicone-input-bg, #ffffff);
+}
+
+.civic-error-summary__title,
+[data-layout="civicone"] .govuk-error-summary__title,
+.civicone .govuk-error-summary__title {
+    font-size: 1.125rem;
+    font-weight: 700;
+    margin-top: 0;
+    margin-bottom: var(--civicone-spacing-3, 15px);
+    color: var(--civicone-text, #0b0c0c);
+}
+
+@media (min-width: 40.0625em) {
+    .civic-error-summary__title,
+    [data-layout="civicone"] .govuk-error-summary__title,
+    .civicone .govuk-error-summary__title {
+        font-size: 1.5rem;
+    }
+}
+
+.civic-error-summary__list,
+[data-layout="civicone"] .govuk-error-summary__list,
+.civicone .govuk-error-summary__list {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.civic-error-summary__list li,
+[data-layout="civicone"] .govuk-error-summary__list li,
+.civicone .govuk-error-summary__list li {
+    margin-bottom: var(--civicone-spacing-1, 5px);
+}
+
+.civic-error-summary__list a,
+[data-layout="civicone"] .govuk-error-summary__list a,
+.civicone .govuk-error-summary__list a {
+    color: var(--civicone-error, #d4351c);
+    font-weight: 700;
+}
+
+/* ===========================================
+   Dark Mode Adjustments
+   =========================================== */
+body.dark-mode .civic-input,
+body.dark-mode .civic-textarea,
+body.dark-mode .civic-select,
+body.dark-mode [data-layout="civicone"] .govuk-input,
+body.dark-mode [data-layout="civicone"] .govuk-textarea,
+body.dark-mode [data-layout="civicone"] .govuk-select {
+    background-color: #1d1d1d;
+    border-color: #ffffff;
+    color: #ffffff;
+}
+
+body.dark-mode .civic-label,
+body.dark-mode .civic-fieldset__legend,
+body.dark-mode [data-layout="civicone"] .govuk-label,
+body.dark-mode [data-layout="civicone"] .govuk-fieldset__legend {
+    color: #ffffff;
+}
+
+body.dark-mode .civic-hint,
+body.dark-mode [data-layout="civicone"] .govuk-hint {
+    color: #b1b4b6;
+}
+
+body.dark-mode .civic-checkboxes__label::before,
+body.dark-mode .civic-radios__label::before {
+    background-color: #1d1d1d;
+    border-color: #ffffff;
+}
+
+body.dark-mode .civic-checkboxes__label::after,
+body.dark-mode .civic-radios__label::after {
+    background-color: #ffffff;
+    border-color: #ffffff;
+}
+
+/* ===========================================
+   Print Styles
+   =========================================== */
+@media print {
+    .civic-input,
+    .civic-textarea,
+    .civic-select,
+    [data-layout="civicone"] .govuk-input,
+    [data-layout="civicone"] .govuk-textarea,
+    [data-layout="civicone"] .govuk-select {
+        border: 1px solid #000000;
+        background: #ffffff;
+    }
+}

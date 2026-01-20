@@ -69,13 +69,19 @@
                     // Layout saved to session
                     this.currentLayout = targetLayout;
 
+                    // Set flag so next page load knows it's a layout switch
+                    sessionStorage.setItem('nexus_layout_switching', 'true');
+
                     // Emit event
                     document.dispatchEvent(new CustomEvent('nexus:layoutChanged', {
                         detail: { layout: targetLayout }
                     }));
 
-                    // Reload page (session will apply new layout)
-                    window.location.replace(this.cleanUrl(window.location.href));
+                    // Small delay to ensure overlay is fully visible before redirect
+                    // This prevents flash of old layout during transition
+                    setTimeout(() => {
+                        window.location.replace(this.cleanUrl(window.location.href));
+                    }, 200);
                 } else {
                     console.error('Layout switch failed:', data.message);
                     this.showError(data.message || 'Failed to switch layout');
@@ -169,22 +175,35 @@
         }
 
         /**
-         * Add smooth transition guard
+         * Add smooth transition guard - ONLY during layout switches
+         * Removed from normal page loads to prevent flash on navigation
          */
         addTransitionGuard() {
-            document.body.classList.add('layout-transition-guard');
+            // Only apply transition guard if we're coming FROM a layout switch
+            // Check for a flag set by the switching process
+            const isLayoutSwitch = sessionStorage.getItem('nexus_layout_switching');
 
-            const markLoaded = () => {
-                setTimeout(() => {
-                    document.body.classList.add('loaded');
-                }, 50);
-            };
+            if (isLayoutSwitch) {
+                // Clear the flag
+                sessionStorage.removeItem('nexus_layout_switching');
 
-            if (document.readyState === 'loading') {
-                document.addEventListener('DOMContentLoaded', markLoaded);
-            } else {
-                markLoaded();
+                // Apply guard only during switch
+                document.body.classList.add('layout-transition-guard');
+
+                const markLoaded = () => {
+                    // Longer delay to ensure new CSS is fully applied
+                    setTimeout(() => {
+                        document.body.classList.add('loaded');
+                    }, 150);
+                };
+
+                if (document.readyState === 'loading') {
+                    document.addEventListener('DOMContentLoaded', markLoaded);
+                } else {
+                    markLoaded();
+                }
             }
+            // If not a layout switch, don't add any opacity guard - let page render normally
         }
 
         getCurrentLayout() {

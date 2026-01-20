@@ -62,6 +62,18 @@ class FederationOnboardingController
         )->fetch();
         $partnerCount = $partnerships['count'] ?? 0;
 
+        // Get user's existing GDPR consents to sync checkbox state
+        $consentStatus = [];
+        try {
+            $gdprService = new \Nexus\Services\Enterprise\GdprService();
+            $userConsents = $gdprService->getUserConsents($userId);
+            foreach ($userConsents as $consent) {
+                $consentStatus[$consent['consent_type_slug']] = (bool) $consent['consent_given'];
+            }
+        } catch (\Throwable $e) {
+            error_log("Federation onboarding consent fetch error: " . $e->getMessage());
+        }
+
         \Nexus\Core\SEO::setTitle('Get Started with Federation');
         \Nexus\Core\SEO::setDescription('Set up your federation profile and connect with members from partner timebanks.');
 
@@ -70,7 +82,8 @@ class FederationOnboardingController
             'userSettings' => $userSettings,
             'userProfile' => $userProfile,
             'partnerCount' => $partnerCount,
-            'basePath' => $basePath
+            'basePath' => $basePath,
+            'consentStatus' => $consentStatus
         ]);
     }
 
