@@ -1,9 +1,9 @@
 # CivicOne WCAG 2.1 AA Source of Truth
 
-**Version:** 1.3.0
+**Version:** 1.4.0
 **Status:** AUTHORITATIVE
 **Created:** 2026-01-20
-**Last Updated:** 2026-01-20 (Enhanced with MOJ/DfE/ONS/HMCTS Design System Guidance)
+**Last Updated:** 2026-01-20 (Added GOV.UK Page Template Boilerplate + Strict Grid Contracts)
 **Maintainer:** Development Team
 
 ---
@@ -954,6 +954,73 @@ Same pattern as Mega Menu. Current implementation in header.php already follows 
 
 Every CivicOne page MUST use one of the five canonical templates defined below. Ad-hoc page structures are NOT permitted.
 
+**CRITICAL:** All templates MUST follow the GOV.UK Page Template boilerplate structure as defined in:
+- GOV.UK Page Template: <https://design-system.service.gov.uk/styles/page-template/>
+- GOV.UK Layout: <https://design-system.service.gov.uk/styles/layout/>
+- GOV.UK Skip Link: <https://design-system.service.gov.uk/components/skip-link/>
+
+### 10.0 GOV.UK Page Template Boilerplate (MANDATORY FOR ALL PAGES)
+
+**ALL CivicOne pages MUST implement this exact structure:**
+
+```html
+<!DOCTYPE html>
+<html lang="en" class="govuk-template">
+<head>
+  <!-- Meta, CSS, etc. -->
+</head>
+<body class="civicone govuk-template__body">
+
+  <!-- REQUIRED: Skip link (FIRST focusable element) -->
+  <a href="#main-content" class="civicone-skip-link">Skip to main content</a>
+
+  <!-- Header/Navigation (site-specific) -->
+  <header><!-- ... --></header>
+
+  <!-- REQUIRED: Width container (max-width: 1020px) -->
+  <div class="civicone-width-container">
+
+    <!-- REQUIRED: Main wrapper (adds vertical padding) -->
+    <main class="civicone-main-wrapper" id="main-content" role="main">
+
+      <!-- Page content using GOV.UK grid -->
+      <div class="civicone-grid-row">
+        <div class="civicone-grid-column-two-thirds">
+          <!-- Content -->
+        </div>
+      </div>
+
+    </main>
+  </div>
+
+  <!-- Footer -->
+  <footer><!-- ... --></footer>
+
+</body>
+</html>
+```
+
+**MANDATORY Boilerplate Rules:**
+
+| Rule ID | Rule | Source | Rationale |
+|---------|------|--------|-----------|
+| BP-001 | Skip link MUST be first focusable element on page | GOV.UK Skip Link | WCAG 2.4.1 (Bypass Blocks) |
+| BP-002 | Skip link MUST target `#main-content` | GOV.UK Skip Link | Consistent navigation |
+| BP-003 | ALL page content MUST be wrapped in `civicone-width-container` (max-width: 1020px) | GOV.UK Layout | Consistent page width, readability |
+| BP-004 | Main content MUST be wrapped in `civicone-main-wrapper` | GOV.UK Layout | Consistent vertical spacing |
+| BP-005 | `<main>` MUST have `id="main-content"` and `role="main"` | GOV.UK Page Template | Skip link target + landmark |
+| BP-006 | NO page-level content may exist outside `civicone-width-container` (except full-width backgrounds) | GOV.UK Layout | Prevents layout inconsistency |
+| BP-007 | Grid columns MUST be inside `civicone-grid-row` | GOV.UK Layout | Proper grid behaviour |
+| BP-008 | DO NOT nest `civicone-grid-row` inside `civicone-grid-column` unless absolutely necessary | GOV.UK Layout | Prevents broken alignment |
+
+**Anti-Patterns (FORBIDDEN):**
+
+- â NO custom page-level containers (e.g., `<div class="custom-wrapper">`)
+- â NO skip link placed after navigation
+- â NO content outside `civicone-width-container` (except full-width hero/banner backgrounds)
+- â NO inline `style="max-width: XXXpx"` on page-level containers
+- â NO mixing GOV.UK grid with custom flexbox/grid layouts on the same page
+
 ### 10.1 Overview of Templates
 
 | Template | Use Cases | Primary Pattern | Grid Type |
@@ -967,6 +1034,14 @@ Every CivicOne page MUST use one of the five canonical templates defined below. 
 ### 10.2 Template A: Directory/List Page (Members, Groups, Volunteering)
 
 **Pattern Source:** MOJ "filter a list" pattern (https://design-patterns.service.justice.gov.uk/patterns/filter-a-list/)
+
+**CRITICAL FOR MEMBERS PAGE:** The Members directory (`/members`) has a large dataset (100+ members) and MUST use a **list or table layout** for results, NOT a card grid. Cards are only permitted for small curated "Featured Members" sections (<10 items).
+
+**Why this matters:**
+- **ONS guidance** (<https://service-manual.ons.gov.uk/design-system/components/card>): "Prefer simple list/table layouts for large datasets"
+- **DfE guidance** (<https://design.education.gov.uk/design-system/components/card>): "Test content without cards first; cards can harm understanding"
+- **Accessibility**: Card grids break screen reader navigation order, pagination context, and 200% zoom reflow
+- **Performance**: Large card grids cause layout thrashing and poor mobile performance
 
 **MANDATORY Structure:**
 
@@ -1432,9 +1507,24 @@ Every CivicOne page MUST use one of the five canonical templates defined below. 
 
 ## 11. Grid & Results Layout Contracts
 
-No CivicOne page may contain ad-hoc or custom grid systems. All pages MUST use one of the approved grid techniques defined below.
+**CRITICAL: NO AD-HOC GRIDS ALLOWED**
+
+No CivicOne page may contain ad-hoc, custom, or "freestyle" grid systems. All pages MUST use one of the three approved grid techniques defined below. Any deviation requires explicit approval and documented justification.
+
+**Why this rule exists:**
+- Custom grids break responsive behaviour across viewports
+- Ad-hoc flexbox/grid layouts fail accessibility testing (zoom, reflow, screen readers)
+- Inconsistent grid systems create maintenance nightmares
+- GOV.UK patterns are battle-tested across millions of users
 
 **IMPORTANT:** All CivicOne components MUST use the `.civicone-` prefix (not `.govuk-`) to avoid collisions with GOV.UK Frontend. See GOV.UK guidance on extending components: <https://design-system.service.gov.uk/get-started/extending-and-modifying-components/>
+
+**FORBIDDEN (will be rejected in code review):**
+- â Custom `display: grid` or `display: flex` for page-level layout
+- â Inline grid styles (e.g., `style="display: grid; grid-template-columns: ..."`)
+- â CSS frameworks (Bootstrap grid, Tailwind grid, etc.) mixed with GOV.UK grid
+- â Masonry/Pinterest/Isotope grids for directory results
+- â Nesting `civicone-grid-row` inside `civicone-grid-column` without justification
 
 ### 11.1 Approved Grid Techniques
 
@@ -1687,7 +1777,18 @@ No CivicOne page may contain ad-hoc or custom grid systems. All pages MUST use o
 
 ## 12. Refactoring Workflow to Avoid Ruining Existing Layouts
 
-This section defines the MANDATORY workflow for any HTML/CSS refactoring to prevent breaking existing functionality.
+**STOP RUINING LAYOUTS: This section is MANDATORY for any layout changes**
+
+This section defines the MANDATORY workflow for any HTML/CSS refactoring to prevent breaking existing functionality. Recent issues with the Members page layout demonstrate why this workflow is non-negotiable.
+
+**Problem:** Well-intentioned refactors have broken working layouts by:
+- Removing/renaming existing CSS grid classes without understanding their purpose
+- Introducing card grids where list layouts existed
+- Nesting grid-row inside grid-column incorrectly
+- Removing max-width containers
+- Breaking responsive behaviour on mobile
+
+**Solution:** Follow this workflow EXACTLY before touching any page layout.
 
 ### 12.1 Pre-Refactoring Investigation (REQUIRED)
 
@@ -1732,42 +1833,94 @@ When possible, fix issues with CSS ONLY (no HTML changes):
 
 ### 12.3 HTML Refactoring Workflow (When Required)
 
-If HTML changes are unavoidable:
+If HTML changes are unavoidable, follow this EXACT workflow:
 
-**Step 1: Create Before/After DOM Diff**
+**Step 1: Document Current Layout (REQUIRED)**
+
+Before changing ANY markup:
+
+```bash
+# 1. Capture current HTML output
+curl http://localhost/members > members-before.html
+
+# 2. Identify all CSS classes used for layout
+grep -o 'class="[^"]*"' members-before.html | sort | uniq > classes-before.txt
+
+# 3. Document which JavaScript depends on these classes
+grep -r "\.member-" assets/js/ > js-dependencies.txt
+```
+
+**Step 2: Create Before/After DOM Diff (MANDATORY)**
 
 ```bash
 # Capture current HTML output
 curl http://localhost/page > before.html
 
-# Make changes
+# Make changes to code
 
 # Capture new HTML output
 curl http://localhost/page > after.html
 
-# Diff the HTML
+# Diff the HTML (shows exact DOM changes)
 diff before.html after.html
+
+# Count lines changed
+diff before.html after.html | wc -l
 ```
 
-**Step 2: Visual Regression Snapshots**
+**RULE:** If diff shows >100 lines changed for a "refactor", you are likely breaking something. Review carefully.
 
-- Screenshot before: Desktop (1920px), Tablet (768px), Mobile (375px)
-- Make changes
-- Screenshot after: Same viewports
-- Compare pixel-by-pixel (use tool like BackstopJS or Percy)
+**Step 3: Visual Regression Snapshots (MANDATORY for Members/Groups/Volunteering)**
 
-**Step 3: Verify No Breaks**
+Must test these FOUR pages at THREE viewports each = 12 screenshots total:
 
-| Check | Tool/Method | Pass Criteria |
-|-------|-------------|---------------|
-| Navigation works | Manual test | Mega menu, mobile drawer functional |
-| Pusher notifications work | Manual test | Real-time updates still appear |
-| Chat widget appears | Manual test | Widget visible and functional |
-| JavaScript console | Browser DevTools | No new errors |
-| Layout switcher works | Manual test | Switch to Modern and back |
-| Mobile nav works | Real device test | Drawer opens/closes |
+| Page | Desktop (1920px) | Tablet (768px) | Mobile (375px) |
+|------|------------------|----------------|----------------|
+| Members (`/members`) | Required | Required | Required |
+| Groups (`/groups`) | Required | Required | Required |
+| Volunteering (`/volunteering`) | Required | Required | Required |
+| Homepage (`/`) | Required | Required | Required |
 
-**Step 4: Preserve Critical Classes/IDs**
+**Process:**
+
+1. **Before changes:**
+   - Screenshot all 4 pages at all 3 viewports (12 screenshots)
+   - Name files: `{page}-{viewport}-before.png`
+   - Store in `docs/screenshots/before/`
+
+2. **Make changes**
+
+3. **After changes:**
+   - Screenshot all 4 pages at all 3 viewports (12 screenshots)
+   - Name files: `{page}-{viewport}-after.png`
+   - Store in `docs/screenshots/after/`
+
+4. **Compare:**
+   - Use visual diff tool (e.g., BackstopJS, Percy, Chromatic)
+   - OR manually overlay images in photo editor
+   - Document any visual differences in commit message
+
+**Step 4: Functional Testing Checklist (MANDATORY)**
+
+Test EVERY item on this checklist before committing layout changes:
+
+| Check | Tool/Method | Pass Criteria | Why It Matters |
+|-------|-------------|---------------|----------------|
+| **Layout not broken** | Visual inspection | Page layout looks correct at 1920px, 768px, 375px | Responsive design |
+| **No horizontal scroll** | Browser test | No horizontal scrollbar at any viewport | WCAG 1.4.10 |
+| **Grid alignment correct** | Visual inspection | Columns align properly, no overlap | Layout integrity |
+| **Max-width respected** | DevTools | Content constrained to 1020px max | GOV.UK standard |
+| **Skip link works** | Keyboard test | Tab → Enter skips to #main-content | WCAG 2.4.1 |
+| **Navigation works** | Manual test | Mega menu, mobile drawer functional | Critical feature |
+| **Pusher notifications** | Manual test | Real-time updates still appear | Real-time features |
+| **Chat widget appears** | Manual test | Widget visible and functional | User support |
+| **JavaScript console** | Browser DevTools | No new errors | Code quality |
+| **Layout switcher works** | Manual test | Switch to Modern and back | Layout isolation |
+| **Mobile nav works** | Real device test | Drawer opens/closes correctly | Mobile UX |
+| **Zoom to 200%** | Browser zoom | Page usable, no broken layout | WCAG 1.4.4 |
+| **Results list order** | Screen reader test | Items announced in visual order | Screen reader UX |
+
+**Step 5: Preserve Critical Classes/IDs**
 
 **NEVER remove these without verifying dependencies:**
 
@@ -1782,12 +1935,14 @@ diff before.html after.html
 | Search bar | `#civic-search-form` | search.js |
 | Chat widget container | `#ai-chat-widget` | ai-chat-widget.js |
 
-**Step 5: Staged Rollout**
+**Step 6: Staged Rollout**
 
-1. **Dev:** Test on localhost with feature flag
+1. **Dev:** Test on localhost with feature flag (`?govuk=1`)
 2. **Staging:** Test with real data and all integrations
-3. **Production (canary):** Enable for 5% of users
+3. **Production (canary):** Enable for 5% of users via feature flag
 4. **Production (full):** Enable for all users
+
+**CRITICAL:** For Members/Groups/Volunteering pages, rollout MUST include A/B testing to verify no performance regression
 
 ### 12.4 Rollback Checklist
 
@@ -1863,6 +2018,71 @@ cp page.php.backup page.php
    - Remove old CSS classes after 1 week of stable operation
    - Update documentation
    - Delete backup files
+
+### 12.6 Members Page: Critical Case Study
+
+**Why the Members page is the #1 priority for getting layout right:**
+
+The Members directory (`/members`) is the highest-traffic directory page and has historically been broken by well-intentioned refactors. This section provides STRICT rules for this page.
+
+**Current Problems (must be fixed):**
+- Members results may be using card grid instead of list/table
+- Grid nesting may be incorrect (grid-row inside grid-column)
+- Max-width container may be missing
+- Responsive stacking may be broken on mobile
+- Pagination may be missing or broken
+
+**MANDATORY Requirements for Members Page:**
+
+| Requirement | Rule | Verification |
+|-------------|------|--------------|
+| **1. Use Template A** | MUST implement Directory/List template (Section 10.2) exactly | Visual inspection |
+| **2. GOV.UK boilerplate** | MUST have skip link, width container (1020px), main wrapper | DOM inspection |
+| **3. MOJ filter pattern** | MUST have aside with filters on left (1/4), results on right (3/4) | Visual inspection |
+| **4. List/table results** | MUST use `<ul class="civicone-results-list">` NOT card grid | DOM inspection |
+| **5. Results summary** | MUST show "Showing X-Y of Z members" with aria-live | Screen reader test |
+| **6. Pagination** | MUST have GOV.UK pagination component with aria-label | Keyboard test |
+| **7. Responsive** | Filters stack above results on mobile (<641px) | Mobile device test |
+| **8. No horizontal scroll** | MUST NOT scroll horizontally at 375px viewport | Browser test |
+| **9. Zoom to 200%** | MUST reflow correctly at 200% zoom | Browser zoom test |
+| **10. Keyboard nav** | All filters/results/pagination keyboard accessible | Tab walkthrough |
+
+**Members Page Layout Checklist (run before committing):**
+
+```bash
+# 1. Verify GOV.UK boilerplate structure
+curl http://localhost/members | grep -c 'civicone-width-container'  # Must be 1
+curl http://localhost/members | grep -c 'civicone-main-wrapper'     # Must be 1
+curl http://localhost/members | grep -c 'id="main-content"'         # Must be 1
+
+# 2. Verify MOJ filter pattern structure
+curl http://localhost/members | grep -c 'civicone-grid-row'         # Must be ≥2
+curl http://localhost/members | grep -c 'civicone-filter-panel'     # Must be 1
+
+# 3. Verify results are list (NOT card grid)
+curl http://localhost/members | grep -c 'civicone-results-list'     # Must be 1
+curl http://localhost/members | grep -c 'civicone-card-group'       # Must be 0 (or 1 if "Featured Members" section exists)
+
+# 4. Verify pagination exists
+curl http://localhost/members | grep -c 'civicone-pagination'        # Must be 1
+```
+
+**Visual Check for Members Page:**
+
+Open `/members` in browser and verify:
+- [ ] Skip link appears on Tab (yellow background)
+- [ ] Page content constrained to ~1020px width (not full viewport)
+- [ ] Filters panel on left (25% width on desktop)
+- [ ] Results panel on right (75% width on desktop)
+- [ ] Results show as vertical list, NOT card grid
+- [ ] Each result has heading → metadata → description structure
+- [ ] Results summary shows "Showing X-Y of Z members"
+- [ ] Pagination appears below results
+- [ ] On mobile (375px): filters stack above results
+- [ ] On mobile (375px): no horizontal scroll
+- [ ] At 200% zoom: page reflows, no horizontal scroll
+
+**If ANY of these checks fail, the refactor is NOT complete.**
 
 ---
 
