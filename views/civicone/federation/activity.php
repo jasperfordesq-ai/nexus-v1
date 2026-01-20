@@ -1,5 +1,8 @@
 <?php
-// Federation Activity Feed - Glassmorphism 2025
+/**
+ * Federation Activity Feed
+ * CivicOne Theme - WCAG 2.1 AA Compliant
+ */
 $pageTitle = $pageTitle ?? "Federation Activity";
 $hideHero = true;
 
@@ -16,155 +19,159 @@ $userOptedIn = $userOptedIn ?? false;
 ?>
 
 <!-- Offline Banner -->
-<div class="offline-banner" id="offlineBanner" role="alert" aria-live="polite">
-    <i class="fa-solid fa-wifi-slash"></i>
+<div class="civic-fed-offline-banner" id="offlineBanner" role="alert" aria-live="polite">
+    <i class="fa-solid fa-wifi-slash" aria-hidden="true"></i>
     <span>No internet connection</span>
 </div>
 
-<div class="htb-container-full">
-    <div id="fed-activity-wrapper">
+<div class="civic-container">
+    <!-- Back Link -->
+    <a href="<?= $basePath ?>/federation" class="civic-fed-back-link">
+        <i class="fa-solid fa-arrow-left" aria-hidden="true"></i>
+        Back to Federation Hub
+    </a>
 
-        <!-- Hero Section -->
-        <div class="fed-hero">
-            <div class="fed-hero-icon">
-                <i class="fa-solid fa-bell"></i>
-            </div>
-            <h1>Federation Activity</h1>
-            <p class="fed-hero-subtitle">
-                View your recent messages, transactions, and updates from partner timebanks.
-            </p>
+    <!-- Page Header -->
+    <header class="civic-fed-header">
+        <h1>Federation Activity</h1>
+    </header>
+
+    <p class="civic-fed-intro">
+        View your recent messages, transactions, and updates from partner timebanks.
+    </p>
+
+    <?php $currentPage = 'activity'; require dirname(__DIR__) . '/partials/federation-nav.php'; ?>
+
+    <!-- Stats Cards -->
+    <?php if ($userOptedIn && !empty($stats)): ?>
+    <div class="civic-fed-stats-grid">
+        <div class="civic-fed-stat-card">
+            <span class="civic-fed-stat-value civic-fed-stat-value--highlight"><?= $stats['unread_messages'] ?? 0 ?></span>
+            <span class="civic-fed-stat-label">Unread</span>
         </div>
-
-        <?php $currentPage = 'activity'; require dirname(__DIR__) . '/partials/federation-nav.php'; ?>
-
-        <!-- Stats Cards -->
-        <?php if ($userOptedIn && !empty($stats)): ?>
-        <div class="activity-header">
-            <div class="stats-grid">
-                <div class="stat-card">
-                    <div class="stat-value unread"><?= $stats['unread_messages'] ?? 0 ?></div>
-                    <div class="stat-label">Unread</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-value"><?= $stats['total_messages'] ?? 0 ?></div>
-                    <div class="stat-label">Messages</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-value sent"><?= number_format($stats['hours_sent'] ?? 0, 1) ?></div>
-                    <div class="stat-label">Hrs Sent</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-value received"><?= number_format($stats['hours_received'] ?? 0, 1) ?></div>
-                    <div class="stat-label">Hrs Received</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-value"><?= $stats['partner_count'] ?? 0 ?></div>
-                    <div class="stat-label">Partners</div>
-                </div>
-            </div>
+        <div class="civic-fed-stat-card">
+            <span class="civic-fed-stat-value"><?= $stats['total_messages'] ?? 0 ?></span>
+            <span class="civic-fed-stat-label">Messages</span>
         </div>
-        <?php endif; ?>
+        <div class="civic-fed-stat-card">
+            <span class="civic-fed-stat-value civic-fed-stat-value--sent"><?= number_format($stats['hours_sent'] ?? 0, 1) ?></span>
+            <span class="civic-fed-stat-label">Hrs Sent</span>
+        </div>
+        <div class="civic-fed-stat-card">
+            <span class="civic-fed-stat-value civic-fed-stat-value--received"><?= number_format($stats['hours_received'] ?? 0, 1) ?></span>
+            <span class="civic-fed-stat-label">Hrs Received</span>
+        </div>
+        <div class="civic-fed-stat-card">
+            <span class="civic-fed-stat-value"><?= $stats['partner_count'] ?? 0 ?></span>
+            <span class="civic-fed-stat-label">Partners</span>
+        </div>
+    </div>
+    <?php endif; ?>
 
-        <?php if (!$userOptedIn): ?>
-        <!-- Not Opted In Notice -->
-        <div class="optin-notice">
-            <i class="fa-solid fa-user-shield"></i>
-            <div>
-                <h3>Enable Federation to See Full Activity</h3>
-                <p>
-                    You can browse partner timebanks, but to receive messages, send transactions,
-                    and participate fully in the federation network, enable federation in your settings.
-                </p>
-                <a href="<?= $basePath ?>/settings?section=federation" class="optin-btn">
-                    <i class="fa-solid fa-toggle-on"></i>
+    <?php if (!$userOptedIn): ?>
+    <!-- Not Opted In Notice -->
+    <div class="civic-fed-card civic-fed-card--accent">
+        <div class="civic-fed-card-body">
+            <div class="civic-fed-notice">
+                <div class="civic-fed-notice-icon">
+                    <i class="fa-solid fa-user-shield" aria-hidden="true"></i>
+                </div>
+                <div class="civic-fed-notice-content">
+                    <h3>Enable Federation to See Full Activity</h3>
+                    <p>
+                        You can browse partner timebanks, but to receive messages, send transactions,
+                        and participate fully in the federation network, enable federation in your settings.
+                    </p>
+                </div>
+                <a href="<?= $basePath ?>/settings?section=federation" class="civic-fed-btn civic-fed-btn--primary">
+                    <i class="fa-solid fa-toggle-on" aria-hidden="true"></i>
                     Enable Federation
                 </a>
             </div>
         </div>
-        <?php endif; ?>
-
-        <!-- Filter Tabs -->
-        <div class="filter-tabs">
-            <button class="filter-tab active" data-filter="all">
-                <i class="fa-solid fa-stream"></i> All Activity
-            </button>
-            <button class="filter-tab" data-filter="message">
-                <i class="fa-solid fa-envelope"></i> Messages
-                <?php if (($stats['unread_messages'] ?? 0) > 0): ?>
-                <span class="badge"><?= $stats['unread_messages'] ?></span>
-                <?php endif; ?>
-            </button>
-            <button class="filter-tab" data-filter="transaction">
-                <i class="fa-solid fa-exchange-alt"></i> Transactions
-            </button>
-            <button class="filter-tab" data-filter="new_partner">
-                <i class="fa-solid fa-handshake"></i> Partners
-            </button>
-        </div>
-
-        <!-- Activity List -->
-        <?php if (!empty($activities)): ?>
-        <div class="activity-list" id="activity-list">
-            <?php foreach ($activities as $activity): ?>
-            <?php
-            $iconClass = 'partner';
-            if ($activity['type'] === 'message') {
-                $iconClass = 'message';
-            } elseif ($activity['type'] === 'transaction') {
-                $iconClass = ($activity['meta']['direction'] ?? '') === 'sent' ? 'transaction-sent' : 'transaction-received';
-            }
-            ?>
-            <a href="<?= $basePath . ($activity['link'] ?? '/federation') ?>"
-               class="activity-card <?= ($activity['is_unread'] ?? false) ? 'unread' : '' ?>"
-               data-type="<?= htmlspecialchars($activity['type']) ?>">
-                <div class="activity-icon <?= $iconClass ?>" style="<?= !empty($activity['color']) ? 'background: ' . $activity['color'] . '20; color: ' . $activity['color'] : '' ?>">
-                    <i class="fa-solid <?= htmlspecialchars($activity['icon'] ?? 'fa-bell') ?>"></i>
-                </div>
-                <div class="activity-content">
-                    <h3 class="activity-title"><?= htmlspecialchars($activity['title'] ?? '') ?></h3>
-                    <?php if (!empty($activity['subtitle'])): ?>
-                    <span class="activity-subtitle">
-                        <i class="fa-solid fa-building"></i>
-                        <?= htmlspecialchars($activity['subtitle']) ?>
-                    </span>
-                    <?php endif; ?>
-                    <?php if (!empty($activity['description'])): ?>
-                    <p class="activity-desc"><?= htmlspecialchars($activity['description']) ?></p>
-                    <?php endif; ?>
-                    <?php if (!empty($activity['preview'])): ?>
-                    <p class="activity-preview">"<?= htmlspecialchars($activity['preview']) ?>..."</p>
-                    <?php endif; ?>
-                </div>
-                <div class="activity-meta">
-                    <span class="activity-time"><?= formatActivityTime($activity['timestamp'] ?? '') ?></span>
-                    <?php if ($activity['is_unread'] ?? false): ?>
-                    <span class="unread-badge"></span>
-                    <?php endif; ?>
-                </div>
-            </a>
-            <?php endforeach; ?>
-        </div>
-        <?php else: ?>
-        <div class="empty-state">
-            <div class="empty-state-icon">
-                <i class="fa-solid fa-bell-slash"></i>
-            </div>
-            <h3>No Federation Activity Yet</h3>
-            <p>
-                <?php if (!$userOptedIn): ?>
-                Enable federation to start connecting with partner timebanks!
-                <?php else: ?>
-                Start connecting with members from partner timebanks to see activity here.
-                <?php endif; ?>
-            </p>
-            <a href="<?= $basePath ?>/federation/members" class="explore-btn">
-                <i class="fa-solid fa-users"></i>
-                Browse Federated Members
-            </a>
-        </div>
-        <?php endif; ?>
-
     </div>
+    <?php endif; ?>
+
+    <!-- Filter Tabs -->
+    <div class="civic-fed-filter-tabs" role="tablist" aria-label="Filter activity">
+        <button class="civic-fed-filter-tab civic-fed-filter-tab--active" data-filter="all" role="tab" aria-selected="true">
+            <i class="fa-solid fa-stream" aria-hidden="true"></i> All Activity
+        </button>
+        <button class="civic-fed-filter-tab" data-filter="message" role="tab" aria-selected="false">
+            <i class="fa-solid fa-envelope" aria-hidden="true"></i> Messages
+            <?php if (($stats['unread_messages'] ?? 0) > 0): ?>
+            <span class="civic-fed-filter-badge"><?= $stats['unread_messages'] ?></span>
+            <?php endif; ?>
+        </button>
+        <button class="civic-fed-filter-tab" data-filter="transaction" role="tab" aria-selected="false">
+            <i class="fa-solid fa-exchange-alt" aria-hidden="true"></i> Transactions
+        </button>
+        <button class="civic-fed-filter-tab" data-filter="new_partner" role="tab" aria-selected="false">
+            <i class="fa-solid fa-handshake" aria-hidden="true"></i> Partners
+        </button>
+    </div>
+
+    <!-- Activity List -->
+    <?php if (!empty($activities)): ?>
+    <div class="civic-fed-activity-feed" id="activity-list">
+        <?php foreach ($activities as $activity): ?>
+        <?php
+        $iconClass = 'civic-fed-activity-icon--partner';
+        if ($activity['type'] === 'message') {
+            $iconClass = 'civic-fed-activity-icon--message';
+        } elseif ($activity['type'] === 'transaction') {
+            $iconClass = ($activity['meta']['direction'] ?? '') === 'sent' ? 'civic-fed-activity-icon--sent' : 'civic-fed-activity-icon--received';
+        }
+        ?>
+        <a href="<?= $basePath . ($activity['link'] ?? '/federation') ?>"
+           class="civic-fed-activity-card <?= ($activity['is_unread'] ?? false) ? 'civic-fed-activity-card--unread' : '' ?>"
+           data-type="<?= htmlspecialchars($activity['type']) ?>">
+            <div class="civic-fed-activity-icon <?= $iconClass ?>">
+                <i class="fa-solid <?= htmlspecialchars($activity['icon'] ?? 'fa-bell') ?>" aria-hidden="true"></i>
+            </div>
+            <div class="civic-fed-activity-body">
+                <h3 class="civic-fed-activity-title"><?= htmlspecialchars($activity['title'] ?? '') ?></h3>
+                <?php if (!empty($activity['subtitle'])): ?>
+                <span class="civic-fed-activity-source">
+                    <i class="fa-solid fa-building" aria-hidden="true"></i>
+                    <?= htmlspecialchars($activity['subtitle']) ?>
+                </span>
+                <?php endif; ?>
+                <?php if (!empty($activity['description'])): ?>
+                <p class="civic-fed-activity-desc"><?= htmlspecialchars($activity['description']) ?></p>
+                <?php endif; ?>
+                <?php if (!empty($activity['preview'])): ?>
+                <p class="civic-fed-activity-preview">"<?= htmlspecialchars($activity['preview']) ?>..."</p>
+                <?php endif; ?>
+            </div>
+            <div class="civic-fed-activity-time">
+                <span><?= formatActivityTime($activity['timestamp'] ?? '') ?></span>
+                <?php if ($activity['is_unread'] ?? false): ?>
+                <span class="civic-fed-unread-dot" aria-label="Unread"></span>
+                <?php endif; ?>
+            </div>
+        </a>
+        <?php endforeach; ?>
+    </div>
+    <?php else: ?>
+    <div class="civic-fed-empty">
+        <div class="civic-fed-empty-icon">
+            <i class="fa-solid fa-bell-slash" aria-hidden="true"></i>
+        </div>
+        <h3>No Federation Activity Yet</h3>
+        <p>
+            <?php if (!$userOptedIn): ?>
+            Enable federation to start connecting with partner timebanks!
+            <?php else: ?>
+            Start connecting with members from partner timebanks to see activity here.
+            <?php endif; ?>
+        </p>
+        <a href="<?= $basePath ?>/federation/members" class="civic-fed-btn civic-fed-btn--primary">
+            <i class="fa-solid fa-users" aria-hidden="true"></i>
+            Browse Federated Members
+        </a>
+    </div>
+    <?php endif; ?>
 </div>
 
 <?php
@@ -194,14 +201,18 @@ function formatActivityTime($timestamp) {
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    const filterTabs = document.querySelectorAll('.filter-tab');
-    const activityCards = document.querySelectorAll('.activity-card');
+    const filterTabs = document.querySelectorAll('.civic-fed-filter-tab');
+    const activityCards = document.querySelectorAll('.civic-fed-activity-card');
 
     filterTabs.forEach(tab => {
         tab.addEventListener('click', function() {
             // Update active tab
-            filterTabs.forEach(t => t.classList.remove('active'));
-            this.classList.add('active');
+            filterTabs.forEach(t => {
+                t.classList.remove('civic-fed-filter-tab--active');
+                t.setAttribute('aria-selected', 'false');
+            });
+            this.classList.add('civic-fed-filter-tab--active');
+            this.setAttribute('aria-selected', 'true');
 
             const filter = this.dataset.filter;
 
@@ -221,9 +232,9 @@ document.addEventListener('DOMContentLoaded', function() {
 (function() {
     const banner = document.getElementById('offlineBanner');
     if (!banner) return;
-    window.addEventListener('online', () => banner.classList.remove('visible'));
-    window.addEventListener('offline', () => banner.classList.add('visible'));
-    if (!navigator.onLine) banner.classList.add('visible');
+    window.addEventListener('online', () => banner.classList.remove('civic-fed-offline-banner--visible'));
+    window.addEventListener('offline', () => banner.classList.add('civic-fed-offline-banner--visible'));
+    if (!navigator.onLine) banner.classList.add('civic-fed-offline-banner--visible');
 })();
 </script>
 

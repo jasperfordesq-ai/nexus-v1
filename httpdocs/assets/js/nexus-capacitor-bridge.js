@@ -332,6 +332,171 @@
     };
 
     // ============================================
+    // NATIVE NETWORK STATE (with web fallback)
+    // ============================================
+    const NativeNetwork = {
+        // Current network status
+        _status: {
+            connected: navigator.onLine,
+            connectionType: 'unknown'
+        },
+
+        // Callbacks for status changes
+        _listeners: [],
+
+        /**
+         * Initialize network monitoring
+         * Uses Capacitor Network plugin for accurate detection in native app
+         * Falls back to navigator.onLine for web
+         */
+        async init() {
+            if (Environment.isCapacitor() && window.Capacitor?.Plugins?.Network) {
+                try {
+                    const { Network } = window.Capacitor.Plugins;
+
+                    // Get initial status
+                    const status = await Network.getStatus();
+                    this._status = {
+                        connected: status.connected,
+                        connectionType: status.connectionType || 'unknown'
+                    };
+
+                    // Listen for changes
+                    Network.addListener('networkStatusChange', (status) => {
+                        const wasConnected = this._status.connected;
+                        this._status = {
+                            connected: status.connected,
+                            connectionType: status.connectionType || 'unknown'
+                        };
+
+                        console.log('[NEXUS Network] Status changed:', this._status);
+
+                        // Notify all listeners
+                        this._listeners.forEach(callback => {
+                            try {
+                                callback(this._status, wasConnected);
+                            } catch (e) {
+                                console.warn('[NEXUS Network] Listener error:', e);
+                            }
+                        });
+
+                        // Dispatch custom event for easy integration
+                        window.dispatchEvent(new CustomEvent('nexus:networkChange', {
+                            detail: { ...this._status, wasConnected }
+                        }));
+                    });
+
+                    console.log('[NEXUS Network] Capacitor Network plugin initialized:', this._status);
+                    return true;
+                } catch (e) {
+                    console.warn('[NEXUS Network] Failed to initialize Capacitor Network:', e);
+                }
+            }
+
+            // Web fallback - use navigator.onLine with online/offline events
+            this._status = {
+                connected: navigator.onLine,
+                connectionType: navigator.onLine ? 'unknown' : 'none'
+            };
+
+            const handleOnline = () => {
+                const wasConnected = this._status.connected;
+                this._status = { connected: true, connectionType: 'unknown' };
+                this._notifyListeners(wasConnected);
+            };
+
+            const handleOffline = () => {
+                const wasConnected = this._status.connected;
+                this._status = { connected: false, connectionType: 'none' };
+                this._notifyListeners(wasConnected);
+            };
+
+            window.addEventListener('online', handleOnline);
+            window.addEventListener('offline', handleOffline);
+
+            console.log('[NEXUS Network] Web fallback initialized:', this._status);
+            return true;
+        },
+
+        _notifyListeners(wasConnected) {
+            this._listeners.forEach(callback => {
+                try {
+                    callback(this._status, wasConnected);
+                } catch (e) {
+                    console.warn('[NEXUS Network] Listener error:', e);
+                }
+            });
+
+            window.dispatchEvent(new CustomEvent('nexus:networkChange', {
+                detail: { ...this._status, wasConnected }
+            }));
+        },
+
+        /**
+         * Get current network status
+         * @returns {Promise<{connected: boolean, connectionType: string}>}
+         */
+        async getStatus() {
+            // Refresh status from Capacitor if available
+            if (Environment.isCapacitor() && window.Capacitor?.Plugins?.Network) {
+                try {
+                    const { Network } = window.Capacitor.Plugins;
+                    const status = await Network.getStatus();
+                    this._status = {
+                        connected: status.connected,
+                        connectionType: status.connectionType || 'unknown'
+                    };
+                } catch (e) {
+                    // Use cached status
+                }
+            }
+            return { ...this._status };
+        },
+
+        /**
+         * Check if currently connected
+         * @returns {boolean}
+         */
+        isConnected() {
+            return this._status.connected;
+        },
+
+        /**
+         * Get connection type (wifi, cellular, none, unknown)
+         * @returns {string}
+         */
+        getConnectionType() {
+            return this._status.connectionType;
+        },
+
+        /**
+         * Add a listener for network status changes
+         * @param {Function} callback - Called with (status, wasConnected)
+         * @returns {Function} Unsubscribe function
+         */
+        addListener(callback) {
+            if (typeof callback !== 'function') return () => {};
+
+            this._listeners.push(callback);
+
+            // Return unsubscribe function
+            return () => {
+                const index = this._listeners.indexOf(callback);
+                if (index > -1) {
+                    this._listeners.splice(index, 1);
+                }
+            };
+        },
+
+        /**
+         * Remove all listeners
+         */
+        removeAllListeners() {
+            this._listeners = [];
+        }
+    };
+
+    // ============================================
     // REPLACE EXISTING HAPTICS
     // ============================================
     function enhanceExistingHaptics() {
@@ -370,6 +535,9 @@
         // Enhance haptics
         enhanceExistingHaptics();
 
+        // Initialize network monitoring
+        NativeNetwork.init();
+
         // Hide splash screen if in native app
         if (Environment.isCapacitor()) {
             // Wait for app to be ready
@@ -403,6 +571,7 @@
         Keyboard: NativeKeyboard,
         Share: NativeShare,
         Splash: NativeSplash,
+        Network: NativeNetwork,
         init
     };
 

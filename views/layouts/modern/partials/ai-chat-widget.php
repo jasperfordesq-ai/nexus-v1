@@ -26,10 +26,15 @@ $currentPath = parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH);
 if (strpos($currentPath, '/ai') === 0) return;
 
 $basePath = Nexus\Core\TenantContext::getBasePath();
+
+// Check if user has AI pulse animation enabled (defaults to false)
+// Note: This setting is stored in federation settings but not readily available here
+// without controller support. Defaulting to false for now.
+$aiPulseEnabled = false;
 ?>
 
 <!-- AI Chat Widget -->
-<div id="ai-chat-widget" class="ai-widget-container">
+<div id="ai-chat-widget" class="ai-widget-container<?= $aiPulseEnabled ? ' pulse-enabled' : '' ?>">
     <!-- Backdrop for mobile drawer -->
     <div id="ai-widget-backdrop" class="ai-widget-backdrop"></div>
 

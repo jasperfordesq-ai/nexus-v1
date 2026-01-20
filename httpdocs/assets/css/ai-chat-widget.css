@@ -74,6 +74,13 @@
     background: linear-gradient(135deg, #6366f1, #8b5cf6);
     opacity: 0;
     animation: fabPulse 2s ease-out infinite;
+    /* Hidden by default - enable via user preference */
+    display: none;
+}
+
+/* Show pulse animation when user has enabled it */
+.ai-widget-container.pulse-enabled .ai-fab-pulse {
+    display: block;
 }
 
 @keyframes fabPulse {

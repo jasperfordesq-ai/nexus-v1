@@ -160,10 +160,13 @@
         // 4. OFFLINE DETECTION
         // ============================================
 
+        networkUnsubscribe: null,
+
         initOfflineDetection: function() {
             // Only enable offline detection on mobile devices
-            // Desktop browsers have unreliable navigator.onLine detection
-            if (window.innerWidth > 768) {
+            // Desktop browsers have unreliable navigator.onLine detection (unless using Capacitor)
+            const isNative = window.NexusNative?.Environment?.isCapacitor?.();
+            if (window.innerWidth > 768 && !isNative) {
                 return;
             }
 
@@ -188,17 +191,37 @@
                 offlineBar.classList.remove('visible');
             }
 
-            // Listen for online/offline events
-            window.addEventListener('online', hideOffline);
-            window.addEventListener('offline', showOffline);
+            // Use NexusNative.Network if available (Capacitor plugin - more reliable)
+            if (window.NexusNative?.Network) {
+                console.log('[CivicOneMobile] Using Capacitor Network plugin for offline detection');
 
-            // On mobile, check initial state after a short delay
-            // This avoids false positives during page load while still catching truly offline state
-            setTimeout(function() {
-                if (!navigator.onLine) {
-                    showOffline();
-                }
-            }, 1000);
+                // Listen for network changes via the Capacitor bridge
+                this.networkUnsubscribe = window.NexusNative.Network.addListener((status, wasConnected) => {
+                    if (status.connected && !wasConnected) {
+                        hideOffline();
+                    } else if (!status.connected && wasConnected) {
+                        showOffline();
+                    }
+                });
+
+                // Check initial state
+                window.NexusNative.Network.getStatus().then(status => {
+                    if (!status.connected) {
+                        showOffline();
+                    }
+                });
+            } else {
+                // Fallback to browser events (less reliable on desktop)
+                window.addEventListener('online', hideOffline);
+                window.addEventListener('offline', showOffline);
+
+                // Check initial state after a short delay to avoid false positives
+                setTimeout(function() {
+                    if (!navigator.onLine) {
+                        showOffline();
+                    }
+                }, 1000);
+            }
         },
 
         // ============================================

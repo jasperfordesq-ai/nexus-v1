@@ -41,6 +41,13 @@ body.chat-page {
     width: 100%;
     touch-action: manipulation;
     padding-bottom: 0 !important; /* Override mobile nav padding */
+    /* Prevent text selection on UI elements */
+    -webkit-user-select: none;
+    user-select: none;
+    /* Smoother scrolling */
+    scroll-behavior: smooth;
+    /* Prevent zoom on double tap */
+    touch-action: manipulation;
 }
 
 /* Hide footer and navigation on chat page */
@@ -97,7 +104,9 @@ body.chat-page {
 }
 
 .chat-back:active {
-    background: rgba(99, 102, 241, 0.1);
+    background: rgba(99, 102, 241, 0.15);
+    transform: scale(0.95);
+    transition: transform 0.1s ease, background 0.1s ease;
 }
 
 .chat-user {

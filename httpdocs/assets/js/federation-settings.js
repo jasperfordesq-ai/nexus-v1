@@ -106,6 +106,8 @@
         var privacyInput = form.querySelector('input[name="privacy_level"]:checked');
         var reachInput = form.querySelector('input[name="service_reach"]:checked');
 
+        var aiPulseInput = form.querySelector('input[name="ai_pulse_enabled"]');
+
         var formData = {
             federation_optin: isOptedIn,
             privacy_level: privacyInput ? privacyInput.value : 'discovery',
@@ -115,7 +117,8 @@
             show_location: form.querySelector('input[name="show_location"]').checked,
             show_skills: form.querySelector('input[name="show_skills"]').checked,
             messaging_enabled: form.querySelector('input[name="messaging_enabled"]').checked,
-            transactions_enabled: form.querySelector('input[name="transactions_enabled"]').checked
+            transactions_enabled: form.querySelector('input[name="transactions_enabled"]').checked,
+            ai_pulse_enabled: aiPulseInput ? aiPulseInput.checked : false
         };
 
         fetch(basePath + '/federation/settings/save', {

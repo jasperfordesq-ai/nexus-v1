@@ -1256,12 +1256,14 @@
 
         offlineIndicator: null,
         onlineIndicator: null,
+        networkUnsubscribe: null,
 
         initOfflineIndicator: function() {
             // Only enable offline indicator on mobile devices
-            // Desktop browsers have unreliable navigator.onLine detection
-            if (window.innerWidth > 768) {
-                console.log('[NexusMobile] Offline indicator disabled on desktop');
+            // Desktop browsers have unreliable navigator.onLine detection (unless using Capacitor)
+            const isNative = window.NexusNative?.Environment?.isCapacitor?.();
+            if (window.innerWidth > 768 && !isNative) {
+                console.log('[NexusMobile] Offline indicator disabled on desktop web');
                 return;
             }
 
@@ -1298,27 +1300,53 @@
             `;
             document.body.appendChild(this.onlineIndicator);
 
-            // Listen for online/offline events
-            window.addEventListener('online', () => this.showOnlineIndicator());
-            window.addEventListener('offline', () => this.showOfflineIndicator());
-
-            // On mobile, check initial state after a short delay
-            // This avoids false positives during page load while still catching truly offline state
             const self = this;
-            setTimeout(function() {
-                if (!navigator.onLine) {
-                    self.showOfflineIndicator();
-                }
-            }, 1000);
+
+            // Use NexusNative.Network if available (Capacitor plugin - more reliable)
+            if (window.NexusNative?.Network) {
+                console.log('[NexusMobile] Using Capacitor Network plugin for offline detection');
+
+                // Listen for network changes via the Capacitor bridge
+                this.networkUnsubscribe = window.NexusNative.Network.addListener((status, wasConnected) => {
+                    if (status.connected && !wasConnected) {
+                        self.showOnlineIndicator();
+                    } else if (!status.connected && wasConnected) {
+                        self.showOfflineIndicator();
+                    }
+                });
+
+                // Check initial state
+                window.NexusNative.Network.getStatus().then(status => {
+                    if (!status.connected) {
+                        self.showOfflineIndicator();
+                    }
+                });
+            } else {
+                // Fallback to browser events (less reliable on desktop)
+                console.log('[NexusMobile] Using browser online/offline events for offline detection');
+
+                window.addEventListener('online', () => this.showOnlineIndicator());
+                window.addEventListener('offline', () => this.showOfflineIndicator());
+
+                // Check initial state after a short delay to avoid false positives
+                setTimeout(function() {
+                    if (!navigator.onLine) {
+                        self.showOfflineIndicator();
+                    }
+                }, 1000);
+            }
         },
 
         showOfflineIndicator: function() {
+            if (!this.offlineIndicator) return;
             document.body.classList.add('is-offline');
             this.offlineIndicator.classList.add('visible');
             this.haptic('warning');
         },
 
         showOnlineIndicator: function() {
+            if (!this.offlineIndicator || !this.onlineIndicator) return;
+
             // Hide offline indicator
             document.body.classList.remove('is-offline');
             this.offlineIndicator.classList.remove('visible');

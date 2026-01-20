@@ -162,6 +162,25 @@ $serviceReach = $userSettings['service_reach'] ?? 'local_only';
                 </div>
             </div>
 
+            <!-- AI Assistant Options -->
+            <div class="fed-settings-card">
+                <h2><i class="fa-solid fa-robot"></i> AI Assistant</h2>
+                <p>Customize the AI assistant appearance</p>
+
+                <div class="fed-toggle-list">
+                    <div class="fed-toggle-item">
+                        <div class="fed-toggle-info">
+                            <h4>AI Button Animation</h4>
+                            <p>Show pulsing animation on the AI assistant button</p>
+                        </div>
+                        <label class="fed-toggle-switch">
+                            <input type="checkbox" name="ai_pulse_enabled" id="ai_pulse_enabled" <?= !empty($userSettings['ai_pulse_enabled']) ? 'checked' : '' ?>>
+                            <span class="fed-toggle-slider"></span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+
             <!-- Service Reach -->
             <div class="fed-settings-card">
                 <h2><i class="fa-solid fa-location-dot"></i> Service Reach</h2>
@@ -327,7 +346,8 @@ $serviceReach = $userSettings['service_reach'] ?? 'local_only';
             show_location: form.querySelector('input[name="show_location"]').checked,
             show_skills: form.querySelector('input[name="show_skills"]').checked,
             messaging_enabled: form.querySelector('input[name="messaging_enabled"]').checked,
-            transactions_enabled: form.querySelector('input[name="transactions_enabled"]').checked
+            transactions_enabled: form.querySelector('input[name="transactions_enabled"]').checked,
+            ai_pulse_enabled: form.querySelector('input[name="ai_pulse_enabled"]').checked
         };
 
         try {

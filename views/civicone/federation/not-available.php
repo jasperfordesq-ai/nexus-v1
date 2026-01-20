@@ -1,5 +1,8 @@
 <?php
-// Federation Not Available - Glassmorphism 2025
+/**
+ * Federation Not Available
+ * CivicOne Theme - WCAG 2.1 AA Compliant
+ */
 $pageTitle = $pageTitle ?? "Federation Not Available";
 $hideHero = true;
 
@@ -11,37 +14,35 @@ $basePath = Nexus\Core\TenantContext::getBasePath();
 ?>
 
 <!-- Offline Banner -->
-<div class="offline-banner" id="offlineBanner" role="alert" aria-live="polite">
+<div class="civic-fed-offline-banner" id="offlineBanner" role="alert" aria-live="polite">
     <i class="fa-solid fa-wifi-slash" aria-hidden="true"></i>
     <span>No internet connection</span>
 </div>
 
-<div class="htb-container-full">
-    <div id="federation-unavailable-wrapper">
+<div class="civic-container">
+    <div class="civic-fed-opt-in-card" role="main">
+        <div class="civic-fed-opt-in-icon" aria-hidden="true">
+            <i class="fa-solid fa-network-wired"></i>
+        </div>
 
-        <article class="unavailable-card" role="status" aria-labelledby="unavailable-title">
-            <div class="unavailable-icon" aria-hidden="true">
-                <i class="fa-solid fa-network-wired"></i>
+        <h1 class="civic-fed-opt-in-title">Federation Not Available</h1>
+
+        <p class="civic-fed-opt-in-message">
+            The federation network is not currently enabled for your timebank.
+            Federation allows members to connect with partner timebanks to expand their community reach.
+        </p>
+
+        <a href="<?= $basePath ?>/members" class="civic-fed-btn civic-fed-btn--primary">
+            <i class="fa-solid fa-users" aria-hidden="true"></i>
+            Browse Local Members
+        </a>
+
+        <aside class="civic-fed-notice" role="note">
+            <i class="fa-solid fa-info-circle" aria-hidden="true"></i>
+            <div>
+                If you believe federation should be enabled, please contact your timebank administrator.
             </div>
-
-            <h1 id="unavailable-title" class="unavailable-title">Federation Not Available</h1>
-
-            <p class="unavailable-message">
-                The federation network is not currently enabled for your timebank.
-                Federation allows members to connect with partner timebanks to expand their community reach.
-            </p>
-
-            <a href="<?= $basePath ?>/members" class="back-btn">
-                <i class="fa-solid fa-users" aria-hidden="true"></i>
-                Browse Local Members
-            </a>
-
-            <aside class="info-note" role="note">
-                <i class="fa-solid fa-info-circle" aria-hidden="true"></i>
-                <span>If you believe federation should be enabled, please contact your timebank administrator.</span>
-            </aside>
-        </article>
-
+        </aside>
     </div>
 </div>
 
@@ -50,9 +51,9 @@ $basePath = Nexus\Core\TenantContext::getBasePath();
 (function() {
     const banner = document.getElementById('offlineBanner');
     if (!banner) return;
-    window.addEventListener('online', () => banner.classList.remove('visible'));
-    window.addEventListener('offline', () => banner.classList.add('visible'));
-    if (!navigator.onLine) banner.classList.add('visible');
+    window.addEventListener('online', () => banner.classList.remove('civic-fed-offline-banner--visible'));
+    window.addEventListener('offline', () => banner.classList.add('civic-fed-offline-banner--visible'));
+    if (!navigator.onLine) banner.classList.add('civic-fed-offline-banner--visible');
 })();
 </script>
 
