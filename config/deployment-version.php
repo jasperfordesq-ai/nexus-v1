@@ -10,7 +10,7 @@
  */
 
 return [
-    'version' => '2026.01.19.013', // Update this with each deployment
-    'timestamp' => 1768845168, // Unix timestamp of last deployment
-    'description' => 'CRITICAL FIX: Remove aggressive scroll monitor breaking scrolling'
+    'version' => time(), // Use actual timestamp to force cache bust
+    'timestamp' => time(), // Unix timestamp of last deployment
+    'description' => 'NUCLEAR CACHE BUST: Force all CSS to reload with unique timestamp'
 ];

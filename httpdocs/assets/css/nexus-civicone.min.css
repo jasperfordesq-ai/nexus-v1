@@ -1,1 +1,1662 @@
-:root{--civic-bg-page:#FAFAF9;--civic-bg-card:#FFFFFF;--civic-text-main:#1F2937;--civic-text-secondary:#4B5563;--civic-text-muted:#6B7280;--civic-brand:#2563EB;--civic-brand-hover:#1D4ED8;--civic-brand-light:#DBEAFE;--civic-accent-green:#059669;--civic-accent-amber:#D97706;--civic-accent-rose:#DB2777;--civic-accent-purple:#7C3AED;--civic-border:#D1D5DB;--civic-border-strong:#9CA3AF;--civic-focus:#FBBF24;--civic-focus-ring:0 0 0 3px rgba(251,191,36,0.5);--civic-pad:24px;--civic-gap:32px;--civic-radius:12px;--civic-radius-lg:16px;--civic-bg-footer:#1F2937;--civic-footer-text:#E5E7EB;--civic-border-footer:#374151;--civic-error:#DC2626;--civic-error-bg:#FEF2F2;--civic-error-border:#DC2626;--civic-success:#059669;--civic-success-bg:#ECFDF5;--civic-shadow-sm:0 1px 2px rgba(0,0,0,0.05);--civic-shadow:0 4px 6px -1px rgba(0,0,0,0.1),0 2px 4px -1px rgba(0,0,0,0.06);--civic-shadow-lg:0 10px 15px -3px rgba(0,0,0,0.1),0 4px 6px -2px rgba(0,0,0,0.05)}body.dark-mode{--civic-bg-page:#111827;--civic-bg-card:#1F2937;--civic-text-main:#F3F4F6;--civic-text-secondary:#D1D5DB;--civic-text-muted:#9CA3AF;--civic-brand:#60A5FA;--civic-brand-hover:#93C5FD;--civic-brand-light:#1E3A5F;--civic-accent-green:#34D399;--civic-accent-amber:#FBBF24;--civic-accent-rose:#F472B6;--civic-accent-purple:#A78BFA;--civic-border:#374151;--civic-border-strong:#4B5563;--civic-focus:#FBBF24;--civic-bg-footer:#0F172A;--civic-footer-text:#E5E7EB;--civic-border-footer:#1E293B;--civic-error:#F87171;--civic-error-bg:#7F1D1D;--civic-success:#34D399;--civic-success-bg:#064E3B;--civic-shadow-sm:0 1px 2px rgba(0,0,0,0.3);--civic-shadow:0 4px 6px -1px rgba(0,0,0,0.4);--civic-shadow-lg:0 10px 15px -3px rgba(0,0,0,0.5)}body{background-color:var(--civic-bg-page);color:var(--civic-text-main);font-family:'Roboto',system-ui,sans-serif;font-size:19px;line-height:1.5;margin:0;padding:0}@media (prefers-reduced-motion:no-preference){body{transition:background-color 0.3s,color 0.3s}}.civic-container{max-width:1200px;margin:0 auto;padding:0 30px}.civic-nav a{color:var(--civic-text-main);text-decoration:none;font-weight:700;margin-left:15px;font-size:18px;white-space:nowrap}body.dark-mode .civic-header{background:#1E1E1E;border-bottom:4px solid var(--civic-brand)}body.dark-mode .civic-nav a,body.dark-mode .civic-dropdown-trigger{color:var(--civic-text-main)}body.dark-mode .civic-hamburger,body.dark-mode .civic-hamburger::before,body.dark-mode .civic-hamburger::after{background:#E0E0E0}body.dark-mode .civic-dropdown-content{background-color:#2C2C2C;border-color:#555;border-radius:8px}body.dark-mode .civic-dropdown-content a{color:#E0E0E0}body.dark-mode .civic-dropdown-content a:hover{background-color:#3C3C3C}body.dark-mode .civic-input{background-color:#2C2C2C;color:#E0E0E0;border-color:#555}.civic-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:var(--civic-gap)}.nexus-grid-3{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:var(--civic-gap)}h1,h2,h3{font-weight:800;color:var(--civic-text-main);margin-top:0;letter-spacing:-0.02em}h1{font-size:clamp(32px,5vw,48px);line-height:1.1;margin-bottom:24px}h2{font-size:clamp(24px,4vw,36px);line-height:1.2;margin-bottom:16px}h3{font-size:clamp(18px,3vw,24px);line-height:1.3;margin-bottom:12px}.civic-meta,.civic-date,.civic-category{font-size:14px;color:var(--civic-text-muted);font-weight:500;text-transform:uppercase;letter-spacing:0.05em}a{color:var(--civic-brand);text-decoration:underline;text-decoration-thickness:2px;text-underline-offset:3px}a:hover{text-decoration-thickness:3px;color:var(--civic-brand-hover)}a:focus,button:focus,input:focus,select:focus,textarea:focus{outline:3px solid var(--civic-focus);outline-offset:2px;box-shadow:var(--civic-focus-ring)}a:focus{background-color:transparent;color:var(--civic-brand)}.civic-card{background:var(--civic-bg-card);padding:var(--civic-pad);border:1px solid var(--civic-border);border-radius:var(--civic-radius);box-shadow:var(--civic-shadow);margin-bottom:24px;position:relative;overflow:hidden}.civic-card--accent{border-left:4px solid var(--civic-brand)}.civic-card--offer{border-left:4px solid var(--civic-accent-green)}.civic-card--request{border-left:4px solid var(--civic-accent-amber)}.civic-card--event{border-left:4px solid var(--civic-accent-purple)}.civic-card--hub{border-left:4px solid var(--civic-accent-rose)}.civic-card:hover{box-shadow:var(--civic-shadow-lg);border-color:var(--civic-border-strong)}@media (prefers-reduced-motion:no-preference){.civic-card{transition:box-shadow 0.2s ease,border-color 0.2s ease}}.civic-card-header{display:flex;align-items:flex-start;gap:16px;margin-bottom:16px}.civic-card-icon{width:48px;height:48px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0;background:var(--civic-brand-light);color:var(--civic-brand)}.civic-card-icon--green{background:#ECFDF5;color:var(--civic-accent-green)}.civic-card-icon--amber{background:#FFFBEB;color:var(--civic-accent-amber)}.civic-card-icon--rose{background:#FDF2F8;color:var(--civic-accent-rose)}.civic-card-footer{display:flex;align-items:center;justify-content:space-between;padding-top:16px;margin-top:16px;border-top:1px solid var(--civic-border)}.nexus-card,.htb-card{background:var(--civic-bg-card);padding:var(--civic-pad);border:1px solid var(--civic-border);box-shadow:0 4px 12px rgba(0,0,0,0.06);border-radius:8px;margin-bottom:20px}.civic-btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;background:var(--civic-brand);color:white;font-weight:600;padding:12px 24px;border:2px solid transparent;border-radius:8px;cursor:pointer;text-decoration:none;min-height:44px;min-width:44px;font-size:16px;box-shadow:var(--civic-shadow-sm)}.civic-btn:hover{background:var(--civic-brand-hover);color:white;box-shadow:var(--civic-shadow);text-decoration:none}.civic-btn:focus{background:var(--civic-brand);color:white}.civic-btn--secondary,.civic-btn--outline,.civic-btn-secondary{background:transparent;color:var(--civic-brand);border:2px solid var(--civic-brand);box-shadow:none}.civic-btn--secondary:hover,.civic-btn--outline:hover,.civic-btn-secondary:hover{background:var(--civic-brand-light);color:var(--civic-brand-hover)}.civic-btn--sm{padding:8px 16px;font-size:14px;min-height:36px;border-radius:6px}.civic-btn--ghost{background:transparent;color:var(--civic-text-main);border:none;box-shadow:none}.civic-btn--ghost:hover{background:var(--civic-bg-page);box-shadow:none}.civic-btn--success{background:var(--civic-accent-green);border-color:var(--civic-accent-green)}.civic-btn--success:hover{background:#047857}.civic-btn--warning{background:var(--civic-accent-amber);border-color:var(--civic-accent-amber)}.civic-btn--warning:hover{background:#B45309}.civic-btn--danger{background:var(--civic-error);border-color:var(--civic-error)}.civic-btn--danger:hover{background:#B91C1C}.civic-btn--sm{padding:8px 16px;font-size:14px;min-height:36px}.civic-btn--lg{padding:16px 32px;font-size:18px;min-height:52px}.civic-btn--block{width:100%}@media (prefers-reduced-motion:no-preference){.civic-btn{transition:background-color 0.15s ease,box-shadow 0.15s ease,transform 0.1s ease}.civic-btn:hover{transform:translateY(-1px)}.civic-btn:active{transform:translateY(0)}}.civic-card .civic-btn{padding:10px 18px;font-size:14px}.civic-btn:active{box-shadow:var(--civic-shadow-sm)}.civic-header{background:#FFFFFF;border-bottom:4px solid var(--civic-brand);padding:16px 0 84px 0;margin-bottom:0;box-shadow:0 4px 12px rgba(0,0,0,0.08)}.civic-nav{display:flex;justify-content:space-between;align-items:center}.civic-nav a{color:var(--civic-text-main);text-decoration:none;font-weight:700;margin-left:15px;font-size:18px;white-space:nowrap}.civic-nav .civic-btn{padding:8px 16px;font-size:16px;min-height:0;box-shadow:0 2px 0 #004D40}.civic-logo{font-size:24px;font-weight:bold;color:var(--civic-brand);text-decoration:none}.civic-input{display:block;width:100%;padding:10px;font-size:19px;border:2px solid #0B0C0C;margin-bottom:20px;box-sizing:border-box}.civic-label{display:block;font-weight:700;margin-bottom:5px;color:var(--civic-text-main)}.visually-hidden,.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}.visually-hidden:focus,.sr-only:focus{position:static;width:auto;height:auto;padding:inherit;margin:inherit;overflow:visible;clip:auto;white-space:normal}.civic-input-error,.civic-input[aria-invalid="true"]{border-color:var(--civic-error-border) !important;border-width:3px;background-color:var(--civic-error-bg)}.civic-input-error:focus,.civic-input[aria-invalid="true"]:focus{outline-color:var(--civic-error)}.civic-error-message{color:var(--civic-error);font-size:16px;font-weight:600;margin-top:-15px;margin-bottom:15px;display:flex;align-items:center;gap:8px}.civic-error-message::before{content:"⚠";font-size:18px}.civic-input-success,.civic-input[aria-invalid="false"]{border-color:var(--civic-success) !important;background-color:var(--civic-success-bg)}.civic-success-message{color:var(--civic-success);font-size:16px;font-weight:600;margin-top:-15px;margin-bottom:15px;display:flex;align-items:center;gap:8px}.civic-success-message::before{content:"✓";font-size:18px}.civic-field-hint{font-size:14px;color:var(--civic-text-secondary);margin-top:-15px;margin-bottom:10px}.civic-label-required::after{content:" *";color:var(--civic-error);font-weight:700}.civic-form-group:focus-within{outline:2px solid var(--civic-brand);outline-offset:4px;border-radius:4px}@media (prefers-contrast:high){:root{--civic-border:#000000;--civic-text-secondary:#000000}.civic-card,.civic-input,.civic-btn{border-width:3px}a{text-decoration-thickness:3px}}@media (forced-colors:active){.civic-btn{border:2px solid ButtonText}.civic-input{border:2px solid CanvasText}a:focus,button:focus,input:focus{outline:3px solid Highlight}}@media print{.skip-link,.civic-utility-bar,.civic-hamburger{display:none !important}a[href]::after{content:" (" attr(href) ")";font-size:12px;color:#666}.civic-btn{border:2px solid #000;background:#fff !important;color:#000 !important}}.civic-member-card{background:var(--civic-bg-card);border:1px solid var(--civic-border);border-radius:8px;padding:20px;text-align:center;box-shadow:var(--civic-shadow-sm)}.civic-member-card:hover{box-shadow:var(--civic-shadow);border-color:var(--civic-border-strong)}@media (prefers-reduced-motion:no-preference){.civic-member-card{transition:box-shadow 0.2s ease,border-color 0.2s ease}}.civic-avatar{width:80px;height:80px;border-radius:50%;object-fit:cover;margin:0 auto 12px;display:block;border:3px solid var(--civic-border)}.civic-avatar--lg{width:120px;height:120px}.civic-avatar--sm{width:48px;height:48px}.civic-avatar-wrapper{position:relative;display:inline-block}.civic-member-name{font-size:1.1rem;font-weight:700;color:var(--civic-text-main);margin:0 0 4px 0;text-decoration:none}.civic-member-name a{color:inherit;text-decoration:none}.civic-member-name a:hover{color:var(--civic-brand);text-decoration:underline}.civic-member-location{font-size:14px;color:var(--civic-text-muted);margin-bottom:12px}.civic-member-stats{display:flex;justify-content:center;gap:16px;padding-top:12px;border-top:1px solid var(--civic-border);margin-top:12px}.civic-member-stat{text-align:center}.civic-member-stat-value{font-size:1.25rem;font-weight:700;color:var(--civic-brand);display:block}.civic-member-stat-label{font-size:12px;color:var(--civic-text-muted);text-transform:uppercase;letter-spacing:0.05em}.civic-members-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:24px;margin-bottom:40px}@media (max-width:600px){.civic-members-grid{grid-template-columns:1fr;gap:16px}}.civic-member-card-link{display:block;text-decoration:none;color:inherit}.civic-member-card-link:hover .civic-member-name{color:var(--civic-brand)}.civic-member-info{margin-top:12px}.civic-member-info .civic-member-location{display:flex;align-items:center;justify-content:center;gap:4px;margin:4px 0 0 0}.civic-member-info .civic-member-location .dashicons{font-size:14px;width:14px;height:14px}.civic-member-actions{margin-top:16px;padding-top:16px;border-top:1px solid var(--civic-border)}.civic-avatar--placeholder{background:var(--civic-border);display:flex;align-items:center;justify-content:center;color:var(--civic-text-muted)}.civic-badge{display:inline-flex;align-items:center;gap:4px;font-size:12px;font-weight:600;padding:3px 8px;border-radius:4px;text-transform:uppercase;letter-spacing:0.03em}.civic-badge--verified{background:#ECFDF5;color:#047857;border:1px solid #A7F3D0}.civic-badge--verified::before{content:"✓";font-weight:700}.civic-badge--new{background:#DBEAFE;color:#1D4ED8;border:1px solid #93C5FD}.civic-badge--admin{background:#FEF2F2;color:#B91C1C;border:1px solid #FECACA}.civic-badge--coordinator{background:#FDF2F8;color:#BE185D;border:1px solid #FBCFE8}.civic-verified-tick{position:absolute;bottom:2px;right:2px;width:22px;height:22px;background:#059669;border-radius:50%;border:2px solid var(--civic-bg-card);display:flex;align-items:center;justify-content:center;color:white;font-size:12px;font-weight:700}.civic-verified-tick::after{content:"✓"}.civic-tags{display:flex;flex-wrap:wrap;gap:6px;margin:12px 0}.civic-tag{display:inline-block;background:var(--civic-bg-page);color:var(--civic-text-secondary);font-size:13px;font-weight:500;padding:4px 10px;border-radius:20px;border:1px solid var(--civic-border);text-decoration:none}.civic-tag:hover{background:var(--civic-brand-light);color:var(--civic-brand);border-color:var(--civic-brand);text-decoration:none}.civic-tag--green{background:#ECFDF5;color:#047857;border-color:#A7F3D0}.civic-tag--amber{background:#FFFBEB;color:#B45309;border-color:#FDE68A}.civic-tag--purple{background:#F3E8FF;color:#7C3AED;border-color:#DDD6FE}.civic-tag--rose{background:#FDF2F8;color:#BE185D;border-color:#FBCFE8}.civic-listing-card{background:var(--civic-bg-card);border:1px solid var(--civic-border);border-radius:8px;padding:20px;box-shadow:var(--civic-shadow-sm);display:flex;flex-direction:column}.civic-listing-card:hover{box-shadow:var(--civic-shadow);border-color:var(--civic-border-strong)}@media (prefers-reduced-motion:no-preference){.civic-listing-card{transition:box-shadow 0.2s ease,border-color 0.2s ease}}.civic-listing-card--offer{border-top:4px solid var(--civic-accent-green)}.civic-listing-card--request{border-top:4px solid var(--civic-accent-amber)}.civic-listing-card--event{border-top:4px solid var(--civic-accent-purple)}.civic-listing-header{display:flex;align-items:flex-start;gap:12px;margin-bottom:12px}.civic-listing-avatar{width:44px;height:44px;border-radius:50%;object-fit:cover;flex-shrink:0}.civic-listing-meta{flex:1;min-width:0}.civic-listing-type{display:inline-block;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;padding:2px 6px;border-radius:3px;margin-bottom:4px}.civic-listing-type--offer{background:#ECFDF5;color:#047857}.civic-listing-type--request{background:#FFFBEB;color:#B45309}.civic-listing-type--event{background:#F3E8FF;color:#7C3AED}.civic-listing-title{font-size:1.1rem;font-weight:700;color:var(--civic-text-main);margin:0 0 4px 0;line-height:1.3}.civic-listing-title a{color:inherit;text-decoration:none}.civic-listing-title a:hover{color:var(--civic-brand);text-decoration:underline}.civic-listing-author{font-size:14px;color:var(--civic-text-muted)}.civic-listing-description{color:var(--civic-text-secondary);font-size:15px;line-height:1.5;margin-bottom:12px;flex:1}.civic-listing-footer{display:flex;align-items:center;justify-content:space-between;padding-top:12px;border-top:1px solid var(--civic-border);margin-top:auto}.civic-listing-time{font-size:13px;color:var(--civic-text-muted)}.civic-listing-category{font-size:12px;color:var(--civic-text-muted);background:var(--civic-bg-page);padding:3px 8px;border-radius:4px}.civic-search-bar{background:var(--civic-bg-card);border:1px solid var(--civic-border);border-radius:8px;padding:16px 20px;margin-bottom:24px;box-shadow:var(--civic-shadow-sm)}.civic-search-row{display:flex;gap:12px;flex-wrap:wrap;align-items:stretch}.civic-search-input-wrapper{flex:1;min-width:200px;position:relative}.civic-search-input{width:100%;padding:10px 12px 10px 40px;font-size:16px;border:2px solid var(--civic-border);border-radius:6px;background:var(--civic-bg-page);color:var(--civic-text-main);box-sizing:border-box}.civic-search-input:focus{border-color:var(--civic-brand);outline:none;box-shadow:0 0 0 3px rgba(37,99,235,0.1)}.civic-search-icon{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--civic-text-muted);pointer-events:none}.civic-filter-select{padding:10px 32px 10px 12px;font-size:16px;border:2px solid var(--civic-border);border-radius:6px;background:var(--civic-bg-card);color:var(--civic-text-main);cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%236B7280' d='M6 8L1 3h10z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center}.civic-filter-select:focus{border-color:var(--civic-brand);outline:none;box-shadow:0 0 0 3px rgba(37,99,235,0.1)}.civic-filter-tabs{display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap}.civic-filter-tab{padding:8px 16px;font-size:14px;font-weight:600;border:2px solid var(--civic-border);border-radius:20px;background:var(--civic-bg-card);color:var(--civic-text-secondary);cursor:pointer;text-decoration:none}.civic-filter-tab:hover{border-color:var(--civic-brand);color:var(--civic-brand);text-decoration:none}.civic-filter-tab--active,.civic-filter-tab.active{background:var(--civic-brand);border-color:var(--civic-brand);color:white}.civic-filter-tab--active:hover,.civic-filter-tab.active:hover{background:var(--civic-brand-hover);border-color:var(--civic-brand-hover);color:white}.civic-results-count{font-size:14px;color:var(--civic-text-muted);margin-bottom:16px}.civic-results-count strong{color:var(--civic-text-main)}.civic-empty-state{text-align:center;padding:48px 24px;background:var(--civic-bg-card);border:1px dashed var(--civic-border);border-radius:8px}.civic-empty-state-icon{font-size:48px;color:var(--civic-text-muted);margin-bottom:16px}.civic-empty-state-title{font-size:1.25rem;font-weight:700;color:var(--civic-text-main);margin-bottom:8px}.civic-empty-state-text{color:var(--civic-text-secondary);margin-bottom:20px}.civic-pagination{display:flex;justify-content:center;align-items:center;gap:8px;margin:40px 0;flex-wrap:wrap}.civic-pagination-btn{display:inline-flex;align-items:center;justify-content:center;min-width:40px;min-height:40px;padding:8px 16px;background:var(--civic-bg-card);border:1px solid var(--civic-border);border-radius:6px;color:var(--civic-text-secondary);font-weight:500;text-decoration:none;transition:all 0.2s ease}.civic-pagination-btn:hover{background:var(--civic-bg-page);border-color:var(--civic-brand);color:var(--civic-brand);text-decoration:none}.civic-pagination-btn:focus{outline:2px solid var(--civic-brand);outline-offset:2px}.civic-pagination-current{background:var(--civic-brand);border-color:var(--civic-brand);color:white;cursor:default}.civic-pagination-current:hover{background:var(--civic-brand);border-color:var(--civic-brand);color:white}.civic-pagination-ellipsis{padding:8px 4px;color:var(--civic-text-muted)}.civic-pagination-prev,.civic-pagination-next{gap:4px}@media (max-width:480px){.civic-pagination-btn{min-width:36px;min-height:36px;padding:6px 12px;font-size:14px}}.civic-credits{display:inline-flex;align-items:center;gap:6px;font-weight:700;color:var(--civic-accent-green)}.civic-credits-value{font-size:1.5rem}.civic-credits-label{font-size:14px;font-weight:500;color:var(--civic-text-muted)}body.skin-torfaen{--civic-brand:#96206d;--civic-brand-hover:#7a1a59;--civic-brand-light:#fdf2f8}body.skin-torfaen .civic-badge--verified{background:#FDF2F8;color:#96206d;border-color:#F9A8D4}body.skin-torfaen .civic-filter-tab--active,body.skin-torfaen .civic-filter-tab.active{background:#96206d;border-color:#96206d}body.skin-torfaen .civic-filter-tab--active:hover,body.skin-torfaen .civic-filter-tab.active:hover{background:#7a1a59;border-color:#7a1a59}:focus-visible{outline:3px solid var(--civic-focus,#FBBF24);outline-offset:2px}a:focus-visible{outline:3px solid var(--civic-focus,#FBBF24);outline-offset:2px;background-color:rgba(251,191,36,0.1);border-radius:2px}.civic-btn:focus-visible,button:focus-visible{outline:3px solid var(--civic-focus,#FBBF24);outline-offset:2px;box-shadow:0 0 0 6px rgba(251,191,36,0.3)}input:focus-visible,textarea:focus-visible,select:focus-visible,.civic-input:focus-visible{outline:3px solid var(--civic-focus,#FBBF24);outline-offset:0;border-color:var(--civic-brand,#2563EB);box-shadow:0 0 0 4px rgba(251,191,36,0.2)}input[type="checkbox"]:focus-visible,input[type="radio"]:focus-visible{outline:3px solid var(--civic-focus,#FBBF24);outline-offset:2px}.civic-card:focus-within{outline:2px solid var(--civic-brand,#2563EB);outline-offset:2px}.civic-nav-link:focus-visible,.civic-dropdown-trigger:focus-visible{outline:3px solid var(--civic-focus,#FBBF24);outline-offset:2px;background-color:rgba(251,191,36,0.15);border-radius:4px}.civic-footer a:focus-visible{outline:2px solid #FFFFFF;outline-offset:2px;background-color:rgba(255,255,255,0.1);border-radius:2px}.civic-footer-social a:focus-visible{outline:3px solid #FFFFFF;outline-offset:2px;background-color:rgba(255,255,255,0.3)}.civic-breadcrumb-link:focus-visible{outline:3px solid var(--civic-focus,#FBBF24);outline-offset:2px}.civic-dropdown-content a:focus-visible{outline:2px solid var(--civic-brand,#2563EB);outline-offset:-2px;background-color:var(--civic-brand-light,#DBEAFE)}.civic-pagination-btn:focus-visible{outline:3px solid var(--civic-focus,#FBBF24);outline-offset:2px}.civic-filter-tab:focus-visible{outline:3px solid var(--civic-focus,#FBBF24);outline-offset:2px}.civic-member-card-link:focus-visible{outline:3px solid var(--civic-focus,#FBBF24);outline-offset:2px;border-radius:8px}body.dark-mode:focus-visible{outline-color:var(--civic-focus,#FBBF24)}body.dark-mode a:focus-visible{background-color:rgba(251,191,36,0.2)}body.dark-mode .civic-dropdown-content a:focus-visible{background-color:#374151;outline-color:var(--civic-focus,#FBBF24)}.skip-link:focus{position:fixed;top:10px;left:10px;z-index:var(--z-notification,1700);padding:16px 24px;background:#FFDD00;color:#000000;font-weight:700;font-size:18px;text-decoration:none;border-radius:4px;box-shadow:0 4px 12px rgba(0,0,0,0.3)}@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:0.01ms !important;animation-iteration-count:1 !important;transition-duration:0.01ms !important;scroll-behavior:auto !important}.civic-card:hover,.civic-btn:hover,.civic-member-card:hover,.civic-listing-card:hover{transform:none !important}}@media print{.skip-link,.civic-utility-bar,.civic-hamburger,.civic-mobile-search-btn,.civic-mega-menu,#civic-menu-toggle,.civic-footer-social,.civic-btn--ghost{display:none !important}body{font-size:12pt;line-height:1.5;color:#000 !important;background:#fff !important}a[href^="http"]::after{content:" (" attr(href) ")";font-size:10pt;color:#666;word-break:break-all}a[href^="/"]::after,a[href^="#"]::after{content:""}h1,h2,h3,h4,h5,h6{color:#000 !important}.civic-card,.civic-member-card,.civic-listing-card{border:1px solid #ccc;box-shadow:none;break-inside:avoid}.civic-btn{border:2px solid #000 !important;background:#fff !important;color:#000 !important}}
+/* Nexus CivicOne Theme - MadeOpen Community Style */
+/* WCAG 2.1 AA Compliant - Updated December 2024 */
+
+:root {
+    /* ==========================================
+       COMMUNITY-FOCUSED COLOR PALETTE
+       Inspired by MadeOpen UK platforms
+       All colors verified for WCAG AA contrast
+       ========================================== */
+
+    /* Page Background - Warm off-white */
+    --civic-bg-page: #FAFAF9;
+    --civic-bg-card: #FFFFFF;
+
+    /* Text - Softer than pure black */
+    --civic-text-main: #1F2937;
+    /* Charcoal - 12.6:1 on white */
+    --civic-text-secondary: #4B5563;
+    /* Warm grey - 7:1 on white */
+    --civic-text-muted: #6B7280;
+    /* For metadata - 5.4:1 */
+
+    /* Primary Brand - Friendly Community Blue */
+    --civic-brand: #2563EB;
+    /* 4.5:1 on white */
+    --civic-brand-hover: #1D4ED8;
+    --civic-brand-light: #DBEAFE;
+    /* Tinted backgrounds */
+
+    /* Accent Colors - Warm & Approachable */
+    --civic-accent-green: #059669;
+    /* Success/Offers - 4.5:1 */
+    --civic-accent-amber: #D97706;
+    /* Warmth/Requests - 4.5:1 */
+    --civic-accent-rose: #DB2777;
+    /* Community/Hubs - 4.5:1 */
+    --civic-accent-purple: #7C3AED;
+    /* Events - 4.6:1 */
+
+    /* Borders - Visible but soft */
+    --civic-border: #D1D5DB;
+    /* 1.5:1 - decorative */
+    --civic-border-strong: #9CA3AF;
+    /* 3:1 - functional */
+
+    /* Focus - High visibility */
+    --civic-focus: #FBBF24;
+    /* Warm yellow */
+    --civic-focus-ring: 0 0 0 3px rgba(251, 191, 36, 0.5);
+
+    /* Spacing */
+    --civic-pad: 24px;
+    --civic-gap: 32px;
+    --civic-radius: 12px;
+    --civic-radius-lg: 16px;
+
+    /* Footer - Warm dark */
+    --civic-bg-footer: #1F2937;
+    --civic-footer-text: #E5E7EB;
+    --civic-border-footer: #374151;
+
+    /* Form States */
+    --civic-error: #DC2626;
+    --civic-error-bg: #FEF2F2;
+    --civic-error-border: #DC2626;
+    --civic-success: #059669;
+    --civic-success-bg: #ECFDF5;
+
+    /* Shadows - Soft depth */
+    --civic-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+    --civic-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    --civic-shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+
+/* Dark Mode Overrides */
+body.dark-mode {
+    --civic-bg-page: #111827;
+    --civic-bg-card: #1F2937;
+    --civic-text-main: #F3F4F6;
+    --civic-text-secondary: #D1D5DB;
+    --civic-text-muted: #9CA3AF;
+
+    /* Lighter brand for dark backgrounds */
+    --civic-brand: #60A5FA;
+    --civic-brand-hover: #93C5FD;
+    --civic-brand-light: #1E3A5F;
+
+    /* Accent colors - lighter for dark mode */
+    --civic-accent-green: #34D399;
+    --civic-accent-amber: #FBBF24;
+    --civic-accent-rose: #F472B6;
+    --civic-accent-purple: #A78BFA;
+
+    /* Borders */
+    --civic-border: #374151;
+    --civic-border-strong: #4B5563;
+
+    /* Focus */
+    --civic-focus: #FBBF24;
+
+    /* Footer */
+    --civic-bg-footer: #0F172A;
+    --civic-footer-text: #E5E7EB;
+    --civic-border-footer: #1E293B;
+
+    /* Form States */
+    --civic-error: #F87171;
+    --civic-error-bg: #7F1D1D;
+    --civic-success: #34D399;
+    --civic-success-bg: #064E3B;
+
+    /* Shadows - more subtle in dark mode */
+    --civic-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+    --civic-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.4);
+    --civic-shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
+}
+
+body {
+    background-color: var(--civic-bg-page);
+    color: var(--civic-text-main);
+    font-family: 'Roboto', system-ui, sans-serif;
+    font-size: 19px;
+    line-height: 1.5;
+    margin: 0;
+    padding: 0;
+}
+
+/* WCAG 2.3.3: Respect user motion preferences */
+@media (prefers-reduced-motion: no-preference) {
+    body {
+        transition: background-color 0.3s, color 0.3s;
+    }
+}
+
+/* Layout */
+.civic-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 30px;
+}
+
+/* ... */
+.civic-nav a {
+    color: var(--civic-text-main);
+    text-decoration: none;
+    font-weight: 700;
+    margin-left: 15px;
+    font-size: 18px;
+    /* Slightly smaller to fit */
+    white-space: nowrap;
+    /* Prevent breaking */
+}
+
+/* Dark mode specific for semantic elements if variables aren't enough */
+body.dark-mode .civic-header {
+    background: #1E1E1E;
+    border-bottom: 4px solid var(--civic-brand);
+}
+
+body.dark-mode .civic-nav a,
+body.dark-mode .civic-dropdown-trigger {
+    color: var(--civic-text-main);
+}
+
+body.dark-mode .civic-hamburger,
+body.dark-mode .civic-hamburger::before,
+body.dark-mode .civic-hamburger::after {
+    background: #E0E0E0;
+}
+
+body.dark-mode .civic-dropdown-content {
+    background-color: #2C2C2C;
+    border-color: #555;
+    border-radius: 8px;
+}
+
+body.dark-mode .civic-dropdown-content a {
+    color: #E0E0E0;
+}
+
+body.dark-mode .civic-dropdown-content a:hover {
+    background-color: #3C3C3C;
+}
+
+body.dark-mode .civic-input {
+    background-color: #2C2C2C;
+    color: #E0E0E0;
+    border-color: #555;
+}
+
+
+.civic-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: var(--civic-gap);
+}
+
+/* Fallback Compatibility (Aliases) */
+.nexus-grid-3 {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: var(--civic-gap);
+}
+
+/* Typography - Community Style */
+h1,
+h2,
+h3 {
+    font-weight: 800;
+    color: var(--civic-text-main);
+    margin-top: 0;
+    letter-spacing: -0.02em;
+}
+
+h1 {
+    font-size: clamp(32px, 5vw, 48px);
+    line-height: 1.1;
+    margin-bottom: 24px;
+}
+
+h2 {
+    font-size: clamp(24px, 4vw, 36px);
+    line-height: 1.2;
+    margin-bottom: 16px;
+}
+
+h3 {
+    font-size: clamp(18px, 3vw, 24px);
+    line-height: 1.3;
+    margin-bottom: 12px;
+}
+
+/* Smaller metadata text */
+.civic-meta,
+.civic-date,
+.civic-category {
+    font-size: 14px;
+    color: var(--civic-text-muted);
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+/* Link styles - EXCLUDE buttons to prevent color override */
+a:not(.civic-button):not(.govuk-button) {
+    color: var(--civic-brand);
+    text-decoration: underline;
+    text-decoration-thickness: 2px;
+    text-underline-offset: 3px;
+}
+
+a:not(.civic-button):not(.govuk-button):hover {
+    text-decoration-thickness: 3px;
+    color: var(--civic-brand-hover);
+}
+
+a:focus,
+button:focus,
+input:focus,
+select:focus,
+textarea:focus {
+    outline: 3px solid var(--civic-focus);
+    outline-offset: 2px;
+    box-shadow: var(--civic-focus-ring);
+}
+
+/* Remove harsh background on focus for links */
+a:focus {
+    background-color: transparent;
+    color: var(--civic-brand);
+}
+
+/* ===========================================
+   CARD UI - MadeOpen Community Style
+   Softer, more approachable design
+   =========================================== */
+
+.civic-card {
+    background: var(--civic-bg-card);
+    padding: var(--civic-pad);
+    border: 1px solid var(--civic-border);
+    border-radius: var(--civic-radius);
+    box-shadow: var(--civic-shadow);
+    margin-bottom: 24px;
+    position: relative;
+    overflow: hidden;
+}
+
+/* Card with colored accent border */
+.civic-card--accent {
+    border-left: 4px solid var(--civic-brand);
+}
+
+.civic-card--offer {
+    border-left: 4px solid var(--civic-accent-green);
+}
+
+.civic-card--request {
+    border-left: 4px solid var(--civic-accent-amber);
+}
+
+.civic-card--event {
+    border-left: 4px solid var(--civic-accent-purple);
+}
+
+.civic-card--hub {
+    border-left: 4px solid var(--civic-accent-rose);
+}
+
+/* Card hover effect */
+.civic-card:hover {
+    box-shadow: var(--civic-shadow-lg);
+    border-color: var(--civic-border-strong);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+    .civic-card {
+        transition: box-shadow 0.2s ease, border-color 0.2s ease;
+    }
+}
+
+/* Card header with icon */
+.civic-card-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    margin-bottom: 16px;
+}
+
+.civic-card-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    flex-shrink: 0;
+    background: var(--civic-brand-light);
+    color: var(--civic-brand);
+}
+
+.civic-card-icon--green {
+    background: #ECFDF5;
+    color: var(--civic-accent-green);
+}
+
+.civic-card-icon--amber {
+    background: #FFFBEB;
+    color: var(--civic-accent-amber);
+}
+
+.civic-card-icon--rose {
+    background: #FDF2F8;
+    color: var(--civic-accent-rose);
+}
+
+/* Card footer */
+.civic-card-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-top: 16px;
+    margin-top: 16px;
+    border-top: 1px solid var(--civic-border);
+}
+
+/* Legacy compatibility */
+.nexus-card,
+.htb-card {
+    background: var(--civic-bg-card);
+    padding: var(--civic-pad);
+    border: 1px solid var(--civic-border);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+    border-radius: 8px;
+    margin-bottom: 20px;
+}
+
+/* ===========================================
+   BUTTONS - MadeOpen Community Style
+   Rounded, friendly, with clear hierarchy
+   =========================================== */
+
+.civic-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    background: var(--civic-brand);
+    color: white;
+    font-weight: 600;
+    padding: 12px 24px;
+    border: 2px solid transparent;
+    border-radius: 8px;
+    cursor: pointer;
+    text-decoration: none;
+    min-height: 44px;
+    min-width: 44px;
+    font-size: 16px;
+    box-shadow: var(--civic-shadow-sm);
+}
+
+.civic-btn:hover {
+    background: var(--civic-brand-hover);
+    color: white;
+    box-shadow: var(--civic-shadow);
+    text-decoration: none;
+}
+
+.civic-btn:focus {
+    background: var(--civic-brand);
+    color: white;
+}
+
+/* Secondary button - outline style */
+.civic-btn--secondary,
+.civic-btn--outline,
+.civic-btn-secondary {
+    background: transparent;
+    color: var(--civic-brand);
+    border: 2px solid var(--civic-brand);
+    box-shadow: none;
+}
+
+.civic-btn--secondary:hover,
+.civic-btn--outline:hover,
+.civic-btn-secondary:hover {
+    background: var(--civic-brand-light);
+    color: var(--civic-brand-hover);
+}
+
+/* Small button */
+.civic-btn--sm {
+    padding: 8px 16px;
+    font-size: 14px;
+    min-height: 36px;
+    border-radius: 6px;
+}
+
+/* Ghost button - minimal */
+.civic-btn--ghost {
+    background: transparent;
+    color: var(--civic-text-main);
+    border: none;
+    box-shadow: none;
+}
+
+.civic-btn--ghost:hover {
+    background: var(--civic-bg-page);
+    box-shadow: none;
+}
+
+/* Success button - green */
+.civic-btn--success {
+    background: var(--civic-accent-green);
+    border-color: var(--civic-accent-green);
+}
+
+.civic-btn--success:hover {
+    background: #047857;
+}
+
+/* Warning button - amber */
+.civic-btn--warning {
+    background: var(--civic-accent-amber);
+    border-color: var(--civic-accent-amber);
+}
+
+.civic-btn--warning:hover {
+    background: #B45309;
+}
+
+/* Danger button - red */
+.civic-btn--danger {
+    background: var(--civic-error);
+    border-color: var(--civic-error);
+}
+
+.civic-btn--danger:hover {
+    background: #B91C1C;
+}
+
+/* Small button */
+.civic-btn--sm {
+    padding: 8px 16px;
+    font-size: 14px;
+    min-height: 36px;
+}
+
+/* Large button */
+.civic-btn--lg {
+    padding: 16px 32px;
+    font-size: 18px;
+    min-height: 52px;
+}
+
+/* Full width button */
+.civic-btn--block {
+    width: 100%;
+}
+
+/* WCAG 2.3.3: Animation only for users who prefer motion */
+@media (prefers-reduced-motion: no-preference) {
+    .civic-btn {
+        transition: background-color 0.15s ease, box-shadow 0.15s ease, transform 0.1s ease;
+    }
+
+    .civic-btn:hover {
+        transform: translateY(-1px);
+    }
+
+    .civic-btn:active {
+        transform: translateY(0);
+    }
+}
+
+/* Smaller buttons inside cards */
+.civic-card .civic-btn {
+    padding: 10px 18px;
+    font-size: 14px;
+}
+
+.civic-btn:active {
+    box-shadow: var(--civic-shadow-sm);
+}
+
+/* Navigation - CivicOne Header */
+.civic-header {
+    background: #FFFFFF;
+    border-bottom: 4px solid var(--civic-brand);
+    padding: 16px 0 84px 0;
+    margin-bottom: 0;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.civic-nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.civic-nav a {
+    color: var(--civic-text-main);
+    text-decoration: none;
+    font-weight: 700;
+    margin-left: 15px;
+    font-size: 18px;
+    white-space: nowrap;
+}
+
+.civic-nav .civic-btn {
+    padding: 8px 16px;
+    font-size: 16px;
+    min-height: 0;
+    box-shadow: 0 2px 0 #004D40;
+}
+
+.civic-logo {
+    font-size: 24px;
+    font-weight: bold;
+    color: var(--civic-brand);
+    text-decoration: none;
+}
+
+/* Forms */
+.civic-input {
+    display: block;
+    width: 100%;
+    padding: 10px;
+    font-size: 19px;
+    border: 2px solid #0B0C0C;
+    margin-bottom: 20px;
+    box-sizing: border-box;
+}
+
+.civic-label {
+    display: block;
+    font-weight: 700;
+    margin-bottom: 5px;
+    color: var(--civic-text-main);
+}
+
+/* ===========================================
+   WCAG 2.1 AA ACCESSIBILITY ENHANCEMENTS
+   =========================================== */
+
+/* Visually Hidden - Screen Reader Only (WCAG 1.3.1) */
+.visually-hidden,
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+/* Show on focus for skip links */
+.visually-hidden:focus,
+.sr-only:focus {
+    position: static;
+    width: auto;
+    height: auto;
+    padding: inherit;
+    margin: inherit;
+    overflow: visible;
+    clip: auto;
+    white-space: normal;
+}
+
+/* Form Error States (WCAG 3.3.1, 3.3.3) */
+.civic-input-error,
+.civic-input[aria-invalid="true"] {
+    border-color: var(--civic-error-border) !important;
+    border-width: 3px;
+    background-color: var(--civic-error-bg);
+}
+
+.civic-input-error:focus,
+.civic-input[aria-invalid="true"]:focus {
+    outline-color: var(--civic-error);
+}
+
+.civic-error-message {
+    color: var(--civic-error);
+    font-size: 16px;
+    font-weight: 600;
+    margin-top: -15px;
+    margin-bottom: 15px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.civic-error-message::before {
+    content: "⚠";
+    font-size: 18px;
+}
+
+/* Form Success States */
+.civic-input-success,
+.civic-input[aria-invalid="false"] {
+    border-color: var(--civic-success) !important;
+    background-color: var(--civic-success-bg);
+}
+
+.civic-success-message {
+    color: var(--civic-success);
+    font-size: 16px;
+    font-weight: 600;
+    margin-top: -15px;
+    margin-bottom: 15px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.civic-success-message::before {
+    content: "✓";
+    font-size: 18px;
+}
+
+/* Form Field Descriptions (WCAG 3.3.2) */
+.civic-field-hint {
+    font-size: 14px;
+    color: var(--civic-text-secondary);
+    margin-top: -15px;
+    margin-bottom: 10px;
+}
+
+/* Required Field Indicator */
+.civic-label-required::after {
+    content: " *";
+    color: var(--civic-error);
+    font-weight: 700;
+}
+
+/* Focus Within for Form Groups */
+.civic-form-group:focus-within {
+    outline: 2px solid var(--civic-brand);
+    outline-offset: 4px;
+    border-radius: 4px;
+}
+
+/* High Contrast Mode Support */
+@media (prefers-contrast: high) {
+    :root {
+        --civic-border: #000000;
+        --civic-text-secondary: #000000;
+    }
+
+    .civic-card,
+    .civic-input,
+    .civic-btn {
+        border-width: 3px;
+    }
+
+    a {
+        text-decoration-thickness: 3px;
+    }
+}
+
+/* Forced Colors Mode (Windows High Contrast) */
+@media (forced-colors: active) {
+    .civic-btn {
+        border: 2px solid ButtonText;
+    }
+
+    .civic-input {
+        border: 2px solid CanvasText;
+    }
+
+    a:focus,
+    button:focus,
+    input:focus {
+        outline: 3px solid Highlight;
+    }
+}
+
+/* Print Styles for Accessibility */
+@media print {
+
+    .skip-link,
+    .civic-utility-bar,
+    .civic-hamburger {
+        display: none !important;
+    }
+
+    a[href]::after {
+        content: " (" attr(href) ")";
+        font-size: 12px;
+        color: #666;
+    }
+
+    .civic-btn {
+        border: 2px solid #000;
+        background: #fff !important;
+        color: #000 !important;
+    }
+}
+
+/* ===========================================
+   MADEOPEN COMMUNITY COMPONENTS
+   Inspired by Connect Torfaen & MadeOpen v3
+   =========================================== */
+
+/* -------------------------------------------
+   MEMBER CARD - Profile display with avatar
+   ------------------------------------------- */
+.civic-member-card {
+    background: var(--civic-bg-card);
+    border: 1px solid var(--civic-border);
+    border-radius: 8px;
+    padding: 20px;
+    text-align: center;
+    box-shadow: var(--civic-shadow-sm);
+}
+
+.civic-member-card:hover {
+    box-shadow: var(--civic-shadow);
+    border-color: var(--civic-border-strong);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+    .civic-member-card {
+        transition: box-shadow 0.2s ease, border-color 0.2s ease;
+    }
+}
+
+.civic-avatar {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin: 0 auto 12px;
+    display: block;
+    border: 3px solid var(--civic-border);
+}
+
+.civic-avatar--lg {
+    width: 120px;
+    height: 120px;
+}
+
+.civic-avatar--sm {
+    width: 48px;
+    height: 48px;
+}
+
+/* Avatar with verification indicator */
+.civic-avatar-wrapper {
+    position: relative;
+    display: inline-block;
+}
+
+.civic-member-name {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--civic-text-main);
+    margin: 0 0 4px 0;
+    text-decoration: none;
+}
+
+.civic-member-name a {
+    color: inherit;
+    text-decoration: none;
+}
+
+.civic-member-name a:hover {
+    color: var(--civic-brand);
+    text-decoration: underline;
+}
+
+.civic-member-location {
+    font-size: 14px;
+    color: var(--civic-text-muted);
+    margin-bottom: 12px;
+}
+
+.civic-member-stats {
+    display: flex;
+    justify-content: center;
+    gap: 16px;
+    padding-top: 12px;
+    border-top: 1px solid var(--civic-border);
+    margin-top: 12px;
+}
+
+.civic-member-stat {
+    text-align: center;
+}
+
+.civic-member-stat-value {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--civic-brand);
+    display: block;
+}
+
+.civic-member-stat-label {
+    font-size: 12px;
+    color: var(--civic-text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+/* Members Grid Layout */
+.civic-members-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 24px;
+    margin-bottom: 40px;
+}
+
+@media (max-width: 600px) {
+    .civic-members-grid {
+        grid-template-columns: 1fr;
+        gap: 16px;
+    }
+}
+
+/* Member Card Link */
+.civic-member-card-link {
+    display: block;
+    text-decoration: none;
+    color: inherit;
+}
+
+.civic-member-card-link:hover .civic-member-name {
+    color: var(--civic-brand);
+}
+
+/* Member Card Info Section */
+.civic-member-info {
+    margin-top: 12px;
+}
+
+.civic-member-info .civic-member-location {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    margin: 4px 0 0 0;
+}
+
+.civic-member-info .civic-member-location .dashicons {
+    font-size: 14px;
+    width: 14px;
+    height: 14px;
+}
+
+/* Member Card Actions */
+.civic-member-actions {
+    margin-top: 16px;
+    padding-top: 16px;
+    border-top: 1px solid var(--civic-border);
+}
+
+/* Avatar Placeholder */
+.civic-avatar--placeholder {
+    background: var(--civic-border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--civic-text-muted);
+}
+
+/* -------------------------------------------
+   VERIFICATION BADGE - Trust indicators
+   ------------------------------------------- */
+.civic-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 12px;
+    font-weight: 600;
+    padding: 3px 8px;
+    border-radius: 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+}
+
+.civic-badge--verified {
+    background: #ECFDF5;
+    color: #047857;
+    border: 1px solid #A7F3D0;
+}
+
+.civic-badge--verified::before {
+    content: "✓";
+    font-weight: 700;
+}
+
+.civic-badge--new {
+    background: #DBEAFE;
+    color: #1D4ED8;
+    border: 1px solid #93C5FD;
+}
+
+.civic-badge--admin {
+    background: #FEF2F2;
+    color: #B91C1C;
+    border: 1px solid #FECACA;
+}
+
+.civic-badge--coordinator {
+    background: #FDF2F8;
+    color: #BE185D;
+    border: 1px solid #FBCFE8;
+}
+
+/* Verification tick on avatar */
+.civic-verified-tick {
+    position: absolute;
+    bottom: 2px;
+    right: 2px;
+    width: 22px;
+    height: 22px;
+    background: #059669;
+    border-radius: 50%;
+    border: 2px solid var(--civic-bg-card);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.civic-verified-tick::after {
+    content: "✓";
+}
+
+/* -------------------------------------------
+   SKILL TAGS / PILLS - Category badges
+   ------------------------------------------- */
+.civic-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin: 12px 0;
+}
+
+.civic-tag {
+    display: inline-block;
+    background: var(--civic-bg-page);
+    color: var(--civic-text-secondary);
+    font-size: 13px;
+    font-weight: 500;
+    padding: 4px 10px;
+    border-radius: 20px;
+    border: 1px solid var(--civic-border);
+    text-decoration: none;
+}
+
+.civic-tag:hover {
+    background: var(--civic-brand-light);
+    color: var(--civic-brand);
+    border-color: var(--civic-brand);
+    text-decoration: none;
+}
+
+/* Colored tag variants */
+.civic-tag--green {
+    background: #ECFDF5;
+    color: #047857;
+    border-color: #A7F3D0;
+}
+
+.civic-tag--amber {
+    background: #FFFBEB;
+    color: #B45309;
+    border-color: #FDE68A;
+}
+
+.civic-tag--purple {
+    background: #F3E8FF;
+    color: #7C3AED;
+    border-color: #DDD6FE;
+}
+
+.civic-tag--rose {
+    background: #FDF2F8;
+    color: #BE185D;
+    border-color: #FBCFE8;
+}
+
+/* -------------------------------------------
+   ACTIVITY/LISTING CARD - Offers & Requests
+   ------------------------------------------- */
+.civic-listing-card {
+    background: var(--civic-bg-card);
+    border: 1px solid var(--civic-border);
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: var(--civic-shadow-sm);
+    display: flex;
+    flex-direction: column;
+}
+
+.civic-listing-card:hover {
+    box-shadow: var(--civic-shadow);
+    border-color: var(--civic-border-strong);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+    .civic-listing-card {
+        transition: box-shadow 0.2s ease, border-color 0.2s ease;
+    }
+}
+
+/* Type indicator strip */
+.civic-listing-card--offer {
+    border-top: 4px solid var(--civic-accent-green);
+}
+
+.civic-listing-card--request {
+    border-top: 4px solid var(--civic-accent-amber);
+}
+
+.civic-listing-card--event {
+    border-top: 4px solid var(--civic-accent-purple);
+}
+
+.civic-listing-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    margin-bottom: 12px;
+}
+
+.civic-listing-avatar {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    object-fit: cover;
+    flex-shrink: 0;
+}
+
+.civic-listing-meta {
+    flex: 1;
+    min-width: 0;
+}
+
+.civic-listing-type {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: 2px 6px;
+    border-radius: 3px;
+    margin-bottom: 4px;
+}
+
+.civic-listing-type--offer {
+    background: #ECFDF5;
+    color: #047857;
+}
+
+.civic-listing-type--request {
+    background: #FFFBEB;
+    color: #B45309;
+}
+
+.civic-listing-type--event {
+    background: #F3E8FF;
+    color: #7C3AED;
+}
+
+.civic-listing-title {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--civic-text-main);
+    margin: 0 0 4px 0;
+    line-height: 1.3;
+}
+
+.civic-listing-title a {
+    color: inherit;
+    text-decoration: none;
+}
+
+.civic-listing-title a:hover {
+    color: var(--civic-brand);
+    text-decoration: underline;
+}
+
+.civic-listing-author {
+    font-size: 14px;
+    color: var(--civic-text-muted);
+}
+
+.civic-listing-description {
+    color: var(--civic-text-secondary);
+    font-size: 15px;
+    line-height: 1.5;
+    margin-bottom: 12px;
+    flex: 1;
+}
+
+.civic-listing-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-top: 12px;
+    border-top: 1px solid var(--civic-border);
+    margin-top: auto;
+}
+
+.civic-listing-time {
+    font-size: 13px;
+    color: var(--civic-text-muted);
+}
+
+.civic-listing-category {
+    font-size: 12px;
+    color: var(--civic-text-muted);
+    background: var(--civic-bg-page);
+    padding: 3px 8px;
+    border-radius: 4px;
+}
+
+/* -------------------------------------------
+   SEARCH/FILTER BAR - Top of listings
+   ------------------------------------------- */
+.civic-search-bar {
+    background: var(--civic-bg-card);
+    border: 1px solid var(--civic-border);
+    border-radius: 8px;
+    padding: 16px 20px;
+    margin-bottom: 24px;
+    box-shadow: var(--civic-shadow-sm);
+}
+
+.civic-search-row {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    align-items: stretch;
+}
+
+.civic-search-input-wrapper {
+    flex: 1;
+    min-width: 200px;
+    position: relative;
+}
+
+.civic-search-input {
+    width: 100%;
+    padding: 10px 12px 10px 40px;
+    font-size: 16px;
+    border: 2px solid var(--civic-border);
+    border-radius: 6px;
+    background: var(--civic-bg-page);
+    color: var(--civic-text-main);
+    box-sizing: border-box;
+}
+
+.civic-search-input:focus {
+    border-color: var(--civic-brand);
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+.civic-search-icon {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--civic-text-muted);
+    pointer-events: none;
+}
+
+.civic-filter-select {
+    padding: 10px 32px 10px 12px;
+    font-size: 16px;
+    border: 2px solid var(--civic-border);
+    border-radius: 6px;
+    background: var(--civic-bg-card);
+    color: var(--civic-text-main);
+    cursor: pointer;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%236B7280' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+}
+
+.civic-filter-select:focus {
+    border-color: var(--civic-brand);
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+/* Filter pills/tabs */
+.civic-filter-tabs {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+}
+
+.civic-filter-tab {
+    padding: 8px 16px;
+    font-size: 14px;
+    font-weight: 600;
+    border: 2px solid var(--civic-border);
+    border-radius: 20px;
+    background: var(--civic-bg-card);
+    color: var(--civic-text-secondary);
+    cursor: pointer;
+    text-decoration: none;
+}
+
+.civic-filter-tab:hover {
+    border-color: var(--civic-brand);
+    color: var(--civic-brand);
+    text-decoration: none;
+}
+
+.civic-filter-tab--active,
+.civic-filter-tab.active {
+    background: var(--civic-brand);
+    border-color: var(--civic-brand);
+    color: white;
+}
+
+.civic-filter-tab--active:hover,
+.civic-filter-tab.active:hover {
+    background: var(--civic-brand-hover);
+    border-color: var(--civic-brand-hover);
+    color: white;
+}
+
+/* Results count */
+.civic-results-count {
+    font-size: 14px;
+    color: var(--civic-text-muted);
+    margin-bottom: 16px;
+}
+
+.civic-results-count strong {
+    color: var(--civic-text-main);
+}
+
+/* -------------------------------------------
+   EMPTY STATE - No results
+   ------------------------------------------- */
+.civic-empty-state {
+    text-align: center;
+    padding: 48px 24px;
+    background: var(--civic-bg-card);
+    border: 1px dashed var(--civic-border);
+    border-radius: 8px;
+}
+
+.civic-empty-state-icon {
+    font-size: 48px;
+    color: var(--civic-text-muted);
+    margin-bottom: 16px;
+}
+
+.civic-empty-state-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--civic-text-main);
+    margin-bottom: 8px;
+}
+
+.civic-empty-state-text {
+    color: var(--civic-text-secondary);
+    margin-bottom: 20px;
+}
+
+/* -------------------------------------------
+   PAGINATION - Page navigation
+   ------------------------------------------- */
+.civic-pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    margin: 40px 0;
+    flex-wrap: wrap;
+}
+
+.civic-pagination-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 40px;
+    min-height: 40px;
+    padding: 8px 16px;
+    background: var(--civic-bg-card);
+    border: 1px solid var(--civic-border);
+    border-radius: 6px;
+    color: var(--civic-text-secondary);
+    font-weight: 500;
+    text-decoration: none;
+    transition: all 0.2s ease;
+}
+
+.civic-pagination-btn:hover {
+    background: var(--civic-bg-page);
+    border-color: var(--civic-brand);
+    color: var(--civic-brand);
+    text-decoration: none;
+}
+
+.civic-pagination-btn:focus {
+    outline: 2px solid var(--civic-brand);
+    outline-offset: 2px;
+}
+
+.civic-pagination-current {
+    background: var(--civic-brand);
+    border-color: var(--civic-brand);
+    color: white;
+    cursor: default;
+}
+
+.civic-pagination-current:hover {
+    background: var(--civic-brand);
+    border-color: var(--civic-brand);
+    color: white;
+}
+
+.civic-pagination-ellipsis {
+    padding: 8px 4px;
+    color: var(--civic-text-muted);
+}
+
+.civic-pagination-prev,
+.civic-pagination-next {
+    gap: 4px;
+}
+
+@media (max-width: 480px) {
+    .civic-pagination-btn {
+        min-width: 36px;
+        min-height: 36px;
+        padding: 6px 12px;
+        font-size: 14px;
+    }
+}
+
+/* -------------------------------------------
+   CREDIT DISPLAY - Timebank balance
+   ------------------------------------------- */
+.civic-credits {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-weight: 700;
+    color: var(--civic-accent-green);
+}
+
+.civic-credits-value {
+    font-size: 1.5rem;
+}
+
+.civic-credits-label {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--civic-text-muted);
+}
+
+/* -------------------------------------------
+   TORFAEN SKIN - Purple theme overrides
+   ------------------------------------------- */
+body.skin-torfaen {
+    --civic-brand: #96206d;
+    --civic-brand-hover: #7a1a59;
+    --civic-brand-light: #fdf2f8;
+}
+
+body.skin-torfaen .civic-badge--verified {
+    background: #FDF2F8;
+    color: #96206d;
+    border-color: #F9A8D4;
+}
+
+body.skin-torfaen .civic-filter-tab--active,
+body.skin-torfaen .civic-filter-tab.active {
+    background: #96206d;
+    border-color: #96206d;
+}
+
+body.skin-torfaen .civic-filter-tab--active:hover,
+body.skin-torfaen .civic-filter-tab.active:hover {
+    background: #7a1a59;
+    border-color: #7a1a59;
+}
+
+/* ===========================================
+   ENHANCED FOCUS INDICATORS (WCAG 2.4.7)
+   Visible focus for all interactive elements
+   =========================================== */
+
+/* Universal focus ring - high visibility yellow */
+:focus-visible {
+    outline: 3px solid var(--civic-focus, #FBBF24);
+    outline-offset: 2px;
+}
+
+/* Links - ensure focus is visible against any background */
+a:focus-visible {
+    outline: 3px solid var(--civic-focus, #FBBF24);
+    outline-offset: 2px;
+    background-color: rgba(251, 191, 36, 0.1);
+    border-radius: 2px;
+}
+
+/* Buttons - prominent focus */
+.civic-btn:focus-visible,
+button:focus-visible {
+    outline: 3px solid var(--civic-focus, #FBBF24);
+    outline-offset: 2px;
+    box-shadow: 0 0 0 6px rgba(251, 191, 36, 0.3);
+}
+
+/* Form inputs - clear focus state */
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible,
+.civic-input:focus-visible {
+    outline: 3px solid var(--civic-focus, #FBBF24);
+    outline-offset: 0;
+    border-color: var(--civic-brand, #2563EB);
+    box-shadow: 0 0 0 4px rgba(251, 191, 36, 0.2);
+}
+
+/* Checkboxes and radios */
+input[type="checkbox"]:focus-visible,
+input[type="radio"]:focus-visible {
+    outline: 3px solid var(--civic-focus, #FBBF24);
+    outline-offset: 2px;
+}
+
+/* Cards that are clickable */
+.civic-card:focus-within {
+    outline: 2px solid var(--civic-brand, #2563EB);
+    outline-offset: 2px;
+}
+
+/* Navigation links */
+.civic-nav-link:focus-visible,
+.civic-dropdown-trigger:focus-visible {
+    outline: 3px solid var(--civic-focus, #FBBF24);
+    outline-offset: 2px;
+    background-color: rgba(251, 191, 36, 0.15);
+    border-radius: 4px;
+}
+
+/* Footer links */
+.civic-footer a:focus-visible {
+    outline: 2px solid #FFFFFF;
+    outline-offset: 2px;
+    background-color: rgba(255, 255, 255, 0.1);
+    border-radius: 2px;
+}
+
+/* Social media icons in footer */
+.civic-footer-social a:focus-visible {
+    outline: 3px solid #FFFFFF;
+    outline-offset: 2px;
+    background-color: rgba(255, 255, 255, 0.3);
+}
+
+/* Breadcrumb links */
+.civic-breadcrumb-link:focus-visible {
+    outline: 3px solid var(--civic-focus, #FBBF24);
+    outline-offset: 2px;
+}
+
+/* Dropdown menu items */
+.civic-dropdown-content a:focus-visible {
+    outline: 2px solid var(--civic-brand, #2563EB);
+    outline-offset: -2px;
+    background-color: var(--civic-brand-light, #DBEAFE);
+}
+
+/* Pagination buttons */
+.civic-pagination-btn:focus-visible {
+    outline: 3px solid var(--civic-focus, #FBBF24);
+    outline-offset: 2px;
+}
+
+/* Filter tabs */
+.civic-filter-tab:focus-visible {
+    outline: 3px solid var(--civic-focus, #FBBF24);
+    outline-offset: 2px;
+}
+
+/* Member cards clickable area */
+.civic-member-card-link:focus-visible {
+    outline: 3px solid var(--civic-focus, #FBBF24);
+    outline-offset: 2px;
+    border-radius: 8px;
+}
+
+/* Dark mode focus adjustments */
+body.dark-mode :focus-visible {
+    outline-color: var(--civic-focus, #FBBF24);
+}
+
+body.dark-mode a:focus-visible {
+    background-color: rgba(251, 191, 36, 0.2);
+}
+
+body.dark-mode .civic-dropdown-content a:focus-visible {
+    background-color: #374151;
+    outline-color: var(--civic-focus, #FBBF24);
+}
+
+/* Skip to main content link - enhanced visibility */
+.skip-link:focus {
+    position: fixed;
+    top: 10px;
+    left: 10px;
+    z-index: var(--z-notification, 1700);
+    padding: 16px 24px;
+    background: #FFDD00;
+    color: #000000;
+    font-weight: 700;
+    font-size: 18px;
+    text-decoration: none;
+    border-radius: 4px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+/* ===========================================
+   REDUCED MOTION PREFERENCES (WCAG 2.3.3)
+   =========================================== */
+
+@media (prefers-reduced-motion: reduce) {
+
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+    }
+
+    .civic-card:hover,
+    .civic-btn:hover,
+    .civic-member-card:hover,
+    .civic-listing-card:hover {
+        transform: none !important;
+    }
+}
+
+/* ===========================================
+   PRINT STYLESHEET (Accessibility)
+   =========================================== */
+
+@media print {
+
+    /* Hide interactive elements */
+    .skip-link,
+    .civic-utility-bar,
+    .civic-hamburger,
+    .civic-mobile-search-btn,
+    .civic-mega-menu,
+    #civic-menu-toggle,
+    .civic-footer-social,
+    .civic-btn--ghost {
+        display: none !important;
+    }
+
+    /* Ensure text is readable */
+    body {
+        font-size: 12pt;
+        line-height: 1.5;
+        color: #000 !important;
+        background: #fff !important;
+    }
+
+    /* Show link URLs */
+    a[href^="http"]::after {
+        content: " (" attr(href) ")";
+        font-size: 10pt;
+        color: #666;
+        word-break: break-all;
+    }
+
+    /* Don't show URL for internal links */
+    a[href^="/"]::after,
+    a[href^="#"]::after {
+        content: "";
+    }
+
+    /* Ensure sufficient contrast */
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6 {
+        color: #000 !important;
+    }
+
+    .civic-card,
+    .civic-member-card,
+    .civic-listing-card {
+        border: 1px solid #ccc;
+        box-shadow: none;
+        break-inside: avoid;
+    }
+
+    /* Buttons print as bordered boxes */
+    .civic-btn {
+        border: 2px solid #000 !important;
+        background: #fff !important;
+        color: #000 !important;
+    }
+}

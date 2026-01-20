@@ -241,14 +241,15 @@ h3 {
     letter-spacing: 0.05em;
 }
 
-a {
+/* Link styles - EXCLUDE buttons to prevent color override */
+a:not(.civic-button):not(.govuk-button) {
     color: var(--civic-brand);
     text-decoration: underline;
     text-decoration-thickness: 2px;
     text-underline-offset: 3px;
 }
 
-a:hover {
+a:not(.civic-button):not(.govuk-button):hover {
     text-decoration-thickness: 3px;
     color: var(--civic-brand-hover);
 }

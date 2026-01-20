@@ -676,6 +676,7 @@ class GdprService
 
     /**
      * Check if user has accepted the current version of a specific consent
+     * Checks tenant-specific version override first
      *
      * @param int $userId
      * @param string $consentType
@@ -683,14 +684,20 @@ class GdprService
      */
     public function hasCurrentVersionConsent(int $userId, string $consentType): bool
     {
+        // Get user's consent version and the required version (tenant override or global)
         $result = $this->query(
-            "SELECT uc.consent_version, ct.current_version
+            "SELECT uc.consent_version,
+                    COALESCE(tco.current_version, ct.current_version) AS current_version
              FROM user_consents uc
              JOIN consent_types ct ON uc.consent_type = ct.slug
+             LEFT JOIN tenant_consent_overrides tco
+                    ON ct.slug = tco.consent_type_slug
+                   AND tco.tenant_id = ?
+                   AND tco.is_active = 1
              WHERE uc.user_id = ? AND uc.consent_type = ? AND uc.tenant_id = ?
                AND uc.consent_given = 1
              ORDER BY uc.created_at DESC LIMIT 1",
-            [$userId, $consentType, $this->tenantId]
+            [$this->tenantId, $userId, $consentType, $this->tenantId]
         )->fetch();
 
         if (!$result) {
@@ -702,17 +709,28 @@ class GdprService
 
     /**
      * Get all required consents that user has not accepted at current version
+     * Checks for tenant-specific version overrides first
      *
      * @param int $userId
      * @return array Array of consent types needing re-acceptance
      */
     public function getOutdatedRequiredConsents(int $userId): array
     {
-        // Get all required consent types
+        // Get all required consent types with tenant override if exists
+        // COALESCE picks tenant override version/text if available, otherwise global
         $requiredTypes = $this->query(
-            "SELECT slug, name, description, current_version, current_text, category
-             FROM consent_types
-             WHERE is_required = TRUE AND is_active = TRUE"
+            "SELECT ct.slug, ct.name, ct.description,
+                    COALESCE(tco.current_version, ct.current_version) AS current_version,
+                    COALESCE(tco.current_text, ct.current_text) AS current_text,
+                    ct.category,
+                    tco.id AS has_tenant_override
+             FROM consent_types ct
+             LEFT JOIN tenant_consent_overrides tco
+                    ON ct.slug = tco.consent_type_slug
+                   AND tco.tenant_id = ?
+                   AND tco.is_active = 1
+             WHERE ct.is_required = TRUE AND ct.is_active = TRUE",
+            [$this->tenantId]
         )->fetchAll();
 
         $outdated = [];
@@ -830,6 +848,113 @@ class GdprService
     }
 
     /**
+     * Get effective consent version for this tenant
+     * Returns tenant override if exists, otherwise global version
+     *
+     * @param string $consentSlug
+     * @return array|null
+     */
+    public function getEffectiveConsentVersion(string $consentSlug): ?array
+    {
+        return $this->query(
+            "SELECT ct.slug, ct.name, ct.description, ct.is_required,
+                    COALESCE(tco.current_version, ct.current_version) AS current_version,
+                    COALESCE(tco.current_text, ct.current_text) AS current_text,
+                    tco.id AS tenant_override_id
+             FROM consent_types ct
+             LEFT JOIN tenant_consent_overrides tco
+                    ON ct.slug = tco.consent_type_slug
+                   AND tco.tenant_id = ?
+                   AND tco.is_active = 1
+             WHERE ct.slug = ? AND ct.is_active = TRUE",
+            [$this->tenantId, $consentSlug]
+        )->fetch() ?: null;
+    }
+
+    /**
+     * Set or update tenant-specific consent version
+     * This allows a tenant to update their terms independently of other tenants
+     *
+     * @param string $consentSlug
+     * @param string $version
+     * @param string|null $text Optional override text (null = use global text)
+     * @return bool
+     */
+    public function setTenantConsentVersion(string $consentSlug, string $version, ?string $text = null): bool
+    {
+        // Verify consent type exists
+        $exists = $this->query(
+            "SELECT 1 FROM consent_types WHERE slug = ? AND is_active = TRUE",
+            [$consentSlug]
+        )->fetch();
+
+        if (!$exists) {
+            throw new \InvalidArgumentException("Invalid consent type: {$consentSlug}");
+        }
+
+        // Upsert tenant override
+        $this->query(
+            "INSERT INTO tenant_consent_overrides
+             (tenant_id, consent_type_slug, current_version, current_text, is_active)
+             VALUES (?, ?, ?, ?, 1)
+             ON DUPLICATE KEY UPDATE
+                current_version = VALUES(current_version),
+                current_text = VALUES(current_text),
+                is_active = 1,
+                updated_at = NOW()",
+            [$this->tenantId, $consentSlug, $version, $text]
+        );
+
+        $this->logger->info("Tenant consent version updated", [
+            'tenant_id' => $this->tenantId,
+            'consent_type' => $consentSlug,
+            'version' => $version,
+            'has_custom_text' => $text !== null
+        ]);
+
+        return true;
+    }
+
+    /**
+     * Remove tenant-specific consent override (revert to global version)
+     *
+     * @param string $consentSlug
+     * @return bool
+     */
+    public function removeTenantConsentOverride(string $consentSlug): bool
+    {
+        $this->query(
+            "UPDATE tenant_consent_overrides
+             SET is_active = 0, updated_at = NOW()
+             WHERE tenant_id = ? AND consent_type_slug = ?",
+            [$this->tenantId, $consentSlug]
+        );
+
+        $this->logger->info("Tenant consent override removed", [
+            'tenant_id' => $this->tenantId,
+            'consent_type' => $consentSlug
+        ]);
+
+        return true;
+    }
+
+    /**
+     * Get all tenant consent overrides for this tenant
+     *
+     * @return array
+     */
+    public function getTenantConsentOverrides(): array
+    {
+        return $this->query(
+            "SELECT tco.*, ct.name, ct.current_version AS global_version
+             FROM tenant_consent_overrides tco
+             JOIN consent_types ct ON tco.consent_type_slug = ct.slug
+             WHERE tco.tenant_id = ? AND tco.is_active = 1",
+            [$this->tenantId]
+        )->fetchAll();
+    }
+
+    /**
      * Get all consent types
      */
     public function getConsentTypes(): array
@@ -857,15 +982,12 @@ class GdprService
 
     /**
      * Update user consent by slug (user-initiated)
+     * Uses tenant-specific version if available
      */
     public function updateUserConsent(int $userId, string $slug, bool $given): array
     {
-        // Get consent type details
-        $consentType = $this->query(
-            "SELECT slug, name, current_version, current_text, is_required
-             FROM consent_types WHERE slug = ? AND is_active = TRUE",
-            [$slug]
-        )->fetch();
+        // Get effective consent type details (with tenant override if exists)
+        $consentType = $this->getEffectiveConsentVersion($slug);
 
         if (!$consentType) {
             throw new \InvalidArgumentException("Invalid consent type: {$slug}");
@@ -876,7 +998,7 @@ class GdprService
             throw new \RuntimeException("Cannot withdraw required consent: {$consentType['name']}");
         }
 
-        // Record consent
+        // Record consent with effective version
         return $this->recordConsent(
             $userId,
             $slug,

@@ -85,7 +85,7 @@
 
     /* Colors - Primary default */
     background-color: var(--govuk-button-background);
-    color: var(--govuk-button-text);
+    color: var(--govuk-button-text) !important; /* Force white text for WCAG compliance */
 
     /* Prevent text selection */
     -webkit-user-select: none;
@@ -154,14 +154,14 @@
 .civicone .govuk-button--secondary {
     background-color: var(--govuk-button-secondary-background);
     box-shadow: 0 2px 0 var(--govuk-button-secondary-shadow);
-    color: var(--govuk-button-secondary-text);
+    color: var(--govuk-button-secondary-text) !important; /* Force black text for WCAG compliance */
 }
 
 .civic-button--secondary:hover,
 [data-layout="civicone"] .govuk-button--secondary:hover,
 .civicone .govuk-button--secondary:hover {
     background-color: var(--govuk-button-secondary-background-hover);
-    color: var(--govuk-button-secondary-text);
+    color: var(--govuk-button-secondary-text) !important; /* Force black text for WCAG compliance */
 }
 
 .civic-button--secondary:focus,
@@ -180,14 +180,14 @@
 .civicone .govuk-button--warning {
     background-color: var(--govuk-button-warning-background);
     box-shadow: 0 2px 0 var(--govuk-button-warning-shadow);
-    color: var(--govuk-button-text);
+    color: var(--govuk-button-text) !important; /* Force white text for WCAG compliance */
 }
 
 .civic-button--warning:hover,
 [data-layout="civicone"] .govuk-button--warning:hover,
 .civicone .govuk-button--warning:hover {
     background-color: var(--govuk-button-warning-background-hover);
-    color: var(--govuk-button-text);
+    color: var(--govuk-button-text) !important; /* Force white text for WCAG compliance */
 }
 
 .civic-button--warning:focus,

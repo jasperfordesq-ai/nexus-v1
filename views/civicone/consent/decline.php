@@ -1,83 +1,404 @@
 <?php
 /**
- * CivicOne Consent Decline Warning Page
+ * CivicOne Consent Decline Page
  * Shown when user chooses not to accept updated terms
  */
-$pageTitle = $pageTitle ?? 'Unable to Continue';
+$pageTitle = 'Unable to Continue';
 $hero_title = 'Account Access';
-$hero_subtitle = 'Action Required';
+$hero_subtitle = 'Action required';
 
 require dirname(__DIR__) . '/../layouts/civicone/header.php';
 
 $basePath = $basePath ?? \Nexus\Core\TenantContext::getBasePath();
+$tenant = \Nexus\Core\TenantContext::get();
+$tenantName = $tenant['name'] ?? 'the platform';
 ?>
 
-<link rel="stylesheet" href="<?= $basePath ?>/assets/css/consent-required.css?v=<?= $cssVersionTimestamp ?? time() ?>">
-
-<div class="consent-required-page">
-    <div class="consent-container consent-decline">
-        <div class="consent-header">
-            <div class="consent-icon decline-icon">
-                <i class="fa-solid fa-triangle-exclamation"></i>
+<div class="civic-container civic-container--narrow">
+    <div class="consent-page">
+        <!-- Warning Banner -->
+        <div class="civic-notification civic-notification--error">
+            <div class="civic-notification__icon">
+                <i class="fa-solid fa-circle-exclamation"></i>
             </div>
-            <h1>Unable to Continue Without Consent</h1>
-            <p class="consent-intro">
-                To use this platform, you must accept our updated Terms of Service and Privacy Policy.
-                These documents outline how we protect your data and the rules for using our services.
-            </p>
-        </div>
-
-        <div class="decline-info">
-            <h3>Your Options</h3>
-            <div class="decline-options">
-                <div class="decline-option">
-                    <div class="option-icon">
-                        <i class="fa-solid fa-check-circle"></i>
-                    </div>
-                    <div class="option-content">
-                        <h4>Accept the Terms</h4>
-                        <p>Return to the consent page and accept the updated terms to continue using your account.</p>
-                        <a href="<?= $basePath ?>/consent-required" class="civic-btn civic-btn-primary">
-                            <i class="fa-solid fa-arrow-left"></i> Return to Consent Page
-                        </a>
-                    </div>
-                </div>
-
-                <div class="decline-option">
-                    <div class="option-icon warning">
-                        <i class="fa-solid fa-user-xmark"></i>
-                    </div>
-                    <div class="option-content">
-                        <h4>Request Account Deletion</h4>
-                        <p>If you no longer wish to use our services, you can request deletion of your account and personal data.</p>
-                        <a href="<?= $basePath ?>/settings" class="civic-btn civic-btn-outline">
-                            <i class="fa-solid fa-cog"></i> Go to Settings
-                        </a>
-                    </div>
-                </div>
-
-                <div class="decline-option">
-                    <div class="option-icon neutral">
-                        <i class="fa-solid fa-envelope"></i>
-                    </div>
-                    <div class="option-content">
-                        <h4>Contact Support</h4>
-                        <p>If you have questions about our terms or need clarification, our support team is here to help.</p>
-                        <a href="mailto:support@hourtimebank.com" class="civic-btn civic-btn-outline">
-                            <i class="fa-solid fa-envelope"></i> Contact Support
-                        </a>
-                    </div>
-                </div>
+            <div class="civic-notification__content">
+                <h2 class="civic-notification__title">Unable to Continue</h2>
+                <p>To use <?= htmlspecialchars($tenantName) ?>, you must accept our updated Terms of Service and Privacy Policy.</p>
             </div>
         </div>
 
-        <div class="consent-footer">
-            <p>
-                <i class="fa-solid fa-info-circle"></i>
-                Your account will remain in a limited state until you accept the updated terms.
-            </p>
+        <!-- Options Card -->
+        <div class="civic-card">
+            <div class="civic-card__header">
+                <h1 class="civic-card__title">Your Options</h1>
+            </div>
+
+            <div class="civic-card__body">
+                <div class="decline-options">
+                    <!-- Option 1: Accept -->
+                    <div class="decline-option decline-option--recommended">
+                        <div class="decline-option__icon">
+                            <i class="fa-solid fa-check-circle"></i>
+                        </div>
+                        <div class="decline-option__content">
+                            <h3>Accept the Updated Terms</h3>
+                            <p>Return to the consent page and review the updated terms. This will allow you to continue using your account.</p>
+                            <a href="<?= $basePath ?>/consent-required" class="civic-btn civic-btn--primary">
+                                <i class="fa-solid fa-arrow-left"></i> Return to Consent Page
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Option 2: Contact Support -->
+                    <div class="decline-option">
+                        <div class="decline-option__icon decline-option__icon--secondary">
+                            <i class="fa-solid fa-comments"></i>
+                        </div>
+                        <div class="decline-option__content">
+                            <h3>Contact Support</h3>
+                            <p>If you have questions about the updated terms or need clarification before accepting, our support team can help.</p>
+                            <a href="<?= $basePath ?>/contact" class="civic-btn civic-btn--outline">
+                                <i class="fa-solid fa-envelope"></i> Contact Support
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Option 3: Delete Account -->
+                    <div class="decline-option">
+                        <div class="decline-option__icon decline-option__icon--danger">
+                            <i class="fa-solid fa-user-xmark"></i>
+                        </div>
+                        <div class="decline-option__content">
+                            <h3>Request Account Deletion</h3>
+                            <p>If you no longer wish to use our services, you can request deletion of your account and personal data under GDPR.</p>
+                            <a href="<?= $basePath ?>/settings" class="civic-btn civic-btn--outline civic-btn--danger">
+                                <i class="fa-solid fa-trash-alt"></i> Go to Account Settings
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Info Section -->
+        <div class="consent-info">
+            <h3><i class="fa-solid fa-info-circle"></i> Why do I need to accept?</h3>
+            <p>These legal documents explain your rights and responsibilities when using our platform, and how we handle your personal data. Accepting them is required to comply with data protection laws.</p>
+            <p>Your account will remain in a restricted state until you accept the updated terms. You won't lose any data.</p>
         </div>
     </div>
 </div>
+
+<style>
+/* Consent Decline Page - CivicOne Theme */
+.consent-page {
+    padding: var(--space-600, 2rem) 0;
+}
+
+/* Error Notification */
+.civic-notification--error {
+    background: var(--color-danger-50, #fef2f2);
+    border-color: var(--color-danger-500, #ef4444);
+}
+
+[data-theme="dark"] .civic-notification--error {
+    background: rgba(239, 68, 68, 0.1);
+}
+
+.civic-notification--error .civic-notification__icon {
+    color: var(--color-danger-600, #dc2626);
+}
+
+/* Card Styles */
+.civic-card {
+    background: var(--color-surface, #fff);
+    border: 1px solid var(--color-gray-200, #e5e7eb);
+    border-radius: var(--radius-lg, 12px);
+    overflow: hidden;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+[data-theme="dark"] .civic-card {
+    background: var(--color-gray-800, #1f2937);
+    border-color: var(--color-gray-700, #374151);
+}
+
+.civic-card__header {
+    padding: var(--space-500, 1.25rem) var(--space-600, 1.5rem);
+    border-bottom: 1px solid var(--color-gray-200, #e5e7eb);
+    background: var(--color-gray-50, #f9fafb);
+}
+
+[data-theme="dark"] .civic-card__header {
+    background: var(--color-gray-900, #111827);
+    border-color: var(--color-gray-700, #374151);
+}
+
+.civic-card__title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    margin: 0;
+    color: var(--color-gray-900, #111827);
+}
+
+[data-theme="dark"] .civic-card__title {
+    color: var(--color-gray-100, #f3f4f6);
+}
+
+.civic-card__body {
+    padding: var(--space-600, 1.5rem);
+}
+
+/* Decline Options */
+.decline-options {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-500, 1.25rem);
+}
+
+.decline-option {
+    display: flex;
+    gap: var(--space-400, 1rem);
+    padding: var(--space-500, 1.25rem);
+    border: 1px solid var(--color-gray-200, #e5e7eb);
+    border-radius: var(--radius-md, 8px);
+    transition: border-color 0.2s;
+}
+
+[data-theme="dark"] .decline-option {
+    border-color: var(--color-gray-700, #374151);
+}
+
+.decline-option--recommended {
+    border-color: var(--color-primary-300, #a5b4fc);
+    background: var(--color-primary-50, #eef2ff);
+}
+
+[data-theme="dark"] .decline-option--recommended {
+    background: rgba(99, 102, 241, 0.1);
+    border-color: var(--color-primary-500, #6366f1);
+}
+
+.decline-option__icon {
+    width: 48px;
+    height: 48px;
+    min-width: 48px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.25rem;
+    background: var(--color-primary-100, #e0e7ff);
+    color: var(--color-primary-600, #4f46e5);
+}
+
+.decline-option__icon--secondary {
+    background: var(--color-gray-100, #f3f4f6);
+    color: var(--color-gray-600, #4b5563);
+}
+
+.decline-option__icon--danger {
+    background: var(--color-danger-100, #fee2e2);
+    color: var(--color-danger-600, #dc2626);
+}
+
+[data-theme="dark"] .decline-option__icon {
+    background: rgba(99, 102, 241, 0.2);
+}
+
+[data-theme="dark"] .decline-option__icon--secondary {
+    background: var(--color-gray-700, #374151);
+    color: var(--color-gray-400, #9ca3af);
+}
+
+[data-theme="dark"] .decline-option__icon--danger {
+    background: rgba(239, 68, 68, 0.2);
+    color: var(--color-danger-400, #f87171);
+}
+
+.decline-option__content h3 {
+    font-size: 1rem;
+    font-weight: 600;
+    margin: 0 0 0.5rem 0;
+    color: var(--color-gray-900, #111827);
+}
+
+[data-theme="dark"] .decline-option__content h3 {
+    color: var(--color-gray-100, #f3f4f6);
+}
+
+.decline-option__content p {
+    font-size: 0.875rem;
+    color: var(--color-gray-600, #4b5563);
+    margin: 0 0 1rem 0;
+    line-height: 1.5;
+}
+
+[data-theme="dark"] .decline-option__content p {
+    color: var(--color-gray-400, #9ca3af);
+}
+
+/* Buttons */
+.civic-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.625rem 1rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    border-radius: var(--radius-md, 8px);
+    cursor: pointer;
+    transition: all 0.2s;
+    text-decoration: none;
+}
+
+.civic-btn--primary {
+    background: var(--color-primary-600, #4f46e5);
+    color: white;
+    border: none;
+}
+
+.civic-btn--primary:hover {
+    background: var(--color-primary-700, #4338ca);
+}
+
+.civic-btn--outline {
+    background: transparent;
+    border: 1px solid var(--color-gray-300, #d1d5db);
+    color: var(--color-gray-700, #374151);
+}
+
+[data-theme="dark"] .civic-btn--outline {
+    border-color: var(--color-gray-600, #4b5563);
+    color: var(--color-gray-300, #d1d5db);
+}
+
+.civic-btn--outline:hover {
+    background: var(--color-gray-50, #f9fafb);
+    border-color: var(--color-gray-400, #9ca3af);
+}
+
+[data-theme="dark"] .civic-btn--outline:hover {
+    background: var(--color-gray-700, #374151);
+}
+
+.civic-btn--danger {
+    border-color: var(--color-danger-300, #fca5a5);
+    color: var(--color-danger-700, #b91c1c);
+}
+
+[data-theme="dark"] .civic-btn--danger {
+    border-color: var(--color-danger-500, #ef4444);
+    color: var(--color-danger-400, #f87171);
+}
+
+.civic-btn--danger:hover {
+    background: var(--color-danger-50, #fef2f2);
+}
+
+[data-theme="dark"] .civic-btn--danger:hover {
+    background: rgba(239, 68, 68, 0.1);
+}
+
+/* Info Section */
+.consent-info {
+    margin-top: var(--space-600, 1.5rem);
+    padding: var(--space-500, 1.25rem);
+    background: var(--color-gray-50, #f9fafb);
+    border-radius: var(--radius-md, 8px);
+    border-left: 4px solid var(--color-primary-500, #6366f1);
+}
+
+[data-theme="dark"] .consent-info {
+    background: var(--color-gray-800, #1f2937);
+}
+
+.consent-info h3 {
+    font-size: 0.9375rem;
+    font-weight: 600;
+    margin: 0 0 0.75rem 0;
+    color: var(--color-gray-900, #111827);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+[data-theme="dark"] .consent-info h3 {
+    color: var(--color-gray-100, #f3f4f6);
+}
+
+.consent-info h3 i {
+    color: var(--color-primary-500, #6366f1);
+}
+
+.consent-info p {
+    font-size: 0.875rem;
+    color: var(--color-gray-600, #4b5563);
+    margin: 0 0 0.5rem 0;
+    line-height: 1.6;
+}
+
+.consent-info p:last-child {
+    margin-bottom: 0;
+}
+
+[data-theme="dark"] .consent-info p {
+    color: var(--color-gray-400, #9ca3af);
+}
+
+/* Notification Styles (reused) */
+.civic-notification {
+    display: flex;
+    gap: var(--space-400, 1rem);
+    padding: var(--space-400, 1rem) var(--space-500, 1.25rem);
+    border-radius: var(--radius-md, 8px);
+    margin-bottom: var(--space-600, 2rem);
+    border-left: 4px solid;
+}
+
+.civic-notification__icon {
+    font-size: 1.5rem;
+    flex-shrink: 0;
+    margin-top: 2px;
+}
+
+.civic-notification__title {
+    font-size: 1.125rem;
+    font-weight: 600;
+    margin: 0 0 0.25rem 0;
+    color: var(--color-gray-900, #111827);
+}
+
+[data-theme="dark"] .civic-notification__title {
+    color: var(--color-gray-100, #f3f4f6);
+}
+
+.civic-notification__content p {
+    margin: 0;
+    color: var(--color-gray-700, #374151);
+    font-size: 0.9375rem;
+}
+
+[data-theme="dark"] .civic-notification__content p {
+    color: var(--color-gray-300, #d1d5db);
+}
+
+/* Responsive */
+@media (max-width: 640px) {
+    .decline-option {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .decline-option__icon {
+        margin: 0 auto;
+    }
+
+    .civic-btn {
+        width: 100%;
+        justify-content: center;
+    }
+}
+</style>
 
 <?php require dirname(__DIR__) . '/../layouts/civicone/footer.php'; ?>

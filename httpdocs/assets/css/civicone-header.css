@@ -1259,8 +1259,9 @@ body.skin-torfaen .civicone-hero-banner {
 
 .hero-badge {
     display: inline-block;
-    background: rgba(255, 255, 255, 0.2);
-    font-weight: 600;
+    background: rgba(255, 255, 255, 0.3); /* Increased from 0.2 for better contrast */
+    color: #ffffff; /* Explicit white for contrast */
+    font-weight: 700; /* Bolder for better legibility */
     font-size: 12px;
     padding: 4px 10px;
     margin-bottom: 12px;
@@ -1270,7 +1271,7 @@ body.skin-torfaen .civicone-hero-banner {
 }
 
 .hero-title {
-    color: white !important;
+    color: #ffffff !important; /* Explicit white for WCAG compliance */
     margin-bottom: 8px;
     font-size: clamp(1.75rem, 4vw, 2.5rem);
     font-weight: 700;
@@ -1279,7 +1280,7 @@ body.skin-torfaen .civicone-hero-banner {
 
 .hero-subtitle {
     font-size: clamp(1rem, 2vw, 1.125rem);
-    opacity: 0.9;
+    color: #ffffff; /* Explicit white instead of opacity for contrast */
     max-width: 600px;
     margin: 0;
     line-height: 1.5;

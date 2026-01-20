@@ -6,16 +6,16 @@
  * - User search for wallet transfers
  * - Listing deletion
  * - Notification deletion
+ *
+ * Note: NEXUS_BASE is already declared globally in body-open.php
  */
-
-var NEXUS_BASE = '';
 
 /**
  * Initialize the CivicOne Dashboard
- * @param {string} basePath - The tenant base path
+ * @param {string} basePath - The tenant base path (optional, uses global NEXUS_BASE if not provided)
  */
 function initCivicOneDashboard(basePath) {
-    NEXUS_BASE = basePath || '';
+    // NEXUS_BASE already declared globally in body-open.php, just use it
     initUserSearch();
     initClickOutsideHandlers();
 }

@@ -30,7 +30,9 @@ class ConsentController
             exit;
         }
 
-        $gdprService = new GdprService();
+        // Use user's tenant_id from session
+        $userTenantId = $_SESSION['tenant_id'] ?? null;
+        $gdprService = new GdprService($userTenantId);
         $outdatedConsents = $gdprService->getOutdatedRequiredConsents($_SESSION['user_id']);
 
         // If no outdated consents, redirect to dashboard
@@ -82,7 +84,9 @@ class ConsentController
         }
 
         try {
-            $gdprService = new GdprService();
+            // Use user's tenant_id from session
+            $userTenantId = $_SESSION['tenant_id'] ?? null;
+            $gdprService = new GdprService($userTenantId);
             $results = $gdprService->acceptMultipleConsents(
                 $_SESSION['user_id'],
                 $acceptedConsents

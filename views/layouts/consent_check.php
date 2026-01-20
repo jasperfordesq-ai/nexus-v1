@@ -58,17 +58,19 @@ if (isset($_SESSION['user_id'])) {
         try {
             // Check for outdated consents using GdprService
             if (class_exists('\Nexus\Services\Enterprise\GdprService')) {
-                $gdprService = new \Nexus\Services\Enterprise\GdprService();
+                // Use user's tenant_id from session, not default
+                $userTenantId = $_SESSION['tenant_id'] ?? null;
+                $gdprService = new \Nexus\Services\Enterprise\GdprService($userTenantId);
                 $outdatedConsents = $gdprService->getOutdatedRequiredConsents($_SESSION['user_id']);
 
                 if (!empty($outdatedConsents)) {
-                    // Check if user is admin/super admin (exempt from lockout)
+                    // Check if user is super admin (exempt from lockout to prevent system inaccessibility)
+                    // Regular admins MUST accept updated terms like everyone else
                     if (class_exists('\Nexus\Models\User')) {
                         $user = \Nexus\Models\User::findById($_SESSION['user_id']);
                         $isSuperAdmin = !empty($user['is_super_admin']);
-                        $isAdmin = ($user['role'] ?? '') === 'admin';
 
-                        if (!$isSuperAdmin && !$isAdmin) {
+                        if (!$isSuperAdmin) {
                             // Store outdated consents in session for the re-consent page
                             $_SESSION['_pending_consents'] = $outdatedConsents;
 
