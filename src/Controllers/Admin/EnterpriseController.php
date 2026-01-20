@@ -1320,6 +1320,113 @@ class EnterpriseController
     }
 
     /**
+     * POST /admin/enterprise/gdpr/consents/tenant-version
+     * Update tenant-specific consent version (triggers re-consent for users)
+     */
+    public function gdprUpdateTenantConsentVersion(): void
+    {
+        header('Content-Type: application/json');
+
+        $data = $this->getJsonInput();
+
+        if (empty($data['consent_slug']) || empty($data['version'])) {
+            http_response_code(400);
+            echo json_encode(['error' => 'Consent type and version are required']);
+            return;
+        }
+
+        $tenantId = $this->getTenantId();
+        $slug = $data['consent_slug'];
+        $version = $data['version'];
+
+        // Validate version format (e.g., 1.0, 2.0, 1.1)
+        if (!preg_match('/^\d+\.\d+$/', $version)) {
+            http_response_code(400);
+            echo json_encode(['error' => 'Version must be in format X.Y (e.g., 2.0)']);
+            return;
+        }
+
+        try {
+            $gdprService = new GdprService($tenantId);
+            $gdprService->setTenantConsentVersion($slug, $version);
+
+            // Get count of users who will need to re-consent
+            $affectedUsers = Database::query(
+                "SELECT COUNT(DISTINCT uc.user_id) as cnt
+                 FROM user_consents uc
+                 WHERE uc.tenant_id = ? AND uc.consent_type = ?
+                   AND uc.consent_given = 1
+                   AND uc.consent_version < ?",
+                [$tenantId, $slug, $version]
+            )->fetch();
+
+            echo json_encode([
+                'success' => true,
+                'message' => "Consent version updated to {$version}",
+                'affected_users' => $affectedUsers['cnt'] ?? 0
+            ]);
+        } catch (\Exception $e) {
+            http_response_code(500);
+            echo json_encode(['error' => $e->getMessage()]);
+        }
+    }
+
+    /**
+     * GET /admin/enterprise/gdpr/consents/tenant-versions
+     * Get tenant's consent version overrides
+     */
+    public function gdprGetTenantConsentVersions(): void
+    {
+        header('Content-Type: application/json');
+
+        $tenantId = $this->getTenantId();
+
+        // Get all consent types with tenant overrides
+        $versions = Database::query(
+            "SELECT ct.slug, ct.name, ct.is_required,
+                    ct.current_version AS global_version,
+                    tco.current_version AS tenant_version,
+                    COALESCE(tco.current_version, ct.current_version) AS effective_version,
+                    tco.updated_at AS last_updated
+             FROM consent_types ct
+             LEFT JOIN tenant_consent_overrides tco
+                    ON ct.slug = tco.consent_type_slug
+                   AND tco.tenant_id = ?
+                   AND tco.is_active = 1
+             WHERE ct.is_active = TRUE
+               AND ct.slug IN ('terms_of_service', 'privacy_policy')
+             ORDER BY ct.display_order, ct.name",
+            [$tenantId]
+        )->fetchAll();
+
+        echo json_encode(['versions' => $versions]);
+    }
+
+    /**
+     * DELETE /admin/enterprise/gdpr/consents/tenant-version/{slug}
+     * Remove tenant override (revert to global version)
+     */
+    public function gdprRemoveTenantConsentVersion(string $slug): void
+    {
+        header('Content-Type: application/json');
+
+        $tenantId = $this->getTenantId();
+
+        try {
+            $gdprService = new GdprService($tenantId);
+            $gdprService->removeTenantConsentOverride($slug);
+
+            echo json_encode([
+                'success' => true,
+                'message' => 'Reverted to global version'
+            ]);
+        } catch (\Exception $e) {
+            http_response_code(500);
+            echo json_encode(['error' => $e->getMessage()]);
+        }
+    }
+
+    /**
      * GET /admin/enterprise/gdpr/audit/export
      * Export GDPR audit log
      */

@@ -27,19 +27,21 @@ function minifyCSS(css) {
 }
 
 // CSS files to minify
-// Updated 2026-01-19: Added Phase 1-14 extracted files, theme transitions
+// Updated 2026-01-20: Complete audit - all CSS files included
 const cssFiles = [
     // Core framework
     'nexus-phoenix.css',
-    // Theme system
-    'theme-transitions.css',
     'nexus-mobile.css',
     'nexus-shared-transitions.css',
+    'nexus-home.css',
+    'nexus-score.css',
+    'nexus-groups.css',
     'post-box-home.css',
     // Header and loading
     'nexus-loading-fix.css',
     'nexus-performance-patch.css',
     'nexus-modern-header.css',
+    'nexus-header-extracted.css',
     // Premium components
     'premium-search.css',
     'premium-dropdowns.css',
@@ -138,8 +140,8 @@ const cssFiles = [
     'civicone-footer.css',
     'civicone-dashboard.css',
     'civicone-achievements.css',
-    // Header extracted styles
-    'nexus-header-extracted.css',
+    'civicone-profile-header.css',
+    'civicone-profile-social.css',
     // Shared components
     'notification-drawer.css',
     'feed-action-pills.css',
@@ -194,8 +196,46 @@ const cssFiles = [
     'civicone-profile.css',
     'civicone-volunteering.css',
     'civicone-wallet.css',
+    // Account navigation (MOJ Sub navigation pattern - 2026-01-20)
+    'civicone-account-nav.css',
+    // GOV.UK component library (WCAG 2.1 AA - 2026-01-20)
+    'civicone-govuk-buttons.css',
+    'civicone-govuk-components.css',
+    'civicone-govuk-focus.css',
+    'civicone-govuk-forms.css',
+    'civicone-govuk-spacing.css',
+    'civicone-govuk-typography.css',
+    // Directory pages (GOV.UK patterns - 2026-01-20)
+    'civicone-listings-directory.css',
+    'civicone-members-directory.css',
     // Design tokens (2026-01-20)
     'design-tokens.css',
+    // Utility CSS
+    'branding.css',
+    'consent-required.css',
+    'glass.css',
+    'layout-isolation.css',
+    'sidebar.css',
+    'strategic-plan.css',
+    // Mobile components
+    'mobile-search-overlay.css',
+    'mobile-select-sheet.css',
+    // Native app
+    'native-form-inputs.css',
+    'native-page-enter.css',
+    // Bundles
+    'modern-bundle.css',
+    'modern-bundle-compiled.css',
+    // Admin
+    'admin-header.css',
+    // Utility fixes
+    'noscript-fallbacks.css',
+    'scroll-fix-emergency.css',
+    // Shell layouts
+    'civicone-federation-shell.css',
+    'civicone-feed.css',
+    // PWA
+    'pwa-install-modal.css',
 ];
 
 const cssDir = path.join(__dirname, '../httpdocs/assets/css');

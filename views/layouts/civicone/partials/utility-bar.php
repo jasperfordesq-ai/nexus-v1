@@ -33,14 +33,6 @@
                 </div>
             <?php endif; ?>
 
-            <style>
-                /* Force Dropdown Hover Logic */
-                .civic-dropdown:hover .civic-dropdown-content {
-                    display: block;
-                    animation: fadeIn 0.2s;
-                }
-            </style>
-
             <!-- Dark Mode Toggle -->
             <button id="civic-theme-toggle" class="civic-utility-link civic-utility-btn" aria-label="Toggle High Contrast">
                 <span class="icon">◑</span> Contrast
@@ -64,16 +56,16 @@
                         // Use LayoutHelper for consistent layout detection
                         $lay = \Nexus\Services\LayoutHelper::get();
                         ?>
-                        <a href="?layout=modern" role="menuitem" <?= $lay === 'modern' ? 'aria-current="true"' : '' ?> style="<?= $lay === 'modern' ? 'font-weight:bold; color:var(--civic-brand, #00796B); background: rgba(0, 121, 107, 0.1);' : '' ?>">
-                            <span style="display:inline-block; margin-right:8px;">✨</span> Modern UI
+                        <a href="?layout=modern" role="menuitem" <?= $lay === 'modern' ? 'aria-current="true"' : '' ?>>
+                            <span class="civic-layout-icon">✨</span> Modern UI
                             <?php if ($lay === 'modern'): ?>
-                                <span style="float:right; color: var(--civic-brand, #00796B);">✓</span>
+                                <span class="civic-checkmark">✓</span>
                             <?php endif; ?>
                         </a>
-                        <a href="?layout=civicone" role="menuitem" <?= $lay === 'civicone' ? 'aria-current="true"' : '' ?> style="<?= $lay === 'civicone' ? 'font-weight:bold; color:var(--civic-brand, #00796B); background: rgba(0, 121, 107, 0.1);' : '' ?>">
-                            <span style="display:inline-block; margin-right:8px;">♿</span> Accessible UI
+                        <a href="?layout=civicone" role="menuitem" <?= $lay === 'civicone' ? 'aria-current="true"' : '' ?>>
+                            <span class="civic-layout-icon">♿</span> Accessible UI
                             <?php if ($lay === 'civicone'): ?>
-                                <span style="float:right; color: var(--civic-brand, #00796B);">✓</span>
+                                <span class="civic-checkmark">✓</span>
                             <?php endif; ?>
                         </a>
 
@@ -88,7 +80,7 @@
                             if (empty($rootPath)) $rootPath = '/';
 
                         ?>
-                            <div style="border-top:1px solid #e5e7eb; margin:5px 0;" role="separator"></div>
+                            <div class="civic-dropdown-separator" role="separator"></div>
                         <?php endif; ?>
                     </div>
                 </div>
@@ -98,74 +90,14 @@
             <!-- Auth / User Links -->
             <?php if (isset($_SESSION['user_id'])): ?>
 
-                <!-- Create Dropdown - SYNCHRONIZED WITH MODERN (uses /compose?tab= URLs) -->
-                <div class="civic-dropdown civic-dropdown--right">
-                    <button class="civic-utility-link civic-utility-btn civic-utility-btn--create" aria-haspopup="menu" aria-expanded="false" aria-controls="utility-create-dropdown-menu">
-                        + Create <span class="civic-arrow" aria-hidden="true">▾</span>
-                    </button>
-                    <div class="civic-dropdown-content" id="utility-create-dropdown-menu" role="menu">
-                        <a href="<?= Nexus\Core\TenantContext::getBasePath() ?>/compose?tab=post" role="menuitem">📝 New Post</a>
-                        <a href="<?= Nexus\Core\TenantContext::getBasePath() ?>/compose?tab=listing" role="menuitem">🎁 New Listing</a>
-                        <?php if (Nexus\Core\TenantContext::hasFeature('events')): ?>
-                            <a href="<?= Nexus\Core\TenantContext::getBasePath() ?>/compose?tab=event" role="menuitem">📅 New Event</a>
-                        <?php endif; ?>
-                        <?php if (Nexus\Core\TenantContext::hasFeature('volunteering')): ?>
-                            <a href="<?= Nexus\Core\TenantContext::getBasePath() ?>/compose?tab=volunteer" role="menuitem">🤝 Volunteer Opp</a>
-                        <?php endif; ?>
-                        <?php if (Nexus\Core\TenantContext::hasFeature('polls')): ?>
-                            <a href="<?= Nexus\Core\TenantContext::getBasePath() ?>/compose?tab=poll" role="menuitem">📊 New Poll</a>
-                        <?php endif; ?>
-                        <?php if (Nexus\Core\TenantContext::hasFeature('goals')): ?>
-                            <a href="<?= Nexus\Core\TenantContext::getBasePath() ?>/compose?tab=goal" role="menuitem">🎯 New Goal</a>
-                        <?php endif; ?>
-                    </div>
-                </div>
+                <!-- REMOVED: Create Dropdown (violates Rule HL-003) -->
+                <!-- Moved to floating action button or page content -->
+                <!-- See: docs/HEADER_FIX_ACTION_PLAN_2026-01-20.md -->
 
-                <?php
-                // Federation Dropdown - SYNCHRONIZED WITH MODERN
-                $hasFederationUtilBar = false;
-                if (class_exists('\Nexus\Services\FederationFeatureService')) {
-                    try {
-                        $hasFederationUtilBar = \Nexus\Services\FederationFeatureService::isTenantFederationEnabled();
-                    } catch (\Exception $e) {
-                        $hasFederationUtilBar = false;
-                    }
-                }
-                if ($hasFederationUtilBar): ?>
-                    <div class="civic-dropdown civic-dropdown--right">
-                        <button class="civic-utility-link civic-utility-btn civic-utility-btn--federation" aria-haspopup="menu" aria-expanded="false">
-                            <i class="fa-solid fa-globe civic-menu-icon"></i>Partner Communities <span class="civic-arrow" aria-hidden="true">▾</span>
-                        </button>
-                        <div class="civic-dropdown-content" role="menu">
-                            <a href="<?= Nexus\Core\TenantContext::getBasePath() ?>/federation" role="menuitem">
-                                <span class="civic-menu-icon civic-menu-icon--purple"><i class="fa-solid fa-house"></i></span>Partner Communities Hub
-                            </a>
-                            <div class="civic-dropdown-separator" role="separator"></div>
-                            <a href="<?= Nexus\Core\TenantContext::getBasePath() ?>/federation/members" role="menuitem">
-                                <span class="civic-menu-icon civic-menu-icon--purple"><i class="fa-solid fa-user-group"></i></span>Members
-                            </a>
-                            <a href="<?= Nexus\Core\TenantContext::getBasePath() ?>/federation/listings" role="menuitem">
-                                <span class="civic-menu-icon civic-menu-icon--pink"><i class="fa-solid fa-hand-holding-heart"></i></span>Listings
-                            </a>
-                            <a href="<?= Nexus\Core\TenantContext::getBasePath() ?>/federation/events" role="menuitem">
-                                <span class="civic-menu-icon civic-menu-icon--amber"><i class="fa-solid fa-calendar-days"></i></span>Events
-                            </a>
-                            <a href="<?= Nexus\Core\TenantContext::getBasePath() ?>/federation/groups" role="menuitem">
-                                <span class="civic-menu-icon civic-menu-icon--indigo"><i class="fa-solid fa-users"></i></span>Groups
-                            </a>
-                            <a href="<?= Nexus\Core\TenantContext::getBasePath() ?>/federation/messages" role="menuitem">
-                                <span class="civic-menu-icon civic-menu-icon--blue"><i class="fa-solid fa-envelope"></i></span>Messages
-                            </a>
-                            <a href="<?= Nexus\Core\TenantContext::getBasePath() ?>/federation/transactions" role="menuitem">
-                                <span class="civic-menu-icon civic-menu-icon--green"><i class="fa-solid fa-coins"></i></span>Transactions
-                            </a>
-                            <div class="civic-dropdown-separator" role="separator"></div>
-                            <a href="<?= Nexus\Core\TenantContext::getBasePath() ?>/settings?section=federation" role="menuitem">
-                                <span class="civic-menu-icon civic-menu-icon--gray"><i class="fa-solid fa-sliders"></i></span>Settings
-                            </a>
-                        </div>
-                    </div>
-                <?php endif; ?>
+                <!-- REMOVED: Federation Dropdown (violates Section 9B Rule FS-003) -->
+                <!-- Moved to federation-scope-switcher.php partial -->
+                <!-- Federation scope switcher appears between header and main content on /federation/* pages -->
+                <!-- See: docs/CIVICONE_WCAG21AA_SOURCE_OF_TRUTH.md Section 9B.2 -->
 
                 <?php if ((!empty($_SESSION['user_role']) && $_SESSION['user_role'] === 'newsletter_admin')): ?>
                     <!-- Newsletter Admin - Limited Access (Matches Modern) -->
@@ -181,13 +113,9 @@
                             <a href="<?= Nexus\Core\TenantContext::getBasePath() ?>/admin/newsletters/segments" role="menuitem">Segments</a>
                         </div>
                     </div>
-                <?php elseif ((!empty($_SESSION['user_role']) && $_SESSION['user_role'] === 'admin') || !empty($_SESSION['is_super_admin'])): ?>
-                    <!-- Admin Links (Matches Modern Header) -->
-                    <a href="<?= \Nexus\Core\TenantContext::getBasePath() ?>/admin" class="civic-utility-link civic-utility-btn civic-utility-btn--admin">Admin</a>
-                    <a href="<?= \Nexus\Core\TenantContext::getBasePath() ?>/admin/group-ranking" class="civic-utility-link civic-utility-btn civic-utility-btn--ranking" title="Smart Group Ranking">
-                        <i class="fa-solid fa-chart-line"></i> Ranking
-                    </a>
                 <?php endif; ?>
+                <!-- REMOVED: Admin and Ranking links (violates Rule HL-003 - clutters utility bar) -->
+                <!-- Moved to user avatar dropdown below (lines 229+) -->
 
                 <?php
                 // Notification & Message counts (matches Modern header)
@@ -220,7 +148,7 @@
                 </a>
 
                 <!-- Notifications Bell (triggers drawer - Matches Modern) -->
-                <button class="civic-utility-link nexus-header-icon-btn badge-container" title="Notifications" onclick="window.nexusNotifDrawer.open()" style="background:none; border:none; cursor:pointer;">
+                <button class="civic-utility-link civic-utility-btn--notification nexus-header-icon-btn badge-container" title="Notifications" data-action="open-notifications">
                     <span class="dashicons dashicons-bell" aria-hidden="true"></span>
                     <?php if ($nUnread > 0): ?>
                         <span id="nexus-bell-badge" class="badge badge--danger badge--sm notification-badge"><?= $nUnread > 99 ? '99+' : $nUnread ?></span>
@@ -236,26 +164,40 @@
                     </button>
                     <div class="civic-dropdown-content" role="menu">
                         <a href="<?= \Nexus\Core\TenantContext::getBasePath() ?>/profile/<?= $_SESSION['user_id'] ?>" role="menuitem">
-                            <i class="fa-solid fa-user" style="margin-right: 10px; width: 16px; text-align: center; color: var(--civic-brand, #00796B);"></i>My Profile
+                            <i class="fa-solid fa-user civic-menu-icon civic-menu-icon--brand"></i>My Profile
                         </a>
                         <a href="<?= \Nexus\Core\TenantContext::getBasePath() ?>/dashboard" role="menuitem">
-                            <i class="fa-solid fa-gauge" style="margin-right: 10px; width: 16px; text-align: center; color: #8b5cf6;"></i>Dashboard
+                            <i class="fa-solid fa-gauge civic-menu-icon civic-menu-icon--purple"></i>Dashboard
                         </a>
                         <a href="<?= \Nexus\Core\TenantContext::getBasePath() ?>/wallet" role="menuitem">
-                            <i class="fa-solid fa-wallet" style="margin-right: 10px; width: 16px; text-align: center; color: #10b981;"></i>Wallet
+                            <i class="fa-solid fa-wallet civic-menu-icon civic-menu-icon--green"></i>Wallet
                         </a>
-                        <div style="border-top: 1px solid #e5e7eb; margin: 8px 0;" role="separator"></div>
-                        <a href="<?= \Nexus\Core\TenantContext::getBasePath() ?>/logout" role="menuitem" style="color: #ef4444; font-weight: 600;">
-                            <i class="fa-solid fa-right-from-bracket" style="margin-right: 10px; width: 16px; text-align: center;"></i>Sign Out
+
+                        <?php
+                        // Admin and Ranking links - Moved from utility bar (Section 9A compliance)
+                        if ((!empty($_SESSION['user_role']) && $_SESSION['user_role'] === 'admin') || !empty($_SESSION['is_super_admin'])):
+                        ?>
+                            <div class="civic-dropdown-separator" role="separator"></div>
+                            <a href="<?= \Nexus\Core\TenantContext::getBasePath() ?>/admin" role="menuitem">
+                                <i class="fa-solid fa-user-shield civic-menu-icon civic-menu-icon--brand"></i>Admin Panel
+                            </a>
+                            <a href="<?= \Nexus\Core\TenantContext::getBasePath() ?>/admin/group-ranking" role="menuitem" title="Smart Group Ranking">
+                                <i class="fa-solid fa-chart-line civic-menu-icon civic-menu-icon--brand"></i>Group Ranking
+                            </a>
+                        <?php endif; ?>
+
+                        <div class="civic-dropdown-separator" role="separator"></div>
+                        <a href="<?= \Nexus\Core\TenantContext::getBasePath() ?>/logout" role="menuitem" class="civic-utility-link--logout">
+                            <i class="fa-solid fa-right-from-bracket civic-menu-icon"></i>Sign Out
                         </a>
                     </div>
                 </div>
                 <!-- Mobile fallback links -->
-                <a href="<?= \Nexus\Core\TenantContext::getBasePath() ?>/dashboard" class="civic-utility-link mobile-only-link" style="font-weight:700; display:none;">Dashboard</a>
-                <a href="<?= \Nexus\Core\TenantContext::getBasePath() ?>/logout" class="civic-utility-link mobile-only-link" style="color:#dc2626; display:none;">Sign Out</a>
+                <a href="<?= \Nexus\Core\TenantContext::getBasePath() ?>/dashboard" class="civic-utility-link mobile-only-link mobile-only-link--dashboard">Dashboard</a>
+                <a href="<?= \Nexus\Core\TenantContext::getBasePath() ?>/logout" class="civic-utility-link mobile-only-link mobile-only-link--logout">Sign Out</a>
             <?php else: ?>
                 <a href="<?= \Nexus\Core\TenantContext::getBasePath() ?>/login" class="civic-utility-link">Sign In</a>
-                <a href="<?= \Nexus\Core\TenantContext::getBasePath() ?>/register" class="civic-utility-link" style="font-weight:700;">Join Now</a>
+                <a href="<?= \Nexus\Core\TenantContext::getBasePath() ?>/register" class="civic-utility-link mobile-only-link--dashboard">Join Now</a>
             <?php endif; ?>
         </div>
 

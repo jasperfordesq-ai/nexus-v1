@@ -150,10 +150,21 @@ class FederatedTransactionController
         // Get current balance
         $user = \Nexus\Models\User::findById($userId);
 
-        View::render('federation/transactions/index', [
+        // Get partner communities for scope switcher (if any)
+        $partnerCommunities = $this->getPartnerCommunities($tenantId);
+        $currentScope = $_GET['scope'] ?? 'all';
+
+        // Use CivicOne wrapper if CivicOne layout is active
+        $viewPath = (layout() === 'civicone')
+            ? 'civicone/federation/transactions'
+            : 'federation/transactions/index';
+
+        View::render($viewPath, [
             'transactions' => $transactions,
             'stats' => $stats,
             'balance' => $user['balance'] ?? 0,
+            'partnerCommunities' => $partnerCommunities,
+            'currentScope' => $currentScope,
             'pageTitle' => 'Federated Transactions'
         ]);
     }
@@ -230,5 +241,29 @@ class FederatedTransactionController
         http_response_code($statusCode);
         header('Content-Type: application/json');
         echo json_encode($data);
+    }
+
+    /**
+     * Get partner communities for scope switcher
+     */
+    private function getPartnerCommunities(int $tenantId): array
+    {
+        $partnerships = \Nexus\Services\FederationPartnershipService::getTenantPartnerships($tenantId);
+        $activePartnerships = array_filter($partnerships, fn($p) => $p['status'] === 'active');
+
+        $partnerCommunities = [];
+        foreach ($activePartnerships as $p) {
+            $partnerId = ($p['tenant_id'] == $tenantId) ? $p['partner_tenant_id'] : $p['tenant_id'];
+            $tenant = \Nexus\Core\Database::query(
+                "SELECT id, name FROM tenants WHERE id = ?",
+                [$partnerId]
+            )->fetch(\PDO::FETCH_ASSOC);
+
+            if ($tenant) {
+                $partnerCommunities[] = $tenant;
+            }
+        }
+
+        return $partnerCommunities;
     }
 }

@@ -1,0 +1,413 @@
+/**
+ * CivicOne GOV.UK Components
+ * Summary List, Tables, and other GOV.UK component patterns
+ * Source: https://design-system.service.gov.uk/components/
+ * WCAG 2.1 AA Compliant
+ * Version: 1.0.0
+ * Created: 2026-01-20
+ */
+
+/* ==========================================
+   Summary List Component
+   https://design-system.service.gov.uk/components/summary-list/
+   ========================================== */
+
+.govuk-summary-list {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  font-size: 16px;
+  line-height: 1.25;
+  color: #0b0c0c;
+  margin: 0 0 20px 0;
+  padding: 0;
+}
+
+@media (min-width: 641px) {
+  .govuk-summary-list {
+    font-size: 19px;
+    line-height: 1.32;
+    margin-bottom: 30px;
+  }
+}
+
+.govuk-summary-list__row {
+  border-bottom: 1px solid #b1b4b6;
+  display: flex;
+  flex-wrap: wrap;
+  padding-top: 10px;
+  padding-bottom: 10px;
+}
+
+@media (min-width: 641px) {
+  .govuk-summary-list__row {
+    padding-top: 15px;
+    padding-bottom: 15px;
+  }
+}
+
+.govuk-summary-list__row:first-child {
+  border-top: 1px solid #b1b4b6;
+}
+
+.govuk-summary-list__key {
+  margin: 0;
+  padding-right: 20px;
+  font-weight: 700;
+  width: 30%;
+  flex-basis: 30%;
+}
+
+@media (max-width: 640px) {
+  .govuk-summary-list__key {
+    width: 100%;
+    flex-basis: 100%;
+    margin-bottom: 5px;
+  }
+}
+
+.govuk-summary-list__value {
+  margin: 0;
+  padding-right: 20px;
+  width: 50%;
+  flex-basis: 50%;
+}
+
+@media (max-width: 640px) {
+  .govuk-summary-list__value {
+    width: 100%;
+    flex-basis: 100%;
+    margin-bottom: 10px;
+  }
+}
+
+.govuk-summary-list__actions {
+  margin: 0;
+  padding: 0;
+  width: 20%;
+  flex-basis: 20%;
+  text-align: right;
+}
+
+@media (max-width: 640px) {
+  .govuk-summary-list__actions {
+    width: 100%;
+    flex-basis: 100%;
+    text-align: left;
+  }
+}
+
+.govuk-summary-list__actions-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.govuk-summary-list__actions-list-item {
+  display: inline;
+  margin-right: 10px;
+  padding-right: 10px;
+}
+
+.govuk-summary-list__actions-list-item:not(:last-child) {
+  border-right: 1px solid #b1b4b6;
+}
+
+/* No border variant */
+.govuk-summary-list--no-border .govuk-summary-list__row {
+  border: 0;
+}
+
+.govuk-summary-list--no-border .govuk-summary-list__row:first-child {
+  border-top: 0;
+}
+
+/* ==========================================
+   GOV.UK Link Component
+   https://design-system.service.gov.uk/styles/typography/#links
+   ========================================== */
+
+.govuk-link {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  text-decoration: underline;
+  text-decoration-thickness: max(1px, 0.0625rem);
+  text-underline-offset: 0.1578em;
+  color: #1d70b8;
+}
+
+.govuk-link:visited {
+  color: #4c2c92;
+}
+
+.govuk-link:hover {
+  color: #003078;
+}
+
+.govuk-link:active {
+  color: #0b0c0c;
+}
+
+.govuk-link:focus {
+  outline: 3px solid transparent;
+  color: #0b0c0c;
+  background-color: #ffdd00;
+  box-shadow: 0 -2px #ffdd00, 0 4px #0b0c0c;
+  text-decoration: none;
+}
+
+/* ==========================================
+   CivicOne Heading Classes
+   ========================================== */
+
+.civicone-heading-xl {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  font-weight: 700;
+  font-size: 32px;
+  line-height: 1.09375;
+  color: #0b0c0c;
+  margin: 0 0 15px 0;
+}
+
+@media (min-width: 641px) {
+  .civicone-heading-xl {
+    font-size: 48px;
+    line-height: 1.04167;
+    margin-bottom: 30px;
+  }
+}
+
+.civicone-heading-l {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  font-weight: 700;
+  font-size: 24px;
+  line-height: 1.04167;
+  color: #0b0c0c;
+  margin: 0 0 15px 0;
+}
+
+@media (min-width: 641px) {
+  .civicone-heading-l {
+    font-size: 36px;
+    line-height: 1.11111;
+    margin-bottom: 20px;
+  }
+}
+
+.civicone-heading-m {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  font-weight: 700;
+  font-size: 18px;
+  line-height: 1.11111;
+  color: #0b0c0c;
+  margin: 0 0 15px 0;
+}
+
+@media (min-width: 641px) {
+  .civicone-heading-m {
+    font-size: 24px;
+    line-height: 1.25;
+  }
+}
+
+/* ==========================================
+   Visually Hidden (Screen Reader Only)
+   ========================================== */
+
+.civicone-visually-hidden {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  overflow: hidden !important;
+  clip: rect(0 0 0 0) !important;
+  clip-path: inset(50%) !important;
+  border: 0 !important;
+  white-space: nowrap !important;
+}
+
+/* ==========================================
+   Wallet Balance Styling
+   ========================================== */
+
+.civicone-wallet-balance {
+  font-size: 24px;
+  line-height: 1.25;
+  font-weight: 700;
+  color: #00703c;
+}
+
+@media (min-width: 641px) {
+  .civicone-wallet-balance {
+    font-size: 36px;
+    line-height: 1.11111;
+  }
+}
+
+/* ==========================================
+   GOV.UK Panel Component
+   https://design-system.service.gov.uk/components/panel/
+   ========================================== */
+
+.govuk-panel {
+  box-sizing: border-box;
+  margin-bottom: 30px;
+  padding: 35px;
+  border: 5px solid transparent;
+  text-align: center;
+}
+
+@media (min-width: 641px) {
+  .govuk-panel {
+    margin-bottom: 50px;
+    padding: 35px;
+  }
+}
+
+.govuk-panel--confirmation {
+  color: #ffffff;
+  background: #00703c;
+}
+
+.govuk-panel__title {
+  margin-top: 0;
+  margin-bottom: 30px;
+  font-size: 32px;
+  line-height: 1.09375;
+  font-weight: 700;
+}
+
+@media (min-width: 641px) {
+  .govuk-panel__title {
+    font-size: 48px;
+    line-height: 1.04167;
+  }
+}
+
+.govuk-panel__body {
+  font-size: 24px;
+  line-height: 1.25;
+}
+
+@media (min-width: 641px) {
+  .govuk-panel__body {
+    font-size: 36px;
+    line-height: 1.11111;
+  }
+}
+
+.govuk-panel--bordered {
+  background: #f3f2f1;
+  color: #0b0c0c;
+  border-color: #b1b4b6;
+}
+
+/* ==========================================
+   GOV.UK Back Link Component
+   https://design-system.service.gov.uk/components/back-link/
+   ========================================== */
+
+.govuk-back-link {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 1.14286;
+  display: inline-block;
+  position: relative;
+  margin-top: 15px;
+  margin-bottom: 15px;
+  padding-left: 14px;
+  border-bottom: 1px solid #1d70b8;
+  text-decoration: none;
+  color: #1d70b8;
+}
+
+@media (min-width: 641px) {
+  .govuk-back-link {
+    font-size: 16px;
+    line-height: 1.25;
+    margin-top: 20px;
+    margin-bottom: 20px;
+  }
+}
+
+.govuk-back-link:visited {
+  color: #1d70b8;
+}
+
+.govuk-back-link:hover {
+  color: #003078;
+  border-bottom-color: #003078;
+}
+
+.govuk-back-link:focus {
+  color: #0b0c0c;
+  background-color: #ffdd00;
+  box-shadow: 0 -2px #ffdd00, 0 4px #0b0c0c;
+  text-decoration: none;
+  outline: 3px solid transparent;
+  border-bottom-color: transparent;
+}
+
+.govuk-back-link::before {
+  content: "";
+  display: block;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 3px;
+  width: 7px;
+  height: 7px;
+  margin: auto 0;
+  transform: rotate(225deg);
+  border: solid;
+  border-width: 1px 1px 0 0;
+  border-color: #505a5f;
+}
+
+@media (min-width: 641px) {
+  .govuk-back-link::before {
+    left: 0;
+  }
+}
+
+.govuk-back-link:focus::before {
+  border-color: #0b0c0c;
+}
+
+/* ==========================================
+   GOV.UK Inset Text Component
+   https://design-system.service.gov.uk/components/inset-text/
+   ========================================== */
+
+.govuk-inset-text {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 1.25;
+  color: #0b0c0c;
+  padding: 15px;
+  margin-top: 20px;
+  margin-bottom: 20px;
+  clear: both;
+  border-left: 10px solid #b1b4b6;
+}
+
+@media (min-width: 641px) {
+  .govuk-inset-text {
+    font-size: 19px;
+    line-height: 1.31579;
+    margin-top: 30px;
+    margin-bottom: 30px;
+  }
+}
+
+.govuk-inset-text > :first-child {
+  margin-top: 0;
+}
+
+.govuk-inset-text > :last-child {
+  margin-bottom: 0;
+}

@@ -5,7 +5,7 @@
  */
 ?>
 <!DOCTYPE html>
-<html lang="en" data-theme="<?= $mode ?>" data-layout="modern">
+<html lang="en" data-theme="<?= $mode ?>" data-layout="civicone">
 
 <head>
     <meta charset="UTF-8">

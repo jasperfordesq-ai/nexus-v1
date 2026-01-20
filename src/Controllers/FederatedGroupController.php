@@ -45,9 +45,69 @@ class FederatedGroupController
             return;
         }
 
-        View::render('federation/groups', [
-            'pageTitle' => 'Federated Groups'
-        ]);
+        // Build filters
+        $filters = [
+            'search' => trim($_GET['q'] ?? ''),
+            'tenant_id' => isset($_GET['tenant']) ? (int)$_GET['tenant'] : null,
+        ];
+
+        $page = max(1, (int)($_GET['page'] ?? 1));
+
+        // Get groups data
+        try {
+            $result = FederatedGroupService::getPartnerGroups(
+                $tenantId,
+                $page,
+                30,
+                $filters['search'] ?: null,
+                $filters['tenant_id']
+            );
+
+            // Get partner tenants for filter dropdown
+            $partnerTenants = FederatedGroupService::getPartnerTenants($tenantId);
+
+            // Get user's memberships to mark joined groups
+            $userGroups = FederatedGroupService::getUserFederatedGroups($userId, $tenantId);
+            $joinedGroupIds = array_column($userGroups, 'id');
+
+            // Mark joined groups
+            foreach ($result['groups'] as &$group) {
+                $group['is_member'] = in_array($group['id'], $joinedGroupIds);
+            }
+
+            // Get partner communities for scope switcher (if any)
+            $partnerCommunities = array_map(fn($t) => [
+                'id' => $t['id'],
+                'name' => $t['name']
+            ], $partnerTenants);
+
+            $currentScope = $_GET['scope'] ?? 'all';
+
+            // Use CivicOne wrapper if CivicOne layout is active
+            $viewPath = (layout() === 'civicone')
+                ? 'civicone/federation/groups'
+                : 'federation/groups';
+
+            View::render($viewPath, [
+                'groups' => $result['groups'],
+                'partnerTenants' => $partnerTenants,
+                'filters' => $filters,
+                'partnerCommunities' => $partnerCommunities,
+                'currentScope' => $currentScope,
+                'pageTitle' => 'Federated Groups'
+            ]);
+
+        } catch (\Exception $e) {
+            error_log('FederatedGroupController::index error: ' . $e->getMessage());
+            View::render('civicone/federation/groups', [
+                'groups' => [],
+                'partnerTenants' => [],
+                'filters' => $filters,
+                'partnerCommunities' => [],
+                'currentScope' => 'all',
+                'pageTitle' => 'Federated Groups'
+            ]);
+        }
     }
 
     /**

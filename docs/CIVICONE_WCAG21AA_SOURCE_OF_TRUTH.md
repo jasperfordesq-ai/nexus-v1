@@ -1,9 +1,9 @@
 # CivicOne WCAG 2.1 AA Source of Truth
 
-**Version:** 1.4.0
+**Version:** 1.8.0
 **Status:** AUTHORITATIVE
 **Created:** 2026-01-20
-**Last Updated:** 2026-01-20 (Added GOV.UK Page Template Boilerplate + Strict Grid Contracts)
+**Last Updated:** 2026-01-20 (Added Section 9B: Federation Mode Contract)
 **Maintainer:** Development Team
 
 ---
@@ -19,6 +19,8 @@
 7. [Design Tokens](#7-design-tokens)
 8. [Accessibility Specification](#8-accessibility-specification)
 9. [Component Rules](#9-component-rules)
+9A. [Global Header & Navigation Contract (MANDATORY)](#9a-global-header--navigation-contract-mandatory)
+9B. [Federation Mode (Partner Communities) — NON-NEGOTIABLE](#9b-federation-mode-partner-communities--non-negotiable)
 10. [Canonical Page Templates (MANDATORY)](#10-canonical-page-templates-mandatory)
 11. [Grid & Results Layout Contracts](#11-grid--results-layout-contracts)
 12. [Refactoring Workflow to Avoid Ruining Existing Layouts](#12-refactoring-workflow-to-avoid-ruining-existing-layouts)
@@ -950,6 +952,1191 @@ Same pattern as Mega Menu. Current implementation in header.php already follows 
 
 ---
 
+## 9A. Global Header & Navigation Contract (MANDATORY)
+
+**CRITICAL:** This section defines the ONLY acceptable header and navigation architecture for CivicOne. The current header implementation has multiple competing navigation systems causing layout issues, accessibility problems, and maintenance complexity. This contract MUST be followed for all header refactoring work.
+
+### 9A.1 Pattern Sources (Authoritative References)
+
+All header and navigation decisions MUST be based on these official UK government design system patterns:
+
+| Pattern Source | URL | Usage |
+|----------------|-----|-------|
+| **GOV.UK Service navigation** | https://design-system.service.gov.uk/components/service-navigation/ | PRIMARY pattern for global navigation |
+| **GOV.UK Phase banner** | https://design-system.service.gov.uk/components/phase-banner/ | Status banner (alpha/beta/live) with feedback link |
+| **GOV.UK "Navigate a service" pattern** | https://design-system.service.gov.uk/patterns/navigate-a-service/ | Planning service header structure |
+| **MOJ Primary navigation** | https://design-patterns.service.justice.gov.uk/components/primary-navigation/ | Top-level sections only, NO calls-to-action |
+| **MOJ Sub navigation** | https://design-patterns.service.justice.gov.uk/components/sub-navigation/ | Second-level navigation (NOT global primary) |
+
+**Key Principle from MOJ Primary Navigation:**
+> "The primary navigation component lets users navigate the top level section of a website. Use the primary navigation component to let users navigate around the top level sections of a website... Don't use the primary navigation component for calls to action."
+
+**Key Principle from GOV.UK Service Navigation:**
+> "The service navigation component is a strip of links across the top of the page that lets users navigate around your service."
+
+### 9A.2 Header Layering (MANDATORY ORDER)
+
+**EVERY CivicOne page MUST implement header layers in this EXACT order:**
+
+```html
+<body>
+  <!-- Layer 1: Skip link (FIRST focusable element) -->
+  <a href="#main-content" class="civicone-skip-link">Skip to main content</a>
+
+  <!-- Layer 2: Phase/Status banner (OPTIONAL) -->
+  <div class="civicone-phase-banner">
+    <p class="civicone-phase-banner__content">
+      <strong class="civicone-tag civicone-phase-banner__tag">Beta</strong>
+      <span class="civicone-phase-banner__text">
+        This is a new service – your <a href="/feedback">feedback</a> will help us improve it.
+      </span>
+    </p>
+  </div>
+
+  <!-- Layer 3: Utility bar (platform/layout controls + auth) -->
+  <div class="civicone-utility-bar">
+    <!-- Platform switcher, contrast toggle, language, sign in/out ONLY -->
+  </div>
+
+  <!-- Layer 4: ONE primary navigation system (service navigation pattern) -->
+  <header class="civicone-header" role="banner">
+    <div class="civicone-width-container">
+      <div class="civicone-service-navigation">
+        <!-- Logo + top-level sections only -->
+      </div>
+    </div>
+  </header>
+
+  <!-- Layer 5: Search (OPTIONAL - inside or immediately below service nav) -->
+  <div class="civicone-width-container">
+    <div class="civicone-search">
+      <!-- Search form -->
+    </div>
+  </div>
+
+  <!-- Main content -->
+  <div class="civicone-width-container">
+    <main id="main-content">...</main>
+  </div>
+</body>
+```
+
+**Layer Rules:**
+
+| Rule ID | Rule | Source | Rationale |
+|---------|------|--------|-----------|
+| HL-001 | Skip link MUST be first focusable element | GOV.UK Skip Link | WCAG 2.4.1 (Bypass Blocks) |
+| HL-002 | Phase banner (if used) MUST be short, single line, with ONE feedback link | GOV.UK Phase Banner | Minimal intrusion, clear purpose |
+| HL-003 | Utility bar MUST contain ONLY: platform switcher, contrast toggle, auth links | GOV.UK Service Navigation | Utility controls separate from content navigation |
+| HL-004 | Primary navigation MUST use service navigation pattern | GOV.UK Service Navigation | Consistent, accessible, tested pattern |
+| HL-005 | Search MAY appear inside service nav OR immediately below, but NEVER as separate competing header block | GOV.UK Service Navigation | Avoid header fragmentation |
+| HL-006 | NO additional navigation layers allowed (no mega menu + service nav duplication) | This contract | Prevents competing navigation systems |
+
+### 9A.3 Primary Navigation Rules (MANDATORY)
+
+**MUST implement ONE of these patterns (not both):**
+
+**Option A: GOV.UK Service Navigation (RECOMMENDED)**
+
+```html
+<nav class="civicone-service-navigation" aria-label="Main navigation">
+  <div class="civicone-service-navigation__container">
+    <!-- Logo -->
+    <div class="civicone-service-navigation__branding">
+      <a href="/" class="civicone-service-navigation__logo">
+        <span class="civicone-service-navigation__service-name">CivicOne</span>
+      </a>
+    </div>
+
+    <!-- Top-level sections (max 5-7) -->
+    <ul class="civicone-service-navigation__list">
+      <li class="civicone-service-navigation__item civicone-service-navigation__item--active">
+        <a href="/feed" class="civicone-service-navigation__link" aria-current="page">Feed</a>
+      </li>
+      <li class="civicone-service-navigation__item">
+        <a href="/members" class="civicone-service-navigation__link">Members</a>
+      </li>
+      <li class="civicone-service-navigation__item">
+        <a href="/groups" class="civicone-service-navigation__link">Groups</a>
+      </li>
+      <li class="civicone-service-navigation__item">
+        <a href="/volunteering" class="civicone-service-navigation__link">Volunteering</a>
+      </li>
+      <li class="civicone-service-navigation__item">
+        <a href="/listings" class="civicone-service-navigation__link">Listings</a>
+      </li>
+    </ul>
+  </div>
+</nav>
+```
+
+**Option B: MOJ Primary Navigation (Alternative)**
+
+Similar structure, different styling. See MOJ Primary Navigation documentation.
+
+**Primary Navigation Constraints:**
+
+| Rule ID | Rule | Source | Rationale |
+|---------|------|--------|-----------|
+| PN-001 | Top-level sections ONLY (max 5-7 items) | GOV.UK/MOJ guidance | Cognitive load, mobile constraints |
+| PN-002 | NO calls-to-action in primary nav (e.g., "Join", "Create Group", "Post Listing") | MOJ Primary Navigation | CTAs belong in utility bar or page content |
+| PN-003 | Active state MUST be marked with `aria-current="page"` or `aria-current="section"` | WCAG 2.4.8 | Orientation for all users |
+| PN-004 | ALL nav items MUST be keyboard operable (Tab, Enter) | WCAG 2.1.1 | Keyboard accessibility |
+| PN-005 | Focus indicator MUST be visible (GOV.UK yellow #ffdd00) | WCAG 2.4.7 | Focus visibility |
+| PN-006 | Nav MUST be inside `civicone-width-container` (same max-width as main content) | GOV.UK Layout | Consistent page width, alignment |
+| PN-007 | Nav links MUST NOT open dropdowns on hover alone | WCAG 1.4.13 | Keyboard/touch accessibility |
+| PN-008 | If using dropdowns, MUST follow disclosure widget pattern (Enter/Space to open, Escape to close) | ARIA APG Disclosure | Standard keyboard interaction |
+
+**FORBIDDEN in Primary Navigation:**
+- ❌ "Join" / "Sign up" buttons (belong in utility bar)
+- ❌ "Create [X]" actions (belong in page content or utility bar)
+- ❌ User profile menu (belongs in utility bar)
+- ❌ Notifications icon (belongs in utility bar)
+- ❌ Search bar (separate layer or inside service nav container, not mixed with nav links)
+- ❌ Mega menu with entire site IA (use top-level sections only)
+
+### 9A.4 Secondary Navigation Rules (MANDATORY)
+
+**CRITICAL:** Secondary navigation appears INSIDE sections (not globally) using MOJ Sub navigation pattern.
+
+**Pattern:** MOJ Sub navigation (https://design-patterns.service.justice.gov.uk/components/sub-navigation/)
+
+**Example (inside Groups section):**
+
+```html
+<!-- Page: /groups/123 (viewing a specific group) -->
+<div class="civicone-width-container">
+  <main id="main-content">
+
+    <!-- Breadcrumbs -->
+    <nav class="civicone-breadcrumbs">
+      <a href="/">Home</a> → <a href="/groups">Groups</a> → Community Garden
+    </nav>
+
+    <!-- Page header -->
+    <h1>Community Garden</h1>
+
+    <!-- SECONDARY navigation (sub-navigation pattern) -->
+    <nav class="civicone-sub-navigation" aria-label="Group menu">
+      <ul class="civicone-sub-navigation__list">
+        <li class="civicone-sub-navigation__item civicone-sub-navigation__item--active">
+          <a href="/groups/123" aria-current="page">Overview</a>
+        </li>
+        <li class="civicone-sub-navigation__item">
+          <a href="/groups/123/members">Members</a>
+        </li>
+        <li class="civicone-sub-navigation__item">
+          <a href="/groups/123/discussions">Discussions</a>
+        </li>
+        <li class="civicone-sub-navigation__item">
+          <a href="/groups/123/events">Events</a>
+        </li>
+      </ul>
+    </nav>
+
+    <!-- Group content -->
+  </main>
+</div>
+```
+
+**Secondary Navigation Constraints:**
+
+| Rule ID | Rule | Source | Rationale |
+|---------|------|--------|-----------|
+| SN-001 | Secondary nav MUST use MOJ Sub navigation pattern | MOJ Sub navigation | Consistent pattern for second-level nav |
+| SN-002 | Secondary nav appears INSIDE sections (not globally in header) | MOJ guidance | Context-specific navigation |
+| SN-003 | DO NOT show secondary nav on unrelated pages (e.g., don't show "Group menu" on homepage) | UX principle | Avoid navigation clutter |
+| SN-004 | Secondary nav MUST have `aria-label` describing context (e.g., "Group menu", "Profile menu") | WCAG 2.4.1 | Landmark identification |
+| SN-005 | Active item MUST be marked with `aria-current="page"` | WCAG 2.4.8 | Orientation |
+
+**FORBIDDEN:**
+- ❌ Showing secondary nav globally in header (e.g., "Feed | Events | Groups | Members" as global secondary nav)
+- ❌ Mixing primary and secondary nav in same component
+- ❌ Using mega menu dropdowns as secondary nav
+
+### 9A.5 Anti-Patterns (EXPLICITLY FORBIDDEN)
+
+**The following patterns are BANNED and will be rejected in code review:**
+
+| Anti-Pattern | Why Banned | Correct Alternative |
+|--------------|------------|---------------------|
+| **Multiple primary nav systems on same page** (e.g., service nav + mega menu + duplicated mobile menu) | Confusing for users, competing focus order, maintenance nightmare | ONE primary nav system (service navigation pattern) |
+| **Calls-to-action in primary nav** ("Join", "Create Group", "Post Listing") | Clutters navigation, breaks MOJ primary nav rule | Move CTAs to utility bar or page content |
+| **Global mega-menu holding entire product IA** | Cognitive overload, poor mobile UX, accessibility issues | Top-level sections (5-7 max) in primary nav + contextual secondary nav |
+| **Header breaks page grid** (header elements outside width container) | Inconsistent alignment, visual jarring, breaks GOV.UK layout pattern | ALL header elements inside `civicone-width-container` (max-width: 1020px) |
+| **Search as separate competing header block** | Fragments header, confusing layout | Search inside or immediately below service nav |
+| **Hover-only mega menu** | Keyboard/touch inaccessible | Click/Enter to open, Escape to close |
+| **Duplicated navigation in desktop vs mobile** | Maintenance burden, divergence risk | Shared nav structure, different presentation (responsive CSS) |
+| **Navigation outside `<header role="banner">` or `<nav>` landmarks** | Screen reader navigation broken | Proper semantic landmarks |
+
+### 9A.6 Implementation Constraints (MUST NOT BREAK)
+
+**File Structure Rules:**
+
+| Rule ID | Rule | Enforcement |
+|---------|------|-------------|
+| IC-001 | Header markup MUST be authored ONLY in `views/layouts/civicone/partials/site-header.php` (and its sub-partials) | Code review: reject PRs violating this |
+| IC-002 | `views/layouts/civicone/header.php` and `header-cached.php` MUST NOT duplicate header markup; they MUST include `site-header.php` | Lint check: ensure both files include site-header.php |
+| IC-003 | Header scripts MUST stay in `views/layouts/civicone/partials/header-scripts.php` | File location enforcement |
+| IC-004 | NO inline `<script>` blocks in header partials (except critical path < 10 lines) | Per CLAUDE.md rules |
+| IC-005 | NO inline `<style>` blocks in header partials | Per CLAUDE.md rules |
+
+**CSS Pipeline Rules:**
+
+| Rule ID | Rule | Enforcement |
+|---------|------|-------------|
+| CP-001 | `httpdocs/assets/css/civicone-header.css` is the ONLY editable source for header styles | Code review: reject edits to .min.css |
+| CP-002 | `civicone-header.min.css` and `purged/civicone-header.min.css` are build outputs and MUST be regenerated, NEVER hand-edited | Build process: regenerate on commit |
+| CP-003 | Header CSS MUST be scoped under `.civicone` or `.civicone-header` to prevent bleed to Modern layout | CSS lint check |
+| CP-004 | All new header CSS selectors MUST use GOV.UK design tokens (see Section 7) | Code review requirement |
+
+**JavaScript Hooks (DO NOT RENAME/REMOVE):**
+
+These IDs/classes are used by existing JavaScript and MUST be preserved during refactoring:
+
+| Hook | File Using It | Purpose |
+|------|---------------|---------|
+| `#civic-mega-menu-btn` | header-scripts.php | Mega menu trigger (to be replaced) |
+| `#civic-mega-menu` | header-scripts.php | Mega menu container (to be replaced) |
+| `#civic-menu-toggle` | mobile-nav-v2.php | Mobile hamburger button |
+| `openMobileMenu()` | mobile-nav-v2.php | Function to open mobile nav |
+| `closeMobileMenu()` | mobile-nav-v2.php | Function to close mobile nav |
+| `#civic-mobile-search-toggle` | header-scripts.php | Mobile search toggle |
+| `.nexus-native-drawer` | nexus-mobile.js | Mobile drawer class |
+
+**When refactoring navigation, update these hooks to new service navigation pattern, but maintain backward compatibility during transition.**
+
+### 9A.7 Refactor Rules for header.php / header-cached.php / CSS Artifacts
+
+**MANDATORY workflow for ANY header refactoring:**
+
+#### Step 1: Pre-Refactor Audit (REQUIRED)
+
+Before touching ANY header code:
+
+1. **Document Current State:**
+   ```bash
+   # Capture current header HTML output
+   curl http://localhost/ > header-before.html
+
+   # List all CSS classes used in header
+   grep -o 'class="[^"]*"' header-before.html | sort | uniq > header-classes-before.txt
+
+   # List all IDs used in header
+   grep -o 'id="[^"]*"' header-before.html | sort | uniq > header-ids-before.txt
+
+   # Check which JavaScript files reference header elements
+   grep -r "civic-.*menu" httpdocs/assets/js/ > header-js-dependencies.txt
+   ```
+
+2. **Visual Regression Baseline:**
+   - Screenshot homepage at 1920px, 768px, 375px (desktop, tablet, mobile)
+   - Screenshot with mobile nav open
+   - Screenshot with utility bar dropdowns open
+   - Store in `docs/screenshots/header-before/`
+
+3. **Accessibility Baseline:**
+   ```bash
+   # Run axe on current header
+   npx axe http://localhost/ --include="header" > header-a11y-before.json
+
+   # Document keyboard tab order
+   # Manually: Tab through header, record order in docs/header-tab-order-before.txt
+   ```
+
+#### Step 2: Identify Navigation Conflicts (REQUIRED)
+
+Document ALL current navigation systems:
+
+| Navigation System | Location | Items | Purpose | Action |
+|-------------------|----------|-------|---------|--------|
+| Utility bar dropdowns | Top of page | Platform switcher, user menu | Utility controls | **KEEP** (consolidate auth links here) |
+| Main header nav | Below utility bar | Feed, Members, Groups, etc. | Primary navigation | **REFACTOR** to service navigation pattern |
+| Mega menu (if exists) | Triggered from header | Full site IA | Secondary navigation | **REMOVE** (replace with contextual sub-nav) |
+| Mobile drawer | Mobile only | Duplicated nav items | Mobile navigation | **REFACTOR** to responsive service nav |
+
+**Decision Matrix:**
+
+- **One primary nav:** Keep main header nav, refactor to service navigation pattern
+- **Utility bar:** Keep, ensure only utility controls (no nav items)
+- **Mega menu:** Remove, replace with contextual sub-navigation per section
+- **Mobile drawer:** Refactor to be responsive version of service nav (same items, different presentation)
+
+#### Step 3: Create Service Navigation Partial (NEW)
+
+Create `views/layouts/civicone/partials/service-navigation.php`:
+
+```php
+<?php
+/**
+ * CivicOne Service Navigation
+ * Pattern: GOV.UK Service Navigation
+ * https://design-system.service.gov.uk/components/service-navigation/
+ */
+
+$currentPath = $_SERVER['REQUEST_URI'] ?? '/';
+$navItems = [
+    ['label' => 'Feed', 'url' => '/feed', 'pattern' => '/feed'],
+    ['label' => 'Members', 'url' => '/members', 'pattern' => '/members'],
+    ['label' => 'Groups', 'url' => '/groups', 'pattern' => '/groups'],
+    ['label' => 'Volunteering', 'url' => '/volunteering', 'pattern' => '/volunteering'],
+    ['label' => 'Listings', 'url' => '/listings', 'pattern' => '/listings'],
+];
+?>
+
+<nav class="civicone-service-navigation" aria-label="Main navigation">
+    <div class="civicone-service-navigation__container">
+
+        <!-- Logo -->
+        <div class="civicone-service-navigation__branding">
+            <a href="<?= $basePath ?>/" class="civicone-service-navigation__logo">
+                <span class="civicone-service-navigation__service-name">CivicOne</span>
+            </a>
+        </div>
+
+        <!-- Navigation list -->
+        <ul class="civicone-service-navigation__list">
+            <?php foreach ($navItems as $item): ?>
+                <?php
+                $isActive = strpos($currentPath, $item['pattern']) === 0;
+                $activeClass = $isActive ? ' civicone-service-navigation__item--active' : '';
+                ?>
+                <li class="civicone-service-navigation__item<?= $activeClass ?>">
+                    <a href="<?= $basePath ?><?= $item['url'] ?>"
+                       class="civicone-service-navigation__link"
+                       <?= $isActive ? 'aria-current="page"' : '' ?>>
+                        <?= htmlspecialchars($item['label']) ?>
+                    </a>
+                </li>
+            <?php endforeach; ?>
+        </ul>
+
+        <!-- Mobile menu toggle -->
+        <button class="civicone-service-navigation__toggle"
+                aria-controls="civicone-service-navigation-list"
+                aria-expanded="false"
+                aria-label="Toggle navigation menu">
+            <span class="civicone-service-navigation__toggle-icon"></span>
+        </button>
+
+    </div>
+</nav>
+```
+
+#### Step 4: Update site-header.php (REQUIRED)
+
+```php
+<?php
+/**
+ * CivicOne Site Header
+ * Orchestrates header layers in correct order
+ */
+?>
+
+<!-- Layer 1: Skip link (first focusable) -->
+<?php require __DIR__ . '/skip-link-and-banner.php'; ?>
+
+<!-- Layer 2: Phase banner (if applicable) -->
+<?php if ($showPhaseBanner): ?>
+    <?php require __DIR__ . '/phase-banner.php'; ?>
+<?php endif; ?>
+
+<!-- Layer 3: Utility bar -->
+<?php require __DIR__ . '/utility-bar.php'; ?>
+
+<!-- Layer 4: Service navigation (PRIMARY NAV) -->
+<header class="civicone-header" role="banner">
+    <div class="civicone-width-container">
+        <?php require __DIR__ . '/service-navigation.php'; ?>
+    </div>
+</header>
+
+<!-- Layer 5: Search (optional, below nav) -->
+<?php if ($showSearch): ?>
+    <div class="civicone-width-container">
+        <?php require __DIR__ . '/search-bar.php'; ?>
+    </div>
+<?php endif; ?>
+```
+
+#### Step 5: Sync header-cached.php (CRITICAL)
+
+**RULE:** `header-cached.php` MUST include the same partials as `header.php`. It MUST NOT duplicate markup.
+
+```php
+<?php
+// header-cached.php
+// MUST use same partial structure as header.php
+
+require __DIR__ . '/partials/document-open.php';
+require __DIR__ . '/partials/assets-css.php';
+?>
+</head>
+<body class="civicone <?= $govukRedesign ? 'civicone--govuk' : '' ?> nexus-skin-civicone <?= $skinClass ?> <?= $homeClass ?> <?= $userClass ?>">
+
+<?php
+// SAME partials as header.php (not duplicated markup)
+require __DIR__ . '/partials/site-header.php';
+require __DIR__ . '/partials/main-open.php';
+?>
+```
+
+#### Step 6: Regenerate CSS Build Artifacts (REQUIRED)
+
+After editing `civicone-header.css`:
+
+```bash
+# Regenerate minified version
+npx csso httpdocs/assets/css/civicone-header.css -o httpdocs/assets/css/civicone-header.min.css
+
+# Regenerate purged version
+npx purgecss --config purgecss.config.js
+
+# Verify file sizes are reasonable
+ls -lh httpdocs/assets/css/civicone-header.*
+ls -lh httpdocs/assets/css/purged/civicone-header.*
+```
+
+#### Step 7: Post-Refactor Validation (REQUIRED)
+
+**Must pass ALL checks:**
+
+- [ ] **HTML diff:** Compare before/after HTML, verify intentional changes only
+- [ ] **Visual regression:** Screenshots match (or differences are intended)
+- [ ] **Keyboard navigation:** Tab order is logical (skip link → phase banner → utility → primary nav → search → main)
+- [ ] **ONE menu toggle only:** No multiple hamburger buttons
+- [ ] **Escape closes nav:** Pressing Escape closes open panels and returns focus to trigger
+- [ ] **No focus stealing:** Opening/closing nav doesn't lose focus context
+- [ ] **Mobile responsive:** Header stacks cleanly at 375px (no horizontal scroll)
+- [ ] **Zoom to 200%:** Header doesn't break at 200% zoom
+- [ ] **Zoom to 400%:** Header reflows to single column at 400% zoom
+- [ ] **Axe audit:** No new accessibility errors
+- [ ] **JavaScript console:** No new errors
+- [ ] **Navigation works:** All nav links functional
+- [ ] **Active state:** Current page marked with `aria-current="page"`
+- [ ] **Utility bar works:** Platform switcher, auth links functional
+- [ ] **Search works:** Search bar functional (if present)
+- [ ] **header-cached.php synced:** Cached variant uses same partials
+
+**If ANY check fails, refactor is NOT complete.**
+
+### 9A.8 Definition of Done: Header & Navigation
+
+**A header refactor is considered COMPLETE when:**
+
+**Structure:**
+- [ ] ONE primary navigation system only (service navigation pattern)
+- [ ] Layers in correct order (skip → phase → utility → primary nav → search)
+- [ ] Header inside `civicone-width-container` (max-width: 1020px)
+- [ ] All header markup in `site-header.php` (and sub-partials)
+- [ ] `header-cached.php` includes same partials (no duplicated markup)
+
+**Accessibility:**
+- [ ] Skip link is first focusable element
+- [ ] Tab order is logical: skip → phase → utility → nav → search → main
+- [ ] All nav items keyboard operable (Tab, Enter)
+- [ ] Escape closes open panels and returns focus
+- [ ] Focus indicator visible on all interactive elements (GOV.UK yellow)
+- [ ] Active page marked with `aria-current="page"`
+- [ ] No focus traps
+- [ ] No focus stealing
+
+**Responsive:**
+- [ ] Header stacks cleanly on mobile (375px viewport)
+- [ ] No horizontal scroll at any viewport width
+- [ ] ONE menu toggle only (no multiple hamburgers)
+- [ ] Mobile nav is responsive version of desktop nav (same items, different presentation)
+- [ ] Touch targets minimum 44x44px on mobile
+
+**Zoom:**
+- [ ] Usable at 200% zoom (no horizontal scroll)
+- [ ] Reflows to single column at 400% zoom
+- [ ] Text doesn't overlap or clip
+
+**Code Quality:**
+- [ ] No inline `<style>` blocks (except critical < 10 lines)
+- [ ] No inline `<script>` blocks (except critical < 10 lines)
+- [ ] Header CSS in `civicone-header.css` only
+- [ ] Minified CSS regenerated (`civicone-header.min.css`)
+- [ ] Purged CSS regenerated (`purged/civicone-header.min.css`)
+- [ ] All CSS scoped under `.civicone` or `.civicone-header`
+
+**Testing:**
+- [ ] Axe audit passes (no new errors)
+- [ ] Lighthouse accessibility score ≥95
+- [ ] Keyboard walkthrough documented
+- [ ] Visual regression screenshots compared
+- [ ] Mobile device testing complete (real devices, not just DevTools)
+- [ ] Screen reader testing complete (NVDA/VoiceOver)
+
+**Documentation:**
+- [ ] Changes documented in commit message
+- [ ] Breaking changes noted
+- [ ] Migration guide provided (if needed)
+
+---
+
+## 9B. Federation Mode (Partner Communities) — NON-NEGOTIABLE
+
+**CRITICAL:** This section defines the ONLY acceptable implementation patterns for Federation features (Partner Communities / Partner Timebanks). Federation allows users to discover and interact with members, listings, events, groups, messages, and transactions from partner organizations within a secure, multi-tenant architecture.
+
+The Federation module presents unique UX challenges:
+- **Context switching:** Users need clear signals when viewing federated (partner) content vs. local content
+- **Provenance:** Every federated item must show its source community for trust and transparency
+- **Navigation separation:** Federation is a distinct service area, not mixed with local tenant features
+- **Cross-theme compatibility:** Federation views must work in both CivicOne and Modern layouts without breaking either
+
+All Federation implementations MUST follow the contracts defined in this section. Deviations will be rejected in code review.
+
+### 9B.1 Pattern Sources (Authoritative References)
+
+All Federation UX decisions MUST be based on these official UK government design system patterns:
+
+| Pattern Source | URL | Usage |
+|----------------|-----|-------|
+| **MOJ Organisation switcher** | https://design-patterns.service.justice.gov.uk/components/organisation-switcher/ | PRIMARY pattern for federation scope switcher (placement, when NOT to use) |
+| **GOV.UK Navigate a service** | https://design-system.service.gov.uk/patterns/navigate-a-service/ | Placement of organisation switchers between header and service navigation |
+| **GOV.UK Service navigation** | https://design-system.service.gov.uk/components/service-navigation/ | Single primary navigation within Federation service area |
+| **MOJ Filter a list pattern** | https://design-patterns.service.justice.gov.uk/patterns/filter-a-list/ | Directory pages for federated members, listings, events, groups |
+| **MOJ Filter component** | https://design-patterns.service.justice.gov.uk/components/filter/ | Selected filters display, "Apply filters" button behaviour |
+| **GOV.UK Pagination** | https://design-system.service.gov.uk/components/pagination/ | Paginating federated results (never infinite scroll by default) |
+
+**Key Principle from MOJ Organisation Switcher:**
+> "Only use the organisation switcher component if users have access to 2 or more organisations. If a user only has access to 1 organisation, do not show the organisation switcher."
+
+**Key Principle from GOV.UK Navigate a Service:**
+> "If your service requires users to switch between different organisations or accounts, place the switcher between the header and the service navigation."
+
+### 9B.2 Federation Scope Context (MANDATORY)
+
+**RULE:** All `/federation/*` pages MUST show a persistent "Federation scope switcher" when the user has access to 2 or more partner communities.
+
+**Placement (MOJ Pattern):**
+- **MUST** appear directly after the global header (site-header.php partial)
+- **MUST** appear before the main content area
+- **MUST** appear above page-specific navigation (if any)
+- **MUST NOT** appear inside the utility bar (too small, wrong semantic context)
+- **MUST NOT** appear if user only has access to 1 partner community (MOJ rule)
+
+**MANDATORY HTML Structure:**
+
+```html
+<!-- After global header, before main content -->
+<div class="civicone-width-container">
+  <div class="moj-organisation-switcher" aria-label="Federation scope">
+    <p class="moj-organisation-switcher__heading">Partner Communities:</p>
+    <nav class="moj-organisation-switcher__nav" aria-label="Switch partner community">
+      <ul class="moj-organisation-switcher__list">
+        <li class="moj-organisation-switcher__item moj-organisation-switcher__item--active">
+          <a href="/federation?scope=all" aria-current="page">
+            All shared communities
+          </a>
+        </li>
+        <li class="moj-organisation-switcher__item">
+          <a href="/federation?scope=123">
+            Edinburgh Timebank
+          </a>
+        </li>
+        <li class="moj-organisation-switcher__item">
+          <a href="/federation?scope=456">
+            Glasgow Community Exchange
+          </a>
+        </li>
+      </ul>
+    </nav>
+    <p class="moj-organisation-switcher__change">
+      <a href="/federation/settings">Change partner preferences</a>
+    </p>
+  </div>
+</div>
+
+<!-- Main content starts -->
+<div class="civicone-width-container">
+  <main class="civicone-main-wrapper" id="main-content">
+    <!-- Page content -->
+  </main>
+</div>
+```
+
+**Federation Scope Switcher Rules:**
+
+| Rule ID | Rule | Source | Rationale |
+|---------|------|--------|-----------|
+| FS-001 | Scope switcher MUST appear on ALL `/federation/*` pages when user has access to 2+ partner communities | MOJ Organisation switcher | Consistent wayfinding across federation service |
+| FS-002 | Scope switcher MUST NOT appear if user only has access to 1 partner community | MOJ Organisation switcher | "Only use if users have access to 2 or more organisations" |
+| FS-003 | Scope switcher MUST appear between global header and main content (inside `civicone-width-container`) | GOV.UK Navigate a service | Correct placement for organisation switchers |
+| FS-004 | Active scope MUST be marked with `aria-current="page"` | ARIA best practices | Screen reader orientation |
+| FS-005 | Switcher MUST use `<nav>` with `aria-label` describing purpose | WCAG 1.3.1 | Landmark navigation |
+| FS-006 | Scope selection MUST persist across federation pages (session or URL param) | UX principle | User expects scope to remain until changed |
+| FS-007 | "Change partner preferences" link MUST allow user to manage which communities they access | MOJ pattern | User control over scope |
+
+**When NOT to Show Scope Switcher:**
+- ✗ On non-federation pages (`/members`, `/groups`, `/listings`, etc. — these are LOCAL tenant pages)
+- ✗ When user has no federation access
+- ✗ When user only has access to 1 partner community (show static context instead: "Partner Community: Edinburgh Timebank")
+
+### 9B.3 Provenance Everywhere (MANDATORY)
+
+**RULE:** Every federated item MUST display its source community to establish trust and context.
+
+**Provenance Display Patterns:**
+
+| Context | Provenance Display | Example |
+|---------|-------------------|---------|
+| **Browse results** (list item) | Tag or metadata line showing source | "Shared from Edinburgh Timebank" |
+| **Detail pages** (member, listing, event, group) | Prominent badge at top of page | "This member is from Glasgow Community Exchange" |
+| **Message threads** | Metadata in message header | "Conversation with Jane Smith (Edinburgh Timebank)" |
+| **Transactions** | Source and destination communities shown | "Transaction with John Doe (Edinburgh Timebank → Your community)" |
+| **Filter panels** | "Source community" filter available | Checkbox/select filter for community name |
+
+**MANDATORY HTML Patterns:**
+
+**Browse Results (List Item):**
+```html
+<li class="civicone-result-item">
+  <h3 class="civicone-result-heading">
+    <a href="/federation/members/123">Jane Smith</a>
+  </h3>
+  <p class="civicone-result-meta">
+    <span class="civicone-federation-badge">
+      Shared from <strong>Edinburgh Timebank</strong>
+    </span>
+    <span class="civicone-result-separator">·</span>
+    Skills: Web design, Photography
+  </p>
+  <p class="civicone-result-description">Available for web design projects...</p>
+</li>
+```
+
+**Detail Page (Member Profile):**
+```html
+<div class="civicone-width-container">
+  <main class="civicone-main-wrapper" id="main-content">
+
+    <!-- Provenance banner (prominent) -->
+    <div class="civicone-federation-provenance-banner">
+      <p>
+        <span class="civicone-federation-icon" aria-hidden="true">🔗</span>
+        This member is from <strong>Edinburgh Timebank</strong>
+      </p>
+    </div>
+
+    <h1 class="civicone-heading-xl">Jane Smith</h1>
+    <!-- Rest of profile -->
+  </main>
+</div>
+```
+
+**Provenance Rules:**
+
+| Rule ID | Rule | Source | Rationale |
+|---------|------|--------|-----------|
+| PR-001 | Every federated item in browse results MUST show source community | UX principle | Users need context for trust decisions |
+| PR-002 | Detail pages MUST display provenance prominently near page title | UX principle | Immediate orientation for users |
+| PR-003 | Provenance MUST NOT rely on color alone (use text label, not just colored badge) | WCAG 1.4.1 | Accessible to colorblind users |
+| PR-004 | Provenance text MUST be machine-readable (use `data-community-id` attribute) | Best practice | Enables analytics and filtering |
+| PR-005 | Browse pages MUST offer "Source community" filter in filter panel | MOJ Filter pattern | Users need ability to filter by community |
+
+### 9B.4 Navigation Separation (MANDATORY)
+
+**RULE:** Federation has its own dedicated navigation configuration. Federation pages MUST NOT mix with local tenant pages.
+
+**Navigation Contract:**
+
+| Navigation Type | Local Tenant Pages | Federation Pages |
+|-----------------|-------------------|------------------|
+| **Primary navigation** | Feed, Members, Groups, Volunteering, Listings, Events | Hub, Members, Listings, Events, Groups, Messages, Transactions |
+| **URLs** | `/members`, `/groups`, `/listings`, `/events`, `/volunteering` | `/federation`, `/federation/members`, `/federation/listings`, `/federation/events`, `/federation/groups`, `/federation/messages`, `/federation/transactions` |
+| **Breadcrumbs** | Home → Members | Home → Federation → Members |
+| **Page titles** | "Members Directory" | "Federated Members" or "Partner Members" |
+| **Search scope** | Local tenant only | Partner communities only |
+
+**Federation Primary Navigation (MANDATORY):**
+
+When user is on ANY `/federation/*` page, the service navigation MUST show Federation-specific navigation items:
+
+```html
+<nav class="civicone-service-navigation" aria-label="Federation navigation">
+  <div class="civicone-service-navigation__container">
+
+    <!-- Logo -->
+    <div class="civicone-service-navigation__branding">
+      <a href="/federation" class="civicone-service-navigation__logo">
+        <span class="civicone-service-navigation__service-name">Partner Communities</span>
+      </a>
+    </div>
+
+    <!-- Federation nav items -->
+    <ul class="civicone-service-navigation__list">
+      <li class="civicone-service-navigation__item">
+        <a href="/federation" class="civicone-service-navigation__link" aria-current="page">
+          Hub
+        </a>
+      </li>
+      <li class="civicone-service-navigation__item">
+        <a href="/federation/members" class="civicone-service-navigation__link">
+          Members
+        </a>
+      </li>
+      <li class="civicone-service-navigation__item">
+        <a href="/federation/listings" class="civicone-service-navigation__link">
+          Listings
+        </a>
+      </li>
+      <li class="civicone-service-navigation__item">
+        <a href="/federation/events" class="civicone-service-navigation__link">
+          Events
+        </a>
+      </li>
+      <li class="civicone-service-navigation__item">
+        <a href="/federation/groups" class="civicone-service-navigation__link">
+          Groups
+        </a>
+      </li>
+      <li class="civicone-service-navigation__item">
+        <a href="/federation/messages" class="civicone-service-navigation__link">
+          Messages
+        </a>
+      </li>
+      <li class="civicone-service-navigation__item">
+        <a href="/federation/transactions" class="civicone-service-navigation__link">
+          Transactions
+        </a>
+      </li>
+    </ul>
+
+  </div>
+</nav>
+```
+
+**Navigation Separation Rules:**
+
+| Rule ID | Rule | Source | Rationale |
+|---------|------|--------|-----------|
+| NS-001 | Federation pages MUST have their own service navigation config | GOV.UK Service navigation | Federation is a distinct service area |
+| NS-002 | Federation navigation MUST use `/federation` prefix for all nav items | GOV.UK Navigate a service | Clear URL structure for service areas |
+| NS-003 | Breadcrumbs on federation pages MUST include "Federation" as parent (Home → Federation → Members) | GOV.UK Breadcrumbs | Consistent wayfinding |
+| NS-004 | Page titles MUST distinguish federated content ("Federated Members" not "Members") | UX principle | Avoid confusion with local pages |
+| NS-005 | Search bars on federation pages MUST scope to federated content only (not local tenant) | UX principle | Consistent search scope |
+| NS-006 | Local tenant navigation MUST NOT include federation nav items (keep separate) | GOV.UK Navigate a service | Prevent navigation clutter |
+
+**Anti-Patterns (FORBIDDEN):**
+- ✗ Mixing federation nav items with local nav items in same primary navigation
+- ✗ Using same breadcrumb structure for local and federated pages
+- ✗ Sharing search scope between local and federated content
+- ✗ Linking to `/members` from federation navigation (MUST link to `/federation/members`)
+
+### 9B.5 Directory/List Template for Federation Browse Pages (MANDATORY)
+
+**RULE:** All federation browse pages MUST implement Template A: Directory/List Page (Section 10.2) with MOJ "filter a list" pattern.
+
+**Required Pages:**
+
+| Page | URL | Template | Filter Requirements |
+|------|-----|----------|---------------------|
+| **Federated Members** | `/federation/members` | Template A | Skills, Location, Source community, Service reach |
+| **Federated Listings** | `/federation/listings` | Template A | Type (offer/request), Category, Location, Source community |
+| **Federated Events** | `/federation/events` | Template A | Date range, Location, Source community, Type |
+| **Federated Groups** | `/federation/groups` | Template A | Category, Location, Source community, Privacy level |
+
+**MANDATORY Filter Component Implementation (MOJ Pattern):**
+
+Federation browse pages MUST implement the MOJ Filter component pattern:
+- Selected filters displayed as removable tags
+- "Apply filters" button (not auto-submit on change)
+- Filter state persists in URL query params
+- Removing a filter tag refreshes the page with updated results
+
+**Example HTML (Federated Members):**
+
+```html
+<div class="civicone-width-container">
+  <main class="civicone-main-wrapper" id="main-content">
+
+    <h1 class="civicone-heading-xl">Federated Members</h1>
+
+    <!-- MOJ Filter a list pattern -->
+    <div class="civicone-grid-row">
+
+      <!-- Filter panel (1/4 width) -->
+      <div class="civicone-grid-column-one-quarter">
+        <aside class="moj-filter-panel" aria-label="Filter members">
+          <h2 class="moj-filter-panel__heading">Filters</h2>
+
+          <form method="get" action="/federation/members">
+
+            <!-- Source community filter (REQUIRED) -->
+            <div class="moj-filter__group">
+              <fieldset class="civicone-fieldset">
+                <legend class="civicone-fieldset__legend">
+                  Source community
+                </legend>
+                <div class="civicone-checkboxes">
+                  <div class="civicone-checkboxes__item">
+                    <input class="civicone-checkboxes__input" id="community-123" name="community[]" type="checkbox" value="123">
+                    <label class="civicone-label civicone-checkboxes__label" for="community-123">
+                      Edinburgh Timebank
+                    </label>
+                  </div>
+                  <div class="civicone-checkboxes__item">
+                    <input class="civicone-checkboxes__input" id="community-456" name="community[]" type="checkbox" value="456">
+                    <label class="civicone-label civicone-checkboxes__label" for="community-456">
+                      Glasgow Community Exchange
+                    </label>
+                  </div>
+                </div>
+              </fieldset>
+            </div>
+
+            <!-- Skills filter -->
+            <div class="moj-filter__group">
+              <label class="civicone-label" for="skills-filter">
+                Skills
+              </label>
+              <input class="civicone-input" id="skills-filter" name="skills" type="text" placeholder="e.g. Web design">
+            </div>
+
+            <!-- Location filter -->
+            <div class="moj-filter__group">
+              <label class="civicone-label" for="location-filter">
+                Location
+              </label>
+              <input class="civicone-input" id="location-filter" name="location" type="text" placeholder="e.g. Edinburgh">
+            </div>
+
+            <!-- Apply filters button (MOJ pattern) -->
+            <button type="submit" class="civicone-button">
+              Apply filters
+            </button>
+
+            <!-- Clear filters link -->
+            <a href="/federation/members" class="moj-filter__clear">
+              Clear filters
+            </a>
+
+          </form>
+        </aside>
+      </div>
+
+      <!-- Results panel (3/4 width) -->
+      <div class="civicone-grid-column-three-quarters">
+
+        <!-- Selected filters (MOJ pattern) -->
+        <div class="moj-filter-tags" aria-label="Selected filters">
+          <h2 class="civicone-visually-hidden">Active filters</h2>
+          <div class="moj-filter-tags__wrapper">
+            <span class="moj-filter-tags__tag">
+              Edinburgh Timebank
+              <a href="/federation/members?community[]=456" class="moj-filter-tags__remove" aria-label="Remove filter: Edinburgh Timebank">
+                <span aria-hidden="true">×</span>
+              </a>
+            </span>
+            <span class="moj-filter-tags__tag">
+              Skills: Web design
+              <a href="/federation/members?community[]=123" class="moj-filter-tags__remove" aria-label="Remove filter: Skills Web design">
+                <span aria-hidden="true">×</span>
+              </a>
+            </span>
+          </div>
+        </div>
+
+        <!-- Results summary -->
+        <p class="civicone-results-summary" aria-live="polite">
+          Showing <strong>1-20</strong> of <strong>156</strong> members
+        </p>
+
+        <!-- Results list (NOT card grid) -->
+        <ul class="civicone-results-list">
+          <li class="civicone-result-item">
+            <h3 class="civicone-result-heading">
+              <a href="/federation/members/123">Jane Smith</a>
+            </h3>
+            <p class="civicone-result-meta">
+              <span class="civicone-federation-badge">
+                Shared from <strong>Edinburgh Timebank</strong>
+              </span>
+              <span class="civicone-result-separator">·</span>
+              Skills: Web design, Photography
+            </p>
+            <p class="civicone-result-description">Available for web design projects...</p>
+          </li>
+          <!-- More results -->
+        </ul>
+
+        <!-- GOV.UK Pagination -->
+        <nav class="civicone-pagination" aria-label="Members pagination">
+          <ul class="civicone-pagination__list">
+            <li class="civicone-pagination__item">
+              <a href="/federation/members?page=1&community[]=123&skills=Web+design" class="civicone-pagination__link" aria-label="Previous page">
+                Previous
+              </a>
+            </li>
+            <li class="civicone-pagination__item">
+              <a href="/federation/members?page=1&community[]=123&skills=Web+design" class="civicone-pagination__link">1</a>
+            </li>
+            <li class="civicone-pagination__item civicone-pagination__item--current">
+              <span class="civicone-pagination__link" aria-current="page">2</span>
+            </li>
+            <li class="civicone-pagination__item">
+              <a href="/federation/members?page=3&community[]=123&skills=Web+design" class="civicone-pagination__link">3</a>
+            </li>
+            <li class="civicone-pagination__item">
+              <a href="/federation/members?page=3&community[]=123&skills=Web+design" class="civicone-pagination__link" aria-label="Next page">
+                Next
+              </a>
+            </li>
+          </ul>
+        </nav>
+
+      </div>
+    </div>
+
+  </main>
+</div>
+```
+
+**Federation Directory Rules:**
+
+| Rule ID | Rule | Source | Rationale |
+|---------|------|--------|-----------|
+| FD-001 | Federation browse pages MUST use Template A: Directory/List (Section 10.2) | This document | Consistent pattern with local directories |
+| FD-002 | Results MUST default to **list or table** layout (NOT card grid) | ONS/DfE guidance + Section 11 | Large datasets break with cards |
+| FD-003 | Filter panel MUST include "Source community" filter | UX principle | Users need to filter by community |
+| FD-004 | Filter panel MUST use MOJ Filter component pattern (selected filters as tags, "Apply filters" button) | MOJ Filter component | Proven accessible pattern |
+| FD-005 | Selected filters MUST be displayed as removable tags using MOJ filter tags pattern | MOJ Filter component | Clear filter state, easy removal |
+| FD-006 | Removing a filter tag MUST refresh the page with updated results (URL changes) | MOJ Filter component | Bookmarkable filter state |
+| FD-007 | Filter form MUST submit via GET (not POST) so results are bookmarkable | MOJ Filter pattern | Users can share filtered results |
+| FD-008 | Results MUST include pagination (GOV.UK Pagination component) | GOV.UK Pagination | No infinite scroll by default |
+| FD-009 | Pagination links MUST preserve filter state in URL query params | UX principle | Filters persist across pages |
+| FD-010 | Results summary MUST use `aria-live="polite"` for dynamic updates | WCAG 4.1.3 | Screen reader announcement |
+
+### 9B.6 Pagination (MANDATORY)
+
+**RULE:** Federation browse pages MUST use GOV.UK Pagination component. Infinite scroll is FORBIDDEN as the default behaviour.
+
+**Why Pagination is Required for Federation:**
+- **Performance:** Federated queries can be expensive (cross-tenant database lookups)
+- **Accessibility:** Infinite scroll breaks keyboard navigation and screen readers
+- **Bookmarkability:** Users need stable URLs to share filtered/paginated results
+- **Orientation:** Users need to know how many results exist ("Showing 1-20 of 156")
+
+**Pagination Rules:**
+
+| Rule ID | Rule | Source | Rationale |
+|---------|------|--------|-----------|
+| PG-001 | MUST use GOV.UK Pagination component | GOV.UK Pagination | Proven accessible pattern |
+| PG-002 | Pagination MUST use `<nav>` with `aria-label` | GOV.UK Pagination | Landmark navigation |
+| PG-003 | Current page MUST be marked with `aria-current="page"` | GOV.UK Pagination | Screen reader orientation |
+| PG-004 | Previous/Next links MUST include hidden text for screen readers ("Previous page" / "Next page") | GOV.UK Pagination | Context for screen readers |
+| PG-005 | Pagination links MUST preserve all filter state in URL query params | UX principle | Filters persist across pages |
+| PG-006 | Default page size: 20 items per page | UX principle | Balance between performance and usability |
+| PG-007 | Infinite scroll is FORBIDDEN as default (may be offered as opt-in progressive enhancement with keyboard fallback) | WCAG 2.1.1 | Keyboard users need pagination control |
+
+### 9B.7 Federation File Mapping (MANDATORY)
+
+**CRITICAL:** The following table defines the EXACT file paths for all Federation pages. These mappings are NON-NEGOTIABLE.
+
+| Route | Controller | CivicOne View File | Modern View File | Implementation Notes |
+|-------|------------|-------------------|------------------|----------------------|
+| `/federation` | `FederationHubController@index` | `views/civicone/federation/hub.php` | `views/modern/federation/dashboard.php` | Federation landing page / hub |
+| `/federation/members` | `FederatedMemberController@index` | `views/civicone/federation/members.php` | `views/modern/federation/members.php` | **Template A: Directory/List** with MOJ filter pattern |
+| `/federation/listings` | `FederatedListingController@index` | `views/civicone/federation/listings.php` | `views/modern/federation/listings.php` | **Template A: Directory/List** with MOJ filter pattern |
+| `/federation/events` | `FederatedEventController@index` | `views/civicone/federation/events.php` | `views/modern/federation/events.php` | **Template A: Directory/List** with MOJ filter pattern |
+| `/federation/groups` | `FederatedGroupController@index` | `views/civicone/federation/groups.php` | `views/modern/federation/groups.php` | **Template A: Directory/List** with MOJ filter pattern |
+| `/federation/messages` | `FederatedMessageController@index` | `views/civicone/federation/messages.php` | `views/modern/federation/messages.php` | **Wrapper view** (includes base view inside CivicOne shell) |
+| `/federation/transactions` | `FederatedTransactionController@index` | `views/civicone/federation/transactions.php` | `views/modern/federation/transactions.php` | **Wrapper view** (includes base view inside CivicOne shell) |
+
+**Base Views (Shared Between Themes):**
+
+The following base views exist in `views/federation/` and are currently shared between CivicOne and Modern layouts:
+
+| Base View | Purpose | Usage |
+|-----------|---------|-------|
+| `views/federation/messages/index.php` | Messages inbox UI | Included by theme-specific wrappers |
+| `views/federation/transactions/index.php` | Transactions list UI | Included by theme-specific wrappers |
+
+**Mixed-Theme Guardrail for Messages/Transactions:**
+
+**PROBLEM:** Messages and Transactions pages currently use base views in `views/federation/messages/index.php` and `views/federation/transactions/index.php`. These base views are shared between CivicOne and Modern layouts, making it risky to apply CivicOne-specific patterns without breaking Modern.
+
+**SOLUTION:** Create CivicOne wrapper views that render the CivicOne federation shell (scope switcher, federation navigation, footer) and include the base view content inside.
+
+**MANDATORY Implementation (Wrapper Pattern):**
+
+**File: `views/civicone/federation/messages.php` (NEW WRAPPER)**
+
+```php
+<?php
+/**
+ * CivicOne Federation Messages Wrapper
+ * Renders CivicOne federation shell + includes base view content
+ */
+
+// CivicOne layout header (includes scope switcher + federation nav)
+require __DIR__ . '/../../layouts/civicone/header.php';
+?>
+
+<!-- Federation scope switcher (if user has 2+ communities) -->
+<?php if (count($partnerCommunities) > 1): ?>
+  <?php require __DIR__ . '/../../layouts/civicone/partials/federation-scope-switcher.php'; ?>
+<?php endif; ?>
+
+<!-- Include base view content (shared between themes) -->
+<div class="civicone-width-container">
+  <main class="civicone-main-wrapper" id="main-content">
+    <?php require __DIR__ . '/../../federation/messages/index.php'; ?>
+  </main>
+</div>
+
+<?php
+// CivicOne layout footer
+require __DIR__ . '/../../layouts/civicone/footer.php';
+?>
+```
+
+**File: `views/civicone/federation/transactions.php` (NEW WRAPPER)**
+
+```php
+<?php
+/**
+ * CivicOne Federation Transactions Wrapper
+ * Renders CivicOne federation shell + includes base view content
+ */
+
+// CivicOne layout header (includes scope switcher + federation nav)
+require __DIR__ . '/../../layouts/civicone/header.php';
+?>
+
+<!-- Federation scope switcher (if user has 2+ communities) -->
+<?php if (count($partnerCommunities) > 1): ?>
+  <?php require __DIR__ . '/../../layouts/civicone/partials/federation-scope-switcher.php'; ?>
+<?php endif; ?>
+
+<!-- Include base view content (shared between themes) -->
+<div class="civicone-width-container">
+  <main class="civicone-main-wrapper" id="main-content">
+    <?php require __DIR__ . '/../../federation/transactions/index.php'; ?>
+  </main>
+</div>
+
+<?php
+// CivicOne layout footer
+require __DIR__ . '/../../layouts/civicone/footer.php';
+?>
+```
+
+**Wrapper Rules:**
+
+| Rule ID | Rule | Rationale |
+|---------|------|-----------|
+| WR-001 | Messages and Transactions pages MUST use wrapper pattern (CivicOne wrapper includes base view) | Prevents breaking Modern layout when applying CivicOne patterns |
+| WR-002 | Wrappers MUST render CivicOne header (with federation scope switcher + federation nav) | Consistent federation UX in CivicOne |
+| WR-003 | Wrappers MUST include base view content inside `civicone-width-container` and `civicone-main-wrapper` | GOV.UK page template boilerplate |
+| WR-004 | Base views (`views/federation/messages/index.php`, `views/federation/transactions/index.php`) MUST NOT be modified to add CivicOne-specific markup | Prevents breaking Modern layout |
+| WR-005 | Future refactoring MAY move base view content into theme-specific views, but MUST maintain backward compatibility during transition | Migration strategy |
+
+### 9B.8 Federation Accessibility Checklist
+
+**Every federation page MUST pass:**
+
+**Context & Orientation:**
+- [ ] Federation scope switcher present (if user has 2+ communities)
+- [ ] Scope switcher uses `<nav>` with `aria-label`
+- [ ] Active scope marked with `aria-current="page"`
+- [ ] Scope switcher only shows if user has 2+ communities (MOJ rule)
+- [ ] Provenance shown on all federated items ("Shared from {Community}")
+- [ ] Provenance does not rely on color alone (uses text label)
+
+**Navigation:**
+- [ ] Federation navigation uses service navigation pattern
+- [ ] Federation nav items link to `/federation/*` URLs (not local URLs)
+- [ ] Breadcrumbs include "Federation" parent (Home → Federation → Members)
+- [ ] Page title distinguishes federated content ("Federated Members")
+- [ ] Active nav item marked with `aria-current="page"`
+
+**Filters & Results:**
+- [ ] Filter panel uses MOJ Filter component pattern
+- [ ] Selected filters displayed as removable tags
+- [ ] "Apply filters" button present (not auto-submit)
+- [ ] "Clear filters" link present
+- [ ] "Source community" filter available
+- [ ] Filter form uses GET method (results bookmarkable)
+- [ ] Results displayed as list/table (NOT card grid for large datasets)
+- [ ] Results summary shows count ("Showing 1-20 of 156")
+- [ ] Results summary uses `aria-live="polite"`
+
+**Pagination:**
+- [ ] GOV.UK Pagination component used
+- [ ] Pagination uses `<nav>` with `aria-label`
+- [ ] Current page marked with `aria-current="page"`
+- [ ] Previous/Next links include hidden context text
+- [ ] Pagination links preserve filter state in URL
+- [ ] NO infinite scroll by default
+
+**Keyboard & Focus:**
+- [ ] All interactive elements keyboard accessible (Tab, Enter, Space)
+- [ ] Focus order is logical (scope switcher → filters → results → pagination)
+- [ ] Focus visible on all elements (3px solid outline)
+- [ ] No keyboard traps
+- [ ] Removing filter tag is keyboard accessible
+
+**Screen Reader:**
+- [ ] Page heading announces correctly (H1)
+- [ ] Federation scope switcher announced (nav landmark)
+- [ ] Active scope announced
+- [ ] Filter panel announced (aside landmark)
+- [ ] Selected filters announced
+- [ ] Results count announced when updated
+- [ ] Provenance badges read correctly
+
+### 9B.9 Definition of Done: Federation Pages
+
+A federation page is considered complete when:
+
+**✓ Structure:**
+- [ ] Uses GOV.UK Page Template boilerplate (skip link, width container, main wrapper)
+- [ ] Federation scope switcher present (if 2+ communities) in correct placement
+- [ ] Federation navigation uses service navigation pattern
+- [ ] Breadcrumbs include "Federation" parent
+- [ ] Page follows correct template (Directory/List for browse, Detail for show, etc.)
+
+**✓ Provenance:**
+- [ ] Every federated item shows source community
+- [ ] Provenance uses text label (not color alone)
+- [ ] Browse pages include "Source community" filter
+
+**✓ Filters (for browse pages):**
+- [ ] MOJ Filter component pattern implemented
+- [ ] Selected filters displayed as removable tags
+- [ ] "Apply filters" button present
+- [ ] "Clear filters" link present
+- [ ] Filter form uses GET method
+- [ ] Filter state persists in URL
+
+**✓ Results (for browse pages):**
+- [ ] Results use list/table layout (NOT card grid)
+- [ ] Results summary shows count with `aria-live="polite"`
+- [ ] GOV.UK Pagination component present
+- [ ] Pagination preserves filter state in URL
+- [ ] NO infinite scroll by default
+
+**✓ Accessibility:**
+- [ ] Passes axe DevTools scan (0 violations)
+- [ ] Keyboard navigable (Tab, Enter, Space)
+- [ ] Focus visible on all interactive elements (3px outline)
+- [ ] Screen reader announces page structure correctly (NVDA/JAWS tested)
+- [ ] Zoom to 200% - no horizontal scroll, all content accessible
+- [ ] Zoom to 400% - content reflows correctly
+
+**✓ Code Quality:**
+- [ ] NO inline CSS (all styles in `civicone-federation.css`)
+- [ ] CSS scoped under `.nexus-skin-civicone`
+- [ ] GOV.UK/MOJ component classes used correctly
+- [ ] Semantic HTML (`<nav>`, `<aside>`, `<ul>`, `<dl>`)
+- [ ] Wrapper pattern used for Messages/Transactions (if applicable)
+
+---
+
 ## 10. Canonical Page Templates (MANDATORY)
 
 Every CivicOne page MUST use one of the five canonical templates defined below. Ad-hoc page structures are NOT permitted.
@@ -1030,6 +2217,7 @@ Every CivicOne page MUST use one of the five canonical templates defined below. 
 | C) Detail Page | Member profile, Group detail, Opportunity detail | Summary list + prose | GOV.UK grid (2/3 + 1/3) |
 | D) Form/Flow | Join, edit profile, create group, create listing | GOV.UK form pattern | Single column |
 | E) Content/Article | Help pages, blog posts | Prose + images | Reading width (2/3 column) |
+| F) Feed/Activity Stream | Community feed landing page | MOJ Timeline + Pagination | Chronological list (2/3 + 1/3) |
 
 ### 10.2 Template A: Directory/List Page (Members, Groups, Volunteering)
 
@@ -1506,7 +2694,937 @@ Every CivicOne page MUST use one of the five canonical templates defined below. 
 - Blog post: `/blog/article-title`
 - Legal page: `/privacy`, `/terms`, `/accessibility`
 
-### 10.7 Listings Contracts (Non-Negotiables)
+### 10.6 Template F: Feed / Activity Stream (Community Pulse Feed Landing Page)
+
+**Pattern Sources:**
+- MOJ Timeline component (chronological record): https://design-patterns.service.justice.gov.uk/components/timeline/
+- GOV.UK Pagination component: https://design-system.service.gov.uk/components/pagination/
+- ONS Pagination guidance (responsive behaviour): https://service-manual.ons.gov.uk/design-system/components/pagination
+- Home Office accessibility guidance for notifications/live regions: https://design.homeoffice.gov.uk/accessibility/interactivity/notifications
+- GOV.UK Accordion (show/hide sections): https://design-system.service.gov.uk/components/accordion/
+
+**CRITICAL: This template governs:**
+- `views/civicone/home.php` (redirect only; no UI)
+- `views/civicone/feed/index.php` (Community Pulse Feed landing page)
+
+**MANDATORY Structure:**
+
+```html
+<div class="civicone-width-container">
+  <main class="civicone-main-wrapper" id="main-content">
+
+    <!-- Page header -->
+    <div class="civicone-grid-row">
+      <div class="civicone-grid-column-two-thirds">
+        <h1 class="civicone-heading-xl">Community Pulse</h1>
+        <p class="civicone-body-lead">Stay connected with your community's latest updates and activities</p>
+      </div>
+    </div>
+
+    <!-- Feed layout (2/3 + 1/3 split) -->
+    <div class="civicone-grid-row">
+
+      <!-- Left: Feed content (2/3 width on desktop) -->
+      <div class="civicone-grid-column-two-thirds">
+
+        <!-- Optional: Composer (post creation) -->
+        <div class="civicone-feed-composer">
+          <!-- Post composition form (if user can post) -->
+        </div>
+
+        <!-- Live region for dynamic updates (polite) -->
+        <div aria-live="polite" aria-atomic="false" class="civicone-visually-hidden" id="feed-announcements"></div>
+
+        <!-- Feed items (chronological list) -->
+        <ol class="civicone-feed-list" reversed>
+          <li class="civicone-feed-item">
+            <article class="civicone-feed-post" aria-labelledby="post-123-heading">
+
+              <!-- Post header -->
+              <header class="civicone-feed-post__header">
+                <h2 id="post-123-heading" class="civicone-feed-post__title civicone-visually-hidden">
+                  Post by Jane Smith on volunteering opportunity
+                </h2>
+                <div class="civicone-feed-post__meta">
+                  <a href="/members/456" class="civicone-feed-post__author">Jane Smith</a>
+                  <span class="civicone-feed-post__separator">·</span>
+                  <time datetime="2026-01-20T14:30:00Z" class="civicone-feed-post__time">2 hours ago</time>
+                  <span class="civicone-feed-post__separator">·</span>
+                  <span class="civicone-feed-post__context">Posted in <a href="/groups/789">Community Garden</a></span>
+                </div>
+              </header>
+
+              <!-- Post body -->
+              <div class="civicone-feed-post__body">
+                <p>Looking for volunteers to help plant spring bulbs this Saturday morning...</p>
+              </div>
+
+              <!-- Actions row -->
+              <footer class="civicone-feed-post__actions">
+                <button type="button"
+                        class="civicone-feed-action civicone-feed-action--like"
+                        aria-pressed="false"
+                        aria-label="Like this post">
+                  <span class="civicone-feed-action__icon" aria-hidden="true">♥</span>
+                  <span class="civicone-feed-action__text">Like</span>
+                  <span class="civicone-feed-action__count">(12)</span>
+                </button>
+
+                <button type="button"
+                        class="civicone-feed-action civicone-feed-action--comment"
+                        aria-expanded="false"
+                        aria-controls="post-123-comments"
+                        aria-label="Show 5 comments">
+                  <span class="civicone-feed-action__icon" aria-hidden="true">💬</span>
+                  <span class="civicone-feed-action__text">Comment</span>
+                  <span class="civicone-feed-action__count">(5)</span>
+                </button>
+
+                <button type="button"
+                        class="civicone-feed-action civicone-feed-action--share"
+                        aria-label="Share this post">
+                  <span class="civicone-feed-action__icon" aria-hidden="true">↗</span>
+                  <span class="civicone-feed-action__text">Share</span>
+                </button>
+
+                <a href="/messages/compose?to=456"
+                   class="civicone-feed-action civicone-feed-action--message"
+                   aria-label="Send message to Jane Smith">
+                  <span class="civicone-feed-action__icon" aria-hidden="true">✉</span>
+                  <span class="civicone-feed-action__text">Message</span>
+                </a>
+              </footer>
+
+              <!-- Comments region (collapsible) -->
+              <section id="post-123-comments"
+                       class="civicone-feed-comments"
+                       role="region"
+                       aria-labelledby="post-123-comments-heading"
+                       hidden>
+                <h3 id="post-123-comments-heading" class="civicone-visually-hidden">Comments on this post</h3>
+                <ul class="civicone-feed-comments-list">
+                  <li class="civicone-feed-comment">
+                    <!-- Comment content -->
+                  </li>
+                </ul>
+              </section>
+
+            </article>
+          </li>
+          <!-- More feed items -->
+        </ol>
+
+        <!-- Pagination or Load More -->
+        <nav class="civicone-pagination" aria-label="Feed pagination">
+          <button type="button" class="civicone-button civicone-button--secondary" aria-label="Load more posts">
+            Load more
+          </button>
+          <!-- OR use GOV.UK pagination component for page-based navigation -->
+        </nav>
+
+      </div>
+
+      <!-- Right: Sidebar (1/3 width on desktop) -->
+      <div class="civicone-grid-column-one-third">
+        <aside aria-label="Feed filters and suggestions">
+
+          <!-- Optional: Feed filters/sorting -->
+          <div class="civicone-feed-filters">
+            <h2 class="civicone-heading-m">Filter activity</h2>
+            <form method="get" action="/feed">
+              <!-- Filter controls (type, date, source) -->
+            </form>
+          </div>
+
+          <!-- Optional: Suggested content -->
+          <div class="civicone-feed-suggestions">
+            <h2 class="civicone-heading-m">Suggested groups</h2>
+            <ul class="civicone-suggestions-list">
+              <!-- Suggested items -->
+            </ul>
+          </div>
+
+        </aside>
+      </div>
+
+    </div>
+
+  </main>
+</div>
+```
+
+#### 10.6.1 Feed Page Layout Contract (MANDATORY)
+
+| Rule ID | Rule | Source | Rationale |
+|---------|------|--------|-----------|
+| FP-001 | Feed MUST use 2/3 + 1/3 column split (content + sidebar) | GOV.UK Layout | Reading width for feed content, space for filters/suggestions |
+| FP-002 | Feed column MUST use reading width (2/3 max) | GOV.UK Layout | Optimal line length for readability |
+| FP-003 | Feed items MUST be in chronological order (newest first or oldest first, consistent) | MOJ Timeline | Predictable navigation for screen readers |
+| FP-004 | Feed MUST NOT use masonry/Pinterest grids | Accessibility | Unpredictable layout breaks screen readers and zoom |
+| FP-005 | Feed MUST remain usable at 200% zoom | WCAG 1.4.4 | Reflow requirement |
+| FP-006 | Feed MUST remain usable at 400% zoom with clean stacking | WCAG 1.4.10 | Reflow to single column |
+| FP-007 | Sidebar stacks below feed on mobile (<641px) | Responsive design | Mobile-first approach |
+
+#### 10.6.2 Feed Item Component Contract (MANDATORY)
+
+**Each feed item MUST implement:**
+
+| Rule ID | Rule | Source | Rationale |
+|---------|------|--------|-----------|
+| FI-001 | Feed items MUST use `<article>` inside `<ol>` or `<ul>` | HTML5 semantics + MOJ Timeline | Chronological record structure |
+| FI-002 | Each article MUST have a unique heading (visible or screen-reader-only) | WCAG 1.3.1 | Document structure for screen readers |
+| FI-003 | Use `<ol reversed>` for newest-first chronological order | HTML5 semantics | Semantic chronological ordering |
+| FI-004 | Meta line MUST include author, time, and context (group/category) | MOJ Timeline pattern | Orientation for all users |
+| FI-005 | Time MUST use `<time datetime="">` with ISO 8601 format | HTML5 semantics | Machine-readable timestamps |
+| FI-006 | Body content MUST be wrapped in semantic HTML (not bare divs) | WCAG 1.3.1 | Semantic structure |
+| FI-007 | Actions row MUST group related actions together | WCAG 1.3.1 | Logical grouping |
+
+**Recommended Structure for Feed Item:**
+
+```html
+<article class="civicone-feed-post" aria-labelledby="post-{id}-heading">
+  <!-- Header: author, time, context -->
+  <header class="civicone-feed-post__header">
+    <h2 id="post-{id}-heading" class="civicone-visually-hidden">
+      Post by {Author} on {topic/context}
+    </h2>
+    <div class="civicone-feed-post__meta">
+      <!-- Author link, time, context -->
+    </div>
+  </header>
+
+  <!-- Body: post content -->
+  <div class="civicone-feed-post__body">
+    <!-- Post text, images, etc. -->
+  </div>
+
+  <!-- Footer: actions -->
+  <footer class="civicone-feed-post__actions">
+    <!-- Like, Comment, Share, Message buttons -->
+  </footer>
+
+  <!-- Optional: Comments region (collapsible) -->
+  <section id="post-{id}-comments" role="region" hidden>
+    <!-- Comments list -->
+  </section>
+</article>
+```
+
+#### 10.6.3 Actions Accessibility (MANDATORY)
+
+**Like Button:**
+
+| Rule ID | Rule | Source | Rationale |
+|---------|------|--------|-----------|
+| FA-001 | Like MUST be a `<button>` (not `<div>` or `<a>`) | WCAG 4.1.2 | Correct semantic role |
+| FA-002 | Like button MUST have `aria-pressed` reflecting state (true/false) | ARIA APG Toggle | Announces state to screen readers |
+| FA-003 | Like button MUST have descriptive `aria-label` ("Like this post" / "Unlike this post") | WCAG 2.4.4 | Clear purpose for screen readers |
+| FA-004 | Like state change MUST announce via live region ("Post liked" / "Post unliked") | Home Office guidance | Non-visual confirmation |
+| FA-005 | Like action MUST NOT move keyboard focus | WCAG 2.4.3 | Focus stability |
+
+**Example:**
+```html
+<button type="button"
+        class="civicone-feed-action civicone-feed-action--like"
+        aria-pressed="false"
+        aria-label="Like this post">
+  <span aria-hidden="true">♥</span>
+  <span>Like</span>
+  <span>(12)</span>
+</button>
+```
+
+**Comment Toggle Button:**
+
+| Rule ID | Rule | Source | Rationale |
+|---------|------|--------|-----------|
+| FA-006 | Comment toggle MUST be a `<button>` | WCAG 4.1.2 | Correct semantic role |
+| FA-007 | Comment button MUST have `aria-expanded` (true when comments visible, false when hidden) | ARIA APG Disclosure | Announces state to screen readers |
+| FA-008 | Comment button MUST have `aria-controls` pointing to comments region ID | ARIA APG | Associates button with controlled region |
+| FA-009 | Comments region MUST have `role="region"` and `aria-labelledby` | ARIA APG | Landmark for screen readers |
+| FA-010 | Comment button MUST have descriptive label ("Show 5 comments" / "Hide comments") | WCAG 2.4.4 | Clear purpose |
+| FA-011 | Opening comments MUST NOT move focus (focus stays on button) | WCAG 2.4.3 | Focus stability unless user navigates |
+
+**Example:**
+```html
+<button type="button"
+        class="civicone-feed-action civicone-feed-action--comment"
+        aria-expanded="false"
+        aria-controls="post-123-comments"
+        aria-label="Show 5 comments">
+  <span aria-hidden="true">💬</span>
+  <span>Comment</span>
+  <span>(5)</span>
+</button>
+
+<section id="post-123-comments"
+         class="civicone-feed-comments"
+         role="region"
+         aria-labelledby="post-123-comments-heading"
+         hidden>
+  <h3 id="post-123-comments-heading" class="civicone-visually-hidden">Comments on this post</h3>
+  <!-- Comments list -->
+</section>
+```
+
+**Share Button:**
+
+| Rule ID | Rule | Source | Rationale |
+|---------|------|--------|-----------|
+| FA-012 | Share MUST be a `<button>` (not hover-only) | WCAG 1.4.13 | Keyboard/touch accessibility |
+| FA-013 | Share action MUST NOT rely on hover | WCAG 1.4.13 | Touch device compatibility |
+| FA-014 | If "Copy link", confirmation MUST announce via polite live region | Home Office guidance | Non-visual confirmation |
+| FA-015 | Copy confirmation MUST NOT move focus | WCAG 2.4.3 | Focus stability |
+| FA-016 | Share button MUST have descriptive `aria-label` ("Share this post") | WCAG 2.4.4 | Clear purpose |
+
+**Example:**
+```html
+<button type="button"
+        class="civicone-feed-action civicone-feed-action--share"
+        aria-label="Share this post">
+  <span aria-hidden="true">↗</span>
+  <span>Share</span>
+</button>
+
+<!-- Live region for copy confirmation -->
+<div aria-live="polite" aria-atomic="true" class="civicone-visually-hidden" id="share-announcements"></div>
+
+<script>
+// When share button clicked and link copied:
+document.getElementById('share-announcements').textContent = 'Link copied to clipboard';
+// Clear after 3 seconds:
+setTimeout(() => {
+  document.getElementById('share-announcements').textContent = '';
+}, 3000);
+</script>
+```
+
+**Message Button/Link:**
+
+| Rule ID | Rule | Source | Rationale |
+|---------|------|--------|-----------|
+| FA-017 | Message MUST be a real `<a>` link or `<button>` (NEVER `<div onclick>`) | WCAG 4.1.2 | Correct semantic role |
+| FA-018 | Message link MUST have descriptive text ("Send message to {Author}") | WCAG 2.4.4 | Clear purpose |
+| FA-019 | If button (opens modal), MUST follow modal keyboard pattern (Escape to close, focus trap) | ARIA APG Dialog | Standard interaction pattern |
+
+**Example:**
+```html
+<a href="/messages/compose?to=456"
+   class="civicone-feed-action civicone-feed-action--message"
+   aria-label="Send message to Jane Smith">
+  <span aria-hidden="true">✉</span>
+  <span>Message</span>
+</a>
+```
+
+#### 10.6.4 Dynamic Updates & Announcements (MANDATORY)
+
+| Rule ID | Rule | Source | Rationale |
+|---------|------|--------|-----------|
+| DU-001 | Use `aria-live="polite"` for non-critical announcements (liked, unliked, copied, etc.) | Home Office guidance | Announces without interrupting |
+| DU-002 | Use `aria-live="assertive"` ONLY for critical errors | Home Office guidance | Immediate announcement for urgent issues |
+| DU-003 | Live region MUST be visually hidden but present in DOM | WCAG 4.1.3 | Screen reader only |
+| DU-004 | Announcements MUST NOT steal keyboard focus | WCAG 2.4.3 | Focus stability |
+| DU-005 | Announcements MUST be concise ("Post liked", "Link copied") | Home Office guidance | Clear and brief |
+| DU-006 | Clear announcement text after 3-5 seconds to avoid announcement spam | Home Office guidance | Prevents repetition on revisit |
+
+**Example:**
+```html
+<!-- Polite live region for general updates -->
+<div aria-live="polite" aria-atomic="false" class="civicone-visually-hidden" id="feed-announcements"></div>
+
+<script>
+function announce(message) {
+  const region = document.getElementById('feed-announcements');
+  region.textContent = message;
+  setTimeout(() => {
+    region.textContent = ''; // Clear after 3 seconds
+  }, 3000);
+}
+
+// Usage:
+likeButton.addEventListener('click', () => {
+  // Toggle like state
+  const liked = toggleLike();
+  announce(liked ? 'Post liked' : 'Post unliked');
+});
+
+shareButton.addEventListener('click', () => {
+  copyToClipboard(postUrl);
+  announce('Link copied to clipboard');
+});
+</script>
+```
+
+#### 10.6.5 Loading More Content (MANDATORY)
+
+| Rule ID | Rule | Source | Rationale |
+|---------|------|--------|-----------|
+| LM-001 | MUST use pagination OR "Load more" button (NOT infinite scroll alone) | GOV.UK/ONS Pagination | Keyboard accessibility |
+| LM-002 | If using "Load more" button, MUST announce new content via live region | Home Office guidance | Screen reader notification |
+| LM-003 | "Load more" button MUST have clear label ("Load more posts", not just "Load more") | WCAG 2.4.4 | Context for screen readers |
+| LM-004 | Infinite scroll is FORBIDDEN unless keyboard-accessible "Load more" fallback exists | WCAG 2.1.1 | Keyboard users must have control |
+| LM-005 | After loading content, focus MUST remain on "Load more" button (do not move focus) | WCAG 2.4.3 | Focus stability |
+| LM-006 | Pagination MUST follow GOV.UK/ONS pagination component guidance | GOV.UK/ONS standards | Consistent accessible pattern |
+
+**Preferred: Pagination**
+```html
+<nav class="civicone-pagination" aria-label="Feed pagination">
+  <ul class="civicone-pagination__list">
+    <li class="civicone-pagination__item">
+      <a href="/feed?page=1" class="civicone-pagination__link" aria-label="Previous page">
+        Previous
+      </a>
+    </li>
+    <li class="civicone-pagination__item">
+      <a href="/feed?page=1" class="civicone-pagination__link">1</a>
+    </li>
+    <li class="civicone-pagination__item civicone-pagination__item--current">
+      <span class="civicone-pagination__link" aria-current="page">2</span>
+    </li>
+    <li class="civicone-pagination__item">
+      <a href="/feed?page=3" class="civicone-pagination__link">3</a>
+    </li>
+    <li class="civicone-pagination__item">
+      <a href="/feed?page=3" class="civicone-pagination__link" aria-label="Next page">
+        Next
+      </a>
+    </li>
+  </ul>
+</nav>
+```
+
+**Alternative: Load More Button**
+```html
+<div class="civicone-feed-load-more">
+  <button type="button"
+          class="civicone-button civicone-button--secondary"
+          aria-label="Load more posts"
+          id="load-more-btn">
+    Load more
+  </button>
+</div>
+
+<div aria-live="polite" class="civicone-visually-hidden" id="load-more-announcements"></div>
+
+<script>
+document.getElementById('load-more-btn').addEventListener('click', async () => {
+  const newPosts = await fetchMorePosts();
+  appendPosts(newPosts);
+
+  // Announce to screen readers
+  document.getElementById('load-more-announcements').textContent =
+    `${newPosts.length} more posts loaded`;
+
+  // Focus stays on button (do not move focus to new content)
+});
+</script>
+```
+
+#### 10.6.6 Definition of Done: Feed Template
+
+**A feed page is considered COMPLETE when:**
+
+**Structure:**
+- [ ] Feed uses 2/3 + 1/3 column split (content + sidebar)
+- [ ] Feed items are inside `<ol>` or `<ul>` (chronological list)
+- [ ] Each feed item is an `<article>` with semantic structure
+- [ ] Each article has a unique heading (visible or sr-only)
+- [ ] Meta line includes author, time (`<time datetime="">`), and context
+- [ ] Actions row groups Like, Comment, Share, Message
+
+**Accessibility:**
+- [ ] Like button has `aria-pressed` and descriptive label
+- [ ] Comment toggle has `aria-expanded` and `aria-controls`
+- [ ] Comments region has `role="region"` and `aria-labelledby`
+- [ ] Share button does not rely on hover
+- [ ] Message is a real link/button (not `<div onclick>`)
+- [ ] All actions are keyboard operable (Tab, Enter/Space)
+
+**Dynamic Updates:**
+- [ ] Polite live region present for announcements (likes, copies, etc.)
+- [ ] Announcements do not steal focus
+- [ ] Announcements clear after 3-5 seconds
+- [ ] No assertive live regions (except critical errors)
+
+**Loading More:**
+- [ ] Uses pagination OR "Load more" button
+- [ ] NO infinite scroll without keyboard fallback
+- [ ] "Load more" announces new content via live region
+- [ ] Focus remains stable after loading content
+
+**Keyboard & Focus:**
+- [ ] Can reach composer (if present) via keyboard
+- [ ] Can navigate to each post via Tab
+- [ ] Can reach each action (Like, Comment, Share, Message) via Tab
+- [ ] Can expand/collapse comments via Enter/Space
+- [ ] Focus indicator visible on all interactive elements
+- [ ] No focus traps
+- [ ] No focus stealing on dynamic updates
+
+**Zoom/Reflow:**
+- [ ] Usable at 200% zoom (no horizontal scroll)
+- [ ] Reflows to single column at 400% zoom
+- [ ] Sidebar stacks below feed on mobile (<641px)
+- [ ] Touch targets minimum 44x44px on mobile
+
+**Screen Reader:**
+- [ ] Feed items announce in logical order
+- [ ] Each article heading is navigable (H key)
+- [ ] Like state changes are announced
+- [ ] Comment toggle state is announced
+- [ ] Share confirmation is announced
+- [ ] No redundant announcements
+
+**Examples:**
+- Community feed: `/feed` or `/feed/index.php`
+- Homepage redirect: `/home.php` (redirects to `/feed`)
+
+---
+
+### 10.7 Template G: Account Area (Dashboard / Profile / Wallet)
+
+**Pattern Sources:**
+- **MOJ Sub navigation:** https://design-patterns.service.justice.gov.uk/components/sub-navigation/
+- **MOJ Side navigation:** https://design-patterns.service.justice.gov.uk/components/side-navigation/
+- **MOJ Notification badge:** https://design-patterns.service.justice.gov.uk/components/notification-badge/
+- **GOV.UK Task list:** https://design-system.service.gov.uk/components/task-list/
+- **GOV.UK Complete multiple tasks pattern:** https://design-system.service.gov.uk/patterns/complete-multiple-tasks/
+- **GOV.UK Summary list:** https://design-system.service.gov.uk/components/summary-list/
+- **GOV.UK Check answers pattern:** https://design-system.service.gov.uk/patterns/check-answers/
+- **GOV.UK Table:** https://design-system.service.gov.uk/components/table/
+- **ONS Tabs:** https://service-manual.ons.gov.uk/design-system/components/tabs
+- **SIS Tabs guidance:** https://service-manual.sis.gov.uk/design-system/components/tabs
+- **NICE Tabs accessibility:** https://design-system.nice.org.uk/components/tabs
+
+#### 10.7.1 The Golden Rule: Tabs Are Not Module Navigation
+
+**CRITICAL NON-NEGOTIABLE:**
+
+> **"Tabs are for switching between closely-related views within a single module. If your 'tabs' are actually switching between different functional modules (e.g., Dashboard → Wallet → Messages), you MUST use secondary navigation with separate pages instead."**
+
+**Why this matters:**
+
+All UK public sector design systems (GOV.UK, ONS, SIS, NICE, MOJ) are clear that tabs should only be used for closely-related content within a single context. Using tabs to switch between fundamentally different modules violates:
+- **WCAG 1.3.1 Info and Relationships** - Tab panels share a single `<main>` landmark, which breaks semantic structure when switching between modules
+- **WCAG 2.4.1 Bypass Blocks** - Users cannot use skip links to jump to different modules
+- **WCAG 2.4.8 Location** - Users lose breadcrumb/URL context about which section they're in
+- **Progressive enhancement** - Tabs require JavaScript; module navigation must work without JS
+
+**The correct pattern:**
+- **Tabs:** Switching between "Overview" and "Details" views of the same event listing → ✅ Acceptable use of tabs
+- **Secondary navigation:** Switching between "Dashboard Overview", "Wallet", "Notifications", "Settings" → ✅ Use MOJ Sub navigation or Side navigation with separate pages
+
+#### 10.7.2 Account Area Structure (MANDATORY)
+
+The Account Area includes all pages related to the logged-in user's personal hub:
+- Dashboard (Overview)
+- Notifications
+- My Hubs (Groups/Communities)
+- My Listings (Offers/Requests)
+- Wallet (Points/Transactions)
+- Events (My Events)
+- Profile Settings
+- Account Settings
+
+**MANDATORY Structure:**
+
+1. **Hub Page (Overview)**
+   - Single landing page with summary cards or task list showing status across all areas
+   - Uses **GOV.UK grid** with cards or summary lists
+   - Example: Dashboard shows unread notifications count, wallet balance, upcoming events, pending listings
+
+2. **Secondary Navigation (Required on ALL Account Area Pages)**
+   - MUST use **MOJ Sub navigation** pattern (horizontal tabs-like navigation) OR **MOJ Side navigation** pattern (left sidebar navigation)
+   - Navigation MUST appear on every page in the account area
+   - Current page MUST be marked with `aria-current="page"`
+   - Navigation items with unread counts MUST use **MOJ Notification badge** component
+
+**MANDATORY HTML Structure (Sub Navigation):**
+
+```html
+<div class="civicone-width-container">
+  <main class="civicone-main-wrapper" id="main-content">
+
+    <!-- Page heading -->
+    <h1 class="civicone-heading-xl">Account</h1>
+
+    <!-- Secondary navigation (MOJ Sub navigation pattern) -->
+    <nav class="moj-sub-navigation" aria-label="Account sections">
+      <ul class="moj-sub-navigation__list">
+        <li class="moj-sub-navigation__item">
+          <a class="moj-sub-navigation__link" href="/dashboard" aria-current="page">
+            Overview
+          </a>
+        </li>
+        <li class="moj-sub-navigation__item">
+          <a class="moj-sub-navigation__link" href="/notifications">
+            Notifications
+            <span class="moj-notification-badge">3</span>
+          </a>
+        </li>
+        <li class="moj-sub-navigation__item">
+          <a class="moj-sub-navigation__link" href="/wallet">
+            Wallet
+          </a>
+        </li>
+        <li class="moj-sub-navigation__item">
+          <a class="moj-sub-navigation__link" href="/settings">
+            Settings
+          </a>
+        </li>
+      </ul>
+    </nav>
+
+    <!-- Page-specific content -->
+    <div class="civicone-grid-row">
+      <div class="civicone-grid-column-two-thirds">
+        <!-- Content here -->
+      </div>
+    </div>
+
+  </main>
+</div>
+```
+
+**Alternative: MOJ Side Navigation (for longer lists of sections):**
+
+```html
+<div class="civicone-width-container">
+  <main class="civicone-main-wrapper" id="main-content">
+
+    <h1 class="civicone-heading-xl">Account</h1>
+
+    <div class="civicone-grid-row">
+
+      <!-- Side navigation (1/4 width) -->
+      <div class="civicone-grid-column-one-quarter">
+        <nav class="moj-side-navigation" aria-label="Account sections">
+          <ul class="moj-side-navigation__list">
+            <li class="moj-side-navigation__item moj-side-navigation__item--active">
+              <a href="/dashboard" aria-current="page">Overview</a>
+            </li>
+            <li class="moj-side-navigation__item">
+              <a href="/notifications">
+                Notifications
+                <span class="moj-notification-badge">3</span>
+              </a>
+            </li>
+            <li class="moj-side-navigation__item">
+              <a href="/wallet">Wallet</a>
+            </li>
+            <li class="moj-side-navigation__item">
+              <a href="/settings">Settings</a>
+            </li>
+          </ul>
+        </nav>
+      </div>
+
+      <!-- Main content (3/4 width) -->
+      <div class="civicone-grid-column-three-quarters">
+        <!-- Page content here -->
+      </div>
+
+    </div>
+
+  </main>
+</div>
+```
+
+#### 10.7.3 Profile Settings Structure (MANDATORY)
+
+Profile settings pages (edit profile, change email, change password) MUST use one of these two patterns:
+
+**Option 1: GOV.UK Summary List + Check Answers Pattern (Recommended)**
+
+Use this when the user can view all their current settings and edit individual fields:
+
+```html
+<h2 class="civicone-heading-l">Your profile</h2>
+
+<dl class="govuk-summary-list">
+  <div class="govuk-summary-list__row">
+    <dt class="govuk-summary-list__key">Full name</dt>
+    <dd class="govuk-summary-list__value">Jane Smith</dd>
+    <dd class="govuk-summary-list__actions">
+      <a class="govuk-link" href="/profile/edit-name">
+        Change<span class="civicone-visually-hidden"> full name</span>
+      </a>
+    </dd>
+  </div>
+
+  <div class="govuk-summary-list__row">
+    <dt class="govuk-summary-list__key">Email address</dt>
+    <dd class="govuk-summary-list__value">jane.smith@example.com</dd>
+    <dd class="govuk-summary-list__actions">
+      <a class="govuk-link" href="/profile/edit-email">
+        Change<span class="civicone-visually-hidden"> email address</span>
+      </a>
+    </dd>
+  </div>
+
+  <div class="govuk-summary-list__row">
+    <dt class="govuk-summary-list__key">Location</dt>
+    <dd class="govuk-summary-list__value">Edinburgh, Scotland</dd>
+    <dd class="govuk-summary-list__actions">
+      <a class="govuk-link" href="/profile/edit-location">
+        Change<span class="civicone-visually-hidden"> location</span>
+      </a>
+    </dd>
+  </div>
+</dl>
+```
+
+**CRITICAL:** Each "Change" link MUST include visually-hidden text describing what will be changed (see GOV.UK Check Answers pattern: https://design-system.service.gov.uk/patterns/check-answers/).
+
+**Why:** Screen reader users navigating by links hear "Change, Change, Change" without context. The hidden span provides: "Change full name", "Change email address", etc.
+
+**Option 2: GOV.UK Task List Pattern (for multi-step setup)**
+
+Use this when the user must complete multiple setup steps (e.g., onboarding flow):
+
+```html
+<h2 class="civicone-heading-l">Complete your profile</h2>
+
+<ul class="govuk-task-list">
+  <li class="govuk-task-list__item govuk-task-list__item--completed">
+    <span class="govuk-task-list__name-and-hint">
+      <a class="govuk-link govuk-task-list__link" href="/profile/step-1">
+        Basic information
+      </a>
+    </span>
+    <strong class="govuk-tag">Completed</strong>
+  </li>
+
+  <li class="govuk-task-list__item">
+    <span class="govuk-task-list__name-and-hint">
+      <a class="govuk-link govuk-task-list__link" href="/profile/step-2">
+        Skills and interests
+      </a>
+    </span>
+    <strong class="govuk-tag govuk-tag--grey">Not started</strong>
+  </li>
+
+  <li class="govuk-task-list__item govuk-task-list__item--cannot-start-yet">
+    <span class="govuk-task-list__name-and-hint">
+      Upload profile picture
+      <span class="govuk-task-list__hint">
+        Complete steps 1 and 2 first
+      </span>
+    </span>
+    <strong class="govuk-tag govuk-tag--grey">Cannot start yet</strong>
+  </li>
+</ul>
+```
+
+#### 10.7.4 Wallet Structure (MANDATORY)
+
+The Wallet page displays the user's points balance and transaction history. MUST use:
+
+1. **GOV.UK Summary List** for key facts (current balance, total earned, total spent)
+2. **GOV.UK Table** for transaction history
+
+**MANDATORY HTML Structure:**
+
+```html
+<h1 class="civicone-heading-xl">Wallet</h1>
+
+<!-- Key facts as Summary List -->
+<h2 class="civicone-heading-l">Balance</h2>
+<dl class="govuk-summary-list">
+  <div class="govuk-summary-list__row">
+    <dt class="govuk-summary-list__key">Current balance</dt>
+    <dd class="govuk-summary-list__value">
+      <strong class="civicone-wallet-balance">1,250 points</strong>
+    </dd>
+  </div>
+
+  <div class="govuk-summary-list__row">
+    <dt class="govuk-summary-list__key">Total earned</dt>
+    <dd class="govuk-summary-list__value">3,840 points</dd>
+  </div>
+
+  <div class="govuk-summary-list__row">
+    <dt class="govuk-summary-list__key">Total spent</dt>
+    <dd class="govuk-summary-list__value">2,590 points</dd>
+  </div>
+</dl>
+
+<!-- Transaction history as Table -->
+<h2 class="civicone-heading-l">Transaction history</h2>
+
+<table class="govuk-table">
+  <caption class="govuk-table__caption govuk-visually-hidden">
+    Your wallet transaction history
+  </caption>
+  <thead class="govuk-table__head">
+    <tr class="govuk-table__row">
+      <th scope="col" class="govuk-table__header">Date</th>
+      <th scope="col" class="govuk-table__header">Description</th>
+      <th scope="col" class="govuk-table__header govuk-table__header--numeric">Amount</th>
+      <th scope="col" class="govuk-table__header govuk-table__header--numeric">Balance</th>
+    </tr>
+  </thead>
+  <tbody class="govuk-table__body">
+    <tr class="govuk-table__row">
+      <td class="govuk-table__cell">
+        <time datetime="2026-01-20">20 Jan 2026</time>
+      </td>
+      <td class="govuk-table__cell">Volunteered at community garden</td>
+      <td class="govuk-table__cell govuk-table__cell--numeric civicone-wallet-earned">
+        +50
+      </td>
+      <td class="govuk-table__cell govuk-table__cell--numeric">1,250</td>
+    </tr>
+
+    <tr class="govuk-table__row">
+      <td class="govuk-table__cell">
+        <time datetime="2026-01-18">18 Jan 2026</time>
+      </td>
+      <td class="govuk-table__cell">Redeemed: Event ticket</td>
+      <td class="govuk-table__cell govuk-table__cell--numeric civicone-wallet-spent">
+        -100
+      </td>
+      <td class="govuk-table__cell govuk-table__cell--numeric">1,200</td>
+    </tr>
+  </tbody>
+</table>
+
+<!-- Optional: Pagination if >20 transactions -->
+<nav class="civicone-pagination" aria-label="Transaction history pages">
+  <!-- GOV.UK Pagination component -->
+</nav>
+```
+
+**Wallet Rules:**
+
+| Rule ID | Rule | Source | Rationale |
+|---------|------|--------|-----------|
+| W-001 | MUST use GOV.UK Summary list for key facts (balance, total earned, total spent) | GOV.UK Summary list | Accessible key-value display |
+| W-002 | MUST use GOV.UK Table for transaction history | GOV.UK Table | Accessible tabular data |
+| W-003 | Table MUST include `<caption>` (can be visually hidden) | GOV.UK Table | WCAG 1.3.1 - table context |
+| W-004 | Date column MUST use `<time datetime="">` with ISO 8601 format | HTML5 spec | Machine-readable dates |
+| W-005 | Numeric columns MUST use `govuk-table__header--numeric` and `govuk-table__cell--numeric` | GOV.UK Table | Right-align numbers |
+| W-006 | Earned/spent amounts MUST have semantic class for styling (e.g., `.civicone-wallet-earned`, `.civicone-wallet-spent`) | Best practice | Visual distinction (green/red) |
+| W-007 | MUST NOT rely on color alone to distinguish earned vs spent | WCAG 1.4.1 | Use +/- prefix as well |
+| W-008 | Transaction history >20 rows MUST use pagination | GOV.UK Pagination | Performance + usability |
+
+#### 10.7.5 Account Area Template Rules (MANDATORY)
+
+| Rule ID | Rule | Source | Rationale |
+|---------|------|--------|-----------|
+| AA-001 | **Tabs MUST NOT be used to switch between different modules** (e.g., Dashboard → Wallet → Notifications). Use MOJ Sub navigation or Side navigation with separate pages instead. | ONS/SIS/NICE/GOV.UK Tabs guidance | Tabs share single `<main>` landmark, breaking semantic structure for module-level navigation. Violates WCAG 1.3.1, 2.4.1, 2.4.8 |
+| AA-002 | Account area MUST have a hub page (Overview/Dashboard) showing summaries across all sections | GOV.UK "Complete multiple tasks" pattern | Provides orientation and entry point |
+| AA-003 | ALL pages in account area MUST include secondary navigation (MOJ Sub navigation or Side navigation) | MOJ Sub navigation / Side navigation | Consistent wayfinding across account sections |
+| AA-004 | Secondary navigation MUST mark current page with `aria-current="page"` | MOJ Sub navigation | WCAG 2.4.8 (Location) |
+| AA-005 | Notification counts in navigation MUST use MOJ Notification badge component | MOJ Notification badge | Accessible count display |
+| AA-006 | Profile settings MUST use GOV.UK Summary list + "Change" links with hidden context text OR GOV.UK Task list for multi-step flows | GOV.UK Check answers / Task list | "Change" links need context for screen readers |
+| AA-007 | Wallet MUST use Summary list for key facts + Table for transaction history | GOV.UK Summary list / Table | Semantic display of financial data |
+| AA-008 | Wallet table MUST use `<time datetime="">` for dates | HTML5 spec | Machine-readable dates |
+| AA-009 | Wallet earned/spent MUST NOT rely on color alone (use +/- prefix) | WCAG 1.4.1 | Color is not sufficient indicator |
+| AA-010 | Account area pages MUST follow GOV.UK Page Template boilerplate (skip link, width container, main wrapper) | GOV.UK Page Template | Consistent page structure |
+
+#### 10.7.6 Accessibility Checklist (Account Area Template)
+
+**Secondary Navigation:**
+
+- [ ] Navigation uses `<nav>` with `aria-label` describing the context (e.g., "Account sections")
+- [ ] Current page marked with `aria-current="page"`
+- [ ] Notification badges use MOJ Notification badge component (not just plain numbers)
+- [ ] Notification counts have accessible text (e.g., "3 unread notifications")
+- [ ] Navigation is keyboard accessible (Tab, Enter)
+- [ ] Focus visible on all navigation links (3px outline)
+- [ ] Navigation appears consistently on all account area pages
+
+**Profile Settings (Summary List):**
+
+- [ ] Uses semantic `<dl>` structure (not table or divs)
+- [ ] Each "Change" link includes visually-hidden context text (e.g., "Change full name")
+- [ ] Change links are keyboard accessible
+- [ ] Change links have clear focus indicators
+- [ ] Form validation follows GOV.UK patterns (error summary, inline errors)
+
+**Wallet:**
+
+- [ ] Balance summary uses `<dl>` (GOV.UK Summary list)
+- [ ] Transaction table has `<caption>` (can be visually hidden)
+- [ ] Table uses `<thead>` and `<th scope="col">`
+- [ ] Date column uses `<time datetime="">` with ISO 8601
+- [ ] Numeric columns right-aligned with `govuk-table__header--numeric`
+- [ ] Earned/spent use +/- prefix (not color alone)
+- [ ] Pagination present if >20 transactions
+- [ ] Pagination uses `<nav>` with `aria-label`
+
+**Keyboard & Focus:**
+
+- [ ] All interactive elements keyboard accessible (Tab, Enter, Space)
+- [ ] Focus order is logical (navigation → content → actions)
+- [ ] Focus visible on all elements (3px solid outline)
+- [ ] No keyboard traps
+
+**Screen Reader:**
+
+- [ ] Page heading announces correctly (H1)
+- [ ] Secondary navigation is discoverable (nav landmark)
+- [ ] Current page announced in navigation
+- [ ] Summary lists read as key-value pairs
+- [ ] Table caption provides context
+- [ ] Table headers associate with cells (`scope="col"`)
+- [ ] Notification counts announced with context
+
+#### 10.7.7 File Mapping (Current Implementation)
+
+| File | Template | Notes |
+|------|----------|-------|
+| `views/civicone/dashboard.php` | **Template G: Account Area Hub (Overview)** | Primary dashboard/account overview page. Should show summary cards or task list across all account sections (notifications, wallet, upcoming events, pending listings). MUST include secondary navigation to other account sections. |
+
+**To be implemented:**
+- `views/civicone/wallet.php` → Wallet page (Summary list + Table)
+- `views/civicone/notifications.php` → Notifications page
+- `views/civicone/profile/settings.php` → Profile settings (Summary list with Change links)
+- `views/civicone/account/settings.php` → Account settings (email, password, privacy)
+
+**Secondary navigation** should be extracted to a reusable partial: `views/layouts/civicone/partials/account-navigation.php`
+
+#### 10.7.8 Definition of Done (Account Area Template)
+
+An account area page is considered complete when:
+
+✅ **Structure:**
+- [ ] Uses GOV.UK Page Template boilerplate (skip link, width container, main wrapper)
+- [ ] Includes secondary navigation (MOJ Sub navigation or Side navigation)
+- [ ] Current page marked with `aria-current="page"` in navigation
+- [ ] Page heading (H1) clearly identifies the section
+
+✅ **Profile Settings (if applicable):**
+- [ ] Uses GOV.UK Summary list with "Change" links
+- [ ] All "Change" links include visually-hidden context text
+- [ ] OR uses GOV.UK Task list for multi-step flows
+
+✅ **Wallet (if applicable):**
+- [ ] Key facts displayed as GOV.UK Summary list
+- [ ] Transaction history displayed as GOV.UK Table
+- [ ] Dates use `<time datetime="">` with ISO 8601
+- [ ] Earned/spent use +/- prefix (not color alone)
+- [ ] Pagination present if >20 transactions
+
+✅ **Accessibility:**
+- [ ] Passes axe DevTools scan (0 violations)
+- [ ] Keyboard navigable (Tab, Enter, Space)
+- [ ] Focus visible on all interactive elements (3px outline)
+- [ ] Screen reader announces page structure correctly (NVDA/JAWS tested)
+- [ ] Zoom to 200% - no horizontal scroll, all content accessible
+- [ ] Zoom to 400% - content reflows correctly
+
+✅ **Code Quality:**
+- [ ] NO inline CSS (all styles in `civicone-dashboard.css` or equivalent)
+- [ ] CSS scoped under `.nexus-skin-civicone`
+- [ ] GOV.UK/MOJ component classes used correctly
+- [ ] Semantic HTML (`<dl>`, `<table>`, `<nav>`, `<time>`)
+
+---
+
+### 10.8 Listings Contracts (Non-Negotiables)
 
 The Listings module (offers/requests marketplace) MUST follow these template mappings and implementation rules:
 
@@ -2849,6 +4967,10 @@ git revert <component-commit-hash>
 |---------|------|--------|---------|
 | 1.0.0 | 2026-01-20 | Development Team | Initial release |
 | 1.1.0 | 2026-01-20 | Development Team | Phase 2 complete: GOV.UK tokens applied to all 17 CSS files (~170 focus states), 5 GOV.UK component CSS files created, all minified files regenerated. Updated Phase 3 to reflect next steps (page template refactoring). |
+| 1.5.0 | 2026-01-20 | Development Team | Added Section 9A: Global Header & Navigation Contract (MANDATORY). Defines strict header layering (skip link → phase banner → utility bar → ONE primary nav → search), bans multiple competing nav systems, establishes GOV.UK Service Navigation as canonical pattern, provides detailed refactor workflow for header.php/header-cached.php, and documents Definition of Done for header work. Based on GOV.UK Service Navigation, MOJ Primary Navigation, and GOV.UK "Navigate a service" pattern. |
+| 1.6.0 | 2026-01-20 | Development Team | Added Template F: Feed / Activity Stream (Section 10.6). Defines canonical template for Community Pulse Feed landing page (views/civicone/feed/index.php). Establishes mandatory patterns for feed layout (2/3+1/3 split), feed items (chronological `<article>` list using MOJ Timeline pattern), actions accessibility (Like with aria-pressed, Comment with aria-expanded/aria-controls, Share without hover, Message as real link/button), dynamic updates (polite live regions per Home Office guidance), and loading more content (pagination or "Load more" button, NO infinite scroll without fallback). Includes comprehensive Definition of Done checklist. Based on MOJ Timeline, GOV.UK Pagination, ONS Pagination, Home Office notifications guidance, and GOV.UK Accordion patterns. |
+| 1.7.0 | 2026-01-20 | Development Team | Added Template G: Account Area (Section 10.7). Defines mandatory patterns for dashboard, profile settings, wallet, and account pages. Establishes "tabs are not module navigation" rule (tabs only for closely-related views within single module; use MOJ Sub/Side navigation for module switching). Documents secondary navigation requirements (MOJ Sub navigation or Side navigation on all account pages), profile settings patterns (GOV.UK Summary list with "Change" links including sr-only context text), wallet structure (Summary list for key facts + Table for transactions with semantic markup). Includes comprehensive accessibility checklist and Definition of Done. Based on MOJ Sub/Side navigation, GOV.UK Summary list, Check answers pattern, Task list, Table, and ONS/SIS/NICE tabs guidance. |
+| 1.8.0 | 2026-01-20 | Development Team | Added Section 9B: Federation Mode (Partner Communities) — NON-NEGOTIABLE. Defines comprehensive contract for all Federation features (/federation/* pages). Establishes mandatory patterns: (1) Federation scope switcher (MOJ Organisation switcher pattern, only show if user has 2+ communities, placement between header and main content); (2) Provenance everywhere (every federated item shows source community for trust/transparency, browse pages offer "Source community" filter); (3) Navigation separation (Federation has own service navigation, distinct from local tenant nav, uses /federation prefix, separate breadcrumbs/page titles); (4) Directory/List template for browse pages (members, listings, events, groups MUST use Template A with MOJ filter-a-list pattern, selected filters as removable tags, "Apply filters" button, list/table layout NOT card grid); (5) GOV.UK Pagination (required for all browse pages, NO infinite scroll by default); (6) Mixed-theme guardrail (wrapper pattern for messages/transactions to prevent breaking Modern layout). Includes file mapping table, accessibility checklist, and Definition of Done. Based on MOJ Organisation switcher, GOV.UK Navigate a service, Service navigation, MOJ Filter a list, Filter component, and GOV.UK Pagination patterns. |
 
 ---
 

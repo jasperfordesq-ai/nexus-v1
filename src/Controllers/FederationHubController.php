@@ -100,11 +100,21 @@ class FederationHubController
         \Nexus\Core\SEO::setTitle('Partner Timebanks');
         \Nexus\Core\SEO::setDescription('Connect with members, listings, events, and groups from our partner timebanks.');
 
+        // Get partner communities (simplified list for scope switcher)
+        $partnerCommunities = array_map(fn($p) => [
+            'id' => $p['id'],
+            'name' => $p['name']
+        ], $partnerTenants);
+
+        $currentScope = $_GET['scope'] ?? 'all';
+
         View::render('federation/hub', [
             'pageTitle' => 'Partner Timebanks',
             'userOptedIn' => $userOptedIn,
             'partnerCount' => $partnerCount,
             'partnerTenants' => $partnerTenants,
+            'partnerCommunities' => $partnerCommunities,
+            'currentScope' => $currentScope,
             'features' => $features,
             'stats' => $stats,
             'basePath' => $basePath

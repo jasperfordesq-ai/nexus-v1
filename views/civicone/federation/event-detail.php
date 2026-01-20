@@ -5,6 +5,7 @@
  */
 $pageTitle = $pageTitle ?? "Federated Event";
 $hideHero = true;
+$bodyClass = 'civicone--federation';
 
 Nexus\Core\SEO::setTitle(($event['title'] ?? 'Event') . ' - Federated');
 Nexus\Core\SEO::setDescription('Event details from a partner timebank in the federation network.');

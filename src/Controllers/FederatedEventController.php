@@ -68,10 +68,25 @@ class FederatedEventController
         // Get partner tenant info for filter dropdown
         $partnerTenants = $this->getPartnerTenantInfo($partnerTenantIds);
 
-        View::render('federation/events', [
+        // Get partner communities for scope switcher (if any)
+        $partnerCommunities = array_map(fn($t) => [
+            'id' => $t['id'],
+            'name' => $t['name']
+        ], $partnerTenants);
+
+        $currentScope = $_GET['scope'] ?? 'all';
+
+        // Use CivicOne wrapper if CivicOne layout is active
+        $viewPath = (layout() === 'civicone')
+            ? 'civicone/federation/events'
+            : 'federation/events';
+
+        View::render($viewPath, [
             'events' => $events,
             'partnerTenants' => $partnerTenants,
             'filters' => $filters,
+            'partnerCommunities' => $partnerCommunities,
+            'currentScope' => $currentScope,
             'pageTitle' => 'Federated Events'
         ]);
     }

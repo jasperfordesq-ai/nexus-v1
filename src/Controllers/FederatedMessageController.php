@@ -50,9 +50,20 @@ class FederatedMessageController
         $conversations = FederatedMessageService::getInbox($userId);
         $unreadCount = FederatedMessageService::getUnreadCount($userId);
 
-        View::render('federation/messages/index', [
+        // Get partner communities for scope switcher (if any)
+        $partnerCommunities = $this->getPartnerCommunities($tenantId);
+        $currentScope = $_GET['scope'] ?? 'all';
+
+        // Use CivicOne wrapper if CivicOne layout is active
+        $viewPath = (layout() === 'civicone')
+            ? 'civicone/federation/messages'
+            : 'federation/messages/index';
+
+        View::render($viewPath, [
             'conversations' => $conversations,
             'unreadCount' => $unreadCount,
+            'partnerCommunities' => $partnerCommunities,
+            'currentScope' => $currentScope,
             'pageTitle' => 'Federated Messages'
         ]);
     }
@@ -293,5 +304,29 @@ class FederatedMessageController
         http_response_code($statusCode);
         header('Content-Type: application/json');
         echo json_encode($data);
+    }
+
+    /**
+     * Get partner communities for scope switcher
+     */
+    private function getPartnerCommunities(int $tenantId): array
+    {
+        $partnerships = \Nexus\Services\FederationPartnershipService::getTenantPartnerships($tenantId);
+        $activePartnerships = array_filter($partnerships, fn($p) => $p['status'] === 'active');
+
+        $partnerCommunities = [];
+        foreach ($activePartnerships as $p) {
+            $partnerId = ($p['tenant_id'] == $tenantId) ? $p['partner_tenant_id'] : $p['tenant_id'];
+            $tenant = \Nexus\Core\Database::query(
+                "SELECT id, name FROM tenants WHERE id = ?",
+                [$partnerId]
+            )->fetch(\PDO::FETCH_ASSOC);
+
+            if ($tenant) {
+                $partnerCommunities[] = $tenant;
+            }
+        }
+
+        return $partnerCommunities;
     }
 }

@@ -85,9 +85,19 @@ class FederatedMemberController
         // Get popular skills for filter suggestions
         $popularSkills = FederationSearchService::getAvailableSkills($partnerTenantIds, '', 15);
 
+        // Get partner communities (simplified list for scope switcher)
+        $partnerCommunities = array_map(fn($t) => [
+            'id' => $t['id'],
+            'name' => $t['name']
+        ], $partnerTenants);
+
+        $currentScope = $_GET['scope'] ?? 'all';
+
         View::render('federation/members', [
             'members' => $members,
             'partnerTenants' => $partnerTenants,
+            'partnerCommunities' => $partnerCommunities,
+            'currentScope' => $currentScope,
             'filters' => $filters,
             'partnerships' => $activePartnerships,
             'searchStats' => $searchStats,

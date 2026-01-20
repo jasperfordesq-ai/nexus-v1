@@ -290,8 +290,15 @@ class ListingRankingService
 
         // Apply filters
         if (!empty($filters['type'])) {
-            $sql .= " AND l.type = ?";
-            $params[] = $filters['type'];
+            if (is_array($filters['type'])) {
+                // Handle multiple types with IN clause
+                $placeholders = str_repeat('?,', count($filters['type']) - 1) . '?';
+                $sql .= " AND l.type IN ($placeholders)";
+                $params = array_merge($params, $filters['type']);
+            } else {
+                $sql .= " AND l.type = ?";
+                $params[] = $filters['type'];
+            }
         }
 
         if (!empty($filters['category_id'])) {

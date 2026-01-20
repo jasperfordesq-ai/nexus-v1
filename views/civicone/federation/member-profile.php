@@ -5,6 +5,7 @@
  */
 $pageTitle = $pageTitle ?? "Member Profile";
 $hideHero = true;
+$bodyClass = 'civicone--federation';
 
 Nexus\Core\SEO::setTitle(($member['name'] ?? 'Member') . ' - Federated Profile');
 Nexus\Core\SEO::setDescription('View federated member profile from partner timebank.');

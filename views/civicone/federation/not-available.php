@@ -5,6 +5,7 @@
  */
 $pageTitle = $pageTitle ?? "Federation Not Available";
 $hideHero = true;
+$bodyClass = 'civicone--federation';
 
 Nexus\Core\SEO::setTitle('Federation Not Available');
 Nexus\Core\SEO::setDescription('Federation is not currently enabled for this timebank.');

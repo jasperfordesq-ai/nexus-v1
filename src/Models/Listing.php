@@ -28,8 +28,15 @@ class Listing
         $params = [$tenantId, $tenantId];
 
         if ($type) {
-            $sql .= " AND l.type = ?";
-            $params[] = $type;
+            if (is_array($type)) {
+                // Handle multiple types with IN clause
+                $placeholders = str_repeat('?,', count($type) - 1) . '?';
+                $sql .= " AND l.type IN ($placeholders)";
+                $params = array_merge($params, $type);
+            } else {
+                $sql .= " AND l.type = ?";
+                $params[] = $type;
+            }
         }
         if ($categoryId) {
             $sql .= " AND l.category_id = ?";
@@ -227,8 +234,15 @@ class Listing
             $params = [$lat, $lon, $lat, $tenantId, $tenantId];
 
             if ($type) {
-                $sql .= " AND l.type = ?";
-                $params[] = $type;
+                if (is_array($type)) {
+                    // Handle multiple types with IN clause
+                    $placeholders = str_repeat('?,', count($type) - 1) . '?';
+                    $sql .= " AND l.type IN ($placeholders)";
+                    $params = array_merge($params, $type);
+                } else {
+                    $sql .= " AND l.type = ?";
+                    $params[] = $type;
+                }
             }
 
             if ($categoryId) {

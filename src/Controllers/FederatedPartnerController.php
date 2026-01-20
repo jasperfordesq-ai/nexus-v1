@@ -92,10 +92,35 @@ class FederatedPartnerController
         )->fetch();
         $userOptedIn = $userFedSettings && $userFedSettings['federation_optin'];
 
+        // Get all active partner tenants for scope switcher
+        $partnerTenants = Database::query("
+            SELECT t.id, t.name
+            FROM federation_partnerships fp
+            JOIN tenants t ON (
+                (fp.tenant_id = ? AND t.id = fp.partner_tenant_id) OR
+                (fp.partner_tenant_id = ? AND t.id = fp.tenant_id)
+            )
+            WHERE (fp.tenant_id = ? OR fp.partner_tenant_id = ?)
+            AND fp.status = 'active'
+            ORDER BY t.name
+        ", [$tenantId, $tenantId, $tenantId, $tenantId])->fetchAll(\PDO::FETCH_ASSOC);
+
+        $partnerCommunities = array_map(fn($t) => [
+            'id' => $t['id'],
+            'name' => $t['name']
+        ], $partnerTenants);
+
+        $currentScope = $_GET['scope'] ?? 'all';
+
         \Nexus\Core\SEO::setTitle($partner['name'] . ' - Partner Timebank');
         \Nexus\Core\SEO::setDescription('View details about our partner timebank ' . $partner['name'] . ' and explore available features.');
 
-        View::render('federation/partner-profile', [
+        // Use CivicOne wrapper if CivicOne layout is active
+        $viewPath = (layout() === 'civicone')
+            ? 'civicone/federation/partner-profile'
+            : 'federation/partner-profile';
+
+        View::render($viewPath, [
             'pageTitle' => $partner['name'],
             'partner' => $partner,
             'partnership' => $partnership,
@@ -104,6 +129,8 @@ class FederatedPartnerController
             'recentActivity' => $recentActivity,
             'partnershipSince' => $partnershipSince,
             'userOptedIn' => $userOptedIn,
+            'partnerCommunities' => $partnerCommunities,
+            'currentScope' => $currentScope,
             'basePath' => $basePath
         ]);
     }

@@ -5,6 +5,7 @@
  */
 $pageTitle = $pageTitle ?? "Federated Listing";
 $hideHero = true;
+$bodyClass = 'civicone--federation';
 
 Nexus\Core\SEO::setTitle(($listing['title'] ?? 'Listing') . ' - Federated');
 Nexus\Core\SEO::setDescription('Listing details from a partner timebank in the federation network.');

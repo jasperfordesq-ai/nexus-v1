@@ -115,6 +115,31 @@ function getSourceBadgeClass($source) {
     </div>
 </div>
 
+<!-- Tenant Version Management Panel -->
+<div class="admin-glass-card tenant-version-panel">
+    <div class="admin-card-header">
+        <div class="admin-card-header-icon" style="background: linear-gradient(135deg, #f59e0b, #d97706);">
+            <i class="fa-solid fa-code-branch"></i>
+        </div>
+        <div class="admin-card-header-content">
+            <h3 class="admin-card-title">Terms & Privacy Version Control</h3>
+            <p class="admin-card-subtitle">Update versions to require users to re-accept your terms</p>
+        </div>
+    </div>
+    <div class="admin-card-body">
+        <div class="version-info-banner">
+            <i class="fa-solid fa-info-circle"></i>
+            <p>When you update your Terms of Service or Privacy Policy, increase the version number below. All users who accepted an older version will be prompted to review and accept the new terms on their next login.</p>
+        </div>
+
+        <div class="version-cards" id="versionCards">
+            <div class="version-card-loading">
+                <i class="fa-solid fa-spinner fa-spin"></i> Loading version info...
+            </div>
+        </div>
+    </div>
+</div>
+
 <!-- Main Content Grid -->
 <div class="consent-content-grid">
     <!-- Consent Types Panel -->
@@ -366,19 +391,19 @@ function getSourceBadgeClass($source) {
 </div>
 
 <!-- New Consent Type Modal -->
-<div class="modal" role="dialog" aria-modal="true"-overlay" id="newConsentTypeModal">
-    <div class="modal" role="dialog" aria-modal="true"-container">
-        <div class="modal" role="dialog" aria-modal="true"-header">
-            <h3 class="modal" role="dialog" aria-modal="true"-title">
+<div class=modal-overlay" id="newConsentTypeModal">
+    <div class=modal-container">
+        <div class=modal-header">
+            <h3 class=modal-title">
                 <i class="fa-solid fa-plus"></i> Create Consent Type
             </h3>
-            <button type="button" class="modal" role="dialog" aria-modal="true"-close" onclick="closeNewConsentTypeModal()">
+            <button type="button" class=modal-close" onclick="closeNewConsentTypeModal()">
                 <i class="fa-solid fa-xmark"></i>
             </button>
         </div>
         <form action="<?= $basePath ?>/admin/enterprise/gdpr/consents/types" method="POST">
             <input type="hidden" name="csrf_token" value="<?= Csrf::generate() ?>">
-            <div class="modal" role="dialog" aria-modal="true"-body">
+            <div class=modal-body">
                 <div class="form-row">
                     <div class="form-group">
                         <label class="form-label">Name <span class="required">*</span></label>
@@ -427,7 +452,7 @@ function getSourceBadgeClass($source) {
                     </div>
                 </div>
             </div>
-            <div class="modal" role="dialog" aria-modal="true"-footer">
+            <div class=modal-footer">
                 <button type="button" class="admin-btn admin-btn-secondary" onclick="closeNewConsentTypeModal()">Cancel</button>
                 <button type="submit" class="admin-btn admin-btn-primary">Create Consent Type</button>
             </div>
@@ -435,18 +460,63 @@ function getSourceBadgeClass($source) {
     </div>
 </div>
 
-<!-- Consent Detail Modal -->
-<div class="modal" role="dialog" aria-modal="true"-overlay" id="consentDetailModal">
-    <div class="modal" role="dialog" aria-modal="true"-container modal-sm">
-        <div class="modal" role="dialog" aria-modal="true"-header">
-            <h3 class="modal" role="dialog" aria-modal="true"-title">
-                <i class="fa-solid fa-file-lines"></i> Consent Details
+<!-- Update Version Modal -->
+<div class="modal-overlay" id="updateVersionModal">
+    <div class="modal-container modal-sm">
+        <div class="modal-header">
+            <h3 class="modal-title">
+                <i class="fa-solid fa-code-branch"></i> Update Version
             </h3>
-            <button type="button" class="modal" role="dialog" aria-modal="true"-close" onclick="closeConsentDetailModal()">
+            <button type="button" class="modal-close" onclick="closeUpdateVersionModal()">
                 <i class="fa-solid fa-xmark"></i>
             </button>
         </div>
-        <div class="modal" role="dialog" aria-modal="true"-body" id="consentDetailContent">
+        <div class="modal-body">
+            <input type="hidden" id="updateVersionSlug">
+
+            <div class="version-preview">
+                <div class="version-preview__row">
+                    <span class="version-preview__label">Document:</span>
+                    <span class="version-preview__value" id="updateVersionName">-</span>
+                </div>
+                <div class="version-preview__row">
+                    <span class="version-preview__label">Current Version:</span>
+                    <span class="version-preview__value" id="updateVersionCurrent">-</span>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">New Version <span class="required">*</span></label>
+                <input type="text" id="updateVersionNew" class="form-control" placeholder="e.g., 2.0" pattern="\d+\.\d+">
+                <small class="form-hint">Use format X.Y (e.g., 2.0, 2.1, 3.0)</small>
+            </div>
+
+            <div class="version-warning">
+                <i class="fa-solid fa-triangle-exclamation"></i>
+                <p>All users who accepted an earlier version will be prompted to review and re-accept the updated terms on their next login.</p>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="admin-btn admin-btn-secondary" onclick="closeUpdateVersionModal()">Cancel</button>
+            <button type="button" class="admin-btn admin-btn-primary" onclick="submitVersionUpdate()">
+                <i class="fa-solid fa-check"></i> Update Version
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Consent Detail Modal -->
+<div class="modal-overlay" id="consentDetailModal">
+    <div class=modal-container modal-sm">
+        <div class=modal-header">
+            <h3 class=modal-title">
+                <i class="fa-solid fa-file-lines"></i> Consent Details
+            </h3>
+            <button type="button" class=modal-close" onclick="closeConsentDetailModal()">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </div>
+        <div class=modal-body" id="consentDetailContent">
             <div class="loading-state">
                 <i class="fa-solid fa-spinner fa-spin"></i>
                 <span>Loading...</span>
@@ -456,6 +526,233 @@ function getSourceBadgeClass($source) {
 </div>
 
 <style>
+/* Tenant Version Panel */
+.tenant-version-panel {
+    margin-bottom: 1.5rem;
+}
+
+.version-info-banner {
+    display: flex;
+    gap: 0.75rem;
+    padding: 1rem;
+    background: rgba(245, 158, 11, 0.1);
+    border: 1px solid rgba(245, 158, 11, 0.3);
+    border-radius: 8px;
+    margin-bottom: 1.25rem;
+}
+
+.version-info-banner i {
+    color: #fbbf24;
+    font-size: 1rem;
+    flex-shrink: 0;
+    margin-top: 2px;
+}
+
+.version-info-banner p {
+    margin: 0;
+    font-size: 0.85rem;
+    color: rgba(255, 255, 255, 0.8);
+    line-height: 1.5;
+}
+
+.version-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1rem;
+}
+
+.version-card-loading {
+    text-align: center;
+    padding: 2rem;
+    color: rgba(255, 255, 255, 0.5);
+    grid-column: 1 / -1;
+}
+
+.version-card {
+    background: rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(99, 102, 241, 0.2);
+    border-radius: 12px;
+    padding: 1.25rem;
+    transition: all 0.2s;
+}
+
+.version-card:hover {
+    border-color: rgba(99, 102, 241, 0.4);
+}
+
+.version-card__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+}
+
+.version-card__title {
+    font-size: 1rem;
+    font-weight: 700;
+    color: #fff;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.version-card__title i {
+    color: #a5b4fc;
+}
+
+.version-card__badge {
+    font-size: 0.65rem;
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.version-card__badge--required {
+    background: rgba(239, 68, 68, 0.2);
+    color: #fca5a5;
+}
+
+.version-card__info {
+    display: flex;
+    gap: 1.5rem;
+    margin-bottom: 1rem;
+}
+
+.version-card__info-item {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.version-card__info-label {
+    font-size: 0.7rem;
+    color: rgba(255, 255, 255, 0.5);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.version-card__info-value {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #fff;
+}
+
+.version-card__info-value--global {
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 0.9rem;
+}
+
+.version-card__info-value--custom {
+    color: #10b981;
+}
+
+.version-card__actions {
+    display: flex;
+    gap: 0.5rem;
+    padding-top: 1rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.version-card__btn {
+    flex: 1;
+    padding: 0.6rem 1rem;
+    border-radius: 8px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    border: none;
+}
+
+.version-card__btn--primary {
+    background: linear-gradient(135deg, #6366f1, #8b5cf6);
+    color: white;
+}
+
+.version-card__btn--primary:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4);
+}
+
+.version-card__btn--secondary {
+    background: rgba(255, 255, 255, 0.1);
+    color: rgba(255, 255, 255, 0.8);
+}
+
+.version-card__btn--secondary:hover {
+    background: rgba(255, 255, 255, 0.15);
+}
+
+.version-card__btn--danger {
+    background: rgba(239, 68, 68, 0.15);
+    color: #fca5a5;
+}
+
+.version-card__btn--danger:hover {
+    background: rgba(239, 68, 68, 0.25);
+}
+
+.version-card__last-updated {
+    font-size: 0.75rem;
+    color: rgba(255, 255, 255, 0.4);
+    margin-top: 0.75rem;
+}
+
+/* Update Version Modal */
+#updateVersionModal .version-preview {
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 8px;
+    padding: 1rem;
+    margin-bottom: 1rem;
+}
+
+#updateVersionModal .version-preview__row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 0.5rem;
+}
+
+#updateVersionModal .version-preview__row:last-child {
+    margin-bottom: 0;
+}
+
+#updateVersionModal .version-preview__label {
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 0.85rem;
+}
+
+#updateVersionModal .version-preview__value {
+    font-weight: 600;
+    color: #fff;
+}
+
+#updateVersionModal .version-warning {
+    display: flex;
+    gap: 0.75rem;
+    padding: 1rem;
+    background: rgba(245, 158, 11, 0.15);
+    border: 1px solid rgba(245, 158, 11, 0.3);
+    border-radius: 8px;
+    margin-top: 1rem;
+}
+
+#updateVersionModal .version-warning i {
+    color: #fbbf24;
+    flex-shrink: 0;
+}
+
+#updateVersionModal .version-warning p {
+    margin: 0;
+    font-size: 0.85rem;
+    color: rgba(255, 255, 255, 0.8);
+}
+
 /* Page Header */
 .admin-page-header {
     display: flex;
@@ -1482,6 +1779,7 @@ document.addEventListener('keydown', function(e) {
     if (e.key === 'Escape') {
         closeNewConsentTypeModal();
         closeConsentDetailModal();
+        closeUpdateVersionModal();
     }
 });
 
@@ -1493,6 +1791,171 @@ document.querySelectorAll('.modal-overlay').forEach(modal => {
         }
     });
 });
+
+// ============================
+// Tenant Version Management
+// ============================
+
+// Load versions on page load
+document.addEventListener('DOMContentLoaded', loadTenantVersions);
+
+function loadTenantVersions() {
+    fetch(basePath + '/admin/enterprise/gdpr/consents/tenant-versions')
+        .then(r => r.json())
+        .then(data => {
+            renderVersionCards(data.versions || []);
+        })
+        .catch(err => {
+            console.error('Failed to load versions:', err);
+            document.getElementById('versionCards').innerHTML =
+                '<p style="color: #ef4444; text-align: center;">Failed to load version info</p>';
+        });
+}
+
+function renderVersionCards(versions) {
+    const container = document.getElementById('versionCards');
+
+    if (!versions.length) {
+        container.innerHTML = '<p style="color: rgba(255,255,255,0.5); text-align: center;">No consent types configured</p>';
+        return;
+    }
+
+    container.innerHTML = versions.map(v => {
+        const hasOverride = v.tenant_version !== null;
+        const effectiveVersion = v.effective_version || v.global_version;
+        const icon = v.slug === 'terms_of_service' ? 'fa-file-contract' : 'fa-shield-halved';
+        const lastUpdated = v.last_updated ? new Date(v.last_updated).toLocaleDateString() : null;
+
+        return `
+            <div class="version-card">
+                <div class="version-card__header">
+                    <h4 class="version-card__title">
+                        <i class="fa-solid ${icon}"></i>
+                        ${escapeHtml(v.name)}
+                    </h4>
+                    ${v.is_required ? '<span class="version-card__badge version-card__badge--required">Required</span>' : ''}
+                </div>
+
+                <div class="version-card__info">
+                    <div class="version-card__info-item">
+                        <span class="version-card__info-label">Effective Version</span>
+                        <span class="version-card__info-value ${hasOverride ? 'version-card__info-value--custom' : ''}">${effectiveVersion}</span>
+                    </div>
+                    <div class="version-card__info-item">
+                        <span class="version-card__info-label">Global Version</span>
+                        <span class="version-card__info-value version-card__info-value--global">${v.global_version}</span>
+                    </div>
+                </div>
+
+                <div class="version-card__actions">
+                    <button class="version-card__btn version-card__btn--primary" onclick="openUpdateVersionModal('${v.slug}', '${escapeHtml(v.name)}', '${effectiveVersion}')">
+                        <i class="fa-solid fa-arrow-up"></i> Update Version
+                    </button>
+                    ${hasOverride ? `
+                        <button class="version-card__btn version-card__btn--danger" onclick="revertToGlobal('${v.slug}')">
+                            <i class="fa-solid fa-rotate-left"></i> Revert
+                        </button>
+                    ` : ''}
+                </div>
+
+                ${lastUpdated ? `<div class="version-card__last-updated">Last updated: ${lastUpdated}</div>` : ''}
+            </div>
+        `;
+    }).join('');
+}
+
+function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
+
+function openUpdateVersionModal(slug, name, currentVersion) {
+    document.getElementById('updateVersionSlug').value = slug;
+    document.getElementById('updateVersionName').textContent = name;
+    document.getElementById('updateVersionCurrent').textContent = currentVersion;
+    document.getElementById('updateVersionNew').value = '';
+    document.getElementById('updateVersionModal').classList.add('show');
+    setTimeout(() => document.getElementById('updateVersionNew').focus(), 100);
+}
+
+function closeUpdateVersionModal() {
+    document.getElementById('updateVersionModal').classList.remove('show');
+}
+
+function submitVersionUpdate() {
+    const slug = document.getElementById('updateVersionSlug').value;
+    const newVersion = document.getElementById('updateVersionNew').value.trim();
+
+    if (!newVersion) {
+        alert('Please enter a new version number');
+        return;
+    }
+
+    if (!/^\d+\.\d+$/.test(newVersion)) {
+        alert('Version must be in format X.Y (e.g., 2.0)');
+        return;
+    }
+
+    const btn = event.target;
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Updating...';
+
+    fetch(basePath + '/admin/enterprise/gdpr/consents/tenant-version', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-Token': '<?= Csrf::generate() ?>'
+        },
+        body: JSON.stringify({
+            consent_slug: slug,
+            version: newVersion
+        })
+    })
+    .then(r => r.json())
+    .then(data => {
+        if (data.success) {
+            closeUpdateVersionModal();
+            loadTenantVersions();
+            alert(`Version updated to ${newVersion}. ${data.affected_users} users will be prompted to re-accept.`);
+        } else {
+            alert(data.error || 'Failed to update version');
+        }
+    })
+    .catch(err => {
+        console.error('Update error:', err);
+        alert('An error occurred');
+    })
+    .finally(() => {
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fa-solid fa-check"></i> Update Version';
+    });
+}
+
+function revertToGlobal(slug) {
+    if (!confirm('Revert to global version? Your tenant-specific version will be removed.')) {
+        return;
+    }
+
+    fetch(basePath + '/admin/enterprise/gdpr/consents/tenant-version/' + slug, {
+        method: 'DELETE',
+        headers: {
+            'X-CSRF-Token': '<?= Csrf::generate() ?>'
+        }
+    })
+    .then(r => r.json())
+    .then(data => {
+        if (data.success) {
+            loadTenantVersions();
+        } else {
+            alert(data.error || 'Failed to revert');
+        }
+    })
+    .catch(err => {
+        console.error('Revert error:', err);
+        alert('An error occurred');
+    });
+}
 </script>
 
 <?php require dirname(__DIR__, 2) . '/partials/admin-footer.php'; ?>

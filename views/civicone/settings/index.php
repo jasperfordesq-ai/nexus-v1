@@ -1,170 +1,230 @@
 <?php
-// CivicOne View: Settings - WCAG 2.1 AA Compliant
-// CSS extracted to civicone-help.css
+// CivicOne View: Account Settings - GOV.UK Check Answers Pattern
+// ===============================================================
+// Pattern: Template G - Check Answers with Summary list
+// WCAG 2.1 AA Compliant
+// Refactored: 2026-01-20
+
 $pageTitle = 'Account Settings';
 require dirname(__DIR__, 2) . '/layouts/civicone/header.php';
 
-$section = $_GET['section'] ?? 'general';
+$basePath = Nexus\Core\TenantContext::getBasePath();
 ?>
 
-<div class="civic-container">
+<div class="govuk-width-container">
+    <main class="govuk-main-wrapper">
 
-    <div class="civic-card civic-settings-header">
-        <h1 class="civic-settings-title">Settings</h1>
-    </div>
+        <!-- Page heading -->
+        <h1 class="govuk-heading-xl">Account Settings</h1>
 
-    <div class="civic-settings-grid">
-
-        <!-- Sidebar Navigation -->
-        <nav class="civic-card civic-settings-sidebar" aria-label="Settings sections">
-            <a href="?section=general"
-               class="civic-settings-nav-link <?= $section === 'general' ? 'civic-settings-nav-link--active' : '' ?>"
-               <?= $section === 'general' ? 'aria-current="page"' : '' ?>>
-                General
-            </a>
-            <a href="?section=profile"
-               class="civic-settings-nav-link <?= $section === 'profile' ? 'civic-settings-nav-link--active' : '' ?>"
-               <?= $section === 'profile' ? 'aria-current="page"' : '' ?>>
-                Profile &amp; Bio
-            </a>
-            <a href="?section=security"
-               class="civic-settings-nav-link <?= $section === 'security' ? 'civic-settings-nav-link--active' : '' ?>"
-               <?= $section === 'security' ? 'aria-current="page"' : '' ?>>
-                Security
-            </a>
-            <a href="?section=privacy"
-               class="civic-settings-nav-link <?= $section === 'privacy' ? 'civic-settings-nav-link--active' : '' ?>"
-               <?= $section === 'privacy' ? 'aria-current="page"' : '' ?>>
-                Privacy
-            </a>
-        </nav>
-
-        <!-- Content Area -->
-        <div class="civic-card civic-settings-content">
-
-            <?php if (isset($_GET['success'])): ?>
-                <div class="civic-settings-alert civic-settings-alert--success" role="status">
-                    Settings updated successfully.
+        <?php if (isset($_GET['success'])): ?>
+            <div class="govuk-notification-banner govuk-notification-banner--success" role="alert" aria-labelledby="govuk-notification-banner-title" data-module="govuk-notification-banner">
+                <div class="govuk-notification-banner__header">
+                    <h2 class="govuk-notification-banner__title" id="govuk-notification-banner-title">Success</h2>
                 </div>
-            <?php endif; ?>
-
-            <?php if (isset($_GET['error'])): ?>
-                <div class="civic-settings-alert civic-settings-alert--error" role="alert">
-                    An error occurred. Please check your inputs.
+                <div class="govuk-notification-banner__content">
+                    <p class="govuk-notification-banner__heading">Settings updated successfully.</p>
                 </div>
+            </div>
+        <?php endif; ?>
+
+        <?php if (isset($_GET['error'])): ?>
+            <div class="govuk-error-summary" aria-labelledby="error-summary-title" role="alert" data-module="govuk-error-summary">
+                <h2 class="govuk-error-summary__title" id="error-summary-title">There is a problem</h2>
+                <div class="govuk-error-summary__body">
+                    <p>An error occurred. Please check your inputs and try again.</p>
+                </div>
+            </div>
+        <?php endif; ?>
+
+        <!-- Profile Information Section -->
+        <h2 class="govuk-heading-l">Profile information</h2>
+        <dl class="govuk-summary-list">
+            <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">Full name</dt>
+                <dd class="govuk-summary-list__value"><?= htmlspecialchars($user['first_name'] . ' ' . $user['last_name']) ?></dd>
+                <dd class="govuk-summary-list__actions">
+                    <a class="govuk-link" href="<?= $basePath ?>/settings/profile/edit">
+                        Change<span class="govuk-visually-hidden"> full name</span>
+                    </a>
+                </dd>
+            </div>
+
+            <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">Email address</dt>
+                <dd class="govuk-summary-list__value"><?= htmlspecialchars($user['email'] ?? 'Not set') ?></dd>
+                <dd class="govuk-summary-list__actions">
+                    <a class="govuk-link" href="<?= $basePath ?>/settings/profile/edit">
+                        Change<span class="govuk-visually-hidden"> email address</span>
+                    </a>
+                </dd>
+            </div>
+
+            <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">About me</dt>
+                <dd class="govuk-summary-list__value">
+                    <?php if (!empty($user['bio'])): ?>
+                        <?= nl2br(htmlspecialchars(mb_substr($user['bio'], 0, 150) . (mb_strlen($user['bio']) > 150 ? '...' : ''))) ?>
+                    <?php else: ?>
+                        <span class="govuk-hint">Not set</span>
+                    <?php endif; ?>
+                </dd>
+                <dd class="govuk-summary-list__actions">
+                    <a class="govuk-link" href="<?= $basePath ?>/settings/profile/edit">
+                        Change<span class="govuk-visually-hidden"> about me bio</span>
+                    </a>
+                </dd>
+            </div>
+
+            <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">Profile picture</dt>
+                <dd class="govuk-summary-list__value">
+                    <?php if (!empty($user['avatar'])): ?>
+                        <img src="<?= htmlspecialchars($user['avatar']) ?>" alt="Profile picture" style="width: 60px; height: 60px; border-radius: 50%; object-fit: cover;">
+                    <?php else: ?>
+                        <span class="govuk-hint">Using default picture</span>
+                    <?php endif; ?>
+                </dd>
+                <dd class="govuk-summary-list__actions">
+                    <a class="govuk-link" href="<?= $basePath ?>/settings/profile/edit">
+                        Change<span class="govuk-visually-hidden"> profile picture</span>
+                    </a>
+                </dd>
+            </div>
+        </dl>
+
+        <!-- Security Section -->
+        <h2 class="govuk-heading-l govuk-!-margin-top-9">Security</h2>
+        <dl class="govuk-summary-list">
+            <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">Password</dt>
+                <dd class="govuk-summary-list__value">
+                    <span class="govuk-hint">Last changed <?= isset($user['password_changed_at']) ? date('j F Y', strtotime($user['password_changed_at'])) : 'Unknown' ?></span>
+                </dd>
+                <dd class="govuk-summary-list__actions">
+                    <a class="govuk-link" href="<?= $basePath ?>/settings/security/password">
+                        Change<span class="govuk-visually-hidden"> password</span>
+                    </a>
+                </dd>
+            </div>
+
+            <?php if (Nexus\Core\TenantContext::hasFeature('two_factor_auth')): ?>
+            <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">Two-factor authentication</dt>
+                <dd class="govuk-summary-list__value">
+                    <?php if (!empty($user['two_factor_enabled'])): ?>
+                        <strong class="govuk-tag govuk-tag--green">Enabled</strong>
+                    <?php else: ?>
+                        <strong class="govuk-tag govuk-tag--grey">Not enabled</strong>
+                    <?php endif; ?>
+                </dd>
+                <dd class="govuk-summary-list__actions">
+                    <a class="govuk-link" href="<?= $basePath ?>/settings/security/two-factor">
+                        <?= !empty($user['two_factor_enabled']) ? 'Manage' : 'Enable' ?><span class="govuk-visually-hidden"> two-factor authentication</span>
+                    </a>
+                </dd>
+            </div>
             <?php endif; ?>
+        </dl>
 
-            <?php if ($section === 'general' || $section === 'profile'): ?>
-                <h2 class="civic-settings-section-title">Profile Information</h2>
-                <form action="<?= Nexus\Core\TenantContext::getBasePath() ?>/settings/profile" method="POST" enctype="multipart/form-data">
-                    <div class="civic-settings-field">
-                        <label for="settings-name" class="civic-settings-label">Full Name</label>
-                        <input type="text"
-                               name="name"
-                               id="settings-name"
-                               class="civic-input civic-settings-input"
-                               value="<?= htmlspecialchars($user['first_name'] . ' ' . $user['last_name']) ?>">
-                    </div>
+        <!-- Privacy Section -->
+        <h2 class="govuk-heading-l govuk-!-margin-top-9">Privacy</h2>
+        <dl class="govuk-summary-list">
+            <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">Who can see my profile?</dt>
+                <dd class="govuk-summary-list__value">
+                    <?php
+                    $privacyProfile = $user['privacy_profile'] ?? 'public';
+                    $privacyLabels = [
+                        'public' => 'Everyone (Public)',
+                        'members' => 'Members only',
+                        'connections' => 'My connections only'
+                    ];
+                    echo htmlspecialchars($privacyLabels[$privacyProfile] ?? 'Everyone (Public)');
+                    ?>
+                </dd>
+                <dd class="govuk-summary-list__actions">
+                    <a class="govuk-link" href="<?= $basePath ?>/settings/privacy/edit">
+                        Change<span class="govuk-visually-hidden"> who can see my profile</span>
+                    </a>
+                </dd>
+            </div>
 
-                    <div class="civic-settings-field">
-                        <label for="settings-bio" class="civic-settings-label">About Me (Bio)</label>
-                        <textarea name="bio"
-                                  id="settings-bio"
-                                  class="civic-input civic-settings-textarea"
-                                  rows="4"><?= htmlspecialchars($user['bio'] ?? '') ?></textarea>
-                    </div>
+            <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">Search engine visibility</dt>
+                <dd class="govuk-summary-list__value">
+                    <?php if (!empty($user['privacy_search'])): ?>
+                        Allow search engines to index my profile
+                    <?php else: ?>
+                        Do not allow search engines to index my profile
+                    <?php endif; ?>
+                </dd>
+                <dd class="govuk-summary-list__actions">
+                    <a class="govuk-link" href="<?= $basePath ?>/settings/privacy/edit">
+                        Change<span class="govuk-visually-hidden"> search engine visibility</span>
+                    </a>
+                </dd>
+            </div>
+        </dl>
 
-                    <div class="civic-settings-field">
-                        <label for="settings-avatar" class="civic-settings-label">Profile Picture</label>
-                        <?php if (!empty($user['avatar'])): ?>
-                            <img src="<?= $user['avatar'] ?>"
-                                 alt="Current profile picture"
-                                 class="civic-settings-avatar-preview">
-                        <?php endif; ?>
-                        <input type="file"
-                               name="avatar"
-                               id="settings-avatar"
-                               class="civic-input civic-settings-input"
-                               accept="image/*">
-                    </div>
+        <!-- Notifications Section (if feature enabled) -->
+        <?php if (Nexus\Core\TenantContext::hasFeature('notifications')): ?>
+        <h2 class="govuk-heading-l govuk-!-margin-top-9">Notifications</h2>
+        <dl class="govuk-summary-list">
+            <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">Email notifications</dt>
+                <dd class="govuk-summary-list__value">
+                    <?php if (!empty($user['email_notifications'])): ?>
+                        <strong class="govuk-tag govuk-tag--green">On</strong>
+                    <?php else: ?>
+                        <strong class="govuk-tag govuk-tag--grey">Off</strong>
+                    <?php endif; ?>
+                </dd>
+                <dd class="govuk-summary-list__actions">
+                    <a class="govuk-link" href="<?= $basePath ?>/settings/notifications/edit">
+                        Change<span class="govuk-visually-hidden"> email notification settings</span>
+                    </a>
+                </dd>
+            </div>
 
-                    <div class="civic-settings-actions">
-                        <button type="submit" class="civic-btn">Save Profile</button>
-                    </div>
-                </form>
+            <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">Push notifications</dt>
+                <dd class="govuk-summary-list__value">
+                    <?php if (!empty($user['push_notifications'])): ?>
+                        <strong class="govuk-tag govuk-tag--green">On</strong>
+                    <?php else: ?>
+                        <strong class="govuk-tag govuk-tag--grey">Off</strong>
+                    <?php endif; ?>
+                </dd>
+                <dd class="govuk-summary-list__actions">
+                    <a class="govuk-link" href="<?= $basePath ?>/settings/notifications/edit">
+                        Change<span class="govuk-visually-hidden"> push notification settings</span>
+                    </a>
+                </dd>
+            </div>
+        </dl>
+        <?php endif; ?>
 
-            <?php elseif ($section === 'security'): ?>
-                <h2 class="civic-settings-section-title">Change Password</h2>
-                <form action="<?= Nexus\Core\TenantContext::getBasePath() ?>/settings/password" method="POST">
-                    <div class="civic-settings-field">
-                        <label for="current-password" class="civic-settings-label">Current Password</label>
-                        <input type="password"
-                               name="current_password"
-                               id="current-password"
-                               class="civic-input civic-settings-input"
-                               required
-                               autocomplete="current-password">
-                    </div>
+        <!-- Account Management Section -->
+        <h2 class="govuk-heading-l govuk-!-margin-top-9">Account management</h2>
 
-                    <div class="civic-settings-field">
-                        <label for="new-password" class="civic-settings-label">New Password</label>
-                        <input type="password"
-                               name="new_password"
-                               id="new-password"
-                               class="civic-input civic-settings-input"
-                               required
-                               autocomplete="new-password">
-                    </div>
-
-                    <div class="civic-settings-field">
-                        <label for="confirm-password" class="civic-settings-label">Confirm New Password</label>
-                        <input type="password"
-                               name="confirm_password"
-                               id="confirm-password"
-                               class="civic-input civic-settings-input"
-                               required
-                               autocomplete="new-password">
-                    </div>
-
-                    <div class="civic-settings-actions">
-                        <button type="submit" class="civic-btn">Update Password</button>
-                    </div>
-                </form>
-
-            <?php elseif ($section === 'privacy'): ?>
-                <h2 class="civic-settings-section-title">Privacy Settings</h2>
-                <form action="<?= Nexus\Core\TenantContext::getBasePath() ?>/settings/privacy" method="POST">
-                    <div class="civic-settings-field">
-                        <label for="privacy-profile" class="civic-settings-label">Who can see my profile?</label>
-                        <select name="privacy_profile" id="privacy-profile" class="civic-input civic-settings-select">
-                            <option value="public" <?= ($user['privacy_profile'] ?? 'public') === 'public' ? 'selected' : '' ?>>Everyone (Public)</option>
-                            <option value="members" <?= ($user['privacy_profile'] ?? 'public') === 'members' ? 'selected' : '' ?>>Members Only</option>
-                            <option value="connections" <?= ($user['privacy_profile'] ?? 'public') === 'connections' ? 'selected' : '' ?>>My Connections Only</option>
-                        </select>
-                    </div>
-
-                    <div class="civic-settings-checkbox-field">
-                        <input type="checkbox"
-                               name="privacy_search"
-                               value="1"
-                               id="privacy-search"
-                               class="civic-settings-checkbox"
-                               <?= !empty($user['privacy_search']) ? 'checked' : '' ?>>
-                        <label for="privacy-search" class="civic-settings-checkbox-label">
-                            Allow me to be found in search results
-                        </label>
-                    </div>
-
-                    <div class="civic-settings-actions">
-                        <button type="submit" class="civic-btn">Save Privacy</button>
-                    </div>
-                </form>
-            <?php endif; ?>
-
+        <div class="govuk-inset-text">
+            <p class="govuk-body">Need to make changes to your account or have concerns about your data?</p>
+            <ul class="govuk-list govuk-list--bullet">
+                <li><a class="govuk-link" href="<?= $basePath ?>/settings/export">Download your data</a></li>
+                <li><a class="govuk-link" href="<?= $basePath ?>/settings/deactivate">Deactivate account</a></li>
+                <li><a class="govuk-link" href="<?= $basePath ?>/settings/delete">Delete account</a></li>
+            </ul>
         </div>
 
-    </div>
+        <!-- Back to profile link -->
+        <p class="govuk-body govuk-!-margin-top-6">
+            <a href="<?= $basePath ?>/profile/<?= $user['id'] ?>" class="govuk-link">
+                <span aria-hidden="true">←</span> Back to profile
+            </a>
+        </p>
 
+    </main>
 </div>
 
 <?php require dirname(__DIR__, 2) . '/layouts/civicone/footer.php'; ?>

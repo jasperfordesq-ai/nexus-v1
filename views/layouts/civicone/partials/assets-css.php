@@ -113,6 +113,7 @@
     <?php endif; ?>
     <?php if (strpos($normPath, '/dashboard') !== false): ?>
         <link rel="stylesheet" href="/assets/css/dashboard.min.css?v=<?= $cssVersion ?>">
+        <link rel="stylesheet" href="/assets/css/civicone-dashboard.min.css?v=<?= $cssVersion ?>">
     <?php endif; ?>
 
     <!-- Mobile Sheets CSS (base styles always load, CSS handles desktop hiding) -->
@@ -136,6 +137,20 @@
     <link rel="stylesheet" href="/assets/css/civicone-govuk-focus.min.css?v=<?= $cssVersion ?>">
     <link rel="stylesheet" href="/assets/css/civicone-govuk-buttons.min.css?v=<?= $cssVersion ?>">
     <link rel="stylesheet" href="/assets/css/civicone-govuk-forms.min.css?v=<?= $cssVersion ?>">
+    <link rel="stylesheet" href="/assets/css/civicone-govuk-components.min.css?v=<?= $cssVersion ?>">
+
+    <!-- CivicOne Layout (includes grid system - must load for all pages) -->
+    <link rel="stylesheet" href="/assets/css/civicone-header.min.css?v=<?= $cssVersion ?>">
+    <link rel="stylesheet" href="/assets/css/civicone-footer.min.css?v=<?= $cssVersion ?>">
+
+    <!-- Account Area Navigation (MOJ Sub navigation pattern) -->
+    <link rel="stylesheet" href="/assets/css/civicone-account-nav.min.css?v=<?= $cssVersion ?>">
+
+    <!-- Profile Header (MOJ Identity Bar pattern - WCAG 2.1 AA 2026-01-20) -->
+    <link rel="stylesheet" href="/assets/css/civicone-profile-header.min.css?v=<?= $cssVersion ?>">
+
+    <!-- Profile Social Components (Posts, Comments, Actions - WCAG 2.1 AA 2026-01-20) -->
+    <link rel="stylesheet" href="/assets/css/civicone-profile-social.min.css?v=<?= $cssVersion ?>">
 
     <!-- Emergency Scroll Fix - MUST be last to override all other styles -->
     <link rel="stylesheet" href="/assets/css/scroll-fix-emergency.min.css?v=<?= $cssVersion ?>">

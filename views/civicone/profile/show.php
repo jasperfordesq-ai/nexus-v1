@@ -1,6 +1,10 @@
 <?php
-// CivicOne View: User Profile - Enhanced with Social Features
-// =========================================================
+// CivicOne View: User Profile - GOV.UK Template C (Detail Page)
+// ==============================================================
+// Pattern: Template C - Detail page with 2/3 + 1/3 column split
+// Components: GOV.UK Summary list for profile details
+// WCAG 2.1 AA Compliant
+// Refactored: 2026-01-20
 
 if (session_status() === PHP_SESSION_NONE) session_start();
 
@@ -11,7 +15,7 @@ $tenantId = $_SESSION['current_tenant_id'] ?? 1;
 $isLoggedIn = !empty($currentUserId);
 
 // ---------------------------------------------------------
-// AJAX HANDLERS
+// AJAX HANDLERS (Preserved from original)
 // ---------------------------------------------------------
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
     ob_clean();
@@ -231,190 +235,242 @@ try {
 
 // Calculate online status for this user
 $profileLastActiveAt = $user['last_active_at'] ?? null;
-$isProfileOnline = $profileLastActiveAt && (strtotime($profileLastActiveAt) > strtotime('-5 minutes'));
+$profileIsOnline = $profileLastActiveAt && (strtotime($profileLastActiveAt) > strtotime('-5 minutes'));
+$profileIsRecentlyActive = $profileLastActiveAt && (strtotime($profileLastActiveAt) > strtotime('-24 hours')) && !$profileIsOnline;
+$profileStatusText = 'Offline';
+if ($profileIsOnline) {
+    $profileStatusText = 'Active now';
+} elseif ($profileIsRecentlyActive) {
+    $hours = floor((time() - strtotime($profileLastActiveAt)) / 3600);
+    $profileStatusText = $hours < 1 ? 'Active recently' : "Active {$hours}h ago";
+}
 
-// CSS extracted to external file per CLAUDE.md guidelines
-// WCAG 2.1 AA Compliant - See civicone-profile.css
+// Prepare variables for profile-header component
+$displayName = $user['name'] ?? ($user['first_name'] . ' ' . $user['last_name']);
+$userOrganizations = $userOrganizations ?? [];
+$headerReviewStats = $headerReviewStats ?? [];
+$headerAvgRating = $headerAvgRating ?? 0;
+$headerTotalReviews = $headerTotalReviews ?? 0;
+
+// Load header
 require __DIR__ . '/../../layouts/civicone/header.php';
 ?>
 
-<div class="civic-container">
-    <div class="civic-profile-grid">
+<!-- Profile Header Component (MOJ Identity Bar) -->
+<?php require __DIR__ . '/components/profile-header.php'; ?>
 
-        <!-- Sidebar: User Info -->
-        <div>
-            <div class="civic-profile-card">
-                <div class="civic-profile-avatar-wrapper">
-                    <img src="<?= htmlspecialchars($user['avatar_url'] ?? '/assets/images/default-avatar.svg') ?>" alt="Profile Photo" class="civic-profile-avatar">
-                    <?php if ($isProfileOnline): ?>
-                    <span class="civic-online-indicator" title="Active now"></span>
+<!-- Template C: Detail Page (2/3 + 1/3 layout) -->
+<div class="civicone-width-container">
+    <main class="civicone-main-wrapper" id="main-content">
+        <div class="civicone-grid-row">
+
+            <!-- Main Content: 2/3 Column -->
+            <div class="civicone-grid-column-two-thirds">
+
+                <!-- GOV.UK Summary List: Profile Details -->
+                <h2 class="civicone-heading-l">Profile Information</h2>
+
+                <dl class="civicone-summary-list">
+                    <div class="civicone-summary-list__row">
+                        <dt class="civicone-summary-list__key">Full name</dt>
+                        <dd class="civicone-summary-list__value"><?= htmlspecialchars($displayName) ?></dd>
+                    </div>
+
+                    <?php if (!empty($user['location'])): ?>
+                    <div class="civicone-summary-list__row">
+                        <dt class="civicone-summary-list__key">Location</dt>
+                        <dd class="civicone-summary-list__value"><?= htmlspecialchars($user['location']) ?></dd>
+                    </div>
                     <?php endif; ?>
-                </div>
 
-                <div class="civic-profile-name"><?= htmlspecialchars($user['name']) ?></div>
-                <div class="civic-profile-location">
-                    <?= htmlspecialchars($user['location'] ?? 'Location Unknown') ?>
-                </div>
-
-                <div class="civic-profile-stats">
-                    <span style="display: block; font-size: 14px; text-transform: uppercase; margin-bottom: 5px;">Balance</span>
-                    <div class="civic-profile-balance"><?= number_format($user['balance'] ?? 0) ?> Credits</div>
-                    <div style="margin-top: 10px; font-size: 14px; color: #505A5F;">
-                        Exchanges: <strong><?= $exchangesCount ?? 0 ?></strong>
+                    <div class="civicone-summary-list__row">
+                        <dt class="civicone-summary-list__key">Member since</dt>
+                        <dd class="civicone-summary-list__value"><?= date('F Y', strtotime($user['created_at'])) ?></dd>
                     </div>
-                </div>
 
-                <?php if ($isLoggedIn && !$isOwner): ?>
-                <div style="display: flex; gap: 10px; margin-bottom: 10px;">
-                    <a href="<?= \Nexus\Core\TenantContext::getBasePath() ?>/messages/create?to=<?= $user['id'] ?>" class="civic-btn" style="flex: 1; padding: 10px 5px; font-size: 0.9rem;">Message</a>
-                    <a href="<?= \Nexus\Core\TenantContext::getBasePath() ?>/wallet?to=<?= $user['id'] ?>" class="civic-btn" style="flex: 1; padding: 10px 5px; font-size: 0.9rem; background: #059669;">Pay</a>
-                </div>
+                    <div class="civicone-summary-list__row">
+                        <dt class="civicone-summary-list__key">Credit balance</dt>
+                        <dd class="civicone-summary-list__value"><?= number_format($user['balance'] ?? 0) ?> Credits</dd>
+                    </div>
 
-                <?php if (!$connection): ?>
-                    <form action="<?= \Nexus\Core\TenantContext::getBasePath() ?>/connections/add" method="POST">
-                        <input type="hidden" name="receiver_id" value="<?= $user['id'] ?>">
-                        <button type="submit" class="civic-btn" style="width: 100%; background: #505A5F; padding: 10px;">Add Friend</button>
-                    </form>
-                <?php elseif ($connection['status'] === 'pending' && $connection['requester_id'] == $currentUserId): ?>
-                    <button disabled class="civic-btn" style="width: 100%; background: #E5E7EB; color: #9CA3AF; cursor: not-allowed; padding: 10px;">Request Sent</button>
-                <?php elseif ($connection['status'] === 'pending' && $connection['receiver_id'] == $currentUserId): ?>
-                    <form action="<?= \Nexus\Core\TenantContext::getBasePath() ?>/connections/accept" method="POST">
-                        <input type="hidden" name="connection_id" value="<?= $connection['id'] ?>">
-                        <button type="submit" class="civic-btn" style="width: 100%; padding: 10px;">Accept Request</button>
-                    </form>
-                <?php elseif ($connection['status'] === 'accepted'): ?>
-                    <div style="margin-top: 10px; color: #059669; font-weight: bold;">✓ Connected</div>
-                <?php endif; ?>
-                <?php endif; ?>
+                    <div class="civicone-summary-list__row">
+                        <dt class="civicone-summary-list__key">Exchanges</dt>
+                        <dd class="civicone-summary-list__value"><?= $exchangesCount ?? 0 ?></dd>
+                    </div>
 
+                    <?php if (!empty($user['bio'])): ?>
+                    <div class="civicone-summary-list__row">
+                        <dt class="civicone-summary-list__key">About</dt>
+                        <dd class="civicone-summary-list__value"><?= nl2br(htmlspecialchars($user['bio'])) ?></dd>
+                    </div>
+                    <?php endif; ?>
+                </dl>
+
+                <!-- Post Composer (Owner only) -->
                 <?php if ($isOwner): ?>
-                    <a href="<?= \Nexus\Core\TenantContext::getBasePath() ?>/profile/edit" class="civic-btn" style="width: 100%; background: #505A5F;">Edit Profile</a>
+                <div class="civic-composer govuk-!-margin-top-6">
+                    <h2 class="civicone-heading-m">Share an update</h2>
+                    <form method="POST" enctype="multipart/form-data">
+                        <div class="civicone-form-group">
+                            <textarea name="content" class="civicone-textarea" rows="3" placeholder="What's on your mind?" required></textarea>
+                        </div>
+                        <div class="civic-composer-actions">
+                            <label class="civicone-button civicone-button--secondary" style="cursor: pointer;">
+                                <i class="fa-solid fa-image" aria-hidden="true"></i> Add Photo
+                                <input type="file" name="image" accept="image/*" style="display: none;">
+                            </label>
+                            <button type="submit" class="civicone-button">Post</button>
+                        </div>
+                    </form>
+                </div>
                 <?php endif; ?>
-            </div>
 
-            <!-- About Section -->
-            <div class="civic-profile-card" style="margin-top: 20px;">
-                <h3 style="text-align: left; border-bottom: 2px solid #0B0C0C; padding-bottom: 10px; margin-bottom: 15px;">About</h3>
-                <?php if (!empty($user['bio'])): ?>
-                    <div style="text-align: left;"><?= $user['bio'] ?></div>
+                <!-- Posts Section -->
+                <h2 class="civicone-heading-l govuk-!-margin-top-8">
+                    <?= $isOwner ? 'Your Posts' : htmlspecialchars($displayName) . "'s Posts" ?>
+                </h2>
+
+                <?php if (empty($posts)): ?>
+                    <div class="civicone-inset-text">
+                        No posts yet.
+                    </div>
                 <?php else: ?>
-                    <p style="text-align: left; color: #505A5F; font-style: italic;">No bio yet.</p>
+                    <?php foreach ($posts as $post): ?>
+                        <div class="civic-post-card" id="post-<?= $post['id'] ?>">
+                            <!-- Post Header -->
+                            <div class="civic-post-header">
+                                <img src="<?= htmlspecialchars($post['author_avatar']) ?>" alt="" class="civic-avatar-sm">
+                                <div style="flex: 1;">
+                                    <div class="civicone-heading-s govuk-!-margin-bottom-1">
+                                        <?= htmlspecialchars($post['author_name']) ?>
+                                    </div>
+                                    <div class="civicone-body-s govuk-!-margin-bottom-0" style="color: #505a5f;">
+                                        <?= date('j F Y \a\t g:i a', strtotime($post['created_at'])) ?>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Post Content -->
+                            <div class="civic-post-content civicone-body">
+                                <?= nl2br(htmlspecialchars($post['content'])) ?>
+                            </div>
+
+                            <?php if (!empty($post['image_url'])): ?>
+                                <img src="<?= htmlspecialchars($post['image_url']) ?>" alt="" class="civic-post-image">
+                            <?php endif; ?>
+
+                            <!-- Post Actions -->
+                            <div class="civic-post-actions">
+                                <button class="civic-action-btn <?= $post['is_liked'] ? 'liked' : '' ?>"
+                                        onclick="toggleLike('post', <?= $post['id'] ?>, this)">
+                                    <i class="<?= $post['is_liked'] ? 'fa-solid' : 'fa-regular' ?> fa-heart" aria-hidden="true"></i>
+                                    <span class="like-count"><?= (int)$post['likes_count'] ?></span> Like
+                                </button>
+                                <button class="civic-action-btn" onclick="toggleComments('post', <?= $post['id'] ?>)">
+                                    <i class="fa-regular fa-comment" aria-hidden="true"></i>
+                                    <span class="comment-count"><?= (int)$post['comments_count'] ?></span> Comment
+                                </button>
+                            </div>
+
+                            <!-- Comments Section -->
+                            <div class="civic-comments-section" id="comments-section-post-<?= $post['id'] ?>">
+                                <div class="comments-list">
+                                    <div class="civicone-body-s" style="color: #505a5f; text-align: center; padding: 20px;">Click to load comments</div>
+                                </div>
+
+                                <?php if ($isLoggedIn): ?>
+                                <div class="civic-comment-form">
+                                    <input type="text" class="civic-comment-input civicone-input" placeholder="Write a comment..."
+                                           onkeydown="if(event.key === 'Enter') submitComment(this, 'post', <?= $post['id'] ?>)">
+                                    <button class="civicone-button civic-comment-submit" onclick="submitComment(this.previousElementSibling, 'post', <?= $post['id'] ?>)">Post</button>
+                                </div>
+                                <?php endif; ?>
+                            </div>
+                        </div>
+                    <?php endforeach; ?>
+                <?php endif; ?>
+
+                <!-- Reviews Section -->
+                <h2 class="civicone-heading-l govuk-!-margin-top-8" id="reviews-section">Reviews</h2>
+
+                <?php if (empty($reviews)): ?>
+                    <div class="civicone-inset-text">
+                        No reviews yet.
+                    </div>
+                <?php else: ?>
+                    <?php foreach ($reviews as $review): ?>
+                        <div class="civicone-summary-card">
+                            <div class="civicone-summary-card__title-wrapper">
+                                <h2 class="civicone-summary-card__title"><?= htmlspecialchars($review['reviewer_name'] ?? 'Anonymous') ?></h2>
+                                <div class="civicone-summary-card__actions">
+                                    <span style="color: #f47738; font-size: 1.2rem;" aria-label="Rating: <?= $review['rating'] ?> out of 5 stars">
+                                        <?= str_repeat('★', $review['rating']) ?><?= str_repeat('☆', 5 - $review['rating']) ?>
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="civicone-summary-card__content">
+                                <p class="civicone-body"><?= nl2br(htmlspecialchars($review['content'] ?? '')) ?></p>
+                                <p class="civicone-body-s" style="color: #505a5f; margin-top: 10px;">
+                                    <?= date('j F Y', strtotime($review['created_at'])) ?>
+                                </p>
+                            </div>
+                        </div>
+                    <?php endforeach; ?>
                 <?php endif; ?>
             </div>
-        </div>
 
-        <!-- Main Content: Posts & Reviews -->
-        <div>
-            <!-- Post Composer (Owner only) -->
-            <?php if ($isOwner): ?>
-            <div class="civic-composer">
-                <form method="POST" enctype="multipart/form-data">
-                    <textarea name="content" placeholder="What's on your mind?" required></textarea>
-                    <div class="civic-composer-actions">
-                        <label style="cursor: pointer; padding: 10px 16px; background: #F3F4F6; font-weight: 600;">
-                            <i class="fa-solid fa-image"></i> Photo
-                            <input type="file" name="image" accept="image/*" style="display: none;">
-                        </label>
-                        <button type="submit" class="civic-comment-submit">Post</button>
-                    </div>
-                </form>
-            </div>
-            <?php endif; ?>
+            <!-- Sidebar: 1/3 Column (Related Links/Actions) -->
+            <div class="civicone-grid-column-one-third">
+                <aside class="civicone-related-content">
+                    <h2 class="civicone-heading-m">Related content</h2>
 
-            <!-- Posts Section -->
-            <h3 style="border-bottom: 2px solid #0B0C0C; padding-bottom: 10px; margin-bottom: 20px;">
-                <?= $isOwner ? 'Your Posts' : htmlspecialchars($user['name']) . "'s Posts" ?>
-            </h3>
-
-            <?php if (empty($posts)): ?>
-                <div class="civic-card" style="text-align: center; padding: 40px; background: #fff; border: 2px solid #0B0C0C;">
-                    <p style="color: #505A5F;">No posts yet.</p>
-                </div>
-            <?php else: ?>
-                <?php foreach ($posts as $post): ?>
-                    <div class="civic-post-card" id="post-<?= $post['id'] ?>">
-                        <!-- Post Header -->
-                        <div class="civic-post-header">
-                            <img src="<?= htmlspecialchars($post['author_avatar']) ?>" alt="" class="civic-avatar-sm">
-                            <div style="flex: 1;">
-                                <div style="font-weight: 700; color: #0B0C0C;">
-                                    <?= htmlspecialchars($post['author_name']) ?>
-                                </div>
-                                <div style="font-size: 0.8rem; color: #505A5F;">
-                                    <?= date('M j, g:i a', strtotime($post['created_at'])) ?>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Post Content -->
-                        <div class="civic-post-content">
-                            <?= nl2br(htmlspecialchars($post['content'])) ?>
-                        </div>
-
-                        <?php if (!empty($post['image_url'])): ?>
-                            <img src="<?= htmlspecialchars($post['image_url']) ?>" alt="" class="civic-post-image">
-                        <?php endif; ?>
-
-                        <!-- Post Actions -->
-                        <div class="civic-post-actions">
-                            <button class="civic-action-btn <?= $post['is_liked'] ? 'liked' : '' ?>"
-                                    onclick="toggleLike('post', <?= $post['id'] ?>, this)">
-                                <i class="<?= $post['is_liked'] ? 'fa-solid' : 'fa-regular' ?> fa-heart"></i>
-                                <span class="like-count"><?= (int)$post['likes_count'] ?></span> Like
-                            </button>
-                            <button class="civic-action-btn" onclick="toggleComments('post', <?= $post['id'] ?>)">
-                                <i class="fa-regular fa-comment"></i>
-                                <span class="comment-count"><?= (int)$post['comments_count'] ?></span> Comment
-                            </button>
-                        </div>
-
-                        <!-- Comments Section -->
-                        <div class="civic-comments-section" id="comments-section-post-<?= $post['id'] ?>">
-                            <div class="comments-list">
-                                <div style="color: #505A5F; text-align: center; padding: 20px;">Click to load comments</div>
-                            </div>
-
-                            <?php if ($isLoggedIn): ?>
-                            <div class="civic-comment-form">
-                                <input type="text" class="civic-comment-input" placeholder="Write a comment..."
-                                       onkeydown="if(event.key === 'Enter') submitComment(this, 'post', <?= $post['id'] ?>)">
-                                <button class="civic-comment-submit" onclick="submitComment(this.previousElementSibling, 'post', <?= $post['id'] ?>)">Post</button>
-                            </div>
+                    <nav role="navigation" aria-labelledby="subsection-title">
+                        <ul class="civicone-list govuk-!-font-size-16">
+                            <?php if ($isOwner): ?>
+                                <li><a class="civicone-link" href="<?= \Nexus\Core\TenantContext::getBasePath() ?>/profile/edit">Edit your profile</a></li>
+                                <li><a class="civicone-link" href="<?= \Nexus\Core\TenantContext::getBasePath() ?>/settings">Account settings</a></li>
+                                <?php if (\Nexus\Core\TenantContext::hasFeature('timebanking')): ?>
+                                <li><a class="civicone-link" href="<?= \Nexus\Core\TenantContext::getBasePath() ?>/wallet">View your wallet</a></li>
+                                <li><a class="civicone-link" href="<?= \Nexus\Core\TenantContext::getBasePath() ?>/wallet/insights">Wallet insights</a></li>
+                                <?php endif; ?>
+                            <?php else: ?>
+                                <li><a class="civicone-link" href="<?= \Nexus\Core\TenantContext::getBasePath() ?>/messages/create?to=<?= $user['id'] ?>">Send a message</a></li>
+                                <?php if (\Nexus\Core\TenantContext::hasFeature('timebanking')): ?>
+                                <li><a class="civicone-link" href="<?= \Nexus\Core\TenantContext::getBasePath() ?>/wallet?to=<?= $user['id'] ?>">Send credits</a></li>
+                                <?php endif; ?>
+                                <li><a class="civicone-link" href="<?= \Nexus\Core\TenantContext::getBasePath() ?>/members">Browse all members</a></li>
                             <?php endif; ?>
-                        </div>
-                    </div>
-                <?php endforeach; ?>
-            <?php endif; ?>
+                        </ul>
+                    </nav>
 
-            <!-- Reviews Section -->
-            <h3 style="margin-top: 40px; border-bottom: 2px solid #0B0C0C; padding-bottom: 10px; margin-bottom: 20px;">Reviews</h3>
+                    <?php if (!empty($userOrganizations)): ?>
+                    <h3 class="civicone-heading-s govuk-!-margin-top-6">Organizations</h3>
+                    <ul class="civicone-list govuk-!-font-size-16">
+                        <?php foreach ($userOrganizations as $org): ?>
+                            <li>
+                                <a class="civicone-link" href="<?= \Nexus\Core\TenantContext::getBasePath() ?>/organizations/<?= $org['id'] ?>">
+                                    <?= htmlspecialchars($org['name']) ?>
+                                    <?php if ($org['member_role'] === 'owner'): ?>
+                                        <span class="civicone-tag civicone-tag--yellow">Owner</span>
+                                    <?php elseif ($org['member_role'] === 'admin'): ?>
+                                        <span class="civicone-tag civicone-tag--purple">Admin</span>
+                                    <?php endif; ?>
+                                </a>
+                            </li>
+                        <?php endforeach; ?>
+                    </ul>
+                    <?php endif; ?>
+                </aside>
+            </div>
 
-            <?php if (empty($reviews)): ?>
-                <div class="civic-card" style="text-align: center; padding: 40px; background: #fff; border: 2px solid #0B0C0C;">
-                    <p style="color: #505A5F;">No reviews yet.</p>
-                </div>
-            <?php else: ?>
-                <?php foreach ($reviews as $review): ?>
-                    <div class="civic-card" style="background: #fff; border: 2px solid #0B0C0C; padding: 20px; margin-bottom: 15px;">
-                        <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
-                            <strong><?= htmlspecialchars($review['reviewer_name'] ?? 'Anonymous') ?></strong>
-                            <span style="color: #505A5F; font-size: 14px;"><?= $review['created_at'] ?></span>
-                        </div>
-                        <p><?= nl2br(htmlspecialchars($review['content'] ?? '')) ?></p>
-                        <div style="color: #F59E0B; font-size: 1.2rem;">
-                            <?= str_repeat('★', $review['rating']) ?><?= str_repeat('☆', 5 - $review['rating']) ?>
-                        </div>
-                    </div>
-                <?php endforeach; ?>
-            <?php endif; ?>
         </div>
-
-    </div>
+    </main>
 </div>
 
 <!-- Toast Notification -->
 <div class="civic-toast" id="civic-toast"></div>
 
+<!-- JavaScript for social interactions -->
 <script>
 const IS_LOGGED_IN = <?= $isLoggedIn ? 'true' : 'false' ?>;
 let availableReactions = [];
@@ -473,7 +529,7 @@ function toggleComments(type, id) {
 function fetchComments(type, id) {
     const section = document.getElementById(`comments-section-${type}-${id}`);
     const list = section.querySelector('.comments-list');
-    list.innerHTML = '<div style="color: #505A5F; text-align: center; padding: 20px;">Loading...</div>';
+    list.innerHTML = '<div class="civicone-body-s" style="color: #505a5f; text-align: center; padding: 20px;">Loading...</div>';
 
     currentTargetType = type;
     currentTargetId = id;
@@ -492,12 +548,12 @@ function fetchComments(type, id) {
             if (data.status === 'success' && data.comments && data.comments.length > 0) {
                 list.innerHTML = data.comments.map(c => renderComment(c, 0)).join('');
             } else {
-                list.innerHTML = '<div style="color: #505A5F; text-align: center; padding: 20px;">No comments yet. Be the first!</div>';
+                list.innerHTML = '<div class="civicone-body-s" style="color: #505a5f; text-align: center; padding: 20px;">No comments yet. Be the first!</div>';
             }
         })
         .catch(err => {
             console.error('Fetch error:', err);
-            list.innerHTML = '<div style="color: #D4351C; text-align: center; padding: 20px;">Error loading comments</div>';
+            list.innerHTML = '<div class="civicone-body-s" style="color: #d4351c; text-align: center; padding: 20px;">Error loading comments</div>';
         });
 }
 
@@ -509,29 +565,29 @@ function escapeHtml(text) {
 
 function renderComment(c, depth) {
     const marginLeft = depth * 40;
-    const isEdited = c.is_edited ? '<span style="font-size: 0.7rem; color: #505A5F;"> (edited)</span>' : '';
+    const isEdited = c.is_edited ? '<span style="font-size: 0.7rem; color: #505a5f;"> (edited)</span>' : '';
     const ownerActions = c.is_owner ? `
-        <span onclick="editComment(${c.id}, '${escapeHtml(c.content).replace(/'/g, "\\'").replace(/\n/g, "\\n")}')" style="cursor: pointer;" title="Edit">✏️</span>
-        <span onclick="deleteComment(${c.id})" style="cursor: pointer; margin-left: 5px;" title="Delete">🗑️</span>
+        <span onclick="editComment(${c.id}, '${escapeHtml(c.content).replace(/'/g, "\\'").replace(/\n/g, "\\n")}')" style="cursor: pointer;" title="Edit" tabindex="0" role="button" aria-label="Edit comment">✏️</span>
+        <span onclick="deleteComment(${c.id})" style="cursor: pointer; margin-left: 5px;" title="Delete" tabindex="0" role="button" aria-label="Delete comment">🗑️</span>
     ` : '';
 
     // Reactions
     const reactions = Object.entries(c.reactions || {}).map(([emoji, count]) => {
         const isActive = (c.user_reactions || []).includes(emoji);
-        return `<span class="civic-reaction ${isActive ? 'active' : ''}" onclick="toggleReaction(${c.id}, '${emoji}')">${emoji} ${count}</span>`;
+        return `<span class="civic-reaction ${isActive ? 'active' : ''}" onclick="toggleReaction(${c.id}, '${emoji}')" role="button" tabindex="0">${emoji} ${count}</span>`;
     }).join('');
 
     // Reaction picker
     const reactionPicker = IS_LOGGED_IN ? `
         <div class="civic-reaction-picker">
-            <span class="civic-reaction" onclick="toggleReactionPicker(${c.id})">+</span>
+            <span class="civic-reaction" onclick="toggleReactionPicker(${c.id})" role="button" tabindex="0" aria-label="Add reaction">+</span>
             <div class="civic-reaction-picker-menu" id="picker-${c.id}">
-                ${availableReactions.map(e => `<span onclick="toggleReaction(${c.id}, '${e}')">${e}</span>`).join('')}
+                ${availableReactions.map(e => `<span onclick="toggleReaction(${c.id}, '${e}')" role="button" tabindex="0">${e}</span>`).join('')}
             </div>
         </div>
     ` : '';
 
-    const replyBtn = IS_LOGGED_IN ? `<span onclick="showReplyForm(${c.id})">Reply</span>` : '';
+    const replyBtn = IS_LOGGED_IN ? `<span onclick="showReplyForm(${c.id})" role="button" tabindex="0">Reply</span>` : '';
 
     const replies = (c.replies || []).map(r => renderComment(r, depth + 1)).join('');
 
@@ -553,9 +609,9 @@ function renderComment(c, depth) {
                 </div>
                 <div class="civic-reply-form" id="reply-form-${c.id}">
                     <div style="display: flex; gap: 8px;">
-                        <input type="text" class="civic-reply-input" placeholder="Write a reply..."
+                        <input type="text" class="civic-reply-input civicone-input" placeholder="Write a reply..."
                                onkeydown="if(event.key === 'Enter') submitReply(${c.id}, this)">
-                        <button class="civic-comment-submit" onclick="submitReply(${c.id}, this.previousElementSibling)" style="padding: 8px 16px;">Reply</button>
+                        <button class="civicone-button civic-comment-submit" onclick="submitReply(${c.id}, this.previousElementSibling)" style="padding: 8px 16px;">Reply</button>
                     </div>
                 </div>
             </div>

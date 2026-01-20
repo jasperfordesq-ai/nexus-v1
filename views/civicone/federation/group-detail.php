@@ -5,6 +5,7 @@
  */
 $pageTitle = $pageTitle ?? "Federated Group";
 $hideHero = true;
+$bodyClass = 'civicone--federation';
 
 Nexus\Core\SEO::setTitle(($group['name'] ?? 'Group') . ' - Federated');
 Nexus\Core\SEO::setDescription('Group details from a partner timebank in the federation network.');

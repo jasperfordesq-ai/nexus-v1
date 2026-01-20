@@ -65,6 +65,24 @@ class Database
         $start = microtime(true);
 
         try {
+            // Validate parameters to prevent array-to-string conversion errors
+            foreach ($params as $key => $value) {
+                if (is_array($value)) {
+                    $backtrace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 3);
+                    $caller = $backtrace[1] ?? [];
+                    $location = isset($caller['file']) && isset($caller['line'])
+                        ? $caller['file'] . ':' . $caller['line']
+                        : 'unknown';
+
+                    throw new \InvalidArgumentException(
+                        "Array parameter detected at key '$key'. " .
+                        "PDO cannot bind array values directly. " .
+                        "Use IN (?, ?, ...) with flattened parameters instead. " .
+                        "Called from: $location"
+                    );
+                }
+            }
+
             $stmt = self::getInstance()->prepare($sql);
             $stmt->execute($params);
 

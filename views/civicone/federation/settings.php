@@ -6,6 +6,7 @@
 $pageTitle = $pageTitle ?? "Federation Settings";
 $pageSubtitle = "Manage your federation preferences";
 $hideHero = true;
+$bodyClass = 'civicone--federation';
 
 require dirname(dirname(__DIR__)) . '/layouts/civicone/header.php';
 $basePath = $basePath ?? Nexus\Core\TenantContext::getBasePath();

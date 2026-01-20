@@ -73,12 +73,27 @@ class FederatedListingController
         // Get categories for filter
         $categories = $this->getCategories();
 
-        View::render('federation/listings', [
+        // Get partner communities for scope switcher (if any)
+        $partnerCommunities = array_map(fn($t) => [
+            'id' => $t['id'],
+            'name' => $t['name']
+        ], $partnerTenants);
+
+        $currentScope = $_GET['scope'] ?? 'all';
+
+        // Use CivicOne wrapper if CivicOne layout is active
+        $viewPath = (layout() === 'civicone')
+            ? 'civicone/federation/listings'
+            : 'federation/listings';
+
+        View::render($viewPath, [
             'listings' => $listings,
             'partnerTenants' => $partnerTenants,
             'categories' => $categories,
             'filters' => $filters,
             'partnerships' => $activePartnerships,
+            'partnerCommunities' => $partnerCommunities,
+            'currentScope' => $currentScope,
             'pageTitle' => 'Federated Listings'
         ]);
     }

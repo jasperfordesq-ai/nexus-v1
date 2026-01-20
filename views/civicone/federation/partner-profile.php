@@ -2,12 +2,18 @@
 /**
  * Federation Partner Profile
  * CivicOne Theme - WCAG 2.1 AA Compliant
+ * Template: Detail Page with GOV.UK patterns
  */
 $pageTitle = $pageTitle ?? "Partner Timebank";
 $hideHero = true;
+$bodyClass = 'civicone--federation';
+$currentPage = 'hub';
+
+\Nexus\Core\SEO::setTitle(($partner['name'] ?? 'Partner') . ' - Partner Timebank Profile');
+\Nexus\Core\SEO::setDescription('View details and available features from ' . ($partner['name'] ?? 'partner timebank'));
 
 require dirname(dirname(__DIR__)) . '/layouts/civicone/header.php';
-$basePath = $basePath ?? Nexus\Core\TenantContext::getBasePath();
+$basePath = \Nexus\Core\TenantContext::getBasePath();
 
 // Extract data passed from controller
 $partner = $partner ?? [];
@@ -17,6 +23,8 @@ $stats = $stats ?? [];
 $recentActivity = $recentActivity ?? [];
 $partnershipSince = $partnershipSince ?? null;
 $userOptedIn = $userOptedIn ?? false;
+$partnerCommunities = $partnerCommunities ?? [];
+$currentScope = $currentScope ?? 'all';
 
 // Format partnership date
 $partnerSinceFormatted = $partnershipSince ? date('F Y', strtotime($partnershipSince)) : 'Unknown';
@@ -25,273 +33,294 @@ $partnerSinceFormatted = $partnershipSince ? date('F Y', strtotime($partnershipS
 $enabledFeatureCount = count(array_filter($features));
 ?>
 
-<!-- Offline Banner -->
-<div class="civic-fed-offline-banner" id="offlineBanner" role="alert" aria-live="polite">
-    <i class="fa-solid fa-wifi-slash" aria-hidden="true"></i>
-    <span>No internet connection</span>
-</div>
+<!-- Federation Scope Switcher (only if user has 2+ communities) -->
+<?php if (count($partnerCommunities) >= 2): ?>
+    <?php require dirname(dirname(__DIR__)) . '/layouts/civicone/partials/federation-scope-switcher.php'; ?>
+<?php endif; ?>
 
-<div class="civic-container">
-    <!-- Back Link -->
-    <a href="<?= $basePath ?>/federation" class="civic-fed-back-link" aria-label="Return to partner timebanks">
-        <i class="fa-solid fa-arrow-left" aria-hidden="true"></i>
-        Back to Partner Timebanks
-    </a>
+<!-- Federation Service Navigation -->
+<?php require dirname(dirname(__DIR__)) . '/layouts/civicone/partials/federation-service-navigation.php'; ?>
 
-    <!-- Partner Header Card -->
-    <article class="civic-fed-partner-header-card" aria-labelledby="partner-name">
-        <header class="civic-fed-partner-header">
-            <div class="civic-fed-partner-logo" aria-hidden="true">
-                <?php if (!empty($partner['og_image_url'])): ?>
-                <img src="<?= htmlspecialchars($partner['og_image_url']) ?>" alt="" loading="lazy">
-                <?php else: ?>
-                <?= strtoupper(substr($partner['name'], 0, 2)) ?>
-                <?php endif; ?>
-            </div>
-            <div class="civic-fed-partner-info">
-                <h1 id="partner-name" class="civic-fed-partner-name"><?= htmlspecialchars($partner['name']) ?></h1>
-                <div class="civic-fed-partner-meta">
-                    <span class="civic-fed-partner-meta-item">
-                        <i class="fa-solid fa-handshake" aria-hidden="true"></i>
-                        Partner since <?= $partnerSinceFormatted ?>
-                    </span>
-                    <span class="civic-fed-partner-meta-item">
-                        <i class="fa-solid fa-puzzle-piece" aria-hidden="true"></i>
-                        <?= $enabledFeatureCount ?> features enabled
-                    </span>
-                    <?php if (!empty($partner['domain'])): ?>
-                    <span class="civic-fed-partner-meta-item">
-                        <i class="fa-solid fa-globe" aria-hidden="true"></i>
-                        <?= htmlspecialchars($partner['domain']) ?>
-                    </span>
-                    <?php endif; ?>
-                </div>
-                <?php if (!empty($partner['description'])): ?>
-                <p class="civic-fed-partner-description"><?= htmlspecialchars($partner['description']) ?></p>
-                <?php endif; ?>
-                <div class="civic-fed-status-badge civic-fed-status-badge--success" role="status">
-                    <i class="fa-solid fa-circle-check" aria-hidden="true"></i>
-                    Active Partnership
-                </div>
-            </div>
-        </header>
-    </article>
+<div class="civicone-width-container">
+    <main class="civicone-main-wrapper" id="main-content">
+        <!-- Back Link -->
+        <a href="<?= $basePath ?>/federation" class="govuk-back-link">Back to Partner Timebanks</a>
 
-    <!-- Stats Grid -->
-    <section class="civic-fed-stats-grid" aria-label="Partner statistics">
-        <?php if ($features['members']): ?>
-        <div class="civic-fed-stat-card">
-            <div class="civic-fed-stat-icon" aria-hidden="true">
-                <i class="fa-solid fa-users"></i>
-            </div>
-            <div class="civic-fed-stat-content">
-                <div class="civic-fed-stat-value"><?= number_format($stats['members']) ?></div>
-                <div class="civic-fed-stat-label">Members</div>
+        <!-- Partner Header Card -->
+        <div class="govuk-panel govuk-panel--confirmation">
+            <h1 class="govuk-panel__title" id="partner-name">
+                <?= htmlspecialchars($partner['name']) ?>
+            </h1>
+            <div class="govuk-panel__body">
+                <span class="govuk-tag govuk-tag--green">Active Partnership</span>
             </div>
         </div>
-        <?php endif; ?>
 
-        <?php if ($features['listings']): ?>
-        <div class="civic-fed-stat-card">
-            <div class="civic-fed-stat-icon" aria-hidden="true">
-                <i class="fa-solid fa-hand-holding-heart"></i>
+        <!-- Partner Information Summary -->
+        <dl class="govuk-summary-list govuk-!-margin-bottom-6">
+            <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">
+                    Partnership status
+                </dt>
+                <dd class="govuk-summary-list__value">
+                    Partner since <?= $partnerSinceFormatted ?>
+                </dd>
             </div>
-            <div class="civic-fed-stat-content">
-                <div class="civic-fed-stat-value"><?= number_format($stats['listings']) ?></div>
-                <div class="civic-fed-stat-label">Listings</div>
+            <?php if (!empty($partner['domain'])): ?>
+            <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">
+                    Website
+                </dt>
+                <dd class="govuk-summary-list__value">
+                    <?= htmlspecialchars($partner['domain']) ?>
+                </dd>
             </div>
-        </div>
-        <?php endif; ?>
-
-        <?php if ($features['events']): ?>
-        <div class="civic-fed-stat-card">
-            <div class="civic-fed-stat-icon" aria-hidden="true">
-                <i class="fa-solid fa-calendar-days"></i>
+            <?php endif; ?>
+            <?php if (!empty($partner['description'])): ?>
+            <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">
+                    About
+                </dt>
+                <dd class="govuk-summary-list__value">
+                    <?= htmlspecialchars($partner['description']) ?>
+                </dd>
             </div>
-            <div class="civic-fed-stat-content">
-                <div class="civic-fed-stat-value"><?= number_format($stats['events']) ?></div>
-                <div class="civic-fed-stat-label">Upcoming Events</div>
+            <?php endif; ?>
+            <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">
+                    Features enabled
+                </dt>
+                <dd class="govuk-summary-list__value">
+                    <strong><?= $enabledFeatureCount ?></strong> out of 6 features
+                </dd>
             </div>
-        </div>
-        <?php endif; ?>
+        </dl>
 
-        <?php if ($features['groups']): ?>
-        <div class="civic-fed-stat-card">
-            <div class="civic-fed-stat-icon" aria-hidden="true">
-                <i class="fa-solid fa-people-group"></i>
-            </div>
-            <div class="civic-fed-stat-content">
-                <div class="civic-fed-stat-value"><?= number_format($stats['groups']) ?></div>
-                <div class="civic-fed-stat-label">Groups</div>
-            </div>
-        </div>
-        <?php endif; ?>
-
-        <?php if ($features['transactions']): ?>
-        <div class="civic-fed-stat-card">
-            <div class="civic-fed-stat-icon" aria-hidden="true">
-                <i class="fa-solid fa-clock"></i>
-            </div>
-            <div class="civic-fed-stat-content">
-                <div class="civic-fed-stat-value"><?= number_format($stats['total_hours_exchanged'], 1) ?></div>
-                <div class="civic-fed-stat-label">Hours Exchanged</div>
-            </div>
-        </div>
-        <?php endif; ?>
-    </section>
-
-    <!-- Available Features -->
-    <section class="civic-fed-card" aria-labelledby="features-heading">
-        <h2 id="features-heading" class="civic-fed-section-title">
-            <i class="fa-solid fa-puzzle-piece" aria-hidden="true"></i>
-            Available Features
-        </h2>
-        <div class="civic-fed-features-grid" role="list">
-            <a href="<?= $basePath ?>/federation/members?tenant=<?= $partner['id'] ?>" class="civic-fed-feature-item <?= !$features['members'] ? 'civic-fed-feature-item--disabled' : '' ?>" role="listitem" <?= !$features['members'] ? 'aria-disabled="true" tabindex="-1"' : '' ?>>
-                <div class="civic-fed-feature-icon" aria-hidden="true">
-                    <i class="fa-solid fa-users"></i>
-                </div>
-                <div class="civic-fed-feature-info">
-                    <h4>Browse Members</h4>
-                    <p>View profiles from this timebank</p>
-                </div>
-                <span class="civic-fed-feature-status <?= $features['members'] ? 'civic-fed-feature-status--enabled' : 'civic-fed-feature-status--disabled' ?>">
-                    <?= $features['members'] ? 'Enabled' : 'Disabled' ?>
-                </span>
-            </a>
-
-            <a href="<?= $basePath ?>/federation/listings?tenant=<?= $partner['id'] ?>" class="civic-fed-feature-item <?= !$features['listings'] ? 'civic-fed-feature-item--disabled' : '' ?>" role="listitem" <?= !$features['listings'] ? 'aria-disabled="true" tabindex="-1"' : '' ?>>
-                <div class="civic-fed-feature-icon" aria-hidden="true">
-                    <i class="fa-solid fa-hand-holding-heart"></i>
-                </div>
-                <div class="civic-fed-feature-info">
-                    <h4>Browse Listings</h4>
-                    <p>Offers & requests</p>
-                </div>
-                <span class="civic-fed-feature-status <?= $features['listings'] ? 'civic-fed-feature-status--enabled' : 'civic-fed-feature-status--disabled' ?>">
-                    <?= $features['listings'] ? 'Enabled' : 'Disabled' ?>
-                </span>
-            </a>
-
-            <a href="<?= $basePath ?>/federation/events?tenant=<?= $partner['id'] ?>" class="civic-fed-feature-item <?= !$features['events'] ? 'civic-fed-feature-item--disabled' : '' ?>" role="listitem" <?= !$features['events'] ? 'aria-disabled="true" tabindex="-1"' : '' ?>>
-                <div class="civic-fed-feature-icon" aria-hidden="true">
-                    <i class="fa-solid fa-calendar-days"></i>
-                </div>
-                <div class="civic-fed-feature-info">
-                    <h4>Browse Events</h4>
-                    <p>Upcoming events to join</p>
-                </div>
-                <span class="civic-fed-feature-status <?= $features['events'] ? 'civic-fed-feature-status--enabled' : 'civic-fed-feature-status--disabled' ?>">
-                    <?= $features['events'] ? 'Enabled' : 'Disabled' ?>
-                </span>
-            </a>
-
-            <a href="<?= $basePath ?>/federation/groups?tenant=<?= $partner['id'] ?>" class="civic-fed-feature-item <?= !$features['groups'] ? 'civic-fed-feature-item--disabled' : '' ?>" role="listitem" <?= !$features['groups'] ? 'aria-disabled="true" tabindex="-1"' : '' ?>>
-                <div class="civic-fed-feature-icon" aria-hidden="true">
-                    <i class="fa-solid fa-people-group"></i>
-                </div>
-                <div class="civic-fed-feature-info">
-                    <h4>Browse Groups</h4>
-                    <p>Interest groups to join</p>
-                </div>
-                <span class="civic-fed-feature-status <?= $features['groups'] ? 'civic-fed-feature-status--enabled' : 'civic-fed-feature-status--disabled' ?>">
-                    <?= $features['groups'] ? 'Enabled' : 'Disabled' ?>
-                </span>
-            </a>
-
-            <div class="civic-fed-feature-item <?= !$features['messaging'] ? 'civic-fed-feature-item--disabled' : '' ?>" role="listitem">
-                <div class="civic-fed-feature-icon" aria-hidden="true">
-                    <i class="fa-solid fa-comments"></i>
-                </div>
-                <div class="civic-fed-feature-info">
-                    <h4>Cross-Messaging</h4>
-                    <p>Message members directly</p>
-                </div>
-                <span class="civic-fed-feature-status <?= $features['messaging'] ? 'civic-fed-feature-status--enabled' : 'civic-fed-feature-status--disabled' ?>">
-                    <?= $features['messaging'] ? 'Enabled' : 'Disabled' ?>
-                </span>
-            </div>
-
-            <div class="civic-fed-feature-item <?= !$features['transactions'] ? 'civic-fed-feature-item--disabled' : '' ?>" role="listitem">
-                <div class="civic-fed-feature-icon" aria-hidden="true">
-                    <i class="fa-solid fa-exchange-alt"></i>
-                </div>
-                <div class="civic-fed-feature-info">
-                    <h4>Hour Exchanges</h4>
-                    <p>Exchange time credits</p>
-                </div>
-                <span class="civic-fed-feature-status <?= $features['transactions'] ? 'civic-fed-feature-status--enabled' : 'civic-fed-feature-status--disabled' ?>">
-                    <?= $features['transactions'] ? 'Enabled' : 'Disabled' ?>
-                </span>
-            </div>
-        </div>
-    </section>
-
-    <!-- Recent Activity with Partner -->
-    <section class="civic-fed-card" aria-labelledby="activity-heading">
-        <h2 id="activity-heading" class="civic-fed-section-title">
-            <i class="fa-solid fa-clock-rotate-left" aria-hidden="true"></i>
-            Your Recent Activity
-        </h2>
-        <?php if (!empty($recentActivity)): ?>
-        <div class="civic-fed-activity-list" role="list" aria-label="Recent activity">
-            <?php foreach ($recentActivity as $activity): ?>
-            <div class="civic-fed-activity-item" role="listitem">
-                <div class="civic-fed-activity-icon" aria-hidden="true">
-                    <i class="fa-solid <?= htmlspecialchars($activity['icon']) ?>"></i>
-                </div>
-                <div class="civic-fed-activity-content">
-                    <p class="civic-fed-activity-text"><?= htmlspecialchars($activity['description']) ?></p>
-                    <span class="civic-fed-activity-time">
-                        <time datetime="<?= date('c', strtotime($activity['date'])) ?>"><?= date('M j, Y', strtotime($activity['date'])) ?></time>
-                    </span>
-                </div>
-            </div>
-            <?php endforeach; ?>
-        </div>
-        <?php else: ?>
-        <div class="civic-fed-empty civic-fed-empty--compact" role="status">
-            <i class="fa-solid fa-clock-rotate-left" aria-hidden="true"></i>
-            <p>No recent activity with this partner yet.</p>
-            <small>Start by browsing their members or listings!</small>
-        </div>
-        <?php endif; ?>
-
-        <!-- Quick Actions -->
-        <div class="civic-fed-actions" aria-label="Quick actions">
+        <!-- Stats Grid -->
+        <h2 class="govuk-heading-m">Statistics</h2>
+        <div class="govuk-grid-row" role="region" aria-label="Partner statistics">
             <?php if ($features['members']): ?>
-            <a href="<?= $basePath ?>/federation/members?tenant=<?= $partner['id'] ?>" class="civic-fed-btn civic-fed-btn--primary">
-                <i class="fa-solid fa-users" aria-hidden="true"></i>
-                Browse Members
-            </a>
+            <div class="govuk-grid-column-one-third">
+                <div class="civic-fed-stat-card">
+                    <div class="civic-fed-stat-icon" aria-hidden="true">
+                        <i class="fa-solid fa-users"></i>
+                    </div>
+                    <div class="civic-fed-stat-content">
+                        <div class="civic-fed-stat-value"><?= number_format($stats['members']) ?></div>
+                        <div class="civic-fed-stat-label">Members</div>
+                    </div>
+                </div>
+            </div>
             <?php endif; ?>
 
             <?php if ($features['listings']): ?>
-            <a href="<?= $basePath ?>/federation/listings?tenant=<?= $partner['id'] ?>" class="civic-fed-btn civic-fed-btn--secondary">
-                <i class="fa-solid fa-hand-holding-heart" aria-hidden="true"></i>
-                Browse Listings
-            </a>
+            <div class="govuk-grid-column-one-third">
+                <div class="civic-fed-stat-card">
+                    <div class="civic-fed-stat-icon" aria-hidden="true">
+                        <i class="fa-solid fa-hand-holding-heart"></i>
+                    </div>
+                    <div class="civic-fed-stat-content">
+                        <div class="civic-fed-stat-value"><?= number_format($stats['listings']) ?></div>
+                        <div class="civic-fed-stat-label">Listings</div>
+                    </div>
+                </div>
+            </div>
             <?php endif; ?>
 
             <?php if ($features['events']): ?>
-            <a href="<?= $basePath ?>/federation/events?tenant=<?= $partner['id'] ?>" class="civic-fed-btn civic-fed-btn--secondary">
-                <i class="fa-solid fa-calendar-days" aria-hidden="true"></i>
-                View Events
-            </a>
+            <div class="govuk-grid-column-one-third">
+                <div class="civic-fed-stat-card">
+                    <div class="civic-fed-stat-icon" aria-hidden="true">
+                        <i class="fa-solid fa-calendar-days"></i>
+                    </div>
+                    <div class="civic-fed-stat-content">
+                        <div class="civic-fed-stat-value"><?= number_format($stats['events']) ?></div>
+                        <div class="civic-fed-stat-label">Upcoming Events</div>
+                    </div>
+                </div>
+            </div>
+            <?php endif; ?>
+
+            <?php if ($features['groups']): ?>
+            <div class="govuk-grid-column-one-third">
+                <div class="civic-fed-stat-card">
+                    <div class="civic-fed-stat-icon" aria-hidden="true">
+                        <i class="fa-solid fa-people-group"></i>
+                    </div>
+                    <div class="civic-fed-stat-content">
+                        <div class="civic-fed-stat-value"><?= number_format($stats['groups']) ?></div>
+                        <div class="civic-fed-stat-label">Groups</div>
+                    </div>
+                </div>
+            </div>
+            <?php endif; ?>
+
+            <?php if ($features['transactions']): ?>
+            <div class="govuk-grid-column-one-third">
+                <div class="civic-fed-stat-card">
+                    <div class="civic-fed-stat-icon" aria-hidden="true">
+                        <i class="fa-solid fa-clock"></i>
+                    </div>
+                    <div class="civic-fed-stat-content">
+                        <div class="civic-fed-stat-value"><?= number_format($stats['total_hours_exchanged'], 1) ?></div>
+                        <div class="civic-fed-stat-label">Hours Exchanged</div>
+                    </div>
+                </div>
+            </div>
             <?php endif; ?>
         </div>
-    </section>
-</div>
 
-<script>
-// Offline Indicator
-(function() {
-    const banner = document.getElementById('offlineBanner');
-    if (!banner) return;
-    window.addEventListener('online', () => banner.classList.remove('civic-fed-offline-banner--visible'));
-    window.addEventListener('offline', () => banner.classList.add('civic-fed-offline-banner--visible'));
-    if (!navigator.onLine) banner.classList.add('civic-fed-offline-banner--visible');
-})();
-</script>
+        <!-- Available Features -->
+        <section aria-labelledby="features-heading">
+            <h2 id="features-heading" class="govuk-heading-m">
+                Available Features
+            </h2>
+            <ul class="govuk-list">
+                <li class="govuk-!-margin-bottom-4">
+                <a href="<?= $basePath ?>/federation/members?tenant=<?= $partner['id'] ?>" class="civic-fed-feature-item <?= !$features['members'] ? 'civic-fed-feature-item--disabled' : '' ?>" <?= !$features['members'] ? 'aria-disabled="true" tabindex="-1"' : '' ?>>
+                    <div class="civic-fed-feature-icon" aria-hidden="true">
+                        <i class="fa-solid fa-users"></i>
+                    </div>
+                    <div class="civic-fed-feature-info">
+                        <h3 class="govuk-heading-s govuk-!-margin-bottom-1">Browse Members</h3>
+                        <p class="govuk-body-s govuk-!-margin-bottom-0">View profiles from this timebank</p>
+                    </div>
+                    <span class="civic-fed-feature-status <?= $features['members'] ? 'civic-fed-feature-status--enabled' : 'civic-fed-feature-status--disabled' ?>">
+                        <?= $features['members'] ? 'Enabled' : 'Disabled' ?>
+                    </span>
+                </a>
+                </li>
+
+                <li class="govuk-!-margin-bottom-4">
+                <a href="<?= $basePath ?>/federation/listings?tenant=<?= $partner['id'] ?>" class="civic-fed-feature-item <?= !$features['listings'] ? 'civic-fed-feature-item--disabled' : '' ?>" <?= !$features['listings'] ? 'aria-disabled="true" tabindex="-1"' : '' ?>>
+                    <div class="civic-fed-feature-icon" aria-hidden="true">
+                        <i class="fa-solid fa-hand-holding-heart"></i>
+                    </div>
+                    <div class="civic-fed-feature-info">
+                        <h3 class="govuk-heading-s govuk-!-margin-bottom-1">Browse Listings</h3>
+                        <p class="govuk-body-s govuk-!-margin-bottom-0">Offers & requests</p>
+                    </div>
+                    <span class="civic-fed-feature-status <?= $features['listings'] ? 'civic-fed-feature-status--enabled' : 'civic-fed-feature-status--disabled' ?>">
+                        <?= $features['listings'] ? 'Enabled' : 'Disabled' ?>
+                    </span>
+                </a>
+                </li>
+
+                <li class="govuk-!-margin-bottom-4">
+                <a href="<?= $basePath ?>/federation/events?tenant=<?= $partner['id'] ?>" class="civic-fed-feature-item <?= !$features['events'] ? 'civic-fed-feature-item--disabled' : '' ?>" <?= !$features['events'] ? 'aria-disabled="true" tabindex="-1"' : '' ?>>
+                    <div class="civic-fed-feature-icon" aria-hidden="true">
+                        <i class="fa-solid fa-calendar-days"></i>
+                    </div>
+                    <div class="civic-fed-feature-info">
+                        <h3 class="govuk-heading-s govuk-!-margin-bottom-1">Browse Events</h3>
+                        <p class="govuk-body-s govuk-!-margin-bottom-0">Upcoming events to join</p>
+                    </div>
+                    <span class="civic-fed-feature-status <?= $features['events'] ? 'civic-fed-feature-status--enabled' : 'civic-fed-feature-status--disabled' ?>">
+                        <?= $features['events'] ? 'Enabled' : 'Disabled' ?>
+                    </span>
+                </a>
+                </li>
+
+                <li class="govuk-!-margin-bottom-4">
+                <a href="<?= $basePath ?>/federation/groups?tenant=<?= $partner['id'] ?>" class="civic-fed-feature-item <?= !$features['groups'] ? 'civic-fed-feature-item--disabled' : '' ?>" <?= !$features['groups'] ? 'aria-disabled="true" tabindex="-1"' : '' ?>>
+                    <div class="civic-fed-feature-icon" aria-hidden="true">
+                        <i class="fa-solid fa-people-group"></i>
+                    </div>
+                    <div class="civic-fed-feature-info">
+                        <h3 class="govuk-heading-s govuk-!-margin-bottom-1">Browse Groups</h3>
+                        <p class="govuk-body-s govuk-!-margin-bottom-0">Interest groups to join</p>
+                    </div>
+                    <span class="civic-fed-feature-status <?= $features['groups'] ? 'civic-fed-feature-status--enabled' : 'civic-fed-feature-status--disabled' ?>">
+                        <?= $features['groups'] ? 'Enabled' : 'Disabled' ?>
+                    </span>
+                </a>
+                </li>
+
+                <li class="govuk-!-margin-bottom-4">
+                <div class="civic-fed-feature-item <?= !$features['messaging'] ? 'civic-fed-feature-item--disabled' : '' ?>">
+                    <div class="civic-fed-feature-icon" aria-hidden="true">
+                        <i class="fa-solid fa-comments"></i>
+                    </div>
+                    <div class="civic-fed-feature-info">
+                        <h3 class="govuk-heading-s govuk-!-margin-bottom-1">Cross-Messaging</h3>
+                        <p class="govuk-body-s govuk-!-margin-bottom-0">Message members directly</p>
+                    </div>
+                    <span class="civic-fed-feature-status <?= $features['messaging'] ? 'civic-fed-feature-status--enabled' : 'civic-fed-feature-status--disabled' ?>">
+                        <?= $features['messaging'] ? 'Enabled' : 'Disabled' ?>
+                    </span>
+                </div>
+                </li>
+
+                <li class="govuk-!-margin-bottom-4">
+                <div class="civic-fed-feature-item <?= !$features['transactions'] ? 'civic-fed-feature-item--disabled' : '' ?>">
+                    <div class="civic-fed-feature-icon" aria-hidden="true">
+                        <i class="fa-solid fa-exchange-alt"></i>
+                    </div>
+                    <div class="civic-fed-feature-info">
+                        <h3 class="govuk-heading-s govuk-!-margin-bottom-1">Hour Exchanges</h3>
+                        <p class="govuk-body-s govuk-!-margin-bottom-0">Exchange time credits</p>
+                    </div>
+                    <span class="civic-fed-feature-status <?= $features['transactions'] ? 'civic-fed-feature-status--enabled' : 'civic-fed-feature-status--disabled' ?>">
+                        <?= $features['transactions'] ? 'Enabled' : 'Disabled' ?>
+                    </span>
+                </div>
+                </li>
+            </ul>
+        </section>
+
+        <!-- Recent Activity with Partner -->
+        <section aria-labelledby="activity-heading">
+            <h2 id="activity-heading" class="govuk-heading-m">
+                Your Recent Activity
+            </h2>
+            <?php if (!empty($recentActivity)): ?>
+            <ul class="govuk-list" aria-label="Recent activity">
+                <?php foreach ($recentActivity as $activity): ?>
+                <li class="govuk-!-margin-bottom-3">
+                <div class="civic-fed-activity-item">
+                    <div class="civic-fed-activity-icon" aria-hidden="true">
+                        <i class="fa-solid <?= htmlspecialchars($activity['icon']) ?>"></i>
+                    </div>
+                    <div class="civic-fed-activity-content">
+                        <p class="civic-fed-activity-text"><?= htmlspecialchars($activity['description']) ?></p>
+                        <span class="civic-fed-activity-time">
+                            <time datetime="<?= date('c', strtotime($activity['date'])) ?>"><?= date('M j, Y', strtotime($activity['date'])) ?></time>
+                        </span>
+                    </div>
+                </div>
+                </li>
+                <?php endforeach; ?>
+            </ul>
+            <?php else: ?>
+            <div class="govuk-inset-text" role="status">
+                <p class="govuk-body">No recent activity with this partner yet.</p>
+                <p class="govuk-body-s">Start by browsing their members or listings!</p>
+            </div>
+            <?php endif; ?>
+
+            <!-- Quick Actions -->
+            <div class="govuk-button-group" role="group" aria-label="Quick actions">
+                <?php if ($features['members']): ?>
+                <a href="<?= $basePath ?>/federation/members?tenant=<?= $partner['id'] ?>" class="govuk-button">
+                    Browse Members
+                </a>
+                <?php endif; ?>
+
+                <?php if ($features['listings']): ?>
+                <a href="<?= $basePath ?>/federation/listings?tenant=<?= $partner['id'] ?>" class="govuk-button govuk-button--secondary">
+                    Browse Listings
+                </a>
+                <?php endif; ?>
+
+                <?php if ($features['events']): ?>
+                <a href="<?= $basePath ?>/federation/events?tenant=<?= $partner['id'] ?>" class="govuk-button govuk-button--secondary">
+                    View Events
+                </a>
+                <?php endif; ?>
+            </div>
+        </section>
+
+    </main>
+</div>
 
 <?php require dirname(dirname(__DIR__)) . '/layouts/civicone/footer.php'; ?>

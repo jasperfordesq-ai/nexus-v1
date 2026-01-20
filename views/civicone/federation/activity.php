@@ -5,6 +5,7 @@
  */
 $pageTitle = $pageTitle ?? "Federation Activity";
 $hideHero = true;
+$bodyClass = 'civicone--federation';
 
 Nexus\Core\SEO::setTitle('Federation Activity - Recent Updates');
 Nexus\Core\SEO::setDescription('View your recent federation activity including messages, transactions, and new partner connections.');

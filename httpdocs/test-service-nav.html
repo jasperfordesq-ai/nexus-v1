@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en" data-layout="civicone">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Service Navigation Test</title>
+    <link rel="stylesheet" href="/assets/css/civicone-header.min.css">
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background: #f5f5f5;
+        }
+        .test-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+        .info {
+            background: #e3f2fd;
+            border-left: 4px solid #2196f3;
+            padding: 12px;
+            margin-bottom: 20px;
+        }
+        .civicone-header {
+            border: 2px dashed #4caf50;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>Service Navigation Test Page</h1>
+        <div class="info">
+            <strong>Purpose:</strong> Test if service navigation renders correctly in isolation.<br>
+            <strong>Viewport:</strong> <span id="viewport-width"></span>px<br>
+            <strong>data-layout:</strong> <code id="data-layout-value"></code>
+        </div>
+
+        <!-- Service Navigation Test -->
+        <header class="civicone-header" role="banner">
+            <div class="civicone-width-container">
+                <nav class="civicone-service-navigation" aria-label="Main navigation">
+                    <div class="civicone-service-navigation__container">
+
+                        <!-- Logo (Service Name) -->
+                        <div class="civicone-service-navigation__branding">
+                            <a href="/" class="civicone-service-navigation__logo" aria-label="Project NEXUS - Go to homepage">
+                                <span class="civicone-service-navigation__service-name">
+                                    Project NEXUS
+                                </span>
+                            </a>
+                        </div>
+
+                        <!-- Navigation list (desktop) -->
+                        <ul class="civicone-service-navigation__list">
+                            <li class="civicone-service-navigation__item civicone-service-navigation__item--active">
+                                <a href="/" class="civicone-service-navigation__link" aria-current="page">
+                                    Feed
+                                </a>
+                            </li>
+                            <li class="civicone-service-navigation__item">
+                                <a href="/members" class="civicone-service-navigation__link">
+                                    Members
+                                </a>
+                            </li>
+                            <li class="civicone-service-navigation__item">
+                                <a href="/groups" class="civicone-service-navigation__link">
+                                    Groups
+                                </a>
+                            </li>
+                            <li class="civicone-service-navigation__item">
+                                <a href="/listings" class="civicone-service-navigation__link">
+                                    Listings
+                                </a>
+                            </li>
+                            <li class="civicone-service-navigation__item">
+                                <a href="/volunteering" class="civicone-service-navigation__link">
+                                    Volunteering
+                                </a>
+                            </li>
+                            <li class="civicone-service-navigation__item">
+                                <a href="/events" class="civicone-service-navigation__link">
+                                    Events
+                                </a>
+                            </li>
+                        </ul>
+
+                        <!-- Mobile menu toggle button -->
+                        <button id="civicone-service-nav-toggle"
+                                class="civicone-service-navigation__toggle"
+                                aria-controls="civicone-service-navigation-list"
+                                aria-expanded="false"
+                                aria-label="Toggle navigation menu">
+                            <span class="civicone-service-navigation__toggle-icon" aria-hidden="true">
+                                <span></span>
+                                <span></span>
+                                <span></span>
+                            </span>
+                            <span class="civicone-service-navigation__toggle-text">Menu</span>
+                        </button>
+
+                    </div>
+
+                    <!-- Mobile navigation panel -->
+                    <div id="civicone-service-navigation-list" class="civicone-service-navigation__mobile-panel" hidden>
+                        <ul class="civicone-service-navigation__mobile-list">
+                            <li class="civicone-service-navigation__mobile-item civicone-service-navigation__item--active">
+                                <a href="/" class="civicone-service-navigation__mobile-link" aria-current="page">Feed</a>
+                            </li>
+                            <li class="civicone-service-navigation__mobile-item">
+                                <a href="/members" class="civicone-service-navigation__mobile-link">Members</a>
+                            </li>
+                            <li class="civicone-service-navigation__mobile-item">
+                                <a href="/groups" class="civicone-service-navigation__mobile-link">Groups</a>
+                            </li>
+                            <li class="civicone-service-navigation__mobile-item">
+                                <a href="/listings" class="civicone-service-navigation__mobile-link">Listings</a>
+                            </li>
+                            <li class="civicone-service-navigation__mobile-item">
+                                <a href="/volunteering" class="civicone-service-navigation__mobile-link">Volunteering</a>
+                            </li>
+                            <li class="civicone-service-navigation__mobile-item">
+                                <a href="/events" class="civicone-service-navigation__mobile-link">Events</a>
+                            </li>
+                        </ul>
+                    </div>
+                </nav>
+            </div>
+        </header>
+
+        <div style="margin-top: 20px; padding: 12px; background: #fff3cd; border-left: 4px solid #ffc107;">
+            <strong>Expected Result (at 1920px):</strong><br>
+            You should see: <code>[Logo: Project NEXUS] Feed Members Groups Listings Volunteering Events</code><br>
+            "Feed" should have a different background (active state).
+        </div>
+
+        <div style="margin-top: 20px; padding: 12px; background: #f8d7da; border-left: 4px solid #dc3545;">
+            <strong>If navigation is NOT visible:</strong><br>
+            1. Open DevTools (F12) → Console tab<br>
+            2. Paste the diagnostic script from <code>/scripts/diagnose-service-nav.js</code><br>
+            3. Check the output for errors
+        </div>
+    </div>
+
+    <script>
+        // Display viewport info
+        document.getElementById('viewport-width').textContent = window.innerWidth;
+        document.getElementById('data-layout-value').textContent = document.documentElement.getAttribute('data-layout') || 'null';
+
+        // Update on resize
+        window.addEventListener('resize', () => {
+            document.getElementById('viewport-width').textContent = window.innerWidth;
+        });
+
+        // Mobile menu toggle
+        const toggleButton = document.getElementById('civicone-service-nav-toggle');
+        const mobilePanel = document.getElementById('civicone-service-navigation-list');
+
+        if (toggleButton && mobilePanel) {
+            toggleButton.addEventListener('click', () => {
+                const isExpanded = toggleButton.getAttribute('aria-expanded') === 'true';
+                toggleButton.setAttribute('aria-expanded', !isExpanded);
+                mobilePanel.hidden = isExpanded;
+            });
+        }
+    </script>
+</body>
+</html>

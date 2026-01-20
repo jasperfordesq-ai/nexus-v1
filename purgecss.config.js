@@ -8,12 +8,15 @@ module.exports = {
     ],
 
     // CSS files to purge
-    // Updated 2026-01-18: Added bundle files and page-specific CSS
+    // Updated 2026-01-20: Complete audit - all CSS files included
     css: [
         // Core framework
         'httpdocs/assets/css/nexus-phoenix.css',
         'httpdocs/assets/css/nexus-mobile.css',
         'httpdocs/assets/css/nexus-shared-transitions.css',
+        'httpdocs/assets/css/nexus-home.css',
+        'httpdocs/assets/css/nexus-score.css',
+        'httpdocs/assets/css/nexus-groups.css',
         'httpdocs/assets/css/post-box-home.css',
         // Header and loading
         'httpdocs/assets/css/nexus-loading-fix.css',
@@ -168,6 +171,57 @@ module.exports = {
         'httpdocs/assets/css/civicone-members-directory.css',
         // CivicOne listings directory - GOV.UK pattern (WCAG 2.1 AA 2026-01-20)
         'httpdocs/assets/css/civicone-listings-directory.css',
+        // CivicOne profile header - MOJ Identity Bar pattern (WCAG 2.1 AA 2026-01-20)
+        'httpdocs/assets/css/civicone-profile-header.css',
+        // CivicOne profile social components - Posts, Comments, Actions (WCAG 2.1 AA 2026-01-20)
+        'httpdocs/assets/css/civicone-profile-social.css',
+        // CivicOne account navigation - MOJ Sub navigation pattern (WCAG 2.1 AA 2026-01-20)
+        'httpdocs/assets/css/civicone-account-nav.css',
+        // GOV.UK component library (WCAG 2.1 AA - 2026-01-20)
+        'httpdocs/assets/css/civicone-govuk-buttons.css',
+        'httpdocs/assets/css/civicone-govuk-components.css',
+        'httpdocs/assets/css/civicone-govuk-focus.css',
+        'httpdocs/assets/css/civicone-govuk-forms.css',
+        'httpdocs/assets/css/civicone-govuk-spacing.css',
+        'httpdocs/assets/css/civicone-govuk-typography.css',
+        // Design tokens (2026-01-20)
+        'httpdocs/assets/css/design-tokens.css',
+        // Micro-interactions and animations (2026-01-20)
+        'httpdocs/assets/css/toast-notifications.css',
+        'httpdocs/assets/css/page-transitions.css',
+        'httpdocs/assets/css/pull-to-refresh.css',
+        'httpdocs/assets/css/button-ripple.css',
+        'httpdocs/assets/css/card-hover-states.css',
+        'httpdocs/assets/css/form-validation.css',
+        'httpdocs/assets/css/avatar-placeholders.css',
+        'httpdocs/assets/css/scroll-progress.css',
+        'httpdocs/assets/css/fab-polish.css',
+        'httpdocs/assets/css/badge-animations.css',
+        'httpdocs/assets/css/error-states.css',
+        // Utility CSS (2026-01-20)
+        'httpdocs/assets/css/branding.css',
+        'httpdocs/assets/css/consent-required.css',
+        'httpdocs/assets/css/glass.css',
+        'httpdocs/assets/css/layout-isolation.css',
+        'httpdocs/assets/css/sidebar.css',
+        'httpdocs/assets/css/strategic-plan.css',
+        // Mobile components (2026-01-20)
+        'httpdocs/assets/css/mobile-search-overlay.css',
+        'httpdocs/assets/css/mobile-select-sheet.css',
+        // Native app (2026-01-20)
+        'httpdocs/assets/css/native-form-inputs.css',
+        'httpdocs/assets/css/native-page-enter.css',
+        // Bundles (2026-01-20)
+        'httpdocs/assets/css/modern-bundle.css',
+        'httpdocs/assets/css/modern-bundle-compiled.css',
+        // Admin (2026-01-20)
+        'httpdocs/assets/css/admin-header.css',
+        // Utility fixes (2026-01-20)
+        'httpdocs/assets/css/noscript-fallbacks.css',
+        'httpdocs/assets/css/scroll-fix-emergency.css',
+        // Shell layouts (2026-01-20)
+        'httpdocs/assets/css/civicone-federation-shell.css',
+        'httpdocs/assets/css/civicone-feed.css',
     ],
 
     // Output directory for purged CSS
@@ -225,6 +279,13 @@ module.exports = {
             // Button states
             'btn-success', 'btn-error', 'btn-loading',
 
+            // CivicOne button variants (WCAG 2.1 AA contrast 2026-01-20)
+            'civicone-page-header-actions__btn--primary',
+            'civicone-page-header-actions__btn--secondary',
+            'civicone-page-header-actions__btn--warning',
+            'civicone-page-header-actions__btn--danger',
+            'civicone-page-header-actions__btn--status',
+
             // Optimistic UI
             'nexus-optimistic-comment', 'nexus-optimistic-error',
             'nexus-optimistic-pending', 'nexus-optimistic-success',
@@ -239,6 +300,21 @@ module.exports = {
             'civic-bottom-sheet', 'civic-bottom-sheet-backdrop',
             'civic-offline-bar', 'civic-offline-indicator', 'civic-online-indicator',
             'civic-pwa-banner', 'civic-update-banner',
+
+            // Profile social components (2026-01-20)
+            'civic-composer', 'civic-composer-actions',
+            'civic-post-card', 'civic-post-header', 'civic-post-content', 'civic-post-actions', 'civic-post-image',
+            'civic-avatar-sm',
+            'civic-action-btn',
+            'civic-comments-section',
+            'civic-comment', 'civic-comment-avatar', 'civic-comment-bubble',
+            'civic-comment-author', 'civic-comment-text', 'civic-comment-meta',
+            'civic-comment-form', 'civic-comment-input', 'civic-comment-submit',
+            'civic-reply-form', 'civic-reply-input',
+            'civic-reactions', 'civic-reaction', 'civic-reaction-picker', 'civic-reaction-picker-menu',
+            'civic-mention',
+            'civic-toast', 'civic-toast-content', 'civic-toast-icon', 'civic-toast-message',
+            'civicone-related-content',
 
             // Native app classes
             'nexus-native-nav-enabled', 'nexus-native-nav-badge',
@@ -271,6 +347,9 @@ module.exports = {
 
             // Keep all civic- prefixed classes
             /^civic-/,
+
+            // Keep all civicone- prefixed classes (GOV.UK patterns)
+            /^civicone-/,
 
             // Keep all fds- prefixed classes
             /^fds-/,

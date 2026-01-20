@@ -479,6 +479,11 @@ $router->add('POST', '/share-target/create', 'Nexus\Controllers\ShareTargetContr
 // --------------------------------------------------------------------------
 
 $router->add('GET', '/dashboard', 'Nexus\Controllers\DashboardController@index');
+$router->add('GET', '/dashboard/notifications', 'Nexus\Controllers\DashboardController@notifications');
+$router->add('GET', '/dashboard/hubs', 'Nexus\Controllers\DashboardController@hubs');
+$router->add('GET', '/dashboard/listings', 'Nexus\Controllers\DashboardController@listings');
+$router->add('GET', '/dashboard/wallet', 'Nexus\Controllers\DashboardController@wallet');
+$router->add('GET', '/dashboard/events', 'Nexus\Controllers\DashboardController@events');
 $router->add('POST', '/dashboard/switch_layout', 'Nexus\Controllers\HomeController@switchLayout');
 $router->add('GET', '/dashboard/switch_layout', 'Nexus\Controllers\HomeController@switchLayout'); // Support GET link
 
@@ -1615,6 +1620,9 @@ $router->add('POST', '/admin/enterprise/gdpr/requests/bulk-process', 'Nexus\Cont
 $router->add('GET', '/admin/enterprise/gdpr/consents', 'Nexus\Controllers\Admin\EnterpriseController@gdprConsents');
 $router->add('POST', '/admin/enterprise/gdpr/consents/types', 'Nexus\Controllers\Admin\EnterpriseController@gdprConsentTypeStore');
 $router->add('POST', '/admin/enterprise/gdpr/consents/backfill', 'Nexus\Controllers\Admin\EnterpriseController@gdprBackfillConsents');
+$router->add('GET', '/admin/enterprise/gdpr/consents/tenant-versions', 'Nexus\Controllers\Admin\EnterpriseController@gdprGetTenantConsentVersions');
+$router->add('POST', '/admin/enterprise/gdpr/consents/tenant-version', 'Nexus\Controllers\Admin\EnterpriseController@gdprUpdateTenantConsentVersion');
+$router->add('DELETE', '/admin/enterprise/gdpr/consents/tenant-version/{slug}', 'Nexus\Controllers\Admin\EnterpriseController@gdprRemoveTenantConsentVersion');
 $router->add('GET', '/admin/enterprise/gdpr/consents/{id}', 'Nexus\Controllers\Admin\EnterpriseController@gdprConsentDetail');
 $router->add('GET', '/admin/enterprise/gdpr/consents/export', 'Nexus\Controllers\Admin\EnterpriseController@gdprConsentsExport');
 $router->add('GET', '/admin/enterprise/gdpr/breaches', 'Nexus\Controllers\Admin\EnterpriseController@gdprBreaches');

@@ -23,7 +23,13 @@ class ListingController
     public function index()
     {
         $this->checkFeature();
+        // Handle type parameter - support both single value and array (from checkboxes)
         $type = $_GET['type'] ?? null;
+        // Ensure type is always an array for consistent handling
+        if ($type !== null && !is_array($type)) {
+            $type = [$type];
+        }
+
         $category = $_GET['cat'] ?? null;
         $search = $_GET['q'] ?? null;
 

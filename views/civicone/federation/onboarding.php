@@ -5,6 +5,7 @@
  */
 $pageTitle = $pageTitle ?? "Get Started with Federation";
 $hideHero = true;
+$bodyClass = 'civicone--federation';
 
 require dirname(dirname(__DIR__)) . '/layouts/civicone/header.php';
 $basePath = $basePath ?? Nexus\Core\TenantContext::getBasePath();

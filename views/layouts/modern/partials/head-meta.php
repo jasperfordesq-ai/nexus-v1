@@ -72,6 +72,10 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;600;700;800&family=Outfit:wght@400;500;700&display=swap" rel="stylesheet">
+
+    <!-- Profile Header (MOJ Identity Bar - WCAG 2.1 AA 2026-01-20) -->
+    <link rel="stylesheet" href="/assets/css/civicone-profile-header.min.css?v=<?= $cssVersion ?>">
+
     <link rel="stylesheet" href="/assets/css/nexus-mobile.min.css?v=<?= $cssVersion ?>">
     <link rel="stylesheet" href="/assets/css/nexus-native-nav-v2.min.css?v=<?= $cssVersion ?>">
     <link rel="stylesheet" href="/assets/css/nexus-polish.min.css?v=<?= $cssVersion ?>">

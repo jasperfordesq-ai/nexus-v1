@@ -495,862 +495,7 @@ $hType = 'Activity Feed';
 require dirname(__DIR__, 2) . '/layouts/civicone/header.php';
 ?>
 
-<style>
-/* ================================================================
-   CIVICONE FEED - MadeOpen Style with GOV.UK/GDS Principles
-   WCAG 2.1 AA Compliant | Dark Mode Support
-   ================================================================ */
-
-:root {
-    --civic-feed-max-width: 680px;
-    --civic-card-radius: 8px;
-    --civic-transition: 0.2s ease;
-}
-
-/* Feed Container */
-.civic-feed-container {
-    max-width: var(--civic-feed-max-width);
-    margin: 0 auto;
-}
-
-/* --------------------------------
-   POST COMPOSER
-   -------------------------------- */
-.civic-composer {
-    background: var(--civic-bg-card);
-    border: 1px solid var(--civic-border);
-    border-radius: var(--civic-card-radius);
-    margin-bottom: 24px;
-    overflow: hidden;
-}
-
-.civic-composer-collapsed {
-    padding: 16px;
-}
-
-.civic-composer-top {
-    display: flex;
-    gap: 12px;
-    align-items: center;
-}
-
-.civic-composer-avatar {
-    width: 44px;
-    height: 44px;
-    border-radius: 50%;
-    object-fit: cover;
-    border: 2px solid var(--civic-border);
-    flex-shrink: 0;
-}
-
-.civic-composer-trigger {
-    flex: 1;
-    background: var(--civic-bg-page);
-    border: 1px solid var(--civic-border);
-    border-radius: 24px;
-    padding: 12px 20px;
-    color: var(--civic-text-muted);
-    cursor: pointer;
-    font-size: 1rem;
-    text-align: left;
-    transition: var(--civic-transition);
-}
-
-.civic-composer-trigger:hover {
-    background: var(--civic-bg-card);
-    border-color: var(--civic-brand);
-}
-
-.civic-composer-trigger:focus {
-    outline: 3px solid var(--civic-brand);
-    outline-offset: 2px;
-}
-
-.civic-composer-divider {
-    height: 1px;
-    background: var(--civic-border);
-    margin: 12px 0;
-}
-
-.civic-composer-shortcuts {
-    display: flex;
-    justify-content: space-around;
-    gap: 8px;
-}
-
-.civic-composer-shortcut {
-    flex: 1;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    padding: 10px;
-    border-radius: 8px;
-    font-size: 0.9rem;
-    font-weight: 600;
-    color: var(--civic-text-secondary);
-    cursor: pointer;
-    transition: var(--civic-transition);
-    background: transparent;
-    border: none;
-    text-decoration: none;
-}
-
-.civic-composer-shortcut:hover {
-    background: var(--civic-bg-page);
-}
-
-.civic-composer-shortcut.photo .dashicons { color: #22C55E; }
-.civic-composer-shortcut.event .dashicons { color: #EF4444; }
-.civic-composer-shortcut.listing .dashicons { color: var(--civic-brand); }
-
-/* Expanded Composer */
-.civic-composer-expanded {
-    display: none;
-    padding: 20px;
-}
-
-.civic-composer-expanded.active {
-    display: block;
-}
-
-.civic-composer-header {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding-bottom: 16px;
-    border-bottom: 1px solid var(--civic-border);
-    margin-bottom: 16px;
-    position: relative;
-}
-
-.civic-composer-title {
-    font-size: 1.25rem;
-    font-weight: 700;
-    color: var(--civic-text-main);
-}
-
-.civic-composer-close {
-    position: absolute;
-    right: 0;
-    width: 36px;
-    height: 36px;
-    border-radius: 50%;
-    background: var(--civic-bg-page);
-    border: none;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: var(--civic-text-muted);
-    transition: var(--civic-transition);
-}
-
-.civic-composer-close:hover {
-    background: var(--civic-border);
-}
-
-.civic-composer-close:focus {
-    outline: 3px solid var(--civic-brand);
-    outline-offset: 2px;
-}
-
-.civic-composer-user {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    margin-bottom: 16px;
-}
-
-.civic-composer-user-name {
-    font-weight: 700;
-    color: var(--civic-text-main);
-}
-
-.civic-composer-textarea {
-    width: 100%;
-    min-height: 120px;
-    border: none;
-    background: transparent;
-    resize: none;
-    font-size: 1.125rem;
-    color: var(--civic-text-main);
-    outline: none;
-    font-family: inherit;
-    line-height: 1.5;
-}
-
-.civic-composer-textarea::placeholder {
-    color: var(--civic-text-muted);
-}
-
-.civic-composer-textarea:focus {
-    outline: none;
-}
-
-.civic-composer-media-preview {
-    display: none;
-    margin: 16px 0;
-    position: relative;
-    border-radius: var(--civic-card-radius);
-    overflow: hidden;
-}
-
-.civic-composer-media-preview.active {
-    display: block;
-}
-
-.civic-composer-media-preview img {
-    max-width: 100%;
-    max-height: 300px;
-    display: block;
-}
-
-.civic-composer-media-remove {
-    position: absolute;
-    top: 8px;
-    right: 8px;
-    width: 32px;
-    height: 32px;
-    background: rgba(0,0,0,0.7);
-    color: #fff;
-    border-radius: 50%;
-    border: none;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.civic-composer-tools {
-    border: 1px solid var(--civic-border);
-    border-radius: var(--civic-card-radius);
-    padding: 12px 16px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 16px;
-}
-
-.civic-composer-tools-label {
-    font-weight: 600;
-    color: var(--civic-text-main);
-}
-
-.civic-composer-tools-icons {
-    display: flex;
-    gap: 8px;
-}
-
-.civic-composer-tool-btn {
-    width: 36px;
-    height: 36px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    transition: var(--civic-transition);
-    background: transparent;
-    border: none;
-    color: var(--civic-text-secondary);
-}
-
-.civic-composer-tool-btn:hover {
-    background: var(--civic-bg-page);
-}
-
-.civic-composer-tool-btn:focus {
-    outline: 3px solid var(--civic-brand);
-    outline-offset: 2px;
-}
-
-.civic-composer-submit {
-    width: 100%;
-    padding: 14px;
-    background: var(--civic-brand);
-    color: #fff;
-    border: none;
-    border-radius: var(--civic-card-radius);
-    font-size: 1rem;
-    font-weight: 700;
-    cursor: pointer;
-    transition: var(--civic-transition);
-}
-
-.civic-composer-submit:hover:not(:disabled) {
-    filter: brightness(0.9);
-}
-
-.civic-composer-submit:disabled {
-    background: var(--civic-border);
-    color: var(--civic-text-muted);
-    cursor: not-allowed;
-}
-
-.civic-composer-submit:focus {
-    outline: 3px solid var(--civic-brand);
-    outline-offset: 2px;
-}
-
-/* Guest CTA */
-.civic-composer-guest {
-    padding: 32px;
-    text-align: center;
-}
-
-.civic-composer-guest h3 {
-    font-size: 1.25rem;
-    font-weight: 700;
-    color: var(--civic-text-main);
-    margin-bottom: 8px;
-}
-
-.civic-composer-guest p {
-    color: var(--civic-text-muted);
-    margin-bottom: 16px;
-}
-
-/* --------------------------------
-   FEED CARDS
-   -------------------------------- */
-.civic-feed-card {
-    background: var(--civic-bg-card);
-    border: 1px solid var(--civic-border);
-    border-radius: var(--civic-card-radius);
-    margin-bottom: 16px;
-    overflow: hidden;
-    transition: var(--civic-transition);
-}
-
-.civic-feed-card:hover {
-    box-shadow: var(--civic-shadow);
-}
-
-/* Feed Header */
-.civic-feed-header {
-    padding: 16px;
-    display: flex;
-    align-items: flex-start;
-    gap: 12px;
-}
-
-.civic-feed-avatar {
-    width: 44px;
-    height: 44px;
-    border-radius: 50%;
-    object-fit: cover;
-    flex-shrink: 0;
-}
-
-.civic-feed-meta {
-    flex: 1;
-    min-width: 0;
-}
-
-.civic-feed-author {
-    font-size: 1rem;
-    font-weight: 700;
-    color: var(--civic-text-main);
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 4px;
-}
-
-.civic-feed-author a {
-    color: var(--civic-text-main);
-    text-decoration: none;
-}
-
-.civic-feed-author a:hover {
-    text-decoration: underline;
-}
-
-.civic-feed-verb {
-    font-weight: 400;
-    color: var(--civic-text-secondary);
-}
-
-.civic-feed-object {
-    font-weight: 700;
-    color: var(--civic-brand);
-}
-
-.civic-feed-time {
-    font-size: 0.875rem;
-    color: var(--civic-text-muted);
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    margin-top: 2px;
-}
-
-.civic-feed-menu {
-    width: 36px;
-    height: 36px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    transition: var(--civic-transition);
-    background: transparent;
-    border: none;
-    color: var(--civic-text-muted);
-}
-
-.civic-feed-menu:hover {
-    background: var(--civic-bg-page);
-}
-
-/* Feed Body */
-.civic-feed-body {
-    padding: 0 16px 16px;
-}
-
-.civic-feed-title {
-    font-size: 1.125rem;
-    font-weight: 700;
-    color: var(--civic-text-main);
-    margin-bottom: 8px;
-}
-
-.civic-feed-content {
-    font-size: 1rem;
-    line-height: 1.6;
-    color: var(--civic-text-main);
-    white-space: pre-wrap;
-    word-wrap: break-word;
-}
-
-.civic-feed-content a {
-    color: var(--civic-brand);
-}
-
-.civic-feed-image {
-    width: 100%;
-    display: block;
-    border-top: 1px solid var(--civic-border);
-}
-
-/* Type-Specific Banners */
-.civic-type-banner {
-    padding: 20px 16px;
-    border-top: 1px solid var(--civic-border);
-}
-
-.civic-type-banner-listing {
-    background: linear-gradient(135deg, #EFF6FF 0%, #DBEAFE 100%);
-    border-left: 4px solid var(--civic-brand);
-}
-
-.civic-type-banner-listing.request {
-    background: linear-gradient(135deg, #FEF3C7 0%, #FDE68A 100%);
-    border-left-color: #F59E0B;
-}
-
-.civic-type-banner-event {
-    background: linear-gradient(135deg, #FDF2F8 0%, #FCE7F3 100%);
-    border-left: 4px solid #DB2777;
-}
-
-.civic-type-banner-goal {
-    background: linear-gradient(135deg, #ECFDF5 0%, #D1FAE5 100%);
-    border-left: 4px solid #22C55E;
-}
-
-.civic-type-banner-poll {
-    background: linear-gradient(135deg, #EFF6FF 0%, #DBEAFE 100%);
-    border-left: 4px solid #3B82F6;
-}
-
-.civic-type-banner-volunteering {
-    background: linear-gradient(135deg, #F0F9FF 0%, #E0F2FE 100%);
-    border-left: 4px solid #0EA5E9;
-}
-
-body.dark-mode .civic-type-banner-listing {
-    background: linear-gradient(135deg, #1E3A5F 0%, #1E40AF 100%);
-}
-
-body.dark-mode .civic-type-banner-listing.request {
-    background: linear-gradient(135deg, #451A03 0%, #78350F 100%);
-}
-
-body.dark-mode .civic-type-banner-event {
-    background: linear-gradient(135deg, #500724 0%, #831843 100%);
-}
-
-body.dark-mode .civic-type-banner-goal {
-    background: linear-gradient(135deg, #052E16 0%, #14532D 100%);
-}
-
-body.dark-mode .civic-type-banner-poll {
-    background: linear-gradient(135deg, #1E3A5F 0%, #1E40AF 100%);
-}
-
-body.dark-mode .civic-type-banner-volunteering {
-    background: linear-gradient(135deg, #082F49 0%, #0C4A6E 100%);
-}
-
-.civic-type-label {
-    font-size: 0.75rem;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    font-weight: 700;
-    margin-bottom: 8px;
-}
-
-.civic-type-title {
-    font-weight: 700;
-    font-size: 1.125rem;
-    color: var(--civic-text-main);
-    margin-bottom: 8px;
-}
-
-.civic-type-meta {
-    font-size: 0.875rem;
-    color: var(--civic-text-secondary);
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    margin-bottom: 16px;
-}
-
-.civic-type-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
-    padding: 4px 12px;
-    background: #fff;
-    border-radius: 16px;
-    font-size: 0.75rem;
-    font-weight: 700;
-    border: 1px solid var(--civic-border);
-}
-
-body.dark-mode .civic-type-badge {
-    background: var(--civic-bg-card);
-}
-
-.civic-view-btn {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    padding: 12px 20px;
-    background: #00703c; /* GOV.UK green for guaranteed WCAG AA (7.41:1 with white) */
-    color: #fff !important;
-    border-radius: 6px;
-    font-size: 0.9375rem;
-    font-weight: 700;
-    text-decoration: none !important;
-    transition: var(--civic-transition);
-    width: 100%;
-}
-
-.civic-view-btn:hover {
-    background: #005a30; /* Darker green on hover */
-    color: #fff !important;
-}
-
-.civic-view-btn:focus {
-    outline: 3px solid var(--civic-brand);
-    outline-offset: 2px;
-}
-
-.civic-view-btn--secondary {
-    background: var(--civic-bg-card);
-    color: var(--civic-text-main);
-    border: 2px solid var(--civic-border);
-}
-
-.civic-view-btn--secondary:hover {
-    background: var(--civic-bg-page);
-    filter: none;
-    color: var(--civic-text-main);
-}
-
-/* Feed Stats */
-.civic-feed-stats {
-    padding: 12px 16px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    font-size: 0.9375rem;
-    color: var(--civic-text-secondary);
-    border-top: 1px solid var(--civic-border);
-    border-bottom: 1px solid var(--civic-border);
-}
-
-.civic-feed-stats-left {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-
-.civic-feed-stats-right {
-    cursor: pointer;
-}
-
-.civic-feed-stats-right:hover {
-    text-decoration: underline;
-}
-
-/* Feed Actions */
-.civic-feed-actions {
-    display: flex;
-    padding: 4px 8px;
-}
-
-.civic-feed-action-btn {
-    flex: 1;
-    height: 44px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    border-radius: 6px;
-    cursor: pointer;
-    transition: var(--civic-transition);
-    font-size: 0.9375rem;
-    font-weight: 600;
-    color: var(--civic-text-secondary);
-    background: transparent;
-    border: none;
-}
-
-.civic-feed-action-btn:hover {
-    background: var(--civic-bg-page);
-}
-
-.civic-feed-action-btn:focus {
-    outline: 3px solid var(--civic-brand);
-    outline-offset: -3px;
-}
-
-.civic-feed-action-btn.liked {
-    color: #D4351C;
-}
-
-/* Comments Section */
-.civic-comments-section {
-    display: none;
-    padding: 16px;
-    background: var(--civic-bg-page);
-    border-top: 1px solid var(--civic-border);
-}
-
-.civic-comments-section.active {
-    display: block;
-}
-
-.civic-comment-form {
-    display: flex;
-    gap: 12px;
-    margin-bottom: 16px;
-}
-
-.civic-comment-avatar {
-    width: 36px;
-    height: 36px;
-    border-radius: 50%;
-    object-fit: cover;
-    flex-shrink: 0;
-}
-
-.civic-comment-input-wrapper {
-    flex: 1;
-    position: relative;
-}
-
-.civic-comment-input {
-    width: 100%;
-    padding: 10px 44px 10px 16px;
-    border: 1px solid var(--civic-border);
-    background: var(--civic-bg-card);
-    border-radius: 24px;
-    font-size: 0.9375rem;
-    color: var(--civic-text-main);
-    outline: none;
-}
-
-.civic-comment-input:focus {
-    border-color: var(--civic-brand);
-    outline: 3px solid var(--civic-brand);
-    outline-offset: 2px;
-}
-
-.civic-comment-input::placeholder {
-    color: var(--civic-text-muted);
-}
-
-.civic-comment-submit {
-    position: absolute;
-    right: 8px;
-    top: 50%;
-    transform: translateY(-50%);
-    color: var(--civic-brand);
-    cursor: pointer;
-    background: none;
-    border: none;
-    padding: 8px;
-}
-
-.civic-comment-submit:hover {
-    opacity: 0.8;
-}
-
-.civic-comment-item {
-    display: flex;
-    gap: 12px;
-    margin-bottom: 12px;
-}
-
-.civic-comment-bubble {
-    background: var(--civic-bg-card);
-    padding: 10px 16px;
-    border-radius: 18px;
-    border: 1px solid var(--civic-border);
-}
-
-.civic-comment-author {
-    font-weight: 700;
-    font-size: 0.875rem;
-    color: var(--civic-text-main);
-    margin-bottom: 2px;
-}
-
-.civic-comment-text {
-    font-size: 0.9375rem;
-    color: var(--civic-text-main);
-    line-height: 1.4;
-}
-
-/* Shared/Reposted Content */
-.civic-shared-card {
-    margin: 12px 16px;
-    border: 1px solid var(--civic-border);
-    border-radius: var(--civic-card-radius);
-    overflow: hidden;
-    background: var(--civic-bg-page);
-}
-
-.civic-shared-header {
-    padding: 12px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    border-bottom: 1px solid var(--civic-border);
-}
-
-.civic-shared-avatar {
-    width: 32px;
-    height: 32px;
-    border-radius: 50%;
-    object-fit: cover;
-}
-
-.civic-shared-author {
-    font-weight: 700;
-    font-size: 0.875rem;
-    color: var(--civic-text-main);
-}
-
-.civic-shared-label {
-    font-weight: 400;
-    color: var(--civic-text-muted);
-    font-size: 0.75rem;
-}
-
-.civic-shared-time {
-    font-size: 0.75rem;
-    color: var(--civic-text-muted);
-}
-
-.civic-shared-body {
-    padding: 12px;
-}
-
-.civic-shared-title {
-    font-weight: 700;
-    color: var(--civic-text-main);
-    margin-bottom: 8px;
-}
-
-.civic-shared-content {
-    font-size: 0.875rem;
-    color: var(--civic-text-main);
-    line-height: 1.4;
-}
-
-/* Empty State */
-.civic-empty-state {
-    background: var(--civic-bg-card);
-    border: 1px solid var(--civic-border);
-    border-radius: var(--civic-card-radius);
-    padding: 60px 32px;
-    text-align: center;
-}
-
-.civic-empty-icon {
-    font-size: 3rem;
-    margin-bottom: 16px;
-}
-
-.civic-empty-title {
-    font-size: 1.25rem;
-    font-weight: 700;
-    color: var(--civic-text-main);
-    margin-bottom: 8px;
-}
-
-.civic-empty-text {
-    color: var(--civic-text-muted);
-    margin-bottom: 24px;
-}
-
-/* Toast - positioned above bottom nav */
-.civic-toast {
-    position: fixed;
-    bottom: calc(90px + env(safe-area-inset-bottom, 0px));
-    left: 50%;
-    transform: translateX(-50%);
-    background: var(--civic-brand);
-    color: #fff;
-    padding: 14px 28px;
-    border-radius: var(--civic-card-radius);
-    font-weight: 600;
-    z-index: 10000;
-    opacity: 0;
-    visibility: hidden;
-    transition: all 0.3s ease;
-    max-width: calc(100% - 32px);
-    text-align: center;
-}
-
-.civic-toast.show {
-    opacity: 1;
-    visibility: visible;
-    bottom: calc(100px + env(safe-area-inset-bottom, 0px));
-}
-
-/* Mobile Responsive */
-@media (max-width: 600px) {
-    .civic-composer-shortcuts {
-        flex-direction: column;
-    }
-
-    .civic-composer-shortcut span {
-        display: none;
-    }
-
-    .civic-feed-action-btn span {
-        display: none;
-    }
-}
-</style>
+<!-- Feed styles now loaded from external CSS file: /assets/css/civicone-feed.css -->
 
 <main id="main-content" role="main">
 <div class="civic-container">
@@ -1443,6 +588,7 @@ body.dark-mode .civic-type-badge {
 
         <!-- Feed Stream -->
         <?php if (!empty($feedItems)): ?>
+            <ol class="civicone-feed-list" reversed>
             <?php foreach ($feedItems as $item):
                 $type = $item['type'];
                 $postId = $item['id'];
@@ -1460,32 +606,56 @@ body.dark-mode .civic-type-badge {
                 $verb = '';
                 $object = '';
                 $viewLink = null;
+                $contextLabel = '';
 
                 switch ($type) {
                     case 'listing':
                         $verb = 'posted a';
                         $object = strtoupper($item['listing_type'] ?? 'LISTING');
                         $viewLink = $basePath . '/listings/' . $postId;
+                        $contextLabel = $authorName . ' posted a ' . strtolower($item['listing_type'] ?? 'listing');
                         break;
                     case 'event':
                         $verb = 'created an event';
                         $viewLink = $basePath . '/events/' . $postId;
+                        $contextLabel = $authorName . ' created an event: ' . ($item['title'] ?? 'Event');
                         break;
                     case 'goal':
                         $verb = 'set a goal';
                         $viewLink = $basePath . '/goals/' . $postId;
+                        $contextLabel = $authorName . ' set a goal: ' . ($item['title'] ?? 'Goal');
                         break;
                     case 'poll':
                         $verb = 'created a poll';
                         $viewLink = $basePath . '/polls/' . $postId;
+                        $contextLabel = $authorName . ' created a poll: ' . ($item['title'] ?? 'Poll');
                         break;
                     case 'volunteering':
                         $verb = 'needs volunteers';
                         $viewLink = $basePath . '/volunteering/' . $postId;
+                        $contextLabel = $authorName . ' needs volunteers for: ' . ($item['title'] ?? 'Opportunity');
+                        break;
+                    case 'post':
+                    default:
+                        $contextLabel = 'Post by ' . $authorName;
                         break;
                 }
+
+                // Generate ISO 8601 datetime
+                $isoDatetime = '';
+                try {
+                    $dt = new DateTime($createdAt);
+                    $isoDatetime = $dt->format('c'); // ISO 8601 format
+                } catch (Exception $e) {
+                    $isoDatetime = $createdAt;
+                }
             ?>
-                <article class="civic-feed-card" id="feed-<?= $type ?>-<?= $postId ?>">
+                <li class="civicone-feed-item">
+                <article class="civicone-feed-post" id="feed-<?= $type ?>-<?= $postId ?>" aria-labelledby="post-<?= $type ?>-<?= $postId ?>-heading">
+                    <header class="civicone-feed-post__header">
+                        <h2 id="post-<?= $type ?>-<?= $postId ?>-heading" class="civicone-feed-post__title civicone-visually-hidden">
+                            <?= htmlspecialchars($contextLabel) ?>
+                        </h2>
                     <!-- Header -->
                     <div class="civic-feed-header">
                         <a href="<?= $basePath ?>/profile/<?= $authorId ?>">
@@ -1502,7 +672,7 @@ body.dark-mode .civic-type-badge {
                                 <?php endif; ?>
                             </div>
                             <div class="civic-feed-time">
-                                <time datetime="<?= $createdAt ?>"><?= $timeElapsed($createdAt) ?></time>
+                                <time datetime="<?= htmlspecialchars($isoDatetime) ?>"><?= $timeElapsed($createdAt) ?></time>
                                 <?php if ($location): ?>
                                     <span aria-hidden="true">·</span>
                                     <span class="dashicons dashicons-location" style="font-size: 14px;" aria-hidden="true"></span>
@@ -1516,6 +686,7 @@ body.dark-mode .civic-type-badge {
                             </button>
                         <?php endif; ?>
                     </div>
+                    </header>
 
                     <!-- Body -->
                     <div class="civic-feed-body">
@@ -1756,32 +927,57 @@ body.dark-mode .civic-type-badge {
                     <!-- Action Buttons -->
                     <div class="civic-feed-actions">
                         <button type="button" onclick="toggleLike(this, '<?= $type ?>', <?= $postId ?>)"
-                                class="civic-feed-action-btn <?= $isLiked ? 'liked' : '' ?>"
-                                aria-pressed="<?= $isLiked ? 'true' : 'false' ?>">
+                                class="civic-feed-action-btn civicone-feed-action civicone-feed-action--like <?= $isLiked ? 'liked' : '' ?>"
+                                aria-pressed="<?= $isLiked ? 'true' : 'false' ?>"
+                                aria-label="<?= $isLiked ? 'Unlike' : 'Like' ?> post by <?= htmlspecialchars($authorName) ?>">
                             <span class="dashicons <?= $isLiked ? 'dashicons-heart' : 'dashicons-heart' ?>" aria-hidden="true"></span>
                             <span>Like</span>
+                            <?php if ($likesCount > 0): ?>
+                                <span>(<?= $likesCount ?>)</span>
+                            <?php endif; ?>
                         </button>
-                        <button type="button" onclick="toggleCommentSection('<?= $type ?>', <?= $postId ?>)" class="civic-feed-action-btn">
+                        <button type="button"
+                                onclick="toggleCommentSection('<?= $type ?>', <?= $postId ?>)"
+                                class="civic-feed-action-btn civicone-feed-action civicone-feed-action--comment"
+                                aria-expanded="false"
+                                aria-controls="comments-section-<?= $type ?>-<?= $postId ?>"
+                                aria-label="<?= $commentsCount > 0 ? 'Show ' . $commentsCount . ' comment' . ($commentsCount > 1 ? 's' : '') : 'Add a comment' ?>">
                             <span class="dashicons dashicons-admin-comments" aria-hidden="true"></span>
                             <span>Comment</span>
+                            <?php if ($commentsCount > 0): ?>
+                                <span>(<?= $commentsCount ?>)</span>
+                            <?php endif; ?>
                         </button>
-                        <button type="button" onclick="shareToFeed('<?= $type ?>', <?= $postId ?>, '<?= addslashes($authorName) ?>')" class="civic-feed-action-btn">
+                        <button type="button" onclick="shareToFeed('<?= $type ?>', <?= $postId ?>, '<?= addslashes($authorName) ?>')"
+                                class="civic-feed-action-btn civicone-feed-action civicone-feed-action--share"
+                                aria-label="Share post by <?= htmlspecialchars($authorName) ?>">
                             <span class="dashicons dashicons-share" aria-hidden="true"></span>
                             <span>Share</span>
                         </button>
                     </div>
 
                     <!-- Comments Section -->
-                    <div id="comments-section-<?= $type ?>-<?= $postId ?>" class="civic-comments-section" aria-label="Comments">
+                    <section id="comments-section-<?= $type ?>-<?= $postId ?>"
+                             class="civic-comments-section civicone-feed-comments"
+                             role="region"
+                             aria-labelledby="post-<?= $type ?>-<?= $postId ?>-comments-heading"
+                             hidden>
+                        <h3 id="post-<?= $type ?>-<?= $postId ?>-comments-heading" class="civicone-visually-hidden">
+                            Comments on this post
+                        </h3>
                         <?php if ($isLoggedIn): ?>
                             <div class="civic-comment-form">
                                 <img src="<?= htmlspecialchars($_SESSION['user_avatar'] ?? '/assets/img/defaults/default_avatar.webp') ?>"
                                      class="civic-comment-avatar" alt="">
                                 <div class="civic-comment-input-wrapper">
-                                    <input type="text" class="civic-comment-input"
+                                    <label for="comment-input-<?= $type ?>-<?= $postId ?>" class="civicone-visually-hidden">
+                                        Write a comment
+                                    </label>
+                                    <input type="text"
+                                           id="comment-input-<?= $type ?>-<?= $postId ?>"
+                                           class="civic-comment-input"
                                            placeholder="Write a comment..."
-                                           onkeydown="if(event.key === 'Enter') submitComment(this, '<?= $type ?>', <?= $postId ?>)"
-                                           aria-label="Write a comment">
+                                           onkeydown="if(event.key === 'Enter') submitComment(this, '<?= $type ?>', <?= $postId ?>)">
                                     <button type="button" class="civic-comment-submit" onclick="submitComment(this.parentElement.querySelector('input'), '<?= $type ?>', <?= $postId ?>)" aria-label="Submit comment">
                                         <span class="dashicons dashicons-arrow-right-alt" aria-hidden="true"></span>
                                     </button>
@@ -1789,9 +985,11 @@ body.dark-mode .civic-type-badge {
                             </div>
                         <?php endif; ?>
                         <div class="comments-list"></div>
-                    </div>
+                    </section>
                 </article>
+                </li>
             <?php endforeach; ?>
+            </ol>
         <?php else: ?>
             <div class="civic-empty-state">
                 <div class="civic-empty-icon" aria-hidden="true">
@@ -1816,6 +1014,9 @@ body.dark-mode .civic-type-badge {
     </div>
 </div>
 </main>
+
+<!-- Feed Announcements Live Region (WCAG 2.1 AA Compliance) -->
+<div aria-live="polite" aria-atomic="false" class="civicone-visually-hidden" id="feed-announcements"></div>
 
 <!-- Toast Notification -->
 <div class="civic-toast" id="civic-toast" role="alert" aria-live="polite"></div>
@@ -1921,6 +1122,9 @@ function toggleLike(btn, type, id) {
                 btn.classList.toggle('liked');
                 btn.setAttribute('aria-pressed', isLiked);
                 showToast(data.error);
+            } else {
+                // Announce to screen readers
+                announceFeed(data.status === 'liked' ? 'Post liked' : 'Post unliked');
             }
         })
         .catch(() => {
@@ -1929,16 +1133,35 @@ function toggleLike(btn, type, id) {
         });
 }
 
+// Feed Announcements Helper
+function announceFeed(message) {
+    const announcer = document.getElementById('feed-announcements');
+    if (announcer) {
+        announcer.textContent = message;
+        // Clear after 3 seconds to prevent stale announcements
+        setTimeout(() => {
+            announcer.textContent = '';
+        }, 3000);
+    }
+}
+
 // Comments - toggleCommentSection is defined globally by mobile-sheets.php
 // It handles both mobile (opens sheet) and desktop (uses this fallback)
 window._feedDesktopToggleComment = function(type, id) {
     const section = document.getElementById(`comments-section-${type}-${id}`);
+    const button = document.querySelector(`[aria-controls="comments-section-${type}-${id}"]`);
     if (!section) return;
 
-    if (section.classList.contains('active')) {
+    const isExpanded = !section.hasAttribute('hidden');
+
+    if (isExpanded) {
         section.classList.remove('active');
+        section.setAttribute('hidden', '');
+        if (button) button.setAttribute('aria-expanded', 'false');
     } else {
         section.classList.add('active');
+        section.removeAttribute('hidden');
+        if (button) button.setAttribute('aria-expanded', 'true');
         const input = section.querySelector('input');
         if (input) input.focus();
         fetchComments(type, id);
@@ -2008,6 +1231,7 @@ function submitComment(input, type, id) {
             if (data.status === 'success') {
                 input.value = '';
                 fetchComments(type, id);
+                announceFeed('Comment posted');
                 showToast('Comment posted!');
             } else if (data.error) {
                 showToast(data.error);
@@ -2037,6 +1261,7 @@ function shareToFeed(type, id, author) {
         .then(res => res.json())
         .then(data => {
             if (data.status === 'success') {
+                announceFeed('Post shared to your feed');
                 showToast('Shared to your feed!');
                 setTimeout(() => location.reload(), 1000);
             } else {

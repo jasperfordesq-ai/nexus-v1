@@ -1,0 +1,928 @@
+/* ================================================================
+   CIVICONE FEED - MadeOpen Style with GOV.UK/GDS Principles
+   WCAG 2.1 AA Compliant | Dark Mode Support
+   Template F: Feed/Activity Stream
+   ================================================================ */
+
+/* Scoped under .nexus-skin-civicone to prevent bleed into other layouts */
+:root {
+    --civic-feed-max-width: 680px;
+    --civic-card-radius: 8px;
+    --civic-transition: 0.2s ease;
+}
+
+/* --------------------------------
+   ACCESSIBILITY UTILITIES
+   -------------------------------- */
+.civicone-visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+/* --------------------------------
+   FEED LIST STRUCTURE
+   -------------------------------- */
+.nexus-skin-civicone .civicone-feed-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.nexus-skin-civicone .civicone-feed-item {
+    margin-bottom: 16px;
+}
+
+.nexus-skin-civicone .civicone-feed-post {
+    background: var(--civic-bg-card);
+    border: 1px solid var(--civic-border);
+    border-radius: var(--civic-card-radius);
+    overflow: hidden;
+    transition: var(--civic-transition);
+}
+
+.nexus-skin-civicone .civicone-feed-post:hover {
+    box-shadow: var(--civic-shadow);
+}
+
+.nexus-skin-civicone .civicone-feed-post__header {
+    /* Semantic header wrapper */
+}
+
+.nexus-skin-civicone .civicone-feed-post__title {
+    /* Visually hidden heading for screen readers */
+}
+
+/* --------------------------------
+   FEED CONTAINER
+   -------------------------------- */
+.nexus-skin-civicone .civic-feed-container {
+    max-width: var(--civic-feed-max-width);
+    margin: 0 auto;
+}
+
+/* --------------------------------
+   POST COMPOSER
+   -------------------------------- */
+.nexus-skin-civicone .civic-composer {
+    background: var(--civic-bg-card);
+    border: 1px solid var(--civic-border);
+    border-radius: var(--civic-card-radius);
+    margin-bottom: 24px;
+    overflow: hidden;
+}
+
+.nexus-skin-civicone .civic-composer-collapsed {
+    padding: 16px;
+}
+
+.nexus-skin-civicone .civic-composer-top {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+}
+
+.nexus-skin-civicone .civic-composer-avatar {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid var(--civic-border);
+    flex-shrink: 0;
+}
+
+.nexus-skin-civicone .civic-composer-trigger {
+    flex: 1;
+    background: var(--civic-bg-page);
+    border: 1px solid var(--civic-border);
+    border-radius: 24px;
+    padding: 12px 20px;
+    color: var(--civic-text-muted);
+    cursor: pointer;
+    font-size: 1rem;
+    text-align: left;
+    transition: var(--civic-transition);
+}
+
+.nexus-skin-civicone .civic-composer-trigger:hover {
+    background: var(--civic-bg-card);
+    border-color: var(--civic-brand);
+}
+
+.nexus-skin-civicone .civic-composer-trigger:focus {
+    outline: 3px solid var(--civic-brand);
+    outline-offset: 2px;
+}
+
+.nexus-skin-civicone .civic-composer-divider {
+    height: 1px;
+    background: var(--civic-border);
+    margin: 12px 0;
+}
+
+.nexus-skin-civicone .civic-composer-shortcuts {
+    display: flex;
+    justify-content: space-around;
+    gap: 8px;
+}
+
+.nexus-skin-civicone .civic-composer-shortcut {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 10px;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--civic-text-secondary);
+    cursor: pointer;
+    transition: var(--civic-transition);
+    background: transparent;
+    border: none;
+    text-decoration: none;
+}
+
+.nexus-skin-civicone .civic-composer-shortcut:hover {
+    background: var(--civic-bg-page);
+}
+
+.nexus-skin-civicone .civic-composer-shortcut.photo .dashicons { color: #22C55E; }
+.nexus-skin-civicone .civic-composer-shortcut.event .dashicons { color: #EF4444; }
+.nexus-skin-civicone .civic-composer-shortcut.listing .dashicons { color: var(--civic-brand); }
+
+/* Expanded Composer */
+.nexus-skin-civicone .civic-composer-expanded {
+    display: none;
+    padding: 20px;
+}
+
+.nexus-skin-civicone .civic-composer-expanded.active {
+    display: block;
+}
+
+.nexus-skin-civicone .civic-composer-header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--civic-border);
+    margin-bottom: 16px;
+    position: relative;
+}
+
+.nexus-skin-civicone .civic-composer-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--civic-text-main);
+}
+
+.nexus-skin-civicone .civic-composer-close {
+    position: absolute;
+    right: 0;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: var(--civic-bg-page);
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--civic-text-muted);
+    transition: var(--civic-transition);
+}
+
+.nexus-skin-civicone .civic-composer-close:hover {
+    background: var(--civic-border);
+}
+
+.nexus-skin-civicone .civic-composer-close:focus {
+    outline: 3px solid var(--civic-brand);
+    outline-offset: 2px;
+}
+
+.nexus-skin-civicone .civic-composer-user {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 16px;
+}
+
+.nexus-skin-civicone .civic-composer-user-name {
+    font-weight: 700;
+    color: var(--civic-text-main);
+}
+
+.nexus-skin-civicone .civic-composer-textarea {
+    width: 100%;
+    min-height: 120px;
+    border: none;
+    background: transparent;
+    resize: none;
+    font-size: 1.125rem;
+    color: var(--civic-text-main);
+    outline: none;
+    font-family: inherit;
+    line-height: 1.5;
+}
+
+.nexus-skin-civicone .civic-composer-textarea::placeholder {
+    color: var(--civic-text-muted);
+}
+
+.nexus-skin-civicone .civic-composer-textarea:focus {
+    outline: none;
+}
+
+.nexus-skin-civicone .civic-composer-media-preview {
+    display: none;
+    margin: 16px 0;
+    position: relative;
+    border-radius: var(--civic-card-radius);
+    overflow: hidden;
+}
+
+.nexus-skin-civicone .civic-composer-media-preview.active {
+    display: block;
+}
+
+.nexus-skin-civicone .civic-composer-media-preview img {
+    max-width: 100%;
+    max-height: 300px;
+    display: block;
+}
+
+.nexus-skin-civicone .civic-composer-media-remove {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    width: 32px;
+    height: 32px;
+    background: rgba(0,0,0,0.7);
+    color: #fff;
+    border-radius: 50%;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.nexus-skin-civicone .civic-composer-tools {
+    border: 1px solid var(--civic-border);
+    border-radius: var(--civic-card-radius);
+    padding: 12px 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 16px;
+}
+
+.nexus-skin-civicone .civic-composer-tools-label {
+    font-weight: 600;
+    color: var(--civic-text-main);
+}
+
+.nexus-skin-civicone .civic-composer-tools-icons {
+    display: flex;
+    gap: 8px;
+}
+
+.nexus-skin-civicone .civic-composer-tool-btn {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: var(--civic-transition);
+    background: transparent;
+    border: none;
+    color: var(--civic-text-secondary);
+}
+
+.nexus-skin-civicone .civic-composer-tool-btn:hover {
+    background: var(--civic-bg-page);
+}
+
+.nexus-skin-civicone .civic-composer-tool-btn:focus {
+    outline: 3px solid var(--civic-brand);
+    outline-offset: 2px;
+}
+
+.nexus-skin-civicone .civic-composer-submit {
+    width: 100%;
+    padding: 14px;
+    background: var(--civic-brand);
+    color: #fff;
+    border: none;
+    border-radius: var(--civic-card-radius);
+    font-size: 1rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: var(--civic-transition);
+}
+
+.nexus-skin-civicone .civic-composer-submit:hover:not(:disabled) {
+    filter: brightness(0.9);
+}
+
+.nexus-skin-civicone .civic-composer-submit:disabled {
+    background: var(--civic-border);
+    color: var(--civic-text-muted);
+    cursor: not-allowed;
+}
+
+.nexus-skin-civicone .civic-composer-submit:focus {
+    outline: 3px solid var(--civic-brand);
+    outline-offset: 2px;
+}
+
+/* Guest CTA */
+.nexus-skin-civicone .civic-composer-guest {
+    padding: 32px;
+    text-align: center;
+}
+
+.nexus-skin-civicone .civic-composer-guest h3 {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--civic-text-main);
+    margin-bottom: 8px;
+}
+
+.nexus-skin-civicone .civic-composer-guest p {
+    color: var(--civic-text-muted);
+    margin-bottom: 16px;
+}
+
+/* --------------------------------
+   FEED CARDS (Legacy support - kept for backward compatibility)
+   -------------------------------- */
+.nexus-skin-civicone .civic-feed-card {
+    background: var(--civic-bg-card);
+    border: 1px solid var(--civic-border);
+    border-radius: var(--civic-card-radius);
+    margin-bottom: 16px;
+    overflow: hidden;
+    transition: var(--civic-transition);
+}
+
+.nexus-skin-civicone .civic-feed-card:hover {
+    box-shadow: var(--civic-shadow);
+}
+
+/* Feed Header */
+.nexus-skin-civicone .civic-feed-header {
+    padding: 16px;
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+}
+
+.nexus-skin-civicone .civic-feed-avatar {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    object-fit: cover;
+    flex-shrink: 0;
+}
+
+.nexus-skin-civicone .civic-feed-meta {
+    flex: 1;
+    min-width: 0;
+}
+
+.nexus-skin-civicone .civic-feed-author {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--civic-text-main);
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 4px;
+}
+
+.nexus-skin-civicone .civic-feed-author a {
+    color: var(--civic-text-main);
+    text-decoration: none;
+}
+
+.nexus-skin-civicone .civic-feed-author a:hover {
+    text-decoration: underline;
+}
+
+.nexus-skin-civicone .civic-feed-verb {
+    font-weight: 400;
+    color: var(--civic-text-secondary);
+}
+
+.nexus-skin-civicone .civic-feed-object {
+    font-weight: 700;
+    color: var(--civic-brand);
+}
+
+.nexus-skin-civicone .civic-feed-time {
+    font-size: 0.875rem;
+    color: var(--civic-text-muted);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 2px;
+}
+
+.nexus-skin-civicone .civic-feed-menu {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: var(--civic-transition);
+    background: transparent;
+    border: none;
+    color: var(--civic-text-muted);
+}
+
+.nexus-skin-civicone .civic-feed-menu:hover {
+    background: var(--civic-bg-page);
+}
+
+/* Feed Body */
+.nexus-skin-civicone .civic-feed-body {
+    padding: 0 16px 16px;
+}
+
+.nexus-skin-civicone .civic-feed-title {
+    font-size: 1.125rem;
+    font-weight: 700;
+    color: var(--civic-text-main);
+    margin-bottom: 8px;
+}
+
+.nexus-skin-civicone .civic-feed-content {
+    font-size: 1rem;
+    line-height: 1.6;
+    color: var(--civic-text-main);
+    white-space: pre-wrap;
+    word-wrap: break-word;
+}
+
+.nexus-skin-civicone .civic-feed-content a {
+    color: var(--civic-brand);
+}
+
+.nexus-skin-civicone .civic-feed-image {
+    width: 100%;
+    display: block;
+    border-top: 1px solid var(--civic-border);
+}
+
+/* --------------------------------
+   TYPE-SPECIFIC BANNERS
+   -------------------------------- */
+.nexus-skin-civicone .civic-type-banner {
+    padding: 20px 16px;
+    border-top: 1px solid var(--civic-border);
+}
+
+.nexus-skin-civicone .civic-type-banner-listing {
+    background: linear-gradient(135deg, #EFF6FF 0%, #DBEAFE 100%);
+    border-left: 4px solid var(--civic-brand);
+}
+
+.nexus-skin-civicone .civic-type-banner-listing.request {
+    background: linear-gradient(135deg, #FEF3C7 0%, #FDE68A 100%);
+    border-left-color: #F59E0B;
+}
+
+.nexus-skin-civicone .civic-type-banner-event {
+    background: linear-gradient(135deg, #FDF2F8 0%, #FCE7F3 100%);
+    border-left: 4px solid #DB2777;
+}
+
+.nexus-skin-civicone .civic-type-banner-goal {
+    background: linear-gradient(135deg, #ECFDF5 0%, #D1FAE5 100%);
+    border-left: 4px solid #22C55E;
+}
+
+.nexus-skin-civicone .civic-type-banner-poll {
+    background: linear-gradient(135deg, #EFF6FF 0%, #DBEAFE 100%);
+    border-left: 4px solid #3B82F6;
+}
+
+.nexus-skin-civicone .civic-type-banner-volunteering {
+    background: linear-gradient(135deg, #F0F9FF 0%, #E0F2FE 100%);
+    border-left: 4px solid #0EA5E9;
+}
+
+body.dark-mode .nexus-skin-civicone .civic-type-banner-listing {
+    background: linear-gradient(135deg, #1E3A5F 0%, #1E40AF 100%);
+}
+
+body.dark-mode .nexus-skin-civicone .civic-type-banner-listing.request {
+    background: linear-gradient(135deg, #451A03 0%, #78350F 100%);
+}
+
+body.dark-mode .nexus-skin-civicone .civic-type-banner-event {
+    background: linear-gradient(135deg, #500724 0%, #831843 100%);
+}
+
+body.dark-mode .nexus-skin-civicone .civic-type-banner-goal {
+    background: linear-gradient(135deg, #052E16 0%, #14532D 100%);
+}
+
+body.dark-mode .nexus-skin-civicone .civic-type-banner-poll {
+    background: linear-gradient(135deg, #1E3A5F 0%, #1E40AF 100%);
+}
+
+body.dark-mode .nexus-skin-civicone .civic-type-banner-volunteering {
+    background: linear-gradient(135deg, #082F49 0%, #0C4A6E 100%);
+}
+
+.nexus-skin-civicone .civic-type-label {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-weight: 700;
+    margin-bottom: 8px;
+}
+
+.nexus-skin-civicone .civic-type-title {
+    font-weight: 700;
+    font-size: 1.125rem;
+    color: var(--civic-text-main);
+    margin-bottom: 8px;
+}
+
+.nexus-skin-civicone .civic-type-meta {
+    font-size: 0.875rem;
+    color: var(--civic-text-secondary);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 16px;
+}
+
+.nexus-skin-civicone .civic-type-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 12px;
+    background: #fff;
+    border-radius: 16px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    border: 1px solid var(--civic-border);
+}
+
+body.dark-mode .nexus-skin-civicone .civic-type-badge {
+    background: var(--civic-bg-card);
+}
+
+.nexus-skin-civicone .civic-view-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 12px 20px;
+    background: #00703c; /* GOV.UK green for guaranteed WCAG AA (7.41:1 with white) */
+    color: #fff !important;
+    border-radius: 6px;
+    font-size: 0.9375rem;
+    font-weight: 700;
+    text-decoration: none !important;
+    transition: var(--civic-transition);
+    width: 100%;
+}
+
+.nexus-skin-civicone .civic-view-btn:hover {
+    background: #005a30; /* Darker green on hover */
+    color: #fff !important;
+}
+
+.nexus-skin-civicone .civic-view-btn:focus {
+    outline: 3px solid var(--civic-brand);
+    outline-offset: 2px;
+}
+
+.nexus-skin-civicone .civic-view-btn--secondary {
+    background: var(--civic-bg-card);
+    color: var(--civic-text-main);
+    border: 2px solid var(--civic-border);
+}
+
+.nexus-skin-civicone .civic-view-btn--secondary:hover {
+    background: var(--civic-bg-page);
+    filter: none;
+    color: var(--civic-text-main);
+}
+
+/* --------------------------------
+   FEED STATS
+   -------------------------------- */
+.nexus-skin-civicone .civic-feed-stats {
+    padding: 12px 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.9375rem;
+    color: var(--civic-text-secondary);
+    border-top: 1px solid var(--civic-border);
+    border-bottom: 1px solid var(--civic-border);
+}
+
+.nexus-skin-civicone .civic-feed-stats-left {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.nexus-skin-civicone .civic-feed-stats-right {
+    cursor: pointer;
+}
+
+.nexus-skin-civicone .civic-feed-stats-right:hover {
+    text-decoration: underline;
+}
+
+/* --------------------------------
+   FEED ACTIONS (WCAG 2.1 AA)
+   -------------------------------- */
+.nexus-skin-civicone .civic-feed-actions {
+    display: flex;
+    padding: 4px 8px;
+}
+
+.nexus-skin-civicone .civic-feed-action-btn,
+.nexus-skin-civicone .civicone-feed-action {
+    flex: 1;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: var(--civic-transition);
+    font-size: 0.9375rem;
+    font-weight: 600;
+    color: var(--civic-text-secondary);
+    background: transparent;
+    border: none;
+}
+
+.nexus-skin-civicone .civic-feed-action-btn:hover,
+.nexus-skin-civicone .civicone-feed-action:hover {
+    background: var(--civic-bg-page);
+}
+
+.nexus-skin-civicone .civic-feed-action-btn:focus,
+.nexus-skin-civicone .civicone-feed-action:focus {
+    outline: 3px solid var(--civic-brand);
+    outline-offset: -3px;
+}
+
+.nexus-skin-civicone .civic-feed-action-btn.liked,
+.nexus-skin-civicone .civicone-feed-action--like[aria-pressed="true"] {
+    color: #D4351C;
+}
+
+/* --------------------------------
+   COMMENTS SECTION (WCAG 2.1 AA Accordion Pattern)
+   -------------------------------- */
+.nexus-skin-civicone .civic-comments-section,
+.nexus-skin-civicone .civicone-feed-comments {
+    display: none;
+    padding: 16px;
+    background: var(--civic-bg-page);
+    border-top: 1px solid var(--civic-border);
+}
+
+.nexus-skin-civicone .civic-comments-section.active,
+.nexus-skin-civicone .civicone-feed-comments:not([hidden]) {
+    display: block;
+}
+
+.nexus-skin-civicone .civic-comment-form {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 16px;
+}
+
+.nexus-skin-civicone .civic-comment-avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    object-fit: cover;
+    flex-shrink: 0;
+}
+
+.nexus-skin-civicone .civic-comment-input-wrapper {
+    flex: 1;
+    position: relative;
+}
+
+.nexus-skin-civicone .civic-comment-input {
+    width: 100%;
+    padding: 10px 44px 10px 16px;
+    border: 1px solid var(--civic-border);
+    background: var(--civic-bg-card);
+    border-radius: 24px;
+    font-size: 0.9375rem;
+    color: var(--civic-text-main);
+    outline: none;
+}
+
+.nexus-skin-civicone .civic-comment-input:focus {
+    border-color: var(--civic-brand);
+    outline: 3px solid var(--civic-brand);
+    outline-offset: 2px;
+}
+
+.nexus-skin-civicone .civic-comment-input::placeholder {
+    color: var(--civic-text-muted);
+}
+
+.nexus-skin-civicone .civic-comment-submit {
+    position: absolute;
+    right: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--civic-brand);
+    cursor: pointer;
+    background: none;
+    border: none;
+    padding: 8px;
+}
+
+.nexus-skin-civicone .civic-comment-submit:hover {
+    opacity: 0.8;
+}
+
+.nexus-skin-civicone .civic-comment-item {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 12px;
+}
+
+.nexus-skin-civicone .civic-comment-bubble {
+    background: var(--civic-bg-card);
+    padding: 10px 16px;
+    border-radius: 18px;
+    border: 1px solid var(--civic-border);
+}
+
+.nexus-skin-civicone .civic-comment-author {
+    font-weight: 700;
+    font-size: 0.875rem;
+    color: var(--civic-text-main);
+    margin-bottom: 2px;
+}
+
+.nexus-skin-civicone .civic-comment-text {
+    font-size: 0.9375rem;
+    color: var(--civic-text-main);
+    line-height: 1.4;
+}
+
+/* --------------------------------
+   SHARED/REPOSTED CONTENT
+   -------------------------------- */
+.nexus-skin-civicone .civic-shared-card {
+    margin: 12px 16px;
+    border: 1px solid var(--civic-border);
+    border-radius: var(--civic-card-radius);
+    overflow: hidden;
+    background: var(--civic-bg-page);
+}
+
+.nexus-skin-civicone .civic-shared-header {
+    padding: 12px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    border-bottom: 1px solid var(--civic-border);
+}
+
+.nexus-skin-civicone .civic-shared-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.nexus-skin-civicone .civic-shared-author {
+    font-weight: 700;
+    font-size: 0.875rem;
+    color: var(--civic-text-main);
+}
+
+.nexus-skin-civicone .civic-shared-label {
+    font-weight: 400;
+    color: var(--civic-text-muted);
+    font-size: 0.75rem;
+}
+
+.nexus-skin-civicone .civic-shared-time {
+    font-size: 0.75rem;
+    color: var(--civic-text-muted);
+}
+
+.nexus-skin-civicone .civic-shared-body {
+    padding: 12px;
+}
+
+.nexus-skin-civicone .civic-shared-title {
+    font-weight: 700;
+    color: var(--civic-text-main);
+    margin-bottom: 8px;
+}
+
+.nexus-skin-civicone .civic-shared-content {
+    font-size: 0.875rem;
+    color: var(--civic-text-main);
+    line-height: 1.4;
+}
+
+/* --------------------------------
+   EMPTY STATE
+   -------------------------------- */
+.nexus-skin-civicone .civic-empty-state {
+    background: var(--civic-bg-card);
+    border: 1px solid var(--civic-border);
+    border-radius: var(--civic-card-radius);
+    padding: 60px 32px;
+    text-align: center;
+}
+
+.nexus-skin-civicone .civic-empty-icon {
+    font-size: 3rem;
+    margin-bottom: 16px;
+}
+
+.nexus-skin-civicone .civic-empty-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--civic-text-main);
+    margin-bottom: 8px;
+}
+
+.nexus-skin-civicone .civic-empty-text {
+    color: var(--civic-text-muted);
+    margin-bottom: 24px;
+}
+
+/* --------------------------------
+   TOAST NOTIFICATION
+   -------------------------------- */
+.nexus-skin-civicone .civic-toast {
+    position: fixed;
+    bottom: calc(90px + env(safe-area-inset-bottom, 0px));
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--civic-brand);
+    color: #fff;
+    padding: 14px 28px;
+    border-radius: var(--civic-card-radius);
+    font-weight: 600;
+    z-index: 10000;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+    max-width: calc(100% - 32px);
+    text-align: center;
+}
+
+.nexus-skin-civicone .civic-toast.show {
+    opacity: 1;
+    visibility: visible;
+    bottom: calc(100px + env(safe-area-inset-bottom, 0px));
+}
+
+/* --------------------------------
+   MOBILE RESPONSIVE
+   -------------------------------- */
+@media (max-width: 600px) {
+    .nexus-skin-civicone .civic-composer-shortcuts {
+        flex-direction: column;
+    }
+
+    .nexus-skin-civicone .civic-composer-shortcut span {
+        display: none;
+    }
+
+    .nexus-skin-civicone .civic-feed-action-btn span {
+        display: none;
+    }
+}

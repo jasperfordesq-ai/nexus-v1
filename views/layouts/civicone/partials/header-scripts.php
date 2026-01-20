@@ -79,66 +79,68 @@
                 // - Swipe gestures
 
                 // ===========================================
-                // MEGA MENU TOGGLE - WCAG 2.1 AA Compliant
+                // SERVICE NAVIGATION MOBILE TOGGLE - WCAG 2.1 AA
                 // ===========================================
-                var megaMenuBtn = document.getElementById('civic-mega-menu-btn');
-                var megaMenu = document.getElementById('civic-mega-menu');
+                var serviceNavToggle = document.getElementById('civicone-service-nav-toggle');
+                var serviceNavPanel = document.getElementById('civicone-service-navigation-list');
 
-                if (megaMenuBtn && megaMenu) {
-                    // Toggle mega menu on click
-                    megaMenuBtn.addEventListener('click', function(e) {
+                if (serviceNavToggle && serviceNavPanel) {
+                    // Toggle mobile nav panel on click
+                    serviceNavToggle.addEventListener('click', function(e) {
                         e.stopPropagation();
                         var isExpanded = this.getAttribute('aria-expanded') === 'true';
 
                         if (isExpanded) {
-                            closeMegaMenu();
+                            closeServiceNav();
                         } else {
-                            openMegaMenu();
+                            openServiceNav();
                         }
                     });
 
-                    // Open mega menu
-                    function openMegaMenu() {
-                        megaMenuBtn.setAttribute('aria-expanded', 'true');
-                        megaMenuBtn.classList.add('active');
-                        megaMenu.classList.add('active');
-                        megaMenu.style.display = 'block';
+                    // Open service nav
+                    function openServiceNav() {
+                        serviceNavToggle.setAttribute('aria-expanded', 'true');
+                        serviceNavToggle.classList.add('active');
+                        serviceNavPanel.removeAttribute('hidden');
+                        serviceNavPanel.classList.add('active');
 
-                        // Focus first link in mega menu
-                        var firstLink = megaMenu.querySelector('a');
+                        // Focus first link in panel
+                        var firstLink = serviceNavPanel.querySelector('a');
                         if (firstLink) {
                             setTimeout(function() { firstLink.focus(); }, 50);
                         }
                     }
 
-                    // Close mega menu
-                    function closeMegaMenu() {
-                        megaMenuBtn.setAttribute('aria-expanded', 'false');
-                        megaMenuBtn.classList.remove('active');
-                        megaMenu.classList.remove('active');
-                        megaMenu.style.display = 'none';
+                    // Close service nav
+                    function closeServiceNav() {
+                        serviceNavToggle.setAttribute('aria-expanded', 'false');
+                        serviceNavToggle.classList.remove('active');
+                        serviceNavPanel.classList.remove('active');
+                        setTimeout(function() {
+                            serviceNavPanel.setAttribute('hidden', '');
+                        }, 150); // Wait for CSS transition
                     }
 
                     // Close on Escape key
                     document.addEventListener('keydown', function(e) {
-                        if (e.key === 'Escape' && megaMenu.classList.contains('active')) {
-                            closeMegaMenu();
-                            megaMenuBtn.focus();
+                        if (e.key === 'Escape' && serviceNavPanel.classList.contains('active')) {
+                            closeServiceNav();
+                            serviceNavToggle.focus();
                         }
                     });
 
                     // Close when clicking outside
                     document.addEventListener('click', function(e) {
-                        if (!megaMenu.contains(e.target) && !megaMenuBtn.contains(e.target)) {
-                            if (megaMenu.classList.contains('active')) {
-                                closeMegaMenu();
+                        if (!serviceNavPanel.contains(e.target) && !serviceNavToggle.contains(e.target)) {
+                            if (serviceNavPanel.classList.contains('active')) {
+                                closeServiceNav();
                             }
                         }
                     });
 
-                    // Keyboard navigation within mega menu
-                    megaMenu.addEventListener('keydown', function(e) {
-                        var links = megaMenu.querySelectorAll('a');
+                    // Keyboard navigation within panel
+                    serviceNavPanel.addEventListener('keydown', function(e) {
+                        var links = serviceNavPanel.querySelectorAll('a');
                         var currentIndex = Array.from(links).indexOf(document.activeElement);
 
                         if (e.key === 'ArrowDown') {
@@ -151,38 +153,57 @@
                             if (currentIndex > 0) {
                                 links[currentIndex - 1].focus();
                             } else {
-                                megaMenuBtn.focus();
+                                serviceNavToggle.focus();
                             }
                         } else if (e.key === 'Tab' && e.shiftKey && currentIndex === 0) {
-                            // Shift+Tab on first link - close menu and focus button
+                            // Shift+Tab on first link - close panel and focus toggle
                             e.preventDefault();
-                            closeMegaMenu();
-                            megaMenuBtn.focus();
+                            closeServiceNav();
+                            serviceNavToggle.focus();
                         }
                     });
                 }
 
+                // BACKWARD COMPATIBILITY: Map old mega menu button to service nav toggle
+                // This allows existing mobile-nav-v2.php to work
+                var oldMegaMenuBtn = document.getElementById('civic-mega-menu-btn');
+                if (oldMegaMenuBtn && serviceNavToggle) {
+                    oldMegaMenuBtn.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        // Trigger service nav toggle instead
+                        serviceNavToggle.click();
+                    });
+                }
+
                 // Mobile Search Toggle
-                var mobileSearchToggle = document.getElementById('civic-mobile-search-toggle');
-                var mobileSearchBar = document.getElementById('civic-mobile-search-bar');
+                var mobileSearchToggle = document.getElementById('civicone-mobile-search-toggle');
+                var mobileSearchBar = document.getElementById('civicone-mobile-search-bar');
 
                 if (mobileSearchToggle && mobileSearchBar) {
                     mobileSearchToggle.addEventListener('click', function() {
                         var isExpanded = this.getAttribute('aria-expanded') === 'true';
 
-                        // Close mobile menu if open
+                        // Close service nav panel if open
+                        if (typeof closeServiceNav === 'function') {
+                            closeServiceNav();
+                        }
+
+                        // Close mobile drawer if open
                         if (typeof closeMobileMenu === 'function') {
                             closeMobileMenu();
                         }
 
                         if (isExpanded) {
+                            mobileSearchBar.removeAttribute('hidden');
                             mobileSearchBar.classList.remove('active');
                             this.setAttribute('aria-expanded', 'false');
                         } else {
+                            mobileSearchBar.removeAttribute('hidden');
                             mobileSearchBar.classList.add('active');
                             this.setAttribute('aria-expanded', 'true');
                             // Focus the search input
-                            var searchInput = document.getElementById('mobile-search-input');
+                            var searchInput = document.getElementById('civicone-mobile-search-input');
                             if (searchInput) searchInput.focus();
                         }
                     });
@@ -232,6 +253,12 @@
                 // WCAG 2.1 AA Compliant Dropdown Navigation
                 // Supports: Click, Enter, Space, Escape, Arrow Keys
                 // ===========================================
+
+                // Prevent duplicate initialization (important for Turbo/AJAX navigation)
+                if (document.body.hasAttribute('data-civic-dropdowns-initialized')) {
+                    return; // Already initialized, skip
+                }
+                document.body.setAttribute('data-civic-dropdowns-initialized', 'true');
 
                 var allDropdowns = document.querySelectorAll('.civic-dropdown button');
 
@@ -384,6 +411,19 @@
                         closeAllDropdowns(null);
                     }
                 });
+
+                // ===========================================
+                // UTILITY BAR - Notification Button Handler
+                // ===========================================
+                var notificationBtn = document.querySelector('[data-action="open-notifications"]');
+                if (notificationBtn) {
+                    notificationBtn.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        if (window.nexusNotifDrawer && typeof window.nexusNotifDrawer.open === 'function') {
+                            window.nexusNotifDrawer.open();
+                        }
+                    });
+                }
             });
         </script>
 

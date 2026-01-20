@@ -166,6 +166,17 @@
     color: white;
 }
 
+/* Notification Badge */
+.dash-notif-badge {
+    background: #ef4444;
+    color: white;
+    font-size: 0.7rem;
+    padding: 2px 6px;
+    border-radius: 99px;
+    font-weight: 700;
+    margin-left: 4px;
+}
+
 /* FAB for Dashboard */
 .dash-fab {
     position: fixed;

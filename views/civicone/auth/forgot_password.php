@@ -5,7 +5,7 @@
 $layout = \Nexus\Services\LayoutHelper::get(); // Get current layout
 
 // 1. Header Selection
-else ($layout === 'civicone') {
+if ($layout === 'civicone') {
     require __DIR__ . '/../../layouts/civicone/header.php';
     echo '<div class="civicone-wrapper" style="padding-top: 40px;">';
 } else {
@@ -188,7 +188,7 @@ else ($layout === 'civicone') {
 
 <?php
 // Close Wrappers & Include Footer
-else ($layout === 'civicone') {
+if ($layout === 'civicone') {
     echo '</div>'; // Close civicone-wrapper
     require __DIR__ . '/../../layouts/civicone/footer.php';
 } else {

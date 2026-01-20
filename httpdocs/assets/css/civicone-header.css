@@ -137,7 +137,7 @@
     border-radius: var(--radius-sm);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
     padding: var(--space-2) 0;
-    z-index: 1000;
+    z-index: 10000; /* Above notification drawer (9999) to prevent overlap */
     margin-top: var(--space-1);
 }
 
@@ -151,9 +151,12 @@
 }
 
 .civic-utility-bar .civic-dropdown-content a {
-    display: block;
+    display: flex;
+    align-items: center;
+    min-height: 44px; /* WCAG 2.5.5 - Minimum touch target size */
     padding: var(--space-3) var(--space-4);
     color: var(--civic-text-primary);
+    background-color: transparent; /* WCAG FIX: Explicitly prevent yellow backgrounds - yellow ONLY for :focus-visible */
     text-decoration: none;
     font-weight: 500;
     font-size: 14px;
@@ -172,15 +175,130 @@
     color: var(--govuk-focus-text-colour, #0b0c0c);
 }
 
-/* Force Dropdown Hover Logic */
-.civic-dropdown:hover .civic-dropdown-content {
+/* Dropdown shown state (for JS toggle) */
+.civic-dropdown-content.is-open {
     display: block;
     animation: civicFadeIn 0.2s;
 }
 
+/* REMOVED: Hover logic conflicts with JS click handlers
+   Hover was preventing dropdown from closing on click
+   JS-only control is more accessible (WCAG 2.1 AA compliant) */
+/* .civic-dropdown:hover .civic-dropdown-content {
+    display: block;
+    animation: civicFadeIn 0.2s;
+} */
+
 @keyframes civicFadeIn {
     from { opacity: 0; transform: translateY(-4px); }
     to { opacity: 1; transform: translateY(0); }
+}
+
+/* Layout Switcher Active State */
+.civic-dropdown-content a[aria-current="true"] {
+    font-weight: bold;
+    color: var(--civic-brand, #00796B);
+    background: rgba(0, 121, 107, 0.1);
+}
+
+.civic-dropdown-content a[aria-current="true"] .civic-checkmark {
+    float: right;
+    color: var(--civic-brand, #00796B);
+}
+
+/* Layout Switcher Icons */
+.civic-layout-icon {
+    display: inline-block;
+    margin-right: 8px;
+}
+
+/* Dropdown Separator */
+.civic-dropdown-separator {
+    border-top: 1px solid #e5e7eb;
+    margin: 5px 0;
+}
+
+/* User Dropdown Menu Icons */
+.civic-menu-icon {
+    margin-right: 10px;
+    width: 16px;
+    text-align: center;
+}
+
+.civic-menu-icon--brand {
+    color: var(--civic-brand, #00796B);
+}
+
+.civic-menu-icon--purple {
+    color: #8b5cf6;
+}
+
+.civic-menu-icon--green {
+    color: #10b981;
+}
+
+.civic-menu-icon--pink {
+    color: #db2777;
+}
+
+.civic-menu-icon--amber {
+    color: #d97706;
+}
+
+.civic-menu-icon--blue {
+    color: #2563eb;
+}
+
+.civic-menu-icon--indigo {
+    color: #4f46e5;
+}
+
+.civic-menu-icon--gray {
+    color: #6b7280;
+}
+
+/* Logout Link Styling */
+.civic-utility-link--logout {
+    color: #ef4444;
+    font-weight: 600;
+}
+
+/* Mobile-only Links */
+.mobile-only-link {
+    display: none;
+}
+
+.mobile-only-link--dashboard {
+    font-weight: 700;
+}
+
+.mobile-only-link--logout {
+    color: #dc2626;
+}
+
+/* Notification Button (reset button styles) */
+.civic-utility-btn--notification {
+    background: none;
+    border: none;
+    cursor: pointer;
+}
+
+@media (max-width: 768px) {
+    .mobile-only-link {
+        display: inline-flex;
+    }
+
+    .desktop-only-dd {
+        display: none;
+    }
+
+    /* WCAG 1.4.10 - Prevent dropdown overflow on narrow screens */
+    .civic-utility-bar .civic-dropdown-content {
+        min-width: auto;
+        max-width: calc(100vw - 20px);
+        right: 10px;
+        left: auto;
+    }
 }
 
 /* ===========================================
@@ -359,9 +477,385 @@
 }
 
 /* ===========================================
-   6. MEGA MENU - Full-width Dropdown
+   6. SERVICE NAVIGATION (GOV.UK Pattern) - NEW 2026-01-20
    =========================================== */
-.civic-menu-btn {
+.civicone-header {
+    background-color: var(--civic-bg-primary);
+    border-bottom: 4px solid var(--civic-brand);
+    position: relative;
+    z-index: 100;
+}
+
+.civicone-width-container {
+    max-width: 1020px; /* GOV.UK standard */
+    margin: 0 auto;
+    padding: 0 var(--space-6);
+}
+
+.civicone-service-navigation__container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-4);
+    min-height: 80px;
+}
+
+/* Logo / Service Name */
+.civicone-service-navigation__branding {
+    flex-shrink: 0;
+}
+
+.civicone-service-navigation__logo {
+    text-decoration: none;
+    color: var(--civic-text-primary);
+    font-weight: 700;
+    font-size: 1.5rem;
+    display: inline-block;
+    transition: opacity var(--duration-fast) var(--ease-default);
+}
+
+.civicone-service-navigation__logo:hover {
+    opacity: 0.8;
+}
+
+.civicone-service-navigation__logo:focus-visible {
+    outline: 3px solid var(--govuk-focus-colour, #ffdd00);
+    outline-offset: 3px;
+    background-color: var(--govuk-focus-colour, #ffdd00);
+    color: var(--govuk-focus-text-colour, #0b0c0c);
+}
+
+.civicone-service-navigation__service-name {
+    display: inline-block;
+}
+
+/* Desktop Navigation List */
+.civicone-service-navigation__list {
+    display: none; /* Hidden on mobile */
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    gap: var(--space-3);
+}
+
+@media (min-width: 768px) {
+    .civicone-service-navigation__list {
+        display: flex;
+        align-items: center;
+    }
+}
+
+.civicone-service-navigation__item {
+    margin: 0;
+    padding: 0;
+}
+
+.civicone-service-navigation__link {
+    display: inline-block;
+    padding: var(--space-3) var(--space-4);
+    color: var(--civic-text-primary);
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 1rem;
+    border-bottom: 4px solid transparent;
+    transition: border-color var(--duration-fast) var(--ease-default);
+    min-height: 44px;
+}
+
+.civicone-service-navigation__link:hover {
+    text-decoration: underline;
+    border-bottom-color: var(--civic-brand-light);
+}
+
+.civicone-service-navigation__link:focus-visible {
+    outline: 3px solid var(--govuk-focus-colour, #ffdd00);
+    outline-offset: 0;
+    background-color: var(--govuk-focus-colour, #ffdd00);
+    color: var(--govuk-focus-text-colour, #0b0c0c);
+    box-shadow: 0 -2px var(--govuk-focus-colour, #ffdd00), 0 4px var(--govuk-focus-text-colour, #0b0c0c);
+    text-decoration: none;
+}
+
+/* Active state */
+.civicone-service-navigation__item--active .civicone-service-navigation__link {
+    border-bottom-color: var(--civic-brand);
+    font-weight: 700;
+}
+
+/* Mobile Toggle Button */
+.civicone-service-navigation__toggle {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    padding: var(--space-3) var(--space-4);
+    background: none;
+    border: 2px solid var(--civic-text-primary);
+    border-radius: var(--radius-sm);
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--civic-text-primary);
+    cursor: pointer;
+    min-height: 44px;
+    min-width: 44px;
+}
+
+@media (min-width: 768px) {
+    .civicone-service-navigation__toggle {
+        display: none; /* Hide on desktop */
+    }
+}
+
+.civicone-service-navigation__toggle:hover {
+    background-color: var(--civic-bg-tertiary);
+}
+
+.civicone-service-navigation__toggle:focus-visible {
+    outline: 3px solid var(--govuk-focus-colour, #ffdd00);
+    outline-offset: 0;
+    background-color: var(--govuk-focus-colour, #ffdd00);
+    color: var(--govuk-focus-text-colour, #0b0c0c);
+    border-color: var(--govuk-focus-text-colour, #0b0c0c);
+}
+
+.civicone-service-navigation__toggle-icon {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    width: 20px;
+    height: 16px;
+}
+
+.civicone-service-navigation__toggle-icon span {
+    display: block;
+    width: 100%;
+    height: 3px;
+    background-color: currentColor;
+    border-radius: 2px;
+    transition: transform var(--duration-fast) var(--ease-default);
+}
+
+.civicone-service-navigation__toggle.active .civicone-service-navigation__toggle-icon span:nth-child(1) {
+    transform: translateY(7px) rotate(45deg);
+}
+
+.civicone-service-navigation__toggle.active .civicone-service-navigation__toggle-icon span:nth-child(2) {
+    opacity: 0;
+}
+
+.civicone-service-navigation__toggle.active .civicone-service-navigation__toggle-icon span:nth-child(3) {
+    transform: translateY(-7px) rotate(-45deg);
+}
+
+/* Mobile Navigation Panel */
+.civicone-service-navigation__mobile-panel {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: var(--civic-bg-primary);
+    border-bottom: 4px solid var(--civic-brand);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    max-height: 0;
+    overflow: hidden;
+    opacity: 0;
+    transition: max-height var(--duration-fast) var(--ease-default), opacity var(--duration-fast) var(--ease-default);
+}
+
+.civicone-service-navigation__mobile-panel.active {
+    max-height: 500px;
+    opacity: 1;
+}
+
+.civicone-service-navigation__mobile-list {
+    list-style: none;
+    margin: 0;
+    padding: var(--space-4) 0;
+}
+
+.civicone-service-navigation__mobile-item {
+    margin: 0;
+    padding: 0;
+    border-top: 1px solid var(--civic-bg-tertiary);
+}
+
+.civicone-service-navigation__mobile-link {
+    display: block;
+    padding: var(--space-4) var(--space-6);
+    color: var(--civic-text-primary);
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 1.125rem;
+}
+
+.civicone-service-navigation__mobile-link:hover {
+    background-color: var(--civic-bg-tertiary);
+    text-decoration: underline;
+}
+
+.civicone-service-navigation__mobile-link:focus-visible {
+    outline: 3px solid var(--govuk-focus-colour, #ffdd00);
+    outline-offset: -3px;
+    background-color: var(--govuk-focus-colour, #ffdd00);
+    color: var(--govuk-focus-text-colour, #0b0c0c);
+}
+
+.civicone-service-navigation__mobile-item--active .civicone-service-navigation__mobile-link {
+    font-weight: 700;
+    border-left: 4px solid var(--civic-brand);
+    padding-left: calc(var(--space-6) - 4px);
+}
+
+/* Search Area */
+.civicone-search-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: var(--space-4);
+    padding: var(--space-4) 0;
+    border-bottom: 1px solid var(--civic-bg-tertiary);
+}
+
+.civicone-desktop-search {
+    display: none;
+}
+
+@media (min-width: 768px) {
+    .civicone-desktop-search {
+        display: block;
+    }
+}
+
+.civicone-search-form {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+}
+
+.civicone-search-input {
+    padding: var(--space-2) var(--space-3);
+    border: 2px solid var(--civic-text-primary);
+    border-radius: var(--radius-sm);
+    font-size: 1rem;
+    min-height: 44px;
+    min-width: 200px;
+}
+
+.civicone-search-input:focus-visible {
+    outline: 3px solid var(--govuk-focus-colour, #ffdd00);
+    outline-offset: 0;
+    box-shadow: inset 0 0 0 2px;
+}
+
+.civicone-search-button {
+    padding: var(--space-2) var(--space-4);
+    background: var(--civic-brand);
+    color: white;
+    border: 2px solid var(--civic-brand);
+    border-radius: var(--radius-sm);
+    font-weight: 600;
+    cursor: pointer;
+    min-height: 44px;
+    min-width: 44px;
+}
+
+.civicone-search-button:hover {
+    background: var(--civic-brand-dark);
+    border-color: var(--civic-brand-dark);
+}
+
+.civicone-search-button:focus-visible {
+    outline: 3px solid var(--govuk-focus-colour, #ffdd00);
+    outline-offset: 0;
+    background-color: var(--govuk-focus-colour, #ffdd00);
+    color: var(--govuk-focus-text-colour, #0b0c0c);
+    border-color: var(--govuk-focus-text-colour, #0b0c0c);
+}
+
+.civicone-mobile-search-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: none;
+    border: 2px solid var(--civic-text-primary);
+    border-radius: var(--radius-sm);
+    padding: var(--space-2);
+    cursor: pointer;
+    min-height: 44px;
+    min-width: 44px;
+}
+
+@media (min-width: 768px) {
+    .civicone-mobile-search-toggle {
+        display: none;
+    }
+}
+
+.civicone-mobile-search-toggle:hover {
+    background-color: var(--civic-bg-tertiary);
+}
+
+.civicone-mobile-search-toggle:focus-visible {
+    outline: 3px solid var(--govuk-focus-colour, #ffdd00);
+    outline-offset: 0;
+    background-color: var(--govuk-focus-colour, #ffdd00);
+    color: var(--govuk-focus-text-colour, #0b0c0c);
+}
+
+.civicone-mobile-search-bar {
+    max-height: 0;
+    overflow: hidden;
+    opacity: 0;
+    transition: max-height var(--duration-fast) var(--ease-default), opacity var(--duration-fast) var(--ease-default);
+}
+
+.civicone-mobile-search-bar.active {
+    max-height: 100px;
+    opacity: 1;
+    padding: var(--space-4);
+}
+
+.civicone-mobile-search-form {
+    display: flex;
+    gap: var(--space-2);
+}
+
+.civicone-mobile-search-input {
+    flex: 1;
+    padding: var(--space-2) var(--space-3);
+    border: 2px solid var(--civic-text-primary);
+    border-radius: var(--radius-sm);
+    font-size: 1rem;
+    min-height: 44px;
+}
+
+.civicone-mobile-search-button {
+    padding: var(--space-2) var(--space-4);
+    background: var(--civic-brand);
+    color: white;
+    border: 2px solid var(--civic-brand);
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    min-height: 44px;
+    min-width: 44px;
+}
+
+.civicone-visually-hidden {
+    position: absolute !important;
+    width: 1px !important;
+    height: 1px !important;
+    margin: -1px !important;
+    padding: 0 !important;
+    overflow: hidden !important;
+    clip: rect(0, 0, 0, 0) !important;
+    white-space: nowrap !important;
+    border: 0 !important;
+}
+
+/* ===========================================
+   DEPRECATED - OLD MEGA MENU (Commented out 2026-01-20)
+   Keeping for rollback safety - DO NOT DELETE
+   =========================================== */
+/* .civic-menu-btn {
     background: var(--civic-bg-primary);
     border: 2px solid var(--civic-text-primary);
     color: var(--civic-text-primary);
@@ -377,8 +871,8 @@
     transition: all var(--duration-fast) var(--ease-default);
     margin-left: var(--space-2);
 }
-
-.civic-menu-btn:hover {
+*/
+/* .civic-menu-btn:hover {
     background-color: var(--civic-bg-tertiary);
     text-decoration: underline;
 }
@@ -478,13 +972,15 @@
     }
 }
 
-/* Hide on mobile */
+/* Hide on mobile
 @media (max-width: 768px) {
     .civic-menu-btn,
     .civic-mega-menu {
         display: none !important;
     }
 }
+*/
+/* END DEPRECATED MEGA MENU SECTION */
 
 /* ===========================================
    7. DARK MODE - Full Theme Override
@@ -1300,4 +1796,90 @@ body.dark-mode .civicone-hero-banner {
         padding: 28px 0;
         margin-bottom: 28px;
     }
+}
+
+/* ===========================================
+   CRITICAL FIX: Service Navigation Visibility
+   Added: 2026-01-20
+   Ensures service navigation displays correctly
+   =========================================== */
+
+/* Force header visibility */
+.civicone-header {
+    display: block !important;
+    visibility: visible !important;
+    position: relative !important;
+    z-index: 100 !important;
+    background-color: #ffffff !important;
+    background-image: none !important;
+    background: #ffffff !important;
+}
+
+.civicone-service-navigation {
+    background-color: transparent !important;
+    background: transparent !important;
+}
+
+.civicone-service-navigation__container {
+    background-color: transparent !important;
+    background: transparent !important;
+}
+
+.civicone-service-navigation__link {
+    color: #0b0c0c !important; /* GOV.UK black - ensure visibility */
+    padding: 0.75rem 1rem !important; /* Ensure padding */
+    display: inline-block !important;
+}
+
+/* Force service navigation container visibility */
+.civicone-service-navigation {
+    display: block !important;
+    visibility: visible !important;
+}
+
+.civicone-service-navigation__container {
+    display: flex !important;
+    visibility: visible !important;
+}
+
+/* Force desktop navigation list visibility at tablet+ */
+@media (min-width: 768px) {
+    .civicone-service-navigation__list {
+        display: flex !important;
+        align-items: center !important;
+        visibility: visible !important;
+        gap: 0.75rem !important; /* Space between items */
+        list-style: none !important;
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+}
+
+/* Ensure mobile toggle is hidden on desktop */
+@media (min-width: 768px) {
+    .civicone-service-navigation__toggle {
+        display: none !important;
+    }
+}
+
+/* Ensure search is visible */
+.civicone-search-wrapper {
+    display: block !important;
+    visibility: visible !important;
+}
+
+.civicone-desktop-search {
+    display: block !important;
+}
+
+@media (max-width: 767px) {
+    .civicone-desktop-search {
+        display: none !important;
+    }
+}
+
+/* Reduce hero section height to prevent overlap */
+.civicone-hero-banner {
+    max-height: 200px !important;
+    overflow: hidden;
 }
