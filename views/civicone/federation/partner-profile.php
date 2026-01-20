@@ -25,7 +25,7 @@ $enabledFeatureCount = count(array_filter($features));
 
 <!-- Offline Banner -->
 <div class="offline-banner" id="offlineBanner" role="alert" aria-live="polite">
-    <i class="fa-solid fa-wifi-slash"></i>
+    <i class="fa-solid fa-wifi-slash" aria-hidden="true"></i>
     <span>No internet connection</span>
 </div>
 
@@ -33,35 +33,35 @@ $enabledFeatureCount = count(array_filter($features));
     <div id="partner-profile-wrapper">
 
         <!-- Back Link -->
-        <a href="<?= $basePath ?>/federation" class="back-link">
-            <i class="fa-solid fa-arrow-left"></i>
+        <a href="<?= $basePath ?>/federation" class="back-link" aria-label="Return to partner timebanks">
+            <i class="fa-solid fa-arrow-left" aria-hidden="true"></i>
             Back to Partner Timebanks
         </a>
 
         <!-- Partner Header Card -->
-        <div class="partner-header-card">
-            <div class="partner-header">
-                <div class="partner-logo">
+        <article class="partner-header-card" aria-labelledby="partner-name">
+            <header class="partner-header">
+                <div class="partner-logo" aria-hidden="true">
                     <?php if (!empty($partner['og_image_url'])): ?>
-                    <img src="<?= htmlspecialchars($partner['og_image_url']) ?>" alt="<?= htmlspecialchars($partner['name']) ?>" loading="lazy">
+                    <img src="<?= htmlspecialchars($partner['og_image_url']) ?>" alt="" loading="lazy">
                     <?php else: ?>
                     <?= strtoupper(substr($partner['name'], 0, 2)) ?>
                     <?php endif; ?>
                 </div>
                 <div class="partner-info">
-                    <h1 class="partner-name"><?= htmlspecialchars($partner['name']) ?></h1>
+                    <h1 id="partner-name" class="partner-name"><?= htmlspecialchars($partner['name']) ?></h1>
                     <div class="partner-meta">
                         <span class="partner-meta-item">
-                            <i class="fa-solid fa-handshake"></i>
+                            <i class="fa-solid fa-handshake" aria-hidden="true"></i>
                             Partner since <?= $partnerSinceFormatted ?>
                         </span>
                         <span class="partner-meta-item">
-                            <i class="fa-solid fa-puzzle-piece"></i>
+                            <i class="fa-solid fa-puzzle-piece" aria-hidden="true"></i>
                             <?= $enabledFeatureCount ?> features enabled
                         </span>
                         <?php if (!empty($partner['domain'])): ?>
                         <span class="partner-meta-item">
-                            <i class="fa-solid fa-globe"></i>
+                            <i class="fa-solid fa-globe" aria-hidden="true"></i>
                             <?= htmlspecialchars($partner['domain']) ?>
                         </span>
                         <?php endif; ?>
@@ -69,19 +69,19 @@ $enabledFeatureCount = count(array_filter($features));
                     <?php if (!empty($partner['description'])): ?>
                     <p class="partner-description"><?= htmlspecialchars($partner['description']) ?></p>
                     <?php endif; ?>
-                    <div class="partnership-badge">
-                        <i class="fa-solid fa-circle-check"></i>
+                    <div class="partnership-badge" role="status">
+                        <i class="fa-solid fa-circle-check" aria-hidden="true"></i>
                         Active Partnership
                     </div>
                 </div>
-            </div>
-        </div>
+            </header>
+        </article>
 
         <!-- Stats Grid -->
-        <div class="stats-grid">
+        <section class="stats-grid" aria-label="Partner statistics">
             <?php if ($features['members']): ?>
             <div class="stat-card">
-                <div class="stat-icon members">
+                <div class="stat-icon members" aria-hidden="true">
                     <i class="fa-solid fa-users"></i>
                 </div>
                 <div class="stat-value"><?= number_format($stats['members']) ?></div>
@@ -91,7 +91,7 @@ $enabledFeatureCount = count(array_filter($features));
 
             <?php if ($features['listings']): ?>
             <div class="stat-card">
-                <div class="stat-icon listings">
+                <div class="stat-icon listings" aria-hidden="true">
                     <i class="fa-solid fa-hand-holding-heart"></i>
                 </div>
                 <div class="stat-value"><?= number_format($stats['listings']) ?></div>
@@ -101,7 +101,7 @@ $enabledFeatureCount = count(array_filter($features));
 
             <?php if ($features['events']): ?>
             <div class="stat-card">
-                <div class="stat-icon events">
+                <div class="stat-icon events" aria-hidden="true">
                     <i class="fa-solid fa-calendar-days"></i>
                 </div>
                 <div class="stat-value"><?= number_format($stats['events']) ?></div>
@@ -111,7 +111,7 @@ $enabledFeatureCount = count(array_filter($features));
 
             <?php if ($features['groups']): ?>
             <div class="stat-card">
-                <div class="stat-icon groups">
+                <div class="stat-icon groups" aria-hidden="true">
                     <i class="fa-solid fa-people-group"></i>
                 </div>
                 <div class="stat-value"><?= number_format($stats['groups']) ?></div>
@@ -121,24 +121,24 @@ $enabledFeatureCount = count(array_filter($features));
 
             <?php if ($features['transactions']): ?>
             <div class="stat-card">
-                <div class="stat-icon hours">
+                <div class="stat-icon hours" aria-hidden="true">
                     <i class="fa-solid fa-clock"></i>
                 </div>
                 <div class="stat-value"><?= number_format($stats['total_hours_exchanged'], 1) ?></div>
                 <div class="stat-label">Hours Exchanged</div>
             </div>
             <?php endif; ?>
-        </div>
+        </section>
 
         <!-- Available Features -->
-        <div class="section-card">
-            <h2 class="section-title">
-                <i class="fa-solid fa-puzzle-piece"></i>
+        <section class="section-card" aria-labelledby="features-heading">
+            <h2 id="features-heading" class="section-title">
+                <i class="fa-solid fa-puzzle-piece" aria-hidden="true"></i>
                 Available Features
             </h2>
-            <div class="features-grid">
-                <a href="<?= $basePath ?>/federation/members?tenant=<?= $partner['id'] ?>" class="feature-item <?= !$features['members'] ? 'disabled' : '' ?>">
-                    <div class="feature-icon members">
+            <div class="features-grid" role="list">
+                <a href="<?= $basePath ?>/federation/members?tenant=<?= $partner['id'] ?>" class="feature-item <?= !$features['members'] ? 'disabled' : '' ?>" role="listitem" <?= !$features['members'] ? 'aria-disabled="true" tabindex="-1"' : '' ?>>
+                    <div class="feature-icon members" aria-hidden="true">
                         <i class="fa-solid fa-users"></i>
                     </div>
                     <div class="feature-info">
@@ -150,8 +150,8 @@ $enabledFeatureCount = count(array_filter($features));
                     </span>
                 </a>
 
-                <a href="<?= $basePath ?>/federation/listings?tenant=<?= $partner['id'] ?>" class="feature-item <?= !$features['listings'] ? 'disabled' : '' ?>">
-                    <div class="feature-icon listings">
+                <a href="<?= $basePath ?>/federation/listings?tenant=<?= $partner['id'] ?>" class="feature-item <?= !$features['listings'] ? 'disabled' : '' ?>" role="listitem" <?= !$features['listings'] ? 'aria-disabled="true" tabindex="-1"' : '' ?>>
+                    <div class="feature-icon listings" aria-hidden="true">
                         <i class="fa-solid fa-hand-holding-heart"></i>
                     </div>
                     <div class="feature-info">
@@ -163,8 +163,8 @@ $enabledFeatureCount = count(array_filter($features));
                     </span>
                 </a>
 
-                <a href="<?= $basePath ?>/federation/events?tenant=<?= $partner['id'] ?>" class="feature-item <?= !$features['events'] ? 'disabled' : '' ?>">
-                    <div class="feature-icon events">
+                <a href="<?= $basePath ?>/federation/events?tenant=<?= $partner['id'] ?>" class="feature-item <?= !$features['events'] ? 'disabled' : '' ?>" role="listitem" <?= !$features['events'] ? 'aria-disabled="true" tabindex="-1"' : '' ?>>
+                    <div class="feature-icon events" aria-hidden="true">
                         <i class="fa-solid fa-calendar-days"></i>
                     </div>
                     <div class="feature-info">
@@ -176,8 +176,8 @@ $enabledFeatureCount = count(array_filter($features));
                     </span>
                 </a>
 
-                <a href="<?= $basePath ?>/federation/groups?tenant=<?= $partner['id'] ?>" class="feature-item <?= !$features['groups'] ? 'disabled' : '' ?>">
-                    <div class="feature-icon groups">
+                <a href="<?= $basePath ?>/federation/groups?tenant=<?= $partner['id'] ?>" class="feature-item <?= !$features['groups'] ? 'disabled' : '' ?>" role="listitem" <?= !$features['groups'] ? 'aria-disabled="true" tabindex="-1"' : '' ?>>
+                    <div class="feature-icon groups" aria-hidden="true">
                         <i class="fa-solid fa-people-group"></i>
                     </div>
                     <div class="feature-info">
@@ -189,8 +189,8 @@ $enabledFeatureCount = count(array_filter($features));
                     </span>
                 </a>
 
-                <div class="feature-item <?= !$features['messaging'] ? 'disabled' : '' ?>" style="cursor: default;">
-                    <div class="feature-icon messaging">
+                <div class="feature-item feature-item-static <?= !$features['messaging'] ? 'disabled' : '' ?>" role="listitem">
+                    <div class="feature-icon messaging" aria-hidden="true">
                         <i class="fa-solid fa-comments"></i>
                     </div>
                     <div class="feature-info">
@@ -202,8 +202,8 @@ $enabledFeatureCount = count(array_filter($features));
                     </span>
                 </div>
 
-                <div class="feature-item <?= !$features['transactions'] ? 'disabled' : '' ?>" style="cursor: default;">
-                    <div class="feature-icon transactions">
+                <div class="feature-item feature-item-static <?= !$features['transactions'] ? 'disabled' : '' ?>" role="listitem">
+                    <div class="feature-icon transactions" aria-hidden="true">
                         <i class="fa-solid fa-exchange-alt"></i>
                     </div>
                     <div class="feature-info">
@@ -215,60 +215,62 @@ $enabledFeatureCount = count(array_filter($features));
                     </span>
                 </div>
             </div>
-        </div>
+        </section>
 
         <!-- Recent Activity with Partner -->
-        <div class="section-card">
-            <h2 class="section-title">
-                <i class="fa-solid fa-clock-rotate-left"></i>
+        <section class="section-card" aria-labelledby="activity-heading">
+            <h2 id="activity-heading" class="section-title">
+                <i class="fa-solid fa-clock-rotate-left" aria-hidden="true"></i>
                 Your Recent Activity
             </h2>
             <?php if (!empty($recentActivity)): ?>
-            <div class="activity-list">
+            <div class="activity-list" role="list" aria-label="Recent activity">
                 <?php foreach ($recentActivity as $activity): ?>
-                <div class="activity-item">
-                    <div class="activity-icon">
+                <div class="activity-item" role="listitem">
+                    <div class="activity-icon" aria-hidden="true">
                         <i class="fa-solid <?= htmlspecialchars($activity['icon']) ?>"></i>
                     </div>
                     <div class="activity-content">
                         <p class="activity-text"><?= htmlspecialchars($activity['description']) ?></p>
-                        <span class="activity-time"><?= date('M j, Y', strtotime($activity['date'])) ?></span>
+                        <span class="activity-time">
+                            <time datetime="<?= date('c', strtotime($activity['date'])) ?>"><?= date('M j, Y', strtotime($activity['date'])) ?></time>
+                        </span>
                     </div>
                 </div>
                 <?php endforeach; ?>
             </div>
             <?php else: ?>
-            <div class="empty-activity">
-                <i class="fa-solid fa-clock-rotate-left"></i>
+            <div class="empty-activity" role="status">
+                <i class="fa-solid fa-clock-rotate-left" aria-hidden="true"></i>
                 <p>No recent activity with this partner yet.</p>
-                <p style="font-size: 0.85rem; margin-top: 8px;">Start by browsing their members or listings!</p>
+                <p class="empty-activity-hint">Start by browsing their members or listings!</p>
             </div>
             <?php endif; ?>
 
             <!-- Quick Actions -->
-            <div class="quick-actions">
+            <nav class="quick-actions" aria-label="Quick actions">
                 <?php if ($features['members']): ?>
                 <a href="<?= $basePath ?>/federation/members?tenant=<?= $partner['id'] ?>" class="action-btn primary">
-                    <i class="fa-solid fa-users"></i>
+                    <i class="fa-solid fa-users" aria-hidden="true"></i>
                     Browse Members
                 </a>
                 <?php endif; ?>
 
                 <?php if ($features['listings']): ?>
                 <a href="<?= $basePath ?>/federation/listings?tenant=<?= $partner['id'] ?>" class="action-btn secondary">
-                    <i class="fa-solid fa-hand-holding-heart"></i>
+                    <i class="fa-solid fa-hand-holding-heart" aria-hidden="true"></i>
                     Browse Listings
                 </a>
                 <?php endif; ?>
 
                 <?php if ($features['events']): ?>
                 <a href="<?= $basePath ?>/federation/events?tenant=<?= $partner['id'] ?>" class="action-btn secondary">
-                    <i class="fa-solid fa-calendar-days"></i>
+                    <i class="fa-solid fa-calendar-days" aria-hidden="true"></i>
                     View Events
                 </a>
                 <?php endif; ?>
-            </div>
-        </div>
+            </nav>
+        </section>
 
     </div>
 </div>

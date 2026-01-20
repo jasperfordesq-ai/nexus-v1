@@ -14,7 +14,7 @@ $groups = $groups ?? [];
 
 <!-- Offline Banner -->
 <div class="offline-banner" id="offlineBanner" role="alert" aria-live="polite">
-    <i class="fa-solid fa-wifi-slash"></i>
+    <i class="fa-solid fa-wifi-slash" aria-hidden="true"></i>
     <span>No internet connection</span>
 </div>
 
@@ -22,58 +22,58 @@ $groups = $groups ?? [];
     <div id="my-groups-wrapper">
 
         <!-- Page Header -->
-        <div class="page-header">
+        <header class="page-header">
             <div>
                 <h1 class="page-title">
-                    <i class="fa-solid fa-user-group"></i>
+                    <i class="fa-solid fa-user-group" aria-hidden="true"></i>
                     My Federated Groups
                 </h1>
                 <p class="page-subtitle">Groups you've joined from partner timebanks</p>
             </div>
             <div class="header-actions">
-                <a href="<?= $basePath ?>/federation/groups">
-                    <i class="fa-solid fa-search"></i>
+                <a href="<?= $basePath ?>/federation/groups" aria-label="Browse available federated groups">
+                    <i class="fa-solid fa-search" aria-hidden="true"></i>
                     Browse Groups
                 </a>
             </div>
-        </div>
+        </header>
 
         <?php if (!empty($_SESSION['flash_success'])): ?>
-            <div class="alert alert-success">
-                <i class="fa-solid fa-check-circle"></i>
+            <div class="alert alert-success" role="status" aria-live="polite">
+                <i class="fa-solid fa-check-circle" aria-hidden="true"></i>
                 <?= htmlspecialchars($_SESSION['flash_success']) ?>
             </div>
             <?php unset($_SESSION['flash_success']); ?>
         <?php endif; ?>
 
         <?php if (!empty($_SESSION['flash_error'])): ?>
-            <div class="alert alert-error">
-                <i class="fa-solid fa-exclamation-circle"></i>
+            <div class="alert alert-error" role="alert">
+                <i class="fa-solid fa-exclamation-circle" aria-hidden="true"></i>
                 <?= htmlspecialchars($_SESSION['flash_error']) ?>
             </div>
             <?php unset($_SESSION['flash_error']); ?>
         <?php endif; ?>
 
         <?php if (empty($groups)): ?>
-            <div class="empty-state">
-                <div class="empty-icon">
+            <div class="empty-state" role="status" aria-labelledby="empty-title">
+                <div class="empty-icon" aria-hidden="true">
                     <i class="fa-solid fa-people-group"></i>
                 </div>
-                <h3 class="empty-title">No Federated Groups Yet</h3>
+                <h3 id="empty-title" class="empty-title">No Federated Groups Yet</h3>
                 <p class="empty-message">
                     You haven't joined any groups from partner timebanks.<br>
                     Browse available groups to connect with members across the network.
                 </p>
                 <a href="<?= $basePath ?>/federation/groups" class="empty-btn">
-                    <i class="fa-solid fa-search"></i>
+                    <i class="fa-solid fa-search" aria-hidden="true"></i>
                     Browse Federated Groups
                 </a>
             </div>
         <?php else: ?>
-            <div class="groups-list">
+            <div class="groups-list" role="list" aria-label="Your federated groups">
                 <?php foreach ($groups as $group): ?>
-                    <div class="group-item">
-                        <div class="group-icon">
+                    <article class="group-item" role="listitem">
+                        <div class="group-icon" aria-hidden="true">
                             <i class="fa-solid fa-people-group"></i>
                         </div>
                         <div class="group-info">
@@ -84,37 +84,37 @@ $groups = $groups ?? [];
                             </h3>
                             <div class="group-meta">
                                 <span class="group-meta-item">
-                                    <i class="fa-solid fa-building"></i>
+                                    <i class="fa-solid fa-building" aria-hidden="true"></i>
                                     <?= htmlspecialchars($group['tenant_name'] ?? 'Partner Timebank') ?>
                                 </span>
                                 <span class="group-meta-item">
-                                    <i class="fa-solid fa-users"></i>
+                                    <i class="fa-solid fa-users" aria-hidden="true"></i>
                                     <?= (int)($group['member_count'] ?? 0) ?> members
                                 </span>
                                 <?php if (!empty($group['joined_at'])): ?>
                                     <span class="group-meta-item">
-                                        <i class="fa-solid fa-calendar"></i>
-                                        Joined <?= date('M j, Y', strtotime($group['joined_at'])) ?>
+                                        <i class="fa-solid fa-calendar" aria-hidden="true"></i>
+                                        Joined <time datetime="<?= date('c', strtotime($group['joined_at'])) ?>"><?= date('M j, Y', strtotime($group['joined_at'])) ?></time>
                                     </span>
                                 <?php endif; ?>
                             </div>
                         </div>
-                        <span class="status-badge status-<?= $group['membership_status'] ?? 'approved' ?>">
+                        <span class="status-badge status-<?= $group['membership_status'] ?? 'approved' ?>" role="status">
                             <?php if (($group['membership_status'] ?? 'approved') === 'pending'): ?>
-                                <i class="fa-solid fa-clock"></i>
+                                <i class="fa-solid fa-clock" aria-hidden="true"></i>
                                 Pending
                             <?php else: ?>
-                                <i class="fa-solid fa-check"></i>
+                                <i class="fa-solid fa-check" aria-hidden="true"></i>
                                 Active
                             <?php endif; ?>
                         </span>
                         <div class="group-actions">
-                            <a href="<?= $basePath ?>/federation/groups/<?= $group['id'] ?>?tenant=<?= $group['tenant_id'] ?>" class="action-link action-link-primary">
-                                <i class="fa-solid fa-eye"></i>
+                            <a href="<?= $basePath ?>/federation/groups/<?= $group['id'] ?>?tenant=<?= $group['tenant_id'] ?>" class="action-link action-link-primary" aria-label="View <?= htmlspecialchars($group['name']) ?>">
+                                <i class="fa-solid fa-eye" aria-hidden="true"></i>
                                 View
                             </a>
                         </div>
-                    </div>
+                    </article>
                 <?php endforeach; ?>
             </div>
         <?php endif; ?>

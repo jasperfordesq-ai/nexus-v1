@@ -12,19 +12,19 @@ $basePath = Nexus\Core\TenantContext::getBasePath();
 
 <!-- Offline Banner -->
 <div class="offline-banner" id="offlineBanner" role="alert" aria-live="polite">
-    <i class="fa-solid fa-wifi-slash"></i>
+    <i class="fa-solid fa-wifi-slash" aria-hidden="true"></i>
     <span>No internet connection</span>
 </div>
 
 <div class="htb-container-full">
     <div id="enable-wrapper">
 
-<div class="enable-card">
-            <div class="enable-icon">
+        <article class="enable-card" role="status" aria-labelledby="enable-title">
+            <div class="enable-icon" aria-hidden="true">
                 <i class="fa-solid fa-exchange-alt"></i>
             </div>
 
-            <h1 class="enable-title">Enable Federated Transactions</h1>
+            <h1 id="enable-title" class="enable-title">Enable Federated Transactions</h1>
 
             <p class="enable-message">
                 To send and receive hours from members of partner timebanks,
@@ -32,20 +32,23 @@ $basePath = Nexus\Core\TenantContext::getBasePath();
             </p>
 
             <a href="<?= $basePath ?>/settings#federation" class="enable-btn">
-                <i class="fa-solid fa-cog"></i>
+                <i class="fa-solid fa-cog" aria-hidden="true"></i>
                 Go to Federation Settings
             </a>
 
-            <div class="info-note">
-                <h4><i class="fa-solid fa-info-circle" style="color: #8b5cf6; margin-right: 6px;"></i>What are Federated Transactions?</h4>
+            <aside class="info-note" role="note">
+                <h4>
+                    <i class="fa-solid fa-info-circle" aria-hidden="true"></i>
+                    What are Federated Transactions?
+                </h4>
                 <ul>
                     <li>Exchange hours with members from partner timebanks</li>
                     <li>Hours are transferred between your balances</li>
                     <li>Transactions are recorded in both timebanks</li>
                     <li>You control who can send you hours</li>
                 </ul>
-            </div>
-        </div>
+            </aside>
+        </article>
 
     </div>
 </div>

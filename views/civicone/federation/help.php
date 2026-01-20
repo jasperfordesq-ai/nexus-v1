@@ -11,7 +11,7 @@ $userOptedIn = $userOptedIn ?? false;
 
 <!-- Offline Banner -->
 <div class="offline-banner" id="offlineBanner" role="alert" aria-live="polite">
-    <i class="fa-solid fa-wifi-slash"></i>
+    <i class="fa-solid fa-wifi-slash" aria-hidden="true"></i>
     <span>No internet connection</span>
 </div>
 
@@ -19,39 +19,39 @@ $userOptedIn = $userOptedIn ?? false;
     <div id="fed-help-wrapper">
 
         <!-- Hero Section -->
-        <div class="help-header">
-            <div class="help-icon">
+        <header class="help-header">
+            <div class="help-icon" aria-hidden="true">
                 <i class="fa-solid fa-circle-question"></i>
             </div>
             <h1 class="help-title">Federation Help & FAQ</h1>
             <p class="help-subtitle">
                 Learn about partner timebanks and how to connect with members from other communities.
             </p>
-        </div>
+        </header>
 
         <?php $currentPage = 'help'; require dirname(__DIR__) . '/partials/federation-nav.php'; ?>
 
         <!-- Quick Links -->
-        <div class="quick-links">
+        <nav class="quick-links" aria-label="Jump to section">
             <a href="#getting-started" class="quick-link">Getting Started</a>
             <a href="#privacy" class="quick-link">Privacy & Safety</a>
             <a href="#features" class="quick-link">Features</a>
             <a href="#troubleshooting" class="quick-link">Troubleshooting</a>
-        </div>
+        </nav>
 
         <!-- Getting Started -->
-        <div class="faq-section" id="getting-started">
-            <h2 class="faq-section-title">
-                <i class="fa-solid fa-rocket"></i>
+        <section class="faq-section" id="getting-started" aria-labelledby="getting-started-heading">
+            <h2 id="getting-started-heading" class="faq-section-title">
+                <i class="fa-solid fa-rocket" aria-hidden="true"></i>
                 Getting Started
             </h2>
 
             <div class="faq-item">
-                <button class="faq-question" aria-expanded="false">
+                <button class="faq-question" aria-expanded="false" aria-controls="faq-1">
                     What is federation?
-                    <i class="fa-solid fa-chevron-down"></i>
+                    <i class="fa-solid fa-chevron-down" aria-hidden="true"></i>
                 </button>
-                <div class="faq-answer">
+                <div class="faq-answer" id="faq-1">
                     <div class="faq-answer-content">
                         Federation allows different timebanks to connect and share resources while maintaining their independence. Members from partner timebanks can browse each other's profiles, listings, events, and groups - and even exchange time credits across communities.
                     </div>
@@ -59,11 +59,11 @@ $userOptedIn = $userOptedIn ?? false;
             </div>
 
             <div class="faq-item">
-                <button class="faq-question" aria-expanded="false">
+                <button class="faq-question" aria-expanded="false" aria-controls="faq-2">
                     How do I enable federation for my account?
-                    <i class="fa-solid fa-chevron-down"></i>
+                    <i class="fa-solid fa-chevron-down" aria-hidden="true"></i>
                 </button>
-                <div class="faq-answer">
+                <div class="faq-answer" id="faq-2">
                     <div class="faq-answer-content">
                         <ol>
                             <li>Go to <a href="<?= $basePath ?>/settings?section=federation">Settings &rarr; Federation</a></li>
@@ -77,31 +77,31 @@ $userOptedIn = $userOptedIn ?? false;
             </div>
 
             <div class="faq-item">
-                <button class="faq-question" aria-expanded="false">
+                <button class="faq-question" aria-expanded="false" aria-controls="faq-3">
                     What are partner timebanks?
-                    <i class="fa-solid fa-chevron-down"></i>
+                    <i class="fa-solid fa-chevron-down" aria-hidden="true"></i>
                 </button>
-                <div class="faq-answer">
+                <div class="faq-answer" id="faq-3">
                     <div class="faq-answer-content">
                         Partner timebanks are other timebanking communities that have established a formal partnership with your timebank. Administrators from both timebanks agree to share certain features (like member profiles, listings, or events) with each other's communities.
                     </div>
                 </div>
             </div>
-        </div>
+        </section>
 
         <!-- Privacy & Safety -->
-        <div class="faq-section" id="privacy">
-            <h2 class="faq-section-title">
-                <i class="fa-solid fa-shield-halved"></i>
+        <section class="faq-section" id="privacy" aria-labelledby="privacy-heading">
+            <h2 id="privacy-heading" class="faq-section-title">
+                <i class="fa-solid fa-shield-halved" aria-hidden="true"></i>
                 Privacy & Safety
             </h2>
 
             <div class="faq-item">
-                <button class="faq-question" aria-expanded="false">
+                <button class="faq-question" aria-expanded="false" aria-controls="faq-4">
                     What information is shared with partner timebanks?
-                    <i class="fa-solid fa-chevron-down"></i>
+                    <i class="fa-solid fa-chevron-down" aria-hidden="true"></i>
                 </button>
-                <div class="faq-answer">
+                <div class="faq-answer" id="faq-4">
                     <div class="faq-answer-content">
                         You control what's shared through your privacy settings:
                         <ul>
@@ -115,11 +115,11 @@ $userOptedIn = $userOptedIn ?? false;
             </div>
 
             <div class="faq-item">
-                <button class="faq-question" aria-expanded="false">
+                <button class="faq-question" aria-expanded="false" aria-controls="faq-5">
                     Can I hide my profile from partner timebanks?
-                    <i class="fa-solid fa-chevron-down"></i>
+                    <i class="fa-solid fa-chevron-down" aria-hidden="true"></i>
                 </button>
-                <div class="faq-answer">
+                <div class="faq-answer" id="faq-5">
                     <div class="faq-answer-content">
                         Yes! You have complete control. You can:
                         <ul>
@@ -133,11 +133,11 @@ $userOptedIn = $userOptedIn ?? false;
             </div>
 
             <div class="faq-item">
-                <button class="faq-question" aria-expanded="false">
+                <button class="faq-question" aria-expanded="false" aria-controls="faq-6">
                     How do I report inappropriate behavior?
-                    <i class="fa-solid fa-chevron-down"></i>
+                    <i class="fa-solid fa-chevron-down" aria-hidden="true"></i>
                 </button>
-                <div class="faq-answer">
+                <div class="faq-answer" id="faq-6">
                     <div class="faq-answer-content">
                         If you encounter inappropriate behavior from a member of a partner timebank, you can:
                         <ul>
@@ -149,21 +149,21 @@ $userOptedIn = $userOptedIn ?? false;
                     </div>
                 </div>
             </div>
-        </div>
+        </section>
 
         <!-- Features -->
-        <div class="faq-section" id="features">
-            <h2 class="faq-section-title">
-                <i class="fa-solid fa-stars"></i>
+        <section class="faq-section" id="features" aria-labelledby="features-heading">
+            <h2 id="features-heading" class="faq-section-title">
+                <i class="fa-solid fa-stars" aria-hidden="true"></i>
                 Features
             </h2>
 
             <div class="faq-item">
-                <button class="faq-question" aria-expanded="false">
+                <button class="faq-question" aria-expanded="false" aria-controls="faq-7">
                     Can I send time credits to members of other timebanks?
-                    <i class="fa-solid fa-chevron-down"></i>
+                    <i class="fa-solid fa-chevron-down" aria-hidden="true"></i>
                 </button>
-                <div class="faq-answer">
+                <div class="faq-answer" id="faq-7">
                     <div class="faq-answer-content">
                         Yes, if both timebanks have enabled federated transactions. Your time credits work the same way - 1 hour = 1 hour, regardless of which timebank the member belongs to. All federated transactions are logged for transparency.
                     </div>
@@ -171,11 +171,11 @@ $userOptedIn = $userOptedIn ?? false;
             </div>
 
             <div class="faq-item">
-                <button class="faq-question" aria-expanded="false">
+                <button class="faq-question" aria-expanded="false" aria-controls="faq-8">
                     How do I join a group from a partner timebank?
-                    <i class="fa-solid fa-chevron-down"></i>
+                    <i class="fa-solid fa-chevron-down" aria-hidden="true"></i>
                 </button>
-                <div class="faq-answer">
+                <div class="faq-answer" id="faq-8">
                     <div class="faq-answer-content">
                         <ol>
                             <li>Browse <a href="<?= $basePath ?>/federation/groups">Federated Groups</a></li>
@@ -189,31 +189,31 @@ $userOptedIn = $userOptedIn ?? false;
             </div>
 
             <div class="faq-item">
-                <button class="faq-question" aria-expanded="false">
+                <button class="faq-question" aria-expanded="false" aria-controls="faq-9">
                     Can I attend events from partner timebanks?
-                    <i class="fa-solid fa-chevron-down"></i>
+                    <i class="fa-solid fa-chevron-down" aria-hidden="true"></i>
                 </button>
-                <div class="faq-answer">
+                <div class="faq-answer" id="faq-9">
                     <div class="faq-answer-content">
                         Yes! Browse <a href="<?= $basePath ?>/federation/events">Federated Events</a> to see upcoming events from partner timebanks. You can RSVP to events marked as "Open to Federation." Some events may be in-person at the partner timebank's location, while others may be virtual.
                     </div>
                 </div>
             </div>
-        </div>
+        </section>
 
         <!-- Troubleshooting -->
-        <div class="faq-section" id="troubleshooting">
-            <h2 class="faq-section-title">
-                <i class="fa-solid fa-wrench"></i>
+        <section class="faq-section" id="troubleshooting" aria-labelledby="troubleshooting-heading">
+            <h2 id="troubleshooting-heading" class="faq-section-title">
+                <i class="fa-solid fa-wrench" aria-hidden="true"></i>
                 Troubleshooting
             </h2>
 
             <div class="faq-item">
-                <button class="faq-question" aria-expanded="false">
+                <button class="faq-question" aria-expanded="false" aria-controls="faq-10">
                     I can't see any partner timebanks
-                    <i class="fa-solid fa-chevron-down"></i>
+                    <i class="fa-solid fa-chevron-down" aria-hidden="true"></i>
                 </button>
-                <div class="faq-answer">
+                <div class="faq-answer" id="faq-10">
                     <div class="faq-answer-content">
                         This could be because:
                         <ul>
@@ -226,11 +226,11 @@ $userOptedIn = $userOptedIn ?? false;
             </div>
 
             <div class="faq-item">
-                <button class="faq-question" aria-expanded="false">
+                <button class="faq-question" aria-expanded="false" aria-controls="faq-11">
                     A member from a partner timebank can't find me
-                    <i class="fa-solid fa-chevron-down"></i>
+                    <i class="fa-solid fa-chevron-down" aria-hidden="true"></i>
                 </button>
-                <div class="faq-answer">
+                <div class="faq-answer" id="faq-11">
                     <div class="faq-answer-content">
                         Check your <a href="<?= $basePath ?>/settings?section=federation">Federation Settings</a> and make sure:
                         <ul>
@@ -243,11 +243,11 @@ $userOptedIn = $userOptedIn ?? false;
             </div>
 
             <div class="faq-item">
-                <button class="faq-question" aria-expanded="false">
+                <button class="faq-question" aria-expanded="false" aria-controls="faq-12">
                     My transaction to a partner member failed
-                    <i class="fa-solid fa-chevron-down"></i>
+                    <i class="fa-solid fa-chevron-down" aria-hidden="true"></i>
                 </button>
-                <div class="faq-answer">
+                <div class="faq-answer" id="faq-12">
                     <div class="faq-answer-content">
                         Transaction failures can occur if:
                         <ul>
@@ -260,12 +260,12 @@ $userOptedIn = $userOptedIn ?? false;
                     </div>
                 </div>
             </div>
-        </div>
+        </section>
 
         <!-- Quick Access Cards -->
-        <div class="help-cards">
+        <section class="help-cards" aria-label="Quick links">
             <a href="<?= $basePath ?>/settings?section=federation" class="help-card">
-                <div class="help-card-icon">
+                <div class="help-card-icon" aria-hidden="true">
                     <i class="fa-solid fa-cog"></i>
                 </div>
                 <h3 class="help-card-title">Federation Settings</h3>
@@ -273,7 +273,7 @@ $userOptedIn = $userOptedIn ?? false;
             </a>
 
             <a href="<?= $basePath ?>/federation" class="help-card">
-                <div class="help-card-icon">
+                <div class="help-card-icon" aria-hidden="true">
                     <i class="fa-solid fa-globe"></i>
                 </div>
                 <h3 class="help-card-title">Partner Timebanks</h3>
@@ -281,23 +281,23 @@ $userOptedIn = $userOptedIn ?? false;
             </a>
 
             <a href="<?= $basePath ?>/federation/activity" class="help-card">
-                <div class="help-card-icon">
+                <div class="help-card-icon" aria-hidden="true">
                     <i class="fa-solid fa-bell"></i>
                 </div>
                 <h3 class="help-card-title">Activity Feed</h3>
                 <p class="help-card-desc">View your recent federated messages, transactions, and updates.</p>
             </a>
-        </div>
+        </section>
 
         <!-- Contact Section -->
-        <div class="contact-section">
-            <h3 class="contact-title">Still have questions?</h3>
+        <section class="contact-section" aria-labelledby="contact-heading">
+            <h3 id="contact-heading" class="contact-title">Still have questions?</h3>
             <p class="contact-desc">Our team is here to help you get the most out of federation.</p>
             <a href="<?= $basePath ?>/help" class="contact-btn">
-                <i class="fa-solid fa-headset"></i>
+                <i class="fa-solid fa-headset" aria-hidden="true"></i>
                 Contact Support
             </a>
-        </div>
+        </section>
 
     </div>
 </div>
@@ -308,6 +308,8 @@ document.querySelectorAll('.faq-question').forEach(function(button) {
     button.addEventListener('click', function() {
         const item = this.closest('.faq-item');
         const isOpen = item.classList.contains('open');
+        const answerId = this.getAttribute('aria-controls');
+        const answer = document.getElementById(answerId);
 
         // Close all other items
         document.querySelectorAll('.faq-item.open').forEach(function(openItem) {
@@ -332,6 +334,7 @@ document.querySelectorAll('.quick-link').forEach(function(link) {
             const target = document.querySelector(href);
             if (target) {
                 target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                target.focus();
             }
         }
     });
