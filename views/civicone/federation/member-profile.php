@@ -19,7 +19,7 @@ $trustScore = $trustScore ?? ['score' => 0, 'level' => 'new'];
 $pendingReviewTransaction = $pendingReviewTransaction ?? null; // Transaction ID if user can review this member
 
 $memberName = $member['name'] ?? 'Member';
-$fallbackUrl = 'https://ui-avatars.com/api/?name=' . urlencode($memberName) . '&background=8b5cf6&color=fff&size=200';
+$fallbackUrl = 'https://ui-avatars.com/api/?name=' . urlencode($memberName) . '&background=00796B&color=fff&size=200';
 $avatarUrl = !empty($member['avatar_url']) ? $member['avatar_url'] : $fallbackUrl;
 
 $reachClass = '';
@@ -140,8 +140,8 @@ switch ($member['service_reach'] ?? 'local_only') {
                         <svg viewBox="0 0 80 80">
                             <defs>
                                 <linearGradient id="trustGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                                    <stop offset="0%" style="stop-color:#8b5cf6"/>
-                                    <stop offset="100%" style="stop-color:#a78bfa"/>
+                                    <stop offset="0%" style="stop-color:#00796B"/>
+                                    <stop offset="100%" style="stop-color:#4db6ac"/>
                                 </linearGradient>
                             </defs>
                             <circle class="trust-score-bg" cx="40" cy="40" r="36"/>

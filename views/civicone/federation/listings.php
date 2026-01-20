@@ -110,7 +110,7 @@ $filters = $filters ?? [];
             <?php if (!empty($listings)): ?>
                 <?php foreach ($listings as $listing): ?>
                     <?php
-                    $fallbackAvatar = 'https://ui-avatars.com/api/?name=' . urlencode($listing['owner_name'] ?? 'User') . '&background=8b5cf6&color=fff&size=100';
+                    $fallbackAvatar = 'https://ui-avatars.com/api/?name=' . urlencode($listing['owner_name'] ?? 'User') . '&background=00796B&color=fff&size=100';
                     $avatar = !empty($listing['owner_avatar']) ? $listing['owner_avatar'] : $fallbackAvatar;
                     $listingUrl = $basePath . '/federation/listings/' . $listing['id'];
                     $listingType = $listing['type'] ?? 'offer';

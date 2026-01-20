@@ -16,7 +16,7 @@ $registrationClosed = $registrationClosed ?? false;
 $isFull = $isFull ?? false;
 
 $organizerName = $event['organizer_name'] ?? 'Unknown';
-$fallbackAvatar = 'https://ui-avatars.com/api/?name=' . urlencode($organizerName) . '&background=8b5cf6&color=fff&size=200';
+$fallbackAvatar = 'https://ui-avatars.com/api/?name=' . urlencode($organizerName) . '&background=00796B&color=fff&size=200';
 $organizerAvatar = !empty($event['organizer_avatar']) ? $event['organizer_avatar'] : $fallbackAvatar;
 
 $eventDate = isset($event['event_date']) ? new DateTime($event['event_date']) : null;

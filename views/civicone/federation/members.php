@@ -268,7 +268,7 @@ function renderFederatedMemberCard($member, $basePath)
     ob_start();
 
     $memberName = $member['name'] ?? 'Member';
-    $fallbackUrl = 'https://ui-avatars.com/api/?name=' . urlencode($memberName) . '&background=8b5cf6&color=fff&size=200';
+    $fallbackUrl = 'https://ui-avatars.com/api/?name=' . urlencode($memberName) . '&background=00796B&color=fff&size=200';
     $avatarUrl = !empty($member['avatar_url']) ? $member['avatar_url'] : $fallbackUrl;
     $profileUrl = $basePath . '/federation/members/' . $member['id'];
 
@@ -590,7 +590,7 @@ document.addEventListener('DOMContentLoaded', function() {
     function createMemberCard(member) {
         const basePath = "<?= $basePath ?>";
         const memberName = member.name || 'Member';
-        const fallbackUrl = `https://ui-avatars.com/api/?name=${encodeURIComponent(memberName)}&background=8b5cf6&color=fff&size=200`;
+        const fallbackUrl = `https://ui-avatars.com/api/?name=${encodeURIComponent(memberName)}&background=00796B&color=fff&size=200`;
         const avatarUrl = member.avatar_url || fallbackUrl;
         const profileUrl = `${basePath}/federation/members/${member.id}`;
 

@@ -13,7 +13,7 @@ $listing = $listing ?? [];
 $canMessage = $canMessage ?? false;
 
 $ownerName = $listing['owner_name'] ?? 'Unknown';
-$fallbackAvatar = 'https://ui-avatars.com/api/?name=' . urlencode($ownerName) . '&background=8b5cf6&color=fff&size=200';
+$fallbackAvatar = 'https://ui-avatars.com/api/?name=' . urlencode($ownerName) . '&background=00796B&color=fff&size=200';
 $ownerAvatar = !empty($listing['owner_avatar']) ? $listing['owner_avatar'] : $fallbackAvatar;
 $type = $listing['type'] ?? 'offer';
 ?>
