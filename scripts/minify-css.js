@@ -179,6 +179,23 @@ const cssFiles = [
     'badge-animations.css',
     // Error states (2026-01-19)
     'error-states.css',
+    // Admin federation (2026-01-20)
+    'admin-federation.css',
+    // CivicOne module-specific CSS (2026-01-20)
+    'civicone-blog.css',
+    'civicone-events.css',
+    'civicone-federation.css',
+    'civicone-groups.css',
+    'civicone-header.css',
+    'civicone-help.css',
+    'civicone-matches.css',
+    'civicone-messages.css',
+    'civicone-mini-modules.css',
+    'civicone-profile.css',
+    'civicone-volunteering.css',
+    'civicone-wallet.css',
+    // Design tokens (2026-01-20)
+    'design-tokens.css',
 ];
 
 const cssDir = path.join(__dirname, '../httpdocs/assets/css');

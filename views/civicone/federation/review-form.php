@@ -26,11 +26,9 @@ $description = htmlspecialchars($transaction['description'] ?? 'Time exchange');
 $completedAt = $transaction['completed_at'] ?? $transaction['created_at'] ?? null;
 ?>
 
-<link rel="stylesheet" href="<?= $basePath ?>/assets/css/federation-reviews.min.css?v=<?= time() ?>">
-
 <!-- Offline Banner -->
 <div class="offline-banner" id="offlineBanner" role="alert" aria-live="polite">
-    <i class="fa-solid fa-wifi-slash"></i>
+    <i class="fa-solid fa-wifi-slash" aria-hidden="true"></i>
     <span>No internet connection</span>
 </div>
 
@@ -38,44 +36,44 @@ $completedAt = $transaction['completed_at'] ?? $transaction['created_at'] ?? nul
     <div id="federation-review-wrapper">
 
         <!-- Back Button -->
-        <a href="<?= $basePath ?>/federation/transactions" class="back-link">
-            <i class="fa-solid fa-arrow-left"></i>
+        <a href="<?= $basePath ?>/federation/transactions" class="back-link" aria-label="Return to transactions">
+            <i class="fa-solid fa-arrow-left" aria-hidden="true"></i>
             Back to Transactions
         </a>
 
         <!-- Review Card -->
-        <div class="review-card">
+        <article class="review-card" aria-labelledby="review-heading">
             <!-- Header -->
-            <div class="review-header">
-                <h2>
-                    <i class="fa-solid fa-star"></i>
+            <header class="review-header">
+                <h2 id="review-heading">
+                    <i class="fa-solid fa-star" aria-hidden="true"></i>
                     Leave a Review
                 </h2>
-            </div>
+            </header>
 
             <!-- Receiver Info -->
-            <div class="receiver-info">
-                <div class="avatar-wrapper">
+            <section class="receiver-info" aria-label="Review recipient">
+                <div class="avatar-wrapper" aria-hidden="true">
                     <?php if ($receiverAvatar): ?>
                         <img src="<?= htmlspecialchars($receiverAvatar) ?>"
                              onerror="this.src='<?= $fallbackAvatar ?>'"
-                             alt="<?= $receiverName ?>"
+                             alt=""
                              class="avatar-lg">
                     <?php else: ?>
                         <div class="avatar-lg">
-                            <span style="font-size: 2.5rem; font-weight: 700; color: white;"><?= strtoupper(substr($receiverName, 0, 1)) ?></span>
+                            <span><?= strtoupper(substr($receiverName, 0, 1)) ?></span>
                         </div>
                     <?php endif; ?>
                 </div>
                 <h4><?= $receiverName ?></h4>
                 <div class="federation-badge">
-                    <i class="fa-solid fa-building"></i>
+                    <i class="fa-solid fa-building" aria-hidden="true"></i>
                     <?= htmlspecialchars($receiverTimebank) ?>
                 </div>
-            </div>
+            </section>
 
             <!-- Transaction Summary -->
-            <div class="transaction-summary">
+            <section class="transaction-summary" aria-label="Transaction details">
                 <div class="row">
                     <div class="col-6">
                         <div class="text-muted small">Amount</div>
@@ -85,7 +83,7 @@ $completedAt = $transaction['completed_at'] ?? $transaction['created_at'] ?? nul
                         <div class="text-muted small">Completed</div>
                         <div class="fw-bold">
                             <?php if ($completedAt): ?>
-                                <?= date('M j, Y', strtotime($completedAt)) ?>
+                                <time datetime="<?= date('c', strtotime($completedAt)) ?>"><?= date('M j, Y', strtotime($completedAt)) ?></time>
                             <?php else: ?>
                                 Recently
                             <?php endif; ?>
@@ -98,20 +96,20 @@ $completedAt = $transaction['completed_at'] ?? $transaction['created_at'] ?? nul
                         <div class="description-text"><?= $description ?></div>
                     </div>
                 <?php endif; ?>
-            </div>
+            </section>
 
             <!-- Review Form -->
-            <div class="review-form-section">
+            <section class="review-form-section" aria-labelledby="review-heading">
                 <form method="POST" action="<?= $basePath ?>/federation/review/<?= $transactionId ?>" id="review-form">
                     <?= \Nexus\Core\Csrf::input() ?>
 
                     <!-- Star Rating -->
                     <div class="form-group">
-                        <label class="form-label">
-                            <i class="fa-solid fa-star-half-stroke" style="color: #fbbf24;"></i>
+                        <label class="form-label" id="rating-label">
+                            <i class="fa-solid fa-star-half-stroke star-icon" aria-hidden="true"></i>
                             How was your experience?
                         </label>
-                        <div class="star-rating" id="star-rating" role="radiogroup" aria-label="Rate your experience">
+                        <div class="star-rating" id="star-rating" role="radiogroup" aria-labelledby="rating-label">
                             <?php for ($i = 1; $i <= 5; $i++): ?>
                                 <button type="button"
                                         class="star-btn"
@@ -119,18 +117,18 @@ $completedAt = $transaction['completed_at'] ?? $transaction['created_at'] ?? nul
                                         role="radio"
                                         aria-checked="false"
                                         aria-label="<?= $i ?> star<?= $i > 1 ? 's' : '' ?>">
-                                    <i class="far fa-star"></i>
+                                    <i class="far fa-star" aria-hidden="true"></i>
                                 </button>
                             <?php endfor; ?>
                         </div>
                         <input type="hidden" name="rating" id="rating-input" value="0" required>
-                        <div class="rating-text text-muted" id="rating-text">Click to rate</div>
+                        <div class="rating-text" id="rating-text" aria-live="polite">Click to rate</div>
                     </div>
 
                     <!-- Comment -->
                     <div class="form-group">
                         <label for="comment" class="form-label">
-                            <i class="fa-solid fa-comment-dots" style="color: #8b5cf6;"></i>
+                            <i class="fa-solid fa-comment-dots comment-icon" aria-hidden="true"></i>
                             Share your experience (optional)
                         </label>
                         <textarea name="comment"
@@ -148,24 +146,95 @@ $completedAt = $transaction['completed_at'] ?? $transaction['created_at'] ?? nul
                     <!-- Submit -->
                     <div class="d-grid">
                         <button type="submit" class="btn-primary" id="submit-btn" disabled aria-disabled="true">
-                            <i class="fa-solid fa-paper-plane"></i>
+                            <i class="fa-solid fa-paper-plane" aria-hidden="true"></i>
                             Submit Review
                         </button>
                     </div>
                 </form>
-            </div>
-        </div>
+            </section>
+        </article>
 
         <!-- Guidelines -->
-        <div class="review-guidelines">
+        <aside class="review-guidelines" role="note">
             <p>
-                <i class="fa-solid fa-shield-heart"></i>
+                <i class="fa-solid fa-shield-heart" aria-hidden="true"></i>
                 Reviews help build trust across timebanks. Please be honest and constructive in your feedback.
             </p>
-        </div>
+        </aside>
     </div>
 </div>
 
-<script src="<?= $basePath ?>/assets/js/federation-review-form.min.js?v=<?= time() ?>"></script>
+<script>
+// Review form functionality
+(function() {
+    'use strict';
+
+    const starRating = document.getElementById('star-rating');
+    const ratingInput = document.getElementById('rating-input');
+    const ratingText = document.getElementById('rating-text');
+    const submitBtn = document.getElementById('submit-btn');
+    const commentInput = document.getElementById('comment');
+    const charCount = document.getElementById('char-count');
+
+    const ratingLabels = ['', 'Poor', 'Fair', 'Good', 'Very Good', 'Excellent'];
+
+    if (starRating) {
+        const stars = starRating.querySelectorAll('.star-btn');
+
+        stars.forEach((star, index) => {
+            star.addEventListener('click', function() {
+                const rating = parseInt(this.dataset.rating);
+                ratingInput.value = rating;
+
+                // Update stars
+                stars.forEach((s, i) => {
+                    const icon = s.querySelector('i');
+                    s.setAttribute('aria-checked', i < rating ? 'true' : 'false');
+                    icon.className = i < rating ? 'fa-solid fa-star' : 'far fa-star';
+                });
+
+                // Update text
+                ratingText.textContent = ratingLabels[rating];
+
+                // Enable submit
+                submitBtn.disabled = false;
+                submitBtn.setAttribute('aria-disabled', 'false');
+            });
+
+            // Hover effect
+            star.addEventListener('mouseenter', function() {
+                const rating = parseInt(this.dataset.rating);
+                stars.forEach((s, i) => {
+                    const icon = s.querySelector('i');
+                    icon.className = i < rating ? 'fa-solid fa-star' : 'far fa-star';
+                });
+            });
+        });
+
+        starRating.addEventListener('mouseleave', function() {
+            const currentRating = parseInt(ratingInput.value);
+            stars.forEach((s, i) => {
+                const icon = s.querySelector('i');
+                icon.className = i < currentRating ? 'fa-solid fa-star' : 'far fa-star';
+            });
+        });
+    }
+
+    // Character counter
+    if (commentInput && charCount) {
+        commentInput.addEventListener('input', function() {
+            charCount.textContent = this.value.length;
+        });
+    }
+
+    // Offline indicator
+    const banner = document.getElementById('offlineBanner');
+    if (banner) {
+        window.addEventListener('online', () => banner.classList.remove('visible'));
+        window.addEventListener('offline', () => banner.classList.add('visible'));
+        if (!navigator.onLine) banner.classList.add('visible');
+    }
+})();
+</script>
 
 <?php require dirname(dirname(__DIR__)) . '/layouts/civicone/footer.php'; ?>

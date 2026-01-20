@@ -1,40 +1,61 @@
 <?php
 /**
- * Pending Reviews List
+ * Pending Reviews List - Glassmorphism 2025
  * Shows transactions that the user hasn't reviewed yet
  */
+
+$pageTitle = $pageTitle ?? 'Pending Reviews';
+$hideHero = true;
+
+Nexus\Core\SEO::setTitle('Pending Reviews - Federation');
+Nexus\Core\SEO::setDescription('Leave feedback for your completed federated exchanges.');
+
+require dirname(dirname(__DIR__)) . '/layouts/civicone/header.php';
+$basePath = Nexus\Core\TenantContext::getBasePath();
 
 $pendingReviews = $pendingReviews ?? [];
 ?>
 
-<div class="federation-pending-reviews">
-    <div class="container py-4">
+<!-- Offline Banner -->
+<div class="offline-banner" id="offlineBanner" role="alert" aria-live="polite">
+    <i class="fa-solid fa-wifi-slash" aria-hidden="true"></i>
+    <span>No internet connection</span>
+</div>
+
+<div class="htb-container-full">
+    <div id="pending-reviews-wrapper">
+
         <!-- Header -->
-        <div class="d-flex justify-content-between align-items-center mb-4">
+        <header class="pending-header">
             <div>
-                <h1 class="h3 mb-1">Pending Reviews</h1>
-                <p class="text-muted mb-0">Leave feedback for your federated exchanges</p>
+                <h1>
+                    <i class="fa-solid fa-star" aria-hidden="true"></i>
+                    Pending Reviews
+                </h1>
+                <p>Leave feedback for your federated exchanges</p>
             </div>
-            <a href="<?= $basePath ?>/federation/transactions" class="btn btn-outline-secondary">
-                <i class="fas fa-arrow-left me-2"></i>Back
+            <a href="<?= $basePath ?>/federation/transactions" class="back-link" aria-label="Return to transactions">
+                <i class="fa-solid fa-arrow-left" aria-hidden="true"></i>
+                Back
             </a>
-        </div>
+        </header>
 
         <?php if (empty($pendingReviews)): ?>
             <!-- Empty State -->
-            <div class="empty-state text-center py-5">
-                <div class="empty-icon mb-4">
-                    <i class="fas fa-check-circle text-success" style="font-size: 4rem; opacity: 0.5;"></i>
+            <div class="reviews-empty-state" role="status" aria-labelledby="empty-title">
+                <div class="empty-icon" aria-hidden="true">
+                    <i class="fa-solid fa-check-circle"></i>
                 </div>
-                <h4>All caught up!</h4>
-                <p class="text-muted mb-4">You've reviewed all your completed federated exchanges.</p>
-                <a href="<?= $basePath ?>/federation/transactions" class="btn btn-primary">
+                <h4 id="empty-title">All caught up!</h4>
+                <p>You've reviewed all your completed federated exchanges.</p>
+                <a href="<?= $basePath ?>/federation/transactions" class="action-btn action-btn-primary">
+                    <i class="fa-solid fa-exchange-alt" aria-hidden="true"></i>
                     View Transactions
                 </a>
             </div>
         <?php else: ?>
             <!-- Pending Reviews List -->
-            <div class="pending-list">
+            <div class="pending-list" role="list" aria-label="Pending reviews">
                 <?php foreach ($pendingReviews as $review): ?>
                     <?php
                     $otherPartyName = htmlspecialchars($review['other_party_name'] ?? 'Member');
@@ -45,54 +66,69 @@ $pendingReviews = $pendingReviews ?? [];
                     $direction = $review['direction'] ?? 'sent';
                     $transactionId = $review['id'] ?? 0;
                     ?>
-                    <div class="pending-card card mb-3">
-                        <div class="card-body">
-                            <div class="row align-items-center">
-                                <div class="col-auto">
-                                    <div class="avatar-circle bg-<?= $direction === 'sent' ? 'danger' : 'success' ?> text-white">
-                                        <i class="fas fa-<?= $direction === 'sent' ? 'arrow-up' : 'arrow-down' ?>"></i>
-                                    </div>
-                                </div>
-                                <div class="col">
-                                    <h5 class="mb-1"><?= $otherPartyName ?></h5>
-                                    <p class="text-muted mb-0 small">
-                                        <i class="fas fa-building me-1"></i><?= $timebank ?>
-                                    </p>
-                                </div>
-                                <div class="col-auto text-end">
-                                    <div class="fw-bold text-<?= $direction === 'sent' ? 'danger' : 'success' ?>">
-                                        <?= $direction === 'sent' ? '-' : '+' ?><?= $amount ?> hrs
-                                    </div>
-                                    <?php if ($completedAt): ?>
-                                        <div class="text-muted small">
-                                            <?= date('j M Y', strtotime($completedAt)) ?>
-                                        </div>
-                                    <?php endif; ?>
-                                </div>
-                                <div class="col-12 col-md-auto mt-3 mt-md-0">
-                                    <a href="<?= $basePath ?>/federation/review/<?= $transactionId ?>"
-                                       class="btn btn-primary w-100">
-                                        <i class="fas fa-star me-2"></i>Leave Review
-                                    </a>
-                                </div>
+                    <article class="pending-card" role="listitem">
+                        <div class="avatar-circle <?= $direction ?>" aria-hidden="true">
+                            <i class="fa-solid fa-<?= $direction === 'sent' ? 'arrow-up' : 'arrow-down' ?>"></i>
+                        </div>
+
+                        <div class="party-info">
+                            <h3 class="party-name"><?= $otherPartyName ?></h3>
+                            <p class="party-timebank">
+                                <i class="fa-solid fa-building" aria-hidden="true"></i>
+                                <?= $timebank ?>
+                            </p>
+                        </div>
+
+                        <div class="amount-info">
+                            <div class="amount-value <?= $direction ?>">
+                                <?= $direction === 'sent' ? '-' : '+' ?><?= $amount ?> hrs
                             </div>
-                            <?php if ($description): ?>
-                                <div class="mt-2 pt-2 border-top">
-                                    <small class="text-muted"><?= $description ?></small>
-                                </div>
+                            <?php if ($completedAt): ?>
+                                <time class="amount-date" datetime="<?= date('c', strtotime($completedAt)) ?>">
+                                    <?= date('j M Y', strtotime($completedAt)) ?>
+                                </time>
                             <?php endif; ?>
                         </div>
-                    </div>
+
+                        <a href="<?= $basePath ?>/federation/review/<?= $transactionId ?>"
+                           class="review-btn"
+                           aria-label="Leave review for <?= $otherPartyName ?>">
+                            <i class="fa-solid fa-star" aria-hidden="true"></i>
+                            Leave Review
+                        </a>
+
+                        <?php if ($description): ?>
+                            <div class="description-line">
+                                <?= $description ?>
+                            </div>
+                        <?php endif; ?>
+                    </article>
                 <?php endforeach; ?>
             </div>
 
             <!-- Info Box -->
-            <div class="alert alert-info mt-4">
-                <i class="fas fa-info-circle me-2"></i>
-                <strong>Why leave reviews?</strong>
-                Reviews help build trust across timebanks. Your feedback helps other members make informed decisions
-                and rewards great community members with recognition.
-            </div>
+            <aside class="reviews-info-box" role="note">
+                <i class="fa-solid fa-info-circle" aria-hidden="true"></i>
+                <p>
+                    <strong>Why leave reviews?</strong>
+                    Reviews help build trust across timebanks. Your feedback helps other members make informed decisions
+                    and rewards great community members with recognition.
+                </p>
+            </aside>
         <?php endif; ?>
+
     </div>
 </div>
+
+<script>
+// Offline indicator
+(function() {
+    const banner = document.getElementById('offlineBanner');
+    if (!banner) return;
+    window.addEventListener('online', () => banner.classList.remove('visible'));
+    window.addEventListener('offline', () => banner.classList.add('visible'));
+    if (!navigator.onLine) banner.classList.add('visible');
+})();
+</script>
+
+<?php require dirname(dirname(__DIR__)) . '/layouts/civicone/footer.php'; ?>

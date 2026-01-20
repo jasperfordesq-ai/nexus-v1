@@ -186,7 +186,7 @@ $stats = $stats ?? [];
             <!-- Activity Feed -->
             <a href="<?= $basePath ?>/federation/activity" class="fed-feature-card">
                 <div class="fed-feature-header">
-                    <div class="fed-feature-icon" style="background: linear-gradient(135deg, #f59e0b, #d97706); color: white;">
+                    <div class="fed-feature-icon activity">
                         <i class="fa-solid fa-bell"></i>
                     </div>
                     <div>
@@ -405,7 +405,7 @@ $stats = $stats ?? [];
     if (!metaTheme) {
         const meta = document.createElement('meta');
         meta.name = 'theme-color';
-        meta.content = '#8b5cf6';
+        meta.content = '#00796B';
         document.head.appendChild(meta);
     }
 
@@ -413,7 +413,7 @@ $stats = $stats ?? [];
         const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
         const meta = document.querySelector('meta[name="theme-color"]');
         if (meta) {
-            meta.setAttribute('content', isDark ? '#0f172a' : '#8b5cf6');
+            meta.setAttribute('content', isDark ? '#0f172a' : '#00796B');
         }
     }
 

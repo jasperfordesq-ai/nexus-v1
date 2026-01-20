@@ -202,7 +202,8 @@ try {
     <!-- Messages CSS (conditional) -->
     <?php if (strpos($normPath, '/messages') !== false): ?>
     <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/messages-index.min.css?v=<?= $cssVersionTimestamp ?>">
-    <?php if (strpos($normPath, '/messages/thread') !== false): ?>
+    <?php // Load thread CSS for /messages/{id} (numeric ID) or /messages/thread/{id} ?>
+    <?php if (preg_match('#/messages/(\d+|thread/)#', $normPath)): ?>
     <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/messages-thread.min.css?v=<?= $cssVersionTimestamp ?>">
     <?php endif; ?>
     <?php endif; ?>
