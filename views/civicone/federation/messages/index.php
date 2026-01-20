@@ -1,5 +1,5 @@
 <?php
-// Federation Messages Inbox - Glassmorphism 2025
+// Federation Messages Inbox - CivicOne WCAG 2.1 AA
 $pageTitle = $pageTitle ?? "Federated Messages";
 $hideHero = true;
 
@@ -11,94 +11,7 @@ $basePath = Nexus\Core\TenantContext::getBasePath();
 
 $conversations = $conversations ?? [];
 $unreadCount = $unreadCount ?? 0;
-?>
 
-<!-- Offline Banner -->
-<div class="offline-banner" id="offlineBanner" role="alert" aria-live="polite">
-    <i class="fa-solid fa-wifi-slash"></i>
-    <span>No internet connection</span>
-</div>
-
-<div class="htb-container-full">
-    <div id="fed-messages-wrapper">
-
-<!-- Back to Messages -->
-        <a href="<?= $basePath ?>/messages" class="back-link">
-            <i class="fa-solid fa-arrow-left"></i>
-            Back to Messages
-        </a>
-
-        <!-- Header -->
-        <div class="messages-header">
-            <h1>
-                <i class="fa-solid fa-globe"></i>
-                Federated Messages
-                <?php if ($unreadCount > 0): ?>
-                    <span class="unread-badge"><?= $unreadCount ?></span>
-                <?php endif; ?>
-            </h1>
-            <a href="<?= $basePath ?>/federation/members" class="find-members-btn">
-                <i class="fa-solid fa-user-plus"></i>
-                Find Members
-            </a>
-        </div>
-
-        <!-- Conversations List -->
-        <?php if (!empty($conversations)): ?>
-            <div class="conversations-list">
-                <?php foreach ($conversations as $conv): ?>
-                    <?php
-                    $isUnread = ($conv['unread_count'] ?? 0) > 0;
-                    $fallbackAvatar = 'https://ui-avatars.com/api/?name=' . urlencode($conv['sender_name'] ?? 'User') . '&background=8b5cf6&color=fff&size=100';
-                    $avatar = !empty($conv['sender_avatar']) ? $conv['sender_avatar'] : $fallbackAvatar;
-                    $threadUrl = $basePath . '/federation/messages/' . $conv['sender_user_id'] . '?tenant=' . $conv['sender_tenant_id'];
-                    $timeAgo = timeAgo($conv['created_at'] ?? '');
-                    ?>
-                    <a href="<?= $threadUrl ?>" class="conversation-card <?= $isUnread ? 'unread' : '' ?>">
-                        <div class="conv-avatar">
-                            <img src="<?= htmlspecialchars($avatar) ?>"
-                                 onerror="this.src='<?= $fallbackAvatar ?>'"
-                                 alt="<?= htmlspecialchars($conv['sender_name'] ?? 'User') ?>">
-                            <?php if ($isUnread): ?>
-                                <span class="conv-unread-dot"></span>
-                            <?php endif; ?>
-                        </div>
-                        <div class="conv-content">
-                            <div class="conv-header">
-                                <div style="display: flex; align-items: center; gap: 8px; min-width: 0;">
-                                    <h3 class="conv-name"><?= htmlspecialchars($conv['sender_name'] ?? 'Unknown') ?></h3>
-                                    <span class="conv-tenant">
-                                        <i class="fa-solid fa-building"></i>
-                                        <?= htmlspecialchars($conv['sender_tenant_name'] ?? 'Partner') ?>
-                                    </span>
-                                </div>
-                                <span class="conv-time"><?= $timeAgo ?></span>
-                            </div>
-                            <p class="conv-preview <?= $isUnread ? 'unread' : '' ?>">
-                                <?= htmlspecialchars(mb_substr($conv['body'] ?? '', 0, 80)) ?><?= mb_strlen($conv['body'] ?? '') > 80 ? '...' : '' ?>
-                            </p>
-                        </div>
-                    </a>
-                <?php endforeach; ?>
-            </div>
-        <?php else: ?>
-            <div class="empty-state">
-                <div class="empty-state-icon">
-                    <i class="fa-solid fa-envelope-open"></i>
-                </div>
-                <h3>No Federated Messages Yet</h3>
-                <p>Start connecting with members from partner timebanks!</p>
-                <a href="<?= $basePath ?>/federation/members" class="find-members-btn">
-                    <i class="fa-solid fa-users"></i>
-                    Browse Federated Members
-                </a>
-            </div>
-        <?php endif; ?>
-
-    </div>
-</div>
-
-<?php
 function timeAgo($datetime) {
     if (empty($datetime)) return '';
     $time = strtotime($datetime);
@@ -112,15 +25,96 @@ function timeAgo($datetime) {
 }
 ?>
 
-<script>
-// Offline indicator
-(function() {
-    const banner = document.getElementById('offlineBanner');
-    if (!banner) return;
-    window.addEventListener('online', () => banner.classList.remove('visible'));
-    window.addEventListener('offline', () => banner.classList.add('visible'));
-    if (!navigator.onLine) banner.classList.add('visible');
-})();
-</script>
+<!-- Offline Banner -->
+<div class="offline-banner" id="offlineBanner" role="alert" aria-live="polite">
+    <i class="fa-solid fa-wifi-slash" aria-hidden="true"></i>
+    <span>No internet connection</span>
+</div>
+
+<div class="htb-container-full">
+    <div id="fed-messages-wrapper">
+
+        <!-- Back to Messages -->
+        <a href="<?= $basePath ?>/messages" class="back-link" aria-label="Return to local messages">
+            <i class="fa-solid fa-arrow-left" aria-hidden="true"></i>
+            Back to Messages
+        </a>
+
+        <!-- Header -->
+        <header class="messages-header" role="banner">
+            <h1>
+                <i class="fa-solid fa-globe" aria-hidden="true"></i>
+                Federated Messages
+                <?php if ($unreadCount > 0): ?>
+                    <span class="unread-badge" role="status" aria-label="<?= $unreadCount ?> unread message<?= $unreadCount !== 1 ? 's' : '' ?>"><?= $unreadCount ?></span>
+                <?php endif; ?>
+            </h1>
+            <a href="<?= $basePath ?>/federation/members" class="find-members-btn" aria-label="Find new members to message">
+                <i class="fa-solid fa-user-plus" aria-hidden="true"></i>
+                Find Members
+            </a>
+        </header>
+
+        <!-- Conversations List -->
+        <?php if (!empty($conversations)): ?>
+            <div class="conversations-list" role="list" aria-label="Message conversations">
+                <?php foreach ($conversations as $conv): ?>
+                    <?php
+                    $isUnread = ($conv['unread_count'] ?? 0) > 0;
+                    $fallbackAvatar = 'https://ui-avatars.com/api/?name=' . urlencode($conv['sender_name'] ?? 'User') . '&background=8b5cf6&color=fff&size=100';
+                    $avatar = !empty($conv['sender_avatar']) ? $conv['sender_avatar'] : $fallbackAvatar;
+                    $threadUrl = $basePath . '/federation/messages/' . $conv['sender_user_id'] . '?tenant=' . $conv['sender_tenant_id'];
+                    $timeAgo = timeAgo($conv['created_at'] ?? '');
+                    $senderName = $conv['sender_name'] ?? 'Unknown';
+                    ?>
+                    <a href="<?= $threadUrl ?>"
+                       class="conversation-card <?= $isUnread ? 'unread' : '' ?>"
+                       role="listitem"
+                       aria-label="Conversation with <?= htmlspecialchars($senderName) ?><?= $isUnread ? ', unread' : '' ?>">
+                        <div class="conv-avatar">
+                            <img src="<?= htmlspecialchars($avatar) ?>"
+                                 onerror="this.src='<?= $fallbackAvatar ?>'"
+                                 alt=""
+                                 loading="lazy">
+                            <?php if ($isUnread): ?>
+                                <span class="conv-unread-dot" aria-hidden="true"></span>
+                            <?php endif; ?>
+                        </div>
+                        <div class="conv-content">
+                            <div class="conv-header">
+                                <div class="conv-header-left">
+                                    <h3 class="conv-name"><?= htmlspecialchars($senderName) ?></h3>
+                                    <span class="conv-tenant">
+                                        <i class="fa-solid fa-building" aria-hidden="true"></i>
+                                        <?= htmlspecialchars($conv['sender_tenant_name'] ?? 'Partner') ?>
+                                    </span>
+                                </div>
+                                <time class="conv-time" datetime="<?= htmlspecialchars($conv['created_at'] ?? '') ?>"><?= $timeAgo ?></time>
+                            </div>
+                            <p class="conv-preview <?= $isUnread ? 'unread' : '' ?>">
+                                <?= htmlspecialchars(mb_substr($conv['body'] ?? '', 0, 80)) ?><?= mb_strlen($conv['body'] ?? '') > 80 ? '...' : '' ?>
+                            </p>
+                        </div>
+                    </a>
+                <?php endforeach; ?>
+            </div>
+        <?php else: ?>
+            <div class="empty-state" role="status">
+                <div class="empty-state-icon" aria-hidden="true">
+                    <i class="fa-solid fa-envelope-open"></i>
+                </div>
+                <h3 class="empty-state-title">No Federated Messages Yet</h3>
+                <p class="empty-state-text">Start connecting with members from partner timebanks!</p>
+                <a href="<?= $basePath ?>/federation/members" class="find-members-btn">
+                    <i class="fa-solid fa-users" aria-hidden="true"></i>
+                    Browse Federated Members
+                </a>
+            </div>
+        <?php endif; ?>
+
+    </div>
+</div>
+
+<script src="/assets/js/federation-messages.js?v=<?= time() ?>"></script>
 
 <?php require dirname(dirname(dirname(__DIR__))) . '/layouts/civicone/footer.php'; ?>

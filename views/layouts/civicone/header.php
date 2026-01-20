@@ -435,6 +435,8 @@ if (class_exists('\Nexus\Core\TenantContext')) {
     <link rel="stylesheet" href="/assets/css/civicone-help.css?v=<?= $cssVersion ?>">
     <!-- CivicOne Matches & Connections CSS (WCAG 2.1 AA 2026-01-19) -->
     <link rel="stylesheet" href="/assets/css/civicone-matches.css?v=<?= $cssVersion ?>">
+    <!-- CivicOne Federation CSS (WCAG 2.1 AA 2026-01-20) -->
+    <link rel="stylesheet" href="/assets/css/civicone-federation.css?v=<?= $cssVersion ?>">
 
     <!-- Skip Link for Accessibility (WCAG 2.4.1) -->
     <a href="#main-content" class="skip-link">Skip to main content</a>

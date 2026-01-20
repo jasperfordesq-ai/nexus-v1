@@ -1288,6 +1288,50 @@ function playVoiceMessage(btn) {
 
     // Load reactions after a short delay
     setTimeout(loadExistingReactions, 500);
+
+    // Visual Viewport API - Handle mobile keyboard appearance
+    // This prevents the chat from glitching when keyboard opens/closes
+    if (window.visualViewport) {
+        const chatApp = document.querySelector('.chat-app');
+        const inputArea = document.querySelector('.chat-input-area');
+
+        function handleViewportResize() {
+            if (!chatApp || !inputArea) return;
+
+            // Calculate the keyboard height by comparing viewport to window
+            const keyboardHeight = window.innerHeight - window.visualViewport.height;
+
+            // When keyboard is open, adjust the chat app height
+            if (keyboardHeight > 100) {
+                // Keyboard is visible
+                chatApp.style.height = `${window.visualViewport.height}px`;
+                // Scroll to bottom to keep input visible
+                messagesEl?.scrollTo({
+                    top: messagesEl.scrollHeight,
+                    behavior: 'smooth'
+                });
+            } else {
+                // Keyboard is hidden - reset to full viewport
+                chatApp.style.height = '';
+            }
+        }
+
+        // Listen for viewport resize (keyboard open/close)
+        window.visualViewport.addEventListener('resize', handleViewportResize);
+        window.visualViewport.addEventListener('scroll', handleViewportResize);
+
+        // Also handle when input is focused
+        inputEl?.addEventListener('focus', () => {
+            // Small delay to let keyboard fully appear
+            setTimeout(() => {
+                handleViewportResize();
+                messagesEl?.scrollTo({
+                    top: messagesEl.scrollHeight,
+                    behavior: 'smooth'
+                });
+            }, 300);
+        });
+    }
 })();
 </script>
 

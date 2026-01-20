@@ -626,7 +626,7 @@ window.closeNewMessage = function() {
     let selectedUserId = null;
     let selectedWrap = null;
     let swipeStartX = 0;
-    let swipeThreshold = 60;
+    let swipeThreshold = 100; // Increased from 60px to reduce accidental swipes
     let isSwiping = false;
 
     // Show toast notification

@@ -32,9 +32,11 @@ body.messages-page {
     overscroll-behavior: none !important;
     overscroll-behavior-y: none !important;
     -webkit-overflow-scrolling: auto !important;
-    height: 100%;
+    height: 100dvh;
+    height: 100vh; /* Fallback for older browsers */
     width: 100%;
     touch-action: manipulation;
+    padding-bottom: 0 !important; /* Override mobile nav padding */
 }
 
 /* Hide footer and navigation on messages page */
@@ -170,13 +172,17 @@ body.messages-page {
     pointer-events: none;
 }
 
-/* Thread List */
+/* Thread List - Single Scrollable Region */
 .messages-list {
     flex: 1;
     overflow-y: auto;
     overflow-x: hidden;
     -webkit-overflow-scrolling: touch;
     overscroll-behavior: contain;
+    overscroll-behavior-y: contain;
+    touch-action: pan-y;
+    position: relative;
+    isolation: isolate;
 }
 
 .messages-thread {
@@ -2456,4 +2462,3 @@ body.messages-page {
     background: var(--holo-border);
     margin: 6px 0;
 }
-</style>

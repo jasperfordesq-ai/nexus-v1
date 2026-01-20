@@ -45,7 +45,7 @@ switch ($member['service_reach'] ?? 'local_only') {
 
 <!-- Offline Banner -->
 <div class="offline-banner" id="offlineBanner" role="alert" aria-live="polite">
-    <i class="fa-solid fa-wifi-slash"></i>
+    <i class="fa-solid fa-wifi-slash" aria-hidden="true"></i>
     <span>No internet connection</span>
 </div>
 
@@ -53,8 +53,8 @@ switch ($member['service_reach'] ?? 'local_only') {
     <div id="federation-profile-wrapper">
 
         <!-- Back to Directory -->
-        <a href="<?= $basePath ?>/federation/members" class="back-link">
-            <i class="fa-solid fa-arrow-left"></i>
+        <a href="<?= $basePath ?>/federation/members" class="back-link" aria-label="Return to member directory">
+            <i class="fa-solid fa-arrow-left" aria-hidden="true"></i>
             Back to Federated Directory
         </a>
 
@@ -72,13 +72,13 @@ switch ($member['service_reach'] ?? 'local_only') {
 
                 <h1 class="profile-name"><?= htmlspecialchars($memberName) ?></h1>
 
-                <div class="federation-badge">
-                    <i class="fa-solid fa-building"></i>
+                <div class="federation-badge" role="status">
+                    <i class="fa-solid fa-building" aria-hidden="true"></i>
                     <?= htmlspecialchars($member['tenant_name'] ?? 'Partner Timebank') ?>
                 </div>
 
-                <div class="reach-badge <?= $reachClass ?>">
-                    <i class="fa-solid <?= $reachIcon ?>"></i>
+                <div class="reach-badge <?= $reachClass ?>" role="status">
+                    <i class="fa-solid <?= $reachIcon ?>" aria-hidden="true"></i>
                     <?= $reachLabel ?>
                 </div>
             </div>
@@ -86,37 +86,37 @@ switch ($member['service_reach'] ?? 'local_only') {
             <!-- Body -->
             <div class="profile-body">
                 <?php if (!empty($member['bio'])): ?>
-                    <div class="info-section">
-                        <h3>
-                            <i class="fa-solid fa-user"></i>
+                    <section class="info-section" aria-labelledby="about-heading">
+                        <h3 id="about-heading">
+                            <i class="fa-solid fa-user" aria-hidden="true"></i>
                             About
                         </h3>
                         <div class="info-content">
                             <?= nl2br(htmlspecialchars($member['bio'])) ?>
                         </div>
-                    </div>
+                    </section>
                 <?php endif; ?>
 
                 <?php if (!empty($member['location'])): ?>
-                    <div class="info-section">
-                        <h3>
-                            <i class="fa-solid fa-location-dot"></i>
+                    <section class="info-section" aria-labelledby="location-heading">
+                        <h3 id="location-heading">
+                            <i class="fa-solid fa-location-dot" aria-hidden="true"></i>
                             Location
                         </h3>
                         <div class="location-display">
-                            <i class="fa-solid fa-map-marker-alt"></i>
+                            <i class="fa-solid fa-map-marker-alt" aria-hidden="true"></i>
                             <?= htmlspecialchars($member['location']) ?>
                         </div>
-                    </div>
+                    </section>
                 <?php endif; ?>
 
                 <?php if (!empty($member['skills'])): ?>
-                    <div class="info-section">
-                        <h3>
-                            <i class="fa-solid fa-star"></i>
+                    <section class="info-section" aria-labelledby="skills-heading">
+                        <h3 id="skills-heading">
+                            <i class="fa-solid fa-star" aria-hidden="true"></i>
                             Skills & Services
                         </h3>
-                        <div class="skills-container">
+                        <div class="skills-container" role="list" aria-label="Skills">
                             <?php
                             $skills = is_array($member['skills'])
                                 ? $member['skills']
@@ -124,13 +124,13 @@ switch ($member['service_reach'] ?? 'local_only') {
                             foreach ($skills as $skill):
                                 if (trim($skill)):
                             ?>
-                                <span class="skill-tag"><?= htmlspecialchars(trim($skill)) ?></span>
+                                <span class="skill-tag" role="listitem"><?= htmlspecialchars(trim($skill)) ?></span>
                             <?php
                                 endif;
                             endforeach;
                             ?>
                         </div>
-                    </div>
+                    </section>
                 <?php endif; ?>
 
                 <!-- Trust Score -->
@@ -191,19 +191,18 @@ switch ($member['service_reach'] ?? 'local_only') {
 
                 <!-- Reviews Section -->
                 <?php if ($reviewStats && $reviewStats['total'] > 0): ?>
-                <div class="reviews-section">
+                <section class="reviews-section" aria-labelledby="reviews-heading">
                     <div class="reviews-header">
-                        <h3 style="margin:0; display:flex; align-items:center; gap:10px; color:var(--htb-text-main);">
-                            <i class="fa-solid fa-comments" style="color:#8b5cf6;"></i>
+                        <h3 id="reviews-heading" class="reviews-title">
+                            <i class="fa-solid fa-comments" aria-hidden="true"></i>
                             Reviews
                         </h3>
                         <div class="reviews-stats">
                             <div class="reviews-average">
                                 <span class="reviews-average-value"><?= number_format($reviewStats['average'], 1) ?></span>
-                                <div class="reviews-average-stars">
+                                <div class="reviews-average-stars" aria-label="<?= number_format($reviewStats['average'], 1) ?> out of 5 stars">
                                     <?php for ($i = 1; $i <= 5; $i++): ?>
-                                        <i class="fa-solid fa-star<?= $i <= round($reviewStats['average']) ? '' : '-half-stroke' ?>"
-                                           style="<?= $i > round($reviewStats['average']) ? 'opacity:0.3;' : '' ?>"></i>
+                                        <i class="fa-solid fa-star<?= $i <= round($reviewStats['average']) ? '' : '-half-stroke' ?><?= $i > round($reviewStats['average']) ? ' star-inactive' : '' ?>" aria-hidden="true"></i>
                                     <?php endfor; ?>
                                 </div>
                             </div>
@@ -211,12 +210,12 @@ switch ($member['service_reach'] ?? 'local_only') {
                         </div>
                     </div>
 
-                    <div class="reviews-list">
+                    <div class="reviews-list" role="list" aria-label="User reviews">
                         <?php foreach ($reviews as $review): ?>
-                        <div class="review-card">
-                            <div class="review-avatar">
+                        <article class="review-card" role="listitem">
+                            <div class="review-avatar" aria-hidden="true">
                                 <?php if (!empty($review['reviewer_avatar'])): ?>
-                                    <img src="<?= htmlspecialchars($review['reviewer_avatar']) ?>" alt="Reviewer">
+                                    <img src="<?= htmlspecialchars($review['reviewer_avatar']) ?>" alt="" loading="lazy">
                                 <?php else: ?>
                                     <?= strtoupper(substr($review['reviewer_name'], 0, 1)) ?>
                                 <?php endif; ?>
@@ -227,13 +226,13 @@ switch ($member['service_reach'] ?? 'local_only') {
                                         <span class="review-author-name"><?= htmlspecialchars($review['reviewer_name']) ?></span>
                                         <?php if ($review['is_cross_tenant']): ?>
                                             <span class="review-author-badge">
-                                                <i class="fa-solid fa-globe"></i> <?= htmlspecialchars($review['reviewer_timebank'] ?? 'Partner') ?>
+                                                <i class="fa-solid fa-globe" aria-hidden="true"></i> <?= htmlspecialchars($review['reviewer_timebank'] ?? 'Partner') ?>
                                             </span>
                                         <?php endif; ?>
                                     </div>
-                                    <div class="review-rating">
+                                    <div class="review-rating" aria-label="<?= $review['rating'] ?> out of 5 stars">
                                         <?php for ($i = 1; $i <= 5; $i++): ?>
-                                            <i class="fa-solid fa-star" style="<?= $i > $review['rating'] ? 'opacity:0.3;' : '' ?>"></i>
+                                            <i class="fa-solid fa-star<?= $i > $review['rating'] ? ' star-inactive' : '' ?>" aria-hidden="true"></i>
                                         <?php endfor; ?>
                                     </div>
                                 </div>
@@ -241,69 +240,71 @@ switch ($member['service_reach'] ?? 'local_only') {
                                 <p class="review-text"><?= htmlspecialchars($review['comment']) ?></p>
                                 <?php endif; ?>
                                 <div class="review-meta">
-                                    <span><i class="fa-regular fa-clock"></i> <?= htmlspecialchars($review['time_ago']) ?></span>
+                                    <span><i class="fa-regular fa-clock" aria-hidden="true"></i> <?= htmlspecialchars($review['time_ago']) ?></span>
                                     <?php if ($review['has_transaction']): ?>
-                                    <span><i class="fa-solid fa-check-circle"></i> Verified exchange</span>
+                                    <span><i class="fa-solid fa-check-circle" aria-hidden="true"></i> Verified exchange</span>
                                     <?php endif; ?>
                                 </div>
                             </div>
-                        </div>
+                        </article>
                         <?php endforeach; ?>
                     </div>
-                </div>
+                </section>
                 <?php elseif (!$reviewStats || $reviewStats['total'] === 0): ?>
-                <div class="info-section">
-                    <div class="no-reviews">
-                        <i class="fa-regular fa-comments"></i>
-                        <p>No reviews yet</p>
+                <section class="info-section" aria-labelledby="no-reviews-heading">
+                    <div class="no-reviews" role="status">
+                        <i class="fa-regular fa-comments" aria-hidden="true"></i>
+                        <p id="no-reviews-heading">No reviews yet</p>
                         <small>Be the first to leave a review after an exchange!</small>
                     </div>
-                </div>
+                </section>
                 <?php endif; ?>
 
                 <!-- Action Buttons -->
-                <div class="action-buttons">
+                <div class="action-buttons" role="group" aria-label="Member actions">
                     <?php if ($canMessage): ?>
-                        <a href="<?= $basePath ?>/messages/compose?to=<?= $member['id'] ?>&federated=1" class="action-btn action-btn-primary">
-                            <i class="fa-solid fa-envelope"></i>
+                        <a href="<?= $basePath ?>/messages/compose?to=<?= $member['id'] ?>&federated=1" class="action-btn action-btn-primary" aria-label="Send message to <?= htmlspecialchars($memberName) ?>">
+                            <i class="fa-solid fa-envelope" aria-hidden="true"></i>
                             Send Message
                         </a>
                     <?php else: ?>
-                        <span class="action-btn action-btn-disabled" title="Messaging not enabled for this member">
-                            <i class="fa-solid fa-envelope"></i>
+                        <span class="action-btn action-btn-disabled" aria-disabled="true" aria-describedby="messaging-disabled">
+                            <i class="fa-solid fa-envelope" aria-hidden="true"></i>
                             Messaging Unavailable
                         </span>
+                        <span id="messaging-disabled" class="visually-hidden">Messaging not enabled for this member</span>
                     <?php endif; ?>
 
                     <?php if ($canTransact): ?>
-                        <a href="<?= $basePath ?>/transactions/new?with=<?= $member['id'] ?>&tenant=<?= $member['tenant_id'] ?>" class="action-btn action-btn-secondary">
-                            <i class="fa-solid fa-exchange-alt"></i>
+                        <a href="<?= $basePath ?>/transactions/new?with=<?= $member['id'] ?>&tenant=<?= $member['tenant_id'] ?>" class="action-btn action-btn-secondary" aria-label="Start transaction with <?= htmlspecialchars($memberName) ?>">
+                            <i class="fa-solid fa-exchange-alt" aria-hidden="true"></i>
                             Start Transaction
                         </a>
                     <?php else: ?>
-                        <span class="action-btn action-btn-disabled" title="Transactions not enabled for this member">
-                            <i class="fa-solid fa-exchange-alt"></i>
+                        <span class="action-btn action-btn-disabled" aria-disabled="true" aria-describedby="transaction-disabled">
+                            <i class="fa-solid fa-exchange-alt" aria-hidden="true"></i>
                             Transactions Unavailable
                         </span>
+                        <span id="transaction-disabled" class="visually-hidden">Transactions not enabled for this member</span>
                     <?php endif; ?>
 
                     <?php if ($pendingReviewTransaction): ?>
-                        <a href="<?= $basePath ?>/federation/review/<?= $pendingReviewTransaction ?>" class="action-btn action-btn-review">
-                            <i class="fa-solid fa-star"></i>
+                        <a href="<?= $basePath ?>/federation/review/<?= $pendingReviewTransaction ?>" class="action-btn action-btn-review" aria-label="Leave a review for <?= htmlspecialchars($memberName) ?>">
+                            <i class="fa-solid fa-star" aria-hidden="true"></i>
                             Leave a Review
                         </a>
                     <?php endif; ?>
                 </div>
 
                 <!-- Privacy Notice -->
-                <div class="privacy-notice">
-                    <i class="fa-solid fa-shield-halved"></i>
+                <aside class="privacy-notice" role="note">
+                    <i class="fa-solid fa-shield-halved" aria-hidden="true"></i>
                     <div>
                         <strong>Federated Profile</strong><br>
                         This member is from <strong><?= htmlspecialchars($member['tenant_name'] ?? 'a partner timebank') ?></strong>.
                         Only information they've chosen to share with federated partners is displayed here.
                     </div>
-                </div>
+                </aside>
             </div>
         </div>
 

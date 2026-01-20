@@ -1,5 +1,5 @@
 <?php
-// Federation Opt-In Required - Glassmorphism 2025
+// Federation Opt-In Required - CivicOne WCAG 2.1 AA
 $pageTitle = $pageTitle ?? "Federation Opt-In Required";
 $hideHero = true;
 
@@ -12,15 +12,15 @@ $basePath = Nexus\Core\TenantContext::getBasePath();
 
 <!-- Offline Banner -->
 <div class="offline-banner" id="offlineBanner" role="alert" aria-live="polite">
-    <i class="fa-solid fa-wifi-slash"></i>
+    <i class="fa-solid fa-wifi-slash" aria-hidden="true"></i>
     <span>No internet connection</span>
 </div>
 
 <div class="htb-container-full">
     <div id="opt-in-wrapper">
 
-<div class="opt-in-card">
-            <div class="opt-in-icon">
+        <div class="opt-in-card" role="main">
+            <div class="opt-in-icon" aria-hidden="true">
                 <i class="fa-solid fa-user-shield"></i>
             </div>
 
@@ -32,33 +32,27 @@ $basePath = Nexus\Core\TenantContext::getBasePath();
             </p>
 
             <a href="<?= $basePath ?>/settings#federation" class="opt-in-btn">
-                <i class="fa-solid fa-cog"></i>
+                <i class="fa-solid fa-cog" aria-hidden="true"></i>
                 Go to Federation Settings
             </a>
 
-            <div class="info-note">
-                <h4><i class="fa-solid fa-info-circle" style="color: #8b5cf6; margin-right: 6px;"></i>What is Federation?</h4>
-                <ul>
+            <aside class="info-note" role="complementary" aria-labelledby="federation-info-heading">
+                <h2 id="federation-info-heading" class="info-note-heading">
+                    <i class="fa-solid fa-info-circle" aria-hidden="true"></i>
+                    What is Federation?
+                </h2>
+                <ul class="info-note-list">
                     <li>Connect with members from partner timebanks</li>
                     <li>Exchange services across communities</li>
                     <li>You control what information is shared</li>
                     <li>You can opt out at any time</li>
                 </ul>
-            </div>
+            </aside>
         </div>
 
     </div>
 </div>
 
-<script>
-// Offline indicator
-(function() {
-    const banner = document.getElementById('offlineBanner');
-    if (!banner) return;
-    window.addEventListener('online', () => banner.classList.remove('visible'));
-    window.addEventListener('offline', () => banner.classList.add('visible'));
-    if (!navigator.onLine) banner.classList.add('visible');
-})();
-</script>
+<script src="/assets/js/federation-common.js?v=<?= time() ?>"></script>
 
 <?php require dirname(dirname(dirname(__DIR__))) . '/layouts/civicone/footer.php'; ?>

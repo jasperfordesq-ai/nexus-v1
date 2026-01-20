@@ -36,9 +36,11 @@ body.chat-page {
     overscroll-behavior: none !important;
     overscroll-behavior-y: none !important;
     -webkit-overflow-scrolling: auto !important;
-    height: 100%;
+    height: 100dvh;
+    height: 100vh; /* Fallback for older browsers */
     width: 100%;
     touch-action: manipulation;
+    padding-bottom: 0 !important; /* Override mobile nav padding */
 }
 
 /* Hide footer and navigation on chat page */
@@ -159,7 +161,7 @@ body.chat-page {
     font-style: italic;
 }
 
-/* Messages Area */
+/* Messages Area - Single Scrollable Region */
 .chat-messages {
     flex: 1;
     overflow-y: auto;
@@ -170,7 +172,10 @@ body.chat-page {
     gap: 8px;
     -webkit-overflow-scrolling: touch;
     overscroll-behavior: contain;
+    overscroll-behavior-y: contain;
     touch-action: pan-y;
+    position: relative;
+    isolation: isolate;
 }
 
 /* Hide scrollbar on mobile */
@@ -904,4 +909,3 @@ body.chat-page {
 [data-theme="dark"] .msg-toast {
     background: #475569;
 }
-</style>
