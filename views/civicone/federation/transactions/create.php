@@ -14,7 +14,7 @@ $recipientTenantId = $recipientTenantId ?? 0;
 $balance = $balance ?? 0;
 
 $recipientName = $recipient['name'] ?? 'Unknown';
-$fallbackAvatar = 'https://ui-avatars.com/api/?name=' . urlencode($recipientName) . '&background=8b5cf6&color=fff&size=200';
+$fallbackAvatar = 'https://ui-avatars.com/api/?name=' . urlencode($recipientName) . '&background=00796B&color=fff&size=200';
 $recipientAvatar = !empty($recipient['avatar_url']) ? $recipient['avatar_url'] : $fallbackAvatar;
 $hasInsufficientBalance = $balance < 0.5;
 ?>

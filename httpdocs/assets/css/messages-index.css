@@ -46,7 +46,10 @@ body.messages-page {
 .messages-page .nexus-quick-fab,
 .messages-page .nexus-bottom-sheet,
 .messages-page .mobile-tab-bar,
-.messages-page #mobileTabBar {
+.messages-page #mobileTabBar,
+.messages-page .ai-chat-widget,
+.messages-page #aiChatWidget,
+.messages-page .nexus-ai-chat-fab {
     display: none !important;
 }
 
@@ -57,7 +60,7 @@ body.messages-page {
     display: flex;
     flex-direction: column;
     background: var(--msg-bg);
-    z-index: 100;
+    z-index: 100000; /* Must be higher than mobile-tab-bar (99999) */
     overflow: hidden;
 }
 

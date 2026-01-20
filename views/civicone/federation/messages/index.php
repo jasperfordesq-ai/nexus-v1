@@ -61,7 +61,7 @@ function timeAgo($datetime) {
                 <?php foreach ($conversations as $conv): ?>
                     <?php
                     $isUnread = ($conv['unread_count'] ?? 0) > 0;
-                    $fallbackAvatar = 'https://ui-avatars.com/api/?name=' . urlencode($conv['sender_name'] ?? 'User') . '&background=8b5cf6&color=fff&size=100';
+                    $fallbackAvatar = 'https://ui-avatars.com/api/?name=' . urlencode($conv['sender_name'] ?? 'User') . '&background=00796B&color=fff&size=100';
                     $avatar = !empty($conv['sender_avatar']) ? $conv['sender_avatar'] : $fallbackAvatar;
                     $threadUrl = $basePath . '/federation/messages/' . $conv['sender_user_id'] . '?tenant=' . $conv['sender_tenant_id'];
                     $timeAgo = timeAgo($conv['created_at'] ?? '');

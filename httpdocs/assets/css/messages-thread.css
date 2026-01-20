@@ -50,7 +50,10 @@ body.chat-page {
 .chat-page .nexus-quick-fab,
 .chat-page .nexus-bottom-sheet,
 .chat-page .mobile-tab-bar,
-.chat-page #mobileTabBar {
+.chat-page #mobileTabBar,
+.chat-page .ai-chat-widget,
+.chat-page #aiChatWidget,
+.chat-page .nexus-ai-chat-fab {
     display: none !important;
 }
 

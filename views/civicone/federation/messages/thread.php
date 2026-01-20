@@ -16,7 +16,7 @@ $canMessage = $canMessage ?? false;
 $cannotMessageReason = $cannotMessageReason ?? '';
 
 $otherName = $otherUser['name'] ?? 'Member';
-$fallbackAvatar = 'https://ui-avatars.com/api/?name=' . urlencode($otherName) . '&background=8b5cf6&color=fff&size=200';
+$fallbackAvatar = 'https://ui-avatars.com/api/?name=' . urlencode($otherName) . '&background=00796B&color=fff&size=200';
 $otherAvatar = !empty($otherUser['avatar_url']) ? $otherUser['avatar_url'] : $fallbackAvatar;
 $currentUserId = $_SESSION['user_id'] ?? 0;
 ?>

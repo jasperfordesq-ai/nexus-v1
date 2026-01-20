@@ -20,7 +20,7 @@ $transactionId = $transactionId ?? 0;
 
 $receiverName = htmlspecialchars($receiver['first_name'] ?? $receiver['name'] ?? 'Member');
 $receiverAvatar = $receiver['avatar_url'] ?? null;
-$fallbackAvatar = 'https://ui-avatars.com/api/?name=' . urlencode($receiverName) . '&background=8b5cf6&color=fff&size=200';
+$fallbackAvatar = 'https://ui-avatars.com/api/?name=' . urlencode($receiverName) . '&background=00796B&color=fff&size=200';
 $amount = number_format((float)($transaction['amount'] ?? 0), 2);
 $description = htmlspecialchars($transaction['description'] ?? 'Time exchange');
 $completedAt = $transaction['completed_at'] ?? $transaction['created_at'] ?? null;
