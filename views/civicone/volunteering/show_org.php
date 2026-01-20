@@ -659,6 +659,9 @@ require __DIR__ . '/../../layouts/header.php';
     .org-profile-card {
         margin: 0 0 20px 0;
         padding: 20px;
+        /* Reduce blur on mobile for performance */
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
     }
 
     .org-profile-content {
@@ -687,12 +690,59 @@ require __DIR__ . '/../../layouts/header.php';
         padding: 0;
     }
 
+    .org-stat-card {
+        /* Reduce blur on mobile */
+        backdrop-filter: blur(5px);
+        -webkit-backdrop-filter: blur(5px);
+    }
+
     .org-section {
         padding: 0;
     }
 
     .org-opps-grid {
         grid-template-columns: 1fr;
+    }
+
+    .org-opp-card {
+        /* Reduce blur on mobile */
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+    }
+
+    /* Disable expensive background animation on mobile */
+    .org-profile-bg::before {
+        animation: none;
+        transform: none;
+        width: 100%;
+        height: 100%;
+        top: 0;
+        left: 0;
+    }
+
+    .org-empty-state {
+        backdrop-filter: blur(5px);
+        -webkit-backdrop-filter: blur(5px);
+    }
+}
+
+/* Reduced motion preferences */
+@media (prefers-reduced-motion: reduce) {
+    .org-profile-bg::before {
+        animation: none;
+    }
+
+    .org-profile-card,
+    .org-stat-card,
+    .org-opp-card,
+    .org-action-btn {
+        transition: none;
+    }
+
+    .org-opp-card:hover,
+    .org-stat-card:hover,
+    .org-action-btn:hover {
+        transform: none;
     }
 }
 </style>

@@ -324,6 +324,9 @@ $pendingCount = $pendingCount ?? 0;
         border-radius: 0;
         position: sticky;
         top: 56px;
+        /* Reduce blur on mobile for performance */
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
     }
 
     .org-utility-header {
@@ -366,6 +369,15 @@ $pendingCount = $pendingCount ?? 0;
 
     .org-utility-tab span {
         display: none;
+    }
+}
+
+/* Reduced motion preferences */
+@media (prefers-reduced-motion: reduce) {
+    .org-utility-bar,
+    .org-utility-tab,
+    .org-utility-action {
+        transition: none;
     }
 }
 </style>
