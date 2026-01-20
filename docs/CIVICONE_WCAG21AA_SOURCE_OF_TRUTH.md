@@ -1,9 +1,9 @@
 # CivicOne WCAG 2.1 AA Source of Truth
 
-**Version:** 1.1.0
+**Version:** 1.3.0
 **Status:** AUTHORITATIVE
 **Created:** 2026-01-20
-**Last Updated:** 2026-01-20 (Phase 2 Complete)
+**Last Updated:** 2026-01-20 (Enhanced with MOJ/DfE/ONS/HMCTS Design System Guidance)
 **Maintainer:** Development Team
 
 ---
@@ -19,10 +19,13 @@
 7. [Design Tokens](#7-design-tokens)
 8. [Accessibility Specification](#8-accessibility-specification)
 9. [Component Rules](#9-component-rules)
-10. [Risk Register and Do Not Break List](#10-risk-register-and-do-not-break-list)
-11. [Rollout Plan](#11-rollout-plan)
-12. [Testing and Tooling](#12-testing-and-tooling)
-13. [Appendix: Implementation Playbook](#13-appendix-implementation-playbook)
+10. [Canonical Page Templates (MANDATORY)](#10-canonical-page-templates-mandatory)
+11. [Grid & Results Layout Contracts](#11-grid--results-layout-contracts)
+12. [Refactoring Workflow to Avoid Ruining Existing Layouts](#12-refactoring-workflow-to-avoid-ruining-existing-layouts)
+13. [Risk Register and Do Not Break List](#13-risk-register-and-do-not-break-list)
+14. [Rollout Plan](#14-rollout-plan)
+15. [Testing and Tooling](#15-testing-and-tooling)
+16. [Appendix: Implementation Playbook](#16-appendix-implementation-playbook)
 
 ---
 
@@ -323,12 +326,57 @@ git checkout v5.15.0  # Example: new stable release
 git clone --depth 1 https://github.com/nhsuk/nhsuk-frontend.git nhsuk-frontend-ref
 ```
 
-### 4.3 Tertiary Source: DfE Frontend (Reference Only)
+### 4.3 MOJ Design System (Card, Filter, Directory Patterns)
+
+**Documentation:** `https://design-patterns.service.justice.gov.uk/`
+**Usage:** PRIMARY reference for directory/list pages (Members, Groups, Volunteering)
+
+**Key Resources:**
+- Card component: https://design-patterns.service.justice.gov.uk/components/card/
+- Filter component: https://design-patterns.service.justice.gov.uk/components/filter/
+- Filter a list pattern: https://design-patterns.service.justice.gov.uk/patterns/filter-a-list/
+
+**Frontend Repository:** `https://github.com/hmcts/frontend`
+**Usage:** Reference for service UI conventions and component implementations
+
+### 4.4 DfE Card Component (Card Grid Guidance)
+
+**Documentation:** `https://design.education.gov.uk/design-system/components/card`
+**Usage:** Reference for card grid layouts and spacing constraints
+
+**Key Principles from DfE:**
+- Maximum 3-4 cards per row
+- Stack to single column on mobile
+- Test content without cards first (cards are enhancement, not requirement)
+
+### 4.5 ONS Card Component (Grid Guidance)
+
+**Documentation:** `https://service-manual.ons.gov.uk/design-system/components/card`
+**Usage:** Reference for card component grid patterns and accessibility
+
+**Key Principles from ONS:**
+- Cards must work without CSS (progressive enhancement)
+- Avoid complex grids that break on zoom
+- Prefer simple list/table layouts for large datasets
+
+### 4.6 GOV.UK Layout & Component Extension Guidance
+
+**Documentation:**
+- Layout guidance: https://design-system.service.gov.uk/styles/layout/
+- Page template: https://design-system.service.gov.uk/styles/page-template/
+- Extending components: https://design-system.service.gov.uk/get-started/extending-and-modifying-components/
+
+**Usage:** MANDATORY reference for:
+- Correct wrapper structure (govuk-width-container → govuk-main-wrapper → govuk-grid-row → govuk-grid-column)
+- Page template structure
+- Component naming/prefix conventions to avoid collisions with GOV.UK Frontend
+
+### 4.7 DfE Frontend (Reference Only)
 
 **Repository:** `https://github.com/DFE-Digital/dfe-frontend.git`
-**Usage:** Reference only if useful for education-sector specific patterns.
+**Usage:** Secondary reference for education-sector specific patterns.
 
-### 4.4 Update Policy
+### 4.8 Update Policy
 
 | Frequency | Action |
 |-----------|--------|
@@ -902,7 +950,923 @@ Same pattern as Mega Menu. Current implementation in header.php already follows 
 
 ---
 
-## 10. Risk Register and Do Not Break List
+## 10. Canonical Page Templates (MANDATORY)
+
+Every CivicOne page MUST use one of the five canonical templates defined below. Ad-hoc page structures are NOT permitted.
+
+### 10.1 Overview of Templates
+
+| Template | Use Cases | Primary Pattern | Grid Type |
+|----------|-----------|-----------------|-----------|
+| A) Directory/List | Members, Groups, Volunteering | MOJ "filter a list" | List/Table + Pagination |
+| B) Dashboard/Home | Homepage, internal hubs | Mixed content + cards | GOV.UK grid + Card groups |
+| C) Detail Page | Member profile, Group detail, Opportunity detail | Summary list + prose | GOV.UK grid (2/3 + 1/3) |
+| D) Form/Flow | Join, edit profile, create group, create listing | GOV.UK form pattern | Single column |
+| E) Content/Article | Help pages, blog posts | Prose + images | Reading width (2/3 column) |
+
+### 10.2 Template A: Directory/List Page (Members, Groups, Volunteering)
+
+**Pattern Source:** MOJ "filter a list" pattern (https://design-patterns.service.justice.gov.uk/patterns/filter-a-list/)
+
+**MANDATORY Structure:**
+
+```html
+<div class="civicone-width-container">
+  <main class="civicone-main-wrapper" id="main-content">
+
+    <!-- Page header -->
+    <div class="civicone-grid-row">
+      <div class="civicone-grid-column-full">
+        <h1 class="civicone-heading-xl">Page Title</h1>
+        <p class="civicone-body-lead">Optional lead paragraph</p>
+      </div>
+    </div>
+
+    <!-- Filter + Results layout (MOJ pattern) -->
+    <div class="civicone-grid-row">
+
+      <!-- Left: Filters (1/4 width on desktop) -->
+      <div class="civicone-grid-column-one-quarter">
+        <aside class="civicone-filter-panel" aria-label="Filter results">
+          <h2 class="civicone-heading-m">Filters</h2>
+          <!-- MOJ Filter component -->
+          <form method="get" action="">
+            <!-- Filter controls here -->
+          </form>
+        </aside>
+      </div>
+
+      <!-- Right: Results (3/4 width on desktop) -->
+      <div class="civicone-grid-column-three-quarters">
+
+        <!-- Results summary -->
+        <p class="civicone-results-summary">
+          Showing <strong>1-20</strong> of <strong>156</strong> results
+        </p>
+
+        <!-- Results list (NOT cards for large datasets) -->
+        <ul class="civicone-results-list">
+          <li class="civicone-result-item">
+            <!-- List item content -->
+          </li>
+        </ul>
+
+        <!-- Pagination -->
+        <nav class="civicone-pagination" aria-label="Results pagination">
+          <!-- Pagination component -->
+        </nav>
+
+      </div>
+    </div>
+
+  </main>
+</div>
+```
+
+**Directory/List Template Rules:**
+
+| Rule ID | Rule | Rationale |
+|---------|------|-----------|
+| DL-001 | MUST use MOJ "filter a list" pattern (https://design-patterns.service.justice.gov.uk/patterns/filter-a-list/) | Proven accessible pattern for directory pages |
+| DL-002 | Results MUST default to list/table layout for large datasets (>20 items) | Cards break pagination and zoom; lists are more accessible (ONS guidance) |
+| DL-003 | Cards MAY be used only for small curated subsets (e.g., "Featured Groups" section with <10 items) | Cards are enhancement for small sets only (DfE/ONS guidance) |
+| DL-004 | If using cards, MUST follow ONS/DfE constraints: max 3-4 per row, stack on mobile, test content without cards first | Ensures cards don't break accessibility (DfE: https://design.education.gov.uk/design-system/components/card) |
+| DL-005 | MUST NOT use masonry/Pinterest grids | Unpredictable layout breaks screen readers and zoom |
+| DL-006 | MUST include pagination for datasets >20 items | Performance and usability (MOJ pattern) |
+| DL-007 | MUST include results summary ("Showing X-Y of Z results") with `aria-live="polite"` for dynamic updates | Orientation for screen reader users (MOJ pattern) |
+| DL-008 | Filter controls MUST use `<form>` with proper `<label>` and `<fieldset>` structure | WCAG 1.3.1 (MOJ filter component guidance) |
+| DL-009 | Filter panel MUST be wrapped in `<aside>` with `aria-label="Filter results"` | Landmark navigation (WCAG 1.3.1) |
+| DL-010 | "Clear filters" button MUST be keyboard accessible and announce state changes | WCAG 2.1.1, 4.1.3 |
+
+**Accessibility Checklist (Directory/List Template):**
+
+**Filters (MOJ Filter Component):**
+
+- [ ] Filters wrapped in `<aside>` with `aria-label="Filter results"`
+- [ ] Filter form uses `<form method="get">` (allows bookmarking filtered results)
+- [ ] Each filter has visible `<label>` associated with input (`for`/`id` match)
+- [ ] Checkbox/radio groups use `<fieldset>` + `<legend>`
+- [ ] "Apply filters" button has clear label and is keyboard accessible
+- [ ] "Clear filters" button present and functional
+- [ ] Filter state persists in URL query params (e.g., `?location=Edinburgh&skills=design`)
+
+**Results Display:**
+
+- [ ] Results count announced to screen readers (`aria-live="polite"` on results summary)
+- [ ] Results summary visible: "Showing 1-20 of 156 results"
+- [ ] List items use semantic structure (`<ul>` with `<li>`, NOT `<div>` containers)
+- [ ] Each result has a clear heading (`<h3>` or `<h4>`) with actionable link
+- [ ] Metadata uses semantic markup (e.g., `<dl>` for key-value pairs, `<time>` for dates)
+- [ ] No visual-only indicators (e.g., color alone for status badges)
+
+**Pagination (GOV.UK Pagination Component):**
+
+- [ ] Pagination uses `<nav>` with `aria-label="Results pagination"`
+- [ ] Current page marked with `aria-current="page"`
+- [ ] Previous/Next links include hidden text for screen readers (e.g., "Previous page")
+- [ ] Page numbers are actual links (not just buttons), preserving URL structure
+- [ ] "Load more" button (if used instead) has clear label and announces state change
+- [ ] Pagination doesn't break on zoom (200%)
+
+**Keyboard & Focus:**
+
+- [ ] All filters operable via keyboard alone (Tab, Enter, Space, Arrow keys)
+- [ ] Focus order is logical (filters → results → pagination)
+- [ ] Focus visible on all interactive elements (GOV.UK yellow #ffdd00)
+- [ ] No keyboard traps in filter panel or results
+- [ ] Skip links present ("Skip to results", "Skip to pagination")
+
+**Responsive & Zoom:**
+
+- [ ] Filters stack above results on mobile (<641px)
+- [ ] Results list maintains order at 200% zoom (WCAG 1.4.4)
+- [ ] Touch targets minimum 44x44px on mobile (WCAG 2.5.5)
+- [ ] No horizontal scroll at any viewport width
+
+**Examples:**
+- Members directory: `/members` (list of members with filters)
+- Groups directory: `/groups` (list of groups with filters)
+- Volunteering opportunities: `/volunteering` (list of opportunities with filters)
+
+### 10.3 Template B: Dashboard/Home (Homepage, Internal Hubs)
+
+**Pattern Source:** GOV.UK page template + MOJ/DfE card patterns
+
+**MANDATORY Structure:**
+
+```html
+<div class="civicone-width-container">
+  <main class="civicone-main-wrapper" id="main-content">
+
+    <!-- Hero/Welcome section -->
+    <div class="civicone-grid-row">
+      <div class="civicone-grid-column-two-thirds">
+        <h1 class="civicone-heading-xl">Welcome, [Name]</h1>
+        <p class="civicone-body-lead">Dashboard introduction</p>
+      </div>
+    </div>
+
+    <!-- Stats summary (if applicable) -->
+    <div class="civicone-grid-row">
+      <div class="civicone-grid-column-full">
+        <dl class="civicone-summary-list civicone-summary-list--no-border">
+          <!-- Summary list for stats -->
+        </dl>
+      </div>
+    </div>
+
+    <!-- Section: Recent Activity -->
+    <div class="civicone-grid-row">
+      <div class="civicone-grid-column-two-thirds">
+        <h2 class="civicone-heading-l">Recent Activity</h2>
+        <ul class="civicone-feed-list">
+          <!-- Feed items -->
+        </ul>
+      </div>
+      <div class="civicone-grid-column-one-third">
+        <h2 class="civicone-heading-m">Quick Actions</h2>
+        <nav aria-label="Quick actions">
+          <!-- Action links -->
+        </nav>
+      </div>
+    </div>
+
+    <!-- Section: Featured/Recommended (cards allowed here for small sets) -->
+    <div class="civicone-grid-row">
+      <div class="civicone-grid-column-full">
+        <h2 class="civicone-heading-l">Recommended Groups</h2>
+        <!-- Cards allowed here (max 3-4, curated subset) -->
+        <div class="civicone-card-group">
+          <div class="civicone-card"><!-- Card content --></div>
+          <div class="civicone-card"><!-- Card content --></div>
+          <div class="civicone-card"><!-- Card content --></div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>
+```
+
+**Dashboard/Home Template Rules:**
+
+| Rule ID | Rule | Rationale |
+|---------|------|-----------|
+| DB-001 | MUST use GOV.UK grid system (govuk-grid-row / govuk-grid-column-*) | Consistent responsive behavior (GOV.UK layout guidance) |
+| DB-002 | Cards allowed ONLY for curated/featured sections with <10 items (e.g., "Recommended Groups") | Cards are visual enhancement, not default layout (ONS/DfE guidance) |
+| DB-003 | Card groups MUST use max 3-4 cards per row, stack to 1 column on mobile (<641px) | DfE/ONS guidance for card accessibility |
+| DB-004 | Cards MUST work without CSS (progressive enhancement) | ONS principle: cards must be usable if CSS fails |
+| DB-005 | Activity feed/timeline MUST use `<ul>` list layout, NOT cards | Chronological content needs predictable order for screen readers |
+| DB-006 | Stats/metrics MUST use GOV.UK summary list component (`<dl>`) | Semantic structure for key-value pairs (WCAG 1.3.1) |
+| DB-007 | Quick actions MUST be wrapped in `<nav>` with `aria-label` | Landmark navigation (WCAG 1.3.1) |
+| DB-008 | MUST NOT have "See all" links without clear destination in link text | WCAG 2.4.4 (link purpose in context) |
+
+**Accessibility Checklist (Dashboard/Home Template):**
+
+- [ ] Page has one `<h1>` (personalized greeting or page title)
+- [ ] Sections have proper heading hierarchy (h1 → h2 → h3)
+- [ ] Stats use `<dl>` (description list) for semantic structure
+- [ ] Card groups stack to single column on mobile
+- [ ] Cards have clear headings and actionable links
+- [ ] Quick actions wrapped in `<nav>` with label
+- [ ] No content hidden behind interaction (e.g., hover-only)
+
+**Examples:**
+- User dashboard: `/dashboard`
+- Homepage: `/` or `/home`
+- Community hub: `/community`
+
+### 10.4 Template C: Detail Page (Profile, Group Detail, Opportunity Detail)
+
+**Pattern Source:** GOV.UK summary list + content page template
+
+**MANDATORY Structure:**
+
+```html
+<div class="civicone-width-container">
+  <main class="civicone-main-wrapper" id="main-content">
+
+    <!-- Breadcrumbs -->
+    <nav class="civicone-breadcrumbs" aria-label="Breadcrumb">
+      <!-- Breadcrumb component -->
+    </nav>
+
+    <!-- Page header -->
+    <div class="civicone-grid-row">
+      <div class="civicone-grid-column-two-thirds">
+        <h1 class="civicone-heading-xl">Item Name</h1>
+        <p class="civicone-body-lead">Optional summary</p>
+      </div>
+    </div>
+
+    <!-- Main content area (2/3 + 1/3 split) -->
+    <div class="civicone-grid-row">
+
+      <!-- Left: Main content -->
+      <div class="civicone-grid-column-two-thirds">
+
+        <!-- Summary list for key details -->
+        <dl class="civicone-summary-list">
+          <div class="civicone-summary-list__row">
+            <dt class="civicone-summary-list__key">Label</dt>
+            <dd class="civicone-summary-list__value">Value</dd>
+          </div>
+        </dl>
+
+        <!-- Prose content -->
+        <h2 class="civicone-heading-l">About</h2>
+        <p class="civicone-body">Description content...</p>
+
+      </div>
+
+      <!-- Right: Sidebar -->
+      <div class="civicone-grid-column-one-third">
+        <aside aria-label="Related information">
+          <h2 class="civicone-heading-m">Contact</h2>
+          <!-- Sidebar content -->
+        </aside>
+      </div>
+
+    </div>
+
+  </main>
+</div>
+```
+
+**Detail Page Template Rules:**
+
+| Rule ID | Rule | Rationale |
+|---------|------|-----------|
+| DP-001 | MUST use 2/3 + 1/3 column split for content + sidebar | GOV.UK standard layout |
+| DP-002 | MUST use GOV.UK summary list for key-value pairs | Semantic and accessible |
+| DP-003 | Sidebar content MUST be marked with `<aside>` | Landmark for screen readers |
+| DP-004 | MUST include breadcrumbs for navigation context | Wayfinding |
+| DP-005 | Stacks to single column on mobile (content first, sidebar second) | Mobile-first responsive |
+
+**Accessibility Checklist (Detail Page Template):**
+
+- [ ] Breadcrumbs present and functional
+- [ ] One `<h1>` for item name
+- [ ] Summary list uses `<dl>`, `<dt>`, `<dd>` tags
+- [ ] Sidebar has `<aside>` with `aria-label`
+- [ ] Related links grouped in `<nav>` if applicable
+- [ ] Images have appropriate alt text
+- [ ] Contact information structured with semantic HTML
+
+**Examples:**
+- Member profile: `/members/123`
+- Group detail: `/groups/456`
+- Volunteering opportunity: `/volunteering/789`
+
+### 10.5 Template D: Form/Flow (Join, Edit Profile, Create Content)
+
+**Pattern Source:** GOV.UK form pattern
+
+**MANDATORY Structure:**
+
+```html
+<div class="civicone-width-container">
+  <main class="civicone-main-wrapper" id="main-content">
+
+    <!-- Breadcrumbs (if part of multi-step flow) -->
+    <nav class="civicone-breadcrumbs" aria-label="Breadcrumb">
+      <!-- Breadcrumb component -->
+    </nav>
+
+    <!-- Error summary (if errors exist) -->
+    <div class="civicone-error-summary" aria-labelledby="error-summary-title" role="alert" tabindex="-1">
+      <h2 class="civicone-error-summary__title" id="error-summary-title">
+        There is a problem
+      </h2>
+      <div class="civicone-error-summary__body">
+        <ul class="civicone-error-summary__list">
+          <li><a href="#input-1">Error message</a></li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Form (single column, reading width) -->
+    <div class="civicone-grid-row">
+      <div class="civicone-grid-column-two-thirds">
+
+        <h1 class="civicone-heading-xl">Form Title</h1>
+
+        <form method="post" action="">
+
+          <!-- Form groups with labels, hints, errors -->
+          <div class="civicone-form-group">
+            <label class="civicone-label" for="input-1">
+              Label text
+            </label>
+            <div id="input-1-hint" class="civicone-hint">
+              Hint text
+            </div>
+            <input class="civicone-input" id="input-1" name="field1" type="text" aria-describedby="input-1-hint">
+          </div>
+
+          <!-- Submit button -->
+          <button class="civicone-button" type="submit">
+            Submit
+          </button>
+
+        </form>
+
+      </div>
+    </div>
+
+  </main>
+</div>
+```
+
+**Form/Flow Template Rules:**
+
+| Rule ID | Rule | Rationale |
+|---------|------|-----------|
+| FF-001 | Forms MUST use single-column layout (2/3 width max) | GOV.UK research shows single column reduces errors |
+| FF-002 | MUST include error summary at top when errors exist | WCAG requirement |
+| FF-003 | Error summary MUST receive focus on page load when present | Keyboard/screen reader accessibility |
+| FF-004 | Every input MUST have visible `<label>` | WCAG requirement |
+| FF-005 | Hints MUST be associated via `aria-describedby` | Screen reader announcement |
+| FF-006 | Errors MUST be associated via `aria-describedby` and `aria-invalid="true"` | WCAG requirement |
+| FF-007 | Multi-step flows MUST show progress indicator | Orientation |
+
+**Accessibility Checklist (Form/Flow Template):**
+
+- [ ] Error summary present when errors exist
+- [ ] Error summary receives focus on page load
+- [ ] All inputs have visible labels
+- [ ] Hints associated with inputs via `aria-describedby`
+- [ ] Errors associated with inputs via `aria-describedby`
+- [ ] Invalid inputs marked with `aria-invalid="true"`
+- [ ] Fieldsets used for radio/checkbox groups
+- [ ] Legends used for fieldset headings
+- [ ] Submit button has clear, action-oriented label
+- [ ] Form can be completed with keyboard only
+
+**Examples:**
+- Join/register form: `/join`
+- Edit profile: `/profile/edit`
+- Create group: `/groups/create`
+- Create listing: `/listings/create`
+
+### 10.6 Template E: Content/Article (Help, Blog)
+
+**Pattern Source:** GOV.UK content page template
+
+**MANDATORY Structure:**
+
+```html
+<div class="civicone-width-container">
+  <main class="civicone-main-wrapper" id="main-content">
+
+    <!-- Breadcrumbs -->
+    <nav class="civicone-breadcrumbs" aria-label="Breadcrumb">
+      <!-- Breadcrumb component -->
+    </nav>
+
+    <!-- Article (reading width, single column) -->
+    <div class="civicone-grid-row">
+      <div class="civicone-grid-column-two-thirds">
+
+        <h1 class="civicone-heading-xl">Article Title</h1>
+
+        <!-- Article metadata -->
+        <p class="civicone-body-s civicone-text-secondary">
+          Published <time datetime="2026-01-20">20 January 2026</time>
+        </p>
+
+        <!-- Lead paragraph -->
+        <p class="civicone-body-lead">Lead paragraph</p>
+
+        <!-- Article body (prose) -->
+        <h2 class="civicone-heading-l">Section Heading</h2>
+        <p class="civicone-body">Content...</p>
+
+        <!-- Inset text (if applicable) -->
+        <div class="civicone-inset-text">
+          <p>Important note or callout</p>
+        </div>
+
+        <!-- Warning text (if applicable) -->
+        <div class="civicone-warning-text">
+          <span class="civicone-warning-text__icon" aria-hidden="true">!</span>
+          <strong class="civicone-warning-text__text">
+            Warning message
+          </strong>
+        </div>
+
+      </div>
+    </div>
+
+  </main>
+</div>
+```
+
+**Content/Article Template Rules:**
+
+| Rule ID | Rule | Rationale |
+|---------|------|-----------|
+| CA-001 | Article content MUST use reading width (2/3 column max) | Optimal line length for readability |
+| CA-002 | MUST use semantic heading hierarchy (h1 → h2 → h3) | Document structure for screen readers |
+| CA-003 | Images MUST have descriptive alt text or `alt=""` if decorative | WCAG requirement |
+| CA-004 | Use GOV.UK inset text / warning text components for callouts | Consistent pattern |
+| CA-005 | Lists MUST use `<ul>`, `<ol>`, or `<dl>` (not `<div>` or `<p>` alone) | Semantic structure |
+
+**Accessibility Checklist (Content/Article Template):**
+
+- [ ] One `<h1>` for article title
+- [ ] Logical heading hierarchy (no skipped levels)
+- [ ] Images have alt text (or `alt=""` if decorative)
+- [ ] Links have descriptive text (not "click here")
+- [ ] Dates use `<time datetime="">` for machine-readability
+- [ ] Lists use semantic markup
+- [ ] Callouts use GOV.UK inset/warning components
+- [ ] No walls of text (broken into paragraphs/headings)
+
+**Examples:**
+- Help article: `/help/how-to-...`
+- Blog post: `/blog/article-title`
+- Legal page: `/privacy`, `/terms`, `/accessibility`
+
+---
+
+## 11. Grid & Results Layout Contracts
+
+No CivicOne page may contain ad-hoc or custom grid systems. All pages MUST use one of the approved grid techniques defined below.
+
+**IMPORTANT:** All CivicOne components MUST use the `.civicone-` prefix (not `.govuk-`) to avoid collisions with GOV.UK Frontend. See GOV.UK guidance on extending components: <https://design-system.service.gov.uk/get-started/extending-and-modifying-components/>
+
+### 11.1 Approved Grid Techniques
+
+| Grid Type | When to Use | Structure | Responsive Behavior |
+|-----------|-------------|-----------|---------------------|
+| **1. GOV.UK Page Grid** | Page-level layout (main content + sidebar) | `govuk-grid-row` → `govuk-grid-column-*` | Stacks to single column on mobile |
+| **2. Card Group Grid** | Small curated sets only (<10 items) | `civicone-card-group` → `civicone-card` | Max 3-4 per row, stacks to 1 column on mobile |
+| **3. Results List/Table** | Large datasets, directories | `<ul class="civicone-results-list">` or `<table>` | Maintains order, no grid wrapping |
+
+### 11.2 Grid Technique 1: GOV.UK Page Grid
+
+**Source:** https://design-system.service.gov.uk/styles/layout/
+
+**Usage:** Page-level structure for content + sidebar, or multi-column layouts.
+
+**HTML Pattern:**
+
+```html
+<div class="civicone-width-container">
+  <main class="civicone-main-wrapper">
+    <div class="civicone-grid-row">
+
+      <!-- Two-thirds column (main content) -->
+      <div class="civicone-grid-column-two-thirds">
+        <!-- Main content -->
+      </div>
+
+      <!-- One-third column (sidebar) -->
+      <div class="civicone-grid-column-one-third">
+        <!-- Sidebar content -->
+      </div>
+
+    </div>
+  </main>
+</div>
+```
+
+**Available Column Widths:**
+
+| Class | Desktop Width | Mobile Behavior |
+|-------|---------------|-----------------|
+| `civicone-grid-column-full` | 100% | 100% |
+| `civicone-grid-column-two-thirds` | ~66% | 100% (stacks) |
+| `civicone-grid-column-one-third` | ~33% | 100% (stacks) |
+| `civicone-grid-column-one-half` | 50% | 100% (stacks) |
+| `civicone-grid-column-one-quarter` | 25% | 100% (stacks) |
+| `civicone-grid-column-three-quarters` | 75% | 100% (stacks) |
+
+**Rules:**
+
+- MUST wrap in `civicone-width-container` (max-width: 1020px)
+- MUST wrap in `civicone-main-wrapper` (adds vertical padding)
+- Columns MUST be inside `civicone-grid-row`
+- Stacks to single column automatically on mobile (<641px)
+
+### 11.3 Grid Technique 2: Card Group Grid
+
+**Source:** MOJ/DfE/ONS card component guidance
+
+**Usage:** ONLY for small curated sets (<10 items). NOT for search results or large directories.
+
+**HTML Pattern:**
+
+```html
+<div class="civicone-card-group">
+  <div class="civicone-card">
+    <h3 class="civicone-card__heading">
+      <a href="/link" class="civicone-card__link">Card Title</a>
+    </h3>
+    <p class="civicone-card__description">Card description</p>
+  </div>
+  <div class="civicone-card">
+    <!-- Another card -->
+  </div>
+  <div class="civicone-card">
+    <!-- Another card -->
+  </div>
+</div>
+```
+
+**CSS (Example Implementation):**
+
+```css
+.civicone-card-group {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: var(--civicone-space-6);
+  margin-bottom: var(--civicone-space-9);
+}
+
+@media (min-width: 641px) and (max-width: 1024px) {
+  .civicone-card-group {
+    grid-template-columns: repeat(2, 1fr); /* Max 2 per row on tablet */
+  }
+}
+
+@media (min-width: 1025px) {
+  .civicone-card-group {
+    grid-template-columns: repeat(3, 1fr); /* Max 3 per row on desktop */
+  }
+}
+
+@media (max-width: 640px) {
+  .civicone-card-group {
+    grid-template-columns: 1fr; /* Single column on mobile */
+  }
+}
+```
+
+**Rules:**
+
+| Rule ID | Rule | Rationale |
+|---------|------|-----------|
+| CG-001 | Cards limited to max 3-4 per row on desktop | DfE/ONS guidance prevents overcrowding |
+| CG-002 | Cards MUST stack to single column on mobile (<641px) | Touch targets and readability |
+| CG-003 | Card content MUST work without CSS (progressive enhancement) | Accessibility baseline |
+| CG-004 | Cards MUST have clear heading and actionable link | Semantic structure |
+| CG-005 | Use ONLY for <10 curated items (featured content, recommendations) | Cards break pagination and zoom for large sets |
+
+### 11.4 Grid Technique 3: Results List/Table Layout
+
+**Source:** MOJ "filter a list" pattern
+
+**Usage:** Default layout for directories, search results, and any dataset >20 items.
+
+**HTML Pattern (List):**
+
+```html
+<ul class="civicone-results-list">
+  <li class="civicone-result-item">
+    <h3 class="civicone-result-heading">
+      <a href="/item/123">Item Title</a>
+    </h3>
+    <p class="civicone-result-meta">Metadata (date, location, etc.)</p>
+    <p class="civicone-result-description">Brief description...</p>
+  </li>
+  <li class="civicone-result-item">
+    <!-- Another result -->
+  </li>
+</ul>
+```
+
+**HTML Pattern (Table):**
+
+```html
+<table class="civicone-table">
+  <caption class="civicone-table__caption">Results</caption>
+  <thead class="civicone-table__head">
+    <tr class="civicone-table__row">
+      <th scope="col" class="civicone-table__header">Name</th>
+      <th scope="col" class="civicone-table__header">Location</th>
+      <th scope="col" class="civicone-table__header">Date</th>
+    </tr>
+  </thead>
+  <tbody class="civicone-table__body">
+    <tr class="civicone-table__row">
+      <td class="civicone-table__cell">Value</td>
+      <td class="civicone-table__cell">Value</td>
+      <td class="civicone-table__cell">Value</td>
+    </tr>
+  </tbody>
+</table>
+```
+
+**Rules:**
+
+| Rule ID | Rule | Rationale |
+|---------|------|-----------|
+| RL-001 | Use list layout for simple results (title + metadata + description) | Semantic and screen-reader friendly |
+| RL-002 | Use table layout for tabular data (multiple comparable columns) | Proper semantic structure |
+| RL-003 | Lists MUST use `<ul>` with `<li>`, NOT `<div>` containers | Screen reader navigation |
+| RL-004 | Tables MUST have `<caption>`, `<thead>`, `<tbody>`, and `scope` attributes | WCAG requirement |
+| RL-005 | NO grid wrapping (cards) for results | Predictable order for screen readers |
+| RL-006 | Include pagination for datasets >20 items | Performance and usability |
+
+### 11.5 Anti-Patterns (DO NOT USE)
+
+| Anti-Pattern | Why It's Banned | Correct Alternative |
+|--------------|-----------------|---------------------|
+| **Masonry/Pinterest grid** | Unpredictable layout breaks screen readers and zoom | List layout with pagination |
+| **Card grid for large datasets** | Breaks pagination, screen reader order, zoom | List/table layout with pagination |
+| **Custom flexbox/grid without responsive rules** | Breaks on mobile, no accessibility testing | Use approved GOV.UK grid |
+| **Float-based layouts** | Legacy technique, unpredictable behavior | Use CSS Grid (GOV.UK grid) |
+| **Absolute positioning for layout** | Breaks responsive design and screen readers | Use GOV.UK grid |
+| **Inline grid styles** | Not maintainable, no consistency | Use approved grid classes |
+
+### 11.6 Example Markup Patterns
+
+**Example 1: Members Directory (Correct - List Layout)**
+
+```html
+<div class="civicone-grid-row">
+  <div class="civicone-grid-column-one-quarter">
+    <!-- Filters (MOJ filter component) -->
+  </div>
+  <div class="civicone-grid-column-three-quarters">
+    <p class="civicone-results-summary">Showing 1-20 of 156 members</p>
+    <ul class="civicone-results-list">
+      <li class="civicone-result-item">
+        <h3><a href="/members/123">John Doe</a></h3>
+        <p class="meta">Location: Edinburgh | Joined: 2025</p>
+        <p>Skills: Web design, Photography</p>
+      </li>
+      <!-- More results -->
+    </ul>
+    <nav class="civicone-pagination"><!-- Pagination --></nav>
+  </div>
+</div>
+```
+
+**Example 2: Homepage "Featured Groups" (Correct - Card Grid for Small Set)**
+
+```html
+<div class="civicone-grid-row">
+  <div class="civicone-grid-column-full">
+    <h2>Featured Groups (3 items only)</h2>
+    <div class="civicone-card-group">
+      <div class="civicone-card">
+        <h3><a href="/groups/1">Community Garden</a></h3>
+        <p>Growing together since 2020</p>
+      </div>
+      <div class="civicone-card">
+        <h3><a href="/groups/2">Book Club</a></h3>
+        <p>Monthly meetups to discuss books</p>
+      </div>
+      <div class="civicone-card">
+        <h3><a href="/groups/3">Knitting Circle</a></h3>
+        <p>Every Thursday at the library</p>
+      </div>
+    </div>
+  </div>
+</div>
+```
+
+**Example 3: Groups Directory (WRONG - Cards for Large Dataset)**
+
+```html
+<!-- ❌ WRONG - DO NOT DO THIS -->
+<div class="civicone-card-group">
+  <!-- 50+ cards here = breaks pagination, screen readers, zoom -->
+  <div class="civicone-card"><!-- Group 1 --></div>
+  <div class="civicone-card"><!-- Group 2 --></div>
+  <!-- ... 50 more cards ... -->
+</div>
+```
+
+**Correct version:** Use list layout with pagination (see Example 1 pattern).
+
+---
+
+## 12. Refactoring Workflow to Avoid Ruining Existing Layouts
+
+This section defines the MANDATORY workflow for any HTML/CSS refactoring to prevent breaking existing functionality.
+
+### 12.1 Pre-Refactoring Investigation (REQUIRED)
+
+Before changing any markup or CSS:
+
+1. **Identify Existing Grid Hooks**
+   - Search for CSS classes used for layout (e.g., `.grid`, `.flex`, `.row`, `.col`)
+   - Document which classes are used by existing JavaScript
+   - Document which classes are used by mobile nav, Pusher, chat widget
+
+2. **Audit Existing CSS**
+   - Find all stylesheets affecting the page being refactored
+   - Check for `!important` rules (indicates specificity conflicts)
+   - Check for inline styles in PHP files (per CLAUDE.md, should be moved)
+
+3. **Document Navigation Hooks**
+   - Confirm IDs used by navigation scripts (e.g., `#civic-mega-menu`, `#civic-menu-toggle`)
+   - Confirm classes used by mobile drawer (e.g., `.mobile-nav-open`)
+   - DO NOT remove or rename these without updating corresponding JavaScript
+
+### 12.2 Scoped CSS-First Approach (PREFERRED)
+
+When possible, fix issues with CSS ONLY (no HTML changes):
+
+1. **Create Scoped CSS Class**
+   ```css
+   /* In civicone-[page].css */
+   .civicone--govuk .existing-component {
+     /* New GOV.UK-aligned styles */
+   }
+   ```
+
+2. **Test with Feature Flag**
+   - Enable `.civicone--govuk` class via query param (`?govuk=1`)
+   - Verify new styles apply correctly
+   - Verify old styles still work when flag is off
+
+3. **Benefits:**
+   - No HTML changes = no risk of breaking JavaScript hooks
+   - Gradual rollout via feature flag
+   - Easy rollback (remove CSS class)
+
+### 12.3 HTML Refactoring Workflow (When Required)
+
+If HTML changes are unavoidable:
+
+**Step 1: Create Before/After DOM Diff**
+
+```bash
+# Capture current HTML output
+curl http://localhost/page > before.html
+
+# Make changes
+
+# Capture new HTML output
+curl http://localhost/page > after.html
+
+# Diff the HTML
+diff before.html after.html
+```
+
+**Step 2: Visual Regression Snapshots**
+
+- Screenshot before: Desktop (1920px), Tablet (768px), Mobile (375px)
+- Make changes
+- Screenshot after: Same viewports
+- Compare pixel-by-pixel (use tool like BackstopJS or Percy)
+
+**Step 3: Verify No Breaks**
+
+| Check | Tool/Method | Pass Criteria |
+|-------|-------------|---------------|
+| Navigation works | Manual test | Mega menu, mobile drawer functional |
+| Pusher notifications work | Manual test | Real-time updates still appear |
+| Chat widget appears | Manual test | Widget visible and functional |
+| JavaScript console | Browser DevTools | No new errors |
+| Layout switcher works | Manual test | Switch to Modern and back |
+| Mobile nav works | Real device test | Drawer opens/closes |
+
+**Step 4: Preserve Critical Classes/IDs**
+
+**NEVER remove these without verifying dependencies:**
+
+| Element | Class/ID | Used By |
+|---------|----------|---------|
+| Mega menu button | `#civic-mega-menu-btn` | header.php JavaScript |
+| Mega menu container | `#civic-mega-menu` | header.php JavaScript |
+| Mobile menu toggle | `#civic-menu-toggle` | mobile-nav-v2.php |
+| Mobile menu drawer | `.nexus-native-drawer` | nexus-mobile.js |
+| Notification drawer | `#notif-drawer` | notifications.js |
+| Main content | `#main-content` | Skip link target |
+| Search bar | `#civic-search-form` | search.js |
+| Chat widget container | `#ai-chat-widget` | ai-chat-widget.js |
+
+**Step 5: Staged Rollout**
+
+1. **Dev:** Test on localhost with feature flag
+2. **Staging:** Test with real data and all integrations
+3. **Production (canary):** Enable for 5% of users
+4. **Production (full):** Enable for all users
+
+### 12.4 Rollback Checklist
+
+If issues are found after deployment:
+
+**Immediate Rollback (CSS-only changes):**
+```php
+// Disable feature flag
+$govukRedesign = false;
+```
+
+**Rollback (HTML changes):**
+```bash
+git revert <commit-hash>
+# OR restore from backup:
+cp page.php.backup page.php
+```
+
+**Post-Rollback Actions:**
+- [ ] Document what broke
+- [ ] Update this source of truth with lessons learned
+- [ ] Create test case to prevent regression
+- [ ] Plan fixes with proper workflow (Section 12.2 or 12.3)
+
+### 12.5 Safe Refactoring Example
+
+**Scenario:** Update Members directory to use MOJ "filter a list" pattern
+
+**WRONG Approach (High Risk):**
+1. Delete all existing HTML
+2. Write new HTML from scratch
+3. Deploy and hope it works
+
+**CORRECT Approach (Low Risk):**
+
+1. **Investigation:**
+   - Document existing CSS classes: `.member-list`, `.member-card`, `.filters`
+   - Check if JavaScript uses these: `grep -r "member-list" assets/js/`
+   - Result: No JavaScript dependencies found ✓
+
+2. **Scoped CSS First:**
+   - Create `.civicone--govuk .member-list { /* new styles */ }`
+   - Test with `?govuk=1` query param
+   - Verify layout works in GOV.UK mode
+   - Verify old layout still works without flag
+
+3. **HTML Refactoring (if needed):**
+   - Create `members/index.php.backup`
+   - Update HTML incrementally (keep existing classes during transition)
+   - Add new GOV.UK classes alongside old classes:
+     ```html
+     <!-- Transition markup -->
+     <div class="member-list civicone-results-list">
+       <!-- Both old and new classes present -->
+     </div>
+     ```
+   - Test thoroughly
+   - Remove old classes only after confirming new ones work
+
+4. **Visual Regression:**
+   - Screenshot before/after
+   - Compare layouts pixel-by-pixel
+   - Verify no unintended changes
+
+5. **Staged Rollout:**
+   - Test on localhost
+   - Deploy to staging
+   - Enable for 5% of users
+   - Monitor for errors
+   - Full rollout
+
+6. **Cleanup:**
+   - Remove old CSS classes after 1 week of stable operation
+   - Update documentation
+   - Delete backup files
+
+---
+
+## 13. Risk Register and Do Not Break List
 
 ### 10.1 Critical Hooks (DO NOT RENAME/REMOVE)
 
@@ -1034,34 +1998,63 @@ These files are shared between layouts. Do NOT add CivicOne-specific styles:
 
 **Recommended Approach:**
 
-**Option A: Start with High-Priority Pages (Recommended)**
+**Option A: Start with Directory/List Pages (Recommended - MANDATORY ORDER)**
 
-Update pages in order of user impact:
+Update pages in STRICT order to apply MOJ "filter a list" pattern + GOV.UK component patterns:
 
-1. **Dashboard** (`views/civicone/dashboard/`)
-   - Replace existing buttons with `.civicone-button`, `.civicone-button--primary`, `.civicone-button--secondary`
-   - Update form inputs to use `.civicone-input` classes
-   - Apply GOV.UK error states where applicable
-   - Test keyboard navigation thoroughly
+1. **Members Directory** (`views/civicone/members/index.php`) - **START HERE**
+   - MUST use Template A: Directory/List Page (Section 10.2)
+   - Apply MOJ "filter a list" pattern (filters + list + pagination)
+   - Replace card grid with `<ul class="civicone-results-list">` layout
+   - Implement MOJ filter component for location, skills, interests
+   - Add GOV.UK pagination component
+   - Test with >100 member dataset to verify performance
+   - **Why first:** Highest traffic directory page, establishes pattern for others
 
-2. **Profile/Settings** (`views/civicone/profile/`, `views/civicone/settings/`)
-   - Standardize form elements with GOV.UK patterns
+2. **Groups Directory** (`views/civicone/groups/index.php`)
+   - MUST use Template A: Directory/List Page (Section 10.2)
+   - Apply same MOJ "filter a list" pattern as Members
+   - Replace card grid with list layout for main results
+   - Keep small "Featured Groups" section with max 3-4 cards (DfE/ONS guidance)
+   - Implement category/location filters using MOJ filter component
+   - Add GOV.UK pagination
+   - **Why second:** Second-highest directory traffic, validates pattern reusability
+
+3. **Volunteering Opportunities** (`views/civicone/volunteering/index.php`)
+   - MUST use Template A: Directory/List Page (Section 10.2)
+   - Apply MOJ "filter a list" pattern consistently
+   - List layout for opportunity results (title, organization, location, dates)
+   - Filters for type, location, date range (MOJ filter component)
+   - GOV.UK pagination
+   - **Why third:** Completes the directory page pattern, validates scalability
+
+4. **Homepage/Dashboard** (`views/civicone/feed/index.php`, `views/civicone/dashboard/`)
+   - MUST use Template B: Dashboard/Home (Section 10.3)
+   - Activity feed uses list layout (NOT cards)
+   - Small "Recommended Groups" section may use cards (max 3-4, DfE/ONS guidance)
+   - Stats summary uses GOV.UK summary list component
+   - Apply GOV.UK button styles to CTAs
+   - **Why fourth:** Mixed-content template, benefits from directory page learnings
+
+5. **Profile/Settings** (`views/civicone/profile/`, `views/civicone/settings/`)
+   - MUST use Template C: Detail Page (Section 10.4) for profiles
+   - MUST use Template D: Form/Flow (Section 10.5) for settings
+   - Standardize form elements with GOV.UK form components
    - Apply `.civicone-label`, `.civicone-hint`, `.civicone-error-message` classes
    - Update button styles to match GOV.UK components
 
-3. **Events Pages** (`views/civicone/events/`)
-   - Update CTAs to use new button styles
-   - Standardize form inputs on create/edit pages
+6. **Events Pages** (`views/civicone/events/`)
+   - Events listing: Use Template A: Directory/List (if >20 events)
+   - Event detail: Use Template C: Detail Page
+   - Event create/edit: Use Template D: Form/Flow
+   - Update CTAs to use GOV.UK button styles
 
-4. **Groups Pages** (`views/civicone/groups/`)
-   - Update navigation buttons
-   - Standardize discussion forms
+7. **Messages/Help** (`views/civicone/messages/`, `views/civicone/help/`)
+   - Message composition: Template D: Form/Flow
+   - Help center articles: Template E: Content/Article
+   - Help search results: Template A: Directory/List (if applicable)
 
-5. **Messages/Help** (`views/civicone/messages/`, `views/civicone/help/`)
-   - Update message composition forms
-   - Standardize help center search and contact forms
-
-**Option B: Testing and Validation First**
+#### Option B: Testing and Validation First
 
 Before page refactoring, validate Phase 2 work:
 
