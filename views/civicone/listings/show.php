@@ -1,5 +1,6 @@
 <?php
-// CivicOne View: Show Listing - MadeOpen Style
+// CivicOne Listing Detail - WCAG 2.1 AA Compliant
+// GOV.UK Detail Page Template (Template C)
 if (session_status() === PHP_SESSION_NONE) session_start();
 
 $hTitle = $listing['title'];
@@ -19,216 +20,264 @@ $breadcrumbs = [
 require dirname(__DIR__, 2) . '/layouts/civicone/partials/breadcrumb.php';
 ?>
 
-<!-- Action Bar -->
-<div class="civic-action-bar" style="margin-bottom: 24px;">
-    <a href="<?= $basePath ?>/listings" class="civic-btn civic-btn--outline">
-        <span class="dashicons dashicons-arrow-left-alt2" aria-hidden="true"></span>
-        Back to Listings
-    </a>
-</div>
+<!-- GOV.UK Page Template Boilerplate -->
+<div class="civicone-width-container civicone--govuk">
+    <main class="civicone-main-wrapper" id="main-content" role="main">
 
-<div class="civic-listing-detail">
-    <div class="civic-listing-detail-grid">
-        <!-- Main Content -->
-        <div class="civic-listing-main">
-            <article class="civic-card">
-                <?php if (!empty($listing['image_url'])): ?>
-                    <div class="civic-listing-image">
-                        <img src="<?= htmlspecialchars($listing['image_url']) ?>"
-                             alt="<?= htmlspecialchars($listing['title']) ?>">
+        <!-- Back Link (optional) -->
+        <a href="<?= $basePath ?>/listings" class="civicone-back-link">
+            Back to all listings
+        </a>
+
+        <!-- Page Header -->
+        <div class="civicone-grid-row">
+            <div class="civicone-grid-column-two-thirds">
+                <h1 class="civicone-heading-xl"><?= htmlspecialchars($listing['title']) ?></h1>
+
+                <!-- Type Badge -->
+                <p class="civicone-listing-detail__type-badge civicone-listing-detail__type-badge--<?= strtolower($listing['type'] ?? 'listing') ?>">
+                    <?= ucfirst($listing['type'] ?? 'Listing') ?>
+                </p>
+            </div>
+        </div>
+
+        <!-- Main Content Area (2/3 + 1/3 split) -->
+        <div class="civicone-grid-row">
+
+            <!-- Left: Main Content (2/3) -->
+            <div class="civicone-grid-column-two-thirds">
+
+                <!-- Summary List for Key Facts -->
+                <h2 class="civicone-heading-l">Key facts</h2>
+                <dl class="civicone-summary-list">
+                    <div class="civicone-summary-list__row">
+                        <dt class="civicone-summary-list__key">Type</dt>
+                        <dd class="civicone-summary-list__value"><?= ucfirst($listing['type'] ?? 'Listing') ?></dd>
                     </div>
+
+                    <?php if (!empty($listing['category_name'])): ?>
+                    <div class="civicone-summary-list__row">
+                        <dt class="civicone-summary-list__key">Category</dt>
+                        <dd class="civicone-summary-list__value"><?= htmlspecialchars($listing['category_name']) ?></dd>
+                    </div>
+                    <?php endif; ?>
+
+                    <?php if (!empty($listing['location'])): ?>
+                    <div class="civicone-summary-list__row">
+                        <dt class="civicone-summary-list__key">Location</dt>
+                        <dd class="civicone-summary-list__value"><?= htmlspecialchars($listing['location']) ?></dd>
+                    </div>
+                    <?php endif; ?>
+
+                    <div class="civicone-summary-list__row">
+                        <dt class="civicone-summary-list__key">Posted</dt>
+                        <dd class="civicone-summary-list__value">
+                            <time datetime="<?= date('Y-m-d', strtotime($listing['created_at'])) ?>">
+                                <?= date('j F Y', strtotime($listing['created_at'])) ?>
+                            </time>
+                        </dd>
+                    </div>
+
+                    <div class="civicone-summary-list__row">
+                        <dt class="civicone-summary-list__key">Posted by</dt>
+                        <dd class="civicone-summary-list__value">
+                            <a href="<?= $basePath ?>/profile/<?= $listing['user_id'] ?>" class="civicone-link">
+                                <?= htmlspecialchars($listing['author_name']) ?>
+                            </a>
+                        </dd>
+                    </div>
+
+                    <?php if (!empty($listing['status'])): ?>
+                    <div class="civicone-summary-list__row">
+                        <dt class="civicone-summary-list__key">Status</dt>
+                        <dd class="civicone-summary-list__value">
+                            <span class="civicone-tag <?= $listing['status'] === 'active' ? 'civicone-tag--green' : '' ?>">
+                                <?= ucfirst($listing['status']) ?>
+                            </span>
+                        </dd>
+                    </div>
+                    <?php endif; ?>
+                </dl>
+
+                <!-- Image (if present) -->
+                <?php if (!empty($listing['image_url'])): ?>
+                <div class="civicone-listing-detail__image">
+                    <img src="<?= htmlspecialchars($listing['image_url']) ?>"
+                         alt="<?= htmlspecialchars($listing['title']) ?>"
+                         loading="lazy">
+                </div>
                 <?php endif; ?>
 
-                <div class="civic-listing-body">
+                <!-- Description -->
+                <h2 class="civicone-heading-l">Description</h2>
+                <div class="civicone-body civicone-listing-detail__description">
                     <?= nl2br(htmlspecialchars($listing['description'])) ?>
                 </div>
 
+                <!-- Additional Attributes (if present) -->
                 <?php if (!empty($listingAttributes)): ?>
-                    <div class="civic-listing-attributes">
-                        <h3 class="civic-section-subtitle">Details</h3>
-                        <dl class="civic-attribute-list">
-                            <?php foreach ($listingAttributes as $attr): ?>
-                                <div class="civic-attribute-item">
-                                    <dt><?= htmlspecialchars($attr['name']) ?></dt>
-                                    <dd><?= htmlspecialchars($attr['value']) ?></dd>
-                                </div>
-                            <?php endforeach; ?>
-                        </dl>
+                <h2 class="civicone-heading-l">Additional details</h2>
+                <dl class="civicone-summary-list">
+                    <?php foreach ($listingAttributes as $attr): ?>
+                    <div class="civicone-summary-list__row">
+                        <dt class="civicone-summary-list__key"><?= htmlspecialchars($attr['name']) ?></dt>
+                        <dd class="civicone-summary-list__value"><?= htmlspecialchars($attr['value']) ?></dd>
                     </div>
+                    <?php endforeach; ?>
+                </dl>
+                <?php endif; ?>
+
+                <!-- GOV.UK Details Component for Extra Info -->
+                <?php if (!empty($listing['terms']) || !empty($listing['safety_notes'])): ?>
+                <details class="civicone-details" role="group">
+                    <summary class="civicone-details__summary">
+                        <span class="civicone-details__summary-text">
+                            Important information
+                        </span>
+                    </summary>
+                    <div class="civicone-details__text">
+                        <?php if (!empty($listing['terms'])): ?>
+                        <h3 class="civicone-heading-s">Terms and conditions</h3>
+                        <p class="civicone-body"><?= nl2br(htmlspecialchars($listing['terms'])) ?></p>
+                        <?php endif; ?>
+
+                        <?php if (!empty($listing['safety_notes'])): ?>
+                        <h3 class="civicone-heading-s">Safety notes</h3>
+                        <p class="civicone-body"><?= nl2br(htmlspecialchars($listing['safety_notes'])) ?></p>
+                        <?php endif; ?>
+                    </div>
+                </details>
                 <?php endif; ?>
 
                 <!-- Social Interactions -->
-                <?php
-                $targetType = 'listing';
-                $targetId = $listing['id'];
-                include dirname(__DIR__) . '/partials/social_interactions.php';
-                ?>
-            </article>
-        </div>
+                <div class="civicone-listing-detail__social">
+                    <?php
+                    $targetType = 'listing';
+                    $targetId = $listing['id'];
+                    include dirname(__DIR__) . '/partials/social_interactions.php';
+                    ?>
+                </div>
 
-        <!-- Sidebar -->
-        <aside class="civic-listing-sidebar">
-            <div class="civic-card civic-author-card">
-                <h3 class="civic-section-subtitle">Posted By</h3>
-                <p class="civic-author-name">
-                    <a href="<?= $basePath ?>/profile/<?= $listing['user_id'] ?>">
-                        <?= htmlspecialchars($listing['author_name']) ?>
-                    </a>
-                </p>
-
-                <?php if (isset($_SESSION['user_id'])): ?>
-                    <?php if ($_SESSION['user_id'] == $listing['user_id']): ?>
-                        <div class="civic-owner-notice">
-                            <span class="dashicons dashicons-yes-alt" aria-hidden="true"></span>
-                            This is your listing
-                        </div>
-                        <a href="<?= $basePath ?>/listings/edit/<?= $listing['id'] ?>" class="civic-btn" style="width: 100%;">
-                            <span class="dashicons dashicons-edit" aria-hidden="true"></span>
-                            Edit Listing
-                        </a>
-                    <?php else: ?>
-                        <a href="<?= $basePath ?>/messages/<?= $listing['user_id'] ?>?ref=<?= urlencode("Re: " . $listing['title']) ?>" class="civic-btn" style="width: 100%;">
-                            <span class="dashicons dashicons-email" aria-hidden="true"></span>
-                            Contact Member
-                        </a>
-                    <?php endif; ?>
-                <?php else: ?>
-                    <p class="civic-login-prompt">
-                        <a href="<?= $basePath ?>/login">Sign in</a> to contact this member.
-                    </p>
-                <?php endif; ?>
             </div>
 
-            <?php if (!empty($listing['location'])): ?>
-                <div class="civic-card" style="margin-top: 16px;">
-                    <h3 class="civic-section-subtitle">
-                        <span class="dashicons dashicons-location" aria-hidden="true"></span>
-                        Location
-                    </h3>
-                    <p class="civic-location-text"><?= htmlspecialchars($listing['location']) ?></p>
-                </div>
-            <?php endif; ?>
-        </aside>
-    </div>
-</div>
+            <!-- Right: Sidebar (1/3) -->
+            <div class="civicone-grid-column-one-third">
+                <aside aria-label="Contact and actions">
 
-<style>
-    .civic-listing-detail-grid {
-        display: grid;
-        grid-template-columns: 1fr 350px;
-        gap: 24px;
-    }
+                    <!-- Primary Action Card -->
+                    <div class="civicone-listing-detail__action-card">
+                        <?php if (isset($_SESSION['user_id'])): ?>
+                            <?php if ($_SESSION['user_id'] == $listing['user_id']): ?>
+                                <!-- Owner Actions -->
+                                <div class="civicone-notification civicone-notification--info">
+                                    <p class="civicone-notification__heading">This is your listing</p>
+                                    <p class="civicone-body-s">You can edit or manage your listing below.</p>
+                                </div>
 
-    .civic-listing-image {
-        border-radius: 8px;
-        overflow: hidden;
-        margin-bottom: 24px;
-    }
+                                <a href="<?= $basePath ?>/listings/edit/<?= $listing['id'] ?>"
+                                   class="civicone-button civicone-listing-detail__action-button">
+                                    Edit this listing
+                                </a>
 
-    .civic-listing-image img {
-        width: 100%;
-        height: auto;
-        display: block;
-    }
+                                <?php if ($listing['status'] === 'active'): ?>
+                                <button type="button"
+                                        class="civicone-button civicone-button--secondary civicone-listing-detail__action-button"
+                                        onclick="if(confirm('Mark this listing as fulfilled?')) { /* Add close/fulfill logic */ }">
+                                    Mark as fulfilled
+                                </button>
+                                <?php endif; ?>
 
-    .civic-listing-body {
-        font-size: 1.1rem;
-        line-height: 1.7;
-        color: var(--civic-text-main);
-    }
+                            <?php else: ?>
+                                <!-- Contact Action -->
+                                <h2 class="civicone-heading-m">Contact</h2>
+                                <p class="civicone-body-s">Send a message to the poster about this listing.</p>
 
-    .civic-listing-attributes {
-        margin-top: 24px;
-        padding-top: 24px;
-        border-top: 1px solid var(--civic-border);
-    }
+                                <a href="<?= $basePath ?>/messages/<?= $listing['user_id'] ?>?ref=<?= urlencode("Re: " . $listing['title']) ?>"
+                                   class="civicone-button civicone-listing-detail__action-button">
+                                    Send message
+                                </a>
 
-    .civic-section-subtitle {
-        font-size: 1rem;
-        font-weight: 700;
-        color: var(--civic-text-main);
-        margin: 0 0 16px 0;
-        display: flex;
-        align-items: center;
-        gap: 8px;
-    }
+                                <button type="button"
+                                        class="civicone-button civicone-button--secondary civicone-listing-detail__action-button"
+                                        onclick="/* Add save/bookmark logic */">
+                                    Save this listing
+                                </button>
+                            <?php endif; ?>
+                        <?php else: ?>
+                            <!-- Login Prompt -->
+                            <div class="civicone-notification civicone-notification--info">
+                                <p class="civicone-notification__heading">Sign in to respond</p>
+                                <p class="civicone-body-s">You need to be signed in to contact the poster or save this listing.</p>
+                            </div>
 
-    .civic-attribute-list {
-        margin: 0;
-    }
+                            <a href="<?= $basePath ?>/login?return=<?= urlencode('/listings/' . $listing['id']) ?>"
+                               class="civicone-button civicone-listing-detail__action-button">
+                                Sign in
+                            </a>
 
-    .civic-attribute-item {
-        display: flex;
-        gap: 8px;
-        margin-bottom: 8px;
-    }
+                            <a href="<?= $basePath ?>/register"
+                               class="civicone-button civicone-button--secondary civicone-listing-detail__action-button">
+                                Create account
+                            </a>
+                        <?php endif; ?>
+                    </div>
 
-    .civic-attribute-item dt {
-        font-weight: 600;
-        color: var(--civic-text-secondary);
-    }
+                    <!-- Share/Report Actions -->
+                    <div class="civicone-listing-detail__secondary-actions">
+                        <h2 class="civicone-heading-s">Share</h2>
+                        <ul class="civicone-listing-detail__share-list">
+                            <li>
+                                <button type="button"
+                                        class="civicone-link"
+                                        onclick="navigator.share ? navigator.share({title: '<?= htmlspecialchars($listing['title']) ?>', url: window.location.href}) : navigator.clipboard.writeText(window.location.href).then(() => alert('Link copied!'))">
+                                    Copy link to this listing
+                                </button>
+                            </li>
+                        </ul>
 
-    .civic-attribute-item dd {
-        margin: 0;
-        color: var(--civic-text-main);
-    }
+                        <h2 class="civicone-heading-s">Report</h2>
+                        <ul class="civicone-listing-detail__report-list">
+                            <li>
+                                <a href="<?= $basePath ?>/report/listing/<?= $listing['id'] ?>" class="civicone-link">
+                                    Report this listing
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
 
-    .civic-author-card {
-        text-align: center;
-    }
+                </aside>
+            </div>
 
-    .civic-author-name {
-        font-size: 1.25rem;
-        font-weight: 700;
-        margin-bottom: 16px;
-    }
+        </div><!-- /grid-row -->
 
-    .civic-author-name a {
-        color: var(--civic-brand);
-        text-decoration: none;
-    }
+        <!-- Related Listings (if applicable) -->
+        <?php if (!empty($relatedListings)): ?>
+        <div class="civicone-grid-row">
+            <div class="civicone-grid-column-full">
+                <h2 class="civicone-heading-l">Related listings</h2>
+                <ul class="civicone-listing-detail__related-list">
+                    <?php foreach (array_slice($relatedListings, 0, 5) as $related): ?>
+                    <li class="civicone-listing-detail__related-item">
+                        <h3 class="civicone-heading-s">
+                            <a href="<?= $basePath ?>/listings/<?= $related['id'] ?>" class="civicone-link">
+                                <?= htmlspecialchars($related['title']) ?>
+                            </a>
+                        </h3>
+                        <p class="civicone-body-s civicone-listing-detail__related-meta">
+                            <?= ucfirst($related['type']) ?>
+                            <?php if (!empty($related['location'])): ?>
+                            · <?= htmlspecialchars($related['location']) ?>
+                            <?php endif; ?>
+                            · Posted <?= date('j M Y', strtotime($related['created_at'])) ?>
+                        </p>
+                    </li>
+                    <?php endforeach; ?>
+                </ul>
+            </div>
+        </div>
+        <?php endif; ?>
 
-    .civic-author-name a:hover {
-        text-decoration: underline;
-    }
-
-    .civic-owner-notice {
-        background: #FDF2F8;
-        color: #BE185D;
-        padding: 12px;
-        border-radius: 8px;
-        margin-bottom: 16px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 8px;
-        font-weight: 600;
-    }
-
-    .civic-login-prompt {
-        color: var(--civic-text-muted);
-    }
-
-    .civic-login-prompt a {
-        color: var(--civic-brand);
-        font-weight: 600;
-    }
-
-    .civic-location-text {
-        margin: 0;
-        font-size: 1.1rem;
-        color: var(--civic-text-main);
-    }
-
-    @media (max-width: 900px) {
-        .civic-listing-detail-grid {
-            grid-template-columns: 1fr;
-        }
-
-        .civic-listing-sidebar {
-            order: -1;
-        }
-    }
-</style>
+    </main>
+</div><!-- /width-container -->
 
 <?php require dirname(__DIR__, 2) . '/layouts/civicone/footer.php'; ?>

@@ -93,3 +93,7 @@
     <link rel="stylesheet" href="/assets/css/civicone-matches.css?v=<?= $cssVersion ?>">
     <!-- CivicOne Federation CSS (WCAG 2.1 AA 2026-01-20) -->
     <link rel="stylesheet" href="/assets/css/civicone-federation.css?v=<?= $cssVersion ?>">
+    <!-- CivicOne Members Directory - GOV.UK Pattern (WCAG 2.1 AA 2026-01-20) -->
+    <link rel="stylesheet" href="/assets/css/civicone-members-directory.css?v=<?= $cssVersion ?>">
+    <!-- CivicOne Listings Directory - GOV.UK Pattern (WCAG 2.1 AA 2026-01-20) -->
+    <link rel="stylesheet" href="/assets/css/civicone-listings-directory.css?v=<?= $cssVersion ?>">

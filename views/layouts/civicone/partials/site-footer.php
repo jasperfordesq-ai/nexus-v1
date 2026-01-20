@@ -55,7 +55,7 @@
 
             <!-- Explore Column -->
             <div class="civic-footer-column">
-                <h4>Explore</h4>
+                <div class="civic-footer-column-heading">Explore</div>
                 <ul>
                     <li><a href="<?= $basePath ?>/listings">Offers & Requests</a></li>
                     <li><a href="<?= $basePath ?>/members">Community</a></li>
@@ -71,7 +71,7 @@
 
             <!-- About Column -->
             <div class="civic-footer-column">
-                <h4>About</h4>
+                <div class="civic-footer-column-heading">About</div>
                 <ul>
                     <li><a href="<?= $basePath ?>/how-it-works">How It Works</a></li>
                     <?php if ($isHourTimebank): ?>
@@ -84,7 +84,7 @@
 
             <!-- Support Column -->
             <div class="civic-footer-column">
-                <h4>Support</h4>
+                <div class="civic-footer-column-heading">Support</div>
                 <ul>
                     <li><a href="<?= $basePath ?>/help">Help Center</a></li>
                     <?php if ($isHourTimebank): ?>

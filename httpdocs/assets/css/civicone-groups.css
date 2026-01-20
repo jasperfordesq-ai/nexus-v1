@@ -72,11 +72,31 @@
     }
 }
 
-/* Groups Grid */
+/* Groups Grid (Legacy - kept for backward compatibility) */
 .civic-groups-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
     gap: 50px;
+}
+
+/* GOV.UK Groups Card Grid (Responsive, max 3 per row) */
+.civicone--govuk .civicone-groups-card-grid {
+    display: grid;
+    grid-template-columns: 1fr; /* Mobile: 1 column */
+    gap: 30px;
+    margin-bottom: 40px;
+}
+
+@media (min-width: 641px) {
+    .civicone--govuk .civicone-groups-card-grid {
+        grid-template-columns: repeat(2, 1fr); /* Tablet: 2 columns */
+    }
+}
+
+@media (min-width: 1024px) {
+    .civicone--govuk .civicone-groups-card-grid {
+        grid-template-columns: repeat(3, 1fr); /* Desktop: 3 columns max */
+    }
 }
 
 /* Group Card */
@@ -203,6 +223,169 @@
     background-color: var(--govuk-focus-colour, #ffdd00);
     color: var(--govuk-focus-text-colour, #0b0c0c);
     box-shadow: 0 -2px var(--govuk-focus-colour, #ffdd00), 0 4px var(--govuk-focus-text-colour, #0b0c0c);
+}
+
+/* --------------------------------------------
+   GOV.UK Group Card Components (BEM naming)
+   -------------------------------------------- */
+.civicone--govuk .civicone-group-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: 0;
+    background: var(--civic-bg-card, #f7f7f7);
+    border: none;
+    border-radius: 6px;
+    overflow: hidden;
+    box-shadow: none;
+    transition: box-shadow 0.2s ease;
+}
+
+.civicone--govuk .civicone-group-card:hover {
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+[data-theme="dark"] .civicone--govuk .civicone-group-card {
+    background: #1F2937;
+}
+
+.civicone--govuk .civicone-group-card__image {
+    padding: 30px 20px 10px 20px;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+}
+
+.civicone--govuk .civicone-group-card__avatar {
+    width: 130px;
+    height: 130px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 4px solid var(--civic-bg-page, #ffffff);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    background: white;
+}
+
+.civicone--govuk .civicone-group-card__placeholder {
+    width: 130px;
+    height: 130px;
+    border-radius: 50%;
+    border: 4px solid var(--civic-bg-page, #ffffff);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    background: #e5e7eb;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #9ca3af;
+}
+
+[data-theme="dark"] .civicone--govuk .civicone-group-card__placeholder {
+    background: #374151;
+    color: #6B7280;
+}
+
+.civicone--govuk .civicone-group-card__content {
+    padding: 10px 20px 30px 20px;
+    width: 100%;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.civicone--govuk .civicone-group-card__title {
+    margin: 0 0 10px 0;
+    font-size: 1.1rem;
+    font-weight: 700;
+    line-height: 1.25;
+}
+
+.civicone--govuk .civicone-group-card__description {
+    margin: 0 0 15px 0;
+    font-size: 0.9rem;
+    color: var(--civic-group-text-muted, #505a5f);
+    flex-grow: 1;
+    line-height: 1.5;
+}
+
+.civicone--govuk .civicone-group-card__meta {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    font-size: 0.85rem;
+    color: var(--civic-group-text-muted, #505a5f);
+    margin: 0 0 15px 0;
+}
+
+.civicone--govuk .civicone-group-card__action {
+    align-self: center;
+    margin-top: auto;
+}
+
+/* Checkbox and Form Elements for Filters */
+.civicone--govuk .civicone-fieldset {
+    border: none;
+    padding: 0;
+    margin: 0;
+}
+
+.civicone--govuk .civicone-checkboxes {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.civicone--govuk .civicone-checkbox-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.civicone--govuk .civicone-checkbox {
+    width: 20px;
+    height: 20px;
+    border: 2px solid #0b0c0c;
+    cursor: pointer;
+}
+
+.civicone--govuk .civicone-checkbox:focus {
+    outline: 3px solid #ffdd00;
+    outline-offset: 0;
+    box-shadow: 0 0 0 2px #0b0c0c;
+}
+
+.civicone--govuk .civicone-checkbox-label {
+    font-size: 16px;
+    line-height: 1.5;
+    cursor: pointer;
+    margin: 0;
+}
+
+@media (min-width: 641px) {
+    .civicone--govuk .civicone-checkbox-label {
+        font-size: 19px;
+    }
+}
+
+/* Primary Button Variant */
+.civicone--govuk .civicone-button--primary {
+    background: #00703c;
+    color: #ffffff;
+    border-color: #00703c;
+}
+
+.civicone--govuk .civicone-button--primary:hover {
+    background: #005a30;
+    border-color: #005a30;
+}
+
+.civicone--govuk .civicone-button--primary:focus {
+    outline: 3px solid #ffdd00;
+    outline-offset: 0;
+    background: #ffdd00;
+    color: #0b0c0c;
+    border-color: #0b0c0c;
 }
 
 

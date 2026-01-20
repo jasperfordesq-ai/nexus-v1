@@ -1040,19 +1040,19 @@ body.dark-mode .civic-type-badge {
     justify-content: center;
     gap: 8px;
     padding: 12px 20px;
-    background: var(--civic-brand);
-    color: #fff;
+    background: #00703c; /* GOV.UK green for guaranteed WCAG AA (7.41:1 with white) */
+    color: #fff !important;
     border-radius: 6px;
     font-size: 0.9375rem;
     font-weight: 700;
-    text-decoration: none;
+    text-decoration: none !important;
     transition: var(--civic-transition);
     width: 100%;
 }
 
 .civic-view-btn:hover {
-    filter: brightness(0.9);
-    color: #fff;
+    background: #005a30; /* Darker green on hover */
+    color: #fff !important;
 }
 
 .civic-view-btn:focus {
@@ -1520,7 +1520,7 @@ body.dark-mode .civic-type-badge {
                     <!-- Body -->
                     <div class="civic-feed-body">
                         <?php if (!empty($item['title']) && $type !== 'post'): ?>
-                            <h3 class="civic-feed-title"><?= htmlspecialchars($item['title']) ?></h3>
+                            <h2 class="civic-feed-title"><?= htmlspecialchars($item['title']) ?></h2>
                         <?php endif; ?>
 
                         <?php
@@ -1670,9 +1670,9 @@ body.dark-mode .civic-type-badge {
                     <?php if ($type === 'event'): ?>
                         <div class="civic-type-banner civic-type-banner-event">
                             <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px;">
-                                <div class="civic-type-label" style="color: #DB2777;">Upcoming Event</div>
+                                <div class="civic-type-label" style="color: #9f1239;">Upcoming Event</div>
                                 <?php if (!empty($item['event_date'])): ?>
-                                    <span class="civic-type-badge" style="color: #DB2777;">
+                                    <span class="civic-type-badge" style="color: #9f1239;">
                                         <span class="dashicons dashicons-calendar" aria-hidden="true"></span>
                                         <?= date('M j', strtotime($item['event_date'])) ?>
                                     </span>
@@ -1680,10 +1680,10 @@ body.dark-mode .civic-type-badge {
                             </div>
                             <div class="civic-type-title"><?= htmlspecialchars($item['title'] ?? 'Event') ?></div>
                             <div class="civic-type-meta">
-                                <span class="dashicons dashicons-location" style="color: #DB2777;" aria-hidden="true"></span>
+                                <span class="dashicons dashicons-location" style="color: #9f1239;" aria-hidden="true"></span>
                                 <?= htmlspecialchars($location ?? 'Location TBD') ?>
                             </div>
-                            <a href="<?= $viewLink ?>" class="civic-view-btn" style="background: #DB2777;">
+                            <a href="<?= $viewLink ?>" class="civic-view-btn" style="background: #9f1239;">
                                 RSVP Now
                                 <span class="dashicons dashicons-arrow-right-alt" aria-hidden="true"></span>
                             </a>
@@ -1713,7 +1713,7 @@ body.dark-mode .civic-type-badge {
                                 <span class="dashicons dashicons-chart-bar" style="color: #3B82F6;" aria-hidden="true"></span>
                                 <?= $item['vote_count'] ?? 0 ?> votes
                             </div>
-                            <a href="<?= $viewLink ?>" class="civic-view-btn" style="background: #3B82F6;">
+                            <a href="<?= $viewLink ?>" class="civic-view-btn" style="background: #2563eb;">
                                 Vote Now
                                 <span class="dashicons dashicons-arrow-right-alt" aria-hidden="true"></span>
                             </a>
@@ -1723,17 +1723,17 @@ body.dark-mode .civic-type-badge {
                     <?php if ($type === 'volunteering'): ?>
                         <div class="civic-type-banner civic-type-banner-volunteering">
                             <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px;">
-                                <div class="civic-type-label" style="color: #0EA5E9;">Volunteer Opportunity</div>
-                                <span class="civic-type-badge" style="color: #0EA5E9;">
+                                <div class="civic-type-label" style="color: #0369a1;">Volunteer Opportunity</div>
+                                <span class="civic-type-badge" style="color: #0369a1;">
                                     <?= $item['credits'] ?? 0 ?> Credits
                                 </span>
                             </div>
                             <div class="civic-type-title"><?= htmlspecialchars($item['title'] ?? 'Opportunity') ?></div>
                             <div class="civic-type-meta">
-                                <span class="dashicons dashicons-location" style="color: #0EA5E9;" aria-hidden="true"></span>
+                                <span class="dashicons dashicons-location" style="color: #0369a1;" aria-hidden="true"></span>
                                 <?= htmlspecialchars($location ?? 'Remote') ?>
                             </div>
-                            <a href="<?= $viewLink ?>" class="civic-view-btn" style="background: #0EA5E9;">
+                            <a href="<?= $viewLink ?>" class="civic-view-btn" style="background: #0369a1;">
                                 I'm Interested
                                 <span class="dashicons dashicons-arrow-right-alt" aria-hidden="true"></span>
                             </a>

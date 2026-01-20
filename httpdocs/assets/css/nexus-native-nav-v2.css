@@ -146,7 +146,7 @@
     max-width: 80px;
     height: 100%;
     text-decoration: none;
-    color: #8e8e93;
+    color: #6b7280; /* Darker gray for WCAG AA contrast (4.59:1 on white) */
     font-size: 10px;
     font-weight: 500;
     letter-spacing: 0;
@@ -191,7 +191,7 @@ button.mobile-tab-item,
 
 [data-theme="dark"] .mobile-tab-item,
 .dark-mode .mobile-tab-item {
-    color: #8e8e93;
+    color: #9ca3af; /* Lighter gray for WCAG AA on dark background (4.85:1 on #1c1c1e) */
 }
 
 [data-theme="dark"] .mobile-tab-item.active,

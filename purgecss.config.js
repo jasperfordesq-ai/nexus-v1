@@ -164,6 +164,10 @@ module.exports = {
         'httpdocs/assets/css/civicone-matches.css',
         // CivicOne federation module (WCAG 2.1 AA 2026-01-20)
         'httpdocs/assets/css/civicone-federation.css',
+        // CivicOne members directory - GOV.UK pattern (WCAG 2.1 AA 2026-01-20)
+        'httpdocs/assets/css/civicone-members-directory.css',
+        // CivicOne listings directory - GOV.UK pattern (WCAG 2.1 AA 2026-01-20)
+        'httpdocs/assets/css/civicone-listings-directory.css',
     ],
 
     // Output directory for purged CSS

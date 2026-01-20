@@ -596,3 +596,176 @@
         transition: none;
     }
 }
+
+
+/* ============================================
+   GOV.UK DIRECTORY/LIST TEMPLATE
+   Volunteering Index - WCAG 2.1 AA
+   Added 2026-01-20
+   ============================================ */
+
+/* --------------------------------------------
+   Opportunities List Layout (NOT card grid)
+   -------------------------------------------- */
+.civicone--govuk .civicone-opportunities-list {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 40px 0;
+}
+
+.civicone--govuk .civicone-opportunity-item {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 20px 0;
+    border-bottom: 1px solid #b1b4b6;
+}
+
+[data-theme="dark"] .civicone--govuk .civicone-opportunity-item {
+    border-bottom-color: #374151;
+}
+
+.civicone--govuk .civicone-opportunity-item:last-child {
+    border-bottom: none;
+}
+
+/* Meta Header (Org name + Posted date) */
+.civicone--govuk .civicone-opportunity-item__meta-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 15px;
+    flex-wrap: wrap;
+}
+
+.civicone--govuk .civicone-opportunity-item__org {
+    font-size: 14px;
+    font-weight: 600;
+    color: #505a5f;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+[data-theme="dark"] .civicone--govuk .civicone-opportunity-item__org {
+    color: #b1b4b6;
+}
+
+.civicone--govuk .civicone-opportunity-item__posted {
+    font-size: 14px;
+    color: #505a5f;
+}
+
+[data-theme="dark"] .civicone--govuk .civicone-opportunity-item__posted {
+    color: #b1b4b6;
+}
+
+/* Title */
+.civicone--govuk .civicone-opportunity-item__title {
+    margin: 0;
+    font-size: 24px;
+    font-weight: 700;
+    line-height: 1.25;
+}
+
+@media (max-width: 640px) {
+    .civicone--govuk .civicone-opportunity-item__title {
+        font-size: 20px;
+    }
+}
+
+/* Description Excerpt */
+.civicone--govuk .civicone-opportunity-item__description {
+    margin: 0;
+    font-size: 16px;
+    line-height: 1.5;
+    color: #0b0c0c;
+}
+
+[data-theme="dark"] .civicone--govuk .civicone-opportunity-item__description {
+    color: #f3f2f1;
+}
+
+@media (min-width: 641px) {
+    .civicone--govuk .civicone-opportunity-item__description {
+        font-size: 19px;
+    }
+}
+
+/* Tags Row */
+.civicone--govuk .civicone-opportunity-item__tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    align-items: center;
+}
+
+.civicone--govuk .civicone-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 5px 10px;
+    background: #f3f2f1;
+    color: #0b0c0c;
+    font-size: 14px;
+    font-weight: 600;
+    border-radius: 4px;
+}
+
+[data-theme="dark"] .civicone--govuk .civicone-tag {
+    background: #1f2937;
+    color: #f3f2f1;
+}
+
+.civicone--govuk .civicone-tag--green {
+    background: #00703c;
+    color: #ffffff;
+}
+
+[data-theme="dark"] .civicone--govuk .civicone-tag--green {
+    background: #00703c;
+    color: #ffffff;
+}
+
+.civicone--govuk .civicone-tag-icon {
+    flex-shrink: 0;
+}
+
+/* Action Button */
+.civicone--govuk .civicone-opportunity-item__action {
+    align-self: flex-start;
+    margin-top: 5px;
+}
+
+/* Responsive Stacking */
+@media (max-width: 640px) {
+    .civicone--govuk .civicone-opportunity-item {
+        padding: 15px 0;
+    }
+
+    .civicone--govuk .civicone-opportunity-item__meta-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 5px;
+    }
+}
+
+
+/* --------------------------------------------
+   Secondary Filter Panel (Dashboard Link)
+   -------------------------------------------- */
+.civicone--govuk .civicone-body-s {
+    font-size: 14px;
+    line-height: 1.5;
+    color: #0b0c0c;
+    margin: 0;
+}
+
+[data-theme="dark"] .civicone--govuk .civicone-body-s {
+    color: #f3f2f1;
+}
+
+@media (min-width: 641px) {
+    .civicone--govuk .civicone-body-s {
+        font-size: 16px;
+    }
+}

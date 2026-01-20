@@ -12,13 +12,13 @@
 }
 
 .civic-footer a {
-    color: var(--civic-footer-text, #E5E7EB);
-    text-decoration: none;
+    color: var(--civic-footer-text, #E5E7EB) !important;
+    text-decoration: none !important;
 }
 
 .civic-footer a:hover {
-    color: #FFFFFF;
-    text-decoration: underline;
+    color: #FFFFFF !important;
+    text-decoration: underline !important;
 }
 
 .civic-footer-grid {
@@ -43,7 +43,7 @@
 .civic-footer-tagline {
     font-size: 15px;
     line-height: 1.6;
-    color: #f3f4f6; /* Explicit light color instead of opacity for WCAG AA */
+    color: #f3f4f6 !important; /* Explicit light color instead of opacity for WCAG AA */
     margin-bottom: 24px;
 }
 
@@ -68,7 +68,8 @@
     text-decoration: none;
 }
 
-.civic-footer-column h4 {
+.civic-footer-column h4,
+.civic-footer-column-heading {
     color: #FFFFFF;
     font-size: 14px;
     font-weight: 700;
@@ -89,11 +90,11 @@
 
 .civic-footer-column a {
     font-size: 15px;
-    color: #e5e7eb; /* Explicit color instead of opacity for WCAG AA */
+    color: #e5e7eb !important; /* Explicit color instead of opacity for WCAG AA */
 }
 
 .civic-footer-column a:hover {
-    color: #ffffff;
+    color: #ffffff !important;
 }
 
 .civic-footer-bottom {
@@ -108,7 +109,15 @@
 
 .civic-footer-copyright {
     font-size: 14px;
-    color: #d1d5db; /* Explicit color instead of opacity for WCAG AA */
+    color: #d1d5db !important; /* Explicit color instead of opacity for WCAG AA */
+}
+
+.civic-footer-copyright a {
+    color: #d1d5db !important; /* Ensure links inherit footer color, not global brand */
+}
+
+.civic-footer-copyright a:hover {
+    color: #ffffff !important;
 }
 
 .civic-footer-links {
@@ -118,11 +127,11 @@
 
 .civic-footer-links a {
     font-size: 14px;
-    color: #d1d5db; /* Explicit color instead of opacity for WCAG AA */
+    color: #d1d5db !important; /* Explicit color instead of opacity for WCAG AA */
 }
 
 .civic-footer-links a:hover {
-    color: #ffffff;
+    color: #ffffff !important;
 }
 
 /* Responsive */

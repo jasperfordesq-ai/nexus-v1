@@ -1162,6 +1162,7 @@ Every CivicOne page MUST use one of the five canonical templates defined below. 
 - Members directory: `/members` (list of members with filters)
 - Groups directory: `/groups` (list of groups with filters)
 - Volunteering opportunities: `/volunteering` (list of opportunities with filters)
+- **Listings directory: `/listings` (Browse all listings - offers/requests marketplace)**
 
 ### 10.3 Template B: Dashboard/Home (Homepage, Internal Hubs)
 
@@ -1332,6 +1333,7 @@ Every CivicOne page MUST use one of the five canonical templates defined below. 
 - Member profile: `/members/123`
 - Group detail: `/groups/456`
 - Volunteering opportunity: `/volunteering/789`
+- **Listing detail: `/listings/123` (Offer/request detail page)**
 
 ### 10.5 Template D: Form/Flow (Join, Edit Profile, Create Content)
 
@@ -1422,7 +1424,8 @@ Every CivicOne page MUST use one of the five canonical templates defined below. 
 - Join/register form: `/join`
 - Edit profile: `/profile/edit`
 - Create group: `/groups/create`
-- Create listing: `/listings/create`
+- **Create listing: `/listings/create`**
+- **Edit listing: `/listings/123/edit`**
 
 ### 10.6 Template E: Content/Article (Help, Blog)
 
@@ -1502,6 +1505,148 @@ Every CivicOne page MUST use one of the five canonical templates defined below. 
 - Help article: `/help/how-to-...`
 - Blog post: `/blog/article-title`
 - Legal page: `/privacy`, `/terms`, `/accessibility`
+
+### 10.7 Listings Contracts (Non-Negotiables)
+
+The Listings module (offers/requests marketplace) MUST follow these template mappings and implementation rules:
+
+#### 10.7.1 Template Mappings for Listings Pages
+
+| File | Template | Pattern Sources | Mandatory Requirements |
+|------|----------|-----------------|------------------------|
+| `views/civicone/listings/index.php` | **Template A: Directory/List** | MOJ "Filter a list" pattern + GOV.UK Layout | â Filter column (1/4) + results column (3/4)<br>â Results default to **list/table** layout<br>â Pagination mandatory for >20 listings<br>â NO masonry grids<br>â Filter component for type, location, category |
+| `views/civicone/listings/show.php` | **Template C: Detail Page** | GOV.UK Summary list + Layout + Breadcrumbs + Details component | â H1 title<br>â Optional breadcrumbs for navigation<br>â Key facts as GOV.UK Summary list (`<dl>`)<br>â Actions grouped clearly (contact, save, share)<br>â Long description behind Details component if needed<br>â Related listings as **list** (not card soup) |
+| `views/civicone/listings/create.php` | **Template D: Form/Flow** | GOV.UK Form pattern + Validation + Error summary + Character count | â One H1 title<br>â Form in 2/3 column (reading width)<br>â Optional help/guidance in 1/3 sidebar<br>â Error summary (focus moved on load)<br>â Inline errors with `aria-describedby`<br>â Turn off native HTML5 validation<br>â Character count for description field |
+| `views/civicone/listings/edit.php` | **Template D: Form/Flow** | Same as create.php | â MUST share form partial with create.php (see 10.7.3) |
+
+**Pattern Source Links:**
+- MOJ Filter pattern: https://design-patterns.service.justice.gov.uk/patterns/filter-a-list/
+- MOJ Filter component: https://design-patterns.service.justice.gov.uk/components/filter/
+- GOV.UK Layout: https://design-system.service.gov.uk/styles/layout/
+- GOV.UK Summary list: https://design-system.service.gov.uk/components/summary-list/
+- GOV.UK Breadcrumbs: https://design-system.service.gov.uk/components/breadcrumbs/
+- GOV.UK Back link: https://design-system.service.gov.uk/components/back-link/
+- GOV.UK Details component: https://design-system.service.gov.uk/components/details/
+- GOV.UK Validation: https://design-system.service.gov.uk/patterns/validation/
+- GOV.UK Error summary: https://design-system.service.gov.uk/components/error-summary/
+- GOV.UK Error message: https://design-system.service.gov.uk/components/error-message/
+- GOV.UK Character count: https://design-system.service.gov.uk/components/character-count/
+
+#### 10.7.2 Listings Index Page (Browse All) - Detailed Requirements
+
+**MUST implement:**
+- MOJ "filter a list" pattern with filter panel on left (1/4 width)
+- Results panel on right (3/4 width)
+- Results displayed as **list or table**, NOT card grid (listings have multiple metadata fields: type, location, date posted, status)
+- Each listing item shows:
+  - Title (h3 link)
+  - Type badge (offer/request)
+  - Category/tags
+  - Location (if applicable)
+  - Posted date
+  - Brief excerpt (if space allows)
+  - "View details" link
+- Pagination component at bottom (GOV.UK pagination pattern)
+- Results summary: "Showing X-Y of Z listings"
+- Filter controls for:
+  - Search by keyword
+  - Type (offer/request)
+  - Category (checkboxes or select)
+  - Location (text input or select)
+  - Date range (optional)
+
+**MUST NOT:**
+- Use card grid for main results (breaks pagination, screen reader order, zoom)
+- Use masonry/Pinterest layout
+- Hide filters behind "Show filters" toggle on desktop (filters must be visible)
+
+#### 10.7.3 Listings Show Page (Detail) - Detailed Requirements
+
+**MUST implement:**
+- GOV.UK page template boilerplate (width container, main wrapper)
+- Optional breadcrumbs: Home â Listings â [Category] â [Title]
+- H1 title for listing
+- GOV.UK Summary list for key facts:
+  - Type: Offer / Request
+  - Category: [category name]
+  - Location: [location or "Remote"]
+  - Posted: [date]
+  - Status: Active / Fulfilled / Expired
+  - Contact: [username or organization]
+- Full description as prose content (use GOV.UK typography)
+- Long supporting information behind GOV.UK Details component (e.g., "Terms and conditions")
+- Action buttons grouped clearly:
+  - Primary action: "Respond to listing" or "Contact poster"
+  - Secondary actions: Save, Share, Report
+- Related listings section (if applicable):
+  - Use **list layout** (NOT card grid)
+  - Max 5-10 related items
+  - Each item: title link + brief metadata
+
+**MUST NOT:**
+- Display related listings as unstructured card soup
+- Use hover-only interactions for actions
+- Hide critical information in collapsed sections (only use Details for supplementary content)
+
+#### 10.7.4 Listings Create/Edit Pages - Detailed Requirements
+
+**MUST implement:**
+- GOV.UK form pattern in 2/3 column (reading width)
+- Optional help text in 1/3 sidebar (e.g., "Tips for writing a great listing")
+- Error summary at top when validation fails:
+  - Focus moved to error summary on page load
+  - Links to each error field
+- Form fields with proper structure:
+  - All inputs have visible `<label>` (no placeholder-only labels)
+  - Hints use `<div id="field-hint">` + `aria-describedby`
+  - Errors use `<p id="field-error" class="civicone-error-message">` + `aria-describedby` + `aria-invalid="true"`
+- Character count component for description field (with live count)
+- Fieldsets for grouped inputs (e.g., location options)
+- Server-side validation only (turn off HTML5 validation: `<form novalidate>`)
+- Clear submit button: "Post listing" or "Save changes"
+
+**MUST NOT:**
+- Duplicate form markup between create.php and edit.php (see 10.7.5)
+- Use placeholder text as sole label
+- Rely on client-side validation alone
+- Use generic button text ("Submit")
+
+#### 10.7.5 Refactor Discipline Rule: Shared Form Partial
+
+**MANDATORY:** `create.php` and `edit.php` MUST share a single partial for form fields to prevent layout divergence and regressions.
+
+**Implementation:**
+```php
+// views/civicone/listings/_form.php (shared partial)
+<form method="post" action="<?= $formAction ?>" novalidate>
+  <!-- All form fields here -->
+  <!-- Use variables: $listing (for edit), $errors, $oldInput -->
+</form>
+
+// views/civicone/listings/create.php
+<?php
+$formAction = $basePath . '/listings';
+$listing = null; // New listing
+require __DIR__ . '/_form.php';
+?>
+
+// views/civicone/listings/edit.php
+<?php
+$formAction = $basePath . '/listings/' . $listing['id'];
+require __DIR__ . '/_form.php';
+?>
+```
+
+**Rationale:**
+- Prevents create/edit forms from drifting apart over time
+- Ensures consistent validation error display
+- Reduces maintenance burden (update form once, both pages benefit)
+- Prevents layout regressions (if create.php is refactored but edit.php isn't)
+
+**FORBIDDEN:**
+- â Duplicating form HTML in both create.php and edit.php
+- â Inline form markup (no partial) in either file
+- â Different field structures between create and edit
 
 ---
 
