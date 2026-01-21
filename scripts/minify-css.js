@@ -59,6 +59,8 @@ const cssFiles = [
     'feed-filter.css',
     'dashboard.css',
     'mobile-sheets.css',
+    'mobile-design-tokens.css',
+    'mobile-accessibility-fixes.css',
     'social-interactions.css',
     'federation-realtime.css',
     'compose-multidraw.css',
