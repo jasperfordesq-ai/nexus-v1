@@ -92,6 +92,10 @@ try {
     <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/design-tokens.min.css?v=<?= $cssVersionTimestamp ?>">
     <!-- BREAKPOINTS (Centralized responsive breakpoints) -->
     <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/breakpoints.css?v=<?= $cssVersionTimestamp ?>">
+    <!-- MOBILE DESIGN TOKENS (Mobile-specific spacing, typography, transitions) -->
+    <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/mobile-design-tokens.css?v=<?= $cssVersionTimestamp ?>">
+    <!-- MOBILE ACCESSIBILITY FIXES (WCAG 2.1 AAA touch target compliance) -->
+    <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/mobile-accessibility-fixes.css?v=<?= $cssVersionTimestamp ?>">
     <!-- Theme Transitions - Smooth dark/light mode switching -->
     <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/theme-transitions.min.css?v=<?= $cssVersionTimestamp ?>">
     <!-- Base CSS - CSS variables, tokens, and global resets -->
@@ -121,45 +125,60 @@ try {
     <?php if (strpos($normPath, '/nexus-score') !== false || strpos($normPath, '/score') !== false): ?>
         <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/nexus-score.css?v=<?= $cssVersionTimestamp ?>">
     <?php endif; ?>
-    <!-- Consolidated polish files (replaces nexus-10x-polish + nexus-ux-polish) -->
-    <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/nexus-polish.min.css?v=<?= $cssVersionTimestamp ?>" media="print" onload="this.media='all'">
-    <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/nexus-interactions.min.css?v=<?= $cssVersionTimestamp ?>" media="print" onload="this.media='all'">
+    <!-- Modern Header Utilities - Extracted inline styles (CRITICAL - load before lazy bundles) -->
+    <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/modern-header-utilities.css?v=<?= $cssVersionTimestamp ?>">
+    <!-- Biometric Modal - Login prompt styling (CRITICAL - may show on load) -->
+    <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/biometric-modal.css?v=<?= $cssVersionTimestamp ?>">
 
-    <!-- Visual Polish Bundle (loading states, empty states, lazy loading, hover, focus) -->
-    <!-- Combines 7 files: loading-skeletons, empty-states, image-lazy-load, hover-interactions, focus-rings, micro-interactions, modal-polish -->
-    <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/bundles/polish.min.css?v=<?= $cssVersionTimestamp ?>" media="print" onload="this.media='all'">
-    <!-- Toast Notifications - Slide-in animations, stacking, auto-dismiss -->
-    <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/toast-notifications.min.css?v=<?= $cssVersionTimestamp ?>" media="print" onload="this.media='all'">
+    <!-- === CONSOLIDATED COMPONENT BUNDLES (lazy-loaded) === -->
+    <!-- Components: Navigation Bundle - Header utilities, dropdowns, navigation -->
+    <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/bundles/components-navigation.css?v=<?= $cssVersionTimestamp ?>" media="print" onload="this.media='all'">
+    <!-- Components: Buttons Bundle - Ripple effects, FAB polish, button interactions -->
+    <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/bundles/components-buttons.css?v=<?= $cssVersionTimestamp ?>" media="print" onload="this.media='all'">
+    <!-- Components: Forms Bundle - Form validation, responsive forms, input polish -->
+    <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/bundles/components-forms.css?v=<?= $cssVersionTimestamp ?>" media="print" onload="this.media='all'">
+    <!-- Components: Cards Bundle - Card hover states, lift effects -->
+    <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/bundles/components-cards.css?v=<?= $cssVersionTimestamp ?>" media="print" onload="this.media='all'">
+    <!-- Components: Modals Bundle - Modal polish, biometric modals -->
+    <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/bundles/components-modals.css?v=<?= $cssVersionTimestamp ?>" media="print" onload="this.media='all'">
+    <!-- Components: Notifications Bundle - Toast notifications, badge animations -->
+    <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/bundles/components-notifications.css?v=<?= $cssVersionTimestamp ?>" media="print" onload="this.media='all'">
+
+    <!-- Utilities: Polish Bundle - Nexus polish, interactions, visual enhancements -->
+    <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/bundles/utilities-polish.css?v=<?= $cssVersionTimestamp ?>" media="print" onload="this.media='all'">
+    <!-- Utilities: Loading Bundle - Skeletons, lazy load, pull-to-refresh -->
+    <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/bundles/utilities-loading.css?v=<?= $cssVersionTimestamp ?>" media="print" onload="this.media='all'">
+    <!-- Utilities: Accessibility Bundle - Focus rings, screen reader, ARIA -->
+    <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/bundles/utilities-accessibility.css?v=<?= $cssVersionTimestamp ?>" media="print" onload="this.media='all'">
+
     <!-- Page Transitions - Smooth fade/slide between pages -->
     <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/page-transitions.min.css?v=<?= $cssVersionTimestamp ?>" media="print" onload="this.media='all'">
-    <!-- Pull-to-Refresh - Native iOS/Android style (mobile only) -->
-    <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/pull-to-refresh.min.css?v=<?= $cssVersionTimestamp ?>" media="print" onload="this.media='all'">
-    <!-- Button Ripple Effects - Material-style touch feedback -->
-    <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/button-ripple.min.css?v=<?= $cssVersionTimestamp ?>" media="print" onload="this.media='all'">
-    <!-- Card Hover States - Lift/glow effects on interactive cards -->
-    <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/card-hover-states.min.css?v=<?= $cssVersionTimestamp ?>" media="print" onload="this.media='all'">
-    <!-- Form Validation - Shake on error, checkmark on success -->
-    <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/form-validation.min.css?v=<?= $cssVersionTimestamp ?>" media="print" onload="this.media='all'">
-    <!-- Avatar Placeholders - Shimmer loading, initials fallback -->
-    <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/avatar-placeholders.min.css?v=<?= $cssVersionTimestamp ?>" media="print" onload="this.media='all'">
     <!-- Scroll Progress - Top bar showing page scroll position -->
     <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/scroll-progress.min.css?v=<?= $cssVersionTimestamp ?>" media="print" onload="this.media='all'">
-    <!-- FAB Polish - Floating action button animations -->
-    <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/fab-polish.min.css?v=<?= $cssVersionTimestamp ?>" media="print" onload="this.media='all'">
-    <!-- Badge Animations - Pop effect when count changes -->
-    <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/badge-animations.min.css?v=<?= $cssVersionTimestamp ?>" media="print" onload="this.media='all'">
     <!-- Error States - Friendly error pages with animations -->
     <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/error-states.min.css?v=<?= $cssVersionTimestamp ?>" media="print" onload="this.media='all'">
+    <!-- Avatar Placeholders - Shimmer loading, initials fallback -->
+    <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/avatar-placeholders.min.css?v=<?= $cssVersionTimestamp ?>" media="print" onload="this.media='all'">
 
-    <!-- Enhancements Bundle (responsive, accessibility, extracted components) -->
+    <!-- CivicOne Utilities - Shared utility classes -->
+    <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/civicone-utilities.css?v=<?= $cssVersionTimestamp ?>">
+
+    <!-- Legacy Enhancements Bundle (responsive, accessibility, extracted components) -->
     <!-- Combines 5 files: responsive-forms, responsive-tables, accessibility, feed-action-pills, ai-chat-widget -->
     <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/bundles/enhancements.min.css?v=<?= $cssVersionTimestamp ?>" media="print" onload="this.media='all'">
+
     <!-- Noscript fallbacks for async-loaded bundles -->
     <noscript>
-        <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/bundles/polish.min.css?v=<?= $cssVersionTimestamp ?>">
+        <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/bundles/components-navigation.css?v=<?= $cssVersionTimestamp ?>">
+        <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/bundles/components-buttons.css?v=<?= $cssVersionTimestamp ?>">
+        <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/bundles/components-forms.css?v=<?= $cssVersionTimestamp ?>">
+        <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/bundles/components-cards.css?v=<?= $cssVersionTimestamp ?>">
+        <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/bundles/components-modals.css?v=<?= $cssVersionTimestamp ?>">
+        <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/bundles/components-notifications.css?v=<?= $cssVersionTimestamp ?>">
+        <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/bundles/utilities-polish.css?v=<?= $cssVersionTimestamp ?>">
+        <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/bundles/utilities-loading.css?v=<?= $cssVersionTimestamp ?>">
+        <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/bundles/utilities-accessibility.css?v=<?= $cssVersionTimestamp ?>">
         <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/bundles/enhancements.min.css?v=<?= $cssVersionTimestamp ?>">
-        <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/nexus-polish.min.css?v=<?= $cssVersionTimestamp ?>">
-        <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/nexus-interactions.min.css?v=<?= $cssVersionTimestamp ?>">
     </noscript>
 
     <!-- Mobile-only CSS -->
@@ -565,7 +584,7 @@ try {
 
     <?php if (empty($hideUtilityBar)): ?>
         <nav class="nexus-utility-bar">
-            <div class="left-utils" style="display:flex; align-items:center;">
+            <div class="left-utils">
                 <?php
                 // Platform Switcher - Public to everyone
                 $showPlatform = true;
@@ -575,8 +594,8 @@ try {
                 if ($showPlatform):
                 ?>
                     <div class="htb-dropdown">
-                        <button class="util-link" style="font-weight:700; text-transform:uppercase; font-size:0.8rem;">Platform <span class="htb-arrow">▾</span></button>
-                        <div class="htb-dropdown-content" style="min-width:200px; left:0; right:auto;">
+                        <button class="util-link platform-dropdown-btn">Platform <span class="htb-arrow">▾</span></button>
+                        <div class="htb-dropdown-content platform-dropdown">
                             <?php foreach (\Nexus\Models\Tenant::all() as $pt):
                                 if ($pt['domain']) {
                                     // Tenant has its own domain
@@ -594,7 +613,7 @@ try {
                 <?php endif; ?>
             </div>
 
-            <div style="display:flex; align-items:center; margin-left:auto;">
+            <div class="right-header-utils">
                 <!-- Mode Switcher - Light/Dark -->
                 <button onclick="toggleMode()" class="mode-switcher" aria-label="Switch between light and dark mode" title="<?= $mode === 'dark' ? 'Switch to Light Mode' : 'Switch to Dark Mode' ?>">
                     <span class="mode-icon-container <?= $mode === 'dark' ? 'dark-mode' : 'light-mode' ?>" id="modeIconContainer">
@@ -614,15 +633,15 @@ try {
                         <button class="util-link">Layout <span class="htb-arrow">▾</span></button>
                         <div class="htb-dropdown-content">
                             <?php $lay = \Nexus\Services\LayoutHelper::get(); ?>
-                            <a href="?layout=modern" style="<?= $lay === 'modern' ? 'font-weight:bold; color:#4f46e5;' : '' ?>">
-                                ✓ Modern UI <span style="font-size:10px; color:#10b981;">(Stable)</span>
+                            <a href="?layout=modern" class="<?= $lay === 'modern' ? 'layout-option--modern' : '' ?>">
+                                ✓ Modern UI <span class="layout-badge--stable">(Stable)</span>
                             </a>
-                            <div style="border-top:1px solid #e5e7eb; margin:8px 0;"></div>
-                            <div style="padding: 6px 12px; font-size: 11px; color: #64748b; font-weight: 500;">
+                            <div class="layout-divider"></div>
+                            <div class="layout-section-label">
                                 ⚠️ Experimental Layouts (Under Development)
                             </div>
-                            <a href="?layout=civicone" style="<?= $lay === 'civicone' ? 'font-weight:bold; color:#059669;' : 'opacity:0.7;' ?>">
-                                Accessible UI <span style="font-size:9px; color:#f59e0b;">BETA</span>
+                            <a href="?layout=civicone" class="layout-option--civicone <?= $lay === 'civicone' ? 'active' : '' ?>">
+                                Accessible UI <span class="layout-badge--beta">BETA</span>
                             </a>
                             <?php
                             $tId = \Nexus\Core\TenantContext::getId();
@@ -640,7 +659,7 @@ try {
 
                 <?php if (isset($_SESSION['user_id'])): ?>
                     <div class="htb-dropdown">
-                        <button class="util-link" style="font-weight:700; color:#10b981;">+ Create <span class="htb-arrow">▾</span></button>
+                        <button class="util-link create-dropdown-btn">+ Create <span class="htb-arrow">▾</span></button>
                         <div class="htb-dropdown-content">
                             <a href="<?= Nexus\Core\TenantContext::getBasePath() ?>/compose?tab=post">📝 New Post</a>
                             <a href="<?= Nexus\Core\TenantContext::getBasePath() ?>/compose?tab=listing">🎁 New Listing</a>
@@ -670,35 +689,35 @@ try {
                     }
                     if ($hasFederationUtilBar): ?>
                         <div class="htb-dropdown">
-                            <button class="util-link" style="font-weight:700; color:#8b5cf6;">
-                                <i class="fa-solid fa-globe" style="margin-right: 4px;"></i>Partner Communities <span class="htb-arrow">▾</span>
+                            <button class="util-link federation-dropdown-btn">
+                                <i class="fa-solid fa-globe"></i>Partner Communities <span class="htb-arrow">▾</span>
                             </button>
-                            <div class="htb-dropdown-content" style="min-width: 220px;">
-                                <a href="<?= Nexus\Core\TenantContext::getBasePath() ?>/federation" style="font-weight: 600; color: #8b5cf6;">
-                                    <i class="fa-solid fa-house" style="margin-right: 6px;"></i>Partner Communities Hub
+                            <div class="htb-dropdown-content federation-dropdown">
+                                <a href="<?= Nexus\Core\TenantContext::getBasePath() ?>/federation" class="federation-hub-link">
+                                    <i class="fa-solid fa-house"></i>Partner Communities Hub
                                 </a>
-                                <div style="border-top:1px solid #e5e7eb; margin:5px 0;"></div>
+                                <div class="layout-divider"></div>
                                 <a href="<?= Nexus\Core\TenantContext::getBasePath() ?>/federation/members">
-                                    <i class="fa-solid fa-user-group" style="margin-right: 6px; color: #8b5cf6;"></i>Members
+                                    <i class="fa-solid fa-user-group federation-menu-icon federation-menu-icon--members"></i>Members
                                 </a>
                                 <a href="<?= Nexus\Core\TenantContext::getBasePath() ?>/federation/listings">
-                                    <i class="fa-solid fa-hand-holding-heart" style="margin-right: 6px; color: #ec4899;"></i>Listings
+                                    <i class="fa-solid fa-hand-holding-heart federation-menu-icon federation-menu-icon--listings"></i>Listings
                                 </a>
                                 <a href="<?= Nexus\Core\TenantContext::getBasePath() ?>/federation/events">
-                                    <i class="fa-solid fa-calendar-days" style="margin-right: 6px; color: #f59e0b;"></i>Events
+                                    <i class="fa-solid fa-calendar-days federation-menu-icon federation-menu-icon--events"></i>Events
                                 </a>
                                 <a href="<?= Nexus\Core\TenantContext::getBasePath() ?>/federation/groups">
-                                    <i class="fa-solid fa-users" style="margin-right: 6px; color: #6366f1;"></i>Groups
+                                    <i class="fa-solid fa-users federation-menu-icon federation-menu-icon--groups"></i>Groups
                                 </a>
                                 <a href="<?= Nexus\Core\TenantContext::getBasePath() ?>/federation/messages">
-                                    <i class="fa-solid fa-envelope" style="margin-right: 6px; color: #3b82f6;"></i>Messages
+                                    <i class="fa-solid fa-envelope federation-menu-icon federation-menu-icon--messages"></i>Messages
                                 </a>
                                 <a href="<?= Nexus\Core\TenantContext::getBasePath() ?>/federation/transactions">
-                                    <i class="fa-solid fa-coins" style="margin-right: 6px; color: #10b981;"></i>Transactions
+                                    <i class="fa-solid fa-coins federation-menu-icon federation-menu-icon--transactions"></i>Transactions
                                 </a>
-                                <div style="border-top:1px solid #e5e7eb; margin:5px 0;"></div>
+                                <div class="layout-divider"></div>
                                 <a href="<?= Nexus\Core\TenantContext::getBasePath() ?>/settings?section=federation">
-                                    <i class="fa-solid fa-sliders" style="margin-right: 6px; color: #6b7280;"></i>Settings
+                                    <i class="fa-solid fa-sliders federation-menu-icon federation-menu-icon--settings"></i>Settings
                                 </a>
                             </div>
                         </div>
@@ -708,18 +727,18 @@ try {
                 <?php if ((!empty($_SESSION['user_role']) && $_SESSION['user_role'] === 'newsletter_admin')): ?>
                     <!-- Newsletter Admin - Limited Access -->
                     <div class="htb-dropdown">
-                        <button class="util-link" style="font-weight:700; color:#f59e0b;">Newsletter <span class="htb-arrow">▾</span></button>
+                        <button class="util-link newsletter-dropdown-btn">Newsletter <span class="htb-arrow">▾</span></button>
                         <div class="htb-dropdown-content">
                             <a href="<?= Nexus\Core\TenantContext::getBasePath() ?>/admin/newsletters">All Newsletters</a>
                             <a href="<?= Nexus\Core\TenantContext::getBasePath() ?>/admin/newsletters/create">Create Newsletter</a>
-                            <div style="border-top:1px solid #e5e7eb; margin:5px 0;"></div>
+                            <div class="layout-divider"></div>
                             <a href="<?= Nexus\Core\TenantContext::getBasePath() ?>/admin/newsletters/subscribers">Subscribers</a>
                             <a href="<?= Nexus\Core\TenantContext::getBasePath() ?>/admin/newsletters/segments">Segments</a>
                         </div>
                     </div>
                 <?php elseif ((!empty($_SESSION['user_role']) && $_SESSION['user_role'] === 'admin') || !empty($_SESSION['is_super_admin'])): ?>
-                    <a href="<?= Nexus\Core\TenantContext::getBasePath() ?>/admin" class="util-link" style="font-weight:700; color:#ea580c;">Admin</a>
-                    <a href="<?= Nexus\Core\TenantContext::getBasePath() ?>/admin/group-ranking" class="util-link" style="font-weight:700; color:#db2777;" title="Smart Group Ranking">
+                    <a href="<?= Nexus\Core\TenantContext::getBasePath() ?>/admin" class="util-link admin-link">Admin</a>
+                    <a href="<?= Nexus\Core\TenantContext::getBasePath() ?>/admin/group-ranking" class="util-link group-ranking-link" title="Smart Group Ranking">
                         <i class="fa-solid fa-chart-line"></i> Ranking
                     </a>
                 <?php endif; ?>
@@ -754,10 +773,10 @@ try {
                     </a>
 
                     <!-- Notifications Bell -->
-                    <button class="nexus-header-icon-btn" title="Notifications" onclick="window.nexusNotifDrawer.open()" style="position: relative;">
+                    <button class="nexus-header-icon-btn" title="Notifications" onclick="window.nexusNotifDrawer.open()">
                         <i class="fa-solid fa-bell"></i>
                         <?php if ($nUnread > 0): ?>
-                            <span class="nexus-notif-indicator" style="position: absolute; top: 4px; right: 4px; width: 10px; height: 10px; background: #ef4444; border-radius: 50%; border: 2px solid var(--header-bg, #1e1b4b); box-shadow: 0 0 0 1px rgba(239,68,68,0.3);"></span>
+                            <span class="nexus-notif-indicator"></span>
                         <?php endif; ?>
                     </button>
 
@@ -811,33 +830,33 @@ try {
                     </aside>
 
                     <!-- User Avatar Dropdown (Premium) -->
-                    <div class="htb-dropdown desktop-only">
-                        <button class="util-link" style="padding: 4px 12px; display: flex; align-items: center; gap: 8px;">
+                    <div class="htb-dropdown desktop-only user-dropdown">
+                        <button class="util-link user-dropdown-btn">
                             <img src="<?= $_SESSION['user_avatar'] ?? '/assets/img/defaults/default_avatar.webp' ?>"
                                 alt="Profile"
-                                style="width: 28px; height: 28px; border-radius: 50%; object-fit: cover;">
-                            <span style="font-weight: 600;"><?= htmlspecialchars(explode(' ', $_SESSION['user_name'] ?? 'User')[0]) ?></span>
+                                class="user-avatar">
+                            <span class="user-name"><?= htmlspecialchars(explode(' ', $_SESSION['user_name'] ?? 'User')[0]) ?></span>
                             <span class="htb-arrow">▾</span>
                         </button>
-                        <div class="htb-dropdown-content" style="min-width: 220px;">
+                        <div class="htb-dropdown-content">
                             <a href="<?= Nexus\Core\TenantContext::getBasePath() ?>/profile/<?= $_SESSION['user_id'] ?>">
-                                <i class="fa-solid fa-user" style="margin-right: 10px; width: 16px; text-align: center; color: #6366f1;"></i>My Profile
+                                <i class="fa-solid fa-user user-menu-icon user-menu-icon--profile"></i>My Profile
                             </a>
                             <a href="<?= Nexus\Core\TenantContext::getBasePath() ?>/dashboard">
-                                <i class="fa-solid fa-gauge" style="margin-right: 10px; width: 16px; text-align: center; color: #8b5cf6;"></i>Dashboard
+                                <i class="fa-solid fa-gauge user-menu-icon user-menu-icon--dashboard"></i>Dashboard
                             </a>
                             <a href="<?= Nexus\Core\TenantContext::getBasePath() ?>/wallet">
-                                <i class="fa-solid fa-wallet" style="margin-right: 10px; width: 16px; text-align: center; color: #10b981;"></i>Wallet
+                                <i class="fa-solid fa-wallet user-menu-icon user-menu-icon--wallet"></i>Wallet
                             </a>
-                            <div style="border-top: 1px solid #e5e7eb; margin: 8px 0;"></div>
-                            <a href="<?= Nexus\Core\TenantContext::getBasePath() ?>/logout" style="color: #ef4444; font-weight: 600;">
-                                <i class="fa-solid fa-right-from-bracket" style="margin-right: 10px; width: 16px; text-align: center;"></i>Sign Out
+                            <div class="user-menu-divider"></div>
+                            <a href="<?= Nexus\Core\TenantContext::getBasePath() ?>/logout" class="logout-link">
+                                <i class="fa-solid fa-right-from-bracket user-menu-icon"></i>Sign Out
                             </a>
                         </div>
                     </div>
                 <?php else: ?>
                     <a href="<?= Nexus\Core\TenantContext::getBasePath() ?>/login" class="util-link">Login</a>
-                    <a href="<?= Nexus\Core\TenantContext::getBasePath() ?>/register" class="util-link" style="font-weight:700; color:#fff;">Join</a>
+                    <a href="<?= Nexus\Core\TenantContext::getBasePath() ?>/register" class="util-link auth-link--join">Join</a>
                 <?php endif; ?>
             </div>
         </nav>
@@ -876,7 +895,7 @@ try {
             </a>
             <!-- Brand link styles moved to nexus-header-extracted.css -->
 
-            <div class="desktop-only" style="display: flex; align-items: center; gap: 8px;">
+            <div class="desktop-only desktop-header-utils">
                 <?php
                 // Premium Mega Menu Navigation
                 $basePath = Nexus\Core\TenantContext::getBasePath();
@@ -984,7 +1003,7 @@ try {
                 ?>
                     <div class="htb-dropdown premium-dropdown">
                         <a href="#" class="nav-link premium-dropdown-trigger">
-                            <i class="fa-solid fa-compass" style="margin-right:6px;"></i>Explore <span class="htb-arrow">▾</span>
+                            <i class="fa-solid fa-compass nav-icon--explore"></i>Explore <span class="htb-arrow">▾</span>
                         </a>
                         <div class="htb-dropdown-content premium-dropdown-menu">
                             <?php foreach ($visibleExploreItems as $key => $item):
@@ -996,15 +1015,15 @@ try {
                                 $highlight = $item['highlight'] ?? false;
 
                                 if ($separator): ?>
-                                    <div style="border-top: 1px solid #e5e7eb; margin: 5px 0;"></div>
+                                    <div class="layout-divider"></div>
                                 <?php endif; ?>
 
                                 <a href="<?= htmlspecialchars($url) ?>"
-                                   style="<?= $highlight ? 'background: rgba(99, 102, 241, 0.1);' : '' ?>"
+                                   class="<?= $highlight ? 'menu-item--highlighted' : '' ?>"
                                    data-debug-url="<?= htmlspecialchars($url) ?>"
                                    data-debug-basepath="<?= htmlspecialchars($basePath) ?>">
-                                    <i class="<?= htmlspecialchars($icon) ?>"
-                                       style="margin-right:10px; width:16px; text-align:center; color:<?= htmlspecialchars($color) ?>;"></i>
+                                    <i class="<?= htmlspecialchars($icon) ?> menu-item-icon"
+                                       style="color:<?= htmlspecialchars($color) ?>;"></i>
                                     <?= htmlspecialchars($label) ?>
                                 </a>
                             <?php endforeach; ?>
@@ -1020,11 +1039,11 @@ try {
             $dbPagesMain = \Nexus\Core\MenuGenerator::getMenuPages('main');
             foreach ($dbPagesMain as $mainPage):
             ?>
-                <a href="<?= htmlspecialchars($mainPage['url']) ?>" class="nav-link"><i class="fa-solid fa-file-lines" style="margin-right:6px; opacity:0.7;"></i><?= htmlspecialchars($mainPage['title']) ?></a>
+                <a href="<?= htmlspecialchars($mainPage['url']) ?>" class="nav-link"><i class="fa-solid fa-file-lines nav-icon--page"></i><?= htmlspecialchars($mainPage['title']) ?></a>
             <?php endforeach; ?>
 
                 <!-- Collapsible Search Container -->
-                <div class="collapsible-search-container" style="margin-left: 15px; display: flex; align-items: center;">
+                <div class="collapsible-search-container">
                     <!-- Search Toggle Button (visible when collapsed) -->
                     <button type="button" class="search-toggle-btn" id="searchToggleBtn" aria-label="Open search" aria-expanded="false">
                         <i class="fa fa-search"></i>

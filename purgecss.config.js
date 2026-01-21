@@ -41,6 +41,8 @@ module.exports = {
         'httpdocs/assets/css/feed-filter.css',
         'httpdocs/assets/css/dashboard.css',
         'httpdocs/assets/css/mobile-sheets.css',
+        'httpdocs/assets/css/mobile-design-tokens.css',
+        'httpdocs/assets/css/mobile-accessibility-fixes.css',
         'httpdocs/assets/css/social-interactions.css',
         'httpdocs/assets/css/strategic-plan.css',
         'httpdocs/assets/css/federation-realtime.css',
@@ -131,6 +133,10 @@ module.exports = {
         'httpdocs/assets/css/admin-gold-standard.css',
         // Admin federation module (created 2026-01-19)
         'httpdocs/assets/css/admin-federation.css',
+        // Admin menu builder - extracted inline styles (2026-01-21)
+        'httpdocs/assets/css/admin-menu-builder.css',
+        // Admin menu index - extracted inline styles (2026-01-21)
+        'httpdocs/assets/css/admin-menu-index.css',
         // Feed components
         'httpdocs/assets/css/feed-empty-state.css',
         // Empty states unified system (2026-01-19)
@@ -153,6 +159,13 @@ module.exports = {
         'httpdocs/assets/css/civicone-groups.css',
         // CivicOne volunteering module (WCAG 2.1 AA 2026-01-19)
         'httpdocs/assets/css/civicone-volunteering.css',
+        // CivicOne utilities - extracted inline styles (2026-01-21)
+        'httpdocs/assets/css/civicone-utilities.css',
+        'httpdocs/assets/css/civicone-blog-utilities.css',
+        'httpdocs/assets/css/civicone-groups-utilities.css',
+        // Modern layout utilities - extracted inline styles (2026-01-21)
+        'httpdocs/assets/css/modern-header-utilities.css',
+        'httpdocs/assets/css/biometric-modal.css',
         // CivicOne mini modules - polls, goals, resources (WCAG 2.1 AA 2026-01-19)
         'httpdocs/assets/css/civicone-mini-modules.css',
         // CivicOne messages & notifications (WCAG 2.1 AA 2026-01-19)
