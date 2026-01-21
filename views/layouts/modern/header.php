@@ -98,6 +98,8 @@ try {
     <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/mobile-accessibility-fixes.min.css?v=<?= $cssVersionTimestamp ?>">
     <!-- MOBILE LOADING STATES (Enhanced loading feedback and skeleton screens) -->
     <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/mobile-loading-states.min.css?v=<?= $cssVersionTimestamp ?>">
+    <!-- MOBILE MICRO-INTERACTIONS (Haptic feedback, ripple effects, gesture feedback) -->
+    <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/mobile-micro-interactions.min.css?v=<?= $cssVersionTimestamp ?>">
     <!-- Theme Transitions - Smooth dark/light mode switching -->
     <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/theme-transitions.min.css?v=<?= $cssVersionTimestamp ?>">
     <!-- Base CSS - CSS variables, tokens, and global resets -->

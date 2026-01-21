@@ -44,6 +44,7 @@ module.exports = {
         'httpdocs/assets/css/mobile-design-tokens.css',
         'httpdocs/assets/css/mobile-accessibility-fixes.css',
         'httpdocs/assets/css/mobile-loading-states.css',
+        'httpdocs/assets/css/mobile-micro-interactions.css',
         'httpdocs/assets/css/social-interactions.css',
         'httpdocs/assets/css/strategic-plan.css',
         'httpdocs/assets/css/federation-realtime.css',

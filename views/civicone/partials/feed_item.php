@@ -468,7 +468,7 @@ if ($type === 'listing') {
                 $parentContent = htmlspecialchars($sharedData['content'] ?? '');
                 $parentContent = preg_replace_callback('/(https?:\/\/[^\s]+)/', function($m) {
                     $url = html_entity_decode($m[1], ENT_QUOTES, 'UTF-8');
-                    return '<a href="' . htmlspecialchars($url, ENT_QUOTES, 'UTF-8') . '" target="_blank" rel="noopener" style="color:#4f46e5; text-decoration:underline;">' . $m[1] . '</a>';
+                    return '<a href="' . htmlspecialchars($url, ENT_QUOTES, 'UTF-8') . '" target="_blank" rel="noopener" class="feed-item-url-link">' . $m[1] . '</a>';
                 }, $parentContent);
 
                 // Check if this is a group post
@@ -538,7 +538,7 @@ if ($type === 'listing') {
             if ($type !== 'review') {
                 $content = preg_replace_callback('/(https?:\/\/[^\s]+)/', function($m) {
                     $url = html_entity_decode($m[1], ENT_QUOTES, 'UTF-8');
-                    return '<a href="' . htmlspecialchars($url, ENT_QUOTES, 'UTF-8') . '" target="_blank" rel="noopener" style="color:#4f46e5; text-decoration:underline;">' . $m[1] . '</a>';
+                    return '<a href="' . htmlspecialchars($url, ENT_QUOTES, 'UTF-8') . '" target="_blank" rel="noopener" class="feed-item-url-link">' . $m[1] . '</a>';
                 }, $content);
                 echo nl2br($content);
             }
@@ -697,36 +697,36 @@ if ($type === 'listing') {
         $receiverAvatar = $item['extra_4'] ?? '/assets/img/defaults/default_avatar.webp';
         if (empty($receiverAvatar)) $receiverAvatar = '/assets/img/defaults/default_avatar.webp';
         ?>
-        <div class="feed-section-box feed-review-box" style="background: linear-gradient(135deg, rgba(251,191,36,0.08), rgba(245,158,11,0.05)); border: 1px solid rgba(251,191,36,0.2); border-radius: 12px; padding: 16px;">
+        <div class="feed-section-box feed-review-box">
             <!-- Review Header with Receiver Info -->
-            <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px;">
-                <a href="<?= $basePath ?>/profile/<?= (int)$receiverId ?>" style="flex-shrink: 0;">
-                    <img src="<?= htmlspecialchars($receiverAvatar) ?>" loading="lazy" alt="<?= htmlspecialchars($receiverName) ?>" style="width: 48px; height: 48px; border-radius: 50%; object-fit: cover; border: 2px solid rgba(251,191,36,0.3);">
+            <div class="feed-review-header">
+                <a href="<?= $basePath ?>/profile/<?= (int)$receiverId ?>" class="feed-review-avatar-link">
+                    <img src="<?= htmlspecialchars($receiverAvatar) ?>" loading="lazy" alt="<?= htmlspecialchars($receiverName) ?>" class="feed-review-avatar">
                 </a>
-                <div style="flex: 1; min-width: 0;">
-                    <div style="font-size: 13px; color: var(--feed-text-muted); margin-bottom: 2px;">Review for</div>
-                    <a href="<?= $basePath ?>/profile/<?= (int)$receiverId ?>" style="font-weight: 700; font-size: 16px; color: var(--feed-text-primary); text-decoration: none;"><?= htmlspecialchars($receiverName) ?></a>
+                <div class="feed-review-content">
+                    <div class="feed-review-label">Review for</div>
+                    <a href="<?= $basePath ?>/profile/<?= (int)$receiverId ?>" class="feed-review-name-link"><?= htmlspecialchars($receiverName) ?></a>
                 </div>
                 <!-- Star Rating -->
-                <div style="display: flex; align-items: center; gap: 2px; background: linear-gradient(135deg, #fbbf24, #f59e0b); padding: 6px 12px; border-radius: 20px;">
+                <div class="feed-review-rating">
                     <?php for ($i = 1; $i <= 5; $i++): ?>
-                        <i class="fa-solid fa-star" style="font-size: 12px; color: <?= $i <= $reviewRating ? '#fff' : 'rgba(255,255,255,0.3)' ?>;"></i>
+                        <i class="fa-solid fa-star <?= $i <= $reviewRating ? 'feed-review-star-filled' : 'feed-review-star-empty' ?>"></i>
                     <?php endfor; ?>
-                    <span style="margin-left: 4px; font-weight: 700; color: #fff; font-size: 13px;"><?= $reviewRating ?>/5</span>
+                    <span class="feed-review-rating-text"><?= $reviewRating ?>/5</span>
                 </div>
             </div>
 
             <!-- Review Comment (already shown in body, but can emphasize here) -->
             <?php if (!empty($item['body'])): ?>
-            <div style="background: var(--feed-bg-card, #fff); border-radius: 10px; padding: 12px 14px; margin-top: 8px; border-left: 3px solid #fbbf24;">
-                <i class="fa-solid fa-quote-left" style="color: #fbbf24; font-size: 14px; margin-right: 6px;"></i>
-                <span style="font-style: italic; color: var(--feed-text-secondary);"><?= htmlspecialchars(mb_substr($item['body'], 0, 200)) ?><?= mb_strlen($item['body']) > 200 ? '...' : '' ?></span>
+            <div class="feed-review-comment">
+                <i class="fa-solid fa-quote-left"></i>
+                <span class="feed-review-comment-text"><?= htmlspecialchars(mb_substr($item['body'], 0, 200)) ?><?= mb_strlen($item['body']) > 200 ? '...' : '' ?></span>
             </div>
             <?php endif; ?>
 
             <!-- Action Button -->
-            <div style="margin-top: 12px; text-align: center;">
-                <a href="<?= $basePath ?>/profile/<?= (int)$receiverId ?>" class="fds-btn-secondary" style="text-decoration: none; display: inline-flex; align-items: center; gap: 6px; background: var(--feed-bg-card); border: 1px solid rgba(251,191,36,0.3);">
+            <div class="feed-review-action">
+                <a href="<?= $basePath ?>/profile/<?= (int)$receiverId ?>" class="fds-btn-secondary feed-review-profile-link">
                     <i class="fa-solid fa-user"></i> View Profile
                 </a>
             </div>
@@ -772,7 +772,7 @@ if ($type === 'listing') {
         </button>
         <?php if ($type === 'listing' && $authorUserId && $authorUserId != ($userId ?? 0)): ?>
             <!-- Message button for listings (contact the seller/requester) -->
-            <a href="<?= $basePath ?>/messages/thread/<?= $authorUserId ?>" class="feed-action-btn" aria-label="Message" style="text-decoration: none;">
+            <a href="<?= $basePath ?>/messages/thread/<?= $authorUserId ?>" class="feed-action-btn feed-action-message-link" aria-label="Message">
                 <i class="fa-regular fa-envelope"></i>
                 <span>Message</span>
             </a>
@@ -786,11 +786,11 @@ if ($type === 'listing') {
 
     <div id="comments-section-<?= $socialTargetType ?>-<?= $socialTargetId ?>" class="feed-comments-section" style="display:none;">
         <?php if ($isLoggedIn ?? false): ?>
-            <div style="display: flex; gap: 8px; margin-bottom: 12px;">
-                <img src="<?= $_SESSION['user_avatar'] ?? '/assets/img/defaults/default_avatar.webp' ?>" loading="lazy" class="feed-shared-avatar" style="flex-shrink: 0;">
-                <div style="flex-grow: 1; position: relative;">
+            <div class="feed-comment-form">
+                <img src="<?= $_SESSION['user_avatar'] ?? '/assets/img/defaults/default_avatar.webp' ?>" loading="lazy" class="feed-shared-avatar feed-comment-avatar">
+                <div class="feed-comment-input-wrapper">
                     <input type="text" class="feed-comment-input" placeholder="Write a comment..." onkeydown="if(event.key === 'Enter') submitComment(this, '<?= $socialTargetType ?>', <?= $socialTargetId ?>)">
-                    <i class="fa-regular fa-paper-plane" style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); color: var(--feed-text-muted); cursor: pointer;" onclick="submitComment(this.previousElementSibling, '<?= $socialTargetType ?>', <?= $socialTargetId ?>)"></i>
+                    <i class="fa-regular fa-paper-plane feed-comment-send-icon" onclick="submitComment(this.previousElementSibling, '<?= $socialTargetType ?>', <?= $socialTargetId ?>)"></i>
                 </div>
             </div>
         <?php endif; ?>

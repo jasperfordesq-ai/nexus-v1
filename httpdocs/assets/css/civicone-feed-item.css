@@ -376,6 +376,13 @@
 }
 
 /* Review Section */
+.feed-review-box {
+    background: linear-gradient(135deg, rgba(251,191,36,0.08), rgba(245,158,11,0.05));
+    border: 1px solid rgba(251,191,36,0.2);
+    border-radius: 12px;
+    padding: 16px;
+}
+
 .feed-review-header {
     display: flex;
     align-items: center;

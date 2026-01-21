@@ -62,6 +62,7 @@ const cssFiles = [
     'mobile-design-tokens.css',
     'mobile-accessibility-fixes.css',
     'mobile-loading-states.css',
+    'mobile-micro-interactions.css',
     'social-interactions.css',
     'federation-realtime.css',
     'compose-multidraw.css',
