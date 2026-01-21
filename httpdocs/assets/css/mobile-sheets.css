@@ -404,7 +404,7 @@
 /* ============================================
    DESKTOP - HIDE MOBILE SHEETS (unless JS opens them)
    ============================================ */
-@media (min-width: 769px) {
+@media (min-width: 768px) {
 
     /* Hide on desktop by default - NO !important so JS can override */
     .mobile-sheet-backdrop:not(.active),

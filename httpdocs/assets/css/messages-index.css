@@ -937,7 +937,7 @@ body.messages-page {
    ============================================ */
 
 /* Hide mobile interface on desktop */
-@media (min-width: 769px) {
+@media (min-width: 768px) {
     .messages-app.mobile-interface {
         display: none !important;
     }

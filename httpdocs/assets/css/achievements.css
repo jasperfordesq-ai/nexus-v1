@@ -1650,7 +1650,7 @@
 }
 
 /* Desktop: Accordions open by default */
-@media (min-width: 769px) {
+@media (min-width: 768px) {
     .badge-category.accordion-desktop-open .badge-accordion-content {
         max-height: 2000px;
         opacity: 1;

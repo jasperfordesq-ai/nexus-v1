@@ -304,7 +304,7 @@ html.ptr-active.ptr-releasing #main-content {
 /* ==============================================
    MOBILE ONLY - Hide on desktop
    ============================================== */
-@media (min-width: 1025px) {
+@media (min-width: 1024px) {
     .ptr-indicator {
         display: none !important;
     }

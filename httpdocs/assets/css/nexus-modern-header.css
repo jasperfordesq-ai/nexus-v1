@@ -1841,7 +1841,7 @@ body>* {
 }
 
 /* Desktop content spacing - clears utility bar (56px) + navbar (64px) + extra padding (16px) = 136px */
-@media (min-width: 1025px) {
+@media (min-width: 1024px) {
 
     .htb-container,
     .htb-container-full {
@@ -1934,7 +1934,7 @@ body>* {
     color: #6366f1;
 }
 
-@media (min-width: 1025px) {
+@media (min-width: 1024px) {
     .htb-hero-buttons {
         flex-direction: row !important;
         max-width: 720px !important;

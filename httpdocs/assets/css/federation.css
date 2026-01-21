@@ -701,7 +701,7 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
     z-index: 9000;
 }
 
-@media (min-width: 769px) {
+@media (min-width: 768px) {
     .fed-fab-container {
         bottom: 32px;
     }

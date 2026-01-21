@@ -383,7 +383,7 @@
 }
 
 /* Tablet-sized screens - use floating panel */
-@media (min-width: 769px) and (max-width: 1024px) {
+@media (min-width: 768px) and (max-width: 1024px) {
     .ai-widget-panel {
         width: 360px;
         height: 480px;
@@ -392,7 +392,7 @@
 }
 
 /* Hide mobile-only elements on desktop */
-@media (min-width: 769px) {
+@media (min-width: 768px) {
     .ai-widget-drag-handle {
         display: none;
     }

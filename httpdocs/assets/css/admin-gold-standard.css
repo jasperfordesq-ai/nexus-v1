@@ -2912,7 +2912,7 @@
     }
 }
 
-@media (min-width: 1025px) {
+@media (min-width: 1024px) {
     .admin-layout .admin-mobile-menu-btn {
         display: none !important;
     }

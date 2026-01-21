@@ -560,7 +560,7 @@
 /* ==============================================
    DESKTOP - HIDE OVERLAY
    ============================================== */
-@media (min-width: 769px) {
+@media (min-width: 768px) {
     /* Only show if explicitly activated (for touch-screen desktops) */
     .mobile-search-overlay:not(.force-show) {
         display: none;

@@ -977,7 +977,7 @@ button.mobile-tab-item,
    4. HIDE ON DESKTOP
    ============================================ */
 
-@media (min-width: 1025px) {
+@media (min-width: 1024px) {
 
     .mobile-tab-bar,
     .mobile-fullscreen-menu,
