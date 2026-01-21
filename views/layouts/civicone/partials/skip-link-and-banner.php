@@ -7,13 +7,13 @@
             <div class="civic-banner-content">
                 <span class="civic-experimental-badge">
                     <i class="fa-solid fa-universal-access" aria-hidden="true"></i>
-                    ACCESSIBLE Experimental in Development
+                    ACCESSIBLE (Experimental)
                 </span>
                 <span class="civic-experimental-text">
                     <strong>WCAG 2.1 AA Compliant</strong> — High contrast, keyboard-friendly design
                 </span>
             </div>
-            <a href="?layout=modern" class="civic-experimental-switch">
+            <a href="#" data-layout-switcher="modern" class="civic-experimental-switch">
                 <i class="fa-solid fa-sparkles" aria-hidden="true"></i>
                 Switch to Modern
             </a>

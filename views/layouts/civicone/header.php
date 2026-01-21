@@ -35,15 +35,13 @@ require __DIR__ . '/partials/utility-bar.php';
 // Main site header (logo, navigation, mega menu, search)
 require __DIR__ . '/partials/site-header.php';
 
-// Hero banner (conditional - only show on specific pages)
-// Per Section 9A.5: Hero should be page-specific, not global
-// Set $showHero = true in individual view files to enable
-if ($showHero ?? false) {
-    require __DIR__ . '/partials/hero.php';
-}
-
 // Main content opening (impersonation banner, <main> tag)
 require __DIR__ . '/partials/main-open.php';
+
+// NOTE: Page Hero now renders AFTER this header include
+// See Section 9C.5 HP-001: Hero MUST render in page template files, NOT in layout header
+// Controllers should set $hero array with title/lead/variant before including header
+// Or use the hero helper partial in individual view files
 
 // Header JavaScript (interactions, dropdowns, mega menu)
 require __DIR__ . '/partials/header-scripts.php';

@@ -153,6 +153,8 @@ module.exports = {
         'httpdocs/assets/css/groups-edit-overlay.css',
         // CivicOne header (extracted 2026-01-19)
         'httpdocs/assets/css/civicone-header.css',
+        // Page Hero (Section 9C: Page Hero Contract - 2026-01-21)
+        'httpdocs/assets/css/civicone-hero.css',
         // CivicOne events module (WCAG 2.1 AA 2026-01-19)
         'httpdocs/assets/css/civicone-events.css',
         // CivicOne profile module (WCAG 2.1 AA 2026-01-19)
@@ -167,7 +169,15 @@ module.exports = {
         'httpdocs/assets/css/civicone-groups-utilities.css',
         // Modern layout utilities - extracted inline styles (2026-01-21)
         'httpdocs/assets/css/modern-header-utilities.css',
+        // CivicOne report pages - strategic plan & impact report (2026-01-21)
+        'httpdocs/assets/css/civicone-report-pages.css',
+        // CivicOne feed item partial - extracted inline styles (2026-01-21)
+        'httpdocs/assets/css/civicone-feed-item.css',
+        // CivicOne goals show page - extracted inline styles (2026-01-21)
+        'httpdocs/assets/css/civicone-goals-show.css',
         'httpdocs/assets/css/biometric-modal.css',
+        // Layout banners (2026-01-21)
+        'httpdocs/assets/css/modern-experimental-banner.css',
         // CivicOne mini modules - polls, goals, resources (WCAG 2.1 AA 2026-01-19)
         'httpdocs/assets/css/civicone-mini-modules.css',
         // CivicOne messages & notifications (WCAG 2.1 AA 2026-01-19)
@@ -237,6 +247,10 @@ module.exports = {
         // Shell layouts (2026-01-20)
         'httpdocs/assets/css/civicone-federation-shell.css',
         'httpdocs/assets/css/civicone-feed.css',
+        // Responsive breakpoints (2026-01-21)
+        'httpdocs/assets/css/breakpoints.css',
+        // Mobile navigation v2 (2026-01-21)
+        'httpdocs/assets/css/mobile-nav-v2.css',
     ],
 
     // Output directory for purged CSS

@@ -4,7 +4,8 @@
     "type": "project",
     "autoload": {
         "psr-4": {
-            "Nexus\\": "src/"
+            "Nexus\\": "src/",
+            "App\\": "app/"
         }
     },
     "autoload-dev": {

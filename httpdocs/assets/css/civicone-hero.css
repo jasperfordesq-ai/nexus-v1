@@ -1,0 +1,221 @@
+/**
+ * CivicOne Page Hero Component
+ * Based on Section 9C.6 of CIVICONE_WCAG21AA_SOURCE_OF_TRUTH.md
+ * Follows GOV.UK page template and typography patterns
+ *
+ * @version 1.0.0
+ * @since 2026-01-21
+ */
+
+/* ==========================================
+   Hero Container
+   ========================================== */
+
+.civicone-hero {
+    margin-bottom: var(--civicone-space-7, 40px); /* 40px on mobile */
+}
+
+/* Responsive: increase spacing on desktop */
+@media (min-width: 641px) {
+    .civicone-hero {
+        margin-bottom: var(--civicone-space-9, 60px); /* 60px on desktop */
+    }
+}
+
+/* ==========================================
+   Hero Heading (H1)
+   ========================================== */
+
+.civicone-hero .civicone-heading-xl {
+    margin-top: 0;
+    margin-bottom: var(--civicone-space-4, 20px);
+    color: var(--civicone-text, #0b0c0c);
+}
+
+/* Ensure H1 is not focusable (headings are not interactive) */
+.civicone-hero h1 {
+    outline: none;
+}
+
+/* ==========================================
+   Lead Paragraph
+   ========================================== */
+
+.civicone-hero__lead {
+    margin-top: 0;
+    margin-bottom: var(--civicone-space-6, 30px);
+    color: var(--civicone-text-secondary, #484949);
+    max-width: 70ch; /* Reading width - Section 9C.6 HS-004 */
+}
+
+/* Ensure only one lead paragraph per page (defensive CSS) */
+.civicone-hero__lead + .civicone-hero__lead {
+    display: none; /* Hide duplicate lead paragraphs */
+}
+
+/* ==========================================
+   Banner Variant (Landing/Hub Pages)
+   ========================================== */
+
+.civicone-hero--banner {
+    padding: var(--civicone-space-7, 40px) 0;
+    border-bottom: 1px solid var(--civicone-border, #b1b4b6);
+}
+
+@media (min-width: 641px) {
+    .civicone-hero--banner {
+        padding: var(--civicone-space-9, 60px) 0;
+    }
+}
+
+/* Optional: Add subtle background color for banner variant */
+.civicone-hero--banner {
+    background-color: var(--civicone-background-light, #f3f2f1);
+}
+
+/* ==========================================
+   Start Button (Banner Hero Only)
+   ========================================== */
+
+.civicone-hero--banner .civicone-button--start {
+    margin-top: var(--civicone-space-5, 25px);
+}
+
+/* Start button icon spacing */
+.civicone-button__start-icon {
+    margin-left: 8px;
+    vertical-align: middle;
+    flex-shrink: 0;
+}
+
+/* Ensure start button displays correctly */
+.civicone-button--start {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* ==========================================
+   Focus States (GOV.UK Pattern)
+   Section 9C.6 HS-007
+   ========================================== */
+
+/* Focus for start button (if present) */
+.civicone-hero .civicone-button--start:focus {
+    outline: 3px solid transparent;
+    background-color: var(--civicone-focus, #ffdd00);
+    box-shadow:
+        0 -2px var(--civicone-focus, #ffdd00),
+        0 4px var(--civicone-focus-text, #0b0c0c);
+    color: var(--civicone-focus-text, #0b0c0c);
+}
+
+/* ==========================================
+   Accessibility
+   ========================================== */
+
+/* Ensure hero text meets contrast requirements (Section 9C.3 PH-008) */
+.civicone-hero {
+    /* Text should have 4.5:1 contrast minimum */
+    /* Using design tokens ensures this is met */
+}
+
+/* No background images with text (Section 9C.3 PH-007, 9C.4 BH-010) */
+.civicone-hero {
+    /* If background images are needed, they must be decorative only */
+    background-image: none;
+}
+
+/* ==========================================
+   Print Styles
+   ========================================== */
+
+@media print {
+    .civicone-hero--banner {
+        background-color: transparent;
+        border-bottom: 1px solid #000;
+        padding: 20px 0;
+    }
+
+    .civicone-hero .civicone-button--start {
+        /* Show button text but hide icon in print */
+        display: inline;
+    }
+
+    .civicone-button__start-icon {
+        display: none;
+    }
+}
+
+/* ==========================================
+   Reduced Motion
+   ========================================== */
+
+@media (prefers-reduced-motion: reduce) {
+    .civicone-hero * {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}
+
+/* ==========================================
+   High Contrast Mode Support
+   ========================================== */
+
+@media (prefers-contrast: high) {
+    .civicone-hero__lead {
+        /* Ensure lead paragraph has sufficient contrast in high contrast mode */
+        color: var(--civicone-text, #0b0c0c);
+    }
+
+    .civicone-hero--banner {
+        border-bottom-width: 2px;
+    }
+}
+
+/* ==========================================
+   Mobile Optimizations
+   ========================================== */
+
+@media (max-width: 640px) {
+    /* Ensure hero doesn't overflow on small screens */
+    .civicone-hero {
+        overflow-wrap: break-word;
+        word-wrap: break-word;
+    }
+
+    /* Reduce spacing slightly on very small screens */
+    .civicone-hero {
+        margin-bottom: var(--civicone-space-6, 30px);
+    }
+
+    .civicone-hero--banner {
+        padding: var(--civicone-space-6, 30px) 0;
+    }
+}
+
+/* ==========================================
+   Zoom Support (WCAG 1.4.4)
+   ========================================== */
+
+/* Hero should remain usable at 200% zoom */
+@media (min-width: 641px) {
+    .civicone-hero {
+        /* Use relative units for spacing to support zoom */
+        /* Already using CSS custom properties which are relative */
+    }
+}
+
+/* At 400% zoom, hero should stack cleanly */
+/* This is handled by max-width on lead paragraph (70ch) */
+
+/* ==========================================
+   Fix for Dark Background Issue
+   ========================================== */
+
+/* Ensure main content area has light background */
+#main-content.civic-container {
+    background-color: var(--civicone-background, #ffffff);
+    min-height: calc(100vh - 200px); /* Account for header/footer */
+}

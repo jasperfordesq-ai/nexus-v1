@@ -8,400 +8,13 @@ $isMentor = isset($_SESSION['user_id']) && $_SESSION['user_id'] == $goal['mentor
 
 require __DIR__ . '/../../layouts/header.php';
 ?>
+<link rel="stylesheet" href="<?= \Nexus\Core\TenantContext::getBasePath() ?>/assets/css/civicone-goals-show.min.css?v=<?= time() ?>">
 
 <!-- Offline Banner -->
 <div class="offline-banner" id="offlineBanner" role="alert" aria-live="polite">
     <i class="fa-solid fa-wifi-slash"></i>
     <span>No internet connection</span>
 </div>
-
-<style>
-    /* ============================================
-       GOLD STANDARD - Native App Features
-       ============================================ */
-
-    /* Offline Banner */
-    .offline-banner {
-        position: fixed;
-        top: 0;
-        left: 0;
-        right: 0;
-        z-index: 10001;
-        padding: 12px 20px;
-        background: linear-gradient(135deg, #ef4444, #dc2626);
-        color: white;
-        font-size: 0.9rem;
-        font-weight: 600;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 8px;
-        transform: translateY(-100%);
-        transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-    .offline-banner.visible {
-        transform: translateY(0);
-    }
-
-    /* Content Reveal Animation */
-    @keyframes fadeInUp {
-        from { opacity: 0; transform: translateY(20px); }
-        to { opacity: 1; transform: translateY(0); }
-    }
-
-    .glass-box {
-        animation: fadeInUp 0.4s ease-out;
-    }
-
-    /* Button Press States */
-    .glass-pill-btn:active,
-    button:active {
-        transform: scale(0.96) !important;
-        transition: transform 0.1s ease !important;
-    }
-
-    /* Touch Targets - WCAG 2.1 AA (44px minimum) */
-    .glass-pill-btn,
-    button {
-        min-height: 44px;
-    }
-
-    /* Focus Visible */
-    .glass-pill-btn:focus-visible,
-    button:focus-visible,
-    a:focus-visible {
-        outline: 3px solid rgba(219, 39, 119, 0.5);
-        outline-offset: 2px;
-    }
-
-    /* Smooth Scroll */
-    html {
-        scroll-behavior: smooth;
-        -webkit-overflow-scrolling: touch;
-    }
-
-    /* Mobile Responsive Enhancements */
-    @media (max-width: 768px) {
-        .glass-pill-btn,
-        button {
-            min-height: 48px;
-        }
-    }
-</style>
-
-<style>
-    /* SCOPED STYLES for #unique-glass-page-wrapper ONLY */
-    #unique-glass-page-wrapper {
-        /* 
-       --- DEFAULT / LIGHT MODE VARIABLES (Fallback) --- 
-    */
-        --glass-bg: rgba(255, 255, 255, 0.55);
-        --glass-border: rgba(255, 255, 255, 0.4);
-        --text-color: #1e293b;
-        --text-muted: #475569;
-        --accent-color: #db2777;
-        /* Pink/Rose for Goals */
-        --success-color: #059669;
-        --heading-gradient: linear-gradient(135deg, #be185d 0%, #db2777 100%);
-
-        /* Subtle iridescent shadow for light mode */
-        --box-shadow:
-            0 8px 32px 0 rgba(31, 38, 135, 0.1),
-            inset 0 0 0 1px rgba(255, 255, 255, 0.2);
-
-        --holographic-glow: 0 0 20px rgba(255, 0, 128, 0.05), 0 0 40px rgba(255, 100, 200, 0.05);
-
-        /* Form Fields & Pills */
-        --pill-bg: rgba(255, 255, 255, 0.25);
-        --pill-border: 1px solid rgba(255, 255, 255, 0.4);
-        --pill-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-
-        /* Status Card Variables (Light) */
-        --status-blue-bg: rgba(59, 130, 246, 0.15);
-        --status-blue-border: rgba(59, 130, 246, 0.3);
-        --status-blue-text: #1d4ed8;
-
-        --status-amber-bg: rgba(245, 158, 11, 0.15);
-        --status-amber-border: rgba(245, 158, 11, 0.3);
-        --status-amber-text: #b45309;
-
-        --status-gray-bg: rgba(148, 163, 184, 0.15);
-        --status-gray-border: rgba(148, 163, 184, 0.3);
-        --status-gray-text: #475569;
-
-        /* Layout & Alignment */
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: flex-start;
-        min-height: 80vh;
-        padding: 50px 20px;
-        box-sizing: border-box;
-
-        /* Typography Defaults */
-        font-family: 'Inter', system-ui, -apple-system, sans-serif;
-        color: var(--text-color);
-        line-height: 1.6;
-
-        /* Background: Adaptive Mesh Gradient (Pink/Rose for Goals) */
-        background: radial-gradient(circle at 50% 0%, #fdf2f8 0%, #fce7f3 100%);
-        background-attachment: fixed;
-    }
-
-    /* 
-   --- THEME SYNC SELECTORS --- 
-   Using html[data-theme] as requested 
-*/
-
-    /* LIGHT MODE EXPLICIT */
-    html[data-theme="light"] #unique-glass-page-wrapper {
-        --glass-bg: rgba(255, 255, 255, 0.55);
-        --glass-border: rgba(255, 255, 255, 0.4);
-        --text-color: #1e293b;
-        --text-muted: #475569;
-        --heading-gradient: linear-gradient(135deg, #be185d 0%, #db2777 100%);
-        --box-shadow:
-            0 8px 32px 0 rgba(31, 38, 135, 0.1),
-            inset 0 0 0 1px rgba(255, 255, 255, 0.2);
-        --holographic-glow: 0 0 20px rgba(255, 0, 128, 0.05), 0 0 40px rgba(255, 100, 200, 0.05);
-        --pill-bg: rgba(255, 255, 255, 0.25);
-
-        --status-blue-bg: rgba(59, 130, 246, 0.15);
-        --status-blue-border: rgba(59, 130, 246, 0.3);
-        --status-blue-text: #1d4ed8;
-
-        --status-amber-bg: rgba(245, 158, 11, 0.15);
-        --status-amber-border: rgba(245, 158, 11, 0.3);
-        --status-amber-text: #b45309;
-
-        --status-gray-bg: rgba(148, 163, 184, 0.15);
-        --status-gray-border: rgba(148, 163, 184, 0.3);
-        --status-gray-text: #475569;
-
-        background: radial-gradient(circle at 50% 0%, #fdf2f8 0%, #fce7f3 100%);
-    }
-
-    /* DARK MODE EXPLICIT */
-    html[data-theme="dark"] #unique-glass-page-wrapper {
-        --glass-bg: rgba(24, 24, 27, 0.45);
-        --glass-border: rgba(255, 255, 255, 0.15);
-        --text-color: #fce7f3;
-        --text-muted: rgba(255, 255, 255, 0.7);
-        --accent-color: #f472b6;
-        --heading-gradient: linear-gradient(135deg, #ffffff 0%, #fbcfe8 100%);
-
-        /* Vivid Dark Mode Shadows */
-        --box-shadow:
-            0 8px 32px 0 rgba(0, 0, 0, 0.4),
-            inset 0 0 0 1px rgba(255, 255, 255, 0.05);
-
-        --holographic-glow:
-            0 0 30px rgba(236, 72, 153, 0.15),
-            0 0 60px rgba(168, 85, 247, 0.15);
-
-        --pill-bg: rgba(24, 24, 27, 0.65);
-        --pill-border: 2px solid rgba(255, 255, 255, 0.1);
-
-        /* Dark Mode Status Cards */
-        --status-blue-bg: rgba(30, 58, 138, 0.3);
-        --status-blue-border: rgba(59, 130, 246, 0.3);
-        --status-blue-text: #93c5fd;
-
-        --status-amber-bg: rgba(120, 53, 15, 0.3);
-        --status-amber-border: rgba(245, 158, 11, 0.3);
-        --status-amber-text: #fcd34d;
-
-        --status-gray-bg: rgba(30, 41, 59, 0.3);
-        --status-gray-border: rgba(148, 163, 184, 0.2);
-        --status-gray-text: #94a3b8;
-
-        background: radial-gradient(circle at 50% 0%, rgb(39, 10, 25) 0%, rgb(20, 10, 20) 90%);
-    }
-
-
-    /* The Glass Container */
-    #unique-glass-page-wrapper .glass-box {
-        position: relative;
-        width: 95%;
-        max-width: 900px;
-        margin-left: auto;
-        margin-right: auto;
-
-        /* High-End Glass Effect */
-        background: var(--glass-bg);
-        backdrop-filter: blur(25px) saturate(200%);
-        -webkit-backdrop-filter: blur(25px) saturate(200%);
-
-        /* Holographic Borders & Shadows */
-        border-radius: 28px;
-        border: 1px solid var(--glass-border);
-        box-shadow: var(--box-shadow), var(--holographic-glow);
-
-        padding: 50px;
-        overflow: hidden;
-        transition: background 0.3s ease, box-shadow 0.3s ease;
-    }
-
-    /* Iridescent Top Edge */
-    #unique-glass-page-wrapper .glass-box::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        height: 1px;
-        background: linear-gradient(90deg, transparent, rgba(244, 114, 182, 0.6), rgba(168, 85, 247, 0.6), transparent);
-        z-index: 10;
-    }
-
-    /* Header Section */
-    #unique-glass-page-wrapper .page-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: flex-start;
-        margin-bottom: 40px;
-        flex-wrap: wrap;
-        gap: 20px;
-    }
-
-    #unique-glass-page-wrapper .back-link {
-        color: var(--text-muted);
-        text-decoration: none;
-        font-weight: 500;
-        font-size: 0.9rem;
-        display: inline-flex;
-        align-items: center;
-        margin-bottom: 10px;
-        transition: color 0.2s;
-    }
-
-    #unique-glass-page-wrapper .back-link:hover {
-        color: var(--accent-color);
-    }
-
-    #unique-glass-page-wrapper h1 {
-        font-size: 2.2rem;
-        font-weight: 800;
-        color: var(--text-color);
-        margin: 5px 0 0 0;
-        letter-spacing: -0.02em;
-        line-height: 1.2;
-    }
-
-    #unique-glass-page-wrapper .status-badge {
-        display: inline-block;
-        padding: 6px 14px;
-        border-radius: 50px;
-        font-size: 0.75rem;
-        font-weight: 700;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-        background: var(--pill-bg);
-        border: var(--pill-border);
-        color: var(--accent-color);
-        margin-bottom: 15px;
-    }
-
-    /* Content Area */
-    #unique-glass-page-wrapper .goal-description {
-        font-size: 1.15rem;
-        line-height: 1.8;
-        color: var(--text-color);
-        margin-bottom: 50px;
-        white-space: pre-wrap;
-        opacity: 0.9;
-    }
-
-    /* Buddy Status Card */
-    #unique-glass-page-wrapper .status-card {
-        border-radius: 20px;
-        padding: 30px;
-        display: flex;
-        flex-direction: column;
-        /* Nested Blur not always needed if background is solid enough, but consistent here */
-        backdrop-filter: blur(10px);
-        transition: all 0.3s ease;
-    }
-
-    /* Status: Matched (Blue) */
-    #unique-glass-page-wrapper .status-card.status-matched {
-        background: var(--status-blue-bg);
-        border: 1px solid var(--status-blue-border);
-        color: var(--status-blue-text);
-    }
-
-    /* Status: Looking (Amber) */
-    #unique-glass-page-wrapper .status-card.status-looking {
-        background: var(--status-amber-bg);
-        border: 1px solid var(--status-amber-border);
-        color: var(--status-amber-text);
-    }
-
-    /* Status: Private (Gray) */
-    #unique-glass-page-wrapper .status-card.status-private {
-        background: var(--status-gray-bg);
-        border: 1px solid var(--status-gray-border);
-        color: var(--status-gray-text);
-    }
-
-
-    /* Action Buttons */
-    #unique-glass-page-wrapper .glass-pill-btn {
-        padding: 10px 24px;
-        border-radius: 50px;
-        border: none;
-        font-weight: 600;
-        cursor: pointer;
-        font-size: 0.95rem;
-        transition: all 0.2s ease;
-        text-decoration: none;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        gap: 8px;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-    }
-
-    #unique-glass-page-wrapper .glass-pill-btn:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
-    }
-
-    /* Variants */
-    #unique-glass-page-wrapper .btn-primary {
-        background: linear-gradient(135deg, #db2777 0%, #be185d 100%);
-        color: white;
-    }
-
-    #unique-glass-page-wrapper .btn-secondary {
-        background: var(--pill-bg);
-        border: var(--pill-border);
-        color: var(--text-color);
-    }
-
-    #unique-glass-page-wrapper .btn-success {
-        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-        color: white;
-    }
-
-
-    /* Responsive */
-    @media (max-width: 768px) {
-        #unique-glass-page-wrapper {
-            padding: 20px 10px;
-        }
-
-        #unique-glass-page-wrapper .glass-box {
-            width: 100%;
-            padding: 30px 20px;
-            border-radius: 20px;
-        }
-
-        #unique-glass-page-wrapper .page-header {
-            flex-direction: column;
-        }
-    }
-</style>
 
 <div id="unique-glass-page-wrapper">
     <div class="glass-box">
@@ -420,7 +33,7 @@ require __DIR__ . '/../../layouts/header.php';
             </div>
 
             <?php if ($isAuthor): ?>
-                <div style="display:flex; gap:10px; flex-wrap: wrap;">
+                <div class="goal-header-actions">
                     <?php if ($goal['status'] === 'active'): ?>
                         <form action="<?= \Nexus\Core\TenantContext::getBasePath() ?>/goals/<?= $goal['id'] ?>/complete" method="POST" onsubmit="return confirm('Mark as achieved? Great job!')">
                             <?= \Nexus\Core\Csrf::input() ?>
@@ -439,16 +52,16 @@ require __DIR__ . '/../../layouts/header.php';
         <?php if ($hasMentor): ?>
             <!-- Matched State -->
             <div class="status-card status-matched">
-                <h3 style="margin: 0 0 10px 0; font-size: 1.25rem;">🤝 Matched with Buddy</h3>
-                <div style="display: flex; align-items: center; gap: 15px;">
-                    <div style="font-size: 2rem;">🎉</div>
+                <h3 class="goal-buddy-heading">🤝 Matched with Buddy</h3>
+                <div class="goal-buddy-info">
+                    <div class="goal-emoji-box">🎉</div>
                     <div>
-                        <div style="opacity: 0.8; font-size: 0.9rem;">Accountability Partner</div>
-                        <div style="font-weight: 700; font-size: 1.1rem;"><?= htmlspecialchars($goal['mentor_name']) ?></div>
+                        <div class="goal-buddy-label">Accountability Partner</div>
+                        <div class="goal-buddy-name"><?= htmlspecialchars($goal['mentor_name']) ?></div>
                     </div>
                     <?php if ($isAuthor || $isMentor): ?>
-                        <div style="margin-left: auto;">
-                            <a href="<?= Nexus\Core\TenantContext::getBasePath() ?>/messages?create=1&to=<?= $isAuthor ? $goal['mentor_id'] : $goal['user_id'] ?>" class="glass-pill-btn btn-primary" style="padding: 8px 16px; font-size: 0.85rem;">Message</a>
+                        <div class="goal-buddy-action">
+                            <a href="<?= Nexus\Core\TenantContext::getBasePath() ?>/messages?create=1&to=<?= $isAuthor ? $goal['mentor_id'] : $goal['user_id'] ?>" class="glass-pill-btn btn-primary goal-buddy-message-btn">Message</a>
                         </div>
                     <?php endif; ?>
                 </div>
@@ -457,10 +70,10 @@ require __DIR__ . '/../../layouts/header.php';
         <?php elseif ($goal['is_public']): ?>
             <!-- Looking State -->
             <div class="status-card status-looking">
-                <div style="text-align: center;">
-                    <div style="font-size: 2rem; margin-bottom: 10px;">🔍</div>
-                    <h3 style="margin: 0 0 10px 0; font-size: 1.25rem;">Looking for a Buddy</h3>
-                    <p style="margin: 0 0 20px 0; opacity: 0.9;">This goal is public! Waiting for a community member to support you.</p>
+                <div class="goal-looking-center">
+                    <div class="goal-looking-emoji">🔍</div>
+                    <h3 class="goal-looking-heading">Looking for a Buddy</h3>
+                    <p class="goal-looking-description">This goal is public! Waiting for a community member to support you.</p>
 
                     <?php if (!$isAuthor && isset($_SESSION['user_id'])): ?>
                         <form action="<?= Nexus\Core\TenantContext::getBasePath() ?>/goals/buddy" method="POST" onsubmit="return confirm('Are you sure you want to be the accountability partner for this goal?');">
@@ -475,11 +88,11 @@ require __DIR__ . '/../../layouts/header.php';
         <?php else: ?>
             <!-- Private State -->
             <div class="status-card status-private">
-                <div style="display: flex; align-items: center; gap: 15px;">
-                    <div style="font-size: 1.5rem;">🔒</div>
+                <div class="goal-private-info">
+                    <div class="goal-private-emoji">🔒</div>
                     <div>
-                        <strong style="display:block;">Private Goal</strong>
-                        <span style="opacity: 0.8; font-size: 0.9rem;">Only you can see this goal.</span>
+                        <strong class="goal-private-label">Private Goal</strong>
+                        <span class="goal-private-description">Only you can see this goal.</span>
                     </div>
                 </div>
             </div>
@@ -494,10 +107,10 @@ require __DIR__ . '/../../layouts/header.php';
         $isLiked = $isLiked ?? false;
         $isLoggedIn = $isLoggedIn ?? !empty($_SESSION['user_id']);
         ?>
-        <div style="margin-top: 40px; padding-top: 30px; border-top: 1px solid var(--glass-border);">
+        <div class="goal-social-section">
             <!-- Like & Comment Buttons -->
-            <div style="display: flex; align-items: center; gap: 15px; flex-wrap: wrap; margin-bottom: 20px;">
-                <button id="like-btn" onclick="goalToggleLike()" class="glass-pill-btn <?= $isLiked ? 'btn-primary' : 'btn-secondary' ?>" style="<?= $isLiked ? '' : '' ?>">
+            <div class="goal-social-buttons">
+                <button id="like-btn" onclick="goalToggleLike()" class="glass-pill-btn <?= $isLiked ? 'btn-primary' : 'btn-secondary' ?>">
                     <i class="<?= $isLiked ? 'fa-solid' : 'fa-regular' ?> fa-heart" id="like-icon"></i>
                     <span id="like-count"><?= $likesCount ?></span>
                     <span><?= $likesCount === 1 ? 'Like' : 'Likes' ?></span>
@@ -515,24 +128,24 @@ require __DIR__ . '/../../layouts/header.php';
             </div>
 
             <!-- Comments Section (Hidden by Default) -->
-            <div id="comments-section" style="display: none; margin-top: 20px;">
+            <div id="comments-section" class="goal-comments-section">
                 <?php if ($isLoggedIn): ?>
-                <form onsubmit="goalSubmitComment(event)" style="margin-bottom: 20px;">
-                    <div style="display: flex; gap: 10px; align-items: flex-start;">
-                        <img src="<?= $_SESSION['user_avatar'] ?? '/assets/img/defaults/default_avatar.webp' ?>" loading="lazy" style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover; border: 1px solid var(--glass-border);">
-                        <div style="flex: 1;">
-                            <textarea id="comment-input" placeholder="Write a comment..." style="width: 100%; min-height: 80px; padding: 12px; border-radius: 12px; border: 1px solid var(--glass-border); background: var(--pill-bg); color: var(--text-color); font-size: 0.95rem; resize: vertical;"></textarea>
-                            <button type="submit" class="glass-pill-btn btn-primary" style="margin-top: 10px;">Post Comment</button>
+                <form onsubmit="goalSubmitComment(event)" class="goal-comment-form">
+                    <div class="goal-comment-input-wrapper">
+                        <img src="<?= $_SESSION['user_avatar'] ?? '/assets/img/defaults/default_avatar.webp' ?>" loading="lazy" class="goal-comment-avatar">
+                        <div class="goal-comment-input-container">
+                            <textarea id="comment-input" placeholder="Write a comment..." class="goal-comment-textarea"></textarea>
+                            <button type="submit" class="glass-pill-btn btn-primary goal-comment-submit-btn">Post Comment</button>
                         </div>
                     </div>
                 </form>
                 <?php else: ?>
-                <p style="text-align: center; color: var(--text-muted); padding: 20px;">
-                    <a href="<?= Nexus\Core\TenantContext::getBasePath() ?>/login" style="color: var(--accent-color);">Log in</a> to leave a comment.
+                <p class="goal-login-prompt">
+                    <a href="<?= Nexus\Core\TenantContext::getBasePath() ?>/login" class="goal-login-link">Log in</a> to leave a comment.
                 </p>
                 <?php endif; ?>
                 <div id="comments-list">
-                    <p style="text-align: center; color: var(--text-muted);">Loading comments...</p>
+                    <p class="goal-comments-loading">Loading comments...</p>
                 </div>
             </div>
         </div>

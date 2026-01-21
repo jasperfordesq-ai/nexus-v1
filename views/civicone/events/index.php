@@ -1,6 +1,7 @@
 <?php
 // CivicOne View: Events Index
 // WCAG 2.1 AA Compliant - External CSS in civicone-events.css
+// $showHero = true; // Disabled - hero is broken
 $heroTitle = "Community Events";
 $heroSub = "Connect, learn, and celebrate with your neighbors.";
 $heroType = 'Gatherings';

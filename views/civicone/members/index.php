@@ -1,29 +1,16 @@
 <?php
-$hTitle = "Community Members";
-$hSubtitle = "Connect with timebankers in your community";
-$hType = "Directory";
+/**
+ * CivicOne Members Directory
+ * Template A: Directory/List Page (Section 10.2)
+ * With Page Hero (Section 9C: Page Hero Contract)
+ */
+
+// Include layout header (opens <main> via main-open.php)
 require __DIR__ . '/../../layouts/civicone/header.php';
+
+// Render hero (auto-resolves from config/heroes.php for /members route)
+require __DIR__ . '/../../layouts/civicone/partials/render-hero.php';
 ?>
-
-<?php
-$breadcrumbs = [
-    ['label' => 'Home', 'url' => '/'],
-    ['label' => 'Community Members']
-];
-require __DIR__ . '/../../layouts/civicone/partials/breadcrumb.php';
-?>
-
-<!-- GOV.UK Page Template Boilerplate -->
-<div class="civicone-width-container civicone--govuk">
-    <main class="civicone-main-wrapper" id="main-content" role="main">
-
-        <!-- Page Header -->
-        <div class="civicone-grid-row">
-            <div class="civicone-grid-column-full">
-                <h1 class="civicone-heading-xl">Community Members</h1>
-                <p class="civicone-body-l">Connect with timebankers in your community. Search by name or location.</p>
-            </div>
-        </div>
 
         <!-- MOJ Filter Pattern: 1/3 Filters + 2/3 Results -->
         <div class="civicone-grid-row">

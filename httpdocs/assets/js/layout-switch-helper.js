@@ -14,7 +14,7 @@
         constructor() {
             this.currentLayout = document.documentElement.getAttribute('data-layout') || 'modern';
             this.switching = false;
-            this.endpoint = '/api/layout-switch.php';
+            this.endpoint = '/api/layout-switch';
             this.init();
         }
 
@@ -278,6 +278,40 @@
     };
 
     /**
+     * Handle scroll to adjust utility bar position
+     */
+    const handleBannerScroll = () => {
+        const banner = document.querySelector('.modern-experimental-banner');
+        if (!banner) return;
+
+        let ticking = false;
+
+        const checkBannerVisibility = () => {
+            const bannerRect = banner.getBoundingClientRect();
+            const html = document.documentElement;
+
+            // If banner has scrolled out of view (top is negative and bottom is <= 0)
+            if (bannerRect.bottom <= 0) {
+                html.classList.add('banner-scrolled');
+            } else {
+                html.classList.remove('banner-scrolled');
+            }
+
+            ticking = false;
+        };
+
+        window.addEventListener('scroll', () => {
+            if (!ticking) {
+                window.requestAnimationFrame(checkBannerVisibility);
+                ticking = true;
+            }
+        }, { passive: true });
+
+        // Check initial state
+        checkBannerVisibility();
+    };
+
+    /**
      * Initialize
      */
     const init = () => {
@@ -289,6 +323,9 @@
         } else {
             console.warn('LayoutSwitcher requires modern browser with fetch API');
         }
+
+        // Setup scroll handler for banner
+        handleBannerScroll();
     };
 
     // Run on DOM ready

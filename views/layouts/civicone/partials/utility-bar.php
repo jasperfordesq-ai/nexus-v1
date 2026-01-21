@@ -47,43 +47,9 @@
             }
             if ($currentSlug !== 'public-sector-demo'):
             ?>
-                <div class="civic-dropdown civic-dropdown--right civic-interface-switcher">
-                    <button class="civic-utility-link civic-utility-btn" aria-haspopup="menu" aria-expanded="false" aria-controls="interface-dropdown-menu">
-                        Layout <span class="civic-arrow" aria-hidden="true">▾</span>
-                    </button>
-                    <div class="civic-dropdown-content" id="interface-dropdown-menu" role="menu">
-                        <?php
-                        // Use LayoutHelper for consistent layout detection
-                        $lay = \Nexus\Services\LayoutHelper::get();
-                        ?>
-                        <a href="?layout=modern" role="menuitem" <?= $lay === 'modern' ? 'aria-current="true"' : '' ?>>
-                            <span class="civic-layout-icon">✨</span> Modern UI
-                            <?php if ($lay === 'modern'): ?>
-                                <span class="civic-checkmark">✓</span>
-                            <?php endif; ?>
-                        </a>
-                        <a href="?layout=civicone" role="menuitem" <?= $lay === 'civicone' ? 'aria-current="true"' : '' ?>>
-                            <span class="civic-layout-icon">♿</span> Accessible UI
-                            <?php if ($lay === 'civicone'): ?>
-                                <span class="civic-checkmark">✓</span>
-                            <?php endif; ?>
-                        </a>
-
-                        <?php
-                        // Nexus Social: Available on Master (ID 1) and Hour Timebank
-                        // Open to ALL users (Guest or Logged In)
-                        $tId = \Nexus\Core\TenantContext::getId();
-                        $isAllowedSocial = ($tId == 1) || ($currentSlug === 'hour-timebank' || $currentSlug === 'hour_timebank');
-
-                        if ($isAllowedSocial):
-                            $rootPath = \Nexus\Core\TenantContext::getBasePath();
-                            if (empty($rootPath)) $rootPath = '/';
-
-                        ?>
-                            <div class="civic-dropdown-separator" role="separator"></div>
-                        <?php endif; ?>
-                    </div>
-                </div>
+                <?php
+                // Layout dropdown removed - now using banner at top of page
+                ?>
             <?php endif; ?>
 
 

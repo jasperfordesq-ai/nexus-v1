@@ -1,9 +1,9 @@
 # CivicOne WCAG 2.1 AA Source of Truth
 
-**Version:** 1.8.0
+**Version:** 1.9.0
 **Status:** AUTHORITATIVE
 **Created:** 2026-01-20
-**Last Updated:** 2026-01-20 (Added Section 9B: Federation Mode Contract)
+**Last Updated:** 2026-01-21 (Added Section 9C: Page Hero Contract)
 **Maintainer:** Development Team
 
 ---
@@ -21,6 +21,7 @@
 9. [Component Rules](#9-component-rules)
 9A. [Global Header & Navigation Contract (MANDATORY)](#9a-global-header--navigation-contract-mandatory)
 9B. [Federation Mode (Partner Communities) — NON-NEGOTIABLE](#9b-federation-mode-partner-communities--non-negotiable)
+9C. [Page Hero (Site-wide) Contract — MANDATORY](#9c-page-hero-site-wide-contract--mandatory)
 10. [Canonical Page Templates (MANDATORY)](#10-canonical-page-templates-mandatory)
 11. [Grid & Results Layout Contracts](#11-grid--results-layout-contracts)
 12. [Refactoring Workflow to Avoid Ruining Existing Layouts](#12-refactoring-workflow-to-avoid-ruining-existing-layouts)
@@ -2134,6 +2135,418 @@ A federation page is considered complete when:
 - [ ] GOV.UK/MOJ component classes used correctly
 - [ ] Semantic HTML (`<nav>`, `<aside>`, `<ul>`, `<dl>`)
 - [ ] Wrapper pattern used for Messages/Transactions (if applicable)
+
+---
+
+## 9C. Page Hero (Site-wide) Contract — MANDATORY
+
+**CRITICAL:** This section defines the ONLY acceptable implementation patterns for the page hero/header region across all CivicOne pages. The hero is a **page header region**, not a marketing-only banner. It provides context and orientation for every page.
+
+**Why this matters:**
+- The hero contains the page's primary heading (H1) — the most important accessibility landmark
+- Inconsistent hero patterns break screen reader navigation and page structure
+- Heroes that live in cached headers cannot vary by page (breaking fundamental UX)
+- Marketing-style "hero banners" must not overshadow the core function: page identification
+
+### 9C.1 Pattern Sources (Authoritative References)
+
+All page hero decisions MUST be based on these official UK government design system patterns:
+
+| Pattern Source | URL | Usage |
+|----------------|-----|-------|
+| **GOV.UK Headings** | https://design-system.service.gov.uk/styles/headings/ | H1 usage, heading hierarchy |
+| **GOV.UK Paragraphs (Lead paragraph)** | https://design-system.service.gov.uk/styles/paragraphs/ | Lead paragraph styling and usage |
+| **GOV.UK Page template** | https://design-system.service.gov.uk/styles/page-template/ | Page structure and heading placement |
+| **GOV.UK Button (Start button)** | https://design-system.service.gov.uk/components/button/ | Primary CTA button patterns |
+
+**Key Principles:**
+- **One H1 per page** (WCAG 1.3.1 - Info and Relationships)
+- **Lead paragraph only once per page** (if used)
+- **No text in images** for hero content (WCAG 1.4.5 - Images of Text)
+- **Start button is a link `<a>`** styled as a button (GOV.UK guidance)
+
+### 9C.2 Hero Variants (MANDATORY)
+
+CivicOne pages MUST use one of these TWO hero variants:
+
+| Variant | Use Cases | Components | Allowed CTAs |
+|---------|-----------|------------|--------------|
+| **Page Hero (default)** | All standard pages (members, groups, profile, settings, etc.) | H1 + optional lead paragraph | None (CTAs in page content) |
+| **Banner Hero (landing/hub only)** | Landing pages, service hubs, onboarding flows | H1 + optional lead paragraph + optional primary CTA | ONE start button only (styled as `<a>`) |
+
+### 9C.3 Page Hero (Default) — MANDATORY Structure
+
+**Use for:** All standard CivicOne pages (directories, detail pages, forms, content pages).
+
+**MANDATORY HTML Structure:**
+
+```html
+<!-- Hero renders AFTER header include, BEFORE page-specific content -->
+<?php require __DIR__ . '/../../layouts/civicone/header.php'; ?>
+
+<div class="civicone-width-container">
+  <main class="civicone-main-wrapper" id="main-content">
+
+    <!-- Page Hero (default variant) -->
+    <div class="civicone-hero civicone-hero--page">
+      <h1 class="civicone-heading-xl">Page Title</h1>
+
+      <!-- Optional: Lead paragraph (use sparingly, only once per page) -->
+      <p class="civicone-body-l civicone-hero__lead">
+        A concise introduction to this page's purpose or content.
+      </p>
+    </div>
+
+    <!-- Page content follows -->
+    <div class="civicone-grid-row">
+      <!-- ... -->
+    </div>
+
+  </main>
+</div>
+```
+
+**Page Hero Rules:**
+
+| Rule ID | Rule | Source | Rationale |
+|---------|------|--------|-----------|
+| PH-001 | Hero MUST render after `header.php` include (not inside cached header) | Page-specific requirement | Cached headers cannot vary by page |
+| PH-002 | Hero MUST contain exactly ONE `<h1>` | WCAG 1.3.1 + GOV.UK Headings | Primary page heading for orientation |
+| PH-003 | H1 MUST use `.civicone-heading-xl` class | GOV.UK Typography | Consistent heading scale |
+| PH-004 | Lead paragraph is OPTIONAL and MUST NOT appear more than once per page | GOV.UK Paragraphs | Lead text is for emphasis, not repetition |
+| PH-005 | Lead paragraph MUST use `.civicone-body-l` class | GOV.UK Typography | Larger text for introduction |
+| PH-006 | Hero MUST NOT contain CTAs (buttons/links) in default variant | UX principle | CTAs belong in page content, not header region |
+| PH-007 | Hero MUST NOT use background images containing text | WCAG 1.4.5 | Images of text fail accessibility |
+| PH-008 | Hero text MUST maintain 4.5:1 contrast minimum | WCAG 1.4.3 | Readability requirement |
+| PH-009 | Hero MUST be inside `civicone-width-container` | GOV.UK Layout | Consistent page width alignment |
+
+### 9C.4 Banner Hero (Landing/Hub Pages Only) — MANDATORY Structure
+
+**Use for:** Landing pages, service hub pages (e.g., `/`, `/federation`, `/volunteering`), onboarding flows.
+
+**MANDATORY HTML Structure:**
+
+```html
+<!-- Hero renders AFTER header include, BEFORE page-specific content -->
+<?php require __DIR__ . '/../../layouts/civicone/header.php'; ?>
+
+<div class="civicone-width-container">
+  <main class="civicone-main-wrapper" id="main-content">
+
+    <!-- Banner Hero (landing/hub variant) -->
+    <div class="civicone-hero civicone-hero--banner">
+      <h1 class="civicone-heading-xl">Welcome to [Service Name]</h1>
+
+      <!-- Optional: Lead paragraph -->
+      <p class="civicone-body-l civicone-hero__lead">
+        A brief description of what this service offers and why it matters.
+      </p>
+
+      <!-- Optional: Primary CTA (start button pattern) -->
+      <a href="/join" role="button" draggable="false" class="civicone-button civicone-button--start" data-module="govuk-button">
+        Get started
+        <svg class="civicone-button__start-icon" xmlns="http://www.w3.org/2000/svg" width="17.5" height="19" viewBox="0 0 33 40" aria-hidden="true" focusable="false">
+          <path fill="currentColor" d="M0 0h13l20 20-20 20H0l20-20z"/>
+        </svg>
+      </a>
+    </div>
+
+    <!-- Page content follows -->
+    <div class="civicone-grid-row">
+      <!-- ... -->
+    </div>
+
+  </main>
+</div>
+```
+
+**Banner Hero Rules:**
+
+| Rule ID | Rule | Source | Rationale |
+|---------|------|--------|-----------|
+| BH-001 | Banner hero ONLY on landing/hub/onboarding pages | UX principle | Avoid CTA fatigue on standard pages |
+| BH-002 | Hero MUST contain exactly ONE `<h1>` | WCAG 1.3.1 + GOV.UK Headings | Primary page heading |
+| BH-003 | Lead paragraph is OPTIONAL (same rules as page hero) | GOV.UK Paragraphs | Introduce the service/purpose |
+| BH-004 | Primary CTA MUST be an `<a>` link styled as button (NOT `<button>`) | GOV.UK Button Start button | Start buttons navigate, use links |
+| BH-005 | Start button MUST use `.civicone-button--start` class | GOV.UK Button | Visual affordance for primary action |
+| BH-006 | Start button MUST include arrow icon (SVG) | GOV.UK Button | Visual cue for navigation action |
+| BH-007 | Start button SVG MUST have `aria-hidden="true"` and `focusable="false"` | Accessibility | Icon is decorative, hide from assistive tech |
+| BH-008 | Maximum ONE primary CTA per banner hero | UX principle | Single clear call-to-action |
+| BH-009 | Secondary CTAs (if needed) MUST appear below hero in page content | UX principle | Avoid competing CTAs in hero |
+| BH-010 | Hero MUST NOT use background images containing text | WCAG 1.4.5 | Images of text fail accessibility |
+
+### 9C.5 Hero Placement Contract (MANDATORY)
+
+**CRITICAL RULE:** The hero MUST NOT live in `header-cached.php` because cached headers cannot vary by page.
+
+**CORRECT Implementation:**
+
+```
+File: views/civicone/members/index.php (example)
+
+<?php
+// Page-specific variables
+$pageTitle = 'Members Directory';
+$pageDescription = 'Connect with community members';
+
+// Include layout header (cached or dynamic)
+require __DIR__ . '/../../layouts/civicone/header.php';
+?>
+
+<!-- Hero renders HERE (page-specific, after header) -->
+<div class="civicone-width-container">
+  <main class="civicone-main-wrapper" id="main-content">
+
+    <div class="civicone-hero civicone-hero--page">
+      <h1 class="civicone-heading-xl"><?= htmlspecialchars($pageTitle) ?></h1>
+      <?php if ($pageDescription): ?>
+        <p class="civicone-body-l civicone-hero__lead">
+          <?= htmlspecialchars($pageDescription) ?>
+        </p>
+      <?php endif; ?>
+    </div>
+
+    <!-- Page content -->
+    <div class="civicone-grid-row">
+      <!-- ... -->
+    </div>
+
+  </main>
+</div>
+
+<?php require __DIR__ . '/../../layouts/civicone/footer.php'; ?>
+```
+
+**WRONG Implementation (DO NOT DO THIS):**
+
+```php
+<!-- ❌ WRONG: Hero in header-cached.php -->
+File: views/layouts/civicone/header-cached.php
+
+<?php require __DIR__ . '/partials/site-header.php'; ?>
+
+<!-- ❌ FORBIDDEN: Hero here is cached and cannot vary by page -->
+<div class="civicone-hero">
+  <h1>Static Title</h1> <!-- ❌ WRONG: All pages get same title -->
+</div>
+
+<?php require __DIR__ . '/partials/main-open.php'; ?>
+```
+
+**Hero Placement Rules:**
+
+| Rule ID | Rule | Rationale |
+|---------|------|-----------|
+| HP-001 | Hero MUST render in page template files (e.g., `views/civicone/members/index.php`), NOT in layout header files | Page-specific content cannot be cached |
+| HP-002 | Hero MUST render after `header.php` include | Header must complete before page-specific content |
+| HP-003 | Hero MUST render inside `<main id="main-content">` | Part of main content, not header |
+| HP-004 | Hero MUST be first visible element inside `<main>` | Primary orientation landmark |
+| HP-005 | `header-cached.php` MUST NOT contain hero markup | Cached headers cannot vary by page |
+
+### 9C.6 Hero Styling Contract (MANDATORY)
+
+**CSS File:** `httpdocs/assets/css/civicone-hero.css` (create if doesn't exist)
+
+**MANDATORY CSS Structure:**
+
+```css
+/**
+ * CivicOne Page Hero Component
+ * Based on GOV.UK page template and typography patterns
+ */
+
+/* Container */
+.civicone-hero {
+  margin-bottom: var(--civicone-space-7); /* 40px on mobile, more on desktop */
+}
+
+/* Heading */
+.civicone-hero .civicone-heading-xl {
+  margin-bottom: var(--civicone-space-4); /* 20px */
+  color: var(--civicone-text); /* #0b0c0c */
+}
+
+/* Lead paragraph */
+.civicone-hero__lead {
+  margin-bottom: var(--civicone-space-6); /* 30px */
+  color: var(--civicone-text-secondary); /* #484949 */
+  max-width: 70ch; /* Reading width */
+}
+
+/* Banner variant (landing pages only) */
+.civicone-hero--banner {
+  padding: var(--civicone-space-7) 0; /* Extra vertical spacing */
+  border-bottom: 1px solid var(--civicone-border); /* Visual separation */
+}
+
+/* Start button in banner hero */
+.civicone-hero--banner .civicone-button--start {
+  margin-top: var(--civicone-space-5); /* 25px */
+}
+
+/* Responsive adjustments */
+@media (min-width: 641px) {
+  .civicone-hero {
+    margin-bottom: var(--civicone-space-9); /* 60px on desktop */
+  }
+
+  .civicone-hero--banner {
+    padding: var(--civicone-space-9) 0;
+  }
+}
+```
+
+**Hero Styling Rules:**
+
+| Rule ID | Rule | Source | Rationale |
+|---------|------|--------|-----------|
+| HS-001 | All hero styles MUST be in `civicone-hero.css` | CLAUDE.md rules | No inline styles |
+| HS-002 | Hero MUST use GOV.UK design tokens for spacing | Section 7 (Design Tokens) | Consistent spacing scale |
+| HS-003 | Hero MUST use GOV.UK design tokens for colors | Section 7 (Design Tokens) | Consistent color palette |
+| HS-004 | Lead paragraph MUST have max-width for readability (70ch or less) | GOV.UK Typography | Optimal line length |
+| HS-005 | Hero MUST NOT use background images by default | Accessibility | Avoid text-on-image contrast issues |
+| HS-006 | If background images used, text MUST have 4.5:1 contrast minimum | WCAG 1.4.3 | Readability requirement |
+| HS-007 | Hero focus states MUST follow GOV.UK focus pattern (yellow #ffdd00) | Section 8 (Accessibility) | Consistent focus indicators |
+
+### 9C.7 Hero vs. Breadcrumbs
+
+**RULE:** Breadcrumbs (if used) MUST appear BEFORE the hero, not after.
+
+**Correct Order:**
+
+```html
+<main class="civicone-main-wrapper" id="main-content">
+
+  <!-- 1. Breadcrumbs first (if applicable) -->
+  <nav class="civicone-breadcrumbs" aria-label="Breadcrumb">
+    <a href="/">Home</a> › <a href="/members">Members</a> › Jane Smith
+  </nav>
+
+  <!-- 2. Hero second -->
+  <div class="civicone-hero civicone-hero--page">
+    <h1 class="civicone-heading-xl">Jane Smith</h1>
+  </div>
+
+  <!-- 3. Page content third -->
+  <div class="civicone-grid-row">
+    <!-- ... -->
+  </div>
+
+</main>
+```
+
+**Why this order:**
+- Breadcrumbs provide wayfinding context BEFORE the page title
+- Screen reader users navigate by headings (H key) — breadcrumbs shouldn't interrupt heading hierarchy
+- GOV.UK pattern shows breadcrumbs above page heading
+
+### 9C.8 Hero Accessibility Checklist
+
+**Every hero MUST pass:**
+
+**Structure:**
+- [ ] Hero renders after `header.php` include (not in cached header)
+- [ ] Hero inside `<main id="main-content">`
+- [ ] Hero contains exactly ONE `<h1>`
+- [ ] H1 uses `.civicone-heading-xl` class
+- [ ] Lead paragraph (if used) uses `.civicone-body-l` class
+- [ ] Lead paragraph appears only once per page
+
+**Banner Hero (if applicable):**
+- [ ] Start button is `<a>` link (not `<button>`)
+- [ ] Start button has `role="button"` and `draggable="false"`
+- [ ] Start button includes arrow SVG with `aria-hidden="true"` and `focusable="false"`
+- [ ] Only ONE primary CTA in hero
+- [ ] Secondary CTAs (if needed) appear below hero in page content
+
+**Keyboard & Focus:**
+- [ ] H1 not focusable (headings are not interactive)
+- [ ] Start button (if present) keyboard accessible (Tab, Enter)
+- [ ] Start button has visible focus indicator (GOV.UK yellow #ffdd00)
+
+**Visual:**
+- [ ] No background images containing text
+- [ ] Text contrast minimum 4.5:1 against background
+- [ ] Lead paragraph has max-width for readability (70ch or less)
+- [ ] Hero spacing uses GOV.UK tokens (consistent with design system)
+
+**Screen Reader:**
+- [ ] Page title (H1) announced as heading level 1
+- [ ] Lead paragraph announced as normal paragraph
+- [ ] Start button (if present) announced as "button" or "link" with clear label
+- [ ] No redundant announcements (e.g., "button button")
+
+### 9C.9 Common Anti-Patterns (FORBIDDEN)
+
+| Anti-Pattern | Why Banned | Correct Alternative |
+|--------------|------------|---------------------|
+| **Hero in `header-cached.php`** | Cached headers cannot vary by page | Hero in page template files after header include |
+| **Multiple H1s per page** | Breaks heading hierarchy (WCAG 1.3.1) | ONE H1 in hero, all other headings H2-H6 |
+| **Start button as `<button>`** | Buttons don't navigate (semantic mismatch) | Use `<a>` with `role="button"` (GOV.UK pattern) |
+| **Multiple primary CTAs in hero** | Competing CTAs confuse users | ONE start button max, others in page content |
+| **Lead paragraph repeated** | Redundant content, bad UX | ONE lead paragraph per page |
+| **Text in hero background images** | Fails WCAG 1.4.5 (Images of Text) | Plain background colors or decorative images only |
+| **Inline hero styles** | Violates CLAUDE.md rules | All styles in `civicone-hero.css` |
+| **Hero outside `<main>`** | Breaks page structure | Hero inside `<main id="main-content">` |
+
+### 9C.10 File Mapping (Current Implementation)
+
+**Hero markup currently lives in:**
+
+| File | Current Location | Status | Action Required |
+|------|------------------|--------|-----------------|
+| `views/layouts/civicone/partials/hero.php` | Partial included by `header.php` | ⚠️ WRONG | MOVE to page templates |
+| Various page templates | Ad-hoc H1 placement | ⚠️ INCONSISTENT | STANDARDIZE using hero contract |
+
+**Target implementation:**
+
+1. **Remove** `partials/hero.php` from header includes
+2. **Add** hero markup to each page template file (after header include, inside `<main>`)
+3. **Create** `civicone-hero.css` with standardized hero styles
+4. **Update** all page templates to use either page hero or banner hero variant
+
+### 9C.11 Definition of Done: Hero Implementation
+
+**A page hero is considered COMPLETE when:**
+
+**✓ Structure:**
+- [ ] Hero renders in page template file (not in cached header)
+- [ ] Hero appears after `header.php` include
+- [ ] Hero inside `<main id="main-content">`
+- [ ] Hero uses correct variant (page or banner)
+- [ ] Breadcrumbs (if used) appear before hero
+
+**✓ Content:**
+- [ ] Exactly ONE `<h1>` per page
+- [ ] H1 text is descriptive and unique per page
+- [ ] Lead paragraph (if used) appears only once
+- [ ] Lead paragraph max 2-3 sentences
+- [ ] Start button (if used) has clear action-oriented label
+
+**✓ Markup:**
+- [ ] H1 uses `.civicone-heading-xl` class
+- [ ] Lead paragraph uses `.civicone-body-l civicone-hero__lead` classes
+- [ ] Start button is `<a>` with `role="button"` (banner hero only)
+- [ ] Start button includes arrow SVG with `aria-hidden="true"` (banner hero only)
+
+**✓ Styling:**
+- [ ] No inline styles (all styles in `civicone-hero.css`)
+- [ ] Uses GOV.UK design tokens for spacing/colors
+- [ ] Text contrast minimum 4.5:1
+- [ ] No background images with text
+- [ ] Lead paragraph has max-width (70ch)
+
+**✓ Accessibility:**
+- [ ] Passes axe DevTools scan (0 violations)
+- [ ] Screen reader announces H1 correctly (heading level 1)
+- [ ] Start button (if present) keyboard accessible (Tab, Enter)
+- [ ] Start button has visible focus indicator (3px solid yellow)
+- [ ] No redundant announcements
+
+**✓ Responsive:**
+- [ ] Hero stacks cleanly on mobile (375px viewport)
+- [ ] Text readable at 200% zoom (no overlap)
+- [ ] Hero reflows correctly at 400% zoom
 
 ---
 
@@ -4971,6 +5384,7 @@ git revert <component-commit-hash>
 | 1.6.0 | 2026-01-20 | Development Team | Added Template F: Feed / Activity Stream (Section 10.6). Defines canonical template for Community Pulse Feed landing page (views/civicone/feed/index.php). Establishes mandatory patterns for feed layout (2/3+1/3 split), feed items (chronological `<article>` list using MOJ Timeline pattern), actions accessibility (Like with aria-pressed, Comment with aria-expanded/aria-controls, Share without hover, Message as real link/button), dynamic updates (polite live regions per Home Office guidance), and loading more content (pagination or "Load more" button, NO infinite scroll without fallback). Includes comprehensive Definition of Done checklist. Based on MOJ Timeline, GOV.UK Pagination, ONS Pagination, Home Office notifications guidance, and GOV.UK Accordion patterns. |
 | 1.7.0 | 2026-01-20 | Development Team | Added Template G: Account Area (Section 10.7). Defines mandatory patterns for dashboard, profile settings, wallet, and account pages. Establishes "tabs are not module navigation" rule (tabs only for closely-related views within single module; use MOJ Sub/Side navigation for module switching). Documents secondary navigation requirements (MOJ Sub navigation or Side navigation on all account pages), profile settings patterns (GOV.UK Summary list with "Change" links including sr-only context text), wallet structure (Summary list for key facts + Table for transactions with semantic markup). Includes comprehensive accessibility checklist and Definition of Done. Based on MOJ Sub/Side navigation, GOV.UK Summary list, Check answers pattern, Task list, Table, and ONS/SIS/NICE tabs guidance. |
 | 1.8.0 | 2026-01-20 | Development Team | Added Section 9B: Federation Mode (Partner Communities) — NON-NEGOTIABLE. Defines comprehensive contract for all Federation features (/federation/* pages). Establishes mandatory patterns: (1) Federation scope switcher (MOJ Organisation switcher pattern, only show if user has 2+ communities, placement between header and main content); (2) Provenance everywhere (every federated item shows source community for trust/transparency, browse pages offer "Source community" filter); (3) Navigation separation (Federation has own service navigation, distinct from local tenant nav, uses /federation prefix, separate breadcrumbs/page titles); (4) Directory/List template for browse pages (members, listings, events, groups MUST use Template A with MOJ filter-a-list pattern, selected filters as removable tags, "Apply filters" button, list/table layout NOT card grid); (5) GOV.UK Pagination (required for all browse pages, NO infinite scroll by default); (6) Mixed-theme guardrail (wrapper pattern for messages/transactions to prevent breaking Modern layout). Includes file mapping table, accessibility checklist, and Definition of Done. Based on MOJ Organisation switcher, GOV.UK Navigate a service, Service navigation, MOJ Filter a list, Filter component, and GOV.UK Pagination patterns. |
+| 1.9.0 | 2026-01-21 | Development Team | Added Section 9C: Page Hero (Site-wide) Contract — MANDATORY. Defines the ONLY acceptable patterns for page hero/header regions across all CivicOne pages. Establishes TWO hero variants: (1) Page Hero (default) - H1 + optional lead paragraph, no CTAs; (2) Banner Hero (landing/hub only) - H1 + optional lead + optional start button. CRITICAL rules: Hero MUST render in page template files (NOT in cached header), hero MUST be inside `<main>`, exactly ONE H1 per page, lead paragraph max once per page, start button must be `<a>` with `role="button"` (GOV.UK pattern), no background images with text (WCAG 1.4.5). Documents hero placement contract (breadcrumbs before hero, hero first inside main), styling contract (civicone-hero.css with GOV.UK tokens), and accessibility checklist. Includes file mapping showing current wrong implementation (hero in partials/hero.php included by header) and target implementation (hero in page templates). Based on GOV.UK Headings, Paragraphs (lead paragraph), Page template, and Button (start button) patterns. |
 
 ---
 

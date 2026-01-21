@@ -193,6 +193,8 @@ const cssFiles = [
     'civicone-federation.css',
     'civicone-groups.css',
     'civicone-header.css',
+    // Page Hero (Section 9C: Page Hero Contract - 2026-01-21)
+    'civicone-hero.css',
     'civicone-help.css',
     'civicone-matches.css',
     'civicone-messages.css',
@@ -240,21 +242,42 @@ const cssFiles = [
     'civicone-feed.css',
     // PWA
     'pwa-install-modal.css',
+    // Report pages - strategic plan & impact report (2026-01-21)
+    'civicone-report-pages.css',
+    // Feed item partial (2026-01-21)
+    'civicone-feed-item.css',
+    // Goals show page (2026-01-21)
+    'civicone-goals-show.css',
+    // Admin menu files (2026-01-21)
+    'admin-menu-builder.css',
+    'admin-menu-index.css',
+    // Biometric modal (2026-01-21)
+    'biometric-modal.css',
+    // Responsive breakpoints (2026-01-21)
+    'breakpoints.css',
+    // CivicOne utilities - extracted inline styles (2026-01-21)
+    'civicone-utilities.css',
+    'civicone-blog-utilities.css',
+    'civicone-groups-utilities.css',
+    // Mobile navigation v2 (2026-01-21)
+    'mobile-nav-v2.css',
+    // Modern layout utilities - extracted inline styles (2026-01-21)
+    'modern-experimental-banner.css',
+    'modern-header-utilities.css',
 ];
 
 const cssDir = path.join(__dirname, '../httpdocs/assets/css');
+const bundlesDir = path.join(cssDir, 'bundles');
 
 console.log('🚀 Minifying CSS files...\n');
 
 let totalOriginal = 0;
 let totalMinified = 0;
 
-cssFiles.forEach(file => {
-    const inputPath = path.join(cssDir, file);
-    const outputPath = path.join(cssDir, file.replace('.css', '.min.css'));
-
+// Helper function to minify a file
+function minifyFile(inputPath, outputPath, displayName) {
     if (!fs.existsSync(inputPath)) {
-        console.log(`⚠️  Skipping ${file} (not found)`);
+        console.log(`⚠️  Skipping ${displayName} (not found)`);
         return;
     }
 
@@ -270,8 +293,28 @@ cssFiles.forEach(file => {
     totalOriginal += originalSize;
     totalMinified += minifiedSize;
 
-    console.log(`✅ ${file}: ${(originalSize/1024).toFixed(1)}KB → ${(minifiedSize/1024).toFixed(1)}KB (${savings}% smaller)`);
+    console.log(`✅ ${displayName}: ${(originalSize/1024).toFixed(1)}KB → ${(minifiedSize/1024).toFixed(1)}KB (${savings}% smaller)`);
+}
+
+// Minify individual CSS files
+cssFiles.forEach(file => {
+    const inputPath = path.join(cssDir, file);
+    const outputPath = path.join(cssDir, file.replace('.css', '.min.css'));
+    minifyFile(inputPath, outputPath, file);
 });
+
+// Minify bundle files
+console.log('\n📦 Minifying bundle files...\n');
+if (fs.existsSync(bundlesDir)) {
+    const bundleFiles = fs.readdirSync(bundlesDir)
+        .filter(file => file.endsWith('.css') && !file.endsWith('.min.css'));
+
+    bundleFiles.forEach(file => {
+        const inputPath = path.join(bundlesDir, file);
+        const outputPath = path.join(bundlesDir, file.replace('.css', '.min.css'));
+        minifyFile(inputPath, outputPath, `bundles/${file}`);
+    });
+}
 
 console.log('\n' + '='.repeat(50));
 console.log(`📊 Total: ${(totalOriginal/1024).toFixed(1)}KB → ${(totalMinified/1024).toFixed(1)}KB`);

@@ -1,31 +1,23 @@
 <?php
-// CivicOne Groups Index - WCAG 2.1 AA Compliant
-// GOV.UK Directory/List Template (Section 10.2)
+/**
+ * CivicOne Groups Directory
+ * Template A: Directory/List Page (Section 10.2)
+ * With Page Hero (Section 9C: Page Hero Contract)
+ */
+
+// Include layout header (opens <main> via main-open.php)
 require __DIR__ . '/../../layouts/civicone/header.php';
+
+// Render hero (auto-resolves from config/heroes.php for /groups route)
+require __DIR__ . '/../../layouts/civicone/partials/render-hero.php';
 
 $basePath = \Nexus\Core\TenantContext::getBasePath();
 ?>
 
-<?php
-$breadcrumbs = [
-    ['label' => 'Home', 'url' => '/'],
-    ['label' => 'Local Hubs']
-];
-require __DIR__ . '/../../layouts/civicone/partials/breadcrumb.php';
-?>
-
-<!-- GOV.UK Page Template Boilerplate -->
-<div class="civicone-width-container civicone--govuk">
-    <main class="civicone-main-wrapper" id="main-content" role="main">
-
-        <!-- Page Header -->
+        <!-- MOJ Filter Pattern: 1/3 Filters + 2/3 Results -->
         <div class="civicone-grid-row">
-            <div class="civicone-grid-column-two-thirds">
-                <h1 class="civicone-heading-xl">Local Hubs</h1>
-                <p class="civicone-body-l">Connect with community groups and timebanking hubs in your area.</p>
-            </div>
             <div class="civicone-grid-column-one-third">
-                <a href="<?= $basePath ?>/create-group" class="civicone-button civicone-button--primary">
+                <a href="<?= $basePath ?>/create-group" class="civicone-button civicone-button--primary" style="width: 100%; margin-bottom: var(--civicone-space-6, 30px);">
                     Start a Hub
                 </a>
             </div>
@@ -264,8 +256,5 @@ require __DIR__ . '/../../layouts/civicone/partials/breadcrumb.php';
 
             </div><!-- /two-thirds -->
         </div><!-- /grid-row -->
-
-    </main>
-</div><!-- /width-container -->
 
 <?php require __DIR__ . '/../../layouts/civicone/footer.php'; ?>

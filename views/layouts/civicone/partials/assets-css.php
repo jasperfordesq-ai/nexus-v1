@@ -143,6 +143,9 @@
     <link rel="stylesheet" href="/assets/css/civicone-header.min.css?v=<?= $cssVersion ?>">
     <link rel="stylesheet" href="/assets/css/civicone-footer.min.css?v=<?= $cssVersion ?>">
 
+    <!-- Page Hero (Section 9C: Page Hero Contract - WCAG 2.1 AA 2026-01-21) -->
+    <link rel="stylesheet" href="/assets/css/civicone-hero.min.css?v=<?= $cssVersion ?>">
+
     <!-- Account Area Navigation (MOJ Sub navigation pattern) -->
     <link rel="stylesheet" href="/assets/css/civicone-account-nav.min.css?v=<?= $cssVersion ?>">
 

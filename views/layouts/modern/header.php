@@ -112,7 +112,7 @@ try {
     <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/nexus-native-nav-v2.min.css?v=<?= $cssVersionTimestamp ?>">
     <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/mobile-nav-v2.css?v=<?= $cssVersionTimestamp ?>">
     <!-- Modern Header CSS - utility bar, navbar, and header-specific styles -->
-    <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/nexus-modern-header.min.css?v=<?= $cssVersionTimestamp ?>">
+    <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/nexus-modern-header-v2.min.css?v=<?= $cssVersionTimestamp ?>">
 
     <!-- Page-specific CSS -->
     <?php if ($isHome): ?>
@@ -136,24 +136,24 @@ try {
 
     <!-- === CONSOLIDATED COMPONENT BUNDLES (lazy-loaded) === -->
     <!-- Components: Navigation Bundle - Header utilities, dropdowns, navigation -->
-    <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/bundles/components-navigation.css?v=<?= $cssVersionTimestamp ?>" media="print" onload="this.media='all'">
+    <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/bundles/components-navigation.min.css?v=<?= $cssVersionTimestamp ?>" media="print" onload="this.media='all'">
     <!-- Components: Buttons Bundle - Ripple effects, FAB polish, button interactions -->
-    <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/bundles/components-buttons.css?v=<?= $cssVersionTimestamp ?>" media="print" onload="this.media='all'">
+    <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/bundles/components-buttons.min.css?v=<?= $cssVersionTimestamp ?>" media="print" onload="this.media='all'">
     <!-- Components: Forms Bundle - Form validation, responsive forms, input polish -->
-    <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/bundles/components-forms.css?v=<?= $cssVersionTimestamp ?>" media="print" onload="this.media='all'">
+    <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/bundles/components-forms.min.css?v=<?= $cssVersionTimestamp ?>" media="print" onload="this.media='all'">
     <!-- Components: Cards Bundle - Card hover states, lift effects -->
-    <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/bundles/components-cards.css?v=<?= $cssVersionTimestamp ?>" media="print" onload="this.media='all'">
+    <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/bundles/components-cards.min.css?v=<?= $cssVersionTimestamp ?>" media="print" onload="this.media='all'">
     <!-- Components: Modals Bundle - Modal polish, biometric modals -->
-    <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/bundles/components-modals.css?v=<?= $cssVersionTimestamp ?>" media="print" onload="this.media='all'">
+    <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/bundles/components-modals.min.css?v=<?= $cssVersionTimestamp ?>" media="print" onload="this.media='all'">
     <!-- Components: Notifications Bundle - Toast notifications, badge animations -->
-    <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/bundles/components-notifications.css?v=<?= $cssVersionTimestamp ?>" media="print" onload="this.media='all'">
+    <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/bundles/components-notifications.min.css?v=<?= $cssVersionTimestamp ?>" media="print" onload="this.media='all'">
 
     <!-- Utilities: Polish Bundle - Nexus polish, interactions, visual enhancements -->
-    <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/bundles/utilities-polish.css?v=<?= $cssVersionTimestamp ?>" media="print" onload="this.media='all'">
+    <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/bundles/utilities-polish.min.css?v=<?= $cssVersionTimestamp ?>" media="print" onload="this.media='all'">
     <!-- Utilities: Loading Bundle - Skeletons, lazy load, pull-to-refresh -->
-    <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/bundles/utilities-loading.css?v=<?= $cssVersionTimestamp ?>" media="print" onload="this.media='all'">
+    <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/bundles/utilities-loading.min.css?v=<?= $cssVersionTimestamp ?>" media="print" onload="this.media='all'">
     <!-- Utilities: Accessibility Bundle - Focus rings, screen reader, ARIA -->
-    <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/bundles/utilities-accessibility.css?v=<?= $cssVersionTimestamp ?>" media="print" onload="this.media='all'">
+    <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/bundles/utilities-accessibility.min.css?v=<?= $cssVersionTimestamp ?>" media="print" onload="this.media='all'">
 
     <!-- Page Transitions - Smooth fade/slide between pages -->
     <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/page-transitions.min.css?v=<?= $cssVersionTimestamp ?>" media="print" onload="this.media='all'">
@@ -167,21 +167,24 @@ try {
     <!-- CivicOne Utilities - Shared utility classes -->
     <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/civicone-utilities.css?v=<?= $cssVersionTimestamp ?>">
 
+    <!-- Modern Experimental Banner -->
+    <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/modern-experimental-banner.css?v=<?= $cssVersionTimestamp ?>">
+
     <!-- Legacy Enhancements Bundle (responsive, accessibility, extracted components) -->
     <!-- Combines 5 files: responsive-forms, responsive-tables, accessibility, feed-action-pills, ai-chat-widget -->
     <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/bundles/enhancements.min.css?v=<?= $cssVersionTimestamp ?>" media="print" onload="this.media='all'">
 
     <!-- Noscript fallbacks for async-loaded bundles -->
     <noscript>
-        <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/bundles/components-navigation.css?v=<?= $cssVersionTimestamp ?>">
-        <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/bundles/components-buttons.css?v=<?= $cssVersionTimestamp ?>">
-        <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/bundles/components-forms.css?v=<?= $cssVersionTimestamp ?>">
-        <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/bundles/components-cards.css?v=<?= $cssVersionTimestamp ?>">
-        <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/bundles/components-modals.css?v=<?= $cssVersionTimestamp ?>">
-        <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/bundles/components-notifications.css?v=<?= $cssVersionTimestamp ?>">
-        <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/bundles/utilities-polish.css?v=<?= $cssVersionTimestamp ?>">
-        <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/bundles/utilities-loading.css?v=<?= $cssVersionTimestamp ?>">
-        <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/bundles/utilities-accessibility.css?v=<?= $cssVersionTimestamp ?>">
+        <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/bundles/components-navigation.min.css?v=<?= $cssVersionTimestamp ?>">
+        <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/bundles/components-buttons.min.css?v=<?= $cssVersionTimestamp ?>">
+        <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/bundles/components-forms.min.css?v=<?= $cssVersionTimestamp ?>">
+        <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/bundles/components-cards.min.css?v=<?= $cssVersionTimestamp ?>">
+        <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/bundles/components-modals.min.css?v=<?= $cssVersionTimestamp ?>">
+        <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/bundles/components-notifications.min.css?v=<?= $cssVersionTimestamp ?>">
+        <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/bundles/utilities-polish.min.css?v=<?= $cssVersionTimestamp ?>">
+        <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/bundles/utilities-loading.min.css?v=<?= $cssVersionTimestamp ?>">
+        <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/bundles/utilities-accessibility.min.css?v=<?= $cssVersionTimestamp ?>">
         <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/bundles/enhancements.min.css?v=<?= $cssVersionTimestamp ?>">
     </noscript>
 
@@ -540,6 +543,120 @@ try {
         })();
     </script>
 
+    <!-- EMERGENCY: JavaScript-based style override to bypass ALL caching -->
+    <script>
+        (function() {
+            function applyEmergencyStyles() {
+                // Find all dropdowns
+                const dropdowns = document.querySelectorAll('.htb-dropdown-content');
+                dropdowns.forEach(dd => {
+                    dd.style.minWidth = 'auto';
+                    dd.style.maxWidth = 'max-content';
+                    dd.style.width = 'auto';
+                    dd.style.padding = '8px 0';
+                    dd.style.whiteSpace = 'normal';
+                });
+
+                // Find all dropdown links
+                const links = document.querySelectorAll('.htb-dropdown-content a');
+                links.forEach(link => {
+                    link.style.whiteSpace = 'nowrap';
+                    link.style.padding = '10px 16px';
+                    link.style.margin = '1px 6px';
+                });
+
+                // Fix mode switcher
+                const modeSwitcher = document.querySelector('.mode-switcher');
+                if (modeSwitcher) {
+                    modeSwitcher.style.gap = '4px';
+                    modeSwitcher.style.padding = '2px 6px 2px 2px';
+                    modeSwitcher.style.marginLeft = '4px';
+                    modeSwitcher.style.borderRadius = '16px';
+                    modeSwitcher.style.minHeight = '28px';
+                }
+
+                const modeIcon = document.querySelector('.mode-icon-container');
+                if (modeIcon) {
+                    modeIcon.style.width = '24px';
+                    modeIcon.style.height = '24px';
+                }
+
+                const modeIconI = document.querySelector('.mode-icon');
+                if (modeIconI) {
+                    modeIconI.style.fontSize = '11px';
+                }
+
+                const modeLabel = document.querySelector('.mode-label');
+                if (modeLabel) {
+                    modeLabel.style.fontSize = '10px';
+                    modeLabel.style.letterSpacing = '0.2px';
+                }
+            }
+
+            // Apply immediately
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', applyEmergencyStyles);
+            } else {
+                applyEmergencyStyles();
+            }
+
+            // Re-apply after a short delay to catch dynamically loaded content
+            setTimeout(applyEmergencyStyles, 100);
+            setTimeout(applyEmergencyStyles, 500);
+        })();
+    </script>
+
+    <!-- EMERGENCY CACHE OVERRIDE: Dark Mode Toggle Size Fix + Dropdown Width Fix -->
+    <style>
+        /* Dark Mode Toggle - Compact Size */
+        .nexus-utility-bar .mode-switcher,
+        .mode-switcher {
+            gap: 4px !important;
+            padding: 2px 6px 2px 2px !important;
+            margin-left: 4px !important;
+            border-radius: 16px !important;
+            min-height: 28px !important;
+        }
+        .mode-switcher .mode-icon-container,
+        .mode-icon-container {
+            width: 24px !important;
+            height: 24px !important;
+        }
+        .mode-switcher .mode-icon,
+        .mode-icon {
+            font-size: 11px !important;
+        }
+        .mode-switcher .mode-label,
+        .mode-label {
+            font-size: 10px !important;
+            letter-spacing: 0.2px !important;
+        }
+        /* Dropdown Width - Compact */
+        .htb-dropdown .htb-dropdown-content,
+        .nexus-utility-bar .htb-dropdown-content,
+        div.htb-dropdown-content,
+        .htb-dropdown-content {
+            min-width: auto !important;
+            max-width: max-content !important;
+            width: auto !important;
+            padding: 8px 0 !important;
+            white-space: normal !important;
+        }
+        /* Compact dropdown links */
+        .htb-dropdown-content a {
+            white-space: nowrap !important;
+            padding: 10px 16px !important;
+            margin: 1px 6px !important;
+        }
+        /* Remove extra bottom spacing in dropdown items */
+        .htb-dropdown-content a:last-child {
+            margin-bottom: 1px !important;
+        }
+        .htb-dropdown-content a:first-child {
+            margin-top: 1px !important;
+        }
+    </style>
+
 </head>
 
 <body class="nexus-skin-modern <?= $isHome ? 'nexus-home-page' : '' ?> <?= isset($_SESSION['user_id']) ? 'logged-in' : '' ?> <?= ((!empty($_SESSION['user_role']) && $_SESSION['user_role'] === 'admin') || !empty($_SESSION['is_super_admin'])) ? 'user-is-admin' : '' ?> <?= $bodyClass ?? '' ?>">
@@ -579,6 +696,9 @@ try {
             })();
         </script>
     <?php endif; ?>
+
+    <!-- Skip Link and Layout Banner -->
+    <?php require __DIR__ . '/partials/skip-link-and-banner.php'; ?>
 
     <!-- Layout Preview Banner (if in preview mode) -->
     <?php require __DIR__ . '/partials/preview-banner.php'; ?>
@@ -627,39 +747,8 @@ try {
                     <i class="fa-solid fa-chevron-right mode-arrow"></i>
                 </button>
                 <?php
-                $tSlug = '';
-                if (class_exists('\Nexus\Core\TenantContext')) {
-                    $tSlug = \Nexus\Core\TenantContext::get()['slug'] ?? '';
-                }
-                if ($tSlug !== 'public-sector-demo'):
+                // Layout dropdown removed - now using banner at top of page
                 ?>
-                    <div class="htb-dropdown desktop-only-dd">
-                        <button class="util-link">Layout <span class="htb-arrow">▾</span></button>
-                        <div class="htb-dropdown-content">
-                            <?php $lay = \Nexus\Services\LayoutHelper::get(); ?>
-                            <a href="?layout=modern" class="<?= $lay === 'modern' ? 'layout-option--modern' : '' ?>">
-                                ✓ Modern UI <span class="layout-badge--stable">(Stable)</span>
-                            </a>
-                            <div class="layout-divider"></div>
-                            <div class="layout-section-label">
-                                ⚠️ Experimental Layouts (Under Development)
-                            </div>
-                            <a href="?layout=civicone" class="layout-option--civicone <?= $lay === 'civicone' ? 'active' : '' ?>">
-                                Accessible UI <span class="layout-badge--beta">BETA</span>
-                            </a>
-                            <?php
-                            $tId = \Nexus\Core\TenantContext::getId();
-                            $isAllowedSocial = ($tId == 1) || ($tSlug === 'hour-timebank' || $tSlug === 'hour_timebank');
-                            if ($isAllowedSocial):
-                                $rootPath = \Nexus\Core\TenantContext::getBasePath();
-                                if (empty($rootPath)) $rootPath = '/';
-
-                            ?>
-                                </a>
-                            <?php endif; ?>
-                        </div>
-                    </div>
-                <?php endif; ?>
 
                 <?php if (isset($_SESSION['user_id'])): ?>
                     <div class="htb-dropdown">

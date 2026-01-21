@@ -11,7 +11,7 @@ if ($tSlug !== 'hour-timebank' && $tSlug !== 'hour_timebank') {
 $pageTitle = 'Strategic Plan 2026-2030';
 require dirname(__DIR__, 2) . '/layouts/civicone/header.php';
 ?>
-<link rel="stylesheet" href="<?= \Nexus\Core\TenantContext::getBasePath() ?>/assets/css/civicone-report-pages.css?v=<?= time() ?>">
+<link rel="stylesheet" href="<?= \Nexus\Core\TenantContext::getBasePath() ?>/assets/css/civicone-report-pages.min.css?v=<?= time() ?>">
 
 <div class="civic-container">
 

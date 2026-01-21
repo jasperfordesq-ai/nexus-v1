@@ -1,4 +1,4 @@
-<link rel="stylesheet" href="<?= \Nexus\Core\TenantContext::getBasePath() ?>/assets/css/civicone-feed-item.css?v=<?= time() ?>">
+<link rel="stylesheet" href="<?= \Nexus\Core\TenantContext::getBasePath() ?>/assets/css/civicone-feed-item.min.css?v=<?= time() ?>">
 <?php
 // Modern Feed Item Partial
 // Expects: $item (array), $isLoggedIn (bool), $userId (int), $timeElapsed (callable)
