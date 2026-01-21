@@ -42,6 +42,11 @@
 
     /* Typography */
     --font-family-primary:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+
+    /* Breakpoints */
+    --breakpoint-xs:320px;--breakpoint-sm:375px;--breakpoint-md:425px;
+    --breakpoint-lg:768px;--breakpoint-xl:1024px;
+    --breakpoint-2xl:1200px;--breakpoint-3xl:1440px;--breakpoint-4xl:1920px;
 }
 
 /* Dark Theme Tokens */

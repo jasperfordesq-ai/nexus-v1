@@ -32,11 +32,35 @@ if (!isset($hero)) {
     // Strip tenant base path if present (e.g., /hour-timebank/groups -> /groups)
     if (class_exists('\Nexus\Core\TenantContext')) {
         $basePath = \Nexus\Core\TenantContext::getBasePath();
+
+        // DEBUG: Log base path
+        error_log("HERO DEBUG: TenantContext::getBasePath() = '" . $basePath . "'");
+
         if (!empty($basePath) && $basePath !== '/' && strpos($currentPath, $basePath) === 0) {
             $currentPath = substr($currentPath, strlen($basePath));
             // Ensure path starts with /
             if (empty($currentPath) || $currentPath[0] !== '/') {
                 $currentPath = '/' . $currentPath;
+            }
+            error_log("HERO DEBUG: Stripped base path, new currentPath = " . $currentPath);
+        } else {
+            error_log("HERO DEBUG: Not stripping base path. Empty: " . (empty($basePath) ? 'YES' : 'NO') . ", Is root: " . ($basePath === '/' ? 'YES' : 'NO') . ", Starts with base: " . (strpos($currentPath, $basePath) === 0 ? 'YES' : 'NO'));
+
+            // If getBasePath() returns empty but REQUEST_URI has a tenant prefix, try to strip it manually
+            // Match pattern: /tenant-slug/route -> /route
+            if (empty($basePath) && preg_match('#^/([a-z0-9-]+)/(.+)$#', $currentPath, $matches)) {
+                // Check if this looks like a tenant path by trying both versions
+                $possibleTenantPath = '/' . $matches[1];
+                $possibleRoutePath = '/' . $matches[2];
+
+                error_log("HERO DEBUG: Trying to resolve without tenant prefix: " . $possibleRoutePath);
+                $testHero = \App\Helpers\HeroResolver::resolve($possibleRoutePath);
+
+                // If the route without tenant prefix has a title, use that path
+                if ($testHero && !empty($testHero['title'])) {
+                    $currentPath = $possibleRoutePath;
+                    error_log("HERO DEBUG: Using stripped path: " . $currentPath);
+                }
             }
         }
     }

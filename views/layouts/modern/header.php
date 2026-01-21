@@ -79,27 +79,38 @@ try {
     <meta name="application-name" content="NEXUS">
     <meta name="msapplication-TileColor" content="#6366f1">
 
-    <!-- Performance: Preconnect to critical domains only (max 4) -->
+    <!-- Performance: Resource Hints for Critical Resources -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="dns-prefetch" href="https://cdnjs.cloudflare.com">
     <link rel="dns-prefetch" href="https://api.mapbox.com">
+
+    <!-- Preload Critical CSS (above-the-fold) -->
+    <link rel="preload" as="style" href="<?= $assetBase ?>/assets/css/design-tokens.min.css?v=<?= $cssVersionTimestamp ?>">
+    <link rel="preload" as="style" href="<?= $assetBase ?>/assets/css/nexus-phoenix.min.css?v=<?= $cssVersionTimestamp ?>">
+    <link rel="preload" as="style" href="<?= $assetBase ?>/assets/css/bundles/core.min.css?v=<?= $cssVersionTimestamp ?>">
+
+    <!-- Preload JavaScript -->
+    <link rel="preload" as="script" href="/assets/js/mobile-interactions.js?v=<?= $cssVersionTimestamp ?>">
 
     <!-- Critical CSS Inline (Lighthouse: Save 660ms) -->
     <?php include __DIR__ . '/critical-css.php'; ?>
 
     <!-- DESIGN TOKENS (Shared variables - must load first) -->
     <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/design-tokens.min.css?v=<?= $cssVersionTimestamp ?>">
-    <!-- BREAKPOINTS (Centralized responsive breakpoints) -->
-    <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/breakpoints.css?v=<?= $cssVersionTimestamp ?>">
-    <!-- MOBILE DESIGN TOKENS (Mobile-specific spacing, typography, transitions) -->
-    <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/mobile-design-tokens.min.css?v=<?= $cssVersionTimestamp ?>">
-    <!-- MOBILE ACCESSIBILITY FIXES (WCAG 2.1 AAA touch target compliance) -->
-    <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/mobile-accessibility-fixes.min.css?v=<?= $cssVersionTimestamp ?>">
-    <!-- MOBILE LOADING STATES (Enhanced loading feedback and skeleton screens) -->
-    <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/mobile-loading-states.min.css?v=<?= $cssVersionTimestamp ?>">
-    <!-- MOBILE MICRO-INTERACTIONS (Haptic feedback, ripple effects, gesture feedback) -->
-    <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/mobile-micro-interactions.min.css?v=<?= $cssVersionTimestamp ?>">
+    <!-- BREAKPOINTS (Inlined in critical-css.php for performance) -->
+    <!-- MOBILE DESIGN TOKENS (Mobile-specific spacing, typography, transitions) - ASYNC LOAD -->
+    <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/mobile-design-tokens.min.css?v=<?= $cssVersionTimestamp ?>" media="print" onload="this.media='all'; this.onload=null;">
+    <noscript><link rel="stylesheet" href="<?= $assetBase ?>/assets/css/mobile-design-tokens.min.css?v=<?= $cssVersionTimestamp ?>"></noscript>
+    <!-- MOBILE ACCESSIBILITY FIXES (WCAG 2.1 AAA touch target compliance) - ASYNC LOAD -->
+    <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/mobile-accessibility-fixes.min.css?v=<?= $cssVersionTimestamp ?>" media="print" onload="this.media='all'; this.onload=null;">
+    <noscript><link rel="stylesheet" href="<?= $assetBase ?>/assets/css/mobile-accessibility-fixes.min.css?v=<?= $cssVersionTimestamp ?>"></noscript>
+    <!-- MOBILE LOADING STATES (Enhanced loading feedback and skeleton screens) - ASYNC LOAD -->
+    <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/mobile-loading-states.min.css?v=<?= $cssVersionTimestamp ?>" media="print" onload="this.media='all'; this.onload=null;">
+    <noscript><link rel="stylesheet" href="<?= $assetBase ?>/assets/css/mobile-loading-states.min.css?v=<?= $cssVersionTimestamp ?>"></noscript>
+    <!-- MOBILE MICRO-INTERACTIONS (Haptic feedback, ripple effects, gesture feedback) - ASYNC LOAD -->
+    <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/mobile-micro-interactions.min.css?v=<?= $cssVersionTimestamp ?>" media="print" onload="this.media='all'; this.onload=null;">
+    <noscript><link rel="stylesheet" href="<?= $assetBase ?>/assets/css/mobile-micro-interactions.min.css?v=<?= $cssVersionTimestamp ?>"></noscript>
     <!-- Theme Transitions - Smooth dark/light mode switching -->
     <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/theme-transitions.min.css?v=<?= $cssVersionTimestamp ?>">
     <!-- Base CSS - CSS variables, tokens, and global resets -->
