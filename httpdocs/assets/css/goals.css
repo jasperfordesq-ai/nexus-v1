@@ -1,10 +1,11 @@
 /* Goals Module CSS - Extracted from PHP files 2026-01-19 */
 /* Source files: create.php, delete.php, edit.php, index.php, show.php */
+/* MIGRATED TO DESIGN TOKENS - 2026-01-21 */
 
 /* ===== From: views/modern/goals/create.php ===== */
 /* ============================================
    GOALS CREATE - Holographic Glassmorphism
-   Pink/Rose Theme (#db2777)
+   Pink/Rose Theme (var(--color-pink-500))
    ============================================ */
 
 .holo-goal-page {
@@ -12,7 +13,7 @@
     padding: 180px 20px 60px;
     position: relative;
     overflow: hidden;
-    background: linear-gradient(135deg, #fdf2f8 0%, #fce7f3 50%, #fbcfe8 100%);
+    background: linear-gradient(135deg, var(--color-pink-50) 0%, var(--color-pink-100) 50%, var(--color-pink-200) 100%);
 }
 
 [data-theme="dark"] .holo-goal-page {
@@ -149,7 +150,7 @@
     width: 72px;
     height: 72px;
     margin: 0 auto 20px;
-    background: linear-gradient(135deg, #db2777 0%, #be185d 100%);
+    background: linear-gradient(135deg, var(--color-pink-600) 0%, var(--color-pink-700) 100%);
     border-radius: 20px;
     display: flex;
     align-items: center;
@@ -163,7 +164,7 @@
     font-size: 2rem;
     font-weight: 800;
     margin: 0 0 10px;
-    background: linear-gradient(135deg, #be185d 0%, #db2777 50%, #ec4899 100%);
+    background: linear-gradient(135deg, var(--color-pink-700) 0%, var(--color-pink-600) 50%, var(--color-pink-500) 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -171,14 +172,14 @@
 }
 
 [data-theme="dark"] .holo-title {
-    background: linear-gradient(135deg, #f472b6 0%, #ec4899 50%, #ffffff 100%);
+    background: linear-gradient(135deg, var(--color-pink-400) 0%, var(--color-pink-500) 50%, #ffffff 100%);
     -webkit-background-clip: text;
     background-clip: text;
 }
 
 .holo-subtitle {
     font-size: 1rem;
-    color: #64748b;
+    color: var(--color-slate-500);
     margin: 0;
 }
 
@@ -195,7 +196,7 @@
     display: block;
     font-size: 0.9rem;
     font-weight: 600;
-    color: #334155;
+    color: var(--color-slate-700);
     margin-bottom: 10px;
     padding-left: 4px;
 }
@@ -210,7 +211,7 @@
     border-radius: 16px;
     border: 2px solid rgba(219, 39, 119, 0.15);
     background: rgba(255, 255, 255, 0.6);
-    color: #1e293b;
+    color: var(--color-slate-800);
     font-size: 1rem;
     font-family: inherit;
     transition: all 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
@@ -219,24 +220,24 @@
 
 .holo-input:focus {
     outline: none;
-    border-color: #db2777;
+    border-color: var(--color-pink-600);
     background: rgba(255, 255, 255, 0.9);
     box-shadow: 0 0 0 4px rgba(219, 39, 119, 0.1);
 }
 
 .holo-input::placeholder {
-    color: #94a3b8;
+    color: var(--color-slate-400);
 }
 
 [data-theme="dark"] .holo-input {
     background: rgba(255, 255, 255, 0.08);
     border-color: rgba(255, 255, 255, 0.1);
-    color: #f8fafc;
+    color: var(--color-slate-50);
 }
 
 [data-theme="dark"] .holo-input:focus {
     background: rgba(255, 255, 255, 0.12);
-    border-color: #f472b6;
+    border-color: var(--color-pink-400);
     box-shadow: 0 0 0 4px rgba(244, 114, 182, 0.15);
 }
 
@@ -290,7 +291,7 @@ textarea.holo-input {
     width: 24px;
     height: 24px;
     margin-top: 2px;
-    accent-color: #22c55e;
+    accent-color: var(--color-green-500);
     cursor: pointer;
     flex-shrink: 0;
 }
@@ -305,7 +306,7 @@ textarea.holo-input {
     gap: 10px;
     font-size: 1.05rem;
     font-weight: 700;
-    color: #15803d;
+    color: var(--color-green-700);
     margin-bottom: 6px;
 }
 
@@ -314,12 +315,12 @@ textarea.holo-input {
 }
 
 [data-theme="dark"] .holo-buddy-title {
-    color: #86efac;
+    color: var(--color-green-300);
 }
 
 .holo-buddy-desc {
     font-size: 0.9rem;
-    color: #166534;
+    color: var(--color-green-800);
     line-height: 1.5;
 }
 
@@ -353,7 +354,7 @@ textarea.holo-input {
 }
 
 .holo-btn-primary {
-    background: linear-gradient(135deg, #db2777 0%, #be185d 100%);
+    background: linear-gradient(135deg, var(--color-pink-600) 0%, var(--color-pink-700) 100%);
     color: white;
     box-shadow: 0 8px 24px rgba(219, 39, 119, 0.35);
 }
@@ -369,13 +370,13 @@ textarea.holo-input {
 
 .holo-btn-secondary {
     background: transparent;
-    color: #64748b;
+    color: var(--color-slate-500);
     border: 2px solid rgba(100, 116, 139, 0.2);
 }
 
 .holo-btn-secondary:hover {
     background: rgba(100, 116, 139, 0.08);
-    color: #475569;
+    color: var(--color-slate-600);
 }
 
 [data-theme="dark"] .holo-btn-secondary {
@@ -396,7 +397,7 @@ textarea.holo-input {
     right: 0;
     z-index: 10001;
     padding: 14px 20px;
-    background: linear-gradient(135deg, #ef4444, #dc2626);
+    background: linear-gradient(135deg, var(--color-red-500), var(--color-red-600));
     color: white;
     font-size: 0.95rem;
     font-weight: 600;
@@ -447,7 +448,7 @@ textarea.holo-input {
         right: 0;
         z-index: 10001;
         padding: 12px 20px;
-        background: linear-gradient(135deg, #ef4444, #dc2626);
+        background: linear-gradient(135deg, var(--color-red-500), var(--color-red-600));
         color: white;
         font-size: 0.9rem;
         font-weight: 600;
@@ -517,23 +518,23 @@ textarea.holo-input {
     }
 
     [data-theme="dark"] .htb-card h2 {
-        color: #f1f5f9;
+        color: var(--color-slate-100);
     }
 
     [data-theme="dark"] .htb-card p[style*="color: #555"] {
-        color: #94a3b8 !important;
+        color: var(--color-slate-400) !important;
     }
 
     [data-theme="dark"] .htb-btn-secondary {
         background: rgba(51, 65, 85, 0.6) !important;
         border-color: rgba(255, 255, 255, 0.15) !important;
-        color: #e2e8f0 !important;
+        color: var(--color-slate-200) !important;
     }
 
 /* ===== From: views/modern/goals/edit.php ===== */
 /* ============================================
    GOALS EDIT - Holographic Glassmorphism
-   Pink/Rose Theme (#db2777)
+   Pink/Rose Theme (var(--color-pink-600))
    ============================================ */
 
 .holo-goal-page {
@@ -541,7 +542,7 @@ textarea.holo-input {
     padding: 180px 20px 60px;
     position: relative;
     overflow: hidden;
-    background: linear-gradient(135deg, #fdf2f8 0%, #fce7f3 50%, #fbcfe8 100%);
+    background: linear-gradient(135deg, var(--color-pink-50) 0%, var(--color-pink-100) 50%, var(--color-pink-200) 100%);
 }
 
 [data-theme="dark"] .holo-goal-page {
@@ -678,7 +679,7 @@ textarea.holo-input {
     width: 72px;
     height: 72px;
     margin: 0 auto 20px;
-    background: linear-gradient(135deg, #db2777 0%, #be185d 100%);
+    background: linear-gradient(135deg, var(--color-pink-600) 0%, var(--color-pink-700) 100%);
     border-radius: 20px;
     display: flex;
     align-items: center;
@@ -692,7 +693,7 @@ textarea.holo-input {
     font-size: 2rem;
     font-weight: 800;
     margin: 0 0 10px;
-    background: linear-gradient(135deg, #be185d 0%, #db2777 50%, #ec4899 100%);
+    background: linear-gradient(135deg, var(--color-pink-700) 0%, var(--color-pink-600) 50%, var(--color-pink-500) 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -700,14 +701,14 @@ textarea.holo-input {
 }
 
 [data-theme="dark"] .holo-title {
-    background: linear-gradient(135deg, #f472b6 0%, #ec4899 50%, #ffffff 100%);
+    background: linear-gradient(135deg, var(--color-pink-400) 0%, var(--color-pink-500) 50%, #ffffff 100%);
     -webkit-background-clip: text;
     background-clip: text;
 }
 
 .holo-subtitle {
     font-size: 1rem;
-    color: #64748b;
+    color: var(--color-slate-500);
     margin: 0;
 }
 
@@ -724,7 +725,7 @@ textarea.holo-input {
     display: block;
     font-size: 0.9rem;
     font-weight: 600;
-    color: #334155;
+    color: var(--color-slate-700);
     margin-bottom: 10px;
     padding-left: 4px;
 }
@@ -739,7 +740,7 @@ textarea.holo-input {
     border-radius: 16px;
     border: 2px solid rgba(219, 39, 119, 0.15);
     background: rgba(255, 255, 255, 0.6);
-    color: #1e293b;
+    color: var(--color-slate-800);
     font-size: 1rem;
     font-family: inherit;
     transition: all 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
@@ -748,24 +749,24 @@ textarea.holo-input {
 
 .holo-input:focus {
     outline: none;
-    border-color: #db2777;
+    border-color: var(--color-pink-600);
     background: rgba(255, 255, 255, 0.9);
     box-shadow: 0 0 0 4px rgba(219, 39, 119, 0.1);
 }
 
 .holo-input::placeholder {
-    color: #94a3b8;
+    color: var(--color-slate-400);
 }
 
 [data-theme="dark"] .holo-input {
     background: rgba(255, 255, 255, 0.08);
     border-color: rgba(255, 255, 255, 0.1);
-    color: #f8fafc;
+    color: var(--color-slate-50);
 }
 
 [data-theme="dark"] .holo-input:focus {
     background: rgba(255, 255, 255, 0.12);
-    border-color: #f472b6;
+    border-color: var(--color-pink-400);
     box-shadow: 0 0 0 4px rgba(244, 114, 182, 0.15);
 }
 
@@ -819,7 +820,7 @@ textarea.holo-input {
     width: 24px;
     height: 24px;
     margin-top: 2px;
-    accent-color: #22c55e;
+    accent-color: var(--color-green-500);
     cursor: pointer;
     flex-shrink: 0;
 }
@@ -834,7 +835,7 @@ textarea.holo-input {
     gap: 10px;
     font-size: 1.05rem;
     font-weight: 700;
-    color: #15803d;
+    color: var(--color-green-700);
     margin-bottom: 6px;
 }
 
@@ -843,12 +844,12 @@ textarea.holo-input {
 }
 
 [data-theme="dark"] .holo-buddy-title {
-    color: #86efac;
+    color: var(--color-green-300);
 }
 
 .holo-buddy-desc {
     font-size: 0.9rem;
-    color: #166534;
+    color: var(--color-green-800);
     line-height: 1.5;
 }
 
@@ -882,7 +883,7 @@ textarea.holo-input {
 
 .holo-btn-primary {
     flex: 2;
-    background: linear-gradient(135deg, #db2777 0%, #be185d 100%);
+    background: linear-gradient(135deg, var(--color-pink-600) 0%, var(--color-pink-700) 100%);
     color: white;
     box-shadow: 0 8px 24px rgba(219, 39, 119, 0.35);
 }
@@ -899,13 +900,13 @@ textarea.holo-input {
 .holo-btn-secondary {
     flex: 1;
     background: rgba(255, 255, 255, 0.5);
-    color: #64748b;
+    color: var(--color-slate-500);
     border: 2px solid rgba(100, 116, 139, 0.2);
 }
 
 .holo-btn-secondary:hover {
     background: rgba(255, 255, 255, 0.8);
-    color: #475569;
+    color: var(--color-slate-600);
 }
 
 [data-theme="dark"] .holo-btn-secondary {
@@ -936,19 +937,19 @@ textarea.holo-input {
     gap: 8px;
     font-size: 0.85rem;
     font-weight: 600;
-    color: #dc2626;
+    color: var(--color-red-600);
     margin-bottom: 16px;
     text-transform: uppercase;
     letter-spacing: 0.5px;
 }
 
 [data-theme="dark"] .holo-danger-label {
-    color: #f87171;
+    color: var(--color-red-500);
 }
 
 .holo-btn-danger {
     width: 100%;
-    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+    background: linear-gradient(135deg, var(--color-red-500) 0%, var(--color-red-600) 100%);
     color: white;
     box-shadow: 0 6px 20px rgba(239, 68, 68, 0.3);
 }
@@ -970,7 +971,7 @@ textarea.holo-input {
     right: 0;
     z-index: 10001;
     padding: 14px 20px;
-    background: linear-gradient(135deg, #ef4444, #dc2626);
+    background: linear-gradient(135deg, var(--color-red-500), var(--color-red-600));
     color: white;
     font-size: 0.95rem;
     font-weight: 600;
@@ -1031,7 +1032,7 @@ textarea.holo-input {
             right: 0;
             z-index: 10001;
             padding: 12px 20px;
-            background: linear-gradient(135deg, #ef4444, #dc2626);
+            background: linear-gradient(135deg, var(--color-red-500), var(--color-red-600));
             color: white;
             font-size: 0.9rem;
             font-weight: 600;
@@ -1126,7 +1127,7 @@ textarea.holo-input {
         }
 
         #goals-glass-wrapper a.glass-goal-card .view-link {
-            color: #84cc16;
+            color: var(--color-lime-500);
             font-weight: 700;
             display: inline-flex;
             align-items: center;
@@ -1135,7 +1136,7 @@ textarea.holo-input {
         }
 
         [data-theme="dark"] #goals-glass-wrapper a.glass-goal-card .view-link {
-            color: #a3e635;
+            color: var(--color-lime-400);
         }
 
         /* ===================================
@@ -1317,7 +1318,7 @@ textarea.holo-input {
 
         /* Glass Primary Button */
         #goals-glass-wrapper .glass-btn-primary {
-            background: linear-gradient(135deg, #84cc16 0%, #65a30d 100%);
+            background: linear-gradient(135deg, var(--color-lime-500) 0%, var(--color-lime-600) 100%);
             color: white;
             border: none;
             padding: 14px 28px;
@@ -1347,7 +1348,7 @@ textarea.holo-input {
             gap: 12px;
             margin: 40px 0 24px 0;
             padding-left: 16px;
-            border-left: 4px solid #84cc16;
+            border-left: 4px solid var(--color-lime-500);
         }
 
         #goals-glass-wrapper .section-header h2 {
@@ -1404,7 +1405,7 @@ textarea.holo-input {
 
         /* Card Header */
         #goals-glass-wrapper .card-header {
-            background: linear-gradient(135deg, #84cc16 0%, #65a30d 100%);
+            background: linear-gradient(135deg, var(--color-lime-500) 0%, var(--color-lime-600) 100%);
             padding: 20px 24px;
             position: relative;
             overflow: hidden;
@@ -1456,17 +1457,17 @@ textarea.holo-input {
 
         #goals-glass-wrapper .status-badge.active {
             background: rgba(255, 255, 255, 0.95);
-            color: #16a34a;
+            color: var(--color-green-600);
         }
 
         #goals-glass-wrapper .status-badge.completed {
             background: rgba(255, 255, 255, 0.95);
-            color: #0891b2;
+            color: var(--color-cyan-600);
         }
 
         #goals-glass-wrapper .status-badge.paused {
             background: rgba(255, 255, 255, 0.8);
-            color: #f59e0b;
+            color: var(--color-warning);
         }
 
         /* Card Body */
@@ -1491,7 +1492,7 @@ textarea.holo-input {
         }
 
         #goals-glass-wrapper .goal-title a:hover {
-            color: #84cc16;
+            color: var(--color-lime-500);
         }
 
         #goals-glass-wrapper .goal-author {
@@ -1504,7 +1505,7 @@ textarea.holo-input {
         }
 
         #goals-glass-wrapper .goal-author i {
-            color: #84cc16;
+            color: var(--color-lime-500);
         }
 
         #goals-glass-wrapper .goal-desc {
@@ -1537,7 +1538,7 @@ textarea.holo-input {
         }
 
         #goals-glass-wrapper .buddy-info i {
-            color: #84cc16;
+            color: var(--color-lime-500);
         }
 
         #goals-glass-wrapper .buddy-info strong {
@@ -1545,7 +1546,7 @@ textarea.holo-input {
         }
 
         #goals-glass-wrapper .view-link {
-            color: #84cc16;
+            color: var(--color-lime-500);
             font-weight: 700;
             text-decoration: none;
             display: inline-flex;
@@ -1555,12 +1556,12 @@ textarea.holo-input {
         }
 
         #goals-glass-wrapper .view-link:hover {
-            color: #65a30d;
+            color: var(--color-lime-600);
             gap: 10px;
         }
 
         [data-theme="dark"] #goals-glass-wrapper .view-link {
-            color: #a3e635;
+            color: var(--color-lime-400);
         }
 
         /* Create Goal Card */
@@ -1702,7 +1703,7 @@ textarea.holo-input {
         #goals-glass-wrapper .nexus-welcome-title {
             font-size: 1.75rem;
             font-weight: 800;
-            background: linear-gradient(135deg, #65a30d, #84cc16, #a3e635);
+            background: linear-gradient(135deg, var(--color-lime-600), var(--color-lime-500), var(--color-lime-400));
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
@@ -1743,7 +1744,7 @@ textarea.holo-input {
         #goals-glass-wrapper .nexus-smart-btn i { font-size: 1rem; }
 
         #goals-glass-wrapper .nexus-smart-btn-primary {
-            background: linear-gradient(135deg, #84cc16, #a3e635);
+            background: linear-gradient(135deg, var(--color-lime-500), var(--color-lime-400));
             color: white;
             box-shadow: 0 4px 14px rgba(132, 204, 22, 0.35);
         }
@@ -1755,19 +1756,19 @@ textarea.holo-input {
 
         #goals-glass-wrapper .nexus-smart-btn-secondary {
             background: linear-gradient(135deg, rgba(132, 204, 22, 0.1), rgba(163, 230, 53, 0.1));
-            color: #65a30d;
+            color: var(--color-lime-600);
             border-color: rgba(132, 204, 22, 0.3);
         }
 
         [data-theme="dark"] #goals-glass-wrapper .nexus-smart-btn-secondary {
             background: linear-gradient(135deg, rgba(132, 204, 22, 0.2), rgba(163, 230, 53, 0.15));
-            color: #bef264;
+            color: var(--color-lime-300);
             border-color: rgba(132, 204, 22, 0.4);
         }
 
         #goals-glass-wrapper .nexus-smart-btn-secondary:hover,
         #goals-glass-wrapper .nexus-smart-btn-outline:hover {
-            background: linear-gradient(135deg, #84cc16, #a3e635);
+            background: linear-gradient(135deg, var(--color-lime-500), var(--color-lime-400));
             color: white;
             border-color: transparent;
             transform: translateY(-2px);
@@ -1804,7 +1805,7 @@ textarea.holo-input {
         right: 0;
         z-index: 10001;
         padding: 12px 20px;
-        background: linear-gradient(135deg, #ef4444, #dc2626);
+        background: linear-gradient(135deg, var(--color-red-500), var(--color-red-600));
         color: white;
         font-size: 0.9rem;
         font-weight: 600;
@@ -1872,12 +1873,12 @@ textarea.holo-input {
     */
         --glass-bg: rgba(255, 255, 255, 0.55);
         --glass-border: rgba(255, 255, 255, 0.4);
-        --text-color: #1e293b;
-        --text-muted: #475569;
-        --accent-color: #db2777;
+        --text-color: var(--color-slate-800);
+        --text-muted: var(--color-slate-600);
+        --accent-color: var(--color-pink-600);
         /* Pink/Rose for Goals */
-        --success-color: #059669;
-        --heading-gradient: linear-gradient(135deg, #be185d 0%, #db2777 100%);
+        --success-color: var(--color-success);
+        --heading-gradient: linear-gradient(135deg, var(--color-pink-700) 0%, var(--color-pink-600) 100%);
 
         /* Subtle iridescent shadow for light mode */
         --box-shadow:
@@ -1894,15 +1895,15 @@ textarea.holo-input {
         /* Status Card Variables (Light) */
         --status-blue-bg: rgba(59, 130, 246, 0.15);
         --status-blue-border: rgba(59, 130, 246, 0.3);
-        --status-blue-text: #1d4ed8;
+        --status-blue-text: var(--color-blue-700);
 
         --status-amber-bg: rgba(245, 158, 11, 0.15);
         --status-amber-border: rgba(245, 158, 11, 0.3);
-        --status-amber-text: #b45309;
+        --status-amber-text: var(--color-amber-700);
 
         --status-gray-bg: rgba(148, 163, 184, 0.15);
         --status-gray-border: rgba(148, 163, 184, 0.3);
-        --status-gray-text: #475569;
+        --status-gray-text: var(--color-slate-600);
 
         /* Layout & Alignment */
         display: flex;
@@ -1919,7 +1920,7 @@ textarea.holo-input {
         line-height: 1.6;
 
         /* Background: Adaptive Mesh Gradient (Pink/Rose for Goals) */
-        background: radial-gradient(circle at 50% 0%, #fdf2f8 0%, #fce7f3 100%);
+        background: radial-gradient(circle at 50% 0%, var(--color-pink-50) 0%, var(--color-pink-100) 100%);
         background-attachment: fixed;
     }
 
@@ -1932,9 +1933,9 @@ textarea.holo-input {
     html[data-theme="light"] #unique-glass-page-wrapper {
         --glass-bg: rgba(255, 255, 255, 0.55);
         --glass-border: rgba(255, 255, 255, 0.4);
-        --text-color: #1e293b;
-        --text-muted: #475569;
-        --heading-gradient: linear-gradient(135deg, #be185d 0%, #db2777 100%);
+        --text-color: var(--color-slate-800);
+        --text-muted: var(--color-slate-600);
+        --heading-gradient: linear-gradient(135deg, var(--color-pink-700) 0%, var(--color-pink-600) 100%);
         --box-shadow:
             0 8px 32px 0 rgba(31, 38, 135, 0.1),
             inset 0 0 0 1px rgba(255, 255, 255, 0.2);
@@ -1943,27 +1944,27 @@ textarea.holo-input {
 
         --status-blue-bg: rgba(59, 130, 246, 0.15);
         --status-blue-border: rgba(59, 130, 246, 0.3);
-        --status-blue-text: #1d4ed8;
+        --status-blue-text: var(--color-blue-700);
 
         --status-amber-bg: rgba(245, 158, 11, 0.15);
         --status-amber-border: rgba(245, 158, 11, 0.3);
-        --status-amber-text: #b45309;
+        --status-amber-text: var(--color-amber-700);
 
         --status-gray-bg: rgba(148, 163, 184, 0.15);
         --status-gray-border: rgba(148, 163, 184, 0.3);
-        --status-gray-text: #475569;
+        --status-gray-text: var(--color-slate-600);
 
-        background: radial-gradient(circle at 50% 0%, #fdf2f8 0%, #fce7f3 100%);
+        background: radial-gradient(circle at 50% 0%, var(--color-pink-50) 0%, var(--color-pink-100) 100%);
     }
 
     /* DARK MODE EXPLICIT */
     html[data-theme="dark"] #unique-glass-page-wrapper {
         --glass-bg: rgba(24, 24, 27, 0.45);
         --glass-border: rgba(255, 255, 255, 0.15);
-        --text-color: #fce7f3;
+        --text-color: var(--color-pink-100);
         --text-muted: rgba(255, 255, 255, 0.7);
-        --accent-color: #f472b6;
-        --heading-gradient: linear-gradient(135deg, #ffffff 0%, #fbcfe8 100%);
+        --accent-color: var(--color-pink-400);
+        --heading-gradient: linear-gradient(135deg, #ffffff 0%, var(--color-pink-200) 100%);
 
         /* Vivid Dark Mode Shadows */
         --box-shadow:
@@ -1980,15 +1981,15 @@ textarea.holo-input {
         /* Dark Mode Status Cards */
         --status-blue-bg: rgba(30, 58, 138, 0.3);
         --status-blue-border: rgba(59, 130, 246, 0.3);
-        --status-blue-text: #93c5fd;
+        --status-blue-text: var(--color-blue-300);
 
         --status-amber-bg: rgba(120, 53, 15, 0.3);
         --status-amber-border: rgba(245, 158, 11, 0.3);
-        --status-amber-text: #fcd34d;
+        --status-amber-text: var(--color-amber-300);
 
         --status-gray-bg: rgba(30, 41, 59, 0.3);
         --status-gray-border: rgba(148, 163, 184, 0.2);
-        --status-gray-text: #94a3b8;
+        --status-gray-text: var(--color-slate-400);
 
         background: radial-gradient(circle at 50% 0%, rgb(39, 10, 25) 0%, rgb(20, 10, 20) 90%);
     }
@@ -2144,7 +2145,7 @@ textarea.holo-input {
 
     /* Variants */
     #unique-glass-page-wrapper .btn-primary {
-        background: linear-gradient(135deg, #db2777 0%, #be185d 100%);
+        background: linear-gradient(135deg, var(--color-pink-600) 0%, var(--color-pink-700) 100%);
         color: white;
     }
 
@@ -2155,7 +2156,7 @@ textarea.holo-input {
     }
 
     #unique-glass-page-wrapper .btn-success {
-        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        background: linear-gradient(135deg, var(--color-success) 0%, var(--color-success) 100%);
         color: white;
     }
 

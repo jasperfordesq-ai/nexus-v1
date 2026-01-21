@@ -15,10 +15,10 @@
 .collections-wrapper,
 .seasons-wrapper,
 .shop-wrapper {
-    margin-top: 120px;
+    margin-top: var(--space-20);
     position: relative;
     z-index: 20;
-    padding: 0 20px 60px;
+    padding: 0 var(--space-5) var(--space-16);
     max-width: 1200px;
     margin-left: auto;
     margin-right: auto;
@@ -29,12 +29,12 @@
 .challenges-nav,
 .collections-nav {
     display: flex;
-    gap: 12px;
-    margin-bottom: 30px;
+    gap: var(--space-3);
+    margin-bottom: var(--space-8);
     overflow-x: auto;
     scrollbar-width: none;
     -ms-overflow-style: none;
-    padding-bottom: 4px;
+    padding-bottom: var(--space-1);
 }
 
 .achievements-nav::-webkit-scrollbar,
@@ -49,13 +49,13 @@
 }
 
 .nav-pill {
-    padding: 10px 20px;
-    border-radius: 25px;
+    padding: var(--space-3) var(--space-5);
+    border-radius: var(--radius-full);
     background: rgba(255, 255, 255, 0.1);
     color: white;
     text-decoration: none;
-    font-weight: 500;
-    transition: all 0.2s;
+    font-weight: var(--font-weight-medium);
+    transition: all var(--transition-fast);
 }
 
 .nav-pill:hover,
@@ -68,17 +68,17 @@
 .back-link {
     display: inline-flex;
     align-items: center;
-    gap: 8px;
+    gap: var(--space-2);
     color: white;
     text-decoration: none;
-    font-weight: 600;
-    margin-bottom: 20px;
-    padding: 8px 16px;
+    font-weight: var(--font-weight-semibold);
+    margin-bottom: var(--space-5);
+    padding: var(--space-2) var(--space-4);
     background: rgba(0, 0, 0, 0.2);
-    border-radius: 20px;
-    -webkit-backdrop-filter: blur(4px);
-    backdrop-filter: blur(4px);
-    transition: background 0.2s;
+    border-radius: var(--space-5);
+    -webkit-backdrop-filter: blur(var(--space-1));
+    backdrop-filter: blur(var(--space-1));
+    transition: background var(--transition-fast);
 }
 
 .back-link:hover {
@@ -88,18 +88,18 @@
 /* Empty States */
 .empty-state {
     text-align: center;
-    padding: 60px 20px;
+    padding: var(--space-16) var(--space-5);
     color: white;
 }
 
 .empty-state-icon {
-    font-size: 64px;
-    margin-bottom: 20px;
+    font-size: var(--space-16);
+    margin-bottom: var(--space-5);
 }
 
 .empty-state h3 {
-    font-size: 24px;
-    margin-bottom: 10px;
+    font-size: var(--space-6);
+    margin-bottom: var(--space-3);
 }
 
 .empty-state p {
@@ -110,12 +110,12 @@
 .view-all-link {
     display: inline-flex;
     align-items: center;
-    gap: 8px;
+    gap: var(--space-2);
     color: var(--color-primary-500);
-    font-weight: 600;
+    font-weight: var(--font-weight-semibold);
     text-decoration: none;
-    margin-top: 16px;
-    transition: color 0.2s;
+    margin-top: var(--space-4);
+    transition: color var(--transition-fast);
 }
 
 .view-all-link:hover {
@@ -126,19 +126,19 @@
 .success-toast {
     background: var(--color-success);
     color: white;
-    padding: 12px 20px;
-    border-radius: 10px;
-    margin-bottom: 20px;
+    padding: var(--space-3) var(--space-5);
+    border-radius: var(--space-3);
+    margin-bottom: var(--space-5);
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: var(--space-3);
     border: 1px solid var(--color-success);
-    transition: opacity 0.3s ease, transform 0.3s ease;
+    transition: opacity var(--transition-base), transform 0.3s ease;
 }
 
 /* Showcase Save Button (hidden by default, shown via JS) */
 .showcase-save-btn {
-    margin-top: 16px;
+    margin-top: var(--space-4);
     display: none;
 }
 
@@ -150,27 +150,27 @@
 .hero-stats-banner {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
-    gap: 16px;
-    margin-bottom: 28px;
+    gap: var(--space-4);
+    margin-bottom: var(--space-8);
 }
 
 .hero-stat-card {
     background: rgba(255, 255, 255, 0.95);
-    -webkit-backdrop-filter: blur(20px);
-    backdrop-filter: blur(20px);
-    border-radius: 16px;
-    padding: 20px;
+    -webkit-backdrop-filter: blur(var(--space-5));
+    backdrop-filter: blur(var(--space-5));
+    border-radius: var(--space-4);
+    padding: var(--space-5);
     display: flex;
     align-items: center;
-    gap: 16px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    gap: var(--space-4);
+    box-shadow: 0 var(--space-1) var(--space-5) rgba(0, 0, 0, 0.08);
     border: 1px solid rgba(255, 255, 255, 0.4);
-    transition: transform 0.2s, box-shadow 0.2s;
+    transition: transform var(--transition-fast), box-shadow 0.2s;
 }
 
 .hero-stat-card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 28px rgba(0, 0, 0, 0.12);
+    transform: translateY(-var(--space-1));
+    box-shadow: 0 var(--space-2) var(--space-8) rgba(0, 0, 0, 0.12);
 }
 
 .hero-stat-card.level-card {
@@ -179,13 +179,13 @@
 }
 
 .hero-stat-icon {
-    width: 56px;
-    height: 56px;
-    border-radius: 14px;
+    width: var(--space-16);
+    height: var(--space-16);
+    border-radius: var(--space-4);
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 24px;
+    font-size: var(--space-6);
     flex-shrink: 0;
 }
 
@@ -206,8 +206,8 @@
 
 /* Level Ring */
 .level-ring {
-    width: 56px;
-    height: 56px;
+    width: var(--space-16);
+    height: var(--space-16);
     border-radius: 50%;
     background: conic-gradient(
         var(--color-primary-500) calc(var(--progress) * 3.6deg),
@@ -222,15 +222,15 @@
 .level-ring::before {
     content: '';
     position: absolute;
-    inset: 4px;
+    inset: var(--space-1);
     background: white;
     border-radius: 50%;
 }
 
 .level-number {
     position: relative;
-    font-size: 1.5rem;
-    font-weight: 800;
+    font-size: var(--font-size-2xl);
+    font-weight: var(--font-weight-bold);
     color: var(--color-primary-500);
 }
 
@@ -240,30 +240,30 @@
 }
 
 .hero-stat-value {
-    font-size: 1.5rem;
-    font-weight: 800;
+    font-size: var(--font-size-2xl);
+    font-weight: var(--font-weight-bold);
     color: var(--color-gray-800);
     line-height: 1.2;
 }
 
 .hero-stat-label {
-    font-size: 0.8rem;
+    font-size: var(--font-size-sm);
     color: var(--color-gray-500);
-    font-weight: 500;
+    font-weight: var(--font-weight-medium);
 }
 
 /* Two-Column Layout */
 .achievements-grid-v2 {
     display: grid;
     grid-template-columns: 1fr 380px;
-    gap: 24px;
+    gap: var(--space-6);
 }
 
 .achievements-column-main,
 .achievements-column-side {
     display: flex;
     flex-direction: column;
-    gap: 20px;
+    gap: var(--space-5);
 }
 
 /* Level Badge in Card Header */
@@ -271,10 +271,10 @@
     margin-left: auto;
     background: linear-gradient(135deg, var(--color-primary-500), var(--color-purple-500));
     color: white;
-    padding: 4px 12px;
-    border-radius: 20px;
-    font-size: 0.75rem;
-    font-weight: 700;
+    padding: var(--space-1) var(--space-3);
+    border-radius: var(--space-5);
+    font-size: var(--font-size-xs);
+    font-weight: var(--font-weight-bold);
 }
 
 /* Badge Count in Card Header */
@@ -282,10 +282,10 @@
     margin-left: auto;
     background: rgba(99, 102, 241, 0.1);
     color: var(--color-primary-500);
-    padding: 4px 12px;
-    border-radius: 20px;
-    font-size: 0.8rem;
-    font-weight: 700;
+    padding: var(--space-1) var(--space-3);
+    border-radius: var(--space-5);
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-bold);
 }
 
 /* XP Progress Card */
@@ -294,36 +294,36 @@
 }
 
 .xp-progress-section {
-    padding: 8px 0;
+    padding: var(--space-2) 0;
 }
 
 .xp-bar-wrapper {
-    margin-bottom: 16px;
+    margin-bottom: var(--space-4);
 }
 
 .xp-bar-track {
-    height: 20px;
+    height: var(--space-5);
     background: var(--color-gray-200);
-    border-radius: 12px;
+    border-radius: var(--space-3);
     overflow: hidden;
     position: relative;
-    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.06);
+    box-shadow: inset 0 var(--space-1) var(--space-1) rgba(0, 0, 0, 0.06);
 }
 
 .xp-bar-fill {
     height: 100%;
     background: linear-gradient(90deg, var(--color-primary-500), var(--color-purple-500), var(--color-purple-500));
-    border-radius: 12px;
+    border-radius: var(--space-3);
     position: relative;
-    min-width: 20px;
-    transition: width 0.6s ease-out;
+    min-width: var(--space-5);
+    transition: width var(--transition-slow);
 }
 
 .xp-bar-glow {
     position: absolute;
     inset: 0;
     background: linear-gradient(90deg, transparent 60%, rgba(255, 255, 255, 0.4));
-    border-radius: 12px;
+    border-radius: var(--space-3);
     animation: xp-shimmer 2s infinite;
 }
 
@@ -336,43 +336,43 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-top: 10px;
-    font-size: 0.8rem;
+    margin-top: var(--space-3);
+    font-size: var(--font-size-sm);
     color: var(--color-gray-500);
 }
 
 .xp-current {
-    font-weight: 700;
+    font-weight: var(--font-weight-bold);
     color: var(--color-primary-500);
 }
 
 .xp-hint {
     text-align: center;
-    font-size: 0.85rem;
+    font-size: var(--font-size-sm);
     color: var(--color-gray-400);
     margin: 0;
 }
 
 .xp-hint.xp-max {
     color: var(--color-success);
-    font-weight: 600;
+    font-weight: var(--font-weight-semibold);
 }
 
 /* Streaks List Layout */
 .streaks-list {
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: var(--space-3);
 }
 
 .streak-row {
     display: flex;
     align-items: center;
-    gap: 12px;
-    padding: 12px 14px;
+    gap: var(--space-3);
+    padding: var(--space-3) var(--space-4);
     background: rgba(99, 102, 241, 0.04);
-    border-radius: 12px;
-    transition: all 0.2s;
+    border-radius: var(--space-3);
+    transition: all var(--transition-fast);
 }
 
 .streak-row:hover {
@@ -385,17 +385,17 @@
 }
 
 .streak-icon-wrap {
-    width: 40px;
-    height: 40px;
+    width: var(--space-10);
+    height: var(--space-10);
     /* Fallback for browsers without color-mix() */
     background: linear-gradient(135deg, var(--streak-color, var(--color-primary-500)), var(--color-primary-600));
-    border-radius: 10px;
+    border-radius: var(--space-3);
     display: flex;
     align-items: center;
     justify-content: center;
     font-size: 1.2rem;
     flex-shrink: 0;
-    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+    box-shadow: 0 var(--space-1) var(--space-3) rgba(99, 102, 241, 0.3);
 }
 
 @supports (background: color-mix(in srgb, red, blue)) {
@@ -410,20 +410,20 @@
 }
 
 .streak-name {
-    font-weight: 600;
+    font-weight: var(--font-weight-semibold);
     color: var(--color-gray-800);
-    font-size: 0.95rem;
+    font-size: var(--font-size-base);
 }
 
 .streak-meta {
-    font-size: 0.75rem;
+    font-size: var(--font-size-xs);
     color: var(--color-gray-400);
 }
 
 .streak-value {
     text-align: right;
-    font-size: 1.5rem;
-    font-weight: 800;
+    font-size: var(--font-size-2xl);
+    font-weight: var(--font-weight-bold);
     color: var(--color-gray-400);
     line-height: 1;
 }
@@ -434,27 +434,27 @@
 
 .streak-value span {
     display: block;
-    font-size: 0.65rem;
-    font-weight: 500;
+    font-size: var(--font-size-xs);
+    font-weight: var(--font-weight-medium);
     color: var(--color-gray-400);
-    margin-top: 2px;
+    margin-top: var(--space-1);
 }
 
 /* Rankings List Layout */
 .rankings-list {
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: var(--space-3);
 }
 
 .rank-row {
     display: flex;
     align-items: center;
-    gap: 12px;
-    padding: 10px 14px;
+    gap: var(--space-3);
+    padding: var(--space-3) var(--space-4);
     background: rgba(251, 191, 36, 0.04);
-    border-radius: 10px;
-    transition: all 0.2s;
+    border-radius: var(--space-3);
+    transition: all var(--transition-fast);
 }
 
 .rank-row:hover {
@@ -466,12 +466,12 @@
     height: 36px;
     /* Fallback for browsers without color-mix() */
     background: linear-gradient(135deg, var(--rank-color, var(--color-warning)), var(--color-warning));
-    border-radius: 8px;
+    border-radius: var(--space-2);
     display: flex;
     align-items: center;
     justify-content: center;
     color: white;
-    font-size: 0.9rem;
+    font-size: var(--font-size-sm);
     flex-shrink: 0;
 }
 
@@ -483,14 +483,14 @@
 
 .rank-row .rank-label {
     flex: 1;
-    font-weight: 500;
+    font-weight: var(--font-weight-medium);
     color: var(--color-gray-600);
-    font-size: 0.9rem;
+    font-size: var(--font-size-sm);
 }
 
 .rank-value {
-    font-size: 1.1rem;
-    font-weight: 700;
+    font-size: var(--font-size-lg);
+    font-weight: var(--font-weight-bold);
     color: var(--color-warning);
 }
 
@@ -498,24 +498,24 @@
 .badges-showcase {
     display: grid;
     grid-template-columns: repeat(6, 1fr);
-    gap: 10px;
+    gap: var(--space-3);
 }
 
 .badge-showcase-item {
     aspect-ratio: 1;
     background: linear-gradient(135deg, rgba(168, 85, 247, 0.1), rgba(139, 92, 246, 0.05));
-    border-radius: 12px;
+    border-radius: var(--space-3);
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    transition: all 0.2s;
-    border: 2px solid transparent;
+    transition: all var(--transition-fast);
+    border: var(--space-1) solid transparent;
 }
 
 .badge-showcase-item:hover {
     transform: scale(1.08);
-    box-shadow: 0 4px 16px rgba(168, 85, 247, 0.25);
+    box-shadow: 0 var(--space-1) var(--space-4) rgba(168, 85, 247, 0.25);
 }
 
 .badge-showcase-item:focus {
@@ -552,8 +552,8 @@
 .activity-item {
     display: flex;
     align-items: flex-start;
-    gap: 12px;
-    padding: 12px 0;
+    gap: var(--space-3);
+    padding: var(--space-3) 0;
     border-bottom: 1px solid rgba(0, 0, 0, 0.05);
     position: relative;
 }
@@ -563,11 +563,11 @@
 }
 
 .activity-dot {
-    width: 10px;
-    height: 10px;
+    width: var(--space-3);
+    height: var(--space-3);
     background: linear-gradient(135deg, var(--color-success), var(--color-success));
     border-radius: 50%;
-    margin-top: 6px;
+    margin-top: var(--space-2);
     flex-shrink: 0;
     box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.15);
 }
@@ -578,22 +578,22 @@
 }
 
 .activity-text {
-    font-size: 0.9rem;
-    font-weight: 500;
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-medium);
     color: var(--color-gray-800);
     line-height: 1.4;
 }
 
 .activity-time {
-    font-size: 0.75rem;
+    font-size: var(--font-size-xs);
     color: var(--color-gray-400);
-    margin-top: 2px;
+    margin-top: var(--space-1);
 }
 
 .activity-xp {
-    font-weight: 700;
+    font-weight: var(--font-weight-bold);
     color: var(--color-success);
-    font-size: 0.9rem;
+    font-size: var(--font-size-sm);
     flex-shrink: 0;
 }
 
@@ -601,7 +601,7 @@
 .stats-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: 12px;
+    gap: var(--space-3);
 }
 
 .stats-grid .stat-item {
@@ -609,33 +609,33 @@
     flex-direction: column;
     align-items: center;
     text-align: center;
-    padding: 16px 12px;
+    padding: var(--space-4) var(--space-3);
     background: rgba(99, 102, 241, 0.04);
-    border-radius: 12px;
-    transition: all 0.2s;
+    border-radius: var(--space-3);
+    transition: all var(--transition-fast);
 }
 
 .stats-grid .stat-item:hover {
     background: rgba(99, 102, 241, 0.08);
-    transform: translateY(-2px);
+    transform: translateY(-var(--space-1));
 }
 
 .stat-icon {
     width: 36px;
     height: 36px;
     background: linear-gradient(135deg, var(--color-primary-500), var(--color-purple-500));
-    border-radius: 10px;
+    border-radius: var(--space-3);
     display: flex;
     align-items: center;
     justify-content: center;
     color: white;
-    font-size: 0.9rem;
-    margin-bottom: 10px;
+    font-size: var(--font-size-sm);
+    margin-bottom: var(--space-3);
 }
 
 .stats-grid .stat-value {
     font-size: 1.4rem;
-    font-weight: 800;
+    font-weight: var(--font-weight-bold);
     color: var(--color-gray-800);
     line-height: 1;
 }
@@ -643,55 +643,55 @@
 .stats-grid .stat-label {
     font-size: 0.7rem;
     color: var(--color-gray-500);
-    margin-top: 6px;
-    font-weight: 500;
+    margin-top: var(--space-2);
+    font-weight: var(--font-weight-medium);
 }
 
 /* Compact Empty State */
 .empty-state.compact {
-    padding: 24px 16px;
+    padding: var(--space-6) var(--space-4);
 }
 
 .empty-state.compact .empty-icon {
-    font-size: 2rem;
-    margin-bottom: 8px;
+    font-size: var(--font-size-3xl);
+    margin-bottom: var(--space-2);
 }
 
 .empty-state.compact p {
     margin: 0;
-    font-size: 0.9rem;
+    font-size: var(--font-size-sm);
 }
 
 /* Empty State CTA */
 .empty-state .cta-btn {
     display: inline-flex;
     align-items: center;
-    gap: 8px;
-    margin-top: 16px;
-    padding: 10px 20px;
+    gap: var(--space-2);
+    margin-top: var(--space-4);
+    padding: var(--space-3) var(--space-5);
     background: linear-gradient(135deg, var(--color-primary-500), var(--color-purple-500));
     color: white;
-    border-radius: 12px;
+    border-radius: var(--space-3);
     text-decoration: none;
-    font-weight: 600;
-    font-size: 0.9rem;
-    transition: transform 0.2s, box-shadow 0.2s;
+    font-weight: var(--font-weight-semibold);
+    font-size: var(--font-size-sm);
+    transition: transform var(--transition-fast), box-shadow 0.2s;
 }
 
 .empty-state .cta-btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 16px rgba(99, 102, 241, 0.4);
+    transform: translateY(-var(--space-1));
+    box-shadow: 0 var(--space-1) var(--space-4) rgba(99, 102, 241, 0.4);
 }
 
 .empty-state.compact .cta-btn {
-    margin-top: 12px;
-    padding: 8px 16px;
-    font-size: 0.85rem;
+    margin-top: var(--space-3);
+    padding: var(--space-2) var(--space-4);
+    font-size: var(--font-size-sm);
 }
 
 /* Nav Pills with Icons */
 .nav-pill i {
-    margin-right: 6px;
+    margin-right: var(--space-2);
 }
 
 /* =================================================================
@@ -702,7 +702,7 @@
 @keyframes card-enter {
     from {
         opacity: 0;
-        transform: translateY(20px);
+        transform: translateY(var(--space-5));
     }
     to {
         opacity: 1;
@@ -734,7 +734,7 @@
 /* Streak row pulse for active streaks */
 @keyframes streak-pulse {
     0%, 100% { box-shadow: inset 3px 0 0 var(--streak-color, var(--color-primary-500)); }
-    50% { box-shadow: inset 3px 0 0 var(--streak-color, var(--color-primary-500)), 0 0 12px rgba(99, 102, 241, 0.2); }
+    50% { box-shadow: inset 3px 0 0 var(--streak-color, var(--color-primary-500)), 0 0 var(--space-3) rgba(99, 102, 241, 0.2); }
 }
 
 .streak-row.active {
@@ -743,8 +743,8 @@
 
 /* Badge showcase hover pulse */
 @keyframes badge-pulse {
-    0%, 100% { box-shadow: 0 4px 16px rgba(168, 85, 247, 0.25); }
-    50% { box-shadow: 0 4px 24px rgba(168, 85, 247, 0.4); }
+    0%, 100% { box-shadow: 0 var(--space-1) var(--space-4) rgba(168, 85, 247, 0.25); }
+    50% { box-shadow: 0 var(--space-1) var(--space-6) rgba(168, 85, 247, 0.4); }
 }
 
 .badge-showcase-item:hover {
@@ -763,7 +763,7 @@
 /* Activity dot pulse */
 @keyframes dot-pulse {
     0%, 100% { box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.15); }
-    50% { box-shadow: 0 0 0 6px rgba(16, 185, 129, 0.08); }
+    50% { box-shadow: 0 0 0 var(--space-2) rgba(16, 185, 129, 0.08); }
 }
 
 .activity-item:first-child .activity-dot {
@@ -772,7 +772,7 @@
 
 /* Stat icon hover bounce */
 .stat-icon {
-    transition: transform 0.2s ease;
+    transition: transform var(--transition-fast) ease;
 }
 
 .stats-grid .stat-item:hover .stat-icon {
@@ -781,8 +781,8 @@
 
 /* Level ring glow effect */
 @keyframes level-glow {
-    0%, 100% { filter: drop-shadow(0 0 4px rgba(99, 102, 241, 0.3)); }
-    50% { filter: drop-shadow(0 0 8px rgba(99, 102, 241, 0.5)); }
+    0%, 100% { filter: drop-shadow(0 0 var(--space-1) rgba(99, 102, 241, 0.3)); }
+    50% { filter: drop-shadow(0 0 var(--space-2) rgba(99, 102, 241, 0.5)); }
 }
 
 .level-ring {
@@ -791,7 +791,7 @@
 
 /* Rank value number counter effect */
 .rank-value {
-    transition: transform 0.2s, color 0.2s;
+    transition: transform var(--transition-fast), color 0.2s;
 }
 
 .rank-row:hover .rank-value {
@@ -801,11 +801,11 @@
 
 /* View all link arrow animation */
 .view-all-link i {
-    transition: transform 0.2s;
+    transition: transform var(--transition-fast);
 }
 
 .view-all-link:hover i {
-    transform: translateX(4px);
+    transform: translateX(var(--space-1));
 }
 
 /* Reduced motion support */
@@ -833,23 +833,23 @@
 .achievements-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 24px;
+    gap: var(--space-6);
 }
 
 .achievement-card {
     background: rgba(255, 255, 255, 0.95);
-    -webkit-backdrop-filter: blur(20px);
-    backdrop-filter: blur(20px);
-    border-radius: 20px;
-    padding: 24px;
+    -webkit-backdrop-filter: blur(var(--space-5));
+    backdrop-filter: blur(var(--space-5));
+    border-radius: var(--space-5);
+    padding: var(--space-6);
     border: 1px solid rgba(255, 255, 255, 0.3);
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-    transition: transform 0.3s, box-shadow 0.3s;
+    box-shadow: 0 var(--space-2) var(--space-8) rgba(0, 0, 0, 0.1);
+    transition: transform var(--transition-base), box-shadow 0.3s;
 }
 
 .achievement-card:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+    transform: translateY(-var(--space-1));
+    box-shadow: 0 var(--space-3) var(--space-10) rgba(0, 0, 0, 0.15);
 }
 
 .achievement-card.two-thirds {
@@ -863,20 +863,20 @@
 .card-header {
     display: flex;
     align-items: center;
-    gap: 12px;
-    margin-bottom: 20px;
-    padding-bottom: 16px;
+    gap: var(--space-3);
+    margin-bottom: var(--space-5);
+    padding-bottom: var(--space-4);
     border-bottom: 1px solid rgba(0, 0, 0, 0.08);
 }
 
 .card-header .icon {
-    font-size: 1.5rem;
+    font-size: var(--font-size-2xl);
 }
 
 .card-header h3 {
     margin: 0;
-    font-size: 1.1rem;
-    font-weight: 700;
+    font-size: var(--font-size-lg);
+    font-weight: var(--font-weight-bold);
     color: var(--color-gray-800);
 }
 
@@ -884,7 +884,7 @@
 .level-display {
     display: flex;
     align-items: center;
-    gap: 24px;
+    gap: var(--space-6);
 }
 
 .level-circle {
@@ -898,17 +898,17 @@
     justify-content: center;
     color: white;
     flex-shrink: 0;
-    box-shadow: 0 8px 24px rgba(99, 102, 241, 0.3);
+    box-shadow: 0 var(--space-2) var(--space-6) rgba(99, 102, 241, 0.3);
 }
 
 .level-num {
-    font-size: 2.5rem;
-    font-weight: 800;
+    font-size: var(--font-size-4xl);
+    font-weight: var(--font-weight-bold);
     line-height: 1;
 }
 
 .level-label {
-    font-size: 0.75rem;
+    font-size: var(--font-size-xs);
     text-transform: uppercase;
     letter-spacing: 1px;
     opacity: 0.9;
@@ -919,42 +919,42 @@
 }
 
 .level-info h4 {
-    margin: 0 0 8px 0;
-    font-size: 0.9rem;
+    margin: 0 0 var(--space-2) 0;
+    font-size: var(--font-size-sm);
     color: var(--color-gray-500);
-    font-weight: 500;
+    font-weight: var(--font-weight-medium);
 }
 
 .xp-display {
     font-size: 1.8rem;
-    font-weight: 800;
+    font-weight: var(--font-weight-bold);
     color: var(--color-gray-800);
-    margin-bottom: 12px;
+    margin-bottom: var(--space-3);
 }
 
 .xp-display span {
-    font-size: 1rem;
+    font-size: var(--font-size-base);
     color: var(--color-gray-500);
-    font-weight: 500;
+    font-weight: var(--font-weight-medium);
 }
 
 .progress-bar-container {
-    height: 12px;
+    height: var(--space-3);
     background: var(--color-gray-200);
-    border-radius: 12px;
+    border-radius: var(--space-3);
     overflow: hidden;
-    margin-bottom: 8px;
+    margin-bottom: var(--space-2);
 }
 
 .progress-bar-fill {
     height: 100%;
     background: linear-gradient(90deg, var(--color-primary-500), var(--color-purple-500));
-    border-radius: 12px;
+    border-radius: var(--space-3);
     transition: width 0.5s ease;
 }
 
 .progress-text {
-    font-size: 0.85rem;
+    font-size: var(--font-size-sm);
     color: var(--color-gray-500);
 }
 
@@ -962,15 +962,15 @@
 .streaks-grid {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
-    gap: 16px;
+    gap: var(--space-4);
 }
 
 .streak-item {
     text-align: center;
-    padding: 16px 8px;
+    padding: var(--space-4) var(--space-2);
     background: rgba(99, 102, 241, 0.05);
-    border-radius: 12px;
-    transition: transform 0.2s;
+    border-radius: var(--space-3);
+    transition: transform var(--transition-fast);
 }
 
 .streak-item:hover {
@@ -978,73 +978,73 @@
 }
 
 .streak-icon {
-    font-size: 1.5rem;
-    margin-bottom: 8px;
+    font-size: var(--font-size-2xl);
+    margin-bottom: var(--space-2);
 }
 
 .streak-count {
     font-size: 1.8rem;
-    font-weight: 800;
+    font-weight: var(--font-weight-bold);
     color: var(--color-gray-800);
 }
 
 .streak-label {
-    font-size: 0.75rem;
+    font-size: var(--font-size-xs);
     color: var(--color-gray-500);
-    margin-top: 4px;
+    margin-top: var(--space-1);
 }
 
 .streak-best {
     font-size: 0.7rem;
     color: var(--color-gray-400);
-    margin-top: 4px;
+    margin-top: var(--space-1);
 }
 
 /* Rankings Grid */
 .rankings-grid {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
-    gap: 12px;
-    margin-bottom: 16px;
+    gap: var(--space-3);
+    margin-bottom: var(--space-4);
 }
 
 .rank-item {
     text-align: center;
-    padding: 16px 8px;
+    padding: var(--space-4) var(--space-2);
     background: linear-gradient(135deg, rgba(251, 191, 36, 0.1), rgba(245, 158, 11, 0.05));
-    border-radius: 12px;
+    border-radius: var(--space-3);
 }
 
 .rank-position {
-    font-size: 1.5rem;
-    font-weight: 800;
+    font-size: var(--font-size-2xl);
+    font-weight: var(--font-weight-bold);
     color: var(--color-warning);
 }
 
 .rank-label {
-    font-size: 0.75rem;
+    font-size: var(--font-size-xs);
     color: var(--color-gray-500);
-    margin-top: 4px;
+    margin-top: var(--space-1);
 }
 
 /* Badge Progress List */
 .badge-progress-list {
     display: flex;
     flex-direction: column;
-    gap: 16px;
+    gap: var(--space-4);
 }
 
 .badge-progress-item {
     display: flex;
     align-items: flex-start;
-    gap: 16px;
-    padding: 16px;
+    gap: var(--space-4);
+    padding: var(--space-4);
     background: rgba(99, 102, 241, 0.05);
-    border-radius: 12px;
+    border-radius: var(--space-3);
 }
 
 .badge-progress-item .badge-icon {
-    font-size: 2rem;
+    font-size: var(--font-size-3xl);
     flex-shrink: 0;
 }
 
@@ -1054,34 +1054,34 @@
 }
 
 .badge-progress-item .badge-name {
-    font-weight: 700;
+    font-weight: var(--font-weight-bold);
     color: var(--color-gray-800);
-    margin-bottom: 4px;
+    margin-bottom: var(--space-1);
 }
 
 .badge-progress-item .badge-desc {
-    font-size: 0.85rem;
+    font-size: var(--font-size-sm);
     color: var(--color-gray-500);
-    margin-bottom: 8px;
+    margin-bottom: var(--space-2);
 }
 
 .progress-mini {
-    height: 6px;
+    height: var(--space-2);
     background: var(--color-gray-200);
-    border-radius: 6px;
+    border-radius: var(--space-2);
     overflow: hidden;
-    margin-bottom: 4px;
+    margin-bottom: var(--space-1);
 }
 
 .progress-mini-fill {
     height: 100%;
     background: linear-gradient(90deg, var(--color-primary-500), var(--color-purple-500));
-    border-radius: 6px;
+    border-radius: var(--space-2);
     transition: width 0.5s ease;
 }
 
 .badge-progress-item .progress-label {
-    font-size: 0.75rem;
+    font-size: var(--font-size-xs);
     color: var(--color-gray-400);
 }
 
@@ -1089,27 +1089,27 @@
 .badges-earned-grid {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
-    gap: 12px;
+    gap: var(--space-3);
 }
 
 .badge-earned {
     text-align: center;
-    padding: 12px;
+    padding: var(--space-3);
     background: linear-gradient(135deg, rgba(168, 85, 247, 0.1), rgba(139, 92, 246, 0.05));
-    border-radius: 12px;
+    border-radius: var(--space-3);
     cursor: pointer;
-    transition: all 0.2s;
+    transition: all var(--transition-fast);
 }
 
 .badge-earned:hover {
     transform: scale(1.05);
-    box-shadow: 0 4px 16px rgba(168, 85, 247, 0.2);
+    box-shadow: 0 var(--space-1) var(--space-4) rgba(168, 85, 247, 0.2);
 }
 
 .badge-earned .badge-icon {
     font-size: 1.8rem;
     display: block;
-    margin-bottom: 6px;
+    margin-bottom: var(--space-2);
 }
 
 .badge-earned .badge-name {
@@ -1122,60 +1122,60 @@
 .xp-log {
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: var(--space-3);
 }
 
 .xp-log-item {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 12px;
+    padding: var(--space-3);
     background: rgba(16, 185, 129, 0.05);
-    border-radius: 10px;
+    border-radius: var(--space-3);
 }
 
 .xp-action {
-    font-weight: 600;
+    font-weight: var(--font-weight-semibold);
     color: var(--color-gray-800);
-    font-size: 0.9rem;
+    font-size: var(--font-size-sm);
 }
 
 .xp-date {
-    font-size: 0.75rem;
+    font-size: var(--font-size-xs);
     color: var(--color-gray-400);
-    margin-top: 2px;
+    margin-top: var(--space-1);
 }
 
 .xp-amount {
-    font-weight: 700;
+    font-weight: var(--font-weight-bold);
     color: var(--color-success);
-    font-size: 0.95rem;
+    font-size: var(--font-size-base);
 }
 
 /* Stats Summary */
 .stats-summary {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-    gap: 16px;
+    grid-template-columns: repeat(auto-fit, minmax(var(--space-20), 1fr));
+    gap: var(--space-4);
 }
 
 .stat-item {
     text-align: center;
-    padding: 16px;
+    padding: var(--space-4);
     background: rgba(99, 102, 241, 0.05);
-    border-radius: 12px;
+    border-radius: var(--space-3);
 }
 
 .stat-value {
     font-size: 1.8rem;
-    font-weight: 800;
+    font-weight: var(--font-weight-bold);
     color: var(--color-gray-800);
 }
 
 .stat-label {
-    font-size: 0.75rem;
+    font-size: var(--font-size-xs);
     color: var(--color-gray-500);
-    margin-top: 4px;
+    margin-top: var(--space-1);
 }
 
 /* =================================================================
@@ -1189,8 +1189,8 @@
     right: 0;
     bottom: 0;
     background: rgba(0, 0, 0, 0.5);
-    -webkit-backdrop-filter: blur(4px);
-    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(var(--space-1));
+    backdrop-filter: blur(var(--space-1));
     z-index: 9999;
     display: flex;
     align-items: flex-end;
@@ -1207,13 +1207,13 @@
 
 .badge-modal-content {
     background: white;
-    border-radius: 24px 24px 0 0;
+    border-radius: var(--space-6) var(--space-6) 0 0;
     width: 100%;
     max-width: 500px;
     max-height: 80vh;
     overflow-y: auto;
     transform: translateY(100%);
-    transition: transform 0.3s ease-out;
+    transition: transform var(--transition-base) ease-out;
 }
 
 .badge-modal-overlay.visible .badge-modal-content {
@@ -1225,26 +1225,26 @@
 }
 
 .badge-modal-handle {
-    width: 40px;
-    height: 4px;
+    width: var(--space-10);
+    height: var(--space-1);
     background: var(--color-gray-300);
-    border-radius: 2px;
-    margin: 12px auto;
+    border-radius: var(--space-1);
+    margin: var(--space-3) auto;
 }
 
 .badge-modal-header {
     text-align: center;
-    padding: 20px 24px;
+    padding: var(--space-5) var(--space-6);
     background: linear-gradient(135deg, rgba(168, 85, 247, 0.1), rgba(139, 92, 246, 0.05));
     position: relative;
 }
 
 .badge-modal-close {
     position: absolute;
-    top: 16px;
-    right: 16px;
-    width: 32px;
-    height: 32px;
+    top: var(--space-4);
+    right: var(--space-4);
+    width: var(--space-8);
+    height: var(--space-8);
     border-radius: 50%;
     border: none;
     background: rgba(0, 0, 0, 0.1);
@@ -1253,7 +1253,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: background 0.2s;
+    transition: background var(--transition-fast);
 }
 
 .badge-modal-close:hover {
@@ -1261,25 +1261,25 @@
 }
 
 .badge-modal-icon {
-    font-size: 4rem;
-    margin-bottom: 12px;
+    font-size: var(--font-size-4xl);
+    margin-bottom: var(--space-3);
 }
 
 .badge-modal-name {
-    font-size: 1.5rem;
-    font-weight: 800;
+    font-size: var(--font-size-2xl);
+    font-weight: var(--font-weight-bold);
     color: var(--color-gray-800);
-    margin: 0 0 12px 0;
+    margin: 0 0 var(--space-3) 0;
 }
 
 .badge-rarity-tag {
     display: inline-flex;
     align-items: center;
-    gap: 6px;
-    padding: 6px 14px;
-    border-radius: 20px;
-    font-size: 0.85rem;
-    font-weight: 600;
+    gap: var(--space-2);
+    padding: var(--space-2) var(--space-4);
+    border-radius: var(--space-5);
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-semibold);
 }
 
 .badge-rarity-tag.legendary {
@@ -1308,11 +1308,11 @@
 }
 
 .badge-modal-body {
-    padding: 24px;
+    padding: var(--space-6);
 }
 
 .badge-modal-section {
-    margin-bottom: 20px;
+    margin-bottom: var(--space-5);
 }
 
 .badge-modal-section:last-child {
@@ -1322,17 +1322,17 @@
 .badge-modal-label {
     display: flex;
     align-items: center;
-    gap: 8px;
-    font-size: 0.85rem;
+    gap: var(--space-2);
+    font-size: var(--font-size-sm);
     color: var(--color-gray-500);
-    margin-bottom: 8px;
+    margin-bottom: var(--space-2);
     text-transform: uppercase;
     letter-spacing: 0.5px;
-    font-weight: 600;
+    font-weight: var(--font-weight-semibold);
 }
 
 .badge-modal-text {
-    font-size: 1rem;
+    font-size: var(--font-size-base);
     color: var(--color-gray-800);
 }
 
@@ -1341,16 +1341,16 @@
 }
 
 .badge-rarity-bar {
-    height: 8px;
+    height: var(--space-2);
     background: var(--color-gray-200);
-    border-radius: 8px;
+    border-radius: var(--space-2);
     overflow: hidden;
-    margin-top: 12px;
+    margin-top: var(--space-3);
 }
 
 .badge-rarity-fill {
     height: 100%;
-    border-radius: 8px;
+    border-radius: var(--space-2);
     transition: width 0.5s ease-out;
 }
 
@@ -1380,83 +1380,83 @@
 
 .badges-progress-bar {
     background: rgba(255, 255, 255, 0.95);
-    -webkit-backdrop-filter: blur(20px);
-    backdrop-filter: blur(20px);
-    border-radius: 16px;
-    padding: 24px;
-    margin-bottom: 32px;
+    -webkit-backdrop-filter: blur(var(--space-5));
+    backdrop-filter: blur(var(--space-5));
+    border-radius: var(--space-4);
+    padding: var(--space-6);
+    margin-bottom: var(--space-8);
     border: 1px solid rgba(255, 255, 255, 0.3);
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 var(--space-2) var(--space-8) rgba(0, 0, 0, 0.1);
 }
 
 .badges-progress-bar h2 {
-    margin: 0 0 12px 0;
+    margin: 0 0 var(--space-3) 0;
     font-size: 1.3rem;
     color: var(--color-gray-800);
 }
 
 .progress-outer {
     background: var(--color-gray-200);
-    border-radius: 12px;
-    height: 24px;
+    border-radius: var(--space-3);
+    height: var(--space-6);
     overflow: hidden;
-    margin-bottom: 8px;
+    margin-bottom: var(--space-2);
 }
 
 .progress-inner {
     height: 100%;
     background: linear-gradient(90deg, var(--color-purple-500), var(--color-primary-500));
-    border-radius: 12px;
+    border-radius: var(--space-3);
     transition: width 0.5s ease;
     display: flex;
     align-items: center;
     justify-content: center;
     color: white;
-    font-weight: 600;
-    font-size: 0.85rem;
+    font-weight: var(--font-weight-semibold);
+    font-size: var(--font-size-sm);
 }
 
 .progress-label {
     text-align: center;
     color: var(--color-gray-500);
-    font-size: 0.9rem;
+    font-size: var(--font-size-sm);
 }
 
 /* Showcase Section */
 .showcase-section {
     background: linear-gradient(135deg, rgba(245, 158, 11, 0.15), rgba(217, 119, 6, 0.1));
-    border: 2px solid rgba(245, 158, 11, 0.3);
-    border-radius: 16px;
-    padding: 24px;
-    margin-bottom: 32px;
+    border: var(--space-1) solid rgba(245, 158, 11, 0.3);
+    border-radius: var(--space-4);
+    padding: var(--space-6);
+    margin-bottom: var(--space-8);
 }
 
 .showcase-section h2 {
-    margin: 0 0 8px 0;
+    margin: 0 0 var(--space-2) 0;
     font-size: 1.2rem;
     color: var(--color-warning);
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: var(--space-3);
 }
 
 .showcase-section p {
-    margin: 0 0 16px 0;
-    font-size: 0.9rem;
+    margin: 0 0 var(--space-4) 0;
+    font-size: var(--font-size-sm);
     color: var(--color-warning);
 }
 
 .showcase-badges {
     display: flex;
-    gap: 16px;
+    gap: var(--space-4);
     flex-wrap: wrap;
 }
 
 .showcase-badge-slot {
     width: 100px;
     height: 100px;
-    border: 2px dashed rgba(245, 158, 11, 0.4);
-    border-radius: 12px;
+    border: var(--space-1) dashed rgba(245, 158, 11, 0.4);
+    border-radius: var(--space-3);
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -1470,52 +1470,52 @@
 }
 
 .showcase-badge-slot .badge-icon {
-    font-size: 2.5rem;
+    font-size: var(--font-size-4xl);
 }
 
 .showcase-badge-slot .badge-name {
     font-size: 0.7rem;
     color: var(--color-warning);
     text-align: center;
-    margin-top: 4px;
+    margin-top: var(--space-1);
 }
 
 .showcase-badge-slot.empty {
     color: var(--color-warning);
-    font-size: 0.8rem;
+    font-size: var(--font-size-sm);
 }
 
 /* Badge Categories */
 .badge-category {
     background: rgba(255, 255, 255, 0.95);
-    -webkit-backdrop-filter: blur(20px);
-    backdrop-filter: blur(20px);
-    border-radius: 16px;
-    padding: 24px;
-    margin-bottom: 24px;
+    -webkit-backdrop-filter: blur(var(--space-5));
+    backdrop-filter: blur(var(--space-5));
+    border-radius: var(--space-4);
+    padding: var(--space-6);
+    margin-bottom: var(--space-6);
     border: 1px solid rgba(255, 255, 255, 0.3);
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 var(--space-2) var(--space-8) rgba(0, 0, 0, 0.1);
 }
 
 .badge-category h3 {
-    margin: 0 0 20px 0;
+    margin: 0 0 var(--space-5) 0;
     font-size: 1.2rem;
-    font-weight: 700;
+    font-weight: var(--font-weight-bold);
     color: var(--color-gray-700);
     display: flex;
     align-items: center;
-    gap: 10px;
-    padding-bottom: 12px;
+    gap: var(--space-3);
+    padding-bottom: var(--space-3);
     border-bottom: 1px solid rgba(0, 0, 0, 0.08);
 }
 
 .badge-category h3 .count {
     background: rgba(99, 102, 241, 0.1);
     color: var(--color-primary-500);
-    font-size: 0.8rem;
-    padding: 4px 10px;
-    border-radius: 20px;
-    font-weight: 600;
+    font-size: var(--font-size-sm);
+    padding: var(--space-1) var(--space-3);
+    border-radius: var(--space-5);
+    font-weight: var(--font-weight-semibold);
 }
 
 /* =================================================================
@@ -1543,7 +1543,7 @@
 .badge-accordion-left {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: var(--space-3);
     flex: 1;
     min-width: 0;
 }
@@ -1559,22 +1559,22 @@
 .badge-preview-icons {
     display: flex;
     align-items: center;
-    gap: 6px;
-    margin-left: 12px;
+    gap: var(--space-2);
+    margin-left: var(--space-3);
     flex-shrink: 0;
 }
 
 .badge-preview-icon {
-    width: 32px;
-    height: 32px;
+    width: var(--space-8);
+    height: var(--space-8);
     background: rgba(168, 85, 247, 0.1);
     border: 1px solid rgba(168, 85, 247, 0.2);
-    border-radius: 8px;
+    border-radius: var(--space-2);
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 1.1rem;
-    transition: transform 0.2s ease;
+    font-size: var(--font-size-lg);
+    transition: transform var(--transition-fast) ease;
 }
 
 .badge-preview-icon.locked {
@@ -1585,16 +1585,16 @@
 }
 
 .badge-preview-more {
-    width: 32px;
-    height: 32px;
+    width: var(--space-8);
+    height: var(--space-8);
     background: rgba(99, 102, 241, 0.1);
     border: 1px solid rgba(99, 102, 241, 0.2);
-    border-radius: 8px;
+    border-radius: var(--space-2);
     display: flex;
     align-items: center;
     justify-content: center;
     font-size: 0.7rem;
-    font-weight: 600;
+    font-weight: var(--font-weight-semibold);
     color: var(--color-primary-500);
 }
 
@@ -1605,21 +1605,21 @@
 
 /* Accordion Toggle Icon */
 .badge-accordion-toggle {
-    width: 32px;
-    height: 32px;
+    width: var(--space-8);
+    height: var(--space-8);
     display: flex;
     align-items: center;
     justify-content: center;
-    border-radius: 8px;
+    border-radius: var(--space-2);
     background: rgba(99, 102, 241, 0.1);
     color: var(--color-primary-500);
-    transition: all 0.3s ease;
+    transition: all var(--transition-base) ease;
     flex-shrink: 0;
-    margin-left: 12px;
+    margin-left: var(--space-3);
 }
 
 .badge-accordion-toggle i {
-    transition: transform 0.3s ease;
+    transition: transform var(--transition-base) ease;
 }
 
 .badge-category.accordion-open .badge-accordion-toggle {
@@ -1641,7 +1641,7 @@
 .badge-category.accordion-open .badge-accordion-content {
     max-height: 2000px;
     opacity: 1;
-    padding-top: 20px;
+    padding-top: var(--space-5);
 }
 
 /* Hide preview when expanded */
@@ -1654,7 +1654,7 @@
     .badge-category.accordion-desktop-open .badge-accordion-content {
         max-height: 2000px;
         opacity: 1;
-        padding-top: 20px;
+        padding-top: var(--space-5);
     }
 
     .badge-category.accordion-desktop-open .badge-preview-icons {
@@ -1668,73 +1668,73 @@
     .badge-preview-icon {
         width: 36px;
         height: 36px;
-        font-size: 1.25rem;
+        font-size: var(--font-size-xl);
     }
 
     .badge-preview-more {
         width: 36px;
         height: 36px;
-        font-size: 0.75rem;
+        font-size: var(--font-size-xs);
     }
 }
 
 /* Mobile: Accordions closed by default, smaller preview */
 @media (max-width: 768px) {
     .badge-category {
-        padding: 16px;
-        margin-bottom: 16px;
+        padding: var(--space-4);
+        margin-bottom: var(--space-4);
     }
 
     .badge-accordion-header {
-        padding: 4px 0;
+        padding: var(--space-1) 0;
     }
 
     .badge-accordion-left h3 {
-        font-size: 1rem;
+        font-size: var(--font-size-base);
     }
 
     .badge-preview-icons {
-        gap: 4px;
-        margin-left: 8px;
+        gap: var(--space-1);
+        margin-left: var(--space-2);
     }
 
     .badge-preview-icon {
-        width: 28px;
-        height: 28px;
-        font-size: 0.95rem;
-        border-radius: 6px;
+        width: var(--space-8);
+        height: var(--space-8);
+        font-size: var(--font-size-base);
+        border-radius: var(--space-2);
     }
 
     .badge-preview-more {
-        width: 28px;
-        height: 28px;
-        font-size: 0.65rem;
-        border-radius: 6px;
+        width: var(--space-8);
+        height: var(--space-8);
+        font-size: var(--font-size-xs);
+        border-radius: var(--space-2);
     }
 
     .badge-accordion-toggle {
-        width: 28px;
-        height: 28px;
-        margin-left: 8px;
+        width: var(--space-8);
+        height: var(--space-8);
+        margin-left: var(--space-2);
     }
 
     /* Smaller badge grid on mobile when expanded */
     .badge-category.accordion-open .badges-grid {
         grid-template-columns: repeat(2, 1fr);
-        gap: 12px;
+        gap: var(--space-3);
     }
 
     .badge-category.accordion-open .badge-item {
-        padding: 12px 8px;
+        padding: var(--space-3) var(--space-2);
     }
 
     .badge-category.accordion-open .badge-item .badge-icon {
-        font-size: 2rem;
-        margin-bottom: 8px;
+        font-size: var(--font-size-3xl);
+        margin-bottom: var(--space-2);
     }
 
     .badge-category.accordion-open .badge-item .badge-name {
-        font-size: 0.8rem;
+        font-size: var(--font-size-sm);
     }
 
     .badge-category.accordion-open .badge-item .badge-desc {
@@ -1746,7 +1746,7 @@
     }
 
     .badge-category.accordion-open .badge-item .pin-btn {
-        padding: 3px 8px;
+        padding: 3px var(--space-2);
         font-size: 0.7rem;
     }
 }
@@ -1765,10 +1765,10 @@
     .badge-preview-count {
         display: inline-flex;
         align-items: center;
-        gap: 4px;
-        font-size: 0.75rem;
+        gap: var(--space-1);
+        font-size: var(--font-size-xs);
         color: var(--color-gray-500);
-        margin-left: 8px;
+        margin-left: var(--space-2);
     }
 
     .badge-preview-count .preview-dots {
@@ -1777,8 +1777,8 @@
     }
 
     .badge-preview-count .preview-dot {
-        width: 8px;
-        height: 8px;
+        width: var(--space-2);
+        height: var(--space-2);
         border-radius: 50%;
         background: rgba(168, 85, 247, 0.4);
     }
@@ -1833,41 +1833,41 @@
 .badges-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-    gap: 16px;
+    gap: var(--space-4);
 }
 
 .badge-item {
-    padding: 16px;
-    border-radius: 12px;
+    padding: var(--space-4);
+    border-radius: var(--space-3);
     text-align: center;
-    transition: all 0.3s ease;
+    transition: all var(--transition-base) ease;
     position: relative;
     cursor: default;
 }
 
 .badge-item.earned {
     background: linear-gradient(135deg, rgba(168, 85, 247, 0.15), rgba(139, 92, 246, 0.1));
-    border: 2px solid rgba(168, 85, 247, 0.4);
+    border: var(--space-1) solid rgba(168, 85, 247, 0.4);
     cursor: pointer;
 }
 
 .badge-item.locked {
     background: rgba(0, 0, 0, 0.03);
-    border: 2px dashed rgba(0, 0, 0, 0.1);
+    border: var(--space-1) dashed rgba(0, 0, 0, 0.1);
     opacity: 0.6;
 }
 
 .badge-item:hover {
-    transform: translateY(-4px);
+    transform: translateY(-var(--space-1));
 }
 
 .badge-item.earned:hover {
-    box-shadow: 0 8px 24px rgba(168, 85, 247, 0.3);
+    box-shadow: 0 var(--space-2) var(--space-6) rgba(168, 85, 247, 0.3);
 }
 
 .badge-item .badge-icon {
-    font-size: 3rem;
-    margin-bottom: 12px;
+    font-size: var(--font-size-4xl);
+    margin-bottom: var(--space-3);
     display: block;
 }
 
@@ -1877,10 +1877,10 @@
 }
 
 .badge-item .badge-name {
-    font-weight: 700;
+    font-weight: var(--font-weight-bold);
     color: var(--color-gray-800);
-    font-size: 0.95rem;
-    margin-bottom: 6px;
+    font-size: var(--font-size-base);
+    margin-bottom: var(--space-2);
 }
 
 .badge-item.locked .badge-name {
@@ -1888,18 +1888,18 @@
 }
 
 .badge-item .badge-desc {
-    font-size: 0.8rem;
+    font-size: var(--font-size-sm);
     color: var(--color-gray-500);
 }
 
 /* Rarity Badge */
 .badge-rarity {
     display: inline-block;
-    font-size: 0.65rem;
-    padding: 2px 8px;
-    border-radius: 10px;
-    font-weight: 600;
-    margin-top: 8px;
+    font-size: var(--font-size-xs);
+    padding: var(--space-1) var(--space-2);
+    border-radius: var(--space-3);
+    font-weight: var(--font-weight-semibold);
+    margin-top: var(--space-2);
 }
 
 .rarity-legendary {
@@ -1928,47 +1928,47 @@
 }
 
 .badge-item .badge-threshold {
-    font-size: 0.75rem;
+    font-size: var(--font-size-xs);
     color: var(--color-gray-400);
-    margin-top: 8px;
+    margin-top: var(--space-2);
 }
 
 .badge-item .earned-check {
     position: absolute;
-    top: 10px;
-    right: 10px;
+    top: var(--space-3);
+    right: var(--space-3);
     background: var(--color-success);
     color: white;
-    width: 24px;
-    height: 24px;
+    width: var(--space-6);
+    height: var(--space-6);
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 0.8rem;
-    box-shadow: 0 2px 8px rgba(16, 185, 129, 0.4);
+    font-size: var(--font-size-sm);
+    box-shadow: 0 var(--space-1) var(--space-2) rgba(16, 185, 129, 0.4);
 }
 
 /* Showcase star indicator */
 .badge-item .showcase-star {
     position: absolute;
-    top: 10px;
-    left: 10px;
+    top: var(--space-3);
+    left: var(--space-3);
     color: var(--color-warning);
     font-size: 1.2rem;
 }
 
 /* Pin to showcase button */
 .badge-item .pin-btn {
-    margin-top: 10px;
-    font-size: 0.75rem;
-    padding: 4px 10px;
+    margin-top: var(--space-3);
+    font-size: var(--font-size-xs);
+    padding: var(--space-1) var(--space-3);
     border: 1px solid rgba(168, 85, 247, 0.4);
     background: white;
     color: var(--color-purple-500);
-    border-radius: 12px;
+    border-radius: var(--space-3);
     cursor: pointer;
-    transition: all 0.2s;
+    transition: all var(--transition-fast);
 }
 
 .badge-item .pin-btn:hover {
@@ -1996,8 +1996,8 @@
 
 .confetti {
     position: absolute;
-    width: 10px;
-    height: 10px;
+    width: var(--space-3);
+    height: var(--space-3);
     opacity: 0;
     animation: confetti-fall 3s ease-out forwards;
 }
@@ -2020,25 +2020,25 @@
 .challenges-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
-    gap: 24px;
+    gap: var(--space-6);
 }
 
 .challenge-card {
     background: rgba(255, 255, 255, 0.95);
-    -webkit-backdrop-filter: blur(20px);
-    backdrop-filter: blur(20px);
-    border-radius: 20px;
-    padding: 24px;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-    transition: transform 0.3s;
+    -webkit-backdrop-filter: blur(var(--space-5));
+    backdrop-filter: blur(var(--space-5));
+    border-radius: var(--space-5);
+    padding: var(--space-6);
+    box-shadow: 0 var(--space-2) var(--space-8) rgba(0, 0, 0, 0.1);
+    transition: transform var(--transition-base);
 }
 
 .challenge-card:hover {
-    transform: translateY(-4px);
+    transform: translateY(-var(--space-1));
 }
 
 .challenge-card.completed {
-    border: 2px solid var(--color-success);
+    border: var(--space-1) solid var(--color-success);
     background: linear-gradient(135deg, rgba(16, 185, 129, 0.05), rgba(255, 255, 255, 0.95));
 }
 
@@ -2046,14 +2046,14 @@
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
-    margin-bottom: 16px;
+    margin-bottom: var(--space-4);
 }
 
 .challenge-type {
-    padding: 4px 12px;
-    border-radius: 20px;
-    font-size: 12px;
-    font-weight: 600;
+    padding: var(--space-1) var(--space-3);
+    border-radius: var(--space-5);
+    font-size: var(--space-3);
+    font-weight: var(--font-weight-semibold);
     text-transform: uppercase;
 }
 
@@ -2078,42 +2078,42 @@
 }
 
 .challenge-time {
-    font-size: 12px;
+    font-size: var(--space-3);
     color: var(--color-gray-500);
     display: flex;
     align-items: center;
-    gap: 4px;
+    gap: var(--space-1);
 }
 
 .challenge-title {
-    font-size: 18px;
-    font-weight: 700;
+    font-size: var(--space-5);
+    font-weight: var(--font-weight-bold);
     color: var(--color-gray-900);
-    margin-bottom: 8px;
+    margin-bottom: var(--space-2);
 }
 
 .challenge-desc {
     color: var(--color-gray-500);
-    font-size: 14px;
-    margin-bottom: 20px;
+    font-size: var(--space-4);
+    margin-bottom: var(--space-5);
 }
 
 .challenge-progress {
-    margin-bottom: 16px;
+    margin-bottom: var(--space-4);
 }
 
 .progress-bar {
-    height: 10px;
+    height: var(--space-3);
     background: var(--color-gray-200);
-    border-radius: 10px;
+    border-radius: var(--space-3);
     overflow: hidden;
-    margin-bottom: 8px;
+    margin-bottom: var(--space-2);
 }
 
 .progress-fill {
     height: 100%;
     background: linear-gradient(90deg, var(--color-primary-600), var(--color-purple-500));
-    border-radius: 10px;
+    border-radius: var(--space-3);
     transition: width 0.5s ease;
 }
 
@@ -2132,25 +2132,25 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding-top: 16px;
+    padding-top: var(--space-4);
     border-top: 1px solid var(--color-gray-200);
 }
 
 .reward-xp {
     display: flex;
     align-items: center;
-    gap: 8px;
-    font-weight: 700;
+    gap: var(--space-2);
+    font-weight: var(--font-weight-bold);
     color: var(--color-success);
-    font-size: 18px;
+    font-size: var(--space-5);
 }
 
 .completed-badge {
     display: flex;
     align-items: center;
-    gap: 6px;
+    gap: var(--space-2);
     color: var(--color-success);
-    font-weight: 600;
+    font-weight: var(--font-weight-semibold);
 }
 
 /* =================================================================
@@ -2160,20 +2160,20 @@
 .collections-grid {
     display: flex;
     flex-direction: column;
-    gap: 24px;
+    gap: var(--space-6);
 }
 
 .collection-card {
     background: rgba(255, 255, 255, 0.95);
-    -webkit-backdrop-filter: blur(20px);
-    backdrop-filter: blur(20px);
-    border-radius: 20px;
-    padding: 28px;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    -webkit-backdrop-filter: blur(var(--space-5));
+    backdrop-filter: blur(var(--space-5));
+    border-radius: var(--space-5);
+    padding: var(--space-8);
+    box-shadow: 0 var(--space-2) var(--space-8) rgba(0, 0, 0, 0.1);
 }
 
 .collection-card.completed {
-    border: 2px solid var(--color-success);
+    border: var(--space-1) solid var(--color-success);
     background: linear-gradient(135deg, rgba(16, 185, 129, 0.05), rgba(255, 255, 255, 0.95));
 }
 
@@ -2181,24 +2181,24 @@
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
-    margin-bottom: 20px;
+    margin-bottom: var(--space-5);
 }
 
 .collection-info {
     display: flex;
     align-items: center;
-    gap: 16px;
+    gap: var(--space-4);
 }
 
 .collection-icon {
-    width: 60px;
-    height: 60px;
+    width: var(--space-16);
+    height: var(--space-16);
     background: linear-gradient(135deg, var(--color-primary-600), var(--color-purple-500));
-    border-radius: 16px;
+    border-radius: var(--space-4);
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 28px;
+    font-size: var(--space-8);
 }
 
 .collection-card.completed .collection-icon {
@@ -2206,15 +2206,15 @@
 }
 
 .collection-title {
-    font-size: 20px;
-    font-weight: 700;
+    font-size: var(--space-5);
+    font-weight: var(--font-weight-bold);
     color: var(--color-gray-900);
-    margin-bottom: 4px;
+    margin-bottom: var(--space-1);
 }
 
 .collection-desc {
     color: var(--color-gray-500);
-    font-size: 14px;
+    font-size: var(--space-4);
 }
 
 .collection-stats {
@@ -2222,8 +2222,8 @@
 }
 
 .collection-progress-text {
-    font-size: 24px;
-    font-weight: 700;
+    font-size: var(--space-6);
+    font-weight: var(--font-weight-bold);
     color: var(--color-primary-600);
 }
 
@@ -2234,7 +2234,7 @@
 .collection-reward {
     font-size: 13px;
     color: var(--color-gray-500);
-    margin-top: 4px;
+    margin-top: var(--space-1);
 }
 
 .collection-reward.claimed {
@@ -2248,9 +2248,9 @@
 .collection-badges {
     display: flex;
     flex-wrap: wrap;
-    gap: 12px;
-    margin-top: 20px;
-    padding-top: 20px;
+    gap: var(--space-3);
+    margin-top: var(--space-5);
+    padding-top: var(--space-5);
     border-top: 1px solid var(--color-gray-200);
 }
 
@@ -2266,33 +2266,33 @@
     width: 50px;
     height: 50px;
     background: var(--color-gray-100);
-    border-radius: 12px;
+    border-radius: var(--space-3);
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 24px;
-    margin: 0 auto 6px;
+    font-size: var(--space-6);
+    margin: 0 auto var(--space-2);
     opacity: 0.4;
     filter: grayscale(1);
-    transition: all 0.2s;
+    transition: all var(--transition-fast);
 }
 
 .collection-badges .badge-item.earned .badge-icon {
     opacity: 1;
     filter: none;
     background: linear-gradient(135deg, var(--color-warning), var(--color-warning));
-    box-shadow: 0 4px 12px rgba(251, 191, 36, 0.3);
+    box-shadow: 0 var(--space-1) var(--space-3) rgba(251, 191, 36, 0.3);
 }
 
 .collection-badges .badge-name {
-    font-size: 11px;
+    font-size: var(--font-size-xs);
     color: var(--color-gray-500);
     line-height: 1.2;
 }
 
 .collection-badges .badge-item.earned .badge-name {
     color: var(--color-gray-900);
-    font-weight: 500;
+    font-weight: var(--font-weight-medium);
 }
 
 /* =================================================================
@@ -2301,36 +2301,36 @@
 
 .season-header {
     background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.9));
-    border-radius: 24px;
-    padding: 32px;
-    margin-bottom: 24px;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    border-radius: var(--space-6);
+    padding: var(--space-8);
+    margin-bottom: var(--space-6);
+    box-shadow: 0 var(--space-2) var(--space-8) rgba(0, 0, 0, 0.1);
 }
 
 .season-title-row {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 24px;
+    margin-bottom: var(--space-6);
 }
 
 .season-name {
-    font-size: 28px;
-    font-weight: 800;
+    font-size: var(--space-8);
+    font-weight: var(--font-weight-bold);
     color: var(--color-gray-900);
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: var(--space-3);
 }
 
 .season-badge {
     display: inline-flex;
     align-items: center;
-    gap: 6px;
-    padding: 6px 14px;
-    border-radius: 20px;
+    gap: var(--space-2);
+    padding: var(--space-2) var(--space-4);
+    border-radius: var(--space-5);
     font-size: 13px;
-    font-weight: 600;
+    font-weight: var(--font-weight-semibold);
 }
 
 .season-badge.active {
@@ -2360,91 +2360,91 @@
 .time-remaining-label {
     font-size: 13px;
     color: var(--color-gray-500);
-    margin-bottom: 4px;
+    margin-bottom: var(--space-1);
 }
 
 .time-remaining-value {
-    font-size: 32px;
-    font-weight: 800;
+    font-size: var(--space-8);
+    font-weight: var(--font-weight-bold);
     color: var(--color-primary-600);
 }
 
 .time-remaining-unit {
-    font-size: 16px;
+    font-size: var(--space-4);
     color: var(--color-gray-500);
-    font-weight: 500;
+    font-weight: var(--font-weight-medium);
 }
 
 .user-rank-card {
     display: flex;
     align-items: center;
-    gap: 24px;
+    gap: var(--space-6);
     background: linear-gradient(135deg, var(--color-primary-600), var(--color-purple-500));
-    border-radius: 16px;
-    padding: 20px 28px;
+    border-radius: var(--space-4);
+    padding: var(--space-5) var(--space-8);
     color: white;
 }
 
 .user-rank-position {
-    font-size: 48px;
+    font-size: var(--space-12);
     font-weight: 900;
     line-height: 1;
 }
 
 .user-rank-position sup {
-    font-size: 20px;
-    font-weight: 600;
+    font-size: var(--space-5);
+    font-weight: var(--font-weight-semibold);
 }
 
 .user-rank-info h4 {
-    font-size: 14px;
-    font-weight: 500;
+    font-size: var(--space-4);
+    font-weight: var(--font-weight-medium);
     opacity: 0.9;
-    margin-bottom: 4px;
+    margin-bottom: var(--space-1);
 }
 
 .user-rank-xp {
-    font-size: 24px;
-    font-weight: 700;
+    font-size: var(--space-6);
+    font-weight: var(--font-weight-bold);
 }
 
 .content-grid {
     display: grid;
     grid-template-columns: 1fr 350px;
-    gap: 24px;
+    gap: var(--space-6);
 }
 
 .leaderboard-card {
     background: rgba(255, 255, 255, 0.95);
-    border-radius: 20px;
-    padding: 24px;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    border-radius: var(--space-5);
+    padding: var(--space-6);
+    box-shadow: 0 var(--space-2) var(--space-8) rgba(0, 0, 0, 0.1);
 }
 
 .leaderboard-card h3 {
-    font-size: 18px;
-    font-weight: 700;
+    font-size: var(--space-5);
+    font-weight: var(--font-weight-bold);
     color: var(--color-gray-900);
-    margin-bottom: 20px;
+    margin-bottom: var(--space-5);
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: var(--space-2);
 }
 
 .leaderboard-list {
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: var(--space-3);
 }
 
 .leaderboard-item {
     display: flex;
     align-items: center;
-    gap: 16px;
-    padding: 12px 16px;
-    border-radius: 12px;
+    gap: var(--space-4);
+    padding: var(--space-3) var(--space-4);
+    border-radius: var(--space-3);
     background: var(--color-gray-50);
-    transition: all 0.2s;
+    transition: all var(--transition-fast);
 }
 
 .leaderboard-item:hover {
@@ -2457,7 +2457,7 @@
 
 .leaderboard-item.current-user {
     background: linear-gradient(135deg, var(--color-info), var(--color-info));
-    border: 2px solid var(--color-info);
+    border: var(--space-1) solid var(--color-info);
 }
 
 .rank-badge {
@@ -2467,8 +2467,8 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    font-weight: 700;
-    font-size: 14px;
+    font-weight: var(--font-weight-bold);
+    font-size: var(--space-4);
     background: var(--color-gray-200);
     color: var(--color-gray-500);
 }
@@ -2489,8 +2489,8 @@
 }
 
 .user-avatar {
-    width: 40px;
-    height: 40px;
+    width: var(--space-10);
+    height: var(--space-10);
     border-radius: 50%;
     object-fit: cover;
     background: var(--color-gray-200);
@@ -2501,44 +2501,44 @@
 }
 
 .user-name {
-    font-weight: 600;
+    font-weight: var(--font-weight-semibold);
     color: var(--color-gray-900);
 }
 
 .user-level {
-    font-size: 12px;
+    font-size: var(--space-3);
     color: var(--color-gray-500);
 }
 
 .user-xp {
-    font-weight: 700;
+    font-weight: var(--font-weight-bold);
     color: var(--color-primary-600);
 }
 
 .rewards-card {
     background: rgba(255, 255, 255, 0.95);
-    border-radius: 20px;
-    padding: 24px;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    border-radius: var(--space-5);
+    padding: var(--space-6);
+    box-shadow: 0 var(--space-2) var(--space-8) rgba(0, 0, 0, 0.1);
 }
 
 .rewards-card h3 {
-    font-size: 18px;
-    font-weight: 700;
+    font-size: var(--space-5);
+    font-weight: var(--font-weight-bold);
     color: var(--color-gray-900);
-    margin-bottom: 20px;
+    margin-bottom: var(--space-5);
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: var(--space-2);
 }
 
 .reward-tier {
     display: flex;
     align-items: center;
-    gap: 12px;
-    padding: 14px;
-    border-radius: 12px;
-    margin-bottom: 10px;
+    gap: var(--space-3);
+    padding: var(--space-4);
+    border-radius: var(--space-3);
+    margin-bottom: var(--space-3);
     background: var(--color-gray-50);
 }
 
@@ -2555,13 +2555,13 @@
 }
 
 .tier-icon {
-    width: 40px;
-    height: 40px;
+    width: var(--space-10);
+    height: var(--space-10);
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 20px;
+    font-size: var(--space-5);
 }
 
 .tier-details {
@@ -2569,60 +2569,60 @@
 }
 
 .tier-name {
-    font-weight: 700;
+    font-weight: var(--font-weight-bold);
     color: var(--color-gray-900);
-    font-size: 14px;
+    font-size: var(--space-4);
 }
 
 .tier-reward {
-    font-size: 12px;
+    font-size: var(--space-3);
     color: var(--color-gray-500);
 }
 
 .past-seasons {
-    margin-top: 32px;
+    margin-top: var(--space-8);
 }
 
 .past-seasons h3 {
     color: white;
-    font-size: 20px;
-    font-weight: 700;
-    margin-bottom: 16px;
+    font-size: var(--space-5);
+    font-weight: var(--font-weight-bold);
+    margin-bottom: var(--space-4);
 }
 
 .past-seasons-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-    gap: 16px;
+    gap: var(--space-4);
 }
 
 .past-season-card {
     background: rgba(255, 255, 255, 0.95);
-    border-radius: 16px;
-    padding: 20px;
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+    border-radius: var(--space-4);
+    padding: var(--space-5);
+    box-shadow: 0 var(--space-1) var(--space-4) rgba(0, 0, 0, 0.1);
 }
 
 .past-season-name {
-    font-weight: 700;
+    font-weight: var(--font-weight-bold);
     color: var(--color-gray-900);
-    margin-bottom: 8px;
+    margin-bottom: var(--space-2);
 }
 
 .past-season-dates {
-    font-size: 12px;
+    font-size: var(--space-3);
     color: var(--color-gray-500);
-    margin-bottom: 12px;
+    margin-bottom: var(--space-3);
 }
 
 .past-season-status {
     display: inline-flex;
     align-items: center;
-    gap: 6px;
-    padding: 4px 10px;
-    border-radius: 12px;
-    font-size: 12px;
-    font-weight: 500;
+    gap: var(--space-2);
+    padding: var(--space-1) var(--space-3);
+    border-radius: var(--space-3);
+    font-size: var(--space-3);
+    font-weight: var(--font-weight-medium);
 }
 
 .past-season-status.completed {
@@ -2665,7 +2665,7 @@
 /* Current user indicator */
 .current-user-tag {
     color: var(--color-info);
-    font-size: 12px;
+    font-size: var(--space-3);
 }
 
 /* Avatar fallback */
@@ -2675,7 +2675,7 @@
     justify-content: center;
     background: var(--color-primary-600);
     color: white;
-    font-weight: 600;
+    font-weight: var(--font-weight-semibold);
 }
 
 /* =================================================================
@@ -2684,49 +2684,49 @@
 
 .xp-balance-card {
     background: linear-gradient(135deg, var(--color-primary-600), var(--color-purple-500));
-    border-radius: 20px;
-    padding: 24px 32px;
+    border-radius: var(--space-5);
+    padding: var(--space-6) var(--space-8);
     color: white;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 30px;
-    box-shadow: 0 8px 32px rgba(79, 70, 229, 0.3);
+    margin-bottom: var(--space-8);
+    box-shadow: 0 var(--space-2) var(--space-8) rgba(79, 70, 229, 0.3);
 }
 
 .xp-balance-info h3 {
-    font-size: 14px;
-    font-weight: 500;
+    font-size: var(--space-4);
+    font-weight: var(--font-weight-medium);
     opacity: 0.9;
-    margin-bottom: 4px;
+    margin-bottom: var(--space-1);
 }
 
 .xp-balance-amount {
-    font-size: 36px;
-    font-weight: 800;
+    font-size: var(--font-size-4xl);
+    font-weight: var(--font-weight-bold);
 }
 
 .xp-balance-icon {
-    font-size: 48px;
+    font-size: var(--space-12);
     opacity: 0.8;
 }
 
 .shop-categories {
     display: flex;
-    gap: 12px;
-    margin-bottom: 24px;
+    gap: var(--space-3);
+    margin-bottom: var(--space-6);
     flex-wrap: wrap;
 }
 
 .category-btn {
-    padding: 8px 16px;
-    border-radius: 20px;
+    padding: var(--space-2) var(--space-4);
+    border-radius: var(--space-5);
     background: rgba(255, 255, 255, 0.95);
     color: var(--color-gray-500);
     border: none;
     cursor: pointer;
-    font-weight: 500;
-    transition: all 0.2s;
+    font-weight: var(--font-weight-medium);
+    transition: all var(--transition-fast);
 }
 
 .category-btn:hover,
@@ -2738,28 +2738,28 @@
 .shop-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    gap: 20px;
+    gap: var(--space-5);
 }
 
 .shop-item {
     background: rgba(255, 255, 255, 0.95);
-    -webkit-backdrop-filter: blur(20px);
-    backdrop-filter: blur(20px);
-    border-radius: 20px;
-    padding: 24px;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-    transition: transform 0.2s, box-shadow 0.2s;
+    -webkit-backdrop-filter: blur(var(--space-5));
+    backdrop-filter: blur(var(--space-5));
+    border-radius: var(--space-5);
+    padding: var(--space-6);
+    box-shadow: 0 var(--space-2) var(--space-8) rgba(0, 0, 0, 0.1);
+    transition: transform var(--transition-fast), box-shadow 0.2s;
     position: relative;
     overflow: hidden;
 }
 
 .shop-item:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+    transform: translateY(-var(--space-1));
+    box-shadow: 0 var(--space-3) var(--space-10) rgba(0, 0, 0, 0.15);
 }
 
 .shop-item.owned {
-    border: 2px solid var(--color-success);
+    border: var(--space-1) solid var(--color-success);
 }
 
 .shop-item.locked {
@@ -2768,12 +2768,12 @@
 
 .item-badge {
     position: absolute;
-    top: 12px;
-    right: 12px;
-    padding: 4px 10px;
-    border-radius: 12px;
-    font-size: 11px;
-    font-weight: 600;
+    top: var(--space-3);
+    right: var(--space-3);
+    padding: var(--space-1) var(--space-3);
+    border-radius: var(--space-3);
+    font-size: var(--font-size-xs);
+    font-weight: var(--font-weight-semibold);
     text-transform: uppercase;
 }
 
@@ -2793,15 +2793,15 @@
 }
 
 .item-icon {
-    width: 64px;
-    height: 64px;
+    width: var(--space-16);
+    height: var(--space-16);
     background: linear-gradient(135deg, var(--color-gray-100), var(--color-gray-200));
-    border-radius: 16px;
+    border-radius: var(--space-4);
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 32px;
-    margin-bottom: 16px;
+    font-size: var(--space-8);
+    margin-bottom: var(--space-4);
 }
 
 .shop-item.owned .item-icon {
@@ -2809,33 +2809,33 @@
 }
 
 .item-name {
-    font-size: 18px;
-    font-weight: 700;
+    font-size: var(--space-5);
+    font-weight: var(--font-weight-bold);
     color: var(--color-gray-900);
-    margin-bottom: 8px;
+    margin-bottom: var(--space-2);
 }
 
 .item-description {
-    font-size: 14px;
+    font-size: var(--space-4);
     color: var(--color-gray-500);
     line-height: 1.5;
-    margin-bottom: 16px;
+    margin-bottom: var(--space-4);
 }
 
 .item-footer {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding-top: 16px;
+    padding-top: var(--space-4);
     border-top: 1px solid var(--color-gray-200);
 }
 
 .item-price {
     display: flex;
     align-items: center;
-    gap: 6px;
-    font-size: 18px;
-    font-weight: 700;
+    gap: var(--space-2);
+    font-size: var(--space-5);
+    font-weight: var(--font-weight-bold);
     color: var(--color-primary-600);
 }
 
@@ -2844,20 +2844,20 @@
 }
 
 .buy-btn {
-    padding: 10px 20px;
-    border-radius: 12px;
+    padding: var(--space-3) var(--space-5);
+    border-radius: var(--space-3);
     background: linear-gradient(135deg, var(--color-primary-600), var(--color-purple-500));
     color: white;
     border: none;
     cursor: pointer;
-    font-weight: 600;
-    font-size: 14px;
-    transition: all 0.2s;
+    font-weight: var(--font-weight-semibold);
+    font-size: var(--space-4);
+    transition: all var(--transition-fast);
 }
 
 .buy-btn:hover:not(:disabled) {
     transform: scale(1.05);
-    box-shadow: 0 4px 12px rgba(79, 70, 229, 0.4);
+    box-shadow: 0 var(--space-1) var(--space-3) rgba(79, 70, 229, 0.4);
 }
 
 .buy-btn:disabled {
@@ -2889,43 +2889,43 @@
 
 .purchase-modal .modal-content {
     background: white;
-    border-radius: 20px;
-    padding: 32px;
+    border-radius: var(--space-5);
+    padding: var(--space-8);
     max-width: 400px;
     width: 90%;
     text-align: center;
 }
 
 .purchase-modal .modal-icon {
-    font-size: 64px;
-    margin-bottom: 16px;
+    font-size: var(--space-16);
+    margin-bottom: var(--space-4);
 }
 
 .purchase-modal .modal-title {
-    font-size: 24px;
-    font-weight: 700;
+    font-size: var(--space-6);
+    font-weight: var(--font-weight-bold);
     color: var(--color-gray-900);
-    margin-bottom: 8px;
+    margin-bottom: var(--space-2);
 }
 
 .purchase-modal .modal-message {
     color: var(--color-gray-500);
-    margin-bottom: 24px;
+    margin-bottom: var(--space-6);
 }
 
 .purchase-modal .modal-buttons {
     display: flex;
-    gap: 12px;
+    gap: var(--space-3);
     justify-content: center;
 }
 
 .purchase-modal .modal-btn {
-    padding: 12px 24px;
-    border-radius: 12px;
-    font-weight: 600;
+    padding: var(--space-3) var(--space-6);
+    border-radius: var(--space-3);
+    font-weight: var(--font-weight-semibold);
     cursor: pointer;
     border: none;
-    transition: all 0.2s;
+    transition: all var(--transition-fast);
 }
 
 .purchase-modal .modal-btn.cancel {
@@ -3201,7 +3201,7 @@
 }
 
 [data-theme="dark"] .badge-showcase-item:hover {
-    box-shadow: 0 4px 16px rgba(168, 85, 247, 0.35);
+    box-shadow: 0 var(--space-1) var(--space-4) rgba(168, 85, 247, 0.35);
 }
 
 [data-theme="dark"] .activity-item {
@@ -3249,7 +3249,7 @@
     .achievements-column-side {
         display: grid;
         grid-template-columns: repeat(2, 1fr);
-        gap: 20px;
+        gap: var(--space-5);
     }
 
     .achievements-column-side .streaks-card,
@@ -3269,7 +3269,7 @@
 
     .season-title-row {
         flex-direction: column;
-        gap: 20px;
+        gap: var(--space-5);
         text-align: center;
     }
 
@@ -3290,25 +3290,25 @@
     .collections-wrapper,
     .seasons-wrapper,
     .shop-wrapper {
-        padding: 0 15px 60px;
+        padding: 0 15px var(--space-16);
         margin-top: 100px;
     }
 
     /* V2 Layout Mobile */
     .hero-stats-banner {
         grid-template-columns: repeat(2, 1fr);
-        gap: 12px;
+        gap: var(--space-3);
     }
 
     .hero-stat-card {
-        padding: 16px;
-        gap: 12px;
+        padding: var(--space-4);
+        gap: var(--space-3);
     }
 
     .hero-stat-icon {
         width: 44px;
         height: 44px;
-        font-size: 20px;
+        font-size: var(--space-5);
     }
 
     .level-ring {
@@ -3321,7 +3321,7 @@
     }
 
     .hero-stat-value {
-        font-size: 1.25rem;
+        font-size: var(--font-size-xl);
     }
 
     .hero-stat-label {
@@ -3372,7 +3372,7 @@
     }
 
     .badge-item .badge-icon {
-        font-size: 2.5rem;
+        font-size: var(--font-size-4xl);
     }
 
     .showcase-badges {
@@ -3385,7 +3385,7 @@
 
     .collection-header {
         flex-direction: column;
-        gap: 16px;
+        gap: var(--space-4);
     }
 
     .collection-stats {
@@ -3395,7 +3395,7 @@
     .xp-balance-card {
         flex-direction: column;
         text-align: center;
-        gap: 16px;
+        gap: var(--space-4);
     }
 
     .shop-grid {
@@ -3422,18 +3422,18 @@
     /* V2 Layout - Small Mobile */
     .hero-stats-banner {
         grid-template-columns: 1fr 1fr;
-        gap: 10px;
+        gap: var(--space-3);
     }
 
     .hero-stat-card {
-        padding: 12px;
-        gap: 10px;
+        padding: var(--space-3);
+        gap: var(--space-3);
     }
 
     .hero-stat-icon {
         width: 38px;
         height: 38px;
-        font-size: 16px;
+        font-size: var(--space-4);
     }
 
     .level-ring {
@@ -3442,15 +3442,15 @@
     }
 
     .level-number {
-        font-size: 1rem;
+        font-size: var(--font-size-base);
     }
 
     .hero-stat-value {
-        font-size: 1.1rem;
+        font-size: var(--font-size-lg);
     }
 
     .hero-stat-label {
-        font-size: 0.65rem;
+        font-size: var(--font-size-xs);
     }
 
     .badges-showcase {
@@ -3463,61 +3463,61 @@
 
     .stats-grid {
         grid-template-columns: 1fr 1fr;
-        gap: 8px;
+        gap: var(--space-2);
     }
 
     .stats-grid .stat-item {
-        padding: 12px 8px;
+        padding: var(--space-3) var(--space-2);
     }
 
     .stat-icon {
-        width: 30px;
-        height: 30px;
-        font-size: 0.8rem;
-        margin-bottom: 8px;
+        width: var(--space-8);
+        height: var(--space-8);
+        font-size: var(--font-size-sm);
+        margin-bottom: var(--space-2);
     }
 
     .stats-grid .stat-value {
-        font-size: 1.1rem;
+        font-size: var(--font-size-lg);
     }
 
     .streak-row,
     .rank-row {
-        padding: 10px 12px;
+        padding: var(--space-3) var(--space-3);
     }
 
     .streak-icon-wrap {
         width: 34px;
         height: 34px;
-        font-size: 1rem;
+        font-size: var(--font-size-base);
     }
 
     .rank-icon-wrap {
-        width: 30px;
-        height: 30px;
-        font-size: 0.8rem;
+        width: var(--space-8);
+        height: var(--space-8);
+        font-size: var(--font-size-sm);
     }
 
     .achievement-card {
-        padding: 18px;
+        padding: var(--space-5);
     }
 
     .card-header {
-        margin-bottom: 16px;
-        padding-bottom: 12px;
+        margin-bottom: var(--space-4);
+        padding-bottom: var(--space-3);
     }
 
     .card-header h3 {
-        font-size: 1rem;
+        font-size: var(--font-size-base);
     }
 
     .level-circle {
-        width: 80px;
-        height: 80px;
+        width: var(--space-20);
+        height: var(--space-20);
     }
 
     .level-num {
-        font-size: 2rem;
+        font-size: var(--font-size-3xl);
     }
 }
 
@@ -3528,7 +3528,7 @@
     }
 
     .badge-modal-content {
-        border-radius: 24px;
+        border-radius: var(--space-6);
         max-height: 80vh;
     }
 

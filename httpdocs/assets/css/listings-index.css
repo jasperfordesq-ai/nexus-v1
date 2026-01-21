@@ -16,20 +16,20 @@
 
             [data-theme="light"] #listings-index-glass-wrapper::before {
                 background: linear-gradient(135deg,
-                        rgba(99, 102, 241, 0.08) 0%,
-                        rgba(139, 92, 246, 0.08) 25%,
-                        rgba(236, 72, 153, 0.08) 50%,
-                        rgba(59, 130, 246, 0.08) 75%,
-                        rgba(16, 185, 129, 0.08) 100%);
+                        color-mix(in srgb, var(--color-primary-500) 8%, transparent) 0%,
+                        color-mix(in srgb, var(--color-purple-500) 8%, transparent) 25%,
+                        color-mix(in srgb, var(--color-pink-500) 8%, transparent) 50%,
+                        color-mix(in srgb, var(--color-info) 8%, transparent) 75%,
+                        color-mix(in srgb, var(--color-success) 8%, transparent) 100%);
                 background-size: 400% 400%;
                 animation: gradientShift 15s ease infinite;
             }
 
             [data-theme="dark"] #listings-index-glass-wrapper::before {
                 background: radial-gradient(circle at 20% 30%,
-                        rgba(99, 102, 241, 0.15) 0%, transparent 50%),
+                        color-mix(in srgb, var(--color-primary-500) 15%, transparent) 0%, transparent 50%),
                     radial-gradient(circle at 80% 70%,
-                        rgba(236, 72, 153, 0.12) 0%, transparent 50%);
+                        color-mix(in srgb, var(--color-pink-500) 12%, transparent) 0%, transparent 50%);
             }
 
             @keyframes gradientShift {
@@ -50,185 +50,185 @@
                 position: relative;
                 z-index: 10;
                 padding: 25px;
-                border-radius: 20px;
+                border-radius: var(--radius-xl);
                 background: linear-gradient(135deg,
-                        rgba(255, 255, 255, 0.75),
-                        rgba(255, 255, 255, 0.6));
+                        color-mix(in srgb, white 75%, transparent),
+                        color-mix(in srgb, white 60%, transparent));
                 backdrop-filter: blur(20px) saturate(120%);
                 -webkit-backdrop-filter: blur(20px) saturate(120%);
-                border: 1px solid rgba(255, 255, 255, 0.3);
-                box-shadow: 0 8px 32px rgba(31, 38, 135, 0.15),
-                    inset 0 0 0 1px rgba(255, 255, 255, 0.4);
+                border: 1px solid color-mix(in srgb, white 30%, transparent);
+                box-shadow: 0 8px 32px color-mix(in srgb, var(--color-gray-900) 15%, transparent),
+                    inset 0 0 0 1px color-mix(in srgb, white 40%, transparent);
                 transition: all 0.3s ease;
             }
 
             /* Dark Mode Search Card */
             [data-theme="dark"] #listings-index-glass-wrapper .glass-search-card {
                 background: linear-gradient(135deg,
-                        rgba(15, 23, 42, 0.6),
-                        rgba(30, 41, 59, 0.5));
+                        color-mix(in srgb, var(--color-gray-100) 60%, transparent),
+                        color-mix(in srgb, var(--color-gray-200) 50%, transparent));
                 backdrop-filter: blur(24px) saturate(150%);
                 -webkit-backdrop-filter: blur(24px) saturate(150%);
-                border: 1px solid rgba(255, 255, 255, 0.15);
-                box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5),
-                    0 0 80px rgba(0, 200, 255, 0.1),
-                    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+                border: 1px solid color-mix(in srgb, white 15%, transparent);
+                box-shadow: 0 8px 32px color-mix(in srgb, black 50%, transparent),
+                    0 0 80px color-mix(in srgb, var(--color-info) 10%, transparent),
+                    inset 0 1px 0 color-mix(in srgb, white 10%, transparent);
             }
 
             /* Glass Search Input - Light Mode */
             #listings-index-glass-wrapper .glass-search-input {
                 width: 100%;
                 padding: 16px 20px 16px 50px;
-                border: 2px solid rgba(255, 255, 255, 0.4);
-                border-radius: 16px;
+                border: 2px solid color-mix(in srgb, white 40%, transparent);
+                border-radius: var(--radius-lg);
                 font-size: 1.05rem;
-                background: rgba(255, 255, 255, 0.6);
+                background: color-mix(in srgb, white 60%, transparent);
                 backdrop-filter: blur(10px);
                 -webkit-backdrop-filter: blur(10px);
-                box-shadow: 0 4px 12px rgba(31, 38, 135, 0.1),
-                    inset 0 1px 0 rgba(255, 255, 255, 0.6);
+                box-shadow: 0 4px 12px color-mix(in srgb, var(--color-gray-900) 10%, transparent),
+                    inset 0 1px 0 color-mix(in srgb, white 60%, transparent);
                 transition: all 0.3s ease;
                 box-sizing: border-box;
                 color: var(--htb-text-main);
             }
 
             #listings-index-glass-wrapper .glass-search-input:focus {
-                border-color: rgba(99, 102, 241, 0.6);
-                box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.15),
-                    0 8px 24px rgba(99, 102, 241, 0.2);
+                border-color: color-mix(in srgb, var(--color-primary-500) 60%, transparent);
+                box-shadow: 0 0 0 4px color-mix(in srgb, var(--color-primary-500) 15%, transparent),
+                    0 8px 24px color-mix(in srgb, var(--color-primary-500) 20%, transparent);
                 outline: none;
-                background: rgba(255, 255, 255, 0.8);
+                background: color-mix(in srgb, white 80%, transparent);
             }
 
             /* Dark Mode Search Input */
             [data-theme="dark"] #listings-index-glass-wrapper .glass-search-input {
-                background: rgba(15, 23, 42, 0.7);
-                border: 2px solid rgba(255, 255, 255, 0.2);
-                color: #f8fafc;
-                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3),
-                    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+                background: color-mix(in srgb, var(--color-gray-100) 70%, transparent);
+                border: 2px solid color-mix(in srgb, white 20%, transparent);
+                color: var(--color-gray-900);
+                box-shadow: 0 4px 12px color-mix(in srgb, black 30%, transparent),
+                    inset 0 1px 0 color-mix(in srgb, white 10%, transparent);
             }
 
             [data-theme="dark"] #listings-index-glass-wrapper .glass-search-input::placeholder {
-                color: #cbd5e1;
+                color: var(--color-gray-600);
             }
 
             [data-theme="dark"] #listings-index-glass-wrapper .glass-search-input:focus {
-                border-color: rgba(99, 102, 241, 0.5);
-                box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.2),
-                    0 8px 24px rgba(99, 102, 241, 0.3);
-                background: rgba(15, 23, 42, 0.85);
+                border-color: color-mix(in srgb, var(--color-primary-500) 50%, transparent);
+                box-shadow: 0 0 0 4px color-mix(in srgb, var(--color-primary-500) 20%, transparent),
+                    0 8px 24px color-mix(in srgb, var(--color-primary-500) 30%, transparent);
+                background: color-mix(in srgb, var(--color-gray-100) 85%, transparent);
             }
 
             /* Glass Badges - Offers (Green) */
             #listings-index-glass-wrapper .glass-badge-offer {
                 background: linear-gradient(135deg,
-                        rgba(236, 253, 245, 0.8),
-                        rgba(209, 250, 229, 0.7));
+                        color-mix(in srgb, var(--color-success) 15%, var(--color-gray-50)),
+                        color-mix(in srgb, var(--color-success) 10%, var(--color-gray-50)));
                 backdrop-filter: blur(10px);
                 -webkit-backdrop-filter: blur(10px);
-                color: #059669;
+                color: var(--color-success);
                 text-decoration: none;
                 padding: 6px 14px;
-                border-radius: 12px;
+                border-radius: var(--radius-md);
                 font-weight: 600;
                 font-size: 0.85rem;
-                border: 1px solid rgba(16, 185, 129, 0.3);
-                box-shadow: 0 2px 8px rgba(16, 185, 129, 0.15);
+                border: 1px solid color-mix(in srgb, var(--color-success) 30%, transparent);
+                box-shadow: 0 2px 8px color-mix(in srgb, var(--color-success) 15%, transparent);
                 transition: all 0.3s ease;
             }
 
             #listings-index-glass-wrapper .glass-badge-offer:hover {
                 transform: translateY(-2px);
-                box-shadow: 0 4px 16px rgba(16, 185, 129, 0.25),
-                    0 0 24px rgba(16, 185, 129, 0.2);
-                border-color: rgba(16, 185, 129, 0.5);
+                box-shadow: 0 4px 16px color-mix(in srgb, var(--color-success) 25%, transparent),
+                    0 0 24px color-mix(in srgb, var(--color-success) 20%, transparent);
+                border-color: color-mix(in srgb, var(--color-success) 50%, transparent);
             }
 
             [data-theme="dark"] #listings-index-glass-wrapper .glass-badge-offer {
                 background: linear-gradient(135deg,
-                        rgba(16, 185, 129, 0.25),
-                        rgba(5, 150, 105, 0.2));
-                color: #6ee7b7;
-                border: 1px solid rgba(16, 185, 129, 0.4);
-                box-shadow: 0 2px 8px rgba(16, 185, 129, 0.2),
-                    0 0 16px rgba(16, 185, 129, 0.1);
+                        color-mix(in srgb, var(--color-success) 25%, transparent),
+                        color-mix(in srgb, var(--color-success) 20%, transparent));
+                color: var(--color-gray-700);
+                border: 1px solid color-mix(in srgb, var(--color-success) 40%, transparent);
+                box-shadow: 0 2px 8px color-mix(in srgb, var(--color-success) 20%, transparent),
+                    0 0 16px color-mix(in srgb, var(--color-success) 10%, transparent);
             }
 
             [data-theme="dark"] #listings-index-glass-wrapper .glass-badge-offer:hover {
-                box-shadow: 0 4px 16px rgba(16, 185, 129, 0.35),
-                    0 0 32px rgba(16, 185, 129, 0.25);
+                box-shadow: 0 4px 16px color-mix(in srgb, var(--color-success) 35%, transparent),
+                    0 0 32px color-mix(in srgb, var(--color-success) 25%, transparent);
             }
 
             /* Glass Badges - Requests (Orange) */
             #listings-index-glass-wrapper .glass-badge-request {
                 background: linear-gradient(135deg,
-                        rgba(255, 247, 237, 0.8),
-                        rgba(255, 237, 213, 0.7));
+                        color-mix(in srgb, var(--color-orange-500) 10%, var(--color-gray-50)),
+                        color-mix(in srgb, var(--color-orange-500) 8%, var(--color-gray-50)));
                 backdrop-filter: blur(10px);
                 -webkit-backdrop-filter: blur(10px);
-                color: #ea580c;
+                color: var(--color-orange-600);
                 text-decoration: none;
                 padding: 6px 14px;
-                border-radius: 12px;
+                border-radius: var(--radius-md);
                 font-weight: 600;
                 font-size: 0.85rem;
-                border: 1px solid rgba(249, 115, 22, 0.3);
-                box-shadow: 0 2px 8px rgba(249, 115, 22, 0.15);
+                border: 1px solid color-mix(in srgb, var(--color-orange-500) 30%, transparent);
+                box-shadow: 0 2px 8px color-mix(in srgb, var(--color-orange-500) 15%, transparent);
                 transition: all 0.3s ease;
             }
 
             #listings-index-glass-wrapper .glass-badge-request:hover {
                 transform: translateY(-2px);
-                box-shadow: 0 4px 16px rgba(249, 115, 22, 0.25),
-                    0 0 24px rgba(249, 115, 22, 0.2);
-                border-color: rgba(249, 115, 22, 0.5);
+                box-shadow: 0 4px 16px color-mix(in srgb, var(--color-orange-500) 25%, transparent),
+                    0 0 24px color-mix(in srgb, var(--color-orange-500) 20%, transparent);
+                border-color: color-mix(in srgb, var(--color-orange-500) 50%, transparent);
             }
 
             [data-theme="dark"] #listings-index-glass-wrapper .glass-badge-request {
                 background: linear-gradient(135deg,
-                        rgba(249, 115, 22, 0.25),
-                        rgba(234, 88, 12, 0.2));
-                color: #fdba74;
-                border: 1px solid rgba(249, 115, 22, 0.4);
-                box-shadow: 0 2px 8px rgba(249, 115, 22, 0.2),
-                    0 0 16px rgba(249, 115, 22, 0.1);
+                        color-mix(in srgb, var(--color-orange-500) 25%, transparent),
+                        color-mix(in srgb, var(--color-orange-600) 20%, transparent));
+                color: var(--color-gray-700);
+                border: 1px solid color-mix(in srgb, var(--color-orange-500) 40%, transparent);
+                box-shadow: 0 2px 8px color-mix(in srgb, var(--color-orange-500) 20%, transparent),
+                    0 0 16px color-mix(in srgb, var(--color-orange-500) 10%, transparent);
             }
 
             [data-theme="dark"] #listings-index-glass-wrapper .glass-badge-request:hover {
-                box-shadow: 0 4px 16px rgba(249, 115, 22, 0.35),
-                    0 0 32px rgba(249, 115, 22, 0.25);
+                box-shadow: 0 4px 16px color-mix(in srgb, var(--color-orange-500) 35%, transparent),
+                    0 0 32px color-mix(in srgb, var(--color-orange-500) 25%, transparent);
             }
 
             /* Glass Badge - All (Blue/Purple) */
             #listings-index-glass-wrapper .glass-badge-all {
                 background: linear-gradient(135deg,
-                        rgba(238, 242, 255, 0.8),
-                        rgba(224, 231, 255, 0.7));
+                        color-mix(in srgb, var(--color-primary-500) 10%, var(--color-gray-50)),
+                        color-mix(in srgb, var(--color-primary-500) 8%, var(--color-gray-50)));
                 backdrop-filter: blur(10px);
                 -webkit-backdrop-filter: blur(10px);
-                color: #6366f1;
+                color: var(--color-primary-500);
                 text-decoration: none;
                 padding: 6px 14px;
-                border-radius: 12px;
+                border-radius: var(--radius-md);
                 font-weight: 600;
                 font-size: 0.85rem;
-                border: 1px solid rgba(99, 102, 241, 0.3);
-                box-shadow: 0 2px 8px rgba(99, 102, 241, 0.15);
+                border: 1px solid color-mix(in srgb, var(--color-primary-500) 30%, transparent);
+                box-shadow: 0 2px 8px color-mix(in srgb, var(--color-primary-500) 15%, transparent);
                 transition: all 0.3s ease;
             }
 
             #listings-index-glass-wrapper .glass-badge-all:hover {
                 transform: translateY(-2px);
-                box-shadow: 0 4px 16px rgba(99, 102, 241, 0.25);
+                box-shadow: 0 4px 16px color-mix(in srgb, var(--color-primary-500) 25%, transparent);
             }
 
             [data-theme="dark"] #listings-index-glass-wrapper .glass-badge-all {
                 background: linear-gradient(135deg,
-                        rgba(99, 102, 241, 0.25),
-                        rgba(139, 92, 246, 0.2));
-                color: #a5b4fc;
-                border: 1px solid rgba(99, 102, 241, 0.4);
+                        color-mix(in srgb, var(--color-primary-500) 25%, transparent),
+                        color-mix(in srgb, var(--color-purple-500) 20%, transparent));
+                color: var(--color-primary-300);
+                border: 1px solid color-mix(in srgb, var(--color-primary-500) 40%, transparent);
             }
 
             /* Active State for Filter Badges */
@@ -236,31 +236,31 @@
             #listings-index-glass-wrapper .glass-badge-offer.active,
             #listings-index-glass-wrapper .glass-badge-request.active {
                 transform: scale(1.05);
-                box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+                box-shadow: 0 4px 16px color-mix(in srgb, black 20%, transparent);
             }
 
             #listings-index-glass-wrapper .glass-badge-all.active {
-                background: linear-gradient(135deg, #6366f1, #8b5cf6);
+                background: linear-gradient(135deg, var(--color-primary-500), var(--color-purple-500));
                 color: white;
-                border-color: #6366f1;
+                border-color: var(--color-primary-500);
             }
 
             #listings-index-glass-wrapper .glass-badge-offer.active {
-                background: linear-gradient(135deg, #10b981, #059669);
+                background: linear-gradient(135deg, var(--color-success), var(--color-success));
                 color: white;
-                border-color: #10b981;
+                border-color: var(--color-success);
             }
 
             #listings-index-glass-wrapper .glass-badge-request.active {
-                background: linear-gradient(135deg, #f97316, #ea580c);
+                background: linear-gradient(135deg, var(--color-orange-500), var(--color-orange-600));
                 color: white;
-                border-color: #f97316;
+                border-color: var(--color-orange-500);
             }
 
             /* Category Filter Chips */
             #listings-index-glass-wrapper .category-filter-chip:hover {
                 transform: translateY(-1px);
-                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+                box-shadow: 0 4px 12px color-mix(in srgb, black 15%, transparent);
             }
 
             /* Glass Listing Cards - Light Mode - MOBILE OPTIMIZED */
@@ -268,14 +268,14 @@
                 position: relative;
                 display: block;
                 background: linear-gradient(135deg,
-                        rgba(255, 255, 255, 0.75),
-                        rgba(255, 255, 255, 0.6));
+                        color-mix(in srgb, white 75%, transparent),
+                        color-mix(in srgb, white 60%, transparent));
                 backdrop-filter: blur(20px) saturate(120%);
                 -webkit-backdrop-filter: blur(20px) saturate(120%);
-                border: 1px solid rgba(255, 255, 255, 0.3);
-                border-radius: 20px;
-                box-shadow: 0 8px 32px rgba(31, 38, 135, 0.12),
-                    inset 0 1px 0 rgba(255, 255, 255, 0.5);
+                border: 1px solid color-mix(in srgb, white 30%, transparent);
+                border-radius: var(--radius-xl);
+                box-shadow: 0 8px 32px color-mix(in srgb, var(--color-gray-900) 12%, transparent),
+                    inset 0 1px 0 color-mix(in srgb, white 50%, transparent);
                 transition: all 0.3s ease;
                 overflow: hidden;
                 text-decoration: none;
@@ -286,9 +286,9 @@
 
             #listings-index-glass-wrapper .glass-listing-card:hover {
                 transform: translateY(-8px);
-                box-shadow: 0 16px 48px rgba(31, 38, 135, 0.2),
-                    0 0 0 1px rgba(99, 102, 241, 0.2),
-                    inset 0 1px 0 rgba(255, 255, 255, 0.6);
+                box-shadow: 0 16px 48px color-mix(in srgb, var(--color-gray-900) 20%, transparent),
+                    0 0 0 1px color-mix(in srgb, var(--color-primary-500) 20%, transparent),
+                    inset 0 1px 0 color-mix(in srgb, white 60%, transparent);
             }
 
             #listings-index-glass-wrapper .glass-listing-card:active {
@@ -298,22 +298,22 @@
             /* Dark Mode Listing Cards */
             [data-theme="dark"] #listings-index-glass-wrapper .glass-listing-card {
                 background: linear-gradient(135deg,
-                        rgba(15, 23, 42, 0.6),
-                        rgba(30, 41, 59, 0.5));
+                        color-mix(in srgb, var(--color-gray-100) 60%, transparent),
+                        color-mix(in srgb, var(--color-gray-200) 50%, transparent));
                 backdrop-filter: blur(24px) saturate(150%);
                 -webkit-backdrop-filter: blur(24px) saturate(150%);
-                border: 1px solid rgba(255, 255, 255, 0.15);
-                box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5),
-                    0 0 60px rgba(0, 200, 255, 0.08),
-                    inset 0 1px 0 rgba(255, 255, 255, 0.08);
+                border: 1px solid color-mix(in srgb, white 15%, transparent);
+                box-shadow: 0 8px 32px color-mix(in srgb, black 50%, transparent),
+                    0 0 60px color-mix(in srgb, var(--color-info) 8%, transparent),
+                    inset 0 1px 0 color-mix(in srgb, white 8%, transparent);
             }
 
             [data-theme="dark"] #listings-index-glass-wrapper .glass-listing-card:hover {
                 transform: translateY(-8px);
-                box-shadow: 0 16px 48px rgba(0, 0, 0, 0.7),
-                    0 0 0 1px rgba(99, 102, 241, 0.25),
-                    0 0 80px rgba(236, 72, 153, 0.15),
-                    inset 0 1px 0 rgba(255, 255, 255, 0.12);
+                box-shadow: 0 16px 48px color-mix(in srgb, black 70%, transparent),
+                    0 0 0 1px color-mix(in srgb, var(--color-primary-500) 25%, transparent),
+                    0 0 80px color-mix(in srgb, var(--color-pink-500) 15%, transparent),
+                    inset 0 1px 0 color-mix(in srgb, white 12%, transparent);
             }
 
             /* Card Body with proper touch targets */
@@ -332,7 +332,7 @@
 
             /* Card Footer with author info */
             #listings-index-glass-wrapper .glass-listing-card .card-footer {
-                border-top: 1px solid rgba(0, 0, 0, 0.06);
+                border-top: 1px solid color-mix(in srgb, black 6%, transparent);
                 padding-top: 15px;
                 margin-top: 15px;
                 display: flex;
@@ -355,7 +355,7 @@
                 height: 36px;
                 border-radius: 50%;
                 object-fit: cover;
-                border: 2px solid rgba(255, 255, 255, 0.8);
+                border: 2px solid color-mix(in srgb, white 80%, transparent);
             }
 
             #listings-index-glass-wrapper .glass-listing-card .card-view-btn {
@@ -363,9 +363,9 @@
                 align-items: center;
                 gap: 6px;
                 padding: 8px 16px;
-                background: linear-gradient(135deg, #6366f1, #8b5cf6);
+                background: linear-gradient(135deg, var(--color-primary-500), var(--color-purple-500));
                 color: white;
-                border-radius: 10px;
+                border-radius: var(--radius-base);
                 font-weight: 600;
                 font-size: 0.85rem;
                 text-decoration: none;
@@ -377,36 +377,36 @@
                 text-align: center;
                 padding: 60px;
                 background: linear-gradient(135deg,
-                        rgba(255, 255, 255, 0.7),
-                        rgba(255, 255, 255, 0.5));
+                        color-mix(in srgb, white 70%, transparent),
+                        color-mix(in srgb, white 50%, transparent));
                 backdrop-filter: blur(20px);
                 -webkit-backdrop-filter: blur(20px);
-                border: 1px solid rgba(255, 255, 255, 0.3);
-                border-radius: 20px;
-                box-shadow: 0 8px 32px rgba(31, 38, 135, 0.12);
+                border: 1px solid color-mix(in srgb, white 30%, transparent);
+                border-radius: var(--radius-xl);
+                box-shadow: 0 8px 32px color-mix(in srgb, var(--color-gray-900) 12%, transparent);
             }
 
             [data-theme="dark"] #listings-index-glass-wrapper .glass-empty-state {
                 background: linear-gradient(135deg,
-                        rgba(15, 23, 42, 0.6),
-                        rgba(30, 41, 59, 0.5));
-                border: 1px solid rgba(255, 255, 255, 0.15);
-                box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+                        color-mix(in srgb, var(--color-gray-100) 60%, transparent),
+                        color-mix(in srgb, var(--color-gray-200) 50%, transparent));
+                border: 1px solid color-mix(in srgb, white 15%, transparent);
+                box-shadow: 0 8px 32px color-mix(in srgb, black 50%, transparent);
             }
 
             /* Spinner Glass Container */
             #listings-index-glass-wrapper .spinner {
                 width: 24px;
                 height: 24px;
-                border: 3px solid rgba(255, 255, 255, 0.3);
+                border: 3px solid color-mix(in srgb, white 30%, transparent);
                 border-top-color: var(--htb-brand-blue);
                 border-radius: 50%;
                 animation: spin 0.8s linear infinite;
             }
 
             [data-theme="dark"] #listings-index-glass-wrapper .spinner {
-                border-color: rgba(255, 255, 255, 0.2);
-                border-top-color: #818cf8;
+                border-color: color-mix(in srgb, white 20%, transparent);
+                border-top-color: var(--color-primary-400);
             }
 
             @keyframes spin {
@@ -467,7 +467,7 @@
 
                 #listings-index-glass-wrapper .glass-listing-card:active {
                     transform: scale(0.98);
-                    background: rgba(99, 102, 241, 0.05);
+                    background: color-mix(in srgb, var(--color-primary-500) 5%, transparent);
                 }
 
                 /* Smaller card header on mobile */
@@ -566,12 +566,12 @@
 
                 #listings-index-glass-wrapper .glass-search-card,
                 #listings-index-glass-wrapper .glass-listing-card {
-                    background: rgba(255, 255, 255, 0.95);
+                    background: color-mix(in srgb, white 95%, transparent);
                 }
 
                 [data-theme="dark"] #listings-index-glass-wrapper .glass-search-card,
                 [data-theme="dark"] #listings-index-glass-wrapper .glass-listing-card {
-                    background: rgba(15, 23, 42, 0.95);
+                    background: color-mix(in srgb, var(--color-gray-100) 95%, transparent);
                 }
             }
 
@@ -580,45 +580,45 @@
                ================================= */
             .nexus-welcome-hero {
                 background: linear-gradient(135deg,
-                    rgba(16, 185, 129, 0.12) 0%,
-                    rgba(59, 130, 246, 0.12) 50%,
-                    rgba(139, 92, 246, 0.08) 100%);
+                    color-mix(in srgb, var(--color-success) 12%, transparent) 0%,
+                    color-mix(in srgb, var(--color-info) 12%, transparent) 50%,
+                    color-mix(in srgb, var(--color-purple-500) 8%, transparent) 100%);
                 backdrop-filter: blur(30px) saturate(150%);
                 -webkit-backdrop-filter: blur(30px) saturate(150%);
-                border: 2px solid rgba(255, 255, 255, 0.5);
-                border-radius: 20px;
+                border: 2px solid color-mix(in srgb, white 50%, transparent);
+                border-radius: var(--radius-xl);
                 padding: 28px 24px;
                 margin-bottom: 20px;
                 text-align: center;
-                box-shadow: 0 12px 40px rgba(16, 185, 129, 0.15),
-                            inset 0 2px 0 rgba(255, 255, 255, 0.6);
+                box-shadow: 0 12px 40px color-mix(in srgb, var(--color-success) 15%, transparent),
+                            inset 0 2px 0 color-mix(in srgb, white 60%, transparent);
             }
 
             [data-theme="dark"] .nexus-welcome-hero {
                 background: linear-gradient(135deg,
-                    rgba(16, 185, 129, 0.20) 0%,
-                    rgba(59, 130, 246, 0.20) 50%,
-                    rgba(139, 92, 246, 0.15) 100%);
-                border: 2px solid rgba(255, 255, 255, 0.2);
-                box-shadow: 0 12px 40px rgba(16, 185, 129, 0.25),
-                            0 0 60px rgba(16, 185, 129, 0.15),
-                            inset 0 2px 0 rgba(255, 255, 255, 0.15);
+                    color-mix(in srgb, var(--color-success) 20%, transparent) 0%,
+                    color-mix(in srgb, var(--color-info) 20%, transparent) 50%,
+                    color-mix(in srgb, var(--color-purple-500) 15%, transparent) 100%);
+                border: 2px solid color-mix(in srgb, white 20%, transparent);
+                box-shadow: 0 12px 40px color-mix(in srgb, var(--color-success) 25%, transparent),
+                            0 0 60px color-mix(in srgb, var(--color-success) 15%, transparent),
+                            inset 0 2px 0 color-mix(in srgb, white 15%, transparent);
             }
 
             .nexus-welcome-title {
                 font-size: 1.75rem;
                 font-weight: 800;
-                background: linear-gradient(90deg, #10b981, #3b82f6, #8b5cf6);
+                background: linear-gradient(90deg, var(--color-success), var(--color-info), var(--color-purple-500));
                 -webkit-background-clip: text;
                 -webkit-text-fill-color: transparent;
                 background-clip: text;
                 margin: 0 0 8px 0;
                 line-height: 1.2;
-                filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
+                filter: drop-shadow(0 2px 4px color-mix(in srgb, black 10%, transparent));
             }
 
             [data-theme="dark"] .nexus-welcome-title {
-                background: linear-gradient(90deg, #34d399, #60a5fa, #a78bfa);
+                background: linear-gradient(90deg, var(--color-gray-700), var(--color-gray-700), var(--color-gray-700));
                 -webkit-background-clip: text;
                 -webkit-text-fill-color: transparent;
                 background-clip: text;
@@ -626,7 +626,7 @@
 
             .nexus-welcome-subtitle {
                 font-size: 0.95rem;
-                color: #64748b;
+                color: var(--color-gray-500);
                 margin: 0;
                 line-height: 1.5;
                 max-width: 500px;
@@ -635,7 +635,7 @@
             }
 
             [data-theme="dark"] .nexus-welcome-subtitle {
-                color: #cbd5e1;
+                color: var(--color-gray-600);
             }
 
             /* ============================================
@@ -651,28 +651,28 @@
             }
 
             .skeleton-card {
-                background: linear-gradient(135deg, rgba(255, 255, 255, 0.7), rgba(255, 255, 255, 0.5));
+                background: linear-gradient(135deg, color-mix(in srgb, white 70%, transparent), color-mix(in srgb, white 50%, transparent));
                 backdrop-filter: blur(20px);
                 -webkit-backdrop-filter: blur(20px);
-                border: 1px solid rgba(255, 255, 255, 0.3);
-                border-radius: 20px;
+                border: 1px solid color-mix(in srgb, white 30%, transparent);
+                border-radius: var(--radius-xl);
                 overflow: hidden;
             }
 
             [data-theme="dark"] .skeleton-card {
-                background: linear-gradient(135deg, rgba(15, 23, 42, 0.6), rgba(30, 41, 59, 0.5));
-                border-color: rgba(255, 255, 255, 0.15);
+                background: linear-gradient(135deg, color-mix(in srgb, var(--color-gray-100) 60%, transparent), color-mix(in srgb, var(--color-gray-200) 50%, transparent));
+                border-color: color-mix(in srgb, white 15%, transparent);
             }
 
             .skeleton-image {
                 height: 180px;
-                background: linear-gradient(90deg, #e5e7eb 25%, #f3f4f6 50%, #e5e7eb 75%);
+                background: linear-gradient(90deg, var(--color-gray-200) 25%, var(--color-gray-100) 50%, var(--color-gray-200) 75%);
                 background-size: 200% 100%;
                 animation: skeleton-shimmer 1.5s infinite;
             }
 
             [data-theme="dark"] .skeleton-image {
-                background: linear-gradient(90deg, #1e293b 25%, #334155 50%, #1e293b 75%);
+                background: linear-gradient(90deg, var(--color-gray-200) 25%, var(--color-gray-300) 50%, var(--color-gray-200) 75%);
                 background-size: 200% 100%;
             }
 
@@ -682,15 +682,15 @@
 
             .skeleton-line {
                 height: 12px;
-                border-radius: 6px;
-                background: linear-gradient(90deg, #e5e7eb 25%, #f3f4f6 50%, #e5e7eb 75%);
+                border-radius: var(--radius-sm);
+                background: linear-gradient(90deg, var(--color-gray-200) 25%, var(--color-gray-100) 50%, var(--color-gray-200) 75%);
                 background-size: 200% 100%;
                 animation: skeleton-shimmer 1.5s infinite;
                 margin-bottom: 10px;
             }
 
             [data-theme="dark"] .skeleton-line {
-                background: linear-gradient(90deg, #1e293b 25%, #334155 50%, #1e293b 75%);
+                background: linear-gradient(90deg, var(--color-gray-200) 25%, var(--color-gray-300) 50%, var(--color-gray-200) 75%);
                 background-size: 200% 100%;
             }
 
@@ -710,13 +710,13 @@
                 width: 36px;
                 height: 36px;
                 border-radius: 50%;
-                background: linear-gradient(90deg, #e5e7eb 25%, #f3f4f6 50%, #e5e7eb 75%);
+                background: linear-gradient(90deg, var(--color-gray-200) 25%, var(--color-gray-100) 50%, var(--color-gray-200) 75%);
                 background-size: 200% 100%;
                 animation: skeleton-shimmer 1.5s infinite;
             }
 
             [data-theme="dark"] .skeleton-avatar {
-                background: linear-gradient(90deg, #1e293b 25%, #334155 50%, #1e293b 75%);
+                background: linear-gradient(90deg, var(--color-gray-200) 25%, var(--color-gray-300) 50%, var(--color-gray-200) 75%);
                 background-size: 200% 100%;
             }
 
@@ -791,7 +791,7 @@
                 left: 50%;
                 width: 0;
                 height: 0;
-                background: rgba(255, 255, 255, 0.3);
+                background: color-mix(in srgb, white 30%, transparent);
                 border-radius: 50%;
                 transform: translate(-50%, -50%);
                 opacity: 0;
@@ -825,7 +825,7 @@
                 right: 0;
                 z-index: 10001;
                 padding: 10px 16px;
-                background: linear-gradient(135deg, #ef4444, #dc2626);
+                background: linear-gradient(135deg, var(--color-danger), var(--color-danger));
                 color: white;
                 font-size: 13px;
                 font-weight: 600;
@@ -866,7 +866,7 @@
             .glass-search-input:focus-visible,
             button:focus-visible,
             a:focus-visible {
-                outline: 3px solid rgba(99, 102, 241, 0.5);
+                outline: 3px solid color-mix(in srgb, var(--color-primary-500) 50%, transparent);
                 outline-offset: 2px;
             }
 
@@ -888,21 +888,21 @@
                 justify-content: center;
                 padding: 30px 20px;
                 gap: 10px;
-                color: #6b7280;
+                color: var(--color-gray-500);
                 font-size: 14px;
                 grid-column: 1 / -1;
             }
 
             .infinite-loader i {
                 font-size: 20px;
-                color: #6366f1;
+                color: var(--color-primary-500);
                 animation: spin 1s linear infinite;
             }
 
             .feed-end-message {
                 text-align: center;
                 padding: 30px 20px;
-                color: #9ca3af;
+                color: var(--color-gray-400);
                 font-size: 14px;
                 grid-column: 1 / -1;
             }
@@ -944,20 +944,20 @@
 
             #listings-index-glass-wrapper .quick-action-btn {
                 background: linear-gradient(135deg,
-                        rgba(255, 255, 255, 0.75),
-                        rgba(255, 255, 255, 0.6));
+                        color-mix(in srgb, white 75%, transparent),
+                        color-mix(in srgb, white 60%, transparent));
                 backdrop-filter: blur(16px) saturate(120%);
                 -webkit-backdrop-filter: blur(16px) saturate(120%);
-                border: 2px solid rgba(255, 255, 255, 0.3);
-                border-radius: 14px;
+                border: 2px solid color-mix(in srgb, white 30%, transparent);
+                border-radius: var(--radius-md);
                 padding: 14px 20px;
                 text-decoration: none;
                 display: flex;
                 align-items: center;
                 gap: 10px;
                 transition: all 0.3s ease;
-                box-shadow: 0 4px 12px rgba(31, 38, 135, 0.1),
-                    inset 0 1px 0 rgba(255, 255, 255, 0.4);
+                box-shadow: 0 4px 12px color-mix(in srgb, var(--color-gray-900) 10%, transparent),
+                    inset 0 1px 0 color-mix(in srgb, white 40%, transparent);
                 position: relative;
                 overflow: hidden;
             }
@@ -969,7 +969,7 @@
                 left: 0;
                 right: 0;
                 bottom: 0;
-                background: linear-gradient(135deg, rgba(99, 102, 241, 0.08), rgba(139, 92, 246, 0.08));
+                background: linear-gradient(135deg, color-mix(in srgb, var(--color-primary-500) 8%, transparent), color-mix(in srgb, var(--color-purple-500) 8%, transparent));
                 opacity: 0;
                 transition: opacity 0.3s ease;
             }
@@ -980,26 +980,26 @@
 
             #listings-index-glass-wrapper .quick-action-btn:hover {
                 transform: translateY(-3px);
-                border-color: rgba(99, 102, 241, 0.4);
-                box-shadow: 0 8px 20px rgba(99, 102, 241, 0.15),
-                    0 0 0 1px rgba(99, 102, 241, 0.15),
-                    inset 0 1px 0 rgba(255, 255, 255, 0.5);
+                border-color: color-mix(in srgb, var(--color-primary-500) 40%, transparent);
+                box-shadow: 0 8px 20px color-mix(in srgb, var(--color-primary-500) 15%, transparent),
+                    0 0 0 1px color-mix(in srgb, var(--color-primary-500) 15%, transparent),
+                    inset 0 1px 0 color-mix(in srgb, white 50%, transparent);
             }
 
             [data-theme="dark"] #listings-index-glass-wrapper .quick-action-btn {
                 background: linear-gradient(135deg,
-                        rgba(15, 23, 42, 0.6),
-                        rgba(30, 41, 59, 0.5));
-                border: 2px solid rgba(255, 255, 255, 0.12);
-                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3),
-                    inset 0 1px 0 rgba(255, 255, 255, 0.06);
+                        color-mix(in srgb, var(--color-gray-100) 60%, transparent),
+                        color-mix(in srgb, var(--color-gray-200) 50%, transparent));
+                border: 2px solid color-mix(in srgb, white 12%, transparent);
+                box-shadow: 0 4px 12px color-mix(in srgb, black 30%, transparent),
+                    inset 0 1px 0 color-mix(in srgb, white 6%, transparent);
             }
 
             [data-theme="dark"] #listings-index-glass-wrapper .quick-action-btn:hover {
-                border-color: rgba(99, 102, 241, 0.3);
-                box-shadow: 0 8px 20px rgba(99, 102, 241, 0.25),
-                    0 0 0 1px rgba(99, 102, 241, 0.2),
-                    0 0 30px rgba(236, 72, 153, 0.12);
+                border-color: color-mix(in srgb, var(--color-primary-500) 30%, transparent);
+                box-shadow: 0 8px 20px color-mix(in srgb, var(--color-primary-500) 25%, transparent),
+                    0 0 0 1px color-mix(in srgb, var(--color-primary-500) 20%, transparent),
+                    0 0 30px color-mix(in srgb, var(--color-pink-500) 12%, transparent);
             }
 
             #listings-index-glass-wrapper .quick-action-icon {
@@ -1042,31 +1042,31 @@
            =================================== */
             #listings-index-glass-wrapper .nexus-welcome-hero {
                 background: linear-gradient(135deg,
-                        rgba(99, 102, 241, 0.12) 0%,
-                        rgba(139, 92, 246, 0.12) 50%,
-                        rgba(236, 72, 153, 0.08) 100%);
+                        color-mix(in srgb, var(--color-primary-500) 12%, transparent) 0%,
+                        color-mix(in srgb, var(--color-purple-500) 12%, transparent) 50%,
+                        color-mix(in srgb, var(--color-pink-500) 8%, transparent) 100%);
                 backdrop-filter: blur(20px);
                 -webkit-backdrop-filter: blur(20px);
-                border: 1px solid rgba(255, 255, 255, 0.4);
-                border-radius: 20px;
+                border: 1px solid color-mix(in srgb, white 40%, transparent);
+                border-radius: var(--radius-xl);
                 padding: 28px 24px;
                 margin-bottom: 30px;
                 text-align: center;
-                box-shadow: 0 8px 32px rgba(99, 102, 241, 0.1);
+                box-shadow: 0 8px 32px color-mix(in srgb, var(--color-primary-500) 10%, transparent);
             }
 
             [data-theme="dark"] #listings-index-glass-wrapper .nexus-welcome-hero {
                 background: linear-gradient(135deg,
-                        rgba(99, 102, 241, 0.15) 0%,
-                        rgba(139, 92, 246, 0.15) 50%,
-                        rgba(236, 72, 153, 0.1) 100%);
-                border-color: rgba(255, 255, 255, 0.1);
+                        color-mix(in srgb, var(--color-primary-500) 15%, transparent) 0%,
+                        color-mix(in srgb, var(--color-purple-500) 15%, transparent) 50%,
+                        color-mix(in srgb, var(--color-pink-500) 10%, transparent) 100%);
+                border-color: color-mix(in srgb, white 10%, transparent);
             }
 
             #listings-index-glass-wrapper .nexus-welcome-title {
                 font-size: 1.75rem;
                 font-weight: 800;
-                background: linear-gradient(135deg, #4f46e5, #7c3aed, #db2777);
+                background: linear-gradient(135deg, var(--color-primary-600), var(--color-purple-500), var(--color-pink-500));
                 -webkit-background-clip: text;
                 -webkit-text-fill-color: transparent;
                 background-clip: text;
@@ -1109,67 +1109,67 @@
             }
 
             #listings-index-glass-wrapper .nexus-smart-btn-primary {
-                background: linear-gradient(135deg, #6366f1, #8b5cf6);
+                background: linear-gradient(135deg, var(--color-primary-500), var(--color-purple-500));
                 color: white;
-                box-shadow: 0 4px 14px rgba(99, 102, 241, 0.35);
+                box-shadow: 0 4px 14px color-mix(in srgb, var(--color-primary-500) 35%, transparent);
             }
 
             #listings-index-glass-wrapper .nexus-smart-btn-primary:hover {
                 transform: translateY(-2px);
-                box-shadow: 0 6px 20px rgba(99, 102, 241, 0.45);
+                box-shadow: 0 6px 20px color-mix(in srgb, var(--color-primary-500) 45%, transparent);
             }
 
             #listings-index-glass-wrapper .nexus-smart-btn-secondary {
-                background: linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(52, 211, 153, 0.1));
-                color: #059669;
-                border-color: rgba(16, 185, 129, 0.3);
+                background: linear-gradient(135deg, color-mix(in srgb, var(--color-success) 10%, transparent), color-mix(in srgb, var(--color-success) 10%, transparent));
+                color: var(--color-success);
+                border-color: color-mix(in srgb, var(--color-success) 30%, transparent);
             }
 
             [data-theme="dark"] #listings-index-glass-wrapper .nexus-smart-btn-secondary {
-                background: linear-gradient(135deg, rgba(16, 185, 129, 0.2), rgba(52, 211, 153, 0.15));
-                color: #6ee7b7;
-                border-color: rgba(16, 185, 129, 0.4);
+                background: linear-gradient(135deg, color-mix(in srgb, var(--color-success) 20%, transparent), color-mix(in srgb, var(--color-success) 15%, transparent));
+                color: var(--color-gray-700);
+                border-color: color-mix(in srgb, var(--color-success) 40%, transparent);
             }
 
             #listings-index-glass-wrapper .nexus-smart-btn-secondary:hover {
-                background: linear-gradient(135deg, #10b981, #34d399);
+                background: linear-gradient(135deg, var(--color-success), var(--color-success));
                 color: white;
                 border-color: transparent;
                 transform: translateY(-2px);
             }
 
             #listings-index-glass-wrapper .nexus-smart-btn-tertiary {
-                background: linear-gradient(135deg, rgba(249, 115, 22, 0.1), rgba(251, 146, 60, 0.1));
-                color: #ea580c;
-                border-color: rgba(249, 115, 22, 0.3);
+                background: linear-gradient(135deg, color-mix(in srgb, var(--color-orange-500) 10%, transparent), color-mix(in srgb, var(--color-orange-500) 10%, transparent));
+                color: var(--color-orange-600);
+                border-color: color-mix(in srgb, var(--color-orange-500) 30%, transparent);
             }
 
             [data-theme="dark"] #listings-index-glass-wrapper .nexus-smart-btn-tertiary {
-                background: linear-gradient(135deg, rgba(249, 115, 22, 0.2), rgba(251, 146, 60, 0.15));
-                color: #fdba74;
-                border-color: rgba(249, 115, 22, 0.4);
+                background: linear-gradient(135deg, color-mix(in srgb, var(--color-orange-500) 20%, transparent), color-mix(in srgb, var(--color-orange-500) 15%, transparent));
+                color: var(--color-gray-700);
+                border-color: color-mix(in srgb, var(--color-orange-500) 40%, transparent);
             }
 
             #listings-index-glass-wrapper .nexus-smart-btn-tertiary:hover {
-                background: linear-gradient(135deg, #f97316, #fb923c);
+                background: linear-gradient(135deg, var(--color-orange-500), var(--color-orange-500));
                 color: white;
                 border-color: transparent;
                 transform: translateY(-2px);
             }
 
             #listings-index-glass-wrapper .nexus-smart-btn-outline {
-                background: rgba(255, 255, 255, 0.5);
+                background: color-mix(in srgb, white 50%, transparent);
                 color: var(--htb-text-main);
-                border-color: rgba(99, 102, 241, 0.3);
+                border-color: color-mix(in srgb, var(--color-primary-500) 30%, transparent);
             }
 
             [data-theme="dark"] #listings-index-glass-wrapper .nexus-smart-btn-outline {
-                background: rgba(15, 23, 42, 0.5);
-                border-color: rgba(99, 102, 241, 0.4);
+                background: color-mix(in srgb, var(--color-gray-100) 50%, transparent);
+                border-color: color-mix(in srgb, var(--color-primary-500) 40%, transparent);
             }
 
             #listings-index-glass-wrapper .nexus-smart-btn-outline:hover {
-                background: linear-gradient(135deg, #6366f1, #8b5cf6);
+                background: linear-gradient(135deg, var(--color-primary-500), var(--color-purple-500));
                 color: white;
                 border-color: transparent;
                 transform: translateY(-2px);
@@ -1201,16 +1201,16 @@
             .listings-create-post {
                 position: relative;
                 background: linear-gradient(165deg,
-                        rgba(255, 255, 255, 0.98) 0%,
-                        rgba(248, 250, 252, 0.95) 100%);
+                        color-mix(in srgb, white 98%, transparent) 0%,
+                        color-mix(in srgb, var(--color-gray-50) 95%, transparent) 100%);
                 backdrop-filter: blur(24px);
                 -webkit-backdrop-filter: blur(24px);
-                border: 1px solid rgba(255, 255, 255, 0.9);
-                border-radius: 20px;
+                border: 1px solid color-mix(in srgb, white 90%, transparent);
+                border-radius: var(--radius-xl);
                 box-shadow:
-                    0 8px 32px rgba(16, 185, 129, 0.1),
-                    0 2px 8px rgba(0, 0, 0, 0.04),
-                    inset 0 1px 0 rgba(255, 255, 255, 1);
+                    0 8px 32px color-mix(in srgb, var(--color-success) 10%, transparent),
+                    0 2px 8px color-mix(in srgb, black 4%, transparent),
+                    inset 0 1px 0 white;
                 margin: 30px 0 20px 0;
                 overflow: hidden;
                 transition: all 0.3s ease;
@@ -1225,7 +1225,7 @@
                 left: 0;
                 right: 0;
                 height: 4px;
-                background: linear-gradient(90deg, #10b981, #059669, #f97316, #ea580c, #10b981);
+                background: linear-gradient(90deg, var(--color-success), var(--color-success), var(--color-orange-500), var(--color-orange-600), var(--color-success));
                 background-size: 300% 100%;
                 animation: gradientFlow 6s ease infinite;
             }
@@ -1244,20 +1244,20 @@
 
             .listings-create-post:hover {
                 box-shadow:
-                    0 12px 40px rgba(16, 185, 129, 0.15),
-                    0 4px 12px rgba(0, 0, 0, 0.05),
-                    inset 0 1px 0 rgba(255, 255, 255, 1);
+                    0 12px 40px color-mix(in srgb, var(--color-success) 15%, transparent),
+                    0 4px 12px color-mix(in srgb, black 5%, transparent),
+                    inset 0 1px 0 white;
             }
 
             [data-theme="dark"] .listings-create-post {
                 background: linear-gradient(165deg,
-                        rgba(30, 41, 59, 0.98) 0%,
-                        rgba(15, 23, 42, 0.95) 100%);
-                border-color: rgba(16, 185, 129, 0.25);
+                        color-mix(in srgb, var(--color-gray-200) 98%, transparent) 0%,
+                        color-mix(in srgb, var(--color-gray-100) 95%, transparent) 100%);
+                border-color: color-mix(in srgb, var(--color-success) 25%, transparent);
                 box-shadow:
-                    0 8px 32px rgba(0, 0, 0, 0.4),
-                    0 2px 8px rgba(0, 0, 0, 0.2),
-                    inset 0 1px 0 rgba(255, 255, 255, 0.08);
+                    0 8px 32px color-mix(in srgb, black 40%, transparent),
+                    0 2px 8px color-mix(in srgb, black 20%, transparent),
+                    inset 0 1px 0 color-mix(in srgb, white 8%, transparent);
             }
 
             /* Compose Prompt Link */
@@ -1280,7 +1280,7 @@
                 position: relative;
                 padding: 3px;
                 border-radius: 50%;
-                background: linear-gradient(135deg, #10b981, #059669, #f97316);
+                background: linear-gradient(135deg, var(--color-success), var(--color-success), var(--color-orange-500));
                 background-size: 200% 200%;
                 animation: holographicShimmer 6s ease infinite;
                 flex-shrink: 0;
@@ -1304,8 +1304,8 @@
                 height: 44px;
                 border-radius: 50%;
                 object-fit: cover;
-                background: #fff;
-                border: 2px solid #fff;
+                background: white;
+                border: 2px solid white;
             }
 
             .composer-avatar-ring.guest {
@@ -1317,10 +1317,10 @@
                 flex: 1;
                 min-width: 0;
                 padding: 12px 16px;
-                background: rgba(243, 244, 246, 0.6);
-                border-radius: 24px;
+                background: color-mix(in srgb, var(--color-gray-100) 60%, transparent);
+                border-radius: var(--radius-full);
                 font-size: 15px;
-                color: #6b7280;
+                color: var(--color-gray-500);
                 cursor: pointer;
                 transition: all 0.2s ease;
                 overflow: hidden;
@@ -1329,16 +1329,16 @@
             }
 
             .compose-prompt-input:hover {
-                background: rgba(243, 244, 246, 0.9);
+                background: color-mix(in srgb, var(--color-gray-100) 90%, transparent);
             }
 
             [data-theme="dark"] .compose-prompt-input {
-                background: rgba(51, 65, 85, 0.5);
-                color: #94a3b8;
+                background: color-mix(in srgb, var(--color-gray-300) 50%, transparent);
+                color: var(--color-gray-500);
             }
 
             [data-theme="dark"] .compose-prompt-input:hover {
-                background: rgba(51, 65, 85, 0.7);
+                background: color-mix(in srgb, var(--color-gray-300) 70%, transparent);
             }
 
             /* Quick Action Buttons */
@@ -1347,14 +1347,14 @@
                 gap: 8px;
                 margin-top: 12px;
                 padding-top: 12px;
-                border-top: 1px solid rgba(0, 0, 0, 0.06);
+                border-top: 1px solid color-mix(in srgb, black 6%, transparent);
                 justify-content: center;
                 flex-wrap: wrap;
                 max-width: 100%;
             }
 
             [data-theme="dark"] .compose-quick-actions {
-                border-top-color: rgba(255, 255, 255, 0.08);
+                border-top-color: color-mix(in srgb, white 8%, transparent);
             }
 
             .compose-quick-btn {
@@ -1362,37 +1362,37 @@
                 align-items: center;
                 gap: 6px;
                 padding: 10px 16px;
-                background: rgba(243, 244, 246, 0.6);
-                border-radius: 12px;
+                background: color-mix(in srgb, var(--color-gray-100) 60%, transparent);
+                border-radius: var(--radius-md);
                 font-size: 13px;
                 font-weight: 600;
-                color: var(--htb-text-main, #1f2937);
+                color: var(--htb-text-main, var(--color-gray-800));
                 text-decoration: none;
                 transition: all 0.2s ease;
                 border: 1px solid transparent;
             }
 
             .compose-quick-btn:hover {
-                background: rgba(243, 244, 246, 0.9);
+                background: color-mix(in srgb, var(--color-gray-100) 90%, transparent);
                 transform: translateY(-1px);
             }
 
             .compose-quick-btn.highlight {
-                background: linear-gradient(135deg, #10b981, #059669);
+                background: linear-gradient(135deg, var(--color-success), var(--color-success));
                 color: white;
             }
 
             .compose-quick-btn.highlight:hover {
-                box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+                box-shadow: 0 4px 12px color-mix(in srgb, var(--color-success) 30%, transparent);
             }
 
             [data-theme="dark"] .compose-quick-btn {
-                background: rgba(51, 65, 85, 0.5);
-                color: #e2e8f0;
+                background: color-mix(in srgb, var(--color-gray-300) 50%, transparent);
+                color: var(--color-gray-800);
             }
 
             [data-theme="dark"] .compose-quick-btn:hover {
-                background: rgba(51, 65, 85, 0.7);
+                background: color-mix(in srgb, var(--color-gray-300) 70%, transparent);
             }
 
             .compose-quick-btn i {
@@ -1482,7 +1482,7 @@
                 left: 14px;
                 top: 50%;
                 transform: translateY(-50%);
-                color: #9ca3af;
+                color: var(--color-gray-400);
                 font-size: 14px;
                 pointer-events: none;
             }
@@ -1503,12 +1503,12 @@
             }
 
             .listings-count-badge {
-                background: linear-gradient(135deg, #6366f1, #8b5cf6);
+                background: linear-gradient(135deg, var(--color-primary-500), var(--color-purple-500));
                 color: white;
                 font-size: 12px;
                 font-weight: 700;
                 padding: 6px 12px;
-                border-radius: 20px;
+                border-radius: var(--radius-xl);
                 white-space: nowrap;
                 min-width: 36px;
                 text-align: center;
@@ -1535,67 +1535,67 @@
                 align-items: center;
                 gap: 5px;
                 padding: 8px 14px;
-                border-radius: 20px;
+                border-radius: var(--radius-xl);
                 font-size: 13px;
                 font-weight: 600;
                 text-decoration: none;
                 white-space: nowrap;
                 transition: all 0.2s ease;
-                background: rgba(243, 244, 246, 0.8);
-                color: #6b7280;
+                background: color-mix(in srgb, var(--color-gray-100) 80%, transparent);
+                color: var(--color-gray-500);
                 border: 1px solid transparent;
                 flex-shrink: 0;
             }
 
             .filter-pill:hover {
-                background: rgba(99, 102, 241, 0.1);
-                color: #6366f1;
+                background: color-mix(in srgb, var(--color-primary-500) 10%, transparent);
+                color: var(--color-primary-500);
             }
 
             .filter-pill.active {
-                background: linear-gradient(135deg, #6366f1, #8b5cf6);
+                background: linear-gradient(135deg, var(--color-primary-500), var(--color-purple-500));
                 color: white;
             }
 
             .filter-pill.offer:hover {
-                color: #10b981;
-                background: rgba(16, 185, 129, 0.1);
+                color: var(--color-success);
+                background: color-mix(in srgb, var(--color-success) 10%, transparent);
             }
 
             .filter-pill.offer.active {
-                background: linear-gradient(135deg, #10b981, #059669);
+                background: linear-gradient(135deg, var(--color-success), var(--color-success));
             }
 
             .filter-pill.request:hover {
-                color: #f97316;
-                background: rgba(249, 115, 22, 0.1);
+                color: var(--color-orange-500);
+                background: color-mix(in srgb, var(--color-orange-500) 10%, transparent);
             }
 
             .filter-pill.request.active {
-                background: linear-gradient(135deg, #f97316, #ea580c);
+                background: linear-gradient(135deg, var(--color-orange-500), var(--color-orange-600));
             }
 
             .filter-pill.category {
-                background: rgba(139, 92, 246, 0.08);
-                color: #8b5cf6;
+                background: color-mix(in srgb, var(--color-purple-500) 8%, transparent);
+                color: var(--color-purple-500);
             }
 
             .filter-pill.category:hover {
-                background: rgba(139, 92, 246, 0.15);
+                background: color-mix(in srgb, var(--color-purple-500) 15%, transparent);
             }
 
             .filter-pill.category.active {
-                background: linear-gradient(135deg, #8b5cf6, #a855f7);
+                background: linear-gradient(135deg, var(--color-purple-500), var(--color-purple-500));
                 color: white;
             }
 
             .filter-pill.clear {
-                background: rgba(239, 68, 68, 0.1);
-                color: #ef4444;
+                background: color-mix(in srgb, var(--color-danger) 10%, transparent);
+                color: var(--color-danger);
             }
 
             .filter-pill.clear:hover {
-                background: rgba(239, 68, 68, 0.2);
+                background: color-mix(in srgb, var(--color-danger) 20%, transparent);
             }
 
             .filter-pill i {
@@ -1609,23 +1609,23 @@
             }
 
             [data-theme="dark"] .filter-pill {
-                background: rgba(51, 65, 85, 0.6);
-                color: #cbd5e1;
+                background: color-mix(in srgb, var(--color-gray-300) 60%, transparent);
+                color: var(--color-gray-600);
             }
 
             [data-theme="dark"] .filter-pill:hover {
-                background: rgba(99, 102, 241, 0.2);
-                color: #a5b4fc;
+                background: color-mix(in srgb, var(--color-primary-500) 20%, transparent);
+                color: var(--color-primary-300);
             }
 
             [data-theme="dark"] .filter-pill.category {
-                background: rgba(139, 92, 246, 0.15);
-                color: #c4b5fd;
+                background: color-mix(in srgb, var(--color-purple-500) 15%, transparent);
+                color: var(--color-gray-700);
             }
 
             /* Nearby Section - Collapsible */
             .nearby-section {
-                border-top: 1px solid rgba(128, 128, 128, 0.1);
+                border-top: 1px solid color-mix(in srgb, var(--color-gray-500) 10%, transparent);
                 padding-top: 12px;
                 margin-top: 4px;
             }
@@ -1636,10 +1636,10 @@
                 gap: 8px;
                 width: 100%;
                 padding: 10px 12px;
-                background: rgba(6, 182, 212, 0.08);
-                border: 1px solid rgba(6, 182, 212, 0.2);
-                border-radius: 10px;
-                color: #0891b2;
+                background: color-mix(in srgb, var(--color-info) 8%, transparent);
+                border: 1px solid color-mix(in srgb, var(--color-info) 20%, transparent);
+                border-radius: var(--radius-base);
+                color: var(--color-info);
                 font-size: 13px;
                 font-weight: 600;
                 cursor: pointer;
@@ -1647,7 +1647,7 @@
             }
 
             .nearby-toggle:hover {
-                background: rgba(6, 182, 212, 0.15);
+                background: color-mix(in srgb, var(--color-info) 15%, transparent);
             }
 
             .nearby-toggle .toggle-icon {
@@ -1661,9 +1661,9 @@
             }
 
             [data-theme="dark"] .nearby-toggle {
-                background: rgba(6, 182, 212, 0.15);
-                border-color: rgba(6, 182, 212, 0.3);
-                color: #67e8f9;
+                background: color-mix(in srgb, var(--color-info) 15%, transparent);
+                border-color: color-mix(in srgb, var(--color-info) 30%, transparent);
+                color: var(--color-gray-700);
             }
 
             .nearby-content {
@@ -1697,7 +1697,7 @@
             }
 
             .location-info i {
-                color: #10b981;
+                color: var(--color-success);
             }
 
             .radius-control {
@@ -1716,8 +1716,8 @@
             .radius-control input[type="range"] {
                 width: 100%;
                 height: 4px;
-                border-radius: 2px;
-                accent-color: #06b6d4;
+                border-radius: var(--radius-sm);
+                accent-color: var(--color-info);
                 cursor: pointer;
             }
 
@@ -1727,11 +1727,11 @@
             }
 
             .btn-nearby-search {
-                background: linear-gradient(135deg, #10b981, #059669);
+                background: linear-gradient(135deg, var(--color-success), var(--color-success));
                 color: white;
                 border: none;
                 padding: 8px 14px;
-                border-radius: 8px;
+                border-radius: var(--radius-base);
                 font-size: 12px;
                 font-weight: 600;
                 cursor: pointer;
@@ -1743,15 +1743,15 @@
 
             .btn-nearby-search:hover {
                 transform: translateY(-1px);
-                box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+                box-shadow: 0 4px 12px color-mix(in srgb, var(--color-success) 30%, transparent);
             }
 
             .btn-nearby-clear {
                 background: transparent;
-                border: 1px solid rgba(128, 128, 128, 0.3);
+                border: 1px solid color-mix(in srgb, var(--color-gray-500) 30%, transparent);
                 color: var(--htb-text-muted);
                 padding: 8px 12px;
-                border-radius: 8px;
+                border-radius: var(--radius-base);
                 font-size: 12px;
                 font-weight: 600;
                 cursor: pointer;
@@ -1770,18 +1770,18 @@
                 align-items: center;
                 gap: 8px;
                 padding: 10px 12px;
-                border-radius: 8px;
+                border-radius: var(--radius-base);
                 font-size: 12px;
             }
 
             .nearby-notice.warning {
-                background: rgba(245, 158, 11, 0.1);
-                color: #b45309;
+                background: color-mix(in srgb, var(--color-warning) 10%, transparent);
+                color: var(--color-warning);
             }
 
             .nearby-notice.info {
-                background: rgba(99, 102, 241, 0.1);
-                color: #4f46e5;
+                background: color-mix(in srgb, var(--color-primary-500) 10%, transparent);
+                color: var(--color-primary-600);
             }
 
             .nearby-notice span {
@@ -1792,28 +1792,28 @@
                 background: currentColor;
                 color: white;
                 padding: 5px 10px;
-                border-radius: 6px;
+                border-radius: var(--radius-sm);
                 text-decoration: none;
                 font-weight: 600;
                 font-size: 11px;
             }
 
             .nearby-notice.warning a {
-                background: #f59e0b;
+                background: var(--color-warning);
             }
 
             .nearby-notice.info a {
-                background: #6366f1;
+                background: var(--color-primary-500);
             }
 
             [data-theme="dark"] .nearby-notice.warning {
-                background: rgba(245, 158, 11, 0.15);
-                color: #fbbf24;
+                background: color-mix(in srgb, var(--color-warning) 15%, transparent);
+                color: var(--color-warning);
             }
 
             [data-theme="dark"] .nearby-notice.info {
-                background: rgba(99, 102, 241, 0.15);
-                color: #a5b4fc;
+                background: color-mix(in srgb, var(--color-primary-500) 15%, transparent);
+                color: var(--color-primary-300);
             }
 
             /* Mobile optimizations */
