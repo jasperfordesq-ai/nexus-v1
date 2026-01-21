@@ -111,6 +111,12 @@ try {
     <!-- MOBILE MICRO-INTERACTIONS (Haptic feedback, ripple effects, gesture feedback) - ASYNC LOAD -->
     <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/mobile-micro-interactions.min.css?v=<?= $cssVersionTimestamp ?>" media="print" onload="this.media='all'; this.onload=null;">
     <noscript><link rel="stylesheet" href="<?= $assetBase ?>/assets/css/mobile-micro-interactions.min.css?v=<?= $cssVersionTimestamp ?>"></noscript>
+    <!-- DESKTOP DESIGN TOKENS (Desktop-specific spacing, typography, hover effects) -->
+    <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/desktop-design-tokens.min.css?v=<?= $cssVersionTimestamp ?>" media="(min-width: 768px)">
+    <!-- DESKTOP HOVER SYSTEM (Unified hover states for pointer devices) -->
+    <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/desktop-hover-system.min.css?v=<?= $cssVersionTimestamp ?>" media="(min-width: 768px)">
+    <!-- DESKTOP LOADING STATES (Table/grid/sidebar skeletons) -->
+    <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/desktop-loading-states.min.css?v=<?= $cssVersionTimestamp ?>" media="(min-width: 768px)">
     <!-- Theme Transitions - Smooth dark/light mode switching -->
     <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/theme-transitions.min.css?v=<?= $cssVersionTimestamp ?>">
     <!-- Base CSS - CSS variables, tokens, and global resets -->

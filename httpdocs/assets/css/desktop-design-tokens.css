@@ -1,0 +1,380 @@
+/**
+ * Desktop Design Tokens
+ * Unified design system for desktop/tablet experiences
+ * Version: 1.0 - 2026-01-21
+ *
+ * PRIORITY: HIGH
+ * Brings desktop to same polish level as mobile
+ * Complements mobile-design-tokens.css
+ */
+
+/* ============================================
+   DESKTOP-SPECIFIC DESIGN TOKENS
+   Applied only on larger screens (768px+)
+   ============================================ */
+
+@media (min-width: 768px) {
+    :root {
+        /* ==========================================
+           SPACING SCALE
+           Slightly more generous than mobile for desktop layouts
+           ========================================== */
+
+        --desktop-space-1: 4px;
+        --desktop-space-2: 8px;
+        --desktop-space-3: 16px;   /* Larger than mobile's 12px */
+        --desktop-space-4: 20px;   /* Mobile uses 16px */
+        --desktop-space-5: 24px;
+        --desktop-space-6: 32px;
+        --desktop-space-8: 48px;
+        --desktop-space-10: 64px;
+        --desktop-space-12: 80px;
+        --desktop-space-16: 128px;
+
+        /* Grid gaps for desktop layouts */
+        --desktop-gap-sm: 16px;
+        --desktop-gap-md: 24px;
+        --desktop-gap-lg: 32px;
+        --desktop-gap-xl: 48px;
+
+        /* ==========================================
+           BORDER RADIUS SCALE
+           Slightly larger than mobile for desktop feel
+           ========================================== */
+
+        --desktop-radius-none: 0;
+        --desktop-radius-sm: 6px;    /* Mobile: 4px */
+        --desktop-radius-md: 10px;   /* Mobile: 8px */
+        --desktop-radius-lg: 14px;   /* Mobile: 12px */
+        --desktop-radius-xl: 18px;   /* Mobile: 16px */
+        --desktop-radius-2xl: 24px;  /* Mobile: 20px */
+        --desktop-radius-3xl: 32px;
+        --desktop-radius-pill: 999px;
+        --desktop-radius-full: 50%;
+
+        /* Semantic radius tokens */
+        --desktop-card-radius: var(--desktop-radius-lg);
+        --desktop-button-radius: var(--desktop-radius-md);
+        --desktop-input-radius: var(--desktop-radius-sm);
+        --desktop-badge-radius: var(--desktop-radius-pill);
+
+        /* ==========================================
+           TYPOGRAPHY SCALE
+           Larger base sizes for desktop readability
+           ========================================== */
+
+        --desktop-text-xs: 12px;
+        --desktop-text-sm: 14px;
+        --desktop-text-base: 16px;
+        --desktop-text-md: 18px;
+        --desktop-text-lg: 20px;
+        --desktop-text-xl: 24px;
+        --desktop-text-2xl: 28px;
+        --desktop-text-3xl: 32px;
+        --desktop-text-4xl: 40px;
+        --desktop-text-5xl: 48px;
+        --desktop-text-6xl: 60px;
+        --desktop-text-7xl: 72px;
+
+        /* Font weights */
+        --desktop-font-normal: 400;
+        --desktop-font-medium: 500;
+        --desktop-font-semibold: 600;
+        --desktop-font-bold: 700;
+
+        /* Line heights */
+        --desktop-leading-tight: 1.25;
+        --desktop-leading-snug: 1.4;
+        --desktop-leading-normal: 1.5;
+        --desktop-leading-relaxed: 1.75;
+        --desktop-leading-loose: 2;
+
+        /* ==========================================
+           TRANSITION TIMING
+           Consistent animation durations
+           ========================================== */
+
+        --desktop-transition-instant: 0ms;
+        --desktop-transition-fast: 150ms;
+        --desktop-transition-normal: 250ms;
+        --desktop-transition-slow: 350ms;
+        --desktop-transition-slower: 500ms;
+
+        /* Easing functions */
+        --desktop-ease-linear: linear;
+        --desktop-ease-in: cubic-bezier(0.4, 0, 1, 1);
+        --desktop-ease-out: cubic-bezier(0, 0, 0.2, 1);
+        --desktop-ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+        --desktop-ease-smooth: cubic-bezier(0.4, 0, 0.2, 1);  /* Primary easing */
+        --desktop-ease-bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
+        --desktop-ease-elastic: cubic-bezier(0.68, -0.55, 0.265, 1.55);
+
+        /* Semantic transition tokens */
+        --desktop-transition-color: color var(--desktop-transition-fast) var(--desktop-ease-smooth);
+        --desktop-transition-bg: background-color var(--desktop-transition-normal) var(--desktop-ease-smooth);
+        --desktop-transition-transform: transform var(--desktop-transition-normal) var(--desktop-ease-smooth);
+        --desktop-transition-opacity: opacity var(--desktop-transition-normal) var(--desktop-ease-smooth);
+        --desktop-transition-shadow: box-shadow var(--desktop-transition-normal) var(--desktop-ease-smooth);
+
+        /* ==========================================
+           HOVER EFFECTS
+           Consistent hover transformations
+           ========================================== */
+
+        /* Lift amounts */
+        --desktop-hover-lift-sm: -2px;
+        --desktop-hover-lift: -4px;
+        --desktop-hover-lift-lg: -8px;
+        --desktop-hover-lift-xl: -12px;
+
+        /* Scale amounts */
+        --desktop-hover-scale-sm: 1.02;
+        --desktop-hover-scale: 1.05;
+        --desktop-hover-scale-lg: 1.08;
+        --desktop-hover-scale-xl: 1.1;
+
+        /* Rotation */
+        --desktop-hover-rotate: 2deg;
+        --desktop-hover-rotate-lg: 5deg;
+
+        /* ==========================================
+           CLICK TARGETS
+           Smaller than mobile (no fat fingers) but still accessible
+           ========================================== */
+
+        --desktop-click-target-sm: 36px;
+        --desktop-click-target: 40px;
+        --desktop-click-target-md: 44px;
+        --desktop-click-target-lg: 48px;
+
+        /* ==========================================
+           SHADOWS
+           Desktop-appropriate shadow depths
+           ========================================== */
+
+        --desktop-shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.05);
+        --desktop-shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.06);
+        --desktop-shadow: 0 4px 8px rgba(0, 0, 0, 0.08);
+        --desktop-shadow-md: 0 6px 12px rgba(0, 0, 0, 0.10);
+        --desktop-shadow-lg: 0 10px 20px rgba(0, 0, 0, 0.12);
+        --desktop-shadow-xl: 0 16px 32px rgba(0, 0, 0, 0.14);
+        --desktop-shadow-2xl: 0 24px 48px rgba(0, 0, 0, 0.16);
+
+        /* Hover shadows */
+        --desktop-shadow-hover: 0 12px 32px rgba(0, 0, 0, 0.12);
+        --desktop-shadow-hover-lg: 0 20px 48px rgba(0, 0, 0, 0.15);
+
+        /* Focus shadows */
+        --desktop-shadow-focus: 0 0 0 3px rgba(var(--color-primary-rgb, 99, 102, 241), 0.3);
+
+        /* ==========================================
+           Z-INDEX SCALE
+           Consistent layering system
+           ========================================== */
+
+        --desktop-z-base: 1;
+        --desktop-z-dropdown: 100;
+        --desktop-z-sticky: 200;
+        --desktop-z-tooltip: 300;
+        --desktop-z-overlay: 400;
+        --desktop-z-modal: 500;
+        --desktop-z-popover: 600;
+        --desktop-z-toast: 700;
+
+        /* ==========================================
+           LAYOUT DIMENSIONS
+           Desktop-specific layout constraints
+           ========================================== */
+
+        --desktop-header-height: 64px;
+        --desktop-sidebar-width: 280px;
+        --desktop-sidebar-width-lg: 340px;
+        --desktop-aside-width: 300px;
+        --desktop-max-content-width: 1400px;
+        --desktop-max-text-width: 720px;
+
+        /* Grid columns */
+        --desktop-grid-cols-2: repeat(2, 1fr);
+        --desktop-grid-cols-3: repeat(3, 1fr);
+        --desktop-grid-cols-4: repeat(4, 1fr);
+        --desktop-grid-cols-5: repeat(5, 1fr);
+
+        /* ==========================================
+           BACKDROP BLUR
+           Glassmorphism effects for desktop
+           ========================================== */
+
+        --desktop-blur-sm: 4px;
+        --desktop-blur: 8px;
+        --desktop-blur-md: 12px;
+        --desktop-blur-lg: 16px;
+        --desktop-blur-xl: 24px;
+
+        /* ==========================================
+           OPACITY SCALE
+           Consistent transparency levels
+           ========================================== */
+
+        --desktop-opacity-0: 0;
+        --desktop-opacity-5: 0.05;
+        --desktop-opacity-10: 0.1;
+        --desktop-opacity-20: 0.2;
+        --desktop-opacity-30: 0.3;
+        --desktop-opacity-40: 0.4;
+        --desktop-opacity-50: 0.5;
+        --desktop-opacity-60: 0.6;
+        --desktop-opacity-70: 0.7;
+        --desktop-opacity-80: 0.8;
+        --desktop-opacity-90: 0.9;
+        --desktop-opacity-100: 1;
+
+        /* ==========================================
+           CURSOR STYLES
+           Desktop-appropriate cursor feedback
+           ========================================== */
+
+        --desktop-cursor-default: default;
+        --desktop-cursor-pointer: pointer;
+        --desktop-cursor-text: text;
+        --desktop-cursor-move: move;
+        --desktop-cursor-not-allowed: not-allowed;
+        --desktop-cursor-grab: grab;
+        --desktop-cursor-grabbing: grabbing;
+        --desktop-cursor-zoom-in: zoom-in;
+        --desktop-cursor-zoom-out: zoom-out;
+    }
+}
+
+/* ==========================================
+   LARGE DESKTOP (1280px+)
+   Enhanced spacing for extra-large screens
+   ========================================== */
+
+@media (min-width: 1280px) {
+    :root {
+        /* Increase spacing for large screens */
+        --desktop-space-8: 56px;
+        --desktop-space-10: 72px;
+        --desktop-space-12: 96px;
+        --desktop-space-16: 160px;
+
+        /* Larger gaps */
+        --desktop-gap-xl: 56px;
+
+        /* Wider layouts */
+        --desktop-max-content-width: 1600px;
+        --desktop-sidebar-width-lg: 380px;
+    }
+}
+
+/* ==========================================
+   EXTRA LARGE DESKTOP (1536px+)
+   Maximum spacing for ultra-wide displays
+   ========================================== */
+
+@media (min-width: 1536px) {
+    :root {
+        /* Maximum spacing */
+        --desktop-space-12: 112px;
+        --desktop-space-16: 192px;
+
+        /* Ultra-wide layouts */
+        --desktop-max-content-width: 1800px;
+    }
+}
+
+/* ==========================================
+   UTILITY CLASSES
+   Pre-built classes using design tokens
+   ========================================== */
+
+@media (min-width: 768px) {
+    /* Spacing utilities */
+    .desktop-p-3 { padding: var(--desktop-space-3); }
+    .desktop-p-4 { padding: var(--desktop-space-4); }
+    .desktop-p-5 { padding: var(--desktop-space-5); }
+    .desktop-p-6 { padding: var(--desktop-space-6); }
+    .desktop-p-8 { padding: var(--desktop-space-8); }
+
+    .desktop-px-4 { padding-left: var(--desktop-space-4); padding-right: var(--desktop-space-4); }
+    .desktop-py-4 { padding-top: var(--desktop-space-4); padding-bottom: var(--desktop-space-4); }
+
+    .desktop-gap-md { gap: var(--desktop-gap-md); }
+    .desktop-gap-lg { gap: var(--desktop-gap-lg); }
+
+    /* Border radius utilities */
+    .desktop-rounded-md { border-radius: var(--desktop-radius-md); }
+    .desktop-rounded-lg { border-radius: var(--desktop-radius-lg); }
+    .desktop-rounded-xl { border-radius: var(--desktop-radius-xl); }
+
+    /* Typography utilities */
+    .desktop-text-sm { font-size: var(--desktop-text-sm); }
+    .desktop-text-base { font-size: var(--desktop-text-base); }
+    .desktop-text-lg { font-size: var(--desktop-text-lg); }
+    .desktop-text-xl { font-size: var(--desktop-text-xl); }
+
+    /* Shadow utilities */
+    .desktop-shadow { box-shadow: var(--desktop-shadow); }
+    .desktop-shadow-lg { box-shadow: var(--desktop-shadow-lg); }
+    .desktop-shadow-hover { box-shadow: var(--desktop-shadow-hover); }
+
+    /* Transition utilities */
+    .desktop-transition-fast { transition: all var(--desktop-transition-fast) var(--desktop-ease-smooth); }
+    .desktop-transition { transition: all var(--desktop-transition-normal) var(--desktop-ease-smooth); }
+}
+
+/* ==========================================
+   HOVER UTILITIES
+   Desktop-only (pointer device detection)
+   ========================================== */
+
+@media (hover: hover) and (pointer: fine) {
+    /* Hover lift */
+    .desktop-hover-lift {
+        transition: var(--desktop-transition-transform);
+    }
+
+    .desktop-hover-lift:hover {
+        transform: translateY(var(--desktop-hover-lift));
+    }
+
+    .desktop-hover-lift-lg {
+        transition: var(--desktop-transition-transform);
+    }
+
+    .desktop-hover-lift-lg:hover {
+        transform: translateY(var(--desktop-hover-lift-lg));
+    }
+
+    /* Hover scale */
+    .desktop-hover-scale {
+        transition: var(--desktop-transition-transform);
+    }
+
+    .desktop-hover-scale:hover {
+        transform: scale(var(--desktop-hover-scale));
+    }
+
+    /* Hover shadow */
+    .desktop-hover-shadow {
+        transition: var(--desktop-transition-shadow);
+    }
+
+    .desktop-hover-shadow:hover {
+        box-shadow: var(--desktop-shadow-hover);
+    }
+}
+
+/* ==========================================
+   ACCESSIBILITY
+   Reduced motion support
+   ========================================== */
+
+@media (prefers-reduced-motion: reduce) {
+    :root {
+        --desktop-transition-fast: 0ms;
+        --desktop-transition-normal: 0ms;
+        --desktop-transition-slow: 0ms;
+        --desktop-transition-slower: 0ms;
+    }
+}

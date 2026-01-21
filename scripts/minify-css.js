@@ -264,6 +264,10 @@ const cssFiles = [
     // Modern layout utilities - extracted inline styles (2026-01-21)
     'modern-experimental-banner.css',
     'modern-header-utilities.css',
+    // Desktop polish system (2026-01-21)
+    'desktop-design-tokens.css',
+    'desktop-hover-system.css',
+    'desktop-loading-states.css',
 ];
 
 const cssDir = path.join(__dirname, '../httpdocs/assets/css');

@@ -1,0 +1,427 @@
+/**
+ * Desktop Hover System
+ * Unified hover states for desktop/pointer devices
+ * Version: 1.0 - 2026-01-21
+ *
+ * PRIORITY: HIGH
+ * Consistent hover feedback across all interactive elements
+ * Desktop-only (no touch device interference)
+ */
+
+/* ============================================
+   HOVER DETECTION
+   Only apply to devices with precise pointer (mouse/trackpad)
+   ============================================ */
+
+@media (hover: hover) and (pointer: fine) {
+
+    /* ==========================================
+       CARD HOVER EFFECTS
+       Unified lift + shadow for all card types
+       ========================================== */
+
+    .card,
+    .glass-card,
+    .civic-group-card,
+    .civic-subhub-card,
+    .news-card,
+    .civicone-group-item,
+    .member-card,
+    .listing-card,
+    .event-card,
+    .feed-item,
+    [data-card] {
+        transition:
+            transform var(--desktop-transition-normal, 0.25s) var(--desktop-ease-smooth, cubic-bezier(0.4, 0, 0.2, 1)),
+            box-shadow var(--desktop-transition-normal, 0.25s) var(--desktop-ease-smooth, cubic-bezier(0.4, 0, 0.2, 1));
+        cursor: pointer;
+    }
+
+    .card:hover,
+    .glass-card:hover,
+    .civic-group-card:hover,
+    .civic-subhub-card:hover,
+    .civicone-group-item:hover,
+    .member-card:hover,
+    .listing-card:hover,
+    .event-card:hover,
+    .feed-item:hover,
+    [data-card]:hover {
+        transform: translateY(var(--desktop-hover-lift, -4px));
+        box-shadow: var(--desktop-shadow-hover, 0 12px 32px rgba(0, 0, 0, 0.12));
+    }
+
+    /* Featured/large cards - enhanced lift */
+    .news-card:hover,
+    .card-featured:hover,
+    .card-large:hover {
+        transform: translateY(var(--desktop-hover-lift-lg, -8px)) scale(var(--desktop-hover-scale-sm, 1.02));
+        box-shadow: var(--desktop-shadow-hover-lg, 0 20px 48px rgba(0, 0, 0, 0.15));
+    }
+
+    /* ==========================================
+       BUTTON HOVER EFFECTS
+       Consistent button interactions
+       ========================================== */
+
+    button,
+    .btn,
+    .civic-btn,
+    .news-btn,
+    .civic-group-card-btn,
+    [role="button"],
+    [type="button"],
+    [type="submit"],
+    [type="reset"] {
+        transition:
+            transform var(--desktop-transition-fast, 0.15s) var(--desktop-ease-smooth, cubic-bezier(0.4, 0, 0.2, 1)),
+            background-color var(--desktop-transition-fast, 0.15s),
+            color var(--desktop-transition-fast, 0.15s),
+            box-shadow var(--desktop-transition-fast, 0.15s);
+        cursor: pointer;
+    }
+
+    button:hover:not(:disabled),
+    .btn:hover:not(:disabled),
+    .civic-btn:hover:not(:disabled),
+    .news-btn:hover:not(:disabled),
+    .civic-group-card-btn:hover:not(:disabled),
+    [role="button"]:hover:not(:disabled),
+    [type="button"]:hover:not(:disabled),
+    [type="submit"]:hover:not(:disabled),
+    [type="reset"]:hover:not(:disabled) {
+        transform: translateY(var(--desktop-hover-lift-sm, -2px));
+    }
+
+    /* Primary buttons - scale effect */
+    .btn-primary:hover:not(:disabled),
+    .btn-success:hover:not(:disabled) {
+        transform: translateY(var(--desktop-hover-lift-sm, -2px)) scale(1.02);
+    }
+
+    /* Icon buttons - scale only */
+    .btn-icon:hover:not(:disabled),
+    .icon-btn:hover:not(:disabled) {
+        transform: scale(var(--desktop-hover-scale-sm, 1.05));
+    }
+
+    /* FAB buttons - enhanced scale */
+    .fab:hover,
+    .floating-action-button:hover {
+        transform: scale(var(--desktop-hover-scale, 1.08));
+        box-shadow: var(--desktop-shadow-hover, 0 12px 32px rgba(0, 0, 0, 0.12));
+    }
+
+    /* ==========================================
+       LINK HOVER EFFECTS
+       Smooth underline animations
+       ========================================== */
+
+    a {
+        transition:
+            color var(--desktop-transition-fast, 0.15s),
+            text-decoration-thickness var(--desktop-transition-fast, 0.15s),
+            text-underline-offset var(--desktop-transition-fast, 0.15s);
+    }
+
+    a:hover {
+        text-decoration-thickness: 2px;
+        text-underline-offset: 4px;
+    }
+
+    /* Link in cards - lift effect */
+    a.card-link:hover {
+        transform: translateY(var(--desktop-hover-lift-sm, -2px));
+    }
+
+    /* ==========================================
+       LIST ITEM HOVER EFFECTS
+       Subtle background + slide
+       ========================================== */
+
+    .list-item,
+    .dropdown-item,
+    .menu-item,
+    .sidebar-item,
+    [role="menuitem"],
+    [role="option"] {
+        transition:
+            background-color var(--desktop-transition-fast, 0.15s),
+            transform var(--desktop-transition-fast, 0.15s),
+            padding-left var(--desktop-transition-fast, 0.15s);
+        cursor: pointer;
+    }
+
+    .list-item:hover,
+    .dropdown-item:hover,
+    .menu-item:hover,
+    .sidebar-item:hover,
+    [role="menuitem"]:hover,
+    [role="option"]:hover {
+        background-color: rgba(var(--color-primary-rgb, 99, 102, 241), 0.06);
+        transform: translateX(2px);
+    }
+
+    /* ==========================================
+       INPUT HOVER EFFECTS
+       Subtle border enhancement
+       ========================================== */
+
+    input[type="text"],
+    input[type="email"],
+    input[type="password"],
+    input[type="search"],
+    input[type="number"],
+    input[type="tel"],
+    input[type="url"],
+    textarea,
+    select {
+        transition:
+            border-color var(--desktop-transition-fast, 0.15s),
+            box-shadow var(--desktop-transition-fast, 0.15s);
+    }
+
+    input[type="text"]:hover:not(:disabled):not(:focus),
+    input[type="email"]:hover:not(:disabled):not(:focus),
+    input[type="password"]:hover:not(:disabled):not(:focus),
+    input[type="search"]:hover:not(:disabled):not(:focus),
+    input[type="number"]:hover:not(:disabled):not(:focus),
+    input[type="tel"]:hover:not(:disabled):not(:focus),
+    input[type="url"]:hover:not(:disabled):not(:focus),
+    textarea:hover:not(:disabled):not(:focus),
+    select:hover:not(:disabled):not(:focus) {
+        border-color: var(--color-primary-400, #818cf8);
+        box-shadow: 0 0 0 1px var(--color-primary-200, #c7d2fe);
+    }
+
+    /* ==========================================
+       ICON HOVER EFFECTS
+       Scale + rotate for visual interest
+       ========================================== */
+
+    .icon-interactive {
+        transition: transform var(--desktop-transition-fast, 0.15s) var(--desktop-ease-bounce, cubic-bezier(0.34, 1.56, 0.64, 1));
+        display: inline-block;
+    }
+
+    .icon-interactive:hover {
+        transform: scale(1.15);
+    }
+
+    /* Icon with rotation */
+    .icon-rotate:hover {
+        transform: rotate(var(--desktop-hover-rotate, 5deg)) scale(1.1);
+    }
+
+    /* Icon bounce */
+    .icon-bounce:hover {
+        animation: iconBounce 0.4s var(--desktop-ease-bounce, cubic-bezier(0.34, 1.56, 0.64, 1));
+    }
+
+    @keyframes iconBounce {
+        0%, 100% { transform: scale(1); }
+        50% { transform: scale(1.2); }
+    }
+
+    /* ==========================================
+       BADGE/CHIP HOVER EFFECTS
+       Subtle scale
+       ========================================== */
+
+    .badge,
+    .chip,
+    .tag {
+        transition: transform var(--desktop-transition-fast, 0.15s) var(--desktop-ease-smooth, cubic-bezier(0.4, 0, 0.2, 1));
+        cursor: default;
+    }
+
+    .badge-interactive:hover,
+    .chip-interactive:hover,
+    .tag-interactive:hover {
+        transform: scale(1.05);
+        cursor: pointer;
+    }
+
+    /* ==========================================
+       IMAGE HOVER EFFECTS
+       Smooth zoom
+       ========================================== */
+
+    .image-hover-zoom {
+        overflow: hidden;
+    }
+
+    .image-hover-zoom img {
+        transition: transform var(--desktop-transition-slow, 0.35s) var(--desktop-ease-smooth, cubic-bezier(0.4, 0, 0.2, 1));
+    }
+
+    .image-hover-zoom:hover img {
+        transform: scale(1.08);
+    }
+
+    /* Image overlay fade-in */
+    .image-overlay {
+        opacity: 0;
+        transition: opacity var(--desktop-transition-normal, 0.25s);
+    }
+
+    .image-hover-overlay:hover .image-overlay {
+        opacity: 1;
+    }
+
+    /* ==========================================
+       AVATAR HOVER EFFECTS
+       Ring + scale
+       ========================================== */
+
+    .avatar {
+        transition: transform var(--desktop-transition-fast, 0.15s) var(--desktop-ease-smooth, cubic-bezier(0.4, 0, 0.2, 1));
+    }
+
+    .avatar-interactive:hover {
+        transform: scale(1.1);
+        box-shadow: 0 0 0 3px rgba(var(--color-primary-rgb, 99, 102, 241), 0.3);
+    }
+
+    /* ==========================================
+       TAB HOVER EFFECTS
+       Underline slide
+       ========================================== */
+
+    [role="tab"] {
+        position: relative;
+        transition: color var(--desktop-transition-fast, 0.15s);
+    }
+
+    [role="tab"]::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: 2px;
+        background: var(--color-primary-500, #6366f1);
+        transform: scaleX(0);
+        transition: transform var(--desktop-transition-normal, 0.25s) var(--desktop-ease-smooth, cubic-bezier(0.4, 0, 0.2, 1));
+    }
+
+    [role="tab"]:hover::after {
+        transform: scaleX(1);
+    }
+
+    [role="tab"][aria-selected="true"]::after {
+        transform: scaleX(1);
+    }
+
+    /* ==========================================
+       TOOLTIP HOVER EFFECTS
+       Fade in with slide
+       ========================================== */
+
+    .tooltip {
+        opacity: 0;
+        transform: translateY(-4px);
+        transition:
+            opacity var(--desktop-transition-normal, 0.25s),
+            transform var(--desktop-transition-normal, 0.25s);
+        pointer-events: none;
+    }
+
+    *:hover > .tooltip,
+    [data-tooltip]:hover::after {
+        opacity: 1;
+        transform: translateY(0);
+        pointer-events: auto;
+    }
+
+    /* ==========================================
+       ACCORDION HOVER EFFECTS
+       Highlight current section
+       ========================================== */
+
+    .accordion-header {
+        transition: background-color var(--desktop-transition-fast, 0.15s);
+    }
+
+    .accordion-header:hover {
+        background-color: rgba(var(--color-primary-rgb, 99, 102, 241), 0.03);
+    }
+
+    /* ==========================================
+       DISABLED STATES
+       Prevent hover effects on disabled elements
+       ========================================== */
+
+    button:disabled,
+    .btn:disabled,
+    input:disabled,
+    select:disabled,
+    textarea:disabled,
+    [aria-disabled="true"] {
+        cursor: not-allowed;
+        opacity: 0.6;
+    }
+
+    button:disabled:hover,
+    .btn:disabled:hover,
+    input:disabled:hover,
+    select:disabled:hover,
+    textarea:disabled:hover,
+    [aria-disabled="true"]:hover {
+        transform: none;
+        box-shadow: none;
+    }
+
+    /* ==========================================
+       LOADING STATES
+       Prevent hover during loading
+       ========================================== */
+
+    .loading,
+    .btn-loading,
+    [aria-busy="true"] {
+        cursor: wait;
+        pointer-events: none;
+    }
+
+    .loading:hover,
+    .btn-loading:hover,
+    [aria-busy="true"]:hover {
+        transform: none;
+    }
+}
+
+/* ==========================================
+   TABLET (768px - 1023px)
+   Slightly reduced hover effects for tablet
+   ========================================== */
+
+@media (hover: hover) and (pointer: fine) and (max-width: 1023px) {
+    /* Reduce lift amounts on tablet */
+    .card:hover,
+    .glass-card:hover {
+        transform: translateY(-2px);
+    }
+
+    .news-card:hover {
+        transform: translateY(-4px);
+    }
+}
+
+/* ==========================================
+   ACCESSIBILITY
+   Reduced motion support
+   ========================================== */
+
+@media (prefers-reduced-motion: reduce) {
+    @media (hover: hover) and (pointer: fine) {
+        /* Disable transform animations, keep color/opacity changes */
+        * {
+            transition-property: color, background-color, border-color, opacity !important;
+        }
+
+        *:hover {
+            transform: none !important;
+        }
+    }
+}

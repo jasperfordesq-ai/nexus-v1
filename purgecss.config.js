@@ -251,6 +251,10 @@ module.exports = {
         'httpdocs/assets/css/breakpoints.css',
         // Mobile navigation v2 (2026-01-21)
         'httpdocs/assets/css/mobile-nav-v2.css',
+        // Desktop polish system (2026-01-21)
+        'httpdocs/assets/css/desktop-design-tokens.css',
+        'httpdocs/assets/css/desktop-hover-system.css',
+        'httpdocs/assets/css/desktop-loading-states.css',
     ],
 
     // Output directory for purged CSS
