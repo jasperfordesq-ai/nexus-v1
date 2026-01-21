@@ -79,137 +79,6 @@ $isMessagesActiveTab = isNavActive('/messages', $currentPath, $basePath);
 $isProfileActiveTab = isNavActive('/profile', $currentPath, $basePath) || isNavActive('/dashboard', $currentPath, $basePath);
 ?>
 <!-- Mobile Tab Bar -->
-<script>
-// Define mobile menu functions early to prevent ReferenceError
-// These need to be available immediately for onclick handlers
-window.openMobileMenu = function() {
-    const menu = document.getElementById('mobileMenu');
-    if (menu) {
-        menu.classList.add('active');
-        document.body.classList.add('mobile-menu-open');
-    }
-};
-
-window.closeMobileMenu = function() {
-    const menu = document.getElementById('mobileMenu');
-    if (menu) {
-        menu.classList.remove('active');
-        document.body.classList.remove('mobile-menu-open');
-    }
-};
-
-window.openMobileNotifications = function() {
-    const sheet = document.getElementById('mobileNotifications');
-    if (sheet) {
-        sheet.classList.add('active');
-        document.body.classList.add('mobile-notifications-open');
-    }
-};
-
-window.closeMobileNotifications = function() {
-    const sheet = document.getElementById('mobileNotifications');
-    if (sheet) {
-        sheet.classList.remove('active');
-        document.body.classList.remove('mobile-notifications-open');
-    }
-};
-
-// Clean up stuck menu classes on page load
-(function() {
-    function cleanupMenuClasses() {
-        // Only remove classes if menus aren't actually open
-        const menuOpen = document.getElementById('mobileMenu')?.classList.contains('active');
-        const notifOpen = document.getElementById('mobileNotifications')?.classList.contains('active');
-
-        if (!menuOpen) {
-            document.body.classList.remove('mobile-menu-open');
-        }
-        if (!notifOpen) {
-            document.body.classList.remove('mobile-notifications-open');
-        }
-    }
-
-    // Run on page load
-    if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', cleanupMenuClasses);
-    } else {
-        cleanupMenuClasses();
-    }
-
-    // Run when tab becomes visible
-    document.addEventListener('visibilitychange', function() {
-        if (!document.hidden) {
-            cleanupMenuClasses();
-        }
-    });
-})();
-</script>
-<style>
-/* FIX: Remove transform from html that breaks position:fixed */
-html[data-layout] { transform: none !important; }
-
-/* Hide on desktop by default */
-.mobile-tab-bar { display: none; }
-
-/* CRITICAL: Hide ALL legacy navigation on mobile including drawer AND header hamburger */
-@media (max-width: 1024px) {
-    .nexus-native-nav,
-    .nexus-native-nav-inner,
-    .nexus-bottom-nav,
-    .nexus-quick-fab,
-    .nexus-native-drawer,
-    .nexus-native-drawer-overlay {
-        display: none !important;
-        visibility: hidden !important;
-        opacity: 0 !important;
-        pointer-events: none !important;
-        transform: translateX(-100%) !important;
-    }
-
-    /* Hide header hamburger menu buttons - we have Menu in bottom tab bar */
-    .nexus-menu-btn,
-    #civic-menu-toggle {
-        display: none !important;
-    }
-
-    /* Show mobile tab bar */
-    .mobile-tab-bar {
-        display: flex !important;
-        visibility: visible !important;
-        opacity: 1 !important;
-        position: fixed !important;
-        bottom: 0 !important;
-        left: 0 !important;
-        right: 0 !important;
-        z-index: 99999 !important;
-        height: 84px !important;
-        background: rgba(255, 255, 255, 0.98) !important;
-        border-top: 1px solid rgba(0, 0, 0, 0.1) !important;
-        -webkit-backdrop-filter: saturate(180%) blur(20px) !important;
-        backdrop-filter: saturate(180%) blur(20px) !important;
-    }
-    [data-theme="dark"] .mobile-tab-bar {
-        background: rgba(28, 28, 30, 0.98) !important;
-        border-top-color: rgba(255, 255, 255, 0.1) !important;
-    }
-    body {
-        padding-bottom: 90px !important;
-    }
-    /* Ensure menu button looks like other tab items */
-    .mobile-tab-item[type="button"],
-    button.mobile-tab-item {
-        background: none;
-        border: none;
-        cursor: pointer;
-        padding: 0;
-        margin: 0;
-        font-family: inherit;
-        outline: none;
-        -webkit-appearance: none;
-        appearance: none;
-    }
-}
-</style>
 <!-- Mobile Bottom Tab Bar -->
 <nav class="mobile-tab-bar" id="mobileTabBar" role="navigation" aria-label="Mobile navigation">
     <div class="mobile-tab-bar-inner">
@@ -259,7 +128,7 @@ html[data-layout] { transform: none !important; }
             </div>
             <div class="mobile-menu-user-info">
                 <h3><?= htmlspecialchars($userName) ?></h3>
-                <p><i class="fa-solid fa-arrow-right" style="font-size: 11px; margin-right: 4px;"></i>View profile</p>
+                <p><i class="fa-solid fa-arrow-right mobile-menu-user-arrow"></i>View profile</p>
             </div>
         </a>
         <?php else: ?>
@@ -272,7 +141,7 @@ html[data-layout] { transform: none !important; }
             </div>
             <div class="mobile-menu-user-info">
                 <h3>Welcome</h3>
-                <p><i class="fa-solid fa-arrow-right" style="font-size: 11px; margin-right: 4px;"></i>Sign in to get started</p>
+                <p><i class="fa-solid fa-arrow-right mobile-menu-user-arrow"></i>Sign in to get started</p>
             </div>
         </a>
         <?php endif; ?>
@@ -362,7 +231,7 @@ html[data-layout] { transform: none !important; }
                 <i class="fa-solid fa-wand-magic-sparkles"></i>
                 Smart Matching
             </a>
-            <a href="<?= $base ?>/ai" class="mobile-menu-item" style="background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(139, 92, 246, 0.1)); font-weight:600;" onclick="closeMobileMenu()">
+            <a href="<?= $base ?>/ai" class="mobile-menu-item mobile-menu-item-ai" onclick="closeMobileMenu()">
                 <i class="fa-solid fa-robot"></i>
                 AI Assistant
             </a>
@@ -410,8 +279,8 @@ html[data-layout] { transform: none !important; }
 
         <?php if ($isLoggedIn && ((!empty($_SESSION['user_role']) && $_SESSION['user_role'] === 'admin') || !empty($_SESSION['is_super_admin']))): ?>
         <!-- Admin Section -->
-        <div class="mobile-menu-section">
-            <div class="mobile-menu-section-title" style="color: #ea580c;">Admin Tools</div>
+        <div class="mobile-menu-section mobile-menu-section-admin">
+            <div class="mobile-menu-section-title">Admin Tools</div>
             <a href="<?= $base ?>/admin" class="mobile-menu-item" onclick="closeMobileMenu()">
                 <i class="fa-solid fa-gauge-high"></i>
                 Admin Dashboard
@@ -424,34 +293,34 @@ html[data-layout] { transform: none !important; }
         <div class="mobile-menu-section">
             <div class="mobile-menu-section-title">Create</div>
             <a href="<?= $base ?>/compose?tab=post" class="mobile-menu-item" onclick="closeMobileMenu()">
-                <i class="fa-solid fa-pen-to-square" style="color: #3b82f6;"></i>
+                <i class="fa-solid fa-pen-to-square mobile-menu-icon-post"></i>
                 New Post
             </a>
             <a href="<?= $base ?>/compose?tab=listing" class="mobile-menu-item" onclick="closeMobileMenu()">
-                <i class="fa-solid fa-hand-holding-heart" style="color: #10b981;"></i>
+                <i class="fa-solid fa-hand-holding-heart mobile-menu-icon-listing"></i>
                 New Listing
             </a>
             <?php if (\Nexus\Core\TenantContext::hasFeature('events')): ?>
             <a href="<?= $base ?>/compose?tab=event" class="mobile-menu-item" onclick="closeMobileMenu()">
-                <i class="fa-solid fa-calendar-plus" style="color: #f59e0b;"></i>
+                <i class="fa-solid fa-calendar-plus mobile-menu-icon-event"></i>
                 New Event
             </a>
             <?php endif; ?>
             <?php if (\Nexus\Core\TenantContext::hasFeature('volunteering')): ?>
             <a href="<?= $base ?>/compose?tab=volunteer" class="mobile-menu-item" onclick="closeMobileMenu()">
-                <i class="fa-solid fa-hands-helping" style="color: #ec4899;"></i>
+                <i class="fa-solid fa-hands-helping mobile-menu-icon-volunteer"></i>
                 Volunteer Opportunity
             </a>
             <?php endif; ?>
             <?php if (\Nexus\Core\TenantContext::hasFeature('polls')): ?>
             <a href="<?= $base ?>/compose?tab=poll" class="mobile-menu-item" onclick="closeMobileMenu()">
-                <i class="fa-solid fa-chart-bar" style="color: #8b5cf6;"></i>
+                <i class="fa-solid fa-chart-bar mobile-menu-icon-poll"></i>
                 New Poll
             </a>
             <?php endif; ?>
             <?php if (\Nexus\Core\TenantContext::hasFeature('goals')): ?>
             <a href="<?= $base ?>/compose?tab=goal" class="mobile-menu-item" onclick="closeMobileMenu()">
-                <i class="fa-solid fa-bullseye" style="color: #ef4444;"></i>
+                <i class="fa-solid fa-bullseye mobile-menu-icon-goal"></i>
                 New Goal
             </a>
             <?php endif; ?>
@@ -484,15 +353,15 @@ html[data-layout] { transform: none !important; }
         <div class="mobile-menu-section">
             <div class="mobile-menu-section-title">Help & Support</div>
             <a href="<?= $base ?>/help" class="mobile-menu-item" onclick="closeMobileMenu()">
-                <i class="fa-solid fa-circle-question" style="color: #f97316;"></i>
+                <i class="fa-solid fa-circle-question mobile-menu-icon-help"></i>
                 Help Center
             </a>
             <a href="<?= $base ?>/contact" class="mobile-menu-item" onclick="closeMobileMenu()">
-                <i class="fa-solid fa-envelope" style="color: #3b82f6;"></i>
+                <i class="fa-solid fa-envelope mobile-menu-icon-contact"></i>
                 Contact Us
             </a>
             <a href="<?= $base ?>/accessibility" class="mobile-menu-item" onclick="closeMobileMenu()">
-                <i class="fa-solid fa-universal-access" style="color: #10b981;"></i>
+                <i class="fa-solid fa-universal-access mobile-menu-icon-accessibility"></i>
                 Accessibility
             </a>
         </div>
@@ -556,101 +425,3 @@ html[data-layout] { transform: none !important; }
         </div>
     </div>
 </div>
-
-
-<script>
-// Haptic Feedback Helper
-const Haptics = {
-    // Check if vibration API is available
-    isSupported: () => 'vibrate' in navigator,
-
-    // Light tap feedback (for buttons, toggles)
-    light: () => {
-        if (Haptics.isSupported()) navigator.vibrate(10);
-        // Also try Capacitor Haptics if available
-        if (window.Capacitor?.Plugins?.Haptics) {
-            window.Capacitor.Plugins.Haptics.impact({ style: 'light' });
-        }
-    },
-
-    // Medium feedback (for selections, confirmations)
-    medium: () => {
-        if (Haptics.isSupported()) navigator.vibrate(20);
-        if (window.Capacitor?.Plugins?.Haptics) {
-            window.Capacitor.Plugins.Haptics.impact({ style: 'medium' });
-        }
-    },
-
-    // Success feedback
-    success: () => {
-        if (Haptics.isSupported()) navigator.vibrate([10, 50, 10]);
-        if (window.Capacitor?.Plugins?.Haptics) {
-            window.Capacitor.Plugins.Haptics.notification({ type: 'success' });
-        }
-    }
-};
-
-// Enhance Mobile Menu Functions with Haptic Feedback
-// Functions already defined at top of file, we're just adding haptics here
-(function() {
-    // Store original functions
-    const originalOpenMenu = window.openMobileMenu;
-    const originalCloseMenu = window.closeMobileMenu;
-    const originalOpenNotif = window.openMobileNotifications;
-    const originalCloseNotif = window.closeMobileNotifications;
-
-    // Enhance with haptic feedback
-    window.openMobileMenu = function() {
-        Haptics.light();
-        if (originalOpenMenu) originalOpenMenu();
-    };
-
-    window.closeMobileMenu = function() {
-        Haptics.light();
-        if (originalCloseMenu) originalCloseMenu();
-    };
-
-    window.openMobileNotifications = function() {
-        Haptics.light();
-        if (originalOpenNotif) originalOpenNotif();
-    };
-
-    window.closeMobileNotifications = function() {
-        Haptics.light();
-        if (originalCloseNotif) originalCloseNotif();
-    };
-})();
-
-function markAllNotificationsRead() {
-    Haptics.success();
-    if (typeof window.nexusNotifications !== 'undefined' && window.nexusNotifications.markAllRead) {
-        window.nexusNotifications.markAllRead();
-    }
-    // Visual feedback
-    document.querySelectorAll('.mobile-notification-item.unread').forEach(item => {
-        item.classList.remove('unread');
-    });
-    document.querySelectorAll('.mobile-tab-badge').forEach(badge => {
-        badge.style.display = 'none';
-    });
-}
-
-// Add haptic feedback to tab bar items
-document.querySelectorAll('.mobile-tab-item').forEach(item => {
-    item.addEventListener('click', () => Haptics.light());
-});
-
-// Add haptic feedback to menu items
-document.querySelectorAll('.mobile-menu-item').forEach(item => {
-    item.addEventListener('click', () => Haptics.light());
-});
-
-// Close menu on escape key
-document.addEventListener('keydown', function(e) {
-    if (e.key === 'Escape') {
-        closeMobileMenu();
-        closeMobileNotifications();
-    }
-});
-
-</script>

@@ -90,6 +90,8 @@ try {
 
     <!-- DESIGN TOKENS (Shared variables - must load first) -->
     <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/design-tokens.min.css?v=<?= $cssVersionTimestamp ?>">
+    <!-- BREAKPOINTS (Centralized responsive breakpoints) -->
+    <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/breakpoints.css?v=<?= $cssVersionTimestamp ?>">
     <!-- Theme Transitions - Smooth dark/light mode switching -->
     <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/theme-transitions.min.css?v=<?= $cssVersionTimestamp ?>">
     <!-- Base CSS - CSS variables, tokens, and global resets -->
@@ -100,6 +102,7 @@ try {
     <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/bundles/components.min.css?v=<?= $cssVersionTimestamp ?>">
     <!-- Mobile Navigation v2 - mobile tab bar, menus, and bottom sheets (v1 removed) -->
     <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/nexus-native-nav-v2.min.css?v=<?= $cssVersionTimestamp ?>">
+    <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/mobile-nav-v2.css?v=<?= $cssVersionTimestamp ?>">
     <!-- Modern Header CSS - utility bar, navbar, and header-specific styles -->
     <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/nexus-modern-header.min.css?v=<?= $cssVersionTimestamp ?>">
 

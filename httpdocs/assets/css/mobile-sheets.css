@@ -49,7 +49,7 @@
 }
 
 [data-theme="dark"] .mobile-sheet {
-    background: #1c1c1e;
+    background: var(--color-gray-900);
     box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.4);
 }
 
@@ -85,7 +85,7 @@
 }
 
 [data-theme="dark"] .mobile-sheet-header {
-    border-color: #333;
+    border-color: var(--color-gray-700);
 }
 
 .mobile-sheet-title {
@@ -95,7 +95,7 @@
 }
 
 [data-theme="dark"] .mobile-sheet-title {
-    color: #fff;
+    color: var(--color-gray-50);
 }
 
 .mobile-sheet-close {
@@ -158,20 +158,20 @@
 
 .mobile-comment-input:focus {
     outline: none;
-    border-color: #6366f1;
+    border-color: var(--color-primary-500);
 }
 
 [data-theme="dark"] .mobile-comment-input {
-    background: #2c2c2e;
-    border-color: #444;
-    color: #fff;
+    background: var(--color-gray-800);
+    border-color: var(--color-gray-600);
+    color: var(--color-gray-50);
 }
 
 .mobile-comment-send {
     width: 40px;
     height: 40px;
     border-radius: 50%;
-    background: linear-gradient(135deg, #6366f1, #8b5cf6);
+    background: linear-gradient(135deg, var(--color-primary-500), var(--color-primary-400));
     color: white;
     border: none;
     display: flex;
@@ -209,7 +209,7 @@
 }
 
 [data-theme="dark"] .mobile-comment-item {
-    border-color: #333;
+    border-color: var(--color-gray-700);
 }
 
 .mobile-comment-content {
@@ -223,7 +223,7 @@
 }
 
 [data-theme="dark"] .mobile-comment-author {
-    color: #fff;
+    color: var(--color-gray-50);
 }
 
 .mobile-comment-text {
@@ -265,7 +265,7 @@
 }
 
 .mobile-comment-action.liked {
-    color: #ec4899;
+    color: var(--color-pink-500);
 }
 
 .mobile-comment-action i {
@@ -297,20 +297,20 @@
 
 .mobile-reply-input:focus {
     outline: none;
-    border-color: #6366f1;
+    border-color: var(--color-primary-500);
 }
 
 [data-theme="dark"] .mobile-reply-input {
-    background: #2c2c2e;
-    border-color: #444;
-    color: #fff;
+    background: var(--color-gray-800);
+    border-color: var(--color-gray-600);
+    color: var(--color-gray-50);
 }
 
 .mobile-reply-send {
     width: 32px;
     height: 32px;
     border-radius: 50%;
-    background: linear-gradient(135deg, #6366f1, #8b5cf6);
+    background: linear-gradient(135deg, var(--color-primary-500), var(--color-primary-400));
     color: white;
     border: none;
     display: flex;
@@ -329,7 +329,7 @@
 }
 
 [data-theme="dark"] .mobile-comment-replies {
-    border-color: #444;
+    border-color: var(--color-gray-600);
 }
 
 .mobile-comment-replies .mobile-comment-item {
@@ -355,12 +355,12 @@
 }
 
 .mobile-comment-likes i {
-    color: #ec4899;
+    color: var(--color-pink-500);
     font-size: 10px;
 }
 
 [data-theme="dark"] .mobile-comment-likes {
-    background: #333;
+    background: var(--color-gray-700);
 }
 
 /* ============================================

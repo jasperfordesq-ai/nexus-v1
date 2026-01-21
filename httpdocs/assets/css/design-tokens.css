@@ -50,10 +50,16 @@
     --color-primary-900: #312e81;
 
     /* Semantic colors */
-    --color-success: #10b981;
-    --color-warning: #f59e0b;
-    --color-danger: #ef4444;
-    --color-info: #3b82f6;
+    --color-success: #10b981;   /* Green */
+    --color-warning: #f59e0b;   /* Amber */
+    --color-danger: #ef4444;    /* Red */
+    --color-info: #3b82f6;      /* Blue */
+
+    /* Extended palette - Additional colors for UI variety */
+    --color-pink-500: #ec4899;  /* Pink - Used for likes, volunteer */
+    --color-purple-500: #8b5cf6; /* Purple - Used for polls, magic */
+    --color-orange-500: #f97316; /* Orange - Used for help, alerts */
+    --color-orange-600: #ea580c; /* Orange 600 - Used for admin sections */
 
     /* Neutral palette - Light theme */
     --color-gray-50: #f9fafb;

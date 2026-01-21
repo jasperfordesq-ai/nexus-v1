@@ -26,7 +26,7 @@
 }
 
 [data-theme="dark"] .mobile-search-overlay {
-    background: #0f0f0f;
+    background: var(--color-gray-900);
 }
 
 .mobile-search-overlay.active {
@@ -50,8 +50,8 @@
 }
 
 [data-theme="dark"] .mobile-search-header {
-    background: #1c1c1e;
-    border-color: #333;
+    background: var(--color-gray-900);
+    border-color: var(--color-gray-700);
 }
 
 /* Back button */
@@ -76,7 +76,7 @@
 }
 
 [data-theme="dark"] .mobile-search-back {
-    color: #fff;
+    color: var(--color-gray-50);
 }
 
 .mobile-search-back svg {
@@ -109,12 +109,12 @@
 }
 
 [data-theme="dark"] .mobile-search-input {
-    background: #2c2c2e;
-    color: #fff;
+    background: var(--color-gray-800);
+    color: var(--color-gray-50);
 }
 
 [data-theme="dark"] .mobile-search-input:focus {
-    background: #3a3a3c;
+    background: var(--color-gray-700);
 }
 
 .mobile-search-input::placeholder {
@@ -161,8 +161,8 @@
 }
 
 [data-theme="dark"] .mobile-search-clear {
-    background: #444;
-    color: #aaa;
+    background: var(--color-gray-600);
+    color: var(--color-gray-400);
 }
 
 /* Cancel button (text) */
@@ -201,7 +201,7 @@
 }
 
 [data-theme="dark"] .mobile-search-tabs {
-    border-color: #333;
+    border-color: var(--color-gray-700);
 }
 
 .mobile-search-tab {
@@ -228,8 +228,8 @@
 }
 
 [data-theme="dark"] .mobile-search-tab {
-    background: #2c2c2e;
-    color: #aaa;
+    background: var(--color-gray-800);
+    color: var(--color-gray-400);
 }
 
 [data-theme="dark"] .mobile-search-tab.active {
