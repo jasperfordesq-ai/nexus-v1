@@ -19,6 +19,13 @@ class RedirectMiddleware
             return;
         }
 
+        // MOBILE FIX: Skip redirect middleware for auth pages (login, register, password reset)
+        // Mobile browsers may have issues with cookie handling during auth flows
+        $requestUri = parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH);
+        if (preg_match('#/(login|register|logout|password)(/|$)#', $requestUri)) {
+            return;
+        }
+
         // SAFETY: Prevent infinite redirect loops
         static $redirectCount = 0;
         if ($redirectCount > 0) {
@@ -27,9 +34,11 @@ class RedirectMiddleware
         $redirectCount++;
 
         // CRITICAL: Check for redirect loop cookie
+        // MOBILE FIX: Increased threshold from 3 to 5 to prevent false positives on mobile browsers
+        // which may handle cookies differently
         $loopCookie = $_COOKIE['redirect_loop_detector'] ?? '0';
-        if ((int)$loopCookie >= 3) {
-            error_log("REDIRECT LOOP BLOCKED: Too many redirects from " . ($_SERVER['HTTP_HOST'] ?? 'unknown'));
+        if ((int)$loopCookie >= 5) {
+            error_log("REDIRECT LOOP BLOCKED: Too many redirects from " . ($_SERVER['HTTP_HOST'] ?? 'unknown') . " on URI: " . ($_SERVER['REQUEST_URI'] ?? '/'));
             // Clear the cookie to allow user to continue after a while
             setcookie('redirect_loop_detector', '0', [
                 'expires' => time() - 3600,
@@ -76,9 +85,10 @@ class RedirectMiddleware
                 }
 
                 // Loop detection cookie logic
+                // MOBILE FIX: Increased expiry from 5 to 15 seconds to give mobile browsers more time
                 $currentCount = isset($_COOKIE['redirect_loop_detector']) ? (int)$_COOKIE['redirect_loop_detector'] : 0;
                 setcookie('redirect_loop_detector', (string)($currentCount + 1), [
-                    'expires' => time() + 5,
+                    'expires' => time() + 15,
                     'path' => '/',
                     'secure' => !empty($_SERVER['HTTPS']),
                     'httponly' => true,
@@ -107,8 +117,9 @@ class RedirectMiddleware
     public static function safeRedirect(string $url, int $statusCode = 302): void
     {
         // Check for redirect loop
+        // MOBILE FIX: Increased threshold from 5 to 8 to prevent false positives
         $loopCookie = $_COOKIE['redirect_loop_detector'] ?? '0';
-        if ((int)$loopCookie >= 5) {
+        if ((int)$loopCookie >= 8) {
             error_log("REDIRECT LOOP BLOCKED (safeRedirect): Attempted redirect to " . $url);
             // Don't redirect, let the page render
             return;
@@ -124,9 +135,10 @@ class RedirectMiddleware
         }
 
         // Set loop detection cookie
+        // MOBILE FIX: Increased expiry from 10 to 20 seconds
         $currentCount = (int)$loopCookie;
         setcookie('redirect_loop_detector', (string)($currentCount + 1), [
-            'expires' => time() + 10,
+            'expires' => time() + 20,
             'path' => '/',
             'secure' => !empty($_SERVER['HTTPS']),
             'httponly' => true,

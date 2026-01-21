@@ -613,7 +613,7 @@ body>* {
     position: absolute;
     top: 100%;
     right: 0;
-    min-width: min(280px, calc(100vw - 32px)); /* Responsive: doesn't overflow on small screens */
+    min-width: auto; /* Changed 2026-01-21: was min(280px, calc(100vw - 32px)) - now auto-sized to content */
     max-width: calc(100vw - 32px); /* Prevent viewport overflow */
     white-space: nowrap;
     background: rgba(255, 255, 255, 0.85);
@@ -640,6 +640,17 @@ body>* {
 .htb-dropdown:hover .htb-dropdown-content {
     display: block;
     animation: fadeIn var(--transition-fast);
+}
+
+/* Utility bar specific overrides - compact dropdowns (2026-01-21) */
+.nexus-utility-bar .htb-dropdown-content {
+    min-width: 160px !important;
+    max-width: 240px !important;
+}
+
+.nexus-utility-bar .left-utils .htb-dropdown-content {
+    left: 0 !important;
+    right: auto !important;
 }
 
 .htb-dropdown-content a {

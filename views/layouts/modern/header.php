@@ -372,6 +372,9 @@ try {
     <!-- Emergency Scroll Fix - MUST be last to override all other styles -->
     <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/scroll-fix-emergency.min.css?v=<?= $cssVersionTimestamp ?>">
 
+    <!-- Modern Header Dropdown Fixes - Override bundle CSS for compact utility bar dropdowns (2026-01-21) -->
+    <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/modern-header-emergency-fixes.css?v=<?= $cssVersionTimestamp ?>">
+
     <!-- Font Awesome - Single file faster than multiple requests -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous" media="print" onload="this.media='all'">
     <noscript>
@@ -562,119 +565,9 @@ try {
         })();
     </script>
 
-    <!-- EMERGENCY: JavaScript-based style override to bypass ALL caching -->
-    <script>
-        (function() {
-            function applyEmergencyStyles() {
-                // Find all dropdowns
-                const dropdowns = document.querySelectorAll('.htb-dropdown-content');
-                dropdowns.forEach(dd => {
-                    dd.style.minWidth = 'auto';
-                    dd.style.maxWidth = 'max-content';
-                    dd.style.width = 'auto';
-                    dd.style.padding = '8px 0';
-                    dd.style.whiteSpace = 'normal';
-                });
+    <!-- Emergency JavaScript styles removed 2026-01-21 - Now handled by modern-header-emergency-fixes.css -->
 
-                // Find all dropdown links
-                const links = document.querySelectorAll('.htb-dropdown-content a');
-                links.forEach(link => {
-                    link.style.whiteSpace = 'nowrap';
-                    link.style.padding = '10px 16px';
-                    link.style.margin = '1px 6px';
-                });
-
-                // Fix mode switcher
-                const modeSwitcher = document.querySelector('.mode-switcher');
-                if (modeSwitcher) {
-                    modeSwitcher.style.gap = '4px';
-                    modeSwitcher.style.padding = '2px 6px 2px 2px';
-                    modeSwitcher.style.marginLeft = '4px';
-                    modeSwitcher.style.borderRadius = '16px';
-                    modeSwitcher.style.minHeight = '28px';
-                }
-
-                const modeIcon = document.querySelector('.mode-icon-container');
-                if (modeIcon) {
-                    modeIcon.style.width = '24px';
-                    modeIcon.style.height = '24px';
-                }
-
-                const modeIconI = document.querySelector('.mode-icon');
-                if (modeIconI) {
-                    modeIconI.style.fontSize = '11px';
-                }
-
-                const modeLabel = document.querySelector('.mode-label');
-                if (modeLabel) {
-                    modeLabel.style.fontSize = '10px';
-                    modeLabel.style.letterSpacing = '0.2px';
-                }
-            }
-
-            // Apply immediately
-            if (document.readyState === 'loading') {
-                document.addEventListener('DOMContentLoaded', applyEmergencyStyles);
-            } else {
-                applyEmergencyStyles();
-            }
-
-            // Re-apply after a short delay to catch dynamically loaded content
-            setTimeout(applyEmergencyStyles, 100);
-            setTimeout(applyEmergencyStyles, 500);
-        })();
-    </script>
-
-    <!-- EMERGENCY CACHE OVERRIDE: Dark Mode Toggle Size Fix + Dropdown Width Fix -->
-    <style>
-        /* Dark Mode Toggle - Compact Size */
-        .nexus-utility-bar .mode-switcher,
-        .mode-switcher {
-            gap: 4px !important;
-            padding: 2px 6px 2px 2px !important;
-            margin-left: 4px !important;
-            border-radius: 16px !important;
-            min-height: 28px !important;
-        }
-        .mode-switcher .mode-icon-container,
-        .mode-icon-container {
-            width: 24px !important;
-            height: 24px !important;
-        }
-        .mode-switcher .mode-icon,
-        .mode-icon {
-            font-size: 11px !important;
-        }
-        .mode-switcher .mode-label,
-        .mode-label {
-            font-size: 10px !important;
-            letter-spacing: 0.2px !important;
-        }
-        /* Dropdown Width - Compact */
-        .htb-dropdown .htb-dropdown-content,
-        .nexus-utility-bar .htb-dropdown-content,
-        div.htb-dropdown-content,
-        .htb-dropdown-content {
-            min-width: auto !important;
-            max-width: max-content !important;
-            width: auto !important;
-            padding: 8px 0 !important;
-            white-space: normal !important;
-        }
-        /* Compact dropdown links */
-        .htb-dropdown-content a {
-            white-space: nowrap !important;
-            padding: 10px 16px !important;
-            margin: 1px 6px !important;
-        }
-        /* Remove extra bottom spacing in dropdown items */
-        .htb-dropdown-content a:last-child {
-            margin-bottom: 1px !important;
-        }
-        .htb-dropdown-content a:first-child {
-            margin-top: 1px !important;
-        }
-    </style>
+    <!-- Emergency inline CSS removed 2026-01-21 - Now handled by modern-header-emergency-fixes.css -->
 
 </head>
 
