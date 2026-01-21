@@ -642,16 +642,8 @@ body>* {
     animation: fadeIn var(--transition-fast);
 }
 
-/* Utility bar specific overrides - compact dropdowns (2026-01-21) */
-.nexus-utility-bar .htb-dropdown-content {
-    min-width: 160px !important;
-    max-width: 240px !important;
-}
-
-.nexus-utility-bar .left-utils .htb-dropdown-content {
-    left: 0 !important;
-    right: auto !important;
-}
+/* Utility bar specific overrides moved to modern-header-emergency-fixes.css (2026-01-21) */
+/* DO NOT add dropdown sizing rules here - they conflict with emergency fixes */
 
 .htb-dropdown-content a {
     display: block;

@@ -1,6 +1,6 @@
 /**
  * features-pwa Bundle
- * Generated: 2026-01-21T06:37:16.912Z
+ * Generated: 2026-01-21T16:06:27.655Z
  * Files: 3
  */
 
@@ -83,7 +83,7 @@
    ============================================ */
 .nexus-notification-prompt {
     position: fixed;
-    bottom: 100px;
+    bottom: var(--space-20, 80px);
     left: var(--space-4, 16px);
     right: var(--space-4, 16px);
     z-index: var(--z-toast, 400);
@@ -114,15 +114,15 @@
 }
 
 .nexus-notification-prompt-icon {
-    width: 48px;
-    height: 48px;
-    background: linear-gradient(135deg, #f59e0b, #f97316);
+    width: var(--space-12, 48px);
+    height: var(--space-12, 48px);
+    background: linear-gradient(135deg, var(--color-warning, #f59e0b), var(--color-orange-500, #f97316));
     border-radius: var(--radius-md, 12px);
     display: flex;
     align-items: center;
     justify-content: center;
     color: white;
-    font-size: 1.5rem;
+    font-size: var(--font-size-2xl, 1.5rem);
     flex-shrink: 0;
 }
 
@@ -214,7 +214,7 @@
     text-align: center;
     position: relative;
     transform: translateY(100%);
-    transition: transform 0.4s cubic-bezier(0.32, 0.72, 0, 1);
+    transition: transform var(--transition-slow, 500ms) cubic-bezier(0.32, 0.72, 0, 1);
     box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.15);
 }
 
@@ -229,7 +229,7 @@
     width: 36px;
     height: 5px;
     background: var(--color-gray-300, rgba(128, 128, 128, 0.3));
-    border-radius: 3px;
+    border-radius: var(--radius-sm, 4px);
     margin: 0 auto var(--space-4, 16px);
 }
 
@@ -242,7 +242,7 @@
     height: 36px;
     background: var(--color-gray-100, rgba(0, 0, 0, 0.05));
     border: none;
-    border-radius: 50%;
+    border-radius: var(--radius-full, 9999px);
     cursor: pointer;
     display: flex;
     align-items: center;
@@ -266,8 +266,8 @@
 }
 
 .nexus-install-icon img {
-    width: 80px;
-    height: 80px;
+    width: var(--space-20, 80px);
+    height: var(--space-20, 80px);
     border-radius: var(--radius-xl, 20px);
     box-shadow: 0 8px 32px rgba(99, 102, 241, 0.25);
 }
@@ -312,7 +312,7 @@
 }
 
 .nexus-install-section-header i {
-    font-size: 1.25rem;
+    font-size: var(--font-size-xl, 1.25rem);
     color: var(--color-primary-500, #6366f1);
 }
 
@@ -381,7 +381,7 @@
     border: 1px solid rgba(245, 158, 11, 0.2);
     border-radius: var(--radius-md, 12px);
     font-size: var(--font-size-sm, 0.875rem);
-    color: #b45309;
+    color: var(--color-amber-700, #b45309);
     margin-bottom: var(--space-4, 16px);
     line-height: var(--line-height-normal, 1.5);
 }
@@ -421,7 +421,7 @@
 }
 
 .nexus-install-section-btn-green {
-    background: linear-gradient(135deg, var(--color-success, #10b981), #059669);
+    background: linear-gradient(135deg, var(--color-success, #10b981), var(--color-green-600, #16a34a));
 }
 
 .nexus-install-section-btn-green:hover {
@@ -471,11 +471,11 @@
 }
 
 .nexus-install-ios-step-num {
-    width: 32px;
-    height: 32px;
+    width: var(--space-8, 32px);
+    height: var(--space-8, 32px);
     background: linear-gradient(135deg, var(--color-primary-500, #6366f1), var(--color-primary-600, #4f46e5));
     color: white;
-    border-radius: 50%;
+    border-radius: var(--radius-full, 9999px);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -489,7 +489,7 @@
 }
 
 .nexus-install-ios-step i {
-    color: #007AFF;
+    color: var(--color-info, #3b82f6); /* iOS blue approximation */
 }
 
 /* ============================================
@@ -521,7 +521,7 @@
     align-items: center;
     justify-content: center;
     color: var(--color-primary-500, #6366f1);
-    font-size: 1.25rem;
+    font-size: var(--font-size-xl, 1.25rem);
 }
 
 /* ============================================
@@ -617,7 +617,7 @@
     background: var(--feed-bg-card, white);
     border-radius: var(--radius-2xl, 24px);
     padding: var(--space-8, 32px) var(--space-6, 24px);
-    max-width: 340px;
+    max-width: 340px; /* Specific size for biometric modal */
     width: 100%;
     text-align: center;
     transform: scale(0.95);
@@ -637,7 +637,7 @@
     align-items: center;
     justify-content: center;
     margin: 0 auto var(--space-5, 20px);
-    font-size: 2.5rem;
+    font-size: var(--font-size-4xl, 2.25rem);
     color: white;
     box-shadow: 0 8px 32px rgba(99, 102, 241, 0.3);
 }
@@ -699,9 +699,9 @@
 
     .nexus-install-prompt-card {
         border-radius: var(--radius-2xl, 24px);
-        max-width: 420px;
+        max-width: 420px; /* Specific size for desktop modal */
         padding: var(--space-8, 32px) var(--space-6, 24px);
-        transform: scale(0.95) translateY(20px);
+        transform: scale(0.95) translateY(var(--space-5, 20px));
         box-shadow: var(--shadow-2xl, 0 25px 50px -12px rgba(0, 0, 0, 0.25));
     }
 
@@ -726,7 +726,7 @@
 [data-theme="dark"] .nexus-notification-prompt-content,
 [data-theme="dark"] .nexus-install-prompt-card,
 [data-theme="dark"] .nexus-biometric-card {
-    background: #1c1c1e;
+    background: var(--color-gray-900, #111827); /* Dark mode card background */
     border-color: rgba(255, 255, 255, 0.1);
 }
 
@@ -772,7 +772,7 @@
 [data-theme="dark"] .nexus-install-apk-note {
     background: rgba(245, 158, 11, 0.12);
     border-color: rgba(245, 158, 11, 0.2);
-    color: #fbbf24;
+    color: var(--color-warning, #f59e0b); /* Warning color for dark mode */
 }
 
 [data-theme="dark"] .nexus-install-divider {
@@ -853,13 +853,14 @@
 /**
  * Pull-to-Refresh - Native iOS/Android Style
  * Custom spinner with elastic pull feedback
- * Version: 1.0 - 2026-01-19
+ * Version: 1.1 - 2026-01-21
  *
  * Features:
  * - iOS-style elastic overscroll
  * - Android Material-style circular progress
  * - Haptic feedback triggers
  * - Dark mode support
+ * - Design token integration for consistency
  * - Reduced motion support
  */
 
@@ -869,11 +870,11 @@
 :root {
     --ptr-threshold: 80px;
     --ptr-max-pull: 140px;
-    --ptr-spinner-size: 40px;
+    --ptr-spinner-size: var(--space-10);
     --ptr-bg: rgba(255, 255, 255, 0.98);
-    --ptr-spinner-color: var(--color-primary-500, #6366f1);
-    --ptr-text-color: var(--text-muted, #6b7280);
-    --ptr-transition: cubic-bezier(0.4, 0, 0.2, 1);
+    --ptr-spinner-color: var(--color-primary-500);
+    --ptr-text-color: var(--text-muted);
+    --ptr-transition: var(--ease-in-out);
 }
 
 [data-theme="dark"] {
@@ -893,18 +894,18 @@
    ============================================== */
 .ptr-indicator {
     position: fixed;
-    top: calc(var(--layout-header-height, 56px) - 10px);
+    top: calc(var(--layout-header-height) - 10px);
     left: 50%;
     transform: translateX(-50%) translateY(-100%);
-    z-index: var(--z-toast, 400);
+    z-index: var(--z-toast);
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 8px;
-    padding: 12px 20px;
+    gap: var(--space-2);
+    padding: var(--space-3) var(--space-5);
     background: var(--ptr-bg);
-    border-radius: 24px;
+    border-radius: var(--radius-2xl);
     box-shadow:
         0 4px 20px rgba(0, 0, 0, 0.15),
         0 0 0 1px rgba(0, 0, 0, 0.05);
@@ -914,8 +915,8 @@
         transform 300ms var(--ptr-transition),
         opacity 200ms ease;
     will-change: transform, opacity;
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
+    backdrop-filter: blur(var(--glass-blur-subtle));
+    -webkit-backdrop-filter: blur(var(--glass-blur-subtle));
 }
 
 [data-theme="dark"] .ptr-indicator {
@@ -971,8 +972,8 @@
 .ptr-spinner-track {
     position: absolute;
     inset: 0;
-    border: 3px solid var(--border-default, rgba(0, 0, 0, 0.1));
-    border-radius: 50%;
+    border: 3px solid var(--border-default);
+    border-radius: var(--radius-full);
 }
 
 [data-theme="dark"] .ptr-spinner-track {
@@ -985,7 +986,7 @@
     inset: 0;
     border: 3px solid transparent;
     border-top-color: var(--ptr-spinner-color);
-    border-radius: 50%;
+    border-radius: var(--radius-full);
     transform: rotate(-90deg);
     transition: none;
 }
@@ -1002,9 +1003,9 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 16px;
+    font-size: var(--font-size-base);
     color: var(--ptr-spinner-color);
-    transition: transform 300ms var(--ptr-transition);
+    transition: transform var(--transition-base);
 }
 
 /* Arrow rotates as you pull */
@@ -1032,13 +1033,13 @@
         border-top-color: var(--ptr-spinner-color);
     }
     25% {
-        border-top-color: #8b5cf6;
+        border-top-color: var(--color-purple-500);
     }
     50% {
-        border-top-color: #ec4899;
+        border-top-color: var(--color-pink-500);
     }
     75% {
-        border-top-color: #f59e0b;
+        border-top-color: var(--color-warning);
     }
     100% {
         transform: rotate(360deg);
@@ -1050,8 +1051,8 @@
    PTR TEXT
    ============================================== */
 .ptr-text {
-    font-size: 12px;
-    font-weight: 500;
+    font-size: var(--font-size-xs);
+    font-weight: var(--font-weight-medium);
     color: var(--ptr-text-color);
     white-space: nowrap;
     transition: opacity 200ms ease;
@@ -1066,14 +1067,14 @@
    SUCCESS STATE
    ============================================== */
 .ptr-indicator.ptr-success .ptr-spinner-progress {
-    border-top-color: var(--color-success, #10b981);
+    border-top-color: var(--color-success);
     animation: none;
 }
 
 .ptr-indicator.ptr-success .ptr-spinner-icon {
     opacity: 1;
     transform: scale(1);
-    color: var(--color-success, #10b981);
+    color: var(--color-success);
 }
 
 .ptr-indicator.ptr-success .ptr-spinner-icon i::before {
@@ -1102,7 +1103,7 @@ html.ptr-active #main-content {
 html.ptr-active.ptr-releasing .ptr-content,
 html.ptr-active.ptr-releasing main,
 html.ptr-active.ptr-releasing #main-content {
-    transition: transform 300ms var(--ptr-transition);
+    transition: transform var(--transition-base);
 }
 
 /* ==============================================
@@ -1110,8 +1111,8 @@ html.ptr-active.ptr-releasing #main-content {
    Smaller, icon-only indicator
    ============================================== */
 .ptr-indicator.ptr-minimal {
-    padding: 10px;
-    border-radius: 50%;
+    padding: var(--space-2);
+    border-radius: var(--radius-full);
     gap: 0;
 }
 
@@ -1133,10 +1134,10 @@ html.ptr-active.ptr-releasing #main-content {
     top: 0;
     left: 0;
     right: 0;
-    border-radius: 0;
+    border-radius: var(--radius-none);
     transform: translateY(-100%);
-    padding: 16px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    padding: var(--space-4);
+    box-shadow: var(--shadow-md);
 }
 
 .ptr-indicator.ptr-inline.ptr-visible {
@@ -1156,7 +1157,7 @@ html.ptr-active.ptr-releasing #main-content {
 /* ==============================================
    MOBILE ONLY - Hide on desktop
    ============================================== */
-@media (min-width: 1025px) {
+@media (min-width: 1024px) {
     .ptr-indicator {
         display: none !important;
     }
@@ -1188,7 +1189,7 @@ html.ptr-active.ptr-releasing #main-content {
    ============================================== */
 @supports (padding-top: env(safe-area-inset-top)) {
     .ptr-indicator {
-        top: calc(var(--layout-header-height, 56px) + env(safe-area-inset-top) - 10px);
+        top: calc(var(--layout-header-height) + env(safe-area-inset-top) - 10px);
     }
 }
 
@@ -1217,7 +1218,7 @@ html.ptr-active.ptr-releasing #main-content {
 /**
  * Page Transitions - Smooth Navigation Effects
  * Fade/slide animations between page navigations
- * Version: 1.0 - 2026-01-19
+ * Version: 1.1 - 2026-01-21 - Migrated to design tokens
  *
  * Features:
  * - Fade out on exit, fade in on enter
@@ -1231,8 +1232,8 @@ html.ptr-active.ptr-releasing #main-content {
    ============================================== */
 :root {
     --page-transition-duration: 200ms;
-    --page-transition-easing: cubic-bezier(0.4, 0, 0.2, 1);
-    --page-slide-distance: 30px;
+    --page-transition-easing: var(--ease-in-out);
+    --page-slide-distance: var(--space-8);
 }
 
 /* ==============================================
@@ -1261,7 +1262,7 @@ html.page-transitioning #main-content {
     }
     to {
         opacity: 0;
-        transform: translateY(-10px);
+        transform: translateY(calc(var(--space-2) * -1));
     }
 }
 
@@ -1315,7 +1316,7 @@ html.page-entering #main-content {
 @keyframes page-fade-in {
     from {
         opacity: 0;
-        transform: translateY(10px);
+        transform: translateY(var(--space-2));
     }
     to {
         opacity: 1;
@@ -1367,20 +1368,20 @@ html.page-entering.nav-back #main-content {
     top: 0;
     left: 0;
     width: 0;
-    height: 3px;
+    height: var(--space-1);
     background: linear-gradient(90deg,
-        var(--color-primary-500, #6366f1),
-        var(--color-primary-400, #818cf8),
-        #a855f7
+        var(--color-primary-500),
+        var(--color-primary-400),
+        var(--color-purple-400)
     );
-    z-index: var(--z-loading-overlay, 510);
+    z-index: var(--z-loading-overlay);
     opacity: 0;
-    transition: opacity 150ms ease;
+    transition: opacity var(--transition-fast);
     pointer-events: none;
-    border-radius: 0 2px 2px 0;
+    border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
     box-shadow:
-        0 0 10px var(--color-primary-500, #6366f1),
-        0 0 5px var(--color-primary-400, #818cf8);
+        0 0 var(--space-2) var(--color-primary-500),
+        0 0 var(--space-1) var(--color-primary-400);
 }
 
 .page-loading-bar.active {
@@ -1389,7 +1390,7 @@ html.page-entering.nav-back #main-content {
 }
 
 .page-loading-bar.complete {
-    animation: loading-complete 300ms ease-out forwards;
+    animation: loading-complete var(--transition-base) ease-out forwards;
 }
 
 @keyframes loading-progress {
@@ -1412,18 +1413,18 @@ html.page-entering.nav-back #main-content {
 .page-loading-overlay {
     position: fixed;
     inset: 0;
-    background: var(--bg-base, #f9fafb);
+    background: var(--bg-base);
     opacity: 0;
     visibility: hidden;
-    z-index: var(--z-loading-overlay, 510);
+    z-index: var(--z-loading-overlay);
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: opacity 200ms ease, visibility 200ms ease;
+    transition: opacity var(--transition-base), visibility var(--transition-base);
 }
 
 [data-theme="dark"] .page-loading-overlay {
-    background: var(--bg-base, #0f172a);
+    background: var(--bg-base);
 }
 
 .page-loading-overlay.visible {
@@ -1432,11 +1433,11 @@ html.page-entering.nav-back #main-content {
 }
 
 .page-loading-spinner {
-    width: 40px;
-    height: 40px;
-    border: 3px solid var(--border-default, rgba(0, 0, 0, 0.1));
-    border-top-color: var(--color-primary-500, #6366f1);
-    border-radius: 50%;
+    width: var(--space-10);
+    height: var(--space-10);
+    border: var(--space-1) solid var(--border-default);
+    border-top-color: var(--color-primary-500);
+    border-radius: var(--radius-full);
     animation: spin 800ms linear infinite;
 }
 
@@ -1451,14 +1452,14 @@ a[data-prefetch="true"]::after,
 a.prefetched::after {
     content: '';
     position: absolute;
-    bottom: -2px;
+    bottom: calc(var(--space-1) * -1);
     left: 0;
     width: 100%;
-    height: 2px;
-    background: var(--color-primary-500, #6366f1);
+    height: var(--space-1);
+    background: var(--color-primary-500);
     transform: scaleX(0);
     transform-origin: right;
-    transition: transform 200ms ease;
+    transition: transform var(--transition-base);
     opacity: 0.5;
 }
 
@@ -1473,7 +1474,7 @@ a.prefetched:hover::after {
    ============================================== */
 html.page-entering .stagger-reveal > * {
     opacity: 0;
-    transform: translateY(20px);
+    transform: translateY(var(--space-5));
     animation: stagger-fade-in 400ms var(--page-transition-easing) forwards;
 }
 
@@ -1586,12 +1587,12 @@ html.page-transitioning .mobile-tab-bar {
    ============================================== */
 @media (max-width: 768px) {
     :root {
-        --page-slide-distance: 20px;
+        --page-slide-distance: var(--space-5);
         --page-transition-duration: 180ms;
     }
 
     .page-loading-bar {
-        height: 2px;
+        height: var(--space-1);
     }
 }
 

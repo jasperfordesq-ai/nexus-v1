@@ -1,6 +1,6 @@
 /**
  * components-forms Bundle
- * Generated: 2026-01-21T06:37:16.880Z
+ * Generated: 2026-01-21T16:06:27.641Z
  * Files: 4
  */
 
@@ -11,7 +11,7 @@
 /**
  * Form Validation Animations
  * Shake on error, checkmark on success, smooth transitions
- * Version: 1.0 - 2026-01-19
+ * Version: 2.0 - 2026-01-21 - Migrated to design tokens
  *
  * Features:
  * - Shake animation for invalid fields
@@ -42,9 +42,9 @@ input[type="datetime-local"],
 select,
 textarea {
     transition:
-        border-color 0.2s ease,
-        box-shadow 0.2s ease,
-        background-color 0.2s ease;
+        border-color var(--transition-fast) var(--ease-out),
+        box-shadow var(--transition-fast) var(--ease-out),
+        background-color var(--transition-fast) var(--ease-out);
 }
 
 /* ==========================================================================
@@ -74,7 +74,7 @@ input:invalid:not(:placeholder-shown),
 select:invalid:not([data-placeholder]),
 textarea:invalid:not(:placeholder-shown),
 [data-validation="error"] {
-    border-color: #ef4444 !important;
+    border-color: var(--color-danger) !important;
     box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.15) !important;
 }
 
@@ -83,16 +83,16 @@ textarea:invalid:not(:placeholder-shown),
 .form-error:focus,
 .has-error input:focus,
 [data-validation="error"]:focus {
-    animation: form-shake 0.5s ease-out;
+    animation: form-shake var(--transition-slow) var(--ease-out);
 }
 
 /* Shake trigger class (for JS-triggered shake) */
 .form-shake {
-    animation: form-shake 0.5s ease-out;
+    animation: form-shake var(--transition-slow) var(--ease-out);
 }
 
 .form-shake-subtle {
-    animation: form-shake-subtle 0.3s ease-out;
+    animation: form-shake-subtle var(--transition-base) var(--ease-out);
 }
 
 /* ==========================================================================
@@ -133,13 +133,13 @@ textarea:invalid:not(:placeholder-shown),
 .has-success select,
 .has-success textarea,
 [data-validation="success"] {
-    border-color: #22c55e !important;
+    border-color: var(--color-success) !important;
     box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.15) !important;
 }
 
 /* Pulse on success */
 .form-success-pulse {
-    animation: form-success-pulse 0.6s ease-out;
+    animation: form-success-pulse 0.6s var(--ease-out);
 }
 
 /* ==========================================================================
@@ -156,13 +156,13 @@ textarea:invalid:not(:placeholder-shown),
 /* Validation icon positioning */
 .form-validation-icon {
     position: absolute;
-    right: 12px;
+    right: var(--space-3);
     top: 50%;
     transform: translateY(-50%);
-    width: 20px;
-    height: 20px;
+    width: var(--space-5);
+    height: var(--space-5);
     opacity: 0;
-    transition: opacity 0.2s ease, transform 0.2s ease;
+    transition: opacity var(--transition-fast) var(--ease-out), transform var(--transition-fast) var(--ease-out);
     pointer-events: none;
 }
 
@@ -176,7 +176,7 @@ textarea:invalid:not(:placeholder-shown),
 
 /* Success checkmark */
 .form-validation-icon--success {
-    color: #22c55e;
+    color: var(--color-success);
 }
 
 .form-validation-icon--success svg {
@@ -186,18 +186,18 @@ textarea:invalid:not(:placeholder-shown),
 
 .is-valid ~ .form-validation-icon--success svg,
 .form-success ~ .form-validation-icon--success svg {
-    animation: form-checkmark-draw 0.4s ease-out forwards;
+    animation: form-checkmark-draw 0.4s var(--ease-out) forwards;
 }
 
 /* Error X icon */
 .form-validation-icon--error {
-    color: #ef4444;
+    color: var(--color-danger);
 }
 
 /* Make room for icon in input */
 .form-validation-wrapper .form-control,
 .form-validation-wrapper input {
-    padding-right: 40px;
+    padding-right: var(--space-10);
 }
 
 /* ==========================================================================
@@ -232,27 +232,27 @@ textarea:invalid:not(:placeholder-shown),
 .invalid-feedback,
 .error-message,
 .field-error {
-    color: #ef4444;
-    font-size: 0.875rem;
-    margin-top: 0.375rem;
+    color: var(--color-danger);
+    font-size: var(--font-size-sm);
+    margin-top: var(--space-1);
     display: block;
-    animation: form-error-slide-in 0.3s ease-out;
+    animation: form-error-slide-in var(--transition-base) var(--ease-out);
 }
 
 /* Success message styling */
 .form-success-message,
 .valid-feedback,
 .success-message {
-    color: #22c55e;
-    font-size: 0.875rem;
-    margin-top: 0.375rem;
+    color: var(--color-success);
+    font-size: var(--font-size-sm);
+    margin-top: var(--space-1);
     display: block;
-    animation: form-error-slide-in 0.3s ease-out;
+    animation: form-error-slide-in var(--transition-base) var(--ease-out);
 }
 
 /* Fade out class for removing messages */
 .form-message-fade-out {
-    animation: form-error-fade-out 0.2s ease-out forwards;
+    animation: form-error-fade-out var(--transition-fast) var(--ease-out) forwards;
 }
 
 /* ==========================================================================
@@ -262,20 +262,20 @@ textarea:invalid:not(:placeholder-shown),
 /* Entire field group shake */
 .form-group.has-error,
 .field-group.has-error {
-    animation: form-shake-subtle 0.4s ease-out;
+    animation: form-shake-subtle 0.4s var(--ease-out);
 }
 
 /* Label color change */
 .form-group.has-error label,
 .field-group.has-error label {
-    color: #ef4444;
-    transition: color 0.2s ease;
+    color: var(--color-danger);
+    transition: color var(--transition-fast) var(--ease-out);
 }
 
 .form-group.has-success label,
 .field-group.has-success label {
-    color: #22c55e;
-    transition: color 0.2s ease;
+    color: var(--color-success);
+    transition: color var(--transition-fast) var(--ease-out);
 }
 
 /* ==========================================================================
@@ -283,38 +283,38 @@ textarea:invalid:not(:placeholder-shown),
    ========================================================================== */
 
 .password-strength {
-    height: 4px;
-    background: #e5e7eb;
-    border-radius: 2px;
-    margin-top: 8px;
+    height: var(--space-1);
+    background: var(--color-gray-200);
+    border-radius: var(--radius-sm);
+    margin-top: var(--space-2);
     overflow: hidden;
 }
 
 .password-strength-bar {
     height: 100%;
     width: 0;
-    border-radius: 2px;
-    transition: width 0.3s ease, background-color 0.3s ease;
+    border-radius: var(--radius-sm);
+    transition: width var(--transition-base) var(--ease-out), background-color var(--transition-base) var(--ease-out);
 }
 
 .password-strength[data-strength="weak"] .password-strength-bar {
     width: 25%;
-    background: #ef4444;
+    background: var(--color-danger);
 }
 
 .password-strength[data-strength="fair"] .password-strength-bar {
     width: 50%;
-    background: #f59e0b;
+    background: var(--color-warning);
 }
 
 .password-strength[data-strength="good"] .password-strength-bar {
     width: 75%;
-    background: #3b82f6;
+    background: var(--color-info);
 }
 
 .password-strength[data-strength="strong"] .password-strength-bar {
     width: 100%;
-    background: #22c55e;
+    background: var(--color-success);
 }
 
 /* ==========================================================================
@@ -322,20 +322,20 @@ textarea:invalid:not(:placeholder-shown),
    ========================================================================== */
 
 .char-counter {
-    font-size: 0.75rem;
-    color: #6b7280;
+    font-size: var(--font-size-xs);
+    color: var(--color-gray-500);
     text-align: right;
-    margin-top: 4px;
-    transition: color 0.2s ease;
+    margin-top: var(--space-1);
+    transition: color var(--transition-fast) var(--ease-out);
 }
 
 .char-counter.warning {
-    color: #f59e0b;
+    color: var(--color-warning);
 }
 
 .char-counter.error {
-    color: #ef4444;
-    font-weight: 500;
+    color: var(--color-danger);
+    font-weight: var(--font-weight-medium);
 }
 
 /* ==========================================================================
@@ -343,8 +343,8 @@ textarea:invalid:not(:placeholder-shown),
    ========================================================================== */
 
 .required-indicator {
-    color: #ef4444;
-    margin-left: 2px;
+    color: var(--color-danger);
+    margin-left: var(--space-1);
 }
 
 /* Pulse animation for required empty fields on submit attempt */
@@ -358,7 +358,7 @@ textarea:invalid:not(:placeholder-shown),
 }
 
 .required-highlight .required-indicator {
-    animation: required-pulse 0.5s ease-in-out 3;
+    animation: required-pulse var(--transition-slow) var(--ease-in-out) 3;
 }
 
 /* ==========================================================================
@@ -375,14 +375,14 @@ textarea:invalid:not(:placeholder-shown),
 .btn-loading::after {
     content: '';
     position: absolute;
-    width: 20px;
-    height: 20px;
+    width: var(--space-5);
+    height: var(--space-5);
     top: 50%;
     left: 50%;
-    margin: -10px 0 0 -10px;
+    margin: calc(var(--space-5) / -2) 0 0 calc(var(--space-5) / -2);
     border: 2px solid transparent;
     border-top-color: currentColor;
-    border-radius: 50%;
+    border-radius: var(--radius-full);
     animation: btn-spin 0.8s linear infinite;
 }
 
@@ -392,15 +392,15 @@ textarea:invalid:not(:placeholder-shown),
 
 /* Button success state */
 .btn-success-state {
-    background: #22c55e !important;
-    border-color: #22c55e !important;
+    background: var(--color-success) !important;
+    border-color: var(--color-success) !important;
 }
 
 /* Button error state */
 .btn-error-state {
-    background: #ef4444 !important;
-    border-color: #ef4444 !important;
-    animation: form-shake-subtle 0.4s ease-out;
+    background: var(--color-danger) !important;
+    border-color: var(--color-danger) !important;
+    animation: form-shake-subtle 0.4s var(--ease-out);
 }
 
 /* ==========================================================================
@@ -409,7 +409,7 @@ textarea:invalid:not(:placeholder-shown),
 
 /* Typing indicator */
 .form-typing {
-    border-color: #3b82f6 !important;
+    border-color: var(--color-info) !important;
     box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1) !important;
 }
 
@@ -417,9 +417,9 @@ textarea:invalid:not(:placeholder-shown),
 .form-validating {
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%236b7280' stroke-width='2'%3E%3Ccircle cx='12' cy='12' r='10' stroke-dasharray='32' stroke-dashoffset='32'%3E%3Canimate attributeName='stroke-dashoffset' dur='1s' values='32;0;32' repeatCount='indefinite'/%3E%3C/circle%3E%3C/svg%3E");
     background-repeat: no-repeat;
-    background-position: right 12px center;
-    background-size: 16px;
-    padding-right: 40px !important;
+    background-position: right var(--space-3) center;
+    background-size: var(--space-4);
+    padding-right: var(--space-10) !important;
 }
 
 /* ==========================================================================
@@ -438,7 +438,7 @@ textarea:invalid:not(:placeholder-shown),
 [data-theme="dark"] .form-success,
 [data-theme="dark"] .has-success input,
 [data-theme="dark"] [data-validation="success"] {
-    border-color: #4ade80 !important;
+    border-color: var(--color-green-400) !important;
     box-shadow: 0 0 0 3px rgba(74, 222, 128, 0.2) !important;
 }
 
@@ -451,7 +451,7 @@ textarea:invalid:not(:placeholder-shown),
 [data-theme="dark"] .form-success-message,
 [data-theme="dark"] .valid-feedback,
 [data-theme="dark"] .success-message {
-    color: #4ade80;
+    color: var(--color-green-400);
 }
 
 [data-theme="dark"] .form-group.has-error label {
@@ -459,19 +459,19 @@ textarea:invalid:not(:placeholder-shown),
 }
 
 [data-theme="dark"] .form-group.has-success label {
-    color: #4ade80;
+    color: var(--color-green-400);
 }
 
 [data-theme="dark"] .password-strength {
-    background: #374151;
+    background: var(--color-gray-200);
 }
 
 [data-theme="dark"] .char-counter {
-    color: #9ca3af;
+    color: var(--color-gray-400);
 }
 
 [data-theme="dark"] .form-validation-icon--success {
-    color: #4ade80;
+    color: var(--color-green-400);
 }
 
 [data-theme="dark"] .form-validation-icon--error {
@@ -534,7 +534,7 @@ textarea:invalid:not(:placeholder-shown),
 /**
  * Responsive Forms - Mobile-First Form Patterns
  * Fixes iOS zoom, touch targets, and keyboard handling
- * Version: 1.0
+ * Version: 1.1 - Migrated to design tokens
  */
 
 /* ==========================================
@@ -557,7 +557,7 @@ input[type="week"],
 input[type="color"],
 textarea,
 select {
-    font-size: max(16px, 1rem); /* Ensures minimum 16px to prevent iOS zoom */
+    font-size: max(16px, var(--font-size-base)); /* Ensures minimum 16px to prevent iOS zoom */
 }
 
 /* ==========================================
@@ -579,13 +579,13 @@ input[type="month"],
 input[type="week"],
 select {
     min-height: 44px;
-    padding: var(--space-3, 12px) var(--space-4, 16px);
-    border: 1px solid var(--color-gray-300, #d1d5db);
-    border-radius: var(--radius-base, 8px);
-    background-color: var(--color-gray-50, #f9fafb);
-    color: var(--color-gray-900, #111827);
-    transition: border-color var(--transition-fast, 150ms),
-                box-shadow var(--transition-fast, 150ms);
+    padding: var(--space-3) var(--space-4);
+    border: 1px solid var(--color-gray-300);
+    border-radius: var(--radius-base);
+    background-color: var(--color-gray-50);
+    color: var(--color-gray-900);
+    transition: border-color var(--transition-fast),
+                box-shadow var(--transition-fast);
     width: 100%;
     box-sizing: border-box;
     -webkit-appearance: none;
@@ -595,16 +595,16 @@ select {
 /* Textarea specific */
 textarea {
     min-height: 100px;
-    padding: var(--space-3, 12px) var(--space-4, 16px);
-    border: 1px solid var(--color-gray-300, #d1d5db);
-    border-radius: var(--radius-base, 8px);
-    background-color: var(--color-gray-50, #f9fafb);
-    color: var(--color-gray-900, #111827);
+    padding: var(--space-3) var(--space-4);
+    border: 1px solid var(--color-gray-300);
+    border-radius: var(--radius-base);
+    background-color: var(--color-gray-50);
+    color: var(--color-gray-900);
     resize: vertical;
     width: 100%;
     box-sizing: border-box;
     font-family: inherit;
-    line-height: var(--line-height-normal, 1.5);
+    line-height: var(--line-height-normal);
 }
 
 /* Focus states */
@@ -612,7 +612,7 @@ input:focus,
 textarea:focus,
 select:focus {
     outline: none;
-    border-color: var(--color-primary-500, #6366f1);
+    border-color: var(--color-primary-500);
     box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
 }
 
@@ -631,28 +631,28 @@ select:focus {
 [data-theme="dark"] input[type="week"],
 [data-theme="dark"] select,
 [data-theme="dark"] textarea {
-    background-color: var(--color-gray-100, #1f2937);
-    border-color: var(--color-gray-300, #4b5563);
-    color: var(--color-gray-900, #f9fafb);
+    background-color: var(--color-gray-100);
+    border-color: var(--color-gray-300);
+    color: var(--color-gray-900);
 }
 
 [data-theme="dark"] input:focus,
 [data-theme="dark"] textarea:focus,
 [data-theme="dark"] select:focus {
-    border-color: var(--color-primary-400, #818cf8);
+    border-color: var(--color-primary-400);
     box-shadow: 0 0 0 3px rgba(129, 140, 248, 0.2);
 }
 
 /* Placeholder styling */
 input::placeholder,
 textarea::placeholder {
-    color: var(--color-gray-400, #9ca3af);
+    color: var(--color-gray-400);
     opacity: 1;
 }
 
 [data-theme="dark"] input::placeholder,
 [data-theme="dark"] textarea::placeholder {
-    color: var(--color-gray-500, #6b7280);
+    color: var(--color-gray-500);
 }
 
 /* ==========================================
@@ -666,16 +666,16 @@ input[type="reset"],
 .btn {
     min-height: 44px;
     min-width: 44px;
-    padding: var(--space-3, 12px) var(--space-6, 24px);
-    font-size: var(--font-size-base, 1rem);
-    font-weight: var(--font-weight-medium, 500);
-    border-radius: var(--radius-base, 8px);
+    padding: var(--space-3) var(--space-6);
+    font-size: var(--font-size-base);
+    font-weight: var(--font-weight-medium);
+    border-radius: var(--radius-base);
     cursor: pointer;
-    transition: all var(--transition-fast, 150ms);
+    transition: all var(--transition-fast);
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    gap: var(--space-2, 8px);
+    gap: var(--space-2);
     border: none;
     text-decoration: none;
     white-space: nowrap;
@@ -685,14 +685,14 @@ input[type="reset"],
 .btn-primary,
 button[type="submit"],
 input[type="submit"] {
-    background: linear-gradient(135deg, var(--color-primary-500, #6366f1), var(--color-primary-600, #4f46e5));
+    background: linear-gradient(135deg, var(--color-primary-500), var(--color-primary-600));
     color: white;
 }
 
 .btn-primary:hover,
 button[type="submit"]:hover,
 input[type="submit"]:hover {
-    background: linear-gradient(135deg, var(--color-primary-600, #4f46e5), var(--color-primary-700, #4338ca));
+    background: linear-gradient(135deg, var(--color-primary-600), var(--color-primary-700));
     transform: translateY(-1px);
     box-shadow: var(--shadow-md);
 }
@@ -705,23 +705,23 @@ input[type="submit"]:active {
 
 /* Secondary button */
 .btn-secondary {
-    background: var(--color-gray-100, #f3f4f6);
-    color: var(--color-gray-700, #374151);
-    border: 1px solid var(--color-gray-300, #d1d5db);
+    background: var(--color-gray-100);
+    color: var(--color-gray-700);
+    border: 1px solid var(--color-gray-300);
 }
 
 .btn-secondary:hover {
-    background: var(--color-gray-200, #e5e7eb);
+    background: var(--color-gray-200);
 }
 
 [data-theme="dark"] .btn-secondary {
-    background: var(--color-gray-200, #374151);
-    color: var(--color-gray-700, #e5e7eb);
-    border-color: var(--color-gray-300, #4b5563);
+    background: var(--color-gray-200);
+    color: var(--color-gray-700);
+    border-color: var(--color-gray-300);
 }
 
 [data-theme="dark"] .btn-secondary:hover {
-    background: var(--color-gray-300, #4b5563);
+    background: var(--color-gray-300);
 }
 
 /* Focus ring for buttons */
@@ -737,10 +737,10 @@ button:focus-visible,
 
 select {
     background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
-    background-position: right 12px center;
+    background-position: right var(--space-3) center;
     background-repeat: no-repeat;
-    background-size: 20px;
-    padding-right: 44px;
+    background-size: var(--space-5);
+    padding-right: calc(var(--space-10) + var(--space-1));  /* 44px for icon + padding */
     cursor: pointer;
 }
 
@@ -754,11 +754,11 @@ select {
 
 input[type="checkbox"],
 input[type="radio"] {
-    width: 20px;
-    height: 20px;
+    width: var(--space-5);
+    height: var(--space-5);
     margin: 0;
     cursor: pointer;
-    accent-color: var(--color-primary-500, #6366f1);
+    accent-color: var(--color-primary-500);
 }
 
 /* Label wrapper for checkbox/radio */
@@ -767,9 +767,9 @@ input[type="radio"] {
 .radio-label {
     display: flex;
     align-items: center;
-    gap: var(--space-3, 12px);
+    gap: var(--space-3);
     min-height: 44px;
-    padding: var(--space-2, 8px) 0;
+    padding: var(--space-2) 0;
     cursor: pointer;
 }
 
@@ -784,26 +784,26 @@ input[type="radio"] {
    ========================================== */
 
 .form-group {
-    margin-bottom: var(--space-5, 20px);
+    margin-bottom: var(--space-5);
 }
 
 .form-label {
     display: block;
-    margin-bottom: var(--space-2, 8px);
-    font-weight: var(--font-weight-medium, 500);
-    font-size: var(--font-size-sm, 0.875rem);
-    color: var(--color-gray-700, #374151);
+    margin-bottom: var(--space-2);
+    font-weight: var(--font-weight-medium);
+    font-size: var(--font-size-sm);
+    color: var(--color-gray-700);
 }
 
 [data-theme="dark"] .form-label {
-    color: var(--color-gray-300, #d1d5db);
+    color: var(--color-gray-300);
 }
 
 .form-hint {
     display: block;
-    margin-top: var(--space-2, 8px);
-    font-size: var(--font-size-sm, 0.875rem);
-    color: var(--color-gray-500, #6b7280);
+    margin-top: var(--space-2);
+    font-size: var(--font-size-sm);
+    color: var(--color-gray-500);
 }
 
 /* Error state */
@@ -813,7 +813,7 @@ input[type="radio"] {
 input.is-invalid,
 textarea.is-invalid,
 select.is-invalid {
-    border-color: var(--color-danger, #ef4444);
+    border-color: var(--color-danger);
 }
 
 .form-group.has-error input:focus,
@@ -827,9 +827,9 @@ select.is-invalid:focus {
 
 .form-error {
     display: block;
-    margin-top: var(--space-2, 8px);
-    font-size: var(--font-size-sm, 0.875rem);
-    color: var(--color-danger, #ef4444);
+    margin-top: var(--space-2);
+    font-size: var(--font-size-sm);
+    color: var(--color-danger);
 }
 
 /* ==========================================
@@ -838,7 +838,7 @@ select.is-invalid:focus {
 
 .form-row {
     display: flex;
-    gap: var(--space-4, 16px);
+    gap: var(--space-4);
     flex-wrap: wrap;
 }
 
@@ -870,27 +870,27 @@ select.is-invalid:focus {
 .input-group input {
     flex: 1;
     min-width: 0;
-    border-radius: var(--radius-base, 8px) 0 0 var(--radius-base, 8px);
+    border-radius: var(--radius-base) 0 0 var(--radius-base);
 }
 
 .input-group-addon {
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 0 var(--space-4, 16px);
-    background: var(--color-gray-100, #f3f4f6);
-    border: 1px solid var(--color-gray-300, #d1d5db);
+    padding: 0 var(--space-4);
+    background: var(--color-gray-100);
+    border: 1px solid var(--color-gray-300);
     border-left: none;
-    border-radius: 0 var(--radius-base, 8px) var(--radius-base, 8px) 0;
-    color: var(--color-gray-500, #6b7280);
-    font-size: var(--font-size-sm, 0.875rem);
+    border-radius: 0 var(--radius-base) var(--radius-base) 0;
+    color: var(--color-gray-500);
+    font-size: var(--font-size-sm);
     white-space: nowrap;
 }
 
 [data-theme="dark"] .input-group-addon {
-    background: var(--color-gray-200, #374151);
-    border-color: var(--color-gray-300, #4b5563);
-    color: var(--color-gray-400, #9ca3af);
+    background: var(--color-gray-200);
+    border-color: var(--color-gray-300);
+    color: var(--color-gray-400);
 }
 
 /* Icon inside input */
@@ -899,15 +899,15 @@ select.is-invalid:focus {
 }
 
 .input-with-icon input {
-    padding-left: 44px;
+    padding-left: calc(var(--space-10) + var(--space-1));  /* 44px for icon space */
 }
 
 .input-with-icon .input-icon {
     position: absolute;
-    left: var(--space-4, 16px);
+    left: var(--space-4);
     top: 50%;
     transform: translateY(-50%);
-    color: var(--color-gray-400, #9ca3af);
+    color: var(--color-gray-400);
     pointer-events: none;
 }
 
@@ -939,17 +939,17 @@ select.is-invalid:focus {
     input[type="search"],
     select,
     textarea {
-        padding: var(--space-3, 12px);
+        padding: var(--space-3);
     }
 
     button,
     .btn {
-        padding: var(--space-3, 12px) var(--space-4, 16px);
+        padding: var(--space-3) var(--space-4);
         width: 100%;
     }
 
     .form-row {
-        gap: var(--space-3, 12px);
+        gap: var(--space-3);
     }
 }
 
@@ -960,21 +960,21 @@ select.is-invalid:focus {
 
 .form-card {
     background: white;
-    border-radius: var(--radius-lg, 16px);
-    padding: var(--space-6, 24px);
+    border-radius: var(--radius-lg);
+    padding: var(--space-6);
     box-shadow: var(--shadow-sm);
-    border: 1px solid var(--color-gray-200, #e5e7eb);
+    border: 1px solid var(--color-gray-200);
 }
 
 [data-theme="dark"] .form-card {
-    background: var(--color-gray-100, #1f2937);
-    border-color: var(--color-gray-200, #374151);
+    background: var(--color-gray-100);
+    border-color: var(--color-gray-200);
 }
 
 @media (max-width: 480px) {
     .form-card {
-        padding: var(--space-4, 16px);
-        border-radius: var(--radius-md, 12px);
+        padding: var(--space-4);
+        border-radius: var(--radius-md);
     }
 }
 
@@ -984,14 +984,14 @@ select.is-invalid:focus {
 
 .form-actions {
     display: flex;
-    gap: var(--space-3, 12px);
-    margin-top: var(--space-6, 24px);
-    padding-top: var(--space-6, 24px);
-    border-top: 1px solid var(--color-gray-200, #e5e7eb);
+    gap: var(--space-3);
+    margin-top: var(--space-6);
+    padding-top: var(--space-6);
+    border-top: 1px solid var(--color-gray-200);
 }
 
 [data-theme="dark"] .form-actions {
-    border-top-color: var(--color-gray-200, #374151);
+    border-top-color: var(--color-gray-200);
 }
 
 .form-actions .btn {
@@ -1033,25 +1033,25 @@ button:disabled,
 
 input[type="file"] {
     min-height: 44px;
-    padding: var(--space-2, 8px);
+    padding: var(--space-2);
     cursor: pointer;
 }
 
 input[type="file"]::file-selector-button {
-    min-height: 32px;
-    padding: var(--space-2, 8px) var(--space-4, 16px);
-    margin-right: var(--space-3, 12px);
-    background: var(--color-primary-500, #6366f1);
+    min-height: var(--space-8);
+    padding: var(--space-2) var(--space-4);
+    margin-right: var(--space-3);
+    background: var(--color-primary-500);
     color: white;
     border: none;
-    border-radius: var(--radius-sm, 4px);
-    font-weight: var(--font-weight-medium, 500);
+    border-radius: var(--radius-sm);
+    font-weight: var(--font-weight-medium);
     cursor: pointer;
-    transition: background var(--transition-fast, 150ms);
+    transition: background var(--transition-fast);
 }
 
 input[type="file"]::file-selector-button:hover {
-    background: var(--color-primary-600, #4f46e5);
+    background: var(--color-primary-600);
 }
 
 /* ==========================================
@@ -1064,8 +1064,8 @@ input[type="search"] {
 
 input[type="search"]::-webkit-search-cancel-button {
     -webkit-appearance: none;
-    width: 20px;
-    height: 20px;
+    width: var(--space-5);
+    height: var(--space-5);
     background: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%236b7280'%3e%3cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M6 18L18 6M6 6l12 12'/%3e%3c/svg%3e");
     cursor: pointer;
 }
@@ -1085,18 +1085,18 @@ input[type="search"]::-webkit-search-cancel-button {
     background: linear-gradient(135deg,
         rgba(30, 41, 59, 0.75) 0%,
         rgba(51, 65, 85, 0.65) 100%);
-    backdrop-filter: blur(24px) saturate(180%);
-    -webkit-backdrop-filter: blur(24px) saturate(180%);
+    backdrop-filter: blur(var(--glass-blur)) saturate(180%);
+    -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(180%);
     border: 1.5px solid rgba(148, 163, 184, 0.25);
-    border-radius: 24px;
+    border-radius: var(--radius-2xl);
     display: flex;
     align-items: center;
-    padding: 10px 18px;
+    padding: var(--space-2) var(--space-4);
     width: 240px;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15),
                 inset 0 1px 0 rgba(255, 255, 255, 0.08),
                 0 0 0 0 rgba(99, 102, 241, 0);
-    transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: all 0.35s var(--ease-in-out);
     position: relative;
     overflow: hidden;
 }
@@ -1112,7 +1112,7 @@ input[type="search"]::-webkit-search-cancel-button {
         transparent,
         rgba(255, 255, 255, 0.1),
         transparent);
-    transition: left 0.5s ease;
+    transition: left var(--transition-slow);
 }
 
 .premium-search:hover::before {
@@ -1149,19 +1149,19 @@ input[type="search"]::-webkit-search-cancel-button {
     cursor: pointer;
     color: rgba(203, 213, 225, 0.75);
     padding: 0;
-    margin-right: 12px;
+    margin-right: var(--space-3);
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 20px;
-    height: 20px;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    width: var(--space-5);
+    height: var(--space-5);
+    transition: all var(--transition-base);
     position: relative;
 }
 
 .search-icon-btn i {
-    font-size: 15px;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    font-size: var(--font-size-sm);
+    transition: all var(--transition-base);
 }
 
 .premium-search:hover .search-icon-btn {
@@ -1178,7 +1178,7 @@ input[type="search"]::-webkit-search-cancel-button {
 
 .premium-search:focus-within .search-icon-btn i {
     transform: rotate(0deg) scale(1.15);
-    filter: drop-shadow(0 0 8px rgba(139, 92, 246, 0.6));
+    filter: drop-shadow(0 0 var(--space-2) rgba(139, 92, 246, 0.6));
 }
 
 /* Input reset - !important needed to override browser defaults */
@@ -1196,9 +1196,9 @@ input[type="search"]::-webkit-search-cancel-button {
     width: 100%;
     font-size: 0.95rem;
     outline: none !important;
-    font-weight: 500;
+    font-weight: var(--font-weight-medium);
     letter-spacing: 0.2px;
-    transition: all 0.3s ease;
+    transition: all var(--transition-base);
     box-shadow: none !important;
     -webkit-appearance: none !important;
     -moz-appearance: none !important;
@@ -1235,8 +1235,8 @@ input[type="search"]::-webkit-search-cancel-button {
 
 .search-input::placeholder {
     color: rgba(203, 213, 225, 0.55);
-    font-weight: 400;
-    transition: all 0.3s ease;
+    font-weight: var(--font-weight-normal);
+    transition: all var(--transition-base);
 }
 
 .premium-search:hover .search-input::placeholder {
@@ -1273,19 +1273,19 @@ input[type="search"]::-webkit-search-cancel-button {
 .search-toggle-btn {
     width: 44px;
     height: 44px;
-    border-radius: 50%;
+    border-radius: var(--radius-full);
     border: 1.5px solid rgba(148, 163, 184, 0.25);
     background: linear-gradient(135deg,
         rgba(30, 41, 59, 0.75) 0%,
         rgba(51, 65, 85, 0.65) 100%);
-    backdrop-filter: blur(24px) saturate(180%);
-    -webkit-backdrop-filter: blur(24px) saturate(180%);
+    backdrop-filter: blur(var(--glass-blur)) saturate(180%);
+    -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(180%);
     color: rgba(203, 213, 225, 0.85);
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: all 0.35s var(--ease-in-out);
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15),
                 inset 0 1px 0 rgba(255, 255, 255, 0.08);
 }
@@ -1302,8 +1302,8 @@ input[type="search"]::-webkit-search-cancel-button {
 }
 
 .search-toggle-btn i {
-    font-size: 16px;
-    transition: transform 0.3s ease;
+    font-size: var(--font-size-base);
+    transition: transform var(--transition-base);
 }
 
 .search-toggle-btn:hover i {
@@ -1332,9 +1332,9 @@ input[type="search"]::-webkit-search-cancel-button {
     margin: 0;
     opacity: 0;
     overflow: hidden;
-    transform: scale(0.8) translateX(20px);
+    transform: scale(0.8) translateX(var(--space-5));
     pointer-events: none;
-    transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: all 0.35s var(--ease-in-out);
     border-width: 0;
 }
 
@@ -1343,7 +1343,7 @@ input[type="search"]::-webkit-search-cancel-button {
     width: 320px;
     min-width: 320px;
     max-width: 380px;
-    padding: 10px 18px;
+    padding: var(--space-2) var(--space-4);
     opacity: 1;
     transform: scale(1) translateX(0);
     pointer-events: auto;
@@ -1357,7 +1357,7 @@ input[type="search"]::-webkit-search-cancel-button {
 
 /* Hide brand/tenant name when search is expanded */
 .nexus-brand-link {
-    transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: all 0.35s var(--ease-in-out);
 }
 
 body.search-expanded .nexus-brand-link {
@@ -1376,15 +1376,15 @@ body.search-expanded .nexus-brand-link {
     cursor: pointer;
     color: rgba(203, 213, 225, 0.6);
     padding: 0;
-    margin-left: 8px;
+    margin-left: var(--space-2);
     display: flex;
     align-items: center;
     justify-content: center;
     width: 0;
-    height: 24px;
+    height: var(--space-6);
     min-width: 0;
-    border-radius: 50%;
-    transition: all 0.25s ease;
+    border-radius: var(--radius-full);
+    transition: all var(--transition-base) var(--ease-in-out);
     opacity: 0;
     transform: scale(0);
     overflow: hidden;
@@ -1394,8 +1394,8 @@ body.search-expanded .nexus-brand-link {
 .collapsible-search-container.search-expanded .search-close-btn {
     opacity: 1;
     transform: scale(1);
-    width: 24px;
-    min-width: 24px;
+    width: var(--space-6);
+    min-width: var(--space-6);
     pointer-events: auto;
 }
 
@@ -1406,7 +1406,7 @@ body.search-expanded .nexus-brand-link {
 }
 
 .search-close-btn i {
-    font-size: 14px;
+    font-size: var(--font-size-sm);
 }
 
 /* Light mode adjustments */
@@ -1466,8 +1466,8 @@ body.search-expanded .nexus-brand-link {
 /* Mobile: Always show full search on small screens */
 @media (max-width: 768px) {
     .search-toggle-btn {
-        width: 40px;
-        height: 40px;
+        width: var(--space-10);
+        height: var(--space-10);
     }
 
     .collapsible-search-container.search-expanded .collapsible-search {

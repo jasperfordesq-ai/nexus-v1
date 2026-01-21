@@ -1,6 +1,6 @@
 /**
  * components-modals Bundle
- * Generated: 2026-01-21T06:37:16.883Z
+ * Generated: 2026-01-21T16:06:27.642Z
  * Files: 3
  */
 
@@ -414,7 +414,7 @@
 /* ============================================
    DESKTOP - HIDE MOBILE SHEETS (unless JS opens them)
    ============================================ */
-@media (min-width: 769px) {
+@media (min-width: 768px) {
 
     /* Hide on desktop by default - NO !important so JS can override */
     .mobile-sheet-backdrop:not(.active),
@@ -446,8 +446,8 @@
     inset: 0;
     z-index: 10001;
     background: rgba(0, 0, 0, 0.6);
-    backdrop-filter: blur(4px);
-    -webkit-backdrop-filter: blur(4px);
+    backdrop-filter: blur(var(--space-1));
+    -webkit-backdrop-filter: blur(var(--space-1));
 }
 
 #biometric-setup-modal.active {
@@ -460,79 +460,79 @@
     bottom: 0;
     left: 0;
     right: 0;
-    background: linear-gradient(to bottom, #1e293b, #0f172a);
-    border-radius: 20px 20px 0 0;
-    padding: 24px;
-    padding-bottom: max(24px, env(safe-area-inset-bottom));
-    animation: slideUp 0.3s ease;
+    background: linear-gradient(to bottom, var(--color-slate-800), var(--color-slate-900));
+    border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+    padding: var(--space-6);
+    padding-bottom: max(var(--space-6), env(safe-area-inset-bottom));
+    animation: slideUp var(--transition-base) ease;
 }
 
 /* Pull handle */
 .biometric-modal-handle {
-    width: 40px;
-    height: 4px;
+    width: var(--space-10);
+    height: var(--space-1);
     background: rgba(255, 255, 255, 0.2);
-    border-radius: 2px;
-    margin: 0 auto 20px;
+    border-radius: var(--radius-sm);
+    margin: 0 auto var(--space-5);
 }
 
 /* Modal header */
 .biometric-modal-header {
     text-align: center;
-    margin-bottom: 20px;
+    margin-bottom: var(--space-5);
 }
 
 .biometric-modal-icon {
-    width: 64px;
-    height: 64px;
+    width: var(--space-16);
+    height: var(--space-16);
     background: linear-gradient(135deg, var(--color-primary-500), var(--color-purple-500));
-    border-radius: 16px;
+    border-radius: var(--radius-lg);
     display: flex;
     align-items: center;
     justify-content: center;
-    margin: 0 auto 16px;
+    margin: 0 auto var(--space-4);
 }
 
 .biometric-modal-title {
-    margin: 0 0 8px;
-    font-size: 1.25rem;
-    font-weight: 700;
-    color: #f1f5f9;
+    margin: 0 0 var(--space-2);
+    font-size: var(--font-size-xl);
+    font-weight: var(--font-weight-bold);
+    color: var(--color-slate-100);
 }
 
 .biometric-modal-description {
     margin: 0;
-    font-size: 0.9rem;
-    color: #94a3b8;
-    line-height: 1.5;
+    font-size: var(--font-size-sm);
+    color: var(--color-slate-400);
+    line-height: var(--line-height-normal);
 }
 
 /* Modal buttons */
 #btn-setup-biometric-now {
     width: 100%;
-    padding: 16px;
+    padding: var(--space-4);
     background: linear-gradient(135deg, var(--color-primary-500), var(--color-purple-500));
     color: white;
     border: none;
-    border-radius: 12px;
-    font-size: 1rem;
-    font-weight: 700;
+    border-radius: var(--radius-md);
+    font-size: var(--font-size-base);
+    font-weight: var(--font-weight-bold);
     cursor: pointer;
-    margin-bottom: 12px;
+    margin-bottom: var(--space-3);
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 8px;
+    gap: var(--space-2);
 }
 
 #btn-skip-biometric {
     width: 100%;
-    padding: 14px;
+    padding: var(--space-3) var(--space-4);
     background: transparent;
-    color: #94a3b8;
+    color: var(--color-slate-400);
     border: none;
-    border-radius: 12px;
-    font-size: 0.9rem;
+    border-radius: var(--radius-md);
+    font-size: var(--font-size-sm);
     cursor: pointer;
 }
 

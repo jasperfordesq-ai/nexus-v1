@@ -1,6 +1,6 @@
 /**
  * utilities-accessibility Bundle
- * Generated: 2026-01-21T06:37:16.920Z
+ * Generated: 2026-01-21T16:06:27.658Z
  * Files: 2
  */
 
@@ -12,7 +12,7 @@
  * Accessibility Enhancements
  * Consistent focus rings, reduced motion, screen reader utilities
  * WCAG 2.1 AA compliant
- * Version: 1.0 - 2026-01-19
+ * Version: 1.1 - 2026-01-21 - Migrated to design tokens
  */
 
 /* ============================================
@@ -24,7 +24,7 @@
 /* Base focus ring - applies to all focusable elements */
 :focus-visible {
     outline: 2px solid var(--color-primary-500, #6366f1);
-    outline-offset: 2px;
+    outline-offset: var(--space-1);
 }
 
 /* Remove default focus outline (we're replacing it with :focus-visible) */
@@ -40,15 +40,15 @@ button:focus-visible,
 .btn:focus-visible,
 .htb-btn:focus-visible {
     outline: 2px solid var(--color-primary-500);
-    outline-offset: 2px;
-    box-shadow: 0 0 0 4px rgba(var(--color-primary-rgb, 99, 102, 241), 0.2);
+    outline-offset: var(--space-1);
+    box-shadow: 0 0 0 var(--space-2) rgba(var(--color-primary-rgb, 99, 102, 241), 0.2);
 }
 
 /* Link focus rings */
 a:focus-visible {
     outline: 2px solid var(--color-primary-500, #6366f1);
-    outline-offset: 2px;
-    border-radius: 2px;
+    outline-offset: var(--space-1);
+    border-radius: var(--radius-sm);
 }
 
 /* Card/interactive container focus */
@@ -57,8 +57,8 @@ a:focus-visible {
 .feed-item:focus-visible,
 [role="button"]:focus-visible {
     outline: 2px solid var(--color-primary-500);
-    outline-offset: 2px;
-    box-shadow: 0 0 0 4px rgba(var(--color-primary-rgb, 99, 102, 241), 0.15);
+    outline-offset: var(--space-1);
+    box-shadow: 0 0 0 var(--space-2) rgba(var(--color-primary-rgb, 99, 102, 241), 0.15);
 }
 
 /* Dark mode focus rings - higher contrast */
@@ -68,7 +68,7 @@ a:focus-visible {
 
 [data-theme="dark"] button:focus-visible,
 [data-theme="dark"] .btn:focus-visible {
-    box-shadow: 0 0 0 4px rgba(var(--color-primary-400-rgb, 129, 140, 248), 0.25);
+    box-shadow: 0 0 0 var(--space-2) rgba(var(--color-primary-400-rgb, 129, 140, 248), 0.25);
 }
 
 /* ============================================
@@ -82,19 +82,19 @@ a:focus-visible {
     left: 0;
     background: var(--color-primary-600, #4f46e5);
     color: white;
-    padding: 12px 24px;
+    padding: var(--space-3) var(--space-6);
     text-decoration: none;
-    z-index: 10000;
-    border-radius: 0 0 8px 0;
-    font-weight: 600;
-    font-size: 0.875rem;
-    transition: top 0.3s ease;
+    z-index: var(--z-emergency);
+    border-radius: 0 0 var(--radius-base) 0;
+    font-weight: var(--font-weight-semibold);
+    font-size: var(--font-size-sm);
+    transition: top var(--transition-base);
 }
 
 .skip-link:focus {
     top: 0;
     outline: 3px solid var(--color-primary-300);
-    outline-offset: 2px;
+    outline-offset: var(--space-1);
 }
 
 /* ============================================
@@ -157,7 +157,7 @@ a:focus-visible {
 @media (prefers-contrast: high) {
     :focus-visible {
         outline-width: 3px;
-        outline-offset: 3px;
+        outline-offset: var(--space-2);
     }
 
     button:focus-visible,
@@ -187,12 +187,12 @@ a:focus-visible {
 
 .form-group:focus-within {
     background: rgba(var(--color-primary-rgb, 99, 102, 241), 0.03);
-    border-radius: 8px;
+    border-radius: var(--radius-base);
 }
 
 .input-group:focus-within {
-    box-shadow: 0 0 0 3px rgba(var(--color-primary-rgb, 99, 102, 241), 0.1);
-    border-radius: 8px;
+    box-shadow: 0 0 0 var(--space-2) rgba(var(--color-primary-rgb, 99, 102, 241), 0.1);
+    border-radius: var(--radius-base);
 }
 
 [data-theme="dark"] .form-group:focus-within {
@@ -223,7 +223,7 @@ button:active:not(:disabled),
 [aria-selected="true"],
 [aria-current="page"],
 [aria-current="true"] {
-    font-weight: 600;
+    font-weight: var(--font-weight-semibold);
 }
 
 /* Expanded state indicators */
@@ -251,7 +251,7 @@ button:active:not(:disabled),
 
 [aria-invalid="true"]:focus-visible {
     outline-color: var(--color-danger);
-    box-shadow: 0 0 0 3px rgba(var(--color-danger-rgb, 239, 68, 68), 0.15);
+    box-shadow: 0 0 0 var(--space-2) rgba(var(--color-danger-rgb, 239, 68, 68), 0.15);
 }
 
 /* Required field indicator */
@@ -273,7 +273,7 @@ label.required::after {
 main a:not(.btn):not(.card):not([class*="link"]) {
     text-decoration: underline;
     text-decoration-thickness: 1px;
-    text-underline-offset: 2px;
+    text-underline-offset: var(--space-1);
 }
 
 main a:not(.btn):not(.card):not([class*="link"]):hover {
@@ -284,7 +284,7 @@ main a:not(.btn):not(.card):not([class*="link"]):hover {
 a[target="_blank"]::after,
 a.external-link::after {
     content: " ↗";
-    font-size: 0.75em;
+    font-size: var(--font-size-xs);
     vertical-align: super;
 }
 
@@ -301,10 +301,10 @@ a.external-link::after {
     display: inline-block;
     width: 1em;
     height: 1em;
-    margin-left: 0.5em;
+    margin-left: var(--space-3);
     border: 2px solid currentColor;
     border-right-color: transparent;
-    border-radius: 50%;
+    border-radius: var(--radius-full);
     animation: a11y-spin 0.75s linear infinite;
 }
 
@@ -342,8 +342,8 @@ a.external-link::after {
 
     /* Add padding to small interactive elements */
     a:not(.btn) {
-        padding: 8px 4px;
-        margin: -8px -4px;
+        padding: var(--space-2) var(--space-2);
+        margin: calc(-1 * var(--space-2)) calc(-1 * var(--space-2));
     }
 }
 
@@ -389,7 +389,7 @@ a.external-link::after {
 /**
  * Focus Ring Improvements
  * Enhanced keyboard navigation visibility
- * Version: 1.0 - 2026-01-19
+ * Version: 1.1 - 2026-01-21 - Migrated to design tokens
  *
  * Uses :focus-visible for keyboard-only focus styles
  * Maintains accessibility while avoiding mouse-click focus rings
@@ -401,9 +401,9 @@ a.external-link::after {
 :root {
     --focus-ring-color: rgba(99, 102, 241, 0.6);
     --focus-ring-color-strong: rgba(99, 102, 241, 0.8);
-    --focus-ring-offset: 2px;
-    --focus-ring-width: 3px;
-    --focus-ring-transition: 150ms ease;
+    --focus-ring-offset: var(--space-1);
+    --focus-ring-width: var(--space-1);
+    --focus-ring-transition: var(--transition-fast);
 }
 
 [data-theme="dark"] {
@@ -431,7 +431,7 @@ button:focus-visible,
 [tabindex]:focus-visible:not([tabindex="-1"]) {
     outline: var(--focus-ring-width) solid var(--focus-ring-color);
     outline-offset: var(--focus-ring-offset);
-    border-radius: 4px;
+    border-radius: var(--radius-sm);
 }
 
 /* ==============================================
@@ -492,7 +492,7 @@ input[type="radio"]:focus-visible {
     outline: none;
     box-shadow:
         0 0 0 var(--focus-ring-width) var(--focus-ring-color),
-        0 8px 32px rgba(0, 0, 0, 0.1);
+        0 var(--space-2) var(--space-8) rgba(0, 0, 0, 0.1);
 }
 
 /* ==============================================
@@ -504,7 +504,7 @@ input[type="radio"]:focus-visible {
 .sidebar-link:focus-visible {
     outline: none;
     background-color: rgba(99, 102, 241, 0.1);
-    box-shadow: inset 3px 0 0 var(--focus-ring-color-strong);
+    box-shadow: inset var(--space-1) 0 0 var(--focus-ring-color-strong);
 }
 
 [data-theme="dark"] .nav-link:focus-visible,
@@ -522,7 +522,7 @@ input[type="radio"]:focus-visible {
 .nav-tab:focus-visible,
 [role="tab"]:focus-visible {
     outline: none;
-    box-shadow: inset 0 -3px 0 var(--focus-ring-color-strong);
+    box-shadow: inset 0 calc(-1 * var(--space-1)) 0 var(--focus-ring-color-strong);
     background-color: rgba(99, 102, 241, 0.05);
 }
 
@@ -536,7 +536,7 @@ input[type="radio"]:focus-visible {
 [role="option"]:focus-visible {
     outline: none;
     background-color: rgba(99, 102, 241, 0.08);
-    box-shadow: inset 3px 0 0 var(--focus-ring-color-strong);
+    box-shadow: inset var(--space-1) 0 0 var(--focus-ring-color-strong);
 }
 
 /* ==============================================
@@ -548,7 +548,7 @@ input[type="radio"]:focus-visible {
 img[tabindex]:focus-visible {
     outline: none;
     box-shadow: 0 0 0 var(--focus-ring-width) var(--focus-ring-color-strong);
-    border-radius: 50%;
+    border-radius: var(--radius-full);
 }
 
 /* ==============================================
@@ -559,7 +559,7 @@ img[tabindex]:focus-visible {
 [class*="icon-"]:focus-visible:not(i) {
     outline: none;
     background-color: rgba(99, 102, 241, 0.15);
-    border-radius: 50%;
+    border-radius: var(--radius-full);
     box-shadow: 0 0 0 var(--focus-ring-width) var(--focus-ring-color);
 }
 
@@ -572,7 +572,7 @@ img[tabindex]:focus-visible {
     outline: none;
     box-shadow:
         0 0 0 var(--focus-ring-width) var(--focus-ring-color-strong),
-        0 8px 24px rgba(99, 102, 241, 0.4);
+        0 var(--space-2) var(--space-6) rgba(99, 102, 241, 0.4);
 }
 
 /* ==============================================
@@ -597,15 +597,15 @@ img[tabindex]:focus-visible {
 .skip-link:focus-visible,
 .skip-to-content:focus-visible {
     position: fixed;
-    top: 10px;
-    left: 10px;
-    z-index: 99999;
-    padding: 12px 24px;
-    background: #6366f1;
+    top: var(--space-3);
+    left: var(--space-3);
+    z-index: var(--z-emergency);
+    padding: var(--space-3) var(--space-6);
+    background: var(--color-primary-500);
     color: white;
-    font-weight: 600;
-    border-radius: 8px;
-    box-shadow: 0 4px 20px rgba(99, 102, 241, 0.4);
+    font-weight: var(--font-weight-semibold);
+    border-radius: var(--radius-base);
+    box-shadow: 0 var(--space-1) var(--space-5) rgba(99, 102, 241, 0.4);
     outline: none;
     text-decoration: none;
 }
@@ -629,7 +629,7 @@ img[tabindex]:focus-visible {
     border-color: var(--focus-ring-color-strong);
     box-shadow:
         0 0 0 var(--focus-ring-width) var(--focus-ring-color),
-        0 4px 12px rgba(99, 102, 241, 0.15);
+        0 var(--space-1) var(--space-3) rgba(99, 102, 241, 0.15);
 }
 
 /* ==============================================
@@ -685,8 +685,8 @@ input[type="file"]:focus-visible {
 .post-action-btn:focus-visible {
     outline: none;
     background-color: rgba(99, 102, 241, 0.1);
-    border-radius: 8px;
-    box-shadow: 0 0 0 2px var(--focus-ring-color);
+    border-radius: var(--radius-base);
+    box-shadow: 0 0 0 var(--space-1) var(--focus-ring-color);
 }
 
 /* ==============================================
@@ -697,7 +697,7 @@ input[type="file"]:focus-visible {
 [aria-expanded]:focus-visible {
     outline: none;
     background-color: rgba(99, 102, 241, 0.05);
-    box-shadow: inset 0 0 0 2px var(--focus-ring-color);
+    box-shadow: inset 0 0 0 var(--space-1) var(--focus-ring-color);
 }
 
 /* ==============================================
@@ -705,8 +705,8 @@ input[type="file"]:focus-visible {
    ============================================== */
 @media (forced-colors: active) {
     *:focus-visible {
-        outline: 3px solid CanvasText !important;
-        outline-offset: 2px !important;
+        outline: var(--space-1) solid CanvasText !important;
+        outline-offset: var(--space-1) !important;
     }
 }
 

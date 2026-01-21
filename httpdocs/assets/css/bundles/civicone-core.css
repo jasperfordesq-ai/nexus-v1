@@ -1,6 +1,6 @@
 /**
  * civicone-core Bundle
- * Generated: 2026-01-21T06:37:16.895Z
+ * Generated: 2026-01-21T16:06:27.647Z
  * Files: 4
  */
 
@@ -85,9 +85,9 @@
    =========================================== */
 .civic-utility-bar {
     background: var(--civic-bg-secondary);
-    border-bottom: 1px solid #e2e8f0;
+    border-bottom: 1px solid var(--color-gray-200);
     padding: var(--space-2) 0;
-    font-size: 14px;
+    font-size: var(--font-size-sm);
 }
 
 .civic-utility-wrapper {
@@ -96,7 +96,7 @@
     align-items: center;
     gap: var(--space-3);
     flex-wrap: wrap;
-    max-width: 1200px;
+    max-width: var(--layout-max-content-width);
     margin: 0 auto;
     padding: 0 var(--space-6);
 }
@@ -112,7 +112,7 @@
     border-radius: var(--radius-sm);
     transition: all var(--duration-fast) var(--ease-default);
     min-height: 44px; /* WCAG touch target */
-    font-size: 14px;
+    font-size: var(--font-size-sm);
 }
 
 .civic-utility-link:hover {
@@ -142,7 +142,7 @@
     top: 100%;
     right: 0;
     background: var(--civic-bg-primary);
-    min-width: 200px;
+    min-width: 12.5rem;
     border: 2px solid var(--civic-text-primary);
     border-radius: var(--radius-sm);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
@@ -169,7 +169,7 @@
     background-color: transparent; /* WCAG FIX: Explicitly prevent yellow backgrounds - yellow ONLY for :focus-visible */
     text-decoration: none;
     font-weight: 500;
-    font-size: 14px;
+    font-size: var(--font-size-sm);
 }
 
 .civic-utility-bar .civic-dropdown-content a:hover {
@@ -219,19 +219,19 @@
 /* Layout Switcher Icons */
 .civic-layout-icon {
     display: inline-block;
-    margin-right: 8px;
+    margin-right: var(--space-2);
 }
 
 /* Dropdown Separator */
 .civic-dropdown-separator {
-    border-top: 1px solid #e5e7eb;
-    margin: 5px 0;
+    border-top: 1px solid var(--color-gray-200);
+    margin: var(--space-1) 0;
 }
 
 /* User Dropdown Menu Icons */
 .civic-menu-icon {
-    margin-right: 10px;
-    width: 16px;
+    margin-right: var(--space-2);
+    width: var(--space-4);
     text-align: center;
 }
 
@@ -240,36 +240,36 @@
 }
 
 .civic-menu-icon--purple {
-    color: #8b5cf6;
+    color: var(--color-purple-500);
 }
 
 .civic-menu-icon--green {
-    color: #10b981;
+    color: var(--color-success);
 }
 
 .civic-menu-icon--pink {
-    color: #db2777;
+    color: var(--color-pink-600);
 }
 
 .civic-menu-icon--amber {
-    color: #d97706;
+    color: var(--color-amber-600);
 }
 
 .civic-menu-icon--blue {
-    color: #2563eb;
+    color: var(--color-blue-600);
 }
 
 .civic-menu-icon--indigo {
-    color: #4f46e5;
+    color: var(--color-primary-600);
 }
 
 .civic-menu-icon--gray {
-    color: #6b7280;
+    color: var(--color-gray-500);
 }
 
 /* Logout Link Styling */
 .civic-utility-link--logout {
-    color: #ef4444;
+    color: var(--color-danger);
     font-weight: 600;
 }
 
@@ -283,7 +283,7 @@
 }
 
 .mobile-only-link--logout {
-    color: #dc2626;
+    color: var(--color-red-600);
 }
 
 /* Notification Button (reset button styles) */
@@ -305,8 +305,8 @@
     /* WCAG 1.4.10 - Prevent dropdown overflow on narrow screens */
     .civic-utility-bar .civic-dropdown-content {
         min-width: auto;
-        max-width: calc(100vw - 20px);
-        right: 10px;
+        max-width: calc(100vw - var(--space-5));
+        right: var(--space-2);
         left: auto;
     }
 }
@@ -320,21 +320,21 @@
     border-bottom: 4px solid var(--civic-brand);
     position: relative;
     z-index: 100;
-    min-height: 100px;
+    min-height: 6.25rem;
 }
 
 .civic-header-wrapper {
     display: flex;
     align-items: center;
     gap: var(--space-6);
-    max-width: 1200px;
+    max-width: var(--layout-max-content-width);
     margin: 0 auto;
     padding: 0 var(--space-6);
 }
 
 /* Logo */
 .civic-logo {
-    font-size: 1.5rem;
+    font-size: var(--font-size-2xl);
     font-weight: 800;
     color: var(--civic-brand);
     text-decoration: none;
@@ -373,7 +373,7 @@
 
 .civic-desktop-nav .civic-nav-link {
     padding: var(--space-3) var(--space-4);
-    font-size: 16px;
+    font-size: var(--font-size-base);
     font-weight: 600;
     color: var(--civic-text-primary);
     text-decoration: none;
@@ -404,7 +404,7 @@
 .civic-desktop-nav .civic-nav-link[aria-current="page"] {
     background-color: rgba(0, 121, 107, 0.1);
     text-decoration: underline;
-    text-underline-offset: 4px;
+    text-underline-offset: var(--space-1);
     text-decoration-thickness: 3px;
     text-decoration-color: var(--civic-brand);
 }
@@ -425,11 +425,11 @@
 
 .civic-search-form input {
     padding: var(--space-3) var(--space-4);
-    font-size: 16px;
+    font-size: var(--font-size-base);
     border: 2px solid var(--civic-text-secondary);
     border-right: none;
     border-radius: var(--radius-sm) 0 0 var(--radius-sm);
-    width: 200px;
+    width: 12.5rem;
     color: var(--civic-text-primary);
     background: var(--civic-bg-primary);
     min-height: 44px;
@@ -449,7 +449,7 @@
 
 .civic-search-form button {
     padding: var(--space-3) var(--space-4);
-    font-size: 16px;
+    font-size: var(--font-size-base);
     font-weight: 600;
     background: var(--civic-brand);
     color: #ffffff;
@@ -497,7 +497,7 @@
 }
 
 .civicone-width-container {
-    max-width: 1020px; /* GOV.UK standard */
+    max-width: 63.75rem; /* GOV.UK standard */
     margin: 0 auto;
     padding: 0 var(--space-6);
 }
@@ -507,7 +507,7 @@
     align-items: center;
     justify-content: space-between;
     gap: var(--space-4);
-    min-height: 80px;
+    min-height: var(--space-20);
 }
 
 /* Logo / Service Name */
@@ -519,7 +519,7 @@
     text-decoration: none;
     color: var(--civic-text-primary);
     font-weight: 700;
-    font-size: 1.5rem;
+    font-size: var(--font-size-2xl);
     display: inline-block;
     transition: opacity var(--duration-fast) var(--ease-default);
 }
@@ -566,8 +566,8 @@
     color: var(--civic-text-primary);
     text-decoration: none;
     font-weight: 600;
-    font-size: 1rem;
-    border-bottom: 4px solid transparent;
+    font-size: var(--font-size-base);
+    border-bottom: var(--space-1) solid transparent;
     transition: border-color var(--duration-fast) var(--ease-default);
     min-height: 44px;
 }
@@ -601,7 +601,7 @@
     background: none;
     border: 2px solid var(--civic-text-primary);
     border-radius: var(--radius-sm);
-    font-size: 1rem;
+    font-size: var(--font-size-base);
     font-weight: 600;
     color: var(--civic-text-primary);
     cursor: pointer;
@@ -630,9 +630,9 @@
 .civicone-service-navigation__toggle-icon {
     display: flex;
     flex-direction: column;
-    gap: 4px;
-    width: 20px;
-    height: 16px;
+    gap: var(--space-1);
+    width: var(--space-5);
+    height: var(--space-4);
 }
 
 .civicone-service-navigation__toggle-icon span {
@@ -640,7 +640,7 @@
     width: 100%;
     height: 3px;
     background-color: currentColor;
-    border-radius: 2px;
+    border-radius: var(--space-1);
     transition: transform var(--duration-fast) var(--ease-default);
 }
 
@@ -672,7 +672,7 @@
 }
 
 .civicone-service-navigation__mobile-panel.active {
-    max-height: 500px;
+    max-height: 31.25rem;
     opacity: 1;
 }
 
@@ -694,7 +694,7 @@
     color: var(--civic-text-primary);
     text-decoration: none;
     font-weight: 600;
-    font-size: 1.125rem;
+    font-size: var(--font-size-lg);
 }
 
 .civicone-service-navigation__mobile-link:hover {
@@ -745,9 +745,9 @@
     padding: var(--space-2) var(--space-3);
     border: 2px solid var(--civic-text-primary);
     border-radius: var(--radius-sm);
-    font-size: 1rem;
+    font-size: var(--font-size-base);
     min-height: 44px;
-    min-width: 200px;
+    min-width: 12.5rem;
 }
 
 .civicone-search-input:focus-visible {
@@ -819,7 +819,7 @@
 }
 
 .civicone-mobile-search-bar.active {
-    max-height: 100px;
+    max-height: 6.25rem;
     opacity: 1;
     padding: var(--space-4);
 }
@@ -834,7 +834,7 @@
     padding: var(--space-2) var(--space-3);
     border: 2px solid var(--civic-text-primary);
     border-radius: var(--radius-sm);
-    font-size: 1rem;
+    font-size: var(--font-size-base);
     min-height: 44px;
 }
 
@@ -873,7 +873,7 @@
     cursor: pointer;
     padding: var(--space-3) var(--space-5);
     border-radius: var(--radius-sm);
-    font-size: 16px;
+    font-size: var(--font-size-base);
     display: inline-flex;
     align-items: center;
     gap: var(--space-2);
@@ -903,7 +903,7 @@
 }
 
 .civic-menu-btn .civic-arrow {
-    font-size: 12px;
+    font-size: var(--font-size-xs);
     transition: transform var(--duration-fast) var(--ease-default);
 }
 
@@ -932,13 +932,13 @@
     display: grid;
     grid-template-columns: repeat(4, 1fr);
     gap: var(--space-8);
-    max-width: 1200px;
+    max-width: var(--layout-max-content-width);
     margin: 0 auto;
     padding: 0 var(--space-6);
 }
 
 .civic-mega-col h3 {
-    font-size: 13px;
+    font-size: var(--font-size-xs);
     text-transform: uppercase;
     letter-spacing: 0.1em;
     color: var(--civic-text-secondary);
@@ -952,7 +952,7 @@
     display: block;
     text-decoration: none;
     color: var(--civic-text-primary);
-    font-size: 16px;
+    font-size: var(--font-size-base);
     font-weight: 500;
     padding: var(--space-2) 0;
     transition: all var(--duration-fast) var(--ease-default);
@@ -1135,7 +1135,7 @@ body.dark-mode .civic-utility-bar .civic-dropdown-content a:hover {
 
 .civic-hamburger {
     display: block;
-    width: 24px;
+    width: var(--space-6);
     height: 2px;
     background: var(--civic-text-primary);
     position: relative;
@@ -1146,7 +1146,7 @@ body.dark-mode .civic-utility-bar .civic-dropdown-content a:hover {
 .civic-hamburger::after {
     content: '';
     position: absolute;
-    width: 24px;
+    width: var(--space-6);
     height: 2px;
     background: var(--civic-text-primary);
     left: 0;
@@ -1171,7 +1171,7 @@ body.dark-mode .civic-utility-bar .civic-dropdown-content a:hover {
     }
 
     .civic-logo {
-        font-size: 1.25rem;
+        font-size: var(--font-size-xl);
     }
 
     /* Hamburger hidden - mobile nav v2 */
@@ -1204,9 +1204,9 @@ body.dark-mode .civic-utility-bar .civic-dropdown-content a:hover {
     }
 
     .civic-mobile-search-btn .dashicons {
-        font-size: 24px;
-        width: 24px;
-        height: 24px;
+        font-size: var(--font-size-2xl);
+        width: var(--space-6);
+        height: var(--space-6);
     }
 
     /* Mobile Search Bar (expandable) */
@@ -1237,7 +1237,7 @@ body.dark-mode .civic-utility-bar .civic-dropdown-content a:hover {
         padding: var(--space-3) var(--space-4);
         border: 2px solid var(--civic-text-secondary);
         border-radius: var(--radius-sm);
-        font-size: 16px;
+        font-size: var(--font-size-base);
         color: var(--civic-text-primary);
         background: var(--civic-bg-primary);
         min-height: 44px;
@@ -1283,7 +1283,7 @@ body.dark-mode .civic-utility-bar .civic-dropdown-content a:hover {
 /* WCAG 2.1 AA Skip Link - GOV.UK Style */
 .skip-link {
     position: absolute;
-    top: -50px;
+    top: -3.125rem;
     left: var(--space-3);
     background: var(--govuk-focus-text-colour, #0b0c0c);
     color: var(--govuk-focus-colour, #ffdd00);
@@ -1338,8 +1338,8 @@ body.dark-mode .civic-utility-bar .civic-dropdown-content a:hover {
 .notif-drawer {
     position: fixed;
     top: 0;
-    right: -350px;
-    width: 350px;
+    right: -21.875rem;
+    width: 21.875rem;
     max-width: 90vw;
     height: 100vh;
     background: var(--civic-bg-primary);
@@ -1365,7 +1365,7 @@ body.dark-mode .civic-utility-bar .civic-dropdown-content a:hover {
 
 .notif-drawer-header span {
     font-weight: 700;
-    font-size: 14px;
+    font-size: var(--font-size-sm);
     letter-spacing: 0.05em;
     color: var(--civic-text-primary);
 }
@@ -1373,7 +1373,7 @@ body.dark-mode .civic-utility-bar .civic-dropdown-content a:hover {
 .notif-drawer-close {
     background: none;
     border: none;
-    font-size: 20px;
+    font-size: var(--font-size-xl);
     cursor: pointer;
     padding: var(--space-2);
     color: var(--civic-text-secondary);
@@ -1410,7 +1410,7 @@ body.dark-mode .civic-utility-bar .civic-dropdown-content a:hover {
 }
 
 .notif-drawer-empty .notif-icon {
-    font-size: 48px;
+    font-size: var(--space-12);
     margin-bottom: var(--space-4);
     opacity: 0.5;
 }
@@ -1441,14 +1441,14 @@ body.dark-mode .civic-utility-bar .civic-dropdown-content a:hover {
 }
 
 .notif-drawer-item .notif-message {
-    font-size: 14px;
+    font-size: var(--font-size-sm);
     font-weight: 500;
     margin-bottom: var(--space-1);
     line-height: 1.4;
 }
 
 .notif-drawer-item .notif-time {
-    font-size: 12px;
+    font-size: var(--font-size-xs);
     color: var(--civic-text-muted);
 }
 
@@ -1462,7 +1462,7 @@ body.dark-mode .civic-utility-bar .civic-dropdown-content a:hover {
 
 .notif-drawer-footer a,
 .notif-drawer-footer button {
-    font-size: 14px;
+    font-size: var(--font-size-sm);
     font-weight: 600;
     color: var(--civic-brand);
     text-decoration: none;
@@ -1514,7 +1514,7 @@ body.dark-mode .civic-utility-bar .civic-dropdown-content a:hover {
     background: none;
     border: none;
     cursor: pointer;
-    font-size: 0.9rem;
+    font-size: var(--font-size-sm);
     padding: 0;
     font-weight: 700;
 }
@@ -1550,19 +1550,19 @@ body.dark-mode .civic-utility-bar .civic-dropdown-content a:hover {
 
 /* User Avatar Button */
 .civic-user-avatar-btn {
-    padding: 4px 12px;
+    padding: var(--space-1) var(--space-3);
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: var(--space-2);
     background: none;
     border: none;
     cursor: pointer;
 }
 
 .civic-user-avatar-btn img {
-    width: 28px;
-    height: 28px;
-    border-radius: 50%;
+    width: var(--space-8);
+    height: var(--space-8);
+    border-radius: var(--radius-full);
     object-fit: cover;
 }
 
@@ -1588,18 +1588,18 @@ body.dark-mode .civic-utility-bar .civic-dropdown-content a:hover {
     right: -6px;
     background: #ef4444;
     color: #fff;
-    font-size: 10px;
+    font-size: var(--space-2);
     font-weight: 700;
-    padding: 2px 5px;
-    border-radius: 10px;
+    padding: 2px var(--space-1);
+    border-radius: var(--radius-md);
     min-width: 14px;
     text-align: center;
 }
 
 /* Dropdown menu item with icon */
 .civic-dropdown-content .civic-menu-icon {
-    margin-right: 10px;
-    width: 16px;
+    margin-right: var(--space-2);
+    width: var(--space-4);
     text-align: center;
 }
 
@@ -1626,8 +1626,8 @@ body.dark-mode .civic-utility-bar .civic-dropdown-content a:hover {
 
 /* Separator in dropdown */
 .civic-dropdown-separator {
-    border-top: 1px solid #e5e7eb;
-    margin: 5px 0;
+    border-top: 1px solid var(--color-gray-200);
+    margin: var(--space-1) 0;
 }
 
 /* ===========================================
@@ -1636,8 +1636,8 @@ body.dark-mode .civic-utility-bar .civic-dropdown-content a:hover {
 .civic-experimental-banner {
     background: linear-gradient(135deg, var(--civic-brand, #00796B) 0%, var(--civic-brand-dark, #005a4f) 100%);
     color: #ffffff;
-    padding: 10px 20px;
-    font-size: 0.875rem;
+    padding: var(--space-2) var(--space-5);
+    font-size: var(--font-size-sm);
     text-align: center;
     border-bottom: none;
     position: relative;
@@ -1656,7 +1656,7 @@ body.dark-mode .civic-utility-bar .civic-dropdown-content a:hover {
 .civic-banner-content {
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: var(--space-3);
     flex-wrap: wrap;
     justify-content: center;
 }
@@ -1664,19 +1664,19 @@ body.dark-mode .civic-utility-bar .civic-dropdown-content a:hover {
 .civic-experimental-badge {
     background: rgba(255, 255, 255, 0.2);
     color: #ffffff;
-    padding: 4px 10px;
-    border-radius: 6px;
+    padding: var(--space-1) var(--space-2);
+    border-radius: var(--radius-base);
     font-weight: 700;
-    font-size: 0.7rem;
+    font-size: var(--font-size-xs);
     letter-spacing: 0.06em;
     display: inline-flex;
     align-items: center;
-    gap: 6px;
+    gap: var(--space-2);
     backdrop-filter: blur(4px);
 }
 
 .civic-experimental-badge i {
-    font-size: 0.8rem;
+    font-size: var(--font-size-sm);
 }
 
 .civic-experimental-text {
@@ -1690,17 +1690,17 @@ body.dark-mode .civic-utility-bar .civic-dropdown-content a:hover {
 .civic-experimental-switch {
     background: rgba(255, 255, 255, 0.15);
     color: #ffffff !important;
-    padding: 6px 14px;
-    border-radius: 6px;
+    padding: var(--space-2) var(--space-3);
+    border-radius: var(--radius-base);
     text-decoration: underline;
     text-decoration-thickness: 2px;
     text-underline-offset: 2px;
     font-weight: 600;
-    font-size: 0.8rem;
+    font-size: var(--font-size-sm);
     transition: all 0.2s ease;
     display: inline-flex;
     align-items: center;
-    gap: 6px;
+    gap: var(--space-2);
     backdrop-filter: blur(4px);
     border: 1px solid rgba(255, 255, 255, 0.2);
 }
@@ -1726,19 +1726,19 @@ body.dark-mode .civic-experimental-banner {
     background: linear-gradient(135deg, #1e3a5f 0%, #0f172a 100%);
 }
 
-/* Mobile banner */
-@media (max-width: 600px) {
+/* Mobile banner - hide on mobile/tablet */
+@media (max-width: 1024px) {
     .civic-experimental-banner {
-        padding: 8px 12px;
+        display: none !important;
     }
 
     .civic-banner-content {
         flex-direction: column;
-        gap: 8px;
+        gap: var(--space-2);
     }
 
     .civic-experimental-text {
-        font-size: 0.8rem;
+        font-size: var(--font-size-sm);
     }
 
     .civic-experimental-switch {
@@ -1752,8 +1752,8 @@ body.dark-mode .civic-experimental-banner {
 .civicone-hero-banner {
     background: var(--civic-brand);
     color: white;
-    padding: 40px 0;
-    margin-bottom: 40px;
+    padding: var(--space-10) 0;
+    margin-bottom: var(--space-10);
     position: relative;
 }
 
@@ -1772,17 +1772,17 @@ body.skin-torfaen .civicone-hero-banner {
     background: #ffffff !important; /* White background for maximum contrast */
     color: #005a4d !important; /* Dark teal text (darker than hero bg for 7:1 contrast on white) */
     font-weight: 700; /* Bolder for better legibility */
-    font-size: 12px;
-    padding: 4px 10px;
-    margin-bottom: 12px;
+    font-size: var(--font-size-xs);
+    padding: var(--space-1) var(--space-2);
+    margin-bottom: var(--space-3);
     text-transform: uppercase;
     letter-spacing: 0.5px;
-    border-radius: 4px;
+    border-radius: var(--radius-sm);
 }
 
 .hero-title {
     color: #ffffff !important; /* Explicit white for WCAG compliance */
-    margin-bottom: 8px;
+    margin-bottom: var(--space-2);
     font-size: clamp(1.75rem, 4vw, 2.5rem);
     font-weight: 700;
     letter-spacing: -0.01em;
@@ -1791,7 +1791,7 @@ body.skin-torfaen .civicone-hero-banner {
 .hero-subtitle {
     font-size: clamp(1rem, 2vw, 1.125rem);
     color: #ffffff !important; /* Explicit white instead of opacity for contrast */
-    max-width: 600px;
+    max-width: 37.5rem;
     margin: 0;
     line-height: 1.5;
 }
@@ -1803,8 +1803,8 @@ body.dark-mode .civicone-hero-banner {
 
 @media (max-width: 768px) {
     .civicone-hero-banner {
-        padding: 28px 0;
-        margin-bottom: 28px;
+        padding: var(--space-8) 0;
+        margin-bottom: var(--space-8);
     }
 }
 
@@ -1939,11 +1939,11 @@ body.dark-mode .civicone-hero-banner {
     align-items: center;
     justify-content: center;
     flex: 1;
-    padding: 10px 4px 8px;
+    padding: var(--space-2) var(--space-1) var(--space-2);
     text-decoration: none;
     color: var(--civic-text-muted, #6b7280);
-    font-size: 10px;
-    font-weight: 600;
+    font-size: var(--font-size-xs);
+    font-weight: var(--font-weight-semibold);
     text-transform: uppercase;
     letter-spacing: 0.03em;
     min-height: 56px; /* WCAG touch target */
@@ -1962,9 +1962,9 @@ body.dark-mode .civicone-hero-banner {
 
 .civic-bottom-nav-item svg,
 .civic-bottom-nav-item .civic-nav-icon {
-    width: 24px;
-    height: 24px;
-    margin-bottom: 4px;
+    width: var(--space-6);
+    height: var(--space-6);
+    margin-bottom: var(--space-1);
     fill: currentColor;
 }
 
@@ -1983,10 +1983,10 @@ body.dark-mode .civicone-hero-banner {
     top: 0;
     left: 50%;
     transform: translateX(-50%);
-    width: 32px;
+    width: var(--space-8);
     height: 3px;
     background: var(--civic-brand, #2563eb);
-    border-radius: 0 0 3px 3px;
+    border-radius: 0 0 var(--radius-sm) var(--radius-sm);
 }
 
 /* Create button special styling */
@@ -1998,12 +1998,12 @@ body.dark-mode .civicone-hero-banner {
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 48px;
-    height: 48px;
+    width: var(--space-12);
+    height: var(--space-12);
     background: var(--civic-brand, #2563eb);
     border-radius: 50%;
-    margin-top: -20px;
-    margin-bottom: 2px;
+    margin-top: -var(--space-5);
+    margin-bottom: var(--space-1);
     box-shadow: 0 4px 12px rgba(37, 99, 235, 0.4);
 }
 
@@ -2019,16 +2019,16 @@ body.dark-mode .civicone-hero-banner {
 /* Notification badge (old style) */
 .civic-bottom-nav-badge {
     position: absolute;
-    top: 6px;
-    right: calc(50% - 16px);
+    top: var(--space-2);
+    right: calc(50% - var(--space-4));
     min-width: 18px;
     height: 18px;
-    padding: 0 5px;
+    padding: 0 var(--space-1);
     background: #ef4444;
     color: white;
-    font-size: 10px;
-    font-weight: 700;
-    border-radius: 9px;
+    font-size: var(--font-size-xs);
+    font-weight: var(--font-weight-bold);
+    border-radius: var(--radius-base);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -2038,16 +2038,16 @@ body.dark-mode .civicone-hero-banner {
 /* Notification badge (inside nav-icon) */
 .civic-nav-badge {
     position: absolute;
-    top: -4px;
-    right: -8px;
+    top: -var(--space-1);
+    right: -var(--space-2);
     min-width: 18px;
     height: 18px;
-    padding: 0 5px;
+    padding: 0 var(--space-1);
     background: #ef4444;
     color: white;
-    font-size: 10px;
-    font-weight: 700;
-    border-radius: 9px;
+    font-size: var(--font-size-xs);
+    font-weight: var(--font-weight-bold);
+    border-radius: var(--radius-base);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -2127,7 +2127,7 @@ body.dark-mode .civic-bottom-nav-item.active {
     display: none; /* Hidden by default */
     position: fixed;
     bottom: 90px; /* Above bottom nav */
-    right: 20px;
+    right: var(--space-5);
     width: 56px;
     height: 56px;
     background: linear-gradient(135deg, var(--civic-brand, #2563eb) 0%, var(--civic-brand-hover, #1d4ed8) 100%);
@@ -2151,8 +2151,8 @@ body.dark-mode .civic-bottom-nav-item.active {
 }
 
 .civic-fab svg {
-    width: 24px;
-    height: 24px;
+    width: var(--space-6);
+    height: var(--space-6);
     fill: white;
 }
 
@@ -2163,15 +2163,15 @@ body.dark-mode .civic-bottom-nav-item.active {
 /* FAB expanded state (optional) */
 .civic-fab.expanded {
     width: auto;
-    border-radius: 28px;
-    padding: 0 24px;
-    gap: 8px;
+    border-radius: 28px; /* Custom FAB expanded radius */
+    padding: 0 var(--space-6);
+    gap: var(--space-2);
 }
 
 .civic-fab.expanded span {
     display: block;
-    font-weight: 600;
-    font-size: 14px;
+    font-weight: var(--font-weight-semibold);
+    font-size: var(--font-size-sm);
 }
 
 /* Show FAB on mobile */
@@ -2210,7 +2210,7 @@ body.dark-mode .civic-bottom-nav-item.active {
         var(--civic-bg-card, #ffffff) 50%,
         var(--civic-bg-page, #f3f4f6) 75%);
     background-size: 200% 100%;
-    border-radius: 4px;
+    border-radius: var(--radius-sm);
 }
 
 @media (prefers-reduced-motion: no-preference) {
@@ -2225,8 +2225,8 @@ body.dark-mode .civic-bottom-nav-item.active {
 }
 
 .civic-skeleton-text {
-    height: 14px;
-    margin-bottom: 8px;
+    height: var(--font-size-sm);
+    margin-bottom: var(--space-2);
     width: 100%;
 }
 
@@ -2235,14 +2235,14 @@ body.dark-mode .civic-bottom-nav-item.active {
 }
 
 .civic-skeleton-title {
-    height: 20px;
+    height: var(--space-5);
     width: 60%;
-    margin-bottom: 12px;
+    margin-bottom: var(--space-3);
 }
 
 .civic-skeleton-avatar {
-    width: 48px;
-    height: 48px;
+    width: var(--space-12);
+    height: var(--space-12);
     border-radius: 50%;
     flex-shrink: 0;
 }
@@ -2250,30 +2250,30 @@ body.dark-mode .civic-bottom-nav-item.active {
 .civic-skeleton-image {
     width: 100%;
     height: 180px;
-    border-radius: var(--civic-radius, 8px);
-    margin-bottom: 16px;
+    border-radius: var(--radius-base);
+    margin-bottom: var(--space-4);
 }
 
 .civic-skeleton-button {
     height: 44px;
     width: 120px;
-    border-radius: 6px;
+    border-radius: var(--radius-base);
 }
 
 /* Skeleton Card */
 .civic-skeleton-card {
     background: var(--civic-bg-card, #ffffff);
     border: 1px solid var(--civic-border, #d1d5db);
-    border-radius: var(--civic-radius, 12px);
-    padding: var(--civic-pad, 20px);
-    margin-bottom: 16px;
+    border-radius: var(--radius-md);
+    padding: var(--space-5);
+    margin-bottom: var(--space-4);
 }
 
 .civic-skeleton-card-header {
     display: flex;
     align-items: center;
-    gap: 12px;
-    margin-bottom: 16px;
+    gap: var(--space-3);
+    margin-bottom: var(--space-4);
 }
 
 .civic-skeleton-card-meta {
@@ -2287,13 +2287,13 @@ body.dark-mode .civic-bottom-nav-item.active {
 /* Skeleton Member Card */
 .civic-skeleton-member {
     text-align: center;
-    padding: 20px;
+    padding: var(--space-5);
 }
 
 .civic-skeleton-member .civic-skeleton-avatar {
-    width: 80px;
-    height: 80px;
-    margin: 0 auto 12px;
+    width: var(--space-20);
+    height: var(--space-20);
+    margin: 0 auto var(--space-3);
 }
 
 /* Dark mode skeletons */
@@ -2323,10 +2323,10 @@ body.dark-mode .civic-skeleton {
     left: 0;
     top: 50%;
     transform: translateY(-50%) translateX(-100%);
-    width: 40px;
-    height: 40px;
+    width: var(--space-10);
+    height: var(--space-10);
     background: var(--civic-bg-card, #ffffff);
-    border-radius: 0 20px 20px 0;
+    border-radius: 0 var(--space-5) var(--space-5) 0;
     box-shadow: 2px 0 10px rgba(0, 0, 0, 0.15);
     display: flex;
     align-items: center;
@@ -2341,8 +2341,8 @@ body.dark-mode .civic-skeleton {
 }
 
 .civic-swipe-back-indicator svg {
-    width: 20px;
-    height: 20px;
+    width: var(--space-5);
+    height: var(--space-5);
     fill: var(--civic-brand, #2563eb);
 }
 
@@ -2360,7 +2360,7 @@ body.dark-mode .civic-skeleton {
     z-index: var(--z-dropdown, 1000);
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: var(--space-2);
     pointer-events: none;
     max-width: 90vw;
 }
@@ -2368,14 +2368,14 @@ body.dark-mode .civic-skeleton {
 .civic-toast {
     background: var(--civic-bg-footer, #1f2937);
     color: white;
-    padding: 12px 20px;
-    border-radius: 8px;
+    padding: var(--space-3) var(--space-5);
+    border-radius: var(--radius-base);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
     display: flex;
     align-items: center;
-    gap: 10px;
-    font-size: 14px;
-    font-weight: 500;
+    gap: var(--space-2);
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-medium);
     pointer-events: auto;
     opacity: 0;
     transform: translateY(20px);
@@ -2444,7 +2444,7 @@ body.dark-mode .civic-skeleton {
 @media (max-width: 768px) {
     /* Larger tap targets on cards */
     .civic-card {
-        padding: 20px;
+        padding: var(--space-5);
     }
 
     .civic-card a,
@@ -2462,7 +2462,7 @@ body.dark-mode .civic-skeleton {
     /* Card actions stack on mobile */
     .civic-card-footer {
         flex-direction: column;
-        gap: 12px;
+        gap: var(--space-3);
     }
 
     .civic-card-footer .civic-btn {
@@ -2471,22 +2471,22 @@ body.dark-mode .civic-skeleton {
 
     /* Larger touch targets for listing cards */
     .civic-listing-card {
-        padding: 16px;
+        padding: var(--space-4);
     }
 
     .civic-listing-footer {
         flex-direction: column;
         align-items: stretch;
-        gap: 12px;
+        gap: var(--space-3);
     }
 
     /* Member cards touch optimization */
     .civic-member-card {
-        padding: 16px;
+        padding: var(--space-4);
     }
 
     .civic-member-actions {
-        padding-top: 12px;
+        padding-top: var(--space-3);
     }
 
     .civic-member-actions .civic-btn {
@@ -2495,21 +2495,21 @@ body.dark-mode .civic-skeleton {
 
     /* Avatar size on mobile */
     .civic-avatar {
-        width: 64px;
-        height: 64px;
+        width: var(--space-16);
+        height: var(--space-16);
     }
 
     /* Search bar touch optimization */
     .civic-search-input,
     .civic-filter-select {
         min-height: 48px;
-        font-size: 16px; /* Prevents iOS zoom */
+        font-size: var(--font-size-base); /* Prevents iOS zoom */
     }
 
     /* Filter tabs touch optimization */
     .civic-filter-tab {
         min-height: 44px;
-        padding: 12px 20px;
+        padding: var(--space-3) var(--space-5);
     }
 
     /* Form inputs */
@@ -2522,14 +2522,14 @@ body.dark-mode .civic-skeleton {
     select,
     textarea {
         min-height: 48px;
-        font-size: 16px; /* Prevents iOS zoom on focus */
-        padding: 12px 16px;
+        font-size: var(--font-size-base); /* Prevents iOS zoom on focus */
+        padding: var(--space-3) var(--space-4);
     }
 
     /* Buttons */
     .civic-btn {
         min-height: 48px;
-        padding: 14px 24px;
+        padding: var(--font-size-sm) var(--space-6);
     }
 
     /* Pagination touch targets */
@@ -2540,12 +2540,12 @@ body.dark-mode .civic-skeleton {
 
     /* Spacing adjustments */
     .civic-container {
-        padding-left: 16px;
-        padding-right: 16px;
+        padding-left: var(--space-4);
+        padding-right: var(--space-4);
     }
 
     .civic-grid {
-        gap: 16px;
+        gap: var(--space-4);
     }
 }
 
@@ -2582,9 +2582,9 @@ body.dark-mode .civic-skeleton {
 }
 
 .civic-loading-spinner {
-    width: 48px;
-    height: 48px;
-    border: 4px solid rgba(255, 255, 255, 0.3);
+    width: var(--space-12);
+    height: var(--space-12);
+    border: var(--space-1) solid rgba(255, 255, 255, 0.3);
     border-top-color: white;
     border-radius: 50%;
 }
@@ -2597,9 +2597,9 @@ body.dark-mode .civic-skeleton {
 
 .civic-loading-text {
     color: white;
-    font-size: 16px;
-    font-weight: 600;
-    margin-top: 16px;
+    font-size: var(--font-size-base);
+    font-weight: var(--font-weight-semibold);
+    margin-top: var(--space-4);
 }
 
 
@@ -2610,13 +2610,13 @@ body.dark-mode .civic-skeleton {
 
 .civic-pwa-banner {
     position: fixed;
-    bottom: 80px;
-    left: 16px;
-    right: 16px;
+    bottom: var(--space-20);
+    left: var(--space-4);
+    right: var(--space-4);
     background: var(--civic-bg-card, #ffffff);
     border: 1px solid var(--civic-border, #d1d5db);
-    border-radius: 12px;
-    padding: 16px;
+    border-radius: var(--radius-md);
+    padding: var(--space-4);
     box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
     z-index: 9500;
     display: none;
@@ -2646,14 +2646,14 @@ body.dark-mode .civic-skeleton {
 .civic-pwa-banner-content {
     display: flex;
     align-items: center;
-    gap: 16px;
+    gap: var(--space-4);
 }
 
 .civic-pwa-banner-icon {
-    width: 48px;
-    height: 48px;
+    width: var(--space-12);
+    height: var(--space-12);
     background: var(--civic-brand, #2563eb);
-    border-radius: 12px;
+    border-radius: var(--radius-md);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -2671,40 +2671,40 @@ body.dark-mode .civic-skeleton {
 }
 
 .civic-pwa-banner-title {
-    font-weight: 700;
-    font-size: 16px;
+    font-weight: var(--font-weight-bold);
+    font-size: var(--font-size-base);
     color: var(--civic-text-main, #1f2937);
-    margin-bottom: 4px;
+    margin-bottom: var(--space-1);
 }
 
 .civic-pwa-banner-desc {
-    font-size: 13px;
+    font-size: var(--font-size-sm);
     color: var(--civic-text-muted, #6b7280);
 }
 
 .civic-pwa-banner-actions {
     display: flex;
-    gap: 8px;
-    margin-top: 12px;
+    gap: var(--space-2);
+    margin-top: var(--space-3);
 }
 
 .civic-pwa-banner-dismiss {
     background: none;
     border: none;
     color: var(--civic-text-muted, #6b7280);
-    font-size: 13px;
+    font-size: var(--font-size-sm);
     cursor: pointer;
-    padding: 8px 12px;
+    padding: var(--space-2) var(--space-3);
 }
 
 .civic-pwa-banner-install {
     background: var(--civic-brand, #2563eb);
     color: white;
     border: none;
-    padding: 10px 20px;
-    border-radius: 6px;
-    font-weight: 600;
-    font-size: 14px;
+    padding: var(--space-2) var(--space-5);
+    border-radius: var(--radius-base);
+    font-weight: var(--font-weight-semibold);
+    font-size: var(--font-size-sm);
     cursor: pointer;
 }
 
@@ -2727,9 +2727,9 @@ body.dark-mode .civic-pwa-banner {
     background: var(--civic-accent-amber, #d97706);
     color: white;
     text-align: center;
-    padding: 8px 16px;
-    font-size: 13px;
-    font-weight: 600;
+    padding: var(--space-2) var(--space-4);
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-semibold);
     z-index: 10002;
     display: none;
 }
@@ -2774,7 +2774,7 @@ body.is-offline .civic-header {
 
     .civic-fab {
         bottom: calc(90px + env(safe-area-inset-bottom));
-        right: calc(20px + env(safe-area-inset-right));
+        right: calc(var(--space-5) + env(safe-area-inset-right));
     }
 }
 
@@ -2823,15 +2823,15 @@ body.is-offline .civic-header {
 .civic-pwa-banner {
     position: fixed;
     bottom: calc(70px + env(safe-area-inset-bottom, 0px));
-    left: 16px;
-    right: 16px;
+    left: var(--space-4);
+    right: var(--space-4);
     max-width: 400px;
     margin: 0 auto;
     background: var(--civic-bg-card, #ffffff);
-    border-radius: 16px;
+    border-radius: var(--radius-lg);
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15), 0 2px 8px rgba(0, 0, 0, 0.1);
     z-index: 9500;
-    padding: 16px;
+    padding: var(--space-4);
     transform: translateY(120%);
     opacity: 0;
     transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.3s ease;
@@ -2847,15 +2847,15 @@ body.is-offline .civic-header {
 .civic-pwa-banner-content {
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: var(--space-3);
 }
 
 .civic-pwa-banner-icon {
     flex-shrink: 0;
-    width: 48px;
-    height: 48px;
+    width: var(--space-12);
+    height: var(--space-12);
     background: linear-gradient(135deg, var(--civic-brand, #2563eb) 0%, #1d4ed8 100%);
-    border-radius: 12px;
+    border-radius: var(--radius-md);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -2874,14 +2874,14 @@ body.is-offline .civic-header {
 
 .civic-pwa-banner-text strong {
     display: block;
-    font-size: 15px;
-    font-weight: 700;
+    font-size: var(--font-size-base);
+    font-weight: var(--font-weight-bold);
     color: var(--civic-text, #111827);
-    margin-bottom: 2px;
+    margin-bottom: var(--space-1);
 }
 
 .civic-pwa-banner-text p {
-    font-size: 13px;
+    font-size: var(--font-size-sm);
     color: var(--civic-text-muted, #6b7280);
     margin: 0;
     line-height: 1.4;
@@ -2890,18 +2890,18 @@ body.is-offline .civic-header {
 .civic-pwa-banner-actions {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: var(--space-2);
     flex-shrink: 0;
 }
 
 .civic-pwa-btn-install {
-    padding: 10px 18px;
+    padding: var(--space-2) 18px;
     background: var(--civic-brand, #2563eb);
     color: #ffffff;
-    font-size: 14px;
-    font-weight: 600;
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-semibold);
     border: none;
-    border-radius: 10px;
+    border-radius: var(--radius-md);
     cursor: pointer;
     transition: background 0.2s ease, transform 0.1s ease;
     min-height: 44px; /* WCAG touch target */
@@ -2928,7 +2928,7 @@ body.is-offline .civic-header {
     padding: 0;
     background: transparent;
     border: none;
-    border-radius: 10px;
+    border-radius: var(--radius-md);
     cursor: pointer;
     color: var(--civic-text-muted, #6b7280);
     display: flex;
@@ -2951,8 +2951,8 @@ body.is-offline .civic-header {
 }
 
 .civic-pwa-btn-dismiss svg {
-    width: 20px;
-    height: 20px;
+    width: var(--space-5);
+    height: var(--space-5);
 }
 
 
@@ -2963,17 +2963,17 @@ body.is-offline .civic-header {
 
 .civic-update-banner {
     position: fixed;
-    top: 16px;
-    left: 16px;
-    right: 16px;
+    top: var(--space-4);
+    left: var(--space-4);
+    right: var(--space-4);
     max-width: 400px;
     margin: 0 auto;
     background: linear-gradient(135deg, #059669 0%, #047857 100%);
     color: #ffffff;
-    border-radius: 12px;
+    border-radius: var(--radius-md);
     box-shadow: 0 8px 24px rgba(5, 150, 105, 0.3);
     z-index: var(--z-dropdown, 1000);
-    padding: 12px 16px;
+    padding: var(--space-3) var(--space-4);
     transform: translateY(-120%);
     opacity: 0;
     transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.3s ease;
@@ -2995,22 +2995,22 @@ body.is-offline .civic-header {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 12px;
+    gap: var(--space-3);
 }
 
 .civic-update-banner-content span {
-    font-size: 14px;
-    font-weight: 500;
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-medium);
 }
 
 .civic-update-btn {
-    padding: 8px 16px;
+    padding: var(--space-2) var(--space-4);
     background: rgba(255, 255, 255, 0.2);
     color: #ffffff;
-    font-size: 13px;
-    font-weight: 600;
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-semibold);
     border: none;
-    border-radius: 8px;
+    border-radius: var(--radius-base);
     cursor: pointer;
     transition: background 0.2s ease;
     min-height: 36px;
@@ -3064,7 +3064,7 @@ body.is-offline .civic-header {
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 16px;
+    padding: var(--space-4);
     opacity: 0;
     visibility: hidden;
     transition: opacity 0.3s ease, visibility 0.3s ease;
@@ -3086,8 +3086,8 @@ body.is-offline .civic-header {
 .civic-webauthn-modal-content {
     position: relative;
     background: var(--civic-bg-card, #ffffff);
-    border-radius: 20px;
-    padding: 32px 24px;
+    border-radius: var(--radius-xl);
+    padding: var(--space-8) var(--space-6);
     max-width: 340px;
     width: 100%;
     text-align: center;
@@ -3101,9 +3101,9 @@ body.is-offline .civic-header {
 }
 
 .civic-webauthn-modal-icon {
-    width: 80px;
-    height: 80px;
-    margin: 0 auto 20px;
+    width: var(--space-20);
+    height: var(--space-20);
+    margin: 0 auto var(--space-5);
     background: linear-gradient(135deg, var(--civic-brand, #2563eb) 0%, #1d4ed8 100%);
     border-radius: 50%;
     display: flex;
@@ -3113,35 +3113,35 @@ body.is-offline .civic-header {
 }
 
 .civic-webauthn-modal-icon svg {
-    width: 40px;
-    height: 40px;
+    width: var(--space-10);
+    height: var(--space-10);
 }
 
 .civic-webauthn-modal-content h2 {
-    font-size: 20px;
-    font-weight: 700;
+    font-size: var(--font-size-xl);
+    font-weight: var(--font-weight-bold);
     color: var(--civic-text, #111827);
-    margin: 0 0 8px;
+    margin: 0 0 var(--space-2);
 }
 
 .civic-webauthn-modal-content p {
-    font-size: 14px;
+    font-size: var(--font-size-sm);
     color: var(--civic-text-muted, #6b7280);
-    margin: 0 0 24px;
+    margin: 0 0 var(--space-6);
     line-height: 1.5;
 }
 
 .civic-webauthn-modal-actions {
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: var(--space-3);
 }
 
 .civic-webauthn-modal-actions .civic-btn {
-    padding: 14px 24px;
-    font-size: 15px;
-    font-weight: 600;
-    border-radius: 12px;
+    padding: var(--font-size-sm) var(--space-6);
+    font-size: var(--font-size-base);
+    font-weight: var(--font-weight-semibold);
+    border-radius: var(--radius-md);
     border: none;
     cursor: pointer;
     min-height: 48px;
@@ -3183,14 +3183,14 @@ body.is-offline .civic-header {
 .civic-webauthn-alert {
     position: fixed;
     bottom: calc(90px + env(safe-area-inset-bottom, 0px));
-    left: 16px;
-    right: 16px;
+    left: var(--space-4);
+    right: var(--space-4);
     max-width: 400px;
     margin: 0 auto;
-    padding: 14px 20px;
-    border-radius: 12px;
-    font-size: 14px;
-    font-weight: 500;
+    padding: var(--font-size-sm) var(--space-5);
+    border-radius: var(--radius-md);
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-medium);
     text-align: center;
     z-index: 10001;
     transform: translateY(20px);
@@ -3222,14 +3222,14 @@ body.is-offline .civic-header {
 /* Loading Spinner */
 .civic-spinner {
     display: inline-block;
-    width: 16px;
-    height: 16px;
+    width: var(--space-4);
+    height: var(--space-4);
     border: 2px solid rgba(255, 255, 255, 0.3);
     border-top-color: #ffffff;
     border-radius: 50%;
     animation: civic-spin 0.8s linear infinite;
     vertical-align: middle;
-    margin-right: 8px;
+    margin-right: var(--space-2);
 }
 
 @keyframes civic-spin {
@@ -3242,13 +3242,13 @@ body.is-offline .civic-header {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    gap: 10px;
-    padding: 14px 24px;
+    gap: var(--space-2);
+    padding: var(--font-size-sm) var(--space-6);
     background: var(--civic-bg-card, #ffffff);
-    border: 2px solid var(--civic-border, #d1d5db);
-    border-radius: 12px;
-    font-size: 15px;
-    font-weight: 600;
+    border: 2px solid var(--color-gray-300);
+    border-radius: var(--radius-md);
+    font-size: var(--font-size-base);
+    font-weight: var(--font-weight-semibold);
     color: var(--civic-text, #111827);
     cursor: pointer;
     min-height: 52px;
@@ -3271,8 +3271,8 @@ body.is-offline .civic-header {
 }
 
 .civic-biometric-btn svg {
-    width: 24px;
-    height: 24px;
+    width: var(--space-6);
+    height: var(--space-6);
 }
 
 /* Hide biometric options when not supported */
@@ -3286,10 +3286,10 @@ body:not(.biometrics-available) .civic-biometric-btn {
 .civic-badge {
     display: inline-flex;
     align-items: center;
-    padding: 4px 10px;
-    font-size: 12px;
-    font-weight: 600;
-    border-radius: 9999px;
+    padding: var(--space-1) var(--space-2);
+    font-size: var(--font-size-xs);
+    font-weight: var(--font-weight-semibold);
+    border-radius: var(--radius-full);
     text-transform: uppercase;
     letter-spacing: 0.03em;
 }
@@ -3385,8 +3385,8 @@ body:not(.biometrics-available) .civic-biometric-btn {
     }
 
     .civic-btn:hover:not(:active) {
-        transform: translateY(-1px);
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        transform: translateY(calc(var(--space-1) * -0.25));
+        box-shadow: 0 var(--space-1) var(--space-3) rgba(0, 0, 0, 0.15);
     }
 }
 
@@ -3422,8 +3422,8 @@ body:not(.biometrics-available) .civic-biometric-btn {
         opacity: 0.5;
     }
     100% {
-        width: 300px;
-        height: 300px;
+        width: calc(var(--space-4) * 18.75);
+        height: calc(var(--space-4) * 18.75);
         opacity: 0;
     }
 }
@@ -3440,14 +3440,14 @@ body:not(.biometrics-available) .civic-biometric-btn {
     }
 
     .civic-card:hover {
-        transform: translateY(-4px);
-        box-shadow: 0 12px 24px rgba(0, 0, 0, 0.1);
+        transform: translateY(calc(var(--space-1) * -1));
+        box-shadow: 0 var(--space-3) var(--space-6) rgba(0, 0, 0, 0.1);
     }
 
     .civic-card:active,
     .civic-card.touch-active {
         transform: scale(0.98);
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        box-shadow: 0 var(--space-1) var(--space-2) rgba(0, 0, 0, 0.1);
     }
 }
 
@@ -3493,7 +3493,7 @@ body:not(.biometrics-available) .civic-biometric-btn {
 @keyframes page-slide-in {
     from {
         opacity: 0;
-        transform: translateX(20px);
+        transform: translateX(var(--space-5));
     }
     to {
         opacity: 1;
@@ -3508,7 +3508,7 @@ body:not(.biometrics-available) .civic-biometric-btn {
     }
     to {
         opacity: 0;
-        transform: translateX(-20px);
+        transform: translateX(calc(var(--space-5) * -1));
     }
 }
 
@@ -3516,7 +3516,7 @@ body:not(.biometrics-available) .civic-biometric-btn {
 @media (prefers-reduced-motion: no-preference) {
     .civic-hero-content > * {
         opacity: 0;
-        transform: translateY(20px);
+        transform: translateY(var(--space-5));
     }
 
     .civic-hero-content.animated > *:nth-child(1) {
@@ -3541,7 +3541,7 @@ body:not(.biometrics-available) .civic-biometric-btn {
 @media (prefers-reduced-motion: no-preference) {
     .civic-grid.animated > .civic-card {
         opacity: 0;
-        transform: translateY(20px);
+        transform: translateY(var(--space-5));
     }
 
     .civic-grid.animated > .civic-card:nth-child(1) { animation: fade-up var(--duration-normal) var(--ease-native) 0.05s forwards; }
@@ -3564,13 +3564,13 @@ body:not(.biometrics-available) .civic-biometric-btn {
     left: 0;
     right: 0;
     background: var(--civic-bg-card, #ffffff);
-    border-radius: 16px 16px 0 0;
-    box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.2);
+    border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+    box-shadow: 0 calc(var(--space-2) * -1.25) var(--space-10) rgba(0, 0, 0, 0.2);
     z-index: var(--z-dropdown, 1000);
     transform: translateY(100%);
     max-height: 90vh;
     overflow: hidden;
-    padding-bottom: env(safe-area-inset-bottom, 0);
+    padding-bottom: env(safe-area-inset-bottom, var(--space-0));
 }
 
 @media (prefers-reduced-motion: no-preference) {
@@ -3584,17 +3584,17 @@ body:not(.biometrics-available) .civic-biometric-btn {
 }
 
 .civic-bottom-sheet-handle {
-    width: 36px;
-    height: 4px;
+    width: calc(var(--space-2) * 4.5);
+    height: var(--space-1);
     background: var(--civic-border, #d1d5db);
-    border-radius: 2px;
-    margin: 12px auto;
+    border-radius: var(--radius-sm);
+    margin: var(--space-3) auto;
 }
 
 .civic-bottom-sheet-content {
-    padding: 0 20px 20px;
+    padding: 0 var(--space-5) var(--space-5);
     overflow-y: auto;
-    max-height: calc(90vh - 60px);
+    max-height: calc(90vh - calc(var(--space-4) * 3.75));
     overscroll-behavior: contain;
 }
 
@@ -3605,8 +3605,8 @@ body:not(.biometrics-available) .civic-biometric-btn {
     z-index: 9999;
     opacity: 0;
     visibility: hidden;
-    -webkit-backdrop-filter: blur(4px);
-    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(var(--space-1));
+    backdrop-filter: blur(var(--space-1));
 }
 
 @media (prefers-reduced-motion: no-preference) {
@@ -3643,18 +3643,18 @@ body.dark-mode .civic-bottom-sheet {
     inset: 0;
     background: rgba(0, 0, 0, 0.5);
     opacity: 0;
-    -webkit-backdrop-filter: blur(4px);
-    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(var(--space-1));
+    backdrop-filter: blur(var(--space-1));
 }
 
 .nexus-share-sheet-content {
     position: relative;
     background: var(--civic-bg-card, #ffffff);
-    border-radius: 16px 16px 0 0;
+    border-radius: var(--radius-lg) var(--radius-lg) 0 0;
     width: 100%;
-    max-width: 500px;
+    max-width: calc(var(--space-4) * 31.25);
     transform: translateY(100%);
-    padding-bottom: env(safe-area-inset-bottom, 20px);
+    padding-bottom: env(safe-area-inset-bottom, var(--space-5));
 }
 
 @media (prefers-reduced-motion: no-preference) {
@@ -3679,57 +3679,57 @@ body.dark-mode .civic-bottom-sheet {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 16px 20px;
+    padding: var(--space-4) var(--space-5);
     border-bottom: 1px solid var(--civic-border, #e5e7eb);
 }
 
 .nexus-share-sheet-header h3 {
     margin: 0;
-    font-size: 18px;
+    font-size: var(--font-size-lg);
     font-weight: 600;
 }
 
 .nexus-share-close {
     background: none;
     border: none;
-    font-size: 24px;
+    font-size: var(--font-size-2xl);
     color: var(--civic-text-muted, #6b7280);
     cursor: pointer;
-    padding: 4px;
+    padding: var(--space-1);
     line-height: 1;
 }
 
 .nexus-share-close:focus {
     /* GOV.UK Focus Pattern */
-    outline: 3px solid var(--govuk-focus-colour, #ffdd00);
+    outline: calc(var(--space-1) * 0.75) solid var(--govuk-focus-colour, #ffdd00);
     outline-offset: 0;
     background-color: var(--govuk-focus-colour, #ffdd00);
     color: var(--govuk-focus-text-colour, #0b0c0c);
-    box-shadow: 0 -2px var(--govuk-focus-colour, #ffdd00), 0 4px var(--govuk-focus-text-colour, #0b0c0c);
+    box-shadow: 0 calc(var(--space-1) * -0.5) var(--govuk-focus-colour, #ffdd00), 0 var(--space-1) var(--govuk-focus-text-colour, #0b0c0c);
 }
 
 .nexus-share-options {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
-    gap: 16px;
-    padding: 20px;
+    gap: var(--space-4);
+    padding: var(--space-5);
 }
 
 .nexus-share-option {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 8px;
-    padding: 16px 8px;
+    gap: var(--space-2);
+    padding: var(--space-4) var(--space-2);
     background: var(--civic-bg-page, #f3f4f6);
     border: none;
-    border-radius: 12px;
+    border-radius: var(--radius-md);
     color: var(--civic-text-main, #1f2937);
     text-decoration: none;
-    font-size: 12px;
+    font-size: var(--font-size-xs);
     font-weight: 500;
     cursor: pointer;
-    min-height: 80px;
+    min-height: var(--space-20);
 }
 
 @media (prefers-reduced-motion: no-preference) {
@@ -3749,15 +3749,15 @@ body.dark-mode .civic-bottom-sheet {
 
 .nexus-share-option:focus {
     /* GOV.UK Focus Pattern */
-    outline: 3px solid var(--govuk-focus-colour, #ffdd00);
+    outline: calc(var(--space-1) * 0.75) solid var(--govuk-focus-colour, #ffdd00);
     outline-offset: 0;
     background-color: var(--govuk-focus-colour, #ffdd00);
     color: var(--govuk-focus-text-colour, #0b0c0c);
-    box-shadow: 0 -2px var(--govuk-focus-colour, #ffdd00), 0 4px var(--govuk-focus-text-colour, #0b0c0c);
+    box-shadow: 0 calc(var(--space-1) * -0.5) var(--govuk-focus-colour, #ffdd00), 0 var(--space-1) var(--govuk-focus-text-colour, #0b0c0c);
 }
 
 .nexus-share-option i {
-    font-size: 24px;
+    font-size: var(--font-size-2xl);
 }
 
 .nexus-share-option[href*="facebook"] i { color: #1877f2; }
@@ -3775,11 +3775,11 @@ body.dark-mode .civic-bottom-sheet {
     left: 0;
     top: 50%;
     transform: translateY(-50%) translateX(-100%);
-    width: 60px;
-    height: 60px;
+    width: calc(var(--space-4) * 3.75);
+    height: calc(var(--space-4) * 3.75);
     background: var(--civic-bg-card, #ffffff);
-    border-radius: 0 30px 30px 0;
-    box-shadow: 4px 0 20px rgba(0, 0, 0, 0.15);
+    border-radius: 0 var(--radius-full) var(--radius-full) 0;
+    box-shadow: var(--space-1) 0 var(--space-5) rgba(0, 0, 0, 0.15);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -3797,7 +3797,7 @@ body.dark-mode .civic-bottom-sheet {
 
 .civic-swipe-indicator.visible {
     opacity: 1;
-    transform: translateY(-50%) translateX(-20px);
+    transform: translateY(-50%) translateX(calc(var(--space-5) * -1));
 }
 
 .civic-swipe-indicator.ready {
@@ -3805,8 +3805,8 @@ body.dark-mode .civic-bottom-sheet {
 }
 
 .civic-swipe-indicator svg {
-    width: 24px;
-    height: 24px;
+    width: var(--space-6);
+    height: var(--space-6);
     fill: var(--civic-brand, #2563eb);
 }
 
@@ -3820,7 +3820,7 @@ body.dark-mode .civic-bottom-sheet {
     top: 0;
     left: 0;
     right: 0;
-    height: 3px;
+    height: calc(var(--space-1) * 0.75);
     background: transparent;
     z-index: 10002;
     pointer-events: none;
@@ -3830,7 +3830,7 @@ body.dark-mode .civic-bottom-sheet {
     height: 100%;
     background: linear-gradient(90deg, var(--civic-brand, #2563eb), var(--civic-accent-purple, #8b5cf6));
     width: 0;
-    box-shadow: 0 0 10px var(--civic-brand, #2563eb);
+    box-shadow: 0 0 var(--space-2) var(--civic-brand, #2563eb);
 }
 
 @media (prefers-reduced-motion: no-preference) {
@@ -3872,11 +3872,11 @@ input[type="tel"]:focus,
 select:focus,
 textarea:focus {
     /* GOV.UK Focus Pattern */
-    outline: 3px solid var(--govuk-focus-colour, #ffdd00);
+    outline: calc(var(--space-1) * 0.75) solid var(--govuk-focus-colour, #ffdd00);
     outline-offset: 0;
     background-color: var(--govuk-focus-colour, #ffdd00);
     color: var(--govuk-focus-text-colour, #0b0c0c);
-    box-shadow: inset 0 0 0 2px var(--govuk-focus-text-colour, #0b0c0c);
+    box-shadow: inset 0 0 0 var(--space-1) var(--govuk-focus-text-colour, #0b0c0c);
 }
 
 @media (prefers-reduced-motion: no-preference) {
@@ -3904,13 +3904,13 @@ textarea:focus {
 .civic-input.valid,
 input.valid {
     border-color: var(--civic-accent-green, #10b981) !important;
-    box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+    box-shadow: 0 0 0 calc(var(--space-1) * 0.75) rgba(16, 185, 129, 0.1);
 }
 
 .civic-input.invalid,
 input.invalid {
     border-color: var(--civic-error, #ef4444) !important;
-    box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+    box-shadow: 0 0 0 calc(var(--space-1) * 0.75) rgba(239, 68, 68, 0.1);
 }
 
 @media (prefers-reduced-motion: no-preference) {
@@ -3922,8 +3922,8 @@ input.invalid {
 
 @keyframes input-shake {
     0%, 100% { transform: translateX(0); }
-    20%, 60% { transform: translateX(-8px); }
-    40%, 80% { transform: translateX(8px); }
+    20%, 60% { transform: translateX(calc(var(--space-2) * -1)); }
+    40%, 80% { transform: translateX(var(--space-2)); }
 }
 
 
@@ -3933,13 +3933,13 @@ input.invalid {
 
 .civic-notification-dot {
     position: absolute;
-    top: -2px;
-    right: -2px;
-    width: 12px;
-    height: 12px;
+    top: calc(var(--space-1) * -0.5);
+    right: calc(var(--space-1) * -0.5);
+    width: var(--space-3);
+    height: var(--space-3);
     background: var(--civic-error, #ef4444);
     border-radius: 50%;
-    border: 2px solid var(--civic-bg-card, #ffffff);
+    border: var(--space-1) solid var(--civic-bg-card, #ffffff);
 }
 
 @media (prefers-reduced-motion: no-preference) {
@@ -3955,7 +3955,7 @@ input.invalid {
     }
     50% {
         transform: scale(1.1);
-        box-shadow: 0 0 0 8px rgba(239, 68, 68, 0);
+        box-shadow: 0 0 0 var(--space-2) rgba(239, 68, 68, 0);
     }
 }
 
@@ -3990,10 +3990,10 @@ input.invalid {
 
 @keyframes error-shake {
     0%, 100% { transform: translateX(0) rotate(0); }
-    20% { transform: translateX(-4px) rotate(-5deg); }
-    40% { transform: translateX(4px) rotate(5deg); }
-    60% { transform: translateX(-4px) rotate(-5deg); }
-    80% { transform: translateX(4px) rotate(5deg); }
+    20% { transform: translateX(calc(var(--space-1) * -1)) rotate(-5deg); }
+    40% { transform: translateX(var(--space-1)) rotate(5deg); }
+    60% { transform: translateX(calc(var(--space-1) * -1)) rotate(-5deg); }
+    80% { transform: translateX(var(--space-1)) rotate(5deg); }
 }
 
 
@@ -4006,11 +4006,11 @@ input.invalid {
     overflow-x: auto;
     scroll-snap-type: x mandatory;
     scroll-behavior: smooth;
-    gap: 16px;
-    padding: 8px 0;
-    margin: 0 -16px;
-    padding-left: 16px;
-    padding-right: 16px;
+    gap: var(--space-4);
+    padding: var(--space-2) 0;
+    margin: 0 calc(var(--space-4) * -1);
+    padding-left: var(--space-4);
+    padding-right: var(--space-4);
 }
 
 .civic-scroll-snap::-webkit-scrollbar {
@@ -4047,10 +4047,10 @@ input.invalid {
 
 .civic-context-menu {
     background: var(--civic-bg-card, #ffffff);
-    border-radius: 12px;
-    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+    border-radius: var(--radius-md);
+    box-shadow: 0 var(--space-2) var(--space-10) rgba(0, 0, 0, 0.2);
     overflow: hidden;
-    min-width: 180px;
+    min-width: calc(var(--space-4) * 11.25);
 }
 
 @media (prefers-reduced-motion: no-preference) {
@@ -4073,12 +4073,12 @@ input.invalid {
 .civic-context-menu button {
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: var(--space-3);
     width: 100%;
-    padding: 14px 18px;
+    padding: var(--space-3) var(--space-4);
     background: none;
     border: none;
-    font-size: 15px;
+    font-size: var(--font-size-sm);
     color: var(--civic-text-main, #1f2937);
     cursor: pointer;
     text-align: left;
@@ -4094,11 +4094,11 @@ input.invalid {
 
 .civic-context-menu button:focus {
     /* GOV.UK Focus Pattern */
-    outline: 3px solid var(--govuk-focus-colour, #ffdd00);
+    outline: calc(var(--space-1) * 0.75) solid var(--govuk-focus-colour, #ffdd00);
     outline-offset: 0;
     background-color: var(--govuk-focus-colour, #ffdd00);
     color: var(--govuk-focus-text-colour, #0b0c0c);
-    box-shadow: 0 -2px var(--govuk-focus-colour, #ffdd00), 0 4px var(--govuk-focus-text-colour, #0b0c0c);
+    box-shadow: 0 calc(var(--space-1) * -0.5) var(--govuk-focus-colour, #ffdd00), 0 var(--space-1) var(--govuk-focus-text-colour, #0b0c0c);
 }
 
 .civic-context-menu button svg {
@@ -4155,14 +4155,14 @@ body.turbo-loading .civic-btn {
     }
     to {
         opacity: 0;
-        transform: translateX(-20px);
+        transform: translateX(calc(var(--space-5) * -1));
     }
 }
 
 @keyframes page-fade-in {
     from {
         opacity: 0;
-        transform: translateX(20px);
+        transform: translateX(var(--space-5));
     }
     to {
         opacity: 1;
@@ -4182,7 +4182,7 @@ body.turbo-loading .civic-btn {
 @keyframes page-fade-out-reverse {
     from {
         opacity: 0;
-        transform: translateX(-20px);
+        transform: translateX(calc(var(--space-5) * -1));
     }
     to {
         opacity: 1;
@@ -4197,7 +4197,7 @@ body.turbo-loading .civic-btn {
     }
     to {
         opacity: 0;
-        transform: translateX(20px);
+        transform: translateX(var(--space-5));
     }
 }
 
@@ -4242,8 +4242,8 @@ body.turbo-loading .civic-btn {
     background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
     color: white;
     text-align: center;
-    padding: 8px 16px;
-    font-size: 13px;
+    padding: var(--space-2) var(--space-4);
+    font-size: var(--font-size-xs);
     font-weight: 600;
     z-index: var(--z-dropdown, 1000);
     transform: translateY(-100%);
@@ -4251,7 +4251,7 @@ body.turbo-loading .civic-btn {
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 8px;
+    gap: var(--space-2);
 }
 
 .civic-offline-indicator.visible {
@@ -4259,18 +4259,18 @@ body.turbo-loading .civic-btn {
 }
 
 .civic-offline-indicator svg {
-    width: 16px;
-    height: 16px;
+    width: var(--space-4);
+    height: var(--space-4);
     flex-shrink: 0;
 }
 
 /* Adjust header position when offline banner is visible */
 body.is-offline .civic-utility-bar {
-    margin-top: 36px;
+    margin-top: calc(var(--space-8) + var(--space-1));
 }
 
 body.is-offline .civic-header {
-    top: 36px;
+    top: calc(var(--space-8) + var(--space-1));
 }
 
 /* Back online indicator */
@@ -4282,8 +4282,8 @@ body.is-offline .civic-header {
     background: linear-gradient(135deg, #10b981 0%, #059669 100%);
     color: white;
     text-align: center;
-    padding: 8px 16px;
-    font-size: 13px;
+    padding: var(--space-2) var(--space-4);
+    font-size: var(--font-size-xs);
     font-weight: 600;
     z-index: var(--z-dropdown, 1000);
     transform: translateY(-100%);
@@ -4291,7 +4291,7 @@ body.is-offline .civic-header {
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 8px;
+    gap: var(--space-2);
 }
 
 .civic-online-indicator.visible {
@@ -4299,8 +4299,8 @@ body.is-offline .civic-header {
 }
 
 .civic-online-indicator svg {
-    width: 16px;
-    height: 16px;
+    width: var(--space-4);
+    height: var(--space-4);
     flex-shrink: 0;
 }
 

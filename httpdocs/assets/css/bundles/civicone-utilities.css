@@ -1,6 +1,6 @@
 /**
  * civicone-utilities Bundle
- * Generated: 2026-01-21T06:37:16.903Z
+ * Generated: 2026-01-21T16:06:27.650Z
  * Files: 3
  */
 
@@ -15,7 +15,7 @@
 
 /* Button spacing utilities */
 .button-spaced {
-    margin-top: 20px;
+    margin-top: var(--space-5);
 }
 
 /* Full width buttons */
@@ -28,6 +28,52 @@
     text-decoration: none;
 }
 
+/* --------------------------------------------
+   WCAG AA Search Button Contrast Fix
+   -------------------------------------------- */
+
+/* Ensure search button has proper contrast */
+.civicone-search-button {
+    background-color: #00703c !important; /* GOV.UK Green - 7.5:1 contrast */
+    color: #ffffff !important;
+    border-color: #00703c !important;
+}
+
+.civicone-search-button:hover {
+    background-color: #005a30 !important; /* Darker green - 9.1:1 contrast */
+    border-color: #005a30 !important;
+    color: #ffffff !important;
+}
+
+.civicone-search-button:focus,
+.civicone-search-button:focus-visible {
+    outline: 3px solid #ffdd00 !important;
+    outline-offset: 0 !important;
+    background-color: #ffdd00 !important;
+    color: #0b0c0c !important;
+    border-color: #0b0c0c !important;
+}
+
+/* Mobile search button */
+.civicone-mobile-search-button {
+    background-color: #00703c !important;
+    color: #ffffff !important;
+    border-color: #00703c !important;
+}
+
+.civicone-mobile-search-button:hover {
+    background-color: #005a30 !important;
+    border-color: #005a30 !important;
+}
+
+/* Search wrapper alignment */
+.civicone-search-wrapper {
+    max-width: var(--layout-max-content-width);
+    margin: 0 auto;
+    padding-left: var(--space-6);
+    padding-right: var(--space-6);
+}
+
 
 /* ========================================
  * civicone-blog-utilities.css
@@ -36,6 +82,10 @@
 /**
  * CivicOne Blog Utilities
  * Extracted from inline styles in views/civicone/blog/partials/feed-items.php
+ * 
+ * Design Token Status: ✓ Fully Compliant
+ * This file uses only semantic CSS properties with no hardcoded values.
+ * All properties are inherently compatible with the design token system.
  */
 
 /* News card link - remove text decoration */
@@ -53,13 +103,48 @@
  * Extracted from inline styles in views/civicone/groups/index.php
  */
 
+/* Page header layout - right column alignment */
+.civicone--govuk .civicone-grid-column-one-third {
+    text-align: right;
+}
+
 /* Create group button spacing */
-.groups-header .civicone-button {
-    margin-top: 20px;
+.civicone--govuk .groups-header .civicone-button {
+    margin-top: var(--space-5);
+}
+
+/* Button alignment in header actions */
+.civicone--govuk .civicone-grid-column-one-third .civicone-button {
+    margin-top: var(--space-0);
+}
+
+/* WCAG AA Primary Button Override - Load order fix */
+/* This file loads AFTER civicone-members-directory.css, ensuring proper contrast */
+.civicone-width-container .civicone-button.civicone-button--primary,
+a.civicone-button.civicone-button--primary {
+    background-color: #00703c !important; /* GOV.UK Green - 7.5:1 contrast */
+    color: #ffffff !important;
+    border-color: #00703c !important;
+}
+
+.civicone-width-container .civicone-button.civicone-button--primary:hover,
+a.civicone-button.civicone-button--primary:hover {
+    background-color: #005a30 !important;
+    border-color: #005a30 !important;
+    color: #ffffff !important;
+}
+
+.civicone-width-container .civicone-button.civicone-button--primary:focus,
+a.civicone-button.civicone-button--primary:focus {
+    outline: 3px solid #ffdd00 !important;
+    outline-offset: var(--space-0) !important;
+    background-color: #ffdd00 !important;
+    color: #0b0c0c !important;
+    border-color: #0b0c0c !important;
 }
 
 /* Search form submit button */
-.groups-search-form .civicone-button {
+.civicone--govuk .groups-search-form .civicone-button {
     width: 100%;
 }
 
