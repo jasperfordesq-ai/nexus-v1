@@ -1,0 +1,4314 @@
+/**
+ * civicone-core Bundle
+ * Generated: 2026-01-21T06:37:16.895Z
+ * Files: 4
+ */
+
+/* ========================================
+ * civicone-header.css
+ * ======================================== */
+
+/* =============================================
+   CIVICONE ACCESSIBLE LAYOUT - WCAG 2.1 AA
+   Based on CIVICONE_DESIGN_STANDARDS.md
+   Version: 2.0 - Full Visual Polish
+   ============================================= */
+
+/* ===========================================
+   DESIGN TOKENS - From Standards Doc
+   Updated 2026-01-20: Now uses GOV.UK spacing tokens
+   =========================================== */
+:root {
+    /* Primary Brand */
+    --civic-brand: #00796B;
+    --civic-brand-dark: #005a4f;
+    --civic-brand-light: #4db6ac;
+
+    /* Text Colors - WCAG AA Verified */
+    --civic-text-primary: var(--govuk-text-colour, #0b0c0c);   /* GOV.UK black */
+    --civic-text-secondary: var(--govuk-secondary-text-colour, #505a5f); /* GOV.UK secondary */
+    --civic-text-muted: #6b7280;     /* 5.4:1 on white */
+
+    /* Backgrounds */
+    --civic-bg-primary: #ffffff;
+    --civic-bg-secondary: #f8fafc;
+    --civic-bg-tertiary: #f1f5f9;
+
+    /* Semantic Colors */
+    --civic-success: #059669;
+    --civic-warning: #d97706;
+    --civic-error: var(--govuk-error-colour, #d4351c);
+    --civic-info: #2563eb;
+
+    /* Focus Ring - GOV.UK yellow focus */
+    --civic-focus-ring: var(--govuk-focus-colour, #ffdd00);
+
+    /* WCAG 2.1 AA Compliant Action Colors (5:1+ contrast on #f8fafc) */
+    --civic-action-create: #047857;      /* 5.26:1 - Emerald 700 */
+    --civic-action-federation: #6d28d9;  /* 6.11:1 - Violet 700 */
+    --civic-action-newsletter: #b45309;  /* 4.65:1 - Amber 700 */
+    --civic-action-admin: #c2410c;       /* 4.63:1 - Orange 700 */
+    --civic-action-ranking: #be185d;     /* 5.81:1 - Pink 700 */
+    --civic-action-logout: #b91c1c;      /* 5.85:1 - Red 700 */
+
+    /* WCAG 2.1 AA Compliant Icon Colors (4.5:1+ contrast on #fff) */
+    --civic-icon-brand: #00796B;    /* 4.50:1 - Original teal */
+    --civic-icon-purple: #7c3aed;   /* 4.53:1 - Violet 600 */
+    --civic-icon-green: #059669;    /* 4.52:1 - Emerald 600 */
+    --civic-icon-pink: #db2777;     /* 4.39:1 - Pink 600 */
+    --civic-icon-amber: #d97706;    /* 3.01:1 - UI only, pair with text */
+    --civic-icon-blue: #2563eb;     /* 4.55:1 - Blue 600 */
+    --civic-icon-indigo: #4f46e5;   /* 5.48:1 - Indigo 600 */
+    --civic-icon-gray: #6b7280;     /* 4.62:1 - Original gray */
+
+    /* Spacing - Map to GOV.UK spacing tokens (5px base) */
+    --space-1: var(--civicone-spacing-1, 5px);
+    --space-2: var(--civicone-spacing-2, 10px);
+    --space-3: var(--civicone-spacing-3, 15px);
+    --space-4: var(--civicone-spacing-4, 20px);
+    --space-5: var(--civicone-spacing-5, 25px);
+    --space-6: var(--civicone-spacing-6, 30px);
+    --space-8: var(--civicone-spacing-8, 40px);
+
+    /* Timing */
+    --duration-fast: 150ms;
+    --ease-default: cubic-bezier(0.4, 0, 0.2, 1);
+
+    /* Border Radius - GOV.UK uses 0 but we allow slight rounding */
+    --radius-sm: 0;       /* GOV.UK style: no radius */
+    --radius-md: 0;
+    --radius-lg: 0;
+}
+
+/* ===========================================
+   1. UTILITY BAR - Top Navigation Strip
+   =========================================== */
+.civic-utility-bar {
+    background: var(--civic-bg-secondary);
+    border-bottom: 1px solid #e2e8f0;
+    padding: var(--space-2) 0;
+    font-size: 14px;
+}
+
+.civic-utility-wrapper {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: var(--space-3);
+    flex-wrap: wrap;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 var(--space-6);
+}
+
+.civic-utility-link {
+    color: var(--civic-text-secondary);
+    text-decoration: none;
+    font-weight: 500;
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-1);
+    padding: var(--space-2) var(--space-3);
+    border-radius: var(--radius-sm);
+    transition: all var(--duration-fast) var(--ease-default);
+    min-height: 44px; /* WCAG touch target */
+    font-size: 14px;
+}
+
+.civic-utility-link:hover {
+    background-color: var(--civic-bg-tertiary);
+    color: var(--civic-text-primary);
+    text-decoration: underline;
+}
+
+.civic-utility-link:focus-visible {
+    /* GOV.UK Focus Pattern */
+    outline: 3px solid var(--govuk-focus-colour, #ffdd00);
+    outline-offset: 0;
+    background-color: var(--govuk-focus-colour, #ffdd00);
+    color: var(--govuk-focus-text-colour, #0b0c0c);
+    box-shadow: 0 -2px var(--govuk-focus-colour, #ffdd00), 0 4px var(--govuk-focus-text-colour, #0b0c0c);
+    text-decoration: none;
+}
+
+/* Utility Dropdowns */
+.civic-utility-bar .civic-dropdown {
+    position: relative;
+}
+
+.civic-utility-bar .civic-dropdown-content {
+    display: none;
+    position: absolute;
+    top: 100%;
+    right: 0;
+    background: var(--civic-bg-primary);
+    min-width: 200px;
+    border: 2px solid var(--civic-text-primary);
+    border-radius: var(--radius-sm);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    padding: var(--space-2) 0;
+    z-index: 10000; /* Above notification drawer (9999) to prevent overlap */
+    margin-top: var(--space-1);
+}
+
+.civic-utility-bar .civic-dropdown-content::before {
+    content: '';
+    position: absolute;
+    top: -8px;
+    left: 0;
+    width: 100%;
+    height: 8px;
+}
+
+.civic-utility-bar .civic-dropdown-content a {
+    display: flex;
+    align-items: center;
+    min-height: 44px; /* WCAG 2.5.5 - Minimum touch target size */
+    padding: var(--space-3) var(--space-4);
+    color: var(--civic-text-primary);
+    background-color: transparent; /* WCAG FIX: Explicitly prevent yellow backgrounds - yellow ONLY for :focus-visible */
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 14px;
+}
+
+.civic-utility-bar .civic-dropdown-content a:hover {
+    background-color: var(--civic-bg-tertiary);
+    text-decoration: underline;
+}
+
+.civic-utility-bar .civic-dropdown-content a:focus-visible {
+    /* GOV.UK Focus Pattern */
+    outline: 3px solid var(--govuk-focus-colour, #ffdd00);
+    outline-offset: 0;
+    background-color: var(--govuk-focus-colour, #ffdd00);
+    color: var(--govuk-focus-text-colour, #0b0c0c);
+}
+
+/* Dropdown shown state (for JS toggle) */
+.civic-dropdown-content.is-open {
+    display: block;
+    animation: civicFadeIn 0.2s;
+}
+
+/* REMOVED: Hover logic conflicts with JS click handlers
+   Hover was preventing dropdown from closing on click
+   JS-only control is more accessible (WCAG 2.1 AA compliant) */
+/* .civic-dropdown:hover .civic-dropdown-content {
+    display: block;
+    animation: civicFadeIn 0.2s;
+} */
+
+@keyframes civicFadeIn {
+    from { opacity: 0; transform: translateY(-4px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Layout Switcher Active State */
+.civic-dropdown-content a[aria-current="true"] {
+    font-weight: bold;
+    color: var(--civic-brand, #00796B);
+    background: rgba(0, 121, 107, 0.1);
+}
+
+.civic-dropdown-content a[aria-current="true"] .civic-checkmark {
+    float: right;
+    color: var(--civic-brand, #00796B);
+}
+
+/* Layout Switcher Icons */
+.civic-layout-icon {
+    display: inline-block;
+    margin-right: 8px;
+}
+
+/* Dropdown Separator */
+.civic-dropdown-separator {
+    border-top: 1px solid #e5e7eb;
+    margin: 5px 0;
+}
+
+/* User Dropdown Menu Icons */
+.civic-menu-icon {
+    margin-right: 10px;
+    width: 16px;
+    text-align: center;
+}
+
+.civic-menu-icon--brand {
+    color: var(--civic-brand, #00796B);
+}
+
+.civic-menu-icon--purple {
+    color: #8b5cf6;
+}
+
+.civic-menu-icon--green {
+    color: #10b981;
+}
+
+.civic-menu-icon--pink {
+    color: #db2777;
+}
+
+.civic-menu-icon--amber {
+    color: #d97706;
+}
+
+.civic-menu-icon--blue {
+    color: #2563eb;
+}
+
+.civic-menu-icon--indigo {
+    color: #4f46e5;
+}
+
+.civic-menu-icon--gray {
+    color: #6b7280;
+}
+
+/* Logout Link Styling */
+.civic-utility-link--logout {
+    color: #ef4444;
+    font-weight: 600;
+}
+
+/* Mobile-only Links */
+.mobile-only-link {
+    display: none;
+}
+
+.mobile-only-link--dashboard {
+    font-weight: 700;
+}
+
+.mobile-only-link--logout {
+    color: #dc2626;
+}
+
+/* Notification Button (reset button styles) */
+.civic-utility-btn--notification {
+    background: none;
+    border: none;
+    cursor: pointer;
+}
+
+@media (max-width: 768px) {
+    .mobile-only-link {
+        display: inline-flex;
+    }
+
+    .desktop-only-dd {
+        display: none;
+    }
+
+    /* WCAG 1.4.10 - Prevent dropdown overflow on narrow screens */
+    .civic-utility-bar .civic-dropdown-content {
+        min-width: auto;
+        max-width: calc(100vw - 20px);
+        right: 10px;
+        left: auto;
+    }
+}
+
+/* ===========================================
+   2. MAIN HEADER - Logo & Navigation
+   =========================================== */
+.civic-header {
+    background-color: var(--civic-bg-primary);
+    padding: var(--space-8) 0;
+    border-bottom: 4px solid var(--civic-brand);
+    position: relative;
+    z-index: 100;
+    min-height: 100px;
+}
+
+.civic-header-wrapper {
+    display: flex;
+    align-items: center;
+    gap: var(--space-6);
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 var(--space-6);
+}
+
+/* Logo */
+.civic-logo {
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: var(--civic-brand);
+    text-decoration: none;
+    letter-spacing: -0.02em;
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    padding: var(--space-2) 0;
+    flex-shrink: 0;
+    min-height: 44px;
+    transition: opacity var(--duration-fast) var(--ease-default);
+}
+
+.civic-logo:hover {
+    opacity: 0.8;
+}
+
+.civic-logo:focus-visible {
+    /* GOV.UK Focus Pattern */
+    outline: 3px solid var(--govuk-focus-colour, #ffdd00);
+    outline-offset: 0;
+    background-color: var(--govuk-focus-colour, #ffdd00);
+    color: var(--govuk-focus-text-colour, #0b0c0c);
+    box-shadow: 0 -2px var(--govuk-focus-colour, #ffdd00), 0 4px var(--govuk-focus-text-colour, #0b0c0c);
+}
+
+/* ===========================================
+   3. DESKTOP NAVIGATION - WCAG 2.1 AA
+   =========================================== */
+.civic-desktop-nav {
+    display: flex;
+    align-items: center;
+    gap: var(--space-1);
+    flex: 1;
+}
+
+.civic-desktop-nav .civic-nav-link {
+    padding: var(--space-3) var(--space-4);
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--civic-text-primary);
+    text-decoration: none;
+    border-radius: var(--radius-sm);
+    transition: all var(--duration-fast) var(--ease-default);
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+}
+
+.civic-desktop-nav .civic-nav-link:hover {
+    background-color: var(--civic-bg-tertiary);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+}
+
+.civic-desktop-nav .civic-nav-link:focus-visible {
+    /* GOV.UK Focus Pattern */
+    outline: 3px solid var(--govuk-focus-colour, #ffdd00);
+    outline-offset: 0;
+    background-color: var(--govuk-focus-colour, #ffdd00);
+    color: var(--govuk-focus-text-colour, #0b0c0c);
+    box-shadow: 0 -2px var(--govuk-focus-colour, #ffdd00), 0 4px var(--govuk-focus-text-colour, #0b0c0c);
+    text-decoration: none;
+}
+
+.civic-desktop-nav .civic-nav-link.active,
+.civic-desktop-nav .civic-nav-link[aria-current="page"] {
+    background-color: rgba(0, 121, 107, 0.1);
+    text-decoration: underline;
+    text-underline-offset: 4px;
+    text-decoration-thickness: 3px;
+    text-decoration-color: var(--civic-brand);
+}
+
+/* ===========================================
+   4. DESKTOP SEARCH - Accessible Form
+   =========================================== */
+.civic-desktop-search {
+    display: flex;
+    align-items: center;
+    margin-left: auto;
+}
+
+.civic-search-form {
+    display: flex;
+    align-items: stretch;
+}
+
+.civic-search-form input {
+    padding: var(--space-3) var(--space-4);
+    font-size: 16px;
+    border: 2px solid var(--civic-text-secondary);
+    border-right: none;
+    border-radius: var(--radius-sm) 0 0 var(--radius-sm);
+    width: 200px;
+    color: var(--civic-text-primary);
+    background: var(--civic-bg-primary);
+    min-height: 44px;
+}
+
+.civic-search-form input::placeholder {
+    color: var(--civic-text-muted);
+}
+
+.civic-search-form input:focus {
+    outline: none;
+    border-color: var(--civic-focus-ring);
+    box-shadow: 0 0 0 3px rgba(30, 64, 175, 0.2);
+    position: relative;
+    z-index: 1;
+}
+
+.civic-search-form button {
+    padding: var(--space-3) var(--space-4);
+    font-size: 16px;
+    font-weight: 600;
+    background: var(--civic-brand);
+    color: #ffffff;
+    border: 2px solid var(--civic-brand);
+    border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+    cursor: pointer;
+    min-height: 44px;
+    transition: background var(--duration-fast) var(--ease-default);
+}
+
+.civic-search-form button:hover {
+    background: var(--civic-brand-dark);
+    border-color: var(--civic-brand-dark);
+}
+
+.civic-search-form button:focus-visible {
+    /* GOV.UK Focus Pattern */
+    outline: 3px solid var(--govuk-focus-colour, #ffdd00);
+    outline-offset: 0;
+    background-color: var(--govuk-focus-colour, #ffdd00);
+    color: var(--govuk-focus-text-colour, #0b0c0c);
+    box-shadow: 0 -2px var(--govuk-focus-colour, #ffdd00), 0 4px var(--govuk-focus-text-colour, #0b0c0c);
+}
+
+/* ===========================================
+   5. RESPONSIVE - Hide on mobile/tablet
+   =========================================== */
+@media (max-width: 1024px) {
+    .civic-desktop-nav {
+        display: none;
+    }
+    .civic-desktop-search {
+        display: none;
+    }
+}
+
+/* ===========================================
+   6. SERVICE NAVIGATION (GOV.UK Pattern) - NEW 2026-01-20
+   =========================================== */
+.civicone-header {
+    background-color: var(--civic-bg-primary);
+    border-bottom: 4px solid var(--civic-brand);
+    position: relative;
+    z-index: 100;
+}
+
+.civicone-width-container {
+    max-width: 1020px; /* GOV.UK standard */
+    margin: 0 auto;
+    padding: 0 var(--space-6);
+}
+
+.civicone-service-navigation__container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-4);
+    min-height: 80px;
+}
+
+/* Logo / Service Name */
+.civicone-service-navigation__branding {
+    flex-shrink: 0;
+}
+
+.civicone-service-navigation__logo {
+    text-decoration: none;
+    color: var(--civic-text-primary);
+    font-weight: 700;
+    font-size: 1.5rem;
+    display: inline-block;
+    transition: opacity var(--duration-fast) var(--ease-default);
+}
+
+.civicone-service-navigation__logo:hover {
+    opacity: 0.8;
+}
+
+.civicone-service-navigation__logo:focus-visible {
+    outline: 3px solid var(--govuk-focus-colour, #ffdd00);
+    outline-offset: 3px;
+    background-color: var(--govuk-focus-colour, #ffdd00);
+    color: var(--govuk-focus-text-colour, #0b0c0c);
+}
+
+.civicone-service-navigation__service-name {
+    display: inline-block;
+}
+
+/* Desktop Navigation List */
+.civicone-service-navigation__list {
+    display: none; /* Hidden on mobile */
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    gap: var(--space-3);
+}
+
+@media (min-width: 768px) {
+    .civicone-service-navigation__list {
+        display: flex;
+        align-items: center;
+    }
+}
+
+.civicone-service-navigation__item {
+    margin: 0;
+    padding: 0;
+}
+
+.civicone-service-navigation__link {
+    display: inline-block;
+    padding: var(--space-3) var(--space-4);
+    color: var(--civic-text-primary);
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 1rem;
+    border-bottom: 4px solid transparent;
+    transition: border-color var(--duration-fast) var(--ease-default);
+    min-height: 44px;
+}
+
+.civicone-service-navigation__link:hover {
+    text-decoration: underline;
+    border-bottom-color: var(--civic-brand-light);
+}
+
+.civicone-service-navigation__link:focus-visible {
+    outline: 3px solid var(--govuk-focus-colour, #ffdd00);
+    outline-offset: 0;
+    background-color: var(--govuk-focus-colour, #ffdd00);
+    color: var(--govuk-focus-text-colour, #0b0c0c);
+    box-shadow: 0 -2px var(--govuk-focus-colour, #ffdd00), 0 4px var(--govuk-focus-text-colour, #0b0c0c);
+    text-decoration: none;
+}
+
+/* Active state */
+.civicone-service-navigation__item--active .civicone-service-navigation__link {
+    border-bottom-color: var(--civic-brand);
+    font-weight: 700;
+}
+
+/* Mobile Toggle Button */
+.civicone-service-navigation__toggle {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    padding: var(--space-3) var(--space-4);
+    background: none;
+    border: 2px solid var(--civic-text-primary);
+    border-radius: var(--radius-sm);
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--civic-text-primary);
+    cursor: pointer;
+    min-height: 44px;
+    min-width: 44px;
+}
+
+@media (min-width: 768px) {
+    .civicone-service-navigation__toggle {
+        display: none; /* Hide on desktop */
+    }
+}
+
+.civicone-service-navigation__toggle:hover {
+    background-color: var(--civic-bg-tertiary);
+}
+
+.civicone-service-navigation__toggle:focus-visible {
+    outline: 3px solid var(--govuk-focus-colour, #ffdd00);
+    outline-offset: 0;
+    background-color: var(--govuk-focus-colour, #ffdd00);
+    color: var(--govuk-focus-text-colour, #0b0c0c);
+    border-color: var(--govuk-focus-text-colour, #0b0c0c);
+}
+
+.civicone-service-navigation__toggle-icon {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    width: 20px;
+    height: 16px;
+}
+
+.civicone-service-navigation__toggle-icon span {
+    display: block;
+    width: 100%;
+    height: 3px;
+    background-color: currentColor;
+    border-radius: 2px;
+    transition: transform var(--duration-fast) var(--ease-default);
+}
+
+.civicone-service-navigation__toggle.active .civicone-service-navigation__toggle-icon span:nth-child(1) {
+    transform: translateY(7px) rotate(45deg);
+}
+
+.civicone-service-navigation__toggle.active .civicone-service-navigation__toggle-icon span:nth-child(2) {
+    opacity: 0;
+}
+
+.civicone-service-navigation__toggle.active .civicone-service-navigation__toggle-icon span:nth-child(3) {
+    transform: translateY(-7px) rotate(-45deg);
+}
+
+/* Mobile Navigation Panel */
+.civicone-service-navigation__mobile-panel {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: var(--civic-bg-primary);
+    border-bottom: 4px solid var(--civic-brand);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    max-height: 0;
+    overflow: hidden;
+    opacity: 0;
+    transition: max-height var(--duration-fast) var(--ease-default), opacity var(--duration-fast) var(--ease-default);
+}
+
+.civicone-service-navigation__mobile-panel.active {
+    max-height: 500px;
+    opacity: 1;
+}
+
+.civicone-service-navigation__mobile-list {
+    list-style: none;
+    margin: 0;
+    padding: var(--space-4) 0;
+}
+
+.civicone-service-navigation__mobile-item {
+    margin: 0;
+    padding: 0;
+    border-top: 1px solid var(--civic-bg-tertiary);
+}
+
+.civicone-service-navigation__mobile-link {
+    display: block;
+    padding: var(--space-4) var(--space-6);
+    color: var(--civic-text-primary);
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 1.125rem;
+}
+
+.civicone-service-navigation__mobile-link:hover {
+    background-color: var(--civic-bg-tertiary);
+    text-decoration: underline;
+}
+
+.civicone-service-navigation__mobile-link:focus-visible {
+    outline: 3px solid var(--govuk-focus-colour, #ffdd00);
+    outline-offset: -3px;
+    background-color: var(--govuk-focus-colour, #ffdd00);
+    color: var(--govuk-focus-text-colour, #0b0c0c);
+}
+
+.civicone-service-navigation__mobile-item--active .civicone-service-navigation__mobile-link {
+    font-weight: 700;
+    border-left: 4px solid var(--civic-brand);
+    padding-left: calc(var(--space-6) - 4px);
+}
+
+/* Search Area */
+.civicone-search-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: var(--space-4);
+    padding: var(--space-4) 0;
+    border-bottom: 1px solid var(--civic-bg-tertiary);
+}
+
+.civicone-desktop-search {
+    display: none;
+}
+
+@media (min-width: 768px) {
+    .civicone-desktop-search {
+        display: block;
+    }
+}
+
+.civicone-search-form {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+}
+
+.civicone-search-input {
+    padding: var(--space-2) var(--space-3);
+    border: 2px solid var(--civic-text-primary);
+    border-radius: var(--radius-sm);
+    font-size: 1rem;
+    min-height: 44px;
+    min-width: 200px;
+}
+
+.civicone-search-input:focus-visible {
+    outline: 3px solid var(--govuk-focus-colour, #ffdd00);
+    outline-offset: 0;
+    box-shadow: inset 0 0 0 2px;
+}
+
+.civicone-search-button {
+    padding: var(--space-2) var(--space-4);
+    background: var(--civic-brand);
+    color: white;
+    border: 2px solid var(--civic-brand);
+    border-radius: var(--radius-sm);
+    font-weight: 600;
+    cursor: pointer;
+    min-height: 44px;
+    min-width: 44px;
+}
+
+.civicone-search-button:hover {
+    background: var(--civic-brand-dark);
+    border-color: var(--civic-brand-dark);
+}
+
+.civicone-search-button:focus-visible {
+    outline: 3px solid var(--govuk-focus-colour, #ffdd00);
+    outline-offset: 0;
+    background-color: var(--govuk-focus-colour, #ffdd00);
+    color: var(--govuk-focus-text-colour, #0b0c0c);
+    border-color: var(--govuk-focus-text-colour, #0b0c0c);
+}
+
+.civicone-mobile-search-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: none;
+    border: 2px solid var(--civic-text-primary);
+    border-radius: var(--radius-sm);
+    padding: var(--space-2);
+    cursor: pointer;
+    min-height: 44px;
+    min-width: 44px;
+}
+
+@media (min-width: 768px) {
+    .civicone-mobile-search-toggle {
+        display: none;
+    }
+}
+
+.civicone-mobile-search-toggle:hover {
+    background-color: var(--civic-bg-tertiary);
+}
+
+.civicone-mobile-search-toggle:focus-visible {
+    outline: 3px solid var(--govuk-focus-colour, #ffdd00);
+    outline-offset: 0;
+    background-color: var(--govuk-focus-colour, #ffdd00);
+    color: var(--govuk-focus-text-colour, #0b0c0c);
+}
+
+.civicone-mobile-search-bar {
+    max-height: 0;
+    overflow: hidden;
+    opacity: 0;
+    transition: max-height var(--duration-fast) var(--ease-default), opacity var(--duration-fast) var(--ease-default);
+}
+
+.civicone-mobile-search-bar.active {
+    max-height: 100px;
+    opacity: 1;
+    padding: var(--space-4);
+}
+
+.civicone-mobile-search-form {
+    display: flex;
+    gap: var(--space-2);
+}
+
+.civicone-mobile-search-input {
+    flex: 1;
+    padding: var(--space-2) var(--space-3);
+    border: 2px solid var(--civic-text-primary);
+    border-radius: var(--radius-sm);
+    font-size: 1rem;
+    min-height: 44px;
+}
+
+.civicone-mobile-search-button {
+    padding: var(--space-2) var(--space-4);
+    background: var(--civic-brand);
+    color: white;
+    border: 2px solid var(--civic-brand);
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    min-height: 44px;
+    min-width: 44px;
+}
+
+.civicone-visually-hidden {
+    position: absolute !important;
+    width: 1px !important;
+    height: 1px !important;
+    margin: -1px !important;
+    padding: 0 !important;
+    overflow: hidden !important;
+    clip: rect(0, 0, 0, 0) !important;
+    white-space: nowrap !important;
+    border: 0 !important;
+}
+
+/* ===========================================
+   DEPRECATED - OLD MEGA MENU (Commented out 2026-01-20)
+   Keeping for rollback safety - DO NOT DELETE
+   =========================================== */
+/* .civic-menu-btn {
+    background: var(--civic-bg-primary);
+    border: 2px solid var(--civic-text-primary);
+    color: var(--civic-text-primary);
+    font-weight: 700;
+    cursor: pointer;
+    padding: var(--space-3) var(--space-5);
+    border-radius: var(--radius-sm);
+    font-size: 16px;
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    min-height: 44px;
+    transition: all var(--duration-fast) var(--ease-default);
+    margin-left: var(--space-2);
+}
+*/
+/* .civic-menu-btn:hover {
+    background-color: var(--civic-bg-tertiary);
+    text-decoration: underline;
+}
+
+.civic-menu-btn:focus-visible {
+    /* GOV.UK Focus Pattern */
+    outline: 3px solid var(--govuk-focus-colour, #ffdd00);
+    outline-offset: 0;
+    background-color: var(--govuk-focus-colour, #ffdd00);
+    color: var(--govuk-focus-text-colour, #0b0c0c);
+    box-shadow: 0 -2px var(--govuk-focus-colour, #ffdd00), 0 4px var(--govuk-focus-text-colour, #0b0c0c);
+}
+
+.civic-menu-btn.active {
+    background-color: var(--civic-brand);
+    color: #ffffff;
+    border-color: var(--civic-brand);
+}
+
+.civic-menu-btn .civic-arrow {
+    font-size: 12px;
+    transition: transform var(--duration-fast) var(--ease-default);
+}
+
+.civic-menu-btn.active .civic-arrow {
+    transform: rotate(180deg);
+}
+
+.civic-mega-menu {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 100%;
+    background: var(--civic-bg-primary);
+    border-top: 4px solid var(--civic-brand);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+    padding: var(--space-8) 0;
+    z-index: 900;
+}
+
+.civic-mega-menu.active {
+    display: block;
+}
+
+.civic-mega-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: var(--space-8);
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 var(--space-6);
+}
+
+.civic-mega-col h3 {
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--civic-text-secondary);
+    margin: 0 0 var(--space-4) 0;
+    padding-bottom: var(--space-3);
+    border-bottom: 2px solid var(--civic-bg-tertiary);
+    font-weight: 700;
+}
+
+.civic-mega-col a {
+    display: block;
+    text-decoration: none;
+    color: var(--civic-text-primary);
+    font-size: 16px;
+    font-weight: 500;
+    padding: var(--space-2) 0;
+    transition: all var(--duration-fast) var(--ease-default);
+}
+
+.civic-mega-col a:hover {
+    color: var(--civic-brand);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+}
+
+.civic-mega-col a:focus-visible {
+    /* GOV.UK Focus Pattern */
+    outline: 3px solid var(--govuk-focus-colour, #ffdd00);
+    outline-offset: 0;
+    background-color: var(--govuk-focus-colour, #ffdd00);
+    color: var(--govuk-focus-text-colour, #0b0c0c);
+    box-shadow: 0 -2px var(--govuk-focus-colour, #ffdd00), 0 4px var(--govuk-focus-text-colour, #0b0c0c);
+    text-decoration: none;
+}
+
+/* Mega Menu Tablet */
+@media (max-width: 1024px) {
+    .civic-mega-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: var(--space-6);
+    }
+}
+
+/* Hide on mobile
+@media (max-width: 768px) {
+    .civic-menu-btn,
+    .civic-mega-menu {
+        display: none !important;
+    }
+}
+*/
+/* END DEPRECATED MEGA MENU SECTION */
+
+/* ===========================================
+   7. DARK MODE - Full Theme Override
+   =========================================== */
+body.dark-mode {
+    --civic-bg-primary: #111827;
+    --civic-bg-secondary: #1f2937;
+    --civic-bg-tertiary: #374151;
+    --civic-text-primary: #f3f4f6;
+    --civic-text-secondary: #d1d5db;
+    --civic-text-muted: #9ca3af;
+    --civic-focus-ring: #60a5fa;
+
+    /* Dark Mode Action Colors (WCAG AA on #1f2937) */
+    --civic-action-create: #34d399;      /* 6.87:1 - Emerald 400 */
+    --civic-action-federation: #a78bfa;  /* 5.49:1 - Violet 400 */
+    --civic-action-newsletter: #fbbf24;  /* 9.17:1 - Amber 400 */
+    --civic-action-admin: #fb923c;       /* 6.25:1 - Orange 400 */
+    --civic-action-ranking: #f472b6;     /* 5.89:1 - Pink 400 */
+    --civic-action-logout: #f87171;      /* 5.18:1 - Red 400 */
+
+    /* Dark Mode Icon Colors (WCAG AA on #1f2937) */
+    --civic-icon-brand: #4db6ac;    /* Teal 300 */
+    --civic-icon-purple: #a78bfa;   /* Violet 400 */
+    --civic-icon-green: #34d399;    /* Emerald 400 */
+    --civic-icon-pink: #f472b6;     /* Pink 400 */
+    --civic-icon-amber: #fbbf24;    /* Amber 400 */
+    --civic-icon-blue: #60a5fa;     /* Blue 400 */
+    --civic-icon-indigo: #818cf8;   /* Indigo 400 */
+    --civic-icon-gray: #9ca3af;     /* Gray 400 */
+}
+
+body.dark-mode .civic-utility-bar {
+    background: var(--civic-bg-secondary);
+    border-bottom-color: #374151;
+}
+
+body.dark-mode .civic-header {
+    background: var(--civic-bg-primary);
+    border-bottom-color: var(--civic-brand-light);
+}
+
+body.dark-mode .civic-logo {
+    color: var(--civic-brand-light);
+}
+
+body.dark-mode .civic-desktop-nav .civic-nav-link {
+    color: var(--civic-text-primary);
+}
+
+body.dark-mode .civic-desktop-nav .civic-nav-link:hover {
+    background-color: var(--civic-bg-tertiary);
+}
+
+body.dark-mode .civic-desktop-nav .civic-nav-link.active {
+    background-color: rgba(77, 182, 172, 0.15);
+    text-decoration-color: var(--civic-brand-light);
+}
+
+body.dark-mode .civic-search-form input {
+    background: var(--civic-bg-secondary);
+    border-color: var(--civic-text-muted);
+    color: var(--civic-text-primary);
+}
+
+body.dark-mode .civic-search-form input::placeholder {
+    color: var(--civic-text-muted);
+}
+
+body.dark-mode .civic-menu-btn {
+    background: var(--civic-bg-secondary);
+    border-color: var(--civic-text-muted);
+    color: var(--civic-text-primary);
+}
+
+body.dark-mode .civic-menu-btn:hover {
+    background-color: var(--civic-bg-tertiary);
+}
+
+body.dark-mode .civic-menu-btn.active {
+    background-color: var(--civic-brand);
+    border-color: var(--civic-brand);
+    color: #ffffff;
+}
+
+body.dark-mode .civic-mega-menu {
+    background: var(--civic-bg-primary);
+    border-top-color: var(--civic-brand-light);
+}
+
+body.dark-mode .civic-mega-col h3 {
+    color: var(--civic-text-secondary);
+    border-bottom-color: var(--civic-bg-tertiary);
+}
+
+body.dark-mode .civic-mega-col a {
+    color: var(--civic-text-primary);
+}
+
+body.dark-mode .civic-mega-col a:hover {
+    color: var(--civic-brand-light);
+}
+
+body.dark-mode .civic-mega-col a:focus-visible {
+    background-color: var(--civic-bg-secondary);
+}
+
+body.dark-mode .civic-utility-bar .civic-dropdown-content {
+    background: var(--civic-bg-secondary);
+    border-color: var(--civic-text-muted);
+}
+
+body.dark-mode .civic-utility-bar .civic-dropdown-content a {
+    color: var(--civic-text-primary);
+}
+
+body.dark-mode .civic-utility-bar .civic-dropdown-content a:hover {
+    background-color: var(--civic-bg-tertiary);
+}
+
+/* ===========================================
+   8. MOBILE ELEMENTS
+   =========================================== */
+#civic-menu-toggle {
+    display: none;
+    background: none;
+    border: 2px solid transparent;
+    cursor: pointer;
+    padding: var(--space-2);
+    border-radius: var(--radius-sm);
+    min-width: 44px;
+    min-height: 44px;
+}
+
+.civic-mobile-search-btn {
+    display: none;
+}
+
+.civic-mobile-search-bar {
+    display: none;
+}
+
+.civic-hamburger {
+    display: block;
+    width: 24px;
+    height: 2px;
+    background: var(--civic-text-primary);
+    position: relative;
+    transition: all var(--duration-fast) var(--ease-default);
+}
+
+.civic-hamburger::before,
+.civic-hamburger::after {
+    content: '';
+    position: absolute;
+    width: 24px;
+    height: 2px;
+    background: var(--civic-text-primary);
+    left: 0;
+    transition: all var(--duration-fast) var(--ease-default);
+}
+
+.civic-hamburger::before { top: -8px; }
+.civic-hamburger::after { top: 8px; }
+
+/* ===========================================
+   9. MOBILE RESPONSIVE - 768px and below
+   =========================================== */
+@media (max-width: 768px) {
+    /* Hide utility bar - moved to drawer */
+    .civic-utility-bar {
+        display: none !important;
+    }
+
+    /* Simplified header on mobile */
+    .civic-header-wrapper {
+        padding: 0 var(--space-4);
+    }
+
+    .civic-logo {
+        font-size: 1.25rem;
+    }
+
+    /* Hamburger hidden - mobile nav v2 */
+    #civic-menu-toggle {
+        display: none !important;
+    }
+
+    /* Mobile Search Button */
+    .civic-mobile-search-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: none;
+        border: none;
+        padding: var(--space-2);
+        cursor: pointer;
+        color: var(--civic-text-primary);
+        min-width: 44px;
+        min-height: 44px;
+        border-radius: var(--radius-sm);
+    }
+
+    .civic-mobile-search-btn:focus-visible {
+        /* GOV.UK Focus Pattern */
+        outline: 3px solid var(--govuk-focus-colour, #ffdd00);
+        outline-offset: 0;
+        background-color: var(--govuk-focus-colour, #ffdd00);
+        color: var(--govuk-focus-text-colour, #0b0c0c);
+        box-shadow: 0 -2px var(--govuk-focus-colour, #ffdd00), 0 4px var(--govuk-focus-text-colour, #0b0c0c);
+    }
+
+    .civic-mobile-search-btn .dashicons {
+        font-size: 24px;
+        width: 24px;
+        height: 24px;
+    }
+
+    /* Mobile Search Bar (expandable) */
+    .civic-mobile-search-bar {
+        display: none;
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        background: var(--civic-bg-primary);
+        padding: var(--space-4);
+        border-top: 1px solid var(--civic-bg-tertiary);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        z-index: 999;
+    }
+
+    .civic-mobile-search-bar.active {
+        display: block;
+    }
+
+    .civic-mobile-search-bar form {
+        display: flex;
+        gap: var(--space-2);
+    }
+
+    .civic-mobile-search-bar input {
+        flex: 1;
+        padding: var(--space-3) var(--space-4);
+        border: 2px solid var(--civic-text-secondary);
+        border-radius: var(--radius-sm);
+        font-size: 16px;
+        color: var(--civic-text-primary);
+        background: var(--civic-bg-primary);
+        min-height: 44px;
+    }
+
+    .civic-mobile-search-bar input:focus {
+        outline: none;
+        border-color: var(--civic-focus-ring);
+        box-shadow: 0 0 0 3px rgba(30, 64, 175, 0.2);
+    }
+
+    .civic-mobile-search-bar button {
+        padding: var(--space-3) var(--space-4);
+        background: var(--civic-brand);
+        color: #ffffff;
+        border: none;
+        border-radius: var(--radius-sm);
+        font-weight: 600;
+        cursor: pointer;
+        min-width: 44px;
+        min-height: 44px;
+    }
+
+    .civic-mobile-search-bar button:focus-visible {
+        /* GOV.UK Focus Pattern */
+        outline: 3px solid var(--govuk-focus-colour, #ffdd00);
+        outline-offset: 0;
+        background-color: var(--govuk-focus-colour, #ffdd00);
+        color: var(--govuk-focus-text-colour, #0b0c0c);
+        box-shadow: 0 -2px var(--govuk-focus-colour, #ffdd00), 0 4px var(--govuk-focus-text-colour, #0b0c0c);
+    }
+
+    /* Mobile: Admin-only theme switcher */
+    body:not(.user-is-admin) .civic-interface-switcher {
+        display: none !important;
+    }
+}
+
+/* ===========================================
+   10. ACCESSIBILITY UTILITIES
+   =========================================== */
+
+/* WCAG 2.1 AA Skip Link - GOV.UK Style */
+.skip-link {
+    position: absolute;
+    top: -50px;
+    left: var(--space-3);
+    background: var(--govuk-focus-text-colour, #0b0c0c);
+    color: var(--govuk-focus-colour, #ffdd00);
+    padding: var(--space-2) var(--space-4);
+    z-index: 10001;
+    font-weight: 700;
+    font-size: var(--civicone-font-size-body, 1rem);
+    line-height: var(--civicone-line-height-body, 1.25);
+    text-decoration: underline;
+    text-underline-offset: 0.1em;
+    transition: top var(--duration-fast) var(--ease-default);
+}
+
+.skip-link:focus {
+    top: 0;
+    outline: 3px solid var(--govuk-focus-colour, #ffdd00);
+    outline-offset: 0;
+    background-color: var(--govuk-focus-colour, #ffdd00);
+    color: var(--govuk-focus-text-colour, #0b0c0c);
+    box-shadow: 0 -2px var(--govuk-focus-colour, #ffdd00), 0 4px var(--govuk-focus-text-colour, #0b0c0c);
+}
+
+/* Visually hidden but accessible */
+.visually-hidden,
+.sr-only {
+    position: absolute !important;
+    width: 1px !important;
+    height: 1px !important;
+    padding: 0 !important;
+    margin: -1px !important;
+    overflow: hidden !important;
+    clip: rect(0, 0, 0, 0) !important;
+    white-space: nowrap !important;
+    border: 0 !important;
+}
+
+/* ===========================================
+   11. NOTIFICATION DRAWER - Slide-out Panel
+   =========================================== */
+.notif-drawer-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 9998;
+}
+
+.notif-drawer-overlay.open {
+    display: block;
+}
+
+.notif-drawer {
+    position: fixed;
+    top: 0;
+    right: -350px;
+    width: 350px;
+    max-width: 90vw;
+    height: 100vh;
+    background: var(--civic-bg-primary);
+    box-shadow: -4px 0 20px rgba(0, 0, 0, 0.15);
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+    transition: right var(--duration-fast) var(--ease-default);
+}
+
+.notif-drawer.open {
+    right: 0;
+}
+
+.notif-drawer-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--space-4) var(--space-5);
+    border-bottom: 2px solid var(--civic-bg-tertiary);
+    background: var(--civic-bg-secondary);
+}
+
+.notif-drawer-header span {
+    font-weight: 700;
+    font-size: 14px;
+    letter-spacing: 0.05em;
+    color: var(--civic-text-primary);
+}
+
+.notif-drawer-close {
+    background: none;
+    border: none;
+    font-size: 20px;
+    cursor: pointer;
+    padding: var(--space-2);
+    color: var(--civic-text-secondary);
+    border-radius: var(--radius-sm);
+    min-width: 44px;
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.notif-drawer-close:hover {
+    background: var(--civic-bg-tertiary);
+}
+
+.notif-drawer-close:focus-visible {
+    /* GOV.UK Focus Pattern */
+    outline: 3px solid var(--govuk-focus-colour, #ffdd00);
+    outline-offset: 0;
+    background-color: var(--govuk-focus-colour, #ffdd00);
+    color: var(--govuk-focus-text-colour, #0b0c0c);
+}
+
+.notif-drawer-list {
+    flex: 1;
+    overflow-y: auto;
+    padding: var(--space-2) 0;
+}
+
+.notif-drawer-empty {
+    padding: var(--space-8);
+    text-align: center;
+    color: var(--civic-text-muted);
+}
+
+.notif-drawer-empty .notif-icon {
+    font-size: 48px;
+    margin-bottom: var(--space-4);
+    opacity: 0.5;
+}
+
+.notif-drawer-item {
+    display: block;
+    padding: var(--space-4) var(--space-5);
+    border-bottom: 1px solid var(--civic-bg-tertiary);
+    text-decoration: none;
+    color: var(--civic-text-primary);
+    transition: background var(--duration-fast) var(--ease-default);
+}
+
+.notif-drawer-item:hover {
+    background: var(--civic-bg-secondary);
+}
+
+.notif-drawer-item:focus-visible {
+    /* GOV.UK Focus Pattern */
+    outline: 3px solid var(--govuk-focus-colour, #ffdd00);
+    outline-offset: 0;
+    background-color: var(--govuk-focus-colour, #ffdd00);
+    color: var(--govuk-focus-text-colour, #0b0c0c);
+}
+
+.notif-drawer-item.is-read {
+    opacity: 0.6;
+}
+
+.notif-drawer-item .notif-message {
+    font-size: 14px;
+    font-weight: 500;
+    margin-bottom: var(--space-1);
+    line-height: 1.4;
+}
+
+.notif-drawer-item .notif-time {
+    font-size: 12px;
+    color: var(--civic-text-muted);
+}
+
+.notif-drawer-footer {
+    display: flex;
+    justify-content: space-between;
+    padding: var(--space-4) var(--space-5);
+    border-top: 2px solid var(--civic-bg-tertiary);
+    background: var(--civic-bg-secondary);
+}
+
+.notif-drawer-footer a,
+.notif-drawer-footer button {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--civic-brand);
+    text-decoration: none;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: var(--space-2) var(--space-3);
+    border-radius: var(--radius-sm);
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+}
+
+.notif-drawer-footer a:hover,
+.notif-drawer-footer button:hover {
+    background: var(--civic-bg-tertiary);
+    text-decoration: underline;
+}
+
+.notif-drawer-footer a:focus-visible,
+.notif-drawer-footer button:focus-visible {
+    /* GOV.UK Focus Pattern */
+    outline: 3px solid var(--govuk-focus-colour, #ffdd00);
+    outline-offset: 0;
+    background-color: var(--govuk-focus-colour, #ffdd00);
+    color: var(--govuk-focus-text-colour, #0b0c0c);
+    box-shadow: 0 -2px var(--govuk-focus-colour, #ffdd00), 0 4px var(--govuk-focus-text-colour, #0b0c0c);
+}
+
+/* ===========================================
+   12. REDUCED MOTION SUPPORT
+   =========================================== */
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}
+
+/* ===========================================
+   13. UTILITY BAR BUTTON CLASSES
+   (Replace inline styles)
+   =========================================== */
+.civic-utility-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 0.9rem;
+    padding: 0;
+    font-weight: 700;
+}
+
+.civic-utility-btn--uppercase {
+    text-transform: uppercase;
+}
+
+.civic-utility-btn--create {
+    color: var(--civic-action-create);
+}
+
+.civic-utility-btn--federation {
+    color: var(--civic-action-federation);
+}
+
+.civic-utility-btn--newsletter {
+    color: var(--civic-action-newsletter);
+}
+
+.civic-utility-btn--admin {
+    color: var(--civic-action-admin);
+}
+
+.civic-utility-btn--ranking {
+    color: var(--civic-action-ranking);
+}
+
+.civic-utility-btn--logout {
+    color: var(--civic-action-logout);
+    font-weight: 600;
+}
+
+/* User Avatar Button */
+.civic-user-avatar-btn {
+    padding: 4px 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: none;
+    border: none;
+    cursor: pointer;
+}
+
+.civic-user-avatar-btn img {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.civic-user-avatar-btn span {
+    font-weight: 600;
+}
+
+/* Dropdown positioning helpers */
+.civic-dropdown--left .civic-dropdown-content {
+    left: 0;
+    right: auto;
+}
+
+.civic-dropdown--right .civic-dropdown-content {
+    right: 0;
+    left: auto;
+}
+
+/* Icon badge (notifications/messages) */
+.civic-icon-badge {
+    position: absolute;
+    top: -6px;
+    right: -6px;
+    background: #ef4444;
+    color: #fff;
+    font-size: 10px;
+    font-weight: 700;
+    padding: 2px 5px;
+    border-radius: 10px;
+    min-width: 14px;
+    text-align: center;
+}
+
+/* Dropdown menu item with icon */
+.civic-dropdown-content .civic-menu-icon {
+    margin-right: 10px;
+    width: 16px;
+    text-align: center;
+}
+
+.civic-dropdown-content .civic-menu-icon--brand { color: var(--civic-icon-brand); }
+.civic-dropdown-content .civic-menu-icon--purple { color: var(--civic-icon-purple); }
+.civic-dropdown-content .civic-menu-icon--green { color: var(--civic-icon-green); }
+.civic-dropdown-content .civic-menu-icon--pink { color: var(--civic-icon-pink); }
+.civic-dropdown-content .civic-menu-icon--amber { color: var(--civic-icon-amber); }
+.civic-dropdown-content .civic-menu-icon--blue { color: var(--civic-icon-blue); }
+.civic-dropdown-content .civic-menu-icon--indigo { color: var(--civic-icon-indigo); }
+.civic-dropdown-content .civic-menu-icon--gray { color: var(--civic-icon-gray); }
+
+/* Active menu item indicator */
+.civic-dropdown-content a[aria-current="true"] {
+    font-weight: bold;
+    color: var(--civic-brand);
+    background: rgba(0, 121, 107, 0.1);
+}
+
+.civic-dropdown-content .civic-menu-check {
+    float: right;
+    color: var(--civic-brand);
+}
+
+/* Separator in dropdown */
+.civic-dropdown-separator {
+    border-top: 1px solid #e5e7eb;
+    margin: 5px 0;
+}
+
+/* ===========================================
+   14. ACCESSIBLE BANNER
+   =========================================== */
+.civic-experimental-banner {
+    background: linear-gradient(135deg, var(--civic-brand, #00796B) 0%, var(--civic-brand-dark, #005a4f) 100%);
+    color: #ffffff;
+    padding: 10px 20px;
+    font-size: 0.875rem;
+    text-align: center;
+    border-bottom: none;
+    position: relative;
+}
+
+.civic-experimental-banner::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+}
+
+.civic-banner-content {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.civic-experimental-badge {
+    background: rgba(255, 255, 255, 0.2);
+    color: #ffffff;
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-weight: 700;
+    font-size: 0.7rem;
+    letter-spacing: 0.06em;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    backdrop-filter: blur(4px);
+}
+
+.civic-experimental-badge i {
+    font-size: 0.8rem;
+}
+
+.civic-experimental-text {
+    color: rgba(255, 255, 255, 0.95);
+}
+
+.civic-experimental-text strong {
+    color: #ffffff;
+}
+
+.civic-experimental-switch {
+    background: rgba(255, 255, 255, 0.15);
+    color: #ffffff !important;
+    padding: 6px 14px;
+    border-radius: 6px;
+    text-decoration: underline;
+    text-decoration-thickness: 2px;
+    text-underline-offset: 2px;
+    font-weight: 600;
+    font-size: 0.8rem;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    backdrop-filter: blur(4px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.civic-experimental-switch:hover {
+    background: rgba(255, 255, 255, 0.25);
+    color: #ffffff !important;
+    transform: translateY(-1px);
+    text-decoration: underline;
+    text-decoration-thickness: 2px;
+}
+
+.civic-experimental-switch:focus-visible {
+    /* GOV.UK Focus Pattern - adapted for dark background */
+    outline: 3px solid var(--govuk-focus-colour, #ffdd00);
+    outline-offset: 0;
+    background-color: var(--govuk-focus-colour, #ffdd00);
+    color: var(--govuk-focus-text-colour, #0b0c0c);
+}
+
+/* Dark mode banner */
+body.dark-mode .civic-experimental-banner {
+    background: linear-gradient(135deg, #1e3a5f 0%, #0f172a 100%);
+}
+
+/* Mobile banner */
+@media (max-width: 600px) {
+    .civic-experimental-banner {
+        padding: 8px 12px;
+    }
+
+    .civic-banner-content {
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .civic-experimental-text {
+        font-size: 0.8rem;
+    }
+
+    .civic-experimental-switch {
+        width: auto;
+    }
+}
+
+/* ===========================================
+   15. HERO BANNER
+   =========================================== */
+.civicone-hero-banner {
+    background: var(--civic-brand);
+    color: white;
+    padding: 40px 0;
+    margin-bottom: 40px;
+    position: relative;
+}
+
+/* Torfaen skin uses purple gradient */
+body.skin-torfaen .civicone-hero-banner {
+    background: linear-gradient(135deg, #96206d 0%, #7a1a59 100%);
+}
+
+.civicone-hero-banner .civic-container {
+    position: relative;
+    z-index: 1;
+}
+
+.hero-badge {
+    display: inline-block;
+    background: #ffffff !important; /* White background for maximum contrast */
+    color: #005a4d !important; /* Dark teal text (darker than hero bg for 7:1 contrast on white) */
+    font-weight: 700; /* Bolder for better legibility */
+    font-size: 12px;
+    padding: 4px 10px;
+    margin-bottom: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border-radius: 4px;
+}
+
+.hero-title {
+    color: #ffffff !important; /* Explicit white for WCAG compliance */
+    margin-bottom: 8px;
+    font-size: clamp(1.75rem, 4vw, 2.5rem);
+    font-weight: 700;
+    letter-spacing: -0.01em;
+}
+
+.hero-subtitle {
+    font-size: clamp(1rem, 2vw, 1.125rem);
+    color: #ffffff !important; /* Explicit white instead of opacity for contrast */
+    max-width: 600px;
+    margin: 0;
+    line-height: 1.5;
+}
+
+/* Dark mode hero */
+body.dark-mode .civicone-hero-banner {
+    background: #1E3A8A;
+}
+
+@media (max-width: 768px) {
+    .civicone-hero-banner {
+        padding: 28px 0;
+        margin-bottom: 28px;
+    }
+}
+
+/* ===========================================
+   CRITICAL FIX: Service Navigation Visibility
+   Added: 2026-01-20
+   Ensures service navigation displays correctly
+   =========================================== */
+
+/* Force header visibility */
+.civicone-header {
+    display: block !important;
+    visibility: visible !important;
+    position: relative !important;
+    z-index: 100 !important;
+    background-color: #ffffff !important;
+    background-image: none !important;
+    background: #ffffff !important;
+}
+
+.civicone-service-navigation {
+    background-color: transparent !important;
+    background: transparent !important;
+}
+
+.civicone-service-navigation__container {
+    background-color: transparent !important;
+    background: transparent !important;
+}
+
+.civicone-service-navigation__link {
+    color: #0b0c0c !important; /* GOV.UK black - ensure visibility */
+    padding: 0.75rem 1rem !important; /* Ensure padding */
+    display: inline-block !important;
+}
+
+/* Force service navigation container visibility */
+.civicone-service-navigation {
+    display: block !important;
+    visibility: visible !important;
+}
+
+.civicone-service-navigation__container {
+    display: flex !important;
+    visibility: visible !important;
+}
+
+/* Force desktop navigation list visibility at tablet+ */
+@media (min-width: 768px) {
+    .civicone-service-navigation__list {
+        display: flex !important;
+        align-items: center !important;
+        visibility: visible !important;
+        gap: 0.75rem !important; /* Space between items */
+        list-style: none !important;
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+}
+
+/* Ensure mobile toggle is hidden on desktop */
+@media (min-width: 768px) {
+    .civicone-service-navigation__toggle {
+        display: none !important;
+    }
+}
+
+/* Ensure search is visible */
+.civicone-search-wrapper {
+    display: block !important;
+    visibility: visible !important;
+}
+
+.civicone-desktop-search {
+    display: block !important;
+}
+
+@media (max-width: 767px) {
+    .civicone-desktop-search {
+        display: none !important;
+    }
+}
+
+/* Reduce hero section height to prevent overlap */
+.civicone-hero-banner {
+    max-height: 200px !important;
+    overflow: hidden;
+}
+
+
+/* ========================================
+ * civicone-mobile.css
+ * ======================================== */
+
+/**
+ * CivicOne Mobile Enhancement CSS
+ * WCAG 2.1 AA Compliant Mobile-First Styles
+ * Includes: Bottom Nav, FAB, Skeletons, Pull-to-Refresh, Touch Enhancements
+ */
+
+/* ===========================================
+   1. BOTTOM NAVIGATION BAR
+   Fixed navigation for key actions on mobile
+   =========================================== */
+
+.civic-bottom-nav {
+    display: none; /* Hidden by default, shown on mobile */
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: var(--civic-bg-card, #ffffff);
+    border-top: 1px solid var(--civic-border, #d1d5db);
+    box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.1);
+    z-index: 9000;
+    padding: 0;
+    padding-bottom: env(safe-area-inset-bottom, 0); /* iOS safe area */
+}
+
+.civic-bottom-nav-inner {
+    display: flex;
+    justify-content: space-around;
+    align-items: stretch;
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 0;
+}
+
+.civic-bottom-nav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    flex: 1;
+    padding: 10px 4px 8px;
+    text-decoration: none;
+    color: var(--civic-text-muted, #6b7280);
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    min-height: 56px; /* WCAG touch target */
+    min-width: 48px;
+    position: relative;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.civic-bottom-nav-item:focus-visible {
+    /* GOV.UK Focus Pattern */
+    outline: 3px solid var(--govuk-focus-colour, #ffdd00);
+    outline-offset: 0;
+    background-color: var(--govuk-focus-colour, #ffdd00);
+    color: var(--govuk-focus-text-colour, #0b0c0c);
+}
+
+.civic-bottom-nav-item svg,
+.civic-bottom-nav-item .civic-nav-icon {
+    width: 24px;
+    height: 24px;
+    margin-bottom: 4px;
+    fill: currentColor;
+}
+
+.civic-bottom-nav-item span {
+    display: block;
+    line-height: 1;
+}
+
+.civic-bottom-nav-item.active {
+    color: var(--civic-brand, #2563eb);
+}
+
+.civic-bottom-nav-item.active::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 32px;
+    height: 3px;
+    background: var(--civic-brand, #2563eb);
+    border-radius: 0 0 3px 3px;
+}
+
+/* Create button special styling */
+.civic-bottom-nav-item--create {
+    position: relative;
+}
+
+.civic-bottom-nav-item--create .civic-nav-icon-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 48px;
+    height: 48px;
+    background: var(--civic-brand, #2563eb);
+    border-radius: 50%;
+    margin-top: -20px;
+    margin-bottom: 2px;
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.4);
+}
+
+.civic-bottom-nav-item--create svg {
+    fill: white;
+    margin-bottom: 0;
+}
+
+.civic-bottom-nav-item--create span {
+    color: var(--civic-brand, #2563eb);
+}
+
+/* Notification badge (old style) */
+.civic-bottom-nav-badge {
+    position: absolute;
+    top: 6px;
+    right: calc(50% - 16px);
+    min-width: 18px;
+    height: 18px;
+    padding: 0 5px;
+    background: #ef4444;
+    color: white;
+    font-size: 10px;
+    font-weight: 700;
+    border-radius: 9px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+}
+
+/* Notification badge (inside nav-icon) */
+.civic-nav-badge {
+    position: absolute;
+    top: -4px;
+    right: -8px;
+    min-width: 18px;
+    height: 18px;
+    padding: 0 5px;
+    background: #ef4444;
+    color: white;
+    font-size: 10px;
+    font-weight: 700;
+    border-radius: 9px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+    box-shadow: 0 2px 4px rgba(239, 68, 68, 0.4);
+    z-index: 1;
+}
+
+/* Pulse animation for new notifications */
+@media (prefers-reduced-motion: no-preference) {
+    .civic-nav-badge.pulse {
+        animation: badge-pulse 2s ease-in-out infinite;
+    }
+}
+
+@keyframes badge-pulse {
+    0%, 100% {
+        transform: scale(1);
+        box-shadow: 0 2px 4px rgba(239, 68, 68, 0.4);
+    }
+    50% {
+        transform: scale(1.1);
+        box-shadow: 0 2px 8px rgba(239, 68, 68, 0.6);
+    }
+}
+
+/* Make nav-icon position relative for badge positioning */
+.civic-bottom-nav-item .civic-nav-icon {
+    position: relative;
+}
+
+/* Dark mode */
+body.dark-mode .civic-bottom-nav {
+    background: var(--civic-bg-card, #1f2937);
+    border-top-color: var(--civic-border, #374151);
+}
+
+body.dark-mode .civic-bottom-nav-item {
+    color: var(--civic-text-muted, #9ca3af);
+}
+
+body.dark-mode .civic-bottom-nav-item.active {
+    color: var(--civic-brand, #60a5fa);
+}
+
+/* Show on mobile */
+@media (max-width: 768px) {
+    .civic-bottom-nav {
+        display: block !important;
+        position: fixed !important;
+        bottom: 0 !important;
+        left: 0 !important;
+        right: 0 !important;
+        z-index: 9999 !important;
+        height: auto;
+        min-height: 56px;
+    }
+
+    /* Add padding to body to prevent content being hidden behind nav */
+    body.has-civic-bottom-nav {
+        padding-bottom: calc(70px + env(safe-area-inset-bottom, 0)) !important;
+    }
+
+    /* Hide the mega menu button on mobile when bottom nav is active */
+    #civic-desktop-menu {
+        display: none !important;
+    }
+}
+
+
+/* ===========================================
+   2. FLOATING ACTION BUTTON (FAB)
+   Sticky create button on mobile
+   =========================================== */
+
+.civic-fab {
+    display: none; /* Hidden by default */
+    position: fixed;
+    bottom: 90px; /* Above bottom nav */
+    right: 20px;
+    width: 56px;
+    height: 56px;
+    background: linear-gradient(135deg, var(--civic-brand, #2563eb) 0%, var(--civic-brand-hover, #1d4ed8) 100%);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    box-shadow: 0 6px 20px rgba(37, 99, 235, 0.4);
+    cursor: pointer;
+    z-index: 8999;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.civic-fab:focus-visible {
+    /* GOV.UK Focus Pattern */
+    outline: 3px solid var(--govuk-focus-colour, #ffdd00);
+    outline-offset: 0;
+    box-shadow: 0 0 0 3px var(--govuk-focus-text-colour, #0b0c0c), 0 0 0 6px var(--govuk-focus-colour, #ffdd00);
+}
+
+.civic-fab svg {
+    width: 24px;
+    height: 24px;
+    fill: white;
+}
+
+.civic-fab:active {
+    transform: scale(0.95);
+}
+
+/* FAB expanded state (optional) */
+.civic-fab.expanded {
+    width: auto;
+    border-radius: 28px;
+    padding: 0 24px;
+    gap: 8px;
+}
+
+.civic-fab.expanded span {
+    display: block;
+    font-weight: 600;
+    font-size: 14px;
+}
+
+/* Show FAB on mobile */
+@media (max-width: 768px) {
+    .civic-fab {
+        display: flex;
+    }
+
+    /* If bottom nav has create button, hide FAB */
+    body.has-civic-bottom-nav .civic-fab {
+        display: none;
+    }
+}
+
+/* Respect reduced motion */
+@media (prefers-reduced-motion: no-preference) {
+    .civic-fab {
+        transition: transform 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    .civic-fab:hover {
+        transform: scale(1.05);
+        box-shadow: 0 8px 25px rgba(37, 99, 235, 0.5);
+    }
+}
+
+
+/* ===========================================
+   3. SKELETON LOADING STATES
+   CSS-only loading placeholders
+   =========================================== */
+
+.civic-skeleton {
+    background: linear-gradient(90deg,
+        var(--civic-bg-page, #f3f4f6) 25%,
+        var(--civic-bg-card, #ffffff) 50%,
+        var(--civic-bg-page, #f3f4f6) 75%);
+    background-size: 200% 100%;
+    border-radius: 4px;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+    .civic-skeleton {
+        animation: civic-skeleton-shimmer 1.5s ease-in-out infinite;
+    }
+}
+
+@keyframes civic-skeleton-shimmer {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+}
+
+.civic-skeleton-text {
+    height: 14px;
+    margin-bottom: 8px;
+    width: 100%;
+}
+
+.civic-skeleton-text:last-child {
+    width: 70%;
+}
+
+.civic-skeleton-title {
+    height: 20px;
+    width: 60%;
+    margin-bottom: 12px;
+}
+
+.civic-skeleton-avatar {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.civic-skeleton-image {
+    width: 100%;
+    height: 180px;
+    border-radius: var(--civic-radius, 8px);
+    margin-bottom: 16px;
+}
+
+.civic-skeleton-button {
+    height: 44px;
+    width: 120px;
+    border-radius: 6px;
+}
+
+/* Skeleton Card */
+.civic-skeleton-card {
+    background: var(--civic-bg-card, #ffffff);
+    border: 1px solid var(--civic-border, #d1d5db);
+    border-radius: var(--civic-radius, 12px);
+    padding: var(--civic-pad, 20px);
+    margin-bottom: 16px;
+}
+
+.civic-skeleton-card-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 16px;
+}
+
+.civic-skeleton-card-meta {
+    flex: 1;
+}
+
+.civic-skeleton-card-body {
+    margin-bottom: 16px;
+}
+
+/* Skeleton Member Card */
+.civic-skeleton-member {
+    text-align: center;
+    padding: 20px;
+}
+
+.civic-skeleton-member .civic-skeleton-avatar {
+    width: 80px;
+    height: 80px;
+    margin: 0 auto 12px;
+}
+
+/* Dark mode skeletons */
+body.dark-mode .civic-skeleton {
+    background: linear-gradient(90deg,
+        var(--civic-bg-page, #111827) 25%,
+        var(--civic-bg-card, #1f2937) 50%,
+        var(--civic-bg-page, #111827) 75%);
+    background-size: 200% 100%;
+}
+
+
+/* ===========================================
+   4. PULL-TO-REFRESH - REMOVED
+   Native iOS/Android-style refresh
+   =========================================== */
+/* Pull-to-refresh feature has been permanently removed due to conflicts with scrolling */
+
+
+/* ===========================================
+   5. SWIPE-TO-GO-BACK INDICATOR
+   Edge swipe gesture feedback
+   =========================================== */
+
+.civic-swipe-back-indicator {
+    position: fixed;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%) translateX(-100%);
+    width: 40px;
+    height: 40px;
+    background: var(--civic-bg-card, #ffffff);
+    border-radius: 0 20px 20px 0;
+    box-shadow: 2px 0 10px rgba(0, 0, 0, 0.15);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    z-index: 9999;
+    pointer-events: none;
+}
+
+.civic-swipe-back-indicator.visible {
+    opacity: 1;
+}
+
+.civic-swipe-back-indicator svg {
+    width: 20px;
+    height: 20px;
+    fill: var(--civic-brand, #2563eb);
+}
+
+
+/* ===========================================
+   6. TOAST NOTIFICATIONS
+   Accessible notification popups
+   =========================================== */
+
+.civic-toast-container {
+    position: fixed;
+    bottom: 100px; /* Above bottom nav */
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: var(--z-dropdown, 1000);
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    pointer-events: none;
+    max-width: 90vw;
+}
+
+.civic-toast {
+    background: var(--civic-bg-footer, #1f2937);
+    color: white;
+    padding: 12px 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 14px;
+    font-weight: 500;
+    pointer-events: auto;
+    opacity: 0;
+    transform: translateY(20px);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+    .civic-toast {
+        animation: civic-toast-in 0.3s ease forwards;
+    }
+
+    .civic-toast.exit {
+        animation: civic-toast-out 0.2s ease forwards;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .civic-toast {
+        opacity: 1;
+        transform: none;
+    }
+}
+
+@keyframes civic-toast-in {
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes civic-toast-out {
+    to {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+}
+
+.civic-toast.success {
+    background: var(--civic-accent-green, #059669);
+}
+
+.civic-toast.error {
+    background: var(--civic-error, #dc2626);
+}
+
+.civic-toast.warning {
+    background: var(--civic-accent-amber, #d97706);
+}
+
+.civic-toast.info {
+    background: var(--civic-brand, #2563eb);
+}
+
+.civic-toast svg {
+    width: 18px;
+    height: 18px;
+    fill: white;
+    flex-shrink: 0;
+}
+
+
+/* ===========================================
+   7. TOUCH-FRIENDLY CARD ENHANCEMENTS
+   Larger tap areas, better spacing
+   =========================================== */
+
+@media (max-width: 768px) {
+    /* Larger tap targets on cards */
+    .civic-card {
+        padding: 20px;
+    }
+
+    .civic-card a,
+    .civic-card button {
+        min-height: 44px;
+        min-width: 44px;
+    }
+
+    /* Full-width buttons on mobile */
+    .civic-card .civic-btn {
+        width: 100%;
+        justify-content: center;
+    }
+
+    /* Card actions stack on mobile */
+    .civic-card-footer {
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .civic-card-footer .civic-btn {
+        width: 100%;
+    }
+
+    /* Larger touch targets for listing cards */
+    .civic-listing-card {
+        padding: 16px;
+    }
+
+    .civic-listing-footer {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 12px;
+    }
+
+    /* Member cards touch optimization */
+    .civic-member-card {
+        padding: 16px;
+    }
+
+    .civic-member-actions {
+        padding-top: 12px;
+    }
+
+    .civic-member-actions .civic-btn {
+        width: 100%;
+    }
+
+    /* Avatar size on mobile */
+    .civic-avatar {
+        width: 64px;
+        height: 64px;
+    }
+
+    /* Search bar touch optimization */
+    .civic-search-input,
+    .civic-filter-select {
+        min-height: 48px;
+        font-size: 16px; /* Prevents iOS zoom */
+    }
+
+    /* Filter tabs touch optimization */
+    .civic-filter-tab {
+        min-height: 44px;
+        padding: 12px 20px;
+    }
+
+    /* Form inputs */
+    .civic-input,
+    input[type="text"],
+    input[type="email"],
+    input[type="password"],
+    input[type="tel"],
+    input[type="search"],
+    select,
+    textarea {
+        min-height: 48px;
+        font-size: 16px; /* Prevents iOS zoom on focus */
+        padding: 12px 16px;
+    }
+
+    /* Buttons */
+    .civic-btn {
+        min-height: 48px;
+        padding: 14px 24px;
+    }
+
+    /* Pagination touch targets */
+    .civic-pagination-btn {
+        min-width: 44px;
+        min-height: 44px;
+    }
+
+    /* Spacing adjustments */
+    .civic-container {
+        padding-left: 16px;
+        padding-right: 16px;
+    }
+
+    .civic-grid {
+        gap: 16px;
+    }
+}
+
+
+/* ===========================================
+   8. LOADING OVERLAY
+   Full-screen loading indicator
+   =========================================== */
+
+.civic-loading-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 10001;
+    opacity: 0;
+    visibility: hidden;
+    -webkit-backdrop-filter: blur(4px);
+    backdrop-filter: blur(4px);
+}
+
+.civic-loading-overlay.visible {
+    opacity: 1;
+    visibility: visible;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+    .civic-loading-overlay {
+        transition: opacity 0.2s ease, visibility 0.2s ease;
+    }
+}
+
+.civic-loading-spinner {
+    width: 48px;
+    height: 48px;
+    border: 4px solid rgba(255, 255, 255, 0.3);
+    border-top-color: white;
+    border-radius: 50%;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+    .civic-loading-spinner {
+        animation: civic-spin 0.8s linear infinite;
+    }
+}
+
+.civic-loading-text {
+    color: white;
+    font-size: 16px;
+    font-weight: 600;
+    margin-top: 16px;
+}
+
+
+/* ===========================================
+   9. INSTALL PWA BANNER
+   Add to homescreen prompt
+   =========================================== */
+
+.civic-pwa-banner {
+    position: fixed;
+    bottom: 80px;
+    left: 16px;
+    right: 16px;
+    background: var(--civic-bg-card, #ffffff);
+    border: 1px solid var(--civic-border, #d1d5db);
+    border-radius: 12px;
+    padding: 16px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+    z-index: 9500;
+    display: none;
+}
+
+.civic-pwa-banner.visible {
+    display: block;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+    .civic-pwa-banner {
+        animation: civic-slide-up 0.3s ease;
+    }
+}
+
+@keyframes civic-slide-up {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.civic-pwa-banner-content {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.civic-pwa-banner-icon {
+    width: 48px;
+    height: 48px;
+    background: var(--civic-brand, #2563eb);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.civic-pwa-banner-icon svg {
+    width: 28px;
+    height: 28px;
+    fill: white;
+}
+
+.civic-pwa-banner-text {
+    flex: 1;
+}
+
+.civic-pwa-banner-title {
+    font-weight: 700;
+    font-size: 16px;
+    color: var(--civic-text-main, #1f2937);
+    margin-bottom: 4px;
+}
+
+.civic-pwa-banner-desc {
+    font-size: 13px;
+    color: var(--civic-text-muted, #6b7280);
+}
+
+.civic-pwa-banner-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 12px;
+}
+
+.civic-pwa-banner-dismiss {
+    background: none;
+    border: none;
+    color: var(--civic-text-muted, #6b7280);
+    font-size: 13px;
+    cursor: pointer;
+    padding: 8px 12px;
+}
+
+.civic-pwa-banner-install {
+    background: var(--civic-brand, #2563eb);
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 6px;
+    font-weight: 600;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+body.dark-mode .civic-pwa-banner {
+    background: var(--civic-bg-card, #1f2937);
+    border-color: var(--civic-border, #374151);
+}
+
+
+/* ===========================================
+   10. OFFLINE INDICATOR
+   Visual feedback when offline
+   =========================================== */
+
+.civic-offline-bar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    background: var(--civic-accent-amber, #d97706);
+    color: white;
+    text-align: center;
+    padding: 8px 16px;
+    font-size: 13px;
+    font-weight: 600;
+    z-index: 10002;
+    display: none;
+}
+
+.civic-offline-bar.visible {
+    display: block;
+}
+
+body.is-offline .civic-offline-bar {
+    display: block;
+}
+
+/* Adjust header position when offline bar visible */
+body.is-offline .civic-header {
+    top: 36px;
+}
+
+
+/* ===========================================
+   11. SAFE AREA INSETS (iOS Notch Support)
+   =========================================== */
+
+@supports (padding: env(safe-area-inset-bottom)) {
+    .civic-bottom-nav {
+        padding-bottom: env(safe-area-inset-bottom);
+    }
+
+    body.has-civic-bottom-nav {
+        padding-bottom: calc(70px + env(safe-area-inset-bottom)) !important;
+    }
+
+    /* Fallback: Always add body padding on mobile when civic-bottom-nav exists */
+    @media (max-width: 768px) {
+        body {
+            padding-bottom: calc(70px + env(safe-area-inset-bottom, 0)) !important;
+        }
+    }
+
+    .civic-toast-container {
+        bottom: calc(100px + env(safe-area-inset-bottom));
+    }
+
+    .civic-fab {
+        bottom: calc(90px + env(safe-area-inset-bottom));
+        right: calc(20px + env(safe-area-inset-right));
+    }
+}
+
+
+/* ===========================================
+   12. VIEW TRANSITIONS API (where supported)
+   Smooth page transitions
+   =========================================== */
+
+@view-transition {
+    navigation: auto;
+}
+
+::view-transition-old(root) {
+    animation: 150ms ease-out both civic-fade-out;
+}
+
+::view-transition-new(root) {
+    animation: 150ms ease-in 75ms both civic-fade-in;
+}
+
+@keyframes civic-fade-out {
+    to { opacity: 0; }
+}
+
+@keyframes civic-fade-in {
+    from { opacity: 0; }
+}
+
+/* Respect reduced motion for view transitions */
+@media (prefers-reduced-motion: reduce) {
+    ::view-transition-group(*),
+    ::view-transition-old(*),
+    ::view-transition-new(*) {
+        animation: none !important;
+    }
+}
+
+
+/* ===========================================
+   13. PWA INSTALL BANNER
+   Non-intrusive app install prompt
+   WCAG 2.1 AA Compliant
+   =========================================== */
+
+.civic-pwa-banner {
+    position: fixed;
+    bottom: calc(70px + env(safe-area-inset-bottom, 0px));
+    left: 16px;
+    right: 16px;
+    max-width: 400px;
+    margin: 0 auto;
+    background: var(--civic-bg-card, #ffffff);
+    border-radius: 16px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15), 0 2px 8px rgba(0, 0, 0, 0.1);
+    z-index: 9500;
+    padding: 16px;
+    transform: translateY(120%);
+    opacity: 0;
+    transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.3s ease;
+    pointer-events: none;
+}
+
+.civic-pwa-banner.visible {
+    transform: translateY(0);
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.civic-pwa-banner-content {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.civic-pwa-banner-icon {
+    flex-shrink: 0;
+    width: 48px;
+    height: 48px;
+    background: linear-gradient(135deg, var(--civic-brand, #2563eb) 0%, #1d4ed8 100%);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #ffffff;
+}
+
+.civic-pwa-banner-icon svg {
+    width: 28px;
+    height: 28px;
+}
+
+.civic-pwa-banner-text {
+    flex: 1;
+    min-width: 0;
+}
+
+.civic-pwa-banner-text strong {
+    display: block;
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--civic-text, #111827);
+    margin-bottom: 2px;
+}
+
+.civic-pwa-banner-text p {
+    font-size: 13px;
+    color: var(--civic-text-muted, #6b7280);
+    margin: 0;
+    line-height: 1.4;
+}
+
+.civic-pwa-banner-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+}
+
+.civic-pwa-btn-install {
+    padding: 10px 18px;
+    background: var(--civic-brand, #2563eb);
+    color: #ffffff;
+    font-size: 14px;
+    font-weight: 600;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: background 0.2s ease, transform 0.1s ease;
+    min-height: 44px; /* WCAG touch target */
+}
+
+.civic-pwa-btn-install:hover {
+    background: #1d4ed8;
+}
+
+.civic-pwa-btn-install:active {
+    transform: scale(0.96);
+}
+
+.civic-pwa-btn-install:focus-visible {
+    /* GOV.UK Focus Pattern */
+    outline: 3px solid var(--govuk-focus-colour, #ffdd00);
+    outline-offset: 0;
+    box-shadow: 0 -2px var(--govuk-focus-colour, #ffdd00), 0 4px var(--govuk-focus-text-colour, #0b0c0c);
+}
+
+.civic-pwa-btn-dismiss {
+    width: 44px;
+    height: 44px;
+    padding: 0;
+    background: transparent;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    color: var(--civic-text-muted, #6b7280);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s ease, color 0.2s ease;
+}
+
+.civic-pwa-btn-dismiss:hover {
+    background: var(--civic-bg-hover, #f3f4f6);
+    color: var(--civic-text, #111827);
+}
+
+.civic-pwa-btn-dismiss:focus-visible {
+    /* GOV.UK Focus Pattern */
+    outline: 3px solid var(--govuk-focus-colour, #ffdd00);
+    outline-offset: 0;
+    background-color: var(--govuk-focus-colour, #ffdd00);
+    color: var(--govuk-focus-text-colour, #0b0c0c);
+}
+
+.civic-pwa-btn-dismiss svg {
+    width: 20px;
+    height: 20px;
+}
+
+
+/* ===========================================
+   14. PWA UPDATE BANNER
+   New version available prompt
+   =========================================== */
+
+.civic-update-banner {
+    position: fixed;
+    top: 16px;
+    left: 16px;
+    right: 16px;
+    max-width: 400px;
+    margin: 0 auto;
+    background: linear-gradient(135deg, #059669 0%, #047857 100%);
+    color: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 8px 24px rgba(5, 150, 105, 0.3);
+    z-index: var(--z-dropdown, 1000);
+    padding: 12px 16px;
+    transform: translateY(-120%);
+    opacity: 0;
+    transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.3s ease;
+}
+
+.civic-update-banner.visible {
+    transform: translateY(0);
+    opacity: 1;
+}
+
+/* Account for iOS status bar */
+@supports (padding: env(safe-area-inset-top)) {
+    .civic-update-banner {
+        top: calc(16px + env(safe-area-inset-top));
+    }
+}
+
+.civic-update-banner-content {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.civic-update-banner-content span {
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.civic-update-btn {
+    padding: 8px 16px;
+    background: rgba(255, 255, 255, 0.2);
+    color: #ffffff;
+    font-size: 13px;
+    font-weight: 600;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.2s ease;
+    min-height: 36px;
+    white-space: nowrap;
+}
+
+.civic-update-btn:hover {
+    background: rgba(255, 255, 255, 0.3);
+}
+
+.civic-update-btn:focus-visible {
+    /* GOV.UK Focus Pattern */
+    outline: 3px solid var(--govuk-focus-colour, #ffdd00);
+    outline-offset: 0;
+    box-shadow: 0 -2px var(--govuk-focus-colour, #ffdd00), 0 4px var(--govuk-focus-text-colour, #0b0c0c);
+}
+
+
+/* ===========================================
+   15. REDUCED MOTION - PWA ELEMENTS
+   =========================================== */
+
+@media (prefers-reduced-motion: reduce) {
+    .civic-pwa-banner,
+    .civic-update-banner {
+        transition: opacity 0.2s ease;
+        transform: none;
+    }
+
+    .civic-pwa-banner:not(.visible),
+    .civic-update-banner:not(.visible) {
+        transform: none;
+    }
+
+    .civic-pwa-btn-install:active {
+        transform: none;
+    }
+}
+
+
+/* ===========================================
+   16. WEBAUTHN BIOMETRIC LOGIN
+   Modal and alerts for biometric auth
+   WCAG 2.1 AA Compliant
+   =========================================== */
+
+.civic-webauthn-modal {
+    position: fixed;
+    inset: 0;
+    z-index: var(--z-dropdown, 1000);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+.civic-webauthn-modal.visible {
+    opacity: 1;
+    visibility: visible;
+}
+
+.civic-webauthn-modal-backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+    -webkit-backdrop-filter: blur(4px);
+    backdrop-filter: blur(4px);
+}
+
+.civic-webauthn-modal-content {
+    position: relative;
+    background: var(--civic-bg-card, #ffffff);
+    border-radius: 20px;
+    padding: 32px 24px;
+    max-width: 340px;
+    width: 100%;
+    text-align: center;
+    box-shadow: 0 24px 48px rgba(0, 0, 0, 0.2);
+    transform: scale(0.9) translateY(20px);
+    transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.civic-webauthn-modal.visible .civic-webauthn-modal-content {
+    transform: scale(1) translateY(0);
+}
+
+.civic-webauthn-modal-icon {
+    width: 80px;
+    height: 80px;
+    margin: 0 auto 20px;
+    background: linear-gradient(135deg, var(--civic-brand, #2563eb) 0%, #1d4ed8 100%);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #ffffff;
+}
+
+.civic-webauthn-modal-icon svg {
+    width: 40px;
+    height: 40px;
+}
+
+.civic-webauthn-modal-content h2 {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--civic-text, #111827);
+    margin: 0 0 8px;
+}
+
+.civic-webauthn-modal-content p {
+    font-size: 14px;
+    color: var(--civic-text-muted, #6b7280);
+    margin: 0 0 24px;
+    line-height: 1.5;
+}
+
+.civic-webauthn-modal-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.civic-webauthn-modal-actions .civic-btn {
+    padding: 14px 24px;
+    font-size: 15px;
+    font-weight: 600;
+    border-radius: 12px;
+    border: none;
+    cursor: pointer;
+    min-height: 48px;
+    transition: background 0.2s ease, transform 0.1s ease;
+}
+
+.civic-webauthn-modal-actions .civic-btn--primary {
+    background: var(--civic-brand, #2563eb);
+    color: #ffffff;
+}
+
+.civic-webauthn-modal-actions .civic-btn--primary:hover {
+    background: #1d4ed8;
+}
+
+.civic-webauthn-modal-actions .civic-btn--primary:active {
+    transform: scale(0.98);
+}
+
+.civic-webauthn-modal-actions .civic-btn--secondary {
+    background: transparent;
+    color: var(--civic-text-muted, #6b7280);
+}
+
+.civic-webauthn-modal-actions .civic-btn--secondary:hover {
+    background: var(--civic-bg-hover, #f3f4f6);
+    color: var(--civic-text, #111827);
+}
+
+.civic-webauthn-modal-actions .civic-btn:focus-visible {
+    /* GOV.UK Focus Pattern */
+    outline: 3px solid var(--govuk-focus-colour, #ffdd00);
+    outline-offset: 0;
+    box-shadow: 0 -2px var(--govuk-focus-colour, #ffdd00), 0 4px var(--govuk-focus-text-colour, #0b0c0c);
+}
+
+
+/* WebAuthn Alert Toast */
+.civic-webauthn-alert {
+    position: fixed;
+    bottom: calc(90px + env(safe-area-inset-bottom, 0px));
+    left: 16px;
+    right: 16px;
+    max-width: 400px;
+    margin: 0 auto;
+    padding: 14px 20px;
+    border-radius: 12px;
+    font-size: 14px;
+    font-weight: 500;
+    text-align: center;
+    z-index: 10001;
+    transform: translateY(20px);
+    opacity: 0;
+    transition: transform 0.3s ease, opacity 0.3s ease;
+}
+
+.civic-webauthn-alert.visible {
+    transform: translateY(0);
+    opacity: 1;
+}
+
+.civic-webauthn-alert--success {
+    background: #059669;
+    color: #ffffff;
+}
+
+.civic-webauthn-alert--error {
+    background: #dc2626;
+    color: #ffffff;
+}
+
+.civic-webauthn-alert--warning {
+    background: #d97706;
+    color: #ffffff;
+}
+
+
+/* Loading Spinner */
+.civic-spinner {
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-top-color: #ffffff;
+    border-radius: 50%;
+    animation: civic-spin 0.8s linear infinite;
+    vertical-align: middle;
+    margin-right: 8px;
+}
+
+@keyframes civic-spin {
+    to { transform: rotate(360deg); }
+}
+
+
+/* Biometric Button Styles */
+.civic-biometric-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 14px 24px;
+    background: var(--civic-bg-card, #ffffff);
+    border: 2px solid var(--civic-border, #d1d5db);
+    border-radius: 12px;
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--civic-text, #111827);
+    cursor: pointer;
+    min-height: 52px;
+    width: 100%;
+    transition: border-color 0.2s ease, background 0.2s ease;
+}
+
+.civic-biometric-btn:hover {
+    border-color: var(--civic-brand, #2563eb);
+    background: rgba(37, 99, 235, 0.05);
+}
+
+.civic-biometric-btn:focus-visible {
+    /* GOV.UK Focus Pattern */
+    outline: 3px solid var(--govuk-focus-colour, #ffdd00);
+    outline-offset: 0;
+    background-color: var(--govuk-focus-colour, #ffdd00);
+    color: var(--govuk-focus-text-colour, #0b0c0c);
+    box-shadow: 0 -2px var(--govuk-focus-colour, #ffdd00), 0 4px var(--govuk-focus-text-colour, #0b0c0c);
+}
+
+.civic-biometric-btn svg {
+    width: 24px;
+    height: 24px;
+}
+
+/* Hide biometric options when not supported */
+body:not(.webauthn-supported) [data-webauthn-login],
+body:not(.webauthn-supported) [data-webauthn-register],
+body:not(.biometrics-available) .civic-biometric-btn {
+    display: none;
+}
+
+/* Security settings status badges */
+.civic-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 4px 10px;
+    font-size: 12px;
+    font-weight: 600;
+    border-radius: 9999px;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+}
+
+.civic-badge--success {
+    background: rgba(5, 150, 105, 0.1);
+    color: #059669;
+}
+
+.civic-badge--neutral {
+    background: rgba(107, 114, 128, 0.1);
+    color: #6b7280;
+}
+
+
+/* ===========================================
+   17. REDUCED MOTION - WEBAUTHN
+   =========================================== */
+
+@media (prefers-reduced-motion: reduce) {
+    .civic-webauthn-modal,
+    .civic-webauthn-modal-content,
+    .civic-webauthn-alert {
+        transition: opacity 0.2s ease;
+    }
+
+    .civic-webauthn-modal-content {
+        transform: none;
+    }
+
+    .civic-webauthn-modal.visible .civic-webauthn-modal-content {
+        transform: none;
+    }
+
+    .civic-spinner {
+        animation: none;
+    }
+}
+
+
+/* ========================================
+ * civicone-native.css
+ * ======================================== */
+
+/**
+ * CivicOne Native Experience CSS
+ * Advanced animations and native-feel interactions
+ * WCAG 2.1 AA Compliant
+ * Updated 2026-01-20: GOV.UK design tokens
+ */
+
+/* ===========================================
+   1. SPRING ANIMATIONS (60fps Native Feel)
+   =========================================== */
+
+:root {
+    /* Native-like spring curves */
+    --spring-bounce: cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    --spring-smooth: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    --spring-snappy: cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    --ease-native: cubic-bezier(0.4, 0, 0.2, 1);
+
+    /* Timing */
+    --duration-instant: 100ms;
+    --duration-fast: 150ms;
+    --duration-normal: 250ms;
+    --duration-slow: 350ms;
+}
+
+/* ===========================================
+   2. BUTTON INTERACTIONS (Native Tap Feel)
+   =========================================== */
+
+.civic-btn,
+.civic-bottom-nav-item,
+.civic-card,
+.civic-member-card {
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+}
+
+/* Active press state */
+@media (prefers-reduced-motion: no-preference) {
+    .civic-btn {
+        transition: transform var(--duration-fast) var(--spring-bounce),
+                    box-shadow var(--duration-fast) ease,
+                    background-color var(--duration-fast) ease;
+    }
+
+    .civic-btn:active,
+    .civic-btn.touch-active {
+        transform: scale(0.96);
+    }
+
+    .civic-btn:hover:not(:active) {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+}
+
+/* Ripple effect */
+.civic-btn {
+    position: relative;
+    overflow: hidden;
+}
+
+.civic-btn::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    opacity: 0;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+    .civic-btn.ripple::after {
+        animation: ripple-effect 0.6s ease-out forwards;
+    }
+}
+
+@keyframes ripple-effect {
+    0% {
+        width: 0;
+        height: 0;
+        opacity: 0.5;
+    }
+    100% {
+        width: 300px;
+        height: 300px;
+        opacity: 0;
+    }
+}
+
+
+/* ===========================================
+   3. CARD INTERACTIONS (Swipe & Press)
+   =========================================== */
+
+@media (prefers-reduced-motion: no-preference) {
+    .civic-card {
+        transition: transform var(--duration-normal) var(--spring-smooth),
+                    box-shadow var(--duration-normal) ease;
+    }
+
+    .civic-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 12px 24px rgba(0, 0, 0, 0.1);
+    }
+
+    .civic-card:active,
+    .civic-card.touch-active {
+        transform: scale(0.98);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+}
+
+/* Long press indicator */
+.civic-card.long-press::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: var(--civic-brand, #2563eb);
+    opacity: 0;
+    border-radius: inherit;
+    pointer-events: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+    .civic-card.long-press::before {
+        animation: long-press-pulse 0.8s ease-out forwards;
+    }
+}
+
+@keyframes long-press-pulse {
+    0% { opacity: 0.1; }
+    50% { opacity: 0.05; }
+    100% { opacity: 0; }
+}
+
+
+/* ===========================================
+   4. PAGE TRANSITIONS (App-like Navigation)
+   =========================================== */
+
+/* Page enter animation */
+@media (prefers-reduced-motion: no-preference) {
+    .civic-page-enter {
+        animation: page-slide-in var(--duration-normal) var(--ease-native) forwards;
+    }
+
+    .civic-page-exit {
+        animation: page-slide-out var(--duration-fast) ease-in forwards;
+    }
+}
+
+@keyframes page-slide-in {
+    from {
+        opacity: 0;
+        transform: translateX(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes page-slide-out {
+    from {
+        opacity: 1;
+        transform: translateX(0);
+    }
+    to {
+        opacity: 0;
+        transform: translateX(-20px);
+    }
+}
+
+/* Hero content stagger animation */
+@media (prefers-reduced-motion: no-preference) {
+    .civic-hero-content > * {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    .civic-hero-content.animated > *:nth-child(1) {
+        animation: fade-up var(--duration-normal) var(--ease-native) 0.1s forwards;
+    }
+    .civic-hero-content.animated > *:nth-child(2) {
+        animation: fade-up var(--duration-normal) var(--ease-native) 0.2s forwards;
+    }
+    .civic-hero-content.animated > *:nth-child(3) {
+        animation: fade-up var(--duration-normal) var(--ease-native) 0.3s forwards;
+    }
+}
+
+@keyframes fade-up {
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Card grid stagger */
+@media (prefers-reduced-motion: no-preference) {
+    .civic-grid.animated > .civic-card {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    .civic-grid.animated > .civic-card:nth-child(1) { animation: fade-up var(--duration-normal) var(--ease-native) 0.05s forwards; }
+    .civic-grid.animated > .civic-card:nth-child(2) { animation: fade-up var(--duration-normal) var(--ease-native) 0.1s forwards; }
+    .civic-grid.animated > .civic-card:nth-child(3) { animation: fade-up var(--duration-normal) var(--ease-native) 0.15s forwards; }
+    .civic-grid.animated > .civic-card:nth-child(4) { animation: fade-up var(--duration-normal) var(--ease-native) 0.2s forwards; }
+    .civic-grid.animated > .civic-card:nth-child(5) { animation: fade-up var(--duration-normal) var(--ease-native) 0.25s forwards; }
+    .civic-grid.animated > .civic-card:nth-child(6) { animation: fade-up var(--duration-normal) var(--ease-native) 0.3s forwards; }
+    .civic-grid.animated > .civic-card:nth-child(n+7) { animation: fade-up var(--duration-normal) var(--ease-native) 0.35s forwards; }
+}
+
+
+/* ===========================================
+   5. BOTTOM SHEET (Native Modal)
+   =========================================== */
+
+.civic-bottom-sheet {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: var(--civic-bg-card, #ffffff);
+    border-radius: 16px 16px 0 0;
+    box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.2);
+    z-index: var(--z-dropdown, 1000);
+    transform: translateY(100%);
+    max-height: 90vh;
+    overflow: hidden;
+    padding-bottom: env(safe-area-inset-bottom, 0);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+    .civic-bottom-sheet {
+        transition: transform var(--duration-normal) var(--spring-smooth);
+    }
+}
+
+.civic-bottom-sheet.active {
+    transform: translateY(0);
+}
+
+.civic-bottom-sheet-handle {
+    width: 36px;
+    height: 4px;
+    background: var(--civic-border, #d1d5db);
+    border-radius: 2px;
+    margin: 12px auto;
+}
+
+.civic-bottom-sheet-content {
+    padding: 0 20px 20px;
+    overflow-y: auto;
+    max-height: calc(90vh - 60px);
+    overscroll-behavior: contain;
+}
+
+.civic-bottom-sheet-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 9999;
+    opacity: 0;
+    visibility: hidden;
+    -webkit-backdrop-filter: blur(4px);
+    backdrop-filter: blur(4px);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+    .civic-bottom-sheet-backdrop {
+        transition: opacity var(--duration-normal) ease, visibility var(--duration-normal) ease;
+    }
+}
+
+.civic-bottom-sheet-backdrop.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+body.dark-mode .civic-bottom-sheet {
+    background: var(--civic-bg-card, #1f2937);
+}
+
+
+/* ===========================================
+   6. NATIVE SHARE SHEET
+   =========================================== */
+
+.nexus-share-sheet {
+    position: fixed;
+    inset: 0;
+    z-index: 10001;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+}
+
+.nexus-share-sheet-backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+    opacity: 0;
+    -webkit-backdrop-filter: blur(4px);
+    backdrop-filter: blur(4px);
+}
+
+.nexus-share-sheet-content {
+    position: relative;
+    background: var(--civic-bg-card, #ffffff);
+    border-radius: 16px 16px 0 0;
+    width: 100%;
+    max-width: 500px;
+    transform: translateY(100%);
+    padding-bottom: env(safe-area-inset-bottom, 20px);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+    .nexus-share-sheet-backdrop {
+        transition: opacity var(--duration-normal) ease;
+    }
+
+    .nexus-share-sheet-content {
+        transition: transform var(--duration-normal) var(--spring-smooth);
+    }
+}
+
+.nexus-share-sheet.active .nexus-share-sheet-backdrop {
+    opacity: 1;
+}
+
+.nexus-share-sheet.active .nexus-share-sheet-content {
+    transform: translateY(0);
+}
+
+.nexus-share-sheet-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--civic-border, #e5e7eb);
+}
+
+.nexus-share-sheet-header h3 {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 600;
+}
+
+.nexus-share-close {
+    background: none;
+    border: none;
+    font-size: 24px;
+    color: var(--civic-text-muted, #6b7280);
+    cursor: pointer;
+    padding: 4px;
+    line-height: 1;
+}
+
+.nexus-share-close:focus {
+    /* GOV.UK Focus Pattern */
+    outline: 3px solid var(--govuk-focus-colour, #ffdd00);
+    outline-offset: 0;
+    background-color: var(--govuk-focus-colour, #ffdd00);
+    color: var(--govuk-focus-text-colour, #0b0c0c);
+    box-shadow: 0 -2px var(--govuk-focus-colour, #ffdd00), 0 4px var(--govuk-focus-text-colour, #0b0c0c);
+}
+
+.nexus-share-options {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    padding: 20px;
+}
+
+.nexus-share-option {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    padding: 16px 8px;
+    background: var(--civic-bg-page, #f3f4f6);
+    border: none;
+    border-radius: 12px;
+    color: var(--civic-text-main, #1f2937);
+    text-decoration: none;
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    min-height: 80px;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+    .nexus-share-option {
+        transition: transform var(--duration-fast) var(--spring-bounce),
+                    background var(--duration-fast) ease;
+    }
+
+    .nexus-share-option:active {
+        transform: scale(0.95);
+    }
+}
+
+.nexus-share-option:hover {
+    background: var(--civic-border, #e5e7eb);
+}
+
+.nexus-share-option:focus {
+    /* GOV.UK Focus Pattern */
+    outline: 3px solid var(--govuk-focus-colour, #ffdd00);
+    outline-offset: 0;
+    background-color: var(--govuk-focus-colour, #ffdd00);
+    color: var(--govuk-focus-text-colour, #0b0c0c);
+    box-shadow: 0 -2px var(--govuk-focus-colour, #ffdd00), 0 4px var(--govuk-focus-text-colour, #0b0c0c);
+}
+
+.nexus-share-option i {
+    font-size: 24px;
+}
+
+.nexus-share-option[href*="facebook"] i { color: #1877f2; }
+.nexus-share-option[href*="twitter"] i { color: #000000; }
+.nexus-share-option[href*="whatsapp"] i { color: #25d366; }
+.nexus-share-option[href*="mailto"] i { color: #ea4335; }
+
+
+/* ===========================================
+   7. SWIPE NAVIGATION INDICATOR
+   =========================================== */
+
+.civic-swipe-indicator {
+    position: fixed;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%) translateX(-100%);
+    width: 60px;
+    height: 60px;
+    background: var(--civic-bg-card, #ffffff);
+    border-radius: 0 30px 30px 0;
+    box-shadow: 4px 0 20px rgba(0, 0, 0, 0.15);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    z-index: 9998;
+    pointer-events: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+    .civic-swipe-indicator {
+        transition: transform var(--duration-fast) var(--ease-native),
+                    opacity var(--duration-fast) ease;
+    }
+}
+
+.civic-swipe-indicator.visible {
+    opacity: 1;
+    transform: translateY(-50%) translateX(-20px);
+}
+
+.civic-swipe-indicator.ready {
+    transform: translateY(-50%) translateX(0);
+}
+
+.civic-swipe-indicator svg {
+    width: 24px;
+    height: 24px;
+    fill: var(--civic-brand, #2563eb);
+}
+
+
+/* ===========================================
+   8. PROGRESS BAR (Page Loading)
+   =========================================== */
+
+.civic-progress-bar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: transparent;
+    z-index: 10002;
+    pointer-events: none;
+}
+
+.civic-progress-bar-inner {
+    height: 100%;
+    background: linear-gradient(90deg, var(--civic-brand, #2563eb), var(--civic-accent-purple, #8b5cf6));
+    width: 0;
+    box-shadow: 0 0 10px var(--civic-brand, #2563eb);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+    .civic-progress-bar-inner {
+        transition: width 0.2s ease;
+    }
+
+    .civic-progress-bar-inner.loading {
+        animation: progress-indeterminate 1.5s ease-in-out infinite;
+    }
+}
+
+@keyframes progress-indeterminate {
+    0% {
+        width: 0;
+        margin-left: 0;
+    }
+    50% {
+        width: 40%;
+        margin-left: 30%;
+    }
+    100% {
+        width: 0;
+        margin-left: 100%;
+    }
+}
+
+
+/* ===========================================
+   9. FORM INPUT ANIMATIONS
+   =========================================== */
+
+/* GOV.UK Focus Pattern for form inputs */
+.civic-input:focus,
+input[type="text"]:focus,
+input[type="email"]:focus,
+input[type="password"]:focus,
+input[type="tel"]:focus,
+select:focus,
+textarea:focus {
+    /* GOV.UK Focus Pattern */
+    outline: 3px solid var(--govuk-focus-colour, #ffdd00);
+    outline-offset: 0;
+    background-color: var(--govuk-focus-colour, #ffdd00);
+    color: var(--govuk-focus-text-colour, #0b0c0c);
+    box-shadow: inset 0 0 0 2px var(--govuk-focus-text-colour, #0b0c0c);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+    .civic-input,
+    input[type="text"],
+    input[type="email"],
+    input[type="password"],
+    input[type="tel"],
+    select,
+    textarea {
+        transition: border-color var(--duration-fast) ease,
+                    box-shadow var(--duration-fast) ease,
+                    transform var(--duration-fast) var(--spring-smooth);
+    }
+
+    .civic-input:focus,
+    input:focus,
+    select:focus,
+    textarea:focus {
+        transform: scale(1.01);
+    }
+}
+
+/* Input validation states */
+.civic-input.valid,
+input.valid {
+    border-color: var(--civic-accent-green, #10b981) !important;
+    box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+}
+
+.civic-input.invalid,
+input.invalid {
+    border-color: var(--civic-error, #ef4444) !important;
+    box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+    .civic-input.shake,
+    input.shake {
+        animation: input-shake 0.5s ease;
+    }
+}
+
+@keyframes input-shake {
+    0%, 100% { transform: translateX(0); }
+    20%, 60% { transform: translateX(-8px); }
+    40%, 80% { transform: translateX(8px); }
+}
+
+
+/* ===========================================
+   10. NOTIFICATION DOT PULSE
+   =========================================== */
+
+.civic-notification-dot {
+    position: absolute;
+    top: -2px;
+    right: -2px;
+    width: 12px;
+    height: 12px;
+    background: var(--civic-error, #ef4444);
+    border-radius: 50%;
+    border: 2px solid var(--civic-bg-card, #ffffff);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+    .civic-notification-dot {
+        animation: notification-pulse 2s ease-in-out infinite;
+    }
+}
+
+@keyframes notification-pulse {
+    0%, 100% {
+        transform: scale(1);
+        box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4);
+    }
+    50% {
+        transform: scale(1.1);
+        box-shadow: 0 0 0 8px rgba(239, 68, 68, 0);
+    }
+}
+
+
+/* ===========================================
+   11. SUCCESS/ERROR STATE ANIMATIONS
+   =========================================== */
+
+@media (prefers-reduced-motion: no-preference) {
+    .civic-success-icon {
+        animation: success-pop 0.4s var(--spring-bounce) forwards;
+    }
+
+    .civic-error-icon {
+        animation: error-shake 0.5s ease forwards;
+    }
+}
+
+@keyframes success-pop {
+    0% {
+        transform: scale(0);
+        opacity: 0;
+    }
+    50% {
+        transform: scale(1.2);
+    }
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+@keyframes error-shake {
+    0%, 100% { transform: translateX(0) rotate(0); }
+    20% { transform: translateX(-4px) rotate(-5deg); }
+    40% { transform: translateX(4px) rotate(5deg); }
+    60% { transform: translateX(-4px) rotate(-5deg); }
+    80% { transform: translateX(4px) rotate(5deg); }
+}
+
+
+/* ===========================================
+   12. SCROLL SNAP FOR HORIZONTAL CARDS
+   =========================================== */
+
+.civic-scroll-snap {
+    display: flex;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scroll-behavior: smooth;
+    gap: 16px;
+    padding: 8px 0;
+    margin: 0 -16px;
+    padding-left: 16px;
+    padding-right: 16px;
+}
+
+.civic-scroll-snap::-webkit-scrollbar {
+    display: none;
+}
+
+.civic-scroll-snap > * {
+    scroll-snap-align: start;
+    flex-shrink: 0;
+}
+
+
+/* ===========================================
+   13. DARK MODE TRANSITIONS
+   =========================================== */
+
+@media (prefers-reduced-motion: no-preference) {
+    body,
+    .civic-card,
+    .civic-header,
+    .civic-footer,
+    .civic-bottom-nav,
+    .civic-btn {
+        transition: background-color var(--duration-slow) ease,
+                    color var(--duration-slow) ease,
+                    border-color var(--duration-slow) ease;
+    }
+}
+
+
+/* ===========================================
+   14. CONTEXT MENU (Long Press)
+   =========================================== */
+
+.civic-context-menu {
+    background: var(--civic-bg-card, #ffffff);
+    border-radius: 12px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+    overflow: hidden;
+    min-width: 180px;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+    .civic-context-menu {
+        animation: context-menu-pop 0.2s var(--spring-bounce) forwards;
+    }
+}
+
+@keyframes context-menu-pop {
+    from {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(0.9);
+    }
+    to {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1);
+    }
+}
+
+.civic-context-menu button {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+    padding: 14px 18px;
+    background: none;
+    border: none;
+    font-size: 15px;
+    color: var(--civic-text-main, #1f2937);
+    cursor: pointer;
+    text-align: left;
+}
+
+.civic-context-menu button:hover {
+    background: var(--civic-bg-page, #f3f4f6);
+}
+
+.civic-context-menu button:active {
+    background: var(--civic-border, #e5e7eb);
+}
+
+.civic-context-menu button:focus {
+    /* GOV.UK Focus Pattern */
+    outline: 3px solid var(--govuk-focus-colour, #ffdd00);
+    outline-offset: 0;
+    background-color: var(--govuk-focus-colour, #ffdd00);
+    color: var(--govuk-focus-text-colour, #0b0c0c);
+    box-shadow: 0 -2px var(--govuk-focus-colour, #ffdd00), 0 4px var(--govuk-focus-text-colour, #0b0c0c);
+}
+
+.civic-context-menu button svg {
+    color: var(--civic-text-muted, #6b7280);
+}
+
+body.dark-mode .civic-context-menu {
+    background: var(--civic-bg-card, #1f2937);
+}
+
+body.dark-mode .civic-context-menu button:hover {
+    background: var(--civic-bg-page, #111827);
+}
+
+
+/* ===========================================
+   15. TURBO LOADING STATE
+   =========================================== */
+
+body.turbo-loading {
+    cursor: wait;
+}
+
+body.turbo-loading .civic-card,
+body.turbo-loading .civic-btn {
+    pointer-events: none;
+    opacity: 0.7;
+}
+
+
+/* ===========================================
+   16. VIEW TRANSITIONS API
+   Native-like page transitions
+   =========================================== */
+
+/* Enable View Transitions for the root */
+@view-transition {
+    navigation: auto;
+}
+
+/* Default page transition - fade and slide */
+::view-transition-old(root) {
+    animation: page-fade-out 0.2s ease-out forwards;
+}
+
+::view-transition-new(root) {
+    animation: page-fade-in 0.25s ease-out forwards;
+}
+
+@keyframes page-fade-out {
+    from {
+        opacity: 1;
+        transform: translateX(0);
+    }
+    to {
+        opacity: 0;
+        transform: translateX(-20px);
+    }
+}
+
+@keyframes page-fade-in {
+    from {
+        opacity: 0;
+        transform: translateX(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+/* Back navigation - reverse direction */
+::view-transition-old(root).back-nav {
+    animation: page-fade-in-reverse 0.2s ease-out forwards;
+}
+
+::view-transition-new(root).back-nav {
+    animation: page-fade-out-reverse 0.25s ease-out forwards;
+}
+
+@keyframes page-fade-out-reverse {
+    from {
+        opacity: 0;
+        transform: translateX(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes page-fade-in-reverse {
+    from {
+        opacity: 1;
+        transform: translateX(0);
+    }
+    to {
+        opacity: 0;
+        transform: translateX(20px);
+    }
+}
+
+/* Cards get their own view-transition-name for shared element transitions */
+.civic-card[data-listing-id] {
+    view-transition-name: var(--card-transition-name);
+}
+
+/* Hero transitions */
+.civicone-hero-banner {
+    view-transition-name: hero-banner;
+}
+
+::view-transition-old(hero-banner),
+::view-transition-new(hero-banner) {
+    animation-duration: 0.3s;
+}
+
+/* Respect reduced motion */
+@media (prefers-reduced-motion: reduce) {
+    ::view-transition-old(root),
+    ::view-transition-new(root) {
+        animation: none;
+    }
+
+    @view-transition {
+        navigation: none;
+    }
+}
+
+
+/* ===========================================
+   17. OFFLINE MODE INDICATOR
+   Shows when app is offline
+   =========================================== */
+
+.civic-offline-indicator {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+    color: white;
+    text-align: center;
+    padding: 8px 16px;
+    font-size: 13px;
+    font-weight: 600;
+    z-index: var(--z-dropdown, 1000);
+    transform: translateY(-100%);
+    transition: transform 0.3s var(--spring-snappy);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.civic-offline-indicator.visible {
+    transform: translateY(0);
+}
+
+.civic-offline-indicator svg {
+    width: 16px;
+    height: 16px;
+    flex-shrink: 0;
+}
+
+/* Adjust header position when offline banner is visible */
+body.is-offline .civic-utility-bar {
+    margin-top: 36px;
+}
+
+body.is-offline .civic-header {
+    top: 36px;
+}
+
+/* Back online indicator */
+.civic-online-indicator {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    color: white;
+    text-align: center;
+    padding: 8px 16px;
+    font-size: 13px;
+    font-weight: 600;
+    z-index: var(--z-dropdown, 1000);
+    transform: translateY(-100%);
+    transition: transform 0.3s var(--spring-snappy);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.civic-online-indicator.visible {
+    transform: translateY(0);
+}
+
+.civic-online-indicator svg {
+    width: 16px;
+    height: 16px;
+    flex-shrink: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .civic-offline-indicator,
+    .civic-online-indicator {
+        transition: none;
+    }
+}
+
+

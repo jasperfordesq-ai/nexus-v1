@@ -16,7 +16,17 @@ $adminPageIcon = 'fa-bars';
 
 // Include standalone admin header
 require dirname(__DIR__) . '/partials/admin-header.php';
+
+// Include menu builder JS
+$additionalJs = [
+    $basePath . '/assets/js/menu-builder-drag-drop.js',
+    $basePath . '/assets/js/menu-builder-validation.js'
+];
 ?>
+
+<!-- Load Menu Builder Scripts -->
+<script src="<?= $basePath ?>/assets/js/menu-builder-drag-drop.js"></script>
+<script src="<?= $basePath ?>/assets/js/menu-builder-validation.js"></script>
 
 <!-- Page Header -->
 <div class="admin-page-header">
@@ -68,7 +78,7 @@ if ($itemCount >= $maxItems * 0.8):
                 <p class="admin-card-subtitle">Drag to reorder, click to edit</p>
             </div>
         </div>
-        <div class="admin-card-body" style="padding: 0;">
+        <div class="admin-card-body admin-card-body--no-padding">
             <?php if (empty($menu['items'])): ?>
             <div class="admin-empty-state">
                 <div class="admin-empty-icon">
@@ -76,7 +86,7 @@ if ($itemCount >= $maxItems * 0.8):
                 </div>
                 <h3 class="admin-empty-title">No Menu Items</h3>
                 <p class="admin-empty-text">Add your first menu item to get started.</p>
-                <button onclick="addMenuItem()" class="admin-btn admin-btn-primary" style="margin-top: 1rem;">
+                <button onclick="addMenuItem()" class="admin-btn admin-btn-primary">
                     <i class="fa-solid fa-plus"></i> Add First Item
                 </button>
             </div>
@@ -120,7 +130,7 @@ if ($itemCount >= $maxItems * 0.8):
 function renderMenuItem($item, $depth = 0) {
     $indent = $depth * 2;
     ?>
-    <div class="menu-item-row" data-item-id="<?= $item['id'] ?>" data-depth="<?= $depth ?>" style="padding-left: <?= $indent ?>rem;">
+    <div class="menu-item-row" data-item-id="<?= $item['id'] ?>" data-depth="<?= $depth ?>">
         <div class="menu-item-drag">
             <i class="fa-solid fa-grip-vertical"></i>
         </div>
@@ -190,7 +200,7 @@ function renderPreviewItem($item) {
 ?>
 
 <!-- Add/Edit Item Modal -->
-<div id="itemModal" class="admin-modal" style="display: none;">
+<div id="itemModal" class="admin-modal admin-modal--hidden">
     <div class="admin-modal-overlay" onclick="closeItemModal()"></div>
     <div class="admin-modal-content">
         <div class="admin-modal-header">
@@ -224,7 +234,7 @@ function renderPreviewItem($item) {
                     <input type="text" name="url" id="item_url" placeholder="/path or https://external.com">
                 </div>
 
-                <div class="form-group" id="page_field" style="display: none;">
+                <div class="form-group form-group--hidden" id="page_field">
                     <label>Select Page</label>
                     <select name="page_id" id="item_page_id">
                         <option value="">-- Select Page --</option>
@@ -274,10 +284,10 @@ function renderPreviewItem($item) {
                 </div>
 
                 <details>
-                    <summary style="cursor: pointer; padding: 0.5rem 0; font-weight: 600;">
+                    <summary class="visibility-settings-summary">
                         <i class="fa-solid fa-eye"></i> Visibility Rules (Optional)
                     </summary>
-                    <div style="padding: 1rem 0;">
+                    <div class="visibility-settings-content">
                         <div class="form-group">
                             <label>
                                 <input type="checkbox" name="requires_auth" id="item_requires_auth" value="1">
@@ -311,7 +321,7 @@ function renderPreviewItem($item) {
 </div>
 
 <!-- Settings Modal -->
-<div id="settingsModal" class="admin-modal" style="display: none;">
+<div id="settingsModal" class="admin-modal admin-modal--hidden">
     <div class="admin-modal-overlay" onclick="closeSettingsModal()"></div>
     <div class="admin-modal-content">
         <div class="admin-modal-header">
@@ -534,14 +544,36 @@ const menuId = <?= $menu['id'] ?>;
 const basePath = '<?= $basePath ?>';
 const csrfToken = '<?= Csrf::generate() ?>';
 
+// Initialize validation
+const validator = new MenuBuilderValidation();
+
+// Initialize drag-and-drop (if items exist)
+let dragDrop = null;
+<?php if (!empty($menu['items'])): ?>
+document.addEventListener('DOMContentLoaded', function() {
+    dragDrop = new MenuBuilderDragDrop('#menuItemsList', {
+        menuId: menuId,
+        basePath: basePath,
+        csrfToken: csrfToken,
+        onReorder: function(newOrder) {
+            console.log('Menu reordered:', newOrder);
+        }
+    });
+});
+<?php endif; ?>
+
 function addMenuItem() {
+    validator.clearAllErrors();
     document.getElementById('itemModalTitle').textContent = 'Add Menu Item';
     document.getElementById('itemForm').reset();
     document.getElementById('item_id').value = '';
-    document.getElementById('itemModal').style.display = 'flex';
+    document.getElementById('itemModal').classList.remove('admin-modal--hidden');
+    updateItemFormFields();
 }
 
 function editMenuItem(itemId) {
+    validator.clearAllErrors();
+
     // Fetch item data and populate the form
     fetch(`${basePath}/admin/menus/item/${itemId}`)
         .then(response => response.json())
@@ -550,6 +582,7 @@ function editMenuItem(itemId) {
                 const item = data.item;
 
                 // Populate form fields
+                document.getElementById('itemModalTitle').textContent = 'Edit Menu Item';
                 document.getElementById('item_id').value = item.id || '';
                 document.getElementById('item_type').value = item.type || 'link';
                 document.getElementById('item_label').value = item.label || '';
@@ -576,7 +609,7 @@ function editMenuItem(itemId) {
                 updateItemFormFields();
 
                 // Open modal
-                document.getElementById('itemModal').style.display = 'flex';
+                document.getElementById('itemModal').classList.remove('admin-modal--hidden');
             } else {
                 alert('Error: Could not load menu item data');
             }
@@ -587,16 +620,39 @@ function editMenuItem(itemId) {
 }
 
 function closeItemModal() {
-    document.getElementById('itemModal').style.display = 'none';
+    validator.clearAllErrors();
+    document.getElementById('itemModal').classList.add('admin-modal--hidden');
 }
 
 function saveMenuItem() {
     const form = document.getElementById('itemForm');
     const formData = new FormData(form);
+
+    // Validate form
+    const validation = validator.validateMenuItemForm(formData);
+
+    if (!validation.valid) {
+        // Show errors
+        validator.showValidationSummary(validation.errors);
+        validation.errors.forEach(error => {
+            validator.showFieldError(error.field, error.message);
+        });
+        return;
+    }
+
+    // Clear any existing errors
+    validator.clearAllErrors();
+
     const itemId = document.getElementById('item_id').value;
     const url = itemId
         ? `${basePath}/admin/menus/item/update/${itemId}`
         : `${basePath}/admin/menus/item/add`;
+
+    // Show loading state
+    const saveBtn = event.target;
+    const originalText = saveBtn.innerHTML;
+    saveBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Saving...';
+    saveBtn.disabled = true;
 
     fetch(url, {
         method: 'POST',
@@ -608,15 +664,19 @@ function saveMenuItem() {
             location.reload();
         } else {
             alert('Error: ' + (data.error || 'Failed to save menu item'));
+            saveBtn.innerHTML = originalText;
+            saveBtn.disabled = false;
         }
     })
     .catch(error => {
         alert('Error: ' + error.message);
+        saveBtn.innerHTML = originalText;
+        saveBtn.disabled = false;
     });
 }
 
 function deleteMenuItem(itemId) {
-    if (!confirm('Delete this menu item?')) {
+    if (!confirm('Delete this menu item? This cannot be undone.')) {
         return;
     }
 
@@ -638,16 +698,39 @@ function deleteMenuItem(itemId) {
 }
 
 function openSettingsModal() {
-    document.getElementById('settingsModal').style.display = 'flex';
+    validator.clearAllErrors();
+    document.getElementById('settingsModal').classList.remove('admin-modal--hidden');
 }
 
 function closeSettingsModal() {
-    document.getElementById('settingsModal').style.display = 'none';
+    validator.clearAllErrors();
+    document.getElementById('settingsModal').classList.add('admin-modal--hidden');
 }
 
 function saveMenuSettings() {
     const form = document.getElementById('settingsForm');
     const formData = new FormData(form);
+
+    // Validate form
+    const validation = validator.validateMenuSettingsForm(formData);
+
+    if (!validation.valid) {
+        // Show errors
+        validator.showValidationSummary(validation.errors);
+        validation.errors.forEach(error => {
+            validator.showFieldError(error.field, error.message);
+        });
+        return;
+    }
+
+    // Clear any existing errors
+    validator.clearAllErrors();
+
+    // Show loading state
+    const saveBtn = event.target;
+    const originalText = saveBtn.innerHTML;
+    saveBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Saving...';
+    saveBtn.disabled = true;
 
     fetch(`${basePath}/admin/menus/update/${menuId}`, {
         method: 'POST',
@@ -659,6 +742,8 @@ function saveMenuSettings() {
             location.reload();
         } else {
             alert('Error: ' + (data.error || 'Failed to save settings'));
+            saveBtn.innerHTML = originalText;
+            saveBtn.disabled = false;
         }
     });
 }
@@ -669,16 +754,75 @@ function updateItemFormFields() {
     const pageField = document.getElementById('page_field');
 
     if (type === 'page') {
-        urlField.style.display = 'none';
-        pageField.style.display = 'block';
+        urlField.classList.add('form-group--hidden');
+        pageField.classList.remove('form-group--hidden');
     } else if (type === 'dropdown' || type === 'divider') {
-        urlField.style.display = 'none';
-        pageField.style.display = 'none';
+        urlField.classList.add('form-group--hidden');
+        pageField.classList.add('form-group--hidden');
     } else {
-        urlField.style.display = 'block';
-        pageField.style.display = 'none';
+        urlField.classList.remove('form-group--hidden');
+        pageField.classList.add('form-group--hidden');
     }
 }
+
+// Add real-time validation on blur
+document.addEventListener('DOMContentLoaded', function() {
+    // Validate label
+    const labelField = document.getElementById('item_label');
+    if (labelField) {
+        labelField.addEventListener('blur', function() {
+            const validation = validator.validateField('label', this.value);
+            if (!validation.valid) {
+                validator.showFieldError('label', validation.message);
+            } else {
+                validator.clearFieldError('label');
+            }
+        });
+    }
+
+    // Validate URL
+    const urlField = document.getElementById('item_url');
+    if (urlField) {
+        urlField.addEventListener('blur', function() {
+            const validation = validator.validateURL(this.value);
+            if (!validation.valid) {
+                validator.showFieldError('url', validation.message);
+            } else {
+                validator.clearFieldError('url');
+            }
+        });
+    }
+
+    // Validate icon
+    const iconField = document.getElementById('item_icon');
+    if (iconField) {
+        iconField.addEventListener('blur', function() {
+            if (this.value.trim()) {
+                const validation = validator.validateIcon(this.value);
+                if (!validation.valid) {
+                    validator.showFieldError('icon', validation.message);
+                } else {
+                    validator.clearFieldError('icon');
+                }
+            }
+        });
+    }
+
+    // Validate CSS class
+    const cssClassField = document.getElementById('item_css_class');
+    if (cssClassField) {
+        cssClassField.addEventListener('blur', function() {
+            if (this.value.trim()) {
+                const validation = validator.validateCssClass(this.value);
+                if (!validation.valid) {
+                    validator.showFieldError('css_class', validation.message);
+                } else {
+                    validator.clearFieldError('css_class');
+                }
+            }
+        });
+    }
+});
 </script>
 
 <?php require dirname(__DIR__) . '/partials/admin-footer.php'; ?>

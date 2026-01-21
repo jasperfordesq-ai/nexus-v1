@@ -1,0 +1,9 @@
+/**
+ * CivicOne Blog Utilities
+ * Extracted from inline styles in views/civicone/blog/partials/feed-items.php
+ */
+
+/* News card link - remove text decoration */
+.news-card-link {
+    text-decoration: none;
+}

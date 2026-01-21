@@ -1,0 +1,47 @@
+{
+  "env": {
+    "browser": true,
+    "es2021": true
+  },
+  "extends": "eslint:recommended",
+  "parserOptions": {
+    "ecmaVersion": "latest",
+    "sourceType": "module"
+  },
+  "rules": {
+    "no-inline-styles": "off",
+    "no-unused-vars": ["warn", { "argsIgnorePattern": "^_" }],
+    "no-console": ["warn", { "allow": ["warn", "error"] }],
+    "prefer-const": "warn",
+    "no-var": "warn"
+  },
+  "overrides": [
+    {
+      "files": ["**/*.js"],
+      "rules": {
+        "no-restricted-syntax": [
+          "error",
+          {
+            "selector": "CallExpression[callee.object.name='style'][callee.property.name='display']",
+            "message": "Avoid using element.style.display. Use CSS classes with classList instead (per CLAUDE.md)."
+          },
+          {
+            "selector": "AssignmentExpression[left.object.property.name='style'][left.property.name='display']",
+            "message": "Avoid using element.style.display = 'value'. Use CSS classes with classList instead (per CLAUDE.md)."
+          },
+          {
+            "selector": "MemberExpression[object.property.name='style'][property.name=/^(padding|margin|color|background|width|height|fontSize|fontWeight)$/]",
+            "message": "Avoid manipulating inline styles directly. Use CSS classes with classList instead (per CLAUDE.md)."
+          }
+        ]
+      }
+    }
+  ],
+  "ignorePatterns": [
+    "**/*.min.js",
+    "**/node_modules/**",
+    "**/vendor/**",
+    "**/_archived/**",
+    "**/govuk-frontend-ref/**"
+  ]
+}

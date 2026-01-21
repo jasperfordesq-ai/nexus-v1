@@ -20,6 +20,47 @@ class Menu
     }
 
     /**
+     * Get paginated menus
+     */
+    public static function paginate($tenantId = null, $page = 1, $perPage = 20)
+    {
+        $tenantId = $tenantId ?? TenantContext::getId();
+        $db = Database::getConnection();
+
+        // Get total count
+        $countStmt = $db->prepare("SELECT COUNT(*) as total FROM menus WHERE tenant_id = ?");
+        $countStmt->execute([$tenantId]);
+        $total = $countStmt->fetch()['total'];
+
+        // Calculate pagination
+        $totalPages = max(1, ceil($total / $perPage));
+        $page = max(1, min($page, $totalPages));
+        $offset = ($page - 1) * $perPage;
+
+        // Get paginated results
+        $stmt = $db->prepare("
+            SELECT * FROM menus
+            WHERE tenant_id = ?
+            ORDER BY location ASC, id ASC
+            LIMIT ? OFFSET ?
+        ");
+        $stmt->execute([$tenantId, $perPage, $offset]);
+        $menus = $stmt->fetchAll();
+
+        return [
+            'data' => $menus,
+            'pagination' => [
+                'current_page' => $page,
+                'per_page' => $perPage,
+                'total' => $total,
+                'total_pages' => $totalPages,
+                'has_prev' => $page > 1,
+                'has_next' => $page < $totalPages
+            ]
+        ];
+    }
+
+    /**
      * Find a menu by ID
      */
     public static function find($id, $tenantId = null)

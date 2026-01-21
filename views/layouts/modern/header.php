@@ -96,6 +96,8 @@ try {
     <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/mobile-design-tokens.min.css?v=<?= $cssVersionTimestamp ?>">
     <!-- MOBILE ACCESSIBILITY FIXES (WCAG 2.1 AAA touch target compliance) -->
     <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/mobile-accessibility-fixes.min.css?v=<?= $cssVersionTimestamp ?>">
+    <!-- MOBILE LOADING STATES (Enhanced loading feedback and skeleton screens) -->
+    <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/mobile-loading-states.min.css?v=<?= $cssVersionTimestamp ?>">
     <!-- Theme Transitions - Smooth dark/light mode switching -->
     <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/theme-transitions.min.css?v=<?= $cssVersionTimestamp ?>">
     <!-- Base CSS - CSS variables, tokens, and global resets -->

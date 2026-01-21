@@ -1,0 +1,56 @@
+/**
+ * Admin Menu Builder Styles
+ * Extracted from inline styles in views/modern/admin/menus/builder.php
+ */
+
+/* Card body zero padding for menu items list */
+.menu-builder-layout .admin-card-body--no-padding {
+    padding: 0;
+}
+
+/* Empty state button spacing */
+.admin-empty-state .admin-btn {
+    margin-top: 1rem;
+}
+
+/* Menu item row indentation - dynamic via data attribute */
+.menu-item-row[data-depth="0"] {
+    padding-left: 0;
+}
+
+.menu-item-row[data-depth="1"] {
+    padding-left: 2rem;
+}
+
+.menu-item-row[data-depth="2"] {
+    padding-left: 4rem;
+}
+
+.menu-item-row[data-depth="3"] {
+    padding-left: 6rem;
+}
+
+.menu-item-row[data-depth="4"] {
+    padding-left: 8rem;
+}
+
+/* Modal hidden state */
+.admin-modal--hidden {
+    display: none;
+}
+
+/* Form field conditional display */
+.form-group--hidden {
+    display: none;
+}
+
+/* Visibility settings summary */
+.visibility-settings-summary {
+    cursor: pointer;
+    padding: 0.5rem 0;
+    font-weight: 600;
+}
+
+.visibility-settings-content {
+    padding: 1rem 0;
+}

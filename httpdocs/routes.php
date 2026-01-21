@@ -1303,7 +1303,9 @@ $router->add('POST', '/admin/menus/item/add', 'Nexus\Controllers\Admin\MenuContr
 $router->add('GET', '/admin/menus/item/{id}', 'Nexus\Controllers\Admin\MenuController@getItem');
 $router->add('POST', '/admin/menus/item/update/{id}', 'Nexus\Controllers\Admin\MenuController@updateItem');
 $router->add('POST', '/admin/menus/item/delete/{id}', 'Nexus\Controllers\Admin\MenuController@deleteItem');
-$router->add('POST', '/admin/menus/reorder', 'Nexus\Controllers\Admin\MenuController@reorder');
+$router->add('POST', '/admin/menus/items/reorder', 'Nexus\Controllers\Admin\MenuController@reorder');
+$router->add('POST', '/admin/menus/cache/clear', 'Nexus\Controllers\Admin\MenuController@clearCache');
+$router->add('POST', '/admin/menus/bulk', 'Nexus\Controllers\Admin\MenuController@bulk');
 
 // Admin Plans (Subscription Manager)
 $router->add('GET', '/admin/plans', 'Nexus\Controllers\Admin\PlanController@index');

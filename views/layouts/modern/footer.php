@@ -318,25 +318,25 @@ if (file_exists($envPath)) {
 
 <?php if (isset($_SESSION['user_id'])): ?>
     <!-- Biometric Setup Prompt (Shows once after login on supported devices) -->
-    <div id="biometric-setup-modal" style="display:none; position:fixed; inset:0; z-index:10001; background:rgba(0,0,0,0.6); backdrop-filter:blur(4px); -webkit-backdrop-filter:blur(4px);">
-        <div style="position:absolute; bottom:0; left:0; right:0; background:linear-gradient(to bottom, #1e293b, #0f172a); border-radius:20px 20px 0 0; padding:24px; padding-bottom:max(24px, env(safe-area-inset-bottom)); animation:slideUp 0.3s ease;">
-            <div style="width:40px; height:4px; background:rgba(255,255,255,0.2); border-radius:2px; margin:0 auto 20px;"></div>
+    <div id="biometric-setup-modal">
+        <div class="biometric-modal-content">
+            <div class="biometric-modal-handle"></div>
 
-            <div style="text-align:center; margin-bottom:20px;">
-                <div style="width:64px; height:64px; background:linear-gradient(135deg, #6366f1, #8b5cf6); border-radius:16px; display:flex; align-items:center; justify-content:center; margin:0 auto 16px;">
+            <div class="biometric-modal-header">
+                <div class="biometric-modal-icon">
                     <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
                         <path d="M12 11c0 3.517-1.009 6.799-2.753 9.571m-3.44-2.04l.054-.09A13.916 13.916 0 008 11a4 4 0 118 0c0 1.017-.07 2.019-.203 3m-2.118 6.844A21.88 21.88 0 0015.171 17m3.839 1.132c.645-2.266.99-4.659.99-7.132A8 8 0 008 4.07M3 15.364c.64-1.319 1-2.8 1-4.364a6 6 0 0112 0c0 .894-.074 1.771-.214 2.626M5 11a7 7 0 1114 0"></path>
                     </svg>
                 </div>
-                <h3 style="margin:0 0 8px; font-size:1.25rem; font-weight:700; color:#f1f5f9;">Enable Biometric Login</h3>
-                <p style="margin:0; font-size:0.9rem; color:#94a3b8; line-height:1.5;">Sign in instantly with your fingerprint or Face ID next time. Fast, secure, and convenient.</p>
+                <h3 class="biometric-modal-title">Enable Biometric Login</h3>
+                <p class="biometric-modal-description">Sign in instantly with your fingerprint or Face ID next time. Fast, secure, and convenient.</p>
             </div>
 
-            <button id="btn-setup-biometric-now" style="width:100%; padding:16px; background:linear-gradient(135deg, #6366f1, #8b5cf6); color:white; border:none; border-radius:12px; font-size:1rem; font-weight:700; cursor:pointer; margin-bottom:12px; display:flex; align-items:center; justify-content:center; gap:8px;">
+            <button id="btn-setup-biometric-now">
                 <i class="fas fa-fingerprint"></i> Set Up Now
             </button>
 
-            <button id="btn-skip-biometric" style="width:100%; padding:14px; background:transparent; color:#94a3b8; border:none; border-radius:12px; font-size:0.9rem; cursor:pointer;">
+            <button id="btn-skip-biometric">
                 Maybe Later
             </button>
         </div>
@@ -374,7 +374,7 @@ if (file_exists($envPath)) {
                     // Only show prompt if user has NO credentials at all
                     // If they have credentials on another device, let them add more via Settings
                     if (!data.registered || data.count === 0) {
-                        document.getElementById('biometric-setup-modal').style.display = 'block';
+                        document.getElementById('biometric-setup-modal').classList.add('active');
                     }
                     // If user already has credentials, don't show popup - they can add this device via Settings > Security
                 } catch (e) {
@@ -436,7 +436,7 @@ if (file_exists($envPath)) {
                     if (verifyResponse.ok) {
                         // Mark as enrolled to prevent re-prompting
                         sessionStorage.setItem('biometric_enrolled', '1');
-                        document.getElementById('biometric-setup-modal').style.display = 'none';
+                        document.getElementById('biometric-setup-modal').classList.remove('active');
 
                         // Show success toast
                         if (window.NexusMobile && NexusMobile.showToast) {
@@ -460,7 +460,7 @@ if (file_exists($envPath)) {
             // Skip button
             document.getElementById('btn-skip-biometric')?.addEventListener('click', function() {
                 sessionStorage.setItem('biometric_prompt_dismissed', '1');
-                document.getElementById('biometric-setup-modal').style.display = 'none';
+                document.getElementById('biometric-setup-modal').classList.remove('active');
             });
 
             // Close on backdrop click

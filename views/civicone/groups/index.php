@@ -25,7 +25,7 @@ require __DIR__ . '/../../layouts/civicone/partials/breadcrumb.php';
                 <p class="civicone-body-l">Connect with community groups and timebanking hubs in your area.</p>
             </div>
             <div class="civicone-grid-column-one-third">
-                <a href="<?= $basePath ?>/create-group" class="civicone-button civicone-button--primary" style="margin-top: 20px;">
+                <a href="<?= $basePath ?>/create-group" class="civicone-button civicone-button--primary">
                     Start a Hub
                 </a>
             </div>
@@ -80,7 +80,7 @@ require __DIR__ . '/../../layouts/civicone/partials/breadcrumb.php';
                             </fieldset>
                         </div>
 
-                        <button type="submit" class="civicone-button civicone-button--secondary" style="width: 100%;">
+                        <button type="submit" class="civicone-button civicone-button--secondary button-full-width">
                             Apply filters
                         </button>
                     </form>
@@ -125,7 +125,7 @@ require __DIR__ . '/../../layouts/civicone/partials/breadcrumb.php';
                     </p>
                 </div>
 
-                <!-- Results: Card Grid (Groups are visual, so cards are appropriate) -->
+                <!-- Results: List Layout (following WCAG 2.1 AA Directory/List Template) -->
                 <?php if (empty($groups)): ?>
                     <div class="civicone-empty-state">
                         <svg class="civicone-empty-icon" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
@@ -138,25 +138,25 @@ require __DIR__ . '/../../layouts/civicone/partials/breadcrumb.php';
                         <p class="civicone-body">Try adjusting your filters or check back later.</p>
                     </div>
                 <?php else: ?>
-                    <div class="civicone-groups-card-grid" role="list">
+                    <ul class="civicone-results-list" id="groups-list" role="list">
                         <?php foreach ($groups as $group): ?>
                             <?php
                             $gName = htmlspecialchars($group['name']);
-                            $gDesc = htmlspecialchars(substr($group['description'] ?? 'No description available.', 0, 100));
-                            if (strlen($group['description'] ?? '') > 100) {
+                            $gDesc = htmlspecialchars(substr($group['description'] ?? 'No description available.', 0, 150));
+                            if (strlen($group['description'] ?? '') > 150) {
                                 $gDesc .= '...';
                             }
                             $hasImg = !empty($group['image_path']);
                             $memberCount = $group['member_count'] ?? 0;
                             ?>
-                            <article class="civicone-group-card" role="listitem">
-                                <!-- Image Section -->
-                                <div class="civicone-group-card__image">
+                            <li class="civicone-group-item">
+                                <!-- Group Image/Avatar -->
+                                <div class="civicone-group-item__avatar">
                                     <?php if ($hasImg): ?>
-                                        <img src="<?= htmlspecialchars($group['image_path']) ?>" alt="" class="civicone-group-card__avatar">
+                                        <img src="<?= htmlspecialchars($group['image_path']) ?>" alt="" class="civicone-avatar civicone-avatar--large">
                                     <?php else: ?>
-                                        <div class="civicone-group-card__placeholder" aria-hidden="true">
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                        <div class="civicone-avatar civicone-avatar--large civicone-avatar--placeholder">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                                                 <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
                                                 <circle cx="9" cy="7" r="4"></circle>
                                                 <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
@@ -166,18 +166,18 @@ require __DIR__ . '/../../layouts/civicone/partials/breadcrumb.php';
                                     <?php endif; ?>
                                 </div>
 
-                                <!-- Content Section -->
-                                <div class="civicone-group-card__content">
-                                    <h3 class="civicone-group-card__title">
+                                <!-- Group Content -->
+                                <div class="civicone-group-item__content">
+                                    <h3 class="civicone-group-item__name">
                                         <a href="<?= $basePath ?>/groups/<?= $group['id'] ?>" class="civicone-link">
                                             <?= $gName ?>
                                         </a>
                                     </h3>
 
-                                    <p class="civicone-group-card__description"><?= $gDesc ?></p>
+                                    <p class="civicone-group-item__description"><?= $gDesc ?></p>
 
                                     <?php if ($memberCount > 0): ?>
-                                    <p class="civicone-group-card__meta">
+                                    <p class="civicone-group-item__meta">
                                         <svg class="civicone-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
                                             <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
                                             <circle cx="9" cy="7" r="4"></circle>
@@ -187,16 +187,19 @@ require __DIR__ . '/../../layouts/civicone/partials/breadcrumb.php';
                                         <?= $memberCount ?> <?= $memberCount === 1 ? 'member' : 'members' ?>
                                     </p>
                                     <?php endif; ?>
+                                </div>
 
+                                <!-- Group Actions -->
+                                <div class="civicone-group-item__actions">
                                     <a href="<?= $basePath ?>/groups/<?= $group['id'] ?>"
-                                       class="civicone-button civicone-button--secondary civicone-group-card__action"
+                                       class="civicone-button civicone-button--secondary"
                                        aria-label="Visit <?= $gName ?> hub">
                                         Visit Hub
                                     </a>
                                 </div>
-                            </article>
+                            </li>
                         <?php endforeach; ?>
-                    </div>
+                    </ul>
                 <?php endif; ?>
 
                 <!-- Pagination -->

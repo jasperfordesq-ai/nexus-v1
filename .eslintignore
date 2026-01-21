@@ -1,0 +1,24 @@
+# ESLint ignore patterns
+# Enforces CLAUDE.md CSS organization rules
+
+# Minified files
+**/*.min.js
+
+# Dependencies
+node_modules/
+vendor/
+
+# Archived/backup files
+**/_archived/
+**/backups/
+**/_backup/
+
+# External libraries
+govuk-frontend-ref/
+
+# Build output
+dist/
+build/
+
+# Test debug files (temporary)
+tests/debug/

@@ -46,7 +46,7 @@ class MenuController
     }
 
     /**
-     * List all menus
+     * List all menus (with optional pagination)
      */
     public function index()
     {
@@ -54,12 +54,26 @@ class MenuController
         $tenantId = TenantContext::getId();
 
         try {
-            $menus = Menu::all($tenantId);
+            // Check if pagination is requested
+            $page = isset($_GET['page']) ? max(1, (int)$_GET['page']) : 1;
+            $perPage = isset($_GET['per_page']) ? max(5, min(100, (int)$_GET['per_page'])) : 20;
+
+            // Use pagination if page parameter exists, otherwise get all
+            if (isset($_GET['page'])) {
+                $result = Menu::paginate($tenantId, $page, $perPage);
+                $menus = $result['data'];
+                $pagination = $result['pagination'];
+            } else {
+                $menus = Menu::all($tenantId);
+                $pagination = null;
+            }
+
             $planStatus = PayPlanService::getPlanStatus($tenantId);
             $canCreateMore = PayPlanService::validateMenuCreation($tenantId);
 
             View::render('admin/menus/index', [
                 'menus' => $menus,
+                'pagination' => $pagination,
                 'plan_status' => $planStatus,
                 'can_create_more' => $canCreateMore
             ]);
@@ -221,10 +235,19 @@ class MenuController
             exit;
         }
 
+        // Validate menu settings
+        $validation = self::validateMenuSettings($_POST);
+        if (!$validation['valid']) {
+            header('Content-Type: application/json');
+            http_response_code(400);
+            echo json_encode(['success' => false, 'error' => $validation['error'], 'field' => $validation['field'] ?? null]);
+            exit;
+        }
+
         $data = [
-            'name' => $_POST['name'] ?? '',
-            'slug' => $_POST['slug'] ?? '',
-            'description' => $_POST['description'] ?? '',
+            'name' => trim($_POST['name'] ?? ''),
+            'slug' => trim($_POST['slug'] ?? ''),
+            'description' => trim($_POST['description'] ?? ''),
             'location' => $_POST['location'] ?? 'header-main',
             'layout' => !empty($_POST['layout']) ? $_POST['layout'] : null,
             'min_plan_tier' => (int)($_POST['min_plan_tier'] ?? 0),
@@ -327,6 +350,15 @@ class MenuController
             exit;
         }
 
+        // Validate input data
+        $validation = self::validateMenuItemData($_POST);
+        if (!$validation['valid']) {
+            header('Content-Type: application/json');
+            http_response_code(400);
+            echo json_encode(['success' => false, 'error' => $validation['error'], 'field' => $validation['field'] ?? null]);
+            exit;
+        }
+
         $menuId = (int)$_POST['menu_id'];
 
         // Verify menu belongs to tenant
@@ -353,13 +385,13 @@ class MenuController
         $data = [
             'menu_id' => $menuId,
             'parent_id' => !empty($_POST['parent_id']) ? (int)$_POST['parent_id'] : null,
-            'type' => $_POST['type'] ?? 'link',
-            'label' => $_POST['label'] ?? '',
-            'url' => $_POST['url'] ?? null,
+            'type' => $validation['data']['type'],
+            'label' => $validation['data']['label'],
+            'url' => $validation['data']['url'],
             'route_name' => $_POST['route_name'] ?? null,
             'page_id' => !empty($_POST['page_id']) ? (int)$_POST['page_id'] : null,
-            'icon' => $_POST['icon'] ?? null,
-            'css_class' => $_POST['css_class'] ?? null,
+            'icon' => $validation['data']['icon'],
+            'css_class' => $validation['data']['css_class'],
             'target' => $_POST['target'] ?? '_self',
             'sort_order' => (int)($_POST['sort_order'] ?? 0),
             'visibility_rules' => self::parseVisibilityRules($_POST),
@@ -415,15 +447,24 @@ class MenuController
             exit;
         }
 
+        // Validate input data
+        $validation = self::validateMenuItemData($_POST);
+        if (!$validation['valid']) {
+            header('Content-Type: application/json');
+            http_response_code(400);
+            echo json_encode(['success' => false, 'error' => $validation['error'], 'field' => $validation['field'] ?? null]);
+            exit;
+        }
+
         $data = [
             'parent_id' => !empty($_POST['parent_id']) ? (int)$_POST['parent_id'] : null,
-            'type' => $_POST['type'] ?? 'link',
-            'label' => $_POST['label'] ?? '',
-            'url' => $_POST['url'] ?? null,
+            'type' => $validation['data']['type'],
+            'label' => $validation['data']['label'],
+            'url' => $validation['data']['url'],
             'route_name' => $_POST['route_name'] ?? null,
             'page_id' => !empty($_POST['page_id']) ? (int)$_POST['page_id'] : null,
-            'icon' => $_POST['icon'] ?? null,
-            'css_class' => $_POST['css_class'] ?? null,
+            'icon' => $validation['data']['icon'],
+            'css_class' => $validation['data']['css_class'],
             'target' => $_POST['target'] ?? '_self',
             'sort_order' => (int)($_POST['sort_order'] ?? 0),
             'visibility_rules' => self::parseVisibilityRules($_POST),
@@ -588,5 +629,232 @@ class MenuController
             'external' => 'External URL',
             'divider' => 'Divider'
         ];
+    }
+
+    /**
+     * Helper: Validate menu item data (server-side validation)
+     */
+    private static function validateMenuItemData($data)
+    {
+        $errors = [];
+        $sanitized = [];
+
+        // Validate label (required, 1-100 chars)
+        $label = trim($data['label'] ?? '');
+        if (empty($label)) {
+            return ['valid' => false, 'error' => 'Label is required', 'field' => 'label'];
+        }
+        if (strlen($label) > 100) {
+            return ['valid' => false, 'error' => 'Label must be 100 characters or less', 'field' => 'label'];
+        }
+        $sanitized['label'] = htmlspecialchars($label, ENT_QUOTES, 'UTF-8');
+
+        // Validate type
+        $type = $data['type'] ?? 'link';
+        $validTypes = ['link', 'dropdown', 'page', 'route', 'external', 'divider'];
+        if (!in_array($type, $validTypes)) {
+            return ['valid' => false, 'error' => 'Invalid menu item type', 'field' => 'type'];
+        }
+        $sanitized['type'] = $type;
+
+        // Validate URL (if applicable)
+        $url = trim($data['url'] ?? '');
+        if (!empty($url) && $type !== 'page' && $type !== 'dropdown' && $type !== 'divider') {
+            // Check for dangerous protocols
+            $dangerousProtocols = ['javascript:', 'data:', 'vbscript:', 'file:', 'about:'];
+            $lowerUrl = strtolower($url);
+            foreach ($dangerousProtocols as $protocol) {
+                if (strpos($lowerUrl, $protocol) === 0) {
+                    return ['valid' => false, 'error' => 'Dangerous URL protocol detected', 'field' => 'url'];
+                }
+            }
+
+            // Check for valid start
+            if (!preg_match('/^(\/|#|https?:\/\/)/', $url)) {
+                return ['valid' => false, 'error' => 'URL must start with /, #, http://, or https://', 'field' => 'url'];
+            }
+
+            // Check length
+            if (strlen($url) > 500) {
+                return ['valid' => false, 'error' => 'URL is too long (max 500 characters)', 'field' => 'url'];
+            }
+
+            $sanitized['url'] = filter_var($url, FILTER_SANITIZE_URL);
+        } else {
+            $sanitized['url'] = null;
+        }
+
+        // Validate icon (FontAwesome class format)
+        $icon = trim($data['icon'] ?? '');
+        if (!empty($icon)) {
+            // Must match fa-{style} fa-{icon-name} format
+            if (!preg_match('/^fa-(solid|regular|light|thin|duotone|brands)\s+fa-[a-z0-9-]+$/i', $icon)) {
+                return ['valid' => false, 'error' => 'Icon must be a valid FontAwesome class (e.g., fa-solid fa-home)', 'field' => 'icon'];
+            }
+            if (strlen($icon) > 100) {
+                return ['valid' => false, 'error' => 'Icon class is too long (max 100 characters)', 'field' => 'icon'];
+            }
+            $sanitized['icon'] = htmlspecialchars($icon, ENT_QUOTES, 'UTF-8');
+        } else {
+            $sanitized['icon'] = null;
+        }
+
+        // Validate CSS class (alphanumeric, hyphens, underscores, spaces only)
+        $cssClass = trim($data['css_class'] ?? '');
+        if (!empty($cssClass)) {
+            if (!preg_match('/^[a-zA-Z0-9_\- ]+$/', $cssClass)) {
+                return ['valid' => false, 'error' => 'CSS class contains invalid characters', 'field' => 'css_class'];
+            }
+            if (strlen($cssClass) > 200) {
+                return ['valid' => false, 'error' => 'CSS class is too long (max 200 characters)', 'field' => 'css_class'];
+            }
+            $sanitized['css_class'] = htmlspecialchars($cssClass, ENT_QUOTES, 'UTF-8');
+        } else {
+            $sanitized['css_class'] = null;
+        }
+
+        return ['valid' => true, 'data' => $sanitized];
+    }
+
+    /**
+     * Helper: Validate menu settings data
+     */
+    private static function validateMenuSettings($data)
+    {
+        // Validate name (required, 1-100 chars)
+        $name = trim($data['name'] ?? '');
+        if (empty($name)) {
+            return ['valid' => false, 'error' => 'Menu name is required', 'field' => 'name'];
+        }
+        if (strlen($name) > 100) {
+            return ['valid' => false, 'error' => 'Menu name must be 100 characters or less', 'field' => 'name'];
+        }
+
+        // Validate slug (required, lowercase alphanumeric and hyphens only)
+        $slug = trim($data['slug'] ?? '');
+        if (empty($slug)) {
+            return ['valid' => false, 'error' => 'Slug is required', 'field' => 'slug'];
+        }
+        if (!preg_match('/^[a-z0-9-]+$/', $slug)) {
+            return ['valid' => false, 'error' => 'Slug must contain only lowercase letters, numbers, and hyphens', 'field' => 'slug'];
+        }
+        if (strlen($slug) > 100) {
+            return ['valid' => false, 'error' => 'Slug must be 100 characters or less', 'field' => 'slug'];
+        }
+
+        return ['valid' => true];
+    }
+
+    /**
+     * Clear all menu cache for current tenant
+     */
+    public function clearCache()
+    {
+        $this->checkAdmin(true);
+
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            header('Content-Type: application/json');
+            echo json_encode(['success' => false, 'error' => 'Invalid request method']);
+            exit;
+        }
+
+        if (!Csrf::verify($_POST['csrf_token'] ?? '')) {
+            header('Content-Type: application/json');
+            echo json_encode(['success' => false, 'error' => 'Invalid CSRF token']);
+            exit;
+        }
+
+        $tenantId = TenantContext::getId();
+
+        try {
+            MenuManager::clearCache($tenantId);
+
+            header('Content-Type: application/json');
+            echo json_encode([
+                'success' => true,
+                'message' => 'Menu cache cleared successfully'
+            ]);
+        } catch (\Exception $e) {
+            header('Content-Type: application/json');
+            http_response_code(500);
+            echo json_encode([
+                'success' => false,
+                'error' => 'Failed to clear cache: ' . $e->getMessage()
+            ]);
+        }
+    }
+
+    /**
+     * Bulk operations on menus (activate, deactivate, delete)
+     */
+    public function bulk()
+    {
+        $this->checkAdmin(true);
+        $tenantId = TenantContext::getId();
+
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            header('Content-Type: application/json');
+            echo json_encode(['success' => false, 'error' => 'Invalid request method']);
+            exit;
+        }
+
+        if (!Csrf::verify($_POST['csrf_token'] ?? '')) {
+            header('Content-Type: application/json');
+            echo json_encode(['success' => false, 'error' => 'Invalid CSRF token']);
+            exit;
+        }
+
+        $action = $_POST['action'] ?? '';
+        $menuIds = json_decode($_POST['menu_ids'] ?? '[]', true);
+
+        if (!in_array($action, ['activate', 'deactivate', 'delete'])) {
+            header('Content-Type: application/json');
+            echo json_encode(['success' => false, 'error' => 'Invalid action']);
+            exit;
+        }
+
+        if (!is_array($menuIds) || empty($menuIds)) {
+            header('Content-Type: application/json');
+            echo json_encode(['success' => false, 'error' => 'No menus selected']);
+            exit;
+        }
+
+        $affected = 0;
+
+        try {
+            foreach ($menuIds as $menuId) {
+                // Verify menu belongs to tenant
+                $menu = Menu::find($menuId, $tenantId);
+                if (!$menu) {
+                    continue;
+                }
+
+                if ($action === 'activate' || $action === 'deactivate') {
+                    if (Menu::toggleActive($menuId, $tenantId)) {
+                        $affected++;
+                    }
+                } elseif ($action === 'delete') {
+                    if (Menu::delete($menuId, $tenantId)) {
+                        $affected++;
+                    }
+                }
+            }
+
+            MenuManager::clearCache($tenantId);
+
+            header('Content-Type: application/json');
+            echo json_encode([
+                'success' => true,
+                'affected' => $affected,
+                'message' => "Successfully {$action}d {$affected} menu(s)"
+            ]);
+        } catch (\Exception $e) {
+            header('Content-Type: application/json');
+            http_response_code(500);
+            echo json_encode([
+                'success' => false,
+                'error' => 'Bulk operation failed: ' . $e->getMessage()
+            ]);
+        }
     }
 }

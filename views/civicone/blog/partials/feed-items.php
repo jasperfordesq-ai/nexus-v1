@@ -8,8 +8,9 @@ foreach ($posts as $post):
     $wordCount = str_word_count(strip_tags($post['content']));
     $readingTime = max(1, ceil($wordCount / 200));
 ?>
+    <li class="news-list-item">
     <article class="news-card">
-        <a href="<?= $basePath ?>/blog/<?= $post['slug'] ?>" class="news-card-link" style="text-decoration: none;">
+        <a href="<?= $basePath ?>/blog/<?= $post['slug'] ?>" class="news-card-link link-no-decoration">
             <div class="news-card-image">
                 <?php if ($post['featured_image']): ?>
                     <img src="<?= htmlspecialchars($post['featured_image']) ?>" loading="lazy" alt="<?= htmlspecialchars($post['title']) ?>" loading="lazy">
@@ -51,4 +52,5 @@ foreach ($posts as $post):
             </div>
         </div>
     </article>
+    </li>
 <?php endforeach; ?>

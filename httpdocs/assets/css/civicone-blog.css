@@ -332,25 +332,20 @@
 
 
 /* --------------------------------------------
-   News Grid
+   News List (WCAG 2.1 AA - List Layout)
+   Following Template A: Directory/List Pattern
    -------------------------------------------- */
-.news-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 30px;
+.news-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
 }
 
-@media (max-width: 1200px) {
-    .news-grid {
-        grid-template-columns: repeat(2, 1fr);
-    }
-}
-
-@media (max-width: 768px) {
-    .news-grid {
-        grid-template-columns: 1fr;
-        gap: 24px;
-    }
+.news-list-item {
+    display: block;
 }
 
 

@@ -77,6 +77,8 @@
     <link rel="stylesheet" href="/assets/css/civicone-profile.min.css?v=<?= $cssVersion ?>">
     <!-- CivicOne Groups CSS (WCAG 2.1 AA 2026-01-19) -->
     <link rel="stylesheet" href="/assets/css/civicone-groups.min.css?v=<?= $cssVersion ?>">
+    <!-- CivicOne Groups Utilities (button alignment, spacing) -->
+    <link rel="stylesheet" href="/assets/css/civicone-groups-utilities.css?v=<?= $cssVersion ?>">
     <!-- CivicOne Volunteering CSS (WCAG 2.1 AA 2026-01-19) -->
     <link rel="stylesheet" href="/assets/css/civicone-volunteering.min.css?v=<?= $cssVersion ?>">
     <!-- CivicOne Mini Modules CSS (Polls, Goals, Resources - WCAG 2.1 AA 2026-01-19) -->

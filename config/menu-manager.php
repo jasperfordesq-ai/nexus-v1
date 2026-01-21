@@ -46,18 +46,33 @@ return [
     /**
      * Feature status
      */
-    'status' => 'UNDER_DEVELOPMENT',
-    'version' => '0.1.0-alpha',
+    'status' => 'BETA',
+    'version' => '0.7.0-beta',
     'stable_release' => false,
 
     /**
      * Known issues
      */
     'known_issues' => [
-        'Menu editing may not persist correctly',
-        'Visibility rules need testing',
-        'Performance not optimized',
-        'Missing bulk operations',
-        'No menu import/export'
+        'Visibility rules need production testing',
+        'Performance not fully optimized for large menus',
+        'No menu import/export functionality',
+        'No automated test coverage'
+    ],
+
+    /**
+     * Recent improvements (v0.7.0-beta)
+     */
+    'recent_improvements' => [
+        'Added bulk operations (activate, deactivate, delete)',
+        'Added drag-and-drop reordering with visual feedback',
+        'Implemented comprehensive client & server validation',
+        'Added URL and CSS class input sanitization',
+        'Implemented cache management UI with animations',
+        'Fixed menu editing persistence issues',
+        'Enhanced security with input validation',
+        'Added pagination support for menu lists',
+        'Improved error handling and user feedback',
+        'Multi-select checkboxes for batch operations'
     ]
 ];

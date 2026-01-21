@@ -20,6 +20,24 @@ $listing = $listing ?? [];
 $errors = $errors ?? [];
 ?>
 
+<!-- GOV.UK Error Summary (WCAG 2.1 AA - appears before form) -->
+<?php if (!empty($errors)): ?>
+<div class="civicone-error-summary" aria-labelledby="error-summary-title" role="alert" tabindex="-1" data-module="civicone-error-summary">
+    <h2 class="civicone-error-summary__title" id="error-summary-title">
+        There is a problem
+    </h2>
+    <div class="civicone-error-summary__body">
+        <ul class="civicone-error-summary__list">
+            <?php foreach ($errors as $field => $error): ?>
+                <li>
+                    <a href="#<?= htmlspecialchars($field) ?>"><?= htmlspecialchars($error) ?></a>
+                </li>
+            <?php endforeach; ?>
+        </ul>
+    </div>
+</div>
+<?php endif; ?>
+
 <!-- GOV.UK Form Pattern -->
 <form action="<?= htmlspecialchars($formAction) ?>"
       method="POST"

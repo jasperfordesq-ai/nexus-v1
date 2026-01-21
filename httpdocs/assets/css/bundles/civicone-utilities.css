@@ -1,0 +1,66 @@
+/**
+ * civicone-utilities Bundle
+ * Generated: 2026-01-21T06:37:16.903Z
+ * Files: 3
+ */
+
+/* ========================================
+ * civicone-utilities.css
+ * ======================================== */
+
+/**
+ * CivicOne Utilities - Shared Utility Classes
+ * Consolidated from inline styles across civicone views
+ */
+
+/* Button spacing utilities */
+.button-spaced {
+    margin-top: 20px;
+}
+
+/* Full width buttons */
+.button-full-width {
+    width: 100%;
+}
+
+/* Link without decoration */
+.link-no-decoration {
+    text-decoration: none;
+}
+
+
+/* ========================================
+ * civicone-blog-utilities.css
+ * ======================================== */
+
+/**
+ * CivicOne Blog Utilities
+ * Extracted from inline styles in views/civicone/blog/partials/feed-items.php
+ */
+
+/* News card link - remove text decoration */
+.news-card-link {
+    text-decoration: none;
+}
+
+
+/* ========================================
+ * civicone-groups-utilities.css
+ * ======================================== */
+
+/**
+ * CivicOne Groups Utilities
+ * Extracted from inline styles in views/civicone/groups/index.php
+ */
+
+/* Create group button spacing */
+.groups-header .civicone-button {
+    margin-top: 20px;
+}
+
+/* Search form submit button */
+.groups-search-form .civicone-button {
+    width: 100%;
+}
+
+

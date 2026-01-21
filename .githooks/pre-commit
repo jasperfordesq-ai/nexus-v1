@@ -1,0 +1,52 @@
+#!/bin/sh
+#
+# Pre-commit Hook: Enforce CLAUDE.md CSS Organization Rules
+# Blocks commits with inline style violations
+#
+# Installation:
+#   git config core.hooksPath .githooks
+#   chmod +x .githooks/pre-commit
+#
+
+echo "🔍 Running pre-commit checks..."
+echo ""
+
+# Check for inline styles in PHP files
+echo "📋 Checking for inline style violations (per CLAUDE.md)..."
+php scripts/lint-inline-styles.php
+
+if [ $? -ne 0 ]; then
+    echo ""
+    echo "❌ COMMIT BLOCKED: Inline style violations detected"
+    echo ""
+    echo "Per CLAUDE.md rules:"
+    echo "  - NEVER use inline style=\"\" attributes"
+    echo "  - Extract static styles to CSS files in /httpdocs/assets/css/"
+    echo "  - Only dynamic values (e.g., \$color from DB) are allowed"
+    echo ""
+    echo "To bypass this hook (NOT RECOMMENDED):"
+    echo "  git commit --no-verify"
+    echo ""
+    exit 1
+fi
+
+# Check JavaScript for style manipulation
+echo ""
+echo "📋 Checking JavaScript for inline style manipulation..."
+npm run lint:js --silent
+
+if [ $? -ne 0 ]; then
+    echo ""
+    echo "❌ COMMIT BLOCKED: JavaScript style violations detected"
+    echo ""
+    echo "Use classList instead of element.style:"
+    echo "  ❌ element.style.display = 'none'"
+    echo "  ✅ element.classList.add('hidden')"
+    echo ""
+    exit 1
+fi
+
+echo ""
+echo "✅ All checks passed! Proceeding with commit..."
+echo ""
+exit 0

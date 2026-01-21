@@ -11,35 +11,36 @@ if ($tSlug !== 'hour-timebank' && $tSlug !== 'hour_timebank') {
 $pageTitle = 'Strategic Plan 2026-2030';
 require dirname(__DIR__, 2) . '/layouts/civicone/header.php';
 ?>
+<link rel="stylesheet" href="<?= \Nexus\Core\TenantContext::getBasePath() ?>/assets/css/civicone-report-pages.css?v=<?= time() ?>">
 
 <div class="civic-container">
 
     <!-- Header Section -->
-    <div class="civic-card" style="margin-bottom: 40px; text-align: center; padding: 40px;">
-        <h1 style="margin-bottom: 15px; font-size: 2.5rem; color: var(--skin-primary); text-transform: uppercase;">Strategic Plan 2026 - 2030</h1>
-        <div style="width: 80px; height: 4px; background: var(--skin-primary); margin: 0 auto 20px;"></div>
-        <p style="font-size: 1.3rem; max-width: 800px; margin: 0 auto; color: #555; line-height: 1.6;">
+    <div class="civic-card report-header">
+        <h1 class="report-title">Strategic Plan 2026 - 2030</h1>
+        <div class="report-divider"></div>
+        <p class="report-subtitle">
             The Power of an Hour: Building a Resilient, Connected Ireland.
         </p>
-        <div style="margin-top: 30px;">
-            <a href="/uploads/tenants/hour-timebank/Timebank-Ireland-Strategic-Plan-2026-2030.pdf" target="_blank" class="civic-btn" style="background: white; border: 2px solid var(--skin-primary); color: var(--skin-primary);">
+        <div class="report-header-actions">
+            <a href="/uploads/tenants/hour-timebank/Timebank-Ireland-Strategic-Plan-2026-2030.pdf" target="_blank" class="civic-btn report-download-btn">
                 Download Official PDF
             </a>
         </div>
     </div>
 
-    <div style="display: grid; grid-template-columns: 280px 1fr; gap: 40px; align-items: start;">
+    <div class="report-grid">
 
         <!-- Sidebar TOC -->
-        <div class="civic-card" style="position: sticky; top: 20px;">
-            <h3 style="color: var(--skin-primary); margin-top: 0; padding-bottom: 15px; border-bottom: 1px solid #eee;">Contents</h3>
-            <ul style="list-style: none; padding: 0; margin: 0; line-height: 2;">
-                <li><a href="#executive-summary" style="text-decoration: none; color: #555;">1. Executive Summary</a></li>
-                <li><a href="#vision" style="text-decoration: none; color: #555;">2. Vision & Mission</a></li>
-                <li><a href="#analysis" style="text-decoration: none; color: #555;">3. SWOT Analysis</a></li>
-                <li><a href="#pillars" style="text-decoration: none; color: #555;">4. Strategic Pillars</a></li>
-                <li><a href="#roadmap" style="text-decoration: none; color: #555;">5. Roadmap (Year 1)</a></li>
-                <li><a href="#risk" style="text-decoration: none; color: #555;">6. Risk & Mitigation</a></li>
+        <div class="civic-card report-toc">
+            <h3 class="report-toc-title">Contents</h3>
+            <ul class="report-toc-list">
+                <li><a href="#executive-summary" class="report-toc-link">1. Executive Summary</a></li>
+                <li><a href="#vision" class="report-toc-link">2. Vision & Mission</a></li>
+                <li><a href="#analysis" class="report-toc-link">3. SWOT Analysis</a></li>
+                <li><a href="#pillars" class="report-toc-link">4. Strategic Pillars</a></li>
+                <li><a href="#roadmap" class="report-toc-link">5. Roadmap (Year 1)</a></li>
+                <li><a href="#risk" class="report-toc-link">6. Risk & Mitigation</a></li>
             </ul>
         </div>
 
@@ -47,65 +48,65 @@ require dirname(__DIR__, 2) . '/layouts/civicone/header.php';
         <div>
 
             <!-- 1. Executive Summary -->
-            <div id="executive-summary" class="civic-card" style="margin-bottom: 40px;">
-                <h2 style="color: var(--skin-primary); margin-top: 0; border-bottom: 2px solid #f0f0f0; padding-bottom: 15px; margin-bottom: 20px;">1. Executive Summary</h2>
+            <div id="executive-summary" class="civic-card report-section">
+                <h2 class="report-section-title">1. Executive Summary</h2>
                 <p>This five-year strategic plan (2026-2030) outlines a clear and ambitious path for hOUR Timebank (TBI) to transition from a single, high-impact regional organisation into a resilient and scalable national network.</p>
                 <p>Our strategy is built on a foundation of proven, exceptional social value. A 2023 Social Impact Study quantified our SROI at <strong>1:16</strong>—for every €1 invested, €16 in tangible social value is returned.</p>
 
-                <h3 style="color: #333; margin-top: 30px;">Two Primary Goals:</h3>
-                <ol style="line-height: 1.6;">
-                    <li style="margin-bottom: 10px;"><strong>Sustainable Growth:</strong> Scale from 245 to 2,500+ members by 2030, establishing a "Centre of Excellence" in West Cork.</li>
+                <h3 class="report-section-subtitle">Two Primary Goals:</h3>
+                <ol class="report-goal-list">
+                    <li class="report-goal-item"><strong>Sustainable Growth:</strong> Scale from 245 to 2,500+ members by 2030, establishing a "Centre of Excellence" in West Cork.</li>
                     <li><strong>Maximising Social Impact:</strong> Deepen community value by investing in technology and diversifying our financial model.</li>
                 </ol>
             </div>
 
             <!-- 2. Vision -->
-            <div id="vision" class="civic-card" style="margin-bottom: 40px;">
-                <h2 style="color: var(--skin-primary); margin-top: 0; border-bottom: 2px solid #f0f0f0; padding-bottom: 15px; margin-bottom: 20px;">2. Our 2026 Vision</h2>
+            <div id="vision" class="civic-card report-section">
+                <h2 class="report-section-title">2. Our 2026 Vision</h2>
 
-                <div style="background: #eef2ff; border: 1px solid #d1d5db; border-radius: 8px; padding: 25px; text-align: center; margin-bottom: 30px;">
-                    <h3 style="color: var(--skin-primary); margin-top: 0;">Our Mission</h3>
-                    <p style="font-style: italic; font-size: 1.1rem; color: #555; margin-bottom: 0;">To connect and empower Irish communities by facilitating the exchange of skills, talents, and support, where every hour given is an hour received.</p>
+                <div class="report-mission-box">
+                    <h3 class="report-box-title">Our Mission</h3>
+                    <p class="report-box-text">To connect and empower Irish communities by facilitating the exchange of skills, talents, and support, where every hour given is an hour received.</p>
                 </div>
 
-                <div style="background: #ecfeff; border: 1px solid #d1d5db; border-radius: 8px; padding: 25px; text-align: center;">
-                    <h3 style="color: var(--skin-primary); margin-top: 0;">Our Vision</h3>
-                    <p style="font-style: italic; font-size: 1.1rem; color: #555; margin-bottom: 0;">An interconnected Ireland where every individual feels valued and supported, and where the power of shared time and talent creates strong, resilient communities.</p>
+                <div class="report-vision-box">
+                    <h3 class="report-box-title">Our Vision</h3>
+                    <p class="report-box-text">An interconnected Ireland where every individual feels valued and supported, and where the power of shared time and talent creates strong, resilient communities.</p>
                 </div>
             </div>
 
             <!-- 3. SWOT -->
-            <div id="analysis" class="civic-card" style="margin-bottom: 40px;">
-                <h2 style="color: var(--skin-primary); margin-top: 0; border-bottom: 2px solid #f0f0f0; padding-bottom: 15px; margin-bottom: 20px;">3. SWOT Analysis</h2>
+            <div id="analysis" class="civic-card report-section">
+                <h2 class="report-section-title">3. SWOT Analysis</h2>
 
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
-                    <div style="background: #f0fdf4; padding: 20px; border-radius: 8px; border-top: 4px solid #10b981;">
-                        <h4 style="margin-top: 0; color: #047857;">Strengths</h4>
-                        <ul style="padding-left: 20px; font-size: 0.9rem;">
+                <div class="report-swot-grid">
+                    <div class="report-swot-box report-swot-box--strengths">
+                        <h4 class="report-swot-title report-swot-title--strengths">Strengths</h4>
+                        <ul class="report-swot-list">
                             <li><strong>Proven Impact:</strong> Independently validated 1:16 SROI.</li>
                             <li><strong>Partnerships:</strong> WCDP and Rethink Ireland.</li>
                             <li><strong>Lean Operations:</strong> Effective low-cost model.</li>
                         </ul>
                     </div>
-                    <div style="background: #fef2f2; padding: 20px; border-radius: 8px; border-top: 4px solid #ef4444;">
-                        <h4 style="margin-top: 0; color: #b91c1c;">Weaknesses</h4>
-                        <ul style="padding-left: 20px; font-size: 0.9rem;">
+                    <div class="report-swot-box report-swot-box--weaknesses">
+                        <h4 class="report-swot-title report-swot-title--weaknesses">Weaknesses</h4>
+                        <ul class="report-swot-list">
                             <li><strong>Financial Instability:</strong> Funding gap after shop closure.</li>
                             <li><strong>Human Resources:</strong> Reliance on key individuals.</li>
                             <li><strong>No Physical Hub:</strong> Lack of central premises.</li>
                         </ul>
                     </div>
-                    <div style="background: #eff6ff; padding: 20px; border-radius: 8px; border-top: 4px solid #2563eb;">
-                        <h4 style="margin-top: 0; color: #1d4ed8;">Opportunities</h4>
-                        <ul style="padding-left: 20px; font-size: 0.9rem;">
+                    <div class="report-swot-box report-swot-box--opportunities">
+                        <h4 class="report-swot-title report-swot-title--opportunities">Opportunities</h4>
+                        <ul class="report-swot-list">
                             <li><strong>Public Sector Contracts:</strong> HSE Social Prescribing.</li>
                             <li><strong>Hybrid Models:</strong> B2B Timebanking.</li>
                             <li><strong>"Loneliness Epidemic":</strong> Powerful narrative.</li>
                         </ul>
                     </div>
-                    <div style="background: #fffbeb; padding: 20px; border-radius: 8px; border-top: 4px solid #f59e0b;">
-                        <h4 style="margin-top: 0; color: #b45309;">Threats</h4>
-                        <ul style="padding-left: 20px; font-size: 0.9rem;">
+                    <div class="report-swot-box report-swot-box--threats">
+                        <h4 class="report-swot-title report-swot-title--threats">Threats</h4>
+                        <ul class="report-swot-list">
                             <li><strong>Funding Cliff:</strong> Securing long-term coordinator funding.</li>
                             <li><strong>Volunteer Burnout:</strong> Unsustainable burden.</li>
                         </ul>
@@ -114,83 +115,83 @@ require dirname(__DIR__, 2) . '/layouts/civicone/header.php';
             </div>
 
             <!-- 4. Pillars -->
-            <div id="pillars" class="civic-card" style="margin-bottom: 40px;">
-                <h2 style="color: var(--skin-primary); margin-top: 0; border-bottom: 2px solid #f0f0f0; padding-bottom: 15px; margin-bottom: 20px;">4. Strategic Pillars</h2>
+            <div id="pillars" class="civic-card report-section">
+                <h2 class="report-section-title">4. Strategic Pillars</h2>
 
-                <h3 style="color: var(--skin-primary);">Pillar 1: Roots & Reach (Growth)</h3>
-                <table style="width: 100%; border-collapse: collapse; margin-bottom: 30px;">
-                    <tr style="background: #f5f5f5;">
-                        <th style="padding: 10px; text-align: left;">Key Initiatives</th>
-                        <th style="padding: 10px; text-align: left;">Year 1 Priorities</th>
-                        <th style="padding: 10px; text-align: left;">KPIs</th>
+                <h3 class="report-pillar-title">Pillar 1: Roots & Reach (Growth)</h3>
+                <table class="report-table">
+                    <tr>
+                        <th>Key Initiatives</th>
+                        <th>Year 1 Priorities</th>
+                        <th>KPIs</th>
                     </tr>
-                    <tr style="border-bottom: 1px solid #eee;">
-                        <td style="padding: 10px;"><strong>1.1: West Cork Centre</strong></td>
-                        <td style="padding: 10px;">Secure funding for Hub Coordinator.</td>
-                        <td style="padding: 10px;">Monthly Hours > 200</td>
+                    <tr>
+                        <td><strong>1.1: West Cork Centre</strong></td>
+                        <td>Secure funding for Hub Coordinator.</td>
+                        <td>Monthly Hours &gt; 200</td>
                     </tr>
-                    <tr style="border-bottom: 1px solid #eee;">
-                        <td style="padding: 10px;"><strong>1.2: National Plan</strong></td>
-                        <td style="padding: 10px;">"Hub-in-a-Box" toolkit.</td>
-                        <td style="padding: 10px;">Toolkit completed.</td>
+                    <tr>
+                        <td><strong>1.2: National Plan</strong></td>
+                        <td>"Hub-in-a-Box" toolkit.</td>
+                        <td>Toolkit completed.</td>
                     </tr>
                 </table>
 
-                <h3 style="color: var(--skin-primary);">Pillar 2: Financial Resilience</h3>
-                <table style="width: 100%; border-collapse: collapse;">
-                    <tr style="background: #f5f5f5;">
-                        <th style="padding: 10px; text-align: left;">Key Initiatives</th>
-                        <th style="padding: 10px; text-align: left;">Year 1 Priorities</th>
-                        <th style="padding: 10px; text-align: left;">KPIs</th>
+                <h3 class="report-pillar-title">Pillar 2: Financial Resilience</h3>
+                <table class="report-table report-table--no-margin">
+                    <tr>
+                        <th>Key Initiatives</th>
+                        <th>Year 1 Priorities</th>
+                        <th>KPIs</th>
                     </tr>
-                    <tr style="border-bottom: 1px solid #eee;">
-                        <td style="padding: 10px;"><strong>2.1: Core Funding</strong></td>
-                        <td style="padding: 10px;">Develop "Case for Support" (SROI).</td>
-                        <td style="padding: 10px;">Core costs funded 2026-28.</td>
+                    <tr>
+                        <td><strong>2.1: Core Funding</strong></td>
+                        <td>Develop "Case for Support" (SROI).</td>
+                        <td>Core costs funded 2026-28.</td>
                     </tr>
-                    <tr style="border-bottom: 1px solid #eee;">
-                        <td style="padding: 10px;"><strong>2.2: Public Contracts</strong></td>
-                        <td style="padding: 10px;">Pilot in West Cork for Social Prescribing.</td>
-                        <td style="padding: 10px;">1x Pilot Contract.</td>
+                    <tr>
+                        <td><strong>2.2: Public Contracts</strong></td>
+                        <td>Pilot in West Cork for Social Prescribing.</td>
+                        <td>1x Pilot Contract.</td>
                     </tr>
                 </table>
             </div>
 
             <!-- 5. Roadmap -->
-            <div id="roadmap" class="civic-card" style="margin-bottom: 40px;">
-                <h2 style="color: var(--skin-primary); margin-top: 0; border-bottom: 2px solid #f0f0f0; padding-bottom: 15px; margin-bottom: 20px;">5. Roadmap: Year 1</h2>
+            <div id="roadmap" class="civic-card report-section">
+                <h2 class="report-section-title">5. Roadmap: Year 1</h2>
 
-                <table style="width: 100%; border-collapse: collapse;">
+                <table class="report-table report-table--no-margin">
                     <thead>
-                        <tr style="background: #f5f5f5;">
-                            <th style="padding: 10px; text-align: left;">Initiative</th>
-                            <th style="padding: 10px; text-align: center;">Q1</th>
-                            <th style="padding: 10px; text-align: center;">Q2</th>
-                            <th style="padding: 10px; text-align: center;">Q3</th>
-                            <th style="padding: 10px; text-align: center;">Q4</th>
+                        <tr>
+                            <th>Initiative</th>
+                            <th class="text-center">Q1</th>
+                            <th class="text-center">Q2</th>
+                            <th class="text-center">Q3</th>
+                            <th class="text-center">Q4</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <tr style="border-bottom: 1px solid #eee;">
-                            <td style="padding: 10px; font-weight: bold;">Fund Coordinator</td>
-                            <td style="padding: 10px; text-align: center;"><span style="background: #06b6d4; color: white; padding: 2px 8px; border-radius: 10px; font-size: 0.8rem; font-weight: bold;">SUBMIT</span></td>
-                            <td style="padding: 10px; text-align: center;"><span style="background: #10b981; color: white; padding: 2px 8px; border-radius: 10px; font-size: 0.8rem; font-weight: bold;">SECURE</span></td>
-                            <td style="padding: 10px; text-align: center;"></td>
-                            <td style="padding: 10px; text-align: center;"></td>
+                        <tr>
+                            <td class="font-bold">Fund Coordinator</td>
+                            <td class="text-center"><span class="report-badge report-badge--submit">SUBMIT</span></td>
+                            <td class="text-center"><span class="report-badge report-badge--secure">SECURE</span></td>
+                            <td class="text-center"></td>
+                            <td class="text-center"></td>
                         </tr>
-                        <tr style="border-bottom: 1px solid #eee;">
-                            <td style="padding: 10px; font-weight: bold;">Re-Engagement</td>
-                            <td style="padding: 10px; text-align: center;"></td>
-                            <td style="padding: 10px; text-align: center;"></td>
-                            <td style="padding: 10px; text-align: center;"><span style="background: #7c3aed; color: white; padding: 2px 8px; border-radius: 10px; font-size: 0.8rem; font-weight: bold;">LAUNCH</span></td>
-                            <td style="padding: 10px; text-align: center;"><span style="background: #f59e0b; color: white; padding: 2px 8px; border-radius: 10px; font-size: 0.8rem; font-weight: bold;">ONGOING</span></td>
+                        <tr>
+                            <td class="font-bold">Re-Engagement</td>
+                            <td class="text-center"></td>
+                            <td class="text-center"></td>
+                            <td class="text-center"><span class="report-badge report-badge--launch">LAUNCH</span></td>
+                            <td class="text-center"><span class="report-badge report-badge--ongoing">ONGOING</span></td>
                         </tr>
-                        <tr style="border-bottom: 1px solid #eee;">
-                            <td style="padding: 10px; font-weight: bold;">Multi-Year Grants</td>
-                            <td style="padding: 10px; text-align: center;"><span style="background: #06b6d4; color: white; padding: 2px 8px; border-radius: 10px; font-size: 0.8rem; font-weight: bold;">SUBMIT</span></td>
-                            <td style="padding: 10px; text-align: center;"><span style="background: #06b6d4; color: white; padding: 2px 8px; border-radius: 10px; font-size: 0.8rem; font-weight: bold;">PITCH</span></td>
-                            <td style="padding: 10px; text-align: center;"><span style="background: #10b981; color: white; padding: 2px 8px; border-radius: 10px; font-size: 0.8rem; font-weight: bold;">SECURE</span></td>
-                            <td style="padding: 10px; text-align: center;"></td>
+                        <tr>
+                            <td class="font-bold">Multi-Year Grants</td>
+                            <td class="text-center"><span class="report-badge report-badge--submit">SUBMIT</span></td>
+                            <td class="text-center"><span class="report-badge report-badge--pitch">PITCH</span></td>
+                            <td class="text-center"><span class="report-badge report-badge--secure">SECURE</span></td>
+                            <td class="text-center"></td>
                         </tr>
                     </tbody>
                 </table>

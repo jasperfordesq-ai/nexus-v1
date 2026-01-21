@@ -1,0 +1,459 @@
+/**
+ * CivicOne Report Pages (Strategic Plan & Impact Report)
+ * Shared styles for tenant report pages
+ * Date: 2026-01-21
+ */
+
+/* === SHARED COMPONENTS === */
+
+/* Header Section */
+.report-header {
+    margin-bottom: 40px;
+    text-align: center;
+    padding: 40px;
+}
+
+.report-title {
+    margin-bottom: 15px;
+    font-size: 2.5rem;
+    color: var(--skin-primary);
+    text-transform: uppercase;
+}
+
+.report-divider {
+    width: 80px;
+    height: 4px;
+    background: var(--skin-primary);
+    margin: 0 auto 20px;
+}
+
+.report-subtitle {
+    font-size: 1.3rem;
+    max-width: 800px;
+    margin: 0 auto;
+    color: #555;
+    line-height: 1.6;
+}
+
+.report-header-actions {
+    margin-top: 30px;
+}
+
+/* Layout Grid */
+.report-grid {
+    display: grid;
+    grid-template-columns: 280px 1fr;
+    gap: 40px;
+    align-items: start;
+}
+
+/* Sidebar TOC */
+.report-toc {
+    position: sticky;
+    top: 20px;
+}
+
+.report-toc-title {
+    color: var(--skin-primary);
+    margin-top: 0;
+    padding-bottom: 15px;
+    border-bottom: 1px solid #eee;
+}
+
+.report-toc-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    line-height: 2;
+}
+
+.report-toc-link {
+    text-decoration: none;
+    color: #555;
+}
+
+.report-toc-link:hover {
+    color: var(--skin-primary);
+}
+
+/* TOC Actions */
+.report-toc-actions {
+    margin-top: 30px;
+    display: grid;
+    gap: 15px;
+}
+
+.report-download-btn {
+    text-align: center;
+    font-size: 0.9rem;
+}
+
+.report-download-btn--primary {
+    background: white;
+    border: 2px solid var(--skin-primary);
+    color: var(--skin-primary);
+}
+
+.report-download-btn--secondary {
+    background: #fff;
+    color: #555;
+    border: 1px solid #ddd;
+}
+
+/* Section Styling */
+.report-section {
+    margin-bottom: 40px;
+}
+
+.report-section-title {
+    color: var(--skin-primary);
+    margin-top: 0;
+    border-bottom: 2px solid #f0f0f0;
+    padding-bottom: 15px;
+    margin-bottom: 20px;
+}
+
+.report-section-subtitle {
+    color: #333;
+    margin-top: 30px;
+}
+
+.report-list {
+    line-height: 1.6;
+}
+
+.report-list-item {
+    margin-bottom: 10px;
+}
+
+/* Case Study Boxes */
+.report-case-study {
+    background: #fdf2f8;
+    border-left: 4px solid var(--skin-primary);
+    padding: 20px;
+    margin: 30px 0;
+    border-radius: 0 8px 8px 0;
+}
+
+.report-case-study-title {
+    margin-top: 0;
+    color: var(--skin-primary);
+}
+
+.report-case-study-text {
+    font-style: italic;
+}
+
+.report-case-study-quote {
+    font-weight: bold;
+    margin-bottom: 0;
+}
+
+/* Mission/Vision Boxes */
+.report-box {
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    padding: 25px;
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.report-box--mission {
+    background: #eef2ff;
+}
+
+.report-box--vision {
+    background: #ecfeff;
+}
+
+.report-box-title {
+    color: var(--skin-primary);
+    margin-top: 0;
+}
+
+.report-box-text {
+    font-style: italic;
+    font-size: 1.1rem;
+    color: #555;
+    margin-bottom: 0;
+}
+
+/* SWOT Grid */
+.report-swot-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+
+.report-swot-box {
+    padding: 20px;
+    border-radius: 8px;
+}
+
+.report-swot-box--strengths {
+    background: #f0fdf4;
+    border-top: 4px solid #10b981;
+}
+
+.report-swot-box--weaknesses {
+    background: #fef2f2;
+    border-top: 4px solid #ef4444;
+}
+
+.report-swot-box--opportunities {
+    background: #eff6ff;
+    border-top: 4px solid #2563eb;
+}
+
+.report-swot-box--threats {
+    background: #fffbeb;
+    border-top: 4px solid #f59e0b;
+}
+
+.report-swot-title {
+    margin-top: 0;
+}
+
+.report-swot-title--strengths {
+    color: #047857;
+}
+
+.report-swot-title--weaknesses {
+    color: #b91c1c;
+}
+
+.report-swot-title--opportunities {
+    color: #1d4ed8;
+}
+
+.report-swot-title--threats {
+    color: #b45309;
+}
+
+.report-swot-list {
+    padding-left: 20px;
+    font-size: 0.9rem;
+}
+
+/* Tables */
+.report-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 30px;
+}
+
+.report-table--no-margin {
+    margin-bottom: 0;
+}
+
+.report-table thead tr {
+    background: #f5f5f5;
+}
+
+.report-table th {
+    padding: 10px;
+    text-align: left;
+}
+
+.report-table th.text-center {
+    text-align: center;
+}
+
+.report-table td {
+    padding: 10px;
+}
+
+.report-table td.text-center {
+    text-align: center;
+}
+
+.report-table tbody tr {
+    border-bottom: 1px solid #eee;
+}
+
+.report-table td.font-bold {
+    font-weight: bold;
+}
+
+/* Roadmap Badges */
+.report-badge {
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-size: 0.8rem;
+    font-weight: bold;
+    color: white;
+}
+
+.report-badge--submit {
+    background: #06b6d4;
+}
+
+.report-badge--secure {
+    background: #10b981;
+}
+
+.report-badge--launch {
+    background: #7c3aed;
+}
+
+.report-badge--ongoing {
+    background: #f59e0b;
+}
+
+.report-badge--pitch {
+    background: #06b6d4;
+}
+
+/* Pillar Headings */
+.report-pillar-title {
+    color: var(--skin-primary);
+}
+
+/* Stat Grid */
+.report-stat-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    margin: 30px 0;
+}
+
+.report-stat-box {
+    background: #fef3f2;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    padding: 20px;
+    text-align: center;
+}
+
+.report-stat-number {
+    font-size: 2.5rem;
+    font-weight: 800;
+    color: var(--skin-primary);
+    margin-bottom: 5px;
+}
+
+.report-stat-label {
+    font-size: 0.9rem;
+    color: #555;
+}
+
+/* Highlights Box */
+.report-highlights {
+    background: #ecfeff;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    padding: 25px;
+    margin: 30px 0;
+}
+
+.report-highlights-title {
+    color: var(--skin-primary);
+    margin-top: 0;
+    margin-bottom: 15px;
+}
+
+.report-highlights-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+}
+
+.report-highlights-list {
+    line-height: 1.8;
+    padding-left: 20px;
+    margin: 0;
+}
+
+/* Key Findings */
+.report-findings-grid {
+    display: grid;
+    gap: 20px;
+}
+
+.report-finding-box {
+    background: #f0fdf4;
+    border-left: 4px solid #10b981;
+    padding: 20px;
+    border-radius: 0 8px 8px 0;
+}
+
+.report-finding-box--secondary {
+    background: #eff6ff;
+    border-left-color: #2563eb;
+}
+
+.report-finding-title {
+    color: #047857;
+    margin-top: 0;
+    font-size: 1.1rem;
+}
+
+.report-finding-title--secondary {
+    color: #1d4ed8;
+}
+
+.report-finding-stat {
+    font-size: 2rem;
+    font-weight: 800;
+    color: #047857;
+    margin: 10px 0;
+}
+
+.report-finding-stat--secondary {
+    color: #1d4ed8;
+}
+
+/* SROI Box */
+.report-sroi-box {
+    background: linear-gradient(135deg, #fef3c7 0%, #fed7aa 100%);
+    border: 2px solid #f59e0b;
+    border-radius: 12px;
+    padding: 30px;
+    text-align: center;
+    margin: 30px 0;
+}
+
+.report-sroi-title {
+    color: #78350f;
+    margin-top: 0;
+    font-size: 1.2rem;
+}
+
+.report-sroi-value {
+    font-size: 4rem;
+    font-weight: 900;
+    color: #78350f;
+    margin: 15px 0;
+}
+
+.report-sroi-description {
+    font-size: 1.1rem;
+    color: #78350f;
+    margin-bottom: 0;
+}
+
+/* Recommendation Boxes */
+.report-recommendation {
+    background: #fdf2f8;
+    border-left: 4px solid var(--skin-primary);
+    padding: 20px;
+    margin-bottom: 20px;
+    border-radius: 0 8px 8px 0;
+}
+
+.report-recommendation-number {
+    font-weight: 800;
+    color: var(--skin-primary);
+    margin-bottom: 10px;
+}
+
+/* Bibliography */
+.report-bibliography-list {
+    list-style: decimal;
+    padding-left: 25px;
+    line-height: 1.8;
+}
+
+.report-bibliography-list li {
+    margin-bottom: 10px;
+}

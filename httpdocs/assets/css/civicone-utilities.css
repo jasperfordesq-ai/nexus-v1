@@ -1,0 +1,19 @@
+/**
+ * CivicOne Utilities - Shared Utility Classes
+ * Consolidated from inline styles across civicone views
+ */
+
+/* Button spacing utilities */
+.button-spaced {
+    margin-top: 20px;
+}
+
+/* Full width buttons */
+.button-full-width {
+    width: 100%;
+}
+
+/* Link without decoration */
+.link-no-decoration {
+    text-decoration: none;
+}

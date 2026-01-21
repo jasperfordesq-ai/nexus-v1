@@ -388,6 +388,134 @@
     border-color: #0b0c0c;
 }
 
+/* --------------------------------------------
+   Groups List Layout (WCAG 2.1 AA Compliant)
+   Following Template A: Directory/List Pattern
+   -------------------------------------------- */
+
+/* Groups List Container (replaces card grid for main results) */
+.civicone--govuk .civicone-results-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+/* Individual Group List Item */
+.civicone--govuk .civicone-group-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 15px;
+    padding: 20px 0;
+    border-bottom: 1px solid #b1b4b6;
+}
+
+@media (min-width: 641px) {
+    .civicone--govuk .civicone-group-item {
+        gap: 20px;
+    }
+}
+
+.civicone--govuk .civicone-group-item:last-child {
+    border-bottom: none;
+}
+
+/* Group Avatar/Image Section */
+.civicone--govuk .civicone-group-item__avatar {
+    position: relative;
+    flex-shrink: 0;
+}
+
+.civicone--govuk .civicone-avatar--large {
+    width: 64px;
+    height: 64px;
+}
+
+@media (min-width: 641px) {
+    .civicone--govuk .civicone-avatar--large {
+        width: 80px;
+        height: 80px;
+    }
+}
+
+/* Group Content Section */
+.civicone--govuk .civicone-group-item__content {
+    flex-grow: 1;
+    min-width: 0;
+}
+
+.civicone--govuk .civicone-group-item__name {
+    font-size: 18px;
+    font-weight: 700;
+    line-height: 1.25;
+    margin: 0 0 8px 0;
+}
+
+@media (min-width: 641px) {
+    .civicone--govuk .civicone-group-item__name {
+        font-size: 22px;
+    }
+}
+
+.civicone--govuk .civicone-group-item__description {
+    margin: 0 0 8px 0;
+    font-size: 16px;
+    line-height: 1.5;
+    color: #505a5f;
+}
+
+@media (min-width: 641px) {
+    .civicone--govuk .civicone-group-item__description {
+        font-size: 19px;
+    }
+}
+
+.civicone--govuk .civicone-group-item__meta {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 14px;
+    line-height: 1.5;
+    margin: 0;
+    color: #505a5f;
+}
+
+@media (min-width: 641px) {
+    .civicone--govuk .civicone-group-item__meta {
+        font-size: 16px;
+    }
+}
+
+/* Group Actions Section */
+.civicone--govuk .civicone-group-item__actions {
+    flex-shrink: 0;
+    margin-top: 5px;
+}
+
+@media (max-width: 640px) {
+    .civicone--govuk .civicone-group-item {
+        flex-wrap: wrap;
+    }
+
+    .civicone--govuk .civicone-group-item__actions {
+        width: 100%;
+        margin-top: 15px;
+    }
+
+    .civicone--govuk .civicone-group-item__actions .civicone-button {
+        width: 100%;
+    }
+}
+
+/* Dark Mode Support for List Items */
+[data-theme="dark"] .civicone--govuk .civicone-group-item {
+    border-bottom-color: #374151;
+}
+
+[data-theme="dark"] .civicone--govuk .civicone-group-item__description,
+[data-theme="dark"] .civicone--govuk .civicone-group-item__meta {
+    color: #d1d5db;
+}
+
 
 /* --------------------------------------------
    Groups Show Page - Tab System

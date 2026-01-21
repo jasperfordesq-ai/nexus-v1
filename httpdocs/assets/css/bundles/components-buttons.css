@@ -1,0 +1,924 @@
+/**
+ * components-buttons Bundle
+ * Generated: 2026-01-21T06:37:16.877Z
+ * Files: 3
+ */
+
+/* ========================================
+ * button-ripple.css
+ * ======================================== */
+
+/**
+ * Button Ripple Effects - Material Design Style
+ * Touch/click feedback with expanding ripple animation
+ * Version: 1.0 - 2026-01-19
+ *
+ * Features:
+ * - Expanding ripple from click point
+ * - Works on buttons, links, and any clickable element
+ * - Automatic color detection (light/dark ripple)
+ * - Touch and mouse support
+ * - Reduced motion support
+ */
+
+/* ==============================================
+   RIPPLE CONTAINER SETUP
+   ============================================== */
+
+/* Elements that should have ripple effect */
+.ripple,
+.btn,
+.glass-btn,
+.glass-btn-primary,
+.glass-btn-secondary,
+.glass-btn-outline,
+.nexus-smart-btn,
+.nav-link,
+.tab-item,
+.dropdown-item,
+.card-clickable,
+[data-ripple="true"] {
+    position: relative;
+    overflow: hidden;
+    -webkit-tap-highlight-color: transparent;
+}
+
+/* Ripple container */
+.ripple-container {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    pointer-events: none;
+    border-radius: inherit;
+}
+
+/* ==============================================
+   RIPPLE ELEMENT
+   ============================================== */
+.ripple-effect {
+    position: absolute;
+    border-radius: 50%;
+    background: currentColor;
+    opacity: 0;
+    transform: scale(0);
+    pointer-events: none;
+    will-change: transform, opacity;
+}
+
+/* Light ripple (for dark backgrounds) */
+.ripple-effect.ripple-light {
+    background: rgba(255, 255, 255, 0.35);
+}
+
+/* Dark ripple (for light backgrounds) */
+.ripple-effect.ripple-dark {
+    background: rgba(0, 0, 0, 0.12);
+}
+
+/* Primary color ripple */
+.ripple-effect.ripple-primary {
+    background: rgba(99, 102, 241, 0.25);
+}
+
+/* Success ripple */
+.ripple-effect.ripple-success {
+    background: rgba(16, 185, 129, 0.25);
+}
+
+/* Danger ripple */
+.ripple-effect.ripple-danger {
+    background: rgba(239, 68, 68, 0.25);
+}
+
+/* ==============================================
+   RIPPLE ANIMATION
+   ============================================== */
+.ripple-effect.ripple-animate {
+    animation: ripple-expand 600ms cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+@keyframes ripple-expand {
+    0% {
+        transform: scale(0);
+        opacity: 0.5;
+    }
+    50% {
+        opacity: 0.3;
+    }
+    100% {
+        transform: scale(4);
+        opacity: 0;
+    }
+}
+
+/* Faster ripple for small buttons */
+.btn-sm .ripple-effect.ripple-animate,
+.ripple-fast .ripple-effect.ripple-animate {
+    animation-duration: 400ms;
+}
+
+/* Slower ripple for large areas */
+.btn-lg .ripple-effect.ripple-animate,
+.card .ripple-effect.ripple-animate,
+.ripple-slow .ripple-effect.ripple-animate {
+    animation-duration: 800ms;
+}
+
+/* ==============================================
+   RIPPLE ON SPECIFIC BUTTON TYPES
+   ============================================== */
+
+/* Primary buttons - light ripple */
+.btn-primary .ripple-effect,
+.glass-btn-primary .ripple-effect,
+.nexus-smart-btn-primary .ripple-effect {
+    background: rgba(255, 255, 255, 0.35);
+}
+
+/* Secondary/outline buttons - primary color ripple */
+.btn-secondary .ripple-effect,
+.btn-outline .ripple-effect,
+.glass-btn-secondary .ripple-effect,
+.glass-btn-outline .ripple-effect {
+    background: rgba(99, 102, 241, 0.2);
+}
+
+/* Danger buttons */
+.btn-danger .ripple-effect {
+    background: rgba(255, 255, 255, 0.35);
+}
+
+/* Success buttons */
+.btn-success .ripple-effect {
+    background: rgba(255, 255, 255, 0.35);
+}
+
+/* Ghost/text buttons */
+.btn-ghost .ripple-effect,
+.btn-text .ripple-effect {
+    background: rgba(99, 102, 241, 0.15);
+}
+
+/* ==============================================
+   DARK MODE ADJUSTMENTS
+   ============================================== */
+[data-theme="dark"] .ripple-effect.ripple-dark {
+    background: rgba(255, 255, 255, 0.15);
+}
+
+[data-theme="dark"] .btn-secondary .ripple-effect,
+[data-theme="dark"] .btn-outline .ripple-effect,
+[data-theme="dark"] .glass-btn-secondary .ripple-effect,
+[data-theme="dark"] .glass-btn-outline .ripple-effect {
+    background: rgba(129, 140, 248, 0.25);
+}
+
+[data-theme="dark"] .nav-link .ripple-effect,
+[data-theme="dark"] .dropdown-item .ripple-effect {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+/* ==============================================
+   RIPPLE ON NAVIGATION
+   ============================================== */
+.nav-link .ripple-effect,
+.tab-item .ripple-effect {
+    background: rgba(99, 102, 241, 0.15);
+}
+
+.nav-link.active .ripple-effect,
+.tab-item.active .ripple-effect {
+    background: rgba(99, 102, 241, 0.2);
+}
+
+/* Mobile tab bar */
+.mobile-tab-bar .tab-item .ripple-effect {
+    background: rgba(99, 102, 241, 0.2);
+}
+
+/* ==============================================
+   RIPPLE ON CARDS
+   ============================================== */
+.card-clickable .ripple-effect,
+.glass-card[onclick] .ripple-effect,
+.glass-card[role="button"] .ripple-effect,
+a.glass-card .ripple-effect {
+    background: rgba(99, 102, 241, 0.1);
+}
+
+[data-theme="dark"] .card-clickable .ripple-effect,
+[data-theme="dark"] a.glass-card .ripple-effect {
+    background: rgba(129, 140, 248, 0.15);
+}
+
+/* ==============================================
+   RIPPLE ON LIST ITEMS
+   ============================================== */
+.list-item .ripple-effect,
+.dropdown-item .ripple-effect,
+.menu-item .ripple-effect {
+    background: rgba(0, 0, 0, 0.08);
+}
+
+[data-theme="dark"] .list-item .ripple-effect,
+[data-theme="dark"] .menu-item .ripple-effect {
+    background: rgba(255, 255, 255, 0.08);
+}
+
+/* ==============================================
+   RIPPLE STATES
+   ============================================== */
+
+/* Pressed/active state enhancement */
+.ripple:active,
+[data-ripple="true"]:active {
+    transform: scale(0.98);
+}
+
+/* Disabled elements - no ripple */
+.ripple:disabled .ripple-container,
+.ripple.disabled .ripple-container,
+[data-ripple="true"]:disabled .ripple-container,
+[aria-disabled="true"] .ripple-container {
+    display: none;
+}
+
+/* ==============================================
+   CENTERED RIPPLE (for icon buttons)
+   ============================================== */
+.ripple-centered .ripple-effect {
+    top: 50% !important;
+    left: 50% !important;
+    transform: translate(-50%, -50%) scale(0);
+}
+
+.ripple-centered .ripple-effect.ripple-animate {
+    animation: ripple-expand-centered 500ms cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+@keyframes ripple-expand-centered {
+    0% {
+        transform: translate(-50%, -50%) scale(0);
+        opacity: 0.5;
+    }
+    100% {
+        transform: translate(-50%, -50%) scale(4);
+        opacity: 0;
+    }
+}
+
+/* ==============================================
+   ICON BUTTONS
+   ============================================== */
+.icon-btn,
+.nexus-header-icon-btn,
+.btn-icon {
+    position: relative;
+    overflow: hidden;
+}
+
+.icon-btn .ripple-effect,
+.nexus-header-icon-btn .ripple-effect,
+.btn-icon .ripple-effect {
+    background: rgba(99, 102, 241, 0.2);
+}
+
+/* ==============================================
+   FLOATING ACTION BUTTON
+   ============================================== */
+.fab .ripple-effect {
+    background: rgba(255, 255, 255, 0.3);
+}
+
+/* ==============================================
+   FORM ELEMENTS
+   ============================================== */
+
+/* Checkbox/Radio ripple */
+.checkbox-ripple,
+.radio-ripple {
+    position: relative;
+}
+
+.checkbox-ripple::before,
+.radio-ripple::before {
+    content: '';
+    position: absolute;
+    inset: -8px;
+    border-radius: 50%;
+    background: rgba(99, 102, 241, 0.15);
+    transform: scale(0);
+    transition: transform 200ms ease;
+}
+
+.checkbox-ripple:active::before,
+.radio-ripple:active::before {
+    transform: scale(1);
+}
+
+/* ==============================================
+   UNBOUNDED RIPPLE (expands beyond container)
+   ============================================== */
+.ripple-unbounded {
+    overflow: visible;
+}
+
+.ripple-unbounded .ripple-container {
+    overflow: visible;
+}
+
+/* ==============================================
+   REDUCED MOTION
+   ============================================== */
+@media (prefers-reduced-motion: reduce) {
+    .ripple-effect {
+        animation: none !important;
+    }
+
+    .ripple-effect.ripple-animate {
+        opacity: 0.2;
+        transform: scale(2);
+        transition: opacity 200ms ease;
+    }
+
+    /* Fade out instead of animate */
+    .ripple-effect.ripple-fade {
+        opacity: 0;
+    }
+}
+
+/* ==============================================
+   PRINT - No ripple
+   ============================================== */
+@media print {
+    .ripple-container,
+    .ripple-effect {
+        display: none !important;
+    }
+}
+
+/* ==============================================
+   HIGH CONTRAST MODE
+   ============================================== */
+@media (prefers-contrast: high) {
+    .ripple-effect {
+        background: currentColor;
+        opacity: 0.3;
+    }
+}
+
+
+/* ========================================
+ * fab-polish.css
+ * ======================================== */
+
+/**
+ * Floating Action Button Polish
+ * Bounce-in animation, expanded state, speed dial
+ * Version: 1.0 - 2026-01-19
+ *
+ * Features:
+ * - Material Design 3 style FAB
+ * - Bounce-in entrance animation
+ * - Expand/collapse with speed dial
+ * - Multiple sizes and colors
+ * - Dark mode support
+ */
+
+/* ==========================================================================
+   Animations
+   ========================================================================== */
+
+@keyframes fab-bounce-in {
+    0% {
+        opacity: 0;
+        transform: scale(0) rotate(-180deg);
+    }
+    50% {
+        transform: scale(1.1) rotate(0deg);
+    }
+    70% {
+        transform: scale(0.95);
+    }
+    100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+@keyframes fab-bounce-out {
+    0% {
+        opacity: 1;
+        transform: scale(1);
+    }
+    100% {
+        opacity: 0;
+        transform: scale(0) rotate(180deg);
+    }
+}
+
+@keyframes fab-pulse {
+    0% {
+        box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4);
+    }
+    50% {
+        box-shadow:
+            0 4px 12px rgba(99, 102, 241, 0.4),
+            0 0 0 8px rgba(99, 102, 241, 0.1);
+    }
+    100% {
+        box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4);
+    }
+}
+
+@keyframes fab-rotate {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(45deg); }
+}
+
+@keyframes fab-action-in {
+    0% {
+        opacity: 0;
+        transform: scale(0) translateY(20px);
+    }
+    100% {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+}
+
+/* ==========================================================================
+   Base FAB Styles
+   ========================================================================== */
+
+.fab,
+.floating-action-button {
+    position: fixed;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    border-radius: 16px;
+    cursor: pointer;
+    font-size: 24px;
+    color: white;
+    background: linear-gradient(135deg, #6366f1, #8b5cf6);
+    box-shadow:
+        0 4px 12px rgba(99, 102, 241, 0.4),
+        0 2px 4px rgba(0, 0, 0, 0.1);
+    transition:
+        transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1),
+        box-shadow 0.2s ease,
+        background 0.2s ease;
+    z-index: 1000;
+    -webkit-tap-highlight-color: transparent;
+    user-select: none;
+}
+
+/* Entrance animation */
+.fab.fab-animate-in,
+.floating-action-button.fab-animate-in {
+    animation: fab-bounce-in 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+/* Exit animation */
+.fab.fab-animate-out,
+.floating-action-button.fab-animate-out {
+    animation: fab-bounce-out 0.3s ease-out forwards;
+}
+
+/* Hover state */
+.fab:hover,
+.floating-action-button:hover {
+    transform: scale(1.08);
+    box-shadow:
+        0 6px 20px rgba(99, 102, 241, 0.5),
+        0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+/* Active/pressed state */
+.fab:active,
+.floating-action-button:active {
+    transform: scale(0.95);
+    box-shadow:
+        0 2px 8px rgba(99, 102, 241, 0.3),
+        0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+/* Focus state */
+.fab:focus-visible,
+.floating-action-button:focus-visible {
+    outline: 2px solid white;
+    outline-offset: 2px;
+}
+
+/* ==========================================================================
+   FAB Sizes
+   ========================================================================== */
+
+/* Small - 40px */
+.fab--sm,
+.fab-small {
+    width: 40px;
+    height: 40px;
+    font-size: 18px;
+    border-radius: 12px;
+}
+
+/* Medium (default) - 56px */
+.fab,
+.fab--md,
+.floating-action-button {
+    width: 56px;
+    height: 56px;
+}
+
+/* Large - 72px */
+.fab--lg,
+.fab-large {
+    width: 72px;
+    height: 72px;
+    font-size: 28px;
+    border-radius: 20px;
+}
+
+/* Extended FAB with label */
+.fab--extended,
+.fab-extended {
+    width: auto;
+    padding: 0 20px;
+    gap: 8px;
+    border-radius: 28px;
+}
+
+.fab--extended .fab-label,
+.fab-extended .fab-label {
+    font-size: 14px;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+/* ==========================================================================
+   FAB Positions
+   ========================================================================== */
+
+/* Bottom right (default) */
+.fab,
+.fab--bottom-right {
+    bottom: 24px;
+    right: 24px;
+}
+
+/* Bottom left */
+.fab--bottom-left {
+    bottom: 24px;
+    left: 24px;
+    right: auto;
+}
+
+/* Bottom center */
+.fab--bottom-center {
+    bottom: 24px;
+    left: 50%;
+    right: auto;
+    transform: translateX(-50%);
+}
+
+.fab--bottom-center:hover {
+    transform: translateX(-50%) scale(1.08);
+}
+
+/* Top right */
+.fab--top-right {
+    top: 80px;
+    right: 24px;
+    bottom: auto;
+}
+
+/* ==========================================================================
+   FAB Colors
+   ========================================================================== */
+
+/* Primary (default) - Indigo/Purple gradient */
+.fab--primary {
+    background: linear-gradient(135deg, #6366f1, #8b5cf6);
+}
+
+/* Secondary - Gray */
+.fab--secondary {
+    background: linear-gradient(135deg, #64748b, #475569);
+    box-shadow:
+        0 4px 12px rgba(71, 85, 105, 0.4),
+        0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Success - Green */
+.fab--success {
+    background: linear-gradient(135deg, #22c55e, #16a34a);
+    box-shadow:
+        0 4px 12px rgba(34, 197, 94, 0.4),
+        0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Danger - Red */
+.fab--danger {
+    background: linear-gradient(135deg, #ef4444, #dc2626);
+    box-shadow:
+        0 4px 12px rgba(239, 68, 68, 0.4),
+        0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Warning - Amber */
+.fab--warning {
+    background: linear-gradient(135deg, #f59e0b, #d97706);
+    box-shadow:
+        0 4px 12px rgba(245, 158, 11, 0.4),
+        0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Info - Blue */
+.fab--info {
+    background: linear-gradient(135deg, #3b82f6, #2563eb);
+    box-shadow:
+        0 4px 12px rgba(59, 130, 246, 0.4),
+        0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Surface - Light background with dark icon */
+.fab--surface {
+    background: white;
+    color: #6366f1;
+    box-shadow:
+        0 4px 12px rgba(0, 0, 0, 0.15),
+        0 2px 4px rgba(0, 0, 0, 0.08);
+}
+
+/* ==========================================================================
+   Pulse Effect (for attention)
+   ========================================================================== */
+
+.fab--pulse {
+    animation: fab-pulse 2s ease-in-out infinite;
+}
+
+/* Badge on FAB */
+.fab-badge {
+    position: absolute;
+    top: -4px;
+    right: -4px;
+    min-width: 20px;
+    height: 20px;
+    padding: 0 6px;
+    background: #ef4444;
+    color: white;
+    font-size: 11px;
+    font-weight: 600;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid white;
+}
+
+/* ==========================================================================
+   Speed Dial (Multiple Actions)
+   ========================================================================== */
+
+.fab-container {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    z-index: 1000;
+}
+
+.fab-actions {
+    position: absolute;
+    bottom: 70px;
+    right: 0;
+    display: flex;
+    flex-direction: column-reverse;
+    gap: 12px;
+    opacity: 0;
+    visibility: hidden;
+    transition:
+        opacity 0.2s ease,
+        visibility 0.2s ease;
+}
+
+/* Show actions when expanded */
+.fab-container.fab-expanded .fab-actions {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* Individual action buttons */
+.fab-action {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    opacity: 0;
+    transform: scale(0) translateY(20px);
+}
+
+.fab-container.fab-expanded .fab-action {
+    animation: fab-action-in 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+/* Stagger animation delay */
+.fab-container.fab-expanded .fab-action:nth-child(1) { animation-delay: 0ms; }
+.fab-container.fab-expanded .fab-action:nth-child(2) { animation-delay: 50ms; }
+.fab-container.fab-expanded .fab-action:nth-child(3) { animation-delay: 100ms; }
+.fab-container.fab-expanded .fab-action:nth-child(4) { animation-delay: 150ms; }
+.fab-container.fab-expanded .fab-action:nth-child(5) { animation-delay: 200ms; }
+
+/* Action button */
+.fab-action-btn {
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: white;
+    color: #374151;
+    border: none;
+    border-radius: 50%;
+    font-size: 18px;
+    cursor: pointer;
+    box-shadow:
+        0 3px 8px rgba(0, 0, 0, 0.15),
+        0 1px 3px rgba(0, 0, 0, 0.1);
+    transition:
+        transform 0.2s ease,
+        background 0.2s ease;
+}
+
+.fab-action-btn:hover {
+    transform: scale(1.1);
+    background: #f3f4f6;
+}
+
+/* Action label */
+.fab-action-label {
+    background: white;
+    color: #374151;
+    padding: 6px 12px;
+    border-radius: 4px;
+    font-size: 13px;
+    font-weight: 500;
+    white-space: nowrap;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    opacity: 0;
+    transform: translateX(10px);
+    transition:
+        opacity 0.2s ease,
+        transform 0.2s ease;
+}
+
+.fab-action:hover .fab-action-label {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+/* Main FAB rotation when expanded */
+.fab-container.fab-expanded .fab-main {
+    transform: rotate(45deg);
+}
+
+.fab-main {
+    transition:
+        transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1),
+        box-shadow 0.2s ease;
+}
+
+/* Overlay when expanded */
+.fab-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.3);
+    opacity: 0;
+    visibility: hidden;
+    transition:
+        opacity 0.3s ease,
+        visibility 0.3s ease;
+    z-index: 999;
+}
+
+.fab-container.fab-expanded .fab-overlay {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* ==========================================================================
+   Mobile Adjustments
+   ========================================================================== */
+
+@media (max-width: 768px) {
+    .fab,
+    .floating-action-button,
+    .fab-container {
+        bottom: 80px; /* Above mobile nav */
+        right: 16px;
+    }
+
+    .fab--bottom-left,
+    .fab-container.fab--bottom-left {
+        left: 16px;
+    }
+
+    /* Smaller on mobile */
+    .fab,
+    .fab--md {
+        width: 52px;
+        height: 52px;
+        font-size: 22px;
+    }
+
+    .fab-actions {
+        bottom: 66px;
+    }
+
+    .fab-action-label {
+        display: none;
+    }
+}
+
+/* ==========================================================================
+   Dark Mode
+   ========================================================================== */
+
+[data-theme="dark"] .fab--surface {
+    background: #1f2937;
+    color: #a5b4fc;
+}
+
+[data-theme="dark"] .fab-action-btn {
+    background: #1f2937;
+    color: #e5e7eb;
+    box-shadow:
+        0 3px 8px rgba(0, 0, 0, 0.3),
+        0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+[data-theme="dark"] .fab-action-btn:hover {
+    background: #374151;
+}
+
+[data-theme="dark"] .fab-action-label {
+    background: #1f2937;
+    color: #e5e7eb;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+}
+
+[data-theme="dark"] .fab-badge {
+    border-color: #1f2937;
+}
+
+[data-theme="dark"] .fab-overlay {
+    background: rgba(0, 0, 0, 0.5);
+}
+
+/* ==========================================================================
+   Reduced Motion
+   ========================================================================== */
+
+@media (prefers-reduced-motion: reduce) {
+    .fab.fab-animate-in,
+    .floating-action-button.fab-animate-in {
+        animation: none;
+        opacity: 1;
+        transform: scale(1);
+    }
+
+    .fab.fab-animate-out,
+    .floating-action-button.fab-animate-out {
+        animation: none;
+    }
+
+    .fab--pulse {
+        animation: none;
+    }
+
+    .fab-container.fab-expanded .fab-action {
+        animation: none;
+        opacity: 1;
+        transform: none;
+    }
+
+    .fab-main {
+        transition: none;
+    }
+}
+
+/* ==========================================================================
+   Print - Hide FABs
+   ========================================================================== */
+
+@media print {
+    .fab,
+    .floating-action-button,
+    .fab-container {
+        display: none !important;
+    }
+}
+
+

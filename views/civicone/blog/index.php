@@ -43,10 +43,10 @@ $basePath = \Nexus\Core\TenantContext::getBasePath();
                 <p class="news-empty-text">Check back soon for the latest news and announcements.</p>
             </div>
         <?php else: ?>
-            <!-- News Grid -->
-            <div class="news-grid" id="news-grid-container" role="list">
+            <!-- News List (WCAG 2.1 AA - List layout for accessibility) -->
+            <ul class="news-list" id="news-grid-container" role="list">
                 <?php require __DIR__ . '/partials/feed-items.php'; ?>
-            </div>
+            </ul>
 
             <!-- Infinite Scroll Sentinel -->
             <div id="news-scroll-sentinel" class="news-scroll-sentinel" aria-hidden="true">

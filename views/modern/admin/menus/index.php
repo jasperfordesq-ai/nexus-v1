@@ -24,25 +24,25 @@ $isEnabled = \Nexus\Core\MenuManager::isEnabled();
 
 <?php if ($isEnabled && !empty($menuManagerConfig['show_warning'])): ?>
 <!-- DEVELOPMENT WARNING BANNER -->
-<div class="admin-alert admin-alert-danger" style="margin-bottom: 1.5rem;">
+<div class="admin-alert admin-alert-danger admin-alert--spaced">
     <div class="admin-alert-icon">
         <i class="fa-solid fa-exclamation-triangle"></i>
     </div>
     <div class="admin-alert-content">
         <strong>⚠️ MENU MANAGER IS UNDER DEVELOPMENT - UNSTABLE</strong>
-        <p style="margin: 0.5rem 0 0;">
+        <p class="beta-info-text">
             <strong>Status:</strong> <?= htmlspecialchars($menuManagerConfig['status'] ?? 'EXPERIMENTAL') ?> |
             <strong>Version:</strong> <?= htmlspecialchars($menuManagerConfig['version'] ?? '0.1.0-alpha') ?>
         </p>
-        <details style="margin-top: 0.75rem;">
-            <summary style="cursor: pointer; font-weight: 600;">Known Issues (Click to expand)</summary>
-            <ul style="margin: 0.5rem 0 0 1.5rem; line-height: 1.8;">
+        <details class="known-issues-details">
+            <summary class="known-issues-summary">Known Issues (Click to expand)</summary>
+            <ul class="known-issues-list">
                 <?php foreach ($menuManagerConfig['known_issues'] ?? [] as $issue): ?>
                     <li><?= htmlspecialchars($issue) ?></li>
                 <?php endforeach; ?>
             </ul>
         </details>
-        <div style="margin-top: 1rem; display: flex; gap: 1rem;">
+        <div class="known-issues-actions">
             <a href="<?= $basePath ?>/admin/menus?enable_menu_manager=0" class="admin-btn admin-btn-danger admin-btn-sm">
                 <i class="fa-solid fa-power-off"></i> Disable Menu Manager (Use Original Navigation)
             </a>
@@ -54,22 +54,22 @@ $isEnabled = \Nexus\Core\MenuManager::isEnabled();
 </div>
 <?php elseif (!$isEnabled): ?>
 <!-- MENU MANAGER DISABLED INFO -->
-<div class="admin-alert admin-alert-info" style="margin-bottom: 1.5rem;">
+<div class="admin-alert admin-alert-info admin-alert--spaced">
     <div class="admin-alert-icon">
         <i class="fa-solid fa-info-circle"></i>
     </div>
     <div class="admin-alert-content">
         <strong>Menu Manager is Currently Disabled</strong>
-        <p style="margin: 0.5rem 0 0;">
+        <p class="beta-info-text">
             The site is using the original stable navigation system.
             The Menu Manager is under development and not recommended for production use.
         </p>
         <?php if (!empty($menuManagerConfig['allow_admin_override'])): ?>
-        <div style="margin-top: 1rem;">
+        <div class="menu-status-wrapper">
             <a href="<?= $basePath ?>/admin/menus?enable_menu_manager=1" class="admin-btn admin-btn-warning admin-btn-sm">
                 <i class="fa-solid fa-flask"></i> Enable Menu Manager (Experimental - Testing Only)
             </a>
-            <span style="margin-left: 1rem; color: #f59e0b;">
+            <span class="menu-status-active">
                 <i class="fa-solid fa-exclamation-triangle"></i>
                 <strong>Warning:</strong> This is experimental and may break navigation
             </span>
@@ -91,6 +91,24 @@ $isEnabled = \Nexus\Core\MenuManager::isEnabled();
         </div>
     </div>
     <div class="page-hero-actions">
+        <div id="bulkActions" class="bulk-actions bulk-actions--hidden">
+            <span class="bulk-selected-count">0 selected</span>
+            <button onclick="bulkActivate()" class="admin-btn admin-btn-success admin-btn-sm">
+                <i class="fa-solid fa-check-circle"></i> Activate
+            </button>
+            <button onclick="bulkDeactivate()" class="admin-btn admin-btn-warning admin-btn-sm">
+                <i class="fa-solid fa-circle-xmark"></i> Deactivate
+            </button>
+            <button onclick="bulkDelete()" class="admin-btn admin-btn-danger admin-btn-sm">
+                <i class="fa-solid fa-trash"></i> Delete
+            </button>
+            <button onclick="clearSelection()" class="admin-btn admin-btn-secondary admin-btn-sm">
+                <i class="fa-solid fa-times"></i> Clear
+            </button>
+        </div>
+        <button onclick="clearMenuCache()" class="admin-btn admin-btn-secondary" id="clearCacheBtn">
+            <i class="fa-solid fa-broom"></i> Clear Cache
+        </button>
         <?php if ($can_create_more['allowed']): ?>
             <a href="<?= $basePath ?>/admin/menus/create" class="admin-btn admin-btn-primary">
                 <i class="fa-solid fa-plus"></i> New Menu
@@ -117,7 +135,7 @@ $isEnabled = \Nexus\Core\MenuManager::isEnabled();
 <?php endif; ?>
 
 <!-- Plan Info Card -->
-<div class="admin-glass-card" style="margin-bottom: 2rem;">
+<div class="admin-glass-card admin-glass-card--spaced">
     <div class="admin-card-header">
         <div class="admin-card-header-icon admin-card-header-icon-blue">
             <i class="fa-solid fa-crown"></i>
@@ -127,7 +145,7 @@ $isEnabled = \Nexus\Core\MenuManager::isEnabled();
             <p class="admin-card-subtitle">
                 Menus: <?= $can_create_more['current_count'] ?? 0 ?> / <?= $can_create_more['max_allowed'] ?? 1 ?>
                 <?php if ($can_create_more['allowed']): ?>
-                    <span style="color: var(--success-color);">
+                    <span class="text-success">
                         (<?= $can_create_more['remaining'] ?? 0 ?> remaining)
                     </span>
                 <?php endif; ?>
@@ -135,7 +153,7 @@ $isEnabled = \Nexus\Core\MenuManager::isEnabled();
         </div>
     </div>
     <div class="admin-card-body">
-        <div class="plan-features-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
+        <div class="plan-features-grid">
             <div class="plan-feature">
                 <strong>Allowed Layouts:</strong>
                 <p><?= implode(', ', $plan_status['allowed_layouts'] ?? ['modern']) ?></p>
@@ -165,7 +183,7 @@ $isEnabled = \Nexus\Core\MenuManager::isEnabled();
             <p class="admin-card-subtitle">Click to edit menu items and settings</p>
         </div>
     </div>
-    <div class="admin-card-body" style="padding: 0;">
+    <div class="admin-card-body admin-card-body--no-padding">
         <?php if (empty($menus)): ?>
         <div class="admin-empty-state">
             <div class="admin-empty-icon">
@@ -174,7 +192,7 @@ $isEnabled = \Nexus\Core\MenuManager::isEnabled();
             <h3 class="admin-empty-title">No Menus Yet</h3>
             <p class="admin-empty-text">Create your first navigation menu to get started.</p>
             <?php if ($can_create_more['allowed']): ?>
-            <a href="<?= $basePath ?>/admin/menus/create" class="admin-btn admin-btn-primary" style="margin-top: 1rem;">
+            <a href="<?= $basePath ?>/admin/menus/create" class="admin-btn admin-btn-primary menu-list-actions">
                 <i class="fa-solid fa-plus"></i> Create First Menu
             </a>
             <?php endif; ?>
@@ -182,7 +200,10 @@ $isEnabled = \Nexus\Core\MenuManager::isEnabled();
         <?php else: ?>
         <div class="menus-list">
             <?php foreach ($menus as $menu): ?>
-            <div class="menu-row" data-menu-id="<?= $menu['id'] ?>">
+            <div class="menu-row" data-menu-id="<?= $menu['id'] ?>" data-menu-active="<?= $menu['is_active'] ? '1' : '0' ?>">
+                <div class="menu-checkbox">
+                    <input type="checkbox" class="menu-select-checkbox" value="<?= $menu['id'] ?>" onchange="updateBulkActions()">
+                </div>
                 <div class="menu-info">
                     <div class="menu-title-row">
                         <span class="menu-title">
@@ -245,6 +266,37 @@ $isEnabled = \Nexus\Core\MenuManager::isEnabled();
             </div>
             <?php endforeach; ?>
         </div>
+
+        <!-- Pagination -->
+        <?php if (isset($pagination) && $pagination['total_pages'] > 1): ?>
+        <div class="pagination">
+            <?php if ($pagination['has_prev']): ?>
+                <a href="?page=<?= $pagination['current_page'] - 1 ?>" class="pagination-btn">
+                    <i class="fa-solid fa-chevron-left"></i> Previous
+                </a>
+            <?php else: ?>
+                <span class="pagination-btn pagination-btn-disabled">
+                    <i class="fa-solid fa-chevron-left"></i> Previous
+                </span>
+            <?php endif; ?>
+
+            <div class="pagination-info">
+                Page <?= $pagination['current_page'] ?> of <?= $pagination['total_pages'] ?>
+                <span class="pagination-total">(<?= $pagination['total'] ?> total)</span>
+            </div>
+
+            <?php if ($pagination['has_next']): ?>
+                <a href="?page=<?= $pagination['current_page'] + 1 ?>" class="pagination-btn">
+                    Next <i class="fa-solid fa-chevron-right"></i>
+                </a>
+            <?php else: ?>
+                <span class="pagination-btn pagination-btn-disabled">
+                    Next <i class="fa-solid fa-chevron-right"></i>
+                </span>
+            <?php endif; ?>
+        </div>
+        <?php endif; ?>
+
         <?php endif; ?>
     </div>
 </div>
@@ -551,6 +603,126 @@ $isEnabled = \Nexus\Core\MenuManager::isEnabled();
         margin-left: 0;
     }
 }
+
+/* Pagination */
+.pagination {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1.5rem;
+    margin-top: 2rem;
+    padding: 1.5rem;
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 0.5rem;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.pagination-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.625rem 1.25rem;
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.2), rgba(139, 92, 246, 0.15));
+    border: 1px solid rgba(99, 102, 241, 0.3);
+    border-radius: 0.375rem;
+    color: #fff;
+    text-decoration: none;
+    font-weight: 500;
+    transition: all 0.2s;
+    backdrop-filter: blur(10px);
+}
+
+.pagination-btn:hover:not(.pagination-btn-disabled) {
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.3), rgba(139, 92, 246, 0.25));
+    border-color: rgba(99, 102, 241, 0.5);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.2);
+}
+
+.pagination-btn-disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    background: rgba(255, 255, 255, 0.05);
+    border-color: rgba(255, 255, 255, 0.1);
+}
+
+.pagination-info {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.25rem;
+    font-weight: 600;
+    color: #fff;
+}
+
+.pagination-total {
+    font-size: 0.875rem;
+    font-weight: 400;
+    color: rgba(255, 255, 255, 0.6);
+}
+
+@media (max-width: 640px) {
+    .pagination {
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    .pagination-btn {
+        width: 100%;
+        justify-content: center;
+    }
+}
+
+/* Bulk Operations */
+.bulk-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.5rem 1rem;
+    background: rgba(99, 102, 241, 0.1);
+    border: 1px solid rgba(99, 102, 241, 0.3);
+    border-radius: 0.5rem;
+    margin-right: 1rem;
+}
+
+.bulk-selected-count {
+    font-weight: 600;
+    color: #fff;
+    padding: 0 0.5rem;
+}
+
+.menu-checkbox {
+    display: flex;
+    align-items: center;
+    padding: 0 1rem;
+}
+
+.menu-select-checkbox {
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+    accent-color: #6366f1;
+}
+
+.menu-row {
+    display: flex;
+    align-items: stretch;
+}
+
+.admin-btn-sm {
+    padding: 0.5rem 0.875rem;
+    font-size: 0.875rem;
+}
+
+.admin-btn-success {
+    background: linear-gradient(135deg, rgba(34, 197, 94, 0.2), rgba(22, 163, 74, 0.15));
+    border-color: rgba(34, 197, 94, 0.3);
+}
+
+.admin-btn-success:hover {
+    background: linear-gradient(135deg, rgba(34, 197, 94, 0.3), rgba(22, 163, 74, 0.25));
+    border-color: rgba(34, 197, 94, 0.5);
+}
 </style>
 
 <script>
@@ -604,6 +776,180 @@ function deleteMenu(menuId, menuName) {
         alert('Error: ' + error.message);
     });
 }
+
+function clearMenuCache() {
+    const btn = document.getElementById('clearCacheBtn');
+    const originalHTML = btn.innerHTML;
+
+    // Show loading state
+    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Clearing...';
+    btn.disabled = true;
+
+    fetch('<?= $basePath ?>/admin/menus/cache/clear', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded'
+        },
+        body: 'csrf_token=<?= Csrf::generate() ?>'
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Show success state
+            btn.innerHTML = '<i class="fa-solid fa-check"></i> Cache Cleared!';
+            btn.classList.remove('admin-btn-secondary');
+            btn.classList.add('admin-btn-success');
+
+            // Show notification
+            showNotification('Cache cleared successfully', 'success');
+
+            // Reset button after 2 seconds
+            setTimeout(() => {
+                btn.innerHTML = originalHTML;
+                btn.disabled = false;
+                btn.classList.remove('admin-btn-success');
+                btn.classList.add('admin-btn-secondary');
+            }, 2000);
+        } else {
+            alert('Error: ' + (data.error || 'Failed to clear cache'));
+            btn.innerHTML = originalHTML;
+            btn.disabled = false;
+        }
+    })
+    .catch(error => {
+        alert('Error: ' + error.message);
+        btn.innerHTML = originalHTML;
+        btn.disabled = false;
+    });
+}
+
+function showNotification(message, type = 'info') {
+    const notification = document.createElement('div');
+    notification.className = `cache-notification cache-notification-${type}`;
+    notification.innerHTML = `
+        <i class="fa-solid fa-${type === 'success' ? 'check-circle' : 'info-circle'}"></i>
+        <span>${message}</span>
+    `;
+    notification.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: ${type === 'success' ? 'rgba(34, 197, 94, 0.9)' : 'rgba(59, 130, 246, 0.9)'};
+        color: white;
+        padding: 1rem 1.5rem;
+        border-radius: 0.5rem;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        z-index: 10000;
+        font-weight: 600;
+        backdrop-filter: blur(10px);
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        animation: slideInRight 0.3s ease;
+    `;
+
+    document.body.appendChild(notification);
+
+    setTimeout(() => {
+        notification.style.opacity = '0';
+        notification.style.transform = 'translateX(100%)';
+        notification.style.transition = 'all 0.3s ease';
+        setTimeout(() => notification.remove(), 300);
+    }, 3000);
+}
+
+// Bulk Operations
+function updateBulkActions() {
+    const checkboxes = document.querySelectorAll('.menu-select-checkbox:checked');
+    const bulkActions = document.getElementById('bulkActions');
+    const count = checkboxes.length;
+
+    if (count > 0) {
+        bulkActions.style.display = 'flex';
+        bulkActions.querySelector('.bulk-selected-count').textContent = `${count} selected`;
+    } else {
+        bulkActions.style.display = 'none';
+    }
+}
+
+function getSelectedMenuIds() {
+    const checkboxes = document.querySelectorAll('.menu-select-checkbox:checked');
+    return Array.from(checkboxes).map(cb => parseInt(cb.value));
+}
+
+function clearSelection() {
+    document.querySelectorAll('.menu-select-checkbox').forEach(cb => cb.checked = false);
+    updateBulkActions();
+}
+
+function bulkActivate() {
+    const ids = getSelectedMenuIds();
+    if (ids.length === 0) return;
+
+    if (!confirm(`Activate ${ids.length} menu(s)?`)) return;
+
+    bulkOperation('activate', ids);
+}
+
+function bulkDeactivate() {
+    const ids = getSelectedMenuIds();
+    if (ids.length === 0) return;
+
+    if (!confirm(`Deactivate ${ids.length} menu(s)?`)) return;
+
+    bulkOperation('deactivate', ids);
+}
+
+function bulkDelete() {
+    const ids = getSelectedMenuIds();
+    if (ids.length === 0) return;
+
+    if (!confirm(`Delete ${ids.length} menu(s)? This will also delete all their menu items. This cannot be undone!`)) return;
+
+    bulkOperation('delete', ids);
+}
+
+function bulkOperation(action, ids) {
+    const formData = new FormData();
+    formData.append('csrf_token', '<?= Csrf::generate() ?>');
+    formData.append('action', action);
+    formData.append('menu_ids', JSON.stringify(ids));
+
+    fetch('<?= $basePath ?>/admin/menus/bulk', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            showNotification(`Successfully ${action}d ${data.affected || ids.length} menu(s)`, 'success');
+            setTimeout(() => location.reload(), 1000);
+        } else {
+            alert('Error: ' + (data.error || `Failed to ${action} menus`));
+        }
+    })
+    .catch(error => {
+        alert('Error: ' + error.message);
+    });
+}
 </script>
+
+<style>
+@keyframes slideInRight {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+.admin-btn-success {
+    background: linear-gradient(135deg, rgba(34, 197, 94, 0.9), rgba(22, 163, 74, 0.9)) !important;
+    border-color: rgba(34, 197, 94, 0.3) !important;
+}
+</style>
 
 <?php require dirname(__DIR__) . '/partials/admin-footer.php'; ?>

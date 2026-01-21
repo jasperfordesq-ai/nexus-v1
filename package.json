@@ -8,10 +8,16 @@
     "minify:php": "php scripts/minify.php",
     "lint:css": "stylelint \"httpdocs/assets/css/**/*.css\" --ignore-pattern \"**/*.min.css\" --ignore-pattern \"**/_archived/**\"",
     "lint:css:fix": "stylelint \"httpdocs/assets/css/**/*.css\" --ignore-pattern \"**/*.min.css\" --ignore-pattern \"**/_archived/**\" --fix",
+    "lint:js": "eslint \"httpdocs/assets/js/**/*.js\" --ignore-pattern \"**/*.min.js\"",
+    "lint:js:fix": "eslint \"httpdocs/assets/js/**/*.js\" --ignore-pattern \"**/*.min.js\" --fix",
+    "lint:php:styles": "php scripts/lint-inline-styles.php",
+    "lint": "npm run lint:css && npm run lint:js && npm run lint:php:styles",
+    "consolidate:css": "node scripts/consolidate-css.js",
     "build": "npm run minify:css && npm run minify:js && npm run build:css:core && npm run build:images"
   },
   "devDependencies": {
     "cssnano": "^7.1.2",
+    "eslint": "^8.57.0",
     "postcss": "^8.5.6",
     "postcss-cli": "^11.0.1",
     "purgecss": "^7.0.2",
