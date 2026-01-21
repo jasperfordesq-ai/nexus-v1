@@ -5,19 +5,23 @@
  * With Page Hero (Section 9C: Page Hero Contract)
  */
 
-// Include layout header (opens <main> via main-open.php)
+// CivicOne layout header
 require __DIR__ . '/../../layouts/civicone/header.php';
-
-// Render hero (auto-resolves from config/heroes.php for /groups route)
-require __DIR__ . '/../../layouts/civicone/partials/render-hero.php';
 
 $basePath = \Nexus\Core\TenantContext::getBasePath();
 ?>
 
+<!-- GOV.UK Page Template Boilerplate (Section 10.0) -->
+<div class="civicone-width-container">
+    <main class="civicone-main-wrapper" id="main-content">
+
+        <!-- Hero (auto-resolves from config/heroes.php for /groups route) -->
+        <?php require __DIR__ . '/../../layouts/civicone/partials/render-hero.php'; ?>
+
         <!-- MOJ Filter Pattern: 1/3 Filters + 2/3 Results -->
         <div class="civicone-grid-row">
             <div class="civicone-grid-column-one-third">
-                <a href="<?= $basePath ?>/create-group" class="civicone-button civicone-button--primary" style="width: 100%; margin-bottom: var(--civicone-space-6, 30px);">
+                <a href="<?= $basePath ?>/create-group" class="civicone-button civicone-button--primary civicone-button--full-width-spaced">
                     Start a Hub
                 </a>
             </div>
@@ -256,5 +260,8 @@ $basePath = \Nexus\Core\TenantContext::getBasePath();
 
             </div><!-- /two-thirds -->
         </div><!-- /grid-row -->
+
+    </main>
+</div>
 
 <?php require __DIR__ . '/../../layouts/civicone/footer.php'; ?>

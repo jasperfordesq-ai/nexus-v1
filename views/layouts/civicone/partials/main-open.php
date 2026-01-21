@@ -7,6 +7,9 @@
     if (file_exists($impersonationBannerPath)) {
         require $impersonationBannerPath;
     }
+
+    // Signal that main content area has started (for bridge file compatibility)
+    define('MAIN_CONTENT_STARTED', true);
     ?>
 
     <main id="main-content" class="civic-container">

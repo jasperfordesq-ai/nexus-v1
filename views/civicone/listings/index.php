@@ -6,26 +6,17 @@ require __DIR__ . '/../../layouts/civicone/header.php';
 $basePath = \Nexus\Core\TenantContext::getBasePath();
 ?>
 
-<?php
-$breadcrumbs = [
-    ['label' => 'Home', 'url' => '/'],
-    ['label' => 'Offers & Requests']
-];
-require __DIR__ . '/../../layouts/civicone/partials/breadcrumb.php';
-?>
-
 <!-- GOV.UK Page Template Boilerplate -->
-<div class="civicone-width-container civicone--govuk">
-    <main class="civicone-main-wrapper" id="main-content" role="main">
+<div class="civicone-width-container">
+    <main class="civicone-main-wrapper" id="main-content">
 
-        <!-- Page Header -->
-        <div class="civicone-grid-row">
-            <div class="civicone-grid-column-two-thirds">
-                <h1 class="civicone-heading-xl">Offers & Requests</h1>
-                <p class="civicone-body-l">Browse community listings, share what you can offer, or request what you need.</p>
-            </div>
+        <!-- Hero (auto-resolves from config/heroes.php for /listings route) -->
+        <?php require __DIR__ . '/../../layouts/civicone/partials/render-hero.php'; ?>
+
+        <!-- Action Button -->
+        <div class="civicone-grid-row civicone-action-row">
             <div class="civicone-grid-column-one-third">
-                <a href="<?= $basePath ?>/listings/create" class="civicone-button" style="margin-top: 20px; width: 100%;">
+                <a href="<?= $basePath ?>/listings/create" class="civicone-button civicone-button--primary civicone-button--full-width">
                     Post an Ad
                 </a>
             </div>
@@ -99,7 +90,7 @@ require __DIR__ . '/../../layouts/civicone/partials/breadcrumb.php';
                         </div>
                         <?php endif; ?>
 
-                        <button type="submit" class="civicone-button civicone-button--secondary" style="width: 100%;">
+                        <button type="submit" class="civicone-button civicone-button--secondary civicone-button--full-width">
                             Apply filters
                         </button>
                     </form>

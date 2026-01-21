@@ -155,6 +155,9 @@
     <!-- Profile Social Components (Posts, Comments, Actions - WCAG 2.1 AA 2026-01-20) -->
     <link rel="stylesheet" href="/assets/css/civicone-profile-social.min.css?v=<?= $cssVersion ?>">
 
+    <!-- Directory Utilities (Extracted inline styles for events, listings, volunteering, feed - 2026-01-21) -->
+    <link rel="stylesheet" href="/assets/css/civicone-directory-utilities.min.css?v=<?= $cssVersion ?>">
+
     <!-- Emergency Scroll Fix - MUST be last to override all other styles -->
     <link rel="stylesheet" href="/assets/css/scroll-fix-emergency.min.css?v=<?= $cssVersion ?>">
     <!-- FONT AWESOME (Icons for mobile nav, buttons, etc.) - Async loaded -->

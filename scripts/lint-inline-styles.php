@@ -14,8 +14,27 @@ $exitCode = 0;
 $violationCount = 0;
 $fileCount = 0;
 
-// Directories to scan
-$scanDirs = ['views'];
+// Check if running in pre-commit hook (check only staged files)
+$isPreCommit = getenv('GIT_AUTHOR_DATE') || isset($_SERVER['GIT_AUTHOR_DATE']);
+$filesToCheck = [];
+
+if ($isPreCommit || (isset($argv[1]) && $argv[1] === '--staged')) {
+    // Get list of staged PHP files
+    exec('git diff --cached --name-only --diff-filter=ACM', $stagedFiles);
+    $filesToCheck = array_filter($stagedFiles, function($file) {
+        return str_ends_with($file, '.php')
+            && file_exists($file)
+            && !str_starts_with($file, 'scripts/');  // Exclude scripts directory
+    });
+
+    if (empty($filesToCheck)) {
+        echo "\n✅ \033[32mNo PHP files staged for commit.\033[0m\n\n";
+        exit(0);
+    }
+} else {
+    // Scan all files in views directory
+    $scanDirs = ['views'];
+}
 
 // Patterns that are allowed (truly dynamic values)
 $allowedPatterns = [
@@ -34,17 +53,14 @@ $allowedPatterns = [
 echo "\n🔍 Scanning PHP files for inline style violations...\n";
 echo "📋 Per CLAUDE.md: inline styles only allowed for truly dynamic values\n\n";
 
-foreach ($scanDirs as $dir) {
-    $iterator = new RecursiveIteratorIterator(
-        new RecursiveDirectoryIterator($dir)
-    );
-
-    foreach ($iterator as $file) {
-        if ($file->getExtension() !== 'php') {
+if (!empty($filesToCheck)) {
+    // Check only specific files (staged files)
+    foreach ($filesToCheck as $filePath) {
+        $filePath = trim($filePath);
+        if (!file_exists($filePath)) {
             continue;
         }
 
-        $filePath = $file->getPathname();
         $content = file_get_contents($filePath);
         $lines = explode("\n", $content);
 
@@ -88,6 +104,66 @@ foreach ($scanDirs as $dir) {
                 $violationCount++;
                 $fileCount++;
                 $exitCode = 1;
+            }
+        }
+    }
+} else {
+    // Scan directories (full scan mode)
+    foreach ($scanDirs as $dir) {
+        $iterator = new RecursiveIteratorIterator(
+            new RecursiveDirectoryIterator($dir)
+        );
+
+        foreach ($iterator as $file) {
+            if ($file->getExtension() !== 'php') {
+                continue;
+            }
+
+            $filePath = $file->getPathname();
+            $content = file_get_contents($filePath);
+            $lines = explode("\n", $content);
+
+            // Find all style attributes
+            preg_match_all('/style="[^"]*"/', $content, $matches, PREG_OFFSET_CAPTURE);
+
+            foreach ($matches[0] as $match) {
+                $styleAttr = $match[0];
+                $offset = $match[1];
+
+                // Check if this is an allowed pattern
+                $isAllowed = false;
+                foreach ($allowedPatterns as $pattern) {
+                    if (preg_match($pattern, $styleAttr)) {
+                        $isAllowed = true;
+                        break;
+                    }
+                }
+
+                if (!$isAllowed) {
+                    // Find line number
+                    $lineNum = substr_count(substr($content, 0, $offset), "\n") + 1;
+                    $line = $lines[$lineNum - 1];
+
+                    // Extract just the relevant part
+                    $snippet = trim(substr($line, max(0, strpos($line, 'style=') - 10), 80));
+                    if (strlen($line) > 80) {
+                        $snippet .= '...';
+                    }
+
+                    if ($violationCount === 0) {
+                        echo "❌ VIOLATIONS FOUND:\n\n";
+                    }
+
+                    echo "  File: \033[33m{$filePath}\033[0m\n";
+                    echo "  Line: \033[33m{$lineNum}\033[0m\n";
+                    echo "  Code: \033[90m{$snippet}\033[0m\n";
+                    echo "  \033[31m✗ Static inline style detected\033[0m\n";
+                    echo "  💡 Fix: Extract to CSS class in /httpdocs/assets/css/\n\n";
+
+                    $violationCount++;
+                    $fileCount++;
+                    $exitCode = 1;
+                }
             }
         }
     }

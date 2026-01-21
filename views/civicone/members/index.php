@@ -5,12 +5,16 @@
  * With Page Hero (Section 9C: Page Hero Contract)
  */
 
-// Include layout header (opens <main> via main-open.php)
+// CivicOne layout header
 require __DIR__ . '/../../layouts/civicone/header.php';
-
-// Render hero (auto-resolves from config/heroes.php for /members route)
-require __DIR__ . '/../../layouts/civicone/partials/render-hero.php';
 ?>
+
+<!-- GOV.UK Page Template Boilerplate (Section 10.0) -->
+<div class="civicone-width-container">
+    <main class="civicone-main-wrapper" id="main-content">
+
+        <!-- Hero (auto-resolves from config/heroes.php for /members route) -->
+        <?php require __DIR__ . '/../../layouts/civicone/partials/render-hero.php'; ?>
 
         <!-- MOJ Filter Pattern: 1/3 Filters + 2/3 Results -->
         <div class="civicone-grid-row">
@@ -37,7 +41,7 @@ require __DIR__ . '/../../layouts/civicone/partials/render-hero.php';
                                 value="<?= htmlspecialchars($_GET['q'] ?? '') ?>"
                             >
                             <span class="civicone-search-icon" aria-hidden="true"></span>
-                            <div id="search-spinner" class="civicone-spinner" style="display: none;" aria-live="polite" aria-label="Searching"></div>
+                            <div id="search-spinner" class="civicone-spinner civicone-spinner--hidden" aria-live="polite" aria-label="Searching"></div>
                         </div>
                     </div>
 
@@ -344,5 +348,8 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 </script>
+
+    </main>
+</div>
 
 <?php require __DIR__ . '/../../layouts/civicone/footer.php'; ?>

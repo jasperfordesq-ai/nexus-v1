@@ -497,9 +497,14 @@ require dirname(__DIR__, 2) . '/layouts/civicone/header.php';
 
 <!-- Feed styles now loaded from external CSS file: /assets/css/civicone-feed.css -->
 
-<main id="main-content" role="main">
-<div class="civic-container">
-    <div class="civic-feed-container">
+<!-- GOV.UK Page Template Boilerplate (Section 10.0) -->
+<div class="civicone-width-container">
+    <main class="civicone-main-wrapper" id="main-content">
+
+        <!-- Hero (auto-resolves from config/heroes.php for /feed route) -->
+        <?php require dirname(__DIR__, 2) . '/layouts/civicone/partials/render-hero.php'; ?>
+
+        <div class="civic-feed-container">
 
         <!-- Post Composer -->
         <?php if ($isLoggedIn): ?>
@@ -544,7 +549,7 @@ require dirname(__DIR__, 2) . '/layouts/civicone/header.php';
                             <span class="civic-composer-user-name"><?= htmlspecialchars($_SESSION['user_name'] ?? 'User') ?></span>
                         </div>
 
-                        <input type="file" id="post-image-input" name="image" accept="image/*" style="display:none;" onchange="previewImage(this)">
+                        <input type="file" id="post-image-input" name="image" accept="image/*" class="feed-image-input-hidden" onchange="previewImage(this)">
 
                         <div id="image-preview-area" class="civic-composer-media-preview">
                             <img id="image-preview-img" src="" alt="Preview">
@@ -561,10 +566,10 @@ require dirname(__DIR__, 2) . '/layouts/civicone/header.php';
                             <span class="civic-composer-tools-label">Add to your post</span>
                             <div class="civic-composer-tools-icons">
                                 <button type="button" class="civic-composer-tool-btn" onclick="document.getElementById('post-image-input').click()" title="Add Photo" aria-label="Add photo">
-                                    <span class="dashicons dashicons-format-image" style="color: #22C55E;" aria-hidden="true"></span>
+                                    <span class="dashicons dashicons-format-image feed-icon-green" aria-hidden="true"></span>
                                 </button>
                                 <button type="button" class="civic-composer-tool-btn" onclick="showToast('Location feature coming soon!')" title="Add Location" aria-label="Add location">
-                                    <span class="dashicons dashicons-location" style="color: #EF4444;" aria-hidden="true"></span>
+                                    <span class="dashicons dashicons-location feed-icon-red" aria-hidden="true"></span>
                                 </button>
                             </div>
                         </div>
@@ -675,7 +680,7 @@ require dirname(__DIR__, 2) . '/layouts/civicone/header.php';
                                 <time datetime="<?= htmlspecialchars($isoDatetime) ?>"><?= $timeElapsed($createdAt) ?></time>
                                 <?php if ($location): ?>
                                     <span aria-hidden="true">·</span>
-                                    <span class="dashicons dashicons-location" style="font-size: 14px;" aria-hidden="true"></span>
+                                    <span class="dashicons dashicons-location feed-icon-location" aria-hidden="true"></span>
                                     <?= htmlspecialchars($location) ?>
                                 <?php endif; ?>
                             </div>
@@ -770,7 +775,7 @@ require dirname(__DIR__, 2) . '/layouts/civicone/header.php';
                                         </a>
                                         <div>
                                             <div class="civic-shared-author">
-                                                <a href="<?= $basePath ?>/profile/<?= $sharedData['user_id'] ?>" style="color: inherit; text-decoration: none;">
+                                                <a href="<?= $basePath ?>/profile/<?= $sharedData['user_id'] ?>" class="feed-shared-link">
                                                     <?= htmlspecialchars($sharedData['author']) ?>
                                                 </a>
                                                 <span class="civic-shared-label">· <?= $sharedData['label'] ?></span>
@@ -787,10 +792,10 @@ require dirname(__DIR__, 2) . '/layouts/civicone/header.php';
                                         <?php endif; ?>
                                     </div>
                                     <?php if (!empty($sharedData['image'])): ?>
-                                        <img src="<?= htmlspecialchars($sharedData['image']) ?>" style="width: 100%; display: block;" alt="">
+                                        <img src="<?= htmlspecialchars($sharedData['image']) ?>" class="feed-shared-image" alt="">
                                     <?php endif; ?>
                                     <?php if (!empty($sharedData['link'])): ?>
-                                        <div style="padding: 12px; border-top: 1px solid var(--civic-border);">
+                                        <div class="feed-shared-body">
                                             <a href="<?= $sharedData['link'] ?>" class="civic-view-btn civic-view-btn--secondary">
                                                 View Original
                                                 <span class="dashicons dashicons-arrow-right-alt" aria-hidden="true"></span>
@@ -821,7 +826,7 @@ require dirname(__DIR__, 2) . '/layouts/civicone/header.php';
                         $listingType = $item['listing_type'] ?? 'offer';
                     ?>
                         <div class="civic-type-banner civic-type-banner-listing <?= $listingType === 'request' ? 'request' : '' ?>">
-                            <div class="civic-type-label" style="color: <?= $listingType === 'offer' ? 'var(--civic-brand)' : '#F59E0B' ?>;">
+                            <div class="civic-type-label <?= $listingType === 'offer' ? 'feed-type-offer' : 'feed-type-request' ?>">
                                 <?= ucfirst($listingType) ?>
                             </div>
                             <div class="civic-type-title"><?= htmlspecialchars($item['title'] ?? '') ?></div>
@@ -840,10 +845,10 @@ require dirname(__DIR__, 2) . '/layouts/civicone/header.php';
 
                     <?php if ($type === 'event'): ?>
                         <div class="civic-type-banner civic-type-banner-event">
-                            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px;">
-                                <div class="civic-type-label" style="color: #9f1239;">Upcoming Event</div>
+                            <div class="feed-event-header">
+                                <div class="civic-type-label feed-type-event">Upcoming Event</div>
                                 <?php if (!empty($item['event_date'])): ?>
-                                    <span class="civic-type-badge" style="color: #9f1239;">
+                                    <span class="civic-type-badge feed-type-event">
                                         <span class="dashicons dashicons-calendar" aria-hidden="true"></span>
                                         <?= date('M j', strtotime($item['event_date'])) ?>
                                     </span>
@@ -851,10 +856,10 @@ require dirname(__DIR__, 2) . '/layouts/civicone/header.php';
                             </div>
                             <div class="civic-type-title"><?= htmlspecialchars($item['title'] ?? 'Event') ?></div>
                             <div class="civic-type-meta">
-                                <span class="dashicons dashicons-location" style="color: #9f1239;" aria-hidden="true"></span>
+                                <span class="dashicons dashicons-location feed-type-event" aria-hidden="true"></span>
                                 <?= htmlspecialchars($location ?? 'Location TBD') ?>
                             </div>
-                            <a href="<?= $viewLink ?>" class="civic-view-btn" style="background: #9f1239;">
+                            <a href="<?= $viewLink ?>" class="civic-view-btn civic-view-btn--event">
                                 RSVP Now
                                 <span class="dashicons dashicons-arrow-right-alt" aria-hidden="true"></span>
                             </a>
@@ -863,10 +868,10 @@ require dirname(__DIR__, 2) . '/layouts/civicone/header.php';
 
                     <?php if ($type === 'goal'): ?>
                         <div class="civic-type-banner civic-type-banner-goal">
-                            <div class="civic-type-label" style="color: #22C55E;">Community Goal</div>
+                            <div class="civic-type-label feed-type-goal">Community Goal</div>
                             <div class="civic-type-title"><?= htmlspecialchars($item['title'] ?? 'Goal') ?></div>
                             <div class="civic-type-meta">
-                                <span class="dashicons dashicons-calendar-alt" style="color: #22C55E;" aria-hidden="true"></span>
+                                <span class="dashicons dashicons-calendar-alt feed-type-goal" aria-hidden="true"></span>
                                 Target: <?= !empty($item['target_date']) ? date('M j, Y', strtotime($item['target_date'])) : 'No Deadline' ?>
                             </div>
                             <a href="<?= $viewLink ?>" class="civic-view-btn civic-view-btn--secondary">
@@ -878,13 +883,13 @@ require dirname(__DIR__, 2) . '/layouts/civicone/header.php';
 
                     <?php if ($type === 'poll'): ?>
                         <div class="civic-type-banner civic-type-banner-poll">
-                            <div class="civic-type-label" style="color: #3B82F6;">Community Poll</div>
+                            <div class="civic-type-label feed-type-poll">Community Poll</div>
                             <div class="civic-type-title"><?= htmlspecialchars($item['title'] ?? 'Poll') ?></div>
                             <div class="civic-type-meta">
-                                <span class="dashicons dashicons-chart-bar" style="color: #3B82F6;" aria-hidden="true"></span>
+                                <span class="dashicons dashicons-chart-bar feed-type-poll" aria-hidden="true"></span>
                                 <?= $item['vote_count'] ?? 0 ?> votes
                             </div>
-                            <a href="<?= $viewLink ?>" class="civic-view-btn" style="background: #2563eb;">
+                            <a href="<?= $viewLink ?>" class="civic-view-btn civic-view-btn--poll">
                                 Vote Now
                                 <span class="dashicons dashicons-arrow-right-alt" aria-hidden="true"></span>
                             </a>
@@ -893,18 +898,18 @@ require dirname(__DIR__, 2) . '/layouts/civicone/header.php';
 
                     <?php if ($type === 'volunteering'): ?>
                         <div class="civic-type-banner civic-type-banner-volunteering">
-                            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px;">
-                                <div class="civic-type-label" style="color: #0369a1;">Volunteer Opportunity</div>
-                                <span class="civic-type-badge" style="color: #0369a1;">
+                            <div class="feed-event-header">
+                                <div class="civic-type-label feed-type-volunteering">Volunteer Opportunity</div>
+                                <span class="civic-type-badge feed-type-volunteering">
                                     <?= $item['credits'] ?? 0 ?> Credits
                                 </span>
                             </div>
                             <div class="civic-type-title"><?= htmlspecialchars($item['title'] ?? 'Opportunity') ?></div>
                             <div class="civic-type-meta">
-                                <span class="dashicons dashicons-location" style="color: #0369a1;" aria-hidden="true"></span>
+                                <span class="dashicons dashicons-location feed-type-volunteering" aria-hidden="true"></span>
                                 <?= htmlspecialchars($location ?? 'Remote') ?>
                             </div>
-                            <a href="<?= $viewLink ?>" class="civic-view-btn" style="background: #0369a1;">
+                            <a href="<?= $viewLink ?>" class="civic-view-btn civic-view-btn--volunteering">
                                 I'm Interested
                                 <span class="dashicons dashicons-arrow-right-alt" aria-hidden="true"></span>
                             </a>
@@ -915,7 +920,7 @@ require dirname(__DIR__, 2) . '/layouts/civicone/header.php';
                     <div class="civic-feed-stats">
                         <div class="civic-feed-stats-left">
                             <?php if ($likesCount > 0): ?>
-                                <span class="dashicons dashicons-heart" style="color: #D4351C; font-size: 16px;" aria-hidden="true"></span>
+                                <span class="dashicons dashicons-heart feed-like-icon" aria-hidden="true"></span>
                                 <span><?= $likesCount ?></span>
                             <?php endif; ?>
                         </div>
@@ -993,7 +998,7 @@ require dirname(__DIR__, 2) . '/layouts/civicone/header.php';
         <?php else: ?>
             <div class="civic-empty-state">
                 <div class="civic-empty-icon" aria-hidden="true">
-                    <span class="dashicons dashicons-megaphone" style="font-size: 48px; width: 48px; height: 48px;"></span>
+                    <span class="dashicons dashicons-megaphone feed-empty-icon-large"></span>
                 </div>
                 <h3 class="civic-empty-title">Welcome to the Community Pulse</h3>
                 <p class="civic-empty-text">It's quiet here... Be the first to post something!</p>
@@ -1011,9 +1016,10 @@ require dirname(__DIR__, 2) . '/layouts/civicone/header.php';
             </div>
         <?php endif; ?>
 
-    </div>
+        </div><!-- /civic-feed-container -->
+
+    </main>
 </div>
-</main>
 
 <!-- Feed Announcements Live Region (WCAG 2.1 AA Compliance) -->
 <div aria-live="polite" aria-atomic="false" class="civicone-visually-hidden" id="feed-announcements"></div>
@@ -1178,7 +1184,7 @@ function fetchComments(type, id) {
     const list = section?.querySelector('.comments-list');
     if (!list) return;
 
-    list.innerHTML = '<div style="color: var(--civic-text-muted); text-align: center; padding: 16px;">Loading comments...</div>';
+    list.innerHTML = '<div class="feed-loading-message">Loading comments...</div>';
 
     currentTargetType = type;
     currentTargetId = id;
@@ -1202,11 +1208,11 @@ function fetchComments(type, id) {
                     </div>
                 `).join('');
             } else {
-                list.innerHTML = '<div style="color: var(--civic-text-muted); text-align: center; padding: 16px;">No comments yet. Be the first!</div>';
+                list.innerHTML = '<div class="feed-loading-message">No comments yet. Be the first!</div>';
             }
         })
         .catch(() => {
-            list.innerHTML = '<div style="color: #D4351C; text-align: center; padding: 16px;">Error loading comments</div>';
+            list.innerHTML = '<div class="feed-error-message">Error loading comments</div>';
         });
 }
 
@@ -1319,7 +1325,7 @@ if (IS_LOGGED_IN && window.innerWidth <= 768) {
             // Fallback if FAB module not loaded
             const fab = document.createElement('button');
             fab.className = 'fab fab-animate-in';
-            fab.innerHTML = '<span class="dashicons dashicons-edit" style="font-size: 24px; width: 24px; height: 24px;"></span>';
+            fab.innerHTML = '<span class="dashicons dashicons-edit feed-fab-icon"></span>';
             fab.setAttribute('aria-label', 'Create post');
             fab.style.cssText = 'position:fixed; bottom:80px; right:16px; width:56px; height:56px; border-radius:16px; background:linear-gradient(135deg, #6366f1, #8b5cf6); color:white; border:none; box-shadow:0 4px 12px rgba(99,102,241,0.4); display:flex; align-items:center; justify-content:center; z-index:1000; cursor:pointer;';
             fab.addEventListener('click', function() {

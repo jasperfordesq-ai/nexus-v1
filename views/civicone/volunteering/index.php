@@ -18,15 +18,18 @@ require __DIR__ . '/../../layouts/civicone/partials/breadcrumb.php';
 <div class="civicone-width-container civicone--govuk">
     <main class="civicone-main-wrapper" id="main-content" role="main">
 
-        <!-- Page Header -->
-        <div class="civicone-grid-row">
+        <!-- Hero (auto-resolves from config/heroes.php for /volunteering route) -->
+        <?php require __DIR__ . '/../../layouts/civicone/partials/render-hero.php'; ?>
+
+        <!-- Page Header (Note: Hero replaces manual H1, keeping for backward compatibility) -->
+        <div class="civicone-grid-row civicone-hidden">
             <div class="civicone-grid-column-two-thirds">
                 <h1 class="civicone-heading-xl">Volunteer Opportunities</h1>
                 <p class="civicone-body-l">Connect with local organizations and make a difference in your community.</p>
             </div>
             <div class="civicone-grid-column-one-third">
                 <?php if (isset($_SESSION['user_id'])): ?>
-                    <a href="<?= $basePath ?>/volunteering/my-applications" class="civicone-button civicone-button--secondary" style="margin-top: 20px; width: 100%;">
+                    <a href="<?= $basePath ?>/volunteering/my-applications" class="civicone-button civicone-button--secondary civicone-action-row civicone-button--full-width">
                         My Applications
                     </a>
                 <?php endif; ?>
@@ -98,7 +101,7 @@ require __DIR__ . '/../../layouts/civicone/partials/breadcrumb.php';
                             </fieldset>
                         </div>
 
-                        <button type="submit" class="civicone-button civicone-button--secondary" style="width: 100%;">
+                        <button type="submit" class="civicone-button civicone-button--secondary civicone-button--full-width">
                             Apply filters
                         </button>
                     </form>
@@ -142,10 +145,10 @@ require __DIR__ . '/../../layouts/civicone/partials/breadcrumb.php';
 
                 <!-- Secondary Actions -->
                 <?php if (isset($_SESSION['user_id'])): ?>
-                <div class="civicone-filter-panel" style="margin-top: 20px;">
+                <div class="civicone-filter-panel civicone-secondary-panel">
                     <h3 class="civicone-heading-s">Organization dashboard</h3>
-                    <p class="civicone-body-s" style="margin-bottom: 15px;">Manage your opportunities and applications</p>
-                    <a href="<?= $basePath ?>/volunteering/dashboard" class="civicone-button civicone-button--secondary" style="width: 100%;">
+                    <p class="civicone-body-s civicone-secondary-panel-description">Manage your opportunities and applications</p>
+                    <a href="<?= $basePath ?>/volunteering/dashboard" class="civicone-button civicone-button--secondary civicone-button--full-width">
                         View Dashboard
                     </a>
                 </div>

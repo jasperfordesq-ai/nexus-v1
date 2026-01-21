@@ -167,8 +167,10 @@ module.exports = {
         'httpdocs/assets/css/civicone-utilities.css',
         'httpdocs/assets/css/civicone-blog-utilities.css',
         'httpdocs/assets/css/civicone-groups-utilities.css',
+        'httpdocs/assets/css/civicone-directory-utilities.css',
         // Modern layout utilities - extracted inline styles (2026-01-21)
         'httpdocs/assets/css/modern-header-utilities.css',
+        'httpdocs/assets/css/modern-header-emergency-fixes.css',
         // CivicOne report pages - strategic plan & impact report (2026-01-21)
         'httpdocs/assets/css/civicone-report-pages.css',
         // CivicOne feed item partial - extracted inline styles (2026-01-21)
