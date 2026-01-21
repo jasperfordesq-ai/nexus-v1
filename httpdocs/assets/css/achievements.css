@@ -61,7 +61,7 @@
 .nav-pill:hover,
 .nav-pill.active {
     background: white;
-    color: #1e1e2e;
+    color: var(--color-gray-900);
 }
 
 /* Back Link */
@@ -111,7 +111,7 @@
     display: inline-flex;
     align-items: center;
     gap: 8px;
-    color: #6366f1;
+    color: var(--color-primary-500);
     font-weight: 600;
     text-decoration: none;
     margin-top: 16px;
@@ -119,20 +119,20 @@
 }
 
 .view-all-link:hover {
-    color: #4f46e5;
+    color: var(--color-primary-600);
 }
 
 /* Success Toast */
 .success-toast {
-    background: #dcfce7;
-    color: #166534;
+    background: var(--color-success);
+    color: white;
     padding: 12px 20px;
     border-radius: 10px;
     margin-bottom: 20px;
     display: flex;
     align-items: center;
     gap: 10px;
-    border: 1px solid #bbf7d0;
+    border: 1px solid var(--color-success);
     transition: opacity 0.3s ease, transform 0.3s ease;
 }
 
@@ -190,17 +190,17 @@
 }
 
 .hero-stat-icon.badges-icon {
-    background: linear-gradient(135deg, #fbbf24, #f59e0b);
+    background: linear-gradient(135deg, var(--color-warning), var(--color-warning));
     color: white;
 }
 
 .hero-stat-icon.streak-icon {
-    background: linear-gradient(135deg, #f97316, #ea580c);
+    background: linear-gradient(135deg, var(--color-orange-500), var(--color-orange-600));
     color: white;
 }
 
 .hero-stat-icon.rank-icon {
-    background: linear-gradient(135deg, #10b981, #059669);
+    background: linear-gradient(135deg, var(--color-success), var(--color-success));
     color: white;
 }
 
@@ -210,7 +210,7 @@
     height: 56px;
     border-radius: 50%;
     background: conic-gradient(
-        #6366f1 calc(var(--progress) * 3.6deg),
+        var(--color-primary-500) calc(var(--progress) * 3.6deg),
         rgba(99, 102, 241, 0.15) calc(var(--progress) * 3.6deg)
     );
     display: flex;
@@ -231,7 +231,7 @@
     position: relative;
     font-size: 1.5rem;
     font-weight: 800;
-    color: #6366f1;
+    color: var(--color-primary-500);
 }
 
 .hero-stat-info {
@@ -242,13 +242,13 @@
 .hero-stat-value {
     font-size: 1.5rem;
     font-weight: 800;
-    color: #1f2937;
+    color: var(--color-gray-800);
     line-height: 1.2;
 }
 
 .hero-stat-label {
     font-size: 0.8rem;
-    color: #6b7280;
+    color: var(--color-gray-500);
     font-weight: 500;
 }
 
@@ -269,7 +269,7 @@
 /* Level Badge in Card Header */
 .level-badge {
     margin-left: auto;
-    background: linear-gradient(135deg, #6366f1, #8b5cf6);
+    background: linear-gradient(135deg, var(--color-primary-500), var(--color-purple-500));
     color: white;
     padding: 4px 12px;
     border-radius: 20px;
@@ -281,7 +281,7 @@
 .badge-count {
     margin-left: auto;
     background: rgba(99, 102, 241, 0.1);
-    color: #6366f1;
+    color: var(--color-primary-500);
     padding: 4px 12px;
     border-radius: 20px;
     font-size: 0.8rem;
@@ -303,7 +303,7 @@
 
 .xp-bar-track {
     height: 20px;
-    background: #e5e7eb;
+    background: var(--color-gray-200);
     border-radius: 12px;
     overflow: hidden;
     position: relative;
@@ -312,7 +312,7 @@
 
 .xp-bar-fill {
     height: 100%;
-    background: linear-gradient(90deg, #6366f1, #8b5cf6, #a855f7);
+    background: linear-gradient(90deg, var(--color-primary-500), var(--color-purple-500), var(--color-purple-500));
     border-radius: 12px;
     position: relative;
     min-width: 20px;
@@ -338,23 +338,23 @@
     align-items: center;
     margin-top: 10px;
     font-size: 0.8rem;
-    color: #6b7280;
+    color: var(--color-gray-500);
 }
 
 .xp-current {
     font-weight: 700;
-    color: #6366f1;
+    color: var(--color-primary-500);
 }
 
 .xp-hint {
     text-align: center;
     font-size: 0.85rem;
-    color: #9ca3af;
+    color: var(--color-gray-400);
     margin: 0;
 }
 
 .xp-hint.xp-max {
-    color: #10b981;
+    color: var(--color-success);
     font-weight: 600;
 }
 
@@ -381,14 +381,14 @@
 
 .streak-row.active {
     background: linear-gradient(135deg, rgba(99, 102, 241, 0.08), rgba(139, 92, 246, 0.06));
-    border-left: 3px solid var(--streak-color, #6366f1);
+    border-left: 3px solid var(--streak-color, var(--color-primary-500));
 }
 
 .streak-icon-wrap {
     width: 40px;
     height: 40px;
     /* Fallback for browsers without color-mix() */
-    background: linear-gradient(135deg, var(--streak-color, #6366f1), #4f46e5);
+    background: linear-gradient(135deg, var(--streak-color, var(--color-primary-500)), var(--color-primary-600));
     border-radius: 10px;
     display: flex;
     align-items: center;
@@ -400,7 +400,7 @@
 
 @supports (background: color-mix(in srgb, red, blue)) {
     .streak-icon-wrap {
-        background: linear-gradient(135deg, var(--streak-color, #6366f1), color-mix(in srgb, var(--streak-color, #6366f1) 80%, black));
+        background: linear-gradient(135deg, var(--streak-color, var(--color-primary-500)), color-mix(in srgb, var(--streak-color, var(--color-primary-500)) 80%, black));
     }
 }
 
@@ -411,32 +411,32 @@
 
 .streak-name {
     font-weight: 600;
-    color: #1f2937;
+    color: var(--color-gray-800);
     font-size: 0.95rem;
 }
 
 .streak-meta {
     font-size: 0.75rem;
-    color: #9ca3af;
+    color: var(--color-gray-400);
 }
 
 .streak-value {
     text-align: right;
     font-size: 1.5rem;
     font-weight: 800;
-    color: #9ca3af;
+    color: var(--color-gray-400);
     line-height: 1;
 }
 
 .streak-value.active {
-    color: #1f2937;
+    color: var(--color-gray-800);
 }
 
 .streak-value span {
     display: block;
     font-size: 0.65rem;
     font-weight: 500;
-    color: #9ca3af;
+    color: var(--color-gray-400);
     margin-top: 2px;
 }
 
@@ -465,7 +465,7 @@
     width: 36px;
     height: 36px;
     /* Fallback for browsers without color-mix() */
-    background: linear-gradient(135deg, var(--rank-color, #fbbf24), #d97706);
+    background: linear-gradient(135deg, var(--rank-color, var(--color-warning)), var(--color-warning));
     border-radius: 8px;
     display: flex;
     align-items: center;
@@ -477,21 +477,21 @@
 
 @supports (background: color-mix(in srgb, red, blue)) {
     .rank-icon-wrap {
-        background: linear-gradient(135deg, var(--rank-color, #fbbf24), color-mix(in srgb, var(--rank-color, #fbbf24) 70%, black));
+        background: linear-gradient(135deg, var(--rank-color, var(--color-warning)), color-mix(in srgb, var(--rank-color, var(--color-warning)) 70%, black));
     }
 }
 
 .rank-row .rank-label {
     flex: 1;
     font-weight: 500;
-    color: #4b5563;
+    color: var(--color-gray-600);
     font-size: 0.9rem;
 }
 
 .rank-value {
     font-size: 1.1rem;
     font-weight: 700;
-    color: #d97706;
+    color: var(--color-warning);
 }
 
 /* Badges Showcase */
@@ -565,7 +565,7 @@
 .activity-dot {
     width: 10px;
     height: 10px;
-    background: linear-gradient(135deg, #10b981, #059669);
+    background: linear-gradient(135deg, var(--color-success), var(--color-success));
     border-radius: 50%;
     margin-top: 6px;
     flex-shrink: 0;
@@ -580,19 +580,19 @@
 .activity-text {
     font-size: 0.9rem;
     font-weight: 500;
-    color: #1f2937;
+    color: var(--color-gray-800);
     line-height: 1.4;
 }
 
 .activity-time {
     font-size: 0.75rem;
-    color: #9ca3af;
+    color: var(--color-gray-400);
     margin-top: 2px;
 }
 
 .activity-xp {
     font-weight: 700;
-    color: #10b981;
+    color: var(--color-success);
     font-size: 0.9rem;
     flex-shrink: 0;
 }
@@ -623,7 +623,7 @@
 .stat-icon {
     width: 36px;
     height: 36px;
-    background: linear-gradient(135deg, #6366f1, #8b5cf6);
+    background: linear-gradient(135deg, var(--color-primary-500), var(--color-purple-500));
     border-radius: 10px;
     display: flex;
     align-items: center;
@@ -636,13 +636,13 @@
 .stats-grid .stat-value {
     font-size: 1.4rem;
     font-weight: 800;
-    color: #1f2937;
+    color: var(--color-gray-800);
     line-height: 1;
 }
 
 .stats-grid .stat-label {
     font-size: 0.7rem;
-    color: #6b7280;
+    color: var(--color-gray-500);
     margin-top: 6px;
     font-weight: 500;
 }
@@ -669,7 +669,7 @@
     gap: 8px;
     margin-top: 16px;
     padding: 10px 20px;
-    background: linear-gradient(135deg, #6366f1, #8b5cf6);
+    background: linear-gradient(135deg, var(--color-primary-500), var(--color-purple-500));
     color: white;
     border-radius: 12px;
     text-decoration: none;
@@ -733,8 +733,8 @@
 
 /* Streak row pulse for active streaks */
 @keyframes streak-pulse {
-    0%, 100% { box-shadow: inset 3px 0 0 var(--streak-color, #6366f1); }
-    50% { box-shadow: inset 3px 0 0 var(--streak-color, #6366f1), 0 0 12px rgba(99, 102, 241, 0.2); }
+    0%, 100% { box-shadow: inset 3px 0 0 var(--streak-color, var(--color-primary-500)); }
+    50% { box-shadow: inset 3px 0 0 var(--streak-color, var(--color-primary-500)), 0 0 12px rgba(99, 102, 241, 0.2); }
 }
 
 .streak-row.active {
@@ -796,7 +796,7 @@
 
 .rank-row:hover .rank-value {
     transform: scale(1.1);
-    color: #b45309;
+    color: var(--color-warning);
 }
 
 /* View all link arrow animation */
@@ -877,7 +877,7 @@
     margin: 0;
     font-size: 1.1rem;
     font-weight: 700;
-    color: #1f2937;
+    color: var(--color-gray-800);
 }
 
 /* Level Display */
@@ -890,7 +890,7 @@
 .level-circle {
     width: 100px;
     height: 100px;
-    background: linear-gradient(135deg, #6366f1, #8b5cf6);
+    background: linear-gradient(135deg, var(--color-primary-500), var(--color-purple-500));
     border-radius: 50%;
     display: flex;
     flex-direction: column;
@@ -921,26 +921,26 @@
 .level-info h4 {
     margin: 0 0 8px 0;
     font-size: 0.9rem;
-    color: #6b7280;
+    color: var(--color-gray-500);
     font-weight: 500;
 }
 
 .xp-display {
     font-size: 1.8rem;
     font-weight: 800;
-    color: #1f2937;
+    color: var(--color-gray-800);
     margin-bottom: 12px;
 }
 
 .xp-display span {
     font-size: 1rem;
-    color: #6b7280;
+    color: var(--color-gray-500);
     font-weight: 500;
 }
 
 .progress-bar-container {
     height: 12px;
-    background: #e5e7eb;
+    background: var(--color-gray-200);
     border-radius: 12px;
     overflow: hidden;
     margin-bottom: 8px;
@@ -948,14 +948,14 @@
 
 .progress-bar-fill {
     height: 100%;
-    background: linear-gradient(90deg, #6366f1, #8b5cf6);
+    background: linear-gradient(90deg, var(--color-primary-500), var(--color-purple-500));
     border-radius: 12px;
     transition: width 0.5s ease;
 }
 
 .progress-text {
     font-size: 0.85rem;
-    color: #6b7280;
+    color: var(--color-gray-500);
 }
 
 /* Streaks Grid */
@@ -985,18 +985,18 @@
 .streak-count {
     font-size: 1.8rem;
     font-weight: 800;
-    color: #1f2937;
+    color: var(--color-gray-800);
 }
 
 .streak-label {
     font-size: 0.75rem;
-    color: #6b7280;
+    color: var(--color-gray-500);
     margin-top: 4px;
 }
 
 .streak-best {
     font-size: 0.7rem;
-    color: #9ca3af;
+    color: var(--color-gray-400);
     margin-top: 4px;
 }
 
@@ -1018,12 +1018,12 @@
 .rank-position {
     font-size: 1.5rem;
     font-weight: 800;
-    color: #d97706;
+    color: var(--color-warning);
 }
 
 .rank-label {
     font-size: 0.75rem;
-    color: #6b7280;
+    color: var(--color-gray-500);
     margin-top: 4px;
 }
 
@@ -1055,19 +1055,19 @@
 
 .badge-progress-item .badge-name {
     font-weight: 700;
-    color: #1f2937;
+    color: var(--color-gray-800);
     margin-bottom: 4px;
 }
 
 .badge-progress-item .badge-desc {
     font-size: 0.85rem;
-    color: #6b7280;
+    color: var(--color-gray-500);
     margin-bottom: 8px;
 }
 
 .progress-mini {
     height: 6px;
-    background: #e5e7eb;
+    background: var(--color-gray-200);
     border-radius: 6px;
     overflow: hidden;
     margin-bottom: 4px;
@@ -1075,14 +1075,14 @@
 
 .progress-mini-fill {
     height: 100%;
-    background: linear-gradient(90deg, #6366f1, #8b5cf6);
+    background: linear-gradient(90deg, var(--color-primary-500), var(--color-purple-500));
     border-radius: 6px;
     transition: width 0.5s ease;
 }
 
 .badge-progress-item .progress-label {
     font-size: 0.75rem;
-    color: #9ca3af;
+    color: var(--color-gray-400);
 }
 
 /* Earned Badges Grid */
@@ -1114,7 +1114,7 @@
 
 .badge-earned .badge-name {
     font-size: 0.7rem;
-    color: #6b7280;
+    color: var(--color-gray-500);
     line-height: 1.2;
 }
 
@@ -1136,19 +1136,19 @@
 
 .xp-action {
     font-weight: 600;
-    color: #1f2937;
+    color: var(--color-gray-800);
     font-size: 0.9rem;
 }
 
 .xp-date {
     font-size: 0.75rem;
-    color: #9ca3af;
+    color: var(--color-gray-400);
     margin-top: 2px;
 }
 
 .xp-amount {
     font-weight: 700;
-    color: #10b981;
+    color: var(--color-success);
     font-size: 0.95rem;
 }
 
@@ -1169,12 +1169,12 @@
 .stat-value {
     font-size: 1.8rem;
     font-weight: 800;
-    color: #1f2937;
+    color: var(--color-gray-800);
 }
 
 .stat-label {
     font-size: 0.75rem;
-    color: #6b7280;
+    color: var(--color-gray-500);
     margin-top: 4px;
 }
 
@@ -1227,7 +1227,7 @@
 .badge-modal-handle {
     width: 40px;
     height: 4px;
-    background: #d1d5db;
+    background: var(--color-gray-300);
     border-radius: 2px;
     margin: 12px auto;
 }
@@ -1248,7 +1248,7 @@
     border-radius: 50%;
     border: none;
     background: rgba(0, 0, 0, 0.1);
-    color: #6b7280;
+    color: var(--color-gray-500);
     cursor: pointer;
     display: flex;
     align-items: center;
@@ -1268,7 +1268,7 @@
 .badge-modal-name {
     font-size: 1.5rem;
     font-weight: 800;
-    color: #1f2937;
+    color: var(--color-gray-800);
     margin: 0 0 12px 0;
 }
 
@@ -1283,28 +1283,28 @@
 }
 
 .badge-rarity-tag.legendary {
-    background: linear-gradient(135deg, #fbbf24, #f59e0b);
-    color: #78350f;
+    background: linear-gradient(135deg, var(--color-warning), var(--color-warning));
+    color: var(--color-warning);
 }
 
 .badge-rarity-tag.epic {
-    background: linear-gradient(135deg, #a855f7, #7c3aed);
+    background: linear-gradient(135deg, var(--color-purple-500), var(--color-purple-500));
     color: white;
 }
 
 .badge-rarity-tag.rare {
-    background: linear-gradient(135deg, #3b82f6, #2563eb);
+    background: linear-gradient(135deg, var(--color-info), var(--color-info));
     color: white;
 }
 
 .badge-rarity-tag.uncommon {
-    background: linear-gradient(135deg, #10b981, #059669);
+    background: linear-gradient(135deg, var(--color-success), var(--color-success));
     color: white;
 }
 
 .badge-rarity-tag.common {
-    background: #e5e7eb;
-    color: #6b7280;
+    background: var(--color-gray-200);
+    color: var(--color-gray-500);
 }
 
 .badge-modal-body {
@@ -1324,7 +1324,7 @@
     align-items: center;
     gap: 8px;
     font-size: 0.85rem;
-    color: #6b7280;
+    color: var(--color-gray-500);
     margin-bottom: 8px;
     text-transform: uppercase;
     letter-spacing: 0.5px;
@@ -1333,7 +1333,7 @@
 
 .badge-modal-text {
     font-size: 1rem;
-    color: #1f2937;
+    color: var(--color-gray-800);
 }
 
 .badge-modal-text.description {
@@ -1342,7 +1342,7 @@
 
 .badge-rarity-bar {
     height: 8px;
-    background: #e5e7eb;
+    background: var(--color-gray-200);
     border-radius: 8px;
     overflow: hidden;
     margin-top: 12px;
@@ -1355,23 +1355,23 @@
 }
 
 .badge-rarity-fill.legendary {
-    background: linear-gradient(90deg, #fbbf24, #f59e0b);
+    background: linear-gradient(90deg, var(--color-warning), var(--color-warning));
 }
 
 .badge-rarity-fill.epic {
-    background: linear-gradient(90deg, #a855f7, #7c3aed);
+    background: linear-gradient(90deg, var(--color-purple-500), var(--color-purple-500));
 }
 
 .badge-rarity-fill.rare {
-    background: linear-gradient(90deg, #3b82f6, #2563eb);
+    background: linear-gradient(90deg, var(--color-info), var(--color-info));
 }
 
 .badge-rarity-fill.uncommon {
-    background: linear-gradient(90deg, #10b981, #059669);
+    background: linear-gradient(90deg, var(--color-success), var(--color-success));
 }
 
 .badge-rarity-fill.common {
-    background: #9ca3af;
+    background: var(--color-gray-400);
 }
 
 /* =================================================================
@@ -1392,11 +1392,11 @@
 .badges-progress-bar h2 {
     margin: 0 0 12px 0;
     font-size: 1.3rem;
-    color: #1f2937;
+    color: var(--color-gray-800);
 }
 
 .progress-outer {
-    background: #e5e7eb;
+    background: var(--color-gray-200);
     border-radius: 12px;
     height: 24px;
     overflow: hidden;
@@ -1405,7 +1405,7 @@
 
 .progress-inner {
     height: 100%;
-    background: linear-gradient(90deg, #a855f7, #6366f1);
+    background: linear-gradient(90deg, var(--color-purple-500), var(--color-primary-500));
     border-radius: 12px;
     transition: width 0.5s ease;
     display: flex;
@@ -1418,7 +1418,7 @@
 
 .progress-label {
     text-align: center;
-    color: #6b7280;
+    color: var(--color-gray-500);
     font-size: 0.9rem;
 }
 
@@ -1434,7 +1434,7 @@
 .showcase-section h2 {
     margin: 0 0 8px 0;
     font-size: 1.2rem;
-    color: #92400e;
+    color: var(--color-warning);
     display: flex;
     align-items: center;
     gap: 10px;
@@ -1443,7 +1443,7 @@
 .showcase-section p {
     margin: 0 0 16px 0;
     font-size: 0.9rem;
-    color: #78350f;
+    color: var(--color-warning);
 }
 
 .showcase-badges {
@@ -1475,13 +1475,13 @@
 
 .showcase-badge-slot .badge-name {
     font-size: 0.7rem;
-    color: #78350f;
+    color: var(--color-warning);
     text-align: center;
     margin-top: 4px;
 }
 
 .showcase-badge-slot.empty {
-    color: #d97706;
+    color: var(--color-warning);
     font-size: 0.8rem;
 }
 
@@ -1501,7 +1501,7 @@
     margin: 0 0 20px 0;
     font-size: 1.2rem;
     font-weight: 700;
-    color: #374151;
+    color: var(--color-gray-700);
     display: flex;
     align-items: center;
     gap: 10px;
@@ -1511,7 +1511,7 @@
 
 .badge-category h3 .count {
     background: rgba(99, 102, 241, 0.1);
-    color: #6366f1;
+    color: var(--color-primary-500);
     font-size: 0.8rem;
     padding: 4px 10px;
     border-radius: 20px;
@@ -1595,7 +1595,7 @@
     justify-content: center;
     font-size: 0.7rem;
     font-weight: 600;
-    color: #6366f1;
+    color: var(--color-primary-500);
 }
 
 /* Mobile-only preview count - hidden by default */
@@ -1612,7 +1612,7 @@
     justify-content: center;
     border-radius: 8px;
     background: rgba(99, 102, 241, 0.1);
-    color: #6366f1;
+    color: var(--color-primary-500);
     transition: all 0.3s ease;
     flex-shrink: 0;
     margin-left: 12px;
@@ -1767,7 +1767,7 @@
         align-items: center;
         gap: 4px;
         font-size: 0.75rem;
-        color: #6b7280;
+        color: var(--color-gray-500);
         margin-left: 8px;
     }
 
@@ -1784,7 +1784,7 @@
     }
 
     .badge-preview-count .preview-dot.earned {
-        background: #a855f7;
+        background: var(--color-purple-500);
     }
 
     .badge-category.accordion-open .badge-preview-count {
@@ -1806,12 +1806,12 @@
 [data-theme="dark"] .badge-preview-more {
     background: rgba(99, 102, 241, 0.15);
     border-color: rgba(99, 102, 241, 0.3);
-    color: #a5b4fc;
+    color: var(--color-primary-300);
 }
 
 [data-theme="dark"] .badge-accordion-toggle {
     background: rgba(99, 102, 241, 0.15);
-    color: #a5b4fc;
+    color: var(--color-primary-300);
 }
 
 [data-theme="dark"] .badge-category.accordion-open .badge-accordion-toggle {
@@ -1819,7 +1819,7 @@
 }
 
 [data-theme="dark"] .badge-preview-count {
-    color: #94a3b8;
+    color: var(--color-gray-400);
 }
 
 [data-theme="dark"] .badge-preview-count .preview-dot {
@@ -1827,7 +1827,7 @@
 }
 
 [data-theme="dark"] .badge-preview-count .preview-dot.earned {
-    background: #a855f7;
+    background: var(--color-purple-500);
 }
 
 .badges-grid {
@@ -1878,18 +1878,18 @@
 
 .badge-item .badge-name {
     font-weight: 700;
-    color: #1f2937;
+    color: var(--color-gray-800);
     font-size: 0.95rem;
     margin-bottom: 6px;
 }
 
 .badge-item.locked .badge-name {
-    color: #6b7280;
+    color: var(--color-gray-500);
 }
 
 .badge-item .badge-desc {
     font-size: 0.8rem;
-    color: #6b7280;
+    color: var(--color-gray-500);
 }
 
 /* Rarity Badge */
@@ -1903,33 +1903,33 @@
 }
 
 .rarity-legendary {
-    background: linear-gradient(135deg, #fbbf24, #f59e0b);
-    color: #78350f;
+    background: linear-gradient(135deg, var(--color-warning), var(--color-warning));
+    color: var(--color-warning);
 }
 
 .rarity-epic {
-    background: linear-gradient(135deg, #a855f7, #7c3aed);
+    background: linear-gradient(135deg, var(--color-purple-500), var(--color-purple-500));
     color: white;
 }
 
 .rarity-rare {
-    background: linear-gradient(135deg, #3b82f6, #2563eb);
+    background: linear-gradient(135deg, var(--color-info), var(--color-info));
     color: white;
 }
 
 .rarity-uncommon {
-    background: linear-gradient(135deg, #10b981, #059669);
+    background: linear-gradient(135deg, var(--color-success), var(--color-success));
     color: white;
 }
 
 .rarity-common {
-    background: #e5e7eb;
-    color: #6b7280;
+    background: var(--color-gray-200);
+    color: var(--color-gray-500);
 }
 
 .badge-item .badge-threshold {
     font-size: 0.75rem;
-    color: #9ca3af;
+    color: var(--color-gray-400);
     margin-top: 8px;
 }
 
@@ -1937,7 +1937,7 @@
     position: absolute;
     top: 10px;
     right: 10px;
-    background: #10b981;
+    background: var(--color-success);
     color: white;
     width: 24px;
     height: 24px;
@@ -1954,7 +1954,7 @@
     position: absolute;
     top: 10px;
     left: 10px;
-    color: #f59e0b;
+    color: var(--color-warning);
     font-size: 1.2rem;
 }
 
@@ -1965,20 +1965,20 @@
     padding: 4px 10px;
     border: 1px solid rgba(168, 85, 247, 0.4);
     background: white;
-    color: #7c3aed;
+    color: var(--color-purple-500);
     border-radius: 12px;
     cursor: pointer;
     transition: all 0.2s;
 }
 
 .badge-item .pin-btn:hover {
-    background: #7c3aed;
+    background: var(--color-purple-500);
     color: white;
 }
 
 .badge-item .pin-btn.pinned {
-    background: #f59e0b;
-    border-color: #f59e0b;
+    background: var(--color-warning);
+    border-color: var(--color-warning);
     color: white;
 }
 
@@ -2038,7 +2038,7 @@
 }
 
 .challenge-card.completed {
-    border: 2px solid #10b981;
+    border: 2px solid var(--color-success);
     background: linear-gradient(135deg, rgba(16, 185, 129, 0.05), rgba(255, 255, 255, 0.95));
 }
 
@@ -2058,28 +2058,28 @@
 }
 
 .challenge-type.daily {
-    background: #fef3c7;
-    color: #92400e;
+    background: var(--color-warning);
+    color: var(--color-warning);
 }
 
 .challenge-type.weekly {
-    background: #dbeafe;
-    color: #1e40af;
+    background: var(--color-info);
+    color: white;
 }
 
 .challenge-type.monthly {
-    background: #f3e8ff;
-    color: #7c3aed;
+    background: var(--color-purple-500);
+    color: var(--color-purple-500);
 }
 
 .challenge-type.special {
-    background: #fce7f3;
-    color: #be185d;
+    background: var(--color-pink-500);
+    color: white;
 }
 
 .challenge-time {
     font-size: 12px;
-    color: #6b7280;
+    color: var(--color-gray-500);
     display: flex;
     align-items: center;
     gap: 4px;
@@ -2088,12 +2088,12 @@
 .challenge-title {
     font-size: 18px;
     font-weight: 700;
-    color: #1e1e2e;
+    color: var(--color-gray-900);
     margin-bottom: 8px;
 }
 
 .challenge-desc {
-    color: #6b7280;
+    color: var(--color-gray-500);
     font-size: 14px;
     margin-bottom: 20px;
 }
@@ -2104,7 +2104,7 @@
 
 .progress-bar {
     height: 10px;
-    background: #e5e7eb;
+    background: var(--color-gray-200);
     border-radius: 10px;
     overflow: hidden;
     margin-bottom: 8px;
@@ -2112,20 +2112,20 @@
 
 .progress-fill {
     height: 100%;
-    background: linear-gradient(90deg, #4f46e5, #7c3aed);
+    background: linear-gradient(90deg, var(--color-primary-600), var(--color-purple-500));
     border-radius: 10px;
     transition: width 0.5s ease;
 }
 
 .challenge-card.completed .progress-fill {
-    background: linear-gradient(90deg, #10b981, #34d399);
+    background: linear-gradient(90deg, var(--color-success), var(--color-success));
 }
 
 .progress-text {
     display: flex;
     justify-content: space-between;
     font-size: 13px;
-    color: #6b7280;
+    color: var(--color-gray-500);
 }
 
 .challenge-reward {
@@ -2133,7 +2133,7 @@
     align-items: center;
     justify-content: space-between;
     padding-top: 16px;
-    border-top: 1px solid #e5e7eb;
+    border-top: 1px solid var(--color-gray-200);
 }
 
 .reward-xp {
@@ -2141,7 +2141,7 @@
     align-items: center;
     gap: 8px;
     font-weight: 700;
-    color: #10b981;
+    color: var(--color-success);
     font-size: 18px;
 }
 
@@ -2149,7 +2149,7 @@
     display: flex;
     align-items: center;
     gap: 6px;
-    color: #10b981;
+    color: var(--color-success);
     font-weight: 600;
 }
 
@@ -2173,7 +2173,7 @@
 }
 
 .collection-card.completed {
-    border: 2px solid #10b981;
+    border: 2px solid var(--color-success);
     background: linear-gradient(135deg, rgba(16, 185, 129, 0.05), rgba(255, 255, 255, 0.95));
 }
 
@@ -2193,7 +2193,7 @@
 .collection-icon {
     width: 60px;
     height: 60px;
-    background: linear-gradient(135deg, #4f46e5, #7c3aed);
+    background: linear-gradient(135deg, var(--color-primary-600), var(--color-purple-500));
     border-radius: 16px;
     display: flex;
     align-items: center;
@@ -2202,18 +2202,18 @@
 }
 
 .collection-card.completed .collection-icon {
-    background: linear-gradient(135deg, #10b981, #34d399);
+    background: linear-gradient(135deg, var(--color-success), var(--color-success));
 }
 
 .collection-title {
     font-size: 20px;
     font-weight: 700;
-    color: #1e1e2e;
+    color: var(--color-gray-900);
     margin-bottom: 4px;
 }
 
 .collection-desc {
-    color: #6b7280;
+    color: var(--color-gray-500);
     font-size: 14px;
 }
 
@@ -2224,25 +2224,25 @@
 .collection-progress-text {
     font-size: 24px;
     font-weight: 700;
-    color: #4f46e5;
+    color: var(--color-primary-600);
 }
 
 .collection-card.completed .collection-progress-text {
-    color: #10b981;
+    color: var(--color-success);
 }
 
 .collection-reward {
     font-size: 13px;
-    color: #6b7280;
+    color: var(--color-gray-500);
     margin-top: 4px;
 }
 
 .collection-reward.claimed {
-    color: #10b981;
+    color: var(--color-success);
 }
 
 .collection-reward.claimed i {
-    color: #10b981;
+    color: var(--color-success);
 }
 
 .collection-badges {
@@ -2251,7 +2251,7 @@
     gap: 12px;
     margin-top: 20px;
     padding-top: 20px;
-    border-top: 1px solid #e5e7eb;
+    border-top: 1px solid var(--color-gray-200);
 }
 
 .collection-badges .badge-item {
@@ -2265,7 +2265,7 @@
 .collection-badges .badge-icon {
     width: 50px;
     height: 50px;
-    background: #f3f4f6;
+    background: var(--color-gray-100);
     border-radius: 12px;
     display: flex;
     align-items: center;
@@ -2280,18 +2280,18 @@
 .collection-badges .badge-item.earned .badge-icon {
     opacity: 1;
     filter: none;
-    background: linear-gradient(135deg, #fef3c7, #fde68a);
+    background: linear-gradient(135deg, var(--color-warning), var(--color-warning));
     box-shadow: 0 4px 12px rgba(251, 191, 36, 0.3);
 }
 
 .collection-badges .badge-name {
     font-size: 11px;
-    color: #6b7280;
+    color: var(--color-gray-500);
     line-height: 1.2;
 }
 
 .collection-badges .badge-item.earned .badge-name {
-    color: #1e1e2e;
+    color: var(--color-gray-900);
     font-weight: 500;
 }
 
@@ -2317,7 +2317,7 @@
 .season-name {
     font-size: 28px;
     font-weight: 800;
-    color: #1e1e2e;
+    color: var(--color-gray-900);
     display: flex;
     align-items: center;
     gap: 12px;
@@ -2334,12 +2334,12 @@
 }
 
 .season-badge.active {
-    background: linear-gradient(135deg, #10b981, #34d399);
+    background: linear-gradient(135deg, var(--color-success), var(--color-success));
     color: white;
 }
 
 .season-badge.ending-soon {
-    background: linear-gradient(135deg, #f59e0b, #fbbf24);
+    background: linear-gradient(135deg, var(--color-warning), var(--color-warning));
     color: white;
     animation: pulse 2s infinite;
 }
@@ -2359,19 +2359,19 @@
 
 .time-remaining-label {
     font-size: 13px;
-    color: #6b7280;
+    color: var(--color-gray-500);
     margin-bottom: 4px;
 }
 
 .time-remaining-value {
     font-size: 32px;
     font-weight: 800;
-    color: #4f46e5;
+    color: var(--color-primary-600);
 }
 
 .time-remaining-unit {
     font-size: 16px;
-    color: #6b7280;
+    color: var(--color-gray-500);
     font-weight: 500;
 }
 
@@ -2379,7 +2379,7 @@
     display: flex;
     align-items: center;
     gap: 24px;
-    background: linear-gradient(135deg, #4f46e5, #7c3aed);
+    background: linear-gradient(135deg, var(--color-primary-600), var(--color-purple-500));
     border-radius: 16px;
     padding: 20px 28px;
     color: white;
@@ -2424,7 +2424,7 @@
 .leaderboard-card h3 {
     font-size: 18px;
     font-weight: 700;
-    color: #1e1e2e;
+    color: var(--color-gray-900);
     margin-bottom: 20px;
     display: flex;
     align-items: center;
@@ -2443,21 +2443,21 @@
     gap: 16px;
     padding: 12px 16px;
     border-radius: 12px;
-    background: #f9fafb;
+    background: var(--color-gray-50);
     transition: all 0.2s;
 }
 
 .leaderboard-item:hover {
-    background: #f3f4f6;
+    background: var(--color-gray-100);
 }
 
 .leaderboard-item.top-3 {
-    background: linear-gradient(135deg, #fef3c7, #fde68a);
+    background: linear-gradient(135deg, var(--color-warning), var(--color-warning));
 }
 
 .leaderboard-item.current-user {
-    background: linear-gradient(135deg, #dbeafe, #bfdbfe);
-    border: 2px solid #3b82f6;
+    background: linear-gradient(135deg, var(--color-info), var(--color-info));
+    border: 2px solid var(--color-info);
 }
 
 .rank-badge {
@@ -2469,22 +2469,22 @@
     justify-content: center;
     font-weight: 700;
     font-size: 14px;
-    background: #e5e7eb;
-    color: #6b7280;
+    background: var(--color-gray-200);
+    color: var(--color-gray-500);
 }
 
 .leaderboard-item.top-3:nth-child(1) .rank-badge {
-    background: linear-gradient(135deg, #fbbf24, #f59e0b);
+    background: linear-gradient(135deg, var(--color-warning), var(--color-warning));
     color: white;
 }
 
 .leaderboard-item.top-3:nth-child(2) .rank-badge {
-    background: linear-gradient(135deg, #9ca3af, #6b7280);
+    background: linear-gradient(135deg, var(--color-gray-400), var(--color-gray-500));
     color: white;
 }
 
 .leaderboard-item.top-3:nth-child(3) .rank-badge {
-    background: linear-gradient(135deg, #d97706, #b45309);
+    background: linear-gradient(135deg, var(--color-warning), var(--color-warning));
     color: white;
 }
 
@@ -2493,7 +2493,7 @@
     height: 40px;
     border-radius: 50%;
     object-fit: cover;
-    background: #e5e7eb;
+    background: var(--color-gray-200);
 }
 
 .user-details {
@@ -2502,17 +2502,17 @@
 
 .user-name {
     font-weight: 600;
-    color: #1e1e2e;
+    color: var(--color-gray-900);
 }
 
 .user-level {
     font-size: 12px;
-    color: #6b7280;
+    color: var(--color-gray-500);
 }
 
 .user-xp {
     font-weight: 700;
-    color: #4f46e5;
+    color: var(--color-primary-600);
 }
 
 .rewards-card {
@@ -2525,7 +2525,7 @@
 .rewards-card h3 {
     font-size: 18px;
     font-weight: 700;
-    color: #1e1e2e;
+    color: var(--color-gray-900);
     margin-bottom: 20px;
     display: flex;
     align-items: center;
@@ -2539,19 +2539,19 @@
     padding: 14px;
     border-radius: 12px;
     margin-bottom: 10px;
-    background: #f9fafb;
+    background: var(--color-gray-50);
 }
 
 .reward-tier.gold {
-    background: linear-gradient(135deg, #fef3c7, #fde68a);
+    background: linear-gradient(135deg, var(--color-warning), var(--color-warning));
 }
 
 .reward-tier.silver {
-    background: linear-gradient(135deg, #f3f4f6, #e5e7eb);
+    background: linear-gradient(135deg, var(--color-gray-100), var(--color-gray-200));
 }
 
 .reward-tier.bronze {
-    background: linear-gradient(135deg, #fed7aa, #fdba74);
+    background: linear-gradient(135deg, var(--color-warning), var(--color-warning));
 }
 
 .tier-icon {
@@ -2570,13 +2570,13 @@
 
 .tier-name {
     font-weight: 700;
-    color: #1e1e2e;
+    color: var(--color-gray-900);
     font-size: 14px;
 }
 
 .tier-reward {
     font-size: 12px;
-    color: #6b7280;
+    color: var(--color-gray-500);
 }
 
 .past-seasons {
@@ -2605,13 +2605,13 @@
 
 .past-season-name {
     font-weight: 700;
-    color: #1e1e2e;
+    color: var(--color-gray-900);
     margin-bottom: 8px;
 }
 
 .past-season-dates {
     font-size: 12px;
-    color: #6b7280;
+    color: var(--color-gray-500);
     margin-bottom: 12px;
 }
 
@@ -2626,45 +2626,45 @@
 }
 
 .past-season-status.completed {
-    background: #d1fae5;
-    color: #059669;
+    background: var(--color-success);
+    color: white;
 }
 
 .past-season-status.active {
-    background: #dbeafe;
-    color: #2563eb;
+    background: var(--color-info);
+    color: white;
 }
 
 /* Tier icon colors */
 .tier-icon-gold {
-    color: #fbbf24;
+    color: var(--color-warning);
 }
 
 .tier-icon-silver {
-    color: #9ca3af;
+    color: var(--color-gray-400);
 }
 
 .tier-icon-bronze {
-    color: #d97706;
+    color: var(--color-warning);
 }
 
 .tier-icon-default {
-    color: #6b7280;
+    color: var(--color-gray-500);
 }
 
 /* Season trophy icon */
 .season-trophy-icon {
-    color: #fbbf24;
+    color: var(--color-warning);
 }
 
 /* XP star icon */
 .xp-star-icon {
-    color: #fbbf24;
+    color: var(--color-warning);
 }
 
 /* Current user indicator */
 .current-user-tag {
-    color: #3b82f6;
+    color: var(--color-info);
     font-size: 12px;
 }
 
@@ -2673,7 +2673,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    background: #4f46e5;
+    background: var(--color-primary-600);
     color: white;
     font-weight: 600;
 }
@@ -2683,7 +2683,7 @@
    ================================================================= */
 
 .xp-balance-card {
-    background: linear-gradient(135deg, #4f46e5, #7c3aed);
+    background: linear-gradient(135deg, var(--color-primary-600), var(--color-purple-500));
     border-radius: 20px;
     padding: 24px 32px;
     color: white;
@@ -2722,7 +2722,7 @@
     padding: 8px 16px;
     border-radius: 20px;
     background: rgba(255, 255, 255, 0.95);
-    color: #6b7280;
+    color: var(--color-gray-500);
     border: none;
     cursor: pointer;
     font-weight: 500;
@@ -2731,7 +2731,7 @@
 
 .category-btn:hover,
 .category-btn.active {
-    background: #4f46e5;
+    background: var(--color-primary-600);
     color: white;
 }
 
@@ -2759,7 +2759,7 @@
 }
 
 .shop-item.owned {
-    border: 2px solid #10b981;
+    border: 2px solid var(--color-success);
 }
 
 .shop-item.locked {
@@ -2778,24 +2778,24 @@
 }
 
 .item-badge.owned {
-    background: #d1fae5;
-    color: #059669;
+    background: var(--color-success);
+    color: white;
 }
 
 .item-badge.limited {
-    background: #fef3c7;
-    color: #d97706;
+    background: var(--color-warning);
+    color: var(--color-warning);
 }
 
 .item-badge.new {
-    background: #dbeafe;
-    color: #2563eb;
+    background: var(--color-info);
+    color: white;
 }
 
 .item-icon {
     width: 64px;
     height: 64px;
-    background: linear-gradient(135deg, #f3f4f6, #e5e7eb);
+    background: linear-gradient(135deg, var(--color-gray-100), var(--color-gray-200));
     border-radius: 16px;
     display: flex;
     align-items: center;
@@ -2805,19 +2805,19 @@
 }
 
 .shop-item.owned .item-icon {
-    background: linear-gradient(135deg, #d1fae5, #a7f3d0);
+    background: linear-gradient(135deg, var(--color-success), var(--color-success));
 }
 
 .item-name {
     font-size: 18px;
     font-weight: 700;
-    color: #1e1e2e;
+    color: var(--color-gray-900);
     margin-bottom: 8px;
 }
 
 .item-description {
     font-size: 14px;
-    color: #6b7280;
+    color: var(--color-gray-500);
     line-height: 1.5;
     margin-bottom: 16px;
 }
@@ -2827,7 +2827,7 @@
     justify-content: space-between;
     align-items: center;
     padding-top: 16px;
-    border-top: 1px solid #e5e7eb;
+    border-top: 1px solid var(--color-gray-200);
 }
 
 .item-price {
@@ -2836,17 +2836,17 @@
     gap: 6px;
     font-size: 18px;
     font-weight: 700;
-    color: #4f46e5;
+    color: var(--color-primary-600);
 }
 
 .item-price i {
-    color: #fbbf24;
+    color: var(--color-warning);
 }
 
 .buy-btn {
     padding: 10px 20px;
     border-radius: 12px;
-    background: linear-gradient(135deg, #4f46e5, #7c3aed);
+    background: linear-gradient(135deg, var(--color-primary-600), var(--color-purple-500));
     color: white;
     border: none;
     cursor: pointer;
@@ -2861,12 +2861,12 @@
 }
 
 .buy-btn:disabled {
-    background: #d1d5db;
+    background: var(--color-gray-300);
     cursor: not-allowed;
 }
 
 .buy-btn.owned {
-    background: #10b981;
+    background: var(--color-success);
 }
 
 /* Purchase Modal */
@@ -2904,12 +2904,12 @@
 .purchase-modal .modal-title {
     font-size: 24px;
     font-weight: 700;
-    color: #1e1e2e;
+    color: var(--color-gray-900);
     margin-bottom: 8px;
 }
 
 .purchase-modal .modal-message {
-    color: #6b7280;
+    color: var(--color-gray-500);
     margin-bottom: 24px;
 }
 
@@ -2929,12 +2929,12 @@
 }
 
 .purchase-modal .modal-btn.cancel {
-    background: #f3f4f6;
-    color: #6b7280;
+    background: var(--color-gray-100);
+    color: var(--color-gray-500);
 }
 
 .purchase-modal .modal-btn.confirm {
-    background: linear-gradient(135deg, #4f46e5, #7c3aed);
+    background: linear-gradient(135deg, var(--color-primary-600), var(--color-purple-500));
     color: white;
 }
 
@@ -2944,11 +2944,11 @@
 
 /* Shop modal icon colors */
 .shop-icon-success {
-    color: #10b981;
+    color: var(--color-success);
 }
 
 .shop-icon-error {
-    color: #ef4444;
+    color: var(--color-danger);
 }
 
 /* =================================================================
@@ -2981,7 +2981,7 @@
 [data-theme="dark"] .past-season-name,
 [data-theme="dark"] .item-name,
 [data-theme="dark"] .purchase-modal .modal-title {
-    color: #f1f5f9;
+    color: var(--color-gray-100);
 }
 
 [data-theme="dark"] .progress-outer,
@@ -3013,17 +3013,17 @@
 [data-theme="dark"] .past-season-dates,
 [data-theme="dark"] .item-description,
 [data-theme="dark"] .purchase-modal .modal-message {
-    color: #94a3b8;
+    color: var(--color-gray-400);
 }
 
 [data-theme="dark"] .badge-item.locked .badge-name {
-    color: #64748b;
+    color: var(--color-gray-500);
 }
 
 [data-theme="dark"] .xp-display,
 [data-theme="dark"] .streak-count,
 [data-theme="dark"] .stat-value {
-    color: #e2e8f0;
+    color: var(--color-gray-200);
 }
 
 [data-theme="dark"] .showcase-section {
@@ -3031,11 +3031,11 @@
 }
 
 [data-theme="dark"] .showcase-section h2 {
-    color: #fbbf24;
+    color: var(--color-warning);
 }
 
 [data-theme="dark"] .showcase-section p {
-    color: #fcd34d;
+    color: var(--color-warning);
 }
 
 [data-theme="dark"] .showcase-badge-slot {
@@ -3044,7 +3044,7 @@
 
 [data-theme="dark"] .badge-item .pin-btn {
     background: rgba(30, 41, 59, 0.8);
-    color: #c4b5fd;
+    color: var(--color-primary-300);
 }
 
 [data-theme="dark"] .leaderboard-item {
@@ -3064,7 +3064,7 @@
 }
 
 [data-theme="dark"] .user-name {
-    color: #e2e8f0;
+    color: var(--color-gray-200);
 }
 
 [data-theme="dark"] .reward-tier {
@@ -3084,17 +3084,17 @@
 }
 
 [data-theme="dark"] .tier-name {
-    color: #e2e8f0;
+    color: var(--color-gray-200);
 }
 
 [data-theme="dark"] .category-btn {
     background: rgba(30, 41, 59, 0.95);
-    color: #94a3b8;
+    color: var(--color-gray-400);
 }
 
 [data-theme="dark"] .category-btn:hover,
 [data-theme="dark"] .category-btn.active {
-    background: #4f46e5;
+    background: var(--color-primary-600);
     color: white;
 }
 
@@ -3108,11 +3108,11 @@
 
 [data-theme="dark"] .purchase-modal .modal-btn.cancel {
     background: rgba(255, 255, 255, 0.1);
-    color: #94a3b8;
+    color: var(--color-gray-400);
 }
 
 [data-theme="dark"] .badge-modal-content {
-    background: #1e293b;
+    background: var(--color-gray-800);
 }
 
 [data-theme="dark"] .badge-modal-header {
@@ -3120,20 +3120,20 @@
 }
 
 [data-theme="dark"] .badge-modal-name {
-    color: #f1f5f9;
+    color: var(--color-gray-100);
 }
 
 [data-theme="dark"] .badge-modal-text {
-    color: #e2e8f0;
+    color: var(--color-gray-200);
 }
 
 [data-theme="dark"] .badge-modal-label {
-    color: #94a3b8;
+    color: var(--color-gray-400);
 }
 
 [data-theme="dark"] .badge-modal-close {
     background: rgba(255, 255, 255, 0.1);
-    color: #94a3b8;
+    color: var(--color-gray-400);
 }
 
 [data-theme="dark"] .badge-modal-close:hover {
@@ -3152,7 +3152,7 @@
 }
 
 [data-theme="dark"] .level-ring::before {
-    background: #1e293b;
+    background: var(--color-gray-800);
 }
 
 [data-theme="dark"] .hero-stat-value,
@@ -3160,7 +3160,7 @@
 [data-theme="dark"] .streak-value.active,
 [data-theme="dark"] .activity-text,
 [data-theme="dark"] .stats-grid .stat-value {
-    color: #e2e8f0;
+    color: var(--color-gray-200);
 }
 
 [data-theme="dark"] .hero-stat-label,
@@ -3169,7 +3169,7 @@
 [data-theme="dark"] .activity-time,
 [data-theme="dark"] .stats-grid .stat-label,
 [data-theme="dark"] .rank-row .rank-label {
-    color: #94a3b8;
+    color: var(--color-gray-400);
 }
 
 [data-theme="dark"] .xp-bar-track {
@@ -3217,24 +3217,24 @@
 }
 
 [data-theme="dark"] .level-badge {
-    background: linear-gradient(135deg, #6366f1, #8b5cf6);
+    background: linear-gradient(135deg, var(--color-primary-500), var(--color-purple-500));
 }
 
 [data-theme="dark"] .badge-count {
     background: rgba(99, 102, 241, 0.15);
-    color: #a5b4fc;
+    color: var(--color-primary-300);
 }
 
 [data-theme="dark"] .xp-hint {
-    color: #64748b;
+    color: var(--color-gray-500);
 }
 
 [data-theme="dark"] .xp-current {
-    color: #a5b4fc;
+    color: var(--color-primary-300);
 }
 
 [data-theme="dark"] .empty-state.compact {
-    color: #94a3b8;
+    color: var(--color-gray-400);
 }
 
 /* =================================================================

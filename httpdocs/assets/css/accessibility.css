@@ -29,9 +29,9 @@ button:focus-visible,
 [type="reset"]:focus-visible,
 .btn:focus-visible,
 .htb-btn:focus-visible {
-    outline: 2px solid var(--color-primary-500, #6366f1);
+    outline: 2px solid var(--color-primary-500);
     outline-offset: 2px;
-    box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.2);
+    box-shadow: 0 0 0 4px rgba(var(--color-primary-rgb, 99, 102, 241), 0.2);
 }
 
 /* Link focus rings */
@@ -46,9 +46,9 @@ a:focus-visible {
 .leaderboard-row:focus-visible,
 .feed-item:focus-visible,
 [role="button"]:focus-visible {
-    outline: 2px solid var(--color-primary-500, #6366f1);
+    outline: 2px solid var(--color-primary-500);
     outline-offset: 2px;
-    box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.15);
+    box-shadow: 0 0 0 4px rgba(var(--color-primary-rgb, 99, 102, 241), 0.15);
 }
 
 /* Dark mode focus rings - higher contrast */
@@ -58,7 +58,7 @@ a:focus-visible {
 
 [data-theme="dark"] button:focus-visible,
 [data-theme="dark"] .btn:focus-visible {
-    box-shadow: 0 0 0 4px rgba(129, 140, 248, 0.25);
+    box-shadow: 0 0 0 4px rgba(var(--color-primary-400-rgb, 129, 140, 248), 0.25);
 }
 
 /* ============================================
@@ -83,7 +83,7 @@ a:focus-visible {
 
 .skip-link:focus {
     top: 0;
-    outline: 3px solid var(--color-primary-300, #a5b4fc);
+    outline: 3px solid var(--color-primary-300);
     outline-offset: 2px;
 }
 
@@ -176,17 +176,17 @@ a:focus-visible {
    ============================================ */
 
 .form-group:focus-within {
-    background: rgba(99, 102, 241, 0.03);
+    background: rgba(var(--color-primary-rgb, 99, 102, 241), 0.03);
     border-radius: 8px;
 }
 
 .input-group:focus-within {
-    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+    box-shadow: 0 0 0 3px rgba(var(--color-primary-rgb, 99, 102, 241), 0.1);
     border-radius: 8px;
 }
 
 [data-theme="dark"] .form-group:focus-within {
-    background: rgba(129, 140, 248, 0.05);
+    background: rgba(var(--color-primary-400-rgb, 129, 140, 248), 0.05);
 }
 
 /* ============================================
@@ -240,8 +240,8 @@ button:active:not(:disabled),
 }
 
 [aria-invalid="true"]:focus-visible {
-    outline-color: var(--color-danger, #dc2626);
-    box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.15);
+    outline-color: var(--color-danger);
+    box-shadow: 0 0 0 3px rgba(var(--color-danger-rgb, 239, 68, 68), 0.15);
 }
 
 /* Required field indicator */
