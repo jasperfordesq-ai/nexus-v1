@@ -1716,10 +1716,10 @@ body.dark-mode .civic-experimental-banner {
     background: linear-gradient(135deg, #1e3a5f 0%, #0f172a 100%);
 }
 
-/* Mobile banner */
-@media (max-width: 600px) {
+/* Mobile banner - hide on mobile/tablet */
+@media (max-width: 1024px) {
     .civic-experimental-banner {
-        padding: 8px 12px;
+        display: none !important;
     }
 
     .civic-banner-content {

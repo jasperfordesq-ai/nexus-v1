@@ -29,8 +29,30 @@ if (!isset($hero)) {
     // Remove query string
     $currentPath = strtok($currentPath, '?');
 
+    // Strip tenant base path if present (e.g., /hour-timebank/groups -> /groups)
+    if (class_exists('\Nexus\Core\TenantContext')) {
+        $basePath = \Nexus\Core\TenantContext::getBasePath();
+        if (!empty($basePath) && $basePath !== '/' && strpos($currentPath, $basePath) === 0) {
+            $currentPath = substr($currentPath, strlen($basePath));
+            // Ensure path starts with /
+            if (empty($currentPath) || $currentPath[0] !== '/') {
+                $currentPath = '/' . $currentPath;
+            }
+        }
+    }
+
+    // DEBUG: Log what path we're using
+    error_log("HERO DEBUG: REQUEST_URI = " . ($_SERVER['REQUEST_URI'] ?? 'NOT SET'));
+    error_log("HERO DEBUG: currentPath after processing = " . $currentPath);
+
     // Get base configuration from route
     $hero = \App\Helpers\HeroResolver::resolve($currentPath);
+
+    // DEBUG: Log resolution result
+    error_log("HERO DEBUG: Hero resolved = " . ($hero !== null ? 'YES' : 'NO'));
+    if ($hero) {
+        error_log("HERO DEBUG: Title = " . ($hero['title'] ?? 'NO TITLE'));
+    }
 }
 
 // Allow controller/page-specific overrides to be merged
@@ -38,7 +60,28 @@ if (isset($heroOverrides) && is_array($heroOverrides)) {
     $hero = array_merge($hero ?? [], $heroOverrides);
 }
 
+// DEBUG: Log before rendering
+error_log("HERO DEBUG: About to render - hero exists: " . (isset($hero) ? 'YES' : 'NO') . ", is array: " . (is_array($hero ?? null) ? 'YES' : 'NO') . ", has title: " . (!empty($hero['title'] ?? null) ? 'YES' : 'NO'));
+
+// VISIBLE DEBUG
+echo '<!-- HERO DEBUG START -->';
+echo '<!-- REQUEST_URI: ' . htmlspecialchars($_SERVER['REQUEST_URI'] ?? 'NOT SET') . ' -->';
+echo '<!-- currentPath: ' . htmlspecialchars($currentPath ?? 'NOT SET') . ' -->';
+echo '<!-- hero isset: ' . (isset($hero) ? 'YES' : 'NO') . ' -->';
+echo '<!-- hero is_array: ' . (is_array($hero ?? null) ? 'YES' : 'NO') . ' -->';
+echo '<!-- hero has title: ' . (!empty($hero['title'] ?? null) ? 'YES' : 'NO') . ' -->';
+if ($hero) {
+    echo '<!-- hero title value: ' . htmlspecialchars($hero['title'] ?? 'NONE') . ' -->';
+}
+echo '<!-- HERO DEBUG END -->';
+
 // Render hero partial if config exists and has title
 if (isset($hero) && is_array($hero) && !empty($hero['title'])) {
+    error_log("HERO DEBUG: RENDERING HERO NOW");
+    echo '<!-- HERO RENDERING NOW -->';
     require __DIR__ . '/page-hero.php';
+    echo '<!-- HERO RENDERED -->';
+} else {
+    error_log("HERO DEBUG: NOT RENDERING - condition failed");
+    echo '<!-- HERO NOT RENDERING - condition failed -->';
 }

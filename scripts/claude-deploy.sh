@@ -140,7 +140,7 @@ get_changed_files() {
     cd "$LOCAL_PATH"
 
     # Deployable paths
-    local deploy_paths="^(src|views|httpdocs|config|bootstrap\.php|migrations|scripts)"
+    local deploy_paths="^(src|views|httpdocs|config|app|bootstrap\.php|migrations|scripts)"
 
     # Exclude patterns
     local excludes="\.env|node_modules|vendor|\.git|\.log$|\.md$"
@@ -161,7 +161,7 @@ get_last_commit_files() {
     cd "$LOCAL_PATH"
 
     # Deployable paths
-    local deploy_paths="^(src|views|httpdocs|config|bootstrap\.php|migrations|scripts)"
+    local deploy_paths="^(src|views|httpdocs|config|app|bootstrap\.php|migrations|scripts)"
 
     # Exclude patterns
     local excludes="\.env|node_modules|vendor|\.git|\.log$|\.md$"
@@ -210,7 +210,7 @@ if [[ "$MODE" == "folders" ]]; then
     echo ""
 
     failed=0
-    for folder in src views httpdocs config; do
+    for folder in src views httpdocs config app; do
         if ! deploy_folder "$folder"; then
             ((failed++))
         fi

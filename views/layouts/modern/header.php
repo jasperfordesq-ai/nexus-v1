@@ -168,7 +168,7 @@ try {
     <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/civicone-utilities.css?v=<?= $cssVersionTimestamp ?>">
 
     <!-- Modern Experimental Banner -->
-    <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/modern-experimental-banner.css?v=<?= $cssVersionTimestamp ?>">
+    <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/modern-experimental-banner-v3.css?v=<?= $cssVersionTimestamp ?>">
 
     <!-- Legacy Enhancements Bundle (responsive, accessibility, extracted components) -->
     <!-- Combines 5 files: responsive-forms, responsive-tables, accessibility, feed-action-pills, ai-chat-widget -->
@@ -389,6 +389,8 @@ try {
     <script defer src="/assets/js/nexus-instant-load.min.js?v=<?= $cssVersionTimestamp ?>"></script>
     <!-- Layout Switch Helper (prevents visual glitches) -->
     <script defer src="/assets/js/layout-switch-helper.min.js?v=<?= $cssVersionTimestamp ?>"></script>
+    <!-- Mobile Interactions (ripple effects, haptic feedback, loading states) -->
+    <script defer src="/assets/js/mobile-interactions.js?v=<?= $cssVersionTimestamp ?>"></script>
 
     <?php
     // Note: Custom Layout Builder CSS removed 2026-01-17

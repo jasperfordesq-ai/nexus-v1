@@ -130,8 +130,14 @@ html[data-layout="modern"].banner-scrolled .nexus-navbar {
 
 /* Responsive Design - Hide banner on mobile/tablet and reset spacing */
 @media (max-width: 1024px) {
+    html[data-layout="modern"] .modern-experimental-banner,
     .modern-experimental-banner {
         display: none !important;
+        visibility: hidden !important;
+        opacity: 0 !important;
+        height: 0 !important;
+        min-height: 0 !important;
+        overflow: hidden !important;
     }
 
     /* Reset utility bar position on mobile */

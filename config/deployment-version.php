@@ -10,7 +10,7 @@
  */
 
 return [
-    'version' => '2.0.1.' . time(), // Use actual timestamp to force cache bust
+    'version' => '2.0.5.' . time(), // Use actual timestamp to force cache bust
     'timestamp' => time(), // Unix timestamp of last deployment
-    'description' => 'NUCLEAR CACHE BUST v2.0.1: Dark Mode button size fix + dropdown overflow fix'
+    'description' => 'v3 CSS file - nuclear cache bust for mobile banner hide'
 ];

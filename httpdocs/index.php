@@ -150,13 +150,28 @@ if (file_exists(__DIR__ . '/../vendor/autoload.php')) {
 
     // Manual Autoloader (PSR-4 simplified)
     spl_autoload_register(function ($class) use ($baseDir) {
+        // Handle Nexus\ namespace -> src/
         $prefix = 'Nexus\\';
         $len = strlen($prefix);
-        if (strncmp($prefix, $class, $len) !== 0) return;
-        $relative_class = substr($class, $len);
-        $file = $baseDir . '/src/' . str_replace('\\', '/', $relative_class) . '.php';
-        if (file_exists($file)) {
-            require $file;
+        if (strncmp($prefix, $class, $len) === 0) {
+            $relative_class = substr($class, $len);
+            $file = $baseDir . '/src/' . str_replace('\\', '/', $relative_class) . '.php';
+            if (file_exists($file)) {
+                require $file;
+                return;
+            }
+        }
+
+        // Handle App\ namespace -> app/
+        $prefix = 'App\\';
+        $len = strlen($prefix);
+        if (strncmp($prefix, $class, $len) === 0) {
+            $relative_class = substr($class, $len);
+            $file = $baseDir . '/app/' . str_replace('\\', '/', $relative_class) . '.php';
+            if (file_exists($file)) {
+                require $file;
+                return;
+            }
         }
     });
 }
