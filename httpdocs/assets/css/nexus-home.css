@@ -10,9 +10,9 @@
     transform: translateX(-50%);
     background: #1e293b;
     color: white;
-    padding: 12px 20px;
-    border-radius: 8px;
-    font-size: 14px;
+    padding: var(--space-3) 20px;
+    border-radius: var(--radius-base);
+    font-size: var(--font-size-sm);
     font-weight: 500;
     z-index: 10000;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
@@ -51,7 +51,7 @@
 
 /* Create post card body */
 .fds-create-post-body {
-    padding: 14px 16px;
+    padding: var(--space-3.5) var(--space-4);
 }
 
 /* Quick action icon colors - reset background to prevent conflicts with generic .icon-* classes */
@@ -86,14 +86,14 @@
 
 .composer-avatar-guest i {
     color: white;
-    font-size: 18px;
+    font-size: var(--font-size-lg);
 }
 
 /* Skeleton layout helpers */
 .skeleton-header {
     display: flex;
-    gap: 12px;
-    margin-bottom: 12px;
+    gap: var(--space-3);
+    margin-bottom: var(--space-3);
 }
 
 .skeleton-header-content {
@@ -101,7 +101,7 @@
 }
 
 .skeleton-line-spaced {
-    margin-bottom: 8px;
+    margin-bottom: var(--space-2);
 }
 
 /* Infinite scroll states */
@@ -118,21 +118,21 @@
 /* Feed empty/error states */
 .feed-state-card {
     text-align: center;
-    padding: 48px 20px;
+    padding: var(--space-12) var(--space-5);
 }
 
 .feed-state-card.error {
-    border-left: 4px solid #ef4444;
+    border-left: var(--space-1) solid #ef4444;
 }
 
 .feed-state-icon {
-    font-size: 48px;
-    margin-bottom: 16px;
+    font-size: var(--space-12);
+    margin-bottom: var(--space-4);
 }
 
 .feed-state-title {
-    font-size: 18px;
-    margin-bottom: 8px;
+    font-size: var(--font-size-lg);
+    margin-bottom: var(--space-2);
 }
 
 .feed-state-title.error {
@@ -152,7 +152,7 @@
 img.avatar-img {
     border-radius: 50% !important;
     object-fit: cover !important;
-    border: 2px solid rgba(99, 102, 241, 0.15);
+    border: var(--space-0.5) solid rgba(99, 102, 241, 0.15);
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
     transition: transform 0.2s ease, box-shadow 0.2s ease;
     /* Respect the width/height attributes set by ImageHelper */
@@ -823,9 +823,9 @@ div .feed-action-pill,
 div button.feed-action-pill {
     display: flex !important;
     align-items: center !important;
-    gap: 6px !important;
-    padding: 8px 14px !important;
-    border-radius: 10px !important;
+    gap: var(--space-1.5) !important;
+    padding: var(--space-2) 14px !important;
+    border-radius: var(--radius-md) !important;
     border: none !important;
     cursor: pointer !important;
     font-weight: 600 !important;
@@ -965,7 +965,7 @@ button.feed-action-pill:active {
 .home-two-column-grid {
     display: grid;
     grid-template-columns: 1fr 340px;
-    gap: 24px;
+    gap: var(--space-6);
     max-width: 1100px;
     margin: 0 auto;
     align-items: start;
@@ -982,7 +982,7 @@ button.feed-action-pill:active {
 .home-sidebar-column {
     display: flex;
     flex-direction: column;
-    gap: 20px;
+    gap: var(--space-5);
 }
 
 /* Sidebar Cards */
@@ -991,7 +991,7 @@ button.feed-action-pill:active {
     -webkit-backdrop-filter: blur(20px);
     backdrop-filter: blur(20px);
     border: 1px solid rgba(255, 255, 255, 0.5);
-    border-radius: 20px;
+    border-radius: var(--radius-full);
     box-shadow: 0 8px 32px rgba(31, 38, 135, 0.08);
     overflow: hidden;
     transition: all 0.3s ease;
@@ -1008,7 +1008,7 @@ button.feed-action-pill:active {
 }
 
 .sidebar-card-header {
-    padding: 16px 20px;
+    padding: var(--space-4) 20px;
     border-bottom: 1px solid rgba(99, 102, 241, 0.1);
 }
 
@@ -1018,12 +1018,12 @@ button.feed-action-pill:active {
 
 .sidebar-card-header h3 {
     margin: 0;
-    font-size: 15px;
+    font-size: var(--font-size-sm);
     font-weight: 700;
     color: #1f2937;
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: var(--space-2.5);
 }
 
 [data-theme="dark"] .sidebar-card-header h3 {
@@ -1032,25 +1032,25 @@ button.feed-action-pill:active {
 
 .sidebar-card-header h3 i {
     color: #6366f1;
-    font-size: 16px;
+    font-size: var(--font-size-base);
 }
 
 .sidebar-card-body {
-    padding: 16px 20px;
+    padding: var(--space-4) 20px;
 }
 
 /* Stats Grid */
 .sidebar-stats-grid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    gap: 12px;
+    gap: var(--space-3);
 }
 
 .sidebar-stat-item {
     text-align: center;
-    padding: 14px 10px;
+    padding: var(--space-3.5) 10px;
     background: linear-gradient(135deg, rgba(99, 102, 241, 0.06), rgba(139, 92, 246, 0.04));
-    border-radius: 14px;
+    border-radius: var(--radius-lg);
     transition: all 0.2s ease;
 }
 
@@ -1064,7 +1064,7 @@ button.feed-action-pill:active {
 
 .sidebar-stat-value {
     display: block;
-    font-size: 24px;
+    font-size: var(--font-size-2xl);
     font-weight: 800;
     background: linear-gradient(135deg, #6366f1, #8b5cf6, #ec4899);
     -webkit-background-clip: text;
@@ -1075,10 +1075,10 @@ button.feed-action-pill:active {
 
 .sidebar-stat-label {
     display: block;
-    font-size: 11px;
+    font-size: var(--font-size-xs);
     font-weight: 600;
     color: #64748b;
-    margin-top: 4px;
+    margin-top: var(--space-1);
     text-transform: uppercase;
     letter-spacing: 0.5px;
 }
@@ -1091,14 +1091,14 @@ button.feed-action-pill:active {
 .sidebar-trending-tags {
     display: flex;
     flex-wrap: wrap;
-    gap: 8px;
+    gap: var(--space-2);
 }
 
 .sidebar-trending-tag {
-    padding: 6px 14px;
+    padding: var(--space-1.5) 14px;
     background: linear-gradient(135deg, rgba(99, 102, 241, 0.08), rgba(139, 92, 246, 0.06));
-    border-radius: 20px;
-    font-size: 13px;
+    border-radius: var(--radius-full);
+    font-size: var(--font-size-sm);
     font-weight: 600;
     color: #6366f1;
     text-decoration: none;
@@ -1119,15 +1119,15 @@ button.feed-action-pill:active {
 .sidebar-member-list {
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: var(--space-2.5);
 }
 
 .sidebar-member-item {
     display: flex;
     align-items: center;
-    gap: 12px;
-    padding: 8px 10px;
-    border-radius: 12px;
+    gap: var(--space-3);
+    padding: var(--space-2) 10px;
+    border-radius: var(--radius-md);
     text-decoration: none;
     transition: background 0.2s ease;
 }
@@ -1145,7 +1145,7 @@ button.feed-action-pill:active {
     height: 40px;
     border-radius: 50%;
     object-fit: cover;
-    border: 2px solid rgba(99, 102, 241, 0.2);
+    border: var(--space-0.5) solid rgba(99, 102, 241, 0.2);
 }
 
 .sidebar-member-info {
@@ -1157,7 +1157,7 @@ button.feed-action-pill:active {
     display: block;
     font-weight: 600;
     color: #1f2937;
-    font-size: 14px;
+    font-size: var(--font-size-sm);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -1169,7 +1169,7 @@ button.feed-action-pill:active {
 
 .sidebar-member-meta {
     display: block;
-    font-size: 12px;
+    font-size: var(--font-size-xs);
     color: #64748b;
     white-space: nowrap;
     overflow: hidden;
@@ -1184,21 +1184,21 @@ button.feed-action-pill:active {
 .sidebar-events-list {
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: var(--space-3);
 }
 
 .sidebar-event-item {
     display: flex;
-    gap: 12px;
+    gap: var(--space-3);
     align-items: center;
     text-decoration: none;
 }
 
 .sidebar-event-date {
     width: 50px;
-    padding: 8px 6px;
+    padding: var(--space-2) 6px;
     background: linear-gradient(135deg, #6366f1, #8b5cf6);
-    border-radius: 10px;
+    border-radius: var(--radius-md);
     text-align: center;
     color: white;
     flex-shrink: 0;
@@ -1206,7 +1206,7 @@ button.feed-action-pill:active {
 
 .sidebar-event-date .month {
     display: block;
-    font-size: 9px;
+    font-size: var(--font-size-xs);
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.5px;
@@ -1215,7 +1215,7 @@ button.feed-action-pill:active {
 
 .sidebar-event-date .day {
     display: block;
-    font-size: 20px;
+    font-size: var(--font-size-xl);
     font-weight: 800;
     line-height: 1.1;
 }
@@ -1229,7 +1229,7 @@ button.feed-action-pill:active {
     display: block;
     font-weight: 600;
     color: #1f2937;
-    font-size: 14px;
+    font-size: var(--font-size-sm);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -1241,7 +1241,7 @@ button.feed-action-pill:active {
 
 .sidebar-event-time {
     display: block;
-    font-size: 12px;
+    font-size: var(--font-size-xs);
     color: #64748b;
 }
 
@@ -1252,11 +1252,11 @@ button.feed-action-pill:active {
 /* View All Link */
 .sidebar-view-all {
     display: block;
-    margin-top: 14px;
-    padding-top: 12px;
+    margin-top: var(--space-3.5);
+    padding-top: var(--space-3);
     border-top: 1px solid rgba(99, 102, 241, 0.1);
     text-align: center;
-    font-size: 13px;
+    font-size: var(--font-size-sm);
     font-weight: 600;
     color: #6366f1;
     text-decoration: none;
@@ -1293,11 +1293,11 @@ button.feed-action-pill:active {
 }
 
 .sidebar-avatar-border {
-    border: 2px solid #e5e7eb;
+    border: var(--space-0.5) solid #e5e7eb;
 }
 
 .sidebar-online-dot {
-    border: 2px solid white;
+    border: var(--space-0.5) solid white;
 }
 
 [data-theme="dark"] .sidebar-text-dark {
@@ -1355,15 +1355,15 @@ button.feed-action-pill:active {
     -webkit-backdrop-filter: blur(20px);
     backdrop-filter: blur(20px);
     border: 1px solid rgba(255, 255, 255, 0.4);
-    border-radius: 20px;
-    padding: 28px 24px;
-    margin-bottom: 20px;
+    border-radius: var(--radius-full);
+    padding: var(--space-7) var(--space-6);
+    margin-bottom: var(--space-5);
     text-align: center;
     box-shadow: 0 8px 32px rgba(99, 102, 241, 0.1);
 }
 
 .nexus-welcome-content {
-    margin-bottom: 20px;
+    margin-bottom: var(--space-5);
 }
 
 .nexus-welcome-title {
@@ -1411,7 +1411,7 @@ button.feed-action-pill:active {
 /* Feed Filter Buttons */
 .nexus-feed-filters {
     display: flex;
-    gap: 8px;
+    gap: var(--space-2);
     justify-content: center;
     flex-wrap: wrap;
 }
@@ -1419,9 +1419,9 @@ button.feed-action-pill:active {
 .feed-filter-btn {
     display: inline-flex;
     align-items: center;
-    gap: 6px;
-    padding: 10px 18px;
-    border-radius: 24px;
+    gap: var(--space-1.5);
+    padding: var(--space-2.5) 18px;
+    border-radius: var(--radius-xl);
     font-weight: 600;
     font-size: 0.85rem;
     border: none;
@@ -1504,12 +1504,12 @@ button.feed-action-pill:active {
     backdrop-filter: blur(24px) saturate(180%);
     -webkit-backdrop-filter: blur(24px) saturate(180%);
     border: 1px solid transparent;
-    border-radius: 24px;
+    border-radius: var(--radius-xl);
     box-shadow:
         0 8px 32px rgba(99, 102, 241, 0.12),
         0 2px 8px rgba(139, 92, 246, 0.08),
         inset 0 1px 0 rgba(255, 255, 255, 0.8);
-    margin-bottom: 16px;
+    margin-bottom: var(--space-4);
     overflow: visible;
     transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
@@ -1519,8 +1519,8 @@ button.feed-action-pill:active {
     content: '';
     position: absolute;
     inset: -2px;
-    border-radius: 26px;
-    padding: 2px;
+    border-radius: var(--radius-xl);
+    padding: var(--space-0.5);
     background: linear-gradient(135deg,
             rgba(99, 102, 241, 0.4),
             rgba(168, 85, 247, 0.4),
@@ -1545,7 +1545,7 @@ button.feed-action-pill:active {
     content: '';
     position: absolute;
     inset: 0;
-    border-radius: 24px;
+    border-radius: var(--radius-xl);
     background: linear-gradient(135deg,
             rgba(99, 102, 241, 0.03) 0%,
             rgba(168, 85, 247, 0.02) 25%,
@@ -1593,7 +1593,7 @@ button.feed-action-pill:active {
     border-radius: 50%;
     object-fit: cover;
     background: #fff;
-    border: 2px solid #fff;
+    border: var(--space-0.5) solid #fff;
 }
 
 .composer-avatar-ring.guest {
@@ -1607,13 +1607,13 @@ button.feed-action-pill:active {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 12px 18px;
+    padding: var(--space-3) 18px;
     background: linear-gradient(135deg, rgba(243, 244, 246, 0.8), rgba(249, 250, 251, 0.6));
     -webkit-backdrop-filter: blur(8px);
     backdrop-filter: blur(8px);
     border: 1px solid rgba(99, 102, 241, 0.1);
-    border-radius: 24px;
-    font-size: 15px;
+    border-radius: var(--radius-xl);
+    font-size: var(--font-size-sm);
     color: #6b7280;
     cursor: pointer;
     transition: all 0.3s ease;
@@ -1632,10 +1632,10 @@ button.feed-action-pill:active {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding-top: 14px;
-    margin-top: 14px;
+    padding-top: var(--space-3.5);
+    margin-top: var(--space-3.5);
     border-top: 1px solid rgba(99, 102, 241, 0.08);
-    gap: 8px;
+    gap: var(--space-2);
 }
 
 /* Composer Action Buttons */
@@ -1643,15 +1643,15 @@ button.feed-action-pill:active {
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 8px;
+    gap: var(--space-2);
     flex: 1;
-    padding: 10px 16px;
+    padding: var(--space-2.5) 16px;
     background: transparent;
     border: none;
-    border-radius: 12px;
+    border-radius: var(--radius-md);
     color: #4b5563;
     font-weight: 600;
-    font-size: 14px;
+    font-size: var(--font-size-sm);
     cursor: pointer;
     transition: all 0.2s ease;
     text-decoration: none;
@@ -1674,7 +1674,7 @@ button.feed-action-pill:active {
 }
 
 .composer-action-btn i {
-    font-size: 18px;
+    font-size: var(--font-size-lg);
 }
 
 /* ====================================
@@ -1688,18 +1688,18 @@ button.feed-action-pill:active {
 .compose-prompt {
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: var(--space-3);
 }
 
 .compose-prompt-input {
     flex: 1;
-    padding: 12px 18px;
+    padding: var(--space-3) 18px;
     background: linear-gradient(135deg, rgba(243, 244, 246, 0.8), rgba(249, 250, 251, 0.6));
     -webkit-backdrop-filter: blur(8px);
     backdrop-filter: blur(8px);
     border: 1px solid rgba(99, 102, 241, 0.1);
-    border-radius: 24px;
-    font-size: 15px;
+    border-radius: var(--radius-xl);
+    font-size: var(--font-size-sm);
     color: #6b7280;
     cursor: pointer;
     transition: all 0.3s ease;
@@ -1715,9 +1715,9 @@ button.feed-action-pill:active {
 /* Quick Action Buttons */
 .compose-quick-actions {
     display: flex;
-    gap: 8px;
-    padding-top: 14px;
-    margin-top: 14px;
+    gap: var(--space-2);
+    padding-top: var(--space-3.5);
+    margin-top: var(--space-3.5);
     border-top: 1px solid rgba(99, 102, 241, 0.08);
 }
 
@@ -1725,15 +1725,15 @@ button.feed-action-pill:active {
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 8px;
+    gap: var(--space-2);
     flex: 1;
-    padding: 10px 16px;
+    padding: var(--space-2.5) 16px;
     background: transparent;
     border: none;
-    border-radius: 12px;
+    border-radius: var(--radius-md);
     color: #4b5563;
     font-weight: 600;
-    font-size: 14px;
+    font-size: var(--font-size-sm);
     cursor: pointer;
     transition: all 0.2s ease;
     text-decoration: none;
@@ -1745,7 +1745,7 @@ button.feed-action-pill:active {
 }
 
 .compose-quick-btn i {
-    font-size: 18px;
+    font-size: var(--font-size-lg);
 }
 
 .compose-quick-btn.highlight {
@@ -1794,11 +1794,11 @@ button.feed-action-pill:active {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 10px 14px;
-    margin-bottom: 16px;
+    padding: var(--space-2.5) 14px;
+    margin-bottom: var(--space-4);
     background: rgba(99, 102, 241, 0.04);
     border: 1px solid rgba(99, 102, 241, 0.1);
-    border-radius: 12px;
+    border-radius: var(--radius-md);
 }
 
 /* Submit Button - Premium gradient */
@@ -1807,14 +1807,14 @@ button.feed-action-pill:active {
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 10px;
-    padding: 14px 24px;
+    gap: var(--space-2.5);
+    padding: var(--space-3.5) 24px;
     background: linear-gradient(135deg, #6366f1, #8b5cf6);
     border: none;
-    border-radius: 14px;
+    border-radius: var(--radius-lg);
     color: #fff;
     font-weight: 700;
-    font-size: 16px;
+    font-size: var(--font-size-base);
     cursor: pointer;
     transition: all 0.3s ease;
     box-shadow: 0 4px 16px rgba(99, 102, 241, 0.3);
@@ -1865,11 +1865,11 @@ button.feed-action-pill:active {
     width: 100%;
     min-height: 48px;
     max-height: 300px;
-    padding: 12px 16px;
+    padding: var(--space-3) 16px;
     background: rgba(255, 255, 255, 0.9);
     border: 1px solid rgba(99, 102, 241, 0.15);
-    border-radius: 20px;
-    font-size: 15px;
+    border-radius: var(--radius-full);
+    font-size: var(--font-size-sm);
     line-height: 1.5;
     color: #1f2937;
     resize: none;
@@ -1939,7 +1939,7 @@ button.feed-action-pill:active {
     justify-content: center;
     cursor: pointer;
     transition: all 0.2s ease;
-    font-size: 18px;
+    font-size: var(--font-size-lg);
 }
 
 .composer-media-btn:hover {
@@ -1951,14 +1951,14 @@ button.feed-action-pill:active {
 .composer-post-btn {
     display: flex;
     align-items: center;
-    gap: 8px;
-    padding: 10px 20px;
+    gap: var(--space-2);
+    padding: var(--space-2.5) 20px;
     background: linear-gradient(135deg, #6366f1, #8b5cf6);
     border: none;
-    border-radius: 20px;
+    border-radius: var(--radius-full);
     color: #fff;
     font-weight: 600;
-    font-size: 14px;
+    font-size: var(--font-size-sm);
     cursor: pointer;
     transition: all 0.3s ease;
     box-shadow: 0 4px 12px rgba(99, 102, 241, 0.25);
@@ -1993,12 +1993,12 @@ button.feed-action-pill:active {
     backdrop-filter: blur(24px);
     -webkit-backdrop-filter: blur(24px);
     border: 1px solid rgba(255, 255, 255, 0.9);
-    border-radius: 24px;
+    border-radius: var(--radius-xl);
     box-shadow:
         0 8px 32px rgba(99, 102, 241, 0.1),
         0 2px 8px rgba(0, 0, 0, 0.04),
         inset 0 1px 0 rgba(255, 255, 255, 1);
-    margin-bottom: 24px;
+    margin-bottom: var(--space-6);
     overflow: hidden;
     position: relative;
     transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
@@ -2049,11 +2049,11 @@ button.feed-action-pill:active {
 /* ========== Premium Post Type Tabs ========== */
 .composer-type-tabs {
     display: flex;
-    gap: 8px;
-    margin-bottom: 20px;
-    padding: 6px;
+    gap: var(--space-2);
+    margin-bottom: var(--space-5);
+    padding: var(--space-1.5);
     background: linear-gradient(135deg, rgba(99, 102, 241, 0.06), rgba(139, 92, 246, 0.04));
-    border-radius: 18px;
+    border-radius: var(--radius-lg);
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
     /* Scrollbar compatibility */
@@ -2074,13 +2074,13 @@ button.feed-action-pill:active {
     position: relative;
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: var(--space-2);
     padding: 11px 18px;
     border: none;
-    border-radius: 14px;
+    border-radius: var(--radius-lg);
     background: transparent;
     color: #64748b;
-    font-size: 13px;
+    font-size: var(--font-size-sm);
     font-weight: 600;
     cursor: pointer;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -2093,13 +2093,13 @@ button.feed-action-pill:active {
     content: '';
     position: absolute;
     inset: 0;
-    border-radius: 14px;
+    border-radius: var(--radius-lg);
     opacity: 0;
     transition: opacity 0.3s ease;
 }
 
 .composer-type-tab i {
-    font-size: 15px;
+    font-size: var(--font-size-sm);
     position: relative;
     z-index: 1;
     transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -2185,11 +2185,11 @@ button.feed-action-pill:active {
 
 .composer-input-inline {
     width: 100%;
-    padding: 14px 18px;
-    margin-bottom: 12px;
-    border: 2px solid rgba(99, 102, 241, 0.12);
-    border-radius: 14px;
-    font-size: 15px;
+    padding: var(--space-3.5) 18px;
+    margin-bottom: var(--space-3);
+    border: var(--space-0.5) solid rgba(99, 102, 241, 0.12);
+    border-radius: var(--radius-lg);
+    font-size: var(--font-size-sm);
     font-weight: 500;
     background: rgba(255, 255, 255, 0.85);
     color: #1e293b;
@@ -2225,11 +2225,11 @@ button.feed-action-pill:active {
 
 .composer-select-inline {
     width: 100%;
-    padding: 14px 18px;
-    margin-bottom: 12px;
-    border: 2px solid rgba(99, 102, 241, 0.12);
-    border-radius: 14px;
-    font-size: 15px;
+    padding: var(--space-3.5) 18px;
+    margin-bottom: var(--space-3);
+    border: var(--space-0.5) solid rgba(99, 102, 241, 0.12);
+    border-radius: var(--radius-lg);
+    font-size: var(--font-size-sm);
     font-weight: 500;
     background: rgba(255, 255, 255, 0.85);
     color: #1e293b;
@@ -2254,8 +2254,8 @@ button.feed-action-pill:active {
 
 .composer-inline-row {
     display: flex;
-    gap: 12px;
-    margin-bottom: 12px;
+    gap: var(--space-3);
+    margin-bottom: var(--space-3);
 }
 
 .composer-inline-row>* {
@@ -2352,8 +2352,8 @@ button.feed-action-pill:active {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-top: 20px;
-    padding-top: 16px;
+    margin-top: var(--space-5);
+    padding-top: var(--space-4);
     border-top: 1px solid rgba(99, 102, 241, 0.1);
 }
 
@@ -2364,14 +2364,14 @@ button.feed-action-pill:active {
     align-items: center;
     justify-content: center;
     border: none;
-    border-radius: 12px;
+    border-radius: var(--radius-md);
     background: rgba(99, 102, 241, 0.08);
     cursor: pointer;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .composer-media-btn i {
-    font-size: 18px;
+    font-size: var(--font-size-lg);
     transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
@@ -2404,7 +2404,7 @@ button.feed-action-pill:active {
     z-index: 1000;
     background: var(--card-bg, #fff);
     border: 1px solid var(--border-color, rgba(0, 0, 0, 0.08));
-    border-radius: 20px;
+    border-radius: var(--radius-full);
     box-shadow:
         0 12px 48px rgba(0, 0, 0, 0.18),
         0 4px 16px rgba(0, 0, 0, 0.1),
@@ -2429,17 +2429,17 @@ button.feed-action-pill:active {
 }
 
 .emoji-picker-header {
-    padding: 12px 14px;
+    padding: var(--space-3) 14px;
     border-bottom: 1px solid var(--border-color, rgba(0, 0, 0, 0.06));
     background: linear-gradient(180deg, var(--card-bg, #fff) 0%, rgba(249, 250, 251, 1) 100%);
 }
 
 .emoji-tabs {
     display: flex;
-    gap: 2px;
+    gap: var(--space-0.5);
     background: rgba(0, 0, 0, 0.04);
-    border-radius: 12px;
-    padding: 4px;
+    border-radius: var(--radius-md);
+    padding: var(--space-1);
 }
 
 .emoji-tab {
@@ -2447,8 +2447,8 @@ button.feed-action-pill:active {
     height: 38px;
     border: none;
     background: transparent;
-    border-radius: 10px;
-    font-size: 18px;
+    border-radius: var(--radius-md);
+    font-size: var(--font-size-lg);
     cursor: pointer;
     transition: all 0.2s ease;
     display: flex;
@@ -2477,14 +2477,14 @@ button.feed-action-pill:active {
     width: 16px;
     height: 3px;
     background: linear-gradient(135deg, #6366f1, #a855f7);
-    border-radius: 3px;
+    border-radius: var(--radius-sm);
 }
 
 .emoji-grid {
     display: grid;
     grid-template-columns: repeat(8, 1fr);
-    gap: 2px;
-    padding: 14px;
+    gap: var(--space-0.5);
+    padding: var(--space-3.5);
     max-height: 300px;
     overflow-y: auto;
     overflow-x: hidden;
@@ -2502,7 +2502,7 @@ button.feed-action-pill:active {
 
 .emoji-grid::-webkit-scrollbar-thumb {
     background: rgba(99, 102, 241, 0.3);
-    border-radius: 3px;
+    border-radius: var(--radius-sm);
 }
 
 .emoji-grid::-webkit-scrollbar-thumb:hover {
@@ -2514,8 +2514,8 @@ button.feed-action-pill:active {
     aspect-ratio: 1;
     border: none;
     background: transparent;
-    border-radius: 10px;
-    font-size: 24px;
+    border-radius: var(--radius-md);
+    font-size: var(--font-size-2xl);
     cursor: pointer;
     transition: all 0.15s cubic-bezier(0.34, 1.56, 0.64, 1);
     display: flex;
@@ -2594,11 +2594,11 @@ button.feed-action-pill:active {
 
     .emoji-tab {
         height: 36px;
-        font-size: 16px;
+        font-size: var(--font-size-base);
     }
 
     .emoji-item {
-        font-size: 22px;
+        font-size: var(--font-size-2xl);
     }
 }
 
@@ -2606,14 +2606,14 @@ button.feed-action-pill:active {
 .composer-post-btn {
     display: flex;
     align-items: center;
-    gap: 10px;
-    padding: 14px 32px;
+    gap: var(--space-2.5);
+    padding: var(--space-3.5) 32px;
     border: none;
-    border-radius: 16px;
+    border-radius: var(--radius-lg);
     background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #a855f7 100%);
     background-size: 200% 100%;
     color: white;
-    font-size: 15px;
+    font-size: var(--font-size-sm);
     font-weight: 700;
     letter-spacing: 0.3px;
     cursor: pointer;
@@ -2653,7 +2653,7 @@ button.feed-action-pill:active {
 }
 
 .composer-post-btn i {
-    font-size: 14px;
+    font-size: var(--font-size-sm);
     transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
@@ -2700,20 +2700,20 @@ button.feed-action-pill:active {
 /* ========== Mobile Responsive ========== */
 @media (max-width: 640px) {
     .fds-create-post {
-        border-radius: 20px;
+        border-radius: var(--radius-full);
         margin-left: -8px;
         margin-right: -8px;
     }
 
     .composer-type-tabs {
-        gap: 6px;
+        gap: var(--space-1.5);
         padding: 5px;
-        border-radius: 14px;
+        border-radius: var(--radius-lg);
     }
 
     .composer-type-tab {
-        padding: 10px 14px;
-        border-radius: 12px;
+        padding: var(--space-2.5) 14px;
+        border-radius: var(--radius-md);
     }
 
     .composer-type-tab span {
@@ -2721,14 +2721,14 @@ button.feed-action-pill:active {
     }
 
     .composer-type-tab i {
-        font-size: 17px;
+        font-size: var(--font-size-lg);
     }
 
     .composer-input-inline,
     .composer-select-inline {
-        padding: 13px 16px;
-        font-size: 15px;
-        border-radius: 12px;
+        padding: 13px var(--space-4);
+        font-size: var(--font-size-sm);
+        border-radius: var(--radius-md);
     }
 
     .composer-inline-row {
@@ -2737,44 +2737,44 @@ button.feed-action-pill:active {
     }
 
     .composer-inline-row>* {
-        margin-bottom: 12px;
+        margin-bottom: var(--space-3);
     }
 
     .composer-post-btn {
-        padding: 13px 24px;
-        font-size: 14px;
-        border-radius: 14px;
+        padding: 13px var(--space-6);
+        font-size: var(--font-size-sm);
+        border-radius: var(--radius-lg);
     }
 
     .composer-action-row {
         flex-wrap: wrap;
-        gap: 12px;
+        gap: var(--space-3);
     }
 }
 
 @media (max-width: 400px) {
     .composer-type-tab {
-        padding: 9px 12px;
+        padding: 9px var(--space-3);
     }
 
     .composer-type-tab i {
-        font-size: 16px;
+        font-size: var(--font-size-base);
     }
 }
 
 /* ========== Premium Multi-Module Form Styles ========== */
 .composer-module-form {
-    padding: 12px 0;
+    padding: var(--space-3) 0;
 }
 
 /* Offer/Request Toggle - Premium Pills */
 .composer-type-toggle {
     display: flex;
-    gap: 12px;
+    gap: var(--space-3);
     margin-bottom: 18px;
-    padding: 6px;
+    padding: var(--space-1.5);
     background: linear-gradient(135deg, rgba(0, 0, 0, 0.02), rgba(0, 0, 0, 0.04));
-    border-radius: 16px;
+    border-radius: var(--radius-lg);
 }
 
 .composer-type-option {
@@ -2790,12 +2790,12 @@ button.feed-action-pill:active {
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 10px;
-    padding: 14px 20px;
-    border-radius: 12px;
+    gap: var(--space-2.5);
+    padding: var(--space-3.5) 20px;
+    border-radius: var(--radius-md);
     font-weight: 700;
-    font-size: 14px;
-    border: 2px solid transparent;
+    font-size: var(--font-size-sm);
+    border: var(--space-0.5) solid transparent;
     background: rgba(255, 255, 255, 0.7);
     color: #64748b;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -2808,7 +2808,7 @@ button.feed-action-pill:active {
 }
 
 .composer-type-option .type-btn i {
-    font-size: 16px;
+    font-size: var(--font-size-base);
     transition: transform 0.3s ease;
 }
 
@@ -2851,10 +2851,10 @@ button.feed-action-pill:active {
 
 .composer-field-label {
     display: block;
-    font-size: 12px;
+    font-size: var(--font-size-xs);
     font-weight: 600;
     color: #64748b;
-    margin-bottom: 6px;
+    margin-bottom: var(--space-1.5);
     text-transform: uppercase;
     letter-spacing: 0.5px;
 }
@@ -2864,21 +2864,21 @@ button.feed-action-pill:active {
 }
 
 .composer-datetime-group {
-    margin-bottom: 12px;
+    margin-bottom: var(--space-3);
 }
 
 .composer-datetime-label {
-    font-size: 12px;
+    font-size: var(--font-size-xs);
     font-weight: 600;
     color: #64748b;
-    margin-bottom: 6px;
+    margin-bottom: var(--space-1.5);
     display: flex;
     align-items: center;
-    gap: 6px;
+    gap: var(--space-1.5);
 }
 
 .composer-datetime-label i {
-    font-size: 10px;
+    font-size: var(--font-size-xs);
     color: #6366f1;
 }
 
@@ -2888,14 +2888,14 @@ button.feed-action-pill:active {
 
 .composer-location-wrapper {
     position: relative;
-    margin-bottom: 10px;
+    margin-bottom: var(--space-2.5);
 }
 
 /* Accordion Styles */
 .composer-accordion {
-    margin: 12px 0;
+    margin: var(--space-3) 0;
     border: 1px solid rgba(99, 102, 241, 0.1);
-    border-radius: 12px;
+    border-radius: var(--radius-md);
     overflow: hidden;
     background: rgba(0, 0, 0, 0.01);
 }
@@ -2906,14 +2906,14 @@ button.feed-action-pill:active {
 }
 
 .composer-accordion summary {
-    padding: 12px 16px;
+    padding: var(--space-3) 16px;
     cursor: pointer;
     font-weight: 600;
-    font-size: 13px;
+    font-size: var(--font-size-sm);
     color: #64748b;
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: var(--space-2);
     transition: background 0.2s ease;
     list-style: none;
 }
@@ -2926,7 +2926,7 @@ button.feed-action-pill:active {
     content: '\f078';
     font-family: 'Font Awesome 6 Free';
     font-weight: 900;
-    font-size: 10px;
+    font-size: var(--font-size-xs);
     margin-left: auto;
     transition: transform 0.2s ease;
 }
@@ -2967,18 +2967,18 @@ button.feed-action-pill:active {
 .composer-attributes-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-    gap: 8px;
-    padding: 12px 16px;
+    gap: var(--space-2);
+    padding: var(--space-3) 16px;
 }
 
 .composer-attribute-item {
     display: flex;
     align-items: center;
-    gap: 8px;
-    padding: 8px 12px;
-    border-radius: 8px;
+    gap: var(--space-2);
+    padding: var(--space-2) 12px;
+    border-radius: var(--radius-base);
     cursor: pointer;
-    font-size: 13px;
+    font-size: var(--font-size-sm);
     color: #374151;
     background: rgba(255, 255, 255, 0.5);
     border: 1px solid transparent;
@@ -3011,19 +3011,19 @@ button.feed-action-pill:active {
 .composer-sdg-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-    gap: 8px;
-    padding: 12px 16px;
+    gap: var(--space-2);
+    padding: var(--space-3) 16px;
 }
 
 .composer-sdg-item {
     display: flex;
     align-items: center;
-    gap: 8px;
-    padding: 10px 12px;
-    border-radius: 10px;
+    gap: var(--space-2);
+    padding: var(--space-2.5) 12px;
+    border-radius: var(--radius-md);
     cursor: pointer;
-    font-size: 12px;
-    border: 2px solid rgba(0, 0, 0, 0.06);
+    font-size: var(--font-size-xs);
+    border: var(--space-0.5) solid rgba(0, 0, 0, 0.06);
     background: rgba(255, 255, 255, 0.5);
     transition: all 0.2s ease;
 }
@@ -3074,17 +3074,17 @@ button.feed-action-pill:active {
 
 /* Poll Options */
 .composer-poll-options {
-    margin-bottom: 8px;
+    margin-bottom: var(--space-2);
 }
 
 .composer-poll-option {
     position: relative;
-    margin-bottom: 8px;
+    margin-bottom: var(--space-2);
 }
 
 .composer-poll-option .remove-option-btn {
     position: absolute;
-    right: 10px;
+    right: var(--space-2.5);
     top: 50%;
     transform: translateY(-50%);
     width: 24px;
@@ -3097,7 +3097,7 @@ button.feed-action-pill:active {
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 12px;
+    font-size: var(--font-size-xs);
     transition: all 0.2s ease;
 }
 
@@ -3109,14 +3109,14 @@ button.feed-action-pill:active {
 .composer-add-option-btn {
     display: flex;
     align-items: center;
-    gap: 6px;
-    padding: 10px 16px;
+    gap: var(--space-1.5);
+    padding: var(--space-2.5) 16px;
     border: 2px dashed rgba(99, 102, 241, 0.3);
-    border-radius: 12px;
+    border-radius: var(--radius-md);
     background: transparent;
     color: #6366f1;
     font-weight: 600;
-    font-size: 13px;
+    font-size: var(--font-size-sm);
     cursor: pointer;
     width: 100%;
     justify-content: center;
@@ -3168,9 +3168,9 @@ button.feed-action-pill:active {
     backdrop-filter: blur(20px) !important;
     -webkit-backdrop-filter: blur(20px) !important;
     border: 1px solid rgba(255, 255, 255, 0.3) !important;
-    border-radius: 16px !important;
+    border-radius: var(--radius-lg) !important;
     box-shadow: 0 8px 32px rgba(31, 38, 135, 0.1) !important;
-    margin-bottom: 20px !important;
+    margin-bottom: var(--space-5) !important;
     transition: all 0.3s ease !important;
     overflow: hidden;
 }
@@ -3190,8 +3190,8 @@ button.feed-action-pill:active {
     -webkit-backdrop-filter: blur(10px);
     color: #fff;
     text-align: center;
-    border-radius: 12px;
-    padding: 16px 24px;
+    border-radius: var(--radius-md);
+    padding: var(--space-4) 24px;
     position: fixed;
     z-index: var(--z-dropdown, 1000);
     left: 50%;
@@ -3223,7 +3223,7 @@ button.feed-action-pill:active {
     justify-content: center;
     cursor: pointer;
     transition: all 0.2s ease;
-    font-size: 20px;
+    font-size: var(--font-size-xl);
     background: rgba(255, 255, 255, 0.4);
     -webkit-backdrop-filter: blur(8px);
     backdrop-filter: blur(8px);
@@ -3249,8 +3249,8 @@ button.feed-action-pill:active {
     -webkit-backdrop-filter: blur(10px);
     border: 1px solid rgba(255, 255, 255, 0.2);
     color: white;
-    padding: 10px 20px;
-    border-radius: 12px;
+    padding: var(--space-2.5) 20px;
+    border-radius: var(--radius-md);
     font-weight: 600;
     cursor: pointer;
     transition: all 0.3s ease;
@@ -3270,8 +3270,8 @@ button.feed-action-pill:active {
     -webkit-backdrop-filter: blur(10px);
     border: 1px solid rgba(255, 255, 255, 0.3);
     color: #1f2937;
-    padding: 8px 16px;
-    border-radius: 10px;
+    padding: var(--space-2) 16px;
+    border-radius: var(--radius-md);
     font-weight: 600;
     cursor: pointer;
     transition: all 0.3s ease;
@@ -3293,7 +3293,7 @@ textarea {
     backdrop-filter: blur(10px) !important;
     -webkit-backdrop-filter: blur(10px) !important;
     border: 1px solid rgba(255, 255, 255, 0.3) !important;
-    border-radius: 10px !important;
+    border-radius: var(--radius-md) !important;
     transition: all 0.3s ease !important;
 }
 
@@ -3310,7 +3310,7 @@ textarea:focus {
     backdrop-filter: blur(8px) !important;
     -webkit-backdrop-filter: blur(8px) !important;
     border: 1px solid rgba(255, 255, 255, 0.3) !important;
-    border-radius: 8px !important;
+    border-radius: var(--radius-base) !important;
     transition: all 0.2s ease !important;
 }
 
@@ -3323,9 +3323,9 @@ textarea:focus {
 .fb-card button.feed-action-pill {
     display: flex !important;
     align-items: center !important;
-    gap: 6px !important;
-    padding: 8px 14px !important;
-    border-radius: 10px !important;
+    gap: var(--space-1.5) !important;
+    padding: var(--space-2) 14px !important;
+    border-radius: var(--radius-md) !important;
     border: none !important;
     cursor: pointer !important;
     font-weight: 600 !important;
@@ -3354,8 +3354,8 @@ textarea:focus {
     background: rgba(255, 255, 255, 0.3) !important;
     backdrop-filter: blur(10px) !important;
     -webkit-backdrop-filter: blur(10px) !important;
-    border-radius: 12px !important;
-    padding: 12px !important;
+    border-radius: var(--radius-md) !important;
+    padding: var(--space-3) !important;
 }
 
 /* Composer Expanded State Glass Effect */
@@ -3498,7 +3498,7 @@ textarea:focus {
 
 /* Feed Item Header */
 .feed-item-header {
-    padding: 16px;
+    padding: var(--space-4);
     display: flex;
     align-items: flex-start;
     justify-content: space-between;
@@ -3506,7 +3506,7 @@ textarea:focus {
 
 .feed-item-author {
     display: flex;
-    gap: 12px;
+    gap: var(--space-3);
 }
 
 .feed-item-avatar-link {
@@ -3530,8 +3530,8 @@ textarea:focus {
 .feed-item-author-name {
     font-weight: 600;
     color: var(--feed-text-primary);
-    font-size: 15px;
-    margin-bottom: 2px;
+    font-size: var(--font-size-sm);
+    margin-bottom: var(--space-0.5);
 }
 
 .feed-item-author-link {
@@ -3554,11 +3554,11 @@ textarea:focus {
 }
 
 .feed-item-meta {
-    font-size: 13px;
+    font-size: var(--font-size-sm);
     color: var(--feed-text-muted);
     display: flex;
     align-items: center;
-    gap: 4px;
+    gap: var(--space-1);
 }
 
 .feed-item-delete {
@@ -3568,25 +3568,25 @@ textarea:focus {
 
 .feed-item-admin-delete {
     color: var(--feed-text-muted);
-    font-size: 16px;
+    font-size: var(--font-size-base);
 }
 
 /* Recommendation Badges */
 .feed-recommendation-badges {
     display: flex;
     flex-wrap: wrap;
-    gap: 6px;
-    margin-top: 6px;
+    gap: var(--space-1.5);
+    margin-top: var(--space-1.5);
 }
 
 .feed-badge {
     display: inline-flex;
     align-items: center;
-    gap: 4px;
-    padding: 3px 8px;
-    font-size: 11px;
+    gap: var(--space-1);
+    padding: 3px var(--space-2);
+    font-size: var(--font-size-xs);
     font-weight: 600;
-    border-radius: 12px;
+    border-radius: var(--radius-md);
     background: color-mix(in srgb, var(--badge-color, #6b7280) 15%, transparent);
     color: var(--badge-color, #6b7280);
     border: 1px solid color-mix(in srgb, var(--badge-color, #6b7280) 30%, transparent);
@@ -3600,7 +3600,7 @@ textarea:focus {
 }
 
 .feed-badge i {
-    font-size: 10px;
+    font-size: var(--font-size-xs);
 }
 
 [data-theme="dark"] .feed-badge {
@@ -3612,11 +3612,11 @@ textarea:focus {
 .edgerank-status-indicator {
     display: inline-flex;
     align-items: center;
-    gap: 6px;
-    padding: 6px 12px;
-    margin-bottom: 12px;
-    border-radius: 20px;
-    font-size: 12px;
+    gap: var(--space-1.5);
+    padding: var(--space-1.5) 12px;
+    margin-bottom: var(--space-3);
+    border-radius: var(--radius-full);
+    font-size: var(--font-size-xs);
     font-weight: 600;
     transition: all 0.2s ease;
 }
@@ -3634,7 +3634,7 @@ textarea:focus {
 }
 
 .edgerank-status-indicator i {
-    font-size: 11px;
+    font-size: var(--font-size-xs);
 }
 
 .edgerank-status-indicator.active i {
@@ -3642,8 +3642,8 @@ textarea:focus {
 }
 
 .edgerank-score {
-    margin-left: 8px;
-    padding-left: 8px;
+    margin-left: var(--space-2);
+    padding-left: var(--space-2);
     border-left: 1px solid currentColor;
     opacity: 0.7;
     font-weight: 500;
@@ -3663,7 +3663,7 @@ textarea:focus {
 /* Feed Item Body */
 .feed-item-body {
     padding: 0 16px 16px 16px;
-    font-size: 15px;
+    font-size: var(--font-size-sm);
     color: var(--feed-text-primary);
     line-height: 1.5;
 }
@@ -3680,8 +3680,8 @@ textarea:focus {
 /* Feed Item Title */
 .feed-item-title {
     font-weight: 700;
-    margin-bottom: 8px;
-    font-size: 17px;
+    margin-bottom: var(--space-2);
+    font-size: var(--font-size-lg);
     color: var(--feed-text-primary);
 }
 
@@ -3691,19 +3691,19 @@ textarea:focus {
 
 /* Shared Content Card */
 .feed-shared-card {
-    margin-top: 12px;
+    margin-top: var(--space-3);
     border: 1px solid var(--feed-border);
-    border-radius: 12px;
+    border-radius: var(--radius-md);
     overflow: hidden;
     background: var(--feed-bg-card);
 }
 
 .feed-shared-header {
-    padding: 12px;
+    padding: var(--space-3);
     border-bottom: 1px solid var(--feed-border-light);
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: var(--space-2);
 }
 
 .feed-shared-avatar {
@@ -3714,7 +3714,7 @@ textarea:focus {
 }
 
 .feed-shared-author {
-    font-size: 14px;
+    font-size: var(--font-size-sm);
     font-weight: 600;
     color: var(--feed-text-primary);
 }
@@ -3722,23 +3722,23 @@ textarea:focus {
 .feed-shared-label {
     font-weight: 400;
     color: var(--feed-text-muted);
-    font-size: 12px;
+    font-size: var(--font-size-xs);
 }
 
 .feed-shared-time {
-    font-size: 12px;
+    font-size: var(--font-size-xs);
     color: var(--feed-text-muted);
 }
 
 .feed-shared-title {
-    padding: 12px 12px 4px 12px;
+    padding: var(--space-3) 12px 4px 12px;
     font-weight: 700;
     color: var(--feed-text-primary);
 }
 
 .feed-shared-content {
-    padding: 12px;
-    font-size: 14px;
+    padding: var(--space-3);
+    font-size: var(--font-size-sm);
     color: var(--feed-text-primary);
     line-height: 1.5;
 }
@@ -3747,8 +3747,8 @@ textarea:focus {
 .feed-shared-group-banner {
     display: flex;
     align-items: center;
-    gap: 10px;
-    padding: 10px 12px;
+    gap: var(--space-2.5);
+    padding: var(--space-2.5) 12px;
     background: linear-gradient(135deg, rgba(99, 102, 241, 0.08), rgba(168, 85, 247, 0.08));
     border-bottom: 1px solid var(--feed-border);
     text-decoration: none;
@@ -3771,8 +3771,8 @@ textarea:focus {
 .feed-group-context {
     display: flex;
     align-items: center;
-    gap: 10px;
-    padding: 10px 14px;
+    gap: var(--space-2.5);
+    padding: var(--space-2.5) 14px;
     background: linear-gradient(135deg, rgba(99, 102, 241, 0.08), rgba(168, 85, 247, 0.08));
     border-bottom: 1px solid var(--feed-border);
     text-decoration: none;
@@ -3794,14 +3794,14 @@ textarea:focus {
 .feed-group-context-avatar {
     width: 36px;
     height: 36px;
-    border-radius: 10px;
+    border-radius: var(--radius-md);
     overflow: hidden;
     background: linear-gradient(135deg, #6366f1, #8b5cf6);
     display: flex;
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
-    border: 2px solid rgba(99, 102, 241, 0.3);
+    border: var(--space-0.5) solid rgba(99, 102, 241, 0.3);
 }
 
 .feed-group-context-avatar img {
@@ -3813,7 +3813,7 @@ textarea:focus {
 .feed-group-context-avatar span {
     color: white;
     font-weight: 700;
-    font-size: 16px;
+    font-size: var(--font-size-base);
 }
 
 .feed-group-context-info {
@@ -3823,11 +3823,11 @@ textarea:focus {
 
 .feed-group-context-name {
     font-weight: 600;
-    font-size: 13px;
+    font-size: var(--font-size-sm);
     color: var(--feed-text-primary);
     display: flex;
     align-items: center;
-    gap: 6px;
+    gap: var(--space-1.5);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -3835,30 +3835,30 @@ textarea:focus {
 
 .feed-group-context-name i {
     color: #6366f1;
-    font-size: 11px;
+    font-size: var(--font-size-xs);
     flex-shrink: 0;
 }
 
 .feed-group-context-location {
-    font-size: 11px;
+    font-size: var(--font-size-xs);
     color: var(--feed-text-muted);
     margin-top: 2px;
     display: flex;
     align-items: center;
-    gap: 4px;
+    gap: var(--space-1);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
 }
 
 .feed-group-context-location i {
-    font-size: 10px;
+    font-size: var(--font-size-xs);
     flex-shrink: 0;
 }
 
 .feed-group-context-arrow {
     color: var(--feed-text-muted);
-    font-size: 12px;
+    font-size: var(--font-size-xs);
     flex-shrink: 0;
 }
 
@@ -3876,14 +3876,14 @@ textarea:focus {
 /* Feed Section Boxes (Event, Goal, Poll, etc.) */
 .feed-section-box {
     background: var(--feed-bg-section);
-    padding: 16px;
+    padding: var(--space-4);
     border-top: 1px solid var(--feed-border);
     border-bottom: 1px solid var(--feed-border);
 }
 
 .feed-event-box {
     background: #fff0f6;
-    border-left: 4px solid #db2777;
+    border-left: var(--space-1) solid #db2777;
 }
 
 [data-theme="dark"] .feed-event-box {
@@ -3892,7 +3892,7 @@ textarea:focus {
 
 .feed-volunteer-box {
     background: #eff6ff;
-    border-left: 4px solid #3b82f6;
+    border-left: var(--space-1) solid #3b82f6;
 }
 
 [data-theme="dark"] .feed-volunteer-box {
@@ -3901,11 +3901,11 @@ textarea:focus {
 
 /* Stats Row */
 .feed-stats-row {
-    padding: 10px 16px;
+    padding: var(--space-2.5) 16px;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    font-size: 14px;
+    font-size: var(--font-size-sm);
     color: var(--feed-text-secondary);
     border-bottom: 1px solid var(--feed-border-light);
 }
@@ -3913,16 +3913,16 @@ textarea:focus {
 /* Comments Section */
 .feed-comments-section {
     border-top: 1px solid var(--feed-border-light);
-    padding: 12px 16px;
+    padding: var(--space-3) 16px;
 }
 
 .feed-comment-input {
     width: 100%;
     border: 1px solid var(--feed-border);
     background: var(--feed-bg-section);
-    padding: 8px 12px;
-    border-radius: 20px;
-    padding-right: 32px;
+    padding: var(--space-2) 12px;
+    border-radius: var(--radius-full);
+    padding-right: var(--space-8);
     color: var(--feed-text-primary);
     transition: all 0.2s ease;
 }
@@ -4207,18 +4207,18 @@ textarea:focus {
 
 /* Event Date Box in Feed */
 .feed-event-date-box {
-    margin-top: 12px;
-    padding: 12px;
+    margin-top: var(--space-3);
+    padding: var(--space-3);
     background: var(--feed-bg-section);
-    border-radius: 8px;
+    border-radius: var(--radius-base);
     display: flex;
-    gap: 12px;
+    gap: var(--space-3);
     align-items: center;
 }
 
 .feed-event-calendar {
     background: var(--feed-bg-card);
-    border-radius: 6px;
+    border-radius: var(--radius-base);
     width: 50px;
     height: 50px;
     text-align: center;
@@ -4229,14 +4229,14 @@ textarea:focus {
 .feed-event-month {
     background: #ef4444;
     color: white;
-    font-size: 10px;
+    font-size: var(--font-size-xs);
     font-weight: 700;
-    padding: 2px;
+    padding: var(--space-0.5);
     text-transform: uppercase;
 }
 
 .feed-event-day {
-    font-size: 20px;
+    font-size: var(--font-size-xl);
     font-weight: 700;
     color: var(--feed-text-primary);
     line-height: 28px;
@@ -4296,11 +4296,11 @@ textarea:focus {
     font-size: 50px;
     color: var(--listing-color);
     filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.05));
-    margin-bottom: 10px;
+    margin-bottom: var(--space-2.5);
 }
 
 .feed-listing-category {
-    font-size: 18px;
+    font-size: var(--font-size-lg);
     font-weight: 800;
     color: var(--listing-color);
 }
@@ -4325,7 +4325,7 @@ textarea:focus {
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 18px;
+    font-size: var(--font-size-lg);
     transition: background 0.15s ease;
 }
 
@@ -4338,13 +4338,13 @@ textarea:focus {
     position: absolute;
     top: 100%;
     right: 0;
-    margin-top: 4px;
+    margin-top: var(--space-1);
     min-width: 280px;
     background: var(--feed-bg-card, #fff);
-    border-radius: 12px;
+    border-radius: var(--radius-md);
     box-shadow: 0 4px 24px rgba(0, 0, 0, 0.25), 0 0 0 1px rgba(0, 0, 0, 0.08);
     z-index: var(--z-notification, 1700);
-    padding: 8px;
+    padding: var(--space-2);
 }
 
 /* Ensure parent container positions dropdown correctly */
@@ -4371,14 +4371,14 @@ textarea:focus {
 .feed-menu-item {
     display: flex;
     align-items: flex-start;
-    gap: 12px;
-    padding: 10px 12px;
+    gap: var(--space-3);
+    padding: var(--space-2.5) 12px;
     border: none;
     background: transparent;
     width: 100%;
     text-align: left;
     cursor: pointer;
-    border-radius: 8px;
+    border-radius: var(--radius-base);
     transition: background 0.1s ease;
     color: var(--feed-text-primary);
     text-decoration: none;
@@ -4390,7 +4390,7 @@ textarea:focus {
 
 .feed-menu-item i {
     width: 20px;
-    font-size: 18px;
+    font-size: var(--font-size-lg);
     color: var(--feed-text-secondary);
     margin-top: 2px;
 }
@@ -4398,13 +4398,13 @@ textarea:focus {
 .feed-menu-label {
     display: block;
     font-weight: 600;
-    font-size: 14px;
+    font-size: var(--font-size-sm);
     color: var(--feed-text-primary);
 }
 
 .feed-menu-hint {
     display: block;
-    font-size: 12px;
+    font-size: var(--font-size-xs);
     color: var(--feed-text-muted);
     margin-top: 2px;
 }
@@ -4432,19 +4432,19 @@ textarea:focus {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 10px 16px;
+    padding: var(--space-2.5) 16px;
     border-bottom: 1px solid var(--feed-border-light);
 }
 
 .feed-reactions-left {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: var(--space-2);
 }
 
 .feed-reaction-icons {
     display: flex;
-    margin-right: 2px;
+    margin-right: var(--space-0.5);
 }
 
 .feed-reaction-icon {
@@ -4454,10 +4454,10 @@ textarea:focus {
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 10px;
+    font-size: var(--font-size-xs);
     color: #fff;
     margin-left: -4px;
-    border: 2px solid var(--feed-bg-card, #fff);
+    border: var(--space-0.5) solid var(--feed-bg-card, #fff);
 }
 
 .feed-reaction-icon:first-child {
@@ -4469,7 +4469,7 @@ textarea:focus {
 }
 
 .feed-reactions-text {
-    font-size: 14px;
+    font-size: var(--font-size-sm);
     color: var(--feed-text-secondary);
     cursor: pointer;
 }
@@ -4480,11 +4480,11 @@ textarea:focus {
 
 .feed-reactions-right {
     display: flex;
-    gap: 16px;
+    gap: var(--space-4);
 }
 
 .feed-stat-link {
-    font-size: 14px;
+    font-size: var(--font-size-sm);
     color: var(--feed-text-muted);
     cursor: pointer;
 }
@@ -4496,9 +4496,9 @@ textarea:focus {
 /* Facebook-style Action Bar */
 .feed-action-bar {
     display: flex;
-    gap: 4px;
+    gap: var(--space-1);
     border-top: 1px solid var(--feed-border-light);
-    padding: 4px 8px;
+    padding: var(--space-1) 8px;
 }
 
 .feed-action-btn {
@@ -4507,15 +4507,15 @@ textarea:focus {
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 6px;
-    padding: 10px 6px;
+    gap: var(--space-1.5);
+    padding: var(--space-2.5) 6px;
     border: none;
     background: transparent;
     color: var(--feed-text-secondary);
-    font-size: 13px;
+    font-size: var(--font-size-sm);
     font-weight: 600;
     cursor: pointer;
-    border-radius: 8px;
+    border-radius: var(--radius-base);
     transition: background 0.15s ease, color 0.15s ease;
     -webkit-tap-highlight-color: transparent;
     overflow: hidden;
@@ -4531,7 +4531,7 @@ textarea:focus {
 }
 
 .feed-action-btn i {
-    font-size: 16px;
+    font-size: var(--font-size-base);
     flex-shrink: 0;
 }
 
@@ -4635,9 +4635,9 @@ textarea:focus {
     -webkit-backdrop-filter: blur(20px);
     backdrop-filter: blur(20px);
     border: 1px solid rgba(255, 255, 255, 0.3);
-    border-radius: 16px;
-    padding: 16px;
-    margin-bottom: 20px;
+    border-radius: var(--radius-lg);
+    padding: var(--space-4);
+    margin-bottom: var(--space-5);
 }
 
 .skeleton-avatar {
@@ -4651,7 +4651,7 @@ textarea:focus {
 
 .skeleton-line {
     height: 12px;
-    border-radius: 6px;
+    border-radius: var(--radius-base);
     background: linear-gradient(90deg, #e5e7eb 25%, #f3f4f6 50%, #e5e7eb 75%);
     background-size: 200% 100%;
     animation: skeleton-shimmer 1.5s infinite;
@@ -4672,11 +4672,11 @@ textarea:focus {
 .skeleton-image {
     width: 100%;
     height: 200px;
-    border-radius: 12px;
+    border-radius: var(--radius-md);
     background: linear-gradient(90deg, #e5e7eb 25%, #f3f4f6 50%, #e5e7eb 75%);
     background-size: 200% 100%;
     animation: skeleton-shimmer 1.5s infinite;
-    margin-top: 12px;
+    margin-top: var(--space-3);
 }
 
 @keyframes skeleton-shimmer {
@@ -4831,15 +4831,15 @@ a:focus-visible {
     left: 0;
     right: 0;
     z-index: 10001;
-    padding: 10px 16px;
+    padding: var(--space-2.5) 16px;
     background: linear-gradient(135deg, #ef4444, #dc2626);
     color: white;
-    font-size: 13px;
+    font-size: var(--font-size-sm);
     font-weight: 600;
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 8px;
+    gap: var(--space-2);
     transform: translateY(-100%);
     transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
@@ -4849,7 +4849,7 @@ a:focus-visible {
 }
 
 .offline-banner i {
-    font-size: 16px;
+    font-size: var(--font-size-base);
 }
 
 /* Back online toast */
@@ -4903,28 +4903,28 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 30px 20px;
-    gap: 10px;
+    padding: 30px var(--space-5);
+    gap: var(--space-2.5);
     color: #6b7280;
-    font-size: 14px;
+    font-size: var(--font-size-sm);
 }
 
 .infinite-scroll-loader i {
-    font-size: 20px;
+    font-size: var(--font-size-xl);
     color: #6366f1;
     animation: spin 1s linear infinite;
 }
 
 .feed-end-message {
     text-align: center;
-    padding: 30px 20px;
+    padding: 30px var(--space-5);
     color: #9ca3af;
-    font-size: 14px;
+    font-size: var(--font-size-sm);
 }
 
 .feed-end-message i {
     font-size: 32px;
-    margin-bottom: 10px;
+    margin-bottom: var(--space-2.5);
     display: block;
     opacity: 0.5;
 }
@@ -4960,18 +4960,18 @@ body {
         padding: 0 12px;
         padding-bottom: 100px;
         /* Extra space for bottom nav */
-        gap: 8px;
+        gap: var(--space-2);
         /* Tighter gap between sections */
     }
 
     .fb-card {
-        border-radius: 12px !important;
-        margin-bottom: 8px !important;
+        border-radius: var(--radius-md) !important;
+        margin-bottom: var(--space-2) !important;
         /* Tighter spacing */
     }
 
     .fds-create-post {
-        border-radius: 16px;
+        border-radius: var(--radius-lg);
         margin-bottom: 0;
         /* Remove gap below composer */
         margin-top: 0;
@@ -4979,11 +4979,11 @@ body {
 
     /* Mobile Welcome Hero */
     .nexus-welcome-hero {
-        padding: 16px;
-        border-radius: 16px;
+        padding: var(--space-4);
+        border-radius: var(--radius-lg);
         margin-bottom: 0;
         /* Remove gap below hero */
-        margin-top: 8px;
+        margin-top: var(--space-2);
     }
 
     .nexus-welcome-title {
@@ -4995,34 +4995,34 @@ body {
     }
 
     .nexus-welcome-content {
-        margin-bottom: 12px;
+        margin-bottom: var(--space-3);
     }
 
     .nexus-smart-buttons {
-        gap: 8px;
+        gap: var(--space-2);
     }
 
     /* Tighter feed spacing on mobile */
     .fb-feed-container,
     #feed-container {
-        margin-top: 8px !important;
+        margin-top: var(--space-2) !important;
         padding-top: 0 !important;
     }
 
     /* Remove extra margins between feed items */
     .fb-card+.fb-card,
     .feed-card+.feed-card {
-        margin-top: 8px !important;
+        margin-top: var(--space-2) !important;
     }
 
     /* Skeleton loader spacing */
     #skeletonLoader {
-        margin-top: 8px !important;
+        margin-top: var(--space-2) !important;
     }
 
     /* Close ALL gaps on mobile */
     .fds-feed-container>* {
-        margin-bottom: 8px !important;
+        margin-bottom: var(--space-2) !important;
     }
 
     .fds-feed-container>*:last-child {
@@ -5031,13 +5031,13 @@ body {
 
     /* Remove gap between welcome hero and composer */
     .nexus-welcome-hero+.fds-create-post {
-        margin-top: 8px !important;
+        margin-top: var(--space-2) !important;
     }
 
     /* Remove gap between composer and skeleton/feed */
     .fds-create-post+.skeleton-container,
     .fds-create-post+.feed-container-real {
-        margin-top: 8px !important;
+        margin-top: var(--space-2) !important;
     }
 
     /* Post composer tighter */
@@ -5046,13 +5046,13 @@ body {
     }
 
     .fds-create-post>div {
-        padding: 12px 16px !important;
+        padding: var(--space-3) 16px !important;
     }
 
     .nexus-smart-btn {
-        padding: 10px 14px;
+        padding: var(--space-2.5) 14px;
         font-size: 0.8rem;
-        border-radius: 10px;
+        border-radius: var(--radius-md);
     }
 
     .nexus-smart-btn i {
