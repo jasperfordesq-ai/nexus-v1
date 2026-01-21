@@ -15,13 +15,13 @@
 .is-native #main-content,
 .is-native .htb-main,
 .is-native .nexus-main-content {
-    animation: native-page-enter 250ms cubic-bezier(0.4, 0, 0.2, 1) forwards;
+    animation: native-page-enter var(--transition-fast) var(--ease-in-out) forwards;
 }
 
 @keyframes native-page-enter {
     from {
         opacity: 0;
-        transform: translateY(8px);
+        transform: translateY(var(--space-2));
     }
     to {
         opacity: 1;
@@ -41,13 +41,13 @@
 .is-native .htb-header,
 .is-native .nexus-modern-header,
 .is-native .nexus-navbar {
-    animation: native-header-enter 200ms cubic-bezier(0.4, 0, 0.2, 1) forwards;
+    animation: native-header-enter 200ms var(--ease-in-out) forwards;
 }
 
 @keyframes native-header-enter {
     from {
         opacity: 0;
-        transform: translateY(-10px);
+        transform: translateY(calc(var(--space-2) * -1.25));
     }
     to {
         opacity: 1;
@@ -62,7 +62,7 @@
 .is-native .member-card,
 .is-native .nexus-card,
 .is-native .civic-card {
-    animation: native-card-enter 300ms cubic-bezier(0.4, 0, 0.2, 1) backwards;
+    animation: native-card-enter var(--transition-base) var(--ease-in-out) backwards;
 }
 
 /* Stagger delays for cards */
@@ -94,7 +94,7 @@
 @keyframes native-card-enter {
     from {
         opacity: 0;
-        transform: translateY(12px);
+        transform: translateY(var(--space-3));
     }
     to {
         opacity: 1;

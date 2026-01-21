@@ -13,16 +13,16 @@
     backdrop-filter: blur(16px) saturate(160%) !important;
     -webkit-backdrop-filter: blur(16px) saturate(160%) !important;
     border: 1px solid rgba(139, 92, 246, 0.25) !important;
-    border-radius: 8px !important;
-    padding: 8px 16px !important;
-    font-weight: 600 !important;
+    border-radius: var(--radius-base) !important;
+    padding: var(--space-2) var(--space-4) !important;
+    font-weight: var(--font-weight-semibold) !important;
     color: rgba(255, 255, 255, 0.95) !important;
     text-shadow: 0 2px 8px rgba(0, 0, 0, 0.15) !important;
     box-shadow:
         0 2px 12px rgba(99, 102, 241, 0.12),
         0 4px 20px rgba(139, 92, 246, 0.08),
         inset 0 1px 0 rgba(255, 255, 255, 0.1) !important;
-    transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    transition: all 0.35s var(--ease-in-out) !important;
     overflow: visible !important;
 }
 
@@ -38,9 +38,9 @@
         transparent,
         rgba(255, 255, 255, 0.12),
         transparent) !important;
-    transition: left 0.6s ease !important;
+    transition: left var(--transition-slow) ease !important;
     pointer-events: none !important;
-    border-radius: 8px !important;
+    border-radius: var(--radius-base) !important;
 }
 
 .premium-dropdown-trigger:hover::before {
@@ -104,23 +104,23 @@
     backdrop-filter: blur(28px) saturate(180%) !important;
     -webkit-backdrop-filter: blur(28px) saturate(180%) !important;
     border: 1px solid rgba(139, 92, 246, 0.2) !important;
-    border-radius: 12px !important;
+    border-radius: var(--radius-md) !important;
     box-shadow:
         0 8px 32px rgba(0, 0, 0, 0.3),
         0 12px 48px rgba(99, 102, 241, 0.15),
         0 0 0 1px rgba(255, 255, 255, 0.05),
         inset 0 1px 0 rgba(255, 255, 255, 0.08) !important;
-    margin-top: 12px !important;
-    padding: 8px 0 !important;
+    margin-top: var(--space-3) !important;
+    padding: var(--space-2) 0 !important;
     min-width: 200px !important;
-    z-index: 9999 !important;
+    z-index: var(--z-dropdown) !important;
 }
 
 /* Dropdown menu items */
 .premium-dropdown-menu a {
     color: rgba(255, 255, 255, 0.9) !important;
-    padding: 10px 18px !important;
-    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    padding: var(--space-2) var(--space-5) !important;
+    transition: all var(--transition-base) var(--ease-in-out) !important;
     position: relative !important;
     overflow: hidden !important;
 }
@@ -136,7 +136,7 @@
         rgba(99, 102, 241, 0.8),
         rgba(139, 92, 246, 0.8)) !important;
     transform: scaleY(0) !important;
-    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    transition: transform var(--transition-base) !important;
 }
 
 .premium-dropdown-menu a:hover::before {
@@ -148,15 +148,15 @@
         rgba(99, 102, 241, 0.15) 0%,
         rgba(139, 92, 246, 0.08) 100%) !important;
     color: #fff !important;
-    padding-left: 24px !important;
+    padding-left: var(--space-6) !important;
     text-shadow: 0 2px 8px rgba(99, 102, 241, 0.3) !important;
 }
 
 /* Arrow styling for dropdown triggers */
 .premium-dropdown-trigger .htb-arrow {
     display: inline-block !important;
-    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
-    margin-left: 4px !important;
+    transition: transform var(--transition-base) !important;
+    margin-left: var(--space-1) !important;
 }
 
 .premium-dropdown:hover .premium-dropdown-trigger .htb-arrow {
@@ -181,7 +181,7 @@
         rgba(99, 102, 241, 0.1) 0%,
         rgba(139, 92, 246, 0.08) 100%) !important;
     border: 1px solid rgba(99, 102, 241, 0.2) !important;
-    color: #4f46e5 !important;
+    color: var(--color-primary-600) !important;
     text-shadow: none !important;
     box-shadow:
         0 2px 12px rgba(99, 102, 241, 0.1),
@@ -193,7 +193,7 @@
         rgba(99, 102, 241, 0.15) 0%,
         rgba(139, 92, 246, 0.12) 100%) !important;
     border-color: rgba(99, 102, 241, 0.3) !important;
-    color: #4338ca !important;
+    color: var(--color-primary-700) !important;
 }
 
 [data-theme="light"] .premium-dropdown:hover .premium-dropdown-trigger,
@@ -202,7 +202,7 @@
         rgba(99, 102, 241, 0.2) 0%,
         rgba(139, 92, 246, 0.15) 100%) !important;
     border-color: rgba(99, 102, 241, 0.4) !important;
-    color: #4338ca !important;
+    color: var(--color-primary-700) !important;
 }
 
 [data-theme="light"] .premium-dropdown-menu {
@@ -214,14 +214,14 @@
 }
 
 [data-theme="light"] .premium-dropdown-menu a {
-    color: #374151 !important;
+    color: var(--color-gray-700) !important;
 }
 
 [data-theme="light"] .premium-dropdown-menu a:hover {
     background: linear-gradient(90deg,
         rgba(99, 102, 241, 0.1) 0%,
         rgba(139, 92, 246, 0.05) 100%) !important;
-    color: #4f46e5 !important;
+    color: var(--color-primary-600) !important;
     text-shadow: none !important;
 }
 
@@ -230,17 +230,17 @@
    ======================================== */
 [data-theme="light"] .nexus-navbar > a[href][style*="color: white"],
 [data-theme="light"] .nexus-navbar > a[href][style*="color:white"] {
-    color: #1f2937 !important;
+    color: var(--color-gray-800) !important;
 }
 
 /* Mobile adjustments */
 @media (max-width: 768px) {
     .premium-dropdown-trigger {
-        padding: 6px 12px !important;
-        font-size: 14px !important;
+        padding: var(--space-1) var(--space-3) !important;
+        font-size: var(--font-size-sm) !important;
     }
 
     .premium-dropdown-menu {
-        margin-top: 8px !important;
+        margin-top: var(--space-2) !important;
     }
 }

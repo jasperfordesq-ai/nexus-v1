@@ -1,7 +1,7 @@
 /**
  * Focus Ring Improvements
  * Enhanced keyboard navigation visibility
- * Version: 1.0 - 2026-01-19
+ * Version: 1.1 - 2026-01-21 - Migrated to design tokens
  *
  * Uses :focus-visible for keyboard-only focus styles
  * Maintains accessibility while avoiding mouse-click focus rings
@@ -13,9 +13,9 @@
 :root {
     --focus-ring-color: rgba(99, 102, 241, 0.6);
     --focus-ring-color-strong: rgba(99, 102, 241, 0.8);
-    --focus-ring-offset: 2px;
-    --focus-ring-width: 3px;
-    --focus-ring-transition: 150ms ease;
+    --focus-ring-offset: var(--space-1);
+    --focus-ring-width: var(--space-1);
+    --focus-ring-transition: var(--transition-fast);
 }
 
 [data-theme="dark"] {
@@ -43,7 +43,7 @@ button:focus-visible,
 [tabindex]:focus-visible:not([tabindex="-1"]) {
     outline: var(--focus-ring-width) solid var(--focus-ring-color);
     outline-offset: var(--focus-ring-offset);
-    border-radius: 4px;
+    border-radius: var(--radius-sm);
 }
 
 /* ==============================================
@@ -104,7 +104,7 @@ input[type="radio"]:focus-visible {
     outline: none;
     box-shadow:
         0 0 0 var(--focus-ring-width) var(--focus-ring-color),
-        0 8px 32px rgba(0, 0, 0, 0.1);
+        0 var(--space-2) var(--space-8) rgba(0, 0, 0, 0.1);
 }
 
 /* ==============================================
@@ -116,7 +116,7 @@ input[type="radio"]:focus-visible {
 .sidebar-link:focus-visible {
     outline: none;
     background-color: rgba(99, 102, 241, 0.1);
-    box-shadow: inset 3px 0 0 var(--focus-ring-color-strong);
+    box-shadow: inset var(--space-1) 0 0 var(--focus-ring-color-strong);
 }
 
 [data-theme="dark"] .nav-link:focus-visible,
@@ -134,7 +134,7 @@ input[type="radio"]:focus-visible {
 .nav-tab:focus-visible,
 [role="tab"]:focus-visible {
     outline: none;
-    box-shadow: inset 0 -3px 0 var(--focus-ring-color-strong);
+    box-shadow: inset 0 calc(-1 * var(--space-1)) 0 var(--focus-ring-color-strong);
     background-color: rgba(99, 102, 241, 0.05);
 }
 
@@ -148,7 +148,7 @@ input[type="radio"]:focus-visible {
 [role="option"]:focus-visible {
     outline: none;
     background-color: rgba(99, 102, 241, 0.08);
-    box-shadow: inset 3px 0 0 var(--focus-ring-color-strong);
+    box-shadow: inset var(--space-1) 0 0 var(--focus-ring-color-strong);
 }
 
 /* ==============================================
@@ -160,7 +160,7 @@ input[type="radio"]:focus-visible {
 img[tabindex]:focus-visible {
     outline: none;
     box-shadow: 0 0 0 var(--focus-ring-width) var(--focus-ring-color-strong);
-    border-radius: 50%;
+    border-radius: var(--radius-full);
 }
 
 /* ==============================================
@@ -171,7 +171,7 @@ img[tabindex]:focus-visible {
 [class*="icon-"]:focus-visible:not(i) {
     outline: none;
     background-color: rgba(99, 102, 241, 0.15);
-    border-radius: 50%;
+    border-radius: var(--radius-full);
     box-shadow: 0 0 0 var(--focus-ring-width) var(--focus-ring-color);
 }
 
@@ -184,7 +184,7 @@ img[tabindex]:focus-visible {
     outline: none;
     box-shadow:
         0 0 0 var(--focus-ring-width) var(--focus-ring-color-strong),
-        0 8px 24px rgba(99, 102, 241, 0.4);
+        0 var(--space-2) var(--space-6) rgba(99, 102, 241, 0.4);
 }
 
 /* ==============================================
@@ -209,15 +209,15 @@ img[tabindex]:focus-visible {
 .skip-link:focus-visible,
 .skip-to-content:focus-visible {
     position: fixed;
-    top: 10px;
-    left: 10px;
-    z-index: 99999;
-    padding: 12px 24px;
-    background: #6366f1;
+    top: var(--space-3);
+    left: var(--space-3);
+    z-index: var(--z-emergency);
+    padding: var(--space-3) var(--space-6);
+    background: var(--color-primary-500);
     color: white;
-    font-weight: 600;
-    border-radius: 8px;
-    box-shadow: 0 4px 20px rgba(99, 102, 241, 0.4);
+    font-weight: var(--font-weight-semibold);
+    border-radius: var(--radius-base);
+    box-shadow: 0 var(--space-1) var(--space-5) rgba(99, 102, 241, 0.4);
     outline: none;
     text-decoration: none;
 }
@@ -241,7 +241,7 @@ img[tabindex]:focus-visible {
     border-color: var(--focus-ring-color-strong);
     box-shadow:
         0 0 0 var(--focus-ring-width) var(--focus-ring-color),
-        0 4px 12px rgba(99, 102, 241, 0.15);
+        0 var(--space-1) var(--space-3) rgba(99, 102, 241, 0.15);
 }
 
 /* ==============================================
@@ -297,8 +297,8 @@ input[type="file"]:focus-visible {
 .post-action-btn:focus-visible {
     outline: none;
     background-color: rgba(99, 102, 241, 0.1);
-    border-radius: 8px;
-    box-shadow: 0 0 0 2px var(--focus-ring-color);
+    border-radius: var(--radius-base);
+    box-shadow: 0 0 0 var(--space-1) var(--focus-ring-color);
 }
 
 /* ==============================================
@@ -309,7 +309,7 @@ input[type="file"]:focus-visible {
 [aria-expanded]:focus-visible {
     outline: none;
     background-color: rgba(99, 102, 241, 0.05);
-    box-shadow: inset 0 0 0 2px var(--focus-ring-color);
+    box-shadow: inset 0 0 0 var(--space-1) var(--focus-ring-color);
 }
 
 /* ==============================================
@@ -317,8 +317,8 @@ input[type="file"]:focus-visible {
    ============================================== */
 @media (forced-colors: active) {
     *:focus-visible {
-        outline: 3px solid CanvasText !important;
-        outline-offset: 2px !important;
+        outline: var(--space-1) solid CanvasText !important;
+        outline-offset: var(--space-1) !important;
     }
 }
 

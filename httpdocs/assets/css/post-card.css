@@ -2,6 +2,7 @@
  * Post Card Component CSS
  * Extracted from views/modern/components/shared/post-card.php
  * Created: 2026-01-19
+ * Migrated to design tokens: 2026-01-21
  *
  * Prefix: post- for post card specific classes
  * Provides styling for feed posts, profile posts, and shared post components
@@ -12,8 +13,8 @@
    ======================================== */
 
 .post-card {
-    padding: 20px;
-    margin-bottom: 20px;
+    padding: var(--space-5);
+    margin-bottom: var(--space-5);
 }
 
 /* ========================================
@@ -23,8 +24,8 @@
 .post-header {
     display: flex;
     align-items: center;
-    gap: 12px;
-    margin-bottom: 16px;
+    gap: var(--space-3);
+    margin-bottom: var(--space-4);
 }
 
 .post-author-meta {
@@ -33,8 +34,8 @@
 
 .post-author-name-heading {
     margin: 0;
-    font-size: 1rem;
-    font-weight: 600;
+    font-size: var(--font-size-base);
+    font-weight: var(--font-weight-semibold);
 }
 
 .post-author-link {
@@ -49,12 +50,12 @@
 .post-meta-row {
     display: flex;
     align-items: center;
-    gap: 8px;
-    margin-top: 4px;
+    gap: var(--space-2);
+    margin-top: var(--space-1);
 }
 
 .post-timestamp {
-    font-size: 0.85rem;
+    font-size: var(--font-size-sm);
     color: var(--htb-text-muted);
 }
 
@@ -63,11 +64,11 @@
    ======================================== */
 
 .visibility-badge {
-    font-size: 0.75rem;
-    padding: 2px 8px;
-    border-radius: 12px;
+    font-size: var(--font-size-xs);
+    padding: var(--space-1) var(--space-2);
+    border-radius: var(--radius-md);
     background: rgba(99, 102, 241, 0.1);
-    color: #6366f1;
+    color: var(--color-primary-500);
 }
 
 /* ========================================
@@ -75,18 +76,18 @@
    ======================================== */
 
 .post-delete-btn {
-    padding: 8px;
+    padding: var(--space-2);
     background: transparent;
     border: none;
     color: var(--htb-text-muted);
     cursor: pointer;
-    border-radius: 8px;
-    transition: all 0.2s;
+    border-radius: var(--radius-base);
+    transition: all var(--transition-base);
 }
 
 .post-delete-btn:hover {
     background: rgba(239, 68, 68, 0.1);
-    color: #ef4444;
+    color: var(--color-danger);
 }
 
 /* ========================================
@@ -94,8 +95,8 @@
    ======================================== */
 
 .post-content {
-    margin-bottom: 16px;
-    line-height: 1.6;
+    margin-bottom: var(--space-4);
+    line-height: var(--line-height-normal);
     color: var(--htb-text-main);
     word-wrap: break-word;
 }
@@ -105,7 +106,7 @@
    ======================================== */
 
 .post-image {
-    margin: 16px 0;
+    margin: var(--space-4) 0;
 }
 
 .post-image img {
@@ -122,8 +123,8 @@
 .post-actions {
     display: flex;
     align-items: center;
-    gap: 16px;
-    padding-top: 16px;
+    gap: var(--space-4);
+    padding-top: var(--space-4);
     border-top: 1px solid var(--htb-border-color);
 }
 
@@ -134,38 +135,38 @@
 .post-action-btn {
     display: flex;
     align-items: center;
-    gap: 6px;
-    padding: 8px 12px;
+    gap: var(--space-2);
+    padding: var(--space-2) var(--space-3);
     background: transparent;
     border: none;
-    border-radius: 8px;
+    border-radius: var(--radius-base);
     cursor: pointer;
-    transition: all 0.2s;
+    transition: all var(--transition-base);
     color: var(--htb-text-muted);
 }
 
 .post-action-btn:hover {
     background: rgba(99, 102, 241, 0.1);
-    color: #6366f1;
+    color: var(--color-primary-500);
 }
 
 /* Like Button */
 .post-action-btn.like-btn.active {
-    color: #ef4444;
+    color: var(--color-danger);
 }
 
 .post-action-btn.like-btn:hover {
-    color: #ef4444;
+    color: var(--color-danger);
 }
 
 /* Comment Button */
 .post-action-btn.comment-btn:hover {
-    color: #6366f1;
+    color: var(--color-primary-500);
 }
 
 /* Share Button */
 .post-action-btn.share-btn:hover {
-    color: #6366f1;
+    color: var(--color-primary-500);
 }
 
 /* ========================================
@@ -173,8 +174,8 @@
    ======================================== */
 
 .post-comments {
-    margin-top: 16px;
-    padding-top: 16px;
+    margin-top: var(--space-4);
+    padding-top: var(--space-4);
     border-top: 1px solid var(--htb-border-color);
 }
 
@@ -188,7 +189,7 @@
 
 @media (max-width: 600px) {
     .post-card {
-        padding: 16px;
+        padding: var(--space-4);
     }
 
     /* Hide text labels on mobile, keep icons */
@@ -197,11 +198,11 @@
     }
 
     .post-actions {
-        gap: 8px;
+        gap: var(--space-2);
     }
 
     .post-action-btn {
-        padding: 8px;
+        padding: var(--space-2);
     }
 }
 
@@ -215,29 +216,29 @@
 }
 
 [data-theme="dark"] .post-author-link {
-    color: #f1f5f9;
+    color: var(--color-slate-100);
 }
 
 [data-theme="dark"] .post-timestamp {
-    color: #94a3b8;
+    color: var(--color-slate-400);
 }
 
 [data-theme="dark"] .visibility-badge {
     background: rgba(99, 102, 241, 0.2);
-    color: #a5b4fc;
+    color: var(--color-primary-300);
 }
 
 [data-theme="dark"] .post-delete-btn {
-    color: #94a3b8;
+    color: var(--color-slate-400);
 }
 
 [data-theme="dark"] .post-delete-btn:hover {
     background: rgba(239, 68, 68, 0.2);
-    color: #f87171;
+    color: var(--color-red-500);
 }
 
 [data-theme="dark"] .post-content {
-    color: #e2e8f0;
+    color: var(--color-slate-200);
 }
 
 [data-theme="dark"] .post-actions {
@@ -245,20 +246,20 @@
 }
 
 [data-theme="dark"] .post-action-btn {
-    color: #94a3b8;
+    color: var(--color-slate-400);
 }
 
 [data-theme="dark"] .post-action-btn:hover {
     background: rgba(99, 102, 241, 0.2);
-    color: #a5b4fc;
+    color: var(--color-primary-300);
 }
 
 [data-theme="dark"] .post-action-btn.like-btn.active {
-    color: #f87171;
+    color: var(--color-red-500);
 }
 
 [data-theme="dark"] .post-action-btn.like-btn:hover {
-    color: #f87171;
+    color: var(--color-red-500);
 }
 
 [data-theme="dark"] .post-comments {

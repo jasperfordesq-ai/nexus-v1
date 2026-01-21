@@ -5,25 +5,25 @@
 
 /* Card body zero padding for menu items list */
 .menu-builder-layout .admin-card-body--no-padding {
-    padding: 0;
+    padding: var(--space-0);
 }
 
 /* Empty state button spacing */
 .admin-empty-state .admin-btn {
-    margin-top: 1rem;
+    margin-top: var(--space-4);
 }
 
 /* Menu item row indentation - dynamic via data attribute */
 .menu-item-row[data-depth="0"] {
-    padding-left: 0;
+    padding-left: var(--space-0);
 }
 
 .menu-item-row[data-depth="1"] {
-    padding-left: 2rem;
+    padding-left: var(--space-8);
 }
 
 .menu-item-row[data-depth="2"] {
-    padding-left: 4rem;
+    padding-left: var(--space-16);
 }
 
 .menu-item-row[data-depth="3"] {
@@ -47,10 +47,10 @@
 /* Visibility settings summary */
 .visibility-settings-summary {
     cursor: pointer;
-    padding: 0.5rem 0;
-    font-weight: 600;
+    padding: var(--space-2) var(--space-0);
+    font-weight: var(--font-weight-semibold);
 }
 
 .visibility-settings-content {
-    padding: 1rem 0;
+    padding: var(--space-4) var(--space-0);
 }

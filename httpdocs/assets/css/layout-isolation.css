@@ -86,13 +86,13 @@ html[data-layout="civicone"] {
 .layout-transition-guard {
     visibility: hidden;
     opacity: 0;
-    transition: opacity 0.15s ease-in-out, visibility 0s 0.15s;
+    transition: opacity var(--transition-fast) var(--ease-in-out), visibility 0s var(--transition-fast);
 }
 
 .layout-transition-guard.loaded {
     visibility: visible;
     opacity: 1;
-    transition: opacity 0.15s ease-in-out;
+    transition: opacity var(--transition-fast) var(--ease-in-out);
 }
 
 /* === HEADER ISOLATION === */

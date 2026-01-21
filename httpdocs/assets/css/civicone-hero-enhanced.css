@@ -15,25 +15,23 @@
     position: relative;
     margin-top: 0;
     margin-bottom: var(--civicone-space-8, 50px);
-    padding: var(--civicone-space-7, 40px) var(--civicone-space-4, 15px);
-    background: #f8f9fa;
-    border-left: 6px solid #1d70b8;
-    border-bottom: 3px solid #b1b4b6;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    padding: var(--civicone-space-7, 40px) 0;
+    background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+    border-left: 4px solid #1d70b8;
+    border-bottom: 1px solid #b1b4b6;
 }
 
 @media (min-width: 641px) {
     .civicone-hero {
-        padding: var(--civicone-space-9, 60px) var(--civicone-space-6, 30px);
+        padding: var(--civicone-space-9, 60px) 0;
         margin-bottom: var(--civicone-space-9, 60px);
-        border-left-width: 8px;
-        border-bottom-width: 4px;
+        border-left-width: 6px;
     }
 }
 
 @media (min-width: 1024px) {
     .civicone-hero {
-        padding: 70px var(--civicone-space-7, 40px);
+        padding: 70px 0;
     }
 }
 
@@ -114,39 +112,37 @@
    ========================================== */
 
 .civicone-hero--banner {
-    padding: var(--civicone-space-8, 50px) var(--civicone-space-4, 15px) !important;
-    background-color: #1d70b8 !important;
-    background-image: linear-gradient(135deg, #1d70b8 0%, #0f385c 100%) !important;
-    border-left: none !important;
-    border-bottom: 5px solid #0f385c !important;
+    padding: var(--civicone-space-8, 50px) 0;
+    background: linear-gradient(135deg, #1d70b8 0%, #0f385c 100%);
+    border-left: none;
+    border-bottom: 3px solid #0f385c;
     margin-top: 0;
     margin-bottom: var(--civicone-space-9, 60px);
-    color: #ffffff !important;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15) !important;
+    color: #ffffff;
 }
 
 @media (min-width: 641px) {
     .civicone-hero--banner {
-        padding: 70px var(--civicone-space-6, 30px);
+        padding: 70px 0;
     }
 }
 
 @media (min-width: 1024px) {
     .civicone-hero--banner {
-        padding: 90px var(--civicone-space-7, 40px);
+        padding: 90px 0;
     }
 }
 
 /* Banner hero text colors */
 .civicone-hero--banner .civicone-heading-xl,
 .civicone-hero--banner h1 {
-    color: #ffffff !important;
+    color: #ffffff;
     margin-bottom: var(--civicone-space-6, 30px);
 }
 
 .civicone-hero--banner .civicone-hero__lead,
 .civicone-hero--banner .civicone-body-l {
-    color: rgba(255, 255, 255, 0.95) !important;
+    color: rgba(255, 255, 255, 0.95);
     margin-bottom: var(--civicone-space-6, 30px);
     font-size: 21px;
 }
@@ -163,32 +159,30 @@
    ========================================== */
 
 .civicone-hero--banner .civicone-button--start {
-    margin-top: var(--civicone-space-6, 30px) !important;
-    background-color: #00703c !important;
-    background-image: none !important;
-    color: #ffffff !important;
-    border: 3px solid #00703c !important;
-    padding: 14px 28px !important;
-    font-size: 19px !important;
-    font-weight: 700 !important;
-    text-decoration: none !important;
-    display: inline-flex !important;
-    align-items: center !important;
-    gap: 8px !important;
-    border-radius: 4px !important;
-    transition: all 0.2s ease !important;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2) !important;
+    margin-top: var(--civicone-space-6, 30px);
+    background-color: #00703c;
+    color: #ffffff;
+    border: 2px solid #00703c;
+    padding: 12px 24px;
+    font-size: 19px;
+    font-weight: 600;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    border-radius: 4px;
+    transition: all 0.2s ease;
 }
 
 .civicone-hero--banner .civicone-button--start:hover {
-    background-color: #005a30 !important;
-    border-color: #005a30 !important;
-    box-shadow: 0 3px 10px rgba(0, 112, 60, 0.4) !important;
+    background-color: #005a30;
+    border-color: #005a30;
+    box-shadow: 0 2px 8px rgba(0, 112, 60, 0.3);
 }
 
 .civicone-hero--banner .civicone-button--start:active {
-    background-color: #004d28 !important;
-    transform: translateY(1px) !important;
+    background-color: #004d28;
+    transform: translateY(1px);
 }
 
 /* Start button icon */
@@ -202,13 +196,11 @@
    Focus States (GOV.UK Pattern) - Enhanced
    ========================================== */
 
-.civicone-hero .civicone-button--start:focus,
-.civicone-hero--banner .civicone-button--start:focus {
-    outline: 3px solid #ffdd00 !important;
-    outline-offset: 2px !important;
-    background-color: #00703c !important;
-    box-shadow: 0 0 0 4px #ffdd00 !important;
-    color: #ffffff !important;
+.civicone-hero .civicone-button--start:focus {
+    outline: 3px solid #ffdd00;
+    outline-offset: 2px;
+    background-color: #00703c;
+    box-shadow: 0 0 0 4px #ffdd00;
 }
 
 /* ==========================================

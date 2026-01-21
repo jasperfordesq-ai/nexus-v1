@@ -1,7 +1,7 @@
 /**
  * Card Hover States - Subtle Lift/Glow Effects
  * Modern interactive card hover animations
- * Version: 1.0 - 2026-01-19
+ * Version: 2.0 - 2026-01-21 - Migrated to design tokens
  *
  * Features:
  * - Smooth translateY lift on hover
@@ -31,9 +31,9 @@
 .message-preview,
 .notification-item {
     transition:
-        transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1),
-        box-shadow 0.3s ease,
-        border-color 0.3s ease;
+        transform var(--transition-base) cubic-bezier(0.34, 1.56, 0.64, 1),
+        box-shadow var(--transition-base) var(--ease-out),
+        border-color var(--transition-base) var(--ease-out);
     will-change: transform, box-shadow;
 }
 
@@ -177,9 +177,9 @@ a.nexus-card:active,
         rgba(236, 72, 153, 0.3)
     );
     opacity: 0;
-    transition: opacity 0.3s ease;
+    transition: opacity var(--transition-base) var(--ease-out);
     z-index: -1;
-    filter: blur(8px);
+    filter: blur(var(--space-2));
 }
 
 .card-featured:hover::before,
@@ -207,7 +207,7 @@ a.nexus-card:active,
 .listing-card .listing-image img,
 .event-card .event-image img,
 .blog-card .blog-image img {
-    transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    transition: transform 400ms var(--ease-bounce);
 }
 
 .card-hover:hover .card-image img,
@@ -225,10 +225,10 @@ a.nexus-card:active,
 /* Hidden content that reveals on hover */
 .card-reveal {
     opacity: 0;
-    transform: translateY(8px);
+    transform: translateY(var(--space-2));
     transition:
-        opacity 0.3s ease,
-        transform 0.3s ease;
+        opacity var(--transition-base) var(--ease-out),
+        transform var(--transition-base) var(--ease-out);
 }
 
 .card-hover:hover .card-reveal,
@@ -244,8 +244,8 @@ a.nexus-card:active,
     opacity: 0;
     visibility: hidden;
     transition:
-        opacity 0.2s ease,
-        visibility 0.2s ease;
+        opacity 200ms var(--ease-out),
+        visibility 200ms var(--ease-out);
 }
 
 .card-hover:hover .card-actions,
@@ -272,13 +272,13 @@ a.nexus-card:active,
 
 /* Glass cards get enhanced backdrop blur on hover */
 .glass-card {
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(var(--glass-blur-subtle));
+    -webkit-backdrop-filter: blur(var(--glass-blur-subtle));
     transition:
-        transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1),
-        box-shadow 0.3s ease,
-        backdrop-filter 0.3s ease,
-        -webkit-backdrop-filter 0.3s ease;
+        transform var(--transition-base) cubic-bezier(0.34, 1.56, 0.64, 1),
+        box-shadow var(--transition-base) var(--ease-out),
+        backdrop-filter var(--transition-base) var(--ease-out),
+        -webkit-backdrop-filter var(--transition-base) var(--ease-out);
 }
 
 .glass-card:hover {
@@ -363,8 +363,8 @@ a.nexus-card:active,
 .civic-card:focus-visible,
 .nexus-card:focus-visible,
 .card-clickable:focus-visible {
-    outline: 2px solid var(--focus-ring-color, #3b82f6);
-    outline-offset: 2px;
+    outline: 2px solid var(--focus-ring-color, var(--color-blue-500));
+    outline-offset: var(--space-1);
     transform: translateY(-4px);
 }
 
@@ -388,8 +388,8 @@ a.nexus-card:active,
     .message-preview,
     .notification-item {
         transition:
-            box-shadow 0.2s ease,
-            border-color 0.2s ease;
+            box-shadow 200ms var(--ease-out),
+            border-color 200ms var(--ease-out);
     }
 
     .card-hover:hover,

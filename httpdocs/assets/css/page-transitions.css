@@ -1,7 +1,7 @@
 /**
  * Page Transitions - Smooth Navigation Effects
  * Fade/slide animations between page navigations
- * Version: 1.0 - 2026-01-19
+ * Version: 1.1 - 2026-01-21 - Migrated to design tokens
  *
  * Features:
  * - Fade out on exit, fade in on enter
@@ -15,8 +15,8 @@
    ============================================== */
 :root {
     --page-transition-duration: 200ms;
-    --page-transition-easing: cubic-bezier(0.4, 0, 0.2, 1);
-    --page-slide-distance: 30px;
+    --page-transition-easing: var(--ease-in-out);
+    --page-slide-distance: var(--space-8);
 }
 
 /* ==============================================
@@ -45,7 +45,7 @@ html.page-transitioning #main-content {
     }
     to {
         opacity: 0;
-        transform: translateY(-10px);
+        transform: translateY(calc(var(--space-2) * -1));
     }
 }
 
@@ -99,7 +99,7 @@ html.page-entering #main-content {
 @keyframes page-fade-in {
     from {
         opacity: 0;
-        transform: translateY(10px);
+        transform: translateY(var(--space-2));
     }
     to {
         opacity: 1;
@@ -151,20 +151,20 @@ html.page-entering.nav-back #main-content {
     top: 0;
     left: 0;
     width: 0;
-    height: 3px;
+    height: var(--space-1);
     background: linear-gradient(90deg,
-        var(--color-primary-500, #6366f1),
-        var(--color-primary-400, #818cf8),
-        #a855f7
+        var(--color-primary-500),
+        var(--color-primary-400),
+        var(--color-purple-400)
     );
-    z-index: var(--z-loading-overlay, 510);
+    z-index: var(--z-loading-overlay);
     opacity: 0;
-    transition: opacity 150ms ease;
+    transition: opacity var(--transition-fast);
     pointer-events: none;
-    border-radius: 0 2px 2px 0;
+    border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
     box-shadow:
-        0 0 10px var(--color-primary-500, #6366f1),
-        0 0 5px var(--color-primary-400, #818cf8);
+        0 0 var(--space-2) var(--color-primary-500),
+        0 0 var(--space-1) var(--color-primary-400);
 }
 
 .page-loading-bar.active {
@@ -173,7 +173,7 @@ html.page-entering.nav-back #main-content {
 }
 
 .page-loading-bar.complete {
-    animation: loading-complete 300ms ease-out forwards;
+    animation: loading-complete var(--transition-base) ease-out forwards;
 }
 
 @keyframes loading-progress {
@@ -196,18 +196,18 @@ html.page-entering.nav-back #main-content {
 .page-loading-overlay {
     position: fixed;
     inset: 0;
-    background: var(--bg-base, #f9fafb);
+    background: var(--bg-base);
     opacity: 0;
     visibility: hidden;
-    z-index: var(--z-loading-overlay, 510);
+    z-index: var(--z-loading-overlay);
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: opacity 200ms ease, visibility 200ms ease;
+    transition: opacity var(--transition-base), visibility var(--transition-base);
 }
 
 [data-theme="dark"] .page-loading-overlay {
-    background: var(--bg-base, #0f172a);
+    background: var(--bg-base);
 }
 
 .page-loading-overlay.visible {
@@ -216,11 +216,11 @@ html.page-entering.nav-back #main-content {
 }
 
 .page-loading-spinner {
-    width: 40px;
-    height: 40px;
-    border: 3px solid var(--border-default, rgba(0, 0, 0, 0.1));
-    border-top-color: var(--color-primary-500, #6366f1);
-    border-radius: 50%;
+    width: var(--space-10);
+    height: var(--space-10);
+    border: var(--space-1) solid var(--border-default);
+    border-top-color: var(--color-primary-500);
+    border-radius: var(--radius-full);
     animation: spin 800ms linear infinite;
 }
 
@@ -235,14 +235,14 @@ a[data-prefetch="true"]::after,
 a.prefetched::after {
     content: '';
     position: absolute;
-    bottom: -2px;
+    bottom: calc(var(--space-1) * -1);
     left: 0;
     width: 100%;
-    height: 2px;
-    background: var(--color-primary-500, #6366f1);
+    height: var(--space-1);
+    background: var(--color-primary-500);
     transform: scaleX(0);
     transform-origin: right;
-    transition: transform 200ms ease;
+    transition: transform var(--transition-base);
     opacity: 0.5;
 }
 
@@ -257,7 +257,7 @@ a.prefetched:hover::after {
    ============================================== */
 html.page-entering .stagger-reveal > * {
     opacity: 0;
-    transform: translateY(20px);
+    transform: translateY(var(--space-5));
     animation: stagger-fade-in 400ms var(--page-transition-easing) forwards;
 }
 
@@ -370,11 +370,11 @@ html.page-transitioning .mobile-tab-bar {
    ============================================== */
 @media (max-width: 768px) {
     :root {
-        --page-slide-distance: 20px;
+        --page-slide-distance: var(--space-5);
         --page-transition-duration: 180ms;
     }
 
     .page-loading-bar {
-        height: 2px;
+        height: var(--space-1);
     }
 }

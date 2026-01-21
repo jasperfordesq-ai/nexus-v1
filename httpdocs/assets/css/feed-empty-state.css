@@ -3,20 +3,20 @@
    ===================================================== */
 .feed-empty-state {
     text-align: center;
-    padding: 64px 40px;
+    padding: var(--space-16) var(--space-10);
     background: linear-gradient(165deg,
         rgba(255, 255, 255, 0.95) 0%,
         rgba(248, 250, 252, 0.9) 50%,
         rgba(238, 242, 255, 0.85) 100%);
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
-    border-radius: 28px;
+    border-radius: var(--radius-2xl);
     border: 1px solid rgba(99, 102, 241, 0.15);
     box-shadow:
         0 8px 32px rgba(99, 102, 241, 0.12),
         0 2px 8px rgba(0, 0, 0, 0.04),
         inset 0 1px 0 rgba(255, 255, 255, 0.8);
-    margin-top: 20px;
+    margin-top: var(--space-5);
     position: relative;
     overflow: hidden;
 }
@@ -47,9 +47,9 @@
 .feed-empty-icon {
     width: 100px;
     height: 100px;
-    margin: 0 auto 28px;
+    margin: 0 auto var(--space-6);
     background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #a855f7 100%);
-    border-radius: 50%;
+    border-radius: var(--radius-full);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -74,7 +74,7 @@
 }
 
 .feed-empty-icon i {
-    font-size: 40px;
+    font-size: var(--space-10);
     color: white;
     text-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
 }
@@ -86,30 +86,30 @@
 }
 
 .feed-empty-title {
-    font-size: 1.75rem;
+    font-size: var(--font-size-3xl);
     font-weight: 800;
-    color: #1f2937;
-    margin-bottom: 14px;
+    color: var(--color-gray-800);
+    margin-bottom: var(--space-3);
     letter-spacing: -0.03em;
     position: relative;
     z-index: 1;
 }
 
 .feed-empty-text {
-    font-size: 1.1rem;
-    color: #64748b;
-    margin-bottom: 32px;
+    font-size: var(--font-size-lg);
+    color: var(--color-slate-500);
+    margin-bottom: var(--space-8);
     max-width: 400px;
     margin-left: auto;
     margin-right: auto;
-    line-height: 1.7;
+    line-height: var(--line-height-relaxed);
     position: relative;
     z-index: 1;
 }
 
 .feed-empty-actions {
     display: flex;
-    gap: 16px;
+    gap: var(--space-4);
     justify-content: center;
     flex-wrap: wrap;
     position: relative;
@@ -119,13 +119,13 @@
 .feed-empty-btn {
     display: inline-flex;
     align-items: center;
-    gap: 10px;
-    padding: 16px 32px;
-    font-size: 1rem;
-    font-weight: 600;
-    border-radius: 14px;
+    gap: var(--space-2);
+    padding: var(--space-4) var(--space-8);
+    font-size: var(--font-size-base);
+    font-weight: var(--font-weight-semibold);
+    border-radius: var(--radius-lg);
     text-decoration: none;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: all var(--transition-base);
     position: relative;
     overflow: hidden;
 }
@@ -147,7 +147,7 @@
 
 .feed-empty-btn.secondary {
     background: rgba(99, 102, 241, 0.08);
-    color: #6366f1;
+    color: var(--color-primary-500);
     border: 2px solid rgba(99, 102, 241, 0.2);
     box-shadow: 0 2px 8px rgba(99, 102, 241, 0.08);
 }
@@ -181,16 +181,16 @@
 }
 
 [data-theme="dark"] .feed-empty-title {
-    color: #f1f5f9;
+    color: var(--color-slate-100);
 }
 
 [data-theme="dark"] .feed-empty-text {
-    color: #94a3b8;
+    color: var(--color-slate-400);
 }
 
 [data-theme="dark"] .feed-empty-btn.secondary {
     background: rgba(99, 102, 241, 0.15);
-    color: #a5b4fc;
+    color: var(--color-primary-300);
     border-color: rgba(99, 102, 241, 0.35);
 }
 
@@ -202,38 +202,38 @@
 /* Mobile responsive */
 @media (max-width: 640px) {
     .feed-empty-state {
-        padding: 48px 24px;
-        margin: 16px 0;
-        border-radius: 24px;
+        padding: var(--space-12) var(--space-6);
+        margin: var(--space-4) 0;
+        border-radius: var(--radius-xl);
     }
 
     .feed-empty-icon {
         width: 80px;
         height: 80px;
-        margin-bottom: 24px;
+        margin-bottom: var(--space-6);
     }
 
     .feed-empty-icon i {
-        font-size: 32px;
+        font-size: var(--space-8);
     }
 
     .feed-empty-title {
-        font-size: 1.4rem;
+        font-size: var(--font-size-2xl);
     }
 
     .feed-empty-text {
-        font-size: 1rem;
-        margin-bottom: 28px;
+        font-size: var(--font-size-base);
+        margin-bottom: var(--space-6);
     }
 
     .feed-empty-actions {
         flex-direction: column;
-        gap: 12px;
+        gap: var(--space-3);
     }
 
     .feed-empty-btn {
         width: 100%;
         justify-content: center;
-        padding: 16px 24px;
+        padding: var(--space-4) var(--space-6);
     }
 }

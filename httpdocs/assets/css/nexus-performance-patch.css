@@ -1,6 +1,7 @@
 /**
  * Nexus Performance Patch
  * Optimizes animations to prevent jank and glitches
+ * Migrated to use design tokens from design-tokens.css
  */
 
 /* ============================================
@@ -9,7 +10,7 @@
 
 /* Override the global transition - it causes jank */
 * {
-    transition-timing-function: cubic-bezier(0.4, 0.0, 0.2, 1);
+    transition-timing-function: var(--ease-in-out);
     /* Remove transition property entirely - too expensive */
 }
 
@@ -21,10 +22,10 @@ button,
 a,
 .nexus-card,
 .glass-card {
-    transition: transform 0.2s cubic-bezier(0.4, 0.0, 0.2, 1),
-                box-shadow 0.2s cubic-bezier(0.4, 0.0, 0.2, 1),
-                opacity 0.2s cubic-bezier(0.4, 0.0, 0.2, 1),
-                background-color 0.2s cubic-bezier(0.4, 0.0, 0.2, 1);
+    transition: transform var(--transition-fast) var(--ease-in-out),
+                box-shadow var(--transition-fast) var(--ease-in-out),
+                opacity var(--transition-fast) var(--ease-in-out),
+                background-color var(--transition-fast) var(--ease-in-out);
 }
 
 /* ============================================
@@ -125,7 +126,7 @@ button:hover,
 
 .dropdown-menu {
     /* Use GPU-accelerated properties only */
-    transition: opacity 0.2s, transform 0.2s;
+    transition: opacity var(--transition-fast), transform var(--transition-fast);
     /* Remove complex transitions */
 }
 
@@ -159,7 +160,7 @@ img {
 
 img[loading="lazy"] {
     /* Simpler fade-in */
-    transition: opacity 0.2s ease-in;
+    transition: opacity var(--transition-fast) ease-in;
 }
 
 /* ============================================
@@ -223,8 +224,8 @@ html.scrolling {
 .nexus-navbar {
     /* Use transform for scroll animations */
     transform: translateY(0) translateZ(0);
-    transition: transform 0.3s cubic-bezier(0.4, 0.0, 0.2, 1),
-                box-shadow 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
+    transition: transform var(--transition-base) var(--ease-in-out),
+                box-shadow var(--transition-base) var(--ease-in-out);
 }
 
 .nexus-navbar.hide-on-scroll {
@@ -254,7 +255,7 @@ html.scrolling {
 /* Below-the-fold can fade in */
 .feed-container,
 .sidebar {
-    animation: fadeIn 0.3s ease-in;
+    animation: fadeIn var(--transition-base) ease-in;
 }
 
 @keyframes fadeIn {

@@ -2,15 +2,15 @@
  * Nexus Polish
  * Consolidated transitions, timing, and performance optimizations
  * Replaces: nexus-smooth-polish.css, nexus-header-polish.css
- * Version: 2.0 - Migrated to Design Tokens
  */
 
 /* ============================================
    CSS VARIABLES - Easing Curves
    ============================================ */
 :root {
-    /* Note: Primary easing curves from design-tokens.css */
-    /* Legacy variables kept for backwards compatibility */
+    --ease-smooth: cubic-bezier(0.4, 0.0, 0.2, 1);
+    --ease-out: cubic-bezier(0.0, 0.0, 0.2, 1);
+    --ease-in-out: cubic-bezier(0.4, 0.0, 0.6, 1);
     --spring-bounce: cubic-bezier(0.68, -0.55, 0.265, 1.55);
     --spring-smooth: cubic-bezier(0.34, 1.56, 0.64, 1);
 }
@@ -21,13 +21,13 @@
 
 /* Default timing function */
 * {
-    transition-timing-function: var(--ease-in-out);
+    transition-timing-function: var(--ease-smooth);
 }
 
 /* Theme transitions */
 [data-theme] {
-    transition: background-color var(--transition-base) var(--ease-in-out),
-                color var(--transition-base) var(--ease-in-out);
+    transition: background-color 0.3s var(--ease-smooth),
+                color 0.3s var(--ease-smooth);
 }
 
 /* ============================================
@@ -36,10 +36,9 @@
 button,
 .btn,
 .glass-btn {
-    transition: transform var(--transition-fast),
-                box-shadow var(--transition-fast),
-                background-color var(--transition-fast);
-    transition-timing-function: var(--ease-in-out);
+    transition: transform 0.15s var(--ease-smooth),
+                box-shadow 0.15s var(--ease-smooth),
+                background-color 0.15s var(--ease-smooth);
     transform: translateZ(0);
     will-change: auto;
 }
@@ -68,21 +67,21 @@ button:active,
 .nexus-card,
 .glass-card,
 .post-card {
-    transition: transform 0.25s var(--ease-in-out),
-                box-shadow 0.25s var(--ease-in-out);
+    transition: transform 0.25s var(--ease-smooth),
+                box-shadow 0.25s var(--ease-smooth);
     transform: translateZ(0);
 }
 
 .nexus-card:hover,
 .glass-card:hover,
 .post-card:hover {
-    transition-duration: var(--transition-fast);
+    transition-duration: 0.15s;
 }
 
 .nexus-card:not(:hover),
 .glass-card:not(:hover),
 .post-card:not(:hover) {
-    transition-duration: var(--transition-base);
+    transition-duration: 0.3s;
 }
 
 /* ============================================
@@ -94,13 +93,13 @@ a.nav-link {
     display: inline-flex;
     align-items: center;
     gap: var(--space-2);
-    padding: var(--space-2) var(--space-4);
+    padding: var(--space-2) 1var(--space-2);
     color: rgba(255, 255, 255, 0.8);
     text-decoration: none;
-    font-weight: var(--font-weight-medium);
-    font-size: var(--font-size-sm);
-    border-radius: var(--radius-base);
-    transition: all 0.2s var(--ease-in-out);
+    font-weight: 500;
+    font-size: 0.9rem;
+    border-radius: var(--space-2);
+    transition: all 0.2s var(--ease-smooth);
     transform: translateZ(0);
 }
 
@@ -108,7 +107,7 @@ a.nav-link {
     content: '';
     position: absolute;
     inset: 0;
-    border-radius: var(--radius-base);
+    border-radius: var(--space-2);
     background: rgba(255, 255, 255, 0.05);
     opacity: 0;
     transition: opacity 0.2s;
@@ -118,7 +117,7 @@ a.nav-link {
 .nav-link:hover {
     color: white;
     transform: translateY(-2px);
-    transition-duration: var(--transition-fast);
+    transition-duration: 0.15s;
 }
 
 .nav-link:hover::before {
@@ -138,7 +137,7 @@ a.nav-link {
 }
 
 .nav-link i {
-    font-size: var(--font-size-xs);
+    font-size: 0.875rem;
     opacity: 0.8;
     transition: all 0.2s;
 }
@@ -165,12 +164,12 @@ a.nav-link {
 }
 
 .dropdown-item {
-    transition: all var(--transition-fast) var(--ease-in-out);
+    transition: all 0.15s var(--ease-smooth);
 }
 
 .dropdown-toggle i.fa-chevron-down {
-    font-size: var(--font-size-xs);
-    transition: transform var(--transition-base) var(--ease-in-out);
+    font-size: 0.75rem;
+    transition: transform 0.3s var(--ease-smooth);
 }
 
 .dropdown.active .dropdown-toggle i.fa-chevron-down,
@@ -201,15 +200,15 @@ a.nav-link {
 input,
 textarea,
 select {
-    transition: border-color 0.2s var(--ease-in-out),
-                box-shadow 0.2s var(--ease-in-out),
-                background-color 0.2s var(--ease-in-out);
+    transition: border-color 0.2s var(--ease-smooth),
+                box-shadow 0.2s var(--ease-smooth),
+                background-color 0.2s var(--ease-smooth);
 }
 
 input:focus,
 textarea:focus,
 select:focus {
-    transition-duration: var(--transition-fast);
+    transition-duration: 0.15s;
 }
 
 /* ============================================
@@ -218,7 +217,7 @@ select:focus {
 .tooltip,
 .popover,
 [role="tooltip"] {
-    transition: opacity var(--transition-fast) var(--ease-out),
+    transition: opacity 0.15s var(--ease-out),
                 transform 0.15s var(--ease-out);
 }
 
@@ -228,7 +227,7 @@ select:focus {
 #nexus-toast,
 .toast,
 .notification {
-    transition: transform var(--transition-base) var(--ease-out),
+    transition: transform 0.3s var(--ease-out),
                 opacity 0.3s var(--ease-out);
 }
 
@@ -238,15 +237,15 @@ select:focus {
 .badge,
 .chip,
 .tag {
-    transition: all var(--transition-fast) var(--ease-in-out);
+    transition: all 0.15s var(--ease-smooth);
 }
 
 /* ============================================
    11. LINK HOVER POLISH
    ============================================ */
 a:not(.nav-link):not(.btn) {
-    transition: color 0.15s var(--ease-in-out),
-                text-decoration-color 0.15s var(--ease-in-out);
+    transition: color 0.15s var(--ease-smooth),
+                text-decoration-color 0.15s var(--ease-smooth);
 }
 
 /* ============================================
@@ -255,13 +254,13 @@ a:not(.nav-link):not(.btn) {
 i,
 .icon,
 [class*="fa-"] {
-    transition: transform 0.2s var(--ease-in-out),
-                color 0.2s var(--ease-in-out);
+    transition: transform 0.2s var(--ease-smooth),
+                color 0.2s var(--ease-smooth);
 }
 
 i:hover,
 .icon:hover {
-    transition-duration: var(--transition-fast);
+    transition-duration: 0.15s;
 }
 
 /* ============================================
@@ -269,9 +268,9 @@ i:hover,
    ============================================ */
 .nexus-navbar,
 .nexus-utility-bar {
-    transition: transform var(--transition-base) var(--ease-in-out),
-                box-shadow 0.3s var(--ease-in-out),
-                background-color var(--transition-base) var(--ease-in-out);
+    transition: transform 0.3s var(--ease-smooth),
+                box-shadow 0.3s var(--ease-smooth),
+                background-color 0.3s var(--ease-smooth);
     transform: translateZ(0);
 }
 
@@ -296,21 +295,21 @@ i:hover,
     align-items: baseline;
     gap: 0;
     color: white !important;
-    font-weight: var(--font-weight-bold);
+    font-weight: 900;
     text-decoration: none !important;
     font-size: clamp(1.1rem, 2.5vw, 1.5rem);
     letter-spacing: -0.5px;
     text-transform: uppercase;
-    line-height: var(--line-height-tight);
-    padding-bottom: var(--space-1);
-    transition: all var(--transition-base) var(--ease-in-out);
+    line-height: 1.2;
+    padding-bottom: 4px;
+    transition: all 0.3s var(--ease-smooth);
 }
 
 .nexus-brand-link .brand-primary {
     position: relative;
     color: inherit;
-    font-weight: var(--font-weight-bold);
-    transition: all var(--transition-base) ease;
+    font-weight: 900;
+    transition: all 0.3s ease;
 }
 
 /* Red underline removed - clean brand styling */
@@ -318,17 +317,17 @@ i:hover,
 .nexus-brand-link .brand-secondary {
     opacity: 0.65;
     font-weight: 800;
-    transition: opacity var(--transition-base) ease;
+    transition: opacity 0.3s ease;
 }
 
 .nexus-brand-link::before {
     content: '';
     position: absolute;
-    inset: calc(var(--space-2) * -1) calc(var(--space-3) * -1);
-    border-radius: var(--radius-md);
+    inset: -var(--space-2) -10px;
+    border-radius: 10px;
     background: linear-gradient(135deg, rgba(99, 102, 241, 0.15), rgba(139, 92, 246, 0.15));
     opacity: 0;
-    transition: opacity var(--transition-base) ease;
+    transition: opacity 0.3s ease;
     z-index: -1;
 }
 
@@ -338,7 +337,7 @@ i:hover,
 
 .nexus-brand-link:hover {
     transform: translateY(-1px);
-    text-shadow: 0 var(--space-1) var(--space-5) rgba(255, 255, 255, 0.15);
+    text-shadow: 0 4px var(--space-5) rgba(255, 255, 255, 0.15);
 }
 
 /* Red underline hover removed */
@@ -353,8 +352,8 @@ i:hover,
 
 .nexus-brand-link:focus-visible {
     outline: 2px solid rgba(99, 102, 241, 0.8);
-    outline-offset: var(--space-1);
-    border-radius: var(--radius-sm);
+    outline-offset: 4px;
+    border-radius: 4px;
 }
 
 /* ============================================
@@ -367,7 +366,7 @@ i:hover,
     padding: var(--space-2) var(--space-3);
     background: rgba(255, 255, 255, 0.05);
     border: 1px solid rgba(99, 102, 241, 0.2);
-    border-radius: var(--radius-md);
+    border-radius: var(--space-3);
     cursor: pointer;
     transition: all 0.2s;
 }
@@ -376,13 +375,13 @@ i:hover,
     background: rgba(255, 255, 255, 0.08);
     border-color: rgba(99, 102, 241, 0.4);
     transform: translateY(-2px);
-    box-shadow: 0 var(--space-1) var(--space-3) rgba(99, 102, 241, 0.2);
+    box-shadow: 0 4px var(--space-3) rgba(99, 102, 241, 0.2);
 }
 
 .user-menu-avatar {
     width: var(--space-8);
     height: var(--space-8);
-    border-radius: var(--radius-full);
+    border-radius: 50%;
     object-fit: cover;
     border: 2px solid rgba(99, 102, 241, 0.3);
     transition: border-color 0.2s;
@@ -396,7 +395,7 @@ i:hover,
    16. IMAGE LOADING POLISH
    ============================================ */
 img {
-    transition: opacity var(--transition-base) var(--ease-out);
+    transition: opacity 0.3s var(--ease-out);
 }
 
 img[loading="lazy"]:not(.loaded) {
@@ -446,9 +445,9 @@ button,
     background: transparent;
     border: none;
     color: white;
-    font-size: var(--font-size-2xl);
+    font-size: 1.5rem;
     cursor: pointer;
-    border-radius: var(--radius-base);
+    border-radius: var(--space-2);
     transition: all 0.2s;
 }
 
@@ -504,7 +503,7 @@ button,
 }
 
 [data-theme="light"] .nexus-brand-link {
-    color: var(--color-slate-900) !important;
+    color: #0f172a !important;
 }
 
 [data-theme="light"] .nexus-brand-link .brand-secondary {
@@ -520,7 +519,7 @@ button,
 }
 
 [data-theme="light"] .nexus-brand-link:hover {
-    text-shadow: 0 var(--space-1) var(--space-5) rgba(15, 23, 42, 0.1);
+    text-shadow: 0 4px var(--space-5) rgba(15, 23, 42, 0.1);
 }
 
 /* Light mode red underline removed */
@@ -531,7 +530,7 @@ button,
 
 [data-theme="light"] .nav-link:hover,
 [data-theme="light"] .nav-link.active {
-    color: var(--color-slate-900);
+    color: #0f172a;
 }
 
 [data-theme="light"] .dropdown-menu {
@@ -543,7 +542,7 @@ button,
 }
 
 [data-theme="light"] .dropdown-item:hover {
-    color: var(--color-slate-900);
+    color: #0f172a;
 }
 
 /* ============================================
@@ -583,7 +582,7 @@ button,
    24. FOCUS STATES - ACCESSIBILITY
    ============================================ */
 *:focus-visible {
-    outline: 3px solid var(--color-primary-500);
+    outline: 3px solid #6366f1;
     outline-offset: 2px;
 }
 
@@ -591,7 +590,7 @@ button,
 .dropdown-toggle:focus-visible,
 .user-menu-toggle:focus-visible,
 .notification-badge:focus-visible {
-    outline: 3px solid var(--color-primary-500);
+    outline: 3px solid #6366f1;
     outline-offset: 2px;
     box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
 }

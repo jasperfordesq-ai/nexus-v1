@@ -28,7 +28,7 @@
 
     /* Transitions */
     --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
-    --ease-smooth: cubic-bezier(0.4, 0, 0.2, 1);
+    --ease-smooth: var(--ease-in-out);
     --ease-ios: cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
 
@@ -131,7 +131,7 @@
     max-width: 500px;
     margin: 0 auto;
     width: 100%;
-    padding: 0 8px;
+    padding: 0 var(--space-2);
 }
 
 /* Tab Items - Clean, minimal design */
@@ -140,24 +140,24 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 2px;
+    gap: var(--space-1);
     flex: 1;
     min-width: 64px;
     max-width: 80px;
     height: 100%;
     text-decoration: none;
-    color: #6b7280; /* Darker gray for WCAG AA contrast (4.59:1 on white) */
-    font-size: 10px;
-    font-weight: 500;
+    color: var(--color-gray-500); /* Darker gray for WCAG AA contrast (4.59:1 on white) */
+    font-size: var(--font-size-xs);
+    font-weight: var(--font-weight-medium);
     letter-spacing: 0;
     position: relative;
     -webkit-tap-highlight-color: transparent;
-    transition: color 0.2s ease, transform 0.15s ease;
+    transition: color var(--transition-fast) var(--ease-in-out), transform var(--transition-fast) var(--ease-in-out);
     background: none;
     border: none;
     cursor: pointer;
     font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Segoe UI', sans-serif;
-    padding: 6px 0;
+    padding: var(--space-2) 0;
 }
 
 /* Button-type tab items - explicit reset for menu button */
@@ -176,13 +176,13 @@ button.mobile-tab-item,
 }
 
 .mobile-tab-item i {
-    font-size: 22px;
+    font-size: var(--font-size-xl);
     line-height: 1;
-    transition: transform 0.2s ease;
+    transition: transform var(--transition-fast) var(--ease-in-out);
 }
 
 .mobile-tab-item.active {
-    color: #6366f1;
+    color: var(--color-primary-500);
 }
 
 .mobile-tab-item.active i {
@@ -191,31 +191,31 @@ button.mobile-tab-item,
 
 [data-theme="dark"] .mobile-tab-item,
 .dark-mode .mobile-tab-item {
-    color: #9ca3af; /* Lighter gray for WCAG AA on dark background (4.85:1 on #1c1c1e) */
+    color: var(--color-gray-400); /* Lighter gray for WCAG AA on dark background (4.85:1 on #1c1c1e) */
 }
 
 [data-theme="dark"] .mobile-tab-item.active,
 .dark-mode .mobile-tab-item.active {
-    color: #818cf8;
+    color: var(--color-primary-400);
 }
 
 /* Notification Badge */
 .mobile-tab-badge {
     position: absolute;
-    top: 2px;
+    top: var(--space-1);
     left: 50%;
-    transform: translateX(6px);
-    min-width: 18px;
-    height: 18px;
+    transform: translateX(var(--space-2));
+    min-width: calc(var(--space-4) + var(--space-1));
+    height: calc(var(--space-4) + var(--space-1));
     background: #ff3b30;
     color: white;
-    font-size: 11px;
-    font-weight: 600;
-    border-radius: 9px;
+    font-size: var(--font-size-xs);
+    font-weight: var(--font-weight-semibold);
+    border-radius: var(--radius-base);
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 0 5px;
+    padding: 0 var(--space-1);
     box-shadow: 0 2px 6px rgba(255, 59, 48, 0.4);
     font-family: -apple-system, BlinkMacSystemFont, sans-serif;
     z-index: 10;
@@ -232,9 +232,9 @@ button.mobile-tab-item,
 .mobile-tab-item.create-btn {
     position: relative;
     flex: 0 0 auto;
-    width: 56px;
-    min-width: 56px;
-    max-width: 56px;
+    width: calc(var(--space-12) + var(--space-2));
+    min-width: calc(var(--space-12) + var(--space-2));
+    max-width: calc(var(--space-12) + var(--space-2));
 }
 
 .mobile-tab-item.create-btn::before {
@@ -243,15 +243,15 @@ button.mobile-tab-item,
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    width: 48px;
-    height: 48px;
+    width: var(--space-12);
+    height: var(--space-12);
     background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
-    border-radius: 16px;
+    border-radius: var(--radius-lg);
     z-index: 1;
     box-shadow:
         0 4px 14px rgba(99, 102, 241, 0.4),
         0 2px 6px rgba(99, 102, 241, 0.2);
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    transition: transform var(--transition-fast) var(--ease-in-out), box-shadow var(--transition-fast) var(--ease-in-out);
 }
 
 .mobile-tab-item.create-btn:hover::before {
@@ -276,9 +276,9 @@ button.mobile-tab-item,
 .mobile-tab-item.create-btn>svg.create-icon {
     color: white !important;
     fill: white !important;
-    width: 24px;
-    height: 24px;
-    font-size: 22px;
+    width: var(--space-6);
+    height: var(--space-6);
+    font-size: var(--font-size-xl);
     position: absolute;
     top: 50%;
     left: 50%;
@@ -293,12 +293,12 @@ button.mobile-tab-item,
 
 /* Profile Avatar Tab */
 .mobile-tab-avatar {
-    width: 26px;
-    height: 26px;
-    border-radius: 50%;
+    width: calc(var(--space-6) + var(--space-1));
+    height: calc(var(--space-6) + var(--space-1));
+    border-radius: var(--radius-full);
     object-fit: cover;
     border: 2px solid transparent;
-    transition: border-color 0.2s ease, transform 0.2s ease;
+    transition: border-color var(--transition-fast) var(--ease-in-out), transform var(--transition-fast) var(--ease-in-out);
 }
 
 .mobile-tab-item.active .mobile-tab-avatar {
@@ -340,8 +340,8 @@ button.mobile-tab-item,
 
 /* Menu Header - Enhanced Full-Screen Design */
 .mobile-menu-header {
-    padding: 20px 20px 24px;
-    padding-top: calc(20px + var(--safe-top));
+    padding: var(--space-5) var(--space-5) var(--space-6);
+    padding-top: calc(var(--space-5) + var(--safe-top));
     background: var(--mobile-menu-bg);
     border-bottom: 0.5px solid var(--mobile-menu-divider);
     display: flex;
@@ -382,12 +382,12 @@ button.mobile-tab-item,
 .mobile-menu-user {
     display: flex;
     align-items: center;
-    gap: 16px;
+    gap: var(--space-4);
     text-decoration: none;
     color: var(--mobile-menu-text);
     position: relative;
     z-index: 1;
-    transition: transform 0.2s ease;
+    transition: transform var(--transition-fast) var(--ease-in-out);
     -webkit-tap-highlight-color: transparent;
 }
 
@@ -398,15 +398,15 @@ button.mobile-tab-item,
 /* Avatar wrapper with animated ring */
 .mobile-menu-avatar-wrapper {
     position: relative;
-    width: 64px;
-    height: 64px;
+    width: var(--space-16);
+    height: var(--space-16);
     flex-shrink: 0;
 }
 
 .mobile-menu-avatar {
-    width: 64px;
-    height: 64px;
-    border-radius: 50%;
+    width: var(--space-16);
+    height: var(--space-16);
+    border-radius: var(--radius-full);
     object-fit: cover;
     border: 3px solid var(--mobile-menu-bg);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
@@ -418,7 +418,7 @@ button.mobile-tab-item,
 .mobile-menu-avatar-ring {
     position: absolute;
     inset: -4px;
-    border-radius: 50%;
+    border-radius: var(--radius-full);
     border: 2px solid rgba(99, 102, 241, 0.4);
     z-index: 1;
     animation: avatar-ring-pulse 3s ease-in-out infinite;
@@ -446,15 +446,15 @@ button.mobile-tab-item,
 
 /* Guest avatar styling */
 .mobile-menu-avatar-guest {
-    width: 64px;
-    height: 64px;
-    border-radius: 50%;
+    width: var(--space-16);
+    height: var(--space-16);
+    border-radius: var(--radius-full);
     background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
     display: flex;
     align-items: center;
     justify-content: center;
     color: white;
-    font-size: 28px;
+    font-size: calc(var(--font-size-2xl) + 0.25rem);
     box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
 }
 
@@ -464,9 +464,9 @@ button.mobile-tab-item,
 }
 
 .mobile-menu-user-info h3 {
-    margin: 0 0 4px 0;
-    font-size: 20px;
-    font-weight: 700;
+    margin: 0 0 var(--space-1) 0;
+    font-size: var(--font-size-xl);
+    font-weight: var(--font-weight-bold);
     letter-spacing: -0.03em;
     color: var(--mobile-menu-text);
     white-space: nowrap;
@@ -476,38 +476,38 @@ button.mobile-tab-item,
 
 .mobile-menu-user-info p {
     margin: 0;
-    font-size: 14px;
-    font-weight: 500;
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-medium);
     color: var(--mobile-nav-active);
     display: flex;
     align-items: center;
-    gap: 6px;
+    gap: var(--space-2);
 }
 
 .mobile-menu-user-info p i {
-    font-size: 12px;
-    transition: transform 0.2s ease;
+    font-size: var(--font-size-xs);
+    transition: transform var(--transition-fast) var(--ease-in-out);
 }
 
 .mobile-menu-user:active .mobile-menu-user-info p i {
-    transform: translateX(2px);
+    transform: translateX(var(--space-1));
 }
 
 /* Close Button - Enhanced Design */
 .mobile-menu-close {
-    width: 44px;
-    height: 44px;
-    border-radius: 50%;
+    width: calc(var(--space-10) + var(--space-1));
+    height: calc(var(--space-10) + var(--space-1));
+    border-radius: var(--radius-full);
     background: rgba(0, 0, 0, 0.05);
     border: none;
     color: var(--mobile-menu-text);
-    font-size: 20px;
+    font-size: var(--font-size-xl);
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
     -webkit-tap-highlight-color: transparent;
-    transition: transform 0.2s ease, background 0.2s ease;
+    transition: transform var(--transition-fast) var(--ease-in-out), background var(--transition-fast) var(--ease-in-out);
     position: relative;
     z-index: 1;
     flex-shrink: 0;
@@ -543,7 +543,7 @@ button.mobile-tab-item,
 
 /* Menu Sections */
 .mobile-menu-section {
-    padding: 12px 0;
+    padding: var(--space-3) 0;
     border-bottom: 0.5px solid var(--mobile-menu-divider);
 }
 
@@ -552,9 +552,9 @@ button.mobile-tab-item,
 }
 
 .mobile-menu-section-title {
-    padding: 8px 20px 12px;
-    font-size: 12px;
-    font-weight: 700;
+    padding: var(--space-2) var(--space-5) var(--space-3);
+    font-size: var(--font-size-xs);
+    font-weight: var(--font-weight-bold);
     text-transform: uppercase;
     letter-spacing: 0.08em;
     color: var(--mobile-menu-text-secondary);
@@ -564,15 +564,15 @@ button.mobile-tab-item,
 .mobile-menu-item {
     display: flex;
     align-items: center;
-    gap: 14px;
-    padding: 12px 20px;
+    gap: var(--space-3);
+    padding: var(--space-3) var(--space-5);
     text-decoration: none;
     color: var(--mobile-menu-text);
-    font-size: 16px;
-    font-weight: 500;
+    font-size: var(--font-size-base);
+    font-weight: var(--font-weight-medium);
     letter-spacing: -0.01em;
     -webkit-tap-highlight-color: transparent;
-    transition: background 0.15s ease, transform 0.15s ease;
+    transition: background var(--transition-fast) var(--ease-in-out), transform var(--transition-fast) var(--ease-in-out);
     position: relative;
 }
 
@@ -583,17 +583,17 @@ button.mobile-tab-item,
 
 /* Icon container with gradient background */
 .mobile-menu-item i {
-    width: 40px;
-    height: 40px;
-    min-width: 40px;
-    border-radius: 12px;
-    font-size: 18px;
+    width: var(--space-10);
+    height: var(--space-10);
+    min-width: var(--space-10);
+    border-radius: var(--radius-md);
+    font-size: var(--font-size-lg);
     display: flex;
     align-items: center;
     justify-content: center;
     color: white;
     background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    transition: transform var(--transition-fast) var(--ease-in-out), box-shadow var(--transition-fast) var(--ease-in-out);
     box-shadow: 0 2px 8px rgba(99, 102, 241, 0.25);
 }
 
@@ -624,50 +624,50 @@ button.mobile-tab-item,
 }
 
 .mobile-menu-section-title[style*="color: #ea580c"] {
-    font-weight: 700;
+    font-weight: var(--font-weight-bold);
 }
 
 .mobile-menu-item-badge {
     margin-left: auto;
-    min-width: 22px;
-    height: 22px;
+    min-width: calc(var(--space-5) + var(--space-1));
+    height: calc(var(--space-5) + var(--space-1));
     background: #ff3b30;
     color: white;
-    font-size: 12px;
-    font-weight: 600;
-    border-radius: 11px;
+    font-size: var(--font-size-xs);
+    font-weight: var(--font-weight-semibold);
+    border-radius: calc(var(--space-3) - var(--space-1));
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 0 7px;
+    padding: 0 calc(var(--space-2) - var(--space-1));
 }
 
 .mobile-menu-item-arrow {
     margin-left: auto;
     color: var(--mobile-menu-text-secondary);
-    font-size: 14px;
+    font-size: var(--font-size-sm);
     opacity: 0.5;
 }
 
 /* Quick Stats Row - Enhanced with gradients */
 .mobile-menu-stats {
     display: flex;
-    gap: 12px;
-    padding: 16px 16px;
-    margin: 16px 16px;
+    gap: var(--space-3);
+    padding: var(--space-4) var(--space-4);
+    margin: var(--space-4) var(--space-4);
 }
 
 .mobile-menu-stat {
     flex: 1;
     text-align: center;
-    padding: 14px 12px;
+    padding: var(--space-3) var(--space-3);
     text-decoration: none;
     color: var(--mobile-menu-text);
     position: relative;
     background: linear-gradient(135deg, rgba(99, 102, 241, 0.08) 0%, rgba(139, 92, 246, 0.08) 100%);
-    border-radius: 16px;
+    border-radius: var(--radius-lg);
     border: 1px solid rgba(99, 102, 241, 0.15);
-    transition: transform 0.2s ease, background 0.2s ease;
+    transition: transform var(--transition-fast) var(--ease-in-out), background var(--transition-fast) var(--ease-in-out);
 }
 
 .mobile-menu-stat:active {
@@ -710,8 +710,8 @@ button.mobile-tab-item,
 }
 
 .mobile-menu-stat-value {
-    font-size: 24px;
-    font-weight: 700;
+    font-size: var(--font-size-2xl);
+    font-weight: var(--font-weight-bold);
     background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
@@ -741,18 +741,18 @@ button.mobile-tab-item,
 }
 
 .mobile-menu-stat-label {
-    font-size: 11px;
-    font-weight: 600;
+    font-size: var(--font-size-xs);
+    font-weight: var(--font-weight-semibold);
     color: var(--mobile-menu-text-secondary);
-    margin-top: 4px;
+    margin-top: var(--space-1);
     text-transform: uppercase;
     letter-spacing: 0.05em;
 }
 
 /* Menu Footer */
 .mobile-menu-footer {
-    padding: 16px 20px;
-    padding-bottom: calc(16px + var(--safe-bottom));
+    padding: var(--space-4) var(--space-5);
+    padding-bottom: calc(var(--space-4) + var(--safe-bottom));
     border-top: 0.5px solid var(--mobile-menu-divider);
     display: flex;
     justify-content: space-between;
@@ -762,17 +762,17 @@ button.mobile-tab-item,
 .mobile-menu-footer-btn {
     display: flex;
     align-items: center;
-    gap: 8px;
-    padding: 12px 16px;
+    gap: var(--space-2);
+    padding: var(--space-3) var(--space-4);
     background: var(--mobile-menu-item-hover);
     border: none;
-    border-radius: 12px;
+    border-radius: var(--radius-md);
     color: var(--mobile-menu-text);
-    font-size: 14px;
-    font-weight: 500;
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-medium);
     cursor: pointer;
     -webkit-tap-highlight-color: transparent;
-    transition: transform 0.15s ease, background 0.15s ease;
+    transition: transform var(--transition-fast) var(--ease-in-out), background var(--transition-fast) var(--ease-in-out);
 }
 
 .mobile-menu-footer-btn:active {
@@ -812,7 +812,7 @@ button.mobile-tab-item,
         transform: translateY(100%) !important;
         opacity: 0 !important;
         pointer-events: none !important;
-        transition: transform 0.3s ease, opacity 0.3s ease !important;
+        transition: transform var(--transition-base) var(--ease-in-out), opacity var(--transition-base) ease !important;
     }
 }
 
@@ -821,7 +821,7 @@ button.mobile-tab-item,
     inset: 0;
     background: rgba(0, 0, 0, 0.4);
     opacity: 0;
-    transition: opacity 0.3s ease;
+    transition: opacity var(--transition-base) var(--ease-in-out);
     -webkit-tap-highlight-color: transparent;
 }
 
@@ -836,9 +836,9 @@ button.mobile-tab-item,
     right: 0;
     max-height: 85vh;
     background: var(--mobile-menu-bg);
-    border-radius: 20px 20px 0 0;
+    border-radius: var(--radius-xl) var(--radius-xl) 0 0;
     transform: translateY(100%);
-    transition: transform 0.4s var(--ease-ios);
+    transition: transform var(--transition-slow) var(--ease-ios);
     display: flex;
     flex-direction: column;
     overflow: hidden;
@@ -853,15 +853,15 @@ button.mobile-tab-item,
 .mobile-notification-handle {
     display: flex;
     justify-content: center;
-    padding: 12px 0 8px;
+    padding: var(--space-3) 0 var(--space-2);
 }
 
 .mobile-notification-handle::after {
     content: '';
-    width: 36px;
-    height: 5px;
+    width: calc(var(--space-8) + var(--space-1));
+    height: var(--space-1);
     background: var(--mobile-menu-divider);
-    border-radius: 3px;
+    border-radius: var(--radius-sm);
 }
 
 /* Notification Header */
@@ -869,30 +869,30 @@ button.mobile-tab-item,
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 8px 20px 16px;
+    padding: var(--space-2) var(--space-5) var(--space-4);
     border-bottom: 0.5px solid var(--mobile-menu-divider);
 }
 
 .mobile-notification-title {
-    font-size: 20px;
-    font-weight: 700;
+    font-size: var(--font-size-xl);
+    font-weight: var(--font-weight-bold);
     margin: 0;
     color: var(--mobile-menu-text);
 }
 
 .mobile-notification-actions {
     display: flex;
-    gap: 12px;
+    gap: var(--space-3);
 }
 
 .mobile-notification-action {
-    font-size: 14px;
-    font-weight: 500;
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-medium);
     color: var(--mobile-nav-active);
     background: none;
     border: none;
     cursor: pointer;
-    padding: 8px;
+    padding: var(--space-2);
     -webkit-tap-highlight-color: transparent;
 }
 
@@ -909,13 +909,13 @@ button.mobile-tab-item,
 .mobile-notification-item {
     display: flex;
     align-items: flex-start;
-    gap: 14px;
-    padding: 16px 20px;
+    gap: var(--space-3);
+    padding: var(--space-4) var(--space-5);
     text-decoration: none;
     color: var(--mobile-menu-text);
     border-bottom: 0.5px solid var(--mobile-menu-divider);
     -webkit-tap-highlight-color: transparent;
-    transition: background 0.15s ease;
+    transition: background var(--transition-fast) var(--ease-in-out);
 }
 
 .mobile-notification-item:active {
@@ -927,12 +927,12 @@ button.mobile-tab-item,
 }
 
 .mobile-notification-dot {
-    width: 10px;
-    height: 10px;
-    border-radius: 50%;
+    width: calc(var(--space-2) + var(--space-1));
+    height: calc(var(--space-2) + var(--space-1));
+    border-radius: var(--radius-full);
     background: #ff3b30;
     flex-shrink: 0;
-    margin-top: 6px;
+    margin-top: var(--space-2);
 }
 
 .mobile-notification-item:not(.unread) .mobile-notification-dot {
@@ -945,30 +945,30 @@ button.mobile-tab-item,
 }
 
 .mobile-notification-message {
-    font-size: 15px;
+    font-size: var(--font-size-sm);
     line-height: 1.4;
-    margin: 0 0 4px 0;
+    margin: 0 0 var(--space-1) 0;
 }
 
 .mobile-notification-time {
-    font-size: 13px;
+    font-size: var(--font-size-xs);
     color: var(--mobile-menu-text-secondary);
 }
 
 .mobile-notification-empty {
-    padding: 60px 20px;
+    padding: calc(var(--space-12) + var(--space-3)) var(--space-5);
     text-align: center;
 }
 
 .mobile-notification-empty i {
-    font-size: 48px;
+    font-size: calc(var(--font-size-3xl) + 1.125rem);
     color: var(--mobile-menu-divider);
-    margin-bottom: 16px;
+    margin-bottom: var(--space-4);
 }
 
 .mobile-notification-empty p {
     color: var(--mobile-menu-text-secondary);
-    font-size: 15px;
+    font-size: var(--font-size-sm);
     margin: 0;
 }
 
@@ -1007,19 +1007,19 @@ button.mobile-tab-item,
 
     .mobile-tab-item {
         flex-direction: row;
-        gap: 6px;
+        gap: var(--space-2);
     }
 
     .mobile-tab-item i {
-        font-size: 20px;
+        font-size: var(--font-size-xl);
     }
 
     .mobile-tab-item span {
-        font-size: 11px;
+        font-size: var(--font-size-xs);
     }
 
     .mobile-menu-header {
-        padding-top: 12px;
+        padding-top: var(--space-3);
     }
 }
 
@@ -1096,13 +1096,13 @@ button.mobile-tab-item,
 .mobile-tab-item:not(.create-btn).active::after {
     content: '';
     position: absolute;
-    bottom: 4px;
+    bottom: var(--space-1);
     left: 50%;
     transform: translateX(-50%);
-    width: 4px;
-    height: 4px;
-    background: #6366f1;
-    border-radius: 50%;
+    width: var(--space-1);
+    height: var(--space-1);
+    background: var(--color-primary-500);
+    border-radius: var(--radius-full);
 }
 
 [data-theme="dark"] .mobile-tab-item:not(.create-btn).active::after,
@@ -1124,16 +1124,16 @@ button.mobile-tab-item,
 
 .mobile-notification-item::after {
     position: absolute;
-    right: 20px;
+    right: var(--space-5);
     top: 50%;
     transform: translateY(-50%);
     opacity: 0;
-    transition: opacity 0.2s ease;
+    transition: opacity var(--transition-fast) var(--ease-in-out);
     font-family: 'Font Awesome 6 Free';
     font-weight: 900;
     content: '\f054';
     /* chevron-right */
-    font-size: 12px;
+    font-size: var(--font-size-xs);
     color: var(--mobile-menu-text-secondary);
 }
 
@@ -1173,7 +1173,7 @@ button.mobile-tab-item,
     width: 3px;
     background: var(--mobile-nav-active);
     transform: scaleY(0);
-    transition: transform 0.2s ease;
+    transition: transform var(--transition-fast) var(--ease-in-out);
 }
 
 .mobile-menu-item:active::before {
@@ -1182,7 +1182,7 @@ button.mobile-tab-item,
 
 /* Stats card hover effect */
 .mobile-menu-stat {
-    transition: transform 0.2s ease;
+    transition: transform var(--transition-fast) var(--ease-in-out);
 }
 
 .mobile-menu-stat:active {
@@ -1201,7 +1201,7 @@ button.mobile-tab-item,
     inset: 0;
     background: currentColor;
     opacity: 0;
-    transition: opacity 0.15s ease;
+    transition: opacity var(--transition-fast) var(--ease-in-out);
 }
 
 .mobile-menu-footer-btn:active::after {
@@ -1210,11 +1210,11 @@ button.mobile-tab-item,
 
 /* Theme toggle smooth transition */
 .theme-toggle-inline {
-    transition: background 0.3s ease, color 0.3s ease;
+    transition: background var(--transition-base) var(--ease-in-out), color var(--transition-base) var(--ease-in-out);
 }
 
 .theme-toggle-inline i {
-    transition: transform 0.3s ease;
+    transition: transform var(--transition-base) var(--ease-in-out);
 }
 
 .theme-toggle-inline:active i {
@@ -1268,7 +1268,7 @@ button.mobile-tab-item,
     }
 
     .mobile-menu-header {
-        padding-top: calc(16px + env(safe-area-inset-top));
+        padding-top: calc(var(--space-4) + env(safe-area-inset-top));
     }
 }
 
@@ -1282,6 +1282,6 @@ button.mobile-tab-item,
 /* Home indicator area */
 @supports (padding-bottom: env(safe-area-inset-bottom)) {
     .mobile-notification-container {
-        padding-bottom: max(16px, env(safe-area-inset-bottom));
+        padding-bottom: max(var(--space-4), env(safe-area-inset-bottom));
     }
 }

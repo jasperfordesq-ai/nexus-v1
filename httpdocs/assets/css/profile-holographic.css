@@ -92,11 +92,11 @@ main#main-content .htb-container {
     max-width: 860px !important;
     width: 100% !important;
     margin: 0 auto !important;
-    padding: 24px 20px 100px !important;
-    padding-top: 100px !important; /* Account for sticky navbar */
+    padding: var(--space-6) var(--space-5) 100px !important;
+    padding-top: 100px !important; /* Account for sticky navbar - fixed value for navbar */
     display: flex !important;
     flex-direction: column !important;
-    gap: 24px !important;
+    gap: var(--space-6) !important;
 }
 
 /* Override any grid or multi-column layouts */
@@ -114,14 +114,14 @@ main#main-content .htb-container > * {
     background: rgba(255, 255, 255, 0.75);
     backdrop-filter: blur(24px) saturate(180%);
     -webkit-backdrop-filter: blur(24px) saturate(180%);
-    border-radius: 28px;
+    border-radius: 28px; /* Custom value for premium look */
     border: 1px solid rgba(255, 255, 255, 0.5);
     box-shadow:
         0 8px 32px rgba(99, 102, 241, 0.1),
         0 4px 16px rgba(0, 0, 0, 0.05),
         inset 0 1px 0 rgba(255, 255, 255, 0.8);
-    padding: 32px;
-    margin-bottom: 24px;
+    padding: var(--space-8);
+    margin-bottom: var(--space-6);
     position: relative;
     overflow: hidden;
     transition: transform 0.3s ease, box-shadow 0.4s ease;
@@ -163,7 +163,7 @@ main#main-content .htb-container > * {
     content: '';
     position: absolute;
     inset: 0;
-    border-radius: 28px;
+    border-radius: 28px; /* Custom value for premium look */
     padding: 2px;
     background: linear-gradient(
         135deg,
@@ -211,7 +211,7 @@ main#main-content .htb-container > * {
     display: flex !important;
     flex-direction: column !important;
     align-items: center !important;
-    gap: 24px !important;
+    gap: var(--space-6) !important;
     text-align: center !important;
 }
 
@@ -325,12 +325,12 @@ main#main-content .htb-container > * {
 /* Online indicator */
 .profile-online-indicator {
     position: absolute;
-    bottom: 8px;
-    right: 8px;
+    bottom: var(--space-2);
+    right: var(--space-2);
     width: 28px;
     height: 28px;
     border-radius: 50%;
-    border: 4px solid white;
+    border: var(--space-1) solid white;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
 }
 
@@ -381,14 +381,14 @@ h2.profile-display-name {
 .glass-info-badge {
     display: inline-flex;
     align-items: center;
-    gap: 8px;
-    padding: 10px 16px;
+    gap: var(--space-2);
+    padding: 10px var(--space-4);
     background: rgba(255, 255, 255, 0.6);
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
     border: 1px solid rgba(255, 255, 255, 0.4);
-    border-radius: 50px;
-    font-size: 0.9rem;
+    border-radius: var(--radius-full);
+    font-size: var(--font-size-sm);
     font-weight: 500;
     color: #374151;
     transition: all 0.3s ease;
@@ -420,15 +420,15 @@ h2.profile-display-name {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    gap: 8px;
-    padding: 12px 24px;
+    gap: var(--space-2);
+    padding: var(--space-3) var(--space-6);
     background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #a855f7 100%);
     background-size: 200% 200%;
     border: none;
-    border-radius: 14px;
+    border-radius: var(--radius-lg);
     color: white;
     font-weight: 600;
-    font-size: 0.95rem;
+    font-size: var(--font-size-sm);
     cursor: pointer;
     transition: all 0.3s ease;
     box-shadow:
@@ -516,7 +516,7 @@ h2.profile-display-name {
         rgba(236, 72, 153, 0.3) 80%,
         transparent 100%
     );
-    margin: 28px 0;
+    margin: 28px 0; /* Custom value for visual rhythm */
     border-radius: 2px;
 }
 
@@ -526,14 +526,14 @@ h2.profile-display-name {
 .glass-badge {
     display: inline-flex;
     align-items: center;
-    gap: 10px;
-    padding: 12px 18px;
+    gap: 10px; /* Custom for visual balance */
+    padding: var(--space-3) 18px;
     background: rgba(255, 255, 255, 0.6);
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
     border: 1px solid rgba(255, 255, 255, 0.4);
-    border-radius: 14px;
-    font-size: 0.95rem;
+    border-radius: var(--radius-lg);
+    font-size: var(--font-size-sm);
     color: #374151;
     cursor: pointer;
     transition: all 0.3s ease;
@@ -574,11 +574,11 @@ h2.profile-display-name {
     background: rgba(255, 255, 255, 0.7);
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
-    border-radius: 20px;
+    border-radius: var(--radius-xl);
     border: 1px solid rgba(255, 255, 255, 0.4);
     box-shadow: 0 4px 24px rgba(0, 0, 0, 0.06);
-    padding: 24px;
-    margin-bottom: 24px;
+    padding: var(--space-6);
+    margin-bottom: var(--space-6);
     transition: all 0.3s ease;
 }
 
@@ -595,16 +595,16 @@ h2.profile-display-name {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 20px;
+    margin-bottom: var(--space-5);
 }
 
 .profile-friends-header h3 {
     margin: 0;
-    font-size: 1.15rem;
+    font-size: var(--font-size-lg);
     font-weight: 700;
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 10px; /* Custom for visual balance */
     color: #1f2937;
     background: none;
     -webkit-text-fill-color: inherit;
@@ -618,7 +618,7 @@ h2.profile-display-name {
     color: #6366f1;
     text-decoration: none;
     font-weight: 600;
-    font-size: 0.9rem;
+    font-size: var(--font-size-sm);
     transition: color 0.2s ease;
 }
 
@@ -630,16 +630,16 @@ h2.profile-display-name {
 .profile-friends-body {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-    gap: 16px;
+    gap: var(--space-4);
 }
 
 .profile-friend-item {
     display: flex;
     align-items: center;
-    gap: 12px;
-    padding: 12px;
+    gap: var(--space-3);
+    padding: var(--space-3);
     background: rgba(255, 255, 255, 0.5);
-    border-radius: 14px;
+    border-radius: var(--radius-lg);
     text-decoration: none;
     transition: all 0.3s ease;
 }
@@ -683,7 +683,7 @@ h2.profile-display-name {
 
 .profile-friend-name {
     font-weight: 600;
-    font-size: 0.95rem;
+    font-size: var(--font-size-sm);
     color: #1f2937;
     white-space: nowrap;
     overflow: hidden;
@@ -695,7 +695,7 @@ h2.profile-display-name {
 }
 
 .profile-friend-meta {
-    font-size: 0.8rem;
+    font-size: var(--font-size-xs);
     color: #6b7280;
     white-space: nowrap;
     overflow: hidden;
@@ -709,11 +709,11 @@ h2.profile-display-name {
     background: rgba(255, 255, 255, 0.7);
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
-    border-radius: 20px;
+    border-radius: var(--radius-xl);
     border: 1px solid rgba(255, 255, 255, 0.4);
     box-shadow: 0 4px 24px rgba(0, 0, 0, 0.06);
-    padding: 24px;
-    margin-bottom: 24px;
+    padding: var(--space-6);
+    margin-bottom: var(--space-6);
     cursor: pointer;
     transition: all 0.3s ease;
 }
@@ -746,11 +746,11 @@ h2.profile-display-name {
     background: rgba(255, 255, 255, 0.7);
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
-    border-radius: 20px;
+    border-radius: var(--radius-xl);
     border: 1px solid rgba(255, 255, 255, 0.4);
     box-shadow: 0 4px 24px rgba(0, 0, 0, 0.06);
-    padding: 28px;
-    margin-bottom: 24px;
+    padding: 28px; /* Custom value for emphasis */
+    margin-bottom: var(--space-6);
 }
 
 .glass-activity-card h3 {
@@ -776,8 +776,8 @@ h2.profile-display-name {
     backdrop-filter: blur(16px);
     -webkit-backdrop-filter: blur(16px);
     border: 1px solid rgba(255, 255, 255, 0.35);
-    border-radius: 18px;
-    padding: 24px;
+    border-radius: 18px; /* Custom value between lg and xl */
+    padding: var(--space-6);
     transition: all 0.3s ease;
 }
 
@@ -798,12 +798,12 @@ h2.profile-display-name {
 .glass-activity-card h3,
 .profile-friends-header h3,
 #reviews-section h3 {
-    margin: 0 0 20px 0;
-    font-size: 1.25rem;
+    margin: 0 0 var(--space-5) 0;
+    font-size: var(--font-size-xl);
     font-weight: 700;
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 10px; /* Custom for visual balance */
     color: #1f2937;
     background: none;
     -webkit-text-fill-color: inherit;
@@ -825,8 +825,8 @@ h2.profile-display-name {
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
     border: 1px solid rgba(255, 255, 255, 0.35);
-    border-radius: 16px;
-    margin-bottom: 16px;
+    border-radius: var(--radius-lg);
+    margin-bottom: var(--space-4);
     overflow: hidden;
 }
 
@@ -842,12 +842,12 @@ h2.profile-display-name {
    ============================================ */
 @media (max-width: 640px) {
     .htb-container {
-        padding: 16px 12px 100px;
+        padding: var(--space-4) var(--space-3) 100px;
     }
 
     .glass-profile-card {
-        padding: 24px 20px;
-        border-radius: 20px;
+        padding: var(--space-6) var(--space-5);
+        border-radius: var(--radius-xl);
     }
 
     .glass-avatar {
@@ -857,17 +857,17 @@ h2.profile-display-name {
 
     .profile-display-name,
     h2.profile-display-name {
-        font-size: 1.75rem;
+        font-size: var(--font-size-3xl);
     }
 
     .glass-info-badge {
-        padding: 8px 12px;
-        font-size: 0.85rem;
+        padding: var(--space-2) var(--space-3);
+        font-size: var(--font-size-sm);
     }
 
     .glass-btn {
-        padding: 10px 18px;
-        font-size: 0.9rem;
+        padding: 10px 18px; /* Custom for button balance */
+        font-size: var(--font-size-sm);
         width: 100%;
     }
 
@@ -999,7 +999,7 @@ h2.profile-display-name {
 
 .badge-count {
     color: #92400e;
-    font-size: 0.8rem;
+    font-size: var(--font-size-xs);
 }
 
 .badge-no-reviews {
@@ -1093,16 +1093,16 @@ h2.profile-display-name {
    BADGES SECTION STYLES
    ============================================ */
 .badges-section {
-    margin-top: 24px;
+    margin-top: var(--space-6);
 }
 
 .badges-section h3 {
-    margin: 0 0 16px 0;
-    font-size: 1.15rem;
+    margin: 0 0 var(--space-4) 0;
+    font-size: var(--font-size-lg);
     font-weight: 700;
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: var(--space-2);
     color: #1f2937;
     background: none;
     -webkit-text-fill-color: inherit;
@@ -1123,22 +1123,22 @@ h2.profile-display-name {
 .badges-grid {
     display: flex;
     flex-wrap: wrap;
-    gap: 12px;
+    gap: var(--space-3);
 }
 
 .badges-grid.featured {
-    gap: 16px;
+    gap: var(--space-4);
 }
 
 .featured-badge {
     background: linear-gradient(135deg, rgba(245, 158, 11, 0.15), rgba(217, 119, 6, 0.1));
     border: 2px solid rgba(245, 158, 11, 0.3);
-    border-radius: 14px;
-    padding: 16px 20px;
+    border-radius: var(--radius-lg);
+    padding: var(--space-4) var(--space-5);
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 8px;
+    gap: var(--space-2);
     cursor: pointer;
     transition: all 0.3s ease;
 }
@@ -1150,13 +1150,13 @@ h2.profile-display-name {
 }
 
 .featured-badge .badge-icon {
-    font-size: 2.2rem;
+    font-size: 2.2rem; /* Custom for large badge icon */
 }
 
 .featured-badge .badge-name {
     font-weight: 700;
     color: #92400e;
-    font-size: 0.9rem;
+    font-size: var(--font-size-sm);
 }
 
 [data-theme="dark"] .featured-badge .badge-name {
@@ -1164,7 +1164,7 @@ h2.profile-display-name {
 }
 
 .glass-badge .badge-icon {
-    font-size: 1.4rem;
+    font-size: 1.4rem; /* Custom for badge icon */
 }
 
 .glass-badge .badge-name {
@@ -1192,7 +1192,7 @@ h2.profile-display-name {
     justify-content: space-between;
     width: 100%;
     padding: 0;
-    margin: 0 0 16px 0;
+    margin: 0 0 var(--space-4) 0;
     background: none;
     border: none;
     cursor: pointer;
@@ -1205,11 +1205,11 @@ h2.profile-display-name {
 
 .badges-accordion-header h3 {
     margin: 0;
-    font-size: 1.15rem;
+    font-size: var(--font-size-lg);
     font-weight: 700;
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: var(--space-2);
     color: #1f2937;
 }
 
@@ -1221,9 +1221,9 @@ h2.profile-display-name {
 .badges-preview {
     display: flex;
     align-items: center;
-    gap: 6px;
+    gap: 6px; /* Custom for icon spacing */
     margin-left: auto;
-    margin-right: 12px;
+    margin-right: var(--space-3);
 }
 
 .badge-preview-pill {
@@ -1231,7 +1231,7 @@ h2.profile-display-name {
     height: 36px;
     background: rgba(168, 85, 247, 0.1);
     border: 1px solid rgba(168, 85, 247, 0.25);
-    border-radius: 10px;
+    border-radius: 10px; /* Custom between base and md */
     display: flex;
     align-items: center;
     justify-content: center;
@@ -1248,7 +1248,7 @@ h2.profile-display-name {
     height: 36px;
     background: rgba(99, 102, 241, 0.1);
     border: 1px solid rgba(99, 102, 241, 0.2);
-    border-radius: 10px;
+    border-radius: 10px; /* Custom between base and md */
     display: flex;
     align-items: center;
     justify-content: center;
@@ -1264,7 +1264,7 @@ h2.profile-display-name {
     display: flex;
     align-items: center;
     justify-content: center;
-    border-radius: 8px;
+    border-radius: var(--radius-base);
     background: rgba(99, 102, 241, 0.1);
     color: #6366f1;
     transition: all 0.3s ease;
@@ -1319,37 +1319,37 @@ h2.profile-display-name {
     .badge-preview-count {
         width: 40px;
         height: 40px;
-        font-size: 0.75rem;
+        font-size: var(--font-size-xs);
     }
 }
 
 /* Mobile: start collapsed, compact layout */
 @media (max-width: 768px) {
     .badges-section.badges-accordion {
-        margin-top: 16px;
+        margin-top: var(--space-4);
     }
 
     .badges-accordion-header {
         margin-bottom: 0;
-        padding: 8px 0;
+        padding: var(--space-2) 0;
     }
 
     .badges-accordion-header h3 {
-        font-size: 1rem;
+        font-size: var(--font-size-base);
     }
 
     .badge-preview-pill {
         width: 30px;
         height: 30px;
-        font-size: 0.95rem;
-        border-radius: 8px;
+        font-size: var(--font-size-sm);
+        border-radius: var(--radius-base);
     }
 
     .badge-preview-count {
         width: 30px;
         height: 30px;
         font-size: 0.65rem;
-        border-radius: 8px;
+        border-radius: var(--radius-base);
     }
 
     .badges-accordion-toggle {
@@ -1359,12 +1359,12 @@ h2.profile-display-name {
 
     /* Compact badge grid when open */
     .badges-accordion.open .badges-grid {
-        gap: 8px;
+        gap: var(--space-2);
     }
 
     .badges-accordion.open .featured-badge {
-        padding: 10px 14px;
-        border-radius: 10px;
+        padding: 10px 14px; /* Custom for compact badge */
+        border-radius: 10px; /* Custom between base and md */
     }
 
     .badges-accordion.open .featured-badge .badge-icon {
@@ -1372,13 +1372,13 @@ h2.profile-display-name {
     }
 
     .badges-accordion.open .featured-badge .badge-name {
-        font-size: 0.75rem;
+        font-size: var(--font-size-xs);
     }
 
     .badges-accordion.open .glass-badge {
-        padding: 8px 12px;
-        border-radius: 10px;
-        gap: 6px;
+        padding: var(--space-2) var(--space-3);
+        border-radius: 10px; /* Custom between base and md */
+        gap: 6px; /* Custom for icon spacing */
     }
 
     .badges-accordion.open .glass-badge .badge-icon {
@@ -1386,25 +1386,25 @@ h2.profile-display-name {
     }
 
     .badges-accordion.open .glass-badge .badge-name {
-        font-size: 0.8rem;
+        font-size: var(--font-size-xs);
     }
 
     /* Padding for accordion content */
     .badges-accordion.open .badges-accordion-content {
-        padding-top: 12px;
+        padding-top: var(--space-3);
     }
 }
 
 /* Extra small mobile */
 @media (max-width: 480px) {
     .badges-preview {
-        gap: 4px;
+        gap: var(--space-1);
     }
 
     .badge-preview-pill {
         width: 26px;
         height: 26px;
-        font-size: 0.85rem;
+        font-size: var(--font-size-sm);
     }
 
     .badge-preview-count {
@@ -1415,7 +1415,7 @@ h2.profile-display-name {
 
     /* Even more compact badges */
     .badges-accordion.open .featured-badge {
-        padding: 8px 10px;
+        padding: var(--space-2) 10px;
     }
 
     .badges-accordion.open .featured-badge .badge-icon {
@@ -1423,15 +1423,15 @@ h2.profile-display-name {
     }
 
     .badges-accordion.open .glass-badge {
-        padding: 6px 10px;
+        padding: 6px 10px; /* Custom for compact badge */
     }
 
     .badges-accordion.open .glass-badge .badge-icon {
-        font-size: 1rem;
+        font-size: var(--font-size-base);
     }
 
     .badges-accordion.open .glass-badge .badge-name {
-        font-size: 0.75rem;
+        font-size: var(--font-size-xs);
     }
 }
 
@@ -1564,7 +1564,7 @@ h2.profile-display-name {
 .composer-inner {
     display: flex;
     align-items: center;
-    gap: 16px;
+    gap: var(--space-4);
 }
 
 .composer-icon {
@@ -1582,7 +1582,7 @@ h2.profile-display-name {
 
 .composer-icon i {
     color: white;
-    font-size: 1.25rem;
+    font-size: var(--font-size-xl);
 }
 
 .glass-composer:hover .composer-icon {
@@ -1595,8 +1595,8 @@ h2.profile-display-name {
 }
 
 .composer-text h3 {
-    margin: 0 0 4px 0;
-    font-size: 1.2rem;
+    margin: 0 0 var(--space-1) 0;
+    font-size: 1.2rem; /* Custom for composer heading */
     font-weight: 700;
     color: #1f2937;
     background: none;
@@ -1610,7 +1610,7 @@ h2.profile-display-name {
 .composer-text p {
     margin: 0;
     color: #6b7280;
-    font-size: 0.95rem;
+    font-size: var(--font-size-sm);
 }
 
 [data-theme="dark"] .composer-text p {
@@ -1619,9 +1619,9 @@ h2.profile-display-name {
 
 .composer-arrow {
     color: #6366f1;
-    font-size: 1.5rem;
+    font-size: var(--font-size-2xl);
     opacity: 0.5;
-    transition: transform 0.3s ease, opacity 0.3s ease;
+    transition: transform var(--transition-base), opacity var(--transition-base);
 }
 
 .glass-composer:hover .composer-arrow {
@@ -1633,12 +1633,12 @@ h2.profile-display-name {
    ACTIVITY CARD STYLES
    ============================================ */
 .glass-activity-card h3 {
-    margin: 0 0 24px 0;
-    font-size: 1.3rem;
+    margin: 0 0 var(--space-6) 0;
+    font-size: 1.3rem; /* Custom for section headers */
     font-weight: 700;
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 10px; /* Custom for visual balance */
     color: #1f2937;
     background: none;
     -webkit-text-fill-color: inherit;
@@ -1655,11 +1655,11 @@ h2.profile-display-name {
 /* Empty state */
 .empty-state {
     text-align: center;
-    padding: 48px 32px;
+    padding: var(--space-12) var(--space-8);
     background: linear-gradient(135deg, rgba(255, 255, 255, 0.4), rgba(255, 255, 255, 0.2));
     -webkit-backdrop-filter: blur(10px);
     backdrop-filter: blur(10px);
-    border-radius: 16px;
+    border-radius: var(--radius-lg);
     border: 1px solid rgba(255, 255, 255, 0.3);
 }
 
@@ -1670,13 +1670,13 @@ h2.profile-display-name {
 
 .empty-emoji {
     font-size: 48px;
-    margin-bottom: 12px;
+    margin-bottom: var(--space-3);
     opacity: 0.5;
 }
 
 .empty-text {
     color: #6b7280;
-    font-size: 1.05rem;
+    font-size: var(--font-size-base);
 }
 
 [data-theme="dark"] .empty-text {
@@ -1687,12 +1687,12 @@ h2.profile-display-name {
    BIO SECTION STYLES
    ============================================ */
 .section-header {
-    margin: 0 0 20px 0;
-    font-size: 1.3rem;
+    margin: 0 0 var(--space-5) 0;
+    font-size: 1.3rem; /* Custom for section headers */
     font-weight: 700;
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 10px; /* Custom for visual balance */
     color: #1f2937;
     background: none;
     -webkit-text-fill-color: inherit;
@@ -1713,12 +1713,12 @@ h2.profile-display-name {
 .bio-content {
     color: #374151;
     line-height: 1.8;
-    font-size: 1rem;
-    padding: 20px;
+    font-size: var(--font-size-base);
+    padding: var(--space-5);
     background: rgba(255, 255, 255, 0.4);
     -webkit-backdrop-filter: blur(8px);
     backdrop-filter: blur(8px);
-    border-radius: 14px;
+    border-radius: var(--radius-lg);
     border: 1px solid rgba(255, 255, 255, 0.3);
 }
 
@@ -1740,8 +1740,8 @@ h2.profile-display-name {
     justify-content: space-between;
     align-items: center;
     flex-wrap: wrap;
-    gap: 16px;
-    margin-bottom: 24px;
+    gap: var(--space-4);
+    margin-bottom: var(--space-6);
 }
 
 .reviews-header .section-header {
@@ -1751,7 +1751,7 @@ h2.profile-display-name {
 .rating-summary {
     display: flex;
     align-items: center;
-    gap: 16px;
+    gap: var(--space-4);
     flex-wrap: wrap;
 }
 
@@ -1759,26 +1759,26 @@ h2.profile-display-name {
 .rating-badge {
     display: flex;
     align-items: center;
-    gap: 8px;
-    padding: 12px 18px;
+    gap: var(--space-2);
+    padding: var(--space-3) 18px;
     background: linear-gradient(135deg, rgba(245, 158, 11, 0.15), rgba(217, 119, 6, 0.1));
     border: 1px solid rgba(245, 158, 11, 0.3);
-    border-radius: 14px;
+    border-radius: var(--radius-lg);
 }
 
 .rating-number {
-    font-size: 1.8rem;
+    font-size: 1.8rem; /* Custom for rating display */
     font-weight: 800;
     color: #f59e0b;
 }
 
 .rating-stars {
     display: flex;
-    gap: 2px;
+    gap: 2px; /* Tight gap for stars */
 }
 
 .rating-stars i {
-    font-size: 0.9rem;
+    font-size: var(--font-size-sm);
 }
 
 .rating-stars i.fa-solid {
@@ -1790,7 +1790,7 @@ h2.profile-display-name {
 }
 
 .rating-count {
-    font-size: 0.75rem;
+    font-size: var(--font-size-xs);
     color: #6b7280;
 }
 
@@ -1798,7 +1798,7 @@ h2.profile-display-name {
 .reviews-list {
     display: flex;
     flex-direction: column;
-    gap: 16px;
+    gap: var(--space-4);
 }
 
 /* Review card enhancements */
@@ -1807,8 +1807,8 @@ h2.profile-display-name {
     -webkit-backdrop-filter: blur(12px);
     backdrop-filter: blur(12px);
     border: 1px solid rgba(255, 255, 255, 0.3);
-    border-radius: 18px;
-    padding: 24px;
+    border-radius: 18px; /* Custom value between lg and xl */
+    padding: var(--space-6);
     transition: all 0.3s ease;
 }
 
@@ -1853,7 +1853,7 @@ h2.profile-display-name {
     background: rgba(255, 255, 255, 0.95);
     backdrop-filter: blur(24px) saturate(180%);
     -webkit-backdrop-filter: blur(24px) saturate(180%);
-    border-radius: 24px;
+    border-radius: var(--radius-2xl);
     border: 1px solid rgba(255, 255, 255, 0.5);
     box-shadow:
         0 25px 50px -12px rgba(0, 0, 0, 0.25),
@@ -1883,14 +1883,14 @@ h2.profile-display-name {
 
 .holo-review-header {
     background: linear-gradient(135deg, #6366f1, #8b5cf6);
-    padding: 24px 28px;
+    padding: var(--space-6) 28px;
     position: relative;
 }
 
 .holo-review-header h3 {
     margin: 0;
     color: white;
-    font-size: 1.4rem;
+    font-size: 1.4rem; /* Custom for modal header */
     font-weight: 700;
     background: none;
     -webkit-text-fill-color: white;
@@ -1898,8 +1898,8 @@ h2.profile-display-name {
 
 .modal-close-btn {
     position: absolute;
-    top: 16px;
-    right: 16px;
+    top: var(--space-4);
+    right: var(--space-4);
     width: 36px;
     height: 36px;
     border-radius: 50%;
@@ -1920,21 +1920,21 @@ h2.profile-display-name {
 }
 
 .holo-review-body {
-    padding: 28px;
+    padding: 28px; /* Custom value for emphasis */
 }
 
 /* Star Rating Section */
 .star-rating-section {
     text-align: center;
-    margin-bottom: 24px;
+    margin-bottom: var(--space-6);
 }
 
 .star-rating-label {
     display: block;
     font-weight: 600;
-    font-size: 1rem;
+    font-size: var(--font-size-base);
     color: #374151;
-    margin-bottom: 16px;
+    margin-bottom: var(--space-4);
 }
 
 [data-theme="dark"] .star-rating-label {
@@ -1944,8 +1944,8 @@ h2.profile-display-name {
 .star-rating-container {
     display: flex;
     justify-content: center;
-    gap: 8px;
-    margin-bottom: 12px;
+    gap: var(--space-2);
+    margin-bottom: var(--space-3);
 }
 
 .holo-star {
@@ -1955,7 +1955,7 @@ h2.profile-display-name {
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 1.5rem;
+    font-size: var(--font-size-2xl);
     cursor: pointer;
     transition: all 0.2s ease;
     background: rgba(243, 244, 246, 0.8) !important;
@@ -1998,23 +1998,23 @@ h2.profile-display-name {
     display: flex;
     justify-content: center;
     align-items: center;
-    gap: 12px;
+    gap: var(--space-3);
 }
 
 .rating-label {
     font-weight: 600;
-    font-size: 1rem;
+    font-size: var(--font-size-base);
     color: #6b7280;
     transition: all 0.2s ease;
 }
 
 .rating-indicator {
     font-weight: 700;
-    font-size: 0.9rem;
+    font-size: var(--font-size-sm);
     color: #f59e0b;
     padding: 4px 10px;
     background: rgba(245, 158, 11, 0.15);
-    border-radius: 20px;
+    border-radius: var(--radius-xl);
     transition: all 0.2s ease;
 }
 
@@ -2022,11 +2022,11 @@ h2.profile-display-name {
 .holo-textarea {
     width: 100%;
     min-height: 100px;
-    padding: 14px 16px;
-    border-radius: 14px;
+    padding: 14px var(--space-4);
+    border-radius: var(--radius-lg);
     border: 2px solid rgba(99, 102, 241, 0.2);
     background: rgba(255, 255, 255, 0.8);
-    font-size: 0.95rem;
+    font-size: var(--font-size-sm);
     font-family: inherit;
     resize: vertical;
     transition: all 0.2s ease;
@@ -2047,19 +2047,19 @@ h2.profile-display-name {
 /* Modal Buttons */
 .holo-modal-buttons {
     display: flex;
-    gap: 12px;
-    margin-top: 20px;
+    gap: var(--space-3);
+    margin-top: var(--space-5);
 }
 
 .holo-btn-cancel {
     flex: 1;
-    padding: 14px 20px !important;
+    padding: 14px var(--space-5) !important;
     border-radius: 12px !important;
     background: rgba(107, 114, 128, 0.1) !important;
     border: 1px solid rgba(107, 114, 128, 0.2) !important;
     color: #6b7280 !important;
     font-weight: 600;
-    font-size: 0.95rem;
+    font-size: var(--font-size-sm);
     cursor: pointer;
     transition: all 0.2s ease;
     box-shadow: none !important;
@@ -2072,13 +2072,13 @@ h2.profile-display-name {
 
 .holo-btn-submit {
     flex: 2;
-    padding: 14px 24px !important;
+    padding: 14px var(--space-6) !important;
     border-radius: 12px !important;
     background: linear-gradient(135deg, #6366f1, #8b5cf6) !important;
     border: none !important;
     color: white !important;
     font-weight: 600;
-    font-size: 0.95rem;
+    font-size: var(--font-size-sm);
     cursor: pointer;
     transition: all 0.2s ease;
     box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3) !important;
@@ -2145,7 +2145,7 @@ h2.profile-display-name {
     }
 
     .badge-modal-content {
-        border-radius: 24px;
+        border-radius: var(--radius-2xl);
         max-height: 80vh;
         animation: modalScaleIn 0.3s ease;
     }
@@ -2182,7 +2182,7 @@ h2.profile-display-name {
 
 .badge-modal-header {
     text-align: center;
-    padding: 24px 24px 20px;
+    padding: var(--space-6) var(--space-6) var(--space-5);
     background: linear-gradient(135deg, rgba(139, 92, 246, 0.1), rgba(99, 102, 241, 0.05));
     position: relative;
 }
@@ -2193,8 +2193,8 @@ h2.profile-display-name {
 
 .badge-modal-close {
     position: absolute;
-    top: 16px;
-    right: 16px;
+    top: var(--space-4);
+    right: var(--space-4);
     width: 32px;
     height: 32px;
     border-radius: 50% !important;
@@ -2221,7 +2221,7 @@ h2.profile-display-name {
 
 .badge-modal-icon {
     font-size: 4rem;
-    margin-bottom: 12px;
+    margin-bottom: var(--space-3);
     animation: badgeBounce 0.6s ease;
 }
 
@@ -2248,10 +2248,10 @@ h2.profile-display-name {
 .badge-rarity-tag {
     display: inline-flex;
     align-items: center;
-    gap: 6px;
-    padding: 6px 14px;
-    border-radius: 20px;
-    font-size: 0.85rem;
+    gap: 6px; /* Custom for icon spacing */
+    padding: 6px 14px; /* Custom for tag balance */
+    border-radius: var(--radius-xl);
+    font-size: var(--font-size-sm);
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.5px;
@@ -2283,11 +2283,11 @@ h2.profile-display-name {
 }
 
 .badge-modal-body {
-    padding: 24px;
+    padding: var(--space-6);
 }
 
 .badge-modal-section {
-    margin-bottom: 20px;
+    margin-bottom: var(--space-5);
 }
 
 .badge-modal-section:last-child {
@@ -2295,15 +2295,15 @@ h2.profile-display-name {
 }
 
 .badge-modal-label {
-    font-size: 0.8rem;
+    font-size: var(--font-size-xs);
     font-weight: 600;
     color: #9ca3af;
     text-transform: uppercase;
     letter-spacing: 0.5px;
-    margin-bottom: 8px;
+    margin-bottom: var(--space-2);
     display: flex;
     align-items: center;
-    gap: 6px;
+    gap: 6px; /* Custom for icon spacing */
 }
 
 .badge-modal-label i {
@@ -2315,16 +2315,16 @@ h2.profile-display-name {
 }
 
 .badge-modal-text {
-    font-size: 1rem;
+    font-size: var(--font-size-base);
     color: #374151;
     line-height: 1.5;
 }
 
 .badge-modal-text.description {
-    padding: 12px 16px;
+    padding: var(--space-3) var(--space-4);
     background: rgba(99, 102, 241, 0.05);
-    border-radius: 12px;
-    border-left: 4px solid #6366f1;
+    border-radius: var(--radius-md);
+    border-left: var(--space-1) solid #6366f1;
 }
 
 [data-theme="dark"] .badge-modal-text {
@@ -2417,7 +2417,7 @@ h2.profile-display-name {
     background: rgba(255, 255, 255, 0.95);
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
-    border-radius: 16px;
+    border-radius: var(--radius-lg);
     padding: 8px;
     box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
     min-width: 180px;
@@ -2440,13 +2440,13 @@ h2.profile-display-name {
 .profile-fab-item {
     display: flex;
     align-items: center;
-    gap: 12px;
-    padding: 12px 16px;
-    border-radius: 12px;
+    gap: var(--space-3);
+    padding: var(--space-3) var(--space-4);
+    border-radius: var(--radius-md);
     color: #374151;
     text-decoration: none;
     font-weight: 500;
-    font-size: 0.9rem;
+    font-size: var(--font-size-sm);
     transition: all 0.2s ease;
     background: transparent !important;
     border: none !important;
@@ -2484,13 +2484,13 @@ h2.profile-display-name {
     right: 0;
     background: linear-gradient(135deg, #ef4444, #dc2626);
     color: white;
-    padding: 12px 20px;
+    padding: var(--space-3) var(--space-5);
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 10px;
+    gap: 10px; /* Custom for visual balance */
     font-weight: 600;
-    font-size: 0.9rem;
+    font-size: var(--font-size-sm);
     z-index: 10001;
     transform: translateY(-100%);
     transition: transform 0.3s ease;

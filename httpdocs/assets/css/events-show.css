@@ -9,17 +9,17 @@
         left: 0;
         right: 0;
         z-index: 10001;
-        padding: 12px 20px;
+        padding: var(--space-3) var(--space-5);
         background: linear-gradient(135deg, #ef4444, #dc2626);
         color: white;
-        font-size: 0.9rem;
-        font-weight: 600;
+        font-size: var(--font-size-sm);
+        font-weight: var(--font-weight-semibold);
         display: flex;
         align-items: center;
         justify-content: center;
-        gap: 8px;
+        gap: var(--space-2);
         transform: translateY(-100%);
-        transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        transition: transform var(--transition-base);
     }
     .offline-banner.visible {
         transform: translateY(0);
@@ -27,19 +27,19 @@
 
     /* Content Reveal Animation */
     @keyframes fadeInUp {
-        from { opacity: 0; transform: translateY(20px); }
+        from { opacity: 0; transform: translateY(var(--space-5)); }
         to { opacity: 1; transform: translateY(0); }
     }
 
     #unique-glass-page-wrapper .glass-box {
-        animation: fadeInUp 0.4s ease-out;
+        animation: fadeInUp 0.4s ease-out /* Content reveal */;
     }
 
     /* Button Press States */
     .glass-btn:active,
     button:active {
         transform: scale(0.96) !important;
-        transition: transform 0.1s ease !important;
+        transition: transform var(--transition-fast) !important;
     }
 
     /* Touch Targets - WCAG 2.1 AA (44px minimum) */
@@ -47,11 +47,11 @@
     button,
     input[type="text"],
     input[type="checkbox"] {
-        min-height: 44px;
+        min-height: 44px /* WCAG 2.1 minimum touch target */;
     }
 
     input[type="text"] {
-        font-size: 16px !important; /* Prevent iOS zoom */
+        font-size: var(--font-size-base) !important; /* Prevent iOS zoom */
     }
 
     /* Focus Visible */
@@ -59,8 +59,8 @@
     button:focus-visible,
     a:focus-visible,
     input:focus-visible {
-        outline: 3px solid rgba(249, 115, 22, 0.5);
-        outline-offset: 2px;
+        outline: 3px solid /* WCAG focus indicator */ rgba(249, 115, 22, 0.5);
+        outline-offset: var(--space-1);
     }
 
     /* Smooth Scroll */
@@ -73,7 +73,7 @@
     @media (max-width: 768px) {
         .glass-btn,
         button {
-            min-height: 48px;
+            min-height: var(--space-12);
         }
     }
 </style>
@@ -93,15 +93,15 @@
 
         /* Subtle iridescent shadow for light mode */
         --box-shadow:
-            0 8px 32px 0 rgba(31, 38, 135, 0.1),
+            0 var(--space-2) var(--space-8) 0 rgba(31, 38, 135, 0.1),
             inset 0 0 0 1px rgba(255, 255, 255, 0.2);
 
-        --holographic-glow: 0 0 20px rgba(249, 115, 22, 0.05), 0 0 40px rgba(255, 200, 100, 0.05);
+        --holographic-glow: 0 0 var(--space-5) rgba(249, 115, 22, 0.05), 0 0 var(--space-10) rgba(255, 200, 100, 0.05);
 
         /* Form Fields & Pills */
         --pill-bg: rgba(255, 255, 255, 0.25);
         --pill-border: 1px solid rgba(255, 255, 255, 0.4);
-        --pill-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        --pill-shadow: 0 var(--space-1) var(--space-3) rgba(0, 0, 0, 0.05);
 
         /* Sidebar Variables */
         --sidebar-bg: rgba(255, 255, 255, 0.3);
@@ -118,13 +118,13 @@
         align-items: center;
         justify-content: flex-start;
         min-height: 80vh;
-        padding: 50px 20px;
+        padding: var(--space-12) 20px;
         box-sizing: border-box;
 
         /* Typography Defaults */
         font-family: 'Inter', system-ui, -apple-system, sans-serif;
         color: var(--text-color);
-        line-height: 1.6;
+        line-height: var(--line-height-normal);
 
         /* Background: Adaptive Mesh Gradient (Orange/Amber) */
         background: radial-gradient(circle at 50% 0%, #fff7ed 0%, #ffedd5 100%);
@@ -144,9 +144,9 @@
         --text-muted: #475569;
         --heading-gradient: linear-gradient(135deg, #c2410c 0%, #f97316 100%);
         --box-shadow:
-            0 8px 32px 0 rgba(31, 38, 135, 0.1),
+            0 var(--space-2) var(--space-8) 0 rgba(31, 38, 135, 0.1),
             inset 0 0 0 1px rgba(255, 255, 255, 0.2);
-        --holographic-glow: 0 0 20px rgba(249, 115, 22, 0.05), 0 0 40px rgba(255, 200, 100, 0.05);
+        --holographic-glow: 0 0 var(--space-5) rgba(249, 115, 22, 0.05), 0 0 var(--space-10) rgba(255, 200, 100, 0.05);
 
         --pill-bg: rgba(255, 255, 255, 0.25);
         --sidebar-bg: rgba(255, 255, 255, 0.3);
@@ -169,12 +169,12 @@
 
         /* Vivid Dark Mode Shadows */
         --box-shadow:
-            0 8px 32px 0 rgba(0, 0, 0, 0.4),
+            0 var(--space-2) var(--space-8) 0 rgba(0, 0, 0, 0.4),
             inset 0 0 0 1px rgba(255, 255, 255, 0.05);
 
         --holographic-glow:
-            0 0 30px rgba(249, 115, 22, 0.15),
-            0 0 60px rgba(251, 146, 60, 0.15);
+            0 0 var(--space-8) rgba(249, 115, 22, 0.15),
+            0 0 var(--space-16) rgba(251, 146, 60, 0.15);
 
         --pill-bg: rgba(24, 24, 27, 0.65);
         --pill-border: 1px solid rgba(255, 255, 255, 0.1);
@@ -194,7 +194,7 @@
     #unique-glass-page-wrapper .glass-box {
         position: relative;
         width: 95%;
-        max-width: 1200px;
+        max-width: var(--layout-max-content-width);
         /* Wider for 2-column */
         margin-left: auto;
         margin-right: auto;
@@ -205,13 +205,13 @@
         -webkit-backdrop-filter: blur(25px) saturate(200%);
 
         /* Holographic Borders & Shadows */
-        border-radius: 28px;
+        border-radius: var(--radius-2xl);
         border: 1px solid var(--glass-border);
         box-shadow: var(--box-shadow), var(--holographic-glow);
 
-        padding: 50px;
+        padding: var(--space-12);
         overflow: hidden;
-        transition: background 0.3s ease, box-shadow 0.3s ease;
+        transition: background var(--transition-base), box-shadow var(--transition-base);
     }
 
     /* Iridescent Top Edge */
@@ -230,7 +230,7 @@
     #unique-glass-page-wrapper .event-layout {
         display: grid;
         grid-template-columns: 2fr 1fr;
-        gap: 40px;
+        gap: var(--space-10);
     }
 
     /* Main Content Area */
@@ -240,96 +240,96 @@
     }
 
     #unique-glass-page-wrapper h1 {
-        font-size: 2.5rem;
-        font-weight: 800;
+        font-size: var(--font-size-4xl);
+        font-weight: var(--font-weight-bold);
         color: var(--text-color);
-        margin: 0 0 10px 0;
-        line-height: 1.2;
+        margin: 0 0 var(--space-3) 0;
+        line-height: var(--line-height-tight);
     }
 
     #unique-glass-page-wrapper .host-byline {
-        font-size: 1.1rem;
+        font-size: var(--font-size-lg);
         color: var(--text-muted);
-        margin-bottom: 30px;
+        margin-bottom: var(--space-8);
         display: flex;
         align-items: center;
-        gap: 8px;
+        gap: var(--space-2);
     }
 
     /* Date Badge (Floating Card) */
     #unique-glass-page-wrapper .glass-date-badge {
         display: flex;
         align-items: center;
-        gap: 20px;
+        gap: var(--space-5);
         background: var(--date-badge-bg);
         border: var(--date-badge-border);
         color: var(--date-text);
-        padding: 20px 25px;
-        border-radius: 20px;
-        margin-bottom: 30px;
+        padding: var(--space-5) var(--space-6);
+        border-radius: var(--radius-xl);
+        margin-bottom: var(--space-8);
         backdrop-filter: blur(5px);
     }
 
     #unique-glass-page-wrapper .date-block {
         text-align: center;
-        padding-right: 20px;
+        padding-right: var(--space-5);
         border-right: 1px solid rgba(255, 255, 255, 0.2);
     }
 
     #unique-glass-page-wrapper .date-month {
         text-transform: uppercase;
-        font-size: 0.9rem;
+        font-size: var(--font-size-sm);
         letter-spacing: 1px;
         opacity: 0.9;
     }
 
     #unique-glass-page-wrapper .date-day {
-        font-size: 2.5rem;
-        font-weight: 800;
+        font-size: var(--font-size-4xl);
+        font-weight: var(--font-weight-bold);
         line-height: 1;
     }
 
     #unique-glass-page-wrapper .time-loc {
         display: flex;
         flex-direction: column;
-        gap: 5px;
+        gap: var(--space-1);
     }
 
     #unique-glass-page-wrapper .time-text {
-        font-size: 1.2rem;
-        font-weight: 700;
+        font-size: var(--font-size-xl);
+        font-weight: var(--font-weight-bold);
     }
 
     #unique-glass-page-wrapper .loc-text {
-        font-size: 1rem;
+        font-size: var(--font-size-base);
         opacity: 0.9;
     }
 
     /* Description */
     #unique-glass-page-wrapper .description {
-        font-size: 1.1rem;
-        line-height: 1.7;
+        font-size: var(--font-size-lg);
+        line-height: var(--line-height-relaxed);
         color: var(--text-color);
         white-space: pre-wrap;
-        margin-bottom: 40px;
+        margin-bottom: var(--space-10);
     }
 
     /* SDG Pills */
     #unique-glass-page-wrapper .sdg-container {
         display: flex;
         flex-wrap: wrap;
-        gap: 10px;
-        margin-bottom: 30px;
+        gap: var(--space-3);
+        margin-bottom: var(--space-8);
     }
 
     #unique-glass-page-wrapper .glass-sdg-pill {
-        padding: 6px 14px;
-        border-radius: 50px;
-        font-size: 0.85rem;
-        font-weight: 600;
+        padding: var(--space-2) var(--space-4);
+        border-radius: var(--radius-full);
+        font-size: var(--font-size-sm);
+        font-weight: var(--font-weight-semibold);
         display: inline-flex;
         align-items: center;
-        gap: 6px;
+        gap: var(--space-2);
         backdrop-filter: blur(4px);
     }
 
@@ -338,39 +338,39 @@
     #unique-glass-page-wrapper .sidebar {
         display: flex;
         flex-direction: column;
-        gap: 25px;
+        gap: var(--space-6);
     }
 
     #unique-glass-page-wrapper .sidebar-card {
         background: var(--sidebar-bg);
         border: var(--sidebar-border);
-        border-radius: 20px;
-        padding: 25px;
+        border-radius: var(--radius-xl);
+        padding: var(--space-6);
         backdrop-filter: blur(10px);
     }
 
     #unique-glass-page-wrapper .sidebar-title {
-        margin: 0 0 15px 0;
-        font-size: 1.1rem;
-        font-weight: 700;
+        margin: 0 0 var(--space-4) 0;
+        font-size: var(--font-size-lg);
+        font-weight: var(--font-weight-bold);
         color: var(--text-color);
     }
 
     /* RSVP Buttons */
     #unique-glass-page-wrapper .rsvp-actions {
         display: flex;
-        gap: 10px;
+        gap: var(--space-3);
     }
 
     #unique-glass-page-wrapper .glass-btn {
         flex: 1;
-        padding: 10px;
-        border-radius: 12px;
+        padding: var(--space-3);
+        border-radius: var(--radius-md);
         border: none;
-        font-weight: 600;
+        font-weight: var(--font-weight-semibold);
         cursor: pointer;
-        font-size: 0.95rem;
-        transition: all 0.2s;
+        font-size: var(--font-size-sm);
+        transition: all var(--transition-fast);
         text-align: center;
         color: var(--text-color);
         background: var(--pill-bg);
@@ -397,8 +397,8 @@
     #unique-glass-page-wrapper .attendee-item {
         display: flex;
         align-items: center;
-        gap: 12px;
-        padding: 10px 0;
+        gap: var(--space-3);
+        padding: var(--space-3) 0;
         border-bottom: 1px solid var(--glass-border);
     }
 
@@ -407,8 +407,8 @@
     }
 
     #unique-glass-page-wrapper .avatar {
-        width: 36px;
-        height: 36px;
+        width: var(--space-10);
+        height: var(--space-10);
         border-radius: 50%;
         object-fit: cover;
         border: 2px solid var(--accent-color);
@@ -432,11 +432,11 @@
     #unique-glass-page-wrapper .glass-modal-content {
         background: var(--glass-bg);
         border: 1px solid var(--glass-border);
-        border-radius: 28px;
-        padding: 40px;
+        border-radius: var(--radius-2xl);
+        padding: var(--space-10);
         width: 90%;
-        max-width: 500px;
-        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.2);
+        max-width: 500px /* Modal width */;
+        box-shadow: 0 var(--space-5) var(--space-12) rgba(0, 0, 0, 0.2);
     }
 
     /* Responsive */
@@ -446,14 +446,14 @@
         }
 
         #unique-glass-page-wrapper {
-            padding: 20px 10px;
+            padding: var(--space-5) 10px;
         }
 
         #unique-glass-page-wrapper .glass-box {
-            padding: 30px 20px;
+            padding: var(--space-8) var(--space-5);
         }
 
         #unique-glass-page-wrapper h1 {
-            font-size: 2rem;
+            font-size: var(--font-size-3xl);
         }
     }

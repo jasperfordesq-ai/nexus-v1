@@ -2,7 +2,7 @@
  * Accessibility Enhancements
  * Consistent focus rings, reduced motion, screen reader utilities
  * WCAG 2.1 AA compliant
- * Version: 1.0 - 2026-01-19
+ * Version: 1.1 - 2026-01-21 - Migrated to design tokens
  */
 
 /* ============================================
@@ -14,7 +14,7 @@
 /* Base focus ring - applies to all focusable elements */
 :focus-visible {
     outline: 2px solid var(--color-primary-500, #6366f1);
-    outline-offset: 2px;
+    outline-offset: var(--space-1);
 }
 
 /* Remove default focus outline (we're replacing it with :focus-visible) */
@@ -30,15 +30,15 @@ button:focus-visible,
 .btn:focus-visible,
 .htb-btn:focus-visible {
     outline: 2px solid var(--color-primary-500);
-    outline-offset: 2px;
-    box-shadow: 0 0 0 4px rgba(var(--color-primary-rgb, 99, 102, 241), 0.2);
+    outline-offset: var(--space-1);
+    box-shadow: 0 0 0 var(--space-2) rgba(var(--color-primary-rgb, 99, 102, 241), 0.2);
 }
 
 /* Link focus rings */
 a:focus-visible {
     outline: 2px solid var(--color-primary-500, #6366f1);
-    outline-offset: 2px;
-    border-radius: 2px;
+    outline-offset: var(--space-1);
+    border-radius: var(--radius-sm);
 }
 
 /* Card/interactive container focus */
@@ -47,8 +47,8 @@ a:focus-visible {
 .feed-item:focus-visible,
 [role="button"]:focus-visible {
     outline: 2px solid var(--color-primary-500);
-    outline-offset: 2px;
-    box-shadow: 0 0 0 4px rgba(var(--color-primary-rgb, 99, 102, 241), 0.15);
+    outline-offset: var(--space-1);
+    box-shadow: 0 0 0 var(--space-2) rgba(var(--color-primary-rgb, 99, 102, 241), 0.15);
 }
 
 /* Dark mode focus rings - higher contrast */
@@ -58,7 +58,7 @@ a:focus-visible {
 
 [data-theme="dark"] button:focus-visible,
 [data-theme="dark"] .btn:focus-visible {
-    box-shadow: 0 0 0 4px rgba(var(--color-primary-400-rgb, 129, 140, 248), 0.25);
+    box-shadow: 0 0 0 var(--space-2) rgba(var(--color-primary-400-rgb, 129, 140, 248), 0.25);
 }
 
 /* ============================================
@@ -72,19 +72,19 @@ a:focus-visible {
     left: 0;
     background: var(--color-primary-600, #4f46e5);
     color: white;
-    padding: 12px 24px;
+    padding: var(--space-3) var(--space-6);
     text-decoration: none;
-    z-index: 10000;
-    border-radius: 0 0 8px 0;
-    font-weight: 600;
-    font-size: 0.875rem;
-    transition: top 0.3s ease;
+    z-index: var(--z-emergency);
+    border-radius: 0 0 var(--radius-base) 0;
+    font-weight: var(--font-weight-semibold);
+    font-size: var(--font-size-sm);
+    transition: top var(--transition-base);
 }
 
 .skip-link:focus {
     top: 0;
     outline: 3px solid var(--color-primary-300);
-    outline-offset: 2px;
+    outline-offset: var(--space-1);
 }
 
 /* ============================================
@@ -147,7 +147,7 @@ a:focus-visible {
 @media (prefers-contrast: high) {
     :focus-visible {
         outline-width: 3px;
-        outline-offset: 3px;
+        outline-offset: var(--space-2);
     }
 
     button:focus-visible,
@@ -177,12 +177,12 @@ a:focus-visible {
 
 .form-group:focus-within {
     background: rgba(var(--color-primary-rgb, 99, 102, 241), 0.03);
-    border-radius: 8px;
+    border-radius: var(--radius-base);
 }
 
 .input-group:focus-within {
-    box-shadow: 0 0 0 3px rgba(var(--color-primary-rgb, 99, 102, 241), 0.1);
-    border-radius: 8px;
+    box-shadow: 0 0 0 var(--space-2) rgba(var(--color-primary-rgb, 99, 102, 241), 0.1);
+    border-radius: var(--radius-base);
 }
 
 [data-theme="dark"] .form-group:focus-within {
@@ -213,7 +213,7 @@ button:active:not(:disabled),
 [aria-selected="true"],
 [aria-current="page"],
 [aria-current="true"] {
-    font-weight: 600;
+    font-weight: var(--font-weight-semibold);
 }
 
 /* Expanded state indicators */
@@ -241,7 +241,7 @@ button:active:not(:disabled),
 
 [aria-invalid="true"]:focus-visible {
     outline-color: var(--color-danger);
-    box-shadow: 0 0 0 3px rgba(var(--color-danger-rgb, 239, 68, 68), 0.15);
+    box-shadow: 0 0 0 var(--space-2) rgba(var(--color-danger-rgb, 239, 68, 68), 0.15);
 }
 
 /* Required field indicator */
@@ -263,7 +263,7 @@ label.required::after {
 main a:not(.btn):not(.card):not([class*="link"]) {
     text-decoration: underline;
     text-decoration-thickness: 1px;
-    text-underline-offset: 2px;
+    text-underline-offset: var(--space-1);
 }
 
 main a:not(.btn):not(.card):not([class*="link"]):hover {
@@ -274,7 +274,7 @@ main a:not(.btn):not(.card):not([class*="link"]):hover {
 a[target="_blank"]::after,
 a.external-link::after {
     content: " ↗";
-    font-size: 0.75em;
+    font-size: var(--font-size-xs);
     vertical-align: super;
 }
 
@@ -291,10 +291,10 @@ a.external-link::after {
     display: inline-block;
     width: 1em;
     height: 1em;
-    margin-left: 0.5em;
+    margin-left: var(--space-3);
     border: 2px solid currentColor;
     border-right-color: transparent;
-    border-radius: 50%;
+    border-radius: var(--radius-full);
     animation: a11y-spin 0.75s linear infinite;
 }
 
@@ -332,8 +332,8 @@ a.external-link::after {
 
     /* Add padding to small interactive elements */
     a:not(.btn) {
-        padding: 8px 4px;
-        margin: -8px -4px;
+        padding: var(--space-2) var(--space-2);
+        margin: calc(-1 * var(--space-2)) calc(-1 * var(--space-2));
     }
 }
 

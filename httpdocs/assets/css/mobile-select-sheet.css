@@ -3,7 +3,7 @@
  * Native app-style bottom sheet for select dropdowns
  * Extends mobile-sheets.css base styles
  *
- * Version: 1.0 - 2026-01-20
+ * Version: 2.0 - 2026-01-21 - Migrated to design tokens
  *
  * Only applies to mobile/native - desktop uses normal browser selects
  */
@@ -26,8 +26,8 @@
    SEARCH INPUT IN SHEET (for long lists)
    ============================================== */
 .mobile-select-search-wrap {
-    padding: 12px 16px;
-    border-bottom: 1px solid var(--feed-border, #e5e7eb);
+    padding: var(--space-3) var(--space-4);
+    border-bottom: 1px solid var(--feed-border, var(--color-gray-200));
 }
 
 [data-theme="dark"] .mobile-select-search-wrap {
@@ -36,11 +36,11 @@
 
 .mobile-select-search {
     width: 100%;
-    padding: 12px 16px 12px 44px;
-    background: var(--feed-bg-main, #f3f4f6);
+    padding: var(--space-3) var(--space-4) var(--space-3) 44px;
+    background: var(--feed-bg-main, var(--color-gray-100));
     border: none;
-    border-radius: 12px;
-    font-size: 16px;
+    border-radius: var(--radius-md);
+    font-size: var(--font-size-base);
     color: var(--feed-text-primary, #111);
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='%236b7280' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='11' cy='11' r='8'%3E%3C/circle%3E%3Cline x1='21' y1='21' x2='16.65' y2='16.65'%3E%3C/line%3E%3C/svg%3E");
     background-repeat: no-repeat;
@@ -63,7 +63,7 @@
 }
 
 .mobile-select-search::placeholder {
-    color: var(--feed-text-muted, #9ca3af);
+    color: var(--feed-text-muted, var(--color-gray-400));
 }
 
 /* ==============================================
@@ -87,12 +87,12 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 16px 20px;
+    padding: var(--space-4) var(--space-5);
     font-size: 17px;
     color: var(--feed-text-primary, #111);
-    border-bottom: 1px solid var(--feed-border, #e5e7eb);
+    border-bottom: 1px solid var(--feed-border, var(--color-gray-200));
     cursor: pointer;
-    transition: background 0.15s ease;
+    transition: background var(--transition-fast);
     -webkit-tap-highlight-color: transparent;
 }
 
@@ -101,7 +101,7 @@
 }
 
 .mobile-select-option:active {
-    background: var(--feed-bg-main, #f3f4f6);
+    background: var(--feed-bg-main, var(--color-gray-100));
 }
 
 [data-theme="dark"] .mobile-select-option {
@@ -116,7 +116,7 @@
 /* Selected option styling */
 .mobile-select-option.selected {
     color: var(--color-primary-500, #6366f1);
-    font-weight: 600;
+    font-weight: var(--font-weight-semibold);
 }
 
 .mobile-select-option.selected::after {
@@ -124,7 +124,7 @@
     width: 22px;
     height: 22px;
     background: var(--color-primary-500, #6366f1);
-    border-radius: 50%;
+    border-radius: var(--radius-full);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -142,8 +142,8 @@
 
 /* Option with icon */
 .mobile-select-option-icon {
-    width: 24px;
-    height: 24px;
+    width: var(--space-6);
+    height: var(--space-6);
     margin-right: 14px;
     flex-shrink: 0;
     display: flex;
@@ -156,7 +156,7 @@
     width: 100%;
     height: 100%;
     object-fit: contain;
-    border-radius: 4px;
+    border-radius: var(--radius-sm);
 }
 
 /* Option description/subtitle */
@@ -174,9 +174,9 @@
 
 .mobile-select-option-desc {
     display: block;
-    font-size: 13px;
+    font-size: var(--font-size-sm);
     color: var(--feed-text-secondary, #666);
-    margin-top: 2px;
+    margin-top: var(--space-1);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -186,13 +186,13 @@
    GROUPED OPTIONS (optgroup equivalent)
    ============================================== */
 .mobile-select-group-header {
-    padding: 12px 20px 8px;
-    font-size: 13px;
-    font-weight: 600;
-    color: var(--feed-text-muted, #9ca3af);
+    padding: var(--space-3) var(--space-5) var(--space-2);
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-semibold);
+    color: var(--feed-text-muted, var(--color-gray-400));
     text-transform: uppercase;
     letter-spacing: 0.5px;
-    background: var(--feed-bg-main, #f9fafb);
+    background: var(--feed-bg-main, var(--color-gray-50));
     position: sticky;
     top: 0;
     z-index: 1;
@@ -207,14 +207,14 @@
    NO RESULTS STATE
    ============================================== */
 .mobile-select-empty {
-    padding: 40px 20px;
+    padding: var(--space-10) var(--space-5);
     text-align: center;
-    color: var(--feed-text-muted, #9ca3af);
+    color: var(--feed-text-muted, var(--color-gray-400));
 }
 
 .mobile-select-empty-icon {
     font-size: 48px;
-    margin-bottom: 12px;
+    margin-bottom: var(--space-3);
     opacity: 0.5;
 }
 
@@ -237,15 +237,15 @@
         align-items: center;
         justify-content: space-between;
         width: 100%;
-        padding: 14px 16px;
+        padding: 14px var(--space-4);
         background: rgba(255, 255, 255, 0.08);
         border: 1.5px solid rgba(255, 255, 255, 0.15);
-        border-radius: 12px;
-        font-size: 16px;
-        color: var(--text-primary, #1f2937);
+        border-radius: var(--radius-md);
+        font-size: var(--font-size-base);
+        color: var(--text-primary, var(--color-gray-800));
         cursor: pointer;
         -webkit-tap-highlight-color: transparent;
-        transition: border-color 0.2s ease;
+        transition: border-color var(--transition-base);
     }
 
     .mobile-select-trigger:focus {
@@ -262,16 +262,16 @@
     }
 
     .mobile-select-trigger-text.placeholder {
-        color: var(--text-tertiary, #9ca3af);
+        color: var(--text-tertiary, var(--color-gray-400));
     }
 
     .mobile-select-trigger-arrow {
-        width: 20px;
-        height: 20px;
-        margin-left: 8px;
+        width: var(--space-5);
+        height: var(--space-5);
+        margin-left: var(--space-2);
         flex-shrink: 0;
-        color: var(--text-secondary, #6b7280);
-        transition: transform 0.2s ease;
+        color: var(--text-secondary, var(--color-gray-500));
+        transition: transform var(--transition-base);
     }
 
     .mobile-select-trigger.open .mobile-select-trigger-arrow {
@@ -318,7 +318,7 @@
 @keyframes selectOptionIn {
     from {
         opacity: 0;
-        transform: translateY(8px);
+        transform: translateY(var(--space-2));
     }
     to {
         opacity: 1;

@@ -12,7 +12,7 @@
 
 /* Ensure smooth reveal when JS shows content */
 body {
-    transition: opacity 0.3s ease-in;
+    transition: opacity var(--transition-base) var(--ease-in);
 }
 
 /* After content is loaded and visible */
@@ -50,7 +50,7 @@ img:not([width]):not([height]) {
 img[loading="lazy"] {
     /* Smooth fade in when lazy images load */
     opacity: 0;
-    transition: opacity 0.3s ease-in;
+    transition: opacity var(--transition-base) var(--ease-in);
 }
 
 img[loading="lazy"].loaded,
@@ -64,7 +64,7 @@ img[loading="lazy"][src] {
 
 .skeleton-feed-container {
     opacity: 1;
-    transition: opacity 0.3s ease-out;
+    transition: opacity var(--transition-base) var(--ease-out);
 }
 
 .skeleton-feed-container.hidden {
@@ -115,13 +115,13 @@ img[loading="lazy"][src] {
 
 /* Set initial theme colors to prevent flash */
 html {
-    background-color: #0f172a;
-    color: #ffffff;
+    background-color: var(--color-slate-900);
+    color: var(--color-gray-50);
 }
 
 html[data-theme="light"] {
-    background-color: #ffffff;
-    color: #0f172a;
+    background-color: var(--color-gray-50);
+    color: var(--color-slate-900);
 }
 
 /* Instant theme application */
@@ -159,7 +159,7 @@ html.loaded {
 .feed-item,
 .post-card {
     opacity: 0;
-    animation: fadeInUp 0.4s ease-out forwards;
+    animation: fadeInUp 0.4s var(--ease-out) forwards;
 }
 
 .feed-item:nth-child(1) { animation-delay: 0.05s; }
@@ -172,7 +172,7 @@ html.loaded {
 @keyframes fadeInUp {
     from {
         opacity: 0;
-        transform: translateY(20px);
+        transform: translateY(var(--space-5));
     }
     to {
         opacity: 1;
@@ -254,7 +254,7 @@ button,
     /* Show smoothly */
     display: flex;
     opacity: 1;
-    animation: modalFadeIn 0.2s ease-out;
+    animation: modalFadeIn 0.2s var(--ease-out);
 }
 
 @keyframes modalFadeIn {
@@ -267,7 +267,7 @@ button,
 }
 
 .modal.closing {
-    animation: modalFadeOut 0.2s ease-out;
+    animation: modalFadeOut 0.2s var(--ease-out);
 }
 
 @keyframes modalFadeOut {
@@ -284,11 +284,11 @@ button,
    ============================================ */
 
 #nexus-toast {
-    animation: toastSlideIn 0.3s ease-out;
+    animation: toastSlideIn var(--transition-base) var(--ease-out);
 }
 
 #nexus-toast.hiding {
-    animation: toastSlideOut 0.3s ease-out;
+    animation: toastSlideOut var(--transition-base) var(--ease-out);
 }
 
 @keyframes toastSlideIn {

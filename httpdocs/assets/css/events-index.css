@@ -9,15 +9,15 @@
             left: 0;
             right: 0;
             z-index: 10001;
-            padding: 12px 20px;
+            padding: var(--space-3) var(--space-5);
             background: linear-gradient(135deg, #ef4444, #dc2626);
             color: white;
-            font-size: 0.9rem;
+            font-size: var(--font-size-sm);
             font-weight: 600;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 8px;
+            gap: var(--space-2);
             transform: translateY(-100%);
             transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
@@ -70,7 +70,7 @@
         .nexus-smart-btn:focus-visible,
         .glass-btn-primary:focus-visible {
             outline: 3px solid rgba(249, 115, 22, 0.5);
-            outline-offset: 2px;
+            outline-offset: var(--space-1);
         }
 
         /* Smooth Scroll */
@@ -82,7 +82,7 @@
         /* Mobile Responsive Enhancements */
         @media (max-width: 768px) {
             .htb-container-full {
-                padding: 0 15px 100px 15px;
+                padding: 0 var(--space-4) 100px var(--space-4);
             }
 
             .htb-btn,
@@ -137,8 +137,8 @@
         #events-glass-wrapper .seo-description {
             text-align: center;
             max-width: 650px;
-            margin: 0 auto 20px auto;
-            font-size: 1.05rem;
+            margin: 0 auto var(--space-5) auto;
+            font-size: var(--font-size-lg);
             line-height: 1.6;
             color: var(--htb-text-main);
             font-weight: 500;
@@ -146,9 +146,9 @@
 
         /* Quick Actions Bar */
         #events-glass-wrapper .quick-actions-bar {
-            margin: 30px 0 20px 0;
+            margin: var(--space-8) 0 var(--space-5) 0;
             display: flex;
-            gap: 12px;
+            gap: var(--space-3);
             justify-content: center;
             flex-wrap: wrap;
         }
@@ -159,13 +159,13 @@
                 rgba(255, 255, 255, 0.6));
             backdrop-filter: blur(16px) saturate(120%);
             -webkit-backdrop-filter: blur(16px) saturate(120%);
-            border: 2px solid rgba(255, 255, 255, 0.3);
-            border-radius: 14px;
-            padding: 14px 20px;
+            border: var(--space-1) solid rgba(255, 255, 255, 0.3);
+            border-radius: var(--radius-lg);
+            padding: var(--space-4) var(--space-5);
             text-decoration: none;
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: var(--space-3);
             transition: all 0.3s ease;
             box-shadow: 0 4px 12px rgba(31, 38, 135, 0.1),
                         inset 0 1px 0 rgba(255, 255, 255, 0.4);
@@ -201,7 +201,7 @@
             background: linear-gradient(135deg,
                 rgba(15, 23, 42, 0.6),
                 rgba(30, 41, 59, 0.5));
-            border: 2px solid rgba(255, 255, 255, 0.12);
+            border: var(--space-1) solid rgba(255, 255, 255, 0.12);
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3),
                         inset 0 1px 0 rgba(255, 255, 255, 0.06);
         }
@@ -219,7 +219,7 @@
         }
 
         #events-glass-wrapper .quick-action-text {
-            font-size: 0.95rem;
+            font-size: var(--font-size-sm);
             font-weight: 700;
             color: var(--htb-text-main);
             position: relative;
@@ -228,17 +228,17 @@
 
         /* Glass Search Card */
         #events-glass-wrapper .glass-search-card {
-            margin-top: 30px !important;
+            margin-top: var(--space-8) !important;
             position: relative;
             z-index: 10;
-            padding: 25px;
-            border-radius: 20px;
+            padding: var(--space-6);
+            border-radius: var(--radius-xl);
             background: linear-gradient(135deg,
                 rgba(255, 255, 255, 0.75),
                 rgba(255, 255, 255, 0.6));
             backdrop-filter: blur(20px) saturate(120%);
             -webkit-backdrop-filter: blur(20px) saturate(120%);
-            border: 1px solid rgba(255, 255, 255, 0.3);
+            border: var(--space-1) solid rgba(255, 255, 255, 0.3);
             box-shadow: 0 8px 32px rgba(31, 38, 135, 0.15),
                         inset 0 0 0 1px rgba(255, 255, 255, 0.4);
             transition: all 0.3s ease;
@@ -250,7 +250,7 @@
                 rgba(30, 41, 59, 0.5));
             backdrop-filter: blur(24px) saturate(150%);
             -webkit-backdrop-filter: blur(24px) saturate(150%);
-            border: 1px solid rgba(255, 255, 255, 0.15);
+            border: var(--space-1) solid rgba(255, 255, 255, 0.15);
             box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5),
                         0 0 80px rgba(249, 115, 22, 0.1),
                         inset 0 1px 0 rgba(255, 255, 255, 0.1);
@@ -259,10 +259,10 @@
         /* Glass Search Input */
         #events-glass-wrapper .glass-search-input {
             width: 100%;
-            padding: 16px 20px 16px 50px;
-            border: 2px solid rgba(255, 255, 255, 0.4);
-            border-radius: 16px;
-            font-size: 1.05rem;
+            padding: var(--space-4) var(--space-5) var(--space-4) 50px;
+            border: var(--space-1) solid rgba(255, 255, 255, 0.4);
+            border-radius: var(--radius-lg);
+            font-size: var(--font-size-lg);
             background: rgba(255, 255, 255, 0.6);
             backdrop-filter: blur(10px);
             -webkit-backdrop-filter: blur(10px);
@@ -283,7 +283,7 @@
 
         [data-theme="dark"] #events-glass-wrapper .glass-search-input {
             background: rgba(15, 23, 42, 0.7);
-            border: 2px solid rgba(255, 255, 255, 0.2);
+            border: var(--space-1) solid rgba(255, 255, 255, 0.2);
             color: #f8fafc;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3),
                         inset 0 1px 0 rgba(255, 255, 255, 0.1);
@@ -302,10 +302,10 @@
 
         /* Glass Select */
         #events-glass-wrapper .glass-select {
-            padding: 14px 40px 14px 16px;
-            border: 2px solid rgba(255, 255, 255, 0.4);
-            border-radius: 12px;
-            font-size: 0.95rem;
+            padding: var(--space-4) var(--space-10) var(--space-4) var(--space-4);
+            border: var(--space-1) solid rgba(255, 255, 255, 0.4);
+            border-radius: var(--radius-md);
+            font-size: var(--font-size-sm);
             background: rgba(255, 255, 255, 0.6);
             backdrop-filter: blur(10px);
             -webkit-backdrop-filter: blur(10px);
@@ -328,7 +328,7 @@
 
         [data-theme="dark"] #events-glass-wrapper .glass-select {
             background-color: rgba(15, 23, 42, 0.7);
-            border: 2px solid rgba(255, 255, 255, 0.2);
+            border: var(--space-1) solid rgba(255, 255, 255, 0.2);
             color: #f8fafc;
         }
 
@@ -342,9 +342,9 @@
             background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
             color: white;
             border: none;
-            padding: 14px 28px;
-            border-radius: 14px;
-            font-size: 1rem;
+            padding: var(--space-4) var(--space-8);
+            border-radius: var(--radius-lg);
+            font-size: var(--font-size-base);
             font-weight: 700;
             cursor: pointer;
             transition: all 0.3s ease;
@@ -353,7 +353,7 @@
             text-decoration: none;
             display: inline-flex;
             align-items: center;
-            gap: 8px;
+            gap: var(--space-2);
         }
 
         #events-glass-wrapper .glass-btn-primary:hover {
@@ -366,14 +366,14 @@
         #events-glass-wrapper .section-header {
             display: flex;
             align-items: center;
-            gap: 12px;
-            margin: 40px 0 24px 0;
-            padding-left: 16px;
-            border-left: 4px solid #f97316;
+            gap: var(--space-3);
+            margin: var(--space-10) 0 var(--space-6) 0;
+            padding-left: var(--space-4);
+            border-left: var(--space-1) solid #f97316;
         }
 
         #events-glass-wrapper .section-header h2 {
-            font-size: 1.35rem;
+            font-size: var(--font-size-xl);
             font-weight: 700;
             color: var(--htb-text-main);
             margin: 0;
@@ -386,8 +386,8 @@
                 rgba(255, 255, 255, 0.6));
             backdrop-filter: blur(20px) saturate(120%);
             -webkit-backdrop-filter: blur(20px) saturate(120%);
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            border-radius: 20px;
+            border: var(--space-1) solid rgba(255, 255, 255, 0.3);
+            border-radius: var(--radius-xl);
             box-shadow: 0 8px 32px rgba(31, 38, 135, 0.12),
                         inset 0 1px 0 rgba(255, 255, 255, 0.5);
             transition: all 0.3s ease;
@@ -409,7 +409,7 @@
                 rgba(30, 41, 59, 0.5));
             backdrop-filter: blur(24px) saturate(150%);
             -webkit-backdrop-filter: blur(24px) saturate(150%);
-            border: 1px solid rgba(255, 255, 255, 0.15);
+            border: var(--space-1) solid rgba(255, 255, 255, 0.15);
             box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5),
                         0 0 60px rgba(249, 115, 22, 0.08),
                         inset 0 1px 0 rgba(255, 255, 255, 0.08);
@@ -427,10 +427,10 @@
         #events-glass-wrapper .card-date-header {
             background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
             color: white;
-            padding: 20px 24px;
+            padding: var(--space-5) var(--space-6);
             display: flex;
             align-items: center;
-            gap: 20px;
+            gap: var(--space-5);
             position: relative;
             overflow: hidden;
         }
@@ -455,21 +455,21 @@
         }
 
         #events-glass-wrapper .date-box .month {
-            font-size: 0.8rem;
+            font-size: var(--font-size-xs);
             text-transform: uppercase;
             opacity: 0.9;
-            letter-spacing: 1px;
+            letter-spacing: var(--space-1);
             font-weight: 600;
         }
 
         #events-glass-wrapper .date-box .day {
-            font-size: 2rem;
+            font-size: var(--font-size-3xl);
             font-weight: 800;
         }
 
         #events-glass-wrapper .time-location {
-            border-left: 1px solid rgba(255, 255, 255, 0.3);
-            padding-left: 20px;
+            border-left: var(--space-1) solid rgba(255, 255, 255, 0.3);
+            padding-left: var(--space-5);
             flex-grow: 1;
             position: relative;
             z-index: 1;
@@ -477,30 +477,30 @@
 
         #events-glass-wrapper .time-location .time {
             font-weight: 700;
-            font-size: 1.1rem;
-            margin-bottom: 4px;
+            font-size: var(--font-size-lg);
+            margin-bottom: var(--space-1);
         }
 
         #events-glass-wrapper .time-location .location {
-            font-size: 0.85rem;
+            font-size: var(--font-size-sm);
             opacity: 0.9;
             display: flex;
             align-items: center;
-            gap: 6px;
+            gap: var(--space-2);
         }
 
         /* Card Body */
         #events-glass-wrapper .card-body {
-            padding: 24px;
+            padding: var(--space-6);
             flex-grow: 1;
             display: flex;
             flex-direction: column;
         }
 
         #events-glass-wrapper .event-title {
-            font-size: 1.3rem;
+            font-size: var(--font-size-xl);
             font-weight: 700;
-            margin: 0 0 12px 0;
+            margin: 0 0 var(--space-3) 0;
             line-height: 1.3;
         }
 
@@ -516,18 +516,18 @@
 
         #events-glass-wrapper .event-desc {
             color: var(--htb-text-muted);
-            font-size: 0.95rem;
+            font-size: var(--font-size-sm);
             line-height: 1.6;
-            margin-bottom: 20px;
+            margin-bottom: var(--space-5);
             flex-grow: 1;
         }
 
         #events-glass-wrapper .host-info {
-            font-size: 0.9rem;
+            font-size: var(--font-size-sm);
             color: var(--htb-text-muted);
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: var(--space-2);
         }
 
         #events-glass-wrapper .host-info i {
@@ -536,8 +536,8 @@
 
         /* Card Footer */
         #events-glass-wrapper .card-footer {
-            border-top: 1px solid rgba(0, 0, 0, 0.06);
-            padding: 16px 24px;
+            border-top: var(--space-1) solid rgba(0, 0, 0, 0.06);
+            padding: var(--space-4) var(--space-6);
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -550,8 +550,8 @@
         #events-glass-wrapper .attendee-count {
             display: flex;
             align-items: center;
-            gap: 8px;
-            font-size: 0.9rem;
+            gap: var(--space-2);
+            font-size: var(--font-size-sm);
             font-weight: 600;
             color: var(--htb-text-main);
         }
@@ -566,13 +566,13 @@
             text-decoration: none;
             display: inline-flex;
             align-items: center;
-            gap: 6px;
+            gap: var(--space-2);
             transition: all 0.2s ease;
         }
 
         #events-glass-wrapper .view-link:hover {
             color: #ea580c;
-            gap: 10px;
+            gap: var(--space-3);
         }
 
         [data-theme="dark"] #events-glass-wrapper .view-link {
@@ -599,8 +599,8 @@
                 rgba(255, 255, 255, 0.3));
             backdrop-filter: blur(16px) saturate(120%);
             -webkit-backdrop-filter: blur(16px) saturate(120%);
-            border: 2px dashed rgba(249, 115, 22, 0.3);
-            border-radius: 20px;
+            border: var(--space-1) dashed rgba(249, 115, 22, 0.3);
+            border-radius: var(--radius-xl);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -620,7 +620,7 @@
             background: linear-gradient(135deg,
                 rgba(15, 23, 42, 0.4),
                 rgba(30, 41, 59, 0.3));
-            border: 2px dashed rgba(249, 115, 22, 0.4);
+            border: var(--space-1) dashed rgba(249, 115, 22, 0.4);
         }
 
         [data-theme="dark"] #events-glass-wrapper .glass-create-card:hover {
@@ -634,21 +634,21 @@
         #events-glass-wrapper .events-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-            gap: 30px;
+            gap: var(--space-8);
         }
 
         /* Glass Empty State */
         #events-glass-wrapper .glass-empty-state {
             grid-column: 1/-1;
             text-align: center;
-            padding: 60px;
+            padding: 60px; /* Intentionally kept as 60px - no exact token match */
             background: linear-gradient(135deg,
                 rgba(255, 255, 255, 0.7),
                 rgba(255, 255, 255, 0.5));
             backdrop-filter: blur(20px);
             -webkit-backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            border-radius: 20px;
+            border: var(--space-1) solid rgba(255, 255, 255, 0.3);
+            border-radius: var(--radius-xl);
             box-shadow: 0 8px 32px rgba(31, 38, 135, 0.12);
         }
 
@@ -656,7 +656,7 @@
             background: linear-gradient(135deg,
                 rgba(15, 23, 42, 0.6),
                 rgba(30, 41, 59, 0.5));
-            border: 1px solid rgba(255, 255, 255, 0.15);
+            border: var(--space-1) solid rgba(255, 255, 255, 0.15);
             box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
         }
 
@@ -716,10 +716,10 @@
                 rgba(253, 186, 116, 0.08) 100%);
             backdrop-filter: blur(20px);
             -webkit-backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.4);
-            border-radius: 20px;
-            padding: 28px 24px;
-            margin-bottom: 30px;
+            border: var(--space-1) solid rgba(255, 255, 255, 0.4);
+            border-radius: var(--radius-xl);
+            padding: var(--space-8) var(--space-6);
+            margin-bottom: var(--space-8);
             text-align: center;
             box-shadow: 0 8px 32px rgba(249, 115, 22, 0.1);
         }
@@ -733,20 +733,20 @@
         }
 
         #events-glass-wrapper .nexus-welcome-title {
-            font-size: 1.75rem;
+            font-size: var(--font-size-3xl);
             font-weight: 800;
             background: linear-gradient(135deg, #ea580c, #f97316, #fb923c);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
-            margin: 0 0 8px 0;
+            margin: 0 0 var(--space-2) 0;
             line-height: 1.2;
         }
 
         #events-glass-wrapper .nexus-welcome-subtitle {
-            font-size: 0.95rem;
+            font-size: var(--font-size-sm);
             color: var(--htb-text-muted);
-            margin: 0 0 20px 0;
+            margin: 0 0 var(--space-5) 0;
             line-height: 1.5;
             max-width: 500px;
             margin-left: auto;
@@ -755,7 +755,7 @@
 
         #events-glass-wrapper .nexus-smart-buttons {
             display: flex;
-            gap: 10px;
+            gap: var(--space-3);
             justify-content: center;
             flex-wrap: wrap;
         }
@@ -763,14 +763,14 @@
         #events-glass-wrapper .nexus-smart-btn {
             display: inline-flex;
             align-items: center;
-            gap: 8px;
-            padding: 12px 20px;
-            border-radius: 12px;
+            gap: var(--space-2);
+            padding: var(--space-3) var(--space-5);
+            border-radius: var(--radius-md);
             font-weight: 600;
-            font-size: 0.9rem;
+            font-size: var(--font-size-sm);
             text-decoration: none;
             transition: all 0.2s ease;
-            border: 2px solid transparent;
+            border: var(--space-1) solid transparent;
         }
 
         #events-glass-wrapper .nexus-smart-btn i { font-size: 1rem; }
@@ -818,9 +818,9 @@
         }
 
         @media (max-width: 640px) {
-            #events-glass-wrapper .nexus-welcome-hero { padding: 20px 16px; border-radius: 16px; }
-            #events-glass-wrapper .nexus-welcome-title { font-size: 1.35rem; }
-            #events-glass-wrapper .nexus-smart-buttons { gap: 8px; }
-            #events-glass-wrapper .nexus-smart-btn { padding: 10px 14px; font-size: 0.8rem; }
+            #events-glass-wrapper .nexus-welcome-hero { padding: var(--space-5) var(--space-4); border-radius: var(--radius-lg); }
+            #events-glass-wrapper .nexus-welcome-title { font-size: var(--font-size-xl); }
+            #events-glass-wrapper .nexus-smart-buttons { gap: var(--space-2); }
+            #events-glass-wrapper .nexus-smart-btn { padding: var(--space-3) var(--space-4); font-size: var(--font-size-xs); }
         }
     </style>

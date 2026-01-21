@@ -23,7 +23,7 @@
     right: 0;
     top: 0;
     bottom: 0;
-    width: 30px;
+    width: var(--space-8);
     background: linear-gradient(to left, rgba(0,0,0,0.05), transparent);
     pointer-events: none;
     opacity: 0;
@@ -304,8 +304,8 @@
 }
 
 .table-cards .cell-avatar img {
-    width: 40px;
-    height: 40px;
+    width: var(--space-10);
+    height: var(--space-10);
     border-radius: var(--radius-full, 9999px);
     object-fit: cover;
     flex-shrink: 0;
@@ -376,7 +376,7 @@
     background: var(--color-gray-50, #f9fafb);
     position: sticky;
     top: 0;
-    z-index: 1;
+    z-index: var(--z-raised);
 }
 
 [data-theme="dark"] .table-scroll th {
@@ -395,12 +395,12 @@
 
 .table-empty {
     text-align: center;
-    padding: var(--space-12, 48px) var(--space-4, 16px);
+    padding: var(--space-12) var(--space-4, 16px);
     color: var(--color-gray-500, #6b7280);
 }
 
 .table-empty-icon {
-    font-size: 48px;
+    font-size: var(--space-12);
     margin-bottom: var(--space-4, 16px);
     opacity: 0.5;
 }
@@ -414,7 +414,7 @@
 
 .table-empty-description {
     font-size: var(--font-size-sm, 0.875rem);
-    max-width: 300px;
+    max-width: var(--space-20);
     margin: 0 auto;
 }
 

@@ -38,11 +38,11 @@
     align-items: center;
     justify-content: center;
     flex: 1;
-    padding: 10px 4px 8px;
+    padding: var(--space-2) var(--space-1) var(--space-2);
     text-decoration: none;
     color: var(--civic-text-muted, #6b7280);
-    font-size: 10px;
-    font-weight: 600;
+    font-size: var(--font-size-xs);
+    font-weight: var(--font-weight-semibold);
     text-transform: uppercase;
     letter-spacing: 0.03em;
     min-height: 56px; /* WCAG touch target */
@@ -61,9 +61,9 @@
 
 .civic-bottom-nav-item svg,
 .civic-bottom-nav-item .civic-nav-icon {
-    width: 24px;
-    height: 24px;
-    margin-bottom: 4px;
+    width: var(--space-6);
+    height: var(--space-6);
+    margin-bottom: var(--space-1);
     fill: currentColor;
 }
 
@@ -82,10 +82,10 @@
     top: 0;
     left: 50%;
     transform: translateX(-50%);
-    width: 32px;
+    width: var(--space-8);
     height: 3px;
     background: var(--civic-brand, #2563eb);
-    border-radius: 0 0 3px 3px;
+    border-radius: 0 0 var(--radius-sm) var(--radius-sm);
 }
 
 /* Create button special styling */
@@ -97,12 +97,12 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 48px;
-    height: 48px;
+    width: var(--space-12);
+    height: var(--space-12);
     background: var(--civic-brand, #2563eb);
     border-radius: 50%;
-    margin-top: -20px;
-    margin-bottom: 2px;
+    margin-top: -var(--space-5);
+    margin-bottom: var(--space-1);
     box-shadow: 0 4px 12px rgba(37, 99, 235, 0.4);
 }
 
@@ -118,16 +118,16 @@
 /* Notification badge (old style) */
 .civic-bottom-nav-badge {
     position: absolute;
-    top: 6px;
-    right: calc(50% - 16px);
+    top: var(--space-2);
+    right: calc(50% - var(--space-4));
     min-width: 18px;
     height: 18px;
-    padding: 0 5px;
+    padding: 0 var(--space-1);
     background: #ef4444;
     color: white;
-    font-size: 10px;
-    font-weight: 700;
-    border-radius: 9px;
+    font-size: var(--font-size-xs);
+    font-weight: var(--font-weight-bold);
+    border-radius: var(--radius-base);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -137,16 +137,16 @@
 /* Notification badge (inside nav-icon) */
 .civic-nav-badge {
     position: absolute;
-    top: -4px;
-    right: -8px;
+    top: -var(--space-1);
+    right: -var(--space-2);
     min-width: 18px;
     height: 18px;
-    padding: 0 5px;
+    padding: 0 var(--space-1);
     background: #ef4444;
     color: white;
-    font-size: 10px;
-    font-weight: 700;
-    border-radius: 9px;
+    font-size: var(--font-size-xs);
+    font-weight: var(--font-weight-bold);
+    border-radius: var(--radius-base);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -226,7 +226,7 @@ body.dark-mode .civic-bottom-nav-item.active {
     display: none; /* Hidden by default */
     position: fixed;
     bottom: 90px; /* Above bottom nav */
-    right: 20px;
+    right: var(--space-5);
     width: 56px;
     height: 56px;
     background: linear-gradient(135deg, var(--civic-brand, #2563eb) 0%, var(--civic-brand-hover, #1d4ed8) 100%);
@@ -250,8 +250,8 @@ body.dark-mode .civic-bottom-nav-item.active {
 }
 
 .civic-fab svg {
-    width: 24px;
-    height: 24px;
+    width: var(--space-6);
+    height: var(--space-6);
     fill: white;
 }
 
@@ -262,15 +262,15 @@ body.dark-mode .civic-bottom-nav-item.active {
 /* FAB expanded state (optional) */
 .civic-fab.expanded {
     width: auto;
-    border-radius: 28px;
-    padding: 0 24px;
-    gap: 8px;
+    border-radius: 28px; /* Custom FAB expanded radius */
+    padding: 0 var(--space-6);
+    gap: var(--space-2);
 }
 
 .civic-fab.expanded span {
     display: block;
-    font-weight: 600;
-    font-size: 14px;
+    font-weight: var(--font-weight-semibold);
+    font-size: var(--font-size-sm);
 }
 
 /* Show FAB on mobile */
@@ -309,7 +309,7 @@ body.dark-mode .civic-bottom-nav-item.active {
         var(--civic-bg-card, #ffffff) 50%,
         var(--civic-bg-page, #f3f4f6) 75%);
     background-size: 200% 100%;
-    border-radius: 4px;
+    border-radius: var(--radius-sm);
 }
 
 @media (prefers-reduced-motion: no-preference) {
@@ -324,8 +324,8 @@ body.dark-mode .civic-bottom-nav-item.active {
 }
 
 .civic-skeleton-text {
-    height: 14px;
-    margin-bottom: 8px;
+    height: var(--font-size-sm);
+    margin-bottom: var(--space-2);
     width: 100%;
 }
 
@@ -334,14 +334,14 @@ body.dark-mode .civic-bottom-nav-item.active {
 }
 
 .civic-skeleton-title {
-    height: 20px;
+    height: var(--space-5);
     width: 60%;
-    margin-bottom: 12px;
+    margin-bottom: var(--space-3);
 }
 
 .civic-skeleton-avatar {
-    width: 48px;
-    height: 48px;
+    width: var(--space-12);
+    height: var(--space-12);
     border-radius: 50%;
     flex-shrink: 0;
 }
@@ -349,30 +349,30 @@ body.dark-mode .civic-bottom-nav-item.active {
 .civic-skeleton-image {
     width: 100%;
     height: 180px;
-    border-radius: var(--civic-radius, 8px);
-    margin-bottom: 16px;
+    border-radius: var(--radius-base);
+    margin-bottom: var(--space-4);
 }
 
 .civic-skeleton-button {
     height: 44px;
     width: 120px;
-    border-radius: 6px;
+    border-radius: var(--radius-base);
 }
 
 /* Skeleton Card */
 .civic-skeleton-card {
     background: var(--civic-bg-card, #ffffff);
     border: 1px solid var(--civic-border, #d1d5db);
-    border-radius: var(--civic-radius, 12px);
-    padding: var(--civic-pad, 20px);
-    margin-bottom: 16px;
+    border-radius: var(--radius-md);
+    padding: var(--space-5);
+    margin-bottom: var(--space-4);
 }
 
 .civic-skeleton-card-header {
     display: flex;
     align-items: center;
-    gap: 12px;
-    margin-bottom: 16px;
+    gap: var(--space-3);
+    margin-bottom: var(--space-4);
 }
 
 .civic-skeleton-card-meta {
@@ -386,13 +386,13 @@ body.dark-mode .civic-bottom-nav-item.active {
 /* Skeleton Member Card */
 .civic-skeleton-member {
     text-align: center;
-    padding: 20px;
+    padding: var(--space-5);
 }
 
 .civic-skeleton-member .civic-skeleton-avatar {
-    width: 80px;
-    height: 80px;
-    margin: 0 auto 12px;
+    width: var(--space-20);
+    height: var(--space-20);
+    margin: 0 auto var(--space-3);
 }
 
 /* Dark mode skeletons */
@@ -422,10 +422,10 @@ body.dark-mode .civic-skeleton {
     left: 0;
     top: 50%;
     transform: translateY(-50%) translateX(-100%);
-    width: 40px;
-    height: 40px;
+    width: var(--space-10);
+    height: var(--space-10);
     background: var(--civic-bg-card, #ffffff);
-    border-radius: 0 20px 20px 0;
+    border-radius: 0 var(--space-5) var(--space-5) 0;
     box-shadow: 2px 0 10px rgba(0, 0, 0, 0.15);
     display: flex;
     align-items: center;
@@ -440,8 +440,8 @@ body.dark-mode .civic-skeleton {
 }
 
 .civic-swipe-back-indicator svg {
-    width: 20px;
-    height: 20px;
+    width: var(--space-5);
+    height: var(--space-5);
     fill: var(--civic-brand, #2563eb);
 }
 
@@ -459,7 +459,7 @@ body.dark-mode .civic-skeleton {
     z-index: var(--z-dropdown, 1000);
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: var(--space-2);
     pointer-events: none;
     max-width: 90vw;
 }
@@ -467,14 +467,14 @@ body.dark-mode .civic-skeleton {
 .civic-toast {
     background: var(--civic-bg-footer, #1f2937);
     color: white;
-    padding: 12px 20px;
-    border-radius: 8px;
+    padding: var(--space-3) var(--space-5);
+    border-radius: var(--radius-base);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
     display: flex;
     align-items: center;
-    gap: 10px;
-    font-size: 14px;
-    font-weight: 500;
+    gap: var(--space-2);
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-medium);
     pointer-events: auto;
     opacity: 0;
     transform: translateY(20px);
@@ -543,7 +543,7 @@ body.dark-mode .civic-skeleton {
 @media (max-width: 768px) {
     /* Larger tap targets on cards */
     .civic-card {
-        padding: 20px;
+        padding: var(--space-5);
     }
 
     .civic-card a,
@@ -561,7 +561,7 @@ body.dark-mode .civic-skeleton {
     /* Card actions stack on mobile */
     .civic-card-footer {
         flex-direction: column;
-        gap: 12px;
+        gap: var(--space-3);
     }
 
     .civic-card-footer .civic-btn {
@@ -570,22 +570,22 @@ body.dark-mode .civic-skeleton {
 
     /* Larger touch targets for listing cards */
     .civic-listing-card {
-        padding: 16px;
+        padding: var(--space-4);
     }
 
     .civic-listing-footer {
         flex-direction: column;
         align-items: stretch;
-        gap: 12px;
+        gap: var(--space-3);
     }
 
     /* Member cards touch optimization */
     .civic-member-card {
-        padding: 16px;
+        padding: var(--space-4);
     }
 
     .civic-member-actions {
-        padding-top: 12px;
+        padding-top: var(--space-3);
     }
 
     .civic-member-actions .civic-btn {
@@ -594,21 +594,21 @@ body.dark-mode .civic-skeleton {
 
     /* Avatar size on mobile */
     .civic-avatar {
-        width: 64px;
-        height: 64px;
+        width: var(--space-16);
+        height: var(--space-16);
     }
 
     /* Search bar touch optimization */
     .civic-search-input,
     .civic-filter-select {
         min-height: 48px;
-        font-size: 16px; /* Prevents iOS zoom */
+        font-size: var(--font-size-base); /* Prevents iOS zoom */
     }
 
     /* Filter tabs touch optimization */
     .civic-filter-tab {
         min-height: 44px;
-        padding: 12px 20px;
+        padding: var(--space-3) var(--space-5);
     }
 
     /* Form inputs */
@@ -621,14 +621,14 @@ body.dark-mode .civic-skeleton {
     select,
     textarea {
         min-height: 48px;
-        font-size: 16px; /* Prevents iOS zoom on focus */
-        padding: 12px 16px;
+        font-size: var(--font-size-base); /* Prevents iOS zoom on focus */
+        padding: var(--space-3) var(--space-4);
     }
 
     /* Buttons */
     .civic-btn {
         min-height: 48px;
-        padding: 14px 24px;
+        padding: var(--font-size-sm) var(--space-6);
     }
 
     /* Pagination touch targets */
@@ -639,12 +639,12 @@ body.dark-mode .civic-skeleton {
 
     /* Spacing adjustments */
     .civic-container {
-        padding-left: 16px;
-        padding-right: 16px;
+        padding-left: var(--space-4);
+        padding-right: var(--space-4);
     }
 
     .civic-grid {
-        gap: 16px;
+        gap: var(--space-4);
     }
 }
 
@@ -681,9 +681,9 @@ body.dark-mode .civic-skeleton {
 }
 
 .civic-loading-spinner {
-    width: 48px;
-    height: 48px;
-    border: 4px solid rgba(255, 255, 255, 0.3);
+    width: var(--space-12);
+    height: var(--space-12);
+    border: var(--space-1) solid rgba(255, 255, 255, 0.3);
     border-top-color: white;
     border-radius: 50%;
 }
@@ -696,9 +696,9 @@ body.dark-mode .civic-skeleton {
 
 .civic-loading-text {
     color: white;
-    font-size: 16px;
-    font-weight: 600;
-    margin-top: 16px;
+    font-size: var(--font-size-base);
+    font-weight: var(--font-weight-semibold);
+    margin-top: var(--space-4);
 }
 
 
@@ -709,13 +709,13 @@ body.dark-mode .civic-skeleton {
 
 .civic-pwa-banner {
     position: fixed;
-    bottom: 80px;
-    left: 16px;
-    right: 16px;
+    bottom: var(--space-20);
+    left: var(--space-4);
+    right: var(--space-4);
     background: var(--civic-bg-card, #ffffff);
     border: 1px solid var(--civic-border, #d1d5db);
-    border-radius: 12px;
-    padding: 16px;
+    border-radius: var(--radius-md);
+    padding: var(--space-4);
     box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
     z-index: 9500;
     display: none;
@@ -745,14 +745,14 @@ body.dark-mode .civic-skeleton {
 .civic-pwa-banner-content {
     display: flex;
     align-items: center;
-    gap: 16px;
+    gap: var(--space-4);
 }
 
 .civic-pwa-banner-icon {
-    width: 48px;
-    height: 48px;
+    width: var(--space-12);
+    height: var(--space-12);
     background: var(--civic-brand, #2563eb);
-    border-radius: 12px;
+    border-radius: var(--radius-md);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -770,40 +770,40 @@ body.dark-mode .civic-skeleton {
 }
 
 .civic-pwa-banner-title {
-    font-weight: 700;
-    font-size: 16px;
+    font-weight: var(--font-weight-bold);
+    font-size: var(--font-size-base);
     color: var(--civic-text-main, #1f2937);
-    margin-bottom: 4px;
+    margin-bottom: var(--space-1);
 }
 
 .civic-pwa-banner-desc {
-    font-size: 13px;
+    font-size: var(--font-size-sm);
     color: var(--civic-text-muted, #6b7280);
 }
 
 .civic-pwa-banner-actions {
     display: flex;
-    gap: 8px;
-    margin-top: 12px;
+    gap: var(--space-2);
+    margin-top: var(--space-3);
 }
 
 .civic-pwa-banner-dismiss {
     background: none;
     border: none;
     color: var(--civic-text-muted, #6b7280);
-    font-size: 13px;
+    font-size: var(--font-size-sm);
     cursor: pointer;
-    padding: 8px 12px;
+    padding: var(--space-2) var(--space-3);
 }
 
 .civic-pwa-banner-install {
     background: var(--civic-brand, #2563eb);
     color: white;
     border: none;
-    padding: 10px 20px;
-    border-radius: 6px;
-    font-weight: 600;
-    font-size: 14px;
+    padding: var(--space-2) var(--space-5);
+    border-radius: var(--radius-base);
+    font-weight: var(--font-weight-semibold);
+    font-size: var(--font-size-sm);
     cursor: pointer;
 }
 
@@ -826,9 +826,9 @@ body.dark-mode .civic-pwa-banner {
     background: var(--civic-accent-amber, #d97706);
     color: white;
     text-align: center;
-    padding: 8px 16px;
-    font-size: 13px;
-    font-weight: 600;
+    padding: var(--space-2) var(--space-4);
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-semibold);
     z-index: 10002;
     display: none;
 }
@@ -873,7 +873,7 @@ body.is-offline .civic-header {
 
     .civic-fab {
         bottom: calc(90px + env(safe-area-inset-bottom));
-        right: calc(20px + env(safe-area-inset-right));
+        right: calc(var(--space-5) + env(safe-area-inset-right));
     }
 }
 
@@ -922,15 +922,15 @@ body.is-offline .civic-header {
 .civic-pwa-banner {
     position: fixed;
     bottom: calc(70px + env(safe-area-inset-bottom, 0px));
-    left: 16px;
-    right: 16px;
+    left: var(--space-4);
+    right: var(--space-4);
     max-width: 400px;
     margin: 0 auto;
     background: var(--civic-bg-card, #ffffff);
-    border-radius: 16px;
+    border-radius: var(--radius-lg);
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15), 0 2px 8px rgba(0, 0, 0, 0.1);
     z-index: 9500;
-    padding: 16px;
+    padding: var(--space-4);
     transform: translateY(120%);
     opacity: 0;
     transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.3s ease;
@@ -946,15 +946,15 @@ body.is-offline .civic-header {
 .civic-pwa-banner-content {
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: var(--space-3);
 }
 
 .civic-pwa-banner-icon {
     flex-shrink: 0;
-    width: 48px;
-    height: 48px;
+    width: var(--space-12);
+    height: var(--space-12);
     background: linear-gradient(135deg, var(--civic-brand, #2563eb) 0%, #1d4ed8 100%);
-    border-radius: 12px;
+    border-radius: var(--radius-md);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -973,14 +973,14 @@ body.is-offline .civic-header {
 
 .civic-pwa-banner-text strong {
     display: block;
-    font-size: 15px;
-    font-weight: 700;
+    font-size: var(--font-size-base);
+    font-weight: var(--font-weight-bold);
     color: var(--civic-text, #111827);
-    margin-bottom: 2px;
+    margin-bottom: var(--space-1);
 }
 
 .civic-pwa-banner-text p {
-    font-size: 13px;
+    font-size: var(--font-size-sm);
     color: var(--civic-text-muted, #6b7280);
     margin: 0;
     line-height: 1.4;
@@ -989,18 +989,18 @@ body.is-offline .civic-header {
 .civic-pwa-banner-actions {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: var(--space-2);
     flex-shrink: 0;
 }
 
 .civic-pwa-btn-install {
-    padding: 10px 18px;
+    padding: var(--space-2) 18px;
     background: var(--civic-brand, #2563eb);
     color: #ffffff;
-    font-size: 14px;
-    font-weight: 600;
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-semibold);
     border: none;
-    border-radius: 10px;
+    border-radius: var(--radius-md);
     cursor: pointer;
     transition: background 0.2s ease, transform 0.1s ease;
     min-height: 44px; /* WCAG touch target */
@@ -1027,7 +1027,7 @@ body.is-offline .civic-header {
     padding: 0;
     background: transparent;
     border: none;
-    border-radius: 10px;
+    border-radius: var(--radius-md);
     cursor: pointer;
     color: var(--civic-text-muted, #6b7280);
     display: flex;
@@ -1050,8 +1050,8 @@ body.is-offline .civic-header {
 }
 
 .civic-pwa-btn-dismiss svg {
-    width: 20px;
-    height: 20px;
+    width: var(--space-5);
+    height: var(--space-5);
 }
 
 
@@ -1062,17 +1062,17 @@ body.is-offline .civic-header {
 
 .civic-update-banner {
     position: fixed;
-    top: 16px;
-    left: 16px;
-    right: 16px;
+    top: var(--space-4);
+    left: var(--space-4);
+    right: var(--space-4);
     max-width: 400px;
     margin: 0 auto;
     background: linear-gradient(135deg, #059669 0%, #047857 100%);
     color: #ffffff;
-    border-radius: 12px;
+    border-radius: var(--radius-md);
     box-shadow: 0 8px 24px rgba(5, 150, 105, 0.3);
     z-index: var(--z-dropdown, 1000);
-    padding: 12px 16px;
+    padding: var(--space-3) var(--space-4);
     transform: translateY(-120%);
     opacity: 0;
     transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.3s ease;
@@ -1094,22 +1094,22 @@ body.is-offline .civic-header {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 12px;
+    gap: var(--space-3);
 }
 
 .civic-update-banner-content span {
-    font-size: 14px;
-    font-weight: 500;
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-medium);
 }
 
 .civic-update-btn {
-    padding: 8px 16px;
+    padding: var(--space-2) var(--space-4);
     background: rgba(255, 255, 255, 0.2);
     color: #ffffff;
-    font-size: 13px;
-    font-weight: 600;
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-semibold);
     border: none;
-    border-radius: 8px;
+    border-radius: var(--radius-base);
     cursor: pointer;
     transition: background 0.2s ease;
     min-height: 36px;
@@ -1163,7 +1163,7 @@ body.is-offline .civic-header {
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 16px;
+    padding: var(--space-4);
     opacity: 0;
     visibility: hidden;
     transition: opacity 0.3s ease, visibility 0.3s ease;
@@ -1185,8 +1185,8 @@ body.is-offline .civic-header {
 .civic-webauthn-modal-content {
     position: relative;
     background: var(--civic-bg-card, #ffffff);
-    border-radius: 20px;
-    padding: 32px 24px;
+    border-radius: var(--radius-xl);
+    padding: var(--space-8) var(--space-6);
     max-width: 340px;
     width: 100%;
     text-align: center;
@@ -1200,9 +1200,9 @@ body.is-offline .civic-header {
 }
 
 .civic-webauthn-modal-icon {
-    width: 80px;
-    height: 80px;
-    margin: 0 auto 20px;
+    width: var(--space-20);
+    height: var(--space-20);
+    margin: 0 auto var(--space-5);
     background: linear-gradient(135deg, var(--civic-brand, #2563eb) 0%, #1d4ed8 100%);
     border-radius: 50%;
     display: flex;
@@ -1212,35 +1212,35 @@ body.is-offline .civic-header {
 }
 
 .civic-webauthn-modal-icon svg {
-    width: 40px;
-    height: 40px;
+    width: var(--space-10);
+    height: var(--space-10);
 }
 
 .civic-webauthn-modal-content h2 {
-    font-size: 20px;
-    font-weight: 700;
+    font-size: var(--font-size-xl);
+    font-weight: var(--font-weight-bold);
     color: var(--civic-text, #111827);
-    margin: 0 0 8px;
+    margin: 0 0 var(--space-2);
 }
 
 .civic-webauthn-modal-content p {
-    font-size: 14px;
+    font-size: var(--font-size-sm);
     color: var(--civic-text-muted, #6b7280);
-    margin: 0 0 24px;
+    margin: 0 0 var(--space-6);
     line-height: 1.5;
 }
 
 .civic-webauthn-modal-actions {
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: var(--space-3);
 }
 
 .civic-webauthn-modal-actions .civic-btn {
-    padding: 14px 24px;
-    font-size: 15px;
-    font-weight: 600;
-    border-radius: 12px;
+    padding: var(--font-size-sm) var(--space-6);
+    font-size: var(--font-size-base);
+    font-weight: var(--font-weight-semibold);
+    border-radius: var(--radius-md);
     border: none;
     cursor: pointer;
     min-height: 48px;
@@ -1282,14 +1282,14 @@ body.is-offline .civic-header {
 .civic-webauthn-alert {
     position: fixed;
     bottom: calc(90px + env(safe-area-inset-bottom, 0px));
-    left: 16px;
-    right: 16px;
+    left: var(--space-4);
+    right: var(--space-4);
     max-width: 400px;
     margin: 0 auto;
-    padding: 14px 20px;
-    border-radius: 12px;
-    font-size: 14px;
-    font-weight: 500;
+    padding: var(--font-size-sm) var(--space-5);
+    border-radius: var(--radius-md);
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-medium);
     text-align: center;
     z-index: 10001;
     transform: translateY(20px);
@@ -1321,14 +1321,14 @@ body.is-offline .civic-header {
 /* Loading Spinner */
 .civic-spinner {
     display: inline-block;
-    width: 16px;
-    height: 16px;
+    width: var(--space-4);
+    height: var(--space-4);
     border: 2px solid rgba(255, 255, 255, 0.3);
     border-top-color: #ffffff;
     border-radius: 50%;
     animation: civic-spin 0.8s linear infinite;
     vertical-align: middle;
-    margin-right: 8px;
+    margin-right: var(--space-2);
 }
 
 @keyframes civic-spin {
@@ -1341,13 +1341,13 @@ body.is-offline .civic-header {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    gap: 10px;
-    padding: 14px 24px;
+    gap: var(--space-2);
+    padding: var(--font-size-sm) var(--space-6);
     background: var(--civic-bg-card, #ffffff);
-    border: 2px solid var(--civic-border, #d1d5db);
-    border-radius: 12px;
-    font-size: 15px;
-    font-weight: 600;
+    border: 2px solid var(--color-gray-300);
+    border-radius: var(--radius-md);
+    font-size: var(--font-size-base);
+    font-weight: var(--font-weight-semibold);
     color: var(--civic-text, #111827);
     cursor: pointer;
     min-height: 52px;
@@ -1370,8 +1370,8 @@ body.is-offline .civic-header {
 }
 
 .civic-biometric-btn svg {
-    width: 24px;
-    height: 24px;
+    width: var(--space-6);
+    height: var(--space-6);
 }
 
 /* Hide biometric options when not supported */
@@ -1385,10 +1385,10 @@ body:not(.biometrics-available) .civic-biometric-btn {
 .civic-badge {
     display: inline-flex;
     align-items: center;
-    padding: 4px 10px;
-    font-size: 12px;
-    font-weight: 600;
-    border-radius: 9999px;
+    padding: var(--space-1) var(--space-2);
+    font-size: var(--font-size-xs);
+    font-weight: var(--font-weight-semibold);
+    border-radius: var(--radius-full);
     text-transform: uppercase;
     letter-spacing: 0.03em;
 }

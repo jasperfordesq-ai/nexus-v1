@@ -6,14 +6,14 @@
 /* Page Background with Ambient Effects */
 .holo-create-page {
     min-height: 100vh;
-    padding: 180px 20px 60px;
+    padding: 180px var(--space-5) var(--space-16);
     position: relative;
     overflow: hidden;
 }
 
 @media (max-width: 900px) {
     .holo-create-page {
-        padding: 20px 16px 120px;
+        padding: var(--space-5) var(--space-4) 120px;
     }
 }
 
@@ -113,19 +113,19 @@
 /* Page Header */
 .holo-page-header {
     text-align: center;
-    margin-bottom: 40px;
+    margin-bottom: var(--space-10);
 }
 
 .holo-page-icon {
     width: 80px;
     height: 80px;
-    margin: 0 auto 20px;
-    background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #a855f7 100%);
-    border-radius: 24px;
+    margin: 0 auto var(--space-5);
+    background: linear-gradient(135deg, var(--color-primary-500) 0%, var(--color-purple-500) 50%, var(--color-purple-400) 100%);
+    border-radius: var(--radius-2xl);
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 2.5rem;
+    font-size: var(--font-size-4xl);
     box-shadow:
         0 20px 40px rgba(99, 102, 241, 0.3),
         0 0 60px rgba(99, 102, 241, 0.2);
@@ -138,10 +138,10 @@
 }
 
 .holo-page-title {
-    font-size: 2.5rem;
+    font-size: var(--font-size-4xl);
     font-weight: 800;
-    margin: 0 0 12px;
-    background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #ec4899 100%);
+    margin: 0 0 var(--space-3);
+    background: linear-gradient(135deg, var(--color-primary-500) 0%, var(--color-purple-500) 50%, var(--color-pink-500) 100%);
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
@@ -149,7 +149,7 @@
 }
 
 .holo-page-subtitle {
-    font-size: 1.1rem;
+    font-size: var(--font-size-lg);
     color: var(--htb-text-muted, #64748b);
     margin: 0;
 }
@@ -159,9 +159,9 @@
     background: rgba(255, 255, 255, 0.7);
     backdrop-filter: blur(40px) saturate(180%);
     -webkit-backdrop-filter: blur(40px) saturate(180%);
-    border-radius: 32px;
+    border-radius: var(--space-8);
     border: 1px solid rgba(255, 255, 255, 0.5);
-    padding: 48px 40px;
+    padding: var(--space-12) var(--space-10);
     box-shadow:
         0 25px 50px rgba(0, 0, 0, 0.08),
         0 0 100px rgba(99, 102, 241, 0.08),
@@ -204,19 +204,19 @@
 
 @media (max-width: 768px) {
     .holo-glass-card {
-        padding: 32px 24px;
-        border-radius: 24px;
+        padding: var(--space-8) var(--space-6);
+        border-radius: var(--radius-2xl);
     }
 
     .holo-page-title {
-        font-size: 1.8rem;
+        font-size: var(--font-size-3xl);
     }
 
     .holo-page-icon {
         width: 64px;
         height: 64px;
-        font-size: 2rem;
-        border-radius: 18px;
+        font-size: var(--font-size-2xl);
+        border-radius: 18px; /* Custom value for icon */
     }
 }
 
@@ -224,21 +224,21 @@
 .holo-type-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 16px;
-    margin-bottom: 32px;
+    gap: var(--space-4);
+    margin-bottom: var(--space-8);
 }
 
 @media (max-width: 600px) {
     .holo-type-grid {
         grid-template-columns: 1fr;
-        gap: 12px;
+        gap: var(--space-3);
     }
 }
 
 .holo-type-card {
     position: relative;
-    padding: 28px 24px;
-    border-radius: 20px;
+    padding: 28px var(--space-6); /* 28px = custom spacing */
+    border-radius: var(--radius-xl);
     text-align: center;
     cursor: pointer;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -258,7 +258,7 @@
 
 .holo-type-card.selected-offer {
     background: linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, rgba(6, 182, 212, 0.1) 100%);
-    border-color: #10b981;
+    border-color: var(--color-success);
     box-shadow:
         0 12px 30px rgba(16, 185, 129, 0.2),
         inset 0 0 30px rgba(16, 185, 129, 0.05);
@@ -266,7 +266,7 @@
 
 .holo-type-card.selected-request {
     background: linear-gradient(135deg, rgba(249, 115, 22, 0.1) 0%, rgba(236, 72, 153, 0.1) 100%);
-    border-color: #f97316;
+    border-color: var(--color-orange-500);
     box-shadow:
         0 12px 30px rgba(249, 115, 22, 0.2),
         inset 0 0 30px rgba(249, 115, 22, 0.05);
@@ -274,13 +274,13 @@
 
 .holo-type-icon {
     font-size: 3rem;
-    margin-bottom: 12px;
+    margin-bottom: var(--space-3);
     display: block;
 }
 
 .holo-type-label {
     font-weight: 700;
-    font-size: 1.1rem;
+    font-size: var(--font-size-lg);
     color: var(--htb-text-main, #1e293b);
 }
 
@@ -289,26 +289,26 @@
 }
 
 .holo-type-desc {
-    font-size: 0.85rem;
+    font-size: var(--font-size-sm);
     color: var(--htb-text-muted, #64748b);
-    margin-top: 4px;
+    margin-top: var(--space-1);
 }
 
 /* Section Headers */
 .holo-section {
-    margin-bottom: 28px;
+    margin-bottom: 28px; /* Custom value between space-6 and space-8 */
 }
 
 .holo-section-title {
-    font-size: 0.8rem;
+    font-size: var(--font-size-xs);
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 1px;
     color: var(--htb-text-muted, #64748b);
-    margin-bottom: 16px;
+    margin-bottom: var(--space-4);
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 10px; /* Custom value between space-2 and space-3 */
 }
 
 .holo-section-title::after {
@@ -333,9 +333,9 @@
 
 .holo-label-optional {
     font-weight: 400;
-    font-size: 0.8rem;
+    font-size: var(--font-size-xs);
     color: var(--htb-text-muted, #94a3b8);
-    margin-left: 6px;
+    margin-left: 6px; /* Custom value */
 }
 
 /* Input Fields */
@@ -343,9 +343,9 @@
 .holo-select,
 .holo-textarea {
     width: 100%;
-    padding: 16px 20px;
-    border-radius: 16px;
-    font-size: 1rem;
+    padding: var(--space-4) var(--space-5);
+    border-radius: var(--radius-lg);
+    font-size: var(--font-size-base);
     font-family: inherit;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     border: 2px solid rgba(0, 0, 0, 0.06);
@@ -365,7 +365,7 @@
 .holo-input:focus,
 .holo-select:focus,
 .holo-textarea:focus {
-    border-color: #6366f1;
+    border-color: var(--color-primary-500);
     background: rgba(255, 255, 255, 0.9);
     box-shadow:
         0 0 0 4px rgba(99, 102, 241, 0.1),
@@ -376,7 +376,7 @@
 [data-theme="dark"] .holo-select:focus,
 [data-theme="dark"] .holo-textarea:focus {
     background: rgba(0, 0, 0, 0.3);
-    border-color: #818cf8;
+    border-color: var(--color-primary-400);
     box-shadow:
         0 0 0 4px rgba(99, 102, 241, 0.15),
         0 8px 20px rgba(99, 102, 241, 0.15);
@@ -398,20 +398,20 @@
     appearance: none;
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
     background-repeat: no-repeat;
-    background-position: right 16px center;
+    background-position: right var(--space-4) center;
     background-size: 18px;
-    padding-right: 48px;
+    padding-right: var(--space-12);
     cursor: pointer;
 }
 
 /* Location Info Box */
 .holo-location-box {
-    padding: 20px 24px;
-    border-radius: 16px;
+    padding: var(--space-5) var(--space-6);
+    border-radius: var(--radius-lg);
     display: flex;
     align-items: flex-start;
-    gap: 16px;
-    margin-bottom: 28px;
+    gap: var(--space-4);
+    margin-bottom: 28px; /* Custom value between space-6 and space-8 */
 }
 
 .holo-location-box.has-location {
@@ -427,21 +427,21 @@
 .holo-location-icon {
     width: 48px;
     height: 48px;
-    border-radius: 14px;
+    border-radius: 14px; /* Custom value between radius-md and radius-lg */
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 1.3rem;
+    font-size: var(--font-size-xl);
     flex-shrink: 0;
 }
 
 .has-location .holo-location-icon {
-    background: linear-gradient(135deg, #06b6d4, #10b981);
+    background: linear-gradient(135deg, var(--color-cyan-500), var(--color-success));
     color: white;
 }
 
 .no-location .holo-location-icon {
-    background: linear-gradient(135deg, #f59e0b, #ef4444);
+    background: linear-gradient(135deg, var(--color-warning), var(--color-danger));
     color: white;
 }
 
@@ -453,7 +453,7 @@
     font-weight: 700;
     font-size: 0.95rem;
     color: var(--htb-text-main, #1e293b);
-    margin-bottom: 4px;
+    margin-bottom: var(--space-1);
 }
 
 [data-theme="dark"] .holo-location-title {
@@ -467,7 +467,7 @@
 }
 
 .holo-location-text a {
-    color: #6366f1;
+    color: var(--color-primary-500);
     font-weight: 600;
     text-decoration: none;
 }
@@ -480,8 +480,8 @@
 .holo-file-upload {
     position: relative;
     border: 2px dashed rgba(99, 102, 241, 0.3);
-    border-radius: 16px;
-    padding: 32px 24px;
+    border-radius: var(--radius-lg);
+    padding: var(--space-8) var(--space-6);
     text-align: center;
     cursor: pointer;
     transition: all 0.3s ease;
@@ -489,7 +489,7 @@
 }
 
 .holo-file-upload:hover {
-    border-color: #6366f1;
+    border-color: var(--color-primary-500);
     background: rgba(99, 102, 241, 0.05);
 }
 
@@ -504,15 +504,15 @@
 }
 
 .holo-file-icon {
-    font-size: 2.5rem;
-    color: #6366f1;
-    margin-bottom: 12px;
+    font-size: var(--font-size-4xl);
+    color: var(--color-primary-500);
+    margin-bottom: var(--space-3);
 }
 
 .holo-file-text {
     font-weight: 600;
     color: var(--htb-text-main, #1e293b);
-    margin-bottom: 4px;
+    margin-bottom: var(--space-1);
 }
 
 [data-theme="dark"] .holo-file-text {
@@ -520,7 +520,7 @@
 }
 
 .holo-file-hint {
-    font-size: 0.85rem;
+    font-size: var(--font-size-sm);
     color: var(--htb-text-muted, #94a3b8);
 }
 
@@ -528,9 +528,9 @@
 .holo-attributes-box {
     background: rgba(0, 0, 0, 0.02);
     border: 1px solid rgba(0, 0, 0, 0.04);
-    border-radius: 20px;
-    padding: 24px;
-    margin-bottom: 28px;
+    border-radius: var(--radius-xl);
+    padding: var(--space-6);
+    margin-bottom: 28px; /* Custom value between space-6 and space-8 */
 }
 
 [data-theme="dark"] .holo-attributes-box {
@@ -541,15 +541,15 @@
 .holo-attributes-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-    gap: 12px;
+    gap: var(--space-3);
 }
 
 .holo-attribute-item {
     display: flex;
     align-items: center;
-    gap: 12px;
-    padding: 12px 16px;
-    border-radius: 12px;
+    gap: var(--space-3);
+    padding: var(--space-3) var(--space-4);
+    border-radius: var(--radius-md);
     cursor: pointer;
     transition: all 0.2s ease;
     background: rgba(255, 255, 255, 0.5);
@@ -567,7 +567,7 @@
 .holo-attribute-item input[type="checkbox"] {
     width: 20px;
     height: 20px;
-    accent-color: #6366f1;
+    accent-color: var(--color-primary-500);
     margin: 0;
     flex-shrink: 0;
 }
@@ -583,9 +583,9 @@
 
 /* Federation Section */
 .holo-federation-section {
-    margin-bottom: 32px;
-    padding: 24px;
-    border-radius: 20px;
+    margin-bottom: var(--space-8);
+    padding: var(--space-6);
+    border-radius: var(--radius-xl);
     background: linear-gradient(135deg, rgba(139, 92, 246, 0.05) 0%, rgba(99, 102, 241, 0.03) 100%);
     border: 1px solid rgba(139, 92, 246, 0.15);
 }
@@ -598,14 +598,14 @@
 .holo-federation-options {
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: var(--space-3);
 }
 
 .holo-radio-card {
     display: flex;
     align-items: flex-start;
-    padding: 16px;
-    border-radius: 12px;
+    padding: var(--space-4);
+    border-radius: var(--radius-md);
     background: rgba(255, 255, 255, 0.6);
     border: 2px solid transparent;
     cursor: pointer;
@@ -627,7 +627,7 @@
 
 .holo-radio-card:has(input:checked) {
     background: rgba(139, 92, 246, 0.1);
-    border-color: #8b5cf6;
+    border-color: var(--color-purple-500);
 }
 
 [data-theme="dark"] .holo-radio-card:has(input:checked) {
@@ -635,9 +635,9 @@
 }
 
 .holo-radio-card input[type="radio"] {
-    margin-right: 12px;
-    margin-top: 4px;
-    accent-color: #8b5cf6;
+    margin-right: var(--space-3);
+    margin-top: var(--space-1);
+    accent-color: var(--color-purple-500);
     width: 18px;
     height: 18px;
 }
@@ -645,7 +645,7 @@
 .radio-content {
     display: flex;
     flex-direction: column;
-    gap: 4px;
+    gap: var(--space-1);
     flex: 1;
 }
 
@@ -664,7 +664,7 @@
 }
 
 .radio-desc {
-    font-size: 0.85rem;
+    font-size: var(--font-size-sm);
     color: var(--htb-text-secondary, #6b7280);
     line-height: 1.4;
 }
@@ -676,23 +676,23 @@
 .holo-federation-optin-notice {
     display: flex;
     align-items: flex-start;
-    gap: 12px;
-    padding: 16px;
-    border-radius: 12px;
+    gap: var(--space-3);
+    padding: var(--space-4);
+    border-radius: var(--radius-md);
     background: rgba(245, 158, 11, 0.1);
     border: 1px solid rgba(245, 158, 11, 0.2);
 }
 
 .holo-federation-optin-notice i {
-    color: #f59e0b;
-    font-size: 1.25rem;
+    color: var(--color-warning);
+    font-size: var(--font-size-xl);
     margin-top: 2px;
 }
 
 .holo-federation-optin-notice strong {
     display: block;
     color: var(--htb-text-main, #1f2937);
-    margin-bottom: 4px;
+    margin-bottom: var(--space-1);
 }
 
 [data-theme="dark"] .holo-federation-optin-notice strong {
@@ -710,16 +710,16 @@
 }
 
 .holo-federation-optin-notice a {
-    color: #8b5cf6;
+    color: var(--color-purple-500);
     text-decoration: underline;
 }
 
 /* SDG Section */
 .holo-sdg-accordion {
     border: 1px solid rgba(0, 0, 0, 0.06);
-    border-radius: 20px;
+    border-radius: var(--radius-xl);
     overflow: hidden;
-    margin-bottom: 32px;
+    margin-bottom: var(--space-8);
     background: rgba(0, 0, 0, 0.01);
 }
 
@@ -729,7 +729,7 @@
 }
 
 .holo-sdg-header {
-    padding: 20px 24px;
+    padding: var(--space-5) var(--space-6);
     cursor: pointer;
     display: flex;
     align-items: center;
@@ -757,7 +757,7 @@
 }
 
 .holo-sdg-content {
-    padding: 0 24px 24px;
+    padding: 0 var(--space-6) var(--space-6);
     border-top: 1px solid rgba(0, 0, 0, 0.04);
 }
 
@@ -768,21 +768,21 @@
 .holo-sdg-intro {
     font-size: 0.9rem;
     color: var(--htb-text-muted, #64748b);
-    margin: 16px 0;
+    margin: var(--space-4) 0;
 }
 
 .holo-sdg-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-    gap: 10px;
+    gap: 10px; /* Custom value between space-2 and space-3 */
 }
 
 .holo-sdg-card {
     display: flex;
     align-items: center;
-    gap: 10px;
-    padding: 12px 14px;
-    border-radius: 12px;
+    gap: 10px; /* Custom value between space-2 and space-3 */
+    padding: var(--space-3) 14px;
+    border-radius: var(--radius-md);
     cursor: pointer;
     transition: all 0.2s ease;
     border: 2px solid rgba(0, 0, 0, 0.06);
@@ -804,11 +804,11 @@
 }
 
 .holo-sdg-card .sdg-icon {
-    font-size: 1.3rem;
+    font-size: var(--font-size-xl);
 }
 
 .holo-sdg-card .sdg-label {
-    font-size: 0.8rem;
+    font-size: var(--font-size-xs);
     font-weight: 600;
     color: var(--htb-text-main, #374151);
 }
@@ -820,17 +820,17 @@
 /* Submit Button */
 .holo-submit-btn {
     width: 100%;
-    padding: 20px 32px;
-    font-size: 1.1rem;
+    padding: var(--space-5) var(--space-8);
+    font-size: var(--font-size-lg);
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 1px;
     border: none;
-    border-radius: 16px;
+    border-radius: var(--radius-lg);
     cursor: pointer;
     position: relative;
     overflow: hidden;
-    background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #a855f7 100%);
+    background: linear-gradient(135deg, var(--color-primary-500) 0%, var(--color-purple-500) 50%, var(--color-purple-400) 100%);
     color: white;
     box-shadow:
         0 12px 30px rgba(99, 102, 241, 0.35),
@@ -885,7 +885,7 @@
     border-top-color: white;
     border-radius: 50%;
     animation: spin 0.8s linear infinite;
-    margin-left: 12px;
+    margin-left: var(--space-3);
 }
 
 @keyframes spin {
@@ -907,6 +907,6 @@
 .holo-textarea:focus-visible,
 .holo-submit-btn:focus-visible,
 .holo-type-card:focus-visible {
-    outline: 3px solid #6366f1;
+    outline: 3px solid var(--color-primary-500);
     outline-offset: 2px;
 }

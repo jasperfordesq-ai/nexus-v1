@@ -1,7 +1,7 @@
 /* ============================================
    CIVICONE MINI MODULES
    Polls, Goals, Resources - WCAG 2.1 AA Compliant
-   Updated 2026-01-20: GOV.UK design tokens
+   Updated 2026-01-21: Design tokens migration
    ============================================ */
 
 /* --------------------------------------------
@@ -16,7 +16,7 @@
     /* Focus Ring */
     --civic-mini-focus-ring: #FFDD00;        /* GOV.UK focus */
     --civic-mini-focus-text: #0B0C0C;
-    --civic-mini-focus-offset: 3px;
+    --civic-mini-focus-offset: var(--space-1);
 
     /* Touch Target */
     --civic-mini-touch-min: 44px;
@@ -44,10 +44,10 @@
     justify-content: space-between;
     align-items: center;
     border-bottom: 4px solid var(--civic-mini-border);
-    padding-bottom: 10px;
-    margin-bottom: 30px;
+    padding-bottom: var(--space-3);
+    margin-bottom: var(--space-8);
     flex-wrap: wrap;
-    gap: 12px;
+    gap: var(--space-3);
 }
 
 .civic-module-header h2 {
@@ -74,7 +74,7 @@
    -------------------------------------------- */
 .civic-module-grid {
     display: grid;
-    gap: 20px;
+    gap: var(--space-5);
 }
 
 .civic-module-grid--cards {
@@ -87,22 +87,22 @@
    -------------------------------------------- */
 .civic-module-empty {
     text-align: center;
-    padding: 40px;
+    padding: var(--space-10);
 }
 
 .civic-module-empty-icon {
-    font-size: 2.5rem;
-    margin-bottom: 10px;
+    font-size: var(--font-size-4xl);
+    margin-bottom: var(--space-3);
 }
 
 .civic-module-empty-title {
-    font-size: 1.5rem;
-    margin-bottom: 10px;
+    font-size: var(--font-size-2xl);
+    margin-bottom: var(--space-3);
     color: var(--civic-mini-text-primary);
 }
 
 .civic-module-empty-text {
-    margin-bottom: 20px;
+    margin-bottom: var(--space-5);
     color: var(--civic-mini-text-secondary);
 }
 
@@ -113,7 +113,7 @@
 .civic-poll-card {
     background: var(--civic-bg-card, #fff);
     border: 2px solid var(--civic-mini-border);
-    padding: 24px;
+    padding: var(--space-6);
 }
 
 [data-theme="dark"] .civic-poll-card {
@@ -126,7 +126,7 @@
 }
 
 .civic-poll-status {
-    margin-bottom: 16px;
+    margin-bottom: var(--space-4);
     color: var(--civic-mini-text-secondary);
 }
 
@@ -154,7 +154,7 @@
 .civic-goal-card {
     background: var(--civic-bg-card, #fff);
     border: 2px solid var(--civic-mini-border);
-    padding: 24px;
+    padding: var(--space-6);
 }
 
 [data-theme="dark"] .civic-goal-card {
@@ -168,9 +168,9 @@
 
 .civic-goal-progress-bar {
     background: #eee;
-    height: 12px;
-    border-radius: 6px;
-    margin: 15px 0;
+    height: var(--space-3);
+    border-radius: var(--radius-base);
+    margin: var(--space-4) 0;
     border: 1px solid #999;
     overflow: hidden;
 }
@@ -183,7 +183,7 @@
 .civic-goal-progress-fill {
     background: var(--civic-mini-border);
     height: 100%;
-    transition: width 0.3s ease;
+    transition: width var(--transition-base);
 }
 
 [data-theme="dark"] .civic-goal-progress-fill {
@@ -191,9 +191,9 @@
 }
 
 .civic-goal-percent {
-    font-weight: 600;
+    font-weight: var(--font-weight-semibold);
     color: var(--civic-mini-text-primary);
-    margin-bottom: 16px;
+    margin-bottom: var(--space-4);
 }
 
 .civic-goal-btn-outline {
@@ -201,10 +201,10 @@
     color: var(--civic-mini-border);
     border: 2px solid var(--civic-mini-border);
     min-height: var(--civic-mini-touch-min);
-    padding: 10px 20px;
-    font-weight: 600;
+    padding: var(--space-3) var(--space-5);
+    font-weight: var(--font-weight-semibold);
     cursor: pointer;
-    transition: all 0.2s;
+    transition: all var(--transition-fast);
 }
 
 [data-theme="dark"] .civic-goal-btn-outline {
@@ -233,7 +233,7 @@
 .civic-resource-card {
     background: var(--civic-bg-card, #fff);
     border: 2px solid var(--civic-mini-border);
-    padding: 24px;
+    padding: var(--space-6);
     display: flex;
     flex-direction: column;
     justify-content: space-between;
@@ -247,20 +247,20 @@
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
-    margin-bottom: 10px;
+    margin-bottom: var(--space-3);
 }
 
 .civic-resource-icon {
-    font-size: 2.5rem;
+    font-size: var(--font-size-4xl);
 }
 
 .civic-resource-size {
     background: var(--civic-mini-border);
     color: #fff;
-    padding: 4px 10px;
-    font-weight: bold;
-    border-radius: 4px;
-    font-size: 0.8rem;
+    padding: var(--space-1) var(--space-3);
+    font-weight: var(--font-weight-bold);
+    border-radius: var(--radius-sm);
+    font-size: var(--font-size-xs);
 }
 
 [data-theme="dark"] .civic-resource-size {
@@ -268,24 +268,24 @@
 }
 
 .civic-resource-card h3 {
-    margin: 0 0 10px;
-    font-size: 1.3rem;
+    margin: 0 0 var(--space-3);
+    font-size: var(--font-size-xl);
     color: var(--civic-mini-text-primary);
 }
 
 .civic-resource-description {
-    font-size: 1rem;
-    line-height: 1.5;
-    margin-bottom: 10px;
+    font-size: var(--font-size-base);
+    line-height: var(--line-height-normal);
+    margin-bottom: var(--space-3);
     color: var(--civic-mini-text-secondary);
 }
 
 .civic-resource-meta {
-    font-size: 0.85rem;
+    font-size: var(--font-size-sm);
     border-top: 1px solid var(--civic-mini-border-light);
-    padding-top: 10px;
+    padding-top: var(--space-3);
     margin-top: auto;
-    margin-bottom: 15px;
+    margin-bottom: var(--space-4);
     color: var(--civic-mini-text-muted);
 }
 

@@ -10,12 +10,12 @@
 
 /* Create group button spacing */
 .civicone--govuk .groups-header .civicone-button {
-    margin-top: 20px;
+    margin-top: var(--space-5);
 }
 
 /* Button alignment in header actions */
 .civicone--govuk .civicone-grid-column-one-third .civicone-button {
-    margin-top: 0;
+    margin-top: var(--space-0);
 }
 
 /* WCAG AA Primary Button Override - Load order fix */
@@ -37,7 +37,7 @@ a.civicone-button.civicone-button--primary:hover {
 .civicone-width-container .civicone-button.civicone-button--primary:focus,
 a.civicone-button.civicone-button--primary:focus {
     outline: 3px solid #ffdd00 !important;
-    outline-offset: 0 !important;
+    outline-offset: var(--space-0) !important;
     background-color: #ffdd00 !important;
     color: #0b0c0c !important;
     border-color: #0b0c0c !important;

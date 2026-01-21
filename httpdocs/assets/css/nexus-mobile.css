@@ -70,9 +70,9 @@
     background: rgba(255, 255, 255, 0.95);
     -webkit-backdrop-filter: blur(20px);
     backdrop-filter: blur(20px);
-    border-top: 1px solid rgba(0, 0, 0, 0.05);
-    padding: 8px 0;
-    padding-bottom: max(8px, env(safe-area-inset-bottom));
+    border-top: 1px solid var(--border-subtle);
+    padding: var(--space-2) 0;
+    padding-bottom: max(var(--space-2), env(safe-area-inset-bottom));
     box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.08);
 }
 
@@ -93,24 +93,24 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 4px;
-    padding: 8px 16px;
+    gap: var(--space-1);
+    padding: var(--space-2) var(--space-4);
     text-decoration: none;
-    color: #64748b;
-    font-size: 0.7rem;
+    color: var(--color-slate-500);
+    font-size: var(--font-size-xs);
     font-weight: 600;
-    transition: all 0.2s;
+    transition: all var(--transition-fast);
     position: relative;
     -webkit-tap-highlight-color: transparent;
 }
 
 .nexus-bottom-nav-item i {
-    font-size: 1.25rem;
-    transition: all 0.2s;
+    font-size: var(--font-size-xl);
+    transition: all var(--transition-fast);
 }
 
 .nexus-bottom-nav-item.active {
-    color: #6366f1;
+    color: var(--color-primary-500);
 }
 
 .nexus-bottom-nav-item.active i {
@@ -118,29 +118,29 @@
 }
 
 [data-theme="dark"] .nexus-bottom-nav-item {
-    color: #94a3b8;
+    color: var(--color-slate-400);
 }
 
 [data-theme="dark"] .nexus-bottom-nav-item.active {
-    color: #818cf8;
+    color: var(--color-primary-400);
 }
 
 /* Badge for notifications */
 .nexus-bottom-nav-badge {
     position: absolute;
     top: 2px;
-    right: 8px;
+    right: var(--space-2);
     min-width: 18px;
     height: 18px;
-    background: #ef4444;
+    background: var(--color-danger);
     color: white;
-    font-size: 0.65rem;
+    font-size: var(--font-size-xs);
     font-weight: 700;
-    border-radius: 9px;
+    border-radius: var(--radius-base);
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 0 5px;
+    padding: 0 var(--space-1);
 }
 
 /* Ripple effect */
@@ -150,8 +150,8 @@
     inset: 0;
     background: currentColor;
     opacity: 0;
-    border-radius: 12px;
-    transition: opacity 0.2s;
+    border-radius: var(--radius-md);
+    transition: opacity var(--transition-fast);
 }
 
 .nexus-bottom-nav-item:active::after {
@@ -197,7 +197,7 @@
             rgba(200, 200, 200, 0.2) 100%);
     background-size: 200% 100%;
     animation: skeleton-shimmer 1.5s ease-in-out infinite;
-    border-radius: 8px;
+    border-radius: var(--radius-base);
 }
 
 [data-theme="dark"] .skeleton {
@@ -221,7 +221,7 @@
 /* Skeleton shapes */
 .skeleton-text {
     height: 1em;
-    margin-bottom: 0.5em;
+    margin-bottom: var(--space-2);
 }
 
 .skeleton-text:last-child {
@@ -231,37 +231,37 @@
 .skeleton-title {
     height: 1.5em;
     width: 60%;
-    margin-bottom: 1em;
+    margin-bottom: var(--space-4);
 }
 
 .skeleton-avatar {
-    width: 48px;
-    height: 48px;
+    width: var(--space-12);
+    height: var(--space-12);
     border-radius: 50%;
 }
 
 .skeleton-card {
     height: 120px;
-    border-radius: 16px;
+    border-radius: var(--radius-lg);
 }
 
 .skeleton-image {
     width: 100%;
     aspect-ratio: 16/9;
-    border-radius: 12px;
+    border-radius: var(--radius-md);
 }
 
 .skeleton-button {
     height: 44px;
     width: 120px;
-    border-radius: 10px;
+    border-radius: var(--radius-md);
 }
 
 /* Skeleton card component */
 .skeleton-card-full {
-    padding: 20px;
+    padding: var(--space-5);
     background: rgba(255, 255, 255, 0.8);
-    border-radius: 16px;
+    border-radius: var(--radius-lg);
     border: 1px solid rgba(0, 0, 0, 0.05);
 }
 
@@ -273,14 +273,14 @@
 .skeleton-card-full .skeleton-header {
     display: flex;
     align-items: center;
-    gap: 12px;
-    margin-bottom: 16px;
+    gap: var(--space-3);
+    margin-bottom: var(--space-4);
 }
 
 .skeleton-card-full .skeleton-body {
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: var(--space-2);
 }
 
 
@@ -318,12 +318,12 @@
         0 0 0 1px rgba(0, 0, 0, 0.05);
     z-index: var(--z-modal, 1400);
     pointer-events: none;
-    transition: opacity 0.15s ease, transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: opacity var(--transition-fast) var(--ease-in-out), transform var(--transition-fast) var(--ease-in-out);
     will-change: transform, opacity;
 }
 
 [data-theme="dark"] .nexus-swipe-back-indicator {
-    background: #1e293b;
+    background: var(--color-slate-800);
     box-shadow:
         0 4px 20px rgba(0, 0, 0, 0.3),
         0 0 0 1px rgba(255, 255, 255, 0.1);
@@ -334,7 +334,7 @@
 }
 
 .nexus-swipe-back-indicator.ready {
-    background: linear-gradient(135deg, #6366f1, #8b5cf6);
+    background: linear-gradient(135deg, var(--color-primary-500), var(--color-purple-500));
     box-shadow:
         0 4px 24px rgba(99, 102, 241, 0.4),
         0 0 0 4px rgba(99, 102, 241, 0.1);
@@ -345,18 +345,18 @@
 }
 
 .nexus-swipe-back-indicator.navigating {
-    background: linear-gradient(135deg, #6366f1, #8b5cf6);
-    transition: transform 0.15s ease-out;
+    background: linear-gradient(135deg, var(--color-primary-500), var(--color-purple-500));
+    transition: transform var(--transition-fast) var(--ease-out);
 }
 
 .nexus-swipe-back-indicator i {
-    color: #6366f1;
-    font-size: 1.1rem;
-    transition: color 0.15s ease;
+    color: var(--color-primary-500);
+    font-size: var(--font-size-lg);
+    transition: color var(--transition-fast) var(--ease-in-out);
 }
 
 [data-theme="dark"] .nexus-swipe-back-indicator i {
-    color: #818cf8;
+    color: var(--color-primary-400);
 }
 
 /* Swipe-back page overlay */
@@ -367,7 +367,7 @@
     opacity: 0;
     z-index: var(--z-modal-backdrop, 1300);
     pointer-events: none;
-    transition: opacity 0.15s ease;
+    transition: opacity var(--transition-fast) var(--ease-in-out);
 }
 
 .nexus-swipe-back-overlay.visible {
@@ -377,7 +377,7 @@
 /* Reduced motion */
 @media (prefers-reduced-motion: reduce) {
     .nexus-swipe-back-indicator {
-        transition: opacity 0.1s;
+        transition: opacity var(--transition-fast);
     }
 
     .nexus-swipe-back-overlay {
@@ -395,12 +395,12 @@
 .nexus-swipe-item-content {
     position: relative;
     background: white;
-    transition: transform 0.2s;
+    transition: transform var(--transition-fast);
     z-index: 2;
 }
 
 [data-theme="dark"] .nexus-swipe-item-content {
-    background: #1e293b;
+    background: var(--color-slate-800);
 }
 
 .nexus-swipe-item-actions {
@@ -417,18 +417,18 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 0 20px;
+    padding: 0 var(--space-5);
     color: white;
     font-weight: 600;
-    font-size: 0.85rem;
+    font-size: var(--font-size-sm);
 }
 
 .nexus-swipe-action.delete {
-    background: #ef4444;
+    background: var(--color-danger);
 }
 
 .nexus-swipe-action.archive {
-    background: #f59e0b;
+    background: var(--color-warning);
 }
 
 .nexus-swipe-action.edit {
@@ -464,7 +464,7 @@
 /* Pressable items */
 .nexus-pressable {
     cursor: pointer;
-    transition: transform 0.1s, opacity 0.1s;
+    transition: transform 0.1s, opacity var(--transition-fast);
     -webkit-user-select: none;
     user-select: none;
 }
@@ -541,7 +541,7 @@ html {
     z-index: var(--z-dropdown, 1000);
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: var(--space-3);
     pointer-events: none;
 }
 
@@ -556,15 +556,15 @@ html {
     -webkit-backdrop-filter: blur(10px);
     backdrop-filter: blur(10px);
     color: white;
-    padding: 14px 24px;
-    border-radius: 12px;
-    font-size: 0.9rem;
+    padding: var(--space-3) var(--space-6);
+    border-radius: var(--radius-md);
+    font-size: var(--font-size-sm);
     font-weight: 500;
     box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
     display: flex;
     align-items: center;
-    gap: 10px;
-    animation: toast-in 0.3s ease-out;
+    gap: var(--space-3);
+    animation: toast-in var(--transition-base) var(--ease-out);
     pointer-events: auto;
 }
 
@@ -581,7 +581,7 @@ html {
 }
 
 .nexus-toast.exit {
-    animation: toast-out 0.2s ease-out forwards;
+    animation: toast-out var(--transition-fast) ease-out forwards;
 }
 
 @keyframes toast-in {
@@ -626,7 +626,7 @@ html {
     z-index: 10001;
     opacity: 0;
     visibility: hidden;
-    transition: all 0.2s;
+    transition: all var(--transition-fast);
 }
 
 [data-theme="dark"] .nexus-loading-overlay {
@@ -639,17 +639,17 @@ html {
 }
 
 .nexus-loading-spinner {
-    width: 48px;
-    height: 48px;
+    width: var(--space-12);
+    height: var(--space-12);
     border: 4px solid rgba(99, 102, 241, 0.2);
-    border-top-color: #6366f1;
+    border-top-color: var(--color-primary-500);
     border-radius: 50%;
-    animation: loading-spin 0.8s linear infinite;
+    animation: loading-spin var(--transition-slow) linear infinite;
 }
 
 .nexus-loading-text {
-    margin-top: 16px;
-    color: #64748b;
+    margin-top: var(--space-4);
+    color: var(--color-slate-500);
     font-weight: 500;
 }
 
@@ -670,7 +670,7 @@ html {
     z-index: var(--z-modal-backdrop, 1300);
     opacity: 0;
     visibility: hidden;
-    transition: all 0.3s ease;
+    transition: all var(--transition-base) var(--ease-in-out);
 }
 
 .nexus-share-sheet.active {
@@ -692,9 +692,9 @@ html {
     left: 0;
     right: 0;
     background: white;
-    border-radius: 20px 20px 0 0;
+    border-radius: var(--radius-xl) var(--radius-xl) 0 0;
     transform: translateY(100%);
-    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: transform var(--transition-base) var(--ease-in-out);
     padding-bottom: env(safe-area-inset-bottom);
 }
 
@@ -703,30 +703,30 @@ html {
 }
 
 [data-theme="dark"] .nexus-share-sheet-content {
-    background: #1e293b;
+    background: var(--color-slate-800);
 }
 
 .nexus-share-sheet-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 16px 20px;
+    padding: var(--space-4) var(--space-5);
     border-bottom: 1px solid rgba(0, 0, 0, 0.1);
 }
 
 .nexus-share-sheet-header h3 {
     margin: 0;
-    font-size: 1.1rem;
+    font-size: var(--font-size-lg);
     font-weight: 700;
 }
 
 .nexus-share-close {
-    width: 32px;
-    height: 32px;
+    width: var(--space-8);
+    height: var(--space-8);
     border-radius: 50%;
     background: rgba(0, 0, 0, 0.05);
     border: none;
-    font-size: 1.2rem;
+    font-size: var(--font-size-xl);
     cursor: pointer;
     display: flex;
     align-items: center;
@@ -739,28 +739,28 @@ html {
 }
 
 .nexus-share-sheet-body {
-    padding: 20px;
+    padding: var(--space-5);
 }
 
 .nexus-share-options {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
-    gap: 16px;
+    gap: var(--space-4);
 }
 
 .nexus-share-option {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 8px;
-    padding: 16px 8px;
+    gap: var(--space-2);
+    padding: var(--space-4) var(--space-2);
     border: none;
     background: rgba(0, 0, 0, 0.03);
-    border-radius: 16px;
+    border-radius: var(--radius-lg);
     text-decoration: none;
     color: inherit;
     cursor: pointer;
-    transition: all 0.2s;
+    transition: all var(--transition-fast);
 }
 
 .nexus-share-option:active {
@@ -769,14 +769,14 @@ html {
 }
 
 .nexus-share-option i {
-    font-size: 1.5rem;
-    width: 48px;
-    height: 48px;
+    font-size: var(--font-size-2xl);
+    width: var(--space-12);
+    height: var(--space-12);
     display: flex;
     align-items: center;
     justify-content: center;
     border-radius: 50%;
-    background: linear-gradient(135deg, #6366f1, #8b5cf6);
+    background: linear-gradient(135deg, var(--color-primary-500), var(--color-purple-500));
     color: white;
 }
 
@@ -793,11 +793,11 @@ html {
 }
 
 .nexus-share-option:nth-child(5) i {
-    background: linear-gradient(135deg, #ef4444, #f97316);
+    background: linear-gradient(135deg, var(--color-danger), var(--color-orange-500));
 }
 
 .nexus-share-option span {
-    font-size: 0.75rem;
+    font-size: var(--font-size-xs);
     font-weight: 600;
     text-align: center;
 }
@@ -819,7 +819,7 @@ html {
     background: #000;
     opacity: 0;
     visibility: hidden;
-    transition: all 0.3s ease;
+    transition: all var(--transition-base) var(--ease-in-out);
 }
 
 .nexus-camera-ui.active {
@@ -849,7 +849,7 @@ html {
     display: flex;
     justify-content: space-around;
     align-items: center;
-    padding: 30px 40px;
+    padding: var(--space-8) var(--space-10);
     padding-bottom: calc(30px + env(safe-area-inset-bottom));
     background: linear-gradient(transparent, rgba(0, 0, 0, 0.7));
 }
@@ -863,12 +863,12 @@ html {
     -webkit-backdrop-filter: blur(10px);
     backdrop-filter: blur(10px);
     color: white;
-    font-size: 1.2rem;
+    font-size: var(--font-size-xl);
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: all 0.2s;
+    transition: all var(--transition-fast);
 }
 
 .nexus-camera-btn:active {
@@ -879,13 +879,13 @@ html {
     width: 72px;
     height: 72px;
     background: white;
-    color: #1f2937;
-    font-size: 1.5rem;
+    color: var(--color-gray-800);
+    font-size: var(--font-size-2xl);
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
 }
 
 .nexus-camera-capture:active {
-    background: #e5e7eb;
+    background: var(--color-gray-200);
 }
 
 .nexus-camera-preview {
@@ -909,23 +909,23 @@ html {
     right: 0;
     display: flex;
     justify-content: center;
-    gap: 20px;
-    padding: 30px;
+    gap: var(--space-5);
+    padding: var(--space-8);
     padding-bottom: calc(30px + env(safe-area-inset-bottom));
     background: linear-gradient(transparent, rgba(0, 0, 0, 0.8));
 }
 
 .nexus-camera-preview-actions .nexus-camera-btn {
     width: auto;
-    padding: 14px 28px;
-    border-radius: 14px;
-    gap: 8px;
-    font-size: 1rem;
+    padding: var(--space-3) 28px;
+    border-radius: var(--radius-md);
+    gap: var(--space-2);
+    font-size: var(--font-size-base);
     font-weight: 600;
 }
 
 .nexus-camera-preview-actions .nexus-camera-btn.primary {
-    background: linear-gradient(135deg, #6366f1, #8b5cf6);
+    background: linear-gradient(135deg, var(--color-primary-500), var(--color-purple-500));
 }
 
 
@@ -939,9 +939,9 @@ html {
     left: 0;
     width: 0;
     height: 3px;
-    background: linear-gradient(90deg, #6366f1, #8b5cf6, #ec4899);
+    background: linear-gradient(90deg, var(--color-primary-500), var(--color-purple-500), var(--color-pink-500));
     z-index: var(--z-notification, 1700);
-    transition: width 0.2s ease-out;
+    transition: width var(--transition-fast) var(--ease-out);
     box-shadow: 0 0 10px rgba(99, 102, 241, 0.5);
     pointer-events: none;
 }
@@ -991,7 +991,7 @@ html {
     width: 200%;
     padding-bottom: 200%;
     opacity: 1;
-    transition: all 0.4s ease-out;
+    transition: all var(--transition-slow) var(--ease-out);
 }
 
 
@@ -1003,23 +1003,23 @@ html {
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 12px;
-    padding: 24px;
-    color: #64748b;
-    font-size: 0.9rem;
+    gap: var(--space-3);
+    padding: var(--space-6);
+    color: var(--color-slate-500);
+    font-size: var(--font-size-sm);
 }
 
 [data-theme="dark"] .nexus-infinite-loader {
-    color: #94a3b8;
+    color: var(--color-slate-400);
 }
 
 .nexus-infinite-spinner {
-    width: 24px;
-    height: 24px;
+    width: var(--space-6);
+    height: var(--space-6);
     border: 3px solid rgba(99, 102, 241, 0.2);
-    border-top-color: #6366f1;
+    border-top-color: var(--color-primary-500);
     border-radius: 50%;
-    animation: infinite-spin 0.8s linear infinite;
+    animation: infinite-spin var(--transition-slow) linear infinite;
 }
 
 @keyframes infinite-spin {
@@ -1032,14 +1032,14 @@ html {
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 32px 24px;
-    color: #94a3b8;
-    font-size: 0.85rem;
+    padding: var(--space-8) var(--space-6);
+    color: var(--color-slate-400);
+    font-size: var(--font-size-sm);
     text-align: center;
 }
 
 [data-theme="dark"] .nexus-infinite-end {
-    color: #64748b;
+    color: var(--color-slate-500);
 }
 
 .nexus-infinite-end::before,
@@ -1048,7 +1048,7 @@ html {
     flex: 1;
     height: 1px;
     background: linear-gradient(90deg, transparent, rgba(148, 163, 184, 0.3), transparent);
-    margin: 0 16px;
+    margin: 0 var(--space-4);
 }
 
 
@@ -1063,7 +1063,7 @@ html {
     opacity: 0;
     visibility: hidden;
     z-index: 99998;
-    transition: opacity 0.2s ease, visibility 0.2s ease;
+    transition: opacity var(--transition-fast) var(--ease-in-out), visibility var(--transition-fast) var(--ease-in-out);
     -webkit-backdrop-filter: blur(2px);
     backdrop-filter: blur(2px);
 }
@@ -1078,7 +1078,7 @@ html {
     min-width: 200px;
     max-width: 280px;
     background: white;
-    border-radius: 14px;
+    border-radius: var(--radius-md);
     box-shadow:
         0 10px 40px rgba(0, 0, 0, 0.2),
         0 0 0 1px rgba(0, 0, 0, 0.05);
@@ -1087,12 +1087,12 @@ html {
     visibility: hidden;
     transform: scale(0.9);
     transform-origin: center center;
-    transition: opacity 0.2s ease, transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), visibility 0.2s ease;
+    transition: opacity var(--transition-fast) var(--ease-in-out), transform var(--transition-fast) cubic-bezier(0.34, 1.56, 0.64, 1), visibility var(--transition-fast) var(--ease-in-out);
     overflow: hidden;
 }
 
 [data-theme="dark"] .nexus-context-menu {
-    background: #1e293b;
+    background: var(--color-slate-800);
     box-shadow:
         0 10px 40px rgba(0, 0, 0, 0.4),
         0 0 0 1px rgba(255, 255, 255, 0.1);
@@ -1107,21 +1107,21 @@ html {
 .nexus-context-item {
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: var(--space-3);
     width: 100%;
-    padding: 14px 16px;
+    padding: var(--space-3) var(--space-4);
     border: none;
     background: transparent;
-    color: #1e293b;
-    font-size: 0.95rem;
+    color: var(--color-slate-800);
+    font-size: var(--font-size-base);
     font-weight: 500;
     text-align: left;
     cursor: pointer;
-    transition: background 0.15s ease;
+    transition: background var(--transition-fast) var(--ease-in-out);
 }
 
 [data-theme="dark"] .nexus-context-item {
-    color: #f1f5f9;
+    color: var(--color-slate-100);
 }
 
 .nexus-context-item:not(:last-child) {
@@ -1141,14 +1141,14 @@ html {
 }
 
 .nexus-context-item i {
-    width: 20px;
+    width: var(--space-5);
     text-align: center;
-    color: #6366f1;
-    font-size: 1rem;
+    color: var(--color-primary-500);
+    font-size: var(--font-size-base);
 }
 
 [data-theme="dark"] .nexus-context-item i {
-    color: #818cf8;
+    color: var(--color-primary-400);
 }
 
 .nexus-context-item.danger {
@@ -1162,12 +1162,12 @@ html {
 /* Reduced motion */
 @media (prefers-reduced-motion: reduce) {
     .nexus-context-menu {
-        transition: opacity 0.1s ease, visibility 0.1s ease;
+        transition: opacity var(--transition-fast) var(--ease-in-out), visibility var(--transition-fast) var(--ease-in-out);
         transform: scale(1);
     }
 
     .nexus-context-backdrop {
-        transition: opacity 0.1s ease, visibility 0.1s ease;
+        transition: opacity var(--transition-fast) var(--ease-in-out), visibility var(--transition-fast) var(--ease-in-out);
     }
 
     .nexus-infinite-spinner {
@@ -1202,20 +1202,20 @@ html {
     top: 0;
     left: 0;
     right: 0;
-    background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+    background: linear-gradient(135deg, var(--color-warning) 0%, var(--color-amber-600) 100%);
     color: white;
     text-align: center;
-    padding: 10px 16px;
+    padding: var(--space-3) var(--space-4);
     font-size: 13px;
     font-weight: 600;
     z-index: var(--z-popover, 1500);
     transform: translateY(-100%);
-    transition: transform 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    transition: transform var(--transition-base) cubic-bezier(0.68, -0.55, 0.265, 1.55);
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 8px;
-    padding-top: max(10px, env(safe-area-inset-top));
+    gap: var(--space-2);
+    padding-top: max(var(--space-3), env(safe-area-inset-top));
 }
 
 .nexus-offline-indicator.visible {
@@ -1223,8 +1223,8 @@ html {
 }
 
 .nexus-offline-indicator svg {
-    width: 16px;
-    height: 16px;
+    width: var(--space-4);
+    height: var(--space-4);
     flex-shrink: 0;
 }
 
@@ -1232,7 +1232,7 @@ html {
 body.is-offline .nexus-utility-bar,
 body.is-offline .htb-header,
 body.is-offline header {
-    margin-top: 40px;
+    margin-top: var(--space-10);
 }
 
 .nexus-online-indicator {
@@ -1240,20 +1240,20 @@ body.is-offline header {
     top: 0;
     left: 0;
     right: 0;
-    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    background: linear-gradient(135deg, var(--color-success) 0%, var(--color-green-600) 100%);
     color: white;
     text-align: center;
-    padding: 10px 16px;
+    padding: var(--space-3) var(--space-4);
     font-size: 13px;
     font-weight: 600;
     z-index: var(--z-popover, 1500);
     transform: translateY(-100%);
-    transition: transform 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    transition: transform var(--transition-base) cubic-bezier(0.68, -0.55, 0.265, 1.55);
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 8px;
-    padding-top: max(10px, env(safe-area-inset-top));
+    gap: var(--space-2);
+    padding-top: max(var(--space-3), env(safe-area-inset-top));
 }
 
 .nexus-online-indicator.visible {
@@ -1261,8 +1261,8 @@ body.is-offline header {
 }
 
 .nexus-online-indicator svg {
-    width: 16px;
-    height: 16px;
+    width: var(--space-4);
+    height: var(--space-4);
     flex-shrink: 0;
 }
 
@@ -1284,10 +1284,10 @@ body.is-offline header {
     position: sticky;
     top: 0;
     z-index: 1000;
-    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1),
-        height 0.3s cubic-bezier(0.4, 0, 0.2, 1),
-        padding 0.3s cubic-bezier(0.4, 0, 0.2, 1),
-        box-shadow 0.3s ease;
+    transition: transform var(--transition-base) var(--ease-in-out),
+        height var(--transition-base) var(--ease-in-out),
+        padding var(--transition-base) var(--ease-in-out),
+        box-shadow var(--transition-base) var(--ease-in-out);
     will-change: transform;
 }
 
@@ -1310,15 +1310,15 @@ body.is-offline header {
 
 /* Compact mode - smaller, more minimal */
 .nexus-collapsing-header.nexus-header-compact {
-    padding-top: 8px !important;
-    padding-bottom: 8px !important;
+    padding-top: var(--space-2) !important;
+    padding-bottom: var(--space-2) !important;
 }
 
 /* Compact mode for common header elements */
 .nexus-collapsing-header.nexus-header-compact .htb-header-title,
 .nexus-collapsing-header.nexus-header-compact .header-title,
 .nexus-collapsing-header.nexus-header-compact h1 {
-    font-size: 1.1rem !important;
+    font-size: var(--font-size-lg) !important;
     margin: 0 !important;
 }
 
@@ -1340,13 +1340,13 @@ body.is-offline header {
 .nexus-collapsing-header.nexus-header-compact .htb-avatar {
     width: 32px !important;
     height: 32px !important;
-    transition: all 0.3s ease;
+    transition: all var(--transition-base) var(--ease-in-out);
 }
 
 /* Reduce button sizes in compact mode */
 .nexus-collapsing-header.nexus-header-compact .htb-btn {
-    padding: 6px 12px !important;
-    font-size: 0.85rem !important;
+    padding: var(--space-1) var(--space-3) !important;
+    font-size: var(--font-size-sm) !important;
 }
 
 /* Add shadow in compact mode for visual separation */
@@ -1372,10 +1372,10 @@ body.nexus-header-is-compact {
 @media (max-width: 768px) {
     .nexus-collapsing-header {
         /* Faster transitions on mobile for snappier feel */
-        transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1),
-            height 0.25s cubic-bezier(0.4, 0, 0.2, 1),
-            padding 0.25s cubic-bezier(0.4, 0, 0.2, 1),
-            box-shadow 0.25s ease;
+        transition: transform var(--transition-base) var(--ease-in-out),
+            height var(--transition-base) var(--ease-in-out),
+            padding var(--transition-base) var(--ease-in-out),
+            box-shadow var(--transition-base) var(--ease-in-out);
     }
 
     .nexus-collapsing-header.nexus-header-compact {
@@ -1385,13 +1385,13 @@ body.nexus-header-is-compact {
 
     .nexus-collapsing-header.nexus-header-compact .htb-header-title,
     .nexus-collapsing-header.nexus-header-compact h1 {
-        font-size: 1rem !important;
+        font-size: var(--font-size-base) !important;
     }
 
     /* Reduce icon sizes in compact mode on mobile */
     .nexus-collapsing-header.nexus-header-compact .htb-btn i,
     .nexus-collapsing-header.nexus-header-compact .header-icon {
-        font-size: 1rem !important;
+        font-size: var(--font-size-base) !important;
     }
 }
 
@@ -1442,14 +1442,14 @@ body.nexus-header-is-compact {
     #terms-glass-wrapper,
     [id$="-glass-wrapper"],
     [id*="glass-wrapper"] {
-        margin-top: 56px !important;
-        padding-top: 1rem !important;
+        margin-top: var(--layout-header-height) !important;
+        padding-top: var(--space-4) !important;
     }
 
     /* Container full - uniform spacing */
     .htb-container-full {
-        padding-top: 1rem !important;
-        margin-top: 56px !important;
+        padding-top: var(--space-4) !important;
+        margin-top: var(--layout-header-height) !important;
     }
 
     /* Welcome hero sections - uniform top margin */
@@ -1475,7 +1475,7 @@ body.nexus-header-is-compact {
     .htb-container .page-header,
     .htb-container-full .page-header {
         margin-top: 0 !important;
-        margin-bottom: 16px !important;
+        margin-bottom: var(--space-4) !important;
         padding-top: 0 !important;
     }
 
@@ -1483,25 +1483,25 @@ body.nexus-header-is-compact {
     .htb-hero-header {
         height: auto !important;
         min-height: 120px !important;
-        padding: 20px 16px !important;
+        padding: var(--space-5) var(--space-4) !important;
     }
 
     .htb-hero-content {
-        padding: 12px 16px !important;
+        padding: var(--space-3) var(--space-4) !important;
     }
 
     .htb-main-title {
-        font-size: 1.75rem !important;
+        font-size: var(--font-size-3xl) !important;
     }
 
     .htb-sub-title {
-        font-size: 1rem !important;
+        font-size: var(--font-size-base) !important;
     }
 
     /* Cards that pull up into hero area */
     .htb-container[style*="margin-top: -80px"],
     .htb-container-full[style*="margin-top: -80px"] {
-        margin-top: 16px !important;
+        margin-top: var(--space-4) !important;
     }
 
     /* Generic first-child content spacing */

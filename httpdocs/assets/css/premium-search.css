@@ -8,18 +8,18 @@
     background: linear-gradient(135deg,
         rgba(30, 41, 59, 0.75) 0%,
         rgba(51, 65, 85, 0.65) 100%);
-    backdrop-filter: blur(24px) saturate(180%);
-    -webkit-backdrop-filter: blur(24px) saturate(180%);
+    backdrop-filter: blur(var(--glass-blur)) saturate(180%);
+    -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(180%);
     border: 1.5px solid rgba(148, 163, 184, 0.25);
-    border-radius: 24px;
+    border-radius: var(--radius-2xl);
     display: flex;
     align-items: center;
-    padding: 10px 18px;
+    padding: var(--space-2) var(--space-4);
     width: 240px;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15),
                 inset 0 1px 0 rgba(255, 255, 255, 0.08),
                 0 0 0 0 rgba(99, 102, 241, 0);
-    transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: all 0.35s var(--ease-in-out);
     position: relative;
     overflow: hidden;
 }
@@ -35,7 +35,7 @@
         transparent,
         rgba(255, 255, 255, 0.1),
         transparent);
-    transition: left 0.5s ease;
+    transition: left var(--transition-slow);
 }
 
 .premium-search:hover::before {
@@ -72,19 +72,19 @@
     cursor: pointer;
     color: rgba(203, 213, 225, 0.75);
     padding: 0;
-    margin-right: 12px;
+    margin-right: var(--space-3);
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 20px;
-    height: 20px;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    width: var(--space-5);
+    height: var(--space-5);
+    transition: all var(--transition-base);
     position: relative;
 }
 
 .search-icon-btn i {
-    font-size: 15px;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    font-size: var(--font-size-sm);
+    transition: all var(--transition-base);
 }
 
 .premium-search:hover .search-icon-btn {
@@ -101,7 +101,7 @@
 
 .premium-search:focus-within .search-icon-btn i {
     transform: rotate(0deg) scale(1.15);
-    filter: drop-shadow(0 0 8px rgba(139, 92, 246, 0.6));
+    filter: drop-shadow(0 0 var(--space-2) rgba(139, 92, 246, 0.6));
 }
 
 /* Input reset - !important needed to override browser defaults */
@@ -119,9 +119,9 @@
     width: 100%;
     font-size: 0.95rem;
     outline: none !important;
-    font-weight: 500;
+    font-weight: var(--font-weight-medium);
     letter-spacing: 0.2px;
-    transition: all 0.3s ease;
+    transition: all var(--transition-base);
     box-shadow: none !important;
     -webkit-appearance: none !important;
     -moz-appearance: none !important;
@@ -158,8 +158,8 @@
 
 .search-input::placeholder {
     color: rgba(203, 213, 225, 0.55);
-    font-weight: 400;
-    transition: all 0.3s ease;
+    font-weight: var(--font-weight-normal);
+    transition: all var(--transition-base);
 }
 
 .premium-search:hover .search-input::placeholder {
@@ -196,19 +196,19 @@
 .search-toggle-btn {
     width: 44px;
     height: 44px;
-    border-radius: 50%;
+    border-radius: var(--radius-full);
     border: 1.5px solid rgba(148, 163, 184, 0.25);
     background: linear-gradient(135deg,
         rgba(30, 41, 59, 0.75) 0%,
         rgba(51, 65, 85, 0.65) 100%);
-    backdrop-filter: blur(24px) saturate(180%);
-    -webkit-backdrop-filter: blur(24px) saturate(180%);
+    backdrop-filter: blur(var(--glass-blur)) saturate(180%);
+    -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(180%);
     color: rgba(203, 213, 225, 0.85);
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: all 0.35s var(--ease-in-out);
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15),
                 inset 0 1px 0 rgba(255, 255, 255, 0.08);
 }
@@ -225,8 +225,8 @@
 }
 
 .search-toggle-btn i {
-    font-size: 16px;
-    transition: transform 0.3s ease;
+    font-size: var(--font-size-base);
+    transition: transform var(--transition-base);
 }
 
 .search-toggle-btn:hover i {
@@ -255,9 +255,9 @@
     margin: 0;
     opacity: 0;
     overflow: hidden;
-    transform: scale(0.8) translateX(20px);
+    transform: scale(0.8) translateX(var(--space-5));
     pointer-events: none;
-    transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: all 0.35s var(--ease-in-out);
     border-width: 0;
 }
 
@@ -266,7 +266,7 @@
     width: 320px;
     min-width: 320px;
     max-width: 380px;
-    padding: 10px 18px;
+    padding: var(--space-2) var(--space-4);
     opacity: 1;
     transform: scale(1) translateX(0);
     pointer-events: auto;
@@ -280,7 +280,7 @@
 
 /* Hide brand/tenant name when search is expanded */
 .nexus-brand-link {
-    transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: all 0.35s var(--ease-in-out);
 }
 
 body.search-expanded .nexus-brand-link {
@@ -299,15 +299,15 @@ body.search-expanded .nexus-brand-link {
     cursor: pointer;
     color: rgba(203, 213, 225, 0.6);
     padding: 0;
-    margin-left: 8px;
+    margin-left: var(--space-2);
     display: flex;
     align-items: center;
     justify-content: center;
     width: 0;
-    height: 24px;
+    height: var(--space-6);
     min-width: 0;
-    border-radius: 50%;
-    transition: all 0.25s ease;
+    border-radius: var(--radius-full);
+    transition: all var(--transition-base) var(--ease-in-out);
     opacity: 0;
     transform: scale(0);
     overflow: hidden;
@@ -317,8 +317,8 @@ body.search-expanded .nexus-brand-link {
 .collapsible-search-container.search-expanded .search-close-btn {
     opacity: 1;
     transform: scale(1);
-    width: 24px;
-    min-width: 24px;
+    width: var(--space-6);
+    min-width: var(--space-6);
     pointer-events: auto;
 }
 
@@ -329,7 +329,7 @@ body.search-expanded .nexus-brand-link {
 }
 
 .search-close-btn i {
-    font-size: 14px;
+    font-size: var(--font-size-sm);
 }
 
 /* Light mode adjustments */
@@ -389,8 +389,8 @@ body.search-expanded .nexus-brand-link {
 /* Mobile: Always show full search on small screens */
 @media (max-width: 768px) {
     .search-toggle-btn {
-        width: 40px;
-        height: 40px;
+        width: var(--space-10);
+        height: var(--space-10);
     }
 
     .collapsible-search-container.search-expanded .collapsible-search {

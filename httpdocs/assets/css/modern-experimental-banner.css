@@ -2,13 +2,14 @@
  * Modern Layout Experimental Banner
  * Sleek, minimalist design with glass-morphism effects
  * Position: Above fixed utility bar (z-index: 60)
+ * MIGRATED TO DESIGN TOKENS v2.0
  */
 
 .modern-experimental-banner {
-    background: #6366f1 !important;
-    background: linear-gradient(135deg, #6366f1 0%, #4f46e5 50%, #9333ea 100%) !important;
-    padding: 6px 0 !important;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1) !important;
+    background: var(--color-primary-500) !important;
+    background: linear-gradient(135deg, var(--color-primary-500) 0%, var(--color-primary-600) 50%, var(--color-purple-500) 100%) !important;
+    padding: var(--space-2) 0 !important;
+    box-shadow: var(--shadow-sm) !important;
     position: relative !important;
     z-index: 9999 !important;
     width: 100% !important;
@@ -16,7 +17,7 @@
     visibility: visible !important;
     opacity: 1 !important;
     height: auto !important;
-    min-height: 40px !important;
+    min-height: var(--space-10) !important;
 }
 
 /* Only show banner on Modern layout */
@@ -26,8 +27,8 @@ html[data-layout="civicone"] .modern-experimental-banner {
 
 /* Push utility bar down to accommodate banner (40px height) */
 html[data-layout="modern"] .nexus-utility-bar {
-    top: 40px !important;
-    transition: top 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    top: var(--space-10) !important;
+    transition: top var(--transition-base) !important;
 }
 
 /* When banner is scrolled away, move utility bar to top */
@@ -37,8 +38,8 @@ html[data-layout="modern"].banner-scrolled .nexus-utility-bar {
 
 /* Push main navbar down (40px to accommodate banner) */
 html[data-layout="modern"] .nexus-navbar {
-    margin-top: 40px !important;
-    transition: margin-top 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    margin-top: var(--space-10) !important;
+    transition: margin-top var(--transition-base) !important;
 }
 
 /* When banner is scrolled away, remove navbar top margin */
@@ -49,65 +50,65 @@ html[data-layout="modern"].banner-scrolled .nexus-navbar {
 .modern-banner-wrapper {
     max-width: 1400px;
     margin: 0 auto;
-    padding: 0 24px;
+    padding: 0 var(--space-6);
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 24px;
+    gap: var(--space-6);
 }
 
 .modern-banner-content {
     display: flex;
     align-items: center;
-    gap: 16px;
+    gap: var(--space-4);
     flex-wrap: wrap;
 }
 
 .modern-experimental-badge {
     display: inline-flex;
     align-items: center;
-    gap: 6px;
+    gap: var(--space-2);
     background: rgba(255, 255, 255, 0.25);
-    backdrop-filter: blur(10px);
-    padding: 4px 10px;
-    border-radius: 12px;
-    font-size: 11px;
-    font-weight: 700;
+    backdrop-filter: blur(var(--glass-blur-subtle));
+    padding: var(--space-1) var(--space-3);
+    border-radius: var(--radius-md);
+    font-size: var(--font-size-xs);
+    font-weight: var(--font-weight-bold);
     letter-spacing: 0.3px;
     color: #ffffff;
     border: 1px solid rgba(255, 255, 255, 0.3);
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    box-shadow: var(--shadow-xs);
 }
 
 .modern-experimental-badge i {
-    font-size: 12px;
+    font-size: var(--font-size-xs);
 }
 
 .modern-experimental-text {
-    font-size: 12px;
+    font-size: var(--font-size-xs);
     color: rgba(255, 255, 255, 0.95);
-    line-height: 1.3;
+    line-height: var(--line-height-tight);
 }
 
 .modern-experimental-text strong {
-    font-weight: 600;
+    font-weight: var(--font-weight-semibold);
     color: #ffffff;
 }
 
 .modern-experimental-switch {
     display: inline-flex;
     align-items: center;
-    gap: 4px;
-    padding: 4px 10px;
+    gap: var(--space-1);
+    padding: var(--space-1) var(--space-3);
     background: rgba(255, 255, 255, 0.95);
     color: var(--color-primary-600);
-    font-size: 12px;
-    font-weight: 600;
+    font-size: var(--font-size-xs);
+    font-weight: var(--font-weight-semibold);
     text-decoration: none;
-    border-radius: 4px;
+    border-radius: var(--radius-sm);
     border: 1px solid rgba(255, 255, 255, 0.3);
-    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    transition: all var(--transition-fast);
+    box-shadow: var(--shadow-sm);
     white-space: nowrap;
     flex-shrink: 0;
 }
@@ -115,17 +116,17 @@ html[data-layout="modern"].banner-scrolled .nexus-navbar {
 .modern-experimental-switch:hover {
     background: #ffffff;
     transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    box-shadow: var(--shadow-md);
     color: var(--color-primary-700);
 }
 
 .modern-experimental-switch:active {
     transform: translateY(0);
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+    box-shadow: var(--shadow-sm);
 }
 
 .modern-experimental-switch i {
-    font-size: 16px;
+    font-size: var(--font-size-base);
 }
 
 /* Responsive Design - Hide banner on mobile/tablet and reset spacing */
@@ -145,29 +146,29 @@ html[data-layout="modern"].banner-scrolled .nexus-navbar {
     }
 
     .modern-banner-wrapper {
-        padding: 0 16px;
+        padding: 0 var(--space-4);
         flex-direction: column;
-        gap: 12px;
+        gap: var(--space-3);
         text-align: center;
     }
 
     .modern-banner-content {
         flex-direction: column;
-        gap: 10px;
+        gap: var(--space-3);
     }
 
     .modern-experimental-badge {
-        padding: 5px 12px;
-        font-size: 11px;
+        padding: var(--space-1) var(--space-3);
+        font-size: var(--font-size-xs);
     }
 
     .modern-experimental-text {
-        font-size: 13px;
+        font-size: var(--font-size-sm);
     }
 
     .modern-experimental-switch {
-        padding: 9px 18px;
-        font-size: 13px;
+        padding: var(--space-2) var(--space-5);
+        font-size: var(--font-size-sm);
     }
 }
 
@@ -177,7 +178,7 @@ html[data-layout="modern"].banner-scrolled .nexus-navbar {
     }
 
     .modern-experimental-text {
-        font-size: 12px;
+        font-size: var(--font-size-xs);
     }
 
     .modern-experimental-switch {
@@ -191,7 +192,7 @@ html[data-layout="modern"].banner-scrolled .nexus-navbar {
     background: linear-gradient(135deg,
         var(--color-primary-700) 0%,
         var(--color-primary-800) 50%,
-        var(--color-purple-700) 100%
+        var(--color-purple-500) 100%
     );
 }
 

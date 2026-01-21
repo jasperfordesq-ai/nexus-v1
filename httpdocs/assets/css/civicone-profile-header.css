@@ -8,26 +8,26 @@
 .civicone .govuk-width-container {
     max-width: 1020px;
     margin: 0 auto;
-    padding: 0 15px;
+    padding: 0 var(--space-4);
 }
 
 @media (min-width: 641px) {
     .civicone .govuk-width-container {
-        padding: 0 30px;
+        padding: 0 var(--space-8);
     }
 }
 
 .civicone .civicone-identity-bar {
     background: #1d70b8; /* GOV.UK Blue */
     color: #ffffff;
-    padding: 20px 0;
-    margin-bottom: 30px;
+    padding: var(--space-5) 0;
+    margin-bottom: var(--space-8);
 }
 
 .civicone .civicone-identity-bar__container {
     display: flex;
     align-items: flex-start;
-    gap: 20px;
+    gap: var(--space-5);
     flex-wrap: wrap;
 }
 
@@ -37,31 +37,31 @@
 }
 
 .civicone .civicone-identity-bar__avatar-img {
-    width: 80px;
-    height: 80px;
-    border-radius: 50%;
+    width: var(--space-20);
+    height: var(--space-20);
+    border-radius: var(--radius-full);
     object-fit: cover;
     border: 3px solid rgba(255, 255, 255, 0.3);
 }
 
 .civicone .civicone-identity-bar__status-indicator {
     position: absolute;
-    bottom: 4px;
-    right: 4px;
+    bottom: var(--space-1);
+    right: var(--space-1);
     width: 18px;
     height: 18px;
-    border-radius: 50%;
+    border-radius: var(--radius-full);
     border: 3px solid #1d70b8;
 }
 
 .civicone .civicone-identity-bar__status-indicator--online {
     background: #00703c; /* GOV.UK Green */
-    box-shadow: 0 0 8px rgba(0, 112, 60, 0.6);
+    box-shadow: 0 0 var(--space-2) rgba(0, 112, 60, 0.6);
 }
 
 .civicone .civicone-identity-bar__status-indicator--recent {
     background: #f47738; /* GOV.UK Orange */
-    box-shadow: 0 0 8px rgba(244, 119, 56, 0.6);
+    box-shadow: 0 0 var(--space-2) rgba(244, 119, 56, 0.6);
 }
 
 @keyframes civicone-pulse {
@@ -79,11 +79,11 @@
 }
 
 .civicone .civicone-identity-bar__heading {
-    margin: 0 0 8px 0;
-    font-size: 2rem;
-    font-weight: 700;
+    margin: 0 0 var(--space-2) 0;
+    font-size: var(--font-size-4xl);
+    font-weight: var(--font-weight-bold);
     color: #ffffff;
-    line-height: 1.2;
+    line-height: var(--line-height-tight);
 }
 
 .civicone .civicone-identity-bar__meta {
@@ -92,55 +92,55 @@
     list-style: none;
     display: flex;
     flex-wrap: wrap;
-    gap: 16px;
-    font-size: 0.9375rem;
+    gap: var(--space-4);
+    font-size: var(--font-size-sm);
 }
 
 .civicone .civicone-identity-bar__meta-item {
     display: inline-flex;
     align-items: center;
-    gap: 6px;
+    gap: var(--space-2);
     color: rgba(255, 255, 255, 0.95);
 }
 
 .civicone .civicone-identity-bar__meta-item i {
     opacity: 0.8;
-    font-size: 0.875rem;
+    font-size: var(--font-size-sm);
 }
 
 .civicone .civicone-identity-bar__meta-item strong {
-    font-weight: 600;
+    font-weight: var(--font-weight-semibold);
 }
 
 /* MOJ Page Header Actions Pattern */
 .civicone .civicone-page-header-actions {
     background: #f3f2f1; /* GOV.UK Light grey */
     border-bottom: 1px solid #b1b4b6;
-    padding: 20px 0;
-    margin-bottom: 30px;
+    padding: var(--space-5) 0;
+    margin-bottom: var(--space-8);
 }
 
 .civicone .civicone-page-header-actions__container {
     display: flex;
     flex-wrap: wrap;
-    gap: 12px;
+    gap: var(--space-3);
     align-items: center;
 }
 
 .civicone .civicone-page-header-actions__btn {
     display: inline-flex;
     align-items: center;
-    gap: 8px;
-    padding: 10px 16px;
-    font-size: 1rem;
-    font-weight: 400;
+    gap: var(--space-2);
+    padding: var(--space-3) var(--space-4);
+    font-size: var(--font-size-base);
+    font-weight: var(--font-weight-normal);
     color: #0b0c0c;
     background: #ffffff;
     border: 2px solid #0b0c0c;
-    border-radius: 0;
+    border-radius: var(--radius-none);
     cursor: pointer;
     text-decoration: none;
-    transition: all 0.15s ease;
+    transition: all var(--transition-fast);
 }
 
 .civicone .civicone-page-header-actions__btn:hover {
@@ -178,7 +178,7 @@
     background: #d4621f; /* Darker orange for 4.7:1 contrast */
     border-color: #d4621f;
     color: #ffffff;
-    font-weight: 600;
+    font-weight: var(--font-weight-semibold);
 }
 
 /* Ensure spans and icons inherit white color */
@@ -203,7 +203,7 @@
     background: #b91e0a; /* Darker red for 6.8:1 contrast */
     border-color: #b91e0a;
     color: #ffffff;
-    font-weight: 600;
+    font-weight: var(--font-weight-semibold);
 }
 
 /* Ensure spans and icons inherit white color */
@@ -259,12 +259,12 @@
 .civicone .civicone-identity-bar__badge {
     display: inline-flex;
     align-items: center;
-    gap: 6px;
-    padding: 4px 10px;
+    gap: var(--space-2);
+    padding: var(--space-1) var(--space-3);
     background: rgba(255, 255, 255, 0.2);
     border: 1px solid rgba(255, 255, 255, 0.3);
-    border-radius: 4px;
-    font-size: 0.875rem;
+    border-radius: var(--radius-sm);
+    font-size: var(--font-size-sm);
     color: #ffffff;
     text-decoration: none;
 }
@@ -315,23 +315,23 @@
 .civicone .civicone-identity-bar__badge--admin {
     background: #d4351c; /* Solid GOV.UK red */
     border-color: #b91e0a; /* Darker red border */
-    font-weight: 700;
+    font-weight: var(--font-weight-bold);
 }
 
 /* Phone reveal button (admin only) */
 .civicone .civicone-identity-bar__reveal-phone {
     display: inline-block;
-    margin-left: 8px;
-    padding: 4px 10px;
-    font-size: 0.8125rem;
-    font-weight: 700;
+    margin-left: var(--space-2);
+    padding: var(--space-1) var(--space-3);
+    font-size: var(--font-size-xs);
+    font-weight: var(--font-weight-bold);
     color: #0b0c0c; /* Black text for contrast */
     background: #ffffff; /* Solid white background */
     border: 2px solid #0b0c0c;
-    border-radius: 3px;
+    border-radius: var(--radius-sm);
     cursor: pointer;
     text-decoration: none;
-    transition: background 0.15s ease;
+    transition: background var(--transition-fast);
 }
 
 .civicone .civicone-identity-bar__reveal-phone:hover {
@@ -358,7 +358,7 @@
 /* Responsive adjustments */
 @media (max-width: 640px) {
     .civicone .civicone-identity-bar__heading {
-        font-size: 1.5rem;
+        font-size: var(--font-size-2xl);
     }
 
     .civicone .civicone-identity-bar__avatar-img {

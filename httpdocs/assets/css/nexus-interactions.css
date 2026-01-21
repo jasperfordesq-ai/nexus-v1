@@ -189,19 +189,19 @@
 }
 
 ::view-transition-old(root) {
-    animation: slideOutLeft 0.3s ease-out both;
+    animation: slideOutLeft var(--transition-base) ease-out both;
 }
 
 ::view-transition-new(root) {
-    animation: slideInRight 0.3s ease-out both;
+    animation: slideInRight var(--transition-base) ease-out both;
 }
 
 .navigating-back::view-transition-old(root) {
-    animation: slideOutRight 0.3s ease-out both;
+    animation: slideOutRight var(--transition-base) ease-out both;
 }
 
 .navigating-back::view-transition-new(root) {
-    animation: slideInLeft 0.3s ease-out both;
+    animation: slideInLeft var(--transition-base) ease-out both;
 }
 
 @keyframes slideOutRight {
@@ -218,7 +218,7 @@
 ::view-transition-old(root),
 ::view-transition-new(root) {
     animation-duration: 0.25s;
-    animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+    animation-timing-function: var(--ease-in-out);
 }
 
 /* ============================================
@@ -235,7 +235,7 @@
         rgba(0, 0, 0, 0.06) 100%);
     background-size: 200% 100%;
     animation: shimmer 1.5s ease-in-out infinite;
-    border-radius: 8px;
+    border-radius: var(--radius-base);
 }
 
 [data-theme="dark"] .skeleton,
@@ -279,8 +279,8 @@
 /* Skeleton components */
 .skeleton-text {
     height: 1em;
-    margin-bottom: 0.5em;
-    border-radius: 4px;
+    margin-bottom: 0.5em; /* Font-relative, keep as-is */
+    border-radius: var(--radius-sm);
 }
 
 .skeleton-text:last-child {
@@ -290,100 +290,100 @@
 .skeleton-title {
     height: 1.5em;
     width: 60%;
-    margin-bottom: 1em;
+    margin-bottom: 1em; /* Font-relative, keep as-is */
 }
 
 .skeleton-avatar,
 .nexus-skeleton-avatar {
-    width: 48px;
-    height: 48px;
+    width: var(--space-12);
+    height: var(--space-12);
     border-radius: 50%;
     flex-shrink: 0;
 }
 
 .nexus-skeleton-avatar.small {
-    width: 24px;
-    height: 24px;
+    width: var(--space-6);
+    height: var(--space-6);
 }
 
 .nexus-skeleton-avatar.large {
-    width: 120px;
-    height: 120px;
+    width: 120px; /* Specific size, no token */
+    height: 120px; /* Specific size, no token */
 }
 
 .skeleton-card {
-    height: 120px;
-    border-radius: 16px;
+    height: 120px; /* Specific size, no token */
+    border-radius: var(--radius-lg);
 }
 
 .skeleton-button,
 .nexus-skeleton-btn {
-    height: 44px;
-    width: 120px;
-    border-radius: 12px;
+    height: 44px; /* Specific size, no exact token */
+    width: 120px; /* Specific size, no token */
+    border-radius: var(--radius-md);
 }
 
 .skeleton-image,
 .nexus-skeleton-image {
     width: 100%;
     aspect-ratio: 16/9;
-    border-radius: 12px;
+    border-radius: var(--radius-md);
 }
 
 .nexus-skeleton-line {
-    height: 14px;
-    border-radius: 4px;
+    height: 14px; /* Specific size, no token */
+    border-radius: var(--radius-sm);
     width: 100%;
 }
 
 .nexus-skeleton-line.short {
-    height: 12px;
-    margin-top: 4px;
+    height: var(--space-3);
+    margin-top: var(--space-1);
 }
 
 /* Skeleton container */
 .nexus-skeleton-container {
     display: flex;
     flex-direction: column;
-    gap: 16px;
+    gap: var(--space-4);
 }
 
 .nexus-skeleton-container.nexus-skeleton-exit {
     opacity: 0;
     transform: translateY(-10px);
-    transition: opacity 0.2s ease, transform 0.2s ease;
+    transition: opacity var(--transition-fast) var(--ease-in-out), transform var(--transition-fast) var(--ease-in-out);
 }
 
 /* Skeleton post */
 .nexus-skeleton-post {
-    padding: 16px;
+    padding: var(--space-4);
 }
 
 .nexus-skeleton-header {
     display: flex;
-    gap: 12px;
-    margin-bottom: 16px;
+    gap: var(--space-3);
+    margin-bottom: var(--space-4);
 }
 
 .nexus-skeleton-meta {
     flex: 1;
     display: flex;
     flex-direction: column;
-    gap: 6px;
+    gap: var(--space-2); /* 8px close enough to 6px */
     justify-content: center;
 }
 
 .nexus-skeleton-body {
     display: flex;
     flex-direction: column;
-    gap: 8px;
-    margin-bottom: 16px;
+    gap: var(--space-2);
+    margin-bottom: var(--space-4);
 }
 
 .nexus-skeleton-actions {
     display: flex;
-    gap: 8px;
-    padding-top: 12px;
+    gap: var(--space-2);
+    padding-top: var(--space-3);
     border-top: 1px solid var(--border-color, #e4e6eb);
 }
 
@@ -394,22 +394,22 @@
 
 .nexus-skeleton-card-image {
     width: 100%;
-    height: 180px;
+    height: 180px; /* Specific size, no token */
 }
 
 .nexus-skeleton-card-body {
-    padding: 12px;
+    padding: var(--space-3);
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: var(--space-2);
 }
 
 .nexus-skeleton-card-footer {
     display: flex;
     align-items: center;
-    gap: 8px;
-    margin-top: 8px;
-    padding-top: 8px;
+    gap: var(--space-2);
+    margin-top: var(--space-2);
+    padding-top: var(--space-2);
     border-top: 1px solid var(--border-color, #e4e6eb);
 }
 
@@ -421,10 +421,10 @@
     z-index: 9998;
     display: flex;
     flex-direction: column;
-    padding: 100px 20px 100px;
+    padding: var(--space-20) var(--space-5) 100px; /* 100px specific, 20px → space-5 */
     opacity: 0;
     visibility: hidden;
-    transition: opacity 0.2s ease, visibility 0.2s ease;
+    transition: opacity var(--transition-fast) var(--ease-in-out), visibility var(--transition-fast) var(--ease-in-out);
 }
 
 [data-theme="dark"] .nexus-page-skeleton {
@@ -439,7 +439,7 @@
 /* Skeleton fade out */
 .skeleton-feed-container,
 [class*="skeleton-container"] {
-    transition: opacity 0.4s cubic-bezier(0.0, 0.0, 0.2, 1);
+    transition: opacity var(--transition-slow) cubic-bezier(0.0, 0.0, 0.2, 1);
 }
 
 /* ============================================
@@ -452,7 +452,7 @@ button,
 a[role="button"] {
     position: relative;
     transform: translateZ(0);
-    transition: all 0.2s cubic-bezier(0.4, 0.0, 0.2, 1);
+    transition: all var(--transition-fast) var(--ease-in-out);
     will-change: transform, box-shadow;
     overflow: hidden;
 }
@@ -495,7 +495,7 @@ button::after,
 button:active::after,
 .btn:active::after,
 .glass-btn:active::after {
-    animation: ripple 0.6s ease-out;
+    animation: ripple var(--transition-slow) var(--ease-out);
 }
 
 /* ============================================
@@ -507,7 +507,7 @@ button:active::after,
 .admin-glass-card,
 .feed-card,
 .post-card {
-    transition: all 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
+    transition: all var(--transition-base) var(--ease-in-out);
     transform: translateZ(0);
     will-change: transform, box-shadow;
 }
@@ -528,11 +528,11 @@ button:active::after,
 .glass-card::before {
     content: '';
     position: absolute;
-    inset: -1px;
+    inset: -1px; /* Specific negative value, no token */
     border-radius: inherit;
     background: linear-gradient(135deg, rgba(99, 102, 241, 0.2), rgba(139, 92, 246, 0.2));
     opacity: 0;
-    transition: opacity 0.3s;
+    transition: opacity var(--transition-base);
     z-index: -1;
     pointer-events: none;
 }
@@ -552,26 +552,26 @@ button:active::after,
 .feed-card,
 .post-card,
 .nexus-card {
-    animation: fadeInUp 0.4s cubic-bezier(0.4, 0.0, 0.2, 1) backwards;
+    animation: fadeInUp var(--transition-slow) var(--ease-in-out) backwards;
 }
 
 /* ============================================
    6. NAVIGATION ICON ANIMATIONS
    ============================================ */
 .nexus-native-nav-item.active i {
-    animation: iconPop 0.4s var(--spring-bounce, cubic-bezier(0.68, -0.55, 0.265, 1.55)) forwards;
+    animation: iconPop var(--transition-slow) var(--spring-bounce, cubic-bezier(0.68, -0.55, 0.265, 1.55)) forwards;
 }
 
 .nexus-native-nav-item.active span {
-    animation: labelFadeIn 0.3s ease-out 0.1s both;
+    animation: labelFadeIn var(--transition-base) ease-out var(--transition-fast) both;
 }
 
 .nexus-native-nav-item.tapped i {
-    animation: iconBounce 0.4s var(--spring-bounce, cubic-bezier(0.68, -0.55, 0.265, 1.55));
+    animation: iconBounce var(--transition-slow) var(--spring-bounce, cubic-bezier(0.68, -0.55, 0.265, 1.55));
 }
 
 .nexus-native-nav-item i {
-    transition: transform 0.2s var(--spring-bounce, cubic-bezier(0.68, -0.55, 0.265, 1.55)), color 0.2s ease;
+    transition: transform var(--transition-fast) var(--spring-bounce, cubic-bezier(0.68, -0.55, 0.265, 1.55)), color var(--transition-fast) var(--ease-in-out);
 }
 
 .nexus-native-nav-item:hover:not(.active) i {
@@ -595,13 +595,13 @@ button:active::after,
     opacity: 0;
     transform: translate(-50%, -50%);
     border-radius: 50%;
-    transition: width 0.5s ease, height 0.5s ease, opacity 0.5s ease;
+    transition: width var(--transition-slow) var(--ease-in-out), height var(--transition-slow) var(--ease-in-out), opacity var(--transition-slow) var(--ease-in-out);
     pointer-events: none;
 }
 
 .nexus-native-nav-item:active::before {
-    width: 150px;
-    height: 150px;
+    width: 150px; /* Specific size, no token */
+    height: 150px; /* Specific size, no token */
     opacity: 0.15;
 }
 
@@ -612,7 +612,7 @@ button:active::after,
 .fa-regular,
 .fa-brands,
 i[class*="fa-"] {
-    transition: transform 0.2s cubic-bezier(0.4, 0.0, 0.2, 1);
+    transition: transform var(--transition-fast) var(--ease-in-out);
 }
 
 button:hover .fa-solid,
@@ -638,12 +638,12 @@ a:hover .fa-solid,
 .badge,
 .admin-badge,
 .notification-badge {
-    animation: bounceIn 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    animation: bounceIn var(--transition-slow) cubic-bezier(0.68, -0.55, 0.265, 1.55);
 }
 
 .notification-badge {
-    animation: bounceIn 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55),
-               pulse 2s ease-in-out 0.5s infinite;
+    animation: bounceIn var(--transition-slow) cubic-bezier(0.68, -0.55, 0.265, 1.55),
+               pulse 2s ease-in-out var(--transition-slow) infinite;
 }
 
 .nexus-native-nav-badge,
@@ -668,7 +668,7 @@ a:hover .fa-solid,
 }
 
 .nexus-quick-fab i {
-    transition: transform 0.3s var(--spring-bounce, cubic-bezier(0.68, -0.55, 0.265, 1.55));
+    transition: transform var(--transition-base) var(--spring-bounce, cubic-bezier(0.68, -0.55, 0.265, 1.55));
 }
 
 .nexus-quick-fab:hover i,
@@ -681,12 +681,12 @@ a:hover .fa-solid,
    ============================================ */
 #nexus-toast,
 .toast-notification {
-    animation: slideInRight 0.4s cubic-bezier(0.4, 0.0, 0.2, 1);
+    animation: slideInRight var(--transition-slow) var(--ease-in-out);
 }
 
 #nexus-toast.hiding,
 .toast-notification.hiding {
-    animation: slideOutRight 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
+    animation: slideOutRight var(--transition-base) var(--ease-in-out);
 }
 
 /* ============================================
@@ -695,17 +695,17 @@ a:hover .fa-solid,
 .modal,
 .modal-overlay,
 [role="dialog"] {
-    animation: fadeIn 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
+    animation: fadeIn var(--transition-base) var(--ease-in-out);
 }
 
 .modal.closing,
 .modal-overlay.closing {
-    animation: fadeOut 0.2s cubic-bezier(0.4, 0.0, 0.2, 1);
+    animation: fadeOut var(--transition-fast) var(--ease-in-out);
 }
 
 .modal-content,
 .modal-dialog {
-    animation: scaleIn 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
+    animation: scaleIn var(--transition-base) var(--ease-in-out);
 }
 
 /* ============================================
@@ -713,22 +713,22 @@ a:hover .fa-solid,
    ============================================ */
 main,
 .main-content {
-    animation: fadeInUp 0.5s cubic-bezier(0.4, 0.0, 0.2, 1);
+    animation: fadeInUp var(--transition-slow) var(--ease-in-out);
 }
 
 .htb-container,
 .htb-container-full,
 [class*="content"] {
-    animation: contentFadeIn 0.35s ease-out;
+    animation: contentFadeIn 0.35s var(--ease-out);
 }
 
 .nexus-content-enter {
-    animation: nexus-content-fade-in 0.3s ease forwards;
+    animation: nexus-content-fade-in var(--transition-base) ease forwards;
 }
 
 /* Page transition fallback */
 .page-transitioning {
-    animation: contentFadeIn 0.25s ease-out;
+    animation: contentFadeIn var(--transition-base) var(--ease-out);
 }
 
 /* ============================================
@@ -749,11 +749,11 @@ main,
 }
 
 .nexus-optimistic-success {
-    animation: nexus-optimistic-success 0.3s ease;
+    animation: nexus-optimistic-success var(--transition-base) var(--ease-in-out);
 }
 
 .nexus-optimistic-error {
-    animation: nexus-optimistic-error 0.5s ease;
+    animation: nexus-optimistic-error var(--transition-slow) var(--ease-in-out);
 }
 
 .nexus-optimistic-error::after {
@@ -776,10 +776,10 @@ main,
     left: 0;
     top: 50%;
     transform: translateY(-50%);
-    width: 3px;
+    width: 3px; /* Specific size, no token */
     height: 60%;
     background: #6366f1;
-    border-radius: 2px;
+    border-radius: var(--radius-sm); /* Design token not available for 2px */
     opacity: 0.5;
 }
 
@@ -791,10 +791,10 @@ main,
     top: 0;
     left: 0;
     width: 0;
-    height: 3px;
+    height: 3px; /* Specific size, no token */
     background: linear-gradient(90deg, #6366f1, #8b5cf6, #ec4899);
     z-index: var(--z-notification, 1700);
-    transition: width 0.3s ease-out;
+    transition: width var(--transition-base) var(--ease-out);
     box-shadow: 0 0 10px rgba(99, 102, 241, 0.5);
 }
 
@@ -805,7 +805,7 @@ main,
 .nexus-loading-bar.complete {
     width: 100%;
     opacity: 0;
-    transition: width 0.2s ease-out, opacity 0.3s ease 0.2s;
+    transition: width var(--transition-fast) var(--ease-out), opacity var(--transition-base) ease var(--transition-fast);
 }
 
 .loading-spinner,
@@ -839,18 +839,18 @@ main,
    ============================================ */
 a {
     position: relative;
-    transition: color 0.2s;
+    transition: color var(--transition-fast);
 }
 
 a:not(.btn):not(.glass-btn):not(.nav-link):not(.nexus-native-nav-item):not(.nexus-drawer-item)::after {
     content: '';
     position: absolute;
-    bottom: -2px;
+    bottom: -2px; /* Specific negative value, no token */
     left: 0;
     width: 0;
-    height: 2px;
+    height: 2px; /* Specific size, no token */
     background: currentColor;
-    transition: width 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
+    transition: width var(--transition-base) var(--ease-in-out);
 }
 
 a:not(.btn):not(.glass-btn):not(.nav-link):not(.nexus-native-nav-item):not(.nexus-drawer-item):hover::after {
@@ -861,7 +861,7 @@ a:not(.btn):not(.glass-btn):not(.nav-link):not(.nexus-native-nav-item):not(.nexu
    17. IMAGE LOADING
    ============================================ */
 img {
-    transition: opacity 0.3s, filter 0.3s;
+    transition: opacity 0.3s, filter var(--transition-base);
 }
 
 img[loading="lazy"] {
@@ -874,8 +874,8 @@ img:not([loading="lazy"]) {
 }
 
 img.blur-up {
-    filter: blur(20px);
-    transition: filter 0.5s;
+    filter: blur(20px); /* Specific blur, no token */
+    transition: filter var(--transition-slow);
 }
 
 img.blur-up.loaded {
@@ -891,7 +891,7 @@ img.blur-up.loaded {
 
 .nexus-pressable,
 .nexus-touch-feedback {
-    transition: transform 0.1s ease;
+    transition: transform var(--transition-fast) var(--ease-in-out);
     -webkit-tap-highlight-color: transparent;
 }
 
@@ -911,7 +911,7 @@ img.blur-up.loaded {
     inset: 0;
     background: currentColor;
     opacity: 0;
-    transition: opacity 0.15s ease;
+    transition: opacity var(--transition-fast) var(--ease-in-out);
     pointer-events: none;
 }
 
@@ -926,9 +926,9 @@ img.blur-up.loaded {
 .nexus-drawer-item,
 .nexus-sheet-action,
 .nexus-drawer-footer-action {
-    transition: transform 0.15s var(--spring-bounce, cubic-bezier(0.68, -0.55, 0.265, 1.55)),
-                box-shadow 0.15s ease,
-                background 0.2s ease;
+    transition: transform var(--transition-fast) var(--spring-bounce, cubic-bezier(0.68, -0.55, 0.265, 1.55)),
+                box-shadow var(--transition-fast) var(--ease-in-out),
+                background var(--transition-fast) var(--ease-in-out);
 }
 
 .htb-btn:active,
@@ -938,8 +938,8 @@ img.blur-up.loaded {
 }
 
 .nexus-drawer-item-icon {
-    transition: transform 0.25s var(--spring-bounce, cubic-bezier(0.68, -0.55, 0.265, 1.55)),
-                box-shadow 0.2s ease;
+    transition: transform var(--transition-base) var(--spring-bounce, cubic-bezier(0.68, -0.55, 0.265, 1.55)),
+                box-shadow var(--transition-fast) var(--ease-in-out);
 }
 
 .nexus-drawer-item:active .nexus-drawer-item-icon {
@@ -955,19 +955,19 @@ img.blur-up.loaded {
    20. SCROLLBAR STYLING
    ============================================ */
 ::-webkit-scrollbar {
-    width: 12px;
-    height: 12px;
+    width: var(--space-3);
+    height: var(--space-3);
 }
 
 ::-webkit-scrollbar-track {
     background: rgba(0, 0, 0, 0.1);
-    border-radius: 6px;
+    border-radius: var(--space-2);
 }
 
 ::-webkit-scrollbar-thumb {
     background: rgba(99, 102, 241, 0.3);
-    border-radius: 6px;
-    transition: background 0.2s;
+    border-radius: var(--space-2);
+    transition: background var(--transition-fast);
 }
 
 ::-webkit-scrollbar-thumb:hover {
@@ -1043,14 +1043,14 @@ body {
 .glass-gradient-border {
     position: relative;
     background: rgba(15, 23, 42, 0.7);
-    -webkit-backdrop-filter: blur(20px);
-    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px); /* Specific blur, no token */
+    backdrop-filter: blur(20px); /* Specific blur, no token */
 }
 
 .glass-gradient-border::before {
     content: '';
     position: absolute;
-    inset: -2px;
+    inset: -2px; /* Specific negative value, no token */
     border-radius: inherit;
     background: linear-gradient(45deg, #6366f1, #8b5cf6, #ec4899, #6366f1);
     background-size: 400% 400%;
@@ -1087,7 +1087,7 @@ button,
 .toast-notification {
     transform: translateZ(0);
     backface-visibility: hidden;
-    perspective: 1000px;
+    perspective: 1000px; /* Performance optimization value, no token */
 }
 
 .nexus-card,
@@ -1146,10 +1146,10 @@ button,
    ============================================ */
 @media (max-width: 900px) {
     .nexus-utility-bar {
-        padding: 6px 8px !important;
+        padding: var(--space-2) var(--space-2) !important;
         height: auto !important;
-        min-height: 40px !important;
-        gap: 4px !important;
+        min-height: var(--space-10) !important;
+        gap: var(--space-1) !important;
         flex-wrap: nowrap !important;
         overflow-x: auto !important;
         overflow-y: hidden !important;
@@ -1168,7 +1168,7 @@ button,
     .nexus-utility-bar > div[style*="margin-left:auto"] {
         display: flex !important;
         align-items: center !important;
-        gap: 6px !important;
+        gap: var(--space-2) /* 8px close to 6px */ !important;
         margin-left: auto !important;
         flex-shrink: 0 !important;
         width: 100% !important;
@@ -1176,27 +1176,27 @@ button,
     }
 
     .nexus-utility-bar .util-link {
-        padding: 6px 8px !important;
-        font-size: 0.75rem !important;
-        min-height: 28px !important;
+        padding: var(--space-2) var(--space-2) !important;
+        font-size: var(--font-size-xs) !important;
+        min-height: 28px /* No exact token */ !important;
         white-space: nowrap !important;
-        border-radius: 6px !important;
+        border-radius: var(--space-2) /* 8px close to 6px */ !important;
         background: rgba(255, 255, 255, 0.08) !important;
         margin-left: 0 !important;
     }
 
     .nexus-utility-bar .htb-dropdown > button {
-        padding: 6px 10px !important;
-        font-size: 0.7rem !important;
-        border-radius: 6px !important;
+        padding: var(--space-2) 10px !important;
+        font-size: var(--font-size-xs) /* Smaller than xs, no token */ !important;
+        border-radius: var(--space-2) /* 8px close to 6px */ !important;
     }
 
     .nexus-utility-bar button[onclick="toggleTheme()"] {
-        width: 32px !important;
-        height: 32px !important;
+        width: var(--space-8) !important;
+        height: var(--space-8) !important;
         padding: 0 !important;
-        font-size: 1rem !important;
-        border-radius: 8px !important;
+        font-size: var(--font-size-base) !important;
+        border-radius: var(--radius-base) !important;
         display: flex !important;
         align-items: center !important;
         justify-content: center !important;
@@ -1209,22 +1209,22 @@ button,
 
     .nexus-utility-bar .htb-dropdown-content {
         position: fixed !important;
-        left: 8px !important;
-        right: 8px !important;
+        left: var(--space-2) !important;
+        right: var(--space-2) !important;
         top: auto !important;
-        bottom: 80px !important;
+        bottom: var(--space-20) !important;
         width: auto !important;
         max-height: 70vh !important;
-        border-radius: 16px !important;
+        border-radius: var(--radius-lg) !important;
         z-index: 10001 !important;
     }
 
     .nexus-utility-bar #nexus-bell-badge {
-        min-width: 14px !important;
-        height: 14px !important;
-        font-size: 0.6rem !important;
-        top: -2px !important;
-        right: -2px !important;
+        min-width: 14px /* No exact token */ !important;
+        height: 14px /* No exact token */ !important;
+        font-size: var(--font-size-xs) /* Smaller than xs, no token */ !important;
+        top: -2px /* Specific negative value, no token */ !important;
+        right: -2px /* Specific negative value, no token */ !important;
     }
 
     .nexus-utility-bar .htb-arrow {
@@ -1240,19 +1240,19 @@ button,
 
     .nexus-utility-bar .util-link,
     .nexus-utility-bar .htb-dropdown > button {
-        padding: 6px 10px !important;
-        min-width: 36px !important;
+        padding: var(--space-2) 10px !important;
+        min-width: 36px /* No exact token */ !important;
         justify-content: center !important;
     }
 }
 
 @media (max-width: 360px) {
     .nexus-utility-bar .htb-dropdown > button {
-        padding: 6px 8px !important;
+        padding: var(--space-2) var(--space-2) !important;
     }
 
     .nexus-utility-bar > div[style*="margin-left:auto"] {
-        gap: 4px !important;
+        gap: var(--space-1) !important;
     }
 }
 
@@ -1260,7 +1260,7 @@ button,
    27. RESPONSIVE GRID LOADING
    ============================================ */
 .nexus-loading {
-    min-height: 200px;
+    min-height: 200px; /* Specific size, no token */
     position: relative;
 }
 
@@ -1268,13 +1268,13 @@ button,
 .listings-grid.nexus-loading .nexus-skeleton-container {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-    gap: 16px;
+    gap: var(--space-4);
 }
 
 @media (max-width: 640px) {
     .marketplace-grid.nexus-loading .nexus-skeleton-container,
     .listings-grid.nexus-loading .nexus-skeleton-container {
         grid-template-columns: repeat(2, 1fr);
-        gap: 8px;
+        gap: var(--space-2);
     }
 }

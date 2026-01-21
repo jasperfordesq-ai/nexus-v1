@@ -6,6 +6,7 @@
  * that rely on JavaScript to reveal content (opacity: 0 -> 1 patterns)
  * 
  * CSS Audit 2026-01-18: Addresses JS-dependent visibility patterns
+ * Design Tokens Migration 2026-01-21: Migrated to use design tokens
  */
 
 /* ============================================
@@ -50,7 +51,7 @@ main,
 .civic-header,
 .civic-utility-bar {
     opacity: 1 !important;
-    transform: translateY(0) !important;
+    transform: translateY(var(--space-0)) !important;
     visibility: visible !important;
 }
 
@@ -125,7 +126,7 @@ img.lazy,
 
 /* Remove animations that rely on JS timing */
 *:not(.modal):not(.toast):not(.drawer) {
-    animation-delay: 0s !important;
+    animation-delay: var(--space-0) !important;
 }
 
 /* ============================================

@@ -59,9 +59,9 @@
 [data-layout="civicone"] .govuk-button,
 .civicone .govuk-button {
     /* Typography */
-    font-family: var(--civicone-font-family, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif);
-    font-size: 1rem; /* 16px mobile */
-    font-weight: 700;
+    font-family: var(--civicone-font-family, var(--font-family-primary));
+    font-size: var(--font-size-base); /* 16px mobile */
+    font-weight: var(--font-weight-bold);
     line-height: 1.1875;
     text-decoration: none;
     text-align: center;
@@ -71,15 +71,15 @@
     position: relative;
     min-height: 44px; /* WCAG touch target */
     min-width: 44px;
-    margin-top: 0;
-    margin-right: 0;
-    margin-left: 0;
-    margin-bottom: 22px; /* GOV.UK: 22px bottom margin */
-    padding: 8px 10px 7px;
+    margin-top: var(--space-0);
+    margin-right: var(--space-0);
+    margin-left: var(--space-0);
+    margin-bottom: var(--space-6); /* GOV.UK: 22px bottom margin */
+    padding: var(--space-2) var(--space-3) 7px;
 
     /* Appearance */
     border: 2px solid transparent;
-    border-radius: 0; /* GOV.UK: No border radius */
+    border-radius: var(--radius-none); /* GOV.UK: No border radius */
     box-shadow: 0 2px 0 var(--govuk-button-shadow);
     cursor: pointer;
 
@@ -92,16 +92,16 @@
     user-select: none;
 
     /* Smooth transitions */
-    transition: background-color 0.1s, box-shadow 0.1s;
+    transition: background-color var(--transition-fast), box-shadow var(--transition-fast);
 }
 
 @media (min-width: 40.0625em) {
     .civic-button,
     [data-layout="civicone"] .govuk-button,
     .civicone .govuk-button {
-        font-size: 1.1875rem; /* 19px desktop */
-        padding: 8px 14px 7px;
-        margin-bottom: 32px;
+        font-size: var(--font-size-lg); /* 19px desktop */
+        padding: var(--space-2) 14px 7px;
+        margin-bottom: var(--space-8);
     }
 }
 
@@ -222,9 +222,9 @@
 .civic-button--start,
 [data-layout="civicone"] .govuk-button--start,
 .civicone .govuk-button--start {
-    font-size: 1.125rem; /* 18px mobile */
-    font-weight: 700;
-    padding: 10px 16px 7px;
+    font-size: var(--font-size-lg); /* 18px mobile */
+    font-weight: var(--font-weight-bold);
+    padding: var(--space-3) var(--space-4) 7px;
     min-height: 52px;
 }
 
@@ -232,8 +232,8 @@
     .civic-button--start,
     [data-layout="civicone"] .govuk-button--start,
     .civicone .govuk-button--start {
-        font-size: 1.5rem; /* 24px desktop */
-        padding: 12px 20px 9px;
+        font-size: var(--font-size-2xl); /* 24px desktop */
+        padding: var(--space-3) var(--space-5) 9px;
         min-height: 56px;
     }
 }
@@ -246,7 +246,7 @@
     display: inline-block;
     width: 17px;
     height: 17px;
-    margin-left: 10px;
+    margin-left: var(--space-3);
     vertical-align: middle;
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='17' height='17' viewBox='0 0 33 40'%3E%3Cpath fill='%23fff' d='M0 0h13l20 20-20 20H0l20-20z'/%3E%3C/svg%3E");
     background-repeat: no-repeat;
@@ -268,15 +268,15 @@
 .civicone .govuk-button-group {
     display: flex;
     flex-wrap: wrap;
-    gap: var(--civicone-spacing-3, 15px);
-    margin-bottom: var(--civicone-spacing-4, 20px);
+    gap: var(--space-4);
+    margin-bottom: var(--space-5);
     align-items: baseline;
 }
 
 .civic-button-group .civic-button,
 [data-layout="civicone"] .govuk-button-group .govuk-button,
 .civicone .govuk-button-group .govuk-button {
-    margin-bottom: var(--civicone-spacing-2, 10px);
+    margin-bottom: var(--space-3);
 }
 
 /* ===========================================
@@ -304,15 +304,15 @@ a.civic-button--secondary:visited,
    Small Button Variant
    =========================================== */
 .civic-button--small {
-    font-size: 0.875rem;
-    padding: 6px 10px 5px;
+    font-size: var(--font-size-sm);
+    padding: 6px var(--space-3) 5px;
     min-height: 36px;
-    margin-bottom: var(--civicone-spacing-2, 10px);
+    margin-bottom: var(--space-3);
 }
 
 @media (min-width: 40.0625em) {
     .civic-button--small {
-        font-size: 1rem;
+        font-size: var(--font-size-base);
     }
 }
 
@@ -330,13 +330,13 @@ a.civic-button--secondary:visited,
 .civic-button--icon {
     display: inline-flex;
     align-items: center;
-    gap: 8px;
+    gap: var(--space-2);
 }
 
 .civic-button--icon svg,
 .civic-button--icon i {
-    width: 20px;
-    height: 20px;
+    width: var(--space-5);
+    height: var(--space-5);
     flex-shrink: 0;
 }
 
@@ -354,12 +354,12 @@ a.civic-button--secondary:visited,
     position: absolute;
     top: 50%;
     left: 50%;
-    width: 20px;
-    height: 20px;
-    margin: -10px 0 0 -10px;
+    width: var(--space-5);
+    height: var(--space-5);
+    margin: calc(var(--space-3) * -1) 0 0 calc(var(--space-3) * -1);
     border: 2px solid rgba(255, 255, 255, 0.3);
     border-top-color: #ffffff;
-    border-radius: 50%;
+    border-radius: var(--radius-full);
     animation: civic-button-spin 0.8s linear infinite;
 }
 

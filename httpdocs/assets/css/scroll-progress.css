@@ -1,7 +1,7 @@
 /**
  * Scroll Progress Indicator
  * Top bar showing page scroll position
- * Version: 1.0 - 2026-01-19
+ * Version: 1.1 - 2026-01-21 - Migrated to design tokens
  *
  * Features:
  * - Fixed top position progress bar
@@ -22,23 +22,23 @@
     width: 100%;
     height: 3px;
     background: transparent;
-    z-index: 9999;
+    z-index: var(--z-emergency);
     pointer-events: none;
 }
 
 .scroll-progress-bar {
     height: 100%;
     width: 0%;
-    background: linear-gradient(90deg, #6366f1, #8b5cf6, #ec4899);
+    background: linear-gradient(90deg, var(--color-primary-500), var(--color-purple-500), var(--color-pink-500));
     transition: width 0.1s linear;
-    border-radius: 0 2px 2px 0;
+    border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
 }
 
 /* Glow effect */
 .scroll-progress--glow .scroll-progress-bar {
     box-shadow:
-        0 0 8px rgba(99, 102, 241, 0.5),
-        0 0 16px rgba(139, 92, 246, 0.3);
+        0 0 var(--space-2) rgba(99, 102, 241, 0.5),
+        0 0 var(--space-4) rgba(139, 92, 246, 0.3);
 }
 
 /* Thin variant */
@@ -57,40 +57,40 @@
 
 /* Primary gradient (default) */
 .scroll-progress--primary .scroll-progress-bar {
-    background: linear-gradient(90deg, #6366f1, #8b5cf6);
+    background: linear-gradient(90deg, var(--color-primary-500), var(--color-purple-500));
 }
 
 /* Success green */
 .scroll-progress--success .scroll-progress-bar {
-    background: linear-gradient(90deg, #22c55e, #16a34a);
+    background: linear-gradient(90deg, var(--color-green-500), var(--color-green-600));
 }
 
 /* Warning amber */
 .scroll-progress--warning .scroll-progress-bar {
-    background: linear-gradient(90deg, #f59e0b, #d97706);
+    background: linear-gradient(90deg, var(--color-amber-500), var(--color-amber-600));
 }
 
 /* Info blue */
 .scroll-progress--info .scroll-progress-bar {
-    background: linear-gradient(90deg, #3b82f6, #2563eb);
+    background: linear-gradient(90deg, var(--color-blue-500), var(--color-blue-600));
 }
 
 /* Rainbow gradient */
 .scroll-progress--rainbow .scroll-progress-bar {
     background: linear-gradient(90deg,
-        #ef4444,
-        #f59e0b,
-        #22c55e,
-        #3b82f6,
-        #8b5cf6,
-        #ec4899
+        var(--color-red-500),
+        var(--color-amber-500),
+        var(--color-green-500),
+        var(--color-blue-500),
+        var(--color-purple-500),
+        var(--color-pink-500)
     );
     background-size: 200% 100%;
 }
 
 /* Solid color */
 .scroll-progress--solid .scroll-progress-bar {
-    background: #6366f1;
+    background: var(--color-primary-500);
 }
 
 /* ==========================================================================
@@ -99,7 +99,7 @@
 
 /* When header is present, position below it */
 .scroll-progress--below-header {
-    top: var(--header-height, 56px);
+    top: var(--header-height, var(--layout-header-height));
 }
 
 /* On scroll, keep at top */
@@ -113,18 +113,18 @@
 
 .scroll-progress-circle {
     position: fixed;
-    bottom: 80px;
-    right: 20px;
-    width: 48px;
-    height: 48px;
-    z-index: 999;
+    bottom: var(--space-20);
+    right: var(--space-5);
+    width: var(--space-12);
+    height: var(--space-12);
+    z-index: var(--z-sticky);
     pointer-events: auto;
     cursor: pointer;
     opacity: 0;
     transform: scale(0.8);
     transition:
-        opacity 0.3s ease,
-        transform 0.3s ease;
+        opacity var(--transition-base),
+        transform var(--transition-base);
 }
 
 .scroll-progress-circle.visible {
@@ -157,28 +157,28 @@
 /* Circle background */
 .scroll-progress-circle-inner {
     position: absolute;
-    top: 4px;
-    left: 4px;
-    right: 4px;
-    bottom: 4px;
+    top: var(--space-1);
+    left: var(--space-1);
+    right: var(--space-1);
+    bottom: var(--space-1);
     background: white;
-    border-radius: 50%;
+    border-radius: var(--radius-full);
     display: flex;
     align-items: center;
     justify-content: center;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    box-shadow: var(--shadow-md);
 }
 
 .scroll-progress-circle-inner i {
-    color: #6366f1;
-    font-size: 16px;
+    color: var(--color-primary-500);
+    font-size: var(--font-size-base);
 }
 
 /* Percentage text */
 .scroll-progress-percent {
-    font-size: 11px;
-    font-weight: 600;
-    color: #6366f1;
+    font-size: var(--font-size-xs);
+    font-weight: var(--font-weight-semibold);
+    color: var(--color-primary-500);
 }
 
 /* ==========================================================================
@@ -187,19 +187,19 @@
 
 .reading-progress {
     position: sticky;
-    top: var(--header-height, 56px);
+    top: var(--header-height, var(--layout-header-height));
     left: 0;
     width: 100%;
     height: 3px;
     background: rgba(0, 0, 0, 0.05);
-    z-index: 100;
-    margin-bottom: 1rem;
+    z-index: var(--z-header);
+    margin-bottom: var(--space-4);
 }
 
 .reading-progress-bar {
     height: 100%;
     width: 0%;
-    background: linear-gradient(90deg, #6366f1, #8b5cf6);
+    background: linear-gradient(90deg, var(--color-primary-500), var(--color-purple-500));
     transition: width 0.1s linear;
 }
 
@@ -207,18 +207,18 @@
 .reading-progress-time {
     position: absolute;
     right: 0;
-    top: 8px;
+    top: var(--space-2);
     background: white;
-    padding: 4px 8px;
-    border-radius: 4px;
-    font-size: 12px;
-    color: #6b7280;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    padding: var(--space-1) var(--space-2);
+    border-radius: var(--radius-sm);
+    font-size: var(--font-size-xs);
+    color: var(--color-gray-500);
+    box-shadow: var(--shadow-sm);
     opacity: 0;
-    transform: translateY(-4px);
+    transform: translateY(calc(-1 * var(--space-1)));
     transition:
-        opacity 0.2s ease,
-        transform 0.2s ease;
+        opacity var(--transition-fast),
+        transform var(--transition-fast);
 }
 
 .reading-progress:hover .reading-progress-time {
@@ -236,18 +236,18 @@
     }
 
     .scroll-progress-circle {
-        width: 40px;
-        height: 40px;
-        bottom: 100px;
-        right: 16px;
+        width: var(--space-10);
+        height: var(--space-10);
+        bottom: var(--space-12);
+        right: var(--space-4);
     }
 
     .scroll-progress-circle-inner i {
-        font-size: 14px;
+        font-size: var(--font-size-sm);
     }
 
     .scroll-progress-percent {
-        font-size: 10px;
+        font-size: var(--font-size-xs);
     }
 }
 
@@ -261,8 +261,8 @@
 
 [data-theme="dark"] .scroll-progress--glow .scroll-progress-bar {
     box-shadow:
-        0 0 10px rgba(99, 102, 241, 0.6),
-        0 0 20px rgba(139, 92, 246, 0.4);
+        0 0 var(--space-3) rgba(99, 102, 241, 0.6),
+        0 0 var(--space-5) rgba(139, 92, 246, 0.4);
 }
 
 [data-theme="dark"] .scroll-progress-circle-bg {
@@ -270,13 +270,13 @@
 }
 
 [data-theme="dark"] .scroll-progress-circle-inner {
-    background: #1f2937;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    background: var(--color-gray-800);
+    box-shadow: 0 var(--space-1) var(--space-2) rgba(0, 0, 0, 0.3);
 }
 
 [data-theme="dark"] .scroll-progress-circle-inner i,
 [data-theme="dark"] .scroll-progress-percent {
-    color: #a5b4fc;
+    color: var(--color-primary-300);
 }
 
 [data-theme="dark"] .reading-progress {
@@ -284,8 +284,8 @@
 }
 
 [data-theme="dark"] .reading-progress-time {
-    background: #1f2937;
-    color: #9ca3af;
+    background: var(--color-gray-800);
+    color: var(--color-gray-500);
 }
 
 /* ==========================================================================
@@ -300,7 +300,7 @@
     }
 
     .scroll-progress-circle {
-        transition: opacity 0.2s ease;
+        transition: opacity var(--transition-fast);
     }
 }
 

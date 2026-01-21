@@ -69,16 +69,16 @@ body * {
     right: 0;
     background: linear-gradient(135deg, #dc2626, #b91c1c);
     color: white;
-    padding: 12px 20px;
+    padding: var(--space-3) var(--space-5);
     text-align: center;
-    font-weight: 600;
+    font-weight: var(--font-weight-semibold);
     z-index: 999999;
-    transition: top 0.3s ease;
+    transition: top var(--transition-base);
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 10px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    gap: var(--space-2);
+    box-shadow: var(--shadow-lg);
 }
 
 .offline-banner.visible {
@@ -86,7 +86,7 @@ body * {
 }
 
 .offline-banner i {
-    font-size: 1.2rem;
+    font-size: var(--font-size-xl);
 }
 
 /* ============================================
@@ -98,8 +98,8 @@ body * {
     z-index: 100;
     background: var(--ed-surface);
     border-bottom: 1px solid var(--ed-border);
-    padding: 12px 16px;
-    padding-top: calc(12px + var(--safe-top));
+    padding: var(--space-3) var(--space-4);
+    padding-top: calc(var(--space-3) + var(--safe-top));
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -110,22 +110,22 @@ body * {
 .edit-header-left {
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: var(--space-3);
 }
 
 .edit-close-btn {
     width: 36px;
     height: 36px;
-    border-radius: 50%;
+    border-radius: var(--radius-full);
     background: rgba(255, 255, 255, 0.05);
     border: none;
     color: var(--ed-text-secondary);
-    font-size: 1.25rem;
+    font-size: var(--font-size-xl);
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: all 0.2s;
+    transition: all var(--transition-fast);
 }
 
 .edit-close-btn:hover {
@@ -134,8 +134,8 @@ body * {
 }
 
 .edit-title {
-    font-size: 1.1rem;
-    font-weight: 700;
+    font-size: var(--font-size-lg);
+    font-weight: var(--font-weight-bold);
     color: var(--ed-text);
 }
 
@@ -160,30 +160,30 @@ body * {
 
 .edit-tabs-inner {
     display: flex;
-    gap: 8px;
-    padding: 12px 16px;
+    gap: var(--space-2);
+    padding: var(--space-3) var(--space-4);
     min-width: min-content;
 }
 
 .edit-pill {
     flex-shrink: 0;
-    padding: 10px 20px;
-    border-radius: 24px;
+    padding: var(--space-2) var(--space-5);
+    border-radius: var(--radius-2xl);
     border: 2px solid var(--ed-border);
     background: transparent;
     color: var(--ed-text-secondary);
-    font-size: 0.9rem;
-    font-weight: 600;
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-semibold);
     cursor: pointer;
-    transition: all 0.2s;
+    transition: all var(--transition-fast);
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: var(--space-2);
     white-space: nowrap;
 }
 
 .edit-pill i {
-    font-size: 1rem;
+    font-size: var(--font-size-base);
 }
 
 .edit-pill:hover {
@@ -213,12 +213,12 @@ body * {
     flex: 1;
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
-    padding-bottom: calc(32px + var(--safe-bottom));
+    padding-bottom: calc(var(--space-8) + var(--safe-bottom));
 }
 
 .edit-panel {
     display: none;
-    padding: 20px 16px;
+    padding: var(--space-5) var(--space-4);
     animation: fadeIn 0.3s ease;
 }
 
@@ -227,7 +227,7 @@ body * {
 }
 
 @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(10px); }
+    from { opacity: 0; transform: translateY(var(--space-2)); }
     to { opacity: 1; transform: translateY(0); }
 }
 
@@ -235,33 +235,33 @@ body * {
    FORM FIELDS
    ============================================ */
 .ed-field {
-    margin-bottom: 24px;
+    margin-bottom: var(--space-6);
 }
 
 .ed-label {
     display: block;
-    font-weight: 600;
-    font-size: 0.95rem;
+    font-weight: var(--font-weight-semibold);
+    font-size: var(--font-size-sm);
     color: var(--ed-text);
-    margin-bottom: 8px;
+    margin-bottom: var(--space-2);
 }
 
 .ed-label-hint {
-    font-weight: 400;
+    font-weight: var(--font-weight-normal);
     color: var(--ed-text-muted);
-    font-size: 0.85rem;
+    font-size: var(--font-size-xs);
 }
 
 .ed-input, .ed-textarea, .ed-select {
     width: 100%;
-    padding: 14px 16px;
-    border-radius: 12px;
+    padding: var(--space-3) var(--space-4);
+    border-radius: var(--radius-md);
     border: 2px solid var(--ed-border);
     background: rgba(255, 255, 255, 0.03);
     color: var(--ed-text);
-    font-size: 1rem;
+    font-size: var(--font-size-base);
     font-family: inherit;
-    transition: all 0.2s;
+    transition: all var(--transition-fast);
 }
 
 .ed-input:focus, .ed-textarea:focus, .ed-select:focus {
@@ -276,8 +276,8 @@ body * {
 }
 
 .ed-hint {
-    margin-top: 6px;
-    font-size: 0.85rem;
+    margin-top: var(--space-1);
+    font-size: var(--font-size-xs);
     color: var(--ed-text-muted);
 }
 
@@ -287,16 +287,16 @@ body * {
 .ed-checkbox-field {
     display: flex;
     align-items: start;
-    gap: 12px;
-    padding: 16px;
-    border-radius: 12px;
+    gap: var(--space-3);
+    padding: var(--space-4);
+    border-radius: var(--radius-md);
     background: rgba(255, 255, 255, 0.03);
-    margin-bottom: 24px;
+    margin-bottom: var(--space-6);
 }
 
 .ed-checkbox-field input[type="checkbox"] {
-    width: 20px;
-    height: 20px;
+    width: var(--space-5);
+    height: var(--space-5);
     accent-color: var(--ed-primary);
     margin-top: 2px;
 }
@@ -306,52 +306,52 @@ body * {
 }
 
 .ed-checkbox-title {
-    font-weight: 600;
+    font-weight: var(--font-weight-semibold);
     color: var(--ed-text);
-    margin-bottom: 4px;
+    margin-bottom: var(--space-1);
 }
 
 .ed-checkbox-desc {
-    font-size: 0.9rem;
+    font-size: var(--font-size-sm);
     color: var(--ed-text-muted);
-    line-height: 1.5;
+    line-height: var(--line-height-normal);
 }
 
 /* ============================================
    IMAGE UPLOAD
    ============================================ */
 .ed-image-upload {
-    margin-bottom: 24px;
+    margin-bottom: var(--space-6);
 }
 
 .ed-image-preview {
     width: 100%;
     max-height: 200px;
     object-fit: cover;
-    border-radius: 12px;
-    margin-bottom: 12px;
+    border-radius: var(--radius-md);
+    margin-bottom: var(--space-3);
     background: rgba(255, 255, 255, 0.03);
 }
 
 .ed-image-actions {
     display: flex;
-    gap: 12px;
+    gap: var(--space-3);
 }
 
 .ed-upload-btn, .ed-clear-btn {
     flex: 1;
-    padding: 12px 16px;
-    border-radius: 10px;
+    padding: var(--space-3) var(--space-4);
+    border-radius: var(--space-2);
     border: 2px solid var(--ed-border);
     background: rgba(255, 255, 255, 0.03);
     color: var(--ed-text);
-    font-weight: 600;
+    font-weight: var(--font-weight-semibold);
     cursor: pointer;
-    transition: all 0.2s;
+    transition: all var(--transition-fast);
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 8px;
+    gap: var(--space-2);
 }
 
 .ed-upload-btn:hover, .ed-clear-btn:hover {
@@ -365,7 +365,7 @@ body * {
 
 .ed-clear-btn {
     flex: 0 0 auto;
-    padding: 12px 20px;
+    padding: var(--space-3) var(--space-5);
     background: rgba(239, 68, 68, 0.1);
     border-color: var(--ed-danger);
     color: var(--ed-danger);
@@ -380,20 +380,20 @@ body * {
    ============================================ */
 .ed-submit {
     width: 100%;
-    padding: 16px 24px;
-    border-radius: 14px;
+    padding: var(--space-4) var(--space-6);
+    border-radius: var(--radius-lg);
     border: none;
     background: linear-gradient(135deg, var(--ed-primary), var(--ed-pink));
     color: white;
-    font-size: 1rem;
-    font-weight: 700;
+    font-size: var(--font-size-base);
+    font-weight: var(--font-weight-bold);
     cursor: pointer;
-    transition: all 0.2s;
+    transition: all var(--transition-fast);
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 10px;
-    margin-top: 32px;
+    gap: var(--space-2);
+    margin-top: var(--space-8);
 }
 
 .ed-submit:hover {
@@ -416,14 +416,14 @@ body * {
    ============================================ */
 .invite-search {
     width: 100%;
-    padding: 14px 16px 14px 44px;
-    border-radius: 12px;
+    padding: var(--space-3) var(--space-4) 14px 44px;
+    border-radius: var(--radius-md);
     border: 2px solid var(--ed-border);
     background: rgba(255, 255, 255, 0.03) url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="%2394a3b8" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>') no-repeat 14px center;
     color: var(--ed-text);
-    font-size: 1rem;
+    font-size: var(--font-size-base);
     font-family: inherit;
-    margin-bottom: 16px;
+    margin-bottom: var(--space-4);
 }
 
 .invite-search:focus {
@@ -435,8 +435,8 @@ body * {
 .user-list {
     display: flex;
     flex-direction: column;
-    gap: 8px;
-    margin-bottom: 16px;
+    gap: var(--space-2);
+    margin-bottom: var(--space-4);
     max-height: 400px;
     overflow-y: auto;
 }
@@ -444,13 +444,13 @@ body * {
 .user-item {
     display: flex;
     align-items: center;
-    gap: 12px;
-    padding: 12px;
-    border-radius: 12px;
+    gap: var(--space-3);
+    padding: var(--space-3);
+    border-radius: var(--radius-md);
     background: rgba(255, 255, 255, 0.03);
     border: 2px solid transparent;
     cursor: pointer;
-    transition: all 0.2s;
+    transition: all var(--transition-fast);
 }
 
 .user-item:hover {
@@ -464,15 +464,15 @@ body * {
 }
 
 .user-item input[type="checkbox"] {
-    width: 20px;
-    height: 20px;
+    width: var(--space-5);
+    height: var(--space-5);
     accent-color: var(--ed-primary);
 }
 
 .user-avatar {
-    width: 48px;
-    height: 48px;
-    border-radius: 50%;
+    width: var(--space-12);
+    height: var(--space-12);
+    border-radius: var(--radius-full);
     object-fit: cover;
 }
 
@@ -481,62 +481,62 @@ body * {
 }
 
 .user-name {
-    font-weight: 600;
+    font-weight: var(--font-weight-semibold);
     color: var(--ed-text);
     margin-bottom: 2px;
 }
 
 .user-email {
-    font-size: 0.85rem;
+    font-size: var(--font-size-xs);
     color: var(--ed-text-muted);
 }
 
 .selected-count {
     text-align: center;
-    padding: 12px;
+    padding: var(--space-3);
     background: var(--ed-primary-light);
-    border-radius: 10px;
+    border-radius: var(--space-2);
     color: var(--ed-primary);
-    font-weight: 600;
-    margin-bottom: 16px;
+    font-weight: var(--font-weight-semibold);
+    margin-bottom: var(--space-4);
 }
 
 .add-directly-box {
-    padding: 16px;
-    border-radius: 12px;
+    padding: var(--space-4);
+    border-radius: var(--radius-md);
     background: rgba(16, 185, 129, 0.1);
     border: 2px solid rgba(16, 185, 129, 0.2);
-    margin-bottom: 24px;
+    margin-bottom: var(--space-6);
 }
 
 .add-directly-box label {
     display: flex;
-    gap: 12px;
+    gap: var(--space-3);
     cursor: pointer;
 }
 
 .add-directly-box input[type="checkbox"] {
-    width: 20px;
-    height: 20px;
+    width: var(--space-5);
+    height: var(--space-5);
     accent-color: var(--ed-success);
     margin-top: 2px;
 }
 
 .add-directly-title {
-    font-weight: 600;
+    font-weight: var(--font-weight-semibold);
     color: var(--ed-text);
-    margin-bottom: 4px;
+    margin-bottom: var(--space-1);
 }
 
 .add-directly-desc {
-    font-size: 0.9rem;
+    font-size: var(--font-size-sm);
     color: var(--ed-text-muted);
-    line-height: 1.5;
+    line-height: var(--line-height-normal);
 }
 
 .no-users {
     text-align: center;
-    padding: 60px 20px;
+    padding: 60px var(--space-5);
     color: var(--ed-text-muted);
 }
 
@@ -545,7 +545,7 @@ body * {
 }
 
 .mb-2 {
-    margin-bottom: 16px;
+    margin-bottom: var(--space-4);
 }
 
 /* ============================================
@@ -557,20 +557,20 @@ body * {
         backdrop-filter: blur(8px);
         align-items: center;
         justify-content: center;
-        padding: 20px;
+        padding: var(--space-5);
     }
 
     .edit-overlay {
         width: 100%;
         max-width: 700px;
         max-height: 90vh;
-        border-radius: 20px;
-        box-shadow: 0 24px 70px rgba(0, 0, 0, 0.5);
+        border-radius: var(--space-5);
+        box-shadow: 0 var(--space-6) 70px rgba(0, 0, 0, 0.5);
         overflow: hidden;
     }
 
     .edit-header {
-        padding: 16px 24px;
+        padding: var(--space-4) var(--space-6);
     }
 
     .edit-tabs {
@@ -578,10 +578,10 @@ body * {
     }
 
     .edit-tabs-inner {
-        padding: 16px 24px;
+        padding: var(--space-4) var(--space-6);
     }
 
     .edit-panel {
-        padding: 24px;
+        padding: var(--space-6);
     }
 }

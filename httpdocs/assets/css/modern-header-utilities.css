@@ -1,6 +1,7 @@
 /**
  * Modern Header Utilities Styles
  * Extracted from inline styles in views/layouts/modern/header.php
+ * Migrated to design tokens for consistency
  */
 
 /* Left utilities layout */
@@ -11,9 +12,9 @@
 
 /* Platform dropdown button */
 .platform-dropdown-btn {
-    font-weight: 700;
+    font-weight: var(--font-weight-bold);
     text-transform: uppercase;
-    font-size: 0.8rem;
+    font-size: var(--font-size-sm);
 }
 
 /* Platform dropdown content positioning */
@@ -32,25 +33,25 @@
 
 /* Layout switcher styles */
 .layout-option--modern {
-    font-weight: bold;
+    font-weight: var(--font-weight-bold);
     color: var(--color-primary-600);
 }
 
 .layout-badge--stable {
-    font-size: 10px;
+    font-size: var(--font-size-xs);
     color: var(--color-success);
 }
 
 .layout-divider {
     border-top: 1px solid var(--color-gray-200);
-    margin: 8px 0;
+    margin: var(--space-2) 0;
 }
 
 .layout-section-label {
-    padding: 6px 12px;
-    font-size: 11px;
+    padding: var(--space-1) var(--space-3);
+    font-size: var(--font-size-xs);
     color: var(--color-gray-500);
-    font-weight: 500;
+    font-weight: var(--font-weight-medium);
 }
 
 .layout-option--civicone {
@@ -58,30 +59,30 @@
 }
 
 .layout-option--civicone.active {
-    font-weight: bold;
-    color: var(--color-success-dark);
+    font-weight: var(--font-weight-bold);
+    color: var(--color-green-700);
     opacity: 1;
 }
 
 .layout-badge--beta {
-    font-size: 9px;
+    font-size: var(--font-size-xs);
     color: var(--color-warning);
 }
 
 /* Create button styling */
 .create-dropdown-btn {
-    font-weight: 700;
+    font-weight: var(--font-weight-bold);
     color: var(--color-success);
 }
 
 /* Federation dropdown */
 .federation-dropdown-btn {
-    font-weight: 700;
+    font-weight: var(--font-weight-bold);
     color: var(--color-purple-500);
 }
 
 .federation-dropdown-btn .fa-globe {
-    margin-right: 4px;
+    margin-right: var(--space-1);
 }
 
 .federation-dropdown .htb-dropdown-content {
@@ -89,17 +90,17 @@
 }
 
 .federation-hub-link {
-    font-weight: 600;
+    font-weight: var(--font-weight-semibold);
     color: var(--color-purple-500);
 }
 
 .federation-hub-link .fa-house {
-    margin-right: 6px;
+    margin-right: var(--space-1);
 }
 
 /* Federation menu icons */
 .federation-menu-icon {
-    margin-right: 6px;
+    margin-right: var(--space-1);
 }
 
 .federation-menu-icon--members {
@@ -132,19 +133,19 @@
 
 /* Newsletter button */
 .newsletter-dropdown-btn {
-    font-weight: 700;
+    font-weight: var(--font-weight-bold);
     color: var(--color-warning);
 }
 
 /* Admin link */
 .admin-link {
-    font-weight: 700;
+    font-weight: var(--font-weight-bold);
     color: var(--color-orange-600);
 }
 
 /* Group ranking link */
 .group-ranking-link {
-    font-weight: 700;
+    font-weight: var(--font-weight-bold);
     color: var(--color-pink-600);
 }
 
@@ -155,33 +156,33 @@
 
 .nexus-notif-indicator {
     position: absolute;
-    top: 4px;
-    right: 4px;
+    top: var(--space-1);
+    right: var(--space-1);
     width: 10px;
     height: 10px;
     background: var(--color-danger);
-    border-radius: 50%;
+    border-radius: var(--radius-full);
     border: 2px solid var(--header-bg, #1e1b4b);
     box-shadow: 0 0 0 1px rgba(239, 68, 68, 0.3);
 }
 
 /* User dropdown */
 .user-dropdown-btn {
-    padding: 4px 12px;
+    padding: var(--space-1) var(--space-3);
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: var(--space-2);
 }
 
 .user-avatar {
     width: 28px;
     height: 28px;
-    border-radius: 50%;
+    border-radius: var(--radius-full);
     object-fit: cover;
 }
 
 .user-name {
-    font-weight: 600;
+    font-weight: var(--font-weight-semibold);
 }
 
 .user-dropdown .htb-dropdown-content {
@@ -190,8 +191,8 @@
 
 /* User dropdown icons */
 .user-menu-icon {
-    margin-right: 10px;
-    width: 16px;
+    margin-right: var(--space-2);
+    width: var(--space-4);
     text-align: center;
 }
 
@@ -210,18 +211,18 @@
 /* User menu divider */
 .user-menu-divider {
     border-top: 1px solid var(--color-gray-200);
-    margin: 8px 0;
+    margin: var(--space-2) 0;
 }
 
 /* Logout link */
 .logout-link {
     color: var(--color-danger);
-    font-weight: 600;
+    font-weight: var(--font-weight-semibold);
 }
 
 /* Auth links */
 .auth-link--join {
-    font-weight: 700;
+    font-weight: var(--font-weight-bold);
     color: #fff;
 }
 
@@ -229,27 +230,27 @@
 .desktop-header-utils {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: var(--space-2);
 }
 
 /* Navigation icons */
 .nav-icon {
-    margin-right: 6px;
+    margin-right: var(--space-1);
 }
 
 .nav-icon--explore {
-    margin-right: 6px;
+    margin-right: var(--space-1);
 }
 
 .nav-icon--page {
-    margin-right: 6px;
+    margin-right: var(--space-1);
     opacity: 0.7;
 }
 
 /* Menu item icons with colors */
 .menu-item-icon {
-    margin-right: 10px;
-    width: 16px;
+    margin-right: var(--space-2);
+    width: var(--space-4);
     text-align: center;
 }
 
@@ -260,7 +261,7 @@
 
 /* Collapsible search */
 .collapsible-search-container {
-    margin-left: 15px;
+    margin-left: var(--space-3);
     display: flex;
     align-items: center;
 }

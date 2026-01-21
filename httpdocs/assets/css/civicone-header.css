@@ -75,9 +75,9 @@
    =========================================== */
 .civic-utility-bar {
     background: var(--civic-bg-secondary);
-    border-bottom: 1px solid #e2e8f0;
+    border-bottom: 1px solid var(--color-gray-200);
     padding: var(--space-2) 0;
-    font-size: 14px;
+    font-size: var(--font-size-sm);
 }
 
 .civic-utility-wrapper {
@@ -86,7 +86,7 @@
     align-items: center;
     gap: var(--space-3);
     flex-wrap: wrap;
-    max-width: 1200px;
+    max-width: var(--layout-max-content-width);
     margin: 0 auto;
     padding: 0 var(--space-6);
 }
@@ -102,7 +102,7 @@
     border-radius: var(--radius-sm);
     transition: all var(--duration-fast) var(--ease-default);
     min-height: 44px; /* WCAG touch target */
-    font-size: 14px;
+    font-size: var(--font-size-sm);
 }
 
 .civic-utility-link:hover {
@@ -132,7 +132,7 @@
     top: 100%;
     right: 0;
     background: var(--civic-bg-primary);
-    min-width: 200px;
+    min-width: 12.5rem;
     border: 2px solid var(--civic-text-primary);
     border-radius: var(--radius-sm);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
@@ -159,7 +159,7 @@
     background-color: transparent; /* WCAG FIX: Explicitly prevent yellow backgrounds - yellow ONLY for :focus-visible */
     text-decoration: none;
     font-weight: 500;
-    font-size: 14px;
+    font-size: var(--font-size-sm);
 }
 
 .civic-utility-bar .civic-dropdown-content a:hover {
@@ -209,19 +209,19 @@
 /* Layout Switcher Icons */
 .civic-layout-icon {
     display: inline-block;
-    margin-right: 8px;
+    margin-right: var(--space-2);
 }
 
 /* Dropdown Separator */
 .civic-dropdown-separator {
-    border-top: 1px solid #e5e7eb;
-    margin: 5px 0;
+    border-top: 1px solid var(--color-gray-200);
+    margin: var(--space-1) 0;
 }
 
 /* User Dropdown Menu Icons */
 .civic-menu-icon {
-    margin-right: 10px;
-    width: 16px;
+    margin-right: var(--space-2);
+    width: var(--space-4);
     text-align: center;
 }
 
@@ -230,36 +230,36 @@
 }
 
 .civic-menu-icon--purple {
-    color: #8b5cf6;
+    color: var(--color-purple-500);
 }
 
 .civic-menu-icon--green {
-    color: #10b981;
+    color: var(--color-success);
 }
 
 .civic-menu-icon--pink {
-    color: #db2777;
+    color: var(--color-pink-600);
 }
 
 .civic-menu-icon--amber {
-    color: #d97706;
+    color: var(--color-amber-600);
 }
 
 .civic-menu-icon--blue {
-    color: #2563eb;
+    color: var(--color-blue-600);
 }
 
 .civic-menu-icon--indigo {
-    color: #4f46e5;
+    color: var(--color-primary-600);
 }
 
 .civic-menu-icon--gray {
-    color: #6b7280;
+    color: var(--color-gray-500);
 }
 
 /* Logout Link Styling */
 .civic-utility-link--logout {
-    color: #ef4444;
+    color: var(--color-danger);
     font-weight: 600;
 }
 
@@ -273,7 +273,7 @@
 }
 
 .mobile-only-link--logout {
-    color: #dc2626;
+    color: var(--color-red-600);
 }
 
 /* Notification Button (reset button styles) */
@@ -295,8 +295,8 @@
     /* WCAG 1.4.10 - Prevent dropdown overflow on narrow screens */
     .civic-utility-bar .civic-dropdown-content {
         min-width: auto;
-        max-width: calc(100vw - 20px);
-        right: 10px;
+        max-width: calc(100vw - var(--space-5));
+        right: var(--space-2);
         left: auto;
     }
 }
@@ -310,21 +310,21 @@
     border-bottom: 4px solid var(--civic-brand);
     position: relative;
     z-index: 100;
-    min-height: 100px;
+    min-height: 6.25rem;
 }
 
 .civic-header-wrapper {
     display: flex;
     align-items: center;
     gap: var(--space-6);
-    max-width: 1200px;
+    max-width: var(--layout-max-content-width);
     margin: 0 auto;
     padding: 0 var(--space-6);
 }
 
 /* Logo */
 .civic-logo {
-    font-size: 1.5rem;
+    font-size: var(--font-size-2xl);
     font-weight: 800;
     color: var(--civic-brand);
     text-decoration: none;
@@ -363,7 +363,7 @@
 
 .civic-desktop-nav .civic-nav-link {
     padding: var(--space-3) var(--space-4);
-    font-size: 16px;
+    font-size: var(--font-size-base);
     font-weight: 600;
     color: var(--civic-text-primary);
     text-decoration: none;
@@ -394,7 +394,7 @@
 .civic-desktop-nav .civic-nav-link[aria-current="page"] {
     background-color: rgba(0, 121, 107, 0.1);
     text-decoration: underline;
-    text-underline-offset: 4px;
+    text-underline-offset: var(--space-1);
     text-decoration-thickness: 3px;
     text-decoration-color: var(--civic-brand);
 }
@@ -415,11 +415,11 @@
 
 .civic-search-form input {
     padding: var(--space-3) var(--space-4);
-    font-size: 16px;
+    font-size: var(--font-size-base);
     border: 2px solid var(--civic-text-secondary);
     border-right: none;
     border-radius: var(--radius-sm) 0 0 var(--radius-sm);
-    width: 200px;
+    width: 12.5rem;
     color: var(--civic-text-primary);
     background: var(--civic-bg-primary);
     min-height: 44px;
@@ -439,7 +439,7 @@
 
 .civic-search-form button {
     padding: var(--space-3) var(--space-4);
-    font-size: 16px;
+    font-size: var(--font-size-base);
     font-weight: 600;
     background: var(--civic-brand);
     color: #ffffff;
@@ -487,7 +487,7 @@
 }
 
 .civicone-width-container {
-    max-width: 1020px; /* GOV.UK standard */
+    max-width: 63.75rem; /* GOV.UK standard */
     margin: 0 auto;
     padding: 0 var(--space-6);
 }
@@ -497,7 +497,7 @@
     align-items: center;
     justify-content: space-between;
     gap: var(--space-4);
-    min-height: 80px;
+    min-height: var(--space-20);
 }
 
 /* Logo / Service Name */
@@ -509,7 +509,7 @@
     text-decoration: none;
     color: var(--civic-text-primary);
     font-weight: 700;
-    font-size: 1.5rem;
+    font-size: var(--font-size-2xl);
     display: inline-block;
     transition: opacity var(--duration-fast) var(--ease-default);
 }
@@ -556,8 +556,8 @@
     color: var(--civic-text-primary);
     text-decoration: none;
     font-weight: 600;
-    font-size: 1rem;
-    border-bottom: 4px solid transparent;
+    font-size: var(--font-size-base);
+    border-bottom: var(--space-1) solid transparent;
     transition: border-color var(--duration-fast) var(--ease-default);
     min-height: 44px;
 }
@@ -591,7 +591,7 @@
     background: none;
     border: 2px solid var(--civic-text-primary);
     border-radius: var(--radius-sm);
-    font-size: 1rem;
+    font-size: var(--font-size-base);
     font-weight: 600;
     color: var(--civic-text-primary);
     cursor: pointer;
@@ -620,9 +620,9 @@
 .civicone-service-navigation__toggle-icon {
     display: flex;
     flex-direction: column;
-    gap: 4px;
-    width: 20px;
-    height: 16px;
+    gap: var(--space-1);
+    width: var(--space-5);
+    height: var(--space-4);
 }
 
 .civicone-service-navigation__toggle-icon span {
@@ -630,7 +630,7 @@
     width: 100%;
     height: 3px;
     background-color: currentColor;
-    border-radius: 2px;
+    border-radius: var(--space-1);
     transition: transform var(--duration-fast) var(--ease-default);
 }
 
@@ -662,7 +662,7 @@
 }
 
 .civicone-service-navigation__mobile-panel.active {
-    max-height: 500px;
+    max-height: 31.25rem;
     opacity: 1;
 }
 
@@ -684,7 +684,7 @@
     color: var(--civic-text-primary);
     text-decoration: none;
     font-weight: 600;
-    font-size: 1.125rem;
+    font-size: var(--font-size-lg);
 }
 
 .civicone-service-navigation__mobile-link:hover {
@@ -735,9 +735,9 @@
     padding: var(--space-2) var(--space-3);
     border: 2px solid var(--civic-text-primary);
     border-radius: var(--radius-sm);
-    font-size: 1rem;
+    font-size: var(--font-size-base);
     min-height: 44px;
-    min-width: 200px;
+    min-width: 12.5rem;
 }
 
 .civicone-search-input:focus-visible {
@@ -809,7 +809,7 @@
 }
 
 .civicone-mobile-search-bar.active {
-    max-height: 100px;
+    max-height: 6.25rem;
     opacity: 1;
     padding: var(--space-4);
 }
@@ -824,7 +824,7 @@
     padding: var(--space-2) var(--space-3);
     border: 2px solid var(--civic-text-primary);
     border-radius: var(--radius-sm);
-    font-size: 1rem;
+    font-size: var(--font-size-base);
     min-height: 44px;
 }
 
@@ -863,7 +863,7 @@
     cursor: pointer;
     padding: var(--space-3) var(--space-5);
     border-radius: var(--radius-sm);
-    font-size: 16px;
+    font-size: var(--font-size-base);
     display: inline-flex;
     align-items: center;
     gap: var(--space-2);
@@ -893,7 +893,7 @@
 }
 
 .civic-menu-btn .civic-arrow {
-    font-size: 12px;
+    font-size: var(--font-size-xs);
     transition: transform var(--duration-fast) var(--ease-default);
 }
 
@@ -922,13 +922,13 @@
     display: grid;
     grid-template-columns: repeat(4, 1fr);
     gap: var(--space-8);
-    max-width: 1200px;
+    max-width: var(--layout-max-content-width);
     margin: 0 auto;
     padding: 0 var(--space-6);
 }
 
 .civic-mega-col h3 {
-    font-size: 13px;
+    font-size: var(--font-size-xs);
     text-transform: uppercase;
     letter-spacing: 0.1em;
     color: var(--civic-text-secondary);
@@ -942,7 +942,7 @@
     display: block;
     text-decoration: none;
     color: var(--civic-text-primary);
-    font-size: 16px;
+    font-size: var(--font-size-base);
     font-weight: 500;
     padding: var(--space-2) 0;
     transition: all var(--duration-fast) var(--ease-default);
@@ -1125,7 +1125,7 @@ body.dark-mode .civic-utility-bar .civic-dropdown-content a:hover {
 
 .civic-hamburger {
     display: block;
-    width: 24px;
+    width: var(--space-6);
     height: 2px;
     background: var(--civic-text-primary);
     position: relative;
@@ -1136,7 +1136,7 @@ body.dark-mode .civic-utility-bar .civic-dropdown-content a:hover {
 .civic-hamburger::after {
     content: '';
     position: absolute;
-    width: 24px;
+    width: var(--space-6);
     height: 2px;
     background: var(--civic-text-primary);
     left: 0;
@@ -1161,7 +1161,7 @@ body.dark-mode .civic-utility-bar .civic-dropdown-content a:hover {
     }
 
     .civic-logo {
-        font-size: 1.25rem;
+        font-size: var(--font-size-xl);
     }
 
     /* Hamburger hidden - mobile nav v2 */
@@ -1194,9 +1194,9 @@ body.dark-mode .civic-utility-bar .civic-dropdown-content a:hover {
     }
 
     .civic-mobile-search-btn .dashicons {
-        font-size: 24px;
-        width: 24px;
-        height: 24px;
+        font-size: var(--font-size-2xl);
+        width: var(--space-6);
+        height: var(--space-6);
     }
 
     /* Mobile Search Bar (expandable) */
@@ -1227,7 +1227,7 @@ body.dark-mode .civic-utility-bar .civic-dropdown-content a:hover {
         padding: var(--space-3) var(--space-4);
         border: 2px solid var(--civic-text-secondary);
         border-radius: var(--radius-sm);
-        font-size: 16px;
+        font-size: var(--font-size-base);
         color: var(--civic-text-primary);
         background: var(--civic-bg-primary);
         min-height: 44px;
@@ -1273,7 +1273,7 @@ body.dark-mode .civic-utility-bar .civic-dropdown-content a:hover {
 /* WCAG 2.1 AA Skip Link - GOV.UK Style */
 .skip-link {
     position: absolute;
-    top: -50px;
+    top: -3.125rem;
     left: var(--space-3);
     background: var(--govuk-focus-text-colour, #0b0c0c);
     color: var(--govuk-focus-colour, #ffdd00);
@@ -1328,8 +1328,8 @@ body.dark-mode .civic-utility-bar .civic-dropdown-content a:hover {
 .notif-drawer {
     position: fixed;
     top: 0;
-    right: -350px;
-    width: 350px;
+    right: -21.875rem;
+    width: 21.875rem;
     max-width: 90vw;
     height: 100vh;
     background: var(--civic-bg-primary);
@@ -1355,7 +1355,7 @@ body.dark-mode .civic-utility-bar .civic-dropdown-content a:hover {
 
 .notif-drawer-header span {
     font-weight: 700;
-    font-size: 14px;
+    font-size: var(--font-size-sm);
     letter-spacing: 0.05em;
     color: var(--civic-text-primary);
 }
@@ -1363,7 +1363,7 @@ body.dark-mode .civic-utility-bar .civic-dropdown-content a:hover {
 .notif-drawer-close {
     background: none;
     border: none;
-    font-size: 20px;
+    font-size: var(--font-size-xl);
     cursor: pointer;
     padding: var(--space-2);
     color: var(--civic-text-secondary);
@@ -1400,7 +1400,7 @@ body.dark-mode .civic-utility-bar .civic-dropdown-content a:hover {
 }
 
 .notif-drawer-empty .notif-icon {
-    font-size: 48px;
+    font-size: var(--space-12);
     margin-bottom: var(--space-4);
     opacity: 0.5;
 }
@@ -1431,14 +1431,14 @@ body.dark-mode .civic-utility-bar .civic-dropdown-content a:hover {
 }
 
 .notif-drawer-item .notif-message {
-    font-size: 14px;
+    font-size: var(--font-size-sm);
     font-weight: 500;
     margin-bottom: var(--space-1);
     line-height: 1.4;
 }
 
 .notif-drawer-item .notif-time {
-    font-size: 12px;
+    font-size: var(--font-size-xs);
     color: var(--civic-text-muted);
 }
 
@@ -1452,7 +1452,7 @@ body.dark-mode .civic-utility-bar .civic-dropdown-content a:hover {
 
 .notif-drawer-footer a,
 .notif-drawer-footer button {
-    font-size: 14px;
+    font-size: var(--font-size-sm);
     font-weight: 600;
     color: var(--civic-brand);
     text-decoration: none;
@@ -1504,7 +1504,7 @@ body.dark-mode .civic-utility-bar .civic-dropdown-content a:hover {
     background: none;
     border: none;
     cursor: pointer;
-    font-size: 0.9rem;
+    font-size: var(--font-size-sm);
     padding: 0;
     font-weight: 700;
 }
@@ -1540,19 +1540,19 @@ body.dark-mode .civic-utility-bar .civic-dropdown-content a:hover {
 
 /* User Avatar Button */
 .civic-user-avatar-btn {
-    padding: 4px 12px;
+    padding: var(--space-1) var(--space-3);
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: var(--space-2);
     background: none;
     border: none;
     cursor: pointer;
 }
 
 .civic-user-avatar-btn img {
-    width: 28px;
-    height: 28px;
-    border-radius: 50%;
+    width: var(--space-8);
+    height: var(--space-8);
+    border-radius: var(--radius-full);
     object-fit: cover;
 }
 
@@ -1578,18 +1578,18 @@ body.dark-mode .civic-utility-bar .civic-dropdown-content a:hover {
     right: -6px;
     background: #ef4444;
     color: #fff;
-    font-size: 10px;
+    font-size: var(--space-2);
     font-weight: 700;
-    padding: 2px 5px;
-    border-radius: 10px;
+    padding: 2px var(--space-1);
+    border-radius: var(--radius-md);
     min-width: 14px;
     text-align: center;
 }
 
 /* Dropdown menu item with icon */
 .civic-dropdown-content .civic-menu-icon {
-    margin-right: 10px;
-    width: 16px;
+    margin-right: var(--space-2);
+    width: var(--space-4);
     text-align: center;
 }
 
@@ -1616,8 +1616,8 @@ body.dark-mode .civic-utility-bar .civic-dropdown-content a:hover {
 
 /* Separator in dropdown */
 .civic-dropdown-separator {
-    border-top: 1px solid #e5e7eb;
-    margin: 5px 0;
+    border-top: 1px solid var(--color-gray-200);
+    margin: var(--space-1) 0;
 }
 
 /* ===========================================
@@ -1626,8 +1626,8 @@ body.dark-mode .civic-utility-bar .civic-dropdown-content a:hover {
 .civic-experimental-banner {
     background: linear-gradient(135deg, var(--civic-brand, #00796B) 0%, var(--civic-brand-dark, #005a4f) 100%);
     color: #ffffff;
-    padding: 10px 20px;
-    font-size: 0.875rem;
+    padding: var(--space-2) var(--space-5);
+    font-size: var(--font-size-sm);
     text-align: center;
     border-bottom: none;
     position: relative;
@@ -1646,7 +1646,7 @@ body.dark-mode .civic-utility-bar .civic-dropdown-content a:hover {
 .civic-banner-content {
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: var(--space-3);
     flex-wrap: wrap;
     justify-content: center;
 }
@@ -1654,19 +1654,19 @@ body.dark-mode .civic-utility-bar .civic-dropdown-content a:hover {
 .civic-experimental-badge {
     background: rgba(255, 255, 255, 0.2);
     color: #ffffff;
-    padding: 4px 10px;
-    border-radius: 6px;
+    padding: var(--space-1) var(--space-2);
+    border-radius: var(--radius-base);
     font-weight: 700;
-    font-size: 0.7rem;
+    font-size: var(--font-size-xs);
     letter-spacing: 0.06em;
     display: inline-flex;
     align-items: center;
-    gap: 6px;
+    gap: var(--space-2);
     backdrop-filter: blur(4px);
 }
 
 .civic-experimental-badge i {
-    font-size: 0.8rem;
+    font-size: var(--font-size-sm);
 }
 
 .civic-experimental-text {
@@ -1680,17 +1680,17 @@ body.dark-mode .civic-utility-bar .civic-dropdown-content a:hover {
 .civic-experimental-switch {
     background: rgba(255, 255, 255, 0.15);
     color: #ffffff !important;
-    padding: 6px 14px;
-    border-radius: 6px;
+    padding: var(--space-2) var(--space-3);
+    border-radius: var(--radius-base);
     text-decoration: underline;
     text-decoration-thickness: 2px;
     text-underline-offset: 2px;
     font-weight: 600;
-    font-size: 0.8rem;
+    font-size: var(--font-size-sm);
     transition: all 0.2s ease;
     display: inline-flex;
     align-items: center;
-    gap: 6px;
+    gap: var(--space-2);
     backdrop-filter: blur(4px);
     border: 1px solid rgba(255, 255, 255, 0.2);
 }
@@ -1724,11 +1724,11 @@ body.dark-mode .civic-experimental-banner {
 
     .civic-banner-content {
         flex-direction: column;
-        gap: 8px;
+        gap: var(--space-2);
     }
 
     .civic-experimental-text {
-        font-size: 0.8rem;
+        font-size: var(--font-size-sm);
     }
 
     .civic-experimental-switch {
@@ -1742,8 +1742,8 @@ body.dark-mode .civic-experimental-banner {
 .civicone-hero-banner {
     background: var(--civic-brand);
     color: white;
-    padding: 40px 0;
-    margin-bottom: 40px;
+    padding: var(--space-10) 0;
+    margin-bottom: var(--space-10);
     position: relative;
 }
 
@@ -1762,17 +1762,17 @@ body.skin-torfaen .civicone-hero-banner {
     background: #ffffff !important; /* White background for maximum contrast */
     color: #005a4d !important; /* Dark teal text (darker than hero bg for 7:1 contrast on white) */
     font-weight: 700; /* Bolder for better legibility */
-    font-size: 12px;
-    padding: 4px 10px;
-    margin-bottom: 12px;
+    font-size: var(--font-size-xs);
+    padding: var(--space-1) var(--space-2);
+    margin-bottom: var(--space-3);
     text-transform: uppercase;
     letter-spacing: 0.5px;
-    border-radius: 4px;
+    border-radius: var(--radius-sm);
 }
 
 .hero-title {
     color: #ffffff !important; /* Explicit white for WCAG compliance */
-    margin-bottom: 8px;
+    margin-bottom: var(--space-2);
     font-size: clamp(1.75rem, 4vw, 2.5rem);
     font-weight: 700;
     letter-spacing: -0.01em;
@@ -1781,7 +1781,7 @@ body.skin-torfaen .civicone-hero-banner {
 .hero-subtitle {
     font-size: clamp(1rem, 2vw, 1.125rem);
     color: #ffffff !important; /* Explicit white instead of opacity for contrast */
-    max-width: 600px;
+    max-width: 37.5rem;
     margin: 0;
     line-height: 1.5;
 }
@@ -1793,8 +1793,8 @@ body.dark-mode .civicone-hero-banner {
 
 @media (max-width: 768px) {
     .civicone-hero-banner {
-        padding: 28px 0;
-        margin-bottom: 28px;
+        padding: var(--space-8) 0;
+        margin-bottom: var(--space-8);
     }
 }
 

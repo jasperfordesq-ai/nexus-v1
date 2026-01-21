@@ -18,7 +18,7 @@
     min-height: 100vh;
     -webkit-font-smoothing: antialiased;
     position: relative;
-    padding: 1rem;
+    padding: var(--space-4);
 }
 
 .admin-gold-bg {
@@ -61,16 +61,16 @@
     z-index: 10;
     background: rgba(15, 23, 42, 0.9);
     border: 1px solid rgba(99, 102, 241, 0.3);
-    border-radius: 12px;
-    padding: 0.75rem 1rem;
-    margin-bottom: 1rem;
+    border-radius: var(--radius-md);
+    padding: var(--space-3) var(--space-4);
+    margin-bottom: var(--space-4);
     max-width: 1600px;
     margin-left: auto;
     margin-right: auto;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 1rem;
+    gap: var(--space-4);
 }
 
 /* Mobile menu button */
@@ -83,11 +83,11 @@
     padding: 0;
     background: rgba(99, 102, 241, 0.15);
     border: 1px solid rgba(99, 102, 241, 0.3);
-    border-radius: 8px;
+    border-radius: var(--radius-base);
     color: rgba(255, 255, 255, 0.9);
     cursor: pointer;
-    transition: all 0.2s;
-    font-size: 1.1rem;
+    transition: all var(--transition-fast);
+    font-size: var(--font-size-lg);
     flex-shrink: 0;
 }
 
@@ -104,13 +104,13 @@
 .admin-header-brand {
     display: flex;
     align-items: center;
-    gap: 0.75rem;
+    gap: var(--space-3);
 }
 
 .admin-header-brand-icon {
     width: 36px;
     height: 36px;
-    border-radius: 8px;
+    border-radius: var(--radius-base);
     background: linear-gradient(135deg, #6366f1, #8b5cf6);
     display: flex;
     align-items: center;
@@ -125,13 +125,13 @@
 }
 
 .admin-header-title {
-    font-size: 0.95rem;
-    font-weight: 700;
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-bold);
     color: #fff;
 }
 
 .admin-header-subtitle {
-    font-size: 0.65rem;
+    font-size: var(--font-size-xs);
     color: rgba(255,255,255,0.5);
     text-transform: uppercase;
 }
@@ -139,22 +139,22 @@
 .admin-header-actions {
     display: flex;
     align-items: center;
-    gap: 0.5rem;
+    gap: var(--space-2);
 }
 
 .admin-back-link {
     display: flex;
     align-items: center;
-    gap: 0.4rem;
-    padding: 0.4rem 0.8rem;
+    gap: var(--space-1);
+    padding: var(--space-1) var(--space-2);
     background: rgba(16, 185, 129, 0.15);
     border: 1px solid rgba(16, 185, 129, 0.3);
-    border-radius: 6px;
+    border-radius: var(--radius-sm);
     color: #10b981;
     text-decoration: none;
-    font-size: 0.75rem;
-    font-weight: 600;
-    transition: background 0.2s;
+    font-size: var(--font-size-xs);
+    font-weight: var(--font-weight-semibold);
+    transition: background var(--transition-fast);
 }
 
 .admin-back-link:hover {
@@ -165,16 +165,16 @@
 .admin-super-admin-btn {
     display: flex;
     align-items: center;
-    gap: 0.5rem;
-    padding: 0.5rem 1rem;
+    gap: var(--space-2);
+    padding: var(--space-2) var(--space-4);
     background: linear-gradient(135deg, #9333ea, #ec4899);
     border: none;
-    border-radius: 8px;
+    border-radius: var(--radius-base);
     color: #fff;
     text-decoration: none;
-    font-size: 0.8rem;
-    font-weight: 700;
-    transition: all 0.2s;
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-bold);
+    transition: all var(--transition-fast);
     box-shadow: 0 4px 15px rgba(147, 51, 234, 0.3);
     animation: superAdminGlow 3s ease-in-out infinite;
 }
@@ -197,13 +197,13 @@
 .admin-header-avatar {
     width: 32px;
     height: 32px;
-    border-radius: 6px;
+    border-radius: var(--radius-sm);
     background: linear-gradient(135deg, #06b6d4, #3b82f6);
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 0.7rem;
-    font-weight: 700;
+    font-size: var(--font-size-xs);
+    font-weight: var(--font-weight-bold);
     color: white;
 }
 
@@ -213,19 +213,19 @@
     z-index: 100;
     background: rgba(15, 23, 42, 0.95);
     border: 1px solid rgba(99, 102, 241, 0.3);
-    border-radius: 12px;
-    padding: 0.5rem;
-    margin: 0 auto 2rem;
+    border-radius: var(--radius-md);
+    padding: var(--space-2);
+    margin: 0 auto var(--space-8);
     max-width: 1600px;
     display: flex;
     align-items: center;
-    gap: 0.5rem;
+    gap: var(--space-2);
 }
 
 .admin-nav-scroll {
     display: flex;
     align-items: center;
-    gap: 0.25rem;
+    gap: var(--space-1);
     flex: 1;
     flex-wrap: wrap;
 }
@@ -238,19 +238,19 @@
 .admin-nav-tab {
     display: flex;
     align-items: center;
-    gap: 0.35rem;
-    padding: 0.45rem 0.7rem;
+    gap: var(--space-1);
+    padding: var(--space-2) var(--space-3);
     color: rgba(255,255,255,0.7);
     text-decoration: none;
-    font-size: 0.78rem;
-    font-weight: 500;
-    border-radius: 6px;
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-medium);
+    border-radius: var(--radius-sm);
     border: none;
     background: transparent;
     cursor: pointer;
     white-space: nowrap;
     font-family: inherit;
-    transition: all 0.15s;
+    transition: all var(--transition-fast);
 }
 
 .admin-nav-tab:hover {
@@ -264,9 +264,9 @@
 }
 
 .admin-nav-tab .chevron {
-    font-size: 0.55rem;
+    font-size: var(--font-size-xs);
     opacity: 0.5;
-    transition: transform 0.2s;
+    transition: transform var(--transition-fast);
 }
 
 /* Dropdowns */
@@ -296,12 +296,12 @@
     min-width: 220px;
     background: #0f172a;
     border: 1px solid rgba(99, 102, 241, 0.4);
-    border-radius: 10px;
-    padding: 0.5rem;
+    border-radius: var(--radius-md);
+    padding: var(--space-2);
     opacity: 0;
     visibility: hidden;
     transform: translateY(-8px);
-    transition: opacity 0.2s ease, transform 0.2s ease, visibility 0.2s;
+    transition: opacity var(--transition-fast) ease, transform var(--transition-fast) ease, visibility var(--transition-fast);
     z-index: 9999;
     box-shadow: 0 10px 40px rgba(0,0,0,0.5);
     pointer-events: none;
@@ -322,13 +322,13 @@
 .admin-dropdown-menu a {
     display: flex;
     align-items: center;
-    gap: 0.6rem;
-    padding: 0.55rem 0.75rem;
+    gap: var(--space-2);
+    padding: var(--space-2) var(--space-3);
     color: rgba(255,255,255,0.85);
     text-decoration: none;
-    font-size: 0.82rem;
-    border-radius: 6px;
-    transition: all 0.1s;
+    font-size: var(--font-size-sm);
+    border-radius: var(--radius-sm);
+    transition: all var(--transition-fast);
 }
 
 .admin-dropdown-menu a:hover {
@@ -344,7 +344,7 @@
 .admin-dropdown-menu a i {
     width: 16px;
     text-align: center;
-    font-size: 0.8rem;
+    font-size: var(--font-size-sm);
     opacity: 0.6;
 }
 
@@ -361,12 +361,12 @@
     min-width: 600px;
     background: #0f172a;
     border: 1px solid rgba(99, 102, 241, 0.4);
-    border-radius: 12px;
-    padding: 1rem;
+    border-radius: var(--radius-md);
+    padding: var(--space-4);
     opacity: 0;
     visibility: hidden;
     transform: translateY(-8px);
-    transition: opacity 0.2s ease, transform 0.2s ease, visibility 0.2s;
+    transition: opacity var(--transition-fast) ease, transform var(--transition-fast) ease, visibility var(--transition-fast);
     z-index: 9999;
     box-shadow: 0 20px 50px rgba(0,0,0,0.6);
     pointer-events: none;
@@ -383,42 +383,42 @@
 .admin-mega-menu-columns {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-    gap: 1.5rem;
+    gap: var(--space-6);
 }
 
 .admin-mega-column {
     display: flex;
     flex-direction: column;
-    gap: 0.5rem;
+    gap: var(--space-2);
 }
 
 .admin-mega-column-title {
-    font-size: 0.7rem;
-    font-weight: 700;
+    font-size: var(--font-size-xs);
+    font-weight: var(--font-weight-bold);
     text-transform: uppercase;
     letter-spacing: 0.05em;
     color: rgba(99, 102, 241, 0.8);
-    padding: 0.4rem 0.75rem;
+    padding: var(--space-1) var(--space-3);
     border-bottom: 1px solid rgba(99, 102, 241, 0.2);
-    margin-bottom: 0.25rem;
+    margin-bottom: var(--space-1);
 }
 
 .admin-mega-column-items {
     display: flex;
     flex-direction: column;
-    gap: 0.25rem;
+    gap: var(--space-1);
 }
 
 .admin-mega-item {
     display: flex;
     align-items: center;
-    gap: 0.6rem;
-    padding: 0.55rem 0.75rem;
+    gap: var(--space-2);
+    padding: var(--space-2) var(--space-3);
     color: rgba(255,255,255,0.85);
     text-decoration: none;
-    font-size: 0.82rem;
-    border-radius: 6px;
-    transition: all 0.15s;
+    font-size: var(--font-size-sm);
+    border-radius: var(--radius-sm);
+    transition: all var(--transition-fast);
 }
 
 .admin-mega-item:hover {
@@ -436,7 +436,7 @@
 .admin-mega-item i {
     width: 18px;
     text-align: center;
-    font-size: 0.85rem;
+    font-size: var(--font-size-sm);
     opacity: 0.6;
 }
 
@@ -462,21 +462,21 @@
 .admin-glass-card {
     background: rgba(15, 23, 42, 0.85);
     border: 1px solid rgba(99, 102, 241, 0.2);
-    border-radius: 12px;
+    border-radius: var(--radius-md);
     overflow: hidden;
-    margin-bottom: 1.5rem;
+    margin-bottom: var(--space-6);
 }
 
 .admin-card-header {
-    padding: 1rem;
+    padding: var(--space-4);
     border-bottom: 1px solid rgba(99, 102, 241, 0.15);
     display: flex;
     align-items: center;
-    gap: 0.75rem;
+    gap: var(--space-3);
 }
 
 .admin-card-body {
-    padding: 1rem;
+    padding: var(--space-4);
 }
 
 /* ============================================================================
@@ -500,12 +500,12 @@
         width: 280px !important;
         height: 100vh !important;
         background: linear-gradient(180deg, #0a0e1a 0%, #0f1629 100%) !important;
-        padding: 80px 15px 20px 15px !important;
+        padding: var(--space-20) 15px var(--space-5) 15px !important;
         overflow-y: scroll !important;
         overflow-x: hidden !important;
         -webkit-overflow-scrolling: touch !important;
         z-index: 99999 !important;
-        transition: left 0.3s ease !important;
+        transition: left var(--transition-base) ease !important;
     }
 
     .admin-mobile-menu.open {
@@ -517,18 +517,18 @@
         position: relative !important;
         z-index: 1 !important;
         display: block;
-        padding: 12px 15px;
-        margin: 5px 0;
+        padding: var(--space-3) 15px;
+        margin: var(--space-1) 0;
         background: rgba(15, 23, 42, 0.6);
         border: 1px solid rgba(99, 102, 241, 0.2);
-        border-radius: 8px;
+        border-radius: var(--radius-base);
         color: #fff;
         text-decoration: none;
-        font-size: 14px;
+        font-size: var(--font-size-sm);
     }
 
     .admin-mobile-link i {
-        margin-right: 10px;
+        margin-right: var(--space-2);
     }
 
     .admin-mobile-link:active {
@@ -543,11 +543,11 @@
     .admin-mobile-category {
         display: flex;
         align-items: center;
-        gap: 0.75rem;
-        padding: 0.5rem 0.75rem;
-        margin-top: 1rem;
-        font-size: 0.75rem;
-        font-weight: 700;
+        gap: var(--space-3);
+        padding: var(--space-2) var(--space-3);
+        margin-top: var(--space-4);
+        font-size: var(--font-size-xs);
+        font-weight: var(--font-weight-bold);
         text-transform: uppercase;
         letter-spacing: 0.1em;
         color: rgba(139, 92, 246, 0.9);
@@ -568,25 +568,25 @@
     }
 
     .admin-super-admin-btn {
-        padding: 0.5rem 0.75rem;
+        padding: var(--space-2) var(--space-3);
     }
 }
 
 @media (max-width: 600px) {
     .admin-gold-wrapper {
-        padding: 0.5rem;
+        padding: var(--space-2);
     }
 
     .admin-header-bar {
-        padding: 0.5rem;
+        padding: var(--space-2);
     }
 
     .admin-glass-card {
-        border-radius: 10px;
+        border-radius: var(--radius-md);
     }
 
     .admin-card-body {
-        padding: 0.75rem;
+        padding: var(--space-3);
     }
 }
 
@@ -594,23 +594,23 @@
 .admin-breadcrumb {
     display: flex;
     align-items: center;
-    gap: 0.5rem;
-    padding: 0.75rem 1rem;
-    margin-bottom: 1.5rem;
+    gap: var(--space-2);
+    padding: var(--space-3) var(--space-4);
+    margin-bottom: var(--space-6);
     background: rgba(15, 23, 42, 0.6);
     border: 1px solid rgba(99, 102, 241, 0.15);
-    border-radius: 10px;
-    font-size: 0.82rem;
+    border-radius: var(--radius-md);
+    font-size: var(--font-size-sm);
     flex-wrap: wrap;
 }
 
 .admin-breadcrumb-item {
     display: flex;
     align-items: center;
-    gap: 0.4rem;
+    gap: var(--space-1);
     color: rgba(255, 255, 255, 0.6);
     text-decoration: none;
-    transition: color 0.15s;
+    transition: color var(--transition-fast);
 }
 
 .admin-breadcrumb-item:hover {
@@ -619,21 +619,21 @@
 
 .admin-breadcrumb-item.current {
     color: #fff;
-    font-weight: 600;
+    font-weight: var(--font-weight-semibold);
 }
 
 .admin-breadcrumb-separator {
     color: rgba(99, 102, 241, 0.4);
-    font-size: 0.7rem;
+    font-size: var(--font-size-xs);
 }
 
 /* Page Header */
 .admin-page-header {
     display: flex;
     flex-direction: column;
-    gap: 1rem;
-    margin-bottom: 2rem;
-    padding-top: 0.5rem;
+    gap: var(--space-4);
+    margin-bottom: var(--space-8);
+    padding-top: var(--space-2);
 }
 
 @media (min-width: 768px) {
@@ -649,22 +649,22 @@
 }
 
 .admin-page-title {
-    font-size: 1.5rem;
-    font-weight: 700;
+    font-size: var(--font-size-2xl);
+    font-weight: var(--font-weight-bold);
     color: #fff;
     display: flex;
     align-items: center;
-    gap: 0.75rem;
-    margin: 0 0 0.5rem 0;
+    gap: var(--space-3);
+    margin: 0 0 var(--space-2) 0;
 }
 
 .admin-page-title i {
     color: #818cf8;
-    font-size: 1.25rem;
+    font-size: var(--font-size-xl);
 }
 
 .admin-page-subtitle {
-    font-size: 0.9rem;
+    font-size: var(--font-size-sm);
     color: rgba(255, 255, 255, 0.6);
     margin: 0;
 }
@@ -672,7 +672,7 @@
 .admin-page-header-actions {
     display: flex;
     align-items: center;
-    gap: 0.75rem;
+    gap: var(--space-3);
     flex-wrap: wrap;
 }
 
@@ -684,15 +684,15 @@
 .admin-search-trigger {
     display: flex;
     align-items: center;
-    gap: 0.5rem;
-    padding: 0.4rem 0.75rem;
+    gap: var(--space-2);
+    padding: var(--space-1) var(--space-3);
     background: rgba(255, 255, 255, 0.05);
     border: 1px solid rgba(99, 102, 241, 0.2);
-    border-radius: 8px;
+    border-radius: var(--radius-base);
     color: rgba(255, 255, 255, 0.6);
-    font-size: 0.8rem;
+    font-size: var(--font-size-sm);
     cursor: pointer;
-    transition: all 0.2s;
+    transition: all var(--transition-fast);
     font-family: inherit;
 }
 
@@ -708,9 +708,9 @@
 
 .admin-search-kbd {
     background: rgba(99, 102, 241, 0.2);
-    padding: 2px 6px;
-    border-radius: 4px;
-    font-size: 0.65rem;
+    padding: var(--space-1) var(--space-2);
+    border-radius: var(--radius-sm);
+    font-size: var(--font-size-xs);
     font-family: inherit;
     border: none;
 }
@@ -725,10 +725,10 @@
     height: 36px;
     background: rgba(255, 255, 255, 0.05);
     border: 1px solid rgba(99, 102, 241, 0.2);
-    border-radius: 8px;
+    border-radius: var(--radius-base);
     color: rgba(255, 255, 255, 0.7);
     text-decoration: none;
-    transition: all 0.2s;
+    transition: all var(--transition-fast);
 }
 
 .admin-notif-bell:hover {
@@ -742,11 +742,11 @@
     right: -4px;
     min-width: 18px;
     height: 18px;
-    padding: 0 5px;
+    padding: 0 var(--space-1);
     background: linear-gradient(135deg, #ef4444, #dc2626);
-    border-radius: 9px;
-    font-size: 0.65rem;
-    font-weight: 700;
+    border-radius: var(--radius-base);
+    font-size: var(--font-size-xs);
+    font-weight: var(--font-weight-bold);
     color: white;
     display: flex;
     align-items: center;
@@ -783,7 +783,7 @@
     margin: 0 1rem;
     background: #0f172a;
     border: 1px solid rgba(99, 102, 241, 0.3);
-    border-radius: 16px;
+    border-radius: var(--radius-lg);
     box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
     overflow: hidden;
 }
@@ -791,14 +791,14 @@
 .admin-search-input-wrapper {
     display: flex;
     align-items: center;
-    gap: 0.75rem;
-    padding: 1rem 1.25rem;
+    gap: var(--space-3);
+    padding: var(--space-4) var(--space-5);
     border-bottom: 1px solid rgba(99, 102, 241, 0.2);
 }
 
 .admin-search-input-wrapper i {
     color: rgba(255, 255, 255, 0.4);
-    font-size: 1rem;
+    font-size: var(--font-size-base);
 }
 
 .admin-search-input {
@@ -807,7 +807,7 @@
     border: none;
     outline: none;
     color: #fff;
-    font-size: 1rem;
+    font-size: var(--font-size-base);
     font-family: inherit;
 }
 
@@ -817,9 +817,9 @@
 
 .admin-search-esc {
     background: rgba(99, 102, 241, 0.2);
-    padding: 4px 8px;
-    border-radius: 4px;
-    font-size: 0.7rem;
+    padding: var(--space-1) var(--space-2);
+    border-radius: var(--radius-sm);
+    font-size: var(--font-size-xs);
     color: rgba(255, 255, 255, 0.5);
     border: none;
     font-family: inherit;
@@ -828,31 +828,31 @@
 .admin-search-results {
     max-height: 350px;
     overflow-y: auto;
-    padding: 0.75rem;
+    padding: var(--space-3);
 }
 
 .admin-search-section {
-    margin-bottom: 0.5rem;
+    margin-bottom: var(--space-2);
 }
 
 .admin-search-section-title {
-    font-size: 0.7rem;
-    font-weight: 600;
+    font-size: var(--font-size-xs);
+    font-weight: var(--font-weight-semibold);
     color: rgba(255, 255, 255, 0.4);
     text-transform: uppercase;
     letter-spacing: 0.05em;
-    padding: 0.5rem 0.75rem;
+    padding: var(--space-2) var(--space-3);
 }
 
 .admin-search-item {
     display: flex;
     align-items: center;
-    gap: 0.75rem;
-    padding: 0.65rem 0.75rem;
-    border-radius: 8px;
+    gap: var(--space-3);
+    padding: var(--space-3) var(--space-3);
+    border-radius: var(--radius-base);
     color: rgba(255, 255, 255, 0.8);
     text-decoration: none;
-    transition: all 0.15s;
+    transition: all var(--transition-fast);
 }
 
 .admin-search-item:hover,
@@ -873,9 +873,9 @@
 
 .admin-search-item kbd {
     background: rgba(99, 102, 241, 0.15);
-    padding: 2px 6px;
-    border-radius: 4px;
-    font-size: 0.65rem;
+    padding: var(--space-1) var(--space-2);
+    border-radius: var(--radius-sm);
+    font-size: var(--font-size-xs);
     color: rgba(255, 255, 255, 0.4);
     border: none;
     font-family: inherit;
@@ -887,19 +887,19 @@
 
 .admin-search-footer {
     display: flex;
-    gap: 1.5rem;
-    padding: 0.75rem 1.25rem;
+    gap: var(--space-6);
+    padding: var(--space-3) var(--space-5);
     border-top: 1px solid rgba(99, 102, 241, 0.15);
-    font-size: 0.75rem;
+    font-size: var(--font-size-xs);
     color: rgba(255, 255, 255, 0.4);
 }
 
 .admin-search-footer kbd {
     background: rgba(99, 102, 241, 0.15);
-    padding: 2px 5px;
-    border-radius: 3px;
-    font-size: 0.65rem;
-    margin-right: 3px;
+    padding: var(--space-1) var(--space-1);
+    border-radius: var(--radius-sm);
+    font-size: var(--font-size-xs);
+    margin-right: var(--space-1);
     border: none;
     font-family: inherit;
 }
@@ -924,14 +924,14 @@
     justify-content: center;
     width: 18px;
     height: 18px;
-    border-radius: 50%;
+    border-radius: var(--radius-full);
     background: rgba(99, 102, 241, 0.2);
     color: rgba(255, 255, 255, 0.5);
-    font-size: 0.65rem;
+    font-size: var(--font-size-xs);
     cursor: help;
     border: none;
-    margin-left: 0.5rem;
-    transition: all 0.2s;
+    margin-left: var(--space-2);
+    transition: all var(--transition-fast);
     position: relative;
 }
 
@@ -946,19 +946,19 @@
     left: 50%;
     transform: translateX(-50%);
     width: 240px;
-    padding: 0.75rem;
+    padding: var(--space-3);
     background: #1e293b;
     border: 1px solid rgba(99, 102, 241, 0.3);
-    border-radius: 8px;
-    font-size: 0.8rem;
+    border-radius: var(--radius-base);
+    font-size: var(--font-size-sm);
     color: rgba(255, 255, 255, 0.8);
     text-align: left;
-    line-height: 1.4;
+    line-height: var(--line-height-normal);
     box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
     z-index: 1000;
     opacity: 0;
     visibility: hidden;
-    transition: all 0.2s;
+    transition: all var(--transition-fast);
     pointer-events: none;
 }
 
@@ -980,7 +980,7 @@
 .admin-help-tooltip strong {
     color: #a5b4fc;
     display: block;
-    margin-bottom: 0.25rem;
+    margin-bottom: var(--space-1);
 }
 
 /* Keyboard Hints */
@@ -990,23 +990,23 @@
     right: 1rem;
     background: rgba(15, 23, 42, 0.95);
     border: 1px solid rgba(99, 102, 241, 0.2);
-    border-radius: 10px;
-    padding: 0.5rem 0.75rem;
-    font-size: 0.75rem;
+    border-radius: var(--radius-md);
+    padding: var(--space-2) var(--space-3);
+    font-size: var(--font-size-xs);
     color: rgba(255, 255, 255, 0.5);
     z-index: 100;
     display: flex;
     align-items: center;
-    gap: 0.75rem;
+    gap: var(--space-3);
     backdrop-filter: blur(8px);
 }
 
 .admin-keyboard-hint kbd {
     background: rgba(99, 102, 241, 0.2);
-    padding: 2px 6px;
-    border-radius: 4px;
-    font-size: 0.7rem;
-    margin-right: 4px;
+    padding: var(--space-1) var(--space-2);
+    border-radius: var(--radius-sm);
+    font-size: var(--font-size-xs);
+    margin-right: var(--space-1);
     border: none;
     font-family: inherit;
 }
@@ -1025,41 +1025,41 @@
 .admin-help-shortcuts {
     display: flex;
     flex-direction: column;
-    gap: 0.5rem;
+    gap: var(--space-2);
 }
 
 .admin-help-row {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 0.4rem 0;
+    padding: var(--space-1) 0;
 }
 
 .admin-help-row kbd {
     background: rgba(99, 102, 241, 0.2);
-    padding: 3px 8px;
-    border-radius: 4px;
-    font-size: 0.75rem;
+    padding: var(--space-1) var(--space-2);
+    border-radius: var(--radius-sm);
+    font-size: var(--font-size-xs);
     color: #a5b4fc;
     border: none;
     font-family: inherit;
-    margin-right: 2px;
+    margin-right: var(--space-1);
 }
 
 .admin-help-row span {
     color: rgba(255, 255, 255, 0.6);
-    font-size: 0.85rem;
+    font-size: var(--font-size-sm);
 }
 
 /* Live Search Results */
 .admin-search-result-item {
     display: flex;
     align-items: center;
-    gap: 0.5rem;
-    padding: 0.25rem;
-    border-radius: 8px;
-    margin-bottom: 0.25rem;
-    transition: background 0.15s;
+    gap: var(--space-2);
+    padding: var(--space-1);
+    border-radius: var(--radius-base);
+    margin-bottom: var(--space-1);
+    transition: background var(--transition-fast);
 }
 
 .admin-search-result-item:hover {
@@ -1070,20 +1070,20 @@
     flex: 1;
     display: flex;
     align-items: center;
-    gap: 0.75rem;
-    padding: 0.5rem 0.5rem;
+    gap: var(--space-3);
+    padding: var(--space-2) var(--space-2);
 }
 
 .admin-search-item-content {
     display: flex;
     flex-direction: column;
-    gap: 0.15rem;
+    gap: var(--space-1);
     flex: 1;
     min-width: 0;
 }
 
 .admin-search-item-title {
-    font-weight: 500;
+    font-weight: var(--font-weight-medium);
     color: #fff;
     white-space: nowrap;
     overflow: hidden;
@@ -1091,7 +1091,7 @@
 }
 
 .admin-search-item-subtitle {
-    font-size: 0.75rem;
+    font-size: var(--font-size-xs);
     color: rgba(255, 255, 255, 0.5);
     white-space: nowrap;
     overflow: hidden;
@@ -1101,9 +1101,9 @@
 .admin-search-actions {
     display: flex;
     align-items: center;
-    gap: 0.25rem;
+    gap: var(--space-1);
     opacity: 0;
-    transition: opacity 0.15s;
+    transition: opacity var(--transition-fast);
 }
 
 .admin-search-result-item:hover .admin-search-actions {
@@ -1116,11 +1116,11 @@
     justify-content: center;
     width: 28px;
     height: 28px;
-    border-radius: 6px;
+    border-radius: var(--radius-sm);
     background: rgba(99, 102, 241, 0.2);
     color: #a5b4fc;
     text-decoration: none;
-    transition: all 0.15s;
+    transition: all var(--transition-fast);
 }
 
 .admin-quick-action:hover {
@@ -1130,25 +1130,25 @@
 }
 
 .admin-quick-action i {
-    font-size: 0.75rem;
+    font-size: var(--font-size-xs);
 }
 
 .admin-search-empty {
-    padding: 1.5rem;
+    padding: var(--space-6);
     text-align: center;
     color: rgba(255, 255, 255, 0.4);
-    font-size: 0.85rem;
+    font-size: var(--font-size-sm);
 }
 
 .admin-search-empty i {
     display: block;
-    font-size: 1.5rem;
-    margin-bottom: 0.5rem;
+    font-size: var(--font-size-2xl);
+    margin-bottom: var(--space-2);
     opacity: 0.5;
 }
 
 .admin-live-section .admin-search-section-title {
-    margin-top: 0.5rem;
+    margin-top: var(--space-2);
 }
 
 .admin-live-section .admin-search-section-title:first-child {

@@ -2,7 +2,7 @@
  * Authentication Pages CSS
  * Consolidated from views/modern/auth/{login,register,reset_password}.php
  * Created: 2026-01-19
- * Updated: 2026-01-19 - WCAG 2.1 AA Compliance Enhancements
+ * Updated: 2026-01-21 - Migrated to design tokens for consistency
  *
  * Prefix: auth- for authentication-specific classes
  * Provides unified styling for login, register, and password reset pages
@@ -39,7 +39,7 @@
 
     /* Focus Ring */
     --auth-focus-ring: var(--color-primary-800);        /* High visibility blue */
-    --auth-focus-offset: 2px;
+    --auth-focus-offset: var(--space-1);
 
     /* Touch Target */
     --auth-touch-min: 44px;
@@ -53,7 +53,7 @@
     width: 100%;
     max-width: 450px;
     margin: 0 auto;
-    padding: 0 15px;
+    padding: 0 var(--space-4);
     box-sizing: border-box;
 }
 
@@ -67,13 +67,13 @@
     position: relative;
     z-index: 10;
     background: white;
-    border-radius: 12px;
+    border-radius: var(--radius-md);
     overflow: hidden;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    box-shadow: var(--shadow-md);
 }
 
 .auth-card-body {
-    padding: 40px;
+    padding: var(--space-10);
 }
 
 /* Desktop spacing for no-hero layout */
@@ -86,12 +86,12 @@
 @media (max-width: 600px) {
     .auth-wrapper {
         padding-top: 120px;
-        padding-left: 10px;
-        padding-right: 10px;
+        padding-left: var(--space-3);
+        padding-right: var(--space-3);
     }
 
     .auth-card-body {
-        padding: 25px !important;
+        padding: var(--space-6) !important;
     }
 }
 
@@ -101,7 +101,7 @@
 
 .auth-heading {
     margin-top: 0;
-    margin-bottom: 25px;
+    margin-bottom: var(--space-6);
     font-weight: 800;
     color: var(--color-gray-900);
     text-align: center;
@@ -109,16 +109,16 @@
 
 .auth-intro-text {
     text-align: center;
-    margin-bottom: 25px;
+    margin-bottom: var(--space-6);
     color: var(--htb-text-main, var(--color-gray-800));
 }
 
 .auth-message {
-    padding: 12px;
-    border-radius: 8px;
-    margin-bottom: 20px;
+    padding: var(--space-3);
+    border-radius: var(--radius-base);
+    margin-bottom: var(--space-5);
     text-align: center;
-    font-size: 0.9rem;
+    font-size: var(--font-size-sm);
 }
 
 .auth-message-success {
@@ -140,13 +140,13 @@
 
 .form-row {
     display: flex;
-    gap: 15px;
+    gap: var(--space-4);
     flex-wrap: wrap;
-    margin-bottom: 20px;
+    margin-bottom: var(--space-5);
 }
 
 .form-group {
-    margin-bottom: 20px;
+    margin-bottom: var(--space-5);
     width: 100%;
 }
 
@@ -158,20 +158,20 @@
 .form-label {
     display: block;
     font-weight: 700;
-    margin-bottom: 8px;
+    margin-bottom: var(--space-2);
     color: var(--htb-text-main, var(--color-gray-800));
-    font-size: 1rem;
+    font-size: var(--font-size-base);
 }
 
 .form-input {
     width: 100%;
     max-width: 100%;
     box-sizing: border-box;
-    padding: 12px;
+    padding: var(--space-3);
     border: 2px solid var(--color-gray-200);
-    border-radius: 8px;
-    font-size: 1rem;
-    transition: border-color 0.2s;
+    border-radius: var(--radius-base);
+    font-size: var(--font-size-base);
+    transition: border-color var(--transition-fast);
 }
 
 .form-input:focus {
@@ -186,16 +186,16 @@
 }
 
 .form-note {
-    font-size: 0.8rem;
+    font-size: var(--font-size-xs);
     color: var(--color-gray-500);
-    margin-top: 6px;
+    margin-top: var(--space-2);
 }
 
 /* Password field row with forgot link */
 .form-label-row {
     display: flex;
     justify-content: space-between;
-    margin-bottom: 8px;
+    margin-bottom: var(--space-2);
 }
 
 .form-label-row .form-label {
@@ -203,10 +203,10 @@
 }
 
 .forgot-password-link {
-    font-size: 0.85rem;
+    font-size: var(--font-size-sm);
     color: var(--auth-link);
     text-decoration: none;
-    padding: 4px 0;
+    padding: var(--space-1) 0;
 }
 
 .forgot-password-link:hover {
@@ -217,7 +217,7 @@
 .forgot-password-link:focus {
     outline: 3px solid var(--auth-focus-ring);
     outline-offset: var(--auth-focus-offset);
-    border-radius: 2px;
+    border-radius: var(--radius-sm);
 }
 
 /* ========================================
@@ -225,22 +225,22 @@
    ======================================== */
 
 .password-rules {
-    margin-top: 12px;
-    font-size: 0.85rem;
+    margin-top: var(--space-3);
+    font-size: var(--font-size-sm);
     color: var(--color-gray-500);
     background: var(--color-gray-50);
-    padding: 12px;
-    border-radius: 6px;
+    padding: var(--space-3);
+    border-radius: var(--radius-base);
 }
 
 .rules-title {
     font-weight: 700;
-    margin-bottom: 6px;
+    margin-bottom: var(--space-2);
 }
 
 .password-match-status {
-    margin-top: 8px;
-    font-size: 0.85rem;
+    margin-top: var(--space-2);
+    font-size: var(--font-size-sm);
 }
 
 /* ========================================
@@ -249,16 +249,16 @@
 
 .auth-submit-btn {
     width: 100%;
-    font-size: 1.05rem;
-    padding: 14px;
+    font-size: var(--font-size-lg);
+    padding: var(--space-4);
     min-height: var(--auth-touch-min);
     background: linear-gradient(135deg, var(--auth-brand), var(--color-purple-500));
     border: none;
     color: white;
     font-weight: 700;
-    border-radius: 8px;
+    border-radius: var(--radius-base);
     cursor: pointer;
-    transition: all 0.2s;
+    transition: all var(--transition-fast);
 }
 
 .auth-submit-btn:hover {
@@ -287,37 +287,37 @@
    ======================================== */
 
 .biometric-login-container {
-    margin-bottom: 25px;
+    margin-bottom: var(--space-6);
 }
 
 .biometric-btn {
     width: 100%;
-    padding: 14px;
+    padding: var(--space-4);
     background: linear-gradient(135deg, var(--color-primary-500), var(--color-purple-500));
     color: white;
     font-weight: 700;
     border: none;
-    border-radius: 8px;
-    font-size: 1.05rem;
+    border-radius: var(--radius-base);
+    font-size: var(--font-size-lg);
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 10px;
+    gap: var(--space-3);
 }
 
 .biometric-divider {
     text-align: center;
-    margin: 15px 0;
+    margin: var(--space-4) 0;
     color: var(--color-gray-400);
-    font-size: 0.9rem;
+    font-size: var(--font-size-sm);
 }
 
 .biometric-promo {
-    margin-bottom: 20px;
-    padding: 14px 16px;
+    margin-bottom: var(--space-5);
+    padding: var(--space-4);
     background: linear-gradient(135deg, rgba(99, 102, 241, 0.08), rgba(139, 92, 246, 0.08));
-    border-radius: 10px;
+    border-radius: var(--radius-md);
     border: 1px solid var(--color-primary-500);
     border-opacity: 0.2;
 }
@@ -325,14 +325,14 @@
 .biometric-promo-inner {
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: var(--space-3);
 }
 
 .biometric-promo-icon {
-    width: 40px;
-    height: 40px;
+    width: var(--space-10);
+    height: var(--space-10);
     background: linear-gradient(135deg, var(--color-primary-500), var(--color-purple-500));
-    border-radius: 10px;
+    border-radius: var(--radius-md);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -345,21 +345,21 @@
 
 .biometric-promo-title {
     font-weight: 700;
-    font-size: 0.9rem;
+    font-size: var(--font-size-sm);
     color: var(--color-primary-600);
-    margin-bottom: 2px;
+    margin-bottom: var(--space-1);
 }
 
 .biometric-promo-subtitle {
-    font-size: 0.8rem;
+    font-size: var(--font-size-xs);
     color: var(--color-gray-500);
 }
 
 .biometric-promo-badge {
     background: rgba(99, 102, 241, 0.1);
     color: var(--color-primary-500);
-    padding: 4px 8px;
-    border-radius: 12px;
+    padding: var(--space-1) var(--space-2);
+    border-radius: var(--radius-md);
     font-size: 0.7rem;
     font-weight: 700;
     text-transform: uppercase;
@@ -370,9 +370,9 @@
    ======================================== */
 
 .auth-footer-link {
-    margin-top: 25px;
+    margin-top: var(--space-6);
     text-align: center;
-    font-size: 0.95rem;
+    font-size: var(--font-size-base);
     color: var(--color-gray-500);
 }
 
@@ -381,7 +381,7 @@
     color: var(--auth-link);
     font-weight: 600;
     text-decoration: none;
-    padding: 2px 0;
+    padding: var(--space-1) 0;
 }
 
 .auth-footer-link a:hover,
@@ -394,13 +394,13 @@
 .auth-login-link a:focus {
     outline: 3px solid var(--auth-focus-ring);
     outline-offset: var(--auth-focus-offset);
-    border-radius: 2px;
+    border-radius: var(--radius-sm);
 }
 
 .auth-login-link {
-    margin-top: 25px;
+    margin-top: var(--space-6);
     text-align: center;
-    font-size: 0.95rem;
+    font-size: var(--font-size-base);
     color: var(--htb-text-muted, var(--color-gray-500));
 }
 
@@ -411,14 +411,14 @@
 .gdpr-consent-label {
     display: flex;
     align-items: flex-start;
-    gap: 10px;
+    gap: var(--space-3);
     cursor: pointer;
-    font-size: 0.9rem;
+    font-size: var(--font-size-sm);
     color: var(--color-gray-700);
 }
 
 .gdpr-consent-label input[type="checkbox"] {
-    margin-top: 4px;
+    margin-top: var(--space-1);
     transform: scale(1.2);
 }
 
@@ -428,17 +428,17 @@
 }
 
 .data-protection-notice {
-    font-size: 0.8rem;
+    font-size: var(--font-size-xs);
     color: var(--color-gray-500);
-    line-height: 1.5;
-    margin-bottom: 20px;
+    line-height: var(--line-height-normal);
+    margin-bottom: var(--space-5);
     background: var(--color-gray-50);
-    padding: 15px;
-    border-radius: 8px;
+    padding: var(--space-4);
+    border-radius: var(--radius-base);
 }
 
 .data-protection-notice p {
-    margin: 5px 0;
+    margin: var(--space-1) 0;
 }
 
 .data-protection-notice p:first-child {
@@ -452,8 +452,8 @@
 }
 
 .data-protection-notice ul {
-    padding-left: 20px;
-    margin: 5px 0;
+    padding-left: var(--space-5);
+    margin: var(--space-1) 0;
 }
 
 .data-protection-notice a {
@@ -471,11 +471,11 @@
     }
 
     .form-group {
-        margin-bottom: 15px;
+        margin-bottom: var(--space-4);
     }
 
     .auth-card-body {
-        padding: 25px;
+        padding: var(--space-6);
     }
 }
 
@@ -709,7 +709,7 @@
 }
 
 /* Data Protection Notice Box - inline style override */
-[data-theme="dark"] div[style*="background: #f9fafb"][style*="border-radius: 8px"] {
+[data-theme="dark"] div[style*="background: #f9fafb"][style*="border-radius: var(--radius-base)"] {
     background: rgba(15, 23, 42, 0.6) !important;
     border: 1px solid rgba(255, 255, 255, 0.1);
 }

@@ -45,7 +45,7 @@
     background-color: var(--civicone-focus);
     color: var(--civicone-focus-text) !important;
     text-decoration: none;
-    box-shadow: 0 -2px var(--civicone-focus), 0 4px var(--civicone-focus-text);
+    box-shadow: 0 -var(--space-1) var(--civicone-focus), 0 var(--space-1) var(--civicone-focus-text);
 }
 
 /* Buttons - GOV.UK style: yellow outline */
@@ -59,7 +59,7 @@
 [data-layout="civicone"] [role="button"]:focus-visible {
     outline: var(--civicone-focus-outline);
     outline-offset: var(--civicone-focus-outline-offset);
-    box-shadow: inset 0 0 0 2px var(--civicone-focus-text);
+    box-shadow: inset 0 0 0 var(--space-1) var(--civicone-focus-text);
 }
 
 /* Form inputs - Yellow outline with thicker border */
@@ -100,14 +100,14 @@
     outline-offset: 0 !important;
     background-color: var(--civicone-focus) !important;
     color: var(--civicone-focus-text) !important;
-    box-shadow: 0 -2px var(--civicone-focus), 0 4px var(--civicone-focus-text) !important;
+    box-shadow: 0 -var(--space-1) var(--civicone-focus), 0 var(--space-1) var(--civicone-focus-text) !important;
 }
 
 /* Logo focus */
 .civic-logo:focus,
 .civic-logo:focus-visible {
     outline: var(--civicone-focus-outline) !important;
-    outline-offset: 4px !important;
+    outline-offset: var(--space-1) !important;
     background-color: var(--civicone-focus) !important;
     color: var(--civicone-focus-text) !important;
 }
@@ -148,17 +148,17 @@
    =========================================== */
 .skip-link:focus {
     position: fixed !important;
-    top: 10px !important;
-    left: 10px !important;
+    top: var(--space-2) !important;
+    left: var(--space-2) !important;
     z-index: 100000 !important;
-    padding: 12px 16px !important;
+    padding: var(--space-3) var(--space-4) !important;
     background-color: var(--civicone-focus) !important;
     color: var(--civicone-focus-text) !important;
-    font-weight: 700 !important;
+    font-weight: var(--font-weight-bold) !important;
     text-decoration: none !important;
     outline: 3px solid var(--civicone-focus-text) !important;
     outline-offset: 0 !important;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3) !important;
+    box-shadow: 0 var(--space-1) var(--space-2) rgba(0, 0, 0, 0.3) !important;
 }
 
 /* ===========================================
@@ -238,7 +238,7 @@
 .civic-footer-social a:focus,
 .civic-footer-social a:focus-visible {
     outline: var(--civicone-focus-outline) !important;
-    outline-offset: 2px !important;
+    outline-offset: var(--space-1) !important;
     background-color: var(--civicone-focus) !important;
 }
 
@@ -248,7 +248,7 @@
 .civic-card:focus-within,
 [data-layout="civicone"] .card:focus-within {
     outline: var(--civicone-focus-outline);
-    outline-offset: 2px;
+    outline-offset: var(--space-1);
 }
 
 /* ===========================================
@@ -279,7 +279,7 @@
 .civic-experimental-switch:focus,
 .civic-experimental-switch:focus-visible {
     outline: var(--civicone-focus-outline) !important;
-    outline-offset: 2px !important;
+    outline-offset: var(--space-1) !important;
     background-color: var(--civicone-focus) !important;
     color: var(--civicone-focus-text) !important;
 }

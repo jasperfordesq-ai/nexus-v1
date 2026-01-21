@@ -9,7 +9,7 @@
 .strategic-plan-wrapper {
     position: relative;
     min-height: 100vh;
-    padding: 160px 1rem 4rem;
+    padding: 160px var(--space-4) var(--space-16);
 }
 
 @media (max-width: 900px) {
@@ -51,11 +51,11 @@
    ============================================ */
 .strategic-plan-header {
     text-align: center;
-    margin-bottom: 3rem;
-    backdrop-filter: blur(20px) saturate(120%);
-    -webkit-backdrop-filter: blur(20px) saturate(120%);
-    border-radius: 20px;
-    padding: 2.5rem;
+    margin-bottom: var(--space-12);
+    backdrop-filter: blur(var(--glass-blur-subtle)) saturate(120%);
+    -webkit-backdrop-filter: blur(var(--glass-blur-subtle)) saturate(120%);
+    border-radius: var(--radius-xl);
+    padding: var(--space-10);
 }
 
 [data-theme="light"] .strategic-plan-header {
@@ -71,39 +71,39 @@
 }
 
 .strategic-plan-header h1 {
-    font-size: 2.5rem;
+    font-size: var(--font-size-4xl);
     font-weight: 800;
     color: var(--htb-text-main);
-    margin: 0 0 0.75rem 0;
+    margin: 0 0 var(--space-3) 0;
     text-transform: uppercase;
     letter-spacing: 0.02em;
 }
 
 .strategic-plan-header .header-divider {
     width: 80px;
-    height: 4px;
+    height: var(--space-1);
     background: var(--htb-accent, #2563eb);
-    margin: 0 auto 1.25rem;
-    border-radius: 2px;
+    margin: 0 auto var(--space-5);
+    border-radius: var(--radius-sm);
 }
 
 .strategic-plan-header .tagline {
-    font-size: 1.25rem;
+    font-size: var(--font-size-xl);
     color: var(--htb-text-muted);
     max-width: 700px;
-    margin: 0 auto 1.5rem;
+    margin: 0 auto var(--space-6);
     line-height: 1.6;
 }
 
 .strategic-plan-header .download-btn {
     display: inline-flex;
     align-items: center;
-    gap: 0.5rem;
-    padding: 0.75rem 1.5rem;
-    border-radius: 10px;
-    font-weight: 600;
+    gap: var(--space-2);
+    padding: var(--space-3) var(--space-6);
+    border-radius: var(--radius-md);
+    font-weight: var(--font-weight-semibold);
     text-decoration: none;
-    transition: all 0.2s ease;
+    transition: all var(--transition-fast);
 }
 
 [data-theme="light"] .strategic-plan-header .download-btn {
@@ -129,7 +129,7 @@
 .strategic-plan-layout {
     display: grid;
     grid-template-columns: 280px 1fr;
-    gap: 2.5rem;
+    gap: var(--space-10);
     align-items: start;
 }
 
@@ -145,10 +145,10 @@
 .strategic-plan-toc {
     position: sticky;
     top: 100px;
-    backdrop-filter: blur(20px) saturate(120%);
-    -webkit-backdrop-filter: blur(20px) saturate(120%);
-    border-radius: 16px;
-    padding: 1.5rem;
+    backdrop-filter: blur(var(--glass-blur-subtle)) saturate(120%);
+    -webkit-backdrop-filter: blur(var(--glass-blur-subtle)) saturate(120%);
+    border-radius: var(--radius-lg);
+    padding: var(--space-6);
 }
 
 [data-theme="light"] .strategic-plan-toc {
@@ -172,11 +172,11 @@
 
 .strategic-plan-toc h3 {
     color: var(--htb-accent, #2563eb);
-    margin: 0 0 1rem 0;
-    padding-bottom: 0.75rem;
+    margin: 0 0 var(--space-4) 0;
+    padding-bottom: var(--space-3);
     border-bottom: 1px solid var(--htb-border, rgba(0, 0, 0, 0.1));
-    font-size: 1rem;
-    font-weight: 700;
+    font-size: var(--font-size-base);
+    font-weight: var(--font-weight-bold);
 }
 
 .strategic-plan-toc ul {
@@ -186,16 +186,16 @@
 }
 
 .strategic-plan-toc li {
-    margin-bottom: 0.5rem;
+    margin-bottom: var(--space-2);
 }
 
 .strategic-plan-toc a {
     display: block;
-    padding: 0.5rem 0;
+    padding: var(--space-2) 0;
     text-decoration: none;
     color: var(--htb-text-muted);
-    font-size: 0.9rem;
-    transition: color 0.2s ease;
+    font-size: var(--font-size-sm);
+    transition: color var(--transition-fast);
 }
 
 .strategic-plan-toc a:hover {
@@ -206,11 +206,11 @@
    CONTENT SECTIONS
    ============================================ */
 .strategic-plan-section {
-    backdrop-filter: blur(20px) saturate(120%);
-    -webkit-backdrop-filter: blur(20px) saturate(120%);
-    border-radius: 20px;
-    padding: 2rem;
-    margin-bottom: 1.5rem;
+    backdrop-filter: blur(var(--glass-blur-subtle)) saturate(120%);
+    -webkit-backdrop-filter: blur(var(--glass-blur-subtle)) saturate(120%);
+    border-radius: var(--radius-xl);
+    padding: var(--space-8);
+    margin-bottom: var(--space-6);
 }
 
 [data-theme="light"] .strategic-plan-section {
@@ -227,35 +227,35 @@
 
 .strategic-plan-section h2 {
     color: var(--htb-accent, #2563eb);
-    margin: 0 0 1.25rem 0;
-    padding-bottom: 0.75rem;
+    margin: 0 0 var(--space-5) 0;
+    padding-bottom: var(--space-3);
     border-bottom: 2px solid var(--htb-border, rgba(0, 0, 0, 0.05));
-    font-size: 1.4rem;
-    font-weight: 700;
+    font-size: var(--font-size-2xl);
+    font-weight: var(--font-weight-bold);
 }
 
 .strategic-plan-section h3 {
     color: var(--htb-text-main);
-    margin: 1.5rem 0 1rem 0;
-    font-size: 1.15rem;
-    font-weight: 600;
+    margin: var(--space-6) 0 var(--space-4) 0;
+    font-size: var(--font-size-lg);
+    font-weight: var(--font-weight-semibold);
 }
 
 .strategic-plan-section p {
     color: var(--htb-text-muted);
-    line-height: 1.7;
-    margin: 0 0 1rem 0;
+    line-height: var(--line-height-relaxed);
+    margin: 0 0 var(--space-4) 0;
 }
 
 .strategic-plan-section ol,
 .strategic-plan-section ul {
     color: var(--htb-text-muted);
-    line-height: 1.7;
-    padding-left: 1.5rem;
+    line-height: var(--line-height-relaxed);
+    padding-left: var(--space-6);
 }
 
 .strategic-plan-section li {
-    margin-bottom: 0.5rem;
+    margin-bottom: var(--space-2);
 }
 
 .strategic-plan-section strong {
@@ -266,20 +266,20 @@
    HIGHLIGHT BOXES (Mission/Vision)
    ============================================ */
 .strategic-plan-highlight {
-    border-radius: 12px;
-    padding: 1.5rem;
+    border-radius: var(--radius-md);
+    padding: var(--space-6);
     text-align: center;
-    margin-bottom: 1rem;
+    margin-bottom: var(--space-4);
 }
 
 .strategic-plan-highlight h3 {
     color: var(--htb-accent, #2563eb);
-    margin: 0 0 0.75rem 0;
+    margin: 0 0 var(--space-3) 0;
 }
 
 .strategic-plan-highlight p {
     font-style: italic;
-    font-size: 1.05rem;
+    font-size: var(--font-size-lg);
     margin-bottom: 0;
 }
 
@@ -309,7 +309,7 @@
 .strategic-plan-swot {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    gap: 1rem;
+    gap: var(--space-4);
 }
 
 @media (max-width: 600px) {
@@ -319,35 +319,35 @@
 }
 
 .strategic-plan-swot-item {
-    padding: 1.25rem;
-    border-radius: 12px;
-    border-top: 4px solid;
+    padding: var(--space-5);
+    border-radius: var(--radius-md);
+    border-top: var(--space-1) solid;
 }
 
 .strategic-plan-swot-item h4 {
-    margin: 0 0 0.75rem 0;
-    font-size: 1rem;
+    margin: 0 0 var(--space-3) 0;
+    font-size: var(--font-size-base);
 }
 
 .strategic-plan-swot-item ul {
-    padding-left: 1.25rem;
-    font-size: 0.9rem;
+    padding-left: var(--space-5);
+    font-size: var(--font-size-sm);
     margin: 0;
 }
 
 .strategic-plan-swot-item li {
-    margin-bottom: 0.4rem;
+    margin-bottom: var(--space-2);
 }
 
 /* Strengths */
 [data-theme="light"] .strategic-plan-swot-item--strengths {
     background: rgba(240, 253, 244, 0.9);
-    border-top-color: #10b981;
+    border-top-color: var(--color-success);
 }
 
 [data-theme="dark"] .strategic-plan-swot-item--strengths {
     background: rgba(16, 185, 129, 0.1);
-    border-top-color: #10b981;
+    border-top-color: var(--color-success);
 }
 
 .strategic-plan-swot-item--strengths h4 {
@@ -361,12 +361,12 @@
 /* Weaknesses */
 [data-theme="light"] .strategic-plan-swot-item--weaknesses {
     background: rgba(254, 242, 242, 0.9);
-    border-top-color: #ef4444;
+    border-top-color: var(--color-danger);
 }
 
 [data-theme="dark"] .strategic-plan-swot-item--weaknesses {
     background: rgba(239, 68, 68, 0.1);
-    border-top-color: #ef4444;
+    border-top-color: var(--color-danger);
 }
 
 .strategic-plan-swot-item--weaknesses h4 {
@@ -399,12 +399,12 @@
 /* Threats */
 [data-theme="light"] .strategic-plan-swot-item--threats {
     background: rgba(255, 251, 235, 0.9);
-    border-top-color: #f59e0b;
+    border-top-color: var(--color-warning);
 }
 
 [data-theme="dark"] .strategic-plan-swot-item--threats {
     background: rgba(245, 158, 11, 0.1);
-    border-top-color: #f59e0b;
+    border-top-color: var(--color-warning);
 }
 
 .strategic-plan-swot-item--threats h4 {
@@ -421,8 +421,8 @@
 .strategic-plan-table {
     width: 100%;
     border-collapse: collapse;
-    margin-bottom: 1.5rem;
-    font-size: 0.9rem;
+    margin-bottom: var(--space-6);
+    font-size: var(--font-size-sm);
 }
 
 .strategic-plan-table th,
@@ -432,7 +432,7 @@
 }
 
 .strategic-plan-table th {
-    font-weight: 600;
+    font-weight: var(--font-weight-semibold);
     color: var(--htb-text-main);
 }
 
@@ -457,9 +457,9 @@
 .strategic-plan-badge {
     display: inline-block;
     padding: 2px 10px;
-    border-radius: 10px;
+    border-radius: var(--radius-md);
     font-size: 0.75rem;
-    font-weight: 700;
+    font-weight: var(--font-weight-bold);
     color: white;
     text-transform: uppercase;
 }
@@ -502,11 +502,11 @@
     }
 
     .strategic-plan-header .tagline {
-        font-size: 1rem;
+        font-size: var(--font-size-base);
     }
 
     .strategic-plan-section {
-        padding: 1.5rem;
+        padding: var(--space-6);
     }
 
     .strategic-plan-table {

@@ -2,6 +2,7 @@
  * Modern Mobile Navigation v2 - CSS
  * Full-screen, native app-like mobile navigation
  * Inspired by Instagram, TikTok, and iOS design patterns
+ * Migrated to design tokens for consistency
  */
 
 /* FIX: Remove transform from html that breaks position:fixed */
@@ -44,17 +45,17 @@ html[data-layout] {
         bottom: 0 !important;
         left: 0 !important;
         right: 0 !important;
-        z-index: 99999 !important;
-        height: 84px !important;
+        z-index: var(--z-navbar) !important;
+        height: var(--layout-mobile-nav-height) !important;
         background: rgba(255, 255, 255, 0.98) !important;
-        border-top: 1px solid rgba(0, 0, 0, 0.1) !important;
-        -webkit-backdrop-filter: saturate(180%) blur(20px) !important;
-        backdrop-filter: saturate(180%) blur(20px) !important;
+        border-top: 1px solid var(--border-default) !important;
+        -webkit-backdrop-filter: saturate(var(--glass-saturation)) blur(var(--glass-blur-subtle)) !important;
+        backdrop-filter: saturate(var(--glass-saturation)) blur(var(--glass-blur-subtle)) !important;
     }
 
     [data-theme="dark"] .mobile-tab-bar {
         background: rgba(28, 28, 30, 0.98) !important;
-        border-top-color: rgba(255, 255, 255, 0.1) !important;
+        border-top-color: var(--border-default) !important;
     }
 
     body {
@@ -102,11 +103,11 @@ html[data-layout] {
 /* AI Assistant special styling */
 .mobile-menu-item-ai {
     background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(139, 92, 246, 0.1));
-    font-weight: 600;
+    font-weight: var(--font-weight-semibold);
 }
 
 /* Arrow icon in user profile link */
 .mobile-menu-user-arrow {
-    font-size: 11px;
-    margin-right: 4px;
+    font-size: var(--font-size-xs);
+    margin-right: var(--space-1);
 }

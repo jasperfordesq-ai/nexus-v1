@@ -2,7 +2,7 @@
  * Mobile Accessibility Fixes
  * WCAG 2.1 AAA compliance improvements
  * Fixes critical touch target size violations
- * Version: 1.0 - 2026-01-21
+ * Version: 1.1 - 2026-01-21 - Migrated to design tokens
  *
  * PRIORITY: CRITICAL
  * These fixes ensure all interactive elements meet 44x44px minimum touch target size
@@ -19,7 +19,7 @@
         min-width: 44px;
         min-height: 44px;
         /* Maintain visual size with padding adjustment */
-        padding: 6px;
+        padding: var(--space-1);
     }
 
     /* Comment Send Button (was 40x40px) */
@@ -33,7 +33,7 @@
         min-width: 44px;
         min-height: 44px;
         /* Adjust font size to maintain proportion */
-        font-size: 14px;
+        font-size: var(--font-size-sm);
     }
 
     /* Comment Avatar - Add padding to increase tap zone */
@@ -41,7 +41,7 @@
         min-width: 44px;
         min-height: 44px;
         /* Use padding to maintain 36px visual size */
-        padding: 4px;
+        padding: var(--space-1);
         box-sizing: content-box;
     }
 
@@ -49,7 +49,7 @@
     .mobile-comment-replies .mobile-comment-avatar {
         min-width: 44px;
         min-height: 44px;
-        padding: 8px;
+        padding: var(--space-2);
         box-sizing: content-box;
     }
 }
@@ -67,19 +67,19 @@
         min-width: 44px;
         min-height: 44px;
         /* Maintain icon size */
-        padding: 10px;
+        padding: var(--space-2);
     }
 
     /* Cancel Button - Ensure adequate tap zone */
     .mobile-search-cancel {
         min-height: 44px;
-        padding: 8px 12px;
+        padding: var(--space-2) var(--space-3);
     }
 
     /* Search Tab Pills - Increase touch target */
     .mobile-search-tab {
         min-height: 44px;
-        padding: 10px 16px;
+        padding: var(--space-2) var(--space-4);
     }
 
     /* Tag Remove Button (was 32x32px) */
@@ -108,7 +108,7 @@
         min-width: 44px;
         min-height: 44px;
         /* Use padding to maintain visual size */
-        padding: 9px;
+        padding: var(--space-2);
         box-sizing: content-box;
     }
 
@@ -144,7 +144,7 @@
     /* Notification Handle - Make draggable */
     .mobile-notification-handle {
         min-height: 44px; /* Increase draggable area */
-        padding: 20px 0; /* Visual handle stays small, tap zone is large */
+        padding: var(--space-5) var(--space-0); /* Visual handle stays small, tap zone is large */
         cursor: grab;
     }
 
@@ -201,10 +201,10 @@
 .mobile-expand-tap-zone::before {
     content: '';
     position: absolute;
-    top: -8px;
-    right: -8px;
-    bottom: -8px;
-    left: -8px;
+    top: calc(-1 * var(--space-2));
+    right: calc(-1 * var(--space-2));
+    bottom: calc(-1 * var(--space-2));
+    left: calc(-1 * var(--space-2));
     /* Invisible tap zone expansion */
 }
 
@@ -228,6 +228,7 @@
     .mobile-interactive:active {
         transform: scale(0.96);
         opacity: 0.8;
+        transition: var(--transition-fast);
     }
 }
 
@@ -240,7 +241,7 @@
     /* Sheet Drag Handle - Increase draggable area */
     .mobile-sheet-handle {
         /* Visual handle is 36x5px, but draggable area is much larger */
-        padding: 20px 0;
+        padding: var(--space-5) var(--space-0);
         min-height: 44px;
         cursor: grab;
         /* Center the visual handle */
@@ -254,7 +255,7 @@
         width: 36px;
         height: 5px;
         background: rgba(128, 128, 128, 0.3);
-        border-radius: 3px;
+        border-radius: var(--radius-sm);
         pointer-events: none;
     }
 

@@ -48,13 +48,13 @@ body.skin-torfaen .civic-card,
 body.skin-torfaen .btn-primary,
 body.skin-torfaen .civic-btn,
 body.skin-torfaen .civic-input {
-    border-radius: 5px;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    border-radius: var(--radius-sm);
+    box-shadow: var(--shadow-sm);
 }
 
 /* Component Appliers - Use increased specificity instead of !important */
 html body header {
-    background-color: #ffffff;
+    background-color: var(--bg-elevated);
 }
 
 html body .btn-primary {
@@ -64,5 +64,5 @@ html body .btn-primary {
 }
 
 html body .hero-section {
-    border-bottom: 4px solid var(--skin-secondary);
+    border-bottom: var(--space-1) solid var(--skin-secondary);
 }

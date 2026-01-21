@@ -1,7 +1,7 @@
 /**
  * Button Ripple Effects - Material Design Style
  * Touch/click feedback with expanding ripple animation
- * Version: 1.0 - 2026-01-19
+ * Version: 1.1 - 2026-01-21 - Migrated to design tokens
  *
  * Features:
  * - Expanding ripple from click point
@@ -47,7 +47,7 @@
    ============================================== */
 .ripple-effect {
     position: absolute;
-    border-radius: 50%;
+    border-radius: var(--radius-full);
     background: currentColor;
     opacity: 0;
     transform: scale(0);
@@ -67,24 +67,24 @@
 
 /* Primary color ripple */
 .ripple-effect.ripple-primary {
-    background: rgba(99, 102, 241, 0.25);
+    background: color-mix(in srgb, var(--color-primary-500) 25%, transparent);
 }
 
 /* Success ripple */
 .ripple-effect.ripple-success {
-    background: rgba(16, 185, 129, 0.25);
+    background: color-mix(in srgb, var(--color-success) 25%, transparent);
 }
 
 /* Danger ripple */
 .ripple-effect.ripple-danger {
-    background: rgba(239, 68, 68, 0.25);
+    background: color-mix(in srgb, var(--color-danger) 25%, transparent);
 }
 
 /* ==============================================
    RIPPLE ANIMATION
    ============================================== */
 .ripple-effect.ripple-animate {
-    animation: ripple-expand 600ms cubic-bezier(0.4, 0, 0.2, 1) forwards;
+    animation: ripple-expand var(--transition-slow) var(--ease-in-out) forwards;
 }
 
 @keyframes ripple-expand {
@@ -130,7 +130,7 @@
 .btn-outline .ripple-effect,
 .glass-btn-secondary .ripple-effect,
 .glass-btn-outline .ripple-effect {
-    background: rgba(99, 102, 241, 0.2);
+    background: color-mix(in srgb, var(--color-primary-500) 20%, transparent);
 }
 
 /* Danger buttons */
@@ -146,7 +146,7 @@
 /* Ghost/text buttons */
 .btn-ghost .ripple-effect,
 .btn-text .ripple-effect {
-    background: rgba(99, 102, 241, 0.15);
+    background: color-mix(in srgb, var(--color-primary-500) 15%, transparent);
 }
 
 /* ==============================================
@@ -160,7 +160,7 @@
 [data-theme="dark"] .btn-outline .ripple-effect,
 [data-theme="dark"] .glass-btn-secondary .ripple-effect,
 [data-theme="dark"] .glass-btn-outline .ripple-effect {
-    background: rgba(129, 140, 248, 0.25);
+    background: color-mix(in srgb, var(--color-primary-400) 25%, transparent);
 }
 
 [data-theme="dark"] .nav-link .ripple-effect,
@@ -173,17 +173,17 @@
    ============================================== */
 .nav-link .ripple-effect,
 .tab-item .ripple-effect {
-    background: rgba(99, 102, 241, 0.15);
+    background: color-mix(in srgb, var(--color-primary-500) 15%, transparent);
 }
 
 .nav-link.active .ripple-effect,
 .tab-item.active .ripple-effect {
-    background: rgba(99, 102, 241, 0.2);
+    background: color-mix(in srgb, var(--color-primary-500) 20%, transparent);
 }
 
 /* Mobile tab bar */
 .mobile-tab-bar .tab-item .ripple-effect {
-    background: rgba(99, 102, 241, 0.2);
+    background: color-mix(in srgb, var(--color-primary-500) 20%, transparent);
 }
 
 /* ==============================================
@@ -193,12 +193,12 @@
 .glass-card[onclick] .ripple-effect,
 .glass-card[role="button"] .ripple-effect,
 a.glass-card .ripple-effect {
-    background: rgba(99, 102, 241, 0.1);
+    background: color-mix(in srgb, var(--color-primary-500) 10%, transparent);
 }
 
 [data-theme="dark"] .card-clickable .ripple-effect,
 [data-theme="dark"] a.glass-card .ripple-effect {
-    background: rgba(129, 140, 248, 0.15);
+    background: color-mix(in srgb, var(--color-primary-400) 15%, transparent);
 }
 
 /* ==============================================
@@ -243,7 +243,7 @@ a.glass-card .ripple-effect {
 }
 
 .ripple-centered .ripple-effect.ripple-animate {
-    animation: ripple-expand-centered 500ms cubic-bezier(0.4, 0, 0.2, 1) forwards;
+    animation: ripple-expand-centered var(--transition-slow) var(--ease-in-out) forwards;
 }
 
 @keyframes ripple-expand-centered {
@@ -270,7 +270,7 @@ a.glass-card .ripple-effect {
 .icon-btn .ripple-effect,
 .nexus-header-icon-btn .ripple-effect,
 .btn-icon .ripple-effect {
-    background: rgba(99, 102, 241, 0.2);
+    background: color-mix(in srgb, var(--color-primary-500) 20%, transparent);
 }
 
 /* ==============================================
@@ -294,11 +294,11 @@ a.glass-card .ripple-effect {
 .radio-ripple::before {
     content: '';
     position: absolute;
-    inset: -8px;
-    border-radius: 50%;
-    background: rgba(99, 102, 241, 0.15);
+    inset: calc(var(--space-2) * -1);
+    border-radius: var(--radius-full);
+    background: color-mix(in srgb, var(--color-primary-500) 15%, transparent);
     transform: scale(0);
-    transition: transform 200ms ease;
+    transition: transform var(--transition-fast) ease;
 }
 
 .checkbox-ripple:active::before,
@@ -328,7 +328,7 @@ a.glass-card .ripple-effect {
     .ripple-effect.ripple-animate {
         opacity: 0.2;
         transform: scale(2);
-        transition: opacity 200ms ease;
+        transition: opacity var(--transition-fast) ease;
     }
 
     /* Fade out instead of animate */

@@ -9,10 +9,10 @@
    ============================================ */
 .edit-glass-bg {
     position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
+    top: var(--space-0);
+    left: var(--space-0);
+    right: var(--space-0);
+    bottom: var(--space-0);
     z-index: -1;
     background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 25%, #e2e8f0 50%, #f1f5f9 75%, #f8fafc 100%);
 }
@@ -53,11 +53,11 @@
     background: linear-gradient(135deg,
         rgba(255, 255, 255, 0.85) 0%,
         rgba(255, 255, 255, 0.7) 100%);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
+    backdrop-filter: blur(var(--glass-blur-subtle));
+    -webkit-backdrop-filter: blur(var(--glass-blur-subtle));
     border: 1px solid rgba(255, 255, 255, 0.5);
-    border-radius: 20px;
-    box-shadow: 0 8px 32px rgba(31, 38, 135, 0.1);
+    border-radius: var(--radius-xl);
+    box-shadow: var(--shadow-glass);
 }
 
 [data-theme="dark"] .edit-container .htb-card {
@@ -153,7 +153,7 @@
    ============================================ */
 @media (max-width: 768px) {
     .edit-container {
-        padding: 100px 16px 40px 16px !important;
+        padding: 100px var(--space-4) var(--space-10) var(--space-4) !important;
     }
 
     .edit-container > form > div {
@@ -161,13 +161,13 @@
     }
 
     .edit-container .htb-card-body {
-        padding: 20px !important;
+        padding: var(--space-5) !important;
     }
 
     .edit-container input[type="text"],
     .edit-container input[type="email"],
     .edit-container input[type="tel"],
     .edit-container textarea {
-        font-size: 16px !important; /* Prevents iOS zoom */
+        font-size: var(--font-size-base) !important; /* Prevents iOS zoom */
     }
 }

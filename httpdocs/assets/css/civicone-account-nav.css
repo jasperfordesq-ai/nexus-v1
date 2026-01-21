@@ -7,14 +7,14 @@
 
 /* Account Area Container */
 .civicone-account-area {
-    margin-top: var(--civicone-space-4, 20px);
+    margin-top: var(--space-5);
 }
 
 /* MOJ Sub navigation */
 .civicone .moj-sub-navigation,
 .civicone-account-area .moj-sub-navigation {
     border-bottom: 1px solid var(--civicone-border, #b1b4b6);
-    margin-bottom: var(--civicone-space-6, 30px);
+    margin-bottom: var(--space-6);
 }
 
 .civicone .moj-sub-navigation__list,
@@ -24,7 +24,7 @@
     padding: 0;
     display: flex;
     flex-wrap: wrap;
-    gap: var(--civicone-space-2, 10px);
+    gap: var(--space-2);
 }
 
 .civicone .moj-sub-navigation__item,
@@ -36,12 +36,12 @@
 .civicone-account-area .moj-sub-navigation__link {
     display: inline-flex;
     align-items: center;
-    gap: var(--civicone-space-2, 10px);
-    padding: var(--civicone-space-3, 15px) var(--civicone-space-4, 20px);
+    gap: var(--space-2);
+    padding: var(--space-3) var(--space-5);
     text-decoration: none;
     color: var(--civicone-link, #1d70b8);
     border-bottom: 4px solid transparent;
-    transition: border-color 0.15s ease;
+    transition: border-color var(--transition-fast);
 }
 
 .civicone .moj-sub-navigation__link:hover,
@@ -63,7 +63,7 @@
 .civicone .moj-sub-navigation__item--active .moj-sub-navigation__link,
 .civicone-account-area .moj-sub-navigation__item--active .moj-sub-navigation__link {
     border-bottom-color: var(--civicone-link, #1d70b8);
-    font-weight: 700;
+    font-weight: var(--font-weight-bold);
     color: var(--civicone-text, #0b0c0c);
 }
 
@@ -84,14 +84,14 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    min-width: 20px;
-    height: 20px;
-    padding: 0 6px;
+    min-width: var(--space-5);
+    height: var(--space-5);
+    padding: 0 var(--space-2);
     background-color: var(--civicone-error, #d4351c);
     color: #ffffff;
-    font-size: 12px;
-    font-weight: 700;
-    border-radius: 10px;
+    font-size: var(--font-size-xs);
+    font-weight: var(--font-weight-bold);
+    border-radius: var(--radius-full);
     line-height: 1;
 }
 
@@ -118,7 +118,7 @@
     .civicone-account-area .moj-sub-navigation__link {
         width: 100%;
         justify-content: flex-start;
-        padding: var(--civicone-space-3, 15px);
+        padding: var(--space-3);
         border-bottom: 1px solid var(--civicone-border, #b1b4b6);
     }
 
@@ -126,7 +126,7 @@
     .civicone-account-area .moj-sub-navigation__item--active .moj-sub-navigation__link {
         border-left: 4px solid var(--civicone-link, #1d70b8);
         border-bottom: 1px solid var(--civicone-border, #b1b4b6);
-        padding-left: calc(var(--civicone-space-3, 15px) - 4px);
+        padding-left: calc(var(--space-3) - 4px);
     }
 }
 

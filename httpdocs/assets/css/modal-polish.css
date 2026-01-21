@@ -12,15 +12,15 @@
     right: 0;
     bottom: 0;
     background: rgba(0, 0, 0, 0.6);
-    backdrop-filter: blur(4px);
-    -webkit-backdrop-filter: blur(4px);
+    backdrop-filter: blur(var(--glass-blur-subtle));
+    -webkit-backdrop-filter: blur(var(--glass-blur-subtle));
     z-index: 9998;
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 20px;
+    padding: var(--space-5);
     opacity: 0;
-    animation: modalFadeIn 0.2s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+    animation: modalFadeIn 0.2s var(--ease-in-out) forwards;
 }
 
 [data-theme="dark"] .modal-overlay {
@@ -37,7 +37,7 @@
 }
 
 .modal-overlay.closing {
-    animation: modalFadeOut 0.2s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+    animation: modalFadeOut 0.2s var(--ease-in-out) forwards;
 }
 
 @keyframes modalFadeOut {
@@ -55,7 +55,7 @@
 
 .modal {
     background: white;
-    border-radius: 20px;
+    border-radius: var(--radius-xl);
     box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
     max-width: 500px;
     width: 100%;
@@ -64,7 +64,7 @@
     display: flex;
     flex-direction: column;
     position: relative;
-    animation: modalSlideUp 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    animation: modalSlideUp 0.3s var(--ease-in-out);
     transform-origin: center center;
 }
 
@@ -85,7 +85,7 @@
 }
 
 .modal.closing {
-    animation: modalSlideDown 0.2s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+    animation: modalSlideDown 0.2s var(--ease-in-out) forwards;
 }
 
 @keyframes modalSlideDown {
@@ -111,7 +111,7 @@
 .modal.fullscreen {
     max-width: 95vw;
     max-height: 95vh;
-    border-radius: 16px;
+    border-radius: var(--radius-lg);
 }
 
 /* ========================================
@@ -119,7 +119,7 @@
    ======================================== */
 
 .modal-header {
-    padding: 20px 24px;
+    padding: var(--space-5) var(--space-6);
     border-bottom: 1px solid rgba(229, 231, 235, 0.8);
     display: flex;
     align-items: center;
@@ -135,8 +135,8 @@
 
 .modal-title {
     margin: 0;
-    font-size: 1.25rem;
-    font-weight: 700;
+    font-size: var(--font-size-xl);
+    font-weight: var(--font-weight-bold);
     color: #1f2937;
 }
 
@@ -147,7 +147,7 @@
 .modal-close {
     width: 36px;
     height: 36px;
-    border-radius: 50%;
+    border-radius: var(--radius-full);
     border: none;
     background: rgba(107, 114, 128, 0.1);
     color: #6b7280;
@@ -155,8 +155,8 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 1.25rem;
-    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    font-size: var(--font-size-xl);
+    transition: all 0.2s var(--ease-in-out);
 }
 
 .modal-close:hover {
@@ -182,7 +182,7 @@
    ======================================== */
 
 .modal-body {
-    padding: 24px;
+    padding: var(--space-6);
     overflow-y: auto;
     flex: 1;
     -webkit-overflow-scrolling: touch;
@@ -194,12 +194,12 @@
 
 .modal-body::-webkit-scrollbar-track {
     background: rgba(0, 0, 0, 0.05);
-    border-radius: 4px;
+    border-radius: var(--radius-sm);
 }
 
 .modal-body::-webkit-scrollbar-thumb {
     background: rgba(0, 0, 0, 0.2);
-    border-radius: 4px;
+    border-radius: var(--radius-sm);
 }
 
 .modal-body::-webkit-scrollbar-thumb:hover {
@@ -223,10 +223,10 @@
    ======================================== */
 
 .modal-footer {
-    padding: 16px 24px;
+    padding: var(--space-4) var(--space-6);
     border-top: 1px solid rgba(229, 231, 235, 0.8);
     display: flex;
-    gap: 12px;
+    gap: var(--space-3);
     justify-content: flex-end;
     flex-shrink: 0;
 }
@@ -246,11 +246,11 @@
     right: 0;
     bottom: 0;
     background: rgba(0, 0, 0, 0.6);
-    backdrop-filter: blur(4px);
-    -webkit-backdrop-filter: blur(4px);
+    backdrop-filter: blur(var(--glass-blur-subtle));
+    -webkit-backdrop-filter: blur(var(--glass-blur-subtle));
     z-index: 9998;
     opacity: 0;
-    animation: modalFadeIn 0.2s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+    animation: modalFadeIn 0.2s var(--ease-in-out) forwards;
 }
 
 [data-theme="dark"] .drawer-overlay {
@@ -269,7 +269,7 @@
     z-index: 9999;
     display: flex;
     flex-direction: column;
-    animation: drawerSlideIn 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    animation: drawerSlideIn 0.3s var(--ease-in-out);
 }
 
 [data-theme="dark"] .drawer {
@@ -287,7 +287,7 @@
 }
 
 .drawer.closing {
-    animation: drawerSlideOut 0.2s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+    animation: drawerSlideOut 0.2s var(--ease-in-out) forwards;
 }
 
 @keyframes drawerSlideOut {
@@ -303,7 +303,7 @@
 .drawer.left {
     left: 0;
     right: auto;
-    animation: drawerSlideInLeft 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    animation: drawerSlideInLeft 0.3s var(--ease-in-out);
     box-shadow: 4px 0 24px rgba(0, 0, 0, 0.2);
 }
 
@@ -321,7 +321,7 @@
 }
 
 .drawer.left.closing {
-    animation: drawerSlideOutLeft 0.2s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+    animation: drawerSlideOutLeft 0.2s var(--ease-in-out) forwards;
 }
 
 @keyframes drawerSlideOutLeft {
@@ -344,11 +344,11 @@
     right: 0;
     bottom: 0;
     background: rgba(0, 0, 0, 0.6);
-    backdrop-filter: blur(4px);
-    -webkit-backdrop-filter: blur(4px);
+    backdrop-filter: blur(var(--glass-blur-subtle));
+    -webkit-backdrop-filter: blur(var(--glass-blur-subtle));
     z-index: 9998;
     opacity: 0;
-    animation: modalFadeIn 0.2s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+    animation: modalFadeIn 0.2s var(--ease-in-out) forwards;
 }
 
 .bottom-sheet {
@@ -358,12 +358,12 @@
     right: 0;
     max-height: 80vh;
     background: white;
-    border-radius: 24px 24px 0 0;
+    border-radius: var(--radius-2xl) var(--radius-2xl) 0 0;
     box-shadow: 0 -4px 24px rgba(0, 0, 0, 0.2);
     z-index: 9999;
     display: flex;
     flex-direction: column;
-    animation: sheetSlideUp 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    animation: sheetSlideUp 0.3s var(--ease-in-out);
 }
 
 [data-theme="dark"] .bottom-sheet {
@@ -381,7 +381,7 @@
 }
 
 .bottom-sheet.closing {
-    animation: sheetSlideDown 0.2s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+    animation: sheetSlideDown 0.2s var(--ease-in-out) forwards;
 }
 
 @keyframes sheetSlideDown {
@@ -398,7 +398,7 @@
     width: 40px;
     height: 4px;
     background: rgba(107, 114, 128, 0.3);
-    border-radius: 2px;
+    border-radius: var(--radius-sm);
     margin: 12px auto 8px;
     flex-shrink: 0;
 }
@@ -414,7 +414,7 @@
 @media (max-width: 768px) {
     .modal {
         max-width: 95vw;
-        border-radius: 16px;
+        border-radius: var(--radius-lg);
     }
 
     .modal.fullscreen {
@@ -428,15 +428,15 @@
     }
 
     .modal-header {
-        padding: 16px 20px;
+        padding: var(--space-4) var(--space-5);
     }
 
     .modal-body {
-        padding: 20px;
+        padding: var(--space-5);
     }
 
     .modal-footer {
-        padding: 12px 20px;
+        padding: var(--space-3) var(--space-5);
     }
 }
 

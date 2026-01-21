@@ -1,23 +1,23 @@
 /* Glass Theme for Nexus TimeBank */
 :root {
-    --primary: #6366f1;
-    --primary-hover: #4f46e5;
-    --background-color: #f8fafc;
+    --primary: var(--color-primary-500);
+    --primary-hover: var(--color-primary-600);
+    --background-color: var(--color-slate-50);
     --card-background-color: rgba(255, 255, 255, 0.7);
-    --text-color: #1e293b;
+    --text-color: var(--color-slate-800);
     --border-color: rgba(255, 255, 255, 0.5);
     --shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.1);
     --glass-border: 1px solid rgba(255, 255, 255, 0.4);
 
     /* Holographic Gradients */
-    --gradient-1: linear-gradient(135deg, #6366f1 0%, #a855f7 50%, #ec4899 100%);
-    --gradient-text: -webkit-linear-gradient(45deg, #6366f1, #ec4899);
+    --gradient-1: linear-gradient(135deg, var(--color-primary-500) 0%, var(--color-purple-400) 50%, var(--color-pink-500) 100%);
+    --gradient-text: -webkit-linear-gradient(45deg, var(--color-primary-500), var(--color-pink-500));
 }
 
 [data-theme="dark"] {
-    --background-color: #0f172a;
+    --background-color: var(--color-slate-900);
     --card-background-color: rgba(15, 23, 42, 0.6);
-    --text-color: #f1f5f9;
+    --text-color: var(--color-slate-100);
     --border-color: rgba(255, 255, 255, 0.1);
     --shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5);
     --glass-border: 1px solid rgba(255, 255, 255, 0.05);
@@ -45,13 +45,13 @@ body {
 /* Glass Panels */
 .glass-panel {
     background: var(--card-background-color);
-    -webkit-backdrop-filter: blur(12px);
-    backdrop-filter: blur(12px);
-    border-radius: 16px;
+    -webkit-backdrop-filter: blur(var(--glass-blur-subtle));
+    backdrop-filter: blur(var(--glass-blur-subtle));
+    border-radius: var(--radius-lg);
     border: var(--glass-border);
     box-shadow: var(--shadow);
-    padding: 2rem;
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    padding: var(--space-8);
+    transition: transform var(--transition-fast), box-shadow var(--transition-fast);
 }
 
 .glass-panel:hover {
@@ -68,7 +68,7 @@ nav strong {
     background: var(--gradient-text);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
-    font-weight: 800;
+    font-weight: var(--font-weight-bold);
 }
 
 /* Buttons */
@@ -76,10 +76,10 @@ button,
 [role="button"] {
     background: var(--gradient-1) !important;
     border: none !important;
-    border-radius: 50px !important;
+    border-radius: var(--radius-full) !important;
     /* Pill shape */
     box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4);
-    transition: all 0.3s ease;
+    transition: all var(--transition-base);
 }
 
 button:hover,
@@ -99,7 +99,7 @@ button.outline,
 
 button.contrast,
 [role="button"].contrast {
-    background: #334155 !important;
+    background: var(--color-slate-700) !important;
     /* Slate 700 */
     box-shadow: 0 4px 15px rgba(51, 65, 85, 0.4);
 }
@@ -113,14 +113,14 @@ nav {
     padding: 0;
     position: sticky;
     top: 0;
-    z-index: 100;
+    z-index: var(--z-navbar);
 }
 
 nav .container {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 1rem 2rem;
+    padding: var(--space-4) var(--space-8);
 }
 
 [data-theme="dark"] nav {
@@ -135,7 +135,7 @@ table {
 
 tr {
     background: rgba(255, 255, 255, 0.05);
-    border-radius: 8px;
+    border-radius: var(--radius-base);
 }
 
 td,
@@ -144,7 +144,7 @@ th {
 }
 
 td:first-child {
-    border-radius: 8px 0 0 8px;
+    border-radius: var(--radius-base) 0 0 8px;
 }
 
 td:last-child {
@@ -156,10 +156,10 @@ td:last-child {
     background: var(--gradient-1);
     background-size: 200% 200%;
     animation: gradientBG 15s ease infinite;
-    padding: 4rem 2rem;
+    padding: var(--space-16) var(--space-8);
     text-align: center;
     border-radius: 0 0 30px 30px;
-    margin-bottom: 2rem;
+    margin-bottom: var(--space-8);
     box-shadow: 0 10px 30px -10px rgba(99, 102, 241, 0.5);
     position: relative;
     overflow: hidden;
@@ -178,8 +178,8 @@ td:last-child {
 
 .hero-content h1 {
     color: white;
-    font-size: 3.5rem;
-    margin-bottom: 0.5rem;
+    font-size: var(--font-size-4xl);
+    margin-bottom: var(--space-2);
     text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
     -webkit-text-fill-color: initial;
     /* Reset gradient text for hero */
@@ -188,8 +188,8 @@ td:last-child {
 
 .hero-content p {
     color: rgba(255, 255, 255, 0.9);
-    font-size: 1.2rem;
-    font-weight: 500;
+    font-size: var(--font-size-xl);
+    font-weight: var(--font-weight-medium);
 }
 
 @keyframes gradientBG {
@@ -215,11 +215,11 @@ td:last-child {
     background: var(--card-background-color);
     -webkit-backdrop-filter: blur(20px);
     backdrop-filter: blur(20px);
-    border-radius: 24px;
+    border-radius: var(--radius-2xl);
     border: var(--glass-border);
     box-shadow: var(--shadow);
-    padding: 32px;
-    margin-bottom: 24px;
+    padding: var(--space-8);
+    margin-bottom: var(--space-6);
 }
 
 [data-theme="dark"] .glass-profile-card {
@@ -241,20 +241,20 @@ td:last-child {
 .glass-info-badge {
     display: inline-flex;
     align-items: center;
-    gap: 6px;
-    padding: 8px 14px;
+    gap: var(--space-2);
+    padding: var(--space-2) var(--space-4);
     background: rgba(255, 255, 255, 0.1);
     border: 1px solid rgba(255, 255, 255, 0.2);
-    border-radius: 50px;
-    font-size: 0.875rem;
+    border-radius: var(--radius-full);
+    font-size: var(--font-size-sm);
     color: var(--text-color);
-    transition: all 0.2s ease;
+    transition: all var(--transition-fast);
 }
 
 [data-theme="dark"] .glass-info-badge {
     background: rgba(255, 255, 255, 0.05);
     border-color: rgba(255, 255, 255, 0.1);
-    color: #e2e8f0;
+    color: var(--color-slate-200);
 }
 
 .glass-info-badge:hover {
@@ -266,21 +266,21 @@ td:last-child {
 .glass-badge {
     display: inline-flex;
     align-items: center;
-    gap: 8px;
-    padding: 10px 16px;
+    gap: var(--space-2);
+    padding: var(--space-3) var(--space-4);
     background: rgba(255, 255, 255, 0.1);
     border: 1px solid rgba(255, 255, 255, 0.2);
-    border-radius: 12px;
-    font-size: 0.9rem;
+    border-radius: var(--radius-md);
+    font-size: var(--font-size-sm);
     color: var(--text-color);
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: all var(--transition-fast);
 }
 
 [data-theme="dark"] .glass-badge {
     background: rgba(255, 255, 255, 0.05);
     border-color: rgba(255, 255, 255, 0.1);
-    color: #e2e8f0;
+    color: var(--color-slate-200);
 }
 
 .glass-badge:hover {
@@ -298,16 +298,16 @@ td:last-child {
 .glass-btn {
     display: inline-flex;
     align-items: center;
-    gap: 8px;
-    padding: 12px 24px;
+    gap: var(--space-2);
+    padding: var(--space-3) var(--space-6);
     background: linear-gradient(135deg, rgba(99, 102, 241, 0.9), rgba(139, 92, 246, 0.9)) !important;
     border: none !important;
-    border-radius: 12px !important;
+    border-radius: var(--radius-md) !important;
     color: white !important;
-    font-weight: 600;
-    font-size: 0.9rem;
+    font-weight: var(--font-weight-semibold);
+    font-size: var(--font-size-sm);
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: all var(--transition-fast);
     box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);
     text-decoration: none;
 }
@@ -327,7 +327,7 @@ td:last-child {
 
 [data-theme="dark"] .glass-btn-secondary {
     background: rgba(255, 255, 255, 0.05) !important;
-    color: #e2e8f0 !important;
+    color: var(--color-slate-200) !important;
 }
 
 .glass-btn-secondary:hover {
@@ -339,14 +339,14 @@ td:last-child {
 .glass-divider {
     height: 1px;
     background: linear-gradient(90deg, transparent, rgba(99, 102, 241, 0.3), transparent);
-    margin: 24px 0;
+    margin: var(--space-6) 0;
 }
 
 /* Profile Container */
 .htb-container {
-    max-width: 1200px;
+    max-width: var(--layout-max-content-width);
     margin: 0 auto;
-    padding: 24px;
+    padding: var(--space-6);
 }
 
 /* Holographic Background */
@@ -379,10 +379,10 @@ td:last-child {
     background: var(--card-background-color);
     -webkit-backdrop-filter: blur(20px);
     backdrop-filter: blur(20px);
-    border-radius: 16px;
+    border-radius: var(--radius-lg);
     border: var(--glass-border);
-    padding: 20px;
-    margin-bottom: 24px;
+    padding: var(--space-5);
+    margin-bottom: var(--space-6);
 }
 
 [data-theme="dark"] .profile-friends-card {
@@ -394,29 +394,29 @@ td:last-child {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 16px;
+    margin-bottom: var(--space-4);
 }
 
 .profile-friends-header h3 {
     margin: 0;
-    font-size: 1.1rem;
-    font-weight: 700;
+    font-size: var(--font-size-lg);
+    font-weight: var(--font-weight-bold);
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: var(--space-2);
     background: none;
     -webkit-text-fill-color: var(--text-color);
 }
 
 [data-theme="dark"] .profile-friends-header h3 {
-    -webkit-text-fill-color: #e2e8f0;
+    -webkit-text-fill-color: var(--color-slate-200);
 }
 
 .profile-friends-link {
-    color: #6366f1;
+    color: var(--color-primary-500);
     text-decoration: none;
-    font-weight: 600;
-    font-size: 0.9rem;
+    font-weight: var(--font-weight-semibold);
+    font-size: var(--font-size-sm);
 }
 
 .profile-friends-link:hover {
@@ -426,17 +426,17 @@ td:last-child {
 .profile-friends-body {
     display: flex;
     flex-wrap: wrap;
-    gap: 12px;
+    gap: var(--space-3);
 }
 
 /* Profile Section Headers - Fix gradient text in dark mode */
 [data-theme="dark"] h3 {
     background: none;
-    -webkit-text-fill-color: #e2e8f0;
+    -webkit-text-fill-color: var(--color-slate-200);
 }
 
 [data-theme="dark"] .profile-display-name {
-    background: linear-gradient(135deg, #e2e8f0, #a5b4fc) !important;
+    background: linear-gradient(135deg, var(--color-slate-200), var(--color-primary-300)) !important;
     -webkit-background-clip: text !important;
     -webkit-text-fill-color: transparent !important;
 }

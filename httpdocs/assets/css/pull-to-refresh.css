@@ -1,13 +1,14 @@
 /**
  * Pull-to-Refresh - Native iOS/Android Style
  * Custom spinner with elastic pull feedback
- * Version: 1.0 - 2026-01-19
+ * Version: 1.1 - 2026-01-21
  *
  * Features:
  * - iOS-style elastic overscroll
  * - Android Material-style circular progress
  * - Haptic feedback triggers
  * - Dark mode support
+ * - Design token integration for consistency
  * - Reduced motion support
  */
 
@@ -17,11 +18,11 @@
 :root {
     --ptr-threshold: 80px;
     --ptr-max-pull: 140px;
-    --ptr-spinner-size: 40px;
+    --ptr-spinner-size: var(--space-10);
     --ptr-bg: rgba(255, 255, 255, 0.98);
-    --ptr-spinner-color: var(--color-primary-500, #6366f1);
-    --ptr-text-color: var(--text-muted, #6b7280);
-    --ptr-transition: cubic-bezier(0.4, 0, 0.2, 1);
+    --ptr-spinner-color: var(--color-primary-500);
+    --ptr-text-color: var(--text-muted);
+    --ptr-transition: var(--ease-in-out);
 }
 
 [data-theme="dark"] {
@@ -41,18 +42,18 @@
    ============================================== */
 .ptr-indicator {
     position: fixed;
-    top: calc(var(--layout-header-height, 56px) - 10px);
+    top: calc(var(--layout-header-height) - 10px);
     left: 50%;
     transform: translateX(-50%) translateY(-100%);
-    z-index: var(--z-toast, 400);
+    z-index: var(--z-toast);
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 8px;
-    padding: 12px 20px;
+    gap: var(--space-2);
+    padding: var(--space-3) var(--space-5);
     background: var(--ptr-bg);
-    border-radius: 24px;
+    border-radius: var(--radius-2xl);
     box-shadow:
         0 4px 20px rgba(0, 0, 0, 0.15),
         0 0 0 1px rgba(0, 0, 0, 0.05);
@@ -62,8 +63,8 @@
         transform 300ms var(--ptr-transition),
         opacity 200ms ease;
     will-change: transform, opacity;
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
+    backdrop-filter: blur(var(--glass-blur-subtle));
+    -webkit-backdrop-filter: blur(var(--glass-blur-subtle));
 }
 
 [data-theme="dark"] .ptr-indicator {
@@ -119,8 +120,8 @@
 .ptr-spinner-track {
     position: absolute;
     inset: 0;
-    border: 3px solid var(--border-default, rgba(0, 0, 0, 0.1));
-    border-radius: 50%;
+    border: 3px solid var(--border-default);
+    border-radius: var(--radius-full);
 }
 
 [data-theme="dark"] .ptr-spinner-track {
@@ -133,7 +134,7 @@
     inset: 0;
     border: 3px solid transparent;
     border-top-color: var(--ptr-spinner-color);
-    border-radius: 50%;
+    border-radius: var(--radius-full);
     transform: rotate(-90deg);
     transition: none;
 }
@@ -150,9 +151,9 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 16px;
+    font-size: var(--font-size-base);
     color: var(--ptr-spinner-color);
-    transition: transform 300ms var(--ptr-transition);
+    transition: transform var(--transition-base);
 }
 
 /* Arrow rotates as you pull */
@@ -180,13 +181,13 @@
         border-top-color: var(--ptr-spinner-color);
     }
     25% {
-        border-top-color: #8b5cf6;
+        border-top-color: var(--color-purple-500);
     }
     50% {
-        border-top-color: #ec4899;
+        border-top-color: var(--color-pink-500);
     }
     75% {
-        border-top-color: #f59e0b;
+        border-top-color: var(--color-warning);
     }
     100% {
         transform: rotate(360deg);
@@ -198,8 +199,8 @@
    PTR TEXT
    ============================================== */
 .ptr-text {
-    font-size: 12px;
-    font-weight: 500;
+    font-size: var(--font-size-xs);
+    font-weight: var(--font-weight-medium);
     color: var(--ptr-text-color);
     white-space: nowrap;
     transition: opacity 200ms ease;
@@ -214,14 +215,14 @@
    SUCCESS STATE
    ============================================== */
 .ptr-indicator.ptr-success .ptr-spinner-progress {
-    border-top-color: var(--color-success, #10b981);
+    border-top-color: var(--color-success);
     animation: none;
 }
 
 .ptr-indicator.ptr-success .ptr-spinner-icon {
     opacity: 1;
     transform: scale(1);
-    color: var(--color-success, #10b981);
+    color: var(--color-success);
 }
 
 .ptr-indicator.ptr-success .ptr-spinner-icon i::before {
@@ -250,7 +251,7 @@ html.ptr-active #main-content {
 html.ptr-active.ptr-releasing .ptr-content,
 html.ptr-active.ptr-releasing main,
 html.ptr-active.ptr-releasing #main-content {
-    transition: transform 300ms var(--ptr-transition);
+    transition: transform var(--transition-base);
 }
 
 /* ==============================================
@@ -258,8 +259,8 @@ html.ptr-active.ptr-releasing #main-content {
    Smaller, icon-only indicator
    ============================================== */
 .ptr-indicator.ptr-minimal {
-    padding: 10px;
-    border-radius: 50%;
+    padding: var(--space-2);
+    border-radius: var(--radius-full);
     gap: 0;
 }
 
@@ -281,10 +282,10 @@ html.ptr-active.ptr-releasing #main-content {
     top: 0;
     left: 0;
     right: 0;
-    border-radius: 0;
+    border-radius: var(--radius-none);
     transform: translateY(-100%);
-    padding: 16px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    padding: var(--space-4);
+    box-shadow: var(--shadow-md);
 }
 
 .ptr-indicator.ptr-inline.ptr-visible {
@@ -336,7 +337,7 @@ html.ptr-active.ptr-releasing #main-content {
    ============================================== */
 @supports (padding-top: env(safe-area-inset-top)) {
     .ptr-indicator {
-        top: calc(var(--layout-header-height, 56px) + env(safe-area-inset-top) - 10px);
+        top: calc(var(--layout-header-height) + env(safe-area-inset-top) - 10px);
     }
 }
 

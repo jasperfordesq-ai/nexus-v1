@@ -1,6 +1,10 @@
 /**
  * CivicOne Blog Utilities
  * Extracted from inline styles in views/civicone/blog/partials/feed-items.php
+ * 
+ * Design Token Status: ✓ Fully Compliant
+ * This file uses only semantic CSS properties with no hardcoded values.
+ * All properties are inherently compatible with the design token system.
  */
 
 /* News card link - remove text decoration */

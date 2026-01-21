@@ -3,8 +3,8 @@
  * Summary List, Tables, and other GOV.UK component patterns
  * Source: https://design-system.service.gov.uk/components/
  * WCAG 2.1 AA Compliant
- * Version: 1.0.0
- * Created: 2026-01-20
+ * Version: 2.0.0 - Migrated to Design Tokens
+ * Updated: 2026-01-21
  */
 
 /* ==========================================
@@ -13,19 +13,19 @@
    ========================================== */
 
 .govuk-summary-list {
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-  font-size: 16px;
-  line-height: 1.25;
+  font-family: var(--font-family-primary);
+  font-size: var(--font-size-base);
+  line-height: var(--line-height-tight);
   color: #0b0c0c;
-  margin: 0 0 20px 0;
+  margin: 0 0 var(--space-5) 0;
   padding: 0;
 }
 
 @media (min-width: 641px) {
   .govuk-summary-list {
-    font-size: 19px;
+    font-size: var(--font-size-lg);
     line-height: 1.32;
-    margin-bottom: 30px;
+    margin-bottom: var(--space-8);
   }
 }
 
@@ -33,14 +33,14 @@
   border-bottom: 1px solid #b1b4b6;
   display: flex;
   flex-wrap: wrap;
-  padding-top: 10px;
-  padding-bottom: 10px;
+  padding-top: var(--space-2);
+  padding-bottom: var(--space-2);
 }
 
 @media (min-width: 641px) {
   .govuk-summary-list__row {
-    padding-top: 15px;
-    padding-bottom: 15px;
+    padding-top: var(--space-4);
+    padding-bottom: var(--space-4);
   }
 }
 
@@ -50,8 +50,8 @@
 
 .govuk-summary-list__key {
   margin: 0;
-  padding-right: 20px;
-  font-weight: 700;
+  padding-right: var(--space-5);
+  font-weight: var(--font-weight-bold);
   width: 30%;
   flex-basis: 30%;
 }
@@ -60,13 +60,13 @@
   .govuk-summary-list__key {
     width: 100%;
     flex-basis: 100%;
-    margin-bottom: 5px;
+    margin-bottom: var(--space-1);
   }
 }
 
 .govuk-summary-list__value {
   margin: 0;
-  padding-right: 20px;
+  padding-right: var(--space-5);
   width: 50%;
   flex-basis: 50%;
 }
@@ -75,7 +75,7 @@
   .govuk-summary-list__value {
     width: 100%;
     flex-basis: 100%;
-    margin-bottom: 10px;
+    margin-bottom: var(--space-2);
   }
 }
 
@@ -103,8 +103,8 @@
 
 .govuk-summary-list__actions-list-item {
   display: inline;
-  margin-right: 10px;
-  padding-right: 10px;
+  margin-right: var(--space-2);
+  padding-right: var(--space-2);
 }
 
 .govuk-summary-list__actions-list-item:not(:last-child) {
@@ -126,7 +126,7 @@
    ========================================== */
 
 .govuk-link {
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  font-family: var(--font-family-primary);
   text-decoration: underline;
   text-decoration-thickness: max(1px, 0.0625rem);
   text-underline-offset: 0.1578em;
@@ -158,9 +158,9 @@
    ========================================== */
 
 .civicone-heading-xl {
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-  font-weight: 700;
-  font-size: 32px;
+  font-family: var(--font-family-primary);
+  font-weight: var(--font-weight-bold);
+  font-size: var(--font-size-4xl);
   line-height: 1.09375;
   color: #0b0c0c;
   margin: 0 0 15px 0;
@@ -170,14 +170,14 @@
   .civicone-heading-xl {
     font-size: 48px;
     line-height: 1.04167;
-    margin-bottom: 30px;
+    margin-bottom: var(--space-8);
   }
 }
 
 .civicone-heading-l {
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-  font-weight: 700;
-  font-size: 24px;
+  font-family: var(--font-family-primary);
+  font-weight: var(--font-weight-bold);
+  font-size: var(--font-size-2xl);
   line-height: 1.04167;
   color: #0b0c0c;
   margin: 0 0 15px 0;
@@ -185,16 +185,16 @@
 
 @media (min-width: 641px) {
   .civicone-heading-l {
-    font-size: 36px;
+    font-size: var(--font-size-4xl);
     line-height: 1.11111;
-    margin-bottom: 20px;
+    margin-bottom: var(--space-5);
   }
 }
 
 .civicone-heading-m {
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-  font-weight: 700;
-  font-size: 18px;
+  font-family: var(--font-family-primary);
+  font-weight: var(--font-weight-bold);
+  font-size: var(--font-size-lg);
   line-height: 1.11111;
   color: #0b0c0c;
   margin: 0 0 15px 0;
@@ -202,8 +202,8 @@
 
 @media (min-width: 641px) {
   .civicone-heading-m {
-    font-size: 24px;
-    line-height: 1.25;
+    font-size: var(--font-size-2xl);
+    line-height: var(--line-height-tight);
   }
 }
 
@@ -229,15 +229,15 @@
    ========================================== */
 
 .civicone-wallet-balance {
-  font-size: 24px;
-  line-height: 1.25;
-  font-weight: 700;
+  font-size: var(--font-size-2xl);
+  line-height: var(--line-height-tight);
+  font-weight: var(--font-weight-bold);
   color: #00703c;
 }
 
 @media (min-width: 641px) {
   .civicone-wallet-balance {
-    font-size: 36px;
+    font-size: var(--font-size-4xl);
     line-height: 1.11111;
   }
 }
@@ -249,16 +249,16 @@
 
 .govuk-panel {
   box-sizing: border-box;
-  margin-bottom: 30px;
-  padding: 35px;
+  margin-bottom: var(--space-8);
+  padding: var(--space-10);
   border: 5px solid transparent;
   text-align: center;
 }
 
 @media (min-width: 641px) {
   .govuk-panel {
-    margin-bottom: 50px;
-    padding: 35px;
+    margin-bottom: var(--space-12);
+    padding: var(--space-10);
   }
 }
 
@@ -269,10 +269,10 @@
 
 .govuk-panel__title {
   margin-top: 0;
-  margin-bottom: 30px;
-  font-size: 32px;
+  margin-bottom: var(--space-8);
+  font-size: var(--font-size-4xl);
   line-height: 1.09375;
-  font-weight: 700;
+  font-weight: var(--font-weight-bold);
 }
 
 @media (min-width: 641px) {
@@ -283,13 +283,13 @@
 }
 
 .govuk-panel__body {
-  font-size: 24px;
-  line-height: 1.25;
+  font-size: var(--font-size-2xl);
+  line-height: var(--line-height-tight);
 }
 
 @media (min-width: 641px) {
   .govuk-panel__body {
-    font-size: 36px;
+    font-size: var(--font-size-4xl);
     line-height: 1.11111;
   }
 }
@@ -306,16 +306,16 @@
    ========================================== */
 
 .govuk-back-link {
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  font-family: var(--font-family-primary);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  font-weight: 400;
-  font-size: 14px;
+  font-weight: var(--font-weight-normal);
+  font-size: var(--font-size-sm);
   line-height: 1.14286;
   display: inline-block;
   position: relative;
-  margin-top: 15px;
-  margin-bottom: 15px;
+  margin-top: var(--space-4);
+  margin-bottom: var(--space-4);
   padding-left: 14px;
   border-bottom: 1px solid #1d70b8;
   text-decoration: none;
@@ -324,10 +324,10 @@
 
 @media (min-width: 641px) {
   .govuk-back-link {
-    font-size: 16px;
-    line-height: 1.25;
-    margin-top: 20px;
-    margin-bottom: 20px;
+    font-size: var(--font-size-base);
+    line-height: var(--line-height-tight);
+    margin-top: var(--space-5);
+    margin-bottom: var(--space-5);
   }
 }
 
@@ -381,26 +381,26 @@
    ========================================== */
 
 .govuk-inset-text {
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  font-family: var(--font-family-primary);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  font-weight: 400;
-  font-size: 16px;
-  line-height: 1.25;
+  font-weight: var(--font-weight-normal);
+  font-size: var(--font-size-base);
+  line-height: var(--line-height-tight);
   color: #0b0c0c;
-  padding: 15px;
-  margin-top: 20px;
-  margin-bottom: 20px;
+  padding: var(--space-4);
+  margin-top: var(--space-5);
+  margin-bottom: var(--space-5);
   clear: both;
   border-left: 10px solid #b1b4b6;
 }
 
 @media (min-width: 641px) {
   .govuk-inset-text {
-    font-size: 19px;
+    font-size: var(--font-size-lg);
     line-height: 1.31579;
-    margin-top: 30px;
-    margin-bottom: 30px;
+    margin-top: var(--space-8);
+    margin-bottom: var(--space-8);
   }
 }
 

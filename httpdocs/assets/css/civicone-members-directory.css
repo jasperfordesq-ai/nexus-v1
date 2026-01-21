@@ -2,6 +2,7 @@
  * CivicOne Members Directory - GOV.UK Pattern
  * Following GOV.UK Design System + MOJ Filter Pattern
  * All styles scoped under .civicone--govuk
+ * Migrated to use design tokens from design-tokens.css
  */
 
 /* ==================================================
@@ -9,33 +10,33 @@
    ================================================== */
 
 .civicone--govuk {
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+    font-family: var(--font-family-primary);
 }
 
 .civicone-width-container {
     max-width: 1020px;
     margin-right: auto;
     margin-left: auto;
-    padding-right: 15px;
-    padding-left: 15px;
+    padding-right: var(--space-4);
+    padding-left: var(--space-4);
 }
 
 @media (min-width: 641px) {
     .civicone-width-container {
-        padding-right: 30px;
-        padding-left: 30px;
+        padding-right: var(--space-8);
+        padding-left: var(--space-8);
     }
 }
 
 .civicone-main-wrapper {
-    padding-top: 20px;
-    padding-bottom: 40px;
+    padding-top: var(--space-5);
+    padding-bottom: var(--space-10);
 }
 
 @media (min-width: 641px) {
     .civicone-main-wrapper {
-        padding-top: 30px;
-        padding-bottom: 60px;
+        padding-top: var(--space-8);
+        padding-bottom: var(--space-16);
     }
 }
 
@@ -46,15 +47,15 @@
 .civicone-grid-row {
     display: flex;
     flex-wrap: wrap;
-    margin-right: -15px;
-    margin-left: -15px;
+    margin-right: calc(var(--space-4) * -1);
+    margin-left: calc(var(--space-4) * -1);
 }
 
 .civicone-grid-column-full,
 .civicone-grid-column-one-third,
 .civicone-grid-column-two-thirds {
-    padding-right: 15px;
-    padding-left: 15px;
+    padding-right: var(--space-4);
+    padding-left: var(--space-4);
     box-sizing: border-box;
 }
 
@@ -90,11 +91,11 @@
    ================================================== */
 
 .civicone-heading-xl {
-    font-size: 32px;
-    line-height: 1.25;
-    font-weight: 700;
+    font-size: var(--font-size-4xl);
+    line-height: var(--line-height-tight);
+    font-weight: var(--font-weight-bold);
     margin-top: 0;
-    margin-bottom: 20px;
+    margin-bottom: var(--space-5);
     color: #0b0c0c;
 }
 
@@ -105,26 +106,26 @@
 }
 
 .civicone-heading-m {
-    font-size: 20px;
-    line-height: 1.25;
-    font-weight: 700;
+    font-size: var(--font-size-xl);
+    line-height: var(--line-height-tight);
+    font-weight: var(--font-weight-bold);
     margin-top: 0;
-    margin-bottom: 15px;
+    margin-bottom: var(--space-4);
     color: #0b0c0c;
 }
 
 @media (min-width: 641px) {
     .civicone-heading-m {
-        font-size: 24px;
+        font-size: var(--font-size-2xl);
     }
 }
 
 .civicone-heading-s {
-    font-size: 16px;
-    line-height: 1.25;
-    font-weight: 700;
+    font-size: var(--font-size-base);
+    line-height: var(--line-height-tight);
+    font-weight: var(--font-weight-bold);
     margin-top: 0;
-    margin-bottom: 10px;
+    margin-bottom: var(--space-3);
     color: #0b0c0c;
 }
 
@@ -135,24 +136,24 @@
 }
 
 .civicone-body-l {
-    font-size: 18px;
-    line-height: 1.5;
+    font-size: var(--font-size-lg);
+    line-height: var(--line-height-normal);
     margin-top: 0;
-    margin-bottom: 20px;
+    margin-bottom: var(--space-5);
     color: #0b0c0c;
 }
 
 @media (min-width: 641px) {
     .civicone-body-l {
-        font-size: 24px;
+        font-size: var(--font-size-2xl);
     }
 }
 
 .civicone-body {
-    font-size: 16px;
-    line-height: 1.5;
+    font-size: var(--font-size-base);
+    line-height: var(--line-height-normal);
     margin-top: 0;
-    margin-bottom: 15px;
+    margin-bottom: var(--space-4);
     color: #0b0c0c;
 }
 
@@ -169,8 +170,8 @@
 .civicone-filter-panel {
     background: #f3f2f1;
     border: 1px solid #b1b4b6;
-    padding: 20px;
-    margin-bottom: 30px;
+    padding: var(--space-5);
+    margin-bottom: var(--space-8);
 }
 
 @media (min-width: 641px) {
@@ -180,21 +181,21 @@
 }
 
 .civicone-filter-header {
-    margin-bottom: 20px;
-    padding-bottom: 15px;
+    margin-bottom: var(--space-5);
+    padding-bottom: var(--space-4);
     border-bottom: 1px solid #b1b4b6;
 }
 
 .civicone-filter-group {
-    margin-bottom: 20px;
+    margin-bottom: var(--space-5);
 }
 
 .civicone-label {
     display: block;
-    font-size: 16px;
-    font-weight: 600;
-    line-height: 1.25;
-    margin-bottom: 10px;
+    font-size: var(--font-size-base);
+    font-weight: var(--font-weight-semibold);
+    line-height: var(--line-height-tight);
+    margin-bottom: var(--space-3);
     color: #0b0c0c;
 }
 
@@ -210,11 +211,11 @@
 
 .civicone-input {
     width: 100%;
-    padding: 10px 40px 10px 12px;
+    padding: var(--space-3) var(--space-10) var(--space-3) var(--space-3);
     border: 2px solid #0b0c0c;
-    border-radius: 0;
-    font-size: 16px;
-    line-height: 1.5;
+    border-radius: var(--radius-none);
+    font-size: var(--font-size-base);
+    line-height: var(--line-height-normal);
     box-sizing: border-box;
     background: #ffffff;
 }
@@ -232,35 +233,35 @@
 }
 
 .civicone-search-input {
-    padding-right: 40px;
+    padding-right: var(--space-10);
 }
 
 .civicone-search-icon {
     position: absolute;
-    right: 12px;
+    right: var(--space-3);
     top: 50%;
     transform: translateY(-50%);
-    width: 20px;
-    height: 20px;
+    width: var(--space-5);
+    height: var(--space-5);
     pointer-events: none;
 }
 
 .civicone-search-icon::before {
     content: "🔍";
-    font-size: 16px;
+    font-size: var(--font-size-base);
 }
 
 .civicone-spinner {
     position: absolute;
-    right: 12px;
+    right: var(--space-3);
     top: 50%;
     transform: translateY(-50%);
-    width: 20px;
-    height: 20px;
+    width: var(--space-5);
+    height: var(--space-5);
     border: 2px solid #b1b4b6;
     border-top-color: #1d70b8;
-    border-radius: 50%;
-    animation: civicone-spin 0.8s linear infinite;
+    border-radius: var(--radius-full);
+    animation: civicone-spin var(--transition-slow) linear infinite;
 }
 
 @keyframes civicone-spin {
@@ -271,29 +272,29 @@
 
 /* Selected Filters */
 .civicone-selected-filters {
-    margin-top: 20px;
-    padding-top: 20px;
+    margin-top: var(--space-5);
+    padding-top: var(--space-5);
     border-top: 1px solid #b1b4b6;
 }
 
 .civicone-filter-tags {
     display: flex;
     flex-wrap: wrap;
-    gap: 10px;
-    margin-top: 10px;
+    gap: var(--space-3);
+    margin-top: var(--space-3);
 }
 
 .civicone-tag {
     display: inline-flex;
     align-items: center;
-    gap: 8px;
-    padding: 5px 10px;
+    gap: var(--space-2);
+    padding: var(--space-1) var(--space-3);
     background: #1d70b8;
     color: #ffffff;
-    font-size: 14px;
-    font-weight: 600;
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-semibold);
     text-decoration: none;
-    border-radius: 3px;
+    border-radius: var(--radius-sm);
 }
 
 .civicone-tag:hover {
@@ -301,8 +302,8 @@
 }
 
 .civicone-tag-remove {
-    font-size: 18px;
-    font-weight: 700;
+    font-size: var(--font-size-lg);
+    font-weight: var(--font-weight-bold);
     line-height: 1;
 }
 
@@ -311,14 +312,14 @@
    ================================================== */
 
 .civicone-results-header {
-    margin-bottom: 20px;
-    padding-bottom: 15px;
+    margin-bottom: var(--space-5);
+    padding-bottom: var(--space-4);
     border-bottom: 2px solid #b1b4b6;
 }
 
 .civicone-results-count {
-    font-size: 16px;
-    line-height: 1.5;
+    font-size: var(--font-size-base);
+    line-height: var(--line-height-normal);
     margin: 0;
     color: #505a5f;
 }
@@ -339,14 +340,14 @@
 .civicone-member-item {
     display: flex;
     align-items: flex-start;
-    gap: 15px;
-    padding: 20px 0;
+    gap: var(--space-4);
+    padding: var(--space-5) 0;
     border-bottom: 1px solid #b1b4b6;
 }
 
 @media (min-width: 641px) {
     .civicone-member-item {
-        gap: 20px;
+        gap: var(--space-5);
     }
 }
 
@@ -360,9 +361,9 @@
 }
 
 .civicone-avatar {
-    width: 48px;
-    height: 48px;
-    border-radius: 50%;
+    width: var(--space-12);
+    height: var(--space-12);
+    border-radius: var(--radius-full);
     object-fit: cover;
 }
 
@@ -383,13 +384,13 @@
 
 .civicone-status-indicator {
     position: absolute;
-    bottom: 2px;
-    right: 2px;
-    width: 12px;
-    height: 12px;
+    bottom: var(--space-1);
+    right: var(--space-1);
+    width: var(--space-3);
+    height: var(--space-3);
     border: 2px solid #ffffff;
-    border-radius: 50%;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+    border-radius: var(--radius-full);
+    box-shadow: var(--shadow-sm);
 }
 
 .civicone-status-indicator--online {
@@ -402,15 +403,15 @@
 }
 
 .civicone-member-item__name {
-    font-size: 18px;
-    font-weight: 700;
-    line-height: 1.25;
-    margin: 0 0 5px 0;
+    font-size: var(--font-size-lg);
+    font-weight: var(--font-weight-bold);
+    line-height: var(--line-height-tight);
+    margin: 0 0 var(--space-1) 0;
 }
 
 @media (min-width: 641px) {
     .civicone-member-item__name {
-        font-size: 20px;
+        font-size: var(--font-size-xl);
     }
 }
 
@@ -434,16 +435,16 @@
 .civicone-member-item__meta {
     display: flex;
     align-items: center;
-    gap: 5px;
-    font-size: 14px;
-    line-height: 1.5;
+    gap: var(--space-1);
+    font-size: var(--font-size-sm);
+    line-height: var(--line-height-normal);
     margin: 0;
     color: #505a5f;
 }
 
 @media (min-width: 641px) {
     .civicone-member-item__meta {
-        font-size: 16px;
+        font-size: var(--font-size-base);
     }
 }
 
@@ -453,26 +454,26 @@
 
 .civicone-member-item__actions {
     flex-shrink: 0;
-    margin-top: 5px;
+    margin-top: var(--space-1);
 }
 
 @media (max-width: 640px) {
     .civicone-member-item__actions {
         width: 100%;
-        margin-top: 15px;
+        margin-top: var(--space-4);
     }
 }
 
 .civicone-button {
     display: inline-block;
-    padding: 8px 15px;
-    font-size: 16px;
-    font-weight: 600;
-    line-height: 1.5;
+    padding: var(--space-2) var(--space-4);
+    font-size: var(--font-size-base);
+    font-weight: var(--font-weight-semibold);
+    line-height: var(--line-height-normal);
     text-align: center;
     text-decoration: none;
     border: 2px solid transparent;
-    border-radius: 0;
+    border-radius: var(--radius-none);
     cursor: pointer;
     box-sizing: border-box;
     white-space: nowrap;
@@ -481,7 +482,7 @@
 @media (min-width: 641px) {
     .civicone-button {
         font-size: 19px;
-        padding: 10px 20px;
+        padding: var(--space-3) var(--space-5);
     }
 }
 
@@ -515,18 +516,18 @@
 
 .civicone-empty-state {
     text-align: center;
-    padding: 60px 20px;
+    padding: var(--space-16) var(--space-5);
     background: #f3f2f1;
     border: 1px solid #b1b4b6;
 }
 
 .civicone-empty-icon {
-    margin-bottom: 20px;
+    margin-bottom: var(--space-5);
     color: #505a5f;
 }
 
 .civicone-empty-state .civicone-heading-m {
-    margin-bottom: 10px;
+    margin-bottom: var(--space-3);
 }
 
 .civicone-empty-state .civicone-body {
@@ -538,15 +539,15 @@
    ================================================== */
 
 .civicone-pagination {
-    margin-top: 40px;
-    padding-top: 30px;
+    margin-top: var(--space-10);
+    padding-top: var(--space-8);
     border-top: 2px solid #b1b4b6;
 }
 
 .civicone-pagination__results {
-    font-size: 16px;
-    line-height: 1.5;
-    margin-bottom: 20px;
+    font-size: var(--font-size-base);
+    line-height: var(--line-height-normal);
+    margin-bottom: var(--space-5);
     color: #505a5f;
 }
 
@@ -560,7 +561,7 @@
     display: flex;
     flex-wrap: wrap;
     align-items: center;
-    gap: 10px;
+    gap: var(--space-3);
     list-style: none;
     padding: 0;
     margin: 0;
@@ -576,10 +577,10 @@
     justify-content: center;
     min-width: 44px;
     min-height: 44px;
-    padding: 8px 12px;
-    font-size: 16px;
-    font-weight: 600;
-    line-height: 1.5;
+    padding: var(--space-2) var(--space-3);
+    font-size: var(--font-size-base);
+    font-weight: var(--font-weight-semibold);
+    line-height: var(--line-height-normal);
     text-decoration: none;
     color: #1d70b8;
     background: #ffffff;
@@ -615,13 +616,13 @@
 
 .civicone-pagination__item--prev .civicone-pagination__link,
 .civicone-pagination__item--next .civicone-pagination__link {
-    padding-left: 15px;
-    padding-right: 15px;
+    padding-left: var(--space-4);
+    padding-right: var(--space-4);
 }
 
 .civicone-pagination__item--ellipsis {
-    padding: 8px 5px;
-    font-size: 16px;
+    padding: var(--space-2) var(--space-1);
+    font-size: var(--font-size-base);
     color: #505a5f;
 }
 
@@ -644,41 +645,41 @@
 }
 
 [data-theme="dark"] .civicone--govuk .civicone-filter-panel {
-    background: #1f2937;
-    border-color: #374151;
+    background: var(--color-gray-800);
+    border-color: var(--color-gray-700);
 }
 
 [data-theme="dark"] .civicone--govuk .civicone-input {
-    background: #111827;
-    border-color: #4b5563;
+    background: var(--color-gray-900);
+    border-color: var(--color-gray-600);
     color: #ffffff;
 }
 
 [data-theme="dark"] .civicone--govuk .civicone-results-header {
-    border-bottom-color: #374151;
+    border-bottom-color: var(--color-gray-700);
 }
 
 [data-theme="dark"] .civicone--govuk .civicone-member-item {
-    border-bottom-color: #374151;
+    border-bottom-color: var(--color-gray-700);
 }
 
 [data-theme="dark"] .civicone--govuk .civicone-empty-state {
-    background: #1f2937;
-    border-color: #374151;
+    background: var(--color-gray-800);
+    border-color: var(--color-gray-700);
 }
 
 [data-theme="dark"] .civicone--govuk .civicone-pagination {
-    border-top-color: #374151;
+    border-top-color: var(--color-gray-700);
 }
 
 [data-theme="dark"] .civicone--govuk .civicone-pagination__link {
-    background: #1f2937;
-    border-color: #374151;
-    color: #60a5fa;
+    background: var(--color-gray-800);
+    border-color: var(--color-gray-700);
+    color: var(--color-blue-400);
 }
 
 [data-theme="dark"] .civicone--govuk .civicone-pagination__link:hover {
-    background: #374151;
+    background: var(--color-gray-700);
 }
 
 [data-theme="dark"] .civicone--govuk .civicone-pagination__link--current {

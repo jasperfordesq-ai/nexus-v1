@@ -1,7 +1,7 @@
 /**
  * Dashboard CSS
  * Extracted from views/modern/dashboard.php
- * Updated: 2026-01-18 (added grid specificity fix)
+ * Updated: 2026-01-21 (migrated to design tokens)
  *
  * Prefix: dash- for dashboard-specific classes
  */
@@ -59,7 +59,7 @@
 .dashboard-container {
     max-width: 1400px;
     margin: 0 auto;
-    padding: 120px 24px 40px 24px;
+    padding: 120px var(--space-6) var(--space-10) var(--space-6);
     position: relative;
     z-index: 1;
 }
@@ -69,13 +69,13 @@
     background: linear-gradient(135deg,
             rgba(255, 255, 255, 0.85) 0%,
             rgba(255, 255, 255, 0.7) 100%);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
+    backdrop-filter: blur(var(--glass-blur));
+    -webkit-backdrop-filter: blur(var(--glass-blur));
     border: 1px solid rgba(255, 255, 255, 0.5);
-    border-radius: 20px;
+    border-radius: var(--radius-xl);
     box-shadow: 0 8px 32px rgba(31, 38, 135, 0.1);
     overflow: hidden;
-    transition: all 0.3s ease;
+    transition: all var(--transition-base);
 }
 
 .dash-glass-card:hover {
@@ -92,16 +92,16 @@
 
 /* Balance Card Special */
 .dash-balance-card {
-    background: linear-gradient(135deg, #4f46e5 0%, #8b5cf6 50%, #a855f7 100%);
+    background: linear-gradient(135deg, var(--color-primary-600) 0%, var(--color-purple-500) 50%, var(--color-purple-400) 100%);
     color: white;
-    padding: 32px;
-    border-radius: 20px;
+    padding: var(--space-8);
+    border-radius: var(--radius-xl);
     box-shadow: 0 10px 40px rgba(79, 70, 229, 0.3);
-    margin-bottom: 24px;
+    margin-bottom: var(--space-6);
 }
 
 .dash-balance-card .balance-amount {
-    font-size: 3rem;
+    font-size: var(--font-size-4xl);
     font-weight: 800;
     line-height: 1;
 }
@@ -111,14 +111,14 @@
     background: linear-gradient(135deg,
             rgba(255, 255, 255, 0.7) 0%,
             rgba(255, 255, 255, 0.5) 100%);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
+    backdrop-filter: blur(var(--glass-blur));
+    -webkit-backdrop-filter: blur(var(--glass-blur));
     border: 1px solid rgba(255, 255, 255, 0.3);
-    border-radius: 16px;
-    padding: 8px;
-    margin-bottom: 24px;
+    border-radius: var(--radius-lg);
+    padding: var(--space-2);
+    margin-bottom: var(--space-6);
     display: flex;
-    gap: 8px;
+    gap: var(--space-2);
     overflow-x: auto;
 }
 
@@ -131,35 +131,35 @@
 
 .dash-tab-glass {
     text-decoration: none;
-    color: #64748b;
-    font-weight: 600;
-    padding: 12px 20px;
-    border-radius: 10px;
-    transition: all 0.2s;
+    color: var(--color-slate-500);
+    font-weight: var(--font-weight-semibold);
+    padding: var(--space-3) var(--space-5);
+    border-radius: var(--radius-md);
+    transition: all var(--transition-fast);
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: var(--space-2);
     white-space: nowrap;
 }
 
 .dash-tab-glass:hover {
     background: rgba(99, 102, 241, 0.1);
-    color: #6366f1;
+    color: var(--color-primary-500);
 }
 
 .dash-tab-glass.active {
-    background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+    background: linear-gradient(135deg, var(--color-primary-500) 0%, var(--color-purple-500) 100%);
     color: white;
     box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);
 }
 
 [data-theme="dark"] .dash-tab-glass {
-    color: #94a3b8;
+    color: var(--color-slate-400);
 }
 
 [data-theme="dark"] .dash-tab-glass:hover {
     background: rgba(99, 102, 241, 0.2);
-    color: #a5b4fc;
+    color: var(--color-primary-300);
 }
 
 [data-theme="dark"] .dash-tab-glass.active {
@@ -168,41 +168,41 @@
 
 /* Notification Badge */
 .dash-notif-badge {
-    background: #ef4444;
+    background: var(--color-danger);
     color: white;
-    font-size: 0.7rem;
-    padding: 2px 6px;
-    border-radius: 99px;
-    font-weight: 700;
-    margin-left: 4px;
+    font-size: var(--font-size-xs);
+    padding: 2px var(--space-2);
+    border-radius: var(--radius-full);
+    font-weight: var(--font-weight-bold);
+    margin-left: var(--space-1);
 }
 
 /* FAB for Dashboard */
 .dash-fab {
     position: fixed;
-    bottom: 24px;
-    right: 24px;
-    z-index: 100;
+    bottom: var(--space-6);
+    right: var(--space-6);
+    z-index: var(--z-dropdown);
     display: flex;
     flex-direction: column-reverse;
     align-items: flex-end;
-    gap: 12px;
+    gap: var(--space-3);
 }
 
 .dash-fab-main {
     width: 56px;
     height: 56px;
-    border-radius: 16px;
-    background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+    border-radius: var(--radius-lg);
+    background: linear-gradient(135deg, var(--color-primary-500) 0%, var(--color-purple-500) 100%);
     border: none;
     color: white;
-    font-size: 24px;
+    font-size: var(--font-size-2xl);
     cursor: pointer;
     box-shadow: 0 4px 20px rgba(99, 102, 241, 0.4);
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: all var(--transition-base) cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .dash-fab-main:hover {
@@ -212,13 +212,13 @@
 
 .dash-fab-main.active {
     transform: rotate(45deg);
-    background: linear-gradient(135deg, #ef4444 0%, #f97316 100%);
+    background: linear-gradient(135deg, var(--color-danger) 0%, var(--color-orange-500) 100%);
 }
 
 .dash-fab-menu {
     display: none;
     flex-direction: column;
-    gap: 10px;
+    gap: var(--space-3);
     align-items: flex-end;
 }
 
@@ -230,7 +230,7 @@
 @keyframes fabSlideIn {
     from {
         opacity: 0;
-        transform: translateY(10px);
+        transform: translateY(var(--space-3));
     }
     to {
         opacity: 1;
@@ -241,18 +241,18 @@
 .dash-fab-item {
     display: flex;
     align-items: center;
-    gap: 10px;
-    padding: 10px 16px;
+    gap: var(--space-3);
+    padding: var(--space-3) var(--space-4);
     background: rgba(255, 255, 255, 0.95);
-    -webkit-backdrop-filter: blur(20px);
-    backdrop-filter: blur(20px);
-    border-radius: 12px;
+    -webkit-backdrop-filter: blur(var(--glass-blur));
+    backdrop-filter: blur(var(--glass-blur));
+    border-radius: var(--radius-md);
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
     text-decoration: none;
-    color: #1f2937;
-    font-weight: 600;
+    color: var(--color-gray-800);
+    font-weight: var(--font-weight-semibold);
     font-size: 14px;
-    transition: all 0.2s;
+    transition: all var(--transition-fast);
     white-space: nowrap;
 }
 
@@ -261,9 +261,9 @@
 }
 
 .dash-fab-item i {
-    width: 32px;
-    height: 32px;
-    border-radius: 8px;
+    width: var(--space-8);
+    height: var(--space-8);
+    border-radius: var(--radius-base);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -272,20 +272,20 @@
 }
 
 .dash-fab-item .icon-send {
-    background: linear-gradient(135deg, #10b981, #059669);
+    background: linear-gradient(135deg, var(--color-success), #059669);
 }
 
 .dash-fab-item .icon-listing {
-    background: linear-gradient(135deg, #6366f1, #8b5cf6);
+    background: linear-gradient(135deg, var(--color-primary-500), var(--color-purple-500));
 }
 
 .dash-fab-item .icon-event {
-    background: linear-gradient(135deg, #f59e0b, #d97706);
+    background: linear-gradient(135deg, var(--color-warning), #d97706);
 }
 
 [data-theme="dark"] .dash-fab-item {
     background: rgba(30, 41, 59, 0.95);
-    color: #f1f5f9;
+    color: var(--color-slate-100);
 }
 
 /* Grid Layout - 2-column dashboard layout with sidebar */
@@ -293,13 +293,13 @@
 .dash-grid {
     display: grid !important;
     grid-template-columns: 2fr 1fr !important;
-    gap: 24px;
+    gap: var(--space-6);
 }
 
 /* Mobile Responsiveness */
 @media (max-width: 900px) {
     .dashboard-container {
-        padding: 100px 16px 24px 16px;
+        padding: 100px var(--space-4) var(--space-6) var(--space-4);
     }
 
     .dashboard-container .dash-grid,
@@ -308,26 +308,26 @@
     }
 
     .dash-balance-card .balance-amount {
-        font-size: 2.25rem;
+        font-size: var(--font-size-3xl);
     }
 
     .dash-tabs-glass {
         padding: 6px;
-        gap: 6px;
+        gap: var(--space-2);
         /* Scroll indicator shadows */
         -webkit-mask-image: linear-gradient(to right, transparent 0, black 16px, black calc(100% - 16px), transparent 100%);
         mask-image: linear-gradient(to right, transparent 0, black 16px, black calc(100% - 16px), transparent 100%);
     }
 
     .dash-tab-glass {
-        padding: 10px 14px;
-        font-size: 0.9rem;
+        padding: var(--space-3) 14px;
+        font-size: var(--font-size-sm);
     }
 
     /* FAB positioned above bottom nav on mobile */
     .dash-fab {
         bottom: calc(80px + env(safe-area-inset-bottom, 0px));
-        right: 16px;
+        right: var(--space-4);
     }
 
     .dash-fab-main {
@@ -352,7 +352,7 @@
     /* Notification header buttons stack on mobile */
     .dash-notif-header-actions {
         flex-direction: column;
-        gap: 8px !important;
+        gap: var(--space-2) !important;
         width: 100%;
     }
 
@@ -369,22 +369,22 @@
 
 @media (max-width: 600px) {
     .dashboard-container {
-        padding: 90px 12px 24px 12px;
+        padding: 90px var(--space-3) var(--space-6) var(--space-3);
         padding-bottom: calc(90px + env(safe-area-inset-bottom, 0px));
     }
 
     .dash-balance-card {
-        padding: 20px;
+        padding: var(--space-5);
     }
 
     .dash-balance-card .balance-amount {
-        font-size: 1.75rem;
+        font-size: var(--font-size-xl);
     }
 
     .dash-balance-card>div {
         flex-direction: column !important;
         align-items: flex-start !important;
-        gap: 16px !important;
+        gap: var(--space-4) !important;
     }
 
     .dash-balance-card a {
@@ -396,12 +396,12 @@
     .dash-tabs-glass {
         margin: 0 -12px 24px -12px;
         border-radius: 0;
-        padding: 8px 12px;
+        padding: var(--space-2) 12px;
     }
 
     .dash-tab-glass {
-        padding: 8px 12px;
-        font-size: 0.85rem;
+        padding: var(--space-2) 12px;
+        font-size: var(--font-size-sm);
     }
 
     .dash-tab-glass i {
@@ -410,9 +410,9 @@
 
     /* Notification items touch-friendly */
     .notif-item {
-        padding: 16px 12px !important;
+        padding: var(--space-4) 12px !important;
         flex-direction: column !important;
-        gap: 12px !important;
+        gap: var(--space-3) !important;
     }
 
     .notif-item>div:last-child {
@@ -432,14 +432,14 @@
 
     /* Quick actions in overview */
     .htb-card-body .htb-btn {
-        padding: 14px 20px;
+        padding: 14px var(--space-5);
     }
 
     /* Hubs tab header */
     .dash-hubs-header {
         flex-direction: column !important;
         align-items: stretch !important;
-        gap: 12px !important;
+        gap: var(--space-3) !important;
     }
 
     .dash-hubs-header .htb-btn {
@@ -451,7 +451,7 @@
     .dash-listings-header {
         flex-direction: column !important;
         align-items: stretch !important;
-        gap: 12px !important;
+        gap: var(--space-3) !important;
     }
 
     .dash-listings-header h3 {
@@ -483,12 +483,12 @@
     }
 
     .dash-wallet-balance-amount span {
-        font-size: 1rem !important;
+        font-size: var(--font-size-base) !important;
     }
 
     .dash-transfer-form input,
     .dash-transfer-form textarea {
-        font-size: 16px !important;
+        font-size: var(--space-4) !important;
         /* Prevent iOS zoom */
     }
 
@@ -506,7 +506,7 @@
     .dash-events-section-header {
         flex-direction: column !important;
         align-items: stretch !important;
-        gap: 10px !important;
+        gap: var(--space-3) !important;
     }
 
     .dash-events-section-header .htb-btn {
@@ -516,13 +516,13 @@
 
     .dash-event-card-inner {
         flex-direction: column !important;
-        gap: 12px !important;
+        gap: var(--space-3) !important;
     }
 
     .dash-event-stats {
         text-align: left !important;
         display: flex;
-        gap: 12px;
+        gap: var(--space-3);
     }
 
     .dash-event-actions {
@@ -538,7 +538,7 @@
     .dash-overview-notif-header {
         flex-direction: column !important;
         align-items: stretch !important;
-        gap: 8px !important;
+        gap: var(--space-2) !important;
     }
 
     .dash-activity-table {
@@ -548,15 +548,15 @@
 
     /* Right column cards on mobile */
     .dash-sidebar-card-header {
-        padding: 12px 16px !important;
+        padding: var(--space-3) var(--space-4) !important;
     }
 
     .dash-sidebar-event {
-        padding: 12px 16px !important;
+        padding: var(--space-3) var(--space-4) !important;
     }
 
     .dash-sidebar-hub {
-        padding: 10px 12px !important;
+        padding: var(--space-3) var(--space-3) !important;
     }
 }
 
@@ -565,42 +565,42 @@
    ============================================ */
 [data-theme="dark"] .notif-card-header,
 [data-theme="dark"] .notif-settings-panel {
-    background: #1e293b;
-    border-color: #334155;
+    background: var(--color-slate-800);
+    border-color: var(--color-slate-700);
 }
 
 [data-theme="dark"] .notif-settings-card {
-    background: #0f172a;
-    border-color: #334155;
+    background: var(--bg-base);
+    border-color: var(--color-slate-700);
 }
 
 [data-theme="dark"] .notif-settings-card h5 {
-    color: #f1f5f9;
+    color: var(--color-slate-100);
 }
 
 [data-theme="dark"] .notif-settings-card select,
 [data-theme="dark"] .hub-setting-item select {
-    background: #1e293b;
-    border-color: #475569;
-    color: #f1f5f9;
+    background: var(--color-slate-800);
+    border-color: var(--color-slate-600);
+    color: var(--color-slate-100);
 }
 
 [data-theme="dark"] .hub-settings-list {
-    background: #0f172a;
-    border-color: #334155;
+    background: var(--bg-base);
+    border-color: var(--color-slate-700);
 }
 
 [data-theme="dark"] .hub-setting-item {
-    border-color: #334155;
+    border-color: var(--color-slate-700);
 }
 
 [data-theme="dark"] .hub-setting-item .hub-name {
-    color: #f1f5f9;
+    color: var(--color-slate-100);
 }
 
 [data-theme="dark"] .notif-item-new {
-    background: #1e293b;
-    border-color: #334155;
+    background: var(--color-slate-800);
+    border-color: var(--color-slate-700);
 }
 
 [data-theme="dark"] .notif-item-new.unread {
@@ -612,19 +612,19 @@
 }
 
 [data-theme="dark"] .notif-message {
-    color: #f1f5f9;
+    color: var(--color-slate-100);
 }
 
 [data-theme="dark"] .notif-time {
-    color: #94a3b8;
+    color: var(--color-slate-400);
 }
 
 [data-theme="dark"] .notif-indicator.read {
-    border-color: #475569;
+    border-color: var(--color-slate-600);
 }
 
 [data-theme="dark"] .notif-delete-btn {
-    color: #64748b;
+    color: var(--color-slate-500);
 }
 
 [data-theme="dark"] .notif-delete-btn:hover {
@@ -637,33 +637,33 @@
 }
 
 [data-theme="dark"] .notif-empty h3 {
-    color: #94a3b8;
+    color: var(--color-slate-400);
 }
 
 [data-theme="dark"] .notif-header-actions .htb-btn {
-    border-color: #475569;
+    border-color: var(--color-slate-600);
 }
 
 [data-theme="dark"] #events-modal {
-    background: #1e293b;
+    background: var(--color-slate-800);
 }
 
 [data-theme="dark"] #events-modal>div:first-child,
 [data-theme="dark"] #events-modal>div:last-child {
-    background: #0f172a;
-    border-color: #334155;
+    background: var(--bg-base);
+    border-color: var(--color-slate-700);
 }
 
 [data-theme="dark"] #events-modal h3 {
-    color: #f1f5f9;
+    color: var(--color-slate-100);
 }
 
 [data-theme="dark"] #events-modal div[style*="padding:20px"] {
-    color: #cbd5e1;
+    color: var(--color-slate-300);
 }
 
 [data-theme="dark"] #events-modal strong {
-    color: #f1f5f9;
+    color: var(--color-slate-100);
 }
 
 /* ============================================
@@ -672,16 +672,16 @@
 
 /* Section titles */
 .dash-section-title {
-    font-size: 1rem;
-    color: #334155;
+    font-size: var(--font-size-base);
+    color: var(--color-slate-700);
     margin: 0;
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: var(--space-2);
 }
 
 .dash-section-title i {
-    color: #64748b;
+    color: var(--color-slate-500);
 }
 
 /* Notifications header */
@@ -689,50 +689,50 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 16px 20px;
-    border-bottom: 1px solid #f1f5f9;
+    padding: var(--space-4) var(--space-5);
+    border-bottom: 1px solid var(--color-slate-100);
 }
 
 .dash-view-all-link {
-    font-size: 0.85rem;
-    font-weight: 600;
-    color: #4f46e5;
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-semibold);
+    color: var(--color-primary-600);
     text-decoration: none;
     white-space: nowrap;
     display: flex;
     align-items: center;
-    gap: 4px;
+    gap: var(--space-1);
 }
 
 .dash-view-all-link i {
-    font-size: 0.75rem;
+    font-size: var(--font-size-xs);
 }
 
 /* Notification items */
 .dash-notif-item {
     display: flex;
-    padding: 14px 20px;
-    border-bottom: 1px solid #f8fafc;
+    padding: 14px var(--space-5);
+    border-bottom: 1px solid var(--color-slate-50);
     text-decoration: none;
-    gap: 12px;
+    gap: var(--space-3);
     align-items: flex-start;
-    transition: background 0.15s;
+    transition: background var(--transition-fast);
 }
 
 .dash-notif-item:hover {
-    background: #f8fafc;
+    background: var(--color-slate-50);
 }
 
 .dash-notif-dot {
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    margin-top: 6px;
+    width: var(--space-2);
+    height: var(--space-2);
+    border-radius: var(--radius-full);
+    margin-top: var(--space-2);
     flex-shrink: 0;
 }
 
 .dash-notif-dot.unread {
-    background: #ef4444;
+    background: var(--color-danger);
     box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.15);
 }
 
@@ -746,61 +746,61 @@
 }
 
 .dash-notif-message {
-    color: #1e293b;
-    font-size: 0.9rem;
-    font-weight: 400;
-    line-height: 1.4;
+    color: var(--color-slate-800);
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-normal);
+    line-height: var(--line-height-normal);
     word-wrap: break-word;
 }
 
 .dash-notif-message.unread {
-    font-weight: 600;
+    font-weight: var(--font-weight-semibold);
 }
 
 .dash-notif-time {
-    color: #94a3b8;
-    font-size: 0.75rem;
+    color: var(--color-slate-400);
+    font-size: var(--font-size-xs);
     margin-top: 3px;
 }
 
 /* Activity styles */
 .dash-activity-action {
-    font-weight: 600;
-    font-size: 0.9rem;
-    color: #1e293b;
-    line-height: 1.3;
+    font-weight: var(--font-weight-semibold);
+    font-size: var(--font-size-sm);
+    color: var(--color-slate-800);
+    line-height: var(--line-height-tight);
 }
 
 .dash-activity-details {
-    font-size: 0.8rem;
-    color: #64748b;
+    font-size: var(--font-size-sm);
+    color: var(--color-slate-500);
     margin-top: 2px;
 }
 
 .dash-activity-date {
     text-align: right;
-    color: #94a3b8;
-    font-size: 0.8rem;
-    padding: 14px 16px;
+    color: var(--color-slate-400);
+    font-size: var(--font-size-sm);
+    padding: 14px var(--space-4);
     white-space: nowrap;
 }
 
 /* Empty states */
 .dash-empty-state {
-    padding: 40px 20px;
+    padding: var(--space-10) var(--space-5);
     text-align: center;
-    color: #94a3b8;
+    color: var(--color-slate-400);
 }
 
 .dash-empty-icon {
-    font-size: 2rem;
-    margin-bottom: 8px;
+    font-size: var(--font-size-4xl);
+    margin-bottom: var(--space-2);
     opacity: 0.3;
 }
 
 .dash-empty-state p {
     margin: 0;
-    color: #94a3b8;
+    color: var(--color-slate-400);
 }
 
 /* ============================================
@@ -808,11 +808,11 @@
    ============================================ */
 
 [data-theme="dark"] .dash-section-title {
-    color: #e2e8f0;
+    color: var(--color-slate-200);
 }
 
 [data-theme="dark"] .dash-section-title i {
-    color: #94a3b8;
+    color: var(--color-slate-400);
 }
 
 [data-theme="dark"] .dash-overview-notif-header {
@@ -820,7 +820,7 @@
 }
 
 [data-theme="dark"] .dash-view-all-link {
-    color: #a5b4fc;
+    color: var(--color-primary-300);
 }
 
 [data-theme="dark"] .dash-notif-item {
@@ -836,31 +836,31 @@
 }
 
 [data-theme="dark"] .dash-notif-message {
-    color: #f1f5f9;
+    color: var(--color-slate-100);
 }
 
 [data-theme="dark"] .dash-notif-time {
-    color: #64748b;
+    color: var(--color-slate-500);
 }
 
 [data-theme="dark"] .dash-activity-action {
-    color: #f1f5f9;
+    color: var(--color-slate-100);
 }
 
 [data-theme="dark"] .dash-activity-details {
-    color: #94a3b8;
+    color: var(--color-slate-400);
 }
 
 [data-theme="dark"] .dash-activity-date {
-    color: #64748b;
+    color: var(--color-slate-500);
 }
 
 [data-theme="dark"] .dash-empty-state {
-    color: #64748b;
+    color: var(--color-slate-500);
 }
 
 [data-theme="dark"] .dash-empty-state p {
-    color: #94a3b8;
+    color: var(--color-slate-400);
 }
 
 [data-theme="dark"] .dash-empty-icon {
@@ -868,46 +868,46 @@
 }
 
 /* Sidebar cards - Upcoming Events & My Hubs */
-[data-theme="dark"] .htb-card-header[style*="background: #f8fafc"] {
+[data-theme="dark"] .htb-card-header[style*="background: var(--color-slate-50)"] {
     background: rgba(30, 41, 59, 0.6) !important;
     border-color: rgba(255, 255, 255, 0.1) !important;
-    color: #cbd5e1 !important;
+    color: var(--color-slate-300) !important;
 }
 
 /* Event cards in sidebar */
-[data-theme="dark"] a[style*="border-bottom: 1px solid #f1f5f9"] {
+[data-theme="dark"] a[style*="border-bottom: 1px solid var(--color-slate-100)"] {
     border-color: rgba(255, 255, 255, 0.08) !important;
 }
 
-[data-theme="dark"] a[style*="border-bottom: 1px solid #f1f5f9"]:hover {
+[data-theme="dark"] a[style*="border-bottom: 1px solid var(--color-slate-100)"]:hover {
     background: rgba(51, 65, 85, 0.4) !important;
 }
 
-[data-theme="dark"] a[style*="border-bottom: 1px solid #f1f5f9"] div[style*="color: #1e293b"] {
-    color: #f1f5f9 !important;
+[data-theme="dark"] a[style*="border-bottom: 1px solid var(--color-slate-100)"] div[style*="color: var(--color-slate-800)"] {
+    color: var(--color-slate-100) !important;
 }
 
-[data-theme="dark"] a[style*="border-bottom: 1px solid #f1f5f9"] div[style*="color: #64748b"] {
-    color: #94a3b8 !important;
+[data-theme="dark"] a[style*="border-bottom: 1px solid var(--color-slate-100)"] div[style*="color: var(--color-slate-500)"] {
+    color: var(--color-slate-400) !important;
 }
 
 /* Hub links in sidebar */
-[data-theme="dark"] a[style*="color: #334155"] {
-    color: #e2e8f0 !important;
+[data-theme="dark"] a[style*="color: var(--color-slate-700)"] {
+    color: var(--color-slate-200) !important;
 }
 
-[data-theme="dark"] a[style*="color: #334155"]:hover {
+[data-theme="dark"] a[style*="color: var(--color-slate-700)"]:hover {
     background: rgba(51, 65, 85, 0.5) !important;
 }
 
-[data-theme="dark"] a[style*="color: #334155"] div[style*="color: #94a3b8"] {
-    color: #64748b !important;
+[data-theme="dark"] a[style*="color: var(--color-slate-700)"] div[style*="color: var(--color-slate-400)"] {
+    color: var(--color-slate-500) !important;
 }
 
 /* Quick Actions card */
 [data-theme="dark"] .htb-btn[style*="background: #f1f5f9"] {
     background: rgba(51, 65, 85, 0.6) !important;
-    color: #e2e8f0 !important;
+    color: var(--color-slate-200) !important;
     border-color: rgba(255, 255, 255, 0.1) !important;
 }
 
@@ -917,7 +917,7 @@
 
 /* Notification Tab Mobile Styles */
 .notif-card-header {
-    padding: 16px 20px;
+    padding: var(--space-4) var(--space-5);
     border-bottom: 1px solid #e2e8f0;
 }
 
@@ -925,31 +925,31 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    gap: 12px;
-    margin-bottom: 12px;
+    gap: var(--space-3);
+    margin-bottom: var(--space-3);
 }
 
 .notif-header-actions {
     display: flex;
-    gap: 8px;
+    gap: var(--space-2);
     flex-wrap: wrap;
 }
 
 .notif-header-actions .htb-btn {
     display: inline-flex;
     align-items: center;
-    gap: 6px;
-    padding: 8px 12px;
-    font-size: 0.85rem;
+    gap: var(--space-2);
+    padding: var(--space-2) 12px;
+    font-size: var(--font-size-sm);
     white-space: nowrap;
 }
 
 /* Settings Panel Mobile */
 .notif-settings-panel {
     display: none;
-    background: #f8fafc;
+    background: var(--color-slate-50);
     border-bottom: 1px solid #e2e8f0;
-    padding: 20px;
+    padding: var(--space-5);
 }
 
 .notif-settings-panel.show {
@@ -958,10 +958,10 @@
 
 .notif-settings-card {
     background: white;
-    padding: 16px;
-    border-radius: 10px;
+    padding: var(--space-4);
+    border-radius: var(--radius-md);
     border: 1px solid #e2e8f0;
-    margin-bottom: 16px;
+    margin-bottom: var(--space-4);
 }
 
 .notif-settings-card:last-child {
@@ -970,22 +970,22 @@
 
 .notif-settings-card h5 {
     margin: 0 0 4px 0;
-    font-size: 0.95rem;
-    color: #1e293b;
+    font-size: var(--font-size-base);
+    color: var(--color-slate-800);
 }
 
 .notif-settings-card p {
     margin: 0 0 12px 0;
-    font-size: 0.85rem;
-    color: #64748b;
+    font-size: var(--font-size-sm);
+    color: var(--color-slate-500);
 }
 
 .notif-settings-card select {
     width: 100%;
-    padding: 10px 12px;
-    border-radius: 8px;
-    border: 1px solid #cbd5e1;
-    font-size: 0.9rem;
+    padding: var(--space-3) var(--space-3);
+    border-radius: var(--radius-base);
+    border: 1px solid var(--color-slate-300);
+    font-size: var(--font-size-sm);
     background: white;
 }
 
@@ -993,16 +993,16 @@
 .hub-settings-list {
     background: white;
     border: 1px solid #e2e8f0;
-    border-radius: 10px;
+    border-radius: var(--radius-md);
     overflow: hidden;
 }
 
 .hub-setting-item {
-    padding: 14px 16px;
-    border-bottom: 1px solid #f1f5f9;
+    padding: 14px var(--space-4);
+    border-bottom: 1px solid var(--color-slate-100);
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: var(--space-2);
 }
 
 .hub-setting-item:last-child {
@@ -1010,17 +1010,17 @@
 }
 
 .hub-setting-item .hub-name {
-    font-weight: 600;
-    font-size: 0.9rem;
-    color: #1e293b;
+    font-weight: var(--font-weight-semibold);
+    font-size: var(--font-size-sm);
+    color: var(--color-slate-800);
 }
 
 .hub-setting-item select {
     width: 100%;
-    padding: 8px 10px;
-    border-radius: 6px;
-    border: 1px solid #cbd5e1;
-    font-size: 0.85rem;
+    padding: var(--space-2) 10px;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--color-slate-300);
+    font-size: var(--font-size-sm);
 }
 
 /* Notification Items */
@@ -1029,10 +1029,10 @@
 }
 
 .notif-item-new {
-    padding: 16px 20px;
-    border-bottom: 1px solid #f1f5f9;
+    padding: var(--space-4) var(--space-5);
+    border-bottom: 1px solid var(--color-slate-100);
     background: white;
-    transition: background 0.2s;
+    transition: background var(--transition-fast);
 }
 
 .notif-item-new.unread {
@@ -1040,7 +1040,7 @@
 }
 
 .notif-item-new:hover {
-    background: #f8fafc;
+    background: var(--color-slate-50);
 }
 
 .notif-item-content {
@@ -1050,15 +1050,15 @@
 }
 
 .notif-indicator {
-    width: 10px;
-    height: 10px;
-    border-radius: 50%;
-    margin-top: 6px;
+    width: var(--space-3);
+    height: var(--space-3);
+    border-radius: var(--radius-full);
+    margin-top: var(--space-2);
     flex-shrink: 0;
 }
 
 .notif-indicator.unread {
-    background: #ef4444;
+    background: var(--color-danger);
     box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.2);
 }
 
@@ -1073,77 +1073,77 @@
 }
 
 .notif-message {
-    font-size: 0.95rem;
-    color: #1e293b;
-    line-height: 1.4;
-    margin-bottom: 4px;
+    font-size: var(--font-size-base);
+    color: var(--color-slate-800);
+    line-height: var(--line-height-normal);
+    margin-bottom: var(--space-1);
     word-wrap: break-word;
 }
 
 .notif-item-new.unread .notif-message {
-    font-weight: 600;
+    font-weight: var(--font-weight-semibold);
 }
 
 .notif-time {
-    font-size: 0.8rem;
-    color: #64748b;
+    font-size: var(--font-size-sm);
+    color: var(--color-slate-500);
 }
 
 .notif-actions {
     display: flex;
-    gap: 8px;
-    margin-top: 12px;
+    gap: var(--space-2);
+    margin-top: var(--space-3);
     flex-wrap: wrap;
 }
 
 .notif-actions .htb-btn {
-    padding: 8px 14px;
-    font-size: 0.85rem;
+    padding: var(--space-2) 14px;
+    font-size: var(--font-size-sm);
 }
 
 .notif-delete-btn {
     background: none;
     border: none;
-    color: #94a3b8;
+    color: var(--color-slate-400);
     cursor: pointer;
-    padding: 8px;
-    border-radius: 6px;
-    transition: all 0.2s;
+    padding: var(--space-2);
+    border-radius: var(--radius-sm);
+    transition: all var(--transition-fast);
 }
 
 .notif-delete-btn:hover {
     background: #fef2f2;
-    color: #ef4444;
+    color: var(--color-danger);
 }
 
 /* Empty State */
 .notif-empty {
-    padding: 60px 20px;
+    padding: 60px var(--space-5);
     text-align: center;
 }
 
 .notif-empty-icon {
     font-size: 3.5rem;
-    color: #cbd5e1;
-    margin-bottom: 16px;
+    color: var(--color-slate-300);
+    margin-bottom: var(--space-4);
 }
 
 .notif-empty h3 {
     margin: 0 0 8px 0;
-    color: #64748b;
-    font-size: 1.1rem;
+    color: var(--color-slate-500);
+    font-size: var(--font-size-lg);
 }
 
 .notif-empty p {
     margin: 0;
-    color: #94a3b8;
-    font-size: 0.9rem;
+    color: var(--color-slate-400);
+    font-size: var(--font-size-sm);
 }
 
 /* Mobile Adjustments */
 @media (max-width: 600px) {
     .notif-card-header {
-        padding: 14px 16px;
+        padding: 14px var(--space-4);
     }
 
     .notif-header-top {
@@ -1158,12 +1158,12 @@
     .notif-header-actions {
         display: grid;
         grid-template-columns: 1fr 1fr;
-        gap: 8px;
+        gap: var(--space-2);
     }
 
     .notif-header-actions .htb-btn {
         justify-content: center;
-        padding: 10px 12px;
+        padding: var(--space-3) var(--space-3);
     }
 
     .notif-header-actions .htb-btn:last-child {
@@ -1171,16 +1171,16 @@
     }
 
     .notif-item-new {
-        padding: 14px 16px;
+        padding: 14px var(--space-4);
     }
 
     .notif-settings-panel {
-        padding: 16px;
+        padding: var(--space-4);
     }
 
     .hub-setting-item {
         flex-direction: column;
-        gap: 8px;
+        gap: var(--space-2);
     }
 }
 

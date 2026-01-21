@@ -5,6 +5,7 @@
  * Pattern: Cards, Action buttons, Comments, Notifications
  * WCAG 2.1 AA Compliant
  * Created: 2026-01-20
+ * Updated: 2026-01-21 - Migrated to design tokens
  */
 
 /* =============================================================================
@@ -14,26 +15,26 @@
 .civicone .civic-composer {
     background: #ffffff;
     border: 2px solid #b1b4b6;
-    padding: 20px;
-    margin-bottom: 30px;
+    padding: var(--space-5);
+    margin-bottom: var(--space-8);
 }
 
 .civicone .civic-composer .govuk-heading-m {
     margin-top: 0;
-    margin-bottom: 15px;
+    margin-bottom: var(--space-4);
 }
 
 .civicone .civic-composer .govuk-form-group {
-    margin-bottom: 15px;
+    margin-bottom: var(--space-4);
 }
 
 .civicone .civic-composer .govuk-textarea {
     font-family: "GDS Transport", arial, sans-serif;
-    font-size: 1rem;
-    line-height: 1.5;
+    font-size: var(--font-size-base);
+    line-height: var(--line-height-normal);
     color: #0b0c0c;
     border: 2px solid #0b0c0c;
-    padding: 10px;
+    padding: var(--space-3);
     width: 100%;
     resize: vertical;
 }
@@ -46,7 +47,7 @@
 
 .civicone .civic-composer-actions {
     display: flex;
-    gap: 15px;
+    gap: var(--space-4);
     align-items: center;
     justify-content: flex-start;
     flex-wrap: wrap;
@@ -63,8 +64,8 @@
 .civicone .civic-post-card {
     background: #ffffff;
     border: 2px solid #b1b4b6;
-    padding: 20px;
-    margin-bottom: 30px;
+    padding: var(--space-5);
+    margin-bottom: var(--space-8);
 }
 
 .civicone .civic-post-card:focus-within {
@@ -75,15 +76,15 @@
 .civicone .civic-post-header {
     display: flex;
     align-items: center;
-    gap: 12px;
-    margin-bottom: 15px;
-    padding-bottom: 15px;
+    gap: var(--space-3);
+    margin-bottom: var(--space-4);
+    padding-bottom: var(--space-4);
     border-bottom: 1px solid #b1b4b6;
 }
 
 .civicone .civic-post-header .civic-avatar-sm {
-    width: 48px;
-    height: 48px;
+    width: var(--space-12);
+    height: var(--space-12);
     border-radius: 50%;
     object-fit: cover;
     border: 2px solid #b1b4b6;
@@ -91,26 +92,26 @@
 
 .civicone .civic-post-header .govuk-heading-s {
     margin: 0;
-    font-size: 1rem;
-    font-weight: 700;
+    font-size: var(--font-size-base);
+    font-weight: var(--font-weight-bold);
 }
 
 .civicone .civic-post-header .govuk-body-s {
-    font-size: 0.875rem;
+    font-size: var(--font-size-sm);
     color: #505a5f;
     margin: 0;
 }
 
 /* Post Content */
 .civicone .civic-post-content {
-    margin-bottom: 15px;
+    margin-bottom: var(--space-4);
 }
 
 .civicone .civic-post-content .govuk-body {
-    font-size: 1rem;
-    line-height: 1.5;
+    font-size: var(--font-size-base);
+    line-height: var(--line-height-normal);
     color: #0b0c0c;
-    margin-bottom: 15px;
+    margin-bottom: var(--space-4);
 }
 
 .civicone .civic-post-content a {
@@ -131,7 +132,7 @@
 
 /* Post Image */
 .civicone .civic-post-image {
-    margin: 15px 0;
+    margin: var(--space-4) 0;
     border: 1px solid #b1b4b6;
 }
 
@@ -147,8 +148,8 @@
 
 .civicone .civic-post-actions {
     display: flex;
-    gap: 15px;
-    padding-top: 15px;
+    gap: var(--space-4);
+    padding-top: var(--space-4);
     border-top: 1px solid #b1b4b6;
     flex-wrap: wrap;
 }
@@ -156,17 +157,17 @@
 .civicone .civic-action-btn {
     display: inline-flex;
     align-items: center;
-    gap: 8px;
-    padding: 8px 12px;
+    gap: var(--space-2);
+    padding: var(--space-2) var(--space-3);
     font-family: "GDS Transport", arial, sans-serif;
-    font-size: 1rem;
-    font-weight: 400;
+    font-size: var(--font-size-base);
+    font-weight: var(--font-weight-normal);
     color: #0b0c0c;
     background: #f3f2f1;
     border: 2px solid #0b0c0c;
-    border-radius: 0;
+    border-radius: var(--radius-none);
     cursor: pointer;
-    transition: none;
+    transition: var(--transition-fast);
 }
 
 .civicone .civic-action-btn:hover {
@@ -185,13 +186,13 @@
 }
 
 .civicone .civic-action-btn i {
-    font-size: 1.125rem;
+    font-size: var(--font-size-lg);
 }
 
 .civicone .civic-action-btn .like-count,
 .civicone .civic-action-btn .comment-count {
-    font-weight: 700;
-    min-width: 20px;
+    font-weight: var(--font-weight-bold);
+    min-width: var(--space-5);
     text-align: center;
 }
 
@@ -218,8 +219,8 @@
    ============================================================================= */
 
 .civicone .civic-comments-section {
-    margin-top: 20px;
-    padding-top: 20px;
+    margin-top: var(--space-5);
+    padding-top: var(--space-5);
     border-top: 2px solid #b1b4b6;
     display: none;
 }
@@ -229,16 +230,16 @@
 }
 
 .civicone .civic-comments-section .govuk-heading-s {
-    margin-bottom: 15px;
-    font-size: 1rem;
+    margin-bottom: var(--space-4);
+    font-size: var(--font-size-base);
 }
 
 /* Individual Comment */
 .civicone .civic-comment {
     display: flex;
-    gap: 12px;
-    margin-bottom: 20px;
-    padding-bottom: 20px;
+    gap: var(--space-3);
+    margin-bottom: var(--space-5);
+    padding-bottom: var(--space-5);
     border-bottom: 1px solid #f3f2f1;
 }
 
@@ -249,8 +250,8 @@
 }
 
 .civicone .civic-comment-avatar {
-    width: 40px;
-    height: 40px;
+    width: var(--space-10);
+    height: var(--space-10);
     border-radius: 50%;
     object-fit: cover;
     border: 2px solid #b1b4b6;
@@ -260,28 +261,28 @@
 .civicone .civic-comment-bubble {
     flex: 1;
     background: #f3f2f1;
-    padding: 12px 15px;
+    padding: var(--space-3) var(--space-4);
     border: 1px solid #b1b4b6;
 }
 
 .civicone .civic-comment-author {
-    font-weight: 700;
-    font-size: 0.875rem;
+    font-weight: var(--font-weight-bold);
+    font-size: var(--font-size-sm);
     color: #0b0c0c;
-    margin-bottom: 4px;
+    margin-bottom: var(--space-1);
 }
 
 .civicone .civic-comment-text {
-    font-size: 1rem;
-    line-height: 1.5;
+    font-size: var(--font-size-base);
+    line-height: var(--line-height-normal);
     color: #0b0c0c;
-    margin-bottom: 8px;
+    margin-bottom: var(--space-2);
 }
 
 .civicone .civic-comment-meta {
     display: flex;
-    gap: 15px;
-    font-size: 0.875rem;
+    gap: var(--space-4);
+    font-size: var(--font-size-sm);
     color: #505a5f;
 }
 
@@ -293,7 +294,7 @@
     cursor: pointer;
     padding: 0;
     font-family: "GDS Transport", arial, sans-serif;
-    font-size: 0.875rem;
+    font-size: var(--font-size-sm);
 }
 
 .civicone .civic-comment-meta button:hover {
@@ -309,29 +310,29 @@
 
 /* Comment Form */
 .civicone .civic-comment-form {
-    margin-top: 20px;
-    padding: 15px;
+    margin-top: var(--space-5);
+    padding: var(--space-4);
     background: #f3f2f1;
     border: 1px solid #b1b4b6;
 }
 
 .civicone .civic-comment-form .govuk-heading-s {
     margin-top: 0;
-    margin-bottom: 10px;
-    font-size: 1rem;
+    margin-bottom: var(--space-3);
+    font-size: var(--font-size-base);
 }
 
 .civicone .civic-comment-input {
     width: 100%;
     font-family: "GDS Transport", arial, sans-serif;
-    font-size: 1rem;
-    line-height: 1.5;
+    font-size: var(--font-size-base);
+    line-height: var(--line-height-normal);
     color: #0b0c0c;
     border: 2px solid #0b0c0c;
-    padding: 8px;
+    padding: var(--space-2);
     resize: vertical;
-    min-height: 80px;
-    margin-bottom: 10px;
+    min-height: var(--space-20);
+    margin-bottom: var(--space-3);
 }
 
 .civicone .civic-comment-input:focus {
@@ -342,9 +343,9 @@
 
 .civicone .civic-comment-submit {
     font-family: "GDS Transport", arial, sans-serif;
-    font-size: 1rem;
-    font-weight: 400;
-    padding: 10px 16px;
+    font-size: var(--font-size-base);
+    font-weight: var(--font-weight-normal);
+    padding: var(--space-3) var(--space-4);
     color: #ffffff;
     background: #00703c;
     border: 2px solid transparent;
@@ -372,9 +373,9 @@
 
 /* Reply Form (Nested comments) */
 .civicone .civic-reply-form {
-    margin-top: 15px;
+    margin-top: var(--space-4);
     margin-left: 52px;
-    padding: 15px;
+    padding: var(--space-4);
     background: #ffffff;
     border: 1px solid #b1b4b6;
 }
@@ -382,14 +383,14 @@
 .civicone .civic-reply-input {
     width: 100%;
     font-family: "GDS Transport", arial, sans-serif;
-    font-size: 0.875rem;
-    line-height: 1.5;
+    font-size: var(--font-size-sm);
+    line-height: var(--line-height-normal);
     color: #0b0c0c;
     border: 2px solid #0b0c0c;
-    padding: 8px;
+    padding: var(--space-2);
     resize: vertical;
     min-height: 60px;
-    margin-bottom: 10px;
+    margin-bottom: var(--space-3);
 }
 
 .civicone .civic-reply-input:focus {
@@ -404,20 +405,20 @@
 
 .civicone .civic-reactions {
     display: flex;
-    gap: 8px;
-    margin-top: 10px;
+    gap: var(--space-2);
+    margin-top: var(--space-3);
     flex-wrap: wrap;
 }
 
 .civicone .civic-reaction {
     display: inline-flex;
     align-items: center;
-    gap: 4px;
-    padding: 4px 8px;
+    gap: var(--space-1);
+    padding: var(--space-1) var(--space-2);
     background: #f3f2f1;
     border: 1px solid #b1b4b6;
-    border-radius: 12px;
-    font-size: 0.875rem;
+    border-radius: var(--radius-md);
+    font-size: var(--font-size-sm);
     cursor: pointer;
 }
 
@@ -447,10 +448,10 @@
     left: 0;
     background: #ffffff;
     border: 2px solid #0b0c0c;
-    padding: 8px;
+    padding: var(--space-2);
     display: none;
-    gap: 8px;
-    z-index: 100;
+    gap: var(--space-2);
+    z-index: var(--z-popover);
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
 }
 
@@ -461,9 +462,9 @@
 .civicone .civic-reaction-picker-menu button {
     background: none;
     border: none;
-    font-size: 1.5rem;
+    font-size: var(--font-size-2xl);
     cursor: pointer;
-    padding: 4px;
+    padding: var(--space-1);
 }
 
 .civicone .civic-reaction-picker-menu button:hover {
@@ -482,7 +483,7 @@
 .civicone .civic-mention {
     color: #1d70b8;
     text-decoration: none;
-    font-weight: 600;
+    font-weight: var(--font-weight-semibold);
 }
 
 .civicone .civic-mention:hover {
@@ -503,23 +504,23 @@
 
 .civicone .civic-toast {
     position: fixed;
-    bottom: 20px;
+    bottom: var(--space-5);
     left: 50%;
     transform: translateX(-50%);
-    z-index: 9999;
+    z-index: var(--z-toast);
     min-width: 300px;
     max-width: 500px;
     background: #00703c;
     color: #ffffff;
     border: 4px solid #00703c;
-    padding: 15px 20px;
+    padding: var(--space-4) 20px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
     display: none;
 }
 
 .civicone .civic-toast.visible {
     display: block;
-    animation: civicToastSlideUp 0.3s ease-out;
+    animation: civicToastSlideUp var(--transition-base) var(--ease-out);
 }
 
 .civicone .civic-toast.error {
@@ -540,24 +541,24 @@
 .civicone .civic-toast .civic-toast-content {
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: var(--space-3);
 }
 
 .civicone .civic-toast .civic-toast-icon {
-    font-size: 1.5rem;
+    font-size: var(--font-size-2xl);
     flex-shrink: 0;
 }
 
 .civicone .civic-toast .civic-toast-message {
     flex: 1;
     font-family: "GDS Transport", arial, sans-serif;
-    font-size: 1rem;
-    line-height: 1.5;
+    font-size: var(--font-size-base);
+    line-height: var(--line-height-normal);
 }
 
 @keyframes civicToastSlideUp {
     from {
-        transform: translate(-50%, 20px);
+        transform: translate(-50%, var(--space-5));
         opacity: 0;
     }
     to {
@@ -573,13 +574,13 @@
 .civicone .civicone-related-content {
     background: #f3f2f1;
     border: 2px solid #b1b4b6;
-    padding: 20px;
+    padding: var(--space-5);
 }
 
 .civicone .civicone-related-content .govuk-heading-m {
     margin-top: 0;
-    margin-bottom: 15px;
-    font-size: 1.125rem;
+    margin-bottom: var(--space-4);
+    font-size: var(--font-size-lg);
 }
 
 .civicone .civicone-related-content .govuk-list {
@@ -589,8 +590,8 @@
 }
 
 .civicone .civicone-related-content .govuk-list li {
-    margin-bottom: 10px;
-    padding-bottom: 10px;
+    margin-bottom: var(--space-3);
+    padding-bottom: var(--space-3);
     border-bottom: 1px solid #b1b4b6;
 }
 
@@ -603,7 +604,7 @@
 .civicone .civicone-related-content .govuk-link {
     color: #1d70b8;
     text-decoration: underline;
-    font-size: 1rem;
+    font-size: var(--font-size-base);
 }
 
 .civicone .civicone-related-content .govuk-link:hover {
@@ -624,40 +625,40 @@
 @media (max-width: 768px) {
     .civicone .civic-post-card,
     .civicone .civic-composer {
-        padding: 15px;
-        margin-bottom: 20px;
+        padding: var(--space-4);
+        margin-bottom: var(--space-5);
     }
 
     .civicone .civic-post-actions {
-        gap: 10px;
+        gap: var(--space-3);
     }
 
     .civicone .civic-action-btn {
-        padding: 6px 10px;
-        font-size: 0.875rem;
+        padding: var(--space-2) var(--space-3);
+        font-size: var(--font-size-sm);
     }
 
     .civicone .civic-comment {
-        gap: 8px;
+        gap: var(--space-2);
     }
 
     .civicone .civic-comment-avatar {
-        width: 32px;
-        height: 32px;
+        width: var(--space-8);
+        height: var(--space-8);
     }
 
     .civicone .civic-reply-form {
-        margin-left: 40px;
+        margin-left: var(--space-10);
     }
 
     .civicone .civic-toast {
         min-width: 280px;
-        max-width: calc(100% - 40px);
-        bottom: 80px; /* Above mobile nav */
+        max-width: calc(100% - var(--space-10));
+        bottom: var(--space-20); /* Above mobile nav */
     }
 
     .civicone .civicone-related-content {
-        margin-top: 20px;
+        margin-top: var(--space-5);
     }
 }
 

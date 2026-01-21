@@ -1,7 +1,7 @@
 /**
  * Desktop Hover System
  * Unified hover states for desktop/pointer devices
- * Version: 1.0 - 2026-01-21
+ * Version: 2.0 - 2026-01-21 - Migrated to design tokens
  *
  * PRIORITY: HIGH
  * Consistent hover feedback across all interactive elements
@@ -32,8 +32,8 @@
     .feed-item,
     [data-card] {
         transition:
-            transform var(--desktop-transition-normal, 0.25s) var(--desktop-ease-smooth, cubic-bezier(0.4, 0, 0.2, 1)),
-            box-shadow var(--desktop-transition-normal, 0.25s) var(--desktop-ease-smooth, cubic-bezier(0.4, 0, 0.2, 1));
+            transform var(--transition-base) var(--ease-in-out),
+            box-shadow var(--transition-base) var(--ease-in-out);
         cursor: pointer;
     }
 
@@ -47,16 +47,16 @@
     .event-card:hover,
     .feed-item:hover,
     [data-card]:hover {
-        transform: translateY(var(--desktop-hover-lift, -4px));
-        box-shadow: var(--desktop-shadow-hover, 0 12px 32px rgba(0, 0, 0, 0.12));
+        transform: translateY(calc(var(--space-1) * -1));
+        box-shadow: var(--shadow-xl);
     }
 
     /* Featured/large cards - enhanced lift */
     .news-card:hover,
     .card-featured:hover,
     .card-large:hover {
-        transform: translateY(var(--desktop-hover-lift-lg, -8px)) scale(var(--desktop-hover-scale-sm, 1.02));
-        box-shadow: var(--desktop-shadow-hover-lg, 0 20px 48px rgba(0, 0, 0, 0.15));
+        transform: translateY(calc(var(--space-2) * -1)) scale(1.02);
+        box-shadow: var(--shadow-2xl);
     }
 
     /* ==========================================
@@ -74,10 +74,10 @@
     [type="submit"],
     [type="reset"] {
         transition:
-            transform var(--desktop-transition-fast, 0.15s) var(--desktop-ease-smooth, cubic-bezier(0.4, 0, 0.2, 1)),
-            background-color var(--desktop-transition-fast, 0.15s),
-            color var(--desktop-transition-fast, 0.15s),
-            box-shadow var(--desktop-transition-fast, 0.15s);
+            transform var(--transition-fast) var(--ease-in-out),
+            background-color var(--transition-fast),
+            color var(--transition-fast),
+            box-shadow var(--transition-fast);
         cursor: pointer;
     }
 
@@ -90,26 +90,26 @@
     [type="button"]:hover:not(:disabled),
     [type="submit"]:hover:not(:disabled),
     [type="reset"]:hover:not(:disabled) {
-        transform: translateY(var(--desktop-hover-lift-sm, -2px));
+        transform: translateY(calc(var(--space-1) / -2));
     }
 
     /* Primary buttons - scale effect */
     .btn-primary:hover:not(:disabled),
     .btn-success:hover:not(:disabled) {
-        transform: translateY(var(--desktop-hover-lift-sm, -2px)) scale(1.02);
+        transform: translateY(calc(var(--space-1) / -2)) scale(1.02);
     }
 
     /* Icon buttons - scale only */
     .btn-icon:hover:not(:disabled),
     .icon-btn:hover:not(:disabled) {
-        transform: scale(var(--desktop-hover-scale-sm, 1.05));
+        transform: scale(1.05);
     }
 
     /* FAB buttons - enhanced scale */
     .fab:hover,
     .floating-action-button:hover {
-        transform: scale(var(--desktop-hover-scale, 1.08));
-        box-shadow: var(--desktop-shadow-hover, 0 12px 32px rgba(0, 0, 0, 0.12));
+        transform: scale(1.08);
+        box-shadow: var(--shadow-xl);
     }
 
     /* ==========================================
@@ -119,19 +119,19 @@
 
     a {
         transition:
-            color var(--desktop-transition-fast, 0.15s),
-            text-decoration-thickness var(--desktop-transition-fast, 0.15s),
-            text-underline-offset var(--desktop-transition-fast, 0.15s);
+            color var(--transition-fast),
+            text-decoration-thickness var(--transition-fast),
+            text-underline-offset var(--transition-fast);
     }
 
     a:hover {
         text-decoration-thickness: 2px;
-        text-underline-offset: 4px;
+        text-underline-offset: var(--space-1);
     }
 
     /* Link in cards - lift effect */
     a.card-link:hover {
-        transform: translateY(var(--desktop-hover-lift-sm, -2px));
+        transform: translateY(calc(var(--space-1) / -2));
     }
 
     /* ==========================================
@@ -146,9 +146,9 @@
     [role="menuitem"],
     [role="option"] {
         transition:
-            background-color var(--desktop-transition-fast, 0.15s),
-            transform var(--desktop-transition-fast, 0.15s),
-            padding-left var(--desktop-transition-fast, 0.15s);
+            background-color var(--transition-fast),
+            transform var(--transition-fast),
+            padding-left var(--transition-fast);
         cursor: pointer;
     }
 
@@ -159,7 +159,7 @@
     [role="menuitem"]:hover,
     [role="option"]:hover {
         background-color: rgba(var(--color-primary-rgb, 99, 102, 241), 0.06);
-        transform: translateX(2px);
+        transform: translateX(var(--space-1));
     }
 
     /* ==========================================
@@ -177,8 +177,8 @@
     textarea,
     select {
         transition:
-            border-color var(--desktop-transition-fast, 0.15s),
-            box-shadow var(--desktop-transition-fast, 0.15s);
+            border-color var(--transition-fast),
+            box-shadow var(--transition-fast);
     }
 
     input[type="text"]:hover:not(:disabled):not(:focus),
@@ -190,8 +190,8 @@
     input[type="url"]:hover:not(:disabled):not(:focus),
     textarea:hover:not(:disabled):not(:focus),
     select:hover:not(:disabled):not(:focus) {
-        border-color: var(--color-primary-400, #818cf8);
-        box-shadow: 0 0 0 1px var(--color-primary-200, #c7d2fe);
+        border-color: var(--color-primary-400);
+        box-shadow: 0 0 0 1px var(--color-primary-200);
     }
 
     /* ==========================================
@@ -200,7 +200,7 @@
        ========================================== */
 
     .icon-interactive {
-        transition: transform var(--desktop-transition-fast, 0.15s) var(--desktop-ease-bounce, cubic-bezier(0.34, 1.56, 0.64, 1));
+        transition: transform var(--transition-fast) var(--ease-bounce);
         display: inline-block;
     }
 
@@ -210,12 +210,12 @@
 
     /* Icon with rotation */
     .icon-rotate:hover {
-        transform: rotate(var(--desktop-hover-rotate, 5deg)) scale(1.1);
+        transform: rotate(5deg) scale(1.1);
     }
 
     /* Icon bounce */
     .icon-bounce:hover {
-        animation: iconBounce 0.4s var(--desktop-ease-bounce, cubic-bezier(0.34, 1.56, 0.64, 1));
+        animation: iconBounce 0.4s var(--ease-bounce);
     }
 
     @keyframes iconBounce {
@@ -231,7 +231,7 @@
     .badge,
     .chip,
     .tag {
-        transition: transform var(--desktop-transition-fast, 0.15s) var(--desktop-ease-smooth, cubic-bezier(0.4, 0, 0.2, 1));
+        transition: transform var(--transition-fast) var(--ease-in-out);
         cursor: default;
     }
 
@@ -252,7 +252,7 @@
     }
 
     .image-hover-zoom img {
-        transition: transform var(--desktop-transition-slow, 0.35s) var(--desktop-ease-smooth, cubic-bezier(0.4, 0, 0.2, 1));
+        transition: transform var(--transition-slow) var(--ease-in-out);
     }
 
     .image-hover-zoom:hover img {
@@ -262,7 +262,7 @@
     /* Image overlay fade-in */
     .image-overlay {
         opacity: 0;
-        transition: opacity var(--desktop-transition-normal, 0.25s);
+        transition: opacity var(--transition-base);
     }
 
     .image-hover-overlay:hover .image-overlay {
@@ -275,12 +275,12 @@
        ========================================== */
 
     .avatar {
-        transition: transform var(--desktop-transition-fast, 0.15s) var(--desktop-ease-smooth, cubic-bezier(0.4, 0, 0.2, 1));
+        transition: transform var(--transition-fast) var(--ease-in-out);
     }
 
     .avatar-interactive:hover {
         transform: scale(1.1);
-        box-shadow: 0 0 0 3px rgba(var(--color-primary-rgb, 99, 102, 241), 0.3);
+        box-shadow: 0 0 0 var(--space-1) rgba(var(--color-primary-rgb, 99, 102, 241), 0.3);
     }
 
     /* ==========================================
@@ -290,7 +290,7 @@
 
     [role="tab"] {
         position: relative;
-        transition: color var(--desktop-transition-fast, 0.15s);
+        transition: color var(--transition-fast);
     }
 
     [role="tab"]::after {
@@ -300,9 +300,9 @@
         left: 0;
         right: 0;
         height: 2px;
-        background: var(--color-primary-500, #6366f1);
+        background: var(--color-primary-500);
         transform: scaleX(0);
-        transition: transform var(--desktop-transition-normal, 0.25s) var(--desktop-ease-smooth, cubic-bezier(0.4, 0, 0.2, 1));
+        transition: transform var(--transition-base) var(--ease-in-out);
     }
 
     [role="tab"]:hover::after {
@@ -320,10 +320,10 @@
 
     .tooltip {
         opacity: 0;
-        transform: translateY(-4px);
+        transform: translateY(calc(var(--space-1) * -1));
         transition:
-            opacity var(--desktop-transition-normal, 0.25s),
-            transform var(--desktop-transition-normal, 0.25s);
+            opacity var(--transition-base),
+            transform var(--transition-base);
         pointer-events: none;
     }
 
@@ -340,7 +340,7 @@
        ========================================== */
 
     .accordion-header {
-        transition: background-color var(--desktop-transition-fast, 0.15s);
+        transition: background-color var(--transition-fast);
     }
 
     .accordion-header:hover {
@@ -400,11 +400,11 @@
     /* Reduce lift amounts on tablet */
     .card:hover,
     .glass-card:hover {
-        transform: translateY(-2px);
+        transform: translateY(calc(var(--space-1) / -2));
     }
 
     .news-card:hover {
-        transform: translateY(-4px);
+        transform: translateY(calc(var(--space-1) * -1));
     }
 }
 

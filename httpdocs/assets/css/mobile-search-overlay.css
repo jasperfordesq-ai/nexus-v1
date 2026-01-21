@@ -3,7 +3,8 @@
  * Full-screen search experience like Instagram/TikTok
  * Following compose-multidraw pattern
  *
- * Version: 1.0 - 2026-01-20
+ * Version: 1.1 - 2026-01-21
+ * Migrated to design tokens (spacing, border-radius, font-size, transitions)
  *
  * Mobile: Full-screen, immersive search
  * Desktop: Hidden (uses normal search)
@@ -41,9 +42,9 @@
 .mobile-search-header {
     display: flex;
     align-items: center;
-    gap: 12px;
-    padding: 12px 16px;
-    padding-top: calc(12px + env(safe-area-inset-top, 0px));
+    gap: var(--space-3);
+    padding: var(--space-3) var(--space-4);
+    padding-top: calc(var(--space-3) + env(safe-area-inset-top, 0px));
     background: var(--bg-surface, #fff);
     border-bottom: 1px solid var(--border-default, #e5e7eb);
     flex-shrink: 0;
@@ -56,9 +57,9 @@
 
 /* Back button */
 .mobile-search-back {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
+    width: var(--space-10);
+    height: var(--space-10);
+    border-radius: var(--radius-full);
     background: transparent;
     border: none;
     display: flex;
@@ -68,7 +69,7 @@
     color: var(--text-primary, #111);
     flex-shrink: 0;
     -webkit-tap-highlight-color: transparent;
-    transition: background 0.15s ease;
+    transition: background var(--transition-fast);
 }
 
 .mobile-search-back:active {
@@ -80,8 +81,8 @@
 }
 
 .mobile-search-back svg {
-    width: 24px;
-    height: 24px;
+    width: var(--space-6);
+    height: var(--space-6);
 }
 
 /* Search input container */
@@ -92,11 +93,11 @@
 
 .mobile-search-input {
     width: 100%;
-    padding: 12px 16px 12px 44px;
+    padding: var(--space-3) var(--space-4) 12px 44px;
     background: var(--bg-muted, #f3f4f6);
     border: none;
-    border-radius: 12px;
-    font-size: 16px;
+    border-radius: var(--radius-md);
+    font-size: var(--font-size-base);
     color: var(--text-primary, #111);
     -webkit-appearance: none;
     appearance: none;
@@ -127,8 +128,8 @@
     left: 14px;
     top: 50%;
     transform: translateY(-50%);
-    width: 20px;
-    height: 20px;
+    width: var(--space-5);
+    height: var(--space-5);
     color: var(--text-tertiary, #9ca3af);
     pointer-events: none;
 }
@@ -136,12 +137,12 @@
 /* Clear button */
 .mobile-search-clear {
     position: absolute;
-    right: 8px;
+    right: var(--space-2);
     top: 50%;
     transform: translateY(-50%);
     width: 28px;
     height: 28px;
-    border-radius: 50%;
+    border-radius: var(--radius-full);
     background: var(--bg-muted, #e5e7eb);
     border: none;
     display: none;
@@ -169,9 +170,9 @@
 .mobile-search-cancel {
     background: none;
     border: none;
-    padding: 8px 4px;
-    font-size: 16px;
-    font-weight: 500;
+    padding: var(--space-2) var(--space-1);
+    font-size: var(--font-size-base);
+    font-weight: var(--font-weight-medium);
     color: var(--color-primary-500, #6366f1);
     cursor: pointer;
     flex-shrink: 0;
@@ -187,8 +188,8 @@
    ============================================== */
 .mobile-search-tabs {
     display: flex;
-    gap: 8px;
-    padding: 12px 16px;
+    gap: var(--space-2);
+    padding: var(--space-3) var(--space-4);
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
     scrollbar-width: none;
@@ -205,16 +206,16 @@
 }
 
 .mobile-search-tab {
-    padding: 8px 16px;
+    padding: var(--space-2) var(--space-4);
     background: var(--bg-muted, #f3f4f6);
     border: none;
-    border-radius: 20px;
-    font-size: 14px;
-    font-weight: 500;
+    border-radius: var(--radius-xl);
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-medium);
     color: var(--text-secondary, #666);
     white-space: nowrap;
     cursor: pointer;
-    transition: background 0.15s ease, color 0.15s ease;
+    transition: background var(--transition-fast), color 0.15s ease;
     -webkit-tap-highlight-color: transparent;
 }
 
@@ -249,19 +250,19 @@
 
 /* Recent searches / suggestions */
 .mobile-search-section {
-    padding: 16px;
+    padding: var(--space-4);
 }
 
 .mobile-search-section-header {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    margin-bottom: 12px;
+    margin-bottom: var(--space-3);
 }
 
 .mobile-search-section-title {
-    font-size: 14px;
-    font-weight: 600;
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-semibold);
     color: var(--text-secondary, #666);
     text-transform: uppercase;
     letter-spacing: 0.5px;
@@ -270,7 +271,7 @@
 .mobile-search-section-action {
     background: none;
     border: none;
-    font-size: 14px;
+    font-size: var(--font-size-sm);
     color: var(--color-primary-500, #6366f1);
     cursor: pointer;
 }
@@ -280,11 +281,11 @@
     display: flex;
     align-items: center;
     gap: 14px;
-    padding: 12px 0;
+    padding: var(--space-3) 0;
     border-bottom: 1px solid var(--border-subtle, #f3f4f6);
     cursor: pointer;
     -webkit-tap-highlight-color: transparent;
-    transition: background 0.15s ease;
+    transition: background var(--transition-fast);
 }
 
 .mobile-search-item:last-child {
@@ -293,8 +294,8 @@
 
 .mobile-search-item:active {
     background: rgba(128, 128, 128, 0.05);
-    margin: 0 -16px;
-    padding: 12px 16px;
+    margin: 0 calc(var(--space-4) * -1);
+    padding: var(--space-3) var(--space-4);
 }
 
 [data-theme="dark"] .mobile-search-item {
@@ -305,21 +306,21 @@
 .mobile-search-item-icon {
     width: 44px;
     height: 44px;
-    border-radius: 50%;
+    border-radius: var(--radius-full);
     background: var(--bg-muted, #f3f4f6);
     display: flex;
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
     color: var(--text-tertiary, #9ca3af);
-    font-size: 18px;
+    font-size: var(--font-size-lg);
 }
 
 .mobile-search-item-icon img {
     width: 100%;
     height: 100%;
     object-fit: cover;
-    border-radius: 50%;
+    border-radius: var(--radius-full);
 }
 
 [data-theme="dark"] .mobile-search-item-icon {
@@ -328,7 +329,7 @@
 
 /* Square icon for categories/listings */
 .mobile-search-item-icon.square {
-    border-radius: 10px;
+    border-radius: var(--radius-md);
 }
 
 /* Content */
@@ -338,8 +339,8 @@
 }
 
 .mobile-search-item-title {
-    font-size: 16px;
-    font-weight: 500;
+    font-size: var(--font-size-base);
+    font-weight: var(--font-weight-medium);
     color: var(--text-primary, #111);
     white-space: nowrap;
     overflow: hidden;
@@ -351,9 +352,9 @@
 }
 
 .mobile-search-item-subtitle {
-    font-size: 14px;
+    font-size: var(--font-size-sm);
     color: var(--text-secondary, #666);
-    margin-top: 2px;
+    margin-top: var(--space-1);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -361,9 +362,9 @@
 
 /* Remove button for recent searches */
 .mobile-search-item-remove {
-    width: 32px;
-    height: 32px;
-    border-radius: 50%;
+    width: var(--space-8);
+    height: var(--space-8);
+    border-radius: var(--radius-full);
     background: transparent;
     border: none;
     display: flex;
@@ -385,15 +386,15 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 40px 20px;
+    padding: var(--space-10) var(--space-5);
 }
 
 .mobile-search-spinner {
-    width: 32px;
-    height: 32px;
+    width: var(--space-8);
+    height: var(--space-8);
     border: 3px solid var(--border-default, #e5e7eb);
     border-top-color: var(--color-primary-500, #6366f1);
-    border-radius: 50%;
+    border-radius: var(--radius-full);
     animation: searchSpin 800ms linear infinite;
 }
 
@@ -405,21 +406,21 @@
    EMPTY STATE
    ============================================== */
 .mobile-search-empty {
-    padding: 60px 20px;
+    padding: 60px var(--space-5);
     text-align: center;
 }
 
 .mobile-search-empty-icon {
     font-size: 64px;
-    margin-bottom: 16px;
+    margin-bottom: var(--space-4);
     opacity: 0.4;
 }
 
 .mobile-search-empty-title {
-    font-size: 18px;
-    font-weight: 600;
+    font-size: var(--font-size-lg);
+    font-weight: var(--font-weight-semibold);
     color: var(--text-primary, #111);
-    margin-bottom: 8px;
+    margin-bottom: var(--space-2);
 }
 
 [data-theme="dark"] .mobile-search-empty-title {
@@ -427,7 +428,7 @@
 }
 
 .mobile-search-empty-text {
-    font-size: 15px;
+    font-size: var(--font-size-base);
     color: var(--text-secondary, #666);
     max-width: 280px;
     margin: 0 auto;
@@ -439,19 +440,19 @@
 .mobile-search-tags {
     display: flex;
     flex-wrap: wrap;
-    gap: 8px;
-    padding: 0 16px 16px;
+    gap: var(--space-2);
+    padding: 0 var(--space-4) var(--space-4);
 }
 
 .mobile-search-tag {
     padding: 8px 14px;
     background: var(--bg-muted, #f3f4f6);
     border: none;
-    border-radius: 20px;
-    font-size: 14px;
+    border-radius: var(--radius-xl);
+    font-size: var(--font-size-sm);
     color: var(--text-primary, #111);
     cursor: pointer;
-    transition: background 0.15s ease;
+    transition: background var(--transition-fast);
     -webkit-tap-highlight-color: transparent;
 }
 
@@ -474,8 +475,8 @@
 .mobile-search-highlight {
     background: rgba(99, 102, 241, 0.2);
     color: var(--color-primary-600, #4f46e5);
-    border-radius: 2px;
-    padding: 0 2px;
+    border-radius: var(--radius-sm);
+    padding: 0 var(--space-1);
 }
 
 [data-theme="dark"] .mobile-search-highlight {
@@ -500,7 +501,7 @@
 @keyframes searchItemIn {
     from {
         opacity: 0;
-        transform: translateY(10px);
+        transform: translateY(var(--space-2));
     }
     to {
         opacity: 1;
@@ -525,12 +526,12 @@
     .mobile-search-trigger {
         display: flex;
         align-items: center;
-        gap: 10px;
-        padding: 10px 14px;
+        gap: var(--space-2);
+        padding: var(--space-2) 14px;
         background: var(--bg-muted, #f3f4f6);
         border: none;
-        border-radius: 12px;
-        font-size: 15px;
+        border-radius: var(--radius-md);
+        font-size: var(--font-size-base);
         color: var(--text-tertiary, #9ca3af);
         cursor: pointer;
         width: 100%;
@@ -546,8 +547,8 @@
     }
 
     .mobile-search-trigger-icon {
-        width: 18px;
-        height: 18px;
+        width: var(--space-4);
+        height: var(--space-4);
         flex-shrink: 0;
     }
 

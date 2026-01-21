@@ -5,7 +5,7 @@
 
 /* Button spacing utilities */
 .button-spaced {
-    margin-top: 20px;
+    margin-top: var(--space-5);
 }
 
 /* Full width buttons */
@@ -58,8 +58,8 @@
 
 /* Search wrapper alignment */
 .civicone-search-wrapper {
-    max-width: 1200px;
+    max-width: var(--layout-max-content-width);
     margin: 0 auto;
-    padding-left: var(--space-6, 30px);
-    padding-right: var(--space-6, 30px);
+    padding-left: var(--space-6);
+    padding-right: var(--space-6);
 }

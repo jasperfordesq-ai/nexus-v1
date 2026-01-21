@@ -14,19 +14,19 @@
 .challenges-nav,
 .collections-nav {
     display: flex;
-    gap: 12px;
-    margin-bottom: 30px;
+    gap: var(--space-3);
+    margin-bottom: var(--space-8);
     flex-wrap: wrap;
 }
 
 .nav-pill {
-    padding: 10px 20px;
-    border-radius: 25px;
+    padding: var(--space-2) var(--space-5);
+    border-radius: var(--radius-full);
     background: rgba(255, 255, 255, 0.1);
     color: white;
     text-decoration: none;
     font-weight: 500;
-    transition: all 0.2s;
+    transition: all var(--transition-fast);
 }
 
 .nav-pill:hover,
@@ -39,16 +39,16 @@
 .back-link {
     display: inline-flex;
     align-items: center;
-    gap: 8px;
+    gap: var(--space-2);
     color: white;
     text-decoration: none;
     font-weight: 600;
-    margin-bottom: 20px;
-    padding: 8px 16px;
+    margin-bottom: var(--space-5);
+    padding: var(--space-2) var(--space-4);
     background: rgba(0, 0, 0, 0.2);
-    border-radius: 20px;
+    border-radius: var(--radius-xl);
     backdrop-filter: blur(4px);
-    transition: background 0.2s;
+    transition: background var(--transition-fast);
 }
 
 .back-link:hover {
@@ -58,18 +58,18 @@
 /* Empty State */
 .empty-state {
     text-align: center;
-    padding: 60px 20px;
+    padding: var(--space-16) var(--space-5);
     color: white;
 }
 
 .empty-state-icon {
-    font-size: 64px;
-    margin-bottom: 20px;
+    font-size: var(--space-16);
+    margin-bottom: var(--space-5);
 }
 
 .empty-state h3 {
-    font-size: 24px;
-    margin-bottom: 10px;
+    font-size: var(--font-size-2xl);
+    margin-bottom: var(--space-2);
 }
 
 .empty-state p {
@@ -84,7 +84,7 @@
     margin-top: 120px;
     position: relative;
     z-index: 20;
-    padding: 0 20px 60px;
+    padding: 0 var(--space-5) var(--space-16);
     max-width: 1200px;
     margin-left: auto;
     margin-right: auto;
@@ -93,14 +93,14 @@
 .achievements-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 24px;
+    gap: var(--space-6);
 }
 
 .achievement-card {
     background: rgba(255, 255, 255, 0.95);
     backdrop-filter: blur(20px);
-    border-radius: 20px;
-    padding: 24px;
+    border-radius: var(--radius-xl);
+    padding: var(--space-6);
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
     border: 1px solid rgba(255, 255, 255, 0.3);
 }
@@ -116,9 +116,9 @@
 .achievement-card .card-header {
     display: flex;
     align-items: center;
-    gap: 12px;
-    margin-bottom: 20px;
-    padding-bottom: 12px;
+    gap: var(--space-3);
+    margin-bottom: var(--space-5);
+    padding-bottom: var(--space-3);
     border-bottom: 1px solid rgba(0, 0, 0, 0.06);
 }
 
@@ -137,7 +137,7 @@
 .level-display {
     display: flex;
     align-items: center;
-    gap: 24px;
+    gap: var(--space-6);
 }
 
 .level-circle {
@@ -173,7 +173,7 @@
 }
 
 .level-info h4 {
-    margin: 0 0 8px 0;
+    margin: 0 0 var(--space-2) 0;
     font-size: 0.9rem;
     color: #6b7280;
     font-weight: 500;
@@ -194,18 +194,18 @@
 
 /* Progress Bar */
 .progress-bar-container {
-    height: 12px;
+    height: var(--space-3);
     background: #e5e7eb;
-    border-radius: 6px;
+    border-radius: var(--radius-base);
     overflow: hidden;
-    margin: 12px 0 8px;
+    margin: var(--space-3) 0 var(--space-2);
 }
 
 .progress-bar-fill {
     height: 100%;
     background: linear-gradient(90deg, #a855f7, #6366f1);
-    border-radius: 6px;
-    transition: width 0.5s ease;
+    border-radius: var(--radius-base);
+    transition: width var(--transition-slow);
 }
 
 .progress-text {
@@ -217,19 +217,19 @@
 .streaks-grid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    gap: 16px;
+    gap: var(--space-4);
 }
 
 .streak-item {
     text-align: center;
-    padding: 16px;
+    padding: var(--space-4);
     background: #f9fafb;
-    border-radius: 12px;
+    border-radius: var(--radius-md);
 }
 
 .streak-item .streak-icon {
     font-size: 1.5rem;
-    margin-bottom: 8px;
+    margin-bottom: var(--space-2);
 }
 
 .streak-item .streak-count {
@@ -243,28 +243,28 @@
     font-size: 0.8rem;
     color: #6b7280;
     font-weight: 600;
-    margin-top: 4px;
+    margin-top: var(--space-1);
 }
 
 .streak-item .streak-best {
     font-size: 0.75rem;
     color: #9ca3af;
-    margin-top: 8px;
+    margin-top: var(--space-2);
 }
 
 /* Rankings Grid */
 .rankings-grid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    gap: 12px;
-    margin-bottom: 16px;
+    gap: var(--space-3);
+    margin-bottom: var(--space-4);
 }
 
 .rank-item {
     text-align: center;
-    padding: 12px;
+    padding: var(--space-3);
     background: linear-gradient(135deg, #fef3c7, #fde68a);
-    border-radius: 10px;
+    border-radius: var(--radius-base);
 }
 
 .rank-item .rank-position {
@@ -282,30 +282,30 @@
 .view-all-link {
     display: inline-flex;
     align-items: center;
-    gap: 6px;
+    gap: var(--space-1);
     color: #6366f1;
     font-weight: 600;
     font-size: 0.9rem;
     text-decoration: none;
-    transition: gap 0.2s;
+    transition: gap var(--transition-fast);
 }
 
 .view-all-link:hover {
-    gap: 10px;
+    gap: var(--space-2);
 }
 
 /* Badge Progress List */
 .badge-progress-list {
     display: flex;
     flex-direction: column;
-    gap: 16px;
-    margin-bottom: 16px;
+    gap: var(--space-4);
+    margin-bottom: var(--space-4);
 }
 
 .badge-progress-item {
     display: flex;
     align-items: flex-start;
-    gap: 16px;
+    gap: var(--space-4);
 }
 
 .badge-progress-item .badge-icon {
@@ -320,27 +320,27 @@
 .badge-progress-item .badge-name {
     font-weight: 700;
     color: #1f2937;
-    margin-bottom: 2px;
+    margin-bottom: var(--space-1);
 }
 
 .badge-progress-item .badge-desc {
     font-size: 0.85rem;
     color: #6b7280;
-    margin-bottom: 8px;
+    margin-bottom: var(--space-2);
 }
 
 .progress-mini {
-    height: 6px;
+    height: var(--space-1);
     background: #e5e7eb;
-    border-radius: 3px;
+    border-radius: var(--radius-sm);
     overflow: hidden;
-    margin-bottom: 4px;
+    margin-bottom: var(--space-1);
 }
 
 .progress-mini-fill {
     height: 100%;
     background: linear-gradient(90deg, #a855f7, #6366f1);
-    border-radius: 3px;
+    border-radius: var(--radius-sm);
 }
 
 .badge-progress-item .progress-label {
@@ -352,16 +352,16 @@
 .badges-earned-grid {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
-    gap: 12px;
+    gap: var(--space-3);
 }
 
 .badge-earned {
     text-align: center;
-    padding: 12px 8px;
+    padding: var(--space-3) var(--space-2);
     background: linear-gradient(135deg, rgba(168, 85, 247, 0.1), rgba(139, 92, 246, 0.05));
-    border-radius: 12px;
+    border-radius: var(--radius-md);
     cursor: pointer;
-    transition: all 0.2s;
+    transition: all var(--transition-fast);
     border: 2px solid transparent;
 }
 
@@ -383,7 +383,7 @@
 .badge-earned .badge-icon {
     font-size: 1.75rem;
     display: block;
-    margin-bottom: 6px;
+    margin-bottom: var(--space-1);
 }
 
 .badge-earned .badge-name {
@@ -397,16 +397,16 @@
 .xp-log {
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: var(--space-3);
 }
 
 .xp-log-item {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 12px;
+    padding: var(--space-3);
     background: #f9fafb;
-    border-radius: 10px;
+    border-radius: var(--radius-base);
 }
 
 .xp-log-item .xp-action {
@@ -430,14 +430,14 @@
 .stats-summary {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-    gap: 16px;
+    gap: var(--space-4);
 }
 
 .stat-item {
     text-align: center;
-    padding: 16px;
+    padding: var(--space-4);
     background: linear-gradient(135deg, #f0f9ff, #e0f2fe);
-    border-radius: 12px;
+    border-radius: var(--radius-md);
 }
 
 .stat-item .stat-value {
@@ -451,7 +451,7 @@
     font-size: 0.75rem;
     color: #0284c7;
     font-weight: 600;
-    margin-top: 6px;
+    margin-top: var(--space-1);
 }
 
 /* ============================================
@@ -471,7 +471,7 @@
     justify-content: center;
     opacity: 0;
     visibility: hidden;
-    transition: opacity 0.3s ease, visibility 0.3s ease;
+    transition: opacity var(--transition-base), visibility var(--transition-base);
 }
 
 .badge-modal-overlay.visible {
@@ -481,14 +481,14 @@
 
 .badge-modal-content {
     background: white;
-    border-radius: 24px;
+    border-radius: var(--radius-2xl);
     max-width: 400px;
     width: 90%;
     max-height: 80vh;
     overflow-y: auto;
     box-shadow: 0 24px 48px rgba(0, 0, 0, 0.2);
     transform: scale(0.9);
-    transition: transform 0.3s ease;
+    transition: transform var(--transition-base);
 }
 
 .badge-modal-overlay.visible .badge-modal-content {
@@ -501,19 +501,19 @@
 
 .badge-modal-header {
     position: relative;
-    padding: 32px 24px 24px;
+    padding: var(--space-8) var(--space-6) var(--space-6);
     text-align: center;
     background: linear-gradient(135deg, #a855f7 0%, #6366f1 100%);
     color: white;
-    border-radius: 24px 24px 0 0;
+    border-radius: var(--radius-2xl) var(--radius-2xl) 0 0;
 }
 
 .badge-modal-close {
     position: absolute;
-    top: 12px;
-    right: 12px;
-    width: 32px;
-    height: 32px;
+    top: var(--space-3);
+    right: var(--space-3);
+    width: var(--space-8);
+    height: var(--space-8);
     border-radius: 50%;
     background: rgba(255, 255, 255, 0.2);
     border: none;
@@ -523,7 +523,7 @@
     align-items: center;
     justify-content: center;
     font-size: 1rem;
-    transition: background 0.2s;
+    transition: background var(--transition-fast);
 }
 
 .badge-modal-close:hover {
@@ -540,22 +540,22 @@
 }
 
 .badge-modal-icon {
-    font-size: 4rem;
-    margin-bottom: 12px;
+    font-size: var(--font-size-4xl);
+    margin-bottom: var(--space-3);
 }
 
 .badge-modal-name {
     font-size: 1.5rem;
     font-weight: 800;
-    margin: 0 0 12px 0;
+    margin: 0 0 var(--space-3) 0;
 }
 
 .badge-rarity-tag {
     display: inline-flex;
     align-items: center;
-    gap: 6px;
-    padding: 6px 14px;
-    border-radius: 20px;
+    gap: var(--space-1);
+    padding: var(--space-1) var(--space-4);
+    border-radius: var(--radius-xl);
     font-size: 0.8rem;
     font-weight: 600;
     background: rgba(255, 255, 255, 0.2);
@@ -587,11 +587,11 @@
 }
 
 .badge-modal-body {
-    padding: 24px;
+    padding: var(--space-6);
 }
 
 .badge-modal-section {
-    margin-bottom: 20px;
+    margin-bottom: var(--space-5);
 }
 
 .badge-modal-section:last-child {
@@ -604,10 +604,10 @@
     color: #6b7280;
     text-transform: uppercase;
     letter-spacing: 0.5px;
-    margin-bottom: 6px;
+    margin-bottom: var(--space-1);
     display: flex;
     align-items: center;
-    gap: 6px;
+    gap: var(--space-1);
 }
 
 .badge-modal-label i {
@@ -625,17 +625,17 @@
 }
 
 .badge-rarity-bar {
-    height: 8px;
+    height: var(--space-2);
     background: #e5e7eb;
-    border-radius: 4px;
+    border-radius: var(--radius-sm);
     overflow: hidden;
-    margin-top: 8px;
+    margin-top: var(--space-2);
 }
 
 .badge-rarity-fill {
     height: 100%;
-    border-radius: 4px;
-    transition: width 0.5s ease;
+    border-radius: var(--radius-sm);
+    transition: width var(--transition-slow);
 }
 
 .badge-rarity-fill.legendary {
@@ -667,7 +667,7 @@
     .badge-modal-content {
         width: 100%;
         max-width: 100%;
-        border-radius: 24px 24px 0 0;
+        border-radius: var(--radius-2xl) var(--radius-2xl) 0 0;
         max-height: 85vh;
         transform: translateY(100%);
     }
@@ -685,12 +685,12 @@
         width: 40px;
         height: 4px;
         background: rgba(255, 255, 255, 0.3);
-        border-radius: 2px;
-        margin: 12px auto 0;
+        border-radius: var(--radius-sm);
+        margin: var(--space-3) auto 0;
     }
 
     .badge-modal-header {
-        padding-top: 20px;
+        padding-top: var(--space-5);
     }
 }
 
@@ -702,7 +702,7 @@
     margin-top: 120px;
     position: relative;
     z-index: 20;
-    padding: 0 20px 60px;
+    padding: 0 var(--space-5) var(--space-16);
     max-width: 1200px;
     margin-left: auto;
     margin-right: auto;
@@ -711,32 +711,32 @@
 .badges-progress-bar {
     background: rgba(255, 255, 255, 0.95);
     backdrop-filter: blur(20px);
-    border-radius: 16px;
-    padding: 24px;
-    margin-bottom: 32px;
+    border-radius: var(--radius-lg);
+    padding: var(--space-6);
+    margin-bottom: var(--space-8);
     border: 1px solid rgba(255, 255, 255, 0.3);
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
 }
 
 .badges-progress-bar h2 {
-    margin: 0 0 12px 0;
+    margin: 0 0 var(--space-3) 0;
     font-size: 1.3rem;
     color: #1f2937;
 }
 
 .progress-outer {
     background: #e5e7eb;
-    border-radius: 12px;
-    height: 24px;
+    border-radius: var(--radius-md);
+    height: var(--space-6);
     overflow: hidden;
-    margin-bottom: 8px;
+    margin-bottom: var(--space-2);
 }
 
 .progress-inner {
     height: 100%;
     background: linear-gradient(90deg, #a855f7, #6366f1);
-    border-radius: 12px;
-    transition: width 0.5s ease;
+    border-radius: var(--radius-md);
+    transition: width var(--transition-slow);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -749,29 +749,29 @@
 .showcase-section {
     background: linear-gradient(135deg, rgba(245, 158, 11, 0.15), rgba(217, 119, 6, 0.1));
     border: 2px solid rgba(245, 158, 11, 0.3);
-    border-radius: 16px;
-    padding: 24px;
-    margin-bottom: 32px;
+    border-radius: var(--radius-lg);
+    padding: var(--space-6);
+    margin-bottom: var(--space-8);
 }
 
 .showcase-section h2 {
-    margin: 0 0 8px 0;
+    margin: 0 0 var(--space-2) 0;
     font-size: 1.2rem;
     color: #92400e;
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: var(--space-2);
 }
 
 .showcase-section p {
-    margin: 0 0 16px 0;
+    margin: 0 0 var(--space-4) 0;
     font-size: 0.9rem;
     color: #78350f;
 }
 
 .showcase-badges {
     display: flex;
-    gap: 16px;
+    gap: var(--space-4);
     flex-wrap: wrap;
 }
 
@@ -779,7 +779,7 @@
     width: 100px;
     height: 100px;
     border: 2px dashed rgba(245, 158, 11, 0.4);
-    border-radius: 12px;
+    border-radius: var(--radius-md);
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -800,7 +800,7 @@
     font-size: 0.7rem;
     color: #78350f;
     text-align: center;
-    margin-top: 4px;
+    margin-top: var(--space-1);
 }
 
 .showcase-badge-slot.empty {
@@ -812,22 +812,22 @@
 .badge-category {
     background: rgba(255, 255, 255, 0.95);
     backdrop-filter: blur(20px);
-    border-radius: 16px;
-    padding: 24px;
-    margin-bottom: 24px;
+    border-radius: var(--radius-lg);
+    padding: var(--space-6);
+    margin-bottom: var(--space-6);
     border: 1px solid rgba(255, 255, 255, 0.3);
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
 }
 
 .badge-category h3 {
-    margin: 0 0 20px 0;
+    margin: 0 0 var(--space-5) 0;
     font-size: 1.2rem;
     font-weight: 700;
     color: #374151;
     display: flex;
     align-items: center;
-    gap: 10px;
-    padding-bottom: 12px;
+    gap: var(--space-2);
+    padding-bottom: var(--space-3);
     border-bottom: 1px solid rgba(0, 0, 0, 0.08);
 }
 
@@ -835,22 +835,22 @@
     background: rgba(99, 102, 241, 0.1);
     color: #6366f1;
     font-size: 0.8rem;
-    padding: 4px 10px;
-    border-radius: 20px;
+    padding: var(--space-1) var(--space-2);
+    border-radius: var(--radius-xl);
     font-weight: 600;
 }
 
 .badges-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-    gap: 16px;
+    gap: var(--space-4);
 }
 
 .badge-item {
-    padding: 16px;
-    border-radius: 12px;
+    padding: var(--space-4);
+    border-radius: var(--radius-md);
     text-align: center;
-    transition: all 0.3s ease;
+    transition: all var(--transition-base);
     position: relative;
     cursor: default;
 }
@@ -890,7 +890,7 @@
     font-weight: 700;
     color: #1f2937;
     font-size: 0.95rem;
-    margin-bottom: 6px;
+    margin-bottom: var(--space-1);
 }
 
 .badge-item.locked .badge-name {
@@ -907,9 +907,9 @@
     display: inline-block;
     font-size: 0.65rem;
     padding: 2px 8px;
-    border-radius: 10px;
+    border-radius: var(--radius-base);
     font-weight: 600;
-    margin-top: 8px;
+    margin-top: var(--space-2);
 }
 
 .rarity-legendary {
@@ -940,17 +940,17 @@
 .badge-item .badge-threshold {
     font-size: 0.75rem;
     color: #9ca3af;
-    margin-top: 8px;
+    margin-top: var(--space-2);
 }
 
 .badge-item .earned-check {
     position: absolute;
-    top: 10px;
-    right: 10px;
+    top: var(--space-2);
+    right: var(--space-2);
     background: #10b981;
     color: white;
-    width: 24px;
-    height: 24px;
+    width: var(--space-6);
+    height: var(--space-6);
     border-radius: 50%;
     display: flex;
     align-items: center;
@@ -961,22 +961,22 @@
 
 .badge-item .showcase-star {
     position: absolute;
-    top: 10px;
-    left: 10px;
+    top: var(--space-2);
+    left: var(--space-2);
     color: #f59e0b;
     font-size: 1.2rem;
 }
 
 .badge-item .pin-btn {
-    margin-top: 10px;
+    margin-top: var(--space-2);
     font-size: 0.75rem;
-    padding: 4px 10px;
+    padding: var(--space-1) var(--space-2);
     border: 1px solid rgba(168, 85, 247, 0.4);
     background: white;
     color: #7c3aed;
-    border-radius: 12px;
+    border-radius: var(--radius-md);
     cursor: pointer;
-    transition: all 0.2s;
+    transition: all var(--transition-fast);
 }
 
 .badge-item .pin-btn:hover {
@@ -994,12 +994,12 @@
 .success-toast {
     background: #dcfce7;
     color: #166534;
-    padding: 12px 20px;
-    border-radius: 10px;
-    margin-bottom: 20px;
+    padding: var(--space-3) var(--space-5);
+    border-radius: var(--radius-base);
+    margin-bottom: var(--space-5);
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: var(--space-2);
     border: 1px solid #bbf7d0;
 }
 
@@ -1017,8 +1017,8 @@
 
 .confetti {
     position: absolute;
-    width: 10px;
-    height: 10px;
+    width: var(--space-2);
+    height: var(--space-2);
     opacity: 0;
     animation: confetti-fall 3s ease-out forwards;
 }
@@ -1040,7 +1040,7 @@
 
 .challenges-wrapper {
     margin-top: 120px;
-    padding: 0 20px 60px;
+    padding: 0 var(--space-5) var(--space-16);
     max-width: 1200px;
     margin-left: auto;
     margin-right: auto;
@@ -1049,16 +1049,16 @@
 .challenges-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
-    gap: 24px;
+    gap: var(--space-6);
 }
 
 .challenge-card {
     background: rgba(255, 255, 255, 0.95);
     backdrop-filter: blur(20px);
-    border-radius: 20px;
-    padding: 24px;
+    border-radius: var(--radius-xl);
+    padding: var(--space-6);
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-    transition: transform 0.3s;
+    transition: transform var(--transition-base);
 }
 
 .challenge-card:hover {
@@ -1074,13 +1074,13 @@
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
-    margin-bottom: 16px;
+    margin-bottom: var(--space-4);
 }
 
 .challenge-type {
-    padding: 4px 12px;
-    border-radius: 20px;
-    font-size: 12px;
+    padding: var(--space-1) var(--space-3);
+    border-radius: var(--radius-xl);
+    font-size: var(--font-size-xs);
     font-weight: 600;
     text-transform: uppercase;
 }
@@ -1106,43 +1106,43 @@
 }
 
 .challenge-time {
-    font-size: 12px;
+    font-size: var(--font-size-xs);
     color: #6b7280;
     display: flex;
     align-items: center;
-    gap: 4px;
+    gap: var(--space-1);
 }
 
 .challenge-title {
-    font-size: 18px;
+    font-size: var(--font-size-lg);
     font-weight: 700;
     color: #1e1e2e;
-    margin-bottom: 8px;
+    margin-bottom: var(--space-2);
 }
 
 .challenge-desc {
     color: #6b7280;
-    font-size: 14px;
-    margin-bottom: 20px;
+    font-size: var(--font-size-sm);
+    margin-bottom: var(--space-5);
 }
 
 .challenge-progress {
-    margin-bottom: 16px;
+    margin-bottom: var(--space-4);
 }
 
 .challenge-progress .progress-bar {
-    height: 10px;
+    height: var(--space-2);
     background: #e5e7eb;
-    border-radius: 10px;
+    border-radius: var(--radius-base);
     overflow: hidden;
-    margin-bottom: 8px;
+    margin-bottom: var(--space-2);
 }
 
 .challenge-progress .progress-fill {
     height: 100%;
     background: linear-gradient(90deg, #4f46e5, #7c3aed);
-    border-radius: 10px;
-    transition: width 0.5s ease;
+    border-radius: var(--radius-base);
+    transition: width var(--transition-slow);
 }
 
 .challenge-card.completed .progress-fill {
@@ -1152,7 +1152,7 @@
 .challenge-progress .progress-text {
     display: flex;
     justify-content: space-between;
-    font-size: 13px;
+    font-size: var(--font-size-sm);
     color: #6b7280;
 }
 
@@ -1160,23 +1160,23 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding-top: 16px;
+    padding-top: var(--space-4);
     border-top: 1px solid #e5e7eb;
 }
 
 .reward-xp {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: var(--space-2);
     font-weight: 700;
     color: #10b981;
-    font-size: 18px;
+    font-size: var(--font-size-lg);
 }
 
 .completed-badge {
     display: flex;
     align-items: center;
-    gap: 6px;
+    gap: var(--space-1);
     color: #10b981;
     font-weight: 600;
 }
@@ -1187,7 +1187,7 @@
 
 .collections-wrapper {
     margin-top: 120px;
-    padding: 0 20px 60px;
+    padding: 0 var(--space-5) var(--space-16);
     max-width: 1200px;
     margin-left: auto;
     margin-right: auto;
@@ -1196,14 +1196,14 @@
 .collections-grid {
     display: flex;
     flex-direction: column;
-    gap: 24px;
+    gap: var(--space-6);
 }
 
 .collection-card {
     background: rgba(255, 255, 255, 0.95);
     backdrop-filter: blur(20px);
-    border-radius: 20px;
-    padding: 28px;
+    border-radius: var(--radius-xl);
+    padding: var(--space-8);
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
 }
 
@@ -1216,24 +1216,24 @@
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
-    margin-bottom: 20px;
+    margin-bottom: var(--space-5);
 }
 
 .collection-info {
     display: flex;
     align-items: center;
-    gap: 16px;
+    gap: var(--space-4);
 }
 
 .collection-icon {
-    width: 60px;
-    height: 60px;
+    width: var(--space-16);
+    height: var(--space-16);
     background: linear-gradient(135deg, #4f46e5, #7c3aed);
-    border-radius: 16px;
+    border-radius: var(--radius-lg);
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 28px;
+    font-size: var(--font-size-3xl);
 }
 
 .collection-card.completed .collection-icon {
@@ -1241,15 +1241,15 @@
 }
 
 .collection-title {
-    font-size: 20px;
+    font-size: var(--font-size-xl);
     font-weight: 700;
     color: #1e1e2e;
-    margin-bottom: 4px;
+    margin-bottom: var(--space-1);
 }
 
 .collection-desc {
     color: #6b7280;
-    font-size: 14px;
+    font-size: var(--font-size-sm);
 }
 
 .collection-stats {
@@ -1257,7 +1257,7 @@
 }
 
 .collection-progress-text {
-    font-size: 24px;
+    font-size: var(--font-size-2xl);
     font-weight: 700;
     color: #4f46e5;
 }
@@ -1267,17 +1267,17 @@
 }
 
 .collection-reward {
-    font-size: 13px;
+    font-size: var(--font-size-sm);
     color: #6b7280;
-    margin-top: 4px;
+    margin-top: var(--space-1);
 }
 
 .collection-badges {
     display: flex;
     flex-wrap: wrap;
-    gap: 12px;
-    margin-top: 20px;
-    padding-top: 20px;
+    gap: var(--space-3);
+    margin-top: var(--space-5);
+    padding-top: var(--space-5);
     border-top: 1px solid #e5e7eb;
 }
 
@@ -1290,18 +1290,18 @@
 }
 
 .collection-badges .badge-icon {
-    width: 50px;
-    height: 50px;
+    width: var(--space-12);
+    height: var(--space-12);
     background: #f3f4f6;
-    border-radius: 12px;
+    border-radius: var(--radius-md);
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 24px;
-    margin: 0 auto 6px;
+    font-size: var(--font-size-2xl);
+    margin: 0 auto var(--space-1);
     opacity: 0.4;
     filter: grayscale(1);
-    transition: all 0.2s;
+    transition: all var(--transition-fast);
 }
 
 .collection-badges .badge-item.earned .badge-icon {
@@ -1312,7 +1312,7 @@
 }
 
 .collection-badges .badge-name {
-    font-size: 11px;
+    font-size: var(--font-size-xs);
     color: #6b7280;
     line-height: 1.2;
 }
@@ -1323,18 +1323,18 @@
 }
 
 .collection-card .progress-bar {
-    height: 8px;
+    height: var(--space-2);
     background: #e5e7eb;
-    border-radius: 8px;
+    border-radius: var(--radius-base);
     overflow: hidden;
-    margin-top: 16px;
+    margin-top: var(--space-4);
 }
 
 .collection-card .progress-fill {
     height: 100%;
     background: linear-gradient(90deg, #4f46e5, #7c3aed);
-    border-radius: 8px;
-    transition: width 0.5s ease;
+    border-radius: var(--radius-base);
+    transition: width var(--transition-slow);
 }
 
 .collection-card.completed .progress-fill {
@@ -1347,7 +1347,7 @@
 
 .seasons-wrapper {
     margin-top: 120px;
-    padding: 0 20px 60px;
+    padding: 0 var(--space-5) var(--space-16);
     max-width: 1200px;
     margin-left: auto;
     margin-right: auto;
@@ -1355,9 +1355,9 @@
 
 .season-header {
     background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.9));
-    border-radius: 24px;
-    padding: 32px;
-    margin-bottom: 24px;
+    border-radius: var(--radius-2xl);
+    padding: var(--space-8);
+    margin-bottom: var(--space-6);
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
 }
 
@@ -1365,25 +1365,25 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 24px;
+    margin-bottom: var(--space-6);
 }
 
 .season-name {
-    font-size: 28px;
+    font-size: var(--font-size-3xl);
     font-weight: 800;
     color: #1e1e2e;
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: var(--space-3);
 }
 
 .season-badge {
     display: inline-flex;
     align-items: center;
-    gap: 6px;
-    padding: 6px 14px;
-    border-radius: 20px;
-    font-size: 13px;
+    gap: var(--space-1);
+    padding: var(--space-1) var(--space-4);
+    border-radius: var(--radius-xl);
+    font-size: var(--font-size-sm);
     font-weight: 600;
 }
 
@@ -1412,19 +1412,19 @@
 }
 
 .time-remaining-label {
-    font-size: 13px;
+    font-size: var(--font-size-sm);
     color: #6b7280;
-    margin-bottom: 4px;
+    margin-bottom: var(--space-1);
 }
 
 .time-remaining-value {
-    font-size: 32px;
+    font-size: var(--space-8);
     font-weight: 800;
     color: #4f46e5;
 }
 
 .time-remaining-unit {
-    font-size: 16px;
+    font-size: var(--font-size-base);
     color: #6b7280;
     font-weight: 500;
 }
@@ -1432,74 +1432,74 @@
 .user-rank-card {
     display: flex;
     align-items: center;
-    gap: 24px;
+    gap: var(--space-6);
     background: linear-gradient(135deg, #4f46e5, #7c3aed);
-    border-radius: 16px;
-    padding: 20px 28px;
+    border-radius: var(--radius-lg);
+    padding: var(--space-5) var(--space-8);
     color: white;
 }
 
 .user-rank-position {
-    font-size: 48px;
+    font-size: var(--space-12);
     font-weight: 900;
     line-height: 1;
 }
 
 .user-rank-position sup {
-    font-size: 20px;
+    font-size: var(--font-size-xl);
     font-weight: 600;
 }
 
 .user-rank-info h4 {
-    font-size: 14px;
+    font-size: var(--font-size-sm);
     font-weight: 500;
     opacity: 0.9;
-    margin-bottom: 4px;
+    margin-bottom: var(--space-1);
 }
 
 .user-rank-xp {
-    font-size: 24px;
+    font-size: var(--font-size-2xl);
     font-weight: 700;
 }
 
 .content-grid {
     display: grid;
     grid-template-columns: 1fr 350px;
-    gap: 24px;
+    gap: var(--space-6);
 }
 
 /* Leaderboard Card */
 .leaderboard-card {
     background: rgba(255, 255, 255, 0.95);
-    border-radius: 20px;
-    padding: 24px;
+    border-radius: var(--radius-xl);
+    padding: var(--space-6);
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
 }
 
 .leaderboard-card h3 {
-    font-size: 18px;
+    font-size: var(--font-size-lg);
     font-weight: 700;
     color: #1e1e2e;
-    margin-bottom: 20px;
+    margin-bottom: var(--space-5);
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: var(--space-2);
 }
 
 .leaderboard-list {
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: var(--space-3);
 }
 
 .leaderboard-item {
     display: flex;
     align-items: center;
-    gap: 16px;
-    padding: 12px 16px;
-    border-radius: 12px;
+    gap: var(--space-4);
+    padding: var(--space-3) var(--space-4);
+    border-radius: var(--radius-md);
     background: #f9fafb;
-    transition: all 0.2s;
+    transition: all var(--transition-fast);
 }
 
 .leaderboard-item:hover {
@@ -1516,14 +1516,14 @@
 }
 
 .rank-badge {
-    width: 36px;
-    height: 36px;
+    width: var(--space-8);
+    height: var(--space-8);
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
     font-weight: 700;
-    font-size: 14px;
+    font-size: var(--font-size-sm);
     background: #e5e7eb;
     color: #6b7280;
 }
@@ -1544,8 +1544,8 @@
 }
 
 .user-avatar {
-    width: 40px;
-    height: 40px;
+    width: var(--space-10);
+    height: var(--space-10);
     border-radius: 50%;
     object-fit: cover;
     background: #e5e7eb;
@@ -1561,7 +1561,7 @@
 }
 
 .user-level {
-    font-size: 12px;
+    font-size: var(--font-size-xs);
     color: #6b7280;
 }
 
@@ -1573,28 +1573,28 @@
 /* Rewards Card */
 .rewards-card {
     background: rgba(255, 255, 255, 0.95);
-    border-radius: 20px;
-    padding: 24px;
+    border-radius: var(--radius-xl);
+    padding: var(--space-6);
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
 }
 
 .rewards-card h3 {
-    font-size: 18px;
+    font-size: var(--font-size-lg);
     font-weight: 700;
     color: #1e1e2e;
-    margin-bottom: 20px;
+    margin-bottom: var(--space-5);
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: var(--space-2);
 }
 
 .reward-tier {
     display: flex;
     align-items: center;
-    gap: 12px;
-    padding: 14px;
-    border-radius: 12px;
-    margin-bottom: 10px;
+    gap: var(--space-3);
+    padding: var(--space-4);
+    border-radius: var(--radius-md);
+    margin-bottom: var(--space-2);
     background: #f9fafb;
 }
 
@@ -1611,13 +1611,13 @@
 }
 
 .tier-icon {
-    width: 40px;
-    height: 40px;
+    width: var(--space-10);
+    height: var(--space-10);
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 20px;
+    font-size: var(--font-size-xl);
 }
 
 .tier-details {
@@ -1627,47 +1627,47 @@
 .tier-name {
     font-weight: 700;
     color: #1e1e2e;
-    font-size: 14px;
+    font-size: var(--font-size-sm);
 }
 
 .tier-reward {
-    font-size: 12px;
+    font-size: var(--font-size-xs);
     color: #6b7280;
 }
 
 /* Past Seasons */
 .past-seasons {
-    margin-top: 32px;
+    margin-top: var(--space-8);
 }
 
 .past-seasons h3 {
     color: white;
-    font-size: 20px;
+    font-size: var(--font-size-xl);
     font-weight: 700;
-    margin-bottom: 16px;
+    margin-bottom: var(--space-4);
 }
 
 .past-seasons-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-    gap: 16px;
+    gap: var(--space-4);
 }
 
 .past-season-card {
     background: rgba(255, 255, 255, 0.95);
-    border-radius: 16px;
-    padding: 20px;
+    border-radius: var(--radius-lg);
+    padding: var(--space-5);
     box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
 }
 
 .past-season-name {
     font-weight: 700;
     color: #1e1e2e;
-    margin-bottom: 8px;
+    margin-bottom: var(--space-2);
 }
 
 .past-season-dates {
-    font-size: 12px;
+    font-size: var(--font-size-xs);
     color: #6b7280;
     margin-bottom: 12px;
 }
@@ -1675,10 +1675,10 @@
 .past-season-status {
     display: inline-flex;
     align-items: center;
-    gap: 6px;
-    padding: 4px 10px;
-    border-radius: 12px;
-    font-size: 12px;
+    gap: var(--space-1);
+    padding: var(--space-1) var(--space-2);
+    border-radius: var(--radius-md);
+    font-size: var(--font-size-xs);
     font-weight: 500;
 }
 
@@ -1698,7 +1698,7 @@
 
 .shop-wrapper {
     margin-top: 120px;
-    padding: 0 20px 60px;
+    padding: 0 var(--space-5) var(--space-16);
     max-width: 1200px;
     margin-left: auto;
     margin-right: auto;
@@ -1706,21 +1706,21 @@
 
 .xp-balance-card {
     background: linear-gradient(135deg, #4f46e5, #7c3aed);
-    border-radius: 20px;
-    padding: 24px 32px;
+    border-radius: var(--radius-xl);
+    padding: var(--space-6) var(--space-8);
     color: white;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 30px;
+    margin-bottom: var(--space-8);
     box-shadow: 0 8px 32px rgba(79, 70, 229, 0.3);
 }
 
 .xp-balance-info h3 {
-    font-size: 14px;
+    font-size: var(--font-size-sm);
     font-weight: 500;
     opacity: 0.9;
-    margin-bottom: 4px;
+    margin-bottom: var(--space-1);
 }
 
 .xp-balance-amount {
@@ -1729,26 +1729,26 @@
 }
 
 .xp-balance-icon {
-    font-size: 48px;
+    font-size: var(--space-12);
     opacity: 0.8;
 }
 
 .shop-categories {
     display: flex;
-    gap: 12px;
-    margin-bottom: 24px;
+    gap: var(--space-3);
+    margin-bottom: var(--space-6);
     flex-wrap: wrap;
 }
 
 .category-btn {
-    padding: 8px 16px;
-    border-radius: 20px;
+    padding: var(--space-2) var(--space-4);
+    border-radius: var(--radius-xl);
     background: rgba(255, 255, 255, 0.95);
     color: #6b7280;
     border: none;
     cursor: pointer;
     font-weight: 500;
-    transition: all 0.2s;
+    transition: all var(--transition-fast);
 }
 
 .category-btn:hover,
@@ -1760,16 +1760,16 @@
 .shop-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    gap: 20px;
+    gap: var(--space-5);
 }
 
 .shop-item {
     background: rgba(255, 255, 255, 0.95);
     backdrop-filter: blur(20px);
-    border-radius: 20px;
-    padding: 24px;
+    border-radius: var(--radius-xl);
+    padding: var(--space-6);
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-    transition: transform 0.2s, box-shadow 0.2s;
+    transition: transform var(--transition-fast), box-shadow var(--transition-fast);
     position: relative;
     overflow: hidden;
 }
@@ -1789,11 +1789,11 @@
 
 .item-badge {
     position: absolute;
-    top: 12px;
-    right: 12px;
-    padding: 4px 10px;
-    border-radius: 12px;
-    font-size: 11px;
+    top: var(--space-3);
+    right: var(--space-3);
+    padding: var(--space-1) var(--space-2);
+    border-radius: var(--radius-md);
+    font-size: var(--font-size-xs);
     font-weight: 600;
     text-transform: uppercase;
 }
@@ -1814,15 +1814,15 @@
 }
 
 .item-icon {
-    width: 64px;
-    height: 64px;
+    width: var(--space-16);
+    height: var(--space-16);
     background: linear-gradient(135deg, #f3f4f6, #e5e7eb);
-    border-radius: 16px;
+    border-radius: var(--radius-lg);
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 32px;
-    margin-bottom: 16px;
+    font-size: var(--space-8);
+    margin-bottom: var(--space-4);
 }
 
 .shop-item.owned .item-icon {
@@ -1830,32 +1830,32 @@
 }
 
 .item-name {
-    font-size: 18px;
+    font-size: var(--font-size-lg);
     font-weight: 700;
     color: #1e1e2e;
-    margin-bottom: 8px;
+    margin-bottom: var(--space-2);
 }
 
 .item-description {
-    font-size: 14px;
+    font-size: var(--font-size-sm);
     color: #6b7280;
     line-height: 1.5;
-    margin-bottom: 16px;
+    margin-bottom: var(--space-4);
 }
 
 .item-footer {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding-top: 16px;
+    padding-top: var(--space-4);
     border-top: 1px solid #e5e7eb;
 }
 
 .item-price {
     display: flex;
     align-items: center;
-    gap: 6px;
-    font-size: 18px;
+    gap: var(--space-1);
+    font-size: var(--font-size-lg);
     font-weight: 700;
     color: #4f46e5;
 }
@@ -1865,15 +1865,15 @@
 }
 
 .buy-btn {
-    padding: 10px 20px;
-    border-radius: 12px;
+    padding: var(--space-2) var(--space-5);
+    border-radius: var(--radius-md);
     background: linear-gradient(135deg, #4f46e5, #7c3aed);
     color: white;
     border: none;
     cursor: pointer;
     font-weight: 600;
-    font-size: 14px;
-    transition: all 0.2s;
+    font-size: var(--font-size-sm);
+    transition: all var(--transition-fast);
 }
 
 .buy-btn:hover:not(:disabled) {
@@ -1910,43 +1910,43 @@
 
 .purchase-modal .modal-content {
     background: white;
-    border-radius: 20px;
-    padding: 32px;
+    border-radius: var(--radius-xl);
+    padding: var(--space-8);
     max-width: 400px;
     width: 90%;
     text-align: center;
 }
 
 .purchase-modal .modal-icon {
-    font-size: 64px;
-    margin-bottom: 16px;
+    font-size: var(--space-16);
+    margin-bottom: var(--space-4);
 }
 
 .purchase-modal .modal-title {
-    font-size: 24px;
+    font-size: var(--font-size-2xl);
     font-weight: 700;
     color: #1e1e2e;
-    margin-bottom: 8px;
+    margin-bottom: var(--space-2);
 }
 
 .purchase-modal .modal-message {
     color: #6b7280;
-    margin-bottom: 24px;
+    margin-bottom: var(--space-6);
 }
 
 .purchase-modal .modal-buttons {
     display: flex;
-    gap: 12px;
+    gap: var(--space-3);
     justify-content: center;
 }
 
 .purchase-modal .modal-btn {
     padding: 12px 24px;
-    border-radius: 12px;
+    border-radius: var(--radius-md);
     font-weight: 600;
     cursor: pointer;
     border: none;
-    transition: all 0.2s;
+    transition: all var(--transition-fast);
 }
 
 .purchase-modal .modal-btn.cancel {
@@ -2091,7 +2091,7 @@
 
     .season-title-row {
         flex-direction: column;
-        gap: 20px;
+        gap: var(--space-5);
         text-align: center;
     }
 
@@ -2112,7 +2112,7 @@
     .collections-wrapper,
     .seasons-wrapper,
     .shop-wrapper {
-        padding: 0 15px 60px;
+        padding: 0 var(--space-4) var(--space-16);
         margin-top: 100px;
     }
 
@@ -2143,7 +2143,7 @@
 
     .collection-header {
         flex-direction: column;
-        gap: 16px;
+        gap: var(--space-4);
     }
 
     .collection-stats {
@@ -2153,7 +2153,7 @@
     .xp-balance-card {
         flex-direction: column;
         text-align: center;
-        gap: 16px;
+        gap: var(--space-4);
     }
 
     .shop-grid {

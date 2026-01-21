@@ -13,15 +13,15 @@
 .civicone--govuk .civicone-listings-list {
     list-style: none;
     padding: 0;
-    margin: 20px 0 0 0;
+    margin: var(--space-5) 0 0 0;
 }
 
 .civicone--govuk .civicone-listing-item {
-    padding: 20px;
-    margin-bottom: 20px;
+    padding: var(--space-5);
+    margin-bottom: var(--space-5);
     background: var(--civic-bg-card, #ffffff);
     border: 1px solid var(--civic-border, #e5e7eb);
-    border-radius: 8px;
+    border-radius: var(--radius-base);
     transition: box-shadow 0.2s ease, border-color 0.2s ease;
 }
 
@@ -45,18 +45,18 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 12px;
+    margin-bottom: var(--space-3);
     flex-wrap: wrap;
-    gap: 8px;
+    gap: var(--space-2);
 }
 
 .civicone--govuk .civicone-listing-item__type {
     display: inline-block;
-    padding: 4px 12px;
-    font-size: 0.75rem;
+    padding: var(--space-1) var(--space-3);
+    font-size: var(--font-size-xs);
     font-weight: 700;
     text-transform: uppercase;
-    border-radius: 4px;
+    border-radius: var(--radius-sm);
     letter-spacing: 0.5px;
 }
 
@@ -81,7 +81,7 @@
 }
 
 .civicone--govuk .civicone-listing-item__posted {
-    font-size: 0.875rem;
+    font-size: var(--font-size-sm);
     color: var(--civic-text-muted, #6b7280);
 }
 
@@ -91,8 +91,8 @@
 
 /* Title */
 .civicone--govuk .civicone-listing-item__title {
-    margin: 0 0 12px 0;
-    font-size: 1.25rem;
+    margin: 0 0 var(--space-3) 0;
+    font-size: var(--font-size-xl);
     font-weight: 600;
     line-height: 1.4;
 }
@@ -127,8 +127,8 @@
 
 /* Description */
 .civicone--govuk .civicone-listing-item__description {
-    margin: 0 0 15px 0;
-    font-size: 1rem;
+    margin: 0 0 var(--space-4) 0;
+    font-size: var(--font-size-base);
     line-height: 1.6;
     color: var(--civic-text-main, #374151);
 }
@@ -139,8 +139,8 @@
 
 /* Footer (Author info) */
 .civicone--govuk .civicone-listing-item__footer {
-    margin-bottom: 15px;
-    padding-top: 12px;
+    margin-bottom: var(--space-4);
+    padding-top: var(--space-3);
     border-top: 1px solid var(--civic-border, #e5e7eb);
 }
 
@@ -149,7 +149,7 @@
 }
 
 .civicone--govuk .civicone-listing-item__author {
-    font-size: 0.875rem;
+    font-size: var(--font-size-sm);
     color: var(--civic-text-muted, #6b7280);
 }
 
@@ -169,7 +169,7 @@
 /* Action Button */
 .civicone--govuk .civicone-listing-item__action {
     display: inline-block;
-    margin-top: 5px;
+    margin-top: var(--space-1);
 }
 
 /* ===================================
@@ -179,12 +179,12 @@
 /* Mobile: Stack filter panel above results */
 @media (max-width: 768px) {
     .civicone--govuk .civicone-listing-item {
-        padding: 15px;
-        margin-bottom: 15px;
+        padding: var(--space-4);
+        margin-bottom: var(--space-4);
     }
 
     .civicone--govuk .civicone-listing-item__title {
-        font-size: 1.125rem;
+        font-size: var(--font-size-lg);
     }
 
     .civicone--govuk .civicone-listing-item__description {
@@ -200,7 +200,7 @@
 /* Very small screens */
 @media (max-width: 480px) {
     .civicone--govuk .civicone-listing-item {
-        padding: 12px;
+        padding: var(--space-3);
     }
 
     .civicone--govuk .civicone-listing-item__meta-header {
@@ -209,7 +209,7 @@
     }
 
     .civicone--govuk .civicone-listing-item__title {
-        font-size: 1rem;
+        font-size: var(--font-size-base);
     }
 }
 
@@ -248,11 +248,11 @@
 
 .civicone--govuk .civicone-empty-state {
     text-align: center;
-    padding: 60px 20px;
+    padding: var(--space-16) var(--space-5);
     background: var(--civic-bg-card, #f9fafb);
     border: 2px dashed var(--civic-border, #d1d5db);
-    border-radius: 8px;
-    margin: 20px 0;
+    border-radius: var(--radius-base);
+    margin: var(--space-5) 0;
 }
 
 [data-theme="dark"] .civicone--govuk .civicone-empty-state {
@@ -261,7 +261,7 @@
 }
 
 .civicone--govuk .civicone-empty-icon {
-    margin-bottom: 20px;
+    margin-bottom: var(--space-5);
     color: var(--civic-text-muted, #9ca3af);
 }
 
@@ -270,7 +270,7 @@
 }
 
 .civicone--govuk .civicone-empty-state .civicone-heading-m {
-    margin-bottom: 10px;
+    margin-bottom: var(--space-3);
     color: var(--civic-text-main, #1f2937);
 }
 
@@ -293,9 +293,9 @@
    =================================== */
 
 .civicone--govuk .civicone-results-header {
-    padding: 15px 0;
+    padding: var(--space-4) 0;
     border-bottom: 1px solid var(--civic-border, #e5e7eb);
-    margin-bottom: 10px;
+    margin-bottom: var(--space-3);
 }
 
 [data-theme="dark"] .civicone--govuk .civicone-results-header {
@@ -304,7 +304,7 @@
 
 .civicone--govuk .civicone-results-count {
     margin: 0;
-    font-size: 1rem;
+    font-size: var(--font-size-base);
     color: var(--civic-text-main, #374151);
 }
 
@@ -352,8 +352,8 @@
 /* Back Link */
 .civicone--govuk .civicone-back-link {
     display: inline-block;
-    margin-bottom: 20px;
-    font-size: 0.875rem;
+    margin-bottom: var(--space-5);
+    font-size: var(--font-size-sm);
     font-weight: 400;
     color: var(--civic-text-main, #0b0c0c);
     text-decoration: underline;
@@ -380,12 +380,12 @@
 /* Type Badge */
 .civicone--govuk .civicone-listing-detail__type-badge {
     display: inline-block;
-    padding: 4px 12px;
-    font-size: 0.875rem;
+    padding: var(--space-1) var(--space-3);
+    font-size: var(--font-size-sm);
     font-weight: 700;
     text-transform: uppercase;
-    border-radius: 4px;
-    margin-top: 10px;
+    border-radius: var(--radius-sm);
+    margin-top: var(--space-3);
     letter-spacing: 0.5px;
 }
 
@@ -409,8 +409,8 @@
 
 /* Image */
 .civicone--govuk .civicone-listing-detail__image {
-    margin: 30px 0;
-    border-radius: 4px;
+    margin: var(--space-8) 0;
+    border-radius: var(--radius-sm);
     overflow: hidden;
 }
 
@@ -422,22 +422,22 @@
 
 /* Description */
 .civicone--govuk .civicone-listing-detail__description {
-    margin-bottom: 30px;
+    margin-bottom: var(--space-8);
     line-height: 1.6;
 }
 
 /* GOV.UK Details Component (Expandable) */
 .civicone--govuk .civicone-details {
-    margin-bottom: 30px;
+    margin-bottom: var(--space-8);
     border-left: 5px solid var(--civic-border, #b1b4b6);
-    padding-left: 20px;
+    padding-left: var(--space-5);
 }
 
 .civicone--govuk .civicone-details__summary {
     display: inline-block;
     position: relative;
-    margin-bottom: 5px;
-    padding-left: 25px;
+    margin-bottom: var(--space-1);
+    padding-left: var(--space-6);
     color: var(--civic-brand, #1d70b8);
     cursor: pointer;
     font-weight: 600;
@@ -472,8 +472,8 @@
 }
 
 .civicone--govuk .civicone-details__text {
-    margin-top: 15px;
-    padding-top: 15px;
+    margin-top: var(--space-4);
+    padding-top: var(--space-4);
     border-top: 1px solid var(--civic-border, #e5e7eb);
 }
 
@@ -487,8 +487,8 @@
 
 /* Social Interactions Container */
 .civicone--govuk .civicone-listing-detail__social {
-    margin-top: 40px;
-    padding-top: 30px;
+    margin-top: var(--space-10);
+    padding-top: var(--space-8);
     border-top: 2px solid var(--civic-border, #e5e7eb);
 }
 
@@ -500,9 +500,9 @@
 .civicone--govuk .civicone-listing-detail__action-card {
     background: var(--civic-bg-card, #f9fafb);
     border: 1px solid var(--civic-border, #e5e7eb);
-    border-radius: 4px;
-    padding: 20px;
-    margin-bottom: 20px;
+    border-radius: var(--radius-sm);
+    padding: var(--space-5);
+    margin-bottom: var(--space-5);
 }
 
 [data-theme="dark"] .civicone--govuk .civicone-listing-detail__action-card {
@@ -512,8 +512,8 @@
 
 /* Notification Box */
 .civicone--govuk .civicone-notification {
-    padding: 15px;
-    margin-bottom: 20px;
+    padding: var(--space-4);
+    margin-bottom: var(--space-5);
     border-left: 5px solid;
     background: var(--civic-bg-card, #f3f4f6);
 }
@@ -529,8 +529,8 @@
 }
 
 .civicone--govuk .civicone-notification__heading {
-    margin: 0 0 5px 0;
-    font-size: 1rem;
+    margin: 0 0 var(--space-1) 0;
+    font-size: var(--font-size-base);
     font-weight: 700;
     color: var(--civic-text-main, #0b0c0c);
 }
@@ -543,7 +543,7 @@
 .civicone--govuk .civicone-listing-detail__action-button {
     display: block;
     width: 100%;
-    margin-bottom: 10px;
+    margin-bottom: var(--space-3);
     text-align: center;
 }
 
@@ -553,8 +553,8 @@
 
 /* Secondary Actions */
 .civicone--govuk .civicone-listing-detail__secondary-actions {
-    margin-top: 30px;
-    padding-top: 20px;
+    margin-top: var(--space-8);
+    padding-top: var(--space-5);
     border-top: 1px solid var(--civic-border, #e5e7eb);
 }
 
@@ -566,12 +566,12 @@
 .civicone--govuk .civicone-listing-detail__report-list {
     list-style: none;
     padding: 0;
-    margin: 10px 0 20px 0;
+    margin: var(--space-3) 0 var(--space-5) 0;
 }
 
 .civicone--govuk .civicone-listing-detail__share-list li,
 .civicone--govuk .civicone-listing-detail__report-list li {
-    margin-bottom: 8px;
+    margin-bottom: var(--space-2);
 }
 
 .civicone--govuk .civicone-listing-detail__share-list button {
@@ -587,11 +587,11 @@
 .civicone--govuk .civicone-listing-detail__related-list {
     list-style: none;
     padding: 0;
-    margin: 20px 0 0 0;
+    margin: var(--space-5) 0 0 0;
 }
 
 .civicone--govuk .civicone-listing-detail__related-item {
-    padding: 15px 0;
+    padding: var(--space-4) 0;
     border-bottom: 1px solid var(--civic-border, #e5e7eb);
 }
 
@@ -604,7 +604,7 @@
 }
 
 .civicone--govuk .civicone-listing-detail__related-meta {
-    margin: 5px 0 0 0;
+    margin: var(--space-1) 0 0 0;
     color: var(--civic-text-muted, #6b7280);
 }
 
@@ -615,11 +615,11 @@
 /* Responsive Design for Detail Page */
 @media (max-width: 768px) {
     .civicone--govuk .civicone-listing-detail__action-card {
-        padding: 15px;
+        padding: var(--space-4);
     }
 
     .civicone--govuk .civicone-listing-detail__secondary-actions {
-        margin-top: 20px;
+        margin-top: var(--space-5);
     }
 }
 
@@ -645,19 +645,19 @@
 
 /* Form Groups */
 .civicone--govuk .civicone-form-group {
-    margin-bottom: 30px;
+    margin-bottom: var(--space-8);
 }
 
 .civicone--govuk .civicone-form-group--error {
-    padding-left: 15px;
+    padding-left: var(--space-4);
     border-left: 5px solid #d4351c; /* GOV.UK Error Red */
 }
 
 /* Labels */
 .civicone--govuk .civicone-label {
     display: block;
-    margin-bottom: 5px;
-    font-size: 1rem;
+    margin-bottom: var(--space-1);
+    font-size: var(--font-size-base);
     font-weight: 600;
     color: var(--civic-text-main, #0b0c0c);
 }
@@ -669,8 +669,8 @@
 /* Hint Text */
 .civicone--govuk .civicone-hint {
     display: block;
-    margin-bottom: 10px;
-    font-size: 0.875rem;
+    margin-bottom: var(--space-3);
+    font-size: var(--font-size-sm);
     line-height: 1.5;
     color: #505a5f; /* GOV.UK Secondary Text */
 }
@@ -682,9 +682,9 @@
 /* Error Messages */
 .civicone--govuk .civicone-error-message {
     display: block;
-    margin-bottom: 10px;
-    padding: 10px;
-    font-size: 0.875rem;
+    margin-bottom: var(--space-3);
+    padding: var(--space-3);
+    font-size: var(--font-size-sm);
     font-weight: 700;
     color: #d4351c;
     background: #fff5f5;
@@ -718,18 +718,18 @@
 
 .civicone--govuk .civicone-fieldset__legend {
     display: block;
-    margin-bottom: 10px;
+    margin-bottom: var(--space-3);
     padding: 0;
 }
 
 .civicone--govuk .civicone-fieldset__legend--m {
-    font-size: 1.125rem;
+    font-size: var(--font-size-lg);
     font-weight: 400;
 }
 
 .civicone--govuk .civicone-fieldset__heading {
     margin: 0;
-    font-size: 1.5rem;
+    font-size: var(--font-size-2xl);
     font-weight: 700;
     line-height: 1.3;
     color: var(--civic-text-main, #0b0c0c);
@@ -745,10 +745,10 @@
 }
 
 .civicone--govuk .civicone-radios--large .civicone-radios__item {
-    margin-bottom: 20px;
-    padding: 15px;
+    margin-bottom: var(--space-5);
+    padding: var(--space-4);
     border: 2px solid var(--civic-border, #b1b4b6);
-    border-radius: 4px;
+    border-radius: var(--radius-sm);
     background: var(--civic-bg-card, #ffffff);
     transition: border-color 0.2s ease, background-color 0.2s ease;
 }
@@ -767,8 +767,8 @@
     display: block;
     position: relative;
     min-height: 40px;
-    margin-bottom: 10px;
-    padding-left: 40px;
+    margin-bottom: var(--space-3);
+    padding-left: var(--space-10);
     clear: left;
 }
 
@@ -787,7 +787,7 @@
 .civicone--govuk .civicone-radios__label {
     display: block;
     margin-bottom: 0;
-    padding: 8px 15px 8px 15px;
+    padding: var(--space-2) var(--space-4) var(--space-2) var(--space-4);
     cursor: pointer;
     touch-action: manipulation;
 }
@@ -840,8 +840,8 @@
 }
 
 .civicone--govuk .civicone-radios__hint {
-    margin-top: 5px;
-    font-size: 0.875rem;
+    margin-top: var(--space-1);
+    font-size: var(--font-size-sm);
     font-weight: 400;
     color: #505a5f;
 }
@@ -856,10 +856,10 @@
     width: 100%;
     height: 40px;
     margin-bottom: 0;
-    padding: 5px;
+    padding: var(--space-1);
     border: 2px solid #0b0c0c;
     border-radius: 0;
-    font-size: 1rem;
+    font-size: var(--font-size-base);
     font-family: inherit;
     line-height: 1.25;
     background-color: var(--civic-bg-card, #ffffff);
@@ -888,10 +888,10 @@
     width: 100%;
     height: 40px;
     margin-bottom: 0;
-    padding: 5px;
+    padding: var(--space-1);
     border: 2px solid #0b0c0c;
     border-radius: 0;
-    font-size: 1rem;
+    font-size: var(--font-size-base);
     font-family: inherit;
     line-height: 1.25;
     background-color: var(--civic-bg-card, #ffffff);
@@ -924,10 +924,10 @@
     box-sizing: border-box;
     width: 100%;
     margin-bottom: 0;
-    padding: 5px;
+    padding: var(--space-1);
     border: 2px solid #0b0c0c;
     border-radius: 0;
-    font-size: 1rem;
+    font-size: var(--font-size-base);
     font-family: inherit;
     line-height: 1.6;
     background-color: var(--civic-bg-card, #ffffff);
@@ -956,10 +956,10 @@
 .civicone--govuk .civicone-file-upload {
     box-sizing: border-box;
     width: 100%;
-    padding: 5px;
+    padding: var(--space-1);
     border: 2px solid #0b0c0c;
     border-radius: 0;
-    font-size: 1rem;
+    font-size: var(--font-size-base);
     font-family: inherit;
     line-height: 1.25;
     background-color: var(--civic-bg-card, #ffffff);
@@ -986,12 +986,12 @@
 .civicone--govuk .civicone-form-group__current-image {
     display: flex;
     align-items: center;
-    gap: 12px;
-    margin-bottom: 15px;
-    padding: 12px;
+    gap: var(--space-3);
+    margin-bottom: var(--space-4);
+    padding: var(--space-3);
     background: var(--civic-bg-page, #f3f4f6);
     border: 1px solid var(--civic-border, #d1d5db);
-    border-radius: 4px;
+    border-radius: var(--radius-sm);
 }
 
 [data-theme="dark"] .civicone--govuk .civicone-form-group__current-image {
@@ -1003,7 +1003,7 @@
     width: 60px;
     height: 60px;
     object-fit: cover;
-    border-radius: 4px;
+    border-radius: var(--radius-sm);
     border: 1px solid var(--civic-border, #d1d5db);
 }
 
@@ -1015,20 +1015,20 @@
 .civicone--govuk .civicone-button-group {
     display: flex;
     align-items: center;
-    gap: 15px;
-    margin-top: 30px;
+    gap: var(--space-4);
+    margin-top: var(--space-8);
 }
 
 .civicone--govuk .civicone-button-group .civicone-link {
-    font-size: 1rem;
+    font-size: var(--font-size-base);
     text-decoration: underline;
     text-underline-offset: 3px;
 }
 
 /* Delete Section (Edit Page) */
 .civicone--govuk .civicone-form-section {
-    margin-top: 60px;
-    padding-top: 30px;
+    margin-top: var(--space-16);
+    padding-top: var(--space-8);
     border-top: 2px solid var(--civic-border, #e5e7eb);
 }
 
@@ -1041,19 +1041,19 @@
 }
 
 .civicone--govuk .civicone-form-delete {
-    margin-top: 15px;
+    margin-top: var(--space-4);
 }
 
 /* Responsive Design for Forms */
 @media (max-width: 768px) {
     .civicone--govuk .civicone-fieldset__heading {
-        font-size: 1.25rem;
+        font-size: var(--font-size-xl);
     }
 
     .civicone--govuk .civicone-button-group {
         flex-direction: column;
         align-items: stretch;
-        gap: 10px;
+        gap: var(--space-3);
     }
 
     .civicone--govuk .civicone-button-group .civicone-button {
@@ -1062,7 +1062,7 @@
     }
 
     .civicone--govuk .civicone-radios--large .civicone-radios__item {
-        padding: 12px;
+        padding: var(--space-3);
     }
 }
 
