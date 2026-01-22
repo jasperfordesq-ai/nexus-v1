@@ -246,7 +246,7 @@ require __DIR__ . '/../layouts/civicone/header.php';
                                 <?php foreach ($recentListings as $index => $listing): ?>
                                 <tr class="govuk-table__row">
                                     <td class="govuk-table__cell" data-label="Listing">
-                                        <a href="<?= $basePath ?>/listing/<?= (int)$listing['id'] ?>" class="govuk-link civicone-listing-title">
+                                        <a href="<?= $basePath ?>/listings/<?= (int)$listing['id'] ?>" class="govuk-link civicone-listing-title">
                                             <?= htmlspecialchars($listing['title']) ?>
                                         </a>
                                         <p class="civicone-listing-meta govuk-!-margin-bottom-0">

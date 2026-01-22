@@ -627,8 +627,8 @@ try {
         <nav class="nexus-utility-bar">
             <div class="left-utils">
                 <?php
-                // Platform Switcher - Public to everyone
-                $showPlatform = true;
+                // Platform Switcher - God users only
+                $showPlatform = !empty($_SESSION['is_god']);
                 // Detect protocol for tenants with custom domains
                 $isSecure = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') || ($_SERVER['SERVER_PORT'] ?? 80) == 443;
                 $protocol = $isSecure ? 'https://' : 'http://';

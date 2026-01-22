@@ -2,9 +2,9 @@
     <nav class="civic-utility-bar" aria-label="Utility navigation">
         <div class="civic-container civic-utility-wrapper">
 
-            <!-- Platform Dropdown - Public to everyone -->
+            <!-- Platform Dropdown - God users only -->
             <?php
-            $showPlatform = true; // Made public to everyone
+            $showPlatform = !empty($_SESSION['is_god']); // Restricted to god users
             // Detect protocol (http for local, https for production)
             $isSecure = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') || ($_SERVER['SERVER_PORT'] ?? 80) == 443;
             $protocol = $isSecure ? 'https://' : 'http://';

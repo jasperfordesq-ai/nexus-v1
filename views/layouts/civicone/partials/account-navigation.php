@@ -14,38 +14,33 @@ if (isset($_SESSION['user_id'])) {
     $notifCount = \Nexus\Models\Notification::countUnread($_SESSION['user_id']);
 }
 
-// Define account section navigation items
+// Define account section navigation items (text-only, GOV.UK compliant)
 $accountNavItems = [
     [
         'label' => 'Overview',
         'url' => '/dashboard',
-        'pattern' => '/dashboard',
-        'icon' => 'fa-house'
+        'pattern' => '/dashboard'
     ],
     [
         'label' => 'Notifications',
         'url' => '/dashboard/notifications',
         'pattern' => '/dashboard/notifications',
-        'icon' => 'fa-bell',
         'badge' => $notifCount
     ],
     [
         'label' => 'My Hubs',
         'url' => '/dashboard/hubs',
-        'pattern' => '/dashboard/hubs',
-        'icon' => 'fa-users'
+        'pattern' => '/dashboard/hubs'
     ],
     [
         'label' => 'My Listings',
         'url' => '/dashboard/listings',
-        'pattern' => '/dashboard/listings',
-        'icon' => 'fa-list'
+        'pattern' => '/dashboard/listings'
     ],
     [
         'label' => 'Wallet',
         'url' => '/dashboard/wallet',
-        'pattern' => '/dashboard/wallet',
-        'icon' => 'fa-wallet'
+        'pattern' => '/dashboard/wallet'
     ],
 ];
 
@@ -54,8 +49,7 @@ if (\Nexus\Core\TenantContext::hasFeature('events')) {
     $accountNavItems[] = [
         'label' => 'Events',
         'url' => '/dashboard/events',
-        'pattern' => '/dashboard/events',
-        'icon' => 'fa-calendar'
+        'pattern' => '/dashboard/events'
     ];
 }
 ?>
@@ -75,8 +69,7 @@ if (\Nexus\Core\TenantContext::hasFeature('events')) {
                 <a class="moj-sub-navigation__link"
                    href="<?= $basePath ?><?= $item['url'] ?>"
                    <?= $isActive ? 'aria-current="page"' : '' ?>>
-                    <i class="fa-solid <?= $item['icon'] ?>" aria-hidden="true"></i>
-                    <span><?= htmlspecialchars($item['label']) ?></span>
+                    <?= htmlspecialchars($item['label']) ?>
                     <?php if (!empty($item['badge']) && $item['badge'] > 0): ?>
                         <span class="moj-notification-badge" aria-label="<?= $item['badge'] ?> unread">
                             <?= $item['badge'] > 99 ? '99+' : $item['badge'] ?>

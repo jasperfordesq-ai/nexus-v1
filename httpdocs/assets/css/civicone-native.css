@@ -1,31 +1,11 @@
 /**
  * CivicOne Native Experience CSS
- * Advanced animations and native-feel interactions
- * WCAG 2.1 AA Compliant
- * Updated 2026-01-20: GOV.UK design tokens
-  * Fully Migrated to Design Tokens: 2026-01-21 ✓
+ * GOV.UK Design System Compliant
+ * Simplified for accessibility
  */
 
 /* ===========================================
-   1. SPRING ANIMATIONS (60fps Native Feel)
-   =========================================== */
-
-:root {
-    /* Native-like spring curves */
-    --spring-bounce: cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    --spring-smooth: cubic-bezier(0.25, 0.46, 0.45, 0.94);
-    --spring-snappy: cubic-bezier(0.68, -0.55, 0.265, 1.55);
-    --ease-native: cubic-bezier(0.4, 0, 0.2, 1);
-
-    /* Timing */
-    --duration-instant: 100ms;
-    --duration-fast: 150ms;
-    --duration-normal: 250ms;
-    --duration-slow: 350ms;
-}
-
-/* ===========================================
-   2. BUTTON INTERACTIONS (Native Tap Feel)
+   1. BASE TOUCH INTERACTIONS
    =========================================== */
 
 .civic-btn,
@@ -36,191 +16,17 @@
     touch-action: manipulation;
 }
 
-/* Active press state */
-@media (prefers-reduced-motion: no-preference) {
-    .civic-btn {
-        transition: transform var(--duration-fast) var(--spring-bounce),
-                    box-shadow var(--duration-fast) ease,
-                    background-color var(--duration-fast) ease;
-    }
+/* ===========================================
+   2. BUTTON STYLES (GOV.UK Compliant)
+   =========================================== */
 
-    .civic-btn:active,
-    .civic-btn.touch-active {
-        transform: scale(0.96);
-    }
-
-    .civic-btn:hover:not(:active) {
-        transform: translateY(calc(var(--space-1) * -0.25));
-        box-shadow: 0 var(--space-1) var(--space-3) rgba(0, 0, 0, 0.15);
-    }
-}
-
-/* Ripple effect */
 .civic-btn {
     position: relative;
     overflow: hidden;
 }
 
-.civic-btn::after {
-    content: '';
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    width: 0;
-    height: 0;
-    background: rgba(255, 255, 255, 0.3);
-    border-radius: 50%;
-    transform: translate(-50%, -50%);
-    opacity: 0;
-}
-
-@media (prefers-reduced-motion: no-preference) {
-    .civic-btn.ripple::after {
-        animation: ripple-effect 0.6s ease-out forwards;
-    }
-}
-
-@keyframes ripple-effect {
-    0% {
-        width: 0;
-        height: 0;
-        opacity: 0.5;
-    }
-    100% {
-        width: calc(var(--space-4) * 18.75);
-        height: calc(var(--space-4) * 18.75);
-        opacity: 0;
-    }
-}
-
-
 /* ===========================================
-   3. CARD INTERACTIONS (Swipe & Press)
-   =========================================== */
-
-@media (prefers-reduced-motion: no-preference) {
-    .civic-card {
-        transition: transform var(--duration-normal) var(--spring-smooth),
-                    box-shadow var(--duration-normal) ease;
-    }
-
-    .civic-card:hover {
-        transform: translateY(calc(var(--space-1) * -1));
-        box-shadow: 0 var(--space-3) var(--space-6) rgba(0, 0, 0, 0.1);
-    }
-
-    .civic-card:active,
-    .civic-card.touch-active {
-        transform: scale(0.98);
-        box-shadow: 0 var(--space-1) var(--space-2) rgba(0, 0, 0, 0.1);
-    }
-}
-
-/* Long press indicator */
-.civic-card.long-press::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: var(--civic-brand, var(--color-blue-600));
-    opacity: 0;
-    border-radius: inherit;
-    pointer-events: none;
-}
-
-@media (prefers-reduced-motion: no-preference) {
-    .civic-card.long-press::before {
-        animation: long-press-pulse 0.8s ease-out forwards;
-    }
-}
-
-@keyframes long-press-pulse {
-    0% { opacity: 0.1; }
-    50% { opacity: 0.05; }
-    100% { opacity: 0; }
-}
-
-
-/* ===========================================
-   4. PAGE TRANSITIONS (App-like Navigation)
-   =========================================== */
-
-/* Page enter animation */
-@media (prefers-reduced-motion: no-preference) {
-    .civic-page-enter {
-        animation: page-slide-in var(--duration-normal) var(--ease-native) forwards;
-    }
-
-    .civic-page-exit {
-        animation: page-slide-out var(--duration-fast) ease-in forwards;
-    }
-}
-
-@keyframes page-slide-in {
-    from {
-        opacity: 0;
-        transform: translateX(var(--space-5));
-    }
-    to {
-        opacity: 1;
-        transform: translateX(0);
-    }
-}
-
-@keyframes page-slide-out {
-    from {
-        opacity: 1;
-        transform: translateX(0);
-    }
-    to {
-        opacity: 0;
-        transform: translateX(calc(var(--space-5) * -1));
-    }
-}
-
-/* Hero content stagger animation */
-@media (prefers-reduced-motion: no-preference) {
-    .civic-hero-content > * {
-        opacity: 0;
-        transform: translateY(var(--space-5));
-    }
-
-    .civic-hero-content.animated > *:nth-child(1) {
-        animation: fade-up var(--duration-normal) var(--ease-native) 0.1s forwards;
-    }
-    .civic-hero-content.animated > *:nth-child(2) {
-        animation: fade-up var(--duration-normal) var(--ease-native) 0.2s forwards;
-    }
-    .civic-hero-content.animated > *:nth-child(3) {
-        animation: fade-up var(--duration-normal) var(--ease-native) 0.3s forwards;
-    }
-}
-
-@keyframes fade-up {
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-/* Card grid stagger */
-@media (prefers-reduced-motion: no-preference) {
-    .civic-grid.animated > .civic-card {
-        opacity: 0;
-        transform: translateY(var(--space-5));
-    }
-
-    .civic-grid.animated > .civic-card:nth-child(1) { animation: fade-up var(--duration-normal) var(--ease-native) 0.05s forwards; }
-    .civic-grid.animated > .civic-card:nth-child(2) { animation: fade-up var(--duration-normal) var(--ease-native) 0.1s forwards; }
-    .civic-grid.animated > .civic-card:nth-child(3) { animation: fade-up var(--duration-normal) var(--ease-native) 0.15s forwards; }
-    .civic-grid.animated > .civic-card:nth-child(4) { animation: fade-up var(--duration-normal) var(--ease-native) 0.2s forwards; }
-    .civic-grid.animated > .civic-card:nth-child(5) { animation: fade-up var(--duration-normal) var(--ease-native) 0.25s forwards; }
-    .civic-grid.animated > .civic-card:nth-child(6) { animation: fade-up var(--duration-normal) var(--ease-native) 0.3s forwards; }
-    .civic-grid.animated > .civic-card:nth-child(n+7) { animation: fade-up var(--duration-normal) var(--ease-native) 0.35s forwards; }
-}
-
-
-/* ===========================================
-   5. BOTTOM SHEET (Native Modal)
+   3. BOTTOM SHEET (Accessible Modal)
    =========================================== */
 
 .civic-bottom-sheet {
@@ -228,20 +34,13 @@
     bottom: 0;
     left: 0;
     right: 0;
-    background: var(--civic-bg-card, var(--color-white));
-    border-radius: var(--radius-lg) var(--radius-lg) 0 0;
-    box-shadow: 0 calc(var(--space-2) * -1.25) var(--space-10) rgba(0, 0, 0, 0.2);
-    z-index: var(--z-dropdown, 1000);
+    background: #ffffff;
+    border-top: 1px solid #b1b4b6;
+    z-index: 1000;
     transform: translateY(100%);
     max-height: 90vh;
     overflow: hidden;
-    padding-bottom: env(safe-area-inset-bottom, var(--space-0));
-}
-
-@media (prefers-reduced-motion: no-preference) {
-    .civic-bottom-sheet {
-        transition: transform var(--duration-normal) var(--spring-smooth);
-    }
+    padding-bottom: env(safe-area-inset-bottom, 0);
 }
 
 .civic-bottom-sheet.active {
@@ -249,17 +48,16 @@
 }
 
 .civic-bottom-sheet-handle {
-    width: calc(var(--space-2) * 4.5);
-    height: var(--space-1);
-    background: var(--civic-border, var(--color-gray-300));
-    border-radius: var(--radius-sm);
-    margin: var(--space-3) auto;
+    width: 2.5rem;
+    height: 0.25rem;
+    background: #b1b4b6;
+    margin: 0.75rem auto;
 }
 
 .civic-bottom-sheet-content {
-    padding: 0 var(--space-5) var(--space-5);
+    padding: 0 1.25rem 1.25rem;
     overflow-y: auto;
-    max-height: calc(90vh - calc(var(--space-4) * 3.75));
+    max-height: calc(90vh - 3rem);
     overscroll-behavior: contain;
 }
 
@@ -270,14 +68,6 @@
     z-index: 9999;
     opacity: 0;
     visibility: hidden;
-    -webkit-backdrop-filter: blur(var(--space-1));
-    backdrop-filter: blur(var(--space-1));
-}
-
-@media (prefers-reduced-motion: no-preference) {
-    .civic-bottom-sheet-backdrop {
-        transition: opacity var(--duration-normal) ease, visibility var(--duration-normal) ease;
-    }
 }
 
 .civic-bottom-sheet-backdrop.active {
@@ -285,13 +75,8 @@
     visibility: visible;
 }
 
-body.dark-mode .civic-bottom-sheet {
-    background: var(--civic-bg-card, var(--color-gray-800));
-}
-
-
 /* ===========================================
-   6. NATIVE SHARE SHEET
+   4. SHARE SHEET
    =========================================== */
 
 .nexus-share-sheet {
@@ -308,28 +93,16 @@ body.dark-mode .civic-bottom-sheet {
     inset: 0;
     background: rgba(0, 0, 0, 0.5);
     opacity: 0;
-    -webkit-backdrop-filter: blur(var(--space-1));
-    backdrop-filter: blur(var(--space-1));
 }
 
 .nexus-share-sheet-content {
     position: relative;
-    background: var(--civic-bg-card, var(--color-white));
-    border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+    background: #ffffff;
+    border-top: 1px solid #b1b4b6;
     width: 100%;
-    max-width: calc(var(--space-4) * 31.25);
+    max-width: 500px;
     transform: translateY(100%);
-    padding-bottom: env(safe-area-inset-bottom, var(--space-5));
-}
-
-@media (prefers-reduced-motion: no-preference) {
-    .nexus-share-sheet-backdrop {
-        transition: opacity var(--duration-normal) ease;
-    }
-
-    .nexus-share-sheet-content {
-        transition: transform var(--duration-normal) var(--spring-smooth);
-    }
+    padding-bottom: env(safe-area-inset-bottom, 1.25rem);
 }
 
 .nexus-share-sheet.active .nexus-share-sheet-backdrop {
@@ -344,140 +117,79 @@ body.dark-mode .civic-bottom-sheet {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: var(--space-4) var(--space-5);
-    border-bottom: 1px solid var(--civic-border, var(--color-gray-200));
+    padding: 1rem 1.25rem;
+    border-bottom: 1px solid #b1b4b6;
 }
 
 .nexus-share-sheet-header h3 {
     margin: 0;
-    font-size: var(--font-size-lg);
+    font-size: 1.125rem;
     font-weight: 600;
+    color: #0b0c0c;
 }
 
 .nexus-share-close {
     background: none;
     border: none;
-    font-size: var(--font-size-2xl);
-    color: var(--civic-text-muted, var(--color-gray-500));
+    font-size: 1.5rem;
+    color: #505a5f;
     cursor: pointer;
-    padding: var(--space-1);
+    padding: 0.25rem;
     line-height: 1;
 }
 
 .nexus-share-close:focus {
-    /* GOV.UK Focus Pattern */
-    outline: calc(var(--space-1) * 0.75) solid var(--govuk-focus-colour, var(--color-brand-yellow));
+    outline: 3px solid #ffdd00;
     outline-offset: 0;
-    background-color: var(--govuk-focus-colour, var(--color-brand-yellow));
-    color: var(--govuk-focus-text-colour, var(--color-govuk-black));
-    box-shadow: 0 calc(var(--space-1) * -0.5) var(--govuk-focus-colour, var(--color-brand-yellow)), 0 var(--space-1) var(--govuk-focus-text-colour, var(--color-govuk-black));
+    background-color: #ffdd00;
+    color: #0b0c0c;
 }
 
 .nexus-share-options {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
-    gap: var(--space-4);
-    padding: var(--space-5);
+    gap: 1rem;
+    padding: 1.25rem;
 }
 
 .nexus-share-option {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: var(--space-2);
-    padding: var(--space-4) var(--space-2);
-    background: var(--civic-bg-page, var(--color-gray-100));
-    border: none;
-    border-radius: var(--radius-md);
-    color: var(--civic-text-main, var(--color-gray-800));
+    gap: 0.5rem;
+    padding: 1rem 0.5rem;
+    background: #f3f2f1;
+    border: 1px solid #b1b4b6;
+    color: #0b0c0c;
     text-decoration: none;
-    font-size: var(--font-size-xs);
+    font-size: 0.75rem;
     font-weight: 500;
     cursor: pointer;
-    min-height: var(--space-20);
-}
-
-@media (prefers-reduced-motion: no-preference) {
-    .nexus-share-option {
-        transition: transform var(--duration-fast) var(--spring-bounce),
-                    background var(--duration-fast) ease;
-    }
-
-    .nexus-share-option:active {
-        transform: scale(0.95);
-    }
+    min-height: 5rem;
 }
 
 .nexus-share-option:hover {
-    background: var(--civic-border, var(--color-gray-200));
+    background: #e8f0f8;
 }
 
 .nexus-share-option:focus {
-    /* GOV.UK Focus Pattern */
-    outline: calc(var(--space-1) * 0.75) solid var(--govuk-focus-colour, var(--color-brand-yellow));
+    outline: 3px solid #ffdd00;
     outline-offset: 0;
-    background-color: var(--govuk-focus-colour, var(--color-brand-yellow));
-    color: var(--govuk-focus-text-colour, var(--color-govuk-black));
-    box-shadow: 0 calc(var(--space-1) * -0.5) var(--govuk-focus-colour, var(--color-brand-yellow)), 0 var(--space-1) var(--govuk-focus-text-colour, var(--color-govuk-black));
+    background-color: #ffdd00;
+    color: #0b0c0c;
 }
 
 .nexus-share-option i {
-    font-size: var(--font-size-2xl);
+    font-size: 1.5rem;
 }
 
 .nexus-share-option[href*="facebook"] i { color: #1877f2; }
-.nexus-share-option[href*="twitter"] i { color: var(--color-black); }
+.nexus-share-option[href*="twitter"] i { color: #0b0c0c; }
 .nexus-share-option[href*="whatsapp"] i { color: #25d366; }
 .nexus-share-option[href*="mailto"] i { color: #ea4335; }
 
-
 /* ===========================================
-   7. SWIPE NAVIGATION INDICATOR
-   =========================================== */
-
-.civic-swipe-indicator {
-    position: fixed;
-    left: 0;
-    top: 50%;
-    transform: translateY(-50%) translateX(-100%);
-    width: calc(var(--space-4) * 3.75);
-    height: calc(var(--space-4) * 3.75);
-    background: var(--civic-bg-card, var(--color-white));
-    border-radius: 0 var(--radius-full) var(--radius-full) 0;
-    box-shadow: var(--space-1) 0 var(--space-5) rgba(0, 0, 0, 0.15);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    opacity: 0;
-    z-index: 9998;
-    pointer-events: none;
-}
-
-@media (prefers-reduced-motion: no-preference) {
-    .civic-swipe-indicator {
-        transition: transform var(--duration-fast) var(--ease-native),
-                    opacity var(--duration-fast) ease;
-    }
-}
-
-.civic-swipe-indicator.visible {
-    opacity: 1;
-    transform: translateY(-50%) translateX(calc(var(--space-5) * -1));
-}
-
-.civic-swipe-indicator.ready {
-    transform: translateY(-50%) translateX(0);
-}
-
-.civic-swipe-indicator svg {
-    width: var(--space-6);
-    height: var(--space-6);
-    fill: var(--civic-brand, var(--color-blue-600));
-}
-
-
-/* ===========================================
-   8. PROGRESS BAR (Page Loading)
+   5. PROGRESS BAR (Page Loading)
    =========================================== */
 
 .civic-progress-bar {
@@ -485,7 +197,7 @@ body.dark-mode .civic-bottom-sheet {
     top: 0;
     left: 0;
     right: 0;
-    height: calc(var(--space-1) * 0.75);
+    height: 3px;
     background: transparent;
     z-index: 10002;
     pointer-events: none;
@@ -493,42 +205,14 @@ body.dark-mode .civic-bottom-sheet {
 
 .civic-progress-bar-inner {
     height: 100%;
-    background: linear-gradient(90deg, var(--civic-brand, var(--color-blue-600)), var(--civic-accent-purple, var(--color-purple-500)));
+    background: #1d70b8;
     width: 0;
-    box-shadow: 0 0 var(--space-2) var(--civic-brand, var(--color-blue-600));
 }
-
-@media (prefers-reduced-motion: no-preference) {
-    .civic-progress-bar-inner {
-        transition: width 0.2s ease;
-    }
-
-    .civic-progress-bar-inner.loading {
-        animation: progress-indeterminate 1.5s ease-in-out infinite;
-    }
-}
-
-@keyframes progress-indeterminate {
-    0% {
-        width: 0;
-        margin-left: 0;
-    }
-    50% {
-        width: 40%;
-        margin-left: 30%;
-    }
-    100% {
-        width: 0;
-        margin-left: 100%;
-    }
-}
-
 
 /* ===========================================
-   9. FORM INPUT ANIMATIONS
+   6. FORM INPUT FOCUS STATES
    =========================================== */
 
-/* GOV.UK Focus Pattern for form inputs */
 .civic-input:focus,
 input[type="text"]:focus,
 input[type="email"]:focus,
@@ -536,134 +220,39 @@ input[type="password"]:focus,
 input[type="tel"]:focus,
 select:focus,
 textarea:focus {
-    /* GOV.UK Focus Pattern */
-    outline: calc(var(--space-1) * 0.75) solid var(--govuk-focus-colour, var(--color-brand-yellow));
+    outline: 3px solid #ffdd00;
     outline-offset: 0;
-    background-color: var(--govuk-focus-colour, var(--color-brand-yellow));
-    color: var(--govuk-focus-text-colour, var(--color-govuk-black));
-    box-shadow: inset 0 0 0 var(--space-1) var(--govuk-focus-text-colour, var(--color-govuk-black));
-}
-
-@media (prefers-reduced-motion: no-preference) {
-    .civic-input,
-    input[type="text"],
-    input[type="email"],
-    input[type="password"],
-    input[type="tel"],
-    select,
-    textarea {
-        transition: border-color var(--duration-fast) ease,
-                    box-shadow var(--duration-fast) ease,
-                    transform var(--duration-fast) var(--spring-smooth);
-    }
-
-    .civic-input:focus,
-    input:focus,
-    select:focus,
-    textarea:focus {
-        transform: scale(1.01);
-    }
+    border-color: #0b0c0c;
 }
 
 /* Input validation states */
 .civic-input.valid,
 input.valid {
-    border-color: var(--civic-accent-green, var(--color-success)) !important;
-    box-shadow: 0 0 0 calc(var(--space-1) * 0.75) rgba(16, 185, 129, 0.1);
+    border-color: #00703c;
 }
 
 .civic-input.invalid,
 input.invalid {
-    border-color: var(--civic-error, var(--color-danger)) !important;
-    box-shadow: 0 0 0 calc(var(--space-1) * 0.75) rgba(239, 68, 68, 0.1);
+    border-color: #d4351c;
 }
-
-@media (prefers-reduced-motion: no-preference) {
-    .civic-input.shake,
-    input.shake {
-        animation: input-shake 0.5s ease;
-    }
-}
-
-@keyframes input-shake {
-    0%, 100% { transform: translateX(0); }
-    20%, 60% { transform: translateX(calc(var(--space-2) * -1)); }
-    40%, 80% { transform: translateX(var(--space-2)); }
-}
-
 
 /* ===========================================
-   10. NOTIFICATION DOT PULSE
+   7. NOTIFICATION DOT
    =========================================== */
 
 .civic-notification-dot {
     position: absolute;
-    top: calc(var(--space-1) * -0.5);
-    right: calc(var(--space-1) * -0.5);
-    width: var(--space-3);
-    height: var(--space-3);
-    background: var(--civic-error, var(--color-danger));
+    top: -2px;
+    right: -2px;
+    width: 0.75rem;
+    height: 0.75rem;
+    background: #d4351c;
     border-radius: 50%;
-    border: var(--space-1) solid var(--civic-bg-card, var(--color-white));
+    border: 2px solid #ffffff;
 }
-
-@media (prefers-reduced-motion: no-preference) {
-    .civic-notification-dot {
-        animation: notification-pulse 2s ease-in-out infinite;
-    }
-}
-
-@keyframes notification-pulse {
-    0%, 100% {
-        transform: scale(1);
-        box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4);
-    }
-    50% {
-        transform: scale(1.1);
-        box-shadow: 0 0 0 var(--space-2) rgba(239, 68, 68, 0);
-    }
-}
-
 
 /* ===========================================
-   11. SUCCESS/ERROR STATE ANIMATIONS
-   =========================================== */
-
-@media (prefers-reduced-motion: no-preference) {
-    .civic-success-icon {
-        animation: success-pop 0.4s var(--spring-bounce) forwards;
-    }
-
-    .civic-error-icon {
-        animation: error-shake 0.5s ease forwards;
-    }
-}
-
-@keyframes success-pop {
-    0% {
-        transform: scale(0);
-        opacity: 0;
-    }
-    50% {
-        transform: scale(1.2);
-    }
-    100% {
-        transform: scale(1);
-        opacity: 1;
-    }
-}
-
-@keyframes error-shake {
-    0%, 100% { transform: translateX(0) rotate(0); }
-    20% { transform: translateX(calc(var(--space-1) * -1)) rotate(-5deg); }
-    40% { transform: translateX(var(--space-1)) rotate(5deg); }
-    60% { transform: translateX(calc(var(--space-1) * -1)) rotate(-5deg); }
-    80% { transform: translateX(var(--space-1)) rotate(5deg); }
-}
-
-
-/* ===========================================
-   12. SCROLL SNAP FOR HORIZONTAL CARDS
+   8. SCROLL SNAP FOR HORIZONTAL CARDS
    =========================================== */
 
 .civic-scroll-snap {
@@ -671,11 +260,11 @@ input.invalid {
     overflow-x: auto;
     scroll-snap-type: x mandatory;
     scroll-behavior: smooth;
-    gap: var(--space-4);
-    padding: var(--space-2) 0;
-    margin: 0 calc(var(--space-4) * -1);
-    padding-left: var(--space-4);
-    padding-right: var(--space-4);
+    gap: 1rem;
+    padding: 0.5rem 0;
+    margin: 0 -1rem;
+    padding-left: 1rem;
+    padding-right: 1rem;
 }
 
 .civic-scroll-snap::-webkit-scrollbar {
@@ -687,100 +276,48 @@ input.invalid {
     flex-shrink: 0;
 }
 
-
 /* ===========================================
-   13. DARK MODE TRANSITIONS
-   =========================================== */
-
-@media (prefers-reduced-motion: no-preference) {
-    body,
-    .civic-card,
-    .civic-header,
-    .civic-footer,
-    .civic-bottom-nav,
-    .civic-btn {
-        transition: background-color var(--duration-slow) ease,
-                    color var(--duration-slow) ease,
-                    border-color var(--duration-slow) ease;
-    }
-}
-
-
-/* ===========================================
-   14. CONTEXT MENU (Long Press)
+   9. CONTEXT MENU
    =========================================== */
 
 .civic-context-menu {
-    background: var(--civic-bg-card, var(--color-white));
-    border-radius: var(--radius-md);
-    box-shadow: 0 var(--space-2) var(--space-10) rgba(0, 0, 0, 0.2);
+    background: #ffffff;
+    border: 1px solid #b1b4b6;
     overflow: hidden;
-    min-width: calc(var(--space-4) * 11.25);
-}
-
-@media (prefers-reduced-motion: no-preference) {
-    .civic-context-menu {
-        animation: context-menu-pop 0.2s var(--spring-bounce) forwards;
-    }
-}
-
-@keyframes context-menu-pop {
-    from {
-        opacity: 0;
-        transform: translate(-50%, -50%) scale(0.9);
-    }
-    to {
-        opacity: 1;
-        transform: translate(-50%, -50%) scale(1);
-    }
+    min-width: 180px;
 }
 
 .civic-context-menu button {
     display: flex;
     align-items: center;
-    gap: var(--space-3);
+    gap: 0.75rem;
     width: 100%;
-    padding: var(--space-3) var(--space-4);
+    padding: 0.75rem 1rem;
     background: none;
     border: none;
-    font-size: var(--font-size-sm);
-    color: var(--civic-text-main, var(--color-gray-800));
+    font-size: 0.875rem;
+    color: #0b0c0c;
     cursor: pointer;
     text-align: left;
 }
 
 .civic-context-menu button:hover {
-    background: var(--civic-bg-page, var(--color-gray-100));
-}
-
-.civic-context-menu button:active {
-    background: var(--civic-border, var(--color-gray-200));
+    background: #f3f2f1;
 }
 
 .civic-context-menu button:focus {
-    /* GOV.UK Focus Pattern */
-    outline: calc(var(--space-1) * 0.75) solid var(--govuk-focus-colour, var(--color-brand-yellow));
+    outline: 3px solid #ffdd00;
     outline-offset: 0;
-    background-color: var(--govuk-focus-colour, var(--color-brand-yellow));
-    color: var(--govuk-focus-text-colour, var(--color-govuk-black));
-    box-shadow: 0 calc(var(--space-1) * -0.5) var(--govuk-focus-colour, var(--color-brand-yellow)), 0 var(--space-1) var(--govuk-focus-text-colour, var(--color-govuk-black));
+    background-color: #ffdd00;
+    color: #0b0c0c;
 }
 
 .civic-context-menu button svg {
-    color: var(--civic-text-muted, var(--color-gray-500));
+    color: #505a5f;
 }
-
-body.dark-mode .civic-context-menu {
-    background: var(--civic-bg-card, var(--color-gray-800));
-}
-
-body.dark-mode .civic-context-menu button:hover {
-    background: var(--civic-bg-page, var(--color-gray-900));
-}
-
 
 /* ===========================================
-   15. TURBO LOADING STATE
+   10. LOADING STATE
    =========================================== */
 
 body.turbo-loading {
@@ -793,102 +330,8 @@ body.turbo-loading .civic-btn {
     opacity: 0.7;
 }
 
-
 /* ===========================================
-   16. VIEW TRANSITIONS API
-   Native-like page transitions
-   =========================================== */
-
-/* Enable View Transitions for the root */
-@view-transition {
-    navigation: auto;
-}
-
-/* Default page transition - fade and slide */
-::view-transition-old(root) {
-    animation: page-fade-out 0.2s ease-out forwards;
-}
-
-::view-transition-new(root) {
-    animation: page-fade-in 0.25s ease-out forwards;
-}
-
-@keyframes page-fade-out {
-    from {
-        opacity: 1;
-        transform: translateX(0);
-    }
-    to {
-        opacity: 0;
-        transform: translateX(calc(var(--space-5) * -1));
-    }
-}
-
-@keyframes page-fade-in {
-    from {
-        opacity: 0;
-        transform: translateX(var(--space-5));
-    }
-    to {
-        opacity: 1;
-        transform: translateX(0);
-    }
-}
-
-/* Back navigation - reverse direction */
-::view-transition-old(root).back-nav {
-    animation: page-fade-in-reverse 0.2s ease-out forwards;
-}
-
-::view-transition-new(root).back-nav {
-    animation: page-fade-out-reverse 0.25s ease-out forwards;
-}
-
-@keyframes page-fade-out-reverse {
-    from {
-        opacity: 0;
-        transform: translateX(calc(var(--space-5) * -1));
-    }
-    to {
-        opacity: 1;
-        transform: translateX(0);
-    }
-}
-
-@keyframes page-fade-in-reverse {
-    from {
-        opacity: 1;
-        transform: translateX(0);
-    }
-    to {
-        opacity: 0;
-        transform: translateX(var(--space-5));
-    }
-}
-
-/* Cards get their own view-transition-name for shared element transitions */
-.civic-card[data-listing-id] {
-    view-transition-name: var(--card-transition-name);
-}
-
-/* Hero transitions - REMOVED (replaced with GOV.UK headings 2026-01-22) */
-
-/* Respect reduced motion */
-@media (prefers-reduced-motion: reduce) {
-    ::view-transition-old(root),
-    ::view-transition-new(root) {
-        animation: none;
-    }
-
-    @view-transition {
-        navigation: none;
-    }
-}
-
-
-/* ===========================================
-   17. OFFLINE MODE INDICATOR
-   Shows when app is offline
+   11. OFFLINE MODE INDICATOR
    =========================================== */
 
 .civic-offline-indicator {
@@ -896,19 +339,18 @@ body.turbo-loading .civic-btn {
     top: 0;
     left: 0;
     right: 0;
-    background: linear-gradient(135deg, var(--color-warning) 0%, var(--color-amber-600) 100%);
-    color: white;
+    background: #f47738;
+    color: #0b0c0c;
     text-align: center;
-    padding: var(--space-2) var(--space-4);
-    font-size: var(--font-size-xs);
+    padding: 0.5rem 1rem;
+    font-size: 0.875rem;
     font-weight: 600;
-    z-index: var(--z-dropdown, 1000);
+    z-index: 1000;
     transform: translateY(-100%);
-    transition: transform 0.3s var(--spring-snappy);
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: var(--space-2);
+    gap: 0.5rem;
 }
 
 .civic-offline-indicator.visible {
@@ -916,18 +358,18 @@ body.turbo-loading .civic-btn {
 }
 
 .civic-offline-indicator svg {
-    width: var(--space-4);
-    height: var(--space-4);
+    width: 1rem;
+    height: 1rem;
     flex-shrink: 0;
 }
 
 /* Adjust header position when offline banner is visible */
 body.is-offline .civic-utility-bar {
-    margin-top: calc(var(--space-8) + var(--space-1));
+    margin-top: 2.5rem;
 }
 
 body.is-offline .civic-header {
-    top: calc(var(--space-8) + var(--space-1));
+    top: 2.5rem;
 }
 
 /* Back online indicator */
@@ -936,19 +378,18 @@ body.is-offline .civic-header {
     top: 0;
     left: 0;
     right: 0;
-    background: linear-gradient(135deg, var(--color-success) 0%, var(--color-success-600) 100%);
-    color: white;
+    background: #00703c;
+    color: #ffffff;
     text-align: center;
-    padding: var(--space-2) var(--space-4);
-    font-size: var(--font-size-xs);
+    padding: 0.5rem 1rem;
+    font-size: 0.875rem;
     font-weight: 600;
-    z-index: var(--z-dropdown, 1000);
+    z-index: 1000;
     transform: translateY(-100%);
-    transition: transform 0.3s var(--spring-snappy);
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: var(--space-2);
+    gap: 0.5rem;
 }
 
 .civic-online-indicator.visible {
@@ -956,12 +397,20 @@ body.is-offline .civic-header {
 }
 
 .civic-online-indicator svg {
-    width: var(--space-4);
-    height: var(--space-4);
+    width: 1rem;
+    height: 1rem;
     flex-shrink: 0;
 }
 
+/* ===========================================
+   12. REDUCED MOTION
+   =========================================== */
+
 @media (prefers-reduced-motion: reduce) {
+    .civic-bottom-sheet,
+    .civic-bottom-sheet-backdrop,
+    .nexus-share-sheet-backdrop,
+    .nexus-share-sheet-content,
     .civic-offline-indicator,
     .civic-online-indicator {
         transition: none;
