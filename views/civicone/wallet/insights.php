@@ -1,6 +1,6 @@
 <?php
-// CivicOne View: User Insights Dashboard - WCAG 2.1 AA Compliant
-// CSS extracted to civicone-wallet.css
+// CivicOne View: User Insights Dashboard
+// GOV.UK Design System Compliant - text-only labels
 
 $hTitle = 'My Insights';
 $hSubtitle = 'Personal Transaction Analytics';
@@ -17,51 +17,32 @@ require dirname(__DIR__, 2) . '/layouts/civicone/header.php';
     <!-- Header -->
     <div class="insights-header">
         <div class="insights-title">
-            <div class="insights-title-icon">
-                <i class="fa-solid fa-chart-pie"></i>
-            </div>
             <div>
                 <h1>My Insights</h1>
                 <div class="insights-title-sub">Your personal timebanking analytics</div>
             </div>
         </div>
         <nav role="navigation" aria-label="Main navigation" class="insights-nav">
-            <a href="<?= \Nexus\Core\TenantContext::getBasePath() ?>/wallet" class="insights-nav-link">
-                <i class="fa-solid fa-wallet"></i> Wallet
-            </a>
-            <a href="<?= \Nexus\Core\TenantContext::getBasePath() ?>/members" class="insights-nav-link">
-                <i class="fa-solid fa-users"></i> Find Members
-            </a>
+            <a href="<?= \Nexus\Core\TenantContext::getBasePath() ?>/wallet" class="insights-nav-link">Wallet</a>
+            <a href="<?= \Nexus\Core\TenantContext::getBasePath() ?>/members" class="insights-nav-link">Find Members</a>
         </nav>
     </div>
 
     <!-- Stats Grid -->
     <div class="insights-stats-grid">
         <div class="insights-glass-card insights-stat-card">
-            <div class="insights-stat-icon green">
-                <i class="fa-solid fa-arrow-down"></i>
-            </div>
             <div class="insights-stat-value positive">+<?= number_format($insights['total_received'] ?? 0, 1) ?></div>
             <div class="insights-stat-label">Total Received</div>
         </div>
         <div class="insights-glass-card insights-stat-card">
-            <div class="insights-stat-icon red">
-                <i class="fa-solid fa-arrow-up"></i>
-            </div>
             <div class="insights-stat-value negative">-<?= number_format($insights['total_sent'] ?? 0, 1) ?></div>
             <div class="insights-stat-label">Total Sent</div>
         </div>
         <div class="insights-glass-card insights-stat-card">
-            <div class="insights-stat-icon blue">
-                <i class="fa-solid fa-exchange-alt"></i>
-            </div>
             <div class="insights-stat-value"><?= $insights['transaction_count'] ?? 0 ?></div>
             <div class="insights-stat-label">Transactions</div>
         </div>
         <div class="insights-glass-card insights-stat-card">
-            <div class="insights-stat-icon purple">
-                <i class="fa-solid fa-chart-line"></i>
-            </div>
             <div class="insights-stat-value <?= ($insights['net_change'] ?? 0) >= 0 ? 'positive' : 'negative' ?>">
                 <?= ($insights['net_change'] ?? 0) >= 0 ? '+' : '' ?><?= number_format($insights['net_change'] ?? 0, 1) ?>
             </div>
@@ -74,10 +55,7 @@ require dirname(__DIR__, 2) . '/layouts/civicone/header.php';
         <!-- Monthly Trends Chart -->
         <div class="insights-glass-card">
             <div class="insights-section-header">
-                <h3 class="insights-section-title">
-                    <i class="fa-solid fa-chart-area" style="color: #a855f7;"></i>
-                    Monthly Activity
-                </h3>
+                <h3 class="insights-section-title">Monthly Activity</h3>
             </div>
             <div class="insights-chart-container">
                 <canvas id="trendsChart"></canvas>
@@ -87,41 +65,21 @@ require dirname(__DIR__, 2) . '/layouts/civicone/header.php';
         <!-- Activity Streak -->
         <div class="insights-glass-card">
             <div class="insights-section-header">
-                <h3 class="insights-section-title">
-                    <i class="fa-solid fa-fire" style="color: #f59e0b;"></i>
-                    Activity Streak
-                </h3>
+                <h3 class="insights-section-title">Activity Streak</h3>
             </div>
             <div class="streak-display">
-                <div class="streak-icon">
-                    <?php if (($streak['current'] ?? 0) >= 7): ?>
-                        <i class="fa-solid fa-fire" style="color: #f59e0b;"></i>
-                    <?php elseif (($streak['current'] ?? 0) >= 3): ?>
-                        <i class="fa-solid fa-fire-flame-curved" style="color: #fb923c;"></i>
-                    <?php else: ?>
-                        <i class="fa-solid fa-seedling" style="color: #10b981;"></i>
-                    <?php endif; ?>
-                </div>
                 <div class="streak-value"><?= $streak['current'] ?? 0 ?></div>
                 <div class="streak-label">
                     <?= ($streak['current'] ?? 0) === 1 ? 'day' : 'days' ?> streak
                 </div>
                 <?php if (($streak['current'] ?? 0) >= 7): ?>
-                <div class="streak-message">
-                    <i class="fa-solid fa-star"></i> You're on fire! Keep it up!
-                </div>
+                <div class="streak-message streak-message--hot">Great progress! Keep it up!</div>
                 <?php elseif (($streak['current'] ?? 0) >= 3): ?>
-                <div class="streak-message">
-                    <i class="fa-solid fa-thumbs-up"></i> Nice momentum!
-                </div>
+                <div class="streak-message streak-message--warm">Nice momentum!</div>
                 <?php elseif (($streak['current'] ?? 0) > 0): ?>
-                <div class="streak-message">
-                    <i class="fa-solid fa-seedling"></i> Growing strong!
-                </div>
+                <div class="streak-message streak-message--growing">Growing strong!</div>
                 <?php else: ?>
-                <div class="streak-message" style="background: rgba(107, 114, 128, 0.1); color: #6b7280;">
-                    Make a transaction to start your streak!
-                </div>
+                <div class="streak-message streak-message--empty">Make a transaction to start your streak!</div>
                 <?php endif; ?>
             </div>
             <div class="streak-footer">
@@ -137,16 +95,10 @@ require dirname(__DIR__, 2) . '/layouts/civicone/header.php';
         <!-- People You've Helped -->
         <div class="insights-glass-card">
             <div class="insights-section-header">
-                <h3 class="insights-section-title">
-                    <i class="fa-solid fa-hand-holding-heart" style="color: #ef4444;"></i>
-                    People You've Helped
-                </h3>
+                <h3 class="insights-section-title">People You've Helped</h3>
             </div>
             <?php if (empty($topGivingPartners)): ?>
             <div class="insights-empty">
-                <div class="insights-empty-icon">
-                    <i class="fa-solid fa-heart"></i>
-                </div>
                 <p>Send credits to see who you've helped!</p>
             </div>
             <?php else: ?>
@@ -175,16 +127,10 @@ require dirname(__DIR__, 2) . '/layouts/civicone/header.php';
         <!-- People Who've Helped You -->
         <div class="insights-glass-card">
             <div class="insights-section-header">
-                <h3 class="insights-section-title">
-                    <i class="fa-solid fa-gift" style="color: #10b981;"></i>
-                    People Who've Helped You
-                </h3>
+                <h3 class="insights-section-title">People Who've Helped You</h3>
             </div>
             <?php if (empty($topReceivingPartners)): ?>
             <div class="insights-empty">
-                <div class="insights-empty-icon">
-                    <i class="fa-solid fa-gift"></i>
-                </div>
                 <p>Receive credits to see your helpers!</p>
             </div>
             <?php else: ?>
@@ -214,10 +160,7 @@ require dirname(__DIR__, 2) . '/layouts/civicone/header.php';
     <!-- Community Impact -->
     <div class="insights-glass-card">
         <div class="insights-section-header">
-            <h3 class="insights-section-title">
-                <i class="fa-solid fa-users" style="color: #3b82f6;"></i>
-                Your Community Impact
-            </h3>
+            <h3 class="insights-section-title">Your Community Impact</h3>
         </div>
         <div class="community-stats">
             <div class="community-stat">
@@ -255,16 +198,16 @@ if (ctx) {
             datasets: [{
                 label: 'Received',
                 data: trendsData.map(d => d.received || 0),
-                borderColor: '#10b981',
-                backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                borderColor: '#00703c',
+                backgroundColor: 'rgba(0, 112, 60, 0.1)',
                 fill: true,
                 tension: 0.4,
                 borderWidth: 3,
             }, {
                 label: 'Sent',
                 data: trendsData.map(d => d.sent || 0),
-                borderColor: '#ef4444',
-                backgroundColor: 'rgba(239, 68, 68, 0.1)',
+                borderColor: '#d4351c',
+                backgroundColor: 'rgba(212, 53, 28, 0.1)',
                 fill: true,
                 tension: 0.4,
                 borderWidth: 3,
@@ -281,7 +224,7 @@ if (ctx) {
                 legend: {
                     position: 'bottom',
                     labels: {
-                        color: isDark ? '#94a3b8' : '#6b7280',
+                        color: isDark ? '#b1b4b6' : '#505a5f',
                         padding: 20,
                     }
                 }
@@ -293,7 +236,7 @@ if (ctx) {
                         color: isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)'
                     },
                     ticks: {
-                        color: isDark ? '#94a3b8' : '#6b7280'
+                        color: isDark ? '#b1b4b6' : '#505a5f'
                     }
                 },
                 x: {
@@ -301,7 +244,7 @@ if (ctx) {
                         display: false
                     },
                     ticks: {
-                        color: isDark ? '#94a3b8' : '#6b7280'
+                        color: isDark ? '#b1b4b6' : '#505a5f'
                     }
                 }
             }

@@ -333,7 +333,7 @@
 }
 
 .nexus-skin-civicone .civic-composer-submit:hover:not(:disabled) {
-    filter: brightness(0.9);
+    background: #003078;
 }
 
 .nexus-skin-civicone .civic-composer-submit:disabled {
@@ -497,57 +497,57 @@
 }
 
 .nexus-skin-civicone .civic-type-banner-listing {
-    background: linear-gradient(135deg, var(--color-blue-50) 0%, var(--color-blue-100) 100%);
-    border-left: var(--space-1) solid var(--civic-brand);
+    background: #e8f0f8;
+    border-left: 4px solid #1d70b8;
 }
 
 .nexus-skin-civicone .civic-type-banner-listing.request {
-    background: linear-gradient(135deg, var(--color-amber-100) 0%, var(--color-amber-200) 100%);
-    border-left-color: var(--color-warning);
+    background: #fff7e6;
+    border-left-color: #f47738;
 }
 
 .nexus-skin-civicone .civic-type-banner-event {
-    background: linear-gradient(135deg, var(--color-pink-50) 0%, var(--color-pink-100) 100%);
-    border-left: var(--space-1) solid var(--color-pink-600);
+    background: #fce4ec;
+    border-left: 4px solid #d53880;
 }
 
 .nexus-skin-civicone .civic-type-banner-goal {
-    background: linear-gradient(135deg, var(--color-emerald-50) 0%, var(--color-emerald-100) 100%);
-    border-left: var(--space-1) solid var(--color-green-500);
+    background: #cce2d8;
+    border-left: 4px solid #00703c;
 }
 
 .nexus-skin-civicone .civic-type-banner-poll {
-    background: linear-gradient(135deg, var(--color-blue-50) 0%, var(--color-blue-100) 100%);
-    border-left: var(--space-1) solid var(--color-blue-500);
+    background: #e8f0f8;
+    border-left: 4px solid #1d70b8;
 }
 
 .nexus-skin-civicone .civic-type-banner-volunteering {
-    background: linear-gradient(135deg, #F0F9FF 0%, #E0F2FE 100%);
-    border-left: var(--space-1) solid var(--color-cyan-500);
+    background: #e0f2fe;
+    border-left: 4px solid #0b0c0c;
 }
 
 body.dark-mode .nexus-skin-civicone .civic-type-banner-listing {
-    background: linear-gradient(135deg, #1E3A5F 0%, #1E40AF 100%);
+    background: #003078;
 }
 
 body.dark-mode .nexus-skin-civicone .civic-type-banner-listing.request {
-    background: linear-gradient(135deg, #451A03 0%, var(--color-warning-900) 100%);
+    background: #6e3619;
 }
 
 body.dark-mode .nexus-skin-civicone .civic-type-banner-event {
-    background: linear-gradient(135deg, #500724 0%, #831843 100%);
+    background: #6b1d4d;
 }
 
 body.dark-mode .nexus-skin-civicone .civic-type-banner-goal {
-    background: linear-gradient(135deg, #052E16 0%, #14532D 100%);
+    background: #005a30;
 }
 
 body.dark-mode .nexus-skin-civicone .civic-type-banner-poll {
-    background: linear-gradient(135deg, #1E3A5F 0%, #1E40AF 100%);
+    background: #003078;
 }
 
 body.dark-mode .nexus-skin-civicone .civic-type-banner-volunteering {
-    background: linear-gradient(135deg, #082F49 0%, var(--color-sky-900) 100%);
+    background: #0c2d48;
 }
 
 .nexus-skin-civicone .civic-type-label {

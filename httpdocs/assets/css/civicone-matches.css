@@ -1381,6 +1381,19 @@
     border: 3px solid white;
 }
 
+.connection-online--active {
+    background: #00703c;
+}
+
+.connection-online--recent {
+    background: #f47738;
+}
+
+.connection-status--online {
+    color: #00703c;
+    font-weight: 600;
+}
+
 .connection-info {
     flex: 1;
     min-width: 0;

@@ -1626,29 +1626,20 @@ body.dark-mode .civic-utility-bar .civic-dropdown-content a:hover {
    14. ACCESSIBLE BANNER
    =========================================== */
 .civic-experimental-banner {
-    background: linear-gradient(135deg, var(--civic-brand, #00796B) 0%, var(--civic-brand-dark, #005a4f) 100%);
+    background: #00703c;
     color: #ffffff;
-    padding: 8px var(--space-6);
+    padding: 8px 1.5rem;
     font-size: 13px;
     text-align: center;
-    border-bottom: none;
+    border-bottom: 1px solid #005a30;
     position: relative;
-    min-height: var(--space-10);
+    min-height: 2.5rem;
     display: flex;
     align-items: center;
     justify-content: center;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
-.civic-experimental-banner::after {
-    content: '';
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    height: var(--space-0-5);
-    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
-}
+/* Removed decorative gradient ::after */
 
 .civic-banner-content {
     display: flex;
@@ -1669,18 +1660,15 @@ body.dark-mode .civic-utility-bar .civic-dropdown-content a:hover {
 }
 
 .civic-experimental-badge {
-    background: rgba(255, 255, 255, 0.25);
+    background: rgba(255, 255, 255, 0.2);
     color: #ffffff;
-    padding: var(--space-1) var(--space-2-5);
-    border-radius: var(--radius-lg);
+    padding: 0.25rem 0.625rem;
     font-weight: 700;
     font-size: 11px;
     letter-spacing: 0.3px;
     display: inline-flex;
     align-items: center;
-    gap: var(--space-1-5);
-    backdrop-filter: blur(10px);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15), inset 0 0 0 1px rgba(255, 255, 255, 0.3);
+    gap: 0.375rem;
     border: 1px solid rgba(255, 255, 255, 0.3);
     white-space: nowrap;
     flex-shrink: 0;
@@ -1704,28 +1692,23 @@ body.dark-mode .civic-utility-bar .civic-dropdown-content a:hover {
 }
 
 .civic-experimental-switch {
-    background: rgba(255, 255, 255, 0.95);
-    color: var(--civic-brand, #00796B) !important;
-    padding: var(--space-1) var(--space-3);
-    border-radius: var(--radius-base);
+    background: #ffffff;
+    color: #0b0c0c !important;
+    padding: 0.25rem 0.75rem;
     text-decoration: none;
     font-weight: 600;
     font-size: 12px;
-    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
     display: inline-flex;
     align-items: center;
-    gap: var(--space-1);
-    border: 1px solid rgba(255, 255, 255, 0.3);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    gap: 0.25rem;
+    border: none;
     white-space: nowrap;
     flex-shrink: 0;
 }
 
 .civic-experimental-switch:hover {
-    background: #ffffff;
-    transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-    color: var(--civic-brand-dark, #005a4f) !important;
+    background: #f3f2f1;
+    color: #0b0c0c !important;
 }
 
 .civic-experimental-switch:focus-visible {
@@ -1738,7 +1721,7 @@ body.dark-mode .civic-utility-bar .civic-dropdown-content a:hover {
 
 /* Dark mode banner */
 body.dark-mode .civic-experimental-banner {
-    background: linear-gradient(135deg, #1e3a5f 0%, var(--color-slate-900) 100%);
+    background: #1d70b8;
 }
 
 /* Compact text on narrower screens */
