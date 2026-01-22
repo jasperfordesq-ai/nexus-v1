@@ -133,8 +133,8 @@
         }
 
         .how-it-works-step-icon {
-            width: 80px;
-            height: 80px;
+            width: var(--space-20);
+            height: var(--space-20);
             font-size: var(--font-size-3xl);
         }
     }

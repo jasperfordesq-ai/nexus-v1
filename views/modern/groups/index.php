@@ -52,13 +52,16 @@ require __DIR__ . '/../../layouts/modern/header.php';
     <div class="glass-search-card">
         <form method="GET" class="search-form">
             <div class="search-input-wrapper">
-                <i class="fa-solid fa-magnifying-glass search-icon"></i>
+                <i class="fa-solid fa-magnifying-glass search-icon" aria-hidden="true"></i>
+                <label for="groups-search" class="visually-hidden">Search <?= $isHubsPage ? 'hubs' : 'groups' ?></label>
                 <input
                     type="text"
+                    id="groups-search"
                     name="q"
                     class="glass-search-input"
                     placeholder="Search <?= $isHubsPage ? 'hubs' : 'groups' ?>..."
                     value="<?= htmlspecialchars($_GET['q'] ?? '') ?>"
+                    aria-label="Search <?= $isHubsPage ? 'hubs' : 'groups' ?>"
                 >
             </div>
             <?php if (!$isHubsPage && !empty($groupTypes)): ?>

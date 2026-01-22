@@ -303,8 +303,8 @@ body.dark-mode {
 }
 
 .civic-fed-avatar--sm {
-    width: 44px;
-    height: 44px;
+    width: var(--space-11);
+    height: var(--space-11);
     border-width: var(--space-0.5);
 }
 
@@ -668,9 +668,9 @@ body.dark-mode {
 .civic-fed-date-box {
     background: var(--civic-brand, var(--color-blue-600));
     color: #fff;
-    padding: 15px;
+    padding: var(--space-4);
     text-align: center;
-    min-width: 80px;
+    min-width: var(--space-20);
     border-radius: var(--radius-base);
 }
 
@@ -844,7 +844,7 @@ body.dark-mode {
 
 .civic-fed-thread-meta {
     text-align: right;
-    min-width: 80px;
+    min-width: var(--space-20);
     font-size: 0.85rem;
     color: var(--civic-fed-text-muted);
 }
@@ -854,8 +854,8 @@ body.dark-mode {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    min-width: 22px;
-    height: 22px;
+    min-width: var(--space-5-5);
+    height: var(--space-5-5);
     padding: 0 var(--space-1.5);
     background: var(--civic-fed-danger);
     color: white;
@@ -1084,7 +1084,7 @@ body.dark-mode {
 
 .civic-fed-search-input {
     width: 100%;
-    padding: var(--space-3) var(--space-3) var(--space-3) 44px;
+    padding: var(--space-3) var(--space-3) var(--space-3) var(--space-11);
     font-size: var(--font-size-base);
     border: 1px solid var(--civic-border, var(--color-gray-300));
     border-radius: var(--space-1.5);
@@ -1474,7 +1474,7 @@ body.dark-mode {
     border-top: none;
     border-left: none;
     border-right: none;
-    margin-bottom: -2px;
+    margin-bottom: -var(--space-0-5);
 }
 
 .civic-fed-tab-link:hover {
@@ -1628,8 +1628,8 @@ body.dark-mode {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 18px;
-    height: 18px;
+    width: var(--space-4-5);
+    height: var(--space-4-5);
     background: var(--civic-fed-danger);
     color: white;
     font-size: var(--font-size-xs);
@@ -2282,7 +2282,7 @@ body.dark-mode {
 
     .civic-fed-header,
     .civic-fed-tab-nav {
-        border-bottom-width: 5px;
+        border-bottom-width: var(--space-1);
     }
 }
 

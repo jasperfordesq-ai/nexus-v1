@@ -33,6 +33,22 @@
     box-sizing: border-box;
 }
 
+/* AVATAR IMAGE CONSTRAINTS
+   Prevent avatars from expanding to fill container
+   Must use !important to override critical-css.php img rule */
+.avatar-img,
+img.avatar-img {
+    width: 44px !important;
+    height: 44px !important;
+    max-width: 44px !important;
+    max-height: 44px !important;
+    min-width: 44px !important;
+    min-height: 44px !important;
+    border-radius: 50%;
+    object-fit: cover;
+    flex-shrink: 0;
+}
+
 :root {
     --htb-bg-page: var(--color-gray-50);
     --htb-bg-card: var(--color-white);

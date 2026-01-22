@@ -187,8 +187,8 @@
 }
 
 .civic-avatar-sm {
-    width: 44px;
-    height: 44px;
+    width: var(--space-11);
+    height: var(--space-11);
     border-radius: var(--radius-full);
     object-fit: cover;
     border: 2px solid var(--civic-profile-border);
@@ -271,7 +271,7 @@
    -------------------------------------------- */
 .civic-comments-section {
     display: none;
-    border-top: 2px solid var(--civic-profile-border);
+    border-top: var(--space-0-5) solid var(--civic-profile-border);
     background: #F8F8F8;
     padding: var(--space-4);
 }
@@ -425,8 +425,8 @@
     font-size: var(--font-size-xl);
     cursor: pointer;
     padding: var(--space-2);
-    min-width: 36px;
-    min-height: 36px;
+    min-width: var(--space-9);
+    min-height: var(--space-9);
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -490,12 +490,12 @@
 .civic-comment-form {
     display: flex;
     gap: var(--space-3);
-    margin-top: 12px;
+    margin-top: var(--space-3);
 }
 
 .civic-comment-input {
     flex: 1;
-    padding: var(--space-3) 14px;
+    padding: var(--space-3) var(--space-3-5);
     min-height: var(--civic-profile-touch-min);
     border: 2px solid var(--civic-profile-border);
     font-size: 16px; /* Prevents iOS zoom */
@@ -520,7 +520,7 @@
 }
 
 .civic-comment-submit {
-    padding: var(--space-3) 20px;
+    padding: var(--space-3) var(--space-5);
     min-height: var(--civic-profile-touch-min);
     background: var(--civic-profile-brand);
     color: #fff;
@@ -554,7 +554,7 @@
     transform: translateX(-50%);
     background: var(--civic-profile-brand);
     color: #fff;
-    padding: var(--space-3) 24px;
+    padding: var(--space-3) var(--space-6);
     font-weight: var(--font-weight-semibold);
     z-index: 10000;
     opacity: 0;
@@ -585,7 +585,7 @@
 
 .civic-composer textarea {
     width: 100%;
-    min-height: 80px;
+    min-height: var(--space-20);
     padding: var(--space-3);
     border: 1px solid var(--civic-profile-border-light);
     font-size: 16px; /* Prevents iOS zoom */
@@ -653,17 +653,17 @@
     .civic-post-card,
     .civic-composer,
     .civic-comment {
-        border-width: 3px;
+        border-width: var(--space-1);
     }
 
     .civic-action-btn {
-        border-width: 2px;
+        border-width: var(--space-0-5);
     }
 
     .civic-comment-input,
     .civic-reply-input,
     .civic-composer textarea {
-        border-width: 3px;
+        border-width: var(--space-1);
     }
 }
 

@@ -8,8 +8,8 @@
 }
 
 .nav-tabs .nav-link.active {
-    color: #6366f1;
-    border-bottom-color: #6366f1;
+    color: var(--color-primary-500);
+    border-bottom-color: var(--color-primary-500);
 }
 
 .card {
@@ -42,8 +42,8 @@
 
 /* Avatar thumbnail for leaderboard - 32x32px */
 .avatar-thumbnail {
-    width: 32px;
-    height: 32px;
+    width: var(--space-8);
+    height: var(--space-8);
     object-fit: cover;
 }
 

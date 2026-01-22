@@ -1,11 +1,11 @@
 /* ============================================
    RESOURCES CREATE - Holographic Glassmorphism
-   Teal Theme (#0d9488)
+   Teal Theme (var(--color-teal-600))
    ============================================ */
 
 .holo-resource-page {
     min-height: 100vh;
-    padding: 180px 20px 60px;
+    padding: 180px var(--space-5) 60px;
     position: relative;
     overflow: hidden;
     background: linear-gradient(135deg, #f0fdfa 0%, #ccfbf1 50%, #99f6e4 100%);
@@ -39,7 +39,7 @@
     height: 350px;
     background: radial-gradient(circle, rgba(20, 184, 166, 0.35) 0%, transparent 70%);
     top: 40%;
-    right: -80px;
+    right: -var(--space-20);
     animation-delay: -7s;
 }
 
@@ -80,7 +80,7 @@
     -webkit-backdrop-filter: blur(40px) saturate(180%);
     border-radius: 28px;
     border: 1px solid rgba(255, 255, 255, 0.5);
-    padding: 48px;
+    padding: var(--space-12);
     box-shadow:
         0 25px 50px -12px rgba(0, 0, 0, 0.1),
         0 0 0 1px rgba(255, 255, 255, 0.3) inset;
@@ -125,7 +125,7 @@
     top: 0;
     left: 0;
     right: 0;
-    height: 2px;
+    height: var(--space-0-5);
     background: linear-gradient(90deg,
         transparent,
         rgba(13, 148, 136, 0.6),
@@ -138,15 +138,15 @@
 /* Header */
 .holo-header {
     text-align: center;
-    margin-bottom: 40px;
+    margin-bottom: var(--space-10);
 }
 
 .holo-header-icon {
     width: 72px;
     height: 72px;
-    margin: 0 auto 20px;
-    background: linear-gradient(135deg, #0d9488 0%, #0f766e 100%);
-    border-radius: 20px;
+    margin: 0 auto var(--space-5);
+    background: linear-gradient(135deg, var(--color-teal-600) 0%, #0f766e 100%);
+    border-radius: var(--radius-2xl);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -158,8 +158,8 @@
 .holo-title {
     font-size: 2rem;
     font-weight: 800;
-    margin: 0 0 10px;
-    background: linear-gradient(135deg, #0f766e 0%, #0d9488 50%, #14b8a6 100%);
+    margin: 0 0 var(--space-2-5);
+    background: linear-gradient(135deg, #0f766e 0%, var(--color-teal-600) 50%, var(--color-teal-500) 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -174,7 +174,7 @@
 
 .holo-subtitle {
     font-size: 1rem;
-    color: #64748b;
+    color: var(--color-slate-500);
     margin: 0;
 }
 
@@ -184,15 +184,15 @@
 
 /* Form Styles */
 .holo-form-group {
-    margin-bottom: 24px;
+    margin-bottom: var(--space-6);
 }
 
 .holo-label {
     display: block;
     font-size: 0.9rem;
     font-weight: 600;
-    color: #334155;
-    margin-bottom: 10px;
+    color: var(--color-slate-700);
+    margin-bottom: var(--space-2-5);
     padding-left: 4px;
 }
 
@@ -203,11 +203,11 @@
 .holo-input,
 .holo-select {
     width: 100%;
-    padding: 16px 20px;
-    border-radius: 16px;
+    padding: 16px var(--space-5);
+    border-radius: var(--radius-xl);
     border: 2px solid rgba(13, 148, 136, 0.15);
     background: rgba(255, 255, 255, 0.6);
-    color: #1e293b;
+    color: var(--color-slate-800);
     font-size: 1rem;
     font-family: inherit;
     transition: all 0.3s ease;
@@ -217,20 +217,20 @@
 .holo-input:focus,
 .holo-select:focus {
     outline: none;
-    border-color: #0d9488;
+    border-color: var(--color-teal-600);
     background: rgba(255, 255, 255, 0.9);
     box-shadow: 0 0 0 4px rgba(13, 148, 136, 0.1);
 }
 
 .holo-input::placeholder {
-    color: #94a3b8;
+    color: var(--color-slate-400);
 }
 
 [data-theme="dark"] .holo-input,
 [data-theme="dark"] .holo-select {
     background: rgba(255, 255, 255, 0.08);
     border-color: rgba(255, 255, 255, 0.1);
-    color: #f8fafc;
+    color: var(--color-slate-50);
 }
 
 [data-theme="dark"] .holo-input:focus,
@@ -245,8 +245,8 @@
 }
 
 [data-theme="dark"] .holo-select option {
-    background: #1e293b;
-    color: #f8fafc;
+    background: var(--color-slate-800);
+    color: var(--color-slate-50);
 }
 
 textarea.holo-input {
@@ -257,9 +257,9 @@ textarea.holo-input {
 
 /* File Upload Zone */
 .holo-upload-zone {
-    padding: 40px 30px;
+    padding: var(--space-10) 30px;
     border: 2px dashed rgba(13, 148, 136, 0.3);
-    border-radius: 20px;
+    border-radius: var(--radius-2xl);
     text-align: center;
     background: linear-gradient(135deg, rgba(13, 148, 136, 0.05) 0%, rgba(20, 184, 166, 0.05) 100%);
     transition: all 0.3s ease;
@@ -272,7 +272,7 @@ textarea.holo-input {
 }
 
 .holo-upload-zone.dragover {
-    border-color: #0d9488;
+    border-color: var(--color-teal-600);
     background: rgba(13, 148, 136, 0.1);
     transform: scale(1.01);
 }
@@ -291,12 +291,12 @@ textarea.holo-input {
     height: 60px;
     margin: 0 auto 16px;
     background: linear-gradient(135deg, rgba(13, 148, 136, 0.15) 0%, rgba(20, 184, 166, 0.1) 100%);
-    border-radius: 16px;
+    border-radius: var(--radius-xl);
     display: flex;
     align-items: center;
     justify-content: center;
     font-size: 1.5rem;
-    color: #0d9488;
+    color: var(--color-teal-600);
 }
 
 [data-theme="dark"] .holo-upload-icon {
@@ -307,7 +307,7 @@ textarea.holo-input {
 .holo-upload-text {
     font-size: 1rem;
     font-weight: 600;
-    color: #334155;
+    color: var(--color-slate-700);
     margin-bottom: 8px;
 }
 
@@ -317,7 +317,7 @@ textarea.holo-input {
 
 .holo-upload-hint {
     font-size: 0.85rem;
-    color: #64748b;
+    color: var(--color-slate-500);
 }
 
 [data-theme="dark"] .holo-upload-hint {
@@ -330,11 +330,11 @@ textarea.holo-input {
 
 .holo-file-name {
     margin-top: 16px;
-    padding: 12px 16px;
+    padding: var(--space-3) 16px;
     background: rgba(13, 148, 136, 0.1);
-    border-radius: 12px;
+    border-radius: var(--radius-lg);
     font-size: 0.9rem;
-    color: #0d9488;
+    color: var(--color-teal-600);
     font-weight: 600;
     display: none;
 }
@@ -352,16 +352,16 @@ textarea.holo-input {
 .holo-actions {
     display: flex;
     flex-direction: column;
-    gap: 12px;
-    margin-top: 32px;
+    gap: var(--space-3);
+    margin-top: var(--space-8);
 }
 
 .holo-btn {
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 10px;
-    padding: 16px 28px;
+    gap: var(--space-2-5);
+    padding: 16px var(--space-7);
     border-radius: 50px;
     font-size: 1rem;
     font-weight: 600;
@@ -370,11 +370,11 @@ textarea.holo-input {
     text-decoration: none;
     border: none;
     font-family: inherit;
-    min-height: 48px;
+    min-height: var(--space-12);
 }
 
 .holo-btn-primary {
-    background: linear-gradient(135deg, #0d9488 0%, #0f766e 100%);
+    background: linear-gradient(135deg, var(--color-teal-600) 0%, #0f766e 100%);
     color: white;
     box-shadow: 0 8px 24px rgba(13, 148, 136, 0.35);
 }
@@ -390,13 +390,13 @@ textarea.holo-input {
 
 .holo-btn-secondary {
     background: transparent;
-    color: #64748b;
+    color: var(--color-slate-500);
     border: 2px solid rgba(100, 116, 139, 0.2);
 }
 
 .holo-btn-secondary:hover {
     background: rgba(100, 116, 139, 0.08);
-    color: #475569;
+    color: var(--color-slate-600);
 }
 
 [data-theme="dark"] .holo-btn-secondary {
@@ -416,15 +416,15 @@ textarea.holo-input {
     left: 0;
     right: 0;
     z-index: 10001;
-    padding: 14px 20px;
-    background: linear-gradient(135deg, #ef4444, #dc2626);
+    padding: var(--space-3-5) var(--space-5);
+    background: linear-gradient(135deg, var(--color-error-500), var(--color-error-600));
     color: white;
     font-size: 0.95rem;
     font-weight: 600;
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 10px;
+    gap: var(--space-2-5);
     transform: translateY(-100%);
     transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
@@ -436,12 +436,12 @@ textarea.holo-input {
 /* Mobile Responsive */
 @media (max-width: 900px) {
     .holo-resource-page {
-        padding: 20px 16px 120px;
+        padding: var(--space-5) 16px 120px;
     }
 
     .holo-glass-card {
-        padding: 32px 24px;
-        border-radius: 24px;
+        padding: var(--space-8) var(--space-6);
+        border-radius: var(--radius-2xl);
     }
 
     .holo-title {
@@ -449,12 +449,12 @@ textarea.holo-input {
     }
 
     .holo-header-icon {
-        width: 64px;
-        height: 64px;
+        width: var(--space-16);
+        height: var(--space-16);
         font-size: 1.5rem;
     }
 
     .holo-upload-zone {
-        padding: 30px 20px;
+        padding: 30px var(--space-5);
     }
 }

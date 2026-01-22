@@ -25,6 +25,7 @@
   "devDependencies": {
     "cssnano": "^7.1.2",
     "eslint": "^8.57.0",
+    "pa11y": "^9.0.1",
     "postcss": "^8.5.6",
     "postcss-cli": "^11.0.1",
     "purgecss": "^7.0.2",

@@ -52,7 +52,8 @@ function civicone_govuk_breadcrumbs($args = []) {
             $html .= htmlspecialchars($item['text']);
             $html .= '</a>';
         } else {
-            $html .= htmlspecialchars($item['text']);
+            // Current page - add aria-current for screen readers
+            $html .= '<span aria-current="page">' . htmlspecialchars($item['text']) . '</span>';
         }
 
         $html .= '</li>';

@@ -22,8 +22,9 @@ $basePath = \Nexus\Core\TenantContext::getBasePath();
             </ol>
         </nav>
 
-        <!-- Hero (auto-resolves from config/heroes.php for /listings route) -->
-        <?php require __DIR__ . '/../../layouts/civicone/partials/render-hero.php'; ?>
+        <!-- Page Header (GOV.UK Typography) -->
+        <h1 class="govuk-heading-xl">Listings</h1>
+        <p class="govuk-body-l">Browse offers and requests from community members.</p>
 
         <!-- Action Button -->
         <div class="civicone-grid-row civicone-action-row">

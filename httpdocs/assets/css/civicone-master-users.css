@@ -6,7 +6,7 @@
 .super-admin-wrapper {
     position: relative;
     z-index: 20;
-    padding: 0 40px 60px;
+    padding: 0 var(--space-10) 60px;
 }
 
 /* Desktop spacing */
@@ -19,11 +19,11 @@
 /* Mobile responsiveness */
 @media (max-width: 600px) {
     .super-admin-wrapper {
-        padding: 120px 15px 100px 15px;
+        padding: 120px var(--space-4) 100px var(--space-4);
     }
 
     .super-admin-wrapper .nexus-card {
-        border-radius: 12px;
+        border-radius: var(--radius-lg);
     }
 
     .super-admin-wrapper .master-users-table {
@@ -45,7 +45,7 @@
    ======================================== */
 
 .master-users-card-header {
-    padding: 20px 25px;
+    padding: var(--space-5) 25px;
     border-bottom: 1px solid var(--color-gray-200, #e2e8f0);
     display: flex;
     justify-content: space-between;
@@ -75,7 +75,7 @@
 }
 
 .master-users-table th {
-    padding: 15px 20px;
+    padding: var(--space-4) var(--space-5);
     text-align: left;
     font-size: 0.8rem;
     text-transform: uppercase;
@@ -91,7 +91,7 @@
 }
 
 .master-users-table td {
-    padding: 15px 20px;
+    padding: var(--space-4) var(--space-5);
 }
 
 .master-users-table td.text-right {
@@ -128,23 +128,23 @@
 .master-users-badge-platform {
     background: var(--color-gray-100, #f1f5f9);
     color: var(--color-gray-600, #475569);
-    padding: 2px 6px;
-    border-radius: 4px;
+    padding: var(--space-0-5) var(--space-1-5);
+    border-radius: var(--radius-sm);
     font-size: 0.8rem;
 }
 
 .master-users-badge-tenant {
     background: var(--color-sky-100, #e0f2fe);
     color: var(--color-sky-700, #0369a1);
-    padding: 2px 6px;
-    border-radius: 4px;
+    padding: var(--space-0-5) var(--space-1-5);
+    border-radius: var(--radius-sm);
     font-size: 0.8rem;
 }
 
 .master-users-tenant-slug {
     font-size: 0.75rem;
     color: var(--color-gray-400, #94a3b8);
-    margin-top: 2px;
+    margin-top: var(--space-0-5);
 }
 
 /* ========================================
@@ -164,8 +164,8 @@
 .master-users-status-active {
     background: var(--color-green-100, #dcfce7);
     color: var(--color-green-800, #166534);
-    padding: 2px 8px;
-    border-radius: 12px;
+    padding: var(--space-0-5) 8px;
+    border-radius: var(--radius-lg);
     font-size: 0.75rem;
     font-weight: 600;
 }
@@ -173,8 +173,8 @@
 .master-users-status-pending {
     background: var(--color-yellow-100, #fef9c3);
     color: var(--color-yellow-800, #854d0e);
-    padding: 2px 8px;
-    border-radius: 12px;
+    padding: var(--space-0-5) 8px;
+    border-radius: var(--radius-lg);
     font-size: 0.75rem;
     font-weight: 600;
 }
@@ -188,20 +188,20 @@
 }
 
 .master-users-btn-approve {
-    padding: 4px 10px;
+    padding: 4px var(--space-2-5);
     font-size: 0.75rem;
-    margin-right: 5px;
+    margin-right: var(--space-1);
     background: var(--color-green-500, #22c55e);
     border-color: var(--color-green-600, #16a34a);
 }
 
 .master-users-btn-delete {
-    padding: 4px 10px;
+    padding: 4px var(--space-2-5);
     font-size: 0.75rem;
     background: var(--color-red-500, #ef4444);
     color: white;
     border: none;
-    border-radius: 4px;
+    border-radius: var(--radius-sm);
     cursor: pointer;
 }
 
@@ -223,7 +223,7 @@
 }
 
 [data-theme="dark"] .master-users-card-header h3 {
-    color: #f1f5f9;
+    color: var(--color-slate-100);
 }
 
 /* Table header */
@@ -232,7 +232,7 @@
 }
 
 [data-theme="dark"] .master-users-table th {
-    color: #94a3b8;
+    color: var(--color-slate-400);
 }
 
 /* Table rows */
@@ -243,17 +243,17 @@
 [data-theme="dark"] .master-users-id,
 [data-theme="dark"] .master-users-email,
 [data-theme="dark"] .master-users-date {
-    color: #94a3b8;
+    color: var(--color-slate-400);
 }
 
 [data-theme="dark"] .master-users-name {
-    color: #f1f5f9;
+    color: var(--color-slate-100);
 }
 
 /* Tenant badges */
 [data-theme="dark"] .master-users-badge-platform {
     background: rgba(51, 65, 85, 0.6);
-    color: #e2e8f0;
+    color: var(--color-slate-200);
 }
 
 [data-theme="dark"] .master-users-badge-tenant {
@@ -262,12 +262,12 @@
 }
 
 [data-theme="dark"] .master-users-tenant-slug {
-    color: #64748b;
+    color: var(--color-slate-500);
 }
 
 /* Role text */
 [data-theme="dark"] .master-users-role {
-    color: #e2e8f0;
+    color: var(--color-slate-200);
 }
 
 /* Status badges */
@@ -285,5 +285,5 @@
 [data-theme="dark"] .nexus-btn-secondary {
     background: rgba(51, 65, 85, 0.6);
     border-color: rgba(255, 255, 255, 0.15);
-    color: #e2e8f0;
+    color: var(--color-slate-200);
 }

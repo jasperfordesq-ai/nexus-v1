@@ -52,10 +52,12 @@ $adminBreadcrumbs = generateAdminBreadcrumbs($adminModules, $currentPath, $baseP
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
+    <!-- Design Tokens - MUST load first -->
+    <link rel="stylesheet" href="/assets/css/design-tokens.css?v=<?= time() ?>">
     <!-- Admin CSS (combined) -->
     <link rel="stylesheet" href="/assets/css/admin-gold-standard.min.css?v=<?= time() ?>">
     <!-- Admin Sidebar CSS -->
-    <link rel="stylesheet" href="/assets/css/admin-sidebar.css?v=<?= time() ?>">
+    <link rel="stylesheet" href="/assets/css/admin-sidebar.min.css?v=<?= time() ?>">
     <!-- Admin Menu Builder - Extracted inline styles -->
     <link rel="stylesheet" href="/assets/css/admin-menu-builder.css?v=<?= time() ?>">
     <!-- Admin Menu Index - Extracted inline styles -->

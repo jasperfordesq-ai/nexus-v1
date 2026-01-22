@@ -155,9 +155,12 @@ img.avatar-img {
     border: var(--space-0.5) solid rgba(99, 102, 241, 0.15);
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
     transition: transform 0.2s ease, box-shadow 0.2s ease;
-    /* Respect the width/height attributes set by ImageHelper */
-    max-width: 100%;
-    height: auto;
+    /* Default avatar size - force constraint */
+    width: 44px !important;
+    height: 44px !important;
+    max-width: 44px !important;
+    max-height: 44px !important;
+    flex-shrink: 0;
 }
 
 .avatar-img:hover,
@@ -178,19 +181,29 @@ img.avatar-img:hover {
     box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
 }
 
-/* Picture element wrapper - constrain to content size */
+/* Picture element wrapper - constrain avatar to proper size */
 picture:has(.avatar-img) {
     display: inline-flex;
     flex-shrink: 0;
+    width: 44px;
+    height: 44px;
+    max-width: 44px;
+    max-height: 44px;
 }
 
 /* Feed item avatar - 44px standard size */
+.feed-item-avatar-link,
 .feed-item-avatar-link picture,
-.feed-item-avatar-link .avatar-img {
+.feed-item-avatar-link .avatar-img,
+.feed-item-avatar-link picture img,
+.feed-item-avatar-link picture .avatar-img {
     width: 44px !important;
     height: 44px !important;
     min-width: 44px;
     min-height: 44px;
+    max-width: 44px !important;
+    max-height: 44px !important;
+    flex-shrink: 0;
 }
 
 /* Sidebar avatars - constrain to reasonable size */

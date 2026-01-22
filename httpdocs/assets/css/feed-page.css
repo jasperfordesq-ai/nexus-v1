@@ -916,3 +916,52 @@
         padding-bottom: calc(100px + env(safe-area-inset-bottom));
     }
 }
+
+/* ============================================
+   AVATAR IMAGE OVERRIDES
+   Override critical-css.php global img rule
+   ============================================ */
+.feed-container .avatar-img,
+.feed-container img.avatar-img,
+.feed-card .avatar-img,
+.feed-card img.avatar-img,
+.feed-item-avatar-link .avatar-img,
+.feed-item-avatar-link img.avatar-img,
+.compose-header .avatar-img,
+.compose-header img.avatar-img,
+.story-avatar .avatar-img,
+.story-avatar img.avatar-img,
+.comment-input-wrap .avatar-img,
+.comment-input-wrap img.avatar-img {
+    width: 44px !important;
+    height: 44px !important;
+    max-width: 44px !important;
+    max-height: 44px !important;
+    min-width: 44px !important;
+    min-height: 44px !important;
+    border-radius: var(--radius-full);
+    object-fit: cover;
+    flex-shrink: 0;
+}
+
+/* Story avatars are larger (56px mobile, 64px otherwise) */
+.story-avatar .avatar-img,
+.story-avatar img.avatar-img {
+    width: 100% !important;
+    height: 100% !important;
+    max-width: none !important;
+    max-height: none !important;
+    min-width: 0 !important;
+    min-height: 0 !important;
+}
+
+/* Comment avatars are smaller (32px) */
+.comment-input-wrap .avatar-img,
+.comment-input-wrap img.avatar-img {
+    width: var(--space-8) !important;
+    height: var(--space-8) !important;
+    max-width: var(--space-8) !important;
+    max-height: var(--space-8) !important;
+    min-width: var(--space-8) !important;
+    min-height: var(--space-8) !important;
+}

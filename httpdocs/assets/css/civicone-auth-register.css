@@ -8,7 +8,7 @@
         width: 100%;
         max-width: 600px;
         margin: 0 auto;
-        padding: 0 15px;
+        padding: 0 var(--space-4);
         box-sizing: border-box;
         /* Prevent overflow */
     }
@@ -18,7 +18,7 @@
         position: relative;
         z-index: 10;
         background: white;
-        border-radius: 12px;
+        border-radius: var(--radius-lg);
         overflow: hidden;
         box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
     }
@@ -33,13 +33,13 @@
 
     .form-row {
         display: flex;
-        gap: 15px;
+        gap: var(--space-4);
         flex-wrap: wrap;
-        margin-bottom: 20px;
+        margin-bottom: var(--space-5);
     }
 
     .form-group {
-        margin-bottom: 20px;
+        margin-bottom: var(--space-5);
         width: 100%;
         /* Default full width */
     }
@@ -63,10 +63,10 @@
         max-width: 100%;
         box-sizing: border-box;
         /* Fix width calc */
-        padding: 12px;
+        padding: var(--space-3);
         /* Standard padding */
-        border: 2px solid #e5e7eb;
-        border-radius: 8px;
+        border: var(--space-0-5) solid var(--color-gray-200);
+        border-radius: var(--radius-md);
         font-size: 1rem;
         transition: border-color 0.2s;
     }
@@ -78,35 +78,59 @@
 
     .form-note {
         font-size: 0.8rem;
-        color: #6b7280;
-        margin-top: 6px;
+        color: var(--color-gray-500);
+        margin-top: var(--space-1-5);
     }
 
     .password-rules {
-        margin-top: 12px;
+        margin-top: var(--space-3);
         font-size: 0.85rem;
-        color: #6b7280;
-        background: #f9fafb;
-        padding: 12px;
-        border-radius: 6px;
+        color: var(--color-gray-500);
+        background: var(--color-gray-50);
+        padding: var(--space-3);
+        border-radius: var(--radius-base);
     }
 
     .rules-title {
         font-weight: 700;
-        margin-bottom: 6px;
+        margin-bottom: var(--space-1-5);
     }
 
     .auth-submit-btn {
+        /* GOV.UK Button - disabled state by default (enabled via JS) */
         width: 100%;
-        font-size: 1.1rem;
-        padding: 14px;
-        background: var(--htb-gradient-create, linear-gradient(135deg, #6366f1 0%, #a855f7 100%));
+        min-height: 44px;
+        font-size: 1.1875rem;
+        font-weight: 700;
+        padding: var(--space-3) var(--space-4);
+        background-color: var(--color-govuk-grey);
+        color: var(--color-white);
         opacity: 0.5;
         pointer-events: none;
-        border: none;
-        color: white;
-        border-radius: 8px;
-        margin-top: 10px;
+        border: 2px solid transparent;
+        border-radius: 0;
+        box-shadow: 0 2px 0 #929191;
+        margin-top: var(--space-2-5);
+        cursor: not-allowed;
+    }
+
+    .auth-submit-btn:not([disabled]) {
+        background-color: var(--color-govuk-green);
+        box-shadow: 0 2px 0 #002d18;
+        opacity: 1;
+        pointer-events: auto;
+        cursor: pointer;
+    }
+
+    .auth-submit-btn:not([disabled]):hover {
+        background-color: var(--color-govuk-green-dark, #005a30);
+    }
+
+    .auth-submit-btn:not([disabled]):focus {
+        outline: 3px solid transparent;
+        background-color: var(--color-govuk-yellow);
+        color: var(--color-govuk-black);
+        box-shadow: 0 2px 0 var(--color-govuk-black);
     }
 
     .auth-login-link {
@@ -133,8 +157,8 @@
     @media (max-width: 600px) {
         .auth-wrapper {
             padding-top: 120px;
-            padding-left: 10px;
-            padding-right: 10px;
+            padding-left: var(--space-2-5);
+            padding-right: var(--space-2-5);
         }
 
         .auth-card-body {
@@ -146,7 +170,7 @@
         }
 
         .form-group {
-            margin-bottom: 15px;
+            margin-bottom: var(--space-4);
         }
     }
 
@@ -161,62 +185,62 @@
     }
 
     [data-theme="dark"] .form-label {
-        color: #e2e8f0;
+        color: var(--color-slate-200);
     }
 
     [data-theme="dark"] .form-input {
         background: rgba(15, 23, 42, 0.6);
         border-color: rgba(255, 255, 255, 0.15);
-        color: #f1f5f9;
+        color: var(--color-slate-100);
     }
 
     [data-theme="dark"] .form-input::placeholder {
-        color: #64748b;
+        color: var(--color-slate-500);
     }
 
     [data-theme="dark"] .form-input:focus {
-        border-color: #6366f1 !important;
+        border-color: var(--color-primary-500) !important;
         box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
     }
 
     [data-theme="dark"] .form-note {
-        color: #94a3b8;
+        color: var(--color-slate-400);
     }
 
     /* Password Rules */
     [data-theme="dark"] .password-rules {
         background: rgba(15, 23, 42, 0.6);
-        color: #94a3b8;
+        color: var(--color-slate-400);
         border: 1px solid rgba(255, 255, 255, 0.1);
     }
 
     [data-theme="dark"] .rules-title {
-        color: #e2e8f0;
+        color: var(--color-slate-200);
     }
 
     /* GDPR Consent Label */
-    [data-theme="dark"] label[style*="color: #374151"] {
-        color: #e2e8f0 !important;
+    [data-theme="dark"] label[style*="color: var(--color-gray-700)"] {
+        color: var(--color-slate-200) !important;
     }
 
     /* Data Protection Notice Box */
-    [data-theme="dark"] div[style*="background: #f9fafb"][style*="border-radius: 8px"] {
+    [data-theme="dark"] div[style*="background: var(--color-gray-50)"][style*="border-radius: var(--radius-md)"] {
         background: rgba(15, 23, 42, 0.6) !important;
         border: 1px solid rgba(255, 255, 255, 0.1);
     }
 
-    [data-theme="dark"] div[style*="background: #f9fafb"] p[style*="color: #374151"] {
-        color: #e2e8f0 !important;
+    [data-theme="dark"] div[style*="background: var(--color-gray-50)"] p[style*="color: var(--color-gray-700)"] {
+        color: var(--color-slate-200) !important;
     }
 
-    [data-theme="dark"] div[style*="background: #f9fafb"] p,
-    [data-theme="dark"] div[style*="background: #f9fafb"] li {
-        color: #94a3b8 !important;
+    [data-theme="dark"] div[style*="background: var(--color-gray-50)"] p,
+    [data-theme="dark"] div[style*="background: var(--color-gray-50)"] li {
+        color: var(--color-slate-400) !important;
     }
 
     /* Login Link */
     [data-theme="dark"] .auth-login-link {
-        color: #94a3b8;
+        color: var(--color-slate-400);
     }
 
     [data-theme="dark"] .auth-login-link a {
@@ -226,10 +250,10 @@
     /* Select dropdown */
     [data-theme="dark"] select.form-input {
         background: rgba(15, 23, 42, 0.6);
-        color: #f1f5f9;
+        color: var(--color-slate-100);
     }
 
     [data-theme="dark"] select.form-input option {
-        background: #1e293b;
-        color: #f1f5f9;
+        background: var(--color-slate-800);
+        color: var(--color-slate-100);
     }

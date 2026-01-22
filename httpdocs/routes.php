@@ -337,6 +337,7 @@ $router->add('GET', '/api/wallet/balance', 'Nexus\Controllers\Api\WalletApiContr
 // Layout Switching API (session-based, no URL pollution)
 $router->add('POST', '/api/layout-switch', 'Nexus\Controllers\Api\LayoutApiController@switch');
 $router->add('GET', '/api/layout-switch', 'Nexus\Controllers\Api\LayoutApiController@current');
+$router->add('GET', '/api/layout-debug', 'Nexus\Controllers\Api\LayoutApiController@debug');
 
 // Nexus Score API
 $router->add('GET', '/api/nexus-score', 'Nexus\Controllers\NexusScoreController@apiGetScore');

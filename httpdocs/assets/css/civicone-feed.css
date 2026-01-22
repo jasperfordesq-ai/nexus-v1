@@ -89,8 +89,8 @@
 }
 
 .nexus-skin-civicone .civic-composer-avatar {
-    width: 44px;
-    height: 44px;
+    width: var(--space-11);
+    height: var(--space-11);
     border-radius: 50%;
     object-fit: cover;
     border: 2px solid var(--civic-border);
@@ -187,8 +187,8 @@
 .nexus-skin-civicone .civic-composer-close {
     position: absolute;
     right: 0;
-    width: 36px;
-    height: 36px;
+    width: var(--space-9);
+    height: var(--space-9);
     border-radius: 50%;
     background: var(--civic-bg-page);
     border: none;
@@ -297,8 +297,8 @@
 }
 
 .nexus-skin-civicone .civic-composer-tool-btn {
-    width: 36px;
-    height: 36px;
+    width: var(--space-9);
+    height: var(--space-9);
     border-radius: 50%;
     display: flex;
     align-items: center;
@@ -390,8 +390,8 @@
 }
 
 .nexus-skin-civicone .civic-feed-avatar {
-    width: 44px;
-    height: 44px;
+    width: var(--space-11);
+    height: var(--space-11);
     border-radius: 50%;
     object-fit: cover;
     flex-shrink: 0;
@@ -441,8 +441,8 @@
 }
 
 .nexus-skin-civicone .civic-feed-menu {
-    width: 36px;
-    height: 36px;
+    width: var(--space-9);
+    height: var(--space-9);
     border-radius: 50%;
     display: flex;
     align-items: center;
@@ -531,7 +531,7 @@ body.dark-mode .nexus-skin-civicone .civic-type-banner-listing {
 }
 
 body.dark-mode .nexus-skin-civicone .civic-type-banner-listing.request {
-    background: linear-gradient(135deg, #451A03 0%, #78350F 100%);
+    background: linear-gradient(135deg, #451A03 0%, var(--color-warning-900) 100%);
 }
 
 body.dark-mode .nexus-skin-civicone .civic-type-banner-event {
@@ -667,7 +667,7 @@ body.dark-mode .nexus-skin-civicone .civic-type-badge {
 .nexus-skin-civicone .civic-feed-action-btn,
 .nexus-skin-civicone .civicone-feed-action {
     flex: 1;
-    height: 44px;
+    height: var(--space-11);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -721,8 +721,8 @@ body.dark-mode .nexus-skin-civicone .civic-type-badge {
 }
 
 .nexus-skin-civicone .civic-comment-avatar {
-    width: 36px;
-    height: 36px;
+    width: var(--space-9);
+    height: var(--space-9);
     border-radius: 50%;
     object-fit: cover;
     flex-shrink: 0;
@@ -735,7 +735,7 @@ body.dark-mode .nexus-skin-civicone .civic-type-badge {
 
 .nexus-skin-civicone .civic-comment-input {
     width: 100%;
-    padding: var(--space-3) 44px var(--space-3) var(--space-4);
+    padding: var(--space-3) var(--space-11) var(--space-3) var(--space-4);
     border: 1px solid var(--civic-border);
     background: var(--civic-bg-card);
     border-radius: var(--radius-2xl);
@@ -893,7 +893,7 @@ body.dark-mode .nexus-skin-civicone .civic-type-badge {
     transform: translateX(-50%);
     background: var(--civic-brand);
     color: #fff;
-    padding: var(--space-4) 28px;
+    padding: var(--space-4) var(--space-7);
     border-radius: var(--civic-card-radius);
     font-weight: var(--font-weight-semibold);
     z-index: 10000;

@@ -14,8 +14,8 @@
         left: 0;
         right: 0;
         z-index: 10001;
-        padding: 12px 20px;
-        background: linear-gradient(135deg, #ef4444, #dc2626);
+        padding: var(--space-3) var(--space-5);
+        background: linear-gradient(135deg, var(--color-error-500), var(--color-error-600));
         color: white;
         font-size: 0.9rem;
         font-weight: 600;
@@ -53,7 +53,7 @@
     .edit-textarea,
     .edit-select,
     button {
-        min-height: 44px;
+        min-height: var(--space-11);
     }
 
     .edit-input,
@@ -82,7 +82,7 @@
     @media (max-width: 768px) {
         .edit-submit,
         button {
-            min-height: 48px;
+            min-height: var(--space-12);
         }
     }
 </style>
@@ -94,13 +94,13 @@
     }
 
     .edit-wrapper .htb-header-box {
-        margin-bottom: 20px;
+        margin-bottom: var(--space-5);
     }
 
     .edit-wrapper .htb-card {
-        padding: 24px;
+        padding: var(--space-6);
         background: var(--htb-card-bg, white);
-        border-radius: 16px;
+        border-radius: var(--radius-xl);
         box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
     }
 
@@ -110,7 +110,7 @@
     }
 
     .edit-form-group {
-        margin-bottom: 20px;
+        margin-bottom: var(--space-5);
     }
 
     .edit-label {
@@ -132,9 +132,9 @@
     .edit-textarea,
     .edit-select {
         width: 100%;
-        padding: 14px 16px;
-        border: 2px solid #e5e7eb;
-        border-radius: 12px;
+        padding: var(--space-3-5) 16px;
+        border: 2px solid var(--color-gray-200);
+        border-radius: var(--radius-lg);
         font-size: 1rem;
         font-family: inherit;
         box-sizing: border-box;
@@ -153,7 +153,7 @@
     .edit-textarea:focus,
     .edit-select:focus {
         outline: none;
-        border-color: #db2777;
+        border-color: var(--color-pink-600);
         box-shadow: 0 0 0 4px rgba(219, 39, 119, 0.1);
     }
 
@@ -162,22 +162,22 @@
     [data-theme="dark"] .edit-select {
         background: rgba(30, 41, 59, 0.8);
         border-color: rgba(255, 255, 255, 0.15);
-        color: #f1f5f9;
+        color: var(--color-slate-100);
     }
 
     .edit-hint {
         font-size: 0.85rem;
         color: var(--htb-text-muted);
-        margin-top: 6px;
+        margin-top: var(--space-1-5);
     }
 
     .edit-current-file {
         font-size: 0.85rem;
-        color: #10b981;
-        margin-top: 6px;
+        color: var(--color-success-500);
+        margin-top: var(--space-1-5);
         display: flex;
         align-items: center;
-        gap: 6px;
+        gap: var(--space-1-5);
     }
 
     .edit-submit {
@@ -185,7 +185,7 @@
         padding: 16px;
         font-size: 1.05rem;
         border-radius: 14px;
-        background: linear-gradient(135deg, #db2777, #ec4899);
+        background: linear-gradient(135deg, var(--color-pink-600), var(--color-pink-500));
         border: none;
         color: white;
         font-weight: 700;
@@ -193,7 +193,7 @@
         box-shadow: 0 4px 14px rgba(219, 39, 119, 0.3);
         transition: all 0.2s ease;
         -webkit-tap-highlight-color: transparent;
-        margin-top: 10px;
+        margin-top: var(--space-2-5);
     }
 
     .edit-submit:hover {
@@ -208,11 +208,11 @@
     .back-link {
         display: inline-flex;
         align-items: center;
-        gap: 6px;
-        color: #db2777;
+        gap: var(--space-1-5);
+        color: var(--color-pink-600);
         text-decoration: none;
         font-weight: 600;
-        margin-bottom: 20px;
+        margin-bottom: var(--space-5);
     }
 
     .back-link:hover {
@@ -223,7 +223,7 @@
     .visibility-options {
         display: grid;
         grid-template-columns: 1fr 1fr;
-        gap: 12px;
+        gap: var(--space-3);
     }
 
     .visibility-option {
@@ -239,8 +239,8 @@
 
     .visibility-option-card {
         padding: 16px;
-        border: 2px solid #e5e7eb;
-        border-radius: 12px;
+        border: 2px solid var(--color-gray-200);
+        border-radius: var(--radius-lg);
         transition: all 0.2s ease;
         background: white;
     }
@@ -251,7 +251,7 @@
     }
 
     .visibility-option input:checked + .visibility-option-card {
-        border-color: #db2777;
+        border-color: var(--color-pink-600);
         background: linear-gradient(135deg, rgba(219, 39, 119, 0.05), rgba(236, 72, 153, 0.05));
     }
 
@@ -292,11 +292,11 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        gap: 10px;
+        gap: var(--space-2-5);
         padding: 16px;
         border: 2px dashed #d1d5db;
-        border-radius: 12px;
-        background: #f9fafb;
+        border-radius: var(--radius-lg);
+        background: var(--color-gray-50);
         color: var(--htb-text-muted);
         font-weight: 500;
         transition: all 0.2s ease;
@@ -309,20 +309,20 @@
     }
 
     .file-input-wrapper:hover .file-input-label {
-        border-color: #db2777;
+        border-color: var(--color-pink-600);
         background: rgba(219, 39, 119, 0.05);
-        color: #db2777;
+        color: var(--color-pink-600);
     }
 
     /* Image Previews */
     .current-image-preview {
-        margin-top: 12px;
+        margin-top: var(--space-3);
         display: flex;
         align-items: center;
-        gap: 12px;
-        padding: 12px;
+        gap: var(--space-3);
+        padding: var(--space-3);
         background: #f0fdf4;
-        border-radius: 10px;
+        border-radius: var(--radius-md);
         border: 1px solid #86efac;
     }
 
@@ -335,7 +335,7 @@
         width: 60px;
         height: 60px;
         object-fit: cover;
-        border-radius: 8px;
+        border-radius: var(--radius-md);
     }
 
     .current-image-preview .cover-img {
@@ -345,14 +345,14 @@
 
     .clear-image-btn {
         margin-left: auto;
-        width: 32px;
-        height: 32px;
+        width: var(--space-8);
+        height: var(--space-8);
         display: flex;
         align-items: center;
         justify-content: center;
-        border-radius: 8px;
+        border-radius: var(--radius-md);
         cursor: pointer;
-        color: #9ca3af;
+        color: var(--color-gray-400);
         background: transparent;
         transition: all 0.2s ease;
         flex-shrink: 0;
@@ -366,7 +366,7 @@
 
     .clear-image-btn:hover {
         background: #fef2f2;
-        color: #dc2626;
+        color: var(--color-error-600);
     }
 
     [data-theme="dark"] .clear-image-btn:hover {
@@ -375,7 +375,7 @@
     }
 
     .clear-image-btn:has(input:checked) {
-        background: #dc2626;
+        background: var(--color-error-600);
         color: white;
     }
 
@@ -434,7 +434,7 @@
         }
 
         .edit-wrapper .htb-card {
-            padding: 20px 16px;
+            padding: var(--space-5) 16px;
             border-radius: 14px;
         }
 

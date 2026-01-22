@@ -16,7 +16,7 @@
     left: 0;
     right: 0;
     z-index: 10001;
-    padding: 12px 20px;
+    padding: var(--space-3) var(--space-5);
     background: linear-gradient(135deg, var(--color-danger), var(--color-red-600));
     color: white;
     font-size: 0.9rem;
@@ -55,7 +55,7 @@ button:active {
 .invite-search,
 .user-item,
 button {
-    min-height: 44px;
+    min-height: var(--space-11);
 }
 
 .invite-search {
@@ -81,23 +81,23 @@ html {
 /* Page Wrapper */
 .invite-wrapper {
     padding-top: 120px;
-    padding-bottom: 40px;
+    padding-bottom: var(--space-10);
 }
 
 .invite-wrapper .htb-header-box {
-    margin-bottom: 20px;
+    margin-bottom: var(--space-5);
 }
 
 .invite-wrapper .htb-card {
-    padding: 24px;
+    padding: var(--space-6);
 }
 
 /* Search Input */
 .invite-search {
     width: 100%;
-    padding: 14px 16px;
+    padding: var(--space-3-5) 16px;
     border: 2px solid var(--color-gray-200);
-    border-radius: 12px;
+    border-radius: var(--radius-lg);
     font-size: 1rem;
     font-family: inherit;
     box-sizing: border-box;
@@ -117,15 +117,15 @@ html {
 .user-list {
     max-height: 400px;
     overflow-y: auto;
-    margin: 20px 0;
+    margin: var(--space-5) 0;
     border: 1px solid var(--color-gray-200);
-    border-radius: 12px;
+    border-radius: var(--radius-lg);
 }
 
 .user-item {
     display: flex;
     align-items: center;
-    padding: 12px 16px;
+    padding: var(--space-3) 16px;
     border-bottom: 1px solid var(--color-gray-100);
     cursor: pointer;
     transition: background 0.15s ease;
@@ -144,18 +144,18 @@ html {
 }
 
 .user-item input[type="checkbox"] {
-    margin-right: 12px;
-    width: 20px;
-    height: 20px;
+    margin-right: var(--space-3);
+    width: var(--space-5);
+    height: var(--space-5);
     accent-color: var(--color-pink-600);
 }
 
 .user-avatar {
-    width: 40px;
-    height: 40px;
+    width: var(--space-10);
+    height: var(--space-10);
     border-radius: 50%;
     object-fit: cover;
-    margin-right: 12px;
+    margin-right: var(--space-3);
     background: var(--color-gray-200);
 }
 
@@ -210,7 +210,7 @@ html {
 /* Empty State */
 .no-users {
     text-align: center;
-    padding: 40px 20px;
+    padding: var(--space-10) var(--space-5);
     color: var(--color-gray-500);
 }
 
@@ -218,11 +218,11 @@ html {
 .back-link {
     display: inline-flex;
     align-items: center;
-    gap: 6px;
+    gap: var(--space-1-5);
     color: var(--color-pink-600);
     text-decoration: none;
     font-weight: 600;
-    margin-bottom: 20px;
+    margin-bottom: var(--space-5);
 }
 
 .back-link:hover {
@@ -233,32 +233,32 @@ html {
 .error-message {
     background: var(--color-red-50);
     color: var(--color-red-600);
-    padding: 12px 16px;
-    border-radius: 8px;
+    padding: var(--space-3) 16px;
+    border-radius: var(--radius-md);
     margin-bottom: 16px;
     font-weight: 500;
 }
 
 /* Add Directly Box */
 .add-directly-box {
-    margin: 20px 0;
+    margin: var(--space-5) 0;
     padding: 16px;
-    background: linear-gradient(135deg, #f0fdf4, #dcfce7);
+    background: linear-gradient(135deg, #f0fdf4, var(--color-success-100));
     border: 2px solid var(--color-green-300);
-    border-radius: 12px;
+    border-radius: var(--radius-lg);
 }
 
 .add-directly-box label {
     display: flex;
     align-items: flex-start;
-    gap: 12px;
+    gap: var(--space-3);
     cursor: pointer;
 }
 
 .add-directly-box input[type="checkbox"] {
-    width: 20px;
-    height: 20px;
-    margin-top: 2px;
+    width: var(--space-5);
+    height: var(--space-5);
+    margin-top: var(--space-0-5);
     accent-color: var(--color-success);
 }
 
@@ -304,12 +304,12 @@ html {
     }
 
     .invite-wrapper .htb-card {
-        padding: 20px 16px;
-        border-radius: 16px;
+        padding: var(--space-5) 16px;
+        border-radius: var(--radius-xl);
     }
 
     .invite-search {
-        padding: 12px 14px;
+        padding: var(--space-3) var(--space-3-5);
         font-size: 16px;
     }
 
@@ -321,6 +321,6 @@ html {
     .invite-submit,
     .user-item,
     button {
-        min-height: 48px;
+        min-height: var(--space-12);
     }
 }

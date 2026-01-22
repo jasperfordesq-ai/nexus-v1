@@ -57,7 +57,7 @@ button:active {
 /* Touch Targets - WCAG 2.1 AA (44px minimum) */
 .glass-pill-btn,
 button {
-    min-height: 44px;
+    min-height: var(--space-11);
 }
 
 /* Focus Visible */
@@ -130,7 +130,7 @@ html {
     align-items: center;
     justify-content: flex-start;
     min-height: 80vh;
-    padding: var(--space-12) 20px;
+    padding: var(--space-12) var(--space-5);
     box-sizing: border-box;
 
     /* Typography Defaults */
@@ -546,12 +546,12 @@ html[data-theme="dark"] #unique-glass-page-wrapper {
 /* Responsive */
 @media (max-width: 768px) {
     #unique-glass-page-wrapper {
-        padding: var(--space-5) 10px;
+        padding: var(--space-5) var(--space-2-5);
     }
 
     #unique-glass-page-wrapper .glass-box {
         width: 100%;
-        padding: var(--space-8) 20px;
+        padding: var(--space-8) var(--space-5);
         border-radius: var(--radius-xl);
     }
 

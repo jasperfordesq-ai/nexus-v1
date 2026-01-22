@@ -686,6 +686,107 @@ body.dark-mode .civic-radios__label::after {
 }
 
 /* ===========================================
+   Legacy Form Class Overrides for GOV.UK Compliance
+   Override existing form classes to use GOV.UK styling
+   =========================================== */
+
+/* Override .form-control (Bootstrap-style) to use GOV.UK styling */
+[data-layout="civicone"] .form-control,
+.civicone .form-control {
+    font-family: var(--civicone-font-family, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif);
+    font-size: var(--font-size-base);
+    font-weight: var(--font-weight-normal);
+    line-height: 1.25;
+    box-sizing: border-box;
+    width: 100%;
+    height: auto;
+    min-height: 44px;
+    padding: var(--space-1) var(--space-2);
+    border: 2px solid var(--color-govuk-black) !important;
+    border-radius: 0 !important;
+    background-color: var(--color-white);
+    color: var(--color-govuk-black);
+}
+
+[data-layout="civicone"] .form-control:focus,
+.civicone .form-control:focus {
+    outline: 3px solid var(--color-govuk-yellow) !important;
+    outline-offset: 0 !important;
+    box-shadow: inset 0 0 0 2px var(--color-govuk-black) !important;
+}
+
+/* Override .form-group to use GOV.UK spacing */
+[data-layout="civicone"] .form-group,
+.civicone .form-group {
+    margin-bottom: var(--space-6);
+}
+
+/* Override .form-label to use GOV.UK styling */
+[data-layout="civicone"] .form-label,
+[data-layout="civicone"] label.control-label,
+.civicone .form-label,
+.civicone label.control-label {
+    display: block;
+    font-size: var(--font-size-base);
+    font-weight: 700;
+    line-height: 1.25;
+    color: var(--color-govuk-black);
+    margin-bottom: var(--space-1);
+}
+
+/* Override .help-block for hint text styling */
+[data-layout="civicone"] .help-block,
+[data-layout="civicone"] .form-text,
+.civicone .help-block,
+.civicone .form-text {
+    display: block;
+    font-size: var(--font-size-base);
+    color: var(--color-govuk-dark-grey);
+    margin-bottom: var(--space-2);
+}
+
+/* Override .has-error for GOV.UK error styling */
+[data-layout="civicone"] .has-error .form-control,
+[data-layout="civicone"] .is-invalid,
+.civicone .has-error .form-control,
+.civicone .is-invalid {
+    border-color: var(--color-govuk-red) !important;
+}
+
+[data-layout="civicone"] .has-error,
+.civicone .has-error {
+    padding-left: var(--space-3);
+    border-left: 5px solid var(--color-govuk-red);
+}
+
+[data-layout="civicone"] .has-error .help-block,
+[data-layout="civicone"] .invalid-feedback,
+.civicone .has-error .help-block,
+.civicone .invalid-feedback {
+    color: var(--color-govuk-red);
+    font-weight: 700;
+}
+
+/* Override textarea.form-control to maintain proper sizing */
+[data-layout="civicone"] textarea.form-control,
+.civicone textarea.form-control {
+    min-height: 100px;
+    resize: vertical;
+}
+
+/* Override select.form-control for GOV.UK styling */
+[data-layout="civicone"] select.form-control,
+.civicone select.form-control {
+    cursor: pointer;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 20 20'%3E%3Cpath fill='%230b0c0c' d='M10 14L4 8h12z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right var(--space-2) center;
+    background-size: var(--space-4);
+    padding-right: var(--space-6);
+}
+
+/* ===========================================
    Print Styles
    =========================================== */
 @media print {

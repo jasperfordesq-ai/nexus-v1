@@ -24,7 +24,7 @@ const cssFiles = glob.sync('httpdocs/assets/css/**/*.css', {
         '**/_archive/**',
         '**/_archived/**'
     ]
-}).sort();
+}).map(f => f.replace(/\\/g, '/')).sort();
 
 console.log(`Found ${cssFiles.length} CSS files`);
 console.log('');

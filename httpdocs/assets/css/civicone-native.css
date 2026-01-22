@@ -369,8 +369,8 @@ body.dark-mode .civic-bottom-sheet {
     outline: calc(var(--space-1) * 0.75) solid var(--govuk-focus-colour, var(--color-brand-yellow));
     outline-offset: 0;
     background-color: var(--govuk-focus-colour, var(--color-brand-yellow));
-    color: var(--govuk-focus-text-colour, #0b0c0c);
-    box-shadow: 0 calc(var(--space-1) * -0.5) var(--govuk-focus-colour, var(--color-brand-yellow)), 0 var(--space-1) var(--govuk-focus-text-colour, #0b0c0c);
+    color: var(--govuk-focus-text-colour, var(--color-govuk-black));
+    box-shadow: 0 calc(var(--space-1) * -0.5) var(--govuk-focus-colour, var(--color-brand-yellow)), 0 var(--space-1) var(--govuk-focus-text-colour, var(--color-govuk-black));
 }
 
 .nexus-share-options {
@@ -417,8 +417,8 @@ body.dark-mode .civic-bottom-sheet {
     outline: calc(var(--space-1) * 0.75) solid var(--govuk-focus-colour, var(--color-brand-yellow));
     outline-offset: 0;
     background-color: var(--govuk-focus-colour, var(--color-brand-yellow));
-    color: var(--govuk-focus-text-colour, #0b0c0c);
-    box-shadow: 0 calc(var(--space-1) * -0.5) var(--govuk-focus-colour, var(--color-brand-yellow)), 0 var(--space-1) var(--govuk-focus-text-colour, #0b0c0c);
+    color: var(--govuk-focus-text-colour, var(--color-govuk-black));
+    box-shadow: 0 calc(var(--space-1) * -0.5) var(--govuk-focus-colour, var(--color-brand-yellow)), 0 var(--space-1) var(--govuk-focus-text-colour, var(--color-govuk-black));
 }
 
 .nexus-share-option i {
@@ -540,8 +540,8 @@ textarea:focus {
     outline: calc(var(--space-1) * 0.75) solid var(--govuk-focus-colour, var(--color-brand-yellow));
     outline-offset: 0;
     background-color: var(--govuk-focus-colour, var(--color-brand-yellow));
-    color: var(--govuk-focus-text-colour, #0b0c0c);
-    box-shadow: inset 0 0 0 var(--space-1) var(--govuk-focus-text-colour, #0b0c0c);
+    color: var(--govuk-focus-text-colour, var(--color-govuk-black));
+    box-shadow: inset 0 0 0 var(--space-1) var(--govuk-focus-text-colour, var(--color-govuk-black));
 }
 
 @media (prefers-reduced-motion: no-preference) {
@@ -762,8 +762,8 @@ input.invalid {
     outline: calc(var(--space-1) * 0.75) solid var(--govuk-focus-colour, var(--color-brand-yellow));
     outline-offset: 0;
     background-color: var(--govuk-focus-colour, var(--color-brand-yellow));
-    color: var(--govuk-focus-text-colour, #0b0c0c);
-    box-shadow: 0 calc(var(--space-1) * -0.5) var(--govuk-focus-colour, var(--color-brand-yellow)), 0 var(--space-1) var(--govuk-focus-text-colour, #0b0c0c);
+    color: var(--govuk-focus-text-colour, var(--color-govuk-black));
+    box-shadow: 0 calc(var(--space-1) * -0.5) var(--govuk-focus-colour, var(--color-brand-yellow)), 0 var(--space-1) var(--govuk-focus-text-colour, var(--color-govuk-black));
 }
 
 .civic-context-menu button svg {
@@ -871,15 +871,7 @@ body.turbo-loading .civic-btn {
     view-transition-name: var(--card-transition-name);
 }
 
-/* Hero transitions */
-.civicone-hero-banner {
-    view-transition-name: hero-banner;
-}
-
-::view-transition-old(hero-banner),
-::view-transition-new(hero-banner) {
-    animation-duration: 0.3s;
-}
+/* Hero transitions - REMOVED (replaced with GOV.UK headings 2026-01-22) */
 
 /* Respect reduced motion */
 @media (prefers-reduced-motion: reduce) {
@@ -944,7 +936,7 @@ body.is-offline .civic-header {
     top: 0;
     left: 0;
     right: 0;
-    background: linear-gradient(135deg, var(--color-success) 0%, #059669 100%);
+    background: linear-gradient(135deg, var(--color-success) 0%, var(--color-success-600) 100%);
     color: white;
     text-align: center;
     padding: var(--space-2) var(--space-4);

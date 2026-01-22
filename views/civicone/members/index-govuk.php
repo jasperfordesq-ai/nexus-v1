@@ -24,8 +24,9 @@ require __DIR__ . '/../components/govuk/tag.php';
 <div class="civicone--govuk govuk-width-container">
     <main class="govuk-main-wrapper" id="main-content">
 
-        <!-- Hero (auto-resolves from config/heroes.php for /members route) -->
-        <?php require __DIR__ . '/../../layouts/civicone/partials/render-hero.php'; ?>
+        <!-- Page Header (GOV.UK Typography) -->
+        <h1 class="govuk-heading-xl">Members Directory</h1>
+        <p class="govuk-body-l">Connect with community members and discover their skills and interests.</p>
 
         <!-- MOJ Filter Pattern: 1/4 Filters + 3/4 Results -->
         <div class="govuk-grid-row">

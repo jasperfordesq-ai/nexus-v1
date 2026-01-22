@@ -101,7 +101,7 @@
     padding: var(--space-2) var(--space-3);
     border-radius: var(--radius-sm);
     transition: all var(--duration-fast) var(--ease-default);
-    min-height: 44px; /* WCAG touch target */
+    min-height: var(--space-11); /* WCAG touch target */
     font-size: var(--font-size-sm);
 }
 
@@ -153,7 +153,7 @@
 .civic-utility-bar .civic-dropdown-content a {
     display: flex;
     align-items: center;
-    min-height: 44px; /* WCAG 2.5.5 - Minimum touch target size */
+    min-height: var(--space-11); /* WCAG 2.5.5 - Minimum touch target size */
     padding: var(--space-3) var(--space-4);
     color: var(--civic-text-primary);
     background-color: transparent; /* WCAG FIX: Explicitly prevent yellow backgrounds - yellow ONLY for :focus-visible */
@@ -334,7 +334,7 @@
     gap: var(--space-2);
     padding: var(--space-2) 0;
     flex-shrink: 0;
-    min-height: 44px;
+    min-height: var(--space-11);
     transition: opacity var(--duration-fast) var(--ease-default);
 }
 
@@ -369,7 +369,7 @@
     text-decoration: none;
     border-radius: var(--radius-sm);
     transition: all var(--duration-fast) var(--ease-default);
-    min-height: 44px;
+    min-height: var(--space-11);
     display: inline-flex;
     align-items: center;
 }
@@ -382,7 +382,7 @@
 
 .civic-desktop-nav .civic-nav-link:focus-visible {
     /* GOV.UK Focus Pattern */
-    outline: 3px solid var(--govuk-focus-colour, var(--color-brand-yellow));
+    outline: var(--space-1) solid var(--govuk-focus-colour, var(--color-brand-yellow));
     outline-offset: 0;
     background-color: var(--govuk-focus-colour, var(--color-brand-yellow));
     color: var(--govuk-focus-text-colour, var(--color-govuk-black));
@@ -422,7 +422,7 @@
     width: 12.5rem;
     color: var(--civic-text-primary);
     background: var(--civic-bg-primary);
-    min-height: 44px;
+    min-height: var(--space-11);
 }
 
 .civic-search-form input::placeholder {
@@ -446,7 +446,7 @@
     border: 2px solid var(--civic-brand);
     border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
     cursor: pointer;
-    min-height: 44px;
+    min-height: var(--space-11);
     transition: background var(--duration-fast) var(--ease-default);
 }
 
@@ -559,7 +559,7 @@
     font-size: var(--font-size-base);
     border-bottom: var(--space-1) solid transparent;
     transition: border-color var(--duration-fast) var(--ease-default);
-    min-height: 44px;
+    min-height: var(--space-11);
 }
 
 .civicone-service-navigation__link:hover {
@@ -595,8 +595,8 @@
     font-weight: 600;
     color: var(--civic-text-primary);
     cursor: pointer;
-    min-height: 44px;
-    min-width: 44px;
+    min-height: var(--space-11);
+    min-width: var(--space-11);
 }
 
 @media (min-width: 768px) {
@@ -628,7 +628,7 @@
 .civicone-service-navigation__toggle-icon span {
     display: block;
     width: 100%;
-    height: 3px;
+    height: var(--space-1);
     background-color: currentColor;
     border-radius: var(--space-1);
     transition: transform var(--duration-fast) var(--ease-default);
@@ -736,7 +736,7 @@
     border: 2px solid var(--civic-text-primary);
     border-radius: var(--radius-sm);
     font-size: var(--font-size-base);
-    min-height: 44px;
+    min-height: var(--space-11);
     min-width: 12.5rem;
 }
 
@@ -754,8 +754,8 @@
     border-radius: var(--radius-sm);
     font-weight: 600;
     cursor: pointer;
-    min-height: 44px;
-    min-width: 44px;
+    min-height: var(--space-11);
+    min-width: var(--space-11);
 }
 
 .civicone-search-button:hover {
@@ -780,8 +780,8 @@
     border-radius: var(--radius-sm);
     padding: var(--space-2);
     cursor: pointer;
-    min-height: 44px;
-    min-width: 44px;
+    min-height: var(--space-11);
+    min-width: var(--space-11);
 }
 
 @media (min-width: 768px) {
@@ -825,7 +825,7 @@
     border: 2px solid var(--civic-text-primary);
     border-radius: var(--radius-sm);
     font-size: var(--font-size-base);
-    min-height: 44px;
+    min-height: var(--space-11);
 }
 
 .civicone-mobile-search-button {
@@ -835,8 +835,8 @@
     border: 2px solid var(--civic-brand);
     border-radius: var(--radius-sm);
     cursor: pointer;
-    min-height: 44px;
-    min-width: 44px;
+    min-height: var(--space-11);
+    min-width: var(--space-11);
 }
 
 .civicone-visually-hidden {
@@ -867,7 +867,7 @@
     display: inline-flex;
     align-items: center;
     gap: var(--space-2);
-    min-height: 44px;
+    min-height: var(--space-11);
     transition: all var(--duration-fast) var(--ease-default);
     margin-left: var(--space-2);
 }
@@ -936,7 +936,7 @@
     color: var(--civic-text-secondary);
     margin: 0 0 var(--space-4) 0;
     padding-bottom: var(--space-3);
-    border-bottom: 2px solid var(--civic-bg-tertiary);
+    border-bottom: var(--space-0-5) solid var(--civic-bg-tertiary);
     font-weight: 700;
 }
 
@@ -1113,8 +1113,8 @@ body.dark-mode .civic-utility-bar .civic-dropdown-content a:hover {
     cursor: pointer;
     padding: var(--space-2);
     border-radius: var(--radius-sm);
-    min-width: 44px;
-    min-height: 44px;
+    min-width: var(--space-11);
+    min-height: var(--space-11);
 }
 
 .civic-mobile-search-btn {
@@ -1128,7 +1128,7 @@ body.dark-mode .civic-utility-bar .civic-dropdown-content a:hover {
 .civic-hamburger {
     display: block;
     width: var(--space-6);
-    height: 2px;
+    height: var(--space-0-5);
     background: var(--civic-text-primary);
     position: relative;
     transition: all var(--duration-fast) var(--ease-default);
@@ -1139,7 +1139,7 @@ body.dark-mode .civic-utility-bar .civic-dropdown-content a:hover {
     content: '';
     position: absolute;
     width: var(--space-6);
-    height: 2px;
+    height: var(--space-0-5);
     background: var(--civic-text-primary);
     left: 0;
     transition: all var(--duration-fast) var(--ease-default);
@@ -1181,8 +1181,8 @@ body.dark-mode .civic-utility-bar .civic-dropdown-content a:hover {
         padding: var(--space-2);
         cursor: pointer;
         color: var(--civic-text-primary);
-        min-width: 44px;
-        min-height: 44px;
+        min-width: var(--space-11);
+        min-height: var(--space-11);
         border-radius: var(--radius-sm);
     }
 
@@ -1232,7 +1232,7 @@ body.dark-mode .civic-utility-bar .civic-dropdown-content a:hover {
         font-size: var(--font-size-base);
         color: var(--civic-text-primary);
         background: var(--civic-bg-primary);
-        min-height: 44px;
+        min-height: var(--space-11);
     }
 
     .civic-mobile-search-bar input:focus {
@@ -1249,8 +1249,8 @@ body.dark-mode .civic-utility-bar .civic-dropdown-content a:hover {
         border-radius: var(--radius-sm);
         font-weight: 600;
         cursor: pointer;
-        min-width: 44px;
-        min-height: 44px;
+        min-width: var(--space-11);
+        min-height: var(--space-11);
     }
 
     .civic-mobile-search-bar button:focus-visible {
@@ -1351,7 +1351,7 @@ body.dark-mode .civic-utility-bar .civic-dropdown-content a:hover {
     justify-content: space-between;
     align-items: center;
     padding: var(--space-4) var(--space-5);
-    border-bottom: 2px solid var(--civic-bg-tertiary);
+    border-bottom: var(--space-0-5) solid var(--civic-bg-tertiary);
     background: var(--civic-bg-secondary);
 }
 
@@ -1370,8 +1370,8 @@ body.dark-mode .civic-utility-bar .civic-dropdown-content a:hover {
     padding: var(--space-2);
     color: var(--civic-text-secondary);
     border-radius: var(--radius-sm);
-    min-width: 44px;
-    min-height: 44px;
+    min-width: var(--space-11);
+    min-height: var(--space-11);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -1448,7 +1448,7 @@ body.dark-mode .civic-utility-bar .civic-dropdown-content a:hover {
     display: flex;
     justify-content: space-between;
     padding: var(--space-4) var(--space-5);
-    border-top: 2px solid var(--civic-bg-tertiary);
+    border-top: var(--space-0-5) solid var(--civic-bg-tertiary);
     background: var(--civic-bg-secondary);
 }
 
@@ -1463,7 +1463,7 @@ body.dark-mode .civic-utility-bar .civic-dropdown-content a:hover {
     cursor: pointer;
     padding: var(--space-2) var(--space-3);
     border-radius: var(--radius-sm);
-    min-height: 44px;
+    min-height: var(--space-11);
     display: inline-flex;
     align-items: center;
     gap: var(--space-2);
@@ -1576,15 +1576,15 @@ body.dark-mode .civic-utility-bar .civic-dropdown-content a:hover {
 /* Icon badge (notifications/messages) */
 .civic-icon-badge {
     position: absolute;
-    top: -6px;
-    right: -6px;
+    top: -var(--space-1-5);
+    right: -var(--space-1-5);
     background: var(--color-danger);
     color: #fff;
     font-size: var(--space-2);
     font-weight: 700;
-    padding: 2px var(--space-1);
+    padding: var(--space-0-5) var(--space-1);
     border-radius: var(--radius-md);
-    min-width: 14px;
+    min-width: var(--space-3-5);
     text-align: center;
 }
 
@@ -1628,12 +1628,12 @@ body.dark-mode .civic-utility-bar .civic-dropdown-content a:hover {
 .civic-experimental-banner {
     background: linear-gradient(135deg, var(--civic-brand, #00796B) 0%, var(--civic-brand-dark, #005a4f) 100%);
     color: #ffffff;
-    padding: 8px 24px;
+    padding: 8px var(--space-6);
     font-size: 13px;
     text-align: center;
     border-bottom: none;
     position: relative;
-    min-height: 40px;
+    min-height: var(--space-10);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -1646,7 +1646,7 @@ body.dark-mode .civic-utility-bar .civic-dropdown-content a:hover {
     bottom: 0;
     left: 0;
     right: 0;
-    height: 2px;
+    height: var(--space-0-5);
     background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
 }
 
@@ -1664,21 +1664,21 @@ body.dark-mode .civic-utility-bar .civic-dropdown-content a:hover {
 .civic-banner-content > div {
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: var(--space-3);
     flex-shrink: 1;
 }
 
 .civic-experimental-badge {
     background: rgba(255, 255, 255, 0.25);
     color: #ffffff;
-    padding: 5px 10px;
-    border-radius: 12px;
+    padding: var(--space-1) var(--space-2-5);
+    border-radius: var(--radius-lg);
     font-weight: 700;
     font-size: 11px;
     letter-spacing: 0.3px;
     display: inline-flex;
     align-items: center;
-    gap: 6px;
+    gap: var(--space-1-5);
     backdrop-filter: blur(10px);
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15), inset 0 0 0 1px rgba(255, 255, 255, 0.3);
     border: 1px solid rgba(255, 255, 255, 0.3);
@@ -1706,15 +1706,15 @@ body.dark-mode .civic-utility-bar .civic-dropdown-content a:hover {
 .civic-experimental-switch {
     background: rgba(255, 255, 255, 0.95);
     color: var(--civic-brand, #00796B) !important;
-    padding: 5px 12px;
-    border-radius: 6px;
+    padding: var(--space-1) var(--space-3);
+    border-radius: var(--radius-base);
     text-decoration: none;
     font-weight: 600;
     font-size: 12px;
     transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
     display: inline-flex;
     align-items: center;
-    gap: 5px;
+    gap: var(--space-1);
     border: 1px solid rgba(255, 255, 255, 0.3);
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
     white-space: nowrap;
@@ -1748,11 +1748,11 @@ body.dark-mode .civic-experimental-banner {
     }
 
     .civic-banner-content {
-        gap: 12px;
+        gap: var(--space-3);
     }
 
     .civic-banner-content > div {
-        gap: 10px;
+        gap: var(--space-2-5);
     }
 }
 
@@ -1777,66 +1777,10 @@ body.dark-mode .civic-experimental-banner {
 }
 
 /* ===========================================
-   15. HERO BANNER
+   15. HERO BANNER - REMOVED
+   Replaced with pure GOV.UK headings (2026-01-22)
+   See: views/layouts/civicone/partials/hero.php
    =========================================== */
-.civicone-hero-banner {
-    background: var(--civic-brand);
-    color: white;
-    padding: var(--space-10) 0;
-    margin-bottom: var(--space-10);
-    position: relative;
-}
-
-/* Torfaen skin uses purple gradient */
-body.skin-torfaen .civicone-hero-banner {
-    background: linear-gradient(135deg, #96206d 0%, #7a1a59 100%);
-}
-
-.civicone-hero-banner .civic-container {
-    position: relative;
-    z-index: 1;
-}
-
-.hero-badge {
-    display: inline-block;
-    background: var(--color-white) !important; /* White background for maximum contrast */
-    color: #005a4d !important; /* Dark teal text (darker than hero bg for 7:1 contrast on white) */
-    font-weight: 700; /* Bolder for better legibility */
-    font-size: var(--font-size-xs);
-    padding: var(--space-1) var(--space-2);
-    margin-bottom: var(--space-3);
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    border-radius: var(--radius-sm);
-}
-
-.hero-title {
-    color: var(--color-white) !important; /* Explicit white for WCAG compliance */
-    margin-bottom: var(--space-2);
-    font-size: clamp(1.75rem, 4vw, 2.5rem);
-    font-weight: 700;
-    letter-spacing: -0.01em;
-}
-
-.hero-subtitle {
-    font-size: clamp(1rem, 2vw, 1.125rem);
-    color: var(--color-white) !important; /* Explicit white instead of opacity for contrast */
-    max-width: 37.5rem;
-    margin: 0;
-    line-height: 1.5;
-}
-
-/* Dark mode hero */
-body.dark-mode .civicone-hero-banner {
-    background: var(--color-blue-800);
-}
-
-@media (max-width: 768px) {
-    .civicone-hero-banner {
-        padding: var(--space-8) 0;
-        margin-bottom: var(--space-8);
-    }
-}
 
 /* ===========================================
    CRITICAL FIX: Service Navigation Visibility
@@ -1916,10 +1860,4 @@ body.dark-mode .civicone-hero-banner {
     .civicone-desktop-search {
         display: none !important;
     }
-}
-
-/* Reduce hero section height to prevent overlap */
-.civicone-hero-banner {
-    max-height: 200px !important;
-    overflow: hidden;
 }

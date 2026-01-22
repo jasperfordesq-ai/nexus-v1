@@ -5,12 +5,12 @@
 
 /* ============================================
    VOLUNTEER LICENSE - Holographic Glassmorphism
-   Purple Theme (#8b5cf6)
+   Purple Theme (var(--color-purple-500))
    ============================================ */
 
 .holo-legal-page {
     min-height: 100vh;
-    padding: 180px 20px 60px;
+    padding: 180px var(--space-5) 60px;
     position: relative;
     overflow: hidden;
     background: linear-gradient(135deg, #faf5ff 0%, #f3e8ff 50%, #e9d5ff 100%);
@@ -44,7 +44,7 @@
     height: 350px;
     background: radial-gradient(circle, rgba(168, 85, 247, 0.35) 0%, transparent 70%);
     top: 40%;
-    right: -80px;
+    right: -var(--space-20);
     animation-delay: -7s;
 }
 
@@ -85,7 +85,7 @@
     -webkit-backdrop-filter: blur(40px) saturate(180%);
     border-radius: 28px;
     border: 1px solid rgba(255, 255, 255, 0.5);
-    padding: 48px;
+    padding: var(--space-12);
     box-shadow:
         0 25px 50px -12px rgba(0, 0, 0, 0.1),
         0 0 0 1px rgba(255, 255, 255, 0.3) inset;
@@ -130,7 +130,7 @@
     top: 0;
     left: 0;
     right: 0;
-    height: 2px;
+    height: var(--space-0-5);
     background: linear-gradient(90deg,
         transparent,
         rgba(139, 92, 246, 0.6),
@@ -145,10 +145,10 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 20px;
-    padding-bottom: 24px;
-    margin-bottom: 32px;
-    border-bottom: 2px solid rgba(139, 92, 246, 0.15);
+    gap: var(--space-5);
+    padding-bottom: var(--space-6);
+    margin-bottom: var(--space-8);
+    border-bottom: var(--space-0-5) solid rgba(139, 92, 246, 0.15);
 }
 
 [data-theme="dark"] .holo-header {
@@ -158,14 +158,14 @@
 .holo-header-content {
     display: flex;
     align-items: center;
-    gap: 20px;
+    gap: var(--space-5);
 }
 
 .holo-header-icon {
-    width: 56px;
-    height: 56px;
-    background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
-    border-radius: 16px;
+    width: var(--space-14);
+    height: var(--space-14);
+    background: linear-gradient(135deg, var(--color-purple-500) 0%, var(--color-primary-700) 100%);
+    border-radius: var(--radius-xl);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -179,7 +179,7 @@
     font-size: 1.6rem;
     font-weight: 800;
     margin: 0;
-    background: linear-gradient(135deg, #7c3aed 0%, #8b5cf6 50%, #a78bfa 100%);
+    background: linear-gradient(135deg, var(--color-primary-700) 0%, var(--color-purple-500) 50%, #a78bfa 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -196,11 +196,11 @@
     display: flex;
     align-items: center;
     gap: 8px;
-    padding: 12px 20px;
+    padding: var(--space-3) var(--space-5);
     border-radius: 50px;
     background: rgba(139, 92, 246, 0.1);
     border: 2px solid rgba(139, 92, 246, 0.2);
-    color: #7c3aed;
+    color: var(--color-primary-700);
     font-size: 0.9rem;
     font-weight: 600;
     cursor: pointer;
@@ -231,7 +231,7 @@
     font-size: 1.1rem;
     color: #4b5563;
     line-height: 1.7;
-    margin-bottom: 32px;
+    margin-bottom: var(--space-8);
 }
 
 [data-theme="dark"] .holo-intro {
@@ -239,7 +239,7 @@
 }
 
 .holo-intro strong {
-    color: #7c3aed;
+    color: var(--color-primary-700);
 }
 
 [data-theme="dark"] .holo-intro strong {
@@ -250,9 +250,9 @@
 .holo-cert-box {
     background: linear-gradient(135deg, rgba(139, 92, 246, 0.08) 0%, rgba(168, 85, 247, 0.05) 100%);
     border: 2px solid rgba(139, 92, 246, 0.2);
-    border-radius: 20px;
-    padding: 32px;
-    margin-bottom: 32px;
+    border-radius: var(--radius-2xl);
+    padding: var(--space-8);
+    margin-bottom: var(--space-8);
 }
 
 [data-theme="dark"] .holo-cert-box {
@@ -263,11 +263,11 @@
 .holo-cert-title {
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: var(--space-3);
     font-size: 1.15rem;
     font-weight: 700;
     color: #6d28d9;
-    margin: 0 0 24px;
+    margin: 0 0 var(--space-6);
 }
 
 .holo-cert-title i {
@@ -307,14 +307,14 @@
 }
 
 .holo-cert-icon {
-    width: 32px;
-    height: 32px;
+    width: var(--space-8);
+    height: var(--space-8);
     background: linear-gradient(135deg, rgba(139, 92, 246, 0.15) 0%, rgba(168, 85, 247, 0.1) 100%);
-    border-radius: 10px;
+    border-radius: var(--radius-md);
     display: flex;
     align-items: center;
     justify-content: center;
-    color: #8b5cf6;
+    color: var(--color-purple-500);
     font-size: 0.85rem;
     flex-shrink: 0;
 }
@@ -326,7 +326,7 @@
 
 .holo-cert-text {
     font-size: 1rem;
-    color: #374151;
+    color: var(--color-gray-700);
     line-height: 1.6;
     flex: 1;
 }
@@ -346,7 +346,7 @@
 /* Footer */
 .holo-legal-footer {
     text-align: center;
-    padding-top: 28px;
+    padding-top: var(--space-7);
     margin-top: 8px;
     border-top: 1px solid rgba(139, 92, 246, 0.15);
 }
@@ -357,7 +357,7 @@
 
 .holo-legal-meta {
     font-size: 0.9rem;
-    color: #6b7280;
+    color: var(--color-gray-500);
     font-style: italic;
 }
 
@@ -368,12 +368,12 @@
 /* Mobile Responsive */
 @media (max-width: 900px) {
     .holo-legal-page {
-        padding: 20px 16px 120px;
+        padding: var(--space-5) 16px 120px;
     }
 
     .holo-glass-card {
-        padding: 32px 24px;
-        border-radius: 24px;
+        padding: var(--space-8) var(--space-6);
+        border-radius: var(--radius-2xl);
     }
 
     .holo-header {
@@ -393,8 +393,8 @@
     }
 
     .holo-header-icon {
-        width: 48px;
-        height: 48px;
+        width: var(--space-12);
+        height: var(--space-12);
         font-size: 1.2rem;
     }
 
@@ -408,14 +408,14 @@
     }
 
     .holo-cert-box {
-        padding: 24px 20px;
+        padding: var(--space-6) var(--space-5);
     }
 }
 
 /* Print Styles */
 @media print {
     .holo-legal-page {
-        padding: 20px;
+        padding: var(--space-5);
         background: white !important;
     }
 
@@ -426,7 +426,7 @@
     .holo-glass-card {
         background: white !important;
         box-shadow: none !important;
-        border: 1px solid #e5e7eb !important;
+        border: 1px solid var(--color-gray-200) !important;
     }
 
     .holo-glass-card::before,
@@ -439,12 +439,12 @@
     }
 
     .holo-title {
-        -webkit-text-fill-color: #7c3aed !important;
-        color: #7c3aed !important;
+        -webkit-text-fill-color: var(--color-primary-700) !important;
+        color: var(--color-primary-700) !important;
     }
 
     .holo-cert-box {
-        background: #f9fafb !important;
-        border-color: #e5e7eb !important;
+        background: var(--color-gray-50) !important;
+        border-color: var(--color-gray-200) !important;
     }
 }

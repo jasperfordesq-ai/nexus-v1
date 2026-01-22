@@ -16,7 +16,7 @@
     background: rgba(255, 255, 255, 0.05);
     backdrop-filter: blur(10px);
     border: 1px solid rgba(99, 102, 241, 0.1);
-    border-radius: 16px;
+    border-radius: var(--radius-xl);
     padding: 1.5rem;
     animation: fadeInUp 0.4s cubic-bezier(0.4, 0.0, 0.2, 1) backwards;
 }
@@ -32,14 +32,14 @@
     flex: 1;
     display: flex;
     flex-direction: column;
-    gap: 6px;
+    gap: var(--space-1-5);
 }
 
 .skeleton-feed-content {
     display: flex;
     flex-direction: column;
     gap: 8px;
-    margin-bottom: 12px;
+    margin-bottom: var(--space-3);
 }
 
 .skeleton-feed-actions {
@@ -53,12 +53,12 @@
 /* Skeleton text variants for header */
 .skeleton-text--author-name {
     width: 140px;
-    height: 18px;
+    height: var(--space-4-5);
 }
 
 .skeleton-text--author-date {
     width: 90px;
-    height: 14px;
+    height: var(--space-3-5);
 }
 
 /* Partial width text line */
@@ -69,12 +69,12 @@
 /* Skeleton card image placeholder */
 .skeleton-card--image {
     height: 250px;
-    margin-top: 12px;
+    margin-top: var(--space-3);
 }
 
 /* Skeleton action buttons */
 .skeleton-button--action {
-    width: 80px;
+    width: var(--space-20);
 }
 
 /* Hide skeleton when content loads */

@@ -417,6 +417,44 @@ if (!empty($_SESSION['_pending_layout_save']) && !empty($_SESSION['user_id'])) {
 // SEO REDIRECT MIDDLEWARE: Check for 301 redirects (with loop prevention)
 \Nexus\Middleware\RedirectMiddleware::handle();
 
+// TENANT ISOLATION: Ensure logged-in users can only access their own tenant
+// This is a CRITICAL security check - users must not access other tenants' data
+//
+// Behavior: When a logged-in user from tenant A visits tenant B:
+// - Super admins: Can access any tenant (for platform management)
+// - Regular users: Automatically logged out so they can browse tenant B anonymously
+//   A flash message explains why they were logged out
+if (!empty($_SESSION['user_id']) && !empty($_SESSION['tenant_id'])) {
+    $currentTenantId = TenantContext::getId();
+    $userTenantId = (int)$_SESSION['tenant_id'];
+    $isSuperAdmin = !empty($_SESSION['is_super_admin']);
+
+    // Super admins can access any tenant, regular users cannot
+    if (!$isSuperAdmin && $currentTenantId !== $userTenantId) {
+        // User is trying to access a different tenant - auto-logout approach
+        // This allows users to browse other tenants anonymously
+
+        // Get user's home tenant name for the message
+        $userTenant = \Nexus\Models\Tenant::find($userTenantId);
+        $homeTenantName = $userTenant['name'] ?? 'your community';
+
+        // Preserve layout preference before destroying session
+        $layoutPreference = $_SESSION['nexus_active_layout'] ?? 'modern';
+
+        // Destroy the session to log out the user
+        session_destroy();
+
+        // Start a new session for the flash message and layout
+        session_start();
+        $_SESSION['nexus_active_layout'] = $layoutPreference;
+        $_SESSION['flash_message'] = "You've been logged out because you're now browsing a different community. You were logged into {$homeTenantName}.";
+        $_SESSION['flash_type'] = 'info';
+
+        // Continue to the requested page (user is now anonymous)
+        // No redirect needed - they can browse this tenant anonymously
+    }
+}
+
 // ACTIVITY TRACKING: Update last_active_at for logged-in users
 // This powers the real-time online status feature
 if (!empty($_SESSION['user_id'])) {

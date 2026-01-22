@@ -16,7 +16,7 @@
     padding: var(--space-4, 20px);
     background: var(--color-white, #ffffff);
     border: 1px solid var(--color-govuk-grey, #b1b4b6);
-    border-radius: 4px;
+    border-radius: var(--radius-sm);
 }
 
 .civic-composer-actions {
@@ -38,7 +38,7 @@
     padding: var(--space-5, 25px);
     background: var(--color-white, #ffffff);
     border: 1px solid var(--color-govuk-grey, #b1b4b6);
-    border-radius: 4px;
+    border-radius: var(--radius-sm);
     margin-bottom: var(--space-5, 25px);
 }
 
@@ -65,7 +65,7 @@
     width: 100%;
     max-width: 600px;
     height: auto;
-    border-radius: 4px;
+    border-radius: var(--radius-sm);
     margin-bottom: var(--space-4, 20px);
 }
 
@@ -132,16 +132,16 @@
 }
 
 .civic-comment--depth-1 {
-    margin-left: 40px;
+    margin-left: var(--space-10);
 }
 
 .civic-comment--depth-2 {
-    margin-left: 80px;
+    margin-left: var(--space-20);
 }
 
 .civic-comment-avatar {
-    width: 40px;
-    height: 40px;
+    width: var(--space-10);
+    height: var(--space-10);
     border-radius: 50%;
     flex-shrink: 0;
 }
@@ -150,7 +150,7 @@
     flex: 1;
     background: var(--color-govuk-grey-light, #f3f2f1);
     padding: var(--space-3, 15px);
-    border-radius: 8px;
+    border-radius: var(--radius-md);
 }
 
 .civic-comment-author {
@@ -228,7 +228,7 @@
     padding: 4px 8px;
     background: var(--color-white, #ffffff);
     border: 1px solid var(--color-govuk-grey, #b1b4b6);
-    border-radius: 12px;
+    border-radius: var(--radius-lg);
     cursor: pointer;
     font-size: var(--font-size-sm, 16px);
     transition: all 0.2s ease;
@@ -261,7 +261,7 @@
     left: 0;
     background: var(--color-white, #ffffff);
     border: 1px solid var(--color-govuk-grey, #b1b4b6);
-    border-radius: 8px;
+    border-radius: var(--radius-md);
     padding: var(--space-2, 10px);
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     z-index: 10;
@@ -323,7 +323,7 @@
     background: var(--color-success, #00703c);
     color: var(--color-white, #ffffff);
     padding: var(--space-3, 15px) var(--space-4, 20px);
-    border-radius: 4px;
+    border-radius: var(--radius-sm);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
     opacity: 0;
     transform: translateY(20px);
@@ -366,8 +366,8 @@
    ============================================ */
 
 .civic-avatar-sm {
-    width: 48px;
-    height: 48px;
+    width: var(--space-12);
+    height: var(--space-12);
     border-radius: 50%;
     object-fit: cover;
 }
@@ -405,21 +405,21 @@
     }
 
     .civic-comment--depth-1 {
-        margin-left: 20px;
+        margin-left: var(--space-5);
     }
 
     .civic-comment--depth-2 {
-        margin-left: 40px;
+        margin-left: var(--space-10);
     }
 
     .civic-comment-avatar {
-        width: 32px;
-        height: 32px;
+        width: var(--space-8);
+        height: var(--space-8);
     }
 
     .civic-toast {
-        bottom: 20px;
-        right: 20px;
-        left: 20px;
+        bottom: var(--space-5);
+        right: var(--space-5);
+        left: var(--space-5);
     }
 }

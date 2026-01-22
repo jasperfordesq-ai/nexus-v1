@@ -8,7 +8,7 @@
     background: linear-gradient(135deg, rgba(15, 23, 42, 0.95), rgba(30, 41, 59, 0.9));
     backdrop-filter: blur(20px);
     border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 20px;
+    border-radius: var(--radius-2xl);
     padding: 2rem;
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
 }
@@ -25,7 +25,7 @@
 .leaderboard-title {
     font-size: 2rem;
     font-weight: 700;
-    color: #f1f5f9;
+    color: var(--color-slate-100);
     display: flex;
     align-items: center;
     gap: 0.5rem;
@@ -40,7 +40,7 @@
     padding: 0.5rem 1rem;
     background: rgba(255, 255, 255, 0.05);
     border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 8px;
+    border-radius: var(--radius-md);
     color: rgba(255, 255, 255, 0.7);
     font-size: 0.875rem;
     cursor: pointer;
@@ -49,7 +49,7 @@
 
 .filter-button:hover,
 .filter-button.active {
-    background: linear-gradient(135deg, #6366f1, #8b5cf6);
+    background: linear-gradient(135deg, var(--color-primary-500), var(--color-purple-500));
     border-color: transparent;
     color: white;
 }
@@ -57,7 +57,7 @@
 .user-rank-card {
     background: linear-gradient(135deg, rgba(16, 185, 129, 0.2), rgba(5, 150, 105, 0.2));
     border: 2px solid rgba(16, 185, 129, 0.4);
-    border-radius: 16px;
+    border-radius: var(--radius-xl);
     padding: 1.5rem;
     margin-bottom: 2rem;
     display: grid;
@@ -67,9 +67,9 @@
 }
 
 .rank-badge {
-    width: 80px;
-    height: 80px;
-    background: linear-gradient(135deg, #10b981, #06b6d4);
+    width: var(--space-20);
+    height: var(--space-20);
+    background: linear-gradient(135deg, var(--color-success-500), var(--color-cyan-500));
     border-radius: 50%;
     display: flex;
     flex-direction: column;
@@ -101,7 +101,7 @@
 .rank-name {
     font-size: 1.25rem;
     font-weight: 600;
-    color: #f1f5f9;
+    color: var(--color-slate-100);
 }
 
 .rank-score-bar {
@@ -114,34 +114,34 @@
     flex: 1;
     height: 8px;
     background: rgba(255, 255, 255, 0.1);
-    border-radius: 4px;
+    border-radius: var(--radius-sm);
     overflow: hidden;
 }
 
 .rank-progress-fill {
     height: 100%;
-    background: linear-gradient(90deg, #10b981, #06b6d4);
-    border-radius: 4px;
+    background: linear-gradient(90deg, var(--color-success-500), var(--color-cyan-500));
+    border-radius: var(--radius-sm);
     box-shadow: 0 0 10px rgba(16, 185, 129, 0.5);
 }
 
 .rank-score-value {
     font-size: 1.5rem;
     font-weight: 700;
-    color: #10b981;
+    color: var(--color-success-500);
 }
 
 .comparison-stat {
     text-align: center;
     padding: 1rem;
     background: rgba(255, 255, 255, 0.05);
-    border-radius: 12px;
+    border-radius: var(--radius-lg);
 }
 
 .comparison-value {
     font-size: 1.5rem;
     font-weight: 700;
-    color: #10b981;
+    color: var(--color-success-500);
 }
 
 .comparison-label {
@@ -161,7 +161,7 @@
 .leader-item {
     background: rgba(255, 255, 255, 0.03);
     border: 1px solid rgba(255, 255, 255, 0.05);
-    border-radius: 12px;
+    border-radius: var(--radius-lg);
     padding: 1rem 1.5rem;
     display: grid;
     grid-template-columns: 60px 1fr auto;
@@ -195,13 +195,13 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 48px;
-    height: 48px;
+    width: var(--space-12);
+    height: var(--space-12);
     background: linear-gradient(135deg, rgba(99, 102, 241, 0.2), rgba(139, 92, 246, 0.2));
-    border-radius: 12px;
+    border-radius: var(--radius-lg);
     font-size: 1.5rem;
     font-weight: 700;
-    color: #6366f1;
+    color: var(--color-primary-500);
 }
 
 .leader-item.rank-1 .leader-rank-display {
@@ -231,7 +231,7 @@
 .leader-name {
     font-size: 1.125rem;
     font-weight: 600;
-    color: #f1f5f9;
+    color: var(--color-slate-100);
 }
 
 .leader-tier {
@@ -252,7 +252,7 @@
 .leader-score-value {
     font-size: 1.5rem;
     font-weight: 700;
-    color: #6366f1;
+    color: var(--color-primary-500);
 }
 
 .leader-score-label {
@@ -267,7 +267,7 @@
     padding: 1rem;
     background: linear-gradient(135deg, rgba(251, 191, 36, 0.1), rgba(245, 158, 11, 0.1));
     border: 1px dashed rgba(251, 191, 36, 0.4);
-    border-radius: 12px;
+    border-radius: var(--radius-lg);
     margin: 1rem 0;
 }
 
@@ -284,7 +284,7 @@
 .average-score {
     font-size: 1.25rem;
     font-weight: 700;
-    color: #fbbf24;
+    color: var(--color-warning-400);
 }
 
 .load-more-button {
@@ -292,8 +292,8 @@
     padding: 1rem;
     background: rgba(255, 255, 255, 0.05);
     border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 12px;
-    color: #6366f1;
+    border-radius: var(--radius-lg);
+    color: var(--color-primary-500);
     font-size: 1rem;
     font-weight: 600;
     cursor: pointer;
@@ -303,7 +303,7 @@
 
 .load-more-button:hover {
     background: rgba(99, 102, 241, 0.1);
-    border-color: #6366f1;
+    border-color: var(--color-primary-500);
 }
 
 /* Empty state styles */

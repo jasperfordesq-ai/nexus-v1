@@ -99,11 +99,11 @@
     }
 
     .timebanking-guide-stat-value.pink {
-        color: #ec4899;
+        color: var(--color-pink-500);
     }
 
     .timebanking-guide-stat-value.green {
-        color: #10b981;
+        color: var(--color-success-500);
     }
 
     /* How It Works Section */
@@ -136,8 +136,8 @@
     }
 
     .timebanking-guide-step-icon {
-        width: 80px;
-        height: 80px;
+        width: var(--space-20);
+        height: var(--space-20);
         border-radius: 50%;
         display: flex;
         align-items: center;
@@ -153,11 +153,11 @@
 
     .timebanking-guide-step-icon.pink {
         background: #fce7f3;
-        color: #db2777;
+        color: var(--color-pink-600);
     }
 
     .timebanking-guide-step-icon.green {
-        background: #dcfce7;
+        background: var(--color-success-100);
         color: #166534;
     }
 
@@ -173,7 +173,7 @@
 
     [data-theme="dark"] .timebanking-guide-step-icon.green {
         background: rgba(16, 185, 129, 0.2);
-        color: #34d399;
+        color: var(--color-success-400);
     }
 
     .timebanking-guide-step h3 {
@@ -190,7 +190,7 @@
     .timebanking-guide-values {
         padding: var(--space-12);
         margin-bottom: var(--space-12);
-        border-left: 5px solid var(--civicone-brand);
+        border-left: var(--space-1) solid var(--civicone-brand);
     }
 
     .timebanking-guide-values h2 {
@@ -230,7 +230,7 @@
         background: #9333ea;
         color: white;
         padding: var(--space-1) var(--space-4);
-        border-radius: 20px;
+        border-radius: var(--radius-2xl);
         font-size: var(--font-size-sm);
         font-weight: bold;
         margin-bottom: var(--space-5);

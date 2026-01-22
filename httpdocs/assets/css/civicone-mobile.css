@@ -46,18 +46,18 @@
     font-weight: var(--font-weight-semibold);
     text-transform: uppercase;
     letter-spacing: 0.03em;
-    min-height: 56px; /* WCAG touch target */
-    min-width: 48px;
+    min-height: var(--space-14); /* WCAG touch target */
+    min-width: var(--space-12);
     position: relative;
     -webkit-tap-highlight-color: transparent;
 }
 
 .civic-bottom-nav-item:focus-visible {
     /* GOV.UK Focus Pattern */
-    outline: 3px solid var(--govuk-focus-colour, var(--color-brand-yellow));
+    outline: var(--space-1) solid var(--govuk-focus-colour, var(--color-brand-yellow));
     outline-offset: 0;
     background-color: var(--govuk-focus-colour, var(--color-brand-yellow));
-    color: var(--govuk-focus-text-colour, #0b0c0c);
+    color: var(--govuk-focus-text-colour, var(--color-govuk-black));
 }
 
 .civic-bottom-nav-item svg,
@@ -84,7 +84,7 @@
     left: 50%;
     transform: translateX(-50%);
     width: var(--space-8);
-    height: 3px;
+    height: var(--space-1);
     background: var(--civic-brand, var(--color-blue-600));
     border-radius: 0 0 var(--radius-sm) var(--radius-sm);
 }
@@ -121,8 +121,8 @@
     position: absolute;
     top: var(--space-2);
     right: calc(50% - var(--space-4));
-    min-width: 18px;
-    height: 18px;
+    min-width: var(--space-4-5);
+    height: var(--space-4-5);
     padding: 0 var(--space-1);
     background: var(--color-danger);
     color: white;
@@ -140,8 +140,8 @@
     position: absolute;
     top: -var(--space-1);
     right: -var(--space-2);
-    min-width: 18px;
-    height: 18px;
+    min-width: var(--space-4-5);
+    height: var(--space-4-5);
     padding: 0 var(--space-1);
     background: var(--color-danger);
     color: white;
@@ -203,7 +203,7 @@ body.dark-mode .civic-bottom-nav-item.active {
         right: 0 !important;
         z-index: 9999 !important;
         height: auto;
-        min-height: 56px;
+        min-height: var(--space-14);
     }
 
     /* Add padding to body to prevent content being hidden behind nav */
@@ -228,8 +228,8 @@ body.dark-mode .civic-bottom-nav-item.active {
     position: fixed;
     bottom: 90px; /* Above bottom nav */
     right: var(--space-5);
-    width: 56px;
-    height: 56px;
+    width: var(--space-14);
+    height: var(--space-14);
     background: linear-gradient(135deg, var(--civic-brand, var(--color-blue-600)) 0%, var(--civic-brand-hover, var(--color-blue-700)) 100%);
     color: white;
     border: none;
@@ -247,7 +247,7 @@ body.dark-mode .civic-bottom-nav-item.active {
     /* GOV.UK Focus Pattern */
     outline: 3px solid var(--govuk-focus-colour, var(--color-brand-yellow));
     outline-offset: 0;
-    box-shadow: 0 0 0 3px var(--govuk-focus-text-colour, #0b0c0c), 0 0 0 6px var(--govuk-focus-colour, var(--color-brand-yellow));
+    box-shadow: 0 0 0 3px var(--govuk-focus-text-colour, var(--color-govuk-black)), 0 0 0 6px var(--govuk-focus-colour, var(--color-brand-yellow));
 }
 
 .civic-fab svg {
@@ -355,7 +355,7 @@ body.dark-mode .civic-bottom-nav-item.active {
 }
 
 .civic-skeleton-button {
-    height: 44px;
+    height: var(--space-11);
     width: 120px;
     border-radius: var(--radius-base);
 }
@@ -529,8 +529,8 @@ body.dark-mode .civic-skeleton {
 }
 
 .civic-toast svg {
-    width: 18px;
-    height: 18px;
+    width: var(--space-4-5);
+    height: var(--space-4-5);
     fill: white;
     flex-shrink: 0;
 }
@@ -549,8 +549,8 @@ body.dark-mode .civic-skeleton {
 
     .civic-card a,
     .civic-card button {
-        min-height: 44px;
-        min-width: 44px;
+        min-height: var(--space-11);
+        min-width: var(--space-11);
     }
 
     /* Full-width buttons on mobile */
@@ -602,13 +602,13 @@ body.dark-mode .civic-skeleton {
     /* Search bar touch optimization */
     .civic-search-input,
     .civic-filter-select {
-        min-height: 48px;
+        min-height: var(--space-12);
         font-size: var(--font-size-base); /* Prevents iOS zoom */
     }
 
     /* Filter tabs touch optimization */
     .civic-filter-tab {
-        min-height: 44px;
+        min-height: var(--space-11);
         padding: var(--space-3) var(--space-5);
     }
 
@@ -621,21 +621,21 @@ body.dark-mode .civic-skeleton {
     input[type="search"],
     select,
     textarea {
-        min-height: 48px;
+        min-height: var(--space-12);
         font-size: var(--font-size-base); /* Prevents iOS zoom on focus */
         padding: var(--space-3) var(--space-4);
     }
 
     /* Buttons */
     .civic-btn {
-        min-height: 48px;
+        min-height: var(--space-12);
         padding: var(--font-size-sm) var(--space-6);
     }
 
     /* Pagination touch targets */
     .civic-pagination-btn {
-        min-width: 44px;
-        min-height: 44px;
+        min-width: var(--space-11);
+        min-height: var(--space-11);
     }
 
     /* Spacing adjustments */
@@ -761,8 +761,8 @@ body.dark-mode .civic-skeleton {
 }
 
 .civic-pwa-banner-icon svg {
-    width: 28px;
-    height: 28px;
+    width: var(--space-7);
+    height: var(--space-7);
     fill: white;
 }
 
@@ -844,7 +844,7 @@ body.is-offline .civic-offline-bar {
 
 /* Adjust header position when offline bar visible */
 body.is-offline .civic-header {
-    top: 36px;
+    top: var(--space-9);
 }
 
 
@@ -963,8 +963,8 @@ body.is-offline .civic-header {
 }
 
 .civic-pwa-banner-icon svg {
-    width: 28px;
-    height: 28px;
+    width: var(--space-7);
+    height: var(--space-7);
 }
 
 .civic-pwa-banner-text {
@@ -995,7 +995,7 @@ body.is-offline .civic-header {
 }
 
 .civic-pwa-btn-install {
-    padding: var(--space-2) 18px;
+    padding: var(--space-2) var(--space-4-5);
     background: var(--civic-brand, var(--color-blue-600));
     color: var(--color-white);
     font-size: var(--font-size-sm);
@@ -1004,7 +1004,7 @@ body.is-offline .civic-header {
     border-radius: var(--radius-md);
     cursor: pointer;
     transition: background 0.2s ease, transform 0.1s ease;
-    min-height: 44px; /* WCAG touch target */
+    min-height: var(--space-11); /* WCAG touch target */
 }
 
 .civic-pwa-btn-install:hover {
@@ -1019,12 +1019,12 @@ body.is-offline .civic-header {
     /* GOV.UK Focus Pattern */
     outline: 3px solid var(--govuk-focus-colour, var(--color-brand-yellow));
     outline-offset: 0;
-    box-shadow: 0 -2px var(--govuk-focus-colour, var(--color-brand-yellow)), 0 4px var(--govuk-focus-text-colour, #0b0c0c);
+    box-shadow: 0 -2px var(--govuk-focus-colour, var(--color-brand-yellow)), 0 4px var(--govuk-focus-text-colour, var(--color-govuk-black));
 }
 
 .civic-pwa-btn-dismiss {
-    width: 44px;
-    height: 44px;
+    width: var(--space-11);
+    height: var(--space-11);
     padding: 0;
     background: transparent;
     border: none;
@@ -1047,7 +1047,7 @@ body.is-offline .civic-header {
     outline: 3px solid var(--govuk-focus-colour, var(--color-brand-yellow));
     outline-offset: 0;
     background-color: var(--govuk-focus-colour, var(--color-brand-yellow));
-    color: var(--govuk-focus-text-colour, #0b0c0c);
+    color: var(--govuk-focus-text-colour, var(--color-govuk-black));
 }
 
 .civic-pwa-btn-dismiss svg {
@@ -1068,7 +1068,7 @@ body.is-offline .civic-header {
     right: var(--space-4);
     max-width: 400px;
     margin: 0 auto;
-    background: linear-gradient(135deg, #059669 0%, #047857 100%);
+    background: linear-gradient(135deg, var(--color-success-600) 0%, var(--color-success-700) 100%);
     color: var(--color-white);
     border-radius: var(--radius-md);
     box-shadow: 0 8px 24px rgba(5, 150, 105, 0.3);
@@ -1113,7 +1113,7 @@ body.is-offline .civic-header {
     border-radius: var(--radius-base);
     cursor: pointer;
     transition: background 0.2s ease;
-    min-height: 36px;
+    min-height: var(--space-9);
     white-space: nowrap;
 }
 
@@ -1125,7 +1125,7 @@ body.is-offline .civic-header {
     /* GOV.UK Focus Pattern */
     outline: 3px solid var(--govuk-focus-colour, var(--color-brand-yellow));
     outline-offset: 0;
-    box-shadow: 0 -2px var(--govuk-focus-colour, var(--color-brand-yellow)), 0 4px var(--govuk-focus-text-colour, #0b0c0c);
+    box-shadow: 0 -2px var(--govuk-focus-colour, var(--color-brand-yellow)), 0 4px var(--govuk-focus-text-colour, var(--color-govuk-black));
 }
 
 
@@ -1244,7 +1244,7 @@ body.is-offline .civic-header {
     border-radius: var(--radius-md);
     border: none;
     cursor: pointer;
-    min-height: 48px;
+    min-height: var(--space-12);
     transition: background 0.2s ease, transform 0.1s ease;
 }
 
@@ -1275,7 +1275,7 @@ body.is-offline .civic-header {
     /* GOV.UK Focus Pattern */
     outline: 3px solid var(--govuk-focus-colour, var(--color-brand-yellow));
     outline-offset: 0;
-    box-shadow: 0 -2px var(--govuk-focus-colour, var(--color-brand-yellow)), 0 4px var(--govuk-focus-text-colour, #0b0c0c);
+    box-shadow: 0 -2px var(--govuk-focus-colour, var(--color-brand-yellow)), 0 4px var(--govuk-focus-text-colour, var(--color-govuk-black));
 }
 
 
@@ -1304,7 +1304,7 @@ body.is-offline .civic-header {
 }
 
 .civic-webauthn-alert--success {
-    background: #059669;
+    background: var(--color-success-600);
     color: var(--color-white);
 }
 
@@ -1366,8 +1366,8 @@ body.is-offline .civic-header {
     outline: 3px solid var(--govuk-focus-colour, var(--color-brand-yellow));
     outline-offset: 0;
     background-color: var(--govuk-focus-colour, var(--color-brand-yellow));
-    color: var(--govuk-focus-text-colour, #0b0c0c);
-    box-shadow: 0 -2px var(--govuk-focus-colour, var(--color-brand-yellow)), 0 4px var(--govuk-focus-text-colour, #0b0c0c);
+    color: var(--govuk-focus-text-colour, var(--color-govuk-black));
+    box-shadow: 0 -2px var(--govuk-focus-colour, var(--color-brand-yellow)), 0 4px var(--govuk-focus-text-colour, var(--color-govuk-black));
 }
 
 .civic-biometric-btn svg {
@@ -1396,7 +1396,7 @@ body:not(.biometrics-available) .civic-biometric-btn {
 
 .civic-badge--success {
     background: rgba(5, 150, 105, 0.1);
-    color: #059669;
+    color: var(--color-success-600);
 }
 
 .civic-badge--neutral {

@@ -49,8 +49,8 @@
     position: absolute;
     bottom: var(--space-1);
     right: var(--space-1);
-    width: 18px;
-    height: 18px;
+    width: var(--space-4-5);
+    height: var(--space-4-5);
     border-radius: var(--radius-full);
     border: 3px solid var(--color-govuk-blue-light);
 }
@@ -368,9 +368,9 @@
     }
 
     .civicone .civicone-identity-bar__status-indicator {
-        width: 14px;
-        height: 14px;
-        border-width: 2px;
+        width: var(--space-3-5);
+        height: var(--space-3-5);
+        border-width: var(--space-0-5);
     }
 
     .civicone .civicone-page-header-actions__btn {
@@ -447,6 +447,6 @@
     }
 
     .civicone .civicone-page-header-actions__btn {
-        border-width: 3px;
+        border-width: var(--space-1);
     }
 }

@@ -5,14 +5,14 @@
 
 /* ============================================
    PRIVACY POLICY - GLASSMORPHISM 2025
-   Theme: Indigo (#6366f1)
+   Theme: Indigo (var(--color-primary-500))
    ============================================ */
 
 #privacy-glass-wrapper {
-    --privacy-theme: #6366f1;
+    --privacy-theme: var(--color-primary-500);
     --privacy-theme-rgb: 99, 102, 241;
     --privacy-theme-light: #818cf8;
-    --privacy-theme-dark: #4f46e5;
+    --privacy-theme-dark: var(--color-primary-600);
     position: relative;
     min-height: 100vh;
     padding: 160px 1rem 4rem; /* Top padding for fixed header + utility bar on desktop */
@@ -93,7 +93,7 @@
 #privacy-glass-wrapper .privacy-page-header .header-icon {
     width: 60px;
     height: 60px;
-    border-radius: 16px;
+    border-radius: var(--radius-xl);
     background: linear-gradient(135deg, var(--privacy-theme) 0%, var(--privacy-theme-dark) 100%);
     display: flex;
     align-items: center;
@@ -187,7 +187,7 @@
 #privacy-glass-wrapper .privacy-section {
     backdrop-filter: blur(20px) saturate(120%);
     -webkit-backdrop-filter: blur(20px) saturate(120%);
-    border-radius: 20px;
+    border-radius: var(--radius-2xl);
     padding: 2rem;
     margin-bottom: 1.5rem;
     transition: all 0.3s ease;
@@ -227,8 +227,8 @@
 }
 
 #privacy-glass-wrapper .privacy-section .section-icon {
-    width: 48px;
-    height: 48px;
+    width: var(--space-12);
+    height: var(--space-12);
     border-radius: 14px;
     display: flex;
     align-items: center;
@@ -313,7 +313,7 @@
     border-collapse: separate;
     border-spacing: 0;
     margin: 1rem 0;
-    border-radius: 12px;
+    border-radius: var(--radius-lg);
     overflow: hidden;
 }
 
@@ -423,7 +423,7 @@
 #privacy-glass-wrapper .privacy-cta {
     text-align: center;
     padding: 3rem 2rem;
-    border-radius: 20px;
+    border-radius: var(--radius-2xl);
     backdrop-filter: blur(20px) saturate(120%);
     -webkit-backdrop-filter: blur(20px) saturate(120%);
     margin-top: 2rem;
@@ -517,8 +517,8 @@
     }
 
     #privacy-glass-wrapper .privacy-page-header .header-icon {
-        width: 56px;
-        height: 56px;
+        width: var(--space-14);
+        height: var(--space-14);
         font-size: 1.5rem;
     }
 
@@ -583,13 +583,13 @@
 /* Touch Targets */
 #privacy-glass-wrapper .privacy-nav-btn,
 #privacy-glass-wrapper .privacy-cta-btn {
-    min-height: 44px;
+    min-height: var(--space-11);
 }
 
 @media (max-width: 768px) {
     #privacy-glass-wrapper .privacy-nav-btn,
     #privacy-glass-wrapper .privacy-cta-btn {
-        min-height: 48px;
+        min-height: var(--space-12);
     }
 }
 

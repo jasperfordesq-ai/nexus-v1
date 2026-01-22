@@ -232,7 +232,7 @@ try {
     <?php endif; ?>
 
     <!-- Post Card CSS (conditional for feed/profile/post pages) -->
-    <?php if ($isHome || strpos($normPath, '/profile') !== false || strpos($normPath, '/post') !== false): ?>
+    <?php if ($isHome || strpos($normPath, '/feed') !== false || strpos($normPath, '/profile') !== false || strpos($normPath, '/post') !== false): ?>
     <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/post-card.min.css?v=<?= $cssVersionTimestamp ?>">
     <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/feed-item.min.css?v=<?= $cssVersionTimestamp ?>">
     <?php endif; ?>
@@ -629,8 +629,9 @@ try {
                 <?php
                 // Platform Switcher - Public to everyone
                 $showPlatform = true;
-                // Get the main platform domain for slug-based tenants
-                $mainPlatformDomain = $_ENV['MAIN_DOMAIN'] ?? 'project-nexus.ie';
+                // Detect protocol for tenants with custom domains
+                $isSecure = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') || ($_SERVER['SERVER_PORT'] ?? 80) == 443;
+                $protocol = $isSecure ? 'https://' : 'http://';
 
                 if ($showPlatform):
                 ?>
@@ -639,12 +640,12 @@ try {
                         <div class="htb-dropdown-content platform-dropdown">
                             <?php foreach (\Nexus\Models\Tenant::all() as $pt):
                                 if ($pt['domain']) {
-                                    // Tenant has its own domain
-                                    $link = 'https://' . $pt['domain'];
+                                    // Tenant has its own domain (uses current protocol)
+                                    $link = $protocol . $pt['domain'];
                                 } else {
-                                    // Tenant uses slug on main platform domain
-                                    $link = 'https://' . $mainPlatformDomain . '/' . $pt['slug'];
-                                    if ($pt['id'] == 1) $link = 'https://' . $mainPlatformDomain;
+                                    // Tenant uses slug - use relative path (works on any domain)
+                                    $link = '/' . $pt['slug'];
+                                    if ($pt['id'] == 1) $link = '/';
                                 }
                             ?>
                                 <a href="<?= $link ?>"><?= htmlspecialchars($pt['name']) ?></a>
@@ -1061,8 +1062,8 @@ try {
 
                     <!-- Expandable Search Form -->
                     <form action="<?= Nexus\Core\TenantContext::getBasePath() ?>/search" method="GET" class="htb-search-box premium-search collapsible-search" id="collapsibleSearch">
-                        <button type="submit" class="search-icon-btn">
-                            <i class="fa fa-search"></i>
+                        <button type="submit" class="search-icon-btn" aria-label="Submit search">
+                            <i class="fa fa-search" aria-hidden="true"></i>
                         </button>
                         <input type="text" name="q" placeholder="Search Nexus..." aria-label="Search" class="search-input" id="searchInput">
                         <button type="button" class="search-close-btn" id="searchCloseBtn" aria-label="Close search">

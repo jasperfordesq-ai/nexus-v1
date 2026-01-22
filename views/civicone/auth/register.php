@@ -42,7 +42,7 @@ if ($layout === 'civicone') {
 
                 <!-- Profile Type -->
                 <div class="form-group">
-                    <label for="profile_type" class="form-label">Profile Type</label>
+                    <label for="profile_type_select" class="form-label">Profile Type</label>
                     <select name="profile_type" id="profile_type_select" required class="form-input" onchange="toggleOrgField()">
                         <option value="individual">Individual</option>
                         <option value="organisation">Organisation</option>
@@ -121,9 +121,9 @@ if ($layout === 'civicone') {
                     </label>
                 </div>
 
-                <!-- Explanatory Notice -->
-                <div style="font-size: 0.8rem; color: #6b7280; line-height: 1.5; margin-bottom: 20px; background: #f9fafb; padding: 15px; border-radius: 8px;">
-                    <p style="margin-top: 0; font-weight: bold; color: #374151;">Data Protection Notice</p>
+                <!-- Explanatory Notice - WCAG AA compliant contrast -->
+                <div style="font-size: 0.8rem; color: #0b0c0c; line-height: 1.5; margin-bottom: 20px; background: #f3f2f1; padding: 15px; border-radius: 0;">
+                    <p style="margin-top: 0; font-weight: bold; color: #0b0c0c;">Data Protection Notice</p>
                     <p style="margin: 5px 0;"><strong>Data Controller:</strong> hOUR Timebank CLG (Ireland)</p>
                     <p><strong>Purpose of Processing:</strong> By clicking "Register," you are entering into a membership agreement with hOUR Timebank. We collect your personal data (name, location, email, and bio) solely to:</p>
                     <ul style="padding-left: 20px; margin: 5px 0;">
@@ -132,7 +132,7 @@ if ($layout === 'civicone') {
                         <li>Send you essential community updates, swap requests, and operational news.</li>
                     </ul>
                     <p><strong>Legal Basis:</strong> This processing is necessary for the performance of a contract (your membership). As a member, you will be automatically subscribed to our community list to ensure the timebank functions effectively. You may unsubscribe from non-critical newsletters at any time, but you will still receive transactional system alerts.</p>
-                    <p style="margin-bottom: 0;"><strong>Your Rights:</strong> Your data is stored securely and acts in accordance with the Data Protection Acts 1988-2018. You have the right to access, rectify, or request deletion of your data by contacting us. For full details on how we share data (e.g., with vetting services or email providers), please view our <a href="<?= Nexus\Core\TenantContext::getBasePath() ?>/privacy" target="_blank" style="color: #6366f1; text-decoration: underline;">Privacy Policy</a>.</p>
+                    <p style="margin-bottom: 0;"><strong>Your Rights:</strong> Your data is stored securely and acts in accordance with the Data Protection Acts 1988-2018. You have the right to access, rectify, or request deletion of your data by contacting us. For full details on how we share data (e.g., with vetting services or email providers), please view our <a href="<?= Nexus\Core\TenantContext::getBasePath() ?>/privacy" target="_blank" style="color: #1d70b8; text-decoration: underline;">Privacy Policy</a>.</p>
                 </div>
 
                 <button type="submit" id="submit-btn" class="htb-btn htb-btn-primary auth-submit-btn">Create Account</button>

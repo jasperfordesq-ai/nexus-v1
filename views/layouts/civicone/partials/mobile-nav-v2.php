@@ -232,7 +232,7 @@ html[data-layout] { transform: none !important; }
             <?php endif; ?>
             <span>Messages</span>
         </a>
-        <button type="button" class="mobile-tab-item" aria-label="Menu<?= ($notifCount > 0) ? ', ' . $notifCount . ' notifications' : '' ?>" onclick="openMobileMenu()">
+        <button type="button" class="mobile-tab-item" aria-label="Menu<?= ($notifCount > 0) ? ', ' . $notifCount . ' notifications' : '' ?>" aria-expanded="false" aria-controls="mobileMenu" onclick="openMobileMenu()">
             <i class="fa-solid fa-bars" aria-hidden="true"></i>
             <?php if ($notifCount > 0): ?>
             <span class="mobile-tab-badge" aria-hidden="true"><?= $notifCount > 99 ? '99+' : $notifCount ?></span>
@@ -244,7 +244,7 @@ html[data-layout] { transform: none !important; }
 
 
 <!-- Full-Screen Menu -->
-<div class="mobile-fullscreen-menu" id="mobileMenu">
+<div class="mobile-fullscreen-menu" id="mobileMenu" role="dialog" aria-modal="true" aria-label="Navigation menu">
     <!-- Enhanced Gradient Header -->
     <div class="mobile-menu-header">
         <div class="mobile-menu-header-bg"></div>

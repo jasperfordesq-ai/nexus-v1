@@ -75,7 +75,7 @@
     .contact-submit-btn {
         width: 100%;
         font-size: var(--font-size-lg);
-        min-height: 48px;
+        min-height: var(--space-12);
     }
 
     /* Info Section */
@@ -104,8 +104,8 @@
         font-size: var(--font-size-2xl);
         margin-right: var(--space-4);
         color: var(--civicone-brand);
-        width: 44px;
-        height: 44px;
+        width: var(--space-11);
+        height: var(--space-11);
         display: flex;
         align-items: center;
         justify-content: center;

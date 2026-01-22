@@ -10,7 +10,7 @@
 .super-admin-wrapper {
     position: relative;
     z-index: 20;
-    padding: 0 40px 60px;
+    padding: 0 var(--space-10) 60px;
 }
 
 .edit-tenant-container {
@@ -18,7 +18,7 @@
     margin: 0 auto;
     display: flex;
     flex-direction: column;
-    gap: 40px;
+    gap: var(--space-10);
 }
 
 /* ========================================
@@ -35,13 +35,13 @@
 .card-header-left {
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: var(--space-3);
 }
 
 .card-header-icon {
-    width: 40px;
-    height: 40px;
-    border-radius: 10px;
+    width: var(--space-10);
+    height: var(--space-10);
+    border-radius: var(--radius-md);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -54,7 +54,7 @@
 }
 
 .card-header-icon--success {
-    background: #10b981;
+    background: var(--color-success-500);
 }
 
 .card-header-title {
@@ -80,26 +80,26 @@
    ======================================== */
 
 .form-section-box {
-    background: #f8fafc;
-    border: 1px solid #e2e8f0;
-    border-radius: 12px;
+    background: var(--color-slate-50);
+    border: 1px solid var(--color-slate-200);
+    border-radius: var(--radius-lg);
     padding: 25px;
     margin-bottom: 30px;
 }
 
 .form-section-box--admin {
-    padding: 20px;
+    padding: var(--space-5);
     margin-bottom: 25px;
 }
 
 .form-section-title {
-    margin: 0 0 20px 0;
-    color: #475569;
+    margin: 0 0 var(--space-5) 0;
+    color: var(--color-slate-600);
     font-size: 0.95rem;
     text-transform: uppercase;
     letter-spacing: 0.5px;
-    border-bottom: 1px solid #e2e8f0;
-    padding-bottom: 10px;
+    border-bottom: 1px solid var(--color-slate-200);
+    padding-bottom: var(--space-2-5);
 }
 
 .form-section-title--no-border {
@@ -114,8 +114,8 @@
 .form-grid-2col {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 20px;
-    margin-bottom: 20px;
+    gap: var(--space-5);
+    margin-bottom: var(--space-5);
 }
 
 .form-grid-2col-gap30 {
@@ -127,14 +127,14 @@
 .form-grid-4col {
     display: grid;
     grid-template-columns: 1fr 1fr 1fr auto;
-    gap: 15px;
+    gap: var(--space-4);
     align-items: end;
 }
 
 .form-grid-auto {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    gap: 15px;
+    gap: var(--space-4);
 }
 
 /* ========================================
@@ -151,8 +151,8 @@
 .form-label--small {
     display: block;
     font-size: 0.8rem;
-    color: #6b7280;
-    margin-bottom: 5px;
+    color: var(--color-gray-500);
+    margin-bottom: var(--space-1);
 }
 
 /* ========================================
@@ -161,12 +161,12 @@
 
 .form-help-text {
     font-size: 0.8rem;
-    color: #6b7280;
-    margin-top: 5px;
+    color: var(--color-gray-500);
+    margin-top: var(--space-1);
 }
 
 .form-help-text--mt10 {
-    margin-top: 10px;
+    margin-top: var(--space-2-5);
 }
 
 /* ========================================
@@ -180,16 +180,16 @@
 
 .input-group-url__prefix {
     background: #fff;
-    padding: 12px 15px;
-    border: 1px solid #e2e8f0;
+    padding: var(--space-3) var(--space-4);
+    border: 1px solid var(--color-slate-200);
     border-right: 0;
-    border-radius: 10px 0 0 10px;
-    color: #6b7280;
+    border-radius: var(--radius-md) 0 0 var(--radius-md);
+    color: var(--color-gray-500);
     font-family: monospace;
 }
 
 .input-group-url .nexus-input {
-    border-radius: 0 10px 10px 0;
+    border-radius: 0 var(--radius-md) var(--radius-md) 0;
 }
 
 /* ========================================
@@ -197,17 +197,17 @@
    ======================================== */
 
 .form-divider {
-    margin-top: 20px;
+    margin-top: var(--space-5);
 }
 
 .form-divider--section {
     margin-top: 30px;
-    border-top: 1px solid #e2e8f0;
-    padding-top: 20px;
+    border-top: 1px solid var(--color-slate-200);
+    padding-top: var(--space-5);
 }
 
 .form-divider--admin {
-    border-top: 1px solid #e5e7eb;
+    border-top: 1px solid var(--color-gray-200);
     padding-top: 25px;
 }
 
@@ -222,10 +222,10 @@
 .module-section-header {
     display: flex;
     align-items: center;
-    gap: 10px;
-    margin-bottom: 15px;
+    gap: var(--space-2-5);
+    margin-bottom: var(--space-4);
     border-bottom: 1px solid #eee;
-    padding-bottom: 10px;
+    padding-bottom: var(--space-2-5);
 }
 
 .module-section-title {
@@ -237,14 +237,14 @@
     font-size: 0.8rem;
     background: #eff6ff;
     color: #1d4ed8;
-    padding: 2px 8px;
-    border-radius: 4px;
+    padding: var(--space-0-5) 8px;
+    border-radius: var(--radius-sm);
 }
 
 .module-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-    gap: 15px;
+    gap: var(--space-4);
 }
 
 /* ========================================
@@ -254,9 +254,9 @@
 .module-card {
     display: flex;
     align-items: center;
-    padding: 15px;
-    border: 1px solid #e5e7eb;
-    border-radius: 12px;
+    padding: var(--space-4);
+    border: 1px solid var(--color-gray-200);
+    border-radius: var(--radius-lg);
     background: #fff;
     cursor: pointer;
     transition: all 0.2s;
@@ -264,15 +264,15 @@
 }
 
 .module-card--active {
-    border-color: #4f46e5;
+    border-color: var(--color-primary-600);
     background: rgba(79, 70, 229, 0.05);
 }
 
 .module-card__checkbox {
-    margin-right: 15px;
-    width: 20px;
-    height: 20px;
-    accent-color: #4f46e5;
+    margin-right: var(--space-4);
+    width: var(--space-5);
+    height: var(--space-5);
+    accent-color: var(--color-primary-600);
 }
 
 .module-card__content {
@@ -282,23 +282,23 @@
 .module-card__label {
     font-weight: 600;
     font-size: 0.95rem;
-    color: #1f2937;
+    color: var(--color-gray-800);
 }
 
 .module-card__status {
     font-size: 0.8rem;
-    color: #9ca3af;
+    color: var(--color-gray-400);
 }
 
 .module-card__status--active {
-    color: #4f46e5;
+    color: var(--color-primary-600);
 }
 
 .module-card__icon {
-    background: #f3f4f6;
-    width: 36px;
-    height: 36px;
-    border-radius: 8px;
+    background: var(--color-gray-100);
+    width: var(--space-9);
+    height: var(--space-9);
+    border-radius: var(--radius-md);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -310,11 +310,11 @@
 
 .module-card__icon .dashicons {
     font-size: 20px;
-    color: #9ca3af;
+    color: var(--color-gray-400);
 }
 
 .module-card__icon--active .dashicons {
-    color: #4f46e5;
+    color: var(--color-primary-600);
 }
 
 /* ========================================
@@ -326,7 +326,7 @@
 }
 
 .btn-submit-primary {
-    padding: 12px 30px;
+    padding: var(--space-3) 30px;
     font-size: 1rem;
     box-shadow: 0 4px 6px -1px rgba(79, 70, 229, 0.2);
 }
@@ -341,10 +341,10 @@
 
 .admin-alert-warning {
     grid-column: 1 / -1;
-    padding: 15px;
+    padding: var(--space-4);
     background: #fff1f2;
     color: #be123c;
-    border-radius: 8px;
+    border-radius: var(--radius-md);
     font-size: 0.9rem;
     text-align: center;
     border: 1px solid #fecdd3;
@@ -354,41 +354,41 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 15px;
+    padding: var(--space-4);
     background: #fff;
-    border: 1px solid #e2e8f0;
-    border-radius: 10px;
+    border: 1px solid var(--color-slate-200);
+    border-radius: var(--radius-md);
     box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02);
 }
 
 .admin-card__info {
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: var(--space-3);
     overflow: hidden;
 }
 
 .admin-card__avatar {
-    width: 36px;
-    height: 36px;
-    background: #f3f4f6;
+    width: var(--space-9);
+    height: var(--space-9);
+    background: var(--color-gray-100);
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    color: #6b7280;
+    color: var(--color-gray-500);
     font-weight: bold;
 }
 
 .admin-card__name {
     font-weight: 600;
     font-size: 0.95rem;
-    color: #1f2937;
+    color: var(--color-gray-800);
 }
 
 .admin-card__email {
     font-size: 0.8rem;
-    color: #6b7280;
+    color: var(--color-gray-500);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -401,11 +401,11 @@
 .admin-card__delete-btn {
     background: none;
     border: none;
-    color: #ef4444;
+    color: var(--color-error-500);
     font-size: 1.4rem;
     cursor: pointer;
     line-height: 1;
-    padding: 0 5px;
+    padding: 0 var(--space-1);
 }
 
 /* ========================================
@@ -413,15 +413,15 @@
    ======================================== */
 
 .grant-access-title {
-    margin: 0 0 15px 0;
-    color: #374151;
+    margin: 0 0 var(--space-4) 0;
+    color: var(--color-gray-700);
 }
 
 .grant-access-form {
     background: #fff;
-    padding: 20px;
-    border: 1px solid #e2e8f0;
-    border-radius: 12px;
+    padding: var(--space-5);
+    border: 1px solid var(--color-slate-200);
+    border-radius: var(--radius-lg);
 }
 
 /* ========================================
@@ -436,9 +436,9 @@
 
 .danger-zone-box {
     display: inline-block;
-    padding: 15px 30px;
-    border: 1px dashed #ef4444;
-    border-radius: 12px;
+    padding: var(--space-4) 30px;
+    border: 1px dashed var(--color-error-500);
+    border-radius: var(--radius-lg);
     background: #fef2f2;
 }
 
@@ -446,7 +446,7 @@
     color: #991b1b;
     font-weight: 700;
     font-size: 0.9rem;
-    margin-bottom: 5px;
+    margin-bottom: var(--space-1);
 }
 
 .danger-zone-text {
@@ -470,11 +470,11 @@
 
 @media (max-width: 600px) {
     .super-admin-wrapper {
-        padding: 120px 15px 100px 15px;
+        padding: 120px var(--space-4) 100px var(--space-4);
     }
 
     .super-admin-wrapper .nexus-card {
-        border-radius: 12px;
+        border-radius: var(--radius-lg);
     }
 
     .form-grid-2col,
@@ -499,11 +499,11 @@
 }
 
 [data-theme="dark"] .card-header-title {
-    color: #f1f5f9;
+    color: var(--color-slate-100);
 }
 
 [data-theme="dark"] .card-header-subtitle {
-    color: #94a3b8;
+    color: var(--color-slate-400);
 }
 
 [data-theme="dark"] .form-section-box {
@@ -512,32 +512,32 @@
 }
 
 [data-theme="dark"] .form-section-title {
-    color: #e2e8f0;
+    color: var(--color-slate-200);
     border-color: rgba(255, 255, 255, 0.1);
 }
 
 [data-theme="dark"] .form-label {
-    color: #e2e8f0;
+    color: var(--color-slate-200);
 }
 
 [data-theme="dark"] .form-label--small {
-    color: #94a3b8;
+    color: var(--color-slate-400);
 }
 
 [data-theme="dark"] .form-help-text {
-    color: #94a3b8;
+    color: var(--color-slate-400);
 }
 
 [data-theme="dark"] .nexus-input {
     background: rgba(15, 23, 42, 0.6);
     border-color: rgba(255, 255, 255, 0.15);
-    color: #f1f5f9;
+    color: var(--color-slate-100);
 }
 
 [data-theme="dark"] .input-group-url__prefix {
     background: rgba(30, 41, 59, 0.6);
     border-color: rgba(255, 255, 255, 0.15);
-    color: #94a3b8;
+    color: var(--color-slate-400);
 }
 
 [data-theme="dark"] .form-divider--section,
@@ -550,12 +550,12 @@
 }
 
 [data-theme="dark"] .module-section-title {
-    color: #f1f5f9;
+    color: var(--color-slate-100);
 }
 
 [data-theme="dark"] .module-section-badge {
     background: rgba(99, 102, 241, 0.2);
-    color: #a5b4fc;
+    color: var(--color-primary-300);
 }
 
 [data-theme="dark"] .module-card {
@@ -564,20 +564,20 @@
 }
 
 [data-theme="dark"] .module-card--active {
-    border-color: #6366f1;
+    border-color: var(--color-primary-500);
     background: rgba(99, 102, 241, 0.15);
 }
 
 [data-theme="dark"] .module-card__label {
-    color: #f1f5f9;
+    color: var(--color-slate-100);
 }
 
 [data-theme="dark"] .module-card__status {
-    color: #64748b;
+    color: var(--color-slate-500);
 }
 
 [data-theme="dark"] .module-card__status--active {
-    color: #a5b4fc;
+    color: var(--color-primary-300);
 }
 
 [data-theme="dark"] .module-card__icon {
@@ -589,11 +589,11 @@
 }
 
 [data-theme="dark"] .module-card__icon .dashicons {
-    color: #64748b;
+    color: var(--color-slate-500);
 }
 
 [data-theme="dark"] .module-card__icon--active .dashicons {
-    color: #a5b4fc;
+    color: var(--color-primary-300);
 }
 
 [data-theme="dark"] .admin-alert-warning {
@@ -609,19 +609,19 @@
 
 [data-theme="dark"] .admin-card__avatar {
     background: rgba(51, 65, 85, 0.6);
-    color: #94a3b8;
+    color: var(--color-slate-400);
 }
 
 [data-theme="dark"] .admin-card__name {
-    color: #f1f5f9;
+    color: var(--color-slate-100);
 }
 
 [data-theme="dark"] .admin-card__email {
-    color: #94a3b8;
+    color: var(--color-slate-400);
 }
 
 [data-theme="dark"] .grant-access-title {
-    color: #e2e8f0;
+    color: var(--color-slate-200);
 }
 
 [data-theme="dark"] .grant-access-form {
@@ -645,5 +645,5 @@
 [data-theme="dark"] .nexus-btn-secondary {
     background: rgba(51, 65, 85, 0.6);
     border-color: rgba(255, 255, 255, 0.15);
-    color: #e2e8f0;
+    color: var(--color-slate-200);
 }

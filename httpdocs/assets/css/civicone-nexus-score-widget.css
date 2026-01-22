@@ -10,7 +10,7 @@
             rgba(30, 41, 59, 0.95) 0%,
             rgba(15, 23, 42, 0.9) 100%);
         backdrop-filter: blur(20px);
-        border-radius: 20px;
+        border-radius: var(--radius-2xl);
         padding: 1.75rem;
         border: 1px solid rgba(255, 255, 255, 0.1);
         box-shadow:
@@ -29,7 +29,7 @@
         left: 0;
         right: 0;
         height: 4px;
-        background: linear-gradient(90deg, #6366f1, #8b5cf6, #ec4899);
+        background: linear-gradient(90deg, var(--color-primary-500), var(--color-purple-500), var(--color-pink-500));
         opacity: 0.8;
     }
 
@@ -69,7 +69,7 @@
     .nexus-widget-score-value {
         font-size: 3rem;
         font-weight: 800;
-        background: linear-gradient(135deg, #6366f1, #8b5cf6, #ec4899);
+        background: linear-gradient(135deg, var(--color-primary-500), var(--color-purple-500), var(--color-pink-500));
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
         background-clip: text;
@@ -99,7 +99,7 @@
         background: linear-gradient(135deg,
             rgba(99, 102, 241, 0.2),
             rgba(139, 92, 246, 0.2));
-        border-radius: 12px;
+        border-radius: var(--radius-lg);
         margin-bottom: 1rem;
         border: 1px solid rgba(99, 102, 241, 0.3);
     }
@@ -121,7 +121,7 @@
         gap: 0.5rem;
         padding: 0.625rem;
         background: rgba(16, 185, 129, 0.1);
-        border-radius: 10px;
+        border-radius: var(--radius-md);
         border: 1px solid rgba(16, 185, 129, 0.2);
         margin-bottom: 1.25rem;
     }
@@ -133,16 +133,16 @@
 
     .nexus-widget-rank-value {
         font-weight: 700;
-        color: #10b981;
+        color: var(--color-success-500);
     }
 
     .nexus-widget-cta {
         display: block;
         width: 100%;
         padding: 0.875rem;
-        background: linear-gradient(135deg, #6366f1, #8b5cf6);
+        background: linear-gradient(135deg, var(--color-primary-500), var(--color-purple-500));
         border: none;
-        border-radius: 12px;
+        border-radius: var(--radius-lg);
         color: white;
         font-weight: 600;
         font-size: 0.95rem;

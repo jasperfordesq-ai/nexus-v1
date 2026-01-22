@@ -19,14 +19,14 @@
     --civic-vol-brand-light: rgba(15, 118, 110, 0.1);
 
     /* Status Colors (WCAG AA) */
-    --civic-vol-success: #047857;            /* 5.3:1 */
+    --civic-vol-success: var(--color-success-700);            /* 5.3:1 */
     --civic-vol-success-bg: var(--color-emerald-50);
     --civic-vol-info: var(--color-blue-700);               /* 6.3:1 */
     --civic-vol-info-bg: var(--color-blue-100);
 
     /* Focus Ring */
     --civic-vol-focus-ring: var(--color-brand-yellow);         /* GOV.UK focus */
-    --civic-vol-focus-text: #0B0C0C;
+    --civic-vol-focus-text: var(--color-govuk-black);
     --civic-vol-focus-offset: 3px;
 
     /* Touch Target */
@@ -44,7 +44,7 @@
     --civic-vol-brand: #5EEAD4;
     --civic-vol-brand-hover: #99F6E4;
     --civic-vol-brand-light: rgba(94, 234, 212, 0.15);
-    --civic-vol-success: #34D399;
+    --civic-vol-success: var(--color-success-400);
     --civic-vol-success-bg: rgba(16, 185, 129, 0.15);
     --civic-vol-info: var(--color-blue-400);
     --civic-vol-info-bg: rgba(59, 130, 246, 0.15);
@@ -99,13 +99,13 @@
     display: inline-flex;
     align-items: center;
     gap: var(--space-1);
-    min-height: 28px;
+    min-height: var(--space-7);
 }
 
 .civic-tags .dashicons {
     font-size: var(--font-size-sm);
-    width: 14px;
-    height: 14px;
+    width: var(--space-3-5);
+    height: var(--space-3-5);
 }
 
 
@@ -265,16 +265,16 @@
 .civic-info-icon {
     color: var(--civic-vol-brand);
     font-size: var(--font-size-xl);
-    width: 20px;
-    height: 20px;
+    width: var(--space-5);
+    height: var(--space-5);
     flex-shrink: 0;
-    margin-top: 2px; /* No token for 2px */
+    margin-top: var(--space-0-5); /* No token for 2px */
 }
 
 .civic-info-content {
     display: flex;
     flex-direction: column;
-    gap: 2px; /* No token for 2px */
+    gap: var(--space-0-5); /* No token for 2px */
 }
 
 .civic-info-label {
@@ -327,8 +327,8 @@
 
 .civic-sidebar-org-icon .dashicons {
     font-size: 28px; /* No exact token */
-    width: 28px;
-    height: 28px;
+    width: var(--space-7);
+    height: var(--space-7);
 }
 
 .civic-sidebar-org-name {
@@ -376,8 +376,8 @@
 
 .civic-alert .dashicons {
     font-size: var(--font-size-2xl);
-    width: 24px;
-    height: 24px;
+    width: var(--space-6);
+    height: var(--space-6);
     flex-shrink: 0;
 }
 
@@ -413,7 +413,7 @@
     color: var(--civic-vol-text-primary);
     display: flex;
     align-items: center;
-    gap: 6px; /* No exact token, closest would be space-2 (8px) */
+    gap: var(--space-1-5); /* No exact token, closest would be space-2 (8px) */
 }
 
 .civic-label .dashicons {
@@ -426,7 +426,7 @@
 .civic-textarea {
     width: 100%;
     padding: var(--space-3);
-    min-height: 80px;
+    min-height: var(--space-20);
     border: 2px solid var(--civic-vol-border);
     border-radius: var(--radius-base);
     font-size: var(--font-size-base); /* Prevents iOS zoom */
@@ -512,7 +512,7 @@
     font-size: var(--font-size-xs);
     color: var(--civic-vol-text-muted);
     background: var(--civic-bg-card, #fff);
-    padding: 2px var(--space-2); /* 2px has no token */
+    padding: var(--space-0-5) var(--space-2); /* 2px has no token */
     border-radius: var(--radius-sm);
 }
 
@@ -573,12 +573,12 @@
     .civic-detail-card,
     .civic-sidebar-card,
     .civic-info-item {
-        border-width: 2px;
+        border-width: var(--space-0-5);
     }
 
     .civic-textarea,
     .civic-shift-content {
-        border-width: 3px;
+        border-width: var(--space-1);
     }
 
     .civic-link {
@@ -616,7 +616,7 @@
 .civicone--govuk .civicone-opportunity-item {
     display: flex;
     flex-direction: column;
-    gap: 10px; /* No exact token, closest is space-3 (12px) */
+    gap: var(--space-2-5); /* No exact token, closest is space-3 (12px) */
     padding: var(--space-5) 0;
     border-bottom: 1px solid var(--color-govuk-grey);
 }
@@ -634,7 +634,7 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    gap: 15px; /* No exact token, closest is space-4 (16px) */
+    gap: var(--space-4); /* No exact token, closest is space-4 (16px) */
     flex-wrap: wrap;
 }
 
@@ -678,7 +678,7 @@
     margin: 0;
     font-size: var(--font-size-base);
     line-height: 1.5;
-    color: #0b0c0c;
+    color: var(--color-govuk-black);
 }
 
 [data-theme="dark"] .civicone--govuk .civicone-opportunity-item__description {
@@ -695,17 +695,17 @@
 .civicone--govuk .civicone-opportunity-item__tags {
     display: flex;
     flex-wrap: wrap;
-    gap: 10px; /* No exact token, closest is space-3 (12px) */
+    gap: var(--space-2-5); /* No exact token, closest is space-3 (12px) */
     align-items: center;
 }
 
 .civicone--govuk .civicone-tag {
     display: inline-flex;
     align-items: center;
-    gap: 5px; /* No exact token, closest is space-1 (4px) or space-2 (8px) */
-    padding: 5px 10px; /* No exact tokens, closest would be space-1/space-3 */
+    gap: var(--space-1); /* No exact token, closest is space-1 (4px) or space-2 (8px) */
+    padding: var(--space-1) var(--space-2-5); /* No exact tokens, closest would be space-1/space-3 */
     background: var(--color-neutral-50);
-    color: #0b0c0c;
+    color: var(--color-govuk-black);
     font-size: var(--font-size-sm);
     font-weight: 600;
     border-radius: var(--radius-sm);
@@ -717,12 +717,12 @@
 }
 
 .civicone--govuk .civicone-tag--green {
-    background: #00703c;
+    background: var(--color-govuk-green);
     color: var(--color-white);
 }
 
 [data-theme="dark"] .civicone--govuk .civicone-tag--green {
-    background: #00703c;
+    background: var(--color-govuk-green);
     color: var(--color-white);
 }
 
@@ -733,19 +733,19 @@
 /* Action Button */
 .civicone--govuk .civicone-opportunity-item__action {
     align-self: flex-start;
-    margin-top: 5px; /* No exact token, closest is space-1 (4px) */
+    margin-top: var(--space-1); /* No exact token, closest is space-1 (4px) */
 }
 
 /* Responsive Stacking */
 @media (max-width: 640px) {
     .civicone--govuk .civicone-opportunity-item {
-        padding: 15px 0; /* No exact token, closest is space-4 (16px) */
+        padding: var(--space-4) 0; /* No exact token, closest is space-4 (16px) */
     }
 
     .civicone--govuk .civicone-opportunity-item__meta-header {
         flex-direction: column;
         align-items: flex-start;
-        gap: 5px; /* No exact token, closest is space-1 (4px) or space-2 (8px) */
+        gap: var(--space-1); /* No exact token, closest is space-1 (4px) or space-2 (8px) */
     }
 }
 
@@ -756,7 +756,7 @@
 .civicone--govuk .civicone-body-s {
     font-size: var(--font-size-sm);
     line-height: 1.5;
-    color: #0b0c0c;
+    color: var(--color-govuk-black);
     margin: 0;
 }
 

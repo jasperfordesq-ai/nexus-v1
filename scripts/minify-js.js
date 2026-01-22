@@ -56,6 +56,8 @@ const jsFiles = [
     'fab-polish.js',
     'badge-animations.js',
     'error-states.js',
+    'civicone-error-summary.js',
+    'mobile-nav-v2.js',
 ];
 
 const jsDir = path.join(__dirname, '../httpdocs/assets/js');

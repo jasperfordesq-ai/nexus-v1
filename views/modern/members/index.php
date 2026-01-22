@@ -81,7 +81,7 @@ $basePath = Nexus\Core\TenantContext::getBasePath();
             </div>
 
             <div class="radius-control">
-                <span class="radius-label">Search Radius:</span>
+                <label for="radius-slider" class="radius-label">Search Radius:</label>
                 <div class="radius-slider-wrapper">
                     <input type="range"
                         class="radius-slider"
@@ -89,8 +89,12 @@ $basePath = Nexus\Core\TenantContext::getBasePath();
                         min="1"
                         max="100"
                         value="25"
-                        step="1">
-                    <span class="radius-value" id="radius-value">25 km</span>
+                        step="1"
+                        aria-valuemin="1"
+                        aria-valuemax="100"
+                        aria-valuenow="25"
+                        aria-valuetext="25 kilometers">
+                    <span class="radius-value" id="radius-value" aria-hidden="true">25 km</span>
                 </div>
             </div>
         </div>
@@ -107,10 +111,11 @@ $basePath = Nexus\Core\TenantContext::getBasePath();
                 </div>
 
                 <div style="position: relative; width: 100%;">
+                    <label for="member-search" class="visually-hidden">Search members</label>
                     <input type="text" id="member-search" placeholder="Search by name, bio, location, skills..."
-                        class="glass-search-input">
-                    <i class="fa-solid fa-search" style="position: absolute; left: 18px; top: 50%; transform: translateY(-50%); color: #9ca3af; font-size: 1rem;"></i>
-                    <div id="search-spinner" class="spinner" style="display: none; position: absolute; right: 18px; top: 50%; transform: translateY(-50%);"></div>
+                        class="glass-search-input" aria-label="Search by name, bio, location, or skills">
+                    <i class="fa-solid fa-search" style="position: absolute; left: 18px; top: 50%; transform: translateY(-50%); color: #9ca3af; font-size: 1rem;" aria-hidden="true"></i>
+                    <div id="search-spinner" class="spinner" style="display: none; position: absolute; right: 18px; top: 50%; transform: translateY(-50%);" aria-hidden="true"></div>
                 </div>
             </div>
         </div>

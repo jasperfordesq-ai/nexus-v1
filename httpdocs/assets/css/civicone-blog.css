@@ -852,15 +852,15 @@
    -------------------------------------------- */
 @media (prefers-contrast: high) {
     .news-card {
-        border-width: 3px;
+        border-width: var(--space-1);
     }
 
     .news-btn {
-        border-width: 2px;
+        border-width: var(--space-0-5);
     }
 
     .civic-article-wrapper {
-        border-width: 3px;
+        border-width: var(--space-1);
     }
 }
 

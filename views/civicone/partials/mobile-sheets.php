@@ -27,8 +27,8 @@ $basePath = class_exists('\Nexus\Core\TenantContext') ? \Nexus\Core\TenantContex
 <div class="mobile-sheet" id="commentSheet">
     <div class="mobile-sheet-handle" id="commentHandle"></div>
     <div class="mobile-sheet-header">
-        <button type="button" class="mobile-sheet-close" onclick="closeMobileCommentSheet()">
-            <i class="fa-solid fa-xmark"></i>
+        <button type="button" class="mobile-sheet-close" onclick="closeMobileCommentSheet()" aria-label="Close comments">
+            <i class="fa-solid fa-xmark" aria-hidden="true"></i>
         </button>
         <span class="mobile-sheet-title">Comments</span>
         <span class="mobile-sheet-header-spacer"></span>

@@ -27,7 +27,7 @@ const allCssFiles = glob.sync('httpdocs/assets/css/**/*.css', {
         '**/_archived/**',
         '**/bundles/**'  // Bundle files are compiled from others
     ]
-});
+}).map(f => f.replace(/\\/g, '/'));
 
 console.log('===========================================');
 console.log('  CSS Discovery Report');

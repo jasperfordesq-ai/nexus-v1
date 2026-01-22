@@ -53,7 +53,7 @@
     align-items: center;
     margin-bottom: 30px;
     flex-wrap: wrap;
-    gap: 12px;
+    gap: var(--space-3);
 }
 
 .civic-groups-header h1 {
@@ -84,7 +84,7 @@
     display: grid;
     grid-template-columns: 1fr; /* Mobile: 1 column */
     gap: 30px;
-    margin-bottom: 40px;
+    margin-bottom: var(--space-10);
 }
 
 @media (min-width: 641px) {
@@ -108,7 +108,7 @@
     padding: 0;
     background: var(--civic-bg-card, #f7f7f7);
     border: none;
-    border-radius: 6px;
+    border-radius: var(--radius-base);
     overflow: hidden;
     margin-bottom: 0;
     box-shadow: none;
@@ -120,7 +120,7 @@
 
 /* Group Card Image Section */
 .civic-group-card-image {
-    padding: 30px 20px 10px 20px;
+    padding: 30px var(--space-5) var(--space-2-5) var(--space-5);
     width: 100%;
     display: flex;
     justify-content: center;
@@ -156,7 +156,7 @@
 
 /* Group Card Content Section */
 .civic-group-card-content {
-    padding: 10px 20px 30px 20px;
+    padding: var(--space-2-5) var(--space-5) 30px var(--space-5);
     width: 100%;
     flex-grow: 1;
     display: flex;
@@ -164,7 +164,7 @@
 }
 
 .civic-group-card-title {
-    margin: 0 0 5px 0;
+    margin: 0 0 var(--space-1) 0;
     font-size: 1.1rem;
     font-weight: 600;
 }
@@ -188,7 +188,7 @@
 }
 
 .civic-group-card-description {
-    margin: 0 0 20px 0;
+    margin: 0 0 var(--space-5) 0;
     font-size: 0.9rem;
     color: var(--civic-group-text-muted);
     flex-grow: 1;
@@ -198,7 +198,7 @@
 .civic-group-card-btn {
     display: inline-block;
     width: auto;
-    padding: 10px 24px;
+    padding: var(--space-2-5) var(--space-6);
     min-height: var(--civic-group-touch-min);
     background: transparent;
     color: var(--civic-group-brand);
@@ -236,7 +236,7 @@
     padding: 0;
     background: var(--civic-bg-card, #f7f7f7);
     border: none;
-    border-radius: 6px;
+    border-radius: var(--radius-base);
     overflow: hidden;
     box-shadow: none;
     transition: box-shadow 0.2s ease;
@@ -251,7 +251,7 @@
 }
 
 .civicone--govuk .civicone-group-card__image {
-    padding: 30px 20px 10px 20px;
+    padding: 30px var(--space-5) var(--space-2-5) var(--space-5);
     width: 100%;
     display: flex;
     justify-content: center;
@@ -286,7 +286,7 @@
 }
 
 .civicone--govuk .civicone-group-card__content {
-    padding: 10px 20px 30px 20px;
+    padding: var(--space-2-5) var(--space-5) 30px var(--space-5);
     width: 100%;
     flex-grow: 1;
     display: flex;
@@ -294,14 +294,14 @@
 }
 
 .civicone--govuk .civicone-group-card__title {
-    margin: 0 0 10px 0;
+    margin: 0 0 var(--space-2-5) 0;
     font-size: 1.1rem;
     font-weight: 700;
     line-height: 1.25;
 }
 
 .civicone--govuk .civicone-group-card__description {
-    margin: 0 0 15px 0;
+    margin: 0 0 var(--space-4) 0;
     font-size: 0.9rem;
     color: var(--civic-group-text-muted, var(--color-govuk-grey-dark));
     flex-grow: 1;
@@ -312,10 +312,10 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 5px;
+    gap: var(--space-1);
     font-size: 0.85rem;
     color: var(--civic-group-text-muted, var(--color-govuk-grey-dark));
-    margin: 0 0 15px 0;
+    margin: 0 0 var(--space-4) 0;
 }
 
 .civicone--govuk .civicone-group-card__action {
@@ -333,18 +333,18 @@
 .civicone--govuk .civicone-checkboxes {
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: var(--space-2-5);
 }
 
 .civicone--govuk .civicone-checkbox-item {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: var(--space-2-5);
 }
 
 .civicone--govuk .civicone-checkbox {
-    width: 20px;
-    height: 20px;
+    width: var(--space-5);
+    height: var(--space-5);
     border: 2px solid var(--color-govuk-black);
     cursor: pointer;
 }
@@ -404,14 +404,14 @@
 .civicone--govuk .civicone-group-item {
     display: flex;
     align-items: flex-start;
-    gap: 15px;
-    padding: 20px 0;
+    gap: var(--space-4);
+    padding: var(--space-5) 0;
     border-bottom: 1px solid var(--color-govuk-grey);
 }
 
 @media (min-width: 641px) {
     .civicone--govuk .civicone-group-item {
-        gap: 20px;
+        gap: var(--space-5);
     }
 }
 
@@ -426,14 +426,14 @@
 }
 
 .civicone--govuk .civicone-avatar--large {
-    width: 64px;
-    height: 64px;
+    width: var(--space-16);
+    height: var(--space-16);
 }
 
 @media (min-width: 641px) {
     .civicone--govuk .civicone-avatar--large {
-        width: 80px;
-        height: 80px;
+        width: var(--space-20);
+        height: var(--space-20);
     }
 }
 
@@ -452,7 +452,7 @@
 
 @media (min-width: 641px) {
     .civicone--govuk .civicone-group-item__name {
-        font-size: 22px;
+        font-size: var(--space-5-5);
     }
 }
 
@@ -472,7 +472,7 @@
 .civicone--govuk .civicone-group-item__meta {
     display: flex;
     align-items: center;
-    gap: 5px;
+    gap: var(--space-1);
     font-size: 14px;
     line-height: 1.5;
     margin: 0;
@@ -488,7 +488,7 @@
 /* Group Actions Section */
 .civicone--govuk .civicone-group-item__actions {
     flex-shrink: 0;
-    margin-top: 5px;
+    margin-top: var(--space-1);
 }
 
 @media (max-width: 640px) {
@@ -498,7 +498,7 @@
 
     .civicone--govuk .civicone-group-item__actions {
         width: 100%;
-        margin-top: 15px;
+        margin-top: var(--space-4);
     }
 
     .civicone--govuk .civicone-group-item__actions .civicone-button {
@@ -522,18 +522,18 @@
    -------------------------------------------- */
 .civic-tab-nav {
     display: flex;
-    border-bottom: 2px solid var(--civic-group-border);
+    border-bottom: var(--space-0-5) solid var(--civic-group-border);
     margin-bottom: 30px;
-    gap: 20px;
+    gap: var(--space-5);
 }
 
 .civic-tab-link {
-    padding: 12px 16px;
+    padding: var(--space-3) 16px;
     min-height: var(--civic-group-touch-min);
     font-weight: 600;
     color: var(--civic-group-text-muted);
     text-decoration: none;
-    border-bottom: 3px solid transparent;
+    border-bottom: var(--space-1) solid transparent;
     transition: all 0.2s;
     cursor: pointer;
     font-size: 1rem;
@@ -593,7 +593,7 @@
    -------------------------------------------- */
 .civic-group-header {
     background: var(--color-white);
-    border-radius: 8px;
+    border-radius: var(--radius-md);
     overflow: hidden;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
     margin-bottom: 30px;
@@ -629,18 +629,18 @@
 
 .civic-group-cover-badge {
     position: absolute;
-    top: 20px;
-    left: 20px;
+    top: var(--space-5);
+    left: var(--space-5);
     background: rgba(0, 0, 0, 0.6);
     color: white;
-    padding: 5px 12px;
-    border-radius: 20px;
+    padding: var(--space-1) var(--space-3);
+    border-radius: var(--radius-2xl);
     font-size: 0.8rem;
     font-weight: 700;
 }
 
 .civic-group-info {
-    padding: 20px 30px;
+    padding: var(--space-5) 30px;
 }
 
 .civic-group-header-content {
@@ -648,7 +648,7 @@
     justify-content: space-between;
     align-items: center;
     flex-wrap: wrap;
-    gap: 20px;
+    gap: var(--space-5);
 }
 
 .civic-group-info h1 {
@@ -658,7 +658,7 @@
 }
 
 .civic-group-info-meta {
-    margin: 5px 0 0 0;
+    margin: var(--space-1) 0 0 0;
     color: var(--civic-group-text-muted);
 }
 
@@ -690,7 +690,7 @@
 .civic-group-action-btn {
     min-height: var(--civic-group-touch-min);
     border-radius: 30px;
-    padding: 10px 30px;
+    padding: var(--space-2-5) 30px;
     font-weight: 600;
     cursor: pointer;
     transition: all 0.2s;
@@ -734,7 +734,7 @@
 .civic-subhubs-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-    gap: 20px;
+    gap: var(--space-5);
 }
 
 .civic-subhub-card {
@@ -745,7 +745,7 @@
     padding: 0;
     background: var(--civic-bg-card, #f7f7f7);
     border: none;
-    border-radius: 6px;
+    border-radius: var(--radius-base);
     overflow: hidden;
     margin-bottom: 0;
     box-shadow: none;
@@ -756,7 +756,7 @@
 }
 
 .civic-subhub-image {
-    padding: 20px 20px 10px 20px;
+    padding: var(--space-5) var(--space-5) var(--space-2-5) 20px;
     width: 100%;
     display: flex;
     justify-content: center;
@@ -785,12 +785,12 @@
 }
 
 .civic-subhub-content {
-    padding: 0 20px 25px 20px;
+    padding: 0 var(--space-5) 25px var(--space-5);
     width: 100%;
 }
 
 .civic-subhub-title {
-    margin: 0 0 5px 0;
+    margin: 0 0 var(--space-1) 0;
     font-size: 1rem;
     font-weight: 600;
 }
@@ -815,9 +815,9 @@
 
 .civic-subhub-btn {
     display: inline-block;
-    margin-top: 10px;
+    margin-top: var(--space-2-5);
     padding: 8px 16px;
-    min-height: 36px;
+    min-height: var(--space-9);
     background: transparent;
     color: var(--civic-group-brand);
     border: 2px solid var(--civic-group-brand);
@@ -849,15 +849,15 @@
 .civic-members-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-    gap: 20px;
+    gap: var(--space-5);
 }
 
 .civic-member-card {
     text-align: center;
-    padding: 20px;
+    padding: var(--space-5);
     background: #f7f7f7;
     border: none;
-    border-radius: 6px;
+    border-radius: var(--radius-base);
     box-shadow: none;
     margin-bottom: 0;
 }
@@ -867,8 +867,8 @@
 }
 
 .civic-member-avatar {
-    width: 80px;
-    height: 80px;
+    width: var(--space-20);
+    height: var(--space-20);
     border-radius: 50%;
     object-fit: cover;
     border: 3px solid white;
@@ -876,8 +876,8 @@
 }
 
 .civic-member-placeholder {
-    width: 80px;
-    height: 80px;
+    width: var(--space-20);
+    height: var(--space-20);
     margin: 0 auto;
     border-radius: 50%;
     background: var(--color-gray-200);
@@ -893,7 +893,7 @@
 }
 
 .civic-member-name {
-    margin: 10px 0 5px 0;
+    margin: var(--space-2-5) 0 var(--space-1) 0;
     font-size: 0.95rem;
 }
 
@@ -927,8 +927,8 @@
 .civic-group-sidebar-card {
     background: white;
     border: 1px solid var(--civic-group-border);
-    padding: 20px;
-    border-radius: 8px;
+    padding: var(--space-5);
+    border-radius: var(--radius-md);
     margin-bottom: 0;
 }
 
@@ -945,8 +945,8 @@
 .civic-group-manager {
     display: flex;
     align-items: center;
-    gap: 10px;
-    margin-bottom: 20px;
+    gap: var(--space-2-5);
+    margin-bottom: var(--space-5);
 }
 
 .civic-group-manager-name {
@@ -966,8 +966,8 @@
     background: white;
     color: var(--civic-group-brand);
     border: 2px solid var(--civic-group-brand);
-    padding: 10px;
-    border-radius: 4px;
+    padding: var(--space-2-5);
+    border-radius: var(--radius-sm);
     font-weight: 600;
     cursor: pointer;
     transition: all 0.2s;
@@ -996,12 +996,12 @@
    Groups Show Page - Activity Tab
    -------------------------------------------- */
 .civic-group-empty-state {
-    padding: 40px;
+    padding: var(--space-10);
     text-align: center;
     background: var(--color-gray-50);
     border: 1px dashed var(--color-gray-300);
     margin-bottom: 0;
-    border-radius: 8px;
+    border-radius: var(--radius-md);
 }
 
 [data-theme="dark"] .civic-group-empty-state {
@@ -1032,7 +1032,7 @@
 
     .civic-tab-link {
         white-space: nowrap;
-        padding: 12px 14px;
+        padding: var(--space-3) var(--space-3-5);
         flex-shrink: 0;
     }
 
@@ -1080,7 +1080,7 @@
     .civic-group-card-btn,
     .civic-subhub-btn,
     .civic-group-action-btn {
-        border-width: 3px;
+        border-width: var(--space-1);
     }
 }
 

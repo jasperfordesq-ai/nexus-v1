@@ -5,7 +5,7 @@
 /* Action Bar */
 .civic-action-bar {
     display: flex;
-    gap: 12px;
+    gap: var(--space-3);
     justify-content: space-between;
     flex-wrap: wrap;
 }
@@ -15,12 +15,12 @@
     font-size: 1.25rem;
     font-weight: 700;
     color: var(--civic-text-main);
-    margin: 0 0 20px 0;
+    margin: 0 0 var(--space-5) 0;
     display: flex;
     align-items: center;
     gap: 8px;
-    padding-bottom: 12px;
-    border-bottom: 2px solid var(--civic-brand);
+    padding-bottom: var(--space-3);
+    border-bottom: var(--space-0-5) solid var(--civic-brand);
 }
 
 .civic-section-title .dashicons {
@@ -29,13 +29,13 @@
 
 /* Badges */
 .civic-badges-section {
-    margin-bottom: 32px;
+    margin-bottom: var(--space-8);
 }
 
 .civic-badges-grid {
     display: flex;
     flex-wrap: wrap;
-    gap: 12px;
+    gap: var(--space-3);
 }
 
 .civic-badge-item {
@@ -45,7 +45,7 @@
     padding: 8px 16px;
     background: var(--civic-brand);
     color: white;
-    border-radius: 20px;
+    border-radius: var(--radius-2xl);
     font-weight: 600;
     font-size: 14px;
     cursor: help;
@@ -65,15 +65,15 @@
 .civic-application-card {
     background: var(--civic-bg-card);
     border: 1px solid var(--civic-border);
-    border-radius: 12px;
-    padding: 20px;
+    border-radius: var(--radius-lg);
+    padding: var(--space-5);
 }
 
 .civic-application-main {
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
-    gap: 20px;
+    gap: var(--space-5);
     flex-wrap: wrap;
 }
 
@@ -94,7 +94,7 @@
 .civic-application-date {
     display: flex;
     align-items: center;
-    gap: 6px;
+    gap: var(--space-1-5);
     color: var(--civic-text-muted);
     font-size: 14px;
     margin: 4px 0;
@@ -103,8 +103,8 @@
 .civic-application-org .dashicons,
 .civic-application-shift .dashicons {
     font-size: 14px;
-    width: 14px;
-    height: 14px;
+    width: var(--space-3-5);
+    height: var(--space-3-5);
 }
 
 .civic-calendar-link {
@@ -122,14 +122,14 @@
     display: flex;
     flex-direction: column;
     align-items: flex-end;
-    gap: 12px;
+    gap: var(--space-3);
 }
 
 /* Status Badge */
 .civic-status {
     display: inline-block;
-    padding: 6px 12px;
-    border-radius: 4px;
+    padding: var(--space-1-5) var(--space-3);
+    border-radius: var(--radius-sm);
     font-size: 12px;
     font-weight: 700;
     text-transform: uppercase;
@@ -138,7 +138,7 @@
 
 .civic-status--approved {
     background: #ECFDF5;
-    color: #047857;
+    color: var(--color-success-700);
 }
 
 .civic-status--declined {
@@ -148,7 +148,7 @@
 
 .civic-status--pending {
     background: #FFFBEB;
-    color: #B45309;
+    color: var(--color-warning-700);
 }
 
 /* Modal */
@@ -182,7 +182,7 @@
     background: var(--civic-bg-card);
     max-width: 500px;
     width: 90%;
-    border-radius: 12px;
+    border-radius: var(--radius-lg);
     box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
     overflow: hidden;
 }
@@ -191,7 +191,7 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 20px;
+    padding: var(--space-5);
     border-bottom: 1px solid var(--civic-border);
     background: var(--civic-bg-page);
 }
@@ -222,14 +222,14 @@
 }
 
 .civic-modal-form {
-    padding: 20px;
+    padding: var(--space-5);
 }
 
 .civic-form-info {
     background: var(--civic-bg-page);
-    padding: 12px 16px;
-    border-radius: 8px;
-    margin-bottom: 20px;
+    padding: var(--space-3) 16px;
+    border-radius: var(--radius-md);
+    margin-bottom: var(--space-5);
 }
 
 .civic-form-info p {
@@ -246,15 +246,15 @@
     display: block;
     font-weight: 600;
     color: var(--civic-text-main);
-    margin-bottom: 6px;
+    margin-bottom: var(--space-1-5);
 }
 
 .civic-input,
 .civic-textarea {
     width: 100%;
-    padding: 12px;
+    padding: var(--space-3);
     border: 2px solid var(--civic-border);
-    border-radius: 8px;
+    border-radius: var(--radius-md);
     font-size: 16px;
     font-family: inherit;
     background: var(--civic-bg-page);
@@ -270,8 +270,8 @@
 
 .civic-modal-actions {
     display: flex;
-    gap: 12px;
-    margin-top: 20px;
+    gap: var(--space-3);
+    margin-top: var(--space-5);
 }
 
 .civic-modal-actions .civic-btn {

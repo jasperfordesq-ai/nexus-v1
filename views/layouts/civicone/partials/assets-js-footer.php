@@ -144,6 +144,8 @@ if (file_exists($envPath)) {
         }
     })();
 </script>
+<!-- Toast Notifications - Slide-in animations, stacking, auto-dismiss -->
+<script src="/assets/js/toast-notifications.min.js?v=<?= $jsVersion ?>" defer></script>
 <!-- Native features for PWA/mobile -->
 <script src="/assets/js/nexus-native-push.min.js?v=<?= $jsVersion ?>" defer></script>
 <script src="/assets/js/nexus-native-features.min.js?v=<?= $jsVersion ?>" defer></script>
@@ -239,6 +241,29 @@ if (file_exists($envPath)) {
 
 <!-- Visual Enhancements & Micro-Interactions -->
 <script src="/assets/js/nexus-transitions.min.js?v=2.5.0" defer></script>
+
+<!-- Flash Message Toast Handler -->
+<?php if (!empty($_SESSION['flash_message'])): ?>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Wait for Toast library to be available
+            var checkToast = setInterval(function() {
+                if (typeof Toast !== 'undefined') {
+                    clearInterval(checkToast);
+                    var type = '<?= htmlspecialchars($_SESSION['flash_type'] ?? 'info') ?>';
+                    var message = '<?= addslashes(htmlspecialchars($_SESSION['flash_message'])) ?>';
+                    if (type === 'success') Toast.success('Success', message);
+                    else if (type === 'error') Toast.error('Error', message);
+                    else if (type === 'warning') Toast.warning('Warning', message);
+                    else Toast.info('Notice', message);
+                }
+            }, 100);
+            // Timeout after 5 seconds to avoid infinite loop
+            setTimeout(function() { clearInterval(checkToast); }, 5000);
+        });
+    </script>
+    <?php unset($_SESSION['flash_message'], $_SESSION['flash_type']); ?>
+<?php endif; ?>
 
 <!-- Layout Switch URL Cleanup -->
 <?php if (isset($_SESSION['_cleanup_refresh_param']) && $_SESSION['_cleanup_refresh_param']): ?>

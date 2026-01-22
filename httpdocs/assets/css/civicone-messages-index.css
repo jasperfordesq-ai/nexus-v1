@@ -108,7 +108,7 @@
         padding: var(--space-4);
         text-decoration: none;
         color: inherit;
-        min-height: 80px;
+        min-height: var(--space-20);
         transition: all 0.2s ease;
     }
 
@@ -261,7 +261,7 @@
         right: 0;
         bottom: 0;
         left: 0;
-        min-height: 44px;
+        min-height: var(--space-11);
     }
 
 }

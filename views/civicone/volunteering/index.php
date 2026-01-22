@@ -18,23 +18,17 @@ require __DIR__ . '/../../layouts/civicone/partials/breadcrumb.php';
 <div class="civicone-width-container civicone--govuk">
     <main class="civicone-main-wrapper" id="main-content" role="main">
 
-        <!-- Hero (auto-resolves from config/heroes.php for /volunteering route) -->
-        <?php require __DIR__ . '/../../layouts/civicone/partials/render-hero.php'; ?>
+        <!-- Page Header (GOV.UK Typography) -->
+        <h1 class="govuk-heading-xl">Volunteering Opportunities</h1>
+        <p class="govuk-body-l">Find volunteering opportunities and make a difference in your community.</p>
 
-        <!-- Page Header (Note: Hero replaces manual H1, keeping for backward compatibility) -->
-        <div class="civicone-grid-row civicone-hidden">
-            <div class="civicone-grid-column-two-thirds">
-                <h1 class="civicone-heading-xl">Volunteer Opportunities</h1>
-                <p class="civicone-body-l">Connect with local organizations and make a difference in your community.</p>
-            </div>
-            <div class="civicone-grid-column-one-third">
-                <?php if (isset($_SESSION['user_id'])): ?>
-                    <a href="<?= $basePath ?>/volunteering/my-applications" class="civicone-button civicone-button--secondary civicone-action-row civicone-button--full-width">
-                        My Applications
-                    </a>
-                <?php endif; ?>
-            </div>
-        </div>
+        <?php if (isset($_SESSION['user_id'])): ?>
+            <p class="govuk-!-margin-bottom-6">
+                <a href="<?= $basePath ?>/volunteering/my-applications" class="civicone-button civicone-button--secondary">
+                    My Applications
+                </a>
+            </p>
+        <?php endif; ?>
 
         <!-- Directory Layout: 1/3 Filters + 2/3 Results -->
         <div class="civicone-grid-row">

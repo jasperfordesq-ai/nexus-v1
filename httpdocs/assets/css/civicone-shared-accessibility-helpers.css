@@ -18,7 +18,7 @@
 
 /* Focus visible for keyboard navigation */
 *:focus-visible {
-    outline: 3px solid #6366f1;
+    outline: 3px solid var(--color-primary-500);
     outline-offset: 2px;
     box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
 }
@@ -34,7 +34,7 @@ a:focus-visible,
 input:focus-visible,
 select:focus-visible,
 textarea:focus-visible {
-    outline: 3px solid #6366f1;
+    outline: 3px solid var(--color-primary-500);
     outline-offset: 2px;
     box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
 }
@@ -45,7 +45,7 @@ textarea:focus-visible {
     a.btn,
     input[type="button"],
     input[type="submit"] {
-        min-height: 44px;
-        min-width: 44px;
+        min-height: var(--space-11);
+        min-width: var(--space-11);
     }
 }

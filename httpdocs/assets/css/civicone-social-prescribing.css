@@ -142,11 +142,11 @@
 
     .social-prescribing-pathway-step-number {
         position: absolute;
-        top: -20px;
+        top: -var(--space-5);
         left: 50%;
         transform: translateX(-50%);
-        width: 40px;
-        height: 40px;
+        width: var(--space-10);
+        height: var(--space-10);
         background: var(--civicone-brand);
         color: white;
         border-radius: 50%;

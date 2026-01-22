@@ -4,22 +4,22 @@
  */
 
 .post-card {
-    padding: 20px;
-    margin-bottom: 20px;
+    padding: var(--space-5);
+    margin-bottom: var(--space-5);
 }
 
 /* Post Header */
 .post-header {
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: var(--space-3);
     margin-bottom: 16px;
 }
 
 /* Post Avatar */
 .post-avatar {
-    width: 48px;
-    height: 48px;
+    width: var(--space-12);
+    height: var(--space-12);
     border-radius: 50%;
     object-fit: cover;
 }
@@ -60,10 +60,10 @@
 /* Visibility Badge */
 .visibility-badge {
     font-size: 0.75rem;
-    padding: 2px 8px;
-    border-radius: 12px;
+    padding: var(--space-0-5) 8px;
+    border-radius: var(--radius-lg);
     background: rgba(99, 102, 241, 0.1);
-    color: #6366f1;
+    color: var(--color-primary-500);
 }
 
 /* Post Delete Button */
@@ -73,13 +73,13 @@
     border: none;
     color: var(--htb-text-muted);
     cursor: pointer;
-    border-radius: 8px;
+    border-radius: var(--radius-md);
     transition: all 0.2s;
 }
 
 .post-delete-btn:hover {
     background: rgba(239, 68, 68, 0.1);
-    color: #ef4444;
+    color: var(--color-error-500);
 }
 
 /* Post Content */
@@ -115,11 +115,11 @@
 .post-action-btn {
     display: flex;
     align-items: center;
-    gap: 6px;
-    padding: 8px 12px;
+    gap: var(--space-1-5);
+    padding: 8px var(--space-3);
     background: transparent;
     border: none;
-    border-radius: 8px;
+    border-radius: var(--radius-md);
     cursor: pointer;
     transition: all 0.2s;
     color: var(--htb-text-muted);
@@ -127,15 +127,15 @@
 
 .post-action-btn:hover {
     background: rgba(99, 102, 241, 0.1);
-    color: #6366f1;
+    color: var(--color-primary-500);
 }
 
 .post-action-btn.like-btn.active {
-    color: #ef4444;
+    color: var(--color-error-500);
 }
 
 .post-action-btn.like-btn:hover {
-    color: #ef4444;
+    color: var(--color-error-500);
 }
 
 /* Comments Section */

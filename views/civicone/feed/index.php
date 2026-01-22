@@ -501,8 +501,9 @@ require dirname(__DIR__, 2) . '/layouts/civicone/header.php';
 <div class="civicone-width-container">
     <main class="civicone-main-wrapper" id="main-content">
 
-        <!-- Hero (auto-resolves from config/heroes.php for /feed route) -->
-        <?php require dirname(__DIR__, 2) . '/layouts/civicone/partials/render-hero.php'; ?>
+        <!-- Page Header (GOV.UK Typography) -->
+        <h1 class="govuk-heading-xl">Community Pulse</h1>
+        <p class="govuk-body-l">Stay connected with your community's latest updates and activities.</p>
 
         <div class="civic-feed-container">
 

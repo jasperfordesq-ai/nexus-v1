@@ -70,5 +70,54 @@ function civicone_govuk_error_summary($args = []) {
     $html .= '</div>'; // .govuk-error-summary__body
     $html .= '</div>'; // .govuk-error-summary
 
+    // Include error summary JS (once per page)
+    static $jsIncluded = false;
+    if (!$jsIncluded) {
+        $html .= '<script src="/assets/js/civicone-error-summary.js" defer></script>';
+        $jsIncluded = true;
+    }
+
     return $html;
+}
+
+/**
+ * Helper function to convert simple field => message array to GOV.UK error format
+ *
+ * @param array $errors - Simple array like ['email' => 'Enter your email']
+ * @param string $fieldPrefix - Prefix for field IDs (default: empty)
+ * @return array - Formatted for civicone_govuk_error_summary
+ *
+ * Usage:
+ * $errors = ['email' => 'Enter your email', 'password' => 'Enter a password'];
+ * echo civicone_govuk_error_summary([
+ *     'errors' => civicone_format_errors($errors)
+ * ]);
+ */
+function civicone_format_errors($errors, $fieldPrefix = '') {
+    $formatted = [];
+    foreach ($errors as $field => $message) {
+        $formatted[] = [
+            'text' => $message,
+            'href' => '#' . $fieldPrefix . $field
+        ];
+    }
+    return $formatted;
+}
+
+/**
+ * Shorthand helper for quick error summary from validation errors
+ *
+ * @param array $errors - Simple array like ['email' => 'Enter your email']
+ * @return string - HTML for error summary (empty string if no errors)
+ *
+ * Usage in PHP templates:
+ * <?= civicone_error_summary_from_array($errors ?? []) ?>
+ */
+function civicone_error_summary_from_array($errors) {
+    if (empty($errors)) {
+        return '';
+    }
+    return civicone_govuk_error_summary([
+        'errors' => civicone_format_errors($errors)
+    ]);
 }

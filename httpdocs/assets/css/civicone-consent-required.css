@@ -133,7 +133,7 @@ $tenantName = $tenant['name'] ?? 'the platform';
     font-size: 1.5rem;
     color: var(--color-warning-600, #d97706);
     flex-shrink: 0;
-    margin-top: 2px;
+    margin-top: var(--space-0-5);
 }
 
 .civic-notification__title {
@@ -353,11 +353,11 @@ $tenantName = $tenant['name'] ?? 'the platform';
 }
 
 .civic-checkbox__box {
-    width: 22px;
-    height: 22px;
-    min-width: 22px;
+    width: var(--space-5-5);
+    height: var(--space-5-5);
+    min-width: var(--space-5-5);
     border: 2px solid var(--color-gray-400, #9ca3af);
-    border-radius: 4px;
+    border-radius: var(--radius-sm);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -367,10 +367,10 @@ $tenantName = $tenant['name'] ?? 'the platform';
 
 .civic-checkbox__box::after {
     content: '';
-    width: 6px;
-    height: 10px;
+    width: var(--space-1-5);
+    height: var(--space-2-5);
     border: solid white;
-    border-width: 0 2px 2px 0;
+    border-width: 0 var(--space-0-5) var(--space-0-5) 0;
     transform: rotate(45deg) scale(0);
     transition: transform 0.15s;
 }

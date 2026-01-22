@@ -12,17 +12,17 @@
     right: 0;
     bottom: 0;
     z-index: -1;
-    background: linear-gradient(135deg, #f8fafc 0%, #f0f9ff 50%, #f8fafc 100%);
+    background: linear-gradient(135deg, var(--color-slate-50) 0%, #f0f9ff 50%, var(--color-slate-50) 100%);
 }
 
 [data-theme="dark"] .audit-log-bg {
-    background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%);
+    background: linear-gradient(135deg, var(--color-slate-900) 0%, var(--color-slate-800) 50%, var(--color-slate-900) 100%);
 }
 
 .audit-container {
     max-width: 1400px;
     margin: 0 auto;
-    padding: 120px 24px 40px 24px;
+    padding: 120px var(--space-6) var(--space-10) var(--space-6);
     position: relative;
     z-index: 10;
 }
@@ -32,10 +32,10 @@
     background: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0.75) 100%);
     backdrop-filter: blur(20px);
     border: 1px solid rgba(255, 255, 255, 0.5);
-    border-radius: 20px;
+    border-radius: var(--radius-2xl);
     box-shadow: 0 8px 32px rgba(31, 38, 135, 0.1);
     overflow: hidden;
-    margin-bottom: 24px;
+    margin-bottom: var(--space-6);
 }
 
 [data-theme="dark"] .audit-card {
@@ -48,7 +48,7 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 24px;
+    padding: var(--space-6);
     border-bottom: 1px solid rgba(229, 231, 235, 0.5);
     flex-wrap: wrap;
     gap: 16px;
@@ -61,26 +61,26 @@
 .audit-title {
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: var(--space-3);
     margin: 0;
     font-size: 1.25rem;
     font-weight: 700;
-    color: #1f2937;
+    color: var(--color-gray-800);
 }
 
 [data-theme="dark"] .audit-title {
-    color: #f1f5f9;
+    color: var(--color-slate-100);
 }
 
 .audit-title i {
-    color: #6366f1;
+    color: var(--color-primary-500);
 }
 
 .audit-count {
     background: rgba(99, 102, 241, 0.1);
-    color: #6366f1;
-    padding: 4px 12px;
-    border-radius: 12px;
+    color: var(--color-primary-500);
+    padding: 4px var(--space-3);
+    border-radius: var(--radius-lg);
     font-size: 0.85rem;
     font-weight: 600;
 }
@@ -93,13 +93,13 @@
 .audit-export-btn {
     display: inline-flex;
     align-items: center;
-    gap: 6px;
-    padding: 10px 18px;
-    background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+    gap: var(--space-1-5);
+    padding: var(--space-2-5) var(--space-4-5);
+    background: linear-gradient(135deg, var(--color-primary-500) 0%, var(--color-primary-600) 100%);
     color: white;
     font-size: 0.9rem;
     font-weight: 600;
-    border-radius: 10px;
+    border-radius: var(--radius-md);
     text-decoration: none;
     transition: all 0.2s;
     box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
@@ -113,8 +113,8 @@
 /* Filters */
 .audit-filters {
     display: flex;
-    gap: 12px;
-    padding: 16px 24px;
+    gap: var(--space-3);
+    padding: 16px var(--space-6);
     background: rgba(99, 102, 241, 0.05);
     border-bottom: 1px solid rgba(229, 231, 235, 0.5);
     flex-wrap: wrap;
@@ -134,17 +134,17 @@
 .audit-filter-label {
     font-size: 0.75rem;
     font-weight: 600;
-    color: #6b7280;
+    color: var(--color-gray-500);
     text-transform: uppercase;
 }
 
 .audit-filter-select, .audit-filter-input {
-    padding: 8px 12px;
+    padding: 8px var(--space-3);
     border: 1px solid rgba(99, 102, 241, 0.2);
-    border-radius: 8px;
+    border-radius: var(--radius-md);
     font-size: 0.9rem;
     background: white;
-    color: #1f2937;
+    color: var(--color-gray-800);
     min-width: 150px;
 }
 
@@ -152,30 +152,30 @@
 [data-theme="dark"] .audit-filter-input {
     background: rgba(15, 23, 42, 0.5);
     border-color: rgba(255, 255, 255, 0.1);
-    color: #f1f5f9;
+    color: var(--color-slate-100);
 }
 
 .audit-filter-btn {
     padding: 8px 16px;
-    background: #6366f1;
+    background: var(--color-primary-500);
     color: white;
     border: none;
-    border-radius: 8px;
+    border-radius: var(--radius-md);
     font-weight: 600;
     cursor: pointer;
     align-self: flex-end;
 }
 
 .audit-filter-btn:hover {
-    background: #4f46e5;
+    background: var(--color-primary-600);
 }
 
 .audit-filter-clear {
     padding: 8px 16px;
     background: transparent;
     border: 1px solid rgba(107, 114, 128, 0.3);
-    color: #6b7280;
-    border-radius: 8px;
+    color: var(--color-gray-500);
+    border-radius: var(--radius-md);
     cursor: pointer;
     align-self: flex-end;
     text-decoration: none;
@@ -191,7 +191,7 @@
     display: flex;
     align-items: flex-start;
     gap: 16px;
-    padding: 16px 24px;
+    padding: 16px var(--space-6);
     border-bottom: 1px solid rgba(229, 231, 235, 0.3);
     transition: background 0.15s;
 }
@@ -213,9 +213,9 @@
 }
 
 .audit-icon {
-    width: 40px;
-    height: 40px;
-    border-radius: 10px;
+    width: var(--space-10);
+    height: var(--space-10);
+    border-radius: var(--radius-md);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -223,13 +223,13 @@
     flex-shrink: 0;
 }
 
-.audit-icon.deposit { background: rgba(16, 185, 129, 0.1); color: #10b981; }
-.audit-icon.withdrawal { background: rgba(239, 68, 68, 0.1); color: #ef4444; }
-.audit-icon.transfer { background: rgba(245, 158, 11, 0.1); color: #f59e0b; }
-.audit-icon.member { background: rgba(59, 130, 246, 0.1); color: #3b82f6; }
-.audit-icon.settings { background: rgba(107, 114, 128, 0.1); color: #6b7280; }
+.audit-icon.deposit { background: rgba(16, 185, 129, 0.1); color: var(--color-success-500); }
+.audit-icon.withdrawal { background: rgba(239, 68, 68, 0.1); color: var(--color-error-500); }
+.audit-icon.transfer { background: rgba(245, 158, 11, 0.1); color: var(--color-warning-500); }
+.audit-icon.member { background: rgba(59, 130, 246, 0.1); color: var(--color-blue-500); }
+.audit-icon.settings { background: rgba(107, 114, 128, 0.1); color: var(--color-gray-500); }
 .audit-icon.ownership { background: rgba(168, 85, 247, 0.1); color: #a855f7; }
-.audit-icon.bulk { background: rgba(236, 72, 153, 0.1); color: #ec4899; }
+.audit-icon.bulk { background: rgba(236, 72, 153, 0.1); color: var(--color-pink-500); }
 
 .audit-content {
     flex: 1;
@@ -238,36 +238,36 @@
 
 .audit-action-label {
     font-weight: 600;
-    color: #1f2937;
+    color: var(--color-gray-800);
     font-size: 0.95rem;
     margin-bottom: 4px;
 }
 
 [data-theme="dark"] .audit-action-label {
-    color: #f1f5f9;
+    color: var(--color-slate-100);
 }
 
 .audit-user {
-    color: #6366f1;
+    color: var(--color-primary-500);
     font-weight: 600;
 }
 
 .audit-target {
-    color: #059669;
+    color: var(--color-success-600);
     font-weight: 600;
 }
 
 .audit-details {
     font-size: 0.85rem;
-    color: #6b7280;
+    color: var(--color-gray-500);
     margin-top: 4px;
 }
 
 .audit-details span {
     display: inline-block;
     background: rgba(107, 114, 128, 0.1);
-    padding: 2px 8px;
-    border-radius: 4px;
+    padding: var(--space-0-5) 8px;
+    border-radius: var(--radius-sm);
     margin-right: 8px;
     margin-top: 4px;
 }
@@ -280,13 +280,13 @@
 
 .audit-time {
     font-size: 0.85rem;
-    color: #6b7280;
+    color: var(--color-gray-500);
     margin-bottom: 4px;
 }
 
 .audit-ip {
     font-size: 0.75rem;
-    color: #9ca3af;
+    color: var(--color-gray-400);
     font-family: monospace;
 }
 
@@ -305,11 +305,11 @@
 }
 
 .audit-page-link {
-    padding: 8px 14px;
+    padding: 8px var(--space-3-5);
     background: rgba(99, 102, 241, 0.1);
     border: 1px solid rgba(99, 102, 241, 0.2);
-    border-radius: 8px;
-    color: #6366f1;
+    border-radius: var(--radius-md);
+    color: var(--color-primary-500);
     text-decoration: none;
     font-weight: 600;
     font-size: 0.9rem;
@@ -321,9 +321,9 @@
 }
 
 .audit-page-link.active {
-    background: #6366f1;
+    background: var(--color-primary-500);
     color: white;
-    border-color: #6366f1;
+    border-color: var(--color-primary-500);
 }
 
 .audit-page-link.disabled {
@@ -334,8 +334,8 @@
 /* Empty State */
 .audit-empty {
     text-align: center;
-    padding: 60px 20px;
-    color: #9ca3af;
+    padding: 60px var(--space-5);
+    color: var(--color-gray-400);
 }
 
 .audit-empty-icon {
@@ -347,7 +347,7 @@
 /* Responsive */
 @media (max-width: 768px) {
     .audit-container {
-        padding: 100px 16px 40px 16px;
+        padding: 100px 16px var(--space-10) 16px;
     }
 
     .audit-header {
@@ -365,7 +365,7 @@
 
     .audit-log-entry {
         flex-direction: column;
-        gap: 12px;
+        gap: var(--space-3);
     }
 
     .audit-meta {

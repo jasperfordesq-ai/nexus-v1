@@ -110,6 +110,8 @@
     <!-- Page-specific Component CSS -->
     <?php if ($isHome): ?>
         <link rel="stylesheet" href="/assets/css/feed-filter.min.css?v=<?= $cssVersion ?>">
+        <!-- CivicOne Home Page Styles (v3.1.0 - GOV.UK Full Compliance) -->
+        <link rel="stylesheet" href="/assets/css/civicone-home.css?v=<?= $cssVersion ?>">
     <?php endif; ?>
     <?php if (strpos($normPath, '/dashboard') !== false): ?>
         <link rel="stylesheet" href="/assets/css/dashboard.min.css?v=<?= $cssVersion ?>">
@@ -156,9 +158,6 @@
     <!-- CivicOne Layout (includes grid system - must load for all pages) -->
     <link rel="stylesheet" href="/assets/css/civicone-header.min.css?v=<?= $cssVersion ?>">
     <link rel="stylesheet" href="/assets/css/civicone-footer.min.css?v=<?= $cssVersion ?>">
-
-    <!-- Page Hero (Section 9C: Page Hero Contract - WCAG 2.1 AA 2026-01-21) -->
-    <link rel="stylesheet" href="/assets/css/civicone-hero.min.css?v=<?= $cssVersion ?>">
 
     <!-- Account Area Navigation (MOJ Sub navigation pattern) -->
     <link rel="stylesheet" href="/assets/css/civicone-account-nav.min.css?v=<?= $cssVersion ?>">

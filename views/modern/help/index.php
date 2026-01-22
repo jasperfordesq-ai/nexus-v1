@@ -51,13 +51,16 @@ $moduleConfig = [
             <!-- Search Bar -->
             <div class="help-search-wrapper">
                 <form action="<?= $basePath ?>/help/search" method="GET" class="help-search-form">
-                    <i class="fa-solid fa-magnifying-glass help-search-icon"></i>
+                    <i class="fa-solid fa-magnifying-glass help-search-icon" aria-hidden="true"></i>
+                    <label for="help-search" class="visually-hidden">Search help articles</label>
                     <input
                         type="text"
+                        id="help-search"
                         name="q"
                         class="help-search-input"
                         placeholder="Search for answers..."
                         autocomplete="off"
+                        aria-label="Search help articles"
                     >
                     <button type="submit" class="help-search-btn">
                         Search

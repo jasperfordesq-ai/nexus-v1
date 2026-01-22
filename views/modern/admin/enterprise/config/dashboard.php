@@ -415,6 +415,9 @@ $currentPage = 'dashboard';
                 'map_view' => ['label' => 'Map View', 'icon' => 'fa-map', 'desc' => 'Interactive maps'],
                 'geolocation' => ['label' => 'Geolocation', 'icon' => 'fa-location-dot', 'desc' => 'Location services'],
             ],
+            'Display & UI' => [
+                'layout_banner' => ['label' => 'Layout Banner', 'icon' => 'fa-palette', 'desc' => 'Theme switcher banner at top of pages'],
+            ],
         ];
 
         foreach ($featureGroups as $groupName => $groupFeatures):

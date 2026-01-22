@@ -59,10 +59,10 @@
     justify-content: space-between;
     align-items: center;
     border-bottom: 4px solid #000;
-    padding-bottom: 10px;
+    padding-bottom: var(--space-2-5);
     margin-bottom: 30px;
     flex-wrap: wrap;
-    gap: 12px;
+    gap: var(--space-3);
 }
 
 .civic-events-header h2 {
@@ -94,13 +94,13 @@
 /* Events Grid */
 .civic-events-grid {
     display: grid;
-    gap: 20px;
+    gap: var(--space-5);
 }
 
 /* Event Card */
 .civic-event-card-layout {
     display: flex;
-    gap: 20px;
+    gap: var(--space-5);
     align-items: flex-start;
     flex-wrap: wrap;
 }
@@ -109,10 +109,10 @@
 .civic-event-date-box {
     background: #000;
     color: #fff;
-    padding: 15px;
+    padding: var(--space-4);
     text-align: center;
-    min-width: 80px;
-    border-radius: 4px;
+    min-width: var(--space-20);
+    border-radius: var(--radius-sm);
 }
 
 [data-theme="dark"] .civic-event-date-box {
@@ -139,7 +139,7 @@
 }
 
 .civic-event-content h3 {
-    margin: 0 0 5px 0;
+    margin: 0 0 var(--space-1) 0;
     font-size: 1.5rem;
 }
 
@@ -165,7 +165,7 @@
 
 .civic-event-meta {
     font-weight: bold;
-    margin-bottom: 10px;
+    margin-bottom: var(--space-2-5);
     font-size: 1.1rem;
     color: var(--civic-event-text-primary);
 }
@@ -173,7 +173,7 @@
 .civic-event-description {
     font-size: 1.1rem;
     line-height: 1.5;
-    margin-bottom: 10px;
+    margin-bottom: var(--space-2-5);
     color: var(--civic-event-text-secondary);
 }
 
@@ -187,8 +187,8 @@
     font-style: normal;
     font-weight: bold;
     background: #eee;
-    padding: 2px 6px;
-    margin-left: 10px;
+    padding: var(--space-0-5) var(--space-1-5);
+    margin-left: var(--space-2-5);
     border: 1px solid #999;
     border-radius: 3px;
     color: var(--civic-event-text-primary);
@@ -216,12 +216,12 @@
 
 /* Alert Messages */
 .civic-alert {
-    padding: 16px 20px;
-    border-radius: 8px;
-    margin-bottom: 24px;
+    padding: 16px var(--space-5);
+    border-radius: var(--radius-md);
+    margin-bottom: var(--space-6);
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: var(--space-3);
     font-weight: 600;
 }
 
@@ -239,7 +239,7 @@
 .civic-event-grid {
     display: grid;
     grid-template-columns: 1fr 350px;
-    gap: 24px;
+    gap: var(--space-6);
 }
 
 @media (max-width: 900px) {
@@ -257,14 +257,14 @@
     font-size: 1.1rem;
     line-height: 1.7;
     color: var(--civic-event-text-primary);
-    margin-bottom: 24px;
+    margin-bottom: var(--space-6);
 }
 
 /* Event Info Box */
 .civic-event-info-box {
     background: var(--civic-bg-page, var(--color-gray-50));
-    padding: 24px;
-    border-radius: 8px;
+    padding: var(--space-6);
+    border-radius: var(--radius-md);
     border-left: 4px solid var(--civic-event-brand);
 }
 
@@ -294,8 +294,8 @@
 
 .civic-detail-item {
     display: flex;
-    gap: 12px;
-    margin-bottom: 12px;
+    gap: var(--space-3);
+    margin-bottom: var(--space-3);
     align-items: flex-start;
 }
 
@@ -306,7 +306,7 @@
 .civic-detail-item dt {
     display: flex;
     align-items: center;
-    gap: 6px;
+    gap: var(--space-1-5);
     font-weight: 600;
     color: var(--civic-event-text-secondary);
     min-width: 140px;
@@ -351,8 +351,8 @@
 }
 
 .civic-attendee img {
-    width: 44px;
-    height: 44px;
+    width: var(--space-11);
+    height: var(--space-11);
     border-radius: 50%;
     object-fit: cover;
     border: 2px solid var(--civic-bg-card, #fff);
@@ -371,7 +371,7 @@
 
 .civic-rsvp-buttons {
     display: flex;
-    gap: 12px;
+    gap: var(--space-3);
 }
 
 .civic-rsvp-buttons .civic-btn {
@@ -492,7 +492,7 @@
 /* Skip to main content link (accessibility) */
 .civic-skip-link {
     position: absolute;
-    top: -40px;
+    top: -var(--space-10);
     left: 0;
     background: var(--civic-event-brand);
     color: white;
@@ -521,7 +521,7 @@
 
 /* Ensure buttons have adequate touch area */
 .civic-event-card-layout .civic-btn {
-    padding: 12px 20px;
+    padding: var(--space-3) var(--space-5);
 }
 
 
@@ -540,7 +540,7 @@
 
     .civic-btn--success,
     .civic-btn--danger {
-        border-width: 2px;
+        border-width: var(--space-0-5);
     }
 
     .civic-detail-item dt,

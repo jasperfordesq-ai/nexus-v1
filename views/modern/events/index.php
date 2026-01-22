@@ -68,7 +68,8 @@ $base = Nexus\Core\TenantContext::getBasePath();
                 </div>
 
                 <div class="filter-row" style="display: flex; gap: 15px; flex-wrap: wrap; align-items: center;">
-                    <select name="category" onchange="this.form.submit()" class="glass-select">
+                    <label for="event-category-filter" class="visually-hidden">Filter by category</label>
+                    <select id="event-category-filter" name="category" onchange="this.form.submit()" class="glass-select" aria-label="Filter by category">
                         <option value="">All Categories</option>
                         <?php if (!empty($categories)): ?>
                             <?php foreach ($categories as $cat): ?>
@@ -79,7 +80,8 @@ $base = Nexus\Core\TenantContext::getBasePath();
                         <?php endif; ?>
                     </select>
 
-                    <select name="date" onchange="this.form.submit()" class="glass-select">
+                    <label for="event-date-filter" class="visually-hidden">Filter by date</label>
+                    <select id="event-date-filter" name="date" onchange="this.form.submit()" class="glass-select" aria-label="Filter by date">
                         <option value="">Any Time</option>
                         <option value="today" <?= (isset($selectedDate) && $selectedDate == 'today') ? 'selected' : '' ?>>Today</option>
                         <option value="tomorrow" <?= (isset($selectedDate) && $selectedDate == 'tomorrow') ? 'selected' : '' ?>>Tomorrow</option>

@@ -896,6 +896,49 @@
 }
 
 /* ==========================================
+   Phase Banner Component
+   https://design-system.service.gov.uk/components/phase-banner/
+   ========================================== */
+
+.civicone--govuk .govuk-phase-banner {
+  padding-top: var(--space-2);
+  padding-bottom: var(--space-2);
+  border-bottom: 1px solid var(--color-govuk-grey);
+}
+
+.civicone--govuk .govuk-phase-banner__content {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  font-family: var(--font-family-primary);
+  font-size: var(--font-size-sm);
+  line-height: var(--line-height-tight);
+  color: var(--color-govuk-black);
+  margin: 0;
+}
+
+@media (min-width: 40.0625em) {
+  .civicone--govuk .govuk-phase-banner__content {
+    font-size: var(--font-size-base);
+  }
+}
+
+.civicone--govuk .govuk-phase-banner__content__tag {
+  margin-right: var(--space-2);
+  max-width: 160px;
+}
+
+@media (min-width: 40.0625em) {
+  .civicone--govuk .govuk-phase-banner__content__tag {
+    margin-right: var(--space-2-5);
+  }
+}
+
+.civicone--govuk .govuk-phase-banner__text {
+  flex: 1;
+}
+
+/* ==========================================
    GOV.UK GRID LAYOUT SYSTEM
    https://design-system.service.gov.uk/styles/layout/
    ========================================== */
@@ -1752,4 +1795,59 @@
   margin: 0;
   font-size: inherit;
   font-weight: inherit;
+}
+
+/* ==========================================
+   GOV.UK Strict Mode - Accessibility Overrides
+   Removes glassmorphism effects for WCAG compliance
+   Apply .civicone--govuk-strict to body for full compliance
+   ========================================== */
+
+/* Remove glassmorphism effects when strict GOV.UK mode is enabled */
+.civicone--govuk-strict *,
+.civicone--govuk-strict *::before,
+.civicone--govuk-strict *::after {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+/* Replace transparent backgrounds with solid colors for readability */
+.civicone--govuk-strict .glass,
+.civicone--govuk-strict [class*="glass"],
+.civicone--govuk-strict [class*="holographic"],
+.civicone--govuk-strict [class*="glassmorphism"] {
+  background: var(--color-white) !important;
+  border: 1px solid var(--color-govuk-grey) !important;
+}
+
+/* Dark mode alternative */
+@media (prefers-color-scheme: dark) {
+  .civicone--govuk-strict .glass,
+  .civicone--govuk-strict [class*="glass"],
+  .civicone--govuk-strict [class*="holographic"],
+  .civicone--govuk-strict [class*="glassmorphism"] {
+    background: var(--color-slate-800) !important;
+    border: 1px solid var(--color-slate-600) !important;
+  }
+}
+
+/* Ensure all text has sufficient contrast in strict mode */
+.civicone--govuk-strict {
+  --text-contrast-min: 4.5;
+}
+
+/* Remove decorative gradients that may affect readability */
+.civicone--govuk-strict [style*="linear-gradient"],
+.civicone--govuk-strict [style*="radial-gradient"] {
+  background-image: none !important;
+}
+
+/* Print styles - always disable effects */
+@media print {
+  .civicone--govuk *,
+  .civicone--govuk *::before,
+  .civicone--govuk *::after {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+  }
 }

@@ -752,3 +752,24 @@
         font-size: var(--font-size-xl);
     }
 }
+
+/* ============================================
+   AVATAR IMAGE OVERRIDES
+   Override critical-css.php global img rule
+   ============================================ */
+.feed-item-avatar-link .avatar-img,
+.feed-item-avatar-link img.avatar-img,
+.fb-card .avatar-img,
+.fb-card img.avatar-img,
+.fds-feed-item .avatar-img,
+.fds-feed-item img.avatar-img {
+    width: 44px !important;
+    height: 44px !important;
+    max-width: 44px !important;
+    max-height: 44px !important;
+    min-width: 44px !important;
+    min-height: 44px !important;
+    border-radius: var(--radius-full);
+    object-fit: cover;
+    flex-shrink: 0;
+}

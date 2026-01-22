@@ -1651,8 +1651,8 @@ class EnterpriseController
 
         try {
             Database::query(
-                "INSERT INTO tenant_settings (tenant_id, setting_key, setting_value)
-                 VALUES (?, ?, ?)
+                "INSERT INTO tenant_settings (tenant_id, setting_key, setting_value, setting_type)
+                 VALUES (?, ?, ?, 'boolean')
                  ON DUPLICATE KEY UPDATE setting_value = ?",
                 [$this->getTenantId(), "feature.{$key}", $enabled ? '1' : '0', $enabled ? '1' : '0']
             );
@@ -2862,6 +2862,8 @@ class EnterpriseController
             // Map & Location
             'map_view' => true,
             'geolocation' => true,
+            // Display & UI
+            'layout_banner' => true,
         ];
 
         // Load stored settings from database

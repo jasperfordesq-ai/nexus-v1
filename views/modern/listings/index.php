@@ -115,8 +115,9 @@ require __DIR__ . '/../../layouts/modern/header.php';
                 <!-- Search Input Row -->
                 <div class="search-row">
                     <div class="search-input-wrapper">
-                        <i class="fa-solid fa-magnifying-glass search-icon"></i>
-                        <input type="text" id="listing-search" placeholder="Search offers, requests, skills..." value="<?= htmlspecialchars($query ?? '') ?>" class="glass-search-input">
+                        <i class="fa-solid fa-magnifying-glass search-icon" aria-hidden="true"></i>
+                        <label for="listing-search" class="visually-hidden">Search listings</label>
+                        <input type="text" id="listing-search" placeholder="Search offers, requests, skills..." value="<?= htmlspecialchars($query ?? '') ?>" class="glass-search-input" aria-label="Search offers, requests, skills">
                         <div id="search-spinner" class="spinner" style="display: none;"></div>
                     </div>
                     <span id="listings-count" class="listings-count-badge">

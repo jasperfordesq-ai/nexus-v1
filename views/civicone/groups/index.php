@@ -27,8 +27,9 @@ $basePath = \Nexus\Core\TenantContext::getBasePath();
             </ol>
         </nav>
 
-        <!-- Hero (auto-resolves from config/heroes.php for /groups route) -->
-        <?php require __DIR__ . '/../../layouts/civicone/partials/render-hero.php'; ?>
+        <!-- Page Header (GOV.UK Typography) -->
+        <h1 class="govuk-heading-xl">Groups Directory</h1>
+        <p class="govuk-body-l">Join groups and connect with people who share your interests.</p>
 
         <!-- MOJ Filter Pattern: 1/3 Filters + 2/3 Results -->
         <div class="civicone-grid-row">

@@ -22,7 +22,7 @@
 }
 
 .report-divider {
-    width: 80px;
+    width: var(--space-20);
     height: 4px;
     background: var(--skin-primary);
     margin: 0 auto var(--space-5);
@@ -109,7 +109,7 @@
 .report-section-title {
     color: var(--skin-primary);
     margin-top: 0;
-    border-bottom: 2px solid var(--color-gray-100);
+    border-bottom: var(--space-0-5) solid var(--color-gray-100);
     padding-bottom: var(--space-4);
     margin-bottom: var(--space-5);
 }
@@ -216,7 +216,7 @@
 }
 
 .report-swot-title--strengths {
-    color: #047857;
+    color: var(--color-success-700);
 }
 
 .report-swot-title--weaknesses {
@@ -384,7 +384,7 @@
 }
 
 .report-finding-title {
-    color: #047857;
+    color: var(--color-success-700);
     margin-top: 0;
     font-size: var(--font-size-lg);
 }
@@ -396,7 +396,7 @@
 .report-finding-stat {
     font-size: var(--font-size-3xl);
     font-weight: 800;
-    color: #047857;
+    color: var(--color-success-700);
     margin: var(--space-3) 0;
 }
 
@@ -415,7 +415,7 @@
 }
 
 .report-sroi-title {
-    color: #78350f;
+    color: var(--color-warning-900);
     margin-top: 0;
     font-size: var(--font-size-xl);
 }
@@ -423,13 +423,13 @@
 .report-sroi-value {
     font-size: 4rem;
     font-weight: 900;
-    color: #78350f;
+    color: var(--color-warning-900);
     margin: var(--space-4) 0;
 }
 
 .report-sroi-description {
     font-size: var(--font-size-lg);
-    color: #78350f;
+    color: var(--color-warning-900);
     margin-bottom: 0;
 }
 

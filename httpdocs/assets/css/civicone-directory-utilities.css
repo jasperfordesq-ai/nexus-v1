@@ -22,11 +22,11 @@
 
 /* Secondary Action Panel Spacing */
 .civicone-secondary-panel {
-    margin-top: 20px;
+    margin-top: var(--space-5);
 }
 
 .civicone-secondary-panel-description {
-    margin-bottom: 15px;
+    margin-bottom: var(--space-4);
 }
 
 /* Feed Composer Image Input */
@@ -61,7 +61,7 @@
 
 /* Feed Shared Content Body */
 .feed-shared-body {
-    padding: 12px;
+    padding: var(--space-3);
     border-top: 1px solid var(--civic-border);
 }
 
@@ -121,8 +121,8 @@
 /* Feed Empty State Icon Large */
 .feed-empty-icon-large {
     font-size: 48px;
-    width: 48px;
-    height: 48px;
+    width: var(--space-12);
+    height: var(--space-12);
 }
 
 /* Feed Loading Message */
@@ -142,8 +142,8 @@
 /* Feed Composer FAB Icon */
 .feed-fab-icon {
     font-size: 24px;
-    width: 24px;
-    height: 24px;
+    width: var(--space-6);
+    height: var(--space-6);
 }
 
 /* Directory Full Width Button with Bottom Margin */

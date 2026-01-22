@@ -5,13 +5,13 @@
 /* Action Bar */
 .civic-action-bar {
     display: flex;
-    gap: 12px;
+    gap: var(--space-3);
     justify-content: space-between;
     flex-wrap: wrap;
 }
 
 .civic-action-bar--spaced {
-    margin-bottom: 32px;
+    margin-bottom: var(--space-8);
 }
 
 /* Empty State Icon Size */
@@ -21,19 +21,19 @@
 
 /* Dashboard Sections */
 .civic-dashboard-section {
-    margin-bottom: 40px;
+    margin-bottom: var(--space-10);
 }
 
 .civic-section-title {
     font-size: 1.25rem;
     font-weight: 700;
     color: var(--civic-text-main);
-    margin: 0 0 20px 0;
+    margin: 0 0 var(--space-5) 0;
     display: flex;
     align-items: center;
     gap: 8px;
-    padding-bottom: 12px;
-    border-bottom: 2px solid var(--civic-brand);
+    padding-bottom: var(--space-3);
+    border-bottom: var(--space-0-5) solid var(--civic-brand);
 }
 
 .civic-section-title .dashicons {
@@ -44,22 +44,22 @@
 .civic-org-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    gap: 20px;
+    gap: var(--space-5);
 }
 
 .civic-org-card {
     background: var(--civic-bg-card);
     border: 1px solid var(--civic-border);
-    border-radius: 12px;
-    padding: 24px;
+    border-radius: var(--radius-lg);
+    padding: var(--space-6);
     text-align: center;
 }
 
 .civic-org-icon {
-    width: 56px;
-    height: 56px;
+    width: var(--space-14);
+    height: var(--space-14);
     background: var(--civic-brand);
-    border-radius: 12px;
+    border-radius: var(--radius-lg);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -69,8 +69,8 @@
 
 .civic-org-icon .dashicons {
     font-size: 24px;
-    width: 24px;
-    height: 24px;
+    width: var(--space-6);
+    height: var(--space-6);
 }
 
 .civic-org-name {
@@ -91,7 +91,7 @@
 .civic-table-card {
     background: var(--civic-bg-card);
     border: 1px solid var(--civic-border);
-    border-radius: 12px;
+    border-radius: var(--radius-lg);
     overflow: hidden;
 }
 
@@ -127,8 +127,8 @@
 /* Status Badges */
 .civic-status {
     display: inline-block;
-    padding: 4px 10px;
-    border-radius: 4px;
+    padding: 4px var(--space-2-5);
+    border-radius: var(--radius-sm);
     font-size: 12px;
     font-weight: 600;
     text-transform: uppercase;
@@ -136,7 +136,7 @@
 
 .civic-status--approved {
     background: #ECFDF5;
-    color: #047857;
+    color: var(--color-success-700);
 }
 
 .civic-status--declined {
@@ -146,7 +146,7 @@
 
 .civic-status--pending {
     background: #FFFBEB;
-    color: #B45309;
+    color: var(--color-warning-700);
 }
 
 /* Action Buttons */
@@ -157,7 +157,7 @@
 
 .civic-btn--success {
     background: #ECFDF5;
-    color: #047857;
+    color: var(--color-success-700);
     border: 1px solid #A7F3D0;
 }
 
@@ -179,7 +179,7 @@
 .civic-opp-list {
     background: var(--civic-bg-card);
     border: 1px solid var(--civic-border);
-    border-radius: 12px;
+    border-radius: var(--radius-lg);
     overflow: hidden;
 }
 
@@ -187,7 +187,7 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 20px;
+    padding: var(--space-5);
     border-bottom: 1px solid var(--civic-border);
     gap: 16px;
     flex-wrap: wrap;
@@ -222,14 +222,14 @@
     margin: 0;
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: var(--space-3);
     flex-wrap: wrap;
 }
 
 .civic-opp-meta .dashicons {
     font-size: 14px;
-    width: 14px;
-    height: 14px;
+    width: var(--space-3-5);
+    height: var(--space-3-5);
 }
 
 .civic-opp-date {

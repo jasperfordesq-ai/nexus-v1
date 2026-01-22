@@ -10,7 +10,7 @@
             backdrop-filter: blur(24px) saturate(120%);
             -webkit-backdrop-filter: blur(24px) saturate(120%);
             border: 1px solid rgba(255, 255, 255, 0.4);
-            border-radius: 24px;
+            border-radius: var(--radius-2xl);
             padding: 30px;
             box-shadow: 0 8px 40px rgba(31, 38, 135, 0.12),
                         inset 0 1px 0 rgba(255, 255, 255, 0.6);
@@ -27,9 +27,9 @@
 
         @media (max-width: 768px) {
             #org-glass-wrapper {
-                padding: 20px;
+                padding: var(--space-5);
                 padding-bottom: 100px;
-                border-radius: 16px;
+                border-radius: var(--radius-xl);
             }
         }
 
@@ -71,14 +71,14 @@
         /* Page Header */
         #org-glass-wrapper .org-page-header {
             text-align: center;
-            padding: 40px 20px 30px;
+            padding: var(--space-10) var(--space-5) 30px;
         }
 
         #org-glass-wrapper .org-page-title {
             font-size: 2.5rem;
             font-weight: 800;
-            margin: 0 0 10px 0;
-            background: linear-gradient(135deg, #6366f1 0%, #0d9488 100%);
+            margin: 0 0 var(--space-2-5) 0;
+            background: linear-gradient(135deg, var(--color-primary-500) 0%, var(--color-teal-600) 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
@@ -98,21 +98,21 @@
             color: var(--htb-text-secondary);
             text-decoration: none;
             font-weight: 600;
-            padding: 10px 0;
-            margin-bottom: 10px;
+            padding: var(--space-2-5) 0;
+            margin-bottom: var(--space-2-5);
             transition: color 0.2s;
         }
 
         #org-glass-wrapper .org-back-link:hover {
-            color: #0d9488;
+            color: var(--color-teal-600);
         }
 
         /* Glass Search Card */
         #org-glass-wrapper .glass-search-card {
             position: relative;
             z-index: 10;
-            padding: 20px 25px;
-            border-radius: 20px;
+            padding: var(--space-5) 25px;
+            border-radius: var(--radius-2xl);
             background: linear-gradient(135deg,
                 rgba(255, 255, 255, 0.75),
                 rgba(255, 255, 255, 0.6));
@@ -138,7 +138,7 @@
 
         #org-glass-wrapper .search-form {
             display: flex;
-            gap: 12px;
+            gap: var(--space-3);
             align-items: center;
             flex-wrap: wrap;
         }
@@ -151,7 +151,7 @@
 
         #org-glass-wrapper .search-input-wrapper i {
             position: absolute;
-            left: 18px;
+            left: var(--space-4-5);
             top: 50%;
             transform: translateY(-50%);
             color: var(--htb-text-secondary);
@@ -160,7 +160,7 @@
 
         #org-glass-wrapper .glass-search-input {
             width: 100%;
-            padding: 14px 20px 14px 48px;
+            padding: var(--space-3-5) var(--space-5) var(--space-3-5) var(--space-12);
             border: 2px solid rgba(255, 255, 255, 0.4);
             border-radius: 14px;
             font-size: 1rem;
@@ -185,7 +185,7 @@
         [data-theme="dark"] #org-glass-wrapper .glass-search-input {
             background: rgba(15, 23, 42, 0.7);
             border: 2px solid rgba(255, 255, 255, 0.2);
-            color: #f8fafc;
+            color: var(--color-slate-50);
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3),
                         inset 0 1px 0 rgba(255, 255, 255, 0.1);
         }
@@ -198,10 +198,10 @@
         }
 
         #org-glass-wrapper .glass-btn-primary {
-            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+            background: linear-gradient(135deg, var(--color-primary-500) 0%, var(--color-purple-500) 100%);
             color: white;
             border: none;
-            padding: 14px 24px;
+            padding: var(--space-3-5) var(--space-6);
             border-radius: 14px;
             font-size: 1rem;
             font-weight: 700;
@@ -224,8 +224,8 @@
         #org-glass-wrapper .org-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
-            gap: 24px;
-            margin-top: 20px;
+            gap: var(--space-6);
+            margin-top: var(--space-5);
         }
 
         @media (max-width: 400px) {
@@ -242,7 +242,7 @@
             backdrop-filter: blur(20px) saturate(120%);
             -webkit-backdrop-filter: blur(20px) saturate(120%);
             border: 1px solid rgba(255, 255, 255, 0.35);
-            border-radius: 20px;
+            border-radius: var(--radius-2xl);
             box-shadow: 0 8px 32px rgba(31, 38, 135, 0.12),
                         inset 0 1px 0 rgba(255, 255, 255, 0.5);
             overflow: hidden;
@@ -279,19 +279,19 @@
 
         /* Card Header with Logo */
         #org-glass-wrapper .org-card-header {
-            padding: 24px 24px 16px;
+            padding: var(--space-6) var(--space-6) 16px;
             display: flex;
             align-items: flex-start;
             gap: 16px;
         }
 
         #org-glass-wrapper .org-logo {
-            width: 64px;
-            height: 64px;
-            border-radius: 16px;
+            width: var(--space-16);
+            height: var(--space-16);
+            border-radius: var(--radius-xl);
             object-fit: cover;
             flex-shrink: 0;
-            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+            background: linear-gradient(135deg, var(--color-primary-500) 0%, var(--color-purple-500) 100%);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -317,7 +317,7 @@
         #org-glass-wrapper .org-card-name {
             font-size: 1.25rem;
             font-weight: 700;
-            margin: 0 0 6px 0;
+            margin: 0 0 var(--space-1-5) 0;
             color: var(--htb-text-main);
             line-height: 1.3;
         }
@@ -327,12 +327,12 @@
             color: var(--htb-text-secondary);
             display: flex;
             align-items: center;
-            gap: 6px;
+            gap: var(--space-1-5);
         }
 
         /* Card Body */
         #org-glass-wrapper .org-card-body {
-            padding: 0 24px 20px;
+            padding: 0 var(--space-6) var(--space-5);
             flex: 1;
         }
 
@@ -351,7 +351,7 @@
         #org-glass-wrapper .org-card-stats {
             display: flex;
             gap: 16px;
-            padding: 16px 24px;
+            padding: 16px var(--space-6);
             background: linear-gradient(135deg,
                 rgba(99, 102, 241, 0.05),
                 rgba(13, 148, 136, 0.05));
@@ -368,13 +368,13 @@
         #org-glass-wrapper .org-stat {
             display: flex;
             align-items: center;
-            gap: 6px;
+            gap: var(--space-1-5);
             font-size: 0.85rem;
             color: var(--htb-text-secondary);
         }
 
         #org-glass-wrapper .org-stat i {
-            color: #6366f1;
+            color: var(--color-primary-500);
             font-size: 0.9rem;
         }
 
@@ -386,13 +386,13 @@
         /* Empty State */
         #org-glass-wrapper .org-empty-state {
             text-align: center;
-            padding: 60px 20px;
+            padding: 60px var(--space-5);
             background: linear-gradient(135deg,
                 rgba(255, 255, 255, 0.75),
                 rgba(255, 255, 255, 0.6));
             backdrop-filter: blur(20px);
             -webkit-backdrop-filter: blur(20px);
-            border-radius: 20px;
+            border-radius: var(--radius-2xl);
             border: 1px solid rgba(255, 255, 255, 0.3);
         }
 
@@ -405,15 +405,15 @@
 
         #org-glass-wrapper .org-empty-icon {
             font-size: 4rem;
-            color: #6366f1;
-            margin-bottom: 20px;
+            color: var(--color-primary-500);
+            margin-bottom: var(--space-5);
             opacity: 0.6;
         }
 
         #org-glass-wrapper .org-empty-title {
             font-size: 1.5rem;
             font-weight: 700;
-            margin: 0 0 10px 0;
+            margin: 0 0 var(--space-2-5) 0;
             color: var(--htb-text-main);
         }
 
@@ -426,7 +426,7 @@
         #org-glass-wrapper .org-result-count {
             font-size: 0.95rem;
             color: var(--htb-text-secondary);
-            margin-bottom: 15px;
+            margin-bottom: var(--space-4);
         }
 
         #org-glass-wrapper .org-result-count strong {

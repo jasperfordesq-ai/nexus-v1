@@ -5,6 +5,9 @@
             <!-- Platform Dropdown - Public to everyone -->
             <?php
             $showPlatform = true; // Made public to everyone
+            // Detect protocol (http for local, https for production)
+            $isSecure = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') || ($_SERVER['SERVER_PORT'] ?? 80) == 443;
+            $protocol = $isSecure ? 'https://' : 'http://';
             if ($showPlatform):
             ?>
                 <div class="civic-dropdown civic-dropdown--left">
@@ -21,7 +24,8 @@
                         }
                         foreach ($tenants as $pt):
                             if (!empty($pt['domain'])) {
-                                $link = 'https://' . $pt['domain'];
+                                // Tenant has custom domain (uses current protocol)
+                                $link = $protocol . $pt['domain'];
                             } else {
                                 $link = '/' . ($pt['slug'] ?? '');
                                 if (($pt['id'] ?? 0) == 1) $link = '/';

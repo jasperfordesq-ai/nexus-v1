@@ -11,14 +11,14 @@
 /* Page Background with Ambient Effects */
 .holo-poll-page {
     min-height: 100vh;
-    padding: 180px 20px 60px;
+    padding: 180px var(--space-5) 60px;
     position: relative;
     overflow: hidden;
 }
 
 @media (max-width: 900px) {
     .holo-poll-page {
-        padding: 20px 16px 120px;
+        padding: var(--space-5) 16px 120px;
     }
 }
 
@@ -64,7 +64,7 @@
 .holo-orb-1 {
     width: 400px;
     height: 400px;
-    background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+    background: linear-gradient(135deg, var(--color-purple-500), var(--color-primary-700));
     top: 10%;
     left: -10%;
     animation: orbFloat1 15s ease-in-out infinite;
@@ -82,7 +82,7 @@
 .holo-orb-3 {
     width: 250px;
     height: 250px;
-    background: linear-gradient(135deg, #6366f1, #818cf8);
+    background: linear-gradient(135deg, var(--color-primary-500), #818cf8);
     top: 60%;
     left: 30%;
     animation: orbFloat3 12s ease-in-out infinite;
@@ -118,15 +118,15 @@
 /* Page Header */
 .holo-page-header {
     text-align: center;
-    margin-bottom: 40px;
+    margin-bottom: var(--space-10);
 }
 
 .holo-page-icon {
-    width: 80px;
-    height: 80px;
-    margin: 0 auto 20px;
-    background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 50%, #6d28d9 100%);
-    border-radius: 24px;
+    width: var(--space-20);
+    height: var(--space-20);
+    margin: 0 auto var(--space-5);
+    background: linear-gradient(135deg, var(--color-purple-500) 0%, var(--color-primary-700) 50%, #6d28d9 100%);
+    border-radius: var(--radius-2xl);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -145,8 +145,8 @@
 .holo-page-title {
     font-size: 2.5rem;
     font-weight: 800;
-    margin: 0 0 12px;
-    background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 50%, #6d28d9 100%);
+    margin: 0 0 var(--space-3);
+    background: linear-gradient(135deg, var(--color-purple-500) 0%, var(--color-primary-700) 50%, #6d28d9 100%);
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
@@ -166,7 +166,7 @@
     -webkit-backdrop-filter: blur(40px) saturate(180%);
     border-radius: 32px;
     border: 1px solid rgba(255, 255, 255, 0.5);
-    padding: 48px 40px;
+    padding: var(--space-12) var(--space-10);
     box-shadow:
         0 25px 50px rgba(0, 0, 0, 0.08),
         0 0 100px rgba(139, 92, 246, 0.08),
@@ -209,8 +209,8 @@
 
 @media (max-width: 768px) {
     .holo-glass-card {
-        padding: 32px 24px;
-        border-radius: 24px;
+        padding: var(--space-8) var(--space-6);
+        border-radius: var(--radius-2xl);
     }
 
     .holo-page-title {
@@ -218,8 +218,8 @@
     }
 
     .holo-page-icon {
-        width: 64px;
-        height: 64px;
+        width: var(--space-16);
+        height: var(--space-16);
         font-size: 2rem;
         border-radius: 18px;
     }
@@ -227,7 +227,7 @@
 
 /* Section Headers */
 .holo-section {
-    margin-bottom: 28px;
+    margin-bottom: var(--space-7);
 }
 
 /* Form Labels */
@@ -236,26 +236,26 @@
     font-weight: 600;
     font-size: 0.95rem;
     color: var(--htb-text-main, #1e293b);
-    margin-bottom: 10px;
+    margin-bottom: var(--space-2-5);
 }
 
 [data-theme="dark"] .holo-label {
-    color: #e2e8f0;
+    color: var(--color-slate-200);
 }
 
 .holo-label-optional {
     font-weight: 400;
     font-size: 0.8rem;
     color: var(--htb-text-muted, #94a3b8);
-    margin-left: 6px;
+    margin-left: var(--space-1-5);
 }
 
 /* Input Fields */
 .holo-input,
 .holo-textarea {
     width: 100%;
-    padding: 16px 20px;
-    border-radius: 16px;
+    padding: 16px var(--space-5);
+    border-radius: var(--radius-xl);
     font-size: 1rem;
     font-family: inherit;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -270,12 +270,12 @@
 [data-theme="dark"] .holo-textarea {
     background: rgba(0, 0, 0, 0.2);
     border-color: rgba(255, 255, 255, 0.08);
-    color: #f8fafc;
+    color: var(--color-slate-50);
 }
 
 .holo-input:focus,
 .holo-textarea:focus {
-    border-color: #8b5cf6;
+    border-color: var(--color-purple-500);
     background: rgba(255, 255, 255, 0.9);
     box-shadow:
         0 0 0 4px rgba(139, 92, 246, 0.1),
@@ -313,12 +313,12 @@
 
 /* Alert Box */
 .holo-alert {
-    padding: 20px 24px;
-    border-radius: 16px;
+    padding: var(--space-5) var(--space-6);
+    border-radius: var(--radius-xl);
     display: flex;
     gap: 16px;
     align-items: flex-start;
-    margin-bottom: 28px;
+    margin-bottom: var(--space-7);
 }
 
 .holo-alert-warning {
@@ -327,9 +327,9 @@
 }
 
 .holo-alert-icon {
-    width: 44px;
-    height: 44px;
-    border-radius: 12px;
+    width: var(--space-11);
+    height: var(--space-11);
+    border-radius: var(--radius-lg);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -338,7 +338,7 @@
 }
 
 .holo-alert-warning .holo-alert-icon {
-    background: linear-gradient(135deg, #f59e0b, #d97706);
+    background: linear-gradient(135deg, var(--color-warning-500), var(--color-warning-600));
     color: white;
 }
 
@@ -349,17 +349,17 @@
 .holo-alert-title {
     font-weight: 700;
     font-size: 0.95rem;
-    color: #b45309;
+    color: var(--color-warning-700);
     margin-bottom: 4px;
 }
 
 [data-theme="dark"] .holo-alert-title {
-    color: #fbbf24;
+    color: var(--color-warning-400);
 }
 
 .holo-alert-text {
     font-size: 0.9rem;
-    color: #92400e;
+    color: var(--color-warning-800);
     line-height: 1.5;
 }
 
@@ -372,7 +372,7 @@
 .holo-divider {
     height: 1px;
     background: linear-gradient(90deg, transparent, rgba(139, 92, 246, 0.2), transparent);
-    margin: 32px 0;
+    margin: var(--space-8) 0;
     border: none;
 }
 
@@ -390,7 +390,7 @@
 }
 
 .holo-btn {
-    padding: 16px 28px;
+    padding: 16px var(--space-7);
     border-radius: 14px;
     font-size: 1rem;
     font-weight: 600;
@@ -398,7 +398,7 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    gap: 10px;
+    gap: var(--space-2-5);
     cursor: pointer;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     border: none;
@@ -406,7 +406,7 @@
 
 .holo-btn-primary {
     flex: 2;
-    background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 50%, #6d28d9 100%);
+    background: linear-gradient(135deg, var(--color-purple-500) 0%, var(--color-primary-700) 50%, #6d28d9 100%);
     color: white;
     box-shadow: 0 8px 24px rgba(139, 92, 246, 0.3);
 }
@@ -426,7 +426,7 @@
 [data-theme="dark"] .holo-btn-secondary {
     background: rgba(255, 255, 255, 0.05);
     border-color: rgba(255, 255, 255, 0.1);
-    color: #e2e8f0;
+    color: var(--color-slate-200);
 }
 
 .holo-btn-secondary:hover {
@@ -440,14 +440,14 @@
 
 /* Danger Zone */
 .holo-danger-zone {
-    margin-top: 32px;
-    padding-top: 32px;
+    margin-top: var(--space-8);
+    padding-top: var(--space-8);
     border-top: 1px solid rgba(239, 68, 68, 0.2);
 }
 
 .holo-btn-danger {
     width: 100%;
-    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+    background: linear-gradient(135deg, var(--color-error-500) 0%, var(--color-error-600) 100%);
     color: white;
     box-shadow: 0 8px 24px rgba(239, 68, 68, 0.25);
 }
@@ -469,7 +469,7 @@
 .holo-input:focus-visible,
 .holo-textarea:focus-visible,
 .holo-btn:focus-visible {
-    outline: 3px solid #8b5cf6;
+    outline: 3px solid var(--color-purple-500);
     outline-offset: 2px;
 }
 
@@ -480,8 +480,8 @@
     left: 0;
     right: 0;
     z-index: 10001;
-    padding: 12px 20px;
-    background: linear-gradient(135deg, #ef4444, #dc2626);
+    padding: var(--space-3) var(--space-5);
+    background: linear-gradient(135deg, var(--color-error-500), var(--color-error-600));
     color: white;
     font-size: 0.9rem;
     font-weight: 600;

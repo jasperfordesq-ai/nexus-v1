@@ -332,15 +332,15 @@
     .civic-poll-card,
     .civic-goal-card,
     .civic-resource-card {
-        border-width: 3px;
+        border-width: var(--space-1);
     }
 
     .civic-goal-progress-bar {
-        border-width: 2px;
+        border-width: var(--space-0-5);
     }
 
     .civic-goal-btn-outline {
-        border-width: 3px;
+        border-width: var(--space-1);
     }
 }
 
@@ -403,7 +403,7 @@
 .civic-download-status {
     font-size: 1rem;
     font-weight: bold;
-    min-height: 24px;
+    min-height: var(--space-6);
     margin-bottom: var(--space-5);
 }
 

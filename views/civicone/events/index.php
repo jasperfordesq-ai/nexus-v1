@@ -27,8 +27,9 @@ $basePath = \Nexus\Core\TenantContext::getBasePath();
             </ol>
         </nav>
 
-        <!-- Hero (auto-resolves from config/heroes.php for /events route) -->
-        <?php require dirname(__DIR__, 2) . '/layouts/civicone/partials/render-hero.php'; ?>
+        <!-- Page Header (GOV.UK Typography) -->
+        <h1 class="govuk-heading-xl">Events</h1>
+        <p class="govuk-body-l">Discover upcoming events and activities in your community.</p>
 
         <!-- Action Button -->
         <div class="civicone-grid-row civicone-action-row">

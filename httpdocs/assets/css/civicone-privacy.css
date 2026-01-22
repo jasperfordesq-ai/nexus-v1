@@ -118,12 +118,12 @@
         color: var(--civicone-text);
         border: 1px solid var(--color-gray-300);
         box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-        min-height: 44px;
+        min-height: var(--space-11);
     }
 
     @media (max-width: 768px) {
         #privacy-wrapper .privacy-nav-btn {
-            min-height: 48px;
+            min-height: var(--space-12);
         }
     }
 
@@ -161,8 +161,8 @@
     }
 
     #privacy-wrapper .privacy-section .section-icon {
-        width: 48px;
-        height: 48px;
+        width: var(--space-12);
+        height: var(--space-12);
         border-radius: var(--radius-2);
         display: flex;
         align-items: center;
@@ -372,12 +372,12 @@
         background: linear-gradient(135deg, var(--privacy-theme) 0%, var(--privacy-theme-dark) 100%);
         color: white;
         box-shadow: 0 4px 16px rgba(var(--privacy-theme-rgb), 0.4);
-        min-height: 44px;
+        min-height: var(--space-11);
     }
 
     @media (max-width: 768px) {
         #privacy-wrapper .privacy-cta-btn {
-            min-height: 48px;
+            min-height: var(--space-12);
         }
     }
 
@@ -422,8 +422,8 @@
         }
 
         #privacy-wrapper .privacy-page-header .header-icon {
-            width: 56px;
-            height: 56px;
+            width: var(--space-14);
+            height: var(--space-14);
             font-size: var(--font-size-xl);
         }
 

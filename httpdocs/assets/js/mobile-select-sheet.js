@@ -39,7 +39,7 @@
             </div>
             <div class="mobile-sheet-body">
                 <div class="mobile-select-search-wrap" style="display: none;">
-                    <input type="text" class="mobile-select-search" placeholder="Search...">
+                    <input type="text" class="mobile-select-search" placeholder="Search..." aria-label="Search options">
                 </div>
                 <ul class="mobile-select-options"></ul>
                 <div class="mobile-select-empty" style="display: none;">

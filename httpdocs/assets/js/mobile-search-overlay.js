@@ -51,7 +51,7 @@
                         <circle cx="11" cy="11" r="8"></circle>
                         <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
                     </svg>
-                    <input type="search" class="mobile-search-input" placeholder="${config.placeholder}" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false">
+                    <input type="search" class="mobile-search-input" placeholder="${config.placeholder}" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" aria-label="Search">
                     <button class="mobile-search-clear" aria-label="Clear search">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <line x1="18" y1="6" x2="6" y2="18"></line>

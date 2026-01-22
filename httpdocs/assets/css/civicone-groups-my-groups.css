@@ -13,7 +13,7 @@
     left: 0;
     right: 0;
     z-index: 10001;
-    padding: 12px 20px;
+    padding: var(--space-3) var(--space-5);
     background: linear-gradient(135deg, var(--color-danger), var(--color-red-600));
     color: white;
     font-size: 0.9rem;
@@ -51,7 +51,7 @@ button:active {
 .visit-btn,
 .browse-btn,
 button {
-    min-height: 44px;
+    min-height: var(--space-11);
 }
 
 .quick-action-btn:focus-visible,
@@ -188,7 +188,7 @@ html {
 }
 
 #my-groups-glass-wrapper .group-card {
-    border-radius: 20px;
+    border-radius: var(--radius-2xl);
     overflow: hidden;
     backdrop-filter: blur(20px) saturate(120%);
     -webkit-backdrop-filter: blur(20px) saturate(120%);
@@ -248,12 +248,12 @@ html {
 
 #my-groups-glass-wrapper .card-badge {
     position: absolute;
-    top: 12px;
-    right: 12px;
+    top: var(--space-3);
+    right: var(--space-3);
     background: rgba(255, 255, 255, 0.95);
     color: var(--mg-theme);
-    padding: 4px 12px;
-    border-radius: 20px;
+    padding: 4px var(--space-3);
+    border-radius: var(--radius-2xl);
     font-size: 0.75rem;
     font-weight: 700;
 }
@@ -312,7 +312,7 @@ html {
     align-items: center;
     gap: 0.5rem;
     padding: 0.5rem 1rem;
-    border-radius: 8px;
+    border-radius: var(--radius-md);
     font-size: 0.85rem;
     font-weight: 600;
     text-decoration: none;
@@ -341,7 +341,7 @@ html {
     grid-column: 1 / -1;
     text-align: center;
     padding: 4rem 2rem;
-    border-radius: 20px;
+    border-radius: var(--radius-2xl);
     backdrop-filter: blur(20px) saturate(120%);
     -webkit-backdrop-filter: blur(20px) saturate(120%);
 }
@@ -422,7 +422,7 @@ html {
     .visit-btn,
     .browse-btn,
     button {
-        min-height: 48px;
+        min-height: var(--space-12);
     }
 
     @keyframes mgGradientShift {

@@ -203,6 +203,28 @@
     --color-govuk-red-dark: #c2410c;
     --color-govuk-grey: #b1b4b6;
     --color-govuk-grey-dark: #505a5f;
+    --color-govuk-mid-grey: #b1b4b6;
+    --color-govuk-dark-grey: #505a5f;
+    --color-govuk-light-grey: #f3f2f1;
+    --color-govuk-yellow: #ffdd00;
+
+    /* Semantic color aliases for WCAG refactoring */
+    --color-success-100: #dcfce7;
+    --color-success-400: #34d399;
+    --color-success-500: #10b981;
+    --color-success-600: #059669;
+    --color-success-700: #047857;
+    --color-error-500: #ef4444;
+    --color-error-600: #dc2626;
+    --color-warning-400: #fbbf24;
+    --color-warning-500: #f59e0b;
+    --color-warning-600: #d97706;
+    --color-warning-700: #b45309;
+    --color-warning-800: #92400e;
+    --color-warning-900: #78350f;
+    --color-primary-700: #7c3aed;
+    --color-pink-800: #96206d;
+    --color-dark-surface: #1e1e2e;
 
     /* Brand colors - Special identities */
     --color-brand-yellow: #ffdd00;    /* Gold, awards */

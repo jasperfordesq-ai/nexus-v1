@@ -20,7 +20,7 @@
         padding: var(--space-1) var(--space-4);
         background: var(--color-primary-100);
         color: var(--civicone-brand);
-        border-radius: 20px;
+        border-radius: var(--radius-2xl);
         font-size: var(--font-size-sm);
         font-weight: bold;
         margin-bottom: var(--space-5);
@@ -60,12 +60,12 @@
 
     .about-story-mission-card {
         padding: var(--space-10);
-        border-left: 5px solid var(--civicone-brand);
+        border-left: var(--space-1) solid var(--civicone-brand);
     }
 
     .about-story-vision-card {
         padding: var(--space-10);
-        border-left: 5px solid var(--color-pink-600);
+        border-left: var(--space-1) solid var(--color-pink-600);
     }
 
     .about-story-mission-card h2 {
@@ -181,7 +181,7 @@
         background: #d1fae5;
         color: #065f46;
         padding: var(--space-2) var(--space-5);
-        border-radius: 20px;
+        border-radius: var(--radius-2xl);
         font-weight: bold;
         display: flex;
         align-items: center;
@@ -190,7 +190,7 @@
 
     [data-theme="dark"] .about-story-badge-item {
         background: rgba(16, 185, 129, 0.2);
-        color: #34d399;
+        color: var(--color-success-400);
     }
 
     .about-story-proof-card {

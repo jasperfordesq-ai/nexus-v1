@@ -27,42 +27,27 @@ $totalResults = count($results ?? []);
             </ol>
         </nav>
 
-        <!-- Hero Section -->
-        <div class="civicone-hero">
-            <div class="civicone-hero__content">
-                <h1 class="civicone-heading-xl">Search Results</h1>
-                <?php if (!empty($corrected_query) && $corrected_query !== $query): ?>
-                    <p class="civicone-body-l">
-                        Showing results for "<strong><?= htmlspecialchars($corrected_query) ?></strong>"
-                        <span class="civicone-hero__note">(corrected from "<?= htmlspecialchars($query) ?>")</span>
-                    </p>
-                <?php else: ?>
-                    <p class="civicone-body-l">
-                        Found <strong><?= $totalResults ?></strong> <?= $totalResults === 1 ? 'result' : 'results' ?> for "<strong><?= htmlspecialchars($query) ?></strong>"
-                    </p>
-                <?php endif; ?>
+        <!-- Page Header (GOV.UK Typography) -->
+        <h1 class="govuk-heading-xl">Search Results</h1>
+        <?php if (!empty($corrected_query) && $corrected_query !== $query): ?>
+            <p class="govuk-body-l">
+                Showing results for "<strong><?= htmlspecialchars($corrected_query) ?></strong>"
+                <span class="govuk-body-s govuk-!-margin-left-1">(corrected from "<?= htmlspecialchars($query) ?>")</span>
+            </p>
+        <?php else: ?>
+            <p class="govuk-body-l">
+                Found <strong><?= $totalResults ?></strong> <?= $totalResults === 1 ? 'result' : 'results' ?> for "<strong><?= htmlspecialchars($query) ?></strong>"
+            </p>
+        <?php endif; ?>
 
-                <?php if (!empty($intent) && !empty($intent['ai_analyzed'])): ?>
-                    <div class="civicone-hero__badges">
-                        <span class="civicone-badge civicone-badge--ai">
-                            <svg class="civicone-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-                                <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"></path>
-                            </svg>
-                            AI-Enhanced Search
-                        </span>
-                        <?php if (!empty($intent['location'])): ?>
-                            <span class="civicone-badge civicone-badge--location">
-                                <svg class="civicone-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-                                    <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
-                                    <circle cx="12" cy="10" r="3"></circle>
-                                </svg>
-                                <?= htmlspecialchars($intent['location']) ?>
-                            </span>
-                        <?php endif; ?>
-                    </div>
+        <?php if (!empty($intent) && !empty($intent['ai_analyzed'])): ?>
+            <p class="govuk-body-s">
+                <strong class="govuk-tag govuk-tag--blue">AI-Enhanced Search</strong>
+                <?php if (!empty($intent['location'])): ?>
+                    <strong class="govuk-tag govuk-tag--grey"><?= htmlspecialchars($intent['location']) ?></strong>
                 <?php endif; ?>
-            </div>
-        </div>
+            </p>
+        <?php endif; ?>
 
         <!-- Directory Layout: 1/3 Filters + 2/3 Results -->
         <div class="civicone-grid-row">

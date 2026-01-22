@@ -79,4 +79,41 @@ class LayoutApiController
         ]);
         exit;
     }
+
+    /**
+     * GET /api/layout-debug
+     *
+     * Debug endpoint to see session state - TEMPORARY
+     */
+    public function debug()
+    {
+        header('Content-Type: application/json');
+
+        // Get tenant info
+        $tenantId = 1;
+        if (class_exists('\Nexus\Core\TenantContext')) {
+            $tenantId = \Nexus\Core\TenantContext::getId() ?: 1;
+        }
+
+        $sessionKey = 'nexus_active_layout_' . $tenantId;
+
+        // Get all layout-related session keys
+        $layoutSessions = [];
+        foreach ($_SESSION as $key => $value) {
+            if (strpos($key, 'nexus_active_layout') !== false || strpos($key, 'nexus_layout') !== false) {
+                $layoutSessions[$key] = $value;
+            }
+        }
+
+        echo json_encode([
+            'tenant_id' => $tenantId,
+            'session_key' => $sessionKey,
+            'session_value' => $_SESSION[$sessionKey] ?? 'NOT SET',
+            'all_layout_sessions' => $layoutSessions,
+            'layout_helper_get' => LayoutHelper::get(),
+            'user_id' => $_SESSION['user_id'] ?? null,
+            'session_id' => session_id(),
+        ], JSON_PRETTY_PRINT);
+        exit;
+    }
 }

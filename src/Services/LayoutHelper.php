@@ -25,9 +25,24 @@ class LayoutHelper
     private const DEFAULT_LAYOUT = 'modern';
 
     /**
-     * THE session key - unified, no more dual keys
+     * THE session key prefix - tenant ID will be appended for isolation
      */
-    private const SESSION_KEY = 'nexus_active_layout';
+    private const SESSION_KEY_PREFIX = 'nexus_active_layout';
+
+    /**
+     * Get session key for layout
+     *
+     * NOTE: Using a single session key (not tenant-specific) because:
+     * 1. API routes like /api/layout-switch don't always have tenant context
+     * 2. User's layout preference should be consistent across the same browser session
+     * 3. Tenant isolation happens at the domain level, not session key level
+     *
+     * @return string Session key (nexus_active_layout)
+     */
+    private static function getSessionKey(): string
+    {
+        return self::SESSION_KEY_PREFIX;
+    }
 
     /**
      * Runtime override layout (not persisted to session or DB)
@@ -43,21 +58,22 @@ class LayoutHelper
      * Get the current active layout
      *
      * Priority order:
-     * 1. Runtime override (for testing/preview)
-     * 2. Session value (already validated)
-     * 3. Database value (for logged-in users)
-     * 4. Default ('modern')
+     * 1. Runtime override (testing only)
+     * 2. User's saved preference from DB (if logged in)
+     * 3. Session value (for anonymous users who switched)
+     * 4. Tenant's default layout
+     * 5. Hardcoded 'modern'
      *
      * @return string The active layout name (modern or civicone)
      */
     public static function get(): string
     {
-        // 1. Check runtime override first (highest priority)
+        // 1. Runtime override (for testing/preview only)
         if (self::$runtimeOverride !== null) {
             return self::$runtimeOverride;
         }
 
-        // 2. Return cached value if available (prevents multiple DB queries)
+        // 2. Already determined this request? Return cached value
         if (self::$cachedLayout !== null) {
             return self::$cachedLayout;
         }
@@ -67,32 +83,61 @@ class LayoutHelper
             session_start();
         }
 
-        // 3. Check session (already validated on previous request)
-        if (isset($_SESSION[self::SESSION_KEY])) {
-            $layout = $_SESSION[self::SESSION_KEY];
-            if (self::isValid($layout)) {
-                self::$cachedLayout = $layout;
-                return $layout;
-            }
-        }
+        $layout = null;
+        $sessionKey = self::getSessionKey();
 
-        // 4. For logged-in users, check database
+        // 3. Logged-in user? Use their saved preference from DB
         if (!empty($_SESSION['user_id'])) {
-            $dbLayout = self::getFromDatabase((int) $_SESSION['user_id']);
-            if ($dbLayout !== null) {
-                // Sync to session for future requests
-                $_SESSION[self::SESSION_KEY] = $dbLayout;
-                self::$cachedLayout = $dbLayout;
-                return $dbLayout;
+            $layout = self::getFromDatabase((int) $_SESSION['user_id']);
+        }
+
+        // 4. No user preference? Check session (for anonymous users who switched)
+        if ($layout === null && isset($_SESSION[$sessionKey])) {
+            $sessionLayout = self::sanitize($_SESSION[$sessionKey]);
+            if (self::isValid($sessionLayout)) {
+                $layout = $sessionLayout;
             }
         }
 
-        // 5. Fall back to default
-        $layout = self::DEFAULT_LAYOUT;
-        $_SESSION[self::SESSION_KEY] = $layout;
+        // 5. No session? Use tenant's default
+        if ($layout === null) {
+            $layout = self::getTenantDefaultLayout();
+        }
+
+        // 6. No tenant default? Use hardcoded default
+        if ($layout === null) {
+            $layout = self::DEFAULT_LAYOUT;
+        }
+
+        // Cache for this request only
         self::$cachedLayout = $layout;
 
         return $layout;
+    }
+
+    /**
+     * Get the tenant's default layout from the database
+     *
+     * @return string|null The tenant's default layout, or null if not set
+     */
+    private static function getTenantDefaultLayout(): ?string
+    {
+        try {
+            // Use TenantContext to get current tenant's default_layout
+            if (class_exists('\Nexus\Core\TenantContext')) {
+                $tenant = \Nexus\Core\TenantContext::get();
+                if ($tenant && !empty($tenant['default_layout'])) {
+                    $layout = self::sanitize($tenant['default_layout']);
+                    if (self::isValid($layout)) {
+                        return $layout;
+                    }
+                }
+            }
+        } catch (\Exception $e) {
+            // Silently fail - use hardcoded default
+        }
+
+        return null;
     }
 
     /**
@@ -119,7 +164,7 @@ class LayoutHelper
         }
 
         // Set in session (THE single key)
-        $_SESSION[self::SESSION_KEY] = $layout;
+        $_SESSION[self::getSessionKey()] = $layout;
 
         // Clear the legacy key if it exists (cleanup)
         unset($_SESSION['nexus_layout']);
@@ -212,7 +257,7 @@ class LayoutHelper
         }
 
         // Set in session
-        $_SESSION[self::SESSION_KEY] = $layout;
+        $_SESSION[self::getSessionKey()] = $layout;
 
         // Clear legacy key
         unset($_SESSION['nexus_layout']);
@@ -309,23 +354,24 @@ class LayoutHelper
     }
 
     /**
-     * Get the default layout
+     * Get the default layout (tenant-aware)
      *
-     * @return string The default layout name
+     * @return string The default layout name (tenant default or hardcoded default)
      */
     public static function getDefault(): string
     {
-        return self::DEFAULT_LAYOUT;
+        $tenantDefault = self::getTenantDefaultLayout();
+        return $tenantDefault ?? self::DEFAULT_LAYOUT;
     }
 
     /**
-     * Get the session key being used
+     * Get the current session key being used (for debugging)
      *
-     * @return string The session key
+     * @return string The session key (tenant-specific)
      */
-    public static function getSessionKey(): string
+    public static function getCurrentSessionKey(): string
     {
-        return self::SESSION_KEY;
+        return self::getSessionKey();
     }
 
     /**
@@ -418,10 +464,10 @@ class LayoutHelper
         }
 
         // If legacy key exists but new key doesn't, migrate
-        if (isset($_SESSION['nexus_layout']) && !isset($_SESSION[self::SESSION_KEY])) {
+        if (isset($_SESSION['nexus_layout']) && !isset($_SESSION[self::getSessionKey()])) {
             $legacyLayout = self::sanitize($_SESSION['nexus_layout']);
             if (self::isValid($legacyLayout)) {
-                $_SESSION[self::SESSION_KEY] = $legacyLayout;
+                $_SESSION[self::getSessionKey()] = $legacyLayout;
             }
         }
 

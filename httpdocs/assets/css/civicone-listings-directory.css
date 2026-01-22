@@ -234,7 +234,7 @@
 /* High contrast mode support */
 @media (prefers-contrast: high) {
     .civicone--govuk .civicone-listing-item {
-        border-width: 2px;
+        border-width: var(--space-0-5);
     }
 
     .civicone--govuk .civicone-listing-item__type {
@@ -429,7 +429,7 @@
 /* GOV.UK Details Component (Expandable) */
 .civicone--govuk .civicone-details {
     margin-bottom: var(--space-8);
-    border-left: 5px solid var(--civic-border, var(--color-govuk-grey));
+    border-left: var(--space-1) solid var(--civic-border, var(--color-govuk-grey));
     padding-left: var(--space-5);
 }
 
@@ -489,7 +489,7 @@
 .civicone--govuk .civicone-listing-detail__social {
     margin-top: var(--space-10);
     padding-top: var(--space-8);
-    border-top: 2px solid var(--civic-border, var(--color-gray-200));
+    border-top: var(--space-0-5) solid var(--civic-border, var(--color-gray-200));
 }
 
 [data-theme="dark"] .civicone--govuk .civicone-listing-detail__social {
@@ -514,7 +514,7 @@
 .civicone--govuk .civicone-notification {
     padding: var(--space-4);
     margin-bottom: var(--space-5);
-    border-left: 5px solid;
+    border-left: var(--space-1) solid;
     background: var(--civic-bg-card, var(--color-gray-100));
 }
 
@@ -650,7 +650,7 @@
 
 .civicone--govuk .civicone-form-group--error {
     padding-left: var(--space-4);
-    border-left: 5px solid var(--color-govuk-red); /* GOV.UK Error Red */
+    border-left: var(--space-1) solid var(--color-govuk-red); /* GOV.UK Error Red */
 }
 
 /* Labels */
@@ -688,7 +688,7 @@
     font-weight: 700;
     color: var(--color-govuk-red);
     background: #fff5f5;
-    border-left: 5px solid var(--color-govuk-red);
+    border-left: var(--space-1) solid var(--color-govuk-red);
 }
 
 [data-theme="dark"] .civicone--govuk .civicone-error-message {
@@ -766,7 +766,7 @@
 .civicone--govuk .civicone-radios__item {
     display: block;
     position: relative;
-    min-height: 40px;
+    min-height: var(--space-10);
     margin-bottom: var(--space-3);
     padding-left: var(--space-10);
     clear: left;
@@ -777,8 +777,8 @@
     z-index: 1;
     top: 0;
     left: 0;
-    width: 40px;
-    height: 40px;
+    width: var(--space-10);
+    height: var(--space-10);
     cursor: pointer;
     margin: 0;
     opacity: 0;
@@ -796,10 +796,10 @@
     content: "";
     box-sizing: border-box;
     position: absolute;
-    top: 15px;
-    left: 15px;
-    width: 40px;
-    height: 40px;
+    top: var(--space-4);
+    left: var(--space-4);
+    width: var(--space-10);
+    height: var(--space-10);
     border: 2px solid currentColor;
     border-radius: 50%;
     background: transparent;
@@ -854,7 +854,7 @@
 .civicone--govuk .civicone-select {
     box-sizing: border-box;
     width: 100%;
-    height: 40px;
+    height: var(--space-10);
     margin-bottom: 0;
     padding: var(--space-1);
     border: 2px solid var(--color-govuk-black);
@@ -886,7 +886,7 @@
 .civicone--govuk .civicone-input {
     box-sizing: border-box;
     width: 100%;
-    height: 40px;
+    height: var(--space-10);
     margin-bottom: 0;
     padding: var(--space-1);
     border: 2px solid var(--color-govuk-black);
@@ -1029,7 +1029,7 @@
 .civicone--govuk .civicone-form-section {
     margin-top: var(--space-16);
     padding-top: var(--space-8);
-    border-top: 2px solid var(--civic-border, var(--color-gray-200));
+    border-top: var(--space-0-5) solid var(--civic-border, var(--color-gray-200));
 }
 
 .civicone--govuk .civicone-form-section--danger {
@@ -1080,11 +1080,11 @@
     .civicone--govuk .civicone-textarea,
     .civicone--govuk .civicone-select,
     .civicone--govuk .civicone-file-upload {
-        border-width: 3px;
+        border-width: var(--space-1);
     }
 
     .civicone--govuk .civicone-radios__label::before {
-        border-width: 3px;
+        border-width: var(--space-1);
     }
 }
 

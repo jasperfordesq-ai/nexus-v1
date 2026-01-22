@@ -79,7 +79,7 @@
         color: var(--civicone-brand);
         font-weight: bold;
         flex-shrink: 0;
-        margin-top: 2px;
+        margin-top: var(--space-0-5);
     }
 
     .partner-funding-image img {
@@ -217,7 +217,7 @@
         }
 
         .partner-logos-grid img {
-            height: 80px;
+            height: var(--space-20);
         }
     }
 }

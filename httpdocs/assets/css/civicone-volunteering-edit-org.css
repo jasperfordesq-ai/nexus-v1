@@ -10,7 +10,7 @@
     right: 0;
     bottom: 0;
     z-index: -1;
-    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 25%, #e2e8f0 50%, #f1f5f9 75%, #f8fafc 100%);
+    background: linear-gradient(135deg, var(--color-slate-50) 0%, var(--color-slate-100) 25%, var(--color-slate-200) 50%, var(--color-slate-100) 75%, var(--color-slate-50) 100%);
 }
 
 .edit-org-glass-bg::before {
@@ -28,7 +28,7 @@
 }
 
 [data-theme="dark"] .edit-org-glass-bg {
-    background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%);
+    background: linear-gradient(135deg, var(--color-slate-900) 0%, var(--color-slate-800) 50%, var(--color-slate-900) 100%);
 }
 
 [data-theme="dark"] .edit-org-glass-bg::before {
@@ -44,7 +44,7 @@
 
 /* Container */
 .edit-org-container {
-    padding: 120px 24px 40px 24px;
+    padding: 120px var(--space-6) var(--space-10) var(--space-6);
     position: relative;
     z-index: 20;
     max-width: 700px;
@@ -59,8 +59,8 @@
     align-items: center;
     gap: 8px;
     background: rgba(255, 255, 255, 0.6);
-    padding: 10px 18px;
-    border-radius: 12px;
+    padding: var(--space-2-5) var(--space-4-5);
+    border-radius: var(--radius-lg);
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
     font-weight: 600;
@@ -77,7 +77,7 @@
 [data-theme="dark"] .edit-org-back-link {
     background: rgba(30, 41, 59, 0.6);
     border-color: rgba(255, 255, 255, 0.1);
-    color: #e2e8f0;
+    color: var(--color-slate-200);
 }
 
 [data-theme="dark"] .edit-org-back-link:hover {
@@ -92,7 +92,7 @@
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
     border: 1px solid rgba(255, 255, 255, 0.5);
-    border-radius: 20px;
+    border-radius: var(--radius-2xl);
     box-shadow: 0 8px 32px rgba(31, 38, 135, 0.1);
     padding: 30px;
     animation: fadeInUp 0.4s ease-out;
@@ -114,9 +114,9 @@
 .edit-org-card-header {
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: var(--space-3);
     margin-bottom: 25px;
-    padding-bottom: 20px;
+    padding-bottom: var(--space-5);
     border-bottom: 1px solid rgba(0, 0, 0, 0.06);
 }
 
@@ -125,10 +125,10 @@
 }
 
 .edit-org-card-icon {
-    width: 48px;
-    height: 48px;
-    background: linear-gradient(135deg, #14b8a6, #0d9488);
-    border-radius: 12px;
+    width: var(--space-12);
+    height: var(--space-12);
+    background: linear-gradient(135deg, var(--color-teal-500), var(--color-teal-600));
+    border-radius: var(--radius-lg);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -140,16 +140,16 @@
     margin: 0;
     font-size: 1.35rem;
     font-weight: 700;
-    color: #111827;
+    color: var(--color-gray-900);
 }
 
 [data-theme="dark"] .edit-org-card-title {
-    color: #f1f5f9;
+    color: var(--color-slate-100);
 }
 
 /* Form Group */
 .edit-org-form-group {
-    margin-bottom: 22px;
+    margin-bottom: var(--space-5-5);
 }
 
 .edit-org-label {
@@ -157,33 +157,33 @@
     font-weight: 600;
     margin-bottom: 8px;
     font-size: 0.9rem;
-    color: #374151;
+    color: var(--color-gray-700);
 }
 
 [data-theme="dark"] .edit-org-label {
-    color: #e2e8f0;
+    color: var(--color-slate-200);
 }
 
 /* Form Inputs */
 .edit-org-input,
 .edit-org-textarea {
     width: 100%;
-    padding: 14px 16px;
+    padding: var(--space-3-5) 16px;
     border: 1px solid #d1d5db;
-    border-radius: 10px;
+    border-radius: var(--radius-md);
     font-size: 1rem;
     font-family: inherit;
     transition: all 0.2s ease;
     background: rgba(255, 255, 255, 0.8);
-    color: #1f2937;
-    min-height: 44px;
+    color: var(--color-gray-800);
+    min-height: var(--space-11);
     box-sizing: border-box;
 }
 
 .edit-org-input:focus,
 .edit-org-textarea:focus {
     outline: none;
-    border-color: #14b8a6;
+    border-color: var(--color-teal-500);
     box-shadow: 0 0 0 3px rgba(20, 184, 166, 0.15);
     background: #fff;
 }
@@ -192,12 +192,12 @@
 [data-theme="dark"] .edit-org-textarea {
     background: rgba(15, 23, 42, 0.5);
     border-color: rgba(255, 255, 255, 0.15);
-    color: #f1f5f9;
+    color: var(--color-slate-100);
 }
 
 [data-theme="dark"] .edit-org-input:focus,
 [data-theme="dark"] .edit-org-textarea:focus {
-    border-color: #14b8a6;
+    border-color: var(--color-teal-500);
     background: rgba(15, 23, 42, 0.7);
 }
 
@@ -208,10 +208,10 @@
 
 /* Feature Box - Auto Pay */
 .edit-org-feature-box {
-    margin-bottom: 22px;
+    margin-bottom: var(--space-5-5);
     background: linear-gradient(135deg, rgba(139, 92, 246, 0.08), rgba(168, 85, 247, 0.05));
     border: 1px solid rgba(139, 92, 246, 0.2);
-    padding: 18px;
+    padding: var(--space-4-5);
     border-radius: 14px;
 }
 
@@ -223,21 +223,21 @@
 .edit-org-feature-label {
     display: flex;
     align-items: flex-start;
-    gap: 12px;
+    gap: var(--space-3);
     cursor: pointer;
 }
 
 .edit-org-feature-checkbox {
-    margin-top: 3px;
-    width: 18px;
-    height: 18px;
-    accent-color: #8b5cf6;
+    margin-top: var(--space-1);
+    width: var(--space-4-5);
+    height: var(--space-4-5);
+    accent-color: var(--color-purple-500);
 }
 
 .edit-org-feature-title {
     font-weight: 700;
-    color: #7c3aed;
-    margin: 0 0 6px 0;
+    color: var(--color-primary-700);
+    margin: 0 0 var(--space-1-5) 0;
     font-size: 0.95rem;
 }
 
@@ -258,10 +258,10 @@
 
 /* Quick Actions Box */
 .edit-org-quick-actions {
-    margin-bottom: 22px;
+    margin-bottom: var(--space-5-5);
     background: linear-gradient(135deg, rgba(79, 70, 229, 0.08), rgba(99, 102, 241, 0.05));
     border: 1px solid rgba(79, 70, 229, 0.15);
-    padding: 18px;
+    padding: var(--space-4-5);
     border-radius: 14px;
 }
 
@@ -273,19 +273,19 @@
 .edit-org-quick-actions-title {
     font-size: 0.8rem;
     font-weight: 600;
-    color: #6366f1;
+    color: var(--color-primary-500);
     text-transform: uppercase;
     letter-spacing: 0.5px;
-    margin: 0 0 12px 0;
+    margin: 0 0 var(--space-3) 0;
 }
 
 [data-theme="dark"] .edit-org-quick-actions-title {
-    color: #a5b4fc;
+    color: var(--color-primary-300);
 }
 
 .edit-org-quick-actions-grid {
     display: flex;
-    gap: 10px;
+    gap: var(--space-2-5);
     flex-wrap: wrap;
 }
 
@@ -297,17 +297,17 @@
     align-items: center;
     justify-content: center;
     gap: 8px;
-    padding: 12px 18px;
-    border-radius: 10px;
+    padding: var(--space-3) var(--space-4-5);
+    border-radius: var(--radius-md);
     font-weight: 600;
     font-size: 0.9rem;
     text-decoration: none;
     transition: all 0.2s ease;
-    min-height: 44px;
+    min-height: var(--space-11);
 }
 
 .edit-org-quick-btn--primary {
-    background: linear-gradient(135deg, #4f46e5, #7c3aed);
+    background: linear-gradient(135deg, var(--color-primary-600), var(--color-primary-700));
     color: white;
     box-shadow: 0 4px 12px rgba(79, 70, 229, 0.25);
 }
@@ -319,7 +319,7 @@
 
 .edit-org-quick-btn--secondary {
     background: rgba(255, 255, 255, 0.8);
-    color: #374151;
+    color: var(--color-gray-700);
     border: 1px solid rgba(0, 0, 0, 0.08);
 }
 
@@ -331,7 +331,7 @@
 [data-theme="dark"] .edit-org-quick-btn--secondary {
     background: rgba(51, 65, 85, 0.6);
     border-color: rgba(255, 255, 255, 0.1);
-    color: #e2e8f0;
+    color: var(--color-slate-200);
 }
 
 [data-theme="dark"] .edit-org-quick-btn--secondary:hover {
@@ -341,9 +341,9 @@
 /* Form Actions */
 .edit-org-form-actions {
     display: flex;
-    gap: 12px;
-    margin-top: 28px;
-    padding-top: 20px;
+    gap: var(--space-3);
+    margin-top: var(--space-7);
+    padding-top: var(--space-5);
     border-top: 1px solid rgba(0, 0, 0, 0.06);
 }
 
@@ -357,15 +357,15 @@
     align-items: center;
     justify-content: center;
     gap: 8px;
-    padding: 14px 24px;
-    border-radius: 12px;
+    padding: var(--space-3-5) var(--space-6);
+    border-radius: var(--radius-lg);
     font-weight: 600;
     font-size: 0.95rem;
     text-decoration: none;
     cursor: pointer;
     border: none;
     transition: all 0.2s ease;
-    min-height: 48px;
+    min-height: var(--space-12);
 }
 
 .edit-org-btn:active {
@@ -374,7 +374,7 @@
 
 .edit-org-btn--primary {
     flex: 1;
-    background: linear-gradient(135deg, #14b8a6, #0d9488);
+    background: linear-gradient(135deg, var(--color-teal-500), var(--color-teal-600));
     color: white;
     box-shadow: 0 4px 12px rgba(20, 184, 166, 0.25);
 }
@@ -386,24 +386,24 @@
 
 .edit-org-btn--secondary {
     background: rgba(255, 255, 255, 0.8);
-    color: #6b7280;
+    color: var(--color-gray-500);
     border: 1px solid rgba(0, 0, 0, 0.08);
 }
 
 .edit-org-btn--secondary:hover {
     background: rgba(255, 255, 255, 0.95);
-    color: #374151;
+    color: var(--color-gray-700);
 }
 
 [data-theme="dark"] .edit-org-btn--secondary {
     background: rgba(51, 65, 85, 0.6);
     border-color: rgba(255, 255, 255, 0.1);
-    color: #94a3b8;
+    color: var(--color-slate-400);
 }
 
 [data-theme="dark"] .edit-org-btn--secondary:hover {
     background: rgba(51, 65, 85, 0.8);
-    color: #e2e8f0;
+    color: var(--color-slate-200);
 }
 
 /* Focus States */
@@ -422,8 +422,8 @@
     left: 0;
     right: 0;
     z-index: 10001;
-    padding: 12px 20px;
-    background: linear-gradient(135deg, #ef4444, #dc2626);
+    padding: var(--space-3) var(--space-5);
+    background: linear-gradient(135deg, var(--color-error-500), var(--color-error-600));
     color: white;
     font-size: 0.9rem;
     font-weight: 600;
@@ -448,23 +448,23 @@
 /* Mobile Responsiveness */
 @media (max-width: 768px) {
     .edit-org-container {
-        padding: 100px 16px 40px 16px;
+        padding: 100px 16px var(--space-10) 16px;
     }
 
     .edit-org-card {
-        padding: 22px;
-        border-radius: 16px;
+        padding: var(--space-5-5);
+        border-radius: var(--radius-xl);
     }
 
     .edit-org-card-header {
         flex-direction: column;
         align-items: flex-start;
-        gap: 10px;
+        gap: var(--space-2-5);
     }
 
     .edit-org-btn {
         min-height: 52px;
-        padding: 16px 20px;
+        padding: 16px var(--space-5);
     }
 
     .edit-org-input,
@@ -494,12 +494,12 @@ html {
 
 /* Utility Classes for Icons */
 .edit-org-label-icon {
-    margin-right: 6px;
+    margin-right: var(--space-1-5);
     opacity: 0.6;
 }
 
 .edit-org-feature-icon {
-    margin-right: 6px;
+    margin-right: var(--space-1-5);
 }
 
 .edit-org-quick-actions-icon {
@@ -508,5 +508,5 @@ html {
 
 /* Back Link Container */
 .edit-org-back-link-container {
-    margin-bottom: 24px;
+    margin-bottom: var(--space-6);
 }

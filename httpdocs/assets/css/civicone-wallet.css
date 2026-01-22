@@ -14,7 +14,7 @@
 
     /* Focus Ring - GOV.UK Style */
     --civic-wallet-focus-ring: var(--color-brand-yellow);
-    --civic-wallet-focus-text: #0B0C0C;
+    --civic-wallet-focus-text: var(--color-govuk-black);
     --civic-wallet-focus-offset: 3px;
 
     /* Touch Target */
@@ -25,7 +25,7 @@
 
     /* Transaction Colors */
     --civic-wallet-positive: var(--color-govuk-green-darker);
-    --civic-wallet-negative: #D32F2F;
+    --civic-wallet-negative: var(--color-error-600);
 }
 
 /* Dark mode tokens */
@@ -34,7 +34,7 @@
     --civic-wallet-text-secondary: var(--color-gray-200);
     --civic-wallet-text-muted: var(--color-gray-300);
     --civic-wallet-border: var(--color-gray-700);
-    --civic-wallet-positive: #4fd1c5;
+    --civic-wallet-positive: var(--color-teal-400);
     --civic-wallet-negative: #fc8181;
 }
 
@@ -43,7 +43,7 @@
    Balance Card
    -------------------------------------------- */
 .civic-balance-card {
-    border-left: var(--space-3) solid var(--civic-brand, #1D70B8);
+    border-left: var(--space-3) solid var(--civic-brand, var(--color-govuk-blue));
 }
 
 .civic-balance-amount {
@@ -126,8 +126,8 @@
     outline: 3px solid var(--govuk-focus-colour, var(--color-brand-yellow));
     outline-offset: 0;
     background-color: var(--govuk-focus-colour, var(--color-brand-yellow));
-    color: var(--govuk-focus-text-colour, #0b0c0c);
-    box-shadow: 0 -2px var(--govuk-focus-colour, var(--color-brand-yellow)), 0 4px var(--govuk-focus-text-colour, #0b0c0c);
+    color: var(--govuk-focus-text-colour, var(--color-govuk-black));
+    box-shadow: 0 -2px var(--govuk-focus-colour, var(--color-brand-yellow)), 0 4px var(--govuk-focus-text-colour, var(--color-govuk-black));
 }
 
 .civic-user-avatar {
@@ -221,8 +221,8 @@
     outline: 3px solid var(--govuk-focus-colour, var(--color-brand-yellow));
     outline-offset: 0;
     background-color: var(--govuk-focus-colour, var(--color-brand-yellow));
-    color: var(--govuk-focus-text-colour, #0b0c0c);
-    box-shadow: 0 -2px var(--govuk-focus-colour, var(--color-brand-yellow)), 0 4px var(--govuk-focus-text-colour, #0b0c0c);
+    color: var(--govuk-focus-text-colour, var(--color-govuk-black));
+    box-shadow: 0 -2px var(--govuk-focus-colour, var(--color-brand-yellow)), 0 4px var(--govuk-focus-text-colour, var(--color-govuk-black));
 }
 
 
@@ -231,7 +231,7 @@
    -------------------------------------------- */
 .civic-wallet-history-header {
     margin-top: var(--space-10);
-    border-top: 2px solid var(--civic-wallet-border);
+    border-top: var(--space-0-5) solid var(--civic-wallet-border);
     padding-top: var(--space-5);
 }
 
@@ -436,9 +436,9 @@
 }
 
 .insights-title-icon {
-    width: 56px;
-    height: 56px;
-    background: linear-gradient(135deg, var(--color-purple-400) 0%, #7c3aed 100%);
+    width: var(--space-14);
+    height: var(--space-14);
+    background: linear-gradient(135deg, var(--color-purple-400) 0%, var(--color-primary-700) 100%);
     border-radius: var(--radius-lg);
     display: flex;
     align-items: center;
@@ -491,8 +491,8 @@
     outline: 3px solid var(--govuk-focus-colour, var(--color-brand-yellow));
     outline-offset: 0;
     background-color: var(--govuk-focus-colour, var(--color-brand-yellow));
-    color: var(--govuk-focus-text-colour, #0b0c0c);
-    box-shadow: 0 -2px var(--govuk-focus-colour, var(--color-brand-yellow)), 0 4px var(--govuk-focus-text-colour, #0b0c0c);
+    color: var(--govuk-focus-text-colour, var(--color-govuk-black));
+    box-shadow: 0 -2px var(--govuk-focus-colour, var(--color-brand-yellow)), 0 4px var(--govuk-focus-text-colour, var(--color-govuk-black));
 }
 
 [data-theme="dark"] .insights-nav-link {
@@ -571,7 +571,7 @@
 .insights-stat-icon.purple { background: rgba(168, 85, 247, 0.15); color: var(--color-purple-400); }
 .insights-stat-icon.orange { background: rgba(251, 191, 36, 0.15); color: var(--color-warning); }
 
-[data-theme="dark"] .insights-stat-icon.green { background: rgba(16, 185, 129, 0.2); color: #34d399; }
+[data-theme="dark"] .insights-stat-icon.green { background: rgba(16, 185, 129, 0.2); color: var(--color-success-400); }
 [data-theme="dark"] .insights-stat-icon.red { background: rgba(239, 68, 68, 0.2); color: var(--color-red-400); }
 [data-theme="dark"] .insights-stat-icon.blue { background: rgba(59, 130, 246, 0.2); color: var(--color-blue-400); }
 [data-theme="dark"] .insights-stat-icon.purple { background: rgba(168, 85, 247, 0.2); color: #c084fc; }
@@ -586,7 +586,7 @@
 .insights-stat-value.positive { color: var(--color-success); }
 .insights-stat-value.negative { color: var(--color-danger); }
 
-[data-theme="dark"] .insights-stat-value.positive { color: #34d399; }
+[data-theme="dark"] .insights-stat-value.positive { color: var(--color-success-400); }
 [data-theme="dark"] .insights-stat-value.negative { color: var(--color-red-400); }
 
 .insights-stat-label {
@@ -690,7 +690,7 @@
     width: var(--space-10);
     height: var(--space-10);
     border-radius: 50%;
-    background: linear-gradient(135deg, var(--color-purple-400), #7c3aed);
+    background: linear-gradient(135deg, var(--color-purple-400), var(--color-primary-700));
     display: flex;
     align-items: center;
     justify-content: center;
@@ -732,7 +732,7 @@
 .insights-partner-amount.received { color: var(--color-success); }
 
 [data-theme="dark"] .insights-partner-amount.given { color: var(--color-red-400); }
-[data-theme="dark"] .insights-partner-amount.received { color: #34d399; }
+[data-theme="dark"] .insights-partner-amount.received { color: var(--color-success-400); }
 
 
 /* --------------------------------------------
@@ -848,8 +848,8 @@
     outline: 3px solid var(--govuk-focus-colour, var(--color-brand-yellow));
     outline-offset: 0;
     background-color: var(--govuk-focus-colour, var(--color-brand-yellow));
-    color: var(--govuk-focus-text-colour, #0b0c0c);
-    box-shadow: 0 -2px var(--govuk-focus-colour, var(--color-brand-yellow)), 0 4px var(--govuk-focus-text-colour, #0b0c0c);
+    color: var(--govuk-focus-text-colour, var(--color-govuk-black));
+    box-shadow: 0 -2px var(--govuk-focus-colour, var(--color-brand-yellow)), 0 4px var(--govuk-focus-text-colour, var(--color-govuk-black));
 }
 
 .civic-wallet-form .civic-btn {
@@ -909,16 +909,16 @@
    -------------------------------------------- */
 @media (prefers-contrast: high) {
     .insights-glass-card {
-        border-width: 3px;
+        border-width: var(--space-1);
     }
 
     .civic-selected-user {
-        border-width: 3px;
+        border-width: var(--space-1);
     }
 
     .wallet-table-desktop th,
     .wallet-table-desktop td {
-        border-width: 2px;
+        border-width: var(--space-0-5);
     }
 }
 

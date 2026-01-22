@@ -15,8 +15,8 @@
     left: 0;
     right: 0;
     z-index: 10001;
-    padding: 12px 20px;
-    background: linear-gradient(135deg, #ef4444, #dc2626);
+    padding: var(--space-3) var(--space-5);
+    background: linear-gradient(135deg, var(--color-error-500), var(--color-error-600));
     color: white;
     font-size: 0.9rem;
     font-weight: 600;
@@ -52,7 +52,7 @@ button:active {
 /* Touch Targets - WCAG 2.1 AA (44px minimum) */
 .htb-btn,
 button {
-    min-height: 44px;
+    min-height: var(--space-11);
 }
 
 /* Focus Visible */
@@ -73,7 +73,7 @@ html {
 @media (max-width: 768px) {
     .htb-btn,
     button {
-        min-height: 48px;
+        min-height: var(--space-12);
     }
 }
 
@@ -84,20 +84,20 @@ html {
 /* Wrapper container */
 .goals-delete-wrapper {
     max-width: 600px;
-    margin: 40px auto;
-    padding: 0 20px;
+    margin: var(--space-10) auto;
+    padding: 0 var(--space-5);
 }
 
 /* Card body centered */
 .goals-delete-card-body {
     text-align: center;
-    padding: 40px 20px;
+    padding: var(--space-10) var(--space-5);
 }
 
 /* Warning icon */
 .goals-delete-warning-icon {
     font-size: 48px;
-    margin-bottom: 20px;
+    margin-bottom: var(--space-5);
 }
 
 /* Title reset */
@@ -116,18 +116,18 @@ html {
 .goals-delete-actions {
     display: flex;
     justify-content: center;
-    gap: 15px;
+    gap: var(--space-4);
 }
 
 /* Danger button (delete confirmation) */
 .htb-btn-danger {
-    background: #ef4444;
+    background: var(--color-error-500);
     color: white;
     border: none;
 }
 
 .htb-btn-danger:hover {
-    background: #dc2626;
+    background: var(--color-error-600);
 }
 
 /* ========================================
@@ -141,15 +141,15 @@ html {
 
 [data-theme="dark"] .htb-card h2,
 [data-theme="dark"] .goals-delete-title {
-    color: #f1f5f9;
+    color: var(--color-slate-100);
 }
 
 [data-theme="dark"] .goals-delete-description {
-    color: #94a3b8;
+    color: var(--color-slate-400);
 }
 
 [data-theme="dark"] .htb-btn-secondary {
     background: rgba(51, 65, 85, 0.6) !important;
     border-color: rgba(255, 255, 255, 0.15) !important;
-    color: #e2e8f0 !important;
+    color: var(--color-slate-200) !important;
 }

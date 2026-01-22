@@ -306,7 +306,7 @@
 }
 
 .feed-volunteer-title {
-    margin-bottom: 5px;
+    margin-bottom: var(--space-1);
 }
 
 .feed-volunteer-location {
@@ -352,7 +352,7 @@
 }
 
 .feed-event-title {
-    margin-bottom: 5px;
+    margin-bottom: var(--space-1);
 }
 
 .feed-event-location {
@@ -453,7 +453,7 @@
     border-radius: var(--radius-base);
     padding: var(--space-3) var(--space-4);
     margin-top: var(--space-2);
-    border-left: 3px solid var(--color-amber-300);
+    border-left: var(--space-1) solid var(--color-amber-300);
 }
 
 .feed-review-comment i {
