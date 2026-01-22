@@ -1,6 +1,7 @@
 /**
  * Post Box Home - Modern Styles
  * Glassmorphic design with responsive layout
+  * Fully Migrated to Design Tokens: 2026-01-21 ✓
  */
 
 /* ==========================================
@@ -237,17 +238,17 @@
 }
 
 .badge-offer {
-    background: linear-gradient(135deg, #059669, #34d399);
+    background: linear-gradient(135deg, var(--color-emerald-600), var(--color-emerald-400));
     color: white;
 }
 
 .badge-request {
-    background: linear-gradient(135deg, #f97316, #f43f5e);
+    background: linear-gradient(135deg, var(--color-orange-500), var(--color-rose-500));
     color: white;
 }
 
 .badge-event {
-    background: linear-gradient(135deg, #6366f1, #8b5cf6);
+    background: linear-gradient(135deg, var(--color-primary-500), var(--color-purple-500));
     color: white;
 }
 
@@ -1006,7 +1007,7 @@
 }
 
 [data-theme="dark"] .modal-container {
-    background: #1e293b;
+    background: var(--color-slate-800);
 }
 
 [data-theme="dark"] .btn-secondary {

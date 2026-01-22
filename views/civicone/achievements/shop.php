@@ -113,12 +113,7 @@ require dirname(__DIR__, 2) . '/layouts/civicone/header.php';
     </div>
 </div>
 
-<!-- JS moved to /assets/js/civicone-achievements.js (2026-01-19) -->
-<script>
-// Initialize shop purchase with basePath
-document.addEventListener('DOMContentLoaded', function() {
-    initShopPurchase('<?= $basePath ?>');
-});
-</script>
+<!-- Page-specific JavaScript -->
+<script src="/assets/js/civicone-achievements.min.js" defer></script>
 
 <?php require dirname(__DIR__, 2) . '/layouts/civicone/footer.php'; ?>

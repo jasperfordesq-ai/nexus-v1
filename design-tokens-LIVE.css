@@ -1,0 +1,307 @@
+/**
+ * Design Tokens - Foundation System
+ * Central source of truth for all design values
+ * Version: 2.0 - Path to 100/100
+ */
+
+:root {
+    /* ==========================================
+       SPACING SCALE - 8px base unit
+       ========================================== */
+    --space-0: 0;
+    --space-1: 4px;      /* 0.25rem - Micro spacing */
+    --space-2: 8px;      /* 0.5rem - Tight spacing */
+    --space-3: 12px;     /* 0.75rem - Compact spacing */
+    --space-4: 16px;     /* 1rem - Default spacing */
+    --space-5: 20px;     /* 1.25rem - Comfortable spacing */
+    --space-6: 24px;     /* 1.5rem - Generous spacing */
+    --space-8: 32px;     /* 2rem - Section spacing */
+    --space-10: 40px;    /* 2.5rem - Large spacing */
+    --space-12: 48px;    /* 3rem - XL spacing */
+    --space-16: 64px;    /* 4rem - XXL spacing */
+    --space-20: 80px;    /* 5rem - Hero spacing */
+
+    /* ==========================================
+       LAYOUT DIMENSIONS - Prevents CLS
+       ========================================== */
+    --layout-header-height: 56px;
+    --layout-header-height-scrolled: 48px;
+    --layout-mobile-nav-height: 84px;
+    --layout-sidebar-width: 340px;
+    --layout-sidebar-width-tablet: 300px;
+    --layout-max-content-width: 1200px;
+    --layout-grid-gap: var(--space-6);
+    --layout-grid-gap-mobile: var(--space-3);
+
+    /* ==========================================
+       COLORS - Theme-aware system
+       ========================================== */
+
+    /* Primary palette */
+    --color-primary-50: #eef2ff;
+    --color-primary-100: #e0e7ff;
+    --color-primary-200: #c7d2fe;
+    --color-primary-300: #a5b4fc;
+    --color-primary-400: #818cf8;
+    --color-primary-500: #6366f1;
+    --color-primary-600: #4f46e5;
+    --color-primary-700: #4338ca;
+    --color-primary-800: #3730a3;
+    --color-primary-900: #312e81;
+
+    /* Semantic colors */
+    --color-success: #10b981;   /* Green */
+    --color-warning: #f59e0b;   /* Amber */
+    --color-danger: #ef4444;    /* Red */
+    --color-info: #3b82f6;      /* Blue */
+
+    /* Extended palette - Additional colors for UI variety */
+    --color-pink-500: #ec4899;  /* Pink - Used for likes, volunteer */
+    --color-purple-500: #8b5cf6; /* Purple - Used for polls, magic */
+    --color-orange-500: #f97316; /* Orange - Used for help, alerts */
+    --color-orange-600: #ea580c; /* Orange 600 - Used for admin sections */
+
+    /* Neutral palette - Light theme */
+    --color-gray-50: #f9fafb;
+    --color-gray-100: #f3f4f6;
+    --color-gray-200: #e5e7eb;
+    --color-gray-300: #d1d5db;
+    --color-gray-400: #9ca3af;
+    --color-gray-500: #6b7280;
+    --color-gray-600: #4b5563;
+    --color-gray-700: #374151;
+    --color-gray-800: #1f2937;
+    --color-gray-900: #111827;
+
+    /* ==========================================
+       GLASSMORPHISM SYSTEM
+       ========================================== */
+    --glass-blur: 24px;
+    --glass-blur-heavy: 40px;
+    --glass-blur-subtle: 12px;
+    --glass-saturation: 200%;
+    --glass-bg-light: rgba(255, 255, 255, 0.7);
+    --glass-bg-dark: rgba(30, 41, 59, 0.7);
+    --glass-border-light: rgba(255, 255, 255, 0.2);
+    --glass-border-dark: rgba(255, 255, 255, 0.1);
+
+    /* ==========================================
+       TYPOGRAPHY
+       ========================================== */
+    --font-family-primary: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    --font-family-display: "Outfit", var(--font-family-primary);
+
+    --font-size-xs: 0.75rem;    /* 12px */
+    --font-size-sm: 0.875rem;   /* 14px */
+    --font-size-base: 1rem;     /* 16px */
+    --font-size-lg: 1.125rem;   /* 18px */
+    --font-size-xl: 1.25rem;    /* 20px */
+    --font-size-2xl: 1.5rem;    /* 24px */
+    --font-size-3xl: 1.875rem;  /* 30px */
+    --font-size-4xl: 2.25rem;   /* 36px */
+
+    --font-weight-normal: 400;
+    --font-weight-medium: 500;
+    --font-weight-semibold: 600;
+    --font-weight-bold: 700;
+
+    --line-height-tight: 1.25;
+    --line-height-normal: 1.5;
+    --line-height-relaxed: 1.75;
+
+    /* ==========================================
+       TRANSITIONS & ANIMATIONS
+       ========================================== */
+    --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-base: 300ms cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-slow: 500ms cubic-bezier(0.4, 0, 0.2, 1);
+
+    --ease-in: cubic-bezier(0.4, 0, 1, 1);
+    --ease-out: cubic-bezier(0, 0, 0.2, 1);
+    --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+    --ease-bounce: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+
+    /* ==========================================
+       SHADOWS
+       ========================================== */
+    --shadow-xs: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    --shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
+    --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+    --shadow-2xl: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+
+    /* Glass shadows */
+    --shadow-glass: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+    --shadow-glass-inset: inset 0 0 0 1px rgba(255, 255, 255, 0.18);
+
+    /* ==========================================
+       BORDER RADIUS
+       ========================================== */
+    --radius-none: 0;
+    --radius-sm: 4px;
+    --radius-base: 8px;
+    --radius-md: 12px;
+    --radius-lg: 16px;
+    --radius-xl: 20px;
+    --radius-2xl: 24px;
+    --radius-full: 9999px;
+
+    /* ==========================================
+       Z-INDEX SCALE
+       Documented hierarchy to prevent z-index wars
+
+       Layer Groups:
+       - Base (0-99): In-flow elements, local stacking
+       - Navigation (100-199): Headers, navbars, sticky elements
+       - Overlays (200-299): Dropdowns, menus, popovers
+       - Modals (300-399): Modal backdrops and dialogs
+       - Notifications (400-499): Toasts, alerts, tooltips
+       - Critical (500+): Emergency overlays, system UI
+       ========================================== */
+
+    /* Base layer - default stacking */
+    --z-base: 0;
+    --z-raised: 1;
+    --z-above: 10;
+
+    /* Navigation layer - sticky headers, navbars */
+    --z-header: 100;
+    --z-sticky: 110;
+    --z-navbar: 120;
+    --z-mega-menu: 130;
+
+    /* Overlay layer - dropdowns, popovers */
+    --z-dropdown: 200;
+    --z-popover: 210;
+    --z-drawer: 220;
+    --z-sidebar-overlay: 230;
+
+    /* Modal layer - dialogs, sheets */
+    --z-modal-backdrop: 300;
+    --z-modal: 310;
+    --z-mobile-sheet-backdrop: 320;
+    --z-mobile-sheet: 330;
+
+    /* Notification layer - toasts, tooltips */
+    --z-toast: 400;
+    --z-tooltip: 410;
+    --z-notification: 420;
+
+    /* Critical layer - system UI that must be on top */
+    --z-ai-widget: 500;
+    --z-loading-overlay: 510;
+    --z-emergency: 9999;
+
+    /* ==========================================
+       BREAKPOINTS (for JS usage)
+       ========================================== */
+    --breakpoint-sm: 480px;
+    --breakpoint-md: 768px;
+    --breakpoint-lg: 1024px;
+    --breakpoint-xl: 1280px;
+    --breakpoint-2xl: 1536px;
+}
+
+/* ==========================================
+   DARK THEME OVERRIDES
+   ========================================== */
+[data-theme="dark"] {
+    /* Inverted gray scale for dark mode */
+    --color-gray-50: #111827;
+    --color-gray-100: #1f2937;
+    --color-gray-200: #374151;
+    --color-gray-300: #4b5563;
+    --color-gray-400: #6b7280;
+    --color-gray-500: #9ca3af;
+    --color-gray-600: #d1d5db;
+    --color-gray-700: #e5e7eb;
+    --color-gray-800: #f3f4f6;
+    --color-gray-900: #f9fafb;
+
+    /* Glassmorphism for dark mode */
+    --glass-bg-light: rgba(30, 41, 59, 0.7);
+    --glass-border-light: rgba(255, 255, 255, 0.1);
+
+    /* Semantic background hierarchy */
+    --bg-base: #0f172a;
+    --bg-elevated: #1e293b;
+    --bg-surface: #334155;
+    --bg-hover: #475569;
+
+    /* Semantic text hierarchy */
+    --text-primary: #f8fafc;
+    --text-secondary: #cbd5e1;
+    --text-muted: #94a3b8;
+    --text-disabled: #64748b;
+
+    /* Semantic border colors */
+    --border-default: rgba(255, 255, 255, 0.1);
+    --border-subtle: rgba(255, 255, 255, 0.05);
+    --border-strong: rgba(255, 255, 255, 0.2);
+
+    /* Enhanced glassmorphism */
+    --glass-bg: rgba(30, 41, 59, 0.8);
+    --glass-bg-heavy: rgba(15, 23, 42, 0.9);
+    --glass-border: rgba(255, 255, 255, 0.08);
+    --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+
+    /* Surface overlays */
+    --overlay-light: rgba(255, 255, 255, 0.05);
+    --overlay-medium: rgba(255, 255, 255, 0.1);
+    --overlay-heavy: rgba(255, 255, 255, 0.15);
+
+    /* Primary color adjustments */
+    --color-primary-hover: #818cf8;
+    --color-primary-active: #a5b4fc;
+}
+
+/* Light theme semantic tokens (explicit defaults) */
+:root {
+    --bg-base: #f9fafb;
+    --bg-elevated: #ffffff;
+    --bg-surface: #f3f4f6;
+    --bg-hover: #e5e7eb;
+
+    --text-primary: #111827;
+    --text-secondary: #4b5563;
+    --text-muted: #6b7280;
+    --text-disabled: #9ca3af;
+
+    --border-default: rgba(0, 0, 0, 0.1);
+    --border-subtle: rgba(0, 0, 0, 0.05);
+    --border-strong: rgba(0, 0, 0, 0.2);
+
+    --glass-bg: rgba(255, 255, 255, 0.8);
+    --glass-bg-heavy: rgba(255, 255, 255, 0.95);
+    --glass-border: rgba(0, 0, 0, 0.08);
+    --glass-shadow: 0 8px 32px rgba(31, 38, 135, 0.15);
+
+    --overlay-light: rgba(0, 0, 0, 0.03);
+    --overlay-medium: rgba(0, 0, 0, 0.06);
+    --overlay-heavy: rgba(0, 0, 0, 0.1);
+
+    --color-primary-hover: #4f46e5;
+    --color-primary-active: #4338ca;
+}
+
+/* ==========================================
+   REDUCED MOTION SUPPORT
+   ========================================== */
+@media (prefers-reduced-motion: reduce) {
+    :root {
+        --transition-fast: 0ms;
+        --transition-base: 0ms;
+        --transition-slow: 0ms;
+    }
+}
+
+/* ==========================================
+   PRINT OPTIMIZATIONS
+   ========================================== */
+@media print {
+    :root {
+        --glass-blur: 0px;
+        --shadow-glass: none;
+    }
+}

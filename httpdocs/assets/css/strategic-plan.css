@@ -1,6 +1,7 @@
 /**
  * Strategic Plan Page - Modern Theme
  * Styles for the strategic plan 2026-2030 page
+  * Fully Migrated to Design Tokens: 2026-01-21 ✓
  */
 
 /* ============================================
@@ -82,7 +83,7 @@
 .strategic-plan-header .header-divider {
     width: 80px;
     height: var(--space-1);
-    background: var(--htb-accent, #2563eb);
+    background: var(--htb-accent, var(--color-blue-600));
     margin: 0 auto var(--space-5);
     border-radius: var(--radius-sm);
 }
@@ -108,18 +109,18 @@
 
 [data-theme="light"] .strategic-plan-header .download-btn {
     background: white;
-    border: 2px solid var(--htb-accent, #2563eb);
-    color: var(--htb-accent, #2563eb);
+    border: 2px solid var(--htb-accent, var(--color-blue-600));
+    color: var(--htb-accent, var(--color-blue-600));
 }
 
 [data-theme="dark"] .strategic-plan-header .download-btn {
     background: rgba(37, 99, 235, 0.1);
-    border: 2px solid var(--htb-accent, #2563eb);
-    color: var(--htb-accent, #2563eb);
+    border: 2px solid var(--htb-accent, var(--color-blue-600));
+    color: var(--htb-accent, var(--color-blue-600));
 }
 
 .strategic-plan-header .download-btn:hover {
-    background: var(--htb-accent, #2563eb);
+    background: var(--htb-accent, var(--color-blue-600));
     color: white;
 }
 
@@ -171,7 +172,7 @@
 }
 
 .strategic-plan-toc h3 {
-    color: var(--htb-accent, #2563eb);
+    color: var(--htb-accent, var(--color-blue-600));
     margin: 0 0 var(--space-4) 0;
     padding-bottom: var(--space-3);
     border-bottom: 1px solid var(--htb-border, rgba(0, 0, 0, 0.1));
@@ -199,7 +200,7 @@
 }
 
 .strategic-plan-toc a:hover {
-    color: var(--htb-accent, #2563eb);
+    color: var(--htb-accent, var(--color-blue-600));
 }
 
 /* ============================================
@@ -226,7 +227,7 @@
 }
 
 .strategic-plan-section h2 {
-    color: var(--htb-accent, #2563eb);
+    color: var(--htb-accent, var(--color-blue-600));
     margin: 0 0 var(--space-5) 0;
     padding-bottom: var(--space-3);
     border-bottom: 2px solid var(--htb-border, rgba(0, 0, 0, 0.05));
@@ -273,7 +274,7 @@
 }
 
 .strategic-plan-highlight h3 {
-    color: var(--htb-accent, #2563eb);
+    color: var(--htb-accent, var(--color-blue-600));
     margin: 0 0 var(--space-3) 0;
 }
 
@@ -351,11 +352,11 @@
 }
 
 .strategic-plan-swot-item--strengths h4 {
-    color: #047857;
+    color: var(--color-emerald-700);
 }
 
 [data-theme="dark"] .strategic-plan-swot-item--strengths h4 {
-    color: #34d399;
+    color: var(--color-emerald-400);
 }
 
 /* Weaknesses */
@@ -370,30 +371,30 @@
 }
 
 .strategic-plan-swot-item--weaknesses h4 {
-    color: #b91c1c;
+    color: var(--color-red-700);
 }
 
 [data-theme="dark"] .strategic-plan-swot-item--weaknesses h4 {
-    color: #f87171;
+    color: var(--color-red-400);
 }
 
 /* Opportunities */
 [data-theme="light"] .strategic-plan-swot-item--opportunities {
     background: rgba(239, 246, 255, 0.9);
-    border-top-color: #2563eb;
+    border-top-color: var(--color-blue-600);
 }
 
 [data-theme="dark"] .strategic-plan-swot-item--opportunities {
     background: rgba(37, 99, 235, 0.1);
-    border-top-color: #2563eb;
+    border-top-color: var(--color-blue-600);
 }
 
 .strategic-plan-swot-item--opportunities h4 {
-    color: #1d4ed8;
+    color: var(--color-blue-700);
 }
 
 [data-theme="dark"] .strategic-plan-swot-item--opportunities h4 {
-    color: #60a5fa;
+    color: var(--color-blue-400);
 }
 
 /* Threats */
@@ -408,11 +409,11 @@
 }
 
 .strategic-plan-swot-item--threats h4 {
-    color: #b45309;
+    color: var(--color-amber-700);
 }
 
 [data-theme="dark"] .strategic-plan-swot-item--threats h4 {
-    color: #fbbf24;
+    color: var(--color-amber-300);
 }
 
 /* ============================================
@@ -465,23 +466,23 @@
 }
 
 .strategic-plan-badge--submit {
-    background: #06b6d4;
+    background: var(--color-cyan-500);
 }
 
 .strategic-plan-badge--secure {
-    background: #10b981;
+    background: var(--color-success);
 }
 
 .strategic-plan-badge--launch {
-    background: #7c3aed;
+    background: var(--color-purple-600);
 }
 
 .strategic-plan-badge--ongoing {
-    background: #f59e0b;
+    background: var(--color-warning);
 }
 
 .strategic-plan-badge--pitch {
-    background: #06b6d4;
+    background: var(--color-cyan-500);
 }
 
 /* Center align timeline columns */

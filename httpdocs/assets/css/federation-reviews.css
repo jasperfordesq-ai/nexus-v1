@@ -12,7 +12,7 @@
     right: 0;
     z-index: 10001;
     padding: 12px 20px;
-    background: linear-gradient(135deg, #ef4444, #dc2626);
+    background: linear-gradient(135deg, var(--color-danger), var(--color-red-600));
     color: white;
     font-size: 0.9rem;
     font-weight: 600;
@@ -54,7 +54,7 @@ body.is-offline #federation-review-wrapper {
 }
 
 .back-link:hover {
-    color: #8b5cf6;
+    color: var(--color-purple-500);
     transform: translateX(-4px);
 }
 
@@ -138,7 +138,7 @@ body.is-offline #federation-review-wrapper {
     font-size: 1.75rem;
     font-weight: 800;
     margin: 0;
-    background: linear-gradient(135deg, #7c3aed, #8b5cf6, #a78bfa);
+    background: linear-gradient(135deg, var(--color-purple-600), var(--color-purple-500), var(--color-purple-400-alt));
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -147,7 +147,7 @@ body.is-offline #federation-review-wrapper {
 }
 
 .review-header h2 i {
-    background: linear-gradient(135deg, #fbbf24, #f59e0b);
+    background: linear-gradient(135deg, var(--color-amber-300), var(--color-warning));
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -160,7 +160,7 @@ body.is-offline #federation-review-wrapper {
 }
 
 [data-theme="dark"] .review-header h2 {
-    background: linear-gradient(135deg, #a78bfa, #c4b5fd);
+    background: linear-gradient(135deg, var(--color-purple-400-alt), var(--color-purple-300));
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -184,7 +184,7 @@ body.is-offline #federation-review-wrapper {
     position: absolute;
     inset: -6px;
     border-radius: 50%;
-    background: linear-gradient(135deg, #8b5cf6, #a78bfa, #c4b5fd);
+    background: linear-gradient(135deg, var(--color-purple-500), var(--color-purple-400-alt), var(--color-purple-300));
     opacity: 0.3;
     animation: rotate 3s linear infinite;
 }
@@ -204,10 +204,26 @@ body.is-offline #federation-review-wrapper {
         0 0 0 1px rgba(139, 92, 246, 0.1);
     position: relative;
     z-index: 1;
-    background: linear-gradient(135deg, #8b5cf6, #a78bfa);
+    background: linear-gradient(135deg, var(--color-purple-500), var(--color-purple-400-alt));
     display: flex;
     align-items: center;
     justify-content: center;
+}
+
+/* Avatar initial text styling */
+.avatar-initial-text {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: white;
+}
+
+/* Form label icon colors */
+.icon-amber {
+    color: #fbbf24;
+}
+
+.icon-purple {
+    color: #8b5cf6;
 }
 
 [data-theme="dark"] .avatar-lg {
@@ -233,13 +249,13 @@ body.is-offline #federation-review-wrapper {
     border-radius: 12px;
     font-size: 0.85rem;
     font-weight: 600;
-    color: #8b5cf6;
+    color: var(--color-purple-500);
 }
 
 [data-theme="dark"] .receiver-info .federation-badge {
     background: rgba(139, 92, 246, 0.2);
     border-color: rgba(139, 92, 246, 0.3);
-    color: #a78bfa;
+    color: var(--color-purple-400-alt);
 }
 
 /* Transaction Summary */
@@ -287,7 +303,7 @@ body.is-offline #federation-review-wrapper {
 }
 
 .transaction-summary .text-primary {
-    color: #8b5cf6;
+    color: var(--color-purple-500);
     font-size: 1.85rem;
     font-weight: 800;
 }
@@ -349,7 +365,7 @@ body.is-offline #federation-review-wrapper {
     border: none;
     cursor: pointer;
     font-size: 3rem;
-    color: #d1d5db;
+    color: var(--color-gray-300);
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     padding: 0;
     line-height: 1;
@@ -375,7 +391,7 @@ body.is-offline #federation-review-wrapper {
 
 .star-btn.active,
 .star-btn.hovered {
-    color: #fbbf24;
+    color: var(--color-amber-300);
     filter: drop-shadow(0 0 8px rgba(251, 191, 36, 0.6));
     transform: scale(1.1);
 }
@@ -406,7 +422,7 @@ body.is-offline #federation-review-wrapper {
 }
 
 .rating-text.text-primary {
-    color: #8b5cf6 !important;
+    color: var(--color-purple-500) !important;
     font-weight: 700;
     font-size: 1.1rem;
 }
@@ -434,7 +450,7 @@ body.is-offline #federation-review-wrapper {
 
 .form-control:focus {
     outline: none;
-    border-color: #8b5cf6;
+    border-color: var(--color-purple-500);
     box-shadow: 0 0 0 4px rgba(139, 92, 246, 0.1),
                 0 4px 12px rgba(139, 92, 246, 0.15);
     background: rgba(255, 255, 255, 0.95);
@@ -457,12 +473,12 @@ body.is-offline #federation-review-wrapper {
 }
 
 .form-text.char-warning {
-    color: #f59e0b;
+    color: var(--color-warning);
     font-weight: 600;
 }
 
 .form-text.char-danger {
-    color: #dc2626;
+    color: var(--color-red-600);
     font-weight: 600;
 }
 
@@ -474,7 +490,7 @@ body.is-offline #federation-review-wrapper {
     gap: 12px;
     width: 100%;
     padding: 18px 36px;
-    background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+    background: linear-gradient(135deg, var(--color-purple-500), var(--color-purple-600));
     color: white;
     border: none;
     border-radius: 14px;
@@ -504,7 +520,7 @@ body.is-offline #federation-review-wrapper {
 }
 
 .btn-primary:hover:not(:disabled) {
-    background: linear-gradient(135deg, #7c3aed, #6d28d9);
+    background: linear-gradient(135deg, var(--color-purple-600), var(--color-purple-700));
     box-shadow: 0 6px 24px rgba(139, 92, 246, 0.4),
                 0 2px 8px rgba(139, 92, 246, 0.3),
                 inset 0 1px 0 rgba(255, 255, 255, 0.2);
@@ -515,7 +531,7 @@ body.is-offline #federation-review-wrapper {
     opacity: 0.5;
     cursor: not-allowed;
     transform: none;
-    background: linear-gradient(135deg, #94a3b8, #64748b);
+    background: linear-gradient(135deg, var(--color-slate-400), var(--color-slate-500));
     box-shadow: none;
 }
 
@@ -542,7 +558,7 @@ body.is-offline #federation-review-wrapper {
 
 .review-guidelines i {
     margin-right: 8px;
-    color: #8b5cf6;
+    color: var(--color-purple-500);
     font-size: 1.1rem;
 }
 

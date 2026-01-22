@@ -480,7 +480,7 @@
 /* Action Buttons */
 [data-theme="dark"] .notif-action-btn.danger {
     background: rgba(185, 28, 28, 0.2);
-    color: #f87171;
+    color: var(--color-red-400);
     border-color: rgba(239, 68, 68, 0.3);
 }
 
@@ -514,7 +514,7 @@
 }
 
 [data-theme="dark"] .notif-empty p a {
-    color: #818cf8;
+    color: var(--color-primary-400);
 }
 
 /* Notification Items */
@@ -542,7 +542,7 @@
 }
 
 [data-theme="dark"] .notif-meta .view-link {
-    color: #818cf8;
+    color: var(--color-primary-400);
 }
 
 [data-theme="dark"] .notif-meta .view-link:hover {
@@ -585,5 +585,5 @@
 
 [data-theme="dark"] .notif-delete-btn:hover {
     background: rgba(239, 68, 68, 0.15);
-    color: #f87171;
+    color: var(--color-red-400);
 }

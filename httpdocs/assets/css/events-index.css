@@ -10,7 +10,7 @@
             right: 0;
             z-index: 10001;
             padding: var(--space-3) var(--space-5);
-            background: linear-gradient(135deg, #ef4444, #dc2626);
+            background: linear-gradient(135deg, var(--color-danger), var(--color-red-600));
             color: white;
             font-size: var(--font-size-sm);
             font-weight: 600;
@@ -52,12 +52,12 @@
         .glass-btn-primary,
         .glass-select,
         input[type="text"],
-        input[type="search" aria-label="Search"] {
+        input[type="search"][aria-label="Search"] {
             min-height: 44px;
         }
 
         input[type="text"],
-        input[type="search" aria-label="Search"] {
+        input[type="search"][aria-label="Search"] {
             font-size: 16px !important; /* Prevent iOS zoom */
         }
 
@@ -284,13 +284,13 @@
         [data-theme="dark"] #events-glass-wrapper .glass-search-input {
             background: rgba(15, 23, 42, 0.7);
             border: var(--space-1) solid rgba(255, 255, 255, 0.2);
-            color: #f8fafc;
+            color: var(--color-slate-50);
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3),
                         inset 0 1px 0 rgba(255, 255, 255, 0.1);
         }
 
         [data-theme="dark"] #events-glass-wrapper .glass-search-input::placeholder {
-            color: #cbd5e1;
+            color: var(--color-slate-300);
         }
 
         [data-theme="dark"] #events-glass-wrapper .glass-search-input:focus {
@@ -329,17 +329,17 @@
         [data-theme="dark"] #events-glass-wrapper .glass-select {
             background-color: rgba(15, 23, 42, 0.7);
             border: var(--space-1) solid rgba(255, 255, 255, 0.2);
-            color: #f8fafc;
+            color: var(--color-slate-50);
         }
 
         [data-theme="dark"] #events-glass-wrapper .glass-select option {
-            background: #1e293b;
-            color: #f8fafc;
+            background: var(--color-slate-800);
+            color: var(--color-slate-50);
         }
 
         /* Glass Primary Button */
         #events-glass-wrapper .glass-btn-primary {
-            background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
+            background: linear-gradient(135deg, var(--color-orange-500) 0%, var(--color-orange-600) 100%);
             color: white;
             border: none;
             padding: var(--space-4) var(--space-8);
@@ -369,7 +369,7 @@
             gap: var(--space-3);
             margin: var(--space-10) 0 var(--space-6) 0;
             padding-left: var(--space-4);
-            border-left: var(--space-1) solid #f97316;
+            border-left: var(--space-1) solid var(--color-orange-500);
         }
 
         #events-glass-wrapper .section-header h2 {
@@ -425,7 +425,7 @@
 
         /* Card Date Header */
         #events-glass-wrapper .card-date-header {
-            background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
+            background: linear-gradient(135deg, var(--color-orange-500) 0%, var(--color-orange-600) 100%);
             color: white;
             padding: var(--space-5) var(--space-6);
             display: flex;
@@ -511,7 +511,7 @@
         }
 
         #events-glass-wrapper .event-title a:hover {
-            color: #f97316;
+            color: var(--color-orange-500);
         }
 
         #events-glass-wrapper .event-desc {
@@ -531,7 +531,7 @@
         }
 
         #events-glass-wrapper .host-info i {
-            color: #f97316;
+            color: var(--color-orange-500);
         }
 
         /* Card Footer */
@@ -557,11 +557,11 @@
         }
 
         #events-glass-wrapper .attendee-count i {
-            color: #f97316;
+            color: var(--color-orange-500);
         }
 
         #events-glass-wrapper .view-link {
-            color: #f97316;
+            color: var(--color-orange-500);
             font-weight: 700;
             text-decoration: none;
             display: inline-flex;
@@ -571,7 +571,7 @@
         }
 
         #events-glass-wrapper .view-link:hover {
-            color: #ea580c;
+            color: var(--color-orange-600);
             gap: var(--space-3);
         }
 
@@ -735,7 +735,7 @@
         #events-glass-wrapper .nexus-welcome-title {
             font-size: var(--font-size-3xl);
             font-weight: 800;
-            background: linear-gradient(135deg, #ea580c, #f97316, #fb923c);
+            background: linear-gradient(135deg, var(--color-orange-600), var(--color-orange-500), #fb923c);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
@@ -776,7 +776,7 @@
         #events-glass-wrapper .nexus-smart-btn i { font-size: 1rem; }
 
         #events-glass-wrapper .nexus-smart-btn-primary {
-            background: linear-gradient(135deg, #f97316, #fb923c);
+            background: linear-gradient(135deg, var(--color-orange-500), #fb923c);
             color: white;
             box-shadow: 0 4px 14px rgba(249, 115, 22, 0.35);
         }
@@ -788,19 +788,19 @@
 
         #events-glass-wrapper .nexus-smart-btn-secondary {
             background: linear-gradient(135deg, rgba(249, 115, 22, 0.1), rgba(251, 146, 60, 0.1));
-            color: #ea580c;
+            color: var(--color-orange-600);
             border-color: rgba(249, 115, 22, 0.3);
         }
 
         [data-theme="dark"] #events-glass-wrapper .nexus-smart-btn-secondary {
             background: linear-gradient(135deg, rgba(249, 115, 22, 0.2), rgba(251, 146, 60, 0.15));
-            color: #fdba74;
+            color: var(--color-orange-300);
             border-color: rgba(249, 115, 22, 0.4);
         }
 
         #events-glass-wrapper .nexus-smart-btn-secondary:hover,
         #events-glass-wrapper .nexus-smart-btn-outline:hover {
-            background: linear-gradient(135deg, #f97316, #fb923c);
+            background: linear-gradient(135deg, var(--color-orange-500), #fb923c);
             color: white;
             border-color: transparent;
             transform: translateY(-2px);
@@ -823,4 +823,3 @@
             #events-glass-wrapper .nexus-smart-buttons { gap: var(--space-2); }
             #events-glass-wrapper .nexus-smart-btn { padding: var(--space-3) var(--space-4); font-size: var(--font-size-xs); }
         }
-    </style>

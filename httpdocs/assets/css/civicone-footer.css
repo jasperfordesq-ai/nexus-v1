@@ -2,22 +2,23 @@
  * CivicOne Footer Styles
  * Extracted from views/layouts/civicone/footer.php
  * Updated 2026-01-21: Migrated to design tokens (v2.0)
+  * Fully Migrated to Design Tokens: 2026-01-21 ✓
  */
 
 .civic-footer {
     background: var(--civic-bg-footer);
-    color: var(--civic-footer-text, #E5E7EB);
+    color: var(--civic-footer-text, var(--color-gray-200));
     padding: var(--civicone-spacing-9, var(--space-16)) 0 var(--civicone-spacing-7, var(--space-10));
     margin-top: var(--civicone-spacing-9, var(--space-16));
 }
 
 .civic-footer a {
-    color: var(--civic-footer-text, #E5E7EB) !important;
+    color: var(--civic-footer-text, var(--color-gray-200)) !important;
     text-decoration: none !important;
 }
 
 .civic-footer a:hover {
-    color: #FFFFFF !important;
+    color: var(--color-white) !important;
     text-decoration: underline !important;
 }
 
@@ -35,7 +36,7 @@
 .civic-footer-logo {
     font-size: var(--font-size-2xl);
     font-weight: 800;
-    color: #FFFFFF;
+    color: var(--color-white);
     margin-bottom: var(--space-4);
     display: block;
 }
@@ -43,7 +44,7 @@
 .civic-footer-tagline {
     font-size: var(--font-size-sm);
     line-height: var(--line-height-normal);
-    color: #f3f4f6 !important; /* Explicit light color instead of opacity for WCAG AA */
+    color: var(--color-gray-100) !important; /* Explicit light color instead of opacity for WCAG AA */
     margin-bottom: var(--space-6);
 }
 
@@ -71,7 +72,7 @@
 
 .civic-footer-column h4,
 .civic-footer-column-heading {
-    color: #FFFFFF;
+    color: var(--color-white);
     font-size: var(--font-size-sm);
     font-weight: var(--font-weight-bold);
     text-transform: uppercase;
@@ -91,12 +92,12 @@
 
 .civic-footer-column a {
     font-size: var(--font-size-sm);
-    color: #e5e7eb !important; /* Explicit color instead of opacity for WCAG AA */
+    color: var(--color-gray-200) !important; /* Explicit color instead of opacity for WCAG AA */
     transition: color var(--transition-fast);
 }
 
 .civic-footer-column a:hover {
-    color: #ffffff !important;
+    color: var(--color-white) !important;
 }
 
 .civic-footer-bottom {
@@ -111,16 +112,16 @@
 
 .civic-footer-copyright {
     font-size: var(--font-size-sm);
-    color: #d1d5db !important; /* Explicit color instead of opacity for WCAG AA */
+    color: var(--color-gray-300) !important; /* Explicit color instead of opacity for WCAG AA */
 }
 
 .civic-footer-copyright a {
-    color: #d1d5db !important; /* Ensure links inherit footer color, not global brand */
+    color: var(--color-gray-300) !important; /* Ensure links inherit footer color, not global brand */
     transition: color var(--transition-fast);
 }
 
 .civic-footer-copyright a:hover {
-    color: #ffffff !important;
+    color: var(--color-white) !important;
 }
 
 .civic-footer-links {
@@ -130,12 +131,12 @@
 
 .civic-footer-links a {
     font-size: var(--font-size-sm);
-    color: #d1d5db !important; /* Explicit color instead of opacity for WCAG AA */
+    color: var(--color-gray-300) !important; /* Explicit color instead of opacity for WCAG AA */
     transition: color var(--transition-fast);
 }
 
 .civic-footer-links a:hover {
-    color: #ffffff !important;
+    color: var(--color-white) !important;
 }
 
 /* Responsive */

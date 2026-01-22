@@ -9,6 +9,7 @@
  * - 404, 500, and general error states
  * - Connection/offline states
  * - Dark mode support
+  * Fully Migrated to Design Tokens: 2026-01-21 ✓
  */
 
 /* ==========================================================================
@@ -313,7 +314,7 @@
     left: 0;
     right: 0;
     padding: var(--space-4);
-    background: linear-gradient(135deg, #fef3c7, #fde68a);
+    background: linear-gradient(135deg, var(--color-amber-100), var(--color-amber-200));
     color: #92400e;
     text-align: center;
     font-weight: var(--font-weight-medium);
@@ -332,7 +333,7 @@
 }
 
 .offline-banner--error {
-    background: linear-gradient(135deg, #fee2e2, #fecaca);
+    background: linear-gradient(135deg, var(--color-red-100), #fecaca);
     color: #991b1b;
     border-top-color: rgba(153, 27, 27, 0.2);
 }
@@ -414,7 +415,7 @@
 .permission-denied {
     padding: var(--space-12);
     text-align: center;
-    background: linear-gradient(135deg, #fef2f2, #fee2e2);
+    background: linear-gradient(135deg, var(--color-red-50), var(--color-red-100));
     border-radius: var(--radius-md);
     border: 1px solid rgba(239, 68, 68, 0.2);
 }
@@ -535,7 +536,7 @@
 }
 
 [data-theme="dark"] .empty-state-icon {
-    background: linear-gradient(135deg, #374151, var(--color-gray-800));
+    background: linear-gradient(135deg, var(--color-gray-700), var(--color-gray-800));
 }
 
 [data-theme="dark"] .empty-state-icon i {
@@ -572,7 +573,7 @@
 
 [data-theme="dark"] .offline-banner {
     background: linear-gradient(135deg, #422006, #78350f);
-    color: #fde68a;
+    color: var(--color-amber-200);
     border-top-color: rgba(253, 230, 138, 0.2);
 }
 

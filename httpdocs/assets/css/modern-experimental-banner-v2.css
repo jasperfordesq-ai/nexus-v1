@@ -2,11 +2,12 @@
  * Modern Layout Experimental Banner
  * Sleek, minimalist design with glass-morphism effects
  * Position: Above fixed utility bar (z-index: 60)
+  * Fully Migrated to Design Tokens: 2026-01-21 ✓
  */
 
 .modern-experimental-banner {
-    background: #6366f1 !important;
-    background: linear-gradient(135deg, #6366f1 0%, #4f46e5 50%, #9333ea 100%) !important;
+    background: var(--color-primary-500) !important;
+    background: linear-gradient(135deg, var(--color-primary-500) 0%, var(--color-primary-600) 50%, var(--color-purple-500-alt) 100%) !important;
     padding: 6px 0 !important;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1) !important;
     position: relative !important;
@@ -74,7 +75,7 @@ html[data-layout="modern"].banner-scrolled .nexus-navbar {
     font-size: 11px;
     font-weight: 700;
     letter-spacing: 0.3px;
-    color: #ffffff;
+    color: var(--color-white);
     border: 1px solid rgba(255, 255, 255, 0.3);
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
@@ -91,7 +92,7 @@ html[data-layout="modern"].banner-scrolled .nexus-navbar {
 
 .modern-experimental-text strong {
     font-weight: 600;
-    color: #ffffff;
+    color: var(--color-white);
 }
 
 .modern-experimental-switch {
@@ -113,7 +114,7 @@ html[data-layout="modern"].banner-scrolled .nexus-navbar {
 }
 
 .modern-experimental-switch:hover {
-    background: #ffffff;
+    background: var(--color-white);
     transform: translateY(-1px);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
     color: var(--color-primary-700);
@@ -211,5 +212,5 @@ html[data-layout="modern"].banner-scrolled .nexus-navbar {
 }
 
 [data-theme="dark"] .modern-experimental-switch:hover {
-    background: #ffffff;
+    background: var(--color-white);
 }

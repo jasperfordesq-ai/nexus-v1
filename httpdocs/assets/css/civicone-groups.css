@@ -8,37 +8,37 @@
    -------------------------------------------- */
 :root {
     /* Text Colors (4.5:1+ contrast on white) */
-    --civic-group-text-primary: #111827;     /* 12.6:1 */
-    --civic-group-text-secondary: #374151;   /* 8.5:1 */
-    --civic-group-text-muted: #4B5563;       /* 7.0:1 */
+    --civic-group-text-primary: var(--color-gray-900);     /* 12.6:1 */
+    --civic-group-text-secondary: var(--color-gray-700);   /* 8.5:1 */
+    --civic-group-text-muted: var(--color-gray-600);       /* 7.0:1 */
 
     /* Brand/Action Colors (WCAG AA) */
-    --civic-group-brand: #00796B;            /* Teal 700 - 5.0:1 */
+    --civic-group-brand: var(--color-govuk-green-darker);            /* Teal 700 - 5.0:1 */
     --civic-group-brand-hover: #00695C;      /* Teal 800 - 6.1:1 */
-    --civic-group-danger: #DC2626;           /* Red 600 - 5.1:1 */
+    --civic-group-danger: var(--color-red-600);           /* Red 600 - 5.1:1 */
 
     /* Focus Ring */
-    --civic-group-focus-ring: #FFDD00;       /* GOV.UK focus */
-    --civic-group-focus-text: #0B0C0C;
+    --civic-group-focus-ring: var(--color-brand-yellow);       /* GOV.UK focus */
+    --civic-group-focus-text: var(--color-govuk-black);
     --civic-group-focus-offset: 3px;
 
     /* Touch Target */
     --civic-group-touch-min: 44px;
 
     /* Borders */
-    --civic-group-border: #E5E7EB;
-    --civic-group-border-dark: #D1D5DB;
+    --civic-group-border: var(--color-gray-200);
+    --civic-group-border-dark: var(--color-gray-300);
 }
 
 /* Dark mode tokens */
 [data-theme="dark"] {
-    --civic-group-text-primary: #F9FAFB;
-    --civic-group-text-secondary: #E5E7EB;
-    --civic-group-text-muted: #D1D5DB;
-    --civic-group-brand: #5EEAD4;
+    --civic-group-text-primary: var(--color-gray-50);
+    --civic-group-text-secondary: var(--color-gray-200);
+    --civic-group-text-muted: var(--color-gray-300);
+    --civic-group-brand: var(--color-teal-300);
     --civic-group-brand-hover: #99F6E4;
-    --civic-group-border: #374151;
-    --civic-group-border-dark: #4B5563;
+    --civic-group-border: var(--color-gray-700);
+    --civic-group-border-dark: var(--color-gray-600);
 }
 
 
@@ -115,7 +115,7 @@
 }
 
 [data-theme="dark"] .civic-group-card {
-    background: #1F2937;
+    background: var(--color-gray-800);
 }
 
 /* Group Card Image Section */
@@ -131,7 +131,7 @@
     height: 130px;
     border-radius: 50%;
     object-fit: cover;
-    border: 4px solid var(--civic-bg-page, #ffffff);
+    border: 4px solid var(--civic-bg-page, var(--color-white));
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
     background: white;
 }
@@ -140,18 +140,18 @@
     width: 130px;
     height: 130px;
     border-radius: 50%;
-    border: 4px solid var(--civic-bg-page, #ffffff);
+    border: 4px solid var(--civic-bg-page, var(--color-white));
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-    background: #e5e7eb;
+    background: var(--color-gray-200);
     display: flex;
     align-items: center;
     justify-content: center;
-    color: #9ca3af;
+    color: var(--color-gray-400);
 }
 
 [data-theme="dark"] .civic-group-card-placeholder {
-    background: #374151;
-    color: #6B7280;
+    background: var(--color-gray-700);
+    color: var(--color-gray-500);
 }
 
 /* Group Card Content Section */
@@ -180,11 +180,11 @@
 
 .civic-group-card-title a:focus {
     /* GOV.UK Focus Pattern */
-    outline: 3px solid var(--govuk-focus-colour, #ffdd00);
+    outline: 3px solid var(--govuk-focus-colour, var(--color-brand-yellow));
     outline-offset: 0;
-    background-color: var(--govuk-focus-colour, #ffdd00);
-    color: var(--govuk-focus-text-colour, #0b0c0c);
-    box-shadow: 0 -2px var(--govuk-focus-colour, #ffdd00), 0 4px var(--govuk-focus-text-colour, #0b0c0c);
+    background-color: var(--govuk-focus-colour, var(--color-brand-yellow));
+    color: var(--govuk-focus-text-colour, var(--color-govuk-black));
+    box-shadow: 0 -2px var(--govuk-focus-colour, var(--color-brand-yellow)), 0 4px var(--govuk-focus-text-colour, var(--color-govuk-black));
 }
 
 .civic-group-card-description {
@@ -218,11 +218,11 @@
 
 .civic-group-card-btn:focus {
     /* GOV.UK Focus Pattern */
-    outline: 3px solid var(--govuk-focus-colour, #ffdd00);
+    outline: 3px solid var(--govuk-focus-colour, var(--color-brand-yellow));
     outline-offset: 0;
-    background-color: var(--govuk-focus-colour, #ffdd00);
-    color: var(--govuk-focus-text-colour, #0b0c0c);
-    box-shadow: 0 -2px var(--govuk-focus-colour, #ffdd00), 0 4px var(--govuk-focus-text-colour, #0b0c0c);
+    background-color: var(--govuk-focus-colour, var(--color-brand-yellow));
+    color: var(--govuk-focus-text-colour, var(--color-govuk-black));
+    box-shadow: 0 -2px var(--govuk-focus-colour, var(--color-brand-yellow)), 0 4px var(--govuk-focus-text-colour, var(--color-govuk-black));
 }
 
 /* --------------------------------------------
@@ -247,7 +247,7 @@
 }
 
 [data-theme="dark"] .civicone--govuk .civicone-group-card {
-    background: #1F2937;
+    background: var(--color-gray-800);
 }
 
 .civicone--govuk .civicone-group-card__image {
@@ -262,7 +262,7 @@
     height: 130px;
     border-radius: 50%;
     object-fit: cover;
-    border: 4px solid var(--civic-bg-page, #ffffff);
+    border: 4px solid var(--civic-bg-page, var(--color-white));
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
     background: white;
 }
@@ -271,18 +271,18 @@
     width: 130px;
     height: 130px;
     border-radius: 50%;
-    border: 4px solid var(--civic-bg-page, #ffffff);
+    border: 4px solid var(--civic-bg-page, var(--color-white));
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-    background: #e5e7eb;
+    background: var(--color-gray-200);
     display: flex;
     align-items: center;
     justify-content: center;
-    color: #9ca3af;
+    color: var(--color-gray-400);
 }
 
 [data-theme="dark"] .civicone--govuk .civicone-group-card__placeholder {
-    background: #374151;
-    color: #6B7280;
+    background: var(--color-gray-700);
+    color: var(--color-gray-500);
 }
 
 .civicone--govuk .civicone-group-card__content {
@@ -303,7 +303,7 @@
 .civicone--govuk .civicone-group-card__description {
     margin: 0 0 15px 0;
     font-size: 0.9rem;
-    color: var(--civic-group-text-muted, #505a5f);
+    color: var(--civic-group-text-muted, var(--color-govuk-grey-dark));
     flex-grow: 1;
     line-height: 1.5;
 }
@@ -314,7 +314,7 @@
     justify-content: center;
     gap: 5px;
     font-size: 0.85rem;
-    color: var(--civic-group-text-muted, #505a5f);
+    color: var(--civic-group-text-muted, var(--color-govuk-grey-dark));
     margin: 0 0 15px 0;
 }
 
@@ -345,14 +345,14 @@
 .civicone--govuk .civicone-checkbox {
     width: 20px;
     height: 20px;
-    border: 2px solid #0b0c0c;
+    border: 2px solid var(--color-govuk-black);
     cursor: pointer;
 }
 
 .civicone--govuk .civicone-checkbox:focus {
-    outline: 3px solid #ffdd00;
+    outline: 3px solid var(--color-brand-yellow);
     outline-offset: 0;
-    box-shadow: 0 0 0 2px #0b0c0c;
+    box-shadow: 0 0 0 2px var(--color-govuk-black);
 }
 
 .civicone--govuk .civicone-checkbox-label {
@@ -370,22 +370,22 @@
 
 /* Primary Button Variant */
 .civicone--govuk .civicone-button--primary {
-    background: #00703c;
-    color: #ffffff;
-    border-color: #00703c;
+    background: var(--color-govuk-green);
+    color: var(--color-white);
+    border-color: var(--color-govuk-green);
 }
 
 .civicone--govuk .civicone-button--primary:hover {
-    background: #005a30;
-    border-color: #005a30;
+    background: var(--color-govuk-green-dark);
+    border-color: var(--color-govuk-green-dark);
 }
 
 .civicone--govuk .civicone-button--primary:focus {
-    outline: 3px solid #ffdd00;
+    outline: 3px solid var(--color-brand-yellow);
     outline-offset: 0;
-    background: #ffdd00;
-    color: #0b0c0c;
-    border-color: #0b0c0c;
+    background: var(--color-brand-yellow);
+    color: var(--color-govuk-black);
+    border-color: var(--color-govuk-black);
 }
 
 /* --------------------------------------------
@@ -406,7 +406,7 @@
     align-items: flex-start;
     gap: 15px;
     padding: 20px 0;
-    border-bottom: 1px solid #b1b4b6;
+    border-bottom: 1px solid var(--color-govuk-grey);
 }
 
 @media (min-width: 641px) {
@@ -460,7 +460,7 @@
     margin: 0 0 8px 0;
     font-size: 16px;
     line-height: 1.5;
-    color: #505a5f;
+    color: var(--color-govuk-grey-dark);
 }
 
 @media (min-width: 641px) {
@@ -476,7 +476,7 @@
     font-size: 14px;
     line-height: 1.5;
     margin: 0;
-    color: #505a5f;
+    color: var(--color-govuk-grey-dark);
 }
 
 @media (min-width: 641px) {
@@ -508,12 +508,12 @@
 
 /* Dark Mode Support for List Items */
 [data-theme="dark"] .civicone--govuk .civicone-group-item {
-    border-bottom-color: #374151;
+    border-bottom-color: var(--color-gray-700);
 }
 
 [data-theme="dark"] .civicone--govuk .civicone-group-item__description,
 [data-theme="dark"] .civicone--govuk .civicone-group-item__meta {
-    color: #d1d5db;
+    color: var(--color-gray-300);
 }
 
 
@@ -549,11 +549,11 @@
 
 .civic-tab-link:focus {
     /* GOV.UK Focus Pattern */
-    outline: 3px solid var(--govuk-focus-colour, #ffdd00);
+    outline: 3px solid var(--govuk-focus-colour, var(--color-brand-yellow));
     outline-offset: 0;
-    background-color: var(--govuk-focus-colour, #ffdd00);
-    color: var(--govuk-focus-text-colour, #0b0c0c);
-    box-shadow: 0 -2px var(--govuk-focus-colour, #ffdd00), 0 4px var(--govuk-focus-text-colour, #0b0c0c);
+    background-color: var(--govuk-focus-colour, var(--color-brand-yellow));
+    color: var(--govuk-focus-text-colour, var(--color-govuk-black));
+    box-shadow: 0 -2px var(--govuk-focus-colour, var(--color-brand-yellow)), 0 4px var(--govuk-focus-text-colour, var(--color-govuk-black));
 }
 
 .civic-tab-link.active {
@@ -592,7 +592,7 @@
    Groups Show Page - Header
    -------------------------------------------- */
 .civic-group-header {
-    background: #ffffff;
+    background: var(--color-white);
     border-radius: 8px;
     overflow: hidden;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
@@ -601,8 +601,8 @@
 }
 
 [data-theme="dark"] .civic-group-header {
-    background: #1F2937;
-    border-color: #374151;
+    background: var(--color-gray-800);
+    border-color: var(--color-gray-700);
 }
 
 .civic-group-cover {
@@ -698,11 +698,11 @@
 
 .civic-group-action-btn:focus {
     /* GOV.UK Focus Pattern */
-    outline: 3px solid var(--govuk-focus-colour, #ffdd00);
+    outline: 3px solid var(--govuk-focus-colour, var(--color-brand-yellow));
     outline-offset: 0;
-    background-color: var(--govuk-focus-colour, #ffdd00);
-    color: var(--govuk-focus-text-colour, #0b0c0c);
-    box-shadow: 0 -2px var(--govuk-focus-colour, #ffdd00), 0 4px var(--govuk-focus-text-colour, #0b0c0c);
+    background-color: var(--govuk-focus-colour, var(--color-brand-yellow));
+    color: var(--govuk-focus-text-colour, var(--color-govuk-black));
+    box-shadow: 0 -2px var(--govuk-focus-colour, var(--color-brand-yellow)), 0 4px var(--govuk-focus-text-colour, var(--color-govuk-black));
 }
 
 .civic-group-leave-btn {
@@ -752,7 +752,7 @@
 }
 
 [data-theme="dark"] .civic-subhub-card {
-    background: #1F2937;
+    background: var(--color-gray-800);
 }
 
 .civic-subhub-image {
@@ -767,7 +767,7 @@
     height: 100px;
     border-radius: 50%;
     object-fit: cover;
-    border: 4px solid var(--civic-bg-page, #ffffff);
+    border: 4px solid var(--civic-bg-page, var(--color-white));
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
 }
 
@@ -775,13 +775,13 @@
     width: 100px;
     height: 100px;
     border-radius: 50%;
-    border: 4px solid var(--civic-bg-page, #ffffff);
+    border: 4px solid var(--civic-bg-page, var(--color-white));
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-    background: #e5e7eb;
+    background: var(--color-gray-200);
     display: flex;
     align-items: center;
     justify-content: center;
-    color: #9ca3af;
+    color: var(--color-gray-400);
 }
 
 .civic-subhub-content {
@@ -806,11 +806,11 @@
 
 .civic-subhub-title a:focus {
     /* GOV.UK Focus Pattern */
-    outline: 3px solid var(--govuk-focus-colour, #ffdd00);
+    outline: 3px solid var(--govuk-focus-colour, var(--color-brand-yellow));
     outline-offset: 0;
-    background-color: var(--govuk-focus-colour, #ffdd00);
-    color: var(--govuk-focus-text-colour, #0b0c0c);
-    box-shadow: 0 -2px var(--govuk-focus-colour, #ffdd00), 0 4px var(--govuk-focus-text-colour, #0b0c0c);
+    background-color: var(--govuk-focus-colour, var(--color-brand-yellow));
+    color: var(--govuk-focus-text-colour, var(--color-govuk-black));
+    box-shadow: 0 -2px var(--govuk-focus-colour, var(--color-brand-yellow)), 0 4px var(--govuk-focus-text-colour, var(--color-govuk-black));
 }
 
 .civic-subhub-btn {
@@ -835,11 +835,11 @@
 
 .civic-subhub-btn:focus {
     /* GOV.UK Focus Pattern */
-    outline: 3px solid var(--govuk-focus-colour, #ffdd00);
+    outline: 3px solid var(--govuk-focus-colour, var(--color-brand-yellow));
     outline-offset: 0;
-    background-color: var(--govuk-focus-colour, #ffdd00);
-    color: var(--govuk-focus-text-colour, #0b0c0c);
-    box-shadow: 0 -2px var(--govuk-focus-colour, #ffdd00), 0 4px var(--govuk-focus-text-colour, #0b0c0c);
+    background-color: var(--govuk-focus-colour, var(--color-brand-yellow));
+    color: var(--govuk-focus-text-colour, var(--color-govuk-black));
+    box-shadow: 0 -2px var(--govuk-focus-colour, var(--color-brand-yellow)), 0 4px var(--govuk-focus-text-colour, var(--color-govuk-black));
 }
 
 
@@ -863,7 +863,7 @@
 }
 
 [data-theme="dark"] .civic-member-card {
-    background: #1F2937;
+    background: var(--color-gray-800);
 }
 
 .civic-member-avatar {
@@ -880,7 +880,7 @@
     height: 80px;
     margin: 0 auto;
     border-radius: 50%;
-    background: #e5e7eb;
+    background: var(--color-gray-200);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -889,7 +889,7 @@
 }
 
 [data-theme="dark"] .civic-member-placeholder {
-    background: #374151;
+    background: var(--color-gray-700);
 }
 
 .civic-member-name {
@@ -908,11 +908,11 @@
 
 .civic-member-name a:focus {
     /* GOV.UK Focus Pattern */
-    outline: 3px solid var(--govuk-focus-colour, #ffdd00);
+    outline: 3px solid var(--govuk-focus-colour, var(--color-brand-yellow));
     outline-offset: 0;
-    background-color: var(--govuk-focus-colour, #ffdd00);
-    color: var(--govuk-focus-text-colour, #0b0c0c);
-    box-shadow: 0 -2px var(--govuk-focus-colour, #ffdd00), 0 4px var(--govuk-focus-text-colour, #0b0c0c);
+    background-color: var(--govuk-focus-colour, var(--color-brand-yellow));
+    color: var(--govuk-focus-text-colour, var(--color-govuk-black));
+    box-shadow: 0 -2px var(--govuk-focus-colour, var(--color-brand-yellow)), 0 4px var(--govuk-focus-text-colour, var(--color-govuk-black));
 }
 
 .civic-member-location {
@@ -933,8 +933,8 @@
 }
 
 [data-theme="dark"] .civic-group-sidebar-card {
-    background: #1F2937;
-    border-color: #374151;
+    background: var(--color-gray-800);
+    border-color: var(--color-gray-700);
 }
 
 .civic-group-sidebar-card h4 {
@@ -974,7 +974,7 @@
 }
 
 [data-theme="dark"] .civic-group-contact-btn {
-    background: #1F2937;
+    background: var(--color-gray-800);
 }
 
 .civic-group-contact-btn:hover {
@@ -984,11 +984,11 @@
 
 .civic-group-contact-btn:focus {
     /* GOV.UK Focus Pattern */
-    outline: 3px solid var(--govuk-focus-colour, #ffdd00);
+    outline: 3px solid var(--govuk-focus-colour, var(--color-brand-yellow));
     outline-offset: 0;
-    background-color: var(--govuk-focus-colour, #ffdd00);
-    color: var(--govuk-focus-text-colour, #0b0c0c);
-    box-shadow: 0 -2px var(--govuk-focus-colour, #ffdd00), 0 4px var(--govuk-focus-text-colour, #0b0c0c);
+    background-color: var(--govuk-focus-colour, var(--color-brand-yellow));
+    color: var(--govuk-focus-text-colour, var(--color-govuk-black));
+    box-shadow: 0 -2px var(--govuk-focus-colour, var(--color-brand-yellow)), 0 4px var(--govuk-focus-text-colour, var(--color-govuk-black));
 }
 
 
@@ -998,15 +998,15 @@
 .civic-group-empty-state {
     padding: 40px;
     text-align: center;
-    background: #f9fafb;
-    border: 1px dashed #d1d5db;
+    background: var(--color-gray-50);
+    border: 1px dashed var(--color-gray-300);
     margin-bottom: 0;
     border-radius: 8px;
 }
 
 [data-theme="dark"] .civic-group-empty-state {
-    background: #111827;
-    border-color: #374151;
+    background: var(--color-gray-900);
+    border-color: var(--color-gray-700);
 }
 
 .civic-group-empty-state h3 {

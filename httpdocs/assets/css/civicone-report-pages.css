@@ -197,17 +197,17 @@
 }
 
 .report-swot-box--weaknesses {
-    background: #fef2f2;
+    background: var(--color-red-50);
     border-top: 4px solid var(--color-danger);
 }
 
 .report-swot-box--opportunities {
-    background: #eff6ff;
+    background: var(--color-blue-50);
     border-top: 4px solid var(--color-blue-600);
 }
 
 .report-swot-box--threats {
-    background: #fffbeb;
+    background: var(--color-amber-50);
     border-top: 4px solid var(--color-warning);
 }
 
@@ -379,7 +379,7 @@
 }
 
 .report-finding-box--secondary {
-    background: #eff6ff;
+    background: var(--color-blue-50);
     border-left-color: var(--color-blue-600);
 }
 
@@ -406,7 +406,7 @@
 
 /* SROI Box */
 .report-sroi-box {
-    background: linear-gradient(135deg, #fef3c7 0%, #fed7aa 100%);
+    background: linear-gradient(135deg, var(--color-amber-100) 0%, #fed7aa 100%);
     border: 2px solid var(--color-warning);
     border-radius: var(--radius-md);
     padding: var(--space-8);

@@ -48,7 +48,7 @@
     width: 100px;
     height: 100px;
     margin: 0 auto var(--space-6);
-    background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #a855f7 100%);
+    background: linear-gradient(135deg, var(--color-primary-500) 0%, var(--color-purple-500) 50%, var(--color-purple-400) 100%);
     border-radius: var(--radius-full);
     display: flex;
     align-items: center;
@@ -80,7 +80,7 @@
 }
 
 .feed-empty-icon.error {
-    background: linear-gradient(135deg, #ef4444, #f87171);
+    background: linear-gradient(135deg, var(--color-danger), var(--color-red-400));
     box-shadow: 0 12px 40px rgba(239, 68, 68, 0.4);
     animation: none;
 }
@@ -131,7 +131,7 @@
 }
 
 .feed-empty-btn.primary {
-    background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+    background: linear-gradient(135deg, var(--color-primary-500) 0%, var(--color-purple-500) 100%);
     color: white;
     box-shadow:
         0 6px 20px rgba(99, 102, 241, 0.4),

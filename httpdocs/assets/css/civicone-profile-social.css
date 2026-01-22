@@ -6,6 +6,7 @@
  * WCAG 2.1 AA Compliant
  * Created: 2026-01-20
  * Updated: 2026-01-21 - Migrated to design tokens
+  * Fully Migrated to Design Tokens: 2026-01-21 ✓
  */
 
 /* =============================================================================
@@ -13,8 +14,8 @@
    ============================================================================= */
 
 .civicone .civic-composer {
-    background: #ffffff;
-    border: 2px solid #b1b4b6;
+    background: var(--color-white);
+    border: 2px solid var(--color-govuk-grey);
     padding: var(--space-5);
     margin-bottom: var(--space-8);
 }
@@ -32,15 +33,15 @@
     font-family: "GDS Transport", arial, sans-serif;
     font-size: var(--font-size-base);
     line-height: var(--line-height-normal);
-    color: #0b0c0c;
-    border: 2px solid #0b0c0c;
+    color: var(--color-govuk-black);
+    border: 2px solid var(--color-govuk-black);
     padding: var(--space-3);
     width: 100%;
     resize: vertical;
 }
 
 .civicone .civic-composer .govuk-textarea:focus {
-    outline: 3px solid #ffdd00;
+    outline: 3px solid var(--color-brand-yellow);
     outline-offset: 0;
     box-shadow: inset 0 0 0 2px;
 }
@@ -62,14 +63,14 @@
    ============================================================================= */
 
 .civicone .civic-post-card {
-    background: #ffffff;
-    border: 2px solid #b1b4b6;
+    background: var(--color-white);
+    border: 2px solid var(--color-govuk-grey);
     padding: var(--space-5);
     margin-bottom: var(--space-8);
 }
 
 .civicone .civic-post-card:focus-within {
-    border-color: #0b0c0c;
+    border-color: var(--color-govuk-black);
 }
 
 /* Post Header (Author info and timestamp) */
@@ -79,7 +80,7 @@
     gap: var(--space-3);
     margin-bottom: var(--space-4);
     padding-bottom: var(--space-4);
-    border-bottom: 1px solid #b1b4b6;
+    border-bottom: 1px solid var(--color-govuk-grey);
 }
 
 .civicone .civic-post-header .civic-avatar-sm {
@@ -87,7 +88,7 @@
     height: var(--space-12);
     border-radius: 50%;
     object-fit: cover;
-    border: 2px solid #b1b4b6;
+    border: 2px solid var(--color-govuk-grey);
 }
 
 .civicone .civic-post-header .govuk-heading-s {
@@ -98,7 +99,7 @@
 
 .civicone .civic-post-header .govuk-body-s {
     font-size: var(--font-size-sm);
-    color: #505a5f;
+    color: var(--color-govuk-grey-dark);
     margin: 0;
 }
 
@@ -110,30 +111,30 @@
 .civicone .civic-post-content .govuk-body {
     font-size: var(--font-size-base);
     line-height: var(--line-height-normal);
-    color: #0b0c0c;
+    color: var(--color-govuk-black);
     margin-bottom: var(--space-4);
 }
 
 .civicone .civic-post-content a {
-    color: #1d70b8;
+    color: var(--color-govuk-blue-light);
     text-decoration: underline;
 }
 
 .civicone .civic-post-content a:hover {
-    color: #003078;
+    color: var(--color-govuk-blue);
 }
 
 .civicone .civic-post-content a:focus {
-    outline: 3px solid #ffdd00;
+    outline: 3px solid var(--color-brand-yellow);
     outline-offset: 0;
-    background: #ffdd00;
-    color: #0b0c0c;
+    background: var(--color-brand-yellow);
+    color: var(--color-govuk-black);
 }
 
 /* Post Image */
 .civicone .civic-post-image {
     margin: var(--space-4) 0;
-    border: 1px solid #b1b4b6;
+    border: 1px solid var(--color-govuk-grey);
 }
 
 .civicone .civic-post-image img {
@@ -150,7 +151,7 @@
     display: flex;
     gap: var(--space-4);
     padding-top: var(--space-4);
-    border-top: 1px solid #b1b4b6;
+    border-top: 1px solid var(--color-govuk-grey);
     flex-wrap: wrap;
 }
 
@@ -162,9 +163,9 @@
     font-family: "GDS Transport", arial, sans-serif;
     font-size: var(--font-size-base);
     font-weight: var(--font-weight-normal);
-    color: #0b0c0c;
-    background: #f3f2f1;
-    border: 2px solid #0b0c0c;
+    color: var(--color-govuk-black);
+    background: var(--color-neutral-50);
+    border: 2px solid var(--color-govuk-black);
     border-radius: var(--radius-none);
     cursor: pointer;
     transition: var(--transition-fast);
@@ -175,10 +176,10 @@
 }
 
 .civicone .civic-action-btn:focus {
-    outline: 3px solid #ffdd00;
+    outline: 3px solid var(--color-brand-yellow);
     outline-offset: 0;
-    background: #ffdd00;
-    color: #0b0c0c;
+    background: var(--color-brand-yellow);
+    color: var(--color-govuk-black);
 }
 
 .civicone .civic-action-btn:active {
@@ -198,9 +199,9 @@
 
 /* Liked state */
 .civicone .civic-action-btn.liked {
-    background: #d4351c;
-    color: #ffffff;
-    border-color: #d4351c;
+    background: var(--color-govuk-red);
+    color: var(--color-white);
+    border-color: var(--color-govuk-red);
 }
 
 .civicone .civic-action-btn.liked:hover {
@@ -209,9 +210,9 @@
 }
 
 .civicone .civic-action-btn.liked:focus {
-    background: #ffdd00;
-    color: #0b0c0c;
-    border-color: #0b0c0c;
+    background: var(--color-brand-yellow);
+    color: var(--color-govuk-black);
+    border-color: var(--color-govuk-black);
 }
 
 /* =============================================================================
@@ -221,7 +222,7 @@
 .civicone .civic-comments-section {
     margin-top: var(--space-5);
     padding-top: var(--space-5);
-    border-top: 2px solid #b1b4b6;
+    border-top: 2px solid var(--color-govuk-grey);
     display: none;
 }
 
@@ -240,7 +241,7 @@
     gap: var(--space-3);
     margin-bottom: var(--space-5);
     padding-bottom: var(--space-5);
-    border-bottom: 1px solid #f3f2f1;
+    border-bottom: 1px solid var(--color-neutral-50);
 }
 
 .civicone .civic-comment:last-child {
@@ -254,28 +255,28 @@
     height: var(--space-10);
     border-radius: 50%;
     object-fit: cover;
-    border: 2px solid #b1b4b6;
+    border: 2px solid var(--color-govuk-grey);
     flex-shrink: 0;
 }
 
 .civicone .civic-comment-bubble {
     flex: 1;
-    background: #f3f2f1;
+    background: var(--color-neutral-50);
     padding: var(--space-3) var(--space-4);
-    border: 1px solid #b1b4b6;
+    border: 1px solid var(--color-govuk-grey);
 }
 
 .civicone .civic-comment-author {
     font-weight: var(--font-weight-bold);
     font-size: var(--font-size-sm);
-    color: #0b0c0c;
+    color: var(--color-govuk-black);
     margin-bottom: var(--space-1);
 }
 
 .civicone .civic-comment-text {
     font-size: var(--font-size-base);
     line-height: var(--line-height-normal);
-    color: #0b0c0c;
+    color: var(--color-govuk-black);
     margin-bottom: var(--space-2);
 }
 
@@ -283,13 +284,13 @@
     display: flex;
     gap: var(--space-4);
     font-size: var(--font-size-sm);
-    color: #505a5f;
+    color: var(--color-govuk-grey-dark);
 }
 
 .civicone .civic-comment-meta button {
     background: none;
     border: none;
-    color: #1d70b8;
+    color: var(--color-govuk-blue-light);
     text-decoration: underline;
     cursor: pointer;
     padding: 0;
@@ -298,22 +299,22 @@
 }
 
 .civicone .civic-comment-meta button:hover {
-    color: #003078;
+    color: var(--color-govuk-blue);
 }
 
 .civicone .civic-comment-meta button:focus {
-    outline: 3px solid #ffdd00;
+    outline: 3px solid var(--color-brand-yellow);
     outline-offset: 0;
-    background: #ffdd00;
-    color: #0b0c0c;
+    background: var(--color-brand-yellow);
+    color: var(--color-govuk-black);
 }
 
 /* Comment Form */
 .civicone .civic-comment-form {
     margin-top: var(--space-5);
     padding: var(--space-4);
-    background: #f3f2f1;
-    border: 1px solid #b1b4b6;
+    background: var(--color-neutral-50);
+    border: 1px solid var(--color-govuk-grey);
 }
 
 .civicone .civic-comment-form .govuk-heading-s {
@@ -327,8 +328,8 @@
     font-family: "GDS Transport", arial, sans-serif;
     font-size: var(--font-size-base);
     line-height: var(--line-height-normal);
-    color: #0b0c0c;
-    border: 2px solid #0b0c0c;
+    color: var(--color-govuk-black);
+    border: 2px solid var(--color-govuk-black);
     padding: var(--space-2);
     resize: vertical;
     min-height: var(--space-20);
@@ -336,7 +337,7 @@
 }
 
 .civicone .civic-comment-input:focus {
-    outline: 3px solid #ffdd00;
+    outline: 3px solid var(--color-brand-yellow);
     outline-offset: 0;
     box-shadow: inset 0 0 0 2px;
 }
@@ -346,23 +347,23 @@
     font-size: var(--font-size-base);
     font-weight: var(--font-weight-normal);
     padding: var(--space-3) var(--space-4);
-    color: #ffffff;
-    background: #00703c;
+    color: var(--color-white);
+    background: var(--color-govuk-green);
     border: 2px solid transparent;
     cursor: pointer;
     box-shadow: 0 2px 0 #002d18;
 }
 
 .civicone .civic-comment-submit:hover {
-    background: #005a30;
+    background: var(--color-govuk-green-dark);
 }
 
 .civicone .civic-comment-submit:focus {
-    outline: 3px solid #ffdd00;
+    outline: 3px solid var(--color-brand-yellow);
     outline-offset: 0;
-    background: #ffdd00;
-    color: #0b0c0c;
-    border-color: #0b0c0c;
+    background: var(--color-brand-yellow);
+    color: var(--color-govuk-black);
+    border-color: var(--color-govuk-black);
     box-shadow: none;
 }
 
@@ -376,8 +377,8 @@
     margin-top: var(--space-4);
     margin-left: 52px;
     padding: var(--space-4);
-    background: #ffffff;
-    border: 1px solid #b1b4b6;
+    background: var(--color-white);
+    border: 1px solid var(--color-govuk-grey);
 }
 
 .civicone .civic-reply-input {
@@ -385,8 +386,8 @@
     font-family: "GDS Transport", arial, sans-serif;
     font-size: var(--font-size-sm);
     line-height: var(--line-height-normal);
-    color: #0b0c0c;
-    border: 2px solid #0b0c0c;
+    color: var(--color-govuk-black);
+    border: 2px solid var(--color-govuk-black);
     padding: var(--space-2);
     resize: vertical;
     min-height: 60px;
@@ -394,7 +395,7 @@
 }
 
 .civicone .civic-reply-input:focus {
-    outline: 3px solid #ffdd00;
+    outline: 3px solid var(--color-brand-yellow);
     outline-offset: 0;
     box-shadow: inset 0 0 0 2px;
 }
@@ -415,8 +416,8 @@
     align-items: center;
     gap: var(--space-1);
     padding: var(--space-1) var(--space-2);
-    background: #f3f2f1;
-    border: 1px solid #b1b4b6;
+    background: var(--color-neutral-50);
+    border: 1px solid var(--color-govuk-grey);
     border-radius: var(--radius-md);
     font-size: var(--font-size-sm);
     cursor: pointer;
@@ -427,14 +428,14 @@
 }
 
 .civicone .civic-reaction:focus {
-    outline: 3px solid #ffdd00;
+    outline: 3px solid var(--color-brand-yellow);
     outline-offset: 0;
 }
 
 .civicone .civic-reaction.active {
-    background: #1d70b8;
-    color: #ffffff;
-    border-color: #1d70b8;
+    background: var(--color-govuk-blue-light);
+    color: var(--color-white);
+    border-color: var(--color-govuk-blue-light);
 }
 
 .civicone .civic-reaction-picker {
@@ -446,8 +447,8 @@
     position: absolute;
     bottom: 100%;
     left: 0;
-    background: #ffffff;
-    border: 2px solid #0b0c0c;
+    background: var(--color-white);
+    border: 2px solid var(--color-govuk-black);
     padding: var(--space-2);
     display: none;
     gap: var(--space-2);
@@ -468,11 +469,11 @@
 }
 
 .civicone .civic-reaction-picker-menu button:hover {
-    background: #f3f2f1;
+    background: var(--color-neutral-50);
 }
 
 .civicone .civic-reaction-picker-menu button:focus {
-    outline: 3px solid #ffdd00;
+    outline: 3px solid var(--color-brand-yellow);
     outline-offset: 0;
 }
 
@@ -481,21 +482,21 @@
    ============================================================================= */
 
 .civicone .civic-mention {
-    color: #1d70b8;
+    color: var(--color-govuk-blue-light);
     text-decoration: none;
     font-weight: var(--font-weight-semibold);
 }
 
 .civicone .civic-mention:hover {
-    color: #003078;
+    color: var(--color-govuk-blue);
     text-decoration: underline;
 }
 
 .civicone .civic-mention:focus {
-    outline: 3px solid #ffdd00;
+    outline: 3px solid var(--color-brand-yellow);
     outline-offset: 0;
-    background: #ffdd00;
-    color: #0b0c0c;
+    background: var(--color-brand-yellow);
+    color: var(--color-govuk-black);
 }
 
 /* =============================================================================
@@ -510,9 +511,9 @@
     z-index: var(--z-toast);
     min-width: 300px;
     max-width: 500px;
-    background: #00703c;
-    color: #ffffff;
-    border: 4px solid #00703c;
+    background: var(--color-govuk-green);
+    color: var(--color-white);
+    border: 4px solid var(--color-govuk-green);
     padding: var(--space-4) 20px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
     display: none;
@@ -524,8 +525,8 @@
 }
 
 .civicone .civic-toast.error {
-    background: #d4351c;
-    border-color: #d4351c;
+    background: var(--color-govuk-red);
+    border-color: var(--color-govuk-red);
 }
 
 .civicone .civic-toast.warning {
@@ -534,8 +535,8 @@
 }
 
 .civicone .civic-toast.info {
-    background: #1d70b8;
-    border-color: #1d70b8;
+    background: var(--color-govuk-blue-light);
+    border-color: var(--color-govuk-blue-light);
 }
 
 .civicone .civic-toast .civic-toast-content {
@@ -572,8 +573,8 @@
    ============================================================================= */
 
 .civicone .civicone-related-content {
-    background: #f3f2f1;
-    border: 2px solid #b1b4b6;
+    background: var(--color-neutral-50);
+    border: 2px solid var(--color-govuk-grey);
     padding: var(--space-5);
 }
 
@@ -592,7 +593,7 @@
 .civicone .civicone-related-content .govuk-list li {
     margin-bottom: var(--space-3);
     padding-bottom: var(--space-3);
-    border-bottom: 1px solid #b1b4b6;
+    border-bottom: 1px solid var(--color-govuk-grey);
 }
 
 .civicone .civicone-related-content .govuk-list li:last-child {
@@ -602,20 +603,20 @@
 }
 
 .civicone .civicone-related-content .govuk-link {
-    color: #1d70b8;
+    color: var(--color-govuk-blue-light);
     text-decoration: underline;
     font-size: var(--font-size-base);
 }
 
 .civicone .civicone-related-content .govuk-link:hover {
-    color: #003078;
+    color: var(--color-govuk-blue);
 }
 
 .civicone .civicone-related-content .govuk-link:focus {
-    outline: 3px solid #ffdd00;
+    outline: 3px solid var(--color-brand-yellow);
     outline-offset: 0;
-    background: #ffdd00;
-    color: #0b0c0c;
+    background: var(--color-brand-yellow);
+    color: var(--color-govuk-black);
 }
 
 /* =============================================================================
@@ -682,10 +683,10 @@
 
 /* Skip to main content link */
 .civicone .govuk-skip-link:focus {
-    outline: 3px solid #ffdd00;
+    outline: 3px solid var(--color-brand-yellow);
     outline-offset: 0;
-    background: #ffdd00;
-    color: #0b0c0c;
+    background: var(--color-brand-yellow);
+    color: var(--color-govuk-black);
 }
 
 /* High contrast mode support */

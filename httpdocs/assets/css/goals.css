@@ -172,7 +172,7 @@
 }
 
 [data-theme="dark"] .holo-title {
-    background: linear-gradient(135deg, var(--color-pink-400) 0%, var(--color-pink-500) 50%, #ffffff 100%);
+    background: linear-gradient(135deg, var(--color-pink-400) 0%, var(--color-pink-500) 50%, var(--color-white) 100%);
     -webkit-background-clip: text;
     background-clip: text;
 }
@@ -701,7 +701,7 @@ textarea.holo-input {
 }
 
 [data-theme="dark"] .holo-title {
-    background: linear-gradient(135deg, var(--color-pink-400) 0%, var(--color-pink-500) 50%, #ffffff 100%);
+    background: linear-gradient(135deg, var(--color-pink-400) 0%, var(--color-pink-500) 50%, var(--color-white) 100%);
     -webkit-background-clip: text;
     background-clip: text;
 }
@@ -1964,7 +1964,7 @@ textarea.holo-input {
         --text-color: var(--color-pink-100);
         --text-muted: rgba(255, 255, 255, 0.7);
         --accent-color: var(--color-pink-400);
-        --heading-gradient: linear-gradient(135deg, #ffffff 0%, var(--color-pink-200) 100%);
+        --heading-gradient: linear-gradient(135deg, var(--color-white) 0%, var(--color-pink-200) 100%);
 
         /* Vivid Dark Mode Shadows */
         --box-shadow:

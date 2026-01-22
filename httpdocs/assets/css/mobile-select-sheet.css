@@ -6,6 +6,7 @@
  * Version: 2.0 - 2026-01-21 - Migrated to design tokens
  *
  * Only applies to mobile/native - desktop uses normal browser selects
+  * Fully Migrated to Design Tokens: 2026-01-21 ✓
  */
 
 /* ==============================================
@@ -115,7 +116,7 @@
 
 /* Selected option styling */
 .mobile-select-option.selected {
-    color: var(--color-primary-500, #6366f1);
+    color: var(--color-primary-500, var(--color-primary-500));
     font-weight: var(--font-weight-semibold);
 }
 
@@ -123,7 +124,7 @@
     content: '';
     width: 22px;
     height: 22px;
-    background: var(--color-primary-500, #6366f1);
+    background: var(--color-primary-500, var(--color-primary-500));
     border-radius: var(--radius-full);
     display: flex;
     align-items: center;
@@ -250,7 +251,7 @@
 
     .mobile-select-trigger:focus {
         outline: none;
-        border-color: var(--color-primary-500, #6366f1);
+        border-color: var(--color-primary-500, var(--color-primary-500));
     }
 
     .mobile-select-trigger-text {

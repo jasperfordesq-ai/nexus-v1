@@ -6,6 +6,7 @@
  * Prefix: mobile- for mobile sheet components
  * Base styles always apply (for JS-triggered sheets on touch devices)
  * Desktop media query hides sheets unless explicitly activated
+  * Fully Migrated to Design Tokens: 2026-01-21 ✓
  */
 
 /* ============================================
@@ -81,7 +82,7 @@
     align-items: center;
     justify-content: space-between;
     padding: 8px 16px 12px;
-    border-bottom: 1px solid var(--feed-border, #e5e7eb);
+    border-bottom: 1px solid var(--feed-border, var(--color-gray-200));
 }
 
 [data-theme="dark"] .mobile-sheet-header {
@@ -128,6 +129,53 @@
    COMMENT SHEET SPECIFIC
    ============================================ */
 
+/* Header spacer for symmetry with close button */
+.mobile-sheet-header-spacer {
+    width: 32px;
+}
+
+/* Flex column layout for sheet body */
+.mobile-sheet-body--flex-column {
+    display: flex;
+    flex-direction: column;
+}
+
+/* Comments list container - takes remaining space */
+.mobile-comments-list--flex {
+    flex: 1;
+    margin-bottom: 12px;
+}
+
+/* Comment input wrapper - stays at bottom */
+.mobile-comment-input-wrap--bottom {
+    flex-shrink: 0;
+    border-top: 1px solid var(--feed-border, #e5e7eb);
+    padding-top: 12px;
+    margin-top: auto;
+}
+
+[data-theme="dark"] .mobile-comment-input-wrap--bottom {
+    border-color: var(--color-gray-700);
+}
+
+/* Sign-in prompt at bottom of sheet */
+.mobile-sheet-signin-prompt {
+    text-align: center;
+    padding: 16px;
+    margin-top: auto;
+}
+
+/* Sign-in link styling */
+.mobile-sheet-signin-link {
+    color: var(--color-primary-500, #6366f1);
+    font-weight: 500;
+}
+
+.mobile-sheet-signin-link:hover {
+    color: var(--color-primary-600, #4f46e5);
+    text-decoration: underline;
+}
+
 .mobile-comment-input-wrap {
     display: flex;
     gap: 12px;
@@ -144,8 +192,8 @@
 
 .mobile-comment-input {
     flex: 1;
-    border: 1px solid var(--feed-border, #e5e7eb);
-    background: var(--feed-bg-main, #f9fafb);
+    border: 1px solid var(--feed-border, var(--color-gray-200));
+    background: var(--feed-bg-main, var(--color-gray-50));
     border-radius: 20px;
     padding: 10px 16px;
     font-size: 15px;
@@ -201,7 +249,7 @@
     display: flex;
     gap: 10px;
     padding: 10px 0;
-    border-bottom: 1px solid var(--feed-border, #e5e7eb);
+    border-bottom: 1px solid var(--feed-border, var(--color-gray-200));
 }
 
 .mobile-comment-item:last-child {
@@ -235,7 +283,7 @@
 
 .mobile-comment-time {
     font-size: 12px;
-    color: var(--feed-text-muted, #9ca3af);
+    color: var(--feed-text-muted, var(--color-gray-400));
     margin-top: 4px;
 }
 
@@ -252,7 +300,7 @@
     padding: 0;
     font-size: 12px;
     font-weight: 600;
-    color: var(--feed-text-muted, #9ca3af);
+    color: var(--feed-text-muted, var(--color-gray-400));
     cursor: pointer;
     display: flex;
     align-items: center;
@@ -287,8 +335,8 @@
 
 .mobile-reply-input {
     flex: 1;
-    border: 1px solid var(--feed-border, #e5e7eb);
-    background: var(--feed-bg-main, #f9fafb);
+    border: 1px solid var(--feed-border, var(--color-gray-200));
+    background: var(--feed-bg-main, var(--color-gray-50));
     border-radius: 18px;
     padding: 8px 14px;
     font-size: 13px;
@@ -325,7 +373,7 @@
     margin-left: 46px;
     margin-top: 8px;
     padding-left: 12px;
-    border-left: 2px solid var(--feed-border, #e5e7eb);
+    border-left: 2px solid var(--feed-border, var(--color-gray-200));
 }
 
 [data-theme="dark"] .mobile-comment-replies {
@@ -346,7 +394,7 @@
     display: inline-flex;
     align-items: center;
     gap: 3px;
-    background: var(--feed-bg-main, #f3f4f6);
+    background: var(--feed-bg-main, var(--color-gray-100));
     padding: 2px 6px;
     border-radius: 10px;
     font-size: 11px;

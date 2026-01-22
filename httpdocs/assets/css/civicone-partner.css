@@ -1,0 +1,223 @@
+/**
+ * CivicOne Partner With Us Page
+ * Template E: Content/Article (Section 10.6)
+ * Tenant-specific: Hour Timebank only
+ * Partnership and investment information
+ * WCAG 2.1 AA Compliant
+ */
+
+.nexus-skin-civicone {
+    /* Hero Section */
+    .partner-hero {
+        margin-bottom: var(--space-10);
+        text-align: center;
+        padding: var(--space-10);
+    }
+
+    .partner-hero h1 {
+        margin-top: 0;
+        margin-bottom: var(--space-4);
+        color: var(--civicone-brand);
+    }
+
+    .partner-hero p {
+        font-size: var(--font-size-xl);
+        color: var(--civicone-text-muted);
+        max-width: 800px;
+        margin: 0 auto;
+        line-height: 1.6;
+    }
+
+    /* Funding Gap Section */
+    .partner-funding-gap {
+        padding: var(--space-12);
+        margin-bottom: var(--space-12);
+    }
+
+    .partner-funding-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: var(--space-12);
+        align-items: center;
+    }
+
+    @media (max-width: 768px) {
+        .partner-funding-grid {
+            grid-template-columns: 1fr;
+            gap: var(--space-8);
+        }
+    }
+
+    .partner-funding-content h2 {
+        color: var(--civicone-brand);
+        margin-top: 0;
+        margin-bottom: var(--space-5);
+    }
+
+    .partner-funding-content p {
+        font-size: var(--font-size-lg);
+        line-height: 1.7;
+        margin-bottom: var(--space-5);
+        color: var(--civicone-text-muted);
+    }
+
+    .partner-funding-list {
+        list-style: none;
+        padding: 0;
+        font-size: var(--font-size-base);
+        color: var(--civicone-text-muted);
+    }
+
+    .partner-funding-list li {
+        margin-bottom: var(--space-4);
+        display: flex;
+        gap: var(--space-3);
+        align-items: flex-start;
+    }
+
+    .partner-funding-list .icon {
+        color: var(--civicone-brand);
+        font-weight: bold;
+        flex-shrink: 0;
+        margin-top: 2px;
+    }
+
+    .partner-funding-image img {
+        width: 100%;
+        border-radius: var(--radius-2);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    [data-theme="dark"] .partner-funding-image img {
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    }
+
+    /* Impact Section */
+    .partner-impact-section {
+        margin-bottom: var(--space-12);
+    }
+
+    .partner-impact-section h2 {
+        text-align: center;
+        margin-bottom: var(--space-10);
+        color: var(--civicone-text);
+    }
+
+    .partner-impact-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: var(--space-8);
+    }
+
+    @media (max-width: 768px) {
+        .partner-impact-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    .partner-impact-card {
+        padding: var(--space-8);
+    }
+
+    .partner-impact-card h3 {
+        color: var(--civicone-brand);
+        margin-top: 0;
+        margin-bottom: var(--space-4);
+    }
+
+    .partner-impact-card p {
+        color: var(--civicone-text-muted);
+        line-height: 1.6;
+    }
+
+    /* CTA Section */
+    .partner-cta {
+        text-align: center;
+        padding: var(--space-16) var(--space-8);
+        margin-bottom: var(--space-12);
+    }
+
+    .partner-cta h2 {
+        color: var(--civicone-text);
+        margin-top: 0;
+        margin-bottom: var(--space-5);
+    }
+
+    .partner-cta p {
+        font-size: var(--font-size-xl);
+        color: var(--civicone-text-muted);
+        margin-bottom: var(--space-8);
+    }
+
+    .partner-cta-buttons {
+        display: flex;
+        gap: var(--space-5);
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+
+    .partner-cta-btn-secondary {
+        background: var(--civicone-bg-card);
+        color: var(--civicone-text-muted);
+        border: 1px solid var(--color-gray-300);
+    }
+
+    [data-theme="dark"] .partner-cta-btn-secondary {
+        border-color: var(--color-gray-700);
+    }
+
+    .partner-cta-btn-secondary:hover {
+        background: var(--civicone-bg-page);
+    }
+
+    /* Partners Section */
+    .partner-logos-section {
+        padding: var(--space-10);
+        text-align: center;
+        background: var(--civicone-bg-page);
+    }
+
+    .partner-logos-section h3 {
+        margin-top: 0;
+        margin-bottom: var(--space-8);
+        color: var(--civicone-text-muted);
+    }
+
+    .partner-logos-grid {
+        display: flex;
+        justify-content: center;
+        gap: var(--space-10);
+        flex-wrap: wrap;
+        align-items: center;
+    }
+
+    .partner-logos-grid img {
+        height: 100px;
+        width: auto;
+        max-width: 200px;
+        object-fit: contain;
+    }
+
+    @media (max-width: 768px) {
+        .partner-hero {
+            padding: var(--space-8);
+        }
+
+        .partner-funding-gap {
+            padding: var(--space-8);
+        }
+
+        .partner-cta {
+            padding: var(--space-12) var(--space-6);
+        }
+
+        .partner-cta-buttons {
+            flex-direction: column;
+            align-items: stretch;
+        }
+
+        .partner-logos-grid img {
+            height: 80px;
+        }
+    }
+}

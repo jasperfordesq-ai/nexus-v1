@@ -1,0 +1,298 @@
+/**
+ * CivicOne Our Story Page
+ * Template E: Content/Article (Section 10.6)
+ * Timeline-based story with stats
+ * WCAG 2.1 AA Compliant
+ */
+
+.nexus-skin-civicone {
+    /* Story Wrapper */
+    .story-wrapper {
+        max-width: 900px;
+        margin: 0 auto;
+        padding: var(--space-8) var(--space-4) var(--space-16);
+    }
+
+    /* Page Header */
+    .story-page-header {
+        text-align: center;
+        margin-bottom: var(--space-10);
+        padding-top: var(--space-4);
+    }
+
+    .story-page-header h1 {
+        font-size: var(--font-size-4xl);
+        font-weight: 800;
+        color: var(--civicone-text);
+        margin: 0 0 var(--space-2) 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: var(--space-3);
+    }
+
+    .story-page-header p {
+        color: var(--civicone-text-muted);
+        font-size: var(--font-size-lg);
+        margin: 0;
+    }
+
+    /* Stats Bar */
+    .story-stats-bar {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: var(--space-4);
+        margin-bottom: var(--space-8);
+    }
+
+    @media (max-width: 768px) {
+        .story-stats-bar {
+            grid-template-columns: 1fr;
+            gap: var(--space-3);
+        }
+    }
+
+    .story-stat-chip {
+        background: var(--civicone-bg-card);
+        border: 1px solid var(--color-gray-300);
+        border-radius: var(--radius-3);
+        padding: var(--space-5) var(--space-4);
+        text-align: center;
+        transition: all 0.15s ease;
+    }
+
+    [data-theme="dark"] .story-stat-chip {
+        border-color: var(--color-gray-700);
+    }
+
+    .story-stat-chip:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    [data-theme="dark"] .story-stat-chip:hover {
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    }
+
+    .story-stat-icon {
+        font-size: var(--font-size-3xl);
+        margin-bottom: var(--space-2);
+        color: var(--civicone-brand);
+    }
+
+    .story-stat-value {
+        font-size: var(--font-size-2xl);
+        font-weight: 800;
+        color: var(--civicone-text);
+        display: block;
+        margin-bottom: var(--space-1);
+    }
+
+    .story-stat-label {
+        font-size: var(--font-size-sm);
+        color: var(--civicone-text-muted);
+        font-weight: 600;
+    }
+
+    /* Timeline */
+    .story-timeline {
+        position: relative;
+        padding-left: var(--space-8);
+    }
+
+    .story-timeline::before {
+        content: '';
+        position: absolute;
+        left: var(--space-4);
+        top: 0;
+        bottom: 0;
+        width: 3px;
+        background: linear-gradient(180deg, var(--color-gray-300) 0%, var(--color-gray-200) 100%);
+        border-radius: 3px;
+    }
+
+    [data-theme="dark"] .story-timeline::before {
+        background: linear-gradient(180deg, var(--color-gray-600) 0%, var(--color-gray-700) 100%);
+    }
+
+    @media (max-width: 768px) {
+        .story-timeline {
+            padding-left: var(--space-6);
+        }
+
+        .story-timeline::before {
+            left: var(--space-2);
+        }
+    }
+
+    /* Timeline Card */
+    .story-card {
+        position: relative;
+        background: var(--civicone-bg-card);
+        border: 1px solid var(--color-gray-300);
+        border-radius: var(--radius-3);
+        overflow: hidden;
+        margin-bottom: var(--space-8);
+        transition: all 0.15s ease;
+    }
+
+    [data-theme="dark"] .story-card {
+        border-color: var(--color-gray-700);
+    }
+
+    .story-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+    }
+
+    [data-theme="dark"] .story-card:hover {
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+    }
+
+    /* Timeline Dot */
+    .story-card::before {
+        content: '';
+        position: absolute;
+        left: calc(-1 * var(--space-8) - 7px);
+        top: var(--space-6);
+        width: 16px;
+        height: 16px;
+        background: var(--civicone-bg-page);
+        border: 3px solid var(--civicone-brand);
+        border-radius: 50%;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+        z-index: 2;
+    }
+
+    @media (max-width: 768px) {
+        .story-card::before {
+            left: calc(-1 * var(--space-6) - 7px);
+            width: 14px;
+            height: 14px;
+        }
+    }
+
+    /* Card Header */
+    .story-card-header {
+        background: var(--civicone-bg-page);
+        padding: var(--space-5) var(--space-6);
+        border-bottom: 1px solid var(--color-gray-300);
+        display: flex;
+        align-items: center;
+        gap: var(--space-3);
+    }
+
+    [data-theme="dark"] .story-card-header {
+        border-bottom-color: var(--color-gray-700);
+    }
+
+    .story-card-header .icon {
+        font-size: var(--font-size-2xl);
+        color: var(--civicone-brand);
+    }
+
+    .story-card-header h2 {
+        color: var(--civicone-text);
+        font-size: var(--font-size-xl);
+        font-weight: 700;
+        margin: 0;
+    }
+
+    /* Card Body */
+    .story-card-body {
+        padding: var(--space-6);
+    }
+
+    .story-card-body p {
+        color: var(--civicone-text-muted);
+        font-size: var(--font-size-base);
+        line-height: 1.7;
+        margin: 0 0 var(--space-4) 0;
+    }
+
+    .story-card-body p:last-child {
+        margin-bottom: 0;
+    }
+
+    /* Quote */
+    .story-quote {
+        background: var(--civicone-bg-page);
+        border-left: 4px solid var(--civicone-brand);
+        padding: var(--space-5) var(--space-6);
+        margin: var(--space-6) 0;
+        border-radius: 0 var(--radius-2) var(--radius-2) 0;
+    }
+
+    .story-quote p {
+        font-style: italic;
+        font-size: var(--font-size-lg);
+        color: var(--civicone-text);
+        margin: 0;
+        font-weight: 600;
+    }
+
+    /* Mission Card */
+    .story-mission-card {
+        background: var(--civicone-bg-card);
+        border: 1px solid var(--color-gray-300);
+        border-radius: var(--radius-3);
+        text-align: center;
+        padding: var(--space-10) var(--space-8);
+        margin-top: var(--space-8);
+    }
+
+    [data-theme="dark"] .story-mission-card {
+        border-color: var(--color-gray-700);
+    }
+
+    .story-mission-card h3 {
+        color: var(--civicone-text);
+        font-size: var(--font-size-2xl);
+        font-weight: 800;
+        margin: 0 0 var(--space-4) 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: var(--space-2);
+    }
+
+    .story-mission-card p {
+        color: var(--civicone-text-muted);
+        font-size: var(--font-size-lg);
+        line-height: 1.7;
+        margin: 0;
+        max-width: 600px;
+        margin: 0 auto;
+    }
+
+    @media (max-width: 768px) {
+        .story-wrapper {
+            padding: var(--space-6) var(--space-4) var(--space-12);
+        }
+
+        .story-page-header h1 {
+            font-size: var(--font-size-3xl);
+        }
+
+        .story-mission-card {
+            padding: var(--space-8) var(--space-6);
+        }
+
+        .story-stat-chip {
+            display: flex;
+            align-items: center;
+            gap: var(--space-4);
+            text-align: left;
+            padding: var(--space-4) var(--space-5);
+        }
+
+        .story-stat-icon {
+            margin-bottom: 0;
+            font-size: var(--font-size-2xl);
+        }
+
+        .story-stat-value {
+            font-size: var(--font-size-xl);
+        }
+    }
+}

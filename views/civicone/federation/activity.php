@@ -228,15 +228,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 });
-
-// Offline indicator
-(function() {
-    const banner = document.getElementById('offlineBanner');
-    if (!banner) return;
-    window.addEventListener('online', () => banner.classList.remove('civic-fed-offline-banner--visible'));
-    window.addEventListener('offline', () => banner.classList.add('civic-fed-offline-banner--visible'));
-    if (!navigator.onLine) banner.classList.add('civic-fed-offline-banner--visible');
-})();
-</script>
+<!-- Federation offline indicator -->
+<script src="<?= \Nexus\Core\TenantContext::getBasePath() ?>/assets/js/civicone-federation-offline.min.js" defer></script>
 
 <?php require dirname(dirname(__DIR__)) . '/layouts/civicone/footer.php'; ?>

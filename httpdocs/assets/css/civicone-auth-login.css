@@ -1,0 +1,371 @@
+/**
+ * Authentication Login Page
+ * Login form and branding
+ * CivicOne Theme
+ */
+
+/* ===========================================
+   LAYOUT & STRUCTURE
+   =========================================== */
+
+.auth-wrapper {
+    width: 100%;
+    max-width: 450px;
+    margin: 0 auto;
+    padding: 0 15px;
+    box-sizing: border-box;
+}
+
+.auth-card {
+    margin-top: 0;
+    position: relative;
+    z-index: 10;
+    background: white;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+.auth-card-body {
+    padding: 40px;
+}
+
+/* ===========================================
+   AUTH PAGE TYPOGRAPHY
+   =========================================== */
+
+.auth-title {
+    margin-top: 0;
+    margin-bottom: 25px;
+    font-weight: 800;
+    color: #0f172a;
+    text-align: center;
+}
+
+/* ===========================================
+   AUTH ALERT MESSAGES
+   =========================================== */
+
+.auth-alert {
+    padding: 12px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    text-align: center;
+    font-size: 0.9rem;
+    border-width: 1px;
+    border-style: solid;
+}
+
+.auth-alert-success {
+    background: #f0fdf4;
+    color: #15803d;
+    font-weight: 600;
+    border-color: #bbf7d0;
+}
+
+.auth-alert-error {
+    background: #fef2f2;
+    color: #b91c1c;
+    border-color: #fecaca;
+}
+
+/* ===========================================
+   BIOMETRIC LOGIN SECTION
+   =========================================== */
+
+.biometric-container {
+    display: none;
+    margin-bottom: 25px;
+}
+
+.biometric-btn {
+    width: 100%;
+    padding: 14px;
+    background: linear-gradient(135deg, #6366f1, #8b5cf6);
+    color: white;
+    font-weight: 700;
+    border: none;
+    border-radius: 8px;
+    font-size: 1.05rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
+
+.biometric-divider {
+    text-align: center;
+    margin: 15px 0;
+    color: #94a3b8;
+    font-size: 0.9rem;
+}
+
+/* ===========================================
+   BIOMETRIC PROMO BOX
+   =========================================== */
+
+.biometric-promo {
+    display: none;
+    margin-bottom: 20px;
+    padding: 14px 16px;
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.08), rgba(139, 92, 246, 0.08));
+    border-radius: 10px;
+    border: 1px solid rgba(99, 102, 241, 0.2);
+}
+
+.biometric-promo-inner {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.biometric-promo-icon {
+    width: 40px;
+    height: 40px;
+    background: linear-gradient(135deg, #6366f1, #8b5cf6);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.biometric-promo-content {
+    flex: 1;
+}
+
+.biometric-promo-title {
+    font-weight: 700;
+    font-size: 0.9rem;
+    color: #4f46e5;
+    margin-bottom: 2px;
+}
+
+.biometric-promo-subtitle {
+    font-size: 0.8rem;
+    color: #64748b;
+}
+
+.biometric-promo-badge {
+    background: rgba(99, 102, 241, 0.1);
+    color: #6366f1;
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
+/* ===========================================
+   AUTH FORM ELEMENTS
+   =========================================== */
+
+.auth-form-group {
+    margin-bottom: 20px;
+}
+
+.auth-form-group-lg {
+    margin-bottom: 25px;
+}
+
+.auth-label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 8px;
+    color: #334155;
+}
+
+.auth-label-inline {
+    font-weight: 600;
+    color: #334155;
+}
+
+.auth-label-row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 8px;
+}
+
+.auth-input {
+    width: 100%;
+    padding: 12px;
+    border: 2px solid #e2e8f0;
+    border-radius: 8px;
+    font-size: 1rem;
+    outline: none;
+    transition: border-color 0.2s;
+    box-sizing: border-box;
+}
+
+.auth-input:focus {
+    border-color: #4f46e5 !important;
+}
+
+/* ===========================================
+   AUTH LINKS
+   =========================================== */
+
+.auth-link {
+    font-size: 0.85rem;
+    color: #4f46e5;
+    text-decoration: none;
+}
+
+.auth-link:hover {
+    text-decoration: underline;
+}
+
+.auth-link-primary {
+    color: #4f46e5;
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.auth-link-primary:hover {
+    text-decoration: underline;
+}
+
+/* ===========================================
+   AUTH BUTTONS
+   =========================================== */
+
+.auth-submit-btn {
+    width: 100%;
+    padding: 14px;
+    background: linear-gradient(135deg, #4f46e5, #7c3aed);
+    color: white;
+    font-weight: 700;
+    border: none;
+    border-radius: 8px;
+    font-size: 1.05rem;
+    cursor: pointer;
+    transition: opacity 0.2s;
+}
+
+.auth-submit-btn:hover {
+    opacity: 0.95;
+}
+
+/* ===========================================
+   AUTH FOOTER TEXT
+   =========================================== */
+
+.auth-footer-text {
+    margin-top: 25px;
+    text-align: center;
+    font-size: 0.95rem;
+    color: #64748b;
+}
+
+/* ===========================================
+   CIVICONE WRAPPER SPACING
+   =========================================== */
+
+.civicone-wrapper-auth {
+    padding-top: 40px;
+}
+
+/* ===========================================
+   RESPONSIVE STYLES
+   =========================================== */
+
+/* Desktop spacing for no-hero layout */
+@media (min-width: 601px) {
+    .auth-wrapper {
+        padding-top: 140px;
+    }
+}
+
+@media (max-width: 600px) {
+    .auth-wrapper {
+        padding-top: 120px;
+        padding-left: 10px;
+        padding-right: 10px;
+    }
+
+    .auth-card-body {
+        padding: 25px !important;
+    }
+}
+
+/* ===========================================
+   DARK MODE
+   =========================================== */
+
+[data-theme="dark"] .auth-card {
+    background: rgba(30, 41, 59, 0.85);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+}
+
+/* Sign In heading */
+[data-theme="dark"] .auth-title {
+    color: #f1f5f9;
+}
+
+/* Success message */
+[data-theme="dark"] .auth-alert-success {
+    background: rgba(22, 163, 74, 0.15);
+    border-color: rgba(34, 197, 94, 0.3);
+    color: #4ade80;
+}
+
+/* Error message */
+[data-theme="dark"] .auth-alert-error {
+    background: rgba(185, 28, 28, 0.15);
+    border-color: rgba(239, 68, 68, 0.3);
+    color: #f87171;
+}
+
+/* Biometric promo box */
+[data-theme="dark"] .biometric-promo {
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.15), rgba(139, 92, 246, 0.15));
+    border-color: rgba(99, 102, 241, 0.3);
+}
+
+[data-theme="dark"] .biometric-promo-title {
+    color: #a5b4fc;
+}
+
+[data-theme="dark"] .biometric-promo-subtitle {
+    color: #94a3b8;
+}
+
+/* Divider text ("or") */
+[data-theme="dark"] .biometric-divider {
+    color: #64748b;
+}
+
+/* Form labels */
+[data-theme="dark"] .auth-label,
+[data-theme="dark"] .auth-label-inline {
+    color: #e2e8f0;
+}
+
+/* Form inputs */
+[data-theme="dark"] .auth-input {
+    background: rgba(15, 23, 42, 0.6);
+    border-color: rgba(255, 255, 255, 0.15);
+    color: #f1f5f9;
+}
+
+[data-theme="dark"] .auth-input::placeholder {
+    color: #64748b;
+}
+
+[data-theme="dark"] .auth-input:focus {
+    border-color: #6366f1;
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+}
+
+/* Links */
+[data-theme="dark"] .auth-link,
+[data-theme="dark"] .auth-link-primary {
+    color: #818cf8;
+}
+
+/* Footer text */
+[data-theme="dark"] .auth-footer-text {
+    color: #94a3b8;
+}

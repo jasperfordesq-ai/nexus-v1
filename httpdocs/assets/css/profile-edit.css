@@ -2,6 +2,7 @@
  * Profile Edit Page CSS
  * Glassmorphism styles for profile settings page
  * Extracted from views/modern/profile/edit.php
+  * Fully Migrated to Design Tokens: 2026-01-21 ✓
  */
 
 /* ============================================
@@ -14,7 +15,7 @@
     right: var(--space-0);
     bottom: var(--space-0);
     z-index: -1;
-    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 25%, #e2e8f0 50%, #f1f5f9 75%, #f8fafc 100%);
+    background: linear-gradient(135deg, var(--color-slate-50) 0%, var(--color-slate-100) 25%, var(--color-slate-200) 50%, var(--color-slate-100) 75%, var(--color-slate-50) 100%);
 }
 
 .edit-glass-bg::before {
@@ -32,7 +33,7 @@
 }
 
 [data-theme="dark"] .edit-glass-bg {
-    background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%);
+    background: linear-gradient(135deg, var(--color-slate-900) 0%, var(--color-slate-800) 50%, var(--color-slate-900) 100%);
 }
 
 [data-theme="dark"] .edit-glass-bg::before {
@@ -69,13 +70,13 @@
 
 [data-theme="dark"] .edit-container h3,
 [data-theme="dark"] .edit-container label {
-    color: #f1f5f9 !important;
+    color: var(--color-slate-100) !important;
 }
 
 [data-theme="dark"] .edit-container .htb-form-control {
     background: rgba(15, 23, 42, 0.5);
     border-color: rgba(255, 255, 255, 0.1);
-    color: #f1f5f9;
+    color: var(--color-slate-100);
 }
 
 /* ============================================
@@ -83,34 +84,34 @@
    ============================================ */
 [data-theme="dark"] .edit-container a[href*="/profile/"].profile-back-link {
     background: rgba(255, 255, 255, 0.1) !important;
-    color: #e2e8f0 !important;
+    color: var(--color-slate-200) !important;
 }
 
 /* ============================================
    DARK MODE: TEXT COLORS
    ============================================ */
 [data-theme="dark"] .edit-container p {
-    color: #94a3b8 !important;
+    color: var(--color-slate-400) !important;
 }
 
 [data-theme="dark"] .edit-container p span {
-    color: #64748b !important;
+    color: var(--color-slate-500) !important;
 }
 
 /* ============================================
    DARK MODE: ACCOUNT STATUS BOX
    ============================================ */
 [data-theme="dark"] .edit-container .edit-status-label {
-    color: #94a3b8 !important;
+    color: var(--color-slate-400) !important;
 }
 
 [data-theme="dark"] .edit-container .edit-status-value {
-    color: #e2e8f0 !important;
+    color: var(--color-slate-200) !important;
 }
 
 [data-theme="dark"] .edit-container .edit-status-badge {
     background: rgba(51, 65, 85, 0.6) !important;
-    color: #e2e8f0 !important;
+    color: var(--color-slate-200) !important;
 }
 
 /* ============================================
@@ -133,7 +134,7 @@
 [data-theme="dark"] .edit-container input[disabled] {
     background: rgba(15, 23, 42, 0.6) !important;
     border-color: rgba(255, 255, 255, 0.05) !important;
-    color: #64748b !important;
+    color: var(--color-slate-500) !important;
 }
 
 /* ============================================
@@ -145,7 +146,7 @@
 }
 
 [data-theme="dark"] .edit-container .edit-secondary-link {
-    color: #94a3b8 !important;
+    color: var(--color-slate-400) !important;
 }
 
 /* ============================================

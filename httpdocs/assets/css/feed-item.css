@@ -2,6 +2,7 @@
  * Feed Item Component Styles
  * Extracted from feed_item.php inline styles
  * Date: 2026-01-19
+  * Fully Migrated to Design Tokens: 2026-01-21 ✓
  */
 
 /* ============================================
@@ -29,12 +30,12 @@
    INLINE LINKS (URLs in content)
    ============================================ */
 .feed-inline-link {
-    color: #4f46e5;
+    color: var(--color-primary-600);
     text-decoration: underline;
 }
 
 [data-theme="dark"] .feed-inline-link {
-    color: #818cf8;
+    color: var(--color-primary-400);
 }
 
 /* ============================================
@@ -42,10 +43,10 @@
    ============================================ */
 .feed-shared-card {
     margin-top: var(--space-3);
-    border: 1px solid var(--feed-border, #e5e7eb);
+    border: 1px solid var(--feed-border, var(--color-gray-200));
     border-radius: var(--radius-md);
     overflow: hidden;
-    background: var(--feed-bg-secondary, #f9fafb);
+    background: var(--feed-bg-secondary, var(--color-gray-50));
 }
 
 [data-theme="dark"] .feed-shared-card {
@@ -60,7 +61,7 @@
     gap: var(--space-2.5);
     padding: var(--space-2.5) var(--space-3);
     background: linear-gradient(135deg, rgba(99, 102, 241, 0.08), rgba(168, 85, 247, 0.08));
-    border-bottom: 1px solid var(--feed-border, #e5e7eb);
+    border-bottom: 1px solid var(--feed-border, var(--color-gray-200));
     text-decoration: none;
     transition: background 0.2s;
 }
@@ -92,13 +93,13 @@
 }
 
 .feed-shared-group-banner-name i {
-    color: #6366f1;
+    color: var(--color-primary-500);
     font-size: 11px;
 }
 
 .feed-shared-group-banner-location {
     font-size: 11px;
-    color: var(--feed-text-muted, #6b7280);
+    color: var(--feed-text-muted, var(--color-gray-500));
     margin-top: 1px;
     white-space: nowrap;
     overflow: hidden;
@@ -110,7 +111,7 @@
 }
 
 .feed-shared-group-banner-arrow {
-    color: var(--feed-text-muted, #9ca3af);
+    color: var(--feed-text-muted, var(--color-gray-400));
     font-size: var(--font-size-xs);
 }
 
@@ -137,13 +138,13 @@
 
 .feed-shared-label {
     font-weight: 400;
-    color: var(--feed-text-muted, #6b7280);
+    color: var(--feed-text-muted, var(--color-gray-500));
     font-size: var(--font-size-sm);
 }
 
 .feed-shared-time {
     font-size: var(--font-size-xs);
-    color: var(--feed-text-muted, #6b7280);
+    color: var(--feed-text-muted, var(--color-gray-500));
 }
 
 .feed-shared-title {
@@ -156,12 +157,12 @@
 .feed-shared-content {
     padding: 0 var(--space-3) var(--space-3);
     font-size: var(--font-size-sm);
-    color: var(--feed-text-secondary, #374151);
+    color: var(--feed-text-secondary, var(--color-gray-700));
     line-height: 1.5;
 }
 
 .feed-shared-image-container {
-    border-top: 1px solid var(--feed-border, #e5e7eb);
+    border-top: 1px solid var(--feed-border, var(--color-gray-200));
 }
 
 .feed-shared-image {
@@ -175,7 +176,7 @@
 .feed-error-fallback {
     margin-top: 12px;
     padding: var(--space-3);
-    background: #fef2f2;
+    background: var(--color-red-50);
     border: 1px solid #fecaca;
     border-radius: var(--radius-base);
     color: #991b1b;
@@ -192,13 +193,13 @@
 }
 
 .feed-error-fallback small {
-    color: #6b7280;
+    color: var(--color-gray-500);
 }
 
 [data-theme="dark"] .feed-error-fallback {
     background: rgba(127, 29, 29, 0.2);
     border-color: rgba(248, 113, 113, 0.3);
-    color: #fca5a5;
+    color: var(--color-red-300);
 }
 
 /* ============================================
@@ -210,7 +211,7 @@
 }
 
 .feed-view-link a {
-    color: #4f46e5;
+    color: var(--color-primary-600);
     font-weight: 600;
     text-decoration: none;
 }
@@ -220,7 +221,7 @@
 }
 
 [data-theme="dark"] .feed-view-link a {
-    color: #818cf8;
+    color: var(--color-primary-400);
 }
 
 /* ============================================
@@ -230,9 +231,9 @@
     overflow: hidden;
     border-radius: var(--radius-md);
     margin-top: 12px;
-    border: 1px solid var(--feed-border, #e5e7eb);
+    border: 1px solid var(--feed-border, var(--color-gray-200));
     aspect-ratio: 16/9;
-    background: var(--feed-bg-secondary, #f3f4f6);
+    background: var(--feed-bg-secondary, var(--color-gray-100));
 }
 
 .feed-media-container img {
@@ -246,7 +247,7 @@
     overflow: hidden;
     border-radius: var(--radius-md);
     margin-top: 12px;
-    border: 1px solid var(--border-color, #e5e7eb);
+    border: 1px solid var(--border-color, var(--color-gray-200));
     background: #000;
 }
 
@@ -264,9 +265,9 @@
     overflow: hidden;
     border-radius: var(--radius-md);
     margin: 0 0 12px 0;
-    border: 1px solid var(--feed-border, #e5e7eb);
+    border: 1px solid var(--feed-border, var(--color-gray-200));
     aspect-ratio: 16/9;
-    background: var(--feed-bg-secondary, #f3f4f6);
+    background: var(--feed-bg-secondary, var(--color-gray-100));
 }
 
 .feed-listing-image-container a {
@@ -297,11 +298,11 @@
 }
 
 .feed-listing-badge-overlay.offer {
-    background: linear-gradient(135deg, #10b981, #059669);
+    background: linear-gradient(135deg, var(--color-success), #059669);
 }
 
 .feed-listing-badge-overlay.request {
-    background: linear-gradient(135deg, #f59e0b, #d97706);
+    background: linear-gradient(135deg, var(--color-warning), var(--color-amber-600));
 }
 
 .feed-listing-badge-overlay i {
@@ -316,7 +317,7 @@
     align-items: center;
     gap: var(--space-4);
     padding: var(--space-3);
-    background: var(--feed-bg-secondary, #f9fafb);
+    background: var(--feed-bg-secondary, var(--color-gray-50));
     border-radius: var(--radius-md);
     margin-top: 12px;
 }
@@ -332,7 +333,7 @@
 
 .feed-event-date-location {
     font-size: var(--font-size-sm);
-    color: var(--feed-text-secondary, #6b7280);
+    color: var(--feed-text-secondary, var(--color-gray-500));
 }
 
 /* ============================================
@@ -340,9 +341,9 @@
    ============================================ */
 .feed-section-box {
     padding: var(--space-4);
-    background: var(--feed-bg-secondary, #f9fafb);
+    background: var(--feed-bg-secondary, var(--color-gray-50));
     border-radius: var(--radius-md);
-    border: 1px solid var(--feed-border, #e5e7eb);
+    border: 1px solid var(--feed-border, var(--color-gray-200));
     margin-top: 12px;
 }
 
@@ -363,7 +364,7 @@
     text-transform: uppercase;
     letter-spacing: 0.5px;
     font-weight: 700;
-    color: var(--feed-text-muted, #6b7280);
+    color: var(--feed-text-muted, var(--color-gray-500));
     margin-bottom: 2px;
 }
 
@@ -376,7 +377,7 @@
 /* Poll Box */
 .feed-poll-meta {
     font-size: var(--font-size-sm);
-    color: var(--feed-text-secondary, #6b7280);
+    color: var(--feed-text-secondary, var(--color-gray-500));
     margin-bottom: var(--space-2.5);
 }
 
@@ -396,8 +397,8 @@
     align-items: center;
     justify-content: center;
     font-size: 24px;
-    color: var(--feed-text-muted, #6b7280);
-    border: 1px solid var(--feed-border, #e5e7eb);
+    color: var(--feed-text-muted, var(--color-gray-500));
+    border: 1px solid var(--feed-border, var(--color-gray-200));
     flex-shrink: 0;
 }
 
@@ -412,7 +413,7 @@
 
 .feed-resource-meta {
     font-size: var(--font-size-sm);
-    color: var(--feed-text-secondary, #6b7280);
+    color: var(--feed-text-secondary, var(--color-gray-500));
 }
 
 /* Volunteering Box */
@@ -438,17 +439,17 @@
 
 .feed-volunteer-credits {
     background: var(--feed-bg-card, #fff);
-    color: #3b82f6;
+    color: var(--color-info);
     padding: var(--space-0.5) var(--space-2);
     border-radius: var(--radius-md);
     font-weight: 700;
     font-size: 0.8rem;
-    border: 1px solid #dbeafe;
+    border: 1px solid var(--color-blue-100);
 }
 
 .feed-volunteer-location {
     font-size: 0.9rem;
-    color: var(--feed-text-secondary, #6b7280);
+    color: var(--feed-text-secondary, var(--color-gray-500));
     margin-bottom: var(--space-2.5);
     display: flex;
     gap: var(--space-1.5);
@@ -469,7 +470,7 @@
 
 .feed-event-label {
     font-size: var(--font-size-sm);
-    color: #be185d;
+    color: var(--color-pink-700);
     font-weight: 600;
     margin-bottom: 6px;
     text-transform: uppercase;
@@ -478,17 +479,17 @@
 
 .feed-event-date-badge {
     background: var(--feed-bg-card, #fff);
-    color: #be185d;
+    color: var(--color-pink-700);
     padding: var(--space-0.5) var(--space-2);
     border-radius: var(--radius-md);
     font-weight: 700;
     font-size: 0.8rem;
-    border: 1px solid #fbcfe8;
+    border: 1px solid var(--color-pink-200);
 }
 
 .feed-event-location {
     font-size: 0.9rem;
-    color: var(--feed-text-secondary, #6b7280);
+    color: var(--feed-text-secondary, var(--color-gray-500));
     margin-bottom: var(--space-2.5);
     display: flex;
     gap: var(--space-1.5);
@@ -532,7 +533,7 @@
 
 .feed-review-for {
     font-size: var(--font-size-sm);
-    color: var(--feed-text-muted, #6b7280);
+    color: var(--feed-text-muted, var(--color-gray-500));
     margin-bottom: 2px;
 }
 
@@ -551,7 +552,7 @@
     display: flex;
     align-items: center;
     gap: 2px;
-    background: linear-gradient(135deg, #fbbf24, #f59e0b);
+    background: linear-gradient(135deg, var(--color-amber-300), var(--color-warning));
     padding: var(--space-1.5) var(--space-3);
     border-radius: var(--radius-full);
     flex-shrink: 0;
@@ -578,18 +579,18 @@
     border-radius: var(--radius-md);
     padding: var(--space-3) var(--space-3.5);
     margin-top: var(--space-2);
-    border-left: 3px solid #fbbf24;
+    border-left: 3px solid var(--color-amber-300);
 }
 
 .feed-review-quote i {
-    color: #fbbf24;
+    color: var(--color-amber-300);
     font-size: var(--font-size-sm);
     margin-right: var(--space-1.5);
 }
 
 .feed-review-quote span {
     font-style: italic;
-    color: var(--feed-text-secondary, #6b7280);
+    color: var(--feed-text-secondary, var(--color-gray-500));
 }
 
 .feed-review-action {
@@ -614,7 +615,7 @@
 }
 
 [data-theme="dark"] .feed-volunteer-label {
-    color: #60a5fa;
+    color: var(--color-blue-400);
 }
 
 [data-theme="dark"] .feed-volunteer-credits {
@@ -627,7 +628,7 @@
 }
 
 [data-theme="dark"] .feed-event-label {
-    color: #f472b6;
+    color: var(--color-pink-400);
 }
 
 [data-theme="dark"] .feed-event-date-badge {
@@ -719,13 +720,13 @@
     right: var(--space-3);
     top: 50%;
     transform: translateY(-50%);
-    color: var(--feed-text-muted, #6b7280);
+    color: var(--feed-text-muted, var(--color-gray-500));
     cursor: pointer;
     transition: color 0.2s;
 }
 
 .feed-comment-submit:hover {
-    color: var(--primary, #6366f1);
+    color: var(--primary, var(--color-primary-500));
 }
 
 /* ============================================

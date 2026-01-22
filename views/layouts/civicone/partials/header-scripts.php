@@ -453,3 +453,6 @@
                 })();
             </script>
         <?php endif; ?>
+
+        <!-- Development Notice Modal -->
+        <script src="/assets/js/dev-notice-modal.min.js?v=<?= $cssVersion ?>"></script>

@@ -75,7 +75,7 @@ html[data-layout="modern"].banner-scrolled .nexus-navbar {
     font-size: var(--font-size-xs);
     font-weight: var(--font-weight-bold);
     letter-spacing: 0.3px;
-    color: #ffffff;
+    color: var(--color-white);
     border: 1px solid rgba(255, 255, 255, 0.3);
     box-shadow: var(--shadow-xs);
 }
@@ -92,7 +92,7 @@ html[data-layout="modern"].banner-scrolled .nexus-navbar {
 
 .modern-experimental-text strong {
     font-weight: var(--font-weight-semibold);
-    color: #ffffff;
+    color: var(--color-white);
 }
 
 .modern-experimental-switch {
@@ -114,7 +114,7 @@ html[data-layout="modern"].banner-scrolled .nexus-navbar {
 }
 
 .modern-experimental-switch:hover {
-    background: #ffffff;
+    background: var(--color-white);
     transform: translateY(-1px);
     box-shadow: var(--shadow-md);
     color: var(--color-primary-700);
@@ -206,5 +206,5 @@ html[data-layout="modern"].banner-scrolled .nexus-navbar {
 }
 
 [data-theme="dark"] .modern-experimental-switch:hover {
-    background: #ffffff;
+    background: var(--color-white);
 }

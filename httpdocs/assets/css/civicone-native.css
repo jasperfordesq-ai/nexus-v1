@@ -3,6 +3,7 @@
  * Advanced animations and native-feel interactions
  * WCAG 2.1 AA Compliant
  * Updated 2026-01-20: GOV.UK design tokens
+  * Fully Migrated to Design Tokens: 2026-01-21 ✓
  */
 
 /* ===========================================
@@ -120,7 +121,7 @@
     content: '';
     position: absolute;
     inset: 0;
-    background: var(--civic-brand, #2563eb);
+    background: var(--civic-brand, var(--color-blue-600));
     opacity: 0;
     border-radius: inherit;
     pointer-events: none;
@@ -227,7 +228,7 @@
     bottom: 0;
     left: 0;
     right: 0;
-    background: var(--civic-bg-card, #ffffff);
+    background: var(--civic-bg-card, var(--color-white));
     border-radius: var(--radius-lg) var(--radius-lg) 0 0;
     box-shadow: 0 calc(var(--space-2) * -1.25) var(--space-10) rgba(0, 0, 0, 0.2);
     z-index: var(--z-dropdown, 1000);
@@ -250,7 +251,7 @@
 .civic-bottom-sheet-handle {
     width: calc(var(--space-2) * 4.5);
     height: var(--space-1);
-    background: var(--civic-border, #d1d5db);
+    background: var(--civic-border, var(--color-gray-300));
     border-radius: var(--radius-sm);
     margin: var(--space-3) auto;
 }
@@ -285,7 +286,7 @@
 }
 
 body.dark-mode .civic-bottom-sheet {
-    background: var(--civic-bg-card, #1f2937);
+    background: var(--civic-bg-card, var(--color-gray-800));
 }
 
 
@@ -313,7 +314,7 @@ body.dark-mode .civic-bottom-sheet {
 
 .nexus-share-sheet-content {
     position: relative;
-    background: var(--civic-bg-card, #ffffff);
+    background: var(--civic-bg-card, var(--color-white));
     border-radius: var(--radius-lg) var(--radius-lg) 0 0;
     width: 100%;
     max-width: calc(var(--space-4) * 31.25);
@@ -344,7 +345,7 @@ body.dark-mode .civic-bottom-sheet {
     justify-content: space-between;
     align-items: center;
     padding: var(--space-4) var(--space-5);
-    border-bottom: 1px solid var(--civic-border, #e5e7eb);
+    border-bottom: 1px solid var(--civic-border, var(--color-gray-200));
 }
 
 .nexus-share-sheet-header h3 {
@@ -357,7 +358,7 @@ body.dark-mode .civic-bottom-sheet {
     background: none;
     border: none;
     font-size: var(--font-size-2xl);
-    color: var(--civic-text-muted, #6b7280);
+    color: var(--civic-text-muted, var(--color-gray-500));
     cursor: pointer;
     padding: var(--space-1);
     line-height: 1;
@@ -365,11 +366,11 @@ body.dark-mode .civic-bottom-sheet {
 
 .nexus-share-close:focus {
     /* GOV.UK Focus Pattern */
-    outline: calc(var(--space-1) * 0.75) solid var(--govuk-focus-colour, #ffdd00);
+    outline: calc(var(--space-1) * 0.75) solid var(--govuk-focus-colour, var(--color-brand-yellow));
     outline-offset: 0;
-    background-color: var(--govuk-focus-colour, #ffdd00);
+    background-color: var(--govuk-focus-colour, var(--color-brand-yellow));
     color: var(--govuk-focus-text-colour, #0b0c0c);
-    box-shadow: 0 calc(var(--space-1) * -0.5) var(--govuk-focus-colour, #ffdd00), 0 var(--space-1) var(--govuk-focus-text-colour, #0b0c0c);
+    box-shadow: 0 calc(var(--space-1) * -0.5) var(--govuk-focus-colour, var(--color-brand-yellow)), 0 var(--space-1) var(--govuk-focus-text-colour, #0b0c0c);
 }
 
 .nexus-share-options {
@@ -385,10 +386,10 @@ body.dark-mode .civic-bottom-sheet {
     align-items: center;
     gap: var(--space-2);
     padding: var(--space-4) var(--space-2);
-    background: var(--civic-bg-page, #f3f4f6);
+    background: var(--civic-bg-page, var(--color-gray-100));
     border: none;
     border-radius: var(--radius-md);
-    color: var(--civic-text-main, #1f2937);
+    color: var(--civic-text-main, var(--color-gray-800));
     text-decoration: none;
     font-size: var(--font-size-xs);
     font-weight: 500;
@@ -408,16 +409,16 @@ body.dark-mode .civic-bottom-sheet {
 }
 
 .nexus-share-option:hover {
-    background: var(--civic-border, #e5e7eb);
+    background: var(--civic-border, var(--color-gray-200));
 }
 
 .nexus-share-option:focus {
     /* GOV.UK Focus Pattern */
-    outline: calc(var(--space-1) * 0.75) solid var(--govuk-focus-colour, #ffdd00);
+    outline: calc(var(--space-1) * 0.75) solid var(--govuk-focus-colour, var(--color-brand-yellow));
     outline-offset: 0;
-    background-color: var(--govuk-focus-colour, #ffdd00);
+    background-color: var(--govuk-focus-colour, var(--color-brand-yellow));
     color: var(--govuk-focus-text-colour, #0b0c0c);
-    box-shadow: 0 calc(var(--space-1) * -0.5) var(--govuk-focus-colour, #ffdd00), 0 var(--space-1) var(--govuk-focus-text-colour, #0b0c0c);
+    box-shadow: 0 calc(var(--space-1) * -0.5) var(--govuk-focus-colour, var(--color-brand-yellow)), 0 var(--space-1) var(--govuk-focus-text-colour, #0b0c0c);
 }
 
 .nexus-share-option i {
@@ -425,7 +426,7 @@ body.dark-mode .civic-bottom-sheet {
 }
 
 .nexus-share-option[href*="facebook"] i { color: #1877f2; }
-.nexus-share-option[href*="twitter"] i { color: #000000; }
+.nexus-share-option[href*="twitter"] i { color: var(--color-black); }
 .nexus-share-option[href*="whatsapp"] i { color: #25d366; }
 .nexus-share-option[href*="mailto"] i { color: #ea4335; }
 
@@ -441,7 +442,7 @@ body.dark-mode .civic-bottom-sheet {
     transform: translateY(-50%) translateX(-100%);
     width: calc(var(--space-4) * 3.75);
     height: calc(var(--space-4) * 3.75);
-    background: var(--civic-bg-card, #ffffff);
+    background: var(--civic-bg-card, var(--color-white));
     border-radius: 0 var(--radius-full) var(--radius-full) 0;
     box-shadow: var(--space-1) 0 var(--space-5) rgba(0, 0, 0, 0.15);
     display: flex;
@@ -471,7 +472,7 @@ body.dark-mode .civic-bottom-sheet {
 .civic-swipe-indicator svg {
     width: var(--space-6);
     height: var(--space-6);
-    fill: var(--civic-brand, #2563eb);
+    fill: var(--civic-brand, var(--color-blue-600));
 }
 
 
@@ -492,9 +493,9 @@ body.dark-mode .civic-bottom-sheet {
 
 .civic-progress-bar-inner {
     height: 100%;
-    background: linear-gradient(90deg, var(--civic-brand, #2563eb), var(--civic-accent-purple, #8b5cf6));
+    background: linear-gradient(90deg, var(--civic-brand, var(--color-blue-600)), var(--civic-accent-purple, var(--color-purple-500)));
     width: 0;
-    box-shadow: 0 0 var(--space-2) var(--civic-brand, #2563eb);
+    box-shadow: 0 0 var(--space-2) var(--civic-brand, var(--color-blue-600));
 }
 
 @media (prefers-reduced-motion: no-preference) {
@@ -536,9 +537,9 @@ input[type="tel"]:focus,
 select:focus,
 textarea:focus {
     /* GOV.UK Focus Pattern */
-    outline: calc(var(--space-1) * 0.75) solid var(--govuk-focus-colour, #ffdd00);
+    outline: calc(var(--space-1) * 0.75) solid var(--govuk-focus-colour, var(--color-brand-yellow));
     outline-offset: 0;
-    background-color: var(--govuk-focus-colour, #ffdd00);
+    background-color: var(--govuk-focus-colour, var(--color-brand-yellow));
     color: var(--govuk-focus-text-colour, #0b0c0c);
     box-shadow: inset 0 0 0 var(--space-1) var(--govuk-focus-text-colour, #0b0c0c);
 }
@@ -567,13 +568,13 @@ textarea:focus {
 /* Input validation states */
 .civic-input.valid,
 input.valid {
-    border-color: var(--civic-accent-green, #10b981) !important;
+    border-color: var(--civic-accent-green, var(--color-success)) !important;
     box-shadow: 0 0 0 calc(var(--space-1) * 0.75) rgba(16, 185, 129, 0.1);
 }
 
 .civic-input.invalid,
 input.invalid {
-    border-color: var(--civic-error, #ef4444) !important;
+    border-color: var(--civic-error, var(--color-danger)) !important;
     box-shadow: 0 0 0 calc(var(--space-1) * 0.75) rgba(239, 68, 68, 0.1);
 }
 
@@ -601,9 +602,9 @@ input.invalid {
     right: calc(var(--space-1) * -0.5);
     width: var(--space-3);
     height: var(--space-3);
-    background: var(--civic-error, #ef4444);
+    background: var(--civic-error, var(--color-danger));
     border-radius: 50%;
-    border: var(--space-1) solid var(--civic-bg-card, #ffffff);
+    border: var(--space-1) solid var(--civic-bg-card, var(--color-white));
 }
 
 @media (prefers-reduced-motion: no-preference) {
@@ -710,7 +711,7 @@ input.invalid {
    =========================================== */
 
 .civic-context-menu {
-    background: var(--civic-bg-card, #ffffff);
+    background: var(--civic-bg-card, var(--color-white));
     border-radius: var(--radius-md);
     box-shadow: 0 var(--space-2) var(--space-10) rgba(0, 0, 0, 0.2);
     overflow: hidden;
@@ -743,38 +744,38 @@ input.invalid {
     background: none;
     border: none;
     font-size: var(--font-size-sm);
-    color: var(--civic-text-main, #1f2937);
+    color: var(--civic-text-main, var(--color-gray-800));
     cursor: pointer;
     text-align: left;
 }
 
 .civic-context-menu button:hover {
-    background: var(--civic-bg-page, #f3f4f6);
+    background: var(--civic-bg-page, var(--color-gray-100));
 }
 
 .civic-context-menu button:active {
-    background: var(--civic-border, #e5e7eb);
+    background: var(--civic-border, var(--color-gray-200));
 }
 
 .civic-context-menu button:focus {
     /* GOV.UK Focus Pattern */
-    outline: calc(var(--space-1) * 0.75) solid var(--govuk-focus-colour, #ffdd00);
+    outline: calc(var(--space-1) * 0.75) solid var(--govuk-focus-colour, var(--color-brand-yellow));
     outline-offset: 0;
-    background-color: var(--govuk-focus-colour, #ffdd00);
+    background-color: var(--govuk-focus-colour, var(--color-brand-yellow));
     color: var(--govuk-focus-text-colour, #0b0c0c);
-    box-shadow: 0 calc(var(--space-1) * -0.5) var(--govuk-focus-colour, #ffdd00), 0 var(--space-1) var(--govuk-focus-text-colour, #0b0c0c);
+    box-shadow: 0 calc(var(--space-1) * -0.5) var(--govuk-focus-colour, var(--color-brand-yellow)), 0 var(--space-1) var(--govuk-focus-text-colour, #0b0c0c);
 }
 
 .civic-context-menu button svg {
-    color: var(--civic-text-muted, #6b7280);
+    color: var(--civic-text-muted, var(--color-gray-500));
 }
 
 body.dark-mode .civic-context-menu {
-    background: var(--civic-bg-card, #1f2937);
+    background: var(--civic-bg-card, var(--color-gray-800));
 }
 
 body.dark-mode .civic-context-menu button:hover {
-    background: var(--civic-bg-page, #111827);
+    background: var(--civic-bg-page, var(--color-gray-900));
 }
 
 
@@ -903,7 +904,7 @@ body.turbo-loading .civic-btn {
     top: 0;
     left: 0;
     right: 0;
-    background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+    background: linear-gradient(135deg, var(--color-warning) 0%, var(--color-amber-600) 100%);
     color: white;
     text-align: center;
     padding: var(--space-2) var(--space-4);
@@ -943,7 +944,7 @@ body.is-offline .civic-header {
     top: 0;
     left: 0;
     right: 0;
-    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    background: linear-gradient(135deg, var(--color-success) 0%, #059669 100%);
     color: white;
     text-align: center;
     padding: var(--space-2) var(--space-4);

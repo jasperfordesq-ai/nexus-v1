@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en" class="govuk-template">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CivicOne Hero Examples - GOV.UK Frontend ONLY</title>
+    <link rel="stylesheet" href="../httpdocs/assets/css/design-tokens.css">
+    <link rel="stylesheet" href="../httpdocs/assets/css/civicone-govuk-typography.css">
+    <link rel="stylesheet" href="../httpdocs/assets/css/civicone-govuk-buttons.css">
+    <link rel="stylesheet" href="../httpdocs/assets/css/civicone-hero-govuk.css">
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            margin: 0; padding: 20px; background: #f3f2f1;
+        }
+        .example { margin-bottom: 60px; padding: 30px; background: white; border: 2px solid #b1b4b6; }
+        .example h2 { margin-top: 0; color: #1d70b8; font-size: 1.5rem; border-bottom: 3px solid #1d70b8; padding-bottom: 10px; }
+        .example-info { background: #f8f9fa; padding: 15px; margin-bottom: 20px; border-left: 4px solid #1d70b8; }
+        .civicone-width-container { max-width: 1020px; margin: 0 auto; }
+        .civicone-heading-xl { font-size: 2rem; font-weight: 700; line-height: 1.09375; }
+        @media (min-width: 641px) { .civicone-heading-xl { font-size: 3rem; line-height: 1.04167; } }
+        .page-title { text-align: center; padding: 40px 20px; background: #0b0c0c; color: white; margin: -20px -20px 40px -20px; }
+        .source-badge { display: inline-block; background: #00703c; color: white; padding: 5px 10px; font-size: 0.875rem; font-weight: 700; margin-top: 10px; }
+    </style>
+</head>
+<body class="civicone">
+
+<div class="page-title">
+    <h1 style="margin: 0; font-size: 2.5rem;">CivicOne Hero Components</h1>
+    <p style="margin: 10px 0 0 0; font-size: 1.25rem;">GOV.UK Frontend ONLY</p>
+    <span class="source-badge">WCAG 2.2 AA Compliant</span>
+</div>
+
+<div class="civicone-width-container">
+
+    <div class="example">
+        <h2>1. Default Page Hero</h2>
+        <div class="example-info">
+            <p><strong>Use for:</strong> Standard pages</p>
+            <p><strong>Source:</strong> GOV.UK Page Template</p>
+        </div>
+
+        <div class="civicone-hero">
+            <h1 class="civicone-heading-xl">Members Directory</h1>
+            <p class="civicone-hero__lead">Connect with community members.</p>
+        </div>
+    </div>
+
+    <div class="example">
+        <h2>2. Banner Hero with Start Button</h2>
+        <div class="example-info">
+            <p><strong>Use for:</strong> Homepage, onboarding</p>
+            <p><strong>Source:</strong> GOV.UK Start Button</p>
+        </div>
+
+        <div class="civicone-hero civicone-hero--banner">
+            <h1 class="civicone-heading-xl">Welcome to CivicOne</h1>
+            <p class="civicone-hero__lead">A community platform.</p>
+            <a href="/join" role="button" draggable="false" class="civicone-button civicone-button--start">
+                Get started
+                <svg class="civicone-button__start-icon" xmlns="http://www.w3.org/2000/svg" width="17.5" height="19" viewBox="0 0 33 40" aria-hidden="true" focusable="false">
+                    <path fill="currentColor" d="M0 0h13l20 20-20 20H0l20-20z"/>
+                </svg>
+            </a>
+        </div>
+    </div>
+
+    <div class="example">
+        <h2>3. Confirmation Panel</h2>
+        <div class="example-info">
+            <p><strong>Use for:</strong> Success pages</p>
+            <p><strong>Source:</strong> GOV.UK Panel Component</p>
+        </div>
+
+        <div class="civicone-panel civicone-panel--confirmation">
+            <h1 class="civicone-panel__title">Application complete</h1>
+            <div class="civicone-panel__body">
+                Your reference number<br>
+                <strong>HDJ2123F</strong>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<footer style="margin-top: 60px; padding: 30px; background: #0b0c0c; color: white; text-align: center;">
+    <h3 style="margin-top: 0; color: #ffdd00;">GOV.UK Frontend ONLY</h3>
+    <p><a href="https://design-system.service.gov.uk/components/panel/" style="color: #ffdd00;">Panel Component</a></p>
+    <p><a href="https://design-system.service.gov.uk/styles/page-template/" style="color: #ffdd00;">Page Template</a></p>
+</footer>
+
+</body>
+</html>

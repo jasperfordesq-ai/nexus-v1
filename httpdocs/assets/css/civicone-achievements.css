@@ -3,6 +3,7 @@
  * Consolidated from 6 achievement view files
  * WCAG 2.1 AA Compliant
  * Updated 2026-01-20: GOV.UK design tokens
+  * Fully Migrated to Design Tokens: 2026-01-21 ✓
  */
 
 /* ============================================
@@ -130,7 +131,7 @@
     margin: 0;
     font-size: 1.1rem;
     font-weight: 700;
-    color: #1f2937;
+    color: var(--color-gray-800);
 }
 
 /* Level Display */
@@ -143,7 +144,7 @@
 .level-circle {
     width: 100px;
     height: 100px;
-    background: linear-gradient(135deg, #a855f7, #6366f1);
+    background: linear-gradient(135deg, var(--color-purple-400), var(--color-primary-500));
     border-radius: 50%;
     display: flex;
     flex-direction: column;
@@ -175,27 +176,27 @@
 .level-info h4 {
     margin: 0 0 var(--space-2) 0;
     font-size: 0.9rem;
-    color: #6b7280;
+    color: var(--color-gray-500);
     font-weight: 500;
 }
 
 .xp-display {
     font-size: 2rem;
     font-weight: 800;
-    color: #1f2937;
+    color: var(--color-gray-800);
     line-height: 1.2;
 }
 
 .xp-display span {
     font-size: 1rem;
-    color: #6b7280;
+    color: var(--color-gray-500);
     font-weight: 600;
 }
 
 /* Progress Bar */
 .progress-bar-container {
     height: var(--space-3);
-    background: #e5e7eb;
+    background: var(--color-gray-200);
     border-radius: var(--radius-base);
     overflow: hidden;
     margin: var(--space-3) 0 var(--space-2);
@@ -203,14 +204,14 @@
 
 .progress-bar-fill {
     height: 100%;
-    background: linear-gradient(90deg, #a855f7, #6366f1);
+    background: linear-gradient(90deg, var(--color-purple-400), var(--color-primary-500));
     border-radius: var(--radius-base);
     transition: width var(--transition-slow);
 }
 
 .progress-text {
     font-size: 0.85rem;
-    color: #6b7280;
+    color: var(--color-gray-500);
 }
 
 /* Streaks Grid */
@@ -223,7 +224,7 @@
 .streak-item {
     text-align: center;
     padding: var(--space-4);
-    background: #f9fafb;
+    background: var(--color-gray-50);
     border-radius: var(--radius-md);
 }
 
@@ -235,20 +236,20 @@
 .streak-item .streak-count {
     font-size: 2rem;
     font-weight: 800;
-    color: #1f2937;
+    color: var(--color-gray-800);
     line-height: 1;
 }
 
 .streak-item .streak-label {
     font-size: 0.8rem;
-    color: #6b7280;
+    color: var(--color-gray-500);
     font-weight: 600;
     margin-top: var(--space-1);
 }
 
 .streak-item .streak-best {
     font-size: 0.75rem;
-    color: #9ca3af;
+    color: var(--color-gray-400);
     margin-top: var(--space-2);
 }
 
@@ -263,7 +264,7 @@
 .rank-item {
     text-align: center;
     padding: var(--space-3);
-    background: linear-gradient(135deg, #fef3c7, #fde68a);
+    background: linear-gradient(135deg, var(--color-amber-100), var(--color-amber-200));
     border-radius: var(--radius-base);
 }
 
@@ -283,7 +284,7 @@
     display: inline-flex;
     align-items: center;
     gap: var(--space-1);
-    color: #6366f1;
+    color: var(--color-primary-500);
     font-weight: 600;
     font-size: 0.9rem;
     text-decoration: none;
@@ -319,19 +320,19 @@
 
 .badge-progress-item .badge-name {
     font-weight: 700;
-    color: #1f2937;
+    color: var(--color-gray-800);
     margin-bottom: var(--space-1);
 }
 
 .badge-progress-item .badge-desc {
     font-size: 0.85rem;
-    color: #6b7280;
+    color: var(--color-gray-500);
     margin-bottom: var(--space-2);
 }
 
 .progress-mini {
     height: var(--space-1);
-    background: #e5e7eb;
+    background: var(--color-gray-200);
     border-radius: var(--radius-sm);
     overflow: hidden;
     margin-bottom: var(--space-1);
@@ -339,13 +340,13 @@
 
 .progress-mini-fill {
     height: 100%;
-    background: linear-gradient(90deg, #a855f7, #6366f1);
+    background: linear-gradient(90deg, var(--color-purple-400), var(--color-primary-500));
     border-radius: var(--radius-sm);
 }
 
 .badge-progress-item .progress-label {
     font-size: 0.75rem;
-    color: #9ca3af;
+    color: var(--color-gray-400);
 }
 
 /* Badges Earned Grid */
@@ -373,11 +374,11 @@
 
 .badge-earned:focus {
     /* GOV.UK Focus Pattern */
-    outline: 3px solid var(--govuk-focus-colour, #ffdd00);
+    outline: 3px solid var(--govuk-focus-colour, var(--color-brand-yellow));
     outline-offset: 0;
-    background-color: var(--govuk-focus-colour, #ffdd00);
+    background-color: var(--govuk-focus-colour, var(--color-brand-yellow));
     color: var(--govuk-focus-text-colour, #0b0c0c);
-    box-shadow: 0 -2px var(--govuk-focus-colour, #ffdd00), 0 4px var(--govuk-focus-text-colour, #0b0c0c);
+    box-shadow: 0 -2px var(--govuk-focus-colour, var(--color-brand-yellow)), 0 4px var(--govuk-focus-text-colour, #0b0c0c);
 }
 
 .badge-earned .badge-icon {
@@ -388,7 +389,7 @@
 
 .badge-earned .badge-name {
     font-size: 0.7rem;
-    color: #6b7280;
+    color: var(--color-gray-500);
     font-weight: 500;
     line-height: 1.2;
 }
@@ -405,24 +406,24 @@
     justify-content: space-between;
     align-items: center;
     padding: var(--space-3);
-    background: #f9fafb;
+    background: var(--color-gray-50);
     border-radius: var(--radius-base);
 }
 
 .xp-log-item .xp-action {
     font-weight: 600;
-    color: #1f2937;
+    color: var(--color-gray-800);
     font-size: 0.9rem;
 }
 
 .xp-log-item .xp-date {
     font-size: 0.75rem;
-    color: #9ca3af;
+    color: var(--color-gray-400);
 }
 
 .xp-log-item .xp-amount {
     font-weight: 700;
-    color: #10b981;
+    color: var(--color-success);
     font-size: 0.95rem;
 }
 
@@ -503,7 +504,7 @@
     position: relative;
     padding: var(--space-8) var(--space-6) var(--space-6);
     text-align: center;
-    background: linear-gradient(135deg, #a855f7 0%, #6366f1 100%);
+    background: linear-gradient(135deg, var(--color-purple-400) 0%, var(--color-primary-500) 100%);
     color: white;
     border-radius: var(--radius-2xl) var(--radius-2xl) 0 0;
 }
@@ -532,11 +533,11 @@
 
 .badge-modal-close:focus {
     /* GOV.UK Focus Pattern */
-    outline: 3px solid var(--govuk-focus-colour, #ffdd00);
+    outline: 3px solid var(--govuk-focus-colour, var(--color-brand-yellow));
     outline-offset: 0;
-    background-color: var(--govuk-focus-colour, #ffdd00);
+    background-color: var(--govuk-focus-colour, var(--color-brand-yellow));
     color: var(--govuk-focus-text-colour, #0b0c0c);
-    box-shadow: 0 -2px var(--govuk-focus-colour, #ffdd00), 0 4px var(--govuk-focus-text-colour, #0b0c0c);
+    box-shadow: 0 -2px var(--govuk-focus-colour, var(--color-brand-yellow)), 0 4px var(--govuk-focus-text-colour, #0b0c0c);
 }
 
 .badge-modal-icon {
@@ -562,22 +563,22 @@
 }
 
 .badge-rarity-tag.legendary {
-    background: linear-gradient(135deg, #fbbf24, #f59e0b);
+    background: linear-gradient(135deg, var(--color-amber-300), var(--color-warning));
     color: #78350f;
 }
 
 .badge-rarity-tag.epic {
-    background: linear-gradient(135deg, #a855f7, #7c3aed);
+    background: linear-gradient(135deg, var(--color-purple-400), #7c3aed);
     color: white;
 }
 
 .badge-rarity-tag.rare {
-    background: linear-gradient(135deg, #3b82f6, #2563eb);
+    background: linear-gradient(135deg, var(--color-info), var(--color-blue-600));
     color: white;
 }
 
 .badge-rarity-tag.uncommon {
-    background: linear-gradient(135deg, #10b981, #059669);
+    background: linear-gradient(135deg, var(--color-success), #059669);
     color: white;
 }
 
@@ -601,7 +602,7 @@
 .badge-modal-label {
     font-size: 0.75rem;
     font-weight: 700;
-    color: #6b7280;
+    color: var(--color-gray-500);
     text-transform: uppercase;
     letter-spacing: 0.5px;
     margin-bottom: var(--space-1);
@@ -611,12 +612,12 @@
 }
 
 .badge-modal-label i {
-    color: #a855f7;
+    color: var(--color-purple-400);
 }
 
 .badge-modal-text {
     font-size: 1rem;
-    color: #1f2937;
+    color: var(--color-gray-800);
     line-height: 1.5;
 }
 
@@ -626,7 +627,7 @@
 
 .badge-rarity-bar {
     height: var(--space-2);
-    background: #e5e7eb;
+    background: var(--color-gray-200);
     border-radius: var(--radius-sm);
     overflow: hidden;
     margin-top: var(--space-2);
@@ -639,23 +640,23 @@
 }
 
 .badge-rarity-fill.legendary {
-    background: linear-gradient(90deg, #fbbf24, #f59e0b);
+    background: linear-gradient(90deg, var(--color-amber-300), var(--color-warning));
 }
 
 .badge-rarity-fill.epic {
-    background: linear-gradient(90deg, #a855f7, #7c3aed);
+    background: linear-gradient(90deg, var(--color-purple-400), #7c3aed);
 }
 
 .badge-rarity-fill.rare {
-    background: linear-gradient(90deg, #3b82f6, #2563eb);
+    background: linear-gradient(90deg, var(--color-info), var(--color-blue-600));
 }
 
 .badge-rarity-fill.uncommon {
-    background: linear-gradient(90deg, #10b981, #059669);
+    background: linear-gradient(90deg, var(--color-success), #059669);
 }
 
 .badge-rarity-fill.common {
-    background: #9ca3af;
+    background: var(--color-gray-400);
 }
 
 /* Mobile drawer style for badge modal */
@@ -721,11 +722,11 @@
 .badges-progress-bar h2 {
     margin: 0 0 var(--space-3) 0;
     font-size: 1.3rem;
-    color: #1f2937;
+    color: var(--color-gray-800);
 }
 
 .progress-outer {
-    background: #e5e7eb;
+    background: var(--color-gray-200);
     border-radius: var(--radius-md);
     height: var(--space-6);
     overflow: hidden;
@@ -734,7 +735,7 @@
 
 .progress-inner {
     height: 100%;
-    background: linear-gradient(90deg, #a855f7, #6366f1);
+    background: linear-gradient(90deg, var(--color-purple-400), var(--color-primary-500));
     border-radius: var(--radius-md);
     transition: width var(--transition-slow);
     display: flex;
@@ -804,7 +805,7 @@
 }
 
 .showcase-badge-slot.empty {
-    color: #d97706;
+    color: var(--color-amber-600);
     font-size: 0.8rem;
 }
 
@@ -823,7 +824,7 @@
     margin: 0 0 var(--space-5) 0;
     font-size: 1.2rem;
     font-weight: 700;
-    color: #374151;
+    color: var(--color-gray-700);
     display: flex;
     align-items: center;
     gap: var(--space-2);
@@ -833,7 +834,7 @@
 
 .badge-category h3 .count {
     background: rgba(99, 102, 241, 0.1);
-    color: #6366f1;
+    color: var(--color-primary-500);
     font-size: 0.8rem;
     padding: var(--space-1) var(--space-2);
     border-radius: var(--radius-xl);
@@ -888,18 +889,18 @@
 
 .badge-item .badge-name {
     font-weight: 700;
-    color: #1f2937;
+    color: var(--color-gray-800);
     font-size: 0.95rem;
     margin-bottom: var(--space-1);
 }
 
 .badge-item.locked .badge-name {
-    color: #6b7280;
+    color: var(--color-gray-500);
 }
 
 .badge-item .badge-desc {
     font-size: 0.8rem;
-    color: #6b7280;
+    color: var(--color-gray-500);
 }
 
 /* Badge Rarity */
@@ -913,33 +914,33 @@
 }
 
 .rarity-legendary {
-    background: linear-gradient(135deg, #fbbf24, #f59e0b);
+    background: linear-gradient(135deg, var(--color-amber-300), var(--color-warning));
     color: #78350f;
 }
 
 .rarity-epic {
-    background: linear-gradient(135deg, #a855f7, #7c3aed);
+    background: linear-gradient(135deg, var(--color-purple-400), #7c3aed);
     color: white;
 }
 
 .rarity-rare {
-    background: linear-gradient(135deg, #3b82f6, #2563eb);
+    background: linear-gradient(135deg, var(--color-info), var(--color-blue-600));
     color: white;
 }
 
 .rarity-uncommon {
-    background: linear-gradient(135deg, #10b981, #059669);
+    background: linear-gradient(135deg, var(--color-success), #059669);
     color: white;
 }
 
 .rarity-common {
-    background: #e5e7eb;
-    color: #6b7280;
+    background: var(--color-gray-200);
+    color: var(--color-gray-500);
 }
 
 .badge-item .badge-threshold {
     font-size: 0.75rem;
-    color: #9ca3af;
+    color: var(--color-gray-400);
     margin-top: var(--space-2);
 }
 
@@ -947,7 +948,7 @@
     position: absolute;
     top: var(--space-2);
     right: var(--space-2);
-    background: #10b981;
+    background: var(--color-success);
     color: white;
     width: var(--space-6);
     height: var(--space-6);
@@ -963,7 +964,7 @@
     position: absolute;
     top: var(--space-2);
     left: var(--space-2);
-    color: #f59e0b;
+    color: var(--color-warning);
     font-size: 1.2rem;
 }
 
@@ -985,15 +986,15 @@
 }
 
 .badge-item .pin-btn.pinned {
-    background: #f59e0b;
-    border-color: #f59e0b;
+    background: var(--color-warning);
+    border-color: var(--color-warning);
     color: white;
 }
 
 /* Success Toast */
 .success-toast {
     background: #dcfce7;
-    color: #166534;
+    color: var(--color-green-800);
     padding: var(--space-3) var(--space-5);
     border-radius: var(--radius-base);
     margin-bottom: var(--space-5);
@@ -1066,7 +1067,7 @@
 }
 
 .challenge-card.completed {
-    border: 2px solid #10b981;
+    border: 2px solid var(--color-success);
     background: linear-gradient(135deg, rgba(16, 185, 129, 0.05), rgba(255, 255, 255, 0.95));
 }
 
@@ -1086,12 +1087,12 @@
 }
 
 .challenge-type.daily {
-    background: #fef3c7;
+    background: var(--color-amber-100);
     color: #92400e;
 }
 
 .challenge-type.weekly {
-    background: #dbeafe;
+    background: var(--color-blue-100);
     color: #1e40af;
 }
 
@@ -1101,13 +1102,13 @@
 }
 
 .challenge-type.special {
-    background: #fce7f3;
-    color: #be185d;
+    background: var(--color-pink-100);
+    color: var(--color-pink-700);
 }
 
 .challenge-time {
     font-size: var(--font-size-xs);
-    color: #6b7280;
+    color: var(--color-gray-500);
     display: flex;
     align-items: center;
     gap: var(--space-1);
@@ -1121,7 +1122,7 @@
 }
 
 .challenge-desc {
-    color: #6b7280;
+    color: var(--color-gray-500);
     font-size: var(--font-size-sm);
     margin-bottom: var(--space-5);
 }
@@ -1132,7 +1133,7 @@
 
 .challenge-progress .progress-bar {
     height: var(--space-2);
-    background: #e5e7eb;
+    background: var(--color-gray-200);
     border-radius: var(--radius-base);
     overflow: hidden;
     margin-bottom: var(--space-2);
@@ -1140,20 +1141,20 @@
 
 .challenge-progress .progress-fill {
     height: 100%;
-    background: linear-gradient(90deg, #4f46e5, #7c3aed);
+    background: linear-gradient(90deg, var(--color-primary-600), #7c3aed);
     border-radius: var(--radius-base);
     transition: width var(--transition-slow);
 }
 
 .challenge-card.completed .progress-fill {
-    background: linear-gradient(90deg, #10b981, #34d399);
+    background: linear-gradient(90deg, var(--color-success), #34d399);
 }
 
 .challenge-progress .progress-text {
     display: flex;
     justify-content: space-between;
     font-size: var(--font-size-sm);
-    color: #6b7280;
+    color: var(--color-gray-500);
 }
 
 .challenge-reward {
@@ -1161,7 +1162,7 @@
     align-items: center;
     justify-content: space-between;
     padding-top: var(--space-4);
-    border-top: 1px solid #e5e7eb;
+    border-top: 1px solid var(--color-gray-200);
 }
 
 .reward-xp {
@@ -1169,7 +1170,7 @@
     align-items: center;
     gap: var(--space-2);
     font-weight: 700;
-    color: #10b981;
+    color: var(--color-success);
     font-size: var(--font-size-lg);
 }
 
@@ -1177,7 +1178,7 @@
     display: flex;
     align-items: center;
     gap: var(--space-1);
-    color: #10b981;
+    color: var(--color-success);
     font-weight: 600;
 }
 
@@ -1208,7 +1209,7 @@
 }
 
 .collection-card.completed {
-    border: 2px solid #10b981;
+    border: 2px solid var(--color-success);
     background: linear-gradient(135deg, rgba(16, 185, 129, 0.05), rgba(255, 255, 255, 0.95));
 }
 
@@ -1228,7 +1229,7 @@
 .collection-icon {
     width: var(--space-16);
     height: var(--space-16);
-    background: linear-gradient(135deg, #4f46e5, #7c3aed);
+    background: linear-gradient(135deg, var(--color-primary-600), #7c3aed);
     border-radius: var(--radius-lg);
     display: flex;
     align-items: center;
@@ -1237,7 +1238,7 @@
 }
 
 .collection-card.completed .collection-icon {
-    background: linear-gradient(135deg, #10b981, #34d399);
+    background: linear-gradient(135deg, var(--color-success), #34d399);
 }
 
 .collection-title {
@@ -1248,7 +1249,7 @@
 }
 
 .collection-desc {
-    color: #6b7280;
+    color: var(--color-gray-500);
     font-size: var(--font-size-sm);
 }
 
@@ -1259,16 +1260,16 @@
 .collection-progress-text {
     font-size: var(--font-size-2xl);
     font-weight: 700;
-    color: #4f46e5;
+    color: var(--color-primary-600);
 }
 
 .collection-card.completed .collection-progress-text {
-    color: #10b981;
+    color: var(--color-success);
 }
 
 .collection-reward {
     font-size: var(--font-size-sm);
-    color: #6b7280;
+    color: var(--color-gray-500);
     margin-top: var(--space-1);
 }
 
@@ -1278,7 +1279,7 @@
     gap: var(--space-3);
     margin-top: var(--space-5);
     padding-top: var(--space-5);
-    border-top: 1px solid #e5e7eb;
+    border-top: 1px solid var(--color-gray-200);
 }
 
 .collection-badges .badge-item {
@@ -1292,7 +1293,7 @@
 .collection-badges .badge-icon {
     width: var(--space-12);
     height: var(--space-12);
-    background: #f3f4f6;
+    background: var(--color-gray-100);
     border-radius: var(--radius-md);
     display: flex;
     align-items: center;
@@ -1307,13 +1308,13 @@
 .collection-badges .badge-item.earned .badge-icon {
     opacity: 1;
     filter: none;
-    background: linear-gradient(135deg, #fef3c7, #fde68a);
+    background: linear-gradient(135deg, var(--color-amber-100), var(--color-amber-200));
     box-shadow: 0 4px 12px rgba(251, 191, 36, 0.3);
 }
 
 .collection-badges .badge-name {
     font-size: var(--font-size-xs);
-    color: #6b7280;
+    color: var(--color-gray-500);
     line-height: 1.2;
 }
 
@@ -1324,7 +1325,7 @@
 
 .collection-card .progress-bar {
     height: var(--space-2);
-    background: #e5e7eb;
+    background: var(--color-gray-200);
     border-radius: var(--radius-base);
     overflow: hidden;
     margin-top: var(--space-4);
@@ -1332,13 +1333,13 @@
 
 .collection-card .progress-fill {
     height: 100%;
-    background: linear-gradient(90deg, #4f46e5, #7c3aed);
+    background: linear-gradient(90deg, var(--color-primary-600), #7c3aed);
     border-radius: var(--radius-base);
     transition: width var(--transition-slow);
 }
 
 .collection-card.completed .progress-fill {
-    background: linear-gradient(90deg, #10b981, #34d399);
+    background: linear-gradient(90deg, var(--color-success), #34d399);
 }
 
 /* ============================================
@@ -1388,12 +1389,12 @@
 }
 
 .season-badge.active {
-    background: linear-gradient(135deg, #10b981, #34d399);
+    background: linear-gradient(135deg, var(--color-success), #34d399);
     color: white;
 }
 
 .season-badge.ending-soon {
-    background: linear-gradient(135deg, #f59e0b, #fbbf24);
+    background: linear-gradient(135deg, var(--color-warning), var(--color-amber-300));
     color: white;
     animation: pulse 2s infinite;
 }
@@ -1413,19 +1414,19 @@
 
 .time-remaining-label {
     font-size: var(--font-size-sm);
-    color: #6b7280;
+    color: var(--color-gray-500);
     margin-bottom: var(--space-1);
 }
 
 .time-remaining-value {
     font-size: var(--space-8);
     font-weight: 800;
-    color: #4f46e5;
+    color: var(--color-primary-600);
 }
 
 .time-remaining-unit {
     font-size: var(--font-size-base);
-    color: #6b7280;
+    color: var(--color-gray-500);
     font-weight: 500;
 }
 
@@ -1433,7 +1434,7 @@
     display: flex;
     align-items: center;
     gap: var(--space-6);
-    background: linear-gradient(135deg, #4f46e5, #7c3aed);
+    background: linear-gradient(135deg, var(--color-primary-600), #7c3aed);
     border-radius: var(--radius-lg);
     padding: var(--space-5) var(--space-8);
     color: white;
@@ -1498,21 +1499,21 @@
     gap: var(--space-4);
     padding: var(--space-3) var(--space-4);
     border-radius: var(--radius-md);
-    background: #f9fafb;
+    background: var(--color-gray-50);
     transition: all var(--transition-fast);
 }
 
 .leaderboard-item:hover {
-    background: #f3f4f6;
+    background: var(--color-gray-100);
 }
 
 .leaderboard-item.top-3 {
-    background: linear-gradient(135deg, #fef3c7, #fde68a);
+    background: linear-gradient(135deg, var(--color-amber-100), var(--color-amber-200));
 }
 
 .leaderboard-item.current-user {
-    background: linear-gradient(135deg, #dbeafe, #bfdbfe);
-    border: 2px solid #3b82f6;
+    background: linear-gradient(135deg, var(--color-blue-100), #bfdbfe);
+    border: 2px solid var(--color-info);
 }
 
 .rank-badge {
@@ -1524,22 +1525,22 @@
     justify-content: center;
     font-weight: 700;
     font-size: var(--font-size-sm);
-    background: #e5e7eb;
-    color: #6b7280;
+    background: var(--color-gray-200);
+    color: var(--color-gray-500);
 }
 
 .leaderboard-item.top-3:nth-child(1) .rank-badge {
-    background: linear-gradient(135deg, #fbbf24, #f59e0b);
+    background: linear-gradient(135deg, var(--color-amber-300), var(--color-warning));
     color: white;
 }
 
 .leaderboard-item.top-3:nth-child(2) .rank-badge {
-    background: linear-gradient(135deg, #9ca3af, #6b7280);
+    background: linear-gradient(135deg, var(--color-gray-400), var(--color-gray-500));
     color: white;
 }
 
 .leaderboard-item.top-3:nth-child(3) .rank-badge {
-    background: linear-gradient(135deg, #d97706, #b45309);
+    background: linear-gradient(135deg, var(--color-amber-600), var(--color-amber-700));
     color: white;
 }
 
@@ -1548,7 +1549,7 @@
     height: var(--space-10);
     border-radius: 50%;
     object-fit: cover;
-    background: #e5e7eb;
+    background: var(--color-gray-200);
 }
 
 .user-details {
@@ -1562,12 +1563,12 @@
 
 .user-level {
     font-size: var(--font-size-xs);
-    color: #6b7280;
+    color: var(--color-gray-500);
 }
 
 .user-xp {
     font-weight: 700;
-    color: #4f46e5;
+    color: var(--color-primary-600);
 }
 
 /* Rewards Card */
@@ -1595,19 +1596,19 @@
     padding: var(--space-4);
     border-radius: var(--radius-md);
     margin-bottom: var(--space-2);
-    background: #f9fafb;
+    background: var(--color-gray-50);
 }
 
 .reward-tier.gold {
-    background: linear-gradient(135deg, #fef3c7, #fde68a);
+    background: linear-gradient(135deg, var(--color-amber-100), var(--color-amber-200));
 }
 
 .reward-tier.silver {
-    background: linear-gradient(135deg, #f3f4f6, #e5e7eb);
+    background: linear-gradient(135deg, var(--color-gray-100), var(--color-gray-200));
 }
 
 .reward-tier.bronze {
-    background: linear-gradient(135deg, #fed7aa, #fdba74);
+    background: linear-gradient(135deg, #fed7aa, var(--color-orange-300));
 }
 
 .tier-icon {
@@ -1632,7 +1633,7 @@
 
 .tier-reward {
     font-size: var(--font-size-xs);
-    color: #6b7280;
+    color: var(--color-gray-500);
 }
 
 /* Past Seasons */
@@ -1668,7 +1669,7 @@
 
 .past-season-dates {
     font-size: var(--font-size-xs);
-    color: #6b7280;
+    color: var(--color-gray-500);
     margin-bottom: 12px;
 }
 
@@ -1688,8 +1689,8 @@
 }
 
 .past-season-status.active {
-    background: #dbeafe;
-    color: #2563eb;
+    background: var(--color-blue-100);
+    color: var(--color-blue-600);
 }
 
 /* ============================================
@@ -1705,7 +1706,7 @@
 }
 
 .xp-balance-card {
-    background: linear-gradient(135deg, #4f46e5, #7c3aed);
+    background: linear-gradient(135deg, var(--color-primary-600), #7c3aed);
     border-radius: var(--radius-xl);
     padding: var(--space-6) var(--space-8);
     color: white;
@@ -1744,7 +1745,7 @@
     padding: var(--space-2) var(--space-4);
     border-radius: var(--radius-xl);
     background: rgba(255, 255, 255, 0.95);
-    color: #6b7280;
+    color: var(--color-gray-500);
     border: none;
     cursor: pointer;
     font-weight: 500;
@@ -1753,7 +1754,7 @@
 
 .category-btn:hover,
 .category-btn.active {
-    background: #4f46e5;
+    background: var(--color-primary-600);
     color: white;
 }
 
@@ -1780,7 +1781,7 @@
 }
 
 .shop-item.owned {
-    border: 2px solid #10b981;
+    border: 2px solid var(--color-success);
 }
 
 .shop-item.locked {
@@ -1804,19 +1805,19 @@
 }
 
 .item-badge.limited {
-    background: #fef3c7;
-    color: #d97706;
+    background: var(--color-amber-100);
+    color: var(--color-amber-600);
 }
 
 .item-badge.new {
-    background: #dbeafe;
-    color: #2563eb;
+    background: var(--color-blue-100);
+    color: var(--color-blue-600);
 }
 
 .item-icon {
     width: var(--space-16);
     height: var(--space-16);
-    background: linear-gradient(135deg, #f3f4f6, #e5e7eb);
+    background: linear-gradient(135deg, var(--color-gray-100), var(--color-gray-200));
     border-radius: var(--radius-lg);
     display: flex;
     align-items: center;
@@ -1838,7 +1839,7 @@
 
 .item-description {
     font-size: var(--font-size-sm);
-    color: #6b7280;
+    color: var(--color-gray-500);
     line-height: 1.5;
     margin-bottom: var(--space-4);
 }
@@ -1848,7 +1849,7 @@
     justify-content: space-between;
     align-items: center;
     padding-top: var(--space-4);
-    border-top: 1px solid #e5e7eb;
+    border-top: 1px solid var(--color-gray-200);
 }
 
 .item-price {
@@ -1857,17 +1858,17 @@
     gap: var(--space-1);
     font-size: var(--font-size-lg);
     font-weight: 700;
-    color: #4f46e5;
+    color: var(--color-primary-600);
 }
 
 .item-price i {
-    color: #fbbf24;
+    color: var(--color-amber-300);
 }
 
 .buy-btn {
     padding: var(--space-2) var(--space-5);
     border-radius: var(--radius-md);
-    background: linear-gradient(135deg, #4f46e5, #7c3aed);
+    background: linear-gradient(135deg, var(--color-primary-600), #7c3aed);
     color: white;
     border: none;
     cursor: pointer;
@@ -1882,12 +1883,12 @@
 }
 
 .buy-btn:disabled {
-    background: #d1d5db;
+    background: var(--color-gray-300);
     cursor: not-allowed;
 }
 
 .buy-btn.owned {
-    background: #10b981;
+    background: var(--color-success);
 }
 
 /* Purchase Modal */
@@ -1930,7 +1931,7 @@
 }
 
 .purchase-modal .modal-message {
-    color: #6b7280;
+    color: var(--color-gray-500);
     margin-bottom: var(--space-6);
 }
 
@@ -1950,12 +1951,12 @@
 }
 
 .purchase-modal .modal-btn.cancel {
-    background: #f3f4f6;
-    color: #6b7280;
+    background: var(--color-gray-100);
+    color: var(--color-gray-500);
 }
 
 .purchase-modal .modal-btn.confirm {
-    background: linear-gradient(135deg, #4f46e5, #7c3aed);
+    background: linear-gradient(135deg, var(--color-primary-600), #7c3aed);
     color: white;
 }
 
@@ -1993,7 +1994,7 @@
 [data-theme="dark"] .user-name,
 [data-theme="dark"] .tier-name,
 [data-theme="dark"] .past-season-name {
-    color: #f1f5f9;
+    color: var(--color-slate-100);
 }
 
 [data-theme="dark"] .progress-outer,
@@ -2009,11 +2010,11 @@
 [data-theme="dark"] .badge-item .badge-name,
 [data-theme="dark"] .xp-display,
 [data-theme="dark"] .stat-item .stat-value {
-    color: #e2e8f0;
+    color: var(--color-slate-200);
 }
 
 [data-theme="dark"] .badge-item.locked .badge-name {
-    color: #94a3b8;
+    color: var(--color-slate-400);
 }
 
 [data-theme="dark"] .showcase-section {
@@ -2021,11 +2022,11 @@
 }
 
 [data-theme="dark"] .showcase-section h2 {
-    color: #fbbf24;
+    color: var(--color-amber-300);
 }
 
 [data-theme="dark"] .showcase-section p {
-    color: #fcd34d;
+    color: var(--color-amber-300);
 }
 
 [data-theme="dark"] .showcase-badge-slot {
@@ -2038,15 +2039,15 @@
 }
 
 [data-theme="dark"] .badge-modal-content {
-    background: #1e293b;
+    background: var(--color-slate-800);
 }
 
 [data-theme="dark"] .badge-modal-body {
-    color: #e2e8f0;
+    color: var(--color-slate-200);
 }
 
 [data-theme="dark"] .badge-modal-text {
-    color: #e2e8f0;
+    color: var(--color-slate-200);
 }
 
 [data-theme="dark"] .leaderboard-item {
@@ -2064,20 +2065,20 @@
 
 [data-theme="dark"] .streak-item .streak-count,
 [data-theme="dark"] .xp-log-item .xp-action {
-    color: #e2e8f0;
+    color: var(--color-slate-200);
 }
 
 [data-theme="dark"] .purchase-modal .modal-content {
-    background: #1e293b;
+    background: var(--color-slate-800);
 }
 
 [data-theme="dark"] .purchase-modal .modal-title {
-    color: #f1f5f9;
+    color: var(--color-slate-100);
 }
 
 [data-theme="dark"] .purchase-modal .modal-btn.cancel {
-    background: #334155;
-    color: #e2e8f0;
+    background: var(--color-slate-700);
+    color: var(--color-slate-200);
 }
 
 /* ============================================

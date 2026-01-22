@@ -29,12 +29,29 @@ unset($_SESSION['form_errors'], $_SESSION['old_input']);
 
 require __DIR__ . '/../../layouts/civicone/header.php';
 $basePath = \Nexus\Core\TenantContext::getBasePath();
+$displayName = htmlspecialchars($user['first_name'] . ' ' . $user['last_name']);
 ?>
 
 <div class="govuk-width-container">
-    <a href="<?= $basePath ?>/profile/<?= $user['id'] ?>" class="govuk-back-link">Back to profile</a>
-
     <main class="govuk-main-wrapper">
+
+        <!-- Breadcrumbs (GOV.UK Template D requirement) -->
+        <nav class="civicone-breadcrumbs" aria-label="Breadcrumb">
+            <ol class="civicone-breadcrumbs__list">
+                <li class="civicone-breadcrumbs__list-item">
+                    <a class="civicone-breadcrumbs__link" href="<?= $basePath ?>">Home</a>
+                </li>
+                <li class="civicone-breadcrumbs__list-item">
+                    <a class="civicone-breadcrumbs__link" href="<?= $basePath ?>/members">Members</a>
+                </li>
+                <li class="civicone-breadcrumbs__list-item">
+                    <a class="civicone-breadcrumbs__link" href="<?= $basePath ?>/profile/<?= $user['id'] ?>"><?= $displayName ?></a>
+                </li>
+                <li class="civicone-breadcrumbs__list-item" aria-current="page">
+                    Edit Profile
+                </li>
+            </ol>
+        </nav>
         <div class="govuk-grid-row">
             <div class="govuk-grid-column-two-thirds">
 
@@ -68,7 +85,7 @@ $basePath = \Nexus\Core\TenantContext::getBasePath();
                                 <h2 class="govuk-fieldset__heading">Profile picture</h2>
                             </legend>
 
-                            <div class="govuk-hint" style="margin-bottom: 15px;">
+                            <div class="govuk-hint profile-avatar-hint">
                                 Upload a photo that's at least 400x400 pixels. JPG or PNG formats only.
                             </div>
 
@@ -78,11 +95,11 @@ $basePath = \Nexus\Core\TenantContext::getBasePath();
                                 </p>
                             <?php endif; ?>
 
-                            <div style="text-align: center; margin-bottom: 20px;">
+                            <div class="profile-avatar-preview-container">
                                 <img src="<?= htmlspecialchars($user['avatar_url'] ?? '/assets/images/default-avatar.svg') ?>"
                                      alt="Current profile photo"
                                      id="avatar-preview"
-                                     style="width: 120px; height: 120px; border-radius: 50%; object-fit: cover; border: 4px solid #1d70b8;">
+                                     class="profile-avatar-preview">
                             </div>
 
                             <input type="file"
@@ -90,8 +107,7 @@ $basePath = \Nexus\Core\TenantContext::getBasePath();
                                    id="avatar"
                                    class="govuk-file-upload <?= isset($errors['avatar']) ? 'govuk-file-upload--error' : '' ?>"
                                    accept="image/jpeg,image/png"
-                                   aria-describedby="<?= isset($errors['avatar']) ? 'avatar-error avatar-hint' : 'avatar-hint' ?>"
-                                   onchange="previewAvatar(this)">
+                                   aria-describedby="<?= isset($errors['avatar']) ? 'avatar-error avatar-hint' : 'avatar-hint' ?>">
                         </fieldset>
                     </div>
 
@@ -108,8 +124,7 @@ $basePath = \Nexus\Core\TenantContext::getBasePath();
                         <select name="profile_type"
                                 id="profile_type"
                                 class="govuk-select <?= isset($errors['profile_type']) ? 'govuk-select--error' : '' ?>"
-                                aria-describedby="<?= isset($errors['profile_type']) ? 'profile_type-error' : '' ?>"
-                                onchange="toggleOrgField()">
+                                aria-describedby="<?= isset($errors['profile_type']) ? 'profile_type-error' : '' ?>">
                             <option value="individual" <?= ($oldInput['profile_type'] ?? $user['profile_type'] ?? 'individual') === 'individual' ? 'selected' : '' ?>>Individual</option>
                             <option value="organisation" <?= ($oldInput['profile_type'] ?? $user['profile_type'] ?? 'individual') === 'organisation' ? 'selected' : '' ?>>Organisation</option>
                         </select>
@@ -117,8 +132,7 @@ $basePath = \Nexus\Core\TenantContext::getBasePath();
 
                     <!-- Organisation Name (conditional) -->
                     <div id="org_field_container"
-                         class="govuk-form-group <?= isset($errors['organization_name']) ? 'govuk-form-group--error' : '' ?>"
-                         style="display: <?= ($oldInput['profile_type'] ?? $user['profile_type'] ?? 'individual') === 'organisation' ? 'block' : 'none' ?>;">
+                         class="govuk-form-group <?= isset($errors['organization_name']) ? 'govuk-form-group--error' : '' ?> <?= ($oldInput['profile_type'] ?? $user['profile_type'] ?? 'individual') === 'organisation' ? 'profile-field-visible' : 'profile-field-hidden' ?>">
                         <label class="govuk-label govuk-label--m" for="organization_name">
                             Organisation name
                         </label>
@@ -230,71 +244,22 @@ $basePath = \Nexus\Core\TenantContext::getBasePath();
     </main>
 </div>
 
-<!-- TinyMCE for Bio (loaded after page content) -->
+<!-- External CSS and JavaScript for profile edit (CLAUDE.md compliant) -->
+<link rel="stylesheet" href="/assets/css/civicone-profile-edit.css">
 <script src="https://cdn.tiny.cloud/1/<?= htmlspecialchars($tinymceApiKey) ?>/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script>
+<script src="/assets/js/civicone-profile-edit.js"></script>
 <script>
-// Avatar preview function
-function previewAvatar(input) {
-    if (input.files && input.files[0]) {
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            document.getElementById('avatar-preview').src = e.target.result;
-        };
-        reader.readAsDataURL(input.files[0]);
-    }
-}
+    // Initialize TinyMCE after external script loads
+    if (typeof window.CivicProfileEdit !== 'undefined') {
+        window.CivicProfileEdit.initializeTinyMCE('<?= htmlspecialchars($tinymceApiKey) ?>', <?= isset($errors['bio']) ? 'true' : 'false' ?>);
 
-// Toggle organization field visibility
-function toggleOrgField() {
-    const profileType = document.getElementById('profile_type').value;
-    const container = document.getElementById('org_field_container');
-    container.style.display = profileType === 'organisation' ? 'block' : 'none';
-}
-
-// Initialize TinyMCE for bio field
-tinymce.init({
-    selector: '#bio-editor',
-    height: 200,
-    menubar: false,
-    statusbar: false,
-    plugins: ['link', 'lists', 'emoticons'],
-    toolbar: 'bold italic | bullist numlist | link emoticons',
-    content_style: `
-        body {
-            font-family: "GDS Transport", arial, sans-serif;
-            font-size: 16px;
-            line-height: 1.5;
-            color: #0b0c0c;
-            padding: 8px;
-        }
-    `,
-    placeholder: 'Tell others about yourself...',
-    branding: false,
-    promotion: false,
-    setup: function(editor) {
-        // Add aria-describedby to TinyMCE iframe when initialized
-        editor.on('init', function() {
-            const iframe = editor.getContainer().querySelector('iframe');
-            if (iframe) {
-                <?php if (isset($errors['bio'])): ?>
-                iframe.setAttribute('aria-describedby', 'bio-error bio-hint');
-                <?php else: ?>
-                iframe.setAttribute('aria-describedby', 'bio-hint');
-                <?php endif; ?>
-            }
+        <?php if (!empty($errors)): ?>
+        // Focus error summary on page load if errors exist
+        window.addEventListener('DOMContentLoaded', function() {
+            window.CivicProfileEdit.focusErrorSummary();
         });
+        <?php endif; ?>
     }
-});
-
-// Focus error summary on page load if errors exist
-<?php if (!empty($errors)): ?>
-window.addEventListener('DOMContentLoaded', function() {
-    const errorSummary = document.querySelector('[data-module="govuk-error-summary"]');
-    if (errorSummary) {
-        errorSummary.focus();
-    }
-});
-<?php endif; ?>
 </script>
 
 <?php require __DIR__ . '/../../layouts/civicone/footer.php'; ?>

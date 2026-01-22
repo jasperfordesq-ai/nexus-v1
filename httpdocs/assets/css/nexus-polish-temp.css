@@ -2,6 +2,7 @@
  * Nexus Polish
  * Consolidated transitions, timing, and performance optimizations
  * Replaces: nexus-smooth-polish.css, nexus-header-polish.css
+  * Fully Migrated to Design Tokens: 2026-01-21 ✓
  */
 
 /* ============================================
@@ -503,7 +504,7 @@ button,
 }
 
 [data-theme="light"] .nexus-brand-link {
-    color: #0f172a !important;
+    color: var(--color-slate-900) !important;
 }
 
 [data-theme="light"] .nexus-brand-link .brand-secondary {
@@ -530,7 +531,7 @@ button,
 
 [data-theme="light"] .nav-link:hover,
 [data-theme="light"] .nav-link.active {
-    color: #0f172a;
+    color: var(--color-slate-900);
 }
 
 [data-theme="light"] .dropdown-menu {
@@ -542,7 +543,7 @@ button,
 }
 
 [data-theme="light"] .dropdown-item:hover {
-    color: #0f172a;
+    color: var(--color-slate-900);
 }
 
 /* ============================================
@@ -582,7 +583,7 @@ button,
    24. FOCUS STATES - ACCESSIBILITY
    ============================================ */
 *:focus-visible {
-    outline: 3px solid #6366f1;
+    outline: 3px solid var(--color-primary-500);
     outline-offset: 2px;
 }
 
@@ -590,7 +591,7 @@ button,
 .dropdown-toggle:focus-visible,
 .user-menu-toggle:focus-visible,
 .notification-badge:focus-visible {
-    outline: 3px solid #6366f1;
+    outline: 3px solid var(--color-primary-500);
     outline-offset: 2px;
     box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
 }

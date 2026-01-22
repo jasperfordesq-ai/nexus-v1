@@ -59,7 +59,7 @@
 .holo-orb-1 {
     width: 400px;
     height: 400px;
-    background: linear-gradient(135deg, #f97316, #ea580c);
+    background: linear-gradient(135deg, var(--color-orange-500), var(--color-orange-600));
     top: 10%;
     left: -10%;
     animation: orbFloat1 15s ease-in-out infinite;
@@ -68,7 +68,7 @@
 .holo-orb-2 {
     width: 300px;
     height: 300px;
-    background: linear-gradient(135deg, #fbbf24, #f59e0b);
+    background: linear-gradient(135deg, var(--color-amber-300), var(--color-warning));
     bottom: 20%;
     right: -5%;
     animation: orbFloat2 18s ease-in-out infinite;
@@ -77,7 +77,7 @@
 .holo-orb-3 {
     width: 250px;
     height: 250px;
-    background: linear-gradient(135deg, #fb923c, #fdba74);
+    background: linear-gradient(135deg, #fb923c, var(--color-orange-300));
     top: 60%;
     left: 30%;
     animation: orbFloat3 12s ease-in-out infinite;
@@ -120,7 +120,7 @@
     width: 80px;
     height: 80px;
     margin: 0 auto var(--space-5);
-    background: linear-gradient(135deg, var(--color-orange-500) 0%, var(--color-orange-600) 50%, #c2410c 100%);
+    background: linear-gradient(135deg, var(--color-orange-500) 0%, var(--color-orange-600) 50%, var(--color-govuk-red-dark) 100%);
     border-radius: var(--radius-2xl);
     display: flex;
     align-items: center;
@@ -141,7 +141,7 @@
     font-size: var(--font-size-4xl);
     font-weight: 800;
     margin: 0 0 var(--space-3);
-    background: linear-gradient(135deg, var(--color-orange-500) 0%, var(--color-orange-600) 50%, #c2410c 100%);
+    background: linear-gradient(135deg, var(--color-orange-500) 0%, var(--color-orange-600) 50%, var(--color-govuk-red-dark) 100%);
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
@@ -150,7 +150,7 @@
 
 .holo-page-subtitle {
     font-size: var(--font-size-lg);
-    color: var(--htb-text-muted, #64748b);
+    color: var(--htb-text-muted, var(--color-slate-500));
     margin: 0;
 }
 
@@ -230,7 +230,7 @@
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 1px;
-    color: var(--htb-text-muted, #64748b);
+    color: var(--htb-text-muted, var(--color-slate-500));
     margin-bottom: var(--space-4);
     display: flex;
     align-items: center;
@@ -249,18 +249,18 @@
     display: block;
     font-weight: 600;
     font-size: var(--font-size-base);
-    color: var(--htb-text-main, #1e293b);
+    color: var(--htb-text-main, var(--color-slate-800));
     margin-bottom: var(--space-3);
 }
 
 [data-theme="dark"] .holo-label {
-    color: #e2e8f0;
+    color: var(--color-slate-200);
 }
 
 .holo-label-optional {
     font-weight: 400;
     font-size: var(--font-size-xs);
-    color: var(--htb-text-muted, #94a3b8);
+    color: var(--htb-text-muted, var(--color-slate-400));
     margin-left: var(--space-2);
 }
 
@@ -276,7 +276,7 @@
     transition: all var(--transition-base);
     border: 2px solid rgba(0, 0, 0, 0.06);
     background: rgba(255, 255, 255, 0.6);
-    color: var(--htb-text-main, #0f172a);
+    color: var(--htb-text-main, var(--color-slate-900));
     outline: none;
     box-sizing: border-box;
 }
@@ -286,7 +286,7 @@
 [data-theme="dark"] .holo-textarea {
     background: rgba(0, 0, 0, 0.2);
     border-color: rgba(255, 255, 255, 0.08);
-    color: #f8fafc;
+    color: var(--color-slate-50);
 }
 
 .holo-input:focus,
@@ -311,7 +311,7 @@
 
 .holo-input::placeholder,
 .holo-textarea::placeholder {
-    color: var(--htb-text-muted, #94a3b8);
+    color: var(--htb-text-muted, var(--color-slate-400));
 }
 
 .holo-textarea {
@@ -377,7 +377,7 @@
     align-items: center;
     justify-content: space-between;
     font-weight: 600;
-    color: var(--htb-text-main, #374151);
+    color: var(--htb-text-main, var(--color-gray-700));
     transition: background var(--transition-fast);
     list-style: none;
 }
@@ -387,7 +387,7 @@
 }
 
 [data-theme="dark"] .holo-sdg-header {
-    color: #e2e8f0;
+    color: var(--color-slate-200);
 }
 
 .holo-sdg-header:hover {
@@ -396,7 +396,7 @@
 
 .holo-sdg-header i {
     transition: transform var(--transition-base);
-    color: var(--htb-text-muted, #94a3b8);
+    color: var(--htb-text-muted, var(--color-slate-400));
 }
 
 .holo-sdg-accordion[open] .holo-sdg-header i {
@@ -414,7 +414,7 @@
 
 .holo-sdg-intro {
     font-size: var(--font-size-sm);
-    color: var(--htb-text-muted, #64748b);
+    color: var(--htb-text-muted, var(--color-slate-500));
     margin: var(--space-4) 0;
 }
 
@@ -457,18 +457,18 @@
 .holo-sdg-card .sdg-label {
     font-size: var(--font-size-xs);
     font-weight: 600;
-    color: var(--htb-text-main, #374151);
+    color: var(--htb-text-main, var(--color-gray-700));
     line-height: 1.2;
 }
 
 [data-theme="dark"] .holo-sdg-card .sdg-label {
-    color: #e2e8f0;
+    color: var(--color-slate-200);
 }
 
 /* Hub Select Info */
 .holo-hub-hint {
     font-size: var(--font-size-sm);
-    color: var(--htb-text-muted, #64748b);
+    color: var(--htb-text-muted, var(--color-slate-500));
     margin-top: var(--space-2);
     display: flex;
     align-items: center;
@@ -492,7 +492,7 @@
     cursor: pointer;
     position: relative;
     overflow: hidden;
-    background: linear-gradient(135deg, var(--color-orange-500) 0%, var(--color-orange-600) 50%, #c2410c 100%);
+    background: linear-gradient(135deg, var(--color-orange-500) 0%, var(--color-orange-600) 50%, var(--color-govuk-red-dark) 100%);
     color: white;
     box-shadow:
         0 12px 30px rgba(249, 115, 22, 0.35),
@@ -580,7 +580,7 @@
     right: 0;
     z-index: 10001;
     padding: var(--space-3) var(--space-5);
-    background: linear-gradient(135deg, #ef4444, #dc2626);
+    background: linear-gradient(135deg, var(--color-danger), var(--color-red-600));
     color: white;
     font-size: var(--font-size-sm);
     font-weight: 600;
@@ -614,7 +614,7 @@
 }
 
 .holo-event-page .mapboxgl-ctrl-geocoder--input {
-    color: var(--htb-text-main, #0f172a);
+    color: var(--htb-text-main, var(--color-slate-900));
     height: auto;
     padding: var(--space-4) 45px;
     font-size: var(--font-size-base);
@@ -622,7 +622,7 @@
 }
 
 [data-theme="dark"] .holo-event-page .mapboxgl-ctrl-geocoder--input {
-    color: #f8fafc;
+    color: var(--color-slate-50);
 }
 
 .holo-event-page .mapboxgl-ctrl-geocoder--input:focus {
@@ -644,7 +644,7 @@
 }
 
 .holo-event-page .mapboxgl-ctrl-geocoder--icon {
-    fill: #f97316;
+    fill: var(--color-orange-500);
     top: 50%;
     transform: translateY(-50%);
 }
@@ -666,18 +666,18 @@
 }
 
 .holo-event-page .mapboxgl-ctrl-geocoder .suggestions > li > a {
-    color: var(--htb-text-main, #1e293b);
+    color: var(--htb-text-main, var(--color-slate-800));
     padding: var(--space-3) var(--space-5);
     transition: background var(--transition-fast);
 }
 
 [data-theme="dark"] .holo-event-page .mapboxgl-ctrl-geocoder .suggestions > li > a {
-    color: #e2e8f0;
+    color: var(--color-slate-200);
 }
 
 .holo-event-page .mapboxgl-ctrl-geocoder .suggestions > .active > a,
 .holo-event-page .mapboxgl-ctrl-geocoder .suggestions > li > a:hover {
-    background: #f97316;
+    background: var(--color-orange-500);
     color: white;
 }
 
@@ -727,7 +727,7 @@
 
 .holo-radio-card:has(input:checked) {
     background: rgba(139, 92, 246, 0.1);
-    border-color: #8b5cf6;
+    border-color: var(--color-purple-500);
 }
 
 [data-theme="dark"] .holo-radio-card:has(input:checked) {
@@ -752,21 +752,21 @@
 .radio-label {
     font-weight: 600;
     font-size: var(--font-size-base);
-    color: var(--htb-text-main, #1f2937);
+    color: var(--htb-text-main, var(--color-gray-800));
 }
 
 [data-theme="dark"] .radio-label {
-    color: #f1f5f9;
+    color: var(--color-slate-100);
 }
 
 .radio-desc {
     font-size: var(--font-size-sm);
-    color: var(--htb-text-secondary, #6b7280);
+    color: var(--htb-text-secondary, var(--color-gray-500));
     line-height: 1.4;
 }
 
 [data-theme="dark"] .radio-desc {
-    color: #94a3b8;
+    color: var(--color-slate-400);
 }
 
 .holo-federation-optin-notice {
@@ -787,22 +787,22 @@
 
 .holo-federation-optin-notice strong {
     display: block;
-    color: var(--htb-text-main, #1f2937);
+    color: var(--htb-text-main, var(--color-gray-800));
     margin-bottom: var(--space-1);
 }
 
 [data-theme="dark"] .holo-federation-optin-notice strong {
-    color: #f1f5f9;
+    color: var(--color-slate-100);
 }
 
 .holo-federation-optin-notice p {
     font-size: var(--font-size-sm);
-    color: var(--htb-text-secondary, #6b7280);
+    color: var(--htb-text-secondary, var(--color-gray-500));
     margin: 0;
 }
 
 [data-theme="dark"] .holo-federation-optin-notice p {
-    color: #94a3b8;
+    color: var(--color-slate-400);
 }
 
 .holo-federation-optin-notice a {

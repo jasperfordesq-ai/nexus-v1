@@ -8,7 +8,7 @@
     --msg-gradient: linear-gradient(135deg, #6366f1, #8b5cf6);
     --msg-gradient-vibrant: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #a855f7 100%);
     --msg-bg: #f8fafc;
-    --msg-surface: #ffffff;
+    --msg-surface: var(--color-white);
     --msg-border: rgba(0, 0, 0, 0.08);
     --msg-text: #1e293b;
     --msg-text-muted: #64748b;
@@ -1125,7 +1125,7 @@ body.messages-page {
     font-size: 1.5rem;
     font-weight: 800;
     margin: 0;
-    background: linear-gradient(135deg, #ffffff 0%, #c4b5fd 50%, #67e8f9 100%);
+    background: linear-gradient(135deg, var(--color-white) 0%, #c4b5fd 50%, var(--color-cyan-300) 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -1328,7 +1328,7 @@ body.messages-page {
 
 .holo-thread.unread .holo-thread-name {
     font-weight: 700;
-    color: #ffffff;
+    color: var(--color-white);
 }
 
 .holo-thread-time {
@@ -1444,7 +1444,7 @@ body.messages-page {
     font-size: 1.75rem;
     font-weight: 800;
     margin: 0 0 12px;
-    background: linear-gradient(135deg, #ffffff 0%, #c4b5fd 50%, #67e8f9 100%);
+    background: linear-gradient(135deg, var(--color-white) 0%, #c4b5fd 50%, var(--color-cyan-300) 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -1612,7 +1612,7 @@ body.messages-page {
     margin: 0;
     font-size: 1.25rem;
     font-weight: 700;
-    background: linear-gradient(135deg, #ffffff, #c4b5fd);
+    background: linear-gradient(135deg, var(--color-white), #c4b5fd);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;

@@ -293,7 +293,7 @@ main#main-content .htb-container > * {
     border: 4px solid transparent;
     background:
         linear-gradient(white, white) padding-box,
-        linear-gradient(135deg, #6366f1, #a855f7, #ec4899) border-box;
+        linear-gradient(135deg, var(--color-primary-500), var(--color-purple-400), var(--color-pink-500)) border-box;
     box-shadow:
         0 8px 32px rgba(99, 102, 241, 0.25),
         0 0 0 4px rgba(255, 255, 255, 0.3);
@@ -315,8 +315,8 @@ main#main-content .htb-container > * {
 
 [data-theme="dark"] .glass-avatar {
     background:
-        linear-gradient(#1e293b, #1e293b) padding-box,
-        linear-gradient(135deg, #6366f1, #a855f7, #ec4899) border-box;
+        linear-gradient(var(--color-slate-800), var(--color-slate-800)) padding-box,
+        linear-gradient(135deg, var(--color-primary-500), var(--color-purple-400), var(--color-pink-500)) border-box;
     box-shadow:
         0 8px 32px rgba(99, 102, 241, 0.3),
         0 0 0 4px rgba(99, 102, 241, 0.2);
@@ -335,7 +335,7 @@ main#main-content .htb-container > * {
 }
 
 [data-theme="dark"] .profile-online-indicator {
-    border-color: #1e293b;
+    border-color: var(--color-slate-800);
 }
 
 @keyframes pulse-online {
@@ -351,7 +351,7 @@ h2.profile-display-name {
     margin: 0 0 16px 0;
     font-size: 2.2rem;
     font-weight: 800;
-    background: linear-gradient(135deg, #1f2937 0%, #4f46e5 50%, #7c3aed 100%);
+    background: linear-gradient(135deg, var(--color-gray-800) 0%, var(--color-primary-600) 50%, var(--color-purple-600) 100%);
     background-size: 200% 200%;
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
@@ -367,7 +367,7 @@ h2.profile-display-name {
 
 [data-theme="dark"] .profile-display-name,
 [data-theme="dark"] h2.profile-display-name {
-    background: linear-gradient(135deg, #f1f5f9 0%, #a5b4fc 50%, #c4b5fd 100%);
+    background: linear-gradient(135deg, var(--color-slate-100) 0%, var(--color-primary-300) 50%, var(--color-purple-300) 100%);
     background-size: 200% 200%;
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
@@ -390,7 +390,7 @@ h2.profile-display-name {
     border-radius: var(--radius-full);
     font-size: var(--font-size-sm);
     font-weight: 500;
-    color: #374151;
+    color: var(--color-gray-700);
     transition: all 0.3s ease;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 }
@@ -405,7 +405,7 @@ h2.profile-display-name {
 [data-theme="dark"] .glass-info-badge {
     background: rgba(255, 255, 255, 0.08);
     border-color: rgba(255, 255, 255, 0.12);
-    color: #e2e8f0;
+    color: var(--color-slate-200);
 }
 
 [data-theme="dark"] .glass-info-badge:hover {
@@ -422,7 +422,7 @@ h2.profile-display-name {
     justify-content: center;
     gap: var(--space-2);
     padding: var(--space-3) var(--space-6);
-    background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #a855f7 100%);
+    background: linear-gradient(135deg, var(--color-primary-500) 0%, var(--color-purple-500) 50%, var(--color-purple-400) 100%);
     background-size: 200% 200%;
     border: none;
     border-radius: var(--radius-lg);
@@ -471,7 +471,7 @@ h2.profile-display-name {
     background: rgba(255, 255, 255, 0.7);
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
-    color: #374151;
+    color: var(--color-gray-700);
     border: 1px solid rgba(255, 255, 255, 0.5);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
 }
@@ -479,23 +479,23 @@ h2.profile-display-name {
 .glass-btn-secondary:hover {
     background: rgba(99, 102, 241, 0.1);
     border-color: rgba(99, 102, 241, 0.3);
-    color: #4f46e5;
+    color: var(--color-primary-600);
     box-shadow: 0 6px 20px rgba(99, 102, 241, 0.15);
 }
 
 [data-theme="dark"] .glass-btn-secondary {
     background: rgba(255, 255, 255, 0.08);
     border-color: rgba(255, 255, 255, 0.12);
-    color: #e2e8f0;
+    color: var(--color-slate-200);
 }
 
 [data-theme="dark"] .glass-btn-secondary:hover {
     background: rgba(99, 102, 241, 0.2);
-    color: #a5b4fc;
+    color: var(--color-primary-300);
 }
 
 .glass-btn-success {
-    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    background: linear-gradient(135deg, var(--color-success) 0%, var(--color-emerald-600) 100%);
     box-shadow: 0 4px 15px rgba(16, 185, 129, 0.35);
 }
 
@@ -534,7 +534,7 @@ h2.profile-display-name {
     border: 1px solid rgba(255, 255, 255, 0.4);
     border-radius: var(--radius-lg);
     font-size: var(--font-size-sm);
-    color: #374151;
+    color: var(--color-gray-700);
     cursor: pointer;
     transition: all 0.3s ease;
 }
@@ -564,7 +564,7 @@ h2.profile-display-name {
 [data-theme="dark"] .glass-badge {
     background: rgba(255, 255, 255, 0.08);
     border-color: rgba(255, 255, 255, 0.12);
-    color: #e2e8f0;
+    color: var(--color-slate-200);
 }
 
 /* ============================================
@@ -605,17 +605,17 @@ h2.profile-display-name {
     display: flex;
     align-items: center;
     gap: 10px; /* Custom for visual balance */
-    color: #1f2937;
+    color: var(--color-gray-800);
     background: none;
     -webkit-text-fill-color: inherit;
 }
 
 [data-theme="dark"] .profile-friends-header h3 {
-    color: #f1f5f9;
+    color: var(--color-slate-100);
 }
 
 .profile-friends-link {
-    color: #6366f1;
+    color: var(--color-primary-500);
     text-decoration: none;
     font-weight: 600;
     font-size: var(--font-size-sm);
@@ -623,7 +623,7 @@ h2.profile-display-name {
 }
 
 .profile-friends-link:hover {
-    color: #4f46e5;
+    color: var(--color-primary-600);
     text-decoration: underline;
 }
 
@@ -684,19 +684,19 @@ h2.profile-display-name {
 .profile-friend-name {
     font-weight: 600;
     font-size: var(--font-size-sm);
-    color: #1f2937;
+    color: var(--color-gray-800);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
 }
 
 [data-theme="dark"] .profile-friend-name {
-    color: #f1f5f9;
+    color: var(--color-slate-100);
 }
 
 .profile-friend-meta {
     font-size: var(--font-size-xs);
-    color: #6b7280;
+    color: var(--color-gray-500);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -732,11 +732,11 @@ h2.profile-display-name {
 }
 
 [data-theme="dark"] .glass-composer h3 {
-    color: #f1f5f9;
+    color: var(--color-slate-100);
 }
 
 [data-theme="dark"] .glass-composer p {
-    color: #94a3b8;
+    color: var(--color-slate-400);
 }
 
 /* ============================================
@@ -754,7 +754,7 @@ h2.profile-display-name {
 }
 
 .glass-activity-card h3 {
-    color: #1f2937;
+    color: var(--color-gray-800);
     background: none;
     -webkit-text-fill-color: inherit;
 }
@@ -765,7 +765,7 @@ h2.profile-display-name {
 }
 
 [data-theme="dark"] .glass-activity-card h3 {
-    color: #f1f5f9;
+    color: var(--color-slate-100);
 }
 
 /* ============================================
@@ -804,7 +804,7 @@ h2.profile-display-name {
     display: flex;
     align-items: center;
     gap: 10px; /* Custom for visual balance */
-    color: #1f2937;
+    color: var(--color-gray-800);
     background: none;
     -webkit-text-fill-color: inherit;
 }
@@ -812,7 +812,7 @@ h2.profile-display-name {
 [data-theme="dark"] .glass-profile-card h3,
 [data-theme="dark"] .glass-activity-card h3,
 [data-theme="dark"] #reviews-section h3 {
-    color: #f1f5f9;
+    color: var(--color-slate-100);
 }
 
 /* ============================================
@@ -915,7 +915,7 @@ h2.profile-display-name {
         -webkit-backdrop-filter: none;
         backdrop-filter: none;
         box-shadow: none;
-        border: 1px solid #e5e7eb;
+        border: 1px solid var(--color-gray-200);
     }
 }
 
@@ -928,7 +928,7 @@ h2.profile-display-name {
 }
 
 .badge-online strong {
-    color: #059669;
+    color: var(--color-emerald-600);
 }
 
 .badge-recent {
@@ -937,12 +937,12 @@ h2.profile-display-name {
 }
 
 .badge-recent i {
-    color: #f59e0b;
+    color: var(--color-warning);
     font-size: 8px;
 }
 
 .badge-recent span {
-    color: #b45309;
+    color: var(--color-amber-700);
 }
 
 .badge-credits {
@@ -951,7 +951,7 @@ h2.profile-display-name {
 }
 
 .badge-credits i {
-    color: #10b981;
+    color: var(--color-success);
 }
 
 .badge-owner {
@@ -961,11 +961,11 @@ h2.profile-display-name {
 }
 
 .badge-owner i {
-    color: #f59e0b;
+    color: var(--color-warning);
 }
 
 .badge-owner span {
-    color: #b45309;
+    color: var(--color-amber-700);
 }
 
 .badge-admin-role {
@@ -975,11 +975,11 @@ h2.profile-display-name {
 }
 
 .badge-admin-role i {
-    color: #8b5cf6;
+    color: var(--color-purple-500);
 }
 
 .badge-admin-role span {
-    color: #7c3aed;
+    color: var(--color-purple-600);
 }
 
 .badge-rating {
@@ -990,11 +990,11 @@ h2.profile-display-name {
 }
 
 .badge-rating i {
-    color: #f59e0b;
+    color: var(--color-warning);
 }
 
 .badge-rating strong {
-    color: #b45309;
+    color: var(--color-amber-700);
 }
 
 .badge-count {
@@ -1007,11 +1007,11 @@ h2.profile-display-name {
 }
 
 .badge-no-reviews i {
-    color: #9ca3af;
+    color: var(--color-gray-400);
 }
 
 .badge-no-reviews span {
-    color: #6b7280;
+    color: var(--color-gray-500);
 }
 
 .badge-admin-phone {
@@ -1020,7 +1020,7 @@ h2.profile-display-name {
 }
 
 .badge-admin-phone i {
-    color: #ef4444;
+    color: var(--color-danger);
 }
 
 /* Status dot */
@@ -1032,7 +1032,7 @@ h2.profile-display-name {
 }
 
 .status-dot.online {
-    background: #10b981;
+    background: var(--color-success);
     animation: pulse-online 2s infinite;
 }
 
@@ -1041,13 +1041,13 @@ h2.profile-display-name {
    ============================================ */
 .btn-warning {
     background: #d4621f; /* WCAG 2.1 AA: 4.7:1 contrast */
-    color: #ffffff;
+    color: var(--color-white);
     box-shadow: 0 4px 15px rgba(212, 98, 31, 0.35);
 }
 
 .btn-warning span,
 .btn-warning i {
-    color: #ffffff !important;
+    color: var(--color-white) !important;
 }
 
 .btn-warning:hover {
@@ -1056,7 +1056,7 @@ h2.profile-display-name {
 }
 
 .btn-purple {
-    background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+    background: linear-gradient(135deg, var(--color-purple-500) 0%, var(--color-purple-600) 100%);
     box-shadow: 0 4px 15px rgba(139, 92, 246, 0.35);
 }
 
@@ -1066,13 +1066,13 @@ h2.profile-display-name {
 
 .btn-danger {
     background: #b91e0a; /* WCAG 2.1 AA: 6.8:1 contrast */
-    color: #ffffff;
+    color: var(--color-white);
     box-shadow: 0 4px 15px rgba(185, 30, 10, 0.35);
 }
 
 .btn-danger span,
 .btn-danger i {
-    color: #ffffff !important;
+    color: var(--color-white) !important;
 }
 
 .btn-danger:hover {
@@ -1103,21 +1103,21 @@ h2.profile-display-name {
     display: flex;
     align-items: center;
     gap: var(--space-2);
-    color: #1f2937;
+    color: var(--color-gray-800);
     background: none;
     -webkit-text-fill-color: inherit;
 }
 
 .badges-section h3 i:first-child {
-    color: #f59e0b;
+    color: var(--color-warning);
 }
 
 .badges-section h3 .fa-trophy {
-    color: #a855f7;
+    color: var(--color-purple-400);
 }
 
 [data-theme="dark"] .badges-section h3 {
-    color: #f1f5f9;
+    color: var(--color-slate-100);
 }
 
 .badges-grid {
@@ -1160,7 +1160,7 @@ h2.profile-display-name {
 }
 
 [data-theme="dark"] .featured-badge .badge-name {
-    color: #fbbf24;
+    color: var(--color-amber-300);
 }
 
 .glass-badge .badge-icon {
@@ -1169,11 +1169,11 @@ h2.profile-display-name {
 
 .glass-badge .badge-name {
     font-weight: 600;
-    color: #1f2937;
+    color: var(--color-gray-800);
 }
 
 [data-theme="dark"] .glass-badge .badge-name {
-    color: #f1f5f9;
+    color: var(--color-slate-100);
 }
 
 /* ============================================
@@ -1210,11 +1210,11 @@ h2.profile-display-name {
     display: flex;
     align-items: center;
     gap: var(--space-2);
-    color: #1f2937;
+    color: var(--color-gray-800);
 }
 
 [data-theme="dark"] .badges-accordion-header h3 {
-    color: #f1f5f9;
+    color: var(--color-slate-100);
 }
 
 /* Preview badges shown when collapsed */
@@ -1254,7 +1254,7 @@ h2.profile-display-name {
     justify-content: center;
     font-size: 0.7rem;
     font-weight: 700;
-    color: #6366f1;
+    color: var(--color-primary-500);
 }
 
 /* Toggle chevron */
@@ -1266,7 +1266,7 @@ h2.profile-display-name {
     justify-content: center;
     border-radius: var(--radius-base);
     background: rgba(99, 102, 241, 0.1);
-    color: #6366f1;
+    color: var(--color-primary-500);
     transition: all 0.3s ease;
     flex-shrink: 0;
 }
@@ -1449,31 +1449,31 @@ h2.profile-display-name {
 [data-theme="dark"] .badge-preview-count {
     background: rgba(99, 102, 241, 0.15);
     border-color: rgba(99, 102, 241, 0.3);
-    color: #a5b4fc;
+    color: var(--color-primary-300);
 }
 
 [data-theme="dark"] .badges-accordion-toggle {
     background: rgba(99, 102, 241, 0.15);
-    color: #a5b4fc;
+    color: var(--color-primary-300);
 }
 
 /* ============================================
    ICON COLORS
    ============================================ */
 .glass-info-badge i.fa-location-dot {
-    color: #6366f1;
+    color: var(--color-primary-500);
 }
 
 .glass-info-badge i.fa-clock {
-    color: #8b5cf6;
+    color: var(--color-purple-500);
 }
 
 .glass-info-badge i.fa-building {
-    color: #6366f1;
+    color: var(--color-primary-500);
 }
 
 .profile-friends-header h3 i {
-    color: #6366f1;
+    color: var(--color-primary-500);
 }
 
 /* ============================================
@@ -1514,13 +1514,13 @@ h2.profile-display-name {
 }
 
 .glass-btn:focus-visible {
-    outline: 2px solid #6366f1;
+    outline: 2px solid var(--color-primary-500);
     outline-offset: 2px;
 }
 
 .glass-badge:focus-visible,
 .featured-badge:focus-visible {
-    outline: 2px solid #f59e0b;
+    outline: 2px solid var(--color-warning);
     outline-offset: 2px;
 }
 
@@ -1532,11 +1532,11 @@ h2.profile-display-name {
 }
 
 [data-theme="dark"] .badge-online strong {
-    color: #34d399;
+    color: var(--color-emerald-400);
 }
 
 [data-theme="dark"] .badge-recent span {
-    color: #fbbf24;
+    color: var(--color-amber-300);
 }
 
 [data-theme="dark"] .badge-credits {
@@ -1545,11 +1545,11 @@ h2.profile-display-name {
 
 [data-theme="dark"] .badge-rating strong,
 [data-theme="dark"] .badge-owner span {
-    color: #fbbf24;
+    color: var(--color-amber-300);
 }
 
 [data-theme="dark"] .badge-count {
-    color: #fcd34d;
+    color: var(--color-amber-300);
 }
 
 /* ============================================
@@ -1571,7 +1571,7 @@ h2.profile-display-name {
     width: 52px;
     height: 52px;
     border-radius: 50%;
-    background: linear-gradient(135deg, #6366f1, #8b5cf6);
+    background: linear-gradient(135deg, var(--color-primary-500), var(--color-purple-500));
     display: flex;
     align-items: center;
     justify-content: center;
@@ -1598,27 +1598,27 @@ h2.profile-display-name {
     margin: 0 0 var(--space-1) 0;
     font-size: 1.2rem; /* Custom for composer heading */
     font-weight: 700;
-    color: #1f2937;
+    color: var(--color-gray-800);
     background: none;
     -webkit-text-fill-color: inherit;
 }
 
 [data-theme="dark"] .composer-text h3 {
-    color: #f1f5f9;
+    color: var(--color-slate-100);
 }
 
 .composer-text p {
     margin: 0;
-    color: #6b7280;
+    color: var(--color-gray-500);
     font-size: var(--font-size-sm);
 }
 
 [data-theme="dark"] .composer-text p {
-    color: #94a3b8;
+    color: var(--color-slate-400);
 }
 
 .composer-arrow {
-    color: #6366f1;
+    color: var(--color-primary-500);
     font-size: var(--font-size-2xl);
     opacity: 0.5;
     transition: transform var(--transition-base), opacity var(--transition-base);
@@ -1639,17 +1639,17 @@ h2.profile-display-name {
     display: flex;
     align-items: center;
     gap: 10px; /* Custom for visual balance */
-    color: #1f2937;
+    color: var(--color-gray-800);
     background: none;
     -webkit-text-fill-color: inherit;
 }
 
 .glass-activity-card h3 i {
-    color: #6366f1;
+    color: var(--color-primary-500);
 }
 
 [data-theme="dark"] .glass-activity-card h3 {
-    color: #f1f5f9;
+    color: var(--color-slate-100);
 }
 
 /* Empty state */
@@ -1675,12 +1675,12 @@ h2.profile-display-name {
 }
 
 .empty-text {
-    color: #6b7280;
+    color: var(--color-gray-500);
     font-size: var(--font-size-base);
 }
 
 [data-theme="dark"] .empty-text {
-    color: #94a3b8;
+    color: var(--color-slate-400);
 }
 
 /* ============================================
@@ -1693,25 +1693,25 @@ h2.profile-display-name {
     display: flex;
     align-items: center;
     gap: 10px; /* Custom for visual balance */
-    color: #1f2937;
+    color: var(--color-gray-800);
     background: none;
     -webkit-text-fill-color: inherit;
 }
 
 .section-header i.fa-user {
-    color: #8b5cf6;
+    color: var(--color-purple-500);
 }
 
 .section-header i.fa-star {
-    color: #f59e0b;
+    color: var(--color-warning);
 }
 
 [data-theme="dark"] .section-header {
-    color: #f1f5f9;
+    color: var(--color-slate-100);
 }
 
 .bio-content {
-    color: #374151;
+    color: var(--color-gray-700);
     line-height: 1.8;
     font-size: var(--font-size-base);
     padding: var(--space-5);
@@ -1725,7 +1725,7 @@ h2.profile-display-name {
 [data-theme="dark"] .bio-content {
     background: rgba(255, 255, 255, 0.05);
     border-color: rgba(255, 255, 255, 0.08);
-    color: #cbd5e1;
+    color: var(--color-slate-300);
 }
 
 /* ============================================
@@ -1769,7 +1769,7 @@ h2.profile-display-name {
 .rating-number {
     font-size: 1.8rem; /* Custom for rating display */
     font-weight: 800;
-    color: #f59e0b;
+    color: var(--color-warning);
 }
 
 .rating-stars {
@@ -1782,16 +1782,16 @@ h2.profile-display-name {
 }
 
 .rating-stars i.fa-solid {
-    color: #f59e0b;
+    color: var(--color-warning);
 }
 
 .rating-stars i.fa-regular {
-    color: #cbd5e1;
+    color: var(--color-slate-300);
 }
 
 .rating-count {
     font-size: var(--font-size-xs);
-    color: #6b7280;
+    color: var(--color-gray-500);
 }
 
 /* Reviews list */
@@ -1882,7 +1882,7 @@ h2.profile-display-name {
 }
 
 .holo-review-header {
-    background: linear-gradient(135deg, #6366f1, #8b5cf6);
+    background: linear-gradient(135deg, var(--color-primary-500), var(--color-purple-500));
     padding: var(--space-6) 28px;
     position: relative;
 }
@@ -1933,12 +1933,12 @@ h2.profile-display-name {
     display: block;
     font-weight: 600;
     font-size: var(--font-size-base);
-    color: #374151;
+    color: var(--color-gray-700);
     margin-bottom: var(--space-4);
 }
 
 [data-theme="dark"] .star-rating-label {
-    color: #e2e8f0;
+    color: var(--color-slate-200);
 }
 
 .star-rating-container {
@@ -1964,13 +1964,13 @@ h2.profile-display-name {
 }
 
 .holo-star.inactive {
-    color: #d1d5db;
+    color: var(--color-gray-300);
 }
 
 .holo-star.active {
     background: linear-gradient(135deg, rgba(245, 158, 11, 0.2), rgba(217, 119, 6, 0.15)) !important;
     border-color: rgba(245, 158, 11, 0.4) !important;
-    color: #f59e0b;
+    color: var(--color-warning);
     transform: scale(1.1);
 }
 
@@ -2004,14 +2004,14 @@ h2.profile-display-name {
 .rating-label {
     font-weight: 600;
     font-size: var(--font-size-base);
-    color: #6b7280;
+    color: var(--color-gray-500);
     transition: all 0.2s ease;
 }
 
 .rating-indicator {
     font-weight: 700;
     font-size: var(--font-size-sm);
-    color: #f59e0b;
+    color: var(--color-warning);
     padding: 4px 10px;
     background: rgba(245, 158, 11, 0.15);
     border-radius: var(--radius-xl);
@@ -2041,7 +2041,7 @@ h2.profile-display-name {
 [data-theme="dark"] .holo-textarea {
     background: rgba(255, 255, 255, 0.05);
     border-color: rgba(255, 255, 255, 0.1);
-    color: #e2e8f0;
+    color: var(--color-slate-200);
 }
 
 /* Modal Buttons */
@@ -2057,7 +2057,7 @@ h2.profile-display-name {
     border-radius: 12px !important;
     background: rgba(107, 114, 128, 0.1) !important;
     border: 1px solid rgba(107, 114, 128, 0.2) !important;
-    color: #6b7280 !important;
+    color: var(--color-gray-500) !important;
     font-weight: 600;
     font-size: var(--font-size-sm);
     cursor: pointer;
@@ -2074,7 +2074,7 @@ h2.profile-display-name {
     flex: 2;
     padding: 14px var(--space-6) !important;
     border-radius: 12px !important;
-    background: linear-gradient(135deg, #6366f1, #8b5cf6) !important;
+    background: linear-gradient(135deg, var(--color-primary-500), var(--color-purple-500)) !important;
     border: none !important;
     color: white !important;
     font-weight: 600;
@@ -2200,7 +2200,7 @@ h2.profile-display-name {
     border-radius: 50% !important;
     background: rgba(0, 0, 0, 0.05) !important;
     border: none !important;
-    color: #6b7280 !important;
+    color: var(--color-gray-500) !important;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -2216,7 +2216,7 @@ h2.profile-display-name {
 
 [data-theme="dark"] .badge-modal-close {
     background: rgba(255, 255, 255, 0.1) !important;
-    color: #94a3b8 !important;
+    color: var(--color-slate-400) !important;
 }
 
 .badge-modal-icon {
@@ -2235,14 +2235,14 @@ h2.profile-display-name {
     margin: 0 0 12px 0;
     font-size: 1.5rem;
     font-weight: 800;
-    color: #1f2937;
+    color: var(--color-gray-800);
     background: none !important;
-    -webkit-text-fill-color: #1f2937 !important;
+    -webkit-text-fill-color: var(--color-gray-800) !important;
 }
 
 [data-theme="dark"] .badge-modal-name {
-    color: #f1f5f9;
-    -webkit-text-fill-color: #f1f5f9 !important;
+    color: var(--color-slate-100);
+    -webkit-text-fill-color: var(--color-slate-100) !important;
 }
 
 .badge-rarity-tag {
@@ -2259,27 +2259,27 @@ h2.profile-display-name {
 
 .badge-rarity-tag.common {
     background: rgba(156, 163, 175, 0.2);
-    color: #6b7280;
+    color: var(--color-gray-500);
 }
 
 .badge-rarity-tag.uncommon {
     background: rgba(34, 197, 94, 0.15);
-    color: #16a34a;
+    color: var(--color-green-600);
 }
 
 .badge-rarity-tag.rare {
     background: rgba(59, 130, 246, 0.15);
-    color: #2563eb;
+    color: var(--color-blue-600);
 }
 
 .badge-rarity-tag.epic {
     background: rgba(139, 92, 246, 0.15);
-    color: #7c3aed;
+    color: var(--color-purple-600);
 }
 
 .badge-rarity-tag.legendary {
     background: linear-gradient(135deg, rgba(245, 158, 11, 0.2), rgba(217, 119, 6, 0.15));
-    color: #b45309;
+    color: var(--color-amber-700);
 }
 
 .badge-modal-body {
@@ -2297,7 +2297,7 @@ h2.profile-display-name {
 .badge-modal-label {
     font-size: var(--font-size-xs);
     font-weight: 600;
-    color: #9ca3af;
+    color: var(--color-gray-400);
     text-transform: uppercase;
     letter-spacing: 0.5px;
     margin-bottom: var(--space-2);
@@ -2307,16 +2307,16 @@ h2.profile-display-name {
 }
 
 .badge-modal-label i {
-    color: #6366f1;
+    color: var(--color-primary-500);
 }
 
 [data-theme="dark"] .badge-modal-label {
-    color: #64748b;
+    color: var(--color-slate-500);
 }
 
 .badge-modal-text {
     font-size: var(--font-size-base);
-    color: #374151;
+    color: var(--color-gray-700);
     line-height: 1.5;
 }
 
@@ -2324,11 +2324,11 @@ h2.profile-display-name {
     padding: var(--space-3) var(--space-4);
     background: rgba(99, 102, 241, 0.05);
     border-radius: var(--radius-md);
-    border-left: var(--space-1) solid #6366f1;
+    border-left: var(--space-1) solid var(--color-primary-500);
 }
 
 [data-theme="dark"] .badge-modal-text {
-    color: #e2e8f0;
+    color: var(--color-slate-200);
 }
 
 [data-theme="dark"] .badge-modal-text.description {
@@ -2354,23 +2354,23 @@ h2.profile-display-name {
 }
 
 .badge-rarity-fill.common {
-    background: linear-gradient(90deg, #9ca3af, #6b7280);
+    background: linear-gradient(90deg, var(--color-gray-400), var(--color-gray-500));
 }
 
 .badge-rarity-fill.uncommon {
-    background: linear-gradient(90deg, #22c55e, #16a34a);
+    background: linear-gradient(90deg, var(--color-green-500), var(--color-green-600));
 }
 
 .badge-rarity-fill.rare {
-    background: linear-gradient(90deg, #3b82f6, #2563eb);
+    background: linear-gradient(90deg, var(--color-info), var(--color-blue-600));
 }
 
 .badge-rarity-fill.epic {
-    background: linear-gradient(90deg, #8b5cf6, #7c3aed);
+    background: linear-gradient(90deg, var(--color-purple-500), var(--color-purple-600));
 }
 
 .badge-rarity-fill.legendary {
-    background: linear-gradient(90deg, #f59e0b, #d97706);
+    background: linear-gradient(90deg, var(--color-warning), var(--color-amber-600));
     box-shadow: 0 0 10px rgba(245, 158, 11, 0.5);
 }
 
@@ -2388,7 +2388,7 @@ h2.profile-display-name {
     width: 56px;
     height: 56px;
     border-radius: 50% !important;
-    background: linear-gradient(135deg, #6366f1, #8b5cf6) !important;
+    background: linear-gradient(135deg, var(--color-primary-500), var(--color-purple-500)) !important;
     border: none !important;
     color: white !important;
     font-size: 1.2rem;
@@ -2443,7 +2443,7 @@ h2.profile-display-name {
     gap: var(--space-3);
     padding: var(--space-3) var(--space-4);
     border-radius: var(--radius-md);
-    color: #374151;
+    color: var(--color-gray-700);
     text-decoration: none;
     font-weight: 500;
     font-size: var(--font-size-sm);
@@ -2462,7 +2462,7 @@ h2.profile-display-name {
 }
 
 [data-theme="dark"] .profile-fab-item {
-    color: #e2e8f0;
+    color: var(--color-slate-200);
 }
 
 .profile-fab-item i {
@@ -2470,9 +2470,9 @@ h2.profile-display-name {
     text-align: center;
 }
 
-.profile-fab-item .icon-edit { color: #6366f1; }
-.profile-fab-item .icon-message { color: #3b82f6; }
-.profile-fab-item .icon-review { color: #f59e0b; }
+.profile-fab-item .icon-edit { color: var(--color-primary-500); }
+.profile-fab-item .icon-message { color: var(--color-info); }
+.profile-fab-item .icon-review { color: var(--color-warning); }
 
 /* ============================================
    OFFLINE BANNER
@@ -2482,7 +2482,7 @@ h2.profile-display-name {
     top: 0;
     left: 0;
     right: 0;
-    background: linear-gradient(135deg, #ef4444, #dc2626);
+    background: linear-gradient(135deg, var(--color-danger), var(--color-red-600));
     color: white;
     padding: var(--space-3) var(--space-5);
     display: flex;

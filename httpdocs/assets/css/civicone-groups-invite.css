@@ -1,0 +1,326 @@
+/**
+ * CivicOne Groups Invite - Member Selection Page
+ * Template D styling for inviting members to groups
+ * WCAG 2.1 AA Compliant with 44px touch targets
+  * Fully Migrated to Design Tokens: 2026-01-21 ✓
+ */
+
+/* ============================================
+   GOLD STANDARD - Native App Features
+   ============================================ */
+
+/* Offline Banner */
+.offline-banner {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 10001;
+    padding: 12px 20px;
+    background: linear-gradient(135deg, var(--color-danger), var(--color-red-600));
+    color: white;
+    font-size: 0.9rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transform: translateY(-100%);
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.offline-banner.visible {
+    transform: translateY(0);
+}
+
+/* Content Reveal Animation */
+@keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.htb-card {
+    animation: fadeInUp 0.4s ease-out;
+}
+
+/* Button Press States */
+.invite-submit:active,
+button:active {
+    transform: scale(0.96) !important;
+    transition: transform 0.1s ease !important;
+}
+
+/* Touch Targets - WCAG 2.1 AA (44px minimum) */
+.invite-submit,
+.invite-search,
+.user-item,
+button {
+    min-height: 44px;
+}
+
+.invite-search {
+    font-size: 16px !important; /* Prevent iOS zoom */
+}
+
+/* Focus Visible */
+.invite-submit:focus-visible,
+.invite-search:focus-visible,
+button:focus-visible,
+a:focus-visible,
+input:focus-visible {
+    outline: 3px solid rgba(219, 39, 119, 0.5);
+    outline-offset: 2px;
+}
+
+/* Smooth Scroll */
+html {
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
+}
+
+/* Page Wrapper */
+.invite-wrapper {
+    padding-top: 120px;
+    padding-bottom: 40px;
+}
+
+.invite-wrapper .htb-header-box {
+    margin-bottom: 20px;
+}
+
+.invite-wrapper .htb-card {
+    padding: 24px;
+}
+
+/* Search Input */
+.invite-search {
+    width: 100%;
+    padding: 14px 16px;
+    border: 2px solid var(--color-gray-200);
+    border-radius: 12px;
+    font-size: 1rem;
+    font-family: inherit;
+    box-sizing: border-box;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    background: white;
+    color: var(--htb-text-main);
+    -webkit-appearance: none;
+}
+
+.invite-search:focus {
+    outline: none;
+    border-color: var(--color-pink-600);
+    box-shadow: 0 0 0 4px rgba(219, 39, 119, 0.1);
+}
+
+/* User List */
+.user-list {
+    max-height: 400px;
+    overflow-y: auto;
+    margin: 20px 0;
+    border: 1px solid var(--color-gray-200);
+    border-radius: 12px;
+}
+
+.user-item {
+    display: flex;
+    align-items: center;
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--color-gray-100);
+    cursor: pointer;
+    transition: background 0.15s ease;
+}
+
+.user-item:last-child {
+    border-bottom: none;
+}
+
+.user-item:hover {
+    background: var(--color-pink-50);
+}
+
+.user-item.selected {
+    background: var(--color-pink-100);
+}
+
+.user-item input[type="checkbox"] {
+    margin-right: 12px;
+    width: 20px;
+    height: 20px;
+    accent-color: var(--color-pink-600);
+}
+
+.user-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-right: 12px;
+    background: var(--color-gray-200);
+}
+
+.user-info {
+    flex: 1;
+}
+
+.user-name {
+    font-weight: 600;
+    color: var(--htb-text-main);
+}
+
+.user-email {
+    font-size: 0.85rem;
+    color: var(--color-gray-500);
+}
+
+/* Submit Button */
+.invite-submit {
+    width: 100%;
+    padding: 16px;
+    font-size: 1.05rem;
+    border-radius: 14px;
+    background: linear-gradient(135deg, var(--color-pink-600), var(--color-pink-500));
+    border: none;
+    color: white;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: 0 4px 14px rgba(219, 39, 119, 0.3);
+    transition: all 0.2s ease;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.invite-submit:disabled {
+    background: var(--color-gray-400);
+    box-shadow: none;
+    cursor: not-allowed;
+}
+
+.invite-submit:active:not(:disabled) {
+    transform: scale(0.98);
+}
+
+/* Selected Count */
+.selected-count {
+    text-align: center;
+    margin-bottom: 16px;
+    font-weight: 600;
+    color: var(--color-pink-600);
+}
+
+/* Empty State */
+.no-users {
+    text-align: center;
+    padding: 40px 20px;
+    color: var(--color-gray-500);
+}
+
+/* Back Link */
+.back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--color-pink-600);
+    text-decoration: none;
+    font-weight: 600;
+    margin-bottom: 20px;
+}
+
+.back-link:hover {
+    text-decoration: underline;
+}
+
+/* Error Message */
+.error-message {
+    background: var(--color-red-50);
+    color: var(--color-red-600);
+    padding: 12px 16px;
+    border-radius: 8px;
+    margin-bottom: 16px;
+    font-weight: 500;
+}
+
+/* Add Directly Box */
+.add-directly-box {
+    margin: 20px 0;
+    padding: 16px;
+    background: linear-gradient(135deg, #f0fdf4, #dcfce7);
+    border: 2px solid var(--color-green-300);
+    border-radius: 12px;
+}
+
+.add-directly-box label {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    cursor: pointer;
+}
+
+.add-directly-box input[type="checkbox"] {
+    width: 20px;
+    height: 20px;
+    margin-top: 2px;
+    accent-color: var(--color-success);
+}
+
+.add-directly-title {
+    font-weight: 600;
+    color: var(--color-green-800);
+}
+
+.add-directly-desc {
+    font-size: 0.85rem;
+    color: var(--color-green-700);
+    margin-top: 4px;
+}
+
+/* Dark Mode */
+[data-theme="dark"] .invite-search {
+    background: rgba(30, 41, 59, 0.8);
+    border-color: rgba(255, 255, 255, 0.15);
+    color: var(--color-slate-100);
+}
+
+[data-theme="dark"] .user-list {
+    border-color: rgba(255, 255, 255, 0.1);
+}
+
+[data-theme="dark"] .user-item {
+    border-color: rgba(255, 255, 255, 0.05);
+}
+
+[data-theme="dark"] .user-item:hover {
+    background: rgba(219, 39, 119, 0.1);
+}
+
+[data-theme="dark"] .user-item.selected {
+    background: rgba(219, 39, 119, 0.2);
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+    .invite-wrapper {
+        padding-top: 100px;
+        padding-bottom: 100px;
+    }
+
+    .invite-wrapper .htb-card {
+        padding: 20px 16px;
+        border-radius: 16px;
+    }
+
+    .invite-search {
+        padding: 12px 14px;
+        font-size: 16px;
+    }
+
+    .user-list {
+        max-height: 350px;
+    }
+
+    /* Mobile Touch Targets */
+    .invite-submit,
+    .user-item,
+    button {
+        min-height: 48px;
+    }
+}

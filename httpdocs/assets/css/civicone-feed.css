@@ -497,27 +497,27 @@
 }
 
 .nexus-skin-civicone .civic-type-banner-listing {
-    background: linear-gradient(135deg, #EFF6FF 0%, #DBEAFE 100%);
+    background: linear-gradient(135deg, var(--color-blue-50) 0%, var(--color-blue-100) 100%);
     border-left: var(--space-1) solid var(--civic-brand);
 }
 
 .nexus-skin-civicone .civic-type-banner-listing.request {
-    background: linear-gradient(135deg, #FEF3C7 0%, #FDE68A 100%);
+    background: linear-gradient(135deg, var(--color-amber-100) 0%, var(--color-amber-200) 100%);
     border-left-color: var(--color-warning);
 }
 
 .nexus-skin-civicone .civic-type-banner-event {
-    background: linear-gradient(135deg, #FDF2F8 0%, #FCE7F3 100%);
+    background: linear-gradient(135deg, var(--color-pink-50) 0%, var(--color-pink-100) 100%);
     border-left: var(--space-1) solid var(--color-pink-600);
 }
 
 .nexus-skin-civicone .civic-type-banner-goal {
-    background: linear-gradient(135deg, #ECFDF5 0%, #D1FAE5 100%);
+    background: linear-gradient(135deg, var(--color-emerald-50) 0%, var(--color-emerald-100) 100%);
     border-left: var(--space-1) solid var(--color-green-500);
 }
 
 .nexus-skin-civicone .civic-type-banner-poll {
-    background: linear-gradient(135deg, #EFF6FF 0%, #DBEAFE 100%);
+    background: linear-gradient(135deg, var(--color-blue-50) 0%, var(--color-blue-100) 100%);
     border-left: var(--space-1) solid var(--color-blue-500);
 }
 
@@ -547,7 +547,7 @@ body.dark-mode .nexus-skin-civicone .civic-type-banner-poll {
 }
 
 body.dark-mode .nexus-skin-civicone .civic-type-banner-volunteering {
-    background: linear-gradient(135deg, #082F49 0%, #0C4A6E 100%);
+    background: linear-gradient(135deg, #082F49 0%, var(--color-sky-900) 100%);
 }
 
 .nexus-skin-civicone .civic-type-label {
@@ -596,7 +596,7 @@ body.dark-mode .nexus-skin-civicone .civic-type-badge {
     justify-content: center;
     gap: var(--space-2);
     padding: var(--space-3) var(--space-5);
-    background: #00703c; /* GOV.UK green for guaranteed WCAG AA (7.41:1 with white) */
+    background: var(--color-govuk-green); /* GOV.UK green for guaranteed WCAG AA (7.41:1 with white) */
     color: #fff !important;
     border-radius: var(--radius-sm);
     font-size: var(--font-size-sm);
@@ -607,7 +607,7 @@ body.dark-mode .nexus-skin-civicone .civic-type-badge {
 }
 
 .nexus-skin-civicone .civic-view-btn:hover {
-    background: #005a30; /* Darker green on hover */
+    background: var(--color-govuk-green-dark); /* Darker green on hover */
     color: #fff !important;
 }
 

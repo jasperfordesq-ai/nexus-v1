@@ -9,32 +9,32 @@
    -------------------------------------------- */
 :root {
     /* Text Colors (4.5:1+ contrast on white) */
-    --civic-blog-text-primary: #111827;      /* 12.6:1 */
-    --civic-blog-text-secondary: #374151;    /* 8.5:1 */
-    --civic-blog-text-muted: #4B5563;        /* 7.0:1 */
+    --civic-blog-text-primary: var(--color-gray-900);      /* 12.6:1 */
+    --civic-blog-text-secondary: var(--color-gray-700);    /* 8.5:1 */
+    --civic-blog-text-muted: var(--color-gray-600);        /* 7.0:1 */
 
     /* Focus Ring - GOV.UK Style */
-    --civic-blog-focus-ring: #FFDD00;
-    --civic-blog-focus-text: #0B0C0C;
+    --civic-blog-focus-ring: var(--color-brand-yellow);
+    --civic-blog-focus-text: var(--color-govuk-black);
     --civic-blog-focus-offset: 3px;
 
     /* Touch Target */
     --civic-blog-touch-min: 44px;
 
     /* Theme Colors (Holographic Purple/Cyan) */
-    --news-primary: #8b5cf6;
+    --news-primary: var(--color-purple-500);
     --news-primary-rgb: 139, 92, 246;
-    --news-secondary: #06b6d4;
+    --news-secondary: var(--color-cyan-500);
     --news-secondary-rgb: 6, 182, 212;
-    --news-accent: #f472b6;
+    --news-accent: var(--color-pink-400);
     --news-accent-rgb: 244, 114, 182;
 }
 
 /* Dark mode tokens */
 [data-theme="dark"] {
-    --civic-blog-text-primary: #F9FAFB;
-    --civic-blog-text-secondary: #E5E7EB;
-    --civic-blog-text-muted: #D1D5DB;
+    --civic-blog-text-primary: var(--color-gray-50);
+    --civic-blog-text-secondary: var(--color-gray-200);
+    --civic-blog-text-muted: var(--color-gray-300);
 }
 
 
@@ -48,7 +48,7 @@
     right: 0;
     z-index: 10001;
     padding: var(--space-3) var(--space-5);
-    background: linear-gradient(135deg, #ef4444, #dc2626);
+    background: linear-gradient(135deg, var(--color-danger), var(--color-red-600));
     color: white;
     font-size: var(--font-size-sm);
     font-weight: 600;
@@ -129,11 +129,11 @@
 #news-holo-wrapper .news-card:focus-visible,
 #news-holo-wrapper a:focus-visible {
     /* GOV.UK Focus Pattern */
-    outline: 3px solid var(--govuk-focus-colour, #ffdd00);
+    outline: 3px solid var(--govuk-focus-colour, var(--color-brand-yellow));
     outline-offset: 0;
-    background-color: var(--govuk-focus-colour, #ffdd00);
-    color: var(--govuk-focus-text-colour, #0b0c0c);
-    box-shadow: 0 -2px var(--govuk-focus-colour, #ffdd00), 0 4px var(--govuk-focus-text-colour, #0b0c0c);
+    background-color: var(--govuk-focus-colour, var(--color-brand-yellow));
+    color: var(--govuk-focus-text-colour, var(--color-govuk-black));
+    box-shadow: 0 -2px var(--govuk-focus-colour, var(--color-brand-yellow)), 0 4px var(--govuk-focus-text-colour, var(--color-govuk-black));
 }
 
 
@@ -292,7 +292,7 @@
     background: rgba(139, 92, 246, 0.2);
     border: 1px solid rgba(139, 92, 246, 0.4);
     border-radius: var(--radius-full);
-    color: #c4b5fd;
+    color: var(--color-purple-300);
     font-size: var(--font-size-sm);
     font-weight: 600;
     text-transform: uppercase;
@@ -306,7 +306,7 @@
     font-weight: 900;
     line-height: 1.1;
     margin: 0 0 var(--space-5);
-    background: linear-gradient(135deg, #ffffff 0%, #c4b5fd 50%, #67e8f9 100%);
+    background: linear-gradient(135deg, var(--color-white) 0%, var(--color-purple-300) 50%, var(--color-cyan-300) 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -472,7 +472,7 @@
     border-radius: var(--radius-xl);
     font-size: var(--font-size-xs);
     font-weight: 600;
-    color: #c4b5fd;
+    color: var(--color-purple-300);
     text-transform: uppercase;
     letter-spacing: 0.5px;
 }
@@ -485,7 +485,7 @@
 }
 
 .news-card-title a {
-    color: #ffffff;
+    color: var(--color-white);
     text-decoration: none;
     transition: color var(--transition-base);
     display: -webkit-box;
@@ -495,7 +495,7 @@
 }
 
 .news-card-title a:hover {
-    color: #c4b5fd;
+    color: var(--color-purple-300);
 }
 
 .news-card-excerpt {
@@ -529,7 +529,7 @@
     background: linear-gradient(135deg, rgba(139, 92, 246, 0.3), rgba(6, 182, 212, 0.2));
     border: 1px solid rgba(139, 92, 246, 0.3);
     border-radius: var(--radius-md);
-    color: #ffffff;
+    color: var(--color-white);
     font-size: var(--font-size-sm);
     font-weight: 600;
     text-decoration: none;
@@ -546,11 +546,11 @@
 
 .news-btn:focus {
     /* GOV.UK Focus Pattern */
-    outline: 3px solid var(--govuk-focus-colour, #ffdd00);
+    outline: 3px solid var(--govuk-focus-colour, var(--color-brand-yellow));
     outline-offset: 0;
-    background-color: var(--govuk-focus-colour, #ffdd00);
-    color: var(--govuk-focus-text-colour, #0b0c0c);
-    box-shadow: 0 -2px var(--govuk-focus-colour, #ffdd00), 0 4px var(--govuk-focus-text-colour, #0b0c0c);
+    background-color: var(--govuk-focus-colour, var(--color-brand-yellow));
+    color: var(--govuk-focus-text-colour, var(--color-govuk-black));
+    box-shadow: 0 -2px var(--govuk-focus-colour, var(--color-brand-yellow)), 0 4px var(--govuk-focus-text-colour, var(--color-govuk-black));
 }
 
 .news-btn i {
@@ -601,7 +601,7 @@
 .news-empty-title {
     font-size: var(--font-size-2xl);
     font-weight: 700;
-    color: #ffffff;
+    color: var(--color-white);
     margin: 0 0 var(--space-3);
 }
 
@@ -617,8 +617,8 @@
    -------------------------------------------- */
 [data-theme="light"] #news-holo-wrapper::before {
     background: linear-gradient(135deg,
-            #e0e7ff 0%,
-            #ddd6fe 50%,
+            var(--color-primary-100) 0%,
+            var(--color-purple-200) 50%,
             #cffafe 100%);
 }
 
@@ -630,7 +630,7 @@
 }
 
 [data-theme="light"] .news-hero-title {
-    background: linear-gradient(135deg, #4c1d95 0%, #7c3aed 50%, #0891b2 100%);
+    background: linear-gradient(135deg, #4c1d95 0%, var(--color-purple-600) 50%, var(--color-cyan-600) 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -641,7 +641,7 @@
 }
 
 [data-theme="light"] .news-hero-badge {
-    color: #6d28d9;
+    color: var(--color-purple-700);
     background: rgba(139, 92, 246, 0.15);
 }
 
@@ -658,11 +658,11 @@
 }
 
 [data-theme="light"] .news-card-title a {
-    color: #1e1b4b;
+    color: var(--color-indigo-950);
 }
 
 [data-theme="light"] .news-card-title a:hover {
-    color: #6d28d9;
+    color: var(--color-purple-700);
 }
 
 [data-theme="light"] .news-card-excerpt {
@@ -684,14 +684,14 @@
 .civic-article-wrapper {
     background: white;
     padding: var(--space-10);
-    border: 1px solid #E5E7EB;
+    border: 1px solid var(--color-gray-200);
     max-width: 800px;
     margin: 0 auto;
 }
 
 [data-theme="dark"] .civic-article-wrapper {
-    background: #1F2937;
-    border-color: #374151;
+    background: var(--color-gray-800);
+    border-color: var(--color-gray-700);
 }
 
 .civic-article-meta {
@@ -703,7 +703,7 @@
 }
 
 [data-theme="dark"] .civic-article-meta {
-    border-bottom-color: #374151;
+    border-bottom-color: var(--color-gray-700);
 }
 
 .civic-article-image {
@@ -714,7 +714,7 @@
 }
 
 [data-theme="dark"] .civic-article-image {
-    border-color: #374151;
+    border-color: var(--color-gray-700);
 }
 
 .civic-article-body {
@@ -736,7 +736,7 @@
 }
 
 [data-theme="dark"] .civic-article-footer {
-    border-top-color: #374151;
+    border-top-color: var(--color-gray-700);
 }
 
 .civic-article-back,
@@ -758,11 +758,11 @@
 .civic-article-back:focus,
 .civic-article-share:focus {
     /* GOV.UK Focus Pattern */
-    outline: 3px solid var(--govuk-focus-colour, #ffdd00);
+    outline: 3px solid var(--govuk-focus-colour, var(--color-brand-yellow));
     outline-offset: 0;
-    background-color: var(--govuk-focus-colour, #ffdd00);
-    color: var(--govuk-focus-text-colour, #0b0c0c);
-    box-shadow: 0 -2px var(--govuk-focus-colour, #ffdd00), 0 4px var(--govuk-focus-text-colour, #0b0c0c);
+    background-color: var(--govuk-focus-colour, var(--color-brand-yellow));
+    color: var(--govuk-focus-text-colour, var(--color-govuk-black));
+    box-shadow: 0 -2px var(--govuk-focus-colour, var(--color-brand-yellow)), 0 4px var(--govuk-focus-text-colour, var(--color-govuk-black));
 }
 
 

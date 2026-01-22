@@ -17,19 +17,19 @@ body * {
     --safe-right: env(safe-area-inset-right, 0px);
 
     /* Dark theme colors */
-    --ed-bg: #0f172a;
+    --ed-bg: var(--color-slate-900);
     --ed-surface: rgba(30, 41, 59, 0.95);
     --ed-border: rgba(255, 255, 255, 0.1);
-    --ed-text: #f1f5f9;
-    --ed-text-secondary: #cbd5e1;
-    --ed-text-muted: #94a3b8;
-    --ed-primary: #6366f1;
+    --ed-text: var(--color-slate-100);
+    --ed-text-secondary: var(--color-slate-300);
+    --ed-text-muted: var(--color-slate-400);
+    --ed-primary: var(--color-primary-500);
     --ed-primary-light: rgba(99, 102, 241, 0.15);
-    --ed-success: #10b981;
+    --ed-success: var(--color-success);
     --ed-success-light: rgba(16, 185, 129, 0.15);
-    --ed-danger: #ef4444;
+    --ed-danger: var(--color-danger);
     --ed-danger-light: rgba(239, 68, 68, 0.15);
-    --ed-pink: #ec4899;
+    --ed-pink: var(--color-pink-500);
     --ed-pink-light: rgba(236, 72, 153, 0.15);
 }
 
@@ -67,7 +67,7 @@ body * {
     top: -60px;
     left: 0;
     right: 0;
-    background: linear-gradient(135deg, #dc2626, #b91c1c);
+    background: linear-gradient(135deg, var(--color-red-600), var(--color-red-700));
     color: white;
     padding: var(--space-3) var(--space-5);
     text-align: center;

@@ -512,7 +512,7 @@
                                 <span>Notifications</span>
                             </div>
                             <div class="nexus-install-feature">
-                                <i class="fa-solid fa-wifi-slash"></i>
+                                <i class="fa-solid fa-cloud-arrow-down"></i>
                                 <span>Offline</span>
                             </div>
                         </div>

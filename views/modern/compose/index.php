@@ -119,24 +119,6 @@ if ($hasVolunteering && class_exists('\Nexus\Models\Category')) {
     }
 }
 
-// Federation settings for listings
-$federationEnabled = false;
-$userFederationOptedIn = false;
-if (class_exists('\Nexus\Services\FederationFeatureService')) {
-    try {
-        $federationEnabled = \Nexus\Services\FederationFeatureService::isTenantFederationEnabled();
-        if ($federationEnabled && $userId) {
-            $userFedSettings = \Nexus\Core\Database::query(
-                "SELECT federation_optin FROM federation_user_settings WHERE user_id = ?",
-                [$userId]
-            )->fetch();
-            $userFederationOptedIn = $userFedSettings && $userFedSettings['federation_optin'];
-        }
-    } catch (\Exception $e) {
-        $federationEnabled = false;
-    }
-}
-
 // Context-aware default tab based on referrer URL
 // Support both ?type= and ?tab= query parameters for flexibility
 $defaultType = $_GET['type'] ?? $_GET['tab'] ?? 'post';
@@ -210,6 +192,10 @@ if (empty($mapboxToken)) {
     <link href="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v5.0.0/mapbox-gl-geocoder.css" rel="stylesheet">
     <script src="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.js"></script>
     <script src="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v5.0.0/mapbox-gl-geocoder.min.js"></script>
+
+    <!-- Compose page CSS -->
+    <link rel="stylesheet" href="/assets/css/civicone-compose-index.min.css">
+    <link rel="stylesheet" href="/assets/css/civicone-utilities-extended.css">
 
     <!-- Global functions - must be before buttons that use onclick -->
     <script>
@@ -387,9 +373,9 @@ if (empty($mapboxToken)) {
         var text = document.getElementById(textId);
         if (!text) return;
         if (select.value) {
-            text.innerHTML = '<i class="fa-solid fa-users" style="margin-right: 4px;"></i> ' + select.options[select.selectedIndex].text;
+            text.innerHTML = '<i class="fa-solid fa-users mr-4"></i> ' + select.options[select.selectedIndex].text;
         } else {
-            text.innerHTML = '<i class="fa-solid fa-globe" style="margin-right: 4px;"></i> Public Feed';
+            text.innerHTML = '<i class="fa-solid fa-globe mr-4"></i> Public Feed';
         }
     }
 
@@ -479,9 +465,6 @@ if (empty($mapboxToken)) {
         haptic();
     }
     </script>
-
-    <!-- Compose Multidraw CSS -->
-    <link rel="stylesheet" href="/assets/css/compose-multidraw.min.css">
 </head>
 <body>
     <!-- Desktop backdrop (centered flex container) - overlay starts inside for desktop -->
@@ -544,14 +527,14 @@ if (empty($mapboxToken)) {
         <!-- Content Panels -->
         <div class="multidraw-content" id="contentArea">
             <?php if ($error): ?>
-            <div class="md-alert error" style="margin: 16px;">
+            <div class="md-alert error m-16">
                 <i class="fa-solid fa-circle-exclamation"></i>
                 <?= htmlspecialchars($error) ?>
             </div>
             <?php endif; ?>
 
             <?php if ($success): ?>
-            <div class="md-alert success" style="margin: 16px;">
+            <div class="md-alert success m-16">
                 <i class="fa-solid fa-circle-check"></i>
                 <?= htmlspecialchars($success) ?>
             </div>
@@ -563,7 +546,7 @@ if (empty($mapboxToken)) {
                     <input type="hidden" name="post_type" value="post">
 
                     <div class="md-user-row">
-                        <?= webp_avatar($userAvatar, $userName, 44) ?>
+                        <img src="<?= htmlspecialchars($userAvatar) ?>" loading="lazy" alt="" class="md-avatar">
                         <div class="md-user-info">
                             <div class="md-user-name"><?= htmlspecialchars($userName) ?></div>
                             <button type="button" class="md-audience-btn" onclick="document.getElementById('post-group-select').click()">
@@ -574,7 +557,7 @@ if (empty($mapboxToken)) {
                         </div>
                     </div>
 
-                    <select id="post-group-select" name="group_id" style="display: none;" onchange="updateAudience(this, 'post-audience-text')">
+                    <select id="post-group-select" name="group_id" class="hidden" onchange="updateAudience(this, 'post-audience-text')">
                         <option value="">Public Feed</option>
                         <?php foreach ($userGroups as $group): ?>
                         <option value="<?= $group['id'] ?>"><?= htmlspecialchars($group['name']) ?></option>
@@ -657,7 +640,7 @@ if (empty($mapboxToken)) {
                                 </button>
                                 <div class="md-ai-status" id="ai-status-listing"></div>
                             </div>
-                            <textarea name="description" id="listing-desc" class="md-input" style="min-height: 100px; resize: vertical;" placeholder="Describe what you're offering or need help with..." required></textarea>
+                            <textarea name="description" id="listing-desc" class="md-input md-textarea-resizable" placeholder="Describe what you're offering or need help with..." required></textarea>
                         </div>
 
                         <button type="button" class="md-next-btn" onclick="nextListingStep(2)">
@@ -739,8 +722,8 @@ if (empty($mapboxToken)) {
                                     <i class="fa-solid fa-camera"></i>
                                     <span>Tap to add photo</span>
                                 </div>
-                                <input type="file" name="image" id="listing-image-file" accept="image/*" style="display: none;" onchange="previewImage(this, 'listing')">
-                                <div class="md-image-preview" id="listing-image-preview" style="display: none;">
+                                <input type="file" name="image" id="listing-image-file" accept="image/*" class="hidden" onchange="previewImage(this, 'listing')">
+                                <div class="md-image-preview hidden" id="listing-image-preview">
                                     <img id="listing-preview-img" src="" alt="Preview" loading="lazy">
                                     <button type="button" class="md-image-remove" onclick="removeImage('listing')">
                                         <i class="fa-solid fa-xmark"></i>
@@ -768,53 +751,6 @@ if (empty($mapboxToken)) {
                         </div>
                         <?php endif; ?>
 
-                        <!-- Partner Timebanks (Federation) -->
-                        <?php if ($federationEnabled): ?>
-                        <div class="md-field md-federation-section">
-                            <label class="md-label">
-                                <i class="fa-solid fa-globe" style="margin-right: 6px; color: #8b5cf6;"></i>
-                                Share with Partner Timebanks
-                                <span class="md-hint-inline">(Optional)</span>
-                            </label>
-
-                            <?php if ($userFederationOptedIn): ?>
-                            <p class="md-hint" style="margin-bottom: 10px;">Make this listing visible to members of our partner timebanks.</p>
-                            <div class="md-federation-options">
-                                <label class="md-federation-option">
-                                    <input type="radio" name="federated_visibility" value="none" checked>
-                                    <span class="md-fed-option-content">
-                                        <span class="md-fed-option-title"><i class="fa-solid fa-lock"></i> Local Only</span>
-                                        <span class="md-fed-option-desc">Only visible to this timebank</span>
-                                    </span>
-                                </label>
-                                <label class="md-federation-option">
-                                    <input type="radio" name="federated_visibility" value="listed">
-                                    <span class="md-fed-option-content">
-                                        <span class="md-fed-option-title"><i class="fa-solid fa-eye"></i> Visible</span>
-                                        <span class="md-fed-option-desc">Partner members can see this</span>
-                                    </span>
-                                </label>
-                                <label class="md-federation-option">
-                                    <input type="radio" name="federated_visibility" value="bookable">
-                                    <span class="md-fed-option-content">
-                                        <span class="md-fed-option-title"><i class="fa-solid fa-handshake"></i> Bookable</span>
-                                        <span class="md-fed-option-desc">Partners can contact you</span>
-                                    </span>
-                                </label>
-                            </div>
-                            <?php else: ?>
-                            <div class="md-federation-notice">
-                                <i class="fa-solid fa-info-circle"></i>
-                                <div>
-                                    <strong>Enable federation to share listings</strong>
-                                    <p>Opt into federation in your <a href="<?= $basePath ?>/settings?section=federation">account settings</a> to share with partner timebanks.</p>
-                                </div>
-                            </div>
-                            <input type="hidden" name="federated_visibility" value="none">
-                            <?php endif; ?>
-                        </div>
-                        <?php endif; ?>
-
                         <button type="button" class="md-next-btn" onclick="nextListingStep(3)">
                             Next: Impact
                             <i class="fa-solid fa-arrow-right"></i>
@@ -837,7 +773,7 @@ if (empty($mapboxToken)) {
                         <!-- SDGs - Same structure as listings/create.php -->
                         <details class="holo-sdg-accordion" open>
                             <summary class="holo-sdg-header">
-                                <span>🌍 Social Impact <span style="font-weight: 400; opacity: 0.6; font-size: 0.85rem;">(Optional)</span></span>
+                                <span>🌍 Social Impact <span class="md-optional-hint">(Optional)</span></span>
                                 <i class="fa-solid fa-chevron-down"></i>
                             </summary>
                             <div class="holo-sdg-content">
@@ -902,7 +838,7 @@ if (empty($mapboxToken)) {
                             </button>
                             <div class="md-ai-status" id="ai-status-event"></div>
                         </div>
-                        <textarea name="description" id="event-desc" class="md-input" style="min-height: 100px; resize: vertical;" placeholder="Tell people what this event is about..."></textarea>
+                        <textarea name="description" id="event-desc" class="md-input md-textarea-resizable" placeholder="Tell people what this event is about..."></textarea>
                     </div>
 
                     <div class="md-field">
@@ -995,7 +931,7 @@ if (empty($mapboxToken)) {
                     <!-- SDGs - Same as events/create.php -->
                     <details class="holo-sdg-accordion">
                         <summary class="holo-sdg-header">
-                            <span>🌍 Social Impact <span style="font-weight: 400; opacity: 0.6; font-size: 0.85rem;">(Optional)</span></span>
+                            <span>🌍 Social Impact <span class="md-optional-hint">(Optional)</span></span>
                             <i class="fa-solid fa-chevron-down"></i>
                         </summary>
                         <div class="holo-sdg-content">
@@ -1012,54 +948,7 @@ if (empty($mapboxToken)) {
                         </div>
                     </details>
 
-                    <!-- Partner Timebanks (Federation) -->
-                    <?php if ($federationEnabled): ?>
-                    <div class="md-federation-section">
-                        <label class="md-label">
-                            <i class="fa-solid fa-globe" style="margin-right: 8px; color: #8b5cf6;"></i>
-                            Share with Partner Timebanks
-                            <span class="md-hint-inline">(Optional)</span>
-                        </label>
-
-                        <?php if ($userFederationOptedIn): ?>
-                        <p class="md-hint" style="margin-bottom: 12px;">Make this event visible to members of our partner timebanks.</p>
-                        <div class="md-federation-options">
-                            <label class="md-radio-card">
-                                <input type="radio" name="federated_visibility" value="none" checked>
-                                <span class="md-radio-content">
-                                    <span class="md-radio-label">Local Only</span>
-                                    <span class="md-radio-desc">Only visible to members of this timebank</span>
-                                </span>
-                            </label>
-                            <label class="md-radio-card">
-                                <input type="radio" name="federated_visibility" value="listed">
-                                <span class="md-radio-content">
-                                    <span class="md-radio-label">Visible</span>
-                                    <span class="md-radio-desc">Partner timebank members can see this event</span>
-                                </span>
-                            </label>
-                            <label class="md-radio-card">
-                                <input type="radio" name="federated_visibility" value="joinable">
-                                <span class="md-radio-content">
-                                    <span class="md-radio-label">Joinable</span>
-                                    <span class="md-radio-desc">Partner members can RSVP to this event</span>
-                                </span>
-                            </label>
-                        </div>
-                        <?php else: ?>
-                        <div class="md-federation-optin-notice">
-                            <i class="fa-solid fa-info-circle"></i>
-                            <div>
-                                <strong>Enable federation to share events</strong>
-                                <p>To share your events with partner timebanks, you need to opt into federation in your <a href="<?= $basePath ?>/settings?section=federation">account settings</a>.</p>
-                            </div>
-                        </div>
-                        <input type="hidden" name="federated_visibility" value="none">
-                        <?php endif; ?>
-                    </div>
-                    <?php endif; ?>
-
-                    <button type="submit" class="md-submit-btn" style="background: linear-gradient(135deg, #ec4899 0%, #be185d 100%);">
+                    <button type="submit" class="md-submit-btn md-submit-btn--event">
                         <i class="fa-solid fa-calendar-plus"></i>
                         Create Event
                     </button>
@@ -1100,7 +989,7 @@ if (empty($mapboxToken)) {
                             </button>
                             <div class="md-ai-status" id="ai-status-poll"></div>
                         </div>
-                        <textarea name="description" id="poll-desc" class="md-input" style="min-height: 60px; resize: vertical;" placeholder="Add more context to your poll..."></textarea>
+                        <textarea name="description" id="poll-desc" class="md-input md-textarea-resizable--small" placeholder="Add more context to your poll..."></textarea>
                     </div>
 
                     <div class="md-field">
@@ -1165,7 +1054,7 @@ if (empty($mapboxToken)) {
                             </button>
                             <div class="md-ai-status" id="ai-status-goal"></div>
                         </div>
-                        <textarea name="description" id="goal-desc" class="md-input" style="min-height: 100px; resize: vertical;" placeholder="Why is this goal important? How will the community help?"></textarea>
+                        <textarea name="description" id="goal-desc" class="md-input md-textarea-resizable" placeholder="Why is this goal important? How will the community help?"></textarea>
                     </div>
 
                     <div class="md-field">
@@ -1204,7 +1093,7 @@ if (empty($mapboxToken)) {
                             To post volunteer opportunities, you need to register your organization first.
                             This helps volunteers trust the opportunities they apply for.
                         </p>
-                        <a href="<?= $basePath ?>/volunteering/dashboard" class="md-submit-btn warning" style="text-decoration: none; display: inline-flex;">
+                        <a href="<?= $basePath ?>/volunteering/dashboard" class="md-submit-btn warning btn-link-inline">
                             <i class="fa-solid fa-plus"></i>
                             Register Organization
                         </a>
@@ -1216,11 +1105,11 @@ if (empty($mapboxToken)) {
                         <i class="fa-solid fa-info-circle"></i>
                         You're signed in as an organization. Manage your opportunities from the dashboard.
                     </div>
-                    <a href="<?= $basePath ?>/volunteering/opp/create" class="md-submit-btn warning" style="text-decoration: none; display: inline-flex; margin-bottom: 12px;">
+                    <a href="<?= $basePath ?>/volunteering/opp/create" class="md-submit-btn warning btn-link-inline md-btn-spaced">
                         <i class="fa-solid fa-plus"></i>
                         Post New Opportunity
                     </a>
-                    <a href="<?= $basePath ?>/volunteering/dashboard" class="md-next-btn" style="text-decoration: none; display: inline-flex;">
+                    <a href="<?= $basePath ?>/volunteering/dashboard" class="md-next-btn btn-link-inline">
                         <i class="fa-solid fa-tachometer-alt"></i>
                         Go to Dashboard
                     </a>
@@ -1289,7 +1178,7 @@ if (empty($mapboxToken)) {
                                 </button>
                                 <div class="md-ai-status" id="ai-status-volunteering"></div>
                             </div>
-                            <textarea name="description" id="vol-desc" class="md-input" style="min-height: 100px; resize: vertical;" placeholder="Describe the role, responsibilities, and impact..." required></textarea>
+                            <textarea name="description" id="vol-desc" class="md-input md-textarea-resizable" placeholder="Describe the role, responsibilities, and impact..." required></textarea>
                         </div>
 
                         <div class="md-field">
@@ -1394,7 +1283,7 @@ if (empty($mapboxToken)) {
                     <!-- Selected Group Display -->
                     <div class="md-selected-group" id="selected-group-display" style="display: <?= $preselectedGroup ? 'flex' : 'none' ?>;">
                         <?php if ($preselectedGroup && !empty($preselectedGroup['image_url'])): ?>
-                        <?= webp_image($preselectedGroup['image_url'], $preselectedGroup['name'], 'md-group-avatar', ['id' => 'selected-group-avatar']) ?>
+                        <img src="<?= htmlspecialchars($preselectedGroup['image_url']) ?>" loading="lazy" class="md-group-avatar md-avatar--img-only" id="selected-group-avatar">
                         <?php else: ?>
                         <div class="md-group-avatar" id="selected-group-avatar"><?= $preselectedGroup ? strtoupper(substr($preselectedGroup['name'], 0, 1)) : 'G' ?></div>
                         <?php endif; ?>
@@ -1409,7 +1298,7 @@ if (empty($mapboxToken)) {
 
                     <!-- Post Content -->
                     <div class="md-user-row">
-                        <?= webp_avatar($userAvatar, $userName, 44) ?>
+                        <img src="<?= htmlspecialchars($userAvatar) ?>" loading="lazy" alt="" class="md-avatar">
                         <div class="md-user-info">
                             <div class="md-user-name"><?= htmlspecialchars($userName) ?></div>
                         </div>
@@ -1424,8 +1313,8 @@ if (empty($mapboxToken)) {
                                 <i class="fa-solid fa-camera"></i>
                                 <span>Add photo (optional)</span>
                             </div>
-                            <input type="file" name="image" id="group-image-file" accept="image/*" style="display: none;" onchange="previewImage(this, 'group')">
-                            <div class="md-image-preview" id="group-image-preview" style="display: none;">
+                            <input type="file" name="image" id="group-image-file" accept="image/*" class="hidden" onchange="previewImage(this, 'group')">
+                            <div class="md-image-preview hidden" id="group-image-preview">
                                 <img id="group-preview-img" src="" alt="Preview" loading="lazy">
                                 <button type="button" class="md-image-remove" onclick="removeImage('group')">
                                     <i class="fa-solid fa-xmark"></i>
@@ -1735,7 +1624,7 @@ if (empty($mapboxToken)) {
             try {
                 // Show loading state
                 resultsContainer.innerHTML = `
-                    <div class="md-location-suggestion" style="opacity: 0.6;">
+                    <div class="md-location-suggestion opacity-60">
                         <div class="md-location-suggestion-icon">
                             <i class="fa-solid fa-spinner fa-spin"></i>
                         </div>
@@ -1772,7 +1661,7 @@ if (empty($mapboxToken)) {
                     `).join('');
                 } else {
                     resultsContainer.innerHTML = `
-                        <div class="md-location-suggestion" style="opacity: 0.6;">
+                        <div class="md-location-suggestion opacity-60">
                             <div class="md-location-suggestion-icon">
                                 <i class="fa-solid fa-circle-question"></i>
                             </div>
@@ -1786,7 +1675,7 @@ if (empty($mapboxToken)) {
             } catch (error) {
                 console.error('Location search error:', error);
                 resultsContainer.innerHTML = `
-                    <div class="md-location-suggestion" style="opacity: 0.6;">
+                    <div class="md-location-suggestion opacity-60">
                         <div class="md-location-suggestion-icon">
                             <i class="fa-solid fa-exclamation-triangle"></i>
                         </div>
@@ -1919,8 +1808,8 @@ if (empty($mapboxToken)) {
                     const resultsContainer = document.getElementById(pickerId + '-results');
                     if (resultsContainer) {
                         resultsContainer.innerHTML = `
-                            <div class="md-location-suggestion" style="color: var(--md-danger);">
-                                <div class="md-location-suggestion-icon" style="background: var(--md-danger-light); color: var(--md-danger);">
+                            <div class="md-location-suggestion text-red-500">
+                                <div class="md-location-suggestion-icon bg-red-50 text-red-500">
                                     <i class="fa-solid fa-location-crosshairs"></i>
                                 </div>
                                 <div class="md-location-suggestion-text">

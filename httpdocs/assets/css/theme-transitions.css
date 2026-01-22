@@ -8,6 +8,7 @@
  * - Consistent dark mode colors across all components
  * - Reduced motion support
  * - Color-scheme meta for native dark mode
+  * Fully Migrated to Design Tokens: 2026-01-21 ✓
  */
 
 /* ==============================================
@@ -47,16 +48,16 @@ html.theme-transitioning *::after {
    ============================================== */
 [data-theme="dark"] {
     /* Background hierarchy */
-    --bg-base: #0f172a;           /* Deepest background */
-    --bg-elevated: #1e293b;       /* Cards, elevated surfaces */
-    --bg-surface: #334155;        /* Interactive surfaces */
-    --bg-hover: #475569;          /* Hover states */
+    --bg-base: var(--color-slate-900);           /* Deepest background */
+    --bg-elevated: var(--color-slate-800);       /* Cards, elevated surfaces */
+    --bg-surface: var(--color-slate-700);        /* Interactive surfaces */
+    --bg-hover: var(--color-slate-600);          /* Hover states */
 
     /* Text hierarchy */
-    --text-primary: #f8fafc;      /* High emphasis */
-    --text-secondary: #cbd5e1;    /* Medium emphasis */
-    --text-muted: #94a3b8;        /* Low emphasis */
-    --text-disabled: #64748b;     /* Disabled state */
+    --text-primary: var(--color-slate-50);      /* High emphasis */
+    --text-secondary: var(--color-slate-300);    /* Medium emphasis */
+    --text-muted: var(--color-slate-400);        /* Low emphasis */
+    --text-disabled: var(--color-slate-500);     /* Disabled state */
 
     /* Border colors */
     --border-default: rgba(255, 255, 255, 0.1);
@@ -70,8 +71,8 @@ html.theme-transitioning *::after {
     --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
 
     /* Primary color adjustments for dark mode */
-    --color-primary-hover: #818cf8;
-    --color-primary-active: #a5b4fc;
+    --color-primary-hover: var(--color-primary-400);
+    --color-primary-active: var(--color-primary-300);
 
     /* Surface overlays */
     --overlay-light: rgba(255, 255, 255, 0.05);
@@ -371,17 +372,17 @@ html.theme-transitioning *::after {
 
 [data-theme="dark"] .badge-success {
     background: rgba(16, 185, 129, 0.2);
-    color: #34d399;
+    color: var(--color-emerald-400);
 }
 
 [data-theme="dark"] .badge-warning {
     background: rgba(245, 158, 11, 0.2);
-    color: #fbbf24;
+    color: var(--color-amber-300);
 }
 
 [data-theme="dark"] .badge-danger {
     background: rgba(239, 68, 68, 0.2);
-    color: #f87171;
+    color: var(--color-red-400);
 }
 
 /* ==============================================
@@ -424,7 +425,7 @@ html.theme-transitioning *::after {
    ============================================== */
 [data-theme="dark"] code {
     background: var(--bg-surface);
-    color: #f472b6;
+    color: var(--color-pink-400);
 }
 
 [data-theme="dark"] pre {
@@ -454,9 +455,9 @@ html.theme-transitioning *::after {
    ============================================== */
 @media print {
     [data-theme="dark"] {
-        --bg-base: #ffffff;
-        --bg-elevated: #ffffff;
-        --text-primary: #000000;
+        --bg-base: var(--color-white);
+        --bg-elevated: var(--color-white);
+        --text-primary: var(--color-black);
         --text-secondary: #333333;
     }
 

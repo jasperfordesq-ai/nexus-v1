@@ -4,6 +4,7 @@
  * Updated: 2026-01-21 (migrated to design tokens)
  *
  * Prefix: dash- for dashboard-specific classes
+  * Fully Migrated to Design Tokens: 2026-01-21 ✓
  */
 
 /* ============================================
@@ -18,7 +19,7 @@
     right: 0;
     bottom: 0;
     z-index: -1;
-    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 25%, #e2e8f0 50%, #f1f5f9 75%, #f8fafc 100%);
+    background: linear-gradient(135deg, var(--color-slate-50) 0%, var(--color-slate-100) 25%, var(--color-slate-200) 50%, var(--color-slate-100) 75%, var(--color-slate-50) 100%);
 }
 
 .dashboard-glass-bg::before {
@@ -36,7 +37,7 @@
 }
 
 [data-theme="dark"] .dashboard-glass-bg {
-    background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%);
+    background: linear-gradient(135deg, var(--color-slate-900) 0%, var(--color-slate-800) 50%, var(--color-slate-900) 100%);
 }
 
 [data-theme="dark"] .dashboard-glass-bg::before {
@@ -280,7 +281,7 @@
 }
 
 .dash-fab-item .icon-event {
-    background: linear-gradient(135deg, var(--color-warning), #d97706);
+    background: linear-gradient(135deg, var(--color-warning), var(--color-amber-600));
 }
 
 [data-theme="dark"] .dash-fab-item {
@@ -608,7 +609,7 @@
 }
 
 [data-theme="dark"] .notif-item-new:hover {
-    background: #334155;
+    background: var(--color-slate-700);
 }
 
 [data-theme="dark"] .notif-message {
@@ -629,11 +630,11 @@
 
 [data-theme="dark"] .notif-delete-btn:hover {
     background: #450a0a;
-    color: #f87171;
+    color: var(--color-red-400);
 }
 
 [data-theme="dark"] .notif-empty-icon {
-    color: #475569;
+    color: var(--color-slate-600);
 }
 
 [data-theme="dark"] .notif-empty h3 {
@@ -737,7 +738,7 @@
 }
 
 .dash-notif-dot.read {
-    background: #cbd5e1;
+    background: var(--color-slate-300);
 }
 
 .dash-notif-content {
@@ -832,7 +833,7 @@
 }
 
 [data-theme="dark"] .dash-notif-dot.read {
-    background: #475569;
+    background: var(--color-slate-600);
 }
 
 [data-theme="dark"] .dash-notif-message {
@@ -864,7 +865,7 @@
 }
 
 [data-theme="dark"] .dash-empty-icon {
-    color: #475569;
+    color: var(--color-slate-600);
 }
 
 /* Sidebar cards - Upcoming Events & My Hubs */
@@ -905,7 +906,7 @@
 }
 
 /* Quick Actions card */
-[data-theme="dark"] .htb-btn[style*="background: #f1f5f9"] {
+[data-theme="dark"] .htb-btn[style*="background: var(--color-slate-100)"] {
     background: rgba(51, 65, 85, 0.6) !important;
     color: var(--color-slate-200) !important;
     border-color: rgba(255, 255, 255, 0.1) !important;
@@ -918,7 +919,7 @@
 /* Notification Tab Mobile Styles */
 .notif-card-header {
     padding: var(--space-4) var(--space-5);
-    border-bottom: 1px solid #e2e8f0;
+    border-bottom: 1px solid var(--color-slate-200);
 }
 
 .notif-header-top {
@@ -948,7 +949,7 @@
 .notif-settings-panel {
     display: none;
     background: var(--color-slate-50);
-    border-bottom: 1px solid #e2e8f0;
+    border-bottom: 1px solid var(--color-slate-200);
     padding: var(--space-5);
 }
 
@@ -960,7 +961,7 @@
     background: white;
     padding: var(--space-4);
     border-radius: var(--radius-md);
-    border: 1px solid #e2e8f0;
+    border: 1px solid var(--color-slate-200);
     margin-bottom: var(--space-4);
 }
 
@@ -992,7 +993,7 @@
 /* Hub Settings List */
 .hub-settings-list {
     background: white;
-    border: 1px solid #e2e8f0;
+    border: 1px solid var(--color-slate-200);
     border-radius: var(--radius-md);
     overflow: hidden;
 }
@@ -1064,7 +1065,7 @@
 
 .notif-indicator.read {
     background: transparent;
-    border: 2px solid #cbd5e1;
+    border: 2px solid var(--color-slate-300);
 }
 
 .notif-body {
@@ -1112,7 +1113,7 @@
 }
 
 .notif-delete-btn:hover {
-    background: #fef2f2;
+    background: var(--color-red-50);
     color: var(--color-danger);
 }
 

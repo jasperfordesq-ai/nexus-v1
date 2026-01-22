@@ -21,7 +21,7 @@
 }
 
 .feed-item-url-link {
-    color: var(--color-primary-600, #4f46e5);
+    color: var(--color-primary-600, var(--color-primary-600));
     text-decoration: underline;
 }
 
@@ -32,7 +32,7 @@
     gap: var(--space-2);
     padding: var(--space-2) var(--space-3);
     background: linear-gradient(135deg, rgba(99,102,241,0.08), rgba(168,85,247,0.08));
-    border-bottom: 1px solid var(--feed-border, #e5e7eb);
+    border-bottom: 1px solid var(--feed-border, var(--color-gray-200));
     text-decoration: none;
     transition: background var(--transition-fast);
 }
@@ -64,13 +64,13 @@
 }
 
 .feed-shared-group-name i {
-    color: var(--color-primary-500, #6366f1);
+    color: var(--color-primary-500, var(--color-primary-500));
     font-size: var(--font-size-xs);
 }
 
 .feed-shared-group-location {
     font-size: var(--font-size-xs);
-    color: var(--feed-text-muted, #6b7280);
+    color: var(--feed-text-muted, var(--color-gray-500));
     margin-top: 1px;
     white-space: nowrap;
     overflow: hidden;
@@ -82,7 +82,7 @@
 }
 
 .feed-shared-group-arrow {
-    color: var(--feed-text-muted, #9ca3af);
+    color: var(--feed-text-muted, var(--color-gray-400));
     font-size: var(--font-size-xs);
 }
 
@@ -103,9 +103,9 @@
     overflow: hidden;
     border-radius: var(--radius-md);
     margin: 0 0 var(--space-3) 0;
-    border: 1px solid var(--feed-border, #e5e7eb);
+    border: 1px solid var(--feed-border, var(--color-gray-200));
     aspect-ratio: 16/9;
-    background: var(--feed-bg-secondary, #f3f4f6);
+    background: var(--feed-bg-secondary, var(--color-gray-100));
 }
 
 .feed-listing-img {
@@ -134,11 +134,11 @@
 }
 
 .feed-listing-badge-offer {
-    background: linear-gradient(135deg, #10b981, #059669);
+    background: linear-gradient(135deg, var(--color-success), var(--color-emerald-600));
 }
 
 .feed-listing-badge-request {
-    background: linear-gradient(135deg, #f59e0b, #d97706);
+    background: linear-gradient(135deg, var(--color-warning), var(--color-amber-600));
 }
 
 /* Listing Banner (no image) */
@@ -153,7 +153,7 @@
 }
 
 .feed-view-original a {
-    color: var(--color-primary-600, #4f46e5);
+    color: var(--color-primary-600, var(--color-primary-600));
     font-weight: var(--font-weight-semibold);
 }
 
@@ -162,9 +162,9 @@
     overflow: hidden;
     border-radius: var(--radius-md);
     margin-top: var(--space-3);
-    border: 1px solid var(--feed-border, #e5e7eb);
+    border: 1px solid var(--feed-border, var(--color-gray-200));
     aspect-ratio: 16/9;
-    background: var(--feed-bg-secondary, #f3f4f6);
+    background: var(--feed-bg-secondary, var(--color-gray-100));
 }
 
 .feed-post-img {
@@ -179,7 +179,7 @@
     overflow: hidden;
     border-radius: var(--radius-md);
     margin-top: var(--space-3);
-    border: 1px solid var(--border-color, #e5e7eb);
+    border: 1px solid var(--border-color, var(--color-gray-200));
     background: #000;
 }
 
@@ -297,12 +297,12 @@
 
 .feed-volunteer-credits {
     background: var(--feed-bg-card);
-    color: #3b82f6;
+    color: var(--color-info);
     padding: var(--space-1) var(--space-2);
     border-radius: var(--radius-md);
     font-weight: var(--font-weight-bold);
     font-size: var(--font-size-sm);
-    border: 1px solid #dbeafe;
+    border: 1px solid var(--color-blue-100);
 }
 
 .feed-volunteer-title {
@@ -334,7 +334,7 @@
 
 .feed-event-label {
     font-size: var(--font-size-sm);
-    color: #be185d;
+    color: var(--color-pink-700);
     font-weight: var(--font-weight-semibold);
     margin-bottom: var(--space-2);
     text-transform: uppercase;
@@ -343,12 +343,12 @@
 
 .feed-event-date-badge {
     background: var(--feed-bg-card);
-    color: #be185d;
+    color: var(--color-pink-700);
     padding: var(--space-1) var(--space-2);
     border-radius: var(--radius-md);
     font-weight: var(--font-weight-bold);
     font-size: var(--font-size-sm);
-    border: 1px solid #fbcfe8;
+    border: 1px solid var(--color-pink-200);
 }
 
 .feed-event-title {
@@ -424,7 +424,7 @@
     display: flex;
     align-items: center;
     gap: var(--space-1);
-    background: linear-gradient(135deg, #fbbf24, #f59e0b);
+    background: linear-gradient(135deg, var(--color-amber-300), var(--color-warning));
     padding: var(--space-2) var(--space-3);
     border-radius: var(--radius-xl);
 }
@@ -453,11 +453,11 @@
     border-radius: var(--radius-base);
     padding: var(--space-3) var(--space-4);
     margin-top: var(--space-2);
-    border-left: 3px solid #fbbf24;
+    border-left: 3px solid var(--color-amber-300);
 }
 
 .feed-review-comment i {
-    color: #fbbf24;
+    color: var(--color-amber-300);
     font-size: var(--font-size-sm);
     margin-right: var(--space-2);
 }
@@ -525,7 +525,7 @@
 .feed-error-box {
     margin-top: var(--space-3);
     padding: var(--space-3);
-    background: #fef2f2;
+    background: var(--color-red-50);
     border: 1px solid #fecaca;
     border-radius: var(--radius-base);
     color: #991b1b;
@@ -537,5 +537,5 @@
 }
 
 .feed-error-details {
-    color: #6b7280;
+    color: var(--color-gray-500);
 }

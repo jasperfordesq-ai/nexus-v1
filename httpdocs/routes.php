@@ -125,6 +125,11 @@ $router->add('GET', '/test-members-comprehensive', function() {
     exit;
 });
 
+$router->add('GET', '/civicone-govuk-test', function() {
+    require __DIR__ . '/civicone-govuk-test.php';
+    exit;
+});
+
 $router->add('GET', '/test-profile-routing', function() {
     require __DIR__ . '/test-profile-routing.php';
     exit;

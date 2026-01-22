@@ -115,6 +115,12 @@
         <link rel="stylesheet" href="/assets/css/dashboard.min.css?v=<?= $cssVersion ?>">
         <link rel="stylesheet" href="/assets/css/civicone-dashboard.min.css?v=<?= $cssVersion ?>">
     <?php endif; ?>
+    <?php if (strpos($normPath, '/members') !== false): ?>
+        <!-- MOJ Filter Component for Members Directory v1.6.0 (GOV.UK/MOJ Compliance) -->
+        <link rel="stylesheet" href="/assets/css/moj-filter.min.css?v=<?= $cssVersion ?>">
+        <!-- Members Directory v1.6.0 (Mobile Bottom Sheet + Prominent Tabs) -->
+        <link rel="stylesheet" href="/assets/css/members-directory-v1.6.min.css?v=<?= $cssVersion ?>">
+    <?php endif; ?>
 
     <!-- Mobile Sheets CSS (base styles always load, CSS handles desktop hiding) -->
     <link rel="stylesheet" href="/assets/css/mobile-sheets.min.css?v=<?= $cssVersion ?>">
@@ -131,13 +137,21 @@
     <!-- Social Interactions CSS -->
     <link rel="stylesheet" href="/assets/css/social-interactions.min.css?v=<?= $cssVersion ?>">
 
-    <!-- GOV.UK Design Tokens - WCAG 2.1 AA Compliant (2026-01-20) -->
+    <!-- GOV.UK Design System - WCAG 2.2 AA Compliant (2026-01-20/22) -->
     <link rel="stylesheet" href="/assets/css/civicone-govuk-typography.min.css?v=<?= $cssVersion ?>">
     <link rel="stylesheet" href="/assets/css/civicone-govuk-spacing.min.css?v=<?= $cssVersion ?>">
     <link rel="stylesheet" href="/assets/css/civicone-govuk-focus.min.css?v=<?= $cssVersion ?>">
     <link rel="stylesheet" href="/assets/css/civicone-govuk-buttons.min.css?v=<?= $cssVersion ?>">
     <link rel="stylesheet" href="/assets/css/civicone-govuk-forms.min.css?v=<?= $cssVersion ?>">
     <link rel="stylesheet" href="/assets/css/civicone-govuk-components.min.css?v=<?= $cssVersion ?>">
+    <!-- GOV.UK Feedback Components (NEW 2026-01-22) -->
+    <link rel="stylesheet" href="/assets/css/civicone-govuk-feedback.min.css?v=<?= $cssVersion ?>">
+    <!-- GOV.UK Navigation Components (NEW 2026-01-22) -->
+    <link rel="stylesheet" href="/assets/css/civicone-govuk-navigation.min.css?v=<?= $cssVersion ?>">
+    <!-- GOV.UK Content Components (NEW 2026-01-22) -->
+    <link rel="stylesheet" href="/assets/css/civicone-govuk-content.min.css?v=<?= $cssVersion ?>">
+    <!-- GOV.UK Tabs Component (NEW 2026-01-22) -->
+    <link rel="stylesheet" href="/assets/css/civicone-govuk-tabs.min.css?v=<?= $cssVersion ?>">
 
     <!-- CivicOne Layout (includes grid system - must load for all pages) -->
     <link rel="stylesheet" href="/assets/css/civicone-header.min.css?v=<?= $cssVersion ?>">
@@ -158,8 +172,15 @@
     <!-- Directory Utilities (Extracted inline styles for events, listings, volunteering, feed - 2026-01-21) -->
     <link rel="stylesheet" href="/assets/css/civicone-directory-utilities.min.css?v=<?= $cssVersion ?>">
 
+    <!-- Extended Utilities (Extracted inline styles per CLAUDE.md - 2026-01-22) -->
+    <link rel="stylesheet" href="/assets/css/civicone-utilities-extended.css?v=<?= $cssVersion ?>">
+
     <!-- Emergency Scroll Fix - MUST be last to override all other styles -->
     <link rel="stylesheet" href="/assets/css/scroll-fix-emergency.min.css?v=<?= $cssVersion ?>">
+    <!-- Development Notice Modal -->
+    <link rel="stylesheet" href="/assets/css/dev-notice-modal.min.css?v=<?= $cssVersion ?>">
+    <!-- Development Banner (Prominent dev environment indicator) -->
+    <link rel="stylesheet" href="/assets/css/civicone-dev-banner.min.css?v=<?= $cssVersion ?>">
     <!-- FONT AWESOME (Icons for mobile nav, buttons, etc.) - Async loaded -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous" media="print" onload="this.media='all'">
     <noscript>

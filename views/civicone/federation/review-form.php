@@ -215,15 +215,7 @@ $completedAt = $transaction['completed_at'] ?? $transaction['created_at'] ?? nul
             charCount.textContent = this.value.length;
         });
     }
-
-    // Offline indicator
-    const banner = document.getElementById('offlineBanner');
-    if (banner) {
-        window.addEventListener('online', () => banner.classList.remove('civic-fed-offline-banner--visible'));
-        window.addEventListener('offline', () => banner.classList.add('civic-fed-offline-banner--visible'));
-        if (!navigator.onLine) banner.classList.add('civic-fed-offline-banner--visible');
-    }
-})();
-</script>
+<!-- Federation offline indicator -->
+<script src="<?= \Nexus\Core\TenantContext::getBasePath() ?>/assets/js/civicone-federation-offline.min.js" defer></script>
 
 <?php require dirname(dirname(__DIR__)) . '/layouts/civicone/footer.php'; ?>

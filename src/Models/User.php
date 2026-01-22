@@ -393,8 +393,10 @@ class User
     {
         $tenantId = TenantContext::getId();
         // Only count users with avatars (hidden from directory without avatar)
-        $sql = "SELECT COUNT(*) as total FROM users WHERE tenant_id = ? AND avatar_url IS NOT NULL AND avatar_url != ''";
-        return Database::query($sql, [$tenantId])->fetch()['total'];
+        $sql = "SELECT COUNT(*) as total FROM users WHERE tenant_id = ? AND avatar_url IS NOT NULL AND LENGTH(avatar_url) > 0";
+        $result = Database::query($sql, [$tenantId])->fetch()['total'];
+        error_log("User::count() for tenant {$tenantId}: {$result}");
+        return $result;
     }
 
     public static function findPending()
@@ -530,7 +532,7 @@ class User
             LEFT JOIN listings l ON u.id = l.user_id AND l.status = 'active'
             WHERE u.tenant_id = ?
             AND u.avatar_url IS NOT NULL
-            AND u.avatar_url != ''
+            AND LENGTH(u.avatar_url) > 0
             AND (
                 u.first_name LIKE ? OR
                 u.last_name LIKE ? OR

@@ -6,6 +6,9 @@
 (function() {
     'use strict';
 
+    // Get tenant base path for API calls
+    const basePath = (typeof NEXUS_BASE !== 'undefined') ? NEXUS_BASE : '';
+
     // ============================================
     // 1. SERVICE WORKER REGISTRATION
     // ============================================
@@ -1262,8 +1265,13 @@
             // Only enable offline indicator on mobile devices
             // Desktop browsers have unreliable navigator.onLine detection (unless using Capacitor)
             const isNative = window.NexusNative?.Environment?.isCapacitor?.();
-            if (window.innerWidth > 768 && !isNative) {
-                console.log('[NexusMobile] Offline indicator disabled on desktop web');
+
+            // BUGFIX: Increase threshold to 1024px and check mobile user agent
+            // to prevent false offline indicators on desktop browsers
+            const isMobileUA = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+
+            if (window.innerWidth > 1024 && !isNative && !isMobileUA) {
+                console.log('[NexusMobile] Offline indicator disabled on desktop web (width:', window.innerWidth, 'px)');
                 return;
             }
 
@@ -1381,7 +1389,7 @@
 
         updateBadges: async function() {
             try {
-                const response = await fetch('/api/notifications/unread-count', {
+                const response = await fetch(basePath + '/api/notifications/unread-count', {
                     credentials: 'include'
                 });
 

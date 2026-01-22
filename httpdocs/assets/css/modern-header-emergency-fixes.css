@@ -1,31 +1,80 @@
 /**
  * Modern Header Emergency Fixes
  * Extracted from inline styles in header.php (2026-01-21)
+ * CRITICAL: These fixes ensure dropdowns appear above page content
  *
- * ROOT CAUSE IDENTIFIED:
- * - Base dropdown CSS (nexus-modern-header.css:616) sets min-width: min(280px, calc(100vw - 32px))
- * - This forces dropdowns to be minimum 280px wide even for short content
- * - Mode switcher was sized for older, larger design and needs to be more compact
- *
- * SOLUTION:
- * Override with content-based sizing for utility bar dropdowns specifically
- * These fixes are intentional overrides, not bandaids.
+ * ROOT CAUSE:
+ * - Header uses position:fixed which creates a stacking context
+ * - Dropdowns inside need high z-index to escape the stacking context
+ * - Base dropdown CSS had incorrect z-index values
  */
 
 /* ==========================================
-   UTILITY BAR DROPDOWNS - AUTO-SIZING
-   Target: Platform, Create, Federation, User dropdowns in utility bar
+   Z-INDEX FIX - Utility Bar must be above page content
    ========================================== */
+.nexus-utility-bar {
+    z-index: 150 !important;
+}
 
-/* Override base 280px min-width for utility bar dropdowns */
+/* ==========================================
+   UTILITY BAR DROPDOWNS - Z-INDEX & SIZING
+   Dropdowns must appear above everything including the header itself
+   ========================================== */
 .nexus-utility-bar .htb-dropdown .htb-dropdown-content,
 .nexus-utility-bar div.htb-dropdown-content,
-nav.nexus-utility-bar .htb-dropdown-content {
+nav.nexus-utility-bar .htb-dropdown-content,
+.nexus-utility-bar .platform-dropdown,
+.nexus-utility-bar .federation-dropdown,
+.nexus-utility-bar .htb-dropdown-content.platform-dropdown,
+.nexus-utility-bar .htb-dropdown-content.federation-dropdown {
     min-width: auto !important;
     max-width: max-content !important;
     width: auto !important;
     padding: var(--space-2) 0 !important;
+    z-index: 9999 !important;
+    position: absolute !important;
 }
+
+/* Ensure dropdown wrapper doesn't create stacking context issues */
+.nexus-utility-bar .htb-dropdown {
+    position: relative !important;
+    z-index: auto !important;
+}
+
+/* ==========================================
+   MEGA MENU DROPDOWN FIXES
+   ========================================== */
+.nexus-navbar .mega-menu-dropdown,
+.mega-menu-wrapper .mega-menu-dropdown,
+div.mega-menu-dropdown {
+    min-width: 360px !important;
+    max-width: 480px !important;
+    width: max-content !important;
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.98) 0%, rgba(255, 255, 255, 0.96) 100%) !important;
+}
+
+[data-theme="dark"] .mega-menu-dropdown {
+    background: linear-gradient(180deg, rgba(15, 23, 42, 0.98) 0%, rgba(30, 41, 59, 0.96) 100%) !important;
+}
+
+/* Mega menu wrapper positioning */
+.mega-menu-wrapper {
+    position: relative !important;
+}
+
+.mega-menu-wrapper .mega-menu-dropdown {
+    left: 50% !important;
+    right: auto !important;
+    transform: translateX(-50%) translateZ(0) !important;
+}
+
+.mega-menu-wrapper.active .mega-menu-dropdown {
+    transform: translateX(-50%) translateZ(0) !important;
+}
+
+/* ==========================================
+   DROPDOWN ALIGNMENT
+   ========================================== */
 
 /* Left-side dropdowns: Platform dropdown alignment */
 .nexus-utility-bar .left-utils .htb-dropdown .htb-dropdown-content,
@@ -67,9 +116,7 @@ nav.nexus-utility-bar .htb-dropdown-content a:last-child {
 
 /* ==========================================
    MODE SWITCHER - COMPACT SIZING
-   Design requirement: Minimize utility bar height
    ========================================== */
-
 .nexus-utility-bar .mode-switcher {
     gap: var(--space-1);
     padding: 2px 6px 2px 2px;
@@ -91,16 +138,3 @@ nav.nexus-utility-bar .htb-dropdown-content a:last-child {
     font-size: 10px;
     letter-spacing: 0.2px;
 }
-
-/* ==========================================
-   FUTURE IMPROVEMENTS
-   ========================================== */
-/*
- * Consider migrating these fixes back to base CSS:
- * 1. Add .utility-bar-dropdown class for compact dropdowns
- * 2. Add .mode-switcher-compact variant
- * 3. Remove need for context-specific overrides
- *
- * However, these overrides serve a specific purpose and are
- * intentional design decisions for the utility bar context.
- */

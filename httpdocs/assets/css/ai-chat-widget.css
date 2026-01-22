@@ -3,6 +3,7 @@
  * Extracted from views/layouts/modern/partials/ai-chat-widget.php
  * Per CLAUDE.md: No inline styles except for truly dynamic values
  * Version: 1.0 - 2026-01-19
+  * Fully Migrated to Design Tokens: 2026-01-21 ✓
  */
 
 /* ============================================
@@ -474,7 +475,7 @@ body.ai-drawer-open .ai-widget-fab {
 .ai-widget-title {
     font-weight: var(--font-weight-bold);
     font-size: var(--font-size-base);
-    color: var(--htb-text-main, #1e293b);
+    color: var(--htb-text-main, var(--color-slate-800));
 }
 
 [data-theme="dark"] .ai-widget-title {
@@ -486,7 +487,7 @@ body.ai-drawer-open .ai-widget-fab {
     align-items: center;
     gap: 6px;
     font-size: 0.8rem;
-    color: var(--htb-text-muted, #64748b);
+    color: var(--htb-text-muted, var(--color-slate-500));
 }
 
 .ai-status-dot {
@@ -515,7 +516,7 @@ body.ai-drawer-open .ai-widget-fab {
     border-radius: var(--radius-base);
     border: none;
     background: transparent;
-    color: var(--htb-text-muted, #64748b);
+    color: var(--htb-text-muted, var(--color-slate-500));
     cursor: pointer;
     display: flex;
     align-items: center;
@@ -581,7 +582,7 @@ body.ai-drawer-open .ai-widget-fab {
     margin: 0 0 var(--space-2);
     font-size: var(--font-size-lg);
     font-weight: var(--font-weight-bold);
-    color: var(--htb-text-main, #1e293b);
+    color: var(--htb-text-main, var(--color-slate-800));
 }
 
 [data-theme="dark"] .ai-widget-welcome h4 {
@@ -591,7 +592,7 @@ body.ai-drawer-open .ai-widget-fab {
 .ai-widget-welcome p {
     margin: 0 0 var(--space-5);
     font-size: 0.9rem;
-    color: var(--htb-text-muted, #64748b);
+    color: var(--htb-text-muted, var(--color-slate-500));
     line-height: 1.5;
 }
 
@@ -653,7 +654,7 @@ body.ai-drawer-open .ai-widget-fab {
 .ai-widget-message.assistant {
     align-self: flex-start;
     background: rgba(0, 0, 0, 0.04);
-    color: var(--htb-text-main, #1e293b);
+    color: var(--htb-text-main, var(--color-slate-800));
     border-bottom-left-radius: var(--radius-sm);
 }
 
@@ -787,7 +788,7 @@ body.ai-drawer-open .ai-widget-fab {
     font-family: inherit;
     font-size: 0.95rem;
     line-height: 1.5;
-    color: var(--htb-text-main, #1e293b);
+    color: var(--htb-text-main, var(--color-slate-800));
     outline: none !important;
     max-height: 100px;
     min-height: var(--space-6);
@@ -819,7 +820,7 @@ body.ai-drawer-open .ai-widget-fab {
 }
 
 .ai-widget-input::placeholder {
-    color: var(--htb-text-muted, #94a3b8);
+    color: var(--htb-text-muted, var(--color-slate-400));
 }
 
 [data-theme="dark"] .ai-widget-input::placeholder {
@@ -866,12 +867,12 @@ body.ai-drawer-open .ai-widget-fab {
 
 .ai-widget-powered {
     font-size: 0.7rem;
-    color: var(--htb-text-muted, #94a3b8);
+    color: var(--htb-text-muted, var(--color-slate-400));
 }
 
 .ai-widget-quota {
     font-size: 0.7rem;
-    color: var(--htb-text-muted, #94a3b8);
+    color: var(--htb-text-muted, var(--color-slate-400));
     background: rgba(var(--color-primary-500-rgb, 99, 102, 241), 0.1);
     padding: calc(var(--space-1) / 2) var(--space-2);
     border-radius: var(--space-2);
@@ -914,7 +915,7 @@ body.ai-drawer-open .ai-widget-fab {
     border: none;
     border-radius: var(--radius-sm);
     font-size: 0.7rem;
-    color: var(--htb-text-muted, #64748b);
+    color: var(--htb-text-muted, var(--color-slate-500));
     cursor: pointer;
     display: flex;
     align-items: center;

@@ -73,11 +73,11 @@
 }
 
 .civic-social-btn.liked {
-    color: #D4351C;
+    color: var(--color-govuk-red);
 }
 
 .civic-social-btn.liked .dashicons {
-    color: #D4351C;
+    color: var(--color-govuk-red);
 }
 
 /* Comments Section */

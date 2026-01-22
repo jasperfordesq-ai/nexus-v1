@@ -6,6 +6,7 @@
  * PRIORITY: HIGH
  * Final polish for native-app-like feel
  * Completes mobile polish journey to 100/100
+  * Fully Migrated to Design Tokens: 2026-01-21 ✓
  */
 
 /* ============================================
@@ -166,11 +167,11 @@
 
 .mobile-list-item-press:active {
     transform: scale(0.98);
-    background: var(--color-gray-100, #f3f4f6);
+    background: var(--color-gray-100, var(--color-gray-100));
 }
 
 [data-theme="dark"] .mobile-list-item-press:active {
-    background: var(--color-gray-800, #1f2937);
+    background: var(--color-gray-800, var(--color-gray-800));
 }
 
 /* Cards */
@@ -215,12 +216,12 @@
 
 .mobile-swipe-actions.left {
     right: 0;
-    background: var(--color-error-500, #ef4444);
+    background: var(--color-error-500, var(--color-danger));
 }
 
 .mobile-swipe-actions.right {
     left: 0;
-    background: var(--color-success-500, #22c55e);
+    background: var(--color-success-500, var(--color-green-500));
 }
 
 /* Swipe action icons */
@@ -276,14 +277,14 @@
     position: relative;
     width: 51px;
     height: 31px;
-    background: var(--color-gray-300, #d1d5db);
+    background: var(--color-gray-300, var(--color-gray-300));
     border-radius: 31px;
     transition: background-color var(--mobile-transition-normal, 0.2s) ease-out;
     cursor: pointer;
 }
 
 .mobile-toggle-switch.active {
-    background: var(--color-primary-500, #6366f1);
+    background: var(--color-primary-500, var(--color-primary-500));
 }
 
 .mobile-toggle-thumb {
@@ -368,15 +369,15 @@
     position: relative;
     width: 20px;
     height: 20px;
-    border: 2px solid var(--color-gray-400, #9ca3af);
+    border: 2px solid var(--color-gray-400, var(--color-gray-400));
     border-radius: var(--mobile-radius-sm, 4px);
     transition: all var(--mobile-transition-fast, 0.15s) ease-out;
     cursor: pointer;
 }
 
 .mobile-checkbox.checked {
-    background: var(--color-primary-500, #6366f1);
-    border-color: var(--color-primary-500, #6366f1);
+    background: var(--color-primary-500, var(--color-primary-500));
+    border-color: var(--color-primary-500, var(--color-primary-500));
     animation: mobile-bounce-in 0.3s ease-out;
 }
 
@@ -402,14 +403,14 @@
     position: relative;
     width: 20px;
     height: 20px;
-    border: 2px solid var(--color-gray-400, #9ca3af);
+    border: 2px solid var(--color-gray-400, var(--color-gray-400));
     border-radius: 50%;
     transition: all var(--mobile-transition-fast, 0.15s) ease-out;
     cursor: pointer;
 }
 
 .mobile-radio.checked {
-    border-color: var(--color-primary-500, #6366f1);
+    border-color: var(--color-primary-500, var(--color-primary-500));
     animation: mobile-bounce-in 0.3s ease-out;
 }
 
@@ -420,7 +421,7 @@
     transform: translate(-50%, -50%) scale(0);
     width: 10px;
     height: 10px;
-    background: var(--color-primary-500, #6366f1);
+    background: var(--color-primary-500, var(--color-primary-500));
     border-radius: 50%;
     transition: transform var(--mobile-transition-fast, 0.15s) cubic-bezier(0.68, -0.55, 0.265, 1.55);
 }
@@ -437,14 +438,14 @@
 .mobile-slider {
     position: relative;
     height: 4px;
-    background: var(--color-gray-200, #e5e7eb);
+    background: var(--color-gray-200, var(--color-gray-200));
     border-radius: 2px;
     cursor: pointer;
 }
 
 .mobile-slider-fill {
     height: 100%;
-    background: var(--color-primary-500, #6366f1);
+    background: var(--color-primary-500, var(--color-primary-500));
     border-radius: 2px;
     transition: width var(--mobile-transition-normal, 0.2s) ease-out;
 }
@@ -456,7 +457,7 @@
     width: 20px;
     height: 20px;
     background: white;
-    border: 2px solid var(--color-primary-500, #6366f1);
+    border: 2px solid var(--color-primary-500, var(--color-primary-500));
     border-radius: 50%;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
     transition: all var(--mobile-transition-fast, 0.15s) ease-out;
@@ -477,27 +478,27 @@
 .mobile-tab-bar {
     position: relative;
     display: flex;
-    border-bottom: 1px solid var(--color-gray-200, #e5e7eb);
+    border-bottom: 1px solid var(--color-gray-200, var(--color-gray-200));
 }
 
 .mobile-tab {
     flex: 1;
     padding: var(--mobile-space-3, 12px) var(--mobile-space-4, 16px);
     text-align: center;
-    color: var(--color-gray-600, #4b5563);
+    color: var(--color-gray-600, var(--color-gray-600));
     transition: color var(--mobile-transition-fast, 0.15s) ease-out;
     cursor: pointer;
 }
 
 .mobile-tab.active {
-    color: var(--color-primary-500, #6366f1);
+    color: var(--color-primary-500, var(--color-primary-500));
 }
 
 .mobile-tab-indicator {
     position: absolute;
     bottom: -1px;
     height: 2px;
-    background: var(--color-primary-500, #6366f1);
+    background: var(--color-primary-500, var(--color-primary-500));
     transition: all var(--mobile-transition-normal, 0.2s) cubic-bezier(0.68, -0.55, 0.265, 1.55);
 }
 
@@ -516,7 +517,7 @@
 }
 
 .mobile-accordion-header:active {
-    background: var(--color-gray-50, #f9fafb);
+    background: var(--color-gray-50, var(--color-gray-50));
 }
 
 .mobile-accordion-icon {
@@ -549,7 +550,7 @@
     width: 56px;
     height: 56px;
     border-radius: 50%;
-    background: var(--color-primary-500, #6366f1);
+    background: var(--color-primary-500, var(--color-primary-500));
     box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4);
     display: flex;
     align-items: center;
@@ -590,7 +591,7 @@
     left: var(--mobile-space-4, 16px);
     right: var(--mobile-space-4, 16px);
     padding: var(--mobile-space-4, 16px);
-    background: var(--color-gray-900, #111827);
+    background: var(--color-gray-900, var(--color-gray-900));
     color: white;
     border-radius: var(--mobile-radius-lg, 12px);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
@@ -599,15 +600,15 @@
 }
 
 .mobile-snackbar.success {
-    background: var(--color-success-500, #22c55e);
+    background: var(--color-success-500, var(--color-green-500));
 }
 
 .mobile-snackbar.error {
-    background: var(--color-error-500, #ef4444);
+    background: var(--color-error-500, var(--color-danger));
 }
 
 .mobile-snackbar.warning {
-    background: var(--color-warning-500, #f59e0b);
+    background: var(--color-warning-500, var(--color-warning));
 }
 
 /* ============================================

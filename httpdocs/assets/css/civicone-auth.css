@@ -1,0 +1,547 @@
+/**
+ * CivicOne Auth Pages Styles (Login & Register)
+ * Template D: Form/Flow (Section 10.5)
+ * Extracted from inline styles per CLAUDE.md
+ * Includes biometric login UI and form styling
+  * Fully Migrated to Design Tokens: 2026-01-21 ✓
+ */
+
+.nexus-skin-civicone {
+
+    /* ==========================================
+       Auth Page Wrapper
+       ========================================== */
+
+    .civicone-auth-wrapper {
+        width: 100%;
+        max-width: 450px;
+        margin: 0 auto;
+        padding: 140px 15px 0 15px;
+        box-sizing: border-box;
+    }
+
+    @media (max-width: 600px) {
+        .civicone-auth-wrapper {
+            padding-top: 120px;
+            padding-left: 10px;
+            padding-right: 10px;
+        }
+    }
+
+    /* ==========================================
+       Auth Card
+       ========================================== */
+
+    .civicone-auth-card {
+        margin-top: 0;
+        position: relative;
+        z-index: 10;
+        background: var(--civicone-bg-card);
+        border-radius: var(--radius-3);
+        overflow: hidden;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        border: 1px solid transparent;
+    }
+
+    [data-theme="dark"] .civicone-auth-card {
+        background: rgba(30, 41, 59, 0.85);
+        border-color: rgba(255, 255, 255, 0.1);
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+    }
+
+    .civicone-auth-card-body {
+        padding: var(--space-8);
+    }
+
+    @media (max-width: 600px) {
+        .civicone-auth-card-body {
+            padding: var(--space-6);
+        }
+    }
+
+    /* ==========================================
+       Auth Page Heading
+       ========================================== */
+
+    .civicone-auth-heading {
+        margin: 0 0 var(--space-6) 0;
+        font-weight: 800;
+        color: var(--civicone-text-main);
+        text-align: center;
+        font-size: 1.75rem;
+    }
+
+    /* ==========================================
+       Success/Error Messages
+       ========================================== */
+
+    .civicone-auth-message {
+        padding: var(--space-3);
+        border-radius: var(--radius-2);
+        margin-bottom: var(--space-5);
+        text-align: center;
+        font-size: 0.9rem;
+        font-weight: 600;
+        border: 1px solid;
+    }
+
+    .civicone-auth-message--success {
+        background: var(--color-success-light);
+        color: var(--color-success);
+        border-color: var(--color-success-border);
+    }
+
+    [data-theme="dark"] .civicone-auth-message--success {
+        background: rgba(22, 163, 74, 0.15);
+        border-color: rgba(34, 197, 94, 0.3);
+        color: var(--color-green-400);
+    }
+
+    .civicone-auth-message--error {
+        background: var(--color-danger-light);
+        color: var(--color-danger);
+        border-color: var(--color-danger-border);
+    }
+
+    [data-theme="dark"] .civicone-auth-message--error {
+        background: rgba(185, 28, 28, 0.15);
+        border-color: rgba(239, 68, 68, 0.3);
+        color: var(--color-red-400);
+    }
+
+    /* ==========================================
+       Biometric Login Button
+       ========================================== */
+
+    .civicone-biometric-container {
+        display: none;
+        margin-bottom: var(--space-6);
+    }
+
+    .civicone-biometric-container.show {
+        display: block;
+    }
+
+    .civicone-biometric-btn {
+        width: 100%;
+        padding: var(--space-3) var(--space-4);
+        background: linear-gradient(135deg, var(--color-primary-500), var(--color-purple-500));
+        color: white;
+        font-weight: 700;
+        border: none;
+        border-radius: var(--radius-2);
+        font-size: 1.05rem;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: var(--space-2);
+        min-height: 52px;
+        transition: opacity 0.2s ease;
+    }
+
+    .civicone-biometric-btn:hover {
+        opacity: 0.95;
+    }
+
+    .civicone-biometric-btn:focus {
+        outline: 3px solid var(--color-focus);
+        outline-offset: 2px;
+    }
+
+    .civicone-biometric-btn:disabled {
+        opacity: 0.7;
+        cursor: not-allowed;
+    }
+
+    .civicone-biometric-divider {
+        text-align: center;
+        margin: var(--space-4) 0;
+        color: var(--civicone-text-muted);
+        font-size: 0.9rem;
+    }
+
+    [data-theme="dark"] .civicone-biometric-divider {
+        color: var(--color-slate-500);
+    }
+
+    /* ==========================================
+       Biometric Feature Promo
+       ========================================== */
+
+    .civicone-biometric-promo {
+        display: none;
+        margin-bottom: var(--space-5);
+        padding: var(--space-3) var(--space-4);
+        background: linear-gradient(135deg, rgba(99, 102, 241, 0.08), rgba(139, 92, 246, 0.08));
+        border-radius: var(--radius-2);
+        border: 1px solid rgba(99, 102, 241, 0.2);
+    }
+
+    .civicone-biometric-promo.show {
+        display: block;
+    }
+
+    [data-theme="dark"] .civicone-biometric-promo {
+        background: linear-gradient(135deg, rgba(99, 102, 241, 0.15), rgba(139, 92, 246, 0.15));
+        border-color: rgba(99, 102, 241, 0.3);
+    }
+
+    .civicone-biometric-promo-content {
+        display: flex;
+        align-items: center;
+        gap: var(--space-3);
+    }
+
+    .civicone-biometric-promo-icon {
+        width: 40px;
+        height: 40px;
+        background: linear-gradient(135deg, var(--color-primary-500), var(--color-purple-500));
+        border-radius: var(--radius-2);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+    }
+
+    .civicone-biometric-promo-text {
+        flex: 1;
+    }
+
+    .civicone-biometric-promo-title {
+        font-weight: 700;
+        font-size: 0.9rem;
+        color: var(--color-primary-600);
+        margin-bottom: var(--space-1);
+    }
+
+    [data-theme="dark"] .civicone-biometric-promo-title {
+        color: var(--color-primary-300);
+    }
+
+    .civicone-biometric-promo-subtitle {
+        font-size: 0.8rem;
+        color: var(--civicone-text-muted);
+    }
+
+    [data-theme="dark"] .civicone-biometric-promo-subtitle {
+        color: var(--color-slate-400);
+    }
+
+    .civicone-biometric-promo-badge {
+        background: rgba(99, 102, 241, 0.1);
+        color: var(--color-primary-500);
+        padding: var(--space-1) var(--space-2);
+        border-radius: var(--radius-3);
+        font-size: 0.7rem;
+        font-weight: 700;
+        text-transform: uppercase;
+    }
+
+    /* ==========================================
+       Auth Form Styling
+       ========================================== */
+
+    .civicone-auth-form .civicone-form-group {
+        margin-bottom: var(--space-5);
+    }
+
+    .civicone-auth-form .civicone-label {
+        display: block;
+        font-weight: 600;
+        margin-bottom: var(--space-2);
+        color: var(--civicone-text-main);
+    }
+
+    .civicone-auth-form .civicone-input {
+        width: 100%;
+        padding: var(--space-3);
+        border: 2px solid var(--color-gray-200);
+        border-radius: var(--radius-2);
+        font-size: 1rem;
+        outline: none;
+        transition: border-color 0.2s ease;
+    }
+
+    .civicone-auth-form .civicone-input:focus {
+        border-color: var(--color-primary-600);
+        box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+    }
+
+    [data-theme="dark"] .civicone-auth-form .civicone-input {
+        background: rgba(15, 23, 42, 0.6);
+        border-color: rgba(255, 255, 255, 0.15);
+        color: var(--color-slate-100);
+    }
+
+    [data-theme="dark"] .civicone-auth-form .civicone-input::placeholder {
+        color: var(--color-slate-500);
+    }
+
+    [data-theme="dark"] .civicone-auth-form .civicone-input:focus {
+        border-color: var(--color-primary-500);
+        box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+    }
+
+    /* ==========================================
+       Password Field with Forgot Link
+       ========================================== */
+
+    .civicone-password-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: var(--space-2);
+    }
+
+    .civicone-forgot-link {
+        font-size: 0.85rem;
+        color: var(--color-primary-600);
+        text-decoration: none;
+        font-weight: 600;
+    }
+
+    .civicone-forgot-link:hover {
+        text-decoration: underline;
+    }
+
+    [data-theme="dark"] .civicone-forgot-link {
+        color: var(--color-primary-400);
+    }
+
+    /* ==========================================
+       Submit Button
+       ========================================== */
+
+    .civicone-auth-submit {
+        width: 100%;
+        padding: var(--space-3) var(--space-4);
+        background: linear-gradient(135deg, var(--color-primary-600), #7c3aed);
+        color: white;
+        font-weight: 700;
+        border: none;
+        border-radius: var(--radius-2);
+        font-size: 1.05rem;
+        cursor: pointer;
+        transition: opacity 0.2s ease;
+        min-height: 52px;
+    }
+
+    .civicone-auth-submit:hover {
+        opacity: 0.95;
+    }
+
+    .civicone-auth-submit:focus {
+        outline: 3px solid var(--color-focus);
+        outline-offset: 2px;
+    }
+
+    /* ==========================================
+       Footer Link (Register/Login toggle)
+       ========================================== */
+
+    .civicone-auth-footer {
+        margin-top: var(--space-6);
+        text-align: center;
+        font-size: 0.95rem;
+        color: var(--civicone-text-muted);
+    }
+
+    [data-theme="dark"] .civicone-auth-footer {
+        color: var(--color-slate-400);
+    }
+
+    .civicone-auth-footer a {
+        color: var(--color-primary-600);
+        font-weight: 600;
+        text-decoration: none;
+    }
+
+    .civicone-auth-footer a:hover {
+        text-decoration: underline;
+    }
+
+    [data-theme="dark"] .civicone-auth-footer a {
+        color: var(--color-primary-400);
+    }
+
+    /* ==========================================
+       Register Page Specific Styles
+       ========================================== */
+
+    /* Form Row (for name fields) */
+    .civicone-auth-form .civicone-form-row {
+        display: flex;
+        gap: var(--space-4);
+        flex-wrap: wrap;
+        margin-bottom: var(--space-5);
+    }
+
+    .civicone-auth-form .civicone-flex-1 {
+        flex: 1;
+        min-width: 240px;
+    }
+
+    /* Form Note/Hint */
+    .civicone-form-note {
+        font-size: 0.85rem;
+        color: var(--civicone-text-muted);
+        margin-top: var(--space-2);
+    }
+
+    [data-theme="dark"] .civicone-form-note {
+        color: var(--color-slate-400);
+    }
+
+    /* Password Strength Meter */
+    .civicone-password-rules {
+        margin-top: var(--space-3);
+        font-size: 0.85rem;
+        color: var(--civicone-text-muted);
+        background: var(--color-gray-50);
+        padding: var(--space-3);
+        border-radius: var(--radius-2);
+        border: 1px solid var(--color-gray-200);
+    }
+
+    [data-theme="dark"] .civicone-password-rules {
+        background: rgba(15, 23, 42, 0.6);
+        color: var(--color-slate-400);
+        border-color: rgba(255, 255, 255, 0.1);
+    }
+
+    .civicone-password-rules .civicone-rules-title {
+        font-weight: 700;
+        margin-bottom: var(--space-2);
+        color: var(--civicone-text-main);
+    }
+
+    [data-theme="dark"] .civicone-password-rules .civicone-rules-title {
+        color: var(--color-slate-200);
+    }
+
+    .civicone-password-rules > div {
+        padding: 2px 0;
+    }
+
+    /* Select Dropdown */
+    .civicone-auth-form select.civicone-input {
+        appearance: none;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%236b7280' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right var(--space-3) center;
+        padding-right: var(--space-8);
+    }
+
+    [data-theme="dark"] .civicone-auth-form select.civicone-input {
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%2394a3b8' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+    }
+
+    [data-theme="dark"] select.civicone-input option {
+        background: var(--color-slate-800);
+        color: var(--color-slate-100);
+    }
+
+    /* GDPR Consent Checkbox */
+    .civicone-gdpr-consent {
+        display: flex;
+        align-items: flex-start;
+        gap: var(--space-3);
+        cursor: pointer;
+        font-size: 0.9rem;
+        color: var(--civicone-text-main);
+        margin-top: var(--space-5);
+        margin-bottom: var(--space-5);
+    }
+
+    .civicone-gdpr-consent input[type="checkbox"] {
+        margin-top: 4px;
+        transform: scale(1.2);
+        cursor: pointer;
+    }
+
+    [data-theme="dark"] .civicone-gdpr-consent {
+        color: var(--color-slate-200);
+    }
+
+    .civicone-gdpr-consent a {
+        color: var(--color-primary-600);
+        text-decoration: underline;
+    }
+
+    [data-theme="dark"] .civicone-gdpr-consent a {
+        color: var(--color-primary-400);
+    }
+
+    /* Data Protection Notice Box */
+    .civicone-data-notice {
+        font-size: 0.85rem;
+        color: var(--civicone-text-muted);
+        line-height: 1.5;
+        margin-bottom: var(--space-5);
+        background: var(--color-gray-50);
+        padding: var(--space-4);
+        border-radius: var(--radius-2);
+        border: 1px solid var(--color-gray-200);
+    }
+
+    [data-theme="dark"] .civicone-data-notice {
+        background: rgba(15, 23, 42, 0.6);
+        border-color: rgba(255, 255, 255, 0.1);
+        color: var(--color-slate-400);
+    }
+
+    .civicone-data-notice-title {
+        font-weight: 700;
+        color: var(--civicone-text-main);
+        margin-top: 0;
+        margin-bottom: var(--space-2);
+    }
+
+    [data-theme="dark"] .civicone-data-notice-title {
+        color: var(--color-slate-200);
+    }
+
+    .civicone-data-notice p {
+        margin: var(--space-2) 0;
+    }
+
+    .civicone-data-notice ul {
+        padding-left: var(--space-5);
+        margin: var(--space-2) 0;
+    }
+
+    .civicone-data-notice a {
+        color: var(--color-primary-600);
+        text-decoration: underline;
+    }
+
+    [data-theme="dark"] .civicone-data-notice a {
+        color: var(--color-primary-400);
+    }
+
+    /* Submit Button - Disabled State for Register */
+    .civicone-auth-submit:disabled,
+    .civicone-auth-submit[disabled] {
+        opacity: 0.5;
+        pointer-events: none;
+        cursor: not-allowed;
+    }
+
+    /* Mobile Adjustments for Register */
+    @media (max-width: 600px) {
+        .civicone-auth-form .civicone-form-row {
+            gap: 0;
+        }
+
+        .civicone-auth-wrapper {
+            padding-left: 10px;
+            padding-right: 10px;
+        }
+
+        .civicone-auth-card-body {
+            padding: var(--space-6) var(--space-4);
+        }
+    }
+
+}

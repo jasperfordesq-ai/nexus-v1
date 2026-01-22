@@ -183,34 +183,14 @@ $currentScope = $currentScope ?? 'all';
     </main>
 </div>
 
-<script>
-// Offline Indicator
-(function initOfflineIndicator() {
-    const banner = document.getElementById('offlineBanner');
-    if (!banner) return;
-
-    function handleOffline() {
-        banner.classList.add('civic-fed-offline-banner--visible');
-    }
-
-    function handleOnline() {
-        banner.classList.remove('civic-fed-offline-banner--visible');
-    }
-
-    window.addEventListener('online', handleOnline);
-    window.addEventListener('offline', handleOffline);
-
-    if (!navigator.onLine) {
-        handleOffline();
-    }
-})();
-</script>
-
 <?php
 // Include real-time notifications for opted-in users
 if ($userOptedIn):
     require dirname(__DIR__) . '/partials/federation-realtime.php';
 endif;
 ?>
+
+<!-- Page-specific JavaScript -->
+<script src="/assets/js/civicone-federation-hub.min.js" defer></script>
 
 <?php require dirname(dirname(__DIR__)) . '/layouts/civicone/footer.php'; ?>

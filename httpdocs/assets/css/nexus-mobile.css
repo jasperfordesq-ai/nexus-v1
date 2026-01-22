@@ -1,6 +1,7 @@
 /**
  * Project NEXUS - Mobile Native App Experience
  * Includes: Bottom nav, page transitions, skeleton loaders, swipe gestures
+  * Fully Migrated to Design Tokens: 2026-01-21 ✓
  */
 
 /* ============================================
@@ -432,7 +433,7 @@
 }
 
 .nexus-swipe-action.edit {
-    background: #6366f1;
+    background: var(--color-primary-500);
 }
 
 
@@ -1152,11 +1153,11 @@ html {
 }
 
 .nexus-context-item.danger {
-    color: #ef4444;
+    color: var(--color-danger);
 }
 
 .nexus-context-item.danger i {
-    color: #ef4444;
+    color: var(--color-danger);
 }
 
 /* Reduced motion */

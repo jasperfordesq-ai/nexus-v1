@@ -45,6 +45,7 @@ const jsFiles = [
     'jGravity.js',
     'groups-edit-overlay.js',
     'federation-review-form.js',
+    'civicone-members-directory.js',
     'toast-notifications.js',
     'page-transitions.js',
     'pull-to-refresh.js',

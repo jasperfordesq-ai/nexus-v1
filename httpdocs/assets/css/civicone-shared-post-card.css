@@ -1,0 +1,161 @@
+/**
+ * Post Card Component
+ * CivicOne Theme
+ */
+
+.post-card {
+    padding: 20px;
+    margin-bottom: 20px;
+}
+
+/* Post Header */
+.post-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 16px;
+}
+
+/* Post Avatar */
+.post-avatar {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+/* Post Header Info */
+.post-header-info {
+    flex: 1;
+}
+
+.post-header-name {
+    margin: 0;
+    font-size: 1rem;
+    font-weight: 600;
+}
+
+.post-header-name-link {
+    color: var(--htb-text-main);
+    text-decoration: none;
+}
+
+.post-header-name-link:hover {
+    text-decoration: underline;
+}
+
+/* Post Meta Row (time + visibility) */
+.post-meta-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 4px;
+}
+
+.post-time {
+    font-size: 0.85rem;
+    color: var(--htb-text-muted);
+}
+
+/* Visibility Badge */
+.visibility-badge {
+    font-size: 0.75rem;
+    padding: 2px 8px;
+    border-radius: 12px;
+    background: rgba(99, 102, 241, 0.1);
+    color: #6366f1;
+}
+
+/* Post Delete Button */
+.post-delete-btn {
+    padding: 8px;
+    background: transparent;
+    border: none;
+    color: var(--htb-text-muted);
+    cursor: pointer;
+    border-radius: 8px;
+    transition: all 0.2s;
+}
+
+.post-delete-btn:hover {
+    background: rgba(239, 68, 68, 0.1);
+    color: #ef4444;
+}
+
+/* Post Content */
+.post-content {
+    margin-bottom: 16px;
+    line-height: 1.6;
+    color: var(--htb-text-main);
+    word-wrap: break-word;
+}
+
+/* Post Image */
+.post-image {
+    margin: 16px 0;
+}
+
+.post-image img {
+    width: 100%;
+    max-height: 500px;
+    object-fit: cover;
+    border-radius: var(--htb-radius);
+}
+
+/* Post Actions Footer */
+.post-actions {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding-top: 16px;
+    border-top: 1px solid var(--htb-border-color);
+}
+
+/* Action Buttons */
+.post-action-btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 12px;
+    background: transparent;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+    color: var(--htb-text-muted);
+}
+
+.post-action-btn:hover {
+    background: rgba(99, 102, 241, 0.1);
+    color: #6366f1;
+}
+
+.post-action-btn.like-btn.active {
+    color: #ef4444;
+}
+
+.post-action-btn.like-btn:hover {
+    color: #ef4444;
+}
+
+/* Comments Section */
+.post-comments {
+    display: none;
+    margin-top: 16px;
+    padding-top: 16px;
+    border-top: 1px solid var(--htb-border-color);
+}
+
+.post-comments.show {
+    display: block;
+}
+
+@media (max-width: 600px) {
+    .post-card {
+        padding: 16px;
+    }
+
+    .post-action-btn span:not(.like-count) {
+        display: none;
+    }
+}

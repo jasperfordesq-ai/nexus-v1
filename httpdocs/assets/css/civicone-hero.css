@@ -5,6 +5,7 @@
  *
  * @version 2.0.0
  * @since 2026-01-21
+  * Fully Migrated to Design Tokens: 2026-01-21 ✓
  */
 
 /* ==========================================
@@ -17,8 +18,8 @@
     margin-bottom: var(--civicone-space-8, 50px);
     padding: var(--civicone-space-7, 40px) var(--civicone-space-4, 15px);
     background: #f8f9fa;
-    border-left: 6px solid #1d70b8;
-    border-bottom: 3px solid #b1b4b6;
+    border-left: 6px solid var(--color-govuk-blue-light);
+    border-bottom: 3px solid var(--color-govuk-grey);
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
 
@@ -45,7 +46,7 @@
 .civicone-hero h1 {
     margin-top: 0;
     margin-bottom: var(--civicone-space-5, 25px);
-    color: #0b0c0c;
+    color: var(--color-govuk-black);
     font-weight: 700;
     letter-spacing: -0.02em;
     font-size: 36px;
@@ -115,13 +116,13 @@
 
 .civicone-hero--banner {
     padding: var(--civicone-space-8, 50px) var(--civicone-space-4, 15px) !important;
-    background-color: #1d70b8 !important;
-    background-image: linear-gradient(135deg, #1d70b8 0%, #0f385c 100%) !important;
+    background-color: var(--color-govuk-blue-light) !important;
+    background-image: linear-gradient(135deg, var(--color-govuk-blue-light) 0%, #0f385c 100%) !important;
     border-left: none !important;
     border-bottom: 5px solid #0f385c !important;
     margin-top: 0;
     margin-bottom: var(--civicone-space-9, 60px);
-    color: #ffffff !important;
+    color: var(--color-white) !important;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15) !important;
 }
 
@@ -140,7 +141,7 @@
 /* Banner hero text colors */
 .civicone-hero--banner .civicone-heading-xl,
 .civicone-hero--banner h1 {
-    color: #ffffff !important;
+    color: var(--color-white) !important;
     margin-bottom: var(--civicone-space-6, 30px);
 }
 
@@ -164,10 +165,10 @@
 
 .civicone-hero--banner .civicone-button--start {
     margin-top: var(--civicone-space-6, 30px) !important;
-    background-color: #00703c !important;
+    background-color: var(--color-govuk-green) !important;
     background-image: none !important;
-    color: #ffffff !important;
-    border: 3px solid #00703c !important;
+    color: var(--color-white) !important;
+    border: 3px solid var(--color-govuk-green) !important;
     padding: 14px 28px !important;
     font-size: 19px !important;
     font-weight: 700 !important;
@@ -181,8 +182,8 @@
 }
 
 .civicone-hero--banner .civicone-button--start:hover {
-    background-color: #005a30 !important;
-    border-color: #005a30 !important;
+    background-color: var(--color-govuk-green-dark) !important;
+    border-color: var(--color-govuk-green-dark) !important;
     box-shadow: 0 3px 10px rgba(0, 112, 60, 0.4) !important;
 }
 
@@ -204,11 +205,11 @@
 
 .civicone-hero .civicone-button--start:focus,
 .civicone-hero--banner .civicone-button--start:focus {
-    outline: 3px solid #ffdd00 !important;
+    outline: 3px solid var(--color-brand-yellow) !important;
     outline-offset: 2px !important;
-    background-color: #00703c !important;
-    box-shadow: 0 0 0 4px #ffdd00 !important;
-    color: #ffffff !important;
+    background-color: var(--color-govuk-green) !important;
+    box-shadow: 0 0 0 4px var(--color-brand-yellow) !important;
+    color: var(--color-white) !important;
 }
 
 /* ==========================================
@@ -222,7 +223,7 @@
     top: 0;
     bottom: 0;
     width: 4px;
-    background: linear-gradient(180deg, #1d70b8 0%, #54319f 100%);
+    background: linear-gradient(180deg, var(--color-govuk-blue-light) 0%, #54319f 100%);
 }
 
 @media (min-width: 641px) {
@@ -259,23 +260,23 @@
     .civicone-hero,
     .civicone-hero--banner {
         background: transparent;
-        color: #000000;
-        border-left: 2px solid #000000;
-        border-bottom: 1px solid #000000;
+        color: var(--color-black);
+        border-left: 2px solid var(--color-black);
+        border-bottom: 1px solid var(--color-black);
         padding: 20px 0;
     }
 
     .civicone-hero--banner .civicone-heading-xl,
     .civicone-hero--banner h1,
     .civicone-hero--banner .civicone-hero__lead {
-        color: #000000;
+        color: var(--color-black);
     }
 
     .civicone-hero .civicone-button--start {
         display: inline;
         background: none;
-        border: 1px solid #000000;
-        color: #000000;
+        border: 1px solid var(--color-black);
+        color: var(--color-black);
     }
 
     .civicone-button__start-icon {
@@ -307,7 +308,7 @@
 @media (prefers-contrast: high) {
     .civicone-hero__lead,
     .civicone-hero .civicone-body-l {
-        color: #0b0c0c;
+        color: var(--color-govuk-black);
     }
 
     .civicone-hero {

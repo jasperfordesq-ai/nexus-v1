@@ -1,0 +1,624 @@
+/**
+ * CivicOne Extended Utilities
+ * CSS classes extracted from inline styles per CLAUDE.md
+ */
+
+/* ============================================
+   LAYOUT - Flexbox
+   ============================================ */
+.flex { display: flex; }
+.flex-col { display: flex; flex-direction: column; }
+.flex-center { display: flex; align-items: center; }
+.flex-center-gap-6 { display: flex; align-items: center; gap: 6px; }
+.flex-center-gap-8 { display: flex; align-items: center; gap: 8px; }
+.flex-center-gap-10 { display: flex; align-items: center; gap: 10px; }
+.flex-center-gap-12 { display: flex; align-items: center; gap: 12px; }
+.flex-center-gap-15 { display: flex; align-items: center; gap: 15px; }
+.flex-center-gap-20 { display: flex; align-items: center; gap: 20px; }
+.flex-between { display: flex; justify-content: space-between; align-items: center; }
+.flex-wrap { display: flex; flex-wrap: wrap; }
+.flex-wrap-gap-20 { display: flex; flex-wrap: wrap; gap: 20px; }
+.flex-end { display: flex; justify-content: flex-end; }
+.justify-center { justify-content: center; }
+.items-center { align-items: center; }
+.items-start { align-items: flex-start; }
+
+/* ============================================
+   LAYOUT - Grid
+   ============================================ */
+.grid { display: grid; }
+.grid-2col { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+.grid-3col { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; }
+.grid-auto-fit-240 { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 20px; }
+.grid-auto-fit-300 { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
+.gap-10 { gap: 10px; }
+.gap-12 { gap: 12px; }
+.gap-15 { gap: 15px; }
+.gap-20 { gap: 20px; }
+.gap-25 { gap: 25px; }
+.gap-40 { gap: 40px; }
+
+/* ============================================
+   LAYOUT - Centering
+   ============================================ */
+.mx-auto { margin-left: auto; margin-right: auto; }
+.container-centered { max-width: 1000px; margin: 0 auto; }
+.container-narrow { max-width: 600px; margin: 0 auto; }
+
+/* ============================================
+   SPACING - Margins
+   ============================================ */
+.m-0 { margin: 0; }
+.mt-0 { margin-top: 0; }
+.mt-5 { margin-top: 5px; }
+.mt-8 { margin-top: 8px; }
+.mt-10 { margin-top: 10px; }
+.mt-12 { margin-top: 12px; }
+.mt-15 { margin-top: 15px; }
+.mt-20 { margin-top: 20px; }
+.mt-25 { margin-top: 25px; }
+.mt-30 { margin-top: 30px; }
+
+.mb-0 { margin-bottom: 0; }
+.mb-5 { margin-bottom: 5px; }
+.mb-8 { margin-bottom: 8px; }
+.mb-10 { margin-bottom: 10px; }
+.mb-12 { margin-bottom: 12px; }
+.mb-15 { margin-bottom: 15px; }
+.mb-20 { margin-bottom: 20px; }
+.mb-24 { margin-bottom: 24px; }
+.mb-25 { margin-bottom: 25px; }
+.mb-30 { margin-bottom: 30px; }
+
+/* ============================================
+   SPACING - Padding
+   ============================================ */
+.p-0 { padding: 0; }
+.p-8 { padding: 8px; }
+.p-10 { padding: 10px; }
+.p-12 { padding: 12px; }
+.p-15 { padding: 15px; }
+.p-20 { padding: 20px; }
+.p-25 { padding: 25px; }
+.p-30 { padding: 30px; }
+
+.px-12 { padding-left: 12px; padding-right: 12px; }
+.px-15 { padding-left: 15px; padding-right: 15px; }
+.px-20 { padding-left: 20px; padding-right: 20px; }
+.px-25 { padding-left: 25px; padding-right: 25px; }
+
+.py-8 { padding-top: 8px; padding-bottom: 8px; }
+.py-10 { padding-top: 10px; padding-bottom: 10px; }
+.py-12 { padding-top: 12px; padding-bottom: 12px; }
+.py-15 { padding-top: 15px; padding-bottom: 15px; }
+
+.pt-10 { padding-top: 10px; }
+.pt-15 { padding-top: 15px; }
+.pt-20 { padding-top: 20px; }
+.pt-40 { padding-top: 40px; }
+
+.pb-10 { padding-bottom: 10px; }
+.pb-15 { padding-bottom: 15px; }
+.pb-20 { padding-bottom: 20px; }
+
+/* ============================================
+   WIDTH & HEIGHT
+   ============================================ */
+.w-full { width: 100%; }
+.w-auto { width: auto; }
+.h-auto { height: auto; }
+.min-h-100 { min-height: 100px; }
+.max-w-200 { max-width: 200px; }
+.max-w-300 { max-width: 300px; }
+.max-w-400 { max-width: 400px; }
+.max-w-500 { max-width: 500px; }
+.max-w-600 { max-width: 600px; }
+
+/* Icon sizing */
+.icon-40 { width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; }
+.icon-48 { width: 48px; height: 48px; display: flex; align-items: center; justify-content: center; }
+
+/* ============================================
+   TYPOGRAPHY - Font Size
+   ============================================ */
+.text-xs { font-size: 0.75rem; }
+.text-sm { font-size: 0.8rem; }
+.text-sm-85 { font-size: 0.85rem; }
+.text-base { font-size: 0.9rem; }
+.text-md { font-size: 1rem; }
+.text-lg { font-size: 1.1rem; }
+.text-xl { font-size: 1.25rem; }
+.text-2xl { font-size: 1.5rem; }
+.text-3xl { font-size: 2rem; }
+.text-4xl { font-size: 2.5rem; }
+.text-5xl { font-size: 3rem; }
+
+/* ============================================
+   TYPOGRAPHY - Font Weight
+   ============================================ */
+.font-normal { font-weight: 400; }
+.font-medium { font-weight: 500; }
+.font-semibold { font-weight: 600; }
+.font-bold { font-weight: 700; }
+.font-extrabold { font-weight: 800; }
+
+/* ============================================
+   TYPOGRAPHY - Alignment & Decoration
+   ============================================ */
+.text-left { text-align: left; }
+.text-center { text-align: center; }
+.text-right { text-align: right; }
+.uppercase { text-transform: uppercase; }
+.uppercase-tracking { text-transform: uppercase; letter-spacing: 1px; }
+.no-underline { text-decoration: none; }
+.underline { text-decoration: underline; }
+.italic { font-style: italic; }
+.line-height-1 { line-height: 1; }
+.line-height-tight { line-height: 1.25; }
+.font-mono { font-family: monospace; }
+
+/* ============================================
+   TYPOGRAPHY - Colors (using design tokens)
+   ============================================ */
+.text-white { color: white; }
+.text-muted { color: var(--color-gray-500, #6b7280); opacity: 0.7; }
+.text-gray-500 { color: #6b7280; }
+.text-gray-600 { color: #4b5563; }
+.text-gray-700 { color: #374151; }
+.text-gray-800 { color: #1f2937; }
+.text-gray-900 { color: #1e293b; }
+.text-slate-500 { color: #64748b; }
+.text-slate-600 { color: #475569; }
+.text-slate-700 { color: #334155; }
+
+/* Brand colors */
+.text-primary { color: var(--color-primary-500, #6366f1); }
+.text-sky-500 { color: #0ea5e9; }
+.text-purple-500 { color: #a855f7; }
+.text-amber-500 { color: #f59e0b; }
+.text-amber-700 { color: #b45309; }
+.text-emerald-500 { color: #10b981; }
+.text-emerald-600 { color: #059669; }
+.text-teal-700 { color: #0f766e; }
+.text-teal-800 { color: #115e59; }
+.text-red-500 { color: #ef4444; }
+.text-red-600 { color: #dc2626; }
+.text-blue-600 { color: #2563eb; }
+.text-violet-600 { color: #7c3aed; }
+.text-pink-600 { color: #db2777; }
+
+/* GOV.UK colors */
+.text-govuk-blue { color: #1d70b8; }
+.text-govuk-link { color: #1d70b8; text-decoration: underline; font-weight: 700; }
+
+/* ============================================
+   BACKGROUNDS
+   ============================================ */
+.bg-white { background: white; }
+.bg-transparent { background: transparent; }
+.bg-gray-50 { background: #f9fafb; }
+.bg-gray-100 { background: #f3f4f6; }
+.bg-slate-50 { background: #f8fafc; }
+.bg-slate-100 { background: #f1f5f9; }
+.bg-slate-900 { background: #0f172a; }
+.bg-dark { background: #111827; }
+
+/* Tinted backgrounds */
+.bg-teal-50 { background: #f0fdfa; }
+.bg-green-50 { background: #f0fdf4; }
+.bg-red-50 { background: #fef2f2; }
+.bg-amber-50 { background: #fffbeb; }
+
+/* Solid accent backgrounds */
+.bg-sky-500 { background: #0ea5e9; }
+.bg-purple-500 { background: #a855f7; }
+.bg-amber-500 { background: #f59e0b; }
+.bg-emerald-500 { background: #10b981; }
+.bg-red-500 { background: #ef4444; }
+
+/* GOV.UK backgrounds */
+.bg-govuk-blue { background: #1d70b8; }
+.bg-govuk-green { background: #00703c; }
+.bg-govuk-red { background: #d4351c; }
+.bg-govuk-yellow { background: #ffdd00; }
+.bg-govuk-black { background: #0b0c0c; }
+
+/* Gradient backgrounds */
+.bg-gradient-indigo { background: linear-gradient(90deg, #6366f1, #8b5cf6); }
+.bg-gradient-indigo-135 { background: linear-gradient(135deg, #4f46e5, #9333ea); }
+.bg-gradient-purple { background: linear-gradient(135deg, #6366f1, #8b5cf6); }
+.bg-gradient-brand { background: var(--primary, #6366f1); }
+
+/* ============================================
+   BORDERS
+   ============================================ */
+.border { border: 1px solid #e5e7eb; }
+.border-light { border: 1px solid #e2e8f0; }
+.border-input { border: 1px solid #ddd; }
+.border-2 { border: 2px solid #e2e8f0; }
+.border-teal { border: 1px solid #ccfbf1; }
+
+.border-t { border-top: 1px solid #e5e7eb; }
+.border-t-light { border-top: 1px solid #e2e8f0; }
+.border-b { border-bottom: 1px solid #e5e7eb; }
+.border-b-light { border-bottom: 1px solid #e2e8f0; }
+.border-b-subtle { border-bottom: 1px solid rgba(0,0,0,0.05); }
+
+/* Accent borders */
+.border-l-4-sky { border-left: 4px solid #0ea5e9; }
+.border-l-4-purple { border-left: 4px solid #a855f7; }
+.border-l-4-amber { border-left: 4px solid #f59e0b; }
+.border-l-4-emerald { border-left: 4px solid #10b981; }
+
+/* Border radius */
+.rounded { border-radius: 4px; }
+.rounded-md { border-radius: 6px; }
+.rounded-lg { border-radius: 8px; }
+.rounded-xl { border-radius: 10px; }
+.rounded-2xl { border-radius: 12px; }
+.rounded-full { border-radius: 50%; }
+.rounded-r-xl { border-radius: 0 10px 10px 0; }
+.rounded-l-xl { border-radius: 10px 0 0 10px; }
+
+/* ============================================
+   DISPLAY & VISIBILITY
+   ============================================ */
+.block { display: block; }
+.inline { display: inline; }
+.inline-block { display: inline-block; }
+.inline-flex { display: inline-flex; }
+.hidden { display: none; }
+.visible { visibility: visible; }
+.invisible { visibility: hidden; }
+.overflow-hidden { overflow: hidden; }
+.overflow-auto { overflow: auto; }
+.overflow-x-auto { overflow-x: auto; }
+
+/* ============================================
+   OPACITY
+   ============================================ */
+.opacity-50 { opacity: 0.5; }
+.opacity-60 { opacity: 0.6; }
+.opacity-70 { opacity: 0.7; }
+.opacity-80 { opacity: 0.8; }
+
+/* ============================================
+   TRANSITIONS
+   ============================================ */
+.transition { transition: all 0.2s ease; }
+.transition-bg { transition: background 0.1s; }
+.transition-opacity { transition: opacity 0.2s ease; }
+
+/* ============================================
+   FORM ELEMENTS
+   ============================================ */
+.form-label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: #1e293b;
+}
+
+.form-label-sm {
+    display: block;
+    margin-bottom: 8px;
+    font-size: 0.85rem;
+    color: #115e59;
+}
+
+.form-label-teal {
+    display: block;
+    margin-bottom: 8px;
+    font-size: 0.85rem;
+    color: #115e59;
+}
+
+.resize-vertical { resize: vertical; }
+
+/* ============================================
+   CARDS & BOXES
+   ============================================ */
+.card-box {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 25px;
+}
+
+.card-box-teal {
+    background: #f0fdfa;
+    border: 1px solid #ccfbf1;
+    border-radius: 12px;
+    padding: 25px;
+}
+
+.card-header-bordered {
+    border-bottom: 1px solid #e5e7eb;
+    padding: 20px 25px;
+}
+
+.card-body-padded {
+    padding: 25px;
+}
+
+.card-body-lg {
+    padding: 30px;
+}
+
+/* ============================================
+   TABLES
+   ============================================ */
+.table-cell {
+    padding: 15px 20px;
+}
+
+.table-header-cell {
+    padding: 15px 20px;
+    text-align: left;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    color: #64748b;
+    font-weight: 700;
+}
+
+.table-collapse { border-collapse: collapse; }
+
+/* ============================================
+   BADGES & TAGS
+   ============================================ */
+.tag-mono {
+    background: #f1f5f9;
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-family: monospace;
+    font-size: 0.85rem;
+    color: #475569;
+    border: 1px solid #e2e8f0;
+}
+
+.code-block {
+    background: #111827;
+    color: #10b981;
+    padding: 15px;
+    border-radius: 6px;
+    font-family: monospace;
+    font-size: 0.85rem;
+    overflow-x: auto;
+}
+
+/* ============================================
+   BUTTONS
+   ============================================ */
+.btn-icon-gradient {
+    background: linear-gradient(135deg, #4f46e5, #9333ea);
+    color: white;
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+}
+
+.btn-subtle {
+    background: white;
+    border: 1px solid #e2e8f0;
+    color: #475569;
+    padding: 6px 12px;
+    font-size: 0.85rem;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+}
+
+/* ============================================
+   STAT CARDS (Master Dashboard)
+   ============================================ */
+.stat-label {
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    opacity: 0.7;
+    margin-bottom: 5px;
+}
+
+.stat-value {
+    font-size: 2.5rem;
+    font-weight: 800;
+    line-height: 1;
+}
+
+.stat-subtext {
+    font-size: 0.8rem;
+    margin-top: 8px;
+    color: #6b7280;
+}
+
+.stat-section-heading {
+    margin: 0 0 20px 0;
+    color: #475569;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border-bottom: 1px solid #e2e8f0;
+    padding-bottom: 10px;
+}
+
+.stat-section-heading-teal {
+    margin: 0 0 20px 0;
+    color: #0f766e;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border-bottom: 1px solid #ccfbf1;
+    padding-bottom: 10px;
+}
+
+/* ============================================
+   SKELETON LOADERS
+   ============================================ */
+.skeleton-80 { height: 80px; width: 100%; }
+.skeleton-40 { height: 40px; width: 100%; }
+
+/* ============================================
+   OBJECT FIT
+   ============================================ */
+.object-cover { object-fit: cover; }
+.object-contain { object-fit: contain; }
+
+/* ============================================
+   EXTRA PADDING VARIANTS
+   ============================================ */
+.px-30 { padding-left: 30px; padding-right: 30px; }
+.pt-15 { padding-top: 15px; }
+
+/* ============================================
+   BUTTON VARIANTS
+   ============================================ */
+.launch-btn {
+    box-shadow: 0 4px 6px -1px rgba(16, 185, 129, 0.2);
+    background: #10b981;
+    border-color: #059669;
+}
+
+.slug-prefix {
+    border-right: 0;
+}
+
+/* ============================================
+   RESPONSIVE UTILITIES
+   ============================================ */
+@media (max-width: 768px) {
+    .grid-2col,
+    .grid-3col {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* ============================================
+   COMPOSE PAGE UTILITIES
+   ============================================ */
+
+/* Alert margin variants */
+.m-16 { margin: 16px; }
+
+/* Textarea with resize */
+.md-textarea-resizable {
+    min-height: 100px;
+    resize: vertical;
+}
+
+.md-textarea-resizable--small {
+    min-height: 60px;
+    resize: vertical;
+}
+
+/* Optional hint text (for SDG labels) */
+.md-optional-hint {
+    font-weight: 400;
+    opacity: 0.6;
+    font-size: 0.85rem;
+}
+
+/* Button as link (inline-flex, no underline) */
+.btn-link-inline {
+    text-decoration: none;
+    display: inline-flex;
+}
+
+/* Event submit button variant */
+.md-submit-btn--event {
+    background: linear-gradient(135deg, #ec4899 0%, #be185d 100%);
+}
+
+/* Button spacing for stacked buttons */
+.md-btn-spaced {
+    margin-bottom: 12px;
+}
+
+/* Avatar with zero font-size (for img inside) */
+.md-avatar--img-only {
+    font-size: 0;
+}
+
+/* ============================================
+   INLINE STYLE REPLACEMENTS
+   Added for CLAUDE.md compliance
+   ============================================ */
+
+/* Display inline for forms */
+.d-inline { display: inline; }
+.d-inline-block { display: inline-block; }
+
+/* Icon sizes */
+.icon-size-48 { font-size: 48px; }
+
+/* Small margin utilities */
+.mr-6 { margin-right: 6px; }
+.mx-4 { margin-left: 4px; margin-right: 4px; }
+.mt-6 { margin-top: 6px; }
+
+/* Small font utilities */
+.text-xxs { font-size: 0.7rem; }
+.text-tiny { font-size: 13px; }
+
+/* Audit log specific */
+.audit-arrow-icon {
+    font-size: 0.7rem;
+    color: #9ca3af;
+    margin: 0 4px;
+}
+
+/* Onboarding specific (using CSS variables) */
+.ob-hint-text {
+    color: var(--ob-text-muted);
+    font-size: 13px;
+}
+
+/* ============================================
+   BUTTON VARIANTS (Danger)
+   ============================================ */
+.btn-danger {
+    background: #ef4444;
+    color: white;
+    border: none;
+}
+
+.btn-danger:hover {
+    background: #dc2626;
+}
+
+/* ============================================
+   FORM ACTION LAYOUTS
+   ============================================ */
+.form-actions-center {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+}
+
+/* ============================================
+   EMPTY STATE ICONS (Editor/Overlay context)
+   ============================================ */
+.empty-state-icon {
+    font-size: 3rem;
+    color: var(--ed-text-secondary, #94a3b8);
+    margin-bottom: 1rem;
+}
+
+/* ============================================
+   TEXT COLOR VARIANTS (Editor/Overlay)
+   ============================================ */
+.text-ed-secondary {
+    color: var(--ed-text-secondary, #94a3b8);
+}
+
+/* ============================================
+   AI EMPTY STATE
+   ============================================ */
+.ai-empty-conversations {
+    text-align: center;
+    color: var(--text-muted, #94a3b8);
+    padding: 2rem 1rem;
+    font-size: 0.875rem;
+}

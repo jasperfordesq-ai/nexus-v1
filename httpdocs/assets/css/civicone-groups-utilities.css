@@ -1,6 +1,7 @@
 /**
  * CivicOne Groups Utilities
  * Extracted from inline styles in views/civicone/groups/index.php
+  * Fully Migrated to Design Tokens: 2026-01-21 ✓
  */
 
 /* Page header layout - right column alignment */
@@ -22,25 +23,25 @@
 /* This file loads AFTER civicone-members-directory.css, ensuring proper contrast */
 .civicone-width-container .civicone-button.civicone-button--primary,
 a.civicone-button.civicone-button--primary {
-    background-color: #00703c !important; /* GOV.UK Green - 7.5:1 contrast */
-    color: #ffffff !important;
-    border-color: #00703c !important;
+    background-color: var(--color-govuk-green) !important; /* GOV.UK Green - 7.5:1 contrast */
+    color: var(--color-white) !important;
+    border-color: var(--color-govuk-green) !important;
 }
 
 .civicone-width-container .civicone-button.civicone-button--primary:hover,
 a.civicone-button.civicone-button--primary:hover {
-    background-color: #005a30 !important;
-    border-color: #005a30 !important;
-    color: #ffffff !important;
+    background-color: var(--color-govuk-green-dark) !important;
+    border-color: var(--color-govuk-green-dark) !important;
+    color: var(--color-white) !important;
 }
 
 .civicone-width-container .civicone-button.civicone-button--primary:focus,
 a.civicone-button.civicone-button--primary:focus {
-    outline: 3px solid #ffdd00 !important;
+    outline: 3px solid var(--color-brand-yellow) !important;
     outline-offset: var(--space-0) !important;
-    background-color: #ffdd00 !important;
-    color: #0b0c0c !important;
-    border-color: #0b0c0c !important;
+    background-color: var(--color-brand-yellow) !important;
+    color: var(--color-govuk-black) !important;
+    border-color: var(--color-govuk-black) !important;
 }
 
 /* Search form submit button */

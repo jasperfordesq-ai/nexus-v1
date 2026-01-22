@@ -114,7 +114,7 @@
 }
 
 .consent-badge.updated {
-    background: var(--color-amber-100, #fef3c7);
+    background: var(--color-amber-100, var(--color-amber-100));
     color: var(--color-amber-700, #b45309);
 }
 
@@ -347,7 +347,7 @@
 }
 
 .option-icon.warning {
-    background: var(--color-danger-100, #fee2e2);
+    background: var(--color-danger-100, var(--color-red-100));
     color: var(--color-danger-600, #dc2626);
 }
 
@@ -363,7 +363,7 @@
 
 [data-theme="dark"] .option-icon.warning {
     background: rgba(239, 68, 68, 0.2);
-    color: var(--color-danger-400, #f87171);
+    color: var(--color-danger-400, var(--color-red-400));
 }
 
 [data-theme="dark"] .option-icon.neutral {

@@ -63,7 +63,7 @@ $completedAt = $transaction['completed_at'] ?? $transaction['created_at'] ?? nul
                              class="avatar-lg">
                     <?php else: ?>
                         <div class="avatar-lg">
-                            <span style="font-size: 2.5rem; font-weight: 700; color: white;"><?= strtoupper(substr($receiverName, 0, 1)) ?></span>
+                            <span class="avatar-initial-text"><?= strtoupper(substr($receiverName, 0, 1)) ?></span>
                         </div>
                     <?php endif; ?>
                 </div>
@@ -108,7 +108,7 @@ $completedAt = $transaction['completed_at'] ?? $transaction['created_at'] ?? nul
                     <!-- Star Rating -->
                     <div class="form-group">
                         <label class="form-label">
-                            <i class="fa-solid fa-star-half-stroke" style="color: #fbbf24;"></i>
+                            <i class="fa-solid fa-star-half-stroke icon-amber"></i>
                             How was your experience?
                         </label>
                         <div class="star-rating" id="star-rating" role="radiogroup" aria-label="Rate your experience">
@@ -130,7 +130,7 @@ $completedAt = $transaction['completed_at'] ?? $transaction['created_at'] ?? nul
                     <!-- Comment -->
                     <div class="form-group">
                         <label for="comment" class="form-label">
-                            <i class="fa-solid fa-comment-dots" style="color: #8b5cf6;"></i>
+                            <i class="fa-solid fa-comment-dots icon-purple"></i>
                             Share your experience (optional)
                         </label>
                         <textarea name="comment"
@@ -166,6 +166,6 @@ $completedAt = $transaction['completed_at'] ?? $transaction['created_at'] ?? nul
     </div>
 </div>
 
-<script src="<?= $basePath ?>/assets/js/federation-review-form.min.js?v=<?= time() ?>"></script>
+<script src="/assets/js/federation-review-form.min.js?v=<?= time() ?>"></script>
 
 <?php require dirname(dirname(__DIR__)) . '/layouts/modern/footer.php'; ?>

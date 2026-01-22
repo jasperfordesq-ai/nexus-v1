@@ -1,6 +1,6 @@
 /**
  * civicone-modules Bundle
- * Generated: 2026-01-21T16:06:27.648Z
+ * Generated: 2026-01-21T20:33:44.178Z
  * Files: 8
  */
 
@@ -4441,6 +4441,90 @@ a.civic-btn:focus {
     .civic-goal-btn-outline {
         transition: none;
     }
+}
+
+/* ============================================
+   RESOURCES DOWNLOAD PAGE
+   ============================================ */
+.civic-download-container {
+    max-width: 500px;
+    margin: var(--space-10) auto;
+    padding: 0 var(--space-5);
+}
+
+.civic-download-card {
+    background: #fff;
+    border: 4px solid var(--civic-mini-border);
+    padding: var(--space-10);
+    text-align: center;
+}
+
+.civic-download-icon {
+    font-size: 4rem;
+    margin-bottom: var(--space-5);
+}
+
+.civic-resource-download-title {
+    font-size: 1.5rem;
+    font-weight: bold;
+    margin: 0 0 var(--space-2) 0;
+    text-transform: uppercase;
+}
+
+.civic-resource-download-meta {
+    font-size: 0.9rem;
+    color: var(--color-gray-600);
+    margin-bottom: var(--space-8);
+}
+
+.civic-countdown-number {
+    font-size: 4rem;
+    font-weight: 900;
+    margin: var(--space-5) 0;
+}
+
+.civic-countdown-text {
+    font-size: 1rem;
+    margin-bottom: var(--space-8);
+}
+
+.civic-download-status {
+    font-size: 1rem;
+    font-weight: bold;
+    min-height: 24px;
+    margin-bottom: var(--space-5);
+}
+
+.civic-download-status.success {
+    color: var(--color-success-600);
+}
+
+.civic-download-back-link {
+    display: inline-block;
+    background: var(--civic-mini-border);
+    color: #fff;
+    padding: var(--space-3) var(--space-6);
+    text-decoration: none;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    transition: background 0.2s ease;
+}
+
+.civic-download-back-link:hover {
+    background: var(--color-gray-700);
+}
+
+.civic-download-manual-link {
+    display: block;
+    margin-top: var(--space-5);
+    font-size: 0.85rem;
+    color: var(--color-gray-600);
+}
+
+.civic-download-manual-link a {
+    color: var(--civic-mini-border);
+    text-decoration: underline;
 }
 
 

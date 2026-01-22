@@ -1,0 +1,460 @@
+/* ============================================
+   RESOURCES CREATE - Holographic Glassmorphism
+   Teal Theme (#0d9488)
+   ============================================ */
+
+.holo-resource-page {
+    min-height: 100vh;
+    padding: 180px 20px 60px;
+    position: relative;
+    overflow: hidden;
+    background: linear-gradient(135deg, #f0fdfa 0%, #ccfbf1 50%, #99f6e4 100%);
+}
+
+[data-theme="dark"] .holo-resource-page {
+    background: linear-gradient(135deg, #042f2e 0%, #0f3d3a 50%, #134e4a 100%);
+}
+
+/* Floating Orbs */
+.holo-orb {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(60px);
+    opacity: 0.5;
+    pointer-events: none;
+    animation: floatOrb 20s ease-in-out infinite;
+}
+
+.holo-orb-1 {
+    width: 400px;
+    height: 400px;
+    background: radial-gradient(circle, rgba(13, 148, 136, 0.4) 0%, transparent 70%);
+    top: -100px;
+    left: -100px;
+    animation-delay: 0s;
+}
+
+.holo-orb-2 {
+    width: 350px;
+    height: 350px;
+    background: radial-gradient(circle, rgba(20, 184, 166, 0.35) 0%, transparent 70%);
+    top: 40%;
+    right: -80px;
+    animation-delay: -7s;
+}
+
+.holo-orb-3 {
+    width: 300px;
+    height: 300px;
+    background: radial-gradient(circle, rgba(6, 182, 212, 0.3) 0%, transparent 70%);
+    bottom: -50px;
+    left: 30%;
+    animation-delay: -14s;
+}
+
+[data-theme="dark"] .holo-orb-1 {
+    background: radial-gradient(circle, rgba(13, 148, 136, 0.3) 0%, transparent 70%);
+}
+
+[data-theme="dark"] .holo-orb-2 {
+    background: radial-gradient(circle, rgba(20, 184, 166, 0.25) 0%, transparent 70%);
+}
+
+[data-theme="dark"] .holo-orb-3 {
+    background: radial-gradient(circle, rgba(6, 182, 212, 0.2) 0%, transparent 70%);
+}
+
+@keyframes floatOrb {
+    0%, 100% { transform: translate(0, 0) scale(1); }
+    33% { transform: translate(30px, -30px) scale(1.05); }
+    66% { transform: translate(-20px, 20px) scale(0.95); }
+}
+
+/* Glass Card */
+.holo-glass-card {
+    position: relative;
+    max-width: 600px;
+    margin: 0 auto;
+    background: rgba(255, 255, 255, 0.7);
+    backdrop-filter: blur(40px) saturate(180%);
+    -webkit-backdrop-filter: blur(40px) saturate(180%);
+    border-radius: 28px;
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    padding: 48px;
+    box-shadow:
+        0 25px 50px -12px rgba(0, 0, 0, 0.1),
+        0 0 0 1px rgba(255, 255, 255, 0.3) inset;
+    overflow: hidden;
+}
+
+[data-theme="dark"] .holo-glass-card {
+    background: rgba(24, 24, 27, 0.6);
+    border-color: rgba(255, 255, 255, 0.1);
+    box-shadow:
+        0 25px 50px -12px rgba(0, 0, 0, 0.4),
+        0 0 0 1px rgba(255, 255, 255, 0.05) inset;
+}
+
+/* Shimmer Effect */
+.holo-glass-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(255, 255, 255, 0.1),
+        transparent
+    );
+    animation: shimmer 8s ease-in-out infinite;
+    pointer-events: none;
+}
+
+@keyframes shimmer {
+    0%, 100% { left: -100%; }
+    50% { left: 100%; }
+}
+
+/* Iridescent Top Edge */
+.holo-glass-card::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(90deg,
+        transparent,
+        rgba(13, 148, 136, 0.6),
+        rgba(6, 182, 212, 0.6),
+        rgba(20, 184, 166, 0.6),
+        transparent
+    );
+}
+
+/* Header */
+.holo-header {
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+.holo-header-icon {
+    width: 72px;
+    height: 72px;
+    margin: 0 auto 20px;
+    background: linear-gradient(135deg, #0d9488 0%, #0f766e 100%);
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.8rem;
+    color: white;
+    box-shadow: 0 10px 30px rgba(13, 148, 136, 0.3);
+}
+
+.holo-title {
+    font-size: 2rem;
+    font-weight: 800;
+    margin: 0 0 10px;
+    background: linear-gradient(135deg, #0f766e 0%, #0d9488 50%, #14b8a6 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    letter-spacing: -0.02em;
+}
+
+[data-theme="dark"] .holo-title {
+    background: linear-gradient(135deg, #5eead4 0%, #2dd4bf 50%, var(--color-white) 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+}
+
+.holo-subtitle {
+    font-size: 1rem;
+    color: #64748b;
+    margin: 0;
+}
+
+[data-theme="dark"] .holo-subtitle {
+    color: rgba(255, 255, 255, 0.6);
+}
+
+/* Form Styles */
+.holo-form-group {
+    margin-bottom: 24px;
+}
+
+.holo-label {
+    display: block;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #334155;
+    margin-bottom: 10px;
+    padding-left: 4px;
+}
+
+[data-theme="dark"] .holo-label {
+    color: rgba(255, 255, 255, 0.9);
+}
+
+.holo-input,
+.holo-select {
+    width: 100%;
+    padding: 16px 20px;
+    border-radius: 16px;
+    border: 2px solid rgba(13, 148, 136, 0.15);
+    background: rgba(255, 255, 255, 0.6);
+    color: #1e293b;
+    font-size: 1rem;
+    font-family: inherit;
+    transition: all 0.3s ease;
+    box-sizing: border-box;
+}
+
+.holo-input:focus,
+.holo-select:focus {
+    outline: none;
+    border-color: #0d9488;
+    background: rgba(255, 255, 255, 0.9);
+    box-shadow: 0 0 0 4px rgba(13, 148, 136, 0.1);
+}
+
+.holo-input::placeholder {
+    color: #94a3b8;
+}
+
+[data-theme="dark"] .holo-input,
+[data-theme="dark"] .holo-select {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(255, 255, 255, 0.1);
+    color: #f8fafc;
+}
+
+[data-theme="dark"] .holo-input:focus,
+[data-theme="dark"] .holo-select:focus {
+    background: rgba(255, 255, 255, 0.12);
+    border-color: #2dd4bf;
+    box-shadow: 0 0 0 4px rgba(45, 212, 191, 0.15);
+}
+
+[data-theme="dark"] .holo-input::placeholder {
+    color: rgba(255, 255, 255, 0.4);
+}
+
+[data-theme="dark"] .holo-select option {
+    background: #1e293b;
+    color: #f8fafc;
+}
+
+textarea.holo-input {
+    resize: vertical;
+    min-height: 100px;
+    line-height: 1.6;
+}
+
+/* File Upload Zone */
+.holo-upload-zone {
+    padding: 40px 30px;
+    border: 2px dashed rgba(13, 148, 136, 0.3);
+    border-radius: 20px;
+    text-align: center;
+    background: linear-gradient(135deg, rgba(13, 148, 136, 0.05) 0%, rgba(20, 184, 166, 0.05) 100%);
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.holo-upload-zone:hover {
+    border-color: rgba(13, 148, 136, 0.5);
+    background: linear-gradient(135deg, rgba(13, 148, 136, 0.08) 0%, rgba(20, 184, 166, 0.08) 100%);
+}
+
+.holo-upload-zone.dragover {
+    border-color: #0d9488;
+    background: rgba(13, 148, 136, 0.1);
+    transform: scale(1.01);
+}
+
+[data-theme="dark"] .holo-upload-zone {
+    border-color: rgba(45, 212, 191, 0.2);
+    background: linear-gradient(135deg, rgba(13, 148, 136, 0.1) 0%, rgba(20, 184, 166, 0.05) 100%);
+}
+
+[data-theme="dark"] .holo-upload-zone:hover {
+    border-color: rgba(45, 212, 191, 0.4);
+}
+
+.holo-upload-icon {
+    width: 60px;
+    height: 60px;
+    margin: 0 auto 16px;
+    background: linear-gradient(135deg, rgba(13, 148, 136, 0.15) 0%, rgba(20, 184, 166, 0.1) 100%);
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    color: #0d9488;
+}
+
+[data-theme="dark"] .holo-upload-icon {
+    color: #2dd4bf;
+    background: rgba(45, 212, 191, 0.15);
+}
+
+.holo-upload-text {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #334155;
+    margin-bottom: 8px;
+}
+
+[data-theme="dark"] .holo-upload-text {
+    color: rgba(255, 255, 255, 0.9);
+}
+
+.holo-upload-hint {
+    font-size: 0.85rem;
+    color: #64748b;
+}
+
+[data-theme="dark"] .holo-upload-hint {
+    color: rgba(255, 255, 255, 0.5);
+}
+
+.holo-file-input {
+    display: none;
+}
+
+.holo-file-name {
+    margin-top: 16px;
+    padding: 12px 16px;
+    background: rgba(13, 148, 136, 0.1);
+    border-radius: 12px;
+    font-size: 0.9rem;
+    color: #0d9488;
+    font-weight: 600;
+    display: none;
+}
+
+.holo-file-name.visible {
+    display: block;
+}
+
+[data-theme="dark"] .holo-file-name {
+    background: rgba(45, 212, 191, 0.15);
+    color: #2dd4bf;
+}
+
+/* Buttons */
+.holo-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 32px;
+}
+
+.holo-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 16px 28px;
+    border-radius: 50px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    border: none;
+    font-family: inherit;
+    min-height: 48px;
+}
+
+.holo-btn-primary {
+    background: linear-gradient(135deg, #0d9488 0%, #0f766e 100%);
+    color: white;
+    box-shadow: 0 8px 24px rgba(13, 148, 136, 0.35);
+}
+
+.holo-btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 32px rgba(13, 148, 136, 0.45);
+}
+
+.holo-btn-primary:active {
+    transform: scale(0.98);
+}
+
+.holo-btn-secondary {
+    background: transparent;
+    color: #64748b;
+    border: 2px solid rgba(100, 116, 139, 0.2);
+}
+
+.holo-btn-secondary:hover {
+    background: rgba(100, 116, 139, 0.08);
+    color: #475569;
+}
+
+[data-theme="dark"] .holo-btn-secondary {
+    color: rgba(255, 255, 255, 0.6);
+    border-color: rgba(255, 255, 255, 0.1);
+}
+
+[data-theme="dark"] .holo-btn-secondary:hover {
+    background: rgba(255, 255, 255, 0.05);
+    color: rgba(255, 255, 255, 0.8);
+}
+
+/* Offline Banner */
+.holo-offline-banner {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 10001;
+    padding: 14px 20px;
+    background: linear-gradient(135deg, #ef4444, #dc2626);
+    color: white;
+    font-size: 0.95rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    transform: translateY(-100%);
+    transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.holo-offline-banner.visible {
+    transform: translateY(0);
+}
+
+/* Mobile Responsive */
+@media (max-width: 900px) {
+    .holo-resource-page {
+        padding: 20px 16px 120px;
+    }
+
+    .holo-glass-card {
+        padding: 32px 24px;
+        border-radius: 24px;
+    }
+
+    .holo-title {
+        font-size: 1.7rem;
+    }
+
+    .holo-header-icon {
+        width: 64px;
+        height: 64px;
+        font-size: 1.5rem;
+    }
+
+    .holo-upload-zone {
+        padding: 30px 20px;
+    }
+}

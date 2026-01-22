@@ -27,15 +27,96 @@ class CoreApiController
     }
 
     // /api/members
+    // Backward compatible: Returns all members when no parameters
+    // Enhanced: Supports search with ?q=query and ?active=true
     public function members()
     {
         $this->getUserId();
         $db = \Nexus\Core\Database::getConnection();
-        // Fix: DB has avatar_url, App expects avatar
-        $stmt = $db->prepare("SELECT id, name, email, avatar_url as avatar, role, bio FROM users WHERE tenant_id = ?");
-        $stmt->execute([TenantContext::getId()]);
-        $members = $stmt->fetchAll();
-        $this->jsonResponse(['data' => $members]);
+
+        $tenantId = TenantContext::getId();
+        $query = isset($_GET['q']) ? trim($_GET['q']) : '';
+        $activeOnly = isset($_GET['active']) && $_GET['active'] === 'true';
+        $limit = isset($_GET['limit']) ? (int)$_GET['limit'] : 100;
+        $offset = isset($_GET['offset']) ? (int)$_GET['offset'] : 0;
+
+        // Base query - IMPORTANT: Always include last_active_at for "Active Now" filtering
+        // Only show members with avatars (consistent with User::count() and directory policy)
+        $sql = "SELECT id, name, email, avatar_url as avatar, role, bio, location, last_active_at
+                FROM users
+                WHERE tenant_id = ?
+                AND avatar_url IS NOT NULL
+                AND LENGTH(avatar_url) > 0";
+        $params = [$tenantId];
+
+        // Add search filter if provided (minimum 2 characters)
+        if (!empty($query) && strlen($query) >= 2) {
+            $sql .= " AND (name LIKE ? OR email LIKE ? OR bio LIKE ? OR location LIKE ?)";
+            $searchTerm = "%{$query}%";
+            $params[] = $searchTerm;
+            $params[] = $searchTerm;
+            $params[] = $searchTerm;
+            $params[] = $searchTerm;
+        }
+
+        // Add active filter if requested (last 5 minutes)
+        if ($activeOnly) {
+            $sql .= " AND last_active_at > DATE_SUB(NOW(), INTERVAL 5 MINUTE)";
+        }
+
+        // Order by last active (most recent first)
+        $sql .= " ORDER BY last_active_at DESC";
+
+        // Add pagination
+        $sql .= " LIMIT ? OFFSET ?";
+        $params[] = $limit;
+        $params[] = $offset;
+
+        try {
+            $stmt = $db->prepare($sql);
+            $stmt->execute($params);
+            $members = $stmt->fetchAll();
+
+            // Get total count for pagination (without LIMIT)
+            // Only count members with avatars (consistent with User::count())
+            $countSql = "SELECT COUNT(*) FROM users WHERE tenant_id = ? AND avatar_url IS NOT NULL AND LENGTH(avatar_url) > 0";
+            $countParams = [$tenantId];
+
+            if (!empty($query) && strlen($query) >= 2) {
+                $countSql .= " AND (name LIKE ? OR email LIKE ? OR bio LIKE ? OR location LIKE ?)";
+                $searchTerm = "%{$query}%";
+                $countParams[] = $searchTerm;
+                $countParams[] = $searchTerm;
+                $countParams[] = $searchTerm;
+                $countParams[] = $searchTerm;
+            }
+
+            if ($activeOnly) {
+                $countSql .= " AND last_active_at > DATE_SUB(NOW(), INTERVAL 5 MINUTE)";
+            }
+
+            $countStmt = $db->prepare($countSql);
+            $countStmt->execute($countParams);
+            $totalCount = $countStmt->fetchColumn();
+
+            // Enhanced response format (backward compatible)
+            $this->jsonResponse([
+                'data' => $members,
+                'meta' => [
+                    'total' => (int)$totalCount,
+                    'showing' => count($members),
+                    'limit' => $limit,
+                    'offset' => $offset
+                ]
+            ]);
+
+        } catch (\Exception $e) {
+            error_log("Members API error: " . $e->getMessage());
+            $this->jsonResponse([
+                'error' => 'Failed to retrieve members',
+                'message' => 'An error occurred while searching members'
+            ], 500);
+        }
     }
 
     // /api/listings

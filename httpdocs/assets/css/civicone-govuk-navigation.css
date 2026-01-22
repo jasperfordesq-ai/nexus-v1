@@ -1,0 +1,468 @@
+/**
+ * CivicOne GOV.UK Navigation Components
+ * Source: GOV.UK Frontend v5.14.0 (WCAG 2.2 AA Compliant)
+ *
+ * Components:
+ * - Pagination (page navigation)
+ * - Breadcrumbs (hierarchical navigation)
+ * - Back Link (return navigation)
+ *
+ * @version 1.0.0
+ * @since 2026-01-22
+ */
+
+/* ==========================================
+   PAGINATION
+   Source: govuk-frontend/components/pagination/
+   ========================================== */
+
+.civicone-pagination {
+    margin-bottom: var(--civicone-space-7, 40px);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+@media (min-width: 641px) {
+    .civicone-pagination {
+        flex-direction: row;
+        align-items: flex-start;
+        margin-bottom: var(--civicone-space-8, 50px);
+    }
+}
+
+.civicone-pagination__list {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.civicone-pagination__item,
+.civicone-pagination__next,
+.civicone-pagination__prev {
+    font-size: 1.1875rem; /* 19px */
+    line-height: 1.3158;
+    box-sizing: border-box;
+    position: relative;
+    min-width: 45px;
+    min-height: 45px;
+    padding: var(--civicone-space-3, 10px) var(--civicone-space-4, 15px);
+    float: left;
+}
+
+.civicone-pagination__item:hover,
+.civicone-pagination__next:hover,
+.civicone-pagination__prev:hover {
+    background-color: #f3f2f1;
+}
+
+.civicone-pagination__item {
+    display: none; /* Hide on mobile except first/last */
+    text-align: center;
+}
+
+@media (min-width: 641px) {
+    .civicone-pagination__item {
+        display: block;
+    }
+}
+
+/* Show first, last, current, and ellipsis on mobile */
+.civicone-pagination__item--current,
+.civicone-pagination__item--ellipsis,
+.civicone-pagination__item:first-child,
+.civicone-pagination__item:last-child {
+    display: block;
+}
+
+.civicone-pagination__item--current {
+    font-weight: 700;
+    outline: 1px solid transparent;
+    background-color: var(--color-govuk-blue, #1d70b8);
+}
+
+.civicone-pagination__item--current:hover {
+    background-color: var(--color-govuk-blue, #1d70b8);
+}
+
+.civicone-pagination__item--current .civicone-pagination__link {
+    color: var(--color-white, #ffffff);
+}
+
+.civicone-pagination__item--current .civicone-pagination__link:hover {
+    color: var(--color-white, #ffffff);
+}
+
+.civicone-pagination__item--current .civicone-pagination__link:focus {
+    color: var(--color-govuk-black, #0b0c0c);
+}
+
+.civicone-pagination__item--ellipsis {
+    font-weight: 700;
+    color: #505a5f;
+}
+
+.civicone-pagination__item--ellipsis:hover {
+    background-color: transparent;
+}
+
+.civicone-pagination__prev,
+.civicone-pagination__next {
+    font-weight: 700;
+}
+
+.civicone-pagination__prev .civicone-pagination__link,
+.civicone-pagination__next .civicone-pagination__link {
+    display: flex;
+    align-items: center;
+}
+
+.civicone-pagination__prev {
+    padding-left: 0;
+}
+
+.civicone-pagination__next {
+    padding-right: 0;
+}
+
+.civicone-pagination__link {
+    display: block;
+    min-width: var(--civicone-space-4, 15px);
+    font-family: inherit;
+    text-decoration: underline;
+    text-decoration-thickness: max(1px, 0.0625rem);
+    text-underline-offset: 0.1em;
+    color: var(--color-govuk-blue, #1d70b8);
+}
+
+/* Increase touch target */
+@media screen {
+    .civicone-pagination__link::after {
+        content: "";
+        position: absolute;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+    }
+}
+
+.civicone-pagination__link:hover {
+    color: var(--color-govuk-blue-dark, #003078);
+    text-decoration-thickness: max(3px, 0.1875rem, 0.12em);
+}
+
+.civicone-pagination__link:focus {
+    outline: 3px solid transparent;
+    color: var(--color-govuk-black, #0b0c0c);
+    background-color: var(--civicone-focus, #ffdd00);
+    box-shadow: 0 -2px var(--civicone-focus, #ffdd00), 0 4px var(--color-govuk-black, #0b0c0c);
+    text-decoration: none;
+}
+
+.civicone-pagination__link:focus .civicone-pagination__icon {
+    color: var(--color-govuk-black, #0b0c0c);
+}
+
+.civicone-pagination__link-title {
+    text-decoration-thickness: inherit;
+}
+
+.civicone-pagination__link-label {
+    font-weight: 400;
+    text-decoration: underline;
+    text-decoration-thickness: max(1px, 0.0625rem);
+    text-underline-offset: 0.1em;
+    display: inline-block;
+}
+
+.civicone-pagination__icon {
+    width: 0.9375rem; /* 15px */
+    height: 0.8125rem; /* 13px */
+    color: #505a5f;
+    fill: currentcolor;
+    forced-color-adjust: auto;
+}
+
+.civicone-pagination__icon--prev {
+    margin-right: var(--civicone-space-4, 15px);
+}
+
+.civicone-pagination__icon--next {
+    margin-left: var(--civicone-space-4, 15px);
+}
+
+/* Block mode - prev/next stacked */
+.civicone-pagination--block {
+    display: block;
+}
+
+.civicone-pagination--block .civicone-pagination__next,
+.civicone-pagination--block .civicone-pagination__prev {
+    padding-left: 0;
+    float: none;
+}
+
+.civicone-pagination--block .civicone-pagination__next .civicone-pagination__link,
+.civicone-pagination--block .civicone-pagination__prev .civicone-pagination__link {
+    display: inline-block;
+}
+
+.civicone-pagination--block .civicone-pagination__next {
+    padding-right: var(--civicone-space-4, 15px);
+}
+
+.civicone-pagination--block .civicone-pagination__prev + .civicone-pagination__next {
+    border-top: 1px solid var(--color-govuk-grey, #b1b4b6);
+}
+
+.civicone-pagination--block .civicone-pagination__link {
+    padding-left: var(--civicone-space-7, 40px);
+    text-align: left;
+}
+
+.civicone-pagination--block .civicone-pagination__link:not(:focus) {
+    text-decoration: none;
+}
+
+.civicone-pagination--block .civicone-pagination__icon {
+    margin-top: 0.326em;
+    margin-left: calc(var(--civicone-space-7, 40px) * -1);
+    float: left;
+}
+
+/* ==========================================
+   BREADCRUMBS
+   Source: govuk-frontend/components/breadcrumbs/
+   ========================================== */
+
+.civicone-breadcrumbs {
+    font-size: 1rem; /* 16px */
+    line-height: 1.25;
+    color: var(--color-govuk-black, #0b0c0c);
+    margin-top: var(--civicone-space-4, 15px);
+    margin-bottom: var(--civicone-space-3, 10px);
+}
+
+.civicone-breadcrumbs__list {
+    margin: 0;
+    padding: 0;
+    list-style-type: none;
+}
+
+.civicone-breadcrumbs__list::after {
+    content: "";
+    display: block;
+    clear: both;
+}
+
+.civicone-breadcrumbs__list-item {
+    display: inline-block;
+    position: relative;
+    margin-bottom: var(--civicone-space-2, 10px);
+    margin-left: 0.625em; /* 10px at 16px font */
+    padding-left: calc(0.625em + 0.35355em); /* 10px + chevron width */
+    float: left;
+}
+
+/* Chevron separator using pseudo-element */
+.civicone-breadcrumbs__list-item::before {
+    content: "";
+    display: block;
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: -0.1768em;
+    width: 0.4375em; /* 7px */
+    height: 0.4375em; /* 7px */
+    margin: auto 0;
+    transform: rotate(45deg);
+    border: solid;
+    border-width: 1px 1px 0 0;
+    border-color: #505a5f;
+}
+
+.civicone-breadcrumbs__list-item:first-child {
+    margin-left: 0;
+    padding-left: 0;
+}
+
+.civicone-breadcrumbs__list-item:first-child::before {
+    content: none;
+    display: none;
+}
+
+.civicone-breadcrumbs__link {
+    font-family: inherit;
+    text-decoration: underline;
+    text-decoration-thickness: max(1px, 0.0625rem);
+    text-underline-offset: 0.1em;
+    color: var(--color-govuk-black, #0b0c0c);
+}
+
+.civicone-breadcrumbs__link:hover {
+    text-decoration-thickness: max(3px, 0.1875rem, 0.12em);
+}
+
+.civicone-breadcrumbs__link:focus {
+    outline: 3px solid transparent;
+    color: var(--color-govuk-black, #0b0c0c);
+    background-color: var(--civicone-focus, #ffdd00);
+    box-shadow: 0 -2px var(--civicone-focus, #ffdd00), 0 4px var(--color-govuk-black, #0b0c0c);
+    text-decoration: none;
+}
+
+/* Collapse on mobile - show only first and last */
+.civicone-breadcrumbs--collapse-on-mobile {
+    @media (max-width: 640px) {
+        .civicone-breadcrumbs__list-item {
+            display: none;
+        }
+
+        .civicone-breadcrumbs__list-item:first-child,
+        .civicone-breadcrumbs__list-item:last-child {
+            display: inline-block;
+        }
+
+        .civicone-breadcrumbs__list-item::before {
+            top: 0.375em;
+            margin: 0;
+        }
+
+        .civicone-breadcrumbs__list {
+            display: flex;
+        }
+    }
+}
+
+/* Inverse variant (white on dark) */
+.civicone-breadcrumbs--inverse {
+    color: var(--color-white, #ffffff);
+}
+
+.civicone-breadcrumbs--inverse .civicone-breadcrumbs__link {
+    color: var(--color-white, #ffffff);
+}
+
+.civicone-breadcrumbs--inverse .civicone-breadcrumbs__link:hover {
+    color: var(--color-white, #ffffff);
+}
+
+.civicone-breadcrumbs--inverse .civicone-breadcrumbs__link:focus {
+    color: var(--color-govuk-black, #0b0c0c);
+}
+
+.civicone-breadcrumbs--inverse .civicone-breadcrumbs__list-item::before {
+    border-color: currentcolor;
+}
+
+/* ==========================================
+   BACK LINK
+   Source: govuk-frontend/components/back-link/
+   ========================================== */
+
+.civicone-back-link {
+    font-size: 1rem; /* 16px */
+    line-height: 1.25;
+    font-family: inherit;
+    text-decoration: underline;
+    text-decoration-thickness: max(1px, 0.0625rem);
+    text-underline-offset: 0.1em;
+    color: var(--color-govuk-black, #0b0c0c);
+    display: inline-block;
+    position: relative;
+    margin-top: var(--civicone-space-4, 15px);
+    margin-bottom: var(--civicone-space-4, 15px);
+    padding-left: 0.875em; /* 14px - space for chevron */
+}
+
+/* Left-pointing chevron */
+.civicone-back-link::before {
+    content: "";
+    display: block;
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0.1875em; /* 3px */
+    width: 0.4375em; /* 7px */
+    height: 0.4375em; /* 7px */
+    margin: auto 0;
+    transform: rotate(225deg); /* Points left */
+    border: solid;
+    border-width: 1px 1px 0 0;
+    border-color: #505a5f;
+}
+
+.civicone-back-link:hover {
+    text-decoration-thickness: max(3px, 0.1875rem, 0.12em);
+}
+
+.civicone-back-link:focus {
+    outline: 3px solid transparent;
+    color: var(--color-govuk-black, #0b0c0c);
+    background-color: var(--civicone-focus, #ffdd00);
+    box-shadow: 0 -2px var(--civicone-focus, #ffdd00), 0 4px var(--color-govuk-black, #0b0c0c);
+    text-decoration: none;
+}
+
+.civicone-back-link:focus::before {
+    border-color: var(--color-govuk-black, #0b0c0c);
+}
+
+/* Increase touch target */
+.civicone-back-link::after {
+    content: "";
+    position: absolute;
+    top: -14px;
+    right: 0;
+    bottom: -14px;
+    left: 0;
+}
+
+/* Inverse variant (white on dark) */
+.civicone-back-link--inverse {
+    color: var(--color-white, #ffffff);
+}
+
+.civicone-back-link--inverse:hover {
+    color: var(--color-white, #ffffff);
+}
+
+.civicone-back-link--inverse:focus {
+    color: var(--color-govuk-black, #0b0c0c);
+}
+
+.civicone-back-link--inverse::before {
+    border-color: currentcolor;
+}
+
+/* ==========================================
+   DARK MODE SUPPORT
+   ========================================== */
+
+@media (prefers-color-scheme: dark) {
+    html[data-theme="dark"] .civicone-pagination__link,
+    html[data-theme="dark"] .civicone-breadcrumbs__link,
+    html[data-theme="dark"] .civicone-back-link {
+        color: var(--color-govuk-blue-light, #5694ca);
+    }
+
+    html[data-theme="dark"] .civicone-pagination__item:hover,
+    html[data-theme="dark"] .civicone-pagination__next:hover,
+    html[data-theme="dark"] .civicone-pagination__prev:hover {
+        background-color: var(--color-gray-700, #374151);
+    }
+
+    html[data-theme="dark"] .civicone-breadcrumbs,
+    html[data-theme="dark"] .civicone-back-link {
+        color: var(--color-gray-100, #f3f4f6);
+    }
+
+    html[data-theme="dark"] .civicone-pagination__icon,
+    html[data-theme="dark"] .civicone-breadcrumbs__list-item::before,
+    html[data-theme="dark"] .civicone-back-link::before {
+        border-color: var(--color-gray-400);
+        color: var(--color-gray-400);
+    }
+}

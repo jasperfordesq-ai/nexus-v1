@@ -9,6 +9,7 @@
  * Only applies when:
  *   - .is-native class is present (Capacitor app), OR
  *   - Screen width is <= 768px (mobile web)
+  * Fully Migrated to Design Tokens: 2026-01-21 ✓
  */
 
 /* ==============================================
@@ -17,20 +18,20 @@
 :root {
     --native-input-bg: rgba(255, 255, 255, 0.08);
     --native-input-border: rgba(255, 255, 255, 0.15);
-    --native-input-border-focus: var(--color-primary-500, #6366f1);
-    --native-input-text: var(--text-primary, #1f2937);
-    --native-input-placeholder: var(--text-tertiary, #9ca3af);
+    --native-input-border-focus: var(--color-primary-500, var(--color-primary-500));
+    --native-input-text: var(--text-primary, var(--color-gray-800));
+    --native-input-placeholder: var(--text-tertiary, var(--color-gray-400));
     --native-input-radius: var(--radius-md);
     --native-input-padding: var(--space-3) var(--space-4);
-    --native-label-color: var(--text-secondary, #6b7280);
+    --native-label-color: var(--text-secondary, var(--color-gray-500));
 }
 
 /* Dark mode variables */
 [data-theme="dark"] {
     --native-input-bg: rgba(255, 255, 255, 0.06);
     --native-input-border: rgba(255, 255, 255, 0.12);
-    --native-input-text: var(--text-primary, #f9fafb);
-    --native-input-placeholder: var(--text-tertiary, #6b7280);
+    --native-input-text: var(--text-primary, var(--color-gray-50));
+    --native-input-placeholder: var(--text-tertiary, var(--color-gray-500));
 }
 
 /* ==============================================
@@ -242,7 +243,7 @@
 .is-native:not(.messages-page) textarea.is-invalid,
 .is-native:not(.messages-page) select.error,
 .is-native:not(.messages-page) select.is-invalid {
-    border-color: var(--color-error, #ef4444);
+    border-color: var(--color-error, var(--color-danger));
 }
 
 .is-native:not(.messages-page) input.error:focus,
@@ -261,7 +262,7 @@
     body:not(.is-native):not(.messages-page) textarea.is-invalid,
     body:not(.is-native):not(.messages-page) select.error,
     body:not(.is-native):not(.messages-page) select.is-invalid {
-        border-color: var(--color-error, #ef4444);
+        border-color: var(--color-error, var(--color-danger));
     }
 
     body:not(.is-native):not(.messages-page) input.error:focus,
@@ -283,7 +284,7 @@
 .is-native:not(.messages-page) textarea.is-valid,
 .is-native:not(.messages-page) select.success,
 .is-native:not(.messages-page) select.is-valid {
-    border-color: var(--color-success, #10b981);
+    border-color: var(--color-success, var(--color-success));
 }
 
 .is-native:not(.messages-page) input.success:focus,
@@ -302,7 +303,7 @@
     body:not(.is-native):not(.messages-page) textarea.is-valid,
     body:not(.is-native):not(.messages-page) select.success,
     body:not(.is-native):not(.messages-page) select.is-valid {
-        border-color: var(--color-success, #10b981);
+        border-color: var(--color-success, var(--color-success));
     }
 
     body:not(.is-native):not(.messages-page) input.success:focus,
@@ -341,8 +342,8 @@
 
 .is-native:not(.messages-page) input[type="checkbox"]:checked,
 .is-native:not(.messages-page) input[type="radio"]:checked {
-    background: var(--color-primary-500, #6366f1);
-    border-color: var(--color-primary-500, #6366f1);
+    background: var(--color-primary-500, var(--color-primary-500));
+    border-color: var(--color-primary-500, var(--color-primary-500));
 }
 
 .is-native:not(.messages-page) input[type="checkbox"]:checked::after {
@@ -395,8 +396,8 @@
 
     body:not(.is-native):not(.messages-page) input[type="checkbox"]:checked,
     body:not(.is-native):not(.messages-page) input[type="radio"]:checked {
-        background: var(--color-primary-500, #6366f1);
-        border-color: var(--color-primary-500, #6366f1);
+        background: var(--color-primary-500, var(--color-primary-500));
+        border-color: var(--color-primary-500, var(--color-primary-500));
     }
 
     body:not(.is-native):not(.messages-page) input[type="checkbox"]:checked::after {
@@ -445,7 +446,7 @@
 .is-native:not(.messages-page) .btn-primary,
 .is-native:not(.messages-page) button[type="submit"],
 .is-native:not(.messages-page) input[type="submit"] {
-    background: var(--color-primary-500, #6366f1);
+    background: var(--color-primary-500, var(--color-primary-500));
     color: white;
 }
 
@@ -480,7 +481,7 @@
     body:not(.is-native):not(.messages-page) .btn-primary,
     body:not(.is-native):not(.messages-page) button[type="submit"],
     body:not(.is-native):not(.messages-page) input[type="submit"] {
-        background: var(--color-primary-500, #6366f1);
+        background: var(--color-primary-500, var(--color-primary-500));
         color: white;
     }
 
@@ -511,7 +512,7 @@
 .is-native:not(.messages-page) input[type="file"]::file-selector-button {
     padding: var(--space-2) var(--space-4);
     margin-right: var(--space-3);
-    background: var(--color-primary-500, #6366f1);
+    background: var(--color-primary-500, var(--color-primary-500));
     color: white;
     border: none;
     border-radius: var(--radius-base);
@@ -532,7 +533,7 @@
     body:not(.is-native):not(.messages-page) input[type="file"]::file-selector-button {
         padding: var(--space-2) var(--space-4);
         margin-right: var(--space-3);
-        background: var(--color-primary-500, #6366f1);
+        background: var(--color-primary-500, var(--color-primary-500));
         color: white;
         border: none;
         border-radius: var(--radius-base);
@@ -580,7 +581,7 @@
 .is-native:not(.messages-page) .help-text,
 .is-native:not(.messages-page) .form-text {
     font-size: var(--font-size-xs);
-    color: var(--text-tertiary, #9ca3af);
+    color: var(--text-tertiary, var(--color-gray-400));
     margin-top: calc(var(--space-1) + var(--space-1));
 }
 
@@ -588,7 +589,7 @@
 .is-native:not(.messages-page) .error-text,
 .is-native:not(.messages-page) .invalid-feedback {
     font-size: var(--font-size-xs);
-    color: var(--color-error, #ef4444);
+    color: var(--color-error, var(--color-danger));
     margin-top: calc(var(--space-1) + var(--space-1));
 }
 
@@ -597,7 +598,7 @@
     body:not(.is-native):not(.messages-page) .help-text,
     body:not(.is-native):not(.messages-page) .form-text {
         font-size: var(--font-size-xs);
-        color: var(--text-tertiary, #9ca3af);
+        color: var(--text-tertiary, var(--color-gray-400));
         margin-top: calc(var(--space-1) + var(--space-1));
     }
 
@@ -605,7 +606,7 @@
     body:not(.is-native):not(.messages-page) .error-text,
     body:not(.is-native):not(.messages-page) .invalid-feedback {
         font-size: var(--font-size-xs);
-        color: var(--color-error, #ef4444);
+        color: var(--color-error, var(--color-danger));
         margin-top: calc(var(--space-1) + var(--space-1));
     }
 }

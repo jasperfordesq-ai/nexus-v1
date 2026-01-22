@@ -246,7 +246,7 @@
     margin-top: -10px;
     margin-left: -10px;
     border: 2px solid rgba(255, 255, 255, 0.3);
-    border-top-color: #ffffff;
+    border-top-color: var(--color-white);
     border-radius: var(--radius-full);
     animation: mobile-spin 0.6s linear infinite;
 }
@@ -254,7 +254,7 @@
 /* Primary button variant */
 .mobile-btn-loading.btn-primary::after {
     border-color: rgba(255, 255, 255, 0.3);
-    border-top-color: #ffffff;
+    border-top-color: var(--color-white);
 }
 
 /* Secondary button variant */

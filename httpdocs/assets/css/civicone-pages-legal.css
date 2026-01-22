@@ -1,0 +1,280 @@
+/**
+ * Legal Page
+ * CivicOne Theme
+ */
+
+/* Legal Hub - CivicOne Native Mobile Design */
+.civic-legal-hub {
+    padding: 0 16px 100px;
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+/* Section Headers */
+.civic-legal-section {
+    margin-bottom: 24px;
+}
+
+.civic-legal-section-title {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--civic-text-main, #111827);
+    margin: 0 0 16px 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.civic-legal-section-title .dashicons {
+    color: var(--civic-brand);
+}
+
+/* Legal Cards */
+.civic-legal-cards {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.civic-legal-card {
+    background: var(--civic-bg-card, #ffffff);
+    border: 1px solid var(--civic-border, #e5e7eb);
+    border-radius: 12px;
+    padding: 16px;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    transition: all 0.15s ease;
+    min-height: 48px;
+}
+
+.civic-legal-card:hover,
+.civic-legal-card:active {
+    background: var(--civic-bg-page, #f9fafb);
+    border-color: var(--civic-brand);
+}
+
+.civic-legal-card-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    color: white;
+}
+
+.civic-legal-card-icon.privacy { background: linear-gradient(135deg, #6366f1, #8b5cf6); }
+.civic-legal-card-icon.terms { background: linear-gradient(135deg, #3b82f6, #1d4ed8); }
+.civic-legal-card-icon.accessibility { background: linear-gradient(135deg, #10b981, #059669); }
+.civic-legal-card-icon.cookies { background: linear-gradient(135deg, #f59e0b, #d97706); }
+.civic-legal-card-icon.help { background: linear-gradient(135deg, #ec4899, #be185d); }
+.civic-legal-card-icon.contact { background: linear-gradient(135deg, #06b6d4, #0891b2); }
+.civic-legal-card-icon.faq { background: linear-gradient(135deg, #8b5cf6, #7c3aed); }
+.civic-legal-card-icon.about { background: linear-gradient(135deg, #f97316, #ea580c); }
+
+.civic-legal-card-icon .dashicons {
+    font-size: 20px;
+    width: 20px;
+    height: 20px;
+}
+
+.civic-legal-card-text {
+    flex: 1;
+    min-width: 0;
+}
+
+.civic-legal-card-text h3 {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--civic-text-main, #111827);
+    margin: 0 0 2px 0;
+}
+
+.civic-legal-card-text p {
+    font-size: 0.85rem;
+    color: var(--civic-text-muted, #6b7280);
+    margin: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.civic-legal-card-arrow {
+    color: var(--civic-text-muted, #6b7280);
+    flex-shrink: 0;
+}
+
+/* Platform Info Card */
+.civic-legal-platform {
+    background: var(--civic-bg-card, #ffffff);
+    border: 1px solid var(--civic-border, #e5e7eb);
+    border-radius: 16px;
+    padding: 24px;
+    text-align: center;
+    margin-bottom: 24px;
+}
+
+.civic-legal-platform-icon {
+    width: 64px;
+    height: 64px;
+    background: var(--civic-brand);
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 16px;
+    color: white;
+}
+
+.civic-legal-platform-icon .dashicons {
+    font-size: 32px;
+    width: 32px;
+    height: 32px;
+}
+
+.civic-legal-platform-name {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--civic-text-main, #111827);
+    margin: 0 0 4px 0;
+}
+
+.civic-legal-platform-tagline {
+    font-size: 0.9rem;
+    color: var(--civic-text-muted, #6b7280);
+    margin: 0 0 16px 0;
+}
+
+.civic-legal-platform-footer {
+    font-size: 0.85rem;
+    color: var(--civic-text-muted, #6b7280);
+    border-top: 1px solid var(--civic-border, #e5e7eb);
+    padding-top: 16px;
+    margin-top: 16px;
+}
+
+.civic-legal-platform-footer a {
+    color: var(--civic-brand);
+    text-decoration: none;
+    font-weight: 600;
+}
+
+/* Community Guidelines */
+.civic-legal-guidelines {
+    background: var(--civic-bg-card, #ffffff);
+    border: 1px solid var(--civic-border, #e5e7eb);
+    border-radius: 16px;
+    overflow: hidden;
+    margin-bottom: 24px;
+}
+
+.civic-legal-guidelines-header {
+    background: var(--civic-bg-page, #f9fafb);
+    padding: 16px;
+    border-bottom: 1px solid var(--civic-border, #e5e7eb);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.civic-legal-guidelines-header .dashicons {
+    color: var(--civic-brand);
+    font-size: 24px;
+    width: 24px;
+    height: 24px;
+}
+
+.civic-legal-guidelines-header h3 {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--civic-text-main, #111827);
+    margin: 0;
+}
+
+.civic-legal-guidelines-body {
+    padding: 16px;
+}
+
+.civic-legal-guideline {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    margin-bottom: 16px;
+}
+
+.civic-legal-guideline:last-child {
+    margin-bottom: 0;
+}
+
+.civic-legal-guideline-icon {
+    width: 32px;
+    height: 32px;
+    background: var(--civic-bg-page, #f3f4f6);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.civic-legal-guideline-icon .dashicons {
+    color: var(--civic-brand);
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
+}
+
+.civic-legal-guideline h4 {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--civic-text-main, #111827);
+    margin: 0 0 2px 0;
+}
+
+.civic-legal-guideline p {
+    font-size: 0.85rem;
+    color: var(--civic-text-muted, #6b7280);
+    margin: 0;
+    line-height: 1.4;
+}
+
+/* Social Links */
+.civic-legal-social {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    margin-top: 16px;
+}
+
+.civic-legal-social a {
+    width: 44px;
+    height: 44px;
+    background: var(--civic-bg-page, #f3f4f6);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--civic-text-muted, #6b7280);
+    text-decoration: none;
+    transition: all 0.15s ease;
+}
+
+.civic-legal-social a:hover {
+    background: var(--civic-brand);
+    color: white;
+}
+
+/* Dark Mode */
+body.dark-mode .civic-legal-card,
+body.dark-mode .civic-legal-platform,
+body.dark-mode .civic-legal-guidelines {
+    background: var(--civic-bg-card, #1f2937);
+    border-color: var(--civic-border, #374151);
+}
+
+body.dark-mode .civic-legal-guidelines-header {
+    background: var(--civic-bg-page, #111827);
+}

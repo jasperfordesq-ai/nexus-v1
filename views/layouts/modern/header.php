@@ -148,6 +148,8 @@ try {
     <?php endif; ?>
     <!-- Modern Header Utilities - Extracted inline styles (CRITICAL - load before lazy bundles) -->
     <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/modern-header-utilities.css?v=<?= $cssVersionTimestamp ?>">
+    <!-- Extended Utilities - Extracted inline styles per CLAUDE.md (2026-01-22) -->
+    <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/civicone-utilities-extended.css?v=<?= $cssVersionTimestamp ?>">
     <!-- Biometric Modal - Login prompt styling (CRITICAL - may show on load) -->
     <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/biometric-modal.css?v=<?= $cssVersionTimestamp ?>">
 
@@ -374,6 +376,9 @@ try {
 
     <!-- Modern Header Dropdown Fixes - Override bundle CSS for compact utility bar dropdowns (2026-01-21) -->
     <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/modern-header-emergency-fixes.css?v=<?= $cssVersionTimestamp ?>">
+
+    <!-- Dev Notice Modal - Preview mode notification for users -->
+    <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/dev-notice-modal.min.css?v=<?= $cssVersionTimestamp ?>">
 
     <!-- Font Awesome - Single file faster than multiple requests -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous" media="print" onload="this.media='all'">

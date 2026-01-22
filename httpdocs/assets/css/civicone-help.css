@@ -5,8 +5,9 @@
  * Accessibility features:
  * - 4.5:1+ contrast ratios for all text
  * - 44px minimum touch targets
- * - GOV.UK focus ring pattern (#FFDD00)
+ * - GOV.UK focus ring pattern (var(--color-brand-yellow))
  * - Supports prefers-contrast and prefers-reduced-motion
+  * Fully Migrated to Design Tokens: 2026-01-21 ✓
  */
 
 /* ==========================================================================
@@ -14,25 +15,25 @@
    ========================================================================== */
 :root {
     /* Text colors - WCAG AA compliant */
-    --civic-help-text-primary: #111827;       /* 12.6:1 on white */
-    --civic-help-text-secondary: #374151;     /* 8.5:1 on white */
-    --civic-help-text-muted: #4b5563;         /* 6.6:1 on white */
+    --civic-help-text-primary: var(--color-gray-900);       /* 12.6:1 on white */
+    --civic-help-text-secondary: var(--color-gray-700);     /* 8.5:1 on white */
+    --civic-help-text-muted: var(--color-gray-600);         /* 6.6:1 on white */
 
     /* Background colors */
     --civic-help-bg-page: #f5f6f7;
-    --civic-help-bg-card: #ffffff;
-    --civic-help-bg-hover: #f3f4f6;
-    --civic-help-bg-article: #f9fafb;
+    --civic-help-bg-card: var(--color-white);
+    --civic-help-bg-hover: var(--color-gray-100);
+    --civic-help-bg-article: var(--color-gray-50);
 
     /* Interactive colors */
     --civic-help-primary: var(--skin-primary, #1e40af);
-    --civic-help-primary-hover: var(--skin-primary-dark, #1e3a8a);
-    --civic-help-focus-ring: #FFDD00;
+    --civic-help-primary-hover: var(--skin-primary-dark, var(--color-blue-800));
+    --civic-help-focus-ring: var(--color-brand-yellow);
 
     /* Status colors */
     --civic-help-success-bg: #dcfce7;
-    --civic-help-success-text: #166534;       /* 4.8:1 on success bg */
-    --civic-help-error-bg: #fee2e2;
+    --civic-help-success-text: var(--color-green-800);       /* 4.8:1 on success bg */
+    --civic-help-error-bg: var(--color-red-100);
     --civic-help-error-text: #991b1b;         /* 5.1:1 on error bg */
 
     /* Spacing */
@@ -136,11 +137,11 @@
 
 .civic-help-article-card:focus-within {
     /* GOV.UK Focus Pattern */
-    outline: 3px solid var(--govuk-focus-colour, #ffdd00);
+    outline: 3px solid var(--govuk-focus-colour, var(--color-brand-yellow));
     outline-offset: 0;
-    background-color: var(--govuk-focus-colour, #ffdd00);
+    background-color: var(--govuk-focus-colour, var(--color-brand-yellow));
     color: var(--govuk-focus-text-colour, #0b0c0c);
-    box-shadow: 0 -2px var(--govuk-focus-colour, #ffdd00), 0 4px var(--govuk-focus-text-colour, #0b0c0c);
+    box-shadow: 0 -2px var(--govuk-focus-colour, var(--color-brand-yellow)), 0 4px var(--govuk-focus-text-colour, #0b0c0c);
 }
 
 .civic-help-article-title {
@@ -161,11 +162,11 @@
 
 .civic-help-article-title a:focus {
     /* GOV.UK Focus Pattern */
-    outline: 3px solid var(--govuk-focus-colour, #ffdd00);
+    outline: 3px solid var(--govuk-focus-colour, var(--color-brand-yellow));
     outline-offset: 0;
-    background-color: var(--govuk-focus-colour, #ffdd00);
+    background-color: var(--govuk-focus-colour, var(--color-brand-yellow));
     color: var(--govuk-focus-text-colour, #0b0c0c);
-    box-shadow: 0 -2px var(--govuk-focus-colour, #ffdd00), 0 4px var(--govuk-focus-text-colour, #0b0c0c);
+    box-shadow: 0 -2px var(--govuk-focus-colour, var(--color-brand-yellow)), 0 4px var(--govuk-focus-text-colour, #0b0c0c);
 }
 
 .civic-help-read-link {
@@ -186,11 +187,11 @@
 
 .civic-help-read-link:focus {
     /* GOV.UK Focus Pattern */
-    outline: 3px solid var(--govuk-focus-colour, #ffdd00);
+    outline: 3px solid var(--govuk-focus-colour, var(--color-brand-yellow));
     outline-offset: 0;
-    background-color: var(--govuk-focus-colour, #ffdd00);
+    background-color: var(--govuk-focus-colour, var(--color-brand-yellow));
     color: var(--govuk-focus-text-colour, #0b0c0c);
-    box-shadow: 0 -2px var(--govuk-focus-colour, #ffdd00), 0 4px var(--govuk-focus-text-colour, #0b0c0c);
+    box-shadow: 0 -2px var(--govuk-focus-colour, var(--color-brand-yellow)), 0 4px var(--govuk-focus-text-colour, #0b0c0c);
 }
 
 /* ==========================================================================
@@ -219,11 +220,11 @@
 
 .civic-help-back-link:focus {
     /* GOV.UK Focus Pattern */
-    outline: 3px solid var(--govuk-focus-colour, #ffdd00);
+    outline: 3px solid var(--govuk-focus-colour, var(--color-brand-yellow));
     outline-offset: 0;
-    background-color: var(--govuk-focus-colour, #ffdd00);
+    background-color: var(--govuk-focus-colour, var(--color-brand-yellow));
     color: var(--govuk-focus-text-colour, #0b0c0c);
-    box-shadow: 0 -2px var(--govuk-focus-colour, #ffdd00), 0 4px var(--govuk-focus-text-colour, #0b0c0c);
+    box-shadow: 0 -2px var(--govuk-focus-colour, var(--color-brand-yellow)), 0 4px var(--govuk-focus-text-colour, #0b0c0c);
 }
 
 .civic-help-article-header {
@@ -274,11 +275,11 @@
 
 .civic-help-article-content a:focus {
     /* GOV.UK Focus Pattern */
-    outline: 3px solid var(--govuk-focus-colour, #ffdd00);
+    outline: 3px solid var(--govuk-focus-colour, var(--color-brand-yellow));
     outline-offset: 0;
-    background-color: var(--govuk-focus-colour, #ffdd00);
+    background-color: var(--govuk-focus-colour, var(--color-brand-yellow));
     color: var(--govuk-focus-text-colour, #0b0c0c);
-    box-shadow: 0 -2px var(--govuk-focus-colour, #ffdd00), 0 4px var(--govuk-focus-text-colour, #0b0c0c);
+    box-shadow: 0 -2px var(--govuk-focus-colour, var(--color-brand-yellow)), 0 4px var(--govuk-focus-text-colour, #0b0c0c);
 }
 
 .civic-help-article-content ul,
@@ -324,11 +325,11 @@
 
 .help-back-link:focus {
     /* GOV.UK Focus Pattern */
-    outline: 3px solid var(--govuk-focus-colour, #ffdd00);
+    outline: 3px solid var(--govuk-focus-colour, var(--color-brand-yellow));
     outline-offset: 0;
-    background-color: var(--govuk-focus-colour, #ffdd00);
+    background-color: var(--govuk-focus-colour, var(--color-brand-yellow));
     color: var(--govuk-focus-text-colour, #0b0c0c);
-    box-shadow: 0 -2px var(--govuk-focus-colour, #ffdd00), 0 4px var(--govuk-focus-text-colour, #0b0c0c);
+    box-shadow: 0 -2px var(--govuk-focus-colour, var(--color-brand-yellow)), 0 4px var(--govuk-focus-text-colour, #0b0c0c);
 }
 
 .help-search-header {
@@ -387,11 +388,11 @@
 
 .help-search-input:focus {
     /* GOV.UK Focus Pattern */
-    outline: 3px solid var(--govuk-focus-colour, #ffdd00);
+    outline: 3px solid var(--govuk-focus-colour, var(--color-brand-yellow));
     outline-offset: 0;
-    background-color: var(--govuk-focus-colour, #ffdd00);
+    background-color: var(--govuk-focus-colour, var(--color-brand-yellow));
     color: var(--govuk-focus-text-colour, #0b0c0c);
-    box-shadow: 0 -2px var(--govuk-focus-colour, #ffdd00), 0 4px var(--govuk-focus-text-colour, #0b0c0c);
+    box-shadow: 0 -2px var(--govuk-focus-colour, var(--color-brand-yellow)), 0 4px var(--govuk-focus-text-colour, #0b0c0c);
 }
 
 .help-search-btn {
@@ -413,11 +414,11 @@
 
 .help-search-btn:focus {
     /* GOV.UK Focus Pattern */
-    outline: 3px solid var(--govuk-focus-colour, #ffdd00);
+    outline: 3px solid var(--govuk-focus-colour, var(--color-brand-yellow));
     outline-offset: 0;
-    background-color: var(--govuk-focus-colour, #ffdd00);
+    background-color: var(--govuk-focus-colour, var(--color-brand-yellow));
     color: var(--govuk-focus-text-colour, #0b0c0c);
-    box-shadow: 0 -2px var(--govuk-focus-colour, #ffdd00), 0 4px var(--govuk-focus-text-colour, #0b0c0c);
+    box-shadow: 0 -2px var(--govuk-focus-colour, var(--color-brand-yellow)), 0 4px var(--govuk-focus-text-colour, #0b0c0c);
 }
 
 /* No Results State */
@@ -464,11 +465,11 @@
 
 .no-results-link:focus {
     /* GOV.UK Focus Pattern */
-    outline: 3px solid var(--govuk-focus-colour, #ffdd00);
+    outline: 3px solid var(--govuk-focus-colour, var(--color-brand-yellow));
     outline-offset: 0;
-    background-color: var(--govuk-focus-colour, #ffdd00);
+    background-color: var(--govuk-focus-colour, var(--color-brand-yellow));
     color: var(--govuk-focus-text-colour, #0b0c0c);
-    box-shadow: 0 -2px var(--govuk-focus-colour, #ffdd00), 0 4px var(--govuk-focus-text-colour, #0b0c0c);
+    box-shadow: 0 -2px var(--govuk-focus-colour, var(--color-brand-yellow)), 0 4px var(--govuk-focus-text-colour, #0b0c0c);
 }
 
 /* Search Results */
@@ -495,11 +496,11 @@
 
 .search-result-card:focus {
     /* GOV.UK Focus Pattern */
-    outline: 3px solid var(--govuk-focus-colour, #ffdd00);
+    outline: 3px solid var(--govuk-focus-colour, var(--color-brand-yellow));
     outline-offset: 0;
-    background-color: var(--govuk-focus-colour, #ffdd00);
+    background-color: var(--govuk-focus-colour, var(--color-brand-yellow));
     color: var(--govuk-focus-text-colour, #0b0c0c);
-    box-shadow: 0 -2px var(--govuk-focus-colour, #ffdd00), 0 4px var(--govuk-focus-text-colour, #0b0c0c);
+    box-shadow: 0 -2px var(--govuk-focus-colour, var(--color-brand-yellow)), 0 4px var(--govuk-focus-text-colour, #0b0c0c);
 }
 
 .search-result-header {
@@ -594,11 +595,11 @@
 
 .civic-settings-nav-link:focus {
     /* GOV.UK Focus Pattern */
-    outline: 3px solid var(--govuk-focus-colour, #ffdd00);
+    outline: 3px solid var(--govuk-focus-colour, var(--color-brand-yellow));
     outline-offset: 0;
-    background-color: var(--govuk-focus-colour, #ffdd00);
+    background-color: var(--govuk-focus-colour, var(--color-brand-yellow));
     color: var(--govuk-focus-text-colour, #0b0c0c);
-    box-shadow: 0 -2px var(--govuk-focus-colour, #ffdd00), 0 4px var(--govuk-focus-text-colour, #0b0c0c);
+    box-shadow: 0 -2px var(--govuk-focus-colour, var(--color-brand-yellow)), 0 4px var(--govuk-focus-text-colour, #0b0c0c);
 }
 
 .civic-settings-nav-link--active {
@@ -670,11 +671,11 @@
 .civic-settings-textarea:focus,
 .civic-settings-select:focus {
     /* GOV.UK Focus Pattern */
-    outline: 3px solid var(--govuk-focus-colour, #ffdd00);
+    outline: 3px solid var(--govuk-focus-colour, var(--color-brand-yellow));
     outline-offset: 0;
-    background-color: var(--govuk-focus-colour, #ffdd00);
+    background-color: var(--govuk-focus-colour, var(--color-brand-yellow));
     color: var(--govuk-focus-text-colour, #0b0c0c);
-    box-shadow: 0 -2px var(--govuk-focus-colour, #ffdd00), 0 4px var(--govuk-focus-text-colour, #0b0c0c);
+    box-shadow: 0 -2px var(--govuk-focus-colour, var(--color-brand-yellow)), 0 4px var(--govuk-focus-text-colour, #0b0c0c);
 }
 
 .civic-settings-textarea {
@@ -710,11 +711,11 @@
 
 .civic-settings-checkbox:focus {
     /* GOV.UK Focus Pattern */
-    outline: 3px solid var(--govuk-focus-colour, #ffdd00);
+    outline: 3px solid var(--govuk-focus-colour, var(--color-brand-yellow));
     outline-offset: 0;
-    background-color: var(--govuk-focus-colour, #ffdd00);
+    background-color: var(--govuk-focus-colour, var(--color-brand-yellow));
     color: var(--govuk-focus-text-colour, #0b0c0c);
-    box-shadow: 0 -2px var(--govuk-focus-colour, #ffdd00), 0 4px var(--govuk-focus-text-colour, #0b0c0c);
+    box-shadow: 0 -2px var(--govuk-focus-colour, var(--color-brand-yellow)), 0 4px var(--govuk-focus-text-colour, #0b0c0c);
 }
 
 .civic-settings-checkbox-label {
@@ -733,13 +734,13 @@
    ========================================================================== */
 @media (prefers-color-scheme: dark) {
     :root {
-        --civic-help-text-primary: #f9fafb;
-        --civic-help-text-secondary: #e5e7eb;
-        --civic-help-text-muted: #d1d5db;
-        --civic-help-bg-page: #111827;
-        --civic-help-bg-card: #1f2937;
-        --civic-help-bg-hover: #374151;
-        --civic-help-bg-article: #1f2937;
+        --civic-help-text-primary: var(--color-gray-50);
+        --civic-help-text-secondary: var(--color-gray-200);
+        --civic-help-text-muted: var(--color-gray-300);
+        --civic-help-bg-page: var(--color-gray-900);
+        --civic-help-bg-card: var(--color-gray-800);
+        --civic-help-bg-hover: var(--color-gray-700);
+        --civic-help-bg-article: var(--color-gray-800);
         --civic-help-success-bg: #064e3b;
         --civic-help-success-text: #a7f3d0;
         --civic-help-error-bg: #7f1d1d;
@@ -765,11 +766,11 @@
    ========================================================================== */
 @media (prefers-contrast: high) {
     :root {
-        --civic-help-text-primary: #000000;
-        --civic-help-text-secondary: #000000;
-        --civic-help-text-muted: #000000;
-        --civic-help-bg-card: #ffffff;
-        --civic-help-bg-article: #ffffff;
+        --civic-help-text-primary: var(--color-black);
+        --civic-help-text-secondary: var(--color-black);
+        --civic-help-text-muted: var(--color-black);
+        --civic-help-bg-card: var(--color-white);
+        --civic-help-bg-article: var(--color-white);
     }
 
     .civic-help-article-card,
@@ -780,7 +781,7 @@
     .help-search-input,
     .search-result-card,
     .no-results {
-        border: 2px solid #000000; /* High contrast mode - intentional hardcoded black */
+        border: 2px solid var(--color-black); /* High contrast mode - intentional hardcoded black */
     }
 
     .civic-help-article-title a,

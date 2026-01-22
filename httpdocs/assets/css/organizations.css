@@ -58,7 +58,7 @@
     width: 44px;
     height: 44px;
     border-radius: var(--radius-md);
-    background: linear-gradient(135deg, var(--color-success), #059669);
+    background: linear-gradient(135deg, var(--color-success), var(--color-emerald-600));
     display: flex;
     align-items: center;
     justify-content: center;
@@ -109,12 +109,12 @@
 
 .org-utility-role.owner {
     background: rgba(251, 191, 36, 0.15);
-    color: #b45309;
+    color: var(--color-amber-700);
 }
 
 .org-utility-role.admin {
     background: rgba(139, 92, 246, 0.15);
-    color: #7c3aed;
+    color: var(--color-purple-600);
 }
 
 .org-utility-role.member {
@@ -129,7 +129,7 @@
 
 [data-theme="dark"] .org-utility-role.admin {
     background: rgba(139, 92, 246, 0.2);
-    color: #a78bfa;
+    color: var(--color-purple-400-alt);
 }
 
 [data-theme="dark"] .org-utility-role.member {
@@ -152,7 +152,7 @@
     background: rgba(16, 185, 129, 0.1);
     border: 1px solid rgba(16, 185, 129, 0.2);
     border-radius: 10px;
-    color: #059669;
+    color: var(--color-emerald-600);
     font-weight: var(--font-weight-semibold);
     font-size: 0.85rem;
     text-decoration: none;
@@ -167,7 +167,7 @@
 }
 
 .org-utility-action.primary {
-    background: linear-gradient(135deg, var(--color-success) 0%, #059669 100%);
+    background: linear-gradient(135deg, var(--color-success) 0%, var(--color-emerald-600) 100%);
     border: none;
     color: white;
     box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
@@ -180,7 +180,7 @@
 [data-theme="dark"] .org-utility-action {
     background: rgba(16, 185, 129, 0.15);
     border-color: rgba(16, 185, 129, 0.3);
-    color: #34d399;
+    color: var(--color-emerald-400);
 }
 
 /* Tab Navigation */
@@ -232,13 +232,13 @@
 }
 
 [data-theme="dark"] .org-utility-tab:hover {
-    color: #34d399;
+    color: var(--color-emerald-400);
     background: rgba(16, 185, 129, 0.1);
 }
 
 [data-theme="dark"] .org-utility-tab.active {
-    color: #34d399;
-    border-bottom-color: #34d399;
+    color: var(--color-emerald-400);
+    border-bottom-color: var(--color-emerald-400);
     background: rgba(16, 185, 129, 0.15);
 }
 
@@ -250,7 +250,7 @@
     min-width: 20px;
     height: 20px;
     padding: 0 6px;
-    background: linear-gradient(135deg, var(--color-warning), #d97706);
+    background: linear-gradient(135deg, var(--color-warning), var(--color-amber-600));
     color: white;
     font-size: 0.7rem;
     font-weight: var(--font-weight-bold);
@@ -592,7 +592,7 @@
 }
 
 .audit-target {
-    color: #059669;
+    color: var(--color-emerald-600);
     font-weight: var(--font-weight-semibold);
 }
 
@@ -722,7 +722,7 @@
     right: 0;
     bottom: 0;
     z-index: -1;
-    background: linear-gradient(135deg, var(--color-gray-50) 0%, #eff6ff 25%, #dbeafe 50%, #eff6ff 75%, var(--color-gray-50) 100%);
+    background: linear-gradient(135deg, var(--color-gray-50) 0%, var(--color-blue-50) 25%, var(--color-blue-100) 50%, var(--color-blue-50) 75%, var(--color-gray-50) 100%);
 }
 
 .org-members-bg::before {
@@ -815,7 +815,7 @@
 }
 
 .org-members-nav-link.active {
-    background: linear-gradient(135deg, var(--color-info) 0%, #2563eb 100%);
+    background: linear-gradient(135deg, var(--color-info) 0%, var(--color-blue-600) 100%);
     color: white;
     border-color: transparent;
 }
@@ -899,7 +899,7 @@
     width: 52px;
     height: 52px;
     border-radius: var(--radius-full);
-    background: linear-gradient(135deg, var(--color-info), #2563eb);
+    background: linear-gradient(135deg, var(--color-info), var(--color-blue-600));
     display: flex;
     align-items: center;
     justify-content: center;
@@ -917,11 +917,11 @@
 }
 
 .member-avatar.owner {
-    background: linear-gradient(135deg, var(--color-warning), #d97706);
+    background: linear-gradient(135deg, var(--color-warning), var(--color-amber-600));
 }
 
 .member-avatar.admin {
-    background: linear-gradient(135deg, var(--color-purple-500), #7c3aed);
+    background: linear-gradient(135deg, var(--color-purple-500), var(--color-purple-600));
 }
 
 .member-info {
@@ -964,12 +964,12 @@
 
 .member-role-badge.owner {
     background: rgba(251, 191, 36, 0.2);
-    color: #b45309;
+    color: var(--color-amber-700);
 }
 
 .member-role-badge.admin {
     background: rgba(139, 92, 246, 0.2);
-    color: #7c3aed;
+    color: var(--color-purple-600);
 }
 
 .member-role-badge.member {
@@ -984,7 +984,7 @@
 
 [data-theme="dark"] .member-role-badge.admin {
     background: rgba(139, 92, 246, 0.3);
-    color: #a78bfa;
+    color: var(--color-purple-400-alt);
 }
 
 [data-theme="dark"] .member-role-badge.member {
@@ -1013,7 +1013,7 @@
 
 .member-action-btn.promote {
     background: rgba(139, 92, 246, 0.1);
-    color: #7c3aed;
+    color: var(--color-purple-600);
 }
 
 .member-action-btn.promote:hover {
@@ -1094,7 +1094,7 @@
 
 .pay-modal-header {
     padding: 20px 24px;
-    background: linear-gradient(135deg, var(--color-success) 0%, #059669 100%);
+    background: linear-gradient(135deg, var(--color-success) 0%, var(--color-emerald-600) 100%);
     color: white;
     display: flex;
     align-items: center;
@@ -1147,7 +1147,7 @@
     width: 48px;
     height: 48px;
     border-radius: var(--radius-full);
-    background: linear-gradient(135deg, var(--color-info), #2563eb);
+    background: linear-gradient(135deg, var(--color-info), var(--color-blue-600));
     display: flex;
     align-items: center;
     justify-content: center;
@@ -1265,7 +1265,7 @@
 .pay-btn-submit {
     flex: 2;
     padding: 14px;
-    background: linear-gradient(135deg, var(--color-success) 0%, #059669 100%);
+    background: linear-gradient(135deg, var(--color-success) 0%, var(--color-emerald-600) 100%);
     color: white;
     border: none;
     border-radius: var(--radius-md);
@@ -1321,7 +1321,7 @@
 }
 
 .pending-btn.approve {
-    background: linear-gradient(135deg, var(--color-success) 0%, #059669 100%);
+    background: linear-gradient(135deg, var(--color-success) 0%, var(--color-emerald-600) 100%);
     color: white;
 }
 
@@ -1439,7 +1439,7 @@
     right: 0;
     bottom: 0;
     z-index: -1;
-    background: linear-gradient(135deg, var(--color-gray-50) 0%, #fef3c7 25%, #fde68a 50%, #fef3c7 75%, var(--color-gray-50) 100%);
+    background: linear-gradient(135deg, var(--color-gray-50) 0%, var(--color-amber-100) 25%, var(--color-amber-200) 50%, var(--color-amber-100) 75%, var(--color-gray-50) 100%);
 }
 
 .requests-bg::before {
@@ -1524,7 +1524,7 @@
 }
 
 .requests-nav-link.active {
-    background: linear-gradient(135deg, var(--color-warning) 0%, #d97706 100%);
+    background: linear-gradient(135deg, var(--color-warning) 0%, var(--color-amber-600) 100%);
     color: white;
     border-color: transparent;
 }
@@ -1582,7 +1582,7 @@
 }
 
 .filter-tab.active {
-    background: linear-gradient(135deg, var(--color-warning) 0%, #d97706 100%);
+    background: linear-gradient(135deg, var(--color-warning) 0%, var(--color-amber-600) 100%);
     color: white;
     border-color: transparent;
 }
@@ -1647,7 +1647,7 @@
     width: 36px;
     height: 36px;
     border-radius: var(--radius-full);
-    background: linear-gradient(135deg, var(--color-warning), #d97706);
+    background: linear-gradient(135deg, var(--color-warning), var(--color-amber-600));
     display: flex;
     align-items: center;
     justify-content: center;
@@ -1680,17 +1680,17 @@
 
 .status-badge.pending {
     background: rgba(251, 191, 36, 0.2);
-    color: #b45309;
+    color: var(--color-amber-700);
 }
 
 .status-badge.approved {
     background: rgba(16, 185, 129, 0.2);
-    color: #047857;
+    color: var(--color-emerald-700);
 }
 
 .status-badge.rejected {
     background: rgba(239, 68, 68, 0.2);
-    color: #dc2626;
+    color: var(--color-red-600);
 }
 
 .status-badge.cancelled {
@@ -1705,12 +1705,12 @@
 
 [data-theme="dark"] .status-badge.approved {
     background: rgba(16, 185, 129, 0.3);
-    color: #34d399;
+    color: var(--color-emerald-400);
 }
 
 [data-theme="dark"] .status-badge.rejected {
     background: rgba(239, 68, 68, 0.3);
-    color: #f87171;
+    color: var(--color-red-400);
 }
 
 /* Amount */
@@ -1753,7 +1753,7 @@
 }
 
 .request-btn.approve {
-    background: linear-gradient(135deg, var(--color-success) 0%, #059669 100%);
+    background: linear-gradient(135deg, var(--color-success) 0%, var(--color-emerald-600) 100%);
     color: white;
 }
 
@@ -1811,7 +1811,7 @@
 }
 
 .pagination-btn.active {
-    background: linear-gradient(135deg, var(--color-warning) 0%, #d97706 100%);
+    background: linear-gradient(135deg, var(--color-warning) 0%, var(--color-amber-600) 100%);
     color: white;
     border-color: transparent;
 }
@@ -1894,7 +1894,7 @@
     right: 0;
     bottom: 0;
     z-index: -1;
-    background: linear-gradient(135deg, var(--color-gray-50) 0%, #ecfdf5 25%, #d1fae5 50%, #ecfdf5 75%, var(--color-gray-50) 100%);
+    background: linear-gradient(135deg, var(--color-gray-50) 0%, var(--color-emerald-50) 25%, var(--color-emerald-100) 50%, var(--color-emerald-50) 75%, var(--color-gray-50) 100%);
 }
 
 .org-wallet-bg::before {
@@ -1964,7 +1964,7 @@
 
 .org-wallet-badge {
     padding: 6px 12px;
-    background: linear-gradient(135deg, var(--color-success) 0%, #059669 100%);
+    background: linear-gradient(135deg, var(--color-success) 0%, var(--color-emerald-600) 100%);
     color: white;
     font-size: 0.75rem;
     font-weight: var(--font-weight-semibold);
@@ -2000,7 +2000,7 @@
 }
 
 .org-wallet-nav-link.active {
-    background: linear-gradient(135deg, var(--color-success) 0%, #059669 100%);
+    background: linear-gradient(135deg, var(--color-success) 0%, var(--color-emerald-600) 100%);
     color: white;
     border-color: transparent;
 }
@@ -2049,7 +2049,7 @@
 }
 
 .org-stat-card.balance {
-    background: linear-gradient(135deg, var(--color-success) 0%, #059669 50%, #047857 100%);
+    background: linear-gradient(135deg, var(--color-success) 0%, var(--color-emerald-600) 50%, var(--color-emerald-700) 100%);
     border: none;
     color: white;
 }
@@ -2211,7 +2211,7 @@
 .org-submit-btn {
     width: 100%;
     padding: 14px;
-    background: linear-gradient(135deg, var(--color-success) 0%, #059669 100%);
+    background: linear-gradient(135deg, var(--color-success) 0%, var(--color-emerald-600) 100%);
     color: white;
     font-weight: var(--font-weight-bold);
     font-size: 1rem;
@@ -2293,7 +2293,7 @@
     width: 36px;
     height: 36px;
     border-radius: var(--radius-full);
-    background: linear-gradient(135deg, var(--color-success), #059669);
+    background: linear-gradient(135deg, var(--color-success), var(--color-emerald-600));
     display: flex;
     align-items: center;
     justify-content: center;
@@ -2393,7 +2393,7 @@
     width: 44px;
     height: 44px;
     border-radius: var(--radius-full);
-    background: linear-gradient(135deg, var(--color-warning), #d97706);
+    background: linear-gradient(135deg, var(--color-warning), var(--color-amber-600));
     display: flex;
     align-items: center;
     justify-content: center;
@@ -2452,7 +2452,7 @@
 }
 
 .org-request-btn.approve {
-    background: linear-gradient(135deg, var(--color-success) 0%, #059669 100%);
+    background: linear-gradient(135deg, var(--color-success) 0%, var(--color-emerald-600) 100%);
     color: white;
 }
 
@@ -2651,7 +2651,7 @@
 
 .org-role-badge.owner {
     background: rgba(251, 191, 36, 0.2);
-    color: #b45309;
+    color: var(--color-amber-700);
 }
 
 .org-role-badge.admin {

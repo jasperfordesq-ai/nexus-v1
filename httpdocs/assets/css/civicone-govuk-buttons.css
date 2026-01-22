@@ -7,12 +7,13 @@
  * See: docs/CIVICONE_WCAG21AA_SOURCE_OF_TRUTH.md
  *
  * GOV.UK Button Specifications:
- * - Primary: Green (#00703c) with white text
- * - Secondary: Grey (#f3f2f1) with black text
- * - Warning: Red (#d4351c) with white text
+ * - Primary: Green (var(--color-govuk-green)) with white text
+ * - Secondary: Grey (var(--color-neutral-50)) with black text
+ * - Warning: Red (var(--color-govuk-red)) with white text
  * - Minimum touch target: 44x44px
  * - Bottom shadow for 3D effect
  * - Focus: Yellow background + black text
+  * Fully Migrated to Design Tokens: 2026-01-21 ✓
  */
 
 /* ===========================================
@@ -20,28 +21,28 @@
    =========================================== */
 :root {
     /* Primary button (green) */
-    --govuk-button-background: #00703c;
-    --govuk-button-background-hover: #005a30;
+    --govuk-button-background: var(--color-govuk-green);
+    --govuk-button-background-hover: var(--color-govuk-green-dark);
     --govuk-button-shadow: #002d18;
 
     /* Secondary button (grey) */
-    --govuk-button-secondary-background: #f3f2f1;
+    --govuk-button-secondary-background: var(--color-neutral-50);
     --govuk-button-secondary-background-hover: #dbdad9;
     --govuk-button-secondary-shadow: #929191;
-    --govuk-button-secondary-text: #0b0c0c;
+    --govuk-button-secondary-text: var(--color-govuk-black);
 
     /* Warning button (red) */
-    --govuk-button-warning-background: #d4351c;
+    --govuk-button-warning-background: var(--color-govuk-red);
     --govuk-button-warning-background-hover: #aa2a16;
     --govuk-button-warning-shadow: #55150b;
 
     /* Inverse button (for dark backgrounds) */
-    --govuk-button-inverse-background: #ffffff;
+    --govuk-button-inverse-background: var(--color-white);
     --govuk-button-inverse-background-hover: #e8e8e8;
     --govuk-button-inverse-shadow: #595959;
 
     /* Button text colors */
-    --govuk-button-text: #ffffff;
+    --govuk-button-text: var(--color-white);
 
     /* CivicOne aliases */
     --civicone-button-primary: var(--govuk-button-background);
@@ -130,9 +131,9 @@
 .civicone .govuk-button:focus,
 .civicone .govuk-button:focus-visible {
     outline: 3px solid transparent;
-    background-color: var(--govuk-focus-colour, #ffdd00);
-    box-shadow: 0 2px 0 var(--govuk-focus-text-colour, #0b0c0c);
-    color: var(--govuk-focus-text-colour, #0b0c0c);
+    background-color: var(--govuk-focus-colour, var(--color-brand-yellow));
+    box-shadow: 0 2px 0 var(--govuk-focus-text-colour, var(--color-govuk-black));
+    color: var(--govuk-focus-text-colour, var(--color-govuk-black));
 }
 
 /* Disabled state */
@@ -168,8 +169,8 @@
 .civic-button--secondary:focus-visible,
 [data-layout="civicone"] .govuk-button--secondary:focus,
 .civicone .govuk-button--secondary:focus {
-    background-color: var(--govuk-focus-colour, #ffdd00);
-    color: var(--govuk-focus-text-colour, #0b0c0c);
+    background-color: var(--govuk-focus-colour, var(--color-brand-yellow));
+    color: var(--govuk-focus-text-colour, var(--color-govuk-black));
 }
 
 /* ===========================================
@@ -194,8 +195,8 @@
 .civic-button--warning:focus-visible,
 [data-layout="civicone"] .govuk-button--warning:focus,
 .civicone .govuk-button--warning:focus {
-    background-color: var(--govuk-focus-colour, #ffdd00);
-    color: var(--govuk-focus-text-colour, #0b0c0c);
+    background-color: var(--govuk-focus-colour, var(--color-brand-yellow));
+    color: var(--govuk-focus-text-colour, var(--color-govuk-black));
 }
 
 /* ===========================================
@@ -358,14 +359,14 @@ a.civic-button--secondary:visited,
     height: var(--space-5);
     margin: calc(var(--space-3) * -1) 0 0 calc(var(--space-3) * -1);
     border: 2px solid rgba(255, 255, 255, 0.3);
-    border-top-color: #ffffff;
+    border-top-color: var(--color-white);
     border-radius: var(--radius-full);
     animation: civic-button-spin 0.8s linear infinite;
 }
 
 .civic-button--secondary.civic-button--loading::after {
     border-color: rgba(11, 12, 12, 0.3);
-    border-top-color: #0b0c0c;
+    border-top-color: var(--color-govuk-black);
 }
 
 @keyframes civic-button-spin {
@@ -380,7 +381,7 @@ a.civic-button--secondary:visited,
 body.dark-mode .civic-button--secondary,
 body.dark-mode [data-layout="civicone"] .govuk-button--secondary {
     background-color: #383f43;
-    color: #ffffff;
+    color: var(--color-white);
     box-shadow: 0 2px 0 #1d1d1d;
 }
 
@@ -396,8 +397,8 @@ body.dark-mode [data-layout="civicone"] .govuk-button--secondary:hover {
     .civic-button,
     [data-layout="civicone"] .govuk-button {
         background-color: transparent !important;
-        color: #000000 !important;
-        border: 2px solid #000000;
+        color: var(--color-black) !important;
+        border: 2px solid var(--color-black);
         box-shadow: none;
     }
 }

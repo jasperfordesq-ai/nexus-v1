@@ -1,6 +1,10 @@
 <?php
-// CivicOne View: Resources Index - WCAG 2.1 AA Compliant
-// CSS extracted to civicone-mini-modules.css
+/**
+ * CivicOne Resources Index - Resource Library Directory
+ * Template A: Directory/List (Section 10.3)
+ * List view of community resources with file metadata
+ * WCAG 2.1 AA Compliant
+ */
 $heroTitle = "Resource Library";
 $heroSub = "Tools, guides, and documents for the community.";
 $heroType = 'Library';
@@ -8,7 +12,10 @@ $heroType = 'Library';
 require dirname(__DIR__, 2) . '/layouts/civicone/header.php';
 ?>
 
-<div class="civic-container">
+<!-- GOV.UK Page Template Boilerplate (Section 10.0) -->
+<div class="civicone-width-container">
+    <main class="civicone-main-wrapper" id="main-content">
+        <div class="civic-container">
 
     <div class="civic-module-header">
         <h2>Community Files</h2>
@@ -58,6 +65,8 @@ require dirname(__DIR__, 2) . '/layouts/civicone/header.php';
         </div>
     <?php endif; ?>
 
-</div>
+        </div>
+    </main>
+</div><!-- /civicone-width-container -->
 
 <?php require dirname(__DIR__, 2) . '/layouts/civicone/footer.php'; ?>

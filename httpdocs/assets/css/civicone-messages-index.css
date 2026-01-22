@@ -1,0 +1,267 @@
+/**
+ * CivicOne Messages Index Page Styles
+ * Template G: Account Area (Section 10.7)
+ * Inbox view with thread list
+ * WCAG 2.1 AA Compliant
+ */
+
+.nexus-skin-civicone {
+
+    /* ==========================================
+       Messages Page Layout
+       ========================================== */
+
+    .civicone-messages-container {
+        max-width: 960px;
+        margin: 0 auto;
+        padding: var(--space-6) var(--space-4);
+    }
+
+    /* ==========================================
+       Page Header
+       ========================================== */
+
+    .civicone-messages-header {
+        margin-bottom: var(--space-6);
+        padding-bottom: var(--space-3);
+        border-bottom: 4px solid var(--civicone-brand);
+    }
+
+    .civicone-messages-header h1 {
+        margin: 0;
+        font-size: 2rem;
+        font-weight: 700;
+        color: var(--civicone-text-main);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    /* ==========================================
+       Empty State
+       ========================================== */
+
+    .civicone-messages-empty {
+        text-align: center;
+        padding: var(--space-8) var(--space-4);
+        background: var(--color-gray-50);
+        border-radius: var(--radius-2);
+        border: 2px dashed var(--color-gray-300);
+    }
+
+    [data-theme="dark"] .civicone-messages-empty {
+        background: var(--color-gray-800);
+        border-color: var(--color-gray-600);
+    }
+
+    .civicone-messages-empty-icon {
+        font-size: 3rem;
+        color: var(--civicone-text-muted);
+        margin-bottom: var(--space-3);
+    }
+
+    .civicone-messages-empty p {
+        color: var(--civicone-text-muted);
+        font-size: 1.125rem;
+        margin: 0 0 var(--space-4) 0;
+    }
+
+    /* ==========================================
+       Thread List
+       ========================================== */
+
+    .civicone-thread-list {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 0;
+    }
+
+    .civicone-thread-item {
+        border-bottom: 1px solid var(--color-gray-200);
+        transition: background 0.2s ease;
+    }
+
+    .civicone-thread-item:last-child {
+        border-bottom: none;
+    }
+
+    .civicone-thread-item--unread {
+        background: var(--color-success-light);
+    }
+
+    [data-theme="dark"] .civicone-thread-item {
+        border-bottom-color: var(--color-gray-700);
+    }
+
+    [data-theme="dark"] .civicone-thread-item--unread {
+        background: rgba(16, 185, 129, 0.15);
+    }
+
+    /* ==========================================
+       Thread Link
+       ========================================== */
+
+    .civicone-thread-link {
+        display: block;
+        padding: var(--space-4);
+        text-decoration: none;
+        color: inherit;
+        min-height: 80px;
+        transition: all 0.2s ease;
+    }
+
+    .civicone-thread-link:hover {
+        background: var(--color-gray-50);
+        text-decoration: none;
+    }
+
+    .civicone-thread-link:focus {
+        outline: 3px solid var(--color-focus);
+        outline-offset: -3px;
+        background: var(--color-focus);
+        color: var(--color-focus-text);
+        z-index: 1;
+        position: relative;
+    }
+
+    [data-theme="dark"] .civicone-thread-link:hover {
+        background: var(--color-gray-800);
+    }
+
+    /* ==========================================
+       Thread Content
+       ========================================== */
+
+    .civicone-thread-content {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: var(--space-4);
+    }
+
+    .civicone-thread-info {
+        flex: 1;
+        min-width: 0; /* Allow text truncation */
+    }
+
+    .civicone-thread-name {
+        font-size: 1rem;
+        font-weight: 600;
+        color: var(--civicone-text-main);
+        margin-bottom: var(--space-2);
+    }
+
+    .civicone-thread-name--unread {
+        font-weight: 700;
+        color: var(--civicone-brand);
+    }
+
+    .civicone-thread-preview {
+        font-size: 0.875rem;
+        color: var(--civicone-text-muted);
+        line-height: 1.4;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .civicone-thread-preview--unread {
+        font-weight: 600;
+        color: var(--civicone-text-main);
+    }
+
+    /* ==========================================
+       Thread Meta (Badge + Date)
+       ========================================== */
+
+    .civicone-thread-meta {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+        gap: var(--space-2);
+        flex-shrink: 0;
+    }
+
+    .civicone-thread-badge {
+        display: inline-block;
+        padding: var(--space-1) var(--space-2);
+        background: var(--civicone-brand);
+        color: var(--civicone-text-inverse);
+        border-radius: var(--radius-2);
+        font-size: 0.75rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .civicone-thread-date {
+        font-size: 0.875rem;
+        color: var(--civicone-text-muted);
+        white-space: nowrap;
+    }
+
+    /* ==========================================
+       Mobile Responsive
+       ========================================== */
+
+    @media (max-width: 768px) {
+        .civicone-messages-container {
+            padding: var(--space-4) var(--space-3);
+        }
+
+        .civicone-messages-header h1 {
+            font-size: 1.5rem;
+        }
+
+        .civicone-thread-content {
+            flex-direction: column;
+            gap: var(--space-2);
+        }
+
+        .civicone-thread-meta {
+            flex-direction: row;
+            align-items: center;
+            align-self: stretch;
+            justify-content: space-between;
+        }
+
+        .civicone-thread-link {
+            min-height: 88px; /* Larger touch target on mobile */
+        }
+
+        .civicone-thread-preview {
+            white-space: normal;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+        }
+    }
+
+    /* ==========================================
+       Touch Target Accessibility
+       ========================================== */
+
+    @media (max-width: 768px) {
+        .civicone-thread-link {
+            min-height: 88px;
+        }
+    }
+
+    /* Ensure adequate spacing for touch */
+    .civicone-thread-link {
+        position: relative;
+    }
+
+    .civicone-thread-link::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        min-height: 44px;
+    }
+
+}

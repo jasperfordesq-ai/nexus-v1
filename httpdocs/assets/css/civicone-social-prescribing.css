@@ -1,0 +1,208 @@
+/**
+ * CivicOne Social Prescribing Page
+ * Template E: Content/Article (Section 10.6)
+ * Tenant-specific: Hour Timebank only
+ * Social prescribing partnership information
+ * WCAG 2.1 AA Compliant
+ */
+
+.nexus-skin-civicone {
+    /* Hero Section */
+    .social-prescribing-hero {
+        margin-bottom: var(--space-10);
+        text-align: center;
+        padding: var(--space-10);
+    }
+
+    .social-prescribing-hero h1 {
+        margin-top: 0;
+        margin-bottom: var(--space-4);
+        color: var(--civicone-brand);
+    }
+
+    .social-prescribing-hero p {
+        font-size: var(--font-size-xl);
+        color: var(--civicone-text-muted);
+        max-width: 800px;
+        margin: 0 auto;
+        line-height: 1.6;
+    }
+
+    /* Outcomes Section */
+    .social-prescribing-outcomes {
+        padding: var(--space-12);
+        margin-bottom: var(--space-12);
+    }
+
+    .social-prescribing-outcomes-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: var(--space-12);
+        align-items: center;
+    }
+
+    @media (max-width: 768px) {
+        .social-prescribing-outcomes-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    .social-prescribing-outcomes h2 {
+        color: var(--civicone-brand);
+        margin-top: 0;
+        margin-bottom: var(--space-5);
+    }
+
+    .social-prescribing-outcomes-list {
+        list-style: none;
+        padding: 0;
+        font-size: var(--font-size-lg);
+        color: var(--civicone-text-muted);
+    }
+
+    .social-prescribing-outcomes-list li {
+        margin-bottom: var(--space-5);
+        position: relative;
+        padding-left: 30px;
+    }
+
+    .social-prescribing-outcomes-list .icon {
+        position: absolute;
+        left: 0;
+        color: var(--civicone-brand);
+        font-weight: bold;
+    }
+
+    .social-prescribing-testimonial {
+        background: rgba(37, 99, 235, 0.05);
+        padding: var(--space-8);
+        border-radius: var(--radius-2);
+        border-left: 4px solid var(--civicone-brand);
+    }
+
+    [data-theme="dark"] .social-prescribing-testimonial {
+        background: rgba(37, 99, 235, 0.15);
+    }
+
+    .social-prescribing-testimonial p {
+        font-style: italic;
+        color: var(--civicone-text-muted);
+        font-size: var(--font-size-lg);
+        line-height: 1.6;
+        margin-bottom: var(--space-4);
+    }
+
+    .social-prescribing-testimonial-author {
+        text-align: right;
+        font-weight: bold;
+        color: var(--civicone-brand);
+    }
+
+    .social-prescribing-testimonial-source {
+        text-align: right;
+        font-size: var(--font-size-sm);
+        color: var(--civicone-text-secondary);
+    }
+
+    /* Referral Pathway Section */
+    .social-prescribing-pathway {
+        margin-bottom: var(--space-12);
+    }
+
+    .social-prescribing-pathway h2 {
+        text-align: center;
+        margin-bottom: var(--space-10);
+        color: var(--civicone-text);
+    }
+
+    .social-prescribing-pathway-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: var(--space-5);
+    }
+
+    @media (max-width: 1024px) {
+        .social-prescribing-pathway-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+
+    @media (max-width: 640px) {
+        .social-prescribing-pathway-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    .social-prescribing-pathway-step {
+        text-align: center;
+        padding: var(--space-8);
+        position: relative;
+        padding-top: 50px;
+    }
+
+    .social-prescribing-pathway-step-number {
+        position: absolute;
+        top: -20px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 40px;
+        height: 40px;
+        background: var(--civicone-brand);
+        color: white;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    [data-theme="dark"] .social-prescribing-pathway-step-number {
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+    }
+
+    .social-prescribing-pathway-step h3 {
+        color: var(--civicone-text);
+        margin-bottom: var(--space-4);
+    }
+
+    .social-prescribing-pathway-step p {
+        color: var(--civicone-text-muted);
+        font-size: var(--font-size-base);
+        line-height: 1.5;
+    }
+
+    /* CTA Section */
+    .social-prescribing-cta {
+        text-align: center;
+        padding: var(--space-14);
+    }
+
+    .social-prescribing-cta h2 {
+        color: var(--civicone-text);
+        margin-top: 0;
+        margin-bottom: var(--space-5);
+    }
+
+    .social-prescribing-cta p {
+        font-size: var(--font-size-lg);
+        color: var(--civicone-text-muted);
+        max-width: 700px;
+        margin: 0 auto var(--space-8) auto;
+        line-height: 1.6;
+    }
+
+    @media (max-width: 768px) {
+        .social-prescribing-hero {
+            padding: var(--space-8);
+        }
+
+        .social-prescribing-outcomes {
+            padding: var(--space-8);
+        }
+
+        .social-prescribing-cta {
+            padding: var(--space-10);
+        }
+    }
+}

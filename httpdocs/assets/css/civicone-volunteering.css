@@ -9,9 +9,9 @@
    -------------------------------------------- */
 :root {
     /* Text Colors (4.5:1+ contrast on white) */
-    --civic-vol-text-primary: #111827;       /* 12.6:1 */
-    --civic-vol-text-secondary: #374151;     /* 8.5:1 */
-    --civic-vol-text-muted: #4B5563;         /* 7.0:1 */
+    --civic-vol-text-primary: var(--color-gray-900);       /* 12.6:1 */
+    --civic-vol-text-secondary: var(--color-gray-700);     /* 8.5:1 */
+    --civic-vol-text-muted: var(--color-gray-600);         /* 7.0:1 */
 
     /* Brand/Action Colors (WCAG AA) */
     --civic-vol-brand: #0F766E;              /* Teal 700 - 5.8:1 */
@@ -20,12 +20,12 @@
 
     /* Status Colors (WCAG AA) */
     --civic-vol-success: #047857;            /* 5.3:1 */
-    --civic-vol-success-bg: #ECFDF5;
-    --civic-vol-info: #1D4ED8;               /* 6.3:1 */
-    --civic-vol-info-bg: #DBEAFE;
+    --civic-vol-success-bg: var(--color-emerald-50);
+    --civic-vol-info: var(--color-blue-700);               /* 6.3:1 */
+    --civic-vol-info-bg: var(--color-blue-100);
 
     /* Focus Ring */
-    --civic-vol-focus-ring: #FFDD00;         /* GOV.UK focus */
+    --civic-vol-focus-ring: var(--color-brand-yellow);         /* GOV.UK focus */
     --civic-vol-focus-text: #0B0C0C;
     --civic-vol-focus-offset: 3px;
 
@@ -33,22 +33,22 @@
     --civic-vol-touch-min: 44px;
 
     /* Borders */
-    --civic-vol-border: #E5E7EB;
+    --civic-vol-border: var(--color-gray-200);
 }
 
 /* Dark mode tokens */
 [data-theme="dark"] {
-    --civic-vol-text-primary: #F9FAFB;
-    --civic-vol-text-secondary: #E5E7EB;
-    --civic-vol-text-muted: #D1D5DB;
+    --civic-vol-text-primary: var(--color-gray-50);
+    --civic-vol-text-secondary: var(--color-gray-200);
+    --civic-vol-text-muted: var(--color-gray-300);
     --civic-vol-brand: #5EEAD4;
     --civic-vol-brand-hover: #99F6E4;
     --civic-vol-brand-light: rgba(94, 234, 212, 0.15);
     --civic-vol-success: #34D399;
     --civic-vol-success-bg: rgba(16, 185, 129, 0.15);
-    --civic-vol-info: #60A5FA;
+    --civic-vol-info: var(--color-blue-400);
     --civic-vol-info-bg: rgba(59, 130, 246, 0.15);
-    --civic-vol-border: #374151;
+    --civic-vol-border: var(--color-gray-700);
 }
 
 
@@ -164,7 +164,7 @@
 }
 
 [data-theme="dark"] .civic-detail-card {
-    background: #1F2937;
+    background: var(--color-gray-800);
 }
 
 .civic-detail-header {
@@ -253,13 +253,13 @@
     align-items: flex-start;
     gap: var(--space-3);
     padding: var(--space-4);
-    background: var(--civic-bg-page, #F9FAFB);
+    background: var(--civic-bg-page, var(--color-gray-50));
     border-radius: var(--radius-base);
     border: 1px solid var(--civic-vol-border);
 }
 
 [data-theme="dark"] .civic-info-item {
-    background: #111827;
+    background: var(--color-gray-900);
 }
 
 .civic-info-icon {
@@ -303,7 +303,7 @@
 }
 
 [data-theme="dark"] .civic-sidebar-card {
-    background: #1F2937;
+    background: var(--color-gray-800);
 }
 
 .civic-sidebar-org {
@@ -367,7 +367,7 @@
 .civic-alert--info {
     background: var(--civic-vol-info-bg);
     color: var(--civic-vol-info);
-    border: 1px solid #93C5FD;
+    border: 1px solid var(--color-blue-300);
 }
 
 [data-theme="dark"] .civic-alert--info {
@@ -432,12 +432,12 @@
     font-size: var(--font-size-base); /* Prevents iOS zoom */
     font-family: inherit;
     resize: vertical;
-    background: var(--civic-bg-page, #F9FAFB);
+    background: var(--civic-bg-page, var(--color-gray-50));
     color: var(--civic-vol-text-primary);
 }
 
 [data-theme="dark"] .civic-textarea {
-    background: #111827;
+    background: var(--color-gray-900);
 }
 
 .civic-textarea:focus {
@@ -476,12 +476,12 @@
     min-height: var(--civic-vol-touch-min);
     border: 2px solid var(--civic-vol-border);
     border-radius: var(--radius-base);
-    background: var(--civic-bg-page, #F9FAFB);
+    background: var(--civic-bg-page, var(--color-gray-50));
     transition: all 0.2s ease;
 }
 
 [data-theme="dark"] .civic-shift-content {
-    background: #111827;
+    background: var(--color-gray-900);
 }
 
 .civic-shift-option input:checked + .civic-shift-content {
@@ -533,12 +533,12 @@
 .civic-login-prompt {
     text-align: center;
     padding: var(--space-5);
-    background: var(--civic-bg-page, #F9FAFB);
+    background: var(--civic-bg-page, var(--color-gray-50));
     border-radius: var(--radius-base);
 }
 
 [data-theme="dark"] .civic-login-prompt {
-    background: #111827;
+    background: var(--color-gray-900);
 }
 
 .civic-login-prompt .dashicons {
@@ -618,11 +618,11 @@
     flex-direction: column;
     gap: 10px; /* No exact token, closest is space-3 (12px) */
     padding: var(--space-5) 0;
-    border-bottom: 1px solid #b1b4b6;
+    border-bottom: 1px solid var(--color-govuk-grey);
 }
 
 [data-theme="dark"] .civicone--govuk .civicone-opportunity-item {
-    border-bottom-color: #374151;
+    border-bottom-color: var(--color-gray-700);
 }
 
 .civicone--govuk .civicone-opportunity-item:last-child {
@@ -641,22 +641,22 @@
 .civicone--govuk .civicone-opportunity-item__org {
     font-size: var(--font-size-sm);
     font-weight: 600;
-    color: #505a5f;
+    color: var(--color-govuk-grey-dark);
     text-transform: uppercase;
     letter-spacing: 0.05em;
 }
 
 [data-theme="dark"] .civicone--govuk .civicone-opportunity-item__org {
-    color: #b1b4b6;
+    color: var(--color-govuk-grey);
 }
 
 .civicone--govuk .civicone-opportunity-item__posted {
     font-size: var(--font-size-sm);
-    color: #505a5f;
+    color: var(--color-govuk-grey-dark);
 }
 
 [data-theme="dark"] .civicone--govuk .civicone-opportunity-item__posted {
-    color: #b1b4b6;
+    color: var(--color-govuk-grey);
 }
 
 /* Title */
@@ -682,7 +682,7 @@
 }
 
 [data-theme="dark"] .civicone--govuk .civicone-opportunity-item__description {
-    color: #f3f2f1;
+    color: var(--color-neutral-50);
 }
 
 @media (min-width: 641px) {
@@ -704,7 +704,7 @@
     align-items: center;
     gap: 5px; /* No exact token, closest is space-1 (4px) or space-2 (8px) */
     padding: 5px 10px; /* No exact tokens, closest would be space-1/space-3 */
-    background: #f3f2f1;
+    background: var(--color-neutral-50);
     color: #0b0c0c;
     font-size: var(--font-size-sm);
     font-weight: 600;
@@ -712,18 +712,18 @@
 }
 
 [data-theme="dark"] .civicone--govuk .civicone-tag {
-    background: #1f2937;
-    color: #f3f2f1;
+    background: var(--color-gray-800);
+    color: var(--color-neutral-50);
 }
 
 .civicone--govuk .civicone-tag--green {
     background: #00703c;
-    color: #ffffff;
+    color: var(--color-white);
 }
 
 [data-theme="dark"] .civicone--govuk .civicone-tag--green {
     background: #00703c;
-    color: #ffffff;
+    color: var(--color-white);
 }
 
 .civicone--govuk .civicone-tag-icon {
@@ -761,7 +761,7 @@
 }
 
 [data-theme="dark"] .civicone--govuk .civicone-body-s {
-    color: #f3f2f1;
+    color: var(--color-neutral-50);
 }
 
 @media (min-width: 641px) {

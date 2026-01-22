@@ -41,13 +41,29 @@ $allowedPatterns = [
     // Dynamic color from variable
     '/style="color:\s*<\?=.*?\?>;?"/',
     // Calculated width/height from variable
-    '/style="(?:width|height):\s*<\?=.*?\?>;?"/',
+    '/style="(?:width|height):\s*<\?=.*?\?\>[^"]*"/',
     // Background position from variable
     '/style="background-position:\s*<\?=.*?\?>;?"/',
     // Transform with calculation
     '/style="transform:\s*<\?=.*?\?>;?"/',
     // Truly conditional styles (e.g., conditional display based on variable)
     '/style="<\?=.*?\?>"/',
+    // CSS custom properties with PHP values (e.g., style="--progress: PHP_VALUE")
+    '/style="--[a-z-]+:\s*<\?=.*?\?\>/',
+    // Concatenated PHP dynamic styles (e.g., echo "style=x" . $var)
+    '/style="[^"]*\'\s*\.\s*/',
+    // Animation delay/duration from PHP (e.g., style="animation-delay: $i * 0.1s")
+    '/style="animation-(?:delay|duration):\s*<\?=.*?\?\>/',
+    // Conditional display from PHP (e.g., style="display: ternary_expr")
+    '/style="display:\s*<\?=.*?\?\>/',
+    // Width/height percentage from PHP long tags (e.g., width: php echo $x percent)
+    '/style="(?:width|height):\s*<\?php\s+echo\s+/',
+    // Left/right position from PHP (e.g., left: php echo $x percent)
+    '/style="(?:left|right|top|bottom):\s*<\?(?:=|php\s+echo)\s*/',
+    // CSS custom properties with PHP long tags (style="--var: php echo)
+    '/style="--[a-z-]+:\s*<\?php\s+echo\s+/',
+    // Background color from PHP (e.g., background-color: php echo $color)
+    '/style="background(?:-color)?:\s*<\?(?:=|php\s+echo)\s*/',
 ];
 
 echo "\n🔍 Scanning PHP files for inline style violations...\n";

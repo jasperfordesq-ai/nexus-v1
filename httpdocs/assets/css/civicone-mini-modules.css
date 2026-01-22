@@ -9,30 +9,30 @@
    -------------------------------------------- */
 :root {
     /* Text Colors (4.5:1+ contrast on white) */
-    --civic-mini-text-primary: #111827;      /* 12.6:1 */
-    --civic-mini-text-secondary: #374151;    /* 8.5:1 */
-    --civic-mini-text-muted: #4B5563;        /* 7.0:1 */
+    --civic-mini-text-primary: var(--color-gray-900);      /* 12.6:1 */
+    --civic-mini-text-secondary: var(--color-gray-700);    /* 8.5:1 */
+    --civic-mini-text-muted: var(--color-gray-600);        /* 7.0:1 */
 
     /* Focus Ring */
-    --civic-mini-focus-ring: #FFDD00;        /* GOV.UK focus */
-    --civic-mini-focus-text: #0B0C0C;
+    --civic-mini-focus-ring: var(--color-brand-yellow);        /* GOV.UK focus */
+    --civic-mini-focus-text: var(--color-govuk-black);
     --civic-mini-focus-offset: var(--space-1);
 
     /* Touch Target */
     --civic-mini-touch-min: 44px;
 
     /* Borders */
-    --civic-mini-border: #0B0C0C;
-    --civic-mini-border-light: #E5E7EB;
+    --civic-mini-border: var(--color-govuk-black);
+    --civic-mini-border-light: var(--color-gray-200);
 }
 
 /* Dark mode tokens */
 [data-theme="dark"] {
-    --civic-mini-text-primary: #F9FAFB;
-    --civic-mini-text-secondary: #E5E7EB;
-    --civic-mini-text-muted: #D1D5DB;
-    --civic-mini-border: #E5E7EB;
-    --civic-mini-border-light: #374151;
+    --civic-mini-text-primary: var(--color-gray-50);
+    --civic-mini-text-secondary: var(--color-gray-200);
+    --civic-mini-text-muted: var(--color-gray-300);
+    --civic-mini-border: var(--color-gray-200);
+    --civic-mini-border-light: var(--color-gray-700);
 }
 
 
@@ -117,7 +117,7 @@
 }
 
 [data-theme="dark"] .civic-poll-card {
-    background: #1F2937;
+    background: var(--color-gray-800);
 }
 
 .civic-poll-card h3 {
@@ -140,11 +140,11 @@
 
 .civic-poll-card .civic-btn:focus {
     /* GOV.UK Focus Pattern */
-    outline: 3px solid var(--govuk-focus-colour, #ffdd00);
+    outline: 3px solid var(--govuk-focus-colour, var(--color-brand-yellow));
     outline-offset: 0;
-    background-color: var(--govuk-focus-colour, #ffdd00);
-    color: var(--govuk-focus-text-colour, #0b0c0c);
-    box-shadow: 0 -2px var(--govuk-focus-colour, #ffdd00), 0 4px var(--govuk-focus-text-colour, #0b0c0c);
+    background-color: var(--govuk-focus-colour, var(--color-brand-yellow));
+    color: var(--govuk-focus-text-colour, var(--color-govuk-black));
+    box-shadow: 0 -2px var(--govuk-focus-colour, var(--color-brand-yellow)), 0 4px var(--govuk-focus-text-colour, var(--color-govuk-black));
 }
 
 
@@ -158,7 +158,7 @@
 }
 
 [data-theme="dark"] .civic-goal-card {
-    background: #1F2937;
+    background: var(--color-gray-800);
 }
 
 .civic-goal-card h3 {
@@ -176,8 +176,8 @@
 }
 
 [data-theme="dark"] .civic-goal-progress-bar {
-    background: #374151;
-    border-color: #4B5563;
+    background: var(--color-gray-700);
+    border-color: var(--color-gray-600);
 }
 
 .civic-goal-progress-fill {
@@ -187,7 +187,7 @@
 }
 
 [data-theme="dark"] .civic-goal-progress-fill {
-    background: #5EEAD4;
+    background: var(--color-teal-300);
 }
 
 .civic-goal-percent {
@@ -208,8 +208,8 @@
 }
 
 [data-theme="dark"] .civic-goal-btn-outline {
-    background: #1F2937;
-    color: #F9FAFB;
+    background: var(--color-gray-800);
+    color: var(--color-gray-50);
 }
 
 .civic-goal-btn-outline:hover {
@@ -219,11 +219,11 @@
 
 .civic-goal-btn-outline:focus {
     /* GOV.UK Focus Pattern */
-    outline: 3px solid var(--govuk-focus-colour, #ffdd00);
+    outline: 3px solid var(--govuk-focus-colour, var(--color-brand-yellow));
     outline-offset: 0;
-    background-color: var(--govuk-focus-colour, #ffdd00);
-    color: var(--govuk-focus-text-colour, #0b0c0c);
-    box-shadow: 0 -2px var(--govuk-focus-colour, #ffdd00), 0 4px var(--govuk-focus-text-colour, #0b0c0c);
+    background-color: var(--govuk-focus-colour, var(--color-brand-yellow));
+    color: var(--govuk-focus-text-colour, var(--color-govuk-black));
+    box-shadow: 0 -2px var(--govuk-focus-colour, var(--color-brand-yellow)), 0 4px var(--govuk-focus-text-colour, var(--color-govuk-black));
 }
 
 
@@ -240,7 +240,7 @@
 }
 
 [data-theme="dark"] .civic-resource-card {
-    background: #1F2937;
+    background: var(--color-gray-800);
 }
 
 .civic-resource-header {
@@ -264,7 +264,7 @@
 }
 
 [data-theme="dark"] .civic-resource-size {
-    background: #4B5563;
+    background: var(--color-gray-600);
 }
 
 .civic-resource-card h3 {
@@ -302,11 +302,11 @@
 
 .civic-resource-download:focus {
     /* GOV.UK Focus Pattern */
-    outline: 3px solid var(--govuk-focus-colour, #ffdd00);
+    outline: 3px solid var(--govuk-focus-colour, var(--color-brand-yellow));
     outline-offset: 0;
-    background-color: var(--govuk-focus-colour, #ffdd00);
-    color: var(--govuk-focus-text-colour, #0b0c0c);
-    box-shadow: 0 -2px var(--govuk-focus-colour, #ffdd00), 0 4px var(--govuk-focus-text-colour, #0b0c0c);
+    background-color: var(--govuk-focus-colour, var(--color-brand-yellow));
+    color: var(--govuk-focus-text-colour, var(--color-govuk-black));
+    box-shadow: 0 -2px var(--govuk-focus-colour, var(--color-brand-yellow)), 0 4px var(--govuk-focus-text-colour, var(--color-govuk-black));
 }
 
 
@@ -317,11 +317,11 @@
 .civic-goal-card a:focus,
 .civic-resource-card a:focus {
     /* GOV.UK Focus Pattern */
-    outline: 3px solid var(--govuk-focus-colour, #ffdd00);
+    outline: 3px solid var(--govuk-focus-colour, var(--color-brand-yellow));
     outline-offset: 0;
-    background-color: var(--govuk-focus-colour, #ffdd00);
-    color: var(--govuk-focus-text-colour, #0b0c0c);
-    box-shadow: 0 -2px var(--govuk-focus-colour, #ffdd00), 0 4px var(--govuk-focus-text-colour, #0b0c0c);
+    background-color: var(--govuk-focus-colour, var(--color-brand-yellow));
+    color: var(--govuk-focus-text-colour, var(--color-govuk-black));
+    box-shadow: 0 -2px var(--govuk-focus-colour, var(--color-brand-yellow)), 0 4px var(--govuk-focus-text-colour, var(--color-govuk-black));
 }
 
 
@@ -353,4 +353,88 @@
     .civic-goal-btn-outline {
         transition: none;
     }
+}
+
+/* ============================================
+   RESOURCES DOWNLOAD PAGE
+   ============================================ */
+.civic-download-container {
+    max-width: 500px;
+    margin: var(--space-10) auto;
+    padding: 0 var(--space-5);
+}
+
+.civic-download-card {
+    background: #fff;
+    border: 4px solid var(--civic-mini-border);
+    padding: var(--space-10);
+    text-align: center;
+}
+
+.civic-download-icon {
+    font-size: 4rem;
+    margin-bottom: var(--space-5);
+}
+
+.civic-resource-download-title {
+    font-size: 1.5rem;
+    font-weight: bold;
+    margin: 0 0 var(--space-2) 0;
+    text-transform: uppercase;
+}
+
+.civic-resource-download-meta {
+    font-size: 0.9rem;
+    color: var(--color-gray-600);
+    margin-bottom: var(--space-8);
+}
+
+.civic-countdown-number {
+    font-size: 4rem;
+    font-weight: 900;
+    margin: var(--space-5) 0;
+}
+
+.civic-countdown-text {
+    font-size: 1rem;
+    margin-bottom: var(--space-8);
+}
+
+.civic-download-status {
+    font-size: 1rem;
+    font-weight: bold;
+    min-height: 24px;
+    margin-bottom: var(--space-5);
+}
+
+.civic-download-status.success {
+    color: var(--color-success-600);
+}
+
+.civic-download-back-link {
+    display: inline-block;
+    background: var(--civic-mini-border);
+    color: #fff;
+    padding: var(--space-3) var(--space-6);
+    text-decoration: none;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    transition: background 0.2s ease;
+}
+
+.civic-download-back-link:hover {
+    background: var(--color-gray-700);
+}
+
+.civic-download-manual-link {
+    display: block;
+    margin-top: var(--space-5);
+    font-size: 0.85rem;
+    color: var(--color-gray-600);
+}
+
+.civic-download-manual-link a {
+    color: var(--civic-mini-border);
+    text-decoration: underline;
 }

@@ -2,6 +2,7 @@
  * CivicOne Directory Utilities
  * Utility classes for directory/list pages
  * Used by: events, listings, volunteering, members, groups
+  * Fully Migrated to Design Tokens: 2026-01-21 ✓
  */
 
 /* Action Button Row Spacing */
@@ -35,11 +36,11 @@
 
 /* Feed Icon Colors */
 .feed-icon-green {
-    color: #22C55E;
+    color: var(--color-green-500);
 }
 
 .feed-icon-red {
-    color: #EF4444;
+    color: var(--color-danger);
 }
 
 .feed-icon-location {
@@ -70,7 +71,7 @@
 }
 
 .feed-type-request {
-    color: #F59E0B;
+    color: var(--color-warning);
 }
 
 .feed-type-event {
@@ -78,11 +79,11 @@
 }
 
 .feed-type-goal {
-    color: #22C55E;
+    color: var(--color-green-500);
 }
 
 .feed-type-poll {
-    color: #3B82F6;
+    color: var(--color-info);
 }
 
 /* Feed Event Layout */
@@ -99,7 +100,7 @@
 }
 
 .civic-view-btn--poll {
-    background: #2563eb;
+    background: var(--color-blue-600);
 }
 
 .civic-view-btn--volunteering {
@@ -113,7 +114,7 @@
 
 /* Feed Like Icon */
 .feed-like-icon {
-    color: #D4351C;
+    color: var(--color-govuk-red);
     font-size: 16px;
 }
 
@@ -133,7 +134,7 @@
 
 /* Feed Error Message */
 .feed-error-message {
-    color: #D4351C;
+    color: var(--color-govuk-red);
     text-align: center;
     padding: 16px;
 }

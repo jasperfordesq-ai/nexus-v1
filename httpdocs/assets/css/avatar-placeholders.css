@@ -9,6 +9,7 @@
  * - Smooth fade-in when loaded
  * - Initials fallback styling
  * - Dark mode support
+  * Fully Migrated to Design Tokens: 2026-01-21 ✓
  */
 
 /* ==========================================================================
@@ -231,7 +232,7 @@
 .avatar-initials--blue { background: linear-gradient(135deg, var(--color-blue-500), var(--color-blue-700)); }
 
 .avatar-initials[data-color="2"],
-.avatar-initials--purple { background: linear-gradient(135deg, var(--color-purple-500), #6d28d9); }
+.avatar-initials--purple { background: linear-gradient(135deg, var(--color-purple-500), var(--color-purple-700)); }
 
 .avatar-initials[data-color="3"],
 .avatar-initials--pink { background: linear-gradient(135deg, var(--color-pink-500), var(--color-pink-700)); }
@@ -243,7 +244,7 @@
 .avatar-initials--orange { background: linear-gradient(135deg, var(--color-orange-500), var(--color-amber-600)); }
 
 .avatar-initials[data-color="6"],
-.avatar-initials--teal { background: linear-gradient(135deg, #14b8a6, #0d9488); }
+.avatar-initials--teal { background: linear-gradient(135deg, var(--color-teal-500), var(--color-teal-600)); }
 
 .avatar-initials[data-color="7"],
 .avatar-initials--red { background: linear-gradient(135deg, var(--color-red-500), var(--color-red-600)); }

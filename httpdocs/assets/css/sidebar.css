@@ -3,6 +3,7 @@
  * Used on: home.php, and potentially other pages with sidebars
  *
  * Dark mode support via CSS variables from theme
+  * Fully Migrated to Design Tokens: 2026-01-21 ✓
  */
 
 /* ============================================
@@ -15,7 +16,7 @@
 }
 
 .sidebar-card {
-    background: var(--bg-card, #ffffff);
+    background: var(--bg-card, var(--color-white));
     border-radius: var(--radius-xl);
     box-shadow: var(--shadow-sm);
     overflow: hidden;
@@ -23,7 +24,7 @@
 
 .sidebar-card-header {
     padding: var(--space-4);
-    border-bottom: 1px solid var(--border-light, #f1f5f9);
+    border-bottom: 1px solid var(--border-light, var(--color-slate-100));
 }
 
 .sidebar-card-header.sidebar-header-flex {
@@ -36,7 +37,7 @@
     margin: 0;
     font-size: var(--font-size-sm);
     font-weight: var(--font-weight-bold);
-    color: var(--text-primary, #1e293b);
+    color: var(--text-primary, var(--color-slate-800));
     display: flex;
     align-items: center;
     gap: var(--space-2);
@@ -123,7 +124,7 @@
 
 .sidebar-divider {
     width: 1px;
-    background: var(--border-light, #e2e8f0);
+    background: var(--border-light, var(--color-slate-200));
 }
 
 /* Offers/Requests grid */
@@ -214,13 +215,13 @@
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    color: var(--text-primary, #1e293b);
+    color: var(--text-primary, var(--color-slate-800));
     text-decoration: none;
 }
 
 .sidebar-member-location {
     font-size: var(--font-size-xs);
-    color: var(--text-muted, #64748b);
+    color: var(--text-muted, var(--color-slate-500));
 }
 
 /* Member row with border (People You May Know) */
@@ -229,7 +230,7 @@
     align-items: center;
     gap: var(--space-3);
     padding: var(--space-2) 0;
-    border-bottom: 1px solid var(--border-light, #f1f5f9);
+    border-bottom: 1px solid var(--border-light, var(--color-slate-100));
 }
 
 .sidebar-member-row:last-child {
@@ -315,7 +316,7 @@
     font-size: var(--font-size-xs);
     text-transform: uppercase;
     letter-spacing: 0.5px;
-    color: var(--text-muted, #64748b);
+    color: var(--text-muted, var(--color-slate-500));
 }
 
 /* ============================================
@@ -371,12 +372,12 @@
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    color: var(--text-primary, #1e293b);
+    color: var(--text-primary, var(--color-slate-800));
 }
 
 .sidebar-listing-author {
     font-size: var(--font-size-xs);
-    color: var(--text-muted, #64748b);
+    color: var(--text-muted, var(--color-slate-500));
 }
 
 .sidebar-listing-badge {
@@ -570,7 +571,7 @@
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    color: var(--text-primary, #1e293b);
+    color: var(--text-primary, var(--color-slate-800));
 }
 
 .sidebar-event-meta {
@@ -579,7 +580,7 @@
     gap: var(--space-1);
     font-size: var(--font-size-xs);
     margin-top: var(--space-1);
-    color: var(--text-muted, #64748b);
+    color: var(--text-muted, var(--color-slate-500));
 }
 
 /* ============================================
@@ -604,7 +605,7 @@
     width: var(--space-12);
     height: var(--space-12);
     border-radius: var(--radius-md);
-    background: linear-gradient(135deg, var(--color-warning), #d97706);
+    background: linear-gradient(135deg, var(--color-warning), var(--color-amber-600));
     display: flex;
     align-items: center;
     justify-content: center;
@@ -635,12 +636,12 @@
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    color: var(--text-primary, #1e293b);
+    color: var(--text-primary, var(--color-slate-800));
 }
 
 .sidebar-group-desc {
     font-size: var(--font-size-xs);
-    color: var(--text-muted, #64748b);
+    color: var(--text-muted, var(--color-slate-500));
 }
 
 /* ============================================
@@ -730,7 +731,7 @@
 .sidebar-action-label {
     font-size: var(--font-size-xs);
     font-weight: var(--font-weight-semibold);
-    color: var(--text-primary, #1e293b);
+    color: var(--text-primary, var(--color-slate-800));
 }
 
 /* ============================================
@@ -739,7 +740,7 @@
 .sidebar-footer {
     text-align: center;
     padding: var(--space-4);
-    color: #94a3b8;
+    color: var(--color-slate-400);
     font-size: var(--font-size-xs);
 }
 
@@ -754,11 +755,11 @@
 }
 
 .sidebar-footer-social a {
-    color: #94a3b8;
+    color: var(--color-slate-400);
 }
 
 .sidebar-footer-social a:hover {
-    color: #64748b;
+    color: var(--color-slate-500);
 }
 
 .sidebar-footer-social i {
@@ -789,15 +790,15 @@
    UTILITY CLASSES (theme-aware)
    ============================================ */
 .sidebar-text-dark {
-    color: var(--text-primary, #1e293b);
+    color: var(--text-primary, var(--color-slate-800));
 }
 
 .sidebar-text-muted {
-    color: var(--text-muted, #64748b);
+    color: var(--text-muted, var(--color-slate-500));
 }
 
 .sidebar-border-light {
-    border-color: var(--border-light, #f1f5f9);
+    border-color: var(--border-light, var(--color-slate-100));
 }
 
 /* ============================================

@@ -138,10 +138,12 @@ class MemberController
 
         if ($cachedCount && (time() - $cacheTime) < 300) {
             $totalMembers = $cachedCount;
+            error_log("MemberController: Using cached count: {$totalMembers} for tenant {$tenantId}");
         } else {
             $totalMembers = User::count();
             $_SESSION[$cacheKey] = $totalMembers;
             $_SESSION["{$cacheKey}_time"] = time();
+            error_log("MemberController: Fresh count: {$totalMembers} for tenant {$tenantId}");
         }
 
         // Fetch organization leadership roles for displayed members

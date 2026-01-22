@@ -10,41 +10,41 @@
 
     /* Page Background - Warm off-white */
     --civic-bg-page: #FAFAF9;
-    --civic-bg-card: #FFFFFF;
+    --civic-bg-card: var(--color-white);
 
     /* Text - Softer than pure black */
-    --civic-text-main: #1F2937;
+    --civic-text-main: var(--color-gray-800);
     /* Charcoal - 12.6:1 on white */
-    --civic-text-secondary: #4B5563;
+    --civic-text-secondary: var(--color-gray-600);
     /* Warm grey - 7:1 on white */
-    --civic-text-muted: #6B7280;
+    --civic-text-muted: var(--color-gray-500);
     /* For metadata - 5.4:1 */
 
     /* Primary Brand - Friendly Community Blue */
-    --civic-brand: #2563EB;
+    --civic-brand: var(--color-blue-600);
     /* 4.5:1 on white */
-    --civic-brand-hover: #1D4ED8;
-    --civic-brand-light: #DBEAFE;
+    --civic-brand-hover: var(--color-blue-700);
+    --civic-brand-light: var(--color-blue-100);
     /* Tinted backgrounds */
 
     /* Accent Colors - Warm & Approachable */
-    --civic-accent-green: #059669;
+    --civic-accent-green: var(--color-emerald-600);
     /* Success/Offers - 4.5:1 */
-    --civic-accent-amber: #D97706;
+    --civic-accent-amber: var(--color-amber-600);
     /* Warmth/Requests - 4.5:1 */
-    --civic-accent-rose: #DB2777;
+    --civic-accent-rose: var(--color-pink-600);
     /* Community/Hubs - 4.5:1 */
-    --civic-accent-purple: #7C3AED;
+    --civic-accent-purple: var(--color-purple-600);
     /* Events - 4.6:1 */
 
     /* Borders - Visible but soft */
-    --civic-border: #D1D5DB;
+    --civic-border: var(--color-gray-300);
     /* 1.5:1 - decorative */
-    --civic-border-strong: #9CA3AF;
+    --civic-border-strong: var(--color-gray-400);
     /* 3:1 - functional */
 
     /* Focus - High visibility */
-    --civic-focus: #FBBF24;
+    --civic-focus: var(--color-amber-300);
     /* Warm yellow */
     --civic-focus-ring: 0 0 0 3px rgba(251, 191, 36, 0.5);
 
@@ -55,16 +55,16 @@
     --civic-radius-lg: var(--radius-lg);
 
     /* Footer - Warm dark */
-    --civic-bg-footer: #1F2937;
-    --civic-footer-text: #E5E7EB;
-    --civic-border-footer: #374151;
+    --civic-bg-footer: var(--color-gray-800);
+    --civic-footer-text: var(--color-gray-200);
+    --civic-border-footer: var(--color-gray-700);
 
     /* Form States */
-    --civic-error: #DC2626;
-    --civic-error-bg: #FEF2F2;
-    --civic-error-border: #DC2626;
-    --civic-success: #059669;
-    --civic-success-bg: #ECFDF5;
+    --civic-error: var(--color-red-600);
+    --civic-error-bg: var(--color-red-50);
+    --civic-error-border: var(--color-red-600);
+    --civic-success: var(--color-emerald-600);
+    --civic-success-bg: var(--color-emerald-50);
 
     /* Shadows - Soft depth */
     --civic-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
@@ -74,39 +74,39 @@
 
 /* Dark Mode Overrides */
 body.dark-mode {
-    --civic-bg-page: #111827;
-    --civic-bg-card: #1F2937;
-    --civic-text-main: #F3F4F6;
-    --civic-text-secondary: #D1D5DB;
-    --civic-text-muted: #9CA3AF;
+    --civic-bg-page: var(--color-gray-900);
+    --civic-bg-card: var(--color-gray-800);
+    --civic-text-main: var(--color-gray-100);
+    --civic-text-secondary: var(--color-gray-300);
+    --civic-text-muted: var(--color-gray-400);
 
     /* Lighter brand for dark backgrounds */
-    --civic-brand: #60A5FA;
-    --civic-brand-hover: #93C5FD;
+    --civic-brand: var(--color-blue-400);
+    --civic-brand-hover: var(--color-blue-300);
     --civic-brand-light: #1E3A5F;
 
     /* Accent colors - lighter for dark mode */
-    --civic-accent-green: #34D399;
-    --civic-accent-amber: #FBBF24;
-    --civic-accent-rose: #F472B6;
-    --civic-accent-purple: #A78BFA;
+    --civic-accent-green: var(--color-emerald-400);
+    --civic-accent-amber: var(--color-amber-300);
+    --civic-accent-rose: var(--color-pink-400);
+    --civic-accent-purple: var(--color-purple-400-alt);
 
     /* Borders */
-    --civic-border: #374151;
-    --civic-border-strong: #4B5563;
+    --civic-border: var(--color-gray-700);
+    --civic-border-strong: var(--color-gray-600);
 
     /* Focus */
-    --civic-focus: #FBBF24;
+    --civic-focus: var(--color-amber-300);
 
     /* Footer */
-    --civic-bg-footer: #0F172A;
-    --civic-footer-text: #E5E7EB;
-    --civic-border-footer: #1E293B;
+    --civic-bg-footer: var(--color-slate-900);
+    --civic-footer-text: var(--color-gray-200);
+    --civic-border-footer: var(--color-slate-800);
 
     /* Form States */
-    --civic-error: #F87171;
+    --civic-error: var(--color-red-400);
     --civic-error-bg: #7F1D1D;
-    --civic-success: #34D399;
+    --civic-success: var(--color-emerald-400);
     --civic-success-bg: #064E3B;
 
     /* Shadows - more subtle in dark mode */
@@ -341,17 +341,17 @@ a:focus {
 }
 
 .civic-card-icon--green {
-    background: #ECFDF5;
+    background: var(--color-emerald-50);
     color: var(--civic-accent-green);
 }
 
 .civic-card-icon--amber {
-    background: #FFFBEB;
+    background: var(--color-amber-50);
     color: var(--civic-accent-amber);
 }
 
 .civic-card-icon--rose {
-    background: #FDF2F8;
+    background: var(--color-pink-50);
     color: var(--civic-accent-rose);
 }
 
@@ -457,7 +457,7 @@ a:focus {
 }
 
 .civic-btn--success:hover {
-    background: #047857;
+    background: var(--color-emerald-700);
 }
 
 /* Warning button - amber */
@@ -467,7 +467,7 @@ a:focus {
 }
 
 .civic-btn--warning:hover {
-    background: #B45309;
+    background: var(--color-amber-700);
 }
 
 /* Danger button - red */
@@ -477,7 +477,7 @@ a:focus {
 }
 
 .civic-btn--danger:hover {
-    background: #B91C1C;
+    background: var(--color-red-700);
 }
 
 /* Small button */
@@ -526,7 +526,7 @@ a:focus {
 
 /* Navigation - CivicOne Header */
 .civic-header {
-    background: #FFFFFF;
+    background: var(--color-white);
     border-bottom: 4px solid var(--civic-brand);
     padding: var(--space-4) 0 84px 0;
     margin-bottom: 0;
@@ -568,7 +568,7 @@ a:focus {
     width: 100%;
     padding: var(--space-2);
     font-size: var(--font-size-lg);
-    border: 2px solid #0B0C0C;
+    border: 2px solid var(--color-govuk-black);
     margin-bottom: var(--space-5);
     box-sizing: border-box;
 }
@@ -688,8 +688,8 @@ a:focus {
 /* High Contrast Mode Support */
 @media (prefers-contrast: high) {
     :root {
-        --civic-border: #000000;
-        --civic-text-secondary: #000000;
+        --civic-border: var(--color-black);
+        --civic-text-secondary: var(--color-black);
     }
 
     .civic-card,
@@ -924,9 +924,9 @@ a:focus {
 }
 
 .civic-badge--verified {
-    background: #ECFDF5;
-    color: #047857;
-    border: 1px solid #A7F3D0;
+    background: var(--color-emerald-50);
+    color: var(--color-emerald-700);
+    border: 1px solid var(--color-emerald-200);
 }
 
 .civic-badge--verified::before {
@@ -935,21 +935,21 @@ a:focus {
 }
 
 .civic-badge--new {
-    background: #DBEAFE;
-    color: #1D4ED8;
-    border: 1px solid #93C5FD;
+    background: var(--color-blue-100);
+    color: var(--color-blue-700);
+    border: 1px solid var(--color-blue-300);
 }
 
 .civic-badge--admin {
-    background: #FEF2F2;
-    color: #B91C1C;
+    background: var(--color-red-50);
+    color: var(--color-red-700);
     border: 1px solid #FECACA;
 }
 
 .civic-badge--coordinator {
-    background: #FDF2F8;
-    color: #BE185D;
-    border: 1px solid #FBCFE8;
+    background: var(--color-pink-50);
+    color: var(--color-pink-700);
+    border: 1px solid var(--color-pink-200);
 }
 
 /* Verification tick on avatar */
@@ -959,7 +959,7 @@ a:focus {
     right: 2px;
     width: 22px;
     height: 22px;
-    background: #059669;
+    background: var(--color-emerald-600);
     border-radius: var(--radius-full);
     border: 2px solid var(--civic-bg-card);
     display: flex;
@@ -1005,27 +1005,27 @@ a:focus {
 
 /* Colored tag variants */
 .civic-tag--green {
-    background: #ECFDF5;
-    color: #047857;
-    border-color: #A7F3D0;
+    background: var(--color-emerald-50);
+    color: var(--color-emerald-700);
+    border-color: var(--color-emerald-200);
 }
 
 .civic-tag--amber {
-    background: #FFFBEB;
-    color: #B45309;
-    border-color: #FDE68A;
+    background: var(--color-amber-50);
+    color: var(--color-amber-700);
+    border-color: var(--color-amber-200);
 }
 
 .civic-tag--purple {
     background: #F3E8FF;
-    color: #7C3AED;
-    border-color: #DDD6FE;
+    color: var(--color-purple-600);
+    border-color: var(--color-purple-200);
 }
 
 .civic-tag--rose {
-    background: #FDF2F8;
-    color: #BE185D;
-    border-color: #FBCFE8;
+    background: var(--color-pink-50);
+    color: var(--color-pink-700);
+    border-color: var(--color-pink-200);
 }
 
 /* -------------------------------------------
@@ -1097,18 +1097,18 @@ a:focus {
 }
 
 .civic-listing-type--offer {
-    background: #ECFDF5;
-    color: #047857;
+    background: var(--color-emerald-50);
+    color: var(--color-emerald-700);
 }
 
 .civic-listing-type--request {
-    background: #FFFBEB;
-    color: #B45309;
+    background: var(--color-amber-50);
+    color: var(--color-amber-700);
 }
 
 .civic-listing-type--event {
     background: #F3E8FF;
-    color: #7C3AED;
+    color: var(--color-purple-600);
 }
 
 .civic-listing-title {
@@ -1414,13 +1414,13 @@ a:focus {
 body.skin-torfaen {
     --civic-brand: #96206d;
     --civic-brand-hover: #7a1a59;
-    --civic-brand-light: #fdf2f8;
+    --civic-brand-light: var(--color-pink-50);
 }
 
 body.skin-torfaen .civic-badge--verified {
-    background: #FDF2F8;
+    background: var(--color-pink-50);
     color: #96206d;
-    border-color: #F9A8D4;
+    border-color: var(--color-pink-300);
 }
 
 body.skin-torfaen .civic-filter-tab--active,
@@ -1442,13 +1442,13 @@ body.skin-torfaen .civic-filter-tab.active:hover {
 
 /* Universal focus ring - high visibility yellow */
 :focus-visible {
-    outline: 3px solid var(--civic-focus, #FBBF24);
+    outline: 3px solid var(--civic-focus, var(--color-amber-300));
     outline-offset: 2px;
 }
 
 /* Links - ensure focus is visible against any background */
 a:focus-visible {
-    outline: 3px solid var(--civic-focus, #FBBF24);
+    outline: 3px solid var(--civic-focus, var(--color-amber-300));
     outline-offset: 2px;
     background-color: rgba(251, 191, 36, 0.1);
     border-radius: var(--radius-sm);
@@ -1457,7 +1457,7 @@ a:focus-visible {
 /* Buttons - prominent focus */
 .civic-btn:focus-visible,
 button:focus-visible {
-    outline: 3px solid var(--civic-focus, #FBBF24);
+    outline: 3px solid var(--civic-focus, var(--color-amber-300));
     outline-offset: 2px;
     box-shadow: 0 0 0 6px rgba(251, 191, 36, 0.3);
 }
@@ -1467,29 +1467,29 @@ input:focus-visible,
 textarea:focus-visible,
 select:focus-visible,
 .civic-input:focus-visible {
-    outline: 3px solid var(--civic-focus, #FBBF24);
+    outline: 3px solid var(--civic-focus, var(--color-amber-300));
     outline-offset: 0;
-    border-color: var(--civic-brand, #2563EB);
+    border-color: var(--civic-brand, var(--color-blue-600));
     box-shadow: 0 0 0 4px rgba(251, 191, 36, 0.2);
 }
 
 /* Checkboxes and radios */
 input[type="checkbox"]:focus-visible,
 input[type="radio"]:focus-visible {
-    outline: 3px solid var(--civic-focus, #FBBF24);
+    outline: 3px solid var(--civic-focus, var(--color-amber-300));
     outline-offset: 2px;
 }
 
 /* Cards that are clickable */
 .civic-card:focus-within {
-    outline: 2px solid var(--civic-brand, #2563EB);
+    outline: 2px solid var(--civic-brand, var(--color-blue-600));
     outline-offset: 2px;
 }
 
 /* Navigation links */
 .civic-nav-link:focus-visible,
 .civic-dropdown-trigger:focus-visible {
-    outline: 3px solid var(--civic-focus, #FBBF24);
+    outline: 3px solid var(--civic-focus, var(--color-amber-300));
     outline-offset: 2px;
     background-color: rgba(251, 191, 36, 0.15);
     border-radius: var(--radius-sm);
@@ -1497,7 +1497,7 @@ input[type="radio"]:focus-visible {
 
 /* Footer links */
 .civic-footer a:focus-visible {
-    outline: 2px solid #FFFFFF;
+    outline: 2px solid var(--color-white);
     outline-offset: 2px;
     background-color: rgba(255, 255, 255, 0.1);
     border-radius: var(--radius-sm);
@@ -1505,46 +1505,46 @@ input[type="radio"]:focus-visible {
 
 /* Social media icons in footer */
 .civic-footer-social a:focus-visible {
-    outline: 3px solid #FFFFFF;
+    outline: 3px solid var(--color-white);
     outline-offset: 2px;
     background-color: rgba(255, 255, 255, 0.3);
 }
 
 /* Breadcrumb links */
 .civic-breadcrumb-link:focus-visible {
-    outline: 3px solid var(--civic-focus, #FBBF24);
+    outline: 3px solid var(--civic-focus, var(--color-amber-300));
     outline-offset: 2px;
 }
 
 /* Dropdown menu items */
 .civic-dropdown-content a:focus-visible {
-    outline: 2px solid var(--civic-brand, #2563EB);
+    outline: 2px solid var(--civic-brand, var(--color-blue-600));
     outline-offset: -2px;
-    background-color: var(--civic-brand-light, #DBEAFE);
+    background-color: var(--civic-brand-light, var(--color-blue-100));
 }
 
 /* Pagination buttons */
 .civic-pagination-btn:focus-visible {
-    outline: 3px solid var(--civic-focus, #FBBF24);
+    outline: 3px solid var(--civic-focus, var(--color-amber-300));
     outline-offset: 2px;
 }
 
 /* Filter tabs */
 .civic-filter-tab:focus-visible {
-    outline: 3px solid var(--civic-focus, #FBBF24);
+    outline: 3px solid var(--civic-focus, var(--color-amber-300));
     outline-offset: 2px;
 }
 
 /* Member cards clickable area */
 .civic-member-card-link:focus-visible {
-    outline: 3px solid var(--civic-focus, #FBBF24);
+    outline: 3px solid var(--civic-focus, var(--color-amber-300));
     outline-offset: 2px;
     border-radius: var(--radius-base);
 }
 
 /* Dark mode focus adjustments */
 body.dark-mode :focus-visible {
-    outline-color: var(--civic-focus, #FBBF24);
+    outline-color: var(--civic-focus, var(--color-amber-300));
 }
 
 body.dark-mode a:focus-visible {
@@ -1552,8 +1552,8 @@ body.dark-mode a:focus-visible {
 }
 
 body.dark-mode .civic-dropdown-content a:focus-visible {
-    background-color: #374151;
-    outline-color: var(--civic-focus, #FBBF24);
+    background-color: var(--color-gray-700);
+    outline-color: var(--civic-focus, var(--color-amber-300));
 }
 
 /* Skip to main content link - enhanced visibility */
@@ -1563,8 +1563,8 @@ body.dark-mode .civic-dropdown-content a:focus-visible {
     left: 10px;
     z-index: var(--z-notification, 1700);
     padding: var(--space-4) var(--space-6);
-    background: #FFDD00;
-    color: #000000;
+    background: var(--color-brand-yellow);
+    color: var(--color-black);
     font-weight: 700;
     font-size: var(--font-size-lg);
     text-decoration: none;

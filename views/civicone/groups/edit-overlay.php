@@ -1,13 +1,14 @@
 <?php
 /**
- * Group Edit & Invite Overlay - Gold Standard Implementation
- * CivicOne theme uses the same implementation as Modern theme
+ * CivicOne Groups Edit Overlay - Two-Tab Modal (Edit Settings + Invite Members)
+ * Overlay Template: Group Edit/Invite Modal (Section 10.13)
+ * WCAG 2.1 AA Compliant
  *
  * Features:
  * - Desktop: Glassmorphism modal with holographic effects
  * - Mobile: Full-screen fixed overlay (100vw x 100vh)
  * - Two tabs: Edit Settings and Invite Members
- * - Horizontal scrollable pill navigation (YouTube/Instagram style)
+ * - Horizontal scrollable pill navigation
  * - Dark mode by default
  * - Safe-area-inset support for notched devices
  * - PWA features: offline detection, haptic feedback
@@ -45,10 +46,10 @@ $pageTitle = $pageTitle ?? 'Edit Group';
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
     <!-- Edit Overlay CSS -->
-    <link rel="stylesheet" href="/assets/css/groups-edit-overlay.css">
+    <link rel="stylesheet" href="/assets/css/purged/groups-edit-overlay.min.css?v=<?= time() ?>">
 
     <!-- Edit Overlay JavaScript -->
-    <script src="/assets/js/groups-edit-overlay.min.js" defer></script>
+    <script src="/assets/js/groups-edit-overlay.min.js?v=<?= time() ?>" defer></script>
 </head>
 <body>
 
@@ -277,13 +278,13 @@ $pageTitle = $pageTitle ?? 'Edit Group';
                  class="edit-panel <?= $defaultTab === 'invite' ? 'active' : '' ?>"
                  role="tabpanel"
                  aria-labelledby="invite-tab">
-                <p class="text-center mb-2" style="color: var(--ed-text-secondary);">
+                <p class="text-center mb-2 text-ed-secondary">
                     Select members to invite to <strong><?= htmlspecialchars($group['name']) ?></strong>
                 </p>
 
                 <?php if (empty($availableUsers)): ?>
                     <div class="no-users">
-                        <i class="fa-solid fa-user-check" style="font-size: 3rem; color: var(--ed-text-secondary); margin-bottom: 1rem;"></i>
+                        <i class="fa-solid fa-user-check empty-state-icon"></i>
                         <p>All community members are already in this group!</p>
                     </div>
                 <?php else: ?>

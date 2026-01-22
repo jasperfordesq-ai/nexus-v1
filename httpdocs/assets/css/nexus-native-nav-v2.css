@@ -2,6 +2,7 @@
  * Project NEXUS - Native Mobile Navigation v2
  * Full-screen, app-like navigation inspired by Instagram, TikTok, and iOS
  * Designed for a true native mobile experience
+  * Fully Migrated to Design Tokens: 2026-01-21 ✓
  */
 
 /* ============================================
@@ -9,18 +10,18 @@
    ============================================ */
 :root {
     /* Navigation Colors */
-    --mobile-nav-bg: #ffffff;
+    --mobile-nav-bg: var(--color-white);
     --mobile-nav-border: rgba(0, 0, 0, 0.08);
     --mobile-nav-text: #8e8e93;
-    --mobile-nav-active: #6366f1;
+    --mobile-nav-active: var(--color-primary-500);
     --mobile-nav-height: 84px;
 
     /* Menu Colors */
-    --mobile-menu-bg: #ffffff;
-    --mobile-menu-item-hover: #f8fafc;
-    --mobile-menu-divider: #f1f5f9;
-    --mobile-menu-text: #1e293b;
-    --mobile-menu-text-secondary: #64748b;
+    --mobile-menu-bg: var(--color-white);
+    --mobile-menu-item-hover: var(--color-slate-50);
+    --mobile-menu-divider: var(--color-slate-100);
+    --mobile-menu-text: var(--color-slate-800);
+    --mobile-menu-text-secondary: var(--color-slate-500);
 
     /* Safe Areas */
     --safe-bottom: env(safe-area-inset-bottom, 0px);
@@ -33,15 +34,15 @@
 }
 
 [data-theme="dark"] {
-    --mobile-nav-bg: #000000;
+    --mobile-nav-bg: var(--color-black);
     --mobile-nav-border: rgba(255, 255, 255, 0.1);
     --mobile-nav-text: #8e8e93;
-    --mobile-nav-active: #818cf8;
+    --mobile-nav-active: var(--color-primary-400);
 
-    --mobile-menu-bg: #000000;
+    --mobile-menu-bg: var(--color-black);
     --mobile-menu-item-hover: #1c1c1e;
     --mobile-menu-divider: #38383a;
-    --mobile-menu-text: #ffffff;
+    --mobile-menu-text: var(--color-white);
     --mobile-menu-text-secondary: #8e8e93;
 }
 
@@ -245,7 +246,7 @@ button.mobile-tab-item,
     transform: translate(-50%, -50%);
     width: var(--space-12);
     height: var(--space-12);
-    background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+    background: linear-gradient(135deg, var(--color-primary-500) 0%, var(--color-purple-500) 100%);
     border-radius: var(--radius-lg);
     z-index: 1;
     box-shadow:
@@ -449,7 +450,7 @@ button.mobile-tab-item,
     width: var(--space-16);
     height: var(--space-16);
     border-radius: var(--radius-full);
-    background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+    background: linear-gradient(135deg, var(--color-primary-500) 0%, var(--color-purple-500) 100%);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -592,7 +593,7 @@ button.mobile-tab-item,
     align-items: center;
     justify-content: center;
     color: white;
-    background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+    background: linear-gradient(135deg, var(--color-primary-500) 0%, var(--color-purple-500) 100%);
     transition: transform var(--transition-fast) var(--ease-in-out), box-shadow var(--transition-fast) var(--ease-in-out);
     box-shadow: 0 2px 8px rgba(99, 102, 241, 0.25);
 }
@@ -603,14 +604,14 @@ button.mobile-tab-item,
 }
 
 /* Different gradient colors for menu items based on position */
-.mobile-menu-item:nth-child(1) i { background: linear-gradient(135deg, #ef4444 0%, #f87171 100%); box-shadow: 0 2px 8px rgba(239, 68, 68, 0.25); }
-.mobile-menu-item:nth-child(2) i { background: linear-gradient(135deg, #3b82f6 0%, #60a5fa 100%); box-shadow: 0 2px 8px rgba(59, 130, 246, 0.25); }
-.mobile-menu-item:nth-child(3) i { background: linear-gradient(135deg, #8b5cf6 0%, #a78bfa 100%); box-shadow: 0 2px 8px rgba(139, 92, 246, 0.25); }
+.mobile-menu-item:nth-child(1) i { background: linear-gradient(135deg, var(--color-danger) 0%, var(--color-red-400) 100%); box-shadow: 0 2px 8px rgba(239, 68, 68, 0.25); }
+.mobile-menu-item:nth-child(2) i { background: linear-gradient(135deg, var(--color-info) 0%, var(--color-blue-400) 100%); box-shadow: 0 2px 8px rgba(59, 130, 246, 0.25); }
+.mobile-menu-item:nth-child(3) i { background: linear-gradient(135deg, var(--color-purple-500) 0%, #a78bfa 100%); box-shadow: 0 2px 8px rgba(139, 92, 246, 0.25); }
 .mobile-menu-item:nth-child(4) i { background: linear-gradient(135deg, #14b8a6 0%, #2dd4bf 100%); box-shadow: 0 2px 8px rgba(20, 184, 166, 0.25); }
-.mobile-menu-item:nth-child(5) i { background: linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%); box-shadow: 0 2px 8px rgba(245, 158, 11, 0.25); }
-.mobile-menu-item:nth-child(6) i { background: linear-gradient(135deg, #10b981 0%, #34d399 100%); box-shadow: 0 2px 8px rgba(16, 185, 129, 0.25); }
-.mobile-menu-item:nth-child(7) i { background: linear-gradient(135deg, #ec4899 0%, #f472b6 100%); box-shadow: 0 2px 8px rgba(236, 72, 153, 0.25); }
-.mobile-menu-item:nth-child(8) i { background: linear-gradient(135deg, #06b6d4 0%, #22d3ee 100%); box-shadow: 0 2px 8px rgba(6, 182, 212, 0.25); }
+.mobile-menu-item:nth-child(5) i { background: linear-gradient(135deg, var(--color-warning) 0%, var(--color-amber-300) 100%); box-shadow: 0 2px 8px rgba(245, 158, 11, 0.25); }
+.mobile-menu-item:nth-child(6) i { background: linear-gradient(135deg, var(--color-success) 0%, #34d399 100%); box-shadow: 0 2px 8px rgba(16, 185, 129, 0.25); }
+.mobile-menu-item:nth-child(7) i { background: linear-gradient(135deg, var(--color-pink-500) 0%, var(--color-pink-400) 100%); box-shadow: 0 2px 8px rgba(236, 72, 153, 0.25); }
+.mobile-menu-item:nth-child(8) i { background: linear-gradient(135deg, var(--color-cyan-500) 0%, var(--color-cyan-400) 100%); box-shadow: 0 2px 8px rgba(6, 182, 212, 0.25); }
 
 /* Dark mode icon adjustments */
 [data-theme="dark"] .mobile-menu-item i {
@@ -618,12 +619,12 @@ button.mobile-tab-item,
 }
 
 /* Admin section special styling */
-.mobile-menu-section-title[style*="color: #ea580c"] ~ .mobile-menu-item i {
-    background: linear-gradient(135deg, #ea580c 0%, #f97316 100%) !important;
+.mobile-menu-section-title[style*="color: var(--color-orange-600)"] ~ .mobile-menu-item i {
+    background: linear-gradient(135deg, var(--color-orange-600) 0%, var(--color-orange-500) 100%) !important;
     box-shadow: 0 2px 8px rgba(234, 88, 12, 0.25) !important;
 }
 
-.mobile-menu-section-title[style*="color: #ea580c"] {
+.mobile-menu-section-title[style*="color: var(--color-orange-600)"] {
     font-weight: var(--font-weight-bold);
 }
 
@@ -712,7 +713,7 @@ button.mobile-tab-item,
 .mobile-menu-stat-value {
     font-size: var(--font-size-2xl);
     font-weight: var(--font-weight-bold);
-    background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+    background: linear-gradient(135deg, var(--color-primary-500) 0%, var(--color-purple-500) 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -720,21 +721,21 @@ button.mobile-tab-item,
 }
 
 .mobile-menu-stat:nth-child(1) .mobile-menu-stat-value {
-    background: linear-gradient(135deg, #10b981 0%, #34d399 100%);
+    background: linear-gradient(135deg, var(--color-success) 0%, #34d399 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
 }
 
 .mobile-menu-stat:nth-child(2) .mobile-menu-stat-value {
-    background: linear-gradient(135deg, #3b82f6 0%, #60a5fa 100%);
+    background: linear-gradient(135deg, var(--color-info) 0%, var(--color-blue-400) 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
 }
 
 .mobile-menu-stat:nth-child(3) .mobile-menu-stat-value {
-    background: linear-gradient(135deg, #ef4444 0%, #f87171 100%);
+    background: linear-gradient(135deg, var(--color-danger) 0%, var(--color-red-400) 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -1107,7 +1108,7 @@ button.mobile-tab-item,
 
 [data-theme="dark"] .mobile-tab-item:not(.create-btn).active::after,
 .dark-mode .mobile-tab-item:not(.create-btn).active::after {
-    background: #818cf8;
+    background: var(--color-primary-400);
 }
 
 

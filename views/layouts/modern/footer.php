@@ -196,6 +196,8 @@ $jsVersion = '2.5.13';
     };
     window.closeLikersModal = window.closeLikersModal || function() {};
 </script>
+<!-- Dev Notice Modal - Preview mode notification for users -->
+<script src="/assets/js/dev-notice-modal.min.js?v=<?= $jsVersion ?>"></script>
 <script src="/assets/js/nexus-mapbox.min.js?v=<?= $jsVersion ?>" defer></script>
 <script src="/assets/js/social-interactions.min.js?v=<?= $jsVersion ?>" defer></script>
 <script src="/assets/js/nexus-ui.min.js?v=<?= $jsVersion ?>" defer></script>

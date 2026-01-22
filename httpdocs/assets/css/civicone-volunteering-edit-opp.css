@@ -1,0 +1,379 @@
+/* Volunteering: Edit Opportunity Form
+   Template D: Form Page
+   WCAG 2.1 AA Compliant */
+
+/* ============================================
+   GOLD STANDARD - Native App Features
+   ============================================ */
+
+/* Offline Banner */
+.offline-banner {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 10001;
+    padding: 12px 20px;
+    background: linear-gradient(135deg, #ef4444, #dc2626);
+    color: white;
+    font-size: 0.9rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transform: translateY(-100%);
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.offline-banner.visible {
+    transform: translateY(0);
+}
+
+/* Content Reveal Animation */
+@keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.htb-card {
+    animation: fadeInUp 0.4s ease-out;
+}
+
+/* Button Press States */
+.htb-btn:active,
+button:active {
+    transform: scale(0.96) !important;
+    transition: transform 0.1s ease !important;
+}
+
+/* Touch Targets - WCAG 2.1 AA (44px minimum) */
+.htb-btn,
+button,
+input[type="text"],
+input[type="date"],
+input[type="datetime-local"],
+input[type="number"],
+select,
+textarea {
+    min-height: 44px;
+}
+
+input[type="text"],
+textarea,
+select {
+    font-size: 16px !important; /* Prevent iOS zoom */
+}
+
+/* Focus Visible */
+.htb-btn:focus-visible,
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+    outline: 3px solid rgba(20, 184, 166, 0.5);
+    outline-offset: 2px;
+}
+
+/* Smooth Scroll */
+html {
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
+}
+
+/* Form Submission Loading State */
+.htb-btn.loading {
+    pointer-events: none;
+    opacity: 0.7;
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+    .htb-container {
+        padding: 0 15px 100px 15px;
+        max-width: 100% !important;
+    }
+
+    div[style*="grid-template-columns: 1fr 1fr"] {
+        grid-template-columns: 1fr !important;
+    }
+
+    .htb-btn {
+        min-height: 48px;
+    }
+
+    table th, table td {
+        padding: 8px !important;
+    }
+}
+
+/* ========================================
+   DARK MODE FOR EDIT OPPORTUNITY
+   ======================================== */
+
+[data-theme="dark"] .htb-card {
+    background: rgba(30, 41, 59, 0.85);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+[data-theme="dark"] .htb-card h3 {
+    color: #f1f5f9;
+}
+
+/* Form labels */
+[data-theme="dark"] label[style*="font-weight: bold"] {
+    color: #e2e8f0 !important;
+}
+
+/* Form inputs */
+[data-theme="dark"] input[style*="border: 1px solid #ddd"],
+[data-theme="dark"] select[style*="border: 1px solid #ddd"],
+[data-theme="dark"] textarea[style*="border: 1px solid #ddd"] {
+    background: rgba(15, 23, 42, 0.6) !important;
+    border-color: rgba(255, 255, 255, 0.15) !important;
+    color: #f1f5f9 !important;
+}
+
+[data-theme="dark"] select option {
+    background: #1e293b;
+    color: #f1f5f9;
+}
+
+/* Muted text */
+[data-theme="dark"] p[style*="color:#666"],
+[data-theme="dark"] span[style*="color:#666"] {
+    color: #94a3b8 !important;
+}
+
+[data-theme="dark"] p[style*="color: #888"],
+[data-theme="dark"] p[style*="color:#888"] {
+    color: #64748b !important;
+}
+
+/* Table */
+[data-theme="dark"] table tr[style*="border-bottom: 1px solid #eee"],
+[data-theme="dark"] table tr[style*="border-bottom: 1px solid #f9f9f9"] {
+    border-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+[data-theme="dark"] table td {
+    color: #e2e8f0;
+}
+
+/* Add Shift Box */
+[data-theme="dark"] div[style*="background: #f9fafb"] {
+    background: rgba(30, 41, 59, 0.5) !important;
+    border-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+[data-theme="dark"] div[style*="background: #f9fafb"] h5 {
+    color: #e2e8f0;
+}
+
+[data-theme="dark"] div[style*="background: #f9fafb"] label {
+    color: #94a3b8;
+}
+
+/* Secondary button */
+[data-theme="dark"] .htb-btn-secondary {
+    background: rgba(51, 65, 85, 0.6) !important;
+    border-color: rgba(255, 255, 255, 0.15) !important;
+    color: #e2e8f0 !important;
+}
+
+/* ========================================
+   PAGE-SPECIFIC UTILITY CLASSES
+   ======================================== */
+
+/* Container with max-width and top margin */
+.edit-opp-container {
+    max-width: 600px;
+    margin-top: 50px;
+}
+
+/* Form field wrapper */
+.form-field {
+    margin-bottom: 20px;
+}
+
+/* Form label styling */
+.form-field-label {
+    display: block;
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+/* Shift form small label */
+.form-field-label-sm {
+    display: block;
+    font-size: 0.8rem;
+    font-weight: bold;
+}
+
+/* Standard form input */
+.form-input {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+}
+
+/* Smaller form input (for shifts) */
+.form-input-sm {
+    width: 100%;
+    padding: 6px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+/* Date grid (2 columns) */
+.date-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    margin-bottom: 20px;
+}
+
+/* Shift form grid (3 columns) */
+.shift-form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+/* Button row */
+.button-row {
+    display: flex;
+    gap: 10px;
+}
+
+/* Flex grow (for buttons) */
+.flex-1 {
+    flex: 1;
+}
+
+/* Card with top margin */
+.card-mt-30 {
+    margin-top: 30px;
+}
+
+/* Muted text */
+.text-muted-sm {
+    color: #666;
+    font-size: 0.9rem;
+}
+
+/* Italic muted text */
+.text-muted-italic {
+    margin-bottom: 20px;
+    font-style: italic;
+    color: #888;
+}
+
+/* Shifts table */
+.shifts-table {
+    width: 100%;
+    text-align: left;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+}
+
+.shifts-table thead tr {
+    border-bottom: 1px solid #eee;
+}
+
+.shifts-table th,
+.shifts-table td {
+    padding: 10px;
+}
+
+.shifts-table tbody tr {
+    border-bottom: 1px solid #f9f9f9;
+}
+
+/* Shift time secondary text */
+.shift-time-secondary {
+    color: #666;
+    font-size: 0.85rem;
+}
+
+/* Delete button (icon only) */
+.btn-delete-icon {
+    border: none;
+    background: none;
+    cursor: pointer;
+    color: #ef4444;
+}
+
+/* Add shift box */
+.add-shift-box {
+    background: #f9fafb;
+    padding: 15px;
+    border-radius: 6px;
+    border: 1px solid #eee;
+}
+
+.add-shift-box h5 {
+    margin-top: 0;
+}
+
+/* Add shift button */
+.btn-add-shift {
+    background: #4f46e5;
+    color: white;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+/* Dark mode overrides for new classes */
+[data-theme="dark"] .form-field-label,
+[data-theme="dark"] .form-field-label-sm {
+    color: #e2e8f0;
+}
+
+[data-theme="dark"] .form-input,
+[data-theme="dark"] .form-input-sm {
+    background: rgba(15, 23, 42, 0.6);
+    border-color: rgba(255, 255, 255, 0.15);
+    color: #f1f5f9;
+}
+
+[data-theme="dark"] .text-muted-sm {
+    color: #94a3b8;
+}
+
+[data-theme="dark"] .text-muted-italic {
+    color: #64748b;
+}
+
+[data-theme="dark"] .shifts-table thead tr {
+    border-color: rgba(255, 255, 255, 0.1);
+}
+
+[data-theme="dark"] .shifts-table tbody tr {
+    border-color: rgba(255, 255, 255, 0.1);
+}
+
+[data-theme="dark"] .shifts-table td {
+    color: #e2e8f0;
+}
+
+[data-theme="dark"] .shift-time-secondary {
+    color: #94a3b8;
+}
+
+[data-theme="dark"] .add-shift-box {
+    background: rgba(30, 41, 59, 0.5);
+    border-color: rgba(255, 255, 255, 0.1);
+}
+
+[data-theme="dark"] .add-shift-box h5 {
+    color: #e2e8f0;
+}
+
+[data-theme="dark"] .add-shift-box label {
+    color: #94a3b8;
+}

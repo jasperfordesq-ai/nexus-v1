@@ -59,7 +59,7 @@
 .holo-orb-1 {
     width: 400px;
     height: 400px;
-    background: linear-gradient(135deg, #f97316, #ea580c);
+    background: linear-gradient(135deg, var(--color-orange-500), var(--color-orange-600));
     top: 10%;
     left: -10%;
     animation: orbFloat1 15s ease-in-out infinite;
@@ -68,7 +68,7 @@
 .holo-orb-2 {
     width: 300px;
     height: 300px;
-    background: linear-gradient(135deg, #fbbf24, #f59e0b);
+    background: linear-gradient(135deg, var(--color-amber-300), var(--color-warning));
     bottom: 20%;
     right: -5%;
     animation: orbFloat2 18s ease-in-out infinite;
@@ -77,7 +77,7 @@
 .holo-orb-3 {
     width: 250px;
     height: 250px;
-    background: linear-gradient(135deg, #fb923c, #fdba74);
+    background: linear-gradient(135deg, #fb923c, var(--color-orange-300));
     top: 60%;
     left: 30%;
     animation: orbFloat3 12s ease-in-out infinite;
@@ -144,13 +144,13 @@
 
 .holo-nav-btn-secondary {
     background: rgba(255, 255, 255, 0.6);
-    color: var(--htb-text-main, #1e293b);
+    color: var(--htb-text-main, var(--color-slate-800));
     border: 1px solid rgba(0, 0, 0, 0.08);
 }
 
 [data-theme="dark"] .holo-nav-btn-secondary {
     background: rgba(255, 255, 255, 0.08);
-    color: #e2e8f0;
+    color: var(--color-slate-200);
     border-color: rgba(255, 255, 255, 0.1);
 }
 
@@ -165,7 +165,7 @@
 }
 
 .holo-nav-btn-primary {
-    background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
+    background: linear-gradient(135deg, var(--color-orange-500) 0%, var(--color-orange-600) 100%);
     color: white;
     box-shadow: 0 8px 20px rgba(249, 115, 22, 0.3);
 }
@@ -190,7 +190,7 @@
 .holo-month-title {
     font-size: 1.8rem;
     font-weight: 800;
-    background: linear-gradient(135deg, #f97316 0%, #ea580c 50%, #c2410c 100%);
+    background: linear-gradient(135deg, var(--color-orange-500) 0%, var(--color-orange-600) 50%, var(--color-govuk-red-dark) 100%);
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
@@ -286,7 +286,7 @@
     font-size: 0.85rem;
     text-transform: uppercase;
     letter-spacing: 1px;
-    color: var(--htb-text-muted, #64748b);
+    color: var(--htb-text-muted, var(--color-slate-500));
     background: rgba(0, 0, 0, 0.02);
     border-bottom: 1px solid rgba(0, 0, 0, 0.06);
 }
@@ -294,7 +294,7 @@
 [data-theme="dark"] .holo-cal-header {
     background: rgba(255, 255, 255, 0.02);
     border-bottom-color: rgba(255, 255, 255, 0.06);
-    color: #94a3b8;
+    color: var(--color-slate-400);
 }
 
 /* Calendar Days */
@@ -343,17 +343,17 @@
 .holo-day-number {
     font-weight: 700;
     font-size: 0.9rem;
-    color: var(--htb-text-muted, #94a3b8);
+    color: var(--htb-text-muted, var(--color-slate-400));
     text-align: right;
     margin-bottom: 6px;
 }
 
 [data-theme="dark"] .holo-day-number {
-    color: #64748b;
+    color: var(--color-slate-500);
 }
 
 .holo-cal-day.today .holo-day-number {
-    color: #f97316;
+    color: var(--color-orange-500);
     font-size: 1rem;
 }
 
@@ -372,7 +372,7 @@
     padding: 6px 8px;
     border-radius: 8px;
     background: rgba(255, 255, 255, 0.8);
-    border-left: 3px solid #f97316;
+    border-left: 3px solid var(--event-color, var(--color-orange-500));
     text-decoration: none;
     transition: all 0.2s ease;
     overflow: hidden;
@@ -395,21 +395,21 @@
 .holo-ev-time {
     font-size: 0.7rem;
     font-weight: 700;
-    color: var(--htb-text-muted, #64748b);
+    color: var(--htb-text-muted, var(--color-slate-500));
     white-space: nowrap;
 }
 
 .holo-ev-title {
     font-size: 0.75rem;
     font-weight: 600;
-    color: var(--htb-text-main, #334155);
+    color: var(--htb-text-main, var(--color-slate-700));
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
 }
 
 [data-theme="dark"] .holo-ev-title {
-    color: #e2e8f0;
+    color: var(--color-slate-200);
 }
 
 /* Mobile List View */
@@ -444,11 +444,11 @@
         padding: 8px;
         background: rgba(249, 115, 22, 0.1);
         border-radius: 10px;
-        color: #f97316;
+        color: var(--color-orange-500);
     }
 
     .holo-cal-day.today .holo-day-number {
-        background: linear-gradient(135deg, #f97316, #ea580c);
+        background: linear-gradient(135deg, var(--color-orange-500), var(--color-orange-600));
         color: white;
     }
 
@@ -471,7 +471,7 @@
 
 /* Empty State */
 .holo-empty-day {
-    color: var(--htb-text-muted, #94a3b8);
+    color: var(--htb-text-muted, var(--color-slate-400));
     font-size: 0.8rem;
     font-style: italic;
 }
@@ -484,7 +484,7 @@
     right: 0;
     z-index: 10001;
     padding: 12px 20px;
-    background: linear-gradient(135deg, #ef4444, #dc2626);
+    background: linear-gradient(135deg, var(--color-danger), var(--color-red-600));
     color: white;
     font-size: 0.9rem;
     font-weight: 600;
@@ -503,6 +503,6 @@
 /* Focus Visible */
 .holo-nav-btn:focus-visible,
 .holo-cal-event:focus-visible {
-    outline: 3px solid #f97316;
+    outline: 3px solid var(--color-orange-500);
     outline-offset: 2px;
 }

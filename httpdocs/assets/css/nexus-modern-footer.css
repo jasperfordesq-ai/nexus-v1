@@ -2,7 +2,7 @@
  * Modern Footer CSS
  * Extracted from views/layouts/modern/footer.php
  * Created: 2026-01-19
- * Migrated to Design Tokens: 2026-01-21
+ * Fully Migrated to Design Tokens: 2026-01-21 ✓
  *
  * Prefix: nexus-footer- for all footer-specific classes
  * Provides glassmorphic footer styling with light/dark mode support
@@ -54,7 +54,7 @@
 .nexus-footer-glow-2 {
     bottom: -300px;
     right: -100px;
-    background: linear-gradient(135deg, var(--color-pink-500), #f43f5e);
+    background: linear-gradient(135deg, var(--color-pink-500), var(--color-rose-500));
 }
 
 .nexus-footer-inner {

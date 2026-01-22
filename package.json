@@ -2,7 +2,10 @@
   "scripts": {
     "build:css": "node scripts/build-css.js",
     "build:css:core": "node scripts/build-core-css.js",
+    "build:css:purge": "node scripts/run-purgecss.js",
     "build:images": "node scripts/optimize-images.js",
+    "css:discover": "node scripts/discover-css.js",
+    "css:auto-config": "node scripts/auto-discover-css.js",
     "minify:css": "node scripts/minify-css.js",
     "minify:js": "node scripts/minify-js.js",
     "minify:php": "php scripts/minify.php",
@@ -13,6 +16,10 @@
     "lint:php:styles": "php scripts/lint-inline-styles.php",
     "lint": "npm run lint:css && npm run lint:js && npm run lint:php:styles",
     "consolidate:css": "node scripts/consolidate-css.js",
+    "deploy:preview": "bash scripts/claude-deploy.sh --last-commit --dry-run",
+    "deploy": "bash scripts/claude-deploy.sh --last-commit --verify",
+    "deploy:changed": "bash scripts/claude-deploy.sh --changed --verify",
+    "deploy:full": "bash scripts/claude-deploy.sh --folders",
     "build": "npm run minify:css && npm run minify:js && npm run build:css:core && npm run build:images"
   },
   "devDependencies": {

@@ -9,8 +9,8 @@
 
 /* Focus Ring Variables */
 :root {
-    --fed-focus-ring: #FFDD00;           /* GOV.UK focus - high visibility */
-    --fed-focus-text: #0B0C0C;
+    --fed-focus-ring: var(--color-brand-yellow);           /* GOV.UK focus - high visibility */
+    --fed-focus-text: var(--color-govuk-black);
     --fed-focus-offset: var(--space-0.5);
     --fed-touch-min: 44px; /* WCAG minimum - no token equivalent */
 }
@@ -44,7 +44,7 @@
 #federation-hub-wrapper select:focus {
     outline: 3px solid var(--fed-focus-ring);
     outline-offset: 0;
-    border-color: #0B0C0C !important;
+    border-color: var(--color-govuk-black) !important;
 }
 
 /* Touch Target Minimums - WCAG 2.5.5 */
@@ -128,7 +128,7 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
                 right: 0;
                 z-index: 10001;
                 padding: 12px var(--space-5);
-                background: linear-gradient(135deg, #ef4444, #dc2626);
+                background: linear-gradient(135deg, var(--color-danger), var(--color-red-600));
                 color: white;
                 font-size: 0.9rem;
                 font-weight: 600;
@@ -230,7 +230,7 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
             .fed-hero-icon {
                 width: 80px;
                 height: 80px;
-                background: linear-gradient(135deg, #8b5cf6, #6366f1);
+                background: linear-gradient(135deg, var(--color-purple-500), var(--color-primary-500));
                 border-radius: var(--radius-xl);
                 display: flex;
                 align-items: center;
@@ -244,24 +244,24 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
             .fed-hero h1 {
                 font-size: 2.25rem;
                 font-weight: 800;
-                color: var(--htb-text-main, #1f2937);
+                color: var(--htb-text-main, var(--color-gray-800));
                 margin: 0 0 var(--space-3);
             }
 
             [data-theme="dark"] .fed-hero h1 {
-                color: #f1f5f9;
+                color: var(--color-slate-100);
             }
 
             .fed-hero-subtitle {
                 font-size: 1.1rem;
-                color: var(--htb-text-secondary, #6b7280);
+                color: var(--htb-text-secondary, var(--color-gray-500));
                 max-width: 600px;
                 margin: 0 auto;
                 line-height: 1.6;
             }
 
             [data-theme="dark"] .fed-hero-subtitle {
-                color: #94a3b8;
+                color: var(--color-slate-400);
             }
 
             /* Partner Count Badge */
@@ -275,7 +275,7 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
                 border-radius: 100px;
                 font-size: 0.9rem;
                 font-weight: 600;
-                color: #8b5cf6;
+                color: var(--color-purple-500);
                 margin-top: var(--space-5);
             }
 
@@ -299,7 +299,7 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
 
             .fed-optin-notice i {
                 font-size: 1.5rem;
-                color: #f59e0b;
+                color: var(--color-warning);
                 margin-top: var(--space-0.5);
             }
 
@@ -307,22 +307,22 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
                 margin: 0 0 var(--space-2);
                 font-size: 1rem;
                 font-weight: 700;
-                color: var(--htb-text-main, #1f2937);
+                color: var(--htb-text-main, var(--color-gray-800));
             }
 
             [data-theme="dark"] .fed-optin-notice h3 {
-                color: #f1f5f9;
+                color: var(--color-slate-100);
             }
 
             .fed-optin-notice p {
                 margin: 0 0 var(--space-3);
                 font-size: 0.9rem;
-                color: var(--htb-text-secondary, #6b7280);
+                color: var(--htb-text-secondary, var(--color-gray-500));
                 line-height: 1.5;
             }
 
             [data-theme="dark"] .fed-optin-notice p {
-                color: #94a3b8;
+                color: var(--color-slate-400);
             }
 
             .fed-optin-btn {
@@ -330,7 +330,7 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
                 align-items: center;
                 gap: var(--space-2);
                 padding: 10px var(--space-5);
-                background: linear-gradient(135deg, #f59e0b, #d97706);
+                background: linear-gradient(135deg, var(--color-warning), var(--color-amber-600));
                 color: white;
                 border-radius: var(--space-2.5);
                 font-weight: 600;
@@ -362,7 +362,7 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
                 background: rgba(139, 92, 246, 0.1);
                 border: 1px solid rgba(139, 92, 246, 0.2);
                 border-radius: 25px;
-                color: #8b5cf6;
+                color: var(--color-purple-500);
                 font-size: 0.9rem;
                 font-weight: 600;
                 text-decoration: none;
@@ -382,7 +382,7 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
             [data-theme="dark"] .fed-quick-link {
                 background: rgba(139, 92, 246, 0.15);
                 border-color: rgba(139, 92, 246, 0.25);
-                color: #a78bfa;
+                color: var(--color-purple-400-alt);
             }
 
             [data-theme="dark"] .fed-quick-link:hover {
@@ -475,39 +475,39 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
                 flex-shrink: 0;
             }
 
-            .fed-feature-icon.members { background: linear-gradient(135deg, #8b5cf6, #7c3aed); color: white; }
-            .fed-feature-icon.listings { background: linear-gradient(135deg, #10b981, #059669); color: white; }
-            .fed-feature-icon.events { background: linear-gradient(135deg, #ec4899, #db2777); color: white; }
-            .fed-feature-icon.groups { background: linear-gradient(135deg, #f97316, #ea580c); color: white; }
-            .fed-feature-icon.messages { background: linear-gradient(135deg, #3b82f6, #2563eb); color: white; }
-            .fed-feature-icon.transactions { background: linear-gradient(135deg, #14b8a6, #0d9488); color: white; }
+            .fed-feature-icon.members { background: linear-gradient(135deg, var(--color-purple-500), var(--color-purple-600)); color: white; }
+            .fed-feature-icon.listings { background: linear-gradient(135deg, var(--color-success), var(--color-emerald-600)); color: white; }
+            .fed-feature-icon.events { background: linear-gradient(135deg, var(--color-pink-500), var(--color-pink-600)); color: white; }
+            .fed-feature-icon.groups { background: linear-gradient(135deg, var(--color-orange-500), var(--color-orange-600)); color: white; }
+            .fed-feature-icon.messages { background: linear-gradient(135deg, var(--color-info), var(--color-blue-600)); color: white; }
+            .fed-feature-icon.transactions { background: linear-gradient(135deg, var(--color-teal-500), var(--color-teal-600)); color: white; }
 
             .fed-feature-title {
                 font-size: 1.1rem;
                 font-weight: 700;
-                color: var(--htb-text-main, #1f2937);
+                color: var(--htb-text-main, var(--color-gray-800));
                 margin: 0;
             }
 
             [data-theme="dark"] .fed-feature-title {
-                color: #f1f5f9;
+                color: var(--color-slate-100);
             }
 
             .fed-feature-stat {
                 font-size: 0.85rem;
-                color: #8b5cf6;
+                color: var(--color-purple-500);
                 font-weight: 600;
             }
 
             .fed-feature-desc {
                 font-size: 0.9rem;
-                color: var(--htb-text-secondary, #6b7280);
+                color: var(--htb-text-secondary, var(--color-gray-500));
                 line-height: 1.5;
                 margin: 0;
             }
 
             [data-theme="dark"] .fed-feature-desc {
-                color: #94a3b8;
+                color: var(--color-slate-400);
             }
 
             .fed-feature-arrow {
@@ -517,7 +517,7 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
                 gap: var(--space-1.5);
                 font-size: 0.85rem;
                 font-weight: 600;
-                color: #8b5cf6;
+                color: var(--color-purple-500);
             }
 
             .fed-feature-arrow i {
@@ -544,7 +544,7 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
             .fed-section-title {
                 font-size: 1.25rem;
                 font-weight: 700;
-                color: var(--htb-text-main, #1f2937);
+                color: var(--htb-text-main, var(--color-gray-800));
                 margin: 0;
                 display: flex;
                 align-items: center;
@@ -552,7 +552,7 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
             }
 
             [data-theme="dark"] .fed-section-title {
-                color: #f1f5f9;
+                color: var(--color-slate-100);
             }
 
             .fed-partners-grid {
@@ -586,13 +586,13 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
                 border-radius: var(--radius-lg);
                 object-fit: cover;
                 margin: 0 auto var(--space-3);
-                background: linear-gradient(135deg, #e0e7ff, #c7d2fe);
+                background: linear-gradient(135deg, var(--color-primary-100), var(--color-primary-200));
                 display: flex;
                 align-items: center;
                 justify-content: center;
                 font-size: 1.5rem;
                 font-weight: 700;
-                color: #6366f1;
+                color: var(--color-primary-500);
             }
 
             .fed-partner-logo img {
@@ -605,12 +605,12 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
             .fed-partner-name {
                 font-weight: 600;
                 font-size: 0.95rem;
-                color: var(--htb-text-main, #1f2937);
+                color: var(--htb-text-main, var(--color-gray-800));
                 margin-bottom: var(--space-2);
             }
 
             [data-theme="dark"] .fed-partner-name {
-                color: #f1f5f9;
+                color: var(--color-slate-100);
             }
 
             .fed-partner-features {
@@ -624,7 +624,7 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
                 font-size: 0.7rem;
                 padding: 3px var(--space-2);
                 background: rgba(139, 92, 246, 0.1);
-                color: #8b5cf6;
+                color: var(--color-purple-500);
                 border-radius: 100px;
                 font-weight: 500;
             }
@@ -636,7 +636,7 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
             .fed-partner-view-link {
                 margin-top: var(--space-3);
                 font-size: 0.8rem;
-                color: #8b5cf6;
+                color: var(--color-purple-500);
                 font-weight: 600;
                 opacity: 0;
                 transform: translateY(4px);
@@ -668,13 +668,13 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
 
             .fed-empty-partners i {
                 font-size: 2.5rem;
-                color: #8b5cf6;
+                color: var(--color-purple-500);
                 opacity: 0.5;
                 margin-bottom: var(--space-4);
             }
 
             .fed-empty-partners p {
-                color: var(--htb-text-secondary, #6b7280);
+                color: var(--htb-text-secondary, var(--color-gray-500));
                 margin: 0;
             }
 
@@ -712,7 +712,7 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
     height: 56px;
     border-radius: var(--radius-full);
     border: none;
-    background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+    background: linear-gradient(135deg, var(--color-purple-500), var(--color-purple-600));
     color: white;
     font-size: 1.25rem;
     cursor: pointer;
@@ -746,7 +746,7 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
 }
 
 .fed-fab-container.open .fed-fab-toggle {
-    background: linear-gradient(135deg, #7c3aed, #6d28d9);
+    background: linear-gradient(135deg, var(--color-purple-600), var(--color-purple-700));
 }
 
 .fed-fab-container.open .fed-fab-toggle i:first-child {
@@ -813,7 +813,7 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
     border-radius: var(--space-2.5);
     font-size: 0.9rem;
     font-weight: 600;
-    color: #1f2937;
+    color: var(--color-gray-800);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
@@ -821,7 +821,7 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
 
 [data-theme="dark"] .fed-fab-label {
     background: rgba(30, 41, 59, 0.95);
-    color: #f1f5f9;
+    color: var(--color-slate-100);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 }
 
@@ -829,7 +829,7 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
     width: 44px;
     height: 44px;
     border-radius: var(--radius-full);
-    background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+    background: linear-gradient(135deg, var(--color-purple-500), var(--color-purple-600));
     color: white;
     display: flex;
     align-items: center;
@@ -847,12 +847,12 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
 
 .fed-fab-item:hover .fed-fab-label {
     background: rgba(139, 92, 246, 0.1);
-    color: #7c3aed;
+    color: var(--color-purple-600);
 }
 
 [data-theme="dark"] .fed-fab-item:hover .fed-fab-label {
     background: rgba(139, 92, 246, 0.2);
-    color: #a78bfa;
+    color: var(--color-purple-400-alt);
 }
 
 /* Backdrop overlay when FAB is open */
@@ -892,7 +892,7 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
                 right: 0;
                 z-index: 10001;
                 padding: 12px var(--space-5);
-                background: linear-gradient(135deg, #ef4444, #dc2626);
+                background: linear-gradient(135deg, var(--color-danger), var(--color-red-600));
                 color: white;
                 font-size: 0.9rem;
                 font-weight: 600;
@@ -923,7 +923,7 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
             .fed-hero-icon {
                 width: 80px;
                 height: 80px;
-                background: linear-gradient(135deg, #8b5cf6, #6366f1);
+                background: linear-gradient(135deg, var(--color-purple-500), var(--color-primary-500));
                 border-radius: var(--radius-xl);
                 display: flex;
                 align-items: center;
@@ -937,24 +937,24 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
             .fed-hero h1 {
                 font-size: 2.25rem;
                 font-weight: 800;
-                color: var(--htb-text-main, #1f2937);
+                color: var(--htb-text-main, var(--color-gray-800));
                 margin: 0 0 var(--space-3);
             }
 
             [data-theme="dark"] .fed-hero h1 {
-                color: #f1f5f9;
+                color: var(--color-slate-100);
             }
 
             .fed-hero-subtitle {
                 font-size: 1.1rem;
-                color: var(--htb-text-secondary, #6b7280);
+                color: var(--htb-text-secondary, var(--color-gray-500));
                 max-width: 600px;
                 margin: 0 auto;
                 line-height: 1.6;
             }
 
             [data-theme="dark"] .fed-hero-subtitle {
-                color: #94a3b8;
+                color: var(--color-slate-400);
             }
 
             #fed-dashboard-wrapper {
@@ -985,7 +985,7 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
                 width: 80px;
                 height: 80px;
                 border-radius: var(--radius-full);
-                background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+                background: linear-gradient(135deg, var(--color-purple-500), var(--color-purple-600));
                 display: flex;
                 align-items: center;
                 justify-content: center;
@@ -1010,12 +1010,12 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
             .dash-name {
                 font-size: 1.5rem;
                 font-weight: 800;
-                color: var(--htb-text-main, #1f2937);
+                color: var(--htb-text-main, var(--color-gray-800));
                 margin: 0 0 var(--space-1.5);
             }
 
             [data-theme="dark"] .dash-name {
-                color: #f1f5f9;
+                color: var(--color-slate-100);
             }
 
             .dash-badges {
@@ -1030,7 +1030,7 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
                 gap: var(--space-1.5);
                 padding: 6px var(--space-3);
                 background: rgba(139, 92, 246, 0.15);
-                color: #7c3aed;
+                color: var(--color-purple-600);
                 border-radius: 100px;
                 font-size: 0.8rem;
                 font-weight: 600;
@@ -1038,7 +1038,7 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
 
             .dash-badge.partners {
                 background: rgba(16, 185, 129, 0.15);
-                color: #059669;
+                color: var(--color-emerald-600);
             }
 
             .dash-settings-btn {
@@ -1046,7 +1046,7 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
                 background: rgba(255, 255, 255, 0.8);
                 border: 1px solid rgba(139, 92, 246, 0.2);
                 border-radius: var(--radius-md);
-                color: #8b5cf6;
+                color: var(--color-purple-500);
                 text-decoration: none;
                 transition: all 0.2s ease;
             }
@@ -1098,13 +1098,13 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
             .dash-stat-value {
                 font-size: 2rem;
                 font-weight: 800;
-                color: #8b5cf6;
+                color: var(--color-purple-500);
                 margin: 0 0 var(--space-1);
             }
 
             .dash-stat-label {
                 font-size: 0.8rem;
-                color: var(--htb-text-muted, #6b7280);
+                color: var(--htb-text-muted, var(--color-gray-500));
                 font-weight: 600;
                 text-transform: uppercase;
                 letter-spacing: 0.5px;
@@ -1158,17 +1158,17 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
                 align-items: center;
                 justify-content: center;
                 font-size: 1.25rem;
-                color: #8b5cf6;
+                color: var(--color-purple-500);
             }
 
             .dash-action-label {
                 font-size: 0.85rem;
                 font-weight: 600;
-                color: var(--htb-text-main, #1f2937);
+                color: var(--htb-text-main, var(--color-gray-800));
             }
 
             [data-theme="dark"] .dash-action-label {
-                color: #f1f5f9;
+                color: var(--color-slate-100);
             }
 
             .dash-action-badge {
@@ -1177,7 +1177,7 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
                 right: var(--space-3);
                 min-width: 22px;
                 height: 22px;
-                background: #ef4444;
+                background: var(--color-danger);
                 color: white;
                 border-radius: 11px;
                 font-size: 0.75rem;
@@ -1208,7 +1208,7 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
             .dash-section-title {
                 font-size: 1.1rem;
                 font-weight: 700;
-                color: var(--htb-text-main, #1f2937);
+                color: var(--htb-text-main, var(--color-gray-800));
                 margin: 0;
                 display: flex;
                 align-items: center;
@@ -1216,16 +1216,16 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
             }
 
             [data-theme="dark"] .dash-section-title {
-                color: #f1f5f9;
+                color: var(--color-slate-100);
             }
 
             .dash-section-title i {
-                color: #8b5cf6;
+                color: var(--color-purple-500);
             }
 
             .dash-view-all {
                 font-size: 0.85rem;
-                color: #8b5cf6;
+                color: var(--color-purple-500);
                 text-decoration: none;
                 font-weight: 600;
             }
@@ -1269,7 +1269,7 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
                 width: 44px;
                 height: 44px;
                 border-radius: var(--radius-full);
-                background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+                background: linear-gradient(135deg, var(--color-purple-500), var(--color-purple-600));
                 display: flex;
                 align-items: center;
                 justify-content: center;
@@ -1286,11 +1286,11 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
             }
 
             .dash-activity-avatar.sent {
-                background: linear-gradient(135deg, #f59e0b, #d97706);
+                background: linear-gradient(135deg, var(--color-warning), var(--color-amber-600));
             }
 
             .dash-activity-avatar.received {
-                background: linear-gradient(135deg, #10b981, #059669);
+                background: linear-gradient(135deg, var(--color-success), var(--color-emerald-600));
             }
 
             .dash-activity-content {
@@ -1300,18 +1300,18 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
 
             .dash-activity-title {
                 font-weight: 600;
-                color: var(--htb-text-main, #1f2937);
+                color: var(--htb-text-main, var(--color-gray-800));
                 margin: 0 0 var(--space-0.5);
                 font-size: 0.95rem;
             }
 
             [data-theme="dark"] .dash-activity-title {
-                color: #f1f5f9;
+                color: var(--color-slate-100);
             }
 
             .dash-activity-desc {
                 font-size: 0.85rem;
-                color: var(--htb-text-muted, #6b7280);
+                color: var(--htb-text-muted, var(--color-gray-500));
                 margin: 0;
             }
 
@@ -1322,14 +1322,14 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
 
             .dash-activity-time {
                 font-size: 0.8rem;
-                color: var(--htb-text-muted, #6b7280);
+                color: var(--htb-text-muted, var(--color-gray-500));
             }
 
             .dash-activity-badge {
                 font-size: 0.75rem;
                 padding: 3px var(--space-2);
                 background: rgba(139, 92, 246, 0.1);
-                color: #7c3aed;
+                color: var(--color-purple-600);
                 border-radius: var(--space-1.5);
                 margin-top: var(--space-1);
                 display: inline-block;
@@ -1372,7 +1372,7 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
                 display: flex;
                 align-items: center;
                 justify-content: center;
-                color: #8b5cf6;
+                color: var(--color-purple-500);
                 font-size: 1.1rem;
                 flex-shrink: 0;
             }
@@ -1384,7 +1384,7 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
 
             .dash-mini-title {
                 font-weight: 600;
-                color: var(--htb-text-main, #1f2937);
+                color: var(--htb-text-main, var(--color-gray-800));
                 margin: 0 0 var(--space-0.5);
                 font-size: 0.95rem;
                 white-space: nowrap;
@@ -1393,17 +1393,17 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
             }
 
             [data-theme="dark"] .dash-mini-title {
-                color: #f1f5f9;
+                color: var(--color-slate-100);
             }
 
             .dash-mini-subtitle {
                 font-size: 0.8rem;
-                color: var(--htb-text-muted, #6b7280);
+                color: var(--htb-text-muted, var(--color-gray-500));
                 margin: 0;
             }
 
             .dash-mini-arrow {
-                color: #8b5cf6;
+                color: var(--color-purple-500);
                 opacity: 0.5;
             }
 
@@ -1411,7 +1411,7 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
             .dash-empty {
                 text-align: center;
                 padding: 32px var(--space-5);
-                color: var(--htb-text-muted, #6b7280);
+                color: var(--htb-text-muted, var(--color-gray-500));
             }
 
             .dash-empty i {
@@ -1457,7 +1457,7 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
                 right: 0;
                 z-index: 10001;
                 padding: 12px var(--space-5);
-                background: linear-gradient(135deg, #ef4444, #dc2626);
+                background: linear-gradient(135deg, var(--color-danger), var(--color-red-600));
                 color: white;
                 font-size: 0.9rem;
                 font-weight: 600;
@@ -1489,7 +1489,7 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
             .fed-hero-icon {
                 width: 80px;
                 height: 80px;
-                background: linear-gradient(135deg, #8b5cf6, #6366f1);
+                background: linear-gradient(135deg, var(--color-purple-500), var(--color-primary-500));
                 border-radius: var(--radius-xl);
                 display: flex;
                 align-items: center;
@@ -1503,24 +1503,24 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
             .fed-hero h1 {
                 font-size: 2.25rem;
                 font-weight: 800;
-                color: var(--htb-text-main, #1f2937);
+                color: var(--htb-text-main, var(--color-gray-800));
                 margin: 0 0 var(--space-3);
             }
 
             [data-theme="dark"] .fed-hero h1 {
-                color: #f1f5f9;
+                color: var(--color-slate-100);
             }
 
             .fed-hero-subtitle {
                 font-size: 1.1rem;
-                color: var(--htb-text-secondary, #6b7280);
+                color: var(--htb-text-secondary, var(--color-gray-500));
                 max-width: 600px;
                 margin: 0 auto;
                 line-height: 1.6;
             }
 
             [data-theme="dark"] .fed-hero-subtitle {
-                color: #94a3b8;
+                color: var(--color-slate-400);
             }
 
             /* Page Layout */
@@ -1543,7 +1543,7 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
             }
 
             .back-link:hover {
-                color: #8b5cf6;
+                color: var(--color-purple-500);
             }
 
             /* Header Card */
@@ -1572,7 +1572,7 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
             .activity-header h1 {
                 font-size: 1.5rem;
                 font-weight: 800;
-                background: linear-gradient(135deg, #7c3aed, #8b5cf6, #a78bfa);
+                background: linear-gradient(135deg, var(--color-purple-600), var(--color-purple-500), var(--color-purple-400-alt));
                 -webkit-background-clip: text;
                 -webkit-text-fill-color: transparent;
                 background-clip: text;
@@ -1611,19 +1611,19 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
             .stat-value {
                 font-size: 1.35rem;
                 font-weight: 800;
-                color: #8b5cf6;
+                color: var(--color-purple-500);
             }
 
             .stat-value.unread {
-                color: #3b82f6;
+                color: var(--color-info);
             }
 
             .stat-value.sent {
-                color: #ef4444;
+                color: var(--color-danger);
             }
 
             .stat-value.received {
-                color: #10b981;
+                color: var(--color-success);
             }
 
             .stat-label {
@@ -1660,11 +1660,11 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
 
             .filter-tab:hover {
                 background: rgba(139, 92, 246, 0.1);
-                color: #8b5cf6;
+                color: var(--color-purple-500);
             }
 
             .filter-tab.active {
-                background: linear-gradient(135deg, #8b5cf6, #a78bfa);
+                background: linear-gradient(135deg, var(--color-purple-500), var(--color-purple-400-alt));
                 color: white;
                 border-color: transparent;
             }
@@ -1681,7 +1681,7 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
                 font-weight: 700;
                 margin-left: var(--space-1.5);
                 background: rgba(239, 68, 68, 0.2);
-                color: #ef4444;
+                color: var(--color-danger);
             }
 
             .filter-tab.active .badge {
@@ -1725,7 +1725,7 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
             }
 
             .activity-card.unread {
-                border-left: var(--space-1) solid #3b82f6;
+                border-left: var(--space-1) solid var(--color-info);
             }
 
             .activity-icon {
@@ -1756,7 +1756,7 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
                 align-items: center;
                 gap: 5px; /* 5px has no exact token - between --space-1 (4px) and --space-1.5 (6px) */
                 font-size: 0.75rem;
-                color: #8b5cf6;
+                color: var(--color-purple-500);
                 background: rgba(139, 92, 246, 0.1);
                 padding: var(--space-0.5) var(--space-2);
                 border-radius: var(--radius-base);
@@ -1798,29 +1798,29 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
                 width: var(--space-2.5);
                 height: var(--space-2.5);
                 border-radius: var(--radius-full);
-                background: #3b82f6;
+                background: var(--color-info);
                 margin-top: var(--space-2);
             }
 
             /* Type Icons */
             .activity-icon.message {
                 background: rgba(59, 130, 246, 0.15);
-                color: #3b82f6;
+                color: var(--color-info);
             }
 
             .activity-icon.transaction-sent {
                 background: rgba(239, 68, 68, 0.15);
-                color: #ef4444;
+                color: var(--color-danger);
             }
 
             .activity-icon.transaction-received {
                 background: rgba(16, 185, 129, 0.15);
-                color: #10b981;
+                color: var(--color-success);
             }
 
             .activity-icon.partner {
                 background: rgba(139, 92, 246, 0.15);
-                color: #8b5cf6;
+                color: var(--color-purple-500);
             }
 
             /* Empty State */
@@ -1845,7 +1845,7 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
 
             .empty-state-icon {
                 font-size: 4rem;
-                color: #8b5cf6;
+                color: var(--color-purple-500);
                 margin-bottom: var(--space-5);
             }
 
@@ -1866,7 +1866,7 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
                 align-items: center;
                 gap: var(--space-2);
                 padding: 12px var(--space-6);
-                background: linear-gradient(135deg, #8b5cf6, #a78bfa);
+                background: linear-gradient(135deg, var(--color-purple-500), var(--color-purple-400-alt));
                 color: white;
                 text-decoration: none;
                 border-radius: var(--radius-md);
@@ -1893,7 +1893,7 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
 
             .optin-notice i {
                 font-size: 1.5rem;
-                color: #f59e0b;
+                color: var(--color-warning);
             }
 
             .optin-notice h3 {
@@ -1914,7 +1914,7 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
                 align-items: center;
                 gap: var(--space-2);
                 padding: 10px var(--space-5);
-                background: linear-gradient(135deg, #f59e0b, #d97706);
+                background: linear-gradient(135deg, var(--color-warning), var(--color-amber-600));
                 color: white;
                 border-radius: var(--space-2.5);
                 font-weight: 600;
@@ -1976,7 +1976,7 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
                 right: 0;
                 z-index: 10001;
                 padding: 12px var(--space-5);
-                background: linear-gradient(135deg, #ef4444, #dc2626);
+                background: linear-gradient(135deg, var(--color-danger), var(--color-red-600));
                 color: white;
                 font-size: 0.9rem;
                 font-weight: 600;
@@ -2012,7 +2012,7 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
             }
 
             .back-link:hover {
-                color: #8b5cf6;
+                color: var(--color-purple-500);
             }
 
             #fed-events-wrapper {
@@ -2042,7 +2042,7 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
             }
 
             .page-title i {
-                color: #8b5cf6;
+                color: var(--color-purple-500);
             }
 
             .page-subtitle {
@@ -2101,7 +2101,7 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
 
             .search-box input:focus {
                 outline: none;
-                border-color: #8b5cf6;
+                border-color: var(--color-purple-500);
                 box-shadow: 0 0 0 4px rgba(139, 92, 246, 0.15);
             }
 
@@ -2110,7 +2110,7 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
                 left: var(--space-4);
                 top: 50%;
                 transform: translateY(-50%);
-                color: #8b5cf6;
+                color: var(--color-purple-500);
             }
 
             .filter-select {
@@ -2132,7 +2132,7 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
 
             .filter-select:focus {
                 outline: none;
-                border-color: #8b5cf6;
+                border-color: var(--color-purple-500);
             }
 
             /* Events Grid */
@@ -2189,7 +2189,7 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
                 align-items: center;
                 gap: var(--space-2);
                 padding: 8px var(--space-3.5);
-                background: linear-gradient(135deg, #8b5cf6, #a78bfa);
+                background: linear-gradient(135deg, var(--color-purple-500), var(--color-purple-400-alt));
                 color: white;
                 border-radius: var(--space-2.5);
                 font-size: 0.85rem;
@@ -2212,7 +2212,7 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
             }
 
             .event-title a:hover {
-                color: #8b5cf6;
+                color: var(--color-purple-500);
             }
 
             .event-tenant {
@@ -2220,7 +2220,7 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
                 align-items: center;
                 gap: var(--space-1.5);
                 font-size: 0.85rem;
-                color: #8b5cf6;
+                color: var(--color-purple-500);
                 font-weight: 600;
             }
 
@@ -2259,7 +2259,7 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
             }
 
             .event-meta-item i {
-                color: #8b5cf6;
+                color: var(--color-purple-500);
                 width: var(--space-4);
             }
 
@@ -2280,32 +2280,32 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
 
             .spots-available {
                 background: rgba(16, 185, 129, 0.1);
-                color: #059669;
+                color: var(--color-emerald-600);
             }
 
             .spots-limited {
                 background: rgba(245, 158, 11, 0.1);
-                color: #d97706;
+                color: var(--color-amber-600);
             }
 
             .spots-full {
                 background: rgba(239, 68, 68, 0.1);
-                color: #dc2626;
+                color: var(--color-red-600);
             }
 
             [data-theme="dark"] .spots-available {
                 background: rgba(16, 185, 129, 0.2);
-                color: #34d399;
+                color: var(--color-emerald-400);
             }
 
             [data-theme="dark"] .spots-limited {
                 background: rgba(245, 158, 11, 0.2);
-                color: #fbbf24;
+                color: var(--color-amber-300);
             }
 
             [data-theme="dark"] .spots-full {
                 background: rgba(239, 68, 68, 0.2);
-                color: #f87171;
+                color: var(--color-red-400);
             }
 
             .view-btn {
@@ -2313,7 +2313,7 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
                 align-items: center;
                 gap: var(--space-2);
                 padding: var(--space-2.5) var(--font-size-lg);
-                background: linear-gradient(135deg, #8b5cf6, #a78bfa);
+                background: linear-gradient(135deg, var(--color-purple-500), var(--color-purple-400-alt));
                 color: white;
                 text-decoration: none;
                 border-radius: var(--radius-md);
@@ -2338,7 +2338,7 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
                 width: 50px;
                 height: 50px;
                 border: var(--space-1) solid rgba(139, 92, 246, 0.2);
-                border-top-color: #8b5cf6;
+                border-top-color: var(--color-purple-500);
                 border-radius: var(--radius-full);
                 animation: spin 1s linear infinite;
                 margin: 0 auto var(--space-5);
@@ -2361,7 +2361,7 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
 
             .empty-icon i {
                 font-size: 2rem;
-                color: #8b5cf6;
+                color: var(--color-purple-500);
             }
 
             .empty-title {
@@ -2402,7 +2402,7 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
             }
 
             .pagination button:hover:not(:disabled) {
-                border-color: #8b5cf6;
+                border-color: var(--color-purple-500);
                 background: rgba(139, 92, 246, 0.1);
             }
 
@@ -2478,7 +2478,7 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
                 right: 0;
                 z-index: 10001;
                 padding: 12px var(--space-5);
-                background: linear-gradient(135deg, #ef4444, #dc2626);
+                background: linear-gradient(135deg, var(--color-danger), var(--color-red-600));
                 color: white;
                 font-size: 0.9rem;
                 font-weight: 600;
@@ -2519,7 +2519,7 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
             }
 
             .back-link:hover {
-                color: #8b5cf6;
+                color: var(--color-purple-500);
             }
 
             .event-card {
@@ -2566,7 +2566,7 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
                 align-items: center;
                 gap: var(--space-2);
                 padding: var(--space-2.5) var(--font-size-lg);
-                background: linear-gradient(135deg, #8b5cf6, #a78bfa);
+                background: linear-gradient(135deg, var(--color-purple-500), var(--color-purple-400-alt));
                 color: white;
                 border-radius: var(--radius-md);
                 font-size: 0.9rem;
@@ -2582,12 +2582,12 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
                 border-radius: var(--radius-md);
                 font-size: 0.9rem;
                 font-weight: 600;
-                color: #8b5cf6;
+                color: var(--color-purple-500);
             }
 
             [data-theme="dark"] .event-tenant {
                 background: rgba(139, 92, 246, 0.2);
-                color: #a78bfa;
+                color: var(--color-purple-400-alt);
             }
 
             .event-title {
@@ -2612,7 +2612,7 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
             }
 
             .section-title i {
-                color: #8b5cf6;
+                color: var(--color-purple-500);
             }
 
             /* Event Details Grid */
@@ -2646,7 +2646,7 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
 
             .detail-icon i {
                 font-size: 1.1rem;
-                color: #8b5cf6;
+                color: var(--color-purple-500);
             }
 
             .detail-content h4 {
@@ -2735,32 +2735,32 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
 
             .spots-available {
                 background: rgba(16, 185, 129, 0.1);
-                color: #059669;
+                color: var(--color-emerald-600);
             }
 
             .spots-limited {
                 background: rgba(245, 158, 11, 0.1);
-                color: #d97706;
+                color: var(--color-amber-600);
             }
 
             .spots-full {
                 background: rgba(239, 68, 68, 0.1);
-                color: #dc2626;
+                color: var(--color-red-600);
             }
 
             [data-theme="dark"] .spots-available {
                 background: rgba(16, 185, 129, 0.2);
-                color: #34d399;
+                color: var(--color-emerald-400);
             }
 
             [data-theme="dark"] .spots-limited {
                 background: rgba(245, 158, 11, 0.2);
-                color: #fbbf24;
+                color: var(--color-amber-300);
             }
 
             [data-theme="dark"] .spots-full {
                 background: rgba(239, 68, 68, 0.2);
-                color: #f87171;
+                color: var(--color-red-400);
             }
 
             .registered-badge {
@@ -2769,7 +2769,7 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
                 gap: var(--space-2);
                 padding: 8px var(--space-4);
                 background: rgba(16, 185, 129, 0.15);
-                color: #059669;
+                color: var(--color-emerald-600);
                 border-radius: var(--space-2.5);
                 font-weight: 600;
                 font-size: 0.9rem;
@@ -2777,7 +2777,7 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
 
             [data-theme="dark"] .registered-badge {
                 background: rgba(16, 185, 129, 0.25);
-                color: #34d399;
+                color: var(--color-emerald-400);
             }
 
             .register-btn {
@@ -2797,7 +2797,7 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
             }
 
             .register-btn-primary {
-                background: linear-gradient(135deg, #8b5cf6, #a78bfa);
+                background: linear-gradient(135deg, var(--color-purple-500), var(--color-purple-400-alt));
                 color: white;
                 box-shadow: 0 4px 14px rgba(139, 92, 246, 0.35);
             }
@@ -2833,7 +2833,7 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
             }
 
             .privacy-notice i {
-                color: #8b5cf6;
+                color: var(--color-purple-500);
                 margin-top: var(--space-0.5);
             }
 
@@ -2850,23 +2850,23 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
             .alert-success {
                 background: rgba(16, 185, 129, 0.1);
                 border: 1px solid rgba(16, 185, 129, 0.3);
-                color: #059669;
+                color: var(--color-emerald-600);
             }
 
             .alert-error {
                 background: rgba(239, 68, 68, 0.1);
                 border: 1px solid rgba(239, 68, 68, 0.3);
-                color: #dc2626;
+                color: var(--color-red-600);
             }
 
             [data-theme="dark"] .alert-success {
                 background: rgba(16, 185, 129, 0.15);
-                color: #34d399;
+                color: var(--color-emerald-400);
             }
 
             [data-theme="dark"] .alert-error {
                 background: rgba(239, 68, 68, 0.15);
-                color: #f87171;
+                color: var(--color-red-400);
             }
 
             /* Touch Targets */
@@ -2918,7 +2918,7 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
                 right: 0;
                 z-index: 10001;
                 padding: 12px var(--space-5);
-                background: linear-gradient(135deg, #ef4444, #dc2626);
+                background: linear-gradient(135deg, var(--color-danger), var(--color-red-600));
                 color: white;
                 font-size: 0.9rem;
                 font-weight: 600;
@@ -2954,7 +2954,7 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
             }
 
             .back-link:hover {
-                color: #8b5cf6;
+                color: var(--color-purple-500);
             }
 
             #fed-groups-wrapper {
@@ -2984,7 +2984,7 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
             }
 
             .page-title i {
-                color: #8b5cf6;
+                color: var(--color-purple-500);
             }
 
             .page-subtitle {
@@ -2999,7 +2999,7 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
                 gap: var(--space-2);
                 padding: 12px var(--space-5);
                 background: rgba(139, 92, 246, 0.1);
-                color: #8b5cf6;
+                color: var(--color-purple-500);
                 text-decoration: none;
                 border-radius: var(--radius-md);
                 font-weight: 600;
@@ -3061,7 +3061,7 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
 
             .search-box input:focus {
                 outline: none;
-                border-color: #8b5cf6;
+                border-color: var(--color-purple-500);
                 box-shadow: 0 0 0 4px rgba(139, 92, 246, 0.15);
             }
 
@@ -3070,7 +3070,7 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
                 left: var(--space-4);
                 top: 50%;
                 transform: translateY(-50%);
-                color: #8b5cf6;
+                color: var(--color-purple-500);
             }
 
             .filter-select {
@@ -3092,7 +3092,7 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
 
             .filter-select:focus {
                 outline: none;
-                border-color: #8b5cf6;
+                border-color: var(--color-purple-500);
             }
 
             /* Groups Grid */
@@ -3149,7 +3149,7 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
                 align-items: center;
                 gap: var(--space-1.5);
                 font-size: 0.8rem;
-                color: #8b5cf6;
+                color: var(--color-purple-500);
                 font-weight: 600;
                 margin-bottom: var(--space-2.5);
             }
@@ -3169,7 +3169,7 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
             }
 
             .group-name a:hover {
-                color: #8b5cf6;
+                color: var(--color-purple-500);
             }
 
             .group-body {
@@ -3206,7 +3206,7 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
             }
 
             .group-stat i {
-                color: #8b5cf6;
+                color: var(--color-purple-500);
             }
 
             .group-footer {
@@ -3223,7 +3223,7 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
                 gap: var(--space-1.5);
                 padding: 6px var(--space-3);
                 background: rgba(16, 185, 129, 0.1);
-                color: #059669;
+                color: var(--color-emerald-600);
                 border-radius: var(--radius-base);
                 font-size: 0.8rem;
                 font-weight: 600;
@@ -3231,7 +3231,7 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
 
             [data-theme="dark"] .member-badge {
                 background: rgba(16, 185, 129, 0.2);
-                color: #34d399;
+                color: var(--color-emerald-400);
             }
 
             .view-btn {
@@ -3239,7 +3239,7 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
                 align-items: center;
                 gap: var(--space-2);
                 padding: var(--space-2.5) var(--font-size-lg);
-                background: linear-gradient(135deg, #8b5cf6, #a78bfa);
+                background: linear-gradient(135deg, var(--color-purple-500), var(--color-purple-400-alt));
                 color: white;
                 text-decoration: none;
                 border-radius: var(--radius-md);
@@ -3264,7 +3264,7 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
                 width: 50px;
                 height: 50px;
                 border: var(--space-1) solid rgba(139, 92, 246, 0.2);
-                border-top-color: #8b5cf6;
+                border-top-color: var(--color-purple-500);
                 border-radius: var(--radius-full);
                 animation: spin 1s linear infinite;
                 margin: 0 auto var(--space-5);
@@ -3287,7 +3287,7 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
 
             .empty-icon i {
                 font-size: 2rem;
-                color: #8b5cf6;
+                color: var(--color-purple-500);
             }
 
             .empty-title {
@@ -3328,7 +3328,7 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
             }
 
             .pagination button:hover:not(:disabled) {
-                border-color: #8b5cf6;
+                border-color: var(--color-purple-500);
                 background: rgba(139, 92, 246, 0.1);
             }
 
@@ -3406,7 +3406,7 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
                 right: 0;
                 z-index: 10001;
                 padding: 12px var(--space-5);
-                background: linear-gradient(135deg, #ef4444, #dc2626);
+                background: linear-gradient(135deg, var(--color-danger), var(--color-red-600));
                 color: white;
                 font-size: 0.9rem;
                 font-weight: 600;
@@ -3447,7 +3447,7 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
             }
 
             .back-link:hover {
-                color: #8b5cf6;
+                color: var(--color-purple-500);
             }
 
             .group-card {
@@ -3498,12 +3498,12 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
                 border-radius: var(--radius-md);
                 font-size: 0.9rem;
                 font-weight: 600;
-                color: #8b5cf6;
+                color: var(--color-purple-500);
             }
 
             [data-theme="dark"] .group-tenant {
                 background: rgba(139, 92, 246, 0.2);
-                color: #a78bfa;
+                color: var(--color-purple-400-alt);
             }
 
             .group-title {
@@ -3528,7 +3528,7 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
             }
 
             .section-title i {
-                color: #8b5cf6;
+                color: var(--color-purple-500);
             }
 
             /* Group Stats */
@@ -3562,7 +3562,7 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
 
             .stat-icon i {
                 font-size: 1.1rem;
-                color: #8b5cf6;
+                color: var(--color-purple-500);
             }
 
             .stat-content h4 {
@@ -3619,22 +3619,22 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
 
             .status-member {
                 background: rgba(16, 185, 129, 0.15);
-                color: #059669;
+                color: var(--color-emerald-600);
             }
 
             .status-pending {
                 background: rgba(245, 158, 11, 0.15);
-                color: #d97706;
+                color: var(--color-amber-600);
             }
 
             [data-theme="dark"] .status-member {
                 background: rgba(16, 185, 129, 0.25);
-                color: #34d399;
+                color: var(--color-emerald-400);
             }
 
             [data-theme="dark"] .status-pending {
                 background: rgba(245, 158, 11, 0.25);
-                color: #fbbf24;
+                color: var(--color-amber-300);
             }
 
             .action-btn {
@@ -3654,7 +3654,7 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
             }
 
             .action-btn-primary {
-                background: linear-gradient(135deg, #8b5cf6, #a78bfa);
+                background: linear-gradient(135deg, var(--color-purple-500), var(--color-purple-400-alt));
                 color: white;
                 box-shadow: 0 4px 14px rgba(139, 92, 246, 0.35);
             }
@@ -3666,7 +3666,7 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
 
             .action-btn-danger {
                 background: rgba(239, 68, 68, 0.1);
-                color: #dc2626;
+                color: var(--color-red-600);
                 border: 2px solid rgba(239, 68, 68, 0.3);
             }
 
@@ -3700,7 +3700,7 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
             }
 
             .privacy-notice i {
-                color: #8b5cf6;
+                color: var(--color-purple-500);
                 margin-top: var(--space-0.5);
             }
 
@@ -3717,23 +3717,23 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
             .alert-success {
                 background: rgba(16, 185, 129, 0.1);
                 border: 1px solid rgba(16, 185, 129, 0.3);
-                color: #059669;
+                color: var(--color-emerald-600);
             }
 
             .alert-error {
                 background: rgba(239, 68, 68, 0.1);
                 border: 1px solid rgba(239, 68, 68, 0.3);
-                color: #dc2626;
+                color: var(--color-red-600);
             }
 
             [data-theme="dark"] .alert-success {
                 background: rgba(16, 185, 129, 0.15);
-                color: #34d399;
+                color: var(--color-emerald-400);
             }
 
             [data-theme="dark"] .alert-error {
                 background: rgba(239, 68, 68, 0.15);
-                color: #f87171;
+                color: var(--color-red-400);
             }
 
             /* Touch Targets */
@@ -3785,7 +3785,7 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
                 right: 0;
                 z-index: 10001;
                 padding: 12px var(--space-5);
-                background: linear-gradient(135deg, #ef4444, #dc2626);
+                background: linear-gradient(135deg, var(--color-danger), var(--color-red-600));
                 color: white;
                 font-size: 0.9rem;
                 font-weight: 600;
@@ -3846,7 +3846,7 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
 
             .enable-icon i {
                 font-size: 3rem;
-                color: #8b5cf6;
+                color: var(--color-purple-500);
             }
 
             .enable-title {
@@ -3868,7 +3868,7 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
                 align-items: center;
                 gap: var(--space-2.5);
                 padding: 14px var(--space-7);
-                background: linear-gradient(135deg, #8b5cf6, #a78bfa);
+                background: linear-gradient(135deg, var(--color-purple-500), var(--color-purple-400-alt));
                 color: white;
                 text-decoration: none;
                 border-radius: var(--space-3.5);
@@ -3931,7 +3931,7 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
                 right: 0;
                 z-index: 10001;
                 padding: 12px var(--space-5);
-                background: linear-gradient(135deg, #ef4444, #dc2626);
+                background: linear-gradient(135deg, var(--color-danger), var(--color-red-600));
                 color: white;
                 font-size: 0.9rem;
                 font-weight: 600;
@@ -3969,7 +3969,7 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
                 display: inline-flex;
                 align-items: center;
                 gap: var(--space-2);
-                color: var(--htb-text-muted, #6b7280);
+                color: var(--htb-text-muted, var(--color-gray-500));
                 text-decoration: none;
                 font-size: 0.9rem;
                 margin-bottom: var(--space-6);
@@ -3978,7 +3978,7 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
             }
 
             .back-link:hover {
-                color: #8b5cf6;
+                color: var(--color-purple-500);
             }
 
             /* Page Header */
@@ -3991,7 +3991,7 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
             .help-icon {
                 width: 80px;
                 height: 80px;
-                background: linear-gradient(135deg, #8b5cf6, #6366f1);
+                background: linear-gradient(135deg, var(--color-purple-500), var(--color-primary-500));
                 border-radius: var(--radius-xl);
                 display: flex;
                 align-items: center;
@@ -4005,17 +4005,17 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
             .help-title {
                 font-size: 2rem;
                 font-weight: 800;
-                color: var(--htb-text-main, #1f2937);
+                color: var(--htb-text-main, var(--color-gray-800));
                 margin: 0 0 var(--space-3);
             }
 
             [data-theme="dark"] .help-title {
-                color: #f1f5f9;
+                color: var(--color-slate-100);
             }
 
             .help-subtitle {
                 font-size: 1.1rem;
-                color: var(--htb-text-muted, #6b7280);
+                color: var(--htb-text-muted, var(--color-gray-500));
                 max-width: 600px;
                 margin: 0 auto;
             }
@@ -4035,7 +4035,7 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
                 background: rgba(139, 92, 246, 0.1);
                 border: 1px solid rgba(139, 92, 246, 0.2);
                 border-radius: 100px;
-                color: #8b5cf6;
+                color: var(--color-purple-500);
                 text-decoration: none;
                 font-size: 0.9rem;
                 font-weight: 600;
@@ -4061,7 +4061,7 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
             .faq-section-title {
                 font-size: 1.25rem;
                 font-weight: 700;
-                color: var(--htb-text-main, #1f2937);
+                color: var(--htb-text-main, var(--color-gray-800));
                 margin: 0 0 var(--space-5);
                 display: flex;
                 align-items: center;
@@ -4069,11 +4069,11 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
             }
 
             [data-theme="dark"] .faq-section-title {
-                color: #f1f5f9;
+                color: var(--color-slate-100);
             }
 
             .faq-section-title i {
-                color: #8b5cf6;
+                color: var(--color-purple-500);
             }
 
             /* FAQ Item */
@@ -4110,12 +4110,12 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
                 gap: var(--space-4);
                 font-size: 1rem;
                 font-weight: 600;
-                color: var(--htb-text-main, #1f2937);
+                color: var(--htb-text-main, var(--color-gray-800));
                 transition: background 0.2s ease;
             }
 
             [data-theme="dark"] .faq-question {
-                color: #f1f5f9;
+                color: var(--color-slate-100);
             }
 
             .faq-question:hover {
@@ -4123,7 +4123,7 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
             }
 
             .faq-question i {
-                color: #8b5cf6;
+                color: var(--color-purple-500);
                 font-size: 0.9rem;
                 transition: transform 0.3s ease;
                 flex-shrink: 0;
@@ -4145,13 +4145,13 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
 
             .faq-answer-content {
                 padding: 0 24px var(--space-5);
-                color: var(--htb-text-muted, #6b7280);
+                color: var(--htb-text-muted, var(--color-gray-500));
                 font-size: 0.95rem;
                 line-height: 1.7;
             }
 
             .faq-answer-content a {
-                color: #8b5cf6;
+                color: var(--color-purple-500);
                 text-decoration: none;
                 font-weight: 500;
             }
@@ -4217,23 +4217,23 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
 
             .help-card-icon i {
                 font-size: 1.25rem;
-                color: #8b5cf6;
+                color: var(--color-purple-500);
             }
 
             .help-card-title {
                 font-size: 1.1rem;
                 font-weight: 700;
-                color: var(--htb-text-main, #1f2937);
+                color: var(--htb-text-main, var(--color-gray-800));
                 margin: 0 0 var(--space-2);
             }
 
             [data-theme="dark"] .help-card-title {
-                color: #f1f5f9;
+                color: var(--color-slate-100);
             }
 
             .help-card-desc {
                 font-size: 0.9rem;
-                color: var(--htb-text-muted, #6b7280);
+                color: var(--htb-text-muted, var(--color-gray-500));
                 margin: 0;
                 line-height: 1.5;
             }
@@ -4254,16 +4254,16 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
             .contact-title {
                 font-size: 1.25rem;
                 font-weight: 700;
-                color: var(--htb-text-main, #1f2937);
+                color: var(--htb-text-main, var(--color-gray-800));
                 margin: 0 0 var(--space-3);
             }
 
             [data-theme="dark"] .contact-title {
-                color: #f1f5f9;
+                color: var(--color-slate-100);
             }
 
             .contact-desc {
-                color: var(--htb-text-muted, #6b7280);
+                color: var(--htb-text-muted, var(--color-gray-500));
                 margin: 0 0 var(--space-5);
                 font-size: 0.95rem;
             }
@@ -4273,7 +4273,7 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
                 align-items: center;
                 gap: var(--space-2);
                 padding: 12px var(--space-6);
-                background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+                background: linear-gradient(135deg, var(--color-purple-500), var(--color-purple-600));
                 color: white;
                 border-radius: var(--radius-md);
                 text-decoration: none;
@@ -4320,7 +4320,7 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
                 right: 0;
                 z-index: 10001;
                 padding: 12px var(--space-5);
-                background: linear-gradient(135deg, #ef4444, #dc2626);
+                background: linear-gradient(135deg, var(--color-danger), var(--color-red-600));
                 color: white;
                 font-size: 0.9rem;
                 font-weight: 600;
@@ -4356,7 +4356,7 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
             }
 
             .back-link:hover {
-                color: #8b5cf6;
+                color: var(--color-purple-500);
             }
 
             /* Welcome Hero */
@@ -4386,7 +4386,7 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
             #federation-listings-wrapper .nexus-welcome-title {
                 font-size: 1.75rem;
                 font-weight: 800;
-                background: linear-gradient(135deg, #7c3aed, #8b5cf6, #a78bfa);
+                background: linear-gradient(135deg, var(--color-purple-600), var(--color-purple-500), var(--color-purple-400-alt));
                 -webkit-background-clip: text;
                 -webkit-text-fill-color: transparent;
                 background-clip: text;
@@ -4412,7 +4412,7 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
                 border-radius: var(--space-5);
                 padding: var(--space-1) var(--space-3);
                 font-size: 0.75rem;
-                color: #8b5cf6;
+                color: var(--color-purple-500);
                 margin-bottom: var(--space-3);
             }
 
@@ -4555,22 +4555,22 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
 
             .listing-type.offer {
                 background: rgba(16, 185, 129, 0.15);
-                color: #059669;
+                color: var(--color-emerald-600);
             }
 
             .listing-type.request {
                 background: rgba(59, 130, 246, 0.15);
-                color: #2563eb;
+                color: var(--color-blue-600);
             }
 
             [data-theme="dark"] .listing-type.offer {
                 background: rgba(16, 185, 129, 0.25);
-                color: #34d399;
+                color: var(--color-emerald-400);
             }
 
             [data-theme="dark"] .listing-type.request {
                 background: rgba(59, 130, 246, 0.25);
-                color: #60a5fa;
+                color: var(--color-blue-400);
             }
 
             .listing-title {
@@ -4602,13 +4602,13 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
                 border-radius: var(--space-2.5);
                 font-size: 0.75rem;
                 font-weight: 600;
-                color: #8b5cf6;
+                color: var(--color-purple-500);
                 margin-bottom: var(--space-3);
             }
 
             [data-theme="dark"] .listing-tenant {
                 background: rgba(139, 92, 246, 0.2);
-                color: #a78bfa;
+                color: var(--color-purple-400-alt);
             }
 
             /* Owner Info */
@@ -4663,7 +4663,7 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
 
             .empty-state-icon {
                 font-size: 4rem;
-                color: #8b5cf6;
+                color: var(--color-purple-500);
                 margin-bottom: var(--space-5);
             }
 
@@ -4672,7 +4672,7 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
                 width: var(--space-5);
                 height: var(--space-5);
                 border: 2px solid rgba(139, 92, 246, 0.2);
-                border-top-color: #8b5cf6;
+                border-top-color: var(--color-purple-500);
                 border-radius: var(--radius-full);
                 animation: spin 0.8s linear infinite;
             }
@@ -4723,7 +4723,7 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
                 right: 0;
                 z-index: 10001;
                 padding: 12px var(--space-5);
-                background: linear-gradient(135deg, #ef4444, #dc2626);
+                background: linear-gradient(135deg, var(--color-danger), var(--color-red-600));
                 color: white;
                 font-size: 0.9rem;
                 font-weight: 600;
@@ -4764,7 +4764,7 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
             }
 
             .back-link:hover {
-                color: #8b5cf6;
+                color: var(--color-purple-500);
             }
 
             .listing-card {
@@ -4819,22 +4819,22 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
 
             .listing-type.offer {
                 background: rgba(16, 185, 129, 0.15);
-                color: #059669;
+                color: var(--color-emerald-600);
             }
 
             .listing-type.request {
                 background: rgba(59, 130, 246, 0.15);
-                color: #2563eb;
+                color: var(--color-blue-600);
             }
 
             [data-theme="dark"] .listing-type.offer {
                 background: rgba(16, 185, 129, 0.25);
-                color: #34d399;
+                color: var(--color-emerald-400);
             }
 
             [data-theme="dark"] .listing-type.request {
                 background: rgba(59, 130, 246, 0.25);
-                color: #60a5fa;
+                color: var(--color-blue-400);
             }
 
             .listing-tenant {
@@ -4846,12 +4846,12 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
                 border-radius: var(--radius-md);
                 font-size: 0.85rem;
                 font-weight: 600;
-                color: #8b5cf6;
+                color: var(--color-purple-500);
             }
 
             [data-theme="dark"] .listing-tenant {
                 background: rgba(139, 92, 246, 0.2);
-                color: #a78bfa;
+                color: var(--color-purple-400-alt);
             }
 
             .listing-title {
@@ -4881,7 +4881,7 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
             }
 
             .section-title i {
-                color: #8b5cf6;
+                color: var(--color-purple-500);
             }
 
             .listing-description {
@@ -4951,7 +4951,7 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
             }
 
             .action-btn-primary {
-                background: linear-gradient(135deg, #8b5cf6, #a78bfa);
+                background: linear-gradient(135deg, var(--color-purple-500), var(--color-purple-400-alt));
                 color: white;
                 box-shadow: 0 4px 14px rgba(139, 92, 246, 0.35);
             }
@@ -4987,7 +4987,7 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
             }
 
             .privacy-notice i {
-                color: #8b5cf6;
+                color: var(--color-purple-500);
                 margin-top: var(--space-0.5);
             }
 
@@ -5043,7 +5043,7 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
                 right: 0;
                 z-index: 10001;
                 padding: 12px var(--space-5);
-                background: linear-gradient(135deg, #ef4444, #dc2626);
+                background: linear-gradient(135deg, var(--color-danger), var(--color-red-600));
                 color: white;
                 font-size: 0.9rem;
                 font-weight: 600;
@@ -5085,7 +5085,7 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
             }
 
             .back-link:hover {
-                color: #8b5cf6;
+                color: var(--color-purple-500);
             }
 
             /* Profile Card */
@@ -5141,7 +5141,7 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
             .profile-avatar-ring {
                 position: absolute;
                 inset: -5px;
-                background: linear-gradient(135deg, #8b5cf6, #a78bfa, #c4b5fd);
+                background: linear-gradient(135deg, var(--color-purple-500), var(--color-purple-400-alt), var(--color-purple-300));
                 border-radius: var(--radius-full);
                 animation: avatarPulse 3s ease-in-out infinite;
             }
@@ -5164,7 +5164,7 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
             }
 
             [data-theme="dark"] .profile-avatar-img {
-                border-color: #1e293b;
+                border-color: var(--color-slate-800);
             }
 
             /* Profile Name */
@@ -5186,13 +5186,13 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
                 padding: 8px var(--space-4);
                 font-size: 0.9rem;
                 font-weight: 600;
-                color: #7c3aed;
+                color: var(--color-purple-600);
                 margin-bottom: 15px; /* 15px has no exact token */
             }
 
             [data-theme="dark"] .federation-badge {
                 background: linear-gradient(135deg, rgba(139, 92, 246, 0.25), rgba(168, 85, 247, 0.2));
-                color: #a78bfa;
+                color: var(--color-purple-400-alt);
             }
 
             /* Service Reach Badge */
@@ -5208,32 +5208,32 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
 
             .reach-badge.local {
                 background: rgba(234, 179, 8, 0.15);
-                color: #ca8a04;
+                color: var(--color-yellow-600);
             }
 
             .reach-badge.remote {
                 background: rgba(16, 185, 129, 0.15);
-                color: #059669;
+                color: var(--color-emerald-600);
             }
 
             .reach-badge.travel {
                 background: rgba(59, 130, 246, 0.15);
-                color: #2563eb;
+                color: var(--color-blue-600);
             }
 
             [data-theme="dark"] .reach-badge.local {
                 background: rgba(234, 179, 8, 0.25);
-                color: #fbbf24;
+                color: var(--color-amber-300);
             }
 
             [data-theme="dark"] .reach-badge.remote {
                 background: rgba(16, 185, 129, 0.25);
-                color: #34d399;
+                color: var(--color-emerald-400);
             }
 
             [data-theme="dark"] .reach-badge.travel {
                 background: rgba(59, 130, 246, 0.25);
-                color: #60a5fa;
+                color: var(--color-blue-400);
             }
 
             /* Profile Body */
@@ -5257,7 +5257,7 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
             }
 
             .info-section h3 i {
-                color: #8b5cf6;
+                color: var(--color-purple-500);
             }
 
             .info-content {
@@ -5276,7 +5276,7 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
             }
 
             .location-display i {
-                color: #8b5cf6;
+                color: var(--color-purple-500);
                 font-size: 1.1rem;
             }
 
@@ -5295,12 +5295,12 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
                 border-radius: var(--space-5);
                 font-size: 0.85rem;
                 font-weight: 600;
-                color: #7c3aed;
+                color: var(--color-purple-600);
             }
 
             [data-theme="dark"] .skill-tag {
                 background: linear-gradient(135deg, rgba(139, 92, 246, 0.2), rgba(168, 85, 247, 0.15));
-                color: #a78bfa;
+                color: var(--color-purple-400-alt);
             }
 
             /* Action Buttons */
@@ -5331,7 +5331,7 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
             }
 
             .action-btn-primary {
-                background: linear-gradient(135deg, #8b5cf6, #a78bfa);
+                background: linear-gradient(135deg, var(--color-purple-500), var(--color-purple-400-alt));
                 color: white;
                 box-shadow: 0 4px 14px rgba(139, 92, 246, 0.35);
             }
@@ -5343,18 +5343,18 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
 
             .action-btn-secondary {
                 background: linear-gradient(135deg, rgba(139, 92, 246, 0.1), rgba(168, 85, 247, 0.1));
-                color: #7c3aed;
+                color: var(--color-purple-600);
                 border: 2px solid rgba(139, 92, 246, 0.3);
             }
 
             [data-theme="dark"] .action-btn-secondary {
                 background: linear-gradient(135deg, rgba(139, 92, 246, 0.2), rgba(168, 85, 247, 0.15));
-                color: #a78bfa;
+                color: var(--color-purple-400-alt);
                 border-color: rgba(139, 92, 246, 0.4);
             }
 
             .action-btn-secondary:hover {
-                background: linear-gradient(135deg, #8b5cf6, #a78bfa);
+                background: linear-gradient(135deg, var(--color-purple-500), var(--color-purple-400-alt));
                 color: white;
                 border-color: transparent;
                 transform: translateY(-2px);
@@ -5372,7 +5372,7 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
             }
 
             .action-btn-review {
-                background: linear-gradient(135deg, #f59e0b, #fbbf24);
+                background: linear-gradient(135deg, var(--color-warning), var(--color-amber-300));
                 color: #1a1a1a;
                 box-shadow: 0 4px 14px rgba(245, 158, 11, 0.35);
             }
@@ -5384,7 +5384,7 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
             }
 
             .action-btn-review.reviewed {
-                background: linear-gradient(135deg, #10b981, #34d399);
+                background: linear-gradient(135deg, var(--color-success), var(--color-emerald-400));
                 color: white;
                 pointer-events: none;
                 box-shadow: 0 4px 14px rgba(16, 185, 129, 0.35);
@@ -5405,7 +5405,7 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
             }
 
             .privacy-notice i {
-                color: #8b5cf6;
+                color: var(--color-purple-500);
                 margin-top: var(--space-0.5);
             }
 
@@ -5463,7 +5463,7 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
                 transform: translate(-50%, -50%);
                 font-size: 1.25rem;
                 font-weight: 800;
-                color: #8b5cf6;
+                color: var(--color-purple-500);
             }
 
             .trust-score-info {
@@ -5500,7 +5500,7 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
             }
 
             .trust-detail i {
-                color: #8b5cf6;
+                color: var(--color-purple-500);
             }
 
             /* Reviews Section */
@@ -5530,13 +5530,13 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
             .reviews-average-value {
                 font-size: 2rem;
                 font-weight: 800;
-                color: #8b5cf6;
+                color: var(--color-purple-500);
             }
 
             .reviews-average-stars {
                 display: flex;
                 gap: var(--space-0.5);
-                color: #fbbf24;
+                color: var(--color-amber-300);
             }
 
             .reviews-count {
@@ -5573,7 +5573,7 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
                 width: 44px;
                 height: 44px;
                 border-radius: var(--radius-full);
-                background: linear-gradient(135deg, #8b5cf6, #a78bfa);
+                background: linear-gradient(135deg, var(--color-purple-500), var(--color-purple-400-alt));
                 display: flex;
                 align-items: center;
                 justify-content: center;
@@ -5617,14 +5617,14 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
                 font-size: 0.7rem;
                 padding: var(--space-0.5) var(--space-2);
                 background: rgba(139, 92, 246, 0.15);
-                color: #8b5cf6;
+                color: var(--color-purple-500);
                 border-radius: var(--space-2.5);
             }
 
             .review-rating {
                 display: flex;
                 gap: var(--space-0.5);
-                color: #fbbf24;
+                color: var(--color-amber-300);
                 font-size: 0.85rem;
             }
 
@@ -5644,7 +5644,7 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
             }
 
             .review-meta i {
-                color: #8b5cf6;
+                color: var(--color-purple-500);
             }
 
             .no-reviews {
@@ -5727,7 +5727,7 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
                 right: 0;
                 z-index: 10001;
                 padding: 12px var(--space-5);
-                background: linear-gradient(135deg, #ef4444, #dc2626);
+                background: linear-gradient(135deg, var(--color-danger), var(--color-red-600));
                 color: white;
                 font-size: 0.9rem;
                 font-weight: 600;
@@ -5835,7 +5835,7 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
             #federation-glass-wrapper .nexus-welcome-title {
                 font-size: 1.75rem;
                 font-weight: 800;
-                background: linear-gradient(135deg, #7c3aed, #8b5cf6, #a78bfa);
+                background: linear-gradient(135deg, var(--color-purple-600), var(--color-purple-500), var(--color-purple-400-alt));
                 -webkit-background-clip: text;
                 -webkit-text-fill-color: transparent;
                 background-clip: text;
@@ -5863,13 +5863,13 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
                 border-radius: var(--space-5);
                 padding: var(--space-1) var(--space-3);
                 font-size: 0.75rem;
-                color: #8b5cf6;
+                color: var(--color-purple-500);
                 margin-bottom: var(--space-3);
             }
 
             [data-theme="dark"] .federation-badge {
                 background: linear-gradient(135deg, rgba(139, 92, 246, 0.25), rgba(168, 85, 247, 0.2));
-                color: #a78bfa;
+                color: var(--color-purple-400-alt);
             }
 
             /* Glass Search/Filter Card */
@@ -5930,7 +5930,7 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
             [data-theme="dark"] #federation-glass-wrapper .glass-search-input {
                 background: rgba(15, 23, 42, 0.7);
                 border: 2px solid rgba(255, 255, 255, 0.2);
-                color: #f8fafc;
+                color: var(--color-slate-50);
                 box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3),
                     inset 0 1px 0 rgba(255, 255, 255, 0.1);
             }
@@ -5964,7 +5964,7 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
             [data-theme="dark"] #federation-glass-wrapper .glass-select {
                 background: rgba(15, 23, 42, 0.7);
                 border: 2px solid rgba(255, 255, 255, 0.2);
-                color: #f8fafc;
+                color: var(--color-slate-50);
             }
 
             /* Section Headers */
@@ -5974,7 +5974,7 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
                 gap: var(--space-3);
                 margin: var(--space-10) 0 var(--space-6) 0;
                 padding-left: var(--space-4);
-                border-left: var(--space-1) solid #8b5cf6;
+                border-left: var(--space-1) solid var(--color-purple-500);
             }
 
             #federation-glass-wrapper .section-header h2 {
@@ -6050,7 +6050,7 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
             #federation-glass-wrapper .avatar-ring {
                 position: absolute;
                 inset: -4px;
-                background: linear-gradient(135deg, #8b5cf6, #a78bfa, #c4b5fd);
+                background: linear-gradient(135deg, var(--color-purple-500), var(--color-purple-400-alt), var(--color-purple-300));
                 border-radius: var(--radius-full);
                 animation: avatarPulse 3s ease-in-out infinite;
             }
@@ -6073,7 +6073,7 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
             }
 
             [data-theme="dark"] #federation-glass-wrapper .avatar-img {
-                border-color: #1e293b;
+                border-color: var(--color-slate-800);
             }
 
             /* Member Name */
@@ -6094,13 +6094,13 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
                 font-size: 0.8rem;
                 font-weight: 600;
                 background: linear-gradient(135deg, rgba(139, 92, 246, 0.1), rgba(168, 85, 247, 0.1));
-                color: #7c3aed;
+                color: var(--color-purple-600);
                 margin-bottom: var(--space-3);
             }
 
             [data-theme="dark"] #federation-glass-wrapper .tenant-badge {
                 background: linear-gradient(135deg, rgba(139, 92, 246, 0.2), rgba(168, 85, 247, 0.15));
-                color: #a78bfa;
+                color: var(--color-purple-400-alt);
             }
 
             /* Service Reach Badge */
@@ -6117,32 +6117,32 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
 
             #federation-glass-wrapper .reach-badge.local {
                 background: rgba(234, 179, 8, 0.15);
-                color: #ca8a04;
+                color: var(--color-yellow-600);
             }
 
             #federation-glass-wrapper .reach-badge.remote {
                 background: rgba(16, 185, 129, 0.15);
-                color: #059669;
+                color: var(--color-emerald-600);
             }
 
             #federation-glass-wrapper .reach-badge.travel {
                 background: rgba(59, 130, 246, 0.15);
-                color: #2563eb;
+                color: var(--color-blue-600);
             }
 
             [data-theme="dark"] #federation-glass-wrapper .reach-badge.local {
                 background: rgba(234, 179, 8, 0.25);
-                color: #fbbf24;
+                color: var(--color-amber-300);
             }
 
             [data-theme="dark"] #federation-glass-wrapper .reach-badge.remote {
                 background: rgba(16, 185, 129, 0.25);
-                color: #34d399;
+                color: var(--color-emerald-400);
             }
 
             [data-theme="dark"] #federation-glass-wrapper .reach-badge.travel {
                 background: rgba(59, 130, 246, 0.25);
-                color: #60a5fa;
+                color: var(--color-blue-400);
             }
 
             /* Location */
@@ -6157,7 +6157,7 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
             }
 
             #federation-glass-wrapper .member-location i {
-                color: #8b5cf6;
+                color: var(--color-purple-500);
             }
 
             /* Bio */
@@ -6179,7 +6179,7 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
                 padding: 12px 0;
                 border: 2px solid rgba(139, 92, 246, 0.3);
                 border-radius: var(--radius-md);
-                color: #8b5cf6;
+                color: var(--color-purple-500);
                 font-weight: 700;
                 text-decoration: none;
                 transition: all 0.3s ease;
@@ -6187,7 +6187,7 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
             }
 
             #federation-glass-wrapper .view-profile-btn:hover {
-                background: linear-gradient(135deg, #8b5cf6, #a78bfa);
+                background: linear-gradient(135deg, var(--color-purple-500), var(--color-purple-400-alt));
                 border-color: transparent;
                 color: white;
                 transform: translateY(-2px);
@@ -6196,7 +6196,7 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
 
             [data-theme="dark"] #federation-glass-wrapper .view-profile-btn {
                 border-color: rgba(139, 92, 246, 0.4);
-                color: #a78bfa;
+                color: var(--color-purple-400-alt);
             }
 
             /* Grid Layout */
@@ -6234,7 +6234,7 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
                 width: var(--space-5);
                 height: var(--space-5);
                 border: 2px solid rgba(139, 92, 246, 0.2);
-                border-top-color: #8b5cf6;
+                border-top-color: var(--color-purple-500);
                 border-radius: var(--radius-full);
                 animation: spin 0.8s linear infinite;
             }
@@ -6298,7 +6298,7 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
                 background: rgba(139, 92, 246, 0.1);
                 border: 1px solid rgba(139, 92, 246, 0.2);
                 border-radius: var(--space-2.5);
-                color: #8b5cf6;
+                color: var(--color-purple-500);
                 font-size: 0.9rem;
                 font-weight: 600;
                 cursor: pointer;
@@ -6348,7 +6348,7 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
             [data-theme="dark"] .skills-input {
                 background: rgba(15, 23, 42, 0.7);
                 border-color: rgba(255, 255, 255, 0.2);
-                color: #f8fafc;
+                color: var(--color-slate-50);
             }
 
             .skills-input:focus {
@@ -6410,12 +6410,12 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
                 border: 1px solid rgba(139, 92, 246, 0.3);
                 border-radius: var(--space-5);
                 font-size: 0.85rem;
-                color: #8b5cf6;
+                color: var(--color-purple-500);
             }
 
             [data-theme="dark"] .skill-tag {
                 background: linear-gradient(135deg, rgba(139, 92, 246, 0.25), rgba(168, 85, 247, 0.15));
-                color: #a78bfa;
+                color: var(--color-purple-400-alt);
             }
 
             .skill-tag .remove {
@@ -6449,7 +6449,7 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
 
             .popular-skill:hover {
                 background: rgba(139, 92, 246, 0.15);
-                color: #8b5cf6;
+                color: var(--color-purple-500);
                 border-color: rgba(139, 92, 246, 0.3);
             }
 
@@ -6472,12 +6472,12 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
             .filter-toggle input[type="checkbox"] {
                 width: 18px;
                 height: 18px;
-                accent-color: #8b5cf6;
+                accent-color: var(--color-purple-500);
                 cursor: pointer;
             }
 
             .filter-toggle:hover {
-                color: #8b5cf6;
+                color: var(--color-purple-500);
             }
 
             /* Search Stats Bar */
@@ -6500,7 +6500,7 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
             }
 
             .stat-item i {
-                color: #8b5cf6;
+                color: var(--color-purple-500);
             }
 
             .stat-item strong {
@@ -6521,7 +6521,7 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
             [data-theme="dark"] .sort-select {
                 background: rgba(15, 23, 42, 0.7);
                 border-color: rgba(255, 255, 255, 0.15);
-                color: #f8fafc;
+                color: var(--color-slate-50);
             }
 
             /* Active Filters Badge */
@@ -6532,7 +6532,7 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
                 min-width: var(--space-5);
                 height: var(--space-5);
                 padding: 0 var(--space-1.5);
-                background: #8b5cf6;
+                background: var(--color-purple-500);
                 color: white;
                 border-radius: var(--space-2.5);
                 font-size: 0.75rem;
@@ -6546,7 +6546,7 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
                 background: transparent;
                 border: 1px solid rgba(239, 68, 68, 0.3);
                 border-radius: var(--radius-base);
-                color: #ef4444;
+                color: var(--color-danger);
                 font-size: 0.85rem;
                 cursor: pointer;
                 transition: all 0.2s ease;
@@ -6569,7 +6569,7 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
             }
 
             .back-link:hover {
-                color: #8b5cf6;
+                color: var(--color-purple-500);
             }
 
 /* =============================================
@@ -6584,7 +6584,7 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
                 right: 0;
                 z-index: 10001;
                 padding: 12px var(--space-5);
-                background: linear-gradient(135deg, #ef4444, #dc2626);
+                background: linear-gradient(135deg, var(--color-danger), var(--color-red-600));
                 color: white;
                 font-size: 0.9rem;
                 font-weight: 600;
@@ -6633,7 +6633,7 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
             }
 
             .page-title i {
-                color: #8b5cf6;
+                color: var(--color-purple-500);
             }
 
             .page-subtitle {
@@ -6647,7 +6647,7 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
                 align-items: center;
                 gap: var(--space-2);
                 padding: 12px var(--space-5);
-                background: linear-gradient(135deg, #8b5cf6, #a78bfa);
+                background: linear-gradient(135deg, var(--color-purple-500), var(--color-purple-400-alt));
                 color: white;
                 text-decoration: none;
                 border-radius: var(--radius-md);
@@ -6709,7 +6709,7 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
 
             .group-icon i {
                 font-size: 1.5rem;
-                color: #8b5cf6;
+                color: var(--color-purple-500);
             }
 
             .group-info {
@@ -6731,7 +6731,7 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
             }
 
             .group-name a:hover {
-                color: #8b5cf6;
+                color: var(--color-purple-500);
             }
 
             .group-meta {
@@ -6749,7 +6749,7 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
             }
 
             .group-meta-item i {
-                color: #8b5cf6;
+                color: var(--color-purple-500);
             }
 
             .status-badge {
@@ -6765,22 +6765,22 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
 
             .status-approved {
                 background: rgba(16, 185, 129, 0.1);
-                color: #059669;
+                color: var(--color-emerald-600);
             }
 
             .status-pending {
                 background: rgba(245, 158, 11, 0.1);
-                color: #d97706;
+                color: var(--color-amber-600);
             }
 
             [data-theme="dark"] .status-approved {
                 background: rgba(16, 185, 129, 0.2);
-                color: #34d399;
+                color: var(--color-emerald-400);
             }
 
             [data-theme="dark"] .status-pending {
                 background: rgba(245, 158, 11, 0.2);
-                color: #fbbf24;
+                color: var(--color-amber-300);
             }
 
             .group-actions {
@@ -6803,7 +6803,7 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
 
             .action-link-primary {
                 background: rgba(139, 92, 246, 0.1);
-                color: #8b5cf6;
+                color: var(--color-purple-500);
             }
 
             .action-link-primary:hover {
@@ -6844,7 +6844,7 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
 
             .empty-icon i {
                 font-size: 2rem;
-                color: #8b5cf6;
+                color: var(--color-purple-500);
             }
 
             .empty-title {
@@ -6865,7 +6865,7 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
                 align-items: center;
                 gap: var(--space-2);
                 padding: 12px var(--space-6);
-                background: linear-gradient(135deg, #8b5cf6, #a78bfa);
+                background: linear-gradient(135deg, var(--color-purple-500), var(--color-purple-400-alt));
                 color: white;
                 text-decoration: none;
                 border-radius: var(--radius-md);
@@ -6892,23 +6892,23 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
             .alert-success {
                 background: rgba(16, 185, 129, 0.1);
                 border: 1px solid rgba(16, 185, 129, 0.3);
-                color: #059669;
+                color: var(--color-emerald-600);
             }
 
             .alert-error {
                 background: rgba(239, 68, 68, 0.1);
                 border: 1px solid rgba(239, 68, 68, 0.3);
-                color: #dc2626;
+                color: var(--color-red-600);
             }
 
             [data-theme="dark"] .alert-success {
                 background: rgba(16, 185, 129, 0.15);
-                color: #34d399;
+                color: var(--color-emerald-400);
             }
 
             [data-theme="dark"] .alert-error {
                 background: rgba(239, 68, 68, 0.15);
-                color: #f87171;
+                color: var(--color-red-400);
             }
 
             /* Touch Targets & Focus */
@@ -6964,7 +6964,7 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
                 right: 0;
                 z-index: 10001;
                 padding: 12px var(--space-5);
-                background: linear-gradient(135deg, #ef4444, #dc2626);
+                background: linear-gradient(135deg, var(--color-danger), var(--color-red-600));
                 color: white;
                 font-size: 0.9rem;
                 font-weight: 600;
@@ -7026,7 +7026,7 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
 
             .unavailable-icon i {
                 font-size: 3rem;
-                color: #8b5cf6;
+                color: var(--color-purple-500);
             }
 
             .unavailable-title {
@@ -7048,7 +7048,7 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
                 align-items: center;
                 gap: var(--space-2.5);
                 padding: 14px var(--space-7);
-                background: linear-gradient(135deg, #8b5cf6, #a78bfa);
+                background: linear-gradient(135deg, var(--color-purple-500), var(--color-purple-400-alt));
                 color: white;
                 text-decoration: none;
                 border-radius: var(--space-3.5);
@@ -7074,7 +7074,7 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
             }
 
             .info-note i {
-                color: #8b5cf6;
+                color: var(--color-purple-500);
                 margin-right: var(--space-2);
             }
 
@@ -7099,12 +7099,12 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
         }
 
         :root {
-            --bg-primary: #0f172a;
-            --bg-secondary: #1e293b;
-            --text-primary: #f1f5f9;
-            --text-secondary: #94a3b8;
-            --accent-purple: #8b5cf6;
-            --accent-purple-light: #a78bfa;
+            --bg-primary: var(--color-slate-900);
+            --bg-secondary: var(--color-slate-800);
+            --text-primary: var(--color-slate-100);
+            --text-secondary: var(--color-slate-400);
+            --accent-purple: var(--color-purple-500);
+            --accent-purple-light: var(--color-purple-400-alt);
         }
 
         body {
@@ -7167,7 +7167,7 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
             font-size: 1.75rem;
             font-weight: 800;
             margin-bottom: var(--space-3);
-            background: linear-gradient(135deg, #f1f5f9, #94a3b8);
+            background: linear-gradient(135deg, var(--color-slate-100), var(--color-slate-400));
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
@@ -7239,7 +7239,7 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
         }
 
         .offline-btn-primary {
-            background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+            background: linear-gradient(135deg, var(--color-purple-500), var(--color-purple-600));
             color: white;
             border: none;
             cursor: pointer;
@@ -7273,13 +7273,13 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
             justify-content: center;
             gap: var(--space-2.5);
             font-size: 0.9rem;
-            color: #f87171;
+            color: var(--color-red-400);
         }
 
         .offline-status.online {
             background: rgba(16, 185, 129, 0.1);
             border-color: rgba(16, 185, 129, 0.2);
-            color: #34d399;
+            color: var(--color-emerald-400);
         }
 
         .offline-status i {
@@ -7319,7 +7319,7 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
             right: 0;
             z-index: 10001;
             padding: 12px var(--space-5);
-            background: linear-gradient(135deg, #ef4444, #dc2626);
+            background: linear-gradient(135deg, var(--color-danger), var(--color-red-600));
             color: white;
             font-size: 0.9rem;
             font-weight: 600;
@@ -7338,11 +7338,11 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
         #onboarding-wrapper {
             min-height: 100vh;
             padding: 80px var(--space-4) 120px;
-            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+            background: linear-gradient(135deg, var(--color-slate-50) 0%, var(--color-slate-100) 100%);
         }
 
         [data-theme="dark"] #onboarding-wrapper {
-            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            background: linear-gradient(135deg, var(--color-slate-900) 0%, var(--color-slate-800) 100%);
         }
 
         @media (min-width: 768px) {
@@ -7375,22 +7375,22 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
             font-weight: 700;
             font-size: 0.9rem;
             background: rgba(139, 92, 246, 0.1);
-            color: #8b5cf6;
+            color: var(--color-purple-500);
             border: 2px solid rgba(139, 92, 246, 0.2);
             transition: all 0.3s ease;
         }
 
         .progress-step.active {
-            background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+            background: linear-gradient(135deg, var(--color-purple-500), var(--color-purple-600));
             color: white;
-            border-color: #8b5cf6;
+            border-color: var(--color-purple-500);
             transform: scale(1.1);
         }
 
         .progress-step.completed {
-            background: #10b981;
+            background: var(--color-success);
             color: white;
-            border-color: #10b981;
+            border-color: var(--color-success);
         }
 
         .progress-line {
@@ -7402,7 +7402,7 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
         }
 
         .progress-line.completed {
-            background: #10b981;
+            background: var(--color-success);
         }
 
         /* Wizard Card */
@@ -7439,7 +7439,7 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
         .step-icon {
             width: 72px;
             height: 72px;
-            background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+            background: linear-gradient(135deg, var(--color-purple-500), var(--color-purple-600));
             border-radius: var(--space-5);
             display: flex;
             align-items: center;
@@ -7453,18 +7453,18 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
         .step-title {
             font-size: 1.5rem;
             font-weight: 800;
-            color: var(--htb-text-main, #1f2937);
+            color: var(--htb-text-main, var(--color-gray-800));
             text-align: center;
             margin: 0 0 var(--space-3);
         }
 
         [data-theme="dark"] .step-title {
-            color: #f1f5f9;
+            color: var(--color-slate-100);
         }
 
         .step-desc {
             font-size: 1rem;
-            color: var(--htb-text-muted, #6b7280);
+            color: var(--htb-text-muted, var(--color-gray-500));
             text-align: center;
             margin: 0 0 var(--space-7);
             line-height: 1.6;
@@ -7497,7 +7497,7 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
 
         .option-card.selected {
             background: rgba(139, 92, 246, 0.1);
-            border-color: #8b5cf6;
+            border-color: var(--color-purple-500);
         }
 
         [data-theme="dark"] .option-card {
@@ -7512,7 +7512,7 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
             width: var(--space-6);
             height: var(--space-6);
             border-radius: var(--radius-full);
-            border: 2px solid #d1d5db;
+            border: 2px solid var(--color-gray-300);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -7522,8 +7522,8 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
         }
 
         .option-card.selected .option-radio {
-            border-color: #8b5cf6;
-            background: #8b5cf6;
+            border-color: var(--color-purple-500);
+            background: var(--color-purple-500);
         }
 
         .option-radio::after {
@@ -7546,25 +7546,25 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
 
         .option-title {
             font-weight: 700;
-            color: var(--htb-text-main, #1f2937);
+            color: var(--htb-text-main, var(--color-gray-800));
             margin: 0 0 var(--space-1);
             font-size: 1rem;
         }
 
         [data-theme="dark"] .option-title {
-            color: #f1f5f9;
+            color: var(--color-slate-100);
         }
 
         .option-desc {
             font-size: 0.85rem;
-            color: var(--htb-text-muted, #6b7280);
+            color: var(--htb-text-muted, var(--color-gray-500));
             margin: 0;
             line-height: 1.5;
         }
 
         .option-icon {
             font-size: 1.25rem;
-            color: #8b5cf6;
+            color: var(--color-purple-500);
         }
 
         /* Toggle Switches */
@@ -7595,18 +7595,18 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
 
         .toggle-title {
             font-weight: 600;
-            color: var(--htb-text-main, #1f2937);
+            color: var(--htb-text-main, var(--color-gray-800));
             margin: 0 0 var(--space-0.5);
             font-size: 0.95rem;
         }
 
         [data-theme="dark"] .toggle-title {
-            color: #f1f5f9;
+            color: var(--color-slate-100);
         }
 
         .toggle-desc {
             font-size: 0.8rem;
-            color: var(--htb-text-muted, #6b7280);
+            color: var(--htb-text-muted, var(--color-gray-500));
             margin: 0;
         }
 
@@ -7630,7 +7630,7 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
             left: 0;
             right: 0;
             bottom: 0;
-            background: #d1d5db;
+            background: var(--color-gray-300);
             border-radius: var(--space-7);
             transition: all 0.3s ease;
         }
@@ -7649,7 +7649,7 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
         }
 
         .toggle-switch input:checked + .toggle-slider {
-            background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+            background: linear-gradient(135deg, var(--color-purple-500), var(--color-purple-600));
         }
 
         .toggle-switch input:checked + .toggle-slider::before {
@@ -7670,7 +7670,7 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
             height: 80px;
             border-radius: var(--radius-full);
             margin: 0 auto var(--space-3);
-            background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+            background: linear-gradient(135deg, var(--color-purple-500), var(--color-purple-600));
             display: flex;
             align-items: center;
             justify-content: center;
@@ -7688,12 +7688,12 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
         .preview-name {
             font-weight: 700;
             font-size: 1.1rem;
-            color: var(--htb-text-main, #1f2937);
+            color: var(--htb-text-main, var(--color-gray-800));
             margin: 0 0 var(--space-1);
         }
 
         [data-theme="dark"] .preview-name {
-            color: #f1f5f9;
+            color: var(--color-slate-100);
         }
 
         .preview-badge {
@@ -7702,7 +7702,7 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
             gap: var(--space-1.5);
             padding: 6px var(--space-3);
             background: rgba(139, 92, 246, 0.2);
-            color: #7c3aed;
+            color: var(--color-purple-600);
             border-radius: 100px;
             font-size: 0.8rem;
             font-weight: 600;
@@ -7734,7 +7734,7 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
 
         .wizard-btn-secondary {
             background: rgba(139, 92, 246, 0.1);
-            color: #8b5cf6;
+            color: var(--color-purple-500);
         }
 
         .wizard-btn-secondary:hover {
@@ -7742,7 +7742,7 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
         }
 
         .wizard-btn-primary {
-            background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+            background: linear-gradient(135deg, var(--color-purple-500), var(--color-purple-600));
             color: white;
             box-shadow: 0 4px 16px rgba(139, 92, 246, 0.3);
         }
@@ -7770,7 +7770,7 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
         .success-icon {
             width: 100px;
             height: 100px;
-            background: linear-gradient(135deg, #10b981, #059669);
+            background: linear-gradient(135deg, var(--color-success), var(--color-emerald-600));
             border-radius: var(--radius-full);
             display: flex;
             align-items: center;
@@ -7802,13 +7802,13 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
             display: block;
             text-align: center;
             margin-top: var(--space-5);
-            color: var(--htb-text-muted, #6b7280);
+            color: var(--htb-text-muted, var(--color-gray-500));
             text-decoration: none;
             font-size: 0.9rem;
         }
 
         .skip-link:hover {
-            color: #8b5cf6;
+            color: var(--color-purple-500);
         }
 
         /* Partner Count Badge */
@@ -7823,16 +7823,16 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
         }
 
         .partner-badge i {
-            color: #8b5cf6;
+            color: var(--color-purple-500);
         }
 
         .partner-badge span {
             font-weight: 700;
-            color: var(--htb-text-main, #1f2937);
+            color: var(--htb-text-main, var(--color-gray-800));
         }
 
         [data-theme="dark"] .partner-badge span {
-            color: #f1f5f9;
+            color: var(--color-slate-100);
         }
 
         /* Focus styles */
@@ -7860,7 +7860,7 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
                 right: 0;
                 z-index: 10001;
                 padding: 12px var(--space-5);
-                background: linear-gradient(135deg, #ef4444, #dc2626);
+                background: linear-gradient(135deg, var(--color-danger), var(--color-red-600));
                 color: white;
                 font-size: 0.9rem;
                 font-weight: 600;
@@ -7900,7 +7900,7 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
                 display: inline-flex;
                 align-items: center;
                 gap: var(--space-2);
-                color: var(--htb-text-muted, #6b7280);
+                color: var(--htb-text-muted, var(--color-gray-500));
                 text-decoration: none;
                 font-size: 0.9rem;
                 margin-bottom: var(--space-6);
@@ -7908,7 +7908,7 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
             }
 
             .back-link:hover {
-                color: #8b5cf6;
+                color: var(--color-purple-500);
             }
 
             /* Partner Header Card */
@@ -7946,7 +7946,7 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
                 width: 100px;
                 height: 100px;
                 border-radius: var(--space-5);
-                background: linear-gradient(135deg, #8b5cf6, #6366f1);
+                background: linear-gradient(135deg, var(--color-purple-500), var(--color-primary-500));
                 display: flex;
                 align-items: center;
                 justify-content: center;
@@ -7971,12 +7971,12 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
             .partner-name {
                 font-size: 1.75rem;
                 font-weight: 800;
-                color: var(--htb-text-main, #1f2937);
+                color: var(--htb-text-main, var(--color-gray-800));
                 margin: 0 0 var(--space-2);
             }
 
             [data-theme="dark"] .partner-name {
-                color: #f1f5f9;
+                color: var(--color-slate-100);
             }
 
             .partner-meta {
@@ -7991,22 +7991,22 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
                 align-items: center;
                 gap: var(--space-1.5);
                 font-size: 0.9rem;
-                color: var(--htb-text-muted, #6b7280);
+                color: var(--htb-text-muted, var(--color-gray-500));
             }
 
             .partner-meta-item i {
-                color: #8b5cf6;
+                color: var(--color-purple-500);
             }
 
             .partner-description {
                 font-size: 1rem;
-                color: var(--htb-text-secondary, #4b5563);
+                color: var(--htb-text-secondary, var(--color-gray-600));
                 line-height: 1.6;
                 margin: 0;
             }
 
             [data-theme="dark"] .partner-description {
-                color: #94a3b8;
+                color: var(--color-slate-400);
             }
 
             /* Partnership Status Badge */
@@ -8020,7 +8020,7 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
                 border-radius: 100px;
                 font-size: 0.85rem;
                 font-weight: 600;
-                color: #16a34a;
+                color: var(--color-green-600);
                 margin-top: var(--space-4);
             }
 
@@ -8068,26 +8068,26 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
                 font-size: 1.1rem;
             }
 
-            .stat-icon.members { background: linear-gradient(135deg, #3b82f6, #2563eb); color: white; }
-            .stat-icon.listings { background: linear-gradient(135deg, #10b981, #059669); color: white; }
-            .stat-icon.events { background: linear-gradient(135deg, #f59e0b, #d97706); color: white; }
-            .stat-icon.groups { background: linear-gradient(135deg, #ec4899, #db2777); color: white; }
-            .stat-icon.hours { background: linear-gradient(135deg, #8b5cf6, #7c3aed); color: white; }
+            .stat-icon.members { background: linear-gradient(135deg, var(--color-info), var(--color-blue-600)); color: white; }
+            .stat-icon.listings { background: linear-gradient(135deg, var(--color-success), var(--color-emerald-600)); color: white; }
+            .stat-icon.events { background: linear-gradient(135deg, var(--color-warning), var(--color-amber-600)); color: white; }
+            .stat-icon.groups { background: linear-gradient(135deg, var(--color-pink-500), var(--color-pink-600)); color: white; }
+            .stat-icon.hours { background: linear-gradient(135deg, var(--color-purple-500), var(--color-purple-600)); color: white; }
 
             .stat-value {
                 font-size: 1.5rem;
                 font-weight: 800;
-                color: var(--htb-text-main, #1f2937);
+                color: var(--htb-text-main, var(--color-gray-800));
                 margin-bottom: var(--space-1);
             }
 
             [data-theme="dark"] .stat-value {
-                color: #f1f5f9;
+                color: var(--color-slate-100);
             }
 
             .stat-label {
                 font-size: 0.8rem;
-                color: var(--htb-text-muted, #6b7280);
+                color: var(--htb-text-muted, var(--color-gray-500));
                 text-transform: uppercase;
                 letter-spacing: 0.5px;
             }
@@ -8111,7 +8111,7 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
             .section-title {
                 font-size: 1.1rem;
                 font-weight: 700;
-                color: var(--htb-text-main, #1f2937);
+                color: var(--htb-text-main, var(--color-gray-800));
                 margin: 0 0 var(--space-5);
                 display: flex;
                 align-items: center;
@@ -8119,11 +8119,11 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
             }
 
             [data-theme="dark"] .section-title {
-                color: #f1f5f9;
+                color: var(--color-slate-100);
             }
 
             .section-title i {
-                color: #8b5cf6;
+                color: var(--color-purple-500);
             }
 
             /* Features Grid */
@@ -8168,27 +8168,27 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
                 flex-shrink: 0;
             }
 
-            .feature-icon.members { background: linear-gradient(135deg, #3b82f6, #2563eb); color: white; }
-            .feature-icon.listings { background: linear-gradient(135deg, #10b981, #059669); color: white; }
-            .feature-icon.events { background: linear-gradient(135deg, #f59e0b, #d97706); color: white; }
-            .feature-icon.groups { background: linear-gradient(135deg, #ec4899, #db2777); color: white; }
-            .feature-icon.messaging { background: linear-gradient(135deg, #06b6d4, #0891b2); color: white; }
-            .feature-icon.transactions { background: linear-gradient(135deg, #8b5cf6, #7c3aed); color: white; }
+            .feature-icon.members { background: linear-gradient(135deg, var(--color-info), var(--color-blue-600)); color: white; }
+            .feature-icon.listings { background: linear-gradient(135deg, var(--color-success), var(--color-emerald-600)); color: white; }
+            .feature-icon.events { background: linear-gradient(135deg, var(--color-warning), var(--color-amber-600)); color: white; }
+            .feature-icon.groups { background: linear-gradient(135deg, var(--color-pink-500), var(--color-pink-600)); color: white; }
+            .feature-icon.messaging { background: linear-gradient(135deg, var(--color-cyan-500), var(--color-cyan-600)); color: white; }
+            .feature-icon.transactions { background: linear-gradient(135deg, var(--color-purple-500), var(--color-purple-600)); color: white; }
 
             .feature-info h4 {
                 font-size: 0.95rem;
                 font-weight: 600;
-                color: var(--htb-text-main, #1f2937);
+                color: var(--htb-text-main, var(--color-gray-800));
                 margin: 0 0 var(--space-1);
             }
 
             [data-theme="dark"] .feature-info h4 {
-                color: #f1f5f9;
+                color: var(--color-slate-100);
             }
 
             .feature-info p {
                 font-size: 0.8rem;
-                color: var(--htb-text-muted, #6b7280);
+                color: var(--htb-text-muted, var(--color-gray-500));
                 margin: 0;
             }
 
@@ -8202,12 +8202,12 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
 
             .feature-status.enabled {
                 background: rgba(34, 197, 94, 0.1);
-                color: #16a34a;
+                color: var(--color-green-600);
             }
 
             .feature-status.disabled {
                 background: rgba(107, 114, 128, 0.1);
-                color: #6b7280;
+                color: var(--color-gray-500);
             }
 
             /* Recent Activity */
@@ -8235,7 +8235,7 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
                 display: flex;
                 align-items: center;
                 justify-content: center;
-                color: #8b5cf6;
+                color: var(--color-purple-500);
                 flex-shrink: 0;
             }
 
@@ -8245,23 +8245,23 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
 
             .activity-text {
                 font-size: 0.9rem;
-                color: var(--htb-text-main, #1f2937);
+                color: var(--htb-text-main, var(--color-gray-800));
                 margin: 0 0 var(--space-0.5);
             }
 
             [data-theme="dark"] .activity-text {
-                color: #f1f5f9;
+                color: var(--color-slate-100);
             }
 
             .activity-time {
                 font-size: 0.75rem;
-                color: var(--htb-text-muted, #6b7280);
+                color: var(--htb-text-muted, var(--color-gray-500));
             }
 
             .empty-activity {
                 text-align: center;
                 padding: var(--space-8);
-                color: var(--htb-text-muted, #6b7280);
+                color: var(--htb-text-muted, var(--color-gray-500));
             }
 
             .empty-activity i {
@@ -8291,7 +8291,7 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
             }
 
             .action-btn.primary {
-                background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+                background: linear-gradient(135deg, var(--color-purple-500), var(--color-purple-600));
                 color: white;
                 border: none;
             }
@@ -8303,7 +8303,7 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
 
             .action-btn.secondary {
                 background: rgba(139, 92, 246, 0.1);
-                color: #8b5cf6;
+                color: var(--color-purple-500);
                 border: 1px solid rgba(139, 92, 246, 0.2);
             }
 
@@ -8360,7 +8360,7 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
             .fed-hero-icon {
                 width: 80px;
                 height: 80px;
-                background: linear-gradient(135deg, #8b5cf6, #6366f1);
+                background: linear-gradient(135deg, var(--color-purple-500), var(--color-primary-500));
                 border-radius: var(--radius-xl);
                 display: flex;
                 align-items: center;
@@ -8374,24 +8374,24 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
             .fed-hero h1 {
                 font-size: 2.25rem;
                 font-weight: 800;
-                color: var(--htb-text-main, #1f2937);
+                color: var(--htb-text-main, var(--color-gray-800));
                 margin: 0 0 var(--space-3);
             }
 
             [data-theme="dark"] .fed-hero h1 {
-                color: #f1f5f9;
+                color: var(--color-slate-100);
             }
 
             .fed-hero-subtitle {
                 font-size: 1.1rem;
-                color: var(--htb-text-secondary, #6b7280);
+                color: var(--htb-text-secondary, var(--color-gray-500));
                 max-width: 600px;
                 margin: 0 auto;
                 line-height: 1.6;
             }
 
             [data-theme="dark"] .fed-hero-subtitle {
-                color: #94a3b8;
+                color: var(--color-slate-400);
             }
 
             /* Header */
@@ -8403,21 +8403,21 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
             .fed-settings-header h1 {
                 font-size: 1.75rem;
                 font-weight: 800;
-                color: var(--htb-text-main, #1f2937);
+                color: var(--htb-text-main, var(--color-gray-800));
                 margin: 0 0 var(--space-2);
             }
 
             [data-theme="dark"] .fed-settings-header h1 {
-                color: #f1f5f9;
+                color: var(--color-slate-100);
             }
 
             .fed-settings-header p {
-                color: var(--htb-text-secondary, #6b7280);
+                color: var(--htb-text-secondary, var(--color-gray-500));
                 margin: 0;
             }
 
             [data-theme="dark"] .fed-settings-header p {
-                color: #94a3b8;
+                color: var(--color-slate-400);
             }
 
             .fed-settings-links {
@@ -8435,7 +8435,7 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
                 background: rgba(139, 92, 246, 0.1);
                 border: 1px solid rgba(139, 92, 246, 0.2);
                 border-radius: var(--space-5);
-                color: #8b5cf6;
+                color: var(--color-purple-500);
                 font-size: 0.85rem;
                 font-weight: 600;
                 text-decoration: none;
@@ -8449,7 +8449,7 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
 
             [data-theme="dark"] .fed-settings-link {
                 background: rgba(139, 92, 246, 0.15);
-                color: #a78bfa;
+                color: var(--color-purple-400-alt);
             }
 
             /* Status Banner */
@@ -8490,12 +8490,12 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
             }
 
             .fed-status-banner.enabled .fed-status-icon {
-                background: linear-gradient(135deg, #10b981, #059669);
+                background: linear-gradient(135deg, var(--color-success), var(--color-emerald-600));
                 color: white;
             }
 
             .fed-status-banner.disabled .fed-status-icon {
-                background: linear-gradient(135deg, #ef4444, #dc2626);
+                background: linear-gradient(135deg, var(--color-danger), var(--color-red-600));
                 color: white;
             }
 
@@ -8503,21 +8503,21 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
                 font-size: 1rem;
                 font-weight: 700;
                 margin: 0 0 var(--space-0.5);
-                color: var(--htb-text-main, #1f2937);
+                color: var(--htb-text-main, var(--color-gray-800));
             }
 
             [data-theme="dark"] .fed-status-text h3 {
-                color: #f1f5f9;
+                color: var(--color-slate-100);
             }
 
             .fed-status-text p {
                 font-size: 0.85rem;
-                color: var(--htb-text-secondary, #6b7280);
+                color: var(--htb-text-secondary, var(--color-gray-500));
                 margin: 0;
             }
 
             [data-theme="dark"] .fed-status-text p {
-                color: #94a3b8;
+                color: var(--color-slate-400);
             }
 
             .fed-status-toggle {
@@ -8533,7 +8533,7 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
 
             .fed-status-banner.enabled .fed-status-toggle {
                 background: rgba(239, 68, 68, 0.1);
-                color: #ef4444;
+                color: var(--color-danger);
             }
 
             .fed-status-banner.enabled .fed-status-toggle:hover {
@@ -8541,7 +8541,7 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
             }
 
             .fed-status-banner.disabled .fed-status-toggle {
-                background: linear-gradient(135deg, #10b981, #059669);
+                background: linear-gradient(135deg, var(--color-success), var(--color-emerald-600));
                 color: white;
             }
 
@@ -8584,7 +8584,7 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
             .fed-settings-card h2 {
                 font-size: 1.1rem;
                 font-weight: 700;
-                color: var(--htb-text-main, #1f2937);
+                color: var(--htb-text-main, var(--color-gray-800));
                 margin: 0 0 var(--space-1);
                 display: flex;
                 align-items: center;
@@ -8592,21 +8592,21 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
             }
 
             [data-theme="dark"] .fed-settings-card h2 {
-                color: #f1f5f9;
+                color: var(--color-slate-100);
             }
 
             .fed-settings-card h2 i {
-                color: #8b5cf6;
+                color: var(--color-purple-500);
             }
 
             .fed-settings-card > p {
                 font-size: 0.9rem;
-                color: var(--htb-text-secondary, #6b7280);
+                color: var(--htb-text-secondary, var(--color-gray-500));
                 margin: 0 0 var(--space-5);
             }
 
             [data-theme="dark"] .fed-settings-card > p {
-                color: #94a3b8;
+                color: var(--color-slate-400);
             }
 
             /* Privacy Level Selector */
@@ -8633,7 +8633,7 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
             }
 
             .fed-privacy-option.selected {
-                border-color: #8b5cf6;
+                border-color: var(--color-purple-500);
                 background: rgba(139, 92, 246, 0.1);
             }
 
@@ -8657,7 +8657,7 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
                 width: 22px;
                 height: 22px;
                 border-radius: var(--radius-full);
-                border: 2px solid #d1d5db;
+                border: 2px solid var(--color-gray-300);
                 display: flex;
                 align-items: center;
                 justify-content: center;
@@ -8667,12 +8667,12 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
             }
 
             [data-theme="dark"] .fed-privacy-radio {
-                border-color: #4b5563;
+                border-color: var(--color-gray-600);
             }
 
             .fed-privacy-option.selected .fed-privacy-radio {
-                border-color: #8b5cf6;
-                background: #8b5cf6;
+                border-color: var(--color-purple-500);
+                background: var(--color-purple-500);
             }
 
             .fed-privacy-option.selected .fed-privacy-radio::after {
@@ -8686,23 +8686,23 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
             .fed-privacy-content h4 {
                 font-size: 0.95rem;
                 font-weight: 600;
-                color: var(--htb-text-main, #1f2937);
+                color: var(--htb-text-main, var(--color-gray-800));
                 margin: 0 0 var(--space-1);
             }
 
             [data-theme="dark"] .fed-privacy-content h4 {
-                color: #f1f5f9;
+                color: var(--color-slate-100);
             }
 
             .fed-privacy-content p {
                 font-size: 0.85rem;
-                color: var(--htb-text-secondary, #6b7280);
+                color: var(--htb-text-secondary, var(--color-gray-500));
                 margin: 0;
                 line-height: 1.5;
             }
 
             [data-theme="dark"] .fed-privacy-content p {
-                color: #94a3b8;
+                color: var(--color-slate-400);
             }
 
             .fed-privacy-badge {
@@ -8712,7 +8712,7 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
                 font-weight: 600;
                 border-radius: 100px;
                 background: rgba(139, 92, 246, 0.1);
-                color: #8b5cf6;
+                color: var(--color-purple-500);
                 margin-left: var(--space-2);
             }
 
@@ -8739,22 +8739,22 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
             .fed-toggle-info h4 {
                 font-size: 0.95rem;
                 font-weight: 600;
-                color: var(--htb-text-main, #1f2937);
+                color: var(--htb-text-main, var(--color-gray-800));
                 margin: 0 0 var(--space-0.5);
             }
 
             [data-theme="dark"] .fed-toggle-info h4 {
-                color: #f1f5f9;
+                color: var(--color-slate-100);
             }
 
             .fed-toggle-info p {
                 font-size: 0.8rem;
-                color: var(--htb-text-secondary, #6b7280);
+                color: var(--htb-text-secondary, var(--color-gray-500));
                 margin: 0;
             }
 
             [data-theme="dark"] .fed-toggle-info p {
-                color: #94a3b8;
+                color: var(--color-slate-400);
             }
 
             /* Toggle Switch */
@@ -8778,13 +8778,13 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
                 left: 0;
                 right: 0;
                 bottom: 0;
-                background: #d1d5db;
+                background: var(--color-gray-300);
                 border-radius: var(--space-7);
                 transition: all 0.3s ease;
             }
 
             [data-theme="dark"] .fed-toggle-slider {
-                background: #4b5563;
+                background: var(--color-gray-600);
             }
 
             .fed-toggle-slider::before {
@@ -8801,7 +8801,7 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
             }
 
             .fed-toggle-switch input:checked + .fed-toggle-slider {
-                background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+                background: linear-gradient(135deg, var(--color-purple-500), var(--color-purple-600));
             }
 
             .fed-toggle-switch input:checked + .fed-toggle-slider::before {
@@ -8839,7 +8839,7 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
             }
 
             .fed-reach-option.selected {
-                border-color: #8b5cf6;
+                border-color: var(--color-purple-500);
                 background: rgba(139, 92, 246, 0.1);
             }
 
@@ -8853,17 +8853,17 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
 
             .fed-reach-option i {
                 font-size: 1.5rem;
-                color: #8b5cf6;
+                color: var(--color-purple-500);
             }
 
             .fed-reach-option span {
                 font-size: 0.85rem;
                 font-weight: 600;
-                color: var(--htb-text-main, #1f2937);
+                color: var(--htb-text-main, var(--color-gray-800));
             }
 
             [data-theme="dark"] .fed-reach-option span {
-                color: #f1f5f9;
+                color: var(--color-slate-100);
             }
 
             /* Stats Summary */
@@ -8889,17 +8889,17 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
             .fed-stat-value {
                 font-size: 1.5rem;
                 font-weight: 800;
-                color: #8b5cf6;
+                color: var(--color-purple-500);
             }
 
             .fed-stat-label {
                 font-size: 0.8rem;
-                color: var(--htb-text-secondary, #6b7280);
+                color: var(--htb-text-secondary, var(--color-gray-500));
                 margin-top: var(--space-1);
             }
 
             [data-theme="dark"] .fed-stat-label {
-                color: #94a3b8;
+                color: var(--color-slate-400);
             }
 
             /* Save Button */
@@ -8912,7 +8912,7 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
 
             .fed-save-btn {
                 padding: 14px var(--space-8);
-                background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+                background: linear-gradient(135deg, var(--color-purple-500), var(--color-purple-600));
                 color: white;
                 border: none;
                 border-radius: var(--radius-md);
@@ -8940,7 +8940,7 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
             .fed-back-btn {
                 padding: 14px var(--space-6);
                 background: transparent;
-                color: var(--htb-text-secondary, #6b7280);
+                color: var(--htb-text-secondary, var(--color-gray-500));
                 border: 1px solid rgba(139, 92, 246, 0.2);
                 border-radius: var(--radius-md);
                 font-size: 1rem;
@@ -8966,7 +8966,7 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
                 left: 50%;
                 transform: translateX(-50%) translateY(100px);
                 padding: 14px var(--space-6);
-                background: #1f2937;
+                background: var(--color-gray-800);
                 color: white;
                 border-radius: var(--radius-md);
                 font-weight: 500;
@@ -8978,11 +8978,11 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
             }
 
             .fed-toast.success {
-                background: linear-gradient(135deg, #10b981, #059669);
+                background: linear-gradient(135deg, var(--color-success), var(--color-emerald-600));
             }
 
             .fed-toast.error {
-                background: linear-gradient(135deg, #ef4444, #dc2626);
+                background: linear-gradient(135deg, var(--color-danger), var(--color-red-600));
             }
 
             .fed-toast.visible {
@@ -9015,7 +9015,7 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
                 right: 0;
                 z-index: 10001;
                 padding: 12px var(--space-5);
-                background: linear-gradient(135deg, #ef4444, #dc2626);
+                background: linear-gradient(135deg, var(--color-danger), var(--color-red-600));
                 color: white;
                 font-size: 0.9rem;
                 font-weight: 600;
@@ -9057,7 +9057,7 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
             }
 
             .back-link:hover {
-                color: #8b5cf6;
+                color: var(--color-purple-500);
             }
 
             /* Header Card */
@@ -9091,7 +9091,7 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
             .messages-header h1 {
                 font-size: 1.5rem;
                 font-weight: 800;
-                background: linear-gradient(135deg, #7c3aed, #8b5cf6, #a78bfa);
+                background: linear-gradient(135deg, var(--color-purple-600), var(--color-purple-500), var(--color-purple-400-alt));
                 -webkit-background-clip: text;
                 -webkit-text-fill-color: transparent;
                 background-clip: text;
@@ -9108,7 +9108,7 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
                 min-width: var(--space-6);
                 height: var(--space-6);
                 padding: 0 var(--space-2);
-                background: linear-gradient(135deg, #ef4444, #dc2626);
+                background: linear-gradient(135deg, var(--color-danger), var(--color-red-600));
                 color: white;
                 font-size: 0.8rem;
                 font-weight: 700;
@@ -9148,7 +9148,7 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
             }
 
             .conversation-card.unread {
-                border-left: var(--space-1) solid #8b5cf6;
+                border-left: var(--space-1) solid var(--color-purple-500);
             }
 
             [data-theme="dark"] .conversation-card {
@@ -9185,13 +9185,13 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
                 right: 0;
                 width: var(--space-3.5);
                 height: var(--space-3.5);
-                background: linear-gradient(135deg, #8b5cf6, #a78bfa);
+                background: linear-gradient(135deg, var(--color-purple-500), var(--color-purple-400-alt));
                 border: 2px solid white;
                 border-radius: var(--radius-full);
             }
 
             [data-theme="dark"] .conv-unread-dot {
-                border-color: #1e293b;
+                border-color: var(--color-slate-800);
             }
 
             /* Conversation Content */
@@ -9227,13 +9227,13 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
                 border-radius: var(--space-2.5);
                 font-size: 0.7rem;
                 font-weight: 600;
-                color: #8b5cf6;
+                color: var(--color-purple-500);
                 white-space: nowrap;
             }
 
             [data-theme="dark"] .conv-tenant {
                 background: rgba(139, 92, 246, 0.2);
-                color: #a78bfa;
+                color: var(--color-purple-400-alt);
             }
 
             .conv-time {
@@ -9277,7 +9277,7 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
 
             .empty-state-icon {
                 font-size: 4rem;
-                color: #8b5cf6;
+                color: var(--color-purple-500);
                 margin-bottom: var(--space-5);
             }
 
@@ -9298,7 +9298,7 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
                 align-items: center;
                 gap: var(--space-2);
                 padding: 12px var(--space-6);
-                background: linear-gradient(135deg, #8b5cf6, #a78bfa);
+                background: linear-gradient(135deg, var(--color-purple-500), var(--color-purple-400-alt));
                 color: white;
                 text-decoration: none;
                 border-radius: var(--radius-md);
@@ -9358,7 +9358,7 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
                 right: 0;
                 z-index: 10001;
                 padding: 12px var(--space-5);
-                background: linear-gradient(135deg, #ef4444, #dc2626);
+                background: linear-gradient(135deg, var(--color-danger), var(--color-red-600));
                 color: white;
                 font-size: 0.9rem;
                 font-weight: 600;
@@ -9420,7 +9420,7 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
 
             .opt-in-icon i {
                 font-size: 3rem;
-                color: #8b5cf6;
+                color: var(--color-purple-500);
             }
 
             .opt-in-title {
@@ -9442,7 +9442,7 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
                 align-items: center;
                 gap: var(--space-2.5);
                 padding: 14px var(--space-7);
-                background: linear-gradient(135deg, #8b5cf6, #a78bfa);
+                background: linear-gradient(135deg, var(--color-purple-500), var(--color-purple-400-alt));
                 color: white;
                 text-decoration: none;
                 border-radius: var(--space-3.5);
@@ -9509,7 +9509,7 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
                 right: 0;
                 z-index: 10001;
                 padding: 12px var(--space-5);
-                background: linear-gradient(135deg, #ef4444, #dc2626);
+                background: linear-gradient(135deg, var(--color-danger), var(--color-red-600));
                 color: white;
                 font-size: 0.9rem;
                 font-weight: 600;
@@ -9554,7 +9554,7 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
             }
 
             .back-link:hover {
-                color: #8b5cf6;
+                color: var(--color-purple-500);
             }
 
             /* Thread Header */
@@ -9610,18 +9610,18 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
                 border-radius: var(--radius-md);
                 font-size: 0.8rem;
                 font-weight: 600;
-                color: #8b5cf6;
+                color: var(--color-purple-500);
             }
 
             [data-theme="dark"] .thread-tenant {
                 background: rgba(139, 92, 246, 0.2);
-                color: #a78bfa;
+                color: var(--color-purple-400-alt);
             }
 
             .view-profile-btn {
                 padding: 10px var(--space-5);
                 background: linear-gradient(135deg, rgba(139, 92, 246, 0.1), rgba(168, 85, 247, 0.1));
-                color: #8b5cf6;
+                color: var(--color-purple-500);
                 text-decoration: none;
                 border-radius: var(--radius-md);
                 font-weight: 600;
@@ -9631,14 +9631,14 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
             }
 
             .view-profile-btn:hover {
-                background: linear-gradient(135deg, #8b5cf6, #a78bfa);
+                background: linear-gradient(135deg, var(--color-purple-500), var(--color-purple-400-alt));
                 color: white;
                 border-color: transparent;
             }
 
             [data-theme="dark"] .view-profile-btn {
                 background: rgba(139, 92, 246, 0.2);
-                color: #a78bfa;
+                color: var(--color-purple-400-alt);
             }
 
             /* Messages Container */
@@ -9688,7 +9688,7 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
             }
 
             .message-group.sent .message-bubble {
-                background: linear-gradient(135deg, #8b5cf6, #a78bfa);
+                background: linear-gradient(135deg, var(--color-purple-500), var(--color-purple-400-alt));
                 color: white;
                 border-bottom-right-radius: var(--space-1);
             }
@@ -9722,7 +9722,7 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
 
             .empty-messages i {
                 font-size: 3rem;
-                color: #8b5cf6;
+                color: var(--color-purple-500);
                 margin-bottom: var(--space-4);
             }
 
@@ -9773,7 +9773,7 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
 
             .send-btn {
                 padding: 14px var(--space-6);
-                background: linear-gradient(135deg, #8b5cf6, #a78bfa);
+                background: linear-gradient(135deg, var(--color-purple-500), var(--color-purple-400-alt));
                 color: white;
                 border: none;
                 border-radius: var(--radius-lg);
@@ -9803,12 +9803,12 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
                 background: rgba(234, 179, 8, 0.1);
                 border: 1px solid rgba(234, 179, 8, 0.3);
                 border-radius: var(--radius-lg);
-                color: #ca8a04;
+                color: var(--color-yellow-600);
             }
 
             [data-theme="dark"] .messaging-disabled {
                 background: rgba(234, 179, 8, 0.15);
-                color: #fbbf24;
+                color: var(--color-amber-300);
             }
 
             /* Touch Targets */
@@ -9876,7 +9876,7 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
                 right: 0;
                 z-index: 10001;
                 padding: 12px var(--space-5);
-                background: linear-gradient(135deg, #ef4444, #dc2626);
+                background: linear-gradient(135deg, var(--color-danger), var(--color-red-600));
                 color: white;
                 font-size: 0.9rem;
                 font-weight: 600;
@@ -9917,7 +9917,7 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
             }
 
             .back-link:hover {
-                color: #8b5cf6;
+                color: var(--color-purple-500);
             }
 
             .send-card {
@@ -9952,7 +9952,7 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
             .send-header h1 {
                 font-size: 1.5rem;
                 font-weight: 800;
-                background: linear-gradient(135deg, #7c3aed, #8b5cf6, #a78bfa);
+                background: linear-gradient(135deg, var(--color-purple-600), var(--color-purple-500), var(--color-purple-400-alt));
                 -webkit-background-clip: text;
                 -webkit-text-fill-color: transparent;
                 background-clip: text;
@@ -9965,7 +9965,7 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
             }
 
             .balance-display strong {
-                color: #10b981;
+                color: var(--color-success);
             }
 
             /* Recipient Section */
@@ -10004,12 +10004,12 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
                 border-radius: var(--space-2.5);
                 font-size: 0.8rem;
                 font-weight: 600;
-                color: #8b5cf6;
+                color: var(--color-purple-500);
             }
 
             [data-theme="dark"] .recipient-tenant {
                 background: rgba(139, 92, 246, 0.2);
-                color: #a78bfa;
+                color: var(--color-purple-400-alt);
             }
 
             /* Form */
@@ -10080,7 +10080,7 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
                 border: 2px solid rgba(139, 92, 246, 0.2);
                 border-radius: var(--space-2.5);
                 background: transparent;
-                color: #8b5cf6;
+                color: var(--color-purple-500);
                 font-weight: 700;
                 cursor: pointer;
                 transition: all 0.2s ease;
@@ -10115,7 +10115,7 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
             .send-btn {
                 width: 100%;
                 padding: var(--space-4);
-                background: linear-gradient(135deg, #8b5cf6, #a78bfa);
+                background: linear-gradient(135deg, var(--color-purple-500), var(--color-purple-400-alt));
                 color: white;
                 border: none;
                 border-radius: var(--space-3.5);
@@ -10154,7 +10154,7 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
             }
 
             .privacy-notice i {
-                color: #8b5cf6;
+                color: var(--color-purple-500);
                 margin-top: var(--space-0.5);
             }
 
@@ -10166,7 +10166,7 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
 
             .no-recipient-icon {
                 font-size: 3rem;
-                color: #8b5cf6;
+                color: var(--color-purple-500);
                 margin-bottom: var(--space-4);
             }
 
@@ -10217,7 +10217,7 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
                 border-radius: var(--radius-base);
                 background: rgba(245, 158, 11, 0.2);
                 border: 1px solid rgba(245, 158, 11, 0.4);
-                color: #fbbf24;
+                color: var(--color-amber-300);
                 font-size: 0.9rem;
                 display: flex;
                 align-items: center;
@@ -10226,7 +10226,7 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
 
             [data-theme="dark"] .send-balance-alert {
                 background: rgba(245, 158, 11, 0.15);
-                color: #fcd34d;
+                color: var(--color-amber-300);
             }
 
             /* No Recipient State */
@@ -10264,7 +10264,7 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
                 right: 0;
                 z-index: 10001;
                 padding: 12px var(--space-5);
-                background: linear-gradient(135deg, #ef4444, #dc2626);
+                background: linear-gradient(135deg, var(--color-danger), var(--color-red-600));
                 color: white;
                 font-size: 0.9rem;
                 font-weight: 600;
@@ -10325,7 +10325,7 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
 
             .enable-icon i {
                 font-size: 3rem;
-                color: #8b5cf6;
+                color: var(--color-purple-500);
             }
 
             .enable-title {
@@ -10347,7 +10347,7 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
                 align-items: center;
                 gap: var(--space-2.5);
                 padding: 14px var(--space-7);
-                background: linear-gradient(135deg, #8b5cf6, #a78bfa);
+                background: linear-gradient(135deg, var(--color-purple-500), var(--color-purple-400-alt));
                 color: white;
                 text-decoration: none;
                 border-radius: var(--space-3.5);
@@ -10410,7 +10410,7 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
                 right: 0;
                 z-index: 10001;
                 padding: 12px var(--space-5);
-                background: linear-gradient(135deg, #ef4444, #dc2626);
+                background: linear-gradient(135deg, var(--color-danger), var(--color-red-600));
                 color: white;
                 font-size: 0.9rem;
                 font-weight: 600;
@@ -10451,7 +10451,7 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
             }
 
             .back-link:hover {
-                color: #8b5cf6;
+                color: var(--color-purple-500);
             }
 
             /* Header Card */
@@ -10479,7 +10479,7 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
             .transactions-header h1 {
                 font-size: 1.5rem;
                 font-weight: 800;
-                background: linear-gradient(135deg, #7c3aed, #8b5cf6, #a78bfa);
+                background: linear-gradient(135deg, var(--color-purple-600), var(--color-purple-500), var(--color-purple-400-alt));
                 -webkit-background-clip: text;
                 -webkit-text-fill-color: transparent;
                 background-clip: text;
@@ -10510,7 +10510,7 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
             .stat-value {
                 font-size: 1.5rem;
                 font-weight: 800;
-                color: #8b5cf6;
+                color: var(--color-purple-500);
             }
 
             .stat-label {
@@ -10520,7 +10520,7 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
             }
 
             .stat-card.balance .stat-value {
-                color: #10b981;
+                color: var(--color-success);
             }
 
             /* Transaction List */
@@ -10565,12 +10565,12 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
 
             .transaction-icon.sent {
                 background: rgba(239, 68, 68, 0.15);
-                color: #ef4444;
+                color: var(--color-danger);
             }
 
             .transaction-icon.received {
                 background: rgba(16, 185, 129, 0.15);
-                color: #10b981;
+                color: var(--color-success);
             }
 
             .transaction-details {
@@ -10590,7 +10590,7 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
                 align-items: center;
                 gap: var(--space-1);
                 font-size: 0.75rem;
-                color: #8b5cf6;
+                color: var(--color-purple-500);
                 background: rgba(139, 92, 246, 0.1);
                 padding: var(--space-0.5) var(--space-2);
                 border-radius: var(--radius-base);
@@ -10612,11 +10612,11 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
             }
 
             .transaction-amount .amount.sent {
-                color: #ef4444;
+                color: var(--color-danger);
             }
 
             .transaction-amount .amount.received {
-                color: #10b981;
+                color: var(--color-success);
             }
 
             .transaction-amount .time {
@@ -10637,7 +10637,7 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
                 align-items: center;
                 gap: var(--space-1.5);
                 padding: 8px var(--space-3.5);
-                background: linear-gradient(135deg, #f59e0b, #fbbf24);
+                background: linear-gradient(135deg, var(--color-warning), var(--color-amber-300));
                 color: #1a1a1a;
                 text-decoration: none;
                 border-radius: var(--space-2.5);
@@ -10654,7 +10654,7 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
             }
 
             .review-btn.reviewed {
-                background: linear-gradient(135deg, #10b981, #34d399);
+                background: linear-gradient(135deg, var(--color-success), var(--color-emerald-400));
                 color: white;
                 pointer-events: none;
             }
@@ -10671,12 +10671,12 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
 
             .status-badge.completed {
                 background: rgba(16, 185, 129, 0.15);
-                color: #10b981;
+                color: var(--color-success);
             }
 
             .status-badge.pending {
                 background: rgba(245, 158, 11, 0.15);
-                color: #f59e0b;
+                color: var(--color-warning);
             }
 
             /* Empty State */
@@ -10701,7 +10701,7 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
 
             .empty-state-icon {
                 font-size: 4rem;
-                color: #8b5cf6;
+                color: var(--color-purple-500);
                 margin-bottom: var(--space-5);
             }
 
@@ -10710,7 +10710,7 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
                 align-items: center;
                 gap: var(--space-2);
                 padding: 12px var(--space-6);
-                background: linear-gradient(135deg, #8b5cf6, #a78bfa);
+                background: linear-gradient(135deg, var(--color-purple-500), var(--color-purple-400-alt));
                 color: white;
                 text-decoration: none;
                 border-radius: var(--radius-md);

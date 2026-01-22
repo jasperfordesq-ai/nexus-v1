@@ -366,7 +366,7 @@
 
     .skeleton-hero {
         height: 400px;
-        background: linear-gradient(90deg, #e5e7eb 25%, #f3f4f6 50%, #e5e7eb 75%);
+        background: linear-gradient(90deg, var(--color-gray-200) 25%, var(--color-gray-100) 50%, var(--color-gray-200) 75%);
         background-size: 200% 100%;
         animation: skeleton-shimmer 1.5s infinite;
         border-radius: var(--radius-2xl);
@@ -374,7 +374,7 @@
     }
 
     [data-theme="dark"] .skeleton-hero {
-        background: linear-gradient(90deg, #1e293b 25%, #334155 50%, #1e293b 75%);
+        background: linear-gradient(90deg, var(--color-slate-800) 25%, var(--color-slate-700) 50%, var(--color-slate-800) 75%);
         background-size: 200% 100%;
     }
 
@@ -393,14 +393,14 @@
     .skeleton-line {
         height: var(--space-3);
         border-radius: var(--radius-base);
-        background: linear-gradient(90deg, #e5e7eb 25%, #f3f4f6 50%, #e5e7eb 75%);
+        background: linear-gradient(90deg, var(--color-gray-200) 25%, var(--color-gray-100) 50%, var(--color-gray-200) 75%);
         background-size: 200% 100%;
         animation: skeleton-shimmer 1.5s infinite;
         margin-bottom: var(--space-3);
     }
 
     [data-theme="dark"] .skeleton-line {
-        background: linear-gradient(90deg, #1e293b 25%, #334155 50%, #1e293b 75%);
+        background: linear-gradient(90deg, var(--color-slate-800) 25%, var(--color-slate-700) 50%, var(--color-slate-800) 75%);
         background-size: 200% 100%;
     }
 
@@ -431,7 +431,7 @@
         right: 0;
         z-index: 10001;
         padding: var(--space-3) var(--space-4);
-        background: linear-gradient(135deg, #ef4444, #dc2626);
+        background: linear-gradient(135deg, var(--color-danger), var(--color-red-600));
         color: white;
         font-size: var(--font-size-sm);
         font-weight: var(--font-weight-semibold);
@@ -483,22 +483,22 @@
 
     /* Images - lazy loading with aspect ratio */
     .glass-hero-card img {
-        background: #f3f4f6;
+        background: var(--color-gray-100);
     }
 
     [data-theme="dark"] .glass-hero-card img {
-        background: #1e293b;
+        background: var(--color-slate-800);
     }
 
     /* Edit Listing Button */
     .listing-edit-btn {
-        background: #f1f5f9;
-        color: #334155;
+        background: var(--color-slate-100);
+        color: var(--color-slate-700);
     }
 
     [data-theme="dark"] .listing-edit-btn {
         background: rgba(51, 65, 85, 0.6);
-        color: #e2e8f0;
+        color: var(--color-slate-200);
     }
 
     [data-theme="dark"] .listing-edit-btn:hover {
@@ -509,11 +509,11 @@
     [data-theme="dark"] #comment-input {
         background: rgba(30, 41, 59, 0.8) !important;
         border-color: rgba(255, 255, 255, 0.15) !important;
-        color: #f1f5f9 !important;
+        color: var(--color-slate-100) !important;
     }
 
     [data-theme="dark"] #comment-input::placeholder {
-        color: #64748b;
+        color: var(--color-slate-500);
     }
 
     /* Reply Input Dark Mode */
@@ -521,7 +521,7 @@
     [data-theme="dark"] input[id^="edit-input-"] {
         background: rgba(30, 41, 59, 0.8) !important;
         border-color: rgba(255, 255, 255, 0.15) !important;
-        color: #f1f5f9 !important;
+        color: var(--color-slate-100) !important;
     }
 
     /* Comment Background Dark Mode */
@@ -531,7 +531,7 @@
 
     /* Reaction Picker Dark Mode */
     [data-theme="dark"] .reaction-picker > div[id^="picker-"] {
-        background: #1e293b !important;
+        background: var(--color-slate-800) !important;
         border-color: rgba(255, 255, 255, 0.15) !important;
     }
 

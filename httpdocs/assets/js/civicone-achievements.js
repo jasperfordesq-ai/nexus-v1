@@ -373,6 +373,17 @@ document.addEventListener('DOMContentLoaded', function () {
         initShopCategories();
     }
 
+    // Initialize shop purchase if on shop page
+    if (document.getElementById('purchaseModal') && document.getElementById('confirmBtn')) {
+        // Get basePath from any link on the page
+        const anyLink = document.querySelector('a[href*="/achievements"]');
+        if (anyLink) {
+            const href = anyLink.getAttribute('href');
+            const basePath = href.substring(0, href.indexOf('/achievements'));
+            initShopPurchase(basePath);
+        }
+    }
+
     // Check if confetti should be triggered (badges page with new_badge param)
     if (document.getElementById('confetti-container')) {
         createConfetti();

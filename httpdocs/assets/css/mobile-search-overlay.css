@@ -8,6 +8,7 @@
  *
  * Mobile: Full-screen, immersive search
  * Desktop: Hidden (uses normal search)
+  * Fully Migrated to Design Tokens: 2026-01-21 ✓
  */
 
 /* ==============================================
@@ -46,7 +47,7 @@
     padding: var(--space-3) var(--space-4);
     padding-top: calc(var(--space-3) + env(safe-area-inset-top, 0px));
     background: var(--bg-surface, #fff);
-    border-bottom: 1px solid var(--border-default, #e5e7eb);
+    border-bottom: 1px solid var(--border-default, var(--color-gray-200));
     flex-shrink: 0;
 }
 
@@ -94,7 +95,7 @@
 .mobile-search-input {
     width: 100%;
     padding: var(--space-3) var(--space-4) 12px 44px;
-    background: var(--bg-muted, #f3f4f6);
+    background: var(--bg-muted, var(--color-gray-100));
     border: none;
     border-radius: var(--radius-md);
     font-size: var(--font-size-base);
@@ -106,7 +107,7 @@
 .mobile-search-input:focus {
     outline: none;
     background: var(--bg-surface, #fff);
-    box-shadow: 0 0 0 2px var(--color-primary-500, #6366f1);
+    box-shadow: 0 0 0 2px var(--color-primary-500, var(--color-primary-500));
 }
 
 [data-theme="dark"] .mobile-search-input {
@@ -119,7 +120,7 @@
 }
 
 .mobile-search-input::placeholder {
-    color: var(--text-tertiary, #9ca3af);
+    color: var(--text-tertiary, var(--color-gray-400));
 }
 
 /* Search icon in input */
@@ -130,7 +131,7 @@
     transform: translateY(-50%);
     width: var(--space-5);
     height: var(--space-5);
-    color: var(--text-tertiary, #9ca3af);
+    color: var(--text-tertiary, var(--color-gray-400));
     pointer-events: none;
 }
 
@@ -143,7 +144,7 @@
     width: 28px;
     height: 28px;
     border-radius: var(--radius-full);
-    background: var(--bg-muted, #e5e7eb);
+    background: var(--bg-muted, var(--color-gray-200));
     border: none;
     display: none;
     align-items: center;
@@ -173,7 +174,7 @@
     padding: var(--space-2) var(--space-1);
     font-size: var(--font-size-base);
     font-weight: var(--font-weight-medium);
-    color: var(--color-primary-500, #6366f1);
+    color: var(--color-primary-500, var(--color-primary-500));
     cursor: pointer;
     flex-shrink: 0;
     -webkit-tap-highlight-color: transparent;
@@ -193,7 +194,7 @@
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
     scrollbar-width: none;
-    border-bottom: 1px solid var(--border-default, #e5e7eb);
+    border-bottom: 1px solid var(--border-default, var(--color-gray-200));
     flex-shrink: 0;
 }
 
@@ -207,7 +208,7 @@
 
 .mobile-search-tab {
     padding: var(--space-2) var(--space-4);
-    background: var(--bg-muted, #f3f4f6);
+    background: var(--bg-muted, var(--color-gray-100));
     border: none;
     border-radius: var(--radius-xl);
     font-size: var(--font-size-sm);
@@ -224,7 +225,7 @@
 }
 
 .mobile-search-tab.active {
-    background: var(--color-primary-500, #6366f1);
+    background: var(--color-primary-500, var(--color-primary-500));
     color: white;
 }
 
@@ -234,7 +235,7 @@
 }
 
 [data-theme="dark"] .mobile-search-tab.active {
-    background: var(--color-primary-500, #6366f1);
+    background: var(--color-primary-500, var(--color-primary-500));
     color: white;
 }
 
@@ -272,7 +273,7 @@
     background: none;
     border: none;
     font-size: var(--font-size-sm);
-    color: var(--color-primary-500, #6366f1);
+    color: var(--color-primary-500, var(--color-primary-500));
     cursor: pointer;
 }
 
@@ -282,7 +283,7 @@
     align-items: center;
     gap: 14px;
     padding: var(--space-3) 0;
-    border-bottom: 1px solid var(--border-subtle, #f3f4f6);
+    border-bottom: 1px solid var(--border-subtle, var(--color-gray-100));
     cursor: pointer;
     -webkit-tap-highlight-color: transparent;
     transition: background var(--transition-fast);
@@ -307,12 +308,12 @@
     width: 44px;
     height: 44px;
     border-radius: var(--radius-full);
-    background: var(--bg-muted, #f3f4f6);
+    background: var(--bg-muted, var(--color-gray-100));
     display: flex;
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
-    color: var(--text-tertiary, #9ca3af);
+    color: var(--text-tertiary, var(--color-gray-400));
     font-size: var(--font-size-lg);
 }
 
@@ -371,7 +372,7 @@
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    color: var(--text-tertiary, #9ca3af);
+    color: var(--text-tertiary, var(--color-gray-400));
     flex-shrink: 0;
 }
 
@@ -392,8 +393,8 @@
 .mobile-search-spinner {
     width: var(--space-8);
     height: var(--space-8);
-    border: 3px solid var(--border-default, #e5e7eb);
-    border-top-color: var(--color-primary-500, #6366f1);
+    border: 3px solid var(--border-default, var(--color-gray-200));
+    border-top-color: var(--color-primary-500, var(--color-primary-500));
     border-radius: var(--radius-full);
     animation: searchSpin 800ms linear infinite;
 }
@@ -446,7 +447,7 @@
 
 .mobile-search-tag {
     padding: 8px 14px;
-    background: var(--bg-muted, #f3f4f6);
+    background: var(--bg-muted, var(--color-gray-100));
     border: none;
     border-radius: var(--radius-xl);
     font-size: var(--font-size-sm);
@@ -457,7 +458,7 @@
 }
 
 .mobile-search-tag:active {
-    background: var(--bg-surface, #e5e7eb);
+    background: var(--bg-surface, var(--color-gray-200));
 }
 
 [data-theme="dark"] .mobile-search-tag {
@@ -474,14 +475,14 @@
    ============================================== */
 .mobile-search-highlight {
     background: rgba(99, 102, 241, 0.2);
-    color: var(--color-primary-600, #4f46e5);
+    color: var(--color-primary-600, var(--color-primary-600));
     border-radius: var(--radius-sm);
     padding: 0 var(--space-1);
 }
 
 [data-theme="dark"] .mobile-search-highlight {
     background: rgba(99, 102, 241, 0.3);
-    color: var(--color-primary-400, #818cf8);
+    color: var(--color-primary-400, var(--color-primary-400));
 }
 
 /* ==============================================
@@ -528,18 +529,18 @@
         align-items: center;
         gap: var(--space-2);
         padding: var(--space-2) 14px;
-        background: var(--bg-muted, #f3f4f6);
+        background: var(--bg-muted, var(--color-gray-100));
         border: none;
         border-radius: var(--radius-md);
         font-size: var(--font-size-base);
-        color: var(--text-tertiary, #9ca3af);
+        color: var(--text-tertiary, var(--color-gray-400));
         cursor: pointer;
         width: 100%;
         -webkit-tap-highlight-color: transparent;
     }
 
     .mobile-search-trigger:active {
-        background: var(--bg-surface, #e5e7eb);
+        background: var(--bg-surface, var(--color-gray-200));
     }
 
     [data-theme="dark"] .mobile-search-trigger {

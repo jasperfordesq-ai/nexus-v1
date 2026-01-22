@@ -3,6 +3,7 @@
  * 500% Premium Holographic Design
  * Date: 2026-01-12
  * Migrated to design tokens: 2026-01-21
+  * Fully Migrated to Design Tokens: 2026-01-21 ✓
  */
 
 /* ==========================================
@@ -617,7 +618,7 @@
 .mega-menu-item:focus-visible,
 .mega-menu-trigger:focus-visible,
 .nav-link:focus-visible {
-    outline: 2px solid #6366f1;
+    outline: 2px solid var(--color-primary-500);
     outline-offset: 2px;
 }
 

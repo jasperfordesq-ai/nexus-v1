@@ -2,6 +2,7 @@
  * Responsive Tables - Mobile-First Table Patterns
  * Converts tables to stacked cards on mobile devices
  * Version: 1.0
+  * Fully Migrated to Design Tokens: 2026-01-21 ✓
  */
 
 /* ==========================================
@@ -50,14 +51,14 @@
     padding: var(--space-3, 12px) var(--space-4, 16px);
     text-align: left;
     vertical-align: middle;
-    border-bottom: 1px solid var(--color-gray-200, #e5e7eb);
+    border-bottom: 1px solid var(--color-gray-200, var(--color-gray-200));
 }
 
 .table-cards th {
     font-weight: var(--font-weight-semibold, 600);
     font-size: var(--font-size-sm, 0.875rem);
-    color: var(--color-gray-600, #4b5563);
-    background: var(--color-gray-50, #f9fafb);
+    color: var(--color-gray-600, var(--color-gray-600));
+    background: var(--color-gray-50, var(--color-gray-50));
     white-space: nowrap;
 }
 
@@ -66,22 +67,22 @@
 }
 
 .table-cards tbody tr:hover {
-    background-color: var(--color-gray-50, #f9fafb);
+    background-color: var(--color-gray-50, var(--color-gray-50));
 }
 
 /* Dark mode */
 [data-theme="dark"] .table-cards th {
-    background: var(--color-gray-100, #1f2937);
-    color: var(--color-gray-400, #9ca3af);
+    background: var(--color-gray-100, var(--color-gray-800));
+    color: var(--color-gray-400, var(--color-gray-400));
 }
 
 [data-theme="dark"] .table-cards th,
 [data-theme="dark"] .table-cards td {
-    border-bottom-color: var(--color-gray-200, #374151);
+    border-bottom-color: var(--color-gray-200, var(--color-gray-700));
 }
 
 [data-theme="dark"] .table-cards tbody tr:hover {
-    background-color: var(--color-gray-100, #1f2937);
+    background-color: var(--color-gray-100, var(--color-gray-800));
 }
 
 /* ==========================================
@@ -117,15 +118,15 @@
         display: block;
         margin-bottom: var(--space-4, 16px);
         padding: var(--space-4, 16px);
-        background: var(--color-gray-50, #f9fafb);
+        background: var(--color-gray-50, var(--color-gray-50));
         border-radius: var(--radius-md, 12px);
-        border: 1px solid var(--color-gray-200, #e5e7eb);
+        border: 1px solid var(--color-gray-200, var(--color-gray-200));
         box-shadow: var(--shadow-sm);
     }
 
     [data-theme="dark"] .table-cards tbody tr {
-        background: var(--color-gray-100, #1f2937);
-        border-color: var(--color-gray-200, #374151);
+        background: var(--color-gray-100, var(--color-gray-800));
+        border-color: var(--color-gray-200, var(--color-gray-700));
     }
 
     /* Each cell becomes a row with label */
@@ -134,7 +135,7 @@
         justify-content: space-between;
         align-items: center;
         padding: var(--space-2, 8px) 0;
-        border-bottom: 1px solid var(--color-gray-100, #f3f4f6);
+        border-bottom: 1px solid var(--color-gray-100, var(--color-gray-100));
         text-align: right;
     }
 
@@ -143,7 +144,7 @@
     }
 
     [data-theme="dark"] .table-cards td {
-        border-bottom-color: var(--color-gray-200, #374151);
+        border-bottom-color: var(--color-gray-200, var(--color-gray-700));
     }
 
     /* Show data-label as the row label */
@@ -151,14 +152,14 @@
         content: attr(data-label);
         font-weight: var(--font-weight-semibold, 600);
         font-size: var(--font-size-sm, 0.875rem);
-        color: var(--color-gray-600, #4b5563);
+        color: var(--color-gray-600, var(--color-gray-600));
         text-align: left;
         flex-shrink: 0;
         margin-right: var(--space-4, 16px);
     }
 
     [data-theme="dark"] .table-cards td::before {
-        color: var(--color-gray-400, #9ca3af);
+        color: var(--color-gray-400, var(--color-gray-400));
     }
 
     /* Cell content alignment */
@@ -216,22 +217,22 @@
 
 /* Striped table */
 .table-cards.table-striped tbody tr:nth-child(even) {
-    background-color: var(--color-gray-50, #f9fafb);
+    background-color: var(--color-gray-50, var(--color-gray-50));
 }
 
 [data-theme="dark"] .table-cards.table-striped tbody tr:nth-child(even) {
-    background-color: var(--color-gray-100, #1f2937);
+    background-color: var(--color-gray-100, var(--color-gray-800));
 }
 
 @media (max-width: 768px) {
     .table-cards.table-striped tbody tr:nth-child(even),
     .table-cards.table-striped tbody tr:nth-child(odd) {
-        background: var(--color-gray-50, #f9fafb);
+        background: var(--color-gray-50, var(--color-gray-50));
     }
 
     [data-theme="dark"] .table-cards.table-striped tbody tr:nth-child(even),
     [data-theme="dark"] .table-cards.table-striped tbody tr:nth-child(odd) {
-        background: var(--color-gray-100, #1f2937);
+        background: var(--color-gray-100, var(--color-gray-800));
     }
 }
 
@@ -251,7 +252,7 @@
         justify-content: flex-start;
         padding-top: var(--space-3, 12px);
         margin-top: var(--space-2, 8px);
-        border-top: 1px solid var(--color-gray-200, #e5e7eb);
+        border-top: 1px solid var(--color-gray-200, var(--color-gray-200));
         border-bottom: none;
     }
 
@@ -260,7 +261,7 @@
     }
 
     [data-theme="dark"] .table-cards td.cell-actions {
-        border-top-color: var(--color-gray-200, #374151);
+        border-top-color: var(--color-gray-200, var(--color-gray-700));
     }
 }
 
@@ -280,17 +281,17 @@
 
 .table-cards .status-badge.status-active {
     background-color: rgba(16, 185, 129, 0.1);
-    color: var(--color-success, #10b981);
+    color: var(--color-success, var(--color-success));
 }
 
 .table-cards .status-badge.status-pending {
     background-color: rgba(245, 158, 11, 0.1);
-    color: var(--color-warning, #f59e0b);
+    color: var(--color-warning, var(--color-warning));
 }
 
 .table-cards .status-badge.status-inactive {
     background-color: rgba(239, 68, 68, 0.1);
-    color: var(--color-danger, #ef4444);
+    color: var(--color-danger, var(--color-danger));
 }
 
 /* ==========================================
@@ -319,7 +320,7 @@
 
 .table-cards .cell-avatar-name {
     font-weight: var(--font-weight-medium, 500);
-    color: var(--color-gray-900, #111827);
+    color: var(--color-gray-900, var(--color-gray-900));
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -327,17 +328,17 @@
 
 .table-cards .cell-avatar-sub {
     font-size: var(--font-size-sm, 0.875rem);
-    color: var(--color-gray-500, #6b7280);
+    color: var(--color-gray-500, var(--color-gray-500));
 }
 
 [data-theme="dark"] .table-cards .cell-avatar-name {
-    color: var(--color-gray-900, #f9fafb);
+    color: var(--color-gray-900, var(--color-gray-50));
 }
 
 @media (max-width: 768px) {
     .table-cards td.cell-avatar {
         padding-bottom: var(--space-3, 12px);
-        border-bottom: 1px solid var(--color-gray-200, #e5e7eb);
+        border-bottom: 1px solid var(--color-gray-200, var(--color-gray-200));
     }
 
     .table-cards td.cell-avatar::before {
@@ -345,7 +346,7 @@
     }
 
     [data-theme="dark"] .table-cards td.cell-avatar {
-        border-bottom-color: var(--color-gray-200, #374151);
+        border-bottom-color: var(--color-gray-200, var(--color-gray-700));
     }
 }
 
@@ -365,28 +366,28 @@
     padding: var(--space-3, 12px) var(--space-4, 16px);
     text-align: left;
     vertical-align: middle;
-    border-bottom: 1px solid var(--color-gray-200, #e5e7eb);
+    border-bottom: 1px solid var(--color-gray-200, var(--color-gray-200));
     white-space: nowrap;
 }
 
 .table-scroll th {
     font-weight: var(--font-weight-semibold, 600);
     font-size: var(--font-size-sm, 0.875rem);
-    color: var(--color-gray-600, #4b5563);
-    background: var(--color-gray-50, #f9fafb);
+    color: var(--color-gray-600, var(--color-gray-600));
+    background: var(--color-gray-50, var(--color-gray-50));
     position: sticky;
     top: 0;
     z-index: var(--z-raised);
 }
 
 [data-theme="dark"] .table-scroll th {
-    background: var(--color-gray-100, #1f2937);
-    color: var(--color-gray-400, #9ca3af);
+    background: var(--color-gray-100, var(--color-gray-800));
+    color: var(--color-gray-400, var(--color-gray-400));
 }
 
 [data-theme="dark"] .table-scroll th,
 [data-theme="dark"] .table-scroll td {
-    border-bottom-color: var(--color-gray-200, #374151);
+    border-bottom-color: var(--color-gray-200, var(--color-gray-700));
 }
 
 /* ==========================================
@@ -396,7 +397,7 @@
 .table-empty {
     text-align: center;
     padding: var(--space-12) var(--space-4, 16px);
-    color: var(--color-gray-500, #6b7280);
+    color: var(--color-gray-500, var(--color-gray-500));
 }
 
 .table-empty-icon {
@@ -408,7 +409,7 @@
 .table-empty-title {
     font-size: var(--font-size-lg, 1.125rem);
     font-weight: var(--font-weight-medium, 500);
-    color: var(--color-gray-700, #374151);
+    color: var(--color-gray-700, var(--color-gray-700));
     margin-bottom: var(--space-2, 8px);
 }
 
@@ -419,5 +420,5 @@
 }
 
 [data-theme="dark"] .table-empty-title {
-    color: var(--color-gray-300, #d1d5db);
+    color: var(--color-gray-300, var(--color-gray-300));
 }

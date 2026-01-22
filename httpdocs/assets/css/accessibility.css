@@ -3,6 +3,7 @@
  * Consistent focus rings, reduced motion, screen reader utilities
  * WCAG 2.1 AA compliant
  * Version: 1.1 - 2026-01-21 - Migrated to design tokens
+  * Fully Migrated to Design Tokens: 2026-01-21 ✓
  */
 
 /* ============================================
@@ -13,7 +14,7 @@
 
 /* Base focus ring - applies to all focusable elements */
 :focus-visible {
-    outline: 2px solid var(--color-primary-500, #6366f1);
+    outline: 2px solid var(--color-primary-500, var(--color-primary-500));
     outline-offset: var(--space-1);
 }
 
@@ -36,7 +37,7 @@ button:focus-visible,
 
 /* Link focus rings */
 a:focus-visible {
-    outline: 2px solid var(--color-primary-500, #6366f1);
+    outline: 2px solid var(--color-primary-500, var(--color-primary-500));
     outline-offset: var(--space-1);
     border-radius: var(--radius-sm);
 }
@@ -53,7 +54,7 @@ a:focus-visible {
 
 /* Dark mode focus rings - higher contrast */
 [data-theme="dark"] :focus-visible {
-    outline-color: var(--color-primary-400, #818cf8);
+    outline-color: var(--color-primary-400, var(--color-primary-400));
 }
 
 [data-theme="dark"] button:focus-visible,
@@ -70,7 +71,7 @@ a:focus-visible {
     position: absolute;
     top: -100px;
     left: 0;
-    background: var(--color-primary-600, #4f46e5);
+    background: var(--color-primary-600, var(--color-primary-600));
     color: white;
     padding: var(--space-3) var(--space-6);
     text-decoration: none;
@@ -229,14 +230,14 @@ button:active:not(:disabled),
 .form-group.has-error label,
 .is-invalid + label,
 [aria-invalid="true"] + label {
-    color: var(--color-danger, #dc2626);
+    color: var(--color-danger, var(--color-red-600));
 }
 
 .form-group.has-error input,
 .form-group.has-error textarea,
 .form-group.has-error select,
 [aria-invalid="true"] {
-    border-color: var(--color-danger, #dc2626);
+    border-color: var(--color-danger, var(--color-red-600));
 }
 
 [aria-invalid="true"]:focus-visible {
@@ -252,7 +253,7 @@ label[for]::after {
 .required label::after,
 label.required::after {
     content: " *";
-    color: var(--color-danger, #dc2626);
+    color: var(--color-danger, var(--color-red-600));
 }
 
 /* ============================================

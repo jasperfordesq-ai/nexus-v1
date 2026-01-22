@@ -1,0 +1,53 @@
+/**
+ * Nexus Score Dashboard Page
+ * CivicOne Theme
+ */
+
+.nav-tabs .nav-link {
+    color: #6c757d;
+}
+
+.nav-tabs .nav-link.active {
+    color: #6366f1;
+    border-bottom-color: #6366f1;
+}
+
+.card {
+    transition: transform 0.2s;
+}
+
+.card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.table-primary {
+    background-color: rgba(99, 102, 241, 0.1) !important;
+}
+
+/* Achievement icon size - 1.5rem */
+.achievement-icon {
+    font-size: 1.5rem;
+}
+
+/* Milestone icon size - 2rem */
+.milestone-icon-lg {
+    font-size: 2rem;
+}
+
+/* Leaderboard medal/rank icon size - 1.5rem */
+.leaderboard-medal-icon {
+    font-size: 1.5rem;
+}
+
+/* Avatar thumbnail for leaderboard - 32x32px */
+.avatar-thumbnail {
+    width: 32px;
+    height: 32px;
+    object-fit: cover;
+}
+
+/* Badge icon size - 3rem */
+.badge-icon-xl {
+    font-size: 3rem;
+}

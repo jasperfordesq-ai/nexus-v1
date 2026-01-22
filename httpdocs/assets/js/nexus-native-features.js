@@ -5,6 +5,9 @@
 (function() {
     'use strict';
 
+    // Get tenant base path for API calls
+    const basePath = (typeof NEXUS_BASE !== 'undefined') ? NEXUS_BASE : '';
+
     // Only run in native Capacitor environment
     const isNativeApp = typeof Capacitor !== 'undefined' && Capacitor.isNativePlatform && Capacitor.isNativePlatform();
 
@@ -72,7 +75,7 @@
 
         async updateBadgeFromServer() {
             try {
-                const response = await fetch('/api/notifications/unread-count', {
+                const response = await fetch(basePath + '/api/notifications/unread-count', {
                     credentials: 'include'
                 });
 

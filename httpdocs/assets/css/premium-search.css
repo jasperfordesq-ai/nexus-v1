@@ -435,17 +435,17 @@ body.search-expanded .nexus-brand-link {
 }
 
 [data-theme="light"] .premium-search:hover .search-icon-btn {
-    color: #4f46e5;
+    color: var(--color-primary-600);
 }
 
 [data-theme="light"] .premium-search:focus-within .search-icon-btn {
-    color: #6366f1;
+    color: var(--color-primary-500);
 }
 
 [data-theme="light"] .search-input,
 [data-theme="light"] .premium-search input,
 [data-theme="light"] .premium-search input[type="text"] {
-    color: #1f2937;
+    color: var(--color-gray-800);
 }
 
 [data-theme="light"] .search-input::placeholder,
@@ -454,5 +454,5 @@ body.search-expanded .nexus-brand-link {
 }
 
 [data-theme="light"] .premium-search:focus-within .search-input {
-    color: #111827;
+    color: var(--color-gray-900);
 }

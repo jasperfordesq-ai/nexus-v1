@@ -262,6 +262,22 @@ require __DIR__ . '/../../layouts/civicone/header.php';
 <!-- Template C: Detail Page (2/3 + 1/3 layout) -->
 <div class="civicone-width-container">
     <main class="civicone-main-wrapper" id="main-content">
+
+        <!-- Breadcrumbs (GOV.UK Template C requirement - DP-004) -->
+        <nav class="civicone-breadcrumbs" aria-label="Breadcrumb">
+            <ol class="civicone-breadcrumbs__list">
+                <li class="civicone-breadcrumbs__list-item">
+                    <a class="civicone-breadcrumbs__link" href="<?= $basePath ?>">Home</a>
+                </li>
+                <li class="civicone-breadcrumbs__list-item">
+                    <a class="civicone-breadcrumbs__link" href="<?= $basePath ?>/members">Members</a>
+                </li>
+                <li class="civicone-breadcrumbs__list-item" aria-current="page">
+                    <?= htmlspecialchars($displayName) ?>
+                </li>
+            </ol>
+        </nav>
+
         <div class="civicone-grid-row">
 
             <!-- Main Content: 2/3 Column -->
@@ -315,9 +331,9 @@ require __DIR__ . '/../../layouts/civicone/header.php';
                             <textarea name="content" class="civicone-textarea" rows="3" placeholder="What's on your mind?" required></textarea>
                         </div>
                         <div class="civic-composer-actions">
-                            <label class="civicone-button civicone-button--secondary" style="cursor: pointer;">
+                            <label class="civicone-button civicone-button--secondary">
                                 <i class="fa-solid fa-image" aria-hidden="true"></i> Add Photo
-                                <input type="file" name="image" accept="image/*" style="display: none;">
+                                <input type="file" name="image" accept="image/*" class="civicone-visually-hidden">
                             </label>
                             <button type="submit" class="civicone-button">Post</button>
                         </div>
@@ -340,11 +356,11 @@ require __DIR__ . '/../../layouts/civicone/header.php';
                             <!-- Post Header -->
                             <div class="civic-post-header">
                                 <img src="<?= htmlspecialchars($post['author_avatar']) ?>" alt="" class="civic-avatar-sm">
-                                <div style="flex: 1;">
+                                <div>
                                     <div class="civicone-heading-s govuk-!-margin-bottom-1">
                                         <?= htmlspecialchars($post['author_name']) ?>
                                     </div>
-                                    <div class="civicone-body-s govuk-!-margin-bottom-0" style="color: #505a5f;">
+                                    <div class="civicone-body-s govuk-!-margin-bottom-0 civicone-text-secondary">
                                         <?= date('j F Y \a\t g:i a', strtotime($post['created_at'])) ?>
                                     </div>
                                 </div>
@@ -375,7 +391,7 @@ require __DIR__ . '/../../layouts/civicone/header.php';
                             <!-- Comments Section -->
                             <div class="civic-comments-section" id="comments-section-post-<?= $post['id'] ?>">
                                 <div class="comments-list">
-                                    <div class="civicone-body-s" style="color: #505a5f; text-align: center; padding: 20px;">Click to load comments</div>
+                                    <div class="civicone-body-s civic-loading-message">Click to load comments</div>
                                 </div>
 
                                 <?php if ($isLoggedIn): ?>
@@ -403,14 +419,14 @@ require __DIR__ . '/../../layouts/civicone/header.php';
                             <div class="civicone-summary-card__title-wrapper">
                                 <h2 class="civicone-summary-card__title"><?= htmlspecialchars($review['reviewer_name'] ?? 'Anonymous') ?></h2>
                                 <div class="civicone-summary-card__actions">
-                                    <span style="color: #f47738; font-size: 1.2rem;" aria-label="Rating: <?= $review['rating'] ?> out of 5 stars">
+                                    <span class="civic-review-rating" aria-label="Rating: <?= $review['rating'] ?> out of 5 stars">
                                         <?= str_repeat('★', $review['rating']) ?><?= str_repeat('☆', 5 - $review['rating']) ?>
                                     </span>
                                 </div>
                             </div>
                             <div class="civicone-summary-card__content">
                                 <p class="civicone-body"><?= nl2br(htmlspecialchars($review['content'] ?? '')) ?></p>
-                                <p class="civicone-body-s" style="color: #505a5f; margin-top: 10px;">
+                                <p class="civicone-body-s civicone-text-secondary govuk-!-margin-top-2">
                                     <?= date('j F Y', strtotime($review['created_at'])) ?>
                                 </p>
                             </div>
@@ -470,287 +486,24 @@ require __DIR__ . '/../../layouts/civicone/header.php';
 <!-- Toast Notification -->
 <div class="civic-toast" id="civic-toast"></div>
 
-<!-- JavaScript for social interactions -->
+<!-- External JavaScript for social interactions (CLAUDE.md compliant) -->
+<link rel="stylesheet" href="/assets/css/civicone-profile-show.css">
+<script src="/assets/js/civicone-profile-show.js"></script>
 <script>
-const IS_LOGGED_IN = <?= $isLoggedIn ? 'true' : 'false' ?>;
-let availableReactions = [];
-let currentTargetType = '';
-let currentTargetId = 0;
+    // Initialize with logged-in state from PHP
+    window.CivicProfile.init(<?= $isLoggedIn ? 'true' : 'false' ?>);
 
-function showToast(message) {
-    const toast = document.getElementById('civic-toast');
-    toast.textContent = message;
-    toast.classList.add('show');
-    setTimeout(() => toast.classList.remove('show'), 3000);
-}
-
-function toggleLike(type, id, btn) {
-    if (!IS_LOGGED_IN) {
-        alert('Please log in to like posts.');
-        return;
+    // Legacy function mappings for inline onclick handlers
+    // TODO: Convert inline handlers to addEventListener in future refactor
+    function toggleLike(type, id, btn) {
+        window.CivicProfile.toggleLike(type, id, btn);
     }
-
-    const formData = new FormData();
-    formData.append('action', 'toggle_like');
-    formData.append('target_type', type);
-    formData.append('target_id', id);
-
-    fetch(window.location.href, { method: 'POST', body: formData })
-        .then(res => res.json())
-        .then(data => {
-            if (data.error) { alert(data.error); return; }
-
-            const countEl = btn.querySelector('.like-count');
-            const icon = btn.querySelector('i');
-            countEl.textContent = data.likes_count;
-
-            if (data.status === 'liked') {
-                btn.classList.add('liked');
-                icon.className = 'fa-solid fa-heart';
-            } else {
-                btn.classList.remove('liked');
-                icon.className = 'fa-regular fa-heart';
-            }
-        });
-}
-
-function toggleComments(type, id) {
-    const section = document.getElementById(`comments-section-${type}-${id}`);
-    if (!section) return;
-
-    if (section.style.display === 'none' || !section.style.display) {
-        section.style.display = 'block';
-        fetchComments(type, id);
-    } else {
-        section.style.display = 'none';
+    function toggleComments(type, id) {
+        window.CivicProfile.toggleComments(type, id);
     }
-}
-
-function fetchComments(type, id) {
-    const section = document.getElementById(`comments-section-${type}-${id}`);
-    const list = section.querySelector('.comments-list');
-    list.innerHTML = '<div class="civicone-body-s" style="color: #505a5f; text-align: center; padding: 20px;">Loading...</div>';
-
-    currentTargetType = type;
-    currentTargetId = id;
-
-    const formData = new FormData();
-    formData.append('action', 'fetch_comments');
-    formData.append('target_type', type);
-    formData.append('target_id', id);
-
-    fetch(window.location.href, { method: 'POST', body: formData })
-        .then(res => res.json())
-        .then(data => {
-            if (data.available_reactions) {
-                availableReactions = data.available_reactions;
-            }
-            if (data.status === 'success' && data.comments && data.comments.length > 0) {
-                list.innerHTML = data.comments.map(c => renderComment(c, 0)).join('');
-            } else {
-                list.innerHTML = '<div class="civicone-body-s" style="color: #505a5f; text-align: center; padding: 20px;">No comments yet. Be the first!</div>';
-            }
-        })
-        .catch(err => {
-            console.error('Fetch error:', err);
-            list.innerHTML = '<div class="civicone-body-s" style="color: #d4351c; text-align: center; padding: 20px;">Error loading comments</div>';
-        });
-}
-
-function escapeHtml(text) {
-    const div = document.createElement('div');
-    div.textContent = text;
-    return div.innerHTML;
-}
-
-function renderComment(c, depth) {
-    const marginLeft = depth * 40;
-    const isEdited = c.is_edited ? '<span style="font-size: 0.7rem; color: #505a5f;"> (edited)</span>' : '';
-    const ownerActions = c.is_owner ? `
-        <span onclick="editComment(${c.id}, '${escapeHtml(c.content).replace(/'/g, "\\'").replace(/\n/g, "\\n")}')" style="cursor: pointer;" title="Edit" tabindex="0" role="button" aria-label="Edit comment">✏️</span>
-        <span onclick="deleteComment(${c.id})" style="cursor: pointer; margin-left: 5px;" title="Delete" tabindex="0" role="button" aria-label="Delete comment">🗑️</span>
-    ` : '';
-
-    // Reactions
-    const reactions = Object.entries(c.reactions || {}).map(([emoji, count]) => {
-        const isActive = (c.user_reactions || []).includes(emoji);
-        return `<span class="civic-reaction ${isActive ? 'active' : ''}" onclick="toggleReaction(${c.id}, '${emoji}')" role="button" tabindex="0">${emoji} ${count}</span>`;
-    }).join('');
-
-    // Reaction picker
-    const reactionPicker = IS_LOGGED_IN ? `
-        <div class="civic-reaction-picker">
-            <span class="civic-reaction" onclick="toggleReactionPicker(${c.id})" role="button" tabindex="0" aria-label="Add reaction">+</span>
-            <div class="civic-reaction-picker-menu" id="picker-${c.id}">
-                ${availableReactions.map(e => `<span onclick="toggleReaction(${c.id}, '${e}')" role="button" tabindex="0">${e}</span>`).join('')}
-            </div>
-        </div>
-    ` : '';
-
-    const replyBtn = IS_LOGGED_IN ? `<span onclick="showReplyForm(${c.id})" role="button" tabindex="0">Reply</span>` : '';
-
-    const replies = (c.replies || []).map(r => renderComment(r, depth + 1)).join('');
-
-    // Highlight @mentions
-    const contentHtml = escapeHtml(c.content).replace(/@(\w+)/g, '<span class="civic-mention">@$1</span>');
-
-    return `
-        <div class="civic-comment" style="margin-left: ${marginLeft}px;" id="comment-${c.id}">
-            <img src="${c.author_avatar}" class="civic-comment-avatar" alt="">
-            <div class="civic-comment-bubble">
-                <div class="civic-comment-author">${escapeHtml(c.author_name)}${isEdited} ${ownerActions}</div>
-                <div class="civic-comment-text">${contentHtml}</div>
-                <div class="civic-comment-meta">
-                    ${replyBtn}
-                </div>
-                <div class="civic-reactions">
-                    ${reactions}
-                    ${reactionPicker}
-                </div>
-                <div class="civic-reply-form" id="reply-form-${c.id}">
-                    <div style="display: flex; gap: 8px;">
-                        <input type="text" class="civic-reply-input civicone-input" placeholder="Write a reply..."
-                               onkeydown="if(event.key === 'Enter') submitReply(${c.id}, this)">
-                        <button class="civicone-button civic-comment-submit" onclick="submitReply(${c.id}, this.previousElementSibling)" style="padding: 8px 16px;">Reply</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-        ${replies}
-    `;
-}
-
-function toggleReactionPicker(commentId) {
-    const picker = document.getElementById(`picker-${commentId}`);
-    if (picker) {
-        picker.style.display = picker.style.display === 'none' ? 'block' : 'none';
+    function submitComment(input, type, id) {
+        window.CivicProfile.submitComment(input, type, id);
     }
-}
-
-function toggleReaction(commentId, emoji) {
-    if (!IS_LOGGED_IN) { alert('Please log in to react.'); return; }
-
-    const picker = document.getElementById(`picker-${commentId}`);
-    if (picker) picker.style.display = 'none';
-
-    const formData = new FormData();
-    formData.append('action', 'toggle_reaction');
-    formData.append('comment_id', commentId);
-    formData.append('emoji', emoji);
-
-    fetch(window.location.href, { method: 'POST', body: formData })
-        .then(res => res.json())
-        .then(data => {
-            if (data.status === 'success') {
-                fetchComments(currentTargetType, currentTargetId);
-            }
-        });
-}
-
-function showReplyForm(commentId) {
-    const form = document.getElementById(`reply-form-${commentId}`);
-    if (form) {
-        form.style.display = form.style.display === 'none' ? 'block' : 'none';
-        const input = form.querySelector('input');
-        if (input) input.focus();
-    }
-}
-
-function submitReply(parentId, input) {
-    const content = input.value.trim();
-    if (!content) return;
-    input.disabled = true;
-
-    const formData = new FormData();
-    formData.append('action', 'reply_comment');
-    formData.append('target_type', currentTargetType);
-    formData.append('target_id', currentTargetId);
-    formData.append('parent_id', parentId);
-    formData.append('content', content);
-
-    fetch(window.location.href, { method: 'POST', body: formData })
-        .then(res => res.json())
-        .then(data => {
-            input.disabled = false;
-            input.value = '';
-            if (data.status === 'success') {
-                fetchComments(currentTargetType, currentTargetId);
-                showToast('Reply posted!');
-            } else if (data.error) {
-                alert(data.error);
-            }
-        });
-}
-
-function editComment(commentId, currentContent) {
-    const newContent = prompt('Edit your comment:', currentContent.replace(/\\n/g, '\n'));
-    if (newContent === null || newContent.trim() === '' || newContent === currentContent) return;
-
-    const formData = new FormData();
-    formData.append('action', 'edit_comment');
-    formData.append('comment_id', commentId);
-    formData.append('content', newContent.trim());
-
-    fetch(window.location.href, { method: 'POST', body: formData })
-        .then(res => res.json())
-        .then(data => {
-            if (data.status === 'success') {
-                fetchComments(currentTargetType, currentTargetId);
-                showToast('Comment updated!');
-            } else if (data.error) {
-                alert(data.error);
-            }
-        });
-}
-
-function deleteComment(commentId) {
-    if (!confirm('Delete this comment?')) return;
-
-    const formData = new FormData();
-    formData.append('action', 'delete_comment');
-    formData.append('comment_id', commentId);
-
-    fetch(window.location.href, { method: 'POST', body: formData })
-        .then(res => res.json())
-        .then(data => {
-            if (data.status === 'success') {
-                fetchComments(currentTargetType, currentTargetId);
-                showToast('Comment deleted!');
-            } else if (data.error) {
-                alert(data.error);
-            }
-        });
-}
-
-function submitComment(input, type, id) {
-    const content = input.value.trim();
-    if (!content) return;
-    input.disabled = true;
-
-    currentTargetType = type;
-    currentTargetId = id;
-
-    const formData = new FormData();
-    formData.append('action', 'submit_comment');
-    formData.append('target_type', type);
-    formData.append('target_id', id);
-    formData.append('content', content);
-
-    fetch(window.location.href, { method: 'POST', body: formData })
-        .then(res => res.json())
-        .then(data => {
-            input.disabled = false;
-            if (data.status === 'success') {
-                input.value = '';
-                fetchComments(type, id);
-                showToast('Comment posted!');
-
-                // Update comment count
-                const countEl = document.querySelector(`#post-${id} .comment-count`);
-                if (countEl) countEl.textContent = parseInt(countEl.textContent) + 1;
-            }
-        });
-}
 </script>
 
 <?php require __DIR__ . '/../../layouts/civicone/footer.php'; ?>

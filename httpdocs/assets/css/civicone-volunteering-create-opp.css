@@ -1,0 +1,81 @@
+/* Volunteering: Create Opportunity Form
+   Template D: Form Page
+   WCAG 2.1 AA Compliant */
+
+/* ==========================================================================
+   Page Header
+   ========================================================================== */
+
+.create-opp-header {
+    margin-bottom: 30px;
+    border-bottom: 4px solid var(--skin-primary, #00796B);
+    padding-bottom: 10px;
+}
+
+.create-opp-header h1 {
+    margin: 0;
+    text-transform: uppercase;
+}
+
+.create-opp-subtitle {
+    margin: 5px 0 0;
+    color: var(--civic-text-secondary, #4B5563);
+}
+
+/* ==========================================================================
+   Form Card
+   ========================================================================== */
+
+.create-opp-card {
+    max-width: 800px;
+}
+
+/* ==========================================================================
+   Form Groups
+   ========================================================================== */
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-label {
+    display: block;
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+.form-input-full {
+    width: 100%;
+}
+
+.form-textarea {
+    width: 100%;
+    font-family: inherit;
+}
+
+/* ==========================================================================
+   Date Range Grid
+   ========================================================================== */
+
+.civic-date-range-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    margin-bottom: 20px;
+}
+
+/* Mobile responsive for date range */
+@media (max-width: 500px) {
+    .civic-date-range-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* ==========================================================================
+   Submit Button
+   ========================================================================== */
+
+.create-opp-submit {
+    width: 100%;
+    font-size: 1.2rem;
+}

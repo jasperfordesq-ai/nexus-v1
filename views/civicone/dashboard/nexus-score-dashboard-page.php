@@ -67,7 +67,7 @@ require_once __DIR__ . '/../../layouts/civicone/header.php';
                                     <?php foreach ($recentAchievements as $achievement): ?>
                                         <div class="list-group-item d-flex justify-content-between align-items-center">
                                             <div>
-                                                <span class="me-2" style="font-size: 1.5rem;"><?php echo $achievement['icon'] ?? '🏆'; ?></span>
+                                                <span class="me-2 achievement-icon"><?php echo $achievement['icon'] ?? '🏆'; ?></span>
                                                 <strong><?php echo htmlspecialchars($achievement['name']); ?></strong>
                                                 <br>
                                                 <small class="text-muted">
@@ -94,7 +94,7 @@ require_once __DIR__ . '/../../layouts/civicone/header.php';
                                             <div class="card h-100">
                                                 <div class="card-body">
                                                     <div class="d-flex align-items-start mb-2">
-                                                        <span style="font-size: 2rem;" class="me-2"><?php echo $milestone['icon'] ?? '🎯'; ?></span>
+                                                        <span class="milestone-icon-lg me-2"><?php echo $milestone['icon'] ?? '🎯'; ?></span>
                                                         <div>
                                                             <h5 class="card-title mb-1"><?php echo htmlspecialchars($milestone['name']); ?></h5>
                                                             <p class="card-text small text-muted mb-2">
@@ -153,7 +153,7 @@ require_once __DIR__ . '/../../layouts/civicone/header.php';
                                                 <tr class="<?php echo isset($_SESSION['user_id']) && $user['user_id'] == $_SESSION['user_id'] ? 'table-primary' : ''; ?>">
                                                     <td>
                                                         <?php if ($index < 3): ?>
-                                                            <span style="font-size: 1.5rem;">
+                                                            <span class="leaderboard-medal-icon">
                                                                 <?php echo ['🥇', '🥈', '🥉'][$index]; ?>
                                                             </span>
                                                         <?php else: ?>
@@ -165,8 +165,7 @@ require_once __DIR__ . '/../../layouts/civicone/header.php';
                                                             <?php if (!empty($user['avatar_url'])): ?>
                                                                 <img src="<?php echo htmlspecialchars($user['avatar_url']); ?>"
                                                                      alt="Avatar"
-                                                                     class="rounded-circle me-2"
-                                                                     style="width: 32px; height: 32px; object-fit: cover;">
+                                                                     class="rounded-circle me-2 avatar-thumbnail">
                                                             <?php endif; ?>
                                                             <span><?php echo htmlspecialchars($user['name']); ?></span>
                                                         </div>
@@ -211,7 +210,7 @@ require_once __DIR__ . '/../../layouts/civicone/header.php';
                                         <div class="col">
                                             <div class="card text-center h-100">
                                                 <div class="card-body">
-                                                    <div style="font-size: 3rem;" class="mb-2">
+                                                    <div class="badge-icon-xl mb-2">
                                                         <?php echo $badge['icon'] ?? '🏅'; ?>
                                                     </div>
                                                     <h6 class="card-title"><?php echo htmlspecialchars($badge['name']); ?></h6>
@@ -243,29 +242,5 @@ require_once __DIR__ . '/../../layouts/civicone/header.php';
     </div>
 </div>
 
-<style>
-    .nav-tabs .nav-link {
-        color: #6c757d;
-    }
-    .nav-tabs .nav-link.active {
-        color: #6366f1;
-        border-bottom-color: #6366f1;
-    }
-    .card {
-        transition: transform 0.2s;
-    }
-    .card:hover {
-        transform: translateY(-4px);
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    }
-    .table-primary {
-        background-color: rgba(99, 102, 241, 0.1) !important;
-    }
-</style>
-
-<?php
-// Include the main layout footer
-if (file_exists(__DIR__ . '/../../layouts/civicone/footer.php')) {
-    require_once __DIR__ . '/../../layouts/civicone/footer.php';
-}
-?>
+<!-- Nexus Score Dashboard Page CSS -->
+<link rel="stylesheet" href="<?= NexusCoreTenantContext::getBasePath() ?>/assets/css/purged/civicone-dashboard-nexus-score.min.css">

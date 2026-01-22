@@ -1,331 +1,448 @@
 <?php
-// Phoenix Search Results View (Restored Legacy "Glass Panel" Design)
-$hero_title = "Search Results";
-$hero_subtitle = 'Showing results for "' . htmlspecialchars($query) . '"';
-$hero_gradient = 'htb-hero-gradient-purple';
+/**
+ * CivicOne Search Results - Universal Search Interface
+ * Template A: Directory/List Page (Section 10.2)
+ * GOV.UK Design System v5.14.0 - WCAG 2.1 AA Compliant
+ */
 
-// Ensure Layout Header
-require __DIR__ . '/../../layouts/civicone/header.php';
+require dirname(__DIR__, 2) . '/layouts/civicone/header.php';
+
+$basePath = \Nexus\Core\TenantContext::getBasePath();
+$totalResults = count($results ?? []);
 ?>
 
-<main id="main-content" role="main" aria-label="Search results">
-<div class="htb-container htb-container-full">
+<!-- GOV.UK Page Template Boilerplate (Section 10.0) -->
+<div class="civicone-width-container">
+    <main class="civicone-main-wrapper" id="main-content">
 
-    <div style="margin-top: 40px; margin-bottom: 60px;">
+        <!-- Breadcrumbs (GOV.UK Template A requirement) -->
+        <nav class="civicone-breadcrumbs" aria-label="Breadcrumb">
+            <ol class="civicone-breadcrumbs__list">
+                <li class="civicone-breadcrumbs__list-item">
+                    <a class="civicone-breadcrumbs__link" href="<?= $basePath ?>">Home</a>
+                </li>
+                <li class="civicone-breadcrumbs__list-item" aria-current="page">
+                    Search Results
+                </li>
+            </ol>
+        </nav>
 
-        <header style="margin-bottom: 30px; border-bottom: 2px solid rgba(255,255,255,0.1); padding-bottom: 20px; display: flex; align-items: flex-end; justify-content: space-between; flex-wrap: wrap; gap: 20px;">
-            <div>
-                <h1 style="margin: 0; font-size: 2rem; font-weight: 800; color: white; text-shadow: 0 2px 4px rgba(0,0,0,0.1);">Search Results</h1>
-
+        <!-- Hero Section -->
+        <div class="civicone-hero">
+            <div class="civicone-hero__content">
+                <h1 class="civicone-heading-xl">Search Results</h1>
                 <?php if (!empty($corrected_query) && $corrected_query !== $query): ?>
-                    <p style="margin: 5px 0 0; color: rgba(255,255,255,0.9); font-size: 1rem;">
+                    <p class="civicone-body-l">
                         Showing results for "<strong><?= htmlspecialchars($corrected_query) ?></strong>"
-                        <span style="opacity: 0.7; font-size: 0.9rem; margin-left: 10px;">
-                            (corrected from "<?= htmlspecialchars($query) ?>")
-                        </span>
+                        <span class="civicone-hero__note">(corrected from "<?= htmlspecialchars($query) ?>")</span>
                     </p>
                 <?php else: ?>
-                    <p style="margin: 5px 0 0; color: rgba(255,255,255,0.9); font-size: 1rem;">Found <?= count($results) ?> matches for "<strong><?= htmlspecialchars($query) ?></strong>"</p>
+                    <p class="civicone-body-l">
+                        Found <strong><?= $totalResults ?></strong> <?= $totalResults === 1 ? 'result' : 'results' ?> for "<strong><?= htmlspecialchars($query) ?></strong>"
+                    </p>
                 <?php endif; ?>
 
                 <?php if (!empty($intent) && !empty($intent['ai_analyzed'])): ?>
-                    <p style="margin: 8px 0 0; color: rgba(255,255,255,0.7); font-size: 0.85rem;">
-                        <span style="background: rgba(99, 102, 241, 0.2); padding: 2px 8px; border-radius: 4px; font-weight: 600;">
+                    <div class="civicone-hero__badges">
+                        <span class="civicone-badge civicone-badge--ai">
+                            <svg class="civicone-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                                <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"></path>
+                            </svg>
                             AI-Enhanced Search
                         </span>
                         <?php if (!empty($intent['location'])): ?>
-                            <span style="margin-left: 8px;">📍 <?= htmlspecialchars($intent['location']) ?></span>
+                            <span class="civicone-badge civicone-badge--location">
+                                <svg class="civicone-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                                    <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                                    <circle cx="12" cy="10" r="3"></circle>
+                                </svg>
+                                <?= htmlspecialchars($intent['location']) ?>
+                            </span>
                         <?php endif; ?>
-                    </p>
+                    </div>
                 <?php endif; ?>
             </div>
+        </div>
 
-            <!-- Filter Tabs -->
-            <?php if (!empty($results)): ?>
-                <div class="htb-search-tabs" style="display: flex; gap: 5px; background: white; padding: 5px; border-radius: 12px; flex-wrap: wrap; border: 1px solid #e5e7eb; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);">
-                    <button onclick="filterSearch('all')" class="htb-tab active" data-filter="all" style="border:none; cursor:pointer; padding: 6px 16px; border-radius: 8px; background: #eff6ff; color: var(--htb-primary); font-weight: 700;">All</button>
-                    <button onclick="filterSearch('user')" class="htb-tab" data-filter="user" style="border:none; cursor:pointer; padding: 6px 16px; border-radius: 8px; background: transparent; color: #6b7280; font-weight: 600; transition: 0.2s;">People</button>
-                    <button onclick="filterSearch('group')" class="htb-tab" data-filter="group" style="border:none; cursor:pointer; padding: 6px 16px; border-radius: 8px; background: transparent; color: #6b7280; font-weight: 600; transition: 0.2s;">Hubs</button>
-                    <button onclick="filterSearch('listing')" class="htb-tab" data-filter="listing" style="border:none; cursor:pointer; padding: 6px 16px; border-radius: 8px; background: transparent; color: #6b7280; font-weight: 600; transition: 0.2s;">Offers & Requests</button>
-                </div>
-            <?php endif; ?>
-        </header>
+        <!-- Directory Layout: 1/3 Filters + 2/3 Results -->
+        <div class="civicone-grid-row">
 
-        <?php if (empty($results)): ?>
-            <div class="htb-card" style="text-align: center; padding: 60px;">
-                <div style="font-size: 3rem; margin-bottom: 20px;">🔍</div>
-                <h3 style="margin-bottom: 10px; color: var(--htb-text-main);">No results found</h3>
-                <p style="color: var(--htb-text-muted);">We couldn't find anything matching "<?= htmlspecialchars($query) ?>". Try different keywords.</p>
-                <div style="margin-top: 30px; display: flex; gap: 10px; justify-content: center;">
-                    <a href="<?= Nexus\Core\TenantContext::getBasePath() ?>/listings" class="htb-btn htb-btn-primary">Browse Listings</a>
-                    <a href="<?= Nexus\Core\TenantContext::getBasePath() ?>/groups" class="htb-btn htb-btn-secondary">Find Hubs</a>
-                </div>
-            </div>
-        <?php else: ?>
+            <!-- Filters Panel (1/3) -->
+            <div class="civicone-grid-column-one-third">
+                <div class="civicone-filter-panel" role="search" aria-label="Filter search results">
 
-            <!-- Empty State Message (Hidden by default) -->
-            <div id="no-filter-results" style="display: none; text-align: center; padding: 40px; background: rgba(255,255,255,0.9); border-radius: 12px; margin-bottom: 20px;">
-                <p style="color: #64748b; font-size: 1.1rem; font-weight: 500;">No results found in this category.</p>
-            </div>
+                    <div class="civicone-filter-header">
+                        <h2 class="civicone-heading-m">Filter results</h2>
+                    </div>
 
-            <div class="htb-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 20px;">
-                <?php foreach ($results as $item): ?>
-                    <?php
-                    // Logic from Legacy View: Calculate URLs manually since SearchService doesn't provide them
-                    $icon = 'admin-post';
-                    $color = 'gray';
-                    $url = '#';
-
-                    switch ($item['type']) {
-                        case 'user':
-                            $icon = 'admin-users';
-                            $color = 'blue';
-                            $url = Nexus\Core\TenantContext::getBasePath() . '/profile/' . $item['id'];
-                            break;
-                        case 'listing':
-                            $icon = 'list-view';
-                            $color = 'green';
-                            $url = Nexus\Core\TenantContext::getBasePath() . '/listings/' . $item['id'];
-                            break;
-                        case 'group':
-                            $icon = 'groups';
-                            $color = 'purple';
-                            $url = Nexus\Core\TenantContext::getBasePath() . '/groups/' . $item['id'];
-                            break;
-                        case 'page':
-                            $icon = 'media-document';
-                            $color = 'orange';
-                            $url = Nexus\Core\TenantContext::getBasePath() . '/pages/' . $item['id']; // Assuming pages are by ID, or slug? Service returns ID.
-                            // If page is by slug, we might have an issue, but standard pages are mostly static.
-                            // Custom pages use slug. SearchService.php returns ID. 
-                            // Legacy code used '/pages/' . $item['id']. Let's stick to that for now.
-                            break;
-                    }
-                    ?>
-
-                    <a href="<?= $url ?>" class="htb-card htb-search-result" data-type="<?= $item['type'] ?>" style="text-decoration: none; color: inherit; transition: all 0.2s ease; position: relative; overflow: hidden; padding: 20px; border: 1px solid rgba(0,0,0,0.05); background: white;">
-                        <div class="htb-card-body" style="display: flex; align-items: flex-start; gap: 15px; padding: 0 !important;">
-                            <!-- Icon/Image -->
-                            <div style="flex-shrink: 0;">
-                                <?php if (!empty($item['image'])): ?>
-                                    <img src="<?= htmlspecialchars($item['image']) ?>" loading="lazy" style="width: 50px; height: 50px; border-radius: 12px; object-fit: cover; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
-                                <?php else: ?>
-                                    <div style="width: 50px; height: 50px; border-radius: 12px; background: #f3f4f6; display: flex; align-items: center; justify-content: center;">
-                                        <!-- Using FontAwesome instead of Dashicons for consistency if available, but staying safe with Dashicons as fallback or text -->
-                                        <span class="dashicons dashicons-<?= $icon ?>" style="color: var(--htb-<?= $color ?>-600); font-size: 24px;"></span>
-                                    </div>
-                                <?php endif; ?>
+                    <!-- Search Input -->
+                    <form method="get" action="<?= $basePath ?>/search">
+                        <div class="civicone-filter-group">
+                            <label for="search-query" class="civicone-label">
+                                Search term
+                            </label>
+                            <div class="civicone-search-wrapper">
+                                <input
+                                    type="text"
+                                    id="search-query"
+                                    name="q"
+                                    class="civicone-input civicone-search-input"
+                                    placeholder="Enter keywords..."
+                                    value="<?= htmlspecialchars($query) ?>"
+                                >
+                                <span class="civicone-search-icon" aria-hidden="true"></span>
                             </div>
+                        </div>
 
-                            <!-- Content -->
-                            <div style="flex-grow: 1; min-width: 0;">
-                                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; gap: 8px;">
-                                    <span class="htb-badge" style="font-size: 0.65rem; padding: 3px 8px; border-radius: 6px; text-transform: uppercase; font-weight: 700; background: var(--htb-<?= $color ?>-100); color: var(--htb-<?= $color ?>-700);"><?= strtoupper($item['type']) ?></span>
+                        <button type="submit" class="civicone-button civicone-button--secondary civicone-button--full-width">
+                            Search
+                        </button>
+                    </form>
 
-                                    <?php if (isset($item['relevance_score']) && $item['relevance_score'] > 0.7): ?>
-                                        <span style="font-size: 0.65rem; padding: 3px 8px; border-radius: 6px; background: rgba(16, 185, 129, 0.1); color: #059669; font-weight: 600;">
-                                            ⭐ High Match
+                    <!-- Type Filter Tabs (Client-side filtering) -->
+                    <?php if (!empty($results)): ?>
+                        <div class="civicone-filter-group">
+                            <fieldset class="civicone-fieldset">
+                                <legend class="civicone-label">Result type</legend>
+                                <div class="civicone-search-tabs" role="tablist" aria-label="Filter by result type">
+                                    <button class="civicone-search-tab active"
+                                            data-filter="all"
+                                            role="tab"
+                                            aria-selected="true"
+                                            aria-controls="search-results-list">
+                                        <span class="civicone-search-tab__text">All</span>
+                                        <span class="civicone-search-tab__count" data-count-type="all"><?= $totalResults ?></span>
+                                    </button>
+                                    <button class="civicone-search-tab"
+                                            data-filter="user"
+                                            role="tab"
+                                            aria-selected="false"
+                                            aria-controls="search-results-list">
+                                        <span class="civicone-search-tab__text">People</span>
+                                        <span class="civicone-search-tab__count" data-count-type="user">
+                                            <?= count(array_filter($results, fn($r) => $r['type'] === 'user')) ?>
                                         </span>
-                                    <?php endif; ?>
-
-                                    <?php if (!empty($item['location'])): ?>
-                                        <span style="font-size: 0.75rem; color: #6b7280;">
-                                            📍 <?= htmlspecialchars($item['location']) ?>
+                                    </button>
+                                    <button class="civicone-search-tab"
+                                            data-filter="group"
+                                            role="tab"
+                                            aria-selected="false"
+                                            aria-controls="search-results-list">
+                                        <span class="civicone-search-tab__text">Hubs</span>
+                                        <span class="civicone-search-tab__count" data-count-type="group">
+                                            <?= count(array_filter($results, fn($r) => $r['type'] === 'group')) ?>
                                         </span>
+                                    </button>
+                                    <button class="civicone-search-tab"
+                                            data-filter="listing"
+                                            role="tab"
+                                            aria-selected="false"
+                                            aria-controls="search-results-list">
+                                        <span class="civicone-search-tab__text">Listings</span>
+                                        <span class="civicone-search-tab__count" data-count-type="listing">
+                                            <?= count(array_filter($results, fn($r) => $r['type'] === 'listing')) ?>
+                                        </span>
+                                    </button>
+                                    <?php if (!empty(array_filter($results, fn($r) => $r['type'] === 'page'))): ?>
+                                    <button class="civicone-search-tab"
+                                            data-filter="page"
+                                            role="tab"
+                                            aria-selected="false"
+                                            aria-controls="search-results-list">
+                                        <span class="civicone-search-tab__text">Pages</span>
+                                        <span class="civicone-search-tab__count" data-count-type="page">
+                                            <?= count(array_filter($results, fn($r) => $r['type'] === 'page')) ?>
+                                        </span>
+                                    </button>
                                     <?php endif; ?>
                                 </div>
-                                <h3 style="margin: 0 0 4px; font-size: 1.1rem; font-weight: 700; color: #111827; line-height: 1.3;">
-                                    <?= htmlspecialchars($item['title']) ?>
-                                </h3>
-                                <?php if (!empty($item['description'])): ?>
-                                    <p style="margin: 0; font-size: 0.9rem; color: #6b7280; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; line-height: 1.5;">
-                                        <?= htmlspecialchars(strip_tags($item['description'])) ?>
-                                    </p>
-                                <?php endif; ?>
-                            </div>
+                            </fieldset>
                         </div>
-                        <div style="position: absolute; right: 20px; bottom: 20px; opacity: 0; transform: translateX(-10px); transition: all 0.2s;" class="arrow-indicator">
-                            <span class="dashicons dashicons-arrow-right-alt2" style="color: var(--htb-primary);"></span>
+
+                        <!-- Sort Options -->
+                        <div class="civicone-filter-group">
+                            <label for="sort-by" class="civicone-label">Sort by</label>
+                            <select id="sort-by" name="sort" class="civicone-select">
+                                <option value="relevance" selected>Relevance</option>
+                                <option value="recent">Most recent</option>
+                                <option value="name">Name (A-Z)</option>
+                            </select>
                         </div>
-                    </a>
-                <?php endforeach; ?>
+                    <?php endif; ?>
+
+                    <!-- Quick Actions -->
+                    <div class="civicone-filter-panel civicone-secondary-panel">
+                        <h3 class="civicone-heading-s">Quick actions</h3>
+                        <p class="civicone-body-s civicone-secondary-panel-description">Browse content by category</p>
+                        <a href="<?= $basePath ?>/members" class="civicone-button civicone-button--secondary civicone-button--full-width">
+                            Browse People
+                        </a>
+                        <a href="<?= $basePath ?>/groups" class="civicone-button civicone-button--secondary civicone-button--full-width">
+                            Browse Hubs
+                        </a>
+                        <a href="<?= $basePath ?>/listings" class="civicone-button civicone-button--secondary civicone-button--full-width">
+                            Browse Listings
+                        </a>
+                    </div>
+
+                </div>
             </div>
 
-        <?php endif; ?>
+            <!-- Results Panel (2/3) -->
+            <div class="civicone-grid-column-two-thirds">
 
-    </div>
-</div>
+                <!-- Results Header with Count -->
+                <div class="civicone-results-header">
+                    <p class="civicone-results-count" id="results-count" role="status" aria-live="polite">
+                        Showing <strong id="visible-count"><?= $totalResults ?></strong> <?= $totalResults === 1 ? 'result' : 'results' ?>
+                    </p>
+                </div>
 
-<script>
-    function filterSearch(type) {
-        // 1. Update Tabs
-        const tabs = document.querySelectorAll('.htb-tab');
-        tabs.forEach(t => {
-            t.classList.remove('active');
-            t.style.background = 'transparent';
-            t.style.color = '#6b7280';
-            t.style.boxShadow = 'none';
-        });
+                <!-- Empty State -->
+                <?php if (empty($results)): ?>
+                    <div class="civicone-empty-state">
+                        <svg class="civicone-empty-icon" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+                            <circle cx="11" cy="11" r="8"></circle>
+                            <path d="m21 21-4.35-4.35"></path>
+                        </svg>
+                        <h2 class="civicone-heading-m">No results found</h2>
+                        <p class="civicone-body">
+                            We couldn't find anything matching "<strong><?= htmlspecialchars($query) ?></strong>".
+                        </p>
+                        <p class="civicone-body">
+                            Try different keywords or browse content by category:
+                        </p>
+                        <div class="civicone-empty-state-actions">
+                            <a href="<?= $basePath ?>/members" class="civicone-button civicone-button--primary">Browse People</a>
+                            <a href="<?= $basePath ?>/groups" class="civicone-button civicone-button--secondary">Browse Hubs</a>
+                            <a href="<?= $basePath ?>/listings" class="civicone-button civicone-button--secondary">Browse Listings</a>
+                        </div>
+                    </div>
+                <?php else: ?>
 
-        // Find clicked tab logic
-        const clicked = document.querySelector(`.htb-tab[data-filter="${type}"]`);
-        if (clicked) {
-            clicked.classList.add('active');
-            clicked.style.background = 'white';
-            clicked.style.color = 'var(--htb-primary)';
-            clicked.style.boxShadow = '0 2px 4px rgba(0,0,0,0.05)';
-        }
+                    <!-- Filter Empty State (Hidden by default) -->
+                    <div id="no-filter-results" class="civicone-empty-state hidden" role="status" aria-live="polite">
+                        <svg class="civicone-empty-icon" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+                            <path d="M3 3h7v7H3zM14 3h7v7h-7zM14 14h7v7h-7zM3 14h7v7H3z"></path>
+                        </svg>
+                        <h2 class="civicone-heading-m">No results in this category</h2>
+                        <p class="civicone-body" id="filter-empty-message">
+                            No results found in this category. Try selecting a different filter.
+                        </p>
+                    </div>
 
-        // 2. Filter Items and Count
-        const items = document.querySelectorAll('.htb-search-result');
-        const emptyMsg = document.getElementById('no-filter-results');
-        let visibleCount = 0;
+                    <!-- Results: LIST LAYOUT (structured result rows) -->
+                    <ul class="civicone-search-results-list" id="search-results-list" role="list">
+                        <?php foreach ($results as $item): ?>
+                            <?php
+                            // Calculate URLs and metadata based on type
+                            $url = '#';
+                            $badgeColor = 'gray';
+                            $typeLabel = 'ITEM';
+                            $iconType = 'default';
 
-        items.forEach(item => {
-            if (type === 'all' || item.getAttribute('data-type') === type) {
-                item.style.display = 'block';
-                visibleCount++;
-            } else {
-                item.style.display = 'none';
-            }
-        });
+                            switch ($item['type']) {
+                                case 'user':
+                                    $badgeColor = 'blue';
+                                    $typeLabel = 'PERSON';
+                                    $iconType = 'user';
+                                    $url = $basePath . '/profile/' . $item['id'];
+                                    break;
+                                case 'listing':
+                                    $badgeColor = 'green';
+                                    $typeLabel = 'LISTING';
+                                    $iconType = 'listing';
+                                    $url = $basePath . '/listings/' . $item['id'];
+                                    break;
+                                case 'group':
+                                    $badgeColor = 'purple';
+                                    $typeLabel = 'HUB';
+                                    $iconType = 'group';
+                                    $url = $basePath . '/groups/' . $item['id'];
+                                    break;
+                                case 'page':
+                                    $badgeColor = 'orange';
+                                    $typeLabel = 'PAGE';
+                                    $iconType = 'page';
+                                    $url = $basePath . '/pages/' . $item['id'];
+                                    break;
+                            }
 
-        // 3. Toggle Empty Message
-        if (visibleCount === 0) {
-            emptyMsg.style.display = 'block';
-            emptyMsg.querySelector('p').textContent = 'No ' + (type === 'all' ? 'results' : type + 's') + ' found matching your search.';
-        } else {
-            emptyMsg.style.display = 'none';
-        }
-    }
-</script>
+                            $itemTitle = htmlspecialchars($item['title'] ?? 'Untitled');
+                            $itemDesc = '';
+                            if (!empty($item['description'])) {
+                                $itemDesc = htmlspecialchars(strip_tags($item['description']));
+                                if (strlen($itemDesc) > 180) {
+                                    $itemDesc = substr($itemDesc, 0, 180) . '...';
+                                }
+                            }
+                            $hasImage = !empty($item['image']);
+                            $isHighMatch = isset($item['relevance_score']) && $item['relevance_score'] > 0.7;
+                            $hasLocation = !empty($item['location']);
+                            ?>
 
-<style>
-    /* Premium Hover Effect */
-    .htb-search-result:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.08) !important;
-        border-color: rgba(var(--htb-primary-rgb), 0.3) !important;
-    }
+                            <li class="civicone-search-result-item" data-type="<?= htmlspecialchars($item['type']) ?>" role="listitem">
+                                <!-- Icon/Image -->
+                                <div class="civicone-search-result-item__icon">
+                                    <?php if ($hasImage): ?>
+                                        <img src="<?= htmlspecialchars($item['image']) ?>"
+                                             alt=""
+                                             loading="lazy"
+                                             class="civicone-search-result-item__image">
+                                    <?php else: ?>
+                                        <div class="civicone-search-result-item__icon-placeholder" aria-hidden="true">
+                                            <?php if ($iconType === 'user'): ?>
+                                                <svg class="civicone-icon-large" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                                                    <circle cx="12" cy="7" r="4"></circle>
+                                                </svg>
+                                            <?php elseif ($iconType === 'group'): ?>
+                                                <svg class="civicone-icon-large" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                                                    <circle cx="9" cy="7" r="4"></circle>
+                                                    <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                                                    <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                                                </svg>
+                                            <?php elseif ($iconType === 'listing'): ?>
+                                                <svg class="civicone-icon-large" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                                    <line x1="8" y1="6" x2="21" y2="6"></line>
+                                                    <line x1="8" y1="12" x2="21" y2="12"></line>
+                                                    <line x1="8" y1="18" x2="21" y2="18"></line>
+                                                    <line x1="3" y1="6" x2="3.01" y2="6"></line>
+                                                    <line x1="3" y1="12" x2="3.01" y2="12"></line>
+                                                    <line x1="3" y1="18" x2="3.01" y2="18"></line>
+                                                </svg>
+                                            <?php else: ?>
+                                                <svg class="civicone-icon-large" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                                                    <polyline points="14 2 14 8 20 8"></polyline>
+                                                    <line x1="16" y1="13" x2="8" y2="13"></line>
+                                                    <line x1="16" y1="17" x2="8" y2="17"></line>
+                                                    <polyline points="10 9 9 9 8 9"></polyline>
+                                                </svg>
+                                            <?php endif; ?>
+                                        </div>
+                                    <?php endif; ?>
+                                </div>
 
-    .htb-search-result:hover .arrow-indicator {
-        opacity: 1 !important;
-        transform: translateX(0) !important;
-    }
+                                <!-- Content -->
+                                <div class="civicone-search-result-item__content">
+                                    <!-- Meta badges -->
+                                    <div class="civicone-search-result-item__meta">
+                                        <span class="civicone-badge civicone-badge--<?= $badgeColor ?>">
+                                            <?= $typeLabel ?>
+                                        </span>
 
-    .htb-search-tabs {
-        background: rgba(0, 0, 0, 0.05);
-        /* Light gray bg for tabs container */
-    }
+                                        <?php if ($isHighMatch): ?>
+                                            <span class="civicone-badge civicone-badge--high-match">
+                                                <svg class="civicone-icon" width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                                                    <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+                                                </svg>
+                                                <span class="govuk-visually-hidden">High relevance: </span>Top Match
+                                            </span>
+                                        <?php endif; ?>
 
-    /* ========================================
-       DARK MODE FOR SEARCH RESULTS
-       ======================================== */
+                                        <?php if ($hasLocation): ?>
+                                            <span class="civicone-badge civicone-badge--muted">
+                                                <svg class="civicone-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                                                    <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                                                    <circle cx="12" cy="10" r="3"></circle>
+                                                </svg>
+                                                <?= htmlspecialchars($item['location']) ?>
+                                            </span>
+                                        <?php endif; ?>
+                                    </div>
 
-    /* Header text */
-    [data-theme="dark"] header h1[style*="color: white"] {
-        color: #f1f5f9 !important;
-    }
+                                    <!-- Title (Main Link) -->
+                                    <h3 class="civicone-search-result-item__title">
+                                        <a href="<?= $url ?>" class="civicone-link">
+                                            <?= $itemTitle ?>
+                                        </a>
+                                    </h3>
 
-    [data-theme="dark"] header p[style*="color: rgba(255,255,255,0.9)"] {
-        color: rgba(226, 232, 240, 0.9) !important;
-    }
+                                    <!-- Description -->
+                                    <?php if ($itemDesc): ?>
+                                        <p class="civicone-search-result-item__description">
+                                            <?= $itemDesc ?>
+                                        </p>
+                                    <?php endif; ?>
+                                </div>
 
-    /* Filter Tabs Container */
-    [data-theme="dark"] .htb-search-tabs {
-        background: rgba(30, 41, 59, 0.8) !important;
-        border-color: rgba(255, 255, 255, 0.1) !important;
-    }
+                                <!-- Action Button -->
+                                <div class="civicone-search-result-item__action">
+                                    <a href="<?= $url ?>"
+                                       class="civicone-button civicone-button--secondary"
+                                       aria-label="View <?= strtolower($typeLabel) ?>: <?= $itemTitle ?>">
+                                        View
+                                    </a>
+                                </div>
+                            </li>
+                        <?php endforeach; ?>
+                    </ul>
 
-    [data-theme="dark"] .htb-search-tabs .htb-tab {
-        color: #94a3b8 !important;
-    }
+                    <!-- Pagination -->
+                    <?php if (isset($pagination) && $pagination['total_pages'] > 1): ?>
+                        <nav class="civicone-pagination" aria-label="Search results pagination">
+                            <?php
+                            $current = $pagination['current_page'];
+                            $total = $pagination['total_pages'];
+                            $base = $basePath . '/search';
+                            $range = 2;
+                            $queryParam = '&q=' . urlencode($query);
+                            ?>
 
-    [data-theme="dark"] .htb-search-tabs .htb-tab.active {
-        background: rgba(99, 102, 241, 0.2) !important;
-        color: #a5b4fc !important;
-    }
+                            <div class="civicone-pagination__results">
+                                Showing <?= (($current - 1) * 20 + 1) ?> to <?= min($current * 20, $total_results ?? $totalResults) ?> of <?= $total_results ?? $totalResults ?> results
+                            </div>
 
-    [data-theme="dark"] .htb-search-tabs .htb-tab:not(.active):hover {
-        background: rgba(51, 65, 85, 0.6) !important;
-        color: #e2e8f0 !important;
-    }
+                            <ul class="civicone-pagination__list">
+                                <?php if ($current > 1): ?>
+                                    <li class="civicone-pagination__item civicone-pagination__item--prev">
+                                        <a href="<?= $base ?>?page=<?= $current - 1 ?><?= $queryParam ?>" class="civicone-pagination__link" aria-label="Go to previous page">
+                                            <span aria-hidden="true">‹</span> Previous
+                                        </a>
+                                    </li>
+                                <?php endif; ?>
 
-    /* Empty State Card */
-    [data-theme="dark"] .htb-card[style*="text-align: center"][style*="padding: 60px"] {
-        background: rgba(30, 41, 59, 0.85) !important;
-        border: 1px solid rgba(255, 255, 255, 0.1) !important;
-    }
+                                <?php for ($i = 1; $i <= $total; $i++): ?>
+                                    <?php if ($i == 1 || $i == $total || ($i >= $current - $range && $i <= $current + $range)): ?>
+                                        <li class="civicone-pagination__item">
+                                            <?php if ($i == $current): ?>
+                                                <span class="civicone-pagination__link civicone-pagination__link--current" aria-current="page">
+                                                    <?= $i ?>
+                                                </span>
+                                            <?php else: ?>
+                                                <a href="<?= $base ?>?page=<?= $i ?><?= $queryParam ?>" class="civicone-pagination__link" aria-label="Go to page <?= $i ?>">
+                                                    <?= $i ?>
+                                                </a>
+                                            <?php endif; ?>
+                                        </li>
+                                    <?php elseif ($i == $current - $range - 1 || $i == $current + $range + 1): ?>
+                                        <li class="civicone-pagination__item civicone-pagination__item--ellipsis" aria-hidden="true">
+                                            <span>⋯</span>
+                                        </li>
+                                    <?php endif; ?>
+                                <?php endfor; ?>
 
-    [data-theme="dark"] .htb-card h3[style*="color: var(--htb-text-main)"] {
-        color: #f1f5f9 !important;
-    }
+                                <?php if ($current < $total): ?>
+                                    <li class="civicone-pagination__item civicone-pagination__item--next">
+                                        <a href="<?= $base ?>?page=<?= $current + 1 ?><?= $queryParam ?>" class="civicone-pagination__link" aria-label="Go to next page">
+                                            Next <span aria-hidden="true">›</span>
+                                        </a>
+                                    </li>
+                                <?php endif; ?>
+                            </ul>
+                        </nav>
+                    <?php endif; ?>
 
-    [data-theme="dark"] .htb-card p[style*="color: var(--htb-text-muted)"] {
-        color: #94a3b8 !important;
-    }
+                <?php endif; ?>
 
-    /* No Filter Results Message */
-    [data-theme="dark"] #no-filter-results {
-        background: rgba(30, 41, 59, 0.9) !important;
-        border: 1px solid rgba(255, 255, 255, 0.1);
-    }
+            </div><!-- /two-thirds -->
+        </div><!-- /grid-row -->
 
-    [data-theme="dark"] #no-filter-results p {
-        color: #94a3b8 !important;
-    }
+    </main>
+</div><!-- /civicone-width-container -->
 
-    /* Search Result Cards */
-    [data-theme="dark"] .htb-search-result {
-        background: rgba(30, 41, 59, 0.85) !important;
-        border-color: rgba(255, 255, 255, 0.1) !important;
-    }
+<script src="/assets/js/civicone-search-results.js?v=<?= time() ?>"></script>
 
-    [data-theme="dark"] .htb-search-result:hover {
-        border-color: rgba(99, 102, 241, 0.4) !important;
-        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3) !important;
-    }
-
-    /* Placeholder icon background */
-    [data-theme="dark"] .htb-search-result div[style*="background: #f3f4f6"] {
-        background: rgba(51, 65, 85, 0.6) !important;
-    }
-
-    /* Result title */
-    [data-theme="dark"] .htb-search-result h3[style*="color: #111827"] {
-        color: #f1f5f9 !important;
-    }
-
-    /* Result description */
-    [data-theme="dark"] .htb-search-result p[style*="color: #6b7280"] {
-        color: #94a3b8 !important;
-    }
-
-    /* Badge colors in dark mode */
-    [data-theme="dark"] .htb-badge[style*="background: var(--htb-blue-100)"] {
-        background: rgba(59, 130, 246, 0.2) !important;
-        color: #60a5fa !important;
-    }
-
-    [data-theme="dark"] .htb-badge[style*="background: var(--htb-green-100)"] {
-        background: rgba(16, 185, 129, 0.2) !important;
-        color: #34d399 !important;
-    }
-
-    [data-theme="dark"] .htb-badge[style*="background: var(--htb-purple-100)"] {
-        background: rgba(139, 92, 246, 0.2) !important;
-        color: #a78bfa !important;
-    }
-
-    [data-theme="dark"] .htb-badge[style*="background: var(--htb-orange-100)"] {
-        background: rgba(245, 158, 11, 0.2) !important;
-        color: #fbbf24 !important;
-    }
-
-    [data-theme="dark"] .htb-badge[style*="background: var(--htb-gray-100)"] {
-        background: rgba(100, 116, 139, 0.2) !important;
-        color: #94a3b8 !important;
-    }
-</style>
-
-<?php require __DIR__ . '/../../layouts/civicone/footer.php'; ?>
+<?php require dirname(__DIR__, 2) . '/layouts/civicone/footer.php'; ?>

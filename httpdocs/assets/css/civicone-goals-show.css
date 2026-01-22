@@ -183,7 +183,7 @@ html[data-theme="dark"] #unique-glass-page-wrapper {
     --text-color: var(--color-pink-100);
     --text-muted: rgba(255, 255, 255, 0.7);
     --accent-color: var(--color-pink-400);
-    --heading-gradient: linear-gradient(135deg, #ffffff 0%, var(--color-pink-200) 100%);
+    --heading-gradient: linear-gradient(135deg, var(--color-white) 0%, var(--color-pink-200) 100%);
 
     /* Vivid Dark Mode Shadows */
     --box-shadow:

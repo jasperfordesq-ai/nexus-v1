@@ -10,7 +10,7 @@
         right: 0;
         z-index: 10001;
         padding: var(--space-3) var(--space-5);
-        background: linear-gradient(135deg, #ef4444, #dc2626);
+        background: linear-gradient(135deg, var(--color-danger), var(--color-red-600));
         color: white;
         font-size: var(--font-size-sm);
         font-weight: var(--font-weight-semibold);
@@ -85,11 +85,11 @@
     */
         --glass-bg: rgba(255, 255, 255, 0.55);
         --glass-border: rgba(255, 255, 255, 0.4);
-        --text-color: #1e293b;
-        --text-muted: #475569;
-        --accent-color: #f97316;
+        --text-color: var(--color-slate-800);
+        --text-muted: var(--color-slate-600);
+        --accent-color: var(--color-orange-500);
         /* Orange for Events */
-        --heading-gradient: linear-gradient(135deg, #c2410c 0%, #f97316 100%);
+        --heading-gradient: linear-gradient(135deg, var(--color-govuk-red-dark) 0%, var(--color-orange-500) 100%);
 
         /* Subtle iridescent shadow for light mode */
         --box-shadow:
@@ -110,7 +110,7 @@
         /* Date Badge Variables */
         --date-badge-bg: rgba(255, 237, 213, 0.6);
         --date-badge-border: 1px solid rgba(253, 186, 116, 0.5);
-        --date-text: #c2410c;
+        --date-text: var(--color-govuk-red-dark);
 
         /* Layout & Alignment */
         display: flex;
@@ -140,9 +140,9 @@
     html[data-theme="light"] #unique-glass-page-wrapper {
         --glass-bg: rgba(255, 255, 255, 0.55);
         --glass-border: rgba(255, 255, 255, 0.4);
-        --text-color: #1e293b;
-        --text-muted: #475569;
-        --heading-gradient: linear-gradient(135deg, #c2410c 0%, #f97316 100%);
+        --text-color: var(--color-slate-800);
+        --text-muted: var(--color-slate-600);
+        --heading-gradient: linear-gradient(135deg, var(--color-govuk-red-dark) 0%, var(--color-orange-500) 100%);
         --box-shadow:
             0 var(--space-2) var(--space-8) 0 rgba(31, 38, 135, 0.1),
             inset 0 0 0 1px rgba(255, 255, 255, 0.2);
@@ -153,7 +153,7 @@
 
         --date-badge-bg: rgba(255, 237, 213, 0.6);
         --date-badge-border: 1px solid rgba(253, 186, 116, 0.5);
-        --date-text: #c2410c;
+        --date-text: var(--color-govuk-red-dark);
 
         background: radial-gradient(circle at 50% 0%, #fff7ed 0%, #ffedd5 100%);
     }
@@ -164,8 +164,8 @@
         --glass-border: rgba(255, 255, 255, 0.15);
         --text-color: #ffedd5;
         --text-muted: rgba(255, 255, 255, 0.7);
-        --accent-color: #fdba74;
-        --heading-gradient: linear-gradient(135deg, #ffffff 0%, #fdba74 100%);
+        --accent-color: var(--color-orange-300);
+        --heading-gradient: linear-gradient(135deg, var(--color-white) 0%, var(--color-orange-300) 100%);
 
         /* Vivid Dark Mode Shadows */
         --box-shadow:
@@ -184,7 +184,7 @@
 
         --date-badge-bg: rgba(67, 20, 7, 0.6);
         --date-badge-border: 1px solid rgba(251, 146, 60, 0.3);
-        --date-text: #fdba74;
+        --date-text: var(--color-orange-300);
 
         background: radial-gradient(circle at 50% 0%, rgb(40, 15, 5) 0%, rgb(20, 10, 5) 90%);
     }
@@ -382,7 +382,7 @@
     }
 
     #unique-glass-page-wrapper .glass-btn.primary {
-        background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
+        background: linear-gradient(135deg, var(--color-orange-500) 0%, var(--color-orange-600) 100%);
         color: white;
         border: none;
     }
@@ -390,7 +390,7 @@
     #unique-glass-page-wrapper .glass-btn.danger {
         background: rgba(239, 68, 68, 0.15);
         border-color: rgba(239, 68, 68, 0.3);
-        color: #ef4444;
+        color: var(--color-danger);
     }
 
     /* Attendee List */

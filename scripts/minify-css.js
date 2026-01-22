@@ -144,6 +144,7 @@ const cssFiles = [
     'civicone-footer.css',
     'civicone-dashboard.css',
     'civicone-achievements.css',
+    'civicone-compose-index.css',
     'civicone-profile-header.css',
     'civicone-profile-social.css',
     // Shared components
@@ -204,14 +205,26 @@ const cssFiles = [
     'civicone-wallet.css',
     // Account navigation (MOJ Sub navigation pattern - 2026-01-20)
     'civicone-account-nav.css',
-    // GOV.UK component library (WCAG 2.1 AA - 2026-01-20)
+    // GOV.UK component library (WCAG 2.2 AA - 2026-01-20/22)
     'civicone-govuk-buttons.css',
     'civicone-govuk-components.css',
     'civicone-govuk-focus.css',
     'civicone-govuk-forms.css',
     'civicone-govuk-spacing.css',
     'civicone-govuk-typography.css',
-    // Directory pages (GOV.UK patterns - 2026-01-20)
+    // GOV.UK feedback components (WCAG 2.2 AA - 2026-01-22)
+    'civicone-govuk-feedback.css',
+    // GOV.UK navigation components (WCAG 2.2 AA - 2026-01-22)
+    'civicone-govuk-navigation.css',
+    // GOV.UK content components (WCAG 2.2 AA - 2026-01-22)
+    'civicone-govuk-content.css',
+    // GOV.UK tabs component (WCAG 2.2 AA - 2026-01-22)
+    'civicone-govuk-tabs.css',
+    // MOJ Filter Component (WCAG 2.2 AA - Members Directory v1.6.0 - 2026-01-22)
+    'moj-filter.css',
+    // Members Directory v1.6.0 (Mobile Bottom Sheet + Prominent Tabs - 2026-01-22)
+    'members-directory-v1.6.css',
+    // Directory pages (GOV.UK patterns - 2026-01-20/22 - enhanced with v1.4 components)
     'civicone-listings-directory.css',
     'civicone-members-directory.css',
     // Design tokens (2026-01-20)

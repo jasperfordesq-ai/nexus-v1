@@ -132,7 +132,7 @@ require __DIR__ . '/../../layouts/header.php';
 
             <!-- Comments List -->
             <div class="comments-list">
-                <div class="loading-skeleton" style="height: 80px; width: 100%;"></div>
+                <div class="loading-skeleton skeleton-80"></div>
             </div>
         </div>
 
@@ -156,7 +156,7 @@ window.SocialInteractions.config = {
     unlikedColor: '#6b7280'
 };
 </script>
-<script src="<?= $basePath ?>/assets/js/social-interactions.min.js"></script>
+<script src="/assets/js/social-interactions.min.js"></script>
 
 <script>
 // Auto-load comments on page load

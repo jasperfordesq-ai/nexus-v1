@@ -7,10 +7,11 @@
  * See: docs/CIVICONE_WCAG21AA_SOURCE_OF_TRUTH.md Section 7
  *
  * GOV.UK Focus Pattern:
- * - Yellow (#ffdd00) background highlight
- * - Black (#0b0c0c) text color when focused
+ * - Yellow (var(--color-brand-yellow)) background highlight
+ * - Black (var(--color-govuk-black)) text color when focused
  * - 3px black bottom border on links (simulates underline)
  * - No outline on the element itself (replaced by background)
+  * Fully Migrated to Design Tokens: 2026-01-21 ✓
  */
 
 /* ===========================================
@@ -18,8 +19,8 @@
    =========================================== */
 :root {
     /* GOV.UK Official Focus Colors */
-    --govuk-focus-colour: #ffdd00;
-    --govuk-focus-text-colour: #0b0c0c;
+    --govuk-focus-colour: var(--color-brand-yellow);
+    --govuk-focus-text-colour: var(--color-govuk-black);
 
     /* CivicOne mappings to GOV.UK */
     --civicone-focus: var(--govuk-focus-colour);
@@ -304,7 +305,7 @@ body.dark-mode .civic-logo:focus-visible {
 @media (prefers-contrast: more) {
     :root {
         --civicone-focus: #ffff00; /* Brighter yellow for high contrast */
-        --civicone-focus-text: #000000;
+        --civicone-focus-text: var(--color-black);
     }
 }
 

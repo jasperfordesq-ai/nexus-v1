@@ -12,236 +12,8 @@ $breakdown = $scoreData['breakdown'] ?? [];
 $communityStats = $communityStats ?? ['average_score' => 450];
 ?>
 
-<style>
-.charts-container {
-    display: grid;
-    gap: 2rem;
-}
-
-.chart-card {
-    background: linear-gradient(135deg, rgba(15, 23, 42, 0.95), rgba(30, 41, 59, 0.9));
-    backdrop-filter: blur(20px);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 20px;
-    padding: 2rem;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-}
-
-.chart-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 1.5rem;
-}
-
-.chart-title {
-    font-size: 1.5rem;
-    font-weight: 700;
-    color: #f1f5f9;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-}
-
-.chart-icon {
-    font-size: 1.75rem;
-}
-
-.radar-chart-container {
-    position: relative;
-    width: 100%;
-    max-width: 500px;
-    margin: 0 auto;
-    aspect-ratio: 1;
-}
-
-.radar-svg {
-    width: 100%;
-    height: 100%;
-}
-
-.radar-grid {
-    fill: none;
-    stroke: rgba(255, 255, 255, 0.1);
-    stroke-width: 1;
-}
-
-.radar-axis {
-    stroke: rgba(255, 255, 255, 0.2);
-    stroke-width: 1;
-}
-
-.radar-data-area {
-    fill: rgba(99, 102, 241, 0.3);
-    stroke: #6366f1;
-    stroke-width: 2;
-    filter: drop-shadow(0 0 10px rgba(99, 102, 241, 0.5));
-}
-
-.radar-comparison-area {
-    fill: rgba(139, 92, 246, 0.2);
-    stroke: #8b5cf6;
-    stroke-width: 2;
-    stroke-dasharray: 5, 5;
-}
-
-.radar-label {
-    fill: #f1f5f9;
-    font-size: 14px;
-    font-weight: 600;
-    text-anchor: middle;
-}
-
-.bar-chart-container {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-}
-
-.bar-item {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-}
-
-.bar-label {
-    min-width: 180px;
-    font-size: 0.95rem;
-    color: #f1f5f9;
-    font-weight: 500;
-}
-
-.bar-track {
-    flex: 1;
-    height: 36px;
-    background: rgba(255, 255, 255, 0.05);
-    border-radius: 18px;
-    position: relative;
-    overflow: hidden;
-}
-
-.bar-fill {
-    height: 100%;
-    background: linear-gradient(90deg, #6366f1, #8b5cf6);
-    border-radius: 18px;
-    display: flex;
-    align-items: center;
-    justify-content: flex-end;
-    padding-right: 1rem;
-    transition: width 1.5s cubic-bezier(0.4, 0, 0.2, 1);
-    box-shadow: 0 0 20px rgba(99, 102, 241, 0.4);
-}
-
-.bar-value {
-    color: #fff;
-    font-weight: 700;
-    font-size: 0.875rem;
-    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-}
-
-.bar-comparison {
-    position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
-    width: 3px;
-    height: 80%;
-    background: #fbbf24;
-    box-shadow: 0 0 10px rgba(251, 191, 36, 0.8);
-    z-index: 10;
-}
-
-.bar-comparison::after {
-    content: 'AVG';
-    position: absolute;
-    top: -24px;
-    left: 50%;
-    transform: translateX(-50%);
-    font-size: 10px;
-    font-weight: 700;
-    color: #fbbf24;
-    white-space: nowrap;
-}
-
-.comparison-legend {
-    display: flex;
-    gap: 2rem;
-    justify-content: center;
-    margin-top: 1.5rem;
-    padding-top: 1.5rem;
-    border-top: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.legend-item {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    font-size: 0.875rem;
-    color: rgba(255, 255, 255, 0.8);
-}
-
-.legend-color {
-    width: 24px;
-    height: 12px;
-    border-radius: 6px;
-}
-
-.stats-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-    gap: 1rem;
-    margin-top: 1.5rem;
-}
-
-.stat-box {
-    background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(139, 92, 246, 0.1));
-    border: 1px solid rgba(99, 102, 241, 0.3);
-    border-radius: 12px;
-    padding: 1rem;
-    text-align: center;
-}
-
-.stat-value {
-    font-size: 2rem;
-    font-weight: 700;
-    color: #6366f1;
-    line-height: 1;
-}
-
-.stat-label {
-    font-size: 0.75rem;
-    color: rgba(255, 255, 255, 0.6);
-    margin-top: 0.5rem;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-}
-
-.trend-indicator {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.25rem;
-    font-size: 0.875rem;
-    margin-top: 0.5rem;
-}
-
-.trend-up {
-    color: #10b981;
-}
-
-.trend-down {
-    color: #ef4444;
-}
-
-@media (max-width: 768px) {
-    .bar-label {
-        min-width: 120px;
-        font-size: 0.85rem;
-    }
-
-    .stats-grid {
-        grid-template-columns: repeat(2, 1fr);
-    }
-}
-</style>
+<!-- Nexus Score Charts CSS -->
+<link rel="stylesheet" href="<?= \Nexus\Core\TenantContext::getBasePath() ?>/assets/css/purged/civicone-nexus-score-charts.min.css">
 
 <div class="charts-container">
     <!-- Radar Chart: Category Comparison -->
@@ -351,11 +123,11 @@ $communityStats = $communityStats ?? ['average_score' => 450];
 
         <div class="comparison-legend">
             <div class="legend-item">
-                <div class="legend-color" style="background: linear-gradient(90deg, #6366f1, #8b5cf6);"></div>
+                <div class="legend-color legend-color-primary"></div>
                 <span>Your Score</span>
             </div>
             <div class="legend-item">
-                <div class="legend-color" style="background: #8b5cf6; opacity: 0.5;"></div>
+                <div class="legend-color legend-color-comparison"></div>
                 <span>Community Average</span>
             </div>
         </div>
@@ -399,11 +171,11 @@ $communityStats = $communityStats ?? ['average_score' => 450];
 
         <div class="comparison-legend">
             <div class="legend-item">
-                <div class="legend-color" style="background: linear-gradient(90deg, #6366f1, #8b5cf6);"></div>
+                <div class="legend-color legend-color-primary"></div>
                 <span>Your Score</span>
             </div>
             <div class="legend-item">
-                <div class="legend-color" style="background: #fbbf24; width: 3px;"></div>
+                <div class="legend-color legend-color-average"></div>
                 <span>Community Average</span>
             </div>
         </div>
@@ -476,16 +248,5 @@ $communityStats = $communityStats ?? ['average_score' => 450];
     </div>
 </div>
 
-<script>
-// Animate bars on load
-document.addEventListener('DOMContentLoaded', function() {
-    const bars = document.querySelectorAll('.bar-fill');
-    bars.forEach(bar => {
-        const width = bar.style.width;
-        bar.style.width = '0%';
-        setTimeout(() => {
-            bar.style.width = width;
-        }, 200);
-    });
-});
-</script>
+<!-- Nexus Score Charts JavaScript -->
+<script src="<?= \Nexus\Core\TenantContext::getBasePath() ?>/assets/js/civicone-nexus-score-charts.min.js" defer></script>

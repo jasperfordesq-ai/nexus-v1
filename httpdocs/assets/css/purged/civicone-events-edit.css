@@ -1,0 +1,317 @@
+/**
+ * CivicOne Events Edit/Create Form Styles
+ * Template D: Form/Flow (Section 10.5)
+ * Extracted from inline styles per CLAUDE.md
+ * Includes SDG selection grid and date/time inputs
+ */
+
+.nexus-skin-civicone {
+
+    /* ==========================================
+       Offline Banner
+       ========================================== */
+
+    .civicone-offline-banner {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        z-index: 10001;
+        padding: var(--space-3) var(--space-4);
+        background: linear-gradient(135deg, var(--color-danger), #dc2626);
+        color: var(--civicone-text-inverse);
+        font-size: 0.9rem;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: var(--space-2);
+        transform: translateY(-100%);
+        transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    /* ==========================================
+       Touch Targets - WCAG 2.1 AA (44px minimum)
+       ========================================== */
+
+    .civicone-input,
+    .civicone-textarea,
+    .civicone-select,
+    .civicone-button {
+        min-height: 44px;
+    }
+
+    .civicone-input,
+    .civicone-textarea {
+        font-size: 16px; /* Prevent iOS zoom */
+    }
+
+    @media (max-width: 768px) {
+        .civicone-input,
+        .civicone-textarea,
+        .civicone-select,
+        .civicone-button {
+            min-height: 48px;
+        }
+    }
+
+    /* ==========================================
+       Date/Time Grid Layout
+       ========================================== */
+
+    .civicone-dates-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: var(--space-4);
+    }
+
+    @media (max-width: 768px) {
+        .civicone-dates-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    /* ==========================================
+       Date & Time Input Styling
+       ========================================== */
+
+    .civicone-input[type="date"],
+    .civicone-input[type="time"] {
+        color-scheme: light;
+    }
+
+    /* ==========================================
+       SDG Selection Accordion
+       ========================================== */
+
+    .civicone-sdg-accordion {
+        background: var(--color-gray-50);
+        border: 1px solid var(--color-gray-200);
+        border-radius: var(--radius-2);
+        overflow: hidden;
+        margin-bottom: var(--space-6);
+        transition: all 0.3s ease;
+    }
+
+    .civicone-sdg-accordion[open] {
+        background: var(--civicone-bg-card);
+    }
+
+    .civicone-sdg-summary {
+        padding: var(--space-4);
+        cursor: pointer;
+        font-weight: 700;
+        color: var(--civicone-text-main);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        user-select: none;
+        list-style: none;
+        transition: background 0.2s ease;
+    }
+
+    .civicone-sdg-summary:hover {
+        background: var(--color-gray-100);
+    }
+
+    .civicone-sdg-summary::-webkit-details-marker {
+        display: none;
+    }
+
+    .civicone-sdg-summary-label {
+        display: flex;
+        align-items: center;
+        gap: var(--space-2);
+    }
+
+    .civicone-sdg-summary-hint {
+        font-weight: 400;
+        font-size: 0.85rem;
+        opacity: 0.7;
+        margin-left: var(--space-1);
+    }
+
+    .civicone-sdg-summary-icon {
+        font-size: 1.2rem;
+        opacity: 0.5;
+        transition: transform 0.3s ease;
+    }
+
+    .civicone-sdg-accordion[open] .civicone-sdg-summary-icon {
+        transform: rotate(180deg);
+    }
+
+    .civicone-sdg-content {
+        padding: var(--space-4);
+        border-top: 1px solid var(--color-gray-200);
+        background: var(--civicone-bg-page);
+    }
+
+    .civicone-sdg-intro {
+        font-size: 0.85rem;
+        color: var(--civicone-text-muted);
+        margin-bottom: var(--space-4);
+        margin-top: 0;
+    }
+
+    /* ==========================================
+       SDG Grid
+       ========================================== */
+
+    .civicone-sdg-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+        gap: var(--space-3);
+    }
+
+    @media (max-width: 600px) {
+        .civicone-sdg-grid {
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: var(--space-2);
+        }
+    }
+
+    /* ==========================================
+       SDG Cards (Interactive Checkboxes)
+       ========================================== */
+
+    .civicone-sdg-card {
+        border: 2px solid var(--color-gray-200);
+        border-radius: var(--radius-2);
+        padding: var(--space-3);
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: var(--space-2);
+        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        background: var(--civicone-bg-page);
+        position: relative;
+        overflow: hidden;
+        min-height: 60px;
+    }
+
+    .civicone-sdg-card:hover {
+        background: var(--color-gray-50);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    }
+
+    .civicone-sdg-card:focus-within {
+        outline: 3px solid var(--color-focus);
+        outline-offset: 0;
+        background: var(--color-focus);
+    }
+
+    /* Hidden checkbox */
+    .civicone-sdg-card input[type="checkbox"] {
+        position: absolute;
+        opacity: 0;
+        pointer-events: none;
+    }
+
+    /* SDG Icon */
+    .civicone-sdg-icon {
+        font-size: 1.4rem;
+        flex-shrink: 0;
+        line-height: 1;
+    }
+
+    /* SDG Label */
+    .civicone-sdg-label {
+        font-size: 0.8rem;
+        font-weight: 700;
+        color: var(--civicone-text-main);
+        line-height: 1.2;
+        flex: 1;
+    }
+
+    /* Selected State */
+    .civicone-sdg-card.selected {
+        background: rgba(0, 121, 107, 0.1);
+        border-color: var(--civicone-brand);
+        box-shadow: 0 0 0 1px var(--civicone-brand), 0 4px 12px rgba(0, 121, 107, 0.15);
+    }
+
+    .civicone-sdg-card.selected::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: currentColor;
+        opacity: 0.05;
+        pointer-events: none;
+    }
+
+    /* Checkmark indicator */
+    .civicone-sdg-card.selected::before {
+        content: '✓';
+        position: absolute;
+        top: 4px;
+        right: 4px;
+        width: 18px;
+        height: 18px;
+        background: var(--civicone-brand);
+        color: var(--civicone-text-inverse);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 11px;
+        font-weight: 700;
+    }
+
+    /* ==========================================
+       Mapbox Geocoder Integration
+       ========================================== */
+
+    /* ==========================================
+       Category Select Styling
+       ========================================== */
+
+    .civicone-select {
+        appearance: none;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%2300796B' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right var(--space-3) center;
+        background-size: 20px;
+        padding-right: var(--space-8);
+    }
+
+    /* ==========================================
+       AI Generate Button Integration
+       ========================================== */
+
+    .civicone-ai-generate-wrapper {
+        margin-bottom: var(--space-2);
+    }
+
+    /* ==========================================
+       Mobile Responsive
+       ========================================== */
+
+    @media (max-width: 768px) {
+        .civicone-sdg-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .civicone-sdg-card {
+            padding: var(--space-4);
+        }
+    }
+
+    /* ==========================================
+       Button Press States (Native Feel)
+       ========================================== */
+
+    .civicone-button:active {
+        transform: scale(0.96);
+        transition: transform 0.1s ease;
+    }
+
+    /* ==========================================
+       Smooth Scroll
+       ========================================== */
+
+}

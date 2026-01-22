@@ -15,6 +15,18 @@ $basePath = \Nexus\Core\TenantContext::getBasePath();
 <div class="civicone-width-container">
     <main class="civicone-main-wrapper" id="main-content">
 
+        <!-- Breadcrumbs (GOV.UK Template A requirement) -->
+        <nav class="civicone-breadcrumbs" aria-label="Breadcrumb">
+            <ol class="civicone-breadcrumbs__list">
+                <li class="civicone-breadcrumbs__list-item">
+                    <a class="civicone-breadcrumbs__link" href="<?= $basePath ?>">Home</a>
+                </li>
+                <li class="civicone-breadcrumbs__list-item" aria-current="page">
+                    Groups
+                </li>
+            </ol>
+        </nav>
+
         <!-- Hero (auto-resolves from config/heroes.php for /groups route) -->
         <?php require __DIR__ . '/../../layouts/civicone/partials/render-hero.php'; ?>
 
@@ -76,7 +88,7 @@ $basePath = \Nexus\Core\TenantContext::getBasePath();
                             </fieldset>
                         </div>
 
-                        <button type="submit" class="civicone-button civicone-button--secondary button-full-width">
+                        <button type="submit" class="civicone-button civicone-button--secondary civicone-button--full-width">
                             Apply filters
                         </button>
                     </form>

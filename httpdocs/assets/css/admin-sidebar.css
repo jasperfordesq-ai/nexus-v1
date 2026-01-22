@@ -1,6 +1,7 @@
 /**
  * Admin Sidebar Navigation
  * Collapsible vertical sidebar with glassmorphism design
+  * Fully Migrated to Design Tokens: 2026-01-21 ✓
  */
 
 /* ==========================================================================
@@ -106,7 +107,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+    background: linear-gradient(135deg, var(--color-primary-500) 0%, var(--color-purple-500) 100%);
     border-radius: var(--radius-md);
     flex-shrink: 0;
 }
@@ -213,7 +214,7 @@
     background: linear-gradient(135deg, rgba(245, 158, 11, 0.15) 0%, rgba(234, 88, 12, 0.1) 100%);
     border: 1px solid rgba(245, 158, 11, 0.3);
     border-radius: var(--radius-base);
-    color: #fbbf24;
+    color: var(--color-amber-300);
     text-decoration: none;
     font-size: var(--font-size-sm);
     font-weight: var(--font-weight-semibold);
@@ -358,7 +359,7 @@
 /* Visual indicator for expanded section header */
 .admin-sidebar-section.expanded .admin-sidebar-section-header {
     background: rgba(99, 102, 241, 0.08);
-    border-left: 2px solid #8b5cf6;
+    border-left: 2px solid var(--color-purple-500);
     margin-left: -2px;
 }
 
@@ -439,7 +440,7 @@
     font-weight: var(--font-weight-semibold);
     line-height: 1;
     color: #fff;
-    background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+    background: linear-gradient(135deg, var(--color-warning) 0%, var(--color-amber-600) 100%);
     border-radius: var(--radius-md);
     margin-left: auto;
     flex-shrink: 0;
@@ -454,18 +455,18 @@
 
 /* Badge variants */
 .admin-sidebar-badge--danger {
-    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+    background: linear-gradient(135deg, var(--color-danger) 0%, var(--color-red-600) 100%);
     box-shadow: 0 2px 4px rgba(239, 68, 68, 0.3);
 }
 
 .admin-sidebar-badge--success {
-    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    background: linear-gradient(135deg, var(--color-success) 0%, #059669 100%);
     box-shadow: 0 2px 4px rgba(16, 185, 129, 0.3);
     animation: none; /* Success badges don't pulse */
 }
 
 .admin-sidebar-badge--info {
-    background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+    background: linear-gradient(135deg, var(--color-primary-500) 0%, var(--color-primary-600) 100%);
     box-shadow: 0 2px 4px rgba(99, 102, 241, 0.3);
     animation: none;
 }
@@ -833,7 +834,7 @@
 .admin-sidebar-toggle:focus-visible,
 .admin-sidebar-footer-btn:focus-visible,
 .admin-sidebar-search-btn:focus-visible {
-    outline: 2px solid #8b5cf6;
+    outline: 2px solid var(--color-purple-500);
     outline-offset: 2px;
 }
 
@@ -842,7 +843,7 @@
 .admin-layout.sidebar-collapsed .admin-sidebar-single:focus-visible,
 .admin-layout.sidebar-collapsed .admin-sidebar-super-admin:focus-visible,
 .admin-layout.sidebar-collapsed .admin-sidebar-logo:focus-visible {
-    outline: 2px solid #8b5cf6;
+    outline: 2px solid var(--color-purple-500);
     outline-offset: 2px;
     border-radius: 8px;
 }
@@ -853,7 +854,7 @@
     top: -100px;
     left: 0;
     padding: var(--space-2) var(--space-4);
-    background: #6366f1;
+    background: var(--color-primary-500);
     color: #fff;
     z-index: 300;
     border-radius: 0 0 var(--radius-base) 0;
@@ -918,7 +919,7 @@
     width: 36px;
     height: 36px;
     border-radius: 50%;
-    background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+    background: linear-gradient(135deg, var(--color-primary-500) 0%, var(--color-purple-500) 100%);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -966,7 +967,7 @@
 
 .admin-sidebar-logout:hover {
     background: rgba(239, 68, 68, 0.15);
-    color: #ef4444;
+    color: var(--color-danger);
 }
 
 .admin-sidebar-logout i {
@@ -1528,7 +1529,7 @@
     left: var(--admin-sidebar-width);
     right: 0;
     height: 3px;
-    background: linear-gradient(90deg, transparent, #8b5cf6, transparent);
+    background: linear-gradient(90deg, transparent, var(--color-purple-500), transparent);
     background-size: 200% 100%;
     animation: admin-loading-bar 1s infinite linear;
     z-index: 1000;

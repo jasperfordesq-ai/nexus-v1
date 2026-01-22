@@ -25,21 +25,21 @@
 /* Ensure search button has proper contrast */
 .civicone-search-button {
     background-color: #00703c !important; /* GOV.UK Green - 7.5:1 contrast */
-    color: #ffffff !important;
+    color: var(--color-white) !important;
     border-color: #00703c !important;
 }
 
 .civicone-search-button:hover {
-    background-color: #005a30 !important; /* Darker green - 9.1:1 contrast */
-    border-color: #005a30 !important;
-    color: #ffffff !important;
+    background-color: var(--color-govuk-green-dark) !important; /* Darker green - 9.1:1 contrast */
+    border-color: var(--color-govuk-green-dark) !important;
+    color: var(--color-white) !important;
 }
 
 .civicone-search-button:focus,
 .civicone-search-button:focus-visible {
-    outline: 3px solid #ffdd00 !important;
+    outline: 3px solid var(--color-brand-yellow) !important;
     outline-offset: 0 !important;
-    background-color: #ffdd00 !important;
+    background-color: var(--color-brand-yellow) !important;
     color: #0b0c0c !important;
     border-color: #0b0c0c !important;
 }
@@ -47,13 +47,13 @@
 /* Mobile search button */
 .civicone-mobile-search-button {
     background-color: #00703c !important;
-    color: #ffffff !important;
+    color: var(--color-white) !important;
     border-color: #00703c !important;
 }
 
 .civicone-mobile-search-button:hover {
-    background-color: #005a30 !important;
-    border-color: #005a30 !important;
+    background-color: var(--color-govuk-green-dark) !important;
+    border-color: var(--color-govuk-green-dark) !important;
 }
 
 /* Search wrapper alignment */
