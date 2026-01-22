@@ -833,6 +833,7 @@
 
     // Global aliases for onclick handlers in HTML
     window.toggleFeedItemMenu = toggleFeedItemMenu;
+    window.closeFeedMenus = closeFeedMenus;
     window.hidePost = hidePost;
     window.muteUser = muteUser;
     window.reportPost = reportPost;
