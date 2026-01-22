@@ -98,8 +98,11 @@ class BulkController
             }
 
             try {
-                // Move user
-                Database::query("UPDATE users SET tenant_id = ? WHERE id = ?", [$targetTenantId, $userId]);
+                // Move user and all their content to new tenant
+                if (!\Nexus\Models\User::moveTenant($userId, $targetTenantId)) {
+                    $errors[] = "Failed to move: " . ($user['first_name'] ?? $userId);
+                    continue;
+                }
 
                 // Grant super admin if requested
                 if ($grantSuperAdmin) {

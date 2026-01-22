@@ -314,17 +314,16 @@ class UserController
         }
 
         try {
-            Database::beginTransaction();
-
             $oldTenantId = $user['tenant_id'];
 
-            // Step 1: Move user to target tenant
-            Database::query("UPDATE users SET tenant_id = ? WHERE id = ?", [$targetTenantId, $userId]);
+            // Step 1: Move user and all their content to target tenant
+            if (!User::moveTenant($userId, $targetTenantId)) {
+                $this->redirectWithError('/super-admin/users/' . $userId . '/edit', 'Failed to move user to new tenant');
+                return;
+            }
 
             // Step 2: Grant super admin privileges
             Database::query("UPDATE users SET is_tenant_super_admin = 1, role = 'tenant_admin' WHERE id = ?", [$userId]);
-
-            Database::commit();
 
             // Audit log
             $userName = trim(($user['first_name'] ?? '') . ' ' . ($user['last_name'] ?? '')) ?: $user['email'];
@@ -335,17 +334,16 @@ class UserController
                 $userName,
                 ['tenant_id' => $oldTenantId, 'is_tenant_super_admin' => $user['is_tenant_super_admin'] ?? 0],
                 ['tenant_id' => $targetTenantId, 'is_tenant_super_admin' => 1],
-                "Moved '{$userName}' to '{$targetTenant['name']}' and granted Super Admin privileges"
+                "Moved '{$userName}' to '{$targetTenant['name']}' and granted Super Admin privileges (with all content)"
             );
 
             $_SESSION['flash_success'] = sprintf(
-                "User moved to '%s' and granted Super Admin privileges. They can now manage this tenant's hierarchy.",
+                "User moved to '%s' and granted Super Admin privileges. All their content has been moved as well.",
                 $targetTenant['name']
             );
             header('Location: /super-admin/users/' . $userId);
 
         } catch (\Exception $e) {
-            Database::rollback();
             error_log("moveAndPromote error: " . $e->getMessage());
             $this->redirectWithError('/super-admin/users/' . $userId . '/edit', 'Failed to move and promote user');
         }
@@ -554,10 +552,10 @@ class UserController
                 $userName,
                 ['tenant_id' => $oldTenantId],
                 ['tenant_id' => $newTenantId],
-                "Moved '{$userName}' to tenant '{$newTenant['name']}'"
+                "Moved '{$userName}' to tenant '{$newTenant['name']}' (with all content)"
             );
 
-            $_SESSION['flash_success'] = 'User moved to new tenant';
+            $_SESSION['flash_success'] = 'User and all their content moved to new tenant';
         } else {
             $_SESSION['flash_error'] = 'Failed to move user';
         }

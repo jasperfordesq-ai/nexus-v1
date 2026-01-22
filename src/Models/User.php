@@ -834,16 +834,110 @@ class User
 
     /**
      * Move user to a different tenant
+     * This method moves the user AND all their associated content to the new tenant.
+     *
+     * @param int $userId The user ID to move
+     * @param int $newTenantId The target tenant ID
+     * @param bool $moveContent Whether to move all user content (default: true)
+     * @return bool Success status
      */
-    public static function moveTenant(int $userId, int $newTenantId): bool
+    public static function moveTenant(int $userId, int $newTenantId, bool $moveContent = true): bool
     {
         try {
+            Database::beginTransaction();
+
+            // Get old tenant for logging
+            $oldUser = self::findById($userId);
+            $oldTenantId = $oldUser['tenant_id'] ?? null;
+
+            // 1. Update the user's tenant_id
             Database::query(
                 "UPDATE users SET tenant_id = ? WHERE id = ?",
                 [$newTenantId, $userId]
             );
+
+            // 2. Move all user-owned content if requested
+            if ($moveContent && $oldTenantId !== null) {
+                // Tables with user_id AND tenant_id that should move with the user
+                // These are user-generated content tables
+                $contentTables = [
+                    'listings',           // User's offers/requests
+                    'feed_posts',         // User's posts
+                    'events',             // User's created events
+                    'goals',              // User's goals
+                    'polls',              // User's created polls
+                    'resources',          // User's resources
+                    'comments',           // User's comments
+                    'likes',              // User's likes
+                    'reactions',          // User's reactions
+                    'vol_organizations',  // User's volunteer organizations
+                    'vol_applications',   // User's volunteer applications
+                    'vol_logs',           // User's volunteer logs
+                    'group_discussions',  // User's group discussions
+                    'group_posts',        // User's group posts
+                ];
+
+                foreach ($contentTables as $table) {
+                    try {
+                        Database::query(
+                            "UPDATE {$table} SET tenant_id = ? WHERE user_id = ? AND tenant_id = ?",
+                            [$newTenantId, $userId, $oldTenantId]
+                        );
+                    } catch (\Exception $e) {
+                        // Table might not exist or have different structure - log and continue
+                        error_log("User::moveTenant - Could not update {$table}: " . $e->getMessage());
+                    }
+                }
+
+                // User settings/preferences tables (always move)
+                $settingsTables = [
+                    'user_badges',
+                    'user_consents',
+                    'user_permissions',
+                    'user_roles',
+                    'user_category_affinity',
+                    'user_distance_preference',
+                    'user_gamification_summary',
+                    'user_stats_cache',
+                    'user_streaks',
+                    'user_xp_log',
+                    'user_points_log',
+                    'nexus_score_cache',
+                    'nexus_score_history',
+                    'nexus_score_milestones',
+                    'leaderboard_cache',
+                    'weekly_rank_snapshots',
+                    'match_cache',
+                    'match_history',
+                    'match_preferences',
+                    'notification_settings',
+                    'push_subscriptions',
+                    'fcm_device_tokens',
+                    'sessions',
+                ];
+
+                foreach ($settingsTables as $table) {
+                    try {
+                        Database::query(
+                            "UPDATE {$table} SET tenant_id = ? WHERE user_id = ? AND tenant_id = ?",
+                            [$newTenantId, $userId, $oldTenantId]
+                        );
+                    } catch (\Exception $e) {
+                        // Log but don't fail - some tables may not exist
+                        error_log("User::moveTenant - Could not update {$table}: " . $e->getMessage());
+                    }
+                }
+            }
+
+            Database::commit();
+
+            // Log the move
+            error_log("User::moveTenant - User {$userId} moved from tenant {$oldTenantId} to {$newTenantId}" .
+                      ($moveContent ? " (with content)" : " (user only)"));
+
             return true;
         } catch (\Exception $e) {
+            Database::rollback();
             error_log("User::moveTenant error: " . $e->getMessage());
             return false;
         }

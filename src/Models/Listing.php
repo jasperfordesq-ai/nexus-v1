@@ -13,6 +13,10 @@ class Listing
     public static function all($type = null, $categoryId = null, $search = null)
     {
         $tenantId = TenantContext::getId();
+        // Note: We don't filter users by tenant_id in JOIN because:
+        // 1. The listing's tenant_id controls visibility
+        // 2. Users may belong to different tenants (federation/cross-tenant)
+        // 3. We still get correct author info via user_id foreign key
         $sql = "SELECT l.*,
                 CASE
                     WHEN u.profile_type = 'organisation' AND u.organization_name IS NOT NULL AND u.organization_name != '' THEN u.organization_name
@@ -20,12 +24,12 @@ class Listing
                 END as author_name,
                 u.email as author_email, u.avatar_url, u.location as user_location, c.name as category_name
                 FROM listings l
-                JOIN users u ON l.user_id = u.id AND u.tenant_id = ?
+                JOIN users u ON l.user_id = u.id
                 LEFT JOIN categories c ON l.category_id = c.id
                 WHERE l.status = 'active' AND l.tenant_id = ?";
 
-        // Start with tenant params for the JOIN and WHERE clauses
-        $params = [$tenantId, $tenantId];
+        // Start with tenant param for the WHERE clause
+        $params = [$tenantId];
 
         if ($type) {
             if (is_array($type)) {
@@ -57,6 +61,10 @@ class Listing
     {
         $tenantId = TenantContext::getId();
         $term = '%' . $query . '%';
+        // Note: We don't filter users by tenant_id in JOIN because:
+        // 1. The listing's tenant_id controls visibility
+        // 2. Users may belong to different tenants (federation/cross-tenant)
+        // 3. We still get correct author info via user_id foreign key
         $sql = "SELECT l.*,
                 CASE
                     WHEN u.profile_type = 'organisation' AND u.organization_name IS NOT NULL AND u.organization_name != '' THEN u.organization_name
@@ -64,7 +72,7 @@ class Listing
                 END as author_name,
                 u.avatar_url, u.location as user_location, c.name as category_name
                 FROM listings l
-                JOIN users u ON l.user_id = u.id AND u.tenant_id = ?
+                JOIN users u ON l.user_id = u.id
                 LEFT JOIN categories c ON l.category_id = c.id
                 LEFT JOIN listing_attributes la ON l.id = la.listing_id
                 LEFT JOIN attributes a ON la.attribute_id = a.id
@@ -81,7 +89,7 @@ class Listing
                 ORDER BY l.created_at DESC
                 LIMIT 50";
 
-        return Database::query($sql, [$tenantId, $tenantId, $term, $term, $term, $term, $term, $term])->fetchAll();
+        return Database::query($sql, [$tenantId, $term, $term, $term, $term, $term, $term])->fetchAll();
     }
 
     public static function create($userId, $title, $description, $type = 'offer', $categoryId = null, $imageUrl = null, $location = null, $latitude = null, $longitude = null, $federatedVisibility = 'none')
@@ -203,6 +211,9 @@ class Listing
         try {
             // Use subquery to filter by distance (avoids HAVING without GROUP BY issues)
             // Use explicit column list to avoid conflict if listings table has distance_km column
+            // Note: We don't filter users by tenant_id in JOIN because:
+            // 1. The listing's tenant_id controls visibility
+            // 2. Users may belong to different tenants (federation/cross-tenant)
             $sql = "
                 SELECT * FROM (
                     SELECT l.id, l.tenant_id, l.user_id, l.title, l.description, l.type, l.category_id,
@@ -223,7 +234,7 @@ class Listing
                             )
                         ) AS calculated_distance_km
                     FROM listings l
-                    JOIN users u ON l.user_id = u.id AND u.tenant_id = ?
+                    JOIN users u ON l.user_id = u.id
                     LEFT JOIN categories c ON l.category_id = c.id
                     WHERE l.tenant_id = ?
                     AND l.status = 'active'
@@ -231,7 +242,7 @@ class Listing
                     AND l.longitude IS NOT NULL
             ";
 
-            $params = [$lat, $lon, $lat, $tenantId, $tenantId];
+            $params = [$lat, $lon, $lat, $tenantId];
 
             if ($type) {
                 if (is_array($type)) {
