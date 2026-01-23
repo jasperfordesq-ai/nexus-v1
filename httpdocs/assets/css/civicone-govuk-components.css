@@ -2451,3 +2451,33 @@
   0%, 100% { opacity: 1; }
   50% { opacity: 0.3; }
 }
+
+/* ==========================================
+   GOV.UK Compliant Utility Classes
+   Added for JS interaction support (2026-01-23)
+   ========================================== */
+
+/* Touch feedback state - used by civicone-events-calendar.js */
+.active-pressed {
+  transform: scale(0.97);
+  transition: transform 0.1s ease-out;
+}
+
+/* Inline icon spacing - used by civicone-compose-index.js */
+.civic-icon-inline {
+  margin-right: var(--space-1);
+}
+
+/* Pending state for async operations - used by civicone-dashboard.js */
+.civic-item--pending {
+  opacity: 0.5;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+}
+
+/* Search no results message - used by civicone-organizations-wallet.js */
+.civic-search-no-results {
+  padding: var(--space-3);
+  text-align: center;
+  color: var(--color-text-secondary);
+}

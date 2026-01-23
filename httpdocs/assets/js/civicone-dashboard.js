@@ -114,7 +114,8 @@ function deleteListing(id) {
     if (!confirm('Are you sure you want to delete this listing? This cannot be undone.')) return;
 
     const el = document.getElementById('listing-' + id);
-    if (el) el.style.opacity = '0.5';
+    // Use CSS class for pending state instead of inline style (GOV.UK compliance)
+    if (el) el.classList.add('civic-item--pending');
 
     const body = new URLSearchParams();
     body.append('id', id);
@@ -143,12 +144,12 @@ function deleteListing(id) {
             if (el) el.remove();
         } else {
             alert('Failed: ' + (data.error || 'Unknown error'));
-            if (el) el.style.opacity = '1';
+            if (el) el.classList.remove('civic-item--pending');
         }
     })
     .catch(function(e) {
         alert('Error: ' + e.message);
-        if (el) el.style.opacity = '1';
+        if (el) el.classList.remove('civic-item--pending');
     });
 }
 
