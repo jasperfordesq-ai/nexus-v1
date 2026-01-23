@@ -74,6 +74,7 @@ const cssFiles = [
     'achievements.css',
     // Profile page
     'profile-holographic.css',
+    'modern-profile-show.css',
     // Footer
     'nexus-modern-footer.css',
     // Auth pages

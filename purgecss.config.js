@@ -240,6 +240,7 @@ module.exports = {
         'httpdocs/assets/css/modern-experimental-banner.css',
         'httpdocs/assets/css/modern-header-emergency-fixes.css',
         'httpdocs/assets/css/modern-header-utilities.css',
+        'httpdocs/assets/css/modern-profile-show.css',
         'httpdocs/assets/css/modern-search-results.css',
         'httpdocs/assets/css/modern-settings-holographic.css',
         'httpdocs/assets/css/moj-filter.css',
