@@ -89,6 +89,9 @@ try {
     <link rel="preload" as="style" href="<?= $assetBase ?>/assets/css/design-tokens.min.css?v=<?= $cssVersionTimestamp ?>">
     <link rel="preload" as="style" href="<?= $assetBase ?>/assets/css/nexus-phoenix.min.css?v=<?= $cssVersionTimestamp ?>">
     <link rel="preload" as="style" href="<?= $assetBase ?>/assets/css/bundles/core.min.css?v=<?= $cssVersionTimestamp ?>">
+    <?php if (strpos($normPath, '/volunteering') !== false): ?>
+    <link rel="preload" as="style" href="<?= $assetBase ?>/assets/css/volunteering.min.css?v=<?= $cssVersionTimestamp ?>">
+    <?php endif; ?>
 
     <!-- Preload JavaScript -->
     <link rel="preload" as="script" href="/assets/js/mobile-interactions.js?v=<?= $cssVersionTimestamp ?>">
@@ -273,6 +276,7 @@ try {
     <!-- Groups CSS (index and show pages) -->
     <?php if (($normPath === '/groups' || preg_match('/\/groups$/', $normPath)) || preg_match('/\/groups\/\d+$/', $normPath)): ?>
     <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/groups-show.min.css?v=<?= $cssVersionTimestamp ?>">
+    <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/modern-groups-show.min.css?v=<?= $cssVersionTimestamp ?>">
     <?php endif; ?>
 
     <!-- Events CSS -->
@@ -316,6 +320,7 @@ try {
     <!-- Volunteering CSS (all /volunteering/* routes) -->
     <?php if (strpos($normPath, '/volunteering') !== false): ?>
     <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/volunteering.min.css?v=<?= $cssVersionTimestamp ?>">
+    <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/modern-volunteering-show.min.css?v=<?= $cssVersionTimestamp ?>">
     <?php endif; ?>
 
     <!-- Groups CSS (all /groups/* and /edit-group/* routes) -->
@@ -366,6 +371,11 @@ try {
     <!-- Scattered Singles CSS (ai, connections, leaderboard, members, onboarding, reports, reviews, search, settings, master) -->
     <?php if (preg_match('/\/(ai|connections|forgot-password|leaderboard|volunteer-license|members|onboarding|nexus-impact-report|reviews|search|settings|master)/', $normPath) || (strpos($normPath, '/events') !== false && strpos($normPath, 'edit') !== false) || (strpos($normPath, '/listings') !== false && strpos($normPath, 'edit') !== false)): ?>
     <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/scattered-singles.min.css?v=<?= $cssVersionTimestamp ?>">
+    <?php endif; ?>
+
+    <!-- Modern Settings Page CSS (extracted inline styles) -->
+    <?php if (strpos($normPath, '/settings') !== false): ?>
+    <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/modern-settings.css?v=<?= $cssVersionTimestamp ?>">
     <?php endif; ?>
 
     <!-- Search Results Page CSS -->

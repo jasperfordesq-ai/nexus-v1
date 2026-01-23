@@ -51,7 +51,7 @@ require dirname(__DIR__, 2) . '/layouts/header.php';
     <aside class="settings-sidebar">
         <div class="settings-sidebar-header">
             <h1 class="settings-sidebar-title">
-                <i class="fa-solid fa-gear" style="margin-right: 8px;"></i>
+                <i class="fa-solid fa-gear icon-mr"></i>
                 Settings
             </h1>
         </div>
@@ -282,10 +282,10 @@ require dirname(__DIR__, 2) . '/layouts/header.php';
 
             <div class="settings-form-group">
                 <label class="settings-label">Account Type</label>
-                <div style="display: flex; align-items: center; gap: 10px;">
+                <div class="account-type-row">
                     <input type="text" value="<?= ucfirst($user['profile_type'] ?? 'Individual') ?><?= ($user['profile_type'] ?? '') === 'organisation' && !empty($user['organization_name']) ? ' (' . htmlspecialchars($user['organization_name']) . ')' : '' ?>"
-                           class="settings-input" disabled style="flex: 1;">
-                    <a href="?section=profile#profile_type_select" class="settings-btn settings-btn-secondary" style="white-space: nowrap;">
+                           class="settings-input account-type-input" disabled>
+                    <a href="?section=profile#profile_type_select" class="settings-btn settings-btn-secondary account-type-btn">
                         <i class="fa-solid fa-pen"></i> Change
                     </a>
                 </div>
@@ -294,16 +294,16 @@ require dirname(__DIR__, 2) . '/layouts/header.php';
 
             <div class="settings-divider"></div>
 
-            <div class="settings-section-header" style="margin-bottom: 20px;">
-                <h3 style="margin: 0; font-size: 1.2rem; font-weight: 700; color: rgb(var(--settings-danger));">
-                    <i class="fa-solid fa-triangle-exclamation" style="margin-right: 8px;"></i>
+            <div class="settings-section-header settings-danger-zone-header">
+                <h3 class="settings-heading-danger">
+                    <i class="fa-solid fa-triangle-exclamation icon-mr"></i>
                     Danger Zone
                 </h3>
             </div>
 
-            <div class="settings-toggle-row" style="background: rgba(var(--settings-danger), 0.05); border: 1px solid rgba(var(--settings-danger), 0.2);">
+            <div class="settings-toggle-row danger-zone-row">
                 <div class="settings-toggle-info">
-                    <h4 style="color: rgb(var(--settings-danger));">Delete Account</h4>
+                    <h4 class="danger-zone-title">Delete Account</h4>
                     <p>Permanently delete your account and all associated data. This action cannot be undone.</p>
                 </div>
                 <button type="button" class="settings-btn settings-btn-danger" onclick="alert('Please contact support to delete your account.')">
@@ -323,40 +323,40 @@ require dirname(__DIR__, 2) . '/layouts/header.php';
             </div>
 
             <!-- Biometric Authentication Section -->
-            <div id="biometric-section" style="display: none; margin-bottom: 32px; padding: 24px; background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(139, 92, 246, 0.08)); border-radius: 20px; border: 1px solid rgba(99, 102, 241, 0.2);">
-                <div style="display: flex; align-items: flex-start; gap: 20px;">
-                    <div style="width: 56px; height: 56px; background: linear-gradient(135deg, rgb(99, 102, 241), rgb(139, 92, 246)); border-radius: 16px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4);">
+            <div id="biometric-section" class="biometric-section">
+                <div class="biometric-section-inner">
+                    <div class="biometric-icon-wrapper">
                         <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <path d="M12 11c0 3.517-1.009 6.799-2.753 9.571m-3.44-2.04l.054-.09A13.916 13.916 0 008 11a4 4 0 118 0c0 1.017-.07 2.019-.203 3m-2.118 6.844A21.88 21.88 0 0015.171 17m3.839 1.132c.645-2.266.99-4.659.99-7.132A8 8 0 008 4.07M3 15.364c.64-1.319 1-2.8 1-4.364a6 6 0 0112 0c0 .894-.074 1.771-.214 2.626M5 11a7 7 0 1114 0"></path>
                         </svg>
                     </div>
-                    <div style="flex: 1;">
-                        <h3 style="margin: 0 0 6px 0; font-size: 1.2rem; font-weight: 800; color: rgb(var(--settings-text));">Biometric Login</h3>
-                        <p style="margin: 0 0 16px 0; font-size: 0.95rem; color: rgb(var(--settings-muted)); line-height: 1.5;">Use your fingerprint or Face ID to sign in quickly and securely. Each device needs to be registered separately.</p>
+                    <div class="biometric-content">
+                        <h3 class="biometric-title">Biometric Login</h3>
+                        <p class="biometric-desc">Use your fingerprint or Face ID to sign in quickly and securely. Each device needs to be registered separately.</p>
 
-                        <div id="biometric-status" style="margin-bottom: 16px;">
-                            <span id="biometric-status-text" style="display: inline-flex; align-items: center; gap: 8px; padding: 6px 14px; border-radius: 20px; font-size: 0.85rem; font-weight: 600; background: rgba(var(--settings-muted), 0.15); color: rgb(var(--settings-muted));">
+                        <div id="biometric-status" class="biometric-status">
+                            <span id="biometric-status-text" class="biometric-status-badge">
                                 <i class="fas fa-circle-notch fa-spin"></i> Checking...
                             </span>
                         </div>
 
-                        <div id="biometric-actions" style="display: flex; gap: 12px; flex-wrap: wrap;">
-                            <button type="button" id="btn-enroll-biometric" onclick="enrollBiometric()" style="display: none; padding: 12px 24px; background: linear-gradient(135deg, rgb(99, 102, 241), rgb(139, 92, 246)); color: white; border: none; border-radius: 12px; font-weight: 700; cursor: pointer; font-size: 0.95rem; transition: all 0.3s ease; box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);">
-                                <i class="fas fa-fingerprint" style="margin-right: 8px;"></i> Set Up Biometric Login
+                        <div id="biometric-actions" class="biometric-actions">
+                            <button type="button" id="btn-enroll-biometric" onclick="enrollBiometric()" class="biometric-btn">
+                                <i class="fas fa-fingerprint icon-mr"></i> Set Up Biometric Login
                             </button>
-                            <button type="button" id="btn-add-device" onclick="enrollBiometric()" style="display: none; padding: 12px 24px; background: linear-gradient(135deg, rgb(99, 102, 241), rgb(139, 92, 246)); color: white; border: none; border-radius: 12px; font-weight: 700; cursor: pointer; font-size: 0.95rem; transition: all 0.3s ease; box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);">
-                                <i class="fas fa-plus" style="margin-right: 8px;"></i> Register This Device
+                            <button type="button" id="btn-add-device" onclick="enrollBiometric()" class="biometric-btn">
+                                <i class="fas fa-plus icon-mr"></i> Register This Device
                             </button>
-                            <button type="button" id="btn-remove-biometric" onclick="removeBiometric()" style="display: none; padding: 12px 24px; background: linear-gradient(135deg, rgb(239, 68, 68), #dc2626); color: white; border: none; border-radius: 12px; font-weight: 700; cursor: pointer; font-size: 0.95rem; transition: all 0.3s ease;">
-                                <i class="fas fa-trash" style="margin-right: 8px;"></i> Remove All Devices
+                            <button type="button" id="btn-remove-biometric" onclick="removeBiometric()" class="biometric-btn biometric-btn-danger">
+                                <i class="fas fa-trash icon-mr"></i> Remove All Devices
                             </button>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <div id="biometric-not-supported" style="display: none; margin-bottom: 32px; padding: 20px 24px; background: rgba(var(--settings-muted), 0.1); border-radius: 16px; color: rgb(var(--settings-muted)); font-size: 0.95rem;">
-                <i class="fas fa-info-circle" style="margin-right: 10px;"></i>
+            <div id="biometric-not-supported" class="biometric-not-supported">
+                <i class="fas fa-info-circle icon-mr-md"></i>
                 Biometric login is not available on this device or browser.
             </div>
 
@@ -645,8 +645,8 @@ require dirname(__DIR__, 2) . '/layouts/header.php';
 
             <div class="settings-divider"></div>
 
-            <h4 style="margin: 0 0 20px 0; font-weight: 700; color: rgb(var(--settings-text)); font-size: 1.1rem;">
-                <i class="fa-solid fa-key" style="margin-right: 10px; color: rgb(var(--settings-primary));"></i>
+            <h4 class="settings-subheading">
+                <i class="fa-solid fa-key settings-subheading-icon"></i>
                 Change Password
             </h4>
 
@@ -819,19 +819,19 @@ require dirname(__DIR__, 2) . '/layouts/header.php';
             ?>
 
             <!-- Your Consents -->
-            <div style="margin-bottom: 32px;">
-                <h4 style="margin: 0 0 16px 0; font-weight: 700; color: rgb(var(--settings-text)); display: flex; align-items: center; gap: 10px;">
-                    <i class="fa-solid fa-file-contract" style="color: rgb(var(--settings-primary));"></i>
+            <div class="consents-section">
+                <h4 class="settings-subheading">
+                    <i class="fa-solid fa-file-contract settings-subheading-icon"></i>
                     Your Consents
                 </h4>
-                <p style="color: rgb(var(--settings-muted)); font-size: 0.9rem; margin-bottom: 20px;">
+                <p class="text-muted text-sm mb-lg">
                     Review and manage how we use your data. You can withdraw consent at any time.
                 </p>
 
                 <?php if (empty($consentTypes)): ?>
-                    <div style="padding: 24px; background: rgba(var(--settings-surface), 0.4); border-radius: 16px; text-align: center;">
-                        <i class="fa-solid fa-check-circle" style="font-size: 2rem; color: #10b981; margin-bottom: 12px; display: block;"></i>
-                        <p style="color: rgb(var(--settings-muted)); margin: 0;">No consent preferences available at this time.</p>
+                    <div class="consents-empty">
+                        <i class="fa-solid fa-check-circle consents-empty-icon"></i>
+                        <p class="consents-empty-text">No consent preferences available at this time.</p>
                     </div>
                 <?php else: ?>
                     <form id="consentsForm">
@@ -840,17 +840,17 @@ require dirname(__DIR__, 2) . '/layouts/header.php';
                             $hasConsent = isset($consentsByType[$type['slug']]) && $consentsByType[$type['slug']]['consent_given'];
                             $isRequired = $type['is_required'] ?? false;
                             ?>
-                            <div class="settings-toggle-row" style="position: relative;">
+                            <div class="settings-toggle-row">
                                 <div class="settings-toggle-info">
-                                    <h4 style="display: flex; align-items: center; gap: 8px;">
+                                    <h4 class="flex items-center gap-sm">
                                         <?= htmlspecialchars($type['name']) ?>
                                         <?php if ($isRequired): ?>
-                                            <span style="padding: 2px 8px; background: rgba(245, 158, 11, 0.15); color: #f59e0b; border-radius: 12px; font-size: 0.7rem; font-weight: 600;">REQUIRED</span>
+                                            <span class="consent-required-badge">REQUIRED</span>
                                         <?php endif; ?>
                                     </h4>
                                     <p><?= htmlspecialchars($type['description'] ?? '') ?></p>
                                     <?php if (!empty($type['current_version'])): ?>
-                                        <small style="color: rgb(var(--settings-muted)); font-size: 0.75rem;">Version <?= htmlspecialchars($type['current_version']) ?></small>
+                                        <small class="consent-version">Version <?= htmlspecialchars($type['current_version']) ?></small>
                                     <?php endif; ?>
                                 </div>
                                 <label class="settings-toggle">
@@ -872,62 +872,62 @@ require dirname(__DIR__, 2) . '/layouts/header.php';
             <div class="settings-divider"></div>
 
             <!-- Data Rights -->
-            <div style="margin-bottom: 32px;">
-                <h4 style="margin: 0 0 16px 0; font-weight: 700; color: rgb(var(--settings-text)); display: flex; align-items: center; gap: 10px;">
-                    <i class="fa-solid fa-scale-balanced" style="color: rgb(var(--settings-primary));"></i>
+            <div class="consents-section">
+                <h4 class="settings-subheading">
+                    <i class="fa-solid fa-scale-balanced settings-subheading-icon"></i>
                     Your Data Rights
                 </h4>
-                <p style="color: rgb(var(--settings-muted)); font-size: 0.9rem; margin-bottom: 20px;">
+                <p class="text-muted text-sm mb-lg">
                     Under GDPR, you have the right to access, export, and request deletion of your personal data.
                 </p>
 
-                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px;">
+                <div class="data-rights-grid">
                     <!-- Export Data -->
-                    <div style="padding: 24px; background: linear-gradient(135deg, rgba(99, 102, 241, 0.08), rgba(139, 92, 246, 0.05)); border: 1px solid rgba(99, 102, 241, 0.2); border-radius: 16px;">
-                        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px;">
-                            <div style="width: 44px; height: 44px; border-radius: 12px; background: linear-gradient(135deg, rgba(99, 102, 241, 0.2), rgba(139, 92, 246, 0.15)); display: flex; align-items: center; justify-content: center;">
-                                <i class="fa-solid fa-download" style="color: #6366f1; font-size: 1.1rem;"></i>
+                    <div class="data-right-card data-right-card-export">
+                        <div class="data-right-header">
+                            <div class="data-right-icon data-right-icon-export">
+                                <i class="fa-solid fa-download"></i>
                             </div>
-                            <h5 style="margin: 0; color: rgb(var(--settings-text)); font-weight: 700;">Export My Data</h5>
+                            <h5 class="data-right-title">Export My Data</h5>
                         </div>
-                        <p style="color: rgb(var(--settings-muted)); font-size: 0.85rem; margin-bottom: 16px; line-height: 1.5;">
+                        <p class="data-right-desc">
                             Request a copy of all your personal data in a machine-readable format (JSON).
                         </p>
-                        <button type="button" onclick="requestDataExport()" class="settings-btn settings-btn-primary" style="width: 100%; justify-content: center;">
+                        <button type="button" onclick="requestDataExport()" class="settings-btn settings-btn-primary data-right-btn">
                             <i class="fa-solid fa-file-export"></i>
                             Request Data Export
                         </button>
                     </div>
 
                     <!-- Data Portability -->
-                    <div style="padding: 24px; background: linear-gradient(135deg, rgba(6, 182, 212, 0.08), rgba(14, 165, 233, 0.05)); border: 1px solid rgba(6, 182, 212, 0.2); border-radius: 16px;">
-                        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px;">
-                            <div style="width: 44px; height: 44px; border-radius: 12px; background: linear-gradient(135deg, rgba(6, 182, 212, 0.2), rgba(14, 165, 233, 0.15)); display: flex; align-items: center; justify-content: center;">
-                                <i class="fa-solid fa-right-left" style="color: #06b6d4; font-size: 1.1rem;"></i>
+                    <div class="data-right-card data-right-card-portability">
+                        <div class="data-right-header">
+                            <div class="data-right-icon data-right-icon-portability">
+                                <i class="fa-solid fa-right-left"></i>
                             </div>
-                            <h5 style="margin: 0; color: rgb(var(--settings-text)); font-weight: 700;">Data Portability</h5>
+                            <h5 class="data-right-title">Data Portability</h5>
                         </div>
-                        <p style="color: rgb(var(--settings-muted)); font-size: 0.85rem; margin-bottom: 16px; line-height: 1.5;">
+                        <p class="data-right-desc">
                             Transfer your data to another service in a standard format.
                         </p>
-                        <button type="button" onclick="requestDataPortability()" class="settings-btn" style="width: 100%; justify-content: center; background: rgba(6, 182, 212, 0.15); color: #06b6d4; border: 1px solid rgba(6, 182, 212, 0.3);">
+                        <button type="button" onclick="requestDataPortability()" class="settings-btn data-right-btn data-right-btn-portability">
                             <i class="fa-solid fa-cloud-arrow-down"></i>
                             Request Portability Export
                         </button>
                     </div>
 
                     <!-- Delete Account -->
-                    <div style="padding: 24px; background: linear-gradient(135deg, rgba(239, 68, 68, 0.08), rgba(220, 38, 38, 0.05)); border: 1px solid rgba(239, 68, 68, 0.2); border-radius: 16px;">
-                        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px;">
-                            <div style="width: 44px; height: 44px; border-radius: 12px; background: linear-gradient(135deg, rgba(239, 68, 68, 0.2), rgba(220, 38, 38, 0.15)); display: flex; align-items: center; justify-content: center;">
-                                <i class="fa-solid fa-trash-can" style="color: #ef4444; font-size: 1.1rem;"></i>
+                    <div class="data-right-card data-right-card-delete">
+                        <div class="data-right-header">
+                            <div class="data-right-icon data-right-icon-delete">
+                                <i class="fa-solid fa-trash-can"></i>
                             </div>
-                            <h5 style="margin: 0; color: rgb(var(--settings-text)); font-weight: 700;">Delete My Account</h5>
+                            <h5 class="data-right-title">Delete My Account</h5>
                         </div>
-                        <p style="color: rgb(var(--settings-muted)); font-size: 0.85rem; margin-bottom: 16px; line-height: 1.5;">
+                        <p class="data-right-desc">
                             Permanently delete your account and all associated data. This cannot be undone.
                         </p>
-                        <button type="button" onclick="requestAccountDeletion()" class="settings-btn" style="width: 100%; justify-content: center; background: rgba(239, 68, 68, 0.15); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.3);">
+                        <button type="button" onclick="requestAccountDeletion()" class="settings-btn data-right-btn data-right-btn-delete">
                             <i class="fa-solid fa-user-slash"></i>
                             Request Account Deletion
                         </button>
@@ -939,18 +939,18 @@ require dirname(__DIR__, 2) . '/layouts/header.php';
 
             <!-- My Requests -->
             <div>
-                <h4 style="margin: 0 0 16px 0; font-weight: 700; color: rgb(var(--settings-text)); display: flex; align-items: center; gap: 10px;">
-                    <i class="fa-solid fa-clipboard-list" style="color: rgb(var(--settings-primary));"></i>
+                <h4 class="settings-subheading">
+                    <i class="fa-solid fa-clipboard-list settings-subheading-icon"></i>
                     My Data Requests
                 </h4>
 
                 <?php if (empty($gdprRequests)): ?>
-                    <div style="padding: 32px; background: rgba(var(--settings-surface), 0.4); border-radius: 16px; text-align: center;">
-                        <i class="fa-solid fa-inbox" style="font-size: 2.5rem; color: rgb(var(--settings-muted)); opacity: 0.4; margin-bottom: 12px; display: block;"></i>
-                        <p style="color: rgb(var(--settings-muted)); margin: 0;">You haven't submitted any data requests yet.</p>
+                    <div class="requests-empty">
+                        <i class="fa-solid fa-inbox requests-empty-icon"></i>
+                        <p class="consents-empty-text">You haven't submitted any data requests yet.</p>
                     </div>
                 <?php else: ?>
-                    <div style="display: flex; flex-direction: column; gap: 12px;">
+                    <div class="requests-list">
                         <?php foreach ($gdprRequests as $request): ?>
                             <?php
                             $statusColors = [
@@ -969,26 +969,26 @@ require dirname(__DIR__, 2) . '/layouts/header.php';
                                 'objection' => 'Processing Objection',
                             ];
                             ?>
-                            <div style="padding: 16px 20px; background: rgba(var(--settings-surface), 0.6); border: 1px solid rgba(var(--settings-primary), 0.1); border-radius: 12px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px;">
-                                <div style="display: flex; align-items: center; gap: 14px;">
-                                    <div style="width: 40px; height: 40px; border-radius: 10px; background: <?= $status['bg'] ?>; display: flex; align-items: center; justify-content: center;">
+                            <div class="request-item">
+                                <div class="request-item-left">
+                                    <div class="request-status-icon" style="background: <?= $status['bg'] ?>;">
                                         <i class="fa-solid <?= $status['icon'] ?>" style="color: <?= $status['color'] ?>;"></i>
                                     </div>
                                     <div>
-                                        <div style="font-weight: 600; color: rgb(var(--settings-text)); margin-bottom: 2px;">
+                                        <div class="request-info-title">
                                             <?= $typeLabels[$request['request_type']] ?? ucfirst($request['request_type']) ?>
                                         </div>
-                                        <div style="font-size: 0.8rem; color: rgb(var(--settings-muted));">
+                                        <div class="request-info-date">
                                             Submitted <?= date('M j, Y', strtotime($request['requested_at'])) ?>
                                         </div>
                                     </div>
                                 </div>
-                                <div style="display: flex; align-items: center; gap: 12px;">
-                                    <span style="padding: 5px 12px; background: <?= $status['bg'] ?>; color: <?= $status['color'] ?>; border-radius: 20px; font-size: 0.75rem; font-weight: 600; text-transform: uppercase;">
+                                <div class="request-item-right">
+                                    <span class="request-status-badge" style="background: <?= $status['bg'] ?>; color: <?= $status['color'] ?>;">
                                         <?= ucfirst(str_replace('_', ' ', $request['status'])) ?>
                                     </span>
                                     <?php if ($request['status'] === 'completed' && !empty($request['download_url'])): ?>
-                                        <a href="<?= htmlspecialchars($request['download_url']) ?>" style="padding: 6px 12px; background: rgba(16, 185, 129, 0.15); color: #10b981; border-radius: 8px; text-decoration: none; font-size: 0.8rem; font-weight: 600; display: inline-flex; align-items: center; gap: 6px;">
+                                        <a href="<?= htmlspecialchars($request['download_url']) ?>" class="request-download-link">
                                             <i class="fa-solid fa-download"></i> Download
                                         </a>
                                     <?php endif; ?>
@@ -1000,8 +1000,8 @@ require dirname(__DIR__, 2) . '/layouts/header.php';
             </div>
 
             <!-- GDPR Request Modal -->
-            <div id="gdprModal" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(8px); z-index: 9999; align-items: center; justify-content: center;">
-                <div style="background: rgb(var(--settings-surface)); border: 1px solid rgba(var(--settings-primary), 0.2); border-radius: 20px; padding: 32px; max-width: 480px; width: 90%; box-shadow: 0 25px 50px rgba(0,0,0,0.3);">
+            <div id="gdprModal" class="gdpr-modal">
+                <div class="gdpr-modal-content">
                     <div id="modalContent"></div>
                 </div>
             </div>
@@ -1164,8 +1164,8 @@ require dirname(__DIR__, 2) . '/layouts/header.php';
             <form method="POST" action="<?= \Nexus\Core\TenantContext::getBasePath() ?>/settings/notifications">
                 <?= Csrf::input() ?>
 
-                <h4 style="margin: 0 0 16px 0; font-weight: 700; color: rgb(var(--settings-text));">
-                    <i class="fa-solid fa-envelope" style="margin-right: 8px; color: rgb(var(--settings-primary));"></i>
+                <h4 class="settings-subheading">
+                    <i class="fa-solid fa-envelope settings-subheading-icon"></i>
                     Email Notifications
                 </h4>
 
@@ -1215,8 +1215,8 @@ require dirname(__DIR__, 2) . '/layouts/header.php';
 
                 <div class="settings-divider"></div>
 
-                <h4 style="margin: 0 0 16px 0; font-weight: 700; color: rgb(var(--settings-text));">
-                    <i class="fa-solid fa-building" style="margin-right: 8px; color: rgb(var(--settings-primary));"></i>
+                <h4 class="settings-subheading">
+                    <i class="fa-solid fa-building settings-subheading-icon"></i>
                     Organization Notifications
                 </h4>
 
@@ -1266,8 +1266,8 @@ require dirname(__DIR__, 2) . '/layouts/header.php';
 
                 <div class="settings-divider"></div>
 
-                <h4 style="margin: 0 0 16px 0; font-weight: 700; color: rgb(var(--settings-text));">
-                    <i class="fa-solid fa-mobile-screen" style="margin-right: 8px; color: rgb(var(--settings-primary));"></i>
+                <h4 class="settings-subheading">
+                    <i class="fa-solid fa-mobile-screen settings-subheading-icon"></i>
                     Push Notifications
                 </h4>
 
@@ -1300,42 +1300,39 @@ require dirname(__DIR__, 2) . '/layouts/header.php';
                 <p class="settings-section-desc">Customize how the platform looks for you.</p>
             </div>
 
-            <h4 style="margin: 0 0 16px 0; font-weight: 700; color: rgb(var(--settings-text));">
-                <i class="fa-solid fa-circle-half-stroke" style="margin-right: 8px; color: rgb(var(--settings-primary));"></i>
+            <h4 class="settings-subheading">
+                <i class="fa-solid fa-circle-half-stroke settings-subheading-icon"></i>
                 Theme
             </h4>
 
-            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 32px;">
-                <label style="cursor: pointer;">
-                    <input type="radio" name="theme" value="light" style="display: none;"
+            <div class="theme-grid">
+                <label class="theme-label">
+                    <input type="radio" name="theme" value="light" class="theme-radio"
                            <?= ($_COOKIE['theme'] ?? 'light') === 'light' ? 'checked' : '' ?>
                            onchange="setTheme('light')">
-                    <div style="padding: 24px; border-radius: 16px; text-align: center; border: 3px solid transparent; background: linear-gradient(135deg, #f8fafc, #e2e8f0); transition: all 0.3s ease;"
-                         class="theme-option" data-theme="light">
-                        <i class="fa-solid fa-sun" style="font-size: 2rem; color: #f59e0b; margin-bottom: 12px; display: block;"></i>
-                        <span style="font-weight: 700; color: #1f2937;">Light</span>
+                    <div class="theme-option theme-option-light" data-theme="light">
+                        <i class="fa-solid fa-sun theme-icon theme-icon-light"></i>
+                        <span class="theme-label-text theme-label-text-light">Light</span>
                     </div>
                 </label>
 
-                <label style="cursor: pointer;">
-                    <input type="radio" name="theme" value="dark" style="display: none;"
+                <label class="theme-label">
+                    <input type="radio" name="theme" value="dark" class="theme-radio"
                            <?= ($_COOKIE['theme'] ?? '') === 'dark' ? 'checked' : '' ?>
                            onchange="setTheme('dark')">
-                    <div style="padding: 24px; border-radius: 16px; text-align: center; border: 3px solid transparent; background: linear-gradient(135deg, #1e293b, #0f172a); transition: all 0.3s ease;"
-                         class="theme-option" data-theme="dark">
-                        <i class="fa-solid fa-moon" style="font-size: 2rem; color: #818cf8; margin-bottom: 12px; display: block;"></i>
-                        <span style="font-weight: 700; color: #f1f5f9;">Dark</span>
+                    <div class="theme-option theme-option-dark" data-theme="dark">
+                        <i class="fa-solid fa-moon theme-icon theme-icon-dark"></i>
+                        <span class="theme-label-text theme-label-text-dark">Dark</span>
                     </div>
                 </label>
 
-                <label style="cursor: pointer;">
-                    <input type="radio" name="theme" value="auto" style="display: none;"
+                <label class="theme-label">
+                    <input type="radio" name="theme" value="auto" class="theme-radio"
                            <?= ($_COOKIE['theme'] ?? '') === 'auto' ? 'checked' : '' ?>
                            onchange="setTheme('auto')">
-                    <div style="padding: 24px; border-radius: 16px; text-align: center; border: 3px solid transparent; background: linear-gradient(135deg, #e0e7ff, #c7d2fe); transition: all 0.3s ease;"
-                         class="theme-option" data-theme="auto">
-                        <i class="fa-solid fa-circle-half-stroke" style="font-size: 2rem; color: #6366f1; margin-bottom: 12px; display: block;"></i>
-                        <span style="font-weight: 700; color: #312e81;">System</span>
+                    <div class="theme-option theme-option-auto" data-theme="auto">
+                        <i class="fa-solid fa-circle-half-stroke theme-icon theme-icon-auto"></i>
+                        <span class="theme-label-text theme-label-text-auto">System</span>
                     </div>
                 </label>
             </div>
@@ -1378,8 +1375,8 @@ require dirname(__DIR__, 2) . '/layouts/header.php';
 
             <div class="settings-divider"></div>
 
-            <h4 style="margin: 0 0 16px 0; font-weight: 700; color: rgb(var(--settings-text));">
-                <i class="fa-solid fa-text-height" style="margin-right: 8px; color: rgb(var(--settings-primary));"></i>
+            <h4 class="settings-subheading">
+                <i class="fa-solid fa-text-height settings-subheading-icon"></i>
                 Display
             </h4>
 
@@ -1407,8 +1404,8 @@ require dirname(__DIR__, 2) . '/layouts/header.php';
 
             <div class="settings-divider"></div>
 
-            <h4 style="margin: 0 0 16px 0; font-weight: 700; color: rgb(var(--settings-text));">
-                <i class="fa-solid fa-robot" style="margin-right: 8px; color: rgb(var(--settings-primary));"></i>
+            <h4 class="settings-subheading">
+                <i class="fa-solid fa-robot settings-subheading-icon"></i>
                 AI Assistant
             </h4>
 
@@ -1425,7 +1422,7 @@ require dirname(__DIR__, 2) . '/layouts/header.php';
                 </label>
             </div>
 
-            <div class="settings-toggle-row" id="ai-pulse-setting" style="<?= ($_COOKIE['ai_widget_enabled'] ?? '0') !== '1' ? 'opacity: 0.5; pointer-events: none;' : '' ?>">
+            <div class="settings-toggle-row <?= ($_COOKIE['ai_widget_enabled'] ?? '0') !== '1' ? 'ai-setting-disabled' : '' ?>" id="ai-pulse-setting">
                 <div class="settings-toggle-info">
                     <h4>AI Button Pulse Animation</h4>
                     <p>Show a pulsing animation on the AI assistant button to draw attention.</p>
@@ -1493,58 +1490,41 @@ require dirname(__DIR__, 2) . '/layouts/header.php';
             ?>
 
             <?php if (empty($userOrganizations)): ?>
-                <div style="text-align: center; padding: 60px 20px; background: rgba(var(--settings-surface), 0.4); border-radius: 20px;">
-                    <i class="fa-solid fa-building-circle-xmark" style="font-size: 4rem; color: rgb(var(--settings-muted)); opacity: 0.4; margin-bottom: 20px; display: block;"></i>
-                    <h3 style="margin: 0 0 8px 0; color: rgb(var(--settings-text));">No Organizations Yet</h3>
-                    <p style="color: rgb(var(--settings-muted)); margin-bottom: 20px;">You are not a member of any organizations.</p>
-                    <a href="<?= TenantContext::getBasePath() ?>/volunteering/organizations" class="settings-btn settings-btn-primary" style="display: inline-flex;">
+                <div class="orgs-empty">
+                    <i class="fa-solid fa-building-circle-xmark orgs-empty-icon"></i>
+                    <h3 class="orgs-empty-title">No Organizations Yet</h3>
+                    <p class="orgs-empty-desc">You are not a member of any organizations.</p>
+                    <a href="<?= TenantContext::getBasePath() ?>/volunteering/organizations" class="settings-btn settings-btn-primary inline-flex">
                         <i class="fa-solid fa-search"></i>
                         Browse Organizations
                     </a>
                 </div>
             <?php else: ?>
-                <div style="display: flex; flex-direction: column; gap: 16px;">
+                <div class="orgs-list">
                     <?php foreach ($userOrganizations as $org): ?>
-                        <div class="settings-toggle-row" style="flex-direction: column; align-items: stretch; gap: 16px;">
-                            <div style="display: flex; align-items: center; gap: 16px;">
+                        <?php
+                        $roleClass = $org['member_role'] === 'owner' ? 'owner' : ($org['member_role'] === 'admin' ? 'admin' : 'member');
+                        ?>
+                        <div class="settings-toggle-row org-card">
+                            <div class="org-card-header">
                                 <!-- Org Avatar/Icon -->
-                                <div style="width: 56px; height: 56px; border-radius: 14px; background: linear-gradient(135deg, <?php
-                                    if ($org['member_role'] === 'owner') {
-                                        echo 'rgba(251, 191, 36, 0.2), rgba(245, 158, 11, 0.15)';
-                                    } elseif ($org['member_role'] === 'admin') {
-                                        echo 'rgba(139, 92, 246, 0.2), rgba(124, 58, 237, 0.15)';
-                                    } else {
-                                        echo 'rgba(99, 102, 241, 0.15), rgba(79, 70, 229, 0.1)';
-                                    }
-                                ?>); display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                                <div class="org-avatar org-avatar-<?= $roleClass ?>">
                                     <?php if (!empty($org['logo_url'])): ?>
-                                        <img src="<?= htmlspecialchars($org['logo_url']) ?>" loading="lazy" alt="" style="width: 40px; height: 40px; border-radius: 10px; object-fit: cover;">
+                                        <img src="<?= htmlspecialchars($org['logo_url']) ?>" loading="lazy" alt="" class="org-avatar-img">
                                     <?php else: ?>
                                         <i class="fa-solid <?php
-                                            if ($org['member_role'] === 'owner') {
-                                                echo 'fa-crown" style="color: #f59e0b;';
-                                            } elseif ($org['member_role'] === 'admin') {
-                                                echo 'fa-shield" style="color: #8b5cf6;';
-                                            } else {
-                                                echo 'fa-building" style="color: rgb(var(--settings-primary));';
-                                            }
-                                        ?> font-size: 1.25rem;"></i>
+                                            if ($org['member_role'] === 'owner') echo 'fa-crown org-icon-owner';
+                                            elseif ($org['member_role'] === 'admin') echo 'fa-shield org-icon-admin';
+                                            else echo 'fa-building org-icon-member';
+                                        ?>"></i>
                                     <?php endif; ?>
                                 </div>
 
                                 <!-- Org Info -->
-                                <div style="flex: 1; min-width: 0;">
-                                    <h4 style="margin: 0 0 4px 0; font-size: 1.05rem; font-weight: 700; color: rgb(var(--settings-text)); display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+                                <div class="org-info">
+                                    <h4 class="org-name">
                                         <?= htmlspecialchars($org['name']) ?>
-                                        <span style="display: inline-flex; align-items: center; gap: 5px; padding: 3px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; <?php
-                                            if ($org['member_role'] === 'owner') {
-                                                echo 'background: linear-gradient(135deg, rgba(251, 191, 36, 0.2), rgba(245, 158, 11, 0.15)); color: #b45309;';
-                                            } elseif ($org['member_role'] === 'admin') {
-                                                echo 'background: linear-gradient(135deg, rgba(139, 92, 246, 0.2), rgba(124, 58, 237, 0.15)); color: #7c3aed;';
-                                            } else {
-                                                echo 'background: rgba(var(--settings-primary), 0.1); color: rgb(var(--settings-primary));';
-                                            }
-                                        ?>">
+                                        <span class="org-role-badge org-role-badge-<?= $roleClass ?>">
                                             <i class="fa-solid <?php
                                                 if ($org['member_role'] === 'owner') echo 'fa-crown';
                                                 elseif ($org['member_role'] === 'admin') echo 'fa-shield';
@@ -1553,27 +1533,27 @@ require dirname(__DIR__, 2) . '/layouts/header.php';
                                             <?= ucfirst($org['member_role']) ?>
                                         </span>
                                     </h4>
-                                    <p style="margin: 0; font-size: 0.9rem; color: rgb(var(--settings-muted)); overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                                    <p class="org-desc">
                                         <?= htmlspecialchars($org['description'] ?? 'No description') ?>
                                     </p>
                                 </div>
                             </div>
 
                             <!-- Action Buttons -->
-                            <div style="display: flex; gap: 10px; flex-wrap: wrap; padding-top: 12px; border-top: 1px solid rgba(var(--settings-primary), 0.08);">
-                                <a href="<?= TenantContext::getBasePath() ?>/volunteering/organization/<?= $org['id'] ?>" style="padding: 10px 16px; border-radius: 10px; text-decoration: none; font-size: 0.85rem; font-weight: 600; background: rgba(var(--settings-primary), 0.1); color: rgb(var(--settings-primary)); display: inline-flex; align-items: center; gap: 6px; transition: all 0.2s;">
+                            <div class="org-actions">
+                                <a href="<?= TenantContext::getBasePath() ?>/volunteering/organization/<?= $org['id'] ?>" class="org-action-btn org-action-btn-view">
                                     <i class="fa-solid fa-eye"></i> View Organization
                                 </a>
                                 <?php if (in_array($org['member_role'], ['owner', 'admin'])): ?>
-                                    <a href="<?= TenantContext::getBasePath() ?>/organizations/<?= $org['id'] ?>/wallet" style="padding: 10px 16px; border-radius: 10px; text-decoration: none; font-size: 0.85rem; font-weight: 600; background: linear-gradient(135deg, rgba(16, 185, 129, 0.15), rgba(5, 150, 105, 0.1)); color: #059669; display: inline-flex; align-items: center; gap: 6px; transition: all 0.2s;">
+                                    <a href="<?= TenantContext::getBasePath() ?>/organizations/<?= $org['id'] ?>/wallet" class="org-action-btn org-action-btn-wallet">
                                         <i class="fa-solid fa-wallet"></i> Wallet
                                     </a>
-                                    <a href="<?= TenantContext::getBasePath() ?>/organizations/<?= $org['id'] ?>/members" style="padding: 10px 16px; border-radius: 10px; text-decoration: none; font-size: 0.85rem; font-weight: 600; background: rgba(139, 92, 246, 0.1); color: #7c3aed; display: inline-flex; align-items: center; gap: 6px; transition: all 0.2s;">
+                                    <a href="<?= TenantContext::getBasePath() ?>/organizations/<?= $org['id'] ?>/members" class="org-action-btn org-action-btn-members">
                                         <i class="fa-solid fa-users"></i> Members
                                     </a>
                                 <?php endif; ?>
                                 <?php if ($org['member_role'] === 'owner'): ?>
-                                    <a href="<?= TenantContext::getBasePath() ?>/volunteering/organization/<?= $org['id'] ?>/edit" style="padding: 10px 16px; border-radius: 10px; text-decoration: none; font-size: 0.85rem; font-weight: 600; background: rgba(245, 158, 11, 0.1); color: #d97706; display: inline-flex; align-items: center; gap: 6px; transition: all 0.2s;">
+                                    <a href="<?= TenantContext::getBasePath() ?>/volunteering/organization/<?= $org['id'] ?>/edit" class="org-action-btn org-action-btn-edit">
                                         <i class="fa-solid fa-pen"></i> Edit
                                     </a>
                                 <?php endif; ?>
@@ -1584,9 +1564,9 @@ require dirname(__DIR__, 2) . '/layouts/header.php';
 
                 <div class="settings-divider"></div>
 
-                <div style="text-align: center;">
-                    <a href="<?= TenantContext::getBasePath() ?>/volunteering/organizations" style="color: rgb(var(--settings-primary)); text-decoration: none; font-weight: 600; font-size: 0.95rem;">
-                        <i class="fa-solid fa-search" style="margin-right: 6px;"></i>
+                <div class="orgs-browse-link">
+                    <a href="<?= TenantContext::getBasePath() ?>/volunteering/organizations">
+                        <i class="fa-solid fa-search icon-mr-sm"></i>
                         Browse More Organizations
                     </a>
                 </div>
@@ -1609,12 +1589,12 @@ require dirname(__DIR__, 2) . '/layouts/header.php';
 
             <?php if (!$federationAvailable): ?>
                 <!-- Federation Not Available -->
-                <div style="text-align: center; padding: 60px 20px;">
-                    <div style="width: 80px; height: 80px; margin: 0 auto 24px; border-radius: 50%; background: linear-gradient(135deg, rgba(107, 114, 128, 0.15), rgba(107, 114, 128, 0.1)); display: flex; align-items: center; justify-content: center;">
-                        <i class="fa-solid fa-network-wired" style="font-size: 2rem; color: rgb(var(--settings-muted));"></i>
+                <div class="federation-unavailable">
+                    <div class="federation-unavailable-icon">
+                        <i class="fa-solid fa-network-wired"></i>
                     </div>
-                    <h3 style="margin: 0 0 12px 0; color: rgb(var(--settings-text));">Federation Not Available</h3>
-                    <p style="color: rgb(var(--settings-muted)); max-width: 400px; margin: 0 auto;">
+                    <h3 class="federation-unavailable-title">Federation Not Available</h3>
+                    <p class="federation-unavailable-desc">
                         Federation features are not currently enabled for your timebank.
                         Contact your timebank administrator for more information.
                     </p>
@@ -1625,14 +1605,14 @@ require dirname(__DIR__, 2) . '/layouts/header.php';
                     <input type="hidden" name="csrf_token" value="<?= Csrf::token() ?>">
 
                     <!-- Master Opt-In -->
-                    <div style="padding: 24px; background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(139, 92, 246, 0.08)); border-radius: 20px; border: 1px solid rgba(99, 102, 241, 0.2); margin-bottom: 32px;">
-                        <div style="display: flex; align-items: center; justify-content: space-between; gap: 20px;">
+                    <div class="federation-optin-card">
+                        <div class="federation-optin-inner">
                             <div>
-                                <h3 style="margin: 0 0 8px 0; color: rgb(var(--settings-text)); font-size: 1.15rem;">
-                                    <i class="fa-solid fa-power-off" style="color: rgb(var(--settings-primary)); margin-right: 8px;"></i>
+                                <h3 class="federation-optin-title">
+                                    <i class="fa-solid fa-power-off text-primary icon-mr"></i>
                                     Enable Federation
                                 </h3>
-                                <p style="margin: 0; color: rgb(var(--settings-muted)); font-size: 0.9rem;">
+                                <p class="federation-optin-desc">
                                     Allow your profile to be visible to partner timebanks and enable cross-timebank features.
                                 </p>
                             </div>
@@ -1649,13 +1629,13 @@ require dirname(__DIR__, 2) . '/layouts/header.php';
                     <div id="federationOptions" style="<?= $fedSettings['federation_optin'] ? '' : 'display: none;' ?>">
 
                         <!-- Visibility Settings -->
-                        <div style="margin-bottom: 32px;">
-                            <h4 style="margin: 0 0 16px 0; color: rgb(var(--settings-text)); font-size: 1rem; display: flex; align-items: center; gap: 8px;">
-                                <i class="fa-solid fa-eye" style="color: rgb(var(--settings-primary));"></i>
+                        <div class="federation-options-section">
+                            <h4 class="settings-subheading">
+                                <i class="fa-solid fa-eye settings-subheading-icon"></i>
                                 Visibility Settings
                             </h4>
 
-                            <div style="display: flex; flex-direction: column; gap: 12px;">
+                            <div class="federation-options-list">
                                 <label class="settings-checkbox-card">
                                     <input type="checkbox" name="profile_visible_federated" value="1"
                                         <?= $fedSettings['profile_visible_federated'] ? 'checked' : '' ?>>
@@ -1695,13 +1675,13 @@ require dirname(__DIR__, 2) . '/layouts/header.php';
                         </div>
 
                         <!-- Interaction Settings -->
-                        <div style="margin-bottom: 32px;">
-                            <h4 style="margin: 0 0 16px 0; color: rgb(var(--settings-text)); font-size: 1rem; display: flex; align-items: center; gap: 8px;">
-                                <i class="fa-solid fa-comments" style="color: rgb(var(--settings-primary));"></i>
+                        <div class="federation-options-section">
+                            <h4 class="settings-subheading">
+                                <i class="fa-solid fa-comments settings-subheading-icon"></i>
                                 Interaction Settings
                             </h4>
 
-                            <div style="display: flex; flex-direction: column; gap: 12px;">
+                            <div class="federation-options-list">
                                 <label class="settings-checkbox-card">
                                     <input type="checkbox" name="messaging_enabled_federated" value="1"
                                         <?= $fedSettings['messaging_enabled_federated'] ? 'checked' : '' ?>>
@@ -1723,22 +1703,22 @@ require dirname(__DIR__, 2) . '/layouts/header.php';
                         </div>
 
                         <!-- Service Reach -->
-                        <div style="margin-bottom: 32px;">
-                            <h4 style="margin: 0 0 16px 0; color: rgb(var(--settings-text)); font-size: 1rem; display: flex; align-items: center; gap: 8px;">
-                                <i class="fa-solid fa-location-dot" style="color: rgb(var(--settings-primary));"></i>
+                        <div class="federation-options-section">
+                            <h4 class="settings-subheading">
+                                <i class="fa-solid fa-location-dot settings-subheading-icon"></i>
                                 Service Reach
                             </h4>
-                            <p style="margin: 0 0 16px 0; color: rgb(var(--settings-muted)); font-size: 0.9rem;">
+                            <p class="text-muted text-sm mb-md">
                                 How far can you provide your services?
                             </p>
 
-                            <div style="display: flex; flex-direction: column; gap: 12px;">
+                            <div class="federation-options-list">
                                 <label class="settings-radio-card">
                                     <input type="radio" name="service_reach" value="local_only"
                                         <?= $fedSettings['service_reach'] === 'local_only' ? 'checked' : '' ?>>
                                     <div class="settings-radio-content">
                                         <span class="settings-radio-title">
-                                            <i class="fa-solid fa-home" style="margin-right: 8px;"></i>
+                                            <i class="fa-solid fa-home icon-mr"></i>
                                             Local Only
                                         </span>
                                         <span class="settings-radio-desc">I can only provide services in my local area</span>
@@ -1750,7 +1730,7 @@ require dirname(__DIR__, 2) . '/layouts/header.php';
                                         <?= $fedSettings['service_reach'] === 'remote_ok' ? 'checked' : '' ?>>
                                     <div class="settings-radio-content">
                                         <span class="settings-radio-title">
-                                            <i class="fa-solid fa-laptop" style="margin-right: 8px;"></i>
+                                            <i class="fa-solid fa-laptop icon-mr"></i>
                                             Remote OK
                                         </span>
                                         <span class="settings-radio-desc">I can provide some services remotely (online/phone)</span>
@@ -1763,7 +1743,7 @@ require dirname(__DIR__, 2) . '/layouts/header.php';
                                         onchange="toggleTravelRadius(this.checked)">
                                     <div class="settings-radio-content">
                                         <span class="settings-radio-title">
-                                            <i class="fa-solid fa-car" style="margin-right: 8px;"></i>
+                                            <i class="fa-solid fa-car icon-mr"></i>
                                             Will Travel
                                         </span>
                                         <span class="settings-radio-desc">I can travel to provide services</span>
@@ -1781,7 +1761,7 @@ require dirname(__DIR__, 2) . '/layouts/header.php';
 
                         <!-- Save Button -->
                         <div class="settings-divider"></div>
-                        <div style="display: flex; justify-content: flex-end; gap: 12px;">
+                        <div class="federation-submit-section">
                             <button type="submit" class="settings-btn settings-btn-primary">
                                 <i class="fa-solid fa-check"></i>
                                 Save Federation Settings
@@ -1791,18 +1771,18 @@ require dirname(__DIR__, 2) . '/layouts/header.php';
 
                     <!-- Quick Opt-Out (when opted in) -->
                     <?php if ($fedSettings['federation_optin']): ?>
-                    <div style="margin-top: 32px; padding: 20px; background: rgba(239, 68, 68, 0.08); border-radius: 16px; border: 1px solid rgba(239, 68, 68, 0.2);">
-                        <div style="display: flex; align-items: center; justify-content: space-between; gap: 20px; flex-wrap: wrap;">
+                    <div class="federation-optout-card">
+                        <div class="federation-optout-inner">
                             <div>
-                                <h4 style="margin: 0 0 4px 0; color: #dc2626; font-size: 0.95rem;">
-                                    <i class="fa-solid fa-power-off" style="margin-right: 8px;"></i>
+                                <h4 class="federation-optout-title">
+                                    <i class="fa-solid fa-power-off icon-mr"></i>
                                     Disable Federation
                                 </h4>
-                                <p style="margin: 0; color: rgb(var(--settings-muted)); font-size: 0.85rem;">
+                                <p class="federation-optout-desc">
                                     Immediately hide your profile from all partner timebanks
                                 </p>
                             </div>
-                            <button type="button" onclick="quickOptOut()" class="settings-btn" style="background: rgba(239, 68, 68, 0.1); color: #dc2626; border: 1px solid rgba(239, 68, 68, 0.3);">
+                            <button type="button" onclick="quickOptOut()" class="settings-btn federation-optout-btn">
                                 <i class="fa-solid fa-eye-slash"></i>
                                 Opt Out
                             </button>
@@ -1860,10 +1840,10 @@ require dirname(__DIR__, 2) . '/layouts/header.php';
                 <p class="settings-section-desc">This section is being developed.</p>
             </div>
 
-            <div style="text-align: center; padding: 60px 20px;">
-                <i class="fa-solid fa-tools" style="font-size: 4rem; color: rgb(var(--settings-muted)); opacity: 0.4; margin-bottom: 20px; display: block;"></i>
-                <h3 style="margin: 0 0 8px 0; color: rgb(var(--settings-text));">Coming Soon</h3>
-                <p style="color: rgb(var(--settings-muted));">This feature is currently under development.</p>
+            <div class="fallback-empty">
+                <i class="fa-solid fa-tools fallback-icon"></i>
+                <h3 class="fallback-title">Coming Soon</h3>
+                <p class="fallback-desc">This feature is currently under development.</p>
             </div>
         <?php endif; ?>
     </main>

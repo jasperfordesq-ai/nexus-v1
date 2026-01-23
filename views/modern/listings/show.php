@@ -68,18 +68,18 @@ $canEdit = ($isOwner || $isAdmin);
 
 <div id="listing-show-glass-wrapper">
 
-<div class="htb-page-layout" style="max-width: 1100px; margin: 0 auto; padding: 160px 60px 40px 60px; font-family: 'Inter', sans-serif;">
+<div class="htb-page-layout listing-page-wrapper">
 
-    <div style="display: grid; grid-template-columns: 1fr 340px; gap: 40px; align-items: start;">
+    <div class="listing-grid-layout">
 
         <!-- LEFT COLUMN: Content -->
-        <div style="position: relative; z-index: 50;">
+        <div class="listing-main-column">
             <!-- 1. Hero Image & Title -->
             <div class="glass-hero-card listing-content">
                 <?php if (!empty($listing['image_url'])): ?>
-                    <div style="width: 100%; height: 400px; position: relative;">
-                        <?= webp_image($listing['image_url'], htmlspecialchars($listing['title']), '', ['style' => 'width: 100%; height: 100%; object-fit: cover; display: block;']) ?>
-                        <div style="position: absolute; top: 20px; left: 20px;">
+                    <div class="listing-hero-image-wrapper">
+                        <?= webp_image($listing['image_url'], htmlspecialchars($listing['title']), '') ?>
+                        <div class="listing-type-badge-position">
                             <span class="glass-type-badge">
                                 <?= ucfirst($listing['type']) ?>
                             </span>
@@ -87,13 +87,13 @@ $canEdit = ($isOwner || $isAdmin);
                     </div>
                 <?php endif; ?>
 
-                <div style="padding: 30px;">
-                    <div class="glass-category-badge" style="margin-bottom: 15px; color: <?= $accentColor ?>; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; font-size: 0.85rem;">
+                <div class="listing-card-padding">
+                    <div class="glass-category-badge listing-category-badge" style="color: <?= $accentColor ?>;">
                         <?= htmlspecialchars($listing['category_name'] ?? 'General') ?>
                     </div>
-                    <h1 style="margin: 0 0 15px 0; font-size: 2.5rem; line-height: 1.2; color: var(--htb-text-main, #0f172a);"><?= htmlspecialchars($listing['title']) ?></h1>
+                    <h1 class="listing-title"><?= htmlspecialchars($listing['title']) ?></h1>
 
-                    <div style="display: flex; align-items: center; gap: 15px; color: var(--htb-text-muted, #64748b); font-size: 0.95rem;">
+                    <div class="listing-meta-row">
                         <span><i class="fa-regular fa-calendar"></i> <?= date('M j, Y', strtotime($listing['created_at'])) ?></span>
                         <?php if (!empty($listing['location'])): ?>
                             <span>&bull;</span>
@@ -105,8 +105,8 @@ $canEdit = ($isOwner || $isAdmin);
 
             <!-- 2. Description -->
             <div class="glass-description-card">
-                <h3 style="font-size: 1.25rem; font-weight: 700; color: var(--htb-text-main); margin-bottom: 15px;">About this listing</h3>
-                <div style="font-size: 1.1rem; line-height: 1.7; color: var(--htb-text-muted); white-space: pre-line;">
+                <h3 class="listing-section-heading">About this listing</h3>
+                <div class="listing-description-text">
                     <?= htmlspecialchars($listing['description']) ?>
                 </div>
             </div>
@@ -114,50 +114,50 @@ $canEdit = ($isOwner || $isAdmin);
             <!-- 2.5. Like & Comment Section -->
             <div class="glass-description-card" id="listing-engagement-section" data-listing-id="<?= $listingId ?>">
                 <!-- Like Button Row -->
-                <div style="display: flex; align-items: center; gap: 20px; padding-bottom: 20px; border-bottom: 1px solid rgba(100,116,139,0.2); flex-wrap: wrap;">
-                    <button id="like-btn" onclick="listingToggleLike()" style="display: flex; align-items: center; gap: 8px; padding: 10px 18px; border-radius: 10px; border: none; cursor: pointer; font-weight: 600; font-size: 0.95rem; transition: all 0.2s ease; background: <?= $isLiked ? 'linear-gradient(135deg, #ec4899, #f43f5e)' : 'rgba(100,116,139,0.1)' ?>; color: <?= $isLiked ? '#fff' : 'var(--htb-text-main)' ?>;">
+                <div class="listing-engagement-row">
+                    <button id="like-btn" onclick="listingToggleLike()" class="listing-action-btn <?= $isLiked ? 'listing-action-btn--liked' : '' ?>">
                         <i class="<?= $isLiked ? 'fa-solid' : 'fa-regular' ?> fa-heart" id="like-icon"></i>
                         <span id="like-count"><?= $likesCount ?></span>
                         <span><?= $likesCount === 1 ? 'Like' : 'Likes' ?></span>
                     </button>
-                    <button onclick="listingToggleComments()" style="display: flex; align-items: center; gap: 8px; padding: 10px 18px; border-radius: 10px; border: none; cursor: pointer; font-weight: 600; font-size: 0.95rem; transition: all 0.2s ease; background: rgba(100,116,139,0.1); color: var(--htb-text-main);">
+                    <button onclick="listingToggleComments()" class="listing-action-btn">
                         <i class="fa-regular fa-comment"></i>
                         <span id="comment-count"><?= $commentsCount ?></span>
                         <span><?= $commentsCount === 1 ? 'Comment' : 'Comments' ?></span>
                     </button>
                     <?php if ($isLoggedIn): ?>
-                    <button onclick="shareToFeed()" style="display: flex; align-items: center; gap: 8px; padding: 10px 18px; border-radius: 10px; border: none; cursor: pointer; font-weight: 600; font-size: 0.95rem; transition: all 0.2s ease; background: rgba(100,116,139,0.1); color: var(--htb-text-main);">
+                    <button onclick="shareToFeed()" class="listing-action-btn">
                         <i class="fa-solid fa-share"></i> Share
                     </button>
                     <?php endif; ?>
                 </div>
 
                 <!-- Comments Section (Initially Hidden) -->
-                <div id="comments-section" style="display: none; padding-top: 20px;">
-                    <h4 style="font-size: 1rem; font-weight: 700; color: var(--htb-text-main); margin-bottom: 15px;">Comments</h4>
+                <div id="comments-section" class="listing-comments-section">
+                    <h4 class="listing-comments-heading">Comments</h4>
 
                     <!-- Comment Form -->
                     <?php if ($isLoggedIn): ?>
-                        <form id="comment-form" onsubmit="listingSubmitComment(event)" style="display: flex; gap: 12px; margin-bottom: 20px;">
+                        <form id="comment-form" onsubmit="listingSubmitComment(event)" class="listing-comment-form">
                             <?= webp_avatar($_SESSION['user_avatar'] ?? null, $_SESSION['user_name'] ?? 'User', 40) ?>
-                            <div style="flex: 1; display: flex; flex-direction: column; gap: 10px;">
-                                <textarea id="comment-input" placeholder="Write a comment..." style="width: 100%; min-height: 60px; padding: 12px; border-radius: 12px; border: 1px solid rgba(100,116,139,0.3); background: rgba(255,255,255,0.5); font-size: 0.95rem; resize: vertical; font-family: inherit;"></textarea>
-                                <button type="submit" style="align-self: flex-end; padding: 8px 20px; border-radius: 8px; border: none; background: <?= $accentColor ?>; color: #fff; font-weight: 600; cursor: pointer; transition: opacity 0.2s;">
+                            <div class="listing-comment-form-inner">
+                                <textarea id="comment-input" placeholder="Write a comment..." class="listing-comment-textarea"></textarea>
+                                <button type="submit" class="listing-comment-submit-btn" style="background: <?= $accentColor ?>;">
                                     Post Comment
                                 </button>
                             </div>
                         </form>
                     <?php else: ?>
-                        <div style="text-align: center; padding: 20px; background: rgba(100,116,139,0.05); border-radius: 12px; margin-bottom: 20px;">
-                            <p style="color: var(--htb-text-muted); margin: 0 0 10px;">
-                                <a href="<?= Nexus\Core\TenantContext::getBasePath() ?>/login" style="color: <?= $accentColor ?>; font-weight: 600; text-decoration: none;">Sign in</a> to leave a comment
+                        <div class="listing-login-prompt">
+                            <p class="listing-login-prompt-text">
+                                <a href="<?= Nexus\Core\TenantContext::getBasePath() ?>/login" class="listing-login-link" style="color: <?= $accentColor ?>;">Sign in</a> to leave a comment
                             </p>
                         </div>
                     <?php endif; ?>
 
                     <!-- Comments List -->
-                    <div id="comments-list" style="display: flex; flex-direction: column; gap: 15px;">
-                        <div style="text-align: center; color: var(--htb-text-muted); padding: 20px;">
+                    <div id="comments-list" class="listing-comments-list">
+                        <div class="listing-loading-text">
                             <i class="fa-solid fa-spinner fa-spin"></i> Loading comments...
                         </div>
                     </div>
@@ -166,13 +166,13 @@ $canEdit = ($isOwner || $isAdmin);
 
             <!-- 3. Attributes Grid -->
             <?php if (!empty($attributes)): ?>
-                <div style="margin-bottom: 40px;">
-                    <h3 style="font-size: 1.25rem; font-weight: 700; color: var(--htb-text-main); margin-bottom: 15px;">Features</h3>
-                    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 15px;">
+                <div class="listing-attributes-section">
+                    <h3 class="listing-section-heading">Features</h3>
+                    <div class="listing-attributes-grid">
                         <?php foreach ($attributes as $attr): ?>
                             <div class="glass-attribute-pill">
                                 <i class="fa-solid fa-check" style="color: <?= $accentColor ?>;"></i>
-                                <span style="font-weight: 600; color: var(--htb-text-main);"><?= htmlspecialchars($attr['name']) ?></span>
+                                <span class="listing-attribute-name"><?= htmlspecialchars($attr['name']) ?></span>
                             </div>
                         <?php endforeach; ?>
                     </div>
@@ -182,17 +182,17 @@ $canEdit = ($isOwner || $isAdmin);
             <!-- 4. Location Map -->
             <?php if (!empty($listing['location']) || (!empty($listing['latitude']) && !empty($listing['longitude']))): ?>
                 <div class="glass-map-container">
-                    <h3 style="font-size: 1.25rem; font-weight: 700; color: var(--htb-text-main); margin-bottom: 15px;">Location</h3>
+                    <h3 class="listing-section-heading">Location</h3>
 
                     <?php if (!empty($listing['location'])): ?>
-                        <div style="margin-bottom: 15px; font-size: 1.05rem; color: var(--htb-text-muted); display: flex; align-items: center; gap: 10px;">
-                            <i class="fa-solid fa-location-dot" style="color: var(--htb-text-muted, #64748b);"></i>
+                        <div class="listing-location-text">
+                            <i class="fa-solid fa-location-dot listing-location-icon"></i>
                             <span><?= htmlspecialchars($listing['location']) ?></span>
                         </div>
                     <?php endif; ?>
 
                     <?php if (!empty($listing['latitude']) && !empty($listing['longitude'])): ?>
-                        <div id="listing-map" style="width: 100%; height: 300px; border-radius: 12px; overflow: hidden;"></div>
+                        <div id="listing-map" class="listing-map"></div>
                         <script>
                             document.addEventListener('DOMContentLoaded', () => {
                                 if (!window.mapboxgl) return;
@@ -216,23 +216,23 @@ $canEdit = ($isOwner || $isAdmin);
         </div>
 
         <!-- RIGHT COLUMN: Sidebar -->
-        <aside style="position: relative; z-index: 50;">
+        <aside class="listing-sidebar">
             <!-- Author Card -->
             <div class="glass-author-card">
-                <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 20px;">
+                <div class="listing-author-header">
                     <?= webp_avatar($listing['avatar_url'] ?? null, $listing['author_name'], 56) ?>
                     <div>
-                        <div style="font-weight: 700; color: var(--htb-text-main); font-size: 1.1rem;"><?= htmlspecialchars($listing['author_name']) ?></div>
-                        <div style="color: var(--htb-text-muted); font-size: 0.9rem;">Member</div>
+                        <div class="listing-author-name"><?= htmlspecialchars($listing['author_name']) ?></div>
+                        <div class="listing-author-role">Member</div>
                     </div>
                 </div>
 
                 <?php if ($canEdit): ?>
-                    <a href="<?= Nexus\Core\TenantContext::getBasePath() ?>/listings/edit/<?= $listing['id'] ?>" class="listing-edit-btn" style="display: block; width: 100%; text-align: center; padding: 12px; font-weight: 700; text-decoration: none; border-radius: 8px; transition: background 0.2s;">
+                    <a href="<?= Nexus\Core\TenantContext::getBasePath() ?>/listings/edit/<?= $listing['id'] ?>" class="listing-edit-btn listing-edit-btn-styled">
                         <i class="fa-solid fa-pen-to-square"></i> Edit Listing
                     </a>
                 <?php else: ?>
-                    <a href="<?= Nexus\Core\TenantContext::getBasePath() ?>/messages/<?= $listing['user_id'] ?>?ref=<?= urlencode("Re: " . $listing['title']) ?>" style="display: block; width: 100%; text-align: center; padding: 12px; background: <?= $accentColor ?>; color: #fff; font-weight: 700; text-decoration: none; border-radius: 8px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); transition: opacity 0.2s;">
+                    <a href="<?= Nexus\Core\TenantContext::getBasePath() ?>/messages/<?= $listing['user_id'] ?>?ref=<?= urlencode("Re: " . $listing['title']) ?>" class="listing-cta-btn" style="background: <?= $accentColor ?>;">
                         Message Author
                     </a>
                 <?php endif; ?>
@@ -245,15 +245,15 @@ $canEdit = ($isOwner || $isAdmin);
                     require_once __DIR__ . '/../../../src/Helpers/SDG.php';
             ?>
                     <div class="glass-sdg-card">
-                        <h4 style="margin: 0 0 15px 0; color: var(--htb-text-muted); text-transform: uppercase; font-size: 0.85rem; letter-spacing: 0.5px;">Social Impact</h4>
-                        <div style="display: flex; flex-direction: column; gap: 10px;">
+                        <h4 class="listing-sdg-heading">Social Impact</h4>
+                        <div class="listing-sdg-list">
                             <?php foreach ($goals as $gid):
                                 $goal = \Nexus\Helpers\SDG::get($gid);
                                 if (!$goal) continue;
                             ?>
-                                <div class="glass-sdg-item" style="display: flex; align-items: center; gap: 10px; padding: 8px; border-left: 3px solid <?= $goal['color'] ?>;">
+                                <div class="glass-sdg-item listing-sdg-item" style="border-left: 3px solid <?= $goal['color'] ?>;">
                                     <span><?= $goal['icon'] ?></span>
-                                    <span style="font-weight: 600; font-size: 0.9rem; color: var(--htb-text-main);"><?= $goal['label'] ?></span>
+                                    <span class="listing-sdg-label"><?= $goal['label'] ?></span>
                                 </div>
                             <?php endforeach; ?>
                         </div>
@@ -327,12 +327,10 @@ $canEdit = ($isOwner || $isAdmin);
             countEl.textContent = data.likes_count;
 
             if (isLiked) {
-                btn.style.background = 'linear-gradient(135deg, #ec4899, #f43f5e)';
-                btn.style.color = '#fff';
+                btn.classList.add('listing-action-btn--liked');
                 icon.className = 'fa-solid fa-heart';
             } else {
-                btn.style.background = 'rgba(100,116,139,0.1)';
-                btn.style.color = 'var(--htb-text-main)';
+                btn.classList.remove('listing-action-btn--liked');
                 icon.className = 'fa-regular fa-heart';
             }
 
@@ -356,9 +354,9 @@ $canEdit = ($isOwner || $isAdmin);
 
         // Desktop: use inline comments section
         const section = document.getElementById('comments-section');
-        const isHidden = section.style.display === 'none';
+        const isHidden = !section.classList.contains('listing-comments-section--visible');
 
-        section.style.display = isHidden ? 'block' : 'none';
+        section.classList.toggle('listing-comments-section--visible');
 
         if (isHidden && !commentsLoaded) {
             loadComments();
@@ -368,7 +366,7 @@ $canEdit = ($isOwner || $isAdmin);
     // Load Comments - Using Master Social Module API
     async function loadComments() {
         const list = document.getElementById('comments-list');
-        list.innerHTML = '<p style="color: var(--htb-text-muted); text-align: center;">Loading comments...</p>';
+        list.innerHTML = '<p class="listing-loading-text">Loading comments...</p>';
 
         try {
             const response = await fetch(API_BASE + '/comments', {
@@ -387,14 +385,14 @@ $canEdit = ($isOwner || $isAdmin);
             if (!response.ok) {
                 const errorText = await response.text();
                 console.error('Comments API error:', response.status, errorText);
-                list.innerHTML = '<p style="color: var(--htb-text-muted); text-align: center;">Failed to load comments (HTTP ' + response.status + ')</p>';
+                list.innerHTML = '<p class="listing-loading-text">Failed to load comments (HTTP ' + response.status + ')</p>';
                 return;
             }
 
             const data = await response.json();
 
             if (data.error) {
-                list.innerHTML = '<p style="color: var(--htb-text-muted); text-align: center;">Failed to load comments: ' + data.error + '</p>';
+                list.innerHTML = '<p class="listing-loading-text">Failed to load comments: ' + data.error + '</p>';
                 return;
             }
 
@@ -402,7 +400,7 @@ $canEdit = ($isOwner || $isAdmin);
             availableReactions = data.available_reactions || [];
 
             if (!data.comments || data.comments.length === 0) {
-                list.innerHTML = '<p style="color: var(--htb-text-muted); text-align: center; padding: 20px;">No comments yet. Be the first to comment!</p>';
+                list.innerHTML = '<p class="listing-loading-text">No comments yet. Be the first to comment!</p>';
                 return;
             }
 
@@ -410,59 +408,59 @@ $canEdit = ($isOwner || $isAdmin);
 
         } catch (err) {
             console.error('Load comments error:', err);
-            list.innerHTML = '<p style="color: var(--htb-text-muted); text-align: center;">Error loading comments</p>';
+            list.innerHTML = '<p class="listing-loading-text">Error loading comments</p>';
         }
     }
 
     // Render Comment with Nested Replies
     function renderComment(c, depth) {
         const indent = depth * 20;
-        const isEdited = c.is_edited ? '<span style="font-size: 0.7rem; color: var(--htb-text-muted);"> (edited)</span>' : '';
+        const isEdited = c.is_edited ? '<span class="listing-edited-tag"> (edited)</span>' : '';
         const ownerActions = c.is_owner ? `
-            <span onclick="listingEditComment(${c.id}, '${escapeHtml(c.content).replace(/'/g, "\\'")}')" style="cursor: pointer; margin-left: 10px;" title="Edit">✏️</span>
-            <span onclick="listingDeleteComment(${c.id})" style="cursor: pointer; margin-left: 5px;" title="Delete">🗑️</span>
+            <span onclick="listingEditComment(${c.id}, '${escapeHtml(c.content).replace(/'/g, "\\'")}')" class="listing-owner-action" title="Edit">✏️</span>
+            <span onclick="listingDeleteComment(${c.id})" class="listing-owner-action listing-owner-action--delete" title="Delete">🗑️</span>
         ` : '';
 
         const reactions = Object.entries(c.reactions || {}).map(([emoji, count]) => {
             const isUserReaction = (c.user_reactions || []).includes(emoji);
-            return `<span onclick="listingToggleReaction(${c.id}, '${emoji}')" style="cursor: pointer; padding: 2px 6px; border-radius: 12px; font-size: 0.8rem; background: ${isUserReaction ? 'rgba(99, 102, 241, 0.2)' : 'rgba(100,116,139,0.1)'}; border: 1px solid ${isUserReaction ? 'rgba(99, 102, 241, 0.4)' : 'rgba(100,116,139,0.2)'};">${emoji} ${count}</span>`;
+            return `<span onclick="listingToggleReaction(${c.id}, '${emoji}')" class="listing-reaction-badge ${isUserReaction ? 'listing-reaction-badge--active' : ''}">${emoji} ${count}</span>`;
         }).join(' ');
 
         const reactionPicker = isLoggedIn ? `
-            <div class="reaction-picker" style="display: inline-block; position: relative;">
-                <span onclick="listingShowReactionPicker(${c.id})" style="cursor: pointer; padding: 2px 6px; border-radius: 12px; font-size: 0.8rem; background: rgba(100,116,139,0.1); border: 1px solid rgba(100,116,139,0.2);">+</span>
-                <div id="picker-${c.id}" style="display: none; position: absolute; bottom: 100%; left: 0; background: var(--htb-card-bg, #fff); border: 1px solid rgba(100,116,139,0.2); border-radius: 8px; padding: 5px; z-index: 100; white-space: nowrap; box-shadow: 0 4px 12px rgba(0,0,0,0.15);">
-                    ${availableReactions.map(e => `<span onclick="listingToggleReaction(${c.id}, '${e}')" style="cursor: pointer; padding: 3px; font-size: 1.2rem;">${e}</span>`).join('')}
+            <div class="listing-reaction-picker">
+                <span onclick="listingShowReactionPicker(${c.id})" class="listing-reaction-add-btn">+</span>
+                <div id="picker-${c.id}" class="listing-reaction-picker-dropdown">
+                    ${availableReactions.map(e => `<span onclick="listingToggleReaction(${c.id}, '${e}')" class="listing-reaction-emoji">${e}</span>`).join('')}
                 </div>
             </div>
         ` : '';
 
-        const replyButton = isLoggedIn ? `<span onclick="listingShowReplyForm(${c.id})" style="cursor: pointer; color: <?= $accentColor ?>; font-size: 0.8rem; margin-left: 10px;">Reply</span>` : '';
+        const replyButton = isLoggedIn ? `<span onclick="listingShowReplyForm(${c.id})" class="listing-comment-reply-link" style="color: <?= $accentColor ?>;">Reply</span>` : '';
 
         const replies = (c.replies || []).map(r => renderComment(r, depth + 1)).join('');
 
         return `
-            <div style="margin-left: ${indent}px; padding: 12px; background: rgba(100,116,139,0.05); border-radius: 12px; margin-bottom: 10px;" id="comment-${c.id}">
-                <div style="display: flex; gap: 12px;">
-                    <img src="${c.author_avatar}" loading="lazy" style="width: ${depth > 0 ? 28 : 36}px; height: ${depth > 0 ? 28 : 36}px; border-radius: 50%; object-fit: cover; flex-shrink: 0;">
-                    <div style="flex: 1;">
-                        <div style="font-weight: 600; font-size: 0.9rem; color: var(--htb-text-main);">
+            <div class="listing-comment-item" style="margin-left: ${indent}px;" id="comment-${c.id}">
+                <div class="listing-comment-content">
+                    <img src="${c.author_avatar}" loading="lazy" class="listing-comment-avatar ${depth > 0 ? 'listing-comment-avatar--small' : ''}">
+                    <div class="listing-comment-body">
+                        <div class="listing-comment-author">
                             ${escapeHtml(c.author_name)}${isEdited}
                             ${ownerActions}
                         </div>
-                        <div id="content-${c.id}" style="color: var(--htb-text-main); margin-top: 4px;">${formatContent(c.content)}</div>
-                        <div style="font-size: 0.75rem; color: var(--htb-text-muted); margin-top: 4px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+                        <div id="content-${c.id}" class="listing-comment-text">${formatContent(c.content)}</div>
+                        <div class="listing-comment-meta">
                             ${formatTime(c.created_at)}
                             ${replyButton}
                         </div>
-                        <div style="margin-top: 6px; display: flex; align-items: center; gap: 6px; flex-wrap: wrap;">
+                        <div class="listing-comment-reactions">
                             ${reactions}
                             ${reactionPicker}
                         </div>
-                        <div id="reply-form-${c.id}" style="display: none; margin-top: 10px;">
-                            <div style="display: flex; gap: 8px;">
-                                <input type="text" id="reply-input-${c.id}" placeholder="Write a reply..." style="flex: 1; padding: 8px 12px; border-radius: 8px; border: 1px solid rgba(100,116,139,0.3); background: rgba(255,255,255,0.5); color: var(--htb-text-main); font-size: 0.85rem;">
-                                <button onclick="listingSubmitReply(${c.id})" style="padding: 8px 16px; border-radius: 8px; background: <?= $accentColor ?>; color: white; border: none; cursor: pointer; font-size: 0.85rem;">Reply</button>
+                        <div id="reply-form-${c.id}" class="listing-reply-form">
+                            <div class="listing-reply-form-inner">
+                                <input type="text" id="reply-input-${c.id}" placeholder="Write a reply..." class="listing-reply-input">
+                                <button onclick="listingSubmitReply(${c.id})" class="listing-reply-btn" style="background: <?= $accentColor ?>;">Reply</button>
                             </div>
                         </div>
                     </div>
@@ -479,7 +477,7 @@ $canEdit = ($isOwner || $isAdmin);
     }
 
     function formatContent(content) {
-        return escapeHtml(content).replace(/@(\w+)/g, '<span style="color: <?= $accentColor ?>; font-weight: 600;">@$1</span>');
+        return escapeHtml(content).replace(/@(\w+)/g, '<span class="listing-mention" style="color: <?= $accentColor ?>;">@$1</span>');
     }
 
     function formatTime(datetime) {
@@ -497,13 +495,13 @@ $canEdit = ($isOwner || $isAdmin);
 
     window.listingShowReactionPicker = function(commentId) {
         const picker = document.getElementById(`picker-${commentId}`);
-        picker.style.display = picker.style.display === 'none' ? 'block' : 'none';
+        picker.classList.toggle('listing-reaction-picker-dropdown--visible');
     };
 
     window.listingShowReplyForm = function(commentId) {
         const form = document.getElementById(`reply-form-${commentId}`);
-        form.style.display = form.style.display === 'none' ? 'block' : 'none';
-        if (form.style.display === 'block') {
+        const isVisible = form.classList.toggle('listing-reply-form--visible');
+        if (isVisible) {
             document.getElementById(`reply-input-${commentId}`).focus();
         }
     };
@@ -551,7 +549,7 @@ $canEdit = ($isOwner || $isAdmin);
             const data = await response.json();
             if (data.error) { alert(data.error); return; }
             input.value = '';
-            document.getElementById(`reply-form-${parentId}`).style.display = 'none';
+            document.getElementById(`reply-form-${parentId}`).classList.remove('listing-reply-form--visible');
             const countEl = document.getElementById('comment-count');
             countEl.textContent = parseInt(countEl.textContent) + 1;
             loadComments();
@@ -585,10 +583,10 @@ $canEdit = ($isOwner || $isAdmin);
         const originalHtml = contentEl.innerHTML;
 
         contentEl.innerHTML = `
-            <div style="display: flex; gap: 8px; flex-wrap: wrap;">
-                <input type="text" id="edit-input-${commentId}" value="${escapeHtml(currentContent)}" style="flex: 1; min-width: 200px; padding: 8px 12px; border-radius: 8px; border: 1px solid rgba(100,116,139,0.3); background: rgba(255,255,255,0.5); color: var(--htb-text-main);">
-                <button onclick="saveEdit(${commentId})" style="padding: 8px 16px; border-radius: 8px; background: <?= $accentColor ?>; color: white; border: none; cursor: pointer;">Save</button>
-                <button onclick="cancelEdit(${commentId}, '${escapeHtml(originalHtml).replace(/'/g, "\\'")}')" style="padding: 8px 16px; border-radius: 8px; background: rgba(100,116,139,0.1); border: 1px solid rgba(100,116,139,0.2); color: var(--htb-text-main); cursor: pointer;">Cancel</button>
+            <div class="listing-edit-form">
+                <input type="text" id="edit-input-${commentId}" value="${escapeHtml(currentContent)}" class="listing-edit-input">
+                <button onclick="saveEdit(${commentId})" class="listing-edit-save-btn" style="background: <?= $accentColor ?>;">Save</button>
+                <button onclick="cancelEdit(${commentId}, '${escapeHtml(originalHtml).replace(/'/g, "\\'")}')" class="listing-edit-cancel-btn">Cancel</button>
             </div>
         `;
         document.getElementById(`edit-input-${commentId}`).focus();
@@ -795,13 +793,13 @@ $canEdit = ($isOwner || $isAdmin);
     // Button Press States
     document.querySelectorAll('button').forEach(btn => {
         btn.addEventListener('pointerdown', function() {
-            this.style.transform = 'scale(0.96)';
+            this.classList.add('listing-btn-pressed');
         });
         btn.addEventListener('pointerup', function() {
-            this.style.transform = 'scale(1)';
+            this.classList.remove('listing-btn-pressed');
         });
         btn.addEventListener('pointerleave', function() {
-            this.style.transform = 'scale(1)';
+            this.classList.remove('listing-btn-pressed');
         });
     });
 })();
