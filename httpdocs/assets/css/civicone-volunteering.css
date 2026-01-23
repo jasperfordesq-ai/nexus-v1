@@ -16,7 +16,7 @@
     /* Brand/Action Colors (WCAG AA) */
     --civic-vol-brand: var(--color-teal-700);              /* Teal 700 - 5.8:1 */
     --civic-vol-brand-hover: var(--color-teal-800);        /* Teal 800 - 7.2:1 */
-    --civic-vol-brand-light: rgba(15, 118, 110, 0.1);
+    --civic-vol-brand-light: var(--color-teal-700-alpha-10);
 
     /* Status Colors (WCAG AA) */
     --civic-vol-success: var(--color-success-700);            /* 5.3:1 */
@@ -43,11 +43,11 @@
     --civic-vol-text-muted: var(--color-gray-300);
     --civic-vol-brand: var(--color-teal-300);
     --civic-vol-brand-hover: #99F6E4;
-    --civic-vol-brand-light: rgba(94, 234, 212, 0.15);
+    --civic-vol-brand-light: var(--color-teal-300-alpha-15);
     --civic-vol-success: var(--color-success-400);
-    --civic-vol-success-bg: rgba(16, 185, 129, 0.15);
+    --civic-vol-success-bg: var(--color-emerald-alpha-15);
     --civic-vol-info: var(--color-blue-400);
-    --civic-vol-info-bg: rgba(59, 130, 246, 0.15);
+    --civic-vol-info-bg: var(--color-blue-alpha-15);
     --civic-vol-border: var(--color-gray-700);
 }
 
@@ -361,7 +361,7 @@
 }
 
 [data-theme="dark"] .civic-alert--success {
-    border-color: rgba(52, 211, 153, 0.3);
+    border-color: var(--color-emerald-300-alpha-30);
 }
 
 .civic-alert--info {
@@ -371,7 +371,7 @@
 }
 
 [data-theme="dark"] .civic-alert--info {
-    border-color: rgba(96, 165, 250, 0.3);
+    border-color: var(--color-blue-400-alpha-30);
 }
 
 .civic-alert .dashicons {

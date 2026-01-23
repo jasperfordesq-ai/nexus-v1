@@ -549,6 +549,22 @@
 
     /* Amber-600 opacity variants (217, 119, 6 = #d97706) */
     --color-amber-600-alpha-10: rgba(217, 119, 6, 0.1);
+    --color-amber-600-alpha-20: rgba(217, 119, 6, 0.2);
+
+    /* Blue-600 opacity variants extended (37, 99, 235 = #2563eb) */
+    --color-blue-600-alpha-20: rgba(37, 99, 235, 0.2);
+
+    /* Teal-700 opacity variants (15, 118, 110 = #0f766e) */
+    --color-teal-700-alpha-10: rgba(15, 118, 110, 0.1);
+
+    /* Teal-300 opacity variants (94, 234, 212 = #5eead4) */
+    --color-teal-300-alpha-15: rgba(94, 234, 212, 0.15);
+
+    /* Blue-400 opacity variants (96, 165, 250 = #60a5fa) */
+    --color-blue-400-alpha-30: rgba(96, 165, 250, 0.3);
+
+    /* Green-pure opacity variants (0, 128, 0 = #008000) */
+    --color-green-pure-alpha-20: rgba(0, 128, 0, 0.2);
 
     /* Black expanded opacity variants */
     --color-black-alpha-6: rgba(0, 0, 0, 0.06);

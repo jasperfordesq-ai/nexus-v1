@@ -11,8 +11,8 @@
     right: 0;
     z-index: 9999;
     background: linear-gradient(135deg, var(--color-warning-500) 0%, var(--color-warning-600) 100%);
-    border-bottom: var(--space-0-5) solid rgba(245, 158, 11, 0.4);
-    box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
+    border-bottom: var(--space-0-5) solid var(--color-amber-500-alpha-40);
+    box-shadow: 0 4px 12px var(--color-amber-500-alpha-30);
     padding: var(--space-3) var(--space-6);
     display: flex;
     justify-content: space-between;
@@ -33,7 +33,7 @@
     width: var(--space-10);
     height: var(--space-10);
     border-radius: 50%;
-    background: rgba(255, 255, 255, 0.2);
+    background: var(--color-white-alpha-20);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -58,7 +58,7 @@
 .impersonation-banner-subtext {
     font-size: 0.8rem;
     opacity: 0.9;
-    color: rgba(255, 255, 255, 0.95);
+    color: var(--color-white-alpha-95);
 }
 
 .impersonation-banner-actions {
@@ -83,15 +83,15 @@
 }
 
 .impersonation-exit-btn {
-    background: rgba(255, 255, 255, 0.95);
+    background: var(--color-white-alpha-95);
     color: var(--color-warning-600);
-    border: 1px solid rgba(255, 255, 255, 0.3);
+    border: 1px solid var(--color-white-alpha-30);
 }
 
 .impersonation-exit-btn:hover {
     background: white;
     transform: translateY(-1px);
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+    box-shadow: 0 4px 8px var(--color-black-alpha-15);
 }
 
 .impersonation-exit-btn i {
@@ -161,18 +161,18 @@
 }
 
 [data-theme="dark"] .impersonation-exit-btn {
-    background: rgba(255, 255, 255, 0.9);
+    background: var(--color-white-alpha-90);
     color: var(--color-warning-600);
 }
 
 /* Light mode adjustments */
 [data-theme="light"] .impersonation-banner {
     background: linear-gradient(135deg, var(--color-warning-400) 0%, var(--color-warning-500) 100%);
-    border-bottom-color: rgba(251, 191, 36, 0.4);
+    border-bottom-color: var(--color-amber-alpha-40);
 }
 
 [data-theme="light"] .impersonation-exit-btn {
     background: white;
     color: var(--color-warning-600);
-    border-color: rgba(217, 119, 6, 0.2);
+    border-color: var(--color-amber-600-alpha-20);
 }

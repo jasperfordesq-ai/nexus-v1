@@ -63,7 +63,7 @@ button {
 button:focus-visible,
 a:focus-visible,
 input:focus-visible {
-    outline: 3px solid rgba(219, 39, 119, 0.5);
+    outline: 3px solid var(--color-pink-600-alpha-50);
     outline-offset: 2px;
 }
 
@@ -105,7 +105,7 @@ html {
 .invite-search:focus {
     outline: none;
     border-color: var(--color-pink-600);
-    box-shadow: 0 0 0 4px rgba(219, 39, 119, 0.1);
+    box-shadow: 0 0 0 4px var(--color-pink-600-alpha-10);
 }
 
 /* User List */
@@ -179,7 +179,7 @@ html {
     color: white;
     font-weight: 700;
     cursor: pointer;
-    box-shadow: 0 4px 14px rgba(219, 39, 119, 0.3);
+    box-shadow: 0 4px 14px var(--color-pink-600-alpha-30);
     transition: all 0.2s ease;
     -webkit-tap-highlight-color: transparent;
 }
@@ -270,25 +270,25 @@ html {
 
 /* Dark Mode */
 [data-theme="dark"] .invite-search {
-    background: rgba(30, 41, 59, 0.8);
-    border-color: rgba(255, 255, 255, 0.15);
+    background: var(--color-slate-alpha-80);
+    border-color: var(--color-white-alpha-15);
     color: var(--color-slate-100);
 }
 
 [data-theme="dark"] .user-list {
-    border-color: rgba(255, 255, 255, 0.1);
+    border-color: var(--color-white-alpha-10);
 }
 
 [data-theme="dark"] .user-item {
-    border-color: rgba(255, 255, 255, 0.05);
+    border-color: var(--color-white-alpha-5);
 }
 
 [data-theme="dark"] .user-item:hover {
-    background: rgba(219, 39, 119, 0.1);
+    background: var(--color-pink-600-alpha-10);
 }
 
 [data-theme="dark"] .user-item.selected {
-    background: rgba(219, 39, 119, 0.2);
+    background: var(--color-pink-600-alpha-20);
 }
 
 /* Mobile Responsive */
