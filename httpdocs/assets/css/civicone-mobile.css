@@ -309,9 +309,6 @@ body.dark-mode .civic-bottom-nav-item.active {
     }
 }
 
-/* Animation removed for GOV.UK compliance */
-    100% { background-position: -200% 0; }
-}
 
 .civic-skeleton-text {
     height: var(--font-size-sm);
