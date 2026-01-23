@@ -328,6 +328,7 @@
 
     /* Slate/Dark opacity variants (30, 41, 59 = #1e293b) */
     --color-slate-alpha-30: rgba(30, 41, 59, 0.3);
+    --color-slate-alpha-40: rgba(30, 41, 59, 0.4);
     --color-slate-alpha-50: rgba(30, 41, 59, 0.5);
     --color-slate-alpha-60: rgba(30, 41, 59, 0.6);
     --color-slate-alpha-65: rgba(30, 41, 59, 0.65);
@@ -427,8 +428,10 @@
     --color-pink-400-alpha-60: rgba(244, 114, 182, 0.6);
 
     /* Pink-600 opacity variants (219, 39, 119 = #db2777) */
+    --color-pink-600-alpha-5: rgba(219, 39, 119, 0.05);
     --color-pink-600-alpha-8: rgba(219, 39, 119, 0.08);
     --color-pink-600-alpha-10: rgba(219, 39, 119, 0.1);
+    --color-pink-500-alpha-5: rgba(236, 72, 153, 0.05);
     --color-pink-600-alpha-15: rgba(219, 39, 119, 0.15);
     --color-pink-600-alpha-20: rgba(219, 39, 119, 0.2);
     --color-pink-600-alpha-25: rgba(219, 39, 119, 0.25);
@@ -661,12 +664,28 @@
     /* Pink expanded opacity variants (236, 72, 153 = #ec4899) */
     --color-pink-alpha-25: rgba(236, 72, 153, 0.25);
 
+    /* Red-600 opacity variants (220, 38, 38 = #dc2626) */
+    --color-red-600-alpha-10: rgba(220, 38, 38, 0.1);
+    --color-red-600-alpha-15: rgba(220, 38, 38, 0.15);
+    --color-red-600-alpha-20: rgba(220, 38, 38, 0.2);
+    --color-red-600-alpha-30: rgba(220, 38, 38, 0.3);
+
     /* Amber expanded opacity variants (251, 191, 36 = #fbbf24) */
     --color-amber-alpha-25: rgba(251, 191, 36, 0.25);
 
     /* Emerald expanded opacity variants (16, 185, 129 = #10b981) */
     --color-emerald-alpha-25: rgba(16, 185, 129, 0.25);
     --color-emerald-alpha-35: rgba(16, 185, 129, 0.35);
+
+    /* Gray-500 opacity variants (107, 114, 128 = #6b7280) */
+    --color-gray-500-alpha-15: rgba(107, 114, 128, 0.15);
+    --color-gray-500-alpha-20: rgba(107, 114, 128, 0.2);
+
+    /* Blue-500 opacity variants (59, 130, 246 = #3b82f6) */
+    --color-blue-500-alpha-20: rgba(59, 130, 246, 0.2);
+
+    /* Slate-200 opacity variants (226, 232, 240 = #e2e8f0) */
+    --color-slate-200-alpha-90: rgba(226, 232, 240, 0.9);
 
     /* Glass shadow expanded (31, 38, 135) */
     --color-glass-shadow-12: rgba(31, 38, 135, 0.12)

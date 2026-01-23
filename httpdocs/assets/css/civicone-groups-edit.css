@@ -63,7 +63,7 @@
     .edit-select:focus-visible,
     button:focus-visible,
     a:focus-visible {
-        outline: 3px solid rgba(219, 39, 119, 0.5);
+        outline: 3px solid var(--color-pink-600-alpha-50);
         outline-offset: 2px;
     }
 
@@ -96,12 +96,12 @@
         padding: var(--space-6);
         background: var(--htb-card-bg, white);
         border-radius: var(--radius-xl);
-        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        box-shadow: 0 4px 20px var(--color-black-alpha-8);
     }
 
     [data-theme="dark"] .edit-wrapper .htb-card {
-        background: rgba(30, 41, 59, 0.8);
-        border: 1px solid rgba(255, 255, 255, 0.1);
+        background: var(--color-slate-alpha-80);
+        border: 1px solid var(--color-white-alpha-10);
     }
 
     .edit-form-group {
@@ -149,14 +149,14 @@
     .edit-select:focus {
         outline: none;
         border-color: var(--color-pink-600);
-        box-shadow: 0 0 0 4px rgba(219, 39, 119, 0.1);
+        box-shadow: 0 0 0 4px var(--color-pink-600-alpha-10);
     }
 
     [data-theme="dark"] .edit-input,
     [data-theme="dark"] .edit-textarea,
     [data-theme="dark"] .edit-select {
-        background: rgba(30, 41, 59, 0.8);
-        border-color: rgba(255, 255, 255, 0.15);
+        background: var(--color-slate-alpha-80);
+        border-color: var(--color-white-alpha-15);
         color: var(--color-slate-100);
     }
 
@@ -185,7 +185,7 @@
         color: white;
         font-weight: 700;
         cursor: pointer;
-        box-shadow: 0 4px 14px rgba(219, 39, 119, 0.3);
+        box-shadow: 0 4px 14px var(--color-pink-600-alpha-30);
         transition: all 0.2s ease;
         -webkit-tap-highlight-color: transparent;
         margin-top: var(--space-2-5);
@@ -193,7 +193,7 @@
 
     .edit-submit:hover {
         transform: translateY(-2px);
-        box-shadow: 0 6px 20px rgba(219, 39, 119, 0.4);
+        box-shadow: 0 6px 20px var(--color-pink-600-alpha-40);
     }
 
     .edit-submit:active {
@@ -241,17 +241,17 @@
     }
 
     [data-theme="dark"] .visibility-option-card {
-        background: rgba(30, 41, 59, 0.6);
-        border-color: rgba(255, 255, 255, 0.15);
+        background: var(--color-slate-alpha-60);
+        border-color: var(--color-white-alpha-15);
     }
 
     .visibility-option input:checked + .visibility-option-card {
         border-color: var(--color-pink-600);
-        background: linear-gradient(135deg, rgba(219, 39, 119, 0.05), rgba(236, 72, 153, 0.05));
+        background: linear-gradient(135deg, var(--color-pink-600-alpha-5), var(--color-pink-500-alpha-5));
     }
 
     [data-theme="dark"] .visibility-option input:checked + .visibility-option-card {
-        background: rgba(219, 39, 119, 0.15);
+        background: var(--color-pink-600-alpha-15);
     }
 
     .visibility-option-icon {
@@ -299,13 +299,13 @@
     }
 
     [data-theme="dark"] .file-input-label {
-        background: rgba(30, 41, 59, 0.4);
-        border-color: rgba(255, 255, 255, 0.2);
+        background: var(--color-slate-alpha-40);
+        border-color: var(--color-white-alpha-20);
     }
 
     .file-input-wrapper:hover .file-input-label {
         border-color: var(--color-pink-600);
-        background: rgba(219, 39, 119, 0.05);
+        background: var(--color-pink-600-alpha-5);
         color: var(--color-pink-600);
     }
 
@@ -322,8 +322,8 @@
     }
 
     [data-theme="dark"] .current-image-preview {
-        background: rgba(16, 185, 129, 0.1);
-        border-color: rgba(16, 185, 129, 0.3);
+        background: var(--color-emerald-alpha-10);
+        border-color: var(--color-emerald-alpha-30);
     }
 
     .current-image-preview img {
@@ -365,7 +365,7 @@
     }
 
     [data-theme="dark"] .clear-image-btn:hover {
-        background: rgba(220, 38, 38, 0.15);
+        background: var(--color-red-600-alpha-15);
         color: var(--color-red-400);
     }
 
@@ -388,8 +388,8 @@
     }
 
     [data-theme="dark"] .current-image-preview:has(.clear-image-btn input:checked) {
-        background: rgba(220, 38, 38, 0.1);
-        border-color: rgba(220, 38, 38, 0.3);
+        background: var(--color-red-600-alpha-10);
+        border-color: var(--color-red-600-alpha-30);
     }
 
     /* Featured checkbox label spacing */
