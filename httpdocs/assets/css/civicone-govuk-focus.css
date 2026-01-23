@@ -138,10 +138,11 @@
 .civic-dropdown-content a:focus-visible,
 .civic-dropdown-content button:focus,
 .civic-dropdown-content button:focus-visible {
-    outline: none !important;
+    outline: 3px solid var(--civicone-focus-text) !important;
+    outline-offset: -3px !important;
     background-color: var(--civicone-focus) !important;
     color: var(--civicone-focus-text) !important;
-    box-shadow: inset 0 0 0 3px var(--civicone-focus-text) !important;
+    box-shadow: none !important;
 }
 
 /* ===========================================
@@ -209,10 +210,11 @@
 
 .notif-drawer-item:focus,
 .notif-drawer-item:focus-visible {
-    outline: none !important;
+    outline: 3px solid var(--civicone-focus-text) !important;
+    outline-offset: -3px !important;
     background-color: var(--civicone-focus) !important;
     color: var(--civicone-focus-text) !important;
-    box-shadow: inset 0 0 0 3px var(--civicone-focus-text) !important;
+    box-shadow: none !important;
 }
 
 .notif-drawer-footer a:focus,
@@ -288,13 +290,14 @@
 /* ===========================================
    Dark Mode Adjustments
    Focus states should remain yellow even in dark mode
+   Scoped to .civicone per GR-016
    =========================================== */
-body.dark-mode .civic-nav-link:focus,
-body.dark-mode .civic-nav-link:focus-visible,
-body.dark-mode .civic-utility-link:focus,
-body.dark-mode .civic-utility-link:focus-visible,
-body.dark-mode .civic-logo:focus,
-body.dark-mode .civic-logo:focus-visible {
+.civicone.dark-mode .civic-nav-link:focus,
+.civicone.dark-mode .civic-nav-link:focus-visible,
+.civicone.dark-mode .civic-utility-link:focus,
+.civicone.dark-mode .civic-utility-link:focus-visible,
+.civicone.dark-mode .civic-logo:focus,
+.civicone.dark-mode .civic-logo:focus-visible {
     background-color: var(--civicone-focus) !important;
     color: var(--civicone-focus-text) !important;
 }
@@ -304,8 +307,8 @@ body.dark-mode .civic-logo:focus-visible {
    =========================================== */
 @media (prefers-contrast: more) {
     :root {
-        --civicone-focus: var(--color-white)f00; /* Brighter yellow for high contrast */
-        --civicone-focus-text: var(--color-black);
+        --civicone-focus: #ffdd00; /* Brighter yellow for high contrast - GOV.UK yellow */
+        --civicone-focus-text: #0b0c0c; /* GOV.UK black */
     }
 }
 

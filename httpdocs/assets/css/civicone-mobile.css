@@ -169,17 +169,17 @@
     position: relative;
 }
 
-/* Dark mode */
-body.dark-mode .civic-bottom-nav {
+/* Dark mode - Scoped to .civicone per GR-016 */
+.civicone.dark-mode .civic-bottom-nav {
     background: var(--civic-bg-card, var(--color-gray-800));
     border-top-color: var(--civic-border, var(--color-gray-700));
 }
 
-body.dark-mode .civic-bottom-nav-item {
+.civicone.dark-mode .civic-bottom-nav-item {
     color: var(--civic-text-muted, var(--color-gray-400));
 }
 
-body.dark-mode .civic-bottom-nav-item.active {
+.civicone.dark-mode .civic-bottom-nav-item.active {
     color: var(--civic-brand, var(--color-blue-400));
 }
 
@@ -382,8 +382,8 @@ body.dark-mode .civic-bottom-nav-item.active {
     margin: 0 auto var(--space-3);
 }
 
-/* Dark mode skeletons */
-body.dark-mode .civic-skeleton {
+/* Dark mode skeletons - Scoped to .civicone per GR-016 */
+.civicone.dark-mode .civic-skeleton {
     background: linear-gradient(90deg,
         var(--civic-bg-page, var(--color-gray-900)) 25%,
         var(--civic-bg-card, var(--color-gray-800)) 50%,
@@ -780,7 +780,8 @@ body.dark-mode .civic-skeleton {
     cursor: pointer;
 }
 
-body.dark-mode .civic-pwa-banner {
+/* Scoped to .civicone per GR-016 */
+.civicone.dark-mode .civic-pwa-banner {
     background: var(--civic-bg-card, var(--color-gray-800));
     border-color: var(--civic-border, var(--color-gray-700));
 }
@@ -810,12 +811,13 @@ body.dark-mode .civic-pwa-banner {
     display: block;
 }
 
-body.is-offline .civic-offline-bar {
+/* Scoped to .civicone per GR-016 */
+.civicone.is-offline .civic-offline-bar {
     display: block;
 }
 
-/* Adjust header position when offline bar visible */
-body.is-offline .civic-header {
+/* Adjust header position when offline bar visible - Scoped to .civicone per GR-016 */
+.civicone.is-offline .civic-header {
     top: var(--space-9);
 }
 

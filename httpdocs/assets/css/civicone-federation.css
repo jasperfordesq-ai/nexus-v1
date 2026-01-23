@@ -54,8 +54,8 @@
     --civic-fed-radius: var(--civic-radius, 12px);
 }
 
-/* Dark mode tokens - inherit from main theme body.dark-mode */
-body.dark-mode {
+/* Dark mode tokens - Scoped to .civicone per GR-016 */
+.civicone.dark-mode {
     --civic-fed-text-primary: var(--civic-text-main);
     --civic-fed-text-secondary: var(--civic-text-secondary);
     --civic-fed-text-muted: var(--civic-text-muted);

@@ -267,14 +267,14 @@
     color: white;
 }
 
-/* Dark Mode */
-body.dark-mode .civic-legal-card,
-body.dark-mode .civic-legal-platform,
-body.dark-mode .civic-legal-guidelines {
+/* Dark Mode - Scoped to .civicone per GR-016 */
+.civicone.dark-mode .civic-legal-card,
+.civicone.dark-mode .civic-legal-platform,
+.civicone.dark-mode .civic-legal-guidelines {
     background: var(--civic-bg-card, var(--color-govuk-black));
     border-color: var(--civic-border, var(--color-govuk-black));
 }
 
-body.dark-mode .civic-legal-guidelines-header {
+.civicone.dark-mode .civic-legal-guidelines-header {
     background: var(--civic-bg-page, var(--color-govuk-black));
 }

@@ -649,38 +649,39 @@
 
 /* ===========================================
    Dark Mode Adjustments
+   Scoped to .civicone per GR-016
    =========================================== */
-body.dark-mode .civic-input,
-body.dark-mode .civic-textarea,
-body.dark-mode .civic-select,
-body.dark-mode [data-layout="civicone"] .govuk-input,
-body.dark-mode [data-layout="civicone"] .govuk-textarea,
-body.dark-mode [data-layout="civicone"] .govuk-select {
+.civicone.dark-mode .civic-input,
+.civicone.dark-mode .civic-textarea,
+.civicone.dark-mode .civic-select,
+.civicone.dark-mode [data-layout="civicone"] .govuk-input,
+.civicone.dark-mode [data-layout="civicone"] .govuk-textarea,
+.civicone.dark-mode [data-layout="civicone"] .govuk-select {
     background-color: #1d1d1d;
     border-color: var(--color-white);
     color: var(--color-white);
 }
 
-body.dark-mode .civic-label,
-body.dark-mode .civic-fieldset__legend,
-body.dark-mode [data-layout="civicone"] .govuk-label,
-body.dark-mode [data-layout="civicone"] .govuk-fieldset__legend {
+.civicone.dark-mode .civic-label,
+.civicone.dark-mode .civic-fieldset__legend,
+.civicone.dark-mode [data-layout="civicone"] .govuk-label,
+.civicone.dark-mode [data-layout="civicone"] .govuk-fieldset__legend {
     color: var(--color-white);
 }
 
-body.dark-mode .civic-hint,
-body.dark-mode [data-layout="civicone"] .govuk-hint {
+.civicone.dark-mode .civic-hint,
+.civicone.dark-mode [data-layout="civicone"] .govuk-hint {
     color: var(--color-govuk-grey);
 }
 
-body.dark-mode .civic-checkboxes__label::before,
-body.dark-mode .civic-radios__label::before {
+.civicone.dark-mode .civic-checkboxes__label::before,
+.civicone.dark-mode .civic-radios__label::before {
     background-color: #1d1d1d;
     border-color: var(--color-white);
 }
 
-body.dark-mode .civic-checkboxes__label::after,
-body.dark-mode .civic-radios__label::after {
+.civicone.dark-mode .civic-checkboxes__label::after,
+.civicone.dark-mode .civic-radios__label::after {
     background-color: var(--color-white);
     border-color: var(--color-white);
 }

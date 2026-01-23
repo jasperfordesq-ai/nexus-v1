@@ -44,7 +44,7 @@ require dirname(__DIR__, 2) . '/layouts/civicone/header.php';
                     </div>
                     <div class="collection-reward">
                         <?php if ($collection['is_completed']): ?>
-                            <i class="fa-solid fa-check-circle" style="color: #10b981;"></i> +<?= $collection['bonus_xp'] ?> XP Claimed
+                            <i class="fa-solid fa-check-circle civic-icon-check"></i> +<?= $collection['bonus_xp'] ?> XP Claimed
                         <?php else: ?>
                             <i class="fa-solid fa-gift"></i> +<?= $collection['bonus_xp'] ?> XP Bonus
                         <?php endif; ?>

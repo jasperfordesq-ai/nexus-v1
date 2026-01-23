@@ -982,8 +982,9 @@
 
 /* ===========================================
    7. DARK MODE - Full Theme Override
+   Scoped to .civicone per GR-016
    =========================================== */
-body.dark-mode {
+.civicone.dark-mode {
     --civic-bg-primary: var(--color-gray-900);
     --civic-bg-secondary: var(--color-gray-800);
     --civic-bg-tertiary: var(--color-gray-700);
@@ -1011,98 +1012,98 @@ body.dark-mode {
     --civic-icon-gray: var(--color-gray-400);     /* Gray 400 */
 }
 
-body.dark-mode .civic-utility-bar {
+.civicone.dark-mode .civic-utility-bar {
     background: var(--civic-bg-secondary);
     border-bottom-color: var(--color-gray-700);
 }
 
-body.dark-mode .civic-header {
+.civicone.dark-mode .civic-header {
     background: var(--civic-bg-primary);
     border-bottom-color: var(--civic-brand-light);
 }
 
-body.dark-mode .civic-logo {
+.civicone.dark-mode .civic-logo {
     color: var(--civic-brand-light);
 }
 
-body.dark-mode .civic-desktop-nav .civic-nav-link {
+.civicone.dark-mode .civic-desktop-nav .civic-nav-link {
     color: var(--civic-text-primary);
 }
 
-body.dark-mode .civic-desktop-nav .civic-nav-link:hover {
+.civicone.dark-mode .civic-desktop-nav .civic-nav-link:hover {
     background-color: var(--civic-bg-tertiary);
 }
 
-body.dark-mode .civic-desktop-nav .civic-nav-link.active {
+.civicone.dark-mode .civic-desktop-nav .civic-nav-link.active {
     background-color: rgba(77, 182, 172, 0.15);
     text-decoration-color: var(--civic-brand-light);
 }
 
-body.dark-mode .civic-search-form input {
+.civicone.dark-mode .civic-search-form input {
     background: var(--civic-bg-secondary);
     border-color: var(--civic-text-muted);
     color: var(--civic-text-primary);
 }
 
-body.dark-mode .civic-search-form input::placeholder {
+.civicone.dark-mode .civic-search-form input::placeholder {
     color: var(--civic-text-muted);
 }
 
-body.dark-mode .civic-menu-btn {
+.civicone.dark-mode .civic-menu-btn {
     background: var(--civic-bg-secondary);
     border-color: var(--civic-text-muted);
     color: var(--civic-text-primary);
 }
 
-body.dark-mode .civic-menu-btn:hover {
+.civicone.dark-mode .civic-menu-btn:hover {
     background-color: var(--civic-bg-tertiary);
 }
 
-body.dark-mode .civic-menu-btn.active {
+.civicone.dark-mode .civic-menu-btn.active {
     background-color: var(--civic-brand);
     border-color: var(--civic-brand);
     color: var(--color-white);
 }
 
-body.dark-mode .civic-mega-menu {
+.civicone.dark-mode .civic-mega-menu {
     background: var(--civic-bg-primary);
     border-top-color: var(--civic-brand-light);
 }
 
-body.dark-mode .civic-mega-col h3 {
+.civicone.dark-mode .civic-mega-col h3 {
     color: var(--civic-text-secondary);
     border-bottom-color: var(--civic-bg-tertiary);
 }
 
-body.dark-mode .civic-mega-col a {
+.civicone.dark-mode .civic-mega-col a {
     color: var(--civic-text-primary);
 }
 
-body.dark-mode .civic-mega-col a:hover {
+.civicone.dark-mode .civic-mega-col a:hover {
     color: var(--civic-brand-light);
 }
 
-body.dark-mode .civic-mega-col a:focus-visible {
+.civicone.dark-mode .civic-mega-col a:focus-visible {
     background-color: var(--civic-bg-secondary);
 }
 
-body.dark-mode .civic-utility-bar .civic-dropdown-content {
+.civicone.dark-mode .civic-utility-bar .civic-dropdown-content {
     background: var(--civic-bg-secondary);
     border-color: var(--civic-text-muted);
 }
 
-body.dark-mode .civic-utility-bar .civic-dropdown-content a {
+.civicone.dark-mode .civic-utility-bar .civic-dropdown-content a {
     color: var(--civic-text-primary);
 }
 
-body.dark-mode .civic-utility-bar .civic-dropdown-content a:hover {
+.civicone.dark-mode .civic-utility-bar .civic-dropdown-content a:hover {
     background-color: var(--civic-bg-tertiary);
 }
 
 /* ===========================================
    8. MOBILE ELEMENTS
    =========================================== */
-#civic-menu-toggle {
+.civicone #civic-menu-toggle {
     display: none;
     background: none;
     border: 2px solid transparent;
@@ -1163,7 +1164,7 @@ body.dark-mode .civic-utility-bar .civic-dropdown-content a:hover {
     }
 
     /* Hamburger hidden - mobile nav v2 */
-    #civic-menu-toggle {
+    .civicone #civic-menu-toggle {
         display: none !important;
     }
 
@@ -1716,7 +1717,7 @@ body.dark-mode .civic-utility-bar .civic-dropdown-content a:hover {
 }
 
 /* Dark mode banner */
-body.dark-mode .civic-experimental-banner {
+.civicone.dark-mode .civic-experimental-banner {
     background: var(--color-govuk-blue-light);
 }
 

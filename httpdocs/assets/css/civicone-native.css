@@ -320,12 +320,13 @@ input.invalid {
    10. LOADING STATE
    =========================================== */
 
-body.turbo-loading {
+/* Scoped to .civicone per GR-016 */
+.civicone.turbo-loading {
     cursor: wait;
 }
 
-body.turbo-loading .civic-card,
-body.turbo-loading .civic-btn {
+.civicone.turbo-loading .civic-card,
+.civicone.turbo-loading .civic-btn {
     pointer-events: none;
     opacity: 0.7;
 }
@@ -363,12 +364,12 @@ body.turbo-loading .civic-btn {
     flex-shrink: 0;
 }
 
-/* Adjust header position when offline banner is visible */
-body.is-offline .civic-utility-bar {
+/* Adjust header position when offline banner is visible - Scoped to .civicone per GR-016 */
+.civicone.is-offline .civic-utility-bar {
     margin-top: 2.5rem;
 }
 
-body.is-offline .civic-header {
+.civicone.is-offline .civic-header {
     top: 2.5rem;
 }
 

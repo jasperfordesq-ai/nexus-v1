@@ -140,9 +140,9 @@ $recentXP = $dashboardData['recent_xp'] ?? [];
             </div>
             <?php else: ?>
             <?php if ($badges['total_earned'] >= $badges['total_available']): ?>
-            <p style="color: #10b981; text-align: center; padding: 20px;">You've unlocked all available badges! Amazing!</p>
+            <p class="civic-text-success civic-text-center civic-p-5">You've unlocked all available badges! Amazing!</p>
             <?php else: ?>
-            <p style="color: #6b7280; text-align: center; padding: 20px;">Keep participating to unlock your next badge!</p>
+            <p class="civic-text-muted civic-text-center civic-p-5">Keep participating to unlock your next badge!</p>
             <?php endif; ?>
             <?php endif; ?>
 
@@ -193,7 +193,7 @@ $recentXP = $dashboardData['recent_xp'] ?? [];
             </a>
             <?php endif; ?>
             <?php else: ?>
-            <p style="color: #6b7280; text-align: center; padding: 20px;">Start participating to earn your first badge!</p>
+            <p class="civic-text-muted civic-text-center civic-p-5">Start participating to earn your first badge!</p>
             <?php endif; ?>
         </div>
 
@@ -217,7 +217,7 @@ $recentXP = $dashboardData['recent_xp'] ?? [];
                 <?php endforeach; ?>
             </div>
             <?php else: ?>
-            <p style="color: #6b7280; text-align: center; padding: 20px;">No XP activity yet. Start participating!</p>
+            <p class="civic-text-muted civic-text-center civic-p-5">No XP activity yet. Start participating!</p>
             <?php endif; ?>
         </div>
 
