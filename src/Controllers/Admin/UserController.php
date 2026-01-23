@@ -67,10 +67,17 @@ class UserController
         $phone = trim($_POST['phone'] ?? '');
         $sendWelcomeEmail = isset($_POST['send_welcome_email']);
 
-        // Super admin can only be granted by existing super admins
+        // SECURITY: Super admin can ONLY be granted by GOD users (not by other super admins)
+        // This prevents privilege escalation attacks where a compromised super admin creates more super admins
         $isSuperAdmin = false;
-        if (!empty($_SESSION['is_super_admin']) && isset($_POST['is_super_admin']) && $role === 'admin') {
+        if (!empty($_SESSION['is_god']) && isset($_POST['is_super_admin']) && $role === 'admin') {
             $isSuperAdmin = (bool)$_POST['is_super_admin'];
+            // Audit log for super admin creation
+            \Nexus\Models\ActivityLog::log(
+                $_SESSION['user_id'],
+                'create_super_admin',
+                "God user created new super admin: {$email}"
+            );
         }
 
         // Validation
