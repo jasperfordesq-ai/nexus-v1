@@ -106,9 +106,6 @@
     /* animation removed for GOV.UK compliance */
 }
 
-/* Animation removed for GOV.UK compliance */
-    to { opacity: 1; transform: translateY(0); }
-}
 
 /* Page Header */
 .holo-page-header {

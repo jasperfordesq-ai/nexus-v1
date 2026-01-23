@@ -71,8 +71,6 @@
     filter: drop-shadow(0 0 10px var(--score-glow));
 }
 
-/* Animation removed for GOV.UK compliance */
-}
 
 .score-circle-text {
     position: absolute;

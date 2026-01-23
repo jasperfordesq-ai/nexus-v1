@@ -58,11 +58,6 @@
     /* animation removed for GOV.UK compliance */
 }
 
-/* Animation removed for GOV.UK compliance */
-    50% {
-        opacity: 0.8;
-    }
-}
 
 .civicone-dev-banner-content {
     display: flex;

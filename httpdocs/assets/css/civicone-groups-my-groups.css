@@ -103,9 +103,6 @@ html {
         rgba(139, 92, 246, 0.12) 0%, transparent 50%);
 }
 
-/* Animation removed for GOV.UK compliance */
-    50% { background-position: 100% 50%; }
-}
 
 #my-groups-glass-wrapper .page-header {
     text-align: center;
