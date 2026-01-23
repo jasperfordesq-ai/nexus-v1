@@ -198,7 +198,7 @@ class NexusNotifications {
         if (!bellIcon) return;
 
         const container = bellIcon.parentNode;
-        let badge = container.querySelector('span');
+        const badge = container.querySelector('span');
 
         if (badge) {
             const current = parseInt(badge.textContent) || 0;
@@ -405,7 +405,7 @@ class NexusNotifications {
         if (!bellIcon) return;
 
         const container = bellIcon.parentNode;
-        let badge = container.querySelector('span');
+        const badge = container.querySelector('span');
 
         if (count > 0) {
             const displayCount = count > 9 ? '9+' : count;

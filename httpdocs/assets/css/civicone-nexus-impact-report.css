@@ -48,9 +48,6 @@ body {
     /* animation removed for GOV.UK compliance */
 }
 
-/* Animation removed for GOV.UK compliance */
-    to { transform: rotate(360deg); }
-}
 
 .report-header-content {
     position: relative;

@@ -92,7 +92,7 @@
     function initSSE() {
         updateConnectionStatus('connecting');
 
-        var eventSource = new EventSource(CONFIG.sseEndpoint);
+        const eventSource = new EventSource(CONFIG.sseEndpoint);
 
         eventSource.addEventListener('connected', function(e) {
             updateConnectionStatus('connected');
@@ -140,7 +140,7 @@
 
             if (reconnectAttempts < maxReconnectAttempts) {
                 reconnectAttempts++;
-                var delay = Math.min(1000 * Math.pow(2, reconnectAttempts), 30000);
+                const delay = Math.min(1000 * Math.pow(2, reconnectAttempts), 30000);
                 console.log('[FedRealtime] Reconnecting in ' + delay + 'ms (attempt ' + reconnectAttempts + ')');
                 setTimeout(initSSE, delay);
             }
@@ -156,7 +156,7 @@
         if (!connectionIndicator) return;
 
         connectionIndicator.className = 'fed-connection-indicator visible ' + status;
-        var statusText = connectionIndicator.querySelector('.status-text');
+        const statusText = connectionIndicator.querySelector('.status-text');
 
         switch (status) {
             case 'connecting':
@@ -182,17 +182,17 @@
         if (!toastContainer) return;
 
         // Limit number of toasts
-        var existingToasts = toastContainer.querySelectorAll('.fed-toast');
+        const existingToasts = toastContainer.querySelectorAll('.fed-toast');
         if (existingToasts.length >= CONFIG.maxToasts) {
             removeToast(existingToasts[0]);
         }
 
-        var toast = document.createElement('div');
+        const toast = document.createElement('div');
         toast.className = 'fed-toast';
         toast.setAttribute('role', 'alert');
 
-        var iconClass = getIconClass(type);
-        var content = formatToastContent(type, data);
+        const iconClass = getIconClass(type);
+        const content = formatToastContent(type, data);
 
         toast.innerHTML =
             '<div class="fed-toast-icon ' + type + '">' +
@@ -264,9 +264,9 @@
      * Format toast content based on event type
      */
     function formatToastContent(type, data) {
-        var title = 'Federation Update';
-        var body = data.message || 'New activity in your federation network';
-        var link = '/federation/activity';
+        let title = 'Federation Update';
+        let body = data.message || 'New activity in your federation network';
+        let link = '/federation/activity';
 
         switch (type) {
             case 'message':
@@ -302,7 +302,7 @@
      * Escape HTML to prevent XSS
      */
     function escapeHtml(text) {
-        var div = document.createElement('div');
+        const div = document.createElement('div');
         div.textContent = text;
         return div.innerHTML;
     }
@@ -315,7 +315,7 @@
         if (localStorage.getItem('fedNotificationSound') === 'off') return;
 
         try {
-            var audio = new Audio('/assets/sounds/notification.mp3');
+            const audio = new Audio('/assets/sounds/notification.mp3');
             audio.volume = 0.3;
             audio.play().catch(function() {}); // Ignore autoplay restrictions
         } catch (e) {

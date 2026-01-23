@@ -32,9 +32,6 @@
     pointer-events: none;
 }
 
-/* Animation removed for GOV.UK compliance */
-    50% { opacity: 0.6; }
-}
 
 .score-hero-content {
     position: relative;

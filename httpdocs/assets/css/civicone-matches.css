@@ -81,10 +81,6 @@
     /* animation removed for GOV.UK compliance */
 }
 
-/* Animation removed for GOV.UK compliance */
-    33% { transform: translate(-1%, 1%) rotate(0.5deg); }
-    66% { transform: translate(1%, -0.5%) rotate(-0.5deg); }
-}
 
 /* ==========================================================================
    Container

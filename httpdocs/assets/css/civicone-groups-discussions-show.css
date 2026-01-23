@@ -25,10 +25,6 @@
         transform: translateY(0);
     }
 
-    /* Content Reveal Animation */
-    /* Animation removed for GOV.UK compliance */
-        to { opacity: 1; transform: translateY(0); }
-    }
 
     .discussion-chat-card {
         /* animation removed for GOV.UK compliance */

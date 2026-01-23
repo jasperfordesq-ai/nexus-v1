@@ -5,11 +5,11 @@
 (function() {
     'use strict';
 
-    var STORAGE_KEY_COLLAPSED = 'admin_sidebar_collapsed';
-    var STORAGE_KEY_EXPANDED_SECTIONS = 'admin_sidebar_expanded_sections';
-    var MOBILE_BREAKPOINT = 1024;
+    const STORAGE_KEY_COLLAPSED = 'admin_sidebar_collapsed';
+    const STORAGE_KEY_EXPANDED_SECTIONS = 'admin_sidebar_expanded_sections';
+    const MOBILE_BREAKPOINT = 1024;
 
-    var AdminSidebar = {
+    const AdminSidebar = {
         sidebar: null,
         backdrop: null,
         layout: null,
@@ -50,9 +50,9 @@
         loadState: function() {
             try {
                 // Default to expanded (not collapsed)
-                var storedCollapsed = localStorage.getItem(STORAGE_KEY_COLLAPSED);
+                const storedCollapsed = localStorage.getItem(STORAGE_KEY_COLLAPSED);
                 this.isCollapsed = storedCollapsed === 'true' ? true : false;
-                var savedSections = localStorage.getItem(STORAGE_KEY_EXPANDED_SECTIONS);
+                const savedSections = localStorage.getItem(STORAGE_KEY_EXPANDED_SECTIONS);
                 this.expandedSections = savedSections ? JSON.parse(savedSections) : [];
             } catch (e) {
                 this.isCollapsed = false;
@@ -84,17 +84,17 @@
             }
 
             // Update footer button label
-            var footerLabel = this.sidebar.querySelector('.admin-sidebar-footer-label');
+            const footerLabel = this.sidebar.querySelector('.admin-sidebar-footer-label');
             if (footerLabel) {
                 footerLabel.textContent = this.isCollapsed ? 'Expand' : 'Collapse';
             }
 
             // Apply expanded sections
-            var sections = this.sidebar.querySelectorAll('.admin-sidebar-section');
-            var self = this;
+            const sections = this.sidebar.querySelectorAll('.admin-sidebar-section');
+            const self = this;
             sections.forEach(function(section) {
-                var key = section.getAttribute('data-section');
-                var header = section.querySelector('.admin-sidebar-section-header');
+                const key = section.getAttribute('data-section');
+                const header = section.querySelector('.admin-sidebar-section-header');
                 if (self.expandedSections.indexOf(key) !== -1) {
                     section.classList.add('expanded');
                     if (header) header.setAttribute('aria-expanded', 'true');
@@ -109,7 +109,7 @@
          * Bind event listeners
          */
         bindEvents: function() {
-            var self = this;
+            const self = this;
 
             // Toggle button (collapse/expand)
             if (this.toggleBtn) {
@@ -135,7 +135,7 @@
             }
 
             // Section headers (expand/collapse)
-            var sectionHeaders = this.sidebar.querySelectorAll('.admin-sidebar-section-header');
+            const sectionHeaders = this.sidebar.querySelectorAll('.admin-sidebar-section-header');
             sectionHeaders.forEach(function(header) {
                 header.addEventListener('click', function(e) {
                     // On touch devices in collapsed mode, toggle flyout visibility
@@ -149,13 +149,13 @@
                         return; // Let CSS hover handle it on non-touch
                     }
                     e.preventDefault();
-                    var section = header.closest('.admin-sidebar-section');
+                    const section = header.closest('.admin-sidebar-section');
                     self.toggleSection(section);
                 });
             });
 
             // Close mobile on link click
-            var links = this.sidebar.querySelectorAll('a');
+            const links = this.sidebar.querySelectorAll('a');
             links.forEach(function(link) {
                 link.addEventListener('click', function() {
                     if (window.innerWidth <= MOBILE_BREAKPOINT) {
@@ -177,7 +177,7 @@
             });
 
             // Close flyouts when navigating via flyout links
-            var flyoutLinks = this.sidebar.querySelectorAll('.admin-sidebar-flyout a');
+            const flyoutLinks = this.sidebar.querySelectorAll('.admin-sidebar-flyout a');
             flyoutLinks.forEach(function(link) {
                 link.addEventListener('click', function() {
                     self.closeAllFlyouts();
@@ -218,7 +218,7 @@
 
             // Update hamburger icon
             if (this.mobileBtn) {
-                var icon = this.mobileBtn.querySelector('i');
+                const icon = this.mobileBtn.querySelector('i');
                 if (icon) {
                     icon.className = 'fa-solid fa-times';
                 }
@@ -238,7 +238,7 @@
 
             // Update hamburger icon
             if (this.mobileBtn) {
-                var icon = this.mobileBtn.querySelector('i');
+                const icon = this.mobileBtn.querySelector('i');
                 if (icon) {
                     icon.className = 'fa-solid fa-bars';
                 }
@@ -249,14 +249,14 @@
          * Toggle a section's expanded state
          */
         toggleSection: function(section) {
-            var key = section.getAttribute('data-section');
-            var isExpanded = section.classList.contains('expanded');
-            var header = section.querySelector('.admin-sidebar-section-header');
+            const key = section.getAttribute('data-section');
+            const isExpanded = section.classList.contains('expanded');
+            const header = section.querySelector('.admin-sidebar-section-header');
 
             if (isExpanded) {
                 section.classList.remove('expanded');
                 if (header) header.setAttribute('aria-expanded', 'false');
-                var idx = this.expandedSections.indexOf(key);
+                const idx = this.expandedSections.indexOf(key);
                 if (idx !== -1) {
                     this.expandedSections.splice(idx, 1);
                 }
@@ -284,10 +284,10 @@
          * Toggle flyout visibility (for touch devices)
          */
         toggleFlyout: function(section) {
-            var isOpen = section.classList.contains('flyout-open');
+            const isOpen = section.classList.contains('flyout-open');
 
             // Close all other flyouts first
-            var allSections = this.sidebar.querySelectorAll('.admin-sidebar-section.flyout-open');
+            const allSections = this.sidebar.querySelectorAll('.admin-sidebar-section.flyout-open');
             allSections.forEach(function(s) {
                 s.classList.remove('flyout-open');
             });
@@ -302,7 +302,7 @@
          * Close all flyouts
          */
         closeAllFlyouts: function() {
-            var allSections = this.sidebar.querySelectorAll('.admin-sidebar-section.flyout-open');
+            const allSections = this.sidebar.querySelectorAll('.admin-sidebar-section.flyout-open');
             allSections.forEach(function(s) {
                 s.classList.remove('flyout-open');
             });
@@ -312,7 +312,7 @@
          * Expand a section by key
          */
         expandSection: function(key) {
-            var section = this.sidebar.querySelector('[data-section="' + key + '"]');
+            const section = this.sidebar.querySelector('[data-section="' + key + '"]');
             if (section && !section.classList.contains('expanded')) {
                 this.toggleSection(section);
             }
@@ -322,7 +322,7 @@
          * Collapse a section by key
          */
         collapseSection: function(key) {
-            var section = this.sidebar.querySelector('[data-section="' + key + '"]');
+            const section = this.sidebar.querySelector('[data-section="' + key + '"]');
             if (section && section.classList.contains('expanded')) {
                 this.toggleSection(section);
             }
@@ -332,7 +332,7 @@
          * Setup keyboard shortcuts
          */
         setupKeyboard: function() {
-            var self = this;
+            const self = this;
 
             document.addEventListener('keydown', function(e) {
                 // Don't trigger in input fields
@@ -366,17 +366,17 @@
          * Handle arrow key navigation within sidebar
          */
         handleArrowNavigation: function(e) {
-            var focusableItems = this.sidebar.querySelectorAll(
+            const focusableItems = this.sidebar.querySelectorAll(
                 '.admin-sidebar-single, .admin-sidebar-section-header, .admin-sidebar-item, .admin-sidebar-super-admin, .admin-sidebar-logo'
             );
-            var focusable = Array.from(focusableItems).filter(function(el) {
+            const focusable = Array.from(focusableItems).filter(function(el) {
                 return el.offsetParent !== null; // Only visible elements
             });
 
-            var currentIndex = focusable.indexOf(document.activeElement);
+            const currentIndex = focusable.indexOf(document.activeElement);
             if (currentIndex === -1) return;
 
-            var handled = false;
+            let handled = false;
 
             if (e.key === 'ArrowDown') {
                 if (currentIndex < focusable.length - 1) {
@@ -390,7 +390,7 @@
                 }
             } else if (e.key === 'ArrowRight') {
                 // Expand section if on section header
-                var section = document.activeElement.closest('.admin-sidebar-section');
+                const section = document.activeElement.closest('.admin-sidebar-section');
                 if (section && !section.classList.contains('expanded')) {
                     this.toggleSection(section);
                     handled = true;
@@ -422,7 +422,7 @@
          * Handle window resize
          */
         handleResize: function() {
-            var isMobile = window.innerWidth <= MOBILE_BREAKPOINT;
+            const isMobile = window.innerWidth <= MOBILE_BREAKPOINT;
 
             if (isMobile && this.isMobileOpen) {
                 // Keep mobile state
@@ -461,14 +461,14 @@
          * Setup navigation loading indicators
          */
         setupNavigationLoading: function() {
-            var self = this;
+            const self = this;
 
             // Add loading state when clicking sidebar links
-            var navLinks = this.sidebar.querySelectorAll('a[href]:not([href^="#"]):not([href^="javascript"])');
+            const navLinks = this.sidebar.querySelectorAll('a[href]:not([href^="#"]):not([href^="javascript"])');
             navLinks.forEach(function(link) {
                 link.addEventListener('click', function(e) {
                     // Don't show loading for external links or same-page
-                    var href = link.getAttribute('href');
+                    const href = link.getAttribute('href');
                     if (href && !href.startsWith('#') && !link.target) {
                         self.showNavigating();
                     }
@@ -485,17 +485,17 @@
          * Expand section containing active item and scroll into view
          */
         expandActiveSection: function() {
-            var self = this;
-            var activeItem = this.sidebar.querySelector('.admin-sidebar-item.active');
+            const self = this;
+            const activeItem = this.sidebar.querySelector('.admin-sidebar-item.active');
 
             if (activeItem) {
-                var section = activeItem.closest('.admin-sidebar-section');
+                const section = activeItem.closest('.admin-sidebar-section');
                 if (section) {
-                    var key = section.getAttribute('data-section');
+                    const key = section.getAttribute('data-section');
                     // Force expand even if not in saved state (current page takes priority)
                     if (!section.classList.contains('expanded')) {
                         section.classList.add('expanded');
-                        var header = section.querySelector('.admin-sidebar-section-header');
+                        const header = section.querySelector('.admin-sidebar-section-header');
                         if (header) header.setAttribute('aria-expanded', 'true');
                         // Add to expanded sections if not already there
                         if (this.expandedSections.indexOf(key) === -1) {
@@ -507,10 +507,10 @@
 
                 // Scroll active item into view after a brief delay (allow expansion animation)
                 setTimeout(function() {
-                    var nav = self.sidebar.querySelector('.admin-sidebar-nav');
+                    const nav = self.sidebar.querySelector('.admin-sidebar-nav');
                     if (nav && activeItem) {
-                        var itemRect = activeItem.getBoundingClientRect();
-                        var navRect = nav.getBoundingClientRect();
+                        const itemRect = activeItem.getBoundingClientRect();
+                        const navRect = nav.getBoundingClientRect();
 
                         // Check if item is outside visible area
                         if (itemRect.top < navRect.top || itemRect.bottom > navRect.bottom) {

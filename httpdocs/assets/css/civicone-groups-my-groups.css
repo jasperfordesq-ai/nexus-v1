@@ -30,9 +30,6 @@
     transform: translateY(0);
 }
 
-/* Animation removed for GOV.UK compliance */
-    to { opacity: 1; transform: translateY(0); }
-}
 
 #my-groups-glass-wrapper .group-card {
     /* animation removed for GOV.UK compliance */

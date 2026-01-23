@@ -401,7 +401,7 @@
             const emptyState = this.sheet.querySelector('.mobile-select-empty');
             const lowerQuery = query.toLowerCase().trim();
             let visibleCount = 0;
-            let visibleGroups = new Set();
+            const visibleGroups = new Set();
 
             options.forEach(option => {
                 const text = option.querySelector('.mobile-select-option-label').textContent.toLowerCase();

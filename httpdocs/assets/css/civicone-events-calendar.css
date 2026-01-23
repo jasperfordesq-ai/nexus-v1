@@ -41,9 +41,6 @@
         radial-gradient(ellipse 50% 30% at 50% 80%, rgba(251, 191, 36, 0.12) 0%, transparent 50%);
 }
 
-/* Animation removed for GOV.UK compliance */
-    100% { opacity: 0.8; transform: scale(1.1); }
-}
 
 /* Floating Orbs */
 .holo-orb {
