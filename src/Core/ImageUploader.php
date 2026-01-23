@@ -48,8 +48,8 @@ class ImageUploader
             throw new \Exception("File too large. Max 8MB.");
         }
 
-        // Generate secure filename (extension already validated above)
-        $filename = \uniqid() . '.' . $extension;
+        // Generate secure filename using cryptographically secure random bytes
+        $filename = \bin2hex(\random_bytes(16)) . '.' . $extension;
 
         // Tenant Scoping
         $tenant = \Nexus\Core\TenantContext::get();
