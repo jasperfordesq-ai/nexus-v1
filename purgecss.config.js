@@ -74,6 +74,7 @@ module.exports = {
         'httpdocs/assets/css/civicone-contact.css',
         'httpdocs/assets/css/civicone-dashboard-nexus-score.css',
         'httpdocs/assets/css/civicone-dashboard.css',
+        'httpdocs/assets/css/civicone-demo-pages.css',
         'httpdocs/assets/css/civicone-dev-banner.css',
         'httpdocs/assets/css/civicone-directory-utilities.css',
         'httpdocs/assets/css/civicone-events-calendar.css',
