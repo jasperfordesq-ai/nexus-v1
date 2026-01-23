@@ -4,6 +4,7 @@ namespace Nexus\Controllers;
 
 use Nexus\Core\Auth;
 use Nexus\Core\TenantContext;
+use Nexus\Helpers\CorsHelper;
 use Nexus\Services\FederationUserService;
 use Nexus\Services\FederationRealtimeService;
 use Nexus\Services\PusherService;
@@ -45,7 +46,7 @@ class FederationStreamController
         header('Cache-Control: no-cache');
         header('Connection: keep-alive');
         header('X-Accel-Buffering: no'); // Disable nginx buffering
-        header('Access-Control-Allow-Origin: *');
+        CorsHelper::setHeaders();
 
         // Disable output buffering
         if (ob_get_level()) {

@@ -4,6 +4,7 @@ namespace Nexus\Controllers\Api;
 
 use Nexus\Core\Database;
 use Nexus\Core\TenantContext;
+use Nexus\Helpers\CorsHelper;
 use Nexus\Middleware\FederationApiMiddleware;
 use Nexus\Services\FederationGateway;
 use Nexus\Services\FederationSearchService;
@@ -675,15 +676,9 @@ class FederationApiController
      */
     public function oauthToken(): void
     {
-        // Set CORS headers for token endpoint
-        header('Access-Control-Allow-Origin: *');
-        header('Access-Control-Allow-Methods: POST, OPTIONS');
-        header('Access-Control-Allow-Headers: Content-Type, Authorization');
-
-        if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
-            http_response_code(204);
-            exit;
-        }
+        // Handle CORS preflight and set headers for token endpoint
+        CorsHelper::handlePreflight([], ['POST', 'OPTIONS'], ['Content-Type', 'Authorization']);
+        CorsHelper::setHeaders([], ['POST', 'OPTIONS'], ['Content-Type', 'Authorization']);
 
         // Handle token request
         $result = FederationJwtService::handleTokenRequest();
