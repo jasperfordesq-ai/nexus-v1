@@ -32,7 +32,7 @@
     let progressBar = null;
     let progressCircle = null;
     let rafId = null;
-    let lastScrollY = 0;
+    const lastScrollY = 0;
 
     /**
      * Calculate scroll progress

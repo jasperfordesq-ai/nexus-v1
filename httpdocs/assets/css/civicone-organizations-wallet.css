@@ -33,9 +33,6 @@
         radial-gradient(ellipse at 80% 20%, rgba(5, 150, 105, 0.15) 0%, transparent 45%);
 }
 
-/* Animation removed for GOV.UK compliance */
-    50% { transform: translate(-1%, 1%) scale(1.02); }
-}
 
 /* Container */
 .org-wallet-container {

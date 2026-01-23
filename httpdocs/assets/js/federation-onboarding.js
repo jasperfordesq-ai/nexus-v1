@@ -5,19 +5,19 @@
 (function() {
     'use strict';
 
-    var config = window.federationOnboardingConfig || {};
-    var basePath = config.basePath || '';
-    var csrfToken = config.csrfToken || '';
+    const config = window.federationOnboardingConfig || {};
+    const basePath = config.basePath || '';
+    const csrfToken = config.csrfToken || '';
 
     // State
-    var currentStep = 1;
-    var enableFederation = true;
-    var privacyLevel = 'social';
+    let currentStep = 1;
+    let enableFederation = true;
+    let privacyLevel = 'social';
 
     // Elements
-    var steps = document.querySelectorAll('.wizard-step');
-    var progressSteps = document.querySelectorAll('.progress-step');
-    var progressLines = document.querySelectorAll('.progress-line');
+    const steps = document.querySelectorAll('.wizard-step');
+    const progressSteps = document.querySelectorAll('.progress-step');
+    const progressLines = document.querySelectorAll('.progress-line');
 
     function showStep(stepNum) {
         steps.forEach(function(s) {
@@ -25,7 +25,7 @@
             s.setAttribute('hidden', '');
         });
 
-        var step = document.querySelector('.wizard-step[data-step="' + stepNum + '"]');
+        const step = document.querySelector('.wizard-step[data-step="' + stepNum + '"]');
         if (step) {
             step.classList.add('active');
             step.removeAttribute('hidden');
@@ -33,7 +33,7 @@
 
         // Update progress
         progressSteps.forEach(function(ps, i) {
-            var num = i + 1;
+            const num = i + 1;
             ps.classList.remove('active', 'completed');
             ps.removeAttribute('aria-current');
 
@@ -65,7 +65,7 @@
 
         // Focus first focusable element in new step
         if (step) {
-            var focusable = step.querySelector('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
+            const focusable = step.querySelector('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
             if (focusable) {
                 setTimeout(function() { focusable.focus(); }, 100);
             }
@@ -94,10 +94,10 @@
     });
 
     // Step 1: Enable federation choice
-    var step1Next = document.getElementById('step1Next');
+    const step1Next = document.getElementById('step1Next');
     if (step1Next) {
         step1Next.addEventListener('click', function() {
-            var selected = document.querySelector('.wizard-step[data-step="1"] .option-card.selected');
+            const selected = document.querySelector('.wizard-step[data-step="1"] .option-card.selected');
             enableFederation = selected && selected.dataset.value === 'yes';
 
             if (enableFederation) {
@@ -109,8 +109,8 @@
     }
 
     // Step 2: Privacy level
-    var step2Back = document.getElementById('step2Back');
-    var step2Next = document.getElementById('step2Next');
+    const step2Back = document.getElementById('step2Back');
+    const step2Next = document.getElementById('step2Next');
 
     if (step2Back) {
         step2Back.addEventListener('click', function() { showStep(1); });
@@ -118,14 +118,14 @@
 
     if (step2Next) {
         step2Next.addEventListener('click', function() {
-            var selected = document.querySelector('#privacyOptions .option-card.selected');
+            const selected = document.querySelector('#privacyOptions .option-card.selected');
             privacyLevel = selected ? selected.dataset.value : 'social';
 
             // Auto-set toggles based on privacy level
-            var toggleLocation = document.getElementById('toggleLocation');
-            var toggleSkills = document.getElementById('toggleSkills');
-            var toggleMessaging = document.getElementById('toggleMessaging');
-            var toggleTransactions = document.getElementById('toggleTransactions');
+            const toggleLocation = document.getElementById('toggleLocation');
+            const toggleSkills = document.getElementById('toggleSkills');
+            const toggleMessaging = document.getElementById('toggleMessaging');
+            const toggleTransactions = document.getElementById('toggleTransactions');
 
             if (privacyLevel === 'discovery') {
                 toggleLocation.checked = false;
@@ -149,8 +149,8 @@
     }
 
     // Step 3: Fine-tune and save
-    var step3Back = document.getElementById('step3Back');
-    var step3Next = document.getElementById('step3Next');
+    const step3Back = document.getElementById('step3Back');
+    const step3Next = document.getElementById('step3Next');
 
     if (step3Back) {
         step3Back.addEventListener('click', function() { showStep(2); });
@@ -158,11 +158,11 @@
 
     if (step3Next) {
         step3Next.addEventListener('click', function() {
-            var btn = step3Next;
+            const btn = step3Next;
             btn.disabled = true;
             btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin" aria-hidden="true"></i> Saving...';
 
-            var data = {
+            const data = {
                 federation_optin: true,
                 privacy_level: privacyLevel,
                 service_reach: 'local_only',
@@ -199,17 +199,17 @@
 
     // Confetti animation
     function launchConfetti() {
-        var canvas = document.getElementById('confetti');
+        const canvas = document.getElementById('confetti');
         if (!canvas) return;
 
-        var ctx = canvas.getContext('2d');
+        const ctx = canvas.getContext('2d');
         canvas.width = window.innerWidth;
         canvas.height = window.innerHeight;
 
-        var pieces = [];
-        var colors = ['#8b5cf6', '#7c3aed', '#10b981', '#f59e0b', '#ec4899'];
+        const pieces = [];
+        const colors = ['#8b5cf6', '#7c3aed', '#10b981', '#f59e0b', '#ec4899'];
 
-        for (var i = 0; i < 150; i++) {
+        for (let i = 0; i < 150; i++) {
             pieces.push({
                 x: canvas.width / 2,
                 y: canvas.height / 2,
@@ -224,7 +224,7 @@
         function animate() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-            var active = false;
+            let active = false;
             pieces.forEach(function(p) {
                 p.x += p.vx;
                 p.y += p.vy;
@@ -253,7 +253,7 @@
     }
 
     // Offline indicator
-    var banner = document.getElementById('offlineBanner');
+    const banner = document.getElementById('offlineBanner');
     if (banner) {
         window.addEventListener('online', function() { banner.classList.remove('visible'); });
         window.addEventListener('offline', function() { banner.classList.add('visible'); });

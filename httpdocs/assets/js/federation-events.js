@@ -5,19 +5,19 @@
 (function() {
     'use strict';
 
-    var basePath = window.federationEventsBasePath || '';
-    var currentPage = 1;
-    var totalPages = 1;
-    var searchTimeout;
+    const basePath = window.federationEventsBasePath || '';
+    let currentPage = 1;
+    let totalPages = 1;
+    let searchTimeout;
 
-    var eventsContainer = document.getElementById('events-container');
-    var searchInput = document.getElementById('event-search');
-    var timebankFilter = document.getElementById('timebank-filter');
-    var timeFilter = document.getElementById('time-filter');
-    var pagination = document.getElementById('pagination');
-    var prevBtn = document.getElementById('prev-page');
-    var nextBtn = document.getElementById('next-page');
-    var pageInfo = document.getElementById('page-info');
+    const eventsContainer = document.getElementById('events-container');
+    const searchInput = document.getElementById('event-search');
+    const timebankFilter = document.getElementById('timebank-filter');
+    const timeFilter = document.getElementById('time-filter');
+    const pagination = document.getElementById('pagination');
+    const prevBtn = document.getElementById('prev-page');
+    const nextBtn = document.getElementById('next-page');
+    const pageInfo = document.getElementById('page-info');
 
     if (!eventsContainer) return;
 
@@ -29,7 +29,7 @@
                 '<p class="loading-text">Loading federated events...</p>' +
             '</div>';
 
-        var params = new URLSearchParams({
+        const params = new URLSearchParams({
             page: currentPage,
             search: searchInput ? searchInput.value : '',
             tenant_id: timebankFilter ? timebankFilter.value : '',
@@ -70,7 +70,7 @@
             return;
         }
 
-        var html = '<div class="events-grid" role="list" aria-label="Federated events">';
+        let html = '<div class="events-grid" role="list" aria-label="Federated events">';
         events.forEach(function(event) {
             html += renderEventCard(event);
         });
@@ -80,19 +80,19 @@
 
     // Render single event card
     function renderEventCard(event) {
-        var eventDate = new Date(event.event_date);
-        var formattedDate = eventDate.toLocaleDateString('en-US', {
+        const eventDate = new Date(event.event_date);
+        const formattedDate = eventDate.toLocaleDateString('en-US', {
             weekday: 'short',
             month: 'short',
             day: 'numeric',
             hour: 'numeric',
             minute: '2-digit'
         });
-        var isoDate = eventDate.toISOString();
+        const isoDate = eventDate.toISOString();
 
-        var spotsLeft = event.max_attendees ? (event.max_attendees - (event.attendee_count || 0)) : null;
-        var spotsClass = 'spots-available';
-        var spotsText = 'Spots Available';
+        const spotsLeft = event.max_attendees ? (event.max_attendees - (event.attendee_count || 0)) : null;
+        let spotsClass = 'spots-available';
+        let spotsText = 'Spots Available';
 
         if (spotsLeft !== null) {
             if (spotsLeft <= 0) {
@@ -169,11 +169,11 @@
     function updateTimebankFilter(tenants) {
         if (!timebankFilter) return;
 
-        var currentValue = timebankFilter.value;
+        const currentValue = timebankFilter.value;
         timebankFilter.innerHTML = '<option value="">All Timebanks</option>';
 
         tenants.forEach(function(tenant) {
-            var option = document.createElement('option');
+            const option = document.createElement('option');
             option.value = tenant.id;
             option.textContent = tenant.name;
             if (tenant.id == currentValue) option.selected = true;
@@ -196,7 +196,7 @@
     // Escape HTML
     function escapeHtml(text) {
         if (!text) return '';
-        var div = document.createElement('div');
+        const div = document.createElement('div');
         div.textContent = text;
         return div.innerHTML;
     }
@@ -248,7 +248,7 @@
     loadEvents();
 
     // Offline indicator
-    var offlineBanner = document.getElementById('offlineBanner');
+    const offlineBanner = document.getElementById('offlineBanner');
     if (offlineBanner) {
         window.addEventListener('online', function() { offlineBanner.classList.remove('visible'); });
         window.addEventListener('offline', function() { offlineBanner.classList.add('visible'); });

@@ -43,7 +43,7 @@
     // 2. TRACK CSS LOADING
     // ============================================
 
-    let cssLoaded = 0;
+    const cssLoaded = 0;
     const requiredCSS = [
         'core'  // Combined bundle (matches core.min.css)
     ];

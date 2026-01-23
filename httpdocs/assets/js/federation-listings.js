@@ -81,7 +81,7 @@
                     }
                     hasMore = data.hasMore;
 
-                    var count = append ? currentOffset : data.listings.length;
+                    const count = append ? currentOffset : data.listings.length;
                     if (countLabel) {
                         countLabel.textContent = count + ' listing' + (count !== 1 ? 's' : '') + ' found';
                     }
@@ -119,13 +119,13 @@
     }
 
     function createListingCard(listing) {
-        var fallbackAvatar = 'https://ui-avatars.com/api/?name=' + encodeURIComponent(listing.owner_name || 'User') + '&background=8b5cf6&color=fff&size=100';
-        var avatar = listing.owner_avatar || fallbackAvatar;
-        var listingUrl = basePath + '/federation/listings/' + listing.id;
-        var type = listing.type || 'offer';
-        var typeIcon = type === 'offer' ? 'fa-hand-holding-heart' : 'fa-hand-holding';
+        const fallbackAvatar = 'https://ui-avatars.com/api/?name=' + encodeURIComponent(listing.owner_name || 'User') + '&background=8b5cf6&color=fff&size=100';
+        const avatar = listing.owner_avatar || fallbackAvatar;
+        const listingUrl = basePath + '/federation/listings/' + listing.id;
+        const type = listing.type || 'offer';
+        const typeIcon = type === 'offer' ? 'fa-hand-holding-heart' : 'fa-hand-holding';
 
-        var card = document.createElement('a');
+        const card = document.createElement('a');
         card.href = listingUrl;
         card.className = 'listing-card';
         card.setAttribute('role', 'listitem');
@@ -155,7 +155,7 @@
 
     function escapeHtml(text) {
         if (!text) return '';
-        var map = {'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;'};
+        const map = {'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;'};
         return String(text).replace(/[&<>"']/g, function(m) { return map[m]; });
     }
 
@@ -165,7 +165,7 @@
 
     // Infinite scroll
     if (infiniteScrollTrigger) {
-        var observer = new IntersectionObserver(function(entries) {
+        const observer = new IntersectionObserver(function(entries) {
             entries.forEach(function(entry) {
                 if (entry.isIntersecting && hasMore && !isLoading) {
                     isLoading = true;
@@ -178,7 +178,7 @@
     }
 
     // Offline indicator
-    var offlineBanner = document.getElementById('offlineBanner');
+    const offlineBanner = document.getElementById('offlineBanner');
     if (offlineBanner) {
         window.addEventListener('online', function() { offlineBanner.classList.remove('visible'); });
         window.addEventListener('offline', function() { offlineBanner.classList.add('visible'); });

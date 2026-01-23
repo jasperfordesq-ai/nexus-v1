@@ -32,9 +32,6 @@
     pointer-events: none;
 }
 
-/* Animation removed for GOV.UK compliance */
-    50% { opacity: 0.6; }
-}
 
 .score-hero-content {
     position: relative;
@@ -74,8 +71,6 @@
     filter: drop-shadow(0 0 10px var(--score-glow));
 }
 
-/* Animation removed for GOV.UK compliance */
-}
 
 .score-circle-text {
     position: absolute;

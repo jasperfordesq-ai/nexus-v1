@@ -21,11 +21,6 @@
     z-index: 1000;
 }
 
-/* Animation removed for GOV.UK compliance */
-    50% {
-        background-position: 100% 50%;
-    }
-}
 
 /* Animated stripe overlay */
 .civicone-dev-banner::before {
@@ -63,11 +58,6 @@
     /* animation removed for GOV.UK compliance */
 }
 
-/* Animation removed for GOV.UK compliance */
-    50% {
-        opacity: 0.8;
-    }
-}
 
 .civicone-dev-banner-content {
     display: flex;

@@ -5,18 +5,18 @@
 (function() {
     'use strict';
 
-    var basePath = window.federationGroupsBasePath || '';
-    var currentPage = 1;
-    var totalPages = 1;
-    var searchTimeout;
+    const basePath = window.federationGroupsBasePath || '';
+    let currentPage = 1;
+    let totalPages = 1;
+    let searchTimeout;
 
-    var groupsContainer = document.getElementById('groups-container');
-    var searchInput = document.getElementById('group-search');
-    var timebankFilter = document.getElementById('timebank-filter');
-    var pagination = document.getElementById('pagination');
-    var prevBtn = document.getElementById('prev-page');
-    var nextBtn = document.getElementById('next-page');
-    var pageInfo = document.getElementById('page-info');
+    const groupsContainer = document.getElementById('groups-container');
+    const searchInput = document.getElementById('group-search');
+    const timebankFilter = document.getElementById('timebank-filter');
+    const pagination = document.getElementById('pagination');
+    const prevBtn = document.getElementById('prev-page');
+    const nextBtn = document.getElementById('next-page');
+    const pageInfo = document.getElementById('page-info');
 
     if (!groupsContainer) return;
 
@@ -28,7 +28,7 @@
                 '<p class="loading-text">Loading federated groups...</p>' +
             '</div>';
 
-        var params = new URLSearchParams({
+        const params = new URLSearchParams({
             page: currentPage,
             search: searchInput ? searchInput.value : '',
             tenant_id: timebankFilter ? timebankFilter.value : ''
@@ -68,7 +68,7 @@
             return;
         }
 
-        var html = '<div class="groups-grid" role="list" aria-label="Federated groups">';
+        let html = '<div class="groups-grid" role="list" aria-label="Federated groups">';
         groups.forEach(function(group) {
             html += renderGroupCard(group);
         });
@@ -135,11 +135,11 @@
     function updateTimebankFilter(tenants) {
         if (!timebankFilter) return;
 
-        var currentValue = timebankFilter.value;
+        const currentValue = timebankFilter.value;
         timebankFilter.innerHTML = '<option value="">All Timebanks</option>';
 
         tenants.forEach(function(tenant) {
-            var option = document.createElement('option');
+            const option = document.createElement('option');
             option.value = tenant.id;
             option.textContent = tenant.name;
             if (tenant.id == currentValue) option.selected = true;
@@ -162,7 +162,7 @@
     // Escape HTML
     function escapeHtml(text) {
         if (!text) return '';
-        var div = document.createElement('div');
+        const div = document.createElement('div');
         div.textContent = text;
         return div.innerHTML;
     }
@@ -207,7 +207,7 @@
     loadGroups();
 
     // Offline indicator
-    var offlineBanner = document.getElementById('offlineBanner');
+    const offlineBanner = document.getElementById('offlineBanner');
     if (offlineBanner) {
         window.addEventListener('online', function() { offlineBanner.classList.remove('visible'); });
         window.addEventListener('offline', function() { offlineBanner.classList.add('visible'); });

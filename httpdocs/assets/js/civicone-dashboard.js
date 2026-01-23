@@ -25,12 +25,12 @@ function initCivicOneDashboard(basePath) {
 // ============================================
 
 function toggleCivicFab() {
-    var menu = document.getElementById('civicFabMenu');
-    var btn = document.querySelector('.civic-fab-main');
+    const menu = document.getElementById('civicFabMenu');
+    const btn = document.querySelector('.civic-fab-main');
 
     if (!menu || !btn) return;
 
-    var isOpen = !menu.hidden;
+    const isOpen = !menu.hidden;
     menu.hidden = isOpen;
     btn.classList.toggle('active', !isOpen);
     btn.setAttribute('aria-expanded', !isOpen);
@@ -41,14 +41,14 @@ function toggleCivicFab() {
 // ============================================
 
 function openEventsModal() {
-    var modal = document.getElementById('events-modal');
+    const modal = document.getElementById('events-modal');
     if (modal && typeof modal.showModal === 'function') {
         modal.showModal();
     }
 }
 
 function toggleNotifSettings() {
-    var panel = document.getElementById('notif-settings-panel');
+    const panel = document.getElementById('notif-settings-panel');
     if (panel) {
         panel.hidden = !panel.hidden;
     }
@@ -81,7 +81,7 @@ function updateNotifSetting(type, id, freq) {
 function deleteNotificationDashboard(id) {
     if (!confirm('Delete this notification?')) return;
 
-    var formData = new URLSearchParams();
+    const formData = new URLSearchParams();
     formData.append('id', id);
 
     fetch(NEXUS_BASE + '/api/notifications/delete', {
@@ -95,7 +95,7 @@ function deleteNotificationDashboard(id) {
     .then(function(res) { return res.json(); })
     .then(function(data) {
         if (data.success) {
-            var item = document.querySelector('[data-notif-id="' + id + '"]');
+            const item = document.querySelector('[data-notif-id="' + id + '"]');
             if (item) item.remove();
         } else {
             alert('Error: ' + (data.error || 'Unknown error'));
@@ -113,10 +113,10 @@ function deleteNotificationDashboard(id) {
 function deleteListing(id) {
     if (!confirm('Are you sure you want to delete this listing? This cannot be undone.')) return;
 
-    var el = document.getElementById('listing-' + id);
+    const el = document.getElementById('listing-' + id);
     if (el) el.style.opacity = '0.5';
 
-    var body = new URLSearchParams();
+    const body = new URLSearchParams();
     body.append('id', id);
     body.append('csrf_token', getCSRFToken());
 
@@ -156,18 +156,18 @@ function deleteListing(id) {
 // Wallet User Search
 // ============================================
 
-var dashSearchTimeout = null;
-var dashSelectedIndex = -1;
+let dashSearchTimeout = null;
+let dashSelectedIndex = -1;
 
 function initUserSearch() {
-    var dashSearchInput = document.getElementById('dashUserSearch');
-    var dashResultsContainer = document.getElementById('dashUserResults');
-    var dashSearchWrapper = document.getElementById('dashSearchWrapper');
+    const dashSearchInput = document.getElementById('dashUserSearch');
+    const dashResultsContainer = document.getElementById('dashUserResults');
+    const dashSearchWrapper = document.getElementById('dashSearchWrapper');
 
     if (!dashSearchInput) return;
 
     dashSearchInput.addEventListener('input', function() {
-        var query = this.value.trim();
+        const query = this.value.trim();
         clearTimeout(dashSearchTimeout);
 
         if (query.length < 1) {
@@ -182,7 +182,7 @@ function initUserSearch() {
     });
 
     dashSearchInput.addEventListener('keydown', function(e) {
-        var results = dashResultsContainer.querySelectorAll('.civic-user-result');
+        const results = dashResultsContainer.querySelectorAll('.civic-user-result');
         if (!results.length) return;
 
         if (e.key === 'ArrowDown') {
@@ -218,7 +218,7 @@ function updateDashResultsSelection(results) {
 }
 
 function searchDashUsers(query) {
-    var dashResultsContainer = document.getElementById('dashUserResults');
+    const dashResultsContainer = document.getElementById('dashUserResults');
 
     fetch(NEXUS_BASE + '/api/wallet/user-search', {
         method: 'POST',
@@ -231,8 +231,8 @@ function searchDashUsers(query) {
 
         if (data.status === 'success' && data.users && data.users.length > 0) {
             dashResultsContainer.innerHTML = data.users.map(function(user) {
-                var initial = (user.display_name || '?')[0].toUpperCase();
-                var avatarHtml = user.avatar_url
+                const initial = (user.display_name || '?')[0].toUpperCase();
+                const avatarHtml = user.avatar_url
                     ? '<img src="' + escapeHtml(user.avatar_url) + '" alt="" loading="lazy">'
                     : '<span>' + initial + '</span>';
 
@@ -262,17 +262,17 @@ function searchDashUsers(query) {
 }
 
 function selectDashUser(username, displayName, avatarUrl, userId) {
-    var dashUsernameInput = document.getElementById('dashRecipientUsername');
-    var dashRecipientId = document.getElementById('dashRecipientId');
-    var dashSelectedUser = document.getElementById('dashSelectedUser');
-    var dashSearchWrapper = document.getElementById('dashSearchWrapper');
-    var dashResultsContainer = document.getElementById('dashUserResults');
+    const dashUsernameInput = document.getElementById('dashRecipientUsername');
+    const dashRecipientId = document.getElementById('dashRecipientId');
+    const dashSelectedUser = document.getElementById('dashSelectedUser');
+    const dashSearchWrapper = document.getElementById('dashSearchWrapper');
+    const dashResultsContainer = document.getElementById('dashUserResults');
 
     dashUsernameInput.value = username;
     dashRecipientId.value = userId || '';
 
-    var initial = (displayName || '?')[0].toUpperCase();
-    var avatarEl = document.getElementById('dashSelectedAvatar');
+    const initial = (displayName || '?')[0].toUpperCase();
+    const avatarEl = document.getElementById('dashSelectedAvatar');
     avatarEl.innerHTML = avatarUrl
         ? '<img src="' + escapeHtml(avatarUrl) + '" alt="" loading="lazy">'
         : '<span>' + initial + '</span>';
@@ -286,11 +286,11 @@ function selectDashUser(username, displayName, avatarUrl, userId) {
 }
 
 function clearDashSelection() {
-    var dashUsernameInput = document.getElementById('dashRecipientUsername');
-    var dashRecipientId = document.getElementById('dashRecipientId');
-    var dashSelectedUser = document.getElementById('dashSelectedUser');
-    var dashSearchWrapper = document.getElementById('dashSearchWrapper');
-    var dashSearchInput = document.getElementById('dashUserSearch');
+    const dashUsernameInput = document.getElementById('dashRecipientUsername');
+    const dashRecipientId = document.getElementById('dashRecipientId');
+    const dashSelectedUser = document.getElementById('dashSelectedUser');
+    const dashSearchWrapper = document.getElementById('dashSearchWrapper');
+    const dashSearchInput = document.getElementById('dashUserSearch');
 
     dashUsernameInput.value = '';
     dashRecipientId.value = '';
@@ -301,17 +301,17 @@ function clearDashSelection() {
 }
 
 function validateDashTransfer(form) {
-    var username = document.getElementById('dashRecipientUsername').value.trim();
-    var recipientId = document.getElementById('dashRecipientId').value.trim();
+    const username = document.getElementById('dashRecipientUsername').value.trim();
+    const recipientId = document.getElementById('dashRecipientId').value.trim();
 
     if (!username && !recipientId) {
         alert('Please select a recipient from the search results.');
-        var searchInput = document.getElementById('dashUserSearch');
+        const searchInput = document.getElementById('dashUserSearch');
         if (searchInput) searchInput.focus();
         return false;
     }
 
-    var btn = form.querySelector('button[type="submit"]');
+    const btn = form.querySelector('button[type="submit"]');
     if (btn) {
         btn.disabled = true;
         btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin" aria-hidden="true"></i> Sending...';
@@ -327,11 +327,11 @@ function validateDashTransfer(form) {
 function initClickOutsideHandlers() {
     document.addEventListener('click', function(e) {
         // FAB menu
-        var fab = document.getElementById('civicFab');
-        var fabMenu = document.getElementById('civicFabMenu');
+        const fab = document.getElementById('civicFab');
+        const fabMenu = document.getElementById('civicFabMenu');
         if (fab && fabMenu && !fab.contains(e.target)) {
             fabMenu.hidden = true;
-            var btn = document.querySelector('.civic-fab-main');
+            const btn = document.querySelector('.civic-fab-main');
             if (btn) {
                 btn.classList.remove('active');
                 btn.setAttribute('aria-expanded', 'false');
@@ -339,8 +339,8 @@ function initClickOutsideHandlers() {
         }
 
         // User search results
-        var searchWrapper = document.getElementById('dashSearchWrapper');
-        var resultsContainer = document.getElementById('dashUserResults');
+        const searchWrapper = document.getElementById('dashSearchWrapper');
+        const resultsContainer = document.getElementById('dashUserResults');
         if (searchWrapper && resultsContainer && !searchWrapper.contains(e.target)) {
             resultsContainer.hidden = true;
         }
@@ -353,12 +353,12 @@ function initClickOutsideHandlers() {
 
 function escapeHtml(text) {
     if (!text) return '';
-    var div = document.createElement('div');
+    const div = document.createElement('div');
     div.textContent = text;
     return div.innerHTML;
 }
 
 function getCSRFToken() {
-    var meta = document.querySelector('meta[name="csrf-token"]');
+    const meta = document.querySelector('meta[name="csrf-token"]');
     return meta ? meta.getAttribute('content') : '';
 }

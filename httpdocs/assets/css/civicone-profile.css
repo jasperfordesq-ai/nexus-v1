@@ -112,9 +112,6 @@
     border-color: var(--color-gray-800);
 }
 
-/* Animation removed for GOV.UK compliance */
-    50% { opacity: 0.85; transform: scale(1.1); }
-}
 
 @media (prefers-reduced-motion: reduce) {
     .civic-online-indicator {

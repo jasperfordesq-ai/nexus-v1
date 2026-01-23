@@ -169,7 +169,7 @@
 }
 
 .hero-stat-card:hover {
-    transform: translateY(-var(--space-1));
+    transform: translateY(calc(-1 * var(--space-1)));
     box-shadow: 0 var(--space-2) var(--space-8) rgba(0, 0, 0, 0.12);
 }
 
@@ -617,7 +617,7 @@
 
 .stats-grid .stat-item:hover {
     background: rgba(99, 102, 241, 0.08);
-    transform: translateY(-var(--space-1));
+    transform: translateY(calc(-1 * var(--space-1)));
 }
 
 .stat-icon {
@@ -679,7 +679,7 @@
 }
 
 .empty-state .cta-btn:hover {
-    transform: translateY(-var(--space-1));
+    transform: translateY(calc(-1 * var(--space-1)));
     box-shadow: 0 var(--space-1) var(--space-4) rgba(99, 102, 241, 0.4);
 }
 
@@ -848,7 +848,7 @@
 }
 
 .achievement-card:hover {
-    transform: translateY(-var(--space-1));
+    transform: translateY(calc(-1 * var(--space-1)));
     box-shadow: 0 var(--space-3) var(--space-10) rgba(0, 0, 0, 0.15);
 }
 
@@ -1858,7 +1858,7 @@
 }
 
 .badge-item:hover {
-    transform: translateY(-var(--space-1));
+    transform: translateY(calc(-1 * var(--space-1)));
 }
 
 .badge-item.earned:hover {
@@ -2034,7 +2034,7 @@
 }
 
 .challenge-card:hover {
-    transform: translateY(-var(--space-1));
+    transform: translateY(calc(-1 * var(--space-1)));
 }
 
 .challenge-card.completed {
@@ -2754,7 +2754,7 @@
 }
 
 .shop-item:hover {
-    transform: translateY(-var(--space-1));
+    transform: translateY(calc(-1 * var(--space-1)));
     box-shadow: 0 var(--space-3) var(--space-10) rgba(0, 0, 0, 0.15);
 }
 

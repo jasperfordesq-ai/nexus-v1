@@ -35,10 +35,10 @@
     };
 
     // State
-    let navigationHistory = [];
+    const navigationHistory = [];
     let currentIndex = -1;
     let isTransitioning = false;
-    let prefetchedUrls = new Set();
+    const prefetchedUrls = new Set();
     let loadingBar = null;
     let loadingOverlay = null;
     let spinnerTimeout = null;

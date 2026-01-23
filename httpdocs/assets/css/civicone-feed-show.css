@@ -91,14 +91,6 @@
         radial-gradient(ellipse at 60% 80%, rgba(168, 85, 247, 0.15) 0%, transparent 50%);
 }
 
-/* Animation removed for GOV.UK compliance */
-    33% { transform: translate(-2%, 1%) rotate(1deg) scale(1.02); }
-    66% { transform: translate(1%, -1%) rotate(-1deg) scale(0.98); }
-}
-
-/* Animation removed for GOV.UK compliance */
-    100% { background-position: 40px 0; }
-}
 
 .post-detail-container {
     max-width: 800px;

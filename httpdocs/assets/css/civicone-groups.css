@@ -570,12 +570,6 @@
     display: block;
 }
 
-/* Animation removed for GOV.UK compliance */
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
 
 @media (prefers-reduced-motion: reduce) {
     .civic-tab-pane {
