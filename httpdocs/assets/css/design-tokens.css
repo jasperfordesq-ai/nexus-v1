@@ -250,6 +250,7 @@
     --color-emerald-600-alpha-10: rgba(5, 150, 105, 0.1);
     --color-emerald-600-alpha-15: rgba(5, 150, 105, 0.15);
     --color-emerald-600-alpha-20: rgba(5, 150, 105, 0.2);
+    --color-emerald-600-alpha-30: rgba(5, 150, 105, 0.3);
 
     /* Emerald-300 opacity variants (52, 211, 153 = #34d399) */
     --color-emerald-300-alpha-8: rgba(52, 211, 153, 0.08);
@@ -432,6 +433,9 @@
     --color-pink-600-alpha-8: rgba(219, 39, 119, 0.08);
     --color-pink-600-alpha-10: rgba(219, 39, 119, 0.1);
     --color-pink-500-alpha-5: rgba(236, 72, 153, 0.05);
+    --color-pink-500-alpha-10: rgba(236, 72, 153, 0.1);
+    --color-pink-500-alpha-30: rgba(236, 72, 153, 0.3);
+    --color-pink-500-alpha-40: rgba(236, 72, 153, 0.4);
     --color-pink-600-alpha-15: rgba(219, 39, 119, 0.15);
     --color-pink-600-alpha-20: rgba(219, 39, 119, 0.2);
     --color-pink-600-alpha-25: rgba(219, 39, 119, 0.25);
@@ -454,6 +458,7 @@
 
     /* Blue-600 opacity variants (37, 99, 235 = #2563eb) */
     --color-blue-600-alpha-3: rgba(37, 99, 235, 0.03);
+    --color-blue-600-alpha-5: rgba(37, 99, 235, 0.05);
     --color-blue-600-alpha-10: rgba(37, 99, 235, 0.1);
     --color-blue-600-alpha-30: rgba(37, 99, 235, 0.3);
     --color-blue-600-alpha-40: rgba(37, 99, 235, 0.4);
@@ -678,6 +683,7 @@
     --color-emerald-alpha-35: rgba(16, 185, 129, 0.35);
 
     /* Gray-500 opacity variants (107, 114, 128 = #6b7280) */
+    --color-gray-500-alpha-10: rgba(107, 114, 128, 0.1);
     --color-gray-500-alpha-15: rgba(107, 114, 128, 0.15);
     --color-gray-500-alpha-20: rgba(107, 114, 128, 0.2);
 
@@ -766,6 +772,24 @@
 
     /* GOV.UK Tag colors */
     --color-govuk-tag-light-blue: #d2e2f1;
+
+    /* GOV.UK Green opacity variants (0, 112, 60 = #00703c) */
+    --color-govuk-green-alpha-30: rgba(0, 112, 60, 0.3);
+    --color-govuk-green-alpha-50: rgba(0, 112, 60, 0.5);
+    --color-govuk-green-alpha-60: rgba(0, 112, 60, 0.6);
+
+    /* GOV.UK Orange opacity variants (244, 119, 56 = #f47738) */
+    --color-govuk-orange-alpha-30: rgba(244, 119, 56, 0.3);
+    --color-govuk-orange-alpha-50: rgba(244, 119, 56, 0.5);
+    --color-govuk-orange-alpha-60: rgba(244, 119, 56, 0.6);
+
+    /* Gold/Bootstrap Amber opacity variants (255, 193, 7 = #ffc107) */
+    --color-gold-alpha-30: rgba(255, 193, 7, 0.3);
+    --color-gold-alpha-50: rgba(255, 193, 7, 0.5);
+
+    /* Material Purple opacity variants (156, 39, 176 = #9c27b0) */
+    --color-material-purple-alpha-30: rgba(156, 39, 176, 0.3);
+    --color-material-purple-alpha-50: rgba(156, 39, 176, 0.5);
 
     /* Achievement/Medal colors */
     --color-medal-bronze: #cd7f32;
