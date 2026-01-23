@@ -20,7 +20,7 @@
         background: white;
         border-radius: var(--radius-lg);
         overflow: hidden;
-        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        box-shadow: 0 4px 6px -1px var(--color-black-alpha-10), 0 2px 4px -1px var(--color-black-alpha-6);
     }
 
     /* Reset negative margin for Social/Civic layouts */
@@ -179,9 +179,9 @@
        ======================================== */
 
     [data-theme="dark"] .auth-card {
-        background: rgba(30, 41, 59, 0.85);
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+        background: var(--color-slate-alpha-85);
+        border: 1px solid var(--color-white-alpha-10);
+        box-shadow: 0 10px 40px var(--color-black-alpha-40);
     }
 
     [data-theme="dark"] .form-label {
@@ -189,8 +189,8 @@
     }
 
     [data-theme="dark"] .form-input {
-        background: rgba(15, 23, 42, 0.6);
-        border-color: rgba(255, 255, 255, 0.15);
+        background: var(--color-slate-900-alpha-60);
+        border-color: var(--color-white-alpha-15);
         color: var(--color-slate-100);
     }
 
@@ -200,7 +200,7 @@
 
     [data-theme="dark"] .form-input:focus {
         border-color: var(--color-primary-500) !important;
-        box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+        box-shadow: 0 0 0 3px var(--color-indigo-alpha-20);
     }
 
     [data-theme="dark"] .form-note {
@@ -209,9 +209,9 @@
 
     /* Password Rules */
     [data-theme="dark"] .password-rules {
-        background: rgba(15, 23, 42, 0.6);
+        background: var(--color-slate-900-alpha-60);
         color: var(--color-slate-400);
-        border: 1px solid rgba(255, 255, 255, 0.1);
+        border: 1px solid var(--color-white-alpha-10);
     }
 
     [data-theme="dark"] .rules-title {
@@ -225,8 +225,8 @@
 
     /* Data Protection Notice Box */
     [data-theme="dark"] div[style*="background: var(--color-gray-50)"][style*="border-radius: var(--radius-md)"] {
-        background: rgba(15, 23, 42, 0.6) !important;
-        border: 1px solid rgba(255, 255, 255, 0.1);
+        background: var(--color-slate-900-alpha-60) !important;
+        border: 1px solid var(--color-white-alpha-10);
     }
 
     [data-theme="dark"] div[style*="background: var(--color-gray-50)"] p[style*="color: var(--color-gray-700)"] {
@@ -249,7 +249,7 @@
 
     /* Select dropdown */
     [data-theme="dark"] select.form-input {
-        background: rgba(15, 23, 42, 0.6);
+        background: var(--color-slate-900-alpha-60);
         color: var(--color-slate-100);
     }
 

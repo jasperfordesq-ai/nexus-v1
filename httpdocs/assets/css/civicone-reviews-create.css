@@ -25,15 +25,15 @@
     right: 0;
     bottom: 0;
     background:
-        radial-gradient(ellipse at 20% 30%, rgba(139, 92, 246, 0.12) 0%, transparent 50%),
-        radial-gradient(ellipse at 80% 70%, rgba(217, 70, 239, 0.1) 0%, transparent 50%);
+        radial-gradient(ellipse at 20% 30%, var(--color-violet-alpha-12) 0%, transparent 50%),
+        radial-gradient(ellipse at 80% 70%, var(--color-fuchsia-alpha-10) 0%, transparent 50%);
     pointer-events: none;
 }
 
 [data-theme="dark"] .review-page-wrapper::before {
     background:
-        radial-gradient(ellipse at 20% 30%, rgba(139, 92, 246, 0.2) 0%, transparent 50%),
-        radial-gradient(ellipse at 80% 70%, rgba(217, 70, 239, 0.15) 0%, transparent 50%);
+        radial-gradient(ellipse at 20% 30%, var(--color-violet-alpha-20) 0%, transparent 50%),
+        radial-gradient(ellipse at 80% 70%, var(--color-fuchsia-alpha-15) 0%, transparent 50%);
 }
 
 .review-card-container {
@@ -44,18 +44,18 @@
 }
 
 .review-glass-card {
-    background: rgba(255, 255, 255, 0.95);
+    background: var(--color-white-alpha-95);
     /* backdrop-filter removed for GOV.UK compliance */
     -webkit-/* backdrop-filter removed for GOV.UK compliance */
-    border: 1px solid rgba(255, 255, 255, 0.8);
-    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15);
+    border: 1px solid var(--color-white-alpha-80);
+    box-shadow: 0 25px 50px -12px var(--color-black-alpha-15);
     border-radius: var(--radius-2xl);
     overflow: hidden;
 }
 
 [data-theme="dark"] .review-glass-card {
-    background: rgba(30, 41, 59, 0.9);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: var(--color-slate-alpha-90);
+    border: 1px solid var(--color-white-alpha-10);
 }
 
 .review-header {
@@ -70,7 +70,7 @@
     font-size: 1.75rem;
     font-weight: 800;
     letter-spacing: -0.5px;
-    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    text-shadow: 0 2px 4px var(--color-black-alpha-10);
 }
 
 .review-header .subtitle {
@@ -129,7 +129,7 @@
 .star-rating-wrapper input[type="radio"]:checked ~ label {
     color: var(--color-warning-500);
     transform: scale(1.1);
-    filter: drop-shadow(0 0 4px rgba(245, 158, 11, 0.4));
+    filter: drop-shadow(0 0 4px var(--color-amber-500-alpha-40));
 }
 
 .star-rating-wrapper label:hover,
@@ -169,8 +169,8 @@
 }
 
 [data-theme="dark"] .comment-textarea {
-    background: rgba(15, 23, 42, 0.5);
-    border-color: rgba(255, 255, 255, 0.1);
+    background: var(--color-slate-900-alpha-50);
+    border-color: var(--color-white-alpha-10);
     color: var(--color-slate-100);
 }
 
@@ -180,7 +180,7 @@
 }
 
 [data-theme="dark"] .comment-textarea:focus {
-    background: rgba(30, 41, 59, 0.8);
+    background: var(--color-slate-alpha-80);
 }
 
 .submit-btn {
@@ -192,14 +192,14 @@
     border: none;
     font-size: 1rem;
     cursor: pointer;
-    box-shadow: 0 4px 15px rgba(124, 58, 237, 0.3);
+    box-shadow: 0 4px 15px var(--color-purple-600-alpha-30);
     transition: transform 0.2s, box-shadow 0.2s;
     width: 100%;
 }
 
 .submit-btn:hover {
     transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(124, 58, 237, 0.4);
+    box-shadow: 0 6px 20px var(--color-purple-600-alpha-40);
 }
 
 .back-link-section {

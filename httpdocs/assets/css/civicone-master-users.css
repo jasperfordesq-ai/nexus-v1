@@ -214,12 +214,12 @@
    ======================================== */
 
 [data-theme="dark"] .nexus-card {
-    background: rgba(30, 41, 59, 0.85);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: var(--color-slate-alpha-85);
+    border: 1px solid var(--color-white-alpha-10);
 }
 
 [data-theme="dark"] .master-users-card-header {
-    border-color: rgba(255, 255, 255, 0.1);
+    border-color: var(--color-white-alpha-10);
 }
 
 [data-theme="dark"] .master-users-card-header h3 {
@@ -228,7 +228,7 @@
 
 /* Table header */
 [data-theme="dark"] .master-users-table thead {
-    background: rgba(30, 41, 59, 0.6);
+    background: var(--color-slate-alpha-60);
 }
 
 [data-theme="dark"] .master-users-table th {
@@ -237,7 +237,7 @@
 
 /* Table rows */
 [data-theme="dark"] .master-users-table tbody tr {
-    border-color: rgba(255, 255, 255, 0.1);
+    border-color: var(--color-white-alpha-10);
 }
 
 [data-theme="dark"] .master-users-id,
@@ -252,12 +252,12 @@
 
 /* Tenant badges */
 [data-theme="dark"] .master-users-badge-platform {
-    background: rgba(51, 65, 85, 0.6);
+    background: var(--color-slate-600-alpha-60);
     color: var(--color-slate-200);
 }
 
 [data-theme="dark"] .master-users-badge-tenant {
-    background: rgba(14, 165, 233, 0.2);
+    background: var(--color-sky-500-alpha-20);
     color: #7dd3fc;
 }
 
@@ -272,18 +272,18 @@
 
 /* Status badges */
 [data-theme="dark"] .master-users-status-active {
-    background: rgba(22, 163, 74, 0.2);
+    background: var(--color-green-600-alpha-20);
     color: var(--color-green-300);
 }
 
 [data-theme="dark"] .master-users-status-pending {
-    background: rgba(234, 179, 8, 0.2);
+    background: var(--color-yellow-500-alpha-20);
     color: #fde047;
 }
 
 /* Buttons */
 [data-theme="dark"] .nexus-btn-secondary {
-    background: rgba(51, 65, 85, 0.6);
-    border-color: rgba(255, 255, 255, 0.15);
+    background: var(--color-slate-600-alpha-60);
+    border-color: var(--color-white-alpha-15);
     color: var(--color-slate-200);
 }
