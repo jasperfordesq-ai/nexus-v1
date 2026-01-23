@@ -35,7 +35,7 @@
     --civic-wallet-text-muted: var(--color-gray-300);
     --civic-wallet-border: var(--color-gray-700);
     --civic-wallet-positive: var(--color-teal-400);
-    --civic-wallet-negative: #fc8181;
+    --civic-wallet-negative: var(--color-red-400-alt);
 }
 
 
@@ -181,14 +181,14 @@
     align-items: center;
     gap: var(--space-3);
     padding: var(--space-3);
-    background: #F0F9FF;
+    background: var(--color-selected-user-bg);
     border: 2px solid var(--civic-brand, var(--color-govuk-blue-light));
     border-radius: var(--radius-base);
     margin-bottom: var(--space-4);
 }
 
 [data-theme="dark"] .civic-selected-user {
-    background: #1E3A5F;
+    background: var(--color-selected-user-bg-dark);
 }
 
 .civic-selected-user.show {
@@ -264,7 +264,7 @@
 }
 
 .wallet-table-desktop thead tr {
-    background: #DEE0E2;
+    background: var(--color-table-header);
     text-align: left;
 }
 
@@ -376,7 +376,7 @@
     right: 0;
     bottom: 0;
     z-index: -1;
-    background: linear-gradient(135deg, var(--color-slate-50) 0%, #faf5ff 25%, #f3e8ff 50%, #faf5ff 75%, var(--color-slate-50) 100%);
+    background: linear-gradient(135deg, var(--color-slate-50) 0%, var(--color-purple-50) 25%, var(--color-purple-100) 50%, var(--color-purple-50) 75%, var(--color-slate-50) 100%);
 }
 
 .insights-bg::before {
@@ -394,7 +394,7 @@
 }
 
 [data-theme="dark"] .insights-bg {
-    background: linear-gradient(135deg, var(--color-slate-900) 0%, #2e1065 50%, var(--color-slate-900) 100%);
+    background: linear-gradient(135deg, var(--color-slate-900) 0%, var(--color-purple-950) 50%, var(--color-slate-900) 100%);
 }
 
 [data-theme="dark"] .insights-bg::before {
@@ -570,7 +570,7 @@
 [data-theme="dark"] .insights-stat-icon.green { background: rgba(16, 185, 129, 0.2); color: var(--color-success-400); }
 [data-theme="dark"] .insights-stat-icon.red { background: rgba(239, 68, 68, 0.2); color: var(--color-red-400); }
 [data-theme="dark"] .insights-stat-icon.blue { background: rgba(59, 130, 246, 0.2); color: var(--color-blue-400); }
-[data-theme="dark"] .insights-stat-icon.purple { background: rgba(168, 85, 247, 0.2); color: #c084fc; }
+[data-theme="dark"] .insights-stat-icon.purple { background: rgba(168, 85, 247, 0.2); color: var(--color-purple-400); }
 
 .insights-stat-value {
     font-size: var(--font-size-4xl);

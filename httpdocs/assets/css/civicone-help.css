@@ -20,13 +20,13 @@
     --civic-help-text-muted: var(--color-gray-600);         /* 6.6:1 on white */
 
     /* Background colors */
-    --civic-help-bg-page: #f5f6f7;
+    --civic-help-bg-page: var(--color-gray-100);
     --civic-help-bg-card: var(--color-white);
     --civic-help-bg-hover: var(--color-gray-100);
     --civic-help-bg-article: var(--color-gray-50);
 
     /* Interactive colors */
-    --civic-help-primary: var(--skin-primary, #1e40af);
+    --civic-help-primary: var(--skin-primary, var(--color-blue-750));
     --civic-help-primary-hover: var(--skin-primary-dark, var(--color-blue-800));
     --civic-help-focus-ring: var(--color-brand-yellow);
 
@@ -34,7 +34,7 @@
     --civic-help-success-bg: var(--color-success-100);
     --civic-help-success-text: var(--color-green-800);       /* 4.8:1 on success bg */
     --civic-help-error-bg: var(--color-red-100);
-    --civic-help-error-text: #991b1b;         /* 5.1:1 on error bg */
+    --civic-help-error-text: var(--color-red-800);         /* 5.1:1 on error bg */
 
     /* Spacing */
     --civic-help-touch-min: 44px;
@@ -741,10 +741,10 @@
         --civic-help-bg-card: var(--color-gray-800);
         --civic-help-bg-hover: var(--color-gray-700);
         --civic-help-bg-article: var(--color-gray-800);
-        --civic-help-success-bg: #064e3b;
+        --civic-help-success-bg: var(--color-emerald-900);
         --civic-help-success-text: var(--color-emerald-200);
-        --civic-help-error-bg: #7f1d1d;
-        --civic-help-error-text: var(--color-red-200, #fecaca);
+        --civic-help-error-bg: var(--color-red-900);
+        --civic-help-error-text: var(--color-red-200);
     }
 
     .civic-help-article-title a {
@@ -756,7 +756,7 @@
     }
 
     .search-result-excerpt mark {
-        background: #854d0e; /* Dark yellow - no exact token */
+        background: var(--color-amber-800);
         color: var(--color-yellow-200); /* Yellow highlight - no exact token */
     }
 }
