@@ -67,11 +67,11 @@
 
     .story-stat-chip:hover {
         transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        box-shadow: 0 4px 12px var(--color-black-alpha-10);
     }
 
     [data-theme="dark"] .story-stat-chip:hover {
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        box-shadow: 0 4px 12px var(--color-black-alpha-30);
     }
 
     .story-stat-icon {
@@ -142,11 +142,11 @@
 
     .story-card:hover {
         transform: translateY(-4px);
-        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+        box-shadow: 0 8px 24px var(--color-black-alpha-10);
     }
 
     [data-theme="dark"] .story-card:hover {
-        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+        box-shadow: 0 8px 24px var(--color-black-alpha-30);
     }
 
     /* Timeline Dot */
@@ -160,7 +160,7 @@
         background: var(--civicone-bg-page);
         border: 3px solid var(--civicone-brand);
         border-radius: 50%;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+        box-shadow: 0 2px 8px var(--color-black-alpha-15);
         z-index: 2;
     }
 

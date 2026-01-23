@@ -264,6 +264,7 @@
     --color-red-alpha-30: rgba(239, 68, 68, 0.3);
     --color-red-alpha-35: rgba(239, 68, 68, 0.35);
     --color-red-alpha-40: rgba(239, 68, 68, 0.4);
+    --color-red-alpha-50: rgba(239, 68, 68, 0.5);
 
     /* Orange opacity variants (249, 115, 22 = #f97316) */
     --color-orange-alpha-3: rgba(249, 115, 22, 0.03);
@@ -552,6 +553,7 @@
     --color-amber-600-alpha-20: rgba(217, 119, 6, 0.2);
 
     /* Blue-600 opacity variants extended (37, 99, 235 = #2563eb) */
+    --color-blue-600-alpha-15: rgba(37, 99, 235, 0.15);
     --color-blue-600-alpha-20: rgba(37, 99, 235, 0.2);
 
     /* Teal-700 opacity variants (15, 118, 110 = #0f766e) */
@@ -820,6 +822,12 @@
     --color-govuk-green-alpha-30: rgba(0, 112, 60, 0.3);
     --color-govuk-green-alpha-50: rgba(0, 112, 60, 0.5);
     --color-govuk-green-alpha-60: rgba(0, 112, 60, 0.6);
+
+    /* GOV.UK Red opacity variants (212, 53, 28 = #d4351c) */
+    --color-govuk-red-alpha-10: rgba(212, 53, 28, 0.1);
+
+    /* GOV.UK Blue Light opacity variants (29, 112, 184 = #1d70b8) */
+    --color-govuk-blue-light-alpha-15: rgba(29, 112, 184, 0.15);
 
     /* GOV.UK Orange opacity variants (244, 119, 56 = #f47738) */
     --color-govuk-orange-alpha-30: rgba(244, 119, 56, 0.3);

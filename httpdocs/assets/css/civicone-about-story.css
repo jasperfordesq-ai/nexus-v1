@@ -27,7 +27,7 @@
     }
 
     [data-theme="dark"] .about-story-badge {
-        background: rgba(99, 102, 241, 0.2);
+        background: var(--color-indigo-alpha-20);
         color: var(--color-primary-300);
     }
 
@@ -189,7 +189,7 @@
     }
 
     [data-theme="dark"] .about-story-badge-item {
-        background: rgba(16, 185, 129, 0.2);
+        background: var(--color-emerald-alpha-20);
         color: var(--color-success-400);
     }
 

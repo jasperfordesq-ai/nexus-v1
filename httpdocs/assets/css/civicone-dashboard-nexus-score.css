@@ -18,11 +18,11 @@
 
 .card:hover {
     transform: translateY(-4px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 12px var(--color-black-alpha-10);
 }
 
 .table-primary {
-    background-color: rgba(99, 102, 241, 0.1) !important;
+    background-color: var(--color-indigo-alpha-10) !important;
 }
 
 /* Achievement icon size - 1.5rem */

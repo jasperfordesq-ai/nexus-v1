@@ -456,7 +456,7 @@
 /* Secondary button (grey) */
 .civicone--govuk .govuk-button--secondary {
   background-color: var(--color-govuk-grey-dark);
-  box-shadow: 0 2px 0 rgba(0, 0, 0, 0.2);
+  box-shadow: 0 2px 0 var(--color-black-alpha-20);
   color: var(--color-white);
 }
 
@@ -487,7 +487,7 @@
 .civicone--govuk .govuk-button:focus {
   outline: 3px solid var(--color-brand-yellow); /* var(--color-govuk-yellow) */
   outline-offset: 0;
-  box-shadow: 0 2px 0 rgba(0, 0, 0, 0.4);
+  box-shadow: 0 2px 0 var(--color-black-alpha-40);
   background-color: var(--color-brand-yellow);
   color: var(--color-govuk-black);
 }

@@ -54,7 +54,7 @@ button {
 .htb-btn:focus-visible,
 button:focus-visible,
 a:focus-visible {
-    outline: 3px solid rgba(239, 68, 68, 0.5);
+    outline: 3px solid var(--color-red-alpha-50);
     outline-offset: 2px;
 }
 
@@ -130,8 +130,8 @@ html {
    ======================================== */
 
 [data-theme="dark"] .htb-card {
-    background: rgba(30, 41, 59, 0.85);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: var(--color-slate-alpha-85);
+    border: 1px solid var(--color-white-alpha-10);
 }
 
 [data-theme="dark"] .htb-card h2,
@@ -144,7 +144,7 @@ html {
 }
 
 [data-theme="dark"] .htb-btn-secondary {
-    background: rgba(51, 65, 85, 0.6) !important;
-    border-color: rgba(255, 255, 255, 0.15) !important;
+    background: var(--color-slate-600-alpha-60) !important;
+    border-color: var(--color-white-alpha-15) !important;
     color: var(--color-slate-200) !important;
 }

@@ -74,14 +74,14 @@
     }
 
     .social-prescribing-testimonial {
-        background: rgba(37, 99, 235, 0.05);
+        background: var(--color-blue-600-alpha-5);
         padding: var(--space-8);
         border-radius: var(--radius-2);
         border-left: 4px solid var(--civicone-brand);
     }
 
     [data-theme="dark"] .social-prescribing-testimonial {
-        background: rgba(37, 99, 235, 0.15);
+        background: var(--color-blue-600-alpha-15);
     }
 
     .social-prescribing-testimonial p {
@@ -154,11 +154,11 @@
         align-items: center;
         justify-content: center;
         font-weight: bold;
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        box-shadow: 0 4px 6px var(--color-black-alpha-10);
     }
 
     [data-theme="dark"] .social-prescribing-pathway-step-number {
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+        box-shadow: 0 4px 6px var(--color-black-alpha-30);
     }
 
     .social-prescribing-pathway-step h3 {

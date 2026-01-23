@@ -104,7 +104,7 @@
     background: var(--civic-profile-online);
     border: 3px solid var(--color-white);
     border-radius: var(--radius-full);
-    box-shadow: 0 2px 4px rgba(16, 185, 129, 0.4);
+    box-shadow: 0 2px 4px var(--color-emerald-alpha-40);
     /* animation removed for GOV.UK compliance */
 }
 
@@ -258,7 +258,7 @@
 
 .civic-action-btn.liked {
     color: var(--civic-profile-danger);
-    background: rgba(212, 53, 28, 0.1);
+    background: var(--color-govuk-red-alpha-10);
 }
 
 
@@ -391,7 +391,7 @@
 }
 
 .civic-reaction.active {
-    background: rgba(212, 53, 28, 0.1);
+    background: var(--color-govuk-red-alpha-10);
     border-color: var(--civic-profile-danger);
 }
 
@@ -410,7 +410,7 @@
     padding: var(--space-2);
     white-space: nowrap;
     z-index: 100;
-    box-shadow: 4px 4px 0 rgba(0, 0, 0, 0.1);
+    box-shadow: 4px 4px 0 var(--color-black-alpha-10);
 }
 
 [data-theme="dark"] .civic-reaction-picker-menu {

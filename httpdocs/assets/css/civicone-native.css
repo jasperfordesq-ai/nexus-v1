@@ -64,7 +64,7 @@
 .civic-bottom-sheet-backdrop {
     position: fixed;
     inset: 0;
-    background: rgba(0, 0, 0, 0.5);
+    background: var(--color-black-alpha-50);
     z-index: 9999;
     opacity: 0;
     visibility: hidden;
@@ -91,7 +91,7 @@
 .nexus-share-sheet-backdrop {
     position: absolute;
     inset: 0;
-    background: rgba(0, 0, 0, 0.5);
+    background: var(--color-black-alpha-50);
     opacity: 0;
 }
 

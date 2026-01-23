@@ -162,17 +162,17 @@
     }
 
     [data-theme="dark"] .timebanking-guide-step-icon.blue {
-        background: rgba(37, 99, 235, 0.2);
+        background: var(--color-blue-600-alpha-20);
         color: var(--color-blue-400);
     }
 
     [data-theme="dark"] .timebanking-guide-step-icon.pink {
-        background: rgba(236, 72, 153, 0.2);
+        background: var(--color-pink-alpha-20);
         color: var(--color-govuk-light-grey);
     }
 
     [data-theme="dark"] .timebanking-guide-step-icon.green {
-        background: rgba(16, 185, 129, 0.2);
+        background: var(--color-emerald-alpha-20);
         color: var(--color-success-400);
     }
 
