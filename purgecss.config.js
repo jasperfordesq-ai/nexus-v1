@@ -149,6 +149,7 @@ module.exports = {
         'httpdocs/assets/css/civicone-pages-privacy.css',
         'httpdocs/assets/css/civicone-partner.css',
         'httpdocs/assets/css/civicone-polls-edit.css',
+        'httpdocs/assets/css/civicone-polls-show.css',
         'httpdocs/assets/css/civicone-privacy.css',
         'httpdocs/assets/css/civicone-profile-edit.css',
         'httpdocs/assets/css/civicone-profile-header.css',

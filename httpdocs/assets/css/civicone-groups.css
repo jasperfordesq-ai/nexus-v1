@@ -43,6 +43,21 @@
 
 
 /* --------------------------------------------
+   Groups Page Container
+   -------------------------------------------- */
+.civic-group-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: var(--space-5);
+}
+
+/* Inline form container */
+.civic-inline-form {
+    display: inline;
+}
+
+
+/* --------------------------------------------
    Groups Index Page
    -------------------------------------------- */
 
@@ -1001,6 +1016,32 @@
 
 .civic-group-empty-state h3 {
     color: var(--civic-group-text-muted);
+}
+
+
+/* --------------------------------------------
+   Groups Show Page - About Tab
+   -------------------------------------------- */
+.civic-group-about-card {
+    background: var(--civic-bg-card, var(--color-gray-75));
+    border: none;
+    padding: 30px;
+    border-radius: var(--radius-md);
+    margin-bottom: 0;
+}
+
+[data-theme="dark"] .civic-group-about-card {
+    background: var(--color-gray-800);
+}
+
+.civic-group-about-card h3 {
+    margin-top: 0;
+    color: var(--civic-group-text-primary);
+}
+
+.civic-group-about-card p {
+    line-height: 1.6;
+    color: var(--civic-group-text-primary);
 }
 
 
