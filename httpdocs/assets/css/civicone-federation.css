@@ -1102,7 +1102,7 @@
     color: var(--govuk-focus-text-colour, var(--color-govuk-black));
     box-shadow: 0 -2px var(--govuk-focus-colour, var(--color-brand-yellow)), 0 4px var(--govuk-focus-text-colour, var(--color-govuk-black));
     border-color: var(--civic-brand, var(--color-blue-600));
-    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+    box-shadow: 0 0 0 3px var(--color-blue-600-alpha-10);
 }
 
 .civic-fed-search-icon {
@@ -2109,7 +2109,7 @@
     border-radius: var(--radius-full);
     object-fit: cover;
     border: var(--space-1) solid var(--civic-bg-page, var(--color-white));
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 6px -1px var(--color-black-alpha-10);
     background: white;
 }
 
