@@ -53,7 +53,7 @@ class SocialApiController
 
         $debug = [
             'api_working' => true,
-            'session_id' => session_id(),
+            // Security: Session ID removed to prevent session hijacking
             'user_id' => $_SESSION['user_id'] ?? null,
             'tenant_id' => TenantContext::get()['id'] ?? null,
             'content_type' => $_SERVER['CONTENT_TYPE'] ?? 'not set',

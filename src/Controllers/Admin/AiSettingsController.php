@@ -2,10 +2,13 @@
 
 namespace Nexus\Controllers\Admin;
 
-// EMERGENCY DEBUGGING
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
-error_reporting(E_ALL);
+// Security: Debug output disabled in production
+// Enable only in development by setting APP_ENV=development in .env
+if (getenv('APP_ENV') === 'development') {
+    ini_set('display_errors', 1);
+    ini_set('display_startup_errors', 1);
+    error_reporting(E_ALL);
+}
 
 use Nexus\Core\TenantContext;
 use Nexus\Core\Csrf;

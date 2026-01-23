@@ -112,7 +112,7 @@ class LayoutApiController
             'all_layout_sessions' => $layoutSessions,
             'layout_helper_get' => LayoutHelper::get(),
             'user_id' => $_SESSION['user_id'] ?? null,
-            'session_id' => session_id(),
+            // Security: Session ID removed to prevent session hijacking
         ], JSON_PRETTY_PRINT);
         exit;
     }

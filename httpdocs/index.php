@@ -212,6 +212,8 @@ if (file_exists($helpersFile)) {
 header("X-Frame-Options: SAMEORIGIN");
 // Prevent MIME sniffing
 header("X-Content-Type-Options: nosniff");
+// XSS Protection (legacy browsers)
+header("X-XSS-Protection: 1; mode=block");
 // Content Security Policy (Legacy Compatible + Pusher WebSocket)
 header("Content-Security-Policy: default-src 'self' 'unsafe-inline' 'unsafe-eval' https: data: blob:; connect-src 'self' https: wss://*.pusher.com wss://ws-eu.pusher.com; img-src 'self' https: data: blob:; font-src 'self' https: data:;");
 // Referrer Policy
