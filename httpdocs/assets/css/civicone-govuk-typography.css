@@ -399,9 +399,10 @@ body.nexus-skin-civicone {
 
 /* ===========================================
    Dark Mode Adjustments
+   Scoped to .civicone per GR-016
    =========================================== */
-body.dark-mode [data-layout="civicone"],
-body.dark-mode.nexus-skin-civicone {
+.civicone.dark-mode [data-layout="civicone"],
+.civicone.dark-mode.nexus-skin-civicone {
     --civicone-text: var(--color-white);
     --civicone-text-secondary: var(--color-govuk-grey);
     --civicone-link: #8eb4e8;

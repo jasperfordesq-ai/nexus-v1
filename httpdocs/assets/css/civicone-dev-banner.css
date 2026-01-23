@@ -242,19 +242,20 @@
    Dark Mode Support
    =========================================== */
 
-body.dark-mode .civicone-dev-banner {
+/* Scoped to .civicone per GR-016 */
+.civicone.dark-mode .civicone-dev-banner {
     background: linear-gradient(135deg, #7f1d1d 0%, #991b1b 50%, #7f1d1d 100%);
 }
 
-body.dark-mode .civicone-dev-banner--accessible {
+.civicone.dark-mode .civicone-dev-banner--accessible {
     background: linear-gradient(135deg, #064e3b 0%, var(--color-emerald-800) 50%, #064e3b 100%);
 }
 
-body.dark-mode .civicone-dev-banner--warning {
+.civicone.dark-mode .civicone-dev-banner--warning {
     background: linear-gradient(135deg, var(--color-warning-800) 0%, var(--color-warning-700) 50%, var(--color-warning-800) 100%);
 }
 
-body.dark-mode .civicone-dev-banner--info {
+.civicone.dark-mode .civicone-dev-banner--info {
     background: linear-gradient(135deg, var(--color-blue-800) 0%, #1e40af 50%, var(--color-blue-800) 100%);
 }
 

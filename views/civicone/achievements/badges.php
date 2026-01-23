@@ -48,7 +48,7 @@ $showcaseUpdated = isset($_GET['showcase_updated']);
                     <?php endif; ?>
                 <?php endfor; ?>
             </div>
-            <button type="submit" id="save-showcase" class="nexus-btn nexus-btn-primary" style="margin-top: 16px; display: none;">
+            <button type="submit" id="save-showcase" class="nexus-btn nexus-btn-primary civic-mt-4 civic-hidden">
                 <i class="fa-solid fa-save"></i> Save Showcase
             </button>
         </form>

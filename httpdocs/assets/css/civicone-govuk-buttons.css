@@ -372,16 +372,17 @@ a.civic-button--secondary:visited,
 
 /* ===========================================
    Dark Mode Adjustments
+   Scoped to .civicone per GR-016
    =========================================== */
-body.dark-mode .civic-button--secondary,
-body.dark-mode [data-layout="civicone"] .govuk-button--secondary {
+.civicone.dark-mode .civic-button--secondary,
+.civicone.dark-mode [data-layout="civicone"] .govuk-button--secondary {
     background-color: #383f43;
     color: var(--color-white);
     box-shadow: 0 2px 0 #1d1d1d;
 }
 
-body.dark-mode .civic-button--secondary:hover,
-body.dark-mode [data-layout="civicone"] .govuk-button--secondary:hover {
+.civicone.dark-mode .civic-button--secondary:hover,
+.civicone.dark-mode [data-layout="civicone"] .govuk-button--secondary:hover {
     background-color: #4a5157;
 }
 

@@ -1876,3 +1876,101 @@
         grid-template-columns: repeat(2, 1fr);
     }
 }
+
+/* ============================================
+   UTILITY CLASSES FOR ACHIEVEMENTS
+   Replaces inline styles per CLAUDE.md rules
+   ============================================ */
+
+/* Color utilities - using design tokens */
+.civic-text-success {
+    color: var(--color-emerald-500, #10b981);
+}
+
+.civic-text-muted {
+    color: var(--color-gray-500, #6b7280);
+}
+
+.civic-text-gold {
+    color: var(--color-amber-400, #fbbf24);
+}
+
+.civic-text-silver {
+    color: var(--color-gray-400, #9ca3af);
+}
+
+.civic-text-bronze {
+    color: var(--color-amber-600, #d97706);
+}
+
+.civic-text-primary-alt {
+    color: var(--color-blue-500, #3b82f6);
+}
+
+/* Icon color utilities for achievements */
+.civic-icon-trophy {
+    color: var(--color-amber-400, #fbbf24);
+}
+
+.civic-icon-star {
+    color: var(--color-amber-400, #fbbf24);
+}
+
+.civic-icon-crown {
+    color: var(--color-amber-400, #fbbf24);
+}
+
+.civic-icon-medal-silver {
+    color: var(--color-gray-400, #9ca3af);
+}
+
+.civic-icon-medal-bronze {
+    color: var(--color-amber-600, #d97706);
+}
+
+.civic-icon-award {
+    color: var(--color-gray-500, #6b7280);
+}
+
+.civic-icon-check {
+    color: var(--color-emerald-500, #10b981);
+}
+
+/* Layout utilities */
+.civic-text-center {
+    text-align: center;
+}
+
+.civic-p-5 {
+    padding: var(--space-5, 20px);
+}
+
+.civic-mt-4 {
+    margin-top: var(--space-4, 16px);
+}
+
+.civic-hidden {
+    display: none;
+}
+
+.civic-flex-center {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* User rank avatar placeholder */
+.civic-avatar-placeholder {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--color-primary-500, #4f46e5);
+    color: var(--color-white);
+    font-weight: 600;
+}
+
+/* User indicator label */
+.civic-you-label {
+    color: var(--color-blue-500, #3b82f6);
+    font-size: 12px;
+}
