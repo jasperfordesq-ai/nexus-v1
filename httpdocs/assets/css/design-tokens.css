@@ -220,6 +220,22 @@
     --color-govuk-light-grey: #f3f2f1;
     --color-govuk-yellow: #ffdd00;
 
+    /* GOV.UK Button shadow colors (darker variants for 3D effect) */
+    --color-govuk-green-shadow: #002d18;
+    --color-govuk-red-darker: #aa2a16;
+    --color-govuk-red-shadow: #55150b;
+    --color-govuk-grey-hover: #dbdad9;
+    --color-govuk-grey-shadow: #929191;
+    --color-govuk-grey-darker: #3d4347;
+    --color-govuk-inverse-hover: #e8e8e8;
+    --color-govuk-inverse-shadow: #595959;
+
+    /* GOV.UK Link colors */
+    --color-govuk-link-visited: #4c2c92;
+
+    /* GOV.UK Tag colors */
+    --color-govuk-tag-light-blue: #d2e2f1;
+
     /* Semantic color aliases for WCAG refactoring */
     --color-success-100: #dcfce7;
     --color-success-400: #34d399;

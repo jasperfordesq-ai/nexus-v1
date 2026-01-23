@@ -23,23 +23,23 @@
     /* Primary button (green) */
     --govuk-button-background: var(--color-govuk-green);
     --govuk-button-background-hover: var(--color-govuk-green-dark);
-    --govuk-button-shadow: #002d18;
+    --govuk-button-shadow: var(--color-govuk-green-shadow);
 
     /* Secondary button (grey) */
     --govuk-button-secondary-background: var(--color-neutral-50);
-    --govuk-button-secondary-background-hover: #dbdad9;
-    --govuk-button-secondary-shadow: #929191;
+    --govuk-button-secondary-background-hover: var(--color-govuk-grey-hover);
+    --govuk-button-secondary-shadow: var(--color-govuk-grey-shadow);
     --govuk-button-secondary-text: var(--color-govuk-black);
 
     /* Warning button (red) */
     --govuk-button-warning-background: var(--color-govuk-red);
-    --govuk-button-warning-background-hover: #aa2a16;
-    --govuk-button-warning-shadow: #55150b;
+    --govuk-button-warning-background-hover: var(--color-govuk-red-darker);
+    --govuk-button-warning-shadow: var(--color-govuk-red-shadow);
 
     /* Inverse button (for dark backgrounds) */
     --govuk-button-inverse-background: var(--color-white);
-    --govuk-button-inverse-background-hover: #e8e8e8;
-    --govuk-button-inverse-shadow: #595959;
+    --govuk-button-inverse-background-hover: var(--color-govuk-inverse-hover);
+    --govuk-button-inverse-shadow: var(--color-govuk-inverse-shadow);
 
     /* Button text colors */
     --govuk-button-text: var(--color-white);
@@ -376,14 +376,14 @@ a.civic-button--secondary:visited,
    =========================================== */
 .civicone.dark-mode .civic-button--secondary,
 .civicone.dark-mode [data-layout="civicone"] .govuk-button--secondary {
-    background-color: #383f43;
+    background-color: var(--color-slate-700);
     color: var(--color-white);
-    box-shadow: 0 2px 0 #1d1d1d;
+    box-shadow: 0 2px 0 var(--color-slate-900);
 }
 
 .civicone.dark-mode .civic-button--secondary:hover,
 .civicone.dark-mode [data-layout="civicone"] .govuk-button--secondary:hover {
-    background-color: #4a5157;
+    background-color: var(--color-slate-600);
 }
 
 /* ===========================================
@@ -400,7 +400,7 @@ a.civic-button--secondary:visited,
     background-image: none !important;
     color: var(--color-white) !important;
     border-radius: 0 !important;
-    box-shadow: 0 2px 0 #002d18 !important;
+    box-shadow: 0 2px 0 var(--color-govuk-green-shadow) !important;
     border: 2px solid transparent !important;
     transform: none !important;
 }
@@ -411,7 +411,7 @@ a.civic-button--secondary:visited,
 .civicone .htb-btn-primary:hover {
     background: var(--color-govuk-green-dark, var(--color-govuk-green-dark)) !important;
     transform: none !important;
-    box-shadow: 0 2px 0 #002d18 !important;
+    box-shadow: 0 2px 0 var(--color-govuk-green-shadow) !important;
 }
 
 [data-layout="civicone"] .nexus-btn-primary:focus,
@@ -432,7 +432,7 @@ a.civic-button--secondary:visited,
     background: var(--color-govuk-light-grey) !important;
     color: var(--color-govuk-black) !important;
     border-radius: 0 !important;
-    box-shadow: 0 2px 0 #929191 !important;
+    box-shadow: 0 2px 0 var(--color-govuk-grey-shadow) !important;
     border: 2px solid transparent !important;
     transform: none !important;
 }
@@ -441,7 +441,7 @@ a.civic-button--secondary:visited,
 [data-layout="civicone"] .htb-btn-secondary:hover,
 .civicone .nexus-btn-secondary:hover,
 .civicone .htb-btn-secondary:hover {
-    background: #dbdad9 !important;
+    background: var(--color-govuk-grey-hover) !important;
     transform: none !important;
 }
 
@@ -461,7 +461,7 @@ a.civic-button--secondary:visited,
     background-image: none !important;
     color: var(--color-white) !important;
     border-radius: 0 !important;
-    box-shadow: 0 2px 0 #002d18 !important;
+    box-shadow: 0 2px 0 var(--color-govuk-green-shadow) !important;
     border: 2px solid transparent !important;
     transform: none !important;
     min-height: 44px;
@@ -491,7 +491,7 @@ a.civic-button--secondary:visited,
     background-image: none !important;
     color: var(--color-white) !important;
     border-radius: 0 !important;
-    box-shadow: 0 2px 0 #002d18 !important;
+    box-shadow: 0 2px 0 var(--color-govuk-green-shadow) !important;
     border: 2px solid transparent !important;
     transform: none !important;
     min-height: 44px;
@@ -522,7 +522,7 @@ a.civic-button--secondary:visited,
     background: var(--color-govuk-light-grey) !important;
     color: var(--color-govuk-black) !important;
     border-radius: 0 !important;
-    box-shadow: 0 2px 0 #929191 !important;
+    box-shadow: 0 2px 0 var(--color-govuk-grey-shadow) !important;
     border: 2px solid transparent !important;
     transform: none !important;
     min-height: 44px;
@@ -531,7 +531,7 @@ a.civic-button--secondary:visited,
 
 [data-layout="civicone"] .btn-secondary:hover,
 .civicone .btn-secondary:hover {
-    background: #dbdad9 !important;
+    background: var(--color-govuk-grey-hover) !important;
     transform: none !important;
 }
 
@@ -552,7 +552,7 @@ a.civic-button--secondary:visited,
     background: var(--color-govuk-red) !important;
     color: var(--color-white) !important;
     border-radius: 0 !important;
-    box-shadow: 0 2px 0 #55150b !important;
+    box-shadow: 0 2px 0 var(--color-govuk-red-shadow) !important;
     border: 2px solid transparent !important;
     min-height: 44px;
     font-weight: 700;
@@ -564,7 +564,7 @@ a.civic-button--secondary:visited,
 .civicone .btn-danger:hover,
 .civicone .civic-btn-danger:hover,
 .civicone .civic-btn--danger:hover {
-    background: #aa2a16 !important;
+    background: var(--color-govuk-red-darker) !important;
 }
 
 [data-layout="civicone"] .btn-danger:focus,
