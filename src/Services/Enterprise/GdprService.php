@@ -587,6 +587,7 @@ class GdprService
              ON DUPLICATE KEY UPDATE
                 consent_given = VALUES(consent_given),
                 consent_text = VALUES(consent_text),
+                consent_version = VALUES(consent_version),
                 consent_hash = VALUES(consent_hash),
                 ip_address = VALUES(ip_address),
                 user_agent = VALUES(user_agent),

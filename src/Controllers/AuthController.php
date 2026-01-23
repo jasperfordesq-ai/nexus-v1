@@ -256,7 +256,8 @@ class AuthController
 
                     // --- GDPR CONSENT RECORDING ---
                     try {
-                        $gdprService = new \Nexus\Services\Enterprise\GdprService();
+                        // Use user's tenant_id to ensure consent is recorded for correct tenant
+                        $gdprService = new \Nexus\Services\Enterprise\GdprService($newUser['tenant_id'] ?? \Nexus\Core\TenantContext::getId());
                         $consentText = "I have read and agree to the Terms of Service and Privacy Policy. I understand that as a member, I will be automatically subscribed to the community newsletter.";
                         $consentVersion = '1.0';
 
