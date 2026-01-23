@@ -59,7 +59,7 @@ button {
 .discussion-form-input:focus-visible,
 button:focus-visible,
 a:focus-visible {
-    outline: 3px solid rgba(219, 39, 119, 0.5);
+    outline: 3px solid var(--color-pink-600-alpha-50);
     outline-offset: 2px;
 }
 
@@ -95,7 +95,7 @@ html {
     align-items: center;
     gap: var(--space-2);
     padding: var(--space-2-5) var(--space-4-5);
-    background: rgba(255, 255, 255, 0.9);
+    background: var(--color-white-alpha-90);
     /* backdrop-filter removed for GOV.UK compliance */
     -webkit-/* backdrop-filter removed for GOV.UK compliance */
     border-radius: var(--radius-lg);
@@ -115,7 +115,7 @@ html {
 
 .discussion-create-card {
     overflow: hidden;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 10px 30px var(--color-black-alpha-10);
     border-radius: var(--radius-2xl);
 }
 
@@ -169,7 +169,7 @@ html {
 .discussion-form-input:focus {
     outline: none;
     border-color: var(--color-pink-600);
-    box-shadow: 0 0 0 4px rgba(219, 39, 119, 0.1);
+    box-shadow: 0 0 0 4px var(--color-pink-600-alpha-10);
 }
 
 .discussion-form-input::placeholder {
@@ -223,7 +223,7 @@ textarea.discussion-form-input {
     font-weight: 600;
     color: white;
     border-radius: var(--radius-lg);
-    box-shadow: 0 4px 15px rgba(219, 39, 119, 0.3);
+    box-shadow: 0 4px 15px var(--color-pink-600-alpha-30);
     cursor: pointer;
     transition: all 0.2s ease;
     -webkit-tap-highlight-color: transparent;
@@ -234,13 +234,13 @@ textarea.discussion-form-input {
 }
 
 [data-theme="dark"] .discussion-form-input {
-    background: rgba(30, 41, 59, 0.8);
-    border-color: rgba(255, 255, 255, 0.15);
+    background: var(--color-slate-alpha-80);
+    border-color: var(--color-white-alpha-15);
     color: var(--color-slate-100);
 }
 
 [data-theme="dark"] .discussion-back-btn {
-    background: rgba(30, 41, 59, 0.9);
+    background: var(--color-slate-alpha-90);
     color: var(--color-slate-300);
 }
 

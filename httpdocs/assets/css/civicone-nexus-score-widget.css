@@ -17,7 +17,7 @@
     justify-content: space-between;
     margin-bottom: 1rem;
     padding-bottom: 1rem;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+    border-bottom: 1px solid var(--color-white-alpha-20);
 }
 
 .nexus-widget-title {
@@ -48,7 +48,7 @@
 
 .nexus-widget-score-label {
     font-size: 0.875rem;
-    color: rgba(255, 255, 255, 0.8);
+    color: var(--color-white-alpha-80);
     text-transform: uppercase;
     letter-spacing: 0.5px;
 }
@@ -59,9 +59,9 @@
     justify-content: center;
     gap: 0.5rem;
     padding: 0.75rem 1rem;
-    background: rgba(255, 255, 255, 0.1);
+    background: var(--color-white-alpha-10);
     margin-bottom: 1rem;
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    border: 1px solid var(--color-white-alpha-20);
 }
 
 .nexus-widget-tier-icon {
@@ -80,14 +80,14 @@
     justify-content: center;
     gap: 0.5rem;
     padding: 0.625rem;
-    background: rgba(255, 255, 255, 0.1);
+    background: var(--color-white-alpha-10);
     margin-bottom: 1rem;
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    border: 1px solid var(--color-white-alpha-20);
 }
 
 .nexus-widget-rank-text {
     font-size: 0.875rem;
-    color: rgba(255, 255, 255, 0.9);
+    color: var(--color-white-alpha-90);
 }
 
 .nexus-widget-rank-value {

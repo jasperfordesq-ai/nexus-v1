@@ -132,7 +132,7 @@
     border-radius: 50%;
     object-fit: cover;
     border: 4px solid var(--civic-bg-page, var(--color-white));
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 6px -1px var(--color-black-alpha-10);
     background: white;
 }
 
@@ -141,7 +141,7 @@
     height: 130px;
     border-radius: 50%;
     border: 4px solid var(--civic-bg-page, var(--color-white));
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 6px -1px var(--color-black-alpha-10);
     background: var(--color-gray-200);
     display: flex;
     align-items: center;
@@ -243,7 +243,7 @@
 }
 
 .civicone--govuk .civicone-group-card:hover {
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 8px var(--color-black-alpha-10);
 }
 
 [data-theme="dark"] .civicone--govuk .civicone-group-card {
@@ -263,7 +263,7 @@
     border-radius: 50%;
     object-fit: cover;
     border: 4px solid var(--civic-bg-page, var(--color-white));
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 6px -1px var(--color-black-alpha-10);
     background: white;
 }
 
@@ -272,7 +272,7 @@
     height: 130px;
     border-radius: 50%;
     border: 4px solid var(--civic-bg-page, var(--color-white));
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 6px -1px var(--color-black-alpha-10);
     background: var(--color-gray-200);
     display: flex;
     align-items: center;
@@ -585,7 +585,7 @@
     background: var(--color-white);
     border-radius: var(--radius-md);
     overflow: hidden;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 1px 3px var(--color-black-alpha-10);
     margin-bottom: var(--space-8);
     border: 1px solid var(--civic-group-border);
 }
@@ -621,7 +621,7 @@
     position: absolute;
     top: var(--space-5);
     left: var(--space-5);
-    background: rgba(0, 0, 0, 0.6);
+    background: var(--color-black-alpha-60);
     color: white;
     padding: var(--space-1) var(--space-3);
     border-radius: var(--radius-2xl);
@@ -758,7 +758,7 @@
     border-radius: 50%;
     object-fit: cover;
     border: 4px solid var(--civic-bg-page, var(--color-white));
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 6px -1px var(--color-black-alpha-10);
 }
 
 .civic-subhub-placeholder {
@@ -766,7 +766,7 @@
     height: 100px;
     border-radius: 50%;
     border: 4px solid var(--civic-bg-page, var(--color-white));
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 6px -1px var(--color-black-alpha-10);
     background: var(--color-gray-200);
     display: flex;
     align-items: center;
@@ -862,7 +862,7 @@
     border-radius: 50%;
     object-fit: cover;
     border: 3px solid white;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 2px 4px var(--color-black-alpha-10);
 }
 
 .civic-member-placeholder {
@@ -875,7 +875,7 @@
     align-items: center;
     justify-content: center;
     border: 3px solid white;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 2px 4px var(--color-black-alpha-10);
 }
 
 [data-theme="dark"] .civic-member-placeholder {
