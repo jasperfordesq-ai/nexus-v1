@@ -307,8 +307,8 @@
    =========================================== */
 @media (prefers-contrast: more) {
     :root {
-        --civicone-focus: #ffdd00; /* Brighter yellow for high contrast - GOV.UK yellow */
-        --civicone-focus-text: #0b0c0c; /* GOV.UK black */
+        --civicone-focus: var(--color-govuk-yellow); /* Brighter yellow for high contrast - GOV.UK yellow */
+        --civicone-focus-text: var(--color-govuk-black); /* GOV.UK black */
     }
 }
 

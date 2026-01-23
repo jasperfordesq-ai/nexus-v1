@@ -134,7 +134,7 @@
 }
 
 .govuk-link:visited {
-  color: #4c2c92;
+  color: var(--color-govuk-link-visited);
 }
 
 .govuk-link:hover {
@@ -461,7 +461,7 @@
 }
 
 .civicone--govuk .govuk-button--secondary:hover {
-  background-color: #3d4347;
+  background-color: var(--color-govuk-grey-darker);
 }
 
 /* Warning button (red) */
@@ -472,7 +472,7 @@
 }
 
 .civicone--govuk .govuk-button--warning:hover {
-  background-color: #aa2a16;
+  background-color: var(--color-govuk-red-darker);
 }
 
 /* Disabled state */
@@ -2322,7 +2322,7 @@
 
 /* Tag variants for task list */
 .civicone--govuk .govuk-tag--light-blue {
-  background-color: #d2e2f1;
+  background-color: var(--color-govuk-tag-light-blue);
   color: var(--color-govuk-blue);
 }
 
