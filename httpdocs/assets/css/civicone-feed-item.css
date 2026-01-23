@@ -539,3 +539,90 @@
 .feed-error-details {
     color: var(--color-gray-500);
 }
+
+/* =====================================================
+   Accessibility & GOV.UK Compliance Additions
+   ===================================================== */
+
+/* Hidden state for comments section - replaces inline style="display:none" */
+.feed-comments-section--hidden {
+    display: none;
+}
+
+/* Reactions/Likes Button - replaces clickable div */
+.feed-reactions-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    padding: 0;
+    margin: 0;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    font-size: inherit;
+    font-family: inherit;
+    color: inherit;
+    text-align: left;
+}
+
+.feed-reactions-btn:hover {
+    text-decoration: underline;
+}
+
+.feed-reactions-btn:focus {
+    outline: 3px solid var(--color-govuk-yellow, #ffdd00);
+    outline-offset: 2px;
+}
+
+/* Comments Count Button - replaces clickable span */
+.feed-stat-btn {
+    display: inline;
+    padding: 0;
+    margin: 0;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    font-size: inherit;
+    font-family: inherit;
+    color: inherit;
+}
+
+.feed-stat-btn:hover {
+    text-decoration: underline;
+}
+
+.feed-stat-btn:focus {
+    outline: 3px solid var(--color-govuk-yellow, #ffdd00);
+    outline-offset: 2px;
+}
+
+/* Comment Send Button - replaces clickable icon */
+.feed-comment-send-btn {
+    position: absolute;
+    right: var(--space-3);
+    top: 50%;
+    transform: translateY(-50%);
+    padding: var(--space-2);
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    color: var(--feed-text-muted);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--radius-base);
+}
+
+.feed-comment-send-btn:hover {
+    color: var(--color-primary-600, var(--feed-text-primary));
+}
+
+.feed-comment-send-btn:focus {
+    outline: 3px solid var(--color-govuk-yellow, #ffdd00);
+    outline-offset: 2px;
+}
+
+/* Ensure icon inside button doesn't have pointer events */
+.feed-comment-send-btn i {
+    pointer-events: none;
+}

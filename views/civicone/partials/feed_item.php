@@ -181,28 +181,28 @@ if ($type === 'listing') {
         </div>
         <!-- 3-Dot Menu (Facebook-style) -->
         <div class="feed-item-menu-container">
-            <button type="button" class="feed-item-menu-btn" onclick="toggleFeedItemMenu(this)" aria-label="More options">
-                <i class="fa-solid fa-ellipsis"></i>
+            <button type="button" class="feed-item-menu-btn" onclick="toggleFeedItemMenu(this)" aria-label="More options" aria-haspopup="true" aria-expanded="false">
+                <i class="fa-solid fa-ellipsis" aria-hidden="true"></i>
             </button>
-            <div class="feed-item-menu-dropdown">
+            <div class="feed-item-menu-dropdown" role="menu">
                 <?php if ($isLoggedIn ?? false): ?>
                     <?php if ($authorUserId != ($_SESSION['user_id'] ?? 0)): ?>
-                        <button type="button" onclick="hidePost(<?= $postId ?>); closeFeedMenus();" class="feed-menu-item">
-                            <i class="fa-solid fa-eye-slash"></i>
+                        <button type="button" onclick="hidePost(<?= $postId ?>); closeFeedMenus();" class="feed-menu-item" role="menuitem">
+                            <i class="fa-solid fa-eye-slash" aria-hidden="true"></i>
                             <div>
                                 <span class="feed-menu-label">Hide post</span>
                                 <span class="feed-menu-hint">See fewer posts like this</span>
                             </div>
                         </button>
-                        <button type="button" onclick="muteUser(<?= $authorUserId ?>); closeFeedMenus();" class="feed-menu-item">
-                            <i class="fa-solid fa-volume-xmark"></i>
+                        <button type="button" onclick="muteUser(<?= $authorUserId ?>); closeFeedMenus();" class="feed-menu-item" role="menuitem">
+                            <i class="fa-solid fa-volume-xmark" aria-hidden="true"></i>
                             <div>
                                 <span class="feed-menu-label">Mute <?= htmlspecialchars(explode(' ', $authorName)[0]) ?></span>
                                 <span class="feed-menu-hint">Stop seeing their posts</span>
                             </div>
                         </button>
-                        <button type="button" onclick="reportPost(<?= $postId ?>); closeFeedMenus();" class="feed-menu-item feed-menu-item-danger">
-                            <i class="fa-solid fa-flag"></i>
+                        <button type="button" onclick="reportPost(<?= $postId ?>); closeFeedMenus();" class="feed-menu-item feed-menu-item-danger" role="menuitem">
+                            <i class="fa-solid fa-flag" aria-hidden="true"></i>
                             <div>
                                 <span class="feed-menu-label">Report post</span>
                                 <span class="feed-menu-hint">I'm concerned about this post</span>
@@ -210,8 +210,8 @@ if ($type === 'listing') {
                         </button>
                     <?php endif; ?>
                     <?php if ($authorUserId == ($_SESSION['user_id'] ?? 0) || ($_SESSION['user_role'] ?? '') === 'admin'): ?>
-                        <button type="button" onclick="deletePost('<?= $type ?>', <?= $postId ?>); closeFeedMenus();" class="feed-menu-item feed-menu-item-danger">
-                            <i class="fa-solid fa-trash"></i>
+                        <button type="button" onclick="deletePost('<?= $type ?>', <?= $postId ?>); closeFeedMenus();" class="feed-menu-item feed-menu-item-danger" role="menuitem">
+                            <i class="fa-solid fa-trash" aria-hidden="true"></i>
                             <div>
                                 <span class="feed-menu-label">Delete post</span>
                                 <span class="feed-menu-hint">Remove this permanently</span>
@@ -219,8 +219,8 @@ if ($type === 'listing') {
                         </button>
                     <?php endif; ?>
                 <?php else: ?>
-                    <a href="<?= $basePath ?>/login" class="feed-menu-item">
-                        <i class="fa-solid fa-right-to-bracket"></i>
+                    <a href="<?= $basePath ?>/login" class="feed-menu-item" role="menuitem">
+                        <i class="fa-solid fa-right-to-bracket" aria-hidden="true"></i>
                         <div>
                             <span class="feed-menu-label">Log in</span>
                             <span class="feed-menu-hint">Sign in to interact</span>
@@ -731,9 +731,9 @@ if ($type === 'listing') {
     <?php if ($likesCount > 0 || $commentsCount > 0): ?>
     <div class="feed-reactions-row">
         <?php if ($likesCount > 0): ?>
-        <div class="feed-reactions-left likes-count-clickable" onclick="event.stopPropagation(); showLikers('<?= $socialTargetType ?>', <?= $socialTargetId ?>)" title="See who liked this">
+        <button type="button" class="feed-reactions-left feed-reactions-btn" onclick="event.stopPropagation(); showLikers('<?= $socialTargetType ?>', <?= $socialTargetId ?>)" aria-label="See who liked this post">
             <span class="feed-reaction-icons">
-                <span class="feed-reaction-icon feed-reaction-heart"><i class="fa-solid fa-heart"></i></span>
+                <span class="feed-reaction-icon feed-reaction-heart"><i class="fa-solid fa-heart" aria-hidden="true"></i></span>
             </span>
             <span class="feed-reactions-text">
                 <?php if ($isLiked && $likesCount === 1): ?>
@@ -744,11 +744,11 @@ if ($type === 'listing') {
                     <?= $likesCount ?> <?= $likesCount === 1 ? 'person' : 'people' ?>
                 <?php endif; ?>
             </span>
-        </div>
+        </button>
         <?php endif; ?>
         <div class="feed-reactions-right">
             <?php if ($commentsCount > 0): ?>
-                <span class="feed-stat-link" onclick="toggleCommentSection('<?= $socialTargetType ?>', <?= $socialTargetId ?>)"><?= $commentsCount ?> <?= $commentsCount === 1 ? 'comment' : 'comments' ?></span>
+                <button type="button" class="feed-stat-btn" onclick="toggleCommentSection('<?= $socialTargetType ?>', <?= $socialTargetId ?>)" aria-label="View <?= $commentsCount ?> <?= $commentsCount === 1 ? 'comment' : 'comments' ?>" aria-expanded="false"><?= $commentsCount ?> <?= $commentsCount === 1 ? 'comment' : 'comments' ?></button>
             <?php endif; ?>
         </div>
     </div>
@@ -757,34 +757,36 @@ if ($type === 'listing') {
     <!-- Action Buttons (Facebook-style full-width) -->
     <div class="feed-action-bar" role="group" aria-label="Post actions">
         <button type="button" onclick="event.preventDefault(); toggleLike(this, '<?= $socialTargetType ?>', <?= $socialTargetId ?>); return false;" class="feed-action-btn <?= $isLiked ? 'liked' : '' ?>" aria-label="<?= $isLiked ? 'Unlike' : 'Like' ?>" aria-pressed="<?= $isLiked ? 'true' : 'false' ?>">
-            <i class="<?= $isLiked ? 'fa-solid' : 'fa-regular' ?> fa-heart"></i>
+            <i class="<?= $isLiked ? 'fa-solid' : 'fa-regular' ?> fa-heart" aria-hidden="true"></i>
             <span class="like-label">Like</span>
         </button>
         <button type="button" onclick="event.preventDefault(); toggleCommentSection('<?= $socialTargetType ?>', <?= $socialTargetId ?>); return false;" class="feed-action-btn" aria-label="Comment" aria-expanded="false">
-            <i class="fa-regular fa-comment"></i>
+            <i class="fa-regular fa-comment" aria-hidden="true"></i>
             <span>Comment</span>
         </button>
         <?php if ($type === 'listing' && $authorUserId && $authorUserId != ($userId ?? 0)): ?>
             <!-- Message button for listings (contact the seller/requester) -->
-            <a href="<?= $basePath ?>/messages/thread/<?= $authorUserId ?>" class="feed-action-btn feed-action-message-link" aria-label="Message">
-                <i class="fa-regular fa-envelope"></i>
+            <a href="<?= $basePath ?>/messages/thread/<?= $authorUserId ?>" class="feed-action-btn feed-action-message-link" aria-label="Message <?= htmlspecialchars($authorName) ?>">
+                <i class="fa-regular fa-envelope" aria-hidden="true"></i>
                 <span>Message</span>
             </a>
         <?php else: ?>
-            <button type="button" onclick="event.preventDefault(); repostToFeed('<?= $socialTargetType ?>', <?= $socialTargetId ?>, '<?= addslashes($authorName) ?>'); return false;" class="feed-action-btn" aria-label="Share">
-                <i class="fa-solid fa-share"></i>
+            <button type="button" onclick="event.preventDefault(); repostToFeed('<?= $socialTargetType ?>', <?= $socialTargetId ?>, '<?= addslashes($authorName) ?>'); return false;" class="feed-action-btn" aria-label="Share this post">
+                <i class="fa-solid fa-share" aria-hidden="true"></i>
                 <span>Share</span>
             </button>
         <?php endif; ?>
     </div>
 
-    <div id="comments-section-<?= $socialTargetType ?>-<?= $socialTargetId ?>" class="feed-comments-section" style="display:none;">
+    <div id="comments-section-<?= $socialTargetType ?>-<?= $socialTargetId ?>" class="feed-comments-section feed-comments-section--hidden">
         <?php if ($isLoggedIn ?? false): ?>
             <div class="feed-comment-form">
-                <img src="<?= $_SESSION['user_avatar'] ?? '/assets/img/defaults/default_avatar.webp' ?>" loading="lazy" class="feed-shared-avatar feed-comment-avatar">
+                <img src="<?= $_SESSION['user_avatar'] ?? '/assets/img/defaults/default_avatar.webp' ?>" loading="lazy" class="feed-shared-avatar feed-comment-avatar" alt="Your avatar">
                 <div class="feed-comment-input-wrapper">
-                    <input type="text" class="feed-comment-input" placeholder="Write a comment..." onkeydown="if(event.key === 'Enter') submitComment(this, '<?= $socialTargetType ?>', <?= $socialTargetId ?>)">
-                    <i class="fa-regular fa-paper-plane feed-comment-send-icon" onclick="submitComment(this.previousElementSibling, '<?= $socialTargetType ?>', <?= $socialTargetId ?>)"></i>
+                    <input type="text" class="feed-comment-input" placeholder="Write a comment..." aria-label="Write a comment" onkeydown="if(event.key === 'Enter') submitComment(this, '<?= $socialTargetType ?>', <?= $socialTargetId ?>)">
+                    <button type="button" class="feed-comment-send-btn" onclick="submitComment(this.parentElement.querySelector('.feed-comment-input'), '<?= $socialTargetType ?>', <?= $socialTargetId ?>)" aria-label="Submit comment">
+                        <i class="fa-regular fa-paper-plane" aria-hidden="true"></i>
+                    </button>
                 </div>
             </div>
         <?php endif; ?>
