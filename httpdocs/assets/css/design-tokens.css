@@ -304,6 +304,7 @@
 
     /* Amber/Warning opacity variants (251, 191, 36 = #fbbf24) */
     --color-amber-alpha-5: rgba(251, 191, 36, 0.05);
+    --color-amber-alpha-8: rgba(251, 191, 36, 0.08);
     --color-amber-alpha-10: rgba(251, 191, 36, 0.1);
     --color-amber-alpha-12: rgba(251, 191, 36, 0.12);
     --color-amber-alpha-15: rgba(251, 191, 36, 0.15);
@@ -392,6 +393,7 @@
     --color-gray-50-alpha-50: rgba(249, 250, 251, 0.5);
 
     /* Amber-500 opacity variants (245, 158, 11 = #f59e0b) */
+    --color-amber-500-alpha-5: rgba(245, 158, 11, 0.05);
     --color-amber-500-alpha-10: rgba(245, 158, 11, 0.1);
     --color-amber-500-alpha-15: rgba(245, 158, 11, 0.15);
     --color-amber-500-alpha-18: rgba(245, 158, 11, 0.18);
