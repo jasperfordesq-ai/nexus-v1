@@ -28,7 +28,7 @@
 
     .auth-card-body {
         /* CRITICAL: Explicit padding to prevent edge flushness */
-        padding: 50px;
+        padding: var(--space-12);
     }
 
     .form-row {
@@ -109,14 +109,14 @@
         pointer-events: none;
         border: 2px solid transparent;
         border-radius: 0;
-        box-shadow: 0 2px 0 #929191;
+        box-shadow: 0 2px 0 var(--color-gray-500);
         margin-top: var(--space-2-5);
         cursor: not-allowed;
     }
 
     .auth-submit-btn:not([disabled]) {
         background-color: var(--color-govuk-green);
-        box-shadow: 0 2px 0 #002d18;
+        box-shadow: 0 2px 0 var(--color-govuk-green-darker);
         opacity: 1;
         pointer-events: auto;
         cursor: pointer;
@@ -134,7 +134,7 @@
     }
 
     .auth-login-link {
-        margin-top: 25px;
+        margin-top: var(--space-6);
         text-align: center;
         font-size: 0.95rem;
         color: var(--htb-text-muted, var(--color-govuk-grey-dark));
@@ -162,7 +162,7 @@
         }
 
         .auth-card-body {
-            padding: 25px !important;
+            padding: var(--space-6) !important;
         }
 
         .form-row {

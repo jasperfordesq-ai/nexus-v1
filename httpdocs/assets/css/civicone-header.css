@@ -9,10 +9,10 @@
    Updated 2026-01-20: Now uses GOV.UK spacing tokens
    =========================================== */
 :root {
-    /* Primary Brand */
+    /* Primary Brand - GOV.UK aligned colors */
     --civic-brand: var(--color-govuk-green-darker);
-    --civic-brand-dark: #005a4f;
-    --civic-brand-light: #4db6ac;
+    --civic-brand-dark: var(--color-govuk-green-darker);  /* GOV.UK green #00703c darker */
+    --civic-brand-light: var(--color-emerald-400);        /* Light green for accents */
 
     /* Text Colors - WCAG AA Verified */
     --civic-text-primary: var(--govuk-text-colour, var(--color-govuk-black));   /* GOV.UK black */
@@ -194,7 +194,7 @@
 .civic-dropdown-content a[aria-current="true"] {
     font-weight: bold;
     color: var(--civic-brand, var(--color-govuk-green-darker));
-    background: rgba(0, 121, 107, 0.1);
+    background: var(--color-emerald-50);
 }
 
 .civic-dropdown-content a[aria-current="true"] .civic-checkmark {
@@ -388,7 +388,7 @@
 
 .civic-desktop-nav .civic-nav-link.active,
 .civic-desktop-nav .civic-nav-link[aria-current="page"] {
-    background-color: rgba(0, 121, 107, 0.1);
+    background-color: var(--color-emerald-50);
     text-decoration: underline;
     text-underline-offset: var(--space-1);
     text-decoration-thickness: 3px;
@@ -997,12 +997,12 @@
     --civic-action-create: var(--color-emerald-400);      /* 6.87:1 - Emerald 400 */
     --civic-action-federation: var(--color-purple-400-alt);  /* 5.49:1 - Violet 400 */
     --civic-action-newsletter: var(--color-amber-300);  /* 9.17:1 - Amber 400 */
-    --civic-action-admin: #fb923c;       /* 6.25:1 - Orange 400 */
+    --civic-action-admin: var(--color-orange-500);       /* 6.25:1 - Orange 400 */
     --civic-action-ranking: var(--color-pink-400);     /* 5.89:1 - Pink 400 */
     --civic-action-logout: var(--color-red-400);      /* 5.18:1 - Red 400 */
 
     /* Dark Mode Icon Colors (WCAG AA on var(--color-gray-800)) */
-    --civic-icon-brand: #4db6ac;    /* Teal 300 */
+    --civic-icon-brand: var(--color-emerald-400);    /* GOV.UK green light */
     --civic-icon-purple: var(--color-purple-400-alt);   /* Violet 400 */
     --civic-icon-green: var(--color-emerald-400);    /* Emerald 400 */
     --civic-icon-pink: var(--color-pink-400);     /* Pink 400 */
@@ -1035,7 +1035,7 @@
 }
 
 .civicone.dark-mode .civic-desktop-nav .civic-nav-link.active {
-    background-color: rgba(77, 182, 172, 0.15);
+    background-color: var(--color-emerald-800);
     text-decoration-color: var(--civic-brand-light);
 }
 
@@ -1605,7 +1605,7 @@
 .civic-dropdown-content a[aria-current="true"] {
     font-weight: bold;
     color: var(--civic-brand);
-    background: rgba(0, 121, 107, 0.1);
+    background: var(--color-emerald-50);
 }
 
 .civic-dropdown-content .civic-menu-check {
