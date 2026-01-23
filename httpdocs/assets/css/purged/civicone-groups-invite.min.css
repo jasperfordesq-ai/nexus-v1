@@ -1,1 +1,1 @@
-@keyframes fadeInUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}.htb-card{animation:fadeInUp 0.4s ease-out}@media (max-width:768px){}
+.htb-card{}@media (max-width:768px){}

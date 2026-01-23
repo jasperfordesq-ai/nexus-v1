@@ -429,6 +429,10 @@
         justify-content: center;
     }
 
+    #unique-glass-page-wrapper .glass-modal-overlay.visible {
+        display: flex;
+    }
+
     #unique-glass-page-wrapper .glass-modal-content {
         background: var(--glass-bg);
         border: 1px solid var(--glass-border);

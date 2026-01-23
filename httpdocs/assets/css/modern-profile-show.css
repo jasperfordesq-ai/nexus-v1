@@ -333,6 +333,279 @@
 }
 
 /* =====================================================
+   COMMENT SYSTEM STYLES
+   Extracted from inline styles in JavaScript templates
+   ===================================================== */
+
+/* Edited indicator */
+.comment-edited-badge {
+    font-size: 0.7rem;
+    color: var(--color-gray-400);
+}
+
+/* Comment action buttons (edit, delete, reply) */
+.comment-action-btn {
+    cursor: pointer;
+    margin-left: var(--space-3);
+    color: var(--color-gray-500);
+    font-size: 12px;
+}
+
+.comment-action-btn--delete {
+    margin-left: var(--space-1);
+}
+
+/* Reaction badge */
+.comment-reaction-badge {
+    cursor: pointer;
+    padding: 2px 6px;
+    border-radius: 12px;
+    font-size: 12px;
+    background: rgba(243, 244, 246, 0.8);
+    border: 1px solid rgba(229, 231, 235, 0.8);
+    margin-right: var(--space-1);
+}
+
+.comment-reaction-badge--active {
+    background: rgba(99, 102, 241, 0.2);
+    border-color: rgba(99, 102, 241, 0.4);
+}
+
+/* Reaction picker */
+.comment-reaction-picker {
+    display: inline-block;
+    position: relative;
+}
+
+.comment-reaction-picker__toggle {
+    cursor: pointer;
+    padding: 2px 6px;
+    border-radius: 12px;
+    font-size: 12px;
+    background: rgba(243, 244, 246, 0.8);
+    border: 1px solid rgba(229, 231, 235, 0.8);
+}
+
+.comment-reaction-picker__dropdown {
+    display: none;
+    position: absolute;
+    bottom: 24px;
+    left: 0;
+    background: var(--color-white);
+    border-radius: 20px;
+    padding: var(--space-1) var(--space-2);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    white-space: nowrap;
+    z-index: var(--z-dropdown);
+}
+
+.comment-reaction-picker__emoji {
+    cursor: pointer;
+    padding: var(--space-1);
+    font-size: 18px;
+    transition: transform 0.1s;
+}
+
+.comment-reaction-picker__emoji:hover {
+    transform: scale(1.3);
+}
+
+/* Mention highlight */
+.comment-mention {
+    color: var(--color-primary-500);
+    font-weight: 600;
+}
+
+/* Comment container */
+.comment-item {
+    margin-bottom: var(--space-3);
+}
+
+.comment-wrapper {
+    display: flex;
+    gap: var(--space-2);
+}
+
+/* Comment avatar */
+.comment-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    object-fit: cover;
+    flex-shrink: 0;
+}
+
+/* Comment content area */
+.comment-body {
+    flex-grow: 1;
+}
+
+/* Comment bubble */
+.comment-bubble {
+    background: rgba(243, 244, 246, 0.8);
+    backdrop-filter: blur(8px);
+    padding: var(--space-2) var(--space-3);
+    border-radius: 18px;
+    display: inline-block;
+    max-width: 100%;
+}
+
+/* Comment author name */
+.comment-author {
+    font-weight: 600;
+    font-size: 13px;
+    color: var(--color-gray-800);
+}
+
+/* Comment text content */
+.comment-text {
+    font-size: 14px;
+    color: var(--color-gray-800);
+    word-wrap: break-word;
+}
+
+/* Comment actions row */
+.comment-actions {
+    margin-top: var(--space-1);
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: var(--space-1);
+}
+
+/* Reply form container */
+.comment-reply-form {
+    display: none;
+    margin-top: var(--space-2);
+}
+
+.comment-reply-form__inner {
+    display: flex;
+    gap: var(--space-2);
+    align-items: center;
+}
+
+/* Reply input */
+.comment-reply-input {
+    flex-grow: 1;
+    border-radius: 20px;
+    padding: var(--space-2) var(--space-3);
+    font-size: 13px;
+}
+
+/* Reply submit button */
+.comment-reply-btn {
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.9), rgba(139, 92, 246, 0.9));
+    color: var(--color-white);
+    border: none;
+    border-radius: 20px;
+    padding: var(--space-2) var(--space-4);
+    cursor: pointer;
+    font-size: 13px;
+}
+
+/* Loading state */
+.comment-loading {
+    color: var(--color-gray-500);
+    padding: var(--space-3);
+    text-align: center;
+}
+
+/* Error state */
+.comment-error {
+    color: var(--color-danger);
+    padding: var(--space-3);
+    text-align: center;
+}
+
+/* Empty state */
+.comment-empty {
+    color: var(--color-gray-400);
+    padding: var(--space-3);
+    font-size: 13px;
+    text-align: center;
+}
+
+/* Basic comment format (fallback) */
+.comment-basic {
+    display: flex;
+    gap: var(--space-2);
+    margin-bottom: var(--space-3);
+}
+
+.comment-basic__bubble {
+    background: var(--color-gray-100);
+    padding: var(--space-2) var(--space-3);
+    border-radius: 18px;
+    flex: 1;
+}
+
+.comment-basic__author {
+    font-weight: 600;
+    font-size: 13px;
+    color: var(--color-gray-800);
+}
+
+.comment-basic__text {
+    font-size: 14px;
+    color: var(--color-gray-800);
+}
+
+/* =====================================================
+   RATING FEEDBACK STYLES
+   ===================================================== */
+
+.rating-label--initial {
+    opacity: 0.6;
+}
+
+.rating-indicator--hidden {
+    opacity: 0;
+}
+
+/* Icon spacing helper */
+.icon-mr-2 {
+    margin-right: var(--space-2);
+}
+
+/* =====================================================
+   DARK MODE - Comment System
+   ===================================================== */
+
+[data-theme="dark"] .comment-bubble {
+    background: rgba(30, 41, 59, 0.8);
+}
+
+[data-theme="dark"] .comment-author,
+[data-theme="dark"] .comment-text {
+    color: var(--color-gray-100);
+}
+
+[data-theme="dark"] .comment-reaction-badge {
+    background: rgba(55, 65, 81, 0.8);
+    border-color: rgba(75, 85, 99, 0.8);
+}
+
+[data-theme="dark"] .comment-reaction-badge--active {
+    background: rgba(99, 102, 241, 0.3);
+    border-color: rgba(99, 102, 241, 0.5);
+}
+
+[data-theme="dark"] .comment-reaction-picker__dropdown {
+    background: var(--color-gray-800);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+}
+
+[data-theme="dark"] .comment-basic__bubble {
+    background: var(--color-gray-700);
+}
+
+[data-theme="dark"] .comment-basic__author,
+[data-theme="dark"] .comment-basic__text {
+    color: var(--color-gray-100);
+}
+
+/* =====================================================
    DARK MODE OVERRIDES
    ===================================================== */
 

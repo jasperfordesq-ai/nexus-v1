@@ -143,6 +143,7 @@ try {
     <!-- Dashboard CSS (loaded when on dashboard page) -->
     <?php if (strpos($normPath, '/dashboard') !== false): ?>
         <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/dashboard.min.css?v=<?= $cssVersionTimestamp ?>">
+        <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/modern-dashboard.css?v=<?= $cssVersionTimestamp ?>">
     <?php endif; ?>
 
     <!-- Nexus Score CSS (loaded when on nexus-score pages) -->
@@ -291,6 +292,7 @@ try {
     <?php endif; ?>
     <?php if (preg_match('/\/events\/\d+$/', $normPath)): ?>
     <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/events-show.min.css?v=<?= $cssVersionTimestamp ?>">
+    <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/modern-events-show.min.css?v=<?= $cssVersionTimestamp ?>">
     <?php endif; ?>
 
     <!-- Blog/News CSS -->

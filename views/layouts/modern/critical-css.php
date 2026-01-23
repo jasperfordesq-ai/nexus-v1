@@ -233,4 +233,9 @@ img{max-width:100%;height:auto}
 
 /* Font Loading */
 @font-face{font-family:'Roboto';font-style:normal;font-weight:400;font-display:optional;src:local('Roboto'),local('Roboto-Regular')}
+
+/* Volunteering Page - Prevent FOUC */
+.vol-page-bg{position:fixed;inset:0;z-index:-1;pointer-events:none}
+.vol-glass-container{margin:100px auto 20px;max-width:1200px;padding:32px;border-radius:24px}
+@media(max-width:900px){.vol-glass-container{margin:80px 10px 20px;padding:20px}}
 </style>
