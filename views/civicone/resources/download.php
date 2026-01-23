@@ -27,7 +27,7 @@ if (($resource['file_size'] ?? 0) > 1024 * 1024) {
 
 <!-- GOV.UK Page Template Boilerplate (Section 10.0) -->
 <div class="civicone-width-container">
-    <main class="civicone-main-wrapper" id="main-content">
+    <main class="civicone-main-wrapper">
         <div class="civic-download-container">
             <div class="civic-download-card">
                 <div class="civic-download-icon" aria-hidden="true"><?= $icon ?></div>

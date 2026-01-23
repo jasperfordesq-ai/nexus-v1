@@ -63,7 +63,8 @@ require __DIR__ . '/../../layouts/modern/header.php';
                        value="<?= htmlspecialchars($query ?? '') ?>" class="vol-search-input">
             </div>
 
-            <select name="cat" class="vol-search-select">
+            <label for="vol-category-select" class="govuk-visually-hidden">Filter by category</label>
+            <select name="cat" id="vol-category-select" class="vol-search-select" aria-label="Filter by category">
                 <option value="">All Categories</option>
                 <?php if (!empty($categories)): ?>
                     <?php foreach ($categories as $cat): ?>

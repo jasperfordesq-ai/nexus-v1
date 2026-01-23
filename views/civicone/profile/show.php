@@ -261,7 +261,7 @@ require __DIR__ . '/../../layouts/civicone/header.php';
 
 <!-- Template C: Detail Page (2/3 + 1/3 layout) -->
 <div class="civicone-width-container">
-    <main class="civicone-main-wrapper" id="main-content">
+    <main class="civicone-main-wrapper">
 
         <!-- Breadcrumbs (GOV.UK Template C requirement - DP-004) -->
         <nav class="civicone-breadcrumbs" aria-label="Breadcrumb">

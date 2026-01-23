@@ -4,7 +4,7 @@ $hSubtitle = "Security Standards, GDPR Compliance & Cloud Architecture";
 require __DIR__ . '/../../layouts/civicone/header.php';
 ?>
 
-<main id="main-content" class="civic-container" style="padding: 40px 20px;">
+<main class="civic-container" style="padding: 40px 20px;">
 
     <header style="margin-bottom: 40px; text-align: center;">
         <h1 style="color: #0d1b2a; font-size: 2.5rem; margin-bottom: 10px;">Technical Proposal</h1>

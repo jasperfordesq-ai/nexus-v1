@@ -8,7 +8,7 @@ $basePath = \Nexus\Core\TenantContext::getBasePath();
 
 <!-- GOV.UK Page Template Boilerplate -->
 <div class="civicone-width-container">
-    <main class="civicone-main-wrapper" id="main-content">
+    <main class="civicone-main-wrapper">
 
         <!-- Breadcrumbs (GOV.UK Template A requirement) -->
         <nav class="civicone-breadcrumbs" aria-label="Breadcrumb">

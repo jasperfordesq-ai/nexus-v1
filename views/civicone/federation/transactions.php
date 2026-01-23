@@ -40,7 +40,7 @@ $currentTenantName = $currentTenant['name'] ?? 'Your Community';
 <?php require dirname(dirname(__DIR__)) . '/layouts/civicone/partials/federation-service-navigation.php'; ?>
 
 <div class="civicone-width-container">
-    <main class="civicone-main-wrapper" id="main-content">
+    <main class="civicone-main-wrapper">
 
         <!-- Page Header -->
         <h1 class="govuk-heading-xl">Federated Transactions</h1>

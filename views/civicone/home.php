@@ -164,7 +164,7 @@ require __DIR__ . '/../layouts/civicone/header.php';
         </ol>
     </nav>
 
-    <main class="govuk-main-wrapper" id="main-content" role="main">
+    <main class="govuk-main-wrapper" role="main">
 
         <!-- Page Header with Caption - GOV.UK page header pattern -->
         <header class="civicone-page-header">

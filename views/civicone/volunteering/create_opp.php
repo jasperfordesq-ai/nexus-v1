@@ -14,7 +14,7 @@ $basePath = \Nexus\Core\TenantContext::getBasePath();
 <link rel="stylesheet" href="<?= $basePath ?>/assets/css/civicone-volunteering-create-opp.css">
 
 <div class="civicone-width-container">
-    <main class="civicone-main-wrapper" id="main-content">
+    <main class="civicone-main-wrapper">
 
         <div class="civic-container">
 

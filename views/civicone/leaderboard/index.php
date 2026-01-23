@@ -27,7 +27,7 @@ $basePath = \Nexus\Core\TenantContext::getBasePath();
 
 <!-- GOV.UK Page Template Boilerplate (Section 10.0) -->
 <div class="civicone-width-container">
-    <main class="civicone-main-wrapper" id="main-content">
+    <main class="civicone-main-wrapper">
 
         <div class="leaderboard-bg" aria-hidden="true"></div>
 

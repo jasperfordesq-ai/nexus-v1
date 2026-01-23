@@ -38,7 +38,7 @@ $currentScope = $currentScope ?? 'all';
 </div>
 
 <div class="civicone-width-container">
-    <main class="civicone-main-wrapper" id="main-content">
+    <main class="civicone-main-wrapper">
         <!-- Page Header -->
         <h1 class="govuk-heading-xl">Partner Communities</h1>
 

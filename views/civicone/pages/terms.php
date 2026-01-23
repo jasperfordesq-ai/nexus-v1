@@ -38,7 +38,7 @@ require __DIR__ . '/../../layouts/civicone/header.php';
         </ol>
     </nav>
 
-    <main class="govuk-main-wrapper" id="main-content" role="main">
+    <main class="govuk-main-wrapper" role="main">
 
         <div class="govuk-grid-row">
             <div class="govuk-grid-column-two-thirds">

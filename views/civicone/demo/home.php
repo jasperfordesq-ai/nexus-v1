@@ -4,7 +4,7 @@ $hSubtitle = "Modernising Community Engagement for Local Government & HSE";
 require __DIR__ . '/../../layouts/civicone/header.php';
 ?>
 
-<main id="main-content" class="civic-container" style="padding: 40px 20px;">
+<main class="civic-container" style="padding: 40px 20px;">
 
     <!-- Hero Section -->
     <div style="background: #f0f9ff; border-radius: 12px; padding: 40px; margin-bottom: 40px; border-left: 6px solid #002d72;">

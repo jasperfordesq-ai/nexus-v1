@@ -4,7 +4,7 @@ $hSubtitle = "Community Wealth Building & Time Credits for Local Govt";
 require __DIR__ . '/../../layouts/civicone/header.php';
 ?>
 
-<main id="main-content" class="civic-container" style="padding: 40px 20px;">
+<main class="civic-container" style="padding: 40px 20px;">
 
     <!-- Council Branding Header -->
     <div style="background: linear-gradient(135deg, #002d72 0%, #1e3a8a 100%); padding: 50px; border-radius: 12px; color: white; margin-bottom: 40px;">

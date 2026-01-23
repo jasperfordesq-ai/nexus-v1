@@ -40,7 +40,7 @@ $activeMembers = array_filter($members, function($mem) {
         </ol>
     </nav>
 
-    <main class="civicone-main-wrapper" id="main-content">
+    <main class="civicone-main-wrapper">
 
         <!-- Page Heading (GOV.UK Standard - Required <h1>) -->
         <h1 class="govuk-heading-xl">Members</h1>

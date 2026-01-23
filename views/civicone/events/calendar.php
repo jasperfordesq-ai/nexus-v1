@@ -40,7 +40,7 @@ $nextLink = "$basePath/events/calendar?month=$nextMonth&year=$nextYear";
 
 <!-- GOV.UK Page Template Boilerplate (Section 10.0) -->
 <div class="civicone-width-container">
-    <main class="civicone-main-wrapper" id="main-content">
+    <main class="civicone-main-wrapper">
 
         <!-- Offline Banner -->
         <div class="holo-offline-banner" id="offlineBanner" role="alert" aria-live="polite">

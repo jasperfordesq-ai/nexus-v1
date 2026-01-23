@@ -4,7 +4,7 @@ $hSubtitle = "Digital Pathways for Social Prescribing in Irish Healthcare";
 require __DIR__ . '/../../layouts/civicone/header.php';
 ?>
 
-<main id="main-content" class="civic-container" style="padding: 40px 20px;">
+<main class="civic-container" style="padding: 40px 20px;">
 
     <!-- HSE Branding Header -->
     <div style="background: linear-gradient(135deg, #007b5f 0%, #045d48 100%); padding: 50px; border-radius: 12px; color: white; margin-bottom: 40px;">
