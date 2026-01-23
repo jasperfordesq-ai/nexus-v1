@@ -160,7 +160,7 @@
     text-decoration: none !important;
     outline: 3px solid var(--civicone-focus-text) !important;
     outline-offset: 0 !important;
-    box-shadow: 0 var(--space-1) var(--space-2) rgba(0, 0, 0, 0.3) !important;
+    box-shadow: 0 var(--space-1) var(--space-2) var(--color-black-alpha-30) !important;
 }
 
 /* ===========================================

@@ -358,14 +358,14 @@ a.civic-button--secondary:visited,
     width: var(--space-5);
     height: var(--space-5);
     margin: calc(var(--space-3) * -1) 0 0 calc(var(--space-3) * -1);
-    border: 2px solid rgba(255, 255, 255, 0.3);
+    border: 2px solid var(--color-white-alpha-30);
     border-top-color: var(--color-white);
     border-radius: var(--radius-full);
     /* animation removed for GOV.UK compliance */
 }
 
 .civic-button--secondary.civic-button--loading::after {
-    border-color: rgba(11, 12, 12, 0.3);
+    border-color: var(--color-black-alpha-30);
     border-top-color: var(--color-govuk-black);
 }
 

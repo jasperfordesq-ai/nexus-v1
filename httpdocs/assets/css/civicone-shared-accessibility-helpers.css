@@ -20,7 +20,7 @@
 *:focus-visible {
     outline: 3px solid var(--color-primary-500);
     outline-offset: 2px;
-    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+    box-shadow: 0 0 0 3px var(--color-indigo-alpha-20);
 }
 
 /* Remove outline for mouse users */
@@ -36,7 +36,7 @@ select:focus-visible,
 textarea:focus-visible {
     outline: 3px solid var(--color-primary-500);
     outline-offset: 2px;
-    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+    box-shadow: 0 0 0 3px var(--color-indigo-alpha-20);
 }
 
 /* Minimum touch target sizes for mobile */

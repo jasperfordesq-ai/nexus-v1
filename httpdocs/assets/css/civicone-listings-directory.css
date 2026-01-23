@@ -26,7 +26,7 @@
 }
 
 .civicone--govuk .civicone-listing-item:hover {
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 2px 8px var(--color-black-alpha-10);
     border-color: var(--civic-brand, var(--color-govuk-green-darker));
 }
 
@@ -37,7 +37,7 @@
 
 [data-theme="dark"] .civicone--govuk .civicone-listing-item:hover {
     border-color: var(--civic-brand, #00B8A9);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 2px 8px var(--color-black-alpha-30);
 }
 
 /* Meta Header (Type Badge + Posted Date) */
@@ -524,7 +524,7 @@
 }
 
 [data-theme="dark"] .civicone--govuk .civicone-notification--info {
-    background: rgba(29, 112, 184, 0.15);
+    background: var(--color-govuk-blue-light-alpha-15);
     border-left-color: var(--color-blue-400);
 }
 
@@ -692,7 +692,7 @@
 }
 
 [data-theme="dark"] .civicone--govuk .civicone-error-message {
-    background: rgba(212, 53, 28, 0.1);
+    background: var(--color-govuk-red-alpha-10);
     color: var(--color-red-300);
 }
 
