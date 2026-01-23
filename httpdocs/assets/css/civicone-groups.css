@@ -14,7 +14,7 @@
 
     /* Brand/Action Colors (WCAG AA) */
     --civic-group-brand: var(--color-govuk-green-darker);            /* Teal 700 - 5.0:1 */
-    --civic-group-brand-hover: #00695C;      /* Teal 800 - 6.1:1 */
+    --civic-group-brand-hover: var(--color-teal-700-govuk);      /* Teal 700 - 6.1:1 */
     --civic-group-danger: var(--color-red-600);           /* Red 600 - 5.1:1 */
 
     /* Focus Ring */
@@ -36,7 +36,7 @@
     --civic-group-text-secondary: var(--color-gray-200);
     --civic-group-text-muted: var(--color-gray-300);
     --civic-group-brand: var(--color-teal-300);
-    --civic-group-brand-hover: #99F6E4;
+    --civic-group-brand-hover: var(--color-teal-200);
     --civic-group-border: var(--color-gray-700);
     --civic-group-border-dark: var(--color-gray-600);
 }
@@ -106,7 +106,7 @@
     align-items: center;
     text-align: center;
     padding: 0;
-    background: var(--civic-bg-card, #f7f7f7);
+    background: var(--civic-bg-card, var(--color-gray-75));
     border: none;
     border-radius: var(--radius-base);
     overflow: hidden;
@@ -234,7 +234,7 @@
     align-items: center;
     text-align: center;
     padding: 0;
-    background: var(--civic-bg-card, #f7f7f7);
+    background: var(--civic-bg-card, var(--color-gray-75));
     border: none;
     border-radius: var(--radius-base);
     overflow: hidden;
@@ -597,7 +597,7 @@
 
 .civic-group-cover {
     height: 200px;
-    background: linear-gradient(135deg, var(--civic-group-brand) 0%, #004d40 100%);
+    background: linear-gradient(135deg, var(--civic-group-brand) 0%, var(--color-teal-900) 100%);
     position: relative;
 }
 
@@ -733,7 +733,7 @@
     align-items: center;
     text-align: center;
     padding: 0;
-    background: var(--civic-bg-card, #f7f7f7);
+    background: var(--civic-bg-card, var(--color-gray-75));
     border: none;
     border-radius: var(--radius-base);
     overflow: hidden;
@@ -845,7 +845,7 @@
 .civic-member-card {
     text-align: center;
     padding: var(--space-5);
-    background: #f7f7f7;
+    background: var(--color-gray-75);
     border: none;
     border-radius: var(--radius-base);
     box-shadow: none;

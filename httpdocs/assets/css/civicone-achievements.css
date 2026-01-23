@@ -524,7 +524,7 @@
 }
 
 .badge-rarity-tag.epic {
-    background: #4c2c92;
+    background: var(--color-rarity-epic);
     color: var(--color-white);
 }
 
@@ -587,7 +587,7 @@
 }
 
 .badge-rarity-fill.epic {
-    background: #4c2c92;
+    background: var(--color-rarity-epic);
 }
 
 .badge-rarity-fill.rare {
@@ -828,7 +828,7 @@
 }
 
 .rarity-epic {
-    background: #4c2c92;
+    background: var(--color-rarity-epic);
     color: var(--color-white);
 }
 
@@ -974,7 +974,7 @@
 .challenge-type.monthly {
     background: var(--color-govuk-light-grey);
     color: var(--color-govuk-black);
-    border: 1px solid #4c2c92;
+    border: 1px solid var(--color-rarity-epic);
 }
 
 .challenge-type.special {
@@ -1381,7 +1381,7 @@
 }
 
 .leaderboard-item.top-3:nth-child(3) .rank-badge {
-    background: #cd7f32;
+    background: var(--color-medal-bronze);
     color: var(--color-white);
 }
 
@@ -1447,8 +1447,8 @@
 }
 
 .reward-tier.bronze {
-    background: #fef3e2;
-    border-color: #cd7f32;
+    background: var(--color-medal-bronze-light);
+    border-color: var(--color-medal-bronze);
 }
 
 .tier-icon {

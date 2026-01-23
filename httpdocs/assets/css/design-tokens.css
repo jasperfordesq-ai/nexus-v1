@@ -136,6 +136,7 @@
     --color-amber-500: #f59e0b;
     --color-amber-600: #d97706;
     --color-amber-700: #b45309;
+    --color-amber-800: #854d0e;
     --color-amber-300: #fcd34d;
 
     /* Red palette - Error states */
@@ -159,21 +160,37 @@
     --color-emerald-800: #065f46;
 
     /* Teal palette - Info states, wellness */
+    --color-teal-200: #99f6e4;
     --color-teal-300: #5eead4;
     --color-teal-400: #2dd4bf;
     --color-teal-500: #14b8a6;
     --color-teal-600: #0d9488;
     --color-teal-700: #0f766e;
+    --color-teal-700-govuk: #00695c;
     --color-teal-800: #115e59;
+    --color-teal-900: #004d40;
+
+    /* Card background grays */
+    --color-gray-75: #f7f7f7;
 
     /* Purple variants - Premium features, polls */
+    --color-purple-50: #faf5ff;
+    --color-purple-100: #f3e8ff;
     --color-purple-200: #ddd6fe;
     --color-purple-300: #c4b5fd;
+    --color-purple-400: #c084fc;
     --color-purple-400-alt: #a78bfa;
     --color-purple-500-alt: #9333ea;
     --color-purple-600: #7c3aed;
     --color-purple-700: #6d28d9;
+    --color-purple-950: #2e1065;
     --color-indigo-800: #5b21b6;
+
+    /* Wallet-specific colors */
+    --color-selected-user-bg: #f0f9ff;
+    --color-selected-user-bg-dark: #1e3a5f;
+    --color-table-header: #dee0e2;
+    --color-red-400-alt: #fc8181;
 
     /* Rose palette - Alerts, important actions */
     --color-rose-300: #fda4af;
@@ -236,6 +253,35 @@
     /* GOV.UK Tag colors */
     --color-govuk-tag-light-blue: #d2e2f1;
 
+    /* Achievement/Medal colors */
+    --color-medal-bronze: #cd7f32;
+    --color-medal-bronze-light: #fef3e2;
+    --color-rarity-epic: #4c2c92;
+
+    /* Listing type colors */
+    --color-listing-offer: #00A86B;
+    --color-listing-request: #FF8C42;
+
+    /* WCAG-compliant button colors */
+    --color-button-warning: #d4621f;
+    --color-button-warning-hover: #b85316;
+    --color-button-danger-wcag: #b91e0a;
+    --color-button-danger-hover: #9a1908;
+
+    /* Extended red palette - Dev banners, dark states */
+    --color-red-800: #991b1b;
+    --color-red-900: #7f1d1d;
+
+    /* Extended emerald palette - Accessible themes */
+    --color-emerald-900: #064e3b;
+
+    /* Extended blue palette - Info themes */
+    --color-blue-750: #1e40af;
+
+    /* Neutral grays - Dev banner hover states */
+    --color-gray-150: #f0f0f0;
+    --color-text-dark: #1a1a1a;
+
     /* Semantic color aliases for WCAG refactoring */
     --color-success-100: #dcfce7;
     --color-success-400: #34d399;
@@ -260,6 +306,7 @@
     /* Red variants - Additional error states */
     --color-red-50: #fef2f2;
     --color-red-100: #fee2e2;
+    --color-red-200: #fecaca;
     --color-red-300: #fca5a5;
     --color-red-400: #f87171;
 

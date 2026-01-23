@@ -71,12 +71,12 @@
 }
 
 [data-theme="dark"] .civicone--govuk .civicone-listing-item__type--offer {
-    background-color: #00A86B;
+    background-color: var(--color-listing-offer);
     color: var(--color-white);
 }
 
 [data-theme="dark"] .civicone--govuk .civicone-listing-item__type--request {
-    background-color: #FF8C42;
+    background-color: var(--color-listing-request);
     color: var(--color-govuk-black);
 }
 
@@ -400,11 +400,11 @@
 }
 
 [data-theme="dark"] .civicone--govuk .civicone-listing-detail__type-badge--offer {
-    background-color: #00A86B;
+    background-color: var(--color-listing-offer);
 }
 
 [data-theme="dark"] .civicone--govuk .civicone-listing-detail__type-badge--request {
-    background-color: #FF8C42;
+    background-color: var(--color-listing-request);
 }
 
 /* Image */
@@ -520,7 +520,7 @@
 
 .civicone--govuk .civicone-notification--info {
     border-left-color: var(--color-govuk-blue-light);
-    background: #d2e2f1;
+    background: var(--color-govuk-tag-light-blue);
 }
 
 [data-theme="dark"] .civicone--govuk .civicone-notification--info {

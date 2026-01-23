@@ -17,7 +17,7 @@
     align-items: center;
     justify-content: center;
     box-shadow: 0 4px 12px rgba(185, 28, 28, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.1);
-    border-bottom: var(--space-1) solid #991b1b;
+    border-bottom: var(--space-1) solid var(--color-red-800);
     z-index: 1000;
 }
 
@@ -150,7 +150,7 @@
     align-items: center;
     gap: var(--space-2);
     background: var(--color-white);
-    color: #1a1a1a;
+    color: var(--color-text-dark);
     padding: var(--space-2-5) var(--space-4-5);
     border-radius: var(--radius-md);
     font-weight: 700;
@@ -164,8 +164,8 @@
 }
 
 .civicone-dev-switch:hover {
-    background: #f0f0f0;
-    color: var(--color-govuk-black)000;
+    background: var(--color-gray-150);
+    color: var(--color-govuk-black);
     transform: translateY(-2px);
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
     text-decoration: none;
@@ -188,7 +188,7 @@
 
 .civicone-dev-banner--accessible {
     background: linear-gradient(135deg, var(--color-emerald-800) 0%, var(--color-success-700) 50%, var(--color-emerald-800) 100%);
-    border-bottom-color: #064e3b;
+    border-bottom-color: var(--color-emerald-900);
     box-shadow: 0 4px 12px rgba(6, 95, 70, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.1);
 }
 
@@ -226,7 +226,7 @@
 
 .civicone-dev-banner--info {
     background: linear-gradient(135deg, var(--color-govuk-blue) 0%, var(--color-blue-500) 50%, var(--color-govuk-blue) 100%);
-    border-bottom-color: #1e40af;
+    border-bottom-color: var(--color-blue-750);
     box-shadow: 0 4px 12px rgba(29, 78, 216, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.1);
 }
 
@@ -244,11 +244,11 @@
 
 /* Scoped to .civicone per GR-016 */
 .civicone.dark-mode .civicone-dev-banner {
-    background: linear-gradient(135deg, #7f1d1d 0%, #991b1b 50%, #7f1d1d 100%);
+    background: linear-gradient(135deg, var(--color-red-900) 0%, var(--color-red-800) 50%, var(--color-red-900) 100%);
 }
 
 .civicone.dark-mode .civicone-dev-banner--accessible {
-    background: linear-gradient(135deg, #064e3b 0%, var(--color-emerald-800) 50%, #064e3b 100%);
+    background: linear-gradient(135deg, var(--color-emerald-900) 0%, var(--color-emerald-800) 50%, var(--color-emerald-900) 100%);
 }
 
 .civicone.dark-mode .civicone-dev-banner--warning {
@@ -256,7 +256,7 @@
 }
 
 .civicone.dark-mode .civicone-dev-banner--info {
-    background: linear-gradient(135deg, var(--color-blue-800) 0%, #1e40af 50%, var(--color-blue-800) 100%);
+    background: linear-gradient(135deg, var(--color-blue-800) 0%, var(--color-blue-750) 50%, var(--color-blue-800) 100%);
 }
 
 /* ===========================================
