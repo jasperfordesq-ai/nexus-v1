@@ -2442,14 +2442,19 @@ class EnterpriseController
             $available = false;
             $version = null;
 
-            // Try to execute version check
+            // Try to execute version check using escapeshellcmd for safety
             if (!empty($info['check_command'])) {
-                $output = @shell_exec($info['check_command']);
-                if ($output && !str_contains($output, 'not found') && !str_contains($output, 'not recognized')) {
-                    $available = true;
-                    // Extract version from first line
-                    $lines = explode("\n", trim($output));
-                    $version = trim($lines[0]);
+                // Only allow specific known safe commands
+                $allowedCommands = ['cwebp -version', 'mysqldump --version', 'mysql --version', 'composer --version'];
+                $baseCommand = preg_replace('/\s+2>&1$/', '', $info['check_command']);
+                if (in_array($baseCommand, $allowedCommands)) {
+                    $output = @shell_exec(escapeshellcmd($info['check_command']));
+                    if ($output && !str_contains($output, 'not found') && !str_contains($output, 'not recognized')) {
+                        $available = true;
+                        // Extract version from first line
+                        $lines = explode("\n", trim($output));
+                        $version = trim($lines[0]);
+                    }
                 }
             }
 

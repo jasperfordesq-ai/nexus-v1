@@ -104,9 +104,15 @@ class HtmlSanitizer
         // Suppress warnings from malformed HTML
         libxml_use_internal_errors(true);
 
+        // Disable external entity loading to prevent XXE attacks
+        $previousEntityLoader = libxml_disable_entity_loader(true);
+
         // Wrap in container to preserve structure
         $wrapped = '<div id="__sanitizer_root__">' . $html . '</div>';
-        $dom->loadHTML('<?xml encoding="UTF-8">' . $wrapped, LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
+        $dom->loadHTML('<?xml encoding="UTF-8">' . $wrapped, LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD | LIBXML_NOENT | LIBXML_NONET);
+
+        // Restore previous entity loader state
+        libxml_disable_entity_loader($previousEntityLoader);
 
         libxml_clear_errors();
 

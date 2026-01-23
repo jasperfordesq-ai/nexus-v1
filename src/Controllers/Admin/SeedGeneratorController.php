@@ -313,6 +313,8 @@ class SeedGeneratorController
         $sql .= "-- Seeding: {$tableName} (" . count($rows) . " records)\n";
         $sql .= "-- ============================================================================\n\n";
 
+        $pdo = Database::getInstance();
+
         foreach ($rows as $row) {
             $columnNames = array_keys($row);
             $values = [];
@@ -320,11 +322,9 @@ class SeedGeneratorController
             foreach ($row as $col => $value) {
                 if ($value === null) {
                     $values[] = 'NULL';
-                } elseif ($col === 'password') {
-                    // Keep bcrypt hashes as-is
-                    $values[] = "'" . addslashes($value) . "'";
                 } else {
-                    $values[] = "'" . addslashes($value) . "'";
+                    // Use PDO::quote for proper SQL escaping (handles all character sets safely)
+                    $values[] = $pdo->quote($value);
                 }
             }
 

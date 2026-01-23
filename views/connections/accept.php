@@ -38,8 +38,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 );
             }
 
-            // Redirect Back
-            header("Location: " . $_SERVER['HTTP_REFERER']);
+            // Redirect Back - validate referer to prevent open redirect
+            $referer = $_SERVER['HTTP_REFERER'] ?? '';
+            $basePath = TenantContext::getBasePath();
+            $allowedHost = $_SERVER['HTTP_HOST'] ?? '';
+
+            // Only redirect to referer if it's from the same host
+            if (!empty($referer)) {
+                $parsedReferer = parse_url($referer);
+                $refererHost = $parsedReferer['host'] ?? '';
+                if ($refererHost === $allowedHost) {
+                    header("Location: " . $referer);
+                    exit;
+                }
+            }
+
+            // Fallback to safe default
+            header("Location: " . $basePath . "/connections");
             exit;
         } catch (Exception $e) {
             echo "Error accepting request: " . $e->getMessage();

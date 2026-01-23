@@ -57,7 +57,7 @@ $canEdit = ($isOwner || $isAdmin);
 <link href="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.css" rel="stylesheet">
 <script src="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.js"></script>
 <script>
-    window.NEXUS_MAPBOX_TOKEN = "<?= getenv('MAPBOX_API_KEY') ?>";
+    window.NEXUS_MAPBOX_TOKEN = "<?= htmlspecialchars(getenv('MAPBOX_API_KEY') ?: '', ENT_QUOTES, 'UTF-8') ?>";
 </script>
 
 <!-- Offline Banner -->
