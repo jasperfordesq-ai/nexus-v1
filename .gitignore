@@ -62,7 +62,9 @@ debug-*.php
 verify-*.php
 
 # Documentation in root (should be in docs/)
+# Note: CLAUDE.md is tracked (not ignored)
 /*.md
+!CLAUDE.md
 
 # SQL scripts in root (should be in scripts/sql/)
 /*.sql
