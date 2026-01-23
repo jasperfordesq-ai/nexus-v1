@@ -9,6 +9,7 @@ use Nexus\Models\VolOrganization;
 use Nexus\Models\VolOpportunity;
 use Nexus\Models\VolApplication;
 use Nexus\Models\Category;
+use Nexus\Models\ActivityLog;
 
 class VolunteeringController
 {
@@ -489,8 +490,6 @@ class VolunteeringController
         }
 
         $categories = Category::getByType('vol_opportunity');
-        $preselectedOrgId = $_GET['org_id'] ?? ($myOrgs[0]['id'] ?? null);
-
         $preselectedOrgId = $_GET['org_id'] ?? ($myOrgs[0]['id'] ?? null);
 
         // View Resolution - Let View class handle layout switching

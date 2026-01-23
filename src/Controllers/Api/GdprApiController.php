@@ -18,7 +18,7 @@ class GdprApiController
 
     public function __construct()
     {
-        $this->gdprService = new GdprService(Database::getInstance()->getConnection());
+        $this->gdprService = new GdprService();
     }
 
     /**
@@ -172,7 +172,7 @@ class GdprApiController
      */
     private function getUserEmail(int $userId): string
     {
-        $db = Database::getInstance()->getConnection();
+        $db = Database::getInstance();
         $stmt = $db->prepare("SELECT email FROM users WHERE id = ?");
         $stmt->execute([$userId]);
         $user = $stmt->fetch();
@@ -185,7 +185,7 @@ class GdprApiController
      */
     private function verifyPassword(int $userId, string $password): bool
     {
-        $db = Database::getInstance()->getConnection();
+        $db = Database::getInstance();
         $stmt = $db->prepare("SELECT password_hash FROM users WHERE id = ?");
         $stmt->execute([$userId]);
         $user = $stmt->fetch();

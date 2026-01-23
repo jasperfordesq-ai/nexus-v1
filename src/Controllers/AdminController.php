@@ -1682,32 +1682,35 @@ class AdminController
 
     /**
      * Test ranking service directly
+     * Note: Debug output removed for security - results are logged server-side
      */
     public function testRanking()
     {
         $this->checkAdmin();
 
-        header('Content-Type: text/plain');
-
-        echo "=== SMART GROUP RANKING TEST ===\n\n";
+        header('Content-Type: application/json');
 
         try {
-            echo "1. Testing updateFeaturedLocalHubs()...\n\n";
-
             $stats = \Nexus\Services\SmartGroupRankingService::updateFeaturedLocalHubs(2, 6);
 
-            echo "SUCCESS!\n\n";
-            echo "Results:\n";
-            print_r($stats);
-        } catch (\Exception $e) {
-            echo "ERROR: " . $e->getMessage() . "\n";
-            echo "File: " . $e->getFile() . "\n";
-            echo "Line: " . $e->getLine() . "\n";
-            echo "\nStack trace:\n";
-            echo $e->getTraceAsString();
-        }
+            // Log detailed results server-side only
+            error_log("SmartGroupRanking test completed: " . json_encode($stats));
 
-        echo "\n\n=== END TEST ===\n";
+            echo json_encode([
+                'success' => true,
+                'message' => 'Ranking update completed successfully',
+                'groups_updated' => $stats['featured_count'] ?? 0
+            ]);
+        } catch (\Exception $e) {
+            // Log full error server-side
+            error_log("SmartGroupRanking test failed: " . $e->getMessage() . " in " . $e->getFile() . ":" . $e->getLine());
+
+            http_response_code(500);
+            echo json_encode([
+                'success' => false,
+                'message' => 'Ranking update failed. Check server logs for details.'
+            ]);
+        }
         exit;
     }
 
