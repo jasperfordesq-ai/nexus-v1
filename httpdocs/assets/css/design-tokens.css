@@ -244,6 +244,7 @@
     --color-emerald-alpha-30: rgba(16, 185, 129, 0.3);
     --color-emerald-alpha-40: rgba(16, 185, 129, 0.4);
     --color-emerald-alpha-50: rgba(16, 185, 129, 0.5);
+    --color-emerald-alpha-60: rgba(16, 185, 129, 0.6);
 
     /* Emerald-600 opacity variants (5, 150, 105 = #059669) */
     --color-emerald-600-alpha-10: rgba(5, 150, 105, 0.1);
@@ -393,6 +394,10 @@
     --color-amber-500-alpha-20: rgba(245, 158, 11, 0.2);
     --color-amber-500-alpha-30: rgba(245, 158, 11, 0.3);
     --color-amber-500-alpha-40: rgba(245, 158, 11, 0.4);
+    --color-amber-500-alpha-85: rgba(245, 158, 11, 0.85);
+    /* Amber-100 opacity variants (254, 243, 199 = #fef3c7) */
+    --color-amber-100-alpha-80: rgba(254, 243, 199, 0.8);
+    --color-amber-100-alpha-85: rgba(254, 243, 199, 0.85);
 
     /* Sky-500 opacity variants (14, 165, 233 = #0ea5e9) */
     --color-sky-500-alpha-40: rgba(14, 165, 233, 0.4);
@@ -446,6 +451,7 @@
 
     /* Blue-600 opacity variants (37, 99, 235 = #2563eb) */
     --color-blue-600-alpha-3: rgba(37, 99, 235, 0.03);
+    --color-blue-600-alpha-10: rgba(37, 99, 235, 0.1);
     --color-blue-600-alpha-30: rgba(37, 99, 235, 0.3);
     --color-blue-600-alpha-40: rgba(37, 99, 235, 0.4);
     --color-blue-600-alpha-50: rgba(37, 99, 235, 0.5);
@@ -499,16 +505,32 @@
     /* Medal/Ranking colors */
     /* Gold (255, 215, 0 = #ffd700) */
     --color-gold-alpha-10: rgba(255, 215, 0, 0.1);
+    --color-gold-alpha-15: rgba(255, 215, 0, 0.15);
     --color-gold-alpha-30: rgba(255, 215, 0, 0.3);
+    --color-gold-alpha-40: rgba(255, 215, 0, 0.4);
     --color-gold-alpha-50: rgba(255, 215, 0, 0.5);
     /* Silver (192, 192, 192 = #c0c0c0) */
     --color-silver-alpha-10: rgba(192, 192, 192, 0.1);
+    --color-silver-alpha-15: rgba(192, 192, 192, 0.15);
     --color-silver-alpha-30: rgba(192, 192, 192, 0.3);
+    --color-silver-alpha-40: rgba(192, 192, 192, 0.4);
     --color-silver-alpha-50: rgba(192, 192, 192, 0.5);
     /* Bronze (205, 127, 50 = #cd7f32) */
     --color-bronze-alpha-10: rgba(205, 127, 50, 0.1);
+    --color-bronze-alpha-15: rgba(205, 127, 50, 0.15);
     --color-bronze-alpha-30: rgba(205, 127, 50, 0.3);
+    --color-bronze-alpha-40: rgba(205, 127, 50, 0.4);
     --color-bronze-alpha-50: rgba(205, 127, 50, 0.5);
+    /* Bronze Dark (184, 115, 51 = #b87333) for gradients */
+    --color-bronze-dark-alpha-15: rgba(184, 115, 51, 0.15);
+    /* Dark Gray (169, 169, 169 = #a9a9a9) for silver gradients */
+    --color-darkgray-alpha-15: rgba(169, 169, 169, 0.15);
+    /* Amber-400 (251, 191, 36 = #fbbf24) */
+    --color-amber-400-alpha-10: rgba(251, 191, 36, 0.1);
+    --color-amber-400-alpha-15: rgba(251, 191, 36, 0.15);
+    --color-amber-400-alpha-40: rgba(251, 191, 36, 0.4);
+    /* Yellow-500 alt (255, 193, 7 = #ffc107) */
+    --color-yellow-500-alt-alpha-15: rgba(255, 193, 7, 0.15);
 
     /* Yellow-500 opacity variants (234, 179, 8 = #eab308) */
     --color-yellow-500-alpha-12: rgba(234, 179, 8, 0.12);
@@ -575,6 +597,8 @@
     --color-slate-900-alpha-70: rgba(15, 23, 42, 0.7);
     --color-slate-900-alpha-75: rgba(15, 23, 42, 0.75);
     --color-slate-900-alpha-85: rgba(15, 23, 42, 0.85);
+    --color-slate-900-alpha-90: rgba(15, 23, 42, 0.9);
+    --color-slate-900-alpha-95: rgba(15, 23, 42, 0.95);
 
     /* Slate-500 opacity variants (100, 116, 139 = #64748b) */
     --color-slate-500-alpha-8: rgba(100, 116, 139, 0.08);
