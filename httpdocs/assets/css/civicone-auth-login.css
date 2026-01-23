@@ -36,7 +36,7 @@
 
 .auth-title {
     margin-top: 0;
-    margin-bottom: 25px;
+    margin-bottom: var(--space-6);
     font-weight: 800;
     color: var(--color-slate-900);
     text-align: center;
@@ -57,7 +57,7 @@
 }
 
 .auth-alert-success {
-    background: #f0fdf4;
+    background: var(--color-emerald-50);
     color: var(--color-govuk-green-dark);
     font-weight: 600;
     border-color: var(--color-emerald-200);
@@ -75,7 +75,7 @@
 
 .biometric-container {
     display: none;
-    margin-bottom: 25px;
+    margin-bottom: var(--space-6);
 }
 
 .biometric-btn {
@@ -108,7 +108,7 @@
 .biometric-promo {
     display: none;
     margin-bottom: var(--space-5);
-    padding: var(--space-3-5) 16px;
+    padding: var(--space-3-5) var(--space-4);
     background: linear-gradient(135deg, rgba(99, 102, 241, 0.08), rgba(139, 92, 246, 0.08));
     border-radius: var(--radius-md);
     border: 1px solid rgba(99, 102, 241, 0.2);
@@ -150,7 +150,7 @@
 .biometric-promo-badge {
     background: rgba(99, 102, 241, 0.1);
     color: var(--color-primary-500);
-    padding: var(--space-1) 8px;
+    padding: var(--space-1) var(--space-2);
     border-radius: var(--radius-lg);
     font-size: 0.7rem;
     font-weight: 700;
@@ -166,7 +166,7 @@
 }
 
 .auth-form-group-lg {
-    margin-bottom: 25px;
+    margin-bottom: var(--space-6);
 }
 
 .auth-label {
@@ -243,7 +243,7 @@
     line-height: 1.2;
     border: 2px solid transparent;
     border-radius: 0; /* GOV.UK: no border radius */
-    box-shadow: 0 2px 0 #002d18;
+    box-shadow: 0 2px 0 var(--color-govuk-green-darker);
     cursor: pointer;
     transition: background-color 0.15s ease;
     text-decoration: none;
@@ -270,7 +270,7 @@
    =========================================== */
 
 .auth-footer-text {
-    margin-top: 25px;
+    margin-top: var(--space-6);
     text-align: center;
     font-size: 0.95rem;
     color: var(--color-slate-500);
@@ -303,7 +303,7 @@
     }
 
     .auth-card-body {
-        padding: 25px !important;
+        padding: var(--space-6) !important;
     }
 }
 
