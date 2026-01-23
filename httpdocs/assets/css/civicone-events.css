@@ -492,7 +492,7 @@
 /* Skip to main content link (accessibility) */
 .civic-skip-link {
     position: absolute;
-    top: -var(--space-10);
+    top: calc(-1 * var(--space-10));
     left: 0;
     background: var(--civic-event-brand);
     color: white;

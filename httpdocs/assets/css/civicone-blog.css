@@ -68,19 +68,6 @@
 /* --------------------------------------------
    Content Reveal Animations
    -------------------------------------------- */
-/* Animation removed for GOV.UK compliance */
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-/* Animation removed for GOV.UK compliance */
-    to {
-        opacity: 1;
-        transform: scale(1);
-    }
-}
 
 #news-holo-wrapper .news-hero-section {
     /* animation removed for GOV.UK compliance */
@@ -172,16 +159,6 @@
     /* animation removed for GOV.UK compliance */
 }
 
-/* Animation removed for GOV.UK compliance */
-    50% {
-        opacity: 0.85;
-        filter: hue-rotate(15deg);
-    }
-    100% {
-        opacity: 1;
-        filter: hue-rotate(-15deg);
-    }
-}
 
 
 /* --------------------------------------------

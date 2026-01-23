@@ -224,8 +224,6 @@
     border-top-color: var(--color-success-500);
 }
 
-/* Animation removed for GOV.UK compliance */
-}
 
 /* Button loading state */
 .org-btn-loading {
@@ -268,9 +266,6 @@
     background-size: 200% 100%;
 }
 
-/* Animation removed for GOV.UK compliance */
-    100% { background-position: -200% 0; }
-}
 
 .org-skeleton-text {
     height: 16px;

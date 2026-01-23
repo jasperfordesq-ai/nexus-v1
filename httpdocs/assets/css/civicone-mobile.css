@@ -163,12 +163,6 @@
     }
 }
 
-/* Animation removed for GOV.UK compliance */
-    50% {
-        transform: scale(1.1);
-        box-shadow: 0 2px 8px rgba(239, 68, 68, 0.6);
-    }
-}
 
 /* Make nav-icon position relative for badge positioning */
 .civic-bottom-nav-item .civic-nav-icon {
@@ -315,9 +309,6 @@ body.dark-mode .civic-bottom-nav-item.active {
     }
 }
 
-/* Animation removed for GOV.UK compliance */
-    100% { background-position: -200% 0; }
-}
 
 .civic-skeleton-text {
     height: var(--font-size-sm);

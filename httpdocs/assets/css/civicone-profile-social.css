@@ -557,12 +557,6 @@
     line-height: var(--line-height-normal);
 }
 
-/* Animation removed for GOV.UK compliance */
-    to {
-        transform: translate(-50%, 0);
-        opacity: 1;
-    }
-}
 
 /* =============================================================================
    SIDEBAR: RELATED CONTENT

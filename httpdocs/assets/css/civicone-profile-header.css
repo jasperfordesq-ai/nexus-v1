@@ -65,9 +65,6 @@
     box-shadow: 0 0 var(--space-2) rgba(244, 119, 56, 0.6);
 }
 
-/* Animation removed for GOV.UK compliance */
-    50% { opacity: 0.5; }
-}
 
 .civicone .civicone-identity-bar__status-indicator--online {
     /* animation removed for GOV.UK compliance */
