@@ -25,7 +25,7 @@ $basePath = Nexus\Core\TenantContext::getBasePath();
 </div>
 
 <div class="civicone-width-container">
-    <main class="civicone-main-wrapper" id="main-content">
+    <main class="civicone-main-wrapper">
         <div class="htb-container discussion-create-wrapper">
 
             <!-- Back Navigation -->

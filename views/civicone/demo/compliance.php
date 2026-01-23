@@ -4,7 +4,7 @@ $hSubtitle = "WCAG 2.1 AA & GDPR Compliance Documentation";
 require __DIR__ . '/../../layouts/civicone/header.php';
 ?>
 
-<main id="main-content" class="civic-container" style="padding: 40px 20px;">
+<main class="civic-container" style="padding: 40px 20px;">
 
     <header style="margin-bottom: 40px; border-bottom: 1px solid #e2e8f0; padding-bottom: 20px;">
         <span style="background: #e0f2fe; color: #002d72; padding: 6px 12px; border-radius: 20px; font-weight: 600; font-size: 0.9rem;">Security & Standards</span>

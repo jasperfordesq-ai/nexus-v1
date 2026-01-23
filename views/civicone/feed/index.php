@@ -499,7 +499,7 @@ require dirname(__DIR__, 2) . '/layouts/civicone/header.php';
 
 <!-- GOV.UK Page Template Boilerplate (Section 10.0) -->
 <div class="civicone-width-container">
-    <main class="civicone-main-wrapper" id="main-content">
+    <main class="civicone-main-wrapper">
 
         <!-- Page Header (GOV.UK Typography) -->
         <h1 class="govuk-heading-xl">Community Pulse</h1>

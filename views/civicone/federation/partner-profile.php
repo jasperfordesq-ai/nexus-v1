@@ -42,7 +42,7 @@ $enabledFeatureCount = count(array_filter($features));
 <?php require dirname(dirname(__DIR__)) . '/layouts/civicone/partials/federation-service-navigation.php'; ?>
 
 <div class="civicone-width-container">
-    <main class="civicone-main-wrapper" id="main-content">
+    <main class="civicone-main-wrapper">
         <!-- Back Link -->
         <a href="<?= $basePath ?>/federation" class="govuk-back-link">Back to Partner Timebanks</a>
 

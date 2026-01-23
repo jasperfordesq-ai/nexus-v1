@@ -16,7 +16,7 @@ require __DIR__ . '/../../layouts/civicone/partials/breadcrumb.php';
 
 <!-- GOV.UK Page Template Boilerplate -->
 <div class="civicone-width-container civicone--govuk">
-    <main class="civicone-main-wrapper" id="main-content" role="main">
+    <main class="civicone-main-wrapper" role="main">
 
         <!-- Page Header (GOV.UK Typography) -->
         <h1 class="govuk-heading-xl">Volunteering Opportunities</h1>

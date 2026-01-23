@@ -82,7 +82,7 @@ function highlightExcerpt(string $content, string $query, int $maxLength = 200):
         </ol>
     </nav>
 
-    <main class="govuk-main-wrapper" id="main-content" role="main">
+    <main class="govuk-main-wrapper" role="main">
 
         <div class="govuk-grid-row">
             <div class="govuk-grid-column-two-thirds">

@@ -25,7 +25,7 @@ require dirname(__DIR__, 2) . '/layouts/civicone/partials/breadcrumb.php';
 
 <!-- GOV.UK Page Template Boilerplate -->
 <div class="civicone-width-container civicone--govuk">
-    <main class="civicone-main-wrapper" id="main-content" role="main">
+    <main class="civicone-main-wrapper" role="main">
 
         <!-- Back Link -->
         <a href="<?= $basePath ?>/groups" class="civicone-back-link">

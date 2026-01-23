@@ -358,7 +358,7 @@ try {
 
 $basePath = \Nexus\Core\TenantContext::getBasePath();
 ?>
-<main id="main-content" role="main" aria-label="User profile">
+<main role="main" aria-label="User profile">
 <div class="htb-container profile-container">
     <div class="glass-profile-card">
         <div class="profile-header-flex">

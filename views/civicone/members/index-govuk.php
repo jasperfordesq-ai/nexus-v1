@@ -22,7 +22,7 @@ require __DIR__ . '/../components/govuk/tag.php';
 
 <!-- GOV.UK Page Template Boilerplate - now using .civicone--govuk scope -->
 <div class="civicone--govuk govuk-width-container">
-    <main class="govuk-main-wrapper" id="main-content">
+    <main class="govuk-main-wrapper">
 
         <!-- Page Header (GOV.UK Typography) -->
         <h1 class="govuk-heading-xl">Members Directory</h1>
