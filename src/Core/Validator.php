@@ -33,6 +33,17 @@ class Validator
         $token = getenv('MAPBOX_ACCESS_TOKEN');
         if (!$token) return null; // Skip if no token configured
 
+        // Security: Sanitize location input to prevent SSRF
+        $location = preg_replace('/[\x00-\x1F\x7F]/', '', $location); // Remove control chars
+        $location = trim($location);
+
+        // Block URL-like inputs and IP addresses
+        if (strlen($location) > 500 ||
+            preg_match('/^(https?|ftp|file|data|javascript|vbscript):/i', $location) ||
+            preg_match('/^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}/', $location)) {
+            return "Invalid location format.";
+        }
+
         $url = "https://api.mapbox.com/geocoding/v5/mapbox.places/" . urlencode($location) . ".json?access_token=$token&country=ie&limit=1";
 
         $ch = curl_init();

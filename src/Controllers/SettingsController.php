@@ -4,6 +4,7 @@ namespace Nexus\Controllers;
 
 use Nexus\Core\View;
 use Nexus\Core\Auth;
+use Nexus\Core\Csrf;
 use Nexus\Models\User;
 use Nexus\Core\TenantContext;
 use Nexus\Services\Enterprise\GdprService;
@@ -56,6 +57,8 @@ class SettingsController
      */
     public function updateProfile()
     {
+        Csrf::verifyOrDie();
+
         if (!isset($_SESSION['user_id'])) {
             header('Location: ' . TenantContext::getBasePath() . '/login');
             exit;
@@ -185,6 +188,8 @@ class SettingsController
      */
     public function updatePassword()
     {
+        Csrf::verifyOrDie();
+
         if (!isset($_SESSION['user_id'])) {
             header('Location: ' . TenantContext::getBasePath() . '/login');
             exit;
@@ -226,6 +231,8 @@ class SettingsController
      */
     public function updatePrivacy()
     {
+        Csrf::verifyOrDie();
+
         if (!isset($_SESSION['user_id'])) {
             header('Location: ' . TenantContext::getBasePath() . '/login');
             exit;
@@ -270,6 +277,8 @@ class SettingsController
      */
     public function updateNotifications()
     {
+        Csrf::verifyOrDie();
+
         if (!isset($_SESSION['user_id'])) {
             header('Location: ' . TenantContext::getBasePath() . '/login');
             exit;
@@ -460,6 +469,8 @@ class SettingsController
      */
     public function updateFederation()
     {
+        Csrf::verifyOrDie();
+
         if (!isset($_SESSION['user_id'])) {
             header('Location: ' . TenantContext::getBasePath() . '/login');
             exit;

@@ -269,12 +269,31 @@ class PageController
     }
     public function show($slug)
     {
-        // Security: Prevent traversal
-        if (strpos($slug, '.') !== false || strpos($slug, '/') !== false) {
+        // Security: Prevent path traversal attacks
+        // Decode URL-encoded characters first, then check for dangerous patterns
+        $decodedSlug = urldecode($slug);
+
+        // Remove null bytes and normalize
+        $decodedSlug = str_replace("\0", '', $decodedSlug);
+
+        // Block directory traversal, path separators, and special characters
+        if (strpos($decodedSlug, '.') !== false ||
+            strpos($decodedSlug, '/') !== false ||
+            strpos($decodedSlug, '\\') !== false) {
             http_response_code(404);
-            echo "Page not found.";
+            View::render('errors/404');
             return;
         }
+
+        // Only allow alphanumeric, hyphens, and underscores in slugs
+        if (!preg_match('/^[a-zA-Z0-9_-]+$/', $decodedSlug)) {
+            http_response_code(404);
+            View::render('errors/404');
+            return;
+        }
+
+        // Use the validated slug
+        $slug = $decodedSlug;
 
         $tenantId = \Nexus\Core\TenantContext::getId();
         $role = $_SESSION['user_role'] ?? '';

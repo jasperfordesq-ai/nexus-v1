@@ -95,12 +95,12 @@ class WebPConverter
         // Get original size
         $originalSize = filesize($imagePath);
 
-        // Execute cwebp
+        // Execute cwebp with properly escaped paths to prevent command injection
         $command = sprintf(
-            'cwebp -q %d "%s" -o "%s" 2>&1',
+            'cwebp -q %d %s -o %s 2>&1',
             $this->quality,
-            $imagePath,
-            $webpPath
+            escapeshellarg($imagePath),
+            escapeshellarg($webpPath)
         );
 
         $output = [];

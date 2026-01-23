@@ -29,6 +29,36 @@ class GeocodingService
     private static $lastRequestTime = 0;
 
     /**
+     * Sanitize address input to prevent SSRF attacks
+     *
+     * @param string $address Raw address input
+     * @return string|null Sanitized address or null if invalid
+     */
+    private static function sanitizeAddress(string $address): ?string
+    {
+        // Remove null bytes and control characters
+        $address = preg_replace('/[\x00-\x1F\x7F]/', '', $address);
+
+        // Limit length to prevent abuse (typical addresses are under 200 chars)
+        if (strlen($address) > 500) {
+            return null;
+        }
+
+        // Block URL-like inputs that could be SSRF attempts
+        if (preg_match('/^(https?|ftp|file|data|javascript|vbscript):/i', trim($address))) {
+            error_log("GeocodingService: Blocked potential SSRF attempt: " . substr($address, 0, 100));
+            return null;
+        }
+
+        // Block IP addresses (internal network probing)
+        if (preg_match('/^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}/', trim($address))) {
+            return null;
+        }
+
+        return trim($address);
+    }
+
+    /**
      * Geocode an address and return coordinates
      *
      * @param string $address The address to geocode
@@ -37,6 +67,12 @@ class GeocodingService
     public static function geocode(string $address): ?array
     {
         if (empty(trim($address))) {
+            return null;
+        }
+
+        // Sanitize input to prevent SSRF
+        $address = self::sanitizeAddress($address);
+        if ($address === null) {
             return null;
         }
 

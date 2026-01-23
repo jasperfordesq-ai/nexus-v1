@@ -3,6 +3,7 @@
 namespace Nexus\Controllers;
 
 use Nexus\Core\TenantContext;
+use Nexus\Core\Csrf;
 
 /**
  * ComposeController
@@ -99,6 +100,9 @@ class ComposeController
         if (session_status() === PHP_SESSION_NONE) {
             session_start();
         }
+
+        // Verify CSRF token
+        Csrf::verifyOrDie();
 
         if (empty($_SESSION['user_id'])) {
             http_response_code(401);

@@ -35,7 +35,7 @@
                     <?= \Nexus\Core\Csrf::input() ?>
 
                     <input type="hidden" name="transaction_id" value="<?= $transactionId ?>">
-                    <input type="hidden" name="receiver_id" value="<?= $_GET['receiver'] ?? 0 ?>">
+                    <input type="hidden" name="receiver_id" value="<?= htmlspecialchars((string)($_GET['receiver'] ?? 0), ENT_QUOTES, 'UTF-8') ?>">
 
                     <label for="rating">Rating</label>
                     <select name="rating" required>
