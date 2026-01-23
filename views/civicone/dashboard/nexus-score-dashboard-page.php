@@ -171,7 +171,7 @@ require_once __DIR__ . '/../../layouts/civicone/header.php';
                                                         </div>
                                                     </td>
                                                     <td>
-                                                        <span class="badge" style="background-color: <?php echo $user['tier']['color'] ?? '#6366f1'; ?>;">
+                                                        <span class="badge" style="background-color: <?php echo $user['tier']['color'] ?? 'var(--color-primary-500)'; ?>;">
                                                             <?php echo $user['tier']['icon'] ?? ''; ?>
                                                             <?php echo $user['tier']['name'] ?? 'Novice'; ?>
                                                         </span>

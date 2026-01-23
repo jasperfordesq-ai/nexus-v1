@@ -2835,7 +2835,7 @@ if (empty($mapboxToken)) {
                         </div>
                     </details>
 
-                    <button type="submit" class="md-submit-btn" style="background: linear-gradient(135deg, #ec4899 0%, #be185d 100%);">
+                    <button type="submit" class="md-submit-btn" style="background: linear-gradient(135deg, var(--color-pink-500) 0%, var(--color-pink-700) 100%);">
                         <i class="fa-solid fa-calendar-plus"></i>
                         Create Event
                     </button>

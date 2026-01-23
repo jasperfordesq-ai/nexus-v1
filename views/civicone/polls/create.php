@@ -9,7 +9,7 @@ require dirname(__DIR__, 2) . '/layouts/civicone/header.php';
 
 <div class="civic-container">
 
-    <h2 style="border-bottom: 4px solid #000; padding-bottom: 10px; margin-bottom: 30px;">New Poll</h2>
+    <h2 class="civic-border-bottom-black" style="padding-bottom: 10px; margin-bottom: 30px;">New Poll</h2>
 
     <form action="<?= Nexus\Core\TenantContext::getBasePath() ?>/polls/store" method="POST" class="civic-card" style="max-width: 600px;">
         <?= Nexus\Core\Csrf::input() ?>
@@ -25,7 +25,7 @@ require dirname(__DIR__, 2) . '/layouts/civicone/header.php';
             <input type="text" name="options[]" class="civic-input" placeholder="Option 1" required style="margin-bottom: 10px;">
             <input type="text" name="options[]" class="civic-input" placeholder="Option 2" required style="margin-bottom: 10px;">
         </div>
-        <button type="button" onclick="addOption()" style="background: #eee; border: 1px solid #999; padding: 5px 10px; cursor: pointer; margin-bottom: 20px;">+ Add Option</button>
+        <button type="button" onclick="addOption()" class="civic-poll-option" style="padding: 5px 10px; cursor: pointer; margin-bottom: 20px;">+ Add Option</button>
 
         <label class="civic-label">End Date (Optional)</label>
         <input type="date" name="end_date" class="civic-input">

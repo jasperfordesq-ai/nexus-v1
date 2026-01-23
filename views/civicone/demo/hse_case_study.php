@@ -7,7 +7,7 @@ require __DIR__ . '/../../layouts/civicone/header.php';
 <main class="civic-container" style="padding: 40px 20px;">
 
     <!-- HSE Branding Header -->
-    <div style="background: linear-gradient(135deg, #007b5f 0%, #045d48 100%); padding: 50px; border-radius: 12px; color: white; margin-bottom: 40px;">
+    <div style="background: linear-gradient(135deg, var(--skin-primary) 0%, var(--skin-primary-dark, #045d48) 100%); padding: 50px; border-radius: 12px; color: white; margin-bottom: 40px;">
         <span style="background: rgba(255,255,255,0.2); text-transform: uppercase; letter-spacing: 1px; font-size: 0.8rem; padding: 4px 10px; border-radius: 4px;">Case Study: Healthcare</span>
         <h1 style="color: white; margin: 15px 0; font-size: 2.5rem;">Reducing Healthcare Pressure via Community Action</h1>
         <p style="font-size: 1.2rem; opacity: 0.9;">A Community Healthcare Organisation (CHO) uses NEXUS to manage a network of "Wellness Volunteers."</p>
@@ -18,10 +18,10 @@ require __DIR__ . '/../../layouts/civicone/header.php';
         <!-- Scenario -->
         <div>
             <h2 style="color: #007b5f; border-bottom: 2px solid #007b5f; padding-bottom: 10px; display: inline-block;">The Scenario</h2>
-            <p style="font-size: 1.1rem; line-height: 1.7; color: #334155;">
+            <p class="civic-text-dark" style="font-size: 1.1rem; line-height: 1.7;">
                 GPs and Public Health Nurses often see patients whose primary complaints are rooted in isolation or lack of activity, rather than acute medical issues. The "Social Prescribing" model works, but tracking referrals and ensuring patient safety has historically been manual and paper-based.
             </p>
-            <p style="font-size: 1.1rem; line-height: 1.7; color: #334155;">
+            <p class="civic-text-dark" style="font-size: 1.1rem; line-height: 1.7;">
                 <strong>The Challenge:</strong> Connecting patients to trusted, vetted community groups without adding administrative burden to clinical staff.
             </p>
         </div>
@@ -49,7 +49,7 @@ require __DIR__ . '/../../layouts/civicone/header.php';
     <!-- Call to Action -->
     <div style="margin-top: 50px; text-align: center;">
         <a href="<?= \Nexus\Core\TenantContext::getBasePath() ?>/volunteering" class="civic-btn" style="background-color: #007b5f; color: white; padding: 12px 25px; border-radius: 6px; text-decoration: none; font-weight: 600; font-size: 1.1rem;">View Live Volunteer Opportunities</a>
-        <p style="margin-top: 15px; color: #64748b; font-size: 0.9rem;">Experience the user journey for a potential volunteer.</p>
+        <p class="civic-text-light" style="margin-top: 15px; font-size: 0.9rem;">Experience the user journey for a potential volunteer.</p>
     </div>
 
 </main>

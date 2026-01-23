@@ -66,7 +66,7 @@ $interactionId = $targetType . '-' . $targetId;
     <div class="civic-social-stats">
         <div class="civic-social-stats-left likes-count-clickable" onclick="event.stopPropagation(); showLikers('<?= $targetType ?>', <?= $targetId ?>)" title="See who liked this">
             <?php if ($likesCount > 0): ?>
-                <span class="dashicons dashicons-heart" style="color: #D4351C; font-size: 16px;" aria-hidden="true"></span>
+                <span class="dashicons dashicons-heart civic-text-red" style="font-size: 16px;" aria-hidden="true"></span>
                 <span id="likes-count-<?= $interactionId ?>"><?= $likesCount ?></span>
             <?php else: ?>
                 <span id="likes-count-<?= $interactionId ?>" style="display: none;">0</span>
@@ -266,7 +266,7 @@ $interactionId = $targetType . '-' . $targetId;
                 }
             })
             .catch(() => {
-                list.innerHTML = '<div style="color: #D4351C; text-align: center; padding: 16px;">Error loading comments</div>';
+                list.innerHTML = '<div class="civic-text-red" style="text-align: center; padding: 16px;">Error loading comments</div>';
             });
     };
 

@@ -9,10 +9,10 @@ require __DIR__ . '/../../layouts/civicone/header.php';
     <!-- Hero Section -->
     <div style="background: #f0f9ff; border-radius: 12px; padding: 40px; margin-bottom: 40px; border-left: 6px solid #002d72;">
         <h1 style="color: #002d72; font-size: 2.5rem; margin-bottom: 20px;">Modernising Community Engagement</h1>
-        <p style="font-size: 1.2rem; color: #334155; line-height: 1.6; max-width: 800px;">
+        <p class="civic-text-dark" style="font-size: 1.2rem; line-height: 1.6; max-width: 800px;">
             **Empowering Irish Communities Through Digital Infrastructure.**
         </p>
-        <p style="font-size: 1.1rem; color: #475569; line-height: 1.6; max-width: 800px; margin-top: 20px;">
+        <p class="civic-text-medium" style="font-size: 1.1rem; line-height: 1.6; max-width: 800px; margin-top: 20px;">
             Project NEXUS provides the digital backbone for local government and healthcare bodies to bridge the gap between policy and grassroots action. By digitizing community exchange, we enable efficient resource allocation and measurable social impact.
         </p>
     </div>
@@ -46,7 +46,7 @@ require __DIR__ . '/../../layouts/civicone/header.php';
     <!-- CTA -->
     <div style="text-align: center; margin-top: 60px; padding: 40px; background: #f8fafc; border-radius: 12px;">
         <h3 style="color: #1e293b;">Ready to Pilot?</h3>
-        <p style="margin-bottom: 20px; color: #64748b;">This platform is fully compliant with S.I. No. 358/2020.</p>
+        <p class="civic-text-light" style="margin-bottom: 20px;">This platform is fully compliant with S.I. No. 358/2020.</p>
         <a href="<?= \Nexus\Core\TenantContext::getBasePath() ?>/compliance" style="text-decoration: underline; color: #002d72; font-weight: 600;">Read our Compliance Statement</a>
     </div>
 

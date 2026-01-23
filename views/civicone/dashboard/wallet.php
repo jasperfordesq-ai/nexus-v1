@@ -32,7 +32,7 @@ $basePath = \Nexus\Core\TenantContext::getBasePath();
                     <dt class="govuk-summary-list__key">Current balance</dt>
                     <dd class="govuk-summary-list__value">
                         <strong class="civicone-wallet-balance"><?= number_format($user['balance']) ?> Credits</strong>
-                        <div style="font-size: 16px; color: #505a5f; margin-top: 5px;">1 Credit = 1 Hour of Service</div>
+                        <div class="civic-text-dark" style="font-size: 16px; margin-top: 5px;">1 Credit = 1 Hour of Service</div>
                     </dd>
                     <dd class="govuk-summary-list__actions">
                         <a class="govuk-link" href="#transfer-form">

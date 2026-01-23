@@ -44,7 +44,7 @@ function get_avatar_civic($url)
                     <form action="<?= \Nexus\Core\TenantContext::getBasePath() ?>/groups/leave" method="POST" class="ajax-form" style="display:inline;">
                         <?= \Nexus\Core\Csrf::input() ?>
                         <input type="hidden" name="group_id" value="<?= $group['id'] ?>">
-                        <button type="submit" class="civic-btn" style="background: transparent; border: 1px solid #ef4444; color: #ef4444; border-radius: 30px; padding: 8px 20px;">
+                        <button type="submit" class="civic-btn civic-border-red civic-text-red" style="background: transparent; border-radius: 30px; padding: 8px 20px;">
                             Leave Hub
                         </button>
                     </form>
@@ -116,13 +116,12 @@ function get_avatar_civic($url)
                                     ">
                                     <?php else: ?>
                                         <!-- SVG Placeholder -->
-                                        <div style="
-                                        width: 100px; 
-                                        height: 100px; 
-                                        border-radius: 50%; 
+                                        <div class="civic-bg-gray-200" style="
+                                        width: 100px;
+                                        height: 100px;
+                                        border-radius: 50%;
                                         border: 4px solid var(--civic-bg-page, #ffffff);
                                         box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
-                                        background: #e5e7eb;
                                         display: flex;
                                         align-items: center;
                                         justify-content: center;
@@ -172,7 +171,7 @@ function get_avatar_civic($url)
 
             <!-- Tab: Activity (Placeholder for Feed) -->
             <div id="tab-feed" class="civic-tab-pane <?= $defaultTab === 'tab-feed' ? 'active' : '' ?>">
-                <div class="civic-card" style="padding: 40px; text-align: center; background: #f9fafb; border: 1px dashed #d1d5db; margin-bottom: 0;">
+                <div class="civic-card civic-bg-gray-50" style="padding: 40px; text-align: center; border: 1px dashed #d1d5db; margin-bottom: 0;">
                     <h3 style="color: var(--civic-text-muted);">Recent Activity</h3>
                     <p>There is no recent activity in this hub.</p>
                 </div>
@@ -198,7 +197,7 @@ function get_avatar_civic($url)
                                     <img src="<?= htmlspecialchars($mem['avatar_url']) ?>" style="width: 80px; height: 80px; border-radius: 50%; object-fit: cover; border: 3px solid white; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
                                 <?php else: ?>
                                     <!-- SVG Fallback -->
-                                    <div style="width: 80px; height: 80px; margin: 0 auto; border-radius: 50%; background: #e5e7eb; display: flex; align-items: center; justify-content: center; border: 3px solid white; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                                    <div class="civic-bg-gray-200" style="width: 80px; height: 80px; margin: 0 auto; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 3px solid white; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
                                         <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                             <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
                                             <circle cx="12" cy="7" r="4"></circle>

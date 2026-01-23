@@ -34,7 +34,7 @@ require dirname(__DIR__, 2) . '/layouts/civicone/header.php';
                         </a>
                     </h3>
 
-                    <p style="margin-bottom:20px; color:#444; line-height:1.5;">
+                    <p class="civic-text-dark" style="margin-bottom:20px; line-height:1.5;">
                         <?= htmlspecialchars(substr($post['excerpt'] ?: strip_tags($post['content']), 0, 150)) ?>...
                     </p>
 
