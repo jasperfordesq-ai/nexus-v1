@@ -153,8 +153,15 @@ if (!$skipBackup && !$dryRun) {
     $dbPass = getenv('DB_PASS');
     $dbHost = getenv('DB_HOST') ?: 'localhost';
 
-    // Create backup using mysqldump
-    $command = "mysqldump -h {$dbHost} -u {$dbUser} -p{$dbPass} {$dbName} > \"{$backupFile}\" 2>&1";
+    // Create backup using mysqldump with properly escaped credentials
+    $command = sprintf(
+        'mysqldump -h %s -u %s -p%s %s > %s 2>&1',
+        escapeshellarg($dbHost),
+        escapeshellarg($dbUser),
+        escapeshellarg($dbPass),
+        escapeshellarg($dbName),
+        escapeshellarg($backupFile)
+    );
     exec($command, $output, $returnCode);
 
     if ($returnCode === 0 && file_exists($backupFile)) {

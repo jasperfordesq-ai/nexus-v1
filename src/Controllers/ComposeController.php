@@ -307,13 +307,34 @@ class ComposeController
                 if (!is_dir($uploadDir)) {
                     mkdir($uploadDir, 0755, true);
                 }
-                $ext = strtolower(pathinfo($_FILES['image']['name'], PATHINFO_EXTENSION));
-                $allowed = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
-                if (in_array($ext, $allowed)) {
-                    $filename = uniqid('post_') . '.' . $ext;
-                    $targetPath = $uploadDir . $filename;
-                    if (move_uploaded_file($_FILES['image']['tmp_name'], $targetPath)) {
-                        $imageUrl = '/uploads/posts/' . $filename;
+
+                // SECURITY: Validate actual MIME type using finfo, not user-supplied data
+                $allowedTypes = [
+                    'image/jpeg' => ['jpg', 'jpeg'],
+                    'image/png' => ['png'],
+                    'image/gif' => ['gif'],
+                    'image/webp' => ['webp']
+                ];
+
+                $finfo = new \finfo(FILEINFO_MIME_TYPE);
+                $actualMime = $finfo->file($_FILES['image']['tmp_name']);
+
+                if (isset($allowedTypes[$actualMime])) {
+                    // Validate extension matches MIME type
+                    $ext = strtolower(pathinfo($_FILES['image']['name'], PATHINFO_EXTENSION));
+                    if (!in_array($ext, $allowedTypes[$actualMime])) {
+                        $ext = $allowedTypes[$actualMime][0];
+                    }
+
+                    // Also verify it's a valid image using getimagesize
+                    $imageInfo = @getimagesize($_FILES['image']['tmp_name']);
+                    if ($imageInfo !== false) {
+                        // SECURITY: Use cryptographically secure random filename
+                        $filename = 'post_' . bin2hex(random_bytes(16)) . '.' . $ext;
+                        $targetPath = $uploadDir . $filename;
+                        if (move_uploaded_file($_FILES['image']['tmp_name'], $targetPath)) {
+                            $imageUrl = '/uploads/posts/' . $filename;
+                        }
                     }
                 }
             }

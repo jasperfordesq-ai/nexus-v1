@@ -136,7 +136,14 @@ if (!$force) {
         $timestamp = date('Y_m_d_His');
         $currentBackup = $backupDir . "/backup_before_restore_{$timestamp}.sql";
 
-        $command = "mysqldump -h {$dbHost} -u {$dbUser} -p{$dbPass} {$dbName} > \"{$currentBackup}\" 2>&1";
+        $command = sprintf(
+            'mysqldump -h %s -u %s -p%s %s > %s 2>&1',
+            escapeshellarg($dbHost),
+            escapeshellarg($dbUser),
+            escapeshellarg($dbPass),
+            escapeshellarg($dbName),
+            escapeshellarg($currentBackup)
+        );
         exec($command, $output, $returnCode);
 
         if ($returnCode === 0 && file_exists($currentBackup)) {
@@ -171,8 +178,15 @@ if (!$force) {
 echo "\n";
 info("Starting restore...");
 
-// Execute restore
-$command = "mysql -h {$dbHost} -u {$dbUser} -p{$dbPass} {$dbName} < \"{$backupPath}\" 2>&1";
+// Execute restore with properly escaped credentials
+$command = sprintf(
+    'mysql -h %s -u %s -p%s %s < %s 2>&1',
+    escapeshellarg($dbHost),
+    escapeshellarg($dbUser),
+    escapeshellarg($dbPass),
+    escapeshellarg($dbName),
+    escapeshellarg($backupPath)
+);
 exec($command, $output, $returnCode);
 
 if ($returnCode === 0) {

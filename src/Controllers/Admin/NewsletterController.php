@@ -1495,7 +1495,7 @@ class NewsletterController
         $requiredTables = ['newsletters', 'newsletter_queue', 'newsletter_opens', 'newsletter_clicks', 'newsletter_subscribers'];
         foreach ($requiredTables as $table) {
             try {
-                $db->query("SELECT 1 FROM $table LIMIT 1");
+                $db->query("SELECT 1 FROM `$table` LIMIT 1");
                 $diagnostics['tables'][$table] = ['exists' => true, 'status' => 'OK'];
             } catch (\Exception $e) {
                 $diagnostics['tables'][$table] = ['exists' => false, 'status' => 'MISSING'];

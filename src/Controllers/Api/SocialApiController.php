@@ -117,6 +117,19 @@ class SocialApiController
         exit;
     }
 
+    /**
+     * Verify CSRF token for session-based requests (not token-based API calls)
+     */
+    private function verifyCsrf()
+    {
+        // Skip CSRF check for Bearer token authentication (API clients)
+        if (!empty($_SERVER['HTTP_AUTHORIZATION']) && strpos($_SERVER['HTTP_AUTHORIZATION'], 'Bearer ') === 0) {
+            return;
+        }
+        // For session-based requests, verify CSRF token
+        \Nexus\Core\Csrf::verifyOrDieJson();
+    }
+
     private function getUserId($required = true)
     {
         // Use unified auth supporting both session and Bearer token
@@ -157,6 +170,7 @@ class SocialApiController
      */
     public function like()
     {
+        $this->verifyCsrf();
         $userId = $this->getUserId();
         $tenantId = $this->getTenantId();
 
@@ -335,6 +349,7 @@ class SocialApiController
                 break;
             case 'submit':
             case 'submit_comment':
+                $this->verifyCsrf(); // CSRF protection for state-changing actions
                 $this->submitComment($targetType, $targetId);
                 break;
             default:
@@ -455,6 +470,7 @@ class SocialApiController
      */
     public function reply()
     {
+        $this->verifyCsrf();
         $userId = $this->getUserId();
         $tenantId = $this->getTenantId();
 
@@ -498,6 +514,7 @@ class SocialApiController
      */
     public function editComment()
     {
+        $this->verifyCsrf();
         $userId = $this->getUserId();
         $commentId = (int)$this->getInput('comment_id', 0);
         $content = trim($this->getInput('content', ''));
@@ -537,6 +554,7 @@ class SocialApiController
      */
     public function deleteComment()
     {
+        $this->verifyCsrf();
         $userId = $this->getUserId();
         $commentId = (int)$this->getInput('comment_id', 0);
 
@@ -579,6 +597,7 @@ class SocialApiController
      */
     public function reaction()
     {
+        $this->verifyCsrf();
         $userId = $this->getUserId();
         $tenantId = $this->getTenantId();
 
@@ -641,6 +660,7 @@ class SocialApiController
      */
     public function share()
     {
+        $this->verifyCsrf();
         $userId = $this->getUserId();
         $tenantId = $this->getTenantId();
 
@@ -691,6 +711,7 @@ class SocialApiController
      */
     public function delete()
     {
+        $this->verifyCsrf();
         $userId = $this->getUserId();
         $targetType = $this->getInput('target_type', '');
         $targetId = (int)$this->getInput('target_id', 0);
@@ -1131,6 +1152,7 @@ class SocialApiController
      */
     public function createPost()
     {
+        $this->verifyCsrf();
         $userId = $this->getUserId();
         $tenantId = $this->getTenantId();
 
@@ -1199,9 +1221,32 @@ class SocialApiController
 
     private function handleImageUpload($file)
     {
-        $allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+        // SECURITY: Validate actual MIME type using finfo, not user-supplied type
+        $allowedTypes = [
+            'image/jpeg' => ['jpg', 'jpeg'],
+            'image/png' => ['png'],
+            'image/gif' => ['gif'],
+            'image/webp' => ['webp']
+        ];
 
-        if (!in_array($file['type'], $allowedTypes)) {
+        // Check actual file MIME type (not user-supplied header)
+        $finfo = new \finfo(FILEINFO_MIME_TYPE);
+        $actualMime = $finfo->file($file['tmp_name']);
+
+        if (!isset($allowedTypes[$actualMime])) {
+            return null;
+        }
+
+        // Validate extension matches MIME type
+        $ext = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
+        if (!in_array($ext, $allowedTypes[$actualMime])) {
+            // Use first valid extension for detected MIME type
+            $ext = $allowedTypes[$actualMime][0];
+        }
+
+        // Also verify it's a valid image using getimagesize
+        $imageInfo = @getimagesize($file['tmp_name']);
+        if ($imageInfo === false) {
             return null;
         }
 
@@ -1210,8 +1255,8 @@ class SocialApiController
             mkdir($uploadDir, 0755, true);
         }
 
-        $ext = pathinfo($file['name'], PATHINFO_EXTENSION);
-        $filename = uniqid('post_') . '.' . $ext;
+        // SECURITY: Use cryptographically secure random filename
+        $filename = 'post_' . bin2hex(random_bytes(16)) . '.' . $ext;
         $filepath = $uploadDir . $filename;
 
         if (move_uploaded_file($file['tmp_name'], $filepath)) {

@@ -148,7 +148,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
         elseif ($_POST['action'] === 'delete_post') {
             if (($_SESSION['user_role'] ?? '') !== 'admin') exit;
             $table = ($targetType === 'post') ? 'feed_posts' : 'listings';
-            $dbClass::query("DELETE FROM $table WHERE id = ?", [$targetId]);
+            $dbClass::query("DELETE FROM `$table` WHERE id = ?", [$targetId]);
             echo json_encode(['status' => 'deleted']);
         }
     } catch (Exception $e) {

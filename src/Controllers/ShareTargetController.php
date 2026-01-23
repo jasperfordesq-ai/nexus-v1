@@ -250,10 +250,29 @@ class ShareTargetController
      */
     private function handleMediaUpload($file)
     {
-        $allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'video/mp4', 'video/webm'];
+        // SECURITY: Validate actual MIME type using finfo, not user-supplied type
+        $allowedTypes = [
+            'image/jpeg' => ['jpg', 'jpeg'],
+            'image/png' => ['png'],
+            'image/gif' => ['gif'],
+            'image/webp' => ['webp'],
+            'video/mp4' => ['mp4'],
+            'video/webm' => ['webm']
+        ];
 
-        if (!in_array($file['type'], $allowedTypes)) {
+        // Check actual file MIME type (not user-supplied header)
+        $finfo = new \finfo(FILEINFO_MIME_TYPE);
+        $actualMime = $finfo->file($file['tmp_name']);
+
+        if (!isset($allowedTypes[$actualMime])) {
             return null;
+        }
+
+        // Validate extension matches MIME type
+        $ext = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
+        if (!in_array($ext, $allowedTypes[$actualMime])) {
+            // Use first valid extension for detected MIME type
+            $ext = $allowedTypes[$actualMime][0];
         }
 
         // Max 10MB
@@ -266,8 +285,8 @@ class ShareTargetController
             mkdir($uploadDir, 0755, true);
         }
 
-        $ext = pathinfo($file['name'], PATHINFO_EXTENSION);
-        $filename = uniqid('share_') . '.' . $ext;
+        // SECURITY: Use cryptographically secure random filename
+        $filename = 'share_' . bin2hex(random_bytes(16)) . '.' . $ext;
         $targetPath = $uploadDir . $filename;
 
         if (move_uploaded_file($file['tmp_name'], $targetPath)) {

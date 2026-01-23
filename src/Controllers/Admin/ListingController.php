@@ -185,7 +185,7 @@ class ListingController
 
         // 3. Execute Delete (Hard Delete for Admin) - SECURITY: Include tenant_id check
         $tenantId = \Nexus\Core\TenantContext::getId();
-        Database::query("DELETE FROM $table WHERE id = ? AND tenant_id = ?", [$id, $tenantId]);
+        Database::query("DELETE FROM `$table` WHERE id = ? AND tenant_id = ?", [$id, $tenantId]);
 
         // 4. Redirect back
         $redirect = UrlHelper::safeReferer('/admin/listings?status=deleted');

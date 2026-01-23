@@ -51,11 +51,14 @@ class UserSeeder
     {
         $userIds = [];
 
+        // SECURITY: Use environment variable for test admin password, or generate secure random
+        $adminPassword = getenv('SEED_ADMIN_PASSWORD') ?: bin2hex(random_bytes(16));
+
         // Create admin user
         $adminId = $this->createUser([
-            'email' => 'admin@nexus.test',
+            'email' => getenv('SEED_ADMIN_EMAIL') ?: 'admin@nexus.test',
             'name' => 'Admin User',
-            'password' => password_hash('password', PASSWORD_BCRYPT),
+            'password' => password_hash($adminPassword, PASSWORD_BCRYPT),
             'role' => 'admin',
             'is_verified' => 1,
             'xp' => 5000,
@@ -64,12 +67,13 @@ class UserSeeder
         ]);
         $userIds[] = $adminId;
 
-        // Create test users
+        // Create test users with secure random passwords
         for ($i = 1; $i <= min(5, $count - 1); $i++) {
+            $testPassword = bin2hex(random_bytes(16));
             $userId = $this->createUser([
                 'email' => "user{$i}@nexus.test",
                 'name' => "Test User {$i}",
-                'password' => password_hash('password', PASSWORD_BCRYPT),
+                'password' => password_hash($testPassword, PASSWORD_BCRYPT),
                 'role' => 'user',
                 'is_verified' => 1,
                 'xp' => rand(100, 1000),
@@ -87,10 +91,12 @@ class UserSeeder
             $name = "{$firstName} {$lastName}";
             $email = strtolower($firstName . '.' . $lastName . rand(1, 999) . '@example.com');
 
+            // SECURITY: Generate secure random password for each seeded user
+            $randomPassword = bin2hex(random_bytes(16));
             $userId = $this->createUser([
                 'email' => $email,
                 'name' => $name,
-                'password' => password_hash('password', PASSWORD_BCRYPT),
+                'password' => password_hash($randomPassword, PASSWORD_BCRYPT),
                 'role' => 'user',
                 'bio' => $this->bios[array_rand($this->bios)],
                 'location' => $this->randomLocation(),

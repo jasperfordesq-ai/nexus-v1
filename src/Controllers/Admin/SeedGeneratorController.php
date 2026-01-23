@@ -9,6 +9,8 @@ class SeedGeneratorController
 {
     private $tenantId;
     private $userId;
+    private $seedAdminEmail;
+    private $seedAdminPassword;
 
     public function __construct()
     {
@@ -17,6 +19,25 @@ class SeedGeneratorController
 
         $this->tenantId = $_SESSION['tenant_id'] ?? 1;
         $this->userId = $_SESSION['user_id'] ?? null;
+
+        // SECURITY: Get admin credentials from environment or generate secure defaults
+        $this->seedAdminEmail = getenv('SEED_ADMIN_EMAIL') ?: 'admin@nexus.local';
+        $this->seedAdminPassword = getenv('SEED_ADMIN_PASSWORD') ?: $this->generateSecurePassword();
+    }
+
+    /**
+     * Generate a cryptographically secure random password
+     */
+    private function generateSecurePassword(): string
+    {
+        // Generate a 24-character password with mixed case, numbers, and symbols
+        $chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*';
+        $password = '';
+        $max = strlen($chars) - 1;
+        for ($i = 0; $i < 24; $i++) {
+            $password .= $chars[random_int(0, $max)];
+        }
+        return $password;
     }
 
     /**
@@ -250,8 +271,8 @@ class SeedGeneratorController
 
         if (!$isDemoMode) {
             $sql .= "\n-- Super Admin Login:\n";
-            $sql .= "-- Email: jasper.ford.esq@gmail.com\n";
-            $sql .= "-- Password: DruryLane66350!\n";
+            $sql .= "-- Email: {$this->seedAdminEmail}\n";
+            $sql .= "-- Password: [SET VIA SEED_ADMIN_PASSWORD ENV VAR]\n";
         }
 
         return $sql;
@@ -346,10 +367,10 @@ class SeedGeneratorController
         $sql .= "-- ============================================================================\n\n";
 
         // Always create super admin first
-        $hashedPassword = password_hash('DruryLane66350!', PASSWORD_BCRYPT);
+        $hashedPassword = password_hash($this->seedAdminPassword, PASSWORD_BCRYPT);
         $sql .= "-- Super Admin Account\n";
         $sql .= "INSERT INTO `users` (`tenant_id`, `email`, `name`, `password`, `role`, `is_verified`, `xp`, `level`, `points`, `created_at`) VALUES\n";
-        $sql .= "(1, 'jasper.ford.esq@gmail.com', 'Jasper Ford', '{$hashedPassword}', 'admin', 1, 10000, 20, 10000, NOW());\n\n";
+        $sql .= "(1, '{$this->seedAdminEmail}', 'Admin User', '{$hashedPassword}', 'admin', 1, 10000, 20, 10000, NOW());\n\n";
 
         if ($isDemoMode) {
             $sql .= "-- Demo Users (secure random passwords)\n";
@@ -447,8 +468,8 @@ PHP;
      */
     private function getScriptBootstrap()
     {
-        $adminEmail = 'jasper.ford.esq@gmail.com';
-        $adminPassword = password_hash('DruryLane66350!', PASSWORD_BCRYPT);
+        $adminEmail = $this->seedAdminEmail;
+        $adminPassword = password_hash($this->seedAdminPassword, PASSWORD_BCRYPT);
 
         return <<<'PHP'
  * IMPORTANT NOTES:
@@ -608,9 +629,9 @@ PHP;
 
         $script .= "\$stmt->execute([\n";
         $script .= "    'tenant_id' => 1,\n";
-        $script .= "    'email' => 'jasper.ford.esq@gmail.com',\n";
-        $script .= "    'name' => 'Jasper Ford',\n";
-        $script .= "    'password' => password_hash('DruryLane66350!', PASSWORD_BCRYPT),\n";
+        $script .= "    'email' => getenv('SEED_ADMIN_EMAIL') ?: 'admin@nexus.local',\n";
+        $script .= "    'name' => 'Admin User',\n";
+        $script .= "    'password' => password_hash(getenv('SEED_ADMIN_PASSWORD') ?: bin2hex(random_bytes(16)), PASSWORD_BCRYPT),\n";
         $script .= "    'role' => 'admin',\n";
         $script .= "    'is_verified' => 1,\n";
         $script .= "    'xp' => 10000,\n";
@@ -620,7 +641,7 @@ PHP;
         $script .= "]);\n";
         $script .= "\$superAdminId = \$pdo->lastInsertId();\n";
         $script .= "\$createdIds['users'][] = \$superAdminId;\n";
-        $script .= "success(\"Created super admin: jasper.ford.esq@gmail.com\");\n\n";
+        $script .= "success(\"Created super admin: \" . (getenv('SEED_ADMIN_EMAIL') ?: 'admin@nexus.local'));\n\n";
 
         if ($isDemoMode) {
             // In demo mode, create additional test users with secure passwords
@@ -771,8 +792,8 @@ foreach ($createdIds as $table => $ids) {
 }
 echo "\n";
 info("Super Admin Login:");
-echo "  Email: " . color("jasper.ford.esq@gmail.com", "cyan") . "\n";
-echo "  Password: " . color("DruryLane66350!", "cyan") . "\n";
+echo "  Email: " . color(getenv('SEED_ADMIN_EMAIL') ?: 'admin@nexus.local', "cyan") . "\n";
+echo "  Password: " . color("[SET VIA SEED_ADMIN_PASSWORD ENV VAR]", "cyan") . "\n";
 echo "\n";
 
 PHP;

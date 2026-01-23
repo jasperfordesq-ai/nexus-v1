@@ -584,6 +584,9 @@ class ListingController
         if (ob_get_level()) ob_clean();
         header('Content-Type: application/json');
 
+        // CSRF protection for AJAX state-changing requests
+        \Nexus\Core\Csrf::verifyOrDieJson();
+
         $userId = $_SESSION['user_id'] ?? 0;
         $tenantId = \Nexus\Core\TenantContext::getId();
 
