@@ -167,7 +167,14 @@ if ($moveToTenant !== null) {
     $dbPass = getenv('DB_PASS');
     $dbHost = getenv('DB_HOST') ?: 'localhost';
 
-    $command = "mysqldump -h {$dbHost} -u {$dbUser} -p{$dbPass} {$dbName} posts > \"{$backupFile}\" 2>&1";
+    $command = sprintf(
+        'mysqldump -h %s -u %s -p%s %s posts > %s 2>&1',
+        escapeshellarg($dbHost),
+        escapeshellarg($dbUser),
+        escapeshellarg($dbPass),
+        escapeshellarg($dbName),
+        escapeshellarg($backupFile)
+    );
     exec($command, $output, $returnCode);
 
     if ($returnCode === 0 && file_exists($backupFile)) {

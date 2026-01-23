@@ -494,6 +494,13 @@ class GroupController
         $tenantId = \Nexus\Core\TenantContext::getId();
         $userId = $_SESSION['user_id'] ?? 0;
 
+        // CSRF protection
+        if ($isAjax) {
+            \Nexus\Core\Csrf::verifyOrDieJson();
+        } else {
+            \Nexus\Core\Csrf::verifyOrDie();
+        }
+
         // Must be logged in
         if (!$userId) {
             if ($isAjax) {

@@ -51,8 +51,8 @@ foreach ($configFiles as $file => $name) {
         echo "  ✅ $name exists\n";
         $success[] = "$name configured";
 
-        // Validate PHP syntax
-        $output = shell_exec("php -l \"$fullPath\" 2>&1");
+        // Validate PHP syntax with properly escaped path
+        $output = shell_exec('php -l ' . escapeshellarg($fullPath) . ' 2>&1');
         if (strpos($output, 'No syntax errors') !== false) {
             echo "     → Syntax valid\n";
         } else {
@@ -107,8 +107,8 @@ $controllerPath = $basePath . '/src/Controllers/Api/LayoutApiController.php';
 if (file_exists($controllerPath)) {
     echo "  ✅ LayoutApiController exists\n";
 
-    // Validate syntax
-    $output = shell_exec("php -l \"$controllerPath\" 2>&1");
+    // Validate syntax with properly escaped path
+    $output = shell_exec('php -l ' . escapeshellarg($controllerPath) . ' 2>&1');
     if (strpos($output, 'No syntax errors') !== false) {
         echo "     → Syntax valid ✓\n";
     }

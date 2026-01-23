@@ -283,7 +283,11 @@ class MenuBuilderDragDrop {
     showErrorMessage(errorText) {
         const message = document.createElement('div');
         message.className = 'menu-save-error';
-        message.innerHTML = `<i class="fa-solid fa-exclamation-circle"></i> ${errorText}`;
+        // Sanitize errorText to prevent XSS
+        const sanitizedText = String(errorText).replace(/[<>"'&]/g, char => ({
+            '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;', '&': '&amp;'
+        })[char]);
+        message.innerHTML = `<i class="fa-solid fa-exclamation-circle"></i> ${sanitizedText}`;
         message.style.cssText = `
             position: fixed;
             top: 20px;

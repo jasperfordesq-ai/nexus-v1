@@ -169,7 +169,8 @@ class SettingsController
                 mkdir($uploadDir, 0755, true);
             }
 
-            $newFileName = md5(time() . $fileName) . '.' . $fileExtension;
+            // SECURITY: Use cryptographically secure random filename
+            $newFileName = bin2hex(random_bytes(16)) . '.' . $fileExtension;
             $dest_path = $uploadDir . $newFileName;
 
             if (move_uploaded_file($fileTmpPath, $dest_path)) {
@@ -329,6 +330,9 @@ class SettingsController
     public function updateConsent()
     {
         header('Content-Type: application/json');
+
+        // CSRF protection for API endpoint
+        Csrf::verifyOrDieJson();
 
         if (!isset($_SESSION['user_id'])) {
             http_response_code(401);
