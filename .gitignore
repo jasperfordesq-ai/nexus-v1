@@ -63,6 +63,8 @@ verify-*.php
 
 # Documentation in root (should be in docs/)
 /*.md
+# Exception: CLAUDE.md is standard for AI assistant guidance
+!CLAUDE.md
 
 # SQL scripts in root (should be in scripts/sql/)
 /*.sql
