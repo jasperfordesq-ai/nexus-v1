@@ -141,11 +141,12 @@ $basePath = \Nexus\Core\TenantContext::getBasePath();
                             <div class="stat-value">Level <?= $userStats['level'] ?></div>
                             <div class="stat-label"><?= number_format($userStats['xp']) ?> XP</div>
                             <div class="xp-progress-container">
-                                <div class="xp-progress-bar" role="progressbar"
+                                <div class="xp-progress-bar"
+                                     role="progressbar"
                                      aria-valuenow="<?= $userStats['level_progress'] ?>"
                                      aria-valuemin="0"
                                      aria-valuemax="100"
-                                     aria-label="Level progress">
+                                     aria-label="Level <?= $userStats['level'] ?> progress: <?= $userStats['level_progress'] ?> percent complete">
                                     <div class="xp-progress-fill" style="--progress: <?= $userStats['level_progress'] ?>%"></div>
                                 </div>
                                 <?php if ($userStats['xp_for_next']): ?>

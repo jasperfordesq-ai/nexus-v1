@@ -1195,3 +1195,87 @@
 .org-bulk-btn.reject:hover {
     background: var(--color-red-alpha-20);
 }
+
+/* ===========================================
+   GOV.UK Compliance - Balance Status Backgrounds
+   Replaces inline style backgrounds
+   =========================================== */
+
+.org-balance-status-critical {
+    background: linear-gradient(135deg, var(--color-error-500) 0%, var(--color-red-600) 100%);
+}
+
+.org-balance-status-low {
+    background: linear-gradient(135deg, var(--color-warning-500) 0%, var(--color-warning-600) 100%);
+}
+
+.org-balance-status-healthy {
+    background: linear-gradient(135deg, var(--color-success-500) 0%, var(--color-success-600) 50%, var(--color-success-700) 100%);
+}
+
+/* ===========================================
+   GOV.UK Compliance - ARIA Combobox Pattern
+   Member search accessibility improvements
+   =========================================== */
+
+/* Combobox input state indicators */
+.org-form-input[role="combobox"][aria-expanded="true"] {
+    border-color: var(--color-success-500);
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+}
+
+/* Listbox results panel */
+.org-member-results[role="listbox"] {
+    display: none;
+}
+
+.org-member-results[role="listbox"].show {
+    display: block;
+}
+
+/* Option items with keyboard navigation support */
+.org-member-result[role="option"] {
+    display: flex;
+    align-items: center;
+    padding: var(--space-2-5) var(--space-4);
+    cursor: pointer;
+    transition: background 0.15s;
+    gap: var(--space-2-5);
+}
+
+.org-member-result[role="option"]:hover,
+.org-member-result[role="option"]:focus,
+.org-member-result[role="option"][aria-selected="true"] {
+    background: var(--color-emerald-alpha-10);
+    outline: none;
+}
+
+.org-member-result[role="option"]:focus {
+    outline: 3px solid var(--color-focus-ring);
+    outline-offset: -3px;
+}
+
+/* Focus visible for keyboard users */
+.org-form-input:focus-visible,
+.org-form-select:focus-visible,
+.org-form-textarea:focus-visible {
+    outline: 3px solid var(--color-govuk-yellow);
+    outline-offset: 0;
+    border-color: var(--color-govuk-black);
+}
+
+/* Clear button accessibility */
+.org-selected-clear:focus-visible {
+    outline: 3px solid var(--color-govuk-yellow);
+    outline-offset: 0;
+    background: var(--color-govuk-yellow);
+    color: var(--color-govuk-black);
+}
+
+/* Bulk action buttons accessibility */
+.org-bulk-btn:focus-visible,
+.org-request-btn:focus-visible {
+    outline: 3px solid var(--color-govuk-yellow);
+    outline-offset: 0;
+}
