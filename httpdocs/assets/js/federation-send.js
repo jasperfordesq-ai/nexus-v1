@@ -7,7 +7,7 @@
 
     // Quick amount setter for amount buttons
     window.setAmount = function(val) {
-        var input = document.getElementById('amount-input');
+        const input = document.getElementById('amount-input');
         if (input) {
             input.value = val;
         }
@@ -15,11 +15,11 @@
 
     // Form submission handler - show loading state
     function initFormSubmit() {
-        var form = document.querySelector('.send-form');
+        const form = document.querySelector('.send-form');
         if (!form) return;
 
         form.addEventListener('submit', function() {
-            var btn = document.getElementById('send-btn');
+            const btn = document.getElementById('send-btn');
             if (btn) {
                 btn.disabled = true;
                 btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Processing...';
@@ -30,7 +30,7 @@
     // Offline indicator - handled by header.php verified-offline system
     // This is kept for backwards compatibility but the header's system is primary
     function initOfflineIndicator() {
-        var banner = document.getElementById('offlineBanner');
+        const banner = document.getElementById('offlineBanner');
         if (!banner) return;
 
         window.addEventListener('online', function() {

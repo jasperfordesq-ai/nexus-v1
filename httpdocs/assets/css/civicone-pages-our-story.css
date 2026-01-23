@@ -22,9 +22,6 @@
     /* animation removed for GOV.UK compliance */
 }
 
-/* Animation removed for GOV.UK compliance */
-    50% { background-position: 100% 50%; }
-}
 
 #story-glass-wrapper .story-inner {
     max-width: 900px;

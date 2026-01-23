@@ -6,13 +6,13 @@
     'use strict';
 
     // Auto-scroll to bottom of messages
-    var container = document.getElementById('messages-container');
+    const container = document.getElementById('messages-container');
     if (container) {
         container.scrollTop = container.scrollHeight;
     }
 
     // Auto-expand textarea
-    var textarea = document.getElementById('message-input');
+    const textarea = document.getElementById('message-input');
     if (textarea) {
         textarea.addEventListener('input', function() {
             // eslint-disable-next-line no-restricted-syntax -- dynamic height for auto-resize
@@ -31,7 +31,7 @@
     }
 
     // Offline indicator
-    var offlineBanner = document.getElementById('offlineBanner');
+    const offlineBanner = document.getElementById('offlineBanner');
     if (offlineBanner) {
         window.addEventListener('online', function() {
             offlineBanner.classList.remove('visible');

@@ -21,12 +21,6 @@
     /* animation removed for GOV.UK compliance */
 }
 
-/* Animation removed for GOV.UK compliance */
-    to {
-        transform: translateY(0);
-        opacity: 1;
-    }
-}
 
 .impersonation-banner-content {
     display: flex;

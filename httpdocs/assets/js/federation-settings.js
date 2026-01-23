@@ -5,15 +5,15 @@
 (function() {
     'use strict';
 
-    var config = window.federationSettingsConfig || {};
-    var basePath = config.basePath || '';
-    var csrfToken = config.csrfToken || '';
-    var isOptedIn = config.isOptedIn || false;
+    const config = window.federationSettingsConfig || {};
+    const basePath = config.basePath || '';
+    const csrfToken = config.csrfToken || '';
+    const isOptedIn = config.isOptedIn || false;
 
-    var form = document.getElementById('settingsForm');
-    var saveBtn = document.getElementById('saveBtn');
-    var statusToggle = document.getElementById('statusToggle');
-    var toast = document.getElementById('toast');
+    const form = document.getElementById('settingsForm');
+    const saveBtn = document.getElementById('saveBtn');
+    const statusToggle = document.getElementById('statusToggle');
+    const toast = document.getElementById('toast');
 
     if (!form) return;
 
@@ -24,7 +24,7 @@
                 o.classList.remove('selected');
             });
             this.classList.add('selected');
-            var input = this.querySelector('input');
+            const input = this.querySelector('input');
             if (input) input.checked = true;
         });
     });
@@ -36,7 +36,7 @@
                 o.classList.remove('selected');
             });
             this.classList.add('selected');
-            var input = this.querySelector('input');
+            const input = this.querySelector('input');
             if (input) input.checked = true;
         });
     });
@@ -54,14 +54,14 @@
     // Status toggle (enable/disable federation)
     if (statusToggle) {
         statusToggle.addEventListener('click', function() {
-            var action = isOptedIn ? 'disable' : 'enable';
-            var confirmMsg = isOptedIn
+            const action = isOptedIn ? 'disable' : 'enable';
+            const confirmMsg = isOptedIn
                 ? 'Are you sure you want to disable federation? Your profile will be hidden from all partner timebanks.'
                 : 'Enable federation to make your profile visible to partner timebanks?';
 
             if (!confirm(confirmMsg)) return;
 
-            var btn = this;
+            const btn = this;
             btn.disabled = true;
             btn.textContent = 'Processing...';
 
@@ -103,12 +103,12 @@
         saveBtn.disabled = true;
         saveBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin" aria-hidden="true"></i> Saving...';
 
-        var privacyInput = form.querySelector('input[name="privacy_level"]:checked');
-        var reachInput = form.querySelector('input[name="service_reach"]:checked');
+        const privacyInput = form.querySelector('input[name="privacy_level"]:checked');
+        const reachInput = form.querySelector('input[name="service_reach"]:checked');
 
-        var aiPulseInput = form.querySelector('input[name="ai_pulse_enabled"]');
+        const aiPulseInput = form.querySelector('input[name="ai_pulse_enabled"]');
 
-        var formData = {
+        const formData = {
             federation_optin: isOptedIn,
             privacy_level: privacyInput ? privacyInput.value : 'discovery',
             service_reach: reachInput ? reachInput.value : 'local_only',
@@ -147,7 +147,7 @@
     });
 
     // Offline indicator
-    var offlineBanner = document.getElementById('offlineBanner');
+    const offlineBanner = document.getElementById('offlineBanner');
     if (offlineBanner) {
         window.addEventListener('online', function() { offlineBanner.classList.remove('visible'); });
         window.addEventListener('offline', function() { offlineBanner.classList.add('visible'); });

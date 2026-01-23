@@ -224,8 +224,6 @@
     border-top-color: var(--color-success-500);
 }
 
-/* Animation removed for GOV.UK compliance */
-}
 
 /* Button loading state */
 .org-btn-loading {

@@ -10,17 +10,17 @@
 (function() {
     'use strict';
 
-    var form = document.getElementById('reset-password-form');
+    const form = document.getElementById('reset-password-form');
     if (!form) return;
 
-    var passwordInput = document.getElementById('password');
-    var confirmInput = document.getElementById('confirm_password');
-    var submitBtn = document.getElementById('submit-btn');
-    var matchStatus = document.getElementById('password-match-status');
+    const passwordInput = document.getElementById('password');
+    const confirmInput = document.getElementById('confirm_password');
+    const submitBtn = document.getElementById('submit-btn');
+    const matchStatus = document.getElementById('password-match-status');
 
     if (!passwordInput || !confirmInput || !submitBtn) return;
 
-    var rules = {
+    const rules = {
         length: { el: document.getElementById('rule-length'), test: function(p) { return p.length >= 12; } },
         upper: { el: document.getElementById('rule-upper'), test: function(p) { return /[A-Z]/.test(p); } },
         lower: { el: document.getElementById('rule-lower'), test: function(p) { return /[a-z]/.test(p); } },
@@ -29,16 +29,16 @@
     };
 
     function checkPassword() {
-        var password = passwordInput.value;
-        var allPassed = true;
+        const password = passwordInput.value;
+        let allPassed = true;
 
-        for (var key in rules) {
+        for (const key in rules) {
             if (Object.prototype.hasOwnProperty.call(rules, key)) {
-                var rule = rules[key];
+                const rule = rules[key];
                 if (!rule.el) continue;
 
-                var passed = rule.test(password);
-                var span = rule.el.querySelector('span');
+                const passed = rule.test(password);
+                const span = rule.el.querySelector('span');
 
                 if (passed) {
                     rule.el.classList.remove('civicone-rule-pending', 'civicone-rule-failed');
@@ -58,11 +58,11 @@
     }
 
     function checkMatch() {
-        var password = passwordInput.value;
-        var confirm = confirmInput.value;
-        var allRulesPassed = true;
+        const password = passwordInput.value;
+        const confirm = confirmInput.value;
+        let allRulesPassed = true;
 
-        for (var key in rules) {
+        for (const key in rules) {
             if (Object.prototype.hasOwnProperty.call(rules, key) && rules[key].el && !rules[key].test(password)) {
                 allRulesPassed = false;
                 break;
@@ -83,7 +83,7 @@
         }
 
         // Enable/disable submit
-        var canSubmit = allRulesPassed && password === confirm && confirm.length > 0;
+        const canSubmit = allRulesPassed && password === confirm && confirm.length > 0;
         submitBtn.disabled = !canSubmit;
         submitBtn.setAttribute('aria-disabled', String(!canSubmit));
     }

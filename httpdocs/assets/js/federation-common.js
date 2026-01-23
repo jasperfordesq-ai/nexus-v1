@@ -7,7 +7,7 @@
     'use strict';
 
     // Offline indicator
-    var offlineBanner = document.getElementById('offlineBanner');
+    const offlineBanner = document.getElementById('offlineBanner');
     if (offlineBanner) {
         window.addEventListener('online', function() {
             offlineBanner.classList.remove('visible');

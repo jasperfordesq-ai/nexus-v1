@@ -389,12 +389,6 @@
     /* animation removed for GOV.UK compliance */
 }
 
-/* Animation removed for GOV.UK compliance */
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
 
 /* Markdown styles in messages */
 .ai-message-content h2,
