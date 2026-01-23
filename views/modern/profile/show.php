@@ -987,54 +987,55 @@ $basePath = \Nexus\Core\TenantContext::getBasePath();
 
         function renderComment(c, depth) {
             const indent = depth * 20;
-            const isEdited = c.is_edited ? '<span style="font-size: 0.7rem; color: #9ca3af;"> (edited)</span>' : '';
+            const isEdited = c.is_edited ? '<span class="comment-edited-badge"> (edited)</span>' : '';
             const ownerActions = c.is_owner ? `
-                <span onclick="editComment(${c.id}, '${escapeHtml(c.content).replace(/'/g, "\\'").replace(/\n/g, "\\n")}')" style="cursor: pointer; margin-left: 10px; color: #6b7280; font-size: 12px;" title="Edit">✏️</span>
-                <span onclick="deleteComment(${c.id})" style="cursor: pointer; margin-left: 5px; color: #6b7280; font-size: 12px;" title="Delete">🗑️</span>
+                <span onclick="editComment(${c.id}, '${escapeHtml(c.content).replace(/'/g, "\\'").replace(/\n/g, "\\n")}')" class="comment-action-btn" title="Edit">✏️</span>
+                <span onclick="deleteComment(${c.id})" class="comment-action-btn comment-action-btn--delete" title="Delete">🗑️</span>
             ` : '';
 
             // Reactions display
             const reactions = Object.entries(c.reactions || {}).map(([emoji, count]) => {
                 const isUserReaction = (c.user_reactions || []).includes(emoji);
-                return `<span onclick="toggleReaction(${c.id}, '${emoji}')" style="cursor: pointer; padding: 2px 6px; border-radius: 12px; font-size: 12px; background: ${isUserReaction ? 'rgba(99, 102, 241, 0.2)' : 'rgba(243, 244, 246, 0.8)'}; border: 1px solid ${isUserReaction ? 'rgba(99, 102, 241, 0.4)' : 'rgba(229, 231, 235, 0.8)'}; margin-right: 4px;">${emoji} ${count}</span>`;
+                const activeClass = isUserReaction ? ' comment-reaction-badge--active' : '';
+                return `<span onclick="toggleReaction(${c.id}, '${emoji}')" class="comment-reaction-badge${activeClass}">${emoji} ${count}</span>`;
             }).join('');
 
             // Reaction picker
             const reactionPicker = IS_LOGGED_IN ? `
-                <div class="reaction-picker" style="display: inline-block; position: relative;">
-                    <span onclick="toggleReactionPicker(${c.id})" style="cursor: pointer; padding: 2px 6px; border-radius: 12px; font-size: 12px; background: rgba(243, 244, 246, 0.8); border: 1px solid rgba(229, 231, 235, 0.8);">+</span>
-                    <div id="reaction-picker-${c.id}" style="display: none; position: absolute; bottom: 24px; left: 0; background: white; border-radius: 20px; padding: 4px 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); white-space: nowrap; z-index: 100;">
-                        ${availableReactions.map(emoji => `<span onclick="toggleReaction(${c.id}, '${emoji}')" style="cursor: pointer; padding: 4px; font-size: 18px; transition: transform 0.1s;" onmouseover="this.style.transform='scale(1.3)'" onmouseout="this.style.transform='scale(1)'">${emoji}</span>`).join('')}
+                <div class="comment-reaction-picker">
+                    <span onclick="toggleReactionPicker(${c.id})" class="comment-reaction-picker__toggle">+</span>
+                    <div id="reaction-picker-${c.id}" class="comment-reaction-picker__dropdown">
+                        ${availableReactions.map(emoji => `<span onclick="toggleReaction(${c.id}, '${emoji}')" class="comment-reaction-picker__emoji">${emoji}</span>`).join('')}
                     </div>
                 </div>
             ` : '';
 
-            const replyButton = IS_LOGGED_IN ? `<span onclick="showReplyForm(${c.id})" style="cursor: pointer; margin-left: 10px; color: #6b7280; font-size: 12px;">Reply</span>` : '';
+            const replyButton = IS_LOGGED_IN ? `<span onclick="showReplyForm(${c.id})" class="comment-action-btn">Reply</span>` : '';
 
             const replies = (c.replies || []).map(r => renderComment(r, depth + 1)).join('');
 
             // Highlight @mentions in content
-            const contentHtml = escapeHtml(c.content).replace(/@(\w+)/g, '<span style="color: #6366f1; font-weight: 600;">@$1</span>');
+            const contentHtml = escapeHtml(c.content).replace(/@(\w+)/g, '<span class="comment-mention">@$1</span>');
 
             return `
-                <div style="margin-left: ${indent}px; margin-bottom: 12px;" id="comment-${c.id}">
-                    <div style="display: flex; gap: 8px;">
-                        <img src="${c.author_avatar}" style="width: 32px; height: 32px; border-radius: 50%; object-fit: cover; flex-shrink: 0;" loading="lazy">
-                        <div style="flex-grow: 1;">
-                            <div style="background: rgba(243, 244, 246, 0.8); backdrop-filter: blur(8px); padding: 8px 12px; border-radius: 18px; display: inline-block; max-width: 100%;">
-                                <div style="font-weight: 600; font-size: 13px; color: #1f2937;">${escapeHtml(c.author_name)}${isEdited}</div>
-                                <div style="font-size: 14px; color: #1f2937; word-wrap: break-word;">${contentHtml}</div>
+                <div class="comment-item" style="margin-left: ${indent}px;" id="comment-${c.id}">
+                    <div class="comment-wrapper">
+                        <img src="${c.author_avatar}" class="comment-avatar" loading="lazy">
+                        <div class="comment-body">
+                            <div class="comment-bubble">
+                                <div class="comment-author">${escapeHtml(c.author_name)}${isEdited}</div>
+                                <div class="comment-text">${contentHtml}</div>
                             </div>
-                            <div style="margin-top: 4px; display: flex; align-items: center; flex-wrap: wrap; gap: 4px;">
+                            <div class="comment-actions">
                                 ${reactions}
                                 ${reactionPicker}
                                 ${replyButton}
                                 ${ownerActions}
                             </div>
-                            <div id="reply-form-${c.id}" style="display: none; margin-top: 8px;">
-                                <div style="display: flex; gap: 8px; align-items: center;">
-                                    <input type="text" class="fds-input" placeholder="Write a reply..." style="flex-grow: 1; border-radius: 20px; padding: 8px 12px; font-size: 13px;" onkeydown="if(event.key === 'Enter') submitReply(${c.id}, this)">
-                                    <button onclick="submitReply(${c.id}, this.previousElementSibling)" style="background: linear-gradient(135deg, rgba(99, 102, 241, 0.9), rgba(139, 92, 246, 0.9)); color: white; border: none; border-radius: 20px; padding: 8px 16px; cursor: pointer; font-size: 13px;">Reply</button>
+                            <div id="reply-form-${c.id}" class="comment-reply-form">
+                                <div class="comment-reply-form__inner">
+                                    <input type="text" class="fds-input comment-reply-input" placeholder="Write a reply..." onkeydown="if(event.key === 'Enter') submitReply(${c.id}, this)">
+                                    <button onclick="submitReply(${c.id}, this.previousElementSibling)" class="comment-reply-btn">Reply</button>
                                 </div>
                             </div>
                         </div>
@@ -1058,7 +1059,7 @@ $basePath = \Nexus\Core\TenantContext::getBasePath();
                 section.appendChild(list);
             }
 
-            list.innerHTML = '<div style="color:#6b7280; padding:10px; text-align:center;">Loading comments...</div>';
+            list.innerHTML = '<div class="comment-loading">Loading comments...</div>';
 
             fetch(API_BASE + '/comments', {
                 method: 'POST',
@@ -1087,23 +1088,23 @@ $basePath = \Nexus\Core\TenantContext::getBasePath();
                     } else {
                         // Fallback to basic rendering
                         list.innerHTML = data.comments.map(c => `
-                        <div style="display:flex; gap:8px; margin-bottom:10px;">
-                            <img src="${c.author_avatar || '/assets/img/defaults/default_avatar.webp'}" style="width:32px; height:32px; border-radius:50%; object-fit:cover;" loading="lazy">
-                            <div style="background:#f3f4f6; padding:8px 12px; border-radius:18px; flex:1;">
-                                <div style="font-weight:600; font-size:13px; color:#1f2937;">${c.author_name || 'Unknown'}</div>
-                                <div style="font-size:14px; color:#1f2937;">${c.content}</div>
+                        <div class="comment-basic">
+                            <img src="${c.author_avatar || '/assets/img/defaults/default_avatar.webp'}" class="comment-avatar" loading="lazy">
+                            <div class="comment-basic__bubble">
+                                <div class="comment-basic__author">${c.author_name || 'Unknown'}</div>
+                                <div class="comment-basic__text">${c.content}</div>
                             </div>
                         </div>`).join('');
                     }
                 } else if (data.error) {
-                    list.innerHTML = '<div style="color:#ef4444; padding:10px; text-align:center;">Error: ' + data.error + '</div>';
+                    list.innerHTML = '<div class="comment-error">Error: ' + data.error + '</div>';
                 } else {
-                    list.innerHTML = '<div style="color:#9ca3af; padding:10px; font-size:13px; text-align:center;">No comments yet. Be the first to comment!</div>';
+                    list.innerHTML = '<div class="comment-empty">No comments yet. Be the first to comment!</div>';
                 }
             })
             .catch(err => {
                 console.error('Fetch comments error:', err);
-                list.innerHTML = '<div style="color:#ef4444; padding:10px; text-align:center;">Failed to load comments. Please try again.</div>';
+                list.innerHTML = '<div class="comment-error">Failed to load comments. Please try again.</div>';
             });
         }
 
@@ -1539,8 +1540,8 @@ $basePath = \Nexus\Core\TenantContext::getBasePath();
                         </div>
 
                         <div class="rating-feedback">
-                            <span id="ratingLabel" class="rating-label" style="opacity: 0.6;">Select a rating</span>
-                            <span id="ratingIndicator" class="rating-indicator" style="opacity: 0;">0/5</span>
+                            <span id="ratingLabel" class="rating-label rating-label--initial">Select a rating</span>
+                            <span id="ratingIndicator" class="rating-indicator rating-indicator--hidden">0/5</span>
                         </div>
                     </div>
 
@@ -1562,7 +1563,7 @@ $basePath = \Nexus\Core\TenantContext::getBasePath();
                             Cancel
                         </button>
                         <button type="button" onclick="submitProfileReview()" class="holo-btn-submit">
-                            <i class="fa-solid fa-paper-plane" style="margin-right: 8px;"></i>
+                            <i class="fa-solid fa-paper-plane icon-mr-2"></i>
                             Submit Review
                         </button>
                     </div>

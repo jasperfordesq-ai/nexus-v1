@@ -103,6 +103,7 @@ const cssFiles = [
     'events-calendar.css',
     'events-create.css',
     'events-show.css',
+    'modern-events-show.css',
     // Blog
     'blog-index.css',
     'blog-show.css',

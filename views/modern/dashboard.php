@@ -48,13 +48,13 @@ $currentPath = $_SERVER['REQUEST_URI'] ?? '';
         <div>
             <!-- Welcome Stats - Glass Balance Card -->
             <div class="dash-balance-card">
-                <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px;">
+                <div class="dash-balance-header">
                     <div>
-                        <div style="font-size: 0.9rem; opacity: 0.8; text-transform: uppercase; font-weight: 700; letter-spacing: 1px;">Current Balance</div>
+                        <div class="dash-balance-label">Current Balance</div>
                         <div class="balance-amount"><?= $user['balance'] ?> Hours</div>
                     </div>
                     <div>
-                        <a href="<?= $basePath ?>/dashboard/wallet" class="htb-btn" style="background: white; color: #4f46e5; border: none; font-weight: 700;">Manage Wallet</a>
+                        <a href="<?= $basePath ?>/dashboard/wallet" class="htb-btn dash-balance-btn">Manage Wallet</a>
                     </div>
                 </div>
             </div>
@@ -96,11 +96,11 @@ $currentPath = $_SERVER['REQUEST_URI'] ?? '';
             <h4 class="mb-3 dash-section-title"><i class="fa-solid fa-clock-rotate-left"></i>Recent Activity</h4>
             <div class="htb-card dash-activity-card">
                 <div class="dash-activity-table">
-                    <table class="htb-table" style="width: 100%;">
+                    <table class="htb-table dash-table-full">
                         <tbody>
                             <?php if (empty($activity_feed)): ?>
                                 <tr>
-                                    <td class="dash-empty-state" style="padding: 40px 20px;">
+                                    <td class="dash-empty-state dash-empty-cell">
                                         <div class="dash-empty-icon"><i class="fa-solid fa-list-check"></i></div>
                                         <p>No activity found.</p>
                                     </td>
@@ -108,7 +108,7 @@ $currentPath = $_SERVER['REQUEST_URI'] ?? '';
                             <?php else: ?>
                                 <?php foreach ($activity_feed as $log): ?>
                                     <tr class="dash-activity-row">
-                                        <td style="padding: 14px 16px;">
+                                        <td class="dash-activity-cell">
                                             <div class="dash-activity-action"><?= htmlspecialchars($log['action']) ?></div>
                                             <div class="dash-activity-details"><?= htmlspecialchars($log['details']) ?></div>
                                         </td>
@@ -128,26 +128,26 @@ $currentPath = $_SERVER['REQUEST_URI'] ?? '';
         <!-- Right Column -->
         <div>
             <!-- Upcoming Events -->
-            <div class="htb-card mb-4" style="overflow: hidden;">
-                <div class="htb-card-header dash-sidebar-card-header" style="background: #f8fafc; padding: 14px 20px; border-bottom: 1px solid #e2e8f0; font-weight: 700; color: #475569; font-size: 0.9rem;">
-                    <i class="fa-solid fa-calendar" style="margin-right: 8px; color: #4f46e5;"></i>Upcoming Events
+            <div class="htb-card mb-4 dash-sidebar-card">
+                <div class="htb-card-header dash-sidebar-card-header dash-sidebar-header">
+                    <i class="fa-solid fa-calendar dash-sidebar-header-icon"></i>Upcoming Events
                 </div>
                 <?php if (empty($myEvents)): ?>
-                    <div style="padding: 30px 20px; text-align: center; color: #94a3b8; font-size: 0.9rem;">
-                        <div style="font-size: 2rem; margin-bottom: 8px; opacity: 0.3;"><i class="fa-solid fa-calendar-xmark"></i></div>
-                        <p style="margin: 0 0 8px 0;">No upcoming events.</p>
-                        <a href="<?= $basePath ?>/events" style="color: #4f46e5; text-decoration: none; font-weight: 600;">Explore Events</a>
+                    <div class="dash-sidebar-empty">
+                        <div class="dash-sidebar-empty-icon"><i class="fa-solid fa-calendar-xmark"></i></div>
+                        <p class="dash-sidebar-empty-text">No upcoming events.</p>
+                        <a href="<?= $basePath ?>/events" class="dash-sidebar-empty-link">Explore Events</a>
                     </div>
                 <?php else: ?>
                     <?php foreach (array_slice($myEvents, 0, 3) as $ev): ?>
-                        <a href="<?= $basePath ?>/events/<?= $ev['id'] ?>" class="dash-sidebar-event" style="padding: 14px 20px; border-bottom: 1px solid #f1f5f9; display: flex; gap: 12px; text-decoration: none; transition: background 0.15s;" onmouseover="this.style.background='#f8fafc'" onmouseout="this.style.background='transparent'">
-                            <div style="background: linear-gradient(135deg, #fef2f2, #fee2e2); color: #dc2626; border-radius: 8px; padding: 6px 10px; text-align: center; min-width: 48px;">
-                                <div style="font-size: 0.65rem; font-weight: 700; text-transform: uppercase;"><?= date('M', strtotime($ev['start_time'])) ?></div>
-                                <div style="font-size: 1.1rem; font-weight: 800; line-height: 1;"><?= date('d', strtotime($ev['start_time'])) ?></div>
+                        <a href="<?= $basePath ?>/events/<?= $ev['id'] ?>" class="dash-sidebar-event dash-sidebar-event-link">
+                            <div class="dash-event-date-badge">
+                                <div class="dash-event-date-month"><?= date('M', strtotime($ev['start_time'])) ?></div>
+                                <div class="dash-event-date-day"><?= date('d', strtotime($ev['start_time'])) ?></div>
                             </div>
-                            <div style="min-width: 0;">
-                                <div style="font-weight: 600; font-size: 0.85rem; color: #1e293b; line-height: 1.3;"><?= htmlspecialchars($ev['title']) ?></div>
-                                <div style="font-size: 0.75rem; color: #64748b; margin-top: 2px;"><i class="fa-solid fa-location-dot" style="margin-right: 4px;"></i><?= htmlspecialchars($ev['location']) ?></div>
+                            <div class="dash-event-content">
+                                <div class="dash-event-title"><?= htmlspecialchars($ev['title']) ?></div>
+                                <div class="dash-event-location"><i class="fa-solid fa-location-dot dash-event-location-icon"></i><?= htmlspecialchars($ev['location']) ?></div>
                             </div>
                         </a>
                     <?php endforeach; ?>
@@ -156,21 +156,21 @@ $currentPath = $_SERVER['REQUEST_URI'] ?? '';
 
             <!-- My Hubs -->
             <div class="htb-card mb-4">
-                <div class="htb-card-header dash-sidebar-card-header" style="background: #f8fafc; padding: 14px 20px; border-bottom: 1px solid #e2e8f0; font-weight: 700; color: #475569; font-size: 0.9rem;">
-                    <i class="fa-solid fa-users" style="margin-right: 8px; color: #db2777;"></i>My Hubs
+                <div class="htb-card-header dash-sidebar-card-header dash-sidebar-header">
+                    <i class="fa-solid fa-users dash-sidebar-header-icon dash-sidebar-header-icon--pink"></i>My Hubs
                 </div>
                 <?php if (empty($myGroups)): ?>
-                    <div style="padding: 30px 20px; text-align: center; color: #94a3b8; font-size: 0.9rem;">
-                        <div style="font-size: 2rem; margin-bottom: 8px; opacity: 0.3;"><i class="fa-solid fa-user-group"></i></div>
-                        <p style="margin: 0 0 8px 0;">You haven't joined any hubs yet.</p>
-                        <a href="<?= $basePath ?>/groups" style="color: #4f46e5; text-decoration: none; font-weight: 600;">Join a Hub</a>
+                    <div class="dash-sidebar-empty">
+                        <div class="dash-sidebar-empty-icon"><i class="fa-solid fa-user-group"></i></div>
+                        <p class="dash-sidebar-empty-text">You haven't joined any hubs yet.</p>
+                        <a href="<?= $basePath ?>/groups" class="dash-sidebar-empty-link">Join a Hub</a>
                     </div>
                 <?php else: ?>
-                    <div style="padding: 8px;">
+                    <div class="dash-hubs-list">
                         <?php foreach (array_slice($myGroups, 0, 4) as $grp): ?>
-                            <a href="<?= $basePath ?>/groups/<?= $grp['id'] ?>" class="dash-sidebar-hub" style="display: block; padding: 10px 12px; border-radius: 8px; text-decoration: none; color: #334155; transition: background 0.15s;" onmouseover="this.style.background='#f1f5f9'" onmouseout="this.style.background='transparent'">
-                                <div style="font-weight: 600; font-size: 0.9rem;"><?= htmlspecialchars($grp['name']) ?></div>
-                                <div style="font-size: 0.75rem; color: #94a3b8;"><i class="fa-solid fa-users" style="margin-right: 4px;"></i><?= $grp['member_count'] ?? '0' ?> members</div>
+                            <a href="<?= $basePath ?>/groups/<?= $grp['id'] ?>" class="dash-sidebar-hub dash-hub-link">
+                                <div class="dash-hub-name"><?= htmlspecialchars($grp['name']) ?></div>
+                                <div class="dash-hub-members"><i class="fa-solid fa-users dash-hub-members-icon"></i><?= $grp['member_count'] ?? '0' ?> members</div>
                             </a>
                         <?php endforeach; ?>
                     </div>
@@ -188,45 +188,45 @@ $currentPath = $_SERVER['REQUEST_URI'] ?? '';
             }
             ?>
             <div class="htb-card mb-4 dash-matches-widget">
-                <div class="htb-card-header dash-sidebar-card-header" style="background: linear-gradient(135deg, #fef2f2, #fce7f3); padding: 14px 20px; border-bottom: 1px solid #fecaca; font-weight: 700; color: #be123c; font-size: 0.9rem; display: flex; justify-content: space-between; align-items: center;">
-                    <span><i class="fa-solid fa-fire" style="margin-right: 8px;"></i>Smart Matches</span>
-                    <a href="<?= $basePath ?>/matches" style="font-size: 0.8rem; color: #6366f1; text-decoration: none; font-weight: 600;">View All <i class="fa-solid fa-arrow-right"></i></a>
+                <div class="htb-card-header dash-sidebar-card-header dash-matches-header">
+                    <span><i class="fa-solid fa-fire dash-matches-header-icon"></i>Smart Matches</span>
+                    <a href="<?= $basePath ?>/matches" class="dash-matches-header-link">View All <i class="fa-solid fa-arrow-right"></i></a>
                 </div>
                 <?php if (empty($dashboardMatches)): ?>
-                    <div style="padding: 24px 20px; text-align: center; color: #94a3b8; font-size: 0.9rem;">
-                        <div style="font-size: 2rem; margin-bottom: 8px; opacity: 0.5;">🔥</div>
-                        <p style="margin: 0 0 8px 0;">No hot matches yet.</p>
-                        <p style="font-size: 0.8rem; color: #64748b; margin: 0 0 12px 0;">Create listings to find compatible members nearby.</p>
-                        <a href="<?= $basePath ?>/listings/create" style="color: #6366f1; text-decoration: none; font-weight: 600;">Create a Listing</a>
+                    <div class="dash-matches-empty">
+                        <div class="dash-matches-empty-icon">🔥</div>
+                        <p class="dash-matches-empty-text">No hot matches yet.</p>
+                        <p class="dash-matches-empty-subtext">Create listings to find compatible members nearby.</p>
+                        <a href="<?= $basePath ?>/listings/create" class="dash-matches-empty-link">Create a Listing</a>
                     </div>
                 <?php else: ?>
-                    <div style="padding: 8px;">
+                    <div class="dash-matches-list">
                         <?php foreach ($dashboardMatches as $match): ?>
                             <?php
                             $matchScore = (int)($match['match_score'] ?? 0);
-                            $scoreColor = $matchScore >= 85 ? '#ef4444' : ($matchScore >= 70 ? '#6366f1' : '#64748b');
+                            $scoreClass = $matchScore >= 85 ? 'dash-match-score--hot' : ($matchScore >= 70 ? 'dash-match-score--warm' : 'dash-match-score--normal');
                             $distanceKm = $match['distance_km'] ?? null;
                             ?>
-                            <a href="<?= $basePath ?>/listings/<?= $match['id'] ?>" class="dash-match-item" style="display: flex; gap: 12px; padding: 12px; border-radius: 12px; text-decoration: none; transition: background 0.15s; margin-bottom: 8px; background: rgba(99, 102, 241, 0.03);" onmouseover="this.style.background='rgba(99, 102, 241, 0.08)'" onmouseout="this.style.background='rgba(99, 102, 241, 0.03)'">
-                                <div style="flex-shrink: 0;">
-                                    <img src="<?= !empty($match['user_avatar']) ? htmlspecialchars($match['user_avatar']) : 'https://ui-avatars.com/api/?name=' . urlencode($match['user_name'] ?? 'U') . '&background=6366f1&color=fff' ?>" loading="lazy" alt="" style="width: 44px; height: 44px; border-radius: 10px; object-fit: cover; border: 2px solid white; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+                            <a href="<?= $basePath ?>/listings/<?= $match['id'] ?>" class="dash-match-item dash-match-link">
+                                <div class="dash-match-avatar-wrapper">
+                                    <img src="<?= !empty($match['user_avatar']) ? htmlspecialchars($match['user_avatar']) : 'https://ui-avatars.com/api/?name=' . urlencode($match['user_name'] ?? 'U') . '&background=6366f1&color=fff' ?>" loading="lazy" alt="" class="dash-match-avatar">
                                 </div>
-                                <div style="flex: 1; min-width: 0;">
-                                    <div style="font-weight: 600; font-size: 0.85rem; color: #1e293b; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;"><?= htmlspecialchars($match['title'] ?? 'Listing') ?></div>
-                                    <div style="font-size: 0.75rem; color: #6366f1; font-weight: 500;"><?= htmlspecialchars($match['user_name'] ?? 'Unknown') ?></div>
-                                    <div style="display: flex; gap: 8px; margin-top: 4px; font-size: 0.7rem;">
-                                        <span style="background: <?= $scoreColor ?>; color: white; padding: 2px 8px; border-radius: 10px; font-weight: 700;"><?= $matchScore ?>%</span>
+                                <div class="dash-match-content">
+                                    <div class="dash-match-title"><?= htmlspecialchars($match['title'] ?? 'Listing') ?></div>
+                                    <div class="dash-match-user"><?= htmlspecialchars($match['user_name'] ?? 'Unknown') ?></div>
+                                    <div class="dash-match-meta">
+                                        <span class="dash-match-score <?= $scoreClass ?>"><?= $matchScore ?>%</span>
                                         <?php if ($distanceKm !== null): ?>
-                                            <span style="color: #10b981; font-weight: 600;"><i class="fa-solid fa-location-dot"></i> <?= number_format($distanceKm, 1) ?>km</span>
+                                            <span class="dash-match-distance"><i class="fa-solid fa-location-dot"></i> <?= number_format($distanceKm, 1) ?>km</span>
                                         <?php endif; ?>
                                     </div>
                                 </div>
                             </a>
                         <?php endforeach; ?>
                     </div>
-                    <div style="padding: 12px 16px; border-top: 1px solid #f1f5f9; text-align: center;">
-                        <a href="<?= $basePath ?>/matches" style="color: #6366f1; text-decoration: none; font-weight: 600; font-size: 0.85rem;">
-                            <i class="fa-solid fa-fire-flame-curved" style="margin-right: 4px;"></i>See All Matches
+                    <div class="dash-matches-footer">
+                        <a href="<?= $basePath ?>/matches" class="dash-matches-footer-link">
+                            <i class="fa-solid fa-fire-flame-curved dash-matches-footer-icon"></i>See All Matches
                         </a>
                     </div>
                 <?php endif; ?>
@@ -235,11 +235,11 @@ $currentPath = $_SERVER['REQUEST_URI'] ?? '';
             <!-- Quick Actions -->
             <div class="htb-card">
                 <div class="htb-card-body">
-                    <a href="<?= $basePath ?>/nexus-score" class="htb-btn" style="background: linear-gradient(135deg, #10b981, #06b6d4); color: white; width: 100%; justify-content: center; margin-bottom: 10px;">
-                        <i class="fa-solid fa-trophy" style="margin-right: 8px;"></i>View My Score
+                    <a href="<?= $basePath ?>/nexus-score" class="htb-btn dash-quick-action-score">
+                        <i class="fa-solid fa-trophy dash-quick-action-score-icon"></i>View My Score
                     </a>
-                    <a href="<?= $basePath ?>/listings/create" class="htb-btn htb-btn-primary" style="width: 100%; justify-content: center; margin-bottom: 10px;">Post Need or Offer</a>
-                    <a href="<?= $basePath ?>/groups/create" class="htb-btn" style="background: #f1f5f9; color: #334155; width: 100%; justify-content: center;">Start New Hub</a>
+                    <a href="<?= $basePath ?>/listings/create" class="htb-btn htb-btn-primary dash-quick-action-listing">Post Need or Offer</a>
+                    <a href="<?= $basePath ?>/groups/create" class="htb-btn dash-quick-action-hub">Start New Hub</a>
                 </div>
             </div>
 

@@ -52,7 +52,7 @@ require __DIR__ . '/../../layouts/header.php';
             <div class="main-content">
                 <h1><?= htmlspecialchars($event['title']) ?></h1>
                 <div class="host-byline">
-                    Hosted by <strong style="color: var(--text-color);"><?= htmlspecialchars($event['organizer_name']) ?></strong>
+                    Hosted by <strong class="event-host-name"><?= htmlspecialchars($event['organizer_name']) ?></strong>
                 </div>
 
                 <!-- Date Badge -->
@@ -95,36 +95,35 @@ require __DIR__ . '/../../layouts/header.php';
                 </div>
 
                 <!-- Like & Comment Section -->
-                <div class="sidebar-card" style="margin-top: 30px;">
-                    <div style="display: flex; align-items: center; gap: 20px; margin-bottom: 20px; flex-wrap: wrap;">
-                        <button id="likeBtn" onclick="eventToggleLike()" style="background: none; border: none; cursor: pointer; display: flex; align-items: center; gap: 8px; padding: 10px 16px; border-radius: 12px; background: <?= $isLiked ? 'rgba(239, 68, 68, 0.15)' : 'var(--pill-bg)' ?>; border: 1px solid <?= $isLiked ? 'rgba(239, 68, 68, 0.3)' : 'var(--glass-border)' ?>; color: var(--text-color); font-size: 1rem; transition: all 0.2s;">
+                <div class="sidebar-card event-social-card">
+                    <div class="event-social-actions">
+                        <button id="likeBtn" onclick="eventToggleLike()" class="event-action-btn<?= $isLiked ? ' liked' : '' ?>">
                             <span id="likeIcon"><?= $isLiked ? '❤️' : '🤍' ?></span>
                             <span id="likesCount"><?= $likesCount ?></span> Likes
                         </button>
-                        <button onclick="eventToggleComments()" style="background: none; border: none; cursor: pointer; display: flex; align-items: center; gap: 8px; padding: 10px 16px; border-radius: 12px; background: var(--pill-bg); border: 1px solid var(--glass-border); color: var(--text-color); font-size: 1rem;">
+                        <button onclick="eventToggleComments()" class="event-action-btn">
                             💬 <span id="commentsCount"><?= $commentsCount ?></span> Comments
                         </button>
                         <?php if (isset($_SESSION['user_id'])): ?>
-                        <button onclick="shareToFeed()" style="background: none; border: none; cursor: pointer; display: flex; align-items: center; gap: 8px; padding: 10px 16px; border-radius: 12px; background: var(--pill-bg); border: 1px solid var(--glass-border); color: var(--text-color); font-size: 1rem;">
+                        <button onclick="shareToFeed()" class="event-action-btn">
                             🔗 Share
                         </button>
                         <?php endif; ?>
                     </div>
 
                     <!-- Comments Section (Hidden by default) -->
-                    <div id="commentsSection" style="display: none;">
-                        <div id="commentsList" style="max-height: 300px; overflow-y: auto; margin-bottom: 15px;">
-                            <p style="color: var(--text-muted); text-align: center;">Loading comments...</p>
+                    <div id="commentsSection" class="event-comments-section">
+                        <div id="commentsList" class="event-comments-list">
+                            <p class="event-comments-loading">Loading comments...</p>
                         </div>
 
                         <?php if (isset($_SESSION['user_id'])): ?>
-                        <form id="commentForm" onsubmit="eventSubmitComment(event)" style="display: flex; gap: 10px;">
-                            <input type="text" id="commentInput" placeholder="Write a comment..." required
-                                   style="flex: 1; padding: 12px 16px; border-radius: 12px; border: 1px solid var(--glass-border); background: var(--pill-bg); color: var(--text-color); font-size: 0.95rem;">
-                            <button type="submit" class="glass-btn primary" style="padding: 12px 20px;">Post</button>
+                        <form id="commentForm" onsubmit="eventSubmitComment(event)" class="event-comment-form">
+                            <input type="text" id="commentInput" placeholder="Write a comment..." required class="event-comment-input">
+                            <button type="submit" class="glass-btn primary event-comment-submit">Post</button>
                         </form>
                         <?php else: ?>
-                        <p style="text-align: center; color: var(--text-muted);"><a href="<?= \Nexus\Core\TenantContext::getBasePath() ?>/login" style="color: var(--accent-color);">Login</a> to comment</p>
+                        <p class="event-login-prompt"><a href="<?= \Nexus\Core\TenantContext::getBasePath() ?>/login" class="event-login-link">Login</a> to comment</p>
                         <?php endif; ?>
                     </div>
                 </div>
@@ -136,8 +135,8 @@ require __DIR__ . '/../../layouts/header.php';
 
                 <!-- Invite Banner -->
                 <?php if ($myStatus === 'invited'): ?>
-                    <div class="sidebar-card" style="border-color: #3b82f6; background: rgba(59, 130, 246, 0.1);">
-                        <h4 class="sidebar-title" style="color: #3b82f6;">📩 You're Invited!</h4>
+                    <div class="sidebar-card event-invite-banner">
+                        <h4 class="sidebar-title event-invite-title">📩 You're Invited!</h4>
                         <form action="<?= Nexus\Core\TenantContext::getBasePath() ?>/events/rsvp" method="POST" class="rsvp-actions">
                             <?= \Nexus\Core\Csrf::input() ?>
                             <input type="hidden" name="event_id" value="<?= $event['id'] ?>">
@@ -151,10 +150,10 @@ require __DIR__ . '/../../layouts/header.php';
                 <div class="sidebar-card">
                     <h4 class="sidebar-title">Your RSVP</h4>
                     <?php if (!isset($_SESSION['user_id'])): ?>
-                        <a href="<?= \Nexus\Core\TenantContext::getBasePath() ?>/login" class="glass-btn primary" style="width:100%; display:block; text-decoration:none;">Login to RSVP</a>
+                        <a href="<?= \Nexus\Core\TenantContext::getBasePath() ?>/login" class="glass-btn primary event-login-rsvp-btn">Login to RSVP</a>
                     <?php else: ?>
                         <?php if ($myStatus == 'going'): ?>
-                            <div style="margin-bottom: 15px; color: #16a34a; font-weight: bold; font-size: 1.1rem; text-align: center;">
+                            <div class="event-going-status">
                                 ✅ You are going!
                             </div>
                         <?php endif; ?>
@@ -172,20 +171,20 @@ require __DIR__ . '/../../layouts/header.php';
 
                 <!-- Attendees -->
                 <div class="sidebar-card">
-                    <h4 class="sidebar-title" style="display:flex; justify-content:space-between;">
-                        Attendees <span style="opacity:0.6;"><?= $count ?></span>
+                    <h4 class="sidebar-title event-attendees-title">
+                        Attendees <span class="event-attendees-count"><?= $count ?></span>
                     </h4>
                     <?php if (empty($attendees)): ?>
-                        <p style="color: var(--text-muted); font-size: 0.9rem;">Be the first!</p>
+                        <p class="event-no-attendees">Be the first!</p>
                     <?php else: ?>
-                        <div style="max-height: 300px; overflow-y: auto;">
+                        <div class="event-attendees-scroll">
                             <?php foreach ($attendees as $att): ?>
                                 <div class="attendee-item">
                                     <?= webp_avatar($att['avatar_url'] ?? null, $att['name'], 40) ?>
-                                    <div style="flex:1;">
-                                        <div style="font-weight: 600; font-size: 0.95rem;"><?= htmlspecialchars($att['name']) ?></div>
+                                    <div class="event-attendee-info">
+                                        <div class="event-attendee-name"><?= htmlspecialchars($att['name']) ?></div>
                                         <?php if ($att['status'] == 'attended'): ?>
-                                            <div style="font-size: 0.75rem; color: #16a34a;">✅ Attended</div>
+                                            <div class="event-attended-badge">✅ Attended</div>
                                         <?php endif; ?>
                                     </div>
                                     <?php if ($canInvite && $att['status'] !== 'attended'): ?>
@@ -193,7 +192,7 @@ require __DIR__ . '/../../layouts/header.php';
                                             <?= \Nexus\Core\Csrf::input() ?>
                                             <input type="hidden" name="event_id" value="<?= $event['id'] ?>">
                                             <input type="hidden" name="user_id" value="<?= $att['user_id'] ?>">
-                                            <button type="submit" class="glass-btn primary" style="padding: 4px 8px; font-size: 0.7rem;">Check In</button>
+                                            <button type="submit" class="glass-btn primary event-checkin-btn">Check In</button>
                                         </form>
                                     <?php endif; ?>
                                 </div>
@@ -206,16 +205,16 @@ require __DIR__ . '/../../layouts/header.php';
                 <?php if (isset($_SESSION['user_id']) && ($event['user_id'] == $_SESSION['user_id'] || !empty($_SESSION['is_super_admin']))): ?>
                     <div class="sidebar-card">
                         <h4 class="sidebar-title">Manage</h4>
-                        <div style="display: flex; flex-direction: column; gap: 10px;">
+                        <div class="event-manage-actions">
                             <?php if (!empty($canInvite)): ?>
-                                <button onclick="document.getElementById('inviteModal').style.display='flex'" class="glass-btn">📩 Invite People</button>
+                                <button onclick="document.getElementById('inviteModal').classList.add('visible')" class="glass-btn">📩 Invite People</button>
                             <?php endif; ?>
 
-                            <a href="<?= Nexus\Core\TenantContext::getBasePath() ?>/events/<?= $event['id'] ?>/edit" class="glass-btn" style="text-decoration:none;">⚙️ Edit Event</a>
+                            <a href="<?= Nexus\Core\TenantContext::getBasePath() ?>/events/<?= $event['id'] ?>/edit" class="glass-btn event-edit-link">⚙️ Edit Event</a>
 
                             <form action="<?= Nexus\Core\TenantContext::getBasePath() ?>/events/<?= $event['id'] ?>/delete" method="POST" onsubmit="return confirm('Cancel event?');">
                                 <?= \Nexus\Core\Csrf::input() ?>
-                                <button type="submit" class="glass-btn danger" style="width:100%;">Cancel Event</button>
+                                <button type="submit" class="glass-btn danger event-cancel-btn">Cancel Event</button>
                             </form>
                         </div>
                     </div>
@@ -226,31 +225,30 @@ require __DIR__ . '/../../layouts/header.php';
 
         <!-- Glass Overlay Modal for Invites -->
         <?php if (!empty($canInvite)): ?>
-            <div id="inviteModal" class="glass-modal-overlay" style="display: none;"> <!-- Explicit inline style as backup -->
+            <div id="inviteModal" class="glass-modal-overlay">
                 <div class="glass-modal-content">
-                    <h3 style="margin-top: 0; color: var(--text-color);">Invite Members</h3>
+                    <h3 class="event-invite-modal-title">Invite Members</h3>
 
                     <?php if (!empty($potentialInvitees)): ?>
-                        <input type="text" id="inviteSearch" placeholder="🔍 Search members..."
-                            style="width: 100%; padding: 10px 15px; border-radius: 12px; border: 1px solid var(--glass-border); background: rgba(255,255,255,0.5); margin-bottom: 15px; color: var(--text-color); font-family: inherit;">
+                        <input type="text" id="inviteSearch" placeholder="🔍 Search members..." class="event-invite-search">
 
                         <form action="<?= Nexus\Core\TenantContext::getBasePath() ?>/events/invite" method="POST">
                             <?= \Nexus\Core\Csrf::input() ?>
                             <input type="hidden" name="event_id" value="<?= $event['id'] ?>">
 
-                            <div id="inviteList" style="margin-bottom: 25px; max-height: 200px; overflow-y: auto;">
+                            <div id="inviteList" class="event-invite-list">
                                 <?php foreach ($potentialInvitees as $pm): ?>
-                                    <label class="invite-item" style="display: flex; align-items: center; gap: 15px; padding: 10px 0; border-bottom: 1px solid var(--glass-border); cursor: pointer; color: var(--text-color);">
-                                        <input type="checkbox" name="user_ids[]" value="<?= $pm['id'] ?>" style="width: 18px; height: 18px; accent-color: var(--accent-color);">
+                                    <label class="invite-item event-invite-item">
+                                        <input type="checkbox" name="user_ids[]" value="<?= $pm['id'] ?>" class="event-invite-checkbox">
                                         <?= webp_avatar($pm['avatar_url'] ?? null, $pm['name'], 30) ?>
                                         <span class="invite-name"><?= htmlspecialchars($pm['name']) ?></span>
                                     </label>
                                 <?php endforeach; ?>
                             </div>
 
-                            <div style="display: flex; gap: 15px;">
-                                <button type="submit" class="glass-btn primary" style="flex: 1;">Send Invites</button>
-                                <button type="button" onclick="document.getElementById('inviteModal').style.display='none'" class="glass-btn" style="flex: 1;">Cancel</button>
+                            <div class="event-modal-buttons">
+                                <button type="submit" class="glass-btn primary event-modal-btn-flex">Send Invites</button>
+                                <button type="button" onclick="document.getElementById('inviteModal').classList.remove('visible')" class="glass-btn event-modal-btn-flex">Cancel</button>
                             </div>
                         </form>
 
@@ -262,18 +260,18 @@ require __DIR__ . '/../../layouts/header.php';
                                 items.forEach(item => {
                                     const name = item.querySelector('.invite-name').innerText.toLowerCase();
                                     if (name.includes(term)) {
-                                        item.style.display = 'flex';
+                                        item.classList.remove('hidden');
                                     } else {
-                                        item.style.display = 'none';
+                                        item.classList.add('hidden');
                                     }
                                 });
                             });
                         </script>
 
                     <?php else: ?>
-                        <div style="padding: 20px; text-align: center; color: var(--text-muted);">
+                        <div class="event-no-invitees">
                             <p>No eligible members found to invite.</p>
-                            <button type="button" onclick="document.getElementById('inviteModal').style.display='none'" class="glass-btn" style="margin-top: 10px;">Close</button>
+                            <button type="button" onclick="document.getElementById('inviteModal').classList.remove('visible')" class="glass-btn event-close-btn-margin">Close</button>
                         </div>
                     <?php endif; ?>
                 </div>
@@ -321,8 +319,11 @@ async function eventToggleLike() {
         isLiked = (data.status === 'liked');
         countEl.textContent = data.likes_count;
         icon.textContent = isLiked ? '❤️' : '🤍';
-        btn.style.background = isLiked ? 'rgba(239, 68, 68, 0.15)' : 'var(--pill-bg)';
-        btn.style.borderColor = isLiked ? 'rgba(239, 68, 68, 0.3)' : 'var(--glass-border)';
+        if (isLiked) {
+            btn.classList.add('liked');
+        } else {
+            btn.classList.remove('liked');
+        }
     } catch (err) {
         console.error('Like error:', err);
     }
@@ -340,10 +341,10 @@ function eventToggleComments() {
 
     // Desktop: use inline comments section
     const section = document.getElementById('commentsSection');
-    const isHidden = section.style.display === 'none';
-    section.style.display = isHidden ? 'block' : 'none';
+    const wasHidden = !section.classList.contains('visible');
+    section.classList.toggle('visible');
 
-    if (isHidden && !commentsLoaded) {
+    if (wasHidden && !commentsLoaded) {
         loadComments();
     }
 }
@@ -368,7 +369,7 @@ async function loadComments() {
         const data = await response.json();
 
         if (data.error) {
-            list.innerHTML = '<p style="color: var(--text-muted); text-align: center;">Failed to load comments</p>';
+            list.innerHTML = '<p class="event-comments-loading">Failed to load comments</p>';
             return;
         }
 
@@ -376,65 +377,66 @@ async function loadComments() {
         availableReactions = data.available_reactions || [];
 
         if (!data.comments || data.comments.length === 0) {
-            list.innerHTML = '<p style="color: var(--text-muted); text-align: center; padding: 20px;">No comments yet. Be the first to comment!</p>';
+            list.innerHTML = '<p class="event-comments-loading event-no-invitees">No comments yet. Be the first to comment!</p>';
             return;
         }
 
         list.innerHTML = data.comments.map(c => renderComment(c, 0)).join('');
     } catch (err) {
         console.error('Comments error:', err);
-        list.innerHTML = '<p style="color: var(--text-muted); text-align: center;">Failed to load comments</p>';
+        list.innerHTML = '<p class="event-comments-loading">Failed to load comments</p>';
     }
 }
 
 function renderComment(c, depth) {
     const indent = depth * 20;
-    const isEdited = c.is_edited ? '<span style="font-size: 0.7rem; color: var(--text-muted);"> (edited)</span>' : '';
+    const isEdited = c.is_edited ? '<span class="event-js-edited"> (edited)</span>' : '';
     const ownerActions = c.is_owner ? `
-        <span onclick="eventEditComment(${c.id}, '${escapeHtml(c.content)}')" style="cursor: pointer; margin-left: 10px;" title="Edit">✏️</span>
-        <span onclick="eventDeleteComment(${c.id})" style="cursor: pointer; margin-left: 5px;" title="Delete">🗑️</span>
+        <span onclick="eventEditComment(${c.id}, '${escapeHtml(c.content)}')" class="event-js-action-icon" title="Edit">✏️</span>
+        <span onclick="eventDeleteComment(${c.id})" class="event-js-action-icon-small" title="Delete">🗑️</span>
     ` : '';
 
     const reactions = Object.entries(c.reactions || {}).map(([emoji, count]) => {
         const isUserReaction = (c.user_reactions || []).includes(emoji);
-        return `<span onclick="eventToggleReaction(${c.id}, '${emoji}')" style="cursor: pointer; padding: 2px 6px; border-radius: 12px; font-size: 0.8rem; background: ${isUserReaction ? 'rgba(99, 102, 241, 0.2)' : 'var(--pill-bg)'}; border: 1px solid ${isUserReaction ? 'rgba(99, 102, 241, 0.4)' : 'var(--glass-border)'};">${emoji} ${count}</span>`;
+        return `<span onclick="eventToggleReaction(${c.id}, '${emoji}')" class="event-js-reaction${isUserReaction ? ' active' : ''}">${emoji} ${count}</span>`;
     }).join(' ');
 
     const reactionPicker = isLoggedIn ? `
-        <div class="reaction-picker" style="display: inline-block; position: relative;">
-            <span onclick="eventShowReactionPicker(${c.id})" style="cursor: pointer; padding: 2px 6px; border-radius: 12px; font-size: 0.8rem; background: var(--pill-bg); border: 1px solid var(--glass-border);">+</span>
-            <div id="picker-${c.id}" style="display: none; position: absolute; bottom: 100%; left: 0; background: var(--card-bg, #fff); border: 1px solid var(--glass-border); border-radius: 8px; padding: 5px; z-index: 100; white-space: nowrap;">
-                ${availableReactions.map(e => `<span onclick="eventToggleReaction(${c.id}, '${e}')" style="cursor: pointer; padding: 3px; font-size: 1.2rem;">${e}</span>`).join('')}
+        <div class="reaction-picker">
+            <span onclick="eventShowReactionPicker(${c.id})" class="event-js-picker-toggle">+</span>
+            <div id="picker-${c.id}" class="event-js-picker-dropdown">
+                ${availableReactions.map(e => `<span onclick="eventToggleReaction(${c.id}, '${e}')" class="event-js-picker-emoji">${e}</span>`).join('')}
             </div>
         </div>
     ` : '';
 
-    const replyButton = isLoggedIn ? `<span onclick="eventShowReplyForm(${c.id})" style="cursor: pointer; color: var(--accent-color); font-size: 0.8rem; margin-left: 10px;">Reply</span>` : '';
+    const replyButton = isLoggedIn ? `<span onclick="eventShowReplyForm(${c.id})" class="event-js-reply-link">Reply</span>` : '';
 
     const replies = (c.replies || []).map(r => renderComment(r, depth + 1)).join('');
+    const avatarClass = depth > 0 ? 'event-js-avatar event-js-avatar-reply' : 'event-js-avatar event-js-avatar-main';
 
     return `
-        <div style="margin-left: ${indent}px; padding: 12px 0; border-bottom: 1px solid var(--glass-border);" id="comment-${c.id}">
-            <div style="display: flex; gap: 12px;">
-                <img src="${c.author_avatar}" style="width: ${depth loading="lazy"> 0 ? 28 : 36}px; height: ${depth > 0 ? 28 : 36}px; border-radius: 50%; object-fit: cover;">
-                <div style="flex: 1;">
-                    <div style="font-weight: 600; font-size: 0.9rem; color: var(--text-color);">
+        <div class="event-js-comment" style="margin-left: ${indent}px;" id="comment-${c.id}">
+            <div class="event-js-comment-wrapper">
+                <img src="${c.author_avatar}" class="${avatarClass}" loading="lazy">
+                <div class="event-js-comment-body">
+                    <div class="event-js-author">
                         ${escapeHtml(c.author_name)}${isEdited}
                         ${ownerActions}
                     </div>
-                    <div id="content-${c.id}" style="color: var(--text-color); margin-top: 4px;">${formatContent(c.content)}</div>
-                    <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 4px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+                    <div id="content-${c.id}" class="event-js-content">${formatContent(c.content)}</div>
+                    <div class="event-js-meta">
                         ${new Date(c.created_at).toLocaleString()}
                         ${replyButton}
                     </div>
-                    <div style="margin-top: 6px; display: flex; align-items: center; gap: 6px; flex-wrap: wrap;">
+                    <div class="event-js-reactions">
                         ${reactions}
                         ${reactionPicker}
                     </div>
-                    <div id="reply-form-${c.id}" style="display: none; margin-top: 10px;">
-                        <div style="display: flex; gap: 8px;">
-                            <input type="text" id="reply-input-${c.id}" placeholder="Write a reply..." style="flex: 1; padding: 8px 12px; border-radius: 8px; border: 1px solid var(--glass-border); background: var(--pill-bg); color: var(--text-color); font-size: 0.85rem;">
-                            <button onclick="eventSubmitReply(${c.id})" style="padding: 8px 16px; border-radius: 8px; background: var(--accent-color); color: white; border: none; cursor: pointer; font-size: 0.85rem;">Reply</button>
+                    <div id="reply-form-${c.id}" class="event-js-reply-form">
+                        <div class="event-js-reply-wrapper">
+                            <input type="text" id="reply-input-${c.id}" placeholder="Write a reply..." class="event-js-reply-input">
+                            <button onclick="eventSubmitReply(${c.id})" class="event-js-reply-submit">Reply</button>
                         </div>
                     </div>
                 </div>
@@ -451,18 +453,18 @@ function escapeHtml(text) {
 }
 
 function formatContent(content) {
-    return escapeHtml(content).replace(/@(\w+)/g, '<span style="color: var(--accent-color); font-weight: 600;">@$1</span>');
+    return escapeHtml(content).replace(/@(\w+)/g, '<span class="event-js-mention">@$1</span>');
 }
 
 function eventShowReactionPicker(commentId) {
     const picker = document.getElementById(`picker-${commentId}`);
-    picker.style.display = picker.style.display === 'none' ? 'block' : 'none';
+    picker.classList.toggle('visible');
 }
 
 function eventShowReplyForm(commentId) {
     const form = document.getElementById(`reply-form-${commentId}`);
-    form.style.display = form.style.display === 'none' ? 'block' : 'none';
-    if (form.style.display === 'block') {
+    form.classList.toggle('visible');
+    if (form.classList.contains('visible')) {
         document.getElementById(`reply-input-${commentId}`).focus();
     }
 }
@@ -512,7 +514,7 @@ async function eventSubmitReply(parentId) {
         const data = await response.json();
         if (data.error) { alert(data.error); return; }
         input.value = '';
-        document.getElementById(`reply-form-${parentId}`).style.display = 'none';
+        document.getElementById(`reply-form-${parentId}`).classList.remove('visible');
         const countEl = document.getElementById('commentsCount');
         countEl.textContent = parseInt(countEl.textContent) + 1;
         loadComments();
@@ -550,10 +552,10 @@ function eventEditComment(commentId, currentContent) {
     const originalHtml = contentEl.innerHTML;
 
     contentEl.innerHTML = `
-        <div style="display: flex; gap: 8px; flex-wrap: wrap;">
-            <input type="text" id="edit-input-${commentId}" value="${escapeHtml(currentContent)}" style="flex: 1; min-width: 200px; padding: 8px 12px; border-radius: 8px; border: 1px solid var(--glass-border); background: var(--pill-bg); color: var(--text-color);">
-            <button onclick="saveEdit(${commentId})" style="padding: 8px 16px; border-radius: 8px; background: var(--accent-color); color: white; border: none; cursor: pointer;">Save</button>
-            <button onclick="cancelEdit(${commentId}, '${escapeHtml(originalHtml).replace(/'/g, "\\'")}')" style="padding: 8px 16px; border-radius: 8px; background: var(--pill-bg); border: 1px solid var(--glass-border); color: var(--text-color); cursor: pointer;">Cancel</button>
+        <div class="event-js-edit-wrapper">
+            <input type="text" id="edit-input-${commentId}" value="${escapeHtml(currentContent)}" class="event-js-edit-input">
+            <button onclick="saveEdit(${commentId})" class="event-js-edit-save">Save</button>
+            <button onclick="cancelEdit(${commentId}, '${escapeHtml(originalHtml).replace(/'/g, "\\'")}')" class="event-js-edit-cancel">Cancel</button>
         </div>
     `;
     document.getElementById(`edit-input-${commentId}`).focus();
