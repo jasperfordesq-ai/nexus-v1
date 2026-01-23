@@ -139,21 +139,9 @@
     <!-- Social Interactions CSS -->
     <link rel="stylesheet" href="/assets/css/social-interactions.min.css?v=<?= $cssVersion ?>">
 
-    <!-- GOV.UK Design System - WCAG 2.2 AA Compliant (2026-01-20/22) -->
-    <link rel="stylesheet" href="/assets/css/civicone-govuk-typography.min.css?v=<?= $cssVersion ?>">
-    <link rel="stylesheet" href="/assets/css/civicone-govuk-spacing.min.css?v=<?= $cssVersion ?>">
-    <link rel="stylesheet" href="/assets/css/civicone-govuk-focus.min.css?v=<?= $cssVersion ?>">
-    <link rel="stylesheet" href="/assets/css/civicone-govuk-buttons.min.css?v=<?= $cssVersion ?>">
-    <link rel="stylesheet" href="/assets/css/civicone-govuk-forms.min.css?v=<?= $cssVersion ?>">
-    <link rel="stylesheet" href="/assets/css/civicone-govuk-components.min.css?v=<?= $cssVersion ?>">
-    <!-- GOV.UK Feedback Components (NEW 2026-01-22) -->
-    <link rel="stylesheet" href="/assets/css/civicone-govuk-feedback.min.css?v=<?= $cssVersion ?>">
-    <!-- GOV.UK Navigation Components (NEW 2026-01-22) -->
-    <link rel="stylesheet" href="/assets/css/civicone-govuk-navigation.min.css?v=<?= $cssVersion ?>">
-    <!-- GOV.UK Content Components (NEW 2026-01-22) -->
-    <link rel="stylesheet" href="/assets/css/civicone-govuk-content.min.css?v=<?= $cssVersion ?>">
-    <!-- GOV.UK Tabs Component (NEW 2026-01-22) -->
-    <link rel="stylesheet" href="/assets/css/civicone-govuk-tabs.min.css?v=<?= $cssVersion ?>">
+    <!-- GOV.UK Design System - WCAG 2.2 AA Compliant (Consolidated Bundle 2026-01-23) -->
+    <!-- Includes: typography, spacing, focus, buttons, forms, components, feedback, navigation, content, tabs -->
+    <link rel="stylesheet" href="/assets/css/bundles/civicone-govuk-all.min.css?v=<?= $cssVersion ?>">
 
     <!-- CivicOne Layout (includes grid system - must load for all pages) -->
     <link rel="stylesheet" href="/assets/css/civicone-header.min.css?v=<?= $cssVersion ?>">
@@ -162,11 +150,8 @@
     <!-- Account Area Navigation (MOJ Sub navigation pattern) -->
     <link rel="stylesheet" href="/assets/css/civicone-account-nav.min.css?v=<?= $cssVersion ?>">
 
-    <!-- Profile Header (MOJ Identity Bar pattern - WCAG 2.1 AA 2026-01-20) -->
-    <link rel="stylesheet" href="/assets/css/civicone-profile-header.min.css?v=<?= $cssVersion ?>">
-
-    <!-- Profile Social Components (Posts, Comments, Actions - WCAG 2.1 AA 2026-01-20) -->
-    <link rel="stylesheet" href="/assets/css/civicone-profile-social.min.css?v=<?= $cssVersion ?>">
+    <!-- Profile Components Bundle (Header + Social - Consolidated 2026-01-23) -->
+    <link rel="stylesheet" href="/assets/css/bundles/civicone-profile-all.min.css?v=<?= $cssVersion ?>">
 
     <!-- Directory Utilities (Extracted inline styles for events, listings, volunteering, feed - 2026-01-21) -->
     <link rel="stylesheet" href="/assets/css/civicone-directory-utilities.min.css?v=<?= $cssVersion ?>">

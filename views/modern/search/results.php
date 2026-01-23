@@ -8,33 +8,33 @@ $hero_gradient = 'htb-hero-gradient-purple';
 require __DIR__ . '/../../layouts/modern/header.php';
 ?>
 
-<main id="main-content" role="main" aria-label="Search results">
+<div class="htb-search-results-wrapper" role="region" aria-label="Search results">
 <div class="htb-container htb-container-full">
 
-    <div style="margin-top: 40px; margin-bottom: 60px;">
+    <div class="search-results-container">
 
-        <header style="margin-bottom: 30px; border-bottom: 2px solid rgba(255,255,255,0.1); padding-bottom: 20px; display: flex; align-items: flex-end; justify-content: space-between; flex-wrap: wrap; gap: 20px;">
+        <header class="search-results-header">
             <div>
-                <h1 style="margin: 0; font-size: 2rem; font-weight: 800; color: white; text-shadow: 0 2px 4px rgba(0,0,0,0.1);">Search Results</h1>
+                <h1 class="search-results-title">Search Results</h1>
 
                 <?php if (!empty($corrected_query) && $corrected_query !== $query): ?>
-                    <p style="margin: 5px 0 0; color: rgba(255,255,255,0.9); font-size: 1rem;">
+                    <p class="search-results-subtitle">
                         Showing results for "<strong><?= htmlspecialchars($corrected_query) ?></strong>"
-                        <span style="opacity: 0.7; font-size: 0.9rem; margin-left: 10px;">
+                        <span class="search-results-correction">
                             (corrected from "<?= htmlspecialchars($query) ?>")
                         </span>
                     </p>
                 <?php else: ?>
-                    <p style="margin: 5px 0 0; color: rgba(255,255,255,0.9); font-size: 1rem;">Found <?= count($results) ?> matches for "<strong><?= htmlspecialchars($query) ?></strong>"</p>
+                    <p class="search-results-subtitle">Found <?= count($results) ?> matches for "<strong><?= htmlspecialchars($query) ?></strong>"</p>
                 <?php endif; ?>
 
                 <?php if (!empty($intent) && !empty($intent['ai_analyzed'])): ?>
-                    <p style="margin: 8px 0 0; color: rgba(255,255,255,0.7); font-size: 0.85rem;">
-                        <span style="background: rgba(99, 102, 241, 0.2); padding: 2px 8px; border-radius: 4px; font-weight: 600;">
+                    <p class="search-ai-badge">
+                        <span class="search-ai-tag">
                             AI-Enhanced Search
                         </span>
                         <?php if (!empty($intent['location'])): ?>
-                            <span style="margin-left: 8px;">📍 <?= htmlspecialchars($intent['location']) ?></span>
+                            <span class="search-location-tag">📍 <?= htmlspecialchars($intent['location']) ?></span>
                         <?php endif; ?>
                     </p>
                 <?php endif; ?>
@@ -42,21 +42,21 @@ require __DIR__ . '/../../layouts/modern/header.php';
 
             <!-- Filter Tabs -->
             <?php if (!empty($results)): ?>
-                <div class="htb-search-tabs" style="display: flex; gap: 5px; background: white; padding: 5px; border-radius: 12px; flex-wrap: wrap; border: 1px solid #e5e7eb; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);">
-                    <button onclick="filterSearch('all')" class="htb-tab active" data-filter="all" style="border:none; cursor:pointer; padding: 6px 16px; border-radius: 8px; background: #eff6ff; color: var(--htb-primary); font-weight: 700;">All</button>
-                    <button onclick="filterSearch('user')" class="htb-tab" data-filter="user" style="border:none; cursor:pointer; padding: 6px 16px; border-radius: 8px; background: transparent; color: #6b7280; font-weight: 600; transition: 0.2s;">People</button>
-                    <button onclick="filterSearch('group')" class="htb-tab" data-filter="group" style="border:none; cursor:pointer; padding: 6px 16px; border-radius: 8px; background: transparent; color: #6b7280; font-weight: 600; transition: 0.2s;">Hubs</button>
-                    <button onclick="filterSearch('listing')" class="htb-tab" data-filter="listing" style="border:none; cursor:pointer; padding: 6px 16px; border-radius: 8px; background: transparent; color: #6b7280; font-weight: 600; transition: 0.2s;">Offers & Requests</button>
+                <div class="search-filter-tabs">
+                    <button onclick="filterSearch('all')" class="search-filter-tab active" data-filter="all">All</button>
+                    <button onclick="filterSearch('user')" class="search-filter-tab" data-filter="user">People</button>
+                    <button onclick="filterSearch('group')" class="search-filter-tab" data-filter="group">Hubs</button>
+                    <button onclick="filterSearch('listing')" class="search-filter-tab" data-filter="listing">Offers & Requests</button>
                 </div>
             <?php endif; ?>
         </header>
 
         <?php if (empty($results)): ?>
-            <div class="htb-card" style="text-align: center; padding: 60px;">
-                <div style="font-size: 3rem; margin-bottom: 20px;">🔍</div>
-                <h3 style="margin-bottom: 10px; color: var(--htb-text-main);">No results found</h3>
-                <p style="color: var(--htb-text-muted);">We couldn't find anything matching "<?= htmlspecialchars($query) ?>". Try different keywords.</p>
-                <div style="margin-top: 30px; display: flex; gap: 10px; justify-content: center;">
+            <div class="htb-card search-empty-state">
+                <div class="search-empty-icon">🔍</div>
+                <h3 class="search-empty-title">No results found</h3>
+                <p class="search-empty-text">We couldn't find anything matching "<?= htmlspecialchars($query) ?>". Try different keywords.</p>
+                <div class="search-empty-actions">
                     <a href="<?= Nexus\Core\TenantContext::getBasePath() ?>/listings" class="htb-btn htb-btn-primary">Browse Listings</a>
                     <a href="<?= Nexus\Core\TenantContext::getBasePath() ?>/groups" class="htb-btn htb-btn-secondary">Find Hubs</a>
                 </div>
@@ -64,11 +64,11 @@ require __DIR__ . '/../../layouts/modern/header.php';
         <?php else: ?>
 
             <!-- Empty State Message (Hidden by default) -->
-            <div id="no-filter-results" style="display: none; text-align: center; padding: 40px; background: rgba(255,255,255,0.9); border-radius: 12px; margin-bottom: 20px;">
-                <p style="color: #64748b; font-size: 1.1rem; font-weight: 500;">No results found in this category.</p>
+            <div id="no-filter-results" class="search-no-filter-results hidden">
+                <p class="search-no-filter-text">No results found in this category.</p>
             </div>
 
-            <div class="htb-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 20px;">
+            <div class="search-results-grid">
                 <?php foreach ($results as $item): ?>
                     <?php
                     // Logic from Legacy View: Calculate URLs manually since SearchService doesn't provide them
@@ -95,57 +95,53 @@ require __DIR__ . '/../../layouts/modern/header.php';
                         case 'page':
                             $icon = 'media-document';
                             $color = 'orange';
-                            $url = Nexus\Core\TenantContext::getBasePath() . '/pages/' . $item['id']; // Assuming pages are by ID, or slug? Service returns ID.
-                            // If page is by slug, we might have an issue, but standard pages are mostly static.
-                            // Custom pages use slug. SearchService.php returns ID. 
-                            // Legacy code used '/pages/' . $item['id']. Let's stick to that for now.
+                            $url = Nexus\Core\TenantContext::getBasePath() . '/pages/' . $item['id'];
                             break;
                     }
                     ?>
 
-                    <a href="<?= $url ?>" class="htb-card htb-search-result" data-type="<?= $item['type'] ?>" style="text-decoration: none; color: inherit; transition: all 0.2s ease; position: relative; overflow: hidden; padding: 20px; border: 1px solid rgba(0,0,0,0.05); background: white;">
-                        <div class="htb-card-body" style="display: flex; align-items: flex-start; gap: 15px; padding: 0 !important;">
+                    <a href="<?= $url ?>" class="htb-card search-result-card" data-type="<?= $item['type'] ?>">
+                        <div class="htb-card-body search-result-body">
                             <!-- Icon/Image -->
-                            <div style="flex-shrink: 0;">
+                            <div class="search-result-icon-wrapper">
                                 <?php if (!empty($item['image'])): ?>
-                                    <img src="<?= htmlspecialchars($item['image']) ?>" loading="lazy" style="width: 50px; height: 50px; border-radius: 12px; object-fit: cover; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
+                                    <img src="<?= htmlspecialchars($item['image']) ?>" loading="lazy" class="search-result-image" alt="">
                                 <?php else: ?>
-                                    <div style="width: 50px; height: 50px; border-radius: 12px; background: #f3f4f6; display: flex; align-items: center; justify-content: center;">
-                                        <!-- Using FontAwesome instead of Dashicons for consistency if available, but staying safe with Dashicons as fallback or text -->
-                                        <span class="dashicons dashicons-<?= $icon ?>" style="color: var(--htb-<?= $color ?>-600); font-size: 24px;"></span>
+                                    <div class="search-result-icon-placeholder">
+                                        <span class="dashicons dashicons-<?= $icon ?> search-result-icon search-result-icon-<?= $color ?>"></span>
                                     </div>
                                 <?php endif; ?>
                             </div>
 
                             <!-- Content -->
-                            <div style="flex-grow: 1; min-width: 0;">
-                                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; gap: 8px;">
-                                    <span class="htb-badge" style="font-size: 0.65rem; padding: 3px 8px; border-radius: 6px; text-transform: uppercase; font-weight: 700; background: var(--htb-<?= $color ?>-100); color: var(--htb-<?= $color ?>-700);"><?= strtoupper($item['type']) ?></span>
+                            <div class="search-result-content">
+                                <div class="search-result-meta">
+                                    <span class="htb-badge search-result-type-badge search-badge-<?= $color ?>"><?= strtoupper($item['type']) ?></span>
 
                                     <?php if (isset($item['relevance_score']) && $item['relevance_score'] > 0.7): ?>
-                                        <span style="font-size: 0.65rem; padding: 3px 8px; border-radius: 6px; background: rgba(16, 185, 129, 0.1); color: #059669; font-weight: 600;">
+                                        <span class="search-result-match-badge">
                                             ⭐ High Match
                                         </span>
                                     <?php endif; ?>
 
                                     <?php if (!empty($item['location'])): ?>
-                                        <span style="font-size: 0.75rem; color: #6b7280;">
+                                        <span class="search-result-location">
                                             📍 <?= htmlspecialchars($item['location']) ?>
                                         </span>
                                     <?php endif; ?>
                                 </div>
-                                <h3 style="margin: 0 0 4px; font-size: 1.1rem; font-weight: 700; color: #111827; line-height: 1.3;">
+                                <h3 class="search-result-title">
                                     <?= htmlspecialchars($item['title']) ?>
                                 </h3>
                                 <?php if (!empty($item['description'])): ?>
-                                    <p style="margin: 0; font-size: 0.9rem; color: #6b7280; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; line-height: 1.5;">
+                                    <p class="search-result-description">
                                         <?= htmlspecialchars(strip_tags($item['description'])) ?>
                                     </p>
                                 <?php endif; ?>
                             </div>
                         </div>
-                        <div style="position: absolute; right: 20px; bottom: 20px; opacity: 0; transform: translateX(-10px); transition: all 0.2s;" class="arrow-indicator">
-                            <span class="dashicons dashicons-arrow-right-alt2" style="color: var(--htb-primary);"></span>
+                        <div class="search-result-arrow">
+                            <span class="dashicons dashicons-arrow-right-alt2"></span>
                         </div>
                     </a>
                 <?php endforeach; ?>
@@ -159,43 +155,37 @@ require __DIR__ . '/../../layouts/modern/header.php';
 <script>
     function filterSearch(type) {
         // 1. Update Tabs
-        const tabs = document.querySelectorAll('.htb-tab');
+        const tabs = document.querySelectorAll('.search-filter-tab');
         tabs.forEach(t => {
             t.classList.remove('active');
-            t.style.background = 'transparent';
-            t.style.color = '#6b7280';
-            t.style.boxShadow = 'none';
         });
 
-        // Find clicked tab logic
-        const clicked = document.querySelector(`.htb-tab[data-filter="${type}"]`);
+        // Find clicked tab
+        const clicked = document.querySelector(`.search-filter-tab[data-filter="${type}"]`);
         if (clicked) {
             clicked.classList.add('active');
-            clicked.style.background = 'white';
-            clicked.style.color = 'var(--htb-primary)';
-            clicked.style.boxShadow = '0 2px 4px rgba(0,0,0,0.05)';
         }
 
         // 2. Filter Items and Count
-        const items = document.querySelectorAll('.htb-search-result');
+        const items = document.querySelectorAll('.search-result-card');
         const emptyMsg = document.getElementById('no-filter-results');
         let visibleCount = 0;
 
         items.forEach(item => {
             if (type === 'all' || item.getAttribute('data-type') === type) {
-                item.style.display = 'block';
+                item.classList.remove('hidden');
                 visibleCount++;
             } else {
-                item.style.display = 'none';
+                item.classList.add('hidden');
             }
         });
 
         // 3. Toggle Empty Message
         if (visibleCount === 0) {
-            emptyMsg.style.display = 'block';
+            emptyMsg.classList.remove('hidden');
             emptyMsg.querySelector('p').textContent = 'No ' + (type === 'all' ? 'results' : type + 's') + ' found matching your search.';
         } else {
-            emptyMsg.style.display = 'none';
+            emptyMsg.classList.add('hidden');
         }
     }
 </script>

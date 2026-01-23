@@ -368,6 +368,11 @@ try {
     <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/scattered-singles.min.css?v=<?= $cssVersionTimestamp ?>">
     <?php endif; ?>
 
+    <!-- Search Results Page CSS -->
+    <?php if (strpos($normPath, '/search') !== false): ?>
+    <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/modern-search-results.css?v=<?= $cssVersionTimestamp ?>">
+    <?php endif; ?>
+
     <!-- Performance Patch - GPU-optimized animations -->
     <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/nexus-performance-patch.min.css?v=<?= $cssVersionTimestamp ?>">
 

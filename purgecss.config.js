@@ -8,7 +8,7 @@ module.exports = {
     ],
 
     // CSS files to purge
-    // Auto-discovered: 2026-01-22
+    // Auto-discovered: 2026-01-23
     css: [
         'httpdocs/assets/css/accessibility.css',
         'httpdocs/assets/css/achievements.css',
@@ -32,7 +32,9 @@ module.exports = {
         'httpdocs/assets/css/bundles/admin-core.css',
         'httpdocs/assets/css/bundles/admin-modules.css',
         'httpdocs/assets/css/bundles/civicone-core.css',
+        'httpdocs/assets/css/bundles/civicone-govuk-all.css',
         'httpdocs/assets/css/bundles/civicone-modules.css',
+        'httpdocs/assets/css/bundles/civicone-profile-all.css',
         'httpdocs/assets/css/bundles/civicone-utilities.css',
         'httpdocs/assets/css/bundles/components-buttons.css',
         'httpdocs/assets/css/bundles/components-cards.css',
@@ -109,8 +111,8 @@ module.exports = {
         'httpdocs/assets/css/civicone-groups-utilities.css',
         'httpdocs/assets/css/civicone-groups.css',
         'httpdocs/assets/css/civicone-header.css',
-        'httpdocs/assets/css/civicone-home.css',
         'httpdocs/assets/css/civicone-help.css',
+        'httpdocs/assets/css/civicone-home.css',
         'httpdocs/assets/css/civicone-how-it-works.css',
         'httpdocs/assets/css/civicone-impact-summary.css',
         'httpdocs/assets/css/civicone-impersonation-banner.css',
@@ -238,6 +240,7 @@ module.exports = {
         'httpdocs/assets/css/modern-experimental-banner.css',
         'httpdocs/assets/css/modern-header-emergency-fixes.css',
         'httpdocs/assets/css/modern-header-utilities.css',
+        'httpdocs/assets/css/modern-search-results.css',
         'httpdocs/assets/css/modern-settings-holographic.css',
         'httpdocs/assets/css/moj-filter.css',
         'httpdocs/assets/css/native-form-inputs.css',
