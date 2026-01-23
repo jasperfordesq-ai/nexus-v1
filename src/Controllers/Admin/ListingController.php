@@ -31,7 +31,7 @@ class ListingController
         // 1. Ensure Admin
         $this->requireAdmin();
 
-        $page = $_GET['page'] ?? 1;
+        $page = max(1, (int)($_GET['page'] ?? 1));
         $limit = 20;
         $offset = ($page - 1) * $limit;
         $tenantIdFilter = $_GET['tenant_id'] ?? null;
@@ -66,7 +66,9 @@ class ListingController
                 $params[] = $tenantIdFilter;
             }
 
-            $sql .= " ORDER BY l.created_at DESC LIMIT $limit OFFSET $offset";
+            $sql .= " ORDER BY l.created_at DESC LIMIT ? OFFSET ?";
+            $params[] = $limit;
+            $params[] = $offset;
 
             // Count for pending only
             $countSql = "SELECT COUNT(*) as c FROM listings WHERE (status = 'pending' OR status IS NULL OR status = '')";
@@ -98,7 +100,9 @@ class ListingController
                 $params[] = $tenantIdFilter;
             }
 
-            $sql .= " ORDER BY combined_content.created_at DESC LIMIT $limit OFFSET $offset";
+            $sql .= " ORDER BY combined_content.created_at DESC LIMIT ? OFFSET ?";
+            $params[] = $limit;
+            $params[] = $offset;
             $countSql = null; // Use sum of all tables
         }
 

@@ -6,6 +6,7 @@ use Nexus\Models\User;
 use Nexus\Models\Transaction;
 use Nexus\Models\OrgMember;
 use Nexus\Core\View;
+use Nexus\Core\Csrf;
 use Nexus\Core\TenantContext;
 
 class ProfileController
@@ -194,6 +195,8 @@ class ProfileController
 
     public function update()
     {
+        Csrf::verifyOrDie();
+
         if (!isset($_SESSION['user_id'])) {
             header('Location: ' . \Nexus\Core\TenantContext::getBasePath() . '/login');
             exit;

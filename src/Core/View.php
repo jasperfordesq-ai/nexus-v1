@@ -24,6 +24,16 @@ class View
      */
     public static function render($viewPath, $data = [])
     {
+        // Security: Sanitize view path to prevent path traversal attacks
+        // Remove null bytes, directory traversal sequences, and validate format
+        $viewPath = str_replace(["\0", '..', "\r", "\n"], '', $viewPath);
+
+        // Only allow alphanumeric, hyphens, underscores, and forward slashes
+        if (!preg_match('/^[a-zA-Z0-9\/_-]+$/', $viewPath)) {
+            self::showViewNotFoundError($viewPath, [], 'invalid');
+            return;
+        }
+
         // Security: Use EXTR_SKIP to prevent overwriting existing variables
         extract($data, EXTR_SKIP);
 
