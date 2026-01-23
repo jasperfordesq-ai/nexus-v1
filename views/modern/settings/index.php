@@ -139,7 +139,7 @@ require dirname(__DIR__, 2) . '/layouts/header.php';
                             <i class="fa-solid fa-camera"></i>
                             Change Photo
                         </label>
-                        <input type="file" name="avatar" id="avatar_upload" accept="image/*" style="display: none;"
+                        <input type="file" name="avatar" id="avatar_upload" accept="image/*" class="hidden"
                                onchange="document.getElementById('avatar-preview').src = window.URL.createObjectURL(this.files[0])">
                     </div>
                 </div>
@@ -234,7 +234,7 @@ require dirname(__DIR__, 2) . '/layouts/header.php';
                     <p class="settings-hint">Select "Organisation" if this account represents a business, charity, or group.</p>
                 </div>
 
-                <div class="settings-form-group" id="org_name_container" style="display: <?= ($user['profile_type'] ?? 'individual') === 'organisation' ? 'block' : 'none' ?>;">
+                <div class="settings-form-group <?= ($user['profile_type'] ?? 'individual') !== 'organisation' ? 'hidden' : '' ?>" id="org_name_container">
                     <label class="settings-label">Organisation Name</label>
                     <input type="text" name="organization_name" value="<?= htmlspecialchars($user['organization_name'] ?? '') ?>"
                            class="settings-input" placeholder="e.g. hOUR Timebank, Community Garden Co-op">
@@ -245,7 +245,7 @@ require dirname(__DIR__, 2) . '/layouts/header.php';
                 function toggleOrgNameField() {
                     const select = document.getElementById('profile_type_select');
                     const container = document.getElementById('org_name_container');
-                    container.style.display = select.value === 'organisation' ? 'block' : 'none';
+                    container.classList.toggle('hidden', select.value !== 'organisation');
                 }
                 </script>
 
@@ -386,18 +386,18 @@ require dirname(__DIR__, 2) . '/layouts/header.php';
                 if (isNativeApp()) {
                     const NativeBiometric = getNativeBiometric();
                     if (!NativeBiometric) {
-                        notSupported.style.display = 'block';
+                        notSupported.classList.add('active');
                         return;
                     }
 
                     try {
                         const result = await NativeBiometric.isAvailable();
                         if (!result.isAvailable) {
-                            notSupported.style.display = 'block';
+                            notSupported.classList.add('active');
                             return;
                         }
 
-                        section.style.display = 'block';
+                        section.classList.add('active');
 
                         // Check if credentials are stored for this user
                         const userEmail = window.NEXUS?.userEmail || '<?= addslashes($_SESSION['user_email'] ?? '') ?>';
@@ -411,56 +411,56 @@ require dirname(__DIR__, 2) . '/layouts/header.php';
                         }
 
                         if (hasCredentials) {
-                            statusText.innerHTML = '<i class="fas fa-check-circle" style="color: rgb(16, 185, 129);"></i> Enabled on this device';
-                            statusText.style.background = 'rgba(16, 185, 129, 0.15)';
-                            statusText.style.color = 'rgb(16, 185, 129)';
-                            btnEnroll.style.display = 'none';
-                            btnAddDevice.style.display = 'none';
-                            btnRemove.style.display = 'inline-flex';
+                            statusText.innerHTML = '<i class="fas fa-check-circle"></i> Enabled on this device';
+                            statusText.classList.add('active');
+                            btnEnroll.classList.remove('active');
+                            btnAddDevice.classList.remove('active');
+                            btnRemove.classList.add('active');
                         } else {
-                            statusText.innerHTML = '<i class="fas fa-circle" style="opacity: 0.5;"></i> Not set up';
-                            btnEnroll.style.display = 'inline-flex';
-                            btnAddDevice.style.display = 'none';
-                            btnRemove.style.display = 'none';
+                            statusText.innerHTML = '<i class="fas fa-circle"></i> Not set up';
+                            statusText.classList.remove('active');
+                            btnEnroll.classList.add('active');
+                            btnAddDevice.classList.remove('active');
+                            btnRemove.classList.remove('active');
                         }
                     } catch (e) {
                         console.error('Native biometric check error:', e);
-                        notSupported.style.display = 'block';
+                        notSupported.classList.add('active');
                     }
                     return;
                 }
 
                 // Browser WebAuthn flow (original code)
                 if (!window.PublicKeyCredential) {
-                    notSupported.style.display = 'block';
+                    notSupported.classList.add('active');
                     return;
                 }
 
                 try {
                     const available = await PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable();
                     if (!available) {
-                        notSupported.style.display = 'block';
+                        notSupported.classList.add('active');
                         return;
                     }
 
-                    section.style.display = 'block';
+                    section.classList.add('active');
 
                     const response = await fetch('/api/webauthn/status', { credentials: 'include' });
                     const data = await response.json();
 
                     if (data.registered && data.count > 0) {
                         const deviceWord = data.count === 1 ? 'device' : 'devices';
-                        statusText.innerHTML = '<i class="fas fa-check-circle" style="color: rgb(16, 185, 129);"></i> Enabled on ' + data.count + ' ' + deviceWord;
-                        statusText.style.background = 'rgba(16, 185, 129, 0.15)';
-                        statusText.style.color = 'rgb(16, 185, 129)';
-                        btnEnroll.style.display = 'none';
-                        btnAddDevice.style.display = 'inline-flex';
-                        btnRemove.style.display = 'inline-flex';
+                        statusText.innerHTML = '<i class="fas fa-check-circle"></i> Enabled on ' + data.count + ' ' + deviceWord;
+                        statusText.classList.add('active');
+                        btnEnroll.classList.remove('active');
+                        btnAddDevice.classList.add('active');
+                        btnRemove.classList.add('active');
                     } else {
-                        statusText.innerHTML = '<i class="fas fa-circle" style="opacity: 0.5;"></i> Not set up';
-                        btnEnroll.style.display = 'inline-flex';
-                        btnAddDevice.style.display = 'none';
-                        btnRemove.style.display = 'none';
+                        statusText.innerHTML = '<i class="fas fa-circle"></i> Not set up';
+                        statusText.classList.remove('active');
+                        btnEnroll.classList.add('active');
+                        btnAddDevice.classList.remove('active');
+                        btnRemove.classList.remove('active');
                     }
                 } catch (e) {
                     console.error('Biometric check error:', e);
@@ -471,7 +471,7 @@ require dirname(__DIR__, 2) . '/layouts/header.php';
             async function enrollBiometric() {
                 const btnEnroll = document.getElementById('btn-enroll-biometric');
                 const btnAddDevice = document.getElementById('btn-add-device');
-                const btn = btnEnroll.style.display !== 'none' ? btnEnroll : btnAddDevice;
+                const btn = btnEnroll.classList.contains('active') ? btnEnroll : btnAddDevice;
                 const originalText = btn.innerHTML;
                 btn.disabled = true;
                 btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Setting up...';
@@ -953,13 +953,14 @@ require dirname(__DIR__, 2) . '/layouts/header.php';
                     <div class="requests-list">
                         <?php foreach ($gdprRequests as $request): ?>
                             <?php
-                            $statusColors = [
-                                'pending' => ['bg' => 'rgba(245, 158, 11, 0.15)', 'color' => '#f59e0b', 'icon' => 'fa-clock'],
-                                'in_progress' => ['bg' => 'rgba(99, 102, 241, 0.15)', 'color' => '#6366f1', 'icon' => 'fa-spinner fa-spin'],
-                                'completed' => ['bg' => 'rgba(16, 185, 129, 0.15)', 'color' => '#10b981', 'icon' => 'fa-check-circle'],
-                                'rejected' => ['bg' => 'rgba(239, 68, 68, 0.15)', 'color' => '#ef4444', 'icon' => 'fa-times-circle'],
+                            $statusIcons = [
+                                'pending' => 'fa-clock',
+                                'in_progress' => 'fa-spinner fa-spin',
+                                'completed' => 'fa-check-circle',
+                                'rejected' => 'fa-times-circle',
                             ];
-                            $status = $statusColors[$request['status']] ?? $statusColors['pending'];
+                            $statusIcon = $statusIcons[$request['status']] ?? 'fa-clock';
+                            $statusClass = 'status-' . ($request['status'] ?? 'pending');
                             $typeLabels = [
                                 'access' => 'Data Export',
                                 'erasure' => 'Account Deletion',
@@ -971,8 +972,8 @@ require dirname(__DIR__, 2) . '/layouts/header.php';
                             ?>
                             <div class="request-item">
                                 <div class="request-item-left">
-                                    <div class="request-status-icon" style="background: <?= $status['bg'] ?>;">
-                                        <i class="fa-solid <?= $status['icon'] ?>" style="color: <?= $status['color'] ?>;"></i>
+                                    <div class="request-status-icon <?= $statusClass ?>">
+                                        <i class="fa-solid <?= $statusIcon ?>"></i>
                                     </div>
                                     <div>
                                         <div class="request-info-title">
@@ -984,7 +985,7 @@ require dirname(__DIR__, 2) . '/layouts/header.php';
                                     </div>
                                 </div>
                                 <div class="request-item-right">
-                                    <span class="request-status-badge" style="background: <?= $status['bg'] ?>; color: <?= $status['color'] ?>;">
+                                    <span class="request-status-badge <?= $statusClass ?>">
                                         <?= ucfirst(str_replace('_', ' ', $request['status'])) ?>
                                     </span>
                                     <?php if ($request['status'] === 'completed' && !empty($request['download_url'])): ?>
@@ -1011,11 +1012,11 @@ require dirname(__DIR__, 2) . '/layouts/header.php';
 
             function showModal(content) {
                 document.getElementById('modalContent').innerHTML = content;
-                document.getElementById('gdprModal').style.display = 'flex';
+                document.getElementById('gdprModal').classList.add('active');
             }
 
             function hideModal() {
-                document.getElementById('gdprModal').style.display = 'none';
+                document.getElementById('gdprModal').classList.remove('active');
             }
 
             document.getElementById('gdprModal').addEventListener('click', function(e) {
@@ -1043,55 +1044,55 @@ require dirname(__DIR__, 2) . '/layouts/header.php';
 
             function requestDataExport() {
                 showModal(`
-                    <div style="text-align: center; margin-bottom: 24px;">
-                        <div style="width: 64px; height: 64px; border-radius: 16px; background: linear-gradient(135deg, rgba(99, 102, 241, 0.2), rgba(139, 92, 246, 0.15)); display: flex; align-items: center; justify-content: center; margin: 0 auto 16px;">
-                            <i class="fa-solid fa-file-export" style="font-size: 1.75rem; color: #6366f1;"></i>
+                    <div class="gdpr-modal-header">
+                        <div class="gdpr-modal-icon gdpr-modal-icon-export">
+                            <i class="fa-solid fa-file-export"></i>
                         </div>
-                        <h3 style="margin: 0 0 8px 0; color: rgb(var(--settings-text));">Request Data Export</h3>
-                        <p style="color: rgb(var(--settings-muted)); font-size: 0.9rem; margin: 0;">We'll prepare a copy of all your personal data. This usually takes 1-3 business days.</p>
+                        <h3 class="gdpr-modal-title">Request Data Export</h3>
+                        <p class="gdpr-modal-desc">We'll prepare a copy of all your personal data. This usually takes 1-3 business days.</p>
                     </div>
-                    <div style="display: flex; gap: 12px;">
-                        <button onclick="hideModal()" style="flex: 1; padding: 12px; border-radius: 10px; border: 1px solid rgba(var(--settings-primary), 0.2); background: transparent; color: rgb(var(--settings-text)); font-weight: 600; cursor: pointer;">Cancel</button>
-                        <button onclick="submitGdprRequest('access')" style="flex: 1; padding: 12px; border-radius: 10px; border: none; background: linear-gradient(135deg, #6366f1, #8b5cf6); color: white; font-weight: 600; cursor: pointer;">Confirm Request</button>
+                    <div class="gdpr-modal-buttons">
+                        <button onclick="hideModal()" class="gdpr-modal-btn gdpr-modal-btn-cancel">Cancel</button>
+                        <button onclick="submitGdprRequest('access')" class="gdpr-modal-btn gdpr-modal-btn-export">Confirm Request</button>
                     </div>
                 `);
             }
 
             function requestDataPortability() {
                 showModal(`
-                    <div style="text-align: center; margin-bottom: 24px;">
-                        <div style="width: 64px; height: 64px; border-radius: 16px; background: linear-gradient(135deg, rgba(6, 182, 212, 0.2), rgba(14, 165, 233, 0.15)); display: flex; align-items: center; justify-content: center; margin: 0 auto 16px;">
-                            <i class="fa-solid fa-right-left" style="font-size: 1.75rem; color: #06b6d4;"></i>
+                    <div class="gdpr-modal-header">
+                        <div class="gdpr-modal-icon gdpr-modal-icon-portability">
+                            <i class="fa-solid fa-right-left"></i>
                         </div>
-                        <h3 style="margin: 0 0 8px 0; color: rgb(var(--settings-text));">Request Data Portability</h3>
-                        <p style="color: rgb(var(--settings-muted)); font-size: 0.9rem; margin: 0;">We'll prepare your data in a standard format that can be transferred to another service.</p>
+                        <h3 class="gdpr-modal-title">Request Data Portability</h3>
+                        <p class="gdpr-modal-desc">We'll prepare your data in a standard format that can be transferred to another service.</p>
                     </div>
-                    <div style="display: flex; gap: 12px;">
-                        <button onclick="hideModal()" style="flex: 1; padding: 12px; border-radius: 10px; border: 1px solid rgba(var(--settings-primary), 0.2); background: transparent; color: rgb(var(--settings-text)); font-weight: 600; cursor: pointer;">Cancel</button>
-                        <button onclick="submitGdprRequest('portability')" style="flex: 1; padding: 12px; border-radius: 10px; border: none; background: linear-gradient(135deg, #06b6d4, #0ea5e9); color: white; font-weight: 600; cursor: pointer;">Confirm Request</button>
+                    <div class="gdpr-modal-buttons">
+                        <button onclick="hideModal()" class="gdpr-modal-btn gdpr-modal-btn-cancel">Cancel</button>
+                        <button onclick="submitGdprRequest('portability')" class="gdpr-modal-btn gdpr-modal-btn-portability">Confirm Request</button>
                     </div>
                 `);
             }
 
             function requestAccountDeletion() {
                 showModal(`
-                    <div style="text-align: center; margin-bottom: 24px;">
-                        <div style="width: 64px; height: 64px; border-radius: 16px; background: linear-gradient(135deg, rgba(239, 68, 68, 0.2), rgba(220, 38, 38, 0.15)); display: flex; align-items: center; justify-content: center; margin: 0 auto 16px;">
-                            <i class="fa-solid fa-exclamation-triangle" style="font-size: 1.75rem; color: #ef4444;"></i>
+                    <div class="gdpr-modal-header">
+                        <div class="gdpr-modal-icon gdpr-modal-icon-delete">
+                            <i class="fa-solid fa-exclamation-triangle"></i>
                         </div>
-                        <h3 style="margin: 0 0 8px 0; color: rgb(var(--settings-text));">Delete Your Account?</h3>
-                        <p style="color: rgb(var(--settings-muted)); font-size: 0.9rem; margin: 0;">This action is <strong>permanent and irreversible</strong>. All your data, including profile, credits, transactions, and history will be permanently deleted.</p>
+                        <h3 class="gdpr-modal-title">Delete Your Account?</h3>
+                        <p class="gdpr-modal-desc">This action is <strong>permanent and irreversible</strong>. All your data, including profile, credits, transactions, and history will be permanently deleted.</p>
                     </div>
-                    <div style="background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.2); border-radius: 10px; padding: 12px; margin-bottom: 20px;">
-                        <p style="color: #ef4444; font-size: 0.85rem; margin: 0; display: flex; align-items: center; gap: 8px;">
+                    <div class="gdpr-modal-warning">
+                        <p>
                             <i class="fa-solid fa-info-circle"></i>
                             Type <strong>DELETE</strong> to confirm
                         </p>
                     </div>
-                    <input type="text" id="deleteConfirmation" placeholder="Type DELETE to confirm" style="width: 100%; padding: 12px; border: 1px solid rgba(239, 68, 68, 0.3); border-radius: 10px; background: transparent; color: rgb(var(--settings-text)); margin-bottom: 16px; box-sizing: border-box;">
-                    <div style="display: flex; gap: 12px;">
-                        <button onclick="hideModal()" style="flex: 1; padding: 12px; border-radius: 10px; border: 1px solid rgba(var(--settings-primary), 0.2); background: transparent; color: rgb(var(--settings-text)); font-weight: 600; cursor: pointer;">Cancel</button>
-                        <button onclick="confirmDeletion()" style="flex: 1; padding: 12px; border-radius: 10px; border: none; background: linear-gradient(135deg, #ef4444, #dc2626); color: white; font-weight: 600; cursor: pointer;">Delete Account</button>
+                    <input type="text" id="deleteConfirmation" placeholder="Type DELETE to confirm" class="gdpr-modal-input">
+                    <div class="gdpr-modal-buttons">
+                        <button onclick="hideModal()" class="gdpr-modal-btn gdpr-modal-btn-cancel">Cancel</button>
+                        <button onclick="confirmDeletion()" class="gdpr-modal-btn gdpr-modal-btn-delete">Delete Account</button>
                     </div>
                 `);
             }
@@ -1116,13 +1117,15 @@ require dirname(__DIR__, 2) . '/layouts/header.php';
 
                     if (data.success) {
                         showModal(`
-                            <div style="text-align: center;">
-                                <div style="width: 64px; height: 64px; border-radius: 16px; background: linear-gradient(135deg, rgba(16, 185, 129, 0.2), rgba(5, 150, 105, 0.15)); display: flex; align-items: center; justify-content: center; margin: 0 auto 16px;">
-                                    <i class="fa-solid fa-check" style="font-size: 1.75rem; color: #10b981;"></i>
+                            <div class="gdpr-modal-header">
+                                <div class="gdpr-modal-icon gdpr-modal-icon-success">
+                                    <i class="fa-solid fa-check"></i>
                                 </div>
-                                <h3 style="margin: 0 0 8px 0; color: rgb(var(--settings-text));">Request Submitted</h3>
-                                <p style="color: rgb(var(--settings-muted)); font-size: 0.9rem; margin: 0 0 20px 0;">Your request has been submitted successfully. We'll process it within 30 days as required by GDPR.</p>
-                                <button onclick="location.reload()" style="padding: 12px 24px; border-radius: 10px; border: none; background: linear-gradient(135deg, #10b981, #059669); color: white; font-weight: 600; cursor: pointer;">OK</button>
+                                <h3 class="gdpr-modal-title">Request Submitted</h3>
+                                <p class="gdpr-modal-desc">Your request has been submitted successfully. We'll process it within 30 days as required by GDPR.</p>
+                            </div>
+                            <div class="gdpr-modal-buttons gdpr-modal-buttons-center">
+                                <button onclick="location.reload()" class="gdpr-modal-btn gdpr-modal-btn-success">OK</button>
                             </div>
                         `);
                     } else {
@@ -1626,7 +1629,7 @@ require dirname(__DIR__, 2) . '/layouts/header.php';
                     </div>
 
                     <!-- Federation Options (shown when opted in) -->
-                    <div id="federationOptions" style="<?= $fedSettings['federation_optin'] ? '' : 'display: none;' ?>">
+                    <div id="federationOptions" class="<?= !$fedSettings['federation_optin'] ? 'hidden' : '' ?>">
 
                         <!-- Visibility Settings -->
                         <div class="federation-options-section">
@@ -1750,11 +1753,11 @@ require dirname(__DIR__, 2) . '/layouts/header.php';
                                     </div>
                                 </label>
 
-                                <div id="travelRadiusField" style="<?= $fedSettings['service_reach'] === 'travel_ok' ? '' : 'display: none;' ?> margin-left: 32px; margin-top: 8px;">
+                                <div id="travelRadiusField" class="travel-radius-field <?= $fedSettings['service_reach'] !== 'travel_ok' ? 'hidden' : '' ?>">
                                     <label class="settings-label">Maximum Travel Distance (km)</label>
-                                    <input type="number" name="travel_radius_km" class="settings-input"
+                                    <input type="number" name="travel_radius_km" class="settings-input settings-input-narrow"
                                         value="<?= htmlspecialchars($fedSettings['travel_radius_km'] ?? '') ?>"
-                                        placeholder="e.g. 50" min="1" max="500" style="max-width: 200px;">
+                                        placeholder="e.g. 50" min="1" max="500">
                                 </div>
                             </div>
                         </div>
@@ -1793,11 +1796,11 @@ require dirname(__DIR__, 2) . '/layouts/header.php';
 
                 <script>
                 function toggleFederationSections(enabled) {
-                    document.getElementById('federationOptions').style.display = enabled ? '' : 'none';
+                    document.getElementById('federationOptions').classList.toggle('hidden', !enabled);
                 }
 
                 function toggleTravelRadius(show) {
-                    document.getElementById('travelRadiusField').style.display = show ? '' : 'none';
+                    document.getElementById('travelRadiusField').classList.toggle('hidden', !show);
                 }
 
                 // Handle radio button changes for travel

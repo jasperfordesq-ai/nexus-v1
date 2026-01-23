@@ -5128,7 +5128,7 @@ html {
             rgba(99, 102, 241, 0.88) 100%
         );
     border-radius: var(--radius-2xl);
-    margin-bottom: -var(--space-20);
+    margin-bottom: -80px; /* Overlaps with profile card below */
     overflow: hidden;
     box-shadow:
         0 var(--space-5) var(--space-15) rgba(16, 185, 129, 0.35),

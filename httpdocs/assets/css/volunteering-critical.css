@@ -1,0 +1,88 @@
+/**
+ * Volunteering Critical CSS - Prevents FOUC
+ * This small file loads early and sets initial layout to prevent flash
+ */
+
+/* Background - immediately set so no white flash */
+.vol-page-bg {
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    background: var(--color-slate-900, #0f172a);
+}
+
+[data-theme="light"] .vol-page-bg {
+    background: var(--color-slate-50, #f8fafc);
+}
+
+/* Container - set layout immediately */
+.vol-glass-container {
+    margin: 100px auto 20px;
+    max-width: 1200px;
+    padding: 32px;
+    border-radius: 24px;
+    background: var(--glass-bg-dark, rgba(15, 23, 42, 0.85));
+}
+
+[data-theme="light"] .vol-glass-container {
+    background: var(--glass-bg-light, rgba(255, 255, 255, 0.9));
+}
+
+/* Hero section base */
+.vol-hero {
+    text-align: center;
+    padding: 40px 20px;
+    margin-bottom: 30px;
+    border-radius: 20px;
+}
+
+/* Offline banner hidden by default */
+.vol-offline-banner {
+    display: none;
+}
+
+/* Organization page styles */
+.org-profile-bg {
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    background: var(--color-slate-900, #0f172a);
+}
+
+[data-theme="light"] .org-profile-bg {
+    background: var(--color-slate-50, #f8fafc);
+}
+
+.org-profile-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 100px 20px 40px;
+}
+
+.org-hero-banner {
+    height: 240px;
+    border-radius: 24px;
+    margin-bottom: -80px;
+    background: linear-gradient(135deg, var(--color-emerald-500, #10b981), var(--color-primary-500, #6366f1));
+    opacity: 0.92;
+}
+
+/* Mobile adjustments */
+@media (max-width: 900px) {
+    .vol-glass-container {
+        margin: 80px 10px 20px;
+        padding: 20px;
+        border-radius: 20px;
+    }
+
+    .org-profile-container {
+        padding: 80px 10px 20px;
+    }
+
+    .org-hero-banner {
+        height: 140px;
+        margin-bottom: -50px;
+    }
+}

@@ -21,14 +21,10 @@ class FederationHubController
      */
     public function index()
     {
-        if (!isset($_SESSION['user_id'])) {
-            header('Location: ' . TenantContext::getBasePath() . '/login');
-            exit;
-        }
-
         $tenantId = TenantContext::getId();
-        $userId = $_SESSION['user_id'];
         $basePath = TenantContext::getBasePath();
+        $isGuest = !isset($_SESSION['user_id']);
+        $userId = $_SESSION['user_id'] ?? null;
 
         // Check if federation is enabled
         $federationEnabled = FederationFeatureService::isGloballyEnabled()
@@ -42,12 +38,15 @@ class FederationHubController
             return;
         }
 
-        // Check if user has opted into federation
-        $userFedSettings = Database::query(
-            "SELECT federation_optin FROM federation_user_settings WHERE user_id = ?",
-            [$userId]
-        )->fetch();
-        $userOptedIn = $userFedSettings && $userFedSettings['federation_optin'];
+        // Check if user has opted into federation (guests default to false)
+        $userOptedIn = false;
+        if ($userId) {
+            $userFedSettings = Database::query(
+                "SELECT federation_optin FROM federation_user_settings WHERE user_id = ?",
+                [$userId]
+            )->fetch();
+            $userOptedIn = $userFedSettings && $userFedSettings['federation_optin'];
+        }
 
         // Get active partnerships
         $partnerships = FederationPartnershipService::getTenantPartnerships($tenantId);
@@ -110,6 +109,7 @@ class FederationHubController
 
         View::render('federation/hub', [
             'pageTitle' => 'Partner Timebanks',
+            'isGuest' => $isGuest,
             'userOptedIn' => $userOptedIn,
             'partnerCount' => $partnerCount,
             'partnerTenants' => $partnerTenants,

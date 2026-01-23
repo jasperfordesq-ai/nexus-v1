@@ -9,17 +9,29 @@
        SPACING SCALE - 8px base unit
        ========================================== */
     --space-0: 0;
+    --space-0-5: 2px;    /* 0.125rem - Hairline */
     --space-1: 4px;      /* 0.25rem - Micro spacing */
+    --space-1-5: 6px;    /* 0.375rem - Tiny spacing */
     --space-2: 8px;      /* 0.5rem - Tight spacing */
+    --space-2-5: 10px;   /* 0.625rem - Small-compact */
     --space-3: 12px;     /* 0.75rem - Compact spacing */
+    --space-3-5: 14px;   /* 0.875rem - Snug spacing */
     --space-4: 16px;     /* 1rem - Default spacing */
     --space-5: 20px;     /* 1.25rem - Comfortable spacing */
     --space-6: 24px;     /* 1.5rem - Generous spacing */
+    --space-7: 28px;     /* 1.75rem - Medium-large spacing */
     --space-8: 32px;     /* 2rem - Section spacing */
+    --space-9: 36px;     /* 2.25rem - Large section */
     --space-10: 40px;    /* 2.5rem - Large spacing */
     --space-12: 48px;    /* 3rem - XL spacing */
+    --space-14: 56px;    /* 3.5rem - Toggle width */
     --space-16: 64px;    /* 4rem - XXL spacing */
     --space-20: 80px;    /* 5rem - Hero spacing */
+    --space-24: 96px;    /* 6rem - Giant spacing */
+    --space-25: 100px;   /* 6.25rem - Fixed header offset */
+    --space-28: 112px;   /* 7rem - Extra large spacing */
+    --space-30: 120px;   /* 7.5rem - Fixed header offset (large) */
+    --space-32: 128px;   /* 8rem - Maximum spacing */
 
     /* ==========================================
        LAYOUT DIMENSIONS - Prevents CLS

@@ -8,6 +8,7 @@ require dirname(dirname(__DIR__)) . '/layouts/modern/header.php';
 $basePath = $basePath ?? Nexus\Core\TenantContext::getBasePath();
 
 // Extract data passed from controller
+$isGuest = $isGuest ?? false;
 $userOptedIn = $userOptedIn ?? false;
 $partnerCount = $partnerCount ?? 0;
 $partnerTenants = $partnerTenants ?? [];
@@ -43,8 +44,27 @@ $stats = $stats ?? [];
 
         <?php $currentPage = 'hub'; require dirname(__DIR__) . '/partials/federation-nav.php'; ?>
 
+        <!-- Guest Login Notice -->
+        <?php if ($isGuest): ?>
+        <div class="fed-optin-notice fed-guest-notice">
+            <i class="fa-solid fa-right-to-bracket"></i>
+            <div>
+                <h3>Log in to Access Partner Timebanks</h3>
+                <p>
+                    Create an account or log in to browse members, listings, events, and groups from our partner timebank communities.
+                </p>
+                <a href="<?= $basePath ?>/login" class="fed-optin-btn">
+                    <i class="fa-solid fa-sign-in-alt"></i>
+                    Log In
+                </a>
+                <a href="<?= $basePath ?>/register" class="fed-optin-btn fed-optin-btn--secondary">
+                    <i class="fa-solid fa-user-plus"></i>
+                    Create Account
+                </a>
+            </div>
+        </div>
+        <?php elseif (!$userOptedIn): ?>
         <!-- Opt-In Notice (if not opted in) -->
-        <?php if (!$userOptedIn): ?>
         <div class="fed-optin-notice">
             <i class="fa-solid fa-user-shield"></i>
             <div>
@@ -186,7 +206,7 @@ $stats = $stats ?? [];
             <!-- Activity Feed -->
             <a href="<?= $basePath ?>/federation/activity" class="fed-feature-card">
                 <div class="fed-feature-header">
-                    <div class="fed-feature-icon" style="background: linear-gradient(135deg, #f59e0b, #d97706); color: white;">
+                    <div class="fed-feature-icon activity">
                         <i class="fa-solid fa-bell"></i>
                     </div>
                     <div>
@@ -214,7 +234,7 @@ $stats = $stats ?? [];
 
             <div class="fed-partners-grid">
                 <?php foreach ($partnerTenants as $partner): ?>
-                <a href="<?= $basePath ?>/federation/partners/<?= $partner['id'] ?>" class="fed-partner-card" style="text-decoration: none; color: inherit;">
+                <a href="<?= $basePath ?>/federation/partners/<?= $partner['id'] ?>" class="fed-partner-card">
                     <div class="fed-partner-logo">
                         <?php if (!empty($partner['logo_url'])): ?>
                         <img src="<?= htmlspecialchars($partner['logo_url']) ?>" alt="<?= htmlspecialchars($partner['name']) ?>" loading="lazy">

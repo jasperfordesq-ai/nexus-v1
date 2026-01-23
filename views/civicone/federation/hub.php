@@ -14,6 +14,7 @@ require dirname(dirname(__DIR__)) . '/layouts/civicone/header.php';
 $basePath = $basePath ?? Nexus\Core\TenantContext::getBasePath();
 
 // Extract data passed from controller
+$isGuest = $isGuest ?? false;
 $userOptedIn = $userOptedIn ?? false;
 $partnerCount = $partnerCount ?? 0;
 $partnerTenants = $partnerTenants ?? [];
@@ -71,8 +72,31 @@ $currentScope = $currentScope ?? 'all';
         </div>
         <?php endif; ?>
 
+        <!-- Guest Login Notice -->
+        <?php if ($isGuest): ?>
+        <div class="govuk-notification-banner" role="region" aria-labelledby="govuk-notification-banner-title" data-module="govuk-notification-banner">
+            <div class="govuk-notification-banner__header">
+                <h2 class="govuk-notification-banner__title" id="govuk-notification-banner-title">
+                    Log in required
+                </h2>
+            </div>
+            <div class="govuk-notification-banner__content">
+                <p class="govuk-notification-banner__heading">
+                    Log in to access partner communities
+                </p>
+                <p class="govuk-body">
+                    Create an account or log in to browse members, listings, events, and groups from our partner timebank communities.
+                </p>
+                <a href="<?= $basePath ?>/login" role="button" draggable="false" class="govuk-button" data-module="govuk-button">
+                    Log in
+                </a>
+                <a href="<?= $basePath ?>/register" class="govuk-button govuk-button--secondary" data-module="govuk-button">
+                    Create account
+                </a>
+            </div>
+        </div>
+        <?php elseif (!$userOptedIn): ?>
         <!-- Opt-In Notice (if not opted in) -->
-        <?php if (!$userOptedIn): ?>
         <div class="govuk-warning-text">
             <span class="govuk-warning-text__icon" aria-hidden="true">!</span>
             <strong class="govuk-warning-text__text">

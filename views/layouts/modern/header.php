@@ -86,12 +86,12 @@ try {
     <link rel="dns-prefetch" href="https://api.mapbox.com">
 
     <!-- Preload Critical CSS (above-the-fold) -->
+    <?php if (strpos($normPath, '/volunteering') !== false): ?>
+    <link rel="preload" as="style" href="<?= $assetBase ?>/assets/css/volunteering-critical.css?v=<?= $cssVersionTimestamp ?>">
+    <?php endif; ?>
     <link rel="preload" as="style" href="<?= $assetBase ?>/assets/css/design-tokens.min.css?v=<?= $cssVersionTimestamp ?>">
     <link rel="preload" as="style" href="<?= $assetBase ?>/assets/css/nexus-phoenix.min.css?v=<?= $cssVersionTimestamp ?>">
     <link rel="preload" as="style" href="<?= $assetBase ?>/assets/css/bundles/core.min.css?v=<?= $cssVersionTimestamp ?>">
-    <?php if (strpos($normPath, '/volunteering') !== false): ?>
-    <link rel="preload" as="style" href="<?= $assetBase ?>/assets/css/volunteering.min.css?v=<?= $cssVersionTimestamp ?>">
-    <?php endif; ?>
 
     <!-- Preload JavaScript -->
     <link rel="preload" as="script" href="/assets/js/mobile-interactions.js?v=<?= $cssVersionTimestamp ?>">
@@ -99,8 +99,17 @@ try {
     <!-- Critical CSS Inline (Lighthouse: Save 660ms) -->
     <?php include __DIR__ . '/critical-css.php'; ?>
 
+    <?php if (strpos($normPath, '/volunteering') !== false): ?>
+    <!-- Volunteering Critical CSS - Tiny file to prevent FOUC, loads before design tokens -->
+    <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/volunteering-critical.css?v=<?= $cssVersionTimestamp ?>">
+    <?php endif; ?>
+
     <!-- DESIGN TOKENS (Shared variables - must load first) -->
     <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/design-tokens.min.css?v=<?= $cssVersionTimestamp ?>">
+    <?php if (strpos($normPath, '/volunteering') !== false): ?>
+    <!-- Volunteering CSS - Full styles -->
+    <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/volunteering.min.css?v=<?= $cssVersionTimestamp ?>">
+    <?php endif; ?>
     <!-- BREAKPOINTS (Inlined in critical-css.php for performance) -->
     <!-- MOBILE DESIGN TOKENS (Mobile-specific spacing, typography, transitions) - ASYNC LOAD -->
     <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/mobile-design-tokens.min.css?v=<?= $cssVersionTimestamp ?>" media="print" onload="this.media='all'; this.onload=null;">
@@ -319,9 +328,8 @@ try {
     <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/federation.min.css?v=<?= $cssVersionTimestamp ?>">
     <?php endif; ?>
 
-    <!-- Volunteering CSS (all /volunteering/* routes) -->
+    <!-- Volunteering CSS loaded early (after design-tokens) to prevent FOUC -->
     <?php if (strpos($normPath, '/volunteering') !== false): ?>
-    <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/volunteering.min.css?v=<?= $cssVersionTimestamp ?>">
     <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/modern-volunteering-show.min.css?v=<?= $cssVersionTimestamp ?>">
     <?php endif; ?>
 
@@ -685,6 +693,54 @@ try {
                 // Layout dropdown removed - now using banner at top of page
                 ?>
 
+                <?php
+                // Federation menu - visible to all users (including guests) when federation is enabled
+                $hasFederationUtilBar = false;
+                if (class_exists('\Nexus\Services\FederationFeatureService')) {
+                    try {
+                        $hasFederationUtilBar = \Nexus\Services\FederationFeatureService::isTenantFederationEnabled();
+                    } catch (\Exception $e) {
+                        $hasFederationUtilBar = false;
+                    }
+                }
+                if ($hasFederationUtilBar): ?>
+                    <div class="htb-dropdown">
+                        <button class="util-link federation-dropdown-btn">
+                            <i class="fa-solid fa-globe"></i>Partner Communities <span class="htb-arrow">▾</span>
+                        </button>
+                        <div class="htb-dropdown-content federation-dropdown">
+                            <a href="<?= Nexus\Core\TenantContext::getBasePath() ?>/federation" class="federation-hub-link">
+                                <i class="fa-solid fa-house"></i>Partner Communities Hub
+                            </a>
+                            <div class="layout-divider"></div>
+                            <a href="<?= Nexus\Core\TenantContext::getBasePath() ?>/federation/members">
+                                <i class="fa-solid fa-user-group federation-menu-icon federation-menu-icon--members"></i>Members
+                            </a>
+                            <a href="<?= Nexus\Core\TenantContext::getBasePath() ?>/federation/listings">
+                                <i class="fa-solid fa-hand-holding-heart federation-menu-icon federation-menu-icon--listings"></i>Listings
+                            </a>
+                            <a href="<?= Nexus\Core\TenantContext::getBasePath() ?>/federation/events">
+                                <i class="fa-solid fa-calendar-days federation-menu-icon federation-menu-icon--events"></i>Events
+                            </a>
+                            <a href="<?= Nexus\Core\TenantContext::getBasePath() ?>/federation/groups">
+                                <i class="fa-solid fa-users federation-menu-icon federation-menu-icon--groups"></i>Groups
+                            </a>
+                            <a href="<?= Nexus\Core\TenantContext::getBasePath() ?>/federation/messages">
+                                <i class="fa-solid fa-envelope federation-menu-icon federation-menu-icon--messages"></i>Messages
+                            </a>
+                            <a href="<?= Nexus\Core\TenantContext::getBasePath() ?>/federation/transactions">
+                                <i class="fa-solid fa-coins federation-menu-icon federation-menu-icon--transactions"></i>Transactions
+                            </a>
+                            <?php if (isset($_SESSION['user_id'])): ?>
+                            <div class="layout-divider"></div>
+                            <a href="<?= Nexus\Core\TenantContext::getBasePath() ?>/settings?section=federation">
+                                <i class="fa-solid fa-sliders federation-menu-icon federation-menu-icon--settings"></i>Settings
+                            </a>
+                            <?php endif; ?>
+                        </div>
+                    </div>
+                <?php endif; ?>
+
                 <?php if (isset($_SESSION['user_id'])): ?>
                     <div class="htb-dropdown">
                         <button class="util-link create-dropdown-btn">+ Create <span class="htb-arrow">▾</span></button>
@@ -705,51 +761,6 @@ try {
                             <?php endif; ?>
                         </div>
                     </div>
-
-                    <?php
-                    $hasFederationUtilBar = false;
-                    if (class_exists('\Nexus\Services\FederationFeatureService')) {
-                        try {
-                            $hasFederationUtilBar = \Nexus\Services\FederationFeatureService::isTenantFederationEnabled();
-                        } catch (\Exception $e) {
-                            $hasFederationUtilBar = false;
-                        }
-                    }
-                    if ($hasFederationUtilBar): ?>
-                        <div class="htb-dropdown">
-                            <button class="util-link federation-dropdown-btn">
-                                <i class="fa-solid fa-globe"></i>Partner Communities <span class="htb-arrow">▾</span>
-                            </button>
-                            <div class="htb-dropdown-content federation-dropdown">
-                                <a href="<?= Nexus\Core\TenantContext::getBasePath() ?>/federation" class="federation-hub-link">
-                                    <i class="fa-solid fa-house"></i>Partner Communities Hub
-                                </a>
-                                <div class="layout-divider"></div>
-                                <a href="<?= Nexus\Core\TenantContext::getBasePath() ?>/federation/members">
-                                    <i class="fa-solid fa-user-group federation-menu-icon federation-menu-icon--members"></i>Members
-                                </a>
-                                <a href="<?= Nexus\Core\TenantContext::getBasePath() ?>/federation/listings">
-                                    <i class="fa-solid fa-hand-holding-heart federation-menu-icon federation-menu-icon--listings"></i>Listings
-                                </a>
-                                <a href="<?= Nexus\Core\TenantContext::getBasePath() ?>/federation/events">
-                                    <i class="fa-solid fa-calendar-days federation-menu-icon federation-menu-icon--events"></i>Events
-                                </a>
-                                <a href="<?= Nexus\Core\TenantContext::getBasePath() ?>/federation/groups">
-                                    <i class="fa-solid fa-users federation-menu-icon federation-menu-icon--groups"></i>Groups
-                                </a>
-                                <a href="<?= Nexus\Core\TenantContext::getBasePath() ?>/federation/messages">
-                                    <i class="fa-solid fa-envelope federation-menu-icon federation-menu-icon--messages"></i>Messages
-                                </a>
-                                <a href="<?= Nexus\Core\TenantContext::getBasePath() ?>/federation/transactions">
-                                    <i class="fa-solid fa-coins federation-menu-icon federation-menu-icon--transactions"></i>Transactions
-                                </a>
-                                <div class="layout-divider"></div>
-                                <a href="<?= Nexus\Core\TenantContext::getBasePath() ?>/settings?section=federation">
-                                    <i class="fa-solid fa-sliders federation-menu-icon federation-menu-icon--settings"></i>Settings
-                                </a>
-                            </div>
-                        </div>
-                    <?php endif; ?>
                 <?php endif; ?>
 
                 <?php if ((!empty($_SESSION['user_role']) && $_SESSION['user_role'] === 'newsletter_admin')): ?>
