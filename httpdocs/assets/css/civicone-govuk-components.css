@@ -1589,9 +1589,11 @@
   z-index: 9999;
 }
 
-/* Element that receives focus from skip link */
+/* Element that receives focus from skip link - GR-007 compliant */
 .civicone--govuk .govuk-skip-link-focused-element:focus {
-  outline: none;
+  outline: 3px solid var(--civicone-focus, #ffdd00);
+  outline-offset: 0;
+  box-shadow: inset 0 0 0 4px var(--civicone-focus-text, #0b0c0c);
 }
 
 /* ========================================

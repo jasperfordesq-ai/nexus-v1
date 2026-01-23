@@ -7,7 +7,7 @@ require __DIR__ . '/../../layouts/civicone/header.php';
 <main class="civic-container" style="padding: 40px 20px;">
 
     <!-- Council Branding Header -->
-    <div style="background: linear-gradient(135deg, #002d72 0%, #1e3a8a 100%); padding: 50px; border-radius: 12px; color: white; margin-bottom: 40px;">
+    <div style="background: linear-gradient(135deg, var(--skin-primary) 0%, var(--skin-primary-dark, #1e3a8a) 100%); padding: 50px; border-radius: 12px; color: white; margin-bottom: 40px;">
         <span style="background: rgba(255,255,255,0.2); text-transform: uppercase; letter-spacing: 1px; font-size: 0.8rem; padding: 4px 10px; border-radius: 4px;">Case Study: Local Government</span>
         <h1 style="color: white; margin: 15px 0; font-size: 2.5rem;">One County, Ten Hubs, One Dashboard</h1>
         <p style="font-size: 1.2rem; opacity: 0.9;">Centralised oversight with localised identity for Bantry, Ennis, and Skibbereen.</p>
@@ -17,17 +17,17 @@ require __DIR__ . '/../../layouts/civicone/header.php';
 
         <div>
             <h2 style="color: #002d72; border-bottom: 2px solid #002d72; padding-bottom: 10px; display: inline-block;">The Challenge</h2>
-            <p style="font-size: 1.1rem; line-height: 1.7; color: #334155;">
+            <p class="civic-text-dark" style="font-size: 1.1rem; line-height: 1.7;">
                 County Councils manage diverse towns, each with unique needs and identities. Centralised "one-size-fits-all" platforms often fail to engage local residents who feel disconnected from a county-wide system.
             </p>
-            <p style="font-size: 1.1rem; line-height: 1.7; color: #334155;">
+            <p class="civic-text-dark" style="font-size: 1.1rem; line-height: 1.7;">
                 However, managing 30 different standalone websites for every town is administratively impossible and creates data silos.
             </p>
         </div>
 
         <div>
             <img src="https://placehold.co/600x300/002d72/FFF?text=Multi-Hub+Architecture" alt="Diagram showing Hub and Spoke model" style="width: 100%; border-radius: 8px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);">
-            <p style="text-align: center; font-size: 0.85rem; color: #64748b; margin-top: 10px;">Fig 1. The Hub & Spoke Tenant Model</p>
+            <p class="civic-text-light" style="text-align: center; font-size: 0.85rem; margin-top: 10px;">Fig 1. The Hub & Spoke Tenant Model</p>
         </div>
 
     </div>
@@ -39,17 +39,17 @@ require __DIR__ . '/../../layouts/civicone/header.php';
         </p>
 
         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px;">
-            <div style="background: #f8fafc; padding: 25px; border-radius: 8px; border-left: 4px solid #002d72;">
+            <div class="civic-border-left-primary" style="background: #f8fafc; padding: 25px; border-radius: 8px;">
                 <strong>Local Skins</strong>
-                <p style="font-size: 0.95rem; color: #475569;">Each town maintains its unique identity, logo, and "Welcome" message. Residents feel they are joining *their* town's hub.</p>
+                <p class="civic-text-medium" style="font-size: 0.95rem;">Each town maintains its unique identity, logo, and "Welcome" message. Residents feel they are joining *their* town's hub.</p>
             </div>
-            <div style="background: #f8fafc; padding: 25px; border-radius: 8px; border-left: 4px solid #002d72;">
+            <div class="civic-border-left-primary" style="background: #f8fafc; padding: 25px; border-radius: 8px;">
                 <strong>Central Data</strong>
-                <p style="font-size: 0.95rem; color: #475569;">The Council centralises data for grant reporting. "How many hours of volunteering happened in West Cork?" is answered in one click.</p>
+                <p class="civic-text-medium" style="font-size: 0.95rem;">The Council centralises data for grant reporting. "How many hours of volunteering happened in West Cork?" is answered in one click.</p>
             </div>
-            <div style="background: #f8fafc; padding: 25px; border-radius: 8px; border-left: 4px solid #002d72;">
+            <div class="civic-border-left-primary" style="background: #f8fafc; padding: 25px; border-radius: 8px;">
                 <strong>Strategic Planning</strong>
-                <p style="font-size: 0.95rem; color: #475569;">Identify capability gaps. If Hub A has excess gardening tools and Hub B has none, facilitate the transfer.</p>
+                <p class="civic-text-medium" style="font-size: 0.95rem;">Identify capability gaps. If Hub A has excess gardening tools and Hub B has none, facilitate the transfer.</p>
             </div>
         </div>
     </div>

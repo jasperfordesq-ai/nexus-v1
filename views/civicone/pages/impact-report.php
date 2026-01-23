@@ -122,26 +122,26 @@ require dirname(__DIR__, 2) . '/layouts/civicone/header.php';
                 <h3 class="report-section-subtitle">3.3 Activity</h3>
                 <p>The currency used is time credits in units of one hour. 2868 hours were exchanged via 797 transactions. By the end of October 2022, there was more than one million hours of time credits in the Community Treasure Chest.</p>
 
-                <table class="report-table" style="margin: 30px 0; background: #fff;">
+                <table class="report-table civic-bg-white" style="margin: 30px 0;">
                     <tr style="background: var(--skin-primary); color: white;">
-                        <th style="padding: 15px; text-align: left;">Metric</th>
-                        <th style="padding: 15px; text-align: left;">Value</th>
+                        <th class="civic-p-3 civic-text-left">Metric</th>
+                        <th class="civic-p-3 civic-text-left">Value</th>
                     </tr>
-                    <tr style="border-bottom: 1px solid #eee;">
-                        <td style="padding: 15px;">Gross Income</td>
-                        <td style="padding: 15px; font-weight: bold;">1,941.10 Time Credits</td>
+                    <tr class="civic-border-bottom">
+                        <td class="civic-p-3">Gross Income</td>
+                        <td class="civic-p-3 civic-font-bold">1,941.10 Time Credits</td>
                     </tr>
-                    <tr style="border-bottom: 1px solid #eee;">
-                        <td style="padding: 15px;">Number of Incoming Transfers</td>
-                        <td style="padding: 15px; font-weight: bold;">559</td>
+                    <tr class="civic-border-bottom">
+                        <td class="civic-p-3">Number of Incoming Transfers</td>
+                        <td class="civic-p-3 civic-font-bold">559</td>
                     </tr>
-                    <tr style="border-bottom: 1px solid #eee;">
-                        <td style="padding: 15px;">Number of Logins</td>
-                        <td style="padding: 15px; font-weight: bold;">1,560</td>
+                    <tr class="civic-border-bottom">
+                        <td class="civic-p-3">Number of Logins</td>
+                        <td class="civic-p-3 civic-font-bold">1,560</td>
                     </tr>
                     <tr>
-                        <td style="padding: 15px;">Balance of Community Account</td>
-                        <td style="padding: 15px; font-weight: bold;">1,007,748.95</td>
+                        <td class="civic-p-3">Balance of Community Account</td>
+                        <td class="civic-p-3 civic-font-bold">1,007,748.95</td>
                     </tr>
                 </table>
 
@@ -159,8 +159,8 @@ require dirname(__DIR__, 2) . '/layouts/civicone/header.php';
                 <h3 class="report-section-subtitle">Profile</h3>
                 <p>Nearly 60% of respondents were aged 56 or older. This reflects the wider TBI membership, though a younger profile is emerging.</p>
 
-                <div style="background: #f9f9f9; padding: 20px; border-radius: 8px; margin: 20px 0;">
-                    <h4 style="margin-top: 0; text-align: center; margin-bottom: 20px;">Members Age Bands</h4>
+                <div class="civic-bg-gray-50 civic-p-4 civic-rounded" style="margin: 20px 0;">
+                    <h4 class="civic-mt-0 civic-text-center civic-mb-4">Members Age Bands</h4>
                     <div style="margin-bottom: 10px; display: flex; align-items: center; justify-content: space-between;">
                         <span>56 - 65</span> <span style="font-weight: bold;">37.5%</span>
                     </div>

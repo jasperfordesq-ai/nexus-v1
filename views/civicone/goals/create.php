@@ -16,7 +16,7 @@ require dirname(__DIR__, 2) . '/layouts/civicone/header.php';
 
     <div style="margin-bottom: 30px; border-bottom: 4px solid var(--skin-primary, #00796B); padding-bottom: 15px; display: flex; justify-content: space-between; align-items: flex-end;">
         <h1 style="margin: 0; text-transform: uppercase; color: var(--skin-primary);">Set a New Goal</h1>
-        <a href="<?= Nexus\Core\TenantContext::getBasePath() ?>/goals" class="civic-btn" style="background: #ccc; color: #333; font-size: 0.9rem;">Cancel</a>
+        <a href="<?= Nexus\Core\TenantContext::getBasePath() ?>/goals" class="civic-btn civic-bg-gray-200 civic-text-dark" style="font-size: 0.9rem;">Cancel</a>
     </div>
 
     <div class="civic-card" style="max-width: 800px; margin: 0 auto;">
@@ -25,19 +25,19 @@ require dirname(__DIR__, 2) . '/layouts/civicone/header.php';
             <?= Nexus\Core\Csrf::input() ?>
 
             <div style="margin-bottom: 20px;">
-                <label for="title" style="display: block; font-weight: bold; margin-bottom: 5px; color: #333;">Goal Title</label>
+                <label for="title" class="civic-text-dark" style="display: block; font-weight: bold; margin-bottom: 5px;">Goal Title</label>
                 <input type="text" name="title" id="title" class="civic-input" placeholder="e.g. Learn to Paint, Run a 5k..." required style="width: 100%;">
                 <p style="font-size: 0.85rem; color: var(--civic-text-secondary, #4B5563); margin-top: 5px;">Short and sweet.</p>
             </div>
 
             <div style="margin-bottom: 20px;">
-                <label for="description" style="display: block; font-weight: bold; margin-bottom: 5px; color: #333;">Description & Details</label>
+                <label for="description" class="civic-text-dark" style="display: block; font-weight: bold; margin-bottom: 5px;">Description & Details</label>
                 <textarea name="description" id="description" class="civic-input" rows="5" placeholder="Share more details about what you want to achieve..." style="width: 100%; font-family: inherit;"></textarea>
             </div>
 
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px;">
                 <div>
-                    <label for="deadline" style="display: block; font-weight: bold; margin-bottom: 5px; color: #333;">Target Date (Optional)</label>
+                    <label for="deadline" class="civic-text-dark" style="display: block; font-weight: bold; margin-bottom: 5px;">Target Date (Optional)</label>
                     <input type="date" name="deadline" id="deadline" class="civic-input" style="width: 100%;">
                 </div>
 

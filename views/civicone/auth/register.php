@@ -116,13 +116,13 @@ if ($layout === 'civicone') {
                     <label style="display: flex; align-items: flex-start; gap: 10px; cursor: pointer; font-size: 0.9rem; color: #374151;">
                         <input type="checkbox" name="gdpr_consent" required style="margin-top: 4px; transform: scale(1.2);">
                         <span>
-                            I have read and agree to the <a href="<?= Nexus\Core\TenantContext::getBasePath() ?>/terms" target="_blank" style="color: #6366f1; text-decoration: underline;">Terms of Service</a> and <a href="<?= Nexus\Core\TenantContext::getBasePath() ?>/privacy" target="_blank" style="color: #6366f1; text-decoration: underline;">Privacy Policy</a>, and I am 18 years of age or older.
+                            I have read and agree to the <a href="<?= Nexus\Core\TenantContext::getBasePath() ?>/terms" target="_blank" class="civic-text-indigo" style="text-decoration: underline;">Terms of Service</a> and <a href="<?= Nexus\Core\TenantContext::getBasePath() ?>/privacy" target="_blank" class="civic-text-indigo" style="text-decoration: underline;">Privacy Policy</a>, and I am 18 years of age or older.
                         </span>
                     </label>
                 </div>
 
                 <!-- Explanatory Notice - WCAG AA compliant contrast -->
-                <div style="font-size: 0.8rem; color: #0b0c0c; line-height: 1.5; margin-bottom: 20px; background: #f3f2f1; padding: 15px; border-radius: 0;">
+                <div class="civic-bg-gray-100" style="font-size: 0.8rem; color: #0b0c0c; line-height: 1.5; margin-bottom: 20px; padding: 15px; border-radius: 0;">
                     <p style="margin-top: 0; font-weight: bold; color: #0b0c0c;">Data Protection Notice</p>
                     <p style="margin: 5px 0;"><strong>Data Controller:</strong> hOUR Timebank CLG (Ireland)</p>
                     <p><strong>Purpose of Processing:</strong> By clicking "Register," you are entering into a membership agreement with hOUR Timebank. We collect your personal data (name, location, email, and bio) solely to:</p>

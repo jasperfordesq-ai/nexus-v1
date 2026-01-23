@@ -15,15 +15,15 @@ $basePath = \Nexus\Core\TenantContext::getBasePath();
     <div class="civic-card">
 
         <?php if (!empty($poll['description'])): ?>
-            <p style="font-size: 1.25rem; margin-bottom: 30px; border-left: 5px solid #000; padding-left: 15px; background: #f9f9f9; padding: 15px;">
+            <p class="civic-border-left-black civic-bg-gray-50" style="font-size: 1.25rem; margin-bottom: 30px; padding-left: 15px; padding: 15px;">
                 <?= htmlspecialchars($poll['description']) ?>
             </p>
         <?php endif; ?>
 
         <?php if ($hasVoted): ?>
             <!-- RESULTS VIEW -->
-            <div style="background: #e6ffFA; border: 2px solid #000; padding: 20px; margin-bottom: 30px;">
-                <h3 style="margin-top: 0; color: #006400;">✅ Thank you for voting!</h3>
+            <div class="civic-success-box">
+                <h3 class="civic-text-green-dark" style="margin-top: 0;">✅ Thank you for voting!</h3>
                 <p style="margin-bottom: 0;">Here are the current results:</p>
             </div>
 
