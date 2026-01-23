@@ -1,0 +1,464 @@
+/**
+ * CivicOne Demo Pages & Marketing Pages
+ * GOV.UK Design System Compliant
+ * Created: 2026-01-23
+ *
+ * Covers:
+ * - demo/technical_specs.php
+ * - demo/hse_case_study.php
+ * - pages/timebanking-guide.php
+ * - pages/about-story.php
+ * - pages/impact-report.php
+ */
+
+/* ========================================
+   Demo Page Container
+   ======================================== */
+
+.demo-page {
+    padding: var(--space-10) var(--space-5);
+    max-width: 1100px;
+    margin: 0 auto;
+}
+
+.demo-page--narrow {
+    max-width: 900px;
+}
+
+/* ========================================
+   Page Headers
+   ======================================== */
+
+.demo-header {
+    text-align: center;
+    margin-bottom: var(--space-10);
+}
+
+.demo-header__title {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: var(--color-text-primary);
+    margin: 0 0 var(--space-3);
+}
+
+.demo-header__subtitle {
+    font-size: 1.2rem;
+    color: var(--color-text-secondary);
+    margin: 0;
+}
+
+/* Hero Banner (case study style) */
+.demo-hero {
+    background: linear-gradient(135deg, var(--skin-primary, var(--color-emerald-600)) 0%, var(--skin-primary-dark, var(--color-emerald-700)) 100%);
+    padding: var(--space-12);
+    border-radius: var(--radius-xl);
+    color: var(--color-white);
+    margin-bottom: var(--space-10);
+}
+
+.demo-hero__label {
+    display: inline-block;
+    background: var(--color-white-alpha-20);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    padding: var(--space-1) var(--space-3);
+    border-radius: var(--radius-base);
+    margin-bottom: var(--space-4);
+}
+
+.demo-hero__title {
+    color: var(--color-white);
+    margin: 0 0 var(--space-4);
+    font-size: 2.5rem;
+    font-weight: 700;
+}
+
+.demo-hero__desc {
+    font-size: 1.2rem;
+    opacity: 0.9;
+    margin: 0;
+    line-height: 1.5;
+}
+
+/* ========================================
+   Content Card (white card with border)
+   ======================================== */
+
+.demo-content-card {
+    background: var(--color-white);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-xl);
+    padding: var(--space-10);
+    margin: 0 auto var(--space-10);
+}
+
+[data-theme="dark"] .demo-content-card {
+    background: var(--color-surface);
+}
+
+/* ========================================
+   Section Headings
+   ======================================== */
+
+.demo-section-heading {
+    color: var(--color-govuk-blue, #002d72);
+    border-bottom: 2px solid var(--color-border);
+    padding-bottom: var(--space-3);
+    margin: 0 0 var(--space-6);
+    font-size: 1.5rem;
+    font-weight: 700;
+}
+
+.demo-section-heading--green {
+    color: var(--color-emerald-600);
+    border-bottom-color: var(--color-emerald-600);
+    display: inline-block;
+}
+
+.demo-section-heading--first {
+    margin-top: 0;
+}
+
+/* ========================================
+   Spec Table (technical_specs style)
+   ======================================== */
+
+.demo-spec-table {
+    width: 100%;
+    text-align: left;
+    border-collapse: collapse;
+    margin-bottom: var(--space-8);
+}
+
+.demo-spec-table th,
+.demo-spec-table td {
+    padding: var(--space-3) 0;
+    border-bottom: 1px solid var(--color-border);
+}
+
+.demo-spec-table th {
+    width: 30%;
+    font-weight: 400;
+    color: var(--color-text-secondary);
+}
+
+.demo-spec-table td {
+    font-weight: 600;
+    color: var(--color-text-primary);
+}
+
+/* ========================================
+   Feature List (security items)
+   ======================================== */
+
+.demo-feature-list {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 var(--space-8);
+}
+
+.demo-feature-list__item {
+    margin-bottom: var(--space-3);
+    line-height: 1.6;
+    color: var(--color-text-primary);
+}
+
+/* ========================================
+   Two Column Grid
+   ======================================== */
+
+.demo-two-col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-12);
+}
+
+@media (max-width: 768px) {
+    .demo-two-col {
+        grid-template-columns: 1fr;
+        gap: var(--space-8);
+    }
+}
+
+/* ========================================
+   Solution Box (green highlight box)
+   ======================================== */
+
+.demo-solution-box {
+    background: var(--color-green-50);
+    padding: var(--space-8);
+    border-radius: var(--radius-xl);
+    border: 1px solid var(--color-green-200);
+}
+
+[data-theme="dark"] .demo-solution-box {
+    background: var(--color-green-900);
+    border-color: var(--color-green-800);
+}
+
+.demo-solution-box__title {
+    color: var(--color-green-700);
+    margin: 0 0 var(--space-4);
+    font-size: 1.25rem;
+    font-weight: 700;
+}
+
+[data-theme="dark"] .demo-solution-box__title {
+    color: var(--color-green-300);
+}
+
+/* Result List (with icons) */
+.demo-result-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.demo-result-list__item {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-3);
+    margin-bottom: var(--space-4);
+}
+
+.demo-result-list__icon {
+    font-size: 1.2rem;
+    flex-shrink: 0;
+}
+
+.demo-result-list__text {
+    color: var(--color-green-800);
+    line-height: 1.5;
+}
+
+[data-theme="dark"] .demo-result-list__text {
+    color: var(--color-green-200);
+}
+
+/* ========================================
+   CTA Section
+   ======================================== */
+
+.demo-cta {
+    text-align: center;
+    margin-top: var(--space-12);
+}
+
+.demo-cta__btn {
+    display: inline-block;
+    padding: var(--space-3) var(--space-8);
+    border-radius: var(--radius-md);
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 1.1rem;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.demo-cta__btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px var(--color-black-alpha-15);
+}
+
+.demo-cta__btn:focus {
+    outline: 3px solid var(--color-govuk-yellow, #ffdd00);
+    outline-offset: 2px;
+}
+
+.demo-cta__btn--navy {
+    background-color: var(--color-govuk-blue, #0d1b2a);
+    color: var(--color-white);
+}
+
+.demo-cta__btn--green {
+    background-color: var(--color-emerald-600, #007b5f);
+    color: var(--color-white);
+}
+
+.demo-cta__btn--primary {
+    background-color: var(--skin-primary, var(--color-primary-600));
+    color: var(--color-white);
+}
+
+.demo-cta__note {
+    margin-top: var(--space-4);
+    font-size: 0.9rem;
+    color: var(--color-text-secondary);
+}
+
+/* ========================================
+   Stats Grid (timebanking guide)
+   ======================================== */
+
+.demo-stats-section {
+    margin-bottom: var(--space-12);
+}
+
+.demo-stats-label {
+    text-align: center;
+    margin-bottom: var(--space-8);
+}
+
+.demo-stats-label span {
+    display: inline-block;
+    background: var(--skin-primary, var(--color-primary-600));
+    color: var(--color-white);
+    padding: var(--space-1) var(--space-4);
+    border-radius: var(--radius-base);
+    font-weight: 700;
+    font-size: 0.9rem;
+}
+
+.demo-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--space-8);
+}
+
+@media (max-width: 768px) {
+    .demo-stats-grid {
+        grid-template-columns: 1fr;
+        gap: var(--space-4);
+    }
+}
+
+.demo-stat-card {
+    text-align: center;
+    padding: var(--space-8);
+}
+
+.demo-stat-card__label {
+    color: var(--color-text-secondary);
+    font-size: 1rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin: 0 0 var(--space-3);
+    font-weight: 600;
+}
+
+.demo-stat-card__value {
+    font-size: 3rem;
+    font-weight: 700;
+    margin: 0;
+}
+
+.demo-stat-card__value--primary {
+    color: var(--skin-primary, var(--color-primary-600));
+}
+
+.demo-stat-card__value--pink {
+    color: var(--color-pink-500);
+}
+
+.demo-stat-card__value--green {
+    color: var(--color-emerald-500);
+}
+
+/* ========================================
+   Steps Grid (3 steps)
+   ======================================== */
+
+.demo-steps-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--space-10);
+}
+
+@media (max-width: 768px) {
+    .demo-steps-grid {
+        grid-template-columns: 1fr;
+        gap: var(--space-8);
+    }
+}
+
+.demo-step {
+    text-align: center;
+}
+
+.demo-step__title {
+    color: var(--color-text-primary);
+    margin: 0 0 var(--space-3);
+    font-size: 1.25rem;
+    font-weight: 600;
+}
+
+.demo-step__desc {
+    color: var(--color-text-secondary);
+    line-height: 1.6;
+    margin: 0;
+}
+
+/* ========================================
+   Values List
+   ======================================== */
+
+.demo-values-list {
+    max-width: 700px;
+    margin: 0 auto;
+    padding-left: var(--space-5);
+}
+
+.demo-values-list li {
+    margin-bottom: var(--space-4);
+    line-height: 1.6;
+    color: var(--color-text-secondary);
+}
+
+.demo-values-list li strong {
+    color: var(--color-text-primary);
+}
+
+/* ========================================
+   Text Utilities
+   ======================================== */
+
+.demo-text-body {
+    font-size: 1.1rem;
+    line-height: 1.7;
+    color: var(--color-text-primary);
+}
+
+.demo-text-lead {
+    font-size: 1.2rem;
+    line-height: 1.6;
+    color: var(--color-text-secondary);
+}
+
+/* ========================================
+   Flex CTA Row
+   ======================================== */
+
+.demo-cta-row {
+    display: flex;
+    justify-content: center;
+    gap: var(--space-5);
+    flex-wrap: wrap;
+}
+
+/* ========================================
+   Mobile Responsive
+   ======================================== */
+
+@media (max-width: 640px) {
+    .demo-page {
+        padding: var(--space-6) var(--space-4);
+    }
+
+    .demo-header__title,
+    .demo-hero__title {
+        font-size: 1.75rem;
+    }
+
+    .demo-hero {
+        padding: var(--space-8) var(--space-5);
+    }
+
+    .demo-content-card {
+        padding: var(--space-6);
+    }
+
+    .demo-stat-card__value {
+        font-size: 2.5rem;
+    }
+}

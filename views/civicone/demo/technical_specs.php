@@ -4,56 +4,57 @@ $hSubtitle = "Security Standards, GDPR Compliance & Cloud Architecture";
 require __DIR__ . '/../../layouts/civicone/header.php';
 ?>
 
-<main class="civic-container" style="padding: 40px 20px;">
+<link rel="stylesheet" href="<?= \Nexus\Core\TenantContext::getBasePath() ?>/assets/css/civicone-demo-pages.css">
 
-    <header style="margin-bottom: 40px; text-align: center;">
-        <h1 class="civic-text-black" style="font-size: 2.5rem; margin-bottom: 10px;">Technical Proposal</h1>
-        <p class="civic-text-medium" style="font-size: 1.2rem;">Project NEXUS: Public Sector Edition</p>
+<main class="demo-page demo-page--narrow">
+
+    <header class="demo-header">
+        <h1 class="demo-header__title">Technical Proposal</h1>
+        <p class="demo-header__subtitle">Project NEXUS: Public Sector Edition</p>
     </header>
 
-    <div style="background: white; border: 1px solid #e2e8f0; border-radius: 12px; padding: 40px; max-width: 900px; margin: 0 auto;">
+    <div class="demo-content-card">
 
         <!-- Platform Summary -->
-        <h2 style="color: #002d72; border-bottom: 2px solid #e2e8f0; padding-bottom: 10px; margin-top: 0;">1. Executive Summary</h2>
-        <table style="width: 100%; text-align: left; border-collapse: collapse; margin-bottom: 30px;">
+        <h2 class="demo-section-heading demo-section-heading--first">1. Executive Summary</h2>
+        <table class="demo-spec-table" aria-label="Platform specifications">
             <tr>
-                <th class="civic-text-light" style="padding: 12px 0; border-bottom: 1px solid #e2e8f0; width: 30%;">Platform</th>
-                <td style="padding: 12px 0; border-bottom: 1px solid #e2e8f0; font-weight: 600;">NEXUS (Custom PHP MVC)</td>
+                <th scope="row">Platform</th>
+                <td>NEXUS (Custom PHP MVC)</td>
             </tr>
             <tr>
-                <th class="civic-text-light" style="padding: 12px 0; border-bottom: 1px solid #e2e8f0;">Database</th>
-                <td style="padding: 12px 0; border-bottom: 1px solid #e2e8f0; font-weight: 600;">MySQL (Spatial Extensions Enabled)</td>
+                <th scope="row">Database</th>
+                <td>MySQL (Spatial Extensions Enabled)</td>
             </tr>
             <tr>
-                <th class="civic-text-light" style="padding: 12px 0; border-bottom: 1px solid #e2e8f0;">Hosting</th>
-                <td style="padding: 12px 0; border-bottom: 1px solid #e2e8f0; font-weight: 600;">Ireland-based / Data Sovereign</td>
+                <th scope="row">Hosting</th>
+                <td>Ireland-based / Data Sovereign</td>
             </tr>
             <tr>
-                <th class="civic-text-light" style="padding: 12px 0; border-bottom: 1px solid #e2e8f0;">Performance</th>
-                <td style="padding: 12px 0; border-bottom: 1px solid #e2e8f0; font-weight: 600;">
-                    < 300ms Page Load (Zero-Bloat Arch)</td>
+                <th scope="row">Performance</th>
+                <td>&lt; 300ms Page Load (Zero-Bloat Arch)</td>
             </tr>
         </table>
 
         <!-- Security -->
-        <h2 style="color: #002d72; border-bottom: 2px solid #e2e8f0; padding-bottom: 10px;">2. Security & Compliance</h2>
-        <ul class="civic-text-dark" style="line-height: 1.6; margin-bottom: 30px;">
-            <li style="margin-bottom: 10px;"><strong>SQL Injection Proof:</strong> All database interactions utilize PDO Prepared Statements.</li>
-            <li style="margin-bottom: 10px;"><strong>Strict Multi-Tenancy:</strong> Physical `tenant_id` scoping at the Database Wrapper level prevents cross-contamination.</li>
-            <li style="margin-bottom: 10px;"><strong>Audit Logging:</strong> Granular tracking of all User/Admin actions.</li>
-            <li style="margin-bottom: 10px;"><strong>Accessibility:</strong> WCAG 2.1 Level AA Compliant (CivicOne Layout).</li>
+        <h2 class="demo-section-heading">2. Security & Compliance</h2>
+        <ul class="demo-feature-list">
+            <li class="demo-feature-list__item"><strong>SQL Injection Proof:</strong> All database interactions utilize PDO Prepared Statements.</li>
+            <li class="demo-feature-list__item"><strong>Strict Multi-Tenancy:</strong> Physical <code>tenant_id</code> scoping at the Database Wrapper level prevents cross-contamination.</li>
+            <li class="demo-feature-list__item"><strong>Audit Logging:</strong> Granular tracking of all User/Admin actions.</li>
+            <li class="demo-feature-list__item"><strong>Accessibility:</strong> WCAG 2.1 Level AA Compliant (CivicOne Layout).</li>
         </ul>
 
         <!-- Integration -->
-        <h2 style="color: #002d72; border-bottom: 2px solid #e2e8f0; padding-bottom: 10px;">3. Integration Capabilities</h2>
-        <p class="civic-text-dark" style="line-height: 1.6;">
+        <h2 class="demo-section-heading">3. Integration Capabilities</h2>
+        <p class="demo-text-body">
             The NEXUS platform is API-First. We expose secure RESTful endpoints for integration with existing Council/HSE data portals, CRM systems (Salesforce/Microsoft Dynamics), and volunteer registries.
         </p>
 
     </div>
 
-    <div style="text-align: center; margin-top: 50px;">
-        <a href="<?= \Nexus\Core\TenantContext::getBasePath() ?>/" class="civic-btn" style="background-color: #0d1b2a; color: white; padding: 12px 30px; border-radius: 6px; text-decoration: none; font-weight: 600;">Back to Demo Home</a>
+    <div class="demo-cta">
+        <a href="<?= \Nexus\Core\TenantContext::getBasePath() ?>/" class="demo-cta__btn demo-cta__btn--navy">Back to Demo Home</a>
     </div>
 
 </main>
