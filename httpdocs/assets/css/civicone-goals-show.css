@@ -53,7 +53,7 @@ button {
 .glass-pill-btn:focus-visible,
 button:focus-visible,
 a:focus-visible {
-    outline: 3px solid rgba(219, 39, 119, 0.5);
+    outline: 3px solid var(--color-pink-600-alpha-50);
     outline-offset: var(--space-1);
 }
 
@@ -79,8 +79,8 @@ html {
     /*
        --- DEFAULT / LIGHT MODE VARIABLES (Fallback) ---
     */
-    --glass-bg: rgba(255, 255, 255, 0.55);
-    --glass-border: rgba(255, 255, 255, 0.4);
+    --glass-bg: var(--color-white-alpha-55);
+    --glass-border: var(--color-white-alpha-40);
     --text-color: var(--color-slate-800);
     --text-muted: var(--color-slate-600);
     --accent-color: var(--color-pink-600);
@@ -90,27 +90,27 @@ html {
 
     /* Subtle iridescent shadow for light mode */
     --box-shadow:
-        0 var(--space-2) var(--space-8) 0 rgba(31, 38, 135, 0.1),
-        inset 0 0 0 1px rgba(255, 255, 255, 0.2);
+        0 var(--space-2) var(--space-8) 0 var(--color-glass-shadow),
+        inset 0 0 0 1px var(--color-white-alpha-20);
 
-    --holographic-glow: 0 0 var(--space-5) rgba(255, 0, 128, 0.05), 0 0 var(--space-10) rgba(255, 100, 200, 0.05);
+    --holographic-glow: 0 0 var(--space-5) var(--color-magenta-alpha-5), 0 0 var(--space-10) var(--color-rose-glow-alpha-5);
 
     /* Form Fields & Pills */
-    --pill-bg: rgba(255, 255, 255, 0.25);
-    --pill-border: 1px solid rgba(255, 255, 255, 0.4);
-    --pill-shadow: 0 var(--space-1) var(--space-3) rgba(0, 0, 0, 0.05);
+    --pill-bg: var(--color-white-alpha-25);
+    --pill-border: 1px solid var(--color-white-alpha-40);
+    --pill-shadow: 0 var(--space-1) var(--space-3) var(--color-black-alpha-5);
 
     /* Status Card Variables (Light) */
-    --status-blue-bg: rgba(59, 130, 246, 0.15);
-    --status-blue-border: rgba(59, 130, 246, 0.3);
+    --status-blue-bg: var(--color-blue-alpha-15);
+    --status-blue-border: var(--color-blue-alpha-30);
     --status-blue-text: var(--color-blue-700);
 
-    --status-amber-bg: rgba(245, 158, 11, 0.15);
-    --status-amber-border: rgba(245, 158, 11, 0.3);
+    --status-amber-bg: var(--color-amber-500-alpha-15);
+    --status-amber-border: var(--color-amber-500-alpha-30);
     --status-amber-text: var(--color-amber-700);
 
-    --status-gray-bg: rgba(148, 163, 184, 0.15);
-    --status-gray-border: rgba(148, 163, 184, 0.3);
+    --status-gray-bg: var(--color-slate-400-alpha-15);
+    --status-gray-border: var(--color-slate-400-alpha-30);
     --status-gray-text: var(--color-slate-600);
 
     /* Layout & Alignment */
@@ -139,27 +139,27 @@ html {
 
 /* LIGHT MODE EXPLICIT */
 html[data-theme="light"] #unique-glass-page-wrapper {
-    --glass-bg: rgba(255, 255, 255, 0.55);
-    --glass-border: rgba(255, 255, 255, 0.4);
+    --glass-bg: var(--color-white-alpha-55);
+    --glass-border: var(--color-white-alpha-40);
     --text-color: var(--color-slate-800);
     --text-muted: var(--color-slate-600);
     --heading-gradient: linear-gradient(135deg, var(--color-pink-700) 0%, var(--color-pink-600) 100%);
     --box-shadow:
-        0 var(--space-2) var(--space-8) 0 rgba(31, 38, 135, 0.1),
-        inset 0 0 0 1px rgba(255, 255, 255, 0.2);
-    --holographic-glow: 0 0 var(--space-5) rgba(255, 0, 128, 0.05), 0 0 var(--space-10) rgba(255, 100, 200, 0.05);
-    --pill-bg: rgba(255, 255, 255, 0.25);
+        0 var(--space-2) var(--space-8) 0 var(--color-glass-shadow),
+        inset 0 0 0 1px var(--color-white-alpha-20);
+    --holographic-glow: 0 0 var(--space-5) var(--color-magenta-alpha-5), 0 0 var(--space-10) var(--color-rose-glow-alpha-5);
+    --pill-bg: var(--color-white-alpha-25);
 
-    --status-blue-bg: rgba(59, 130, 246, 0.15);
-    --status-blue-border: rgba(59, 130, 246, 0.3);
+    --status-blue-bg: var(--color-blue-alpha-15);
+    --status-blue-border: var(--color-blue-alpha-30);
     --status-blue-text: var(--color-blue-700);
 
-    --status-amber-bg: rgba(245, 158, 11, 0.15);
-    --status-amber-border: rgba(245, 158, 11, 0.3);
+    --status-amber-bg: var(--color-amber-500-alpha-15);
+    --status-amber-border: var(--color-amber-500-alpha-30);
     --status-amber-text: var(--color-amber-700);
 
-    --status-gray-bg: rgba(148, 163, 184, 0.15);
-    --status-gray-border: rgba(148, 163, 184, 0.3);
+    --status-gray-bg: var(--color-slate-400-alpha-15);
+    --status-gray-border: var(--color-slate-400-alpha-30);
     --status-gray-text: var(--color-slate-600);
 
     background: radial-gradient(circle at 50% 0%, var(--color-pink-50) 0%, var(--color-pink-100) 100%);
@@ -167,36 +167,36 @@ html[data-theme="light"] #unique-glass-page-wrapper {
 
 /* DARK MODE EXPLICIT */
 html[data-theme="dark"] #unique-glass-page-wrapper {
-    --glass-bg: rgba(24, 24, 27, 0.45);
-    --glass-border: rgba(255, 255, 255, 0.15);
+    --glass-bg: var(--color-zinc-900-alpha-45);
+    --glass-border: var(--color-white-alpha-15);
     --text-color: var(--color-pink-100);
-    --text-muted: rgba(255, 255, 255, 0.7);
+    --text-muted: var(--color-white-alpha-70);
     --accent-color: var(--color-pink-400);
     --heading-gradient: linear-gradient(135deg, var(--color-white) 0%, var(--color-pink-200) 100%);
 
     /* Vivid Dark Mode Shadows */
     --box-shadow:
-        0 var(--space-2) var(--space-8) 0 rgba(0, 0, 0, 0.4),
-        inset 0 0 0 1px rgba(255, 255, 255, 0.05);
+        0 var(--space-2) var(--space-8) 0 var(--color-black-alpha-40),
+        inset 0 0 0 1px var(--color-white-alpha-5);
 
     --holographic-glow:
-        0 0 var(--space-8) rgba(236, 72, 153, 0.15),
-        0 0 var(--space-16) rgba(168, 85, 247, 0.15);
+        0 0 var(--space-8) var(--color-pink-alpha-15),
+        0 0 var(--space-16) var(--color-purple-alpha-15);
 
-    --pill-bg: rgba(24, 24, 27, 0.65);
-    --pill-border: 2px solid rgba(255, 255, 255, 0.1);
+    --pill-bg: var(--color-zinc-900-alpha-65);
+    --pill-border: 2px solid var(--color-white-alpha-10);
 
     /* Dark Mode Status Cards */
-    --status-blue-bg: rgba(30, 58, 138, 0.3);
-    --status-blue-border: rgba(59, 130, 246, 0.3);
+    --status-blue-bg: var(--color-blue-900-alpha-30);
+    --status-blue-border: var(--color-blue-alpha-30);
     --status-blue-text: var(--color-blue-300);
 
-    --status-amber-bg: rgba(120, 53, 15, 0.3);
-    --status-amber-border: rgba(245, 158, 11, 0.3);
+    --status-amber-bg: var(--color-amber-900-alpha-30);
+    --status-amber-border: var(--color-amber-500-alpha-30);
     --status-amber-text: var(--color-amber-300);
 
-    --status-gray-bg: rgba(30, 41, 59, 0.3);
-    --status-gray-border: rgba(148, 163, 184, 0.2);
+    --status-gray-bg: var(--color-slate-alpha-30);
+    --status-gray-border: var(--color-slate-400-alpha-20);
     --status-gray-text: var(--color-slate-400);
 
     background: radial-gradient(circle at 50% 0%, rgb(39, 10, 25) 0%, rgb(20, 10, 20) 90%);
@@ -234,7 +234,7 @@ html[data-theme="dark"] #unique-glass-page-wrapper {
     left: 0;
     right: 0;
     height: 1px;
-    background: linear-gradient(90deg, transparent, rgba(244, 114, 182, 0.6), rgba(168, 85, 247, 0.6), transparent);
+    background: linear-gradient(90deg, transparent, var(--color-pink-400-alpha-60), var(--color-purple-alpha-60), transparent);
     z-index: var(--z-raised);
 }
 
@@ -343,12 +343,12 @@ html[data-theme="dark"] #unique-glass-page-wrapper {
     align-items: center;
     justify-content: center;
     gap: var(--space-2);
-    box-shadow: 0 var(--space-1) var(--space-3) rgba(0, 0, 0, 0.05);
+    box-shadow: 0 var(--space-1) var(--space-3) var(--color-black-alpha-5);
 }
 
 #unique-glass-page-wrapper .glass-pill-btn:hover {
     transform: translateY(-2px);
-    box-shadow: 0 var(--space-2) var(--space-4) rgba(0, 0, 0, 0.1);
+    box-shadow: 0 var(--space-2) var(--space-4) var(--color-black-alpha-10);
 }
 
 /* Variants */
