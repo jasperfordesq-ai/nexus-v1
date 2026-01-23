@@ -10,6 +10,64 @@
 | **Cache** | Redis 7+ |
 | **Live URL** | https://project-nexus.ie |
 | **Alt URL** | https://hour-timebank.ie |
+| **Local Dev** | http://staging.timebank.local/ |
+| **Test Tenant** | `hour-timebank` (tenant 2) |
+
+---
+
+## MANDATORY RULES
+
+### CSS Rules - CRITICAL
+
+- **NEVER** write inline `<style>` blocks in PHP/HTML files
+- **NEVER** use inline `style=""` attributes except for truly dynamic values (e.g., calculated widths)
+- All CSS must go in `/httpdocs/assets/css/` with clear file names
+- Create new CSS files for new components (e.g., `component-name.css`)
+- CSS must be loaded via layout headers (`views/layouts/*/header.php`)
+- Add new CSS files to `purgecss.config.js`
+
+### Color Variables - MANDATORY
+
+Always use CSS variables from `design-tokens.css` instead of hardcoded hex colors:
+
+```css
+/* CORRECT */
+color: var(--color-primary-500);
+background: var(--color-warning);
+border-color: var(--color-gray-500);
+
+/* WRONG - never use hardcoded colors in new code */
+color: #6366f1;
+background: #fbbf24;
+```
+
+See `/httpdocs/assets/css/design-tokens.css` for full palette.
+
+> **Note**: Legacy files have hardcoded colors - do NOT mass-replace (risk of regressions).
+
+### JavaScript Rules - CRITICAL
+
+- **NEVER** write large inline `<script>` blocks in PHP files
+- Extract JS to `/httpdocs/assets/js/` files
+- Small event handlers (1-2 lines) in `onclick` are acceptable
+- Anything more complex goes in external JS files
+
+### Theme System - CRITICAL
+
+- Theme is determined by **user preference** (not tenant or URL)
+- Stored in `users.preferred_layout` column and `nexus_active_layout` session key
+- Default theme is `modern`, alternative is `civicone`
+- **Both themes must be kept in sync** - if you edit `views/modern/X.php`, check if `views/civicone/X.php` exists and needs the same change
+- Before making changes to theme files, **always test on both themes**
+
+### General Principles
+
+- **Do NOT default to the quickest solution**
+- Prioritize maintainability and organization over speed
+- Follow existing patterns in the codebase
+- Ask if unsure about where code should live
+
+---
 
 ## Project Overview
 
@@ -318,6 +376,16 @@ function handler(_event) {
    - Contemporary responsive design
    - Feature-rich UI
 
+### File Organization
+
+| Type | Location |
+|------|----------|
+| CSS | `/httpdocs/assets/css/` |
+| JS | `/httpdocs/assets/js/` |
+| PHP Views | `/views/{theme}/` |
+| Partials | `/views/{theme}/partials/` |
+| Layouts | `/views/layouts/{theme}/` |
+
 ### CSS Design Tokens
 
 Use design tokens for consistency:
@@ -327,6 +395,8 @@ Use design tokens for consistency:
 color: var(--color-text);
 background: var(--color-background);
 border-color: var(--color-border);
+color: var(--color-primary-500);
+background: var(--color-warning);
 
 /* Spacing */
 padding: var(--space-4);
@@ -338,6 +408,20 @@ font-size: var(--font-size-body);
 font-weight: var(--font-weight-bold);
 ```
 
+### Tracking New CSS Files
+
+When creating new CSS files, ensure they're included in the build pipeline:
+
+```bash
+# Check if your new CSS file is tracked
+npm run css:discover
+
+# Auto-add all missing CSS files to purgecss.config.js
+npm run css:auto-config
+```
+
+**Why this matters:** CSS files not in `purgecss.config.js` won't be optimized for production, leading to missing styles in deployed builds.
+
 ### Build Commands
 
 ```bash
@@ -346,6 +430,8 @@ npm run build:css:purge  # Run PurgeCSS
 npm run minify:css       # Minify CSS files
 npm run lint:css         # Lint CSS
 npm run lint:js          # Lint JavaScript
+npm run css:discover     # Find untracked CSS files
+npm run css:auto-config  # Auto-add CSS to purgecss config
 ```
 
 ## Testing
@@ -395,6 +481,30 @@ class ExampleServiceTest extends TestCase
     }
 }
 ```
+
+## Local Development
+
+### URLs
+
+- **Local server**: `http://staging.timebank.local/`
+- **Tenant URLs**: `http://staging.timebank.local/{tenant-slug}/`
+- **Test tenant**: `hour-timebank` (tenant 2)
+
+### Testing URLs
+
+- Compose form: `http://staging.timebank.local/hour-timebank/compose`
+- Dashboard: `http://staging.timebank.local/dashboard`
+- Admin panel: `http://staging.timebank.local/admin`
+
+### Theme Testing
+
+To test both themes:
+1. Change your user's `preferred_layout` in the database, OR
+2. Switch via the UI theme toggle
+
+**Important**: Always test changes on both themes before committing.
+
+---
 
 ## Deployment
 
