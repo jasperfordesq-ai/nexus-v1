@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Nexus\Services\Enterprise;
 
 use Nexus\Core\Database;
+use Nexus\Services\Enterprise\LoggerService;
+use Nexus\Services\Enterprise\MetricsService;
 use ZipArchive;
 
 /**

@@ -397,9 +397,9 @@ class UserController
             header('Location: ' . TenantContext::getBasePath() . '/admin/users/' . $userId . '/edit?badge_added=true');
             exit;
         } catch (\Throwable $e) {
-            // Check if it is a missing class error
-            error_log("Add Badge Failed: " . $e->getMessage());
-            header('Location: ' . TenantContext::getBasePath() . '/admin/users/' . $_POST['user_id'] . '/edit?error=system_error&msg=' . urlencode($e->getMessage()));
+            // Log the full error server-side but don't expose to user
+            error_log("Add Badge Failed: " . $e->getMessage() . " | File: " . $e->getFile() . " | Line: " . $e->getLine());
+            header('Location: ' . TenantContext::getBasePath() . '/admin/users/' . $_POST['user_id'] . '/edit?error=badge_failed');
             exit;
         }
     }
