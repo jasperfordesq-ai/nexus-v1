@@ -81,7 +81,7 @@
     overflow-y: auto;
     z-index: 100;
     display: none;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 12px var(--color-black-alpha-10);
 }
 
 [data-theme="dark"] .civic-user-results {
@@ -288,11 +288,11 @@
 }
 
 .wallet-table-desktop tbody tr:hover {
-    background: rgba(0, 0, 0, 0.02);
+    background: var(--color-black-alpha-2);
 }
 
 [data-theme="dark"] .wallet-table-desktop tbody tr:hover {
-    background: rgba(255, 255, 255, 0.02);
+    background: var(--color-white-alpha-2);
 }
 
 .wallet-table-desktop .amount-positive {
@@ -387,9 +387,9 @@
     width: 200%;
     height: 200%;
     background:
-        radial-gradient(ellipse at 20% 30%, rgba(168, 85, 247, 0.12) 0%, transparent 50%),
-        radial-gradient(ellipse at 80% 20%, rgba(139, 92, 246, 0.1) 0%, transparent 45%),
-        radial-gradient(ellipse at 50% 80%, rgba(192, 132, 252, 0.08) 0%, transparent 50%);
+        radial-gradient(ellipse at 20% 30%, var(--color-purple-alpha-12) 0%, transparent 50%),
+        radial-gradient(ellipse at 80% 20%, var(--color-violet-alpha-10) 0%, transparent 45%),
+        radial-gradient(ellipse at 50% 80%, var(--color-purple-400-alpha-8) 0%, transparent 50%);
     /* animation removed for GOV.UK compliance */
 }
 
@@ -399,8 +399,8 @@
 
 [data-theme="dark"] .insights-bg::before {
     background:
-        radial-gradient(ellipse at 20% 30%, rgba(168, 85, 247, 0.2) 0%, transparent 50%),
-        radial-gradient(ellipse at 80% 20%, rgba(139, 92, 246, 0.15) 0%, transparent 45%);
+        radial-gradient(ellipse at 20% 30%, var(--color-purple-alpha-20) 0%, transparent 50%),
+        radial-gradient(ellipse at 80% 20%, var(--color-violet-alpha-15) 0%, transparent 45%);
 }
 
 
@@ -463,9 +463,9 @@
 
 .insights-nav-link {
     padding: var(--space-3) var(--space-5);
-    background: rgba(255, 255, 255, 0.8);
+    background: var(--color-white-alpha-80);
     /* backdrop-filter removed for GOV.UK compliance */
-    border: 1px solid rgba(168, 85, 247, 0.2);
+    border: 1px solid var(--color-purple-alpha-20);
     border-radius: var(--radius-md);
     color: var(--civic-wallet-text-secondary);
     font-weight: 600;
@@ -479,7 +479,7 @@
 }
 
 .insights-nav-link:hover {
-    background: rgba(168, 85, 247, 0.1);
+    background: var(--color-purple-alpha-10);
 }
 
 .insights-nav-link:focus {
@@ -492,8 +492,8 @@
 }
 
 [data-theme="dark"] .insights-nav-link {
-    background: rgba(30, 41, 59, 0.8);
-    border-color: rgba(168, 85, 247, 0.3);
+    background: var(--color-slate-800-alpha-80);
+    border-color: var(--color-purple-alpha-30);
     color: var(--color-slate-200);
 }
 
@@ -503,21 +503,21 @@
    -------------------------------------------- */
 .insights-glass-card {
     background: linear-gradient(135deg,
-        rgba(255, 255, 255, 0.9) 0%,
-        rgba(255, 255, 255, 0.75) 100%);
+        var(--color-white-alpha-90) 0%,
+        var(--color-white-alpha-75) 100%);
     /* backdrop-filter removed for GOV.UK compliance */
     -webkit-/* backdrop-filter removed for GOV.UK compliance */
-    border: 1px solid rgba(255, 255, 255, 0.5);
+    border: 1px solid var(--color-white-alpha-50);
     border-radius: var(--radius-xl);
-    box-shadow: 0 8px 32px rgba(31, 38, 135, 0.1);
+    box-shadow: 0 8px 32px var(--color-glass-shadow);
     overflow: hidden;
 }
 
 [data-theme="dark"] .insights-glass-card {
     background: linear-gradient(135deg,
-        rgba(30, 41, 59, 0.9) 0%,
-        rgba(30, 41, 59, 0.75) 100%);
-    border-color: rgba(255, 255, 255, 0.1);
+        var(--color-slate-800-alpha-90) 0%,
+        var(--color-slate-800-alpha-75) 100%);
+    border-color: var(--color-white-alpha-10);
 }
 
 
@@ -546,7 +546,7 @@
     width: 60px;
     height: 60px;
     border-radius: 50%;
-    background: linear-gradient(135deg, rgba(168, 85, 247, 0.1), transparent);
+    background: linear-gradient(135deg, var(--color-purple-alpha-10), transparent);
     transform: translate(var(--space-5), calc(-1 * var(--space-5)));
 }
 
@@ -561,16 +561,16 @@
     font-size: 1.25rem;
 }
 
-.insights-stat-icon.green { background: rgba(16, 185, 129, 0.15); color: var(--color-success); }
-.insights-stat-icon.red { background: rgba(239, 68, 68, 0.15); color: var(--color-danger); }
-.insights-stat-icon.blue { background: rgba(59, 130, 246, 0.15); color: var(--color-info); }
-.insights-stat-icon.purple { background: rgba(168, 85, 247, 0.15); color: var(--color-purple-400); }
-.insights-stat-icon.orange { background: rgba(251, 191, 36, 0.15); color: var(--color-warning); }
+.insights-stat-icon.green { background: var(--color-emerald-alpha-15); color: var(--color-success); }
+.insights-stat-icon.red { background: var(--color-red-alpha-15); color: var(--color-danger); }
+.insights-stat-icon.blue { background: var(--color-blue-alpha-15); color: var(--color-info); }
+.insights-stat-icon.purple { background: var(--color-purple-alpha-15); color: var(--color-purple-400); }
+.insights-stat-icon.orange { background: var(--color-amber-alpha-15); color: var(--color-warning); }
 
-[data-theme="dark"] .insights-stat-icon.green { background: rgba(16, 185, 129, 0.2); color: var(--color-success-400); }
-[data-theme="dark"] .insights-stat-icon.red { background: rgba(239, 68, 68, 0.2); color: var(--color-red-400); }
-[data-theme="dark"] .insights-stat-icon.blue { background: rgba(59, 130, 246, 0.2); color: var(--color-blue-400); }
-[data-theme="dark"] .insights-stat-icon.purple { background: rgba(168, 85, 247, 0.2); color: var(--color-purple-400); }
+[data-theme="dark"] .insights-stat-icon.green { background: var(--color-emerald-alpha-20); color: var(--color-success-400); }
+[data-theme="dark"] .insights-stat-icon.red { background: var(--color-red-alpha-20); color: var(--color-red-400); }
+[data-theme="dark"] .insights-stat-icon.blue { background: var(--color-blue-alpha-20); color: var(--color-blue-400); }
+[data-theme="dark"] .insights-stat-icon.purple { background: var(--color-purple-alpha-20); color: var(--color-purple-400); }
 
 .insights-stat-value {
     font-size: var(--font-size-4xl);
@@ -618,11 +618,11 @@
     align-items: center;
     justify-content: space-between;
     padding: var(--space-5) var(--space-6);
-    border-bottom: 1px solid rgba(168, 85, 247, 0.1);
+    border-bottom: 1px solid var(--color-purple-alpha-10);
 }
 
 [data-theme="dark"] .insights-section-header {
-    border-bottom-color: rgba(255, 255, 255, 0.1);
+    border-bottom-color: var(--color-white-alpha-10);
 }
 
 .insights-section-title {
@@ -656,13 +656,13 @@
     display: flex;
     align-items: center;
     padding: var(--space-3) 0;
-    border-bottom: 1px solid rgba(168, 85, 247, 0.08);
+    border-bottom: 1px solid var(--color-purple-alpha-8);
     gap: var(--space-3);
     min-height: var(--civic-wallet-touch-min);
 }
 
 [data-theme="dark"] .insights-partner-item {
-    border-bottom-color: rgba(255, 255, 255, 0.05);
+    border-bottom-color: var(--color-white-alpha-5);
 }
 
 .insights-partner-item:last-child {
@@ -673,7 +673,7 @@
     width: var(--space-6);
     height: var(--space-6);
     border-radius: var(--radius-sm);
-    background: rgba(168, 85, 247, 0.1);
+    background: var(--color-purple-alpha-10);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -762,7 +762,7 @@
     color: var(--color-warning);
     margin-top: var(--space-3);
     padding: var(--space-2) var(--space-4);
-    background: rgba(251, 191, 36, 0.1);
+    background: var(--color-amber-alpha-10);
     border-radius: var(--radius-xl);
     display: inline-block;
 }
@@ -770,7 +770,7 @@
 .streak-footer {
     padding: 0 var(--space-6) var(--space-6);
     text-align: center;
-    border-top: 1px solid rgba(168, 85, 247, 0.1);
+    border-top: 1px solid var(--color-purple-alpha-10);
 }
 
 .streak-footer-content {
@@ -798,12 +798,12 @@
 .community-stat {
     text-align: center;
     padding: var(--space-4);
-    background: rgba(168, 85, 247, 0.05);
+    background: var(--color-purple-500-alpha-5);
     border-radius: var(--radius-md);
 }
 
 [data-theme="dark"] .community-stat {
-    background: rgba(168, 85, 247, 0.1);
+    background: var(--color-purple-alpha-10);
 }
 
 .community-stat-value {

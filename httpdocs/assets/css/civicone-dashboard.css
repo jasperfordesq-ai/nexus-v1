@@ -88,7 +88,7 @@
     border-radius: var(--radius-lg);
     padding: var(--space-6);
     margin-bottom: var(--space-6);
-    box-shadow: 0 10px 25px -5px rgba(37, 99, 235, 0.3);
+    box-shadow: 0 10px 25px -5px var(--color-blue-600-alpha-30);
 }
 
 .civic-balance-card-inner {
@@ -150,7 +150,7 @@
     background: var(--color-white);
     color: var(--civic-brand, var(--color-blue-600));
     border-color: var(--color-white);
-    box-shadow: 0 2px 0 rgba(0, 0, 0, 0.12);
+    box-shadow: 0 2px 0 var(--color-black-alpha-12);
     margin-bottom: 0; /* Remove default GOV.UK margin in card */
     font-weight: 700;
 }
@@ -158,7 +158,7 @@
 .civic-balance-card .civic-button--secondary:hover {
     background: var(--color-slate-50);
     border-color: var(--color-slate-50);
-    box-shadow: 0 3px 0 rgba(0, 0, 0, 0.15);
+    box-shadow: 0 3px 0 var(--color-black-alpha-15);
     color: var(--civic-brand, var(--color-blue-600));
 }
 
@@ -481,7 +481,7 @@
 }
 
 .civic-listing-card:hover {
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+    box-shadow: 0 8px 24px var(--color-black-alpha-8);
     transform: translateY(-2px);
 }
 
@@ -613,11 +613,11 @@
     text-decoration: none;
     transition: background 0.15s ease;
     margin: var(--space-1) var(--space-2);
-    background: rgba(99, 102, 241, 0.03);
+    background: var(--color-indigo-alpha-3);
 }
 
 .civic-match-item:hover {
-    background: rgba(99, 102, 241, 0.08);
+    background: var(--color-indigo-alpha-8);
 }
 
 .civic-match-avatar {
@@ -634,7 +634,7 @@
     flex-shrink: 0;
     overflow: hidden;
     border: 2px solid var(--color-white);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 2px 8px var(--color-black-alpha-10);
 }
 
 .civic-match-avatar img {
@@ -786,11 +786,11 @@
     padding: 0;
     width: 500px;
     max-width: 92vw;
-    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    box-shadow: 0 25px 50px -12px var(--color-black-alpha-25);
 }
 
 .civic-modal::backdrop {
-    background: rgba(0, 0, 0, 0.5);
+    background: var(--color-black-alpha-50);
 }
 
 .civic-modal-header {
@@ -960,7 +960,7 @@
 }
 
 .civic-notif-full-item.unread {
-    background: rgba(37, 99, 235, 0.03);
+    background: var(--color-blue-600-alpha-3);
 }
 
 .civic-notif-body {
@@ -995,7 +995,7 @@
 }
 
 .civic-hub-card:hover {
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+    box-shadow: 0 4px 16px var(--color-black-alpha-6);
 }
 
 .civic-hub-card-title {
@@ -1090,7 +1090,7 @@
 }
 
 .civic-listing-card:hover {
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+    box-shadow: 0 8px 24px var(--color-black-alpha-8);
     transform: translateY(-2px);
 }
 
@@ -1203,7 +1203,7 @@
     color: var(--color-white);
     border-radius: var(--radius-xl);
     padding: var(--space-7);
-    box-shadow: 0 10px 25px -5px rgba(79, 70, 229, 0.3);
+    box-shadow: 0 10px 25px -5px var(--color-primary-600-alpha-30);
 }
 
 .civic-wallet-balance-label {
@@ -1280,8 +1280,8 @@
     align-items: center;
     gap: var(--space-2-5);
     padding: var(--space-2-5) var(--space-3-5);
-    background: rgba(79, 70, 229, 0.1);
-    border: 2px solid rgba(79, 70, 229, 0.3);
+    background: var(--color-primary-600-alpha-10);
+    border: 2px solid var(--color-primary-600-alpha-30);
     border-radius: var(--radius-base);
 }
 
@@ -1340,7 +1340,7 @@
 }
 
 .civic-selected-clear:hover {
-    background: rgba(239, 68, 68, 0.1);
+    background: var(--color-red-alpha-10);
     color: var(--color-danger);
 }
 
@@ -1355,13 +1355,13 @@
     left: 0;
     right: 0;
     background: var(--color-white);
-    border: 2px solid rgba(79, 70, 229, 0.2);
+    border: 2px solid var(--color-primary-600-alpha-20);
     border-top: none;
     border-radius: 0 0 var(--radius-base) var(--radius-base);
     max-height: 280px;
     overflow-y: auto;
     z-index: 100;
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+    box-shadow: 0 8px 24px var(--color-black-alpha-12);
 }
 
 .civic-user-result {
@@ -1379,7 +1379,7 @@
 
 .civic-user-result:hover,
 .civic-user-result.selected {
-    background: rgba(79, 70, 229, 0.08);
+    background: var(--color-primary-600-alpha-8);
 }
 
 .civic-user-avatar {
@@ -1654,7 +1654,7 @@
     background: var(--civic-brand, var(--color-blue-600));
     color: var(--color-white);
     border: none;
-    box-shadow: 0 4px 20px rgba(37, 99, 235, 0.4);
+    box-shadow: 0 4px 20px var(--color-blue-600-alpha-40);
     cursor: pointer;
     display: flex;
     align-items: center;
@@ -1665,11 +1665,11 @@
 
 .civic-fab-main:hover {
     transform: scale(1.05);
-    box-shadow: 0 6px 24px rgba(37, 99, 235, 0.5);
+    box-shadow: 0 6px 24px var(--color-blue-600-alpha-50);
 }
 
 .civic-fab-main:focus {
-    outline: 3px solid rgba(37, 99, 235, 0.5);
+    outline: 3px solid var(--color-blue-600-alpha-50);
     outline-offset: 2px;
 }
 
@@ -1703,7 +1703,7 @@
     padding: var(--space-2-5) 16px;
     background: var(--color-white);
     border-radius: var(--radius-2xl);
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+    box-shadow: 0 4px 16px var(--color-black-alpha-12);
     text-decoration: none;
     color: var(--color-slate-800);
     font-weight: 600;
@@ -1714,7 +1714,7 @@
 
 .civic-fab-item:hover {
     transform: translateX(-4px);
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+    box-shadow: 0 6px 20px var(--color-black-alpha-15);
 }
 
 .civic-fab-item i {
