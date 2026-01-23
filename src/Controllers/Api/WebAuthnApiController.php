@@ -365,11 +365,30 @@ class WebAuthnApiController
     }
 
     /**
-     * GET /api/webauthn/remove
-     * Remove all WebAuthn credentials for current user (convenient GET endpoint)
+     * POST /api/webauthn/remove-all
+     * Remove all WebAuthn credentials for current user
+     * SECURITY: Changed from GET to POST to prevent CSRF attacks
      */
     public function removeAll()
     {
+        // SECURITY: Require POST method
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            $this->jsonResponse([
+                'success' => false,
+                'error' => 'Method not allowed. Use POST request.'
+            ], 405);
+            return;
+        }
+
+        // SECURITY: Verify CSRF token for browser-based requests
+        if (!$this->verifyCsrfToken()) {
+            $this->jsonResponse([
+                'success' => false,
+                'error' => 'Invalid CSRF token'
+            ], 403);
+            return;
+        }
+
         $userId = $this->getUserId();
 
         $db = Database::getConnection();
@@ -389,6 +408,27 @@ class WebAuthnApiController
             'message' => "Removed {$count} biometric credential(s). You can now re-register on any device.",
             'removed_count' => $count
         ]);
+    }
+
+    /**
+     * Verify CSRF token from request headers or body
+     */
+    private function verifyCsrfToken(): bool
+    {
+        // Check for Bearer token auth (API clients don't need CSRF)
+        $authHeader = $_SERVER['HTTP_AUTHORIZATION'] ?? '';
+        if (strpos($authHeader, 'Bearer ') === 0) {
+            return true;
+        }
+
+        // For browser requests, verify CSRF token
+        $token = $_SERVER['HTTP_X_CSRF_TOKEN'] ?? null;
+        if (!$token) {
+            $input = json_decode(file_get_contents('php://input'), true);
+            $token = $input['csrf_token'] ?? null;
+        }
+
+        return $token && isset($_SESSION['csrf_token']) && hash_equals($_SESSION['csrf_token'], $token);
     }
 
     /**

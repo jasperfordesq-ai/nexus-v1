@@ -13,7 +13,6 @@ $pageTitle = $post['title'];
 $hideHero = true; // Disable default hero
 
 ?>
-<!-- DEBUG MARKER: BLOG POST LOADED (Legacy Fallback) -->
 
 <div class="blog-section-wrapper">
 

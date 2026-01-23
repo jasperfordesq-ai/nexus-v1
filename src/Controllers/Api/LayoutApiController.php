@@ -83,11 +83,22 @@ class LayoutApiController
     /**
      * GET /api/layout-debug
      *
-     * Debug endpoint to see session state - TEMPORARY
+     * Debug endpoint to see session state
+     * SECURITY: Restricted to admin users only in development environment
      */
     public function debug()
     {
         header('Content-Type: application/json');
+
+        // SECURITY: Only allow in development and for admins
+        $appEnv = getenv('APP_ENV') ?: ($_ENV['APP_ENV'] ?? 'production');
+        $isAdmin = !empty($_SESSION['user_role']) && in_array($_SESSION['user_role'], ['admin', 'super_admin']);
+
+        if ($appEnv === 'production' || !$isAdmin) {
+            http_response_code(403);
+            echo json_encode(['error' => 'Debug endpoint disabled in production or requires admin access']);
+            exit;
+        }
 
         // Get tenant info
         $tenantId = 1;
@@ -97,22 +108,11 @@ class LayoutApiController
 
         $sessionKey = 'nexus_active_layout_' . $tenantId;
 
-        // Get all layout-related session keys
-        $layoutSessions = [];
-        foreach ($_SESSION as $key => $value) {
-            if (strpos($key, 'nexus_active_layout') !== false || strpos($key, 'nexus_layout') !== false) {
-                $layoutSessions[$key] = $value;
-            }
-        }
-
         echo json_encode([
             'tenant_id' => $tenantId,
             'session_key' => $sessionKey,
             'session_value' => $_SESSION[$sessionKey] ?? 'NOT SET',
-            'all_layout_sessions' => $layoutSessions,
-            'layout_helper_get' => LayoutHelper::get(),
-            'user_id' => $_SESSION['user_id'] ?? null,
-            // Security: Session ID removed to prevent session hijacking
+            'layout_helper_get' => LayoutHelper::get()
         ], JSON_PRETTY_PRINT);
         exit;
     }

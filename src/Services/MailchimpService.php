@@ -64,10 +64,10 @@ class MailchimpService
             error_log($msg);
             return ['success' => true, 'message' => $msg];
         } else {
-            // Enhanced logging for debugging
+            // Enhanced logging for debugging - SECURITY: Never log API keys
             $cleanResult = str_replace(["\n", "\r"], " ", $result);
             $msg = "Mailchimp Error ($httpCode): $cleanResult";
-            error_log($msg . " - API Key: " . substr($this->apiKey, 0, 5) . "...");
+            error_log($msg);
             return ['success' => false, 'message' => $msg];
         }
     }

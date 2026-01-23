@@ -1067,7 +1067,11 @@ class CronJobController
                     define('CRON_INTERNAL_RUN', true);
                 }
 
-                $cronKey = Env::get('CRON_KEY', 'default_insecure_key_change_me');
+                // SECURITY: Require CRON_KEY to be explicitly set
+                $cronKey = Env::get('CRON_KEY');
+                if (empty($cronKey)) {
+                    throw new \Exception('CRON_KEY environment variable is not configured');
+                }
                 $controller = new \Nexus\Controllers\CronController();
 
                 $methodMap = [

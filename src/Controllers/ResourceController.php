@@ -197,11 +197,31 @@ class ResourceController
             die("Resource not found");
         }
 
+        // SECURITY: Validate path to prevent directory traversal attacks
+        $baseDir = realpath(__DIR__ . '/../../httpdocs/uploads');
+        if (!$baseDir) {
+            error_log("SECURITY: Base uploads directory not found");
+            http_response_code(500);
+            die("Server configuration error");
+        }
+
         $filepath = __DIR__ . '/../../httpdocs' . $res['file_path'];
-        if (!file_exists($filepath)) {
+        $realPath = realpath($filepath);
+
+        // SECURITY: Ensure the resolved path is within the uploads directory
+        if (!$realPath || strpos($realPath, $baseDir) !== 0) {
+            error_log("SECURITY: Path traversal attempt blocked for resource $id: " . $res['file_path']);
+            http_response_code(403);
+            die("Access denied");
+        }
+
+        if (!file_exists($realPath)) {
             http_response_code(404);
             die("File not found on server.");
         }
+
+        // Use the validated realPath from here on
+        $filepath = $realPath;
 
         // Increment download counter
         ResourceItem::incrementDownload($id);

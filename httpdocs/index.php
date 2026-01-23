@@ -218,6 +218,10 @@ header("X-XSS-Protection: 1; mode=block");
 header("Content-Security-Policy: default-src 'self' 'unsafe-inline' 'unsafe-eval' https: data: blob:; connect-src 'self' https: wss://*.pusher.com wss://ws-eu.pusher.com; img-src 'self' https: data: blob:; font-src 'self' https: data:;");
 // Referrer Policy
 header("Referrer-Policy: strict-origin-when-cross-origin");
+// HSTS - Force HTTPS for all future requests (1 year, include subdomains)
+if (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on') {
+    header("Strict-Transport-Security: max-age=31536000; includeSubDomains; preload");
+}
 
 // Secure Session Settings
 if (!$isDownloadRequest && session_status() === PHP_SESSION_NONE) {

@@ -407,9 +407,12 @@ class AdminController
         foreach ($fields as $field) {
             if (isset($_POST[$field])) {
                 $value = $_POST[$field];
+                // SECURITY: Escape backslashes and dollar signs in replacement string
+                // to prevent regex backreference injection attacks
+                $safeValue = addcslashes($value, '\\$');
                 // Simple regex replacement or append
                 if (preg_match("/^{$field}=/m", $envContent)) {
-                    $envContent = preg_replace("/^{$field}=.*/m", "{$field}=\"{$value}\"", $envContent);
+                    $envContent = preg_replace("/^{$field}=.*/m", "{$field}=\"{$safeValue}\"", $envContent);
                 } else {
                     $envContent .= "\n{$field}=\"{$value}\"";
                 }
@@ -1722,11 +1725,21 @@ class AdminController
     {
         // Skip key check if running internally from admin panel
         if (!defined('CRON_INTERNAL_RUN') || !CRON_INTERNAL_RUN) {
-            // Verify secret key - check both CRON_KEY and CRON_SECRET_KEY for compatibility
+            // SECURITY: Require CRON_KEY to be explicitly set - no insecure defaults
             $secretKey = $_GET['key'] ?? '';
-            $expectedKey = \Nexus\Core\Env::get('CRON_KEY') ?: (getenv('CRON_SECRET_KEY') ?: 'change-me-in-production');
+            $expectedKey = \Nexus\Core\Env::get('CRON_KEY') ?: getenv('CRON_SECRET_KEY');
 
-            if ($secretKey !== $expectedKey) {
+            if (empty($expectedKey)) {
+                error_log("SECURITY WARNING: CRON_KEY environment variable is not set");
+                http_response_code(503);
+                echo json_encode([
+                    'success' => false,
+                    'error' => 'Cron key not configured'
+                ]);
+                return;
+            }
+
+            if (empty($secretKey) || !hash_equals($expectedKey, $secretKey)) {
                 http_response_code(403);
                 echo json_encode([
                     'success' => false,
