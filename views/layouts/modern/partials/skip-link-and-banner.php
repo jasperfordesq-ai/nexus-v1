@@ -25,10 +25,10 @@ try {
             <div class="modern-banner-content">
                 <span class="modern-experimental-badge">
                     <i class="fa-solid fa-sparkles" aria-hidden="true"></i>
-                    MODERN (Stable)
+                    MODERN (Dev)
                 </span>
                 <span class="modern-experimental-text">
-                    <strong>Next-Gen Interface</strong> — Fast, beautiful, responsive design
+                    Fast, beautiful, responsive design
                 </span>
             </div>
             <a href="#" data-layout-switcher="civicone" class="modern-experimental-switch">

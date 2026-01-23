@@ -344,6 +344,21 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
                 box-shadow: 0 4px 16px rgba(245, 158, 11, 0.3);
             }
 
+            .fed-optin-btn--secondary {
+                background: transparent;
+                border: 2px solid var(--color-warning);
+                color: var(--color-warning);
+            }
+
+            .fed-optin-btn--secondary:hover {
+                background: var(--color-warning);
+                color: white;
+            }
+
+            .fed-guest-notice .fed-optin-btn {
+                margin-right: var(--space-3);
+            }
+
             /* Quick Links Bar */
             .fed-quick-links {
                 display: flex;
@@ -481,6 +496,7 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
             .fed-feature-icon.groups { background: linear-gradient(135deg, var(--color-orange-500), var(--color-orange-600)); color: white; }
             .fed-feature-icon.messages { background: linear-gradient(135deg, var(--color-info), var(--color-blue-600)); color: white; }
             .fed-feature-icon.transactions { background: linear-gradient(135deg, var(--color-teal-500), var(--color-teal-600)); color: white; }
+            .fed-feature-icon.activity { background: linear-gradient(135deg, var(--color-amber-500), var(--color-amber-600)); color: white; }
 
             .fed-feature-title {
                 font-size: 1.1rem;
@@ -567,6 +583,8 @@ body.mobile-notifications-open:not(:has(#mobileNotifications.active)) {
                 border-radius: var(--radius-lg);
                 padding: var(--space-5);
                 text-align: center;
+                text-decoration: none;
+                color: inherit;
                 transition: all 0.2s ease;
             }
 
