@@ -234,7 +234,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Offline banner logic
     const offlineBanner = document.getElementById('offlineBanner');
     if (offlineBanner) {
-        function updateOnlineStatus() {
+        const updateOnlineStatus = function() {
             if (!navigator.onLine) {
                 offlineBanner.classList.add('visible');
                 document.body.classList.add('is-offline');
@@ -246,7 +246,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 updateSubmitButton(); // Re-check if button should be enabled
                 submitBtn.title = '';
             }
-        }
+        };
 
         window.addEventListener('online', updateOnlineStatus);
         window.addEventListener('offline', updateOnlineStatus);

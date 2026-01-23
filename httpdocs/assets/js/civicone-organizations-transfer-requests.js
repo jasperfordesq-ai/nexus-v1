@@ -16,9 +16,9 @@
 
         rows.forEach(row => {
             if (status === 'all' || row.dataset.status === status) {
-                row.style.display = '';
+                row.classList.remove('hidden');
             } else {
-                row.style.display = 'none';
+                row.classList.add('hidden');
             }
         });
     };

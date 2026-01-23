@@ -122,12 +122,12 @@
         currentPage = paginationData.current_page || 1;
 
         if (totalPages > 1) {
-            pagination.style.display = 'flex';
+            pagination.classList.remove('hidden');
             pageInfo.textContent = 'Page ' + currentPage + ' of ' + totalPages;
             prevBtn.disabled = currentPage <= 1;
             nextBtn.disabled = currentPage >= totalPages;
         } else {
-            pagination.style.display = 'none';
+            pagination.classList.add('hidden');
         }
     }
 

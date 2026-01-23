@@ -214,7 +214,7 @@
     function show(fab) {
         fab.classList.remove('fab-animate-out');
         fab.classList.add('fab-animate-in');
-        fab.style.display = '';
+        fab.classList.remove('hidden');
     }
 
     /**
@@ -224,7 +224,7 @@
         fab.classList.remove('fab-animate-in');
         fab.classList.add('fab-animate-out');
         setTimeout(() => {
-            fab.style.display = 'none';
+            fab.classList.add('hidden');
         }, 300);
     }
 

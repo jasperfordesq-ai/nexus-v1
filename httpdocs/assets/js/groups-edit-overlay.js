@@ -124,7 +124,11 @@ document.addEventListener('DOMContentLoaded', function() {
 
             items.forEach(item => {
                 const name = item.dataset.name || '';
-                item.style.display = name.includes(query) ? 'flex' : 'none';
+                if (name.includes(query)) {
+                    item.classList.remove('hidden');
+                } else {
+                    item.classList.add('hidden');
+                }
             });
         });
     }
@@ -153,10 +157,12 @@ document.addEventListener('DOMContentLoaded', function() {
         addDirectlyCheckbox.addEventListener('change', function() {
             if (this.checked) {
                 submitBtn.innerHTML = '<i class="fa-solid fa-check"></i> Add Members Now';
-                submitBtn.style.background = 'linear-gradient(135deg, #10b981, #059669)';
+                submitBtn.classList.remove('btn-invite');
+                submitBtn.classList.add('btn-add-direct');
             } else {
                 submitBtn.innerHTML = '<i class="fa-solid fa-paper-plane"></i> Send Invitations';
-                submitBtn.style.background = 'linear-gradient(135deg, #6366f1, #8b5cf6)';
+                submitBtn.classList.remove('btn-add-direct');
+                submitBtn.classList.add('btn-invite');
             }
             haptic();
         });
@@ -237,7 +243,7 @@ document.addEventListener('DOMContentLoaded', function() {
         input.addEventListener('change', function() {
             const label = this.parentElement.querySelector('i') || this.parentElement;
             if (this.files.length > 0) {
-                label.style.color = '#10b981';
+                label.classList.add('file-selected');
                 haptic(15);
             }
         });

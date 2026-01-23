@@ -415,15 +415,15 @@
             const status = document.querySelector('[data-webauthn-status]');
 
             if (this.isRegistered) {
-                if (registerBtn) registerBtn.style.display = 'none';
-                if (removeBtn) removeBtn.style.display = '';
+                if (registerBtn) registerBtn.classList.add('hidden');
+                if (removeBtn) removeBtn.classList.remove('hidden');
                 if (status) {
                     status.textContent = 'Enabled';
                     status.className = 'civic-badge civic-badge--success';
                 }
             } else {
-                if (registerBtn) registerBtn.style.display = '';
-                if (removeBtn) removeBtn.style.display = 'none';
+                if (registerBtn) registerBtn.classList.remove('hidden');
+                if (removeBtn) removeBtn.classList.add('hidden');
                 if (status) {
                     status.textContent = 'Disabled';
                     status.className = 'civic-badge civic-badge--neutral';

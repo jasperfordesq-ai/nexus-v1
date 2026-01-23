@@ -9,8 +9,7 @@ document.querySelectorAll('input[type="file"]').forEach(input => {
         const label = this.nextElementSibling.querySelector('span');
         if (this.files.length > 0) {
             label.textContent = this.files[0].name;
-            this.nextElementSibling.style.borderColor = '#10b981';
-            this.nextElementSibling.style.color = '#10b981';
+            this.nextElementSibling.classList.add('file-selected');
         }
     });
 });

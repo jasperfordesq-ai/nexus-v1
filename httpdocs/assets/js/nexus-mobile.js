@@ -405,19 +405,17 @@
 
             // Create loading indicator
             const loader = document.createElement('div');
-            loader.className = 'nexus-infinite-loader';
+            loader.className = 'nexus-infinite-loader hidden';
             loader.innerHTML = `
                 <div class="nexus-infinite-spinner"></div>
                 <span>Loading more...</span>
             `;
-            loader.style.display = 'none';
             container.appendChild(loader);
 
             // Create end indicator
             const endIndicator = document.createElement('div');
-            endIndicator.className = 'nexus-infinite-end';
+            endIndicator.className = 'nexus-infinite-end hidden';
             endIndicator.innerHTML = `<span>You've reached the end</span>`;
-            endIndicator.style.display = 'none';
             container.appendChild(endIndicator);
 
             // Determine scroll target (container or window)
@@ -454,7 +452,7 @@
                 if (isLoading || !hasMore) return;
 
                 isLoading = true;
-                loader.style.display = 'flex';
+                loader.classList.remove('hidden');
                 currentPage++;
 
                 try {
@@ -518,10 +516,10 @@
                     self.showToast('Failed to load more items', 'error');
                 } finally {
                     isLoading = false;
-                    loader.style.display = 'none';
+                    loader.classList.add('hidden');
 
                     if (!hasMore) {
-                        endIndicator.style.display = 'flex';
+                        endIndicator.classList.remove('hidden');
                     }
                 }
             }
@@ -551,7 +549,7 @@
                 reset: () => {
                     currentPage = 1;
                     hasMore = true;
-                    endIndicator.style.display = 'none';
+                    endIndicator.classList.add('hidden');
                 },
                 destroy: () => {
                     scrollTarget.removeEventListener('scroll', handleScroll);
@@ -783,14 +781,15 @@
 
                 // Handle common actions
                 switch (action) {
-                    case 'copy-link':
+                    case 'copy-link': {
                         const url = currentTarget?.dataset.url || window.location.href;
                         navigator.clipboard.writeText(url).then(() => {
                             self.showToast('Link copied!', 'success');
                         });
                         break;
+                    }
 
-                    case 'copy':
+                    case 'copy': {
                         const text = currentTarget?.textContent || currentTarget?.innerText;
                         if (text) {
                             navigator.clipboard.writeText(text.trim()).then(() => {
@@ -798,6 +797,7 @@
                             });
                         }
                         break;
+                    }
 
                     case 'share':
                         if (navigator.share) {
@@ -1447,8 +1447,7 @@
                 // Hide desktop footer on mobile (JS fallback for CSS)
                 const siteFooter = document.querySelector('.nexus-site-footer');
                 if (siteFooter) {
-                    siteFooter.style.display = 'none';
-                    siteFooter.style.visibility = 'hidden';
+                    siteFooter.classList.add('hidden');
                 }
 
                 // Initialize bottom nav

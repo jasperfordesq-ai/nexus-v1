@@ -90,7 +90,9 @@
         };
 
         window.autoResizeCommentInput = function(textarea) {
+            // eslint-disable-next-line no-restricted-syntax -- dynamic height for auto-resize
             textarea.style.height = 'auto';
+            // eslint-disable-next-line no-restricted-syntax -- dynamic height for auto-resize
             textarea.style.height = Math.min(textarea.scrollHeight, 120) + 'px';
         };
 
@@ -290,6 +292,7 @@
                 .then(data => {
                     if (data.status === 'success') {
                         input.value = '';
+                        // eslint-disable-next-line no-restricted-syntax -- reset auto-resize height
                         input.style.height = 'auto';
                         loadMobileComments(currentCommentTarget.type, currentCommentTarget.id);
 

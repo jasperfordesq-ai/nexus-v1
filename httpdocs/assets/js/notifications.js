@@ -136,7 +136,7 @@ class NexusNotifications {
         if (messageBadge) {
             const current = parseInt(messageBadge.textContent) || 0;
             messageBadge.textContent = current + 1;
-            messageBadge.style.display = 'flex';
+            messageBadge.classList.remove('hidden');
         }
     }
 
@@ -204,7 +204,7 @@ class NexusNotifications {
             const current = parseInt(badge.textContent) || 0;
             const newCount = current + 1;
             badge.textContent = newCount > 9 ? '9+' : newCount;
-            badge.style.display = 'flex';
+            badge.classList.remove('hidden');
         } else {
             const s = document.createElement('span');
             s.style.cssText = 'position: absolute; top: -6px; right: -6px; background: #ef4444; color: white; border-radius: 50%; min-width: 16px; height: 16px; padding: 0 4px; font-size: 0.65rem; display: flex; align-items: center; justify-content: center; font-weight: 700; border: 2px solid rgba(0,0,0,0.1);';
@@ -268,11 +268,11 @@ class NexusNotifications {
             mobileList.innerHTML = loadingHTML;
         }
         if (badge) {
-            badge.style.display = 'none';
+            badge.classList.add('hidden');
         }
         // Hide mobile badges
         document.querySelectorAll('.mobile-tab-badge, .nexus-notif-badge').forEach(b => {
-            b.style.display = 'none';
+            b.classList.add('hidden');
         });
 
         // UI Feedback on button (if provided)
@@ -339,8 +339,8 @@ class NexusNotifications {
             if (mobileList) {
                 mobileList.innerHTML = originalMobileHTML;
             }
-            if (badge) {
-                badge.style.display = originalBadgeDisplay;
+            if (badge && originalBadgeDisplay !== 'none') {
+                badge.classList.remove('hidden');
             }
             if (btn) {
                 btn.textContent = originalText;
@@ -411,15 +411,15 @@ class NexusNotifications {
             const displayCount = count > 9 ? '9+' : count;
             if (badge) {
                 badge.textContent = displayCount;
-                badge.style.display = 'flex';
+                badge.classList.remove('hidden');
             } else {
                 const s = document.createElement('span');
-                s.style.cssText = 'position: absolute; top: -6px; right: -6px; background: #ef4444; color: white; border-radius: 50%; min-width: 16px; height: 16px; padding: 0 4px; font-size: 0.65rem; display: flex; align-items: center; justify-content: center; font-weight: 700; border: 2px solid rgba(0,0,0,0.1);';
+                s.className = 'notification-badge';
                 s.textContent = displayCount;
                 container.appendChild(s);
             }
         } else {
-            if (badge) badge.style.display = 'none';
+            if (badge) badge.classList.add('hidden');
         }
     }
 }

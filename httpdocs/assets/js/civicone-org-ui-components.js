@@ -54,7 +54,11 @@ const OrgUI = {
             icon.innerHTML = `<i class="fa-solid ${icons[type] || icons.warning}"></i>`;
 
             const input = document.getElementById('orgModalInput');
-            input.style.display = showInput ? 'block' : 'none';
+            if (showInput) {
+                input.classList.remove('hidden');
+            } else {
+                input.classList.add('hidden');
+            }
             input.placeholder = inputPlaceholder;
             input.value = inputValue;
 
@@ -360,7 +364,7 @@ const OrgUI = {
             } = options;
 
             if (indicator) {
-                indicator.style.display = 'inline-flex';
+                indicator.classList.remove('hidden');
             }
 
             this.intervalId = setInterval(async () => {

@@ -256,7 +256,7 @@ window.markAllNotificationsRead = function() {
         item.classList.remove('unread');
     });
     document.querySelectorAll('.mobile-tab-badge').forEach(badge => {
-        badge.style.display = 'none';
+        badge.classList.add('hidden');
     });
 };
 

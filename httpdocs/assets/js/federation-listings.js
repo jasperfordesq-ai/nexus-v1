@@ -31,7 +31,7 @@
     // Search & filter handlers
     searchInput.addEventListener('keyup', function() {
         clearTimeout(debounceTimer);
-        if (spinner) spinner.style.display = 'block';
+        if (spinner) spinner.classList.remove('hidden');
         debounceTimer = setTimeout(function() {
             currentOffset = 0;
             hasMore = true;
@@ -61,14 +61,14 @@
             limit: 30
         });
 
-        if (!append && spinner) spinner.style.display = 'block';
+        if (!append && spinner) spinner.classList.remove('hidden');
         isLoading = true;
 
         fetch(basePath + '/federation/listings/api?' + params.toString())
             .then(function(res) { return res.json(); })
             .then(function(data) {
-                if (spinner) spinner.style.display = 'none';
-                if (loadMoreSpinner) loadMoreSpinner.style.display = 'none';
+                if (spinner) spinner.classList.add('hidden');
+                if (loadMoreSpinner) loadMoreSpinner.classList.add('hidden');
                 isLoading = false;
 
                 if (data.success) {
@@ -89,8 +89,8 @@
             })
             .catch(function(err) {
                 console.error('Fetch error:', err);
-                if (spinner) spinner.style.display = 'none';
-                if (loadMoreSpinner) loadMoreSpinner.style.display = 'none';
+                if (spinner) spinner.classList.add('hidden');
+                if (loadMoreSpinner) loadMoreSpinner.classList.add('hidden');
                 isLoading = false;
             });
     }
@@ -169,7 +169,7 @@
             entries.forEach(function(entry) {
                 if (entry.isIntersecting && hasMore && !isLoading) {
                     isLoading = true;
-                    if (loadMoreSpinner) loadMoreSpinner.style.display = 'flex';
+                    if (loadMoreSpinner) loadMoreSpinner.classList.remove('hidden');
                     fetchListings(true);
                 }
             });

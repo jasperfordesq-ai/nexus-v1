@@ -93,11 +93,11 @@
         const section = document.getElementById(`comments-section-${type}-${id}`);
         if (!section) return;
 
-        if (section.style.display === 'none' || !section.style.display) {
-            section.style.display = 'block';
+        if (section.classList.contains('hidden') || window.getComputedStyle(section).display === 'none') {
+            section.classList.remove('hidden');
             fetchComments(type, id);
         } else {
-            section.style.display = 'none';
+            section.classList.add('hidden');
         }
     }
 
@@ -230,7 +230,7 @@
     function toggleReactionPicker(commentId) {
         const picker = document.getElementById(`picker-${commentId}`);
         if (picker) {
-            picker.style.display = picker.style.display === 'none' ? 'block' : 'none';
+            picker.classList.toggle('hidden');
         }
     }
 
@@ -245,7 +245,7 @@
         }
 
         const picker = document.getElementById(`picker-${commentId}`);
-        if (picker) picker.style.display = 'none';
+        if (picker) picker.classList.add('hidden');
 
         const formData = new FormData();
         formData.append('action', 'toggle_reaction');
@@ -268,9 +268,9 @@
     function showReplyForm(commentId) {
         const form = document.getElementById(`reply-form-${commentId}`);
         if (form) {
-            form.style.display = form.style.display === 'none' ? 'block' : 'none';
+            form.classList.toggle('hidden');
             const input = form.querySelector('input');
-            if (input) input.focus();
+            if (input && !form.classList.contains('hidden')) input.focus();
         }
     }
 

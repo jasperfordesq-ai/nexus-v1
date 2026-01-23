@@ -99,8 +99,10 @@
             `avatar-placeholder avatar-placeholder--${size}` :
             'image-placeholder';
 
-        // Copy dimensions if set
+        // Copy dimensions if set - dynamic values from image element
+        // eslint-disable-next-line no-restricted-syntax -- dynamic width from image
         if (img.width) wrapper.style.width = `${img.width}px`;
+        // eslint-disable-next-line no-restricted-syntax -- dynamic height from image
         if (img.height) wrapper.style.height = `${img.height}px`;
 
         // Wrap

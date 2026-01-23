@@ -103,9 +103,12 @@
             const x = event.clientX - rect.left - size / 2;
             const y = event.clientY - rect.top - size / 2;
 
-            // Apply styles
+            // Apply styles - dynamic values based on click position
+            // eslint-disable-next-line no-restricted-syntax -- dynamic size calculation
             ripple.style.width = ripple.style.height = `${size}px`;
+            // eslint-disable-next-line no-restricted-syntax -- dynamic position calculation
             ripple.style.left = `${x}px`;
+            // eslint-disable-next-line no-restricted-syntax -- dynamic position calculation
             ripple.style.top = `${y}px`;
 
             // Add variant class if present

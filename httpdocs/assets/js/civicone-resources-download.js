@@ -31,7 +31,7 @@
 
         // Create hidden iframe for download
         const iframe = document.createElement('iframe');
-        iframe.style.display = 'none';
+        iframe.classList.add('hidden');
         iframe.src = downloadUrl;
         document.body.appendChild(iframe);
 

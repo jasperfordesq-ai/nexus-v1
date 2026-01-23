@@ -228,7 +228,9 @@
             btn.classList.add("liked");
             if (!usesCssClasses) {
                 // Only set inline styles for legacy buttons
+                // eslint-disable-next-line no-restricted-syntax
                 btn.style.color = getColor('liked');
+                // eslint-disable-next-line no-restricted-syntax
                 btn.style.fontWeight = "600";
             }
         } else {
@@ -237,7 +239,9 @@
             btn.classList.remove("liked");
             if (!usesCssClasses) {
                 // Only set inline styles for legacy buttons
+                // eslint-disable-next-line no-restricted-syntax
                 btn.style.color = getColor('unliked');
+                // eslint-disable-next-line no-restricted-syntax
                 btn.style.fontWeight = "normal";
             }
         }
@@ -292,7 +296,9 @@
             btn.classList.remove("liked");
             if (!usesCssClasses) {
                 // Only set inline styles for legacy buttons that don't use CSS classes
+                // eslint-disable-next-line no-restricted-syntax
                 btn.style.color = getColor('unliked');
+                // eslint-disable-next-line no-restricted-syntax
                 btn.style.fontWeight = "normal";
             }
         } else {
@@ -302,7 +308,9 @@
             btn.classList.add("liked");
             if (!usesCssClasses) {
                 // Only set inline styles for legacy buttons that don't use CSS classes
+                // eslint-disable-next-line no-restricted-syntax
                 btn.style.color = getColor('liked');
+                // eslint-disable-next-line no-restricted-syntax
                 btn.style.fontWeight = "600";
             }
 
@@ -394,7 +402,8 @@
             if (section.classList.contains('fds-comments-section')) {
                 section.classList.add('active');
             } else {
-                section.style.display = 'block';
+                // Legacy comment sections use inline display toggle
+                section.classList.remove('hidden');
             }
             const input = section.querySelector("input");
             if (input) input.focus();
@@ -404,7 +413,8 @@
             if (section.classList.contains('fds-comments-section')) {
                 section.classList.remove('active');
             } else {
-                section.style.display = 'none';
+                // Legacy comment sections use inline display toggle
+                section.classList.add('hidden');
             }
         }
     };
@@ -630,7 +640,7 @@
     SocialInteractions.toggleReactionPicker = function(commentId) {
         const picker = document.getElementById(`reaction-picker-${commentId}`);
         if (picker) {
-            picker.style.display = picker.style.display === 'none' ? 'block' : 'none';
+            picker.classList.toggle('hidden');
         }
     };
 
@@ -645,7 +655,7 @@
 
         // Hide picker
         const picker = document.getElementById(`reaction-picker-${commentId}`);
-        if (picker) picker.style.display = 'none';
+        if (picker) picker.classList.add('hidden');
 
         fetch(SocialInteractions.apiBase + '/reaction', {
             method: 'POST',
@@ -677,9 +687,9 @@
     SocialInteractions.showReplyForm = function(commentId) {
         const form = document.getElementById(`reply-form-${commentId}`);
         if (form) {
-            form.style.display = form.style.display === 'none' ? 'block' : 'none';
+            form.classList.toggle('hidden');
             const input = form.querySelector('input');
-            if (input) input.focus();
+            if (input && !form.classList.contains('hidden')) input.focus();
         }
     };
 
@@ -973,7 +983,9 @@
                     <span style="font-weight: 600;">${escapeHtml(user.name)}</span>
                     <span style="color: #6b7280; font-size: 12px;">@${escapeHtml(user.username)}</span>
                 `;
+                // eslint-disable-next-line no-restricted-syntax -- dynamic hover effect for mention dropdown
                 item.addEventListener('mouseover', () => item.style.background = '#f3f4f6');
+                // eslint-disable-next-line no-restricted-syntax -- dynamic hover effect for mention dropdown
                 item.addEventListener('mouseout', () => item.style.background = 'white');
                 item.addEventListener('click', () => {
                     insertMention(input, user.username);
@@ -1039,7 +1051,7 @@
         // Reset state
         modalTitle.textContent = 'Likes';
         modalContent.innerHTML = '<div class="likers-loading">Loading...</div>';
-        loadMoreBtn.style.display = 'none';
+        loadMoreBtn.classList.add('hidden');
         modal.dataset.type = type;
         modal.dataset.id = id;
         modal.dataset.page = 1;
@@ -1379,11 +1391,11 @@
 
                     // Show/hide load more button
                     if (data.has_more) {
-                        loadMoreBtn.style.display = 'inline-block';
+                        loadMoreBtn.classList.remove('hidden');
                         const modal = document.getElementById('likers-modal');
                         modal.dataset.page = page + 1;
                     } else {
-                        loadMoreBtn.style.display = 'none';
+                        loadMoreBtn.classList.add('hidden');
                     }
                 } else if (page === 1) {
                     container.innerHTML = `

@@ -15,7 +15,9 @@
     var textarea = document.getElementById('message-input');
     if (textarea) {
         textarea.addEventListener('input', function() {
+            // eslint-disable-next-line no-restricted-syntax -- dynamic height for auto-resize
             this.style.height = 'auto';
+            // eslint-disable-next-line no-restricted-syntax -- dynamic height for auto-resize
             this.style.height = Math.min(this.scrollHeight, 150) + 'px';
         });
 

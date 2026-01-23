@@ -397,17 +397,17 @@
                 }
             } else if (e.key === 'ArrowLeft') {
                 // Collapse section if on section header
-                var section = document.activeElement.closest('.admin-sidebar-section');
-                if (section && section.classList.contains('expanded')) {
-                    this.toggleSection(section);
+                const sectionLeft = document.activeElement.closest('.admin-sidebar-section');
+                if (sectionLeft && sectionLeft.classList.contains('expanded')) {
+                    this.toggleSection(sectionLeft);
                     handled = true;
                 }
             } else if (e.key === 'Enter' || e.key === ' ') {
                 // Toggle section or follow link
                 if (document.activeElement.classList.contains('admin-sidebar-section-header')) {
-                    var section = document.activeElement.closest('.admin-sidebar-section');
-                    if (section) {
-                        this.toggleSection(section);
+                    const sectionEnter = document.activeElement.closest('.admin-sidebar-section');
+                    if (sectionEnter) {
+                        this.toggleSection(sectionEnter);
                         handled = true;
                     }
                 }

@@ -142,6 +142,7 @@
 
         // Update bar
         if (progressBar) {
+            // eslint-disable-next-line no-restricted-syntax -- dynamic progress width
             progressBar.style.width = `${progress}%`;
             progressBar.parentElement.setAttribute('aria-valuenow', Math.round(progress));
         }
@@ -259,6 +260,7 @@
                 progress = 100;
             }
 
+            // eslint-disable-next-line no-restricted-syntax -- dynamic progress width
             bar.style.width = `${Math.min(Math.max(progress, 0), 100)}%`;
         }
 

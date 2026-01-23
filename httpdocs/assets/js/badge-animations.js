@@ -122,13 +122,13 @@
 
         // Handle zero - hide badge
         if (value === 0) {
-            badge.style.display = 'none';
+            badge.classList.add('hidden');
             return;
         }
 
         // Show badge if was hidden
-        if (badge.style.display === 'none') {
-            badge.style.display = '';
+        if (badge.classList.contains('hidden')) {
+            badge.classList.remove('hidden');
             fadeIn(badge);
         }
 
@@ -270,7 +270,7 @@
 
         // Hide if zero
         if (count === 0 && !dot) {
-            badge.style.display = 'none';
+            badge.classList.add('hidden');
         }
 
         return badge;

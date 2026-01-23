@@ -219,8 +219,8 @@
                     canvas.toBlob((blob) => {
                         capturedBlob = blob;
                         previewImg.src = URL.createObjectURL(blob);
-                        preview.style.display = 'flex';
-                        video.style.display = 'none';
+                        preview.classList.remove('hidden');
+                        video.classList.add('hidden');
                     }, 'image/jpeg', config.quality);
                 });
 
@@ -233,8 +233,8 @@
 
                 // Retake
                 cameraUI.querySelector('.nexus-camera-retake').addEventListener('click', () => {
-                    preview.style.display = 'none';
-                    video.style.display = 'block';
+                    preview.classList.add('hidden');
+                    video.classList.remove('hidden');
                     capturedBlob = null;
                     this.haptic('light');
                 });

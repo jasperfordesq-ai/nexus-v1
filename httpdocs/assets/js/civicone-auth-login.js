@@ -29,20 +29,20 @@ async function checkBiometricSupport() {
                 const data = await response.json();
                 // If we got allowCredentials, user has set up biometrics
                 if (data.allowCredentials && data.allowCredentials.length > 0) {
-                    if (container) container.style.display = 'block';
-                    if (promo) promo.style.display = 'none';
+                    if (container) container.classList.remove('hidden');
+                    if (promo) promo.classList.add('hidden');
                 } else {
                     // No credentials - show promo instead
-                    if (container) container.style.display = 'none';
-                    if (promo) promo.style.display = 'block';
+                    if (container) container.classList.add('hidden');
+                    if (promo) promo.classList.remove('hidden');
                 }
             } else {
                 // No session/credentials - show promo to advertise the feature
-                if (promo) promo.style.display = 'block';
+                if (promo) promo.classList.remove('hidden');
             }
         } catch (e) {
             // Show promo as fallback
-            if (promo) promo.style.display = 'block';
+            if (promo) promo.classList.remove('hidden');
         }
     } catch (e) {
         console.log('[WebAuthn] Biometric check failed:', e);

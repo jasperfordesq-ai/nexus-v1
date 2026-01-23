@@ -191,7 +191,7 @@
             // Store platform preference
             try {
                 localStorage.setItem(this.config.platformStorageKey, isMobile ? 'mobile' : 'web');
-            } catch (e) {}
+            } catch (_e) { /* ignore storage errors */ }
         },
 
         /**
@@ -1064,7 +1064,7 @@
                         try {
                             const errorData = await response.json();
                             console.log('[NexusAuth] Refresh error details:', errorData);
-                        } catch (e) {}
+                        } catch (_e) { /* ignore JSON parse errors */ }
 
                         // DON'T clear tokens immediately - the user might need to re-login
                         // but we shouldn't force logout silently

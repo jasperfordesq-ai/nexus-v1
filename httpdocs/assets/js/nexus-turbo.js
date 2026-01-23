@@ -560,9 +560,11 @@
         hideProgress: function() {
             const bar = document.getElementById('nexus-turbo-progress');
             if (bar) {
+                // eslint-disable-next-line no-restricted-syntax -- dynamic progress width
                 bar.style.width = '100%';
                 setTimeout(() => {
                     bar.classList.remove('active');
+                    // eslint-disable-next-line no-restricted-syntax -- dynamic progress width
                     bar.style.width = '0';
                 }, 200);
             }

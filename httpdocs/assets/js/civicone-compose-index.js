@@ -152,8 +152,8 @@
                     var preview = document.getElementById(type + '-image-preview');
 
                     if (previewImg) previewImg.src = e.target.result;
-                    if (placeholder) placeholder.style.display = 'none';
-                    if (preview) preview.style.display = 'block';
+                    if (placeholder) placeholder.classList.add('hidden');
+                    if (preview) preview.classList.remove('hidden');
                 };
                 reader.readAsDataURL(input.files[0]);
             }
@@ -165,8 +165,8 @@
             var preview = document.getElementById(type + '-image-preview');
 
             if (fileInput) fileInput.value = '';
-            if (placeholder) placeholder.style.display = 'flex';
-            if (preview) preview.style.display = 'none';
+            if (placeholder) placeholder.classList.remove('hidden');
+            if (preview) preview.classList.add('hidden');
             this.haptic();
         },
 
@@ -392,16 +392,20 @@
                 var typeMatch = itemType === 'any' || itemType === selectedType;
 
                 if (catMatch && typeMatch) {
-                    item.style.display = 'flex';
+                    item.classList.remove('hidden');
                     visibleCount++;
                 } else {
-                    item.style.display = 'none';
+                    item.classList.add('hidden');
                     var checkbox = item.querySelector('input');
                     if (checkbox) checkbox.checked = false;
                 }
             });
 
-            container.style.display = visibleCount > 0 ? 'block' : 'none';
+            if (visibleCount > 0) {
+                container.classList.remove('hidden');
+            } else {
+                container.classList.add('hidden');
+            }
         },
 
         // AI Content Generation
@@ -556,10 +560,10 @@
                 groupItems.forEach(function(item) {
                     var name = item.dataset.name.toLowerCase();
                     if (name.includes(query)) {
-                        item.style.display = 'flex';
+                        item.classList.remove('hidden');
                         hasResults = true;
                     } else {
-                        item.style.display = 'none';
+                        item.classList.add('hidden');
                     }
                 });
 

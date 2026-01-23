@@ -61,6 +61,7 @@ function openBadgeModal(element) {
     if (rarityBar) {
         const rarityLower = badgeRarity.toLowerCase();
         rarityBar.className = 'badge-rarity-fill ' + rarityLower;
+        // eslint-disable-next-line no-restricted-syntax -- dynamic width for animation
         rarityBar.style.width = '0%';
     }
 
@@ -71,11 +72,11 @@ function openBadgeModal(element) {
     // Hide navbar and bottom tab bar while drawer is open
     const navbar = document.querySelector('.nexus-navbar');
     if (navbar) {
-        navbar.style.display = 'none';
+        navbar.classList.add('hidden');
     }
     const mobileTabBar = document.querySelector('.mobile-tab-bar');
     if (mobileTabBar) {
-        mobileTabBar.style.display = 'none';
+        mobileTabBar.classList.add('hidden');
     }
 
     // Animate rarity bar
@@ -83,6 +84,7 @@ function openBadgeModal(element) {
         setTimeout(() => {
             // Invert percentage for visual (rarer = less fill = more impressive)
             const fillWidth = Math.max(5, 100 - badgePercent);
+            // eslint-disable-next-line no-restricted-syntax -- dynamic width for animation
             rarityBar.style.width = fillWidth + '%';
         }, 100);
     }
@@ -117,11 +119,11 @@ function closeBadgeModal() {
     // Restore navbar and bottom tab bar visibility
     const navbar = document.querySelector('.nexus-navbar');
     if (navbar) {
-        navbar.style.display = '';
+        navbar.classList.remove('hidden');
     }
     const mobileTabBar = document.querySelector('.mobile-tab-bar');
     if (mobileTabBar) {
-        mobileTabBar.style.display = '';
+        mobileTabBar.classList.remove('hidden');
     }
 
     // On mobile, animate drawer closing
@@ -194,7 +196,7 @@ function toggleShowcase(btn, key, name, icon) {
     }
 
     if (saveBtn) {
-        saveBtn.style.display = 'inline-flex';
+        saveBtn.classList.remove('hidden');
     }
 }
 
@@ -325,9 +327,9 @@ function initShopCategories() {
             const category = this.dataset.category;
             document.querySelectorAll('.shop-item').forEach(item => {
                 if (category === 'all' || item.dataset.category === category) {
-                    item.style.display = 'block';
+                    item.classList.remove('hidden');
                 } else {
-                    item.style.display = 'none';
+                    item.classList.add('hidden');
                 }
             });
         });

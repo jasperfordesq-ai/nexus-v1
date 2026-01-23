@@ -103,7 +103,7 @@
         const observer = new IntersectionObserver(async (entries) => {
             if (entries[0].isIntersecting && !loading && !finished) {
                 loading = true;
-                if (spinner) spinner.style.display = 'block';
+                if (spinner) spinner.classList.remove('hidden');
                 page++;
 
                 try {
@@ -112,7 +112,7 @@
 
                     if (!html.trim()) {
                         finished = true;
-                        sentinel.style.display = 'none';
+                        sentinel.classList.add('hidden');
                     } else {
                         const temp = document.createElement('div');
                         temp.innerHTML = html;
@@ -145,7 +145,7 @@
                 }
 
                 loading = false;
-                if (spinner) spinner.style.display = 'none';
+                if (spinner) spinner.classList.add('hidden');
             }
         }, {
             rootMargin: '200px'

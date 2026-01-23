@@ -223,6 +223,7 @@
             const x = e.clientX - rect.left - size / 2;
             const y = e.clientY - rect.top - size / 2;
 
+            // eslint-disable-next-line no-restricted-syntax -- dynamic ripple size/position
             ripple.style.width = ripple.style.height = size + 'px';
             ripple.style.left = x + 'px';
             ripple.style.top = y + 'px';

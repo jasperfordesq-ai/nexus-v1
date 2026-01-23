@@ -20,10 +20,10 @@
         const type = typeSelect.value;
 
         if (type === 'organisation') {
-            orgContainer.style.display = 'block';
+            orgContainer.classList.remove('hidden');
             if (orgInput) orgInput.setAttribute('required', 'required');
         } else {
-            orgContainer.style.display = 'none';
+            orgContainer.classList.add('hidden');
             if (orgInput) {
                 orgInput.removeAttribute('required');
                 orgInput.value = ''; // Clear value when hidden
@@ -58,10 +58,12 @@
 
             if (passed) {
                 el.innerHTML = '✅ ' + originalText;
-                el.style.color = '#16a34a'; // Green
+                el.classList.remove('validation-error');
+                el.classList.add('validation-success');
             } else {
                 el.innerHTML = '❌ ' + originalText;
-                el.style.color = '#ef4444'; // Red
+                el.classList.remove('validation-success');
+                el.classList.add('validation-error');
                 allValid = false;
             }
         }

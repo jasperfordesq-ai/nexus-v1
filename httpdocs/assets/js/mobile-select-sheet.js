@@ -287,11 +287,11 @@
             const searchWrap = this.sheet.querySelector('.mobile-select-search-wrap');
             const searchInput = this.sheet.querySelector('.mobile-select-search');
             if (select.options.length > 8) {
-                searchWrap.style.display = 'block';
+                searchWrap.classList.remove('hidden');
                 this.sheet.classList.add('has-search');
                 searchInput.value = '';
             } else {
-                searchWrap.style.display = 'none';
+                searchWrap.classList.add('hidden');
                 this.sheet.classList.remove('has-search');
             }
 
@@ -301,7 +301,7 @@
             document.body.classList.add('mobile-sheet-open');
 
             // Focus search if visible
-            if (searchWrap.style.display !== 'none') {
+            if (!searchWrap.classList.contains('hidden')) {
                 setTimeout(() => searchInput.focus(), 300);
             }
 
@@ -317,7 +317,7 @@
             const optionsList = this.sheet.querySelector('.mobile-select-options');
             const emptyState = this.sheet.querySelector('.mobile-select-empty');
             optionsList.innerHTML = '';
-            emptyState.style.display = 'none';
+            emptyState.classList.add('hidden');
 
             let currentGroup = null;
 
@@ -408,22 +408,32 @@
                 const desc = option.querySelector('.mobile-select-option-desc')?.textContent.toLowerCase() || '';
                 const matches = text.includes(lowerQuery) || desc.includes(lowerQuery);
 
-                option.style.display = matches ? '' : 'none';
                 if (matches) {
+                    option.classList.remove('hidden');
                     visibleCount++;
                     if (option.dataset.group) {
                         visibleGroups.add(option.dataset.group);
                     }
+                } else {
+                    option.classList.add('hidden');
                 }
             });
 
             // Show/hide group headers
             groups.forEach(group => {
-                group.style.display = visibleGroups.has(group.textContent) ? '' : 'none';
+                if (visibleGroups.has(group.textContent)) {
+                    group.classList.remove('hidden');
+                } else {
+                    group.classList.add('hidden');
+                }
             });
 
             // Show empty state
-            emptyState.style.display = visibleCount === 0 ? '' : 'none';
+            if (visibleCount === 0) {
+                emptyState.classList.remove('hidden');
+            } else {
+                emptyState.classList.add('hidden');
+            }
         }
 
         selectOption(optionEl) {

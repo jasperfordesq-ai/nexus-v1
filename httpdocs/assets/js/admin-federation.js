@@ -213,14 +213,16 @@ function showPermissionsModal(id, partnership) {
     });
 
     document.getElementById('permissionsToggles').innerHTML = html;
-    document.getElementById('permissionsModal').style.display = 'flex';
+    document.getElementById('permissionsModal').classList.remove('hidden');
+    document.getElementById('permissionsModal').classList.add('active');
 }
 
 /**
  * Close permissions modal
  */
 function closePermissionsModal() {
-    document.getElementById('permissionsModal').style.display = 'none';
+    document.getElementById('permissionsModal').classList.add('hidden');
+    document.getElementById('permissionsModal').classList.remove('active');
     currentPartnership = null;
 }
 
@@ -261,14 +263,16 @@ function showCounterProposalModal(id, currentLevel) {
     document.getElementById('counterProposalPartnershipId').value = id;
     document.getElementById('counterProposalLevel').value = currentLevel;
     document.getElementById('counterProposalMessage').value = '';
-    document.getElementById('counterProposalModal').style.display = 'flex';
+    document.getElementById('counterProposalModal').classList.remove('hidden');
+    document.getElementById('counterProposalModal').classList.add('active');
 }
 
 /**
  * Close counter-proposal modal
  */
 function closeCounterProposalModal() {
-    document.getElementById('counterProposalModal').style.display = 'none';
+    document.getElementById('counterProposalModal').classList.add('hidden');
+    document.getElementById('counterProposalModal').classList.remove('active');
 }
 
 /**

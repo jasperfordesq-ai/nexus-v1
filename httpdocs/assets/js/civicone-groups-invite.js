@@ -22,7 +22,11 @@
 
                 items.forEach(item => {
                     const name = item.dataset.name;
-                    item.style.display = name.includes(query) ? 'flex' : 'none';
+                    if (name.includes(query)) {
+                        item.classList.remove('hidden');
+                    } else {
+                        item.classList.add('hidden');
+                    }
                 });
             });
         }
@@ -51,10 +55,12 @@
             addDirectlyCheckbox.addEventListener('change', function() {
                 if (this.checked) {
                     submitBtn.textContent = 'Add Members Now';
-                    submitBtn.style.background = 'linear-gradient(135deg, #10b981, #059669)';
+                    submitBtn.classList.remove('btn-invite');
+                    submitBtn.classList.add('btn-add-direct');
                 } else {
                     submitBtn.textContent = 'Send Invitations';
-                    submitBtn.style.background = 'linear-gradient(135deg, #db2777, #ec4899)';
+                    submitBtn.classList.remove('btn-add-direct');
+                    submitBtn.classList.add('btn-invite');
                 }
             });
         }

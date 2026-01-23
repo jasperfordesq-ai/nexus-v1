@@ -144,8 +144,10 @@
         const ripple = document.createElement('span');
         ripple.className = `ripple-effect ${getRippleClass(element)}`;
 
-        // Position ripple
+        // Position ripple - dynamic size/position based on click location
+        // eslint-disable-next-line no-restricted-syntax -- dynamic ripple size
         ripple.style.width = `${size}px`;
+        // eslint-disable-next-line no-restricted-syntax -- dynamic ripple size
         ripple.style.height = `${size}px`;
         ripple.style.left = `${x - size / 2}px`;
         ripple.style.top = `${y - size / 2}px`;

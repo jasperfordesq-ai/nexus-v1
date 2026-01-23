@@ -1,94 +1,104 @@
 /**
- * CivicOne Auth Reset Password - Password Validation
+ * CivicOne Auth Reset Password - Client-side validation
+ * GOV.UK Design System compliant
  * WCAG 2.1 AA Compliant
- * Real-time password strength validation and match checking
+ *
+ * @version 2.0.0
+ * @since 2026-01-23
  */
 
 (function() {
     'use strict';
 
-    let passwordValid = false;
-    let passwordsMatch = false;
+    var form = document.getElementById('reset-password-form');
+    if (!form) return;
 
-    function checkPasswordStrength() {
-        const password = document.getElementById('password').value;
-        const rules = {
-            length: password.length >= 12,
-            upper: /[A-Z]/.test(password),
-            lower: /[a-z]/.test(password),
-            number: /[0-9]/.test(password),
-            symbol: /[\W_]/.test(password)
-        };
+    var passwordInput = document.getElementById('password');
+    var confirmInput = document.getElementById('confirm_password');
+    var submitBtn = document.getElementById('submit-btn');
+    var matchStatus = document.getElementById('password-match-status');
 
-        passwordValid = true;
-        for (const [key, passed] of Object.entries(rules)) {
-            const el = document.getElementById('rule-' + key);
-            if (!el) continue;
+    if (!passwordInput || !confirmInput || !submitBtn) return;
 
-            const text = el.innerHTML.substring(el.innerHTML.indexOf(' ') + 1);
-            if (passed) {
-                el.innerHTML = '\u2705 ' + text;
-                el.style.color = '#16a34a';
-            } else {
-                el.innerHTML = '\u274C ' + text;
-                el.style.color = '#ef4444';
-                passwordValid = false;
+    var rules = {
+        length: { el: document.getElementById('rule-length'), test: function(p) { return p.length >= 12; } },
+        upper: { el: document.getElementById('rule-upper'), test: function(p) { return /[A-Z]/.test(p); } },
+        lower: { el: document.getElementById('rule-lower'), test: function(p) { return /[a-z]/.test(p); } },
+        number: { el: document.getElementById('rule-number'), test: function(p) { return /[0-9]/.test(p); } },
+        symbol: { el: document.getElementById('rule-symbol'), test: function(p) { return /[!@#$%^&*()_+\-=[\]{}|;:,.<>?]/.test(p); } }
+    };
+
+    function checkPassword() {
+        var password = passwordInput.value;
+        var allPassed = true;
+
+        for (var key in rules) {
+            if (Object.prototype.hasOwnProperty.call(rules, key)) {
+                var rule = rules[key];
+                if (!rule.el) continue;
+
+                var passed = rule.test(password);
+                var span = rule.el.querySelector('span');
+
+                if (passed) {
+                    rule.el.classList.remove('civicone-rule-pending', 'civicone-rule-failed');
+                    rule.el.classList.add('civicone-rule-passed');
+                    if (span) span.textContent = '\u2713'; // checkmark
+                } else {
+                    rule.el.classList.remove('civicone-rule-passed', 'civicone-rule-pending');
+                    rule.el.classList.add(password.length > 0 ? 'civicone-rule-failed' : 'civicone-rule-pending');
+                    if (span) span.textContent = password.length > 0 ? '\u2717' : '\u25CB'; // X or circle
+                    allPassed = false;
+                }
             }
         }
 
-        checkPasswordMatch();
-        updateSubmitButton();
+        checkMatch();
+        return allPassed;
     }
 
-    function checkPasswordMatch() {
-        const password = document.getElementById('password').value;
-        const confirmPassword = document.getElementById('confirm_password').value;
-        const statusEl = document.getElementById('password-match-status');
+    function checkMatch() {
+        var password = passwordInput.value;
+        var confirm = confirmInput.value;
+        var allRulesPassed = true;
 
-        if (!statusEl) return;
-
-        if (confirmPassword.length === 0) {
-            statusEl.style.display = 'none';
-            passwordsMatch = false;
-        } else if (password === confirmPassword) {
-            statusEl.style.display = 'block';
-            statusEl.innerHTML = '\u2705 Passwords match';
-            statusEl.style.color = '#16a34a';
-            passwordsMatch = true;
-        } else {
-            statusEl.style.display = 'block';
-            statusEl.innerHTML = '\u274C Passwords do not match';
-            statusEl.style.color = '#ef4444';
-            passwordsMatch = false;
+        for (var key in rules) {
+            if (Object.prototype.hasOwnProperty.call(rules, key) && rules[key].el && !rules[key].test(password)) {
+                allRulesPassed = false;
+                break;
+            }
         }
 
-        updateSubmitButton();
-    }
-
-    function updateSubmitButton() {
-        const btn = document.getElementById('submit-btn');
-        if (!btn) return;
-
-        if (passwordValid && passwordsMatch) {
-            btn.style.opacity = '1';
-            btn.style.pointerEvents = 'auto';
-            btn.style.cursor = 'pointer';
-            btn.disabled = false;
-        } else {
-            btn.style.opacity = '0.5';
-            btn.style.pointerEvents = 'none';
-            btn.style.cursor = 'not-allowed';
-            btn.disabled = true;
+        if (matchStatus) {
+            if (confirm.length === 0) {
+                matchStatus.textContent = '';
+                matchStatus.className = 'govuk-body-s govuk-!-margin-top-2';
+            } else if (password === confirm && allRulesPassed) {
+                matchStatus.textContent = '\u2713 Passwords match';
+                matchStatus.className = 'govuk-body-s govuk-!-margin-top-2 civicone-match-success';
+            } else if (password !== confirm) {
+                matchStatus.textContent = '\u2717 Passwords do not match';
+                matchStatus.className = 'govuk-body-s govuk-!-margin-top-2 civicone-match-error';
+            }
         }
+
+        // Enable/disable submit
+        var canSubmit = allRulesPassed && password === confirm && confirm.length > 0;
+        submitBtn.disabled = !canSubmit;
+        submitBtn.setAttribute('aria-disabled', String(!canSubmit));
     }
 
-    // Expose functions globally
-    window.checkPasswordStrength = checkPasswordStrength;
-    window.checkPasswordMatch = checkPasswordMatch;
+    passwordInput.addEventListener('input', checkPassword);
+    confirmInput.addEventListener('input', checkMatch);
 
-    // Initialize on page load
-    document.addEventListener('DOMContentLoaded', function() {
-        updateSubmitButton();
+    // Prevent form submission if invalid
+    form.addEventListener('submit', function(e) {
+        if (submitBtn.disabled) {
+            e.preventDefault();
+        }
     });
 
+    // Expose functions globally for backward compatibility
+    window.checkPasswordStrength = checkPassword;
+    window.checkPasswordMatch = checkMatch;
 })();

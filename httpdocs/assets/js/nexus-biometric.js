@@ -171,7 +171,8 @@
         // Show the existing modal from footer.php
         showExistingModal(modal) {
             console.log('[Biometric] Showing existing modal from footer');
-            modal.style.display = 'flex';
+            modal.classList.remove('hidden');
+            modal.classList.add('active');
 
             const setupBtn = document.getElementById('btn-setup-biometric-now');
             const skipBtn = document.getElementById('btn-skip-biometric');
@@ -188,7 +189,8 @@
                     e.preventDefault();
                     e.stopPropagation();
                     console.log('[Biometric] Setup button clicked!');
-                    modal.style.display = 'none';
+                    modal.classList.add('hidden');
+                    modal.classList.remove('active');
                     await this.setupBiometricFromPrompt();
                 });
             }
@@ -202,7 +204,8 @@
                     e.preventDefault();
                     console.log('[Biometric] Skip button clicked');
                     localStorage.setItem(this.promptRemindLaterKey, Date.now().toString());
-                    modal.style.display = 'none';
+                    modal.classList.add('hidden');
+                    modal.classList.remove('active');
                 });
             }
 
@@ -211,7 +214,8 @@
                 if (e.target === modal) {
                     console.log('[Biometric] Backdrop clicked');
                     localStorage.setItem(this.promptRemindLaterKey, Date.now().toString());
-                    modal.style.display = 'none';
+                    modal.classList.add('hidden');
+                    modal.classList.remove('active');
                 }
             });
         },

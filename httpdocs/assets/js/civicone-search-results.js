@@ -40,7 +40,7 @@
         // 3. Toggle Empty Message
         if (emptyMsg) {
             if (visibleCount === 0) {
-                emptyMsg.style.display = 'block';
+                emptyMsg.classList.remove('hidden');
                 const msgText = emptyMsg.querySelector('p');
                 if (msgText) {
                     const typeLabel = {
@@ -53,7 +53,7 @@
                     msgText.textContent = `No ${typeLabel} found matching your search.`;
                 }
             } else {
-                emptyMsg.style.display = 'none';
+                emptyMsg.classList.add('hidden');
             }
         }
 
@@ -87,16 +87,18 @@
 
         items.sort((a, b) => {
             switch (sortBy) {
-                case 'name':
+                case 'name': {
                     const titleA = a.querySelector('.civicone-search-result-item__title')?.textContent?.trim() || '';
                     const titleB = b.querySelector('.civicone-search-result-item__title')?.textContent?.trim() || '';
                     return titleA.localeCompare(titleB);
+                }
 
-                case 'recent':
+                case 'recent': {
                     // If items have data-date attribute, sort by date
                     const dateA = a.getAttribute('data-date') || '0';
                     const dateB = b.getAttribute('data-date') || '0';
                     return dateB.localeCompare(dateA); // Descending (newest first)
+                }
 
                 case 'relevance':
                 default:

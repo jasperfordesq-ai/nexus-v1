@@ -359,13 +359,11 @@ class MenuBuilderValidation {
         `;
 
         const title = document.createElement('div');
-        title.style.fontWeight = '600';
-        title.style.marginBottom = '0.5rem';
+        title.className = 'menu-builder-error-title';
         title.innerHTML = '<i class="fa-solid fa-exclamation-triangle"></i> Please fix the following errors:';
 
         const list = document.createElement('ul');
-        list.style.margin = '0';
-        list.style.paddingLeft = '1.5rem';
+        list.className = 'menu-builder-error-list';
 
         errors.forEach(error => {
             const item = document.createElement('li');

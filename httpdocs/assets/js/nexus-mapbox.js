@@ -53,7 +53,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 input.parentNode.insertBefore(container, input);
 
                 // Hide original input (we will sync value to it)
-                input.style.display = 'none';
+                input.classList.add('hidden');
                 input.type = 'hidden'; // Ensure it is hidden even if CSS overrides display
 
                 const geocoder = new MapboxGeocoder({
@@ -110,8 +110,7 @@ document.addEventListener('DOMContentLoaded', () => {
             } catch (err) {
                 console.error('Project NEXUS Mapbox Error:', err);
                 // Fallback: Show original input if Mapbox crashes
-                input.style.display = 'block';
-                input.style.opacity = '1';
+                input.classList.remove('hidden');
             }
         });
     }
@@ -175,22 +174,15 @@ document.addEventListener('DOMContentLoaded', () => {
                     if (lonEl) lonEl.value = '';
                 });
 
-                // Styling adjustments for the injected geocoder
+                // Styling adjustments for the injected geocoder (third-party Mapbox component)
                 const geocoderCtrl = directContainer.querySelector('.mapboxgl-ctrl-geocoder');
                 if (geocoderCtrl) {
-                    geocoderCtrl.style.boxShadow = 'none';
-                    geocoderCtrl.style.background = 'transparent';
-                    geocoderCtrl.style.width = '100%';
-                    geocoderCtrl.style.maxWidth = '100%';
+                    geocoderCtrl.classList.add('nexus-mapbox-geocoder-override');
                 }
 
                 const input = directContainer.querySelector('input');
                 if (input) {
-                    input.style.boxShadow = 'none';
-                    input.style.background = 'transparent';
-                    input.style.width = '100%';
-                    input.style.height = '100%';
-                    input.style.padding = '15px';
+                    input.classList.add('nexus-mapbox-input-override');
                 }
 
             } catch (err) {

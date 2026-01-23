@@ -85,10 +85,13 @@
         for (let i = 0; i < count; i++) {
             const confetti = document.createElement('div');
             confetti.className = 'confetti-piece';
+            // Dynamic random styles for confetti animation
+            /* eslint-disable no-restricted-syntax */
             confetti.style.left = Math.random() * 100 + '%';
             confetti.style.background = colors[Math.floor(Math.random() * colors.length)];
             confetti.style.animationDelay = (Math.random() * 0.5) + 's';
             confetti.style.animationDuration = (Math.random() * 2 + 2) + 's';
+            /* eslint-enable no-restricted-syntax */
             container.appendChild(confetti);
         }
 

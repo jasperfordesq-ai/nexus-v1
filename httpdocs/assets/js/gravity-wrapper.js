@@ -30,7 +30,7 @@ document.addEventListener('DOMContentLoaded', function () {
             const gravityLink = document.createElement('a');
             gravityLink.href = '#';
             gravityLink.innerText = 'Gravity';
-            gravityLink.style.color = '#888';
+            gravityLink.className = 'gravity-link';
             gravityLink.onclick = function (e) {
                 e.preventDefault();
                 $('body').jGravity({

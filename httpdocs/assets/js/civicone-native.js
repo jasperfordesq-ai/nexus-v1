@@ -63,6 +63,7 @@
 
         startProgress: function() {
             if (!this.progressBar) return;
+            // eslint-disable-next-line no-restricted-syntax -- dynamic progress width
             this.progressBar.style.width = '0';
             this.progressBar.classList.add('loading');
 
@@ -71,6 +72,7 @@
             this.progressInterval = setInterval(() => {
                 progress += Math.random() * 15;
                 if (progress > 90) progress = 90;
+                // eslint-disable-next-line no-restricted-syntax -- dynamic progress width
                 this.progressBar.style.width = progress + '%';
             }, 200);
         },
@@ -79,9 +81,11 @@
             if (!this.progressBar) return;
             clearInterval(this.progressInterval);
             this.progressBar.classList.remove('loading');
+            // eslint-disable-next-line no-restricted-syntax -- dynamic progress width
             this.progressBar.style.width = '100%';
 
             setTimeout(() => {
+                // eslint-disable-next-line no-restricted-syntax -- dynamic progress width
                 this.progressBar.style.width = '0';
             }, 300);
         },

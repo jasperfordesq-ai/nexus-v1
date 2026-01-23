@@ -198,7 +198,7 @@
 
         feedItems.forEach(item => {
             if (filterType === 'all') {
-                item.style.display = '';
+                item.classList.remove('hidden');
                 visibleCount++;
                 return;
             }
@@ -206,10 +206,10 @@
             const itemType = item.dataset.feedType;
 
             if (itemType === filterType) {
-                item.style.display = '';
+                item.classList.remove('hidden');
                 visibleCount++;
             } else {
-                item.style.display = 'none';
+                item.classList.add('hidden');
             }
         });
 
@@ -266,16 +266,16 @@
                 const feedItems = document.querySelectorAll('[data-feed-type="listings"], .feed-listing');
                 feedItems.forEach(item => {
                     if (state.subFilter === 'all') {
-                        item.style.display = '';
+                        item.classList.remove('hidden');
                     } else {
                         const listingType = item.dataset.listingType ||
                             (item.querySelector('.listing-type-offer') ? 'offers' :
                              item.querySelector('.listing-type-request') ? 'requests' : null);
 
                         if (listingType === state.subFilter) {
-                            item.style.display = '';
+                            item.classList.remove('hidden');
                         } else if (listingType) {
-                            item.style.display = 'none';
+                            item.classList.add('hidden');
                         }
                     }
                 });
@@ -302,14 +302,14 @@
             const reader = new FileReader();
             reader.onload = function(e) {
                 document.getElementById('image-preview-img').src = e.target.result;
-                document.getElementById('image-preview-area').style.display = 'block';
+                document.getElementById('image-preview-area').classList.remove('hidden');
 
                 // Hide video preview if showing
                 const videoArea = document.getElementById('video-preview-area');
                 const videoPlayer = document.getElementById('video-preview-player');
                 const videoInput = document.getElementById('post-video-input');
                 if (videoArea) {
-                    videoArea.style.display = 'none';
+                    videoArea.classList.add('hidden');
                     if (videoPlayer && videoPlayer.src) {
                         URL.revokeObjectURL(videoPlayer.src);
                         videoPlayer.src = '';
@@ -323,7 +323,7 @@
 
     function removeImage() {
         document.getElementById('post-image-input').value = '';
-        document.getElementById('image-preview-area').style.display = 'none';
+        document.getElementById('image-preview-area').classList.add('hidden');
     }
 
     // Video preview
@@ -343,10 +343,10 @@
 
             const videoURL = URL.createObjectURL(file);
             videoPlayer.src = videoURL;
-            videoArea.style.display = 'block';
+            videoArea.classList.remove('hidden');
 
             // Hide image preview if showing
-            document.getElementById('image-preview-area').style.display = 'none';
+            document.getElementById('image-preview-area').classList.add('hidden');
             document.getElementById('post-image-input').value = '';
         }
     }
@@ -361,7 +361,7 @@
 
         videoPlayer.src = '';
         document.getElementById('post-video-input').value = '';
-        videoArea.style.display = 'none';
+        videoArea.classList.add('hidden');
     }
 
     // ============================================
@@ -384,12 +384,12 @@
         const picker = document.getElementById('emoji-picker-container');
         if (!picker) return;
 
-        const isVisible = picker.style.display !== 'none';
+        const isVisible = !picker.classList.contains('hidden');
 
         if (isVisible) {
-            picker.style.display = 'none';
+            picker.classList.add('hidden');
         } else {
-            picker.style.display = 'block';
+            picker.classList.remove('hidden');
             renderEmojis(currentEmojiCategory);
         }
     }
@@ -427,7 +427,7 @@
         // Close the picker
         const picker = document.getElementById('emoji-picker-container');
         if (picker) {
-            picker.style.display = 'none';
+            picker.classList.add('hidden');
         }
     }
 
@@ -443,7 +443,7 @@
             const picker = document.getElementById('emoji-picker-container');
             const btn = document.getElementById('emoji-picker-btn');
             if (picker && btn && !picker.contains(e.target) && e.target !== btn && !btn.contains(e.target)) {
-                picker.style.display = 'none';
+                picker.classList.add('hidden');
             }
         });
     }
@@ -480,10 +480,10 @@
 
         // Show/hide fields
         document.querySelectorAll('.composer-fields-inline').forEach(field => {
-            field.style.display = 'none';
+            field.classList.add('hidden');
         });
         const fieldsEl = document.getElementById('fields-' + type);
-        if (fieldsEl) fieldsEl.style.display = 'block';
+        if (fieldsEl) fieldsEl.classList.remove('hidden');
 
         // Update form action
         const form = document.getElementById('composer-form');
@@ -525,12 +525,13 @@
             case 'goal':
                 setRequired(fieldsEl, 'input[name="goal_title"]', true);
                 break;
-            case 'poll':
+            case 'poll': {
                 setRequired(fieldsEl, 'input[name="poll_question"]', true);
                 const pollOptions = fieldsEl.querySelectorAll('input[name="poll_options[]"]');
                 if (pollOptions[0]) pollOptions[0].required = true;
                 if (pollOptions[1]) pollOptions[1].required = true;
                 break;
+            }
         }
     }
 
@@ -594,9 +595,10 @@
             const catMatch = itemCat === 'global' || itemCat == selectedCat || !selectedCat;
             const typeMatch = itemType === 'any' || itemType === selectedType;
 
-            item.style.display = (catMatch && typeMatch) ? 'flex' : 'none';
-
-            if (item.style.display === 'none') {
+            if (catMatch && typeMatch) {
+                item.classList.remove('hidden');
+            } else {
+                item.classList.add('hidden');
                 const checkbox = item.querySelector('input');
                 if (checkbox) checkbox.checked = false;
             }
@@ -690,11 +692,11 @@
 
         const initialItems = feedContainer.querySelectorAll('.fb-card').length;
         if (initialItems < ITEMS_PER_PAGE) {
-            if (endMessage) endMessage.style.display = 'block';
+            if (endMessage) endMessage.classList.remove('hidden');
             return;
         }
 
-        sentinel.style.display = 'flex';
+        sentinel.classList.remove('hidden');
 
         const observer = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
@@ -708,7 +710,7 @@
 
         async function loadMoreFeed() {
             isLoading = true;
-            sentinel.style.display = 'flex';
+            sentinel.classList.remove('hidden');
             currentPage++;
 
             try {
@@ -743,17 +745,17 @@
 
                 if (!hasMore || (data.items && data.items.length < ITEMS_PER_PAGE)) {
                     hasMore = false;
-                    sentinel.style.display = 'none';
-                    if (endMessage) endMessage.style.display = 'block';
+                    sentinel.classList.add('hidden');
+                    if (endMessage) endMessage.classList.remove('hidden');
                     observer.disconnect();
                 }
             } catch (err) {
                 console.error('Feed load error:', err);
                 hasMore = false;
-                sentinel.style.display = 'none';
+                sentinel.classList.add('hidden');
                 if (endMessage) {
                     endMessage.innerHTML = '<i class="fa-solid fa-exclamation-circle"></i> Failed to load more';
-                    endMessage.style.display = 'block';
+                    endMessage.classList.remove('hidden');
                 }
             } finally {
                 isLoading = false;

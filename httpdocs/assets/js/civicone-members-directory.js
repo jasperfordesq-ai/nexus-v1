@@ -457,9 +457,9 @@
         // Show/hide clear button based on input value
         function toggleClearButton() {
             if (searchInput.value.trim().length > 0) {
-                clearButton.style.display = 'flex';
+                clearButton.classList.remove('hidden');
             } else {
-                clearButton.style.display = 'none';
+                clearButton.classList.add('hidden');
             }
         }
 
@@ -490,10 +490,10 @@
         const resultsList = document.querySelector('.civicone-results-list');
 
         if (skeleton) {
-            skeleton.style.display = 'block';
+            skeleton.classList.remove('hidden');
         }
         if (resultsList) {
-            resultsList.style.opacity = '0.3';
+            resultsList.classList.add('loading');
         }
     }
 
@@ -502,10 +502,10 @@
         const resultsList = document.querySelector('.civicone-results-list');
 
         if (skeleton) {
-            skeleton.style.display = 'none';
+            skeleton.classList.add('hidden');
         }
         if (resultsList) {
-            resultsList.style.opacity = '1';
+            resultsList.classList.remove('loading');
         }
     }
 
@@ -531,7 +531,7 @@
     }
 
     // Initialize new features
-    function init() {
+    function initNewFeatures() {
         initializeClearButton();
         // Other initialization code...
     }

@@ -160,7 +160,7 @@
         if (message) {
             const errorEl = getErrorElement(field);
             errorEl.textContent = message;
-            errorEl.style.display = 'block';
+            errorEl.classList.remove('hidden');
         }
 
         // Shake form group if exists
@@ -205,7 +205,7 @@
         if (errorEl) {
             errorEl.classList.add('form-message-fade-out');
             setTimeout(() => {
-                errorEl.style.display = 'none';
+                errorEl.classList.add('hidden');
                 errorEl.classList.remove('form-message-fade-out');
             }, 200);
         }
@@ -239,7 +239,7 @@
         const errorEl = wrapper.querySelector('.form-error-message') ||
                         wrapper.parentElement?.querySelector('.form-error-message');
         if (errorEl) {
-            errorEl.style.display = 'none';
+            errorEl.classList.add('hidden');
         }
 
         // Clear form group

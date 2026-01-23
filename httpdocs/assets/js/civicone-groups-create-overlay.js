@@ -59,8 +59,8 @@
                 const imagePreview = document.getElementById('imagePreview');
 
                 if (previewImg) previewImg.src = e.target.result;
-                if (uploadArea) uploadArea.style.display = 'none';
-                if (imagePreview) imagePreview.style.display = 'block';
+                if (uploadArea) uploadArea.classList.add('hidden');
+                if (imagePreview) imagePreview.classList.remove('hidden');
             };
             reader.readAsDataURL(input.files[0]);
         }
@@ -74,8 +74,8 @@
         const imagePreview = document.getElementById('imagePreview');
 
         if (imageFile) imageFile.value = '';
-        if (uploadArea) uploadArea.style.display = 'block';
-        if (imagePreview) imagePreview.style.display = 'none';
+        if (uploadArea) uploadArea.classList.remove('hidden');
+        if (imagePreview) imagePreview.classList.add('hidden');
     };
 
     // Initialize event listeners

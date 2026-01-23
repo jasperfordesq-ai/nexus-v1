@@ -170,9 +170,9 @@ window.initGoalSocial = function(config) {
 
         // Desktop: use inline comments section
         const section = document.getElementById('comments-section');
-        const isHidden = section.style.display === 'none';
+        const isHidden = section.classList.contains('hidden') || window.getComputedStyle(section).display === 'none';
 
-        section.style.display = isHidden ? 'block' : 'none';
+        section.classList.toggle('hidden');
 
         if (isHidden && !commentsLoaded) {
             loadComments();
@@ -315,8 +315,8 @@ window.initGoalSocial = function(config) {
 
     window.goalShowReplyForm = function(commentId) {
         const form = document.getElementById(`reply-form-${commentId}`);
-        form.style.display = form.style.display === 'none' ? 'block' : 'none';
-        if (form.style.display === 'block') {
+        form.classList.toggle('hidden');
+        if (!form.classList.contains('hidden')) {
             document.getElementById(`reply-input-${commentId}`).focus();
         }
     };
@@ -343,7 +343,7 @@ window.initGoalSocial = function(config) {
             const data = await response.json();
             if (data.error) { alert(data.error); return; }
             input.value = '';
-            document.getElementById(`reply-form-${parentId}`).style.display = 'none';
+            document.getElementById(`reply-form-${parentId}`).classList.add('hidden');
             const countEl = document.getElementById('comment-count');
             countEl.textContent = parseInt(countEl.textContent) + 1;
             loadComments();
