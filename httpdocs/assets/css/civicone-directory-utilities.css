@@ -75,7 +75,7 @@
 }
 
 .feed-type-event {
-    color: #9f1239;
+    color: var(--color-rose-800);
 }
 
 .feed-type-goal {
@@ -96,7 +96,7 @@
 
 /* Feed Button Colors */
 .civic-view-btn--event {
-    background: #9f1239;
+    background: var(--color-rose-800);
 }
 
 .civic-view-btn--poll {
@@ -104,12 +104,12 @@
 }
 
 .civic-view-btn--volunteering {
-    background: #0369a1;
+    background: var(--color-sky-700);
 }
 
 /* Feed Type Label - Volunteering */
 .feed-type-volunteering {
-    color: #0369a1;
+    color: var(--color-sky-700);
 }
 
 /* Feed Like Icon */

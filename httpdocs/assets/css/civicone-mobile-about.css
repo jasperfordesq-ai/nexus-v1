@@ -27,7 +27,7 @@
 
     /* Holographic Gradients */
     --gradient-brand: linear-gradient(135deg, var(--color-primary-500) 0%, var(--color-pink-500) 50%, var(--color-warning-500) 100%);
-    --gradient-hero: linear-gradient(135deg, var(--color-primary-600) 0%, var(--color-primary-700) 25%, var(--color-pink-600) 50%, var(--color-warning-500) 75%, #fcd34d 100%);
+    --gradient-hero: linear-gradient(135deg, var(--color-primary-600) 0%, var(--color-primary-700) 25%, var(--color-pink-600) 50%, var(--color-warning-500) 75%, var(--color-amber-300) 100%);
 
     /* Blur Values */
     --blur-sm: blur(8px);

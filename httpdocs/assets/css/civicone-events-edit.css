@@ -96,7 +96,7 @@
         --text-muted: var(--color-slate-600);
         --accent-color: var(--color-govuk-yellow);
         /* Orange for Events */
-        --heading-gradient: linear-gradient(135deg, #c2410c 0%, var(--color-govuk-yellow) 100%);
+        --heading-gradient: linear-gradient(135deg, var(--color-govuk-red-dark) 0%, var(--color-govuk-yellow) 100%);
 
         /* Subtle iridescent shadow for light mode */
         --box-shadow:
@@ -142,7 +142,7 @@
         --glass-border: rgba(255, 255, 255, 0.4);
         --text-color: var(--color-slate-800);
         --text-muted: var(--color-slate-600);
-        --heading-gradient: linear-gradient(135deg, #c2410c 0%, var(--color-govuk-yellow) 100%);
+        --heading-gradient: linear-gradient(135deg, var(--color-govuk-red-dark) 0%, var(--color-govuk-yellow) 100%);
         --box-shadow:
             0 8px 32px 0 rgba(31, 38, 135, 0.1),
             inset 0 0 0 1px rgba(255, 255, 255, 0.2);
@@ -159,8 +159,8 @@
         --glass-border: rgba(255, 255, 255, 0.15);
         --text-color: #ffedd5;
         --text-muted: rgba(255, 255, 255, 0.7);
-        --accent-color: #fdba74;
-        --heading-gradient: linear-gradient(135deg, var(--color-white) 0%, #fdba74 100%);
+        --accent-color: var(--color-orange-300);
+        --heading-gradient: linear-gradient(135deg, var(--color-white) 0%, var(--color-orange-300) 100%);
 
         /* Vivid Dark Mode Shadows */
         --box-shadow:

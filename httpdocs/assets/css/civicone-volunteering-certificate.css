@@ -93,7 +93,7 @@
     justify-content: center;
     margin: 0 auto var(--space-5);
     font-size: 2.8rem;
-    color: #c4b5fd;
+    color: var(--color-purple-300);
     box-shadow:
         0 10px 40px rgba(99, 102, 241, 0.25),
         inset 0 0 30px rgba(255, 255, 255, 0.1);
@@ -109,7 +109,7 @@
 .vc-header-title {
     font-size: 2.4rem;
     font-weight: 800;
-    background: linear-gradient(135deg, var(--color-primary-300), #f0abfc, #fda4af);
+    background: linear-gradient(135deg, var(--color-primary-300), #f0abfc, var(--color-rose-300));
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -148,7 +148,7 @@
 }
 
 .vc-btn-primary {
-    background: linear-gradient(135deg, var(--color-primary-500), var(--color-purple-500), #a855f7);
+    background: linear-gradient(135deg, var(--color-primary-500), var(--color-purple-500), var(--color-purple-400));
     color: white;
     box-shadow: 0 6px 25px rgba(99, 102, 241, 0.35);
 }
@@ -190,7 +190,7 @@
 }
 
 .vc-preview-banner strong {
-    color: #fcd34d;
+    color: var(--color-amber-300);
     font-weight: 700;
 }
 
@@ -433,7 +433,7 @@
 .vc-cert-recipient {
     font-size: 3rem;
     font-weight: 800;
-    background: linear-gradient(135deg, var(--color-primary-300), #c4b5fd, #f0abfc);
+    background: linear-gradient(135deg, var(--color-primary-300), var(--color-purple-300), #f0abfc);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -471,7 +471,7 @@
 .vc-cert-hours-value {
     font-size: 2.5rem;
     font-weight: 800;
-    background: linear-gradient(135deg, var(--color-primary-300), #c4b5fd);
+    background: linear-gradient(135deg, var(--color-primary-300), var(--color-purple-300));
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;

@@ -530,8 +530,8 @@
 }
 
 .civicone .civic-toast.warning {
-    background: #f47738;
-    border-color: #f47738;
+    background: var(--color-orange-500);
+    border-color: var(--color-orange-500);
 }
 
 .civicone .civic-toast.info {

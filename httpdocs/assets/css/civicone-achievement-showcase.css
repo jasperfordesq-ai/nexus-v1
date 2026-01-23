@@ -55,7 +55,7 @@
 }
 
 .featured-badge-card:hover {
-    background: #e8f0f8;
+    background: var(--color-blue-50);
 }
 
 .featured-badge-content {
@@ -112,7 +112,7 @@
 }
 
 .badge-card:hover {
-    background: #e8f0f8;
+    background: var(--color-blue-50);
     border-color: var(--color-govuk-blue-light);
 }
 
@@ -199,7 +199,7 @@
 .milestone-reward {
     margin-top: 0.75rem;
     padding: 0.75rem;
-    background: #cce2d8;
+    background: var(--color-emerald-100);
     border-left: 4px solid var(--color-govuk-green);
     font-size: 0.875rem;
     color: var(--color-govuk-black);

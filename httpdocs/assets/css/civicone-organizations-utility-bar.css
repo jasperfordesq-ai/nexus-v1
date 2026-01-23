@@ -126,7 +126,7 @@
 
 [data-theme="dark"] .org-utility-role.admin {
     background: rgba(139, 92, 246, 0.2);
-    color: #a78bfa;
+    color: var(--color-purple-400);
 }
 
 [data-theme="dark"] .org-utility-role.member {

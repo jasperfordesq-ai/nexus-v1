@@ -377,7 +377,7 @@
    ============================================ */
 
 .civic-review-rating {
-    color: var(--color-warning, #f47738);
+    color: var(--color-warning, var(--color-orange-500));
     font-size: 1.2rem;
 }
 

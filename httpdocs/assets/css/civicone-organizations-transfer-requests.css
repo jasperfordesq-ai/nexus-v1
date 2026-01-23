@@ -12,7 +12,7 @@
     right: 0;
     bottom: 0;
     z-index: -1;
-    background: linear-gradient(135deg, var(--color-slate-50) 0%, #fef3c7 25%, #fde68a 50%, #fef3c7 75%, var(--color-slate-50) 100%);
+    background: linear-gradient(135deg, var(--color-slate-50) 0%, var(--color-amber-100) 25%, var(--color-amber-200) 50%, var(--color-amber-100) 75%, var(--color-slate-50) 100%);
 }
 
 .requests-bg::before {
@@ -294,7 +294,7 @@
 
 [data-theme="dark"] .status-badge.rejected {
     background: rgba(239, 68, 68, 0.3);
-    color: #f87171;
+    color: var(--color-red-400);
 }
 
 /* Amount */

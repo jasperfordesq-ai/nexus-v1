@@ -13,7 +13,7 @@
     padding: 180px var(--space-5) 60px;
     position: relative;
     overflow: hidden;
-    background: linear-gradient(135deg, #fdf2f8 0%, #fce7f3 50%, var(--color-govuk-light-grey) 100%);
+    background: linear-gradient(135deg, var(--color-pink-50) 0%, var(--color-pink-100) 50%, var(--color-govuk-light-grey) 100%);
 }
 
 [data-theme="dark"] .holo-goal-page {
@@ -309,12 +309,12 @@ textarea.holo-input {
 }
 
 [data-theme="dark"] .holo-buddy-title {
-    color: #86efac;
+    color: var(--color-green-300);
 }
 
 .holo-buddy-desc {
     font-size: 0.9rem;
-    color: #166534;
+    color: var(--color-green-800);
     line-height: 1.5;
 }
 
@@ -409,7 +409,7 @@ textarea.holo-input {
 }
 
 [data-theme="dark"] .holo-danger-label {
-    color: #f87171;
+    color: var(--color-red-400);
 }
 
 .holo-btn-danger {

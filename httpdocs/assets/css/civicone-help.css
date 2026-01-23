@@ -539,7 +539,7 @@
 }
 
 .search-result-excerpt mark {
-    background: #fef08a; /* Yellow highlight - no exact token */
+    background: var(--color-yellow-200); /* Yellow highlight - no exact token */
     color: var(--civic-help-text-primary);
     padding: var(--space-1) var(--space-1); /* 4px 4px - slightly larger than original 1px 3px */
     border-radius: var(--radius-sm); /* 4px - close to original 2px */
@@ -742,9 +742,9 @@
         --civic-help-bg-hover: var(--color-gray-700);
         --civic-help-bg-article: var(--color-gray-800);
         --civic-help-success-bg: #064e3b;
-        --civic-help-success-text: #a7f3d0;
+        --civic-help-success-text: var(--color-emerald-200);
         --civic-help-error-bg: #7f1d1d;
-        --civic-help-error-text: #fecaca;
+        --civic-help-error-text: var(--color-red-200, #fecaca);
     }
 
     .civic-help-article-title a {
@@ -757,7 +757,7 @@
 
     .search-result-excerpt mark {
         background: #854d0e; /* Dark yellow - no exact token */
-        color: #fef08a; /* Yellow highlight - no exact token */
+        color: var(--color-yellow-200); /* Yellow highlight - no exact token */
     }
 }
 

@@ -228,7 +228,7 @@
 .audit-icon.transfer { background: rgba(245, 158, 11, 0.1); color: var(--color-warning-500); }
 .audit-icon.member { background: rgba(59, 130, 246, 0.1); color: var(--color-blue-500); }
 .audit-icon.settings { background: rgba(107, 114, 128, 0.1); color: var(--color-gray-500); }
-.audit-icon.ownership { background: rgba(168, 85, 247, 0.1); color: #a855f7; }
+.audit-icon.ownership { background: rgba(168, 85, 247, 0.1); color: var(--color-purple-400); }
 .audit-icon.bulk { background: rgba(236, 72, 153, 0.1); color: var(--color-pink-500); }
 
 .audit-content {

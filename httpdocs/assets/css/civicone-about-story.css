@@ -178,8 +178,8 @@
     }
 
     .about-story-badge-item {
-        background: #d1fae5;
-        color: #065f46;
+        background: var(--color-emerald-100);
+        color: var(--color-emerald-800);
         padding: var(--space-2) var(--space-5);
         border-radius: var(--radius-2xl);
         font-weight: bold;

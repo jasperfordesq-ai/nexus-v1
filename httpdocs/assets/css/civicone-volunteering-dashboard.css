@@ -135,12 +135,12 @@
 }
 
 .civic-status--approved {
-    background: #ECFDF5;
+    background: var(--color-emerald-50);
     color: var(--color-success-700);
 }
 
 .civic-status--declined {
-    background: #FEF2F2;
+    background: var(--color-red-50);
     color: var(--color-govuk-red);
 }
 
@@ -156,23 +156,23 @@
 }
 
 .civic-btn--success {
-    background: #ECFDF5;
+    background: var(--color-emerald-50);
     color: var(--color-success-700);
-    border: 1px solid #A7F3D0;
+    border: 1px solid var(--color-emerald-200);
 }
 
 .civic-btn--success:hover {
-    background: #D1FAE5;
+    background: var(--color-emerald-100);
 }
 
 .civic-btn--danger {
-    background: #FEF2F2;
+    background: var(--color-red-50);
     color: var(--color-govuk-red);
-    border: 1px solid #FECACA;
+    border: 1px solid var(--color-red-200, #fecaca);
 }
 
 .civic-btn--danger:hover {
-    background: #FEE2E2;
+    background: var(--color-red-100);
 }
 
 /* Opportunity List */

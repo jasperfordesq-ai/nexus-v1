@@ -14,8 +14,8 @@
     --civic-vol-text-muted: var(--color-gray-600);         /* 7.0:1 */
 
     /* Brand/Action Colors (WCAG AA) */
-    --civic-vol-brand: #0F766E;              /* Teal 700 - 5.8:1 */
-    --civic-vol-brand-hover: #115E59;        /* Teal 800 - 7.2:1 */
+    --civic-vol-brand: var(--color-teal-700);              /* Teal 700 - 5.8:1 */
+    --civic-vol-brand-hover: var(--color-teal-800);        /* Teal 800 - 7.2:1 */
     --civic-vol-brand-light: rgba(15, 118, 110, 0.1);
 
     /* Status Colors (WCAG AA) */
@@ -41,7 +41,7 @@
     --civic-vol-text-primary: var(--color-gray-50);
     --civic-vol-text-secondary: var(--color-gray-200);
     --civic-vol-text-muted: var(--color-gray-300);
-    --civic-vol-brand: #5EEAD4;
+    --civic-vol-brand: var(--color-teal-300);
     --civic-vol-brand-hover: #99F6E4;
     --civic-vol-brand-light: rgba(94, 234, 212, 0.15);
     --civic-vol-success: var(--color-success-400);
@@ -357,7 +357,7 @@
 .civic-alert--success {
     background: var(--civic-vol-success-bg);
     color: var(--civic-vol-success);
-    border: 1px solid #A7F3D0;
+    border: 1px solid var(--color-emerald-200);
 }
 
 [data-theme="dark"] .civic-alert--success {

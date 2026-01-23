@@ -237,7 +237,7 @@
 }
 
 [data-theme="dark"] .edit-org-feature-title {
-    color: #c4b5fd;
+    color: var(--color-purple-300);
 }
 
 .edit-org-feature-description {

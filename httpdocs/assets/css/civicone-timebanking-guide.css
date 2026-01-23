@@ -152,18 +152,18 @@
     }
 
     .timebanking-guide-step-icon.pink {
-        background: #fce7f3;
+        background: var(--color-pink-100);
         color: var(--color-pink-600);
     }
 
     .timebanking-guide-step-icon.green {
         background: var(--color-success-100);
-        color: #166534;
+        color: var(--color-green-800);
     }
 
     [data-theme="dark"] .timebanking-guide-step-icon.blue {
         background: rgba(37, 99, 235, 0.2);
-        color: #60a5fa;
+        color: var(--color-blue-400);
     }
 
     [data-theme="dark"] .timebanking-guide-step-icon.pink {
@@ -227,7 +227,7 @@
     }
 
     .timebanking-guide-cta-badge {
-        background: #9333ea;
+        background: var(--color-purple-500);
         color: white;
         padding: var(--space-1) var(--space-4);
         border-radius: var(--radius-2xl);
@@ -238,7 +238,7 @@
     }
 
     [data-theme="dark"] .timebanking-guide-cta-badge {
-        background: #a855f7;
+        background: var(--color-purple-400);
     }
 
     .timebanking-guide-cta h2 {

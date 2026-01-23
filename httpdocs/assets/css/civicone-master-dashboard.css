@@ -132,12 +132,12 @@
         border-color: rgba(20, 184, 166, 0.3) !important;
     }
 
-    [data-theme="dark"] div[style*="background: #f0fdfa"] h4[style*="color:#0f766e"] {
-        color: #5eead4 !important;
+    [data-theme="dark"] div[style*="background: #f0fdfa"] h4[style*="color:var(--color-teal-700)"] {
+        color: var(--color-teal-300) !important;
         border-color: rgba(20, 184, 166, 0.3) !important;
     }
 
-    [data-theme="dark"] div[style*="background: #f0fdfa"] label[style*="color:#115e59"] {
+    [data-theme="dark"] div[style*="background: #f0fdfa"] label[style*="color:var(--color-teal-800)"] {
         color: #99f6e4 !important;
     }
 

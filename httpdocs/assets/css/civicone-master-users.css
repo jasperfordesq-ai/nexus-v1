@@ -134,8 +134,8 @@
 }
 
 .master-users-badge-tenant {
-    background: var(--color-sky-100, #e0f2fe);
-    color: var(--color-sky-700, #0369a1);
+    background: var(--color-sky-100, var(--color-blue-100));
+    color: var(--color-sky-700, var(--color-sky-700));
     padding: var(--space-0-5) var(--space-1-5);
     border-radius: var(--radius-sm);
     font-size: 0.8rem;
@@ -162,8 +162,8 @@
    ======================================== */
 
 .master-users-status-active {
-    background: var(--color-green-100, #dcfce7);
-    color: var(--color-green-800, #166534);
+    background: var(--color-green-100, var(--color-success-100));
+    color: var(--color-green-800, var(--color-green-800));
     padding: var(--space-0-5) 8px;
     border-radius: var(--radius-lg);
     font-size: 0.75rem;
@@ -273,7 +273,7 @@
 /* Status badges */
 [data-theme="dark"] .master-users-status-active {
     background: rgba(22, 163, 74, 0.2);
-    color: #86efac;
+    color: var(--color-green-300);
 }
 
 [data-theme="dark"] .master-users-status-pending {

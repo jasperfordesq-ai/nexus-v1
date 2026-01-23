@@ -69,7 +69,7 @@
 .holo-orb-2 {
     width: 300px;
     height: 300px;
-    background: linear-gradient(135deg, #a855f7, #c084fc);
+    background: linear-gradient(135deg, var(--color-purple-400), #c084fc);
     bottom: 20%;
     right: -5%;
     /* animation removed for GOV.UK compliance */
@@ -117,7 +117,7 @@
     width: var(--space-20);
     height: var(--space-20);
     margin: 0 auto var(--space-5);
-    background: linear-gradient(135deg, var(--color-purple-500) 0%, var(--color-primary-700) 50%, #6d28d9 100%);
+    background: linear-gradient(135deg, var(--color-purple-500) 0%, var(--color-primary-700) 50%, var(--color-purple-700) 100%);
     border-radius: var(--radius-2xl);
     display: flex;
     align-items: center;
@@ -137,7 +137,7 @@
     font-size: 2.5rem;
     font-weight: 800;
     margin: 0 0 var(--space-3);
-    background: linear-gradient(135deg, var(--color-purple-500) 0%, var(--color-primary-700) 50%, #6d28d9 100%);
+    background: linear-gradient(135deg, var(--color-purple-500) 0%, var(--color-primary-700) 50%, var(--color-purple-700) 100%);
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
@@ -275,7 +275,7 @@
 [data-theme="dark"] .holo-input:focus,
 [data-theme="dark"] .holo-textarea:focus {
     background: rgba(0, 0, 0, 0.3);
-    border-color: #a78bfa;
+    border-color: var(--color-purple-400);
     box-shadow:
         0 0 0 4px rgba(139, 92, 246, 0.15),
         0 8px 20px rgba(139, 92, 246, 0.15);
@@ -354,7 +354,7 @@
 }
 
 [data-theme="dark"] .holo-alert-text {
-    color: #fcd34d;
+    color: var(--color-amber-300);
     opacity: 0.8;
 }
 
@@ -396,7 +396,7 @@
 
 .holo-btn-primary {
     flex: 2;
-    background: linear-gradient(135deg, var(--color-purple-500) 0%, var(--color-primary-700) 50%, #6d28d9 100%);
+    background: linear-gradient(135deg, var(--color-purple-500) 0%, var(--color-primary-700) 50%, var(--color-purple-700) 100%);
     color: white;
     box-shadow: 0 8px 24px rgba(139, 92, 246, 0.3);
 }

@@ -235,7 +235,7 @@
 
 .module-section-badge {
     font-size: 0.8rem;
-    background: #eff6ff;
+    background: var(--color-blue-50);
     color: var(--color-govuk-blue);
     padding: var(--space-0-5) 8px;
     border-radius: var(--radius-sm);
@@ -343,7 +343,7 @@
     grid-column: 1 / -1;
     padding: var(--space-4);
     background: var(--color-white)1f2;
-    color: #be123c;
+    color: var(--color-rose-700);
     border-radius: var(--radius-md);
     font-size: 0.9rem;
     text-align: center;
@@ -439,7 +439,7 @@
     padding: var(--space-4) 30px;
     border: 1px dashed var(--color-error-500);
     border-radius: var(--radius-lg);
-    background: #fef2f2;
+    background: var(--color-red-50);
 }
 
 .danger-zone-title {
@@ -599,7 +599,7 @@
 [data-theme="dark"] .admin-alert-warning {
     background: rgba(239, 68, 68, 0.15);
     border-color: rgba(239, 68, 68, 0.3);
-    color: #fca5a5;
+    color: var(--color-red-300);
 }
 
 [data-theme="dark"] .admin-card {
@@ -635,11 +635,11 @@
 }
 
 [data-theme="dark"] .danger-zone-title {
-    color: #fca5a5;
+    color: var(--color-red-300);
 }
 
 [data-theme="dark"] .danger-zone-text {
-    color: #f87171;
+    color: var(--color-red-400);
 }
 
 [data-theme="dark"] .nexus-btn-secondary {
