@@ -276,9 +276,6 @@ if ($type === 'listing') {
             $sharedData = null;
             $shareError = null;
 
-            // DEBUG: Output values to HTML comment
-            echo "<!-- DEBUG SHARED: parent_id={$parentId} parent_type={$parentType} -->";
-
             try {
                 // Determine DB Class - check both possible class names
                 $dbForShare = null;
@@ -450,9 +447,6 @@ if ($type === 'listing') {
             } catch (Exception $e) {
                 $shareError = $e->getMessage();
             }
-
-            // DEBUG: Confirm what we got
-            echo "<!-- DEBUG RESULT: sharedData=" . ($sharedData ? 'FOUND' : 'NULL') . " shareError=" . ($shareError ?? 'none') . " -->";
 
             // Display User's Caption (if any)
             $content = preg_replace_callback('/(https?:\/\/[^\s]+)/', function($m) {

@@ -69,13 +69,21 @@ class ConnectionController
     public function accept()
     {
         $this->authCheck();
-        $id = $_POST['connection_id'];
+        $id = (int) ($_POST['connection_id'] ?? 0);
+        $currentUserId = $_SESSION['user_id'];
 
         // Fetch connection to get requester for email
         $db = Database::getConnection();
         $conn = $db->query("SELECT * FROM connections WHERE id = ?", [$id])->fetch();
 
-        Connection::acceptRequest($id);
+        // SECURITY: Verify current user is the receiver of this connection request
+        if (!$conn || (int)$conn['receiver_id'] !== (int)$currentUserId) {
+            $_SESSION['error'] = 'You are not authorized to accept this connection request.';
+            header('Location: ' . \Nexus\Core\TenantContext::getBasePath() . '/connections');
+            exit;
+        }
+
+        Connection::acceptRequest($id, $currentUserId);
 
         // Gamification: Check connection badges for both users
         try {
@@ -119,9 +127,16 @@ class ConnectionController
     public function remove()
     {
         $this->authCheck();
-        $id = $_POST['connection_id'];
-        Connection::removeConnection($id);
-        header('Location: /connections'); // Refresh
+        $id = (int) ($_POST['connection_id'] ?? 0);
+        $currentUserId = $_SESSION['user_id'];
+
+        // SECURITY: Verify current user is part of this connection
+        $removed = Connection::removeConnection($id, $currentUserId);
+        if (!$removed) {
+            $_SESSION['error'] = 'You are not authorized to remove this connection.';
+        }
+        header('Location: ' . \Nexus\Core\TenantContext::getBasePath() . '/connections');
+        exit;
     }
 
     private function authCheck()

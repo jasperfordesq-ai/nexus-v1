@@ -34,11 +34,14 @@ class CronController
             $key = $headers['X-Cron-Key'] ?? null;
         }
 
-        $validKey = Env::get('CRON_KEY', 'default_insecure_key_change_me');
+        // SECURITY: Require CRON_KEY to be explicitly set - no insecure defaults
+        $validKey = Env::get('CRON_KEY');
 
-        // Note: 'default_insecure_key_change_me' is a fallback to prevent open access if ENV is missing, 
-        // effectively forcing the user to supply the fallback key if they haven't configured .env yet.
-        // ideally we should block if CRON_KEY is not set.
+        if (empty($validKey)) {
+            error_log("SECURITY WARNING: CRON_KEY environment variable is not set. Cron access blocked.");
+            http_response_code(503);
+            die('Service Unavailable: Cron key not configured');
+        }
 
         if (!$key || !hash_equals($validKey, $key)) {
             http_response_code(403);

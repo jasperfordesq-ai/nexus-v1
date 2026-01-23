@@ -19,16 +19,46 @@ class Connection
         return true;
     }
 
-    public static function acceptRequest($id)
+    /**
+     * Accept a connection request - verifies the current user is the receiver
+     * @param int $id Connection ID
+     * @param int $receiverId User ID of the person accepting (must be the receiver)
+     * @return bool True if accepted, false if not authorized
+     */
+    public static function acceptRequest($id, $receiverId = null)
     {
+        // SECURITY: Verify the accepting user is the intended receiver
+        if ($receiverId !== null) {
+            $sql = "UPDATE connections SET status = 'accepted' WHERE id = ? AND receiver_id = ?";
+            $stmt = Database::query($sql, [$id, $receiverId]);
+            return $stmt->rowCount() > 0;
+        }
+        // Legacy fallback (should be avoided) - log warning
+        error_log("SECURITY WARNING: acceptRequest called without receiverId verification for connection $id");
         $sql = "UPDATE connections SET status = 'accepted' WHERE id = ?";
         Database::query($sql, [$id]);
+        return true;
     }
 
-    public static function removeConnection($id)
+    /**
+     * Remove a connection - verifies the current user is part of the connection
+     * @param int $id Connection ID
+     * @param int $userId User ID of the person removing (must be requester or receiver)
+     * @return bool True if removed, false if not authorized
+     */
+    public static function removeConnection($id, $userId = null)
     {
+        // SECURITY: Verify the user is part of this connection
+        if ($userId !== null) {
+            $sql = "DELETE FROM connections WHERE id = ? AND (requester_id = ? OR receiver_id = ?)";
+            $stmt = Database::query($sql, [$id, $userId, $userId]);
+            return $stmt->rowCount() > 0;
+        }
+        // Legacy fallback (should be avoided) - log warning
+        error_log("SECURITY WARNING: removeConnection called without userId verification for connection $id");
         $sql = "DELETE FROM connections WHERE id = ?";
         Database::query($sql, [$id]);
+        return true;
     }
 
     public static function getStatus($user1, $user2)

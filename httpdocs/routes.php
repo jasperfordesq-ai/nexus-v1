@@ -204,7 +204,7 @@ $router->add('POST', '/api/app/log', 'Nexus\Controllers\Api\AppController@log');
 // Pusher Realtime API (WebSocket authentication)
 $router->add('POST', '/api/pusher/auth', 'Nexus\Controllers\Api\PusherAuthController@auth');
 $router->add('GET', '/api/pusher/config', 'Nexus\Controllers\Api\PusherAuthController@config');
-$router->add('GET', '/api/pusher/debug', 'Nexus\Controllers\Api\PusherAuthController@debug');
+// SECURITY: Debug endpoint removed - exposed sensitive configuration
 
 // WebAuthn Biometric Auth API (Primary endpoints - used by nexus-native.js)
 $router->add('POST', '/api/webauthn/register-challenge', 'Nexus\Controllers\Api\WebAuthnApiController@registerChallenge');
@@ -212,7 +212,7 @@ $router->add('POST', '/api/webauthn/register-verify', 'Nexus\Controllers\Api\Web
 $router->add('POST', '/api/webauthn/auth-challenge', 'Nexus\Controllers\Api\WebAuthnApiController@authChallenge');
 $router->add('POST', '/api/webauthn/auth-verify', 'Nexus\Controllers\Api\WebAuthnApiController@authVerify');
 $router->add('POST', '/api/webauthn/remove', 'Nexus\Controllers\Api\WebAuthnApiController@remove');
-$router->add('GET', '/api/webauthn/remove', 'Nexus\Controllers\Api\WebAuthnApiController@removeAll'); // Clear all credentials via GET
+$router->add('POST', '/api/webauthn/remove-all', 'Nexus\Controllers\Api\WebAuthnApiController@removeAll'); // SECURITY: Changed to POST only
 $router->add('GET', '/api/webauthn/credentials', 'Nexus\Controllers\Api\WebAuthnApiController@credentials');
 $router->add('GET', '/api/webauthn/status', 'Nexus\Controllers\Api\WebAuthnApiController@status'); // Status endpoint
 

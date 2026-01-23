@@ -44,6 +44,7 @@ class SocialApiController
     /**
      * Test endpoint to verify API is working
      * GET /api/social/test
+     * SECURITY: Restricted to admin users only
      */
     public function test()
     {
@@ -51,23 +52,25 @@ class SocialApiController
             session_start();
         }
 
+        // SECURITY: Require admin authentication for debug endpoints
+        if (empty($_SESSION['user_role']) || !in_array($_SESSION['user_role'], ['admin', 'super_admin'])) {
+            header('Content-Type: application/json');
+            http_response_code(403);
+            echo json_encode(['error' => 'Access denied. Admin authentication required.']);
+            exit;
+        }
+
         $debug = [
             'api_working' => true,
-            // Security: Session ID removed to prevent session hijacking
-            'user_id' => $_SESSION['user_id'] ?? null,
-            'tenant_id' => TenantContext::get()['id'] ?? null,
-            'content_type' => $_SERVER['CONTENT_TYPE'] ?? 'not set',
             'request_method' => $_SERVER['REQUEST_METHOD'],
-            'likes_table_exists' => false,
-            'likes_count' => 0
+            'likes_table_exists' => false
         ];
 
         try {
             $result = Database::query("SELECT COUNT(*) as cnt FROM likes")->fetch();
             $debug['likes_table_exists'] = true;
-            $debug['likes_count'] = $result['cnt'] ?? 0;
         } catch (\Exception $e) {
-            $debug['likes_error'] = $e->getMessage();
+            $debug['likes_error'] = 'Database error';
         }
 
         header('Content-Type: application/json');

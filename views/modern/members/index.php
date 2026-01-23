@@ -106,7 +106,6 @@ $basePath = Nexus\Core\TenantContext::getBasePath();
                     <h2 style="font-size: 1.25rem; font-weight: 700; color: var(--htb-text-main); margin: 0;">Find Members</h2>
                     <span id="members-count" style="font-size: 0.9rem; font-weight: 600; color: var(--htb-text-muted);">
                         Showing <?= count($members) ?> of <?= $total_members ?? count($members) ?> members
-                        <!-- DEBUG: TenantID=<?= \Nexus\Core\TenantContext::getId() ?> -->
                     </span>
                 </div>
 

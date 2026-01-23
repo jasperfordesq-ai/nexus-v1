@@ -134,17 +134,15 @@ class AiSettingsController
 
             // API Keys (CRITICAL: trim() prevents copy-paste whitespace that causes 401 errors)
             // Only save if provided and not placeholder
+            // SECURITY: Never log API keys or their lengths
             if (!empty($_POST['gemini_api_key']) && strpos($_POST['gemini_api_key'], '*') === false) {
                 $settingsToSave['gemini_api_key'] = trim($_POST['gemini_api_key']);
-                error_log("Saving Gemini API key (length after trim: " . strlen($settingsToSave['gemini_api_key']) . ")");
             }
             if (!empty($_POST['openai_api_key']) && strpos($_POST['openai_api_key'], '*') === false) {
                 $settingsToSave['openai_api_key'] = trim($_POST['openai_api_key']);
-                error_log("Saving OpenAI API key (length after trim: " . strlen($settingsToSave['openai_api_key']) . ")");
             }
             if (!empty($_POST['anthropic_api_key']) && strpos($_POST['anthropic_api_key'], '*') === false) {
                 $settingsToSave['anthropic_api_key'] = trim($_POST['anthropic_api_key']);
-                error_log("Saving Anthropic API key (length after trim: " . strlen($settingsToSave['anthropic_api_key']) . ")");
             }
 
             // Model selections (also trimmed for consistency)

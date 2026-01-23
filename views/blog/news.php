@@ -18,7 +18,6 @@ $pageTitle = 'Latest News';
 $hideHero = true; // Disable default hero
 require_once __DIR__ . '/../layouts/modern/header.php';
 ?>
-<!-- DEBUG MARKER: BLOG INDEX LOADED (Legacy Fallback) -->
 
 <div class="blog-section-wrapper">
 

@@ -82,8 +82,28 @@ class Event
         return Database::query($sql, [$groupId])->fetchAll();
     }
 
-    public static function find($id)
+    /**
+     * Find an event by ID with tenant scoping for security
+     * @param int $id Event ID
+     * @param int|null $tenantId Optional tenant ID for cross-tenant isolation
+     * @return array|false Event data or false if not found
+     */
+    public static function find($id, $tenantId = null)
     {
+        // SECURITY: If tenant context is available, enforce tenant isolation
+        if ($tenantId === null && class_exists('\Nexus\Core\TenantContext')) {
+            $tenantId = \Nexus\Core\TenantContext::getId();
+        }
+
+        if ($tenantId !== null) {
+            $sql = "SELECT e.*, u.name as organizer_name, u.avatar_url as organizer_avatar
+                    FROM events e
+                    JOIN users u ON e.user_id = u.id
+                    WHERE e.id = ? AND e.tenant_id = ?";
+            return Database::query($sql, [$id, $tenantId])->fetch();
+        }
+
+        // Fallback for contexts without tenant (e.g., super admin)
         $sql = "SELECT e.*, u.name as organizer_name, u.avatar_url as organizer_avatar
                 FROM events e
                 JOIN users u ON e.user_id = u.id
@@ -110,9 +130,37 @@ class Event
         return Database::query($sql, $params);
     }
 
-    public static function delete($id)
+    /**
+     * Delete an event with ownership verification
+     * @param int $id Event ID
+     * @param int|null $userId User ID of the person deleting (for ownership check)
+     * @param int|null $tenantId Tenant ID for cross-tenant isolation
+     * @return bool True if deleted, false if not authorized
+     */
+    public static function delete($id, $userId = null, $tenantId = null)
     {
-        return Database::query("DELETE FROM events WHERE id = ?", [$id]);
+        // SECURITY: Get tenant context if not provided
+        if ($tenantId === null && class_exists('\Nexus\Core\TenantContext')) {
+            $tenantId = \Nexus\Core\TenantContext::getId();
+        }
+
+        // Build secure delete query with ownership and tenant checks
+        $params = [$id];
+        $conditions = ['id = ?'];
+
+        if ($userId !== null) {
+            $conditions[] = 'user_id = ?';
+            $params[] = $userId;
+        }
+
+        if ($tenantId !== null) {
+            $conditions[] = 'tenant_id = ?';
+            $params[] = $tenantId;
+        }
+
+        $sql = "DELETE FROM events WHERE " . implode(' AND ', $conditions);
+        $stmt = Database::query($sql, $params);
+        return $stmt->rowCount() > 0;
     }
     public static function getAttending($userId)
     {

@@ -45,8 +45,10 @@ class AnthropicProvider extends BaseProvider
         // This prevents 401 errors from hidden characters
         $apiKey = trim($this->apiKey);
 
-        // DEBUG: Log sanitized key info to verify it's clean
-        error_log("Anthropic Request: Key Length: " . strlen($apiKey) . " | Preview: " . substr($apiKey, 0, 10) . "...");
+        // SECURITY: Only log key presence, never expose key content
+        if (empty($apiKey)) {
+            error_log("Anthropic Request: API key is empty or not configured");
+        }
 
         $model = $this->getModel($options);
 
@@ -125,8 +127,10 @@ class AnthropicProvider extends BaseProvider
         // This prevents 401 errors from hidden characters
         $apiKey = trim($this->apiKey);
 
-        // DEBUG: Log sanitized key info to verify it's clean
-        error_log("Anthropic Stream Request: Key Length: " . strlen($apiKey) . " | Preview: " . substr($apiKey, 0, 10) . "...");
+        // SECURITY: Only log key presence, never expose key content
+        if (empty($apiKey)) {
+            error_log("Anthropic Stream Request: API key is empty or not configured");
+        }
 
         $model = $this->getModel($options);
 
