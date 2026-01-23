@@ -455,7 +455,7 @@
     }
 
     .civicone-gdpr-consent input[type="checkbox"] {
-        margin-top: 4px;
+        margin-top: var(--space-1);
         transform: scale(1.2);
         cursor: pointer;
     }

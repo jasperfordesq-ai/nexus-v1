@@ -21,7 +21,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 8px;
+    gap: var(--space-2);
     transform: translateY(-100%);
     transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
@@ -30,13 +30,12 @@
 }
 
 /* Content Reveal Animation */
-@keyframes fadeInUp {
-    from { opacity: 0; transform: translateY(20px); }
+/* Animation removed for GOV.UK compliance */
     to { opacity: 1; transform: translateY(0); }
 }
 
 .htb-card {
-    animation: fadeInUp 0.4s ease-out;
+    /* animation removed for GOV.UK compliance */
 }
 
 /* Button Press States */
@@ -103,7 +102,7 @@ html {
     }
 
     table th, table td {
-        padding: 8px !important;
+        padding: var(--space-2) !important;
     }
 }
 
@@ -255,7 +254,7 @@ html {
 
 /* Card with top margin */
 .card-mt-30 {
-    margin-top: 30px;
+    margin-top: var(--space-8);
 }
 
 /* Muted text */

@@ -1,60 +1,62 @@
 <?php
 /**
- * CivicOne Help Center Search Results
- * Search results with query highlighting
+ * Help Center Search Results - GOV.UK Design System
+ * Template E: Content/Article (Search variant)
+ * WCAG 2.1 AA Compliant
+ *
+ * @version 2.0.0 - Full GOV.UK refactor
+ * @since 2026-01-23
  */
-$hTitle = "Search Help";
-$hSubtitle = "Find answers quickly";
-$hType = "Support";
-$hGradient = 'mt-hero-gradient-primary';
 
-require __DIR__ . '/../../layouts/civicone/header.php';
-$basePath = Nexus\Core\TenantContext::getBasePath();
+use Nexus\Core\TenantContext;
 
-// Module display names and icons
-$moduleConfig = [
-    'getting_started' => ['name' => 'Getting Started', 'icon' => 'fa-rocket', 'color' => '#10b981'],
-    'core' => ['name' => 'Platform Basics', 'icon' => 'fa-cube', 'color' => '#6366f1'],
-    'wallet' => ['name' => 'Wallet & Credits', 'icon' => 'fa-wallet', 'color' => '#f59e0b'],
-    'listings' => ['name' => 'Marketplace', 'icon' => 'fa-store', 'color' => '#ec4899'],
-    'groups' => ['name' => 'Community Hubs', 'icon' => 'fa-users', 'color' => '#8b5cf6'],
-    'events' => ['name' => 'Events', 'icon' => 'fa-calendar-days', 'color' => '#06b6d4'],
-    'volunteering' => ['name' => 'Volunteering', 'icon' => 'fa-hand-holding-heart', 'color' => '#f43f5e'],
-    'blog' => ['name' => 'News & Updates', 'icon' => 'fa-newspaper', 'color' => '#64748b'],
-    'polls' => ['name' => 'Polls & Voting', 'icon' => 'fa-square-poll-vertical', 'color' => '#14b8a6'],
-    'goals' => ['name' => 'Goals & Buddies', 'icon' => 'fa-bullseye', 'color' => '#f97316'],
-    'governance' => ['name' => 'Governance', 'icon' => 'fa-landmark', 'color' => '#7c3aed'],
-    'gamification' => ['name' => 'Badges & Rewards', 'icon' => 'fa-trophy', 'color' => '#eab308'],
-    'ai_assistant' => ['name' => 'AI Assistant', 'icon' => 'fa-sparkles', 'color' => '#a855f7'],
-    'sustainability' => ['name' => 'Impact & SDGs', 'icon' => 'fa-leaf', 'color' => '#22c55e'],
-    'offline' => ['name' => 'Offline Mode', 'icon' => 'fa-wifi-slash', 'color' => '#94a3b8'],
-    'mobile' => ['name' => 'Mobile App', 'icon' => 'fa-mobile-screen', 'color' => '#3b82f6'],
-    'insights' => ['name' => 'Your Stats', 'icon' => 'fa-chart-line', 'color' => '#06b6d4'],
-    'security' => ['name' => 'Privacy & Security', 'icon' => 'fa-shield-halved', 'color' => '#ef4444'],
-    'resources' => ['name' => 'Resource Library', 'icon' => 'fa-book-open', 'color' => '#84cc16'],
-    'reviews' => ['name' => 'Reviews & Ratings', 'icon' => 'fa-star', 'color' => '#fbbf24'],
+$basePath = TenantContext::getBasePath();
+$pageTitle = !empty($query) ? 'Search results for "' . htmlspecialchars($query) . '"' : 'Search Help Centre';
+
+require dirname(__DIR__, 2) . '/layouts/civicone/header.php';
+
+// Module display names (GOV.UK compliant - no icons)
+$moduleNames = [
+    'getting_started' => 'Getting Started',
+    'core' => 'Platform Basics',
+    'wallet' => 'Wallet and Credits',
+    'listings' => 'Marketplace',
+    'groups' => 'Community Hubs',
+    'events' => 'Events',
+    'volunteering' => 'Volunteering',
+    'blog' => 'News and Updates',
+    'polls' => 'Polls and Voting',
+    'goals' => 'Goals and Buddies',
+    'governance' => 'Governance',
+    'gamification' => 'Badges and Rewards',
+    'ai_assistant' => 'AI Assistant',
+    'sustainability' => 'Impact and SDGs',
+    'offline' => 'Offline Mode',
+    'mobile' => 'Mobile App',
+    'insights' => 'Your Stats',
+    'security' => 'Privacy and Security',
+    'resources' => 'Resource Library',
+    'reviews' => 'Reviews and Ratings',
 ];
 
-// Helper function to create excerpt with highlighted search terms
-function highlightExcerpt($content, $query, $maxLength = 200) {
-    // Strip HTML tags
+/**
+ * Create excerpt with highlighted search terms
+ */
+function highlightExcerpt(string $content, string $query, int $maxLength = 200): string
+{
     $text = strip_tags($content);
-
-    // Find position of query
     $pos = stripos($text, $query);
+
     if ($pos !== false) {
-        // Get surrounding context
         $start = max(0, $pos - 50);
         $excerpt = substr($text, $start, $maxLength);
         if ($start > 0) $excerpt = '...' . $excerpt;
         if (strlen($text) > $start + $maxLength) $excerpt .= '...';
     } else {
-        // Just get beginning
         $excerpt = substr($text, 0, $maxLength);
         if (strlen($text) > $maxLength) $excerpt .= '...';
     }
 
-    // Highlight query terms
     if (!empty($query)) {
         $excerpt = preg_replace('/(' . preg_quote($query, '/') . ')/i', '<mark>$1</mark>', $excerpt);
     }
@@ -63,86 +65,132 @@ function highlightExcerpt($content, $query, $maxLength = 200) {
 }
 ?>
 
-<div class="help-search-page">
-    <div class="help-search-container">
+<div class="govuk-width-container">
 
-        <!-- Back Link -->
-        <a href="<?= $basePath ?>/help" class="help-back-link">
-            <i class="fa-solid fa-arrow-left"></i>
-            Back to Help Center
-        </a>
+    <!-- Breadcrumbs -->
+    <nav class="govuk-breadcrumbs" aria-label="Breadcrumb">
+        <ol class="govuk-breadcrumbs__list">
+            <li class="govuk-breadcrumbs__list-item">
+                <a class="govuk-breadcrumbs__link" href="<?= $basePath ?>">Home</a>
+            </li>
+            <li class="govuk-breadcrumbs__list-item">
+                <a class="govuk-breadcrumbs__link" href="<?= $basePath ?>/help">Help Centre</a>
+            </li>
+            <li class="govuk-breadcrumbs__list-item" aria-current="page">
+                Search
+            </li>
+        </ol>
+    </nav>
 
-        <!-- Search Header -->
-        <div class="help-search-header">
-            <?php if (!empty($query)): ?>
-                <h1>Results for <span class="help-search-query">"<?= htmlspecialchars($query) ?>"</span></h1>
-                <p class="help-search-count"><?= count($results) ?> article<?= count($results) !== 1 ? 's' : '' ?> found</p>
-            <?php else: ?>
-                <h1>Search Help Center</h1>
-                <p class="help-search-count">Enter a search term to find articles</p>
-            <?php endif; ?>
+    <main class="govuk-main-wrapper" id="main-content" role="main">
 
-            <!-- Search Form -->
-            <div class="help-search-form-wrapper">
-                <form action="<?= $basePath ?>/help/search" method="GET" class="help-search-form">
-                    <label for="help-search-input" class="visually-hidden">Search help articles</label>
-                    <div class="help-search-input-wrapper">
-                        <i class="fa-solid fa-magnifying-glass help-search-icon" aria-hidden="true"></i>
-                        <input
-                            type="text"
-                            name="q"
-                            id="help-search-input"
-                            class="help-search-input"
-                            placeholder="Search for help..."
-                            value="<?= htmlspecialchars($query ?? '') ?>"
-                            autocomplete="off"
-                            autofocus
-                        >
+        <div class="govuk-grid-row">
+            <div class="govuk-grid-column-two-thirds">
+
+                <?php if (!empty($query)): ?>
+                    <h1 class="govuk-heading-xl">
+                        Search results for "<?= htmlspecialchars($query) ?>"
+                    </h1>
+                    <p class="govuk-body-l">
+                        <?= count($results) ?> article<?= count($results) !== 1 ? 's' : '' ?> found
+                    </p>
+                <?php else: ?>
+                    <h1 class="govuk-heading-xl">Search Help Centre</h1>
+                    <p class="govuk-body-l">
+                        Enter a search term to find articles
+                    </p>
+                <?php endif; ?>
+
+                <!-- Search Form -->
+                <form action="<?= $basePath ?>/help/search" method="GET" class="govuk-!-margin-bottom-6">
+                    <div class="govuk-form-group">
+                        <label class="govuk-label govuk-label--m" for="search-query">
+                            Search help articles
+                        </label>
+                        <div id="search-hint" class="govuk-hint">
+                            Enter keywords to search our help documentation
+                        </div>
+                        <input class="govuk-input govuk-!-width-two-thirds"
+                               id="search-query"
+                               name="q"
+                               type="search"
+                               value="<?= htmlspecialchars($query ?? '') ?>"
+                               aria-describedby="search-hint"
+                               autofocus>
                     </div>
-                    <button type="submit" class="help-search-btn">Search</button>
+                    <button type="submit" class="govuk-button" data-module="govuk-button">
+                        Search
+                    </button>
                 </form>
+
+                <?php if (!empty($query)): ?>
+                    <?php if (empty($results)): ?>
+                        <!-- No Results -->
+                        <div class="govuk-inset-text">
+                            <h2 class="govuk-heading-m">No articles found</h2>
+                            <p class="govuk-body">
+                                We could not find any articles matching your search.
+                            </p>
+                            <p class="govuk-body">
+                                Try different keywords or <a href="<?= $basePath ?>/help" class="govuk-link">browse all articles</a>.
+                            </p>
+                        </div>
+                    <?php else: ?>
+                        <!-- Results List -->
+                        <hr class="govuk-section-break govuk-section-break--l govuk-section-break--visible">
+
+                        <ul class="govuk-list" role="list" aria-label="Search results">
+                            <?php foreach ($results as $article):
+                                $moduleName = $moduleNames[$article['module_tag']] ?? ucfirst(str_replace('_', ' ', $article['module_tag']));
+                                $excerpt = highlightExcerpt($article['content'], $query);
+                            ?>
+                            <li class="govuk-!-margin-bottom-6">
+                                <h2 class="govuk-heading-m govuk-!-margin-bottom-2">
+                                    <a href="<?= $basePath ?>/help/<?= htmlspecialchars($article['slug']) ?>" class="govuk-link">
+                                        <?= htmlspecialchars($article['title']) ?>
+                                    </a>
+                                </h2>
+                                <p class="govuk-body-s govuk-!-margin-bottom-2 civicone-text-secondary">
+                                    <?= htmlspecialchars($moduleName) ?>
+                                </p>
+                                <p class="govuk-body">
+                                    <?= $excerpt ?>
+                                </p>
+                                <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible">
+                            </li>
+                            <?php endforeach; ?>
+                        </ul>
+                    <?php endif; ?>
+                <?php endif; ?>
+
+            </div>
+
+            <!-- Sidebar -->
+            <div class="govuk-grid-column-one-third">
+                <aside class="govuk-!-margin-top-6" role="complementary">
+
+                    <h2 class="govuk-heading-s">Browse by category</h2>
+                    <p class="govuk-body">
+                        <a href="<?= $basePath ?>/help" class="govuk-link">View all help categories</a>
+                    </p>
+
+                    <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible">
+
+                    <h2 class="govuk-heading-s">Still need help?</h2>
+                    <ul class="govuk-list">
+                        <li>
+                            <a href="<?= $basePath ?>/faq" class="govuk-link">Frequently asked questions</a>
+                        </li>
+                        <li>
+                            <a href="<?= $basePath ?>/contact" class="govuk-link">Contact us</a>
+                        </li>
+                    </ul>
+
+                </aside>
             </div>
         </div>
 
-        <?php if (!empty($query)): ?>
-            <?php if (empty($results)): ?>
-                <!-- No Results -->
-                <div class="no-results" role="status">
-                    <div class="no-results-icon">
-                        <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
-                    </div>
-                    <h2>No articles found</h2>
-                    <p>Try different keywords or browse our help categories</p>
-                    <a href="<?= $basePath ?>/help" class="no-results-link">
-                        <i class="fa-solid fa-folder-open" aria-hidden="true"></i>
-                        Browse All Articles
-                    </a>
-                </div>
-            <?php else: ?>
-                <!-- Results List -->
-                <div class="search-results" role="list" aria-label="Search results">
-                    <?php foreach ($results as $article):
-                        $config = $moduleConfig[$article['module_tag']] ?? ['name' => ucfirst($article['module_tag']), 'icon' => 'fa-file-lines', 'color' => '#6366f1'];
-                        $excerpt = highlightExcerpt($article['content'], $query);
-                    ?>
-                    <a href="<?= $basePath ?>/help/<?= htmlspecialchars($article['slug']) ?>" class="search-result-card" role="listitem">
-                        <div class="search-result-header">
-                            <div class="search-result-icon" style="background: <?= $config['color'] ?>;">
-                                <i class="fa-solid <?= $config['icon'] ?>" aria-hidden="true"></i>
-                            </div>
-                            <div>
-                                <h2 class="search-result-title"><?= htmlspecialchars($article['title']) ?></h2>
-                                <span class="search-result-category"><?= $config['name'] ?></span>
-                            </div>
-                        </div>
-                        <p class="search-result-excerpt"><?= $excerpt ?></p>
-                    </a>
-                    <?php endforeach; ?>
-                </div>
-            <?php endif; ?>
-        <?php endif; ?>
-
-    </div>
+    </main>
 </div>
 
-<?php require __DIR__ . '/../../layouts/civicone/footer.php'; ?>
+<?php require dirname(__DIR__, 2) . '/layouts/civicone/footer.php'; ?>

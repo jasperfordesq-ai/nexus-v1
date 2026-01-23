@@ -58,14 +58,14 @@
 
 .auth-alert-success {
     background: #f0fdf4;
-    color: #15803d;
+    color: var(--color-govuk-green-dark);
     font-weight: 600;
     border-color: #bbf7d0;
 }
 
 .auth-alert-error {
     background: #fef2f2;
-    color: #b91c1c;
+    color: var(--color-govuk-red);
     border-color: #fecaca;
 }
 
@@ -150,7 +150,7 @@
 .biometric-promo-badge {
     background: rgba(99, 102, 241, 0.1);
     color: var(--color-primary-500);
-    padding: 4px 8px;
+    padding: var(--space-1) 8px;
     border-radius: var(--radius-lg);
     font-size: 0.7rem;
     font-weight: 700;
@@ -172,7 +172,7 @@
 .auth-label {
     display: block;
     font-weight: 600;
-    margin-bottom: 8px;
+    margin-bottom: var(--space-2);
     color: var(--color-slate-700);
 }
 
@@ -184,7 +184,7 @@
 .auth-label-row {
     display: flex;
     justify-content: space-between;
-    margin-bottom: 8px;
+    margin-bottom: var(--space-2);
 }
 
 .auth-input {
@@ -250,7 +250,7 @@
 }
 
 .auth-submit-btn:hover {
-    background-color: var(--color-govuk-green-dark, #005a30);
+    background-color: var(--color-govuk-green-dark, var(--color-govuk-green-dark));
 }
 
 .auth-submit-btn:focus {
@@ -380,7 +380,7 @@
 /* Links */
 [data-theme="dark"] .auth-link,
 [data-theme="dark"] .auth-link-primary {
-    color: #818cf8;
+    color: var(--color-govuk-blue-lighter);
 }
 
 /* Footer text */

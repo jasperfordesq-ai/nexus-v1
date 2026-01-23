@@ -1,132 +1,163 @@
 <?php
 /**
  * Onboarding Overlay - Locked Full-Screen Experience
+ * GOV.UK Design System - Standalone Page
+ * WCAG 2.1 AA Compliant
  *
  * Features:
  * - Desktop: Full-screen modal (cannot close)
  * - Mobile: Full-screen overlay (100vw x 100vh)
- * - Based on /create-group and /compose designs
- * - Dark mode by default
+ * - Based on GOV.UK Start Page pattern
  * - NO close button - must complete to proceed
  * - Safe-area-inset support for notched devices
- * - Locks user out until completion
+ *
+ * @version 2.0.0 - Full GOV.UK refactor
+ * @since 2026-01-23
  */
 
-$basePath = \Nexus\Core\TenantContext::getBasePath();
-$tenantId = \Nexus\Core\TenantContext::getId();
+use Nexus\Core\TenantContext;
+use Nexus\Core\Csrf;
+
+$basePath = TenantContext::getBasePath();
+$tenantId = TenantContext::getId();
 $userId = $_SESSION['user_id'] ?? null;
 $userName = $_SESSION['user_name'] ?? 'User';
 
-$pageTitle = 'Complete Your Profile';
+$pageTitle = 'Complete your profile';
 ?>
 <!DOCTYPE html>
-<html lang="en" data-theme="dark">
+<html lang="en" class="govuk-template">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
-    <meta name="theme-color" content="#1e293b">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title><?= htmlspecialchars($pageTitle) ?></title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="theme-color" content="#0b0c0c">
+    <title><?= htmlspecialchars($pageTitle) ?> - Project NEXUS</title>
 
-    <!-- Fonts & Icons -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <!-- GOV.UK Frontend CSS -->
+    <link rel="stylesheet" href="/assets/css/civicone/govuk-frontend-5.14.0.min.css">
+    <link rel="stylesheet" href="/assets/css/civicone/civicone-base.css">
 
     <!-- Onboarding CSS (extracted per CLAUDE.md) -->
-    <link rel="stylesheet" href="/assets/css/civicone-onboarding-index.css?v=<?= time() ?>">
-
-    <style>
-    /* Critical inline styles for standalone page - rest extracted to civicone-onboarding-index.css */
-    html, body {
-        width: 100%;
-        height: 100%;
-        overflow: hidden;
-        font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-        background: var(--ob-bg);
-        color: var(--ob-text);
-        -webkit-font-smoothing: antialiased;
-        -moz-osx-font-smoothing: grayscale;
-    }
-    </style>
+    <link rel="stylesheet" href="/assets/css/civicone-onboarding-index.css?v=<?= filemtime($_SERVER['DOCUMENT_ROOT'] . '/assets/css/civicone-onboarding-index.css') ?>">
 </head>
-<body>
+<body class="govuk-template__body civicone-onboarding-body">
+    <script>document.body.className += ' js-enabled';</script>
 
-<!-- LOCKED Backdrop (no escape) -->
-<div class="onboarding-backdrop">
-    <!-- Main Overlay -->
-    <div class="onboarding-overlay">
+    <!-- Skip Link -->
+    <a href="#main-content" class="govuk-skip-link" data-module="govuk-skip-link">Skip to main content</a>
 
-        <!-- Header -->
-        <div class="onboarding-header">
-            <div class="onboarding-header-content">
-                <div class="onboarding-icon">
-                    <i class="fa-solid fa-user-astronaut"></i>
-                </div>
-                <h1 class="onboarding-title">Welcome to the Community!</h1>
-                <p class="onboarding-subtitle">Let's complete your profile so you can start connecting with your neighbors.</p>
+    <!-- Locked Backdrop -->
+    <div class="civicone-onboarding-backdrop">
+
+        <!-- Main Panel -->
+        <div class="civicone-onboarding-panel" role="dialog" aria-modal="true" aria-labelledby="onboarding-title">
+
+            <!-- Header -->
+            <div class="civicone-onboarding-header">
+                <span class="govuk-caption-l">Welcome to the community</span>
+                <h1 class="govuk-heading-xl" id="onboarding-title">Complete your profile</h1>
+                <p class="govuk-body-l">
+                    Let's set up your profile so you can start connecting with your neighbours.
+                </p>
             </div>
-        </div>
 
-        <!-- Content Area -->
-        <div class="onboarding-content">
-            <form action="<?= $basePath ?>/onboarding/store" method="POST" enctype="multipart/form-data" class="onboarding-form" id="onboardingForm">
-                <?= Nexus\Core\Csrf::input() ?>
+            <!-- Content -->
+            <main class="civicone-onboarding-content" id="main-content" role="main">
 
-                <!-- Profile Picture -->
-                <div class="ob-field">
-                    <label class="ob-label">Profile Picture <span class="ob-required">*</span></label>
-                    <div class="ob-avatar-upload">
-                        <div class="ob-avatar-preview" id="avatarPreview">
-                            <?php if (!empty($user['avatar_url'])): ?>
-                                <img src="<?= htmlspecialchars($user['avatar_url']) ?>" loading="lazy" alt="Avatar" id="avatarImg">
-                            <?php else: ?>
-                                <i class="fa-solid fa-user"></i>
-                            <?php endif; ?>
-                        </div>
-                        <div class="ob-avatar-info">
-                            <div class="ob-avatar-title">Upload your photo</div>
-                            <div class="ob-avatar-desc">Choose a clear photo that represents you. JPG, PNG or GIF (max 8MB)</div>
-                            <label class="ob-upload-btn">
-                                <i class="fa-solid fa-camera"></i>
-                                Choose Photo
-                                <input type="file" name="avatar" id="avatarInput" accept="image/*" onchange="previewAvatar(this)">
-                            </label>
-                        </div>
+                <form action="<?= $basePath ?>/onboarding/store" method="POST" enctype="multipart/form-data" class="civicone-onboarding-form" id="onboardingForm" novalidate>
+                    <?= Csrf::input() ?>
+
+                    <!-- Profile Picture -->
+                    <div class="govuk-form-group">
+                        <fieldset class="govuk-fieldset">
+                            <legend class="govuk-fieldset__legend govuk-fieldset__legend--m">
+                                <h2 class="govuk-fieldset__heading">
+                                    Profile picture
+                                </h2>
+                            </legend>
+                            <div id="avatar-hint" class="govuk-hint">
+                                Choose a clear photo that represents you. JPG, PNG or GIF (max 8MB).
+                            </div>
+
+                            <div class="civicone-avatar-upload">
+                                <div class="civicone-avatar-preview" id="avatarPreview">
+                                    <?php if (!empty($user['avatar_url'])): ?>
+                                        <img src="<?= htmlspecialchars($user['avatar_url']) ?>" loading="lazy" alt="Current avatar" id="avatarImg">
+                                    <?php else: ?>
+                                        <span class="civicone-avatar-placeholder" aria-hidden="true">
+                                            <svg width="40" height="40" viewBox="0 0 24 24" fill="currentColor">
+                                                <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+                                            </svg>
+                                        </span>
+                                    <?php endif; ?>
+                                </div>
+                                <div class="civicone-avatar-actions">
+                                    <label class="govuk-button govuk-button--secondary" for="avatarInput">
+                                        Choose photo
+                                    </label>
+                                    <input type="file"
+                                           name="avatar"
+                                           id="avatarInput"
+                                           class="govuk-file-upload civicone-file-hidden"
+                                           accept="image/*"
+                                           aria-describedby="avatar-hint">
+                                </div>
+                            </div>
+                        </fieldset>
                     </div>
-                </div>
 
-                <!-- Bio -->
-                <div class="ob-field">
-                    <label class="ob-label" for="bio">Bio <span class="ob-required">*</span></label>
-                    <textarea id="bio"
-                              name="bio"
-                              class="ob-textarea"
-                              placeholder="Tell us a little about yourself... What are your interests? What brings you to the community?"
-                              required><?= htmlspecialchars($user['bio'] ?? '') ?></textarea>
-                    <div class="ob-hint">This helps your neighbors get to know you and find common interests.</div>
-                </div>
+                    <!-- Bio -->
+                    <div class="govuk-form-group">
+                        <label class="govuk-label govuk-label--m" for="bio">
+                            About you
+                        </label>
+                        <div id="bio-hint" class="govuk-hint">
+                            Tell us a little about yourself. What are your interests? What brings you to the community?
+                            This helps your neighbours get to know you and find common interests.
+                        </div>
+                        <textarea class="govuk-textarea"
+                                  id="bio"
+                                  name="bio"
+                                  rows="5"
+                                  aria-describedby="bio-hint"
+                                  required><?= htmlspecialchars($user['bio'] ?? '') ?></textarea>
+                    </div>
 
-                <!-- Submit -->
-                <button type="submit" class="ob-submit" id="submitBtn">
-                    Complete Setup
-                    <i class="fa-solid fa-arrow-right"></i>
-                </button>
+                    <!-- Submit -->
+                    <div class="govuk-button-group">
+                        <button type="submit" class="govuk-button" data-module="govuk-button" id="submitBtn">
+                            Complete setup
+                        </button>
+                    </div>
 
-                <div class="text-center mt-3 ob-hint-text">
-                    <i class="fa-solid fa-lock mr-6"></i>
-                    You must complete this step to access the platform
-                </div>
-            </form>
+                    <div class="govuk-inset-text">
+                        You must complete this step to access the platform. Your information helps build trust
+                        in our community.
+                    </div>
+                </form>
+
+            </main>
+
         </div>
 
     </div>
-</div>
 
-<!-- Onboarding Flow JavaScript -->
-<script src="<?= NexusCoreTenantContext::getBasePath() ?>/assets/js/civicone-onboarding-index.min.js" defer></script>
+    <!-- Onboarding JavaScript -->
+    <script src="/assets/js/civicone-onboarding-index.min.js" defer></script>
+    <script>
+        // Preview avatar image
+        document.getElementById('avatarInput').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    const preview = document.getElementById('avatarPreview');
+                    preview.innerHTML = '<img src="' + event.target.result + '" alt="Avatar preview" id="avatarImg">';
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+    </script>
 
 </body>
 </html>

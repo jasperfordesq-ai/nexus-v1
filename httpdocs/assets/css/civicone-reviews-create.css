@@ -45,8 +45,8 @@
 
 .review-glass-card {
     background: rgba(255, 255, 255, 0.95);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
+    /* backdrop-filter removed for GOV.UK compliance */
+    -webkit-/* backdrop-filter removed for GOV.UK compliance */
     border: 1px solid rgba(255, 255, 255, 0.8);
     box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15);
     border-radius: var(--radius-2xl);
@@ -74,7 +74,7 @@
 }
 
 .review-header .subtitle {
-    margin-top: 8px;
+    margin-top: var(--space-2);
     font-size: 1rem;
     opacity: 0.95;
     font-weight: 500;
@@ -147,7 +147,7 @@
     font-size: 0.85rem;
     color: var(--color-slate-600);
     display: block;
-    margin-bottom: 8px;
+    margin-bottom: var(--space-2);
 }
 
 [data-theme="dark"] .comment-label {
@@ -186,7 +186,7 @@
 .submit-btn {
     background: linear-gradient(135deg, var(--color-primary-700) 0%, #c026d3 100%);
     color: white;
-    padding: 16px;
+    padding: var(--space-4);
     border-radius: 14px;
     font-weight: 700;
     border: none;

@@ -13,7 +13,7 @@
     display: flex;
     align-items: center;
     gap: var(--space-3);
-    margin-bottom: 16px;
+    margin-bottom: var(--space-4);
 }
 
 /* Post Avatar */
@@ -48,8 +48,8 @@
 .post-meta-row {
     display: flex;
     align-items: center;
-    gap: 8px;
-    margin-top: 4px;
+    gap: var(--space-2);
+    margin-top: var(--space-1);
 }
 
 .post-time {
@@ -68,7 +68,7 @@
 
 /* Post Delete Button */
 .post-delete-btn {
-    padding: 8px;
+    padding: var(--space-2);
     background: transparent;
     border: none;
     color: var(--htb-text-muted);
@@ -84,7 +84,7 @@
 
 /* Post Content */
 .post-content {
-    margin-bottom: 16px;
+    margin-bottom: var(--space-4);
     line-height: 1.6;
     color: var(--htb-text-main);
     word-wrap: break-word;
@@ -92,7 +92,7 @@
 
 /* Post Image */
 .post-image {
-    margin: 16px 0;
+    margin: var(--space-4) 0;
 }
 
 .post-image img {
@@ -106,8 +106,8 @@
 .post-actions {
     display: flex;
     align-items: center;
-    gap: 16px;
-    padding-top: 16px;
+    gap: var(--space-4);
+    padding-top: var(--space-4);
     border-top: 1px solid var(--htb-border-color);
 }
 
@@ -116,7 +116,7 @@
     display: flex;
     align-items: center;
     gap: var(--space-1-5);
-    padding: 8px var(--space-3);
+    padding: var(--space-2) var(--space-3);
     background: transparent;
     border: none;
     border-radius: var(--radius-md);
@@ -141,8 +141,8 @@
 /* Comments Section */
 .post-comments {
     display: none;
-    margin-top: 16px;
-    padding-top: 16px;
+    margin-top: var(--space-4);
+    padding-top: var(--space-4);
     border-top: 1px solid var(--htb-border-color);
 }
 
@@ -152,7 +152,7 @@
 
 @media (max-width: 600px) {
     .post-card {
-        padding: 16px;
+        padding: var(--space-4);
     }
 
     .post-action-btn span:not(.like-count) {

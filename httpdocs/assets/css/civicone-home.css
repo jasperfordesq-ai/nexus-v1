@@ -14,13 +14,13 @@
    ========================================================================== */
 
 :root {
-    --govuk-colour-light-grey: #f3f2f1;
-    --govuk-colour-dark-grey: #505a5f;
-    --govuk-colour-mid-grey: #b1b4b6;
-    --govuk-colour-black: #0b0c0c;
-    --govuk-colour-white: #ffffff;
-    --govuk-colour-blue: #1d70b8;
-    --govuk-colour-focus: #ffdd00;
+    --govuk-colour-light-grey: var(--color-govuk-light-grey);
+    --govuk-colour-dark-grey: var(--color-govuk-grey-dark);
+    --govuk-colour-mid-grey: var(--color-govuk-grey);
+    --govuk-colour-black: var(--color-govuk-black);
+    --govuk-colour-white: var(--color-white);
+    --govuk-colour-blue: var(--color-govuk-blue-light);
+    --govuk-colour-focus: var(--color-govuk-yellow);
     --govuk-spacing-4: 15px;
     --govuk-spacing-5: 20px;
     --govuk-spacing-6: 25px;
@@ -31,7 +31,7 @@
    ========================================================================== */
 
 .civicone-page-header {
-    margin-bottom: 30px;
+    margin-bottom: var(--space-8);
 }
 
 /* ==========================================================================
@@ -47,7 +47,7 @@
 }
 
 .civicone-stats-box .govuk-heading-s {
-    margin-bottom: 10px;
+    margin-bottom: var(--space-3);
 }
 
 .civicone-stats-list {
@@ -59,7 +59,7 @@
 .civicone-stat-row {
     display: flex;
     justify-content: space-between;
-    padding: 5px 0;
+    padding: var(--space-1) 0;
     border-bottom: 1px solid var(--govuk-colour-mid-grey);
 }
 
@@ -99,7 +99,7 @@
     color: var(--govuk-colour-dark-grey);
     font-size: 16px;
     line-height: 1.25;
-    margin-top: 5px;
+    margin-top: var(--space-1);
 }
 
 /* Responsive table wrapper */
@@ -131,7 +131,7 @@
 .civicone-event-location {
     color: var(--govuk-colour-dark-grey);
     font-size: 16px;
-    margin-top: 5px;
+    margin-top: var(--space-1);
 }
 
 /* ==========================================================================
@@ -143,7 +143,7 @@
 }
 
 .civicone-group-item {
-    margin-bottom: 15px;
+    margin-bottom: var(--space-4);
 }
 
 .civicone-group-item:last-child {
@@ -153,7 +153,7 @@
 .civicone-group-members {
     color: var(--govuk-colour-dark-grey);
     font-size: 16px;
-    margin-top: 2px;
+    margin-top: var(--space-1);
 }
 
 /* ==========================================================================
@@ -165,8 +165,8 @@
 }
 
 .civicone-action-item {
-    margin-bottom: 20px;
-    padding-bottom: 20px;
+    margin-bottom: var(--space-5);
+    padding-bottom: var(--space-5);
     border-bottom: 1px solid var(--govuk-colour-mid-grey);
 }
 
@@ -199,7 +199,7 @@
 }
 
 .civicone-help-list li {
-    margin-bottom: 10px;
+    margin-bottom: var(--space-3);
 }
 
 .civicone-help-list li:last-child {
@@ -211,7 +211,7 @@
    ========================================================================== */
 
 .civicone-back-to-top {
-    margin-top: 30px;
+    margin-top: var(--space-8);
     padding-top: 25px;
     border-top: 1px solid var(--govuk-colour-mid-grey);
 }
@@ -219,7 +219,7 @@
 .civicone-back-to-top a {
     display: inline-flex;
     align-items: center;
-    gap: 8px;
+    gap: var(--space-2);
 }
 
 .civicone-back-to-top-icon {
@@ -248,7 +248,7 @@
 @media print {
     .civicone-stats-box {
         background-color: transparent !important;
-        border: 1px solid #000 !important;
+        border: 1px solid var(--color-govuk-black) !important;
         border-left-width: 5px !important;
     }
 
@@ -257,14 +257,14 @@
     }
 
     .govuk-notification-banner {
-        border: 2px solid #000 !important;
+        border: 2px solid var(--color-govuk-black) !important;
         background: transparent !important;
     }
 
     .govuk-tag {
-        border: 1px solid #000 !important;
+        border: 1px solid var(--color-govuk-black) !important;
         background: transparent !important;
-        color: #000 !important;
+        color: var(--color-govuk-black) !important;
     }
 
     a[href]::after {
@@ -290,7 +290,7 @@
 /* Mobile (up to 640px) */
 @media (max-width: 640px) {
     .civicone-stats-box {
-        margin-top: 30px;
+        margin-top: var(--space-8);
     }
 
     .civicone-action-link {
@@ -314,7 +314,7 @@
     .govuk-table__responsive-wrapper td {
         display: block;
         text-align: left;
-        padding: 10px 0;
+        padding: var(--space-3) 0;
         border-bottom: none;
     }
 
@@ -322,7 +322,7 @@
         content: attr(data-label);
         display: block;
         font-weight: 700;
-        margin-bottom: 5px;
+        margin-bottom: var(--space-1);
     }
 
     .govuk-table__responsive-wrapper td[data-label="Type"]::before {
@@ -331,7 +331,7 @@
 
     .govuk-table__responsive-wrapper tr {
         border-bottom: 1px solid var(--govuk-colour-mid-grey);
-        padding: 15px 0;
+        padding: var(--space-4) 0;
     }
 
     .govuk-table__responsive-wrapper tr:last-child {
@@ -342,7 +342,7 @@
 /* Tablet (641px to 768px) */
 @media (min-width: 641px) and (max-width: 768px) {
     .civicone-stats-box {
-        margin-top: 20px;
+        margin-top: var(--space-5);
     }
 }
 
@@ -351,12 +351,12 @@
    ========================================================================== */
 
 [data-theme="dark"] .civicone-stats-box {
-    background-color: var(--color-gray-800, #1f2937);
-    border-left-color: var(--color-primary-500, #6366f1);
+    background-color: var(--color-gray-800, var(--color-govuk-black));
+    border-left-color: var(--color-primary-500, var(--color-govuk-blue-light));
 }
 
 [data-theme="dark"] .civicone-stat-row {
-    border-bottom-color: var(--color-gray-600, #4b5563);
+    border-bottom-color: var(--color-gray-600, var(--color-govuk-grey-dark));
 }
 
 [data-theme="dark"] .civicone-meta-text,
@@ -364,15 +364,15 @@
 [data-theme="dark"] .civicone-event-time,
 [data-theme="dark"] .civicone-event-location,
 [data-theme="dark"] .civicone-group-members {
-    color: var(--color-gray-400, #9ca3af);
+    color: var(--color-gray-400, var(--color-govuk-grey-dark));
 }
 
 [data-theme="dark"] .civicone-action-item {
-    border-bottom-color: var(--color-gray-600, #4b5563);
+    border-bottom-color: var(--color-gray-600, var(--color-govuk-grey-dark));
 }
 
 [data-theme="dark"] .civicone-back-to-top {
-    border-top-color: var(--color-gray-600, #4b5563);
+    border-top-color: var(--color-gray-600, var(--color-govuk-grey-dark));
 }
 
 /* ==========================================================================

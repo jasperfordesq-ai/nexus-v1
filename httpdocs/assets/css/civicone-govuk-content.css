@@ -21,7 +21,7 @@
 .civicone-details {
     font-size: 1.1875rem; /* 19px */
     line-height: 1.3158;
-    color: var(--color-govuk-black, #0b0c0c);
+    color: var(--color-govuk-black, var(--color-govuk-black));
     margin-bottom: var(--civicone-space-7, 40px);
     display: block;
 }
@@ -70,19 +70,19 @@
         position: relative;
         width: fit-content;
         padding-left: calc(var(--civicone-space-5, 20px) + 5px);
-        color: var(--color-govuk-blue, #1d70b8);
+        color: var(--color-govuk-blue, var(--color-govuk-blue-light));
         cursor: pointer;
     }
 
     .civicone-details__summary:hover {
-        color: var(--color-govuk-blue-dark, #003078);
+        color: var(--color-govuk-blue-dark, var(--color-govuk-blue));
     }
 
     .civicone-details__summary:focus {
         outline: 3px solid transparent;
-        color: var(--color-govuk-black, #0b0c0c);
-        background-color: var(--civicone-focus, #ffdd00);
-        box-shadow: 0 -2px var(--civicone-focus, #ffdd00), 0 4px var(--color-govuk-black, #0b0c0c);
+        color: var(--color-govuk-black, var(--color-govuk-black));
+        background-color: var(--civicone-focus, var(--color-govuk-yellow));
+        box-shadow: 0 -2px var(--civicone-focus, var(--color-govuk-yellow)), 0 4px var(--color-govuk-black, var(--color-govuk-black));
     }
 
     .civicone-details__summary-text {
@@ -117,24 +117,24 @@
         height: 0;
         border-style: solid;
         border-width: 7px 0 7px 8.66px; /* Equilateral triangle pointing right */
-        border-color: transparent transparent transparent var(--color-govuk-black, #0b0c0c);
+        border-color: transparent transparent transparent var(--color-govuk-black, var(--color-govuk-black));
     }
 
     .civicone-details[open] > .civicone-details__summary::before {
         /* Down-pointing arrow (open state) */
         border-width: 8.66px 7px 0 7px;
-        border-color: var(--color-govuk-black, #0b0c0c) transparent transparent transparent;
+        border-color: var(--color-govuk-black, var(--color-govuk-black)) transparent transparent transparent;
     }
 
     .civicone-details__text {
-        border-left: 5px solid var(--color-govuk-grey, #b1b4b6);
+        border-left: 5px solid var(--color-govuk-grey, var(--color-govuk-grey));
     }
 }
 
 /* Fallback for old browsers without <details> support */
 @media screen\0 {
     .civicone-details {
-        border-left: 10px solid var(--color-govuk-grey, #b1b4b6);
+        border-left: 10px solid var(--color-govuk-grey, var(--color-govuk-grey));
     }
 
     .civicone-details__summary {
@@ -156,7 +156,7 @@
 .civicone-summary-list {
     font-size: 1.1875rem; /* 19px */
     line-height: 1.3158;
-    color: var(--color-govuk-black, #0b0c0c);
+    color: var(--color-govuk-black, var(--color-govuk-black));
     margin: 0;
     margin-bottom: var(--civicone-space-7, 40px);
 }
@@ -172,7 +172,7 @@
 }
 
 .civicone-summary-list__row {
-    border-bottom: 1px solid var(--color-govuk-grey, #b1b4b6);
+    border-bottom: 1px solid var(--color-govuk-grey, var(--color-govuk-grey));
 }
 
 @media (max-width: 640px) {
@@ -277,7 +277,7 @@
     .civicone-summary-list__actions-list-item {
         margin-right: var(--civicone-space-3, 10px);
         padding-right: var(--civicone-space-3, 10px);
-        border-right: 1px solid var(--color-govuk-grey, #b1b4b6);
+        border-right: 1px solid var(--color-govuk-grey, var(--color-govuk-grey));
     }
 
     .civicone-summary-list__actions-list-item:last-child {
@@ -295,7 +295,7 @@
     }
 
     .civicone-summary-list__actions-list-item:not(:first-child) {
-        border-left: 1px solid var(--color-govuk-grey, #b1b4b6);
+        border-left: 1px solid var(--color-govuk-grey, var(--color-govuk-grey));
     }
 
     .civicone-summary-list__actions-list-item:first-child {
@@ -327,7 +327,7 @@
 
 .civicone-summary-card {
     margin-bottom: var(--civicone-space-7, 40px);
-    border: 1px solid var(--color-govuk-grey, #b1b4b6);
+    border: 1px solid var(--color-govuk-grey, var(--color-govuk-grey));
 }
 
 @media (min-width: 641px) {
@@ -339,7 +339,7 @@
 .civicone-summary-card__title-wrapper {
     padding: var(--civicone-space-4, 15px);
     border-bottom: 1px solid transparent;
-    background-color: #f3f2f1;
+    background-color: var(--color-govuk-light-grey);
 }
 
 @media (min-width: 641px) {
@@ -409,11 +409,11 @@
 @media (prefers-color-scheme: dark) {
     html[data-theme="dark"] .civicone-details,
     html[data-theme="dark"] .civicone-summary-list {
-        color: var(--color-gray-100, #f3f4f6);
+        color: var(--color-gray-100, var(--color-govuk-light-grey));
     }
 
     html[data-theme="dark"] .civicone-details__summary {
-        color: var(--color-govuk-blue-light, #5694ca);
+        color: var(--color-govuk-blue-light, var(--color-govuk-blue-lighter));
     }
 
     html[data-theme="dark"] .civicone-details__summary:hover {
@@ -422,7 +422,7 @@
 
     html[data-theme="dark"] .civicone-details__summary::before,
     html[data-theme="dark"] .civicone-details[open] > .civicone-details__summary::before {
-        border-color: var(--color-gray-100, #f3f4f6);
+        border-color: var(--color-gray-100, var(--color-govuk-light-grey));
     }
 
     html[data-theme="dark"] .civicone-details__text {
@@ -450,7 +450,7 @@
 .civicone-table {
     font-size: 1.1875rem; /* 19px */
     line-height: 1.3158;
-    color: var(--color-govuk-black, #0b0c0c);
+    color: var(--color-govuk-black, var(--color-govuk-black));
     width: 100%;
     margin-bottom: var(--civicone-space-6, 30px);
     border-spacing: 0;
@@ -483,7 +483,7 @@
 .civicone-table__header,
 .civicone-table__cell {
     padding: var(--civicone-space-2, 10px) var(--civicone-space-4, 15px) var(--civicone-space-2, 10px) 0;
-    border-bottom: 1px solid var(--color-govuk-grey, #b1b4b6);
+    border-bottom: 1px solid var(--color-govuk-grey, var(--color-govuk-grey));
     text-align: left;
     vertical-align: top;
 }
@@ -557,12 +557,12 @@
 /* Dark mode support */
 @media (prefers-color-scheme: dark) {
     html[data-theme="dark"] .civicone-table {
-        color: var(--color-white, #ffffff);
+        color: var(--color-white, var(--color-white));
     }
 
     html[data-theme="dark"] .civicone-table__header,
     html[data-theme="dark"] .civicone-table__cell {
-        border-bottom-color: var(--color-gray-600, #6b7280);
+        border-bottom-color: var(--color-gray-600, var(--color-govuk-grey-dark));
     }
 }
 

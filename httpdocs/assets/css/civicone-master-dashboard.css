@@ -78,7 +78,7 @@
         border-color: rgba(255, 255, 255, 0.1) !important;
     }
 
-    [data-theme="dark"] table tr[style*="background: #fff"] {
+    [data-theme="dark"] table tr[style*="background: var(--color-white)"] {
         background: rgba(30, 41, 59, 0.4) !important;
     }
 
@@ -111,7 +111,7 @@
     }
 
     /* Card body text */
-    [data-theme="dark"] .nexus-card-body p[style*="color: #4b5563"] {
+    [data-theme="dark"] .nexus-card-body p[style*="color: var(--color-govuk-grey-dark)"] {
         color: var(--color-slate-400) !important;
     }
 
@@ -148,7 +148,7 @@
         color: var(--color-slate-100) !important;
     }
 
-    [data-theme="dark"] span[style*="background:#fff"][style*="border:1px solid var(--color-slate-200)"] {
+    [data-theme="dark"] span[style*="background:var(--color-white)"][style*="border:1px solid var(--color-slate-200)"] {
         background: rgba(30, 41, 59, 0.6) !important;
         border-color: rgba(255, 255, 255, 0.15) !important;
         color: var(--color-slate-400) !important;

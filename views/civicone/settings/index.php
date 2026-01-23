@@ -80,7 +80,7 @@ $basePath = Nexus\Core\TenantContext::getBasePath();
                 <dt class="govuk-summary-list__key">Profile picture</dt>
                 <dd class="govuk-summary-list__value">
                     <?php if (!empty($user['avatar'])): ?>
-                        <img src="<?= htmlspecialchars($user['avatar']) ?>" alt="Profile picture" style="width: 60px; height: 60px; border-radius: 50%; object-fit: cover;">
+                        <img src="<?= htmlspecialchars($user['avatar']) ?>" alt="Profile picture" class="civicone-summary-avatar">
                     <?php else: ?>
                         <span class="govuk-hint">Using default picture</span>
                     <?php endif; ?>

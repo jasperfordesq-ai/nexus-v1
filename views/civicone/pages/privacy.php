@@ -19,7 +19,7 @@ if (class_exists('Nexus\Core\TenantContext')) {
 ?>
 
 <!-- Privacy Policy CSS -->
-<link rel="stylesheet" href="<?= NexusCoreTenantContext::getBasePath() ?>/assets/css/purged/civicone-pages-privacy.min.css">
+<link rel="stylesheet" href="<?= \Nexus\Core\TenantContext::getBasePath() ?>/assets/css/purged/civicone-pages-privacy.min.css">
 
 <div id="privacy-glass-wrapper">
     <div class="privacy-inner">
@@ -225,6 +225,6 @@ if (class_exists('Nexus\Core\TenantContext')) {
 </div>
 
 <!-- Privacy Policy JavaScript -->
-<script src="<?= NexusCoreTenantContext::getBasePath() ?>/assets/js/civicone-pages-privacy.min.js" defer></script>
+<script src="<?= \Nexus\Core\TenantContext::getBasePath() ?>/assets/js/civicone-pages-privacy.min.js" defer></script>
 
 <?php require __DIR__ . '/../../layouts/civicone/footer.php'; ?>

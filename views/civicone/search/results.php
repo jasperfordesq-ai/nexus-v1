@@ -13,7 +13,7 @@ $totalResults = count($results ?? []);
 
 <!-- GOV.UK Page Template Boilerplate (Section 10.0) -->
 <div class="civicone-width-container">
-    <main class="civicone-main-wrapper" id="main-content">
+    <div class="civicone-main-wrapper" role="main" aria-label="Search results">
 
         <!-- Breadcrumbs (GOV.UK Template A requirement) -->
         <nav class="civicone-breadcrumbs" aria-label="Breadcrumb">
@@ -425,7 +425,7 @@ $totalResults = count($results ?? []);
             </div><!-- /two-thirds -->
         </div><!-- /grid-row -->
 
-    </main>
+    </div><!-- /civicone-main-wrapper -->
 </div><!-- /civicone-width-container -->
 
 <script src="/assets/js/civicone-search-results.js?v=<?= time() ?>"></script>

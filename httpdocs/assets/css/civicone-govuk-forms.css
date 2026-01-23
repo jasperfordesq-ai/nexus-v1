@@ -372,7 +372,7 @@
 [data-layout="civicone"] .govuk-checkboxes__label,
 .civicone .govuk-checkboxes__label {
     display: inline-block;
-    padding-left: 56px;
+    padding-left: var(--space-16);
     padding-top: var(--space-2);
     padding-bottom: var(--space-2);
     font-size: var(--font-size-base);
@@ -468,7 +468,7 @@
 [data-layout="civicone"] .govuk-radios__label,
 .civicone .govuk-radios__label {
     display: inline-block;
-    padding-left: 56px;
+    padding-left: var(--space-16);
     padding-top: var(--space-2);
     padding-bottom: var(--space-2);
     font-size: var(--font-size-base);

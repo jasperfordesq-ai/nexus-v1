@@ -46,7 +46,7 @@
 
 .master-users-card-header {
     padding: var(--space-5) 25px;
-    border-bottom: 1px solid var(--color-gray-200, #e2e8f0);
+    border-bottom: 1px solid var(--color-gray-200, var(--color-govuk-grey));
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -70,8 +70,8 @@
 }
 
 .master-users-table thead {
-    background: var(--color-gray-50, #f8fafc);
-    border-bottom: 1px solid var(--color-gray-200, #e2e8f0);
+    background: var(--color-gray-50, var(--color-govuk-light-grey));
+    border-bottom: 1px solid var(--color-gray-200, var(--color-govuk-grey));
 }
 
 .master-users-table th {
@@ -79,7 +79,7 @@
     text-align: left;
     font-size: 0.8rem;
     text-transform: uppercase;
-    color: var(--color-gray-500, #64748b);
+    color: var(--color-gray-500, var(--color-govuk-grey-dark));
 }
 
 .master-users-table th.text-right {
@@ -87,7 +87,7 @@
 }
 
 .master-users-table tbody tr {
-    border-bottom: 1px solid var(--color-gray-200, #e2e8f0);
+    border-bottom: 1px solid var(--color-gray-200, var(--color-govuk-grey));
 }
 
 .master-users-table td {
@@ -103,21 +103,21 @@
    ======================================== */
 
 .master-users-id {
-    color: var(--color-gray-500, #64748b);
+    color: var(--color-gray-500, var(--color-govuk-grey-dark));
 }
 
 .master-users-name {
     font-weight: 600;
-    color: var(--color-gray-900, #1e293b);
+    color: var(--color-gray-900, var(--color-govuk-black));
 }
 
 .master-users-email {
     font-size: 0.85rem;
-    color: var(--color-gray-500, #64748b);
+    color: var(--color-gray-500, var(--color-govuk-grey-dark));
 }
 
 .master-users-date {
-    color: var(--color-gray-500, #64748b);
+    color: var(--color-gray-500, var(--color-govuk-grey-dark));
     font-size: 0.9rem;
 }
 
@@ -126,8 +126,8 @@
    ======================================== */
 
 .master-users-badge-platform {
-    background: var(--color-gray-100, #f1f5f9);
-    color: var(--color-gray-600, #475569);
+    background: var(--color-gray-100, var(--color-govuk-light-grey));
+    color: var(--color-gray-600, var(--color-govuk-grey-dark));
     padding: var(--space-0-5) var(--space-1-5);
     border-radius: var(--radius-sm);
     font-size: 0.8rem;
@@ -143,7 +143,7 @@
 
 .master-users-tenant-slug {
     font-size: 0.75rem;
-    color: var(--color-gray-400, #94a3b8);
+    color: var(--color-gray-400, var(--color-govuk-grey-dark));
     margin-top: var(--space-0-5);
 }
 
@@ -153,7 +153,7 @@
 
 .master-users-role {
     text-transform: capitalize;
-    color: var(--color-gray-600, #475569);
+    color: var(--color-gray-600, var(--color-govuk-grey-dark));
     font-weight: 500;
 }
 
@@ -188,17 +188,17 @@
 }
 
 .master-users-btn-approve {
-    padding: 4px var(--space-2-5);
+    padding: var(--space-1) var(--space-2-5);
     font-size: 0.75rem;
     margin-right: var(--space-1);
-    background: var(--color-green-500, #22c55e);
-    border-color: var(--color-green-600, #16a34a);
+    background: var(--color-green-500, var(--color-govuk-green));
+    border-color: var(--color-green-600, var(--color-govuk-green));
 }
 
 .master-users-btn-delete {
-    padding: 4px var(--space-2-5);
+    padding: var(--space-1) var(--space-2-5);
     font-size: 0.75rem;
-    background: var(--color-red-500, #ef4444);
+    background: var(--color-red-500, var(--color-govuk-red));
     color: white;
     border: none;
     border-radius: var(--radius-sm);
@@ -206,7 +206,7 @@
 }
 
 .master-users-btn-delete:hover {
-    background: var(--color-red-600, #dc2626);
+    background: var(--color-red-600, var(--color-govuk-red));
 }
 
 /* ========================================

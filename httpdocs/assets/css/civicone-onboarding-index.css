@@ -84,10 +84,10 @@
     z-index: 100;
     background: var(--ob-surface);
     border-bottom: 1px solid var(--ob-border);
-    padding: 16px var(--space-6);
+    padding: var(--space-4) var(--space-6);
     padding-top: calc(16px + var(--ob-safe-top));
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
+    /* backdrop-filter removed for GOV.UK compliance */
+    -webkit-/* backdrop-filter removed for GOV.UK compliance */
 }
 
 .onboarding-header-content {
@@ -106,7 +106,7 @@
     justify-content: center;
     color: white;
     font-size: 36px;
-    margin-bottom: 16px;
+    margin-bottom: var(--space-4);
     box-shadow: 0 8px 24px rgba(99, 102, 241, 0.4);
 }
 
@@ -114,7 +114,7 @@
     font-size: 28px;
     font-weight: 800;
     color: var(--ob-text);
-    margin-bottom: 8px;
+    margin-bottom: var(--space-2);
 }
 
 .onboarding-subtitle {
@@ -160,7 +160,7 @@
 .ob-input,
 .ob-textarea {
     width: 100%;
-    padding: 16px;
+    padding: var(--space-4);
     border: 2px solid var(--ob-border);
     border-radius: var(--radius-lg);
     background: rgba(30, 41, 59, 0.6);
@@ -186,7 +186,7 @@
 .ob-hint {
     font-size: 13px;
     color: var(--ob-text-muted);
-    margin-top: 8px;
+    margin-top: var(--space-2);
     line-height: 1.4;
 }
 
@@ -235,7 +235,7 @@
 .ob-avatar-title {
     font-weight: 600;
     color: var(--ob-text);
-    margin-bottom: 4px;
+    margin-bottom: var(--space-1);
 }
 
 .ob-avatar-desc {
@@ -247,7 +247,7 @@
 .ob-upload-btn {
     display: inline-flex;
     align-items: center;
-    gap: 8px;
+    gap: var(--space-2);
     padding: var(--space-2-5) 16px;
     background: var(--ob-primary-light);
     color: var(--ob-primary);
@@ -294,7 +294,7 @@
 }
 
 .ob-submit:disabled {
-    background: #4b5563;
+    background: var(--color-govuk-grey-dark);
     box-shadow: none;
     cursor: not-allowed;
 }
@@ -302,7 +302,7 @@
 /* Required indicator */
 .ob-required {
     color: var(--ob-pink);
-    margin-left: 4px;
+    margin-left: var(--space-1);
 }
 
 .ob-hint-text {
@@ -335,7 +335,7 @@
 
     .onboarding-header {
         border-radius: var(--radius-2xl) var(--radius-2xl) 0 0;
-        padding-top: 16px;
+        padding-top: var(--space-4);
     }
 
     .onboarding-title {
@@ -384,11 +384,7 @@
 /* ============================================
    ANIMATIONS
    ============================================ */
-@keyframes onboarding-fadeIn {
-    from {
-        opacity: 0;
-        transform: scale(0.95);
-    }
+/* Animation removed for GOV.UK compliance */
     to {
         opacity: 1;
         transform: scale(1);
@@ -396,7 +392,7 @@
 }
 
 .onboarding-overlay {
-    animation: onboarding-fadeIn 0.4s ease-out;
+    /* animation removed for GOV.UK compliance */
 }
 
 /* ============================================
@@ -415,7 +411,7 @@
    ============================================ */
 @media (prefers-reduced-motion: reduce) {
     .onboarding-overlay {
-        animation: none;
+        /* animation removed for GOV.UK compliance */
     }
 
     .ob-submit,

@@ -27,7 +27,7 @@
     filter: blur(60px);
     opacity: 0.5;
     pointer-events: none;
-    animation: floatOrb 20s ease-in-out infinite;
+    /* animation removed for GOV.UK compliance */
 }
 
 .holo-orb-1 {
@@ -69,8 +69,7 @@
     background: radial-gradient(circle, rgba(192, 132, 252, 0.2) 0%, transparent 70%);
 }
 
-@keyframes floatOrb {
-    0%, 100% { transform: translate(0, 0) scale(1); }
+/* Animation removed for GOV.UK compliance */
     33% { transform: translate(30px, -30px) scale(1.05); }
     66% { transform: translate(-20px, 20px) scale(0.95); }
 }
@@ -81,8 +80,8 @@
     max-width: 800px;
     margin: 0 auto;
     background: rgba(255, 255, 255, 0.7);
-    backdrop-filter: blur(40px) saturate(180%);
-    -webkit-backdrop-filter: blur(40px) saturate(180%);
+    /* backdrop-filter removed for GOV.UK compliance */ saturate(180%);
+    -webkit-/* backdrop-filter removed for GOV.UK compliance */ saturate(180%);
     border-radius: 28px;
     border: 1px solid rgba(255, 255, 255, 0.5);
     padding: var(--space-12);
@@ -114,12 +113,11 @@
         rgba(255, 255, 255, 0.1),
         transparent
     );
-    animation: shimmer 8s ease-in-out infinite;
+    /* animation removed for GOV.UK compliance */
     pointer-events: none;
 }
 
-@keyframes shimmer {
-    0%, 100% { left: -100%; }
+/* Animation removed for GOV.UK compliance */
     50% { left: 100%; }
 }
 
@@ -187,7 +185,7 @@
 }
 
 [data-theme="dark"] .holo-title {
-    background: linear-gradient(135deg, #c4b5fd 0%, #a78bfa 50%, #ffffff 100%);
+    background: linear-gradient(135deg, #c4b5fd 0%, #a78bfa 50%, var(--color-white) 100%);
     -webkit-background-clip: text;
     background-clip: text;
 }
@@ -195,7 +193,7 @@
 .holo-btn-print {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: var(--space-2);
     padding: var(--space-3) var(--space-5);
     border-radius: 50px;
     background: rgba(139, 92, 246, 0.1);
@@ -229,7 +227,7 @@
 /* Content */
 .holo-intro {
     font-size: 1.1rem;
-    color: #4b5563;
+    color: var(--color-govuk-grey-dark);
     line-height: 1.7;
     margin-bottom: var(--space-8);
 }
@@ -271,7 +269,7 @@
 }
 
 .holo-cert-title i {
-    color: #22c55e;
+    color: var(--color-govuk-green);
     font-size: 1.2rem;
 }
 
@@ -288,8 +286,8 @@
 .holo-cert-item {
     display: flex;
     align-items: flex-start;
-    gap: 16px;
-    padding: 16px 0;
+    gap: var(--space-4);
+    padding: var(--space-4) 0;
     border-bottom: 1px solid rgba(139, 92, 246, 0.1);
 }
 
@@ -347,7 +345,7 @@
 .holo-legal-footer {
     text-align: center;
     padding-top: var(--space-7);
-    margin-top: 8px;
+    margin-top: var(--space-2);
     border-top: 1px solid rgba(139, 92, 246, 0.15);
 }
 
@@ -379,13 +377,13 @@
     .holo-header {
         flex-direction: column;
         align-items: flex-start;
-        gap: 16px;
+        gap: var(--space-4);
     }
 
     .holo-header-content {
         flex-direction: column;
         align-items: flex-start;
-        gap: 16px;
+        gap: var(--space-4);
     }
 
     .holo-title {

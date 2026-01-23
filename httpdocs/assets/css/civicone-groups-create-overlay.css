@@ -46,7 +46,7 @@ body {
     right: 0;
     bottom: 0;
     background: var(--overlay-bg);
-    backdrop-filter: blur(8px);
+    /* backdrop-filter removed for GOV.UK compliance */
     z-index: 9998;
     display: flex;
     align-items: center;
@@ -112,8 +112,8 @@ body {
 /* Type Pills Navigation */
 .type-pills-nav {
     display: flex;
-    gap: 8px;
-    padding: 16px var(--space-6);
+    gap: var(--space-2);
+    padding: var(--space-4) var(--space-6);
     border-bottom: 1px solid var(--border-color);
     overflow-x: auto;
     flex-shrink: 0;
@@ -141,7 +141,7 @@ body {
 .type-pill {
     display: inline-flex;
     align-items: center;
-    gap: 8px;
+    gap: var(--space-2);
     padding: var(--space-2-5) var(--space-4-5);
     border-radius: var(--radius-lg);
     background: var(--bg-primary);
@@ -186,13 +186,13 @@ body {
     font-size: 0.875rem;
     font-weight: 600;
     color: var(--text-primary);
-    margin-bottom: 8px;
+    margin-bottom: var(--space-2);
 }
 
 .form-label.required::after {
     content: '*';
     color: var(--color-danger);
-    margin-left: 4px;
+    margin-left: var(--space-1);
 }
 
 .form-input,
@@ -232,7 +232,7 @@ body {
 .image-upload-area {
     border: 2px dashed var(--border-color);
     border-radius: var(--radius-lg);
-    padding: 30px;
+    padding: var(--space-8);
     text-align: center;
     cursor: pointer;
     transition: all 0.2s;
@@ -285,7 +285,7 @@ body {
 
 /* Footer Actions */
 .create-footer {
-    padding: 16px var(--space-6);
+    padding: var(--space-4) var(--space-6);
     border-top: 1px solid var(--border-color);
     display: flex;
     gap: var(--space-3);
@@ -303,7 +303,7 @@ body {
     border: none;
     display: inline-flex;
     align-items: center;
-    gap: 8px;
+    gap: var(--space-2);
 }
 
 .btn-cancel {
@@ -355,7 +355,7 @@ body {
 }
 
 .alert-inline-margin {
-    margin: 16px var(--space-6) 0;
+    margin: var(--space-4) var(--space-6) 0;
 }
 
 /* Visually hidden file input */
@@ -364,14 +364,14 @@ body {
 }
 
 .alert-inline-margin {
-    margin: 16px var(--space-6) 0;
+    margin: var(--space-4) var(--space-6) 0;
 }
 
 /* Admin Badge */
 .admin-badge {
     display: inline-flex;
     align-items: center;
-    gap: 4px;
+    gap: var(--space-1);
     padding: var(--space-0-5) 8px;
     background: rgba(245, 158, 11, 0.1);
     color: var(--color-warning);

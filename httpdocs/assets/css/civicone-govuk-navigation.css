@@ -54,7 +54,7 @@
 .civicone-pagination__item:hover,
 .civicone-pagination__next:hover,
 .civicone-pagination__prev:hover {
-    background-color: #f3f2f1;
+    background-color: var(--color-govuk-light-grey);
 }
 
 .civicone-pagination__item {
@@ -79,28 +79,28 @@
 .civicone-pagination__item--current {
     font-weight: 700;
     outline: 1px solid transparent;
-    background-color: var(--color-govuk-blue, #1d70b8);
+    background-color: var(--color-govuk-blue, var(--color-govuk-blue-light));
 }
 
 .civicone-pagination__item--current:hover {
-    background-color: var(--color-govuk-blue, #1d70b8);
+    background-color: var(--color-govuk-blue, var(--color-govuk-blue-light));
 }
 
 .civicone-pagination__item--current .civicone-pagination__link {
-    color: var(--color-white, #ffffff);
+    color: var(--color-white, var(--color-white));
 }
 
 .civicone-pagination__item--current .civicone-pagination__link:hover {
-    color: var(--color-white, #ffffff);
+    color: var(--color-white, var(--color-white));
 }
 
 .civicone-pagination__item--current .civicone-pagination__link:focus {
-    color: var(--color-govuk-black, #0b0c0c);
+    color: var(--color-govuk-black, var(--color-govuk-black));
 }
 
 .civicone-pagination__item--ellipsis {
     font-weight: 700;
-    color: #505a5f;
+    color: var(--color-govuk-grey-dark);
 }
 
 .civicone-pagination__item--ellipsis:hover {
@@ -133,7 +133,7 @@
     text-decoration: underline;
     text-decoration-thickness: max(1px, 0.0625rem);
     text-underline-offset: 0.1em;
-    color: var(--color-govuk-blue, #1d70b8);
+    color: var(--color-govuk-blue, var(--color-govuk-blue-light));
 }
 
 /* Increase touch target */
@@ -149,20 +149,20 @@
 }
 
 .civicone-pagination__link:hover {
-    color: var(--color-govuk-blue-dark, #003078);
+    color: var(--color-govuk-blue-dark, var(--color-govuk-blue));
     text-decoration-thickness: max(3px, 0.1875rem, 0.12em);
 }
 
 .civicone-pagination__link:focus {
     outline: 3px solid transparent;
-    color: var(--color-govuk-black, #0b0c0c);
-    background-color: var(--civicone-focus, #ffdd00);
-    box-shadow: 0 -2px var(--civicone-focus, #ffdd00), 0 4px var(--color-govuk-black, #0b0c0c);
+    color: var(--color-govuk-black, var(--color-govuk-black));
+    background-color: var(--civicone-focus, var(--color-govuk-yellow));
+    box-shadow: 0 -2px var(--civicone-focus, var(--color-govuk-yellow)), 0 4px var(--color-govuk-black, var(--color-govuk-black));
     text-decoration: none;
 }
 
 .civicone-pagination__link:focus .civicone-pagination__icon {
-    color: var(--color-govuk-black, #0b0c0c);
+    color: var(--color-govuk-black, var(--color-govuk-black));
 }
 
 .civicone-pagination__link-title {
@@ -180,7 +180,7 @@
 .civicone-pagination__icon {
     width: 0.9375rem; /* 15px */
     height: 0.8125rem; /* 13px */
-    color: #505a5f;
+    color: var(--color-govuk-grey-dark);
     fill: currentcolor;
     forced-color-adjust: auto;
 }
@@ -214,7 +214,7 @@
 }
 
 .civicone-pagination--block .civicone-pagination__prev + .civicone-pagination__next {
-    border-top: 1px solid var(--color-govuk-grey, #b1b4b6);
+    border-top: 1px solid var(--color-govuk-grey, var(--color-govuk-grey));
 }
 
 .civicone-pagination--block .civicone-pagination__link {
@@ -240,7 +240,7 @@
 .civicone-breadcrumbs {
     font-size: 1rem; /* 16px */
     line-height: 1.25;
-    color: var(--color-govuk-black, #0b0c0c);
+    color: var(--color-govuk-black, var(--color-govuk-black));
     margin-top: var(--civicone-space-4, 15px);
     margin-bottom: var(--civicone-space-3, 10px);
 }
@@ -280,7 +280,7 @@
     transform: rotate(45deg);
     border: solid;
     border-width: 1px 1px 0 0;
-    border-color: #505a5f;
+    border-color: var(--color-govuk-grey-dark);
 }
 
 .civicone-breadcrumbs__list-item:first-child {
@@ -298,7 +298,7 @@
     text-decoration: underline;
     text-decoration-thickness: max(1px, 0.0625rem);
     text-underline-offset: 0.1em;
-    color: var(--color-govuk-black, #0b0c0c);
+    color: var(--color-govuk-black, var(--color-govuk-black));
 }
 
 .civicone-breadcrumbs__link:hover {
@@ -307,9 +307,9 @@
 
 .civicone-breadcrumbs__link:focus {
     outline: 3px solid transparent;
-    color: var(--color-govuk-black, #0b0c0c);
-    background-color: var(--civicone-focus, #ffdd00);
-    box-shadow: 0 -2px var(--civicone-focus, #ffdd00), 0 4px var(--color-govuk-black, #0b0c0c);
+    color: var(--color-govuk-black, var(--color-govuk-black));
+    background-color: var(--civicone-focus, var(--color-govuk-yellow));
+    box-shadow: 0 -2px var(--civicone-focus, var(--color-govuk-yellow)), 0 4px var(--color-govuk-black, var(--color-govuk-black));
     text-decoration: none;
 }
 
@@ -338,19 +338,19 @@
 
 /* Inverse variant (white on dark) */
 .civicone-breadcrumbs--inverse {
-    color: var(--color-white, #ffffff);
+    color: var(--color-white, var(--color-white));
 }
 
 .civicone-breadcrumbs--inverse .civicone-breadcrumbs__link {
-    color: var(--color-white, #ffffff);
+    color: var(--color-white, var(--color-white));
 }
 
 .civicone-breadcrumbs--inverse .civicone-breadcrumbs__link:hover {
-    color: var(--color-white, #ffffff);
+    color: var(--color-white, var(--color-white));
 }
 
 .civicone-breadcrumbs--inverse .civicone-breadcrumbs__link:focus {
-    color: var(--color-govuk-black, #0b0c0c);
+    color: var(--color-govuk-black, var(--color-govuk-black));
 }
 
 .civicone-breadcrumbs--inverse .civicone-breadcrumbs__list-item::before {
@@ -369,7 +369,7 @@
     text-decoration: underline;
     text-decoration-thickness: max(1px, 0.0625rem);
     text-underline-offset: 0.1em;
-    color: var(--color-govuk-black, #0b0c0c);
+    color: var(--color-govuk-black, var(--color-govuk-black));
     display: inline-block;
     position: relative;
     margin-top: var(--civicone-space-4, 15px);
@@ -391,7 +391,7 @@
     transform: rotate(225deg); /* Points left */
     border: solid;
     border-width: 1px 1px 0 0;
-    border-color: #505a5f;
+    border-color: var(--color-govuk-grey-dark);
 }
 
 .civicone-back-link:hover {
@@ -400,14 +400,14 @@
 
 .civicone-back-link:focus {
     outline: 3px solid transparent;
-    color: var(--color-govuk-black, #0b0c0c);
-    background-color: var(--civicone-focus, #ffdd00);
-    box-shadow: 0 -2px var(--civicone-focus, #ffdd00), 0 4px var(--color-govuk-black, #0b0c0c);
+    color: var(--color-govuk-black, var(--color-govuk-black));
+    background-color: var(--civicone-focus, var(--color-govuk-yellow));
+    box-shadow: 0 -2px var(--civicone-focus, var(--color-govuk-yellow)), 0 4px var(--color-govuk-black, var(--color-govuk-black));
     text-decoration: none;
 }
 
 .civicone-back-link:focus::before {
-    border-color: var(--color-govuk-black, #0b0c0c);
+    border-color: var(--color-govuk-black, var(--color-govuk-black));
 }
 
 /* Increase touch target */
@@ -422,15 +422,15 @@
 
 /* Inverse variant (white on dark) */
 .civicone-back-link--inverse {
-    color: var(--color-white, #ffffff);
+    color: var(--color-white, var(--color-white));
 }
 
 .civicone-back-link--inverse:hover {
-    color: var(--color-white, #ffffff);
+    color: var(--color-white, var(--color-white));
 }
 
 .civicone-back-link--inverse:focus {
-    color: var(--color-govuk-black, #0b0c0c);
+    color: var(--color-govuk-black, var(--color-govuk-black));
 }
 
 .civicone-back-link--inverse::before {
@@ -445,18 +445,18 @@
     html[data-theme="dark"] .civicone-pagination__link,
     html[data-theme="dark"] .civicone-breadcrumbs__link,
     html[data-theme="dark"] .civicone-back-link {
-        color: var(--color-govuk-blue-light, #5694ca);
+        color: var(--color-govuk-blue-light, var(--color-govuk-blue-lighter));
     }
 
     html[data-theme="dark"] .civicone-pagination__item:hover,
     html[data-theme="dark"] .civicone-pagination__next:hover,
     html[data-theme="dark"] .civicone-pagination__prev:hover {
-        background-color: var(--color-gray-700, #374151);
+        background-color: var(--color-gray-700, var(--color-govuk-black));
     }
 
     html[data-theme="dark"] .civicone-breadcrumbs,
     html[data-theme="dark"] .civicone-back-link {
-        color: var(--color-gray-100, #f3f4f6);
+        color: var(--color-gray-100, var(--color-govuk-light-grey));
     }
 
     html[data-theme="dark"] .civicone-pagination__icon,

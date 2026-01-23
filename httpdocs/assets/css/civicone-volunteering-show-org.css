@@ -23,7 +23,7 @@
         radial-gradient(ellipse at 25% 30%, rgba(20, 184, 166, 0.12) 0%, transparent 50%),
         radial-gradient(ellipse at 75% 25%, rgba(79, 70, 229, 0.1) 0%, transparent 45%),
         radial-gradient(ellipse at 50% 80%, rgba(16, 185, 129, 0.08) 0%, transparent 50%);
-    animation: orgProfileFloat 20s ease-in-out infinite;
+    /* animation removed for GOV.UK compliance */
 }
 
 [data-theme="dark"] .org-profile-bg {
@@ -36,8 +36,7 @@
         radial-gradient(ellipse at 75% 25%, rgba(79, 70, 229, 0.15) 0%, transparent 45%);
 }
 
-@keyframes orgProfileFloat {
-    0%, 100% { transform: translate(0, 0) scale(1); }
+/* Animation removed for GOV.UK compliance */
     50% { transform: translate(-1%, 1%) scale(1.02); }
 }
 
@@ -83,8 +82,8 @@
     background: linear-gradient(135deg,
         rgba(255, 255, 255, 0.95) 0%,
         rgba(255, 255, 255, 0.85) 100%);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
+    /* backdrop-filter removed for GOV.UK compliance */
+    -webkit-/* backdrop-filter removed for GOV.UK compliance */
     border: 1px solid rgba(255, 255, 255, 0.6);
     border-radius: var(--radius-2xl);
     padding: var(--space-6);
@@ -138,7 +137,7 @@
 .org-profile-info {
     flex: 1;
     min-width: 0;
-    padding-top: 8px;
+    padding-top: var(--space-2);
 }
 
 .org-profile-name {
@@ -157,7 +156,7 @@
     display: inline-flex;
     align-items: center;
     gap: var(--space-1-5);
-    padding: 4px var(--space-3);
+    padding: var(--space-1) var(--space-3);
     border-radius: var(--radius-2xl);
     font-size: 0.75rem;
     font-weight: 600;
@@ -184,14 +183,14 @@
 .org-profile-meta {
     display: flex;
     flex-wrap: wrap;
-    gap: 16px;
-    margin-bottom: 16px;
+    gap: var(--space-4);
+    margin-bottom: var(--space-4);
 }
 
 .org-profile-meta-item {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: var(--space-2);
     font-size: 0.9rem;
     color: var(--color-gray-500);
     text-decoration: none;
@@ -213,7 +212,7 @@
 }
 
 .org-profile-description {
-    color: #4b5563;
+    color: var(--color-govuk-grey-dark);
     line-height: 1.7;
     margin: 0;
     font-size: 0.95rem;
@@ -241,7 +240,7 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    gap: 8px;
+    gap: var(--space-2);
     padding: var(--space-3) var(--space-5);
     border-radius: var(--radius-lg);
     font-weight: 600;
@@ -300,7 +299,7 @@
 .org-stats-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-    gap: 16px;
+    gap: var(--space-4);
     margin-bottom: var(--space-8);
     padding: 0 var(--space-5);
 }
@@ -309,8 +308,8 @@
     background: linear-gradient(135deg,
         rgba(255, 255, 255, 0.9) 0%,
         rgba(255, 255, 255, 0.7) 100%);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
+    /* backdrop-filter removed for GOV.UK compliance */
+    -webkit-/* backdrop-filter removed for GOV.UK compliance */
     border: 1px solid rgba(255, 255, 255, 0.6);
     border-radius: var(--radius-xl);
     padding: var(--space-5);
@@ -347,7 +346,7 @@
     font-size: 1.75rem;
     font-weight: 800;
     color: var(--color-gray-900);
-    margin-bottom: 4px;
+    margin-bottom: var(--space-1);
 }
 
 [data-theme="dark"] .org-stat-value {
@@ -409,7 +408,7 @@
     display: inline-flex;
     align-items: center;
     gap: var(--space-1-5);
-    padding: 8px 16px;
+    padding: var(--space-2) 16px;
     background: rgba(16, 185, 129, 0.1);
     border: 1px solid rgba(16, 185, 129, 0.2);
     border-radius: var(--radius-md);
@@ -436,8 +435,8 @@
     background: linear-gradient(135deg,
         rgba(255, 255, 255, 0.95) 0%,
         rgba(255, 255, 255, 0.85) 100%);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
+    /* backdrop-filter removed for GOV.UK compliance */
+    -webkit-/* backdrop-filter removed for GOV.UK compliance */
     border: 1px solid rgba(255, 255, 255, 0.6);
     border-radius: var(--radius-xl);
     padding: var(--space-5);
@@ -556,12 +555,12 @@
 /* Empty State */
 .org-empty-state {
     text-align: center;
-    padding: 60px var(--space-5);
+    padding: var(--space-16) var(--space-5);
     background: linear-gradient(135deg,
         rgba(255, 255, 255, 0.8) 0%,
         rgba(255, 255, 255, 0.6) 100%);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
+    /* backdrop-filter removed for GOV.UK compliance */
+    -webkit-/* backdrop-filter removed for GOV.UK compliance */
     border: 1px solid rgba(255, 255, 255, 0.6);
     border-radius: var(--radius-2xl);
 }
@@ -623,8 +622,8 @@
         margin: 0 0 var(--space-5) 0;
         padding: var(--space-5);
         /* Reduce blur on mobile for performance */
-        backdrop-filter: blur(10px);
-        -webkit-backdrop-filter: blur(10px);
+        /* backdrop-filter removed for GOV.UK compliance */
+        -webkit-/* backdrop-filter removed for GOV.UK compliance */
     }
 
     .org-profile-content {
@@ -655,8 +654,8 @@
 
     .org-stat-card {
         /* Reduce blur on mobile */
-        backdrop-filter: blur(5px);
-        -webkit-backdrop-filter: blur(5px);
+        /* backdrop-filter removed for GOV.UK compliance */
+        -webkit-/* backdrop-filter removed for GOV.UK compliance */
     }
 
     .org-section {
@@ -669,13 +668,13 @@
 
     .org-opp-card {
         /* Reduce blur on mobile */
-        backdrop-filter: blur(10px);
-        -webkit-backdrop-filter: blur(10px);
+        /* backdrop-filter removed for GOV.UK compliance */
+        -webkit-/* backdrop-filter removed for GOV.UK compliance */
     }
 
     /* Disable expensive background animation on mobile */
     .org-profile-bg::before {
-        animation: none;
+        /* animation removed for GOV.UK compliance */
         transform: none;
         width: 100%;
         height: 100%;
@@ -684,15 +683,15 @@
     }
 
     .org-empty-state {
-        backdrop-filter: blur(5px);
-        -webkit-backdrop-filter: blur(5px);
+        /* backdrop-filter removed for GOV.UK compliance */
+        -webkit-/* backdrop-filter removed for GOV.UK compliance */
     }
 }
 
 /* Reduced motion preferences */
 @media (prefers-reduced-motion: reduce) {
     .org-profile-bg::before {
-        animation: none;
+        /* animation removed for GOV.UK compliance */
     }
 
     .org-profile-card,

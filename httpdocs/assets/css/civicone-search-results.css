@@ -5,12 +5,12 @@
 
 .search-results-container {
     margin-top: var(--space-10);
-    margin-bottom: 60px;
+    margin-bottom: var(--space-16);
 }
 
 /* Search Header */
 .search-results-header {
-    margin-bottom: 30px;
+    margin-bottom: var(--space-8);
     border-bottom: var(--space-0-5) solid rgba(255, 255, 255, 0.1);
     padding-bottom: var(--space-5);
     display: flex;
@@ -41,7 +41,7 @@
 }
 
 .search-ai-badge {
-    margin: 8px 0 0;
+    margin: var(--space-2) 0 0;
     color: rgba(255, 255, 255, 0.7);
     font-size: 0.85rem;
 }
@@ -54,7 +54,7 @@
 }
 
 .search-ai-location {
-    margin-left: 8px;
+    margin-left: var(--space-2);
 }
 
 /* Filter Tabs */
@@ -108,7 +108,7 @@
 /* Empty State */
 .search-empty-state {
     text-align: center;
-    padding: 60px;
+    padding: var(--space-16);
 }
 
 .search-empty-icon {
@@ -134,7 +134,7 @@
 }
 
 .search-empty-actions {
-    margin-top: 30px;
+    margin-top: var(--space-8);
     display: flex;
     gap: var(--space-2-5);
     justify-content: center;
@@ -255,7 +255,7 @@
     align-items: center;
     justify-content: space-between;
     margin-bottom: var(--space-1-5);
-    gap: 8px;
+    gap: var(--space-2);
 }
 
 .search-result-badge {

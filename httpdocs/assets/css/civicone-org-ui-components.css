@@ -14,7 +14,7 @@
     right: 0;
     bottom: 0;
     background: rgba(0, 0, 0, 0.5);
-    backdrop-filter: blur(4px);
+    /* backdrop-filter removed for GOV.UK compliance */
     z-index: 9999;
     display: flex;
     align-items: center;
@@ -144,7 +144,7 @@
 .org-modal-footer {
     display: flex;
     gap: var(--space-3);
-    padding: 16px var(--space-6);
+    padding: var(--space-4) var(--space-6);
     background: rgba(249, 250, 251, 0.5);
     border-top: 1px solid rgba(229, 231, 235, 0.5);
 }
@@ -166,7 +166,7 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    gap: 8px;
+    gap: var(--space-2);
 }
 
 .org-modal-btn.cancel {
@@ -207,7 +207,7 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    gap: 8px;
+    gap: var(--space-2);
 }
 
 .org-spinner {
@@ -216,7 +216,7 @@
     border: 2px solid rgba(255, 255, 255, 0.3);
     border-top-color: white;
     border-radius: 50%;
-    animation: orgSpin 0.8s linear infinite;
+    /* animation removed for GOV.UK compliance */
 }
 
 .org-spinner.dark {
@@ -224,8 +224,7 @@
     border-top-color: var(--color-success-500);
 }
 
-@keyframes orgSpin {
-    to { transform: rotate(360deg); }
+/* Animation removed for GOV.UK compliance */
 }
 
 /* Button loading state */
@@ -247,7 +246,7 @@
     border: 2px solid rgba(255, 255, 255, 0.3);
     border-top-color: white;
     border-radius: 50%;
-    animation: orgSpin 0.8s linear infinite;
+    /* animation removed for GOV.UK compliance */
 }
 
 /* Skeleton loading */
@@ -257,7 +256,7 @@
         rgba(229, 231, 235, 0.8) 50%,
         rgba(229, 231, 235, 0.5) 100%);
     background-size: 200% 100%;
-    animation: orgSkeletonShimmer 1.5s ease-in-out infinite;
+    /* animation removed for GOV.UK compliance */
     border-radius: var(--radius-md);
 }
 
@@ -269,14 +268,13 @@
     background-size: 200% 100%;
 }
 
-@keyframes orgSkeletonShimmer {
-    0% { background-position: 200% 0; }
+/* Animation removed for GOV.UK compliance */
     100% { background-position: -200% 0; }
 }
 
 .org-skeleton-text {
     height: 16px;
-    margin-bottom: 8px;
+    margin-bottom: var(--space-2);
 }
 
 .org-skeleton-text.short {
@@ -454,7 +452,7 @@
    ============================================ */
 .org-empty-state {
     text-align: center;
-    padding: 60px 30px;
+    padding: var(--space-16) 30px;
 }
 
 .org-empty-illustration {
@@ -475,11 +473,10 @@
     inset: -8px;
     border: 2px dashed rgba(16, 185, 129, 0.2);
     border-radius: 50%;
-    animation: orgEmptyPulse 3s ease-in-out infinite;
+    /* animation removed for GOV.UK compliance */
 }
 
-@keyframes orgEmptyPulse {
-    0%, 100% { transform: scale(1); opacity: 1; }
+/* Animation removed for GOV.UK compliance */
     50% { transform: scale(1.05); opacity: 0.5; }
 }
 
@@ -520,7 +517,7 @@
 .org-empty-btn {
     display: inline-flex;
     align-items: center;
-    gap: 8px;
+    gap: var(--space-2);
     padding: var(--space-3) var(--space-6);
     border-radius: var(--radius-md);
     font-weight: 600;
@@ -557,7 +554,7 @@
 .org-checkbox-wrapper {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: var(--space-2);
 }
 
 .org-checkbox {
@@ -602,7 +599,7 @@
     padding: var(--space-3) var(--space-5);
     background: linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(16, 185, 129, 0.05));
     border-bottom: 1px solid rgba(16, 185, 129, 0.2);
-    gap: 16px;
+    gap: var(--space-4);
 }
 
 .org-select-all-bar.show {
@@ -617,11 +614,11 @@
 
 .org-bulk-actions {
     display: flex;
-    gap: 8px;
+    gap: var(--space-2);
 }
 
 .org-bulk-btn {
-    padding: 8px 16px;
+    padding: var(--space-2) 16px;
     border-radius: var(--radius-md);
     font-weight: 600;
     font-size: 0.85rem;
@@ -714,7 +711,7 @@
     left: 0;
     background: var(--color-success-500);
     color: white;
-    padding: 8px 16px;
+    padding: var(--space-2) 16px;
     z-index: 10001;
     transition: top 0.3s;
 }
@@ -741,7 +738,7 @@
     gap: var(--space-1-5);
     font-size: 0.75rem;
     color: var(--color-success-500);
-    padding: 4px var(--space-2-5);
+    padding: var(--space-1) var(--space-2-5);
     background: rgba(16, 185, 129, 0.1);
     border-radius: var(--radius-lg);
 }
@@ -751,11 +748,10 @@
     height: 8px;
     background: var(--color-success-500);
     border-radius: 50%;
-    animation: orgLivePulse 2s ease-in-out infinite;
+    /* animation removed for GOV.UK compliance */
 }
 
-@keyframes orgLivePulse {
-    0%, 100% { opacity: 1; transform: scale(1); }
+/* Animation removed for GOV.UK compliance */
     50% { opacity: 0.5; transform: scale(0.8); }
 }
 

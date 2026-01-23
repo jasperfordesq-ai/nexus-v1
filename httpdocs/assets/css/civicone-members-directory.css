@@ -298,13 +298,10 @@
     border: 2px solid var(--color-govuk-grey);
     border-top-color: var(--color-govuk-blue-light);
     border-radius: var(--radius-full);
-    animation: civicone-spin var(--transition-slow) linear infinite;
+    /* animation removed for GOV.UK compliance */
 }
 
-@keyframes civicone-spin {
-    to {
-        transform: translateY(-50%) rotate(360deg);
-    }
+/* Animation removed for GOV.UK compliance */
 }
 
 /* Selected Filters */
@@ -727,17 +724,14 @@
    ================================================== */
 
 .civicone-view-container {
-    animation: fadeIn 0.2s ease-in;
+    /* animation removed for GOV.UK compliance */
 }
 
 .civicone-view-container--hidden {
     display: none;
 }
 
-@keyframes fadeIn {
-    from {
-        opacity: 0;
-    }
+/* Animation removed for GOV.UK compliance */
     to {
         opacity: 1;
     }
@@ -746,7 +740,7 @@
 /* WCAG 2.3.3 - Animation from Interactions */
 @media (prefers-reduced-motion: reduce) {
     .civicone-view-container {
-        animation: none;
+        /* animation removed for GOV.UK compliance */
     }
 
     .civicone-view-toggle__button,

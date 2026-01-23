@@ -22,7 +22,7 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        gap: 8px;
+        gap: var(--space-2);
         transform: translateY(-100%);
         transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
@@ -31,13 +31,12 @@
     }
 
     /* Content Reveal Animation */
-    @keyframes fadeInUp {
-        from { opacity: 0; transform: translateY(20px); }
+    /* Animation removed for GOV.UK compliance */
         to { opacity: 1; transform: translateY(0); }
     }
 
     #unique-glass-page-wrapper .glass-box {
-        animation: fadeInUp 0.4s ease-out;
+        /* animation removed for GOV.UK compliance */
     }
 
     /* Button Press States */
@@ -99,9 +98,9 @@
         --glass-border: rgba(255, 255, 255, 0.4);
         --text-color: var(--color-slate-800);
         --text-muted: var(--color-slate-600);
-        --accent-color: #f97316;
+        --accent-color: var(--color-govuk-yellow);
         /* Orange for Events */
-        --heading-gradient: linear-gradient(135deg, #c2410c 0%, #f97316 100%);
+        --heading-gradient: linear-gradient(135deg, #c2410c 0%, var(--color-govuk-yellow) 100%);
 
         /* Subtle iridescent shadow for light mode */
         --box-shadow:
@@ -132,7 +131,7 @@
         line-height: 1.6;
 
         /* Background: Adaptive Mesh Gradient (Orange/Amber) */
-        background: radial-gradient(circle at 50% 0%, #fff7ed 0%, #ffedd5 100%);
+        background: radial-gradient(circle at 50% 0%, var(--color-white)7ed 0%, #ffedd5 100%);
         background-attachment: fixed;
     }
 
@@ -147,7 +146,7 @@
         --glass-border: rgba(255, 255, 255, 0.4);
         --text-color: var(--color-slate-800);
         --text-muted: var(--color-slate-600);
-        --heading-gradient: linear-gradient(135deg, #c2410c 0%, #f97316 100%);
+        --heading-gradient: linear-gradient(135deg, #c2410c 0%, var(--color-govuk-yellow) 100%);
         --box-shadow:
             0 8px 32px 0 rgba(31, 38, 135, 0.1),
             inset 0 0 0 1px rgba(255, 255, 255, 0.2);
@@ -155,7 +154,7 @@
         --pill-bg: rgba(255, 255, 255, 0.25);
         --input-bg: rgba(255, 255, 255, 0.35);
 
-        background: radial-gradient(circle at 50% 0%, #fff7ed 0%, #ffedd5 100%);
+        background: radial-gradient(circle at 50% 0%, var(--color-white)7ed 0%, #ffedd5 100%);
     }
 
     /* DARK MODE EXPLICIT */
@@ -165,7 +164,7 @@
         --text-color: #ffedd5;
         --text-muted: rgba(255, 255, 255, 0.7);
         --accent-color: #fdba74;
-        --heading-gradient: linear-gradient(135deg, #ffffff 0%, #fdba74 100%);
+        --heading-gradient: linear-gradient(135deg, var(--color-white) 0%, #fdba74 100%);
 
         /* Vivid Dark Mode Shadows */
         --box-shadow:
@@ -196,8 +195,8 @@
 
         /* High-End Glass Effect */
         background: var(--glass-bg);
-        backdrop-filter: blur(25px) saturate(200%);
-        -webkit-backdrop-filter: blur(25px) saturate(200%);
+        /* backdrop-filter removed for GOV.UK compliance */ saturate(200%);
+        -webkit-/* backdrop-filter removed for GOV.UK compliance */ saturate(200%);
 
         /* Holographic Borders & Shadows */
         border-radius: 28px;
@@ -258,7 +257,7 @@
     #unique-glass-page-wrapper .glass-input {
         width: 100%;
         box-sizing: border-box;
-        padding: 16px var(--space-5);
+        padding: var(--space-4) var(--space-5);
         border-radius: var(--radius-xl);
         border: 1px solid var(--glass-border);
         background: var(--input-bg);
@@ -303,7 +302,7 @@
         border: 1px solid var(--glass-border);
         border-radius: var(--radius-xl);
         overflow: hidden;
-        margin-bottom: 30px;
+        margin-bottom: var(--space-8);
         transition: all 0.3s ease;
     }
 
@@ -397,7 +396,7 @@
         align-items: center;
         justify-content: center;
         box-shadow: 0 4px 15px rgba(249, 115, 22, 0.3);
-        background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
+        background: linear-gradient(135deg, var(--color-govuk-yellow) 0%, var(--color-govuk-yellow) 100%);
         color: white;
     }
 
@@ -450,7 +449,7 @@
     #unique-glass-page-wrapper .mapboxgl-ctrl-geocoder--input {
         color: var(--text-color);
         height: auto;
-        padding: 16px 45px;
+        padding: var(--space-4) 45px;
         /* Space for icon */
         font-size: 1rem;
         font-family: inherit;
@@ -475,8 +474,8 @@
         border: 1px solid var(--glass-border);
         border-radius: var(--radius-lg);
         box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
-        backdrop-filter: blur(20px);
-        -webkit-backdrop-filter: blur(20px);
+        /* backdrop-filter removed for GOV.UK compliance */
+        -webkit-/* backdrop-filter removed for GOV.UK compliance */
         margin-top: var(--space-1);
         overflow: hidden;
     }

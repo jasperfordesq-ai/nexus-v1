@@ -121,8 +121,8 @@ $tenantName = $tenant['name'] ?? 'the platform';
 }
 
 .civic-notification--warning {
-    background: var(--color-warning-50, #fffbeb);
-    border-color: var(--color-warning-500, #f59e0b);
+    background: var(--color-warning-50, var(--color-white)beb);
+    border-color: var(--color-warning-500, var(--color-govuk-yellow));
 }
 
 [data-theme="dark"] .civic-notification--warning {
@@ -131,7 +131,7 @@ $tenantName = $tenant['name'] ?? 'the platform';
 
 .civic-notification__icon {
     font-size: 1.5rem;
-    color: var(--color-warning-600, #d97706);
+    color: var(--color-warning-600, var(--color-govuk-yellow));
     flex-shrink: 0;
     margin-top: var(--space-0-5);
 }
@@ -140,57 +140,57 @@ $tenantName = $tenant['name'] ?? 'the platform';
     font-size: 1.125rem;
     font-weight: 600;
     margin: 0 0 0.25rem 0;
-    color: var(--color-gray-900, #111827);
+    color: var(--color-gray-900, var(--color-govuk-black));
 }
 
 [data-theme="dark"] .civic-notification__title {
-    color: var(--color-gray-100, #f3f4f6);
+    color: var(--color-gray-100, var(--color-govuk-light-grey));
 }
 
 .civic-notification__content p {
     margin: 0;
-    color: var(--color-gray-700, #374151);
+    color: var(--color-gray-700, var(--color-govuk-black));
     font-size: 0.9375rem;
 }
 
 [data-theme="dark"] .civic-notification__content p {
-    color: var(--color-gray-300, #d1d5db);
+    color: var(--color-gray-300, var(--color-govuk-grey));
 }
 
 /* Card Styles */
 .civic-card {
-    background: var(--color-surface, #fff);
-    border: 1px solid var(--color-gray-200, #e5e7eb);
+    background: var(--color-surface, var(--color-white));
+    border: 1px solid var(--color-gray-200, var(--color-govuk-grey));
     border-radius: var(--radius-lg, 12px);
     overflow: hidden;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 }
 
 [data-theme="dark"] .civic-card {
-    background: var(--color-gray-800, #1f2937);
-    border-color: var(--color-gray-700, #374151);
+    background: var(--color-gray-800, var(--color-govuk-black));
+    border-color: var(--color-gray-700, var(--color-govuk-black));
 }
 
 .civic-card__header {
     padding: var(--space-500, 1.25rem) var(--space-600, 1.5rem);
-    border-bottom: 1px solid var(--color-gray-200, #e5e7eb);
-    background: var(--color-gray-50, #f9fafb);
+    border-bottom: 1px solid var(--color-gray-200, var(--color-govuk-grey));
+    background: var(--color-gray-50, var(--color-govuk-light-grey));
 }
 
 [data-theme="dark"] .civic-card__header {
-    background: var(--color-gray-900, #111827);
-    border-color: var(--color-gray-700, #374151);
+    background: var(--color-gray-900, var(--color-govuk-black));
+    border-color: var(--color-gray-700, var(--color-govuk-black));
 }
 
 .civic-card__title {
     font-size: 1.25rem;
     font-weight: 700;
     margin: 0;
-    color: var(--color-gray-900, #111827);
+    color: var(--color-gray-900, var(--color-govuk-black));
 }
 
 [data-theme="dark"] .civic-card__title {
-    color: var(--color-gray-100, #f3f4f6);
+    color: var(--color-gray-100, var(--color-govuk-light-grey));
 }
 
 .civic-card__body {
@@ -199,13 +199,13 @@ $tenantName = $tenant['name'] ?? 'the platform';
 
 .civic-lead {
     font-size: 1rem;
-    color: var(--color-gray-600, #4b5563);
+    color: var(--color-gray-600, var(--color-govuk-grey-dark));
     margin: 0 0 var(--space-600, 1.5rem) 0;
     line-height: 1.6;
 }
 
 [data-theme="dark"] .civic-lead {
-    color: var(--color-gray-400, #9ca3af);
+    color: var(--color-gray-400, var(--color-govuk-grey-dark));
 }
 
 /* Consent Items */
@@ -217,18 +217,18 @@ $tenantName = $tenant['name'] ?? 'the platform';
 }
 
 .consent-item {
-    border: 1px solid var(--color-gray-200, #e5e7eb);
+    border: 1px solid var(--color-gray-200, var(--color-govuk-grey));
     border-radius: var(--radius-md, 8px);
     padding: var(--space-500, 1.25rem);
     transition: border-color 0.2s, box-shadow 0.2s;
 }
 
 [data-theme="dark"] .consent-item {
-    border-color: var(--color-gray-700, #374151);
+    border-color: var(--color-gray-700, var(--color-govuk-black));
 }
 
 .consent-item:hover {
-    border-color: var(--color-primary-300, #a5b4fc);
+    border-color: var(--color-primary-300, var(--color-govuk-blue-lighter));
 }
 
 .consent-item__header {
@@ -243,22 +243,22 @@ $tenantName = $tenant['name'] ?? 'the platform';
     font-size: 1.0625rem;
     font-weight: 600;
     margin: 0 0 0.25rem 0;
-    color: var(--color-gray-900, #111827);
+    color: var(--color-gray-900, var(--color-govuk-black));
 }
 
 [data-theme="dark"] .consent-item__title {
-    color: var(--color-gray-100, #f3f4f6);
+    color: var(--color-gray-100, var(--color-govuk-light-grey));
 }
 
 .consent-item__description {
     font-size: 0.875rem;
-    color: var(--color-gray-600, #4b5563);
+    color: var(--color-gray-600, var(--color-govuk-grey-dark));
     margin: 0;
     line-height: 1.5;
 }
 
 [data-theme="dark"] .consent-item__description {
-    color: var(--color-gray-400, #9ca3af);
+    color: var(--color-gray-400, var(--color-govuk-grey-dark));
 }
 
 /* Tags */
@@ -280,18 +280,18 @@ $tenantName = $tenant['name'] ?? 'the platform';
 }
 
 .civic-tag--info {
-    background: var(--color-primary-100, #e0e7ff);
-    color: var(--color-primary-800, #3730a3);
+    background: var(--color-primary-100, var(--color-govuk-light-grey));
+    color: var(--color-primary-800, var(--color-govuk-blue));
 }
 
 [data-theme="dark"] .civic-tag--warning {
     background: rgba(245, 158, 11, 0.2);
-    color: var(--color-warning-400, #fbbf24);
+    color: var(--color-warning-400, var(--color-govuk-yellow));
 }
 
 [data-theme="dark"] .civic-tag--info {
     background: rgba(99, 102, 241, 0.2);
-    color: var(--color-primary-400, #818cf8);
+    color: var(--color-primary-400, var(--color-govuk-blue-lighter));
 }
 
 /* Link Styles */
@@ -303,7 +303,7 @@ $tenantName = $tenant['name'] ?? 'the platform';
     display: inline-flex;
     align-items: center;
     gap: 0.5rem;
-    color: var(--color-primary-600, #4f46e5);
+    color: var(--color-primary-600, var(--color-govuk-blue));
     font-size: 0.9375rem;
     font-weight: 500;
     text-decoration: none;
@@ -311,16 +311,16 @@ $tenantName = $tenant['name'] ?? 'the platform';
 }
 
 .civic-link--external:hover {
-    color: var(--color-primary-700, #4338ca);
+    color: var(--color-primary-700, var(--color-govuk-blue));
     text-decoration: underline;
 }
 
 [data-theme="dark"] .civic-link--external {
-    color: var(--color-primary-400, #818cf8);
+    color: var(--color-primary-400, var(--color-govuk-blue-lighter));
 }
 
 [data-theme="dark"] .civic-link--external:hover {
-    color: var(--color-primary-300, #a5b4fc);
+    color: var(--color-primary-300, var(--color-govuk-blue-lighter));
 }
 
 .civic-link--external i:last-child {
@@ -331,11 +331,11 @@ $tenantName = $tenant['name'] ?? 'the platform';
 /* Checkbox Styles */
 .consent-item__checkbox {
     padding-top: var(--space-400, 1rem);
-    border-top: 1px solid var(--color-gray-100, #f3f4f6);
+    border-top: 1px solid var(--color-gray-100, var(--color-govuk-light-grey));
 }
 
 [data-theme="dark"] .consent-item__checkbox {
-    border-color: var(--color-gray-700, #374151);
+    border-color: var(--color-gray-700, var(--color-govuk-black));
 }
 
 .civic-checkbox {
@@ -356,7 +356,7 @@ $tenantName = $tenant['name'] ?? 'the platform';
     width: var(--space-5-5);
     height: var(--space-5-5);
     min-width: var(--space-5-5);
-    border: 2px solid var(--color-gray-400, #9ca3af);
+    border: 2px solid var(--color-gray-400, var(--color-govuk-grey-dark));
     border-radius: var(--radius-sm);
     display: flex;
     align-items: center;
@@ -376,8 +376,8 @@ $tenantName = $tenant['name'] ?? 'the platform';
 }
 
 .civic-checkbox input:checked + .civic-checkbox__box {
-    background: var(--color-primary-600, #4f46e5);
-    border-color: var(--color-primary-600, #4f46e5);
+    background: var(--color-primary-600, var(--color-govuk-blue));
+    border-color: var(--color-primary-600, var(--color-govuk-blue));
 }
 
 .civic-checkbox input:checked + .civic-checkbox__box::after {
@@ -390,16 +390,16 @@ $tenantName = $tenant['name'] ?? 'the platform';
 
 .civic-checkbox__label {
     font-size: 0.9375rem;
-    color: var(--color-gray-800, #1f2937);
+    color: var(--color-gray-800, var(--color-govuk-black));
     line-height: 1.5;
 }
 
 [data-theme="dark"] .civic-checkbox__label {
-    color: var(--color-gray-200, #e5e7eb);
+    color: var(--color-gray-200, var(--color-govuk-grey));
 }
 
 .consent-version {
-    color: var(--color-gray-500, #6b7280);
+    color: var(--color-gray-500, var(--color-govuk-grey-dark));
     font-size: 0.8125rem;
 }
 

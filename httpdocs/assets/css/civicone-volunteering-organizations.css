@@ -7,11 +7,11 @@
             background: linear-gradient(135deg,
                 rgba(255, 255, 255, 0.85),
                 rgba(255, 255, 255, 0.7));
-            backdrop-filter: blur(24px) saturate(120%);
-            -webkit-backdrop-filter: blur(24px) saturate(120%);
+            /* backdrop-filter removed for GOV.UK compliance */ saturate(120%);
+            -webkit-/* backdrop-filter removed for GOV.UK compliance */ saturate(120%);
             border: 1px solid rgba(255, 255, 255, 0.4);
             border-radius: var(--radius-2xl);
-            padding: 30px;
+            padding: var(--space-8);
             box-shadow: 0 8px 40px rgba(31, 38, 135, 0.12),
                         inset 0 1px 0 rgba(255, 255, 255, 0.6);
         }
@@ -53,7 +53,7 @@
                 rgba(20, 184, 166, 0.08) 75%,
                 rgba(99, 102, 241, 0.08) 100%);
             background-size: 400% 400%;
-            animation: orgGradientShift 15s ease infinite;
+            /* animation removed for GOV.UK compliance */
         }
 
         [data-theme="dark"] #org-glass-wrapper::before {
@@ -63,8 +63,7 @@
                 rgba(13, 148, 136, 0.12) 0%, transparent 50%);
         }
 
-        @keyframes orgGradientShift {
-            0%, 100% { background-position: 0% 50%; }
+        /* Animation removed for GOV.UK compliance */
             50% { background-position: 100% 50%; }
         }
 
@@ -94,7 +93,7 @@
         #org-glass-wrapper .org-back-link {
             display: inline-flex;
             align-items: center;
-            gap: 8px;
+            gap: var(--space-2);
             color: var(--htb-text-secondary);
             text-decoration: none;
             font-weight: 600;
@@ -116,20 +115,20 @@
             background: linear-gradient(135deg,
                 rgba(255, 255, 255, 0.75),
                 rgba(255, 255, 255, 0.6));
-            backdrop-filter: blur(20px) saturate(120%);
-            -webkit-backdrop-filter: blur(20px) saturate(120%);
+            /* backdrop-filter removed for GOV.UK compliance */ saturate(120%);
+            -webkit-/* backdrop-filter removed for GOV.UK compliance */ saturate(120%);
             border: 1px solid rgba(255, 255, 255, 0.3);
             box-shadow: 0 8px 32px rgba(31, 38, 135, 0.15),
                         inset 0 0 0 1px rgba(255, 255, 255, 0.4);
-            margin-bottom: 30px;
+            margin-bottom: var(--space-8);
         }
 
         [data-theme="dark"] #org-glass-wrapper .glass-search-card {
             background: linear-gradient(135deg,
                 rgba(15, 23, 42, 0.6),
                 rgba(30, 41, 59, 0.5));
-            backdrop-filter: blur(24px) saturate(150%);
-            -webkit-backdrop-filter: blur(24px) saturate(150%);
+            /* backdrop-filter removed for GOV.UK compliance */ saturate(150%);
+            -webkit-/* backdrop-filter removed for GOV.UK compliance */ saturate(150%);
             border: 1px solid rgba(255, 255, 255, 0.15);
             box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5),
                         0 0 80px rgba(99, 102, 241, 0.1),
@@ -165,8 +164,8 @@
             border-radius: 14px;
             font-size: 1rem;
             background: rgba(255, 255, 255, 0.6);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
+            /* backdrop-filter removed for GOV.UK compliance */
+            -webkit-/* backdrop-filter removed for GOV.UK compliance */
             box-shadow: 0 4px 12px rgba(31, 38, 135, 0.1),
                         inset 0 1px 0 rgba(255, 255, 255, 0.6);
             transition: all 0.3s ease;
@@ -211,7 +210,7 @@
                         inset 0 1px 0 rgba(255, 255, 255, 0.2);
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: var(--space-2);
         }
 
         #org-glass-wrapper .glass-btn-primary:hover {
@@ -239,8 +238,8 @@
             background: linear-gradient(135deg,
                 rgba(255, 255, 255, 0.8),
                 rgba(255, 255, 255, 0.65));
-            backdrop-filter: blur(20px) saturate(120%);
-            -webkit-backdrop-filter: blur(20px) saturate(120%);
+            /* backdrop-filter removed for GOV.UK compliance */ saturate(120%);
+            -webkit-/* backdrop-filter removed for GOV.UK compliance */ saturate(120%);
             border: 1px solid rgba(255, 255, 255, 0.35);
             border-radius: var(--radius-2xl);
             box-shadow: 0 8px 32px rgba(31, 38, 135, 0.12),
@@ -282,7 +281,7 @@
             padding: var(--space-6) var(--space-6) 16px;
             display: flex;
             align-items: flex-start;
-            gap: 16px;
+            gap: var(--space-4);
         }
 
         #org-glass-wrapper .org-logo {
@@ -350,8 +349,8 @@
         /* Card Stats */
         #org-glass-wrapper .org-card-stats {
             display: flex;
-            gap: 16px;
-            padding: 16px var(--space-6);
+            gap: var(--space-4);
+            padding: var(--space-4) var(--space-6);
             background: linear-gradient(135deg,
                 rgba(99, 102, 241, 0.05),
                 rgba(13, 148, 136, 0.05));
@@ -386,12 +385,12 @@
         /* Empty State */
         #org-glass-wrapper .org-empty-state {
             text-align: center;
-            padding: 60px var(--space-5);
+            padding: var(--space-16) var(--space-5);
             background: linear-gradient(135deg,
                 rgba(255, 255, 255, 0.75),
                 rgba(255, 255, 255, 0.6));
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
+            /* backdrop-filter removed for GOV.UK compliance */
+            -webkit-/* backdrop-filter removed for GOV.UK compliance */
             border-radius: var(--radius-2xl);
             border: 1px solid rgba(255, 255, 255, 0.3);
         }

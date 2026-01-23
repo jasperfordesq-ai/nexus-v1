@@ -50,7 +50,7 @@
     font-size: 4em;
     font-weight: bold;
     margin: var(--space-5) 0;
-    color: var(--civic-brand, #1D70B8);
+    color: var(--civic-brand, var(--color-govuk-blue-light));
     line-height: 1.1;
 }
 
@@ -134,7 +134,7 @@
     width: var(--space-10);
     height: var(--space-10);
     border-radius: 50%;
-    background: var(--civic-brand, #1D70B8);
+    background: var(--civic-brand, var(--color-govuk-blue-light));
     display: flex;
     align-items: center;
     justify-content: center;
@@ -182,7 +182,7 @@
     gap: var(--space-3);
     padding: var(--space-3);
     background: #F0F9FF;
-    border: 2px solid var(--civic-brand, #1D70B8);
+    border: 2px solid var(--civic-brand, var(--color-govuk-blue-light));
     border-radius: var(--radius-base);
     margin-bottom: var(--space-4);
 }
@@ -390,7 +390,7 @@
         radial-gradient(ellipse at 20% 30%, rgba(168, 85, 247, 0.12) 0%, transparent 50%),
         radial-gradient(ellipse at 80% 20%, rgba(139, 92, 246, 0.1) 0%, transparent 45%),
         radial-gradient(ellipse at 50% 80%, rgba(192, 132, 252, 0.08) 0%, transparent 50%);
-    animation: insightsFloat 20s ease-in-out infinite;
+    /* animation removed for GOV.UK compliance */
 }
 
 [data-theme="dark"] .insights-bg {
@@ -403,8 +403,7 @@
         radial-gradient(ellipse at 80% 20%, rgba(139, 92, 246, 0.15) 0%, transparent 45%);
 }
 
-@keyframes insightsFloat {
-    0%, 100% { transform: translate(0, 0) scale(1); }
+/* Animation removed for GOV.UK compliance */
     50% { transform: translate(-1%, 1%) scale(1.02); }
 }
 
@@ -468,7 +467,7 @@
 .insights-nav-link {
     padding: var(--space-3) var(--space-5);
     background: rgba(255, 255, 255, 0.8);
-    backdrop-filter: blur(10px);
+    /* backdrop-filter removed for GOV.UK compliance */
     border: 1px solid rgba(168, 85, 247, 0.2);
     border-radius: var(--radius-md);
     color: var(--civic-wallet-text-secondary);
@@ -509,8 +508,8 @@
     background: linear-gradient(135deg,
         rgba(255, 255, 255, 0.9) 0%,
         rgba(255, 255, 255, 0.75) 100%);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
+    /* backdrop-filter removed for GOV.UK compliance */
+    -webkit-/* backdrop-filter removed for GOV.UK compliance */
     border: 1px solid rgba(255, 255, 255, 0.5);
     border-radius: var(--radius-xl);
     box-shadow: 0 8px 32px rgba(31, 38, 135, 0.1);
@@ -828,7 +827,7 @@
    -------------------------------------------- */
 .insights-empty {
     text-align: center;
-    padding: 60px var(--space-5);
+    padding: var(--space-16) var(--space-5);
     color: var(--civic-wallet-text-muted);
 }
 
@@ -928,7 +927,7 @@
    -------------------------------------------- */
 @media (prefers-reduced-motion: reduce) {
     .insights-bg::before {
-        animation: none;
+        /* animation removed for GOV.UK compliance */
     }
 
     .civic-user-result,

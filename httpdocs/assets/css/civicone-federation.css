@@ -667,7 +667,7 @@ body.dark-mode {
 /* Date Box */
 .civic-fed-date-box {
     background: var(--civic-brand, var(--color-blue-600));
-    color: #fff;
+    color: var(--color-white);
     padding: var(--space-4);
     text-align: center;
     min-width: var(--space-20);
@@ -2224,7 +2224,7 @@ body.dark-mode {
    ============================================ */
 .civic-fed-offline {
     text-align: center;
-    padding: 60px var(--space-6);
+    padding: var(--space-16) var(--space-6);
 }
 
 .civic-fed-offline-icon {
@@ -2328,17 +2328,17 @@ body.dark-mode {
     .civic-fed-listing-card,
     .civic-fed-event-card,
     .civic-fed-sidebar-card {
-        border: 1px solid #000;
+        border: 1px solid var(--color-govuk-black);
         box-shadow: none;
         break-inside: avoid;
     }
 
     .civic-fed-hub-hero {
         background: #f0f0f0 !important;
-        color: #000 !important;
+        color: var(--color-govuk-black) !important;
     }
 
     .civic-fed-hub-hero h1 {
-        color: #000 !important;
+        color: var(--color-govuk-black) !important;
     }
 }

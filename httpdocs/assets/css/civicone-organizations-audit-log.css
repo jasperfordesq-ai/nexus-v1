@@ -30,7 +30,7 @@
 /* Glass Card */
 .audit-card {
     background: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0.75) 100%);
-    backdrop-filter: blur(20px);
+    /* backdrop-filter removed for GOV.UK compliance */
     border: 1px solid rgba(255, 255, 255, 0.5);
     border-radius: var(--radius-2xl);
     box-shadow: 0 8px 32px rgba(31, 38, 135, 0.1);
@@ -51,7 +51,7 @@
     padding: var(--space-6);
     border-bottom: 1px solid rgba(229, 231, 235, 0.5);
     flex-wrap: wrap;
-    gap: 16px;
+    gap: var(--space-4);
 }
 
 [data-theme="dark"] .audit-header {
@@ -79,7 +79,7 @@
 .audit-count {
     background: rgba(99, 102, 241, 0.1);
     color: var(--color-primary-500);
-    padding: 4px var(--space-3);
+    padding: var(--space-1) var(--space-3);
     border-radius: var(--radius-lg);
     font-size: 0.85rem;
     font-weight: 600;
@@ -87,7 +87,7 @@
 
 .audit-actions {
     display: flex;
-    gap: 8px;
+    gap: var(--space-2);
 }
 
 .audit-export-btn {
@@ -114,7 +114,7 @@
 .audit-filters {
     display: flex;
     gap: var(--space-3);
-    padding: 16px var(--space-6);
+    padding: var(--space-4) var(--space-6);
     background: rgba(99, 102, 241, 0.05);
     border-bottom: 1px solid rgba(229, 231, 235, 0.5);
     flex-wrap: wrap;
@@ -128,7 +128,7 @@
 .audit-filter-group {
     display: flex;
     flex-direction: column;
-    gap: 4px;
+    gap: var(--space-1);
 }
 
 .audit-filter-label {
@@ -139,7 +139,7 @@
 }
 
 .audit-filter-select, .audit-filter-input {
-    padding: 8px var(--space-3);
+    padding: var(--space-2) var(--space-3);
     border: 1px solid rgba(99, 102, 241, 0.2);
     border-radius: var(--radius-md);
     font-size: 0.9rem;
@@ -156,7 +156,7 @@
 }
 
 .audit-filter-btn {
-    padding: 8px 16px;
+    padding: var(--space-2) 16px;
     background: var(--color-primary-500);
     color: white;
     border: none;
@@ -171,7 +171,7 @@
 }
 
 .audit-filter-clear {
-    padding: 8px 16px;
+    padding: var(--space-2) 16px;
     background: transparent;
     border: 1px solid rgba(107, 114, 128, 0.3);
     color: var(--color-gray-500);
@@ -190,8 +190,8 @@
 .audit-log-entry {
     display: flex;
     align-items: flex-start;
-    gap: 16px;
-    padding: 16px var(--space-6);
+    gap: var(--space-4);
+    padding: var(--space-4) var(--space-6);
     border-bottom: 1px solid rgba(229, 231, 235, 0.3);
     transition: background 0.15s;
 }
@@ -240,7 +240,7 @@
     font-weight: 600;
     color: var(--color-gray-800);
     font-size: 0.95rem;
-    margin-bottom: 4px;
+    margin-bottom: var(--space-1);
 }
 
 [data-theme="dark"] .audit-action-label {
@@ -260,7 +260,7 @@
 .audit-details {
     font-size: 0.85rem;
     color: var(--color-gray-500);
-    margin-top: 4px;
+    margin-top: var(--space-1);
 }
 
 .audit-details span {
@@ -268,8 +268,8 @@
     background: rgba(107, 114, 128, 0.1);
     padding: var(--space-0-5) 8px;
     border-radius: var(--radius-sm);
-    margin-right: 8px;
-    margin-top: 4px;
+    margin-right: var(--space-2);
+    margin-top: var(--space-1);
 }
 
 .audit-meta {
@@ -281,7 +281,7 @@
 .audit-time {
     font-size: 0.85rem;
     color: var(--color-gray-500);
-    margin-bottom: 4px;
+    margin-bottom: var(--space-1);
 }
 
 .audit-ip {
@@ -295,8 +295,8 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 8px;
-    padding: 16px;
+    gap: var(--space-2);
+    padding: var(--space-4);
     border-top: 1px solid rgba(229, 231, 235, 0.5);
 }
 
@@ -305,7 +305,7 @@
 }
 
 .audit-page-link {
-    padding: 8px var(--space-3-5);
+    padding: var(--space-2) var(--space-3-5);
     background: rgba(99, 102, 241, 0.1);
     border: 1px solid rgba(99, 102, 241, 0.2);
     border-radius: var(--radius-md);
@@ -334,14 +334,14 @@
 /* Empty State */
 .audit-empty {
     text-align: center;
-    padding: 60px var(--space-5);
+    padding: var(--space-16) var(--space-5);
     color: var(--color-gray-400);
 }
 
 .audit-empty-icon {
     font-size: 3rem;
     opacity: 0.3;
-    margin-bottom: 16px;
+    margin-bottom: var(--space-4);
 }
 
 /* Responsive */

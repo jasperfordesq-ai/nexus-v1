@@ -58,9 +58,9 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    border-bottom: 4px solid #000;
+    border-bottom: 4px solid var(--color-govuk-black);
     padding-bottom: var(--space-2-5);
-    margin-bottom: 30px;
+    margin-bottom: var(--space-8);
     flex-wrap: wrap;
     gap: var(--space-3);
 }
@@ -107,8 +107,8 @@
 
 /* Date Box (High Contrast) */
 .civic-event-date-box {
-    background: #000;
-    color: #fff;
+    background: var(--color-govuk-black);
+    color: var(--color-white);
     padding: var(--space-4);
     text-align: center;
     min-width: var(--space-20);
@@ -216,7 +216,7 @@
 
 /* Alert Messages */
 .civic-alert {
-    padding: 16px var(--space-5);
+    padding: var(--space-4) var(--space-5);
     border-radius: var(--radius-md);
     margin-bottom: var(--space-6);
     display: flex;
@@ -280,7 +280,7 @@
     margin: 0 0 16px 0;
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: var(--space-2);
 }
 
 .civic-section-subtitle .dashicons {
@@ -320,7 +320,7 @@
 @media (max-width: 900px) {
     .civic-detail-item {
         flex-direction: column;
-        gap: 4px;
+        gap: var(--space-1);
     }
 
     .civic-detail-item dt {
@@ -332,7 +332,7 @@
 .civic-attendees-grid {
     display: flex;
     flex-wrap: wrap;
-    gap: 8px;
+    gap: var(--space-2);
 }
 
 .civic-attendee {
@@ -355,7 +355,7 @@
     height: var(--space-11);
     border-radius: 50%;
     object-fit: cover;
-    border: 2px solid var(--civic-bg-card, #fff);
+    border: 2px solid var(--civic-bg-card, var(--color-white));
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
     transition: transform 0.2s ease;
 }
@@ -496,7 +496,7 @@
     left: 0;
     background: var(--civic-event-brand);
     color: white;
-    padding: 8px 16px;
+    padding: var(--space-2) 16px;
     z-index: 100;
     text-decoration: none;
     font-weight: 600;
@@ -531,7 +531,7 @@
 
 @media (prefers-contrast: high) {
     .civic-event-date-box {
-        border: 2px solid #000;
+        border: 2px solid var(--color-govuk-black);
     }
 
     .civic-event-content h3 a {
@@ -545,12 +545,12 @@
 
     .civic-detail-item dt,
     .civic-detail-item dd {
-        color: #000;
+        color: var(--color-govuk-black);
     }
 
     [data-theme="dark"] .civic-detail-item dt,
     [data-theme="dark"] .civic-detail-item dd {
-        color: #fff;
+        color: var(--color-white);
     }
 }
 

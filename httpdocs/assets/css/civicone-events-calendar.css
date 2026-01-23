@@ -31,7 +31,7 @@
         radial-gradient(ellipse 50% 30% at 50% 80%, rgba(251, 191, 36, 0.1) 0%, transparent 50%);
     pointer-events: none;
     z-index: -1;
-    animation: holoShift 20s ease-in-out infinite alternate;
+    /* animation removed for GOV.UK compliance */
 }
 
 [data-theme="dark"] .holo-calendar-page::before {
@@ -41,8 +41,7 @@
         radial-gradient(ellipse 50% 30% at 50% 80%, rgba(251, 191, 36, 0.12) 0%, transparent 50%);
 }
 
-@keyframes holoShift {
-    0% { opacity: 1; transform: scale(1); }
+/* Animation removed for GOV.UK compliance */
     100% { opacity: 0.8; transform: scale(1.1); }
 }
 
@@ -62,7 +61,7 @@
     background: linear-gradient(135deg, var(--color-orange-500), var(--color-orange-600));
     top: 10%;
     left: -10%;
-    animation: orbFloat1 15s ease-in-out infinite;
+    /* animation removed for GOV.UK compliance */
 }
 
 .holo-orb-2 {
@@ -71,7 +70,7 @@
     background: linear-gradient(135deg, var(--color-amber-300), var(--color-warning));
     bottom: 20%;
     right: -5%;
-    animation: orbFloat2 18s ease-in-out infinite;
+    /* animation removed for GOV.UK compliance */
 }
 
 .holo-orb-3 {
@@ -80,7 +79,7 @@
     background: linear-gradient(135deg, #fb923c, var(--color-orange-300));
     top: 60%;
     left: 30%;
-    animation: orbFloat3 12s ease-in-out infinite;
+    /* animation removed for GOV.UK compliance */
 }
 
 @keyframes orbFloat1 {
@@ -102,11 +101,10 @@
 .holo-calendar-container {
     max-width: 1200px;
     margin: 0 auto;
-    animation: fadeInUp 0.5s ease-out;
+    /* animation removed for GOV.UK compliance */
 }
 
-@keyframes fadeInUp {
-    from { opacity: 0; transform: translateY(30px); }
+/* Animation removed for GOV.UK compliance */
     to { opacity: 1; transform: translateY(0); }
 }
 
@@ -115,9 +113,9 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 30px;
+    margin-bottom: var(--space-8);
     flex-wrap: wrap;
-    gap: 16px;
+    gap: var(--space-4);
 }
 
 @media (max-width: 768px) {
@@ -131,7 +129,7 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    gap: 8px;
+    gap: var(--space-2);
     padding: var(--space-3) var(--space-5);
     border-radius: var(--radius-lg);
     font-size: 0.95rem;
@@ -184,7 +182,7 @@
 .holo-month-nav {
     display: flex;
     align-items: center;
-    gap: 16px;
+    gap: var(--space-4);
 }
 
 .holo-month-title {
@@ -225,8 +223,8 @@
 /* Glass Card */
 .holo-glass-card {
     background: rgba(255, 255, 255, 0.7);
-    backdrop-filter: blur(40px) saturate(180%);
-    -webkit-backdrop-filter: blur(40px) saturate(180%);
+    /* backdrop-filter removed for GOV.UK compliance */ saturate(180%);
+    -webkit-/* backdrop-filter removed for GOV.UK compliance */ saturate(180%);
     border-radius: var(--radius-2xl);
     border: 1px solid rgba(255, 255, 255, 0.5);
     box-shadow:
@@ -260,13 +258,12 @@
         rgba(255, 255, 255, 0.1),
         transparent
     );
-    animation: shimmer 8s ease-in-out infinite;
+    /* animation removed for GOV.UK compliance */
     pointer-events: none;
     z-index: 1;
 }
 
-@keyframes shimmer {
-    0% { left: -100%; }
+/* Animation removed for GOV.UK compliance */
     50%, 100% { left: 100%; }
 }
 
@@ -280,7 +277,7 @@
 
 /* Calendar Header Row */
 .holo-cal-header {
-    padding: 16px 8px;
+    padding: var(--space-4) 8px;
     text-align: center;
     font-weight: 700;
     font-size: 0.85rem;
@@ -300,7 +297,7 @@
 /* Calendar Days */
 .holo-cal-day {
     min-height: 120px;
-    padding: 8px;
+    padding: var(--space-2);
     border-right: 1px solid rgba(0, 0, 0, 0.04);
     border-bottom: 1px solid rgba(0, 0, 0, 0.04);
     position: relative;
@@ -361,7 +358,7 @@
 .holo-day-events {
     display: flex;
     flex-direction: column;
-    gap: 4px;
+    gap: var(--space-1);
 }
 
 /* Event Item */
@@ -425,10 +422,10 @@
 
     .holo-cal-day {
         min-height: auto;
-        padding: 16px;
+        padding: var(--space-4);
         border-right: none;
         display: flex;
-        gap: 16px;
+        gap: var(--space-4);
         align-items: flex-start;
     }
 
@@ -441,7 +438,7 @@
         min-width: var(--space-10);
         text-align: center;
         margin-bottom: 0;
-        padding: 8px;
+        padding: var(--space-2);
         background: rgba(249, 115, 22, 0.1);
         border-radius: var(--radius-md);
         color: var(--color-orange-500);
@@ -491,7 +488,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 8px;
+    gap: var(--space-2);
     transform: translateY(-100%);
     transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }

@@ -1,49 +1,130 @@
 <?php
 /**
- * Template D: Confirmation Page
- * Delete Goal Confirmation
+ * Goal Delete Confirmation Page - GOV.UK Design System
+ * Template D: Form/Flow - Confirmation Pattern
  * WCAG 2.1 AA Compliant
- * CivicOne Theme
+ *
+ * @version 2.0.0 - Full GOV.UK refactor
+ * @since 2026-01-23
  */
 
-$hTitle = 'Delete Goal';
-require __DIR__ . '/../../layouts/header.php';
+use Nexus\Core\TenantContext;
+use Nexus\Core\Csrf;
 
-$basePath = \Nexus\Core\TenantContext::getBasePath();
+$basePath = TenantContext::getBasePath();
+$pageTitle = 'Delete goal';
+
+require dirname(__DIR__, 2) . '/layouts/civicone/header.php';
 ?>
 
-<!-- Goals Delete CSS -->
-<link rel="stylesheet" href="/assets/css/purged/civicone-goals-delete.min.css?v=<?= time() ?>">
+<div class="govuk-width-container">
 
-<!-- Offline Banner -->
-<div class="offline-banner" id="offlineBanner" role="alert" aria-live="polite">
-    <i class="fa-solid fa-wifi-slash" aria-hidden="true"></i>
-    <span>No internet connection</span>
-</div>
+    <!-- Breadcrumbs -->
+    <nav class="govuk-breadcrumbs" aria-label="Breadcrumb">
+        <ol class="govuk-breadcrumbs__list">
+            <li class="govuk-breadcrumbs__list-item">
+                <a class="govuk-breadcrumbs__link" href="<?= $basePath ?>">Home</a>
+            </li>
+            <li class="govuk-breadcrumbs__list-item">
+                <a class="govuk-breadcrumbs__link" href="<?= $basePath ?>/goals">Goals</a>
+            </li>
+            <li class="govuk-breadcrumbs__list-item">
+                <a class="govuk-breadcrumbs__link" href="<?= $basePath ?>/goals/<?= htmlspecialchars($goal['id']) ?>"><?= htmlspecialchars($goal['title']) ?></a>
+            </li>
+            <li class="govuk-breadcrumbs__list-item" aria-current="page">
+                Delete
+            </li>
+        </ol>
+    </nav>
 
-<div class="goals-delete-wrapper">
-    <div class="htb-card">
-        <div class="goals-delete-card-body">
-            <div class="goals-delete-warning-icon" aria-hidden="true">&#9888;&#65039;</div>
-            <h2 class="goals-delete-title">Delete Goal?</h2>
-            <p class="goals-delete-description">
-                Are you sure you want to delete <strong>#<?= htmlspecialchars($goal['id']) ?> <?= htmlspecialchars($goal['title']) ?></strong>?
-                <br>This action cannot be undone.
-            </p>
+    <main class="govuk-main-wrapper" id="main-content" role="main">
 
-            <form action="<?= $basePath ?>/goals/<?= $goal['id'] ?>/delete" method="POST">
-                <?= \Nexus\Core\Csrf::input() ?>
+        <div class="govuk-grid-row">
+            <div class="govuk-grid-column-two-thirds">
 
-                <div class="goals-delete-actions">
-                    <a href="<?= $basePath ?>/goals/<?= $goal['id'] ?>" class="htb-btn htb-btn-secondary">Cancel</a>
-                    <button type="submit" class="htb-btn htb-btn-danger">Yes, Delete Goal</button>
+                <!-- Warning Text -->
+                <div class="govuk-warning-text">
+                    <span class="govuk-warning-text__icon" aria-hidden="true">!</span>
+                    <strong class="govuk-warning-text__text">
+                        <span class="govuk-visually-hidden">Warning</span>
+                        This action cannot be undone
+                    </strong>
                 </div>
-            </form>
+
+                <h1 class="govuk-heading-xl">Are you sure you want to delete this goal?</h1>
+
+                <!-- Goal Summary -->
+                <dl class="govuk-summary-list govuk-!-margin-bottom-6">
+                    <div class="govuk-summary-list__row">
+                        <dt class="govuk-summary-list__key">Goal ID</dt>
+                        <dd class="govuk-summary-list__value">#<?= htmlspecialchars($goal['id']) ?></dd>
+                    </div>
+                    <div class="govuk-summary-list__row">
+                        <dt class="govuk-summary-list__key">Title</dt>
+                        <dd class="govuk-summary-list__value"><?= htmlspecialchars($goal['title']) ?></dd>
+                    </div>
+                    <?php if (!empty($goal['description'])): ?>
+                    <div class="govuk-summary-list__row">
+                        <dt class="govuk-summary-list__key">Description</dt>
+                        <dd class="govuk-summary-list__value"><?= htmlspecialchars(substr($goal['description'], 0, 200)) ?><?= strlen($goal['description']) > 200 ? '...' : '' ?></dd>
+                    </div>
+                    <?php endif; ?>
+                    <?php if (isset($goal['progress'])): ?>
+                    <div class="govuk-summary-list__row">
+                        <dt class="govuk-summary-list__key">Progress</dt>
+                        <dd class="govuk-summary-list__value"><?= htmlspecialchars($goal['progress']) ?>%</dd>
+                    </div>
+                    <?php endif; ?>
+                </dl>
+
+                <div class="govuk-inset-text">
+                    Deleting this goal will permanently remove all associated progress, milestones, and activity history.
+                    This includes any buddy connections and social interactions linked to this goal.
+                </div>
+
+                <!-- Delete Form -->
+                <form action="<?= $basePath ?>/goals/<?= $goal['id'] ?>/delete" method="POST">
+                    <?= Csrf::input() ?>
+
+                    <div class="govuk-button-group">
+                        <button type="submit" class="govuk-button govuk-button--warning" data-module="govuk-button">
+                            Yes, delete this goal
+                        </button>
+                        <a href="<?= $basePath ?>/goals/<?= $goal['id'] ?>" class="govuk-link">Cancel</a>
+                    </div>
+                </form>
+
+            </div>
+
+            <!-- Sidebar -->
+            <div class="govuk-grid-column-one-third">
+                <aside class="govuk-!-margin-top-6" role="complementary">
+
+                    <h2 class="govuk-heading-s">Before you delete</h2>
+
+                    <p class="govuk-body">
+                        Consider whether you might want to:
+                    </p>
+
+                    <ul class="govuk-list govuk-list--bullet">
+                        <li>Mark the goal as complete instead</li>
+                        <li>Archive the goal for future reference</li>
+                        <li>Update the goal with new targets</li>
+                    </ul>
+
+                    <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible">
+
+                    <h2 class="govuk-heading-s">Need help?</h2>
+                    <p class="govuk-body">
+                        <a href="<?= $basePath ?>/help" class="govuk-link">Visit our help centre</a> if you have
+                        questions about managing your goals.
+                    </p>
+
+                </aside>
+            </div>
         </div>
-    </div>
+
+    </main>
 </div>
 
-<!-- Goals Delete JavaScript -->
-<script src="/assets/js/civicone-goals-delete.js?v=<?= time() ?>" defer></script>
-
-<?php require __DIR__ . '/../../layouts/footer.php'; ?>
+<?php require dirname(__DIR__, 2) . '/layouts/civicone/footer.php'; ?>

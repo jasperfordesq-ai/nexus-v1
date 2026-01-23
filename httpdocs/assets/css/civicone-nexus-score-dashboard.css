@@ -11,7 +11,7 @@
 
 .score-hero-card {
     background: linear-gradient(135deg, rgba(15, 23, 42, 0.95), rgba(30, 41, 59, 0.9));
-    backdrop-filter: blur(20px);
+    /* backdrop-filter removed for GOV.UK compliance */
     border: 1px solid rgba(255, 255, 255, 0.1);
     border-radius: var(--radius-2xl);
     padding: 3rem;
@@ -28,12 +28,11 @@
     width: 200%;
     height: 200%;
     background: radial-gradient(circle, var(--score-glow) 0%, transparent 70%);
-    animation: pulse-glow 3s ease-in-out infinite;
+    /* animation removed for GOV.UK compliance */
     pointer-events: none;
 }
 
-@keyframes pulse-glow {
-    0%, 100% { opacity: 0.3; }
+/* Animation removed for GOV.UK compliance */
     50% { opacity: 0.6; }
 }
 
@@ -71,14 +70,11 @@
     stroke-linecap: round;
     stroke-dasharray: 565.48; /* 2 * PI * 90 */
     stroke-dashoffset: 565.48;
-    animation: fillScore 2s ease-out forwards;
+    /* animation removed for GOV.UK compliance */
     filter: drop-shadow(0 0 10px var(--score-glow));
 }
 
-@keyframes fillScore {
-    to {
-        stroke-dashoffset: calc(565.48 - (565.48 * var(--score-percentage) / 100));
-    }
+/* Animation removed for GOV.UK compliance */
 }
 
 .score-circle-text {
@@ -149,7 +145,7 @@
 
 .category-card {
     background: linear-gradient(135deg, rgba(15, 23, 42, 0.9), rgba(30, 41, 59, 0.8));
-    backdrop-filter: blur(16px);
+    /* backdrop-filter removed for GOV.UK compliance */
     border: 1px solid rgba(255, 255, 255, 0.1);
     border-radius: var(--radius-xl);
     padding: 1.5rem;

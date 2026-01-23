@@ -28,7 +28,7 @@
     --civic-msg-unread-bg: #f0fdf4;
     --civic-msg-sent-bg: var(--skin-primary, var(--color-govuk-green-darker));
     --civic-msg-received-bg: var(--color-gray-200);
-    --civic-msg-sent-text: #fff;
+    --civic-msg-sent-text: var(--color-white);
     --civic-msg-received-text: var(--color-gray-800);
 }
 
@@ -49,7 +49,7 @@
    Messages Module Header
    -------------------------------------------- */
 .civic-msg-header {
-    margin-bottom: 30px;
+    margin-bottom: var(--space-8);
     border-bottom: 4px solid var(--skin-primary, var(--color-govuk-green-darker));
     padding-bottom: var(--space-2-5);
 }
@@ -104,7 +104,7 @@
     background: #ccc;
     color: #333;
     font-size: 0.9rem;
-    padding: 8px var(--space-4);
+    padding: var(--space-2) var(--space-4);
     min-height: var(--civic-msg-touch-min);
 }
 
@@ -212,7 +212,7 @@
     background: var(--skin-primary);
     color: white;
     border-radius: 50%;
-    padding: 4px 8px;
+    padding: var(--space-1) 8px;
     font-size: 0.8rem;
     font-weight: bold;
 }
@@ -277,7 +277,7 @@
 .civic-chat-sender {
     font-weight: bold;
     font-size: 0.8rem;
-    margin-bottom: 4px;
+    margin-bottom: var(--space-1);
     opacity: 0.8;
 }
 
@@ -298,7 +298,7 @@
    -------------------------------------------- */
 .civic-chat-reply {
     padding: var(--space-5);
-    background: #fff;
+    background: var(--color-white);
 }
 
 [data-theme="dark"] .civic-chat-reply {
@@ -349,9 +349,9 @@
 .civic-notification-card {
     display: flex;
     align-items: flex-start;
-    gap: 16px;
+    gap: var(--space-4);
     padding: var(--space-5);
-    background: var(--civic-bg-card, #fff);
+    background: var(--civic-bg-card, var(--color-white));
     border: 1px solid var(--civic-border, var(--color-gray-200));
     border-radius: var(--radius-lg);
     transition: box-shadow 0.2s ease;
@@ -411,7 +411,7 @@
 
 .civic-notification-actions {
     display: flex;
-    gap: 8px;
+    gap: var(--space-2);
     flex-shrink: 0;
 }
 
@@ -461,7 +461,7 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    gap: 8px;
+    gap: var(--space-2);
     margin-top: var(--space-6);
     flex-wrap: wrap;
 }
@@ -469,8 +469,8 @@
 .civic-pagination-btn {
     min-width: var(--civic-msg-touch-min);
     min-height: var(--civic-msg-touch-min);
-    padding: 8px 16px;
-    background: var(--civic-bg-card, #fff);
+    padding: var(--space-2) 16px;
+    background: var(--civic-bg-card, var(--color-white));
     border: 2px solid var(--civic-msg-border-light);
     border-radius: var(--radius-md);
     color: var(--civic-msg-text-primary);
@@ -499,7 +499,7 @@
 .civic-pagination-current {
     background: var(--skin-primary, var(--color-govuk-green-darker));
     border-color: var(--skin-primary, var(--color-govuk-green-darker));
-    color: #fff;
+    color: var(--color-white);
 }
 
 [data-theme="dark"] .civic-pagination-btn {
@@ -513,15 +513,15 @@
    -------------------------------------------- */
 .civic-empty-state {
     text-align: center;
-    padding: 60px var(--space-5);
-    background: var(--civic-bg-card, #fff);
+    padding: var(--space-16) var(--space-5);
+    background: var(--civic-bg-card, var(--color-white));
     border-radius: var(--radius-lg);
     border: 2px dashed var(--civic-msg-border-light);
 }
 
 .civic-empty-state-icon {
     color: var(--civic-msg-text-muted);
-    margin-bottom: 16px;
+    margin-bottom: var(--space-4);
 }
 
 .civic-empty-state-icon .dashicons {

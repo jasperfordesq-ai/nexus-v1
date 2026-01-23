@@ -304,7 +304,7 @@ body.dark-mode .civic-logo:focus-visible {
    =========================================== */
 @media (prefers-contrast: more) {
     :root {
-        --civicone-focus: #ffff00; /* Brighter yellow for high contrast */
+        --civicone-focus: var(--color-white)f00; /* Brighter yellow for high contrast */
         --civicone-focus-text: var(--color-black);
     }
 }

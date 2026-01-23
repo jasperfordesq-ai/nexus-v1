@@ -63,7 +63,7 @@
     .social-prescribing-outcomes-list li {
         margin-bottom: var(--space-5);
         position: relative;
-        padding-left: 30px;
+        padding-left: var(--space-8);
     }
 
     .social-prescribing-outcomes-list .icon {

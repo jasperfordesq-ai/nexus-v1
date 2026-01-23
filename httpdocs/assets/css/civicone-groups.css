@@ -51,7 +51,7 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 30px;
+    margin-bottom: var(--space-8);
     flex-wrap: wrap;
     gap: var(--space-3);
 }
@@ -83,7 +83,7 @@
 .civicone--govuk .civicone-groups-card-grid {
     display: grid;
     grid-template-columns: 1fr; /* Mobile: 1 column */
-    gap: 30px;
+    gap: var(--space-8);
     margin-bottom: var(--space-10);
 }
 
@@ -120,7 +120,7 @@
 
 /* Group Card Image Section */
 .civic-group-card-image {
-    padding: 30px var(--space-5) var(--space-2-5) var(--space-5);
+    padding: var(--space-8) var(--space-5) var(--space-2-5) var(--space-5);
     width: 100%;
     display: flex;
     justify-content: center;
@@ -251,7 +251,7 @@
 }
 
 .civicone--govuk .civicone-group-card__image {
-    padding: 30px var(--space-5) var(--space-2-5) var(--space-5);
+    padding: var(--space-8) var(--space-5) var(--space-2-5) var(--space-5);
     width: 100%;
     display: flex;
     justify-content: center;
@@ -523,7 +523,7 @@
 .civic-tab-nav {
     display: flex;
     border-bottom: var(--space-0-5) solid var(--civic-group-border);
-    margin-bottom: 30px;
+    margin-bottom: var(--space-8);
     gap: var(--space-5);
 }
 
@@ -563,18 +563,14 @@
 
 .civic-tab-pane {
     display: none;
-    animation: civicFadeIn 0.3s ease-in-out;
+    /* animation removed for GOV.UK compliance */
 }
 
 .civic-tab-pane.active {
     display: block;
 }
 
-@keyframes civicFadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(5px);
-    }
+/* Animation removed for GOV.UK compliance */
     to {
         opacity: 1;
         transform: translateY(0);
@@ -583,7 +579,7 @@
 
 @media (prefers-reduced-motion: reduce) {
     .civic-tab-pane {
-        animation: none;
+        /* animation removed for GOV.UK compliance */
     }
 }
 
@@ -596,7 +592,7 @@
     border-radius: var(--radius-md);
     overflow: hidden;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-    margin-bottom: 30px;
+    margin-bottom: var(--space-8);
     border: 1px solid var(--civic-group-border);
 }
 
@@ -669,7 +665,7 @@
 .civic-group-content-grid {
     display: grid;
     grid-template-columns: 1fr 300px;
-    gap: 30px;
+    gap: var(--space-8);
     align-items: start;
 }
 
@@ -816,7 +812,7 @@
 .civic-subhub-btn {
     display: inline-block;
     margin-top: var(--space-2-5);
-    padding: 8px 16px;
+    padding: var(--space-2) 16px;
     min-height: var(--space-9);
     background: transparent;
     color: var(--civic-group-brand);
@@ -1037,7 +1033,7 @@
     }
 
     .civic-group-info {
-        padding: 16px;
+        padding: var(--space-4);
     }
 
     .civic-group-info h1 {
@@ -1047,7 +1043,7 @@
     .civic-group-header-content {
         flex-direction: column;
         align-items: stretch;
-        gap: 16px;
+        gap: var(--space-4);
     }
 
     .civic-group-header-content > div:last-child {

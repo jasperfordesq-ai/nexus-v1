@@ -24,7 +24,7 @@
         radial-gradient(ellipse at 25% 30%, rgba(20, 184, 166, 0.12) 0%, transparent 50%),
         radial-gradient(ellipse at 75% 25%, rgba(79, 70, 229, 0.1) 0%, transparent 45%),
         radial-gradient(ellipse at 50% 80%, rgba(139, 92, 246, 0.08) 0%, transparent 50%);
-    animation: editOrgFloat 20s ease-in-out infinite;
+    /* animation removed for GOV.UK compliance */
 }
 
 [data-theme="dark"] .edit-org-glass-bg {
@@ -37,8 +37,7 @@
         radial-gradient(ellipse at 75% 25%, rgba(79, 70, 229, 0.15) 0%, transparent 45%);
 }
 
-@keyframes editOrgFloat {
-    0%, 100% { transform: translate(0, 0) scale(1); }
+/* Animation removed for GOV.UK compliance */
     50% { transform: translate(-1%, 1%) scale(1.02); }
 }
 
@@ -54,15 +53,15 @@
 /* Back Link */
 .edit-org-back-link {
     text-decoration: none;
-    color: var(--htb-text-main, #374151);
+    color: var(--htb-text-main, var(--color-govuk-black));
     display: inline-flex;
     align-items: center;
-    gap: 8px;
+    gap: var(--space-2);
     background: rgba(255, 255, 255, 0.6);
     padding: var(--space-2-5) var(--space-4-5);
     border-radius: var(--radius-lg);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
+    /* backdrop-filter removed for GOV.UK compliance */
+    -webkit-/* backdrop-filter removed for GOV.UK compliance */
     font-weight: 600;
     font-size: 0.9rem;
     transition: all 0.2s ease;
@@ -89,13 +88,13 @@
     background: linear-gradient(135deg,
         rgba(255, 255, 255, 0.85) 0%,
         rgba(255, 255, 255, 0.7) 100%);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
+    /* backdrop-filter removed for GOV.UK compliance */
+    -webkit-/* backdrop-filter removed for GOV.UK compliance */
     border: 1px solid rgba(255, 255, 255, 0.5);
     border-radius: var(--radius-2xl);
     box-shadow: 0 8px 32px rgba(31, 38, 135, 0.1);
-    padding: 30px;
-    animation: fadeInUp 0.4s ease-out;
+    padding: var(--space-8);
+    /* animation removed for GOV.UK compliance */
 }
 
 [data-theme="dark"] .edit-org-card {
@@ -105,8 +104,7 @@
     border-color: rgba(255, 255, 255, 0.1);
 }
 
-@keyframes fadeInUp {
-    from { opacity: 0; transform: translateY(20px); }
+/* Animation removed for GOV.UK compliance */
     to { opacity: 1; transform: translateY(0); }
 }
 
@@ -155,7 +153,7 @@
 .edit-org-label {
     display: block;
     font-weight: 600;
-    margin-bottom: 8px;
+    margin-bottom: var(--space-2);
     font-size: 0.9rem;
     color: var(--color-gray-700);
 }
@@ -169,7 +167,7 @@
 .edit-org-textarea {
     width: 100%;
     padding: var(--space-3-5) 16px;
-    border: 1px solid #d1d5db;
+    border: 1px solid var(--color-govuk-grey);
     border-radius: var(--radius-md);
     font-size: 1rem;
     font-family: inherit;
@@ -185,7 +183,7 @@
     outline: none;
     border-color: var(--color-teal-500);
     box-shadow: 0 0 0 3px rgba(20, 184, 166, 0.15);
-    background: #fff;
+    background: var(--color-white);
 }
 
 [data-theme="dark"] .edit-org-input,
@@ -296,7 +294,7 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    gap: 8px;
+    gap: var(--space-2);
     padding: var(--space-3) var(--space-4-5);
     border-radius: var(--radius-md);
     font-weight: 600;
@@ -356,7 +354,7 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    gap: 8px;
+    gap: var(--space-2);
     padding: var(--space-3-5) var(--space-6);
     border-radius: var(--radius-lg);
     font-weight: 600;
@@ -430,7 +428,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 8px;
+    gap: var(--space-2);
     transform: translateY(-100%);
     transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
@@ -464,13 +462,13 @@
 
     .edit-org-btn {
         min-height: 52px;
-        padding: 16px var(--space-5);
+        padding: var(--space-4) var(--space-5);
     }
 
     .edit-org-input,
     .edit-org-textarea {
         font-size: 16px !important; /* Prevents iOS zoom */
-        padding: 16px;
+        padding: var(--space-4);
     }
 
     .edit-org-form-actions {
@@ -503,7 +501,7 @@ html {
 }
 
 .edit-org-quick-actions-icon {
-    margin-right: 4px;
+    margin-right: var(--space-1);
 }
 
 /* Back Link Container */

@@ -25,12 +25,12 @@
     --ff-text-muted: #8a8d91;
     --ff-pill-bg: rgba(0, 0, 0, 0.05);
     --ff-pill-bg-hover: rgba(0, 0, 0, 0.08);
-    --ff-pill-bg-active: var(--color-primary-500);
+    --ff-pill-bg-active: var(--color-govuk-blue);
     --ff-pill-text-active: var(--color-white);
     --ff-shadow: 0 8px 32px rgba(0, 0, 0, 0.08), 0 var(--space-1) var(--space-2) rgba(0, 0, 0, 0.04);
     --ff-shadow-hover: 0 12px 40px rgba(0, 0, 0, 0.12);
-    --ff-location-active: var(--color-success);
-    --ff-algo-active: var(--color-warning);
+    --ff-location-active: var(--color-govuk-green);
+    --ff-algo-active: var(--color-govuk-blue);
     --ff-transition: var(--transition-base);
     --ff-height-primary: 56px;
     --ff-height-secondary: 44px;
@@ -46,7 +46,7 @@
     --ff-text-muted: var(--color-slate-500);
     --ff-pill-bg: rgba(255, 255, 255, 0.08);
     --ff-pill-bg-hover: rgba(255, 255, 255, 0.12);
-    --ff-pill-bg-active: var(--color-primary-500);
+    --ff-pill-bg-active: var(--color-govuk-blue);
     --ff-shadow: 0 8px 32px rgba(0, 0, 0, 0.3), 0 0 60px rgba(99, 102, 241, 0.1);
 }
 
@@ -154,7 +154,7 @@
 .feed-filter-algo-btn.active {
     background: var(--ff-algo-active);
     color: white;
-    box-shadow: 0 var(--space-1) var(--space-2) rgba(245, 158, 11, 0.3);
+    box-shadow: 0 var(--space-1) var(--space-2) rgba(0, 48, 120, 0.3);
 }
 
 .feed-filter-algo-btn.active i {

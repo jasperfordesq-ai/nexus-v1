@@ -170,13 +170,16 @@ $currentFilterData = $filterLabels[$currentFilter] ?? $filterLabels['all'];
 
     <!-- Secondary Row (Desktop) -->
     <div class="feed-filter-secondary" id="feedFilterSecondary">
-        <div class="feed-filter-subgroup feed-filter-radius" data-parent="location" <?= $locationMode !== 'nearby' ? 'style="display:none;"' : '' ?>>
+        <div class="feed-filter-subgroup feed-filter-radius <?= $locationMode !== 'nearby' ? 'hidden' : '' ?>" data-parent="location">
             <div class="feed-filter-radius-header">
                 <i class="fa-solid fa-map-marker-alt"></i>
                 <span><?= htmlspecialchars($userLocationName ?? 'Your Location') ?></span>
             </div>
             <div class="feed-filter-radius-control">
+                <label for="radiusSlider" class="govuk-visually-hidden">Search radius in kilometres</label>
                 <input type="range" id="radiusSlider" class="feed-filter-radius-slider" min="10" max="500" step="10" value="<?= $currentRadius ?>"
+                    aria-label="Search radius"
+                    aria-valuemin="10" aria-valuemax="500" aria-valuenow="<?= $currentRadius ?>"
                     oninput="FeedFilter.updateRadiusPreview(this.value)"
                     onchange="FeedFilter.setRadius(this.value)">
                 <div class="feed-filter-radius-labels">
@@ -187,7 +190,7 @@ $currentFilterData = $filterLabels[$currentFilter] ?? $filterLabels['all'];
             </div>
         </div>
 
-        <div class="feed-filter-subgroup" data-parent="listings" <?= $currentFilter !== 'listings' ? 'style="display:none;"' : '' ?>>
+        <div class="feed-filter-subgroup <?= $currentFilter !== 'listings' ? 'hidden' : '' ?>" data-parent="listings">
             <button type="button" class="feed-filter-sub <?= ($currentFilter === 'listings' && (!$currentSubFilter || $currentSubFilter === 'all')) ? 'active' : '' ?>" data-subfilter="all" onclick="FeedFilter.setSubFilter('all')">All</button>
             <button type="button" class="feed-filter-sub <?= ($currentFilter === 'listings' && $currentSubFilter === 'offers') ? 'active' : '' ?>" data-subfilter="offers" onclick="FeedFilter.setSubFilter('offers')">
                 <i class="fa-solid fa-gift"></i> Offers
@@ -198,7 +201,7 @@ $currentFilterData = $filterLabels[$currentFilter] ?? $filterLabels['all'];
         </div>
 
         <?php if ($hasVolunteering): ?>
-        <div class="feed-filter-subgroup" data-parent="volunteering" <?= $currentFilter !== 'volunteering' ? 'style="display:none;"' : '' ?>>
+        <div class="feed-filter-subgroup <?= $currentFilter !== 'volunteering' ? 'hidden' : '' ?>" data-parent="volunteering">
             <button type="button" class="feed-filter-sub <?= ($currentFilter === 'volunteering' && (!$currentSubFilter || $currentSubFilter === 'all')) ? 'active' : '' ?>" data-subfilter="all" onclick="FeedFilter.setSubFilter('all')">All</button>
             <button type="button" class="feed-filter-sub <?= ($currentFilter === 'volunteering' && $currentSubFilter === 'opportunities') ? 'active' : '' ?>" data-subfilter="opportunities" onclick="FeedFilter.setSubFilter('opportunities')">
                 <i class="fa-solid fa-briefcase"></i> Opportunities
@@ -210,7 +213,7 @@ $currentFilterData = $filterLabels[$currentFilter] ?? $filterLabels['all'];
         <?php endif; ?>
 
         <?php if ($hasGroups): ?>
-        <div class="feed-filter-subgroup" data-parent="groups" <?= $currentFilter !== 'groups' ? 'style="display:none;"' : '' ?>>
+        <div class="feed-filter-subgroup <?= $currentFilter !== 'groups' ? 'hidden' : '' ?>" data-parent="groups">
             <button type="button" class="feed-filter-sub <?= ($currentFilter === 'groups' && (!$currentSubFilter || $currentSubFilter === 'my-groups')) ? 'active' : '' ?>" data-subfilter="my-groups" onclick="FeedFilter.setSubFilter('my-groups')">
                 <i class="fa-solid fa-user-group"></i> My Groups
             </button>
@@ -410,20 +413,20 @@ window.FeedFilter = (function() {
         const showLocationSlider = locationMode === 'nearby' && hasUserLocation;
 
         document.querySelectorAll('.feed-filter-subgroup').forEach(group => {
-            group.style.display = 'none';
+            group.classList.add('hidden');
         });
 
         let shouldShow = false;
 
         if (showLocationSlider) {
             const locGroup = document.querySelector('.feed-filter-radius');
-            if (locGroup) { locGroup.style.display = 'flex'; shouldShow = true; }
+            if (locGroup) { locGroup.classList.remove('hidden'); shouldShow = true; }
         }
 
         if (hasSecondary) {
             const activeGroup = document.querySelector(`.feed-filter-subgroup[data-parent="${currentFilter}"]`);
             if (activeGroup) {
-                activeGroup.style.display = 'flex';
+                activeGroup.classList.remove('hidden');
                 shouldShow = true;
                 if (!currentSubFilter) {
                     const first = activeGroup.querySelector('.feed-filter-sub');

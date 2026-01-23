@@ -41,7 +41,7 @@
     --civic-action-ranking: var(--color-pink-700);     /* 5.81:1 - Pink 700 */
     --civic-action-logout: var(--color-red-700);      /* 5.85:1 - Red 700 */
 
-    /* WCAG 2.1 AA Compliant Icon Colors (4.5:1+ contrast on #fff) */
+    /* WCAG 2.1 AA Compliant Icon Colors (4.5:1+ contrast on var(--color-white)) */
     --civic-icon-brand: var(--color-govuk-green-darker);    /* 4.50:1 - Original teal */
     --civic-icon-purple: var(--color-purple-600);   /* 4.53:1 - Violet 600 */
     --civic-icon-green: var(--color-emerald-600);    /* 4.52:1 - Emerald 600 */
@@ -178,7 +178,7 @@
 /* Dropdown shown state (for JS toggle) */
 .civic-dropdown-content.is-open {
     display: block;
-    animation: civicFadeIn 0.2s;
+    /* animation removed for GOV.UK compliance */
 }
 
 /* REMOVED: Hover logic conflicts with JS click handlers
@@ -186,11 +186,10 @@
    JS-only control is more accessible (WCAG 2.1 AA compliant) */
 /* .civic-dropdown:hover .civic-dropdown-content {
     display: block;
-    animation: civicFadeIn 0.2s;
+    /* animation removed for GOV.UK compliance */
 } */
 
-@keyframes civicFadeIn {
-    from { opacity: 0; transform: translateY(-4px); }
+/* Animation removed for GOV.UK compliance */
     to { opacity: 1; transform: translateY(0); }
 }
 
@@ -1579,7 +1578,7 @@ body.dark-mode .civic-utility-bar .civic-dropdown-content a:hover {
     top: -var(--space-1-5);
     right: -var(--space-1-5);
     background: var(--color-danger);
-    color: #fff;
+    color: var(--color-white);
     font-size: var(--space-2);
     font-weight: 700;
     padding: var(--space-0-5) var(--space-1);
@@ -1626,12 +1625,12 @@ body.dark-mode .civic-utility-bar .civic-dropdown-content a:hover {
    14. ACCESSIBLE BANNER
    =========================================== */
 .civic-experimental-banner {
-    background: #00703c;
-    color: #ffffff;
-    padding: 8px 1.5rem;
+    background: var(--color-govuk-green);
+    color: var(--color-white);
+    padding: var(--space-2) 1.5rem;
     font-size: 13px;
     text-align: center;
-    border-bottom: 1px solid #005a30;
+    border-bottom: 1px solid var(--color-govuk-green-dark);
     position: relative;
     min-height: 2.5rem;
     display: flex;
@@ -1644,7 +1643,7 @@ body.dark-mode .civic-utility-bar .civic-dropdown-content a:hover {
 .civic-banner-content {
     display: flex;
     align-items: center;
-    gap: 16px;
+    gap: var(--space-4);
     flex-wrap: nowrap;
     justify-content: space-between;
     width: 100%;
@@ -1661,7 +1660,7 @@ body.dark-mode .civic-utility-bar .civic-dropdown-content a:hover {
 
 .civic-experimental-badge {
     background: rgba(255, 255, 255, 0.2);
-    color: #ffffff;
+    color: var(--color-white);
     padding: 0.25rem 0.625rem;
     font-weight: 700;
     font-size: 11px;
@@ -1687,13 +1686,13 @@ body.dark-mode .civic-utility-bar .civic-dropdown-content a:hover {
 }
 
 .civic-experimental-text strong {
-    color: #ffffff;
+    color: var(--color-white);
     font-weight: 600;
 }
 
 .civic-experimental-switch {
-    background: #ffffff;
-    color: #0b0c0c !important;
+    background: var(--color-white);
+    color: var(--color-govuk-black) !important;
     padding: 0.25rem 0.75rem;
     text-decoration: none;
     font-weight: 600;
@@ -1707,8 +1706,8 @@ body.dark-mode .civic-utility-bar .civic-dropdown-content a:hover {
 }
 
 .civic-experimental-switch:hover {
-    background: #f3f2f1;
-    color: #0b0c0c !important;
+    background: var(--color-govuk-light-grey);
+    color: var(--color-govuk-black) !important;
 }
 
 .civic-experimental-switch:focus-visible {
@@ -1721,7 +1720,7 @@ body.dark-mode .civic-utility-bar .civic-dropdown-content a:hover {
 
 /* Dark mode banner */
 body.dark-mode .civic-experimental-banner {
-    background: #1d70b8;
+    background: var(--color-govuk-blue-light);
 }
 
 /* Compact text on narrower screens */

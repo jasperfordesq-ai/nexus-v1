@@ -148,7 +148,7 @@
 
     .timebanking-guide-step-icon.blue {
         background: var(--color-blue-100);
-        color: #2563eb;
+        color: var(--color-govuk-blue-light);
     }
 
     .timebanking-guide-step-icon.pink {
@@ -168,7 +168,7 @@
 
     [data-theme="dark"] .timebanking-guide-step-icon.pink {
         background: rgba(236, 72, 153, 0.2);
-        color: #f9a8d4;
+        color: var(--color-govuk-light-grey);
     }
 
     [data-theme="dark"] .timebanking-guide-step-icon.green {

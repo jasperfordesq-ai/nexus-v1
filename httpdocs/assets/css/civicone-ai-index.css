@@ -35,7 +35,7 @@
     display: flex;
     flex-direction: column;
     background: rgba(255, 255, 255, 0.9);
-    backdrop-filter: blur(20px);
+    /* backdrop-filter removed for GOV.UK compliance */
     border-radius: var(--radius-xl);
     border: 1px solid rgba(0, 0, 0, 0.08);
     overflow: hidden;
@@ -81,7 +81,7 @@
 }
 
 .ai-new-chat-btn:focus-visible {
-    outline: 2px solid #fff;
+    outline: 2px solid var(--color-white);
     outline-offset: 2px;
 }
 
@@ -136,7 +136,7 @@
 .ai-conversation-item .conv-title {
     font-weight: 500;
     font-size: 0.875rem;
-    color: var(--text-primary, #1e293b);
+    color: var(--text-primary, var(--color-govuk-black));
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -148,7 +148,7 @@
 
 .ai-conversation-item .conv-date {
     font-size: 0.75rem;
-    color: var(--text-muted, #64748b);
+    color: var(--text-muted, var(--color-govuk-grey-dark));
 }
 
 /* Delete button for conversations */
@@ -158,7 +158,7 @@
     background: transparent;
     border: none;
     border-radius: var(--radius-base);
-    color: var(--text-muted, #64748b);
+    color: var(--text-muted, var(--color-govuk-grey-dark));
     cursor: pointer;
     transition: all 0.15s ease;
     flex-shrink: 0;
@@ -185,7 +185,7 @@
     display: flex;
     flex-direction: column;
     background: rgba(255, 255, 255, 0.9);
-    backdrop-filter: blur(20px);
+    /* backdrop-filter removed for GOV.UK compliance */
     border-radius: var(--radius-xl);
     border: 1px solid rgba(0, 0, 0, 0.08);
     overflow: hidden;
@@ -212,7 +212,7 @@
 .ai-chat-header h2 {
     font-size: 1.125rem;
     font-weight: 600;
-    color: var(--text-primary, #1e293b);
+    color: var(--text-primary, var(--color-govuk-black));
     margin: 0;
 }
 
@@ -276,7 +276,7 @@
 .ai-welcome h3 {
     font-size: 1.5rem;
     font-weight: 700;
-    color: var(--text-primary, #1e293b);
+    color: var(--text-primary, var(--color-govuk-black));
     margin-bottom: 0.5rem;
 }
 
@@ -285,7 +285,7 @@
 }
 
 .ai-welcome p {
-    color: var(--text-muted, #64748b);
+    color: var(--text-muted, var(--color-govuk-grey-dark));
     max-width: 400px;
     margin-bottom: 2rem;
 }
@@ -352,7 +352,7 @@
 }
 
 .ai-message.user .ai-message-avatar {
-    background: linear-gradient(135deg, var(--color-blue-500), #2563eb);
+    background: linear-gradient(135deg, var(--color-blue-500), var(--color-govuk-blue-light));
     color: white;
 }
 
@@ -369,7 +369,7 @@
 
 .ai-message.assistant .ai-message-content {
     background: rgba(0, 0, 0, 0.05);
-    color: var(--text-primary, #1e293b);
+    color: var(--text-primary, var(--color-govuk-black));
     border-bottom-left-radius: 4px;
 }
 
@@ -386,14 +386,10 @@
 
 /* Message entry animation */
 .ai-message {
-    animation: messageSlideIn 0.3s ease-out;
+    /* animation removed for GOV.UK compliance */
 }
 
-@keyframes messageSlideIn {
-    from {
-        opacity: 0;
-        transform: translateY(12px);
-    }
+/* Animation removed for GOV.UK compliance */
     to {
         opacity: 1;
         transform: translateY(0);
@@ -467,8 +463,8 @@
 /* Message Actions */
 .ai-message-actions {
     display: flex;
-    gap: 4px;
-    margin-top: 8px;
+    gap: var(--space-1);
+    margin-top: var(--space-2);
     opacity: 0;
     transition: opacity 0.2s ease;
 }
@@ -478,16 +474,16 @@
 }
 
 .ai-action-btn {
-    padding: 4px 8px;
+    padding: var(--space-1) 8px;
     background: rgba(0, 0, 0, 0.05);
     border: none;
     border-radius: var(--radius-base);
     font-size: 0.75rem;
-    color: var(--text-muted, #64748b);
+    color: var(--text-muted, var(--color-govuk-grey-dark));
     cursor: pointer;
     display: flex;
     align-items: center;
-    gap: 4px;
+    gap: var(--space-1);
     transition: all 0.15s ease;
 }
 
@@ -510,9 +506,9 @@
 .ai-stopped-indicator {
     display: inline-block;
     font-size: 0.75rem;
-    color: var(--text-muted, #94a3b8);
+    color: var(--text-muted, var(--color-govuk-grey-dark));
     font-style: italic;
-    margin-left: 8px;
+    margin-left: var(--space-2);
 }
 
 /* Error message styles */
@@ -564,7 +560,7 @@
 /* Typing Indicator */
 .ai-typing {
     display: flex;
-    gap: 4px;
+    gap: var(--space-1);
     padding: 1rem;
 }
 
@@ -573,14 +569,13 @@
     height: 8px;
     background: var(--color-primary-500);
     border-radius: 50%;
-    animation: typingBounce 1.4s ease-in-out infinite;
+    /* animation removed for GOV.UK compliance */
 }
 
 .ai-typing span:nth-child(2) { animation-delay: 0.2s; }
 .ai-typing span:nth-child(3) { animation-delay: 0.4s; }
 
-@keyframes typingBounce {
-    0%, 60%, 100% { transform: translateY(0); }
+/* Animation removed for GOV.UK compliance */
     30% { transform: translateY(-8px); }
 }
 
@@ -591,12 +586,11 @@
     height: 1em;
     background: var(--color-primary-500);
     margin-left: var(--space-0-5);
-    animation: cursorBlink 0.8s ease-in-out infinite;
+    /* animation removed for GOV.UK compliance */
     vertical-align: text-bottom;
 }
 
-@keyframes cursorBlink {
-    0%, 50% { opacity: 1; }
+/* Animation removed for GOV.UK compliance */
     51%, 100% { opacity: 0; }
 }
 
@@ -626,7 +620,7 @@
     min-height: var(--space-12);
     max-height: 150px;
     background: transparent;
-    color: var(--text-primary, #1e293b);
+    color: var(--text-primary, var(--color-govuk-black));
     transition: border-color 0.2s ease;
 }
 
@@ -645,7 +639,7 @@
 }
 
 [data-theme="dark"] .ai-input-field:focus {
-    border-color: #818cf8;
+    border-color: var(--color-govuk-blue-lighter);
     box-shadow: 0 0 0 3px rgba(129, 140, 248, 0.2);
     background: rgba(30, 30, 30, 0.5) !important;
     color: var(--color-slate-100) !important;
@@ -653,7 +647,7 @@
 }
 
 .ai-input-field::placeholder {
-    color: var(--text-muted, #94a3b8);
+    color: var(--text-muted, var(--color-govuk-grey-dark));
 }
 
 [data-theme="dark"] .ai-input-field::placeholder {
@@ -708,11 +702,10 @@
     align-items: center;
     justify-content: center;
     transition: all 0.2s ease;
-    animation: pulseStop 1.5s ease-in-out infinite;
+    /* animation removed for GOV.UK compliance */
 }
 
-@keyframes pulseStop {
-    0%, 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4); }
+/* Animation removed for GOV.UK compliance */
     50% { box-shadow: 0 0 0 8px rgba(239, 68, 68, 0); }
 }
 
@@ -735,7 +728,7 @@
     display: flex;
     justify-content: space-between;
     font-size: 0.75rem;
-    color: var(--text-muted, #64748b);
+    color: var(--text-muted, var(--color-govuk-grey-dark));
     padding-top: 0.5rem;
 }
 
@@ -932,7 +925,7 @@
 /* Extra small devices */
 @media (max-width: 480px) {
     .ai-page-wrapper {
-        padding-top: 60px;
+        padding-top: var(--space-16);
     }
 
     .ai-page-container {

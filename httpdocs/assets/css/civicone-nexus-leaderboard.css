@@ -6,7 +6,7 @@
 
 .leaderboard-container {
     background: linear-gradient(135deg, rgba(15, 23, 42, 0.95), rgba(30, 41, 59, 0.9));
-    backdrop-filter: blur(20px);
+    /* backdrop-filter removed for GOV.UK compliance */
     border: 1px solid rgba(255, 255, 255, 0.1);
     border-radius: var(--radius-2xl);
     padding: 2rem;
@@ -206,19 +206,19 @@
 
 .leader-item.rank-1 .leader-rank-display {
     background: linear-gradient(135deg, #ffd700, #ffa500);
-    color: #000;
+    color: var(--color-govuk-black);
     font-size: 2rem;
 }
 
 .leader-item.rank-2 .leader-rank-display {
     background: linear-gradient(135deg, #c0c0c0, #808080);
-    color: #000;
+    color: var(--color-govuk-black);
     font-size: 1.75rem;
 }
 
 .leader-item.rank-3 .leader-rank-display {
     background: linear-gradient(135deg, #cd7f32, #8b4513);
-    color: #fff;
+    color: var(--color-white);
     font-size: 1.75rem;
 }
 

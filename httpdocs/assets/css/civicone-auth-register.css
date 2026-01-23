@@ -53,8 +53,8 @@
     .form-label {
         display: block;
         font-weight: 700;
-        margin-bottom: 8px;
-        color: var(--htb-text-main, #1f2937);
+        margin-bottom: var(--space-2);
+        color: var(--htb-text-main, var(--color-govuk-black));
         font-size: 1rem;
     }
 
@@ -73,7 +73,7 @@
 
     .form-input:focus {
         outline: none;
-        border-color: #0ea5e9 !important;
+        border-color: var(--color-govuk-blue-light) !important;
     }
 
     .form-note {
@@ -123,7 +123,7 @@
     }
 
     .auth-submit-btn:not([disabled]):hover {
-        background-color: var(--color-govuk-green-dark, #005a30);
+        background-color: var(--color-govuk-green-dark, var(--color-govuk-green-dark));
     }
 
     .auth-submit-btn:not([disabled]):focus {
@@ -137,11 +137,11 @@
         margin-top: 25px;
         text-align: center;
         font-size: 0.95rem;
-        color: var(--htb-text-muted, #6b7280);
+        color: var(--htb-text-muted, var(--color-govuk-grey-dark));
     }
 
     .auth-login-link a {
-        color: #0ea5e9;
+        color: var(--color-govuk-blue-light);
         font-weight: 600;
         text-decoration: none;
     }
@@ -244,7 +244,7 @@
     }
 
     [data-theme="dark"] .auth-login-link a {
-        color: #818cf8;
+        color: var(--color-govuk-blue-lighter);
     }
 
     /* Select dropdown */

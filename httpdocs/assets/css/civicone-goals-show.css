@@ -32,11 +32,7 @@
 }
 
 /* Content Reveal Animation */
-@keyframes fadeInUp {
-    from {
-        opacity: 0;
-        transform: translateY(var(--space-5));
-    }
+/* Animation removed for GOV.UK compliance */
     to {
         opacity: 1;
         transform: translateY(0);
@@ -44,7 +40,7 @@
 }
 
 .glass-box {
-    animation: fadeInUp 0.4s var(--ease-out);
+    /* animation removed for GOV.UK compliance */
 }
 
 /* Button Press States */
@@ -224,8 +220,8 @@ html[data-theme="dark"] #unique-glass-page-wrapper {
 
     /* High-End Glass Effect */
     background: var(--glass-bg);
-    backdrop-filter: blur(25px) saturate(200%);
-    -webkit-backdrop-filter: blur(25px) saturate(200%);
+    /* backdrop-filter removed for GOV.UK compliance */ saturate(200%);
+    -webkit-/* backdrop-filter removed for GOV.UK compliance */ saturate(200%);
 
     /* Holographic Borders & Shadows */
     border-radius: var(--radius-2xl);
@@ -314,7 +310,7 @@ html[data-theme="dark"] #unique-glass-page-wrapper {
     display: flex;
     flex-direction: column;
     /* Nested Blur not always needed if background is solid enough, but consistent here */
-    backdrop-filter: blur(var(--glass-blur-subtle));
+    /* backdrop-filter removed for GOV.UK compliance */);
     transition: all var(--transition-base);
 }
 

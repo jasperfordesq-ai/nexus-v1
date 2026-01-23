@@ -12,7 +12,7 @@
 :root {
     /* Light Mode Colors */
     --bg-primary: var(--color-slate-50);
-    --bg-secondary: #ffffff;
+    --bg-secondary: var(--color-white);
     --bg-glass: rgba(255, 255, 255, 0.72);
     --bg-glass-strong: rgba(255, 255, 255, 0.85);
     --border-glass: rgba(255, 255, 255, 0.6);
@@ -110,7 +110,7 @@ body {
         radial-gradient(ellipse 45% 40% at 60% 70%, rgba(245, 158, 11, 0.18), transparent 60%),
         radial-gradient(ellipse 30% 25% at 20% 75%, rgba(6, 182, 212, 0.15), transparent 50%),
         radial-gradient(ellipse 50% 45% at 85% 60%, rgba(139, 92, 246, 0.12), transparent 55%);
-    animation: holoOrbs 25s ease-in-out infinite;
+    /* animation removed for GOV.UK compliance */
 }
 
 /* Noise texture overlay for depth */
@@ -141,10 +141,7 @@ body {
     opacity: 0.015;
 }
 
-@keyframes holoOrbs {
-    0%, 100% {
-        transform: translate(0, 0) rotate(0deg) scale(1);
-    }
+/* Animation removed for GOV.UK compliance */
     20% {
         transform: translate(3%, 2%) rotate(3deg) scale(1.02);
     }
@@ -228,11 +225,10 @@ body {
     -webkit-text-fill-color: transparent;
     background-clip: text;
     background-size: 200% 200%;
-    animation: gradientShift 8s ease infinite;
+    /* animation removed for GOV.UK compliance */
 }
 
-@keyframes gradientShift {
-    0%, 100% { background-position: 0% 50%; }
+/* Animation removed for GOV.UK compliance */
     50% { background-position: 100% 50%; }
 }
 
@@ -258,7 +254,7 @@ body {
     -webkit-backdrop-filter: var(--blur-xl) saturate(180%);
     border: 1px solid var(--border-glass);
     border-radius: var(--radius-2xl);
-    padding: 16px 16px var(--space-4-5);
+    padding: var(--space-4) 16px var(--space-4-5);
     text-align: center;
     box-shadow: var(--shadow-md), var(--shadow-glow);
     position: relative;
@@ -273,16 +269,15 @@ body {
     border-radius: 25px;
     padding: 1px;
     background: var(--gradient-hero);
-    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask: linear-gradient(var(--color-white) 0 0) content-box, linear-gradient(var(--color-white) 0 0);
+    mask: linear-gradient(var(--color-white) 0 0) content-box, linear-gradient(var(--color-white) 0 0);
     -webkit-mask-composite: xor;
     mask-composite: exclude;
     opacity: 0.5;
-    animation: borderGlow 4s ease-in-out infinite;
+    /* animation removed for GOV.UK compliance */
 }
 
-@keyframes borderGlow {
-    0%, 100% { opacity: 0.3; }
+/* Animation removed for GOV.UK compliance */
     50% { opacity: 0.6; }
 }
 
@@ -297,14 +292,13 @@ body {
     align-items: center;
     justify-content: center;
     position: relative;
-    animation: logoGradient 6s ease infinite;
+    /* animation removed for GOV.UK compliance */
     box-shadow:
         0 6px 24px rgba(99, 102, 241, 0.3),
         0 0 0 1px rgba(255, 255, 255, 0.2) inset;
 }
 
-@keyframes logoGradient {
-    0%, 100% { background-position: 0% 50%; }
+/* Animation removed for GOV.UK compliance */
     50% { background-position: 100% 50%; }
 }
 
@@ -330,7 +324,7 @@ body {
     font-weight: 800;
     letter-spacing: -0.03em;
     color: var(--text-primary);
-    margin-bottom: 4px;
+    margin-bottom: var(--space-1);
 }
 
 .hero-subtitle {
@@ -393,15 +387,11 @@ body {
     -webkit-tap-highlight-color: transparent;
     transition: transform var(--transition-spring);
     outline: none;
-    animation: iconFadeIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) backwards;
+    /* animation removed for GOV.UK compliance */
     animation-delay: var(--anim-delay, 0s);
 }
 
-@keyframes iconFadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(20px) scale(0.8);
-    }
+/* Animation removed for GOV.UK compliance */
     to {
         opacity: 1;
         transform: translateY(0) scale(1);
@@ -413,7 +403,7 @@ body {
 }
 
 .app-icon:focus-visible .app-icon-circle {
-    outline: 3px solid var(--accent-color, #6366f1);
+    outline: 3px solid var(--accent-color, var(--color-govuk-blue-light));
     outline-offset: 4px;
 }
 
@@ -441,12 +431,11 @@ body {
     filter: blur(12px);
     transition: opacity 0.3s ease;
     z-index: -1;
-    animation: glowPulse 3s ease-in-out infinite;
+    /* animation removed for GOV.UK compliance */
     animation-delay: var(--anim-delay, 0s);
 }
 
-@keyframes glowPulse {
-    0%, 100% { opacity: 0.3; transform: scale(1); }
+/* Animation removed for GOV.UK compliance */
     50% { opacity: 0.5; transform: scale(1.05); }
 }
 
@@ -457,7 +446,7 @@ body {
 .app-icon:hover .glow-ring,
 .app-icon:focus .glow-ring {
     opacity: 0.7 !important;
-    animation: none;
+    /* animation removed for GOV.UK compliance */
 }
 
 /* Glass shine overlay - premium reflection */
@@ -515,12 +504,11 @@ body {
 
 /* Special animation for heart icon */
 .app-icon-circle i.fa-heart {
-    animation: heartbeat 2s ease-in-out infinite;
+    /* animation removed for GOV.UK compliance */
     animation-delay: var(--anim-delay, 0s);
 }
 
-@keyframes heartbeat {
-    0%, 100% { transform: scale(1); }
+/* Animation removed for GOV.UK compliance */
     10% { transform: scale(1.1); }
     20% { transform: scale(1); }
     30% { transform: scale(1.08); }
@@ -528,22 +516,21 @@ body {
 }
 
 .app-icon:hover .app-icon-circle i.fa-heart {
-    animation: none;
+    /* animation removed for GOV.UK compliance */
     transform: scale(1.15);
 }
 
 /* Special animation for compass icon */
 .app-icon-circle i.fa-compass {
-    animation: compassSpin 8s linear infinite;
+    /* animation removed for GOV.UK compliance */
 }
 
-@keyframes compassSpin {
-    from { transform: rotate(0deg); }
+/* Animation removed for GOV.UK compliance */
     to { transform: rotate(360deg); }
 }
 
 .app-icon:hover .app-icon-circle i.fa-compass {
-    animation: none;
+    /* animation removed for GOV.UK compliance */
     transform: scale(1.15) rotate(-10deg);
 }
 
@@ -583,11 +570,10 @@ body {
 }
 
 .app-icon:active .ripple {
-    animation: rippleEffect 0.4s ease-out;
+    /* animation removed for GOV.UK compliance */
 }
 
-@keyframes rippleEffect {
-    0% { opacity: 1; transform: scale(0); }
+/* Animation removed for GOV.UK compliance */
     100% { opacity: 0; transform: scale(2); }
 }
 
@@ -609,11 +595,10 @@ body {
 }
 
 .app-icon:hover .shimmer {
-    animation: shimmerSlide 0.8s ease-out;
+    /* animation removed for GOV.UK compliance */
 }
 
-@keyframes shimmerSlide {
-    0% { opacity: 1; transform: translateX(-100%); }
+/* Animation removed for GOV.UK compliance */
     100% { opacity: 0; transform: translateX(100%); }
 }
 
@@ -702,12 +687,12 @@ body {
 }
 
 .dock-explore {
-    background: linear-gradient(135deg, var(--color-pink-500) 0%, #f43f5e 100%);
+    background: linear-gradient(135deg, var(--color-pink-500) 0%, var(--color-govuk-red) 100%);
     box-shadow: 0 4px 16px rgba(236, 72, 153, 0.4);
 }
 
 .dock-profile {
-    background: linear-gradient(135deg, #0ea5e9 0%, var(--color-cyan-500) 100%);
+    background: linear-gradient(135deg, var(--color-govuk-blue-light) 0%, var(--color-cyan-500) 100%);
     box-shadow: 0 4px 16px rgba(14, 165, 233, 0.4);
 }
 

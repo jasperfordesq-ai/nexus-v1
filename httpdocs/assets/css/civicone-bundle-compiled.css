@@ -203,8 +203,8 @@ body,
 [data-theme="dark"] .htb-dropdown-content {
     background: rgba(15, 23, 42, 0.85);
     border: 1px solid rgba(255, 255, 255, 0.1);
-    -webkit-backdrop-filter: blur(20px);
-    backdrop-filter: blur(20px);
+    -webkit-/* backdrop-filter removed for GOV.UK compliance */
+    /* backdrop-filter removed for GOV.UK compliance */
 }
 
 [data-theme="dark"] .htb-dropdown-content a {
@@ -359,10 +359,7 @@ body,
 }
 
 /* KINETIC ANIMATION */
-@keyframes gradient-flow {
-    0% {
-        background-position: 0% 50%;
-    }
+/* Animation removed for GOV.UK compliance */
 
     50% {
         background-position: 100% 50%;
@@ -474,7 +471,7 @@ html {
 /* NEW: Focused Single Column Layout for Forms */
 .htb-container-focused {
     max-width: 700px;
-    margin: 60px auto var(--space-20) auto;
+    margin: var(--space-16) auto var(--space-20) auto;
     padding: 0 var(--space-5);
     position: relative;
     z-index: 10;
@@ -490,14 +487,14 @@ html {
         linear-gradient(to bottom, rgba(255, 255, 255, 0.9), rgba(249, 250, 251, 0.85));
     border: 1px solid rgba(255, 255, 255, 0.6);
     border-radius: var(--radius-lg);
-    padding: 30px;
+    padding: var(--space-8);
     box-shadow:
         0 4px 6px rgba(0, 0, 0, 0.02),
         0 0 40px rgba(99, 102, 241, 0.06),
         0 0 80px rgba(168, 85, 247, 0.04),
         inset 0 1px 0 rgba(255, 255, 255, 0.8);
-    -webkit-backdrop-filter: blur(16px) saturate(180%);
-    backdrop-filter: blur(16px) saturate(180%);
+    -webkit-/* backdrop-filter removed for GOV.UK compliance */ saturate(180%);
+    /* backdrop-filter removed for GOV.UK compliance */ saturate(180%);
     position: relative;
     overflow: hidden;
 }
@@ -517,12 +514,11 @@ html {
         rgba(255, 255, 255, 0.4) 75%,
         transparent 100%
     );
-    animation: holographic-shimmer 8s ease-in-out infinite;
+    /* animation removed for GOV.UK compliance */
     pointer-events: none;
 }
 
-@keyframes holographic-shimmer {
-    0%, 100% { transform: translateX(0); }
+/* Animation removed for GOV.UK compliance */
     50% { transform: translateX(50%); }
 }
 
@@ -584,25 +580,25 @@ html {
 .htb-card,
 .nexus-card {
     background: rgba(255, 255, 255, 0.70);
-    -webkit-backdrop-filter: blur(16px);
-    backdrop-filter: blur(16px);
+    -webkit-/* backdrop-filter removed for GOV.UK compliance */
+    /* backdrop-filter removed for GOV.UK compliance */
     border-radius: var(--htb-radius);
     box-shadow: var(--htb-shadow);
     overflow: hidden;
-    margin-bottom: 30px;
+    margin-bottom: var(--space-8);
     border: 1px solid rgba(255, 255, 255, 0.4);
 }
 
 .nexus-glass,
 .nexus-card.nexus-glass {
     background: rgba(255, 255, 255, 0.65) !important;
-    -webkit-backdrop-filter: blur(16px) !important;
-    backdrop-filter: blur(16px) !important;
+    -webkit-/* backdrop-filter removed for GOV.UK compliance */ !important;
+    /* backdrop-filter removed for GOV.UK compliance */ !important;
     border: 1px solid rgba(255, 255, 255, 0.6) !important;
 }
 
 .htb-card-body {
-    padding: 30px;
+    padding: var(--space-8);
 }
 
 /* UTILITY CLASSES */
@@ -615,19 +611,19 @@ html {
 .nexus-grid-3 {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: 30px;
+    gap: var(--space-8);
 }
 
 .nexus-grid-4 {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
-    gap: 30px;
+    gap: var(--space-8);
 }
 
 .nexus-grid-2 {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    gap: 30px;
+    gap: var(--space-8);
 }
 
 @media(max-width: 1024px) {
@@ -768,7 +764,7 @@ table.htb-table tr:last-child td {
 .htb-section-gray {
     background-color: var(--color-gray-50);
     width: 100%;
-    padding: 60px 0;
+    padding: var(--space-16) 0;
     margin-bottom: 50px;
     border-top: 1px solid rgba(0, 0, 0, 0.05);
     border-bottom: 1px solid rgba(0, 0, 0, 0.05);
@@ -826,11 +822,11 @@ table.htb-table tr:last-child td {
     font-size: 1.2rem;
     color: var(--color-gray-600);
     line-height: 1.6;
-    margin-bottom: 30px;
+    margin-bottom: var(--space-8);
 }
 
 .htb-step-card {
-    padding: 30px;
+    padding: var(--space-8);
     text-align: center;
     border: none;
     background: white;
@@ -862,7 +858,7 @@ table.htb-table tr:last-child td {
 }
 
 .htb-step-icon-orange {
-    background: linear-gradient(135deg, #ffedd5 0%, #fff7ed 100%);
+    background: linear-gradient(135deg, #ffedd5 0%, var(--color-white)7ed 100%);
     color: var(--color-orange-600);
     box-shadow: 0 4px 10px rgba(234, 88, 12, 0.1);
 }
@@ -906,7 +902,7 @@ table.htb-table tr:last-child td {
 
 .htb-member-card {
     text-align: center;
-    padding: 30px;
+    padding: var(--space-8);
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -960,7 +956,7 @@ table.htb-table tr:last-child td {
 
 .htb-tab-pane.active {
     display: block;
-    animation: fadeIn 0.3s ease-out;
+    /* animation removed for GOV.UK compliance */
 }
 
 /* AGENT FIX: Mobile Visibility Utilities */
@@ -1047,7 +1043,7 @@ textarea.nexus-input {
     font-size: 0.95rem;
     outline: none;
     transition: all 0.2s ease;
-    background: #fff;
+    background: var(--color-white);
     color: var(--color-slate-800);
     box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
     /* Subtle shadow polish */
@@ -2104,9 +2100,9 @@ a:focus {
     }
 
     .civic-btn {
-        border: 2px solid #000;
-        background: #fff !important;
-        color: #000 !important;
+        border: 2px solid var(--color-govuk-black);
+        background: var(--color-white) !important;
+        color: var(--color-govuk-black) !important;
     }
 }
 
@@ -2983,8 +2979,8 @@ body.dark-mode .civic-dropdown-content a:focus-visible {
     body {
         font-size: 12pt;
         line-height: 1.5;
-        color: #000 !important;
-        background: #fff !important;
+        color: var(--color-govuk-black) !important;
+        background: var(--color-white) !important;
     }
 
     /* Show link URLs */
@@ -3003,7 +2999,7 @@ body.dark-mode .civic-dropdown-content a:focus-visible {
 
     /* Ensure sufficient contrast */
     h1, h2, h3, h4, h5, h6 {
-        color: #000 !important;
+        color: var(--color-govuk-black) !important;
     }
 
     .civic-card,
@@ -3016,9 +3012,9 @@ body.dark-mode .civic-dropdown-content a:focus-visible {
 
     /* Buttons print as bordered boxes */
     .civic-btn {
-        border: 2px solid #000 !important;
-        background: #fff !important;
-        color: #000 !important;
+        border: 2px solid var(--color-govuk-black) !important;
+        background: var(--color-white) !important;
+        color: var(--color-govuk-black) !important;
     }
 }/**
  * CivicOne Mobile Enhancement CSS
@@ -3178,15 +3174,11 @@ body.dark-mode .civic-dropdown-content a:focus-visible {
 /* Pulse animation for new notifications */
 @media (prefers-reduced-motion: no-preference) {
     .civic-nav-badge.pulse {
-        animation: badge-pulse 2s ease-in-out infinite;
+        /* animation removed for GOV.UK compliance */
     }
 }
 
-@keyframes badge-pulse {
-    0%, 100% {
-        transform: scale(1);
-        box-shadow: 0 2px 4px rgba(239, 68, 68, 0.4);
-    }
+/* Animation removed for GOV.UK compliance */
     50% {
         transform: scale(1.1);
         box-shadow: 0 2px 8px rgba(239, 68, 68, 0.6);
@@ -3332,12 +3324,11 @@ body.dark-mode .civic-bottom-nav-item.active {
 
 @media (prefers-reduced-motion: no-preference) {
     .civic-skeleton {
-        animation: civic-skeleton-shimmer 1.5s ease-in-out infinite;
+        /* animation removed for GOV.UK compliance */
     }
 }
 
-@keyframes civic-skeleton-shimmer {
-    0% { background-position: 200% 0; }
+/* Animation removed for GOV.UK compliance */
     100% { background-position: -200% 0; }
 }
 
@@ -3500,11 +3491,11 @@ body.dark-mode .civic-skeleton {
 
 @media (prefers-reduced-motion: no-preference) {
     .civic-toast {
-        animation: civic-toast-in 0.3s ease forwards;
+        /* animation removed for GOV.UK compliance */
     }
 
     .civic-toast.exit {
-        animation: civic-toast-out 0.2s ease forwards;
+        /* animation removed for GOV.UK compliance */
     }
 }
 
@@ -3515,18 +3506,10 @@ body.dark-mode .civic-skeleton {
     }
 }
 
-@keyframes civic-toast-in {
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+/* Animation removed for GOV.UK compliance */
 }
 
-@keyframes civic-toast-out {
-    to {
-        opacity: 0;
-        transform: translateY(-20px);
-    }
+/* Animation removed for GOV.UK compliance */
 }
 
 .civic-toast.success {
@@ -3683,8 +3666,8 @@ body.dark-mode .civic-skeleton {
     z-index: 10001;
     opacity: 0;
     visibility: hidden;
-    -webkit-backdrop-filter: blur(4px);
-    backdrop-filter: blur(4px);
+    -webkit-/* backdrop-filter removed for GOV.UK compliance */
+    /* backdrop-filter removed for GOV.UK compliance */
 }
 
 .civic-loading-overlay.visible {
@@ -3708,7 +3691,7 @@ body.dark-mode .civic-skeleton {
 
 @media (prefers-reduced-motion: no-preference) {
     .civic-loading-spinner {
-        animation: civic-spin 0.8s linear infinite;
+        /* animation removed for GOV.UK compliance */
     }
 }
 
@@ -3745,15 +3728,11 @@ body.dark-mode .civic-skeleton {
 
 @media (prefers-reduced-motion: no-preference) {
     .civic-pwa-banner {
-        animation: civic-slide-up 0.3s ease;
+        /* animation removed for GOV.UK compliance */
     }
 }
 
-@keyframes civic-slide-up {
-    from {
-        opacity: 0;
-        transform: translateY(20px);
-    }
+/* Animation removed for GOV.UK compliance */
     to {
         opacity: 1;
         transform: translateY(0);
@@ -3906,19 +3885,17 @@ body.is-offline .civic-header {
 }
 
 ::view-transition-old(root) {
-    animation: 150ms ease-out both civic-fade-out;
+    /* animation removed for GOV.UK compliance */
 }
 
 ::view-transition-new(root) {
-    animation: 150ms ease-in 75ms both civic-fade-in;
+    /* animation removed for GOV.UK compliance */
 }
 
-@keyframes civic-fade-out {
-    to { opacity: 0; }
+/* Animation removed for GOV.UK compliance */
 }
 
-@keyframes civic-fade-in {
-    from { opacity: 0; }
+/* Animation removed for GOV.UK compliance */
 }
 
 /* Respect reduced motion for view transitions */
@@ -3926,7 +3903,7 @@ body.is-offline .civic-header {
     ::view-transition-group(*),
     ::view-transition-old(*),
     ::view-transition-new(*) {
-        animation: none !important;
+        /* animation removed for GOV.UK compliance */
     }
 }
 
@@ -4189,8 +4166,8 @@ body.is-offline .civic-header {
     position: absolute;
     inset: 0;
     background: rgba(0, 0, 0, 0.5);
-    -webkit-backdrop-filter: blur(4px);
-    backdrop-filter: blur(4px);
+    -webkit-/* backdrop-filter removed for GOV.UK compliance */
+    /* backdrop-filter removed for GOV.UK compliance */
 }
 
 .civic-webauthn-modal-content {
@@ -4335,13 +4312,12 @@ body.is-offline .civic-header {
     border: 2px solid rgba(255, 255, 255, 0.3);
     border-top-color: var(--color-white);
     border-radius: 50%;
-    animation: civic-spin 0.8s linear infinite;
+    /* animation removed for GOV.UK compliance */
     vertical-align: middle;
     margin-right: var(--space-2);
 }
 
-@keyframes civic-spin {
-    to { transform: rotate(360deg); }
+/* Animation removed for GOV.UK compliance */
 }
 
 
@@ -4429,7 +4405,7 @@ body:not(.biometrics-available) .civic-biometric-btn {
     }
 
     .civic-spinner {
-        animation: none;
+        /* animation removed for GOV.UK compliance */
     }
 }
 /**
@@ -4508,16 +4484,11 @@ body:not(.biometrics-available) .civic-biometric-btn {
 
 @media (prefers-reduced-motion: no-preference) {
     .civic-btn.ripple::after {
-        animation: ripple-effect 0.6s ease-out forwards;
+        /* animation removed for GOV.UK compliance */
     }
 }
 
-@keyframes ripple-effect {
-    0% {
-        width: 0;
-        height: 0;
-        opacity: 0.5;
-    }
+/* Animation removed for GOV.UK compliance */
     100% {
         width: 300px;
         height: 300px;
@@ -4561,12 +4532,11 @@ body:not(.biometrics-available) .civic-biometric-btn {
 
 @media (prefers-reduced-motion: no-preference) {
     .civic-card.long-press::before {
-        animation: long-press-pulse 0.8s ease-out forwards;
+        /* animation removed for GOV.UK compliance */
     }
 }
 
-@keyframes long-press-pulse {
-    0% { opacity: 0.1; }
+/* Animation removed for GOV.UK compliance */
     50% { opacity: 0.05; }
     100% { opacity: 0; }
 }
@@ -4579,30 +4549,22 @@ body:not(.biometrics-available) .civic-biometric-btn {
 /* Page enter animation */
 @media (prefers-reduced-motion: no-preference) {
     .civic-page-enter {
-        animation: page-slide-in var(--duration-normal) var(--ease-native) forwards;
+        /* animation removed for GOV.UK compliance */
     }
 
     .civic-page-exit {
-        animation: page-slide-out var(--duration-fast) ease-in forwards;
+        /* animation removed for GOV.UK compliance */
     }
 }
 
-@keyframes page-slide-in {
-    from {
-        opacity: 0;
-        transform: translateX(20px);
-    }
+/* Animation removed for GOV.UK compliance */
     to {
         opacity: 1;
         transform: translateX(0);
     }
 }
 
-@keyframes page-slide-out {
-    from {
-        opacity: 1;
-        transform: translateX(0);
-    }
+/* Animation removed for GOV.UK compliance */
     to {
         opacity: 0;
         transform: translateX(-20px);
@@ -4617,21 +4579,17 @@ body:not(.biometrics-available) .civic-biometric-btn {
     }
 
     .civic-hero-content.animated > *:nth-child(1) {
-        animation: fade-up var(--duration-normal) var(--ease-native) 0.1s forwards;
+        /* animation removed for GOV.UK compliance */
     }
     .civic-hero-content.animated > *:nth-child(2) {
-        animation: fade-up var(--duration-normal) var(--ease-native) 0.2s forwards;
+        /* animation removed for GOV.UK compliance */
     }
     .civic-hero-content.animated > *:nth-child(3) {
-        animation: fade-up var(--duration-normal) var(--ease-native) 0.3s forwards;
+        /* animation removed for GOV.UK compliance */
     }
 }
 
-@keyframes fade-up {
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+/* Animation removed for GOV.UK compliance */
 }
 
 /* Card grid stagger */
@@ -4641,13 +4599,13 @@ body:not(.biometrics-available) .civic-biometric-btn {
         transform: translateY(20px);
     }
 
-    .civic-grid.animated > .civic-card:nth-child(1) { animation: fade-up var(--duration-normal) var(--ease-native) 0.05s forwards; }
-    .civic-grid.animated > .civic-card:nth-child(2) { animation: fade-up var(--duration-normal) var(--ease-native) 0.1s forwards; }
-    .civic-grid.animated > .civic-card:nth-child(3) { animation: fade-up var(--duration-normal) var(--ease-native) 0.15s forwards; }
-    .civic-grid.animated > .civic-card:nth-child(4) { animation: fade-up var(--duration-normal) var(--ease-native) 0.2s forwards; }
-    .civic-grid.animated > .civic-card:nth-child(5) { animation: fade-up var(--duration-normal) var(--ease-native) 0.25s forwards; }
-    .civic-grid.animated > .civic-card:nth-child(6) { animation: fade-up var(--duration-normal) var(--ease-native) 0.3s forwards; }
-    .civic-grid.animated > .civic-card:nth-child(n+7) { animation: fade-up var(--duration-normal) var(--ease-native) 0.35s forwards; }
+    .civic-grid.animated > .civic-card:nth-child(1) { /* animation removed for GOV.UK compliance */ }
+    .civic-grid.animated > .civic-card:nth-child(2) { /* animation removed for GOV.UK compliance */ }
+    .civic-grid.animated > .civic-card:nth-child(3) { /* animation removed for GOV.UK compliance */ }
+    .civic-grid.animated > .civic-card:nth-child(4) { /* animation removed for GOV.UK compliance */ }
+    .civic-grid.animated > .civic-card:nth-child(5) { /* animation removed for GOV.UK compliance */ }
+    .civic-grid.animated > .civic-card:nth-child(6) { /* animation removed for GOV.UK compliance */ }
+    .civic-grid.animated > .civic-card:nth-child(n+7) { /* animation removed for GOV.UK compliance */ }
 }
 
 
@@ -4702,8 +4660,8 @@ body:not(.biometrics-available) .civic-biometric-btn {
     z-index: 9999;
     opacity: 0;
     visibility: hidden;
-    -webkit-backdrop-filter: blur(4px);
-    backdrop-filter: blur(4px);
+    -webkit-/* backdrop-filter removed for GOV.UK compliance */
+    /* backdrop-filter removed for GOV.UK compliance */
 }
 
 @media (prefers-reduced-motion: no-preference) {
@@ -4740,8 +4698,8 @@ body.dark-mode .civic-bottom-sheet {
     inset: 0;
     background: rgba(0, 0, 0, 0.5);
     opacity: 0;
-    -webkit-backdrop-filter: blur(4px);
-    backdrop-filter: blur(4px);
+    -webkit-/* backdrop-filter removed for GOV.UK compliance */
+    /* backdrop-filter removed for GOV.UK compliance */
 }
 
 .nexus-share-sheet-content {
@@ -4918,15 +4876,11 @@ body.dark-mode .civic-bottom-sheet {
     }
 
     .civic-progress-bar-inner.loading {
-        animation: progress-indeterminate 1.5s ease-in-out infinite;
+        /* animation removed for GOV.UK compliance */
     }
 }
 
-@keyframes progress-indeterminate {
-    0% {
-        width: 0;
-        margin-left: 0;
-    }
+/* Animation removed for GOV.UK compliance */
     50% {
         width: 40%;
         margin-left: 30%;
@@ -4979,12 +4933,11 @@ input.invalid {
 @media (prefers-reduced-motion: no-preference) {
     .civic-input.shake,
     input.shake {
-        animation: input-shake 0.5s ease;
+        /* animation removed for GOV.UK compliance */
     }
 }
 
-@keyframes input-shake {
-    0%, 100% { transform: translateX(0); }
+/* Animation removed for GOV.UK compliance */
     20%, 60% { transform: translateX(-8px); }
     40%, 80% { transform: translateX(8px); }
 }
@@ -5007,15 +4960,11 @@ input.invalid {
 
 @media (prefers-reduced-motion: no-preference) {
     .civic-notification-dot {
-        animation: notification-pulse 2s ease-in-out infinite;
+        /* animation removed for GOV.UK compliance */
     }
 }
 
-@keyframes notification-pulse {
-    0%, 100% {
-        transform: scale(1);
-        box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4);
-    }
+/* Animation removed for GOV.UK compliance */
     50% {
         transform: scale(1.1);
         box-shadow: 0 0 0 8px rgba(239, 68, 68, 0);
@@ -5029,19 +4978,15 @@ input.invalid {
 
 @media (prefers-reduced-motion: no-preference) {
     .civic-success-icon {
-        animation: success-pop 0.4s var(--spring-bounce) forwards;
+        /* animation removed for GOV.UK compliance */
     }
 
     .civic-error-icon {
-        animation: error-shake 0.5s ease forwards;
+        /* animation removed for GOV.UK compliance */
     }
 }
 
-@keyframes success-pop {
-    0% {
-        transform: scale(0);
-        opacity: 0;
-    }
+/* Animation removed for GOV.UK compliance */
     50% {
         transform: scale(1.2);
     }
@@ -5051,8 +4996,7 @@ input.invalid {
     }
 }
 
-@keyframes error-shake {
-    0%, 100% { transform: translateX(0) rotate(0); }
+/* Animation removed for GOV.UK compliance */
     20% { transform: translateX(-4px) rotate(-5deg); }
     40% { transform: translateX(4px) rotate(5deg); }
     60% { transform: translateX(-4px) rotate(-5deg); }
@@ -5119,15 +5063,11 @@ input.invalid {
 
 @media (prefers-reduced-motion: no-preference) {
     .civic-context-menu {
-        animation: context-menu-pop 0.2s var(--spring-bounce) forwards;
+        /* animation removed for GOV.UK compliance */
     }
 }
 
-@keyframes context-menu-pop {
-    from {
-        opacity: 0;
-        transform: translate(-50%, -50%) scale(0.9);
-    }
+/* Animation removed for GOV.UK compliance */
     to {
         opacity: 1;
         transform: translate(-50%, -50%) scale(1);
@@ -5196,29 +5136,21 @@ body.turbo-loading .civic-btn {
 
 /* Default page transition - fade and slide */
 ::view-transition-old(root) {
-    animation: page-fade-out 0.2s ease-out forwards;
+    /* animation removed for GOV.UK compliance */
 }
 
 ::view-transition-new(root) {
-    animation: page-fade-in 0.25s ease-out forwards;
+    /* animation removed for GOV.UK compliance */
 }
 
-@keyframes page-fade-out {
-    from {
-        opacity: 1;
-        transform: translateX(0);
-    }
+/* Animation removed for GOV.UK compliance */
     to {
         opacity: 0;
         transform: translateX(-20px);
     }
 }
 
-@keyframes page-fade-in {
-    from {
-        opacity: 0;
-        transform: translateX(20px);
-    }
+/* Animation removed for GOV.UK compliance */
     to {
         opacity: 1;
         transform: translateX(0);
@@ -5227,29 +5159,21 @@ body.turbo-loading .civic-btn {
 
 /* Back navigation - reverse direction */
 ::view-transition-old(root).back-nav {
-    animation: page-fade-in-reverse 0.2s ease-out forwards;
+    /* animation removed for GOV.UK compliance */
 }
 
 ::view-transition-new(root).back-nav {
-    animation: page-fade-out-reverse 0.25s ease-out forwards;
+    /* animation removed for GOV.UK compliance */
 }
 
-@keyframes page-fade-out-reverse {
-    from {
-        opacity: 0;
-        transform: translateX(-20px);
-    }
+/* Animation removed for GOV.UK compliance */
     to {
         opacity: 1;
         transform: translateX(0);
     }
 }
 
-@keyframes page-fade-in-reverse {
-    from {
-        opacity: 1;
-        transform: translateX(0);
-    }
+/* Animation removed for GOV.UK compliance */
     to {
         opacity: 0;
         transform: translateX(20px);
@@ -5275,7 +5199,7 @@ body.turbo-loading .civic-btn {
 @media (prefers-reduced-motion: reduce) {
     ::view-transition-old(root),
     ::view-transition-new(root) {
-        animation: none;
+        /* animation removed for GOV.UK compliance */
     }
 
     @view-transition {
@@ -5895,16 +5819,11 @@ body.dark-mode .civic-drawer-user {
 
 @media (prefers-reduced-motion: no-preference) {
     .civic-bottom-nav-item.ripple::after {
-        animation: nav-ripple 0.5s ease-out forwards;
+        /* animation removed for GOV.UK compliance */
     }
 }
 
-@keyframes nav-ripple {
-    0% {
-        width: 0;
-        height: 0;
-        opacity: 0.5;
-    }
+/* Animation removed for GOV.UK compliance */
 
     100% {
         width: 100px;
@@ -5925,14 +5844,11 @@ body.dark-mode .civic-drawer-user {
     }
 
     .civic-bottom-nav-item.bounce .civic-nav-icon {
-        animation: icon-bounce 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        /* animation removed for GOV.UK compliance */
     }
 }
 
-@keyframes icon-bounce {
-    0% {
-        transform: scale(1);
-    }
+/* Animation removed for GOV.UK compliance */
 
     30% {
         transform: scale(0.8);
@@ -5954,15 +5870,11 @@ body.dark-mode .civic-drawer-user {
 /* Active indicator animation */
 @media (prefers-reduced-motion: no-preference) {
     .civic-bottom-nav-item.active::before {
-        animation: indicator-appear 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55) forwards;
+        /* animation removed for GOV.UK compliance */
     }
 }
 
-@keyframes indicator-appear {
-    0% {
-        width: 0;
-        opacity: 0;
-    }
+/* Animation removed for GOV.UK compliance */
 
     100% {
         width: var(--space-8);
@@ -5983,14 +5895,11 @@ body.dark-mode .civic-drawer-user {
     }
 
     .civic-bottom-nav-item--create.bounce .civic-nav-icon-wrapper {
-        animation: fab-bounce 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        /* animation removed for GOV.UK compliance */
     }
 }
 
-@keyframes fab-bounce {
-    0% {
-        transform: scale(1) translateY(0);
-    }
+/* Animation removed for GOV.UK compliance */
 
     20% {
         transform: scale(0.85) translateY(0);
@@ -6046,7 +5955,7 @@ body.dark-mode .civic-drawer-user {
     .civic-bottom-nav-item .civic-nav-icon,
     .civic-dropdown-trigger::after {
         transition: none !important;
-        animation: none !important;
+        /* animation removed for GOV.UK compliance */
     }
 
     #civic-main-nav {

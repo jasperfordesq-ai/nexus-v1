@@ -521,7 +521,7 @@
 
 .civicone .civic-toast.visible {
     display: block;
-    animation: civicToastSlideUp var(--transition-base) var(--ease-out);
+    /* animation removed for GOV.UK compliance */
 }
 
 .civicone .civic-toast.error {
@@ -557,11 +557,7 @@
     line-height: var(--line-height-normal);
 }
 
-@keyframes civicToastSlideUp {
-    from {
-        transform: translate(-50%, var(--space-5));
-        opacity: 0;
-    }
+/* Animation removed for GOV.UK compliance */
     to {
         transform: translate(-50%, 0);
         opacity: 1;
@@ -706,7 +702,7 @@
 /* Reduced motion support */
 @media (prefers-reduced-motion: reduce) {
     .civicone .civic-toast.visible {
-        animation: none;
+        /* animation removed for GOV.UK compliance */
     }
 
     .civicone .civic-action-btn:active {

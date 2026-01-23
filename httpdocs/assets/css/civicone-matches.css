@@ -78,11 +78,10 @@
         radial-gradient(ellipse at 25% 25%, rgba(99, 102, 241, 0.15) 0%, transparent 50%),
         radial-gradient(ellipse at 75% 25%, rgba(236, 72, 153, 0.12) 0%, transparent 45%),
         radial-gradient(ellipse at 50% 75%, rgba(16, 185, 129, 0.1) 0%, transparent 50%);
-    animation: cosmicDrift 25s ease-in-out infinite;
+    /* animation removed for GOV.UK compliance */
 }
 
-@keyframes cosmicDrift {
-    0%, 100% { transform: translate(0, 0) rotate(0deg); }
+/* Animation removed for GOV.UK compliance */
     33% { transform: translate(-1%, 1%) rotate(0.5deg); }
     66% { transform: translate(1%, -0.5%) rotate(-0.5deg); }
 }
@@ -139,7 +138,7 @@
 
 .match-stat-card {
     background: var(--civic-match-bg-card);
-    backdrop-filter: blur(20px);
+    /* backdrop-filter removed for GOV.UK compliance */
     border: 1px solid rgba(255, 255, 255, 0.5);
     border-radius: var(--civic-match-radius-lg);
     padding: var(--civic-match-spacing-lg);
@@ -198,7 +197,7 @@
     display: flex;
     gap: var(--civic-match-spacing-xs);
     background: var(--civic-match-bg-card);
-    backdrop-filter: blur(20px);
+    /* backdrop-filter removed for GOV.UK compliance */
     border: 1px solid rgba(255, 255, 255, 0.4);
     border-radius: var(--civic-match-radius-lg);
     padding: var(--civic-match-spacing-xs);
@@ -321,7 +320,7 @@
    ========================================================================== */
 .match-card {
     background: var(--civic-match-bg-card);
-    backdrop-filter: blur(20px);
+    /* backdrop-filter removed for GOV.UK compliance */
     border: 1px solid rgba(255, 255, 255, 0.5);
     border-radius: var(--civic-match-radius-xl);
     overflow: hidden;
@@ -359,11 +358,10 @@
     border-radius: var(--radius-xl);
     z-index: -1;
     opacity: 0.5;
-    animation: hotPulse 2s ease-in-out infinite;
+    /* animation removed for GOV.UK compliance */
 }
 
-@keyframes hotPulse {
-    0%, 100% { opacity: 0.3; }
+/* Animation removed for GOV.UK compliance */
     50% { opacity: 0.6; }
 }
 
@@ -568,7 +566,7 @@
     text-align: center;
     padding: var(--space-16) var(--civic-match-spacing-lg);
     background: var(--civic-match-bg-card);
-    backdrop-filter: blur(20px);
+    /* backdrop-filter removed for GOV.UK compliance */
     border-radius: var(--civic-match-radius-xl);
     border: 1px solid rgba(255, 255, 255, 0.5);
 }
@@ -638,7 +636,7 @@
     flex-wrap: wrap;
     gap: var(--civic-match-spacing-md);
     background: rgba(99, 102, 241, 0.08);
-    backdrop-filter: blur(10px);
+    /* backdrop-filter removed for GOV.UK compliance */
     border: 1px solid rgba(99, 102, 241, 0.2);
     border-radius: var(--civic-match-radius-lg);
     padding: var(--civic-match-spacing-md) var(--civic-match-spacing-lg);
@@ -778,7 +776,7 @@
 /* Form Card */
 .prefs-card {
     background: var(--civic-match-bg-card);
-    backdrop-filter: blur(20px);
+    /* backdrop-filter removed for GOV.UK compliance */
     border: 1px solid rgba(255, 255, 255, 0.5);
     border-radius: var(--civic-match-radius-xl);
     padding: var(--civic-match-spacing-xl);
@@ -809,7 +807,7 @@
 .prefs-card-title .icon.distance { background: linear-gradient(135deg, var(--civic-match-mutual-start), var(--civic-match-mutual-end)); }
 .prefs-card-title .icon.score { background: linear-gradient(135deg, var(--civic-match-good-start), var(--civic-match-good-end)); }
 .prefs-card-title .icon.notify { background: linear-gradient(135deg, var(--color-warning), var(--civic-match-hot-start)); }
-.prefs-card-title .icon.category { background: linear-gradient(135deg, var(--color-pink-500), #f43f5e); }
+.prefs-card-title .icon.category { background: linear-gradient(135deg, var(--color-pink-500), var(--color-govuk-red)); }
 
 /* Form Groups */
 .prefs-group {
@@ -1288,7 +1286,7 @@
 
 .connections-card {
     background: var(--civic-match-bg-card);
-    backdrop-filter: blur(20px);
+    /* backdrop-filter removed for GOV.UK compliance */
     border-radius: var(--civic-match-radius-xl);
     border: 1px solid rgba(255, 255, 255, 0.3);
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
@@ -1382,7 +1380,7 @@
 }
 
 .connection-online--active {
-    background: #00703c;
+    background: var(--color-govuk-green);
 }
 
 .connection-online--recent {
@@ -1390,7 +1388,7 @@
 }
 
 .connection-status--online {
-    color: #00703c;
+    color: var(--color-govuk-green);
     font-weight: 600;
 }
 
@@ -1643,7 +1641,7 @@
 @media (prefers-reduced-motion: reduce) {
     .matches-cosmos-bg::before,
     .match-card.hot-match::before {
-        animation: none;
+        /* animation removed for GOV.UK compliance */
     }
 
     .match-stat-card,

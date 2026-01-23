@@ -25,7 +25,7 @@
     background:
         radial-gradient(ellipse at 20% 30%, rgba(251, 191, 36, 0.12) 0%, transparent 50%),
         radial-gradient(ellipse at 80% 20%, rgba(245, 158, 11, 0.1) 0%, transparent 45%);
-    animation: requestsFloat 20s ease-in-out infinite;
+    /* animation removed for GOV.UK compliance */
 }
 
 [data-theme="dark"] .requests-bg {
@@ -37,8 +37,7 @@
         radial-gradient(ellipse at 20% 30%, rgba(251, 191, 36, 0.2) 0%, transparent 50%);
 }
 
-@keyframes requestsFloat {
-    0%, 100% { transform: translate(0, 0) scale(1); }
+/* Animation removed for GOV.UK compliance */
     50% { transform: translate(-1%, 1%) scale(1.02); }
 }
 
@@ -57,7 +56,7 @@
     justify-content: space-between;
     margin-bottom: var(--space-8);
     flex-wrap: wrap;
-    gap: 16px;
+    gap: var(--space-4);
 }
 
 .requests-title h1 {
@@ -73,13 +72,13 @@
 
 .requests-nav {
     display: flex;
-    gap: 8px;
+    gap: var(--space-2);
 }
 
 .requests-nav-link {
     padding: var(--space-2-5) var(--space-5);
     background: rgba(255, 255, 255, 0.8);
-    backdrop-filter: blur(10px);
+    /* backdrop-filter removed for GOV.UK compliance */
     border: 1px solid rgba(251, 191, 36, 0.2);
     border-radius: var(--radius-lg);
     color: var(--color-gray-700);
@@ -89,7 +88,7 @@
     transition: all 0.2s;
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: var(--space-2);
 }
 
 .requests-nav-link:hover {
@@ -113,8 +112,8 @@
     background: linear-gradient(135deg,
         rgba(255, 255, 255, 0.9) 0%,
         rgba(255, 255, 255, 0.75) 100%);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
+    /* backdrop-filter removed for GOV.UK compliance */
+    -webkit-/* backdrop-filter removed for GOV.UK compliance */
     border: 1px solid rgba(255, 255, 255, 0.5);
     border-radius: var(--radius-2xl);
     box-shadow: 0 8px 32px rgba(31, 38, 135, 0.1);
@@ -131,14 +130,14 @@
 /* Filter Tabs */
 .requests-filters {
     display: flex;
-    gap: 8px;
+    gap: var(--space-2);
     padding: var(--space-5) var(--space-6);
     border-bottom: 1px solid rgba(251, 191, 36, 0.2);
     overflow-x: auto;
 }
 
 .filter-tab {
-    padding: 8px 16px;
+    padding: var(--space-2) 16px;
     border-radius: var(--radius-2xl);
     font-size: 0.85rem;
     font-weight: 600;
@@ -166,7 +165,7 @@
     background: rgba(255, 255, 255, 0.2);
     border-radius: var(--radius-md);
     font-size: 0.7rem;
-    margin-left: 4px;
+    margin-left: var(--space-1);
 }
 
 /* Requests Table */
@@ -177,7 +176,7 @@
 
 .requests-table th {
     text-align: left;
-    padding: 16px var(--space-5);
+    padding: var(--space-4) var(--space-5);
     font-size: 0.75rem;
     font-weight: 600;
     text-transform: uppercase;
@@ -192,7 +191,7 @@
 }
 
 .requests-table td {
-    padding: 16px var(--space-5);
+    padding: var(--space-4) var(--space-5);
     border-bottom: 1px solid rgba(229, 231, 235, 0.3);
     vertical-align: middle;
 }
@@ -259,8 +258,8 @@
 .status-badge {
     display: inline-flex;
     align-items: center;
-    gap: 4px;
-    padding: 4px var(--space-2-5);
+    gap: var(--space-1);
+    padding: var(--space-1) var(--space-2-5);
     border-radius: var(--radius-2xl);
     font-size: 0.75rem;
     font-weight: 600;
@@ -362,27 +361,27 @@
 /* Empty State */
 .requests-empty {
     text-align: center;
-    padding: 60px var(--space-5);
+    padding: var(--space-16) var(--space-5);
     color: var(--color-gray-400);
 }
 
 .requests-empty-icon {
     font-size: 3rem;
     opacity: 0.3;
-    margin-bottom: 16px;
+    margin-bottom: var(--space-4);
 }
 
 /* Pagination */
 .requests-pagination {
     display: flex;
     justify-content: center;
-    gap: 8px;
+    gap: var(--space-2);
     padding: var(--space-5);
     border-top: 1px solid rgba(229, 231, 235, 0.3);
 }
 
 .pagination-btn {
-    padding: 8px 16px;
+    padding: var(--space-2) 16px;
     border-radius: var(--radius-md);
     font-size: 0.85rem;
     font-weight: 600;
@@ -432,7 +431,7 @@
 
     .requests-table tr {
         display: block;
-        padding: 16px;
+        padding: var(--space-4);
         margin-bottom: var(--space-3);
         background: rgba(255, 255, 255, 0.5);
         border-radius: var(--radius-lg);
@@ -446,7 +445,7 @@
         display: flex;
         justify-content: space-between;
         align-items: center;
-        padding: 8px 0;
+        padding: var(--space-2) 0;
         border-bottom: 1px solid rgba(229, 231, 235, 0.2);
     }
 

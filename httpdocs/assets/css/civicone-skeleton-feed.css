@@ -12,8 +12,8 @@
 }
 
 .skeleton-feed-card {
-    background: #f3f2f1;
-    border: 1px solid #b1b4b6;
+    background: var(--color-govuk-light-grey);
+    border: 1px solid var(--color-govuk-grey);
     padding: 1.5rem;
 }
 
@@ -43,7 +43,7 @@
     gap: 1rem;
     margin-top: 1rem;
     padding-top: 1rem;
-    border-top: 1px solid #b1b4b6;
+    border-top: 1px solid var(--color-govuk-grey);
 }
 
 /* Skeleton text variants for header */

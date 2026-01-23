@@ -156,7 +156,7 @@
 
 /* Detail Cards */
 .civic-detail-card {
-    background: var(--civic-bg-card, #fff);
+    background: var(--civic-bg-card, var(--color-white));
     border: 1px solid var(--civic-vol-border);
     border-radius: var(--radius-md);
     padding: var(--space-6);
@@ -294,7 +294,7 @@
    Sidebar
    -------------------------------------------- */
 .civic-sidebar-card {
-    background: var(--civic-bg-card, #fff);
+    background: var(--civic-bg-card, var(--color-white));
     border: 1px solid var(--civic-vol-border);
     border-radius: var(--radius-md);
     padding: var(--space-6);
@@ -511,7 +511,7 @@
 .civic-shift-capacity {
     font-size: var(--font-size-xs);
     color: var(--civic-vol-text-muted);
-    background: var(--civic-bg-card, #fff);
+    background: var(--civic-bg-card, var(--color-white));
     padding: var(--space-0-5) var(--space-2); /* 2px has no token */
     border-radius: var(--radius-sm);
 }

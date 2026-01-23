@@ -18,7 +18,7 @@
     margin: 0 0 var(--space-5) 0;
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: var(--space-2);
     padding-bottom: var(--space-3);
     border-bottom: var(--space-0-5) solid var(--civic-brand);
 }
@@ -41,8 +41,8 @@
 .civic-badge-item {
     display: inline-flex;
     align-items: center;
-    gap: 8px;
-    padding: 8px 16px;
+    gap: var(--space-2);
+    padding: var(--space-2) 16px;
     background: var(--civic-brand);
     color: white;
     border-radius: var(--radius-2xl);
@@ -59,7 +59,7 @@
 .civic-applications-list {
     display: flex;
     flex-direction: column;
-    gap: 16px;
+    gap: var(--space-4);
 }
 
 .civic-application-card {
@@ -97,7 +97,7 @@
     gap: var(--space-1-5);
     color: var(--civic-text-muted);
     font-size: 14px;
-    margin: 4px 0;
+    margin: var(--space-1) 0;
 }
 
 .civic-application-org .dashicons,
@@ -108,7 +108,7 @@
 }
 
 .civic-calendar-link {
-    margin-left: 8px;
+    margin-left: var(--space-2);
     color: var(--civic-brand);
     text-decoration: none;
     font-size: 13px;
@@ -143,11 +143,11 @@
 
 .civic-status--declined {
     background: #FEF2F2;
-    color: #B91C1C;
+    color: var(--color-govuk-red);
 }
 
 .civic-status--pending {
-    background: #FFFBEB;
+    background: var(--color-white)BEB;
     color: var(--color-warning-700);
 }
 
@@ -201,7 +201,7 @@
     font-size: 1.25rem;
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: var(--space-2);
     color: var(--civic-text-main);
 }
 
@@ -214,7 +214,7 @@
     border: none;
     cursor: pointer;
     color: var(--civic-text-muted);
-    padding: 4px;
+    padding: var(--space-1);
 }
 
 .civic-modal-close:hover {
@@ -233,13 +233,13 @@
 }
 
 .civic-form-info p {
-    margin: 4px 0;
+    margin: var(--space-1) 0;
     font-size: 14px;
     color: var(--civic-text-secondary);
 }
 
 .civic-form-group {
-    margin-bottom: 16px;
+    margin-bottom: var(--space-4);
 }
 
 .civic-label {

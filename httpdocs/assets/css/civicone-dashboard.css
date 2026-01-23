@@ -441,8 +441,8 @@
 .civic-empty-large h3 {
     font-size: var(--font-size-2xl);
     font-weight: 700;
-    color: var(--govuk-text-colour, #0b0c0c);
-    margin: 16px 0 8px;
+    color: var(--govuk-text-colour, var(--color-govuk-black));
+    margin: var(--space-4) 0 8px;
 }
 
 .civic-empty-large .civic-empty-text {
@@ -488,7 +488,7 @@
 .civic-listing-type {
     display: inline-block;
     background: var(--color-slate-200);
-    padding: 4px var(--space-2-5);
+    padding: var(--space-1) var(--space-2-5);
     font-weight: 700;
     font-size: var(--font-size-xs);
     text-transform: uppercase;
@@ -665,7 +665,7 @@
 
 .civic-match-meta {
     display: flex;
-    gap: 8px;
+    gap: var(--space-2);
     margin-top: var(--space-1);
     font-size: var(--font-size-xs);
 }
@@ -722,7 +722,7 @@
 
 .civic-notif-actions {
     display: flex;
-    gap: 8px;
+    gap: var(--space-2);
     flex-wrap: wrap;
 }
 
@@ -754,7 +754,7 @@
 /* Notification Item Actions */
 .civic-notif-item-actions {
     display: flex;
-    gap: 8px;
+    gap: var(--space-2);
     margin-top: var(--space-3);
 }
 
@@ -776,7 +776,7 @@
     justify-content: center;
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: var(--space-2);
 }
 
 /* Modal */
@@ -970,7 +970,7 @@
 
 .civic-notif-item-actions {
     display: flex;
-    gap: 8px;
+    gap: var(--space-2);
     margin-top: var(--space-2-5);
     flex-wrap: wrap;
 }
@@ -1071,7 +1071,7 @@
     font-size: var(--font-size-base);
     display: inline-flex;
     align-items: center;
-    gap: 8px;
+    gap: var(--space-2);
     margin-bottom: var(--space-4);
 }
 
@@ -1245,7 +1245,7 @@
     display: block;
     font-size: var(--font-size-base);
     font-weight: 600;
-    color: var(--govuk-text-colour, #0b0c0c);
+    color: var(--govuk-text-colour, var(--color-govuk-black));
     margin-bottom: var(--space-1-5);
 }
 
@@ -1801,7 +1801,7 @@
     }
 
     .civic-dash-tab {
-        padding: 8px var(--space-3);
+        padding: var(--space-2) var(--space-3);
         font-size: var(--font-size-sm);
     }
 
@@ -1848,7 +1848,7 @@
     .civic-transactions-header,
     .civic-transaction-row {
         grid-template-columns: 80px 1fr 70px;
-        gap: 8px;
+        gap: var(--space-2);
     }
 
     .civic-fab {

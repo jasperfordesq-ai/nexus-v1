@@ -14,8 +14,8 @@
 
 .civic-composer {
     padding: var(--space-4, 20px);
-    background: var(--color-white, #ffffff);
-    border: 1px solid var(--color-govuk-grey, #b1b4b6);
+    background: var(--color-white, var(--color-white));
+    border: 1px solid var(--color-govuk-grey, var(--color-govuk-grey));
     border-radius: var(--radius-sm);
 }
 
@@ -36,8 +36,8 @@
 
 .civic-post-card {
     padding: var(--space-5, 25px);
-    background: var(--color-white, #ffffff);
-    border: 1px solid var(--color-govuk-grey, #b1b4b6);
+    background: var(--color-white, var(--color-white));
+    border: 1px solid var(--color-govuk-grey, var(--color-govuk-grey));
     border-radius: var(--radius-sm);
     margin-bottom: var(--space-5, 25px);
 }
@@ -74,7 +74,7 @@
     display: flex;
     gap: var(--space-4, 20px);
     padding-top: var(--space-3, 15px);
-    border-top: 1px solid var(--color-govuk-grey-light, #f3f2f1);
+    border-top: 1px solid var(--color-govuk-grey-light, var(--color-govuk-light-grey));
 }
 
 .civic-action-btn {
@@ -84,25 +84,25 @@
     padding: var(--space-2, 10px) var(--space-3, 15px);
     background: transparent;
     border: none;
-    color: var(--color-text-secondary, #505a5f);
+    color: var(--color-text-secondary, var(--color-govuk-grey-dark));
     cursor: pointer;
     font-size: var(--font-size-base, 19px);
     transition: color 0.2s ease;
 }
 
 .civic-action-btn:hover {
-    color: var(--color-primary-500, #1d70b8);
+    color: var(--color-primary-500, var(--color-govuk-blue-light));
 }
 
 .civic-action-btn:focus {
-    outline: 3px solid var(--color-brand-yellow, #ffdd00);
+    outline: 3px solid var(--color-brand-yellow, var(--color-govuk-yellow));
     outline-offset: 0;
-    background: var(--color-brand-yellow, #ffdd00);
-    color: var(--color-text-primary, #0b0c0c);
+    background: var(--color-brand-yellow, var(--color-govuk-yellow));
+    color: var(--color-text-primary, var(--color-govuk-black));
 }
 
 .civic-action-btn.liked {
-    color: var(--color-error, #d4351c);
+    color: var(--color-error, var(--color-govuk-red));
 }
 
 /* ============================================
@@ -112,7 +112,7 @@
 .civic-comments-section {
     display: none;
     padding-top: var(--space-4, 20px);
-    border-top: 1px solid var(--color-govuk-grey-light, #f3f2f1);
+    border-top: 1px solid var(--color-govuk-grey-light, var(--color-govuk-light-grey));
     margin-top: var(--space-4, 20px);
 }
 
@@ -148,7 +148,7 @@
 
 .civic-comment-bubble {
     flex: 1;
-    background: var(--color-govuk-grey-light, #f3f2f1);
+    background: var(--color-govuk-grey-light, var(--color-govuk-light-grey));
     padding: var(--space-3, 15px);
     border-radius: var(--radius-md);
 }
@@ -163,7 +163,7 @@
 
 .civic-comment-edited {
     font-size: var(--font-size-sm, 16px);
-    color: var(--color-text-secondary, #505a5f);
+    color: var(--color-text-secondary, var(--color-govuk-grey-dark));
     font-weight: 400;
 }
 
@@ -179,7 +179,7 @@
 }
 
 .civic-comment-action:focus {
-    outline: 3px solid var(--color-brand-yellow, #ffdd00);
+    outline: 3px solid var(--color-brand-yellow, var(--color-govuk-yellow));
     outline-offset: 2px;
 }
 
@@ -191,7 +191,7 @@
 
 .civic-comment-meta {
     font-size: var(--font-size-sm, 16px);
-    color: var(--color-text-secondary, #505a5f);
+    color: var(--color-text-secondary, var(--color-govuk-grey-dark));
     cursor: pointer;
 }
 
@@ -206,7 +206,7 @@
 
 /* Mention highlighting */
 .civic-mention {
-    color: var(--color-primary-500, #1d70b8);
+    color: var(--color-primary-500, var(--color-govuk-blue-light));
     font-weight: 600;
 }
 
@@ -224,10 +224,10 @@
 .civic-reaction {
     display: inline-flex;
     align-items: center;
-    gap: 4px;
-    padding: 4px 8px;
-    background: var(--color-white, #ffffff);
-    border: 1px solid var(--color-govuk-grey, #b1b4b6);
+    gap: var(--space-1);
+    padding: var(--space-1) 8px;
+    background: var(--color-white, var(--color-white));
+    border: 1px solid var(--color-govuk-grey, var(--color-govuk-grey));
     border-radius: var(--radius-lg);
     cursor: pointer;
     font-size: var(--font-size-sm, 16px);
@@ -236,17 +236,17 @@
 
 .civic-reaction:hover {
     background: var(--color-primary-50, #d5e8f3);
-    border-color: var(--color-primary-500, #1d70b8);
+    border-color: var(--color-primary-500, var(--color-govuk-blue-light));
 }
 
 .civic-reaction:focus {
-    outline: 3px solid var(--color-brand-yellow, #ffdd00);
+    outline: 3px solid var(--color-brand-yellow, var(--color-govuk-yellow));
     outline-offset: 0;
 }
 
 .civic-reaction.active {
     background: var(--color-primary-50, #d5e8f3);
-    border-color: var(--color-primary-500, #1d70b8);
+    border-color: var(--color-primary-500, var(--color-govuk-blue-light));
 }
 
 /* Reaction Picker */
@@ -259,8 +259,8 @@
     position: absolute;
     bottom: 100%;
     left: 0;
-    background: var(--color-white, #ffffff);
-    border: 1px solid var(--color-govuk-grey, #b1b4b6);
+    background: var(--color-white, var(--color-white));
+    border: 1px solid var(--color-govuk-grey, var(--color-govuk-grey));
     border-radius: var(--radius-md);
     padding: var(--space-2, 10px);
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
@@ -320,8 +320,8 @@
     position: fixed;
     bottom: 30px;
     right: 30px;
-    background: var(--color-success, #00703c);
-    color: var(--color-white, #ffffff);
+    background: var(--color-success, var(--color-govuk-green));
+    color: var(--color-white, var(--color-white));
     padding: var(--space-3, 15px) var(--space-4, 20px);
     border-radius: var(--radius-sm);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
@@ -350,15 +350,15 @@
 }
 
 .civic-loading-message {
-    color: var(--color-text-secondary, #505a5f);
+    color: var(--color-text-secondary, var(--color-govuk-grey-dark));
 }
 
 .civic-empty-message {
-    color: var(--color-text-secondary, #505a5f);
+    color: var(--color-text-secondary, var(--color-govuk-grey-dark));
 }
 
 .civic-error-message {
-    color: var(--color-error, #d4351c);
+    color: var(--color-error, var(--color-govuk-red));
 }
 
 /* ============================================

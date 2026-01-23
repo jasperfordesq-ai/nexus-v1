@@ -19,11 +19,10 @@
     margin: -2rem -1rem;
     background: linear-gradient(135deg, var(--color-warning-500) 0%, var(--color-warning-400) 25%, #fcd34d 50%, var(--color-warning-500) 75%, var(--color-warning-600) 100%);
     background-size: 400% 400%;
-    animation: storyGradientShift 15s ease infinite;
+    /* animation removed for GOV.UK compliance */
 }
 
-@keyframes storyGradientShift {
-    0%, 100% { background-position: 0% 50%; }
+/* Animation removed for GOV.UK compliance */
     50% { background-position: 100% 50%; }
 }
 
@@ -79,8 +78,8 @@
 #story-glass-wrapper .story-glass-card {
     position: relative;
     background: var(--glass-bg);
-    backdrop-filter: blur(20px) saturate(120%);
-    -webkit-backdrop-filter: blur(20px) saturate(120%);
+    /* backdrop-filter removed for GOV.UK compliance */ saturate(120%);
+    -webkit-/* backdrop-filter removed for GOV.UK compliance */ saturate(120%);
     border: 1px solid var(--glass-border);
     border-radius: var(--radius-2xl);
     box-shadow:
@@ -178,8 +177,8 @@
 
 #story-glass-wrapper .stat-chip {
     background: rgba(255, 255, 255, 0.2);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
+    /* backdrop-filter removed for GOV.UK compliance */
+    -webkit-/* backdrop-filter removed for GOV.UK compliance */
     border: 1px solid rgba(255, 255, 255, 0.3);
     border-radius: var(--radius-xl);
     padding: 1.25rem 1rem;
@@ -316,7 +315,7 @@
     }
 
     #story-glass-wrapper .story-timeline {
-        padding-left: 30px;
+        padding-left: var(--space-8);
     }
 
     #story-glass-wrapper .story-timeline::before {
@@ -355,13 +354,12 @@
         padding: 2rem 1.5rem;
     }
 
-    @keyframes storyGradientShift {
-        0%, 100% { background-position: 50% 50%; }
+    /* Animation removed for GOV.UK compliance */
     }
 }
 
 /* Browser Fallback */
-@supports not (backdrop-filter: blur(10px)) {
+@supports not (/* backdrop-filter removed for GOV.UK compliance */) {
     #story-glass-wrapper .story-glass-card,
     #story-glass-wrapper .stat-chip,
     #story-glass-wrapper .mission-card {

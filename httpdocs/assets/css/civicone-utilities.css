@@ -63,3 +63,66 @@
     padding-left: var(--space-6);
     padding-right: var(--space-6);
 }
+
+/* --------------------------------------------
+   Avatar Utilities for Summary Lists
+   -------------------------------------------- */
+
+/* Small avatar for summary list rows (60px) */
+.civicone-summary-avatar {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+/* --------------------------------------------
+   Password Validation States
+   GOV.UK compliant colors for form validation
+   -------------------------------------------- */
+
+/* Pending state - neutral gray */
+.civicone-rule-pending {
+    color: var(--color-govuk-grey-dark); /* GOV.UK secondary text */
+}
+
+/* Passed state - GOV.UK green */
+.civicone-rule-passed {
+    color: var(--color-govuk-green); /* GOV.UK green */
+}
+
+/* Failed state - GOV.UK red */
+.civicone-rule-failed {
+    color: var(--color-govuk-red); /* GOV.UK red */
+}
+
+/* Password match success */
+.civicone-match-success {
+    color: var(--color-govuk-green); /* GOV.UK green */
+}
+
+/* Password match error */
+.civicone-match-error {
+    color: var(--color-govuk-red); /* GOV.UK red */
+}
+
+/* --------------------------------------------
+   Card Components
+   GOV.UK style bordered cards
+   -------------------------------------------- */
+
+/* Simple bordered card for help articles, etc */
+.civicone-card-bordered {
+    border: 1px solid var(--color-govuk-grey); /* GOV.UK border color */
+    padding: var(--space-5);
+}
+
+/* --------------------------------------------
+   Text Color Utilities
+   GOV.UK compliant secondary text colors
+   -------------------------------------------- */
+
+/* Secondary/muted text color */
+.civicone-text-secondary {
+    color: var(--color-govuk-grey-dark); /* GOV.UK secondary text */
+}

@@ -65,13 +65,12 @@
     box-shadow: 0 0 var(--space-2) rgba(244, 119, 56, 0.6);
 }
 
-@keyframes civicone-pulse {
-    0%, 100% { opacity: 1; }
+/* Animation removed for GOV.UK compliance */
     50% { opacity: 0.5; }
 }
 
 .civicone .civicone-identity-bar__status-indicator--online {
-    animation: civicone-pulse 2s infinite;
+    /* animation removed for GOV.UK compliance */
 }
 
 .civicone .civicone-identity-bar__info {
@@ -399,7 +398,7 @@
 
 @media (prefers-reduced-motion: reduce) {
     .civicone .civicone-identity-bar__status-indicator--online {
-        animation: none;
+        /* animation removed for GOV.UK compliance */
     }
 
     .civicone .civicone-page-header-actions__btn {

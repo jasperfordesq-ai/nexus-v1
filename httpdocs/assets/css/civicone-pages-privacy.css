@@ -11,7 +11,7 @@
 #privacy-glass-wrapper {
     --privacy-theme: var(--color-primary-500);
     --privacy-theme-rgb: 99, 102, 241;
-    --privacy-theme-light: #818cf8;
+    --privacy-theme-light: var(--color-govuk-blue-lighter);
     --privacy-theme-dark: var(--color-primary-600);
     position: relative;
     min-height: 100vh;
@@ -43,7 +43,7 @@
         rgba(167, 139, 250, 0.08) 75%,
         rgba(99, 102, 241, 0.08) 100%);
     background-size: 400% 400%;
-    animation: privacyGradientShift 15s ease infinite;
+    /* animation removed for GOV.UK compliance */
 }
 
 [data-theme="dark"] #privacy-glass-wrapper::before {
@@ -53,19 +53,17 @@
         radial-gradient(ellipse at 50% 50%, rgba(129, 140, 248, 0.05) 0%, transparent 70%);
 }
 
-@keyframes privacyGradientShift {
-    0%, 100% { background-position: 0% 50%; }
+/* Animation removed for GOV.UK compliance */
     50% { background-position: 100% 50%; }
 }
 
 /* Content Reveal Animation */
-@keyframes privacyFadeInUp {
-    from { opacity: 0; transform: translateY(20px); }
+/* Animation removed for GOV.UK compliance */
     to { opacity: 1; transform: translateY(0); }
 }
 
 #privacy-glass-wrapper {
-    animation: privacyFadeInUp 0.4s ease-out;
+    /* animation removed for GOV.UK compliance */
 }
 
 #privacy-glass-wrapper .privacy-inner {
@@ -185,8 +183,8 @@
 
 /* Privacy Section Card */
 #privacy-glass-wrapper .privacy-section {
-    backdrop-filter: blur(20px) saturate(120%);
-    -webkit-backdrop-filter: blur(20px) saturate(120%);
+    /* backdrop-filter removed for GOV.UK compliance */ saturate(120%);
+    -webkit-/* backdrop-filter removed for GOV.UK compliance */ saturate(120%);
     border-radius: var(--radius-2xl);
     padding: 2rem;
     margin-bottom: 1.5rem;
@@ -424,8 +422,8 @@
     text-align: center;
     padding: 3rem 2rem;
     border-radius: var(--radius-2xl);
-    backdrop-filter: blur(20px) saturate(120%);
-    -webkit-backdrop-filter: blur(20px) saturate(120%);
+    /* backdrop-filter removed for GOV.UK compliance */ saturate(120%);
+    -webkit-/* backdrop-filter removed for GOV.UK compliance */ saturate(120%);
     margin-top: 2rem;
 }
 
@@ -575,8 +573,7 @@
         gap: 0.5rem;
     }
 
-    @keyframes privacyGradientShift {
-        0%, 100% { background-position: 50% 50%; }
+    /* Animation removed for GOV.UK compliance */
     }
 }
 
@@ -609,7 +606,7 @@
 }
 
 /* Browser Fallback */
-@supports not (backdrop-filter: blur(10px)) {
+@supports not (/* backdrop-filter removed for GOV.UK compliance */) {
     [data-theme="light"] #privacy-glass-wrapper .privacy-section,
     [data-theme="light"] #privacy-glass-wrapper .privacy-cta {
         background: rgba(255, 255, 255, 0.95);

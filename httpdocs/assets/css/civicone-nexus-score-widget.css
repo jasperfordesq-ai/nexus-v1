@@ -5,10 +5,10 @@
  */
 
 .nexus-score-widget {
-    background: #1d70b8;
+    background: var(--color-govuk-blue-light);
     padding: 1.5rem;
     margin-bottom: 1.5rem;
-    color: #ffffff;
+    color: var(--color-white);
 }
 
 .nexus-widget-header {
@@ -26,7 +26,7 @@
     gap: 0.5rem;
     font-size: 1.125rem;
     font-weight: 700;
-    color: #ffffff;
+    color: var(--color-white);
 }
 
 .nexus-widget-icon {
@@ -41,7 +41,7 @@
 .nexus-widget-score-value {
     font-size: 3rem;
     font-weight: 700;
-    color: #ffffff;
+    color: var(--color-white);
     line-height: 1;
     margin-bottom: 0.5rem;
 }
@@ -71,7 +71,7 @@
 .nexus-widget-tier-name {
     font-size: 1rem;
     font-weight: 600;
-    color: #ffffff;
+    color: var(--color-white);
 }
 
 .nexus-widget-rank {
@@ -92,16 +92,16 @@
 
 .nexus-widget-rank-value {
     font-weight: 700;
-    color: #ffffff;
+    color: var(--color-white);
 }
 
 .nexus-widget-cta {
     display: block;
     width: 100%;
     padding: 0.75rem;
-    background: #ffffff;
+    background: var(--color-white);
     border: none;
-    color: #1d70b8;
+    color: var(--color-govuk-blue-light);
     font-weight: 600;
     font-size: 1rem;
     text-align: center;
@@ -110,12 +110,12 @@
 }
 
 .nexus-widget-cta:hover {
-    background: #f3f2f1;
+    background: var(--color-govuk-light-grey);
 }
 
 .nexus-widget-cta:focus {
-    outline: 3px solid #ffdd00;
+    outline: 3px solid var(--color-govuk-yellow);
     outline-offset: 0;
-    background-color: #ffdd00;
-    color: #0b0c0c;
+    background-color: var(--color-govuk-yellow);
+    color: var(--color-govuk-black);
 }
