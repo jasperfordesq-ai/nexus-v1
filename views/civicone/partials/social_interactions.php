@@ -64,17 +64,25 @@ $interactionId = $targetType . '-' . $targetId;
 <div class="civic-social-interactions" id="social-<?= $interactionId ?>">
     <!-- Stats Row -->
     <div class="civic-social-stats">
-        <div class="civic-social-stats-left likes-count-clickable" onclick="event.stopPropagation(); showLikers('<?= $targetType ?>', <?= $targetId ?>)" title="See who liked this">
+        <button type="button"
+                class="civic-social-stats-left likes-count-clickable"
+                onclick="event.stopPropagation(); showLikers('<?= $targetType ?>', <?= $targetId ?>)"
+                aria-label="See who liked this (<?= $likesCount ?> like<?= $likesCount != 1 ? 's' : '' ?>)">
             <?php if ($likesCount > 0): ?>
                 <span class="dashicons dashicons-heart civic-text-red" style="font-size: 16px;" aria-hidden="true"></span>
                 <span id="likes-count-<?= $interactionId ?>"><?= $likesCount ?></span>
             <?php else: ?>
-                <span id="likes-count-<?= $interactionId ?>" style="display: none;">0</span>
+                <span id="likes-count-<?= $interactionId ?>" class="visually-hidden">0</span>
             <?php endif; ?>
-        </div>
-        <div class="civic-social-stats-right" onclick="toggleSocialComments('<?= $interactionId ?>')">
+        </button>
+        <button type="button"
+                class="civic-social-stats-right"
+                onclick="toggleSocialComments('<?= $interactionId ?>')"
+                aria-expanded="false"
+                aria-controls="comments-<?= $interactionId ?>"
+                aria-label="Toggle comments section (<?= $commentsCount ?> comment<?= $commentsCount != 1 ? 's' : '' ?>)">
             <span id="comments-count-<?= $interactionId ?>"><?= $commentsCount ?></span> Comment<?= $commentsCount != 1 ? 's' : '' ?>
-        </div>
+        </button>
     </div>
 
     <!-- Action Buttons -->
@@ -83,15 +91,25 @@ $interactionId = $targetType . '-' . $targetId;
                 onclick="toggleSocialLike('<?= $interactionId ?>', '<?= $targetType ?>', <?= $targetId ?>)"
                 class="civic-social-btn <?= $isLiked ? 'liked' : '' ?>"
                 id="like-btn-<?= $interactionId ?>"
-                aria-pressed="<?= $isLiked ? 'true' : 'false' ?>">
+                aria-pressed="<?= $isLiked ? 'true' : 'false' ?>"
+                aria-label="<?= $isLiked ? 'Unlike this content' : 'Like this content' ?>">
             <span class="dashicons dashicons-heart" aria-hidden="true"></span>
             <span>Like</span>
         </button>
-        <button type="button" onclick="toggleSocialComments('<?= $interactionId ?>')" class="civic-social-btn">
+        <button type="button"
+                onclick="toggleSocialComments('<?= $interactionId ?>')"
+                class="civic-social-btn"
+                aria-expanded="false"
+                aria-controls="comments-<?= $interactionId ?>"
+                aria-label="Toggle comments">
             <span class="dashicons dashicons-admin-comments" aria-hidden="true"></span>
             <span>Comment</span>
         </button>
-        <button type="button" onclick="openShareModal('<?= $targetType ?>', <?= $targetId ?>)" class="civic-social-btn">
+        <button type="button"
+                onclick="openShareModal('<?= $targetType ?>', <?= $targetId ?>)"
+                class="civic-social-btn"
+                aria-haspopup="dialog"
+                aria-label="Share this content">
             <span class="dashicons dashicons-share" aria-hidden="true"></span>
             <span>Share</span>
         </button>
@@ -102,7 +120,8 @@ $interactionId = $targetType . '-' . $targetId;
         <?php if ($isLoggedIn): ?>
             <div class="civic-comment-form">
                 <img src="<?= htmlspecialchars($_SESSION['user_avatar'] ?? '/assets/img/defaults/default_avatar.webp') ?>"
-                     class="civic-comment-avatar" alt="">
+                     class="civic-comment-avatar"
+                     alt="Your profile picture">
                 <div class="civic-comment-input-wrap">
                     <input type="text"
                            class="civic-comment-input"
@@ -119,14 +138,18 @@ $interactionId = $targetType . '-' . $targetId;
                 </div>
             </div>
         <?php else: ?>
-            <p style="color: var(--civic-text-muted); text-align: center; padding: 16px;">
-                <a href="<?= $basePath ?>/login" style="color: var(--civic-brand); font-weight: 600;">Sign in</a> to comment
+            <p class="civic-social-login-prompt">
+                <a href="<?= $basePath ?>/login" class="civic-social-login-link">Sign in</a> to comment
             </p>
         <?php endif; ?>
-        <div class="civic-comments-list" id="comments-list-<?= $interactionId ?>">
-            <div style="color: var(--civic-text-muted); text-align: center; padding: 16px;">
+        <div class="civic-comments-list"
+             id="comments-list-<?= $interactionId ?>"
+             role="region"
+             aria-label="Comments"
+             aria-live="polite">
+            <p class="civic-social-status-message">
                 Click to load comments...
-            </div>
+            </p>
         </div>
     </div>
 </div>
@@ -134,20 +157,36 @@ $interactionId = $targetType . '-' . $targetId;
 <!-- Share Modal (only rendered once per page) -->
 <?php if (!defined('CIVIC_SHARE_MODAL_RENDERED')): ?>
 <?php define('CIVIC_SHARE_MODAL_RENDERED', true); ?>
-<div class="civic-share-modal" id="civic-share-modal">
-    <div class="civic-share-content">
-        <div class="civic-share-title">Share this content</div>
-        <div class="civic-share-options">
-            <a href="#" id="share-to-feed" class="civic-share-option" onclick="shareToFeedFromModal(); return false;">
+<div class="civic-share-modal"
+     id="civic-share-modal"
+     role="dialog"
+     aria-modal="true"
+     aria-labelledby="civic-share-modal-title"
+     aria-hidden="true">
+    <div class="civic-share-content" role="document">
+        <h2 class="civic-share-title" id="civic-share-modal-title">Share this content</h2>
+        <div class="civic-share-options" role="group" aria-label="Share options">
+            <button type="button"
+                    id="share-to-feed"
+                    class="civic-share-option"
+                    onclick="shareToFeedFromModal()">
                 <span class="dashicons dashicons-megaphone" aria-hidden="true"></span>
                 Share to your Feed
-            </a>
-            <a href="#" id="share-copy-link" class="civic-share-option" onclick="copyShareLink(); return false;">
+            </button>
+            <button type="button"
+                    id="share-copy-link"
+                    class="civic-share-option"
+                    onclick="copyShareLink()">
                 <span class="dashicons dashicons-admin-links" aria-hidden="true"></span>
                 Copy Link
-            </a>
+            </button>
         </div>
-        <button type="button" class="civic-share-close" onclick="closeShareModal()">Cancel</button>
+        <button type="button"
+                class="civic-share-close"
+                onclick="closeShareModal()"
+                aria-label="Cancel and close share dialog">
+            Cancel
+        </button>
     </div>
 </div>
 
@@ -174,6 +213,13 @@ $interactionId = $targetType . '-' . $targetId;
         }
     };
 
+    // Show Likers (stub - may be overridden by page-specific implementation)
+    if (typeof window.showLikers === 'undefined') {
+        window.showLikers = function(targetType, targetId) {
+            showSocialToast('View likes coming soon');
+        };
+    }
+
     // Toggle Like
     window.toggleSocialLike = function(interactionId, targetType, targetId) {
         if (!IS_LOGGED_IN) {
@@ -187,6 +233,7 @@ $interactionId = $targetType . '-' . $targetId;
         // Optimistic UI update
         btn.classList.toggle('liked');
         btn.setAttribute('aria-pressed', !isLiked);
+        btn.setAttribute('aria-label', !isLiked ? 'Unlike this content' : 'Like this content');
 
         const formData = new FormData();
         formData.append('action', 'toggle_like');
@@ -200,6 +247,7 @@ $interactionId = $targetType . '-' . $targetId;
                     // Revert on error
                     btn.classList.toggle('liked');
                     btn.setAttribute('aria-pressed', isLiked);
+                    btn.setAttribute('aria-label', isLiked ? 'Unlike this content' : 'Like this content');
                     showSocialToast(data.error);
                 } else {
                     // Update count
@@ -213,6 +261,7 @@ $interactionId = $targetType . '-' . $targetId;
             .catch(() => {
                 btn.classList.toggle('liked');
                 btn.setAttribute('aria-pressed', isLiked);
+                btn.setAttribute('aria-label', isLiked ? 'Unlike this content' : 'Like this content');
             });
     };
 
@@ -221,9 +270,9 @@ $interactionId = $targetType . '-' . $targetId;
         const section = document.getElementById('comments-' + interactionId);
         if (!section) return;
 
-        if (section.classList.contains('active')) {
-            section.classList.remove('active');
-        } else {
+        const isExpanding = !section.classList.contains('active');
+
+        if (isExpanding) {
             section.classList.add('active');
             const input = document.getElementById('comment-input-' + interactionId);
             if (input) input.focus();
@@ -233,6 +282,17 @@ $interactionId = $targetType . '-' . $targetId;
             const targetType = parts[0];
             const targetId = parts.slice(1).join('-');
             fetchSocialComments(interactionId, targetType, targetId);
+        } else {
+            section.classList.remove('active');
+        }
+
+        // Update aria-expanded on all buttons that control this section
+        const container = document.getElementById('social-' + interactionId);
+        if (container) {
+            const toggleButtons = container.querySelectorAll('[aria-controls="comments-' + interactionId + '"]');
+            toggleButtons.forEach(function(btn) {
+                btn.setAttribute('aria-expanded', isExpanding ? 'true' : 'false');
+            });
         }
     };
 
@@ -241,7 +301,7 @@ $interactionId = $targetType . '-' . $targetId;
         const list = document.getElementById('comments-list-' + interactionId);
         if (!list) return;
 
-        list.innerHTML = '<div style="color: var(--civic-text-muted); text-align: center; padding: 16px;">Loading...</div>';
+        list.innerHTML = '<p class="civic-social-status-message" aria-live="polite">Loading comments...</p>';
 
         const formData = new FormData();
         formData.append('action', 'fetch_comments');
@@ -253,20 +313,22 @@ $interactionId = $targetType . '-' . $targetId;
             .then(data => {
                 if (data.comments && data.comments.length > 0) {
                     list.innerHTML = data.comments.map(c => `
-                        <div class="civic-comment-item">
-                            <img src="${escapeHtml(c.author_avatar || '/assets/img/defaults/default_avatar.webp')}" class="civic-comment-avatar" alt="">
+                        <article class="civic-comment-item">
+                            <img src="${escapeHtml(c.author_avatar || '/assets/img/defaults/default_avatar.webp')}"
+                                 class="civic-comment-avatar"
+                                 alt="${escapeHtml(c.author_name || 'Unknown')}'s profile picture">
                             <div class="civic-comment-bubble">
-                                <div class="civic-comment-author">${escapeHtml(c.author_name || 'Unknown')}</div>
-                                <div class="civic-comment-text">${escapeHtml(c.content)}</div>
+                                <p class="civic-comment-author">${escapeHtml(c.author_name || 'Unknown')}</p>
+                                <p class="civic-comment-text">${escapeHtml(c.content)}</p>
                             </div>
-                        </div>
+                        </article>
                     `).join('');
                 } else {
-                    list.innerHTML = '<div style="color: var(--civic-text-muted); text-align: center; padding: 16px;">No comments yet. Be the first!</div>';
+                    list.innerHTML = '<p class="civic-social-status-message">No comments yet. Be the first!</p>';
                 }
             })
             .catch(() => {
-                list.innerHTML = '<div class="civic-text-red" style="text-align: center; padding: 16px;">Error loading comments</div>';
+                list.innerHTML = '<p class="civic-social-status-message civic-social-error" role="alert">Error loading comments</p>';
             });
     };
 
@@ -310,15 +372,66 @@ $interactionId = $targetType . '-' . $targetId;
     };
 
     // Share Modal
+    let lastFocusedElement = null;
+
     window.openShareModal = function(targetType, targetId) {
         currentShareType = targetType;
         currentShareId = targetId;
-        document.getElementById('civic-share-modal').classList.add('active');
+
+        // Store the currently focused element to restore focus on close
+        lastFocusedElement = document.activeElement;
+
+        const modal = document.getElementById('civic-share-modal');
+        modal.classList.add('active');
+        modal.setAttribute('aria-hidden', 'false');
+
+        // Focus the first interactive element in the modal
+        const firstButton = modal.querySelector('button');
+        if (firstButton) {
+            firstButton.focus();
+        }
+
+        // Trap focus within modal
+        modal.addEventListener('keydown', trapFocus);
     };
 
     window.closeShareModal = function() {
-        document.getElementById('civic-share-modal').classList.remove('active');
+        const modal = document.getElementById('civic-share-modal');
+        modal.classList.remove('active');
+        modal.setAttribute('aria-hidden', 'true');
+        modal.removeEventListener('keydown', trapFocus);
+
+        // Restore focus to the element that opened the modal
+        if (lastFocusedElement) {
+            lastFocusedElement.focus();
+            lastFocusedElement = null;
+        }
     };
+
+    // Focus trap for modal accessibility
+    function trapFocus(e) {
+        if (e.key === 'Escape') {
+            closeShareModal();
+            return;
+        }
+
+        if (e.key !== 'Tab') return;
+
+        const modal = document.getElementById('civic-share-modal');
+        const focusableElements = modal.querySelectorAll(
+            'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+        );
+        const firstElement = focusableElements[0];
+        const lastElement = focusableElements[focusableElements.length - 1];
+
+        if (e.shiftKey && document.activeElement === firstElement) {
+            e.preventDefault();
+            lastElement.focus();
+        } else if (!e.shiftKey && document.activeElement === lastElement) {
+            e.preventDefault();
+            firstElement.focus();
+        }
+    }
 
     window.shareToFeedFromModal = function() {
         if (!IS_LOGGED_IN) {
