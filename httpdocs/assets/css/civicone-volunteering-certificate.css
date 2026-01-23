@@ -24,9 +24,9 @@
     right: 0;
     bottom: 0;
     background:
-        radial-gradient(ellipse at 15% 25%, rgba(99, 102, 241, 0.18) 0%, transparent 50%),
-        radial-gradient(ellipse at 85% 75%, rgba(236, 72, 153, 0.12) 0%, transparent 50%),
-        radial-gradient(ellipse at 50% 50%, rgba(139, 92, 246, 0.08) 0%, transparent 60%),
+        radial-gradient(ellipse at 15% 25%, var(--color-indigo-alpha-18) 0%, transparent 50%),
+        radial-gradient(ellipse at 85% 75%, var(--color-pink-alpha-12) 0%, transparent 50%),
+        radial-gradient(ellipse at 50% 50%, var(--color-violet-alpha-8) 0%, transparent 60%),
         linear-gradient(135deg, var(--color-slate-900) 0%, var(--color-slate-800) 50%, var(--color-slate-900) 100%);
     z-index: -2;
 }
@@ -86,7 +86,7 @@
 .vc-header-icon {
     width: 90px;
     height: 90px;
-    background: linear-gradient(135deg, rgba(99, 102, 241, 0.25), rgba(236, 72, 153, 0.25));
+    background: linear-gradient(135deg, var(--color-indigo-alpha-25), var(--color-pink-alpha-25));
     border-radius: var(--radius-2xl);
     display: flex;
     align-items: center;
@@ -95,15 +95,15 @@
     font-size: 2.8rem;
     color: var(--color-purple-300);
     box-shadow:
-        0 10px 40px rgba(99, 102, 241, 0.25),
-        inset 0 0 30px rgba(255, 255, 255, 0.1);
+        0 10px 40px var(--color-indigo-alpha-25),
+        inset 0 0 30px var(--color-white-alpha-10);
     /* backdrop-filter removed for GOV.UK compliance */
-    border: 1px solid rgba(255, 255, 255, 0.12);
+    border: 1px solid var(--color-white-alpha-12);
     /* animation removed for GOV.UK compliance */
 }
 
 /* Animation removed for GOV.UK compliance */
-    50% { box-shadow: 0 15px 50px rgba(139, 92, 246, 0.35), inset 0 0 30px rgba(255, 255, 255, 0.15); }
+    50% { box-shadow: 0 15px 50px var(--color-violet-alpha-35), inset 0 0 30px var(--color-white-alpha-15); }
 }
 
 .vc-header-title {
@@ -118,7 +118,7 @@
 }
 
 .vc-header-subtitle {
-    color: rgba(255, 255, 255, 0.55);
+    color: var(--color-white-alpha-55);
     font-size: 1.1rem;
     margin: 0;
     font-weight: 500;
@@ -150,32 +150,32 @@
 .vc-btn-primary {
     background: linear-gradient(135deg, var(--color-primary-500), var(--color-purple-500), var(--color-purple-400));
     color: white;
-    box-shadow: 0 6px 25px rgba(99, 102, 241, 0.35);
+    box-shadow: 0 6px 25px var(--color-indigo-alpha-35);
 }
 
 .vc-btn-primary:hover {
     transform: translateY(-3px);
-    box-shadow: 0 10px 35px rgba(99, 102, 241, 0.45);
+    box-shadow: 0 10px 35px var(--color-indigo-alpha-45);
     color: white;
 }
 
 .vc-btn-secondary {
-    background: rgba(255, 255, 255, 0.08);
-    color: rgba(255, 255, 255, 0.9);
+    background: var(--color-white-alpha-8);
+    color: var(--color-white-alpha-90);
     /* backdrop-filter removed for GOV.UK compliance */
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    border: 1px solid var(--color-white-alpha-10);
 }
 
 .vc-btn-secondary:hover {
-    background: rgba(255, 255, 255, 0.12);
+    background: var(--color-white-alpha-12);
     transform: translateY(-2px);
     color: white;
 }
 
 /* Preview Banner */
 .vc-preview-banner {
-    background: linear-gradient(135deg, rgba(251, 191, 36, 0.15), rgba(245, 158, 11, 0.15));
-    border: 1px solid rgba(251, 191, 36, 0.25);
+    background: linear-gradient(135deg, var(--color-amber-alpha-15), var(--color-amber-500-alpha-15));
+    border: 1px solid var(--color-amber-alpha-25);
     border-radius: 14px;
     padding: var(--space-3-5) var(--space-5);
     margin-bottom: var(--space-7);
@@ -195,7 +195,7 @@
 }
 
 .vc-preview-banner span {
-    color: rgba(255, 255, 255, 0.65);
+    color: var(--color-white-alpha-65);
     margin-left: var(--space-1-5);
 }
 
@@ -214,12 +214,12 @@
 }
 
 .vc-stat {
-    background: rgba(255, 255, 255, 0.04);
+    background: var(--color-white-alpha-4);
     /* backdrop-filter removed for GOV.UK compliance */
     border-radius: 18px;
     padding: 26px var(--space-5);
     text-align: center;
-    border: 1px solid rgba(255, 255, 255, 0.08);
+    border: 1px solid var(--color-white-alpha-8);
     transition: all 0.3s ease;
     position: relative;
     overflow: hidden;
@@ -239,7 +239,7 @@
 
 .vc-stat:hover {
     transform: translateY(-4px);
-    background: rgba(255, 255, 255, 0.07);
+    background: var(--color-white-alpha-7);
 }
 
 .vc-stat:hover::before {
@@ -257,7 +257,7 @@
 }
 
 .vc-stat-label {
-    color: rgba(255, 255, 255, 0.55);
+    color: var(--color-white-alpha-55);
     font-size: 0.9rem;
     margin-top: var(--space-2);
     font-weight: 500;
@@ -265,22 +265,22 @@
 
 /* Certificate Card Container */
 .vc-card {
-    background: rgba(255, 255, 255, 0.03);
+    background: var(--color-white-alpha-3);
     /* backdrop-filter removed for GOV.UK compliance */
     border-radius: 28px;
-    border: 1px solid rgba(255, 255, 255, 0.07);
+    border: 1px solid var(--color-white-alpha-7);
     overflow: hidden;
     margin-bottom: 35px;
-    box-shadow: 0 25px 80px rgba(0, 0, 0, 0.25);
+    box-shadow: 0 25px 80px var(--color-black-alpha-25);
 }
 
 .vc-card-header {
     padding: var(--space-5-5) var(--space-7);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    border-bottom: 1px solid var(--color-white-alpha-5);
     display: flex;
     justify-content: space-between;
     align-items: center;
-    background: rgba(255, 255, 255, 0.02);
+    background: var(--color-white-alpha-2);
 }
 
 .vc-card-title {
@@ -318,11 +318,11 @@
     padding: 50px 45px;
     position: relative;
     overflow: hidden;
-    border: 1px solid rgba(255, 255, 255, 0.08);
+    border: 1px solid var(--color-white-alpha-8);
     box-shadow:
-        0 0 0 1px rgba(99, 102, 241, 0.1),
-        0 30px 80px rgba(0, 0, 0, 0.4),
-        inset 0 1px 0 rgba(255, 255, 255, 0.05);
+        0 0 0 1px var(--color-indigo-alpha-10),
+        0 30px 80px var(--color-black-alpha-40),
+        inset 0 1px 0 var(--color-white-alpha-5);
 }
 
 /* Animated gradient border effect */
@@ -379,7 +379,7 @@
     height: 70px;
     object-fit: contain;
     border-radius: var(--radius-xl);
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 8px 25px var(--color-black-alpha-30);
 }
 
 .vc-cert-logo-placeholder {
@@ -393,7 +393,7 @@
     margin: 0 auto;
     font-size: 1.8rem;
     color: white;
-    box-shadow: 0 8px 25px rgba(99, 102, 241, 0.4);
+    box-shadow: 0 8px 25px var(--color-indigo-alpha-40);
 }
 
 /* Certificate content */
@@ -408,7 +408,7 @@
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 4px;
-    color: rgba(255, 255, 255, 0.4);
+    color: var(--color-white-alpha-40);
     margin: 0 0 8px;
 }
 
@@ -425,7 +425,7 @@
 
 .vc-cert-presents {
     font-size: 1rem;
-    color: rgba(255, 255, 255, 0.5);
+    color: var(--color-white-alpha-50);
     margin: 0 0 var(--space-4);
     font-weight: 500;
 }
@@ -444,13 +444,13 @@
 .vc-cert-line {
     width: 250px;
     height: var(--space-0-5);
-    background: linear-gradient(90deg, transparent, rgba(165, 180, 252, 0.5), transparent);
+    background: linear-gradient(90deg, transparent, var(--color-indigo-300-alpha-50), transparent);
     margin: 0 auto 35px;
 }
 
 .vc-cert-body {
     font-size: 1.1rem;
-    color: rgba(255, 255, 255, 0.65);
+    color: var(--color-white-alpha-65);
     line-height: 1.8;
     margin: 0 auto 25px;
     max-width: 480px;
@@ -461,8 +461,8 @@
     display: inline-flex;
     align-items: center;
     gap: var(--space-3);
-    background: linear-gradient(135deg, rgba(99, 102, 241, 0.2), rgba(139, 92, 246, 0.2));
-    border: 1px solid rgba(99, 102, 241, 0.3);
+    background: linear-gradient(135deg, var(--color-indigo-alpha-20), var(--color-violet-alpha-20));
+    border: 1px solid var(--color-indigo-alpha-30);
     border-radius: var(--radius-xl);
     padding: var(--space-4-5) 35px;
     margin: var(--space-4) 0 35px;
@@ -479,7 +479,7 @@
 
 .vc-cert-hours-label {
     font-size: 1rem;
-    color: rgba(255, 255, 255, 0.6);
+    color: var(--color-white-alpha-60);
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 1px;
@@ -501,20 +501,20 @@
 .vc-cert-sig-value {
     font-size: 1.3rem;
     font-weight: 700;
-    color: rgba(255, 255, 255, 0.85);
+    color: var(--color-white-alpha-85);
     margin-bottom: var(--space-2);
 }
 
 .vc-cert-sig-line {
     width: 140px;
     height: 1px;
-    background: rgba(255, 255, 255, 0.2);
+    background: var(--color-white-alpha-20);
     margin: 0 auto var(--space-2-5);
 }
 
 .vc-cert-sig-label {
     font-size: 0.8rem;
-    color: rgba(255, 255, 255, 0.4);
+    color: var(--color-white-alpha-40);
     text-transform: uppercase;
     letter-spacing: 1px;
 }
@@ -535,22 +535,22 @@
     color: white;
     font-size: 1.5rem;
     box-shadow:
-        0 6px 25px rgba(99, 102, 241, 0.5),
-        inset 0 2px 4px rgba(255, 255, 255, 0.2);
+        0 6px 25px var(--color-indigo-alpha-50),
+        inset 0 2px 4px var(--color-white-alpha-20);
 }
 
 /* History Card */
 .vc-history {
-    background: rgba(255, 255, 255, 0.03);
+    background: var(--color-white-alpha-3);
     /* backdrop-filter removed for GOV.UK compliance */
     border-radius: var(--radius-2xl);
-    border: 1px solid rgba(255, 255, 255, 0.06);
+    border: 1px solid var(--color-white-alpha-6);
     overflow: hidden;
 }
 
 .vc-history-header {
     padding: var(--space-5) 26px;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    border-bottom: 1px solid var(--color-white-alpha-5);
 }
 
 .vc-history-title {
@@ -574,7 +574,7 @@
     justify-content: space-between;
     align-items: center;
     padding: var(--space-3-5) 0;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+    border-bottom: 1px solid var(--color-white-alpha-4);
 }
 
 .vc-history-item:last-child {
@@ -588,19 +588,19 @@
 }
 
 .vc-history-date {
-    color: rgba(255, 255, 255, 0.45);
+    color: var(--color-white-alpha-45);
     font-size: 0.85rem;
     margin-top: var(--space-1);
 }
 
 .vc-history-hours {
-    background: rgba(99, 102, 241, 0.15);
+    background: var(--color-indigo-alpha-15);
     color: var(--color-primary-300);
     padding: var(--space-1-5) var(--space-3-5);
     border-radius: var(--radius-2xl);
     font-weight: 700;
     font-size: 0.85rem;
-    border: 1px solid rgba(99, 102, 241, 0.2);
+    border: 1px solid var(--color-indigo-alpha-20);
 }
 
 /* Empty state */
@@ -627,7 +627,7 @@
 }
 
 .vc-empty-text {
-    color: rgba(255, 255, 255, 0.5);
+    color: var(--color-white-alpha-50);
     margin: 0 0 30px;
     font-size: 1rem;
 }
@@ -635,22 +635,22 @@
 /* Light Mode */
 [data-theme="light"] .vc-page::before {
     background:
-        radial-gradient(ellipse at 15% 25%, rgba(99, 102, 241, 0.12) 0%, transparent 50%),
-        radial-gradient(ellipse at 85% 75%, rgba(236, 72, 153, 0.08) 0%, transparent 50%),
+        radial-gradient(ellipse at 15% 25%, var(--color-indigo-alpha-12) 0%, transparent 50%),
+        radial-gradient(ellipse at 85% 75%, var(--color-pink-alpha-8) 0%, transparent 50%),
         linear-gradient(135deg, var(--color-slate-50) 0%, var(--color-slate-200) 50%, var(--color-slate-100) 100%);
 }
 
 [data-theme="light"] .vc-orb { opacity: 0.25; }
-[data-theme="light"] .vc-header-subtitle { color: rgba(0, 0, 0, 0.5); }
-[data-theme="light"] .vc-stat { background: rgba(255, 255, 255, 0.7); border-color: rgba(0, 0, 0, 0.06); }
-[data-theme="light"] .vc-stat-label { color: rgba(0, 0, 0, 0.5); }
-[data-theme="light"] .vc-card { background: rgba(255, 255, 255, 0.8); border-color: rgba(0, 0, 0, 0.06); }
+[data-theme="light"] .vc-header-subtitle { color: var(--color-black-alpha-50); }
+[data-theme="light"] .vc-stat { background: var(--color-white-alpha-70); border-color: var(--color-black-alpha-6); }
+[data-theme="light"] .vc-stat-label { color: var(--color-black-alpha-50); }
+[data-theme="light"] .vc-card { background: var(--color-white-alpha-80); border-color: var(--color-black-alpha-6); }
 [data-theme="light"] .vc-card-title { color: var(--color-slate-800); }
-[data-theme="light"] .vc-history { background: rgba(255, 255, 255, 0.8); border-color: rgba(0, 0, 0, 0.06); }
+[data-theme="light"] .vc-history { background: var(--color-white-alpha-80); border-color: var(--color-black-alpha-6); }
 [data-theme="light"] .vc-history-title { color: var(--color-slate-800); }
 [data-theme="light"] .vc-history-org { color: var(--color-slate-800); }
-[data-theme="light"] .vc-history-date { color: rgba(0, 0, 0, 0.5); }
-[data-theme="light"] .vc-btn-secondary { background: rgba(0, 0, 0, 0.05); color: rgba(0, 0, 0, 0.7); }
+[data-theme="light"] .vc-history-date { color: var(--color-black-alpha-50); }
+[data-theme="light"] .vc-btn-secondary { background: var(--color-black-alpha-5); color: var(--color-black-alpha-70); }
 
 /* Mobile */
 @media (max-width: 768px) {
@@ -783,7 +783,7 @@
         padding: var(--space-3) 35px !important;
         border-radius: var(--radius-md) !important;
         margin: 0 0 35px !important;
-        background: rgba(99, 102, 241, 0.05) !important;
+        background: var(--color-indigo-alpha-5) !important;
         -webkit-print-color-adjust: exact !important;
         print-color-adjust: exact !important;
     }
@@ -823,8 +823,8 @@
 
 /* Print tip styling */
 .vc-print-tip {
-    background: rgba(99, 102, 241, 0.1);
-    border: 1px solid rgba(99, 102, 241, 0.2);
+    background: var(--color-indigo-alpha-10);
+    border: 1px solid var(--color-indigo-alpha-20);
     border-radius: var(--radius-lg);
     padding: var(--space-3-5) var(--space-4-5);
     margin-top: var(--space-5);
@@ -851,13 +851,13 @@
 }
 
 .vc-print-tip-text {
-    color: rgba(255, 255, 255, 0.6);
+    color: var(--color-white-alpha-60);
     font-size: 0.85rem;
     line-height: 1.5;
 }
 
 [data-theme="light"] .vc-print-tip {
-    background: rgba(99, 102, 241, 0.08);
+    background: var(--color-indigo-alpha-8);
 }
 
 [data-theme="light"] .vc-print-tip-title {
@@ -865,7 +865,7 @@
 }
 
 [data-theme="light"] .vc-print-tip-text {
-    color: rgba(0, 0, 0, 0.6);
+    color: var(--color-black-alpha-60);
 }
 
 /* Screen-only class */
