@@ -32,7 +32,7 @@ $basePath = \Nexus\Core\TenantContext::getBasePath();
                     <dt class="govuk-summary-list__key">Current balance</dt>
                     <dd class="govuk-summary-list__value">
                         <strong class="civicone-wallet-balance"><?= number_format($user['balance']) ?> Credits</strong>
-                        <div class="civic-text-dark" style="font-size: 16px; margin-top: 5px;">1 Credit = 1 Hour of Service</div>
+                        <div class="civic-wallet-balance-note">1 Credit = 1 Hour of Service</div>
                     </dd>
                     <dd class="govuk-summary-list__actions">
                         <a class="govuk-link" href="#transfer-form">
@@ -62,27 +62,36 @@ $basePath = \Nexus\Core\TenantContext::getBasePath();
                         </div>
 
                         <!-- Selected User Chip -->
-                        <div id="dashSelectedUser" class="civic-selected-user" hidden>
-                            <div id="dashSelectedAvatar" class="civic-selected-avatar">
+                        <div id="dashSelectedUser" class="civic-selected-user" hidden role="status" aria-live="polite">
+                            <div id="dashSelectedAvatar" class="civic-selected-avatar" aria-hidden="true">
                                 <span id="dashSelectedInitial">?</span>
                             </div>
                             <div class="civic-selected-info">
                                 <div id="dashSelectedName" class="civic-selected-name">-</div>
                                 <div id="dashSelectedUsername" class="civic-selected-username">-</div>
                             </div>
-                            <button type="button" onclick="clearDashSelection()" class="civic-selected-clear" aria-label="Clear selection">
+                            <button type="button" onclick="clearDashSelection()" class="civic-selected-clear" aria-label="Clear recipient selection and search again">
                                 <i class="fa-solid fa-times" aria-hidden="true"></i>
                             </button>
                         </div>
 
-                        <!-- Search Input -->
+                        <!-- Search Input with ARIA Combobox Pattern -->
                         <div id="dashSearchWrapper" class="civic-search-wrapper">
                             <input type="text"
                                    id="dashUserSearch"
                                    class="civic-input"
                                    autocomplete="off"
-                                   aria-describedby="dashUserSearch-hint">
-                            <div id="dashUserResults" class="civic-search-results" hidden></div>
+                                   role="combobox"
+                                   aria-autocomplete="list"
+                                   aria-expanded="false"
+                                   aria-controls="dashUserResults"
+                                   aria-describedby="dashUserSearch-hint"
+                                   aria-haspopup="listbox">
+                            <div id="dashUserResults"
+                                 class="civic-search-results"
+                                 role="listbox"
+                                 aria-label="User search results"
+                                 hidden></div>
                         </div>
                     </div>
 
