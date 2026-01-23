@@ -5,6 +5,7 @@ namespace Nexus\Controllers;
 use Nexus\Core\View;
 use Nexus\Core\TenantContext;
 use Nexus\Models\ActivityLog;
+use Nexus\Helpers\UrlHelper;
 
 class FeedController
 {
@@ -82,7 +83,7 @@ class FeedController
             }
         }
 
-        header('Location: ' . $_SERVER['HTTP_REFERER'] ?? TenantContext::getBasePath() . '/dashboard');
+        header('Location: ' . UrlHelper::safeReferer(TenantContext::getBasePath() . '/dashboard'));
     }
 
     /**

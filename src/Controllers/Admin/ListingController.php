@@ -5,6 +5,7 @@ namespace Nexus\Controllers\Admin;
 use Nexus\Core\Database;
 use Nexus\Core\View;
 use Nexus\Core\Auth;
+use Nexus\Helpers\UrlHelper;
 
 class ListingController
 {
@@ -183,7 +184,7 @@ class ListingController
         Database::query("DELETE FROM $table WHERE id = ? AND tenant_id = ?", [$id, $tenantId]);
 
         // 4. Redirect back
-        $redirect = $_SERVER['HTTP_REFERER'] ?? '/admin/listings?status=deleted';
+        $redirect = UrlHelper::safeReferer('/admin/listings?status=deleted');
         header("Location: $redirect");
         exit;
     }
@@ -211,7 +212,7 @@ class ListingController
         );
 
         // Redirect back to pending review
-        $redirect = $_SERVER['HTTP_REFERER'] ?? '/admin/listings?status=pending';
+        $redirect = UrlHelper::safeReferer('/admin/listings?status=pending');
         header("Location: $redirect");
         exit;
     }

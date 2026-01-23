@@ -4,6 +4,7 @@ namespace Nexus\Controllers;
 
 use Nexus\Core\TenantContext;
 use Nexus\Models\Report;
+use Nexus\Helpers\UrlHelper;
 
 class ReportController
 {
@@ -34,7 +35,7 @@ class ReportController
             }
 
             // Redirect back with flash message (using query param for MVP)
-            $referer = $_SERVER['HTTP_REFERER'] ?? '/';
+            $referer = UrlHelper::safeReferer(TenantContext::getBasePath() . '/dashboard');
             // Append &reported=1
             $sep = (strpos($referer, '?') !== false) ? '&' : '?';
             header("Location: " . $referer . $sep . "msg=reported");

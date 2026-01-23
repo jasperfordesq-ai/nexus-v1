@@ -8,6 +8,7 @@ use Nexus\Models\Listing;
 use Nexus\Models\User;
 use Nexus\Models\Group;
 use Nexus\Services\LayoutValidator;
+use Nexus\Helpers\UrlHelper;
 
 // V12: Removed FDS Mobile Detection (2026-01-17)
 // The abandoned standalone mobile app has been removed.
@@ -128,7 +129,7 @@ class HomeController
      */
     private function redirectBack()
     {
-        $redirect = $_SERVER['HTTP_REFERER'] ?? '/dashboard';
+        $redirect = UrlHelper::safeReferer('/dashboard');
 
         // Prevent infinite loop if referer is the switch endpoint itself
         if (strpos($redirect, 'switch_layout') !== false) {

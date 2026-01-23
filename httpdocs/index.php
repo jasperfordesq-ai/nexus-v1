@@ -44,16 +44,20 @@ register_shutdown_function(function() {
 
         // Send email alert using the app's Mailer (Gmail API or SMTP)
         try {
-            $mailerFile = __DIR__ . '/../src/Core/Mailer.php';
-            if (file_exists($mailerFile)) {
-                require_once $mailerFile;
-                $mailer = new \Nexus\Core\Mailer();
-                $mailer->send(
-                    'jasper.ford.esq@gmail.com',
-                    '[NEXUS ALERT] Site Error on ' . ($_SERVER['HTTP_HOST'] ?? 'project-nexus.ie'),
-                    nl2br(htmlspecialchars($errorMsg)),
-                    'jasper@hour-timebank.ie'
-                );
+            $alertEmail = getenv('ERROR_ALERT_EMAIL') ?: getenv('ADMIN_EMAIL');
+            $alertFrom = getenv('ERROR_ALERT_FROM') ?: getenv('MAIL_FROM_ADDRESS');
+            if ($alertEmail) {
+                $mailerFile = __DIR__ . '/../src/Core/Mailer.php';
+                if (file_exists($mailerFile)) {
+                    require_once $mailerFile;
+                    $mailer = new \Nexus\Core\Mailer();
+                    $mailer->send(
+                        $alertEmail,
+                        '[NEXUS ALERT] Site Error on ' . ($_SERVER['HTTP_HOST'] ?? 'project-nexus.ie'),
+                        nl2br(htmlspecialchars($errorMsg)),
+                        $alertFrom ?: null
+                    );
+                }
             }
         } catch (\Throwable $e) {
             error_log('Failed to send error alert email: ' . $e->getMessage());
@@ -87,16 +91,20 @@ set_error_handler(function($errno, $errstr, $errfile, $errline) {
 
         // Send email alert using the app's Mailer (Gmail API or SMTP)
         try {
-            $mailerFile = __DIR__ . '/../src/Core/Mailer.php';
-            if (file_exists($mailerFile)) {
-                require_once $mailerFile;
-                $mailer = new \Nexus\Core\Mailer();
-                $mailer->send(
-                    'jasper.ford.esq@gmail.com',
-                    '[NEXUS WARNING] Error on ' . ($_SERVER['HTTP_HOST'] ?? 'project-nexus.ie'),
-                    nl2br(htmlspecialchars($errorMsg)),
-                    'jasper@hour-timebank.ie'
-                );
+            $alertEmail = getenv('ERROR_ALERT_EMAIL') ?: getenv('ADMIN_EMAIL');
+            $alertFrom = getenv('ERROR_ALERT_FROM') ?: getenv('MAIL_FROM_ADDRESS');
+            if ($alertEmail) {
+                $mailerFile = __DIR__ . '/../src/Core/Mailer.php';
+                if (file_exists($mailerFile)) {
+                    require_once $mailerFile;
+                    $mailer = new \Nexus\Core\Mailer();
+                    $mailer->send(
+                        $alertEmail,
+                        '[NEXUS WARNING] Error on ' . ($_SERVER['HTTP_HOST'] ?? 'project-nexus.ie'),
+                        nl2br(htmlspecialchars($errorMsg)),
+                        $alertFrom ?: null
+                    );
+                }
             }
         } catch (\Throwable $e) {
             error_log('Failed to send error alert email: ' . $e->getMessage());
@@ -119,13 +127,6 @@ set_error_handler(function($errno, $errstr, $errfile, $errline) {
 // 0.5 LAYOUT PERSISTENCE
 // Skip session for download routes to prevent header corruption
 $isDownloadRequest = (strpos($_SERVER['REQUEST_URI'] ?? '', '/download') !== false);
-
-// --- DEBUG TRAP: CONFIRM SERVER REACHABILITY ---
-// Remove this after confirmation
-// if (isset($_GET['mobile_debug'])) {
-//    die('<div style="background:red; color:white; padding:50px; text-align:center; font-size:24px; position:fixed; top:0; left:0; width:100%; height:100%; z-index:99999;"><h1>SERVER CONFIRMED</h1><p>The code is live.</p></div>');
-// }
-// -----------------------------------------------
 
 // 1. SMART PATH DETECTION (Live vs Local)
 if (file_exists(__DIR__ . '/../vendor/autoload.php')) {

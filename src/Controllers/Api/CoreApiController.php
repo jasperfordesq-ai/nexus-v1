@@ -37,8 +37,8 @@ class CoreApiController
         $tenantId = TenantContext::getId();
         $query = isset($_GET['q']) ? trim($_GET['q']) : '';
         $activeOnly = isset($_GET['active']) && $_GET['active'] === 'true';
-        $limit = isset($_GET['limit']) ? (int)$_GET['limit'] : 100;
-        $offset = isset($_GET['offset']) ? (int)$_GET['offset'] : 0;
+        $limit = min(500, max(1, (int) ($_GET['limit'] ?? 100)));
+        $offset = max(0, (int) ($_GET['offset'] ?? 0));
 
         // Base query - IMPORTANT: Always include last_active_at for "Active Now" filtering
         // Only show members with avatars (consistent with User::count() and directory policy)

@@ -7,6 +7,7 @@ use Nexus\Models\Notification;
 use Nexus\Models\User;
 use Nexus\Core\Mailer;
 use Nexus\Core\Database;
+use Nexus\Helpers\UrlHelper;
 
 class ConnectionController
 {
@@ -62,7 +63,7 @@ class ConnectionController
             }
         }
 
-        header('Location: ' . $_SERVER['HTTP_REFERER']);
+        header('Location: ' . UrlHelper::safeReferer('/connections'));
     }
 
     public function accept()

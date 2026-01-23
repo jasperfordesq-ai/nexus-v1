@@ -226,32 +226,50 @@ class BlogRestoreController
                 exit;
             }
 
-            // Read and execute SQL file
+            // Read SQL file and parse safely
             $sql = file_get_contents($filepath);
             $pdo = Database::getInstance();
             $pdo->beginTransaction();
 
-            // Split by semicolons and execute each statement
-            $statements = explode(';', $sql);
+            // Parse and validate SQL - only allow INSERT INTO posts statements
+            $parsed = $this->parseSqlExport($sql);
+
+            if (!empty($parsed['errors'])) {
+                echo json_encode([
+                    'success' => false,
+                    'error' => 'Invalid SQL file: ' . implode('; ', $parsed['errors'])
+                ]);
+                exit;
+            }
+
             $insertedCount = 0;
             $skippedCount = 0;
             $errors = [];
 
-            foreach ($statements as $statement) {
-                $statement = trim($statement);
+            // Get posts table columns for validation
+            $columnsStmt = Database::query("DESCRIBE posts");
+            $validColumns = array_column($columnsStmt->fetchAll(\PDO::FETCH_ASSOC), 'Field');
 
-                // Skip empty statements and comments
-                if (empty($statement) || strpos($statement, '--') === 0) {
+            foreach ($parsed['inserts'] as $insert) {
+                // Validate columns match posts table
+                $invalidCols = array_diff($insert['columns'], $validColumns);
+                if (!empty($invalidCols)) {
+                    $errors[] = 'Invalid columns: ' . implode(', ', $invalidCols);
                     continue;
                 }
 
                 try {
-                    $pdo->exec($statement);
-                    if (stripos($statement, 'INSERT INTO posts') === 0) {
-                        $insertedCount++;
-                    }
+                    // Build safe prepared statement
+                    $columns = implode(', ', array_map(function($col) {
+                        return '`' . preg_replace('/[^a-zA-Z0-9_]/', '', $col) . '`';
+                    }, $insert['columns']));
+
+                    $placeholders = implode(', ', array_fill(0, count($insert['values']), '?'));
+
+                    $sql = "INSERT INTO posts ({$columns}) VALUES ({$placeholders})";
+                    Database::query($sql, $insert['values']);
+                    $insertedCount++;
                 } catch (\Exception $e) {
-                    // Check if it's a duplicate entry error
                     if (strpos($e->getMessage(), 'Duplicate entry') !== false) {
                         $skippedCount++;
                     } else {
@@ -289,6 +307,205 @@ class BlogRestoreController
         }
 
         exit;
+    }
+
+    /**
+     * Parse SQL export file and extract only valid INSERT INTO posts statements.
+     * This prevents arbitrary SQL execution by only allowing specific insert operations.
+     *
+     * @param string $sql Raw SQL content
+     * @return array ['inserts' => [...], 'errors' => [...]]
+     */
+    private function parseSqlExport(string $sql): array
+    {
+        $result = [
+            'inserts' => [],
+            'errors' => [],
+        ];
+
+        // Split into statements (handle semicolons in strings)
+        $statements = $this->splitSqlStatements($sql);
+
+        foreach ($statements as $statement) {
+            $statement = trim($statement);
+
+            // Skip empty, comments, and safe SET statements
+            if (empty($statement) ||
+                strpos($statement, '--') === 0 ||
+                preg_match('/^SET\s+(FOREIGN_KEY_CHECKS|NAMES|CHARACTER_SET)/i', $statement)) {
+                continue;
+            }
+
+            // Only allow INSERT INTO posts
+            if (!preg_match('/^INSERT\s+INTO\s+posts\s*\(/i', $statement)) {
+                // Log but don't fail - might be benign statements
+                if (!preg_match('/^(SET|\/\*)/i', $statement)) {
+                    $result['errors'][] = 'Blocked non-INSERT statement: ' . substr($statement, 0, 50) . '...';
+                }
+                continue;
+            }
+
+            // Parse the INSERT statement
+            $parsed = $this->parseInsertStatement($statement);
+            if ($parsed === null) {
+                $result['errors'][] = 'Failed to parse INSERT: ' . substr($statement, 0, 50) . '...';
+                continue;
+            }
+
+            $result['inserts'][] = $parsed;
+        }
+
+        return $result;
+    }
+
+    /**
+     * Split SQL into statements, handling quoted strings properly.
+     */
+    private function splitSqlStatements(string $sql): array
+    {
+        $statements = [];
+        $current = '';
+        $inString = false;
+        $stringChar = '';
+        $length = strlen($sql);
+
+        for ($i = 0; $i < $length; $i++) {
+            $char = $sql[$i];
+
+            if (!$inString) {
+                if ($char === "'" || $char === '"') {
+                    $inString = true;
+                    $stringChar = $char;
+                } elseif ($char === ';') {
+                    $statements[] = $current;
+                    $current = '';
+                    continue;
+                }
+            } else {
+                // Handle escape sequences
+                if ($char === '\\' && $i + 1 < $length) {
+                    $current .= $char . $sql[$i + 1];
+                    $i++;
+                    continue;
+                }
+                // Handle doubled quotes (SQL escape)
+                if ($char === $stringChar) {
+                    if ($i + 1 < $length && $sql[$i + 1] === $stringChar) {
+                        $current .= $char . $sql[$i + 1];
+                        $i++;
+                        continue;
+                    }
+                    $inString = false;
+                }
+            }
+
+            $current .= $char;
+        }
+
+        if (trim($current) !== '') {
+            $statements[] = $current;
+        }
+
+        return $statements;
+    }
+
+    /**
+     * Parse an INSERT INTO posts statement and extract columns and values.
+     */
+    private function parseInsertStatement(string $sql): ?array
+    {
+        // Match: INSERT INTO posts (col1, col2, ...) VALUES (val1, val2, ...)
+        if (!preg_match('/^INSERT\s+INTO\s+posts\s*\(([^)]+)\)\s*VALUES\s*\((.+)\)$/is', $sql, $matches)) {
+            return null;
+        }
+
+        $columnsStr = $matches[1];
+        $valuesStr = $matches[2];
+
+        // Parse column names
+        $columns = array_map(function($col) {
+            return trim(trim($col), '`"');
+        }, explode(',', $columnsStr));
+
+        // Parse values (handle quoted strings)
+        $values = $this->parseValuesList($valuesStr);
+
+        if (count($columns) !== count($values)) {
+            return null;
+        }
+
+        return [
+            'columns' => $columns,
+            'values' => $values,
+        ];
+    }
+
+    /**
+     * Parse a comma-separated list of SQL values, handling quoted strings.
+     */
+    private function parseValuesList(string $valuesStr): array
+    {
+        $values = [];
+        $current = '';
+        $inString = false;
+        $stringChar = '';
+        $length = strlen($valuesStr);
+
+        for ($i = 0; $i < $length; $i++) {
+            $char = $valuesStr[$i];
+
+            if (!$inString) {
+                if ($char === "'" || $char === '"') {
+                    $inString = true;
+                    $stringChar = $char;
+                    continue; // Don't include the opening quote
+                } elseif ($char === ',') {
+                    $values[] = $this->parseValue(trim($current));
+                    $current = '';
+                    continue;
+                }
+            } else {
+                // Handle escape sequences
+                if ($char === '\\' && $i + 1 < $length) {
+                    $current .= $valuesStr[$i + 1];
+                    $i++;
+                    continue;
+                }
+                // Handle doubled quotes
+                if ($char === $stringChar) {
+                    if ($i + 1 < $length && $valuesStr[$i + 1] === $stringChar) {
+                        $current .= $char;
+                        $i++;
+                        continue;
+                    }
+                    $inString = false;
+                    continue; // Don't include the closing quote
+                }
+            }
+
+            $current .= $char;
+        }
+
+        if (trim($current) !== '' || $inString === false) {
+            $values[] = $this->parseValue(trim($current));
+        }
+
+        return $values;
+    }
+
+    /**
+     * Convert a SQL value string to appropriate PHP type.
+     */
+    private function parseValue(string $value)
+    {
+        if (strtoupper($value) === 'NULL') {
+            return null;
+        }
+        if (is_numeric($value)) {
+            return strpos($value, '.') !== false ? (float) $value : (int) $value;
+        }
+        // String value - unescape SQL escapes
+        return str_replace("''", "'", $value);
     }
 
     public function downloadExport()

@@ -8,6 +8,7 @@ use Nexus\Models\User;
 use Nexus\Core\Mailer;
 use Nexus\Core\EmailTemplate;
 use Nexus\Services\RealtimeService;
+use Nexus\Helpers\UrlHelper;
 
 class MessageController
 {
@@ -198,7 +199,7 @@ class MessageController
             $subject = $_POST['subject'] ?? '';
 
             if (!$receiverId || empty($body)) {
-                header('Location: ' . $_SERVER['HTTP_REFERER']);
+                header('Location: ' . UrlHelper::safeReferer(TenantContext::getBasePath() . '/messages'));
                 exit;
             }
 

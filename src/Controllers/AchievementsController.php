@@ -11,6 +11,7 @@ use Nexus\Services\ChallengeService;
 use Nexus\Services\BadgeCollectionService;
 use Nexus\Services\XPShopService;
 use Nexus\Services\LeaderboardSeasonService;
+use Nexus\Helpers\UrlHelper;
 
 class AchievementsController
 {
@@ -171,7 +172,7 @@ class AchievementsController
         $badgeKeys = $_POST['badge_keys'] ?? [];
         \Nexus\Models\UserBadge::updateShowcase($_SESSION['user_id'], $badgeKeys);
 
-        $referer = $_SERVER['HTTP_REFERER'] ?? TenantContext::getBasePath() . '/achievements/badges';
+        $referer = UrlHelper::safeReferer(TenantContext::getBasePath() . '/achievements/badges');
         header('Location: ' . $referer . '?showcase_updated=1');
         exit;
     }

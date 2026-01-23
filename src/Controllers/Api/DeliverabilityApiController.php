@@ -56,8 +56,8 @@ class DeliverabilityApiController
             $filters['assigned_to'] = $userId;
         }
 
-        $limit = isset($_GET['limit']) ? (int) $_GET['limit'] : 50;
-        $offset = isset($_GET['offset']) ? (int) $_GET['offset'] : 0;
+        $limit = min(500, max(1, (int) ($_GET['limit'] ?? 50)));
+        $offset = max(0, (int) ($_GET['offset'] ?? 0));
 
         $deliverables = Deliverable::getAll($filters, $limit, $offset);
         $total = Deliverable::getCount($filters);
@@ -571,7 +571,7 @@ class DeliverabilityApiController
     {
         $this->requireAuth();
 
-        $limit = isset($_GET['limit']) ? (int) $_GET['limit'] : 100;
+        $limit = min(500, max(1, (int) ($_GET['limit'] ?? 100)));
         $history = Deliverable::getHistory($id, $limit);
 
         return $this->jsonResponse(['data' => $history]);

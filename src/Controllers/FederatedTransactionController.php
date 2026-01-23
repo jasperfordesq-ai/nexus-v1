@@ -8,6 +8,7 @@ use Nexus\Services\FederatedTransactionService;
 use Nexus\Services\FederationFeatureService;
 use Nexus\Services\FederationUserService;
 use Nexus\Services\FederatedMessageService;
+use Nexus\Helpers\UrlHelper;
 
 /**
  * Federated Transaction Controller
@@ -94,7 +95,7 @@ class FederatedTransactionController
                 $this->jsonResponse(['success' => false, 'error' => 'Missing required fields'], 400);
             }
             $_SESSION['flash_error'] = 'Please fill in all required fields';
-            header('Location: ' . $_SERVER['HTTP_REFERER']);
+            header('Location: ' . UrlHelper::safeReferer(TenantContext::getBasePath() . '/federation/transactions'));
             exit;
         }
 
@@ -117,7 +118,7 @@ class FederatedTransactionController
             header('Location: ' . TenantContext::getBasePath() . '/federation/transactions');
         } else {
             $_SESSION['flash_error'] = $result['error'] ?? 'Transaction failed';
-            header('Location: ' . $_SERVER['HTTP_REFERER']);
+            header('Location: ' . UrlHelper::safeReferer(TenantContext::getBasePath() . '/federation/transactions'));
         }
         exit;
     }

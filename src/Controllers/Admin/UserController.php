@@ -7,6 +7,7 @@ use Nexus\Core\Csrf;
 use Nexus\Core\TenantContext;
 use Nexus\Core\AdminAuth;
 use Nexus\Models\User;
+use Nexus\Helpers\UrlHelper;
 
 class UserController
 {
@@ -334,7 +335,7 @@ class UserController
             }
         }
 
-        $referer = $_SERVER['HTTP_REFERER'] ?? '/admin';
+        $referer = UrlHelper::safeReferer('/admin');
         header('Location: ' . $referer);
         exit;
     }

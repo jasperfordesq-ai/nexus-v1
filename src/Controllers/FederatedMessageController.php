@@ -8,6 +8,7 @@ use Nexus\Services\FederatedMessageService;
 use Nexus\Services\FederationFeatureService;
 use Nexus\Services\FederationUserService;
 use Nexus\Services\FederationGateway;
+use Nexus\Helpers\UrlHelper;
 
 /**
  * Federated Message Controller
@@ -176,7 +177,7 @@ class FederatedMessageController
                 $this->jsonResponse(['success' => false, 'error' => 'Missing required fields'], 400);
             }
             $_SESSION['flash_error'] = 'Please enter a message';
-            header('Location: ' . $_SERVER['HTTP_REFERER']);
+            header('Location: ' . UrlHelper::safeReferer(TenantContext::getBasePath() . '/federation/messages'));
             exit;
         }
 

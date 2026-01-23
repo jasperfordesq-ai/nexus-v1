@@ -78,225 +78,12 @@ $router->add('GET', '/super-admin/federation/tenant/{id}', 'Nexus\Controllers\Su
 $router->add('POST', '/super-admin/federation/update-tenant-feature', 'Nexus\Controllers\SuperAdmin\FederationController@updateTenantFeature');
 
 // --------------------------------------------------------------------------
-// ADMIN UTILITIES
+// DEBUG/TEST ROUTES REMOVED FOR SECURITY (2026-01-23)
 // --------------------------------------------------------------------------
-$router->add('GET', '/test-permissions', function() {
-    require __DIR__ . '/test-permissions.php';
-    exit;
-});
-
-$router->add('GET', '/check-database-status', function() {
-    require __DIR__ . '/check-database-status.php';
-    exit;
-});
-
-$router->add('GET', '/test-permission-features', function() {
-    require __DIR__ . '/test-permission-features.php';
-    exit;
-});
-
-$router->add('GET', '/diagnose-members-issues', function() {
-    require __DIR__ . '/diagnose-members-issues.php';
-    exit;
-});
-
-$router->add('GET', '/check-session', function() {
-    require __DIR__ . '/check-session.php';
-    exit;
-});
-
-$router->add('GET', '/check-username', function() {
-    require __DIR__ . '/check-username.php';
-    exit;
-});
-
-$router->add('GET', '/view-error-log', function() {
-    require __DIR__ . '/view-error-log.php';
-    exit;
-});
-
-$router->add('GET', '/debug-members-load', function() {
-    require __DIR__ . '/debug-members-load.php';
-    exit;
-});
-
-$router->add('GET', '/test-members-comprehensive', function() {
-    require __DIR__ . '/test-members-comprehensive.php';
-    exit;
-});
-
-$router->add('GET', '/civicone-govuk-test', function() {
-    require __DIR__ . '/civicone-govuk-test.php';
-    exit;
-});
-
-$router->add('GET', '/test-profile-routing', function() {
-    require __DIR__ . '/test-profile-routing.php';
-    exit;
-});
-
-$router->add('GET', '/test-index', function() {
-    require __DIR__ . '/test-index.php';
-    exit;
-});
-
-$router->add('GET', '/install-permissions', function() {
-    require __DIR__ . '/install-permissions.php';
-    exit;
-});
-
-$router->add('POST', '/install-permissions', function() {
-    require __DIR__ . '/install-permissions.php';
-    exit;
-});
-
-$router->add('GET', '/run-menu-migration', function() {
-    require __DIR__ . '/run-menu-migration.php';
-    exit;
-});
-
-$router->add('GET', '/test-simple-route', function() {
-    require __DIR__ . '/../test-simple-route.php';
-    exit;
-});
-
-$router->add('GET', '/test-ajax-endpoint', function() {
-    require __DIR__ . '/../test-ajax-endpoint.php';
-    exit;
-});
-
-$router->add('GET', '/run-migration-017', function() {
-    require __DIR__ . '/run-migration-017.php';
-    exit;
-});
-
-$router->add('GET', '/run-migration-019', function() {
-    require __DIR__ . '/../scripts/run_migration_019.php';
-    exit;
-});
-
-$router->add('GET', '/run-migration-020', function() {
-    require __DIR__ . '/../scripts/run_migration_020.php';
-    exit;
-});
-
-$router->add('GET', '/run-migration-reactions', function() {
-    require __DIR__ . '/../scripts/migrations/create_message_reactions_table.php';
-    exit;
-});
-
-$router->add('GET', '/check-tables', function() {
-    require __DIR__ . '/check-tables.php';
-    exit;
-});
-
-$router->add('GET', '/check-menu', function() {
-    require __DIR__ . '/check-menu.php';
-    exit;
-});
-
-$router->add('GET', '/test-match-preferences', function() {
-    require __DIR__ . '/test-match-preferences.php';
-    exit;
-});
-
-$router->add('GET', '/create-cron-log', function() {
-    require __DIR__ . '/create-cron-log.php';
-    exit;
-});
-
-$router->add('GET', '/debug-matching', function() {
-    require __DIR__ . '/debug-matching.php';
-    exit;
-});
-
-$router->add('GET', '/fix-enum', function() {
-    require __DIR__ . '/fix-enum.php';
-    exit;
-});
-
-$router->add('GET', '/geocode-users', function() {
-    require __DIR__ . '/geocode_users.php';
-    exit;
-});
-
-$router->add('GET', '/sync-listing-locations', function() {
-    require __DIR__ . '/../scripts/sync_listing_locations.php';
-    exit;
-});
-
-$router->add('GET', '/debug-listings', function() {
-    require __DIR__ . '/../scripts/debug_listings.php';
-    exit;
-});
-
-$router->add('GET', '/debug-tenant-data', function() {
-    require __DIR__ . '/debug-tenant-data.php';
-    exit;
-});
-
-// Session/Auth Debug (God only)
-$router->add('GET', '/debug-session', function() {
-    if (empty($_SESSION['is_god'])) {
-        http_response_code(403);
-        die('God access required');
-    }
-
-    header('Content-Type: text/html; charset=utf-8');
-    echo "<h2>Session Data</h2><pre>";
-    echo "user_id: " . ($_SESSION['user_id'] ?? 'NOT SET') . "\n";
-    echo "user_name: " . ($_SESSION['user_name'] ?? 'NOT SET') . "\n";
-    echo "user_email: " . ($_SESSION['user_email'] ?? 'NOT SET') . "\n";
-    echo "user_role: " . ($_SESSION['user_role'] ?? 'NOT SET') . "\n";
-    echo "is_admin: " . ($_SESSION['is_admin'] ?? 'NOT SET') . "\n";
-    echo "is_super_admin: " . ($_SESSION['is_super_admin'] ?? 'NOT SET') . "\n";
-    echo "is_god: " . ($_SESSION['is_god'] ?? 'NOT SET') . "\n";
-    echo "tenant_id: " . ($_SESSION['tenant_id'] ?? 'NOT SET') . "\n";
-    echo "</pre>";
-
-    if (isset($_SESSION['user_id'])) {
-        echo "<h2>Database User Data</h2><pre>";
-        $user = \Nexus\Core\Database::query(
-            "SELECT id, name, email, role, is_super_admin, is_god, is_tenant_super_admin, tenant_id, status FROM users WHERE id = ?",
-            [$_SESSION['user_id']]
-        )->fetch();
-        print_r($user);
-        echo "</pre>";
-
-        echo "<h2>AdminAuth Status</h2><pre>";
-        echo "AdminAuth::isGod(): " . (\Nexus\Core\AdminAuth::isGod() ? 'true' : 'false') . "\n";
-        echo "AdminAuth::isSuperAdmin(): " . (\Nexus\Core\AdminAuth::isSuperAdmin() ? 'true' : 'false') . "\n";
-        echo "AdminAuth::isAdmin(): " . (\Nexus\Core\AdminAuth::isAdmin() ? 'true' : 'false') . "\n";
-        echo "AdminAuth::getPrivilegeLevel(): " . \Nexus\Core\AdminAuth::getPrivilegeLevel() . "\n";
-        echo "</pre>";
-    }
-    exit;
-});
-
-$router->add('GET', '/test-tenant-resolve', function() {
-    require __DIR__ . '/test-tenant-resolve.php';
-    exit;
-});
-
-$router->add('GET', '/fix-tenant-domain', function() {
-    require __DIR__ . '/fix-tenant-domain.php';
-    exit;
-});
-
-$router->add('GET', '/test-feed-api', function() {
-    require __DIR__ . '/test-feed-api.php';
-    exit;
-});
-
-$router->add('GET', '/test-blog-posts', function() {
-    require __DIR__ . '/test-blog-posts.php';
-    exit;
-});
-
-$router->add('GET', '/check-posts-status', function() {
-    require __DIR__ . '/check-posts-status.php';
-    exit;
-});
+// Previously contained 30+ debug/test endpoints that exposed sensitive data.
+// These routes have been removed from production. If needed for development,
+// access them via CLI scripts in /scripts/ directory instead.
+// --------------------------------------------------------------------------
 
 // --------------------------------------------------------------------------
 // FEDERATION API (External Partner Integration)
@@ -1112,7 +899,7 @@ $router->add('POST', '/admin/group-locations', 'Nexus\Controllers\AdminControlle
 $router->add('GET', '/admin/geocode-groups', 'Nexus\Controllers\AdminController@geocodeGroups');
 $router->add('GET', '/admin/smart-match-users', 'Nexus\Controllers\AdminController@smartMatchUsers');
 $router->add('GET', '/admin/smart-match-monitoring', 'Nexus\Controllers\AdminController@smartMatchMonitoring');
-$router->add('GET', '/admin/test-smart-match', 'Nexus\Controllers\AdminController@testSmartMatch');
+// Removed: /admin/test-smart-match (debug endpoint)
 
 // WebP Image Converter
 $router->add('GET', '/admin/webp-converter', 'Nexus\Controllers\AdminController@webpConverter');
@@ -1122,7 +909,7 @@ $router->add('POST', '/admin/webp-converter/convert', 'Nexus\Controllers\AdminCo
 $router->add('GET', '/admin/group-ranking', 'Nexus\Controllers\AdminController@groupRanking');
 $router->add('POST', '/admin/group-ranking/update', 'Nexus\Controllers\AdminController@updateFeaturedGroups');
 $router->add('POST', '/admin/group-ranking/toggle', 'Nexus\Controllers\AdminController@toggleFeaturedGroup');
-$router->add('GET', '/admin/test-ranking', 'Nexus\Controllers\AdminController@testRanking');
+// Removed: /admin/test-ranking (debug endpoint)
 
 // Cron Endpoints
 $router->add('GET', '/admin/cron/update-featured-groups', 'Nexus\Controllers\AdminController@cronUpdateFeaturedGroups');
