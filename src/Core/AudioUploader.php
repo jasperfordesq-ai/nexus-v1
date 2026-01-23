@@ -189,9 +189,20 @@ class AudioUploader
             return false;
         }
 
-        $path = __DIR__ . '/../../httpdocs' . $url;
+        // Prevent path traversal attacks (e.g., /uploads/../../../etc/passwd)
+        $uploadsDir = realpath(__DIR__ . '/../../httpdocs/uploads');
+        if (!$uploadsDir) {
+            return false;
+        }
 
-        if (file_exists($path) && is_file($path)) {
+        $path = realpath(__DIR__ . '/../../httpdocs' . $url);
+
+        // Ensure the resolved path is within the uploads directory
+        if (!$path || strpos($path, $uploadsDir) !== 0) {
+            return false;
+        }
+
+        if (is_file($path)) {
             return unlink($path);
         }
 

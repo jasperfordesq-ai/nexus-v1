@@ -1,1 +1,0 @@
-.dev-notice-btn-primary:hover{background:var(--color-primary-700);transform:translateY(-1px);box-shadow:0 4px 12px rgba(79,70,229,0.4)}.dev-notice-btn-secondary:hover{background:var(--color-gray-100);border-color:var(--color-gray-400)}@media (prefers-color-scheme:dark){.dev-notice-btn-secondary:hover{background:var(--color-gray-600)}}

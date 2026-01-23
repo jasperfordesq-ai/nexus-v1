@@ -1728,28 +1728,30 @@ button.feed-action-pill:active {
 /* Quick Action Buttons */
 .compose-quick-actions {
     display: flex;
-    gap: var(--space-2);
-    padding-top: var(--space-3.5);
+    justify-content: center;
+    gap: var(--space-3);
+    padding: var(--space-4) 0;
     margin-top: var(--space-3.5);
     border-top: 1px solid rgba(99, 102, 241, 0.08);
 }
 
 .compose-quick-btn {
     display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: var(--space-2);
-    flex: 1;
-    padding: var(--space-2.5) 16px;
+    gap: var(--space-1);
+    padding: var(--space-3) var(--space-6);
     background: transparent;
     border: none;
     border-radius: var(--radius-md);
     color: var(--color-gray-600);
     font-weight: 600;
-    font-size: var(--font-size-sm);
+    font-size: var(--font-size-xs);
     cursor: pointer;
     transition: all 0.2s ease;
     text-decoration: none;
+    min-width: 100px;
 }
 
 .compose-quick-btn:hover {
@@ -1758,7 +1760,7 @@ button.feed-action-pill:active {
 }
 
 .compose-quick-btn i {
-    font-size: var(--font-size-lg);
+    font-size: var(--font-size-xl);
 }
 
 .compose-quick-btn.highlight {

@@ -18,6 +18,9 @@ if (class_exists('Nexus\Core\TenantContext')) {
 $footerBasePath = Nexus\Core\TenantContext::getBasePath();
 $tSlug = $t['slug'] ?? '';
 $isHourTimebank = ($tSlug === 'hour-timebank' || $tSlug === 'hour_timebank');
+
+// Get tenant contact email - use contact_email column, fallback to default
+$tenantContactEmail = $t['contact_email'] ?? 'support@project-nexus.ie';
 ?>
 
 <!-- Footer CSS now loaded via header.php: nexus-modern-footer.min.css -->
@@ -46,7 +49,7 @@ $isHourTimebank = ($tSlug === 'hour-timebank' || $tSlug === 'hour_timebank');
                     Building stronger communities through time-based exchange. Share skills, earn credits, and connect with neighbors.
                 </p>
                 <div class="nexus-footer-social">
-                    <a href="mailto:jasper@hour-timebank.ie" title="Email Us">
+                    <a href="mailto:<?= htmlspecialchars($tenantContactEmail) ?>" title="Email Us">
                         <i class="fa-solid fa-envelope"></i>
                     </a>
                 </div>

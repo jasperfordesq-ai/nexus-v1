@@ -22,36 +22,42 @@ $message = '';
 $messageType = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
-    switch ($_POST['action']) {
-        case 'toggle_active':
-            if (isset($_POST['type_id'])) {
-                GroupType::toggleActive($_POST['type_id']);
-                $message = "Group type status updated";
-                $messageType = 'success';
-            }
-            break;
-
-        case 'delete':
-            if (isset($_POST['type_id'])) {
-                try {
-                    GroupType::delete($_POST['type_id']);
-                    $message = "Group type deleted successfully";
+    // Validate CSRF token for all POST actions
+    if (!\Nexus\Core\Csrf::verify()) {
+        $message = "Invalid request. Please refresh and try again.";
+        $messageType = 'error';
+    } else {
+        switch ($_POST['action']) {
+            case 'toggle_active':
+                if (isset($_POST['type_id'])) {
+                    GroupType::toggleActive($_POST['type_id']);
+                    $message = "Group type status updated";
                     $messageType = 'success';
-                } catch (Exception $e) {
-                    $message = "Error deleting group type: " . $e->getMessage();
-                    $messageType = 'error';
                 }
-            }
-            break;
+                break;
 
-        case 'reorder':
-            if (isset($_POST['order'])) {
-                $orderedIds = json_decode($_POST['order'], true);
-                GroupType::reorder($orderedIds);
-                $message = "Group types reordered successfully";
-                $messageType = 'success';
-            }
-            break;
+            case 'delete':
+                if (isset($_POST['type_id'])) {
+                    try {
+                        GroupType::delete($_POST['type_id']);
+                        $message = "Group type deleted successfully";
+                        $messageType = 'success';
+                    } catch (Exception $e) {
+                        $message = "Error deleting group type: " . $e->getMessage();
+                        $messageType = 'error';
+                    }
+                }
+                break;
+
+            case 'reorder':
+                if (isset($_POST['order'])) {
+                    $orderedIds = json_decode($_POST['order'], true);
+                    GroupType::reorder($orderedIds);
+                    $message = "Group types reordered successfully";
+                    $messageType = 'success';
+                }
+                break;
+        }
     }
 }
 
@@ -186,6 +192,7 @@ require dirname(__DIR__) . '/partials/admin-header.php';
                 </div>
                 <div class="type-status">
                     <form method="POST" style="display: inline;">
+                        <?= \Nexus\Core\Csrf::field() ?>
                         <input type="hidden" name="action" value="toggle_active">
                         <input type="hidden" name="type_id" value="<?= $type['id'] ?>">
                         <button type="submit" class="status-toggle">
@@ -201,6 +208,7 @@ require dirname(__DIR__) . '/partials/admin-header.php';
                         <i class="fa-solid fa-pen"></i>
                     </a>
                     <form method="POST" style="display: inline;" onsubmit="return confirm('Delete this type? Groups will not be deleted, only uncategorized.');">
+                        <?= \Nexus\Core\Csrf::field() ?>
                         <input type="hidden" name="action" value="delete">
                         <input type="hidden" name="type_id" value="<?= $type['id'] ?>">
                         <button type="submit" class="action-btn action-btn-danger" title="Delete">
@@ -634,10 +642,11 @@ document.addEventListener('DOMContentLoaded', function() {
             onEnd: function() {
                 const order = Array.from(list.children).map(row => row.dataset.typeId);
 
-                // Send reorder request
+                // Send reorder request with CSRF token
                 const formData = new FormData();
                 formData.append('action', 'reorder');
                 formData.append('order', JSON.stringify(order));
+                formData.append('csrf_token', '<?= \Nexus\Core\Csrf::token() ?>');
 
                 fetch(window.location.href, {
                     method: 'POST',

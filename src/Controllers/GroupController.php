@@ -541,11 +541,27 @@ class GroupController
                 if (!is_dir($uploadDir)) {
                     mkdir($uploadDir, 0755, true);
                 }
+
+                // Validate file extension
                 $ext = strtolower(pathinfo($_FILES['image']['name'], PATHINFO_EXTENSION));
-                $allowed = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
-                if (!in_array($ext, $allowed)) {
-                    throw new \Exception('Invalid image format. Allowed: ' . implode(', ', $allowed));
+                $allowedExt = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
+                if (!in_array($ext, $allowedExt)) {
+                    throw new \Exception('Invalid image format. Allowed: ' . implode(', ', $allowedExt));
                 }
+
+                // Validate MIME type using file content (prevents extension spoofing)
+                $finfo = new \finfo(FILEINFO_MIME_TYPE);
+                $mimeType = $finfo->file($_FILES['image']['tmp_name']);
+                $allowedMimes = [
+                    'image/jpeg',
+                    'image/png',
+                    'image/gif',
+                    'image/webp'
+                ];
+                if (!in_array($mimeType, $allowedMimes)) {
+                    throw new \Exception('Invalid image file type. The file content does not match an allowed image format.');
+                }
+
                 $filename = uniqid('post_') . '.' . $ext;
                 $targetPath = $uploadDir . $filename;
                 if (move_uploaded_file($_FILES['image']['tmp_name'], $targetPath)) {

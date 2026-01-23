@@ -319,8 +319,10 @@ async function sendMessageWithStreaming(message) {
                         const data = JSON.parse(line.slice(6));
 
                         if (data.error) {
-                            contentEl.innerHTML = parseMarkdown('Sorry, an error occurred: ' + data.error);
-                            addMessageActions(messageEl, fullContent || data.error, message);
+                            // Escape error message for security (parseMarkdown also escapes, but be explicit)
+                            const safeError = escapeHtml(data.error);
+                            contentEl.innerHTML = parseMarkdown('Sorry, an error occurred: ' + safeError);
+                            addMessageActions(messageEl, fullContent || safeError, message);
                             return;
                         }
 

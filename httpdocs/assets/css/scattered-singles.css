@@ -4826,10 +4826,21 @@ a.leaderboard-row {
                 }
             }
 
-            #members-glass-wrapper .avatar-img {
+            /* Picture element must fill container for webp_avatar() output */
+            #members-glass-wrapper .avatar-container picture {
                 display: block;
                 width: 100%;
                 height: 100%;
+                position: relative;
+                z-index: 1;
+            }
+
+            #members-glass-wrapper .avatar-img {
+                display: block;
+                width: 100% !important;
+                height: 100% !important;
+                max-width: 100% !important;
+                max-height: 100% !important;
                 object-fit: cover;
                 border-radius: var(--radius-full);
                 border: var(--space-1) solid white;

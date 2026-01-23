@@ -183,7 +183,7 @@ class UserController
             exit;
         }
 
-        View::render('admin/users/permissions');
+        View::render('admin/users/permissions', ['user' => $user]);
     }
 
     public function update()

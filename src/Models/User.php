@@ -847,8 +847,9 @@ class User
             Database::beginTransaction();
 
             // Get old tenant for logging
-            $oldUser = self::findById($userId);
+            $oldUser = self::findById($userId, false); // Don't enforce tenant for this lookup
             $oldTenantId = $oldUser['tenant_id'] ?? null;
+            $oldAvatarUrl = $oldUser['avatar_url'] ?? null;
 
             // 1. Update the user's tenant_id
             Database::query(
@@ -875,6 +876,7 @@ class User
                     'vol_logs',           // User's volunteer logs
                     'group_discussions',  // User's group discussions
                     'group_posts',        // User's group posts
+                    'notifications',      // User's notifications
                 ];
 
                 foreach ($contentTables as $table) {
@@ -887,6 +889,53 @@ class User
                         // Table might not exist or have different structure - log and continue
                         error_log("User::moveTenant - Could not update {$table}: " . $e->getMessage());
                     }
+                }
+
+                // Tables with sender_id column (messages, transactions)
+                $senderTables = [
+                    'messages' => ['sender_id', 'receiver_id'],
+                    'transactions' => ['sender_id', 'receiver_id'],
+                ];
+
+                foreach ($senderTables as $table => $columns) {
+                    foreach ($columns as $col) {
+                        try {
+                            Database::query(
+                                "UPDATE {$table} SET tenant_id = ? WHERE {$col} = ? AND tenant_id = ?",
+                                [$newTenantId, $userId, $oldTenantId]
+                            );
+                        } catch (\Exception $e) {
+                            error_log("User::moveTenant - Could not update {$table}.{$col}: " . $e->getMessage());
+                        }
+                    }
+                }
+
+                // Reviews - user can be reviewer or receiver
+                try {
+                    Database::query(
+                        "UPDATE reviews SET tenant_id = ?, reviewer_tenant_id = ? WHERE reviewer_id = ? AND tenant_id = ?",
+                        [$newTenantId, $newTenantId, $userId, $oldTenantId]
+                    );
+                    Database::query(
+                        "UPDATE reviews SET tenant_id = ?, receiver_tenant_id = ? WHERE receiver_id = ? AND tenant_id = ?",
+                        [$newTenantId, $newTenantId, $userId, $oldTenantId]
+                    );
+                } catch (\Exception $e) {
+                    error_log("User::moveTenant - Could not update reviews: " . $e->getMessage());
+                }
+
+                // Connections - user can be requester or receiver
+                try {
+                    Database::query(
+                        "UPDATE connections SET tenant_id = ? WHERE requester_id = ? AND tenant_id = ?",
+                        [$newTenantId, $userId, $oldTenantId]
+                    );
+                    Database::query(
+                        "UPDATE connections SET tenant_id = ? WHERE receiver_id = ? AND tenant_id = ?",
+                        [$newTenantId, $userId, $oldTenantId]
+                    );
+                } catch (\Exception $e) {
+                    error_log("User::moveTenant - Could not update connections: " . $e->getMessage());
                 }
 
                 // User settings/preferences tables (always move)
@@ -927,6 +976,11 @@ class User
                         error_log("User::moveTenant - Could not update {$table}: " . $e->getMessage());
                     }
                 }
+
+                // 3. Move avatar file if it exists and is in old tenant's folder
+                if ($oldAvatarUrl && strpos($oldAvatarUrl, "/uploads/{$oldTenantId}/") !== false) {
+                    self::moveAvatarToNewTenant($userId, $oldAvatarUrl, $oldTenantId, $newTenantId);
+                }
             }
 
             Database::commit();
@@ -940,6 +994,51 @@ class User
             Database::rollback();
             error_log("User::moveTenant error: " . $e->getMessage());
             return false;
+        }
+    }
+
+    /**
+     * Move avatar file to new tenant's upload folder
+     */
+    private static function moveAvatarToNewTenant(int $userId, string $oldAvatarUrl, int $oldTenantId, int $newTenantId): void
+    {
+        try {
+            $docRoot = $_SERVER['DOCUMENT_ROOT'] ?? '/var/www/vhosts/project-nexus.ie/httpdocs';
+            $oldPath = $docRoot . $oldAvatarUrl;
+
+            if (!file_exists($oldPath)) {
+                error_log("User::moveAvatarToNewTenant - Old avatar not found: {$oldPath}");
+                return;
+            }
+
+            // Create new path
+            $filename = basename($oldAvatarUrl);
+            $newDir = $docRoot . "/uploads/{$newTenantId}/avatars/";
+            $newPath = $newDir . $filename;
+            $newAvatarUrl = "/uploads/{$newTenantId}/avatars/{$filename}";
+
+            // Ensure directory exists
+            if (!is_dir($newDir)) {
+                mkdir($newDir, 0755, true);
+            }
+
+            // Copy file (don't delete old one in case of rollback)
+            if (copy($oldPath, $newPath)) {
+                // Update user's avatar_url
+                Database::query(
+                    "UPDATE users SET avatar_url = ? WHERE id = ?",
+                    [$newAvatarUrl, $userId]
+                );
+
+                // Delete old file after successful copy
+                @unlink($oldPath);
+
+                error_log("User::moveAvatarToNewTenant - Moved avatar from {$oldAvatarUrl} to {$newAvatarUrl}");
+            } else {
+                error_log("User::moveAvatarToNewTenant - Failed to copy avatar from {$oldPath} to {$newPath}");
+            }
+        } catch (\Exception $e) {
+            error_log("User::moveAvatarToNewTenant error: " . $e->getMessage());
         }
     }
 

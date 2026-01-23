@@ -3,13 +3,20 @@
  * Floating AI Chat Widget
  *
  * A floating bubble chat interface for AI assistant access from any page.
- * Only shows for logged-in users.
+ * Hidden by default - user must enable in Settings > Appearance.
  */
+
+// Check if user has AI widget enabled (defaults to OFF)
+// Read from cookie - user can enable in Settings > Appearance
+$aiWidgetEnabled = isset($_COOKIE['ai_widget_enabled']) && $_COOKIE['ai_widget_enabled'] === '1';
+
+// Don't show if user hasn't enabled the widget
+if (!$aiWidgetEnabled) return;
 
 // Only show for logged in users
 if (!isset($_SESSION['user_id'])) return;
 
-// Check if AI is enabled
+// Check if AI is enabled globally
 $aiEnabled = true;
 try {
     if (class_exists('Nexus\Services\AI\AIServiceFactory')) {
@@ -421,7 +428,8 @@ $aiPulseEnabled = isset($_COOKIE['ai_pulse_enabled']) && $_COOKIE['ai_pulse_enab
                         const data = JSON.parse(line.slice(6));
 
                         if (data.error) {
-                            msg.innerHTML = parseMarkdown('Sorry: ' + data.error);
+                            // Escape error message explicitly for security
+                            msg.innerHTML = parseMarkdown('Sorry: ' + escapeHtml(data.error));
                             finishResponse();
                             return;
                         }
@@ -561,14 +569,22 @@ $aiPulseEnabled = isset($_COOKIE['ai_pulse_enabled']) && $_COOKIE['ai_pulse_enab
         msgElement.appendChild(actionsDiv);
     }
 
+    // Escape HTML to prevent XSS
+    function escapeHtml(text) {
+        if (!text) return '';
+        return text.replace(/&/g, '&amp;')
+                   .replace(/</g, '&lt;')
+                   .replace(/>/g, '&gt;')
+                   .replace(/"/g, '&quot;')
+                   .replace(/'/g, '&#39;');
+    }
+
     // Simple markdown parser for AI responses
     function parseMarkdown(text) {
         if (!text) return '';
 
         // Escape HTML first
-        let html = text.replace(/&/g, '&amp;')
-                       .replace(/</g, '&lt;')
-                       .replace(/>/g, '&gt;');
+        let html = escapeHtml(text);
 
         // Code blocks
         html = html.replace(/```(\w*)\n([\s\S]*?)```/g, '<pre><code>$2</code></pre>');

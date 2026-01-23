@@ -42,8 +42,11 @@ class TokenService
         $secret = getenv('JWT_SECRET') ?: ($_ENV['JWT_SECRET'] ?? null);
 
         if (!$secret) {
-            // Derive from APP_KEY or use a fallback (not recommended for production)
-            $appKey = getenv('APP_KEY') ?: ($_ENV['APP_KEY'] ?? 'nexus-default-key-change-me');
+            // Derive from APP_KEY - no insecure fallback allowed
+            $appKey = getenv('APP_KEY') ?: ($_ENV['APP_KEY'] ?? null);
+            if (!$appKey) {
+                throw new \RuntimeException('Security configuration error: JWT_SECRET or APP_KEY must be set in environment');
+            }
             $secret = hash('sha256', $appKey . 'jwt-token-secret');
         }
 

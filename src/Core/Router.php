@@ -78,43 +78,6 @@ class Router
             $uri = rtrim($uri, '/');
         }
 
-        // DEBUG: Log API requests (disabled in production)
-        // if (strpos($uri, '/api/') === 0) {
-        //     error_log("Router - API request: $method $uri (basePath: $basePath, original URI: " . $_SERVER['REQUEST_URI'] . ")");
-        // }
-
-        // DEBUG: Route Tracing
-        if (isset($_GET['debug_router'])) {
-            echo "<h1>Router Debug</h1>";
-            echo "<p>Raw URI: " . htmlspecialchars($_SERVER['REQUEST_URI']) . "</p>";
-            echo "<p>Parsed Path: " . htmlspecialchars(parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH)) . "</p>";
-            echo "<p>Tenant Base Path: " . htmlspecialchars($basePath) . "</p>";
-            echo "<p>Processed URI (Router sees this): <strong>" . htmlspecialchars($uri) . "</strong></p>";
-
-            echo "<h2>Matching Against:</h2>";
-            echo "<ul>";
-            $matchFound = false;
-            foreach ($this->routes as $route) {
-                // Show all routes that might match, or admin/super routes
-                if (strpos($route['pattern'], 'admin') !== false ||
-                    strpos($route['pattern'], 'super') !== false ||
-                    strpos($route['pattern'], 'profile') !== false ||
-                    strpos($route['pattern'], 'members') !== false) {
-                    $isMatch = preg_match($route['pattern'], $uri) ? "MATCH!" : "No";
-                    $style = $isMatch === "MATCH!" ? "color:green; font-weight:bold;" : "color:gray;";
-                    echo "<li style='$style'>Pattern: " . htmlspecialchars($route['pattern']) . " - Result: $isMatch</li>";
-                    if ($isMatch === "MATCH!") $matchFound = true;
-                }
-            }
-            echo "</ul>";
-
-            if (!$matchFound) {
-                echo "<h3 style='color:red'>NO MATCH FOUND</h3>";
-            }
-            exit;
-        }
-
-        // file_put_contents(__DIR__ . '/../../router_debug.log', date('Y-m-d H:i:s') . " - Method: $method, URI: $uri\n", FILE_APPEND);
 
         foreach ($this->routes as $route) {
             if ($route['method'] === $method && preg_match($route['pattern'], $uri, $matches)) {

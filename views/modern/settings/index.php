@@ -1414,6 +1414,19 @@ require dirname(__DIR__, 2) . '/layouts/header.php';
 
             <div class="settings-toggle-row">
                 <div class="settings-toggle-info">
+                    <h4>Show AI Assistant Button</h4>
+                    <p>Display a floating AI assistant button on all pages for quick access.</p>
+                </div>
+                <label class="settings-toggle">
+                    <input type="checkbox" name="ai_widget_enabled" value="1"
+                           <?= ($_COOKIE['ai_widget_enabled'] ?? '0') === '1' ? 'checked' : '' ?>
+                           onchange="setAiWidgetEnabled(this.checked)">
+                    <span class="settings-toggle-slider"></span>
+                </label>
+            </div>
+
+            <div class="settings-toggle-row" id="ai-pulse-setting" style="<?= ($_COOKIE['ai_widget_enabled'] ?? '0') !== '1' ? 'opacity: 0.5; pointer-events: none;' : '' ?>">
+                <div class="settings-toggle-info">
                     <h4>AI Button Pulse Animation</h4>
                     <p>Show a pulsing animation on the AI assistant button to draw attention.</p>
                 </div>
@@ -1426,6 +1439,25 @@ require dirname(__DIR__, 2) . '/layouts/header.php';
             </div>
 
             <script>
+                function setAiWidgetEnabled(enabled) {
+                    document.cookie = `ai_widget_enabled=${enabled ? '1' : '0'};path=/;max-age=31536000`;
+                    // Show/hide the widget immediately if it exists, or reload to apply
+                    const widget = document.getElementById('ai-chat-widget');
+                    if (widget) {
+                        widget.style.display = enabled ? '' : 'none';
+                    }
+                    // Enable/disable the pulse setting
+                    const pulseSetting = document.getElementById('ai-pulse-setting');
+                    if (pulseSetting) {
+                        pulseSetting.style.opacity = enabled ? '' : '0.5';
+                        pulseSetting.style.pointerEvents = enabled ? '' : 'none';
+                    }
+                    // If enabling and widget doesn't exist, need to reload
+                    if (enabled && !widget) {
+                        window.location.reload();
+                    }
+                }
+
                 function setAiPulse(enabled) {
                     document.cookie = `ai_pulse_enabled=${enabled ? '1' : '0'};path=/;max-age=31536000`;
                     // Update the widget immediately if it exists

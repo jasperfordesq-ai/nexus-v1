@@ -216,6 +216,14 @@ class FederationApiKeysController
     public function suspend(int $id): void
     {
         $user = Auth::requireAdmin();
+
+        // Validate CSRF
+        if (!isset($_POST['csrf_token']) || !Auth::validateCsrf($_POST['csrf_token'])) {
+            $_SESSION['flash_error'] = 'Invalid request. Please try again.';
+            header('Location: /admin/federation/api-keys');
+            exit;
+        }
+
         $tenantId = TenantContext::getId();
         $db = Database::getInstance();
 
@@ -253,6 +261,14 @@ class FederationApiKeysController
     public function activate(int $id): void
     {
         $user = Auth::requireAdmin();
+
+        // Validate CSRF
+        if (!isset($_POST['csrf_token']) || !Auth::validateCsrf($_POST['csrf_token'])) {
+            $_SESSION['flash_error'] = 'Invalid request. Please try again.';
+            header('Location: /admin/federation/api-keys');
+            exit;
+        }
+
         $tenantId = TenantContext::getId();
         $db = Database::getInstance();
 
@@ -289,6 +305,14 @@ class FederationApiKeysController
     public function revoke(int $id): void
     {
         $user = Auth::requireAdmin();
+
+        // Validate CSRF
+        if (!isset($_POST['csrf_token']) || !Auth::validateCsrf($_POST['csrf_token'])) {
+            $_SESSION['flash_error'] = 'Invalid request. Please try again.';
+            header('Location: /admin/federation/api-keys');
+            exit;
+        }
+
         $tenantId = TenantContext::getId();
         $db = Database::getInstance();
 
@@ -326,6 +350,14 @@ class FederationApiKeysController
     public function regenerate(int $id): void
     {
         $user = Auth::requireAdmin();
+
+        // Validate CSRF
+        if (!isset($_POST['csrf_token']) || !Auth::validateCsrf($_POST['csrf_token'])) {
+            $_SESSION['flash_error'] = 'Invalid request. Please try again.';
+            header('Location: /admin/federation/api-keys');
+            exit;
+        }
+
         $tenantId = TenantContext::getId();
         $db = Database::getInstance();
 

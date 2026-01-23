@@ -1593,7 +1593,7 @@
     }
 
     .feed-filter-algo-btn span {
-        display: none;
+        display: none !important;
     }
 
     .feed-filter-algo-btn i {
@@ -1618,20 +1618,21 @@
     }
 
     .feed-filter-pill {
-        padding: var(--space-2) var(--space-3);
+        padding: var(--space-2) var(--space-2) !important;
         font-size: var(--font-size-xs);
-        min-height: 36px;
-        gap: 6px;
+        min-height: 40px !important;
+        min-width: 40px !important;
+        gap: 0 !important;
+        justify-content: center !important;
     }
 
     .feed-filter-pill i {
-        font-size: 14px;
+        font-size: 18px !important;
     }
 
-    /* Show icon and text on mobile for better UX */
+    /* Hide text on mobile - icons only */
     .feed-filter-pill span {
-        display: inline;
-        font-size: 11px;
+        display: none !important;
     }
 
     .feed-filter-location {
@@ -1697,14 +1698,19 @@
     }
 
     /* Touch target size - balanced for mobile usability */
-    .feed-filter-pill,
+    .feed-filter-pill {
+        min-height: 40px;
+        min-width: 40px;
+        padding: var(--space-2);
+    }
+
     .feed-filter-algo-btn {
-        min-height: 36px;
+        min-height: 40px;
         padding: var(--space-2) var(--space-3);
     }
 
     .feed-filter-location-btn {
-        min-height: 36px;
+        min-height: 40px;
         padding: var(--space-2) 10px;
     }
 

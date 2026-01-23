@@ -1,1 +1,1 @@
-.nav-tabs .nav-link{color:#6c757d}.nav-tabs .nav-link.active{border-bottom-color:#6366f1;color:#6366f1}.card{transition:transform .2s}.card:hover{box-shadow:0 4px 12px rgba(0,0,0,.1);transform:translateY(-4px)}.table-primary{background-color:rgba(99,102,241,.1)!important}
+.avatar-thumbnail{width:var(--space-8);height:var(--space-8);object-fit:cover}.badge-icon-xl{font-size:3rem}

@@ -35,14 +35,6 @@ class TenantContext
                 // We do NOT allow path-based overrides on a tenant domain.
                 self::$tenant = $domainTenant;
                 self::$basePath = '';
-                if (isset($_GET['debug_tenant'])) {
-                    echo "<pre>RESOLVED via DOMAIN (non-master):\n";
-                    echo "Host: " . htmlspecialchars($host) . "\n";
-                    echo "Tenant ID: " . $domainTenant['id'] . "\n";
-                    echo "Tenant Slug: " . ($domainTenant['slug'] ?? 'none') . "\n";
-                    echo "basePath: '' (empty because on tenant domain)\n";
-                    echo "</pre>";
-                }
                 return;
             }
         }
@@ -86,7 +78,6 @@ class TenantContext
             'strategic-plan',
             'faq',
             'impact-summary',
-            'debug-users',
             'migrate-messages',
             'legal',
             'newsletter',
@@ -121,7 +112,6 @@ class TenantContext
             'privacy',
             'password',
             'settings', // User Settings
-            'debug-test' // Debug Route
         ];
 
         if (!empty($firstSegment) && !in_array($firstSegment, $reserved)) {
@@ -160,15 +150,6 @@ class TenantContext
 
         // 2.5 For reserved routes (admin, dashboard, etc.), use session tenant if available
         // This ensures admin areas use the logged-in user's tenant, not Master
-        // DEBUG: Check what values we have
-        if (isset($_GET['debug_tenant'])) {
-            echo "<pre>DEBUG TenantContext:\n";
-            echo "firstSegment: " . htmlspecialchars($firstSegment) . "\n";
-            echo "in_array reserved: " . (in_array($firstSegment, $reserved) ? 'YES' : 'NO') . "\n";
-            echo "SESSION tenant_id: " . ($_SESSION['tenant_id'] ?? 'NOT SET') . "\n";
-            echo "SESSION user_id: " . ($_SESSION['user_id'] ?? 'NOT SET') . "\n";
-            echo "</pre>";
-        }
         if (in_array($firstSegment, $reserved) && !empty($_SESSION['tenant_id'])) {
             $db = Database::getConnection();
             $stmt = $db->prepare("SELECT * FROM tenants WHERE id = ?");
@@ -185,13 +166,6 @@ class TenantContext
                 // Set basePath to tenant slug for non-master tenants so links work correctly
                 // Master tenant (ID 1) uses empty basePath, other tenants use their slug
                 self::$basePath = ($sessionTenant['id'] == 1) ? '' : '/' . $sessionTenant['slug'];
-                if (isset($_GET['debug_tenant'])) {
-                    echo "<pre>RESOLVED via session:\n";
-                    echo "Tenant ID: " . $sessionTenant['id'] . "\n";
-                    echo "Tenant Slug: " . ($sessionTenant['slug'] ?? 'none') . "\n";
-                    echo "basePath set to: '" . self::$basePath . "'\n";
-                    echo "</pre>";
-                }
                 return;
             }
         }

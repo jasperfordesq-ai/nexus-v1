@@ -114,7 +114,8 @@ class RateLimiter
 
         $db = Database::getInstance();
         $cutoff = date('Y-m-d H:i:s', time() - (self::ATTEMPT_WINDOW * 4));
-        $db->exec("DELETE FROM login_attempts WHERE attempted_at < '$cutoff'");
+        $stmt = $db->prepare("DELETE FROM login_attempts WHERE attempted_at < ?");
+        $stmt->execute([$cutoff]);
     }
 
     /**
