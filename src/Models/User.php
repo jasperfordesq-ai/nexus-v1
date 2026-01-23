@@ -592,7 +592,29 @@ class User
     {
         $tenantId = TenantContext::getId();
 
-        // If super admin flag is provided, update it too
+        // SECURITY: Defense-in-depth check for super admin changes
+        // Only GOD users can grant/change super admin status
+        if ($isSuperAdmin !== null) {
+            // Get current user's super admin status
+            $currentUser = Database::query("SELECT is_super_admin FROM users WHERE id = ?", [$id])->fetch();
+            $currentIsSuperAdmin = !empty($currentUser['is_super_admin']);
+
+            // If trying to change super admin status, verify caller is GOD
+            if ((bool)$isSuperAdmin !== $currentIsSuperAdmin) {
+                if (empty($_SESSION['is_god'])) {
+                    // SECURITY: Block unauthorized super admin change attempt
+                    error_log("SECURITY: Blocked unauthorized is_super_admin change for user {$id} by user " . ($_SESSION['user_id'] ?? 'unknown'));
+                    // Fall through to update without super admin change
+                    $isSuperAdmin = null;
+                } else {
+                    // Log the super admin change by god user
+                    $action = $isSuperAdmin ? 'granted' : 'revoked';
+                    error_log("SECURITY AUDIT: Super admin {$action} for user {$id} by god user " . ($_SESSION['user_id'] ?? 'unknown'));
+                }
+            }
+        }
+
+        // If super admin flag is provided and authorized, update it too
         if ($isSuperAdmin !== null) {
             $sql = "UPDATE users SET role = ?, is_approved = ?, is_super_admin = ? WHERE id = ? AND tenant_id = ?";
             Database::query($sql, [$role, $isApproved, $isSuperAdmin ? 1 : 0, $id, $tenantId]);
@@ -1108,10 +1130,23 @@ class User
 
     /**
      * Grant god mode to a user (can only be done by existing god)
+     * SECURITY: This is the highest privilege level - requires audit logging
      */
     public static function grantGodMode(int $userId): bool
     {
         if (!self::isGod()) {
+            error_log("SECURITY: Unauthorized attempt to grant god mode to user {$userId} by user " . ($_SESSION['user_id'] ?? 'unknown'));
+            return false;
+        }
+
+        // Prevent granting god mode to yourself (redundant but explicit)
+        if ($userId === (int)($_SESSION['user_id'] ?? 0)) {
+            return false;
+        }
+
+        // Get target user info for audit
+        $targetUser = Database::query("SELECT email, first_name, last_name FROM users WHERE id = ?", [$userId])->fetch();
+        if (!$targetUser) {
             return false;
         }
 
@@ -1119,27 +1154,71 @@ class User
             "UPDATE users SET is_god = 1 WHERE id = ?",
             [$userId]
         );
+
+        // CRITICAL: Audit log for god mode grant
+        error_log("SECURITY AUDIT: God mode GRANTED to user {$userId} ({$targetUser['email']}) by god user " . ($_SESSION['user_id'] ?? 'unknown'));
+
+        // Also log to activity log if available
+        try {
+            \Nexus\Models\ActivityLog::log(
+                $_SESSION['user_id'] ?? 0,
+                'grant_god_mode',
+                "CRITICAL: Granted god mode to user #{$userId}: {$targetUser['email']}"
+            );
+        } catch (\Throwable $e) {
+            // Activity log may not be available, but we logged to error_log above
+        }
+
         return true;
     }
 
     /**
      * Revoke god mode from a user (can only be done by existing god)
+     * SECURITY: This is a critical privilege change - requires audit logging
      */
     public static function revokeGodMode(int $userId): bool
     {
         if (!self::isGod()) {
+            error_log("SECURITY: Unauthorized attempt to revoke god mode from user {$userId} by user " . ($_SESSION['user_id'] ?? 'unknown'));
             return false;
         }
 
         // Prevent revoking your own god mode
         if ($userId === (int)($_SESSION['user_id'] ?? 0)) {
+            error_log("SECURITY: User attempted to revoke their own god mode - blocked");
             return false;
+        }
+
+        // Get target user info for audit
+        $targetUser = Database::query("SELECT email, first_name, last_name, is_god FROM users WHERE id = ?", [$userId])->fetch();
+        if (!$targetUser) {
+            return false;
+        }
+
+        // Only revoke if they actually have god mode
+        if (empty($targetUser['is_god'])) {
+            return true; // Already not a god, no-op
         }
 
         Database::query(
             "UPDATE users SET is_god = 0 WHERE id = ?",
             [$userId]
         );
+
+        // CRITICAL: Audit log for god mode revocation
+        error_log("SECURITY AUDIT: God mode REVOKED from user {$userId} ({$targetUser['email']}) by god user " . ($_SESSION['user_id'] ?? 'unknown'));
+
+        // Also log to activity log if available
+        try {
+            \Nexus\Models\ActivityLog::log(
+                $_SESSION['user_id'] ?? 0,
+                'revoke_god_mode',
+                "CRITICAL: Revoked god mode from user #{$userId}: {$targetUser['email']}"
+            );
+        } catch (\Throwable $e) {
+            // Activity log may not be available, but we logged to error_log above
+        }
+
         return true;
     }
 }
