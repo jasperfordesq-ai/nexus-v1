@@ -10,12 +10,12 @@
 }
 
 .chart-card {
-    background: linear-gradient(135deg, rgba(15, 23, 42, 0.95), rgba(30, 41, 59, 0.9));
+    background: linear-gradient(135deg, var(--color-slate-900-alpha-95), var(--color-slate-alpha-90));
     /* backdrop-filter removed for GOV.UK compliance */
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    border: 1px solid var(--color-white-alpha-10);
     border-radius: var(--radius-2xl);
     padding: 2rem;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 8px 32px var(--color-black-alpha-30);
 }
 
 .chart-header {
@@ -53,24 +53,24 @@
 
 .radar-grid {
     fill: none;
-    stroke: rgba(255, 255, 255, 0.1);
+    stroke: var(--color-white-alpha-10);
     stroke-width: 1;
 }
 
 .radar-axis {
-    stroke: rgba(255, 255, 255, 0.2);
+    stroke: var(--color-white-alpha-20);
     stroke-width: 1;
 }
 
 .radar-data-area {
-    fill: rgba(99, 102, 241, 0.3);
+    fill: var(--color-indigo-alpha-30);
     stroke: var(--color-primary-500);
     stroke-width: 2;
-    filter: drop-shadow(0 0 10px rgba(99, 102, 241, 0.5));
+    filter: drop-shadow(0 0 10px var(--color-indigo-alpha-50));
 }
 
 .radar-comparison-area {
-    fill: rgba(139, 92, 246, 0.2);
+    fill: var(--color-violet-alpha-20);
     stroke: var(--color-purple-500);
     stroke-width: 2;
     stroke-dasharray: 5, 5;
@@ -105,7 +105,7 @@
 .bar-track {
     flex: 1;
     height: var(--space-9);
-    background: rgba(255, 255, 255, 0.05);
+    background: var(--color-white-alpha-5);
     border-radius: 18px;
     position: relative;
     overflow: hidden;
@@ -120,14 +120,14 @@
     justify-content: flex-end;
     padding-right: 1rem;
     transition: width 1.5s cubic-bezier(0.4, 0, 0.2, 1);
-    box-shadow: 0 0 var(--space-5) rgba(99, 102, 241, 0.4);
+    box-shadow: 0 0 var(--space-5) var(--color-indigo-alpha-40);
 }
 
 .bar-value {
     color: var(--color-white);
     font-weight: 700;
     font-size: 0.875rem;
-    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    text-shadow: 0 2px 4px var(--color-black-alpha-30);
 }
 
 .bar-comparison {
@@ -137,7 +137,7 @@
     width: var(--space-1);
     height: 80%;
     background: var(--color-warning-400);
-    box-shadow: 0 0 10px rgba(251, 191, 36, 0.8);
+    box-shadow: 0 0 10px var(--color-amber-alpha-80);
     z-index: 10;
 }
 
@@ -159,7 +159,7 @@
     justify-content: center;
     margin-top: 1.5rem;
     padding-top: 1.5rem;
-    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    border-top: 1px solid var(--color-white-alpha-10);
 }
 
 .legend-item {
@@ -167,7 +167,7 @@
     align-items: center;
     gap: 0.5rem;
     font-size: 0.875rem;
-    color: rgba(255, 255, 255, 0.8);
+    color: var(--color-white-alpha-80);
 }
 
 .legend-color {
@@ -199,8 +199,8 @@
 }
 
 .stat-box {
-    background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(139, 92, 246, 0.1));
-    border: 1px solid rgba(99, 102, 241, 0.3);
+    background: linear-gradient(135deg, var(--color-indigo-alpha-10), var(--color-violet-alpha-10));
+    border: 1px solid var(--color-indigo-alpha-30);
     border-radius: var(--radius-lg);
     padding: 1rem;
     text-align: center;
@@ -215,7 +215,7 @@
 
 .stat-label {
     font-size: 0.75rem;
-    color: rgba(255, 255, 255, 0.6);
+    color: var(--color-white-alpha-60);
     margin-top: 0.5rem;
     text-transform: uppercase;
     letter-spacing: 0.05em;

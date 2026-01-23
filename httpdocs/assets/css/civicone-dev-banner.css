@@ -16,7 +16,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    box-shadow: 0 4px 12px rgba(185, 28, 28, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    box-shadow: 0 4px 12px var(--color-red-700-alpha-35), inset 0 1px 0 var(--color-white-alpha-10);
     border-bottom: var(--space-1) solid var(--color-red-800);
     z-index: 1000;
 }
@@ -34,8 +34,8 @@
         -45deg,
         transparent,
         transparent 10px,
-        rgba(0, 0, 0, 0.05) 10px,
-        rgba(0, 0, 0, 0.05) 20px
+        var(--color-black-alpha-5) 10px,
+        var(--color-black-alpha-5) 20px
     );
     pointer-events: none;
 }
@@ -50,9 +50,9 @@
     height: var(--space-1);
     background: linear-gradient(90deg,
         transparent 0%,
-        rgba(255, 255, 255, 0.5) 20%,
-        rgba(255, 255, 255, 0.8) 50%,
-        rgba(255, 255, 255, 0.5) 80%,
+        var(--color-white-alpha-50) 20%,
+        var(--color-white-alpha-80) 50%,
+        var(--color-white-alpha-50) 80%,
         transparent 100%
     );
     /* animation removed for GOV.UK compliance */
@@ -81,7 +81,7 @@
 
 /* Main badge - large and attention-grabbing */
 .civicone-dev-badge {
-    background: rgba(255, 255, 255, 0.95);
+    background: var(--color-white-alpha-95);
     color: var(--color-govuk-red);
     padding: var(--space-2) 16px;
     border-radius: var(--radius-md);
@@ -92,8 +92,8 @@
     display: inline-flex;
     align-items: center;
     gap: var(--space-2);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-    border: 2px solid rgba(255, 255, 255, 1);
+    box-shadow: 0 4px 12px var(--color-black-alpha-20);
+    border: 2px solid var(--color-white);
     white-space: nowrap;
     flex-shrink: 0;
     /* animation removed for GOV.UK compliance */
@@ -102,7 +102,7 @@
 /* Animation removed for GOV.UK compliance */
     50% {
         transform: scale(1.02);
-        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+        box-shadow: 0 6px 20px var(--color-black-alpha-30);
     }
 }
 
@@ -128,7 +128,7 @@
     font-weight: 500;
     line-height: 1.4;
     color: var(--color-white);
-    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+    text-shadow: 0 1px 2px var(--color-black-alpha-20);
 }
 
 .civicone-dev-text strong {
@@ -160,14 +160,14 @@
     flex-shrink: 0;
     transition: all 0.2s ease;
     border: 2px solid var(--color-white);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 2px 8px var(--color-black-alpha-20);
 }
 
 .civicone-dev-switch:hover {
     background: var(--color-gray-150);
     color: var(--color-govuk-black);
     transform: translateY(-2px);
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 4px 15px var(--color-black-alpha-30);
     text-decoration: none;
 }
 
@@ -189,7 +189,7 @@
 .civicone-dev-banner--accessible {
     background: linear-gradient(135deg, var(--color-emerald-800) 0%, var(--color-success-700) 50%, var(--color-emerald-800) 100%);
     border-bottom-color: var(--color-emerald-900);
-    box-shadow: 0 4px 12px rgba(6, 95, 70, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    box-shadow: 0 4px 12px var(--color-emerald-800-alpha-35), inset 0 1px 0 var(--color-white-alpha-10);
 }
 
 .civicone-dev-banner--accessible .civicone-dev-badge {
@@ -208,7 +208,7 @@
 .civicone-dev-banner--warning {
     background: linear-gradient(135deg, var(--color-warning-600) 0%, var(--color-warning-500) 50%, var(--color-warning-600) 100%);
     border-bottom-color: var(--color-warning-700);
-    box-shadow: 0 4px 12px rgba(217, 119, 6, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    box-shadow: 0 4px 12px var(--color-amber-600-alpha-35), inset 0 1px 0 var(--color-white-alpha-10);
 }
 
 .civicone-dev-banner--warning .civicone-dev-badge {
@@ -227,7 +227,7 @@
 .civicone-dev-banner--info {
     background: linear-gradient(135deg, var(--color-govuk-blue) 0%, var(--color-blue-500) 50%, var(--color-govuk-blue) 100%);
     border-bottom-color: var(--color-blue-750);
-    box-shadow: 0 4px 12px rgba(29, 78, 216, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    box-shadow: 0 4px 12px var(--color-blue-700-alpha-35), inset 0 1px 0 var(--color-white-alpha-10);
 }
 
 .civicone-dev-banner--info .civicone-dev-badge {

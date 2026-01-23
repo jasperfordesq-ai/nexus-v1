@@ -66,7 +66,7 @@ a:focus-visible,
 input:focus-visible,
 select:focus-visible,
 textarea:focus-visible {
-    outline: 3px solid rgba(20, 184, 166, 0.5);
+    outline: 3px solid var(--color-teal-500-alpha-50);
     outline-offset: 2px;
 }
 
@@ -107,8 +107,8 @@ html {
    ======================================== */
 
 [data-theme="dark"] .htb-card {
-    background: rgba(30, 41, 59, 0.85);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: var(--color-slate-alpha-85);
+    border: 1px solid var(--color-white-alpha-10);
 }
 
 [data-theme="dark"] .htb-card h3 {
@@ -124,8 +124,8 @@ html {
 [data-theme="dark"] input[style*="border: 1px solid #ddd"],
 [data-theme="dark"] select[style*="border: 1px solid #ddd"],
 [data-theme="dark"] textarea[style*="border: 1px solid #ddd"] {
-    background: rgba(15, 23, 42, 0.6) !important;
-    border-color: rgba(255, 255, 255, 0.15) !important;
+    background: var(--color-slate-900-alpha-60) !important;
+    border-color: var(--color-white-alpha-15) !important;
     color: var(--color-slate-100) !important;
 }
 
@@ -148,7 +148,7 @@ html {
 /* Table */
 [data-theme="dark"] table tr[style*="border-bottom: 1px solid #eee"],
 [data-theme="dark"] table tr[style*="border-bottom: 1px solid #f9f9f9"] {
-    border-color: rgba(255, 255, 255, 0.1) !important;
+    border-color: var(--color-white-alpha-10) !important;
 }
 
 [data-theme="dark"] table td {
@@ -157,8 +157,8 @@ html {
 
 /* Add Shift Box */
 [data-theme="dark"] div[style*="background: var(--color-gray-50)"] {
-    background: rgba(30, 41, 59, 0.5) !important;
-    border-color: rgba(255, 255, 255, 0.1) !important;
+    background: var(--color-slate-alpha-50) !important;
+    border-color: var(--color-white-alpha-10) !important;
 }
 
 [data-theme="dark"] div[style*="background: var(--color-gray-50)"] h5 {
@@ -171,8 +171,8 @@ html {
 
 /* Secondary button */
 [data-theme="dark"] .htb-btn-secondary {
-    background: rgba(51, 65, 85, 0.6) !important;
-    border-color: rgba(255, 255, 255, 0.15) !important;
+    background: var(--color-slate-700-alpha-60) !important;
+    border-color: var(--color-white-alpha-15) !important;
     color: var(--color-slate-200) !important;
 }
 
@@ -331,8 +331,8 @@ html {
 
 [data-theme="dark"] .form-input,
 [data-theme="dark"] .form-input-sm {
-    background: rgba(15, 23, 42, 0.6);
-    border-color: rgba(255, 255, 255, 0.15);
+    background: var(--color-slate-900-alpha-60);
+    border-color: var(--color-white-alpha-15);
     color: var(--color-slate-100);
 }
 
@@ -345,11 +345,11 @@ html {
 }
 
 [data-theme="dark"] .shifts-table thead tr {
-    border-color: rgba(255, 255, 255, 0.1);
+    border-color: var(--color-white-alpha-10);
 }
 
 [data-theme="dark"] .shifts-table tbody tr {
-    border-color: rgba(255, 255, 255, 0.1);
+    border-color: var(--color-white-alpha-10);
 }
 
 [data-theme="dark"] .shifts-table td {
@@ -361,8 +361,8 @@ html {
 }
 
 [data-theme="dark"] .add-shift-box {
-    background: rgba(30, 41, 59, 0.5);
-    border-color: rgba(255, 255, 255, 0.1);
+    background: var(--color-slate-alpha-50);
+    border-color: var(--color-white-alpha-10);
 }
 
 [data-theme="dark"] .add-shift-box h5 {
