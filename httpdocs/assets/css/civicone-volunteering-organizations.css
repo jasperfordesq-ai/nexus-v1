@@ -5,24 +5,24 @@
         /* Main Content Card Wrapper */
         #org-glass-wrapper {
             background: linear-gradient(135deg,
-                rgba(255, 255, 255, 0.85),
-                rgba(255, 255, 255, 0.7));
+                var(--color-white-alpha-85),
+                var(--color-white-alpha-70));
             /* backdrop-filter removed for GOV.UK compliance */ saturate(120%);
             -webkit-/* backdrop-filter removed for GOV.UK compliance */ saturate(120%);
-            border: 1px solid rgba(255, 255, 255, 0.4);
+            border: 1px solid var(--color-white-alpha-40);
             border-radius: var(--radius-2xl);
             padding: var(--space-8);
-            box-shadow: 0 8px 40px rgba(31, 38, 135, 0.12),
-                        inset 0 1px 0 rgba(255, 255, 255, 0.6);
+            box-shadow: 0 8px 40px var(--color-glass-shadow-12),
+                        inset 0 1px 0 var(--color-white-alpha-60);
         }
 
         [data-theme="dark"] #org-glass-wrapper {
             background: linear-gradient(135deg,
-                rgba(15, 23, 42, 0.75),
-                rgba(30, 41, 59, 0.65));
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            box-shadow: 0 8px 40px rgba(0, 0, 0, 0.4),
-                        inset 0 1px 0 rgba(255, 255, 255, 0.08);
+                var(--color-slate-900-alpha-75),
+                var(--color-slate-alpha-65));
+            border: 1px solid var(--color-white-alpha-10);
+            box-shadow: 0 8px 40px var(--color-black-alpha-40),
+                        inset 0 1px 0 var(--color-white-alpha-8);
         }
 
         @media (max-width: 768px) {
@@ -47,20 +47,20 @@
 
         [data-theme="light"] #org-glass-wrapper::before {
             background: linear-gradient(135deg,
-                rgba(99, 102, 241, 0.08) 0%,
-                rgba(139, 92, 246, 0.08) 25%,
-                rgba(13, 148, 136, 0.08) 50%,
-                rgba(20, 184, 166, 0.08) 75%,
-                rgba(99, 102, 241, 0.08) 100%);
+                var(--color-indigo-alpha-8) 0%,
+                var(--color-violet-alpha-8) 25%,
+                var(--color-teal-600-alpha-8) 50%,
+                var(--color-teal-500-alpha-8) 75%,
+                var(--color-indigo-alpha-8) 100%);
             background-size: 400% 400%;
             /* animation removed for GOV.UK compliance */
         }
 
         [data-theme="dark"] #org-glass-wrapper::before {
             background: radial-gradient(circle at 20% 30%,
-                rgba(99, 102, 241, 0.15) 0%, transparent 50%),
+                var(--color-indigo-alpha-15) 0%, transparent 50%),
             radial-gradient(circle at 80% 70%,
-                rgba(13, 148, 136, 0.12) 0%, transparent 50%);
+                var(--color-teal-600-alpha-12) 0%, transparent 50%);
         }
 
         /* Animation removed for GOV.UK compliance */
@@ -113,26 +113,26 @@
             padding: var(--space-5) 25px;
             border-radius: var(--radius-2xl);
             background: linear-gradient(135deg,
-                rgba(255, 255, 255, 0.75),
-                rgba(255, 255, 255, 0.6));
+                var(--color-white-alpha-75),
+                var(--color-white-alpha-60));
             /* backdrop-filter removed for GOV.UK compliance */ saturate(120%);
             -webkit-/* backdrop-filter removed for GOV.UK compliance */ saturate(120%);
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            box-shadow: 0 8px 32px rgba(31, 38, 135, 0.15),
-                        inset 0 0 0 1px rgba(255, 255, 255, 0.4);
+            border: 1px solid var(--color-white-alpha-30);
+            box-shadow: 0 8px 32px var(--color-glass-shadow-15),
+                        inset 0 0 0 1px var(--color-white-alpha-40);
             margin-bottom: var(--space-8);
         }
 
         [data-theme="dark"] #org-glass-wrapper .glass-search-card {
             background: linear-gradient(135deg,
-                rgba(15, 23, 42, 0.6),
-                rgba(30, 41, 59, 0.5));
+                var(--color-slate-900-alpha-60),
+                var(--color-slate-alpha-50));
             /* backdrop-filter removed for GOV.UK compliance */ saturate(150%);
             -webkit-/* backdrop-filter removed for GOV.UK compliance */ saturate(150%);
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5),
-                        0 0 80px rgba(99, 102, 241, 0.1),
-                        inset 0 1px 0 rgba(255, 255, 255, 0.1);
+            border: 1px solid var(--color-white-alpha-15);
+            box-shadow: 0 8px 32px var(--color-black-alpha-50),
+                        0 0 80px var(--color-indigo-alpha-10),
+                        inset 0 1px 0 var(--color-white-alpha-10);
         }
 
         #org-glass-wrapper .search-form {
@@ -160,40 +160,40 @@
         #org-glass-wrapper .glass-search-input {
             width: 100%;
             padding: var(--space-3-5) var(--space-5) var(--space-3-5) var(--space-12);
-            border: 2px solid rgba(255, 255, 255, 0.4);
+            border: 2px solid var(--color-white-alpha-40);
             border-radius: 14px;
             font-size: 1rem;
-            background: rgba(255, 255, 255, 0.6);
+            background: var(--color-white-alpha-60);
             /* backdrop-filter removed for GOV.UK compliance */
             -webkit-/* backdrop-filter removed for GOV.UK compliance */
-            box-shadow: 0 4px 12px rgba(31, 38, 135, 0.1),
-                        inset 0 1px 0 rgba(255, 255, 255, 0.6);
+            box-shadow: 0 4px 12px var(--color-glass-shadow),
+                        inset 0 1px 0 var(--color-white-alpha-60);
             transition: all 0.3s ease;
             box-sizing: border-box;
             color: var(--htb-text-main);
         }
 
         #org-glass-wrapper .glass-search-input:focus {
-            border-color: rgba(99, 102, 241, 0.6);
-            box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.15),
-                        0 8px 24px rgba(99, 102, 241, 0.2);
+            border-color: var(--color-indigo-alpha-60);
+            box-shadow: 0 0 0 4px var(--color-indigo-alpha-15),
+                        0 8px 24px var(--color-indigo-alpha-20);
             outline: none;
-            background: rgba(255, 255, 255, 0.8);
+            background: var(--color-white-alpha-80);
         }
 
         [data-theme="dark"] #org-glass-wrapper .glass-search-input {
-            background: rgba(15, 23, 42, 0.7);
-            border: 2px solid rgba(255, 255, 255, 0.2);
+            background: var(--color-slate-900-alpha-70);
+            border: 2px solid var(--color-white-alpha-20);
             color: var(--color-slate-50);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3),
-                        inset 0 1px 0 rgba(255, 255, 255, 0.1);
+            box-shadow: 0 4px 12px var(--color-black-alpha-30),
+                        inset 0 1px 0 var(--color-white-alpha-10);
         }
 
         [data-theme="dark"] #org-glass-wrapper .glass-search-input:focus {
-            border-color: rgba(99, 102, 241, 0.5);
-            box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.2),
-                        0 8px 24px rgba(99, 102, 241, 0.3);
-            background: rgba(15, 23, 42, 0.85);
+            border-color: var(--color-indigo-alpha-50);
+            box-shadow: 0 0 0 4px var(--color-indigo-alpha-20),
+                        0 8px 24px var(--color-indigo-alpha-30);
+            background: var(--color-slate-900-alpha-85);
         }
 
         #org-glass-wrapper .glass-btn-primary {
@@ -206,8 +206,8 @@
             font-weight: 700;
             cursor: pointer;
             transition: all 0.3s ease;
-            box-shadow: 0 4px 16px rgba(99, 102, 241, 0.3),
-                        inset 0 1px 0 rgba(255, 255, 255, 0.2);
+            box-shadow: 0 4px 16px var(--color-indigo-alpha-30),
+                        inset 0 1px 0 var(--color-white-alpha-20);
             display: flex;
             align-items: center;
             gap: var(--space-2);
@@ -215,8 +215,8 @@
 
         #org-glass-wrapper .glass-btn-primary:hover {
             transform: translateY(-2px);
-            box-shadow: 0 8px 24px rgba(99, 102, 241, 0.4),
-                        inset 0 1px 0 rgba(255, 255, 255, 0.3);
+            box-shadow: 0 8px 24px var(--color-indigo-alpha-40),
+                        inset 0 1px 0 var(--color-white-alpha-30);
         }
 
         /* Organizations Grid */
@@ -236,14 +236,14 @@
         /* Organization Card */
         #org-glass-wrapper .org-card {
             background: linear-gradient(135deg,
-                rgba(255, 255, 255, 0.8),
-                rgba(255, 255, 255, 0.65));
+                var(--color-white-alpha-80),
+                var(--color-white-alpha-65));
             /* backdrop-filter removed for GOV.UK compliance */ saturate(120%);
             -webkit-/* backdrop-filter removed for GOV.UK compliance */ saturate(120%);
-            border: 1px solid rgba(255, 255, 255, 0.35);
+            border: 1px solid var(--color-white-alpha-35);
             border-radius: var(--radius-2xl);
-            box-shadow: 0 8px 32px rgba(31, 38, 135, 0.12),
-                        inset 0 1px 0 rgba(255, 255, 255, 0.5);
+            box-shadow: 0 8px 32px var(--color-glass-shadow-12),
+                        inset 0 1px 0 var(--color-white-alpha-50);
             overflow: hidden;
             transition: all 0.3s ease;
             display: flex;
@@ -254,26 +254,26 @@
 
         #org-glass-wrapper .org-card:hover {
             transform: translateY(-6px);
-            box-shadow: 0 16px 48px rgba(99, 102, 241, 0.2),
-                        0 0 0 1px rgba(99, 102, 241, 0.15),
-                        inset 0 1px 0 rgba(255, 255, 255, 0.6);
-            border-color: rgba(99, 102, 241, 0.3);
+            box-shadow: 0 16px 48px var(--color-indigo-alpha-20),
+                        0 0 0 1px var(--color-indigo-alpha-15),
+                        inset 0 1px 0 var(--color-white-alpha-60);
+            border-color: var(--color-indigo-alpha-30);
         }
 
         [data-theme="dark"] #org-glass-wrapper .org-card {
             background: linear-gradient(135deg,
-                rgba(15, 23, 42, 0.7),
-                rgba(30, 41, 59, 0.6));
-            border: 1px solid rgba(255, 255, 255, 0.12);
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4),
-                        inset 0 1px 0 rgba(255, 255, 255, 0.08);
+                var(--color-slate-900-alpha-70),
+                var(--color-slate-alpha-60));
+            border: 1px solid var(--color-white-alpha-12);
+            box-shadow: 0 8px 32px var(--color-black-alpha-40),
+                        inset 0 1px 0 var(--color-white-alpha-8);
         }
 
         [data-theme="dark"] #org-glass-wrapper .org-card:hover {
-            box-shadow: 0 16px 48px rgba(99, 102, 241, 0.25),
-                        0 0 40px rgba(99, 102, 241, 0.15),
-                        inset 0 1px 0 rgba(255, 255, 255, 0.1);
-            border-color: rgba(99, 102, 241, 0.4);
+            box-shadow: 0 16px 48px var(--color-indigo-alpha-25),
+                        0 0 40px var(--color-indigo-alpha-15),
+                        inset 0 1px 0 var(--color-white-alpha-10);
+            border-color: var(--color-indigo-alpha-40);
         }
 
         /* Card Header with Logo */
@@ -297,8 +297,8 @@
             color: white;
             font-size: 1.5rem;
             font-weight: 700;
-            border: 2px solid rgba(255, 255, 255, 0.3);
-            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.2);
+            border: 2px solid var(--color-white-alpha-30);
+            box-shadow: 0 4px 12px var(--color-indigo-alpha-20);
         }
 
         #org-glass-wrapper .org-logo img {
@@ -352,16 +352,16 @@
             gap: var(--space-4);
             padding: var(--space-4) var(--space-6);
             background: linear-gradient(135deg,
-                rgba(99, 102, 241, 0.05),
-                rgba(13, 148, 136, 0.05));
-            border-top: 1px solid rgba(255, 255, 255, 0.2);
+                var(--color-indigo-alpha-5),
+                var(--color-teal-600-alpha-5));
+            border-top: 1px solid var(--color-white-alpha-20);
         }
 
         [data-theme="dark"] #org-glass-wrapper .org-card-stats {
             background: linear-gradient(135deg,
-                rgba(99, 102, 241, 0.1),
-                rgba(13, 148, 136, 0.1));
-            border-top: 1px solid rgba(255, 255, 255, 0.08);
+                var(--color-indigo-alpha-10),
+                var(--color-teal-600-alpha-10));
+            border-top: 1px solid var(--color-white-alpha-8);
         }
 
         #org-glass-wrapper .org-stat {
@@ -387,19 +387,19 @@
             text-align: center;
             padding: var(--space-16) var(--space-5);
             background: linear-gradient(135deg,
-                rgba(255, 255, 255, 0.75),
-                rgba(255, 255, 255, 0.6));
+                var(--color-white-alpha-75),
+                var(--color-white-alpha-60));
             /* backdrop-filter removed for GOV.UK compliance */
             -webkit-/* backdrop-filter removed for GOV.UK compliance */
             border-radius: var(--radius-2xl);
-            border: 1px solid rgba(255, 255, 255, 0.3);
+            border: 1px solid var(--color-white-alpha-30);
         }
 
         [data-theme="dark"] #org-glass-wrapper .org-empty-state {
             background: linear-gradient(135deg,
-                rgba(15, 23, 42, 0.6),
-                rgba(30, 41, 59, 0.5));
-            border: 1px solid rgba(255, 255, 255, 0.1);
+                var(--color-slate-900-alpha-60),
+                var(--color-slate-alpha-50));
+            border: 1px solid var(--color-white-alpha-10);
         }
 
         #org-glass-wrapper .org-empty-icon {
