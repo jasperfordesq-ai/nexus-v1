@@ -422,8 +422,11 @@
     --color-pink-400-alpha-60: rgba(244, 114, 182, 0.6);
 
     /* Pink-600 opacity variants (219, 39, 119 = #db2777) */
+    --color-pink-600-alpha-8: rgba(219, 39, 119, 0.08);
     --color-pink-600-alpha-10: rgba(219, 39, 119, 0.1);
     --color-pink-600-alpha-15: rgba(219, 39, 119, 0.15);
+    --color-pink-600-alpha-20: rgba(219, 39, 119, 0.2);
+    --color-pink-600-alpha-25: rgba(219, 39, 119, 0.25);
     --color-pink-600-alpha-30: rgba(219, 39, 119, 0.3);
     --color-pink-600-alpha-35: rgba(219, 39, 119, 0.35);
     --color-pink-600-alpha-40: rgba(219, 39, 119, 0.4);
@@ -449,6 +452,7 @@
 
     /* Primary-600/Indigo-600 opacity variants (79, 70, 229 = #4f46e5) */
     --color-primary-600-alpha-3: rgba(79, 70, 229, 0.03);
+    --color-primary-600-alpha-5: rgba(79, 70, 229, 0.05);
     --color-primary-600-alpha-8: rgba(79, 70, 229, 0.08);
     --color-primary-600-alpha-10: rgba(79, 70, 229, 0.1);
     --color-primary-600-alpha-20: rgba(79, 70, 229, 0.2);
@@ -475,14 +479,42 @@
     --color-emerald-300-alpha-30: rgba(52, 211, 153, 0.3);
 
     /* Slate-800 opacity variants (30, 41, 59 = #1e293b) */
+    --color-slate-800-alpha-40: rgba(30, 41, 59, 0.4);
     --color-slate-800-alpha-50: rgba(30, 41, 59, 0.5);
+    --color-slate-800-alpha-60: rgba(30, 41, 59, 0.6);
     --color-slate-800-alpha-75: rgba(30, 41, 59, 0.75);
     --color-slate-800-alpha-80: rgba(30, 41, 59, 0.8);
     --color-slate-800-alpha-85: rgba(30, 41, 59, 0.85);
     --color-slate-800-alpha-90: rgba(30, 41, 59, 0.9);
+    --color-slate-800-alpha-95: rgba(30, 41, 59, 0.95);
 
     /* Slate-900 opacity variants (15, 23, 42 = #0f172a) */
     --color-slate-900-alpha-60: rgba(15, 23, 42, 0.6);
+
+    /* Slate-600 opacity variants (51, 65, 85 = #334155) */
+    --color-slate-600-alpha-50: rgba(51, 65, 85, 0.5);
+    --color-slate-600-alpha-60: rgba(51, 65, 85, 0.6);
+    --color-slate-600-alpha-90: rgba(51, 65, 85, 0.9);
+
+    /* Medal/Ranking colors */
+    /* Gold (255, 215, 0 = #ffd700) */
+    --color-gold-alpha-10: rgba(255, 215, 0, 0.1);
+    --color-gold-alpha-30: rgba(255, 215, 0, 0.3);
+    --color-gold-alpha-50: rgba(255, 215, 0, 0.5);
+    /* Silver (192, 192, 192 = #c0c0c0) */
+    --color-silver-alpha-10: rgba(192, 192, 192, 0.1);
+    --color-silver-alpha-30: rgba(192, 192, 192, 0.3);
+    --color-silver-alpha-50: rgba(192, 192, 192, 0.5);
+    /* Bronze (205, 127, 50 = #cd7f32) */
+    --color-bronze-alpha-10: rgba(205, 127, 50, 0.1);
+    --color-bronze-alpha-30: rgba(205, 127, 50, 0.3);
+    --color-bronze-alpha-50: rgba(205, 127, 50, 0.5);
+
+    /* Yellow-500 opacity variants (234, 179, 8 = #eab308) */
+    --color-yellow-500-alpha-12: rgba(234, 179, 8, 0.12);
+
+    /* Amber-600 opacity variants (217, 119, 6 = #d97706) */
+    --color-amber-600-alpha-10: rgba(217, 119, 6, 0.1);
 
     /* Black expanded opacity variants */
     --color-black-alpha-6: rgba(0, 0, 0, 0.06);
