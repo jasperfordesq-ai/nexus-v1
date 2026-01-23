@@ -59,7 +59,7 @@
     .discussion-reply-input:focus-visible,
     button:focus-visible,
     a:focus-visible {
-        outline: 3px solid rgba(219, 39, 119, 0.5);
+        outline: 3px solid var(--color-pink-600-alpha-50);
         outline-offset: 2px;
     }
 
@@ -99,7 +99,7 @@
         align-items: center;
         gap: var(--space-2);
         padding: var(--space-2-5) var(--space-4-5);
-        background: rgba(255, 255, 255, 0.9);
+        background: var(--color-white-alpha-90);
         /* backdrop-filter removed for GOV.UK compliance */
         -webkit-/* backdrop-filter removed for GOV.UK compliance */
         border-radius: var(--radius-lg);
@@ -124,16 +124,16 @@
         display: flex;
         flex-direction: column;
         overflow: hidden;
-        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.1);
-        border: 1px solid rgba(255, 255, 255, 0.6);
+        box-shadow: 0 20px 50px var(--color-black-alpha-10);
+        border: 1px solid var(--color-white-alpha-60);
         border-radius: var(--radius-2xl);
     }
 
     /* Chat Header */
     .discussion-header {
         padding: var(--space-4) var(--space-5);
-        border-bottom: 1px solid rgba(0, 0, 0, 0.05);
-        background: rgba(255, 255, 255, 0.9);
+        border-bottom: 1px solid var(--color-black-alpha-5);
+        background: var(--color-white-alpha-90);
         /* backdrop-filter removed for GOV.UK compliance */
         -webkit-/* backdrop-filter removed for GOV.UK compliance */
         display: flex;
@@ -191,7 +191,7 @@
         flex-grow: 1;
         overflow-y: auto;
         padding: var(--space-5);
-        background: rgba(255, 255, 255, 0.4);
+        background: var(--color-white-alpha-40);
         display: flex;
         flex-direction: column;
         gap: var(--space-3);
@@ -203,7 +203,7 @@
     }
 
     .discussion-stream::-webkit-scrollbar-thumb {
-        background: rgba(0, 0, 0, 0.1);
+        background: var(--color-black-alpha-10);
         border-radius: var(--radius-sm);
     }
 
@@ -230,7 +230,7 @@
         height: var(--space-9);
         border-radius: var(--radius-md);
         object-fit: cover;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        box-shadow: 0 2px 8px var(--color-black-alpha-10);
     }
 
     .discussion-avatar-placeholder {
@@ -245,7 +245,7 @@
         font-weight: 700;
         font-size: 0.9rem;
         flex-shrink: 0;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        box-shadow: 0 2px 8px var(--color-black-alpha-10);
     }
 
     .discussion-bubble-wrap {
@@ -274,7 +274,7 @@
         border-radius: var(--radius-xl);
         font-size: 0.95rem;
         line-height: 1.5;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        box-shadow: 0 2px 8px var(--color-black-alpha-5);
         word-wrap: break-word;
     }
 
@@ -298,7 +298,7 @@
     }
 
     .discussion-bubble.me .discussion-time {
-        color: rgba(255, 255, 255, 0.85);
+        color: var(--color-white-alpha-85);
     }
 
     .discussion-bubble.others .discussion-time {
@@ -308,10 +308,10 @@
     /* Reply Dock */
     .discussion-reply-dock {
         padding: var(--space-3-5) 16px;
-        background: rgba(255, 255, 255, 0.9);
+        background: var(--color-white-alpha-90);
         /* backdrop-filter removed for GOV.UK compliance */
         -webkit-/* backdrop-filter removed for GOV.UK compliance */
-        border-top: 1px solid rgba(0, 0, 0, 0.05);
+        border-top: 1px solid var(--color-black-alpha-5);
         flex-shrink: 0;
     }
 
@@ -328,7 +328,7 @@
         border-radius: var(--radius-2xl);
         border: 2px solid transparent;
         background: white;
-        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        box-shadow: 0 2px 10px var(--color-black-alpha-5);
         resize: none;
         min-height: var(--space-12);
         max-height: 120px;
@@ -341,7 +341,7 @@
 
     .discussion-reply-input:focus {
         border-color: var(--color-pink-200);
-        box-shadow: 0 0 0 4px rgba(219, 39, 119, 0.1);
+        box-shadow: 0 0 0 4px var(--color-pink-600-alpha-10);
     }
 
     .discussion-reply-btn {
@@ -356,7 +356,7 @@
         align-items: center;
         justify-content: center;
         cursor: pointer;
-        box-shadow: 0 4px 12px rgba(219, 39, 119, 0.35);
+        box-shadow: 0 4px 12px var(--color-pink-600-alpha-35);
         -webkit-tap-highlight-color: transparent;
         transition: transform 0.2s ease;
     }
@@ -475,27 +475,27 @@
 
     /* Dark Mode */
     [data-theme="dark"] .discussion-chat-card {
-        border-color: rgba(255, 255, 255, 0.1);
+        border-color: var(--color-white-alpha-10);
     }
 
     [data-theme="dark"] .discussion-header {
-        background: rgba(30, 41, 59, 0.95);
+        background: var(--color-slate-alpha-95);
     }
 
     [data-theme="dark"] .discussion-stream {
-        background: rgba(15, 23, 42, 0.6);
+        background: var(--color-slate-900-alpha-60);
     }
 
     [data-theme="dark"] .discussion-bubble.others {
-        background: rgba(51, 65, 85, 0.9);
+        background: var(--color-slate-600-alpha-90);
         color: var(--color-slate-200);
     }
 
     [data-theme="dark"] .discussion-reply-dock {
-        background: rgba(30, 41, 59, 0.95);
+        background: var(--color-slate-alpha-95);
     }
 
     [data-theme="dark"] .discussion-reply-input {
-        background: rgba(51, 65, 85, 0.8);
+        background: var(--color-slate-700-alpha-80);
         color: var(--color-slate-200);
     }
