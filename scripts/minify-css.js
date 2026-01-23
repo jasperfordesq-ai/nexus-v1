@@ -75,6 +75,10 @@ const cssFiles = [
     // Profile page
     'profile-holographic.css',
     'modern-profile-show.css',
+    // Groups show page
+    'modern-groups-show.css',
+    // Volunteering show page
+    'modern-volunteering-show.css',
     // Footer
     'nexus-modern-footer.css',
     // Auth pages

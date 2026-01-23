@@ -88,7 +88,7 @@ if ($currentUserId && !$isMember) {
                         <span class="member-badge">
                             <i class="fa-solid fa-circle-check"></i> Member
                         </span>
-                        <form action="<?= Nexus\Core\TenantContext::getBasePath() ?>/groups/leave" method="POST" class="ajax-form" data-reload="true" style="display: inline;">
+                        <form action="<?= Nexus\Core\TenantContext::getBasePath() ?>/groups/leave" method="POST" class="ajax-form inline-form" data-reload="true">
                             <?= \Nexus\Core\Csrf::input() ?>
                             <input type="hidden" name="group_id" value="<?= $group['id'] ?>">
                             <button type="submit" class="btn-secondary">Leave Hub</button>
@@ -98,7 +98,7 @@ if ($currentUserId && !$isMember) {
                             <i class="fa-solid fa-clock"></i> Pending Approval
                         </span>
                     <?php else: ?>
-                        <form action="<?= Nexus\Core\TenantContext::getBasePath() ?>/groups/join" method="POST" class="ajax-form" data-reload="true" style="display: inline;">
+                        <form action="<?= Nexus\Core\TenantContext::getBasePath() ?>/groups/join" method="POST" class="ajax-form inline-form" data-reload="true">
                             <?= \Nexus\Core\Csrf::input() ?>
                             <input type="hidden" name="group_id" value="<?= $group['id'] ?>">
                             <button type="submit" class="btn-primary">
@@ -219,15 +219,15 @@ if ($currentUserId && !$isMember) {
                         </a>
                         <div class="group-compose-actions">
                             <a href="<?= Nexus\Core\TenantContext::getBasePath() ?>/compose?type=post&group=<?= $group['id'] ?>" class="group-compose-btn">
-                                <i class="fa-solid fa-pen" style="color: #db2777;"></i>
+                                <i class="fa-solid fa-pen compose-icon-post"></i>
                                 <span>Post</span>
                             </a>
                             <a href="<?= Nexus\Core\TenantContext::getBasePath() ?>/compose?type=listing&group=<?= $group['id'] ?>" class="group-compose-btn">
-                                <i class="fa-solid fa-hand-holding-heart" style="color: #10b981;"></i>
+                                <i class="fa-solid fa-hand-holding-heart compose-icon-listing"></i>
                                 <span>Listing</span>
                             </a>
                             <a href="<?= Nexus\Core\TenantContext::getBasePath() ?>/compose?type=event&group=<?= $group['id'] ?>" class="group-compose-btn">
-                                <i class="fa-solid fa-calendar-plus" style="color: #6366f1;"></i>
+                                <i class="fa-solid fa-calendar-plus compose-icon-event"></i>
                                 <span>Event</span>
                             </a>
                         </div>
@@ -256,35 +256,35 @@ if ($currentUserId && !$isMember) {
                             <div class="feed-skeleton skeleton">
                                 <div class="feed-skeleton-header">
                                     <div class="skeleton skeleton-avatar"></div>
-                                    <div style="flex: 1;">
-                                        <div class="skeleton skeleton-text" style="width: 40%;"></div>
-                                        <div class="skeleton skeleton-text small" style="width: 25%;"></div>
+                                    <div class="flex-grow">
+                                        <div class="skeleton skeleton-text skeleton-width-40"></div>
+                                        <div class="skeleton skeleton-text small skeleton-width-25"></div>
                                     </div>
                                 </div>
                                 <div class="feed-skeleton-content">
                                     <div class="skeleton skeleton-text"></div>
-                                    <div class="skeleton skeleton-text" style="width: 85%;"></div>
-                                    <div class="skeleton skeleton-text" style="width: 60%;"></div>
+                                    <div class="skeleton skeleton-text skeleton-width-85"></div>
+                                    <div class="skeleton skeleton-text skeleton-width-60"></div>
                                 </div>
                             </div>
                             <div class="feed-skeleton skeleton">
                                 <div class="feed-skeleton-header">
                                     <div class="skeleton skeleton-avatar"></div>
-                                    <div style="flex: 1;">
-                                        <div class="skeleton skeleton-text" style="width: 35%;"></div>
-                                        <div class="skeleton skeleton-text small" style="width: 20%;"></div>
+                                    <div class="flex-grow">
+                                        <div class="skeleton skeleton-text skeleton-width-35"></div>
+                                        <div class="skeleton skeleton-text small skeleton-width-20"></div>
                                     </div>
                                 </div>
                                 <div class="feed-skeleton-content">
                                     <div class="skeleton skeleton-text"></div>
-                                    <div class="skeleton skeleton-text" style="width: 90%;"></div>
+                                    <div class="skeleton skeleton-text skeleton-width-90"></div>
                                 </div>
                             </div>
                         </div>
                     </div>
 
                     <!-- Load More Button -->
-                    <div id="groupFeedLoadMore" class="feed-load-more" style="display: none;">
+                    <div id="groupFeedLoadMore" class="feed-load-more hidden">
                         <button type="button" onclick="loadGroupFeed(<?= $group['id'] ?>, true)">
                             <i class="fa-solid fa-arrow-down"></i>
                             Load More
@@ -397,7 +397,7 @@ if ($currentUserId && !$isMember) {
                                         </button>
                                     </form>
                                 <?php else: ?>
-                                    <div style="text-align: center; color: var(--htb-text-muted); padding: 8px;">
+                                    <div class="join-locked-message">
                                         <i class="fa-solid fa-lock"></i> Join hub to reply
                                     </div>
                                 <?php endif; ?>
@@ -527,15 +527,15 @@ if ($currentUserId && !$isMember) {
                     </div>
 
                     <?php if (isset($_GET['submitted'])): ?>
-                        <div style="background: #dcfce7; border: 1px solid #86efac; color: #166534; padding: 14px 18px; border-radius: var(--holo-radius-xs); margin-bottom: 20px; display: flex; align-items: center; gap: 10px;">
+                        <div class="review-success-alert">
                             <i class="fa-solid fa-check-circle"></i>
                             <span>Your review has been submitted!</span>
                         </div>
                     <?php endif; ?>
 
                     <div id="reviews-list">
-                        <div style="text-align: center; padding: 40px; color: var(--htb-text-muted);">
-                            <i class="fa-solid fa-spinner fa-spin" style="font-size: 1.5rem; margin-bottom: 12px; display: block;"></i>
+                        <div class="reviews-loading">
+                            <i class="fa-solid fa-spinner fa-spin"></i>
                             <span>Loading reviews...</span>
                         </div>
                     </div>
@@ -560,19 +560,19 @@ if ($currentUserId && !$isMember) {
                                     data.reviews.forEach(review => {
                                         const date = new Date(review.created_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
                                         const stars = Array(5).fill(0).map((_, i) =>
-                                            `<i class="${i < review.rating ? 'fas' : 'far'} fa-star" style="color: #fbbf24; font-size: 0.7rem;"></i>`
+                                            `<i class="${i < review.rating ? 'fas' : 'far'} fa-star review-star"></i>`
                                         ).join('');
 
                                         listHtml += `
-                                            <div class="holo-discussion-item" style="cursor: default;">
+                                            <div class="holo-discussion-item review-item-static">
                                                 <img src="${review.reviewer_avatar || '/assets/images/default-avatar.svg'}" class="holo-discussion-avatar" alt="">
                                                 <div class="holo-discussion-content">
-                                                    <div class="holo-discussion-title" style="font-size: 0.9rem;">
+                                                    <div class="holo-discussion-title review-item-title">
                                                         <strong>${escapeHtml(review.reviewer_name)}</strong> reviewed <strong>${escapeHtml(review.receiver_name)}</strong>
                                                     </div>
-                                                    <div style="display: flex; gap: 2px; margin: 6px 0;">${stars}</div>
-                                                    ${review.comment ? `<p style="margin: 8px 0 0 0; font-size: 0.85rem; color: var(--htb-text-main); line-height: 1.5;">${escapeHtml(review.comment)}</p>` : ''}
-                                                    <div class="holo-discussion-meta" style="margin-top: 8px;">
+                                                    <div class="review-stars-row">${stars}</div>
+                                                    ${review.comment ? `<p class="review-comment">${escapeHtml(review.comment)}</p>` : ''}
+                                                    <div class="holo-discussion-meta review-meta-spaced">
                                                         <span><i class="fa-regular fa-clock"></i> ${date}</span>
                                                     </div>
                                                 </div>
@@ -616,66 +616,64 @@ if ($currentUserId && !$isMember) {
                     </div>
 
                     <!-- Quick Actions -->
-                    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 12px; margin-bottom: 24px;">
+                    <div class="settings-actions-grid">
                         <a href="<?= Nexus\Core\TenantContext::getBasePath() ?>/edit-group/<?= $group['id'] ?>?tab=edit"
-                           class="holo-action-card"
-                           style="display: flex; align-items: center; gap: 12px; padding: 16px; background: var(--holo-card-bg, white); border: 1px solid var(--holo-border-color, rgba(0,0,0,0.06)); border-radius: var(--holo-radius-sm); text-decoration: none; color: inherit; transition: var(--holo-transition);">
-                            <div style="width: 40px; height: 40px; background: linear-gradient(135deg, #3b82f6, #6366f1); border-radius: 10px; display: flex; align-items: center; justify-content: center; color: white;">
+                           class="settings-action-card">
+                            <div class="settings-action-icon settings-action-icon--edit">
                                 <i class="fa-solid fa-pen"></i>
                             </div>
                             <div>
-                                <div style="font-weight: 600; color: var(--htb-text-main);">Edit Hub</div>
-                                <div style="font-size: 0.8rem; color: var(--htb-text-muted);">Update info & cover</div>
+                                <div class="settings-action-title">Edit Hub</div>
+                                <div class="settings-action-subtitle">Update info & cover</div>
                             </div>
                         </a>
 
                         <a href="<?= Nexus\Core\TenantContext::getBasePath() ?>/edit-group/<?= $group['id'] ?>?tab=invite"
-                           class="holo-action-card"
-                           style="display: flex; align-items: center; gap: 12px; padding: 16px; background: var(--holo-card-bg, white); border: 1px solid var(--holo-border-color, rgba(0,0,0,0.06)); border-radius: var(--holo-radius-sm); text-decoration: none; color: inherit; transition: var(--holo-transition);">
-                            <div style="width: 40px; height: 40px; background: linear-gradient(135deg, #10b981, #14b8a6); border-radius: 10px; display: flex; align-items: center; justify-content: center; color: white;">
+                           class="settings-action-card">
+                            <div class="settings-action-icon settings-action-icon--invite">
                                 <i class="fa-solid fa-user-plus"></i>
                             </div>
                             <div>
-                                <div style="font-weight: 600; color: var(--htb-text-main);">Invite Members</div>
-                                <div style="font-size: 0.8rem; color: var(--htb-text-muted);">Grow your hub</div>
+                                <div class="settings-action-title">Invite Members</div>
+                                <div class="settings-action-subtitle">Grow your hub</div>
                             </div>
                         </a>
                     </div>
 
                     <!-- Pending Requests Section -->
                     <?php if (!empty($pendingMembers)): ?>
-                    <div style="margin-bottom: 32px; padding: 20px; background: linear-gradient(135deg, #fef3c7, #fde68a); border: 2px solid #f59e0b; border-radius: 16px;">
-                        <h3 style="font-size: 1rem; font-weight: 700; margin: 0 0 16px 0; color: #92400e; display: flex; align-items: center; gap: 8px;">
+                    <div class="pending-requests-section">
+                        <h3 class="pending-requests-title">
                             <i class="fa-solid fa-user-clock"></i>
                             Pending Requests (<?= count($pendingMembers) ?>)
                         </h3>
-                        <p style="font-size: 0.85rem; color: #a16207; margin-bottom: 16px;">
+                        <p class="pending-requests-description">
                             These members have requested to join your hub. Approve or deny their requests.
                         </p>
-                        <div style="display: flex; flex-direction: column; gap: 12px;">
+                        <div class="pending-requests-list">
                             <?php foreach ($pendingMembers as $pending): ?>
-                                <div style="display: flex; align-items: center; gap: 12px; padding: 12px 16px; background: white; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
+                                <div class="pending-member-card">
                                     <?= webp_avatar($pending['avatar_url'] ?? null, $pending['name'], 44) ?>
-                                    <div style="flex: 1;">
-                                        <div style="font-weight: 600; color: #1f2937;"><?= htmlspecialchars($pending['name']) ?></div>
-                                        <div style="font-size: 0.8rem; color: #6b7280;">Waiting for approval</div>
+                                    <div class="pending-member-info">
+                                        <div class="pending-member-name"><?= htmlspecialchars($pending['name']) ?></div>
+                                        <div class="pending-member-status">Waiting for approval</div>
                                     </div>
-                                    <div style="display: flex; gap: 8px;">
-                                        <form action="<?= Nexus\Core\TenantContext::getBasePath() ?>/groups/manage-member" method="POST" style="margin: 0;">
+                                    <div class="pending-member-actions">
+                                        <form action="<?= Nexus\Core\TenantContext::getBasePath() ?>/groups/manage-member" method="POST" class="form-no-margin">
                                             <?= \Nexus\Core\Csrf::input() ?>
                                             <input type="hidden" name="group_id" value="<?= $group['id'] ?>">
                                             <input type="hidden" name="user_id" value="<?= $pending['id'] ?>">
                                             <input type="hidden" name="action" value="approve">
-                                            <button type="submit" style="padding: 8px 16px; background: linear-gradient(135deg, #10b981, #059669); border: none; border-radius: 8px; color: white; font-size: 0.85rem; font-weight: 600; cursor: pointer; transition: all 0.2s;">
+                                            <button type="submit" class="btn-approve">
                                                 <i class="fa-solid fa-check"></i> Approve
                                             </button>
                                         </form>
-                                        <form action="<?= Nexus\Core\TenantContext::getBasePath() ?>/groups/manage-member" method="POST" style="margin: 0;" onsubmit="return confirm('Deny this request?');">
+                                        <form action="<?= Nexus\Core\TenantContext::getBasePath() ?>/groups/manage-member" method="POST" class="form-no-margin" onsubmit="return confirm('Deny this request?');">
                                             <?= \Nexus\Core\Csrf::input() ?>
                                             <input type="hidden" name="group_id" value="<?= $group['id'] ?>">
                                             <input type="hidden" name="user_id" value="<?= $pending['id'] ?>">
                                             <input type="hidden" name="action" value="deny">
-                                            <button type="submit" style="padding: 8px 16px; background: #fef2f2; border: 1px solid #fecaca; border-radius: 8px; color: #dc2626; font-size: 0.85rem; font-weight: 600; cursor: pointer; transition: all 0.2s;">
+                                            <button type="submit" class="btn-deny">
                                                 <i class="fa-solid fa-times"></i> Deny
                                             </button>
                                         </form>
@@ -688,28 +686,28 @@ if ($currentUserId && !$isMember) {
 
                     <!-- Invited Members Section -->
                     <?php if (!empty($invitedMembers)): ?>
-                    <div style="margin-bottom: 32px; padding: 20px; background: linear-gradient(135deg, #ede9fe, #ddd6fe); border: 2px solid #a78bfa; border-radius: 16px;">
-                        <h3 style="font-size: 1rem; font-weight: 700; margin: 0 0 16px 0; color: #5b21b6; display: flex; align-items: center; gap: 8px;">
+                    <div class="invited-section">
+                        <h3 class="invited-section-title">
                             <i class="fa-solid fa-envelope"></i>
                             Invited (<?= count($invitedMembers) ?>)
                         </h3>
-                        <p style="font-size: 0.85rem; color: #6d28d9; margin-bottom: 16px;">
+                        <p class="invited-section-description">
                             These members have been invited but haven't accepted yet.
                         </p>
-                        <div style="display: flex; flex-direction: column; gap: 12px;">
+                        <div class="pending-requests-list">
                             <?php foreach ($invitedMembers as $invited): ?>
-                                <div style="display: flex; align-items: center; gap: 12px; padding: 12px 16px; background: white; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
+                                <div class="invited-member-card">
                                     <?= webp_avatar($invited['avatar_url'] ?? null, $invited['name'], 44) ?>
-                                    <div style="flex: 1;">
-                                        <div style="font-weight: 600; color: #1f2937;"><?= htmlspecialchars($invited['name']) ?></div>
-                                        <div style="font-size: 0.8rem; color: #6b7280;">Invitation sent</div>
+                                    <div class="invited-member-info">
+                                        <div class="invited-member-name"><?= htmlspecialchars($invited['name']) ?></div>
+                                        <div class="invited-member-status">Invitation sent</div>
                                     </div>
-                                    <form action="<?= Nexus\Core\TenantContext::getBasePath() ?>/groups/manage-member" method="POST" style="margin: 0;" onsubmit="return confirm('Cancel this invitation?');">
+                                    <form action="<?= Nexus\Core\TenantContext::getBasePath() ?>/groups/manage-member" method="POST" class="form-no-margin" onsubmit="return confirm('Cancel this invitation?');">
                                         <?= \Nexus\Core\Csrf::input() ?>
                                         <input type="hidden" name="group_id" value="<?= $group['id'] ?>">
                                         <input type="hidden" name="user_id" value="<?= $invited['id'] ?>">
                                         <input type="hidden" name="action" value="kick">
-                                        <button type="submit" style="padding: 8px 16px; background: #fef2f2; border: 1px solid #fecaca; border-radius: 8px; color: #dc2626; font-size: 0.85rem; font-weight: 600; cursor: pointer; transition: all 0.2s;">
+                                        <button type="submit" class="btn-cancel-invite">
                                             <i class="fa-solid fa-times"></i> Cancel
                                         </button>
                                     </form>
@@ -720,8 +718,8 @@ if ($currentUserId && !$isMember) {
                     <?php endif; ?>
 
                     <!-- Member Management -->
-                    <h3 style="font-size: 1rem; font-weight: 700; margin: 24px 0 16px 0; color: var(--htb-text-main);">
-                        <i class="fa-solid fa-users-gear" style="color: var(--holo-primary); margin-right: 8px;"></i>
+                    <h3 class="member-management-title">
+                        <i class="fa-solid fa-users-gear"></i>
                         Manage Members
                     </h3>
 
@@ -731,13 +729,13 @@ if ($currentUserId && !$isMember) {
                             if ($isOwner) continue;
                             $isOrg = ($mem['role'] === 'admin');
                         ?>
-                            <div class="holo-discussion-item" style="cursor: default;">
+                            <div class="holo-discussion-item member-item-static">
                                 <?= webp_avatar($mem['avatar_url'] ?? null, $mem['name'], 40) ?>
                                 <div class="holo-discussion-content">
                                     <h3 class="holo-discussion-title"><?= htmlspecialchars($mem['name']) ?></h3>
                                     <div class="holo-discussion-meta">
                                         <?php if ($isOrg): ?>
-                                            <span style="background: linear-gradient(135deg, #8b5cf6, #7c3aed); color: white; padding: 2px 8px; border-radius: 6px; font-size: 0.75rem; font-weight: 600;">
+                                            <span class="member-role-badge">
                                                 <i class="fa-solid fa-star"></i> Organiser
                                             </span>
                                         <?php else: ?>
@@ -745,37 +743,37 @@ if ($currentUserId && !$isMember) {
                                         <?php endif; ?>
                                     </div>
                                 </div>
-                                <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                                <div class="member-actions-wrap">
                                     <?php if ($isOrg): ?>
                                         <!-- Demote to Member -->
-                                        <form action="<?= Nexus\Core\TenantContext::getBasePath() ?>/groups/manage-member" method="POST" style="margin: 0;" onsubmit="return confirm('Demote this organiser to regular member?');">
+                                        <form action="<?= Nexus\Core\TenantContext::getBasePath() ?>/groups/manage-member" method="POST" class="form-no-margin" onsubmit="return confirm('Demote this organiser to regular member?');">
                                             <?= \Nexus\Core\Csrf::input() ?>
                                             <input type="hidden" name="group_id" value="<?= $group['id'] ?>">
                                             <input type="hidden" name="user_id" value="<?= $mem['id'] ?>">
                                             <input type="hidden" name="action" value="demote">
-                                            <button type="submit" style="padding: 8px 12px; background: #fef3c7; border: 1px solid #fcd34d; border-radius: 8px; color: #92400e; font-size: 0.8rem; font-weight: 600; cursor: pointer;">
+                                            <button type="submit" class="btn-demote">
                                                 <i class="fa-solid fa-arrow-down"></i> Demote
                                             </button>
                                         </form>
                                     <?php else: ?>
                                         <!-- Promote to Organiser -->
-                                        <form action="<?= Nexus\Core\TenantContext::getBasePath() ?>/groups/manage-member" method="POST" style="margin: 0;" onsubmit="return confirm('Promote this member to organiser?');">
+                                        <form action="<?= Nexus\Core\TenantContext::getBasePath() ?>/groups/manage-member" method="POST" class="form-no-margin" onsubmit="return confirm('Promote this member to organiser?');">
                                             <?= \Nexus\Core\Csrf::input() ?>
                                             <input type="hidden" name="group_id" value="<?= $group['id'] ?>">
                                             <input type="hidden" name="user_id" value="<?= $mem['id'] ?>">
                                             <input type="hidden" name="action" value="promote">
-                                            <button type="submit" style="padding: 8px 12px; background: #f0fdf4; border: 1px solid #86efac; border-radius: 8px; color: #166534; font-size: 0.8rem; font-weight: 600; cursor: pointer;">
+                                            <button type="submit" class="btn-promote">
                                                 <i class="fa-solid fa-arrow-up"></i> Promote
                                             </button>
                                         </form>
                                     <?php endif; ?>
                                     <!-- Remove -->
-                                    <form action="<?= Nexus\Core\TenantContext::getBasePath() ?>/groups/manage-member" method="POST" style="margin: 0;" onsubmit="return confirm('Remove this user from the hub?');">
+                                    <form action="<?= Nexus\Core\TenantContext::getBasePath() ?>/groups/manage-member" method="POST" class="form-no-margin" onsubmit="return confirm('Remove this user from the hub?');">
                                         <?= \Nexus\Core\Csrf::input() ?>
                                         <input type="hidden" name="group_id" value="<?= $group['id'] ?>">
                                         <input type="hidden" name="user_id" value="<?= $mem['id'] ?>">
                                         <input type="hidden" name="action" value="kick">
-                                        <button type="submit" style="padding: 8px 12px; background: #fef2f2; border: 1px solid #fecaca; border-radius: 8px; color: #dc2626; font-size: 0.8rem; font-weight: 600; cursor: pointer;">
+                                        <button type="submit" class="btn-remove">
                                             <i class="fa-solid fa-times"></i> Remove
                                         </button>
                                     </form>
@@ -803,23 +801,23 @@ if ($currentUserId && !$isMember) {
                     </div>
                     <div class="holo-action-subtitle"><?= count($members) ?> members</div>
                 </div>
-                <form action="<?= Nexus\Core\TenantContext::getBasePath() ?>/groups/leave" method="POST" class="ajax-form" data-reload="true" style="margin: 0;">
+                <form action="<?= Nexus\Core\TenantContext::getBasePath() ?>/groups/leave" method="POST" class="ajax-form form-no-margin" data-reload="true">
                     <?= \Nexus\Core\Csrf::input() ?>
                     <input type="hidden" name="group_id" value="<?= $group['id'] ?>">
                     <button type="submit" class="holo-action-btn secondary">Leave</button>
                 </form>
             <?php elseif ($isPending): ?>
                 <div class="holo-action-info">
-                    <div class="holo-action-member-badge" style="background: linear-gradient(135deg, #fef3c7, #fde68a); color: #92400e;">
+                    <div class="holo-action-member-badge action-badge-pending">
                         <i class="fa-solid fa-clock"></i>
                         <span>Pending</span>
                     </div>
                     <div class="holo-action-subtitle">Waiting for organiser approval</div>
                 </div>
-                <form action="<?= Nexus\Core\TenantContext::getBasePath() ?>/groups/leave" method="POST" class="ajax-form" data-reload="true" style="margin: 0;" onsubmit="return confirm('Cancel your join request?');">
+                <form action="<?= Nexus\Core\TenantContext::getBasePath() ?>/groups/leave" method="POST" class="ajax-form form-no-margin" data-reload="true" onsubmit="return confirm('Cancel your join request?');">
                     <?= \Nexus\Core\Csrf::input() ?>
                     <input type="hidden" name="group_id" value="<?= $group['id'] ?>">
-                    <button type="submit" class="holo-action-btn secondary" style="background: #fef2f2; color: #dc2626; border: 1px solid #fecaca;">
+                    <button type="submit" class="holo-action-btn secondary btn-cancel-request">
                         <i class="fa-solid fa-times"></i> Cancel Request
                     </button>
                 </form>
@@ -828,7 +826,7 @@ if ($currentUserId && !$isMember) {
                     <h4 class="holo-action-title">Join <?= htmlspecialchars($group['name']) ?></h4>
                     <div class="holo-action-subtitle"><?= count($members) ?> members<?= $group['visibility'] === 'private' ? ' · Private hub' : '' ?></div>
                 </div>
-                <form action="<?= Nexus\Core\TenantContext::getBasePath() ?>/groups/join" method="POST" class="ajax-form" data-reload="true" style="margin: 0;">
+                <form action="<?= Nexus\Core\TenantContext::getBasePath() ?>/groups/join" method="POST" class="ajax-form form-no-margin" data-reload="true">
                     <?= \Nexus\Core\Csrf::input() ?>
                     <input type="hidden" name="group_id" value="<?= $group['id'] ?>">
                     <button type="submit" class="holo-action-btn primary">
@@ -887,16 +885,16 @@ if ($currentUserId && !$isMember) {
             </button>
         </div>
         <div class="holo-modal-body">
-            <div style="text-align: center; margin-bottom: 20px;">
-                <img id="reviewMemberAvatar" src="" style="width: 64px; height: 64px; border-radius: 50%; margin-bottom: 10px;" loading="lazy">
-                <div style="font-weight: 700; font-size: 1rem;" id="reviewMemberName"></div>
+            <div class="review-modal-avatar-section">
+                <img id="reviewMemberAvatar" src="" class="review-modal-avatar" loading="lazy">
+                <div class="review-modal-name" id="reviewMemberName"></div>
             </div>
 
             <form id="reviewForm" action="<?= Nexus\Core\TenantContext::getBasePath() ?>/groups/<?= $group['id'] ?>/reviews" method="POST">
                 <?= \Nexus\Core\Csrf::input() ?>
                 <input type="hidden" name="receiver_id" id="reviewReceiverId" value="">
 
-                <div class="holo-form-group" style="text-align: center;">
+                <div class="holo-form-group rating-form-group">
                     <label class="holo-form-label">Your Rating</label>
                     <div class="holo-star-rating" id="starRating">
                         <i class="far fa-star" data-rating="1"></i>
@@ -906,7 +904,7 @@ if ($currentUserId && !$isMember) {
                         <i class="far fa-star" data-rating="5"></i>
                     </div>
                     <input type="hidden" name="rating" id="ratingInput" value="" required>
-                    <div id="ratingLabel" style="color: var(--htb-text-muted); font-size: 0.9rem; margin-top: 8px;"></div>
+                    <div id="ratingLabel" class="rating-label"></div>
                 </div>
 
                 <div class="holo-form-group">
@@ -915,7 +913,7 @@ if ($currentUserId && !$isMember) {
                 </div>
 
                 <button type="submit" id="submitBtn" class="holo-form-submit" disabled>
-                    <i class="fa-solid fa-paper-plane" style="margin-right: 8px;"></i> Submit Review
+                    <i class="fa-solid fa-paper-plane submit-review-icon"></i> Submit Review
                 </button>
             </form>
         </div>
@@ -1275,7 +1273,7 @@ function createPostElement(post) {
             </button>
             ${deleteBtn}
         </div>
-        <div id="comments-${post.id}" class="feed-post-comments" style="display:none;">
+        <div id="comments-${post.id}" class="feed-post-comments hidden">
             <div class="feed-comment-input-row">
                 <input type="text" class="feed-comment-input" placeholder="Write a comment..." onkeydown="if(event.key==='Enter')submitGroupComment(this, ${post.id})">
                 <button class="feed-action-btn" onclick="submitGroupComment(this.previousElementSibling, ${post.id})">
@@ -1472,7 +1470,7 @@ async function loadGroupComments(postId) {
         }
     } catch (error) {
         console.error('Error loading comments:', error);
-        list.innerHTML = '<div class="gf-no-comments" style="color:#ef4444;"><i class="fa-solid fa-exclamation-triangle"></i><br>Failed to load comments</div>';
+        list.innerHTML = '<div class="gf-no-comments comments-error"><i class="fa-solid fa-exclamation-triangle"></i><br>Failed to load comments</div>';
     }
 }
 
@@ -1533,7 +1531,7 @@ function renderComment(comment, postId, isReply = false) {
                     </div>
                 </div>
             </div>
-            <div class="gf-reply-form" id="reply-form-${commentId}" style="display:none;">
+            <div class="gf-reply-form reply-form-hidden" id="reply-form-${commentId}">
                 <input type="text" placeholder="Write a reply..." onkeypress="if(event.key==='Enter'){event.preventDefault();gfSubmitReply(this, ${postId}, ${commentId});}">
                 <button type="button" onclick="gfSubmitReply(this.previousElementSibling, ${postId}, ${commentId})">Reply</button>
             </div>

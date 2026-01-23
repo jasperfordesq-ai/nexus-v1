@@ -58,44 +58,44 @@ $accentColor = '#14b8a6'; // Teal for volunteering
 <div id="vol-show-glass-wrapper">
 
 
-<div style="max-width: 1100px; margin: 40px auto; padding: 0 20px; font-family: 'Inter', sans-serif;">
+<div class="vol-show-wrapper">
 
     <!-- Back Navigation -->
-    <div style="margin-bottom: 20px;">
-        <a href="<?= Nexus\Core\TenantContext::getBasePath() ?>/volunteering" style="text-decoration: none; color: #64748b; font-weight: 600; display: inline-flex; align-items: center; gap: 8px;">
+    <div class="vol-back-nav">
+        <a href="<?= Nexus\Core\TenantContext::getBasePath() ?>/volunteering" class="vol-back-link">
             <i class="fa-solid fa-arrow-left"></i> Back to Opportunities
         </a>
     </div>
 
-    <div class="page-grid" style="display: grid; grid-template-columns: 1fr 380px; gap: 40px; align-items: start;">
+    <div class="page-grid vol-page-grid">
 
         <!-- LEFT COLUMN: Content -->
         <main>
             <!-- Header Card -->
             <div class="glass-card">
-                <div style="display: flex; justify-content: space-between; align-items: start; flex-wrap: wrap; gap: 15px; margin-bottom: 20px;">
+                <div class="vol-header-flex">
                     <div>
                         <span class="glass-badge">
                             <i class="fa-solid fa-hand-holding-heart"></i> Volunteering
                         </span>
                         <?php if ($opportunity['location']): ?>
-                            <span style="margin-left: 12px; color: var(--htb-text-muted); font-size: 0.95rem;">
+                            <span class="vol-location-text">
                                 <i class="fa-solid fa-location-dot"></i> <?= htmlspecialchars($opportunity['location']) ?>
                             </span>
                         <?php endif; ?>
                     </div>
                 </div>
 
-                <h1 style="margin: 0 0 15px 0; font-size: 2.2rem; line-height: 1.2; color: var(--htb-text-main);">
+                <h1 class="vol-title">
                     <?= htmlspecialchars($opportunity['title']) ?>
                 </h1>
 
-                <div style="display: flex; align-items: center; gap: 12px; color: var(--htb-text-muted); font-size: 0.95rem;">
+                <div class="vol-meta-row">
                     <span><i class="fa-solid fa-building"></i> <?= htmlspecialchars($opportunity['org_name']) ?></span>
                     <?php if ($opportunity['org_website']): ?>
                         <span>&bull;</span>
-                        <a href="<?= htmlspecialchars($opportunity['org_website']) ?>" target="_blank" style="color: <?= $accentColor ?>;">
-                            Visit Website <i class="fa-solid fa-arrow-up-right-from-square" style="font-size: 0.8rem;"></i>
+                        <a href="<?= htmlspecialchars($opportunity['org_website']) ?>" target="_blank" class="vol-website-link">
+                            Visit Website <i class="fa-solid fa-arrow-up-right-from-square vol-external-icon"></i>
                         </a>
                     <?php endif; ?>
                 </div>
@@ -103,34 +103,34 @@ $accentColor = '#14b8a6'; // Teal for volunteering
 
             <!-- Description Card -->
             <div class="glass-card">
-                <h3 style="font-size: 1.25rem; font-weight: 700; color: var(--htb-text-main); margin: 0 0 15px 0;">
-                    <i class="fa-solid fa-info-circle" style="color: <?= $accentColor ?>;"></i> About the Role
+                <h3 class="vol-section-heading">
+                    <i class="fa-solid fa-info-circle vol-section-icon"></i> About the Role
                 </h3>
-                <div style="font-size: 1.1rem; line-height: 1.8; color: var(--htb-text-muted); white-space: pre-wrap;">
+                <div class="vol-description">
                     <?= nl2br(htmlspecialchars($opportunity['description'])) ?>
                 </div>
             </div>
 
             <!-- Details Grid -->
             <div class="glass-card">
-                <h3 style="font-size: 1.25rem; font-weight: 700; color: var(--htb-text-main); margin: 0 0 20px 0;">
-                    <i class="fa-solid fa-clipboard-list" style="color: <?= $accentColor ?>;"></i> Details
+                <h3 class="vol-section-heading vol-section-heading--lg">
+                    <i class="fa-solid fa-clipboard-list vol-section-icon"></i> Details
                 </h3>
-                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px;">
+                <div class="vol-details-grid">
                     <div class="glass-info-pill">
-                        <i class="fa-solid fa-tools" style="font-size: 1.2rem; color: <?= $accentColor ?>;"></i>
+                        <i class="fa-solid fa-tools vol-pill-icon"></i>
                         <div>
-                            <div style="font-size: 0.8rem; color: var(--htb-text-muted); text-transform: uppercase; letter-spacing: 0.5px;">Skills Needed</div>
-                            <div style="font-weight: 600; color: var(--htb-text-main);">
+                            <div class="vol-pill-label">Skills Needed</div>
+                            <div class="vol-pill-value">
                                 <?= htmlspecialchars($opportunity['skills_needed'] ?? 'None specified') ?>
                             </div>
                         </div>
                     </div>
                     <div class="glass-info-pill">
-                        <i class="fa-solid fa-calendar-days" style="font-size: 1.2rem; color: <?= $accentColor ?>;"></i>
+                        <i class="fa-solid fa-calendar-days vol-pill-icon"></i>
                         <div>
-                            <div style="font-size: 0.8rem; color: var(--htb-text-muted); text-transform: uppercase; letter-spacing: 0.5px;">Dates</div>
-                            <div style="font-weight: 600; color: var(--htb-text-main);">
+                            <div class="vol-pill-label">Dates</div>
+                            <div class="vol-pill-value">
                                 <?php if ($opportunity['start_date']): ?>
                                     <?= date('M d, Y', strtotime($opportunity['start_date'])) ?>
                                     <?= $opportunity['end_date'] ? ' - ' . date('M d, Y', strtotime($opportunity['end_date'])) : ' (Ongoing)' ?>
@@ -146,48 +146,48 @@ $accentColor = '#14b8a6'; // Teal for volunteering
             <!-- Like & Comment Section -->
             <div class="glass-card" id="vol-engagement-section">
                 <!-- Like Button Row -->
-                <div style="display: flex; align-items: center; gap: 20px; padding-bottom: 20px; border-bottom: 1px solid rgba(100,116,139,0.2); flex-wrap: wrap;">
-                    <button id="like-btn" onclick="volToggleLike()" style="display: flex; align-items: center; gap: 8px; padding: 10px 18px; border-radius: 10px; border: none; cursor: pointer; font-weight: 600; font-size: 0.95rem; transition: all 0.2s ease; background: <?= $isLiked ? 'linear-gradient(135deg, #14b8a6, #0d9488)' : 'rgba(100,116,139,0.1)' ?>; color: <?= $isLiked ? '#fff' : 'var(--htb-text-main)' ?>;">
+                <div class="vol-engagement-row">
+                    <button id="like-btn" onclick="volToggleLike()" class="vol-action-btn<?= $isLiked ? ' vol-action-btn--liked' : '' ?>">
                         <i class="<?= $isLiked ? 'fa-solid' : 'fa-regular' ?> fa-heart" id="like-icon"></i>
                         <span id="like-count"><?= $likesCount ?></span>
                         <span><?= $likesCount === 1 ? 'Like' : 'Likes' ?></span>
                     </button>
-                    <button onclick="volToggleComments()" style="display: flex; align-items: center; gap: 8px; padding: 10px 18px; border-radius: 10px; border: none; cursor: pointer; font-weight: 600; font-size: 0.95rem; transition: all 0.2s ease; background: rgba(100,116,139,0.1); color: var(--htb-text-main);">
+                    <button onclick="volToggleComments()" class="vol-action-btn">
                         <i class="fa-regular fa-comment"></i>
                         <span id="comment-count"><?= $commentsCount ?></span>
                         <span><?= $commentsCount === 1 ? 'Comment' : 'Comments' ?></span>
                     </button>
                     <?php if ($isLoggedIn): ?>
-                    <button onclick="shareToFeed()" style="display: flex; align-items: center; gap: 8px; padding: 10px 18px; border-radius: 10px; border: none; cursor: pointer; font-weight: 600; font-size: 0.95rem; transition: all 0.2s ease; background: rgba(100,116,139,0.1); color: var(--htb-text-main);">
+                    <button onclick="shareToFeed()" class="vol-action-btn">
                         <i class="fa-solid fa-share"></i> Share
                     </button>
                     <?php endif; ?>
                 </div>
 
                 <!-- Comments Section (Initially Hidden) -->
-                <div id="comments-section" style="display: none; padding-top: 20px;">
-                    <h4 style="font-size: 1rem; font-weight: 700; color: var(--htb-text-main); margin-bottom: 15px;">Comments</h4>
+                <div id="comments-section" class="vol-comments-section">
+                    <h4 class="vol-comments-heading">Comments</h4>
 
                     <?php if ($isLoggedIn): ?>
-                        <form id="comment-form" onsubmit="volunteeringSubmitComment(event)" style="display: flex; gap: 12px; margin-bottom: 20px;">
-                            <img src="<?= htmlspecialchars($_SESSION['user_avatar'] ?? '/assets/img/defaults/default_avatar.webp') ?>" loading="lazy" style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover; flex-shrink: 0;">
-                            <div style="flex: 1; display: flex; flex-direction: column; gap: 10px;">
-                                <textarea id="comment-input" placeholder="Write a comment..." style="width: 100%; min-height: 60px; padding: 12px; border-radius: 12px; border: 1px solid rgba(100,116,139,0.3); background: rgba(255,255,255,0.5); font-size: 0.95rem; resize: vertical; font-family: inherit;"></textarea>
-                                <button type="submit" style="align-self: flex-end; padding: 8px 20px; border-radius: 8px; border: none; background: <?= $accentColor ?>; color: #fff; font-weight: 600; cursor: pointer; transition: opacity 0.2s;">
+                        <form id="comment-form" onsubmit="volunteeringSubmitComment(event)" class="vol-comment-form">
+                            <img src="<?= htmlspecialchars($_SESSION['user_avatar'] ?? '/assets/img/defaults/default_avatar.webp') ?>" loading="lazy" class="vol-avatar">
+                            <div class="vol-input-wrapper">
+                                <textarea id="comment-input" placeholder="Write a comment..." class="vol-textarea"></textarea>
+                                <button type="submit" class="vol-submit-btn">
                                     Post Comment
                                 </button>
                             </div>
                         </form>
                     <?php else: ?>
-                        <div style="text-align: center; padding: 20px; background: rgba(100,116,139,0.05); border-radius: 12px; margin-bottom: 20px;">
-                            <p style="color: var(--htb-text-muted); margin: 0;">
-                                <a href="<?= Nexus\Core\TenantContext::getBasePath() ?>/login" style="color: <?= $accentColor ?>; font-weight: 600; text-decoration: none;">Sign in</a> to leave a comment
+                        <div class="vol-login-prompt">
+                            <p>
+                                <a href="<?= Nexus\Core\TenantContext::getBasePath() ?>/login" class="vol-login-link">Sign in</a> to leave a comment
                             </p>
                         </div>
                     <?php endif; ?>
 
-                    <div id="comments-list" style="display: flex; flex-direction: column; gap: 15px;">
-                        <div style="text-align: center; color: var(--htb-text-muted); padding: 20px;">
+                    <div id="comments-list" class="vol-comments-list">
+                        <div class="vol-loading-text">
                             <i class="fa-solid fa-spinner fa-spin"></i> Loading comments...
                         </div>
                     </div>
@@ -199,28 +199,28 @@ $accentColor = '#14b8a6'; // Teal for volunteering
         <aside>
             <div class="glass-sidebar">
                 <!-- Organization Info -->
-                <div style="text-align: center; margin-bottom: 25px; padding-bottom: 20px; border-bottom: 1px solid rgba(100,116,139,0.2);">
-                    <div style="width: 70px; height: 70px; background: linear-gradient(135deg, <?= $accentColor ?>, #0d9488); border-radius: 16px; display: flex; align-items: center; justify-content: center; margin: 0 auto 15px; box-shadow: 0 4px 16px rgba(20, 184, 166, 0.3);">
-                        <i class="fa-solid fa-building" style="font-size: 1.8rem; color: #fff;"></i>
+                <div class="vol-org-header">
+                    <div class="vol-org-icon-wrapper">
+                        <i class="fa-solid fa-building vol-org-icon"></i>
                     </div>
-                    <h3 style="margin: 0 0 5px 0; font-size: 1.2rem; color: var(--htb-text-main);">
+                    <h3 class="vol-org-name">
                         <?= htmlspecialchars($opportunity['org_name']) ?>
                     </h3>
-                    <p style="margin: 0; color: var(--htb-text-muted); font-size: 0.9rem;">Organization</p>
+                    <p class="vol-org-label">Organization</p>
                 </div>
 
                 <!-- Application Status / Form -->
                 <?php if (isset($_GET['msg']) && $_GET['msg'] == 'applied'): ?>
-                    <div style="background: linear-gradient(135deg, rgba(34, 197, 94, 0.15), rgba(16, 185, 129, 0.1)); padding: 20px; border-radius: 12px; text-align: center; border: 1px solid rgba(34, 197, 94, 0.3);">
-                        <i class="fa-solid fa-circle-check" style="font-size: 2rem; color: #22c55e; margin-bottom: 10px;"></i>
-                        <p style="margin: 0; font-weight: 600; color: #166534;">Application Sent!</p>
-                        <p style="margin: 5px 0 0; font-size: 0.9rem; color: #15803d;">The organisation will contact you shortly.</p>
+                    <div class="vol-status-card vol-status-card--success">
+                        <i class="fa-solid fa-circle-check vol-status-icon vol-status-icon--success"></i>
+                        <p class="vol-status-title vol-status-title--success">Application Sent!</p>
+                        <p class="vol-status-text vol-status-text--success">The organisation will contact you shortly.</p>
                     </div>
                 <?php elseif ($hasApplied): ?>
-                    <div style="background: linear-gradient(135deg, rgba(59, 130, 246, 0.15), rgba(99, 102, 241, 0.1)); padding: 20px; border-radius: 12px; text-align: center; border: 1px solid rgba(59, 130, 246, 0.3);">
-                        <i class="fa-solid fa-clock" style="font-size: 2rem; color: #3b82f6; margin-bottom: 10px;"></i>
-                        <p style="margin: 0; font-weight: 600; color: #1e40af;">Already Applied</p>
-                        <p style="margin: 5px 0 0; font-size: 0.9rem; color: #1e3a8a;">You've applied for this opportunity.</p>
+                    <div class="vol-status-card vol-status-card--pending">
+                        <i class="fa-solid fa-clock vol-status-icon vol-status-icon--pending"></i>
+                        <p class="vol-status-title vol-status-title--pending">Already Applied</p>
+                        <p class="vol-status-text vol-status-text--pending">You've applied for this opportunity.</p>
                     </div>
                 <?php elseif (isset($_SESSION['user_id'])): ?>
                     <form action="<?= Nexus\Core\TenantContext::getBasePath() ?>/volunteering/apply" method="POST">
@@ -228,24 +228,24 @@ $accentColor = '#14b8a6'; // Teal for volunteering
                         <input type="hidden" name="opportunity_id" value="<?= $opportunity['id'] ?>">
 
                         <?php if (!empty($shifts)): ?>
-                            <div style="margin-bottom: 20px;">
-                                <label style="display: block; margin-bottom: 10px; font-weight: 600; color: var(--htb-text-main);">
-                                    <i class="fa-solid fa-clock" style="color: <?= $accentColor ?>;"></i> Select a Shift
+                            <div class="vol-form-group">
+                                <label class="vol-form-label vol-form-label--shift">
+                                    <i class="fa-solid fa-clock vol-section-icon"></i> Select a Shift
                                 </label>
-                                <div style="display: flex; flex-direction: column; gap: 10px;">
+                                <div class="vol-shift-list">
                                     <?php foreach ($shifts as $shift): ?>
                                         <label class="glass-shift-card" onclick="this.querySelector('input').checked = true; document.querySelectorAll('.glass-shift-card').forEach(c => c.classList.remove('selected')); this.classList.add('selected');">
-                                            <input type="radio" name="shift_id" value="<?= $shift['id'] ?>" required style="display: none;">
-                                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                            <input type="radio" name="shift_id" value="<?= $shift['id'] ?>" required class="hidden">
+                                            <div class="vol-shift-row">
                                                 <div>
-                                                    <div style="font-weight: 600; color: var(--htb-text-main);">
+                                                    <div class="vol-shift-date">
                                                         <?= date('M d', strtotime($shift['start_time'])) ?>
                                                     </div>
-                                                    <div style="font-size: 0.85rem; color: var(--htb-text-muted);">
+                                                    <div class="vol-shift-time">
                                                         <?= date('g:i A', strtotime($shift['start_time'])) ?> - <?= date('g:i A', strtotime($shift['end_time'])) ?>
                                                     </div>
                                                 </div>
-                                                <div style="font-size: 0.8rem; color: var(--htb-text-muted);">
+                                                <div class="vol-shift-spots">
                                                     <?= $shift['capacity'] ?> spots
                                                 </div>
                                             </div>
@@ -255,11 +255,11 @@ $accentColor = '#14b8a6'; // Teal for volunteering
                             </div>
                         <?php endif; ?>
 
-                        <div style="margin-bottom: 20px;">
-                            <label style="display: block; margin-bottom: 8px; font-weight: 600; color: var(--htb-text-main);">
-                                <i class="fa-solid fa-message" style="color: <?= $accentColor ?>;"></i> Message (Optional)
+                        <div class="vol-form-group">
+                            <label class="vol-form-label">
+                                <i class="fa-solid fa-message vol-section-icon"></i> Message (Optional)
                             </label>
-                            <textarea name="message" rows="3" placeholder="Tell them why you'd like to volunteer..." style="width: 100%; padding: 12px; border-radius: 12px; border: 1px solid rgba(100,116,139,0.3); background: rgba(255,255,255,0.5); font-size: 0.95rem; resize: vertical; font-family: inherit;"></textarea>
+                            <textarea name="message" rows="3" placeholder="Tell them why you'd like to volunteer..." class="vol-form-textarea"></textarea>
                         </div>
 
                         <button type="submit" class="glass-btn-primary">
@@ -267,10 +267,10 @@ $accentColor = '#14b8a6'; // Teal for volunteering
                         </button>
                     </form>
                 <?php else: ?>
-                    <div style="text-align: center; padding: 20px; background: rgba(100,116,139,0.05); border-radius: 12px;">
-                        <i class="fa-solid fa-user-lock" style="font-size: 2rem; color: var(--htb-text-muted); margin-bottom: 10px;"></i>
-                        <p style="margin: 0 0 15px; color: var(--htb-text-muted);">Join our community to volunteer.</p>
-                        <a href="<?= Nexus\Core\TenantContext::getBasePath() ?>/login" class="glass-btn-primary" style="display: block; text-decoration: none; text-align: center;">
+                    <div class="vol-status-card vol-status-card--login">
+                        <i class="fa-solid fa-user-lock vol-status-icon vol-status-icon--locked"></i>
+                        <p class="vol-status-text vol-status-text--muted">Join our community to volunteer.</p>
+                        <a href="<?= Nexus\Core\TenantContext::getBasePath() ?>/login" class="glass-btn-primary vol-login-btn">
                             Login to Apply
                         </a>
                     </div>
@@ -337,12 +337,10 @@ $accentColor = '#14b8a6'; // Teal for volunteering
             countEl.textContent = data.likes_count;
 
             if (isLiked) {
-                btn.style.background = 'linear-gradient(135deg, #14b8a6, #0d9488)';
-                btn.style.color = '#fff';
+                btn.classList.add('vol-action-btn--liked');
                 icon.className = 'fa-solid fa-heart';
             } else {
-                btn.style.background = 'rgba(100,116,139,0.1)';
-                btn.style.color = 'var(--htb-text-main)';
+                btn.classList.remove('vol-action-btn--liked');
                 icon.className = 'fa-regular fa-heart';
             }
 
@@ -365,9 +363,9 @@ $accentColor = '#14b8a6'; // Teal for volunteering
 
         // Desktop: use inline comments section
         const section = document.getElementById('comments-section');
-        const isHidden = section.style.display === 'none';
+        const isHidden = !section.classList.contains('vol-comments-section--visible');
 
-        section.style.display = isHidden ? 'block' : 'none';
+        section.classList.toggle('vol-comments-section--visible');
 
         if (isHidden && !commentsLoaded) {
             loadComments();
@@ -394,7 +392,7 @@ $accentColor = '#14b8a6'; // Teal for volunteering
             const data = await response.json();
 
             if (data.error) {
-                list.innerHTML = '<p style="color: var(--htb-text-muted); text-align: center;">Failed to load comments</p>';
+                list.innerHTML = '<p class="vol-loading-text">Failed to load comments</p>';
                 return;
             }
 
@@ -402,7 +400,7 @@ $accentColor = '#14b8a6'; // Teal for volunteering
             availableReactions = data.available_reactions || [];
 
             if (!data.comments || data.comments.length === 0) {
-                list.innerHTML = '<p style="color: var(--htb-text-muted); text-align: center; padding: 20px;">No comments yet. Be the first to comment!</p>';
+                list.innerHTML = '<p class="vol-loading-text">No comments yet. Be the first to comment!</p>';
                 return;
             }
 
@@ -410,58 +408,60 @@ $accentColor = '#14b8a6'; // Teal for volunteering
 
         } catch (err) {
             console.error('Load comments error:', err);
-            list.innerHTML = '<p style="color: var(--htb-text-muted); text-align: center;">Error loading comments</p>';
+            list.innerHTML = '<p class="vol-loading-text">Error loading comments</p>';
         }
     }
 
     function renderComment(c, depth) {
         const indent = depth * 20;
-        const isEdited = c.is_edited ? '<span style="font-size: 0.7rem; color: var(--htb-text-muted);"> (edited)</span>' : '';
+        const isEdited = c.is_edited ? '<span class="vol-edited-tag"> (edited)</span>' : '';
         const ownerActions = c.is_owner ? `
-            <span onclick="volunteeringEditComment(${c.id}, '${escapeHtml(c.content).replace(/'/g, "\\'")}')" style="cursor: pointer; margin-left: 10px;" title="Edit">✏️</span>
-            <span onclick="volunteeringDeleteComment(${c.id})" style="cursor: pointer; margin-left: 5px;" title="Delete">🗑️</span>
+            <span onclick="volunteeringEditComment(${c.id}, '${escapeHtml(c.content).replace(/'/g, "\\'")}')" class="vol-owner-action vol-owner-action--edit" title="Edit">✏️</span>
+            <span onclick="volunteeringDeleteComment(${c.id})" class="vol-owner-action vol-owner-action--delete" title="Delete">🗑️</span>
         ` : '';
 
         const reactions = Object.entries(c.reactions || {}).map(([emoji, count]) => {
             const isUserReaction = (c.user_reactions || []).includes(emoji);
-            return `<span onclick="volunteeringToggleReaction(${c.id}, '${emoji}')" style="cursor: pointer; padding: 2px 6px; border-radius: 12px; font-size: 0.8rem; background: ${isUserReaction ? 'rgba(20, 184, 166, 0.2)' : 'rgba(100,116,139,0.1)'}; border: 1px solid ${isUserReaction ? 'rgba(20, 184, 166, 0.4)' : 'rgba(100,116,139,0.2)'};">${emoji} ${count}</span>`;
+            return `<span onclick="volunteeringToggleReaction(${c.id}, '${emoji}')" class="vol-reaction${isUserReaction ? ' vol-reaction--active' : ''}">${emoji} ${count}</span>`;
         }).join(' ');
 
         const reactionPicker = isLoggedIn ? `
-            <div class="reaction-picker" style="display: inline-block; position: relative;">
-                <span onclick="volunteeringShowReactionPicker(${c.id})" style="cursor: pointer; padding: 2px 6px; border-radius: 12px; font-size: 0.8rem; background: rgba(100,116,139,0.1); border: 1px solid rgba(100,116,139,0.2);">+</span>
-                <div id="picker-${c.id}" style="display: none; position: absolute; bottom: 100%; left: 0; background: var(--htb-card-bg, #fff); border: 1px solid rgba(100,116,139,0.2); border-radius: 8px; padding: 5px; z-index: 100; white-space: nowrap; box-shadow: 0 4px 12px rgba(0,0,0,0.15);">
-                    ${availableReactions.map(e => `<span onclick="volunteeringToggleReaction(${c.id}, '${e}')" style="cursor: pointer; padding: 3px; font-size: 1.2rem;">${e}</span>`).join('')}
+            <div class="vol-reaction-picker">
+                <span onclick="volunteeringShowReactionPicker(${c.id})" class="vol-reaction-add">+</span>
+                <div id="picker-${c.id}" class="vol-picker-dropdown">
+                    ${availableReactions.map(e => `<span onclick="volunteeringToggleReaction(${c.id}, '${e}')" class="vol-picker-emoji">${e}</span>`).join('')}
                 </div>
             </div>
         ` : '';
 
-        const replyButton = isLoggedIn ? `<span onclick="volunteeringShowReplyForm(${c.id})" style="cursor: pointer; color: <?= $accentColor ?>; font-size: 0.8rem; margin-left: 10px;">Reply</span>` : '';
+        const replyButton = isLoggedIn ? `<span onclick="volunteeringShowReplyForm(${c.id})" class="vol-reply-link">Reply</span>` : '';
 
         const replies = (c.replies || []).map(r => renderComment(r, depth + 1)).join('');
 
+        const avatarClass = depth > 0 ? 'vol-avatar vol-avatar--sm' : 'vol-avatar vol-avatar--md';
+
         return `
-            <div style="margin-left: ${indent}px; padding: 12px; background: rgba(100,116,139,0.05); border-radius: 12px; margin-bottom: 10px;" id="comment-${c.id}">
-                <div style="display: flex; gap: 12px;">
-                    <img src="${c.author_avatar}" loading="lazy" style="width: ${depth > 0 ? 28 : 36}px; height: ${depth > 0 ? 28 : 36}px; border-radius: 50%; object-fit: cover; flex-shrink: 0;">
-                    <div style="flex: 1;">
-                        <div style="font-weight: 600; font-size: 0.9rem; color: var(--htb-text-main);">
+            <div class="vol-comment" style="margin-left: ${indent}px;" id="comment-${c.id}">
+                <div class="vol-comment-inner">
+                    <img src="${c.author_avatar}" loading="lazy" class="${avatarClass}">
+                    <div class="vol-comment-body">
+                        <div class="vol-comment-author">
                             ${escapeHtml(c.author_name)}${isEdited}
                             ${ownerActions}
                         </div>
-                        <div id="content-${c.id}" style="color: var(--htb-text-main); margin-top: 4px;">${formatContent(c.content)}</div>
-                        <div style="font-size: 0.75rem; color: var(--htb-text-muted); margin-top: 4px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+                        <div id="content-${c.id}" class="vol-comment-content">${formatContent(c.content)}</div>
+                        <div class="vol-comment-meta">
                             ${formatTime(c.created_at)}
                             ${replyButton}
                         </div>
-                        <div style="margin-top: 6px; display: flex; align-items: center; gap: 6px; flex-wrap: wrap;">
+                        <div class="vol-comment-reactions">
                             ${reactions}
                             ${reactionPicker}
                         </div>
-                        <div id="reply-form-${c.id}" style="display: none; margin-top: 10px;">
-                            <div style="display: flex; gap: 8px;">
-                                <input type="text" id="reply-input-${c.id}" placeholder="Write a reply..." style="flex: 1; padding: 8px 12px; border-radius: 8px; border: 1px solid rgba(100,116,139,0.3); background: rgba(255,255,255,0.5); color: var(--htb-text-main); font-size: 0.85rem;">
-                                <button onclick="volunteeringSubmitReply(${c.id})" style="padding: 8px 16px; border-radius: 8px; background: <?= $accentColor ?>; color: white; border: none; cursor: pointer; font-size: 0.85rem;">Reply</button>
+                        <div id="reply-form-${c.id}" class="vol-reply-form">
+                            <div class="vol-reply-input-wrapper">
+                                <input type="text" id="reply-input-${c.id}" placeholder="Write a reply..." class="vol-reply-input">
+                                <button onclick="volunteeringSubmitReply(${c.id})" class="vol-reply-btn">Reply</button>
                             </div>
                         </div>
                     </div>
@@ -478,7 +478,7 @@ $accentColor = '#14b8a6'; // Teal for volunteering
     }
 
     function formatContent(content) {
-        return escapeHtml(content).replace(/@(\w+)/g, '<span style="color: <?= $accentColor ?>; font-weight: 600;">@$1</span>');
+        return escapeHtml(content).replace(/@(\w+)/g, '<span class="vol-mention">@$1</span>');
     }
 
     function formatTime(datetime) {
@@ -496,13 +496,14 @@ $accentColor = '#14b8a6'; // Teal for volunteering
 
     window.volunteeringShowReactionPicker = function(commentId) {
         const picker = document.getElementById(`picker-${commentId}`);
-        picker.style.display = picker.style.display === 'none' ? 'block' : 'none';
+        picker.classList.toggle('vol-picker-dropdown--visible');
     };
 
     window.volunteeringShowReplyForm = function(commentId) {
         const form = document.getElementById(`reply-form-${commentId}`);
-        form.style.display = form.style.display === 'none' ? 'block' : 'none';
-        if (form.style.display === 'block') {
+        const isVisible = form.classList.contains('vol-reply-form--visible');
+        form.classList.toggle('vol-reply-form--visible');
+        if (!isVisible) {
             document.getElementById(`reply-input-${commentId}`).focus();
         }
     };
@@ -550,7 +551,7 @@ $accentColor = '#14b8a6'; // Teal for volunteering
             const data = await response.json();
             if (data.error) { alert(data.error); return; }
             input.value = '';
-            document.getElementById(`reply-form-${parentId}`).style.display = 'none';
+            document.getElementById(`reply-form-${parentId}`).classList.remove('vol-reply-form--visible');
             const countEl = document.getElementById('comment-count');
             countEl.textContent = parseInt(countEl.textContent) + 1;
             loadComments();
@@ -584,10 +585,10 @@ $accentColor = '#14b8a6'; // Teal for volunteering
         const originalHtml = contentEl.innerHTML;
 
         contentEl.innerHTML = `
-            <div style="display: flex; gap: 8px; flex-wrap: wrap;">
-                <input type="text" id="edit-input-${commentId}" value="${escapeHtml(currentContent)}" style="flex: 1; min-width: 200px; padding: 8px 12px; border-radius: 8px; border: 1px solid rgba(100,116,139,0.3); background: rgba(255,255,255,0.5); color: var(--htb-text-main);">
-                <button onclick="saveEdit(${commentId})" style="padding: 8px 16px; border-radius: 8px; background: <?= $accentColor ?>; color: white; border: none; cursor: pointer;">Save</button>
-                <button onclick="cancelEdit(${commentId}, '${escapeHtml(originalHtml).replace(/'/g, "\\'")}')" style="padding: 8px 16px; border-radius: 8px; background: rgba(100,116,139,0.1); border: 1px solid rgba(100,116,139,0.2); color: var(--htb-text-main); cursor: pointer;">Cancel</button>
+            <div class="vol-edit-wrapper">
+                <input type="text" id="edit-input-${commentId}" value="${escapeHtml(currentContent)}" class="vol-edit-input">
+                <button onclick="saveEdit(${commentId})" class="vol-edit-save">Save</button>
+                <button onclick="cancelEdit(${commentId}, '${escapeHtml(originalHtml).replace(/'/g, "\\'")}')" class="vol-edit-cancel">Cancel</button>
             </div>
         `;
         document.getElementById(`edit-input-${commentId}`).focus();
