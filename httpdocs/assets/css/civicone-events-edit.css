@@ -63,7 +63,7 @@
     button:focus-visible,
     a:focus-visible,
     .glass-input:focus-visible {
-        outline: 3px solid rgba(249, 115, 22, 0.5);
+        outline: 3px solid var(--color-orange-alpha-50);
         outline-offset: 2px;
     }
 
@@ -90,8 +90,8 @@
         /* 
        --- DEFAULT / LIGHT MODE VARIABLES (Fallback) --- 
     */
-        --glass-bg: rgba(255, 255, 255, 0.55);
-        --glass-border: rgba(255, 255, 255, 0.4);
+        --glass-bg: var(--color-white-alpha-55);
+        --glass-border: var(--color-white-alpha-40);
         --text-color: var(--color-slate-800);
         --text-muted: var(--color-slate-600);
         --accent-color: var(--color-govuk-yellow);
@@ -100,17 +100,17 @@
 
         /* Subtle iridescent shadow for light mode */
         --box-shadow:
-            0 8px 32px 0 rgba(31, 38, 135, 0.1),
-            inset 0 0 0 1px rgba(255, 255, 255, 0.2);
+            0 8px 32px 0 var(--color-glass-shadow),
+            inset 0 0 0 1px var(--color-white-alpha-20);
 
-        --holographic-glow: 0 0 20px rgba(249, 115, 22, 0.05), 0 0 40px rgba(255, 200, 100, 0.05);
+        --holographic-glow: 0 0 20px var(--color-orange-alpha-5), 0 0 40px var(--color-amber-glow-alpha-5);
 
         /* Form Fields & Pills */
-        --pill-bg: rgba(255, 255, 255, 0.25);
-        --input-bg: rgba(255, 255, 255, 0.35);
-        --input-focus-bg: rgba(255, 255, 255, 0.5);
-        --pill-border: 2px solid rgba(255, 255, 255, 0.4);
-        --pill-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        --pill-bg: var(--color-white-alpha-25);
+        --input-bg: var(--color-white-alpha-35);
+        --input-focus-bg: var(--color-white-alpha-50);
+        --pill-border: 2px solid var(--color-white-alpha-40);
+        --pill-shadow: 0 4px 12px var(--color-black-alpha-5);
 
         /* Layout & Alignment */
         display: flex;
@@ -138,44 +138,44 @@
 
     /* LIGHT MODE EXPLICIT */
     html[data-theme="light"] #unique-glass-page-wrapper {
-        --glass-bg: rgba(255, 255, 255, 0.55);
-        --glass-border: rgba(255, 255, 255, 0.4);
+        --glass-bg: var(--color-white-alpha-55);
+        --glass-border: var(--color-white-alpha-40);
         --text-color: var(--color-slate-800);
         --text-muted: var(--color-slate-600);
         --heading-gradient: linear-gradient(135deg, var(--color-govuk-red-dark) 0%, var(--color-govuk-yellow) 100%);
         --box-shadow:
-            0 8px 32px 0 rgba(31, 38, 135, 0.1),
-            inset 0 0 0 1px rgba(255, 255, 255, 0.2);
-        --holographic-glow: 0 0 20px rgba(249, 115, 22, 0.05), 0 0 40px rgba(255, 200, 100, 0.05);
-        --pill-bg: rgba(255, 255, 255, 0.25);
-        --input-bg: rgba(255, 255, 255, 0.35);
+            0 8px 32px 0 var(--color-glass-shadow),
+            inset 0 0 0 1px var(--color-white-alpha-20);
+        --holographic-glow: 0 0 20px var(--color-orange-alpha-5), 0 0 40px var(--color-amber-glow-alpha-5);
+        --pill-bg: var(--color-white-alpha-25);
+        --input-bg: var(--color-white-alpha-35);
 
         background: radial-gradient(circle at 50% 0%, var(--color-white)7ed 0%, #ffedd5 100%);
     }
 
     /* DARK MODE EXPLICIT */
     html[data-theme="dark"] #unique-glass-page-wrapper {
-        --glass-bg: rgba(24, 24, 27, 0.45);
-        --glass-border: rgba(255, 255, 255, 0.15);
+        --glass-bg: var(--color-zinc-900-alpha-45);
+        --glass-border: var(--color-white-alpha-15);
         --text-color: #ffedd5;
-        --text-muted: rgba(255, 255, 255, 0.7);
+        --text-muted: var(--color-white-alpha-70);
         --accent-color: var(--color-orange-300);
         --heading-gradient: linear-gradient(135deg, var(--color-white) 0%, var(--color-orange-300) 100%);
 
         /* Vivid Dark Mode Shadows */
         --box-shadow:
-            0 8px 32px 0 rgba(0, 0, 0, 0.4),
-            inset 0 0 0 1px rgba(255, 255, 255, 0.05);
+            0 8px 32px 0 var(--color-black-alpha-40),
+            inset 0 0 0 1px var(--color-white-alpha-5);
 
         --holographic-glow:
-            0 0 30px rgba(249, 115, 22, 0.15),
-            0 0 60px rgba(251, 146, 60, 0.15);
+            0 0 30px var(--color-orange-alpha-15),
+            0 0 60px var(--color-orange-400-alpha-15);
 
-        --pill-bg: rgba(24, 24, 27, 0.65);
-        --pill-border: 2px solid rgba(255, 255, 255, 0.1);
+        --pill-bg: var(--color-zinc-900-alpha-65);
+        --pill-border: 2px solid var(--color-white-alpha-10);
 
-        --input-bg: rgba(24, 24, 27, 0.6);
-        --input-focus-bg: rgba(24, 24, 27, 0.8);
+        --input-bg: var(--color-zinc-900-alpha-60);
+        --input-focus-bg: var(--color-zinc-900-alpha-80);
 
         background: radial-gradient(circle at 50% 0%, rgb(40, 15, 5) 0%, rgb(20, 10, 5) 90%);
     }
@@ -211,7 +211,7 @@
         left: 0;
         right: 0;
         height: 1px;
-        background: linear-gradient(90deg, transparent, rgba(251, 146, 60, 0.6), rgba(253, 186, 116, 0.6), transparent);
+        background: linear-gradient(90deg, transparent, var(--color-orange-400-alpha-60), var(--color-orange-300-alpha-60), transparent);
         z-index: 10;
     }
 
@@ -261,14 +261,14 @@
         font-size: 1rem;
         font-family: inherit;
         transition: all 0.2s ease;
-        box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.05);
+        box-shadow: inset 0 2px 4px var(--color-black-alpha-5);
     }
 
     #unique-glass-page-wrapper .glass-input:focus {
         outline: none;
         background: var(--input-focus-bg);
         border-color: var(--accent-color);
-        box-shadow: 0 0 0 4px rgba(249, 115, 22, 0.15);
+        box-shadow: 0 0 0 4px var(--color-orange-alpha-15);
         /* Orange ring */
     }
 
@@ -341,22 +341,22 @@
         align-items: center;
         gap: var(--space-2-5);
         transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-        background: rgba(255, 255, 255, 0.05);
+        background: var(--color-white-alpha-5);
         position: relative;
         overflow: hidden;
     }
 
     #unique-glass-page-wrapper .glass-sdg-card:hover {
-        background: rgba(255, 255, 255, 0.15);
+        background: var(--color-white-alpha-15);
         transform: translateY(-2px);
     }
 
     /* Active State */
     #unique-glass-page-wrapper .glass-sdg-card.selected {
-        background: rgba(255, 255, 255, 0.2);
+        background: var(--color-white-alpha-20);
         border-color: currentColor;
         /* Inherit color from JS style */
-        box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+        box-shadow: 0 0 15px var(--color-black-alpha-10);
     }
 
     #unique-glass-page-wrapper .glass-sdg-card.selected::after {
@@ -391,7 +391,7 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        box-shadow: 0 4px 15px rgba(249, 115, 22, 0.3);
+        box-shadow: 0 4px 15px var(--color-orange-alpha-30);
         background: linear-gradient(135deg, var(--color-govuk-yellow) 0%, var(--color-govuk-yellow) 100%);
         color: white;
     }
@@ -415,11 +415,11 @@
 
     #unique-glass-page-wrapper .glass-btn-primary:hover {
         transform: translateY(-2px);
-        box-shadow: 0 8px 25px rgba(249, 115, 22, 0.4);
+        box-shadow: 0 8px 25px var(--color-orange-alpha-40);
     }
 
     #unique-glass-page-wrapper .glass-btn-secondary:hover {
-        background: rgba(255, 255, 255, 0.2);
+        background: var(--color-white-alpha-20);
         color: var(--text-color);
     }
 
@@ -433,7 +433,7 @@
         background: var(--input-bg);
         border: 1px solid var(--glass-border);
         border-radius: var(--radius-xl);
-        box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.05);
+        box-shadow: inset 0 2px 4px var(--color-black-alpha-5);
         width: 100% !important;
         max-width: none !important;
         min-width: 0 !important;
@@ -453,7 +453,7 @@
 
     #unique-glass-page-wrapper .mapboxgl-ctrl-geocoder--input:focus {
         outline: none;
-        box-shadow: 0 0 0 4px rgba(249, 115, 22, 0.15);
+        box-shadow: 0 0 0 4px var(--color-orange-alpha-15);
         /* Orange ring match */
     }
 
@@ -469,7 +469,7 @@
         background-color: var(--glass-bg);
         border: 1px solid var(--glass-border);
         border-radius: var(--radius-lg);
-        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+        box-shadow: 0 10px 25px var(--color-black-alpha-20);
         /* backdrop-filter removed for GOV.UK compliance */
         -webkit-/* backdrop-filter removed for GOV.UK compliance */
         margin-top: var(--space-1);
