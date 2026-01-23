@@ -346,6 +346,82 @@
     --color-glass-shadow: rgba(31, 38, 135, 0.1);
     --color-glass-shadow-15: rgba(31, 38, 135, 0.15);
 
+    /* Cyan opacity variants expanded (6, 182, 212 = #06b6d4) */
+    --color-cyan-alpha-10: rgba(6, 182, 212, 0.1);
+    --color-cyan-alpha-12: rgba(6, 182, 212, 0.12);
+    --color-cyan-alpha-20: rgba(6, 182, 212, 0.2);
+    --color-cyan-alpha-25: rgba(6, 182, 212, 0.25);
+    --color-cyan-alpha-30: rgba(6, 182, 212, 0.3);
+    --color-cyan-alpha-40: rgba(6, 182, 212, 0.4);
+    --color-cyan-alpha-50: rgba(6, 182, 212, 0.5);
+
+    /* Pink-400 opacity variants (244, 114, 182 = #f472b6) */
+    --color-pink-400-alpha-10: rgba(244, 114, 182, 0.1);
+    --color-pink-400-alpha-15: rgba(244, 114, 182, 0.15);
+    --color-pink-400-alpha-20: rgba(244, 114, 182, 0.2);
+    --color-pink-400-alpha-30: rgba(244, 114, 182, 0.3);
+    --color-pink-400-alpha-40: rgba(244, 114, 182, 0.4);
+
+    /* Violet expanded opacity variants (139, 92, 246 = #8b5cf6) */
+    --color-violet-alpha-15: rgba(139, 92, 246, 0.15);
+    --color-violet-alpha-25: rgba(139, 92, 246, 0.25);
+    --color-violet-alpha-40: rgba(139, 92, 246, 0.4);
+    --color-violet-alpha-50: rgba(139, 92, 246, 0.5);
+    --color-violet-alpha-60: rgba(139, 92, 246, 0.6);
+
+    /* Gray-800 opacity variants (31, 41, 55 = #1f2937) */
+    --color-gray-800-alpha-50: rgba(31, 41, 55, 0.5);
+
+    /* Blue-600 opacity variants (37, 99, 235 = #2563eb) */
+    --color-blue-600-alpha-3: rgba(37, 99, 235, 0.03);
+    --color-blue-600-alpha-30: rgba(37, 99, 235, 0.3);
+    --color-blue-600-alpha-40: rgba(37, 99, 235, 0.4);
+    --color-blue-600-alpha-50: rgba(37, 99, 235, 0.5);
+
+    /* Primary-600/Indigo-600 opacity variants (79, 70, 229 = #4f46e5) */
+    --color-primary-600-alpha-3: rgba(79, 70, 229, 0.03);
+    --color-primary-600-alpha-8: rgba(79, 70, 229, 0.08);
+    --color-primary-600-alpha-10: rgba(79, 70, 229, 0.1);
+    --color-primary-600-alpha-20: rgba(79, 70, 229, 0.2);
+    --color-primary-600-alpha-30: rgba(79, 70, 229, 0.3);
+
+    /* Green-600 opacity variants (22, 163, 74 = #16a34a) */
+    --color-green-600-alpha-15: rgba(22, 163, 74, 0.15);
+
+    /* Green-500 opacity variants (34, 197, 94 = #22c55e) */
+    --color-green-500-alpha-30: rgba(34, 197, 94, 0.3);
+
+    /* Red-800 opacity variants (185, 28, 28 = #b91c1c) */
+    --color-red-800-alpha-15: rgba(185, 28, 28, 0.15);
+
+    /* Emerald-300 opacity variants (52, 211, 153 = #34d399) */
+    --color-emerald-300-alpha-30: rgba(52, 211, 153, 0.3);
+
+    /* Slate-800 opacity variants (30, 41, 59 = #1e293b) */
+    --color-slate-800-alpha-75: rgba(30, 41, 59, 0.75);
+    --color-slate-800-alpha-80: rgba(30, 41, 59, 0.8);
+    --color-slate-800-alpha-85: rgba(30, 41, 59, 0.85);
+    --color-slate-800-alpha-90: rgba(30, 41, 59, 0.9);
+
+    /* Slate-900 opacity variants (15, 23, 42 = #0f172a) */
+    --color-slate-900-alpha-60: rgba(15, 23, 42, 0.6);
+
+    /* Black expanded opacity variants */
+    --color-black-alpha-6: rgba(0, 0, 0, 0.06);
+
+    /* Dark purple background variants (15, 12, 41) */
+    --color-dark-purple-bg: rgba(15, 12, 41, 0.9);
+    --color-dark-purple-bg-95: rgba(15, 12, 41, 0.95);
+
+    /* Dark purple alt background variants (30, 27, 75) */
+    --color-dark-purple-alt-bg: rgba(30, 27, 75, 0.95);
+
+    /* Purple-500 opacity variants (168, 85, 247 = #a855f7) */
+    --color-purple-500-alpha-5: rgba(168, 85, 247, 0.05);
+
+    /* Purple-400 opacity variants (192, 132, 252 = #c084fc) */
+    --color-purple-400-alpha-8: rgba(192, 132, 252, 0.08);
+
     /* Rose palette - Alerts, important actions */
     --color-rose-300: #fda4af;
     --color-rose-400: #fb7185;
