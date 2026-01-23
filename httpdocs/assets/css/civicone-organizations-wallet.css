@@ -6,7 +6,7 @@
     right: 0;
     bottom: 0;
     z-index: -1;
-    background: linear-gradient(135deg, var(--color-slate-50) 0%, #ecfdf5 25%, #d1fae5 50%, #ecfdf5 75%, var(--color-slate-50) 100%);
+    background: linear-gradient(135deg, var(--color-slate-50) 0%, var(--color-emerald-50) 25%, var(--color-emerald-100) 50%, var(--color-emerald-50) 75%, var(--color-slate-50) 100%);
 }
 
 .org-wallet-bg::before {
@@ -1112,11 +1112,11 @@
 }
 
 .org-balance-gauge-fill.critical {
-    background: #fca5a5;
+    background: var(--color-red-300);
 }
 
 .org-balance-gauge-fill.low {
-    background: #fcd34d;
+    background: var(--color-amber-300);
 }
 
 .org-balance-gauge-fill.healthy {

@@ -169,7 +169,7 @@
 }
 
 .nexus-share-option:hover {
-    background: #e8f0f8;
+    background: var(--color-blue-50);
 }
 
 .nexus-share-option:focus {
@@ -339,7 +339,7 @@ body.turbo-loading .civic-btn {
     top: 0;
     left: 0;
     right: 0;
-    background: #f47738;
+    background: var(--color-orange-500);
     color: var(--color-govuk-black);
     text-align: center;
     padding: 0.5rem 1rem;

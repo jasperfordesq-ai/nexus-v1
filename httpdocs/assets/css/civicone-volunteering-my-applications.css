@@ -137,12 +137,12 @@
 }
 
 .civic-status--approved {
-    background: #ECFDF5;
+    background: var(--color-emerald-50);
     color: var(--color-success-700);
 }
 
 .civic-status--declined {
-    background: #FEF2F2;
+    background: var(--color-red-50);
     color: var(--color-govuk-red);
 }
 

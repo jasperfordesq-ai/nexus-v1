@@ -61,7 +61,7 @@
 }
 
 .civicone .civicone-identity-bar__status-indicator--recent {
-    background: #f47738; /* GOV.UK Orange */
+    background: var(--color-orange-500); /* GOV.UK Orange */
     box-shadow: 0 0 var(--space-2) rgba(244, 119, 56, 0.6);
 }
 

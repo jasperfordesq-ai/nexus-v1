@@ -1286,8 +1286,8 @@ body.dark-mode *:focus-visible {
 
 /* Default (Government Blue) */
 :root {
-    --skin-primary: #002d72;
-    --skin-secondary: #007b5f;
+    --skin-primary: var(--color-govuk-blue);
+    --skin-secondary: var(--color-govuk-green);
     --skin-accent: var(--color-yellow-400);
     --skin-text-on-primary: var(--color-white);
 }
@@ -2307,7 +2307,7 @@ a:focus {
 .civic-badge--admin {
     background: var(--color-red-50);
     color: var(--color-red-700);
-    border: 1px solid #FECACA;
+    border: 1px solid var(--color-red-200, #fecaca);
 }
 
 .civic-badge--coordinator {

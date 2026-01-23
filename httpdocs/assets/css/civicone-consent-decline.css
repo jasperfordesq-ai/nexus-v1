@@ -11,7 +11,7 @@
 
 /* Error Notification */
 .civic-notification--error {
-    background: var(--color-danger-50, #fef2f2);
+    background: var(--color-danger-50, var(--color-red-50));
     border-color: var(--color-danger-500, var(--color-govuk-red));
 }
 
@@ -112,7 +112,7 @@
 }
 
 .decline-option__icon--danger {
-    background: var(--color-danger-100, #fee2e2);
+    background: var(--color-danger-100, var(--color-red-100));
     color: var(--color-danger-600, var(--color-govuk-red));
 }
 
@@ -127,7 +127,7 @@
 
 [data-theme="dark"] .decline-option__icon--danger {
     background: rgba(239, 68, 68, 0.2);
-    color: var(--color-danger-400, #f87171);
+    color: var(--color-danger-400, var(--color-red-400));
 }
 
 .decline-option__content h3 {
@@ -197,17 +197,17 @@
 }
 
 .civic-btn--danger {
-    border-color: var(--color-danger-300, #fca5a5);
+    border-color: var(--color-danger-300, var(--color-red-300));
     color: var(--color-danger-700, var(--color-govuk-red));
 }
 
 [data-theme="dark"] .civic-btn--danger {
     border-color: var(--color-danger-500, var(--color-govuk-red));
-    color: var(--color-danger-400, #f87171);
+    color: var(--color-danger-400, var(--color-red-400));
 }
 
 .civic-btn--danger:hover {
-    background: var(--color-danger-50, #fef2f2);
+    background: var(--color-danger-50, var(--color-red-50));
 }
 
 [data-theme="dark"] .civic-btn--danger:hover {

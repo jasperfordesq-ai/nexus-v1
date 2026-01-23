@@ -736,9 +736,9 @@ a:focus {
     }
 
     .civic-btn {
-        border: 2px solid #000;
-        background: #fff !important;
-        color: #000 !important;
+        border: 2px solid var(--color-black);
+        background: var(--color-white) !important;
+        color: var(--color-black) !important;
     }
 }
 
@@ -943,7 +943,7 @@ a:focus {
 .civic-badge--admin {
     background: var(--color-red-50);
     color: var(--color-red-700);
-    border: 1px solid #FECACA;
+    border: 1px solid var(--color-red-200, #fecaca);
 }
 
 .civic-badge--coordinator {
@@ -1617,8 +1617,8 @@ body.dark-mode .civic-dropdown-content a:focus-visible {
     body {
         font-size: 12pt;
         line-height: 1.5;
-        color: #000 !important;
-        background: #fff !important;
+        color: var(--color-black) !important;
+        background: var(--color-white) !important;
     }
 
     /* Show link URLs */
@@ -1642,7 +1642,7 @@ body.dark-mode .civic-dropdown-content a:focus-visible {
     h4,
     h5,
     h6 {
-        color: #000 !important;
+        color: var(--color-black) !important;
     }
 
     .civic-card,
@@ -1655,8 +1655,8 @@ body.dark-mode .civic-dropdown-content a:focus-visible {
 
     /* Buttons print as bordered boxes */
     .civic-btn {
-        border: 2px solid #000 !important;
-        background: #fff !important;
-        color: #000 !important;
+        border: 2px solid var(--color-black) !important;
+        background: var(--color-white) !important;
+        color: var(--color-black) !important;
     }
 }

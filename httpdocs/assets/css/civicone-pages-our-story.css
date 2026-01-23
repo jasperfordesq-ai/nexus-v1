@@ -17,7 +17,7 @@
     min-height: 100vh;
     padding: 0;
     margin: -2rem -1rem;
-    background: linear-gradient(135deg, var(--color-warning-500) 0%, var(--color-warning-400) 25%, #fcd34d 50%, var(--color-warning-500) 75%, var(--color-warning-600) 100%);
+    background: linear-gradient(135deg, var(--color-warning-500) 0%, var(--color-warning-400) 25%, var(--color-amber-300) 50%, var(--color-warning-500) 75%, var(--color-warning-600) 100%);
     background-size: 400% 400%;
     /* animation removed for GOV.UK compliance */
 }
@@ -269,7 +269,7 @@
 [data-theme="dark"] #story-glass-wrapper .story-page-header h1,
 [data-theme="dark"] #story-glass-wrapper .card-header h2,
 [data-theme="dark"] #story-glass-wrapper .mission-card h3 {
-    color: #fef3c7;
+    color: var(--color-amber-100);
 }
 
 [data-theme="dark"] #story-glass-wrapper .story-page-header p,
@@ -279,7 +279,7 @@
 }
 
 [data-theme="dark"] #story-glass-wrapper .stat-chip .stat-value {
-    color: #fef3c7;
+    color: var(--color-amber-100);
 }
 
 [data-theme="dark"] #story-glass-wrapper .stat-chip .stat-label {
@@ -292,7 +292,7 @@
 }
 
 [data-theme="dark"] #story-glass-wrapper .story-quote p {
-    color: #fef3c7;
+    color: var(--color-amber-100);
 }
 
 [data-theme="dark"] #story-glass-wrapper .card-header {

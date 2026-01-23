@@ -1377,7 +1377,7 @@
 }
 
 .connection-online--recent {
-    background: #f47738;
+    background: var(--color-orange-500);
 }
 
 .connection-status--online {

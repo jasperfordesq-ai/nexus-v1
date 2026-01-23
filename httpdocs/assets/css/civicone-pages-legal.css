@@ -71,7 +71,7 @@
 .civic-legal-card-icon.accessibility { background: linear-gradient(135deg, var(--color-success-500), var(--color-success-600)); }
 .civic-legal-card-icon.cookies { background: linear-gradient(135deg, var(--color-warning-500), var(--color-warning-600)); }
 .civic-legal-card-icon.help { background: linear-gradient(135deg, var(--color-pink-500), var(--color-govuk-red)); }
-.civic-legal-card-icon.contact { background: linear-gradient(135deg, var(--color-cyan-500), #0891b2); }
+.civic-legal-card-icon.contact { background: linear-gradient(135deg, var(--color-cyan-500), var(--color-cyan-600)); }
 .civic-legal-card-icon.faq { background: linear-gradient(135deg, var(--color-purple-500), var(--color-primary-700)); }
 .civic-legal-card-icon.about { background: linear-gradient(135deg, var(--color-govuk-yellow), var(--color-govuk-yellow)); }
 

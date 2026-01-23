@@ -588,15 +588,15 @@
 
 .civic-matches-widget .civic-dash-card-header {
     background: linear-gradient(135deg, var(--color-red-50), var(--color-pink-100));
-    border-color: #fecaca;
+    border-color: var(--color-red-200, #fecaca);
 }
 
 .civic-matches-widget .civic-dash-card-title {
-    color: #be123c;
+    color: var(--color-rose-700);
 }
 
 .civic-matches-widget .civic-dash-card-title i {
-    color: #be123c;
+    color: var(--color-rose-700);
 }
 
 .civic-matches-list {
@@ -1108,7 +1108,7 @@
 }
 
 .civic-listing-placeholder.offer {
-    background: linear-gradient(135deg, var(--color-success-100), #bbf7d0);
+    background: linear-gradient(135deg, var(--color-success-100), var(--color-emerald-200));
     color: var(--color-green-500);
 }
 
@@ -1748,8 +1748,8 @@
    ============================================ */
 
 [data-theme="dark"] .civic-matches-widget .civic-dash-card-header {
-    background: linear-gradient(135deg, #1f1f1f, #2d1f2f);
-    border-color: #4a2c4a;
+    background: linear-gradient(135deg, var(--color-zinc-900), var(--color-zinc-800));
+    border-color: var(--color-purple-900, #4a2c4a);
 }
 
 [data-theme="dark"] .civic-modal {

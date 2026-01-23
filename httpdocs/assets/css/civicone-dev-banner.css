@@ -187,17 +187,17 @@
    =========================================== */
 
 .civicone-dev-banner--accessible {
-    background: linear-gradient(135deg, #065f46 0%, var(--color-success-700) 50%, #065f46 100%);
+    background: linear-gradient(135deg, var(--color-emerald-800) 0%, var(--color-success-700) 50%, var(--color-emerald-800) 100%);
     border-bottom-color: #064e3b;
     box-shadow: 0 4px 12px rgba(6, 95, 70, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.1);
 }
 
 .civicone-dev-banner--accessible .civicone-dev-badge {
-    color: #065f46;
+    color: var(--color-emerald-800);
 }
 
 .civicone-dev-banner--accessible .civicone-dev-switch:hover {
-    color: #065f46;
+    color: var(--color-emerald-800);
 }
 
 /* ===========================================
@@ -247,7 +247,7 @@ body.dark-mode .civicone-dev-banner {
 }
 
 body.dark-mode .civicone-dev-banner--accessible {
-    background: linear-gradient(135deg, #064e3b 0%, #065f46 50%, #064e3b 100%);
+    background: linear-gradient(135deg, #064e3b 0%, var(--color-emerald-800) 50%, #064e3b 100%);
 }
 
 body.dark-mode .civicone-dev-banner--warning {
@@ -255,7 +255,7 @@ body.dark-mode .civicone-dev-banner--warning {
 }
 
 body.dark-mode .civicone-dev-banner--info {
-    background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 50%, #1e3a8a 100%);
+    background: linear-gradient(135deg, var(--color-blue-800) 0%, #1e40af 50%, var(--color-blue-800) 100%);
 }
 
 /* ===========================================

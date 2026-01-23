@@ -27,7 +27,7 @@
 }
 
 .nav-pill:hover {
-    background: #e8f0f8;
+    background: var(--color-blue-50);
 }
 
 .nav-pill.active {
@@ -343,7 +343,7 @@
 }
 
 .badge-earned:hover {
-    background: #e8f0f8;
+    background: var(--color-blue-50);
     border-color: var(--color-govuk-blue-light);
 }
 
@@ -783,7 +783,7 @@
 }
 
 .badge-item:hover {
-    background: #e8f0f8;
+    background: var(--color-blue-50);
 }
 
 .badge-item .badge-icon {
@@ -900,7 +900,7 @@
 
 /* Success Toast */
 .success-toast {
-    background: #cce2d8;
+    background: var(--color-emerald-100);
     color: var(--color-govuk-black);
     padding: 0.75rem 1rem;
     margin-bottom: 1rem;
@@ -966,7 +966,7 @@
 }
 
 .challenge-type.weekly {
-    background: #e8f0f8;
+    background: var(--color-blue-50);
     color: var(--color-govuk-black);
     border: 1px solid var(--color-govuk-blue-light);
 }
@@ -978,9 +978,9 @@
 }
 
 .challenge-type.special {
-    background: #fce4ec;
+    background: var(--color-pink-100);
     color: var(--color-govuk-black);
-    border: 1px solid #d53880;
+    border: 1px solid var(--color-pink-600);
 }
 
 .challenge-time {
@@ -1352,7 +1352,7 @@
 }
 
 .leaderboard-item.current-user {
-    background: #e8f0f8;
+    background: var(--color-blue-50);
     border-color: var(--color-govuk-blue-light);
     border-width: 2px;
 }
@@ -1520,12 +1520,12 @@
 }
 
 .past-season-status.completed {
-    background: #cce2d8;
+    background: var(--color-emerald-100);
     color: var(--color-govuk-green);
 }
 
 .past-season-status.active {
-    background: #e8f0f8;
+    background: var(--color-blue-50);
     color: var(--color-govuk-blue-light);
 }
 
@@ -1630,7 +1630,7 @@
 }
 
 .item-badge.owned {
-    background: #cce2d8;
+    background: var(--color-emerald-100);
     color: var(--color-govuk-green);
 }
 
@@ -1640,7 +1640,7 @@
 }
 
 .item-badge.new {
-    background: #e8f0f8;
+    background: var(--color-blue-50);
     color: var(--color-govuk-blue-light);
 }
 
@@ -1656,7 +1656,7 @@
 }
 
 .shop-item.owned .item-icon {
-    background: #cce2d8;
+    background: var(--color-emerald-100);
 }
 
 .item-name {

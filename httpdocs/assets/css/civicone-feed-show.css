@@ -144,7 +144,7 @@
 }
 
 [data-theme="dark"] .glass-button:hover {
-    color: #a78bfa;
+    color: var(--color-purple-400);
 }
 
 /* Holographic Glass Card */
@@ -264,7 +264,7 @@
 
 [data-theme="dark"] .post-visibility {
     background: rgba(168, 85, 247, 0.15);
-    color: #a78bfa;
+    color: var(--color-purple-400);
     border-color: rgba(168, 85, 247, 0.3);
 }
 
@@ -312,7 +312,7 @@
     left: 0;
     width: 0;
     height: var(--space-0-5);
-    background: linear-gradient(90deg, var(--color-primary-500), #a78bfa);
+    background: linear-gradient(90deg, var(--color-primary-500), var(--color-purple-400));
     transition: width 0.3s ease;
 }
 
@@ -526,7 +526,7 @@
 
 [data-theme="dark"] .comment-input:focus {
     background: rgba(30, 41, 59, 0.95);
-    border-color: #a78bfa;
+    border-color: var(--color-purple-400);
     box-shadow: 0 0 0 4px rgba(168, 85, 247, 0.15), 0 8px 16px rgba(168, 85, 247, 0.2);
 }
 
@@ -642,7 +642,7 @@
     font-size: 3rem;
     margin-bottom: var(--space-3);
     opacity: 0.3;
-    background: linear-gradient(135deg, var(--color-primary-500), #a78bfa);
+    background: linear-gradient(135deg, var(--color-primary-500), var(--color-purple-400));
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
