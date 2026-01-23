@@ -319,7 +319,9 @@ $pageTitle = $displayName . ' - Profile';
 
 // Load holographic glassmorphism profile CSS (use min version for production)
 $profileCssFile = defined('DEBUG_MODE') && DEBUG_MODE ? 'profile-holographic.css' : 'profile-holographic.min.css';
+$profileShowCssFile = defined('DEBUG_MODE') && DEBUG_MODE ? 'modern-profile-show.css' : 'modern-profile-show.min.css';
 $additionalCSS = '<link rel="stylesheet" href="/assets/css/' . $profileCssFile . '?v=' . time() . '">';
+$additionalCSS .= '<link rel="stylesheet" href="/assets/css/' . $profileShowCssFile . '?v=' . time() . '">';
 
 require dirname(__DIR__, 2) . '/layouts/header.php';
 ?>
@@ -370,9 +372,9 @@ $basePath = \Nexus\Core\TenantContext::getBasePath();
                      height="140"
                      loading="lazy">
                 <?php if ($profileIsOnline): ?>
-                    <span class="profile-online-indicator online" style="background:#10b981;animation:pulse-online 2s infinite;" title="Active now"></span>
+                    <span class="profile-online-indicator online" title="Active now"></span>
                 <?php elseif ($profileIsRecentlyActive): ?>
-                    <span class="profile-online-indicator recent" style="background:#f59e0b;" title="Active today"></span>
+                    <span class="profile-online-indicator recent" title="Active today"></span>
                 <?php endif; ?>
             </div>
 
@@ -660,7 +662,7 @@ $basePath = \Nexus\Core\TenantContext::getBasePath();
     <?php if (!empty($profileFriends)): ?>
     <div class="profile-friends-card">
         <div class="profile-friends-header">
-            <h3><i class="fa-solid fa-user-group" style="color: #6366f1;"></i> Friends</h3>
+            <h3><i class="fa-solid fa-user-group"></i> Friends</h3>
             <a href="<?= $basePath ?>/connections" class="profile-friends-link">See All</a>
         </div>
         <div class="profile-friends-body">
@@ -675,9 +677,9 @@ $basePath = \Nexus\Core\TenantContext::getBasePath();
                     <div class="profile-friend-avatar">
                         <?= webp_avatar($friend['avatar_url'] ?: null, $friendName, 48) ?>
                         <?php if ($friendIsOnline): ?>
-                            <span class="profile-friend-online" style="background: #10b981;" title="Online now"></span>
+                            <span class="profile-friend-online online-now" title="Online now"></span>
                         <?php elseif ($friendIsRecent): ?>
-                            <span class="profile-friend-online" style="background: #f59e0b;" title="Active today"></span>
+                            <span class="profile-friend-online active-today" title="Active today"></span>
                         <?php endif; ?>
                     </div>
                     <div class="profile-friend-info">
@@ -766,36 +768,36 @@ $basePath = \Nexus\Core\TenantContext::getBasePath();
             </h3>
 
             <!-- Rating Summary Badge + Write Review Button -->
-            <div style="display: flex; align-items: center; gap: 16px; flex-wrap: wrap;">
+            <div class="reviews-header-content">
                 <?php if ($totalReviews > 0): ?>
-                <div class="glass-badge" style="background: linear-gradient(135deg, rgba(245, 158, 11, 0.15), rgba(217, 119, 6, 0.1)); border-color: rgba(245, 158, 11, 0.3);">
-                    <div style="display: flex; align-items: center; gap: 8px;">
-                        <span style="font-size: 1.8rem; font-weight: 800; color: #f59e0b;"><?= $avgRating ?></span>
+                <div class="glass-badge rating-summary-badge">
+                    <div class="rating-content">
+                        <span class="rating-number"><?= $avgRating ?></span>
                         <div>
-                            <div style="display: flex; gap: 2px;">
+                            <div class="stars-container">
                                 <?php for ($i = 1; $i <= 5; $i++): ?>
                                     <?php if ($i <= floor($avgRating)): ?>
-                                        <i class="fa-solid fa-star" style="color: #f59e0b; font-size: 0.9rem;"></i>
+                                        <i class="fa-solid fa-star star-filled"></i>
                                     <?php elseif ($i - 0.5 <= $avgRating): ?>
-                                        <i class="fa-solid fa-star-half-stroke" style="color: #f59e0b; font-size: 0.9rem;"></i>
+                                        <i class="fa-solid fa-star-half-stroke star-half"></i>
                                     <?php else: ?>
-                                        <i class="fa-regular fa-star" style="color: #cbd5e1; font-size: 0.9rem;"></i>
+                                        <i class="fa-regular fa-star star-empty"></i>
                                     <?php endif; ?>
                                 <?php endfor; ?>
                             </div>
-                            <span style="font-size: 0.75rem; color: #6b7280;"><?= $totalReviews ?> review<?= $totalReviews !== 1 ? 's' : '' ?></span>
+                            <span class="review-count"><?= $totalReviews ?> review<?= $totalReviews !== 1 ? 's' : '' ?></span>
                         </div>
                     </div>
                 </div>
                 <?php else: ?>
-                <div class="glass-badge" style="opacity: 0.7;">
-                    <i class="fa-regular fa-star" style="color: #9ca3af;"></i>
-                    <span style="color: #6b7280; font-size: 0.9rem;">No reviews yet</span>
+                <div class="glass-badge no-reviews-badge">
+                    <i class="fa-regular fa-star"></i>
+                    <span>No reviews yet</span>
                 </div>
                 <?php endif; ?>
 
                 <?php if (isset($_SESSION['user_id']) && $_SESSION['user_id'] != $user['id']): ?>
-                <button type="button" onclick="openReviewModal()" class="glass-btn" style="background: linear-gradient(135deg, rgba(245, 158, 11, 0.9), rgba(217, 119, 6, 0.9)); box-shadow: 0 4px 15px rgba(245, 158, 11, 0.3); padding: 8px 16px; font-size: 0.9rem;">
+                <button type="button" onclick="openReviewModal()" class="glass-btn btn-write-review">
                     <i class="fa-solid fa-pen"></i> Write a Review
                 </button>
                 <?php endif; ?>
@@ -804,52 +806,52 @@ $basePath = \Nexus\Core\TenantContext::getBasePath();
 
         <?php if (!empty($reviews)): ?>
             <!-- Reviews List -->
-            <div style="display: flex; flex-direction: column; gap: 16px;">
+            <div class="reviews-list">
                 <?php foreach ($reviews as $review): ?>
-                <div class="glass-review-card" style="background: linear-gradient(135deg, rgba(255, 255, 255, 0.5), rgba(255, 255, 255, 0.25)); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.3); border-radius: 16px; padding: 20px; transition: all 0.3s ease;">
-                    <div style="display: flex; gap: 16px;">
+                <div class="glass-review-card">
+                    <div class="review-card-inner">
                         <!-- Reviewer Avatar -->
-                        <a href="<?= \Nexus\Core\TenantContext::getBasePath() ?>/profile/<?= $review['reviewer_id'] ?>" style="text-decoration: none; flex-shrink: 0;">
+                        <a href="<?= \Nexus\Core\TenantContext::getBasePath() ?>/profile/<?= $review['reviewer_id'] ?>" class="review-avatar-link">
                             <?= webp_avatar($review['reviewer_avatar'] ?: null, $review['reviewer_name'], 52) ?>
                         </a>
 
-                        <div style="flex: 1; min-width: 0;">
+                        <div class="review-content">
                             <!-- Header Row -->
-                            <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 8px; margin-bottom: 8px;">
+                            <div class="review-header-row">
                                 <div>
-                                    <a href="<?= \Nexus\Core\TenantContext::getBasePath() ?>/profile/<?= $review['reviewer_id'] ?>" style="text-decoration: none;">
-                                        <span style="font-weight: 700; font-size: 1rem; color: #1f2937;"><?= htmlspecialchars($review['reviewer_name']) ?></span>
+                                    <a href="<?= \Nexus\Core\TenantContext::getBasePath() ?>/profile/<?= $review['reviewer_id'] ?>" class="reviewer-name-link">
+                                        <span class="reviewer-name"><?= htmlspecialchars($review['reviewer_name']) ?></span>
                                     </a>
                                     <?php if (!empty($review['group_name'])): ?>
-                                    <span style="margin-left: 8px; padding: 3px 10px; background: linear-gradient(135deg, rgba(99, 102, 241, 0.15), rgba(139, 92, 246, 0.1)); border-radius: 20px; font-size: 0.75rem; color: #6366f1; font-weight: 600;">
-                                        <i class="fa-solid fa-users" style="margin-right: 4px;"></i><?= htmlspecialchars($review['group_name']) ?>
+                                    <span class="review-group-badge">
+                                        <i class="fa-solid fa-users"></i><?= htmlspecialchars($review['group_name']) ?>
                                     </span>
                                     <?php endif; ?>
                                 </div>
-                                <span style="font-size: 0.8rem; color: #9ca3af;">
-                                    <i class="fa-regular fa-clock" style="margin-right: 4px;"></i>
+                                <span class="review-date">
+                                    <i class="fa-regular fa-clock"></i>
                                     <?= date('M j, Y', strtotime($review['created_at'])) ?>
                                 </span>
                             </div>
 
                             <!-- Star Rating -->
-                            <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 10px;">
-                                <div style="display: flex; gap: 2px;">
+                            <div class="review-rating">
+                                <div class="review-stars">
                                     <?php for ($i = 1; $i <= 5; $i++): ?>
                                         <?php if ($i <= $review['rating']): ?>
-                                            <i class="fa-solid fa-star" style="color: #f59e0b; font-size: 1rem;"></i>
+                                            <i class="fa-solid fa-star star-filled"></i>
                                         <?php else: ?>
-                                            <i class="fa-regular fa-star" style="color: #e5e7eb; font-size: 1rem;"></i>
+                                            <i class="fa-regular fa-star star-empty"></i>
                                         <?php endif; ?>
                                     <?php endfor; ?>
                                 </div>
-                                <span style="font-size: 0.85rem; font-weight: 600; color: #374151;"><?= $review['rating'] ?>/5</span>
+                                <span class="review-rating-text"><?= $review['rating'] ?>/5</span>
                             </div>
 
                             <!-- Review Comment -->
                             <?php if (!empty($review['comment'])): ?>
-                            <div style="color: #4b5563; font-size: 0.95rem; line-height: 1.6; background: rgba(255, 255, 255, 0.4); padding: 12px 16px; border-radius: 12px; border-left: 4px solid rgba(245, 158, 11, 0.5);">
-                                <i class="fa-solid fa-quote-left" style="color: #d1d5db; margin-right: 8px; font-size: 0.8rem;"></i>
+                            <div class="review-comment">
+                                <i class="fa-solid fa-quote-left quote-icon"></i>
                                 <?= nl2br(htmlspecialchars($review['comment'])) ?>
                             </div>
                             <?php endif; ?>
@@ -860,12 +862,12 @@ $basePath = \Nexus\Core\TenantContext::getBasePath();
             </div>
         <?php else: ?>
             <!-- Empty State -->
-            <div style="text-align: center; padding: 48px 32px; background: linear-gradient(135deg, rgba(255, 255, 255, 0.4), rgba(255, 255, 255, 0.2)); backdrop-filter: blur(10px); border-radius: 16px; border: 1px solid rgba(255, 255, 255, 0.3);">
-                <div style="width: 80px; height: 80px; margin: 0 auto 20px; background: linear-gradient(135deg, rgba(245, 158, 11, 0.15), rgba(217, 119, 6, 0.1)); border-radius: 50%; display: flex; align-items: center; justify-content: center;">
-                    <i class="fa-regular fa-star" style="font-size: 2rem; color: #f59e0b;"></i>
+            <div class="reviews-empty-state">
+                <div class="reviews-empty-icon">
+                    <i class="fa-regular fa-star"></i>
                 </div>
-                <h4 style="margin: 0 0 8px 0; font-size: 1.1rem; font-weight: 700; color: #374151;">No Reviews Yet</h4>
-                <p style="margin: 0; color: #6b7280; font-size: 0.95rem;">
+                <h4 class="reviews-empty-title">No Reviews Yet</h4>
+                <p class="reviews-empty-text">
                     <?php if ($isOwner): ?>
                         Complete exchanges with other members to receive reviews.
                     <?php else: ?>
@@ -873,7 +875,7 @@ $basePath = \Nexus\Core\TenantContext::getBasePath();
                     <?php endif; ?>
                 </p>
                 <?php if (isset($_SESSION['user_id']) && $_SESSION['user_id'] != $user['id']): ?>
-                <button onclick="openReviewModal()" class="glass-btn" style="margin-top: 20px; background: linear-gradient(135deg, rgba(245, 158, 11, 0.9), rgba(217, 119, 6, 0.9)); box-shadow: 0 4px 15px rgba(245, 158, 11, 0.3);">
+                <button onclick="openReviewModal()" class="glass-btn btn-write-review">
                     <i class="fa-solid fa-star"></i> Leave a Review
                 </button>
                 <?php endif; ?>
@@ -1508,7 +1510,7 @@ $basePath = \Nexus\Core\TenantContext::getBasePath();
                     <i class="fa-solid fa-xmark"></i>
                 </button>
                 <h3>
-                    <i class="fa-solid fa-star" style="margin-right: 10px;"></i>
+                    <i class="fa-solid fa-star review-modal-star-icon"></i>
                     Rate <?= htmlspecialchars($user['first_name']) ?>
                 </h3>
             </div>
@@ -1543,9 +1545,9 @@ $basePath = \Nexus\Core\TenantContext::getBasePath();
                     </div>
 
                     <!-- Comment -->
-                    <div style="margin-bottom: 8px;">
-                        <label style="font-weight: 700; font-size: 0.9rem; color: #374151; display: block; margin-bottom: 10px;">
-                            <i class="fa-solid fa-comment" style="margin-right: 6px; color: #64748b;"></i>
+                    <div class="review-comment-field">
+                        <label class="review-comment-label">
+                            <i class="fa-solid fa-comment"></i>
                             Comment (Optional)
                         </label>
                         <textarea id="profileReviewComment"
@@ -1585,12 +1587,12 @@ $basePath = \Nexus\Core\TenantContext::getBasePath();
             </a>
         <?php else: ?>
             <?php if ($canImpersonate): ?>
-            <form action="<?= \Nexus\Core\TenantContext::getBasePath() ?>/admin/impersonate" method="POST" onsubmit="return confirm('You are about to login as <?= htmlspecialchars($user['first_name'] . ' ' . $user['last_name']) ?>. Continue?');" style="display:inline; width: 100%;">
+            <form action="<?= \Nexus\Core\TenantContext::getBasePath() ?>/admin/impersonate" method="POST" onsubmit="return confirm('You are about to login as <?= htmlspecialchars($user['first_name'] . ' ' . $user['last_name']) ?>. Continue?');" class="fab-impersonate-form">
                 <?= Nexus\Core\Csrf::input() ?>
                 <input type="hidden" name="user_id" value="<?= $user['id'] ?>">
-                <button type="submit" class="profile-fab-item" style="width: 100%; text-align: left; background: linear-gradient(135deg, rgba(245, 158, 11, 0.2), rgba(217, 119, 6, 0.2)); border: 1px solid rgba(245, 158, 11, 0.3);">
-                    <i class="fa-solid fa-user-secret" style="color: #fbbf24;"></i>
-                    <span style="color: #fbbf24;">Login As User</span>
+                <button type="submit" class="profile-fab-item fab-impersonate-btn">
+                    <i class="fa-solid fa-user-secret"></i>
+                    <span>Login As User</span>
                 </button>
             </form>
             <?php endif; ?>
