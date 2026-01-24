@@ -243,7 +243,7 @@ $pageSpecificCSS = [
     // Search results
     'search' => [
         'condition' => strpos($normPath, '/search') !== false,
-        'files' => ['modern-search-results.css']
+        'files' => ['modern-search-results.css', 'search-results.css']
     ]
 ];
 
