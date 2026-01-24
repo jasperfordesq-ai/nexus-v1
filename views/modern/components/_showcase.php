@@ -34,19 +34,52 @@ function safeInclude($path, $vars = []) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Component Library Showcase - All 77 Components</title>
+
+    <!-- Core Framework CSS -->
     <link rel="stylesheet" href="<?= $basePath ?>/assets/css/design-tokens.css">
+    <link rel="stylesheet" href="<?= $basePath ?>/assets/css/nexus-phoenix.min.css">
+    <link rel="stylesheet" href="<?= $basePath ?>/assets/css/bundles/core.min.css">
+    <link rel="stylesheet" href="<?= $basePath ?>/assets/css/bundles/components.min.css">
+
+    <!-- Component CSS Bundles -->
+    <link rel="stylesheet" href="<?= $basePath ?>/assets/css/bundles/components-navigation.min.css">
+    <link rel="stylesheet" href="<?= $basePath ?>/assets/css/bundles/components-buttons.min.css">
+    <link rel="stylesheet" href="<?= $basePath ?>/assets/css/bundles/components-forms.min.css">
+    <link rel="stylesheet" href="<?= $basePath ?>/assets/css/bundles/components-cards.min.css">
+    <link rel="stylesheet" href="<?= $basePath ?>/assets/css/bundles/components-modals.min.css">
+    <link rel="stylesheet" href="<?= $basePath ?>/assets/css/bundles/components-notifications.min.css">
+
+    <!-- Utilities & Polish -->
+    <link rel="stylesheet" href="<?= $basePath ?>/assets/css/bundles/utilities-polish.min.css">
+    <link rel="stylesheet" href="<?= $basePath ?>/assets/css/bundles/enhancements.min.css">
+    <link rel="stylesheet" href="<?= $basePath ?>/assets/css/social-interactions.min.css">
+    <link rel="stylesheet" href="<?= $basePath ?>/assets/css/components.min.css">
+    <link rel="stylesheet" href="<?= $basePath ?>/assets/css/partials.min.css">
+    <link rel="stylesheet" href="<?= $basePath ?>/assets/css/avatar-placeholders.min.css">
+
+    <!-- Card & Glass Styles -->
+    <link rel="stylesheet" href="<?= $basePath ?>/assets/css/glass.min.css">
+    <link rel="stylesheet" href="<?= $basePath ?>/assets/css/card-hover-states.min.css">
+    <link rel="stylesheet" href="<?= $basePath ?>/assets/css/post-card.min.css">
+
+    <!-- Component Library Specific -->
     <link rel="stylesheet" href="<?= $basePath ?>/assets/css/modern/components-library.css">
+
+    <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
     <style>
         * { box-sizing: border-box; }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: var(--color-background, #f5f5f5);
+            font-family: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: var(--color-background, #f8fafc);
             color: var(--color-text, #1a1a1a);
             margin: 0;
             padding: 0;
-            line-height: 1.5;
+            line-height: 1.6;
         }
 
         .showcase {
@@ -57,60 +90,88 @@ function safeInclude($path, $vars = []) {
 
         .showcase__header {
             text-align: center;
-            padding: var(--space-8, 32px) 0;
+            padding: var(--space-10, 48px) var(--space-6, 24px);
             margin-bottom: var(--space-8, 32px);
-            border-bottom: 2px solid var(--color-border, #e5e5e5);
+            background: linear-gradient(135deg, var(--color-primary-600, #4f46e5) 0%, var(--color-primary-700, #4338ca) 100%);
+            border-radius: var(--radius-xl, 16px);
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .showcase__header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+            opacity: 0.5;
         }
 
         .showcase__title {
-            font-size: 2.5rem;
+            font-size: 2.75rem;
             font-weight: 700;
             margin: 0 0 var(--space-2, 8px);
+            position: relative;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
 
         .showcase__subtitle {
-            font-size: 1.125rem;
-            color: var(--color-text-muted, #666);
+            font-size: 1.25rem;
+            color: rgba(255,255,255,0.9);
             margin: 0;
+            position: relative;
         }
 
         .showcase__stats {
             display: flex;
             justify-content: center;
-            gap: var(--space-6, 24px);
-            margin-top: var(--space-4, 16px);
+            gap: var(--space-4, 16px);
+            margin-top: var(--space-5, 20px);
+            position: relative;
         }
 
         .showcase__stat {
-            background: var(--color-surface, #fff);
+            background: rgba(255,255,255,0.15);
+            backdrop-filter: blur(10px);
             padding: var(--space-3, 12px) var(--space-5, 20px);
             border-radius: var(--radius-lg, 8px);
-            border: 1px solid var(--color-border, #e5e5e5);
+            border: 1px solid rgba(255,255,255,0.2);
+            text-align: center;
         }
 
         .showcase__stat-value {
-            font-size: 1.5rem;
+            font-size: 1.75rem;
             font-weight: 700;
-            color: var(--color-primary-600, #4f46e5);
+            color: white;
+            display: block;
         }
 
         .showcase__stat-label {
-            font-size: 0.875rem;
-            color: var(--color-text-muted, #666);
+            font-size: 0.8rem;
+            color: rgba(255,255,255,0.8);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
 
         .showcase__toc {
             background: var(--color-surface, #fff);
-            padding: var(--space-4, 16px);
-            border-radius: var(--radius-lg, 8px);
+            padding: var(--space-5, 20px);
+            border-radius: var(--radius-xl, 16px);
             border: 1px solid var(--color-border, #e5e5e5);
             margin-bottom: var(--space-8, 32px);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.04);
         }
 
         .showcase__toc-title {
-            font-size: 1rem;
+            font-size: 0.8rem;
             font-weight: 600;
             margin: 0 0 var(--space-3, 12px);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--color-text-muted, #64748b);
         }
 
         .showcase__toc-list {
@@ -123,19 +184,29 @@ function safeInclude($path, $vars = []) {
         }
 
         .showcase__toc-item a {
-            display: inline-block;
-            padding: var(--space-1, 4px) var(--space-3, 12px);
-            background: var(--color-surface-alt, #f5f5f5);
-            border-radius: var(--radius-full, 9999px);
-            color: var(--color-text, #1a1a1a);
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: var(--space-2, 8px) var(--space-4, 16px);
+            background: var(--color-surface-alt, #f8fafc);
+            border-radius: var(--radius-lg, 8px);
+            color: var(--color-text, #1e293b);
             text-decoration: none;
             font-size: 0.875rem;
-            transition: all 0.15s;
+            font-weight: 500;
+            transition: all 0.2s;
+            border: 1px solid transparent;
         }
 
         .showcase__toc-item a:hover {
-            background: var(--color-primary-100, #e0e7ff);
+            background: var(--color-primary-50, #eef2ff);
             color: var(--color-primary-700, #4338ca);
+            border-color: var(--color-primary-200, #c7d2fe);
+            transform: translateY(-1px);
+        }
+
+        .showcase__toc-item a i {
+            opacity: 0.7;
         }
 
         .showcase__category {
@@ -146,41 +217,45 @@ function safeInclude($path, $vars = []) {
             display: flex;
             align-items: center;
             gap: var(--space-3, 12px);
-            padding: var(--space-4, 16px);
+            padding: var(--space-4, 16px) var(--space-5, 20px);
             background: var(--color-surface, #fff);
-            border-radius: var(--radius-lg, 8px);
+            border-radius: var(--radius-lg, 12px);
             border: 1px solid var(--color-border, #e5e5e5);
-            margin-bottom: var(--space-4, 16px);
+            margin-bottom: var(--space-5, 20px);
             position: sticky;
-            top: 0;
+            top: 12px;
             z-index: 10;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.06);
         }
 
         .showcase__category-icon {
-            width: 40px;
-            height: 40px;
+            width: 44px;
+            height: 44px;
             display: flex;
             align-items: center;
             justify-content: center;
-            background: var(--color-primary-100, #e0e7ff);
-            color: var(--color-primary-600, #4f46e5);
-            border-radius: var(--radius-md, 6px);
-            font-size: 1.125rem;
+            background: linear-gradient(135deg, var(--color-primary-500, #6366f1), var(--color-primary-600, #4f46e5));
+            color: white;
+            border-radius: var(--radius-lg, 10px);
+            font-size: 1.25rem;
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
         }
 
         .showcase__category-title {
-            font-size: 1.25rem;
+            font-size: 1.35rem;
             font-weight: 600;
             margin: 0;
+            color: var(--color-text, #1e293b);
         }
 
         .showcase__category-count {
             margin-left: auto;
-            background: var(--color-surface-alt, #f5f5f5);
-            padding: var(--space-1, 4px) var(--space-3, 12px);
+            background: var(--color-primary-50, #eef2ff);
+            color: var(--color-primary-700, #4338ca);
+            padding: var(--space-1, 4px) var(--space-4, 16px);
             border-radius: var(--radius-full, 9999px);
             font-size: 0.875rem;
-            color: var(--color-text-muted, #666);
+            font-weight: 500;
         }
 
         .showcase__grid {
@@ -191,14 +266,22 @@ function safeInclude($path, $vars = []) {
 
         .showcase__component {
             background: var(--color-surface, #fff);
-            border-radius: var(--radius-lg, 8px);
+            border-radius: var(--radius-lg, 12px);
             border: 1px solid var(--color-border, #e5e5e5);
             overflow: hidden;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.04), 0 4px 12px rgba(0,0,0,0.03);
+            transition: all 0.2s ease;
+        }
+
+        .showcase__component:hover {
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08), 0 8px 24px rgba(0,0,0,0.06);
+            transform: translateY(-2px);
+            border-color: var(--color-primary-200, #c7d2fe);
         }
 
         .showcase__component-header {
             padding: var(--space-3, 12px) var(--space-4, 16px);
-            background: var(--color-surface-alt, #f5f5f5);
+            background: linear-gradient(to right, var(--color-surface-alt, #f8fafc), var(--color-surface, #fff));
             border-bottom: 1px solid var(--color-border, #e5e5e5);
             display: flex;
             align-items: center;
@@ -207,22 +290,33 @@ function safeInclude($path, $vars = []) {
 
         .showcase__component-name {
             font-weight: 600;
-            font-size: 0.875rem;
+            font-size: 0.9rem;
             margin: 0;
+            color: var(--color-text, #1e293b);
         }
 
         .showcase__component-file {
-            font-size: 0.75rem;
-            color: var(--color-text-muted, #666);
-            font-family: monospace;
+            font-size: 0.7rem;
+            color: var(--color-primary-600, #4f46e5);
+            font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+            background: var(--color-primary-50, #eef2ff);
+            padding: 2px 8px;
+            border-radius: 4px;
         }
 
         .showcase__component-preview {
-            padding: var(--space-4, 16px);
-            min-height: 120px;
+            padding: var(--space-5, 20px);
+            min-height: 140px;
             display: flex;
             align-items: center;
             justify-content: center;
+            background: repeating-linear-gradient(
+                45deg,
+                transparent,
+                transparent 10px,
+                rgba(0,0,0,0.01) 10px,
+                rgba(0,0,0,0.01) 20px
+            );
         }
 
         .showcase__component-preview--left {
@@ -231,6 +325,12 @@ function safeInclude($path, $vars = []) {
 
         .showcase__component-preview--full {
             display: block;
+        }
+
+        .showcase__demo-text {
+            color: var(--color-text-muted, #94a3b8);
+            font-size: 0.875rem;
+            font-style: italic;
         }
 
         .showcase__back-to-top {
@@ -262,14 +362,77 @@ function safeInclude($path, $vars = []) {
             width: 100%;
         }
 
+        /* Smooth scroll */
+        html {
+            scroll-behavior: smooth;
+        }
+
+        /* Scroll margin for sticky header */
+        section[id] {
+            scroll-margin-top: 80px;
+        }
+
         @media (max-width: 768px) {
             .showcase__grid {
                 grid-template-columns: 1fr;
             }
 
             .showcase__stats {
-                flex-direction: column;
-                align-items: center;
+                flex-direction: row;
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+
+            .showcase__stat {
+                min-width: 100px;
+            }
+
+            .showcase__header {
+                padding: var(--space-6, 24px);
+            }
+
+            .showcase__title {
+                font-size: 1.75rem;
+            }
+
+            .showcase__subtitle {
+                font-size: 1rem;
+            }
+
+            .showcase__toc-list {
+                gap: var(--space-2, 8px);
+            }
+
+            .showcase__toc-item a {
+                padding: var(--space-1, 4px) var(--space-3, 12px);
+                font-size: 0.8rem;
+            }
+
+            .showcase__category-header {
+                top: 8px;
+                padding: var(--space-3, 12px);
+            }
+
+            .showcase__category-icon {
+                width: 36px;
+                height: 36px;
+                font-size: 1rem;
+            }
+
+            .showcase__category-title {
+                font-size: 1.1rem;
+            }
+        }
+
+        /* Print styles */
+        @media print {
+            .showcase__back-to-top,
+            .showcase__toc {
+                display: none;
+            }
+
+            .showcase__category-header {
+                position: static;
             }
         }
     </style>
@@ -297,20 +460,20 @@ function safeInclude($path, $vars = []) {
 
         <!-- Table of Contents -->
         <nav class="showcase__toc">
-            <h2 class="showcase__toc-title">Jump to Category:</h2>
+            <h2 class="showcase__toc-title">Jump to Category</h2>
             <ul class="showcase__toc-list">
-                <li class="showcase__toc-item"><a href="#layout">Layout (5)</a></li>
-                <li class="showcase__toc-item"><a href="#navigation">Navigation (6)</a></li>
-                <li class="showcase__toc-item"><a href="#cards">Cards (10)</a></li>
-                <li class="showcase__toc-item"><a href="#forms">Forms (15)</a></li>
-                <li class="showcase__toc-item"><a href="#buttons">Buttons (3)</a></li>
-                <li class="showcase__toc-item"><a href="#feedback">Feedback (6)</a></li>
-                <li class="showcase__toc-item"><a href="#media">Media (5)</a></li>
-                <li class="showcase__toc-item"><a href="#data">Data (4)</a></li>
-                <li class="showcase__toc-item"><a href="#interactive">Interactive (7)</a></li>
-                <li class="showcase__toc-item"><a href="#social">Social (3)</a></li>
-                <li class="showcase__toc-item"><a href="#shared">Shared (2)</a></li>
-                <li class="showcase__toc-item"><a href="#nexus">Nexus Score (6)</a></li>
+                <li class="showcase__toc-item"><a href="#layout"><i class="fa-solid fa-layer-group"></i> Layout (5)</a></li>
+                <li class="showcase__toc-item"><a href="#navigation"><i class="fa-solid fa-compass"></i> Navigation (6)</a></li>
+                <li class="showcase__toc-item"><a href="#cards"><i class="fa-solid fa-id-card"></i> Cards (10)</a></li>
+                <li class="showcase__toc-item"><a href="#forms"><i class="fa-solid fa-keyboard"></i> Forms (15)</a></li>
+                <li class="showcase__toc-item"><a href="#buttons"><i class="fa-solid fa-hand-pointer"></i> Buttons (3)</a></li>
+                <li class="showcase__toc-item"><a href="#feedback"><i class="fa-solid fa-bell"></i> Feedback (6)</a></li>
+                <li class="showcase__toc-item"><a href="#media"><i class="fa-solid fa-image"></i> Media (5)</a></li>
+                <li class="showcase__toc-item"><a href="#data"><i class="fa-solid fa-table"></i> Data (4)</a></li>
+                <li class="showcase__toc-item"><a href="#interactive"><i class="fa-solid fa-hand-sparkles"></i> Interactive (7)</a></li>
+                <li class="showcase__toc-item"><a href="#social"><i class="fa-solid fa-share-nodes"></i> Social (3)</a></li>
+                <li class="showcase__toc-item"><a href="#shared"><i class="fa-solid fa-puzzle-piece"></i> Shared (2)</a></li>
+                <li class="showcase__toc-item"><a href="#nexus"><i class="fa-solid fa-chart-line"></i> Nexus Score (6)</a></li>
             </ul>
         </nav>
 
