@@ -4,6 +4,8 @@
  * Theme Color: Blue (#3b82f6)
  * Tenant: Hour Timebank Ireland
  * Legal Entity: hOUR Timebank CLG (RCN 20162023)
+ *
+ * Updated: January 2026 - Insurance feedback incorporated
  */
 $pageTitle = 'Terms of Service';
 $hideHero = true;
@@ -20,821 +22,7 @@ if (class_exists('Nexus\Core\TenantContext')) {
 }
 ?>
 
-<style>
-/* ============================================
-   TERMS OF SERVICE - GLASSMORPHISM 2025
-   Theme: Blue (#3b82f6)
-   ============================================ */
-
-#terms-glass-wrapper {
-    --terms-theme: #3b82f6;
-    --terms-theme-rgb: 59, 130, 246;
-    --terms-theme-light: #60a5fa;
-    --terms-theme-dark: #2563eb;
-    position: relative;
-    min-height: 100vh;
-    padding: 160px 1rem 4rem;
-}
-
-@media (max-width: 900px) {
-    #terms-glass-wrapper {
-        padding-top: 120px;
-    }
-}
-
-#terms-glass-wrapper::before {
-    content: '';
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    z-index: -1;
-    transition: opacity 0.3s ease;
-}
-
-[data-theme="light"] #terms-glass-wrapper::before {
-    background: linear-gradient(135deg,
-        rgba(59, 130, 246, 0.08) 0%,
-        rgba(96, 165, 250, 0.08) 25%,
-        rgba(37, 99, 235, 0.08) 50%,
-        rgba(59, 130, 246, 0.08) 75%,
-        rgba(96, 165, 250, 0.08) 100%);
-    background-size: 400% 400%;
-    animation: termsGradientShift 15s ease infinite;
-}
-
-[data-theme="dark"] #terms-glass-wrapper::before {
-    background:
-        radial-gradient(ellipse at 20% 20%, rgba(59, 130, 246, 0.15) 0%, transparent 50%),
-        radial-gradient(ellipse at 80% 80%, rgba(37, 99, 235, 0.1) 0%, transparent 50%),
-        radial-gradient(ellipse at 50% 50%, rgba(96, 165, 250, 0.05) 0%, transparent 70%);
-}
-
-@keyframes termsGradientShift {
-    0%, 100% { background-position: 0% 50%; }
-    50% { background-position: 100% 50%; }
-}
-
-@keyframes termsFadeInUp {
-    from { opacity: 0; transform: translateY(20px); }
-    to { opacity: 1; transform: translateY(0); }
-}
-
-#terms-glass-wrapper {
-    animation: termsFadeInUp 0.4s ease-out;
-}
-
-#terms-glass-wrapper .terms-inner {
-    max-width: 900px;
-    margin: 0 auto;
-}
-
-/* Page Header */
-#terms-glass-wrapper .terms-page-header {
-    text-align: center;
-    margin-bottom: 2rem;
-}
-
-#terms-glass-wrapper .terms-page-header h1 {
-    font-size: 2.5rem;
-    font-weight: 800;
-    color: var(--htb-text-main);
-    margin: 0 0 0.75rem 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.75rem;
-}
-
-#terms-glass-wrapper .terms-page-header .header-icon {
-    width: 60px;
-    height: 60px;
-    border-radius: 16px;
-    background: linear-gradient(135deg, var(--terms-theme) 0%, var(--terms-theme-dark) 100%);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.75rem;
-    color: white;
-    box-shadow: 0 8px 24px rgba(59, 130, 246, 0.4);
-}
-
-#terms-glass-wrapper .terms-page-header p {
-    color: var(--htb-text-muted);
-    font-size: 1.15rem;
-    margin: 0;
-    max-width: 600px;
-    margin: 0 auto;
-}
-
-#terms-glass-wrapper .terms-page-header .last-updated {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-    margin-top: 1rem;
-    padding: 0.5rem 1rem;
-    border-radius: 50px;
-    font-size: 0.85rem;
-    font-weight: 600;
-}
-
-[data-theme="light"] #terms-glass-wrapper .terms-page-header .last-updated {
-    background: rgba(59, 130, 246, 0.1);
-    color: var(--terms-theme-dark);
-}
-
-[data-theme="dark"] #terms-glass-wrapper .terms-page-header .last-updated {
-    background: rgba(59, 130, 246, 0.2);
-    color: var(--terms-theme-light);
-}
-
-/* Quick Navigation */
-#terms-glass-wrapper .terms-quick-nav {
-    display: flex;
-    justify-content: center;
-    gap: 0.75rem;
-    margin-bottom: 2.5rem;
-    flex-wrap: wrap;
-}
-
-#terms-glass-wrapper .terms-nav-btn {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 0.65rem 1.15rem;
-    border-radius: 50px;
-    font-weight: 600;
-    font-size: 0.85rem;
-    text-decoration: none;
-    transition: all 0.3s ease;
-    cursor: pointer;
-}
-
-[data-theme="light"] #terms-glass-wrapper .terms-nav-btn {
-    background: rgba(255, 255, 255, 0.7);
-    color: var(--htb-text-main);
-    border: 1px solid rgba(59, 130, 246, 0.2);
-    box-shadow: 0 2px 8px rgba(59, 130, 246, 0.1);
-}
-
-[data-theme="dark"] #terms-glass-wrapper .terms-nav-btn {
-    background: rgba(30, 41, 59, 0.7);
-    color: var(--htb-text-main);
-    border: 1px solid rgba(59, 130, 246, 0.3);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-}
-
-#terms-glass-wrapper .terms-nav-btn:hover {
-    transform: translateY(-2px);
-    border-color: var(--terms-theme);
-}
-
-[data-theme="light"] #terms-glass-wrapper .terms-nav-btn:hover {
-    background: rgba(255, 255, 255, 0.9);
-    box-shadow: 0 4px 16px rgba(59, 130, 246, 0.2);
-}
-
-[data-theme="dark"] #terms-glass-wrapper .terms-nav-btn:hover {
-    background: rgba(30, 41, 59, 0.9);
-    box-shadow: 0 4px 16px rgba(59, 130, 246, 0.3);
-}
-
-/* Terms Section Card */
-#terms-glass-wrapper .terms-section {
-    backdrop-filter: blur(20px) saturate(120%);
-    -webkit-backdrop-filter: blur(20px) saturate(120%);
-    border-radius: 20px;
-    padding: 2rem;
-    margin-bottom: 1.5rem;
-    transition: all 0.3s ease;
-    position: relative;
-    overflow: hidden;
-}
-
-[data-theme="light"] #terms-glass-wrapper .terms-section {
-    background: rgba(255, 255, 255, 0.7);
-    border: 1px solid rgba(59, 130, 246, 0.15);
-    box-shadow: 0 8px 32px rgba(59, 130, 246, 0.1);
-}
-
-[data-theme="dark"] #terms-glass-wrapper .terms-section {
-    background: rgba(30, 41, 59, 0.6);
-    border: 1px solid rgba(59, 130, 246, 0.2);
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-}
-
-#terms-glass-wrapper .terms-section:hover {
-    transform: translateY(-2px);
-}
-
-[data-theme="light"] #terms-glass-wrapper .terms-section:hover {
-    box-shadow: 0 12px 40px rgba(59, 130, 246, 0.15);
-}
-
-[data-theme="dark"] #terms-glass-wrapper .terms-section:hover {
-    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
-}
-
-#terms-glass-wrapper .terms-section .section-header {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    margin-bottom: 1.25rem;
-}
-
-#terms-glass-wrapper .terms-section .section-number {
-    width: 40px;
-    height: 40px;
-    border-radius: 12px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.1rem;
-    font-weight: 800;
-    flex-shrink: 0;
-}
-
-[data-theme="light"] #terms-glass-wrapper .terms-section .section-number,
-[data-theme="dark"] #terms-glass-wrapper .terms-section .section-number {
-    background: linear-gradient(135deg, var(--terms-theme) 0%, var(--terms-theme-dark) 100%);
-    color: white;
-}
-
-#terms-glass-wrapper .terms-section .section-icon {
-    width: 48px;
-    height: 48px;
-    border-radius: 14px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.35rem;
-    flex-shrink: 0;
-}
-
-[data-theme="light"] #terms-glass-wrapper .terms-section .section-icon {
-    background: linear-gradient(135deg, rgba(59, 130, 246, 0.15) 0%, rgba(59, 130, 246, 0.05) 100%);
-    color: var(--terms-theme);
-}
-
-[data-theme="dark"] #terms-glass-wrapper .terms-section .section-icon {
-    background: linear-gradient(135deg, rgba(59, 130, 246, 0.25) 0%, rgba(59, 130, 246, 0.1) 100%);
-    color: var(--terms-theme-light);
-}
-
-#terms-glass-wrapper .terms-section .section-header h2 {
-    font-size: 1.35rem;
-    font-weight: 700;
-    color: var(--htb-text-main);
-    margin: 0;
-}
-
-#terms-glass-wrapper .terms-section p {
-    color: var(--htb-text-muted);
-    font-size: 1rem;
-    line-height: 1.75;
-    margin: 0 0 1rem 0;
-}
-
-#terms-glass-wrapper .terms-section p:last-child {
-    margin-bottom: 0;
-}
-
-#terms-glass-wrapper .terms-section strong {
-    color: var(--htb-text-main);
-}
-
-#terms-glass-wrapper .terms-section ul,
-#terms-glass-wrapper .terms-section ol {
-    margin: 1rem 0;
-    padding-left: 0;
-    list-style: none;
-}
-
-#terms-glass-wrapper .terms-section ul li,
-#terms-glass-wrapper .terms-section ol li {
-    position: relative;
-    padding-left: 1.75rem;
-    margin-bottom: 0.75rem;
-    color: var(--htb-text-muted);
-    line-height: 1.6;
-}
-
-#terms-glass-wrapper .terms-section ul li::before {
-    content: '';
-    position: absolute;
-    left: 0;
-    top: 0.5rem;
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    background: var(--terms-theme);
-}
-
-#terms-glass-wrapper .terms-section ol {
-    counter-reset: terms-counter;
-}
-
-#terms-glass-wrapper .terms-section ol li {
-    counter-increment: terms-counter;
-}
-
-#terms-glass-wrapper .terms-section ol li::before {
-    content: counter(terms-counter);
-    position: absolute;
-    left: 0;
-    top: 0;
-    width: 20px;
-    height: 20px;
-    border-radius: 6px;
-    background: var(--terms-theme);
-    color: white;
-    font-size: 0.75rem;
-    font-weight: 700;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-/* Highlight Section */
-#terms-glass-wrapper .terms-section.highlight {
-    border-left: 4px solid var(--terms-theme);
-}
-
-[data-theme="light"] #terms-glass-wrapper .terms-section.highlight {
-    background: linear-gradient(135deg, rgba(59, 130, 246, 0.08) 0%, rgba(255, 255, 255, 0.7) 100%);
-}
-
-[data-theme="dark"] #terms-glass-wrapper .terms-section.highlight {
-    background: linear-gradient(135deg, rgba(59, 130, 246, 0.15) 0%, rgba(30, 41, 59, 0.6) 100%);
-}
-
-/* Important Notice */
-#terms-glass-wrapper .terms-notice {
-    display: flex;
-    align-items: flex-start;
-    gap: 1rem;
-    padding: 1.25rem;
-    border-radius: 14px;
-    margin: 1.5rem 0;
-}
-
-[data-theme="light"] #terms-glass-wrapper .terms-notice {
-    background: rgba(59, 130, 246, 0.08);
-    border: 1px solid rgba(59, 130, 246, 0.15);
-}
-
-[data-theme="dark"] #terms-glass-wrapper .terms-notice {
-    background: rgba(59, 130, 246, 0.12);
-    border: 1px solid rgba(59, 130, 246, 0.2);
-}
-
-#terms-glass-wrapper .terms-notice .notice-icon {
-    font-size: 1.5rem;
-    flex-shrink: 0;
-}
-
-#terms-glass-wrapper .terms-notice .notice-content h4 {
-    font-size: 1rem;
-    font-weight: 700;
-    color: var(--htb-text-main);
-    margin: 0 0 0.5rem 0;
-}
-
-#terms-glass-wrapper .terms-notice .notice-content p {
-    margin: 0;
-    font-size: 0.95rem;
-}
-
-/* Time Credit Visual */
-#terms-glass-wrapper .time-credit-visual {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 1.5rem;
-    padding: 2rem;
-    margin: 1.5rem 0;
-    border-radius: 16px;
-}
-
-[data-theme="light"] #terms-glass-wrapper .time-credit-visual {
-    background: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(59, 130, 246, 0.05) 100%);
-    border: 1px solid rgba(59, 130, 246, 0.15);
-}
-
-[data-theme="dark"] #terms-glass-wrapper .time-credit-visual {
-    background: linear-gradient(135deg, rgba(59, 130, 246, 0.15) 0%, rgba(59, 130, 246, 0.08) 100%);
-    border: 1px solid rgba(59, 130, 246, 0.2);
-}
-
-#terms-glass-wrapper .time-credit-visual .credit-box {
-    text-align: center;
-}
-
-#terms-glass-wrapper .time-credit-visual .credit-icon {
-    width: 60px;
-    height: 60px;
-    border-radius: 16px;
-    margin: 0 auto 0.75rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.75rem;
-}
-
-[data-theme="light"] #terms-glass-wrapper .time-credit-visual .credit-icon {
-    background: rgba(255, 255, 255, 0.8);
-    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.2);
-}
-
-[data-theme="dark"] #terms-glass-wrapper .time-credit-visual .credit-icon {
-    background: rgba(30, 41, 59, 0.8);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-}
-
-#terms-glass-wrapper .time-credit-visual .credit-label {
-    font-size: 0.9rem;
-    font-weight: 600;
-    color: var(--htb-text-main);
-}
-
-#terms-glass-wrapper .time-credit-visual .equals-sign {
-    font-size: 2rem;
-    font-weight: 800;
-    color: var(--terms-theme);
-}
-
-/* Prohibited Items Grid */
-#terms-glass-wrapper .prohibited-grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 1rem;
-    margin: 1.5rem 0;
-}
-
-#terms-glass-wrapper .prohibited-item {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-    padding: 1rem;
-    border-radius: 12px;
-}
-
-[data-theme="light"] #terms-glass-wrapper .prohibited-item {
-    background: rgba(239, 68, 68, 0.08);
-    border: 1px solid rgba(239, 68, 68, 0.15);
-}
-
-[data-theme="dark"] #terms-glass-wrapper .prohibited-item {
-    background: rgba(239, 68, 68, 0.12);
-    border: 1px solid rgba(239, 68, 68, 0.2);
-}
-
-#terms-glass-wrapper .prohibited-item .prohibited-icon {
-    width: 36px;
-    height: 36px;
-    border-radius: 10px;
-    background: rgba(239, 68, 68, 0.15);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: #ef4444;
-    font-size: 1rem;
-    flex-shrink: 0;
-}
-
-#terms-glass-wrapper .prohibited-item span {
-    font-size: 0.95rem;
-    color: var(--htb-text-muted);
-    font-weight: 500;
-}
-
-/* Entity Info Box */
-#terms-glass-wrapper .entity-info {
-    padding: 1.5rem;
-    border-radius: 14px;
-    margin: 1.5rem 0;
-}
-
-[data-theme="light"] #terms-glass-wrapper .entity-info {
-    background: rgba(59, 130, 246, 0.05);
-    border: 1px solid rgba(59, 130, 246, 0.15);
-}
-
-[data-theme="dark"] #terms-glass-wrapper .entity-info {
-    background: rgba(59, 130, 246, 0.1);
-    border: 1px solid rgba(59, 130, 246, 0.2);
-}
-
-#terms-glass-wrapper .entity-info dl {
-    margin: 0;
-    display: grid;
-    grid-template-columns: auto 1fr;
-    gap: 0.5rem 1.5rem;
-}
-
-#terms-glass-wrapper .entity-info dt {
-    font-weight: 700;
-    color: var(--htb-text-main);
-    font-size: 0.9rem;
-}
-
-#terms-glass-wrapper .entity-info dd {
-    margin: 0;
-    color: var(--htb-text-muted);
-    font-size: 0.95rem;
-}
-
-#terms-glass-wrapper .entity-info dd a {
-    color: var(--terms-theme);
-    text-decoration: none;
-}
-
-#terms-glass-wrapper .entity-info dd a:hover {
-    text-decoration: underline;
-}
-
-/* Partner Org Features */
-#terms-glass-wrapper .partner-features {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 1rem;
-    margin: 1.5rem 0;
-}
-
-#terms-glass-wrapper .partner-feature {
-    display: flex;
-    align-items: flex-start;
-    gap: 0.75rem;
-    padding: 1rem;
-    border-radius: 12px;
-}
-
-[data-theme="light"] #terms-glass-wrapper .partner-feature {
-    background: rgba(34, 197, 94, 0.08);
-    border: 1px solid rgba(34, 197, 94, 0.15);
-}
-
-[data-theme="dark"] #terms-glass-wrapper .partner-feature {
-    background: rgba(34, 197, 94, 0.12);
-    border: 1px solid rgba(34, 197, 94, 0.2);
-}
-
-#terms-glass-wrapper .partner-feature .feature-icon {
-    width: 36px;
-    height: 36px;
-    border-radius: 10px;
-    background: rgba(34, 197, 94, 0.15);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: #22c55e;
-    font-size: 1rem;
-    flex-shrink: 0;
-}
-
-#terms-glass-wrapper .partner-feature .feature-text {
-    flex: 1;
-}
-
-#terms-glass-wrapper .partner-feature .feature-text strong {
-    display: block;
-    color: var(--htb-text-main);
-    font-size: 0.95rem;
-    margin-bottom: 0.25rem;
-}
-
-#terms-glass-wrapper .partner-feature .feature-text span {
-    font-size: 0.85rem;
-    color: var(--htb-text-muted);
-    line-height: 1.4;
-}
-
-/* Contact CTA */
-#terms-glass-wrapper .terms-cta {
-    text-align: center;
-    padding: 3rem 2rem;
-    border-radius: 20px;
-    backdrop-filter: blur(20px) saturate(120%);
-    -webkit-backdrop-filter: blur(20px) saturate(120%);
-    margin-top: 2rem;
-}
-
-[data-theme="light"] #terms-glass-wrapper .terms-cta {
-    background: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(59, 130, 246, 0.05) 100%);
-    border: 1px solid rgba(59, 130, 246, 0.2);
-}
-
-[data-theme="dark"] #terms-glass-wrapper .terms-cta {
-    background: linear-gradient(135deg, rgba(59, 130, 246, 0.2) 0%, rgba(59, 130, 246, 0.1) 100%);
-    border: 1px solid rgba(59, 130, 246, 0.3);
-}
-
-#terms-glass-wrapper .terms-cta h2 {
-    font-size: 1.75rem;
-    font-weight: 800;
-    color: var(--htb-text-main);
-    margin: 0 0 0.75rem 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.75rem;
-}
-
-#terms-glass-wrapper .terms-cta p {
-    color: var(--htb-text-muted);
-    font-size: 1.05rem;
-    line-height: 1.6;
-    max-width: 600px;
-    margin: 0 auto 1.5rem auto;
-}
-
-#terms-glass-wrapper .terms-cta-btn {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 0.875rem 2rem;
-    border-radius: 50px;
-    font-weight: 600;
-    font-size: 1rem;
-    text-decoration: none;
-    transition: all 0.3s ease;
-    background: linear-gradient(135deg, var(--terms-theme) 0%, var(--terms-theme-dark) 100%);
-    color: white;
-    box-shadow: 0 4px 16px rgba(59, 130, 246, 0.4);
-}
-
-#terms-glass-wrapper .terms-cta-btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 24px rgba(59, 130, 246, 0.5);
-}
-
-/* Back to Legal Link */
-#terms-glass-wrapper .back-link {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-    margin-bottom: 1.5rem;
-    font-size: 0.9rem;
-    font-weight: 600;
-    text-decoration: none;
-    transition: all 0.2s ease;
-}
-
-[data-theme="light"] #terms-glass-wrapper .back-link {
-    color: var(--terms-theme-dark);
-}
-
-[data-theme="dark"] #terms-glass-wrapper .back-link {
-    color: var(--terms-theme-light);
-}
-
-#terms-glass-wrapper .back-link:hover {
-    gap: 0.75rem;
-}
-
-/* ========================================
-   RESPONSIVE
-   ======================================== */
-@media (max-width: 768px) {
-    #terms-glass-wrapper {
-        padding: 120px 1rem 3rem;
-    }
-
-    #terms-glass-wrapper .terms-page-header h1 {
-        font-size: 1.85rem;
-        flex-direction: column;
-        gap: 1rem;
-    }
-
-    #terms-glass-wrapper .terms-page-header .header-icon {
-        width: 56px;
-        height: 56px;
-        font-size: 1.5rem;
-    }
-
-    #terms-glass-wrapper .terms-page-header p {
-        font-size: 1rem;
-    }
-
-    #terms-glass-wrapper .terms-quick-nav {
-        gap: 0.5rem;
-    }
-
-    #terms-glass-wrapper .terms-nav-btn {
-        padding: 0.5rem 0.9rem;
-        font-size: 0.8rem;
-    }
-
-    #terms-glass-wrapper .terms-section {
-        padding: 1.5rem;
-    }
-
-    #terms-glass-wrapper .terms-section .section-header {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 0.75rem;
-    }
-
-    #terms-glass-wrapper .terms-section .section-icon {
-        width: 42px;
-        height: 42px;
-        font-size: 1.15rem;
-    }
-
-    #terms-glass-wrapper .terms-section .section-header h2 {
-        font-size: 1.2rem;
-    }
-
-    #terms-glass-wrapper .prohibited-grid,
-    #terms-glass-wrapper .partner-features {
-        grid-template-columns: 1fr;
-    }
-
-    #terms-glass-wrapper .time-credit-visual {
-        flex-direction: column;
-        gap: 1rem;
-        padding: 1.5rem;
-    }
-
-    #terms-glass-wrapper .time-credit-visual .equals-sign {
-        transform: rotate(90deg);
-    }
-
-    #terms-glass-wrapper .terms-notice {
-        flex-direction: column;
-        text-align: center;
-    }
-
-    #terms-glass-wrapper .entity-info dl {
-        grid-template-columns: 1fr;
-        gap: 0.25rem;
-    }
-
-    #terms-glass-wrapper .entity-info dt {
-        margin-top: 0.75rem;
-    }
-
-    #terms-glass-wrapper .entity-info dt:first-child {
-        margin-top: 0;
-    }
-
-    #terms-glass-wrapper .terms-cta {
-        padding: 2rem 1.5rem;
-    }
-
-    #terms-glass-wrapper .terms-cta h2 {
-        font-size: 1.35rem;
-        flex-direction: column;
-        gap: 0.5rem;
-    }
-
-    @keyframes termsGradientShift {
-        0%, 100% { background-position: 50% 50%; }
-    }
-}
-
-/* Touch Targets */
-#terms-glass-wrapper .terms-nav-btn,
-#terms-glass-wrapper .terms-cta-btn {
-    min-height: 44px;
-}
-
-@media (max-width: 768px) {
-    #terms-glass-wrapper .terms-nav-btn,
-    #terms-glass-wrapper .terms-cta-btn {
-        min-height: 48px;
-    }
-}
-
-/* Button Press States */
-#terms-glass-wrapper .terms-nav-btn:active,
-#terms-glass-wrapper .terms-cta-btn:active {
-    transform: scale(0.96) !important;
-    transition: transform 0.1s ease !important;
-}
-
-/* Focus Visible */
-#terms-glass-wrapper .terms-nav-btn:focus-visible,
-#terms-glass-wrapper .terms-cta-btn:focus-visible,
-#terms-glass-wrapper .back-link:focus-visible {
-    outline: 3px solid rgba(59, 130, 246, 0.5);
-    outline-offset: 2px;
-}
-
-/* Browser Fallback */
-@supports not (backdrop-filter: blur(10px)) {
-    [data-theme="light"] #terms-glass-wrapper .terms-section,
-    [data-theme="light"] #terms-glass-wrapper .terms-cta {
-        background: rgba(255, 255, 255, 0.95);
-    }
-
-    [data-theme="dark"] #terms-glass-wrapper .terms-section,
-    [data-theme="dark"] #terms-glass-wrapper .terms-cta {
-        background: rgba(30, 41, 59, 0.95);
-    }
-}
-</style>
+<!-- Terms Page Styles - Loaded via page-specific CSS loader in header.php -->
 
 <div id="terms-glass-wrapper">
     <div class="terms-inner">
@@ -860,6 +48,9 @@ if (class_exists('Nexus\Core\TenantContext')) {
 
         <!-- Quick Navigation -->
         <div class="terms-quick-nav">
+            <a href="#platform-role" class="terms-nav-btn">
+                <i class="fa-solid fa-diagram-project"></i> Platform Role
+            </a>
             <a href="#who-we-are" class="terms-nav-btn">
                 <i class="fa-solid fa-building"></i> Who We Are
             </a>
@@ -889,6 +80,45 @@ if (class_exists('Nexus\Core\TenantContext')) {
             <p>By accessing or using hOUR Timebank Ireland (accessible at <strong>hour-timebank.ie</strong>), you agree to be bound by these Terms of Service. Please read them carefully before participating in our community.</p>
             <p>These terms establish a framework for <strong>fair, respectful, and meaningful exchanges</strong> between community members across Ireland. Our goal is to create a trusted environment where everyone's time is valued equally.</p>
             <p>If you are using the platform on behalf of an organisation, you represent that you have authority to bind that organisation to these terms.</p>
+        </div>
+
+        <!-- Platform Role & Disclaimer -->
+        <div class="terms-section highlight" id="platform-role">
+            <div class="section-header">
+                <div class="section-icon"><i class="fa-solid fa-diagram-project"></i></div>
+                <h2>Platform Role & Responsibility</h2>
+            </div>
+            <p><strong>hOUR Timebank Ireland is a connection platform only.</strong> We provide technology and tools that enable community members to find and arrange service exchanges with each other.</p>
+
+            <div class="terms-notice" style="border-left: 4px solid #3b82f6;">
+                <span class="notice-icon" style="color: #3b82f6;"><i class="fa-solid fa-circle-info"></i></span>
+                <div class="notice-content">
+                    <h4>Critical Distinction</h4>
+                    <p><strong>We are NOT a service provider.</strong> We do not perform, supervise, direct, or control any services exchanged between members. We are similar to online platforms like Yelp, Facebook Marketplace, or community notice boards — we facilitate connections, but the actual exchanges are entirely between independent members.</p>
+                </div>
+            </div>
+
+            <p><strong>What We Do:</strong></p>
+            <ul>
+                <li>Provide a platform for members to create profiles and list services they can offer or need</li>
+                <li>Facilitate communication between members through messaging features</li>
+                <li>Track Time Credits earned and spent by members</li>
+                <li>Offer tools for members to review and provide feedback on exchanges</li>
+                <li>Moderate content to ensure compliance with community guidelines</li>
+                <li>Provide support and guidance on how to use the platform</li>
+            </ul>
+
+            <p><strong>What We Do NOT Do:</strong></p>
+            <ul>
+                <li>Perform any services on behalf of members</li>
+                <li>Employ, hire, or contract with members to provide services</li>
+                <li>Supervise, direct, or control how services are performed</li>
+                <li>Verify the quality, safety, or suitability of services</li>
+                <li>Act as an agent, intermediary, or representative in exchanges</li>
+                <li>Guarantee outcomes or resolve service quality disputes</li>
+            </ul>
+
+            <p>By using this platform, you acknowledge that <strong>all service exchanges are direct arrangements between independent members</strong>, and hOUR Timebank CLG bears no responsibility for the quality, safety, or outcome of those exchanges.</p>
         </div>
 
         <!-- Who We Are -->
@@ -958,10 +188,64 @@ if (class_exists('Nexus\Core\TenantContext')) {
             </ul>
         </div>
 
+        <!-- Transaction Recording -->
+        <div class="terms-section" id="transactions">
+            <div class="section-header">
+                <div class="section-number">3</div>
+                <h2>Transaction Recording & Verification</h2>
+            </div>
+            <p>When members complete a service exchange, Time Credits must be recorded through the platform. Here's how the process works:</p>
+
+            <p><strong>Recording an Exchange:</strong></p>
+            <ol>
+                <li><strong>Service Provider Initiates:</strong> After completing a service, the provider records the exchange through the platform, specifying the recipient and hours provided</li>
+                <li><strong>Recipient Confirms:</strong> The recipient receives a notification and must confirm or dispute the exchange within 7 days</li>
+                <li><strong>Credits Transfer:</strong> Upon confirmation (or after 7 days if no dispute is raised), Time Credits are automatically transferred</li>
+                <li><strong>Both Parties Notified:</strong> Both members receive confirmation of the completed transaction</li>
+            </ol>
+
+            <p><strong>Transaction Disputes:</strong></p>
+            <p>If a recipient believes a transaction record is inaccurate (wrong hours, service not completed, etc.), they may dispute it within 7 days:</p>
+
+            <ul>
+                <li><strong>Dispute Window:</strong> 7 days from receipt of transaction notification</li>
+                <li><strong>Dispute Process:</strong> The recipient can reject the transaction and provide a reason</li>
+                <li><strong>Member Resolution:</strong> Members are encouraged to communicate directly to resolve the discrepancy</li>
+                <li><strong>Platform Mediation:</strong> If members cannot agree, either party may request platform mediation (see Section 14: Dispute Resolution)</li>
+                <li><strong>Final Decision:</strong> hOUR Timebank CLG reserves the right to make a final determination based on available evidence, including messages, previous transaction history, and member statements</li>
+            </ul>
+
+            <div class="terms-notice">
+                <span class="notice-icon"><i class="fa-solid fa-file-invoice"></i></span>
+                <div class="notice-content">
+                    <h4>Keep Your Own Records</h4>
+                    <p>We recommend members maintain their own records of exchanges, including dates, services provided, hours worked, and any agreements made. This helps resolve disputes quickly and fairly.</p>
+                </div>
+            </div>
+
+            <p><strong>Fraudulent Transactions:</strong></p>
+            <p>Recording transactions that did not occur, inflating hours, or otherwise misrepresenting exchanges is strictly prohibited and will result in:</p>
+            <ul>
+                <li>Immediate reversal of fraudulent credits</li>
+                <li>Formal warning or account suspension</li>
+                <li>Permanent account termination for repeated violations</li>
+                <li>Potential referral to An Garda Síochána for fraud</li>
+            </ul>
+
+            <p><strong>Platform Fees:</strong></p>
+            <p>hOUR Timebank Ireland operates on a <strong>not-for-profit basis</strong>. There are currently:</p>
+            <ul>
+                <li><strong>No transaction fees</strong> — Members do not pay to record exchanges</li>
+                <li><strong>No membership fees</strong> — Platform use is free for individual members</li>
+                <li><strong>Partner Organisation Fees:</strong> Partner organisations may be charged a modest annual fee to cover platform hosting and support costs</li>
+            </ul>
+            <p>Should we ever introduce fees for individual members, you will be notified at least 60 days in advance and given the option to close your account before any fees apply.</p>
+        </div>
+
         <!-- Safeguarding - Prohibited Services -->
         <div class="terms-section highlight" id="safeguarding">
             <div class="section-header">
-                <div class="section-number">3</div>
+                <div class="section-number">4</div>
                 <h2>Safeguarding & Prohibited Services</h2>
             </div>
             <p>hOUR Timebank CLG takes safeguarding seriously. Under the <strong>National Vetting Bureau (Children and Vulnerable Persons) Acts 2012-2016</strong>, certain activities involving children or vulnerable persons require Garda Vetting by a Registered Organisation.</p>
@@ -1045,7 +329,7 @@ if (class_exists('Nexus\Core\TenantContext')) {
         <!-- Partner Organisations -->
         <div class="terms-section highlight" id="partners">
             <div class="section-header">
-                <div class="section-number">4</div>
+                <div class="section-number">5</div>
                 <h2>Partner Organisations</h2>
             </div>
             <p>hOUR Timebank Ireland provides platform services to Irish community groups, voluntary organisations, charities, and other relevant bodies ("Partner Organisations") who wish to operate timebanking within their communities.</p>
@@ -1096,7 +380,7 @@ if (class_exists('Nexus\Core\TenantContext')) {
         <!-- Account Responsibilities -->
         <div class="terms-section">
             <div class="section-header">
-                <div class="section-number">5</div>
+                <div class="section-number">6</div>
                 <h2>Account Responsibilities</h2>
             </div>
             <p>When you create an account, you agree to:</p>
@@ -1118,10 +402,62 @@ if (class_exists('Nexus\Core\TenantContext')) {
             </div>
         </div>
 
+        <!-- Privacy & Data Protection -->
+        <div class="terms-section highlight" id="privacy">
+            <div class="section-header">
+                <div class="section-number">7</div>
+                <h2>Privacy & Data Protection</h2>
+            </div>
+            <p>Your privacy is important to us. hOUR Timebank CLG is committed to protecting your personal data in accordance with the <strong>General Data Protection Regulation (GDPR)</strong> and Irish data protection law.</p>
+
+            <p><strong>Key Privacy Points:</strong></p>
+            <ul>
+                <li>We collect only the personal information necessary to operate the platform</li>
+                <li>Your data is stored securely and never sold to third parties</li>
+                <li>You have the right to access, correct, or delete your personal data</li>
+                <li>You control your privacy settings and what information is visible to other members</li>
+                <li>We use cookies and similar technologies to improve your experience</li>
+            </ul>
+
+            <div class="terms-notice">
+                <span class="notice-icon"><i class="fa-solid fa-file-shield"></i></span>
+                <div class="notice-content">
+                    <h4>Full Privacy Policy</h4>
+                    <p>For complete details on how we collect, use, store, and protect your personal data, please read our full <strong><a href="<?= $basePath ?>/privacy" style="color: var(--terms-theme); text-decoration: underline;">Privacy Policy</a></strong>. The Privacy Policy forms part of these Terms of Service.</p>
+                </div>
+            </div>
+
+            <p><strong>Your Privacy Responsibilities:</strong></p>
+            <p>As mentioned in Section 6 (Account Responsibilities), you are solely responsible for:</p>
+            <ul>
+                <li>Reviewing and configuring your privacy settings appropriately</li>
+                <li>Understanding what information you choose to share publicly or with other members</li>
+                <li>Opting in or out of optional features like federation, email notifications, or data sharing</li>
+                <li>Keeping your account credentials secure</li>
+            </ul>
+
+            <p>hOUR Timebank CLG is not liable for disclosure of information that occurs because you enabled public sharing features or failed to configure your privacy settings.</p>
+
+            <p><strong>Data Controller:</strong></p>
+            <p>For the purposes of GDPR, the data controller is:</p>
+            <div class="entity-info" style="margin-top: 1rem;">
+                <dl>
+                    <dt>Entity</dt>
+                    <dd>hOUR Timebank CLG</dd>
+
+                    <dt>Address</dt>
+                    <dd>21 Páirc Goodman, Skibbereen, Co. Cork, P81 AK26, Ireland</dd>
+
+                    <dt>Data Protection Contact</dt>
+                    <dd><a href="mailto:jasper@hour-timebank.ie">jasper@hour-timebank.ie</a></dd>
+                </dl>
+            </div>
+        </div>
+
         <!-- Community Guidelines -->
         <div class="terms-section" id="community">
             <div class="section-header">
-                <div class="section-number">6</div>
+                <div class="section-number">8</div>
                 <h2>Community Guidelines</h2>
             </div>
             <p>Our community is built on <strong>trust, respect, and mutual support</strong>. All members must:</p>
@@ -1135,10 +471,111 @@ if (class_exists('Nexus\Core\TenantContext')) {
             </ol>
         </div>
 
+        <!-- Reviews and Feedback -->
+        <div class="terms-section" id="reviews">
+            <div class="section-header">
+                <div class="section-number">9</div>
+                <h2>Reviews and Feedback System</h2>
+            </div>
+            <p>Members can leave reviews for each other after completing exchanges. Reviews help build trust and accountability in the community.</p>
+
+            <p><strong>Review Guidelines:</strong></p>
+            <ul>
+                <li><strong>Honesty:</strong> Reviews should be truthful and based on your actual experience</li>
+                <li><strong>Relevance:</strong> Focus on the service exchange, not personal characteristics unrelated to the service</li>
+                <li><strong>Respect:</strong> Avoid offensive language, personal attacks, or discriminatory remarks</li>
+                <li><strong>Fairness:</strong> Consider the context — was the member a beginner? Were there circumstances beyond their control?</li>
+                <li><strong>Timeliness:</strong> Reviews should be submitted within 14 days of the exchange</li>
+            </ul>
+
+            <p><strong>What You May Include in Reviews:</strong></p>
+            <ul>
+                <li>Description of the service provided</li>
+                <li>Quality and professionalism of the work</li>
+                <li>Timeliness and reliability</li>
+                <li>Communication and friendliness</li>
+                <li>Whether you would exchange with this member again</li>
+            </ul>
+
+            <p><strong>Prohibited Review Content:</strong></p>
+            <div class="prohibited-grid">
+                <div class="prohibited-item">
+                    <span class="prohibited-icon"><i class="fa-solid fa-ban"></i></span>
+                    <span>Defamatory statements</span>
+                </div>
+                <div class="prohibited-item">
+                    <span class="prohibited-icon"><i class="fa-solid fa-ban"></i></span>
+                    <span>Discriminatory remarks</span>
+                </div>
+                <div class="prohibited-item">
+                    <span class="prohibited-icon"><i class="fa-solid fa-ban"></i></span>
+                    <span>Personal information disclosure</span>
+                </div>
+                <div class="prohibited-item">
+                    <span class="prohibited-icon"><i class="fa-solid fa-ban"></i></span>
+                    <span>Profanity or hate speech</span>
+                </div>
+                <div class="prohibited-item">
+                    <span class="prohibited-icon"><i class="fa-solid fa-ban"></i></span>
+                    <span>Irrelevant personal attacks</span>
+                </div>
+                <div class="prohibited-item">
+                    <span class="prohibited-icon"><i class="fa-solid fa-ban"></i></span>
+                    <span>False or malicious statements</span>
+                </div>
+            </div>
+
+            <p><strong>Review Moderation:</strong></p>
+            <p>hOUR Timebank CLG reserves the right to:</p>
+            <ul>
+                <li>Review and moderate all feedback submitted on the platform</li>
+                <li>Remove reviews that violate these guidelines</li>
+                <li>Edit reviews to remove prohibited content (with notification to the author)</li>
+                <li>Suspend or terminate accounts that repeatedly post inappropriate reviews</li>
+                <li>Investigate reports of fake, coerced, or fraudulent reviews</li>
+            </ul>
+
+            <div class="terms-notice">
+                <span class="notice-icon"><i class="fa-solid fa-shield-halved"></i></span>
+                <div class="notice-content">
+                    <h4>Defamation Protection</h4>
+                    <p><strong>Reviews reflect the personal opinions of members.</strong> Under the Defamation Act 2009, hOUR Timebank CLG operates as a platform host and is protected under Section 27 (innocent publication defence) provided we take reasonable care. We actively moderate content and respond to complaints, but we are not liable for the content of member reviews unless we fail to act on legitimate complaints.</p>
+                </div>
+            </div>
+
+            <p><strong>Disputing a Review:</strong></p>
+            <p>If you believe a review about you is false, defamatory, or violates our guidelines:</p>
+            <ol>
+                <li><strong>Report the Review:</strong> Use the "Report" button on the review or contact us at <a href="mailto:jasper@hour-timebank.ie" style="color: var(--terms-theme);">jasper@hour-timebank.ie</a></li>
+                <li><strong>Provide Evidence:</strong> Explain why the review violates guidelines and provide any supporting evidence</li>
+                <li><strong>Investigation:</strong> We will review the complaint within 5 working days</li>
+                <li><strong>Decision:</strong> We will remove or edit reviews that clearly violate guidelines; we will not remove honest negative reviews simply because you disagree with them</li>
+                <li><strong>Right to Reply:</strong> You may post a public response to any review (subject to the same guidelines)</li>
+            </ol>
+
+            <p><strong>Review Authenticity:</strong></p>
+            <ul>
+                <li>Only members who have actually exchanged services may leave reviews for each other</li>
+                <li>Members cannot review themselves</li>
+                <li>Soliciting positive reviews in exchange for incentives is prohibited</li>
+                <li>Posting fake reviews or asking others to post reviews on your behalf is prohibited</li>
+            </ul>
+
+            <p><strong>Your Responsibility:</strong></p>
+            <p>By posting a review, you confirm that:</p>
+            <ul>
+                <li>The review is based on your genuine experience</li>
+                <li>The content is accurate to the best of your knowledge</li>
+                <li>You are not posting at the direction of a third party</li>
+                <li>You grant hOUR Timebank CLG a licence to display the review on the platform</li>
+                <li>You accept responsibility for any legal consequences if your review is found to be defamatory or false</li>
+            </ul>
+        </div>
+
         <!-- Prohibited Activities -->
         <div class="terms-section" id="prohibited">
             <div class="section-header">
-                <div class="section-number">7</div>
+                <div class="section-number">10</div>
                 <h2>Prohibited Activities</h2>
             </div>
             <p>The following activities are strictly prohibited and may result in account termination:</p>
@@ -1182,7 +619,7 @@ if (class_exists('Nexus\Core\TenantContext')) {
         <!-- Safety -->
         <div class="terms-section">
             <div class="section-header">
-                <div class="section-number">8</div>
+                <div class="section-number">11</div>
                 <h2>Safety & Meetings</h2>
             </div>
             <p>Your safety is important. We recommend following these guidelines:</p>
@@ -1199,7 +636,7 @@ if (class_exists('Nexus\Core\TenantContext')) {
         <!-- Nature of Relationship -->
         <div class="terms-section highlight" id="relationship">
             <div class="section-header">
-                <div class="section-number">9</div>
+                <div class="section-number">12</div>
                 <h2>Nature of Relationship</h2>
             </div>
             <p>It is essential that all members understand the legal nature of their relationship with hOUR Timebank CLG and with other members:</p>
@@ -1228,7 +665,7 @@ if (class_exists('Nexus\Core\TenantContext')) {
         <!-- Assumption of Risk -->
         <div class="terms-section" id="assumption-of-risk">
             <div class="section-header">
-                <div class="section-number">10</div>
+                <div class="section-number">13</div>
                 <h2>Assumption of Risk & Personal Responsibility</h2>
             </div>
             <p>By participating in the timebank, you acknowledge and accept the following:</p>
@@ -1264,7 +701,7 @@ if (class_exists('Nexus\Core\TenantContext')) {
         <!-- Insurance Recommendations -->
         <div class="terms-section" id="insurance">
             <div class="section-header">
-                <div class="section-number">11</div>
+                <div class="section-number">14</div>
                 <h2>Insurance Recommendations</h2>
             </div>
             <p>While not legally required, we <strong>strongly recommend</strong> the following insurance considerations:</p>
@@ -1294,7 +731,7 @@ if (class_exists('Nexus\Core\TenantContext')) {
         <!-- Liability -->
         <div class="terms-section highlight" id="liability">
             <div class="section-header">
-                <div class="section-number">12</div>
+                <div class="section-number">15</div>
                 <h2>Limitation of Liability</h2>
             </div>
             <p>hOUR Timebank CLG provides a platform for community members to connect and exchange services. To the maximum extent permitted by Irish law:</p>
@@ -1330,7 +767,7 @@ if (class_exists('Nexus\Core\TenantContext')) {
         <!-- Dispute Resolution -->
         <div class="terms-section" id="disputes">
             <div class="section-header">
-                <div class="section-number">13</div>
+                <div class="section-number">16</div>
                 <h2>Dispute Resolution</h2>
             </div>
             <p>We encourage members to resolve disputes amicably. If a dispute arises:</p>
@@ -1345,7 +782,7 @@ if (class_exists('Nexus\Core\TenantContext')) {
             <p>For unresolved disputes, we recommend the <strong>Mediators' Institute of Ireland (MII)</strong> or another accredited mediation service before pursuing legal action.</p>
 
             <p><strong>Step 4: Legal Proceedings</strong></p>
-            <p>If mediation fails, disputes shall be subject to the exclusive jurisdiction of the Irish courts under Section 12 (Governing Law).</p>
+            <p>If mediation fails, disputes shall be subject to the exclusive jurisdiction of the Irish courts under Section 18 (Governing Law).</p>
 
             <div class="terms-notice">
                 <span class="notice-icon"><i class="fa-solid fa-circle-info"></i></span>
@@ -1359,7 +796,7 @@ if (class_exists('Nexus\Core\TenantContext')) {
         <!-- Intellectual Property -->
         <div class="terms-section">
             <div class="section-header">
-                <div class="section-number">14</div>
+                <div class="section-number">17</div>
                 <h2>Intellectual Property</h2>
             </div>
             <p>The hOUR Timebank platform, including its design, features, and content (excluding user-generated content), is owned by hOUR Timebank CLG and protected by intellectual property laws.</p>
@@ -1373,7 +810,7 @@ if (class_exists('Nexus\Core\TenantContext')) {
         <!-- Termination -->
         <div class="terms-section">
             <div class="section-header">
-                <div class="section-number">15</div>
+                <div class="section-number">18</div>
                 <h2>Account Termination</h2>
             </div>
             <p>We reserve the right to suspend or terminate accounts that violate these terms. Reasons for termination include:</p>
@@ -1390,7 +827,7 @@ if (class_exists('Nexus\Core\TenantContext')) {
         <!-- Governing Law -->
         <div class="terms-section highlight">
             <div class="section-header">
-                <div class="section-number">16</div>
+                <div class="section-number">19</div>
                 <h2>Governing Law</h2>
             </div>
             <p>These Terms of Service are governed by and construed in accordance with the <strong>laws of the Republic of Ireland</strong>.</p>
@@ -1401,7 +838,7 @@ if (class_exists('Nexus\Core\TenantContext')) {
         <!-- Changes to Terms -->
         <div class="terms-section">
             <div class="section-header">
-                <div class="section-number">17</div>
+                <div class="section-number">20</div>
                 <h2>Changes to These Terms</h2>
             </div>
             <p>We may update these terms from time to time to reflect changes in our practices, legal requirements, or platform features. When we make significant changes:</p>
@@ -1426,33 +863,14 @@ if (class_exists('Nexus\Core\TenantContext')) {
     </div>
 </div>
 
-<script>
-// Smooth scroll for anchor links
-document.querySelectorAll('#terms-glass-wrapper .terms-nav-btn').forEach(btn => {
-    btn.addEventListener('click', function(e) {
-        const href = this.getAttribute('href');
-        if (href.startsWith('#')) {
-            e.preventDefault();
-            const target = document.querySelector(href);
-            if (target) {
-                target.scrollIntoView({ behavior: 'smooth', block: 'start' });
-            }
-        }
-    });
-});
-
-// Button press states
-document.querySelectorAll('#terms-glass-wrapper .terms-nav-btn, #terms-glass-wrapper .terms-cta-btn').forEach(btn => {
-    btn.addEventListener('pointerdown', function() {
-        this.style.transform = 'scale(0.96)';
-    });
-    btn.addEventListener('pointerup', function() {
-        this.style.transform = '';
-    });
-    btn.addEventListener('pointerleave', function() {
-        this.style.transform = '';
-    });
-});
-</script>
+<!-- Terms Page JavaScript -->
+<?php
+// Use deployment version for cache busting (same pattern as footer.php)
+$deploymentVersion = file_exists(__DIR__ . '/../../../../config/deployment-version.php')
+    ? require __DIR__ . '/../../../../config/deployment-version.php'
+    : ['version' => time()];
+$jsVersion = $deploymentVersion['version'] ?? time();
+?>
+<script src="/assets/js/terms-page.js?v=<?= $jsVersion ?>" defer></script>
 
 <?php require __DIR__ . '/../../../../layouts/modern/footer.php'; ?>
