@@ -12,163 +12,141 @@ $basePath = \Nexus\Core\TenantContext::getBasePath();
 ?>
 
 <!-- GOV.UK Page Template Boilerplate (Section 10.0) -->
-<div class="civicone-width-container">
-    <main class="civicone-main-wrapper">
+<div class="govuk-width-container">
+    <main class="govuk-main-wrapper" id="main-content">
 
         <!-- Breadcrumbs (GOV.UK Template A requirement) -->
-        <nav class="civicone-breadcrumbs" aria-label="Breadcrumb">
-            <ol class="civicone-breadcrumbs__list">
-                <li class="civicone-breadcrumbs__list-item">
-                    <a class="civicone-breadcrumbs__link" href="<?= $basePath ?>">Home</a>
+        <nav class="govuk-breadcrumbs govuk-!-margin-bottom-6" aria-label="Breadcrumb">
+            <ol class="govuk-breadcrumbs__list">
+                <li class="govuk-breadcrumbs__list-item">
+                    <a class="govuk-breadcrumbs__link" href="<?= $basePath ?>">Home</a>
                 </li>
-                <li class="civicone-breadcrumbs__list-item" aria-current="page">
+                <li class="govuk-breadcrumbs__list-item" aria-current="page">
                     Events
                 </li>
             </ol>
         </nav>
 
-        <!-- Page Header (GOV.UK Typography) -->
-        <h1 class="govuk-heading-xl">Events</h1>
-        <p class="govuk-body-l">Discover upcoming events and activities in your community.</p>
-
-        <!-- Action Button -->
-        <div class="civicone-grid-row civicone-action-row">
-            <div class="civicone-grid-column-one-third">
-                <a href="<?= $basePath ?>/events/create" class="civicone-button civicone-button--primary civicone-button--full-width">
+        <!-- Page Header -->
+        <div class="govuk-grid-row">
+            <div class="govuk-grid-column-two-thirds">
+                <h1 class="govuk-heading-xl">Events</h1>
+                <p class="govuk-body-l">Discover upcoming events and activities in your community.</p>
+            </div>
+            <div class="govuk-grid-column-one-third">
+                <a href="<?= $basePath ?>/events/create" class="govuk-button govuk-!-margin-bottom-0">
                     Host Event
                 </a>
             </div>
         </div>
 
         <!-- Directory Layout: 1/3 Filters + 2/3 Results -->
-        <div class="civicone-grid-row">
+        <div class="govuk-grid-row">
 
             <!-- Filters Panel (1/3) -->
-            <div class="civicone-grid-column-one-third">
-                <div class="civicone-filter-panel" role="search" aria-label="Filter events">
-
-                    <div class="civicone-filter-header">
-                        <h2 class="civicone-heading-m">Filter events</h2>
-                    </div>
+            <div class="govuk-grid-column-one-third">
+                <div class="govuk-!-padding-4" style="background: #f3f2f1; margin-bottom: 1.5rem;">
+                    <h2 class="govuk-heading-m">Filter events</h2>
 
                     <form method="get" action="<?= $basePath ?>/events">
-                        <div class="civicone-filter-group">
-                            <label for="event-search" class="civicone-label">
+                        <!-- Search Input -->
+                        <div class="govuk-form-group">
+                            <label class="govuk-label" for="event-search">
                                 Search by title or location
                             </label>
-                            <div class="civicone-search-wrapper">
-                                <input
-                                    type="text"
-                                    id="event-search"
-                                    name="q"
-                                    class="civicone-input civicone-search-input"
-                                    placeholder="Enter keywords..."
-                                    value="<?= htmlspecialchars($_GET['q'] ?? '') ?>"
-                                >
-                                <span class="civicone-search-icon" aria-hidden="true"></span>
-                            </div>
+                            <input
+                                type="text"
+                                id="event-search"
+                                name="q"
+                                class="govuk-input"
+                                placeholder="Enter keywords..."
+                                value="<?= htmlspecialchars($_GET['q'] ?? '') ?>"
+                            >
                         </div>
 
-                        <div class="civicone-filter-group">
-                            <fieldset class="civicone-fieldset">
-                                <legend class="civicone-label">Event type</legend>
-                                <div class="civicone-checkboxes">
-                                    <div class="civicone-checkbox-item">
-                                        <input type="checkbox" id="type-online" name="type[]" value="online" class="civicone-checkbox" <?= in_array('online', $_GET['type'] ?? []) ? 'checked' : '' ?>>
-                                        <label for="type-online" class="civicone-checkbox-label">Online</label>
+                        <!-- Event Type Checkboxes -->
+                        <div class="govuk-form-group">
+                            <fieldset class="govuk-fieldset">
+                                <legend class="govuk-fieldset__legend">Event type</legend>
+                                <div class="govuk-checkboxes govuk-checkboxes--small" data-module="govuk-checkboxes">
+                                    <div class="govuk-checkboxes__item">
+                                        <input type="checkbox" id="type-online" name="type[]" value="online" class="govuk-checkboxes__input" <?= in_array('online', $_GET['type'] ?? []) ? 'checked' : '' ?>>
+                                        <label class="govuk-label govuk-checkboxes__label" for="type-online">Online</label>
                                     </div>
-                                    <div class="civicone-checkbox-item">
-                                        <input type="checkbox" id="type-inperson" name="type[]" value="inperson" class="civicone-checkbox" <?= in_array('inperson', $_GET['type'] ?? []) ? 'checked' : '' ?>>
-                                        <label for="type-inperson" class="civicone-checkbox-label">In-person</label>
+                                    <div class="govuk-checkboxes__item">
+                                        <input type="checkbox" id="type-inperson" name="type[]" value="inperson" class="govuk-checkboxes__input" <?= in_array('inperson', $_GET['type'] ?? []) ? 'checked' : '' ?>>
+                                        <label class="govuk-label govuk-checkboxes__label" for="type-inperson">In-person</label>
                                     </div>
                                 </div>
                             </fieldset>
                         </div>
 
-                        <div class="civicone-filter-group">
-                            <fieldset class="civicone-fieldset">
-                                <legend class="civicone-label">Time range</legend>
-                                <div class="civicone-checkboxes">
-                                    <div class="civicone-checkbox-item">
-                                        <input type="checkbox" id="time-today" name="time[]" value="today" class="civicone-checkbox" <?= in_array('today', $_GET['time'] ?? []) ? 'checked' : '' ?>>
-                                        <label for="time-today" class="civicone-checkbox-label">Today</label>
+                        <!-- Time Range Checkboxes -->
+                        <div class="govuk-form-group">
+                            <fieldset class="govuk-fieldset">
+                                <legend class="govuk-fieldset__legend">Time range</legend>
+                                <div class="govuk-checkboxes govuk-checkboxes--small" data-module="govuk-checkboxes">
+                                    <div class="govuk-checkboxes__item">
+                                        <input type="checkbox" id="time-today" name="time[]" value="today" class="govuk-checkboxes__input" <?= in_array('today', $_GET['time'] ?? []) ? 'checked' : '' ?>>
+                                        <label class="govuk-label govuk-checkboxes__label" for="time-today">Today</label>
                                     </div>
-                                    <div class="civicone-checkbox-item">
-                                        <input type="checkbox" id="time-week" name="time[]" value="week" class="civicone-checkbox" <?= in_array('week', $_GET['time'] ?? []) ? 'checked' : '' ?>>
-                                        <label for="time-week" class="civicone-checkbox-label">This week</label>
+                                    <div class="govuk-checkboxes__item">
+                                        <input type="checkbox" id="time-week" name="time[]" value="week" class="govuk-checkboxes__input" <?= in_array('week', $_GET['time'] ?? []) ? 'checked' : '' ?>>
+                                        <label class="govuk-label govuk-checkboxes__label" for="time-week">This week</label>
                                     </div>
-                                    <div class="civicone-checkbox-item">
-                                        <input type="checkbox" id="time-month" name="time[]" value="month" class="civicone-checkbox" <?= in_array('month', $_GET['time'] ?? []) ? 'checked' : '' ?>>
-                                        <label for="time-month" class="civicone-checkbox-label">This month</label>
+                                    <div class="govuk-checkboxes__item">
+                                        <input type="checkbox" id="time-month" name="time[]" value="month" class="govuk-checkboxes__input" <?= in_array('month', $_GET['time'] ?? []) ? 'checked' : '' ?>>
+                                        <label class="govuk-label govuk-checkboxes__label" for="time-month">This month</label>
                                     </div>
                                 </div>
                             </fieldset>
                         </div>
 
-                        <button type="submit" class="civicone-button civicone-button--secondary civicone-button--full-width">
+                        <button type="submit" class="govuk-button govuk-button--secondary">
                             Apply filters
                         </button>
                     </form>
 
-                    <!-- Selected Filters (shown when filters are active) -->
+                    <!-- Selected Filters -->
                     <?php
                     $hasFilters = !empty($_GET['q']) || !empty($_GET['type']) || !empty($_GET['time']);
                     if ($hasFilters):
                     ?>
-                    <div class="civicone-selected-filters">
-                        <h3 class="civicone-heading-s">Active filters</h3>
-                        <div class="civicone-filter-tags">
-                            <?php if (!empty($_GET['q'])): ?>
-                            <a href="<?= $basePath ?>/events" class="civicone-tag civicone-tag--removable">
-                                Search: <?= htmlspecialchars($_GET['q']) ?>
-                                <span class="civicone-tag-remove" aria-label="Remove filter">×</span>
-                            </a>
-                            <?php endif; ?>
-                            <?php if (!empty($_GET['type'])): ?>
-                                <?php foreach ($_GET['type'] as $type): ?>
-                                <a href="<?= $basePath ?>/events?q=<?= urlencode($_GET['q'] ?? '') ?>" class="civicone-tag civicone-tag--removable">
-                                    Type: <?= htmlspecialchars(ucfirst($type)) ?>
-                                    <span class="civicone-tag-remove" aria-label="Remove filter">×</span>
-                                </a>
-                                <?php endforeach; ?>
-                            <?php endif; ?>
-                            <?php if (!empty($_GET['time'])): ?>
-                                <?php foreach ($_GET['time'] as $time): ?>
-                                <a href="<?= $basePath ?>/events?q=<?= urlencode($_GET['q'] ?? '') ?>" class="civicone-tag civicone-tag--removable">
-                                    Time: <?= htmlspecialchars(ucfirst($time)) ?>
-                                    <span class="civicone-tag-remove" aria-label="Remove filter">×</span>
-                                </a>
-                                <?php endforeach; ?>
-                            <?php endif; ?>
-                        </div>
-                        <a href="<?= $basePath ?>/events" class="civicone-link">Clear all filters</a>
-                    </div>
+                    <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible">
+                    <h3 class="govuk-heading-s">Active filters</h3>
+                    <p class="govuk-body">
+                        <?php if (!empty($_GET['q'])): ?>
+                            <strong class="govuk-tag">Search: <?= htmlspecialchars($_GET['q']) ?></strong>
+                        <?php endif; ?>
+                        <?php if (!empty($_GET['type'])): ?>
+                            <?php foreach ($_GET['type'] as $type): ?>
+                                <strong class="govuk-tag govuk-tag--grey">Type: <?= htmlspecialchars(ucfirst($type)) ?></strong>
+                            <?php endforeach; ?>
+                        <?php endif; ?>
+                        <?php if (!empty($_GET['time'])): ?>
+                            <?php foreach ($_GET['time'] as $time): ?>
+                                <strong class="govuk-tag govuk-tag--grey">Time: <?= htmlspecialchars(ucfirst($time)) ?></strong>
+                            <?php endforeach; ?>
+                        <?php endif; ?>
+                    </p>
+                    <a href="<?= $basePath ?>/events" class="govuk-link">Clear all filters</a>
                     <?php endif; ?>
-
                 </div>
             </div>
 
             <!-- Results Panel (2/3) -->
-            <div class="civicone-grid-column-two-thirds">
+            <div class="govuk-grid-column-two-thirds">
 
-                <!-- Results Header with Count -->
-                <div class="civicone-results-header">
-                    <p class="civicone-results-count" id="results-count">
-                        Showing <strong><?= count($events ?? []) ?></strong> <?= count($events ?? []) === 1 ? 'event' : 'events' ?>
-                    </p>
-                </div>
+                <!-- Results Count -->
+                <p class="govuk-body govuk-!-margin-bottom-4">
+                    Showing <strong><?= count($events ?? []) ?></strong> <?= count($events ?? []) === 1 ? 'event' : 'events' ?>
+                </p>
 
-                <!-- Results: LIST LAYOUT (structured result rows) -->
+                <!-- Results List -->
                 <?php if (empty($events)): ?>
-                    <div class="civicone-empty-state">
-                        <svg class="civicone-empty-icon" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
-                            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
-                            <line x1="16" y1="2" x2="16" y2="6"></line>
-                            <line x1="8" y1="2" x2="8" y2="6"></line>
-                            <line x1="3" y1="10" x2="21" y2="10"></line>
-                        </svg>
-                        <h2 class="civicone-heading-m">No events found</h2>
-                        <p class="civicone-body">
+                    <div class="govuk-inset-text">
+                        <h2 class="govuk-heading-m">No events found</h2>
+                        <p class="govuk-body">
                             <?php if (!empty($_GET['q'])): ?>
                                 No events match your search. Try different keywords or check back later.
                             <?php else: ?>
@@ -177,7 +155,7 @@ $basePath = \Nexus\Core\TenantContext::getBasePath();
                         </p>
                     </div>
                 <?php else: ?>
-                    <ul class="civicone-events-list" role="list">
+                    <ul class="govuk-list" role="list">
                         <?php foreach ($events as $ev): ?>
                             <?php
                             $eventTitle = htmlspecialchars($ev['title']);
@@ -188,155 +166,110 @@ $basePath = \Nexus\Core\TenantContext::getBasePath();
                             $eventDate = strtotime($ev['start_time']);
                             $eventDateFormatted = date('l, F j, Y', $eventDate);
                             $eventTime = date('g:i A', $eventDate);
-                            $eventMonth = date('M', $eventDate);
-                            $eventDay = date('d', $eventDate);
                             $eventLocation = htmlspecialchars($ev['location'] ?? 'Online');
                             $isOnline = empty($ev['location']) || strtolower($ev['location']) === 'online';
                             $organizerName = htmlspecialchars($ev['organizer_name'] ?? 'Organizer');
                             $attendeeCount = $ev['attendee_count'] ?? 0;
                             ?>
-                            <li class="civicone-event-item" role="listitem">
-                                <!-- Date Badge -->
-                                <div class="civicone-event-item__date-badge" aria-hidden="true">
-                                    <div class="civicone-event-item__date-month"><?= $eventMonth ?></div>
-                                    <div class="civicone-event-item__date-day"><?= $eventDay ?></div>
-                                </div>
+                            <li class="govuk-!-margin-bottom-4 govuk-!-padding-bottom-4" style="border-bottom: 1px solid #b1b4b6;">
+                                <!-- Date & Type -->
+                                <p class="govuk-body-s govuk-!-margin-bottom-1">
+                                    <strong class="govuk-tag <?= $isOnline ? 'govuk-tag--blue' : 'govuk-tag--green' ?>">
+                                        <?= $isOnline ? 'Online' : 'In-person' ?>
+                                    </strong>
+                                    <span style="color: #505a5f;">&middot; <?= $eventDateFormatted ?> at <?= $eventTime ?></span>
+                                </p>
 
-                                <!-- Event Content -->
-                                <div class="civicone-event-item__content">
-                                    <!-- Title (Main Link) -->
-                                    <h3 class="civicone-event-item__title">
-                                        <a href="<?= $basePath ?>/events/<?= $ev['id'] ?>" class="civicone-link">
-                                            <?= $eventTitle ?>
-                                        </a>
-                                    </h3>
-
-                                    <!-- Metadata (Date, Time, Location) -->
-                                    <div class="civicone-event-item__meta">
-                                        <span class="civicone-event-item__meta-item">
-                                            <svg class="civicone-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-                                                <circle cx="12" cy="12" r="10"></circle>
-                                                <polyline points="12 6 12 12 16 14"></polyline>
-                                            </svg>
-                                            <span class="govuk-visually-hidden">Time: </span><?= $eventDateFormatted ?> at <?= $eventTime ?>
-                                        </span>
-                                        <span class="civicone-event-item__meta-item">
-                                            <svg class="civicone-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-                                                <?php if ($isOnline): ?>
-                                                <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
-                                                <line x1="8" y1="21" x2="16" y2="21"></line>
-                                                <line x1="12" y1="17" x2="12" y2="21"></line>
-                                                <?php else: ?>
-                                                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
-                                                <circle cx="12" cy="10" r="3"></circle>
-                                                <?php endif; ?>
-                                            </svg>
-                                            <span class="govuk-visually-hidden">Location: </span><?= $eventLocation ?>
-                                        </span>
-                                    </div>
-
-                                    <!-- Description Excerpt -->
-                                    <p class="civicone-event-item__description"><?= $eventDesc ?></p>
-
-                                    <!-- Footer (Organizer + Attendees) -->
-                                    <div class="civicone-event-item__footer">
-                                        <span class="civicone-event-item__organizer">
-                                            Hosted by <strong><?= $organizerName ?></strong>
-                                        </span>
-                                        <?php if ($attendeeCount > 0): ?>
-                                        <span class="civicone-event-item__attendees">
-                                            <svg class="civicone-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-                                                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-                                                <circle cx="9" cy="7" r="4"></circle>
-                                                <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
-                                                <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
-                                            </svg>
-                                            <?= $attendeeCount ?> <?= $attendeeCount === 1 ? 'person' : 'people' ?> attending
-                                        </span>
-                                        <?php endif; ?>
-                                    </div>
-                                </div>
-
-                                <!-- Action Link -->
-                                <div class="civicone-event-item__action">
-                                    <a href="<?= $basePath ?>/events/<?= $ev['id'] ?>"
-                                       class="civicone-button civicone-button--secondary"
-                                       aria-label="View details and RSVP for <?= $eventTitle ?>">
-                                        View & RSVP
+                                <!-- Title -->
+                                <h3 class="govuk-heading-s govuk-!-margin-bottom-2">
+                                    <a href="<?= $basePath ?>/events/<?= $ev['id'] ?>" class="govuk-link">
+                                        <?= $eventTitle ?>
                                     </a>
-                                </div>
+                                </h3>
+
+                                <!-- Description -->
+                                <p class="govuk-body govuk-!-margin-bottom-2"><?= $eventDesc ?></p>
+
+                                <!-- Meta -->
+                                <p class="govuk-body-s govuk-!-margin-bottom-2" style="color: #505a5f;">
+                                    <i class="fa-solid fa-location-dot govuk-!-margin-right-1" aria-hidden="true"></i>
+                                    <?= $eventLocation ?>
+                                    &middot; Hosted by <strong><?= $organizerName ?></strong>
+                                    <?php if ($attendeeCount > 0): ?>
+                                        &middot; <?= $attendeeCount ?> <?= $attendeeCount === 1 ? 'person' : 'people' ?> attending
+                                    <?php endif; ?>
+                                </p>
+
+                                <!-- Action -->
+                                <a href="<?= $basePath ?>/events/<?= $ev['id'] ?>"
+                                   class="govuk-button govuk-button--secondary govuk-!-margin-bottom-0"
+                                   aria-label="View details and RSVP for <?= $eventTitle ?>">
+                                    View & RSVP
+                                </a>
                             </li>
                         <?php endforeach; ?>
                     </ul>
                 <?php endif; ?>
 
-                <!-- Pagination -->
+                <!-- GOV.UK Pagination -->
                 <?php if (isset($pagination) && $pagination['total_pages'] > 1): ?>
-                    <nav class="civicone-pagination" aria-label="Events pagination">
-                        <?php
-                        $current = $pagination['current_page'];
-                        $total = $pagination['total_pages'];
-                        $base = $pagination['base_path'];
-                        $range = 2;
-                        $query = !empty($_GET['q']) ? '&q=' . urlencode($_GET['q']) : '';
-                        if (!empty($_GET['type'])) {
-                            foreach ($_GET['type'] as $type) {
-                                $query .= '&type[]=' . urlencode($type);
-                            }
+                    <?php
+                    $current = $pagination['current_page'];
+                    $total = $pagination['total_pages'];
+                    $base = $pagination['base_path'];
+                    $query = !empty($_GET['q']) ? '&q=' . urlencode($_GET['q']) : '';
+                    if (!empty($_GET['type'])) {
+                        foreach ($_GET['type'] as $type) {
+                            $query .= '&type[]=' . urlencode($type);
                         }
-                        if (!empty($_GET['time'])) {
-                            foreach ($_GET['time'] as $time) {
-                                $query .= '&time[]=' . urlencode($time);
-                            }
+                    }
+                    if (!empty($_GET['time'])) {
+                        foreach ($_GET['time'] as $time) {
+                            $query .= '&time[]=' . urlencode($time);
                         }
-                        ?>
-
-                        <div class="civicone-pagination__results">
-                            Showing <?= (($current - 1) * 20 + 1) ?> to <?= min($current * 20, $total_events ?? count($events ?? [])) ?> of <?= $total_events ?? count($events ?? []) ?> events
+                    }
+                    ?>
+                    <nav class="govuk-pagination" role="navigation" aria-label="Pagination">
+                        <?php if ($current > 1): ?>
+                        <div class="govuk-pagination__prev">
+                            <a class="govuk-link govuk-pagination__link" href="<?= $base ?>?page=<?= $current - 1 ?><?= $query ?>" rel="prev">
+                                <svg class="govuk-pagination__icon govuk-pagination__icon--prev" xmlns="http://www.w3.org/2000/svg" height="13" width="15" aria-hidden="true" focusable="false" viewBox="0 0 15 13">
+                                    <path d="m6.5938-0.0078125-6.7266 6.7266 6.7441 6.4062 1.377-1.449-4.1856-3.9768h12.896v-2h-12.984l4.2931-4.293-1.414-1.414z"></path>
+                                </svg>
+                                <span class="govuk-pagination__link-title">Previous<span class="govuk-visually-hidden"> page</span></span>
+                            </a>
                         </div>
+                        <?php endif; ?>
 
-                        <ul class="civicone-pagination__list">
-                            <?php if ($current > 1): ?>
-                                <li class="civicone-pagination__item civicone-pagination__item--prev">
-                                    <a href="<?= $base ?>?page=<?= $current - 1 ?><?= $query ?>" class="civicone-pagination__link" aria-label="Go to previous page">
-                                        <span aria-hidden="true">‹</span> Previous
-                                    </a>
-                                </li>
-                            <?php endif; ?>
-
+                        <ul class="govuk-pagination__list">
                             <?php for ($i = 1; $i <= $total; $i++): ?>
-                                <?php if ($i == 1 || $i == $total || ($i >= $current - $range && $i <= $current + $range)): ?>
-                                    <li class="civicone-pagination__item">
-                                        <?php if ($i == $current): ?>
-                                            <span class="civicone-pagination__link civicone-pagination__link--current" aria-current="page">
-                                                <?= $i ?>
-                                            </span>
-                                        <?php else: ?>
-                                            <a href="<?= $base ?>?page=<?= $i ?><?= $query ?>" class="civicone-pagination__link" aria-label="Go to page <?= $i ?>">
-                                                <?= $i ?>
-                                            </a>
-                                        <?php endif; ?>
+                                <?php if ($i == 1 || $i == $total || ($i >= $current - 1 && $i <= $current + 1)): ?>
+                                    <li class="govuk-pagination__item<?= $i == $current ? ' govuk-pagination__item--current' : '' ?>">
+                                        <a class="govuk-link govuk-pagination__link" href="<?= $base ?>?page=<?= $i ?><?= $query ?>" aria-label="Page <?= $i ?>"<?= $i == $current ? ' aria-current="page"' : '' ?>>
+                                            <?= $i ?>
+                                        </a>
                                     </li>
-                                <?php elseif ($i == $current - $range - 1 || $i == $current + $range + 1): ?>
-                                    <li class="civicone-pagination__item civicone-pagination__item--ellipsis" aria-hidden="true">
-                                        <span>⋯</span>
-                                    </li>
+                                <?php elseif ($i == $current - 2 || $i == $current + 2): ?>
+                                    <li class="govuk-pagination__item govuk-pagination__item--ellipses">&ctdot;</li>
                                 <?php endif; ?>
                             <?php endfor; ?>
-
-                            <?php if ($current < $total): ?>
-                                <li class="civicone-pagination__item civicone-pagination__item--next">
-                                    <a href="<?= $base ?>?page=<?= $current + 1 ?><?= $query ?>" class="civicone-pagination__link" aria-label="Go to next page">
-                                        Next <span aria-hidden="true">›</span>
-                                    </a>
-                                </li>
-                            <?php endif; ?>
                         </ul>
+
+                        <?php if ($current < $total): ?>
+                        <div class="govuk-pagination__next">
+                            <a class="govuk-link govuk-pagination__link" href="<?= $base ?>?page=<?= $current + 1 ?><?= $query ?>" rel="next">
+                                <span class="govuk-pagination__link-title">Next<span class="govuk-visually-hidden"> page</span></span>
+                                <svg class="govuk-pagination__icon govuk-pagination__icon--next" xmlns="http://www.w3.org/2000/svg" height="13" width="15" aria-hidden="true" focusable="false" viewBox="0 0 15 13">
+                                    <path d="m8.107-0.0078125-1.4136 1.414 4.2926 4.293h-12.986v2h12.896l-4.1855 3.9766 1.377 1.4492 6.7441-6.4062-6.7246-6.7266z"></path>
+                                </svg>
+                            </a>
+                        </div>
+                        <?php endif; ?>
                     </nav>
                 <?php endif; ?>
 
-            </div><!-- /two-thirds -->
-        </div><!-- /grid-row -->
+            </div><!-- /.govuk-grid-column-two-thirds -->
+        </div><!-- /.govuk-grid-row -->
 
     </main>
 </div><!-- /width-container -->
