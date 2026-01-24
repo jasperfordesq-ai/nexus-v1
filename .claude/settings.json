@@ -1,7 +1,31 @@
 {
+  "defaultMode": "acceptEdits",
   "permissions": {
     "allow": [
-      "Bash(\"C:/xampp/mysql/bin/mysql.exe\" -u root -e \"SHOW TABLES LIKE ''federation%'';\" truth_)"
+      "Read",
+      "Edit",
+      "Write",
+      "Bash(git status:*)",
+      "Bash(git diff:*)",
+      "Bash(git grep:*)",
+      "Bash(rg:*)",
+      "Bash(ls:*)",
+      "Bash(find:*)",
+      "Bash(npm:*)",
+      "Bash(node:*)",
+      "Bash(php:*)"
+    ],
+    "ask": [
+      "Bash(git push:*)",
+      "Bash(git reset:*)",
+      "Bash(git clean:*)",
+      "Bash(rm:*)",
+      "Bash(sudo:*)"
+    ],
+    "deny": [
+      "Read(./.env)",
+      "Read(./secrets/**)",
+      "Bash(rm -rf:*)"
     ]
   }
 }
