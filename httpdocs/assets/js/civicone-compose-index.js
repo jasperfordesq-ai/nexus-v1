@@ -674,9 +674,9 @@
         }
 
         // ============================================
-        // PREVENT BODY SCROLL ON MOBILE
+        // PREVENT BODY SCROLL ON MOBILE - using classList for GOV.UK compliance
         // ============================================
-        document.body.style.overflow = 'hidden';
+        document.body.classList.add('body-no-scroll');
     });
 
 })();

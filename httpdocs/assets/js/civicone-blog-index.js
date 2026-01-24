@@ -32,7 +32,7 @@
     }
 
     // ============================================
-    // Button Press States (Micro-interactions)
+    // Button Press States (Micro-interactions) - using classList for GOV.UK compliance
     // ============================================
     function initButtonStates() {
         const elements = document.querySelectorAll('#news-holo-wrapper .news-btn, #news-holo-wrapper .news-card');
@@ -40,18 +40,18 @@
         elements.forEach(el => {
             el.addEventListener('pointerdown', function() {
                 if (this.classList.contains('news-card')) {
-                    this.style.transform = 'scale(0.98)';
+                    this.classList.add('btn-pressed-xs');
                 } else {
-                    this.style.transform = 'scale(0.96)';
+                    this.classList.add('btn-pressed');
                 }
             });
 
             el.addEventListener('pointerup', function() {
-                this.style.transform = '';
+                this.classList.remove('btn-pressed', 'btn-pressed-xs');
             });
 
             el.addEventListener('pointerleave', function() {
-                this.style.transform = '';
+                this.classList.remove('btn-pressed', 'btn-pressed-xs');
             });
         });
     }
@@ -120,8 +120,7 @@
                         while (temp.firstChild) {
                             const node = temp.firstChild;
                             if (node.nodeType === 1) {
-                                node.style.opacity = '0';
-                                node.style.transition = 'opacity 0.5s ease';
+                                node.classList.add('fade-out');
 
                                 // Handle image visibility
                                 const images = node.querySelectorAll('img');
@@ -135,7 +134,7 @@
                             }
                             container.appendChild(node);
                             if (node.nodeType === 1) {
-                                setTimeout(() => node.style.opacity = '1', 50);
+                                setTimeout(() => node.classList.replace('fade-out', 'fade-in'), 50);
                             }
                         }
                     }
