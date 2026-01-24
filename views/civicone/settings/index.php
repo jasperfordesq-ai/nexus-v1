@@ -1,9 +1,13 @@
 <?php
-// CivicOne View: Account Settings - GOV.UK Check Answers Pattern
-// ===============================================================
-// Pattern: Template G - Check Answers with Summary list
-// WCAG 2.1 AA Compliant
-// Refactored: 2026-01-20
+/**
+ * CivicOne Account Settings - GOV.UK Frontend v5.14.0 Compliant
+ * Pattern: Check Answers with Summary list
+ * WCAG 2.1 AA Compliant
+ *
+ * v2.0.0 GOV.UK Polish Refactor (2026-01-24):
+ * - Layout provides govuk-width-container and govuk-main-wrapper
+ * - Uses official GOV.UK Frontend v5.14.0 classes
+ */
 
 $pageTitle = 'Account Settings';
 require dirname(__DIR__, 2) . '/layouts/civicone/header.php';
@@ -11,11 +15,21 @@ require dirname(__DIR__, 2) . '/layouts/civicone/header.php';
 $basePath = Nexus\Core\TenantContext::getBasePath();
 ?>
 
-<div class="govuk-width-container">
-    <main class="govuk-main-wrapper">
+<!-- GOV.UK Breadcrumbs -->
+<nav class="govuk-breadcrumbs govuk-!-margin-bottom-6" aria-label="Breadcrumb">
+    <ol class="govuk-breadcrumbs__list">
+        <li class="govuk-breadcrumbs__list-item">
+            <a class="govuk-breadcrumbs__link" href="<?= $basePath ?>">Home</a>
+        </li>
+        <li class="govuk-breadcrumbs__list-item">
+            <a class="govuk-breadcrumbs__link" href="<?= $basePath ?>/dashboard">Dashboard</a>
+        </li>
+        <li class="govuk-breadcrumbs__list-item" aria-current="page">Settings</li>
+    </ol>
+</nav>
 
-        <!-- Page heading -->
-        <h1 class="govuk-heading-xl">Account Settings</h1>
+<!-- Page heading -->
+<h1 class="govuk-heading-xl">Account Settings</h1>
 
         <?php if (isset($_GET['success'])): ?>
             <div class="govuk-notification-banner govuk-notification-banner--success" role="alert" aria-labelledby="govuk-notification-banner-title" data-module="govuk-notification-banner">
@@ -217,14 +231,11 @@ $basePath = Nexus\Core\TenantContext::getBasePath();
             </ul>
         </div>
 
-        <!-- Back to profile link -->
-        <p class="govuk-body govuk-!-margin-top-6">
-            <a href="<?= $basePath ?>/profile/<?= $user['id'] ?>" class="govuk-link">
-                <span aria-hidden="true">←</span> Back to profile
-            </a>
-        </p>
-
-    </main>
-</div>
+<!-- Back to profile link -->
+<p class="govuk-body govuk-!-margin-top-6">
+    <a href="<?= $basePath ?>/profile/<?= $user['id'] ?>" class="govuk-link">
+        <span aria-hidden="true">←</span> Back to profile
+    </a>
+</p>
 
 <?php require dirname(__DIR__, 2) . '/layouts/civicone/footer.php'; ?>
