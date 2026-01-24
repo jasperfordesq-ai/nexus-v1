@@ -358,7 +358,7 @@
                 }, 200);
             }
 
-            console.log('✅ Nexus loading enhancements initialized');
+            console.warn('✅ Nexus loading enhancements initialized');
         }, 100);
     }
 

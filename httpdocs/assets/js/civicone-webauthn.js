@@ -22,14 +22,14 @@
             this.checkSupport();
 
             if (!this.isSupported) {
-                console.log('[CivicOne WebAuthn] Not supported in this browser');
+                console.warn('[CivicOne WebAuthn] Not supported in this browser');
                 return;
             }
 
             this.checkRegistration();
             this.initEventListeners();
 
-            console.log('[CivicOne WebAuthn] Initialized');
+            console.warn('[CivicOne WebAuthn] Initialized');
         },
 
         // =========================================

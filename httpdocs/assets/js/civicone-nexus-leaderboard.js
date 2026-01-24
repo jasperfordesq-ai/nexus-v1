@@ -6,7 +6,7 @@
 
 function loadMoreLeaders() {
     // Implement AJAX call to load more leaderboard entries
-    console.log('Loading more leaders...');
+    console.warn('Loading more leaders...');
 }
 
 // Filter button handlers
@@ -14,7 +14,7 @@ document.querySelectorAll('.filter-button').forEach(button => {
     button.addEventListener('click', function() {
         const timeframe = this.dataset.timeframe;
         // Implement AJAX call to filter leaderboard
-        console.log('Filter by timeframe:', timeframe);
+        console.warn('Filter by timeframe:', timeframe);
 
         // Update active state
         document.querySelectorAll('.filter-button').forEach(btn => btn.classList.remove('active'));

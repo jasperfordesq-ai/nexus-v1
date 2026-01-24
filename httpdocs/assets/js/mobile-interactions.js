@@ -514,7 +514,7 @@
             CheckboxRadio.init();
             PageLoadingBar.init();
 
-            console.log('✅ Mobile Interactions initialized');
+            console.warn('✅ Mobile Interactions initialized');
         }
     };
 

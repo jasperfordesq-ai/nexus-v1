@@ -145,7 +145,7 @@
             }, 300);
         }, 500);
 
-        console.log('✅ Content loaded and visible');
+        console.warn('✅ Content loaded and visible');
     }
 
     // ============================================

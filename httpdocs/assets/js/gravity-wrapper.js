@@ -21,7 +21,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const isDefaultLayout = document.body.getAttribute('data-layout') === 'default';
 
     if (isDefaultLayout && typeof $.fn.jGravity === 'function') {
-        console.log('Gravity: Ready');
+        console.warn('Gravity: Ready');
 
         // Add Gravity Toggle to Footer
         const footer = document.querySelector('footer.container small');
@@ -45,6 +45,6 @@ document.addEventListener('DOMContentLoaded', function () {
             footer.appendChild(gravityLink);
         }
     } else {
-        console.log('Gravity: Disabled (Layout differs or jGravity missing)');
+        console.warn('Gravity: Disabled (Layout differs or jGravity missing)');
     }
 });

@@ -208,7 +208,7 @@
         // Initial update
         updateProgress();
 
-        console.log('[ScrollProgress] Initialized');
+        console.warn('[ScrollProgress] Initialized');
     }
 
     /**

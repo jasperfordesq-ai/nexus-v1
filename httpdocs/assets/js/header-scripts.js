@@ -89,7 +89,7 @@
         // Ignore storage errors
     }
 
-    console.log('ERROR TRAP ACTIVE - Any errors will be caught and displayed');
+    console.warn('ERROR TRAP ACTIVE - Any errors will be caught and displayed');
 
     // =============================================================================
     // OFFLINE BANNER HANDLER

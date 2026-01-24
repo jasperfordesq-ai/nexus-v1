@@ -441,7 +441,7 @@
         initializeSearch(); // Single search input
         initializeTabs(); // Tabs with new structure
         initializeViewToggle(); // List/Grid view toggle
-        console.log('CivicOne Members Directory v1.6.0 initialized (GOV.UK/MOJ compliant)');
+        console.warn('CivicOne Members Directory v1.6.0 initialized (GOV.UK/MOJ compliant)');
     }
 
     // ==================================================

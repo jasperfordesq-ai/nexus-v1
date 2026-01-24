@@ -32,7 +32,7 @@
 
     function init(isLoggedIn) {
         IS_LOGGED_IN = isLoggedIn;
-        console.log('CivicOne Profile Show initialized (GOV.UK compliant)');
+        console.warn('CivicOne Profile Show initialized (GOV.UK compliant)');
     }
 
     // ==================================================

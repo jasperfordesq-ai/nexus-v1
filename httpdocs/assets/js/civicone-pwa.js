@@ -24,7 +24,7 @@
             this.initPushNotifications();
             this.initAppLifecycle();
 
-            console.log('[CivicOne PWA] Initialized');
+            console.warn('[CivicOne PWA] Initialized');
         },
 
         // =========================================
@@ -61,7 +61,7 @@
                     this.showInstallBanner();
                 }, 30000); // 30 seconds delay
 
-                console.log('[CivicOne PWA] Install prompt captured');
+                console.warn('[CivicOne PWA] Install prompt captured');
             });
 
             // Track successful installation
@@ -76,7 +76,7 @@
                     CivicOneMobile.showToast('App installed successfully!', 'success');
                 }
 
-                console.log('[CivicOne PWA] App installed');
+                console.warn('[CivicOne PWA] App installed');
             });
 
             // Set up install button click handlers
@@ -162,7 +162,7 @@
 
         async promptInstall() {
             if (!this.deferredPrompt) {
-                console.log('[CivicOne PWA] No install prompt available');
+                console.warn('[CivicOne PWA] No install prompt available');
                 return;
             }
 
@@ -171,7 +171,7 @@
 
             // Wait for user choice
             const { outcome } = await this.deferredPrompt.userChoice;
-            console.log('[CivicOne PWA] User choice:', outcome);
+            console.warn('[CivicOne PWA] User choice:', outcome);
 
             // Clear the prompt
             this.deferredPrompt = null;
@@ -185,7 +185,7 @@
         initPushNotifications: function() {
             // Check support (including Notification API for mobile browsers)
             if (!('serviceWorker' in navigator) || !('PushManager' in window) || !('Notification' in window)) {
-                console.log('[CivicOne PWA] Push notifications not supported');
+                console.warn('[CivicOne PWA] Push notifications not supported');
                 return;
             }
 
@@ -209,7 +209,7 @@
                 if (subscription) {
                     this.pushSubscription = subscription;
                     document.body.classList.add('push-enabled');
-                    console.log('[CivicOne PWA] Existing push subscription found');
+                    console.warn('[CivicOne PWA] Existing push subscription found');
                 }
             } catch (e) {
                 console.error('[CivicOne PWA] Error checking push subscription:', e);
@@ -222,7 +222,7 @@
                 const permission = await Notification.requestPermission();
 
                 if (permission !== 'granted') {
-                    console.log('[CivicOne PWA] Push permission denied');
+                    console.warn('[CivicOne PWA] Push permission denied');
                     if (window.CivicOneMobile) {
                         CivicOneMobile.showToast('Notification permission denied', 'warning');
                     }
@@ -278,7 +278,7 @@
                     CivicOneMobile.showToast('Notifications enabled!', 'success');
                 }
 
-                console.log('[CivicOne PWA] Push subscription successful');
+                console.warn('[CivicOne PWA] Push subscription successful');
 
             } catch (e) {
                 console.error('[CivicOne PWA] Error subscribing to push:', e);
@@ -336,7 +336,7 @@
         },
 
         onAppResume: function() {
-            console.log('[CivicOne PWA] App resumed');
+            console.warn('[CivicOne PWA] App resumed');
 
             // Refresh badges
             if (window.updateBottomNavBadges) {
@@ -352,7 +352,7 @@
         },
 
         onAppPause: function() {
-            console.log('[CivicOne PWA] App paused');
+            console.warn('[CivicOne PWA] App paused');
         },
 
         // =========================================
