@@ -1,169 +1,315 @@
 <?php
 /**
- * AI Assistant Page
- * Full-featured AI chat interface
+ * AI Assistant Page - GOV.UK Design System
+ * WCAG 2.1 AA Compliant Chat Interface
  */
 
-$hero_title = "AI Assistant";
-$hero_subtitle = "Your intelligent timebank companion";
-$hero_gradient = 'htb-hero-gradient-special';
-$hero_type = 'AI';
+$pageTitle = "AI Assistant";
+\Nexus\Core\SEO::setTitle('AI Assistant - Your Timebank Companion');
+\Nexus\Core\SEO::setDescription('Get intelligent help with timebanking, listings, and community features.');
 
-require __DIR__ . '/../../layouts/header.php';
+require __DIR__ . '/../../layouts/civicone/header.php';
 
 $basePath = \Nexus\Core\TenantContext::getBasePath();
 $currentConversationId = $conversation['id'] ?? null;
 ?>
 
-<!-- AI Chat Interface CSS -->
-<link rel="stylesheet" href="<?= NexusCoreTenantContext::getBasePath() ?>/assets/css/purged/civicone-ai-index.min.css">
+<div class="govuk-width-container">
+    <main class="govuk-main-wrapper">
+        <div class="govuk-grid-row">
+            <!-- Sidebar with conversations -->
+            <aside class="govuk-grid-column-one-third" role="complementary" aria-label="Conversation history">
+                <div class="govuk-!-margin-bottom-4">
+                    <button type="button" class="govuk-button govuk-!-margin-bottom-0" data-module="govuk-button" onclick="startNewChat()" style="width: 100%;">
+                        <i class="fa-solid fa-plus govuk-!-margin-right-2" aria-hidden="true"></i>
+                        New Chat
+                    </button>
+                </div>
 
-<div class="ai-page-wrapper">
-<div class="ai-page-container">
-    <!-- Sidebar with conversations -->
-    <aside class="ai-sidebar" role="complementary" aria-label="Conversation history">
-        <div class="ai-sidebar-header">
-            <button class="ai-new-chat-btn" onclick="startNewChat()" aria-label="Start a new conversation">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <line x1="12" y1="5" x2="12" y2="19"></line>
-                    <line x1="5" y1="12" x2="19" y2="12"></line>
-                </svg>
-                New Chat
-            </button>
-            <button class="ai-sidebar-toggle" id="sidebarToggle" onclick="toggleSidebar()" aria-label="Toggle conversations">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <polyline points="6 9 12 15 18 9"></polyline>
-                </svg>
-            </button>
-        </div>
+                <h2 class="govuk-heading-s">Previous Chats</h2>
 
-        <div class="ai-conversations-list" id="conversationsList" role="list" aria-label="Previous conversations">
-            <?php if (empty($conversations)): ?>
-                <p class="ai-empty-conversations">
-                    No conversations yet.<br>Start a new chat!
-                </p>
-            <?php else: ?>
-                <?php foreach ($conversations as $conv): ?>
-                    <div class="ai-conversation-item <?= ($conv['id'] ?? 0) == $currentConversationId ? 'active' : '' ?>"
-                         onclick="loadConversation(<?= $conv['id'] ?>)"
-                         data-id="<?= $conv['id'] ?>"
-                         role="button"
-                         tabindex="0"
-                         aria-label="Conversation: <?= htmlspecialchars($conv['title'] ?? 'New Chat') ?>">
-                        <div class="conv-icon">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
-                            </svg>
+                <div id="conversationsList" role="list" aria-label="Previous conversations">
+                    <?php if (empty($conversations)): ?>
+                        <div class="govuk-!-padding-4 govuk-!-text-align-center" style="background: #f3f2f1; border-left: 5px solid #1d70b8;">
+                            <p class="govuk-body-s govuk-!-margin-bottom-0">
+                                No conversations yet.<br>Start a new chat!
+                            </p>
                         </div>
-                        <div class="conv-info">
-                            <div class="conv-title"><?= htmlspecialchars($conv['title'] ?? 'New Chat') ?></div>
-                            <div class="conv-date"><?= date('M j, g:i a', strtotime($conv['created_at'])) ?></div>
-                        </div>
-                        <button class="conv-delete-btn" onclick="event.stopPropagation(); deleteConversation(<?= $conv['id'] ?>)" aria-label="Delete conversation" title="Delete">
-                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <polyline points="3 6 5 6 21 6"></polyline>
-                                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
-                            </svg>
-                        </button>
-                    </div>
-                <?php endforeach; ?>
-            <?php endif; ?>
-        </div>
-    </aside>
+                    <?php else: ?>
+                        <?php foreach ($conversations as $conv): ?>
+                            <div class="govuk-!-margin-bottom-2 govuk-!-padding-3 <?= ($conv['id'] ?? 0) == $currentConversationId ? '' : 'govuk-button--secondary' ?>"
+                                 style="background: <?= ($conv['id'] ?? 0) == $currentConversationId ? '#1d70b8' : '#f3f2f1' ?>; color: <?= ($conv['id'] ?? 0) == $currentConversationId ? 'white' : 'inherit' ?>; cursor: pointer; display: flex; align-items: center; gap: 10px; border-left: 5px solid <?= ($conv['id'] ?? 0) == $currentConversationId ? '#00703c' : '#b1b4b6' ?>;"
+                                 onclick="loadConversation(<?= $conv['id'] ?>)"
+                                 data-id="<?= $conv['id'] ?>"
+                                 role="button"
+                                 tabindex="0"
+                                 aria-label="Conversation: <?= htmlspecialchars($conv['title'] ?? 'New Chat') ?>">
+                                <i class="fa-solid fa-message" aria-hidden="true"></i>
+                                <div style="flex: 1; min-width: 0;">
+                                    <p class="govuk-body-s govuk-!-font-weight-bold govuk-!-margin-bottom-0" style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                                        <?= htmlspecialchars($conv['title'] ?? 'New Chat') ?>
+                                    </p>
+                                    <p class="govuk-body-s govuk-!-margin-bottom-0" style="opacity: 0.7;">
+                                        <?= date('M j, g:i a', strtotime($conv['created_at'])) ?>
+                                    </p>
+                                </div>
+                                <button type="button"
+                                        onclick="event.stopPropagation(); deleteConversation(<?= $conv['id'] ?>)"
+                                        class="govuk-button govuk-button--warning govuk-!-margin-bottom-0"
+                                        style="padding: 4px 8px; min-width: 0;"
+                                        aria-label="Delete conversation"
+                                        title="Delete">
+                                    <i class="fa-solid fa-trash" aria-hidden="true"></i>
+                                </button>
+                            </div>
+                        <?php endforeach; ?>
+                    <?php endif; ?>
+                </div>
+            </aside>
 
-    <!-- Main Chat Area -->
-    <main class="ai-chat-main" role="main" aria-label="AI Chat">
-        <div class="ai-chat-header">
-            <h2 id="chatTitle"><?= htmlspecialchars($conversation['title'] ?? 'NEXUS AI Assistant') ?></h2>
-            <div class="ai-provider-badge">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <circle cx="12" cy="12" r="3"></circle>
-                    <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"></path>
-                </svg>
-                <span id="providerName"><?= ucfirst($defaultProvider ?? 'Gemini') ?></span>
-            </div>
-        </div>
-
-        <div class="ai-messages-container" id="messagesContainer" role="log" aria-live="polite" aria-label="Chat messages">
-            <?php if (empty($messages)): ?>
-                <!-- Welcome State -->
-                <div class="ai-welcome" id="welcomeState">
-                    <div class="ai-welcome-icon">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2z"></path>
-                            <path d="M12 16v-4M12 8h.01"></path>
-                        </svg>
-                    </div>
-                    <h3>Welcome to NEXUS AI</h3>
-                    <p><?= nl2br(htmlspecialchars($welcomeMessage ?? "I'm your intelligent timebank assistant. I can help you find members, create listings, understand features, and more!")) ?></p>
-
-                    <div class="ai-suggestions">
-                        <button class="ai-suggestion-btn" onclick="sendSuggestion('How does timebanking work?')">
-                            How does timebanking work?
-                        </button>
-                        <button class="ai-suggestion-btn" onclick="sendSuggestion('Help me write a listing description')">
-                            Help me write a listing
-                        </button>
-                        <button class="ai-suggestion-btn" onclick="sendSuggestion('What skills are in demand?')">
-                            What skills are in demand?
-                        </button>
-                        <button class="ai-suggestion-btn" onclick="sendSuggestion('How do I earn time credits?')">
-                            How do I earn credits?
-                        </button>
+            <!-- Main Chat Area -->
+            <div class="govuk-grid-column-two-thirds" role="main" aria-label="AI Chat">
+                <!-- Chat Header -->
+                <div class="govuk-!-margin-bottom-4 govuk-!-padding-4" style="background: #1d70b8; color: white;">
+                    <div style="display: flex; align-items: center; justify-content: space-between;">
+                        <h1 class="govuk-heading-m govuk-!-margin-bottom-0" style="color: white;">
+                            <i class="fa-solid fa-robot govuk-!-margin-right-2" aria-hidden="true"></i>
+                            <span id="chatTitle"><?= htmlspecialchars($conversation['title'] ?? 'NEXUS AI Assistant') ?></span>
+                        </h1>
+                        <strong class="govuk-tag" style="background: #00703c;">
+                            <i class="fa-solid fa-brain govuk-!-margin-right-1" aria-hidden="true"></i>
+                            <span id="providerName"><?= ucfirst($defaultProvider ?? 'Gemini') ?></span>
+                        </strong>
                     </div>
                 </div>
-            <?php else: ?>
-                <?php foreach ($messages as $msg): ?>
-                    <div class="ai-message <?= $msg['role'] ?>">
-                        <div class="ai-message-avatar">
-                            <?php if ($msg['role'] === 'assistant'): ?>
-                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <circle cx="12" cy="12" r="3"></circle>
-                                </svg>
-                            <?php else: ?>
-                                <?= substr($_SESSION['user_name'] ?? 'U', 0, 1) ?>
-                            <?php endif; ?>
-                        </div>
-                        <div class="ai-message-content">
-                            <?= nl2br(htmlspecialchars($msg['content'])) ?>
-                        </div>
-                    </div>
-                <?php endforeach; ?>
-            <?php endif; ?>
-        </div>
 
-        <div class="ai-input-area">
-            <div class="ai-input-wrapper">
-                <textarea
-                    class="ai-input-field"
-                    id="messageInput"
-                    placeholder="Ask me anything about timebanking..."
-                    rows="1"
-                    onkeydown="handleInputKeydown(event)"
-                    aria-label="Type your message"
-                ></textarea>
-                <button class="ai-send-btn" id="sendBtn" onclick="sendMessage()" aria-label="Send message">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <line x1="22" y1="2" x2="11" y2="13"></line>
-                        <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
-                    </svg>
-                </button>
-                <button class="ai-stop-btn hidden" id="stopBtn" onclick="stopGeneration()" aria-label="Stop generation">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <rect x="6" y="6" width="12" height="12" rx="2"></rect>
-                    </svg>
-                </button>
-            </div>
-            <div class="ai-limits-bar">
-                <span>Daily: <span id="dailyUsage"><?= $limits['daily_used'] ?? 0 ?></span>/<?= $limits['daily_limit'] ?? 50 ?></span>
-                <span>Monthly: <span id="monthlyUsage"><?= $limits['monthly_used'] ?? 0 ?></span>/<?= $limits['monthly_limit'] ?? 1000 ?></span>
+                <!-- Messages Container -->
+                <div id="messagesContainer"
+                     role="log"
+                     aria-live="polite"
+                     aria-label="Chat messages"
+                     style="min-height: 400px; max-height: 500px; overflow-y: auto; background: #f3f2f1; padding: 20px; border: 1px solid #b1b4b6;">
+                    <?php if (empty($messages)): ?>
+                        <!-- Welcome State -->
+                        <div id="welcomeState" class="govuk-!-text-align-center govuk-!-padding-6">
+                            <p class="govuk-body govuk-!-margin-bottom-4">
+                                <i class="fa-solid fa-robot fa-3x" style="color: #1d70b8;" aria-hidden="true"></i>
+                            </p>
+                            <h2 class="govuk-heading-l">Welcome to NEXUS AI</h2>
+                            <p class="govuk-body-l govuk-!-margin-bottom-6">
+                                <?= nl2br(htmlspecialchars($welcomeMessage ?? "I'm your intelligent timebank assistant. I can help you find members, create listings, understand features, and more!")) ?>
+                            </p>
+
+                            <div class="govuk-button-group" style="flex-wrap: wrap; justify-content: center;">
+                                <button type="button" class="govuk-button govuk-button--secondary" data-module="govuk-button" onclick="sendSuggestion('How does timebanking work?')">
+                                    How does timebanking work?
+                                </button>
+                                <button type="button" class="govuk-button govuk-button--secondary" data-module="govuk-button" onclick="sendSuggestion('Help me write a listing description')">
+                                    Help me write a listing
+                                </button>
+                                <button type="button" class="govuk-button govuk-button--secondary" data-module="govuk-button" onclick="sendSuggestion('What skills are in demand?')">
+                                    What skills are in demand?
+                                </button>
+                                <button type="button" class="govuk-button govuk-button--secondary" data-module="govuk-button" onclick="sendSuggestion('How do I earn time credits?')">
+                                    How do I earn credits?
+                                </button>
+                            </div>
+                        </div>
+                    <?php else: ?>
+                        <?php foreach ($messages as $msg): ?>
+                            <div class="govuk-!-margin-bottom-4 govuk-!-padding-4" style="background: <?= $msg['role'] === 'assistant' ? 'white' : '#d4351c15' ?>; border-left: 5px solid <?= $msg['role'] === 'assistant' ? '#1d70b8' : '#00703c' ?>;">
+                                <div style="display: flex; align-items: flex-start; gap: 12px;">
+                                    <div style="width: 36px; height: 36px; border-radius: 50%; background: <?= $msg['role'] === 'assistant' ? '#1d70b8' : '#00703c' ?>; color: white; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                                        <?php if ($msg['role'] === 'assistant'): ?>
+                                            <i class="fa-solid fa-robot" aria-hidden="true"></i>
+                                        <?php else: ?>
+                                            <?= substr($_SESSION['user_name'] ?? 'U', 0, 1) ?>
+                                        <?php endif; ?>
+                                    </div>
+                                    <div style="flex: 1;">
+                                        <p class="govuk-body-s govuk-!-font-weight-bold govuk-!-margin-bottom-1">
+                                            <?= $msg['role'] === 'assistant' ? 'AI Assistant' : ($_SESSION['user_name'] ?? 'You') ?>
+                                        </p>
+                                        <p class="govuk-body govuk-!-margin-bottom-0">
+                                            <?= nl2br(htmlspecialchars($msg['content'])) ?>
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        <?php endforeach; ?>
+                    <?php endif; ?>
+                </div>
+
+                <!-- Input Area -->
+                <div class="govuk-!-margin-top-4">
+                    <div class="govuk-form-group govuk-!-margin-bottom-2">
+                        <label class="govuk-label govuk-visually-hidden" for="messageInput">Type your message</label>
+                        <textarea
+                            class="govuk-textarea"
+                            id="messageInput"
+                            placeholder="Ask me anything about timebanking..."
+                            rows="3"
+                            onkeydown="handleInputKeydown(event)"
+                            aria-label="Type your message"
+                        ></textarea>
+                    </div>
+                    <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px;">
+                        <div class="govuk-button-group govuk-!-margin-bottom-0">
+                            <button type="button" class="govuk-button govuk-!-margin-bottom-0" data-module="govuk-button" id="sendBtn" onclick="sendMessage()">
+                                <i class="fa-solid fa-paper-plane govuk-!-margin-right-2" aria-hidden="true"></i>
+                                Send Message
+                            </button>
+                            <button type="button" class="govuk-button govuk-button--warning govuk-!-margin-bottom-0 govuk-!-display-none" data-module="govuk-button" id="stopBtn" onclick="stopGeneration()">
+                                <i class="fa-solid fa-stop govuk-!-margin-right-2" aria-hidden="true"></i>
+                                Stop
+                            </button>
+                        </div>
+                        <p class="govuk-body-s govuk-!-margin-bottom-0" style="color: #505a5f;">
+                            Daily: <strong id="dailyUsage"><?= $limits['daily_used'] ?? 0 ?></strong>/<?= $limits['daily_limit'] ?? 50 ?>
+                            |
+                            Monthly: <strong id="monthlyUsage"><?= $limits['monthly_used'] ?? 0 ?></strong>/<?= $limits['monthly_limit'] ?? 1000 ?>
+                        </p>
+                    </div>
+                </div>
             </div>
         </div>
     </main>
 </div>
-</div><!-- .ai-page-wrapper -->
 
-<!-- AI Chat Interface JavaScript -->
-<script src="<?= NexusCoreTenantContext::getBasePath() ?>/assets/js/civicone-ai-index.min.js" defer></script>
+<script>
+var basePath = '<?= $basePath ?>';
+var currentConversationId = <?= $currentConversationId ?? 'null' ?>;
+var isGenerating = false;
 
-<?php require __DIR__ . '/../../layouts/footer.php'; ?>
+function startNewChat() {
+    window.location.href = basePath + '/ai';
+}
+
+function loadConversation(id) {
+    window.location.href = basePath + '/ai/' + id;
+}
+
+function deleteConversation(id) {
+    if (!confirm('Delete this conversation?')) return;
+
+    fetch(basePath + '/api/ai/conversations/' + id, {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' }
+    }).then(function(response) {
+        if (response.ok) {
+            var item = document.querySelector('[data-id="' + id + '"]');
+            if (item) item.remove();
+            if (currentConversationId === id) {
+                startNewChat();
+            }
+        }
+    });
+}
+
+function sendSuggestion(text) {
+    document.getElementById('messageInput').value = text;
+    sendMessage();
+}
+
+function handleInputKeydown(e) {
+    if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        sendMessage();
+    }
+}
+
+function sendMessage() {
+    var input = document.getElementById('messageInput');
+    var message = input.value.trim();
+    if (!message || isGenerating) return;
+
+    // Hide welcome state
+    var welcome = document.getElementById('welcomeState');
+    if (welcome) welcome.classList.add('govuk-!-display-none');
+
+    // Add user message
+    addMessage('user', message);
+    input.value = '';
+
+    // Show loading state
+    isGenerating = true;
+    document.getElementById('sendBtn').classList.add('govuk-!-display-none');
+    document.getElementById('stopBtn').classList.remove('govuk-!-display-none');
+
+    // Add typing indicator
+    var typingId = 'typing-' + Date.now();
+    addMessage('assistant', '<i class="fa-solid fa-spinner fa-spin"></i> Thinking...', typingId);
+
+    // Send to API
+    fetch(basePath + '/api/ai/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            message: message,
+            conversation_id: currentConversationId
+        })
+    })
+    .then(function(response) { return response.json(); })
+    .then(function(data) {
+        // Remove typing indicator
+        var typing = document.getElementById(typingId);
+        if (typing) typing.remove();
+
+        if (data.error) {
+            addMessage('assistant', 'Error: ' + data.error);
+        } else {
+            addMessage('assistant', data.response);
+            if (data.conversation_id && !currentConversationId) {
+                currentConversationId = data.conversation_id;
+            }
+            // Update usage
+            if (data.usage) {
+                document.getElementById('dailyUsage').textContent = data.usage.daily || 0;
+                document.getElementById('monthlyUsage').textContent = data.usage.monthly || 0;
+            }
+        }
+    })
+    .catch(function(err) {
+        var typing = document.getElementById(typingId);
+        if (typing) typing.remove();
+        addMessage('assistant', 'Sorry, something went wrong. Please try again.');
+    })
+    .finally(function() {
+        isGenerating = false;
+        document.getElementById('sendBtn').classList.remove('govuk-!-display-none');
+        document.getElementById('stopBtn').classList.add('govuk-!-display-none');
+    });
+}
+
+function addMessage(role, content, id) {
+    var container = document.getElementById('messagesContainer');
+    var div = document.createElement('div');
+    if (id) div.id = id;
+    div.className = 'govuk-!-margin-bottom-4 govuk-!-padding-4';
+    div.style.cssText = 'background: ' + (role === 'assistant' ? 'white' : '#d4351c15') + '; border-left: 5px solid ' + (role === 'assistant' ? '#1d70b8' : '#00703c') + ';';
+
+    var avatar = role === 'assistant'
+        ? '<i class="fa-solid fa-robot" aria-hidden="true"></i>'
+        : '<?= substr($_SESSION['user_name'] ?? 'U', 0, 1) ?>';
+    var name = role === 'assistant' ? 'AI Assistant' : '<?= addslashes($_SESSION['user_name'] ?? 'You') ?>';
+
+    div.innerHTML =
+        '<div style="display: flex; align-items: flex-start; gap: 12px;">' +
+        '<div style="width: 36px; height: 36px; border-radius: 50%; background: ' + (role === 'assistant' ? '#1d70b8' : '#00703c') + '; color: white; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">' + avatar + '</div>' +
+        '<div style="flex: 1;">' +
+        '<p class="govuk-body-s govuk-!-font-weight-bold govuk-!-margin-bottom-1">' + name + '</p>' +
+        '<p class="govuk-body govuk-!-margin-bottom-0">' + content.replace(/\n/g, '<br>') + '</p>' +
+        '</div></div>';
+
+    container.appendChild(div);
+    container.scrollTop = container.scrollHeight;
+}
+
+function stopGeneration() {
+    isGenerating = false;
+    document.getElementById('sendBtn').classList.remove('govuk-!-display-none');
+    document.getElementById('stopBtn').classList.add('govuk-!-display-none');
+}
+</script>
+
+<?php require __DIR__ . '/../../layouts/civicone/footer.php'; ?>
