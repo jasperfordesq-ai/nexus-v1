@@ -8,32 +8,32 @@
    ============================================ */
 
 :root {
-    --glass-bg: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.85) 100%);
-    --glass-border: rgba(255, 255, 255, 0.5);
-    --glass-shadow: 0 8px 32px rgba(31, 38, 135, 0.1);
-    --glass-hover-shadow: 0 12px 40px rgba(31, 38, 135, 0.15);
+    --glass-bg: linear-gradient(135deg, var(--color-white-alpha-95) 0%, var(--color-white-alpha-85) 100%);
+    --glass-border: var(--color-white-alpha-50);
+    --glass-shadow: 0 8px 32px var(--color-glass-shadow);
+    --glass-hover-shadow: 0 12px 40px var(--color-glass-shadow-15);
     --holographic-shimmer: linear-gradient(
         135deg,
-        rgba(99, 102, 241, 0.1) 0%,
-        rgba(168, 85, 247, 0.08) 25%,
-        rgba(236, 72, 153, 0.08) 50%,
-        rgba(168, 85, 247, 0.08) 75%,
-        rgba(99, 102, 241, 0.1) 100%
+        var(--color-indigo-alpha-10) 0%,
+        var(--color-purple-alpha-8) 25%,
+        var(--color-pink-alpha-8) 50%,
+        var(--color-purple-alpha-8) 75%,
+        var(--color-indigo-alpha-10) 100%
     );
 }
 
 [data-theme="dark"] {
-    --glass-bg: linear-gradient(135deg, rgba(30, 41, 59, 0.95) 0%, rgba(30, 41, 59, 0.85) 100%);
-    --glass-border: rgba(255, 255, 255, 0.1);
-    --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-    --glass-hover-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
+    --glass-bg: linear-gradient(135deg, var(--color-slate-alpha-95) 0%, var(--color-slate-alpha-85) 100%);
+    --glass-border: var(--color-white-alpha-10);
+    --glass-shadow: 0 8px 32px var(--color-black-alpha-30);
+    --glass-hover-shadow: 0 12px 40px var(--color-black-alpha-40);
     --holographic-shimmer: linear-gradient(
         135deg,
-        rgba(99, 102, 241, 0.15) 0%,
-        rgba(168, 85, 247, 0.12) 25%,
-        rgba(236, 72, 153, 0.12) 50%,
-        rgba(168, 85, 247, 0.12) 75%,
-        rgba(99, 102, 241, 0.15) 100%
+        var(--color-indigo-alpha-15) 0%,
+        var(--color-purple-alpha-12) 25%,
+        var(--color-pink-alpha-12) 50%,
+        var(--color-purple-alpha-12) 75%,
+        var(--color-indigo-alpha-15) 100%
     );
 }
 
@@ -57,9 +57,9 @@
     width: 200%;
     height: 200%;
     background:
-        radial-gradient(ellipse at 20% 30%, rgba(99, 102, 241, 0.12) 0%, transparent 50%),
-        radial-gradient(ellipse at 80% 20%, rgba(236, 72, 153, 0.1) 0%, transparent 45%),
-        radial-gradient(ellipse at 60% 80%, rgba(168, 85, 247, 0.1) 0%, transparent 50%);
+        radial-gradient(ellipse at 20% 30%, var(--color-indigo-alpha-12) 0%, transparent 50%),
+        radial-gradient(ellipse at 80% 20%, var(--color-pink-alpha-10) 0%, transparent 45%),
+        radial-gradient(ellipse at 60% 80%, var(--color-purple-alpha-10) 0%, transparent 50%);
     /* animation removed for GOV.UK compliance */
 }
 
@@ -73,7 +73,7 @@
     background: repeating-linear-gradient(
         90deg,
         transparent 0px,
-        rgba(99, 102, 241, 0.02) 1px,
+        var(--color-indigo-alpha-2) 1px,
         transparent 2px,
         transparent 40px
     );
@@ -86,9 +86,9 @@
 
 [data-theme="dark"] .post-detail-bg::before {
     background:
-        radial-gradient(ellipse at 20% 30%, rgba(99, 102, 241, 0.2) 0%, transparent 50%),
-        radial-gradient(ellipse at 80% 20%, rgba(236, 72, 153, 0.15) 0%, transparent 45%),
-        radial-gradient(ellipse at 60% 80%, rgba(168, 85, 247, 0.15) 0%, transparent 50%);
+        radial-gradient(ellipse at 20% 30%, var(--color-indigo-alpha-20) 0%, transparent 50%),
+        radial-gradient(ellipse at 80% 20%, var(--color-pink-alpha-15) 0%, transparent 45%),
+        radial-gradient(ellipse at 60% 80%, var(--color-purple-alpha-15) 0%, transparent 50%);
 }
 
 
@@ -140,7 +140,7 @@
     color: var(--color-primary-500);
     transform: translateX(-4px) translateY(-2px);
     box-shadow: var(--glass-hover-shadow);
-    border-color: rgba(99, 102, 241, 0.3);
+    border-color: var(--color-indigo-alpha-30);
 }
 
 [data-theme="dark"] .glass-button:hover {
@@ -170,7 +170,7 @@
     background: linear-gradient(
         90deg,
         transparent 0%,
-        rgba(255, 255, 255, 0.1) 50%,
+        var(--color-white-alpha-10) 50%,
         transparent 100%
     );
     /* animation removed for GOV.UK compliance */
@@ -200,21 +200,21 @@
     height: var(--space-14);
     border-radius: 50%;
     object-fit: cover;
-    border: 3px solid rgba(99, 102, 241, 0.2);
+    border: 3px solid var(--color-indigo-alpha-20);
     flex-shrink: 0;
-    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.15),
-                inset 0 0 0 1px rgba(255, 255, 255, 0.2);
+    box-shadow: 0 4px 12px var(--color-indigo-alpha-15),
+                inset 0 0 0 1px var(--color-white-alpha-20);
     transition: all 0.3s ease;
 }
 
 .post-avatar:hover {
     transform: scale(1.05);
-    border-color: rgba(99, 102, 241, 0.4);
-    box-shadow: 0 6px 16px rgba(99, 102, 241, 0.25);
+    border-color: var(--color-indigo-alpha-40);
+    box-shadow: 0 6px 16px var(--color-indigo-alpha-25);
 }
 
 [data-theme="dark"] .post-avatar {
-    border-color: rgba(168, 85, 247, 0.3);
+    border-color: var(--color-purple-alpha-30);
 }
 
 .post-meta {
@@ -254,18 +254,18 @@
     align-items: center;
     gap: var(--space-1);
     padding: var(--space-1) var(--space-2-5);
-    background: rgba(99, 102, 241, 0.1);
+    background: var(--color-indigo-alpha-10);
     border-radius: var(--radius-md);
     font-size: 0.8rem;
     color: var(--color-primary-500);
     font-weight: 600;
-    border: 1px solid rgba(99, 102, 241, 0.2);
+    border: 1px solid var(--color-indigo-alpha-20);
 }
 
 [data-theme="dark"] .post-visibility {
-    background: rgba(168, 85, 247, 0.15);
+    background: var(--color-purple-alpha-15);
     color: var(--color-purple-400);
-    border-color: rgba(168, 85, 247, 0.3);
+    border-color: var(--color-purple-alpha-30);
 }
 
 .post-menu-btn {
@@ -279,7 +279,7 @@
 }
 
 .post-menu-btn:hover {
-    background: rgba(99, 102, 241, 0.1);
+    background: var(--color-indigo-alpha-10);
     color: var(--color-primary-500);
 }
 
@@ -324,8 +324,8 @@
     width: 100%;
     height: auto;
     display: block;
-    border-top: 1px solid rgba(99, 102, 241, 0.1);
-    border-bottom: 1px solid rgba(99, 102, 241, 0.1);
+    border-top: 1px solid var(--color-indigo-alpha-10);
+    border-bottom: 1px solid var(--color-indigo-alpha-10);
 }
 
 /* Stats Bar with Holographic Accent */
@@ -335,7 +335,7 @@
     padding: var(--space-3-5) var(--space-6);
     font-size: 0.95rem;
     color: var(--color-slate-500);
-    border-bottom: 1px solid rgba(99, 102, 241, 0.1);
+    border-bottom: 1px solid var(--color-indigo-alpha-10);
     background: var(--holographic-shimmer);
     background-size: 200% 100%;
     /* animation removed for GOV.UK compliance */
@@ -356,7 +356,7 @@
 }
 
 .post-stats .stat-item:hover {
-    background: rgba(99, 102, 241, 0.15);
+    background: var(--color-indigo-alpha-15);
     color: var(--color-primary-500);
     transform: translateY(-2px);
 }
@@ -364,7 +364,7 @@
 .post-stats .stat-item i {
     color: var(--color-primary-500);
     font-size: 1.1rem;
-    filter: drop-shadow(0 2px 4px rgba(99, 102, 241, 0.3));
+    filter: drop-shadow(0 2px 4px var(--color-indigo-alpha-30));
 }
 
 /* Action Buttons - Full Facebook Style */
@@ -402,7 +402,7 @@
     width: 0;
     height: 0;
     border-radius: 50%;
-    background: radial-gradient(circle, rgba(99, 102, 241, 0.2), transparent);
+    background: radial-gradient(circle, var(--color-indigo-alpha-20), transparent);
     transform: translate(-50%, -50%);
     transition: width 0.6s, height 0.6s;
 }
@@ -413,7 +413,7 @@
 }
 
 .action-btn:hover {
-    background: rgba(99, 102, 241, 0.08);
+    background: var(--color-indigo-alpha-8);
     color: var(--color-primary-500);
     transform: translateY(-2px);
 }
@@ -446,14 +446,14 @@
 /* Comments Section - Premium Design */
 .comments-section {
     padding: var(--space-6);
-    background: rgba(99, 102, 241, 0.02);
-    border-top: 1px solid rgba(99, 102, 241, 0.1);
+    background: var(--color-indigo-alpha-2);
+    border-top: 1px solid var(--color-indigo-alpha-10);
     position: relative;
     z-index: 1;
 }
 
 [data-theme="dark"] .comments-section {
-    background: rgba(99, 102, 241, 0.05);
+    background: var(--color-indigo-alpha-5);
 }
 
 .comments-header {
@@ -472,7 +472,7 @@
 
 .comments-header i {
     color: var(--color-primary-500);
-    filter: drop-shadow(0 2px 4px rgba(99, 102, 241, 0.3));
+    filter: drop-shadow(0 2px 4px var(--color-indigo-alpha-30));
 }
 
 /* Comment Compose - Holographic Style */
@@ -488,8 +488,8 @@
     border-radius: 50%;
     object-fit: cover;
     flex-shrink: 0;
-    border: 2px solid rgba(99, 102, 241, 0.2);
-    box-shadow: 0 2px 8px rgba(99, 102, 241, 0.1);
+    border: 2px solid var(--color-indigo-alpha-20);
+    box-shadow: 0 2px 8px var(--color-indigo-alpha-10);
 }
 
 .comment-input-wrapper {
@@ -499,10 +499,10 @@
 
 .comment-input {
     width: 100%;
-    background: rgba(255, 255, 255, 0.9);
+    background: var(--color-white-alpha-90);
     /* backdrop-filter removed for GOV.UK compliance */
     -webkit-/* backdrop-filter removed for GOV.UK compliance */
-    border: 2px solid rgba(99, 102, 241, 0.2);
+    border: 2px solid var(--color-indigo-alpha-20);
     border-radius: var(--radius-2xl);
     padding: var(--space-3) var(--space-14) var(--space-3) var(--space-5);
     font-size: 0.95rem;
@@ -514,20 +514,20 @@
 .comment-input:focus {
     outline: none;
     border-color: var(--color-primary-500);
-    box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1), 0 8px 16px rgba(99, 102, 241, 0.15);
-    background: rgba(255, 255, 255, 1);
+    box-shadow: 0 0 0 4px var(--color-indigo-alpha-10), 0 8px 16px var(--color-indigo-alpha-15);
+    background: var(--color-white);
 }
 
 [data-theme="dark"] .comment-input {
-    background: rgba(30, 41, 59, 0.8);
-    border-color: rgba(168, 85, 247, 0.3);
+    background: var(--color-slate-alpha-80);
+    border-color: var(--color-purple-alpha-30);
     color: var(--color-slate-100);
 }
 
 [data-theme="dark"] .comment-input:focus {
-    background: rgba(30, 41, 59, 0.95);
+    background: var(--color-slate-alpha-95);
     border-color: var(--color-purple-400);
-    box-shadow: 0 0 0 4px rgba(168, 85, 247, 0.15), 0 8px 16px rgba(168, 85, 247, 0.2);
+    box-shadow: 0 0 0 4px var(--color-purple-alpha-15), 0 8px 16px var(--color-purple-alpha-20);
 }
 
 .comment-send-btn {
@@ -546,12 +546,12 @@
     align-items: center;
     justify-content: center;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4);
+    box-shadow: 0 4px 12px var(--color-indigo-alpha-40);
 }
 
 .comment-send-btn:hover {
     transform: translateY(-50%) scale(1.08) rotate(15deg);
-    box-shadow: 0 6px 20px rgba(99, 102, 241, 0.5);
+    box-shadow: 0 6px 20px var(--color-indigo-alpha-50);
 }
 
 .comment-send-btn:active {
@@ -569,27 +569,27 @@
     display: flex;
     gap: var(--space-3);
     padding: var(--space-4);
-    background: rgba(255, 255, 255, 0.6);
+    background: var(--color-white-alpha-60);
     /* backdrop-filter removed for GOV.UK compliance */
     -webkit-/* backdrop-filter removed for GOV.UK compliance */
     border-radius: var(--radius-xl);
-    border: 1px solid rgba(99, 102, 241, 0.1);
+    border: 1px solid var(--color-indigo-alpha-10);
     transition: all 0.3s ease;
 }
 
 .comment-item:hover {
-    background: rgba(255, 255, 255, 0.8);
-    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.1);
+    background: var(--color-white-alpha-80);
+    box-shadow: 0 4px 12px var(--color-indigo-alpha-10);
     transform: translateY(-2px);
 }
 
 [data-theme="dark"] .comment-item {
-    background: rgba(30, 41, 59, 0.5);
-    border-color: rgba(168, 85, 247, 0.2);
+    background: var(--color-slate-alpha-50);
+    border-color: var(--color-purple-alpha-20);
 }
 
 [data-theme="dark"] .comment-item:hover {
-    background: rgba(30, 41, 59, 0.7);
+    background: var(--color-slate-alpha-70);
 }
 
 .comment-avatar {
@@ -598,7 +598,7 @@
     border-radius: 50%;
     object-fit: cover;
     flex-shrink: 0;
-    border: 2px solid rgba(99, 102, 241, 0.2);
+    border: 2px solid var(--color-indigo-alpha-20);
 }
 
 .comment-body {
@@ -651,9 +651,9 @@
 /* Loading Skeleton with Holographic Shimmer */
 .loading-skeleton {
     background: linear-gradient(90deg,
-        rgba(99, 102, 241, 0.05) 0%,
-        rgba(168, 85, 247, 0.1) 50%,
-        rgba(99, 102, 241, 0.05) 100%
+        var(--color-indigo-alpha-5) 0%,
+        var(--color-purple-alpha-10) 50%,
+        var(--color-indigo-alpha-5) 100%
     );
     background-size: 200% 100%;
     /* animation removed for GOV.UK compliance */

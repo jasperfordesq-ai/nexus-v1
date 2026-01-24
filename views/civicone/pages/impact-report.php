@@ -122,27 +122,31 @@ require dirname(__DIR__, 2) . '/layouts/civicone/header.php';
                 <h3 class="report-section-subtitle">3.3 Activity</h3>
                 <p>The currency used is time credits in units of one hour. 2868 hours were exchanged via 797 transactions. By the end of October 2022, there was more than one million hours of time credits in the Community Treasure Chest.</p>
 
-                <table class="report-table civic-bg-white" style="margin: 30px 0;">
-                    <tr style="background: var(--skin-primary); color: white;">
-                        <th class="civic-p-3 civic-text-left">Metric</th>
-                        <th class="civic-p-3 civic-text-left">Value</th>
-                    </tr>
-                    <tr class="civic-border-bottom">
-                        <td class="civic-p-3">Gross Income</td>
-                        <td class="civic-p-3 civic-font-bold">1,941.10 Time Credits</td>
-                    </tr>
-                    <tr class="civic-border-bottom">
-                        <td class="civic-p-3">Number of Incoming Transfers</td>
-                        <td class="civic-p-3 civic-font-bold">559</td>
-                    </tr>
-                    <tr class="civic-border-bottom">
-                        <td class="civic-p-3">Number of Logins</td>
-                        <td class="civic-p-3 civic-font-bold">1,560</td>
-                    </tr>
-                    <tr>
-                        <td class="civic-p-3">Balance of Community Account</td>
-                        <td class="civic-p-3 civic-font-bold">1,007,748.95</td>
-                    </tr>
+                <table class="report-table" aria-label="Activity metrics">
+                    <thead>
+                        <tr>
+                            <th scope="col">Metric</th>
+                            <th scope="col">Value</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Gross Income</td>
+                            <td>1,941.10 Time Credits</td>
+                        </tr>
+                        <tr>
+                            <td>Number of Incoming Transfers</td>
+                            <td>559</td>
+                        </tr>
+                        <tr>
+                            <td>Number of Logins</td>
+                            <td>1,560</td>
+                        </tr>
+                        <tr>
+                            <td>Balance of Community Account</td>
+                            <td>1,007,748.95</td>
+                        </tr>
+                    </tbody>
                 </table>
 
                 <div class="report-case-study">
@@ -159,26 +163,37 @@ require dirname(__DIR__, 2) . '/layouts/civicone/header.php';
                 <h3 class="report-section-subtitle">Profile</h3>
                 <p>Nearly 60% of respondents were aged 56 or older. This reflects the wider TBI membership, though a younger profile is emerging.</p>
 
-                <div class="civic-bg-gray-50 civic-p-4 civic-rounded" style="margin: 20px 0;">
-                    <h4 class="civic-mt-0 civic-text-center civic-mb-4">Members Age Bands</h4>
-                    <div style="margin-bottom: 10px; display: flex; align-items: center; justify-content: space-between;">
-                        <span>56 - 65</span> <span style="font-weight: bold;">37.5%</span>
-                    </div>
-                    <div style="background: #ddd; height: 10px; border-radius: 5px; margin-bottom: 15px; overflow: hidden;">
-                        <div style="background: var(--skin-primary); width: 37.5%; height: 100%;"></div>
+                <div class="report-progress-container" role="figure" aria-label="Members age distribution">
+                    <h4 class="report-progress-title">Members Age Bands</h4>
+
+                    <div class="report-progress-item">
+                        <div class="report-progress-label">
+                            <span>56 - 65</span>
+                            <span class="report-progress-value">37.5%</span>
+                        </div>
+                        <div class="report-progress-bar" role="progressbar" aria-valuenow="37.5" aria-valuemin="0" aria-valuemax="100">
+                            <div class="report-progress-fill report-progress-fill--primary" style="width: 37.5%;"></div>
+                        </div>
                     </div>
 
-                    <div style="margin-bottom: 10px; display: flex; align-items: center; justify-content: space-between;">
-                        <span>66+</span> <span style="font-weight: bold;">20.0%</span>
+                    <div class="report-progress-item">
+                        <div class="report-progress-label">
+                            <span>66+</span>
+                            <span class="report-progress-value">20.0%</span>
+                        </div>
+                        <div class="report-progress-bar" role="progressbar" aria-valuenow="20" aria-valuemin="0" aria-valuemax="100">
+                            <div class="report-progress-fill report-progress-fill--cyan" style="width: 20%;"></div>
+                        </div>
                     </div>
-                    <div style="background: #ddd; height: 10px; border-radius: 5px; margin-bottom: 15px; overflow: hidden;">
-                        <div style="background: #06b6d4; width: 20%; height: 100%;"></div>
-                    </div>
-                    <div style="margin-bottom: 10px; display: flex; align-items: center; justify-content: space-between;">
-                        <span>36 - 45</span> <span style="font-weight: bold;">17.5%</span>
-                    </div>
-                    <div style="background: #ddd; height: 10px; border-radius: 5px; margin-bottom: 15px; overflow: hidden;">
-                        <div style="background: #9333ea; width: 17.5%; height: 100%;"></div>
+
+                    <div class="report-progress-item">
+                        <div class="report-progress-label">
+                            <span>36 - 45</span>
+                            <span class="report-progress-value">17.5%</span>
+                        </div>
+                        <div class="report-progress-bar" role="progressbar" aria-valuenow="17.5" aria-valuemin="0" aria-valuemax="100">
+                            <div class="report-progress-fill report-progress-fill--purple" style="width: 17.5%;"></div>
+                        </div>
                     </div>
                 </div>
 
@@ -193,18 +208,18 @@ require dirname(__DIR__, 2) . '/layouts/civicone/header.php';
             </div>
 
             <!-- 5. SROI -->
-            <div id="sroi" class="civic-card report-section" style="background: linear-gradient(135deg, var(--skin-primary), #4a044e); color: white;">
-                <h2 style="color: white; margin-top: 0; border-bottom: 2px solid rgba(255,255,255,0.2); padding-bottom: 15px; margin-bottom: 20px;">5. Calculating the SROI</h2>
+            <section id="sroi" class="report-sroi-hero report-section" aria-label="SROI calculation">
+                <h2>5. Calculating the SROI</h2>
                 <p>We estimated proxy costs for outcomes (e.g., improved health = cost of community counselling). The total input was €50,000.</p>
 
-                <h3 style="color: rgba(255,255,255,0.9); margin-top: 30px;">5.4 SROI Results</h3>
-                <div style="text-align: center; padding: 20px;">
-                    <p style="font-size: 1.2rem; opacity: 0.9;">Social Return on Investment</p>
-                    <div style="font-size: 5rem; font-weight: bold; line-height: 1;">€16</div>
-                    <p style="font-size: 1.2rem; opacity: 0.9;">generated for every €1 invested.</p>
-                    <p style="margin-top: 20px; font-style: italic; opacity: 0.8;">Based on a Total Present Value of €803,184 created against the input of €50,000.</p>
+                <h3>5.4 SROI Results</h3>
+                <div class="report-sroi-result">
+                    <p class="report-sroi-result__label">Social Return on Investment</p>
+                    <p class="report-sroi-result__value">€16</p>
+                    <p class="report-sroi-result__desc">generated for every €1 invested.</p>
+                    <p class="report-sroi-result__note">Based on a Total Present Value of €803,184 created against the input of €50,000.</p>
                 </div>
-            </div>
+            </section>
 
             <!-- 6. Discussion -->
             <div id="discussion" class="civic-card report-section">

@@ -11,9 +11,9 @@
 #story-glass-wrapper {
     --story-theme: var(--color-warning-500);
     --story-theme-rgb: 245, 158, 11;
-    --glass-bg: rgba(255, 255, 255, 0.25);
-    --glass-border: rgba(255, 255, 255, 0.3);
-    --glass-shadow: rgba(245, 158, 11, 0.15);
+    --glass-bg: var(--color-white-alpha-25);
+    --glass-border: var(--color-white-alpha-30);
+    --glass-shadow: var(--color-amber-500-alpha-15);
     min-height: 100vh;
     padding: 0;
     margin: -2rem -1rem;
@@ -41,7 +41,7 @@
     font-weight: 800;
     color: white;
     margin: 0 0 0.5rem 0;
-    text-shadow: 0 2px 20px rgba(0, 0, 0, 0.2);
+    text-shadow: 0 2px 20px var(--color-black-alpha-20);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -49,7 +49,7 @@
 }
 
 #story-glass-wrapper .story-page-header p {
-    color: rgba(255, 255, 255, 0.9);
+    color: var(--color-white-alpha-90);
     font-size: 1.15rem;
     margin: 0;
 }
@@ -67,7 +67,7 @@
     top: 0;
     bottom: 0;
     width: var(--space-1);
-    background: linear-gradient(180deg, rgba(255, 255, 255, 0.6) 0%, rgba(255, 255, 255, 0.2) 100%);
+    background: linear-gradient(180deg, var(--color-white-alpha-60) 0%, var(--color-white-alpha-20) 100%);
     border-radius: 3px;
 }
 
@@ -81,7 +81,7 @@
     border-radius: var(--radius-2xl);
     box-shadow:
         0 8px 32px var(--glass-shadow),
-        inset 0 1px 0 rgba(255, 255, 255, 0.3);
+        inset 0 1px 0 var(--color-white-alpha-30);
     overflow: hidden;
     margin-bottom: 2rem;
     transition: all 0.3s ease;
@@ -91,7 +91,7 @@
     transform: translateY(-4px) translateX(4px);
     box-shadow:
         0 16px 48px var(--glass-shadow),
-        inset 0 1px 0 rgba(255, 255, 255, 0.4);
+        inset 0 1px 0 var(--color-white-alpha-40);
 }
 
 /* Timeline Dot */
@@ -105,15 +105,15 @@
     background: white;
     border: 3px solid var(--story-theme);
     border-radius: 50%;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 4px 12px var(--color-black-alpha-20);
     z-index: 2;
 }
 
 /* Card Header */
 #story-glass-wrapper .card-header {
-    background: linear-gradient(135deg, rgba(255, 255, 255, 0.25) 0%, rgba(255, 255, 255, 0.1) 100%);
+    background: linear-gradient(135deg, var(--color-white-alpha-25) 0%, var(--color-white-alpha-10) 100%);
     padding: 1.25rem 1.5rem;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+    border-bottom: 1px solid var(--color-white-alpha-20);
     display: flex;
     align-items: center;
     gap: var(--space-3);
@@ -121,7 +121,7 @@
 
 #story-glass-wrapper .card-header .icon {
     font-size: 1.5rem;
-    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.15));
+    filter: drop-shadow(0 2px 4px var(--color-black-alpha-15));
 }
 
 #story-glass-wrapper .card-header h2 {
@@ -129,7 +129,7 @@
     font-size: 1.4rem;
     font-weight: 700;
     margin: 0;
-    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
+    text-shadow: 0 1px 3px var(--color-black-alpha-15);
 }
 
 /* Card Body */
@@ -138,7 +138,7 @@
 }
 
 #story-glass-wrapper .card-body p {
-    color: rgba(255, 255, 255, 0.9);
+    color: var(--color-white-alpha-90);
     font-size: 1.05rem;
     line-height: 1.7;
     margin: 0 0 1rem 0;
@@ -150,7 +150,7 @@
 
 /* Highlight Quote */
 #story-glass-wrapper .story-quote {
-    background: linear-gradient(135deg, rgba(255, 255, 255, 0.2) 0%, rgba(255, 255, 255, 0.1) 100%);
+    background: linear-gradient(135deg, var(--color-white-alpha-20) 0%, var(--color-white-alpha-10) 100%);
     border-left: 4px solid white;
     padding: 1.25rem 1.5rem;
     margin: 1.5rem 0;
@@ -173,10 +173,10 @@
 }
 
 #story-glass-wrapper .stat-chip {
-    background: rgba(255, 255, 255, 0.2);
+    background: var(--color-white-alpha-20);
     /* backdrop-filter removed for GOV.UK compliance */
     -webkit-/* backdrop-filter removed for GOV.UK compliance */
-    border: 1px solid rgba(255, 255, 255, 0.3);
+    border: 1px solid var(--color-white-alpha-30);
     border-radius: var(--radius-xl);
     padding: 1.25rem 1rem;
     text-align: center;
@@ -185,13 +185,13 @@
 
 #story-glass-wrapper .stat-chip:hover {
     transform: translateY(-2px);
-    background: rgba(255, 255, 255, 0.25);
+    background: var(--color-white-alpha-25);
 }
 
 #story-glass-wrapper .stat-chip .stat-icon {
     font-size: 1.75rem;
     margin-bottom: 0.5rem;
-    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.15));
+    filter: drop-shadow(0 2px 4px var(--color-black-alpha-15));
 }
 
 #story-glass-wrapper .stat-chip .stat-value {
@@ -199,18 +199,18 @@
     font-weight: 800;
     color: white;
     display: block;
-    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    text-shadow: 0 2px 8px var(--color-black-alpha-20);
 }
 
 #story-glass-wrapper .stat-chip .stat-label {
     font-size: 0.85rem;
-    color: rgba(255, 255, 255, 0.85);
+    color: var(--color-white-alpha-85);
     font-weight: 600;
 }
 
 /* Mission Card - Special */
 #story-glass-wrapper .mission-card {
-    background: linear-gradient(135deg, rgba(255, 255, 255, 0.3) 0%, rgba(255, 255, 255, 0.15) 100%);
+    background: linear-gradient(135deg, var(--color-white-alpha-30) 0%, var(--color-white-alpha-15) 100%);
     text-align: center;
     padding: 2.5rem;
 }
@@ -231,7 +231,7 @@
 }
 
 #story-glass-wrapper .mission-card p {
-    color: rgba(255, 255, 255, 0.9);
+    color: var(--color-white-alpha-90);
     font-size: 1.15rem;
     line-height: 1.7;
     margin: 0;
@@ -243,9 +243,9 @@
    DARK MODE
    ======================================== */
 [data-theme="dark"] #story-glass-wrapper {
-    --glass-bg: rgba(15, 23, 42, 0.6);
-    --glass-border: rgba(255, 255, 255, 0.1);
-    --glass-shadow: rgba(0, 0, 0, 0.3);
+    --glass-bg: var(--color-slate-900-alpha-60);
+    --glass-border: var(--color-white-alpha-10);
+    --glass-shadow: var(--color-black-alpha-30);
     background: linear-gradient(135deg, var(--color-warning-800) 0%, var(--color-warning-700) 25%, var(--color-warning-600) 50%, var(--color-warning-500) 75%, var(--color-warning-700) 100%);
     background-size: 400% 400%;
 }
@@ -258,7 +258,7 @@
 }
 
 [data-theme="dark"] #story-glass-wrapper .story-timeline::before {
-    background: linear-gradient(180deg, rgba(255, 255, 255, 0.3) 0%, rgba(255, 255, 255, 0.1) 100%);
+    background: linear-gradient(180deg, var(--color-white-alpha-30) 0%, var(--color-white-alpha-10) 100%);
 }
 
 [data-theme="dark"] #story-glass-wrapper .story-glass-card::before {
@@ -275,7 +275,7 @@
 [data-theme="dark"] #story-glass-wrapper .story-page-header p,
 [data-theme="dark"] #story-glass-wrapper .card-body p,
 [data-theme="dark"] #story-glass-wrapper .mission-card p {
-    color: rgba(254, 243, 199, 0.85);
+    color: var(--color-amber-100-alpha-85);
 }
 
 [data-theme="dark"] #story-glass-wrapper .stat-chip .stat-value {
@@ -283,11 +283,11 @@
 }
 
 [data-theme="dark"] #story-glass-wrapper .stat-chip .stat-label {
-    color: rgba(254, 243, 199, 0.8);
+    color: var(--color-amber-100-alpha-80);
 }
 
 [data-theme="dark"] #story-glass-wrapper .story-quote {
-    background: rgba(255, 255, 255, 0.1);
+    background: var(--color-white-alpha-10);
     border-left-color: var(--color-warning-400);
 }
 
@@ -296,7 +296,7 @@
 }
 
 [data-theme="dark"] #story-glass-wrapper .card-header {
-    background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%);
+    background: linear-gradient(135deg, var(--color-white-alpha-10) 0%, var(--color-white-alpha-5) 100%);
 }
 
 /* ========================================
@@ -360,12 +360,12 @@
     #story-glass-wrapper .story-glass-card,
     #story-glass-wrapper .stat-chip,
     #story-glass-wrapper .mission-card {
-        background: rgba(245, 158, 11, 0.85);
+        background: var(--color-amber-500-alpha-85);
     }
 
     [data-theme="dark"] #story-glass-wrapper .story-glass-card,
     [data-theme="dark"] #story-glass-wrapper .stat-chip,
     [data-theme="dark"] #story-glass-wrapper .mission-card {
-        background: rgba(15, 23, 42, 0.9);
+        background: var(--color-slate-900-alpha-90);
     }
 }

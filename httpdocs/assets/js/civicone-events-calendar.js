@@ -29,12 +29,12 @@
         }
     })();
 
-    // Touch feedback
+    // Touch feedback - use CSS class instead of inline styles (GOV.UK compliance)
     document.addEventListener('DOMContentLoaded', function() {
         document.querySelectorAll('.holo-nav-btn, .holo-cal-event').forEach(el => {
-            el.addEventListener('pointerdown', () => el.style.transform = 'scale(0.97)');
-            el.addEventListener('pointerup', () => el.style.transform = '');
-            el.addEventListener('pointerleave', () => el.style.transform = '');
+            el.addEventListener('pointerdown', () => el.classList.add('active-pressed'));
+            el.addEventListener('pointerup', () => el.classList.remove('active-pressed'));
+            el.addEventListener('pointerleave', () => el.classList.remove('active-pressed'));
         });
     });
 

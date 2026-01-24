@@ -263,7 +263,7 @@
     border: 1px solid var(--color-govuk-grey, var(--color-govuk-grey));
     border-radius: var(--radius-md);
     padding: var(--space-2, 10px);
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 8px var(--color-black-alpha-10);
     z-index: 10;
 }
 
@@ -324,7 +324,7 @@
     color: var(--color-white, var(--color-white));
     padding: var(--space-3, 15px) var(--space-4, 20px);
     border-radius: var(--radius-sm);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 4px 12px var(--color-black-alpha-20);
     opacity: 0;
     transform: translateY(20px);
     transition: all 0.3s ease;

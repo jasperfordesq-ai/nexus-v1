@@ -39,14 +39,15 @@ include dirname(__DIR__) . '/components/org-ui-components.php';
         <?php
         // Get balance status for indicator
         $balanceStatus = \Nexus\Services\BalanceAlertService::getBalanceStatus($org['id']);
-        $statusColors = [
-            'critical' => ['bg' => 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)', 'icon' => 'fa-triangle-exclamation'],
-            'low' => ['bg' => 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)', 'icon' => 'fa-exclamation-circle'],
-            'healthy' => ['bg' => 'linear-gradient(135deg, #10b981 0%, #059669 50%, #047857 100%)', 'icon' => 'fa-coins']
+        $statusIcons = [
+            'critical' => 'fa-triangle-exclamation',
+            'low' => 'fa-exclamation-circle',
+            'healthy' => 'fa-coins'
         ];
-        $statusStyle = $statusColors[$balanceStatus['status']] ?? $statusColors['healthy'];
+        $statusIcon = $statusIcons[$balanceStatus['status']] ?? $statusIcons['healthy'];
+        $statusClass = 'org-balance-status-' . ($balanceStatus['status'] ?? 'healthy');
         ?>
-        <div class="org-glass-card org-stat-card balance org-position-relative" style="background: <?= $statusStyle['bg'] ?>;" role="region" aria-label="Current Balance">
+        <div class="org-glass-card org-stat-card balance org-position-relative <?= $statusClass ?>" role="region" aria-label="Current Balance">
             <?php if ($balanceStatus['status'] !== 'healthy'): ?>
             <div class="org-status-label" role="status">
                 <?= $balanceStatus['label'] ?>
@@ -58,7 +59,7 @@ include dirname(__DIR__) . '/components/org-ui-components.php';
                 <span>Live</span>
             </div>
             <div class="org-stat-icon">
-                <i class="fa-solid <?= $statusStyle['icon'] ?>" aria-hidden="true"></i>
+                <i class="fa-solid <?= $statusIcon ?>" aria-hidden="true"></i>
             </div>
             <div class="org-stat-value" id="balanceValue" aria-live="polite"><?= number_format($summary['balance'], 1) ?></div>
             <div class="org-stat-label">Current Balance</div>
@@ -170,21 +171,33 @@ include dirname(__DIR__) . '/components/org-ui-components.php';
                         </div>
 
                         <div class="org-form-group org-hidden-form" id="memberSelectGroup">
-                            <label class="org-form-label">Select Member</label>
-                            <div class="org-selected-member" id="selectedMember">
-                                <div class="org-member-avatar" id="selectedMemberAvatar">?</div>
+                            <label class="org-form-label" for="memberSearch" id="memberSearchLabel">Select Member</label>
+                            <div class="org-selected-member" id="selectedMember" role="status" aria-live="polite">
+                                <div class="org-member-avatar" id="selectedMemberAvatar" aria-hidden="true">?</div>
                                 <div class="org-member-info">
                                     <div class="org-member-name" id="selectedMemberName">-</div>
                                     <div class="org-member-role" id="selectedMemberRole">-</div>
                                 </div>
-                                <button type="button" class="org-selected-clear" onclick="clearMemberSelection()">
-                                    <i class="fa-solid fa-times"></i>
+                                <button type="button" class="org-selected-clear" onclick="clearMemberSelection()" aria-label="Clear member selection and search again">
+                                    <i class="fa-solid fa-times" aria-hidden="true"></i>
                                 </button>
                             </div>
                             <div class="org-member-search-wrapper" id="memberSearchWrapper">
-                                <input type="text" id="memberSearch" placeholder="Search members..."
-                                       class="org-form-input" autocomplete="off">
-                                <div class="org-member-results" id="memberResults"></div>
+                                <input type="text"
+                                       id="memberSearch"
+                                       placeholder="Search members..."
+                                       class="org-form-input"
+                                       autocomplete="off"
+                                       role="combobox"
+                                       aria-autocomplete="list"
+                                       aria-expanded="false"
+                                       aria-controls="memberResults"
+                                       aria-labelledby="memberSearchLabel"
+                                       aria-haspopup="listbox">
+                                <div class="org-member-results"
+                                     id="memberResults"
+                                     role="listbox"
+                                     aria-label="Member search results"></div>
                             </div>
                         </div>
 
@@ -233,21 +246,33 @@ include dirname(__DIR__) . '/components/org-ui-components.php';
                         <input type="hidden" name="recipient_id" id="directRecipientId" value="">
 
                         <div class="org-form-group">
-                            <label class="org-form-label">Recipient</label>
-                            <div class="org-selected-member" id="directSelectedMember">
-                                <div class="org-member-avatar" id="directSelectedAvatar">?</div>
+                            <label class="org-form-label" for="directMemberSearch" id="directMemberSearchLabel">Recipient</label>
+                            <div class="org-selected-member" id="directSelectedMember" role="status" aria-live="polite">
+                                <div class="org-member-avatar" id="directSelectedAvatar" aria-hidden="true">?</div>
                                 <div class="org-member-info">
                                     <div class="org-member-name" id="directSelectedName">-</div>
                                     <div class="org-member-role" id="directSelectedRole">-</div>
                                 </div>
-                                <button type="button" class="org-selected-clear" onclick="clearDirectSelection()">
-                                    <i class="fa-solid fa-times"></i>
+                                <button type="button" class="org-selected-clear" onclick="clearDirectSelection()" aria-label="Clear recipient selection and search again">
+                                    <i class="fa-solid fa-times" aria-hidden="true"></i>
                                 </button>
                             </div>
                             <div class="org-member-search-wrapper" id="directSearchWrapper">
-                                <input type="text" id="directMemberSearch" placeholder="Search members..."
-                                       class="org-form-input" autocomplete="off">
-                                <div class="org-member-results" id="directMemberResults"></div>
+                                <input type="text"
+                                       id="directMemberSearch"
+                                       placeholder="Search members..."
+                                       class="org-form-input"
+                                       autocomplete="off"
+                                       role="combobox"
+                                       aria-autocomplete="list"
+                                       aria-expanded="false"
+                                       aria-controls="directMemberResults"
+                                       aria-labelledby="directMemberSearchLabel"
+                                       aria-haspopup="listbox">
+                                <div class="org-member-results"
+                                     id="directMemberResults"
+                                     role="listbox"
+                                     aria-label="Member search results"></div>
                             </div>
                         </div>
 
@@ -464,10 +489,14 @@ const memberSearch = document.getElementById('memberSearch');
 const memberResults = document.getElementById('memberResults');
 
 if (memberSearch) {
+    let memberActiveIndex = -1;
+
     memberSearch.addEventListener('input', function() {
         const query = this.value.toLowerCase().trim();
+        memberActiveIndex = -1;
         if (query.length < 1) {
             memberResults.classList.remove('show');
+            memberSearch.setAttribute('aria-expanded', 'false');
             return;
         }
 
@@ -477,9 +506,18 @@ if (memberSearch) {
         );
 
         if (filtered.length > 0) {
-            memberResults.innerHTML = filtered.map(m => `
-                <div class="org-member-result" onclick="selectMember(${m.user_id}, '${escapeHtml(m.display_name)}', '${m.role}', '${escapeHtml(m.avatar_url || '')}')">
-                    <div class="org-member-avatar">
+            memberResults.innerHTML = filtered.map((m, index) => `
+                <div class="org-member-result"
+                     role="option"
+                     id="member-option-${index}"
+                     tabindex="-1"
+                     aria-selected="false"
+                     data-user-id="${m.user_id}"
+                     data-name="${escapeHtml(m.display_name)}"
+                     data-role="${m.role}"
+                     data-avatar="${escapeHtml(m.avatar_url || '')}"
+                     onclick="selectMember(${m.user_id}, '${escapeHtml(m.display_name)}', '${m.role}', '${escapeHtml(m.avatar_url || '')}')">
+                    <div class="org-member-avatar" aria-hidden="true">
                         ${m.avatar_url ? `<img src="${m.avatar_url}" alt="" loading="lazy">` : (m.display_name || '?')[0].toUpperCase()}
                     </div>
                     <div class="org-member-info">
@@ -489,11 +527,46 @@ if (memberSearch) {
                 </div>
             `).join('');
             memberResults.classList.add('show');
+            memberSearch.setAttribute('aria-expanded', 'true');
         } else {
-            memberResults.innerHTML = '<div class="org-no-results">No members found</div>';
+            memberResults.innerHTML = '<div class="org-no-results" role="status">No members found</div>';
             memberResults.classList.add('show');
+            memberSearch.setAttribute('aria-expanded', 'true');
         }
     });
+
+    // Keyboard navigation for member search
+    memberSearch.addEventListener('keydown', function(e) {
+        const options = memberResults.querySelectorAll('[role="option"]');
+        if (!options.length) return;
+
+        if (e.key === 'ArrowDown') {
+            e.preventDefault();
+            memberActiveIndex = Math.min(memberActiveIndex + 1, options.length - 1);
+            updateMemberActiveOption(options, memberActiveIndex);
+        } else if (e.key === 'ArrowUp') {
+            e.preventDefault();
+            memberActiveIndex = Math.max(memberActiveIndex - 1, 0);
+            updateMemberActiveOption(options, memberActiveIndex);
+        } else if (e.key === 'Enter' && memberActiveIndex >= 0) {
+            e.preventDefault();
+            options[memberActiveIndex].click();
+        } else if (e.key === 'Escape') {
+            memberResults.classList.remove('show');
+            memberSearch.setAttribute('aria-expanded', 'false');
+            memberActiveIndex = -1;
+        }
+    });
+
+    function updateMemberActiveOption(options, activeIndex) {
+        options.forEach((opt, i) => {
+            opt.setAttribute('aria-selected', i === activeIndex ? 'true' : 'false');
+            if (i === activeIndex) {
+                opt.scrollIntoView({ block: 'nearest' });
+                memberSearch.setAttribute('aria-activedescendant', opt.id);
+            }
+        });
+    }
 }
 
 function selectMember(id, name, role, avatar) {
@@ -507,13 +580,17 @@ function selectMember(id, name, role, avatar) {
     document.getElementById('selectedMember').classList.add('show');
     document.getElementById('memberSearchWrapper').classList.add('org-hidden-form');
     memberResults.classList.remove('show');
+    memberSearch?.setAttribute('aria-expanded', 'false');
 }
 
 function clearMemberSelection() {
     document.getElementById('requestRecipientId').value = '';
     document.getElementById('selectedMember').classList.remove('show');
     document.getElementById('memberSearchWrapper').classList.remove('org-hidden-form');
-    document.getElementById('memberSearch').value = '';
+    const searchInput = document.getElementById('memberSearch');
+    searchInput.value = '';
+    searchInput.setAttribute('aria-expanded', 'false');
+    searchInput.focus();
 }
 
 // Direct transfer member search (Admin)
@@ -521,10 +598,14 @@ const directSearch = document.getElementById('directMemberSearch');
 const directResults = document.getElementById('directMemberResults');
 
 if (directSearch) {
+    let directActiveIndex = -1;
+
     directSearch.addEventListener('input', function() {
         const query = this.value.toLowerCase().trim();
+        directActiveIndex = -1;
         if (query.length < 1) {
             directResults.classList.remove('show');
+            directSearch.setAttribute('aria-expanded', 'false');
             return;
         }
 
@@ -534,9 +615,18 @@ if (directSearch) {
         );
 
         if (filtered.length > 0) {
-            directResults.innerHTML = filtered.map(m => `
-                <div class="org-member-result" onclick="selectDirectMember(${m.user_id}, '${escapeHtml(m.display_name)}', '${m.role}', '${escapeHtml(m.avatar_url || '')}')">
-                    <div class="org-member-avatar">
+            directResults.innerHTML = filtered.map((m, index) => `
+                <div class="org-member-result"
+                     role="option"
+                     id="direct-option-${index}"
+                     tabindex="-1"
+                     aria-selected="false"
+                     data-user-id="${m.user_id}"
+                     data-name="${escapeHtml(m.display_name)}"
+                     data-role="${m.role}"
+                     data-avatar="${escapeHtml(m.avatar_url || '')}"
+                     onclick="selectDirectMember(${m.user_id}, '${escapeHtml(m.display_name)}', '${m.role}', '${escapeHtml(m.avatar_url || '')}')">
+                    <div class="org-member-avatar" aria-hidden="true">
                         ${m.avatar_url ? `<img src="${m.avatar_url}" alt="" loading="lazy">` : (m.display_name || '?')[0].toUpperCase()}
                     </div>
                     <div class="org-member-info">
@@ -546,11 +636,46 @@ if (directSearch) {
                 </div>
             `).join('');
             directResults.classList.add('show');
+            directSearch.setAttribute('aria-expanded', 'true');
         } else {
-            directResults.innerHTML = '<div class="org-no-results">No members found</div>';
+            directResults.innerHTML = '<div class="org-no-results" role="status">No members found</div>';
             directResults.classList.add('show');
+            directSearch.setAttribute('aria-expanded', 'true');
         }
     });
+
+    // Keyboard navigation for direct member search
+    directSearch.addEventListener('keydown', function(e) {
+        const options = directResults.querySelectorAll('[role="option"]');
+        if (!options.length) return;
+
+        if (e.key === 'ArrowDown') {
+            e.preventDefault();
+            directActiveIndex = Math.min(directActiveIndex + 1, options.length - 1);
+            updateDirectActiveOption(options, directActiveIndex);
+        } else if (e.key === 'ArrowUp') {
+            e.preventDefault();
+            directActiveIndex = Math.max(directActiveIndex - 1, 0);
+            updateDirectActiveOption(options, directActiveIndex);
+        } else if (e.key === 'Enter' && directActiveIndex >= 0) {
+            e.preventDefault();
+            options[directActiveIndex].click();
+        } else if (e.key === 'Escape') {
+            directResults.classList.remove('show');
+            directSearch.setAttribute('aria-expanded', 'false');
+            directActiveIndex = -1;
+        }
+    });
+
+    function updateDirectActiveOption(options, activeIndex) {
+        options.forEach((opt, i) => {
+            opt.setAttribute('aria-selected', i === activeIndex ? 'true' : 'false');
+            if (i === activeIndex) {
+                opt.scrollIntoView({ block: 'nearest' });
+                directSearch.setAttribute('aria-activedescendant', opt.id);
+            }
+        });
+    }
 }
 
 function selectDirectMember(id, name, role, avatar) {
@@ -564,20 +689,30 @@ function selectDirectMember(id, name, role, avatar) {
     document.getElementById('directSelectedMember').classList.add('show');
     document.getElementById('directSearchWrapper').classList.add('org-hidden-form');
     directResults.classList.remove('show');
+    directSearch?.setAttribute('aria-expanded', 'false');
 }
 
 function clearDirectSelection() {
     document.getElementById('directRecipientId').value = '';
     document.getElementById('directSelectedMember').classList.remove('show');
     document.getElementById('directSearchWrapper').classList.remove('org-hidden-form');
-    document.getElementById('directMemberSearch').value = '';
+    const searchInput = document.getElementById('directMemberSearch');
+    searchInput.value = '';
+    searchInput.setAttribute('aria-expanded', 'false');
+    searchInput.focus();
 }
 
 // Close dropdowns on outside click
 document.addEventListener('click', function(e) {
     if (!e.target.closest('.org-member-search-wrapper')) {
-        memberResults?.classList.remove('show');
-        directResults?.classList.remove('show');
+        if (memberResults) {
+            memberResults.classList.remove('show');
+            memberSearch?.setAttribute('aria-expanded', 'false');
+        }
+        if (directResults) {
+            directResults.classList.remove('show');
+            directSearch?.setAttribute('aria-expanded', 'false');
+        }
     }
 });
 

@@ -12,9 +12,9 @@ function toggleRecipientSelect(select) {
     const recipientId = document.getElementById('requestRecipientId');
 
     if (select.value === 'other') {
-        group.style.display = 'block';
+        group.classList.remove('hidden');
     } else {
-        group.style.display = 'none';
+        group.classList.add('hidden');
         recipientId.value = '0';
         clearMemberSelection();
     }
@@ -51,7 +51,7 @@ if (memberSearch) {
             `).join('');
             memberResults.classList.add('show');
         } else {
-            memberResults.innerHTML = '<div style="padding: 12px; text-align: center; color: #9ca3af;">No members found</div>';
+            memberResults.innerHTML = '<div class="civic-search-no-results" role="status">No members found</div>';
             memberResults.classList.add('show');
         }
     });
@@ -66,14 +66,14 @@ function selectMember(id, name, role, avatar) {
         : name[0].toUpperCase();
 
     document.getElementById('selectedMember').classList.add('show');
-    document.getElementById('memberSearchWrapper').style.display = 'none';
+    document.getElementById('memberSearchWrapper').classList.add('hidden');
     memberResults.classList.remove('show');
 }
 
 function clearMemberSelection() {
     document.getElementById('requestRecipientId').value = '';
     document.getElementById('selectedMember').classList.remove('show');
-    document.getElementById('memberSearchWrapper').style.display = 'block';
+    document.getElementById('memberSearchWrapper').classList.remove('hidden');
     document.getElementById('memberSearch').value = '';
 }
 
@@ -108,7 +108,7 @@ if (directSearch) {
             `).join('');
             directResults.classList.add('show');
         } else {
-            directResults.innerHTML = '<div style="padding: 12px; text-align: center; color: #9ca3af;">No members found</div>';
+            directResults.innerHTML = '<div class="civic-search-no-results" role="status">No members found</div>';
             directResults.classList.add('show');
         }
     });
@@ -123,14 +123,14 @@ function selectDirectMember(id, name, role, avatar) {
         : name[0].toUpperCase();
 
     document.getElementById('directSelectedMember').classList.add('show');
-    document.getElementById('directSearchWrapper').style.display = 'none';
+    document.getElementById('directSearchWrapper').classList.add('hidden');
     directResults.classList.remove('show');
 }
 
 function clearDirectSelection() {
     document.getElementById('directRecipientId').value = '';
     document.getElementById('directSelectedMember').classList.remove('show');
-    document.getElementById('directSearchWrapper').style.display = 'block';
+    document.getElementById('directSearchWrapper').classList.remove('hidden');
     document.getElementById('directMemberSearch').value = '';
 }
 

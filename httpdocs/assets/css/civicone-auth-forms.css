@@ -20,7 +20,7 @@
     background: white;
     border-radius: var(--radius-lg);
     overflow: hidden;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    box-shadow: 0 4px 6px -1px var(--color-black-alpha-10), 0 2px 4px -1px var(--color-black-alpha-6);
 }
 
 .civic-auth-card-body {
@@ -67,7 +67,7 @@
 .civic-form-input:focus {
     outline: none;
     border-color: var(--color-primary-600);
-    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+    box-shadow: 0 0 0 3px var(--color-indigo-alpha-10);
 }
 
 .civic-auth-submit-btn {
@@ -86,7 +86,7 @@
 
 .civic-auth-submit-btn:hover {
     transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
+    box-shadow: 0 4px 12px var(--color-primary-600-alpha-30);
 }
 
 .civic-auth-submit-btn:active {
@@ -125,9 +125,9 @@
 
 /* Dark Mode */
 [data-theme="dark"] .civic-auth-card {
-    background: rgba(30, 41, 59, 0.85);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+    background: var(--color-slate-alpha-85);
+    border: 1px solid var(--color-white-alpha-10);
+    box-shadow: 0 10px 40px var(--color-black-alpha-40);
 }
 
 [data-theme="dark"] .civic-auth-description {
@@ -139,8 +139,8 @@
 }
 
 [data-theme="dark"] .civic-form-input {
-    background: rgba(15, 23, 42, 0.6);
-    border-color: rgba(255, 255, 255, 0.15);
+    background: var(--color-slate-900-alpha-60);
+    border-color: var(--color-white-alpha-15);
     color: var(--color-gray-100);
 }
 
@@ -150,7 +150,7 @@
 
 [data-theme="dark"] .civic-form-input:focus {
     border-color: var(--color-primary-500);
-    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+    box-shadow: 0 0 0 3px var(--color-indigo-alpha-20);
 }
 
 [data-theme="dark"] .civic-auth-link {
@@ -189,9 +189,9 @@
 }
 
 [data-theme="dark"] .civic-password-rules {
-    background: rgba(15, 23, 42, 0.6);
+    background: var(--color-slate-900-alpha-60);
     color: var(--color-gray-400);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    border: 1px solid var(--color-white-alpha-10);
 }
 
 [data-theme="dark"] .civic-rules-title {

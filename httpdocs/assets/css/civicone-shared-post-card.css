@@ -62,7 +62,7 @@
     font-size: 0.75rem;
     padding: var(--space-0-5) 8px;
     border-radius: var(--radius-lg);
-    background: rgba(99, 102, 241, 0.1);
+    background: var(--color-indigo-alpha-10);
     color: var(--color-primary-500);
 }
 
@@ -78,7 +78,7 @@
 }
 
 .post-delete-btn:hover {
-    background: rgba(239, 68, 68, 0.1);
+    background: var(--color-red-alpha-10);
     color: var(--color-error-500);
 }
 
@@ -126,7 +126,7 @@
 }
 
 .post-action-btn:hover {
-    background: rgba(99, 102, 241, 0.1);
+    background: var(--color-indigo-alpha-10);
     color: var(--color-primary-500);
 }
 

@@ -657,7 +657,7 @@
 .civicone.dark-mode [data-layout="civicone"] .govuk-input,
 .civicone.dark-mode [data-layout="civicone"] .govuk-textarea,
 .civicone.dark-mode [data-layout="civicone"] .govuk-select {
-    background-color: #1d1d1d;
+    background-color: var(--color-slate-900);
     border-color: var(--color-white);
     color: var(--color-white);
 }
@@ -676,7 +676,7 @@
 
 .civicone.dark-mode .civic-checkboxes__label::before,
 .civicone.dark-mode .civic-radios__label::before {
-    background-color: #1d1d1d;
+    background-color: var(--color-slate-900);
     border-color: var(--color-white);
 }
 

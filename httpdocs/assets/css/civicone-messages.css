@@ -151,11 +151,11 @@
 }
 
 .civic-thread-link:hover {
-    background-color: rgba(0, 0, 0, 0.03);
+    background-color: var(--color-black-alpha-3);
 }
 
 [data-theme="dark"] .civic-thread-link:hover {
-    background-color: rgba(255, 255, 255, 0.05);
+    background-color: var(--color-white-alpha-5);
 }
 
 .civic-thread-link:focus {
@@ -358,7 +358,7 @@
 }
 
 .civic-notification-card:hover {
-    box-shadow: var(--civic-shadow, 0 4px 12px rgba(0, 0, 0, 0.1));
+    box-shadow: var(--civic-shadow, 0 4px 12px var(--color-black-alpha-10));
 }
 
 .civic-notification--unread {

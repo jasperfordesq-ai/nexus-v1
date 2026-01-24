@@ -437,7 +437,7 @@
     left: 0;
     right: 0;
     bottom: 0;
-    background: rgba(0, 0, 0, 0.5);
+    background: var(--color-black-alpha-50);
     z-index: 9999;
     display: flex;
     align-items: center;
@@ -478,7 +478,7 @@
     right: 0.75rem;
     width: 2rem;
     height: 2rem;
-    background: rgba(255, 255, 255, 0.2);
+    background: var(--color-white-alpha-20);
     border: none;
     color: var(--color-white);
     cursor: pointer;
@@ -489,7 +489,7 @@
 }
 
 .badge-modal-close:hover {
-    background: rgba(255, 255, 255, 0.3);
+    background: var(--color-white-alpha-30);
 }
 
 .badge-modal-close:focus {
@@ -515,7 +515,7 @@
     padding: 0.25rem 0.75rem;
     font-size: 0.75rem;
     font-weight: 600;
-    background: rgba(255, 255, 255, 0.2);
+    background: var(--color-white-alpha-20);
 }
 
 .badge-rarity-tag.legendary {
@@ -524,7 +524,7 @@
 }
 
 .badge-rarity-tag.epic {
-    background: #4c2c92;
+    background: var(--color-rarity-epic);
     color: var(--color-white);
 }
 
@@ -587,7 +587,7 @@
 }
 
 .badge-rarity-fill.epic {
-    background: #4c2c92;
+    background: var(--color-rarity-epic);
 }
 
 .badge-rarity-fill.rare {
@@ -618,7 +618,7 @@
         display: block;
         width: 2.5rem;
         height: 4px;
-        background: rgba(255, 255, 255, 0.3);
+        background: var(--color-white-alpha-30);
         margin: 0.75rem auto 0;
     }
 
@@ -828,7 +828,7 @@
 }
 
 .rarity-epic {
-    background: #4c2c92;
+    background: var(--color-rarity-epic);
     color: var(--color-white);
 }
 
@@ -974,7 +974,7 @@
 .challenge-type.monthly {
     background: var(--color-govuk-light-grey);
     color: var(--color-govuk-black);
-    border: 1px solid #4c2c92;
+    border: 1px solid var(--color-rarity-epic);
 }
 
 .challenge-type.special {
@@ -1381,7 +1381,7 @@
 }
 
 .leaderboard-item.top-3:nth-child(3) .rank-badge {
-    background: #cd7f32;
+    background: var(--color-medal-bronze);
     color: var(--color-white);
 }
 
@@ -1447,8 +1447,8 @@
 }
 
 .reward-tier.bronze {
-    background: #fef3e2;
-    border-color: #cd7f32;
+    background: var(--color-medal-bronze-light);
+    border-color: var(--color-medal-bronze);
 }
 
 .tier-icon {
@@ -1718,7 +1718,7 @@
     left: 0;
     right: 0;
     bottom: 0;
-    background: rgba(0, 0, 0, 0.5);
+    background: var(--color-black-alpha-50);
     z-index: 1000;
     justify-content: center;
     align-items: center;

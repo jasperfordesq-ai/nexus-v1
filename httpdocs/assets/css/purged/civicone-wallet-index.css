@@ -337,4 +337,66 @@
         color: var(--civicone-text-muted);
     }
 
+    /* ==========================================
+       GOV.UK Compliance Fixes
+       Added for WCAG 2.1 AA compliance
+       ========================================== */
+
+    /* Balance note text - replaces inline style */
+    .civic-wallet-balance-note {
+        font-size: var(--font-size-base);
+        margin-top: var(--space-1-5);
+        color: var(--civicone-text-muted);
+    }
+
+    /* Search autocomplete - ARIA combobox pattern */
+    .civic-search-wrapper {
+        position: relative;
+    }
+
+    .civic-search-results {
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        background: var(--civicone-bg-card);
+        border: 2px solid var(--color-gray-200);
+        border-top: none;
+        border-radius: 0 0 var(--radius-2) var(--radius-2);
+        max-height: 300px;
+        overflow-y: auto;
+        z-index: var(--z-dropdown);
+        box-shadow: 0 4px 12px var(--color-black-alpha-10);
+    }
+
+    .civic-search-results[hidden] {
+        display: none;
+    }
+
+    .civic-search-results[aria-expanded="true"] {
+        display: block;
+    }
+
+    /* Keyboard focus styles for search results */
+    .civic-search-result-item {
+        display: flex;
+        align-items: center;
+        gap: var(--space-3);
+        padding: var(--space-3);
+        cursor: pointer;
+        transition: background-color 0.15s;
+    }
+
+    .civic-search-result-item:hover,
+    .civic-search-result-item:focus,
+    .civic-search-result-item[aria-selected="true"] {
+        background: var(--color-gray-100);
+        outline: none;
+    }
+
+    .civic-search-result-item:focus {
+        outline: 3px solid var(--color-focus);
+        outline-offset: -3px;
+    }
+
 }

@@ -5,12 +5,12 @@
  */
 
 .leaderboard-container {
-    background: linear-gradient(135deg, rgba(15, 23, 42, 0.95), rgba(30, 41, 59, 0.9));
+    background: linear-gradient(135deg, var(--color-slate-900-alpha-95), var(--color-slate-800-alpha-90));
     /* backdrop-filter removed for GOV.UK compliance */
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    border: 1px solid var(--color-white-alpha-10);
     border-radius: var(--radius-2xl);
     padding: 2rem;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 8px 32px var(--color-black-alpha-30);
 }
 
 .leaderboard-header {
@@ -38,10 +38,10 @@
 
 .filter-button {
     padding: 0.5rem 1rem;
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: var(--color-white-alpha-5);
+    border: 1px solid var(--color-white-alpha-10);
     border-radius: var(--radius-md);
-    color: rgba(255, 255, 255, 0.7);
+    color: var(--color-white-alpha-70);
     font-size: 0.875rem;
     cursor: pointer;
     transition: all 0.3s ease;
@@ -55,8 +55,8 @@
 }
 
 .user-rank-card {
-    background: linear-gradient(135deg, rgba(16, 185, 129, 0.2), rgba(5, 150, 105, 0.2));
-    border: 2px solid rgba(16, 185, 129, 0.4);
+    background: linear-gradient(135deg, var(--color-emerald-alpha-20), var(--color-emerald-600-alpha-20));
+    border: 2px solid var(--color-emerald-alpha-40);
     border-radius: var(--radius-xl);
     padding: 1.5rem;
     margin-bottom: 2rem;
@@ -75,7 +75,7 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    box-shadow: 0 8px 24px rgba(16, 185, 129, 0.4);
+    box-shadow: 0 8px 24px var(--color-emerald-alpha-40);
 }
 
 .rank-number {
@@ -87,7 +87,7 @@
 
 .rank-label {
     font-size: 0.625rem;
-    color: rgba(255, 255, 255, 0.9);
+    color: var(--color-white-alpha-90);
     text-transform: uppercase;
     letter-spacing: 0.05em;
 }
@@ -113,7 +113,7 @@
 .rank-progress {
     flex: 1;
     height: 8px;
-    background: rgba(255, 255, 255, 0.1);
+    background: var(--color-white-alpha-10);
     border-radius: var(--radius-sm);
     overflow: hidden;
 }
@@ -122,7 +122,7 @@
     height: 100%;
     background: linear-gradient(90deg, var(--color-success-500), var(--color-cyan-500));
     border-radius: var(--radius-sm);
-    box-shadow: 0 0 10px rgba(16, 185, 129, 0.5);
+    box-shadow: 0 0 10px var(--color-emerald-alpha-50);
 }
 
 .rank-score-value {
@@ -134,7 +134,7 @@
 .comparison-stat {
     text-align: center;
     padding: 1rem;
-    background: rgba(255, 255, 255, 0.05);
+    background: var(--color-white-alpha-5);
     border-radius: var(--radius-lg);
 }
 
@@ -146,7 +146,7 @@
 
 .comparison-label {
     font-size: 0.75rem;
-    color: rgba(255, 255, 255, 0.6);
+    color: var(--color-white-alpha-60);
     text-transform: uppercase;
     letter-spacing: 0.05em;
     margin-top: 0.25rem;
@@ -159,8 +159,8 @@
 }
 
 .leader-item {
-    background: rgba(255, 255, 255, 0.03);
-    border: 1px solid rgba(255, 255, 255, 0.05);
+    background: var(--color-white-alpha-3);
+    border: 1px solid var(--color-white-alpha-5);
     border-radius: var(--radius-lg);
     padding: 1rem 1.5rem;
     display: grid;
@@ -171,24 +171,24 @@
 }
 
 .leader-item:hover {
-    background: rgba(255, 255, 255, 0.05);
-    border-color: rgba(255, 255, 255, 0.1);
+    background: var(--color-white-alpha-5);
+    border-color: var(--color-white-alpha-10);
     transform: translateX(4px);
 }
 
 .leader-item.rank-1 {
-    background: linear-gradient(135deg, rgba(255, 215, 0, 0.15), rgba(255, 193, 7, 0.15));
-    border-color: rgba(255, 215, 0, 0.4);
+    background: linear-gradient(135deg, var(--color-gold-alpha-15), var(--color-yellow-500-alt-alpha-15));
+    border-color: var(--color-gold-alpha-40);
 }
 
 .leader-item.rank-2 {
-    background: linear-gradient(135deg, rgba(192, 192, 192, 0.15), rgba(169, 169, 169, 0.15));
-    border-color: rgba(192, 192, 192, 0.4);
+    background: linear-gradient(135deg, var(--color-silver-alpha-15), var(--color-darkgray-alpha-15));
+    border-color: var(--color-silver-alpha-40);
 }
 
 .leader-item.rank-3 {
-    background: linear-gradient(135deg, rgba(205, 127, 50, 0.15), rgba(184, 115, 51, 0.15));
-    border-color: rgba(205, 127, 50, 0.4);
+    background: linear-gradient(135deg, var(--color-bronze-alpha-15), var(--color-bronze-dark-alpha-15));
+    border-color: var(--color-bronze-alpha-40);
 }
 
 .leader-rank-display {
@@ -197,7 +197,7 @@
     justify-content: center;
     width: var(--space-12);
     height: var(--space-12);
-    background: linear-gradient(135deg, rgba(99, 102, 241, 0.2), rgba(139, 92, 246, 0.2));
+    background: linear-gradient(135deg, var(--color-indigo-alpha-20), var(--color-violet-alpha-20));
     border-radius: var(--radius-lg);
     font-size: 1.5rem;
     font-weight: 700;
@@ -236,7 +236,7 @@
 
 .leader-tier {
     font-size: 0.875rem;
-    color: rgba(255, 255, 255, 0.6);
+    color: var(--color-white-alpha-60);
     display: flex;
     align-items: center;
     gap: 0.5rem;
@@ -257,7 +257,7 @@
 
 .leader-score-label {
     font-size: 0.75rem;
-    color: rgba(255, 255, 255, 0.5);
+    color: var(--color-white-alpha-50);
 }
 
 .average-line {
@@ -265,8 +265,8 @@
     align-items: center;
     gap: 1rem;
     padding: 1rem;
-    background: linear-gradient(135deg, rgba(251, 191, 36, 0.1), rgba(245, 158, 11, 0.1));
-    border: 1px dashed rgba(251, 191, 36, 0.4);
+    background: linear-gradient(135deg, var(--color-amber-400-alpha-10), var(--color-amber-500-alpha-10));
+    border: 1px dashed var(--color-amber-400-alpha-40);
     border-radius: var(--radius-lg);
     margin: 1rem 0;
 }
@@ -278,7 +278,7 @@
 .average-text {
     flex: 1;
     font-size: 0.95rem;
-    color: rgba(255, 255, 255, 0.8);
+    color: var(--color-white-alpha-80);
 }
 
 .average-score {
@@ -290,8 +290,8 @@
 .load-more-button {
     width: 100%;
     padding: 1rem;
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: var(--color-white-alpha-5);
+    border: 1px solid var(--color-white-alpha-10);
     border-radius: var(--radius-lg);
     color: var(--color-primary-500);
     font-size: 1rem;
@@ -302,7 +302,7 @@
 }
 
 .load-more-button:hover {
-    background: rgba(99, 102, 241, 0.1);
+    background: var(--color-indigo-alpha-10);
     border-color: var(--color-primary-500);
 }
 
@@ -310,7 +310,7 @@
 .leaderboard-empty-state {
     text-align: center;
     padding: 3rem 1rem;
-    color: rgba(255, 255, 255, 0.6);
+    color: var(--color-white-alpha-60);
 }
 
 .leaderboard-empty-icon {

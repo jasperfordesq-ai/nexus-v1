@@ -114,7 +114,8 @@ function deleteListing(id) {
     if (!confirm('Are you sure you want to delete this listing? This cannot be undone.')) return;
 
     const el = document.getElementById('listing-' + id);
-    if (el) el.style.opacity = '0.5';
+    // Use CSS class for pending state instead of inline style (GOV.UK compliance)
+    if (el) el.classList.add('civic-item--pending');
 
     const body = new URLSearchParams();
     body.append('id', id);
@@ -143,12 +144,12 @@ function deleteListing(id) {
             if (el) el.remove();
         } else {
             alert('Failed: ' + (data.error || 'Unknown error'));
-            if (el) el.style.opacity = '1';
+            if (el) el.classList.remove('civic-item--pending');
         }
     })
     .catch(function(e) {
         alert('Error: ' + e.message);
-        if (el) el.style.opacity = '1';
+        if (el) el.classList.remove('civic-item--pending');
     });
 }
 
@@ -173,6 +174,8 @@ function initUserSearch() {
         if (query.length < 1) {
             dashResultsContainer.hidden = true;
             dashResultsContainer.innerHTML = '';
+            dashSearchInput.setAttribute('aria-expanded', 'false');
+            dashSearchInput.removeAttribute('aria-activedescendant');
             return;
         }
 
@@ -188,11 +191,11 @@ function initUserSearch() {
         if (e.key === 'ArrowDown') {
             e.preventDefault();
             dashSelectedIndex = Math.min(dashSelectedIndex + 1, results.length - 1);
-            updateDashResultsSelection(results);
+            updateDashResultsSelection(results, dashSearchInput);
         } else if (e.key === 'ArrowUp') {
             e.preventDefault();
             dashSelectedIndex = Math.max(dashSelectedIndex - 1, 0);
-            updateDashResultsSelection(results);
+            updateDashResultsSelection(results, dashSearchInput);
         } else if (e.key === 'Enter') {
             e.preventDefault();
             if (dashSelectedIndex >= 0 && results[dashSelectedIndex]) {
@@ -200,16 +203,24 @@ function initUserSearch() {
             }
         } else if (e.key === 'Escape') {
             dashResultsContainer.hidden = true;
+            dashSearchInput.setAttribute('aria-expanded', 'false');
+            dashSearchInput.removeAttribute('aria-activedescendant');
         }
     });
 }
 
-function updateDashResultsSelection(results) {
+function updateDashResultsSelection(results, inputEl) {
     results.forEach(function(r, i) {
-        if (i === dashSelectedIndex) {
+        const isSelected = i === dashSelectedIndex;
+        if (isSelected) {
             r.classList.add('selected');
+            r.setAttribute('aria-selected', 'true');
+            if (inputEl && r.id) {
+                inputEl.setAttribute('aria-activedescendant', r.id);
+            }
         } else {
             r.classList.remove('selected');
+            r.setAttribute('aria-selected', 'false');
         }
     });
     if (results[dashSelectedIndex]) {
@@ -219,6 +230,7 @@ function updateDashResultsSelection(results) {
 
 function searchDashUsers(query) {
     const dashResultsContainer = document.getElementById('dashUserResults');
+    const dashSearchInput = document.getElementById('dashUserSearch');
 
     fetch(NEXUS_BASE + '/api/wallet/user-search', {
         method: 'POST',
@@ -230,18 +242,22 @@ function searchDashUsers(query) {
         dashSelectedIndex = -1;
 
         if (data.status === 'success' && data.users && data.users.length > 0) {
-            dashResultsContainer.innerHTML = data.users.map(function(user) {
+            dashResultsContainer.innerHTML = data.users.map(function(user, index) {
                 const initial = (user.display_name || '?')[0].toUpperCase();
                 const avatarHtml = user.avatar_url
                     ? '<img src="' + escapeHtml(user.avatar_url) + '" alt="" loading="lazy">'
                     : '<span>' + initial + '</span>';
 
-                return '<button type="button" class="civic-user-result" onclick="selectDashUser(\'' +
+                return '<button type="button" class="civic-user-result civic-search-result-item" ' +
+                    'id="dash-user-option-' + index + '" ' +
+                    'role="option" ' +
+                    'aria-selected="false" ' +
+                    'onclick="selectDashUser(\'' +
                     escapeHtml(user.username || '') + '\', \'' +
                     escapeHtml(user.display_name) + '\', \'' +
                     escapeHtml(user.avatar_url || '') + '\', \'' +
                     user.id + '\')">' +
-                    '<div class="civic-user-avatar">' + avatarHtml + '</div>' +
+                    '<div class="civic-user-avatar" aria-hidden="true">' + avatarHtml + '</div>' +
                     '<div class="civic-user-info">' +
                         '<div class="civic-user-name">' + escapeHtml(user.display_name) + '</div>' +
                         '<div class="civic-user-username">' + (user.username ? '@' + escapeHtml(user.username) : '<em>No username</em>') + '</div>' +
@@ -249,15 +265,24 @@ function searchDashUsers(query) {
                 '</button>';
             }).join('');
             dashResultsContainer.hidden = false;
+            if (dashSearchInput) {
+                dashSearchInput.setAttribute('aria-expanded', 'true');
+            }
         } else {
-            dashResultsContainer.innerHTML = '<div class="civic-no-results">No users found</div>';
+            dashResultsContainer.innerHTML = '<div class="civic-no-results" role="status">No users found</div>';
             dashResultsContainer.hidden = false;
+            if (dashSearchInput) {
+                dashSearchInput.setAttribute('aria-expanded', 'true');
+            }
         }
     })
     .catch(function(err) {
         console.error('Dashboard user search error:', err);
-        dashResultsContainer.innerHTML = '<div class="civic-no-results">Search error</div>';
+        dashResultsContainer.innerHTML = '<div class="civic-no-results" role="alert">Search error</div>';
         dashResultsContainer.hidden = false;
+        if (dashSearchInput) {
+            dashSearchInput.setAttribute('aria-expanded', 'true');
+        }
     });
 }
 
@@ -267,6 +292,7 @@ function selectDashUser(username, displayName, avatarUrl, userId) {
     const dashSelectedUser = document.getElementById('dashSelectedUser');
     const dashSearchWrapper = document.getElementById('dashSearchWrapper');
     const dashResultsContainer = document.getElementById('dashUserResults');
+    const dashSearchInput = document.getElementById('dashUserSearch');
 
     dashUsernameInput.value = username;
     dashRecipientId.value = userId || '';
@@ -283,6 +309,10 @@ function selectDashUser(username, displayName, avatarUrl, userId) {
     dashSelectedUser.hidden = false;
     dashSearchWrapper.hidden = true;
     dashResultsContainer.hidden = true;
+    if (dashSearchInput) {
+        dashSearchInput.setAttribute('aria-expanded', 'false');
+        dashSearchInput.removeAttribute('aria-activedescendant');
+    }
 }
 
 function clearDashSelection() {
@@ -297,6 +327,8 @@ function clearDashSelection() {
     dashSelectedUser.hidden = true;
     dashSearchWrapper.hidden = false;
     dashSearchInput.value = '';
+    dashSearchInput.setAttribute('aria-expanded', 'false');
+    dashSearchInput.removeAttribute('aria-activedescendant');
     dashSearchInput.focus();
 }
 
@@ -341,8 +373,13 @@ function initClickOutsideHandlers() {
         // User search results
         const searchWrapper = document.getElementById('dashSearchWrapper');
         const resultsContainer = document.getElementById('dashUserResults');
+        const searchInput = document.getElementById('dashUserSearch');
         if (searchWrapper && resultsContainer && !searchWrapper.contains(e.target)) {
             resultsContainer.hidden = true;
+            if (searchInput) {
+                searchInput.setAttribute('aria-expanded', 'false');
+                searchInput.removeAttribute('aria-activedescendant');
+            }
         }
     });
 }
