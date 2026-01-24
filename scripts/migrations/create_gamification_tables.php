@@ -33,8 +33,9 @@ $failed = [];
  */
 function tableExists($db, $table) {
     try {
-        $result = $db->query("SHOW TABLES LIKE '{$table}'");
-        return $result->rowCount() > 0;
+        $stmt = $db->prepare("SHOW TABLES LIKE ?");
+        $stmt->execute([$table]);
+        return $stmt->rowCount() > 0;
     } catch (Exception $e) {
         return false;
     }
@@ -42,11 +43,14 @@ function tableExists($db, $table) {
 
 /**
  * Check if a column exists in a table
+ * Note: Table name uses backticks (safe from hardcoded arrays), column uses prepared param
  */
 function columnExists($db, $table, $column) {
     try {
-        $result = $db->query("SHOW COLUMNS FROM {$table} LIKE '{$column}'");
-        return $result->rowCount() > 0;
+        // Table name is from hardcoded arrays only - validated at callsite
+        $stmt = $db->prepare("SHOW COLUMNS FROM `{$table}` LIKE ?");
+        $stmt->execute([$column]);
+        return $stmt->rowCount() > 0;
     } catch (Exception $e) {
         return false;
     }
