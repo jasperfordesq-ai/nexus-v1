@@ -336,7 +336,7 @@
             showOffline();
         }
 
-        console.log('[ErrorStates] Initialized');
+        console.warn('[ErrorStates] Initialized');
     }
 
     // Public API

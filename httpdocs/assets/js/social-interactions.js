@@ -1589,7 +1589,7 @@
     global.loadMoreLikers = SocialInteractions.loadMoreLikers;
 
     // Log that the module loaded successfully (for debugging)
-    console.log('[SocialInteractions] Module loaded, showLikers available:', typeof SocialInteractions.showLikers);
+    console.warn('[SocialInteractions] Module loaded, showLikers available:', typeof SocialInteractions.showLikers);
 
     // Export to global
     global.SocialInteractions = SocialInteractions;

@@ -36,7 +36,7 @@
             this.initViewTransitions();
             this.initOfflineIndicator();
 
-            console.log('[CivicOne Native] Advanced features initialized');
+            console.warn('[CivicOne Native] Advanced features initialized');
         },
 
         // ============================================
@@ -580,7 +580,7 @@
         initViewTransitions: function() {
             // Check for View Transitions support
             if (!document.startViewTransition) {
-                console.log('[CivicOne Native] View Transitions API not supported');
+                console.warn('[CivicOne Native] View Transitions API not supported');
                 return;
             }
 
@@ -619,7 +619,7 @@
                 }, 300);
             });
 
-            console.log('[CivicOne Native] View Transitions enabled');
+            console.warn('[CivicOne Native] View Transitions enabled');
         },
 
         // ============================================
@@ -633,7 +633,7 @@
             // Only enable offline indicator on mobile devices
             // Desktop browsers have unreliable navigator.onLine detection
             if (window.innerWidth > 768) {
-                console.log('[CivicOne Native] Offline indicator disabled on desktop');
+                console.warn('[CivicOne Native] Offline indicator disabled on desktop');
                 return;
             }
 

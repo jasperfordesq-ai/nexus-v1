@@ -245,7 +245,7 @@
         // Attach to existing elements
         const selector = config.selectors.join(', ');
         const count = attachAll(selector);
-        console.log(`[ButtonRipple] Attached to ${count} elements`);
+        console.warn(`[ButtonRipple] Attached to ${count} elements`);
 
         // Watch for new elements
         const observer = new MutationObserver((mutations) => {

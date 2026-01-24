@@ -354,7 +354,7 @@
             window.addEventListener('scroll', handleScroll, { passive: true });
         }
 
-        console.log(`[FAB] Initialized ${fabInstances.length} floating action buttons`);
+        console.warn(`[FAB] Initialized ${fabInstances.length} floating action buttons`);
     }
 
     // Public API

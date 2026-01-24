@@ -267,7 +267,7 @@
             subtree: true
         });
 
-        console.log(`[AvatarPlaceholder] Initialized ${images.length} images`);
+        console.warn(`[AvatarPlaceholder] Initialized ${images.length} images`);
     }
 
     /**

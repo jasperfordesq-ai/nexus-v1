@@ -49,7 +49,7 @@
                 if (promo) promo.classList.add('show');
             }
         } catch (e) {
-            console.log('[WebAuthn] Biometric check failed:', e);
+            console.warn('[WebAuthn] Biometric check failed:', e);
         }
     }
 
