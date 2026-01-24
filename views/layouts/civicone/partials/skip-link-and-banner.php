@@ -1,5 +1,5 @@
-    <!-- Skip Link for Accessibility (WCAG 2.4.1) -->
-    <a href="#main-content" class="skip-link">Skip to main content</a>
+    <!-- Skip Link for Accessibility (WCAG 2.4.1) - GOV.UK Pattern -->
+    <a href="#main-content" class="govuk-skip-link" data-module="govuk-skip-link">Skip to main content</a>
 
 <?php
 // Tenant feature check for layout banner
@@ -19,23 +19,13 @@ try {
 ?>
 
 <?php if ($showLayoutBanner): ?>
-    <!-- Development Banner - Prominent dev environment indicator -->
-    <div class="civicone-dev-banner civicone-dev-banner--accessible" role="status" aria-live="polite">
-        <div class="civicone-dev-banner-content">
-            <div>
-                <span class="civicone-dev-badge">
-                    <i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i>
-                    DEVELOPMENT
-                </span>
-                <span class="civicone-dev-text">
-                    <strong>Development Environment</strong>
-                    <span>WCAG 2.1 AA Compliant — High contrast, keyboard-friendly design</span>
-                </span>
-            </div>
-            <a href="#" data-layout-switcher="modern" class="civicone-dev-switch">
-                <i class="fa-solid fa-sparkles" aria-hidden="true"></i>
-                Switch to Modern
-            </a>
-        </div>
+    <!-- Phase Banner - GOV.UK Pattern -->
+    <div class="govuk-phase-banner govuk-width-container">
+        <p class="govuk-phase-banner__content">
+            <strong class="govuk-tag govuk-phase-banner__content__tag">Beta</strong>
+            <span class="govuk-phase-banner__text">
+                This is a new accessible layout — <a class="govuk-link" href="#" data-layout-switcher="modern">switch to classic view</a> or <a class="govuk-link" href="<?= \Nexus\Core\TenantContext::getBasePath() ?>/help/feedback">give feedback</a>.
+            </span>
+        </p>
     </div>
 <?php endif; ?>
