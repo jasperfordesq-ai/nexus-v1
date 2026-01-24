@@ -1043,19 +1043,20 @@ function appendCsrf(formData) {
 
 // Composer Functions
 function toggleComposer(show) {
-    const collapsed = document.getElementById('composer-collapsed');
-    const expanded = document.getElementById('composer-expanded');
-    const trigger = collapsed?.querySelector('.civic-composer-trigger');
+    var collapsed = document.getElementById('composer-collapsed');
+    var expanded = document.getElementById('composer-expanded');
+    var trigger = collapsed ? collapsed.querySelector('.civic-composer-trigger') : null;
 
     if (show) {
-        if (collapsed) collapsed.style.display = 'none';
+        if (collapsed) collapsed.classList.add('hidden');
         if (expanded) {
             expanded.classList.add('active');
-            document.getElementById('composer-input')?.focus();
+            var input = document.getElementById('composer-input');
+            if (input) input.focus();
         }
         if (trigger) trigger.setAttribute('aria-expanded', 'true');
     } else {
-        if (collapsed) collapsed.style.display = 'block';
+        if (collapsed) collapsed.classList.remove('hidden');
         if (expanded) expanded.classList.remove('active');
         if (trigger) trigger.setAttribute('aria-expanded', 'false');
     }
@@ -1324,11 +1325,10 @@ if (IS_LOGGED_IN && window.innerWidth <= 768) {
             });
         } else {
             // Fallback if FAB module not loaded
-            const fab = document.createElement('button');
-            fab.className = 'fab fab-animate-in';
+            var fab = document.createElement('button');
+            fab.className = 'fab fab-animate-in feed-fab-fallback';
             fab.innerHTML = '<span class="dashicons dashicons-edit feed-fab-icon"></span>';
             fab.setAttribute('aria-label', 'Create post');
-            fab.style.cssText = 'position:fixed; bottom:80px; right:16px; width:56px; height:56px; border-radius:16px; background:linear-gradient(135deg, #6366f1, #8b5cf6); color:white; border:none; box-shadow:0 4px 12px rgba(99,102,241,0.4); display:flex; align-items:center; justify-content:center; z-index:1000; cursor:pointer;';
             fab.addEventListener('click', function() {
                 toggleComposer(true);
                 window.scrollTo({ top: 0, behavior: 'smooth' });
