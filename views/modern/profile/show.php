@@ -1097,7 +1097,7 @@ $basePath = \Nexus\Core\TenantContext::getBasePath();
                         </div>`).join('');
                     }
                 } else if (data.error) {
-                    list.innerHTML = '<div class="comment-error">Error: ' + data.error + '</div>';
+                    list.innerHTML = '<div class="comment-error">Error: ' + escapeHtml(data.error) + '</div>';
                 } else {
                     list.innerHTML = '<div class="comment-empty">No comments yet. Be the first to comment!</div>';
                 }

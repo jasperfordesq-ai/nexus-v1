@@ -40,8 +40,9 @@ class FederationImportController
 
         $file = $_FILES['csv_file'];
 
-        // Validate file type
-        $mimeType = mime_content_type($file['tmp_name']);
+        // Validate file type using finfo (replaces deprecated mime_content_type)
+        $finfo = new \finfo(FILEINFO_MIME_TYPE);
+        $mimeType = $finfo->file($file['tmp_name']);
         if (!in_array($mimeType, ['text/csv', 'text/plain', 'application/csv'])) {
             $_SESSION['flash_error'] = 'Invalid file type. Please upload a CSV file.';
             header('Location: /admin/federation/data');

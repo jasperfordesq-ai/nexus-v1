@@ -323,6 +323,14 @@ if (!isset($notifications)) {
 </div>
 
 <script>
+    // Security: HTML escape function to prevent XSS
+    function escapeHtml(text) {
+        if (text === null || text === undefined) return '';
+        const div = document.createElement('div');
+        div.textContent = String(text);
+        return div.innerHTML;
+    }
+
     function toggleEmailProvider() {
         var provider = document.getElementById('email_provider').value;
         var gmailSettings = document.getElementById('gmail_api_settings');
@@ -351,9 +359,9 @@ if (!isset($notifications)) {
         .then(function(response) { return response.json(); })
         .then(function(data) {
             if (data.success) {
-                resultSpan.innerHTML = '<span style="color: #16a34a;">&#10004; ' + data.message + '</span>';
+                resultSpan.innerHTML = '<span style="color: #16a34a;">&#10004; ' + escapeHtml(data.message) + '</span>';
             } else {
-                resultSpan.innerHTML = '<span style="color: #dc2626;">&#10008; ' + data.message + '</span>';
+                resultSpan.innerHTML = '<span style="color: #dc2626;">&#10008; ' + escapeHtml(data.message) + '</span>';
             }
         })
         .catch(function(error) {

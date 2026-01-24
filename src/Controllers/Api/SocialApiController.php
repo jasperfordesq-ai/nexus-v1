@@ -984,6 +984,11 @@ class SocialApiController
 
     private function loadGroupFeed($groupId, $currentUserId, $tenantId, $limit, $offset)
     {
+        // Security: Cast all numeric values to integers to prevent SQL injection
+        $currentUserId = (int) $currentUserId;
+        $limit = (int) $limit;
+        $offset = (int) $offset;
+
         // Check if group_id column exists
         try {
             $columns = Database::query("SHOW COLUMNS FROM feed_posts LIKE 'group_id'")->fetch();
@@ -1013,6 +1018,11 @@ class SocialApiController
 
     private function loadUserPosts($userId, $currentUserId, $tenantId, $limit, $offset)
     {
+        // Security: Cast all numeric values to integers to prevent SQL injection
+        $currentUserId = (int) $currentUserId;
+        $limit = (int) $limit;
+        $offset = (int) $offset;
+
         $sql = "SELECT p.id, p.content, p.image_url, p.created_at, p.likes_count,
                        'post' as type,
                        COALESCE(u.name, CONCAT(u.first_name, ' ', u.last_name)) as author_name,
@@ -1031,6 +1041,11 @@ class SocialApiController
 
     private function loadAggregatedFeed($currentUserId, $tenantId, $filter, $limit, $offset)
     {
+        // Security: Cast all numeric values to integers to prevent SQL injection
+        $currentUserId = (int) $currentUserId;
+        $limit = (int) $limit;
+        $offset = (int) $offset;
+
         $items = [];
         $likeSubquery = $currentUserId
             ? "(SELECT COUNT(*) FROM likes WHERE user_id = $currentUserId AND target_type = '%s' AND target_id = %s.id)"
