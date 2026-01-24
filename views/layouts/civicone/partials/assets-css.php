@@ -139,8 +139,11 @@
     <!-- Social Interactions CSS -->
     <link rel="stylesheet" href="/assets/css/social-interactions.min.css?v=<?= $cssVersion ?>">
 
-    <!-- GOV.UK Design System - WCAG 2.2 AA Compliant (Consolidated Bundle 2026-01-23) -->
-    <!-- Includes: typography, spacing, focus, buttons, forms, components, feedback, navigation, content, tabs -->
+    <!-- GOV.UK Frontend v5.14.0 (Official Design System) - WCAG 2.1 AA Compliant -->
+    <!-- Source: https://github.com/alphagov/govuk-frontend pinned to v5.14.0 -->
+    <link rel="stylesheet" href="/assets/govuk-frontend-5.14.0/govuk-frontend.min.css?v=<?= $cssVersion ?>">
+
+    <!-- GOV.UK Design System Extensions (Project-specific overrides) -->
     <link rel="stylesheet" href="/assets/css/bundles/civicone-govuk-all.min.css?v=<?= $cssVersion ?>">
 
     <!-- CivicOne Layout (includes grid system - must load for all pages) -->
