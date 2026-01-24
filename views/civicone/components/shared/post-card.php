@@ -116,7 +116,7 @@ if ($currentUserId) {
         <img src="<?= htmlspecialchars($post['image_url']) ?>"
              alt="Post image"
              loading="lazy"
-             onerror="this.style.display='none'">
+             onerror="this.classList.add('hidden')">
     </figure>
     <?php endif; ?>
 

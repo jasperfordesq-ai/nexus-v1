@@ -30,7 +30,7 @@ $basePath = \Nexus\Core\TenantContext::getBasePath();
 <?php if (empty($notifications)): ?>
     <div class="civic-empty-state">
         <div class="civic-empty-state-icon">
-            <span class="dashicons dashicons-bell" style="font-size: 48px;" aria-hidden="true"></span>
+            <span class="dashicons dashicons-bell icon-size-48" aria-hidden="true"></span>
         </div>
         <h3 class="civic-empty-state-title">No notifications yet</h3>
         <p class="civic-empty-state-text">When you receive messages, connection requests, or other updates, they'll appear here.</p>
