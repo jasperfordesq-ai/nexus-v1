@@ -124,6 +124,10 @@
         <link rel="stylesheet" href="/assets/css/members-directory-v1.6.min.css?v=<?= $cssVersion ?>">
     <?php endif; ?>
 
+    <!-- Cookie Consent (EU Compliance) -->
+    <link rel="stylesheet" href="/assets/css/civicone/cookie-banner.css?v=<?= $cssVersion ?>">
+    <script src="/assets/js/cookie-consent.js?v=<?= $cssVersion ?>"></script>
+
     <!-- Mobile Sheets CSS (base styles always load, CSS handles desktop hiding) -->
     <link rel="stylesheet" href="/assets/css/mobile-sheets.min.css?v=<?= $cssVersion ?>">
     <link rel="stylesheet" href="/assets/css/pwa-install-modal.css?v=<?= $cssVersion ?>">

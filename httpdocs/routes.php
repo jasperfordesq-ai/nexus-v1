@@ -142,6 +142,14 @@ $router->add('POST', '/api/layout-switch', 'Nexus\Controllers\Api\LayoutApiContr
 $router->add('GET', '/api/layout-switch', 'Nexus\Controllers\Api\LayoutApiController@current');
 $router->add('GET', '/api/layout-debug', 'Nexus\Controllers\Api\LayoutApiController@debug');
 
+// Cookie Consent API (EU Compliance)
+$router->add('GET', '/api/cookie-consent', 'Nexus\Controllers\Api\CookieConsentController@show');
+$router->add('POST', '/api/cookie-consent', 'Nexus\Controllers\Api\CookieConsentController@store');
+$router->add('PUT', '/api/cookie-consent/{id}', 'Nexus\Controllers\Api\CookieConsentController@update');
+$router->add('DELETE', '/api/cookie-consent/{id}', 'Nexus\Controllers\Api\CookieConsentController@withdraw');
+$router->add('GET', '/api/cookie-consent/inventory', 'Nexus\Controllers\Api\CookieConsentController@inventory');
+$router->add('GET', '/api/cookie-consent/check/{category}', 'Nexus\Controllers\Api\CookieConsentController@check');
+
 // Nexus Score API
 $router->add('GET', '/api/nexus-score', 'Nexus\Controllers\NexusScoreController@apiGetScore');
 $router->add('POST', '/api/nexus-score/recalculate', 'Nexus\Controllers\NexusScoreController@apiRecalculateScores');
@@ -378,6 +386,10 @@ $router->add('GET', '/legal', 'Nexus\Controllers\PageController@legal');
 $router->add('GET', '/legal/volunteer-license', function () {
     \Nexus\Core\View::render('legal/volunteer-license');
 });
+$router->add('GET', '/legal/cookies', 'Nexus\Controllers\CookiePolicyController@index');
+
+// Cookie Preferences
+$router->add('GET', '/cookie-preferences', 'Nexus\Controllers\CookiePreferencesController@index');
 
 // CMS Pages (created via Page Builder)
 $router->add('GET', '/page/{slug}', 'Nexus\Controllers\PageController@show');

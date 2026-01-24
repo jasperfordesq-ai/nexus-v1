@@ -103,6 +103,8 @@
             <div class="civic-footer-links">
                 <a href="<?= $basePath ?>/privacy">Privacy Policy</a>
                 <a href="<?= $basePath ?>/terms">Terms of Service</a>
+                <a href="<?= $basePath ?>/cookie-preferences">Cookie Preferences</a>
+                <a href="<?= $basePath ?>/legal/cookies">Cookies</a>
                 <a href="<?= $basePath ?>/accessibility">Accessibility</a>
             </div>
         </div>
