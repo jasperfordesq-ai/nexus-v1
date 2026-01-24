@@ -11,12 +11,8 @@ require dirname(__DIR__, 2) . '/layouts/civicone/header.php';
 $basePath = \Nexus\Core\TenantContext::getBasePath();
 ?>
 
-<!-- GOV.UK Page Template Boilerplate (Section 10.0) -->
-<div class="govuk-width-container">
-    <main class="govuk-main-wrapper" id="main-content">
-
-        <!-- Breadcrumbs (GOV.UK Template A requirement) -->
-        <nav class="govuk-breadcrumbs govuk-!-margin-bottom-6" aria-label="Breadcrumb">
+<!-- Breadcrumbs (GOV.UK Template A requirement) -->
+<nav class="govuk-breadcrumbs govuk-!-margin-bottom-6" aria-label="Breadcrumb">
             <ol class="govuk-breadcrumbs__list">
                 <li class="govuk-breadcrumbs__list-item">
                     <a class="govuk-breadcrumbs__link" href="<?= $basePath ?>">Home</a>
@@ -268,10 +264,7 @@ $basePath = \Nexus\Core\TenantContext::getBasePath();
                     </nav>
                 <?php endif; ?>
 
-            </div><!-- /.govuk-grid-column-two-thirds -->
-        </div><!-- /.govuk-grid-row -->
-
-    </main>
-</div><!-- /width-container -->
+        </div><!-- /.govuk-grid-column-two-thirds -->
+    </div><!-- /.govuk-grid-row -->
 
 <?php require dirname(__DIR__, 2) . '/layouts/civicone/footer.php'; ?>
