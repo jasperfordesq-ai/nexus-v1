@@ -13,20 +13,20 @@ Last updated: 2026-01-24
 
 | File | Status | Notes |
 |------|--------|-------|
-| `layouts/civicone/header.php` | 🟡 Partial | Has govuk-template ref, needs proper GOV.UK service nav |
-| `layouts/civicone/footer.php` | ⬜ Not started | Needs GOV.UK footer pattern |
+| `layouts/civicone/header.php` | ✅ Polished | govuk-template documented, includes all partials |
+| `layouts/civicone/footer.php` | ✅ Polished | Uses govuk-footer pattern |
 | `layouts/civicone/partials/document-open.php` | ✅ Polished | Has govuk-template class |
 | `layouts/civicone/partials/body-open.php` | ✅ Polished | Has govuk-template__body class |
 | `layouts/civicone/partials/assets-css.php` | ✅ Polished | Loads govuk-frontend-5.14.0 |
 | `layouts/civicone/partials/assets-js-footer.php` | ✅ Polished | Loads govuk-frontend JS |
-| `layouts/civicone/partials/service-navigation.php` | 🟡 Partial | Uses civicone- classes, needs govuk- |
-| `layouts/civicone/partials/site-header.php` | 🟡 Partial | Uses civicone- classes, needs govuk- |
-| `layouts/civicone/partials/utility-bar.php` | ⬜ Not started | Needs review |
-| `layouts/civicone/partials/skip-link-and-banner.php` | ⬜ Not started | Check for govuk-skip-link |
-| `layouts/civicone/partials/main-open.php` | ⬜ Not started | Needs govuk-main-wrapper |
-| `layouts/civicone/partials/main-close.php` | ⬜ Not started | - |
-| `layouts/civicone/partials/page-hero.php` | ⬜ Not started | Replace with Page Heading Region |
-| `layouts/civicone/partials/hero.php` | ⬜ Not started | Replace with Page Heading Region |
+| `layouts/civicone/partials/service-navigation.php` | ✅ Polished | Uses govuk-service-navigation with More dropdown |
+| `layouts/civicone/partials/site-header.php` | ✅ Polished | Uses govuk-header wrapper |
+| `layouts/civicone/partials/utility-bar.php` | ✅ Polished | GOV.UK compatible dropdowns and drawer |
+| `layouts/civicone/partials/skip-link-and-banner.php` | ✅ Polished | Uses govuk-skip-link and govuk-phase-banner |
+| `layouts/civicone/partials/main-open.php` | ✅ Polished | Uses govuk-main-wrapper |
+| `layouts/civicone/partials/main-close.php` | ✅ Polished | Closes govuk-main-wrapper |
+| `layouts/civicone/partials/page-heading.php` | ✅ Polished | NEW: GOV.UK page heading partial |
+| `layouts/civicone/partials/site-footer.php` | ✅ Polished | Uses govuk-footer classes |
 
 ---
 
