@@ -523,6 +523,25 @@
     position: relative;
 }
 
+/* Ensure dropdown parent doesn't clip */
+.govuk-service-navigation__list {
+    overflow: visible;
+}
+
+.govuk-service-navigation__wrapper {
+    overflow: visible;
+}
+
+.govuk-service-navigation__container {
+    overflow: visible;
+}
+
+/* Increase z-index for service nav dropdown */
+.govuk-service-navigation {
+    position: relative;
+    z-index: 10;
+}
+
 /* ==========================================
    DARK MODE SUPPORT
    ========================================== */
