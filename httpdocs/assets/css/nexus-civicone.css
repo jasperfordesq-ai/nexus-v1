@@ -1,6 +1,11 @@
 /* Nexus CivicOne Theme - MadeOpen Community Style */
 /* WCAG 2.1 AA Compliant - Updated December 2024 */
 
+/* Override GOV.UK grey background on .govuk-template divs */
+.govuk-template {
+    background-color: transparent !important;
+}
+
 :root {
     /* ==========================================
        COMMUNITY-FOCUSED COLOR PALETTE
@@ -8,8 +13,8 @@
        All colors verified for WCAG AA contrast
        ========================================== */
 
-    /* Page Background - Warm off-white */
-    --civic-bg-page: #FAFAF9;
+    /* Page Background - Pure white (GOV.UK standard) */
+    --civic-bg-page: #ffffff;
     --civic-bg-card: var(--color-white);
 
     /* Text - Softer than pure black */

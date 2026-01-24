@@ -597,6 +597,18 @@
 }
 
 /* ==========================================
+   PANEL BACKGROUNDS
+   GOV.UK compliant panel backgrounds
+   ========================================== */
+
+/* Filter/sidebar panel background (light grey) */
+.civicone-panel-bg {
+    background-color: var(--color-govuk-light-grey, #f3f2f1);
+    padding: var(--space-4);
+    margin-bottom: var(--space-5);
+}
+
+/* ==========================================
    UTILITY BAR (Account/Platform controls)
    ========================================== */
 
@@ -752,6 +764,12 @@
     box-shadow: -2px 0 10px rgba(0, 0, 0, 0.2);
     display: flex;
     flex-direction: column;
+}
+
+/* Ensure hidden attribute works */
+.civicone-drawer[hidden],
+.civicone-drawer-overlay[hidden] {
+    display: none !important;
 }
 
 .civicone-drawer__header {
