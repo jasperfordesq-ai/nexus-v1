@@ -3,6 +3,26 @@
  * CivicOne Theme
  */
 
+/* Skip to content link - GOV.UK pattern */
+.skip-link {
+    position: absolute;
+    top: -40px;
+    left: 0;
+    background: var(--color-govuk-black, #0b0c0c);
+    color: var(--color-white, #fff);
+    padding: 8px 16px;
+    text-decoration: none;
+    z-index: 10000;
+    border-radius: 0 0 4px 0;
+    font-weight: 600;
+}
+
+.skip-link:focus {
+    top: 0;
+    outline: 3px solid var(--color-govuk-yellow, #ffdd00);
+    outline-offset: 0;
+}
+
 /* Screen reader only utility class */
 .sr-only {
     position: absolute;
