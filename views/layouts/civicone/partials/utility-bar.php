@@ -1,20 +1,28 @@
-    <!-- 1. Utility Bar (Top Row) - WCAG 2.1 AA Compliant -->
-    <nav class="civic-utility-bar" aria-label="Utility navigation">
-        <div class="civic-container civic-utility-wrapper">
+    <!-- Utility Bar (Account/Platform controls) - Above service navigation -->
+    <div class="govuk-width-container">
+        <nav class="civicone-utility-bar govuk-!-padding-top-1 govuk-!-padding-bottom-1" aria-label="Account and platform controls">
+            <ul class="govuk-list civicone-utility-list">
 
-            <!-- Platform Dropdown - God users only -->
-            <?php
-            $showPlatform = !empty($_SESSION['is_god']); // Restricted to god users
-            // Detect protocol (http for local, https for production)
-            $isSecure = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') || ($_SERVER['SERVER_PORT'] ?? 80) == 443;
-            $protocol = $isSecure ? 'https://' : 'http://';
-            if ($showPlatform):
-            ?>
-                <div class="civic-dropdown civic-dropdown--left">
-                    <button class="civic-utility-link civic-utility-btn civic-utility-btn--uppercase" aria-haspopup="menu" aria-expanded="false" aria-controls="platform-dropdown-menu">
-                        Platform <span class="civic-arrow" aria-hidden="true">▾</span>
+                <?php
+                $basePath = \Nexus\Core\TenantContext::getBasePath();
+                $showPlatform = !empty($_SESSION['is_god']);
+                $isSecure = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') || ($_SERVER['SERVER_PORT'] ?? 80) == 443;
+                $protocol = $isSecure ? 'https://' : 'http://';
+                ?>
+
+                <?php if ($showPlatform): ?>
+                <!-- Platform Switcher (God users only) -->
+                <li class="civicone-utility-item civicone-utility-item--dropdown">
+                    <button type="button"
+                            class="govuk-body-s civicone-utility-button"
+                            aria-expanded="false"
+                            aria-controls="platform-dropdown">
+                        Platform
+                        <svg class="civicone-utility-chevron" width="10" height="6" viewBox="0 0 10 6" aria-hidden="true">
+                            <path fill="currentColor" d="M0 0h10L5 6z"/>
+                        </svg>
                     </button>
-                    <div class="civic-dropdown-content" id="platform-dropdown-menu" role="menu">
+                    <ul class="civicone-utility-dropdown" id="platform-dropdown" hidden>
                         <?php
                         $tenants = [];
                         try {
@@ -24,201 +32,250 @@
                         }
                         foreach ($tenants as $pt):
                             if (!empty($pt['domain'])) {
-                                // Tenant has custom domain (uses current protocol)
                                 $link = $protocol . $pt['domain'];
                             } else {
                                 $link = '/' . ($pt['slug'] ?? '');
                                 if (($pt['id'] ?? 0) == 1) $link = '/';
                             }
                         ?>
-                            <a href="<?= htmlspecialchars($link) ?>" role="menuitem"><?= htmlspecialchars($pt['name'] ?? 'Unknown') ?></a>
+                        <li><a href="<?= htmlspecialchars($link) ?>" class="govuk-link"><?= htmlspecialchars($pt['name'] ?? 'Unknown') ?></a></li>
                         <?php endforeach; ?>
-                    </div>
-                </div>
-            <?php endif; ?>
-
-            <!-- Dark Mode Toggle -->
-            <button id="civic-theme-toggle" class="civic-utility-link civic-utility-btn" aria-label="Toggle High Contrast">
-                <span class="icon">◑</span> Contrast
-            </button>
-
-            <!-- Theme Switcher - Visible for everyone on desktop, admins only on mobile -->
-            <?php
-            // VISIBILITY LOGIC: Hide on 'public-sector-demo' tenant only
-            $currentSlug = '';
-            if (class_exists('\Nexus\Core\TenantContext')) {
-                $currentSlug = \Nexus\Core\TenantContext::get()['slug'] ?? '';
-            }
-            if ($currentSlug !== 'public-sector-demo'):
-            ?>
-                <?php
-                // Layout dropdown removed - now using banner at top of page
-                ?>
-            <?php endif; ?>
-
-
-            <!-- Auth / User Links -->
-            <?php if (isset($_SESSION['user_id'])): ?>
-
-                <!-- REMOVED: Create Dropdown (violates Rule HL-003) -->
-                <!-- Moved to floating action button or page content -->
-                <!-- See: docs/HEADER_FIX_ACTION_PLAN_2026-01-20.md -->
-
-                <!-- REMOVED: Federation Dropdown (violates Section 9B Rule FS-003) -->
-                <!-- Moved to federation-scope-switcher.php partial -->
-                <!-- Federation scope switcher appears between header and main content on /federation/* pages -->
-                <!-- See: docs/CIVICONE_WCAG21AA_SOURCE_OF_TRUTH.md Section 9B.2 -->
-
-                <?php if ((!empty($_SESSION['user_role']) && $_SESSION['user_role'] === 'newsletter_admin')): ?>
-                    <!-- Newsletter Admin - Limited Access (Matches Modern) -->
-                    <div class="civic-dropdown civic-dropdown--right">
-                        <button class="civic-utility-link civic-utility-btn civic-utility-btn--newsletter" aria-haspopup="menu" aria-expanded="false">
-                            Newsletter <span class="civic-arrow" aria-hidden="true">▾</span>
-                        </button>
-                        <div class="civic-dropdown-content" role="menu">
-                            <a href="<?= Nexus\Core\TenantContext::getBasePath() ?>/admin/newsletters" role="menuitem">All Newsletters</a>
-                            <a href="<?= Nexus\Core\TenantContext::getBasePath() ?>/admin/newsletters/create" role="menuitem">Create Newsletter</a>
-                            <div class="civic-dropdown-separator" role="separator"></div>
-                            <a href="<?= Nexus\Core\TenantContext::getBasePath() ?>/admin/newsletters/subscribers" role="menuitem">Subscribers</a>
-                            <a href="<?= Nexus\Core\TenantContext::getBasePath() ?>/admin/newsletters/segments" role="menuitem">Segments</a>
-                        </div>
-                    </div>
+                    </ul>
+                </li>
                 <?php endif; ?>
-                <!-- REMOVED: Admin and Ranking links (violates Rule HL-003 - clutters utility bar) -->
-                <!-- Moved to user avatar dropdown below (lines 229+) -->
 
-                <?php
-                // Notification & Message counts (matches Modern header)
-                $nUserId = $_SESSION['user_id'];
-                $nUnread = \Nexus\Models\Notification::countUnread($nUserId);
-                $nRecent = \Nexus\Models\Notification::getLatest($nUserId, 5);
+                <!-- High Contrast Toggle -->
+                <li class="civicone-utility-item">
+                    <button type="button" id="contrast-toggle" class="govuk-body-s civicone-utility-button" aria-pressed="false">
+                        <span aria-hidden="true">◐</span> Contrast
+                    </button>
+                </li>
 
-                // Message count logic
-                $msgUnread = 0;
-                try {
-                    if (class_exists('Nexus\Models\MessageThread')) {
-                        $msgThreads = Nexus\Models\MessageThread::getForUser($nUserId);
-                        foreach ($msgThreads as $msgThread) {
-                            if (!empty($msgThread['unread_count'])) {
-                                $msgUnread += (int)$msgThread['unread_count'];
+                <?php if (isset($_SESSION['user_id'])): ?>
+                    <?php
+                    $nUserId = $_SESSION['user_id'];
+                    $nUnread = \Nexus\Models\Notification::countUnread($nUserId);
+                    $nRecent = \Nexus\Models\Notification::getLatest($nUserId, 5);
+                    $msgUnread = 0;
+                    try {
+                        if (class_exists('Nexus\Models\MessageThread')) {
+                            $msgThreads = Nexus\Models\MessageThread::getForUser($nUserId);
+                            foreach ($msgThreads as $msgThread) {
+                                if (!empty($msgThread['unread_count'])) {
+                                    $msgUnread += (int)$msgThread['unread_count'];
+                                }
                             }
                         }
+                    } catch (Exception $e) {
+                        $msgUnread = 0;
                     }
-                } catch (Exception $e) {
-                    $msgUnread = 0;
-                }
-                ?>
+                    ?>
 
-                <!-- Messages Icon (Matches Modern) -->
-                <a href="<?= \Nexus\Core\TenantContext::getBasePath() ?>/messages" class="civic-utility-link nexus-header-icon-btn badge-container" title="Messages">
-                    <span class="dashicons dashicons-email" aria-hidden="true"></span>
-                    <?php if ($msgUnread > 0): ?>
-                        <span class="badge badge--danger badge--sm notification-badge"><?= $msgUnread > 99 ? '99+' : $msgUnread ?></span>
-                    <?php endif; ?>
-                </a>
-
-                <!-- Notifications Bell (triggers drawer - Matches Modern) -->
-                <button class="civic-utility-link civic-utility-btn--notification nexus-header-icon-btn badge-container" title="Notifications" data-action="open-notifications">
-                    <span class="dashicons dashicons-bell" aria-hidden="true"></span>
-                    <?php if ($nUnread > 0): ?>
-                        <span id="nexus-bell-badge" class="badge badge--danger badge--sm notification-badge"><?= $nUnread > 99 ? '99+' : $nUnread ?></span>
-                    <?php endif; ?>
-                </button>
-
-                <!-- User Avatar Dropdown (Premium - Matches Modern) -->
-                <div class="civic-dropdown civic-dropdown--right civic-user-dropdown desktop-only-dd">
-                    <button class="civic-utility-link civic-user-avatar-btn" aria-haspopup="menu" aria-expanded="false">
-                        <img src="<?= $_SESSION['user_avatar'] ?? '/assets/img/defaults/default_avatar.webp' ?>" alt="Profile">
-                        <span><?= htmlspecialchars(explode(' ', $_SESSION['user_name'] ?? 'User')[0]) ?></span>
-                        <span class="civic-arrow" aria-hidden="true">▾</span>
-                    </button>
-                    <div class="civic-dropdown-content" role="menu">
-                        <a href="<?= \Nexus\Core\TenantContext::getBasePath() ?>/profile/<?= $_SESSION['user_id'] ?>" role="menuitem">
-                            <i class="fa-solid fa-user civic-menu-icon civic-menu-icon--brand"></i>My Profile
+                    <!-- Messages -->
+                    <li class="civicone-utility-item">
+                        <a href="<?= $basePath ?>/messages" class="govuk-body-s civicone-utility-link">
+                            Messages<?php if ($msgUnread > 0): ?> <span class="govuk-tag govuk-tag--red"><?= $msgUnread > 99 ? '99+' : $msgUnread ?></span><?php endif; ?>
                         </a>
-                        <a href="<?= \Nexus\Core\TenantContext::getBasePath() ?>/dashboard" role="menuitem">
-                            <i class="fa-solid fa-gauge civic-menu-icon civic-menu-icon--purple"></i>Dashboard
-                        </a>
-                        <a href="<?= \Nexus\Core\TenantContext::getBasePath() ?>/wallet" role="menuitem">
-                            <i class="fa-solid fa-wallet civic-menu-icon civic-menu-icon--green"></i>Wallet
-                        </a>
+                    </li>
 
-                        <?php
-                        // Admin and Ranking links - Moved from utility bar (Section 9A compliance)
-                        if ((!empty($_SESSION['user_role']) && $_SESSION['user_role'] === 'admin') || !empty($_SESSION['is_super_admin'])):
-                        ?>
-                            <div class="civic-dropdown-separator" role="separator"></div>
-                            <a href="<?= \Nexus\Core\TenantContext::getBasePath() ?>/admin" role="menuitem">
-                                <i class="fa-solid fa-user-shield civic-menu-icon civic-menu-icon--brand"></i>Admin Panel
-                            </a>
-                            <a href="<?= \Nexus\Core\TenantContext::getBasePath() ?>/admin/group-ranking" role="menuitem" title="Smart Group Ranking">
-                                <i class="fa-solid fa-chart-line civic-menu-icon civic-menu-icon--brand"></i>Group Ranking
-                            </a>
-                        <?php endif; ?>
+                    <!-- Notifications -->
+                    <li class="civicone-utility-item">
+                        <button type="button" class="govuk-body-s civicone-utility-button" data-action="open-notifications">
+                            Notifications<?php if ($nUnread > 0): ?> <span class="govuk-tag govuk-tag--red" id="notif-badge"><?= $nUnread > 99 ? '99+' : $nUnread ?></span><?php endif; ?>
+                        </button>
+                    </li>
 
-                        <div class="civic-dropdown-separator" role="separator"></div>
-                        <a href="<?= \Nexus\Core\TenantContext::getBasePath() ?>/logout" role="menuitem" class="civic-utility-link--logout">
-                            <i class="fa-solid fa-right-from-bracket civic-menu-icon"></i>Sign Out
-                        </a>
-                    </div>
-                </div>
-                <!-- Mobile fallback links -->
-                <a href="<?= \Nexus\Core\TenantContext::getBasePath() ?>/dashboard" class="civic-utility-link mobile-only-link mobile-only-link--dashboard">Dashboard</a>
-                <a href="<?= \Nexus\Core\TenantContext::getBasePath() ?>/logout" class="civic-utility-link mobile-only-link mobile-only-link--logout">Sign Out</a>
+                    <!-- Account Dropdown -->
+                    <li class="civicone-utility-item civicone-utility-item--dropdown civicone-utility-item--account">
+                        <button type="button"
+                                class="govuk-body-s civicone-utility-button civicone-utility-button--account"
+                                aria-expanded="false"
+                                aria-controls="account-dropdown">
+                            <img src="<?= $_SESSION['user_avatar'] ?? '/assets/img/defaults/default_avatar.webp' ?>" alt="" class="civicone-utility-avatar" width="24" height="24">
+                            <?= htmlspecialchars(explode(' ', $_SESSION['user_name'] ?? 'Account')[0]) ?>
+                            <svg class="civicone-utility-chevron" width="10" height="6" viewBox="0 0 10 6" aria-hidden="true">
+                                <path fill="currentColor" d="M0 0h10L5 6z"/>
+                            </svg>
+                        </button>
+                        <ul class="civicone-utility-dropdown civicone-utility-dropdown--right" id="account-dropdown" hidden>
+                            <li><a href="<?= $basePath ?>/profile/<?= $_SESSION['user_id'] ?>" class="govuk-link">My profile</a></li>
+                            <li><a href="<?= $basePath ?>/dashboard" class="govuk-link">Dashboard</a></li>
+                            <li><a href="<?= $basePath ?>/wallet" class="govuk-link">Wallet</a></li>
+                            <li><a href="<?= $basePath ?>/settings" class="govuk-link">Settings</a></li>
+                            <?php if ((!empty($_SESSION['user_role']) && $_SESSION['user_role'] === 'admin') || !empty($_SESSION['is_super_admin'])): ?>
+                            <li class="civicone-utility-dropdown-separator"></li>
+                            <li><a href="<?= $basePath ?>/admin" class="govuk-link">Admin panel</a></li>
+                            <?php endif; ?>
+                            <li class="civicone-utility-dropdown-separator"></li>
+                            <li><a href="<?= $basePath ?>/logout" class="govuk-link">Sign out</a></li>
+                        </ul>
+                    </li>
+                <?php else: ?>
+                    <!-- Sign In / Register -->
+                    <li class="civicone-utility-item">
+                        <a href="<?= $basePath ?>/login" class="govuk-body-s civicone-utility-link">Sign in</a>
+                    </li>
+                    <li class="civicone-utility-item">
+                        <a href="<?= $basePath ?>/register" class="govuk-body-s civicone-utility-link civicone-utility-link--highlight">Create account</a>
+                    </li>
+                <?php endif; ?>
+            </ul>
+        </nav>
+    </div>
+
+    <?php if (isset($_SESSION['user_id'])): ?>
+    <!-- Notifications Drawer -->
+    <div id="notif-drawer-overlay" class="civicone-drawer-overlay" hidden></div>
+    <aside id="notif-drawer" class="civicone-drawer" role="dialog" aria-labelledby="notif-drawer-title" aria-modal="true" hidden>
+        <div class="civicone-drawer__header">
+            <h2 id="notif-drawer-title" class="govuk-heading-s govuk-!-margin-bottom-0">Notifications</h2>
+            <button type="button" class="civicone-drawer__close" aria-label="Close notifications">
+                <span aria-hidden="true">×</span>
+            </button>
+        </div>
+        <div id="notif-list" class="civicone-drawer__content">
+            <?php if (empty($nRecent)): ?>
+                <p class="govuk-body govuk-!-margin-top-4 govuk-!-text-align-centre">No notifications yet.</p>
             <?php else: ?>
-                <a href="<?= \Nexus\Core\TenantContext::getBasePath() ?>/login" class="civic-utility-link">Sign In</a>
-                <a href="<?= \Nexus\Core\TenantContext::getBasePath() ?>/register" class="civic-utility-link mobile-only-link--dashboard">Join Now</a>
+                <ul class="govuk-list">
+                    <?php foreach ($nRecent as $n):
+                        $notifLink = $n['link'] ?: '#';
+                        if ($notifLink !== '#' && strpos($notifLink, 'http') !== 0 && strpos($notifLink, $basePath) !== 0) {
+                            $notifLink = $basePath . $notifLink;
+                        }
+                    ?>
+                    <li class="civicone-notification<?= $n['is_read'] ? '' : ' civicone-notification--unread' ?>">
+                        <a href="<?= htmlspecialchars($notifLink) ?>" class="govuk-link" data-notif-id="<?= $n['id'] ?>">
+                            <?= htmlspecialchars($n['message']) ?>
+                        </a>
+                        <p class="govuk-body-s govuk-!-margin-top-1 govuk-!-margin-bottom-0" style="color: #505a5f;">
+                            <?= date('j M Y, g:i a', strtotime($n['created_at'])) ?>
+                        </p>
+                    </li>
+                    <?php endforeach; ?>
+                </ul>
             <?php endif; ?>
         </div>
+        <div class="civicone-drawer__footer">
+            <a href="<?= $basePath ?>/notifications" class="govuk-link">View all notifications</a>
+            <button type="button" class="govuk-button govuk-button--secondary govuk-!-margin-bottom-0" onclick="window.nexusNotifications?.markAllRead(this)">
+                Mark all as read
+            </button>
+        </div>
+    </aside>
 
-        <?php if (isset($_SESSION['user_id'])): ?>
-            <!-- Notifications Drawer (slides in from right - Matches Modern) -->
-            <div id="notif-drawer-overlay" class="notif-drawer-overlay" onclick="window.nexusNotifDrawer.close()"></div>
-            <aside id="notif-drawer" class="notif-drawer" role="dialog" aria-labelledby="notif-drawer-title" aria-modal="true">
-                <div class="notif-drawer-header">
-                    <span id="notif-drawer-title">NOTIFICATIONS</span>
-                    <button class="notif-drawer-close" onclick="window.nexusNotifDrawer.close()" aria-label="Close notifications">
-                        <i class="fa-solid fa-xmark"></i>
-                    </button>
-                </div>
+    <!-- Utility Bar Dropdown JavaScript -->
+    <script>
+    (function() {
+        // Dropdown toggle functionality
+        const dropdownButtons = document.querySelectorAll('.civicone-utility-item--dropdown > button');
 
-                <div id="nexus-notif-list" class="notif-drawer-list">
-                    <?php if (empty($nRecent)): ?>
-                        <div class="notif-drawer-empty">
-                            <div class="notif-icon"><i class="fa-regular fa-bell-slash"></i></div>
-                            <div class="notif-text">No notifications yet</div>
-                        </div>
-                    <?php else: ?>
-                        <?php
-                        $notifBasePath = Nexus\Core\TenantContext::getBasePath();
-                        foreach ($nRecent as $n):
-                            // Ensure link uses basePath if it's a relative path
-                            $notifLink = $n['link'] ?: '#';
-                            if ($notifLink !== '#' && strpos($notifLink, 'http') !== 0 && strpos($notifLink, $notifBasePath) !== 0) {
-                                // Relative path - prepend basePath
-                                $notifLink = $notifBasePath . $notifLink;
-                            }
-                        ?>
-                            <a href="<?= htmlspecialchars($notifLink) ?>" data-notif-id="<?= $n['id'] ?>" class="notif-drawer-item<?= $n['is_read'] ? ' is-read' : '' ?>">
-                                <div class="notif-message">
-                                    <?= htmlspecialchars($n['message']) ?>
-                                </div>
-                                <div class="notif-time">
-                                    <i class="fa-regular fa-clock"></i> <?= date('M j, g:i a', strtotime($n['created_at'])) ?>
-                                </div>
-                            </a>
-                        <?php endforeach; ?>
-                    <?php endif; ?>
-                </div>
+        dropdownButtons.forEach(function(btn) {
+            const dropdown = btn.nextElementSibling;
+            if (!dropdown) return;
 
-                <div class="notif-drawer-footer">
-                    <a href="<?= Nexus\Core\TenantContext::getBasePath() ?>/notifications">
-                        <i class="fa-solid fa-list"></i> View all
-                    </a>
-                    <button type="button" onclick="window.nexusNotifications.markAllRead(this);">
-                        <i class="fa-solid fa-check-double"></i> Mark all read
-                    </button>
-                </div>
-            </aside>
-        <?php endif; ?>
-    </nav><!-- End Utility Navigation -->
+            btn.addEventListener('click', function(e) {
+                e.preventDefault();
+                const isOpen = btn.getAttribute('aria-expanded') === 'true';
+
+                // Close all other dropdowns
+                dropdownButtons.forEach(function(otherBtn) {
+                    otherBtn.setAttribute('aria-expanded', 'false');
+                    const otherDropdown = otherBtn.nextElementSibling;
+                    if (otherDropdown) otherDropdown.setAttribute('hidden', '');
+                });
+
+                // Toggle current
+                if (!isOpen) {
+                    btn.setAttribute('aria-expanded', 'true');
+                    dropdown.removeAttribute('hidden');
+                }
+            });
+
+            // Keyboard navigation
+            btn.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape' && btn.getAttribute('aria-expanded') === 'true') {
+                    btn.setAttribute('aria-expanded', 'false');
+                    dropdown.setAttribute('hidden', '');
+                    btn.focus();
+                }
+            });
+
+            dropdown.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape') {
+                    btn.setAttribute('aria-expanded', 'false');
+                    dropdown.setAttribute('hidden', '');
+                    btn.focus();
+                }
+            });
+        });
+
+        // Close dropdowns when clicking outside
+        document.addEventListener('click', function(e) {
+            if (!e.target.closest('.civicone-utility-item--dropdown')) {
+                dropdownButtons.forEach(function(btn) {
+                    btn.setAttribute('aria-expanded', 'false');
+                    const dropdown = btn.nextElementSibling;
+                    if (dropdown) dropdown.setAttribute('hidden', '');
+                });
+            }
+        });
+
+        // Notifications drawer
+        const notifDrawer = document.getElementById('notif-drawer');
+        const notifOverlay = document.getElementById('notif-drawer-overlay');
+        const notifCloseBtn = notifDrawer?.querySelector('.civicone-drawer__close');
+
+        window.nexusNotifDrawer = {
+            open: function() {
+                if (notifDrawer && notifOverlay) {
+                    notifDrawer.removeAttribute('hidden');
+                    notifOverlay.removeAttribute('hidden');
+                    notifDrawer.focus();
+                }
+            },
+            close: function() {
+                if (notifDrawer && notifOverlay) {
+                    notifDrawer.setAttribute('hidden', '');
+                    notifOverlay.setAttribute('hidden', '');
+                }
+            }
+        };
+
+        document.querySelectorAll('[data-action="open-notifications"]').forEach(function(btn) {
+            btn.addEventListener('click', function() {
+                window.nexusNotifDrawer.open();
+            });
+        });
+
+        if (notifOverlay) {
+            notifOverlay.addEventListener('click', function() {
+                window.nexusNotifDrawer.close();
+            });
+        }
+
+        if (notifCloseBtn) {
+            notifCloseBtn.addEventListener('click', function() {
+                window.nexusNotifDrawer.close();
+            });
+        }
+
+        // Contrast toggle
+        const contrastToggle = document.getElementById('contrast-toggle');
+        if (contrastToggle) {
+            contrastToggle.addEventListener('click', function() {
+                const isPressed = this.getAttribute('aria-pressed') === 'true';
+                this.setAttribute('aria-pressed', !isPressed);
+                document.documentElement.classList.toggle('high-contrast', !isPressed);
+                localStorage.setItem('civicone-high-contrast', !isPressed ? 'true' : 'false');
+            });
+
+            // Restore preference
+            if (localStorage.getItem('civicone-high-contrast') === 'true') {
+                contrastToggle.setAttribute('aria-pressed', 'true');
+                document.documentElement.classList.add('high-contrast');
+            }
+        }
+    })();
+    </script>
+    <?php endif; ?>
