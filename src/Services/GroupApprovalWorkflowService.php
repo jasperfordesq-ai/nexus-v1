@@ -266,6 +266,10 @@ class GroupApprovalWorkflowService
      */
     public static function getPendingRequests($limit = 50, $offset = 0)
     {
+        // SECURITY: Cast to int to prevent SQL injection
+        $limit = (int)$limit;
+        $offset = (int)$offset;
+
         $tenantId = TenantContext::getId();
 
         try {
@@ -301,6 +305,10 @@ class GroupApprovalWorkflowService
      */
     public static function getApprovalHistory($filters = [], $limit = 50, $offset = 0)
     {
+        // SECURITY: Cast to int to prevent SQL injection
+        $limit = (int)$limit;
+        $offset = (int)$offset;
+
         $tenantId = TenantContext::getId();
 
         $sql = "SELECT r.*,

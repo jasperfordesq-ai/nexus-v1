@@ -132,9 +132,12 @@ class Listing
 
     public static function getRecent($type, $limit = 5, $since = null)
     {
-        $sql = "SELECT l.*, u.name as user_name 
-                FROM listings l 
-                JOIN users u ON l.user_id = u.id 
+        // SECURITY: Cast to int to prevent SQL injection
+        $limit = (int)$limit;
+
+        $sql = "SELECT l.*, u.name as user_name
+                FROM listings l
+                JOIN users u ON l.user_id = u.id
                 WHERE l.type = ? AND l.status = 'active'";
         $params = [$type];
 

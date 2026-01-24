@@ -288,6 +288,10 @@ class GroupModerationService
      */
     public static function getPendingFlags($filters = [], $limit = 50, $offset = 0)
     {
+        // SECURITY: Cast to int to prevent SQL injection
+        $limit = (int)$limit;
+        $offset = (int)$offset;
+
         $tenantId = TenantContext::getId();
 
         $sql = "SELECT f.*,
@@ -329,6 +333,10 @@ class GroupModerationService
      */
     public static function getModerationHistory($filters = [], $limit = 50, $offset = 0)
     {
+        // SECURITY: Cast to int to prevent SQL injection
+        $limit = (int)$limit;
+        $offset = (int)$offset;
+
         $tenantId = TenantContext::getId();
 
         $sql = "SELECT f.*,
