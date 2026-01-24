@@ -364,6 +364,29 @@
     transform: scale(1.1);
 }
 
+/* Event Show Page Utilities */
+.civic-action-bar--spaced {
+    margin-bottom: var(--space-6);
+}
+
+.civic-card--section {
+    margin-top: var(--space-6);
+}
+
+.civic-rsvp-invite {
+    margin-top: var(--space-5);
+    padding-top: var(--space-5);
+    border-top: 1px solid var(--civic-border, var(--color-gray-200));
+}
+
+.civic-btn--full-width {
+    width: 100%;
+}
+
+.civic-card--host {
+    margin-top: var(--space-4);
+}
+
 /* RSVP Card */
 .civic-rsvp-card {
     text-align: center;
