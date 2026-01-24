@@ -149,6 +149,9 @@ $isHourTimebank = ($tSlug === 'hour-timebank' || $tSlug === 'hour_timebank');
                         <a class="govuk-footer__link" href="<?= $basePath ?>/terms">Terms of service</a>
                     </li>
                     <li class="govuk-footer__inline-list-item">
+                        <a class="govuk-footer__link" href="<?= $basePath ?>/cookie-preferences">Cookie preferences</a>
+                    </li>
+                    <li class="govuk-footer__inline-list-item">
                         <a class="govuk-footer__link" href="<?= $basePath ?>/accessibility">Accessibility statement</a>
                     </li>
                 </ul>

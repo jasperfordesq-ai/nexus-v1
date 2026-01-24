@@ -117,6 +117,8 @@ $tenantContactEmail = $t['contact_email'] ?? 'support@project-nexus.ie';
             <nav class="nexus-footer-legal">
                 <a href="<?= $footerBasePath ?>/privacy">Privacy Policy</a>
                 <a href="<?= $footerBasePath ?>/terms">Terms of Service</a>
+                <a href="<?= $footerBasePath ?>/cookie-preferences">Cookie Preferences</a>
+                <a href="<?= $footerBasePath ?>/legal/cookies">Cookies</a>
             </nav>
         </div>
     </div>
