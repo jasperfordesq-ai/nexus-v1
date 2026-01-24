@@ -17,12 +17,8 @@ class Csrf
         // Only generate if completely missing. 
         // This prevents race conditions or multi-calls from invalidating previous forms.
         if (empty($_SESSION['csrf_token'])) {
-            try {
-                $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
-            } catch (\Exception $e) {
-                // Fallback for older PHP or system randomness fail
-                $_SESSION['csrf_token'] = md5(uniqid(rand(), true));
-            }
+            // Use cryptographically secure random bytes (PHP 7+ always has random_bytes)
+            $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
         }
 
         return $_SESSION['csrf_token'];
