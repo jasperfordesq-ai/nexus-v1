@@ -198,76 +198,8 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="<?= htmlspecialchars(\Nexus\Core\TenantContext::get()['name'] ?? 'NEXUS') ?>">
 
-    <!-- Deep Style Sync: Gov Colors Overrides -->
-    <style>
-        :root {
-            --civic-gov-blue: #002d72;
-            --civic-hse-green: #007b5f;
-            --civic-primary: var(--civic-gov-blue);
-            /* Default to Gov Blue for Demo */
-            --civic-accent: var(--civic-hse-green);
-        }
-
-        /* Refine Buttons */
-        .civic-btn {
-            border-radius: 4px !important;
-            font-weight: 600;
-            letter-spacing: 0.5px;
-            text-transform: none;
-            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
-        }
-
-        .civic-btn-primary {
-            background-color: var(--civic-gov-blue) !important;
-            border-color: var(--civic-gov-blue) !important;
-        }
-
-        .civic-btn-accent {
-            background-color: var(--civic-hse-green) !important;
-            border-color: var(--civic-hse-green) !important;
-        }
-
-        /* Nav Active State */
-        .civic-nav-link.active {
-            border-bottom: 2px solid var(--civic-gov-blue);
-            color: var(--civic-gov-blue) !important;
-            font-weight: 700;
-        }
-
-        /* .civic-logo font override */
-        .civic-logo {
-            font-family: 'Roboto', sans-serif;
-            letter-spacing: -0.5px;
-        }
-
-        /* --- LAYOUT STABILITY LOCK --- */
-        html[data-layout-stable] * {
-            transition-duration: 0ms !important;
-            animation-duration: 0ms !important;
-        }
-
-        /* --- OFFLINE BANNER FIX --- */
-        .offline-banner,
-        #offlineBanner {
-            display: none !important;
-        }
-
-        .offline-banner.verified-offline,
-        #offlineBanner.verified-offline {
-            display: flex !important;
-        }
-
-        /* Always hide on desktop (unreliable navigator.onLine) */
-        @media (min-width: 769px) {
-
-            .offline-banner,
-            #offlineBanner,
-            .offline-banner.verified-offline,
-            #offlineBanner.verified-offline {
-                display: none !important;
-            }
-        }
-    </style>
+    <!-- GOV.UK Layout Overrides (Extracted to external CSS per CLAUDE.md) -->
+    <link rel="stylesheet" href="/assets/css/civicone-layout-overrides.css?v=<?= $cssVersion ?>">
 
     <!-- Error Trap: Catch any JavaScript errors before page reload -->
     <script>

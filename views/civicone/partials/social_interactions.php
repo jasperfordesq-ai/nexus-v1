@@ -69,7 +69,7 @@ $interactionId = $targetType . '-' . $targetId;
                 onclick="event.stopPropagation(); showLikers('<?= $targetType ?>', <?= $targetId ?>)"
                 aria-label="See who liked this (<?= $likesCount ?> like<?= $likesCount != 1 ? 's' : '' ?>)">
             <?php if ($likesCount > 0): ?>
-                <span class="dashicons dashicons-heart civic-text-red" style="font-size: 16px;" aria-hidden="true"></span>
+                <span class="dashicons dashicons-heart civic-text-red civic-icon-sm" aria-hidden="true"></span>
                 <span id="likes-count-<?= $interactionId ?>"><?= $likesCount ?></span>
             <?php else: ?>
                 <span id="likes-count-<?= $interactionId ?>" class="visually-hidden">0</span>
@@ -251,10 +251,14 @@ $interactionId = $targetType . '-' . $targetId;
                     showSocialToast(data.error);
                 } else {
                     // Update count
-                    const countEl = document.getElementById('likes-count-' + interactionId);
+                    var countEl = document.getElementById('likes-count-' + interactionId);
                     if (countEl) {
                         countEl.textContent = data.likes_count || 0;
-                        countEl.parentElement.style.display = data.likes_count > 0 ? 'flex' : 'none';
+                        if (data.likes_count > 0) {
+                            countEl.parentElement.classList.remove('hidden');
+                        } else {
+                            countEl.parentElement.classList.add('hidden');
+                        }
                     }
                 }
             })

@@ -46,11 +46,11 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // Touch feedback
+    // Touch feedback - using classList for GOV.UK compliance
     document.querySelectorAll('.holo-btn').forEach(el => {
-        el.addEventListener('pointerdown', () => el.style.transform = 'scale(0.97)');
-        el.addEventListener('pointerup', () => el.style.transform = '');
-        el.addEventListener('pointerleave', () => el.style.transform = '');
+        el.addEventListener('pointerdown', () => el.classList.add('btn-pressed-sm'));
+        el.addEventListener('pointerup', () => el.classList.remove('btn-pressed-sm'));
+        el.addEventListener('pointerleave', () => el.classList.remove('btn-pressed-sm'));
     });
 });
 

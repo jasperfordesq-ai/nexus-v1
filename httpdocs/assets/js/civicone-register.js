@@ -68,17 +68,9 @@
             }
         }
 
-        // Enable/disable submit button
+        // Enable/disable submit button - CSS handles visual state via :disabled
         if (submitBtn) {
-            if (allValid) {
-                submitBtn.disabled = false;
-                submitBtn.style.opacity = '1';
-                submitBtn.style.cursor = 'pointer';
-            } else {
-                submitBtn.disabled = true;
-                submitBtn.style.opacity = '0.5';
-                submitBtn.style.cursor = 'not-allowed';
-            }
+            submitBtn.disabled = !allValid;
         }
     }
 

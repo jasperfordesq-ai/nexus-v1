@@ -25,7 +25,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Expand comments section by default
     const section = document.getElementById('comments-section-<?= $socialTargetType ?>-<?= $socialTargetId ?>');
     if (section) {
-        section.style.display = 'block';
+        section.classList.add('section-visible');
         fetchComments('<?= $socialTargetType ?>', <?= $socialTargetId ?>);
     }
 });

@@ -344,6 +344,7 @@
         background: var(--color-white-alpha-5);
         position: relative;
         overflow: hidden;
+        color: var(--sdg-color, inherit);
     }
 
     #unique-glass-page-wrapper .glass-sdg-card:hover {

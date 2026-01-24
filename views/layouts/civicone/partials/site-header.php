@@ -96,7 +96,7 @@
     <!-- The mobile-nav-v2.php drawer still uses #civic-menu-toggle -->
     <!-- Map service nav toggle to work with existing mobile drawer -->
     <button id="civic-menu-toggle"
-            style="display: none;"
+            class="hidden"
             aria-label="Open Menu"
             onclick="if(typeof openMobileMenu==='function'){openMobileMenu();}">
         <span class="civic-hamburger"></span>

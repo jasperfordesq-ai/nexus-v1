@@ -374,3 +374,39 @@
         font-size: 1.1rem;
     }
 }
+
+
+/* ============================================
+   CREATE POLL FORM STYLES
+   ============================================ */
+
+.poll-create-heading {
+    padding-bottom: var(--space-2-5);
+    margin-bottom: var(--space-8);
+}
+
+.poll-create-form {
+    max-width: 600px;
+}
+
+.poll-create-option-input {
+    margin-bottom: var(--space-2-5);
+}
+
+.poll-create-add-btn {
+    padding: var(--space-1) var(--space-2-5);
+    cursor: pointer;
+    margin-bottom: var(--space-5);
+}
+
+.poll-create-add-btn:focus {
+    outline: 3px solid var(--color-govuk-yellow);
+    outline-offset: 0;
+    background-color: var(--color-govuk-yellow);
+    color: var(--color-govuk-black);
+}
+
+.poll-create-submit {
+    width: 100%;
+    margin-top: var(--space-5);
+}
