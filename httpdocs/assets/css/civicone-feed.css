@@ -926,3 +926,36 @@ body.dark-mode .nexus-skin-civicone .civic-type-badge {
         display: none;
     }
 }
+
+/* --------------------------------
+   FAB FALLBACK STYLES
+   For when FAB module is not loaded
+   -------------------------------- */
+.feed-fab-fallback {
+    position: fixed;
+    bottom: 80px;
+    right: 16px;
+    width: 56px;
+    height: 56px;
+    border-radius: var(--radius-xl);
+    background: linear-gradient(135deg, var(--color-primary-500), var(--color-purple-500));
+    color: var(--color-white);
+    border: none;
+    box-shadow: 0 4px 12px var(--color-indigo-alpha-40);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    cursor: pointer;
+}
+
+.feed-fab-fallback:hover {
+    box-shadow: 0 6px 16px var(--color-indigo-alpha-50);
+}
+
+.feed-fab-fallback:focus {
+    outline: 3px solid var(--color-govuk-yellow);
+    outline-offset: 0;
+    background: var(--color-govuk-yellow);
+    color: var(--color-govuk-black);
+}

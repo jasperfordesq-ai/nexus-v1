@@ -119,18 +119,7 @@ document.querySelectorAll('form').forEach(form => {
     });
 });
 
-// Button Press States
-document.querySelectorAll('.htb-btn, button').forEach(btn => {
-    btn.addEventListener('pointerdown', function() {
-        this.style.transform = 'scale(0.96)';
-    });
-    btn.addEventListener('pointerup', function() {
-        this.style.transform = '';
-    });
-    btn.addEventListener('pointerleave', function() {
-        this.style.transform = '';
-    });
-});
+// Button Press States - Handled by CSS :active pseudo-class
 
 // Dynamic Theme Color
 (function initDynamicThemeColor() {
