@@ -2481,3 +2481,30 @@
   text-align: center;
   color: var(--color-text-secondary);
 }
+
+/* ==========================================
+   Compose Page Utilities
+   Used by compose/index.php JavaScript
+   ========================================== */
+
+/* Form input error state - validation feedback */
+.md-input--error {
+  border-color: var(--color-red-500) !important;
+  box-shadow: 0 0 0 3px var(--color-red-100);
+}
+
+/* SDG card selected state - uses CSS custom property for dynamic color */
+.holo-sdg-card.sdg-selected {
+  border-color: var(--sdg-color, var(--color-primary-500));
+  background-color: color-mix(in srgb, var(--sdg-color, var(--color-primary-500)) 10%, transparent);
+  box-shadow: 0 4px 15px color-mix(in srgb, var(--sdg-color, var(--color-primary-500)) 20%, transparent);
+}
+
+/* Fallback for browsers without color-mix support */
+@supports not (background-color: color-mix(in srgb, red 50%, blue)) {
+  .holo-sdg-card.sdg-selected {
+    border-color: var(--sdg-color, var(--color-primary-500));
+    background-color: var(--color-primary-50);
+    box-shadow: 0 4px 15px var(--color-primary-100);
+  }
+}

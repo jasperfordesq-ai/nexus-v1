@@ -191,18 +191,7 @@ document.querySelectorAll('form').forEach(form => {
     });
 });
 
-// Button Press States
-document.querySelectorAll('.glass-pill-btn, button').forEach(btn => {
-    btn.addEventListener('pointerdown', function() {
-        this.style.transform = 'scale(0.96)';
-    });
-    btn.addEventListener('pointerup', function() {
-        this.style.transform = '';
-    });
-    btn.addEventListener('pointerleave', function() {
-        this.style.transform = '';
-    });
-});
+// Button Press States - handled by CSS :active state in civicone-goals-show.css
 
 // Dynamic Theme Color
 (function initDynamicThemeColor() {
@@ -316,9 +305,9 @@ document.querySelectorAll('.glass-pill-btn, button').forEach(btn => {
 
         // Desktop: use inline comments section
         const section = document.getElementById('comments-section');
-        const isHidden = section.style.display === 'none';
+        const isHidden = !section.classList.contains('visible');
 
-        section.style.display = isHidden ? 'block' : 'none';
+        section.classList.toggle('visible');
 
         if (isHidden && !commentsLoaded) {
             loadComments();
@@ -327,7 +316,7 @@ document.querySelectorAll('.glass-pill-btn, button').forEach(btn => {
 
     async function loadComments() {
         const list = document.getElementById('comments-list');
-        list.innerHTML = '<p style="text-align: center; color: var(--text-muted);">Loading comments...</p>';
+        list.innerHTML = '<p class="goal-comments-message">Loading comments...</p>';
 
         try {
             const response = await fetch(API_BASE + '/comments', {
@@ -344,14 +333,14 @@ document.querySelectorAll('.glass-pill-btn, button').forEach(btn => {
             });
 
             if (!response.ok) {
-                list.innerHTML = '<p style="text-align: center; color: var(--text-muted);">Failed to load comments.</p>';
+                list.innerHTML = '<p class="goal-comments-message">Failed to load comments.</p>';
                 return;
             }
 
             const data = await response.json();
 
             if (data.error) {
-                list.innerHTML = '<p style="text-align: center; color: var(--text-muted);">Failed to load comments.</p>';
+                list.innerHTML = '<p class="goal-comments-message">Failed to load comments.</p>';
                 return;
             }
 
@@ -359,7 +348,7 @@ document.querySelectorAll('.glass-pill-btn, button').forEach(btn => {
             availableReactions = data.available_reactions || [];
 
             if (!data.comments || data.comments.length === 0) {
-                list.innerHTML = '<p style="text-align: center; color: var(--text-muted); padding: 20px;">No comments yet. Be the first to comment!</p>';
+                list.innerHTML = '<p class="goal-comments-message">No comments yet. Be the first to comment!</p>';
                 return;
             }
 
@@ -367,43 +356,44 @@ document.querySelectorAll('.glass-pill-btn, button').forEach(btn => {
 
         } catch (err) {
             console.error('Load comments error:', err);
-            list.innerHTML = '<p style="text-align: center; color: var(--text-muted);">Failed to load comments.</p>';
+            list.innerHTML = '<p class="goal-comments-message">Failed to load comments.</p>';
         }
     }
 
     function renderComment(c, depth) {
-        const indent = depth * 20;
-        const isEdited = c.is_edited ? '<span style="font-size: 0.7rem; color: var(--text-muted);"> (edited)</span>' : '';
+        const indentStyle = depth > 0 ? `margin-left: ${depth * 20}px;` : '';
+        const isEdited = c.is_edited ? '<span class="goal-comment-edited"> (edited)</span>' : '';
         const ownerActions = c.is_owner ? `
-            <span onclick="goalEditComment(${c.id}, '${escapeHtml(c.content).replace(/'/g, "\\'")}')" style="cursor: pointer; margin-left: 10px;" title="Edit">✏️</span>
-            <span onclick="goalDeleteComment(${c.id})" style="cursor: pointer; margin-left: 5px;" title="Delete">🗑️</span>
+            <span class="goal-comment-actions" onclick="goalEditComment(${c.id}, '${escapeHtml(c.content).replace(/'/g, "\\'")}')" title="Edit">✏️</span>
+            <span class="goal-comment-actions" onclick="goalDeleteComment(${c.id})" title="Delete">🗑️</span>
         ` : '';
 
         const reactions = Object.entries(c.reactions || {}).map(([emoji, count]) => {
             const isUserReaction = (c.user_reactions || []).includes(emoji);
-            return `<span onclick="goalToggleReaction(${c.id}, '${emoji}')" style="cursor: pointer; padding: 2px 6px; border-radius: 12px; font-size: 0.8rem; background: ${isUserReaction ? 'rgba(219, 39, 119, 0.2)' : 'var(--pill-bg)'}; border: 1px solid ${isUserReaction ? 'rgba(219, 39, 119, 0.4)' : 'var(--glass-border)'};">${emoji} ${count}</span>`;
+            const activeClass = isUserReaction ? ' active' : '';
+            return `<span class="goal-reaction-pill${activeClass}" onclick="goalToggleReaction(${c.id}, '${emoji}')">${emoji} ${count}</span>`;
         }).join(' ');
 
         const replies = (c.replies || []).map(r => renderComment(r, depth + 1)).join('');
 
         return `
-            <div style="margin-left: ${indent}px; padding: 15px; margin-bottom: 10px; background: var(--pill-bg); border-radius: 12px; border: 1px solid var(--glass-border);">
-                <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px;">
-                    <img src="${c.avatar || '/assets/img/defaults/default_avatar.webp'}" style="width: 32px; height: 32px; border-radius: 50%; object-fit: cover;" loading="lazy">
+            <div class="goal-comment-box" style="${indentStyle}">
+                <div class="goal-comment-header">
+                    <img src="${c.avatar || '/assets/img/defaults/default_avatar.webp'}" class="goal-comment-box-avatar" loading="lazy" alt="">
                     <div>
-                        <strong style="color: var(--text-color);">${escapeHtml(c.author_name)}</strong>${isEdited}
-                        <div style="font-size: 0.75rem; color: var(--text-muted);">${c.time_ago}</div>
+                        <strong class="goal-comment-author">${escapeHtml(c.author_name)}</strong>${isEdited}
+                        <div class="goal-comment-time">${c.time_ago}</div>
                     </div>
                     ${ownerActions}
                 </div>
-                <div id="content-${c.id}" style="color: var(--text-color); margin-bottom: 10px;">${escapeHtml(c.content)}</div>
-                <div style="display: flex; gap: 8px; flex-wrap: wrap; align-items: center;">
+                <div id="content-${c.id}" class="goal-comment-content">${escapeHtml(c.content)}</div>
+                <div class="goal-comment-reactions">
                     ${reactions}
-                    <span onclick="goalShowReplyForm(${c.id})" style="cursor: pointer; color: var(--accent-color); font-size: 0.85rem;">↩️ Reply</span>
+                    <span class="goal-reply-btn" onclick="goalShowReplyForm(${c.id})">↩️ Reply</span>
                 </div>
-                <div id="reply-form-${c.id}" style="display: none; margin-top: 10px;">
-                    <input type="text" id="reply-input-${c.id}" placeholder="Write a reply..." style="width: 100%; padding: 8px 12px; border-radius: 8px; border: 1px solid var(--glass-border); background: var(--pill-bg); color: var(--text-color);">
-                    <button onclick="goalSubmitReply(${c.id})" class="glass-pill-btn btn-primary" style="margin-top: 8px; padding: 6px 12px; font-size: 0.85rem;">Reply</button>
+                <div id="reply-form-${c.id}" class="goal-reply-form">
+                    <input type="text" id="reply-input-${c.id}" placeholder="Write a reply..." class="goal-reply-input">
+                    <button onclick="goalSubmitReply(${c.id})" class="glass-pill-btn btn-primary goal-reply-submit">Reply</button>
                 </div>
                 ${replies}
             </div>
@@ -461,8 +451,9 @@ document.querySelectorAll('.glass-pill-btn, button').forEach(btn => {
 
     window.goalShowReplyForm = function(commentId) {
         const form = document.getElementById(`reply-form-${commentId}`);
-        form.style.display = form.style.display === 'none' ? 'block' : 'none';
-        if (form.style.display === 'block') {
+        const wasHidden = !form.classList.contains('visible');
+        form.classList.toggle('visible');
+        if (wasHidden) {
             document.getElementById(`reply-input-${commentId}`).focus();
         }
     };
@@ -489,7 +480,7 @@ document.querySelectorAll('.glass-pill-btn, button').forEach(btn => {
             const data = await response.json();
             if (data.error) { alert(data.error); return; }
             input.value = '';
-            document.getElementById(`reply-form-${parentId}`).style.display = 'none';
+            document.getElementById(`reply-form-${parentId}`).classList.remove('visible');
             const countEl = document.getElementById('comment-count');
             countEl.textContent = parseInt(countEl.textContent) + 1;
             loadComments();
@@ -544,10 +535,10 @@ document.querySelectorAll('.glass-pill-btn, button').forEach(btn => {
         const originalHtml = contentEl.innerHTML;
 
         contentEl.innerHTML = `
-            <div style="display: flex; gap: 8px; flex-wrap: wrap;">
-                <input type="text" id="edit-input-${commentId}" value="${escapeHtml(currentContent)}" style="flex: 1; min-width: 200px; padding: 8px 12px; border-radius: 8px; border: 1px solid var(--glass-border); background: var(--pill-bg); color: var(--text-color);">
-                <button onclick="goalSaveEdit(${commentId})" class="glass-pill-btn btn-primary" style="padding: 6px 12px;">Save</button>
-                <button onclick="goalCancelEdit(${commentId}, '${escapeHtml(originalHtml).replace(/'/g, "\\'")}')" class="glass-pill-btn btn-secondary" style="padding: 6px 12px;">Cancel</button>
+            <div class="goal-edit-form">
+                <input type="text" id="edit-input-${commentId}" value="${escapeHtml(currentContent)}" class="goal-edit-input">
+                <button onclick="goalSaveEdit(${commentId})" class="glass-pill-btn btn-primary goal-edit-btn">Save</button>
+                <button onclick="goalCancelEdit(${commentId}, '${escapeHtml(originalHtml).replace(/'/g, "\\'")}')" class="glass-pill-btn btn-secondary goal-edit-btn">Cancel</button>
             </div>
         `;
         document.getElementById(`edit-input-${commentId}`).focus();

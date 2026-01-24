@@ -479,6 +479,10 @@ html[data-theme="dark"] #unique-glass-page-wrapper {
     margin-top: var(--space-5);
 }
 
+.goal-comments-section.visible {
+    display: block;
+}
+
 .goal-comment-form {
     margin-bottom: var(--space-5);
 }
@@ -547,4 +551,176 @@ html[data-theme="dark"] #unique-glass-page-wrapper {
     #unique-glass-page-wrapper .page-header {
         flex-direction: column;
     }
+}
+
+/* ============================================
+   Comment Component Styles
+   Used by JavaScript-generated comment HTML
+   ============================================ */
+
+/* Comment box container */
+.goal-comment-box {
+    padding: var(--space-4);
+    margin-bottom: var(--space-2-5);
+    background: var(--pill-bg);
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--glass-border);
+}
+
+/* Comment header with avatar and meta */
+.goal-comment-header {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2-5);
+    margin-bottom: var(--space-2);
+}
+
+/* Comment avatar */
+.goal-comment-box-avatar {
+    width: var(--space-8);
+    height: var(--space-8);
+    border-radius: var(--radius-full);
+    object-fit: cover;
+}
+
+/* Comment author name */
+.goal-comment-author {
+    color: var(--text-color);
+    font-weight: var(--font-weight-semibold);
+}
+
+/* Edited indicator */
+.goal-comment-edited {
+    font-size: var(--font-size-xs);
+    color: var(--text-muted);
+}
+
+/* Comment timestamp */
+.goal-comment-time {
+    font-size: var(--font-size-xs);
+    color: var(--text-muted);
+}
+
+/* Comment owner actions (edit/delete) */
+.goal-comment-actions {
+    cursor: pointer;
+    margin-left: var(--space-2-5);
+}
+
+.goal-comment-actions:hover {
+    opacity: 0.8;
+}
+
+/* Comment content */
+.goal-comment-content {
+    color: var(--text-color);
+    margin-bottom: var(--space-2-5);
+}
+
+/* Reactions row */
+.goal-comment-reactions {
+    display: flex;
+    gap: var(--space-2);
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+/* Reaction pill */
+.goal-reaction-pill {
+    cursor: pointer;
+    padding: var(--space-0-5) var(--space-1-5);
+    border-radius: var(--radius-lg);
+    font-size: var(--font-size-sm);
+    background: var(--pill-bg);
+    border: 1px solid var(--glass-border);
+    transition: transform var(--transition-fast);
+}
+
+.goal-reaction-pill:hover {
+    transform: scale(1.05);
+}
+
+.goal-reaction-pill.active {
+    background: var(--color-pink-600-alpha-20);
+    border-color: var(--color-pink-600-alpha-40);
+}
+
+/* Reply button */
+.goal-reply-btn {
+    cursor: pointer;
+    color: var(--accent-color);
+    font-size: var(--font-size-sm);
+}
+
+.goal-reply-btn:hover {
+    text-decoration: underline;
+}
+
+/* Reply form (hidden by default) */
+.goal-reply-form {
+    display: none;
+    margin-top: var(--space-2-5);
+}
+
+.goal-reply-form.visible {
+    display: block;
+}
+
+/* Reply input field */
+.goal-reply-input {
+    width: 100%;
+    padding: var(--space-2) var(--space-3);
+    border-radius: var(--radius-md);
+    border: 1px solid var(--glass-border);
+    background: var(--pill-bg);
+    color: var(--text-color);
+    font-size: var(--font-size-base);
+}
+
+.goal-reply-input:focus {
+    outline: 3px solid var(--color-govuk-yellow, #ffdd00);
+    outline-offset: 0;
+}
+
+/* Reply submit button */
+.goal-reply-submit {
+    margin-top: var(--space-2);
+    padding: var(--space-1-5) var(--space-3);
+    font-size: var(--font-size-sm);
+}
+
+/* Loading message */
+.goal-comments-message {
+    text-align: center;
+    color: var(--text-muted);
+    padding: var(--space-5);
+}
+
+/* Edit form container */
+.goal-edit-form {
+    display: flex;
+    gap: var(--space-2);
+    flex-wrap: wrap;
+}
+
+/* Edit input field */
+.goal-edit-input {
+    flex: 1;
+    min-width: 200px;
+    padding: var(--space-2) var(--space-3);
+    border-radius: var(--radius-md);
+    border: 1px solid var(--glass-border);
+    background: var(--pill-bg);
+    color: var(--text-color);
+    font-size: var(--font-size-base);
+}
+
+.goal-edit-input:focus {
+    outline: 3px solid var(--color-govuk-yellow, #ffdd00);
+    outline-offset: 0;
+}
+
+/* Edit action buttons */
+.goal-edit-btn {
+    padding: var(--space-1-5) var(--space-3);
 }

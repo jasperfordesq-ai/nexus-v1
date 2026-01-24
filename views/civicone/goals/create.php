@@ -4,6 +4,8 @@ $pageTitle = 'Set a Goal';
 require dirname(__DIR__, 2) . '/layouts/civicone/header.php';
 ?>
 
+<link rel="stylesheet" href="<?= Nexus\Core\TenantContext::getBasePath() ?>/assets/css/civicone-goals-form.css">
+
 <div class="civic-container">
     <?php
     $breadcrumbs = [
@@ -14,46 +16,46 @@ require dirname(__DIR__, 2) . '/layouts/civicone/header.php';
     require dirname(__DIR__, 2) . '/layouts/civicone/partials/breadcrumb.php';
     ?>
 
-    <div style="margin-bottom: 30px; border-bottom: 4px solid var(--skin-primary, #00796B); padding-bottom: 15px; display: flex; justify-content: space-between; align-items: flex-end;">
-        <h1 style="margin: 0; text-transform: uppercase; color: var(--skin-primary);">Set a New Goal</h1>
-        <a href="<?= Nexus\Core\TenantContext::getBasePath() ?>/goals" class="civic-btn civic-bg-gray-200 civic-text-dark" style="font-size: 0.9rem;">Cancel</a>
+    <div class="goal-form-header">
+        <h1 class="goal-form-title">Set a New Goal</h1>
+        <a href="<?= Nexus\Core\TenantContext::getBasePath() ?>/goals" class="civic-btn civic-bg-gray-200 civic-text-dark goal-form-cancel">Cancel</a>
     </div>
 
-    <div class="civic-card" style="max-width: 800px; margin: 0 auto;">
+    <div class="civic-card goal-form-card">
 
         <form action="<?= Nexus\Core\TenantContext::getBasePath() ?>/goals/store" method="POST">
             <?= Nexus\Core\Csrf::input() ?>
 
-            <div style="margin-bottom: 20px;">
-                <label for="title" class="civic-text-dark" style="display: block; font-weight: bold; margin-bottom: 5px;">Goal Title</label>
-                <input type="text" name="title" id="title" class="civic-input" placeholder="e.g. Learn to Paint, Run a 5k..." required style="width: 100%;">
-                <p style="font-size: 0.85rem; color: var(--civic-text-secondary, #4B5563); margin-top: 5px;">Short and sweet.</p>
+            <div class="goal-form-group">
+                <label for="title" class="goal-form-label">Goal Title</label>
+                <input type="text" name="title" id="title" class="civic-input goal-form-input" placeholder="e.g. Learn to Paint, Run a 5k..." required>
+                <p class="goal-form-hint">Short and sweet.</p>
             </div>
 
-            <div style="margin-bottom: 20px;">
-                <label for="description" class="civic-text-dark" style="display: block; font-weight: bold; margin-bottom: 5px;">Description & Details</label>
-                <textarea name="description" id="description" class="civic-input" rows="5" placeholder="Share more details about what you want to achieve..." style="width: 100%; font-family: inherit;"></textarea>
+            <div class="goal-form-group">
+                <label for="description" class="goal-form-label">Description & Details</label>
+                <textarea name="description" id="description" class="civic-input goal-form-textarea" rows="5" placeholder="Share more details about what you want to achieve..."></textarea>
             </div>
 
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px;">
+            <div class="goal-form-grid">
                 <div>
-                    <label for="deadline" class="civic-text-dark" style="display: block; font-weight: bold; margin-bottom: 5px;">Target Date (Optional)</label>
-                    <input type="date" name="deadline" id="deadline" class="civic-input" style="width: 100%;">
+                    <label for="deadline" class="goal-form-label">Target Date (Optional)</label>
+                    <input type="date" name="deadline" id="deadline" class="civic-input goal-form-input">
                 </div>
 
-                <div style="display: flex; align-items: center; padding-top: 25px;">
-                    <label style="display: flex; align-items: center; cursor: pointer;">
-                        <input type="checkbox" name="is_public" value="1" checked style="width: 20px; height: 20px; margin-right: 10px;">
+                <div class="goal-form-checkbox-wrapper">
+                    <label class="goal-form-checkbox-label">
+                        <input type="checkbox" name="is_public" value="1" checked class="goal-form-checkbox">
                         <span>
-                            <strong style="display: block;">Make Public?</strong>
-                            <span style="font-size: 0.85rem; color: var(--civic-text-secondary, #4B5563);">Allow others to see and support this goal.</span>
+                            <strong class="goal-form-checkbox-title">Make Public?</strong>
+                            <span class="goal-form-checkbox-desc">Allow others to see and support this goal.</span>
                         </span>
                     </label>
                 </div>
             </div>
 
-            <div style="margin-top: 30px; text-align: right;">
-                <button type="submit" class="civic-btn" style="padding: 12px 30px; font-size: 1.1rem;">Create Goal</button>
+            <div class="goal-form-actions">
+                <button type="submit" class="civic-btn goal-form-submit">Create Goal</button>
             </div>
 
         </form>
