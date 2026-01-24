@@ -156,7 +156,7 @@ $basePath = \Nexus\Core\TenantContext::getBasePath();
     });
 
     searchInput.addEventListener('keydown', function(e) {
-        var results = resultsDiv.querySelectorAll('.civic-user-result');
+        var results = resultsDiv.querySelectorAll('.govuk-wallet-result');
         if (!results.length) return;
 
         if (e.key === 'ArrowDown') {
@@ -202,7 +202,7 @@ $basePath = \Nexus\Core\TenantContext::getBasePath();
             if (data.status === 'success' && data.users && data.users.length > 0) {
                 resultsDiv.innerHTML = data.users.map(function(user) {
                     var initial = (user.display_name || '?')[0].toUpperCase();
-                    return '<div class="civic-user-result govuk-!-padding-3" style="cursor: pointer; border-bottom: 1px solid #f3f2f1;" onclick="selectCivicUser(\'' + escapeHtml(user.username || '') + '\', \'' + escapeHtml(user.display_name) + '\', \'' + escapeHtml(user.avatar_url || '') + '\', \'' + user.id + '\')">' +
+                    return '<div class="govuk-wallet-result govuk-!-padding-3" style="cursor: pointer; border-bottom: 1px solid #f3f2f1;" onclick="selectCivicUser(\'' + escapeHtml(user.username || '') + '\', \'' + escapeHtml(user.display_name) + '\', \'' + escapeHtml(user.avatar_url || '') + '\', \'' + user.id + '\')">' +
                         '<strong>' + escapeHtml(user.display_name) + '</strong>' +
                         '<span style="color: #505a5f;"> ' + (user.username ? '@' + escapeHtml(user.username) : '') + '</span>' +
                     '</div>';
