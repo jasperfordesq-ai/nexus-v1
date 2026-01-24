@@ -215,14 +215,14 @@ document.addEventListener('DOMContentLoaded', function() {
             this.classList.add('civic-fed-filter-tab--active');
             this.setAttribute('aria-selected', 'true');
 
-            const filter = this.dataset.filter;
+            var filter = this.dataset.filter;
 
             // Filter cards
-            activityCards.forEach(card => {
+            activityCards.forEach(function(card) {
                 if (filter === 'all' || card.dataset.type === filter) {
-                    card.style.display = 'flex';
+                    card.classList.remove('hidden');
                 } else {
-                    card.style.display = 'none';
+                    card.classList.add('hidden');
                 }
             });
         });

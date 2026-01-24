@@ -246,7 +246,7 @@ require __DIR__ . '/../../layouts/civicone/header.php';
 
         // Show selected, hide search
         selectedDiv.classList.add('show');
-        searchWrapper.style.display = 'none';
+        searchWrapper.classList.add('hidden');
         resultsDiv.classList.remove('show');
     };
 
@@ -254,7 +254,7 @@ require __DIR__ . '/../../layouts/civicone/header.php';
         usernameInput.value = '';
         recipientIdInput.value = '';
         selectedDiv.classList.remove('show');
-        searchWrapper.style.display = 'block';
+        searchWrapper.classList.remove('hidden');
         searchInput.value = '';
         searchInput.focus();
     };

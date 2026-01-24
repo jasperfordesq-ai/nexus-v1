@@ -372,9 +372,9 @@ if (empty($mapboxToken)) {
         var text = document.getElementById(textId);
         if (!text) return;
         if (select.value) {
-            text.innerHTML = '<i class="fa-solid fa-users" style="margin-right: 4px;"></i> ' + select.options[select.selectedIndex].text;
+            text.innerHTML = '<i class="fa-solid fa-users civic-icon-inline"></i> ' + select.options[select.selectedIndex].text;
         } else {
-            text.innerHTML = '<i class="fa-solid fa-globe" style="margin-right: 4px;"></i> Public Feed';
+            text.innerHTML = '<i class="fa-solid fa-globe civic-icon-inline"></i> Public Feed';
         }
     }
 
@@ -525,14 +525,14 @@ if (empty($mapboxToken)) {
         <!-- Content Panels -->
         <div class="multidraw-content" id="contentArea">
             <?php if ($error): ?>
-            <div class="md-alert error" style="margin: 16px;">
+            <div class="md-alert error md-alert--margin">
                 <i class="fa-solid fa-circle-exclamation"></i>
                 <?= htmlspecialchars($error) ?>
             </div>
             <?php endif; ?>
 
             <?php if ($success): ?>
-            <div class="md-alert success" style="margin: 16px;">
+            <div class="md-alert success md-alert--margin">
                 <i class="fa-solid fa-circle-check"></i>
                 <?= htmlspecialchars($success) ?>
             </div>
@@ -555,7 +555,7 @@ if (empty($mapboxToken)) {
                         </div>
                     </div>
 
-                    <select id="post-group-select" name="group_id" style="display: none;" onchange="updateAudience(this, 'post-audience-text')">
+                    <select id="post-group-select" name="group_id" class="hidden" onchange="updateAudience(this, 'post-audience-text')">
                         <option value="">Public Feed</option>
                         <?php foreach ($userGroups as $group): ?>
                         <option value="<?= $group['id'] ?>"><?= htmlspecialchars($group['name']) ?></option>
@@ -638,7 +638,7 @@ if (empty($mapboxToken)) {
                                 </button>
                                 <div class="md-ai-status" id="ai-status-listing"></div>
                             </div>
-                            <textarea name="description" id="listing-desc" class="md-input" style="min-height: 100px; resize: vertical;" placeholder="Describe what you're offering or need help with..." required></textarea>
+                            <textarea name="description" id="listing-desc" class="md-input md-textarea-field" placeholder="Describe what you're offering or need help with..." required></textarea>
                         </div>
 
                         <button type="button" class="md-next-btn" onclick="nextListingStep(2)">
@@ -720,8 +720,8 @@ if (empty($mapboxToken)) {
                                     <i class="fa-solid fa-camera"></i>
                                     <span>Tap to add photo</span>
                                 </div>
-                                <input type="file" name="image" id="listing-image-file" accept="image/*" style="display: none;" onchange="previewImage(this, 'listing')">
-                                <div class="md-image-preview" id="listing-image-preview" style="display: none;">
+                                <input type="file" name="image" id="listing-image-file" accept="image/*" class="hidden" onchange="previewImage(this, 'listing')">
+                                <div class="md-image-preview hidden" id="listing-image-preview">
                                     <img id="listing-preview-img" src="" alt="Preview" loading="lazy">
                                     <button type="button" class="md-image-remove" onclick="removeImage('listing')">
                                         <i class="fa-solid fa-xmark"></i>
@@ -771,7 +771,7 @@ if (empty($mapboxToken)) {
                         <!-- SDGs - Same structure as listings/create.php -->
                         <details class="holo-sdg-accordion" open>
                             <summary class="holo-sdg-header">
-                                <span>🌍 Social Impact <span style="font-weight: 400; opacity: 0.6; font-size: 0.85rem;">(Optional)</span></span>
+                                <span>🌍 Social Impact <span class="md-hint-inline">(Optional)</span></span>
                                 <i class="fa-solid fa-chevron-down"></i>
                             </summary>
                             <div class="holo-sdg-content">
@@ -836,7 +836,7 @@ if (empty($mapboxToken)) {
                             </button>
                             <div class="md-ai-status" id="ai-status-event"></div>
                         </div>
-                        <textarea name="description" id="event-desc" class="md-input" style="min-height: 100px; resize: vertical;" placeholder="Tell people what this event is about..."></textarea>
+                        <textarea name="description" id="event-desc" class="md-input md-textarea-field" placeholder="Tell people what this event is about..."></textarea>
                     </div>
 
                     <div class="md-field">
@@ -929,7 +929,7 @@ if (empty($mapboxToken)) {
                     <!-- SDGs - Same as events/create.php -->
                     <details class="holo-sdg-accordion">
                         <summary class="holo-sdg-header">
-                            <span>🌍 Social Impact <span style="font-weight: 400; opacity: 0.6; font-size: 0.85rem;">(Optional)</span></span>
+                            <span>🌍 Social Impact <span class="md-hint-inline">(Optional)</span></span>
                             <i class="fa-solid fa-chevron-down"></i>
                         </summary>
                         <div class="holo-sdg-content">
@@ -946,7 +946,7 @@ if (empty($mapboxToken)) {
                         </div>
                     </details>
 
-                    <button type="submit" class="md-submit-btn" style="background: linear-gradient(135deg, var(--color-pink-500) 0%, var(--color-pink-700) 100%);">
+                    <button type="submit" class="md-submit-btn md-submit-btn--event">
                         <i class="fa-solid fa-calendar-plus"></i>
                         Create Event
                     </button>
@@ -987,7 +987,7 @@ if (empty($mapboxToken)) {
                             </button>
                             <div class="md-ai-status" id="ai-status-poll"></div>
                         </div>
-                        <textarea name="description" id="poll-desc" class="md-input" style="min-height: 60px; resize: vertical;" placeholder="Add more context to your poll..."></textarea>
+                        <textarea name="description" id="poll-desc" class="md-input md-textarea-field--small" placeholder="Add more context to your poll..."></textarea>
                     </div>
 
                     <div class="md-field">
@@ -1052,7 +1052,7 @@ if (empty($mapboxToken)) {
                             </button>
                             <div class="md-ai-status" id="ai-status-goal"></div>
                         </div>
-                        <textarea name="description" id="goal-desc" class="md-input" style="min-height: 100px; resize: vertical;" placeholder="Why is this goal important? How will the community help?"></textarea>
+                        <textarea name="description" id="goal-desc" class="md-input md-textarea-field" placeholder="Why is this goal important? How will the community help?"></textarea>
                     </div>
 
                     <div class="md-field">
@@ -1091,7 +1091,7 @@ if (empty($mapboxToken)) {
                             To post volunteer opportunities, you need to register your organization first.
                             This helps volunteers trust the opportunities they apply for.
                         </p>
-                        <a href="<?= $basePath ?>/volunteering/dashboard" class="md-submit-btn warning" style="text-decoration: none; display: inline-flex;">
+                        <a href="<?= $basePath ?>/volunteering/dashboard" class="md-submit-btn warning md-link-btn">
                             <i class="fa-solid fa-plus"></i>
                             Register Organization
                         </a>
@@ -1103,11 +1103,11 @@ if (empty($mapboxToken)) {
                         <i class="fa-solid fa-info-circle"></i>
                         You're signed in as an organization. Manage your opportunities from the dashboard.
                     </div>
-                    <a href="<?= $basePath ?>/volunteering/opp/create" class="md-submit-btn warning" style="text-decoration: none; display: inline-flex; margin-bottom: 12px;">
+                    <a href="<?= $basePath ?>/volunteering/opp/create" class="md-submit-btn warning md-link-btn md-next-btn--spaced">
                         <i class="fa-solid fa-plus"></i>
                         Post New Opportunity
                     </a>
-                    <a href="<?= $basePath ?>/volunteering/dashboard" class="md-next-btn" style="text-decoration: none; display: inline-flex;">
+                    <a href="<?= $basePath ?>/volunteering/dashboard" class="md-next-btn md-link-btn">
                         <i class="fa-solid fa-tachometer-alt"></i>
                         Go to Dashboard
                     </a>
@@ -1176,7 +1176,7 @@ if (empty($mapboxToken)) {
                                 </button>
                                 <div class="md-ai-status" id="ai-status-volunteering"></div>
                             </div>
-                            <textarea name="description" id="vol-desc" class="md-input" style="min-height: 100px; resize: vertical;" placeholder="Describe the role, responsibilities, and impact..." required></textarea>
+                            <textarea name="description" id="vol-desc" class="md-input md-textarea-field" placeholder="Describe the role, responsibilities, and impact..." required></textarea>
                         </div>
 
                         <div class="md-field">
@@ -1279,9 +1279,9 @@ if (empty($mapboxToken)) {
                     </div>
 
                     <!-- Selected Group Display -->
-                    <div class="md-selected-group" id="selected-group-display" style="display: <?= $preselectedGroup ? 'flex' : 'none' ?>;">
+                    <div class="md-selected-group<?= $preselectedGroup ? ' visible' : '' ?>" id="selected-group-display">
                         <?php if ($preselectedGroup && !empty($preselectedGroup['image_url'])): ?>
-                        <img src="<?= htmlspecialchars($preselectedGroup['image_url']) ?>" loading="lazy" class="md-group-avatar" id="selected-group-avatar" style="font-size: 0;">
+                        <img src="<?= htmlspecialchars($preselectedGroup['image_url']) ?>" loading="lazy" class="md-group-avatar md-avatar--no-text" id="selected-group-avatar">
                         <?php else: ?>
                         <div class="md-group-avatar" id="selected-group-avatar"><?= $preselectedGroup ? strtoupper(substr($preselectedGroup['name'], 0, 1)) : 'G' ?></div>
                         <?php endif; ?>
@@ -1311,8 +1311,8 @@ if (empty($mapboxToken)) {
                                 <i class="fa-solid fa-camera"></i>
                                 <span>Add photo (optional)</span>
                             </div>
-                            <input type="file" name="image" id="group-image-file" accept="image/*" style="display: none;" onchange="previewImage(this, 'group')">
-                            <div class="md-image-preview" id="group-image-preview" style="display: none;">
+                            <input type="file" name="image" id="group-image-file" accept="image/*" class="hidden" onchange="previewImage(this, 'group')">
+                            <div class="md-image-preview hidden" id="group-image-preview">
                                 <img id="group-preview-img" src="" alt="Preview" loading="lazy">
                                 <button type="button" class="md-image-remove" onclick="removeImage('group')">
                                     <i class="fa-solid fa-xmark"></i>
@@ -1623,7 +1623,7 @@ if (empty($mapboxToken)) {
             try {
                 // Show loading state
                 resultsContainer.innerHTML = `
-                    <div class="md-location-suggestion" style="opacity: 0.6;">
+                    <div class="md-location-suggestion md-muted">
                         <div class="md-location-suggestion-icon">
                             <i class="fa-solid fa-spinner fa-spin"></i>
                         </div>
@@ -1660,7 +1660,7 @@ if (empty($mapboxToken)) {
                     `).join('');
                 } else {
                     resultsContainer.innerHTML = `
-                        <div class="md-location-suggestion" style="opacity: 0.6;">
+                        <div class="md-location-suggestion md-muted">
                             <div class="md-location-suggestion-icon">
                                 <i class="fa-solid fa-circle-question"></i>
                             </div>
@@ -1674,7 +1674,7 @@ if (empty($mapboxToken)) {
             } catch (error) {
                 console.error('Location search error:', error);
                 resultsContainer.innerHTML = `
-                    <div class="md-location-suggestion" style="opacity: 0.6;">
+                    <div class="md-location-suggestion md-muted">
                         <div class="md-location-suggestion-icon">
                             <i class="fa-solid fa-exclamation-triangle"></i>
                         </div>
@@ -1807,8 +1807,8 @@ if (empty($mapboxToken)) {
                     const resultsContainer = document.getElementById(pickerId + '-results');
                     if (resultsContainer) {
                         resultsContainer.innerHTML = `
-                            <div class="md-location-suggestion" style="color: var(--md-danger);">
-                                <div class="md-location-suggestion-icon" style="background: var(--md-danger-light); color: var(--md-danger);">
+                            <div class="md-location-suggestion md-location-error">
+                                <div class="md-location-suggestion-icon md-location-error-icon">
                                     <i class="fa-solid fa-location-crosshairs"></i>
                                 </div>
                                 <div class="md-location-suggestion-text">
