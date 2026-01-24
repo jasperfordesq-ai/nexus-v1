@@ -1,157 +1,265 @@
 <?php
 /**
  * Template D: Form Page - Edit Volunteer Opportunity
+ * GOV.UK Design System (WCAG 2.1 AA)
  *
  * Purpose: Edit existing volunteer opportunity details and manage shifts
  * Features: Offline detection, form validation, shift scheduling
- * WCAG 2.1 AA: 44px minimum touch targets, keyboard navigation, focus states
  */
 
-// views/modern/volunteering/edit_opp.php
-$hero_title = "Edit Opportunity";
-$hero_subtitle = "Update details for this role.";
-$hero_gradient = 'htb-hero-gradient-teal';
+$pageTitle = "Edit Opportunity";
+\Nexus\Core\SEO::setTitle('Edit Opportunity');
+\Nexus\Core\SEO::setDescription('Update details for this volunteer opportunity.');
 
-require __DIR__ . '/../../layouts/header.php';
+require __DIR__ . '/../../layouts/civicone/header.php';
 
 $basePath = \Nexus\Core\TenantContext::getBasePath();
 ?>
-<link rel="stylesheet" href="/assets/css/purged/civicone-volunteering-edit-opp.min.css">
-
 
 <!-- Offline Banner -->
-<div class="offline-banner" id="offlineBanner" role="alert" aria-live="polite">
-    <i class="fa-solid fa-wifi-slash" aria-hidden="true"></i>
-    <span>No internet connection</span>
+<div id="offlineBanner" class="govuk-!-display-none" role="alert" aria-live="polite" style="position: fixed; top: 0; left: 0; right: 0; z-index: 1000; background: #d4351c; color: white; padding: 12px; text-align: center;">
+    <i class="fa-solid fa-wifi-slash govuk-!-margin-right-2" aria-hidden="true"></i>
+    <strong>No internet connection</strong>
 </div>
 
-<div class="htb-container edit-opp-container">
-    <div class="htb-card">
-        <div class="htb-card-body">
-            <h3>Edit <?= htmlspecialchars($opp['title']) ?></h3>
-            <form action="<?= $basePath ?>/volunteering/opp/update" method="POST">
-                <?= \Nexus\Core\Csrf::input() ?>
-                <input type="hidden" name="opp_id" value="<?= $opp['id'] ?>">
+<div class="govuk-width-container">
+    <a href="<?= $basePath ?>/volunteering/dashboard" class="govuk-back-link">Back to dashboard</a>
 
-                <div class="form-field">
-                    <label class="form-field-label">Role Title</label>
-                    <input type="text" name="title" value="<?= htmlspecialchars($opp['title']) ?>" required class="form-input">
-                </div>
+    <main class="govuk-main-wrapper">
+        <div class="govuk-grid-row">
+            <div class="govuk-grid-column-two-thirds">
+                <h1 class="govuk-heading-xl">
+                    <i class="fa-solid fa-edit govuk-!-margin-right-2" style="color: #1d70b8;" aria-hidden="true"></i>
+                    Edit <?= htmlspecialchars($opp['title']) ?>
+                </h1>
 
-                <div class="form-field">
-                    <label class="form-field-label">Category</label>
-                    <select name="category_id" class="form-input">
-                        <option value="">Select Category...</option>
-                        <?php foreach ($categories as $cat): ?>
-                            <option value="<?= $cat['id'] ?>" <?= $opp['category_id'] == $cat['id'] ? 'selected' : '' ?>><?= htmlspecialchars($cat['name']) ?></option>
-                        <?php endforeach; ?>
-                    </select>
-                </div>
-
-                <div class="form-field">
-                    <label class="form-field-label">Location</label>
-                    <input type="text" name="location" value="<?= htmlspecialchars($opp['location']) ?>" required class="form-input mapbox-location-input-v2">
-                    <input type="hidden" name="latitude" value="<?= $opp['latitude'] ?? '' ?>">
-                    <input type="hidden" name="longitude" value="<?= $opp['longitude'] ?? '' ?>">
-                </div>
-
-                <div class="form-field">
-                    <label class="form-field-label">Skills</label>
-                    <input type="text" name="skills" value="<?= htmlspecialchars($opp['skills_needed']) ?>" placeholder="Comma separated" class="form-input">
-                </div>
-
-                <div class="date-grid">
-                    <div>
-                        <label class="form-field-label">Start Date</label>
-                        <input type="date" name="start_date" value="<?= $opp['start_date'] ?>" class="form-input">
-                    </div>
-                    <div>
-                        <label class="form-field-label">End Date</label>
-                        <input type="date" name="end_date" value="<?= $opp['end_date'] ?>" class="form-input">
-                    </div>
-                </div>
-
-                <div class="form-field">
-                    <label class="form-field-label">Description</label>
-                    <textarea name="description" rows="6" required class="form-input"><?= htmlspecialchars($opp['description']) ?></textarea>
-                </div>
-
-                <div class="button-row">
-                    <button class="htb-btn htb-btn-primary flex-1">Save Changes</button>
-                    <a href="<?= $basePath ?>/volunteering/dashboard" class="htb-btn htb-btn-secondary">Cancel</a>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <!-- Shifts Management -->
-    <div class="htb-card card-mt-30">
-        <div class="htb-card-body">
-            <h3>Manage Shifts</h3>
-            <p class="text-muted-sm">Add specific time slots for this opportunity.</p>
-
-            <?php if (!empty($shifts)): ?>
-                <table class="shifts-table">
-                    <thead>
-                        <tr>
-                            <th>Time</th>
-                            <th>Capacity</th>
-                            <th>Action</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <?php foreach ($shifts as $shift): ?>
-                            <tr>
-                                <td>
-                                    <?= date('M d, Y', strtotime($shift['start_time'])) ?><br>
-                                    <span class="shift-time-secondary">
-                                        <?= date('h:i A', strtotime($shift['start_time'])) ?> - <?= date('h:i A', strtotime($shift['end_time'])) ?>
-                                    </span>
-                                </td>
-                                <td><?= $shift['capacity'] ?> vols</td>
-                                <td>
-                                    <form action="<?= $basePath ?>/volunteering/shift/delete" method="POST" onsubmit="return confirm('Are you sure?');">
-                                        <?= \Nexus\Core\Csrf::input() ?>
-                                        <input type="hidden" name="shift_id" value="<?= $shift['id'] ?>">
-                                        <button class="btn-delete-icon" title="Delete" aria-label="Delete shift">&#128465;</button>
-                                    </form>
-                                </td>
-                            </tr>
-                        <?php endforeach; ?>
-                    </tbody>
-                </table>
-            <?php else: ?>
-                <p class="text-muted-italic">No shifts added yet. This opportunity is "Flexible" by default.</p>
-            <?php endif; ?>
-
-            <div class="add-shift-box">
-                <h5>Add New Shift</h5>
-                <form action="<?= $basePath ?>/volunteering/shift/store" method="POST">
+                <form action="<?= $basePath ?>/volunteering/opp/update" method="POST" id="editOppForm">
                     <?= \Nexus\Core\Csrf::input() ?>
                     <input type="hidden" name="opp_id" value="<?= $opp['id'] ?>">
 
-                    <div class="shift-form-grid">
-                        <div>
-                            <label class="form-field-label-sm">Start Time</label>
-                            <input type="datetime-local" name="start_time" required class="form-input-sm">
+                    <!-- Role Title -->
+                    <div class="govuk-form-group">
+                        <label class="govuk-label govuk-label--s" for="title">Role Title</label>
+                        <input type="text"
+                               name="title"
+                               id="title"
+                               value="<?= htmlspecialchars($opp['title']) ?>"
+                               required
+                               class="govuk-input">
+                    </div>
+
+                    <!-- Category -->
+                    <div class="govuk-form-group">
+                        <label class="govuk-label govuk-label--s" for="category_id">Category</label>
+                        <select name="category_id" id="category_id" class="govuk-select">
+                            <option value="">Select Category...</option>
+                            <?php foreach ($categories as $cat): ?>
+                                <option value="<?= $cat['id'] ?>" <?= $opp['category_id'] == $cat['id'] ? 'selected' : '' ?>>
+                                    <?= htmlspecialchars($cat['name']) ?>
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+
+                    <!-- Location -->
+                    <div class="govuk-form-group">
+                        <label class="govuk-label govuk-label--s" for="location">Location</label>
+                        <input type="text"
+                               name="location"
+                               id="location"
+                               value="<?= htmlspecialchars($opp['location']) ?>"
+                               required
+                               class="govuk-input mapbox-location-input-v2">
+                        <input type="hidden" name="latitude" value="<?= $opp['latitude'] ?? '' ?>">
+                        <input type="hidden" name="longitude" value="<?= $opp['longitude'] ?? '' ?>">
+                    </div>
+
+                    <!-- Skills -->
+                    <div class="govuk-form-group">
+                        <label class="govuk-label govuk-label--s" for="skills">Skills</label>
+                        <span class="govuk-hint">Comma separated list of skills needed</span>
+                        <input type="text"
+                               name="skills"
+                               id="skills"
+                               value="<?= htmlspecialchars($opp['skills_needed']) ?>"
+                               placeholder="e.g. Communication, Teamwork, First Aid"
+                               class="govuk-input">
+                    </div>
+
+                    <!-- Date Range -->
+                    <div class="govuk-grid-row">
+                        <div class="govuk-grid-column-one-half">
+                            <div class="govuk-form-group">
+                                <label class="govuk-label govuk-label--s" for="start_date">Start Date</label>
+                                <input type="date"
+                                       name="start_date"
+                                       id="start_date"
+                                       value="<?= $opp['start_date'] ?>"
+                                       class="govuk-input">
+                            </div>
                         </div>
-                        <div>
-                            <label class="form-field-label-sm">End Time</label>
-                            <input type="datetime-local" name="end_time" required class="form-input-sm">
-                        </div>
-                        <div>
-                            <label class="form-field-label-sm">Capacity</label>
-                            <input type="number" name="capacity" value="1" min="1" required class="form-input-sm">
+                        <div class="govuk-grid-column-one-half">
+                            <div class="govuk-form-group">
+                                <label class="govuk-label govuk-label--s" for="end_date">End Date</label>
+                                <input type="date"
+                                       name="end_date"
+                                       id="end_date"
+                                       value="<?= $opp['end_date'] ?>"
+                                       class="govuk-input">
+                            </div>
                         </div>
                     </div>
-                    <button class="htb-btn htb-btn-sm btn-add-shift">+ Add Shift</button>
+
+                    <!-- Description -->
+                    <div class="govuk-form-group">
+                        <label class="govuk-label govuk-label--s" for="description">Description</label>
+                        <textarea name="description"
+                                  id="description"
+                                  rows="6"
+                                  required
+                                  class="govuk-textarea"><?= htmlspecialchars($opp['description']) ?></textarea>
+                    </div>
+
+                    <!-- Form Actions -->
+                    <div class="govuk-button-group">
+                        <button type="submit" class="govuk-button" data-module="govuk-button">
+                            <i class="fa-solid fa-check govuk-!-margin-right-2" aria-hidden="true"></i>
+                            Save Changes
+                        </button>
+                        <a href="<?= $basePath ?>/volunteering/dashboard" class="govuk-button govuk-button--secondary" data-module="govuk-button">
+                            Cancel
+                        </a>
+                    </div>
                 </form>
             </div>
         </div>
-    </div>
+
+        <!-- Shifts Management -->
+        <div class="govuk-grid-row govuk-!-margin-top-6">
+            <div class="govuk-grid-column-two-thirds">
+                <div class="govuk-!-padding-4" style="background: #f3f2f1; border-left: 5px solid #1d70b8;">
+                    <h2 class="govuk-heading-m">
+                        <i class="fa-solid fa-calendar-alt govuk-!-margin-right-2" style="color: #1d70b8;" aria-hidden="true"></i>
+                        Manage Shifts
+                    </h2>
+                    <p class="govuk-hint">Add specific time slots for this opportunity.</p>
+
+                    <?php if (!empty($shifts)): ?>
+                        <table class="govuk-table govuk-!-margin-bottom-4">
+                            <thead class="govuk-table__head">
+                                <tr class="govuk-table__row">
+                                    <th scope="col" class="govuk-table__header">Time</th>
+                                    <th scope="col" class="govuk-table__header">Capacity</th>
+                                    <th scope="col" class="govuk-table__header">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody class="govuk-table__body">
+                                <?php foreach ($shifts as $shift): ?>
+                                    <tr class="govuk-table__row">
+                                        <td class="govuk-table__cell">
+                                            <strong><?= date('M d, Y', strtotime($shift['start_time'])) ?></strong><br>
+                                            <span class="govuk-hint govuk-!-margin-bottom-0">
+                                                <?= date('h:i A', strtotime($shift['start_time'])) ?> - <?= date('h:i A', strtotime($shift['end_time'])) ?>
+                                            </span>
+                                        </td>
+                                        <td class="govuk-table__cell">
+                                            <strong class="govuk-tag" style="background: #1d70b8;">
+                                                <?= $shift['capacity'] ?> vols
+                                            </strong>
+                                        </td>
+                                        <td class="govuk-table__cell">
+                                            <form action="<?= $basePath ?>/volunteering/shift/delete" method="POST" onsubmit="return confirm('Are you sure you want to delete this shift?');">
+                                                <?= \Nexus\Core\Csrf::input() ?>
+                                                <input type="hidden" name="shift_id" value="<?= $shift['id'] ?>">
+                                                <button type="submit" class="govuk-button govuk-button--warning govuk-!-margin-bottom-0" data-module="govuk-button" title="Delete shift">
+                                                    <i class="fa-solid fa-trash" aria-hidden="true"></i>
+                                                </button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                <?php endforeach; ?>
+                            </tbody>
+                        </table>
+                    <?php else: ?>
+                        <p class="govuk-body govuk-!-margin-bottom-4">
+                            <em>No shifts added yet. This opportunity is "Flexible" by default.</em>
+                        </p>
+                    <?php endif; ?>
+
+                    <!-- Add New Shift -->
+                    <div class="govuk-!-padding-4" style="background: white; border: 1px solid #b1b4b6;">
+                        <h3 class="govuk-heading-s">
+                            <i class="fa-solid fa-plus govuk-!-margin-right-2" style="color: #00703c;" aria-hidden="true"></i>
+                            Add New Shift
+                        </h3>
+                        <form action="<?= $basePath ?>/volunteering/shift/store" method="POST">
+                            <?= \Nexus\Core\Csrf::input() ?>
+                            <input type="hidden" name="opp_id" value="<?= $opp['id'] ?>">
+
+                            <div class="govuk-grid-row">
+                                <div class="govuk-grid-column-one-third">
+                                    <div class="govuk-form-group">
+                                        <label class="govuk-label" for="shift_start">Start Time</label>
+                                        <input type="datetime-local" name="start_time" id="shift_start" required class="govuk-input">
+                                    </div>
+                                </div>
+                                <div class="govuk-grid-column-one-third">
+                                    <div class="govuk-form-group">
+                                        <label class="govuk-label" for="shift_end">End Time</label>
+                                        <input type="datetime-local" name="end_time" id="shift_end" required class="govuk-input">
+                                    </div>
+                                </div>
+                                <div class="govuk-grid-column-one-third">
+                                    <div class="govuk-form-group">
+                                        <label class="govuk-label" for="shift_capacity">Capacity</label>
+                                        <input type="number" name="capacity" id="shift_capacity" value="1" min="1" required class="govuk-input">
+                                    </div>
+                                </div>
+                            </div>
+                            <button type="submit" class="govuk-button govuk-button--secondary" data-module="govuk-button">
+                                <i class="fa-solid fa-plus govuk-!-margin-right-2" aria-hidden="true"></i>
+                                Add Shift
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
 </div>
 
+<script>
+// Offline Indicator
+(function() {
+    var banner = document.getElementById('offlineBanner');
+    if (!banner) return;
 
-<script src="/assets/js/civicone-volunteering-edit-opp.js"></script>
+    function handleOffline() {
+        banner.classList.remove('govuk-!-display-none');
+        if (navigator.vibrate) navigator.vibrate(100);
+    }
 
-<?php require __DIR__ . '/../../layouts/footer.php'; ?>
+    function handleOnline() {
+        banner.classList.add('govuk-!-display-none');
+    }
+
+    window.addEventListener('online', handleOnline);
+    window.addEventListener('offline', handleOffline);
+
+    if (!navigator.onLine) {
+        handleOffline();
+    }
+})();
+
+// Form Submission Offline Protection
+document.querySelectorAll('form').forEach(function(form) {
+    form.addEventListener('submit', function(e) {
+        if (!navigator.onLine) {
+            e.preventDefault();
+            alert('You are offline. Please connect to the internet to save changes.');
+        }
+    });
+});
+</script>
+
+<?php require __DIR__ . '/../../layouts/civicone/footer.php'; ?>
