@@ -91,7 +91,7 @@ require dirname(__DIR__, 2) . '/layouts/civicone/header.php';
         <!-- Impact Cards -->
         <div class="govuk-grid-row">
             <div class="govuk-grid-column-one-third">
-                <div class="civicone-card-bordered govuk-!-margin-bottom-6">
+                <div class="govuk-!-padding-4 govuk-!-margin-bottom-6" style="border: 1px solid #b1b4b6; border-left: 5px solid #00703c;">
                     <h3 class="govuk-heading-m">Exceptional social value</h3>
                     <p class="govuk-body">
                         Align your brand with a model proven to return <strong>€16 in social value
@@ -101,7 +101,7 @@ require dirname(__DIR__, 2) . '/layouts/civicone/header.php';
                 </div>
             </div>
             <div class="govuk-grid-column-one-third">
-                <div class="civicone-card-bordered govuk-!-margin-bottom-6">
+                <div class="govuk-!-padding-4 govuk-!-margin-bottom-6" style="border: 1px solid #b1b4b6; border-left: 5px solid #1d70b8;">
                     <h3 class="govuk-heading-m">Proof and transparency</h3>
                     <p class="govuk-body">
                         Our impact is validated by an independent <strong>2023 Social Impact Study</strong>.
@@ -110,7 +110,7 @@ require dirname(__DIR__, 2) . '/layouts/civicone/header.php';
                 </div>
             </div>
             <div class="govuk-grid-column-one-third">
-                <div class="civicone-card-bordered govuk-!-margin-bottom-6">
+                <div class="govuk-!-padding-4 govuk-!-margin-bottom-6" style="border: 1px solid #b1b4b6; border-left: 5px solid #d53880;">
                     <h3 class="govuk-heading-m">Strategic growth</h3>
                     <p class="govuk-body">
                         Invest in a resilient organisation that has a clear <strong>5-year roadmap</strong>
