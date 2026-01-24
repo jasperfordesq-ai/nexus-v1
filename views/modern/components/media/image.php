@@ -39,12 +39,18 @@ $aspectClasses = [
 $useAspectRatio = isset($aspectClasses[$aspectRatio]);
 $aspectClass = $aspectClasses[$aspectRatio] ?? '';
 $coverClass = $cover ? 'component-image--cover' : '';
+
+// Build attributes array for webp_image helper
+$imgAttrs = [];
+if ($width) $imgAttrs['width'] = $width;
+if ($height) $imgAttrs['height'] = $height;
+if ($lazy) $imgAttrs['loading'] = 'lazy';
 ?>
 
 <?php if ($useAspectRatio): ?>
 <div class="component-image__wrapper <?= e($aspectClass) ?>">
     <?php if ($src): ?>
-        <?= webp_image($src, $alt, $cssClass . ' component-image--fill ' . $coverClass, $width, $height, $lazy) ?>
+        <?= webp_image($src, $alt, $cssClass . ' component-image--fill ' . $coverClass, $imgAttrs) ?>
     <?php else: ?>
         <img
             src="<?= e($fallback) ?>"
@@ -56,7 +62,7 @@ $coverClass = $cover ? 'component-image--cover' : '';
 </div>
 <?php else: ?>
     <?php if ($src): ?>
-        <?= webp_image($src, $alt, $cssClass, $width, $height, $lazy) ?>
+        <?= webp_image($src, $alt, $cssClass, $imgAttrs) ?>
     <?php else: ?>
         <img
             src="<?= e($fallback) ?>"

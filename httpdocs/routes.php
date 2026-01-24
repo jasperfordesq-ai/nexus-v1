@@ -94,6 +94,9 @@ $router->add('GET', '/dev/shared-components', function () {
 $router->add('GET', '/dev/storybook', function () {
     require __DIR__ . '/../views/modern/components/_storybook.php';
 });
+$router->add('GET', '/dev/component-showcase', function () {
+    require __DIR__ . '/../views/modern/components/_showcase.php';
+});
 $router->add('GET', '/dev/component-preview', function () {
     require __DIR__ . '/../views/modern/components/_preview.php';
 });
