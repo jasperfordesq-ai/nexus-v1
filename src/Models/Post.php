@@ -83,6 +83,10 @@ class Post
     public static function getAll($limit = 10, $offset = 0, $status = 'published')
     {
         $tenantId = TenantContext::getId();
+        // SECURITY: Cast to int to prevent SQL injection
+        $limit = (int)$limit;
+        $offset = (int)$offset;
+
         $sql = "SELECT p.*, COALESCE(u.name, 'Unknown Author') as author_name
                 FROM posts p
                 LEFT JOIN users u ON p.author_id = u.id

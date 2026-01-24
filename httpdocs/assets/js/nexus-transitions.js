@@ -16,7 +16,7 @@
     function initPageTransitions() {
         // Check if page transitions are disabled
         if (window.NEXUS_PAGE_TRANSITIONS_DISABLED) {
-            console.log('⏭️  Page transitions disabled (prevents glitches)');
+            console.warn('⏭️  Page transitions disabled (prevents glitches)');
             return;
         }
 
@@ -396,7 +396,7 @@
     function init() {
         // Check if loading fix is already handling these
         if (window.NEXUS_PAGE_TRANSITIONS_DISABLED) {
-            console.log('⏭️  Using optimized loading system');
+            console.warn('⏭️  Using optimized loading system');
             // Don't duplicate functionality - loading-fix.js handles it
             return;
         }
@@ -417,7 +417,7 @@
         enhanceModals();
         initRippleEffect();
 
-        console.log('✨ Nexus visual enhancements initialized');
+        console.warn('✨ Nexus visual enhancements initialized');
     }
 
     // Add CSS for transitions
