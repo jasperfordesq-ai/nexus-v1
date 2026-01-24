@@ -7,7 +7,20 @@
     if (file_exists($impersonationBannerPath)) {
         require $impersonationBannerPath;
     }
+    ?>
 
+    <!-- Cookie Consent Banner (EU Compliance) -->
+    <?php
+    $cookieBannerPath = __DIR__ . '/../../civicone/partials/cookie-banner.php';
+    if (!file_exists($cookieBannerPath)) {
+        $cookieBannerPath = __DIR__ . '/../../modern/partials/cookie-banner.php';
+    }
+    if (file_exists($cookieBannerPath)) {
+        require $cookieBannerPath;
+    }
+    ?>
+
+    <?php
     // Signal that main content area has started (for bridge file compatibility)
     define('MAIN_CONTENT_STARTED', true);
     ?>

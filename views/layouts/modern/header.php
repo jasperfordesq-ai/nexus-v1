@@ -127,6 +127,10 @@ try {
     <!-- Mobile Interactions (ripple effects, haptic feedback, loading states) -->
     <script defer src="/assets/js/mobile-interactions.js?v=<?= $cssVersionTimestamp ?>"></script>
 
+    <!-- Cookie Consent Library (EU compliance) -->
+    <script src="/assets/js/cookie-consent.js?v=<?= $cssVersionTimestamp ?>"></script>
+    <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/cookie-banner.css?v=<?= $cssVersionTimestamp ?>">
+
     <!-- Global NEXUS_BASE for AJAX calls -->
     <script>const NEXUS_BASE = "<?= rtrim(\Nexus\Core\TenantContext::getBasePath(), '/') ?>";</script>
     <!-- Header Scripts (error trap, offline banner, bfcache cleanup) -->
@@ -159,6 +163,17 @@ try {
 
     <!-- Admin Impersonation Banner -->
     <?php require __DIR__ . '/../../modern/partials/impersonation-banner.php'; ?>
+
+    <!-- Cookie Consent Banner (EU compliance) -->
+    <?php
+    $cookieBannerPath = __DIR__ . '/../../modern/partials/cookie-banner.php';
+    if (!file_exists($cookieBannerPath)) {
+        $cookieBannerPath = __DIR__ . '/../../civicone/partials/cookie-banner.php';
+    }
+    if (file_exists($cookieBannerPath)) {
+        require $cookieBannerPath;
+    }
+    ?>
 
     <!-- Main Content Area (for skip-link target) -->
     <main id="main-content" role="main">
