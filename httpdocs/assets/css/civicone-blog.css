@@ -641,6 +641,80 @@
 
 
 /* --------------------------------------------
+   Simple News Index (CivicOne Grid Layout)
+   -------------------------------------------- */
+.news-simple-empty {
+    text-align: center;
+    padding: var(--space-10);
+}
+
+.news-simple-card {
+    border-top: 4px solid var(--civic-brand-primary, var(--color-govuk-black));
+}
+
+.news-simple-img-container {
+    margin-bottom: var(--space-5);
+    border-radius: var(--radius-base);
+    overflow: hidden;
+}
+
+.news-simple-img {
+    width: 100%;
+    height: auto;
+    display: block;
+}
+
+.news-simple-date {
+    color: var(--color-text-secondary, var(--civic-blog-text-secondary));
+    font-size: var(--font-size-sm);
+    margin-bottom: var(--space-1);
+}
+
+.news-simple-title {
+    margin-top: 0;
+    margin-bottom: var(--space-2-5);
+}
+
+.news-simple-title a {
+    text-decoration: none;
+    color: inherit;
+}
+
+.news-simple-title a:hover {
+    text-decoration: underline;
+}
+
+.news-simple-title a:focus {
+    outline: 3px solid var(--color-govuk-yellow);
+    outline-offset: 0;
+    background-color: var(--color-govuk-yellow);
+    color: var(--color-govuk-black);
+}
+
+.news-simple-excerpt {
+    margin-bottom: var(--space-5);
+    line-height: 1.5;
+}
+
+.news-simple-read-link {
+    font-weight: var(--font-weight-bold);
+    text-decoration: underline;
+    color: var(--civic-brand-primary, var(--color-govuk-black));
+}
+
+.news-simple-read-link:hover {
+    color: var(--color-govuk-blue);
+}
+
+.news-simple-read-link:focus {
+    outline: 3px solid var(--color-govuk-yellow);
+    outline-offset: 0;
+    background-color: var(--color-govuk-yellow);
+    color: var(--color-govuk-black);
+}
+
+
+/* --------------------------------------------
    Blog Show Page
    -------------------------------------------- */
 .civic-article-wrapper {
