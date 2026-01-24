@@ -40,7 +40,10 @@ $missing = [];
 
 foreach ($requiredTables as $table) {
     try {
-        $result = $pdo->query("SHOW TABLES LIKE '$table'")->fetch();
+        // Use prepared statement for table name pattern
+        $stmt = $pdo->prepare("SHOW TABLES LIKE ?");
+        $stmt->execute([$table]);
+        $result = $stmt->fetch();
         if ($result) {
             $existing[] = $table;
             echo "[OK] $table\n";
