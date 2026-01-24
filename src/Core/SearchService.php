@@ -119,6 +119,9 @@ class SearchService
      */
     private function searchSQL($query, $expandedQueries, $limit)
     {
+        // SECURITY: Cast to int to prevent SQL injection
+        $limit = (int)$limit;
+
         $tenantId = \Nexus\Core\TenantContext::getId();
         $allResults = [];
 
