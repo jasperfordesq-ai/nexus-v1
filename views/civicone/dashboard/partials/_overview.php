@@ -91,7 +91,7 @@
 
         <?php if (\Nexus\Core\TenantContext::hasFeature('events')): ?>
         <!-- Upcoming Events -->
-        <section aria-labelledby="events-sidebar-heading" class="govuk-!-padding-4 govuk-!-margin-bottom-4" style="background: #f3f2f1;">
+        <section aria-labelledby="events-sidebar-heading" class="govuk-!-padding-4 govuk-!-margin-bottom-4 civicone-panel-bg">
             <h2 id="events-sidebar-heading" class="govuk-heading-s">Upcoming Events</h2>
             <?php if (empty($myEvents)): ?>
                 <p class="govuk-body-s">No upcoming events.</p>
@@ -126,7 +126,7 @@
             // Silently fail - matches not critical for dashboard
         }
         ?>
-        <section aria-labelledby="matches-heading" class="govuk-!-padding-4 govuk-!-margin-bottom-4" style="background: #f3f2f1;">
+        <section aria-labelledby="matches-heading" class="govuk-!-padding-4 govuk-!-margin-bottom-4 civicone-panel-bg">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
                 <h2 id="matches-heading" class="govuk-heading-s govuk-!-margin-bottom-0">Smart Matches</h2>
                 <a href="<?= $basePath ?>/matches" class="govuk-link govuk-body-s">View all</a>
@@ -170,7 +170,7 @@
         </section>
 
         <!-- My Hubs -->
-        <section aria-labelledby="hubs-sidebar-heading" class="govuk-!-padding-4 govuk-!-margin-bottom-4" style="background: #f3f2f1;">
+        <section aria-labelledby="hubs-sidebar-heading" class="govuk-!-padding-4 govuk-!-margin-bottom-4 civicone-panel-bg">
             <h2 id="hubs-sidebar-heading" class="govuk-heading-s">My Hubs</h2>
             <?php if (empty($myGroups)): ?>
                 <p class="govuk-body-s">You haven't joined any hubs yet.</p>
@@ -190,7 +190,7 @@
         </section>
 
         <!-- Quick Actions -->
-        <section class="govuk-!-padding-4" style="background: #f3f2f1;">
+        <section class="govuk-!-padding-4 civicone-panel-bg">
             <h2 class="govuk-heading-s">Quick Actions</h2>
             <p class="govuk-!-margin-bottom-2">
                 <a href="<?= $basePath ?>/achievements" class="govuk-button govuk-button--secondary govuk-!-margin-bottom-2" style="width: 100%;">View Achievements</a>

@@ -142,19 +142,19 @@ require __DIR__ . '/../../layouts/civicone/header.php';
         <!-- Stats Row -->
         <div class="govuk-grid-row govuk-!-margin-bottom-6 no-print">
             <div class="govuk-grid-column-one-third">
-                <div class="govuk-!-padding-4 govuk-!-text-align-center" style="background: #f3f2f1; border-left: 5px solid #00703c;">
+                <div class="govuk-!-padding-4 govuk-!-text-align-center civicone-panel-bg" style="border-left: 5px solid #00703c;">
                     <p class="govuk-heading-xl govuk-!-margin-bottom-1" style="color: #00703c;"><?= number_format($displayHours, 1) ?></p>
                     <p class="govuk-body-s govuk-!-margin-bottom-0">Total Verified Hours</p>
                 </div>
             </div>
             <div class="govuk-grid-column-one-third">
-                <div class="govuk-!-padding-4 govuk-!-text-align-center" style="background: #f3f2f1; border-left: 5px solid #1d70b8;">
+                <div class="govuk-!-padding-4 govuk-!-text-align-center civicone-panel-bg" style="border-left: 5px solid #1d70b8;">
                     <p class="govuk-heading-xl govuk-!-margin-bottom-1" style="color: #1d70b8;"><?= $displayActivities ?></p>
                     <p class="govuk-body-s govuk-!-margin-bottom-0">Activities Completed</p>
                 </div>
             </div>
             <div class="govuk-grid-column-one-third">
-                <div class="govuk-!-padding-4 govuk-!-text-align-center" style="background: #f3f2f1; border-left: 5px solid #f47738;">
+                <div class="govuk-!-padding-4 govuk-!-text-align-center civicone-panel-bg" style="border-left: 5px solid #f47738;">
                     <p class="govuk-heading-xl govuk-!-margin-bottom-1" style="color: #f47738;"><?= $displayOrgs ?></p>
                     <p class="govuk-body-s govuk-!-margin-bottom-0">Organizations Helped</p>
                 </div>
@@ -164,7 +164,7 @@ require __DIR__ . '/../../layouts/civicone/header.php';
         <?php if ($totalHours > 0 || $previewMode): ?>
             <!-- Certificate Preview -->
             <div class="govuk-!-margin-bottom-6" style="background: white; border: 1px solid #b1b4b6;">
-                <div class="govuk-!-padding-3" style="background: #f3f2f1; border-bottom: 1px solid #b1b4b6;">
+                <div class="govuk-!-padding-3 civicone-panel-bg" style="border-bottom: 1px solid #b1b4b6;">
                     <div class="govuk-grid-row">
                         <div class="govuk-grid-column-two-thirds">
                             <h2 class="govuk-heading-s govuk-!-margin-bottom-0">
@@ -229,7 +229,7 @@ require __DIR__ . '/../../layouts/civicone/header.php';
 
         <?php else: ?>
             <!-- No Hours Message -->
-            <div class="govuk-!-padding-6 govuk-!-text-align-center" style="background: #f3f2f1; border-left: 5px solid #1d70b8;">
+            <div class="govuk-!-padding-6 govuk-!-text-align-center civicone-panel-bg" style="border-left: 5px solid #1d70b8;">
                 <p class="govuk-body govuk-!-margin-bottom-4">
                     <i class="fa-solid fa-hourglass-half fa-3x" style="color: #1d70b8;" aria-hidden="true"></i>
                 </p>

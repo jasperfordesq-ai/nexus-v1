@@ -30,7 +30,7 @@ $currentConversationId = $conversation['id'] ?? null;
 
                 <div id="conversationsList" role="list" aria-label="Previous conversations">
                     <?php if (empty($conversations)): ?>
-                        <div class="govuk-!-padding-4 govuk-!-text-align-center" style="background: #f3f2f1; border-left: 5px solid #1d70b8;">
+                        <div class="govuk-!-padding-4 govuk-!-text-align-center civicone-panel-bg" style="border-left: 5px solid #1d70b8;">
                             <p class="govuk-body-s govuk-!-margin-bottom-0">
                                 No conversations yet.<br>Start a new chat!
                             </p>
@@ -88,7 +88,8 @@ $currentConversationId = $conversation['id'] ?? null;
                      role="log"
                      aria-live="polite"
                      aria-label="Chat messages"
-                     style="min-height: 400px; max-height: 500px; overflow-y: auto; background: #f3f2f1; padding: 20px; border: 1px solid #b1b4b6;">
+                     class="civicone-panel-bg"
+                     style="min-height: 400px; max-height: 500px; overflow-y: auto; padding: 20px; border: 1px solid #b1b4b6;">
                     <?php if (empty($messages)): ?>
                         <!-- Welcome State -->
                         <div id="welcomeState" class="govuk-!-text-align-center govuk-!-padding-6">

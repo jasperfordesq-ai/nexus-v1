@@ -77,7 +77,7 @@ require dirname(__DIR__, 2) . '/layouts/civicone/header.php';
 </div>
 
 <!-- Documents Section -->
-<div class="govuk-!-padding-6 govuk-!-margin-bottom-6" style="background: #f3f2f1;">
+<div class="govuk-!-padding-6 govuk-!-margin-bottom-6 civicone-panel-bg">
     <h2 class="govuk-heading-l govuk-!-text-align-center govuk-!-margin-bottom-6">Our Strategic Documents</h2>
 
     <div class="govuk-grid-row">

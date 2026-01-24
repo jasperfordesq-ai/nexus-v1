@@ -321,7 +321,7 @@ require __DIR__ . '/../../layouts/civicone/header.php';
 
         <!-- Post Composer (Owner only) -->
         <?php if ($isOwner): ?>
-        <div class="govuk-!-margin-top-6 govuk-!-padding-4" style="background: #f3f2f1;">
+        <div class="govuk-!-margin-top-6 govuk-!-padding-4 civicone-panel-bg">
             <h2 class="govuk-heading-m">Share an update</h2>
             <form method="POST" enctype="multipart/form-data">
                 <div class="govuk-form-group">
@@ -349,7 +349,7 @@ require __DIR__ . '/../../layouts/civicone/header.php';
             </div>
         <?php else: ?>
             <?php foreach ($posts as $post): ?>
-                <div class="govuk-!-margin-bottom-6 govuk-!-padding-4" style="background: #f3f2f1; border-left: 5px solid #1d70b8;" id="post-<?= $post['id'] ?>">
+                <div class="govuk-!-margin-bottom-6 govuk-!-padding-4 civicone-panel-bg" style="border-left: 5px solid #1d70b8;" id="post-<?= $post['id'] ?>">
                     <!-- Post Header -->
                     <div style="display: flex; gap: 10px; margin-bottom: 15px;">
                         <img src="<?= htmlspecialchars($post['author_avatar']) ?>" alt="" width="40" height="40" style="border-radius: 50%;">
@@ -428,7 +428,7 @@ require __DIR__ . '/../../layouts/civicone/header.php';
 
     <!-- Sidebar: 1/3 Column (Related Links/Actions) -->
     <div class="govuk-grid-column-one-third">
-        <aside class="govuk-!-padding-4" style="background: #f3f2f1;">
+        <aside class="govuk-!-padding-4 civicone-panel-bg">
             <h2 class="govuk-heading-m">Related content</h2>
 
             <ul class="govuk-list">

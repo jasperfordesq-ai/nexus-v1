@@ -475,6 +475,13 @@
     background: #ffffff;
     border: 1px solid #b1b4b6;
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+    display: none;
+}
+
+/* Show dropdown when More button is expanded */
+.govuk-service-navigation__item--more[aria-expanded="true"] .govuk-service-navigation__dropdown,
+.govuk-service-navigation__link--more[aria-expanded="true"] + .govuk-service-navigation__dropdown {
+    display: block;
 }
 
 .govuk-service-navigation__dropdown-list {

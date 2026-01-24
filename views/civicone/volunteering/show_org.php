@@ -48,7 +48,7 @@ require __DIR__ . '/../../layouts/civicone/header.php';
                 <div class="govuk-!-padding-6" style="background: white; border: 1px solid #b1b4b6; border-left: 5px solid #00703c;">
                     <div style="display: flex; align-items: flex-start; gap: 24px; flex-wrap: wrap;">
                         <!-- Logo -->
-                        <div style="width: 100px; height: 100px; border-radius: 50%; background: #f3f2f1; display: flex; align-items: center; justify-content: center; flex-shrink: 0; overflow: hidden; border: 3px solid #00703c;">
+                        <div class="civicone-panel-bg" style="width: 100px; height: 100px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; overflow: hidden; border: 3px solid #00703c;">
                             <?php if (!empty($org['logo_url'])): ?>
                                 <img src="<?= htmlspecialchars($org['logo_url']) ?>" loading="lazy" alt="<?= htmlspecialchars($org['name']) ?>" style="width: 100%; height: 100%; object-fit: cover;">
                             <?php else: ?>
@@ -143,7 +143,7 @@ require __DIR__ . '/../../layouts/civicone/header.php';
         <!-- Stats Grid -->
         <div class="govuk-grid-row govuk-!-margin-bottom-6">
             <div class="govuk-grid-column-one-third">
-                <div class="govuk-!-padding-4 govuk-!-text-align-center" style="background: #f3f2f1; border-left: 5px solid #00703c;">
+                <div class="govuk-!-padding-4 govuk-!-text-align-center civicone-panel-bg" style="border-left: 5px solid #00703c;">
                     <p class="govuk-heading-xl govuk-!-margin-bottom-1" style="color: #00703c;"><?= count($opportunities) ?></p>
                     <p class="govuk-body-s govuk-!-margin-bottom-0">
                         <i class="fa-solid fa-hand-holding-heart govuk-!-margin-right-1" aria-hidden="true"></i>
@@ -153,7 +153,7 @@ require __DIR__ . '/../../layouts/civicone/header.php';
             </div>
             <?php if ($hasTimebanking && $memberCount > 0): ?>
                 <div class="govuk-grid-column-one-third">
-                    <div class="govuk-!-padding-4 govuk-!-text-align-center" style="background: #f3f2f1; border-left: 5px solid #1d70b8;">
+                    <div class="govuk-!-padding-4 govuk-!-text-align-center civicone-panel-bg" style="border-left: 5px solid #1d70b8;">
                         <p class="govuk-heading-xl govuk-!-margin-bottom-1" style="color: #1d70b8;"><?= $memberCount ?></p>
                         <p class="govuk-body-s govuk-!-margin-bottom-0">
                             <i class="fa-solid fa-users govuk-!-margin-right-1" aria-hidden="true"></i>
@@ -164,7 +164,7 @@ require __DIR__ . '/../../layouts/civicone/header.php';
             <?php endif; ?>
             <?php if (!empty($org['created_at'])): ?>
                 <div class="govuk-grid-column-one-third">
-                    <div class="govuk-!-padding-4 govuk-!-text-align-center" style="background: #f3f2f1; border-left: 5px solid #f47738;">
+                    <div class="govuk-!-padding-4 govuk-!-text-align-center civicone-panel-bg" style="border-left: 5px solid #f47738;">
                         <p class="govuk-heading-xl govuk-!-margin-bottom-1" style="color: #f47738;"><?= date('Y', strtotime($org['created_at'])) ?></p>
                         <p class="govuk-body-s govuk-!-margin-bottom-0">
                             <i class="fa-solid fa-calendar govuk-!-margin-right-1" aria-hidden="true"></i>
@@ -202,7 +202,7 @@ require __DIR__ . '/../../layouts/civicone/header.php';
                                 <a href="<?= $base ?>/volunteering/<?= $opp['id'] ?>" style="text-decoration: none; color: inherit; display: block;">
                                     <div class="govuk-!-padding-4">
                                         <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px;">
-                                            <div style="width: 48px; height: 48px; border-radius: 50%; background: #f3f2f1; display: flex; align-items: center; justify-content: center;">
+                                            <div class="civicone-panel-bg" style="width: 48px; height: 48px; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
                                                 <i class="fa-solid fa-hands-helping" style="color: #1d70b8;" aria-hidden="true"></i>
                                             </div>
                                             <div>
@@ -239,7 +239,7 @@ require __DIR__ . '/../../layouts/civicone/header.php';
                 </div>
             <?php else: ?>
                 <!-- Empty State -->
-                <div class="govuk-!-padding-6 govuk-!-text-align-center" style="background: #f3f2f1; border-left: 5px solid #1d70b8;">
+                <div class="govuk-!-padding-6 govuk-!-text-align-center civicone-panel-bg" style="border-left: 5px solid #1d70b8;">
                     <p class="govuk-body govuk-!-margin-bottom-4">
                         <i class="fa-solid fa-clipboard-list fa-3x" style="color: #1d70b8;" aria-hidden="true"></i>
                     </p>

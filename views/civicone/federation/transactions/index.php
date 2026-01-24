@@ -52,7 +52,7 @@ $balance = $balance ?? 0;
                 </div>
             </div>
             <div class="govuk-grid-column-one-quarter">
-                <div class="govuk-!-padding-4 govuk-!-text-align-center" style="background: #f3f2f1; border-top: 4px solid #d4351c;">
+                <div class="govuk-!-padding-4 govuk-!-text-align-center civicone-panel-bg" style="border-top: 4px solid #d4351c;">
                     <i class="fa-solid fa-arrow-up fa-lg govuk-!-margin-bottom-2" style="color: #d4351c;" aria-hidden="true"></i>
                     <p class="govuk-heading-l govuk-!-margin-bottom-1" style="color: #d4351c;">
                         <?= number_format($stats['total_sent_hours'] ?? 0, 1) ?>
@@ -61,7 +61,7 @@ $balance = $balance ?? 0;
                 </div>
             </div>
             <div class="govuk-grid-column-one-quarter">
-                <div class="govuk-!-padding-4 govuk-!-text-align-center" style="background: #f3f2f1; border-top: 4px solid #00703c;">
+                <div class="govuk-!-padding-4 govuk-!-text-align-center civicone-panel-bg" style="border-top: 4px solid #00703c;">
                     <i class="fa-solid fa-arrow-down fa-lg govuk-!-margin-bottom-2" style="color: #00703c;" aria-hidden="true"></i>
                     <p class="govuk-heading-l govuk-!-margin-bottom-1" style="color: #00703c;">
                         <?= number_format($stats['total_received_hours'] ?? 0, 1) ?>
@@ -70,7 +70,7 @@ $balance = $balance ?? 0;
                 </div>
             </div>
             <div class="govuk-grid-column-one-quarter">
-                <div class="govuk-!-padding-4 govuk-!-text-align-center" style="background: #f3f2f1; border-top: 4px solid #1d70b8;">
+                <div class="govuk-!-padding-4 govuk-!-text-align-center civicone-panel-bg" style="border-top: 4px solid #1d70b8;">
                     <i class="fa-solid fa-exchange-alt fa-lg govuk-!-margin-bottom-2" style="color: #1d70b8;" aria-hidden="true"></i>
                     <p class="govuk-heading-l govuk-!-margin-bottom-1" style="color: #1d70b8;">
                         <?= ($stats['total_sent_count'] ?? 0) + ($stats['total_received_count'] ?? 0) ?>
@@ -154,7 +154,7 @@ $balance = $balance ?? 0;
                         <?php endforeach; ?>
                     </div>
                 <?php else: ?>
-                    <div class="govuk-!-padding-6 govuk-!-text-align-center" style="background: #f3f2f1; border-left: 5px solid #1d70b8;">
+                    <div class="govuk-!-padding-6 govuk-!-text-align-center civicone-panel-bg" style="border-left: 5px solid #1d70b8;">
                         <i class="fa-solid fa-exchange-alt fa-3x govuk-!-margin-bottom-4" style="color: #1d70b8;" aria-hidden="true"></i>
                         <h2 class="govuk-heading-m">No Federated Transactions Yet</h2>
                         <p class="govuk-body govuk-!-margin-bottom-4">Exchange hours with members from partner timebanks!</p>

@@ -314,7 +314,7 @@ require __DIR__ . '/../layouts/civicone/header.php';
             <div class="govuk-grid-column-one-third">
 
                 <!-- Community Stats - GOV.UK related content pattern -->
-                <aside class="govuk-!-padding-4 govuk-!-margin-bottom-6" style="background: #f3f2f1;" aria-labelledby="stats-heading" role="complementary">
+                <aside class="govuk-!-padding-4 govuk-!-margin-bottom-6 civicone-panel-bg" aria-labelledby="stats-heading" role="complementary">
                     <h2 class="govuk-heading-s" id="stats-heading">Community at a glance</h2>
                     <dl class="govuk-body-s govuk-!-margin-bottom-0">
                         <div class="govuk-!-margin-bottom-2" style="display: flex; justify-content: space-between;">

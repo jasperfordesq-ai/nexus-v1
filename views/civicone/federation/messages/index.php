@@ -120,7 +120,7 @@ function timeAgo($datetime) {
                         <?php endforeach; ?>
                     </div>
                 <?php else: ?>
-                    <div class="govuk-!-padding-6 govuk-!-text-align-center" style="background: #f3f2f1; border-left: 5px solid #1d70b8;">
+                    <div class="govuk-!-padding-6 govuk-!-text-align-center civicone-panel-bg" style="border-left: 5px solid #1d70b8;">
                         <i class="fa-solid fa-envelope-open fa-3x govuk-!-margin-bottom-4" style="color: #1d70b8;" aria-hidden="true"></i>
                         <h2 class="govuk-heading-m">No Federated Messages Yet</h2>
                         <p class="govuk-body govuk-!-margin-bottom-4">Start connecting with members from partner timebanks!</p>

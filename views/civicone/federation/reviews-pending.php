@@ -45,7 +45,7 @@ $pendingReviews = $pendingReviews ?? [];
             <div class="govuk-grid-column-two-thirds">
                 <?php if (empty($pendingReviews)): ?>
                     <!-- Empty State -->
-                    <div class="govuk-!-padding-6 govuk-!-text-align-center" style="background: #f3f2f1; border-left: 5px solid #00703c;">
+                    <div class="govuk-!-padding-6 govuk-!-text-align-center civicone-panel-bg" style="border-left: 5px solid #00703c;">
                         <i class="fa-solid fa-check-circle fa-3x govuk-!-margin-bottom-4" style="color: #00703c;" aria-hidden="true"></i>
                         <h2 class="govuk-heading-m">All caught up!</h2>
                         <p class="govuk-body govuk-!-margin-bottom-4">You've reviewed all your completed federated exchanges.</p>

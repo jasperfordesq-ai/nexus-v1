@@ -13,7 +13,7 @@ $basePath = \Nexus\Core\TenantContext::getBasePath();
 
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds">
-        <div class="govuk-!-padding-6 govuk-!-text-align-center" style="background: #f3f2f1; border-left: 5px solid #1d70b8;">
+        <div class="govuk-!-padding-6 govuk-!-text-align-center civicone-panel-bg" style="border-left: 5px solid #1d70b8;">
             <p class="govuk-body govuk-!-margin-bottom-4">
                 <i class="fa-solid fa-network-wired fa-3x" style="color: #1d70b8;" aria-hidden="true"></i>
             </p>

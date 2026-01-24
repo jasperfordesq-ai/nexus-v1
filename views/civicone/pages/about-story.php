@@ -71,7 +71,7 @@ require dirname(__DIR__, 2) . '/layouts/civicone/header.php';
 </div>
 
 <!-- Values Section -->
-<div class="govuk-!-padding-6 govuk-!-margin-bottom-6" style="background: #f3f2f1;">
+<div class="govuk-!-padding-6 govuk-!-margin-bottom-6 civicone-panel-bg">
     <h2 class="govuk-heading-l govuk-!-text-align-center govuk-!-margin-bottom-6">The Values That Guide Every Hour</h2>
 
     <div class="govuk-grid-row">
@@ -130,7 +130,7 @@ require dirname(__DIR__, 2) . '/layouts/civicone/header.php';
         </div>
     </div>
     <div class="govuk-grid-column-one-third">
-        <div class="govuk-!-padding-4" style="background: #f3f2f1;">
+        <div class="govuk-!-padding-4 civicone-panel-bg">
             <h3 class="govuk-heading-s">Want proof of our impact?</h3>
             <p class="govuk-body-s govuk-!-margin-bottom-4">We have an independently verified Social Return on Investment (SROI) study.</p>
             <a href="<?= $basePath ?>/impact-report" class="govuk-button" data-module="govuk-button">View Full Report</a>

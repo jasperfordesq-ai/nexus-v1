@@ -104,7 +104,7 @@ if (!empty($notifSettings)) {
     </dialog>
 
     <!-- Settings Panel -->
-    <div id="notif-settings-panel" class="govuk-!-padding-4 govuk-!-margin-bottom-6" style="background: #f3f2f1; display: none;">
+    <div id="notif-settings-panel" class="govuk-!-padding-4 govuk-!-margin-bottom-6 civicone-panel-bg" style="display: none;">
         <div class="govuk-grid-row">
             <div class="govuk-grid-column-one-half">
                 <div class="govuk-form-group">

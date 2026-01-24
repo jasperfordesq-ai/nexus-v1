@@ -137,7 +137,7 @@ $basePath = \Nexus\Core\TenantContext::getBasePath();
         <!-- Shifts Management -->
         <div class="govuk-grid-row govuk-!-margin-top-6">
             <div class="govuk-grid-column-two-thirds">
-                <div class="govuk-!-padding-4" style="background: #f3f2f1; border-left: 5px solid #1d70b8;">
+                <div class="govuk-!-padding-4 civicone-panel-bg" style="border-left: 5px solid #1d70b8;">
                     <h2 class="govuk-heading-m">
                         <i class="fa-solid fa-calendar-alt govuk-!-margin-right-2" style="color: #1d70b8;" aria-hidden="true"></i>
                         Manage Shifts

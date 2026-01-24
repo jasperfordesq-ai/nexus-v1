@@ -4,6 +4,41 @@ html[data-layout] { transform: none !important; }
 /* Hide on desktop by default */
 .mobile-tab-bar { display: none; }
 
+/* CRITICAL: Hide mobile fullscreen menu and notification sheet on desktop */
+.mobile-fullscreen-menu,
+.mobile-notification-sheet,
+#mobileMenu,
+#mobileNotifications {
+    display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+}
+
+/* Only show these elements on mobile/tablet */
+@media (max-width: 1024px) {
+    .mobile-fullscreen-menu,
+    .mobile-notification-sheet,
+    #mobileMenu,
+    #mobileNotifications {
+        display: block !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+        pointer-events: auto !important;
+    }
+
+    /* But when not active, hide them properly */
+    .mobile-fullscreen-menu:not(.active),
+    #mobileMenu:not(.active) {
+        transform: translateX(100%) !important;
+    }
+
+    .mobile-notification-sheet:not(.active),
+    #mobileNotifications:not(.active) {
+        transform: translateY(100%) !important;
+    }
+}
+
 /* CRITICAL: Hide ALL legacy navigation on mobile including drawer AND header hamburger */
 @media (max-width: 1024px) {
     .nexus-native-nav,

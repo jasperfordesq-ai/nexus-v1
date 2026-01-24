@@ -273,25 +273,25 @@ $serviceReach = $userSettings['service_reach'] ?? 'local_only';
 
             <div class="govuk-grid-row" role="region" aria-label="Activity statistics">
                 <div class="govuk-grid-column-one-quarter">
-                    <div class="govuk-!-padding-3 govuk-!-text-align-center" style="background: #f3f2f1;">
+                    <div class="govuk-!-padding-3 govuk-!-text-align-center civicone-panel-bg">
                         <p class="govuk-heading-l govuk-!-margin-bottom-1"><?= number_format(($stats['messages_sent'] ?? 0) + ($stats['messages_received'] ?? 0)) ?></p>
                         <p class="govuk-body-s govuk-!-margin-bottom-0" style="color: #505a5f;">Messages Exchanged</p>
                     </div>
                 </div>
                 <div class="govuk-grid-column-one-quarter">
-                    <div class="govuk-!-padding-3 govuk-!-text-align-center" style="background: #f3f2f1;">
+                    <div class="govuk-!-padding-3 govuk-!-text-align-center civicone-panel-bg">
                         <p class="govuk-heading-l govuk-!-margin-bottom-1"><?= number_format($stats['transactions_count'] ?? 0) ?></p>
                         <p class="govuk-body-s govuk-!-margin-bottom-0" style="color: #505a5f;">Transactions</p>
                     </div>
                 </div>
                 <div class="govuk-grid-column-one-quarter">
-                    <div class="govuk-!-padding-3 govuk-!-text-align-center" style="background: #f3f2f1;">
+                    <div class="govuk-!-padding-3 govuk-!-text-align-center civicone-panel-bg">
                         <p class="govuk-heading-l govuk-!-margin-bottom-1"><?= number_format($stats['hours_exchanged'] ?? 0, 1) ?></p>
                         <p class="govuk-body-s govuk-!-margin-bottom-0" style="color: #505a5f;">Hours Exchanged</p>
                     </div>
                 </div>
                 <div class="govuk-grid-column-one-quarter">
-                    <div class="govuk-!-padding-3 govuk-!-text-align-center" style="background: #f3f2f1;">
+                    <div class="govuk-!-padding-3 govuk-!-text-align-center civicone-panel-bg">
                         <p class="govuk-heading-l govuk-!-margin-bottom-1"><?= $partnerCount ?></p>
                         <p class="govuk-body-s govuk-!-margin-bottom-0" style="color: #505a5f;">Partner Timebanks</p>
                     </div>

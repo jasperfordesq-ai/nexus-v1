@@ -34,7 +34,7 @@ $basePath = \Nexus\Core\TenantContext::getBasePath();
 
         <?php if ($isAdmin): ?>
             <!-- Add Member Form -->
-            <div class="govuk-!-margin-bottom-6 govuk-!-padding-4" style="background: #f3f2f1; border-left: 5px solid #00703c;">
+            <div class="govuk-!-margin-bottom-6 govuk-!-padding-4 civicone-panel-bg" style="border-left: 5px solid #00703c;">
                 <h3 class="govuk-heading-s govuk-!-margin-bottom-3">
                     <i class="fa-solid fa-user-plus govuk-!-margin-right-2" style="color: #00703c;" aria-hidden="true"></i>
                     Add Member
@@ -65,7 +65,7 @@ $basePath = \Nexus\Core\TenantContext::getBasePath();
 
         <?php if ($isOwner ?? false): ?>
             <!-- Transfer Ownership Section (Owner Only) -->
-            <div class="govuk-!-margin-bottom-6 govuk-!-padding-4" style="background: #f3f2f1; border-left: 5px solid #f47738;">
+            <div class="govuk-!-margin-bottom-6 govuk-!-padding-4 civicone-panel-bg" style="border-left: 5px solid #f47738;">
                 <h3 class="govuk-heading-s govuk-!-margin-bottom-3">
                     <i class="fa-solid fa-crown govuk-!-margin-right-2" style="color: #f47738;" aria-hidden="true"></i>
                     Transfer Ownership
@@ -113,7 +113,7 @@ $basePath = \Nexus\Core\TenantContext::getBasePath();
 
         <?php if ($isAdmin && !empty($pendingMembers)): ?>
             <!-- Pending Membership Requests -->
-            <div class="govuk-!-margin-bottom-6 govuk-!-padding-4" style="background: #f3f2f1; border-left: 5px solid #f47738;">
+            <div class="govuk-!-margin-bottom-6 govuk-!-padding-4 civicone-panel-bg" style="border-left: 5px solid #f47738;">
                 <h3 class="govuk-heading-s govuk-!-margin-bottom-3">
                     <i class="fa-solid fa-user-clock govuk-!-margin-right-2" style="color: #f47738;" aria-hidden="true"></i>
                     Pending Requests
@@ -178,25 +178,25 @@ $basePath = \Nexus\Core\TenantContext::getBasePath();
             ?>
             <div class="govuk-grid-row govuk-!-margin-bottom-4">
                 <div class="govuk-grid-column-one-quarter">
-                    <div class="govuk-!-padding-3 govuk-!-text-align-center" style="background: #f3f2f1; border-left: 3px solid #1d70b8;">
+                    <div class="govuk-!-padding-3 govuk-!-text-align-center civicone-panel-bg" style="border-left: 3px solid #1d70b8;">
                         <p class="govuk-heading-m govuk-!-margin-bottom-0" style="color: #1d70b8;"><?= count($members) ?></p>
                         <p class="govuk-body-s govuk-!-margin-bottom-0">Total</p>
                     </div>
                 </div>
                 <div class="govuk-grid-column-one-quarter">
-                    <div class="govuk-!-padding-3 govuk-!-text-align-center" style="background: #f3f2f1; border-left: 3px solid #f47738;">
+                    <div class="govuk-!-padding-3 govuk-!-text-align-center civicone-panel-bg" style="border-left: 3px solid #f47738;">
                         <p class="govuk-heading-m govuk-!-margin-bottom-0" style="color: #f47738;"><?= $ownerCount ?></p>
                         <p class="govuk-body-s govuk-!-margin-bottom-0">Owner</p>
                     </div>
                 </div>
                 <div class="govuk-grid-column-one-quarter">
-                    <div class="govuk-!-padding-3 govuk-!-text-align-center" style="background: #f3f2f1; border-left: 3px solid #912b88;">
+                    <div class="govuk-!-padding-3 govuk-!-text-align-center civicone-panel-bg" style="border-left: 3px solid #912b88;">
                         <p class="govuk-heading-m govuk-!-margin-bottom-0" style="color: #912b88;"><?= $adminCount ?></p>
                         <p class="govuk-body-s govuk-!-margin-bottom-0">Admins</p>
                     </div>
                 </div>
                 <div class="govuk-grid-column-one-quarter">
-                    <div class="govuk-!-padding-3 govuk-!-text-align-center" style="background: #f3f2f1; border-left: 3px solid #505a5f;">
+                    <div class="govuk-!-padding-3 govuk-!-text-align-center civicone-panel-bg" style="border-left: 3px solid #505a5f;">
                         <p class="govuk-heading-m govuk-!-margin-bottom-0" style="color: #505a5f;"><?= $memberCount ?></p>
                         <p class="govuk-body-s govuk-!-margin-bottom-0">Members</p>
                     </div>
@@ -204,7 +204,7 @@ $basePath = \Nexus\Core\TenantContext::getBasePath();
             </div>
 
             <?php if (empty($members)): ?>
-                <div class="govuk-!-padding-6 govuk-!-text-align-center" style="background: #f3f2f1; border-left: 5px solid #1d70b8;">
+                <div class="govuk-!-padding-6 govuk-!-text-align-center civicone-panel-bg" style="border-left: 5px solid #1d70b8;">
                     <p class="govuk-body govuk-!-margin-bottom-4">
                         <i class="fa-solid fa-users-slash fa-3x" style="color: #1d70b8;" aria-hidden="true"></i>
                     </p>
@@ -325,7 +325,7 @@ $basePath = \Nexus\Core\TenantContext::getBasePath();
             </div>
 
             <!-- Wallet Balance -->
-            <div class="govuk-!-margin-bottom-4 govuk-!-padding-3" style="background: #f3f2f1; border-left: 3px solid #1d70b8;">
+            <div class="govuk-!-margin-bottom-4 govuk-!-padding-3 civicone-panel-bg" style="border-left: 3px solid #1d70b8;">
                 <p class="govuk-body-s govuk-!-margin-bottom-0">
                     <i class="fa-solid fa-wallet govuk-!-margin-right-2" style="color: #1d70b8;" aria-hidden="true"></i>
                     Organization Balance: <strong><?= number_format($walletBalance ?? 0, 2) ?></strong> credits

@@ -25,7 +25,7 @@ $basePath = \Nexus\Core\TenantContext::getBasePath();
 <div class="govuk-grid-row govuk-!-margin-bottom-6">
     <!-- Balance Card -->
     <div class="govuk-grid-column-one-half">
-        <div class="govuk-!-padding-6" style="background: #f3f2f1; border-left: 5px solid #00703c;">
+        <div class="govuk-!-padding-6 civicone-panel-bg" style="border-left: 5px solid #00703c;">
             <h2 class="govuk-heading-m">Current Balance</h2>
             <p class="govuk-heading-xl govuk-!-margin-bottom-2" style="color: #00703c;">
                 <?= number_format($user['balance'] ?? 0) ?>
@@ -45,7 +45,7 @@ $basePath = \Nexus\Core\TenantContext::getBasePath();
                 <input type="hidden" name="recipient_id" id="civicRecipientId" value="">
 
                 <!-- Selected User Display -->
-                <div class="govuk-!-padding-3 govuk-!-margin-bottom-4" id="civicSelectedUser" style="background: #f3f2f1; display: none;">
+                <div class="govuk-!-padding-3 govuk-!-margin-bottom-4 civicone-panel-bg" id="civicSelectedUser" style="display: none;">
                     <div style="display: flex; gap: 1rem; align-items: center;">
                         <div id="civicSelectedAvatar" style="width: 40px; height: 40px; border-radius: 50%; background: #1d70b8; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold;">?</div>
                         <div style="flex: 1;">

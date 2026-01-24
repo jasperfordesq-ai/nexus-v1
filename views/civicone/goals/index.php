@@ -61,7 +61,7 @@ $basePath = Nexus\Core\TenantContext::getBasePath();
 
                     <!-- Progress Bar -->
                     <div class="govuk-!-margin-bottom-2" role="progressbar" aria-valuenow="<?= $progress ?>" aria-valuemin="0" aria-valuemax="100" aria-label="<?= $progress ?>% complete">
-                        <div style="height: 8px; background: #f3f2f1; border-radius: 4px; overflow: hidden;">
+                        <div class="civicone-panel-bg" style="height: 8px; border-radius: 4px; overflow: hidden;">
                             <div style="width: <?= $progress ?>%; height: 100%; background: <?= $progressColor ?>;"></div>
                         </div>
                     </div>

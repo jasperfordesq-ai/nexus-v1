@@ -40,7 +40,7 @@ $basePath = \Nexus\Core\TenantContext::getBasePath();
                 </div>
 
                 <!-- Filters -->
-                <div class="govuk-!-margin-bottom-6 govuk-!-padding-4" style="background: #f3f2f1; border-left: 5px solid #1d70b8;">
+                <div class="govuk-!-margin-bottom-6 govuk-!-padding-4 civicone-panel-bg" style="border-left: 5px solid #1d70b8;">
                     <form method="GET">
                         <div class="govuk-grid-row">
                             <div class="govuk-grid-column-one-quarter">
@@ -102,7 +102,7 @@ $basePath = \Nexus\Core\TenantContext::getBasePath();
 
                 <!-- Log Entries -->
                 <?php if (empty($logs)): ?>
-                    <div class="govuk-!-padding-6 govuk-!-text-align-center" style="background: #f3f2f1; border-left: 5px solid #1d70b8;">
+                    <div class="govuk-!-padding-6 govuk-!-text-align-center civicone-panel-bg" style="border-left: 5px solid #1d70b8;">
                         <p class="govuk-body govuk-!-margin-bottom-4">
                             <i class="fa-solid fa-shield-halved fa-3x" style="color: #1d70b8;" aria-hidden="true"></i>
                         </p>

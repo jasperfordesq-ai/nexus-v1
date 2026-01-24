@@ -138,7 +138,7 @@ switch ($member['service_reach'] ?? 'local_only') {
 
                     <!-- Trust Score -->
                     <?php if ($trustScore['score'] > 0): ?>
-                        <div class="govuk-!-padding-4 govuk-!-margin-bottom-6" style="background: #f3f2f1; border-left: 5px solid #00703c;">
+                        <div class="govuk-!-padding-4 govuk-!-margin-bottom-6 civicone-panel-bg" style="border-left: 5px solid #00703c;">
                             <div style="display: flex; align-items: center; gap: 16px;">
                                 <div style="text-align: center;">
                                     <p class="govuk-heading-xl govuk-!-margin-bottom-0" style="color: #00703c;">
@@ -198,7 +198,7 @@ switch ($member['service_reach'] ?? 'local_only') {
 
                         <div role="list" aria-label="User reviews">
                             <?php foreach ($reviews as $review): ?>
-                            <article class="govuk-!-padding-4 govuk-!-margin-bottom-4" style="background: #f3f2f1;" role="listitem">
+                            <article class="govuk-!-padding-4 govuk-!-margin-bottom-4 civicone-panel-bg" role="listitem">
                                 <div style="display: flex; gap: 12px;">
                                     <div style="width: 40px; height: 40px; border-radius: 50%; background: #1d70b8; color: #fff; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
                                         <?php if (!empty($review['reviewer_avatar'])): ?>
@@ -241,7 +241,7 @@ switch ($member['service_reach'] ?? 'local_only') {
                             <?php endforeach; ?>
                         </div>
                     <?php elseif (!$reviewStats || $reviewStats['total'] === 0): ?>
-                        <div class="govuk-!-padding-6 govuk-!-text-align-center govuk-!-margin-bottom-6" style="background: #f3f2f1;">
+                        <div class="govuk-!-padding-6 govuk-!-text-align-center govuk-!-margin-bottom-6 civicone-panel-bg">
                             <i class="fa-regular fa-comments fa-2x govuk-!-margin-bottom-2" style="color: #505a5f;" aria-hidden="true"></i>
                             <p class="govuk-body govuk-!-margin-bottom-1">No reviews yet</p>
                             <p class="govuk-body-s govuk-!-margin-bottom-0" style="color: #505a5f;">

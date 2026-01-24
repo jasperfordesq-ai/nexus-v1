@@ -6,6 +6,22 @@
  */
 
 /* ============================================
+   CRITICAL: Hide mobile navigation on desktop
+   ============================================ */
+@media (min-width: 1025px) {
+    .mobile-fullscreen-menu,
+    .mobile-notification-sheet,
+    .mobile-tab-bar,
+    #mobileMenu,
+    #mobileNotifications {
+        display: none !important;
+        visibility: hidden !important;
+        opacity: 0 !important;
+        pointer-events: none !important;
+    }
+}
+
+/* ============================================
    CSS VARIABLES - Design Tokens
    ============================================ */
 :root {

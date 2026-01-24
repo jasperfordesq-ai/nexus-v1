@@ -98,7 +98,7 @@ $basePath = \Nexus\Core\TenantContext::getBasePath();
 
                     <?php if (\Nexus\Core\TenantContext::hasFeature('wallet')): ?>
                         <!-- Auto-Pay Feature Box -->
-                        <div class="govuk-!-margin-bottom-6 govuk-!-padding-4" style="background: #f3f2f1; border-left: 5px solid #f47738;">
+                        <div class="govuk-!-margin-bottom-6 govuk-!-padding-4 civicone-panel-bg" style="border-left: 5px solid #f47738;">
                             <div class="govuk-checkboxes" data-module="govuk-checkboxes">
                                 <div class="govuk-checkboxes__item">
                                     <input type="checkbox"
@@ -121,7 +121,7 @@ $basePath = \Nexus\Core\TenantContext::getBasePath();
                         </div>
 
                         <!-- Quick Actions -->
-                        <div class="govuk-!-margin-bottom-6 govuk-!-padding-4" style="background: #f3f2f1; border-left: 5px solid #1d70b8;">
+                        <div class="govuk-!-margin-bottom-6 govuk-!-padding-4 civicone-panel-bg" style="border-left: 5px solid #1d70b8;">
                             <h3 class="govuk-heading-s govuk-!-margin-bottom-3">
                                 <i class="fa-solid fa-bolt govuk-!-margin-right-2" style="color: #1d70b8;" aria-hidden="true"></i>
                                 Quick Actions

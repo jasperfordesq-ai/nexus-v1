@@ -43,7 +43,7 @@ require dirname(__DIR__, 2) . '/layouts/civicone/header.php';
 <div class="govuk-grid-row">
     <!-- Sidebar TOC -->
     <div class="govuk-grid-column-one-third">
-        <nav class="govuk-!-padding-4 govuk-!-margin-bottom-6" style="background: #f3f2f1; position: sticky; top: 1rem;" aria-label="Page contents">
+        <nav class="govuk-!-padding-4 govuk-!-margin-bottom-6 civicone-panel-bg" style="position: sticky; top: 1rem;" aria-label="Page contents">
             <h3 class="govuk-heading-s govuk-!-margin-bottom-3">Contents</h3>
             <ul class="govuk-list">
                 <li><a href="#executive-summary" class="govuk-link">1. Executive Summary</a></li>
@@ -97,7 +97,7 @@ require dirname(__DIR__, 2) . '/layouts/civicone/header.php';
 
                     <div class="govuk-grid-row">
                         <div class="govuk-grid-column-one-half govuk-!-margin-bottom-4">
-                            <div class="govuk-!-padding-3" style="border-left: 4px solid #00703c; background: #f3f2f1;">
+                            <div class="govuk-!-padding-3 civicone-panel-bg" style="border-left: 4px solid #00703c;">
                                 <h4 class="govuk-heading-s" style="color: #00703c;">Strengths</h4>
                                 <ul class="govuk-list govuk-list--bullet govuk-body-s">
                                     <li><strong>Proven Impact:</strong> Independently validated 1:16 SROI.</li>
@@ -107,7 +107,7 @@ require dirname(__DIR__, 2) . '/layouts/civicone/header.php';
                             </div>
                         </div>
                         <div class="govuk-grid-column-one-half govuk-!-margin-bottom-4">
-                            <div class="govuk-!-padding-3" style="border-left: 4px solid #d4351c; background: #f3f2f1;">
+                            <div class="govuk-!-padding-3 civicone-panel-bg" style="border-left: 4px solid #d4351c;">
                                 <h4 class="govuk-heading-s" style="color: #d4351c;">Weaknesses</h4>
                                 <ul class="govuk-list govuk-list--bullet govuk-body-s">
                                     <li><strong>Financial Instability:</strong> Funding gap after shop closure.</li>
@@ -117,7 +117,7 @@ require dirname(__DIR__, 2) . '/layouts/civicone/header.php';
                             </div>
                         </div>
                         <div class="govuk-grid-column-one-half govuk-!-margin-bottom-4">
-                            <div class="govuk-!-padding-3" style="border-left: 4px solid #1d70b8; background: #f3f2f1;">
+                            <div class="govuk-!-padding-3 civicone-panel-bg" style="border-left: 4px solid #1d70b8;">
                                 <h4 class="govuk-heading-s" style="color: #1d70b8;">Opportunities</h4>
                                 <ul class="govuk-list govuk-list--bullet govuk-body-s">
                                     <li><strong>Public Sector Contracts:</strong> HSE Social Prescribing.</li>
@@ -127,7 +127,7 @@ require dirname(__DIR__, 2) . '/layouts/civicone/header.php';
                             </div>
                         </div>
                         <div class="govuk-grid-column-one-half govuk-!-margin-bottom-4">
-                            <div class="govuk-!-padding-3" style="border-left: 4px solid #f47738; background: #f3f2f1;">
+                            <div class="govuk-!-padding-3 civicone-panel-bg" style="border-left: 4px solid #f47738;">
                                 <h4 class="govuk-heading-s" style="color: #f47738;">Threats</h4>
                                 <ul class="govuk-list govuk-list--bullet govuk-body-s">
                                     <li><strong>Funding Cliff:</strong> Securing long-term coordinator funding.</li>

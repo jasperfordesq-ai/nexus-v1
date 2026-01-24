@@ -45,25 +45,25 @@ $basePath = \Nexus\Core\TenantContext::getBasePath();
 <!-- Stats Grid -->
 <div class="govuk-grid-row govuk-!-margin-bottom-6">
     <div class="govuk-grid-column-one-quarter">
-        <div class="govuk-!-padding-4" style="background: #f3f2f1; text-align: center;">
+        <div class="govuk-!-padding-4 civicone-panel-bg" style="text-align: center;">
             <p class="govuk-heading-l govuk-!-margin-bottom-1" style="color: #00703c;">+<?= number_format($insights['total_received'] ?? 0, 1) ?></p>
             <p class="govuk-body-s govuk-!-margin-bottom-0" style="color: #505a5f;">Total Received</p>
         </div>
     </div>
     <div class="govuk-grid-column-one-quarter">
-        <div class="govuk-!-padding-4" style="background: #f3f2f1; text-align: center;">
+        <div class="govuk-!-padding-4 civicone-panel-bg" style="text-align: center;">
             <p class="govuk-heading-l govuk-!-margin-bottom-1" style="color: #d4351c;">-<?= number_format($insights['total_sent'] ?? 0, 1) ?></p>
             <p class="govuk-body-s govuk-!-margin-bottom-0" style="color: #505a5f;">Total Sent</p>
         </div>
     </div>
     <div class="govuk-grid-column-one-quarter">
-        <div class="govuk-!-padding-4" style="background: #f3f2f1; text-align: center;">
+        <div class="govuk-!-padding-4 civicone-panel-bg" style="text-align: center;">
             <p class="govuk-heading-l govuk-!-margin-bottom-1"><?= $insights['transaction_count'] ?? 0 ?></p>
             <p class="govuk-body-s govuk-!-margin-bottom-0" style="color: #505a5f;">Transactions</p>
         </div>
     </div>
     <div class="govuk-grid-column-one-quarter">
-        <div class="govuk-!-padding-4" style="background: #f3f2f1; text-align: center;">
+        <div class="govuk-!-padding-4 civicone-panel-bg" style="text-align: center;">
             <p class="govuk-heading-l govuk-!-margin-bottom-1" style="color: <?= ($insights['net_change'] ?? 0) >= 0 ? '#00703c' : '#d4351c' ?>;">
                 <?= ($insights['net_change'] ?? 0) >= 0 ? '+' : '' ?><?= number_format($insights['net_change'] ?? 0, 1) ?>
             </p>

@@ -44,7 +44,7 @@ if (class_exists('Nexus\Core\TenantContext')) {
     </div>
     <div class="govuk-grid-column-one-third">
         <!-- Quick Navigation -->
-        <nav class="govuk-!-padding-4" style="background: #f3f2f1;" aria-label="Page contents">
+        <nav class="govuk-!-padding-4 civicone-panel-bg" aria-label="Page contents">
             <h2 class="govuk-heading-s govuk-!-margin-bottom-3">Contents</h2>
             <ul class="govuk-list">
                 <li><a href="#data-collection" class="govuk-link">Data Collection</a></li>

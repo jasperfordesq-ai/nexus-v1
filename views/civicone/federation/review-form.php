@@ -53,7 +53,7 @@ $completedAt = $transaction['completed_at'] ?? $transaction['created_at'] ?? nul
                     </h1>
 
                     <!-- Receiver Info -->
-                    <div class="govuk-!-padding-4 govuk-!-margin-bottom-6 govuk-!-text-align-center" style="background: #f3f2f1;">
+                    <div class="govuk-!-padding-4 govuk-!-margin-bottom-6 govuk-!-text-align-center civicone-panel-bg">
                         <div style="width: 80px; height: 80px; border-radius: 50%; margin: 0 auto 16px; overflow: hidden; border: 3px solid #1d70b8;">
                             <?php if ($receiverAvatar): ?>
                                 <img src="<?= htmlspecialchars($receiverAvatar) ?>"

@@ -78,6 +78,34 @@ $isListingsActiveTab = isNavActive('/listings', $currentPath, $basePath);
 $isMessagesActiveTab = isNavActive('/messages', $currentPath, $basePath);
 $isProfileActiveTab = isNavActive('/profile', $currentPath, $basePath) || isNavActive('/dashboard', $currentPath, $basePath);
 ?>
+<!-- CRITICAL: Absolutely positioned overlay to hide mobile menu on desktop -->
+<style>
+/* Nuclear option: absolute hide on desktop with max specificity */
+@media (min-width: 1025px) {
+    body .mobile-fullscreen-menu,
+    body .mobile-notification-sheet,
+    body #mobileMenu,
+    body #mobileNotifications,
+    body .mobile-tab-bar,
+    html body .mobile-fullscreen-menu,
+    html body .mobile-notification-sheet,
+    html body #mobileMenu,
+    html body #mobileNotifications,
+    html body .mobile-tab-bar {
+        display: none !important;
+        visibility: hidden !important;
+        opacity: 0 !important;
+        pointer-events: none !important;
+        position: absolute !important;
+        left: -9999px !important;
+        top: -9999px !important;
+        width: 0 !important;
+        height: 0 !important;
+        overflow: hidden !important;
+        clip: rect(0,0,0,0) !important;
+    }
+}
+</style>
 <!-- Mobile Tab Bar -->
 <!-- Mobile Bottom Tab Bar -->
 <nav class="mobile-tab-bar" id="mobileTabBar" role="navigation" aria-label="Mobile navigation">

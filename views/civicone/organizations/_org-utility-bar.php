@@ -26,7 +26,7 @@ $role = $role ?? 'member';
 $pendingCount = $pendingCount ?? 0;
 ?>
 
-<div class="govuk-!-margin-bottom-6 govuk-!-padding-4" style="background: #f3f2f1; border-left: 5px solid #1d70b8;">
+<div class="govuk-!-margin-bottom-6 govuk-!-padding-4 civicone-panel-bg" style="border-left: 5px solid #1d70b8;">
     <!-- Header with org identity and actions -->
     <div class="govuk-grid-row govuk-!-margin-bottom-4">
         <div class="govuk-grid-column-two-thirds">

@@ -9,6 +9,10 @@ module.exports = {
 
     // CSS files to purge
     // Auto-discovered: 2026-01-24
+    //
+    // ⚠️ IMPORTANT: Design token files are EXCLUDED from this list
+    // They contain CSS variables that PurgeCSS incorrectly removes
+    // See CSS_BUILD_RULES.md for details
     css: [
         'httpdocs/assets/css/accessibility.css',
         'httpdocs/assets/css/achievements.css',
@@ -167,6 +171,7 @@ module.exports = {
         'httpdocs/assets/css/civicone-report-pages.css',
         'httpdocs/assets/css/civicone-resources-form.css',
         'httpdocs/assets/css/civicone-reviews-create.css',
+        'httpdocs/assets/css/civicone-service-navigation.css',
         'httpdocs/assets/css/civicone-search-results.css',
         'httpdocs/assets/css/civicone-shared-accessibility-helpers.css',
         'httpdocs/assets/css/civicone-shared-post-card.css',
@@ -194,8 +199,9 @@ module.exports = {
         'httpdocs/assets/css/cookie-banner.css',
         'httpdocs/assets/css/cookie-preferences.css',
         'httpdocs/assets/css/dashboard.css',
-        'httpdocs/assets/css/design-tokens.css',
-        'httpdocs/assets/css/desktop-design-tokens.css',
+        // EXCLUDED: Design tokens should NEVER be purged - they contain CSS variables
+        // 'httpdocs/assets/css/design-tokens.css',
+        // 'httpdocs/assets/css/desktop-design-tokens.css',
         'httpdocs/assets/css/desktop-hover-system.css',
         'httpdocs/assets/css/desktop-loading-states.css',
         'httpdocs/assets/css/dev-notice-modal.css',
@@ -239,7 +245,7 @@ module.exports = {
         'httpdocs/assets/css/messages-thread.css',
         'httpdocs/assets/css/micro-interactions.css',
         'httpdocs/assets/css/mobile-accessibility-fixes.css',
-        'httpdocs/assets/css/mobile-design-tokens.css',
+        // 'httpdocs/assets/css/mobile-design-tokens.css', // EXCLUDED: Never purge design tokens
         'httpdocs/assets/css/mobile-loading-states.css',
         'httpdocs/assets/css/mobile-micro-interactions.css',
         'httpdocs/assets/css/mobile-nav-v2.css',

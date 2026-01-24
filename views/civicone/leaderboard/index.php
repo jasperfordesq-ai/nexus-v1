@@ -103,7 +103,7 @@ $basePath = \Nexus\Core\TenantContext::getBasePath();
                 elseif ($entry['rank'] === 2) $tagClass = 'govuk-tag--grey';
                 elseif ($entry['rank'] === 3) $tagClass = 'govuk-tag--orange';
             ?>
-                <tr class="govuk-table__row" <?= $isCurrentUser ? 'style="background: #f3f2f1;"' : '' ?>>
+                <tr class="govuk-table__row <?= $isCurrentUser ? 'civicone-panel-bg' : '' ?>">
                     <td class="govuk-table__cell">
                         <?php if ($medal): ?>
                             <span class="govuk-tag <?= $tagClass ?>" aria-label="Rank <?= $entry['rank'] ?>">
@@ -151,7 +151,7 @@ $basePath = \Nexus\Core\TenantContext::getBasePath();
         $loginStreak = $userStreaks['login'];
         $streakIcon = \Nexus\Services\StreakService::getStreakIcon($loginStreak['current']);
         ?>
-        <div class="govuk-!-padding-4 govuk-!-margin-bottom-6" style="background: #f3f2f1; border-left: 5px solid #f47738;">
+        <div class="govuk-!-padding-4 govuk-!-margin-bottom-6 civicone-panel-bg" style="border-left: 5px solid #f47738;">
             <p class="govuk-body-l govuk-!-margin-bottom-0">
                 <span aria-hidden="true"><?= $streakIcon ?></span>
                 <strong><?= $loginStreak['current'] ?> day login streak</strong>
@@ -171,7 +171,7 @@ $basePath = \Nexus\Core\TenantContext::getBasePath();
                 <p class="govuk-body-s govuk-!-margin-bottom-1" aria-hidden="true">⭐</p>
                 <p class="govuk-heading-m govuk-!-margin-bottom-1">Level <?= $userStats['level'] ?></p>
                 <p class="govuk-body-s govuk-!-margin-bottom-3" style="color: #505a5f;"><?= number_format($userStats['xp']) ?> XP</p>
-                <div style="height: 8px; background: #f3f2f1; border-radius: 4px; overflow: hidden;" role="progressbar" aria-valuenow="<?= $userStats['level_progress'] ?>" aria-valuemin="0" aria-valuemax="100">
+                <div class="civicone-panel-bg" style="height: 8px; border-radius: 4px; overflow: hidden;" role="progressbar" aria-valuenow="<?= $userStats['level_progress'] ?>" aria-valuemin="0" aria-valuemax="100">
                     <div style="width: <?= $userStats['level_progress'] ?>%; height: 100%; background: #1d70b8;"></div>
                 </div>
                 <?php if ($userStats['xp_for_next']): ?>

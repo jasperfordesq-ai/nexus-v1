@@ -37,7 +37,7 @@ $basePath = \Nexus\Core\TenantContext::getBasePath();
 
         <?php if (empty($applications)): ?>
             <!-- Empty State -->
-            <div class="govuk-!-padding-6 govuk-!-text-align-center" style="background: #f3f2f1; border-left: 5px solid #1d70b8;">
+            <div class="govuk-!-padding-6 govuk-!-text-align-center civicone-panel-bg" style="border-left: 5px solid #1d70b8;">
                 <p class="govuk-body govuk-!-margin-bottom-4">
                     <i class="fa-solid fa-clipboard fa-3x" style="color: #1d70b8;" aria-hidden="true"></i>
                 </p>
@@ -54,7 +54,7 @@ $basePath = \Nexus\Core\TenantContext::getBasePath();
 
             <!-- Badges Section -->
             <?php if (!empty($badges)): ?>
-                <div class="govuk-!-margin-bottom-6 govuk-!-padding-4" style="background: #f3f2f1; border-left: 5px solid #f47738;">
+                <div class="govuk-!-margin-bottom-6 govuk-!-padding-4 civicone-panel-bg" style="border-left: 5px solid #f47738;">
                     <h2 class="govuk-heading-m">
                         <i class="fa-solid fa-award govuk-!-margin-right-2" style="color: #f47738;" aria-hidden="true"></i>
                         Achievements
