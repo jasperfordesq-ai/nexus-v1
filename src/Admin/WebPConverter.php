@@ -268,8 +268,9 @@ class WebPConverter
      */
     public function convertOnUpload(string $uploadedFilePath): array
     {
-        // Only convert if it's an image
-        $mimeType = mime_content_type($uploadedFilePath);
+        // Only convert if it's an image (use finfo instead of deprecated mime_content_type)
+        $finfo = new \finfo(FILEINFO_MIME_TYPE);
+        $mimeType = $finfo->file($uploadedFilePath);
         if (!str_starts_with($mimeType, 'image/')) {
             return ['success' => false, 'message' => 'Not an image'];
         }

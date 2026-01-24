@@ -46,8 +46,15 @@ class ResourceItem
     public static function delete($id)
     {
         $res = self::find($id);
-        if ($res && file_exists(__DIR__ . '/../../httpdocs' . $res['file_path'])) {
-            unlink(__DIR__ . '/../../httpdocs' . $res['file_path']);
+        if ($res && !empty($res['file_path'])) {
+            // Security: Validate path is within uploads directory to prevent path traversal
+            $uploadsDir = realpath(__DIR__ . '/../../httpdocs/uploads');
+            $fullPath = realpath(__DIR__ . '/../../httpdocs' . $res['file_path']);
+
+            // Only delete if file exists AND is within the uploads directory
+            if ($fullPath && $uploadsDir && strpos($fullPath, $uploadsDir) === 0 && file_exists($fullPath)) {
+                unlink($fullPath);
+            }
         }
         Database::query("DELETE FROM resources WHERE id = ?", [$id]);
     }
