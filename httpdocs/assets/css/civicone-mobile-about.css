@@ -237,6 +237,10 @@ body {
     transition: transform var(--transition-spring);
 }
 
+.theme-icon--rotating {
+    transform: rotate(360deg) scale(0);
+}
+
 [data-theme="dark"] .theme-icon {
     color: var(--color-warning-400);
 }
@@ -343,6 +347,7 @@ body {
     padding: var(--space-5) 16px calc(100px + env(safe-area-inset-bottom));
     -webkit-overflow-scrolling: touch;
     overscroll-behavior-y: contain;
+    scroll-behavior: smooth;
 }
 
 /* Custom scrollbar */

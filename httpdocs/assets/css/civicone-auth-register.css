@@ -257,3 +257,161 @@
         background: var(--color-slate-800);
         color: var(--color-slate-100);
     }
+
+/* ==========================================
+   Additional Utility Classes
+   GOV.UK Compliant - No inline styles
+   ========================================== */
+
+/* CivicOne wrapper with top padding */
+.civicone-wrapper--auth {
+    padding-top: var(--space-10);
+}
+
+/* Honeypot field (hidden from users) */
+.honeypot-field {
+    display: none !important;
+}
+
+/* Organisation field visibility toggle */
+.auth-org-field {
+    display: none;
+}
+
+.auth-org-field.visible {
+    display: block;
+}
+
+/* GDPR Consent section */
+.auth-consent-group {
+    margin-top: var(--space-5);
+}
+
+.auth-consent-label {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-2-5);
+    cursor: pointer;
+    font-size: var(--font-size-sm);
+    color: var(--color-govuk-black);
+}
+
+.auth-consent-checkbox {
+    margin-top: var(--space-1);
+    width: var(--space-6);
+    height: var(--space-6);
+    min-width: var(--space-6);
+    accent-color: var(--color-govuk-blue);
+}
+
+.auth-consent-checkbox:focus {
+    outline: 3px solid var(--color-govuk-yellow);
+    outline-offset: 0;
+}
+
+/* Links with underline */
+.auth-link-underline {
+    text-decoration: underline;
+    color: var(--color-govuk-blue);
+}
+
+.auth-link-underline:hover {
+    color: var(--color-govuk-blue-dark);
+}
+
+.auth-link-underline:focus {
+    outline: 3px solid var(--color-govuk-yellow);
+    outline-offset: 0;
+    background-color: var(--color-govuk-yellow);
+    color: var(--color-govuk-black);
+}
+
+/* Data Protection Notice Box */
+.auth-data-notice {
+    font-size: var(--font-size-sm);
+    color: var(--color-govuk-black);
+    line-height: 1.5;
+    margin-bottom: var(--space-5);
+    padding: var(--space-4);
+    background-color: var(--color-gray-100);
+    border-left: 4px solid var(--color-govuk-blue);
+}
+
+.auth-data-notice-title {
+    margin-top: 0;
+    margin-bottom: var(--space-2);
+    font-weight: var(--font-weight-bold);
+    color: var(--color-govuk-black);
+}
+
+.auth-data-notice p {
+    margin: var(--space-1) 0;
+}
+
+.auth-data-notice-list {
+    padding-left: var(--space-5);
+    margin: var(--space-1) 0;
+}
+
+.auth-data-notice p:last-child {
+    margin-bottom: 0;
+}
+
+/* Password rule validation states */
+.password-rule {
+    transition: color 0.2s ease;
+}
+
+.password-rule--valid {
+    color: var(--color-govuk-green);
+}
+
+.password-rule--invalid {
+    color: var(--color-govuk-red);
+}
+
+/* Submit button enabled state (controlled by JS) */
+.auth-submit-btn--enabled {
+    background-color: var(--color-govuk-green) !important;
+    box-shadow: 0 2px 0 var(--color-govuk-green-darker) !important;
+    opacity: 1 !important;
+    pointer-events: auto !important;
+    cursor: pointer !important;
+}
+
+.auth-submit-btn--enabled:hover {
+    background-color: var(--color-govuk-green-dark) !important;
+}
+
+.auth-submit-btn--enabled:focus {
+    outline: 3px solid transparent;
+    background-color: var(--color-govuk-yellow) !important;
+    color: var(--color-govuk-black) !important;
+    box-shadow: 0 2px 0 var(--color-govuk-black) !important;
+}
+
+/* GOV.UK Focus states for form inputs */
+.form-input:focus {
+    outline: 3px solid var(--color-govuk-yellow);
+    outline-offset: 0;
+    border-color: var(--color-govuk-black);
+}
+
+/* Dark mode for additional classes */
+[data-theme="dark"] .auth-consent-label {
+    color: var(--color-slate-200);
+}
+
+[data-theme="dark"] .auth-data-notice {
+    background-color: var(--color-slate-900-alpha-60);
+    border-color: var(--color-govuk-blue-lighter);
+    color: var(--color-slate-300);
+}
+
+[data-theme="dark"] .auth-data-notice-title {
+    color: var(--color-slate-200);
+}
+
+[data-theme="dark"] .auth-link-underline {
+    color: var(--color-govuk-blue-lighter);
+}
