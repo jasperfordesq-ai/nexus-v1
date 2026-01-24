@@ -677,17 +677,25 @@
 }
 
 .civicone-utility-link--highlight {
-    background-color: #1d70b8;
-    color: #ffffff;
+    background-color: #00703c;
+    color: #ffffff !important;
+    padding: 4px 10px;
+    border-radius: 2px;
+    font-weight: 700;
 }
 
 .civicone-utility-link--highlight:hover {
-    background-color: #003078;
-    color: #ffffff;
+    background-color: #005a30;
+    color: #ffffff !important;
+    text-decoration: none;
 }
 
 .civicone-utility-link--highlight:focus {
-    color: #0b0c0c;
+    outline: 3px solid transparent;
+    color: #0b0c0c !important;
+    background-color: #ffdd00;
+    box-shadow: 0 -2px #ffdd00, 0 4px #0b0c0c;
+    text-decoration: none;
 }
 
 /* Utility Dropdown */
