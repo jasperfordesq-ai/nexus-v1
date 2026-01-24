@@ -65,9 +65,9 @@ function openBadgeModal(element) {
         rarityBar.style.width = '0%';
     }
 
-    // Show modal and hide navbar
+    // Show modal and hide navbar - using classList for GOV.UK compliance
     modal.classList.add('visible');
-    document.body.style.overflow = 'hidden';
+    document.body.classList.add('body-no-scroll');
 
     // Hide navbar and bottom tab bar while drawer is open
     const navbar = document.querySelector('.nexus-navbar');
@@ -126,17 +126,17 @@ function closeBadgeModal() {
         mobileTabBar.classList.remove('hidden');
     }
 
-    // On mobile, animate drawer closing
+    // On mobile, animate drawer closing - using classList for GOV.UK compliance
     if (window.innerWidth <= 640 && content) {
         content.classList.add('closing');
         setTimeout(() => {
             modal.classList.remove('visible');
             content.classList.remove('closing');
-            document.body.style.overflow = '';
+            document.body.classList.remove('body-no-scroll');
         }, 200);
     } else {
         modal.classList.remove('visible');
-        document.body.style.overflow = '';
+        document.body.classList.remove('body-no-scroll');
     }
 }
 
