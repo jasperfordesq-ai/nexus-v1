@@ -2,6 +2,7 @@
 
 namespace Nexus\Controllers;
 
+use Nexus\Core\Csrf;
 use Nexus\Core\Database;
 use Nexus\Core\TenantContext;
 use Nexus\Models\Tenant;
@@ -32,6 +33,7 @@ class MasterController
     public function createTenant()
     {
         $this->checkSuperAdmin();
+        Csrf::verifyOrDie();
 
         $name = $_POST['name'] ?? '';
         $slug = $_POST['slug'] ?? '';
@@ -93,6 +95,7 @@ class MasterController
     public function addAdmin()
     {
         $this->checkSuperAdmin();
+        Csrf::verifyOrDie();
 
         $tenantId = $_POST['tenant_id'];
         $name = $_POST['name'];
@@ -122,6 +125,7 @@ class MasterController
     public function deleteAdmin()
     {
         $this->checkSuperAdmin();
+        Csrf::verifyOrDie();
         $adminId = $_POST['admin_id'] ?? 0;
         $tenantId = $_POST['tenant_id'] ?? 0;
 
@@ -158,6 +162,7 @@ class MasterController
     public function update()
     {
         $this->checkSuperAdmin();
+        Csrf::verifyOrDie();
 
         $id = $_POST['id'];
         $name = $_POST['name'];
@@ -255,6 +260,7 @@ class MasterController
     public function deleteUser()
     {
         $this->checkSuperAdmin();
+        Csrf::verifyOrDie();
         $userId = $_POST['user_id'] ?? null;
 
         if ($userId) {
@@ -274,6 +280,7 @@ class MasterController
     public function approveUser()
     {
         $this->checkSuperAdmin();
+        Csrf::verifyOrDie();
         $userId = $_POST['user_id'] ?? null;
 
         if ($userId) {

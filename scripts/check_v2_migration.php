@@ -30,7 +30,9 @@ try {
 
     $missing = [];
     foreach ($tables as $table) {
-        $result = $pdo->query("SHOW TABLES LIKE '{$table}'")->fetch();
+        $stmt = $pdo->prepare("SHOW TABLES LIKE ?");
+        $stmt->execute([$table]);
+        $result = $stmt->fetch();
         $status = $result ? '✓ EXISTS' : '✗ MISSING';
         echo "{$status}: {$table}\n";
         if (!$result) $missing[] = $table;
@@ -42,7 +44,9 @@ try {
     $columns = ['target_audience', 'audience_config', 'schedule', 'activated_at', 'last_run_at', 'total_awards'];
     foreach ($columns as $col) {
         try {
-            $result = $pdo->query("SHOW COLUMNS FROM achievement_campaigns LIKE '{$col}'")->fetch();
+            $stmt = $pdo->prepare("SHOW COLUMNS FROM achievement_campaigns LIKE ?");
+            $stmt->execute([$col]);
+            $result = $stmt->fetch();
             $status = $result ? '✓ EXISTS' : '✗ MISSING';
             echo "{$status}: achievement_campaigns.{$col}\n";
             if (!$result) $missing[] = "achievement_campaigns.{$col}";
@@ -56,7 +60,9 @@ try {
     // Check users columns
     $userCols = ['login_streak', 'last_daily_reward', 'email_preferences'];
     foreach ($userCols as $col) {
-        $result = $pdo->query("SHOW COLUMNS FROM users LIKE '{$col}'")->fetch();
+        $stmt = $pdo->prepare("SHOW COLUMNS FROM users LIKE ?");
+        $stmt->execute([$col]);
+        $result = $stmt->fetch();
         $status = $result ? '✓ EXISTS' : '✗ MISSING';
         echo "{$status}: users.{$col}\n";
         if (!$result) $missing[] = "users.{$col}";
