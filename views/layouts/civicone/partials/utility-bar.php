@@ -1,7 +1,8 @@
     <!-- Utility Bar (Account/Platform controls) - Above service navigation -->
-    <div class="govuk-width-container">
-        <nav class="civicone-utility-bar govuk-!-padding-top-1 govuk-!-padding-bottom-1" aria-label="Account and platform controls">
-            <ul class="govuk-list civicone-utility-list">
+    <div class="civicone-utility-bar">
+        <div class="govuk-width-container">
+            <nav class="govuk-!-padding-top-1 govuk-!-padding-bottom-1" aria-label="Account and platform controls">
+                <ul class="govuk-list civicone-utility-list">
 
                 <?php
                 $basePath = \Nexus\Core\TenantContext::getBasePath();
@@ -119,8 +120,9 @@
                         <a href="<?= $basePath ?>/register" class="govuk-body-s civicone-utility-link civicone-utility-link--highlight">Create account</a>
                     </li>
                 <?php endif; ?>
-            </ul>
-        </nav>
+                </ul>
+            </nav>
+        </div>
     </div>
 
     <?php if (isset($_SESSION['user_id'])): ?>
