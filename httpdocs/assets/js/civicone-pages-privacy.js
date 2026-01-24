@@ -17,15 +17,15 @@ document.querySelectorAll('#privacy-glass-wrapper .privacy-nav-btn').forEach(btn
     });
 });
 
-// Button press states
+// Button press states - using classList for GOV.UK compliance
 document.querySelectorAll('#privacy-glass-wrapper .privacy-nav-btn, #privacy-glass-wrapper .privacy-cta-btn').forEach(btn => {
     btn.addEventListener('pointerdown', function() {
-        this.style.transform = 'scale(0.96)';
+        this.classList.add('btn-pressed');
     });
     btn.addEventListener('pointerup', function() {
-        this.style.transform = '';
+        this.classList.remove('btn-pressed');
     });
     btn.addEventListener('pointerleave', function() {
-        this.style.transform = '';
+        this.classList.remove('btn-pressed');
     });
 });
