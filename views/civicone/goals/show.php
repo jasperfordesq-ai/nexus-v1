@@ -1,105 +1,119 @@
 <?php
-// Goal Detail View - High-End Adaptive Holographic Glassmorphism Edition
-// ISOLATED LAYOUT: Uses #unique-glass-page-wrapper and html[data-theme] selectors.
-
+/**
+ * CivicOne View: Goal Detail
+ * GOV.UK Design System Compliant (WCAG 2.1 AA)
+ */
+$pageTitle = htmlspecialchars($goal['title']);
 $isAuthor = isset($_SESSION['user_id']) && $_SESSION['user_id'] == $goal['user_id'];
 $hasMentor = !empty($goal['mentor_id']);
 $isMentor = isset($_SESSION['user_id']) && $_SESSION['user_id'] == $goal['mentor_id'];
 
-require __DIR__ . '/../../layouts/header.php';
+require dirname(__DIR__, 2) . '/layouts/civicone/header.php';
+$basePath = \Nexus\Core\TenantContext::getBasePath();
 ?>
-<link rel="stylesheet" href="<?= \Nexus\Core\TenantContext::getBasePath() ?>/assets/css/civicone-goals-show.min.css?v=<?= time() ?>">
 
-<!-- Offline Banner -->
-<div class="offline-banner" id="offlineBanner" role="alert" aria-live="polite">
-    <i class="fa-solid fa-wifi-slash"></i>
-    <span>No internet connection</span>
-</div>
+<nav class="govuk-breadcrumbs govuk-!-margin-bottom-6" aria-label="Breadcrumb">
+    <ol class="govuk-breadcrumbs__list">
+        <li class="govuk-breadcrumbs__list-item">
+            <a class="govuk-breadcrumbs__link" href="<?= $basePath ?>">Home</a>
+        </li>
+        <li class="govuk-breadcrumbs__list-item">
+            <a class="govuk-breadcrumbs__link" href="<?= $basePath ?>/goals">Goals</a>
+        </li>
+        <li class="govuk-breadcrumbs__list-item" aria-current="page"><?= htmlspecialchars($goal['title']) ?></li>
+    </ol>
+</nav>
 
-<div id="unique-glass-page-wrapper">
-    <div class="glass-box">
+<a href="<?= $basePath ?>/goals" class="govuk-back-link govuk-!-margin-bottom-6">Back to Goals</a>
 
-        <!-- Header -->
-        <div class="page-header">
-            <div>
-                <a href="<?= Nexus\Core\TenantContext::getBasePath() ?>/goals" class="back-link">
-                    <span>←</span> &nbsp; Back to Goals
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+
+        <!-- Status Tag -->
+        <?php if ($goal['status'] === 'completed'): ?>
+            <span class="govuk-tag govuk-tag--green govuk-!-margin-bottom-4">Completed</span>
+        <?php else: ?>
+            <span class="govuk-tag govuk-tag--blue govuk-!-margin-bottom-4">Active Goal</span>
+        <?php endif; ?>
+
+        <h1 class="govuk-heading-xl govuk-!-margin-bottom-4"><?= htmlspecialchars($goal['title']) ?></h1>
+
+        <?php if ($isAuthor): ?>
+            <div class="govuk-button-group govuk-!-margin-bottom-6">
+                <?php if ($goal['status'] === 'active'): ?>
+                    <form action="<?= $basePath ?>/goals/<?= $goal['id'] ?>/complete" method="POST" style="display: inline;"
+                          onsubmit="return confirm('Mark as achieved? Great job!')">
+                        <?= \Nexus\Core\Csrf::input() ?>
+                        <button type="submit" class="govuk-button" data-module="govuk-button">
+                            <i class="fa-solid fa-check govuk-!-margin-right-1" aria-hidden="true"></i>
+                            Mark Complete
+                        </button>
+                    </form>
+                <?php endif; ?>
+                <a href="<?= $basePath ?>/goals/<?= $goal['id'] ?>/edit" class="govuk-button govuk-button--secondary" data-module="govuk-button">
+                    <i class="fa-solid fa-pen govuk-!-margin-right-1" aria-hidden="true"></i>
+                    Edit
                 </a>
-                <br>
-                <div class="status-badge">
-                    <?= $goal['status'] === 'completed' ? '✅ COMPLETED' : '🎯 GOAL' ?>
-                </div>
-                <h1><?= htmlspecialchars($goal['title']) ?></h1>
             </div>
-
-            <?php if ($isAuthor): ?>
-                <div class="goal-header-actions">
-                    <?php if ($goal['status'] === 'active'): ?>
-                        <form action="<?= \Nexus\Core\TenantContext::getBasePath() ?>/goals/<?= $goal['id'] ?>/complete" method="POST" onsubmit="return confirm('Mark as achieved? Great job!')">
-                            <?= \Nexus\Core\Csrf::input() ?>
-                            <button type="submit" class="glass-pill-btn btn-success">✅ Mark Complete</button>
-                        </form>
-                    <?php endif; ?>
-                    <a href="<?= \Nexus\Core\TenantContext::getBasePath() ?>/goals/<?= $goal['id'] ?>/edit" class="glass-pill-btn btn-secondary">⚙️ Edit</a>
-                </div>
-            <?php endif; ?>
-        </div>
+        <?php endif; ?>
 
         <!-- Description -->
-        <div class="goal-description"><?= htmlspecialchars($goal['description']) ?></div>
+        <p class="govuk-body-l govuk-!-margin-bottom-6"><?= nl2br(htmlspecialchars($goal['description'])) ?></p>
 
-        <!-- Buddy Status Section -->
+        <!-- Buddy Status -->
         <?php if ($hasMentor): ?>
             <!-- Matched State -->
-            <div class="status-card status-matched">
-                <h3 class="goal-buddy-heading">🤝 Matched with Buddy</h3>
-                <div class="goal-buddy-info">
-                    <div class="goal-emoji-box">🎉</div>
-                    <div>
-                        <div class="goal-buddy-label">Accountability Partner</div>
-                        <div class="goal-buddy-name"><?= htmlspecialchars($goal['mentor_name']) ?></div>
-                    </div>
+            <div class="govuk-notification-banner govuk-notification-banner--success govuk-!-margin-bottom-6" role="region" aria-labelledby="buddy-heading">
+                <div class="govuk-notification-banner__header">
+                    <h2 class="govuk-notification-banner__title" id="buddy-heading">Accountability Partner</h2>
+                </div>
+                <div class="govuk-notification-banner__content">
+                    <p class="govuk-notification-banner__heading">
+                        <i class="fa-solid fa-handshake govuk-!-margin-right-1" aria-hidden="true"></i>
+                        Matched with <?= htmlspecialchars($goal['mentor_name']) ?>
+                    </p>
                     <?php if ($isAuthor || $isMentor): ?>
-                        <div class="goal-buddy-action">
-                            <a href="<?= Nexus\Core\TenantContext::getBasePath() ?>/messages?create=1&to=<?= $isAuthor ? $goal['mentor_id'] : $goal['user_id'] ?>" class="glass-pill-btn btn-primary goal-buddy-message-btn">Message</a>
-                        </div>
+                        <p class="govuk-body">
+                            <a href="<?= $basePath ?>/messages?create=1&to=<?= $isAuthor ? $goal['mentor_id'] : $goal['user_id'] ?>" class="govuk-link">
+                                Send a message
+                            </a>
+                        </p>
                     <?php endif; ?>
                 </div>
             </div>
 
         <?php elseif ($goal['is_public']): ?>
-            <!-- Looking State -->
-            <div class="status-card status-looking">
-                <div class="goal-looking-center">
-                    <div class="goal-looking-emoji">🔍</div>
-                    <h3 class="goal-looking-heading">Looking for a Buddy</h3>
-                    <p class="goal-looking-description">This goal is public! Waiting for a community member to support you.</p>
-
-                    <?php if (!$isAuthor && isset($_SESSION['user_id'])): ?>
-                        <form action="<?= Nexus\Core\TenantContext::getBasePath() ?>/goals/buddy" method="POST" onsubmit="return confirm('Are you sure you want to be the accountability partner for this goal?');">
-                            <?= \Nexus\Core\Csrf::input() ?>
-                            <input type="hidden" name="goal_id" value="<?= $goal['id'] ?>">
-                            <button class="glass-pill-btn btn-primary">Become Buddy 🤝</button>
-                        </form>
-                    <?php endif; ?>
-                </div>
+            <!-- Looking for Buddy -->
+            <div class="govuk-inset-text govuk-!-margin-bottom-6">
+                <h3 class="govuk-heading-s govuk-!-margin-bottom-2">
+                    <i class="fa-solid fa-magnifying-glass govuk-!-margin-right-1" aria-hidden="true"></i>
+                    Looking for an Accountability Partner
+                </h3>
+                <p class="govuk-body govuk-!-margin-bottom-2">This goal is public. Waiting for a community member to offer support.</p>
+                <?php if (!$isAuthor && isset($_SESSION['user_id'])): ?>
+                    <form action="<?= $basePath ?>/goals/buddy" method="POST" style="display: inline;"
+                          onsubmit="return confirm('Are you sure you want to be the accountability partner for this goal?');">
+                        <?= \Nexus\Core\Csrf::input() ?>
+                        <input type="hidden" name="goal_id" value="<?= $goal['id'] ?>">
+                        <button type="submit" class="govuk-button govuk-button--secondary" data-module="govuk-button">
+                            <i class="fa-solid fa-handshake govuk-!-margin-right-1" aria-hidden="true"></i>
+                            Become Buddy
+                        </button>
+                    </form>
+                <?php endif; ?>
             </div>
 
         <?php else: ?>
-            <!-- Private State -->
-            <div class="status-card status-private">
-                <div class="goal-private-info">
-                    <div class="goal-private-emoji">🔒</div>
-                    <div>
-                        <strong class="goal-private-label">Private Goal</strong>
-                        <span class="goal-private-description">Only you can see this goal.</span>
-                    </div>
-                </div>
+            <!-- Private Goal -->
+            <div class="govuk-inset-text govuk-!-margin-bottom-6">
+                <p class="govuk-body govuk-!-margin-bottom-0">
+                    <i class="fa-solid fa-lock govuk-!-margin-right-1" aria-hidden="true"></i>
+                    <strong>Private Goal</strong> — Only you can see this goal.
+                </p>
             </div>
-
         <?php endif; ?>
 
-        <!-- Social Engagement Section - Master Platform Social Media Module -->
+        <!-- Social Engagement Section -->
         <?php
         $goalId = $goal['id'];
         $likesCount = $likesCount ?? 0;
@@ -107,46 +121,48 @@ require __DIR__ . '/../../layouts/header.php';
         $isLiked = $isLiked ?? false;
         $isLoggedIn = $isLoggedIn ?? !empty($_SESSION['user_id']);
         ?>
-        <div class="goal-social-section">
-            <!-- Like & Comment Buttons -->
-            <div class="goal-social-buttons">
-                <button id="like-btn" onclick="goalToggleLike()" class="glass-pill-btn <?= $isLiked ? 'btn-primary' : 'btn-secondary' ?>">
-                    <i class="<?= $isLiked ? 'fa-solid' : 'fa-regular' ?> fa-heart" id="like-icon"></i>
-                    <span id="like-count"><?= $likesCount ?></span>
-                    <span><?= $likesCount === 1 ? 'Like' : 'Likes' ?></span>
+
+        <hr class="govuk-section-break govuk-section-break--l govuk-section-break--visible">
+
+        <div class="govuk-!-margin-bottom-6">
+            <div class="govuk-button-group">
+                <button id="like-btn" type="button" onclick="goalToggleLike()"
+                        class="govuk-button <?= $isLiked ? '' : 'govuk-button--secondary' ?>" data-module="govuk-button">
+                    <i class="<?= $isLiked ? 'fa-solid' : 'fa-regular' ?> fa-heart govuk-!-margin-right-1" id="like-icon" aria-hidden="true"></i>
+                    <span id="like-count"><?= $likesCount ?></span> <?= $likesCount === 1 ? 'Like' : 'Likes' ?>
                 </button>
-                <button onclick="goalToggleComments()" class="glass-pill-btn btn-secondary">
-                    <i class="fa-regular fa-comment"></i>
-                    <span id="comment-count"><?= $commentsCount ?></span>
-                    <span><?= $commentsCount === 1 ? 'Comment' : 'Comments' ?></span>
+                <button type="button" onclick="goalToggleComments()" class="govuk-button govuk-button--secondary" data-module="govuk-button">
+                    <i class="fa-regular fa-comment govuk-!-margin-right-1" aria-hidden="true"></i>
+                    <span id="comment-count"><?= $commentsCount ?></span> <?= $commentsCount === 1 ? 'Comment' : 'Comments' ?>
                 </button>
                 <?php if ($isLoggedIn): ?>
-                <button onclick="shareToFeed()" class="glass-pill-btn btn-secondary">
-                    <i class="fa-solid fa-share"></i> Share
+                <button type="button" onclick="shareToFeed()" class="govuk-button govuk-button--secondary" data-module="govuk-button">
+                    <i class="fa-solid fa-share govuk-!-margin-right-1" aria-hidden="true"></i>
+                    Share
                 </button>
                 <?php endif; ?>
             </div>
+        </div>
 
-            <!-- Comments Section (Hidden by Default) -->
-            <div id="comments-section" class="goal-comments-section">
-                <?php if ($isLoggedIn): ?>
-                <form onsubmit="goalSubmitComment(event)" class="goal-comment-form">
-                    <div class="goal-comment-input-wrapper">
-                        <img src="<?= $_SESSION['user_avatar'] ?? '/assets/img/defaults/default_avatar.webp' ?>" loading="lazy" class="goal-comment-avatar">
-                        <div class="goal-comment-input-container">
-                            <textarea id="comment-input" placeholder="Write a comment..." class="goal-comment-textarea"></textarea>
-                            <button type="submit" class="glass-pill-btn btn-primary goal-comment-submit-btn">Post Comment</button>
-                        </div>
-                    </div>
-                </form>
-                <?php else: ?>
-                <p class="goal-login-prompt">
-                    <a href="<?= Nexus\Core\TenantContext::getBasePath() ?>/login" class="goal-login-link">Log in</a> to leave a comment.
-                </p>
-                <?php endif; ?>
-                <div id="comments-list">
-                    <p class="goal-comments-loading">Loading comments...</p>
+        <!-- Comments Section -->
+        <div id="comments-section" class="govuk-!-margin-bottom-6" style="display: none;">
+            <?php if ($isLoggedIn): ?>
+            <form onsubmit="goalSubmitComment(event)" class="govuk-!-margin-bottom-4">
+                <div class="govuk-form-group">
+                    <label class="govuk-label govuk-visually-hidden" for="comment-input">Write a comment</label>
+                    <textarea id="comment-input" class="govuk-textarea" rows="3" placeholder="Write a comment..."></textarea>
                 </div>
+                <button type="submit" class="govuk-button govuk-button--secondary" data-module="govuk-button">
+                    Post Comment
+                </button>
+            </form>
+            <?php else: ?>
+            <p class="govuk-body">
+                <a href="<?= $basePath ?>/login" class="govuk-link">Log in</a> to leave a comment.
+            </p>
+            <?php endif; ?>
+            <div id="comments-list">
+                <p class="govuk-body" style="color: #505a5f;">Loading comments...</p>
             </div>
         </div>
 
@@ -154,75 +170,6 @@ require __DIR__ . '/../../layouts/header.php';
 </div>
 
 <script>
-// ============================================
-// GOLD STANDARD - Native App Features
-// ============================================
-
-// Offline Indicator
-(function initOfflineIndicator() {
-    const banner = document.getElementById('offlineBanner');
-    if (!banner) return;
-
-    function handleOffline() {
-        banner.classList.add('visible');
-        if (navigator.vibrate) navigator.vibrate(100);
-    }
-
-    function handleOnline() {
-        banner.classList.remove('visible');
-    }
-
-    window.addEventListener('online', handleOnline);
-    window.addEventListener('offline', handleOffline);
-
-    if (!navigator.onLine) {
-        handleOffline();
-    }
-})();
-
-// Form Submission Offline Protection
-document.querySelectorAll('form').forEach(form => {
-    form.addEventListener('submit', function(e) {
-        if (!navigator.onLine) {
-            e.preventDefault();
-            alert('You are offline. Please connect to the internet to submit.');
-            return;
-        }
-    });
-});
-
-// Button Press States - handled by CSS :active state in civicone-goals-show.css
-
-// Dynamic Theme Color
-(function initDynamicThemeColor() {
-    const metaTheme = document.querySelector('meta[name="theme-color"]');
-    if (!metaTheme) {
-        const meta = document.createElement('meta');
-        meta.name = 'theme-color';
-        meta.content = '#db2777';
-        document.head.appendChild(meta);
-    }
-
-    function updateThemeColor() {
-        const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
-        const meta = document.querySelector('meta[name="theme-color"]');
-        if (meta) {
-            meta.setAttribute('content', isDark ? '#0f172a' : '#db2777');
-        }
-    }
-
-    const observer = new MutationObserver(updateThemeColor);
-    observer.observe(document.documentElement, {
-        attributes: true,
-        attributeFilter: ['data-theme']
-    });
-
-    updateThemeColor();
-})();
-
-// ============================================
-// MASTER PLATFORM SOCIAL MEDIA MODULE
-// ============================================
 (function() {
     const goalId = <?= $goalId ?>;
     const isLoggedIn = <?= $isLoggedIn ? 'true' : 'false' ?>;
@@ -230,12 +177,11 @@ document.querySelectorAll('form').forEach(form => {
     let commentsLoaded = false;
     let availableReactions = [];
 
-    const API_BASE = '<?= \Nexus\Core\TenantContext::getBasePath() ?>/api/social';
+    const API_BASE = '<?= $basePath ?>/api/social';
 
-    // Unique function names to avoid conflict with social-interactions.js
     window.goalToggleLike = async function() {
         <?php if (!$isLoggedIn): ?>
-        window.location.href = '<?= Nexus\Core\TenantContext::getBasePath() ?>/login';
+        window.location.href = '<?= $basePath ?>/login';
         return;
         <?php endif; ?>
 
@@ -275,13 +221,11 @@ document.querySelectorAll('form').forEach(form => {
             countEl.textContent = data.likes_count;
 
             if (isLiked) {
-                btn.classList.remove('btn-secondary');
-                btn.classList.add('btn-primary');
+                btn.classList.remove('govuk-button--secondary');
                 icon.classList.remove('fa-regular');
                 icon.classList.add('fa-solid');
             } else {
-                btn.classList.remove('btn-primary');
-                btn.classList.add('btn-secondary');
+                btn.classList.add('govuk-button--secondary');
                 icon.classList.remove('fa-solid');
                 icon.classList.add('fa-regular');
             }
@@ -294,20 +238,17 @@ document.querySelectorAll('form').forEach(form => {
     };
 
     window.goalToggleComments = function() {
-        // Check if mobile (screen width <= 768px or touch device)
         const isMobile = window.innerWidth <= 768 || ('ontouchstart' in window);
 
         if (isMobile && typeof openMobileCommentSheet === 'function') {
-            // Use mobile drawer on mobile devices
             openMobileCommentSheet('goal', goalId, '');
             return;
         }
 
-        // Desktop: use inline comments section
         const section = document.getElementById('comments-section');
-        const isHidden = !section.classList.contains('visible');
+        const isHidden = section.style.display === 'none';
 
-        section.classList.toggle('visible');
+        section.style.display = isHidden ? 'block' : 'none';
 
         if (isHidden && !commentsLoaded) {
             loadComments();
@@ -316,7 +257,7 @@ document.querySelectorAll('form').forEach(form => {
 
     async function loadComments() {
         const list = document.getElementById('comments-list');
-        list.innerHTML = '<p class="goal-comments-message">Loading comments...</p>';
+        list.innerHTML = '<p class="govuk-body" style="color: #505a5f;">Loading comments...</p>';
 
         try {
             const response = await fetch(API_BASE + '/comments', {
@@ -333,14 +274,14 @@ document.querySelectorAll('form').forEach(form => {
             });
 
             if (!response.ok) {
-                list.innerHTML = '<p class="goal-comments-message">Failed to load comments.</p>';
+                list.innerHTML = '<p class="govuk-body" style="color: #505a5f;">Failed to load comments.</p>';
                 return;
             }
 
             const data = await response.json();
 
             if (data.error) {
-                list.innerHTML = '<p class="goal-comments-message">Failed to load comments.</p>';
+                list.innerHTML = '<p class="govuk-body" style="color: #505a5f;">Failed to load comments.</p>';
                 return;
             }
 
@@ -348,7 +289,7 @@ document.querySelectorAll('form').forEach(form => {
             availableReactions = data.available_reactions || [];
 
             if (!data.comments || data.comments.length === 0) {
-                list.innerHTML = '<p class="goal-comments-message">No comments yet. Be the first to comment!</p>';
+                list.innerHTML = '<p class="govuk-body" style="color: #505a5f;">No comments yet. Be the first to comment!</p>';
                 return;
             }
 
@@ -356,44 +297,41 @@ document.querySelectorAll('form').forEach(form => {
 
         } catch (err) {
             console.error('Load comments error:', err);
-            list.innerHTML = '<p class="goal-comments-message">Failed to load comments.</p>';
+            list.innerHTML = '<p class="govuk-body" style="color: #505a5f;">Failed to load comments.</p>';
         }
     }
 
     function renderComment(c, depth) {
         const indentStyle = depth > 0 ? `margin-left: ${depth * 20}px;` : '';
-        const isEdited = c.is_edited ? '<span class="goal-comment-edited"> (edited)</span>' : '';
+        const isEdited = c.is_edited ? '<span class="govuk-body-s" style="color: #505a5f;"> (edited)</span>' : '';
         const ownerActions = c.is_owner ? `
-            <span class="goal-comment-actions" onclick="goalEditComment(${c.id}, '${escapeHtml(c.content).replace(/'/g, "\\'")}')" title="Edit">✏️</span>
-            <span class="goal-comment-actions" onclick="goalDeleteComment(${c.id})" title="Delete">🗑️</span>
+            <a href="#" onclick="goalEditComment(${c.id}, '${escapeHtml(c.content).replace(/'/g, "\\'")}'); return false;" class="govuk-link govuk-body-s">Edit</a>
+            <a href="#" onclick="goalDeleteComment(${c.id}); return false;" class="govuk-link govuk-body-s" style="color: #d4351c;">Delete</a>
         ` : '';
 
         const reactions = Object.entries(c.reactions || {}).map(([emoji, count]) => {
             const isUserReaction = (c.user_reactions || []).includes(emoji);
-            const activeClass = isUserReaction ? ' active' : '';
-            return `<span class="goal-reaction-pill${activeClass}" onclick="goalToggleReaction(${c.id}, '${emoji}')">${emoji} ${count}</span>`;
+            const activeClass = isUserReaction ? 'govuk-tag--blue' : 'govuk-tag--grey';
+            return `<span class="govuk-tag ${activeClass}" style="cursor: pointer;" onclick="goalToggleReaction(${c.id}, '${emoji}')">${emoji} ${count}</span>`;
         }).join(' ');
 
         const replies = (c.replies || []).map(r => renderComment(r, depth + 1)).join('');
 
         return `
-            <div class="goal-comment-box" style="${indentStyle}">
-                <div class="goal-comment-header">
-                    <img src="${c.avatar || '/assets/img/defaults/default_avatar.webp'}" class="goal-comment-box-avatar" loading="lazy" alt="">
-                    <div>
-                        <strong class="goal-comment-author">${escapeHtml(c.author_name)}</strong>${isEdited}
-                        <div class="goal-comment-time">${c.time_ago}</div>
-                    </div>
+            <div class="govuk-!-padding-3 govuk-!-margin-bottom-3" style="border-left: 4px solid #1d70b8; background: #f8f8f8; ${indentStyle}">
+                <p class="govuk-body-s govuk-!-margin-bottom-1">
+                    <strong>${escapeHtml(c.author_name)}</strong>${isEdited}
+                    <span style="color: #505a5f;">&middot; ${c.time_ago}</span>
                     ${ownerActions}
-                </div>
-                <div id="content-${c.id}" class="goal-comment-content">${escapeHtml(c.content)}</div>
-                <div class="goal-comment-reactions">
+                </p>
+                <p id="content-${c.id}" class="govuk-body govuk-!-margin-bottom-2">${escapeHtml(c.content)}</p>
+                <div class="govuk-!-margin-bottom-2">
                     ${reactions}
-                    <span class="goal-reply-btn" onclick="goalShowReplyForm(${c.id})">↩️ Reply</span>
+                    <a href="#" onclick="goalShowReplyForm(${c.id}); return false;" class="govuk-link govuk-body-s">Reply</a>
                 </div>
-                <div id="reply-form-${c.id}" class="goal-reply-form">
-                    <input type="text" id="reply-input-${c.id}" placeholder="Write a reply..." class="goal-reply-input">
-                    <button onclick="goalSubmitReply(${c.id})" class="glass-pill-btn btn-primary goal-reply-submit">Reply</button>
+                <div id="reply-form-${c.id}" style="display: none;" class="govuk-!-margin-top-2">
+                    <input type="text" id="reply-input-${c.id}" placeholder="Write a reply..." class="govuk-input govuk-!-margin-bottom-2">
+                    <button onclick="goalSubmitReply(${c.id})" class="govuk-button govuk-button--secondary govuk-button--small" data-module="govuk-button">Reply</button>
                 </div>
                 ${replies}
             </div>
@@ -451,8 +389,8 @@ document.querySelectorAll('form').forEach(form => {
 
     window.goalShowReplyForm = function(commentId) {
         const form = document.getElementById(`reply-form-${commentId}`);
-        const wasHidden = !form.classList.contains('visible');
-        form.classList.toggle('visible');
+        const wasHidden = form.style.display === 'none';
+        form.style.display = wasHidden ? 'block' : 'none';
         if (wasHidden) {
             document.getElementById(`reply-input-${commentId}`).focus();
         }
@@ -480,7 +418,7 @@ document.querySelectorAll('form').forEach(form => {
             const data = await response.json();
             if (data.error) { alert(data.error); return; }
             input.value = '';
-            document.getElementById(`reply-form-${parentId}`).classList.remove('visible');
+            document.getElementById(`reply-form-${parentId}`).style.display = 'none';
             const countEl = document.getElementById('comment-count');
             countEl.textContent = parseInt(countEl.textContent) + 1;
             loadComments();
@@ -535,11 +473,11 @@ document.querySelectorAll('form').forEach(form => {
         const originalHtml = contentEl.innerHTML;
 
         contentEl.innerHTML = `
-            <div class="goal-edit-form">
-                <input type="text" id="edit-input-${commentId}" value="${escapeHtml(currentContent)}" class="goal-edit-input">
-                <button onclick="goalSaveEdit(${commentId})" class="glass-pill-btn btn-primary goal-edit-btn">Save</button>
-                <button onclick="goalCancelEdit(${commentId}, '${escapeHtml(originalHtml).replace(/'/g, "\\'")}')" class="glass-pill-btn btn-secondary goal-edit-btn">Cancel</button>
+            <div class="govuk-form-group govuk-!-margin-bottom-2">
+                <input type="text" id="edit-input-${commentId}" value="${escapeHtml(currentContent)}" class="govuk-input">
             </div>
+            <button onclick="goalSaveEdit(${commentId})" class="govuk-button govuk-button--secondary govuk-button--small" data-module="govuk-button">Save</button>
+            <button onclick="goalCancelEdit(${commentId}, '${escapeHtml(originalHtml).replace(/'/g, "\\'")}')" class="govuk-button govuk-button--secondary govuk-button--small" data-module="govuk-button">Cancel</button>
         `;
         document.getElementById(`edit-input-${commentId}`).focus();
     };
@@ -601,8 +539,4 @@ document.querySelectorAll('form').forEach(form => {
 })();
 </script>
 
-<?php
-// Mobile Bottom Sheets - Now included centrally in footer.php
-?>
-
-<?php require __DIR__ . '/../../layouts/footer.php'; ?>
+<?php require dirname(__DIR__, 2) . '/layouts/civicone/footer.php'; ?>
