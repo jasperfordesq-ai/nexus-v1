@@ -21,6 +21,9 @@ class Event
 
     public static function upcoming($tenantId, $limit = 50, $categoryId = null, $dateFilter = null, $search = null)
     {
+        // SECURITY: Cast to int to prevent SQL injection
+        $limit = (int)$limit;
+
         // Get upcoming events, sorted by nearest date first
         $sql = "SELECT e.*, u.name as organizer_name, c.name as category_name, c.color as category_color
                 FROM events e
