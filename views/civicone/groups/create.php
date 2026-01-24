@@ -1,9 +1,9 @@
 <?php
-// CivicOne View: Create Hub - WCAG 2.1 AA Compliant
-// GOV.UK Form Template (Template D)
-
+/**
+ * CivicOne View: Create Hub
+ * GOV.UK Design System Compliant (WCAG 2.1 AA)
+ */
 $pageTitle = 'Start a Hub';
-$pageSubtitle = 'Build a space for your local community or shared interest';
 
 // Handle form errors from session
 $errors = $_SESSION['form_errors'] ?? [];
@@ -14,139 +14,128 @@ require dirname(__DIR__, 2) . '/layouts/civicone/header.php';
 $basePath = \Nexus\Core\TenantContext::getBasePath();
 ?>
 
-<?php
-$breadcrumbs = [
-    ['label' => 'Home', 'url' => '/'],
-    ['label' => 'Local Hubs', 'url' => '/groups'],
-    ['label' => 'Start a Hub']
-];
-require dirname(__DIR__, 2) . '/layouts/civicone/partials/breadcrumb.php';
-?>
+<nav class="govuk-breadcrumbs govuk-!-margin-bottom-6" aria-label="Breadcrumb">
+    <ol class="govuk-breadcrumbs__list">
+        <li class="govuk-breadcrumbs__list-item">
+            <a class="govuk-breadcrumbs__link" href="<?= $basePath ?>">Home</a>
+        </li>
+        <li class="govuk-breadcrumbs__list-item">
+            <a class="govuk-breadcrumbs__link" href="<?= $basePath ?>/groups">Local Hubs</a>
+        </li>
+        <li class="govuk-breadcrumbs__list-item" aria-current="page">Start a Hub</li>
+    </ol>
+</nav>
 
-<!-- GOV.UK Page Template Boilerplate -->
-<div class="civicone-width-container civicone--govuk">
-    <main class="civicone-main-wrapper" role="main">
+<a href="<?= $basePath ?>/groups" class="govuk-back-link govuk-!-margin-bottom-6">Back to local hubs</a>
 
-        <!-- Back Link -->
-        <a href="<?= $basePath ?>/groups" class="civicone-back-link">
-            Back to local hubs
-        </a>
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
 
-        <!-- Page Header -->
-        <div class="civicone-grid-row">
-            <div class="civicone-grid-column-two-thirds">
-                <h1 class="civicone-heading-xl">Start a Hub</h1>
-                <p class="civicone-body-l">
-                    Create a space for your neighbourhood or interest group to connect and collaborate.
-                </p>
+        <h1 class="govuk-heading-xl">Start a Hub</h1>
+        <p class="govuk-body-l govuk-!-margin-bottom-6">
+            Create a space for your neighbourhood or interest group to connect and collaborate.
+        </p>
+
+        <!-- GOV.UK Error Summary -->
+        <?php if (!empty($errors)): ?>
+        <div class="govuk-error-summary" aria-labelledby="error-summary-title" role="alert" data-module="govuk-error-summary">
+            <h2 class="govuk-error-summary__title" id="error-summary-title">
+                There is a problem
+            </h2>
+            <div class="govuk-error-summary__body">
+                <ul class="govuk-list govuk-error-summary__list">
+                    <?php foreach ($errors as $field => $error): ?>
+                        <li>
+                            <a href="#<?= htmlspecialchars($field) ?>"><?= htmlspecialchars($error) ?></a>
+                        </li>
+                    <?php endforeach; ?>
+                </ul>
             </div>
         </div>
+        <?php endif; ?>
 
-        <!-- Form Container -->
-        <div class="civicone-grid-row">
-            <div class="civicone-grid-column-two-thirds">
+        <!-- Form -->
+        <form action="<?= $basePath ?>/groups/store" method="POST" novalidate>
+            <?= Nexus\Core\Csrf::input() ?>
 
-                <!-- GOV.UK Error Summary -->
-                <?php if (!empty($errors)): ?>
-                <div class="civicone-error-summary" aria-labelledby="error-summary-title" role="alert" tabindex="-1">
-                    <h2 class="civicone-error-summary__title" id="error-summary-title">
-                        There is a problem
-                    </h2>
-                    <div class="civicone-error-summary__body">
-                        <ul class="civicone-error-summary__list">
-                            <?php foreach ($errors as $field => $error): ?>
-                                <li>
-                                    <a href="#<?= htmlspecialchars($field) ?>"><?= htmlspecialchars($error) ?></a>
-                                </li>
-                            <?php endforeach; ?>
-                        </ul>
-                    </div>
+            <!-- Hub Name -->
+            <div class="govuk-form-group <?= isset($errors['name']) ? 'govuk-form-group--error' : '' ?>">
+                <label class="govuk-label" for="name">
+                    Hub name
+                </label>
+                <div id="name-hint" class="govuk-hint">
+                    For example, "West Cork Gardeners" or "Northside Book Club"
                 </div>
+                <?php if (isset($errors['name'])): ?>
+                    <p id="name-error" class="govuk-error-message">
+                        <span class="govuk-visually-hidden">Error:</span>
+                        <?= htmlspecialchars($errors['name']) ?>
+                    </p>
                 <?php endif; ?>
-
-                <!-- Form -->
-                <form action="<?= $basePath ?>/groups/store" method="POST" novalidate>
-                    <?= Nexus\Core\Csrf::input() ?>
-
-                    <!-- Hub Name -->
-                    <div class="civicone-form-group <?= isset($errors['name']) ? 'civicone-form-group--error' : '' ?>">
-                        <label class="civicone-label" for="name">
-                            Hub name
-                        </label>
-                        <div id="name-hint" class="civicone-hint">
-                            For example, "West Cork Gardeners" or "Northside Book Club"
-                        </div>
-                        <?php if (isset($errors['name'])): ?>
-                            <p id="name-error" class="civicone-error-message">
-                                <span class="civicone-visually-hidden">Error:</span>
-                                <?= htmlspecialchars($errors['name']) ?>
-                            </p>
-                        <?php endif; ?>
-                        <input class="civicone-input <?= isset($errors['name']) ? 'civicone-input--error' : '' ?>"
-                               id="name"
-                               name="name"
-                               type="text"
-                               value="<?= htmlspecialchars($oldInput['name'] ?? '') ?>"
-                               aria-describedby="name-hint <?= isset($errors['name']) ? 'name-error' : '' ?>">
-                    </div>
-
-                    <!-- Description -->
-                    <div class="civicone-form-group <?= isset($errors['description']) ? 'civicone-form-group--error' : '' ?>">
-                        <label class="civicone-label" for="description">
-                            Description
-                        </label>
-                        <div id="description-hint" class="civicone-hint">
-                            Explain what your hub is about and who should join
-                        </div>
-                        <?php if (isset($errors['description'])): ?>
-                            <p id="description-error" class="civicone-error-message">
-                                <span class="civicone-visually-hidden">Error:</span>
-                                <?= htmlspecialchars($errors['description']) ?>
-                            </p>
-                        <?php endif; ?>
-                        <textarea class="civicone-textarea <?= isset($errors['description']) ? 'civicone-textarea--error' : '' ?>"
-                                  id="description"
-                                  name="description"
-                                  rows="5"
-                                  aria-describedby="description-hint <?= isset($errors['description']) ? 'description-error' : '' ?>"><?= htmlspecialchars($oldInput['description'] ?? '') ?></textarea>
-                    </div>
-
-                    <!-- Location (Optional) -->
-                    <div class="civicone-form-group <?= isset($errors['location']) ? 'civicone-form-group--error' : '' ?>">
-                        <label class="civicone-label" for="location">
-                            Location (optional)
-                        </label>
-                        <div id="location-hint" class="civicone-hint">
-                            Add a location to help members find local hubs near them
-                        </div>
-                        <?php if (isset($errors['location'])): ?>
-                            <p id="location-error" class="civicone-error-message">
-                                <span class="civicone-visually-hidden">Error:</span>
-                                <?= htmlspecialchars($errors['location']) ?>
-                            </p>
-                        <?php endif; ?>
-                        <input class="civicone-input mapbox-location-input-v2 <?= isset($errors['location']) ? 'civicone-input--error' : '' ?>"
-                               id="location"
-                               name="location"
-                               type="text"
-                               value="<?= htmlspecialchars($oldInput['location'] ?? '') ?>"
-                               autocomplete="off"
-                               aria-describedby="location-hint <?= isset($errors['location']) ? 'location-error' : '' ?>">
-                        <input type="hidden" name="latitude" id="location_lat" value="<?= htmlspecialchars($oldInput['latitude'] ?? '') ?>">
-                        <input type="hidden" name="longitude" id="location_lng" value="<?= htmlspecialchars($oldInput['longitude'] ?? '') ?>">
-                    </div>
-
-                    <!-- Submit Button -->
-                    <button type="submit" class="civicone-button" data-module="civicone-button">
-                        Create hub
-                    </button>
-
-                </form>
-
+                <input class="govuk-input <?= isset($errors['name']) ? 'govuk-input--error' : '' ?>"
+                       id="name"
+                       name="name"
+                       type="text"
+                       value="<?= htmlspecialchars($oldInput['name'] ?? '') ?>"
+                       aria-describedby="name-hint <?= isset($errors['name']) ? 'name-error' : '' ?>"
+                       required>
             </div>
-        </div>
 
-    </main>
-</div><!-- /width-container -->
+            <!-- Description -->
+            <div class="govuk-form-group <?= isset($errors['description']) ? 'govuk-form-group--error' : '' ?>">
+                <label class="govuk-label" for="description">
+                    Description
+                </label>
+                <div id="description-hint" class="govuk-hint">
+                    Explain what your hub is about and who should join
+                </div>
+                <?php if (isset($errors['description'])): ?>
+                    <p id="description-error" class="govuk-error-message">
+                        <span class="govuk-visually-hidden">Error:</span>
+                        <?= htmlspecialchars($errors['description']) ?>
+                    </p>
+                <?php endif; ?>
+                <textarea class="govuk-textarea <?= isset($errors['description']) ? 'govuk-textarea--error' : '' ?>"
+                          id="description"
+                          name="description"
+                          rows="5"
+                          aria-describedby="description-hint <?= isset($errors['description']) ? 'description-error' : '' ?>"
+                          required><?= htmlspecialchars($oldInput['description'] ?? '') ?></textarea>
+            </div>
+
+            <!-- Location (Optional) -->
+            <div class="govuk-form-group <?= isset($errors['location']) ? 'govuk-form-group--error' : '' ?>">
+                <label class="govuk-label" for="location">
+                    Location <span class="govuk-hint govuk-!-display-inline">(optional)</span>
+                </label>
+                <div id="location-hint" class="govuk-hint">
+                    Add a location to help members find local hubs near them
+                </div>
+                <?php if (isset($errors['location'])): ?>
+                    <p id="location-error" class="govuk-error-message">
+                        <span class="govuk-visually-hidden">Error:</span>
+                        <?= htmlspecialchars($errors['location']) ?>
+                    </p>
+                <?php endif; ?>
+                <input class="govuk-input mapbox-location-input-v2 <?= isset($errors['location']) ? 'govuk-input--error' : '' ?>"
+                       id="location"
+                       name="location"
+                       type="text"
+                       value="<?= htmlspecialchars($oldInput['location'] ?? '') ?>"
+                       autocomplete="off"
+                       aria-describedby="location-hint <?= isset($errors['location']) ? 'location-error' : '' ?>">
+                <input type="hidden" name="latitude" id="location_lat" value="<?= htmlspecialchars($oldInput['latitude'] ?? '') ?>">
+                <input type="hidden" name="longitude" id="location_lng" value="<?= htmlspecialchars($oldInput['longitude'] ?? '') ?>">
+            </div>
+
+            <!-- Submit Button -->
+            <button type="submit" class="govuk-button" data-module="govuk-button">
+                Create hub
+            </button>
+
+        </form>
+
+    </div>
+</div>
 
 <?php require dirname(__DIR__, 2) . '/layouts/civicone/footer.php'; ?>

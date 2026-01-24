@@ -1,59 +1,79 @@
 <?php
-$pageTitle = "HSE Social Prescribing Case Study - Project NEXUS";
-$hSubtitle = "Digital Pathways for Social Prescribing in Irish Healthcare";
+/**
+ * HSE Social Prescribing Case Study
+ * GOV.UK Design System (WCAG 2.1 AA)
+ */
+$pageTitle = "HSE Social Prescribing Case Study";
+$basePath = \Nexus\Core\TenantContext::getBasePath();
 require __DIR__ . '/../../layouts/civicone/header.php';
 ?>
 
-<link rel="stylesheet" href="<?= \Nexus\Core\TenantContext::getBasePath() ?>/assets/css/civicone-demo-pages.css">
+<nav class="govuk-breadcrumbs govuk-!-margin-bottom-6" aria-label="Breadcrumb">
+    <ol class="govuk-breadcrumbs__list">
+        <li class="govuk-breadcrumbs__list-item">
+            <a class="govuk-breadcrumbs__link" href="<?= $basePath ?>">Home</a>
+        </li>
+        <li class="govuk-breadcrumbs__list-item">
+            <a class="govuk-breadcrumbs__link" href="<?= $basePath ?>/demo">Case Studies</a>
+        </li>
+        <li class="govuk-breadcrumbs__list-item" aria-current="page">HSE Healthcare</li>
+    </ol>
+</nav>
 
-<main class="demo-page">
-
-    <!-- HSE Branding Header -->
-    <div class="demo-hero">
-        <span class="demo-hero__label">Case Study: Healthcare</span>
-        <h1 class="demo-hero__title">Reducing Healthcare Pressure via Community Action</h1>
-        <p class="demo-hero__desc">A Community Healthcare Organisation (CHO) uses NEXUS to manage a network of "Wellness Volunteers."</p>
+<!-- Header Section -->
+<div class="govuk-notification-banner govuk-notification-banner--success govuk-!-margin-bottom-6" role="region" aria-labelledby="hse-title">
+    <div class="govuk-notification-banner__header">
+        <h2 class="govuk-notification-banner__title" id="hse-title">Case Study: Healthcare</h2>
     </div>
+    <div class="govuk-notification-banner__content govuk-!-text-align-center">
+        <h1 class="govuk-notification-banner__heading">Reducing Healthcare Pressure via Community Action</h1>
+        <p class="govuk-body-l">A Community Healthcare Organisation (CHO) uses NEXUS to manage a network of "Wellness Volunteers."</p>
+    </div>
+</div>
 
-    <div class="demo-two-col">
-
-        <!-- Scenario -->
-        <div>
-            <h2 class="demo-section-heading demo-section-heading--green">The Scenario</h2>
-            <p class="demo-text-body">
+<div class="govuk-grid-row govuk-!-margin-bottom-8">
+    <!-- Scenario -->
+    <div class="govuk-grid-column-one-half">
+        <div class="govuk-!-padding-4" style="border: 1px solid #b1b4b6; border-left: 5px solid #00703c; height: 100%;">
+            <h2 class="govuk-heading-l" style="color: #00703c;">The Scenario</h2>
+            <p class="govuk-body">
                 GPs and Public Health Nurses often see patients whose primary complaints are rooted in isolation or lack of activity, rather than acute medical issues. The "Social Prescribing" model works, but tracking referrals and ensuring patient safety has historically been manual and paper-based.
             </p>
-            <p class="demo-text-body">
+            <p class="govuk-body govuk-!-margin-bottom-0">
                 <strong>The Challenge:</strong> Connecting patients to trusted, vetted community groups without adding administrative burden to clinical staff.
             </p>
         </div>
+    </div>
 
-        <!-- Solution -->
-        <div class="demo-solution-box">
-            <h3 class="demo-solution-box__title">The Result</h3>
-            <ul class="demo-result-list" role="list">
-                <li class="demo-result-list__item">
-                    <span class="demo-result-list__icon" aria-hidden="true">🏥</span>
-                    <span class="demo-result-list__text"><strong>Direct Referral:</strong> Patients are referred directly to community garden projects or walking groups via the NEXUS portal.</span>
+    <!-- Solution -->
+    <div class="govuk-grid-column-one-half">
+        <div class="govuk-!-padding-4" style="border: 1px solid #b1b4b6; border-left: 5px solid #1d70b8; height: 100%;">
+            <h2 class="govuk-heading-l" style="color: #1d70b8;">The Result</h2>
+            <ul class="govuk-list govuk-list--spaced">
+                <li>
+                    <strong class="govuk-tag govuk-tag--green govuk-!-margin-right-2">Direct Referral</strong>
+                    Patients are referred directly to community garden projects or walking groups via the NEXUS portal.
                 </li>
-                <li class="demo-result-list__item">
-                    <span class="demo-result-list__icon" aria-hidden="true">📊</span>
-                    <span class="demo-result-list__text"><strong>Real-Time Data:</strong> The HSE can track engagement levels and "hours of support" generated.</span>
+                <li>
+                    <strong class="govuk-tag govuk-tag--blue govuk-!-margin-right-2">Real-Time Data</strong>
+                    The HSE can track engagement levels and "hours of support" generated.
                 </li>
-                <li class="demo-result-list__item">
-                    <span class="demo-result-list__icon" aria-hidden="true">💰</span>
-                    <span class="demo-result-list__text"><strong>ROI Calculator:</strong> Clear visualisation of social value versus clinical hours saved.</span>
+                <li>
+                    <strong class="govuk-tag govuk-tag--purple govuk-!-margin-right-2">ROI Calculator</strong>
+                    Clear visualisation of social value versus clinical hours saved.
                 </li>
             </ul>
         </div>
     </div>
+</div>
 
-    <!-- Call to Action -->
-    <div class="demo-cta">
-        <a href="<?= \Nexus\Core\TenantContext::getBasePath() ?>/volunteering" class="demo-cta__btn demo-cta__btn--green">View Live Volunteer Opportunities</a>
-        <p class="demo-cta__note">Experience the user journey for a potential volunteer.</p>
-    </div>
-
-</main>
+<!-- CTA Section -->
+<div class="govuk-!-padding-6 govuk-!-text-align-center" style="background: #00703c; color: white;">
+    <h2 class="govuk-heading-l" style="color: white;">See It In Action</h2>
+    <p class="govuk-body-l govuk-!-margin-bottom-4" style="color: white;">Experience the user journey for a potential volunteer.</p>
+    <a href="<?= $basePath ?>/volunteering" class="govuk-button govuk-button--secondary" data-module="govuk-button">
+        View Live Volunteer Opportunities
+    </a>
+</div>
 
 <?php require __DIR__ . '/../../layouts/civicone/footer.php'; ?>

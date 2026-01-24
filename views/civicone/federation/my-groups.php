@@ -1,7 +1,7 @@
 <?php
 /**
  * My Federated Groups
- * CivicOne Theme - WCAG 2.1 AA Compliant
+ * GOV.UK Design System (WCAG 2.1 AA)
  */
 $pageTitle = $pageTitle ?? "My Federated Groups";
 $hideHero = true;
@@ -15,117 +15,146 @@ $basePath = Nexus\Core\TenantContext::getBasePath();
 $groups = $groups ?? [];
 ?>
 
-<!-- Offline Banner -->
-<div class="civic-fed-offline-banner" id="offlineBanner" role="alert" aria-live="polite">
-    <i class="fa-solid fa-wifi-slash" aria-hidden="true"></i>
-    <span>No internet connection</span>
-</div>
+<div class="govuk-width-container">
+    <!-- Offline Banner -->
+    <div class="govuk-notification-banner govuk-notification-banner--warning govuk-!-display-none" id="offlineBanner" role="alert" aria-live="polite" data-module="govuk-notification-banner">
+        <div class="govuk-notification-banner__content">
+            <p class="govuk-notification-banner__heading">
+                <i class="fa-solid fa-wifi-slash govuk-!-margin-right-2" aria-hidden="true"></i>
+                No internet connection
+            </p>
+        </div>
+    </div>
 
-<div class="civic-container">
     <!-- Back Link -->
-    <a href="<?= $basePath ?>/federation/groups" class="civic-fed-back-link" aria-label="Return to federated groups">
-        <i class="fa-solid fa-arrow-left" aria-hidden="true"></i>
+    <a href="<?= $basePath ?>/federation/groups" class="govuk-back-link govuk-!-margin-top-4">
         Back to Federated Groups
     </a>
 
-    <!-- Page Header -->
-    <header class="civic-fed-header">
-        <div class="civic-fed-header-content">
-            <h1>
-                <i class="fa-solid fa-user-group" aria-hidden="true"></i>
-                My Federated Groups
-            </h1>
-            <p class="civic-fed-subtitle">Groups you've joined from partner timebanks</p>
-        </div>
-        <a href="<?= $basePath ?>/federation/groups" class="civic-fed-btn civic-fed-btn--secondary" aria-label="Browse available federated groups">
-            <i class="fa-solid fa-search" aria-hidden="true"></i>
-            Browse Groups
-        </a>
-    </header>
-
-    <?php if (!empty($_SESSION['flash_success'])): ?>
-        <div class="civic-fed-alert civic-fed-alert--success" role="status" aria-live="polite">
-            <i class="fa-solid fa-check-circle" aria-hidden="true"></i>
-            <?= htmlspecialchars($_SESSION['flash_success']) ?>
-        </div>
-        <?php unset($_SESSION['flash_success']); ?>
-    <?php endif; ?>
-
-    <?php if (!empty($_SESSION['flash_error'])): ?>
-        <div class="civic-fed-alert civic-fed-alert--error" role="alert">
-            <i class="fa-solid fa-exclamation-circle" aria-hidden="true"></i>
-            <?= htmlspecialchars($_SESSION['flash_error']) ?>
-        </div>
-        <?php unset($_SESSION['flash_error']); ?>
-    <?php endif; ?>
-
-    <?php if (empty($groups)): ?>
-        <div class="civic-fed-empty" role="status" aria-labelledby="empty-title">
-            <div class="civic-fed-empty-icon" aria-hidden="true">
-                <i class="fa-solid fa-people-group"></i>
+    <main class="govuk-main-wrapper govuk-!-padding-top-4" id="main-content" role="main">
+        <!-- Page Header -->
+        <div class="govuk-grid-row govuk-!-margin-bottom-6">
+            <div class="govuk-grid-column-two-thirds">
+                <h1 class="govuk-heading-xl govuk-!-margin-bottom-2">
+                    <i class="fa-solid fa-user-group govuk-!-margin-right-2" style="color: #1d70b8;" aria-hidden="true"></i>
+                    My Federated Groups
+                </h1>
+                <p class="govuk-body-l" style="color: #505a5f;">Groups you've joined from partner timebanks</p>
             </div>
-            <h3 id="empty-title">No Federated Groups Yet</h3>
-            <p>
-                You haven't joined any groups from partner timebanks.<br>
-                Browse available groups to connect with members across the network.
-            </p>
-            <a href="<?= $basePath ?>/federation/groups" class="civic-fed-btn civic-fed-btn--primary">
-                <i class="fa-solid fa-search" aria-hidden="true"></i>
-                Browse Federated Groups
-            </a>
+            <div class="govuk-grid-column-one-third govuk-!-text-align-right">
+                <a href="<?= $basePath ?>/federation/groups" class="govuk-button govuk-button--secondary" data-module="govuk-button">
+                    <i class="fa-solid fa-search govuk-!-margin-right-2" aria-hidden="true"></i>
+                    Browse Groups
+                </a>
+            </div>
         </div>
-    <?php else: ?>
-        <div class="civic-fed-my-groups-list" role="list" aria-label="Your federated groups">
-            <?php foreach ($groups as $group): ?>
-                <article class="civic-fed-my-group-card" role="listitem">
-                    <div class="civic-fed-my-group-icon" aria-hidden="true">
-                        <i class="fa-solid fa-people-group"></i>
-                    </div>
-                    <div class="civic-fed-my-group-info">
-                        <h3 class="civic-fed-my-group-name">
-                            <a href="<?= $basePath ?>/federation/groups/<?= $group['id'] ?>?tenant=<?= $group['tenant_id'] ?>">
-                                <?= htmlspecialchars($group['name']) ?>
-                            </a>
-                        </h3>
-                        <div class="civic-fed-my-group-meta">
-                            <span class="civic-fed-my-group-meta-item">
-                                <i class="fa-solid fa-building" aria-hidden="true"></i>
-                                <?= htmlspecialchars($group['tenant_name'] ?? 'Partner Timebank') ?>
-                            </span>
-                            <span class="civic-fed-my-group-meta-item">
-                                <i class="fa-solid fa-users" aria-hidden="true"></i>
-                                <?= (int)($group['member_count'] ?? 0) ?> members
-                            </span>
-                            <?php if (!empty($group['joined_at'])): ?>
-                                <span class="civic-fed-my-group-meta-item">
-                                    <i class="fa-solid fa-calendar" aria-hidden="true"></i>
-                                    Joined <time datetime="<?= date('c', strtotime($group['joined_at'])) ?>"><?= date('M j, Y', strtotime($group['joined_at'])) ?></time>
-                                </span>
-                            <?php endif; ?>
-                        </div>
-                    </div>
-                    <span class="civic-fed-status-badge civic-fed-status-badge--<?= ($group['membership_status'] ?? 'approved') === 'pending' ? 'pending' : 'success' ?>" role="status">
-                        <?php if (($group['membership_status'] ?? 'approved') === 'pending'): ?>
-                            <i class="fa-solid fa-clock" aria-hidden="true"></i>
-                            Pending
-                        <?php else: ?>
-                            <i class="fa-solid fa-check" aria-hidden="true"></i>
-                            Active
-                        <?php endif; ?>
-                    </span>
-                    <div class="civic-fed-my-group-actions">
-                        <a href="<?= $basePath ?>/federation/groups/<?= $group['id'] ?>?tenant=<?= $group['tenant_id'] ?>" class="civic-fed-btn civic-fed-btn--small civic-fed-btn--secondary" aria-label="View <?= htmlspecialchars($group['name']) ?>">
-                            <i class="fa-solid fa-eye" aria-hidden="true"></i>
-                            View
+
+        <?php if (!empty($_SESSION['flash_success'])): ?>
+            <div class="govuk-notification-banner govuk-notification-banner--success" role="status" aria-live="polite" data-module="govuk-notification-banner">
+                <div class="govuk-notification-banner__header">
+                    <h2 class="govuk-notification-banner__title">Success</h2>
+                </div>
+                <div class="govuk-notification-banner__content">
+                    <p class="govuk-notification-banner__heading"><?= htmlspecialchars($_SESSION['flash_success']) ?></p>
+                </div>
+            </div>
+            <?php unset($_SESSION['flash_success']); ?>
+        <?php endif; ?>
+
+        <?php if (!empty($_SESSION['flash_error'])): ?>
+            <div class="govuk-error-summary" aria-labelledby="error-summary-title" role="alert" tabindex="-1" data-module="govuk-error-summary">
+                <h2 class="govuk-error-summary__title" id="error-summary-title">There is a problem</h2>
+                <div class="govuk-error-summary__body">
+                    <p class="govuk-body"><?= htmlspecialchars($_SESSION['flash_error']) ?></p>
+                </div>
+            </div>
+            <?php unset($_SESSION['flash_error']); ?>
+        <?php endif; ?>
+
+        <div class="govuk-grid-row">
+            <div class="govuk-grid-column-two-thirds">
+                <?php if (empty($groups)): ?>
+                    <div class="govuk-!-padding-6 govuk-!-text-align-center" style="background: #f3f2f1; border-left: 5px solid #1d70b8;">
+                        <i class="fa-solid fa-people-group fa-3x govuk-!-margin-bottom-4" style="color: #1d70b8;" aria-hidden="true"></i>
+                        <h2 class="govuk-heading-m">No Federated Groups Yet</h2>
+                        <p class="govuk-body govuk-!-margin-bottom-4">
+                            You haven't joined any groups from partner timebanks.<br>
+                            Browse available groups to connect with members across the network.
+                        </p>
+                        <a href="<?= $basePath ?>/federation/groups" class="govuk-button" data-module="govuk-button">
+                            <i class="fa-solid fa-search govuk-!-margin-right-2" aria-hidden="true"></i>
+                            Browse Federated Groups
                         </a>
                     </div>
-                </article>
-            <?php endforeach; ?>
+                <?php else: ?>
+                    <div role="list" aria-label="Your federated groups">
+                        <?php foreach ($groups as $group): ?>
+                            <article class="govuk-!-padding-4 govuk-!-margin-bottom-4" style="background: #fff; border: 1px solid #b1b4b6; border-left: 5px solid #1d70b8;" role="listitem">
+                                <div style="display: flex; align-items: flex-start; gap: 16px;">
+                                    <div style="width: 48px; height: 48px; border-radius: 50%; background: #1d70b8; color: #fff; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                                        <i class="fa-solid fa-people-group" aria-hidden="true"></i>
+                                    </div>
+                                    <div style="flex: 1;">
+                                        <h3 class="govuk-heading-s govuk-!-margin-bottom-2">
+                                            <a href="<?= $basePath ?>/federation/groups/<?= $group['id'] ?>?tenant=<?= $group['tenant_id'] ?>" class="govuk-link">
+                                                <?= htmlspecialchars($group['name']) ?>
+                                            </a>
+                                        </h3>
+                                        <p class="govuk-body-s govuk-!-margin-bottom-2" style="color: #505a5f;">
+                                            <i class="fa-solid fa-building govuk-!-margin-right-1" aria-hidden="true"></i>
+                                            <?= htmlspecialchars($group['tenant_name'] ?? 'Partner Timebank') ?>
+                                            <span class="govuk-!-margin-left-3">
+                                                <i class="fa-solid fa-users govuk-!-margin-right-1" aria-hidden="true"></i>
+                                                <?= (int)($group['member_count'] ?? 0) ?> members
+                                            </span>
+                                            <?php if (!empty($group['joined_at'])): ?>
+                                                <span class="govuk-!-margin-left-3">
+                                                    <i class="fa-solid fa-calendar govuk-!-margin-right-1" aria-hidden="true"></i>
+                                                    Joined <time datetime="<?= date('c', strtotime($group['joined_at'])) ?>"><?= date('M j, Y', strtotime($group['joined_at'])) ?></time>
+                                                </span>
+                                            <?php endif; ?>
+                                        </p>
+                                    </div>
+                                    <div style="text-align: right;">
+                                        <?php if (($group['membership_status'] ?? 'approved') === 'pending'): ?>
+                                            <span class="govuk-tag govuk-tag--yellow govuk-!-margin-bottom-2">
+                                                <i class="fa-solid fa-clock govuk-!-margin-right-1" aria-hidden="true"></i>
+                                                Pending
+                                            </span>
+                                        <?php else: ?>
+                                            <span class="govuk-tag govuk-tag--green govuk-!-margin-bottom-2">
+                                                <i class="fa-solid fa-check govuk-!-margin-right-1" aria-hidden="true"></i>
+                                                Active
+                                            </span>
+                                        <?php endif; ?>
+                                        <br>
+                                        <a href="<?= $basePath ?>/federation/groups/<?= $group['id'] ?>?tenant=<?= $group['tenant_id'] ?>" class="govuk-button govuk-button--secondary govuk-!-margin-bottom-0" data-module="govuk-button" style="font-size: 14px;">
+                                            <i class="fa-solid fa-eye govuk-!-margin-right-1" aria-hidden="true"></i>
+                                            View
+                                        </a>
+                                    </div>
+                                </div>
+                            </article>
+                        <?php endforeach; ?>
+                    </div>
+                <?php endif; ?>
+            </div>
         </div>
-    <?php endif; ?>
+    </main>
 </div>
 
 <!-- Federation offline indicator -->
-<script src="<?= \Nexus\Core\TenantContext::getBasePath() ?>/assets/js/civicone-federation-offline.min.js" defer></script>
+<script>
+(function() {
+    'use strict';
+    var banner = document.getElementById('offlineBanner');
+    function updateOffline(offline) {
+        if (banner) banner.classList.toggle('govuk-!-display-none', !offline);
+    }
+    window.addEventListener('online', function() { updateOffline(false); });
+    window.addEventListener('offline', function() { updateOffline(true); });
+    if (!navigator.onLine) updateOffline(true);
+})();
+</script>
 
 <?php require dirname(dirname(__DIR__)) . '/layouts/civicone/footer.php'; ?>

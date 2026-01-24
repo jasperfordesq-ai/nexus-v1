@@ -127,6 +127,9 @@ $appIcons = [
     <!-- Font Awesome Pro -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
+    <!-- GOV.UK Frontend -->
+    <link rel="stylesheet" href="/assets/css/govuk-frontend.min.css">
+
     <!-- Google Fonts - Inter -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -142,14 +145,14 @@ $appIcons = [
 
     <!-- Desktop Notice -->
     <div class="desktop-notice">
-        <div class="desktop-notice-content">
-            <div class="desktop-notice-icon">
-                <i class="fa-solid fa-mobile-screen-button"></i>
+        <div class="desktop-notice-content govuk-!-text-align-center">
+            <div class="desktop-notice-icon govuk-!-margin-bottom-4">
+                <i class="fa-solid fa-mobile-screen-button" aria-hidden="true"></i>
             </div>
-            <h2>Mobile Experience</h2>
-            <p>This page is optimized for mobile devices. Visit on your phone for the best experience.</p>
-            <a href="<?= $base ?>/">
-                <i class="fa-solid fa-arrow-left"></i>
+            <h2 class="govuk-heading-l">Mobile Experience</h2>
+            <p class="govuk-body">This page is optimized for mobile devices. Visit on your phone for the best experience.</p>
+            <a href="<?= $base ?>/" class="govuk-button" data-module="govuk-button">
+                <i class="fa-solid fa-arrow-left govuk-!-margin-right-2" aria-hidden="true"></i>
                 Go to Main Site
             </a>
         </div>
@@ -158,13 +161,13 @@ $appIcons = [
     <!-- Mobile App Container -->
     <div class="app-container">
         <!-- Header -->
-        <header class="app-header">
-            <a href="<?= $base ?>/" class="header-btn" aria-label="Go back home">
-                <i class="fa-solid fa-chevron-left"></i>
+        <header class="app-header" role="banner">
+            <a href="<?= $base ?>/" class="header-btn govuk-link" aria-label="Go back home">
+                <i class="fa-solid fa-chevron-left" aria-hidden="true"></i>
             </a>
-            <span class="header-title">About Us</span>
-            <button class="header-btn" onclick="toggleTheme()" aria-label="Toggle theme">
-                <i class="fa-solid <?= $isDark ? 'fa-sun' : 'fa-moon' ?> theme-icon" id="themeIcon"></i>
+            <span class="header-title govuk-!-font-weight-bold">About Us</span>
+            <button type="button" class="header-btn" onclick="toggleTheme()" aria-label="Toggle theme">
+                <i class="fa-solid <?= $isDark ? 'fa-sun' : 'fa-moon' ?> theme-icon" id="themeIcon" aria-hidden="true"></i>
             </button>
         </header>
 
@@ -195,16 +198,16 @@ $appIcons = [
         </div>
 
         <!-- Dock Bar -->
-        <nav role="navigation" aria-label="Main navigation" class="dock-bar" aria-label="Quick navigation">
-            <div class="dock-inner">
-                <a href="<?= $base ?>/" class="dock-item dock-home" aria-label="Home">
-                    <i class="fa-solid fa-house"></i>
+        <nav role="navigation" aria-label="Quick navigation" class="dock-bar">
+            <div class="dock-inner govuk-!-padding-2">
+                <a href="<?= $base ?>/" class="dock-item dock-home govuk-link" aria-label="Home">
+                    <i class="fa-solid fa-house" aria-hidden="true"></i>
                 </a>
-                <a href="<?= $base ?>/listings" class="dock-item dock-explore" aria-label="Explore listings">
-                    <i class="fa-solid fa-compass"></i>
+                <a href="<?= $base ?>/listings" class="dock-item dock-explore govuk-link" aria-label="Explore listings">
+                    <i class="fa-solid fa-compass" aria-hidden="true"></i>
                 </a>
-                <a href="<?= $base ?>/dashboard" class="dock-item dock-profile" aria-label="Your dashboard">
-                    <i class="fa-solid fa-user"></i>
+                <a href="<?= $base ?>/dashboard" class="dock-item dock-profile govuk-link" aria-label="Your dashboard">
+                    <i class="fa-solid fa-user" aria-hidden="true"></i>
                 </a>
             </div>
         </nav>

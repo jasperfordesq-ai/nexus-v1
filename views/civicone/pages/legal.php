@@ -59,7 +59,7 @@ require __DIR__ . '/../../layouts/civicone/header.php';
 
                     <!-- Privacy Policy -->
                     <div class="govuk-grid-column-one-third govuk-!-margin-bottom-6">
-                        <div class="civicone-card-bordered">
+                        <div class="govuk-!-padding-4" style="border: 1px solid #b1b4b6; height: 100%;">
                             <h2 class="govuk-heading-m govuk-!-margin-bottom-2">
                                 <a href="<?= $basePath ?>/privacy" class="govuk-link">Privacy Policy</a>
                             </h2>
@@ -71,7 +71,7 @@ require __DIR__ . '/../../layouts/civicone/header.php';
 
                     <!-- Terms of Service -->
                     <div class="govuk-grid-column-one-third govuk-!-margin-bottom-6">
-                        <div class="civicone-card-bordered">
+                        <div class="govuk-!-padding-4" style="border: 1px solid #b1b4b6; height: 100%;">
                             <h2 class="govuk-heading-m govuk-!-margin-bottom-2">
                                 <a href="<?= $basePath ?>/terms" class="govuk-link">Terms of Service</a>
                             </h2>
@@ -83,7 +83,7 @@ require __DIR__ . '/../../layouts/civicone/header.php';
 
                     <!-- Accessibility -->
                     <div class="govuk-grid-column-one-third govuk-!-margin-bottom-6">
-                        <div class="civicone-card-bordered">
+                        <div class="govuk-!-padding-4" style="border: 1px solid #b1b4b6; height: 100%;">
                             <h2 class="govuk-heading-m govuk-!-margin-bottom-2">
                                 <a href="<?= $basePath ?>/accessibility" class="govuk-link">Accessibility Statement</a>
                             </h2>
@@ -95,7 +95,7 @@ require __DIR__ . '/../../layouts/civicone/header.php';
 
                     <!-- Cookie Policy -->
                     <div class="govuk-grid-column-one-third govuk-!-margin-bottom-6">
-                        <div class="civicone-card-bordered">
+                        <div class="govuk-!-padding-4" style="border: 1px solid #b1b4b6; height: 100%;">
                             <h2 class="govuk-heading-m govuk-!-margin-bottom-2">
                                 <a href="<?= $basePath ?>/cookies" class="govuk-link">Cookie Policy</a>
                             </h2>
@@ -107,7 +107,7 @@ require __DIR__ . '/../../layouts/civicone/header.php';
 
                     <!-- Contact -->
                     <div class="govuk-grid-column-one-third govuk-!-margin-bottom-6">
-                        <div class="civicone-card-bordered">
+                        <div class="govuk-!-padding-4" style="border: 1px solid #b1b4b6; height: 100%;">
                             <h2 class="govuk-heading-m govuk-!-margin-bottom-2">
                                 <a href="<?= $basePath ?>/contact" class="govuk-link">Contact Us</a>
                             </h2>
@@ -119,7 +119,7 @@ require __DIR__ . '/../../layouts/civicone/header.php';
 
                     <!-- Help Centre -->
                     <div class="govuk-grid-column-one-third govuk-!-margin-bottom-6">
-                        <div class="civicone-card-bordered">
+                        <div class="govuk-!-padding-4" style="border: 1px solid #b1b4b6; height: 100%;">
                             <h2 class="govuk-heading-m govuk-!-margin-bottom-2">
                                 <a href="<?= $basePath ?>/help" class="govuk-link">Help Centre</a>
                             </h2>

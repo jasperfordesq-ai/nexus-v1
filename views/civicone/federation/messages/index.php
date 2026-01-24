@@ -1,7 +1,7 @@
 <?php
 /**
  * Federation Messages Inbox
- * CivicOne Theme - WCAG 2.1 AA Compliant
+ * GOV.UK Design System (WCAG 2.1 AA)
  */
 $pageTitle = $pageTitle ?? "Federated Messages";
 $hideHero = true;
@@ -28,103 +28,124 @@ function timeAgo($datetime) {
 }
 ?>
 
-<!-- Offline Banner -->
-<div class="civic-fed-offline-banner" id="offlineBanner" role="alert" aria-live="polite">
-    <i class="fa-solid fa-wifi-slash" aria-hidden="true"></i>
-    <span>No internet connection</span>
-</div>
+<div class="govuk-width-container">
+    <!-- Offline Banner -->
+    <div class="govuk-notification-banner govuk-notification-banner--warning govuk-!-display-none" id="offlineBanner" role="alert" aria-live="polite" data-module="govuk-notification-banner">
+        <div class="govuk-notification-banner__content">
+            <p class="govuk-notification-banner__heading">
+                <i class="fa-solid fa-wifi-slash govuk-!-margin-right-2" aria-hidden="true"></i>
+                No internet connection
+            </p>
+        </div>
+    </div>
 
-<div class="civic-container">
     <!-- Back Link -->
-    <a href="<?= $basePath ?>/messages" class="civic-fed-back-link" aria-label="Return to local messages">
-        <i class="fa-solid fa-arrow-left" aria-hidden="true"></i>
+    <a href="<?= $basePath ?>/messages" class="govuk-back-link govuk-!-margin-top-4">
         Back to Messages
     </a>
 
-    <!-- Header -->
-    <header class="civic-fed-header">
-        <div class="civic-fed-header-content">
-            <h1>
-                <i class="fa-solid fa-globe" aria-hidden="true"></i>
-                Federated Messages
-                <?php if ($unreadCount > 0): ?>
-                    <span class="civic-fed-count-badge" role="status" aria-label="<?= $unreadCount ?> unread message<?= $unreadCount !== 1 ? 's' : '' ?>"><?= $unreadCount ?></span>
-                <?php endif; ?>
-            </h1>
-        </div>
-        <a href="<?= $basePath ?>/federation/members" class="civic-fed-btn civic-fed-btn--secondary" aria-label="Find new members to message">
-            <i class="fa-solid fa-user-plus" aria-hidden="true"></i>
-            Find Members
-        </a>
-    </header>
-
-    <!-- Conversations List -->
-    <?php if (!empty($conversations)): ?>
-        <div class="civic-fed-conversations-list" role="list" aria-label="Message conversations">
-            <?php foreach ($conversations as $conv): ?>
-                <?php
-                $isUnread = ($conv['unread_count'] ?? 0) > 0;
-                $fallbackAvatar = 'https://ui-avatars.com/api/?name=' . urlencode($conv['sender_name'] ?? 'User') . '&background=00796B&color=fff&size=100';
-                $avatar = !empty($conv['sender_avatar']) ? $conv['sender_avatar'] : $fallbackAvatar;
-                $threadUrl = $basePath . '/federation/messages/' . $conv['sender_user_id'] . '?tenant=' . $conv['sender_tenant_id'];
-                $timeAgo = timeAgo($conv['created_at'] ?? '');
-                $senderName = $conv['sender_name'] ?? 'Unknown';
-                ?>
-                <a href="<?= $threadUrl ?>"
-                   class="civic-fed-conversation-card <?= $isUnread ? 'civic-fed-conversation-card--unread' : '' ?>"
-                   role="listitem"
-                   aria-label="Conversation with <?= htmlspecialchars($senderName) ?><?= $isUnread ? ', unread' : '' ?>">
-                    <div class="civic-fed-conversation-avatar">
-                        <img src="<?= htmlspecialchars($avatar) ?>"
-                             onerror="this.src='<?= $fallbackAvatar ?>'"
-                             alt=""
-                             loading="lazy">
-                        <?php if ($isUnread): ?>
-                            <span class="civic-fed-unread-dot" aria-hidden="true"></span>
-                        <?php endif; ?>
-                    </div>
-                    <div class="civic-fed-conversation-content">
-                        <div class="civic-fed-conversation-header">
-                            <div class="civic-fed-conversation-info">
-                                <h3 class="civic-fed-conversation-name"><?= htmlspecialchars($senderName) ?></h3>
-                                <span class="civic-fed-conversation-tenant">
-                                    <i class="fa-solid fa-building" aria-hidden="true"></i>
-                                    <?= htmlspecialchars($conv['sender_tenant_name'] ?? 'Partner') ?>
-                                </span>
-                            </div>
-                            <time class="civic-fed-conversation-time" datetime="<?= htmlspecialchars($conv['created_at'] ?? '') ?>"><?= $timeAgo ?></time>
-                        </div>
-                        <p class="civic-fed-conversation-preview <?= $isUnread ? 'civic-fed-conversation-preview--unread' : '' ?>">
-                            <?= htmlspecialchars(mb_substr($conv['body'] ?? '', 0, 80)) ?><?= mb_strlen($conv['body'] ?? '') > 80 ? '...' : '' ?>
-                        </p>
-                    </div>
-                </a>
-            <?php endforeach; ?>
-        </div>
-    <?php else: ?>
-        <div class="civic-fed-empty" role="status">
-            <div class="civic-fed-empty-icon" aria-hidden="true">
-                <i class="fa-solid fa-envelope-open"></i>
+    <main class="govuk-main-wrapper govuk-!-padding-top-4" id="main-content" role="main">
+        <!-- Header -->
+        <div class="govuk-grid-row govuk-!-margin-bottom-6">
+            <div class="govuk-grid-column-two-thirds">
+                <h1 class="govuk-heading-xl govuk-!-margin-bottom-2">
+                    <i class="fa-solid fa-globe govuk-!-margin-right-2" style="color: #1d70b8;" aria-hidden="true"></i>
+                    Federated Messages
+                    <?php if ($unreadCount > 0): ?>
+                        <span class="govuk-tag govuk-tag--red govuk-!-margin-left-2" role="status">
+                            <?= $unreadCount ?> unread
+                        </span>
+                    <?php endif; ?>
+                </h1>
             </div>
-            <h3>No Federated Messages Yet</h3>
-            <p>Start connecting with members from partner timebanks!</p>
-            <a href="<?= $basePath ?>/federation/members" class="civic-fed-btn civic-fed-btn--primary">
-                <i class="fa-solid fa-users" aria-hidden="true"></i>
-                Browse Federated Members
-            </a>
+            <div class="govuk-grid-column-one-third govuk-!-text-align-right">
+                <a href="<?= $basePath ?>/federation/members" class="govuk-button govuk-button--secondary" data-module="govuk-button">
+                    <i class="fa-solid fa-user-plus govuk-!-margin-right-2" aria-hidden="true"></i>
+                    Find Members
+                </a>
+            </div>
         </div>
-    <?php endif; ?>
+
+        <div class="govuk-grid-row">
+            <div class="govuk-grid-column-two-thirds">
+                <!-- Conversations List -->
+                <?php if (!empty($conversations)): ?>
+                    <div role="list" aria-label="Message conversations">
+                        <?php foreach ($conversations as $conv): ?>
+                            <?php
+                            $isUnread = ($conv['unread_count'] ?? 0) > 0;
+                            $fallbackAvatar = 'https://ui-avatars.com/api/?name=' . urlencode($conv['sender_name'] ?? 'User') . '&background=1d70b8&color=fff&size=100';
+                            $avatar = !empty($conv['sender_avatar']) ? $conv['sender_avatar'] : $fallbackAvatar;
+                            $threadUrl = $basePath . '/federation/messages/' . $conv['sender_user_id'] . '?tenant=' . $conv['sender_tenant_id'];
+                            $timeAgo = timeAgo($conv['created_at'] ?? '');
+                            $senderName = $conv['sender_name'] ?? 'Unknown';
+                            $borderColor = $isUnread ? '#1d70b8' : '#b1b4b6';
+                            ?>
+                            <a href="<?= $threadUrl ?>"
+                               class="govuk-!-padding-4 govuk-!-margin-bottom-3"
+                               style="display: block; background: #fff; border: 1px solid #b1b4b6; border-left: 5px solid <?= $borderColor ?>; text-decoration: none; color: inherit;"
+                               role="listitem">
+                                <div style="display: flex; align-items: flex-start; gap: 16px;">
+                                    <div style="position: relative; flex-shrink: 0;">
+                                        <img src="<?= htmlspecialchars($avatar) ?>"
+                                             onerror="this.src='<?= $fallbackAvatar ?>'"
+                                             alt=""
+                                             style="width: 48px; height: 48px; border-radius: 50%; object-fit: cover;"
+                                             loading="lazy">
+                                        <?php if ($isUnread): ?>
+                                            <span style="position: absolute; top: 0; right: 0; width: 12px; height: 12px; background: #1d70b8; border-radius: 50%; border: 2px solid #fff;" aria-hidden="true"></span>
+                                        <?php endif; ?>
+                                    </div>
+                                    <div style="flex: 1; min-width: 0;">
+                                        <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 8px;">
+                                            <div>
+                                                <p class="govuk-body govuk-!-font-weight-bold govuk-!-margin-bottom-1" style="<?= $isUnread ? 'color: #0b0c0c;' : '' ?>">
+                                                    <?= htmlspecialchars($senderName) ?>
+                                                </p>
+                                                <p class="govuk-body-s govuk-!-margin-bottom-2" style="color: #505a5f;">
+                                                    <i class="fa-solid fa-building govuk-!-margin-right-1" aria-hidden="true"></i>
+                                                    <?= htmlspecialchars($conv['sender_tenant_name'] ?? 'Partner') ?>
+                                                </p>
+                                            </div>
+                                            <time class="govuk-body-s" style="color: #505a5f; white-space: nowrap;" datetime="<?= htmlspecialchars($conv['created_at'] ?? '') ?>">
+                                                <?= $timeAgo ?>
+                                            </time>
+                                        </div>
+                                        <p class="govuk-body-s govuk-!-margin-bottom-0" style="color: <?= $isUnread ? '#0b0c0c' : '#505a5f' ?>; <?= $isUnread ? 'font-weight: bold;' : '' ?> overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                                            <?= htmlspecialchars(mb_substr($conv['body'] ?? '', 0, 80)) ?><?= mb_strlen($conv['body'] ?? '') > 80 ? '...' : '' ?>
+                                        </p>
+                                    </div>
+                                </div>
+                            </a>
+                        <?php endforeach; ?>
+                    </div>
+                <?php else: ?>
+                    <div class="govuk-!-padding-6 govuk-!-text-align-center" style="background: #f3f2f1; border-left: 5px solid #1d70b8;">
+                        <i class="fa-solid fa-envelope-open fa-3x govuk-!-margin-bottom-4" style="color: #1d70b8;" aria-hidden="true"></i>
+                        <h2 class="govuk-heading-m">No Federated Messages Yet</h2>
+                        <p class="govuk-body govuk-!-margin-bottom-4">Start connecting with members from partner timebanks!</p>
+                        <a href="<?= $basePath ?>/federation/members" class="govuk-button" data-module="govuk-button">
+                            <i class="fa-solid fa-users govuk-!-margin-right-2" aria-hidden="true"></i>
+                            Browse Federated Members
+                        </a>
+                    </div>
+                <?php endif; ?>
+            </div>
+        </div>
+    </main>
 </div>
 
 <script src="/assets/js/federation-messages.js?v=<?= time() ?>"></script>
 <script>
-// Offline indicator
 (function() {
-    const banner = document.getElementById('offlineBanner');
-    if (!banner) return;
-    window.addEventListener('online', () => banner.classList.remove('civic-fed-offline-banner--visible'));
-    window.addEventListener('offline', () => banner.classList.add('civic-fed-offline-banner--visible'));
-    if (!navigator.onLine) banner.classList.add('civic-fed-offline-banner--visible');
+    'use strict';
+    var banner = document.getElementById('offlineBanner');
+    function updateOffline(offline) {
+        if (banner) banner.classList.toggle('govuk-!-display-none', !offline);
+    }
+    window.addEventListener('online', function() { updateOffline(false); });
+    window.addEventListener('offline', function() { updateOffline(true); });
+    if (!navigator.onLine) updateOffline(true);
 })();
 </script>
 

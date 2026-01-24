@@ -1,7 +1,7 @@
 <?php
 /**
  * Federation Settings
- * CivicOne Theme - WCAG 2.1 AA Compliant
+ * CivicOne Theme - GOV.UK Design System (WCAG 2.1 AA)
  */
 $pageTitle = $pageTitle ?? "Federation Settings";
 $pageSubtitle = "Manage your federation preferences";
@@ -23,281 +23,301 @@ $serviceReach = $userSettings['service_reach'] ?? 'local_only';
 ?>
 
 <!-- Offline Banner -->
-<div class="civic-fed-offline-banner" id="offlineBanner" role="alert" aria-live="polite">
-    <i class="fa-solid fa-wifi-slash" aria-hidden="true"></i>
-    <span>No internet connection</span>
+<div class="govuk-notification-banner govuk-notification-banner--warning govuk-!-margin-bottom-4 hidden" id="offlineBanner" role="alert" aria-live="polite">
+    <div class="govuk-notification-banner__content">
+        <p class="govuk-body">
+            <i class="fa-solid fa-wifi-slash govuk-!-margin-right-2" aria-hidden="true"></i>
+            No internet connection
+        </p>
+    </div>
 </div>
 
-<div class="civic-container">
-    <!-- Back Link -->
-    <a href="<?= $basePath ?>/federation" class="civic-fed-back-link">
-        <i class="fa-solid fa-arrow-left" aria-hidden="true"></i>
-        Back to Federation Hub
-    </a>
+<nav class="govuk-breadcrumbs govuk-!-margin-bottom-6" aria-label="Breadcrumb">
+    <ol class="govuk-breadcrumbs__list">
+        <li class="govuk-breadcrumbs__list-item">
+            <a class="govuk-breadcrumbs__link" href="<?= $basePath ?>">Home</a>
+        </li>
+        <li class="govuk-breadcrumbs__list-item">
+            <a class="govuk-breadcrumbs__link" href="<?= $basePath ?>/federation">Federation</a>
+        </li>
+        <li class="govuk-breadcrumbs__list-item" aria-current="page">Settings</li>
+    </ol>
+</nav>
 
-    <!-- Page Header -->
-    <header class="civic-fed-header">
-        <h1>Federation Settings</h1>
-    </header>
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+        <h1 class="govuk-heading-xl govuk-!-margin-bottom-4">
+            <i class="fa-solid fa-cog govuk-!-margin-right-2" aria-hidden="true"></i>
+            Federation Settings
+        </h1>
+        <p class="govuk-body-l govuk-!-margin-bottom-6">
+            Control your privacy, visibility, and how you appear to members from partner timebanks.
+        </p>
+    </div>
+</div>
 
-    <p class="civic-fed-intro">
-        Control your privacy, visibility, and how you appear to members from partner timebanks.
-    </p>
+<?php $currentPage = 'settings'; $userOptedIn = $isOptedIn; require dirname(__DIR__) . '/partials/federation-nav.php'; ?>
 
-    <?php $currentPage = 'settings'; $userOptedIn = $isOptedIn; require dirname(__DIR__) . '/partials/federation-nav.php'; ?>
-
-    <!-- Status Banner -->
-    <div class="civic-fed-status-banner <?= $isOptedIn ? 'civic-fed-status-banner--enabled' : 'civic-fed-status-banner--disabled' ?>" role="status" aria-live="polite">
-        <div class="civic-fed-status-info">
-            <div class="civic-fed-status-icon">
-                <i class="fa-solid <?= $isOptedIn ? 'fa-check' : 'fa-eye-slash' ?>" aria-hidden="true"></i>
-            </div>
-            <div class="civic-fed-status-text">
-                <h2>Federation is <?= $isOptedIn ? 'Enabled' : 'Disabled' ?></h2>
-                <p><?= $isOptedIn
+<!-- Status Banner -->
+<div class="govuk-notification-banner <?= $isOptedIn ? 'govuk-notification-banner--success' : '' ?> govuk-!-margin-bottom-6" role="status" aria-live="polite">
+    <div class="govuk-notification-banner__header">
+        <h2 class="govuk-notification-banner__title">Federation Status</h2>
+    </div>
+    <div class="govuk-notification-banner__content">
+        <div class="govuk-grid-row">
+            <div class="govuk-grid-column-two-thirds">
+                <h3 class="govuk-notification-banner__heading">
+                    <i class="fa-solid <?= $isOptedIn ? 'fa-check' : 'fa-eye-slash' ?> govuk-!-margin-right-2" aria-hidden="true"></i>
+                    Federation is <?= $isOptedIn ? 'Enabled' : 'Disabled' ?>
+                </h3>
+                <p class="govuk-body"><?= $isOptedIn
                     ? 'Your profile is visible to ' . $partnerCount . ' partner timebank' . ($partnerCount !== 1 ? 's' : '')
                     : 'Your profile is hidden from partner timebanks' ?></p>
             </div>
+            <div class="govuk-grid-column-one-third govuk-!-text-align-right">
+                <button type="button" class="govuk-button <?= $isOptedIn ? 'govuk-button--warning' : '' ?>" data-module="govuk-button" id="statusToggle">
+                    <?= $isOptedIn ? 'Disable Federation' : 'Enable Federation' ?>
+                </button>
+            </div>
         </div>
-        <button type="button" class="civic-fed-btn <?= $isOptedIn ? 'civic-fed-btn--danger' : 'civic-fed-btn--primary' ?>" id="statusToggle">
-            <?= $isOptedIn ? 'Disable Federation' : 'Enable Federation' ?>
-        </button>
     </div>
+</div>
 
     <form id="settingsForm" aria-label="Federation settings form">
         <!-- Privacy Level -->
-        <section class="civic-fed-card" aria-labelledby="privacy-heading">
-            <div class="civic-fed-card-header">
-                <h2 id="privacy-heading">
-                    <i class="fa-solid fa-shield-halved" aria-hidden="true"></i>
-                    Privacy Level
-                </h2>
-            </div>
-            <div class="civic-fed-card-body">
-                <p class="civic-fed-card-desc">Choose how much of your profile to share with partner timebanks</p>
+        <div class="govuk-!-padding-4 govuk-!-margin-bottom-6" style="border: 1px solid #b1b4b6; border-left: 5px solid #1d70b8;">
+            <h2 class="govuk-heading-m" id="privacy-heading">
+                <i class="fa-solid fa-shield-halved govuk-!-margin-right-2" aria-hidden="true"></i>
+                Privacy Level
+            </h2>
+            <p class="govuk-hint govuk-!-margin-bottom-4">Choose how much of your profile to share with partner timebanks</p>
 
-                <fieldset class="civic-fed-radio-group" role="radiogroup" aria-labelledby="privacy-heading">
-                    <legend class="visually-hidden">Privacy level options</legend>
-
-                    <label class="civic-fed-radio-option <?= $privacyLevel === 'discovery' ? 'civic-fed-radio-option--selected' : '' ?>">
-                        <input type="radio" name="privacy_level" value="discovery" <?= $privacyLevel === 'discovery' ? 'checked' : '' ?>>
-                        <span class="civic-fed-radio-indicator" aria-hidden="true"></span>
-                        <div class="civic-fed-radio-content">
-                            <h4>Discovery Only</h4>
-                            <p>Only your name and avatar are visible. Good for browsing without sharing details.</p>
+            <div class="govuk-form-group">
+                <fieldset class="govuk-fieldset" aria-labelledby="privacy-heading">
+                    <legend class="govuk-visually-hidden">Privacy level options</legend>
+                    <div class="govuk-radios govuk-radios--small" data-module="govuk-radios">
+                        <div class="govuk-radios__item">
+                            <input class="govuk-radios__input" id="privacy-discovery" name="privacy_level" type="radio" value="discovery" <?= $privacyLevel === 'discovery' ? 'checked' : '' ?>>
+                            <label class="govuk-label govuk-radios__label" for="privacy-discovery">
+                                <strong>Discovery Only</strong>
+                            </label>
+                            <div class="govuk-hint govuk-radios__hint">
+                                Only your name and avatar are visible. Good for browsing without sharing details.
+                            </div>
                         </div>
-                    </label>
-
-                    <label class="civic-fed-radio-option <?= $privacyLevel === 'social' ? 'civic-fed-radio-option--selected' : '' ?>">
-                        <input type="radio" name="privacy_level" value="social" <?= $privacyLevel === 'social' ? 'checked' : '' ?>>
-                        <span class="civic-fed-radio-indicator" aria-hidden="true"></span>
-                        <div class="civic-fed-radio-content">
-                            <h4>Social <span class="civic-fed-tag civic-fed-tag--success">Recommended</span></h4>
-                            <p>Share your skills, bio, and location. Enables messaging with partner members.</p>
+                        <div class="govuk-radios__item">
+                            <input class="govuk-radios__input" id="privacy-social" name="privacy_level" type="radio" value="social" <?= $privacyLevel === 'social' ? 'checked' : '' ?>>
+                            <label class="govuk-label govuk-radios__label" for="privacy-social">
+                                <strong>Social</strong> <span class="govuk-tag govuk-tag--green">Recommended</span>
+                            </label>
+                            <div class="govuk-hint govuk-radios__hint">
+                                Share your skills, bio, and location. Enables messaging with partner members.
+                            </div>
                         </div>
-                    </label>
-
-                    <label class="civic-fed-radio-option <?= $privacyLevel === 'economic' ? 'civic-fed-radio-option--selected' : '' ?>">
-                        <input type="radio" name="privacy_level" value="economic" <?= $privacyLevel === 'economic' ? 'checked' : '' ?>>
-                        <span class="civic-fed-radio-indicator" aria-hidden="true"></span>
-                        <div class="civic-fed-radio-content">
-                            <h4>Economic</h4>
-                            <p>Full profile sharing plus ability to send/receive time credits across timebanks.</p>
+                        <div class="govuk-radios__item">
+                            <input class="govuk-radios__input" id="privacy-economic" name="privacy_level" type="radio" value="economic" <?= $privacyLevel === 'economic' ? 'checked' : '' ?>>
+                            <label class="govuk-label govuk-radios__label" for="privacy-economic">
+                                <strong>Economic</strong>
+                            </label>
+                            <div class="govuk-hint govuk-radios__hint">
+                                Full profile sharing plus ability to send/receive time credits across timebanks.
+                            </div>
                         </div>
-                    </label>
+                    </div>
                 </fieldset>
             </div>
-        </section>
+        </div>
 
         <!-- Visibility Options -->
-        <section class="civic-fed-card" aria-labelledby="visibility-heading">
-            <div class="civic-fed-card-header">
-                <h2 id="visibility-heading">
-                    <i class="fa-solid fa-sliders" aria-hidden="true"></i>
-                    Visibility Options
-                </h2>
-            </div>
-            <div class="civic-fed-card-body">
-                <p class="civic-fed-card-desc">Fine-tune what information is shared</p>
+        <div class="govuk-!-padding-4 govuk-!-margin-bottom-6" style="border: 1px solid #b1b4b6; border-left: 5px solid #1d70b8;">
+            <h2 class="govuk-heading-m" id="visibility-heading">
+                <i class="fa-solid fa-sliders govuk-!-margin-right-2" aria-hidden="true"></i>
+                Visibility Options
+            </h2>
+            <p class="govuk-hint govuk-!-margin-bottom-4">Fine-tune what information is shared</p>
 
-                <div class="civic-fed-toggle-list" role="group" aria-labelledby="visibility-heading">
-                    <div class="civic-fed-toggle-item">
-                        <div class="civic-fed-toggle-info">
-                            <h4 id="search-toggle-label">Show in Federated Search</h4>
-                            <p id="search-toggle-desc">Appear in search results for partner timebank members</p>
+            <div class="govuk-form-group">
+                <fieldset class="govuk-fieldset" aria-labelledby="visibility-heading">
+                    <legend class="govuk-visually-hidden">Visibility options</legend>
+                    <div class="govuk-checkboxes govuk-checkboxes--small" data-module="govuk-checkboxes">
+                        <div class="govuk-checkboxes__item">
+                            <input class="govuk-checkboxes__input" id="appear_in_search" name="appear_in_search" type="checkbox" <?= !empty($userSettings['appear_in_federated_search']) ? 'checked' : '' ?>>
+                            <label class="govuk-label govuk-checkboxes__label" for="appear_in_search">
+                                <strong>Show in Federated Search</strong>
+                            </label>
+                            <div class="govuk-hint govuk-checkboxes__hint">
+                                Appear in search results for partner timebank members
+                            </div>
                         </div>
-                        <label class="civic-fed-toggle">
-                            <input type="checkbox" name="appear_in_search" <?= !empty($userSettings['appear_in_federated_search']) ? 'checked' : '' ?> aria-labelledby="search-toggle-label" aria-describedby="search-toggle-desc">
-                            <span class="civic-fed-toggle-slider" aria-hidden="true"></span>
-                        </label>
-                    </div>
-
-                    <div class="civic-fed-toggle-item">
-                        <div class="civic-fed-toggle-info">
-                            <h4 id="profile-toggle-label">Profile Visible</h4>
-                            <p id="profile-toggle-desc">Allow partner members to view your full profile</p>
+                        <div class="govuk-checkboxes__item">
+                            <input class="govuk-checkboxes__input" id="profile_visible" name="profile_visible" type="checkbox" <?= !empty($userSettings['profile_visible_federated']) ? 'checked' : '' ?>>
+                            <label class="govuk-label govuk-checkboxes__label" for="profile_visible">
+                                <strong>Profile Visible</strong>
+                            </label>
+                            <div class="govuk-hint govuk-checkboxes__hint">
+                                Allow partner members to view your full profile
+                            </div>
                         </div>
-                        <label class="civic-fed-toggle">
-                            <input type="checkbox" name="profile_visible" <?= !empty($userSettings['profile_visible_federated']) ? 'checked' : '' ?> aria-labelledby="profile-toggle-label" aria-describedby="profile-toggle-desc">
-                            <span class="civic-fed-toggle-slider" aria-hidden="true"></span>
-                        </label>
-                    </div>
-
-                    <div class="civic-fed-toggle-item">
-                        <div class="civic-fed-toggle-info">
-                            <h4 id="location-toggle-label">Show Location</h4>
-                            <p id="location-toggle-desc">Display your city/region to partner members</p>
+                        <div class="govuk-checkboxes__item">
+                            <input class="govuk-checkboxes__input" id="show_location" name="show_location" type="checkbox" <?= !empty($userSettings['show_location_federated']) ? 'checked' : '' ?>>
+                            <label class="govuk-label govuk-checkboxes__label" for="show_location">
+                                <strong>Show Location</strong>
+                            </label>
+                            <div class="govuk-hint govuk-checkboxes__hint">
+                                Display your city/region to partner members
+                            </div>
                         </div>
-                        <label class="civic-fed-toggle">
-                            <input type="checkbox" name="show_location" <?= !empty($userSettings['show_location_federated']) ? 'checked' : '' ?> aria-labelledby="location-toggle-label" aria-describedby="location-toggle-desc">
-                            <span class="civic-fed-toggle-slider" aria-hidden="true"></span>
-                        </label>
-                    </div>
-
-                    <div class="civic-fed-toggle-item">
-                        <div class="civic-fed-toggle-info">
-                            <h4 id="skills-toggle-label">Show Skills</h4>
-                            <p id="skills-toggle-desc">Display your skills and services to partner members</p>
+                        <div class="govuk-checkboxes__item">
+                            <input class="govuk-checkboxes__input" id="show_skills" name="show_skills" type="checkbox" <?= !empty($userSettings['show_skills_federated']) ? 'checked' : '' ?>>
+                            <label class="govuk-label govuk-checkboxes__label" for="show_skills">
+                                <strong>Show Skills</strong>
+                            </label>
+                            <div class="govuk-hint govuk-checkboxes__hint">
+                                Display your skills and services to partner members
+                            </div>
                         </div>
-                        <label class="civic-fed-toggle">
-                            <input type="checkbox" name="show_skills" <?= !empty($userSettings['show_skills_federated']) ? 'checked' : '' ?> aria-labelledby="skills-toggle-label" aria-describedby="skills-toggle-desc">
-                            <span class="civic-fed-toggle-slider" aria-hidden="true"></span>
-                        </label>
-                    </div>
-
-                    <div class="civic-fed-toggle-item">
-                        <div class="civic-fed-toggle-info">
-                            <h4 id="messaging-toggle-label">Receive Messages</h4>
-                            <p id="messaging-toggle-desc">Allow partner members to send you messages</p>
+                        <div class="govuk-checkboxes__item">
+                            <input class="govuk-checkboxes__input" id="messaging_enabled" name="messaging_enabled" type="checkbox" <?= !empty($userSettings['messaging_enabled_federated']) ? 'checked' : '' ?>>
+                            <label class="govuk-label govuk-checkboxes__label" for="messaging_enabled">
+                                <strong>Receive Messages</strong>
+                            </label>
+                            <div class="govuk-hint govuk-checkboxes__hint">
+                                Allow partner members to send you messages
+                            </div>
                         </div>
-                        <label class="civic-fed-toggle">
-                            <input type="checkbox" name="messaging_enabled" <?= !empty($userSettings['messaging_enabled_federated']) ? 'checked' : '' ?> aria-labelledby="messaging-toggle-label" aria-describedby="messaging-toggle-desc">
-                            <span class="civic-fed-toggle-slider" aria-hidden="true"></span>
-                        </label>
-                    </div>
-
-                    <div class="civic-fed-toggle-item">
-                        <div class="civic-fed-toggle-info">
-                            <h4 id="transactions-toggle-label">Accept Transactions</h4>
-                            <p id="transactions-toggle-desc">Allow receiving time credits from partner members</p>
+                        <div class="govuk-checkboxes__item">
+                            <input class="govuk-checkboxes__input" id="transactions_enabled" name="transactions_enabled" type="checkbox" <?= !empty($userSettings['transactions_enabled_federated']) ? 'checked' : '' ?>>
+                            <label class="govuk-label govuk-checkboxes__label" for="transactions_enabled">
+                                <strong>Accept Transactions</strong>
+                            </label>
+                            <div class="govuk-hint govuk-checkboxes__hint">
+                                Allow receiving time credits from partner members
+                            </div>
                         </div>
-                        <label class="civic-fed-toggle">
-                            <input type="checkbox" name="transactions_enabled" <?= !empty($userSettings['transactions_enabled_federated']) ? 'checked' : '' ?> aria-labelledby="transactions-toggle-label" aria-describedby="transactions-toggle-desc">
-                            <span class="civic-fed-toggle-slider" aria-hidden="true"></span>
-                        </label>
                     </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- AI Assistant Options -->
-        <section class="civic-fed-card" aria-labelledby="ai-heading">
-            <div class="civic-fed-card-header">
-                <h2 id="ai-heading">
-                    <i class="fa-solid fa-robot" aria-hidden="true"></i>
-                    AI Assistant
-                </h2>
-            </div>
-            <div class="civic-fed-card-body">
-                <p class="civic-fed-card-desc">Customize the AI assistant appearance</p>
-
-                <div class="civic-fed-toggle-list" role="group" aria-labelledby="ai-heading">
-                    <div class="civic-fed-toggle-item">
-                        <div class="civic-fed-toggle-info">
-                            <h4 id="ai-pulse-toggle-label">AI Button Animation</h4>
-                            <p id="ai-pulse-toggle-desc">Show pulsing animation on the AI assistant button</p>
-                        </div>
-                        <label class="civic-fed-toggle">
-                            <input type="checkbox" name="ai_pulse_enabled" id="ai_pulse_enabled" <?= !empty($userSettings['ai_pulse_enabled']) ? 'checked' : '' ?> aria-labelledby="ai-pulse-toggle-label" aria-describedby="ai-pulse-toggle-desc">
-                            <span class="civic-fed-toggle-slider" aria-hidden="true"></span>
-                        </label>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Service Reach -->
-        <section class="civic-fed-card" aria-labelledby="reach-heading">
-            <div class="civic-fed-card-header">
-                <h2 id="reach-heading">
-                    <i class="fa-solid fa-location-dot" aria-hidden="true"></i>
-                    Service Reach
-                </h2>
-            </div>
-            <div class="civic-fed-card-body">
-                <p class="civic-fed-card-desc">How far are you willing to travel for exchanges?</p>
-
-                <fieldset class="civic-fed-reach-options" role="radiogroup" aria-labelledby="reach-heading">
-                    <legend class="visually-hidden">Service reach options</legend>
-
-                    <label class="civic-fed-reach-option <?= $serviceReach === 'local_only' ? 'civic-fed-reach-option--selected' : '' ?>">
-                        <input type="radio" name="service_reach" value="local_only" <?= $serviceReach === 'local_only' ? 'checked' : '' ?>>
-                        <i class="fa-solid fa-house" aria-hidden="true"></i>
-                        <span>Local Only</span>
-                    </label>
-
-                    <label class="civic-fed-reach-option <?= $serviceReach === 'will_travel' ? 'civic-fed-reach-option--selected' : '' ?>">
-                        <input type="radio" name="service_reach" value="will_travel" <?= $serviceReach === 'will_travel' ? 'checked' : '' ?>>
-                        <i class="fa-solid fa-car" aria-hidden="true"></i>
-                        <span>Will Travel</span>
-                    </label>
-
-                    <label class="civic-fed-reach-option <?= $serviceReach === 'remote_ok' ? 'civic-fed-reach-option--selected' : '' ?>">
-                        <input type="radio" name="service_reach" value="remote_ok" <?= $serviceReach === 'remote_ok' ? 'checked' : '' ?>>
-                        <i class="fa-solid fa-laptop" aria-hidden="true"></i>
-                        <span>Remote OK</span>
-                    </label>
                 </fieldset>
             </div>
-        </section>
+        </div>
+
+        <!-- AI Assistant Options -->
+        <div class="govuk-!-padding-4 govuk-!-margin-bottom-6" style="border: 1px solid #b1b4b6; border-left: 5px solid #1d70b8;">
+            <h2 class="govuk-heading-m" id="ai-heading">
+                <i class="fa-solid fa-robot govuk-!-margin-right-2" aria-hidden="true"></i>
+                AI Assistant
+            </h2>
+            <p class="govuk-hint govuk-!-margin-bottom-4">Customize the AI assistant appearance</p>
+
+            <div class="govuk-form-group">
+                <fieldset class="govuk-fieldset" aria-labelledby="ai-heading">
+                    <legend class="govuk-visually-hidden">AI assistant options</legend>
+                    <div class="govuk-checkboxes govuk-checkboxes--small" data-module="govuk-checkboxes">
+                        <div class="govuk-checkboxes__item">
+                            <input class="govuk-checkboxes__input" id="ai_pulse_enabled" name="ai_pulse_enabled" type="checkbox" <?= !empty($userSettings['ai_pulse_enabled']) ? 'checked' : '' ?>>
+                            <label class="govuk-label govuk-checkboxes__label" for="ai_pulse_enabled">
+                                <strong>AI Button Animation</strong>
+                            </label>
+                            <div class="govuk-hint govuk-checkboxes__hint">
+                                Show pulsing animation on the AI assistant button
+                            </div>
+                        </div>
+                    </div>
+                </fieldset>
+            </div>
+        </div>
+
+        <!-- Service Reach -->
+        <div class="govuk-!-padding-4 govuk-!-margin-bottom-6" style="border: 1px solid #b1b4b6; border-left: 5px solid #1d70b8;">
+            <h2 class="govuk-heading-m" id="reach-heading">
+                <i class="fa-solid fa-location-dot govuk-!-margin-right-2" aria-hidden="true"></i>
+                Service Reach
+            </h2>
+            <p class="govuk-hint govuk-!-margin-bottom-4">How far are you willing to travel for exchanges?</p>
+
+            <div class="govuk-form-group">
+                <fieldset class="govuk-fieldset" aria-labelledby="reach-heading">
+                    <legend class="govuk-visually-hidden">Service reach options</legend>
+                    <div class="govuk-radios govuk-radios--inline" data-module="govuk-radios">
+                        <div class="govuk-radios__item">
+                            <input class="govuk-radios__input" id="reach-local" name="service_reach" type="radio" value="local_only" <?= $serviceReach === 'local_only' ? 'checked' : '' ?>>
+                            <label class="govuk-label govuk-radios__label" for="reach-local">
+                                <i class="fa-solid fa-house govuk-!-margin-right-1" aria-hidden="true"></i>
+                                Local Only
+                            </label>
+                        </div>
+                        <div class="govuk-radios__item">
+                            <input class="govuk-radios__input" id="reach-travel" name="service_reach" type="radio" value="will_travel" <?= $serviceReach === 'will_travel' ? 'checked' : '' ?>>
+                            <label class="govuk-label govuk-radios__label" for="reach-travel">
+                                <i class="fa-solid fa-car govuk-!-margin-right-1" aria-hidden="true"></i>
+                                Will Travel
+                            </label>
+                        </div>
+                        <div class="govuk-radios__item">
+                            <input class="govuk-radios__input" id="reach-remote" name="service_reach" type="radio" value="remote_ok" <?= $serviceReach === 'remote_ok' ? 'checked' : '' ?>>
+                            <label class="govuk-label govuk-radios__label" for="reach-remote">
+                                <i class="fa-solid fa-laptop govuk-!-margin-right-1" aria-hidden="true"></i>
+                                Remote OK
+                            </label>
+                        </div>
+                    </div>
+                </fieldset>
+            </div>
+        </div>
 
         <!-- Activity Summary -->
-        <section class="civic-fed-card" aria-labelledby="activity-heading">
-            <div class="civic-fed-card-header">
-                <h2 id="activity-heading">
-                    <i class="fa-solid fa-chart-simple" aria-hidden="true"></i>
-                    Your Federation Activity
-                </h2>
-            </div>
-            <div class="civic-fed-card-body">
-                <p class="civic-fed-card-desc">Summary of your cross-timebank interactions</p>
+        <div class="govuk-!-padding-4 govuk-!-margin-bottom-6" style="border: 1px solid #b1b4b6; border-left: 5px solid #1d70b8;">
+            <h2 class="govuk-heading-m" id="activity-heading">
+                <i class="fa-solid fa-chart-simple govuk-!-margin-right-2" aria-hidden="true"></i>
+                Your Federation Activity
+            </h2>
+            <p class="govuk-hint govuk-!-margin-bottom-4">Summary of your cross-timebank interactions</p>
 
-                <div class="civic-fed-stats-grid civic-fed-stats-grid--compact" role="region" aria-label="Activity statistics">
-                    <div class="civic-fed-stat-card">
-                        <span class="civic-fed-stat-value"><?= number_format(($stats['messages_sent'] ?? 0) + ($stats['messages_received'] ?? 0)) ?></span>
-                        <span class="civic-fed-stat-label">Messages Exchanged</span>
+            <div class="govuk-grid-row" role="region" aria-label="Activity statistics">
+                <div class="govuk-grid-column-one-quarter">
+                    <div class="govuk-!-padding-3 govuk-!-text-align-center" style="background: #f3f2f1;">
+                        <p class="govuk-heading-l govuk-!-margin-bottom-1"><?= number_format(($stats['messages_sent'] ?? 0) + ($stats['messages_received'] ?? 0)) ?></p>
+                        <p class="govuk-body-s govuk-!-margin-bottom-0" style="color: #505a5f;">Messages Exchanged</p>
                     </div>
-                    <div class="civic-fed-stat-card">
-                        <span class="civic-fed-stat-value"><?= number_format($stats['transactions_count'] ?? 0) ?></span>
-                        <span class="civic-fed-stat-label">Transactions</span>
+                </div>
+                <div class="govuk-grid-column-one-quarter">
+                    <div class="govuk-!-padding-3 govuk-!-text-align-center" style="background: #f3f2f1;">
+                        <p class="govuk-heading-l govuk-!-margin-bottom-1"><?= number_format($stats['transactions_count'] ?? 0) ?></p>
+                        <p class="govuk-body-s govuk-!-margin-bottom-0" style="color: #505a5f;">Transactions</p>
                     </div>
-                    <div class="civic-fed-stat-card">
-                        <span class="civic-fed-stat-value"><?= number_format($stats['hours_exchanged'] ?? 0, 1) ?></span>
-                        <span class="civic-fed-stat-label">Hours Exchanged</span>
+                </div>
+                <div class="govuk-grid-column-one-quarter">
+                    <div class="govuk-!-padding-3 govuk-!-text-align-center" style="background: #f3f2f1;">
+                        <p class="govuk-heading-l govuk-!-margin-bottom-1"><?= number_format($stats['hours_exchanged'] ?? 0, 1) ?></p>
+                        <p class="govuk-body-s govuk-!-margin-bottom-0" style="color: #505a5f;">Hours Exchanged</p>
                     </div>
-                    <div class="civic-fed-stat-card">
-                        <span class="civic-fed-stat-value"><?= $partnerCount ?></span>
-                        <span class="civic-fed-stat-label">Partner Timebanks</span>
+                </div>
+                <div class="govuk-grid-column-one-quarter">
+                    <div class="govuk-!-padding-3 govuk-!-text-align-center" style="background: #f3f2f1;">
+                        <p class="govuk-heading-l govuk-!-margin-bottom-1"><?= $partnerCount ?></p>
+                        <p class="govuk-body-s govuk-!-margin-bottom-0" style="color: #505a5f;">Partner Timebanks</p>
                     </div>
                 </div>
             </div>
-        </section>
+        </div>
 
         <!-- Save Actions -->
-        <div class="civic-fed-form-actions">
-            <a href="<?= $basePath ?>/federation/dashboard" class="civic-fed-btn civic-fed-btn--secondary">
-                <i class="fa-solid fa-arrow-left" aria-hidden="true"></i>
+        <div class="govuk-button-group govuk-!-margin-bottom-6">
+            <a href="<?= $basePath ?>/federation/dashboard" class="govuk-button govuk-button--secondary" data-module="govuk-button">
+                <i class="fa-solid fa-arrow-left govuk-!-margin-right-1" aria-hidden="true"></i>
                 Back
             </a>
-            <button type="submit" class="civic-fed-btn civic-fed-btn--primary" id="saveBtn">
-                <i class="fa-solid fa-check" aria-hidden="true"></i>
+            <button type="submit" class="govuk-button" data-module="govuk-button" id="saveBtn">
+                <i class="fa-solid fa-check govuk-!-margin-right-1" aria-hidden="true"></i>
                 Save Settings
             </button>
         </div>
     </form>
 
     <!-- Toast notification -->
-    <div class="civic-fed-toast" id="toast" role="status" aria-live="polite"></div>
+    <div class="govuk-notification-banner hidden" id="toast" role="status" aria-live="polite">
+        <div class="govuk-notification-banner__content">
+            <p class="govuk-body" id="toastMessage"></p>
+        </div>
+    </div>
 </div>
 
 <script src="/assets/js/federation-settings.js?v=<?= time() ?>"></script>

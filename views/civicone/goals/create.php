@@ -1,67 +1,90 @@
 <?php
-// CivicOne View: Create Goal
+/**
+ * CivicOne View: Create Goal
+ * GOV.UK Design System Compliant (WCAG 2.1 AA)
+ */
 $pageTitle = 'Set a Goal';
 require dirname(__DIR__, 2) . '/layouts/civicone/header.php';
+$basePath = \Nexus\Core\TenantContext::getBasePath();
 ?>
 
-<link rel="stylesheet" href="<?= Nexus\Core\TenantContext::getBasePath() ?>/assets/css/civicone-goals-form.css">
+<nav class="govuk-breadcrumbs govuk-!-margin-bottom-6" aria-label="Breadcrumb">
+    <ol class="govuk-breadcrumbs__list">
+        <li class="govuk-breadcrumbs__list-item">
+            <a class="govuk-breadcrumbs__link" href="<?= $basePath ?>">Home</a>
+        </li>
+        <li class="govuk-breadcrumbs__list-item">
+            <a class="govuk-breadcrumbs__link" href="<?= $basePath ?>/goals">Goals</a>
+        </li>
+        <li class="govuk-breadcrumbs__list-item" aria-current="page">Set a New Goal</li>
+    </ol>
+</nav>
 
-<div class="civic-container">
-    <?php
-    $breadcrumbs = [
-        ['label' => 'Home', 'url' => '/'],
-        ['label' => 'Goals', 'url' => '/goals'],
-        ['label' => 'Set a New Goal']
-    ];
-    require dirname(__DIR__, 2) . '/layouts/civicone/partials/breadcrumb.php';
-    ?>
+<a href="<?= $basePath ?>/goals" class="govuk-back-link govuk-!-margin-bottom-6">Back to Goals</a>
 
-    <div class="goal-form-header">
-        <h1 class="goal-form-title">Set a New Goal</h1>
-        <a href="<?= Nexus\Core\TenantContext::getBasePath() ?>/goals" class="civic-btn civic-bg-gray-200 civic-text-dark goal-form-cancel">Cancel</a>
-    </div>
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
 
-    <div class="civic-card goal-form-card">
+        <h1 class="govuk-heading-xl">
+            <i class="fa-solid fa-bullseye govuk-!-margin-right-2" aria-hidden="true"></i>
+            Set a New Goal
+        </h1>
+        <p class="govuk-body-l govuk-!-margin-bottom-6">Create a goal and find an accountability partner to help you achieve it.</p>
 
-        <form action="<?= Nexus\Core\TenantContext::getBasePath() ?>/goals/store" method="POST">
-            <?= Nexus\Core\Csrf::input() ?>
+        <form action="<?= $basePath ?>/goals/store" method="POST">
+            <?= \Nexus\Core\Csrf::input() ?>
 
-            <div class="goal-form-group">
-                <label for="title" class="goal-form-label">Goal Title</label>
-                <input type="text" name="title" id="title" class="civic-input goal-form-input" placeholder="e.g. Learn to Paint, Run a 5k..." required>
-                <p class="goal-form-hint">Short and sweet.</p>
+            <!-- Title -->
+            <div class="govuk-form-group">
+                <label class="govuk-label" for="title">Goal Title</label>
+                <div id="title-hint" class="govuk-hint">Short and sweet, e.g. "Learn to Paint" or "Run a 5k"</div>
+                <input class="govuk-input" type="text" name="title" id="title" aria-describedby="title-hint" required>
             </div>
 
-            <div class="goal-form-group">
-                <label for="description" class="goal-form-label">Description & Details</label>
-                <textarea name="description" id="description" class="civic-input goal-form-textarea" rows="5" placeholder="Share more details about what you want to achieve..."></textarea>
+            <!-- Description -->
+            <div class="govuk-form-group">
+                <label class="govuk-label" for="description">
+                    Description & Details <span class="govuk-hint govuk-!-display-inline">(optional)</span>
+                </label>
+                <div id="description-hint" class="govuk-hint">Share more details about what you want to achieve</div>
+                <textarea class="govuk-textarea" name="description" id="description" rows="5" aria-describedby="description-hint"></textarea>
             </div>
 
-            <div class="goal-form-grid">
-                <div>
-                    <label for="deadline" class="goal-form-label">Target Date (Optional)</label>
-                    <input type="date" name="deadline" id="deadline" class="civic-input goal-form-input">
-                </div>
-
-                <div class="goal-form-checkbox-wrapper">
-                    <label class="goal-form-checkbox-label">
-                        <input type="checkbox" name="is_public" value="1" checked class="goal-form-checkbox">
-                        <span>
-                            <strong class="goal-form-checkbox-title">Make Public?</strong>
-                            <span class="goal-form-checkbox-desc">Allow others to see and support this goal.</span>
-                        </span>
-                    </label>
-                </div>
+            <!-- Target Date -->
+            <div class="govuk-form-group">
+                <label class="govuk-label" for="deadline">
+                    Target Date <span class="govuk-hint govuk-!-display-inline">(optional)</span>
+                </label>
+                <div id="deadline-hint" class="govuk-hint">When do you want to achieve this goal?</div>
+                <input class="govuk-input govuk-input--width-10" type="date" name="deadline" id="deadline" aria-describedby="deadline-hint">
             </div>
 
-            <div class="goal-form-actions">
-                <button type="submit" class="civic-btn goal-form-submit">Create Goal</button>
+            <!-- Public Goal Checkbox -->
+            <div class="govuk-form-group">
+                <fieldset class="govuk-fieldset">
+                    <legend class="govuk-fieldset__legend govuk-fieldset__legend--s">Visibility</legend>
+                    <div class="govuk-checkboxes" data-module="govuk-checkboxes">
+                        <div class="govuk-checkboxes__item">
+                            <input class="govuk-checkboxes__input" id="is_public" name="is_public" type="checkbox" value="1" checked>
+                            <label class="govuk-label govuk-checkboxes__label" for="is_public">
+                                <strong>Make this goal public</strong>
+                                <span class="govuk-hint govuk-!-margin-bottom-0">Allow others to see and support this goal. Public goals can get accountability partners.</span>
+                            </label>
+                        </div>
+                    </div>
+                </fieldset>
             </div>
 
+            <div class="govuk-button-group">
+                <button type="submit" class="govuk-button" data-module="govuk-button">
+                    <i class="fa-solid fa-plus govuk-!-margin-right-1" aria-hidden="true"></i>
+                    Create Goal
+                </button>
+                <a href="<?= $basePath ?>/goals" class="govuk-link">Cancel</a>
+            </div>
         </form>
 
     </div>
-
 </div>
 
 <?php require dirname(__DIR__, 2) . '/layouts/civicone/footer.php'; ?>
