@@ -7,6 +7,17 @@
 (function() {
     'use strict';
 
+    // Security: Validate redirect URL to prevent open redirect attacks
+    function safeRedirect(url) {
+        if (!url) return '/dashboard';
+        // Only allow relative URLs starting with /
+        if (typeof url === 'string' && url.startsWith('/') && !url.startsWith('//')) {
+            return url;
+        }
+        // Reject absolute URLs and protocol-relative URLs
+        return '/dashboard';
+    }
+
     // ============================================
     // Check for Biometric Support
     // ============================================
@@ -68,7 +79,7 @@
             if (window.NexusPWA && NexusPWA.Biometric) {
                 const result = await NexusPWA.Biometric.authenticate();
                 if (result && result.redirect) {
-                    window.location.href = result.redirect;
+                    window.location.href = safeRedirect(result.redirect);
                 } else if (result && result.success) {
                     window.location.reload();
                 }
@@ -117,7 +128,7 @@
 
                 if (verifyResponse.ok) {
                     const result = await verifyResponse.json();
-                    window.location.href = result.redirect || '/dashboard';
+                    window.location.href = safeRedirect(result.redirect);
                 } else {
                     throw new Error('Biometric verification failed');
                 }

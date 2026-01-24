@@ -4,6 +4,17 @@
  * CivicOne Theme
  */
 
+// Security: Validate redirect URL to prevent open redirect attacks
+function safeRedirect(url) {
+    if (!url) return '/dashboard';
+    // Only allow relative URLs starting with /
+    if (typeof url === 'string' && url.startsWith('/') && !url.startsWith('//')) {
+        return url;
+    }
+    // Reject absolute URLs and protocol-relative URLs
+    return '/dashboard';
+}
+
 // Check for biometric/WebAuthn support and show the option
 async function checkBiometricSupport() {
     const container = document.getElementById('biometric-login-container');
@@ -61,7 +72,7 @@ async function attemptBiometricLogin() {
         if (window.NexusPWA && NexusPWA.Biometric) {
             const result = await NexusPWA.Biometric.authenticate();
             if (result && result.redirect) {
-                window.location.href = result.redirect;
+                window.location.href = safeRedirect(result.redirect);
             } else if (result && result.success) {
                 window.location.reload();
             }
@@ -110,7 +121,7 @@ async function attemptBiometricLogin() {
 
             if (verifyResponse.ok) {
                 const result = await verifyResponse.json();
-                window.location.href = result.redirect || '/dashboard';
+                window.location.href = safeRedirect(result.redirect);
             } else {
                 throw new Error('Biometric verification failed');
             }
