@@ -86,6 +86,19 @@ $router->add('POST', '/super-admin/federation/update-tenant-feature', 'Nexus\Con
 // --------------------------------------------------------------------------
 
 // --------------------------------------------------------------------------
+// DEV TOOLS - Component Library & Testing (Local Development Only)
+// --------------------------------------------------------------------------
+$router->add('GET', '/dev/shared-components', function () {
+    require __DIR__ . '/../views/modern/components/shared/_test.php';
+});
+$router->add('GET', '/dev/storybook', function () {
+    require __DIR__ . '/../views/modern/components/_storybook.php';
+});
+$router->add('GET', '/dev/component-preview', function () {
+    require __DIR__ . '/../views/modern/components/_preview.php';
+});
+
+// --------------------------------------------------------------------------
 // FEDERATION API (External Partner Integration)
 // --------------------------------------------------------------------------
 $router->add('GET', '/api/v1/federation', 'Nexus\Controllers\Api\FederationApiController@index');

@@ -112,6 +112,7 @@ class TenantContext
             'privacy',
             'password',
             'settings', // User Settings
+            'dev', // Development tools (component library, storybook, etc.)
         ];
 
         if (!empty($firstSegment) && !in_array($firstSegment, $reserved)) {
