@@ -18,9 +18,6 @@ $socialTargetId = $post['id'];
 require __DIR__ . '/../../layouts/civicone/header.php';
 ?>
 
-<div class="govuk-width-container">
-    <main class="govuk-main-wrapper" id="main-content">
-
 <nav class="govuk-breadcrumbs govuk-!-margin-bottom-6" aria-label="Breadcrumb">
     <ol class="govuk-breadcrumbs__list">
         <li class="govuk-breadcrumbs__list-item">
@@ -149,9 +146,6 @@ require __DIR__ . '/../../layouts/civicone/header.php';
         </div>
     </div>
 
-</div>
-
-    </main>
 </div>
 
 <script src="<?= $basePath ?>/assets/js/civicone-feed-show.min.js" defer></script>
