@@ -2594,3 +2594,15 @@
 .section-visible {
   display: block;
 }
+
+/* ==========================================
+   Button Disabled State
+   ========================================== */
+
+/* Disabled button styling via :disabled pseudo-class */
+button:disabled,
+input[type="submit"]:disabled,
+.btn-disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}

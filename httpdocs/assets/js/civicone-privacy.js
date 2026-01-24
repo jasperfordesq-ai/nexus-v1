@@ -28,22 +28,22 @@
     }
 
     // ============================================
-    // Button Press States
+    // Button Press States - using classList for GOV.UK compliance
     // ============================================
     function initButtonStates() {
         const buttons = document.querySelectorAll('#privacy-wrapper .privacy-nav-btn, #privacy-wrapper .privacy-cta-btn');
 
         buttons.forEach(btn => {
             btn.addEventListener('pointerdown', function() {
-                this.style.transform = 'scale(0.96)';
+                this.classList.add('btn-pressed');
             });
 
             btn.addEventListener('pointerup', function() {
-                this.style.transform = '';
+                this.classList.remove('btn-pressed');
             });
 
             btn.addEventListener('pointerleave', function() {
-                this.style.transform = '';
+                this.classList.remove('btn-pressed');
             });
         });
     }
