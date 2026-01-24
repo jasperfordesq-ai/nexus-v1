@@ -17,6 +17,28 @@
 
 ## MANDATORY RULES
 
+### 🔴 CIVICONE ULTIMATE SOURCE OF TRUTH - CRITICAL
+
+#### FOR ALL CIVICONE COMPONENTS/PAGES: GOV.UK Frontend GitHub Repository is the ONLY source of truth
+
+- **Repository:** <https://github.com/alphagov/govuk-frontend>
+- **Components:** <https://github.com/alphagov/govuk-frontend/tree/main/packages/govuk-frontend/src/govuk/components>
+- **Design System:** <https://design-system.service.gov.uk/>
+
+**Mandatory process when working on ANY CivicOne file:**
+
+1. Search GOV.UK Frontend GitHub for the component
+2. Extract exact CSS/HTML/patterns from official source
+3. Implement using official GOV.UK styles (no custom interpretations)
+4. Document GitHub source in code comments
+5. Test WCAG 2.1 AA compliance
+
+**This rule overrides all other guidance for CivicOne.** When in doubt, always check the GOV.UK Frontend GitHub repository first.
+
+See: `docs/CIVICONE_WCAG21AA_SOURCE_OF_TRUTH.md` for full specification.
+
+---
+
 ### CSS Rules - CRITICAL
 
 - **NEVER** write inline `<style>` blocks in PHP/HTML files
@@ -448,13 +470,36 @@ npm run css:auto-config
 ### Build Commands
 
 ```bash
-npm run build:css        # Build all CSS
+npm run build:css        # Build all CSS (includes validation)
 npm run build:css:purge  # Run PurgeCSS
-npm run minify:css       # Minify CSS files
+npm run minify:css       # Minify CSS files (includes validation)
 npm run lint:css         # Lint CSS
 npm run lint:js          # Lint JavaScript
 npm run css:discover     # Find untracked CSS files
 npm run css:auto-config  # Auto-add CSS to purgecss config
+npm run validate:design-tokens  # Check design tokens aren't corrupted
+```
+
+### ⚠️ CRITICAL: Design Tokens Protection
+
+**Design token files are EXCLUDED from PurgeCSS** because PurgeCSS removes CSS variables (it thinks they're unused classes).
+
+**Files protected:**
+
+- `design-tokens.css` / `design-tokens.min.css`
+- `desktop-design-tokens.css` / `desktop-design-tokens.min.css`
+- `mobile-design-tokens.css` / `mobile-design-tokens.min.css`
+
+**NEVER add these back to purgecss.config.js!**
+
+See [CSS_BUILD_RULES.md](CSS_BUILD_RULES.md) for full details.
+
+If styling breaks site-wide, check if design-tokens.min.css is corrupted:
+
+```bash
+npm run validate:design-tokens
+# If corrupted, rebuild with:
+npm run minify:css
 ```
 
 ## Testing

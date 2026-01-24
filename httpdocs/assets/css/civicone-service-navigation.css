@@ -1,15 +1,22 @@
 /**
- * CivicOne Service Navigation Enhancements
- * GOV.UK-compliant dropdown styles with icons and descriptions
+ * CivicOne Service Navigation
  *
- * Extends the official GOV.UK service navigation component with:
- * - Icon support for dropdown items
- * - Description text for better UX
- * - Proper spacing and alignment
- * - Enhanced accessibility
+ * SOURCE OF TRUTH: GOV.UK Frontend GitHub Repository
+ * Component: https://github.com/alphagov/govuk-frontend/tree/main/packages/govuk-frontend/src/govuk/components/service-navigation
+ * Styles: https://github.com/alphagov/govuk-frontend/blob/main/packages/govuk-frontend/src/govuk/components/service-navigation/_index.scss
+ * Documentation: https://design-system.service.gov.uk/components/service-navigation/
  *
- * Based on: GOV.UK Design System
+ * This file implements the official GOV.UK service navigation component with:
+ * - Light blue background (#f0f4f5) from GOV.UK Frontend v5.11.0+
+ * - Darker blue links (#144e81) for better contrast (GOV.UK shade-25)
+ * - 4px bottom border for active state (official pattern)
+ * - Enhanced categorized dropdown (custom extension for multi-section navigation)
+ *
+ * CRITICAL: All styling decisions MUST reference the GOV.UK Frontend source code.
+ * Do not deviate from official patterns without documented justification.
+ *
  * WCAG 2.1 AA Compliant
+ * Last synced with GOV.UK Frontend: 2026-01-24
  */
 
 /* ============================================
@@ -17,7 +24,7 @@
    ============================================ */
 
 .govuk-service-navigation {
-    background-color: var(--color-white, #ffffff);
+    background-color: #f0f4f5;
     color: var(--color-govuk-black, #0b0c0c);
     border-bottom: 1px solid var(--color-gray-400, #b1b4b6);
 }
@@ -76,18 +83,18 @@
 .govuk-service-navigation__link {
     display: inline-block;
     padding: var(--space-3, 12px) var(--space-4, 16px);
-    color: var(--color-govuk-black, #0b0c0c);
+    color: #144e81;
     text-decoration: none;
-    font-size: 0.9375rem;
-    line-height: 1.25;
+    font-size: 1.1875rem;
+    line-height: 1.31579;
     font-weight: 400;
-    border-bottom: 3px solid transparent;
-    transition: border-color 0.2s ease;
+    border-bottom: 4px solid transparent;
+    transition: border-color 0.15s ease-in-out;
 }
 
 .govuk-service-navigation__link:hover {
-    border-bottom-color: var(--color-gray-400, #b1b4b6);
-    text-decoration: underline;
+    border-bottom-color: var(--color-gray-600, #505a5f);
+    text-decoration: none;
 }
 
 .govuk-service-navigation__link:focus {
@@ -100,7 +107,7 @@
 
 .govuk-service-navigation__item--active .govuk-service-navigation__link,
 .govuk-service-navigation__link[aria-current="page"] {
-    border-bottom-color: var(--color-govuk-blue, #003078);
+    border-bottom-color: #144e81;
     font-weight: 700;
 }
 

@@ -1,10 +1,30 @@
 # CivicOne WCAG 2.1 AA Source of Truth
 
-**Version:** 2.1.0
+**Version:** 2.2.0
 **Status:** AUTHORITATIVE
 **Created:** 2026-01-20
-**Last Updated:** 2026-01-23 (Updated rollout status - 85.8% complete)
+**Last Updated:** 2026-01-24 (Established GOV.UK Frontend GitHub as ultimate source of truth)
 **Maintainer:** Development Team
+
+---
+
+## 🔴 CRITICAL: ULTIMATE SOURCE OF TRUTH
+
+**ALL CivicOne design, component, and styling decisions MUST follow the official GOV.UK Frontend repository:**
+
+- **Repository:** <https://github.com/alphagov/govuk-frontend>
+- **Components:** <https://github.com/alphagov/govuk-frontend/tree/main/packages/govuk-frontend/src/govuk/components>
+- **Documentation:** <https://design-system.service.gov.uk/>
+
+### Mandatory Process for ANY CivicOne Changes
+
+1. **Search GOV.UK Frontend GitHub repository** for the component/pattern
+2. **Extract exact CSS/HTML** from the official source code
+3. **Implement using official styles** - no deviations without documented justification
+4. **Test against WCAG 2.1 AA** standards
+5. **Document the GitHub source** in code comments
+
+**This rule overrides all other guidance.** When in doubt, the GOV.UK Frontend GitHub repository is the final authority.
 
 ---
 
