@@ -160,7 +160,7 @@
     text-decoration: none !important;
     outline: 3px solid var(--civicone-focus-text) !important;
     outline-offset: 0 !important;
-    box-shadow: 0 var(--space-1) var(--space-2) rgba(0, 0, 0, 0.3) !important;
+    box-shadow: 0 var(--space-1) var(--space-2) var(--color-black-alpha-30) !important;
 }
 
 /* ===========================================
@@ -307,8 +307,8 @@
    =========================================== */
 @media (prefers-contrast: more) {
     :root {
-        --civicone-focus: #ffdd00; /* Brighter yellow for high contrast - GOV.UK yellow */
-        --civicone-focus-text: #0b0c0c; /* GOV.UK black */
+        --civicone-focus: var(--color-govuk-yellow); /* Brighter yellow for high contrast - GOV.UK yellow */
+        --civicone-focus-text: var(--color-govuk-black); /* GOV.UK black */
     }
 }
 

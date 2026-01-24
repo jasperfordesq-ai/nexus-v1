@@ -117,7 +117,7 @@
 }
 
 .civicone-notification-banner--success .civicone-notification-banner__link:hover {
-    color: #004e2a;
+    color: var(--color-govuk-green-dark);
 }
 
 .civicone-notification-banner--success .civicone-notification-banner__link:focus {

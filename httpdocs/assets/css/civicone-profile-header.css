@@ -42,7 +42,7 @@
     height: var(--space-20);
     border-radius: var(--radius-full);
     object-fit: cover;
-    border: 3px solid rgba(255, 255, 255, 0.3);
+    border: 3px solid var(--color-white-alpha-30);
 }
 
 .civicone .civicone-identity-bar__status-indicator {
@@ -57,12 +57,12 @@
 
 .civicone .civicone-identity-bar__status-indicator--online {
     background: var(--color-govuk-green); /* GOV.UK Green */
-    box-shadow: 0 0 var(--space-2) rgba(0, 112, 60, 0.6);
+    box-shadow: 0 0 var(--space-2) var(--color-govuk-green-alpha-60);
 }
 
 .civicone .civicone-identity-bar__status-indicator--recent {
     background: var(--color-orange-500); /* GOV.UK Orange */
-    box-shadow: 0 0 var(--space-2) rgba(244, 119, 56, 0.6);
+    box-shadow: 0 0 var(--space-2) var(--color-govuk-orange-alpha-60);
 }
 
 
@@ -97,7 +97,7 @@
     display: inline-flex;
     align-items: center;
     gap: var(--space-2);
-    color: rgba(255, 255, 255, 0.95);
+    color: var(--color-white-alpha-95);
 }
 
 .civicone .civicone-identity-bar__meta-item i {
@@ -172,8 +172,8 @@
 }
 
 .civicone .civicone-page-header-actions__btn--warning {
-    background: #d4621f; /* Darker orange for 4.7:1 contrast */
-    border-color: #d4621f;
+    background: var(--color-button-warning); /* Darker orange for 4.7:1 contrast */
+    border-color: var(--color-button-warning);
     color: var(--color-white);
     font-weight: var(--font-weight-semibold);
 }
@@ -185,8 +185,8 @@
 }
 
 .civicone .civicone-page-header-actions__btn--warning:hover {
-    background: #b85316; /* Even darker on hover */
-    border-color: #b85316;
+    background: var(--color-button-warning-hover); /* Even darker on hover */
+    border-color: var(--color-button-warning-hover);
 }
 
 .civicone .civicone-page-header-actions__btn--warning:focus {
@@ -197,8 +197,8 @@
 }
 
 .civicone .civicone-page-header-actions__btn--danger {
-    background: #b91e0a; /* Darker red for 6.8:1 contrast */
-    border-color: #b91e0a;
+    background: var(--color-button-danger-wcag); /* Darker red for 6.8:1 contrast */
+    border-color: var(--color-button-danger-wcag);
     color: var(--color-white);
     font-weight: var(--font-weight-semibold);
 }
@@ -210,8 +210,8 @@
 }
 
 .civicone .civicone-page-header-actions__btn--danger:hover {
-    background: #9a1908; /* Even darker on hover */
-    border-color: #9a1908;
+    background: var(--color-button-danger-hover); /* Even darker on hover */
+    border-color: var(--color-button-danger-hover);
 }
 
 .civicone .civicone-page-header-actions__btn--danger:focus {
@@ -258,8 +258,8 @@
     align-items: center;
     gap: var(--space-2);
     padding: var(--space-1) var(--space-3);
-    background: rgba(255, 255, 255, 0.2);
-    border: 1px solid rgba(255, 255, 255, 0.3);
+    background: var(--color-white-alpha-20);
+    border: 1px solid var(--color-white-alpha-30);
     border-radius: var(--radius-sm);
     font-size: var(--font-size-sm);
     color: var(--color-white);
@@ -267,7 +267,7 @@
 }
 
 .civicone .civicone-identity-bar__badge:hover {
-    background: rgba(255, 255, 255, 0.3);
+    background: var(--color-white-alpha-30);
 }
 
 .civicone .civicone-identity-bar__badge:focus {
@@ -280,38 +280,38 @@
 }
 
 .civicone .civicone-identity-bar__badge--status-online {
-    background: rgba(0, 112, 60, 0.3);
-    border-color: rgba(0, 112, 60, 0.5);
+    background: var(--color-govuk-green-alpha-30);
+    border-color: var(--color-govuk-green-alpha-50);
 }
 
 .civicone .civicone-identity-bar__badge--status-recent {
-    background: rgba(244, 119, 56, 0.3);
-    border-color: rgba(244, 119, 56, 0.5);
+    background: var(--color-govuk-orange-alpha-30);
+    border-color: var(--color-govuk-orange-alpha-50);
 }
 
 .civicone .civicone-identity-bar__badge--credits {
-    background: rgba(0, 112, 60, 0.3);
-    border-color: rgba(0, 112, 60, 0.5);
+    background: var(--color-govuk-green-alpha-30);
+    border-color: var(--color-govuk-green-alpha-50);
 }
 
 .civicone .civicone-identity-bar__badge--org-owner {
-    background: rgba(255, 193, 7, 0.3);
-    border-color: rgba(255, 193, 7, 0.5);
+    background: var(--color-gold-alpha-30);
+    border-color: var(--color-gold-alpha-50);
 }
 
 .civicone .civicone-identity-bar__badge--org-admin {
-    background: rgba(156, 39, 176, 0.3);
-    border-color: rgba(156, 39, 176, 0.5);
+    background: var(--color-material-purple-alpha-30);
+    border-color: var(--color-material-purple-alpha-50);
 }
 
 .civicone .civicone-identity-bar__badge--rating {
-    background: rgba(244, 119, 56, 0.3);
-    border-color: rgba(244, 119, 56, 0.5);
+    background: var(--color-govuk-orange-alpha-30);
+    border-color: var(--color-govuk-orange-alpha-50);
 }
 
 .civicone .civicone-identity-bar__badge--admin {
     background: var(--color-govuk-red); /* Solid GOV.UK red */
-    border-color: #b91e0a; /* Darker red border */
+    border-color: var(--color-button-danger-wcag); /* Darker red border */
     font-weight: var(--font-weight-bold);
 }
 

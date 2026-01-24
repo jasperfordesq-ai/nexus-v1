@@ -96,7 +96,7 @@
     }
 
     [data-theme="dark"] .civicone-thread-item--unread {
-        background: rgba(16, 185, 129, 0.15);
+        background: var(--color-emerald-alpha-15);
     }
 
     /* ==========================================

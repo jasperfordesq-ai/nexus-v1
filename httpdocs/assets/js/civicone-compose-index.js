@@ -56,14 +56,14 @@
             this.haptic();
         },
 
-        // Update audience display
+        // Update audience display - use CSS class for spacing (GOV.UK compliance)
         updateAudience: function(select, textId) {
             const text = document.getElementById(textId);
             if (!text) return;
             if (select.value) {
-                text.innerHTML = '<i class="fa-solid fa-users" style="margin-right: 4px;"></i> ' + select.options[select.selectedIndex].text;
+                text.innerHTML = '<i class="fa-solid fa-users civic-icon-inline" aria-hidden="true"></i> ' + select.options[select.selectedIndex].text;
             } else {
-                text.innerHTML = '<i class="fa-solid fa-globe" style="margin-right: 4px;"></i> Public Feed';
+                text.innerHTML = '<i class="fa-solid fa-globe civic-icon-inline" aria-hidden="true"></i> Public Feed';
             }
         },
 
@@ -100,21 +100,21 @@
             const title = document.getElementById('listing-title');
             const desc = document.getElementById('listing-desc');
 
-            // Validate step 1 before moving to step 2
+            // Validate step 1 before moving to step 2 - use CSS class for error state (GOV.UK compliance)
             if (step === 2) {
                 if (!title || !title.value.trim()) {
                     if (title) {
                         title.focus();
-                        title.style.borderColor = '#ef4444';
-                        setTimeout(function() { title.style.borderColor = ''; }, 400);
+                        title.classList.add('civic-input--error');
+                        setTimeout(function() { title.classList.remove('civic-input--error'); }, 400);
                     }
                     return;
                 }
                 if (!desc || !desc.value.trim()) {
                     if (desc) {
                         desc.focus();
-                        desc.style.borderColor = '#ef4444';
-                        setTimeout(function() { desc.style.borderColor = ''; }, 400);
+                        desc.classList.add('civic-input--error');
+                        setTimeout(function() { desc.classList.remove('civic-input--error'); }, 400);
                     }
                     return;
                 }

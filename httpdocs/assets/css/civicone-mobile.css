@@ -18,7 +18,7 @@
     right: 0;
     background: var(--civic-bg-card, var(--color-white));
     border-top: 1px solid var(--civic-border, var(--color-gray-300));
-    box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 -4px 12px var(--color-black-alpha-10);
     z-index: 9000;
     padding: 0;
     padding-bottom: env(safe-area-inset-bottom, 0); /* iOS safe area */
@@ -104,7 +104,7 @@
     border-radius: 50%;
     margin-top: -var(--space-5);
     margin-bottom: var(--space-1);
-    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.4);
+    box-shadow: 0 4px 12px var(--color-blue-600-alpha-40);
 }
 
 .civic-bottom-nav-item--create svg {
@@ -152,7 +152,7 @@
     align-items: center;
     justify-content: center;
     line-height: 1;
-    box-shadow: 0 2px 4px rgba(239, 68, 68, 0.4);
+    box-shadow: 0 2px 4px var(--color-red-500-alpha-40);
     z-index: 1;
 }
 
@@ -224,7 +224,7 @@
     color: white;
     border: none;
     border-radius: 50%;
-    box-shadow: 0 6px 20px rgba(37, 99, 235, 0.4);
+    box-shadow: 0 6px 20px var(--color-blue-600-alpha-40);
     cursor: pointer;
     z-index: 8999;
     align-items: center;
@@ -284,7 +284,7 @@
 
     .civic-fab:hover {
         transform: scale(1.05);
-        box-shadow: 0 8px 25px rgba(37, 99, 235, 0.5);
+        box-shadow: 0 8px 25px var(--color-blue-600-alpha-50);
     }
 }
 
@@ -413,7 +413,7 @@
     height: var(--space-10);
     background: var(--civic-bg-card, var(--color-white));
     border-radius: 0 var(--space-5) var(--space-5) 0;
-    box-shadow: 2px 0 10px rgba(0, 0, 0, 0.15);
+    box-shadow: 2px 0 10px var(--color-black-alpha-15);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -456,7 +456,7 @@
     color: white;
     padding: var(--space-3) var(--space-5);
     border-radius: var(--radius-base);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 4px 12px var(--color-black-alpha-30);
     display: flex;
     align-items: center;
     gap: var(--space-2);
@@ -636,7 +636,7 @@
 .civic-loading-overlay {
     position: fixed;
     inset: 0;
-    background: rgba(0, 0, 0, 0.5);
+    background: var(--color-black-alpha-50);
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -660,7 +660,7 @@
 .civic-loading-spinner {
     width: var(--space-12);
     height: var(--space-12);
-    border: var(--space-1) solid rgba(255, 255, 255, 0.3);
+    border: var(--space-1) solid var(--color-white-alpha-30);
     border-top-color: white;
     border-radius: 50%;
 }
@@ -693,7 +693,7 @@
     border: 1px solid var(--civic-border, var(--color-gray-300));
     border-radius: var(--radius-md);
     padding: var(--space-4);
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 10px 25px var(--color-black-alpha-20);
     z-index: 9500;
     display: none;
 }
@@ -901,7 +901,7 @@
     margin: 0 auto;
     background: var(--civic-bg-card, var(--color-white));
     border-radius: var(--radius-lg);
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15), 0 2px 8px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 8px 32px var(--color-black-alpha-15), 0 2px 8px var(--color-black-alpha-10);
     z-index: 9500;
     padding: var(--space-4);
     transform: translateY(120%);
@@ -1043,7 +1043,7 @@
     background: linear-gradient(135deg, var(--color-success-600) 0%, var(--color-success-700) 100%);
     color: var(--color-white);
     border-radius: var(--radius-md);
-    box-shadow: 0 8px 24px rgba(5, 150, 105, 0.3);
+    box-shadow: 0 8px 24px var(--color-emerald-600-alpha-30);
     z-index: var(--z-dropdown, 1000);
     padding: var(--space-3) var(--space-4);
     transform: translateY(-120%);
@@ -1077,7 +1077,7 @@
 
 .civic-update-btn {
     padding: var(--space-2) var(--space-4);
-    background: rgba(255, 255, 255, 0.2);
+    background: var(--color-white-alpha-20);
     color: var(--color-white);
     font-size: var(--font-size-sm);
     font-weight: var(--font-weight-semibold);
@@ -1090,7 +1090,7 @@
 }
 
 .civic-update-btn:hover {
-    background: rgba(255, 255, 255, 0.3);
+    background: var(--color-white-alpha-30);
 }
 
 .civic-update-btn:focus-visible {
@@ -1150,7 +1150,7 @@
 .civic-webauthn-modal-backdrop {
     position: absolute;
     inset: 0;
-    background: rgba(0, 0, 0, 0.5);
+    background: var(--color-black-alpha-50);
 }
 
 .civic-webauthn-modal-content {
@@ -1161,7 +1161,7 @@
     max-width: 340px;
     width: 100%;
     text-align: center;
-    box-shadow: 0 24px 48px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 24px 48px var(--color-black-alpha-20);
     transform: scale(0.9) translateY(20px);
     transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
@@ -1294,7 +1294,7 @@
     display: inline-block;
     width: var(--space-4);
     height: var(--space-4);
-    border: 2px solid rgba(255, 255, 255, 0.3);
+    border: 2px solid var(--color-white-alpha-30);
     border-top-color: var(--color-white);
     border-radius: 50%;
     /* animation removed for GOV.UK compliance */
@@ -1327,7 +1327,7 @@
 
 .civic-biometric-btn:hover {
     border-color: var(--civic-brand, var(--color-blue-600));
-    background: rgba(37, 99, 235, 0.05);
+    background: var(--color-blue-600-alpha-5);
 }
 
 .civic-biometric-btn:focus-visible {
@@ -1364,12 +1364,12 @@ body:not(.biometrics-available) .civic-biometric-btn {
 }
 
 .civic-badge--success {
-    background: rgba(5, 150, 105, 0.1);
+    background: var(--color-emerald-600-alpha-10);
     color: var(--color-success-600);
 }
 
 .civic-badge--neutral {
-    background: rgba(107, 114, 128, 0.1);
+    background: var(--color-gray-500-alpha-10);
     color: var(--color-gray-500);
 }
 

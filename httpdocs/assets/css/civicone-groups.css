@@ -14,7 +14,7 @@
 
     /* Brand/Action Colors (WCAG AA) */
     --civic-group-brand: var(--color-govuk-green-darker);            /* Teal 700 - 5.0:1 */
-    --civic-group-brand-hover: #00695C;      /* Teal 800 - 6.1:1 */
+    --civic-group-brand-hover: var(--color-teal-700-govuk);      /* Teal 700 - 6.1:1 */
     --civic-group-danger: var(--color-red-600);           /* Red 600 - 5.1:1 */
 
     /* Focus Ring */
@@ -36,9 +36,24 @@
     --civic-group-text-secondary: var(--color-gray-200);
     --civic-group-text-muted: var(--color-gray-300);
     --civic-group-brand: var(--color-teal-300);
-    --civic-group-brand-hover: #99F6E4;
+    --civic-group-brand-hover: var(--color-teal-200);
     --civic-group-border: var(--color-gray-700);
     --civic-group-border-dark: var(--color-gray-600);
+}
+
+
+/* --------------------------------------------
+   Groups Page Container
+   -------------------------------------------- */
+.civic-group-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: var(--space-5);
+}
+
+/* Inline form container */
+.civic-inline-form {
+    display: inline;
 }
 
 
@@ -106,7 +121,7 @@
     align-items: center;
     text-align: center;
     padding: 0;
-    background: var(--civic-bg-card, #f7f7f7);
+    background: var(--civic-bg-card, var(--color-gray-75));
     border: none;
     border-radius: var(--radius-base);
     overflow: hidden;
@@ -132,7 +147,7 @@
     border-radius: 50%;
     object-fit: cover;
     border: 4px solid var(--civic-bg-page, var(--color-white));
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 6px -1px var(--color-black-alpha-10);
     background: white;
 }
 
@@ -141,7 +156,7 @@
     height: 130px;
     border-radius: 50%;
     border: 4px solid var(--civic-bg-page, var(--color-white));
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 6px -1px var(--color-black-alpha-10);
     background: var(--color-gray-200);
     display: flex;
     align-items: center;
@@ -234,7 +249,7 @@
     align-items: center;
     text-align: center;
     padding: 0;
-    background: var(--civic-bg-card, #f7f7f7);
+    background: var(--civic-bg-card, var(--color-gray-75));
     border: none;
     border-radius: var(--radius-base);
     overflow: hidden;
@@ -243,7 +258,7 @@
 }
 
 .civicone--govuk .civicone-group-card:hover {
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 8px var(--color-black-alpha-10);
 }
 
 [data-theme="dark"] .civicone--govuk .civicone-group-card {
@@ -263,7 +278,7 @@
     border-radius: 50%;
     object-fit: cover;
     border: 4px solid var(--civic-bg-page, var(--color-white));
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 6px -1px var(--color-black-alpha-10);
     background: white;
 }
 
@@ -272,7 +287,7 @@
     height: 130px;
     border-radius: 50%;
     border: 4px solid var(--civic-bg-page, var(--color-white));
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 6px -1px var(--color-black-alpha-10);
     background: var(--color-gray-200);
     display: flex;
     align-items: center;
@@ -585,7 +600,7 @@
     background: var(--color-white);
     border-radius: var(--radius-md);
     overflow: hidden;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 1px 3px var(--color-black-alpha-10);
     margin-bottom: var(--space-8);
     border: 1px solid var(--civic-group-border);
 }
@@ -597,7 +612,7 @@
 
 .civic-group-cover {
     height: 200px;
-    background: linear-gradient(135deg, var(--civic-group-brand) 0%, #004d40 100%);
+    background: linear-gradient(135deg, var(--civic-group-brand) 0%, var(--color-teal-900) 100%);
     position: relative;
 }
 
@@ -621,7 +636,7 @@
     position: absolute;
     top: var(--space-5);
     left: var(--space-5);
-    background: rgba(0, 0, 0, 0.6);
+    background: var(--color-black-alpha-60);
     color: white;
     padding: var(--space-1) var(--space-3);
     border-radius: var(--radius-2xl);
@@ -733,7 +748,7 @@
     align-items: center;
     text-align: center;
     padding: 0;
-    background: var(--civic-bg-card, #f7f7f7);
+    background: var(--civic-bg-card, var(--color-gray-75));
     border: none;
     border-radius: var(--radius-base);
     overflow: hidden;
@@ -758,7 +773,7 @@
     border-radius: 50%;
     object-fit: cover;
     border: 4px solid var(--civic-bg-page, var(--color-white));
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 6px -1px var(--color-black-alpha-10);
 }
 
 .civic-subhub-placeholder {
@@ -766,7 +781,7 @@
     height: 100px;
     border-radius: 50%;
     border: 4px solid var(--civic-bg-page, var(--color-white));
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 6px -1px var(--color-black-alpha-10);
     background: var(--color-gray-200);
     display: flex;
     align-items: center;
@@ -845,7 +860,7 @@
 .civic-member-card {
     text-align: center;
     padding: var(--space-5);
-    background: #f7f7f7;
+    background: var(--color-gray-75);
     border: none;
     border-radius: var(--radius-base);
     box-shadow: none;
@@ -862,7 +877,7 @@
     border-radius: 50%;
     object-fit: cover;
     border: 3px solid white;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 2px 4px var(--color-black-alpha-10);
 }
 
 .civic-member-placeholder {
@@ -875,7 +890,7 @@
     align-items: center;
     justify-content: center;
     border: 3px solid white;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 2px 4px var(--color-black-alpha-10);
 }
 
 [data-theme="dark"] .civic-member-placeholder {
@@ -1001,6 +1016,32 @@
 
 .civic-group-empty-state h3 {
     color: var(--civic-group-text-muted);
+}
+
+
+/* --------------------------------------------
+   Groups Show Page - About Tab
+   -------------------------------------------- */
+.civic-group-about-card {
+    background: var(--civic-bg-card, var(--color-gray-75));
+    border: none;
+    padding: 30px;
+    border-radius: var(--radius-md);
+    margin-bottom: 0;
+}
+
+[data-theme="dark"] .civic-group-about-card {
+    background: var(--color-gray-800);
+}
+
+.civic-group-about-card h3 {
+    margin-top: 0;
+    color: var(--civic-group-text-primary);
+}
+
+.civic-group-about-card p {
+    line-height: 1.6;
+    color: var(--civic-group-text-primary);
 }
 
 

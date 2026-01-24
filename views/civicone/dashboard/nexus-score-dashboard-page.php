@@ -20,227 +20,261 @@ $currentPage = 'nexus-score';
 require_once __DIR__ . '/../../layouts/civicone/header.php';
 ?>
 
-<div class="container py-4">
-    <div class="row mb-4">
-        <div class="col-12">
-            <h1 class="mb-2">My Nexus Score</h1>
-            <p class="text-muted">Track your community engagement, contributions, and achievements</p>
-        </div>
-    </div>
+<div class="nexus-score-page">
+    <header class="nexus-score-header">
+        <h1>My Nexus Score</h1>
+        <p>Track your community engagement, contributions, and achievements</p>
+    </header>
 
     <!-- Score Dashboard Component -->
-    <div class="row mb-4">
-        <div class="col-12">
-            <?php require __DIR__ . '/../components/nexus-score-dashboard.php'; ?>
-        </div>
-    </div>
+    <section class="govuk-margin-bottom-6" aria-label="Score overview">
+        <?php require __DIR__ . '/../components/nexus-score-dashboard.php'; ?>
+    </section>
 
-    <!-- Tabs for Achievements and Leaderboard -->
-    <div class="row">
-        <div class="col-12">
-            <ul class="nav nav-tabs mb-4" id="scoreTabs" role="tablist">
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link active" id="achievements-tab" data-bs-toggle="tab" data-bs-target="#achievements" type="button" role="tab" aria-controls="achievements" aria-selected="true">
-                        Achievements & Milestones
-                    </button>
-                </li>
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link" id="leaderboard-tab" data-bs-toggle="tab" data-bs-target="#leaderboard" type="button" role="tab" aria-controls="leaderboard" aria-selected="false">
-                        Leaderboard
-                    </button>
-                </li>
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link" id="badges-tab" data-bs-toggle="tab" data-bs-target="#badges" type="button" role="tab" aria-controls="badges" aria-selected="false">
-                        My Badges
-                    </button>
-                </li>
-            </ul>
+    <!-- GOV.UK Tabs for Achievements and Leaderboard -->
+    <div class="govuk-tabs" data-module="govuk-tabs">
+        <ul class="govuk-tabs__list" role="tablist">
+            <li class="govuk-tabs__list-item" role="presentation">
+                <button class="govuk-tabs__tab active" id="achievements-tab" type="button" role="tab" aria-controls="achievements" aria-selected="true">
+                    Achievements & Milestones
+                </button>
+            </li>
+            <li class="govuk-tabs__list-item" role="presentation">
+                <button class="govuk-tabs__tab" id="leaderboard-tab" type="button" role="tab" aria-controls="leaderboard" aria-selected="false">
+                    Leaderboard
+                </button>
+            </li>
+            <li class="govuk-tabs__list-item" role="presentation">
+                <button class="govuk-tabs__tab" id="badges-tab" type="button" role="tab" aria-controls="badges" aria-selected="false">
+                    My Badges
+                </button>
+            </li>
+        </ul>
 
-            <div class="tab-content" id="scoreTabsContent">
-                <!-- Achievements Tab -->
-                <div class="tab-pane fade show active" id="achievements" role="tabpanel" aria-labelledby="achievements-tab">
-                    <div class="row">
-                        <div class="col-12 mb-4">
-                            <h3>Recent Achievements</h3>
-                            <?php if (!empty($recentAchievements)): ?>
-                                <div class="list-group">
-                                    <?php foreach ($recentAchievements as $achievement): ?>
-                                        <div class="list-group-item d-flex justify-content-between align-items-center">
-                                            <div>
-                                                <span class="me-2 achievement-icon"><?php echo $achievement['icon'] ?? '🏆'; ?></span>
-                                                <strong><?php echo htmlspecialchars($achievement['name']); ?></strong>
-                                                <br>
-                                                <small class="text-muted">
-                                                    Earned on <?php echo date('M j, Y', strtotime($achievement['date'])); ?>
-                                                </small>
-                                            </div>
-                                            <span class="badge bg-primary rounded-pill">+<?php echo $achievement['points']; ?> pts</span>
-                                        </div>
-                                    <?php endforeach; ?>
-                                </div>
-                            <?php else: ?>
-                                <div class="alert alert-info">
-                                    No recent achievements. Keep engaging with the community to unlock new achievements!
-                                </div>
-                            <?php endif; ?>
-                        </div>
-
-                        <div class="col-12">
-                            <h3>Milestones</h3>
-                            <?php if (!empty($milestones)): ?>
-                                <div class="row row-cols-1 row-cols-md-2 g-3">
-                                    <?php foreach ($milestones as $milestone): ?>
-                                        <div class="col">
-                                            <div class="card h-100">
-                                                <div class="card-body">
-                                                    <div class="d-flex align-items-start mb-2">
-                                                        <span class="milestone-icon-lg me-2"><?php echo $milestone['icon'] ?? '🎯'; ?></span>
-                                                        <div>
-                                                            <h5 class="card-title mb-1"><?php echo htmlspecialchars($milestone['name']); ?></h5>
-                                                            <p class="card-text small text-muted mb-2">
-                                                                <?php echo htmlspecialchars($milestone['description']); ?>
-                                                            </p>
-                                                            <span class="badge bg-success"><?php echo $milestone['date']; ?></span>
-                                                        </div>
-                                                    </div>
-                                                    <?php if (isset($milestone['reward'])): ?>
-                                                        <div class="mt-2 pt-2 border-top">
-                                                            <small class="text-muted">
-                                                                <strong>Reward:</strong> <?php echo htmlspecialchars($milestone['reward']); ?>
-                                                            </small>
-                                                        </div>
-                                                    <?php endif; ?>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    <?php endforeach; ?>
-                                </div>
-                            <?php else: ?>
-                                <div class="alert alert-info">
-                                    No milestones achieved yet. Start your journey to unlock your first milestone!
-                                </div>
-                            <?php endif; ?>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Leaderboard Tab -->
-                <div class="tab-pane fade" id="leaderboard" role="tabpanel" aria-labelledby="leaderboard-tab">
-                    <div class="row">
-                        <div class="col-12">
-                            <h3>Community Leaderboard</h3>
-                            <?php if ($currentUserData): ?>
-                                <div class="alert alert-info mb-4">
-                                    <strong>Your Rank:</strong> #<?php echo $currentUserData['rank']; ?>
-                                    out of <?php echo $currentUserData['total_users']; ?> members
-                                    with <?php echo number_format($currentUserData['score'], 1); ?> points
-                                </div>
-                            <?php endif; ?>
-
-                            <?php if (!empty($leaderboardData['top_users'])): ?>
-                                <div class="table-responsive">
-                                    <table class="table table-hover">
-                                        <thead>
-                                            <tr>
-                                                <th>Rank</th>
-                                                <th>Member</th>
-                                                <th>Tier</th>
-                                                <th>Score</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <?php foreach ($leaderboardData['top_users'] as $index => $user): ?>
-                                                <tr class="<?php echo isset($_SESSION['user_id']) && $user['user_id'] == $_SESSION['user_id'] ? 'table-primary' : ''; ?>">
-                                                    <td>
-                                                        <?php if ($index < 3): ?>
-                                                            <span class="leaderboard-medal-icon">
-                                                                <?php echo ['🥇', '🥈', '🥉'][$index]; ?>
-                                                            </span>
-                                                        <?php else: ?>
-                                                            #<?php echo $index + 1; ?>
-                                                        <?php endif; ?>
-                                                    </td>
-                                                    <td>
-                                                        <div class="d-flex align-items-center">
-                                                            <?php if (!empty($user['avatar_url'])): ?>
-                                                                <img src="<?php echo htmlspecialchars($user['avatar_url']); ?>"
-                                                                     alt="Avatar"
-                                                                     class="rounded-circle me-2 avatar-thumbnail">
-                                                            <?php endif; ?>
-                                                            <span><?php echo htmlspecialchars($user['name']); ?></span>
-                                                        </div>
-                                                    </td>
-                                                    <td>
-                                                        <span class="badge" style="background-color: <?php echo $user['tier']['color'] ?? 'var(--color-primary-500)'; ?>;">
-                                                            <?php echo $user['tier']['icon'] ?? ''; ?>
-                                                            <?php echo $user['tier']['name'] ?? 'Novice'; ?>
-                                                        </span>
-                                                    </td>
-                                                    <td><strong><?php echo number_format($user['score'], 1); ?></strong></td>
-                                                </tr>
-                                            <?php endforeach; ?>
-                                        </tbody>
-                                    </table>
-                                </div>
-
-                                <?php if (isset($leaderboardData['community_average'])): ?>
-                                    <div class="mt-3">
-                                        <small class="text-muted">
-                                            Community Average: <?php echo number_format($leaderboardData['community_average'], 1); ?> points
-                                        </small>
+        <!-- Achievements Tab Panel -->
+        <section class="govuk-tabs__panel active" id="achievements" role="tabpanel" aria-labelledby="achievements-tab">
+            <div class="govuk-margin-bottom-6">
+                <h2 class="govuk-heading-m">Recent Achievements</h2>
+                <?php if (!empty($recentAchievements)): ?>
+                    <ul class="govuk-summary-list" role="list">
+                        <?php foreach ($recentAchievements as $achievement): ?>
+                            <li class="govuk-summary-list__row" role="listitem">
+                                <div class="govuk-summary-list__content govuk-flex govuk-flex--align-center govuk-flex--gap-3">
+                                    <span class="achievement-icon" aria-hidden="true"><?php echo $achievement['icon'] ?? '🏆'; ?></span>
+                                    <div>
+                                        <strong><?php echo htmlspecialchars($achievement['name']); ?></strong>
+                                        <small>Earned on <?php echo date('M j, Y', strtotime($achievement['date'])); ?></small>
                                     </div>
-                                <?php endif; ?>
-                            <?php else: ?>
-                                <div class="alert alert-info">
-                                    No leaderboard data available yet.
                                 </div>
-                            <?php endif; ?>
-                        </div>
+                                <span class="govuk-tag govuk-tag--blue">+<?php echo $achievement['points']; ?> pts</span>
+                            </li>
+                        <?php endforeach; ?>
+                    </ul>
+                <?php else: ?>
+                    <div class="govuk-inset-text govuk-inset-text--info">
+                        No recent achievements. Keep engaging with the community to unlock new achievements!
                     </div>
+                <?php endif; ?>
+            </div>
+
+            <div>
+                <h2 class="govuk-heading-m">Milestones</h2>
+                <?php if (!empty($milestones)): ?>
+                    <div class="govuk-card-grid govuk-card-grid--2">
+                        <?php foreach ($milestones as $milestone): ?>
+                            <article class="govuk-card">
+                                <div class="govuk-flex govuk-flex--gap-3">
+                                    <span class="milestone-icon-lg" aria-hidden="true"><?php echo $milestone['icon'] ?? '🎯'; ?></span>
+                                    <div>
+                                        <h3 class="govuk-card__title"><?php echo htmlspecialchars($milestone['name']); ?></h3>
+                                        <p class="govuk-card__text"><?php echo htmlspecialchars($milestone['description']); ?></p>
+                                        <span class="govuk-tag govuk-tag--green"><?php echo $milestone['date']; ?></span>
+                                        <?php if (isset($milestone['reward'])): ?>
+                                            <p class="govuk-card__meta">
+                                                <strong>Reward:</strong> <?php echo htmlspecialchars($milestone['reward']); ?>
+                                            </p>
+                                        <?php endif; ?>
+                                    </div>
+                                </div>
+                            </article>
+                        <?php endforeach; ?>
+                    </div>
+                <?php else: ?>
+                    <div class="govuk-inset-text govuk-inset-text--info">
+                        No milestones achieved yet. Start your journey to unlock your first milestone!
+                    </div>
+                <?php endif; ?>
+            </div>
+        </section>
+
+        <!-- Leaderboard Tab Panel -->
+        <section class="govuk-tabs__panel" id="leaderboard" role="tabpanel" aria-labelledby="leaderboard-tab">
+            <h2 class="govuk-heading-m">Community Leaderboard</h2>
+            <?php if ($currentUserData): ?>
+                <div class="govuk-inset-text">
+                    <strong>Your Rank:</strong> #<?php echo $currentUserData['rank']; ?>
+                    out of <?php echo $currentUserData['total_users']; ?> members
+                    with <?php echo number_format($currentUserData['score'], 1); ?> points
+                </div>
+            <?php endif; ?>
+
+            <?php if (!empty($leaderboardData['top_users'])): ?>
+                <div class="table-responsive">
+                    <table class="govuk-table" aria-label="Community leaderboard">
+                        <thead>
+                            <tr>
+                                <th scope="col">Rank</th>
+                                <th scope="col">Member</th>
+                                <th scope="col">Tier</th>
+                                <th scope="col">Score</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php foreach ($leaderboardData['top_users'] as $index => $user):
+                                $isCurrentUser = isset($_SESSION['user_id']) && $user['user_id'] == $_SESSION['user_id'];
+                            ?>
+                                <tr class="<?php echo $isCurrentUser ? 'govuk-table__row--highlight' : ''; ?>">
+                                    <td>
+                                        <?php if ($index < 3): ?>
+                                            <span class="leaderboard-medal-icon" aria-label="<?php echo ['Gold', 'Silver', 'Bronze'][$index]; ?> medal">
+                                                <?php echo ['🥇', '🥈', '🥉'][$index]; ?>
+                                            </span>
+                                        <?php else: ?>
+                                            #<?php echo $index + 1; ?>
+                                        <?php endif; ?>
+                                    </td>
+                                    <td>
+                                        <div class="govuk-flex govuk-flex--align-center govuk-flex--gap-2">
+                                            <?php if (!empty($user['avatar_url'])): ?>
+                                                <img src="<?php echo htmlspecialchars($user['avatar_url']); ?>"
+                                                     alt=""
+                                                     class="avatar-thumbnail">
+                                            <?php endif; ?>
+                                            <span><?php echo htmlspecialchars($user['name']); ?></span>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <span class="govuk-tag govuk-tag--tier" style="--tier-color: <?php echo htmlspecialchars($user['tier']['color'] ?? 'var(--color-primary-500)'); ?>">
+                                            <span aria-hidden="true"><?php echo $user['tier']['icon'] ?? ''; ?></span>
+                                            <?php echo htmlspecialchars($user['tier']['name'] ?? 'Novice'); ?>
+                                        </span>
+                                    </td>
+                                    <td><strong><?php echo number_format($user['score'], 1); ?></strong></td>
+                                </tr>
+                            <?php endforeach; ?>
+                        </tbody>
+                    </table>
                 </div>
 
-                <!-- Badges Tab -->
-                <div class="tab-pane fade" id="badges" role="tabpanel" aria-labelledby="badges-tab">
-                    <div class="row">
-                        <div class="col-12">
-                            <h3>My Badges</h3>
-                            <?php if (!empty($badges)): ?>
-                                <div class="row row-cols-2 row-cols-md-3 row-cols-lg-4 g-3">
-                                    <?php foreach ($badges as $badge): ?>
-                                        <div class="col">
-                                            <div class="card text-center h-100">
-                                                <div class="card-body">
-                                                    <div class="badge-icon-xl mb-2">
-                                                        <?php echo $badge['icon'] ?? '🏅'; ?>
-                                                    </div>
-                                                    <h6 class="card-title"><?php echo htmlspecialchars($badge['name']); ?></h6>
-                                                    <?php if (isset($badge['description'])): ?>
-                                                        <p class="card-text small text-muted">
-                                                            <?php echo htmlspecialchars($badge['description']); ?>
-                                                        </p>
-                                                    <?php endif; ?>
-                                                    <?php if (isset($badge['awarded_at'])): ?>
-                                                        <small class="text-muted">
-                                                            <?php echo date('M j, Y', strtotime($badge['awarded_at'])); ?>
-                                                        </small>
-                                                    <?php endif; ?>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    <?php endforeach; ?>
-                                </div>
-                            <?php else: ?>
-                                <div class="alert alert-info">
-                                    No badges earned yet. Participate in the community to unlock badges!
-                                </div>
-                            <?php endif; ?>
-                        </div>
-                    </div>
+                <?php if (isset($leaderboardData['community_average'])): ?>
+                    <p class="govuk-margin-top-4">
+                        <small>Community Average: <?php echo number_format($leaderboardData['community_average'], 1); ?> points</small>
+                    </p>
+                <?php endif; ?>
+            <?php else: ?>
+                <div class="govuk-inset-text govuk-inset-text--info">
+                    No leaderboard data available yet.
                 </div>
-            </div>
-        </div>
+            <?php endif; ?>
+        </section>
+
+        <!-- Badges Tab Panel -->
+        <section class="govuk-tabs__panel" id="badges" role="tabpanel" aria-labelledby="badges-tab">
+            <h2 class="govuk-heading-m">My Badges</h2>
+            <?php if (!empty($badges)): ?>
+                <div class="govuk-card-grid govuk-card-grid--4">
+                    <?php foreach ($badges as $badge): ?>
+                        <article class="govuk-card govuk-card--text-center">
+                            <div class="badge-icon-xl govuk-margin-bottom-4" aria-hidden="true">
+                                <?php echo $badge['icon'] ?? '🏅'; ?>
+                            </div>
+                            <h3 class="govuk-card__title"><?php echo htmlspecialchars($badge['name']); ?></h3>
+                            <?php if (isset($badge['description'])): ?>
+                                <p class="govuk-card__text">
+                                    <?php echo htmlspecialchars($badge['description']); ?>
+                                </p>
+                            <?php endif; ?>
+                            <?php if (isset($badge['awarded_at'])): ?>
+                                <p class="govuk-card__meta">
+                                    <?php echo date('M j, Y', strtotime($badge['awarded_at'])); ?>
+                                </p>
+                            <?php endif; ?>
+                        </article>
+                    <?php endforeach; ?>
+                </div>
+            <?php else: ?>
+                <div class="govuk-inset-text govuk-inset-text--info">
+                    No badges earned yet. Participate in the community to unlock badges!
+                </div>
+            <?php endif; ?>
+        </section>
     </div>
 </div>
+
+<!-- GOV.UK Tabs JavaScript -->
+<script>
+(function() {
+    var tabs = document.querySelectorAll('.govuk-tabs__tab');
+    var panels = document.querySelectorAll('.govuk-tabs__panel');
+
+    tabs.forEach(function(tab) {
+        tab.addEventListener('click', function() {
+            // Deactivate all tabs
+            tabs.forEach(function(t) {
+                t.classList.remove('active');
+                t.setAttribute('aria-selected', 'false');
+            });
+
+            // Hide all panels
+            panels.forEach(function(p) {
+                p.classList.remove('active');
+            });
+
+            // Activate clicked tab
+            this.classList.add('active');
+            this.setAttribute('aria-selected', 'true');
+
+            // Show corresponding panel
+            var panelId = this.getAttribute('aria-controls');
+            var panel = document.getElementById(panelId);
+            if (panel) {
+                panel.classList.add('active');
+            }
+        });
+
+        // Keyboard navigation
+        tab.addEventListener('keydown', function(e) {
+            var tabArray = Array.from(tabs);
+            var currentIndex = tabArray.indexOf(this);
+            var newIndex = currentIndex;
+
+            switch(e.key) {
+                case 'ArrowLeft':
+                    newIndex = currentIndex > 0 ? currentIndex - 1 : tabArray.length - 1;
+                    e.preventDefault();
+                    break;
+                case 'ArrowRight':
+                    newIndex = currentIndex < tabArray.length - 1 ? currentIndex + 1 : 0;
+                    e.preventDefault();
+                    break;
+                case 'Home':
+                    newIndex = 0;
+                    e.preventDefault();
+                    break;
+                case 'End':
+                    newIndex = tabArray.length - 1;
+                    e.preventDefault();
+                    break;
+            }
+
+            if (newIndex !== currentIndex) {
+                tabArray[newIndex].focus();
+                tabArray[newIndex].click();
+            }
+        });
+    });
+})();
+</script>
 
 <!-- Nexus Score Dashboard Page CSS -->
 <link rel="stylesheet" href="<?= NexusCoreTenantContext::getBasePath() ?>/assets/css/purged/civicone-dashboard-nexus-score.min.css">

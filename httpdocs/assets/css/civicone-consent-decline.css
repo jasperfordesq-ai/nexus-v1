@@ -16,7 +16,7 @@
 }
 
 [data-theme="dark"] .civic-notification--error {
-    background: rgba(239, 68, 68, 0.1);
+    background: var(--color-red-alpha-10);
 }
 
 .civic-notification--error .civic-notification__icon {
@@ -29,7 +29,7 @@
     border: 1px solid var(--color-gray-200, var(--color-govuk-grey));
     border-radius: var(--radius-lg, 12px);
     overflow: hidden;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    box-shadow: 0 1px 3px var(--color-black-alpha-5);
 }
 
 [data-theme="dark"] .civic-card {
@@ -89,7 +89,7 @@
 }
 
 [data-theme="dark"] .decline-option--recommended {
-    background: rgba(99, 102, 241, 0.1);
+    background: var(--color-indigo-alpha-10);
     border-color: var(--color-primary-500, var(--color-govuk-blue-light));
 }
 
@@ -117,7 +117,7 @@
 }
 
 [data-theme="dark"] .decline-option__icon {
-    background: rgba(99, 102, 241, 0.2);
+    background: var(--color-indigo-alpha-20);
 }
 
 [data-theme="dark"] .decline-option__icon--secondary {
@@ -126,7 +126,7 @@
 }
 
 [data-theme="dark"] .decline-option__icon--danger {
-    background: rgba(239, 68, 68, 0.2);
+    background: var(--color-red-alpha-20);
     color: var(--color-danger-400, var(--color-red-400));
 }
 
@@ -211,7 +211,7 @@
 }
 
 [data-theme="dark"] .civic-btn--danger:hover {
-    background: rgba(239, 68, 68, 0.1);
+    background: var(--color-red-alpha-10);
 }
 
 /* Info Section */

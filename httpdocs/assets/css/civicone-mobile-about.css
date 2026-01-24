@@ -13,17 +13,17 @@
     /* Light Mode Colors */
     --bg-primary: var(--color-slate-50);
     --bg-secondary: var(--color-white);
-    --bg-glass: rgba(255, 255, 255, 0.72);
-    --bg-glass-strong: rgba(255, 255, 255, 0.85);
-    --border-glass: rgba(255, 255, 255, 0.6);
-    --border-subtle: rgba(0, 0, 0, 0.06);
+    --bg-glass: var(--color-white-alpha-72);
+    --bg-glass-strong: var(--color-white-alpha-85);
+    --border-glass: var(--color-white-alpha-60);
+    --border-subtle: var(--color-black-alpha-6);
     --text-primary: var(--color-slate-900);
     --text-secondary: var(--color-slate-600);
     --text-muted: var(--color-slate-400);
-    --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.04);
-    --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.08);
-    --shadow-lg: 0 16px 48px rgba(0, 0, 0, 0.12);
-    --shadow-glow: 0 0 40px rgba(99, 102, 241, 0.15);
+    --shadow-sm: 0 2px 8px var(--color-black-alpha-4);
+    --shadow-md: 0 8px 24px var(--color-black-alpha-8);
+    --shadow-lg: 0 16px 48px var(--color-black-alpha-12);
+    --shadow-glow: 0 0 40px var(--color-indigo-alpha-15);
 
     /* Holographic Gradients */
     --gradient-brand: linear-gradient(135deg, var(--color-primary-500) 0%, var(--color-pink-500) 50%, var(--color-warning-500) 100%);
@@ -44,17 +44,17 @@
 [data-theme="dark"] {
     --bg-primary: var(--color-slate-900);
     --bg-secondary: var(--color-slate-800);
-    --bg-glass: rgba(30, 41, 59, 0.72);
-    --bg-glass-strong: rgba(30, 41, 59, 0.88);
-    --border-glass: rgba(255, 255, 255, 0.08);
-    --border-subtle: rgba(255, 255, 255, 0.06);
+    --bg-glass: var(--color-slate-alpha-72);
+    --bg-glass-strong: var(--color-slate-alpha-88);
+    --border-glass: var(--color-white-alpha-8);
+    --border-subtle: var(--color-white-alpha-6);
     --text-primary: var(--color-slate-100);
     --text-secondary: var(--color-slate-300);
     --text-muted: var(--color-slate-500);
-    --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.2);
-    --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.3);
-    --shadow-lg: 0 16px 48px rgba(0, 0, 0, 0.4);
-    --shadow-glow: 0 0 60px rgba(139, 92, 246, 0.2);
+    --shadow-sm: 0 2px 8px var(--color-black-alpha-20);
+    --shadow-md: 0 8px 24px var(--color-black-alpha-30);
+    --shadow-lg: 0 16px 48px var(--color-black-alpha-40);
+    --shadow-glow: 0 0 60px var(--color-violet-alpha-20);
 }
 
 /* ========================================
@@ -105,11 +105,11 @@ body {
     top: -50%;
     left: -50%;
     background:
-        radial-gradient(ellipse 40% 30% at 25% 30%, rgba(99, 102, 241, 0.25), transparent 60%),
-        radial-gradient(ellipse 35% 35% at 75% 25%, rgba(236, 72, 153, 0.2), transparent 55%),
-        radial-gradient(ellipse 45% 40% at 60% 70%, rgba(245, 158, 11, 0.18), transparent 60%),
-        radial-gradient(ellipse 30% 25% at 20% 75%, rgba(6, 182, 212, 0.15), transparent 50%),
-        radial-gradient(ellipse 50% 45% at 85% 60%, rgba(139, 92, 246, 0.12), transparent 55%);
+        radial-gradient(ellipse 40% 30% at 25% 30%, var(--color-indigo-alpha-25), transparent 60%),
+        radial-gradient(ellipse 35% 35% at 75% 25%, var(--color-pink-alpha-20), transparent 55%),
+        radial-gradient(ellipse 45% 40% at 60% 70%, var(--color-amber-500-alpha-18), transparent 60%),
+        radial-gradient(ellipse 30% 25% at 20% 75%, var(--color-cyan-alpha-15), transparent 50%),
+        radial-gradient(ellipse 50% 45% at 85% 60%, var(--color-violet-alpha-12), transparent 55%);
     /* animation removed for GOV.UK compliance */
 }
 
@@ -130,11 +130,11 @@ body {
 
 [data-theme="dark"] .holo-bg::before {
     background:
-        radial-gradient(ellipse 40% 30% at 25% 30%, rgba(99, 102, 241, 0.35), transparent 60%),
-        radial-gradient(ellipse 35% 35% at 75% 25%, rgba(236, 72, 153, 0.28), transparent 55%),
-        radial-gradient(ellipse 45% 40% at 60% 70%, rgba(139, 92, 246, 0.25), transparent 60%),
-        radial-gradient(ellipse 30% 25% at 20% 75%, rgba(6, 182, 212, 0.2), transparent 50%),
-        radial-gradient(ellipse 50% 45% at 85% 60%, rgba(245, 158, 11, 0.15), transparent 55%);
+        radial-gradient(ellipse 40% 30% at 25% 30%, var(--color-indigo-alpha-35), transparent 60%),
+        radial-gradient(ellipse 35% 35% at 75% 25%, var(--color-pink-alpha-28), transparent 55%),
+        radial-gradient(ellipse 45% 40% at 60% 70%, var(--color-violet-alpha-25), transparent 60%),
+        radial-gradient(ellipse 30% 25% at 20% 75%, var(--color-cyan-alpha-20), transparent 50%),
+        radial-gradient(ellipse 50% 45% at 85% 60%, var(--color-amber-500-alpha-15), transparent 55%);
 }
 
 [data-theme="dark"] .holo-bg::after {
@@ -294,8 +294,8 @@ body {
     position: relative;
     /* animation removed for GOV.UK compliance */
     box-shadow:
-        0 6px 24px rgba(99, 102, 241, 0.3),
-        0 0 0 1px rgba(255, 255, 255, 0.2) inset;
+        0 6px 24px var(--color-indigo-alpha-30),
+        0 0 0 1px var(--color-white-alpha-20) inset;
 }
 
 /* Animation removed for GOV.UK compliance */
@@ -308,13 +308,13 @@ body {
     position: absolute;
     inset: 2px;
     border-radius: 14px;
-    border: 1px solid rgba(255, 255, 255, 0.3);
+    border: 1px solid var(--color-white-alpha-30);
 }
 
 .hero-logo i {
     font-size: 1.5rem;
     color: white;
-    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+    filter: drop-shadow(0 2px 4px var(--color-black-alpha-20));
     position: relative;
     z-index: 1;
 }
@@ -458,9 +458,9 @@ body {
     background:
         linear-gradient(
             145deg,
-            rgba(255, 255, 255, 0.55) 0%,
-            rgba(255, 255, 255, 0.25) 25%,
-            rgba(255, 255, 255, 0.05) 50%,
+            var(--color-white-alpha-55) 0%,
+            var(--color-white-alpha-25) 25%,
+            var(--color-white-alpha-5) 50%,
             transparent 100%
         );
     pointer-events: none;
@@ -473,9 +473,9 @@ body {
     position: absolute;
     inset: 1px;
     border-radius: 25px;
-    border: 1.5px solid rgba(255, 255, 255, 0.35);
-    border-bottom-color: rgba(255, 255, 255, 0.1);
-    border-right-color: rgba(255, 255, 255, 0.15);
+    border: 1.5px solid var(--color-white-alpha-35);
+    border-bottom-color: var(--color-white-alpha-10);
+    border-right-color: var(--color-white-alpha-15);
     pointer-events: none;
     z-index: 3;
 }
@@ -486,7 +486,7 @@ body {
     color: white;
     position: relative;
     z-index: 4;
-    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+    filter: drop-shadow(0 2px 4px var(--color-black-alpha-30));
     transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
@@ -499,7 +499,7 @@ body {
 .app-icon:hover .app-icon-circle i,
 .app-icon:focus .app-icon-circle i {
     transform: scale(1.15) rotate(-3deg);
-    filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.35));
+    filter: drop-shadow(0 4px 8px var(--color-black-alpha-35));
 }
 
 /* Special animation for heart icon */
@@ -562,7 +562,7 @@ body {
     position: absolute;
     inset: 0;
     border-radius: 26px;
-    background: radial-gradient(circle, rgba(255,255,255,0.4) 0%, transparent 70%);
+    background: radial-gradient(circle, var(--color-white-alpha-40) 0%, transparent 70%);
     opacity: 0;
     transform: scale(0);
     z-index: 5;
@@ -585,7 +585,7 @@ body {
     background: linear-gradient(
         110deg,
         transparent 20%,
-        rgba(255, 255, 255, 0.4) 50%,
+        var(--color-white-alpha-40) 50%,
         transparent 80%
     );
     opacity: 0;
@@ -655,7 +655,7 @@ body {
     color: white;
     position: relative;
     z-index: 1;
-    filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.2));
+    filter: drop-shadow(0 1px 2px var(--color-black-alpha-20));
 }
 
 /* Glass shine on dock items */
@@ -666,8 +666,8 @@ body {
     border-radius: var(--radius-xl);
     background: linear-gradient(
         135deg,
-        rgba(255, 255, 255, 0.35) 0%,
-        rgba(255, 255, 255, 0) 50%
+        var(--color-white-alpha-35) 0%,
+        transparent 50%
     );
     pointer-events: none;
 }
@@ -677,23 +677,23 @@ body {
     position: absolute;
     inset: 0;
     border-radius: var(--radius-xl);
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    border: 1px solid var(--color-white-alpha-20);
 }
 
 /* Dock item colors */
 .dock-home {
     background: linear-gradient(135deg, var(--color-primary-500) 0%, var(--color-purple-500) 100%);
-    box-shadow: 0 4px 16px rgba(99, 102, 241, 0.4);
+    box-shadow: 0 4px 16px var(--color-indigo-alpha-40);
 }
 
 .dock-explore {
     background: linear-gradient(135deg, var(--color-pink-500) 0%, var(--color-govuk-red) 100%);
-    box-shadow: 0 4px 16px rgba(236, 72, 153, 0.4);
+    box-shadow: 0 4px 16px var(--color-pink-alpha-40);
 }
 
 .dock-profile {
     background: linear-gradient(135deg, var(--color-govuk-blue-light) 0%, var(--color-cyan-500) 100%);
-    box-shadow: 0 4px 16px rgba(14, 165, 233, 0.4);
+    box-shadow: 0 4px 16px var(--color-sky-500-alpha-40);
 }
 
 /* ========================================
@@ -734,7 +734,7 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
-    box-shadow: 0 16px 48px rgba(99, 102, 241, 0.3);
+    box-shadow: 0 16px 48px var(--color-indigo-alpha-30);
 }
 
 .desktop-notice-icon i {
@@ -770,12 +770,12 @@ body {
     font-weight: 600;
     font-size: 1rem;
     transition: all var(--transition-smooth);
-    box-shadow: 0 8px 24px rgba(99, 102, 241, 0.3);
+    box-shadow: 0 8px 24px var(--color-indigo-alpha-30);
 }
 
 .desktop-notice a:hover {
     transform: translateY(-2px);
-    box-shadow: 0 12px 32px rgba(99, 102, 241, 0.4);
+    box-shadow: 0 12px 32px var(--color-indigo-alpha-40);
 }
 
 @media (min-width: 769px) {

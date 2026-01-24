@@ -9,10 +9,10 @@
    Updated 2026-01-20: Now uses GOV.UK spacing tokens
    =========================================== */
 :root {
-    /* Primary Brand */
+    /* Primary Brand - GOV.UK aligned colors */
     --civic-brand: var(--color-govuk-green-darker);
-    --civic-brand-dark: #005a4f;
-    --civic-brand-light: #4db6ac;
+    --civic-brand-dark: var(--color-govuk-green-darker);  /* GOV.UK green #00703c darker */
+    --civic-brand-light: var(--color-emerald-400);        /* Light green for accents */
 
     /* Text Colors - WCAG AA Verified */
     --civic-text-primary: var(--govuk-text-colour, var(--color-govuk-black));   /* GOV.UK black */
@@ -135,7 +135,7 @@
     min-width: 12.5rem;
     border: 2px solid var(--civic-text-primary);
     border-radius: var(--radius-sm);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    box-shadow: 0 4px 12px var(--color-black-alpha-15);
     padding: var(--space-2) 0;
     z-index: 10000; /* Above notification drawer (9999) to prevent overlap */
     margin-top: var(--space-1);
@@ -194,7 +194,7 @@
 .civic-dropdown-content a[aria-current="true"] {
     font-weight: bold;
     color: var(--civic-brand, var(--color-govuk-green-darker));
-    background: rgba(0, 121, 107, 0.1);
+    background: var(--color-emerald-50);
 }
 
 .civic-dropdown-content a[aria-current="true"] .civic-checkmark {
@@ -388,7 +388,7 @@
 
 .civic-desktop-nav .civic-nav-link.active,
 .civic-desktop-nav .civic-nav-link[aria-current="page"] {
-    background-color: rgba(0, 121, 107, 0.1);
+    background-color: var(--color-emerald-50);
     text-decoration: underline;
     text-underline-offset: var(--space-1);
     text-decoration-thickness: 3px;
@@ -428,7 +428,7 @@
 .civic-search-form input:focus {
     outline: none;
     border-color: var(--civic-focus-ring);
-    box-shadow: 0 0 0 3px rgba(30, 64, 175, 0.2);
+    box-shadow: 0 0 0 3px var(--color-blue-750-alpha-20);
     position: relative;
     z-index: 1;
 }
@@ -650,7 +650,7 @@
     right: 0;
     background: var(--civic-bg-primary);
     border-bottom: 4px solid var(--civic-brand);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    box-shadow: 0 4px 12px var(--color-black-alpha-15);
     max-height: 0;
     overflow: hidden;
     opacity: 0;
@@ -907,7 +907,7 @@
     width: 100%;
     background: var(--civic-bg-primary);
     border-top: 4px solid var(--civic-brand);
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+    box-shadow: 0 8px 24px var(--color-black-alpha-12);
     padding: var(--space-8) 0;
     z-index: 900;
 }
@@ -997,12 +997,12 @@
     --civic-action-create: var(--color-emerald-400);      /* 6.87:1 - Emerald 400 */
     --civic-action-federation: var(--color-purple-400-alt);  /* 5.49:1 - Violet 400 */
     --civic-action-newsletter: var(--color-amber-300);  /* 9.17:1 - Amber 400 */
-    --civic-action-admin: #fb923c;       /* 6.25:1 - Orange 400 */
+    --civic-action-admin: var(--color-orange-500);       /* 6.25:1 - Orange 400 */
     --civic-action-ranking: var(--color-pink-400);     /* 5.89:1 - Pink 400 */
     --civic-action-logout: var(--color-red-400);      /* 5.18:1 - Red 400 */
 
     /* Dark Mode Icon Colors (WCAG AA on var(--color-gray-800)) */
-    --civic-icon-brand: #4db6ac;    /* Teal 300 */
+    --civic-icon-brand: var(--color-emerald-400);    /* GOV.UK green light */
     --civic-icon-purple: var(--color-purple-400-alt);   /* Violet 400 */
     --civic-icon-green: var(--color-emerald-400);    /* Emerald 400 */
     --civic-icon-pink: var(--color-pink-400);     /* Pink 400 */
@@ -1035,7 +1035,7 @@
 }
 
 .civicone.dark-mode .civic-desktop-nav .civic-nav-link.active {
-    background-color: rgba(77, 182, 172, 0.15);
+    background-color: var(--color-emerald-800);
     text-decoration-color: var(--civic-brand-light);
 }
 
@@ -1208,7 +1208,7 @@
         background: var(--civic-bg-primary);
         padding: var(--space-4);
         border-top: 1px solid var(--civic-bg-tertiary);
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        box-shadow: 0 4px 12px var(--color-black-alpha-10);
         z-index: 999;
     }
 
@@ -1235,7 +1235,7 @@
     .civic-mobile-search-bar input:focus {
         outline: none;
         border-color: var(--civic-focus-ring);
-        box-shadow: 0 0 0 3px rgba(30, 64, 175, 0.2);
+        box-shadow: 0 0 0 3px var(--color-blue-750-alpha-20);
     }
 
     .civic-mobile-search-bar button {
@@ -1316,7 +1316,7 @@
     display: none;
     position: fixed;
     inset: 0;
-    background: rgba(0, 0, 0, 0.5);
+    background: var(--color-black-alpha-50);
     z-index: 9998;
 }
 
@@ -1332,7 +1332,7 @@
     max-width: 90vw;
     height: 100vh;
     background: var(--civic-bg-primary);
-    box-shadow: -4px 0 20px rgba(0, 0, 0, 0.15);
+    box-shadow: -4px 0 20px var(--color-black-alpha-15);
     z-index: 9999;
     display: flex;
     flex-direction: column;
@@ -1605,7 +1605,7 @@
 .civic-dropdown-content a[aria-current="true"] {
     font-weight: bold;
     color: var(--civic-brand);
-    background: rgba(0, 121, 107, 0.1);
+    background: var(--color-emerald-50);
 }
 
 .civic-dropdown-content .civic-menu-check {
@@ -1657,7 +1657,7 @@
 }
 
 .civic-experimental-badge {
-    background: rgba(255, 255, 255, 0.2);
+    background: var(--color-white-alpha-20);
     color: var(--color-white);
     padding: 0.25rem 0.625rem;
     font-weight: 700;
@@ -1666,7 +1666,7 @@
     display: inline-flex;
     align-items: center;
     gap: 0.375rem;
-    border: 1px solid rgba(255, 255, 255, 0.3);
+    border: 1px solid var(--color-white-alpha-30);
     white-space: nowrap;
     flex-shrink: 0;
 }
@@ -1676,7 +1676,7 @@
 }
 
 .civic-experimental-text {
-    color: rgba(255, 255, 255, 0.95);
+    color: var(--color-white-alpha-95);
     font-size: 12px;
     line-height: 1.3;
     white-space: nowrap;

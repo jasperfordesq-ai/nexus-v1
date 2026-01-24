@@ -42,9 +42,9 @@
     --civic-event-link: #7DD3FC;
     --civic-event-link-hover: #BAE6FD;
     --civic-event-success: var(--color-emerald-400);
-    --civic-event-success-bg: rgba(16, 185, 129, 0.15);
+    --civic-event-success-bg: var(--color-emerald-alpha-15);
     --civic-event-danger: var(--color-red-400);
-    --civic-event-danger-bg: rgba(239, 68, 68, 0.15);
+    --civic-event-danger-bg: var(--color-red-alpha-15);
     --civic-event-focus-ring: var(--color-teal-300);
 }
 
@@ -232,7 +232,7 @@
 }
 
 [data-theme="dark"] .civic-alert--success {
-    border-color: rgba(52, 211, 153, 0.3);
+    border-color: var(--color-emerald-300-alpha-30);
 }
 
 /* Event Detail Grid */
@@ -269,7 +269,7 @@
 }
 
 [data-theme="dark"] .civic-event-info-box {
-    background: rgba(31, 41, 55, 0.5);
+    background: var(--color-gray-800-alpha-50);
 }
 
 /* Section Subtitle */
@@ -356,7 +356,7 @@
     border-radius: 50%;
     object-fit: cover;
     border: 2px solid var(--civic-bg-card, var(--color-white));
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 1px 3px var(--color-black-alpha-10);
     transition: transform 0.2s ease;
 }
 

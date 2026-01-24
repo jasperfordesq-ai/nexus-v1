@@ -20,9 +20,9 @@
     width: 200%;
     height: 200%;
     background:
-        radial-gradient(ellipse at 25% 30%, rgba(20, 184, 166, 0.12) 0%, transparent 50%),
-        radial-gradient(ellipse at 75% 25%, rgba(79, 70, 229, 0.1) 0%, transparent 45%),
-        radial-gradient(ellipse at 50% 80%, rgba(16, 185, 129, 0.08) 0%, transparent 50%);
+        radial-gradient(ellipse at 25% 30%, var(--color-teal-500-alpha-12) 0%, transparent 50%),
+        radial-gradient(ellipse at 75% 25%, var(--color-primary-600-alpha-10) 0%, transparent 45%),
+        radial-gradient(ellipse at 50% 80%, var(--color-emerald-alpha-8) 0%, transparent 50%);
     /* animation removed for GOV.UK compliance */
 }
 
@@ -32,8 +32,8 @@
 
 [data-theme="dark"] .org-profile-bg::before {
     background:
-        radial-gradient(ellipse at 25% 30%, rgba(20, 184, 166, 0.2) 0%, transparent 50%),
-        radial-gradient(ellipse at 75% 25%, rgba(79, 70, 229, 0.15) 0%, transparent 45%);
+        radial-gradient(ellipse at 25% 30%, var(--color-teal-500-alpha-20) 0%, transparent 50%),
+        radial-gradient(ellipse at 75% 25%, var(--color-primary-600-alpha-15) 0%, transparent 45%);
 }
 
 
@@ -53,7 +53,7 @@
     border-radius: var(--radius-2xl);
     margin-bottom: -60px;
     overflow: hidden;
-    box-shadow: 0 8px 32px rgba(16, 185, 129, 0.25);
+    box-shadow: 0 8px 32px var(--color-emerald-alpha-25);
 }
 
 .org-hero-banner::before {
@@ -61,8 +61,8 @@
     position: absolute;
     inset: 0;
     background:
-        radial-gradient(ellipse at 30% 20%, rgba(255, 255, 255, 0.15) 0%, transparent 50%),
-        radial-gradient(ellipse at 70% 80%, rgba(255, 255, 255, 0.1) 0%, transparent 50%);
+        radial-gradient(ellipse at 30% 20%, var(--color-white-alpha-15) 0%, transparent 50%),
+        radial-gradient(ellipse at 70% 80%, var(--color-white-alpha-10) 0%, transparent 50%);
 }
 
 .org-hero-pattern {
@@ -77,22 +77,22 @@
     position: relative;
     z-index: 10;
     background: linear-gradient(135deg,
-        rgba(255, 255, 255, 0.95) 0%,
-        rgba(255, 255, 255, 0.85) 100%);
+        var(--color-white-alpha-95) 0%,
+        var(--color-white-alpha-85) 100%);
     /* backdrop-filter removed for GOV.UK compliance */
     -webkit-/* backdrop-filter removed for GOV.UK compliance */
-    border: 1px solid rgba(255, 255, 255, 0.6);
+    border: 1px solid var(--color-white-alpha-60);
     border-radius: var(--radius-2xl);
     padding: var(--space-6);
     margin: 0 var(--space-5) var(--space-6) var(--space-5);
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 8px 32px var(--color-black-alpha-10);
 }
 
 [data-theme="dark"] .org-profile-card {
     background: linear-gradient(135deg,
-        rgba(30, 41, 59, 0.95) 0%,
-        rgba(30, 41, 59, 0.85) 100%);
-    border-color: rgba(255, 255, 255, 0.1);
+        var(--color-slate-alpha-95) 0%,
+        var(--color-slate-alpha-85) 100%);
+    border-color: var(--color-white-alpha-10);
 }
 
 .org-profile-content {
@@ -114,14 +114,14 @@
     font-size: 3rem;
     font-weight: 700;
     flex-shrink: 0;
-    box-shadow: 0 8px 24px rgba(16, 185, 129, 0.35);
+    box-shadow: 0 8px 24px var(--color-emerald-alpha-35);
     overflow: hidden;
     border: 4px solid white;
     margin-top: -60px;
 }
 
 [data-theme="dark"] .org-profile-logo {
-    border-color: rgba(30, 41, 59, 0.9);
+    border-color: var(--color-slate-alpha-90);
 }
 
 .org-profile-logo img {
@@ -163,17 +163,17 @@
 }
 
 .org-profile-status.active {
-    background: rgba(16, 185, 129, 0.15);
+    background: var(--color-emerald-alpha-15);
     color: var(--color-success-600);
 }
 
 .org-profile-status.pending {
-    background: rgba(251, 191, 36, 0.15);
+    background: var(--color-amber-alpha-15);
     color: var(--color-warning-700);
 }
 
 [data-theme="dark"] .org-profile-status.active {
-    background: rgba(16, 185, 129, 0.2);
+    background: var(--color-emerald-alpha-20);
     color: var(--color-success-400);
 }
 
@@ -226,11 +226,11 @@
     gap: var(--space-2-5);
     margin-top: var(--space-5);
     padding-top: var(--space-5);
-    border-top: 1px solid rgba(0, 0, 0, 0.06);
+    border-top: 1px solid var(--color-black-alpha-6);
 }
 
 [data-theme="dark"] .org-quick-actions {
-    border-top-color: rgba(255, 255, 255, 0.08);
+    border-top-color: var(--color-white-alpha-8);
 }
 
 .org-action-btn {
@@ -252,44 +252,44 @@
 .org-action-btn--primary {
     background: linear-gradient(135deg, var(--color-success-500) 0%, var(--color-success-600) 100%);
     color: white;
-    box-shadow: 0 4px 16px rgba(16, 185, 129, 0.3);
+    box-shadow: 0 4px 16px var(--color-emerald-alpha-30);
 }
 
 .org-action-btn--primary:hover {
     transform: translateY(-2px);
-    box-shadow: 0 6px 24px rgba(16, 185, 129, 0.4);
+    box-shadow: 0 6px 24px var(--color-emerald-alpha-40);
 }
 
 .org-action-btn--wallet {
     background: linear-gradient(135deg, var(--color-primary-500) 0%, var(--color-primary-600) 100%);
     color: white;
-    box-shadow: 0 4px 16px rgba(99, 102, 241, 0.3);
+    box-shadow: 0 4px 16px var(--color-indigo-alpha-30);
 }
 
 .org-action-btn--wallet:hover {
     transform: translateY(-2px);
-    box-shadow: 0 6px 24px rgba(99, 102, 241, 0.4);
+    box-shadow: 0 6px 24px var(--color-indigo-alpha-40);
 }
 
 .org-action-btn--secondary {
-    background: rgba(0, 0, 0, 0.05);
+    background: var(--color-black-alpha-5);
     color: var(--color-gray-700);
-    border: 1px solid rgba(0, 0, 0, 0.08);
+    border: 1px solid var(--color-black-alpha-8);
 }
 
 .org-action-btn--secondary:hover {
-    background: rgba(0, 0, 0, 0.08);
+    background: var(--color-black-alpha-8);
     transform: translateY(-1px);
 }
 
 [data-theme="dark"] .org-action-btn--secondary {
-    background: rgba(255, 255, 255, 0.08);
-    border-color: rgba(255, 255, 255, 0.1);
+    background: var(--color-white-alpha-8);
+    border-color: var(--color-white-alpha-10);
     color: var(--color-slate-200);
 }
 
 [data-theme="dark"] .org-action-btn--secondary:hover {
-    background: rgba(255, 255, 255, 0.12);
+    background: var(--color-white-alpha-12);
 }
 
 /* Stats Grid */
@@ -303,11 +303,11 @@
 
 .org-stat-card {
     background: linear-gradient(135deg,
-        rgba(255, 255, 255, 0.9) 0%,
-        rgba(255, 255, 255, 0.7) 100%);
+        var(--color-white-alpha-90) 0%,
+        var(--color-white-alpha-70) 100%);
     /* backdrop-filter removed for GOV.UK compliance */
     -webkit-/* backdrop-filter removed for GOV.UK compliance */
-    border: 1px solid rgba(255, 255, 255, 0.6);
+    border: 1px solid var(--color-white-alpha-60);
     border-radius: var(--radius-xl);
     padding: var(--space-5);
     text-align: center;
@@ -316,14 +316,14 @@
 
 .org-stat-card:hover {
     transform: translateY(-2px);
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+    box-shadow: 0 8px 24px var(--color-black-alpha-8);
 }
 
 [data-theme="dark"] .org-stat-card {
     background: linear-gradient(135deg,
-        rgba(30, 41, 59, 0.9) 0%,
-        rgba(30, 41, 59, 0.7) 100%);
-    border-color: rgba(255, 255, 255, 0.1);
+        var(--color-slate-alpha-90) 0%,
+        var(--color-slate-alpha-70) 100%);
+    border-color: var(--color-white-alpha-10);
 }
 
 .org-stat-icon {
@@ -331,7 +331,7 @@
     height: var(--space-12);
     margin: 0 auto var(--space-3);
     border-radius: var(--radius-lg);
-    background: rgba(16, 185, 129, 0.1);
+    background: var(--color-emerald-alpha-10);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -389,7 +389,7 @@
     width: var(--space-9);
     height: var(--space-9);
     border-radius: var(--radius-md);
-    background: rgba(16, 185, 129, 0.1);
+    background: var(--color-emerald-alpha-10);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -406,8 +406,8 @@
     align-items: center;
     gap: var(--space-1-5);
     padding: var(--space-2) 16px;
-    background: rgba(16, 185, 129, 0.1);
-    border: 1px solid rgba(16, 185, 129, 0.2);
+    background: var(--color-emerald-alpha-10);
+    border: 1px solid var(--color-emerald-alpha-20);
     border-radius: var(--radius-md);
     color: var(--color-success-600);
     font-weight: 600;
@@ -417,7 +417,7 @@
 }
 
 .org-section-action:hover {
-    background: rgba(16, 185, 129, 0.15);
+    background: var(--color-emerald-alpha-15);
     transform: translateY(-1px);
 }
 
@@ -430,11 +430,11 @@
 
 .org-opp-card {
     background: linear-gradient(135deg,
-        rgba(255, 255, 255, 0.95) 0%,
-        rgba(255, 255, 255, 0.85) 100%);
+        var(--color-white-alpha-95) 0%,
+        var(--color-white-alpha-85) 100%);
     /* backdrop-filter removed for GOV.UK compliance */
     -webkit-/* backdrop-filter removed for GOV.UK compliance */
-    border: 1px solid rgba(255, 255, 255, 0.6);
+    border: 1px solid var(--color-white-alpha-60);
     border-radius: var(--radius-xl);
     padding: var(--space-5);
     text-decoration: none;
@@ -445,19 +445,19 @@
 
 .org-opp-card:hover {
     transform: translateY(-4px);
-    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.12);
-    border-color: rgba(16, 185, 129, 0.3);
+    box-shadow: 0 12px 40px var(--color-black-alpha-12);
+    border-color: var(--color-emerald-alpha-30);
 }
 
 [data-theme="dark"] .org-opp-card {
     background: linear-gradient(135deg,
-        rgba(30, 41, 59, 0.95) 0%,
-        rgba(30, 41, 59, 0.85) 100%);
-    border-color: rgba(255, 255, 255, 0.1);
+        var(--color-slate-alpha-95) 0%,
+        var(--color-slate-alpha-85) 100%);
+    border-color: var(--color-white-alpha-10);
 }
 
 [data-theme="dark"] .org-opp-card:hover {
-    border-color: rgba(16, 185, 129, 0.4);
+    border-color: var(--color-emerald-alpha-40);
 }
 
 .org-opp-header {
@@ -495,7 +495,7 @@
 .org-opp-type {
     display: inline-block;
     padding: var(--space-0-5) 8px;
-    background: rgba(16, 185, 129, 0.1);
+    background: var(--color-emerald-alpha-10);
     color: var(--color-success-600);
     font-size: 0.7rem;
     font-weight: 600;
@@ -504,7 +504,7 @@
 }
 
 [data-theme="dark"] .org-opp-type {
-    background: rgba(16, 185, 129, 0.2);
+    background: var(--color-emerald-alpha-20);
     color: var(--color-success-400);
 }
 
@@ -529,11 +529,11 @@
     flex-wrap: wrap;
     gap: var(--space-3);
     padding-top: var(--space-3);
-    border-top: 1px solid rgba(0, 0, 0, 0.05);
+    border-top: 1px solid var(--color-black-alpha-5);
 }
 
 [data-theme="dark"] .org-opp-footer {
-    border-top-color: rgba(255, 255, 255, 0.08);
+    border-top-color: var(--color-white-alpha-8);
 }
 
 .org-opp-meta {
@@ -554,19 +554,19 @@
     text-align: center;
     padding: var(--space-16) var(--space-5);
     background: linear-gradient(135deg,
-        rgba(255, 255, 255, 0.8) 0%,
-        rgba(255, 255, 255, 0.6) 100%);
+        var(--color-white-alpha-80) 0%,
+        var(--color-white-alpha-60) 100%);
     /* backdrop-filter removed for GOV.UK compliance */
     -webkit-/* backdrop-filter removed for GOV.UK compliance */
-    border: 1px solid rgba(255, 255, 255, 0.6);
+    border: 1px solid var(--color-white-alpha-60);
     border-radius: var(--radius-2xl);
 }
 
 [data-theme="dark"] .org-empty-state {
     background: linear-gradient(135deg,
-        rgba(30, 41, 59, 0.8) 0%,
-        rgba(30, 41, 59, 0.6) 100%);
-    border-color: rgba(255, 255, 255, 0.1);
+        var(--color-slate-alpha-80) 0%,
+        var(--color-slate-alpha-60) 100%);
+    border-color: var(--color-white-alpha-10);
 }
 
 .org-empty-icon {
@@ -574,7 +574,7 @@
     height: var(--space-20);
     margin: 0 auto var(--space-5);
     border-radius: var(--radius-2xl);
-    background: rgba(16, 185, 129, 0.1);
+    background: var(--color-emerald-alpha-10);
     display: flex;
     align-items: center;
     justify-content: center;

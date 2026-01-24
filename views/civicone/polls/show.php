@@ -1,49 +1,62 @@
 <?php
-// CivicOne Poll Detail View
+// CivicOne Poll Detail View - GOV.UK WCAG 2.1 AA Compliant
 if (session_status() === PHP_SESSION_NONE) session_start();
 
 $hTitle = "Poll";
 $hSubtitle = $poll['question'];
 $hType = 'Community Poll';
 
+// Load page-specific CSS
+$additionalCSS = '<link rel="stylesheet" href="/assets/css/civicone-polls-show.css">';
+
 require __DIR__ . '/../../layouts/civicone/header.php';
 $basePath = \Nexus\Core\TenantContext::getBasePath();
 ?>
 
-<div class="civic-container" style="max-width: 700px;">
+<div class="civic-container poll-container">
 
     <div class="civic-card">
 
         <?php if (!empty($poll['description'])): ?>
-            <p class="civic-border-left-black civic-bg-gray-50" style="font-size: 1.25rem; margin-bottom: 30px; padding-left: 15px; padding: 15px;">
+            <p class="poll-description">
                 <?= htmlspecialchars($poll['description']) ?>
             </p>
         <?php endif; ?>
 
         <?php if ($hasVoted): ?>
             <!-- RESULTS VIEW -->
-            <div class="civic-success-box">
-                <h3 class="civic-text-green-dark" style="margin-top: 0;">✅ Thank you for voting!</h3>
-                <p style="margin-bottom: 0;">Here are the current results:</p>
+            <div class="civic-success-box" role="status" aria-live="polite">
+                <h3 class="civic-text-green-dark poll-success-heading">Thank you for voting!</h3>
+                <p class="poll-success-text">Here are the current results:</p>
             </div>
 
-            <div class="poll-results">
-                <?php foreach ($options as $opt): ?>
+            <div class="poll-results" aria-label="Poll results">
+                <?php foreach ($options as $index => $opt): ?>
                     <?php
                     $percent = $totalVotes > 0 ? round(($opt['vote_count'] / $totalVotes) * 100) : 0;
+                    $optionId = 'poll-option-' . $index;
                     ?>
-                    <div style="margin-bottom: 25px;">
-                        <div style="display: flex; justify-content: space-between; margin-bottom: 8px; font-weight: 700; font-size: 1.1rem;">
-                            <span><?= htmlspecialchars($opt['label']) ?></span>
-                            <span><?= $percent ?>% (<?= $opt['vote_count'] ?>)</span>
+                    <div class="poll-result-item">
+                        <div class="poll-result-header" id="<?= $optionId ?>-label">
+                            <span class="poll-result-label"><?= htmlspecialchars($opt['label']) ?></span>
+                            <span class="poll-result-percentage"><?= $percent ?>% (<?= $opt['vote_count'] ?>)</span>
                         </div>
-                        <div style="background: #ccc; height: 30px; border: 1px solid #000; width: 100%;">
-                            <div style="background: #000; width: <?= $percent ?>%; height: 100%;"></div>
+                        <div class="poll-progress-container">
+                            <div
+                                class="poll-progress-bar"
+                                role="progressbar"
+                                aria-valuenow="<?= $percent ?>"
+                                aria-valuemin="0"
+                                aria-valuemax="100"
+                                aria-labelledby="<?= $optionId ?>-label"
+                                aria-label="<?= htmlspecialchars($opt['label']) ?>: <?= $percent ?> percent, <?= $opt['vote_count'] ?> votes"
+                                style="width: <?= $percent ?>%;"
+                            ></div>
                         </div>
                     </div>
                 <?php endforeach; ?>
 
-                <div style="margin-top: 30px; border-top: 2px solid #000; padding-top: 15px; text-align: center; font-weight: bold; font-size: 1.2rem;">
+                <div class="poll-total-votes" aria-live="polite">
                     Total Votes Cast: <?= $totalVotes ?>
                 </div>
             </div>
@@ -51,24 +64,35 @@ $basePath = \Nexus\Core\TenantContext::getBasePath();
         <?php else: ?>
             <!-- VOTING VIEW -->
             <?php if (!isset($_SESSION['user_id'])): ?>
-                <p style="font-size: 1.2rem; text-align: center;">
-                    Please <a href="<?= Nexus\Core\TenantContext::getBasePath() ?>/login" style="font-weight: bold;">login</a> to cast your vote.
+                <p class="poll-login-prompt">
+                    Please <a href="<?= Nexus\Core\TenantContext::getBasePath() ?>/login" class="poll-login-link">login</a> to cast your vote.
                 </p>
             <?php else: ?>
-                <form action="<?= Nexus\Core\TenantContext::getBasePath() ?>/polls/vote" method="POST">
+                <form action="<?= Nexus\Core\TenantContext::getBasePath() ?>/polls/vote" method="POST" aria-label="Poll voting form">
                     <?= \Nexus\Core\Csrf::input() ?>
                     <input type="hidden" name="poll_id" value="<?= $poll['id'] ?>">
 
-                    <div style="display: flex; flex-direction: column; gap: 20px; margin-bottom: 40px;">
-                        <?php foreach ($options as $opt): ?>
-                            <label style="display: flex; align-items: center; gap: 20px; padding: 20px; border: 2px solid #000; cursor: pointer; background: #fff;">
-                                <input type="radio" name="option_id" value="<?= $opt['id'] ?>" required style="transform: scale(2); margin-left: 5px;">
-                                <span style="font-size: 1.25rem; font-weight: 600;"><?= htmlspecialchars($opt['label']) ?></span>
+                    <fieldset class="poll-options-group">
+                        <legend class="poll-sr-only">Select your vote for: <?= htmlspecialchars($poll['question']) ?></legend>
+                        <?php foreach ($options as $index => $opt): ?>
+                            <?php $optionInputId = 'poll-vote-option-' . $opt['id']; ?>
+                            <label class="poll-option" for="<?= $optionInputId ?>">
+                                <input
+                                    type="radio"
+                                    name="option_id"
+                                    id="<?= $optionInputId ?>"
+                                    value="<?= $opt['id'] ?>"
+                                    required
+                                    class="poll-option-input"
+                                    aria-describedby="poll-option-desc-<?= $opt['id'] ?>"
+                                >
+                                <span class="poll-option-indicator" aria-hidden="true"></span>
+                                <span class="poll-option-label" id="poll-option-desc-<?= $opt['id'] ?>"><?= htmlspecialchars($opt['label']) ?></span>
                             </label>
                         <?php endforeach; ?>
-                    </div>
+                    </fieldset>
 
-                    <button type="submit" class="civic-btn" style="width: 100%; font-size: 1.3rem; padding: 20px;">
+                    <button type="submit" class="poll-submit-btn" aria-label="Submit your vote for this poll">
                         Submit My Vote
                     </button>
                 </form>

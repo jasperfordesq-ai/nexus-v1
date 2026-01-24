@@ -11,16 +11,16 @@ function get_avatar_civic($url)
 }
 ?>
 
-<div class="civic-container" style="max-width: 1200px; margin: 0 auto; padding: 20px;">
+<div class="civic-container civic-group-container">
 
     <!-- Group Header Card -->
     <div class="civic-group-header">
         <div class="civic-group-cover">
             <?php if (!empty($group['image_url'])): ?>
-                <img src="<?= htmlspecialchars($group['image_url']) ?>" style="width: 100%; height: 100%; object-fit: cover; opacity: 0.8;">
+                <img src="<?= htmlspecialchars($group['image_url']) ?>" alt="<?= htmlspecialchars($group['name']) ?> cover image">
             <?php else: ?>
-                <div style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; color: white;">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <div class="civic-group-cover-placeholder" aria-hidden="true">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                         <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
                         <circle cx="9" cy="7" r="4"></circle>
                         <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
@@ -28,12 +28,12 @@ function get_avatar_civic($url)
                     </svg>
                 </div>
             <?php endif; ?>
-            <span style="position: absolute; top: 20px; left: 20px; background: rgba(0,0,0,0.6); color: white; padding: 5px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: 700;">Local Hub</span>
+            <span class="civic-group-cover-badge">Local Hub</span>
         </div>
-        <div class="civic-group-info civic-group-header-content" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 20px;">
+        <div class="civic-group-info civic-group-header-content">
             <div>
-                <h1 style="margin: 0; font-size: 2rem; color: var(--civic-text-main, #111827);"><?= htmlspecialchars($group['name']) ?></h1>
-                <p style="margin: 5px 0 0 0; color: var(--civic-text-muted, #6b7280);">
+                <h1><?= htmlspecialchars($group['name']) ?></h1>
+                <p class="civic-group-info-meta">
                     <?= count($members) ?> Members · Managed by <?= htmlspecialchars($group['owner_name'] ?? 'Organizer') ?>
                 </p>
             </div>
@@ -41,18 +41,18 @@ function get_avatar_civic($url)
             <!-- Action Buttons -->
             <div>
                 <?php if ($isMember): ?>
-                    <form action="<?= \Nexus\Core\TenantContext::getBasePath() ?>/groups/leave" method="POST" class="ajax-form" style="display:inline;">
+                    <form action="<?= \Nexus\Core\TenantContext::getBasePath() ?>/groups/leave" method="POST" class="ajax-form civic-inline-form">
                         <?= \Nexus\Core\Csrf::input() ?>
                         <input type="hidden" name="group_id" value="<?= $group['id'] ?>">
-                        <button type="submit" class="civic-btn civic-border-red civic-text-red" style="background: transparent; border-radius: 30px; padding: 8px 20px;">
+                        <button type="submit" class="civic-group-action-btn civic-group-leave-btn">
                             Leave Hub
                         </button>
                     </form>
                 <?php else: ?>
-                    <form action="<?= \Nexus\Core\TenantContext::getBasePath() ?>/groups/join" method="POST" class="ajax-form" style="display:inline;">
+                    <form action="<?= \Nexus\Core\TenantContext::getBasePath() ?>/groups/join" method="POST" class="ajax-form civic-inline-form">
                         <?= \Nexus\Core\Csrf::input() ?>
                         <input type="hidden" name="group_id" value="<?= $group['id'] ?>">
-                        <button type="submit" class="civic-btn" style="border-radius: 30px; padding: 10px 30px;">
+                        <button type="submit" class="civic-group-action-btn civic-group-join-btn">
                             Join Hub
                         </button>
                     </form>
@@ -72,62 +72,33 @@ function get_avatar_civic($url)
         <!-- Left Column: Tabs & Content -->
         <main>
             <!-- Tabs -->
-            <div class="civic-tab-nav">
+            <div class="civic-tab-nav" role="tablist" aria-label="Hub content sections">
                 <?php if ($hasSubHubs): ?>
-                    <a href="#tab-subhubs" class="civic-tab-link <?= $defaultTab === 'tab-subhubs' ? 'active' : '' ?>" onclick="switchTab(event, 'tab-subhubs')">Sub-Hubs</a>
+                    <button type="button" role="tab" id="btn-subhubs" class="civic-tab-link <?= $defaultTab === 'tab-subhubs' ? 'active' : '' ?>" aria-selected="<?= $defaultTab === 'tab-subhubs' ? 'true' : 'false' ?>" aria-controls="tab-subhubs" onclick="switchTab(event, 'tab-subhubs')">Sub-Hubs</button>
                 <?php endif; ?>
-                <a href="#tab-feed" class="civic-tab-link <?= $defaultTab === 'tab-feed' ? 'active' : '' ?>" onclick="switchTab(event, 'tab-feed')">Activity</a>
-                <a href="#tab-about" class="civic-tab-link" onclick="switchTab(event, 'tab-about')">About</a>
-                <a href="#tab-members" class="civic-tab-link" onclick="switchTab(event, 'tab-members')">Members (<?= count($members) ?>)</a>
+                <button type="button" role="tab" id="btn-feed" class="civic-tab-link <?= $defaultTab === 'tab-feed' ? 'active' : '' ?>" aria-selected="<?= $defaultTab === 'tab-feed' ? 'true' : 'false' ?>" aria-controls="tab-feed" onclick="switchTab(event, 'tab-feed')">Activity</button>
+                <button type="button" role="tab" id="btn-about" class="civic-tab-link" aria-selected="false" aria-controls="tab-about" onclick="switchTab(event, 'tab-about')">About</button>
+                <button type="button" role="tab" id="btn-members" class="civic-tab-link" aria-selected="false" aria-controls="tab-members" onclick="switchTab(event, 'tab-members')">Members (<?= count($members) ?>)</button>
             </div>
 
             <!-- Tab: Sub-Hubs -->
             <?php if ($hasSubHubs): ?>
-                <div id="tab-subhubs" class="civic-tab-pane <?= $defaultTab === 'tab-subhubs' ? 'active' : '' ?>">
-                    <div class="civic-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 20px;">
+                <div id="tab-subhubs" class="civic-tab-pane <?= $defaultTab === 'tab-subhubs' ? 'active' : '' ?>" role="tabpanel" aria-labelledby="btn-subhubs">
+                    <div class="civic-subhubs-grid">
                         <?php foreach ($subGroups as $sub): ?>
                             <?php
                             $sName = htmlspecialchars($sub['name']);
                             $sImg = !empty($sub['image_url']) ? $sub['image_url'] : '';
                             ?>
-                            <div class="civic-card" style="
-                            display: flex; 
-                            flex-direction: column; 
-                            align-items: center; 
-                            text-align: center; 
-                            padding: 0; 
-                            background: var(--civic-bg-card, #f7f7f7); 
-                            border: none; 
-                            border-radius: 6px; 
-                            overflow: hidden;
-                            margin-bottom: 0;
-                            box-shadow: none;
-                        ">
+                            <div class="civic-subhub-card">
                                 <!-- Image Section -->
-                                <div style="padding: 20px 20px 10px 20px; width: 100%; display: flex; justify-content: center;">
+                                <div class="civic-subhub-image">
                                     <?php if ($sImg): ?>
-                                        <img src="<?= $sImg ?>" alt="<?= $sName ?>" style="
-                                        width: 100px; 
-                                        height: 100px; 
-                                        border-radius: 50%; 
-                                        object-fit: cover; 
-                                        border: 4px solid var(--civic-bg-page, #ffffff);
-                                        box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
-                                    ">
+                                        <img src="<?= $sImg ?>" alt="<?= $sName ?>" class="civic-subhub-avatar">
                                     <?php else: ?>
                                         <!-- SVG Placeholder -->
-                                        <div class="civic-bg-gray-200" style="
-                                        width: 100px;
-                                        height: 100px;
-                                        border-radius: 50%;
-                                        border: 4px solid var(--civic-bg-page, #ffffff);
-                                        box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
-                                        display: flex;
-                                        align-items: center;
-                                        justify-content: center;
-                                        color: #9ca3af;
-                                    ">
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                                        <div class="civic-subhub-placeholder" aria-hidden="true">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                                                 <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
                                                 <circle cx="9" cy="7" r="4"></circle>
                                                 <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
@@ -138,30 +109,13 @@ function get_avatar_civic($url)
                                 </div>
 
                                 <!-- Content -->
-                                <div style="padding: 0 20px 25px 20px; width: 100%;">
-                                    <h3 style="
-                                    margin: 0 0 5px 0; 
-                                    font-size: 1rem; 
-                                    font-weight: 600; 
-                                    color: var(--civic-brand, #00796B);
-                                ">
-                                        <a href="<?= \Nexus\Core\TenantContext::getBasePath() ?>/groups/<?= $sub['id'] ?>" style="text-decoration: none; color: inherit;">
+                                <div class="civic-subhub-content">
+                                    <h3 class="civic-subhub-title">
+                                        <a href="<?= \Nexus\Core\TenantContext::getBasePath() ?>/groups/<?= $sub['id'] ?>">
                                             <?= $sName ?>
                                         </a>
                                     </h3>
-                                    <a href="<?= \Nexus\Core\TenantContext::getBasePath() ?>/groups/<?= $sub['id'] ?>" class="civic-btn" style="
-                                    display: inline-block;
-                                    margin-top: 10px;
-                                    padding: 6px 16px;
-                                    background: transparent;
-                                    color: var(--civic-brand, #00796B);
-                                    border: 1px solid var(--civic-brand, #00796B);
-                                    border-radius: 30px;
-                                    font-weight: 600;
-                                    font-size: 0.8rem;
-                                    text-decoration: none;
-                                    transition: all 0.2s;
-                                ">Visit Hub</a>
+                                    <a href="<?= \Nexus\Core\TenantContext::getBasePath() ?>/groups/<?= $sub['id'] ?>" class="civic-subhub-btn" aria-label="Visit <?= $sName ?> hub">Visit Hub</a>
                                 </div>
                             </div>
                         <?php endforeach; ?>
@@ -170,44 +124,44 @@ function get_avatar_civic($url)
             <?php endif; ?>
 
             <!-- Tab: Activity (Placeholder for Feed) -->
-            <div id="tab-feed" class="civic-tab-pane <?= $defaultTab === 'tab-feed' ? 'active' : '' ?>">
-                <div class="civic-card civic-bg-gray-50" style="padding: 40px; text-align: center; border: 1px dashed #d1d5db; margin-bottom: 0;">
-                    <h3 style="color: var(--civic-text-muted);">Recent Activity</h3>
+            <div id="tab-feed" class="civic-tab-pane <?= $defaultTab === 'tab-feed' ? 'active' : '' ?>" role="tabpanel" aria-labelledby="btn-feed">
+                <div class="civic-group-empty-state">
+                    <h3>Recent Activity</h3>
                     <p>There is no recent activity in this hub.</p>
                 </div>
             </div>
 
             <!-- Tab: About -->
-            <div id="tab-about" class="civic-tab-pane">
-                <div class="civic-card" style="background: var(--civic-bg-card, #f7f7f7); border: none; padding: 30px; border-radius: 8px; margin-bottom: 0;">
-                    <h3 style="margin-top: 0;">Running this hub</h3>
-                    <p style="line-height: 1.6; color: var(--civic-text-main);"><?= nl2br(htmlspecialchars($group['description'])) ?></p>
+            <div id="tab-about" class="civic-tab-pane" role="tabpanel" aria-labelledby="btn-about">
+                <div class="civic-group-about-card">
+                    <h3>Running this hub</h3>
+                    <p><?= nl2br(htmlspecialchars($group['description'])) ?></p>
                 </div>
             </div>
 
             <!-- Tab: Members -->
-            <div id="tab-members" class="civic-tab-pane">
-                <div class="civic-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 20px;">
+            <div id="tab-members" class="civic-tab-pane" role="tabpanel" aria-labelledby="btn-members">
+                <div class="civic-members-grid">
                     <?php if (empty($members)): ?>
                         <p>No members yet.</p>
                     <?php else: ?>
                         <?php foreach ($members as $mem): ?>
-                            <div class="civic-card" style="text-align: center; padding: 20px; background: #f7f7f7; border: none; border-radius: 6px; box-shadow:none; margin-bottom:0;">
+                            <div class="civic-member-card">
                                 <?php if (!empty($mem['avatar_url'])): ?>
-                                    <img src="<?= htmlspecialchars($mem['avatar_url']) ?>" style="width: 80px; height: 80px; border-radius: 50%; object-fit: cover; border: 3px solid white; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                                    <img src="<?= htmlspecialchars($mem['avatar_url']) ?>" alt="<?= htmlspecialchars($mem['name']) ?>" class="civic-member-avatar">
                                 <?php else: ?>
                                     <!-- SVG Fallback -->
-                                    <div class="civic-bg-gray-200" style="width: 80px; height: 80px; margin: 0 auto; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 3px solid white; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <div class="civic-member-placeholder" aria-hidden="true">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                                             <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
                                             <circle cx="12" cy="7" r="4"></circle>
                                         </svg>
                                     </div>
                                 <?php endif; ?>
-                                <h4 style="margin: 10px 0 5px 0; font-size: 0.95rem;">
-                                    <a href="<?= \Nexus\Core\TenantContext::getBasePath() ?>/profile/<?= $mem['id'] ?>" style="text-decoration: none; color: var(--civic-text-main);"><?= htmlspecialchars($mem['name']) ?></a>
+                                <h4 class="civic-member-name">
+                                    <a href="<?= \Nexus\Core\TenantContext::getBasePath() ?>/profile/<?= $mem['id'] ?>"><?= htmlspecialchars($mem['name']) ?></a>
                                 </h4>
-                                <span style="font-size: 0.8rem; color: var(--civic-text-muted);"><?= htmlspecialchars($mem['location'] ?? 'Member') ?></span>
+                                <span class="civic-member-location"><?= htmlspecialchars($mem['location'] ?? 'Member') ?></span>
                             </div>
                         <?php endforeach; ?>
                     <?php endif; ?>
@@ -217,16 +171,16 @@ function get_avatar_civic($url)
 
         <!-- Right Column: Sidebar -->
         <aside>
-            <div class="civic-card" style="background: white; border: 1px solid #e5e7eb; padding: 20px; border-radius: 8px; margin-bottom:0;">
-                <h4 style="margin-top: 0;">Hub Manager</h4>
-                <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 20px;">
+            <div class="civic-group-sidebar-card">
+                <h4>Hub Manager</h4>
+                <div class="civic-group-manager">
                     <!-- Manager Avatar Logic could go here -->
                     <div>
-                        <strong style="display: block;"><?= htmlspecialchars($group['owner_name'] ?? 'Organizer') ?></strong>
-                        <span style="font-size: 0.85rem; color: #6b7280;">Organizer</span>
+                        <span class="civic-group-manager-name"><?= htmlspecialchars($group['owner_name'] ?? 'Organizer') ?></span>
+                        <span class="civic-group-manager-role">Organizer</span>
                     </div>
                 </div>
-                <button class="civic-btn" style="width: 100%; background: white; color: var(--civic-brand); border: 1px solid var(--civic-brand);">Contact (Coming Soon)</button>
+                <button type="button" class="civic-group-contact-btn" aria-label="Contact hub manager (coming soon)" disabled>Contact (Coming Soon)</button>
             </div>
         </aside>
 
@@ -238,14 +192,50 @@ function get_avatar_civic($url)
     function switchTab(e, tabId) {
         e.preventDefault();
 
-        // Hide all tabs
-        document.querySelectorAll('.civic-tab-pane').forEach(el => el.classList.remove('active'));
-        document.querySelectorAll('.civic-tab-link').forEach(el => el.classList.remove('active'));
+        // Hide all tabs and update ARIA
+        document.querySelectorAll('.civic-tab-pane').forEach(function(el) {
+            el.classList.remove('active');
+        });
+        document.querySelectorAll('.civic-tab-link').forEach(function(el) {
+            el.classList.remove('active');
+            el.setAttribute('aria-selected', 'false');
+        });
 
-        // Show target
+        // Show target and update ARIA
         document.getElementById(tabId).classList.add('active');
         e.currentTarget.classList.add('active');
+        e.currentTarget.setAttribute('aria-selected', 'true');
     }
+
+    // Add keyboard navigation for tabs
+    document.addEventListener('DOMContentLoaded', function() {
+        var tabList = document.querySelector('.civic-tab-nav');
+        if (tabList) {
+            tabList.addEventListener('keydown', function(e) {
+                var tabs = Array.from(tabList.querySelectorAll('.civic-tab-link'));
+                var currentIndex = tabs.indexOf(document.activeElement);
+
+                if (currentIndex === -1) return;
+
+                var nextIndex;
+                if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
+                    e.preventDefault();
+                    nextIndex = (currentIndex + 1) % tabs.length;
+                    tabs[nextIndex].focus();
+                } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+                    e.preventDefault();
+                    nextIndex = (currentIndex - 1 + tabs.length) % tabs.length;
+                    tabs[nextIndex].focus();
+                } else if (e.key === 'Home') {
+                    e.preventDefault();
+                    tabs[0].focus();
+                } else if (e.key === 'End') {
+                    e.preventDefault();
+                    tabs[tabs.length - 1].focus();
+                }
+            });
+        }
+    });
 </script>
 
 <?php require __DIR__ . '/../../layouts/civicone/footer.php'; ?>

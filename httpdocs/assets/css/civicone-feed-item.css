@@ -31,14 +31,14 @@
     align-items: center;
     gap: var(--space-2);
     padding: var(--space-2) var(--space-3);
-    background: linear-gradient(135deg, rgba(99,102,241,0.08), rgba(168,85,247,0.08));
+    background: linear-gradient(135deg, var(--color-indigo-alpha-8), var(--color-purple-alpha-8));
     border-bottom: 1px solid var(--feed-border, var(--color-gray-200));
     text-decoration: none;
     transition: background var(--transition-fast);
 }
 
 .feed-shared-group-banner:hover {
-    background: linear-gradient(135deg, rgba(99,102,241,0.12), rgba(168,85,247,0.12));
+    background: linear-gradient(135deg, var(--color-indigo-alpha-12), var(--color-purple-alpha-12));
 }
 
 .feed-shared-group-img {
@@ -46,7 +46,7 @@
     height: var(--space-8);
     border-radius: var(--radius-base);
     object-fit: cover;
-    border: 1px solid rgba(99,102,241,0.2);
+    border: 1px solid var(--color-indigo-alpha-20);
 }
 
 .feed-shared-group-content {
@@ -377,8 +377,8 @@
 
 /* Review Section */
 .feed-review-box {
-    background: linear-gradient(135deg, rgba(251,191,36,0.08), rgba(245,158,11,0.05));
-    border: 1px solid rgba(251,191,36,0.2);
+    background: linear-gradient(135deg, var(--color-amber-alpha-8), var(--color-amber-500-alpha-5));
+    border: 1px solid var(--color-amber-alpha-20);
     border-radius: var(--radius-md);
     padding: var(--space-4);
 }
@@ -399,7 +399,7 @@
     height: var(--space-12);
     border-radius: var(--radius-full);
     object-fit: cover;
-    border: 2px solid rgba(251,191,36,0.3);
+    border: 2px solid var(--color-amber-alpha-30);
 }
 
 .feed-review-content {
@@ -438,7 +438,7 @@
 }
 
 .feed-review-star-empty {
-    color: rgba(255,255,255,0.3);
+    color: var(--color-white-alpha-30);
 }
 
 .feed-review-rating-text {
@@ -478,7 +478,7 @@
     align-items: center;
     gap: var(--space-2);
     background: var(--feed-bg-card);
-    border: 1px solid rgba(251,191,36,0.3);
+    border: 1px solid var(--color-amber-alpha-30);
 }
 
 /* Comment Section */
@@ -538,4 +538,91 @@
 
 .feed-error-details {
     color: var(--color-gray-500);
+}
+
+/* =====================================================
+   Accessibility & GOV.UK Compliance Additions
+   ===================================================== */
+
+/* Hidden state for comments section - replaces inline style="display:none" */
+.feed-comments-section--hidden {
+    display: none;
+}
+
+/* Reactions/Likes Button - replaces clickable div */
+.feed-reactions-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    padding: 0;
+    margin: 0;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    font-size: inherit;
+    font-family: inherit;
+    color: inherit;
+    text-align: left;
+}
+
+.feed-reactions-btn:hover {
+    text-decoration: underline;
+}
+
+.feed-reactions-btn:focus {
+    outline: 3px solid var(--color-govuk-yellow, #ffdd00);
+    outline-offset: 2px;
+}
+
+/* Comments Count Button - replaces clickable span */
+.feed-stat-btn {
+    display: inline;
+    padding: 0;
+    margin: 0;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    font-size: inherit;
+    font-family: inherit;
+    color: inherit;
+}
+
+.feed-stat-btn:hover {
+    text-decoration: underline;
+}
+
+.feed-stat-btn:focus {
+    outline: 3px solid var(--color-govuk-yellow, #ffdd00);
+    outline-offset: 2px;
+}
+
+/* Comment Send Button - replaces clickable icon */
+.feed-comment-send-btn {
+    position: absolute;
+    right: var(--space-3);
+    top: 50%;
+    transform: translateY(-50%);
+    padding: var(--space-2);
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    color: var(--feed-text-muted);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--radius-base);
+}
+
+.feed-comment-send-btn:hover {
+    color: var(--color-primary-600, var(--feed-text-primary));
+}
+
+.feed-comment-send-btn:focus {
+    outline: 3px solid var(--color-govuk-yellow, #ffdd00);
+    outline-offset: 2px;
+}
+
+/* Ensure icon inside button doesn't have pointer events */
+.feed-comment-send-btn i {
+    pointer-events: none;
 }
