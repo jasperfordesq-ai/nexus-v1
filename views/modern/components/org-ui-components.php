@@ -20,7 +20,7 @@
         </div>
         <div class="org-modal-body">
             <p class="org-modal-text" id="orgModalText">Are you sure you want to proceed?</p>
-            <input type="text" class="org-modal-input" id="orgModalInput" style="display: none;" placeholder="">
+            <input type="text" class="org-modal-input component-hidden" id="orgModalInput" placeholder="">
         </div>
         <div class="org-modal-footer">
             <button type="button" class="org-modal-btn cancel" id="orgModalCancel">Cancel</button>
@@ -80,7 +80,11 @@ const OrgUI = {
             icon.innerHTML = `<i class="fa-solid ${icons[type] || icons.warning}"></i>`;
 
             const input = document.getElementById('orgModalInput');
-            input.style.display = showInput ? 'block' : 'none';
+            if (showInput) {
+                input.classList.remove('component-hidden');
+            } else {
+                input.classList.add('component-hidden');
+            }
             input.placeholder = inputPlaceholder;
             input.value = inputValue;
 
@@ -291,10 +295,10 @@ const OrgUI = {
 
         showSkeleton(container, count = 3) {
             container.innerHTML = Array(count).fill(`
-                <div style="display: flex; gap: 12px; padding: 16px; align-items: center;">
+                <div class="org-skeleton-row">
                     <div class="org-skeleton org-skeleton-avatar"></div>
-                    <div style="flex: 1;">
-                        <div class="org-skeleton org-skeleton-text" style="width: 70%;"></div>
+                    <div class="org-skeleton-row__content">
+                        <div class="org-skeleton org-skeleton-text org-skeleton-text--wide"></div>
                         <div class="org-skeleton org-skeleton-text short"></div>
                     </div>
                 </div>
@@ -386,7 +390,7 @@ const OrgUI = {
             } = options;
 
             if (indicator) {
-                indicator.style.display = 'inline-flex';
+                indicator.classList.remove('component-hidden');
             }
 
             this.intervalId = setInterval(async () => {

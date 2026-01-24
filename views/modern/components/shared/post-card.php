@@ -47,38 +47,41 @@ if ($currentUserId) {
         // Likes table may not exist or query failed
     }
 }
+
+$likeClass = 'component-post-card__action-btn component-post-card__like-btn';
+if ($hasLiked) $likeClass .= ' component-post-card__like-btn--liked';
 ?>
 
-<article class="nexus-card post-card"
+<article class="nexus-card component-post-card"
          data-post-id="<?= $post['id'] ?>"
          role="article"
          aria-label="Post by <?= htmlspecialchars($postAuthor['first_name'] . ' ' . $postAuthor['last_name']) ?>">
 
     <!-- Post Header -->
-    <header class="post-header" style="display: flex; align-items: center; gap: 12px; margin-bottom: 16px;">
+    <header class="component-post-card__header">
         <a href="<?= $basePath ?>/profile/<?= $postAuthor['id'] ?>"
+           class="component-post-card__avatar-link"
            aria-label="View profile of <?= htmlspecialchars($postAuthor['first_name'] . ' ' . $postAuthor['last_name']) ?>">
             <?= webp_avatar($postAuthor['avatar_url'] ?: null, $postAuthor['first_name'] . ' ' . $postAuthor['last_name'], 48) ?>
         </a>
 
-        <div style="flex: 1;">
-            <h3 style="margin: 0; font-size: 1rem; font-weight: 600;">
+        <div class="component-post-card__author-info">
+            <h3 class="component-post-card__author-name">
                 <a href="<?= $basePath ?>/profile/<?= $postAuthor['id'] ?>"
-                   style="color: var(--htb-text-main); text-decoration: none;"
+                   class="component-post-card__author-link"
                    aria-label="<?= htmlspecialchars($postAuthor['first_name'] . ' ' . $postAuthor['last_name']) ?>'s profile">
                     <?= htmlspecialchars($postAuthor['first_name'] . ' ' . $postAuthor['last_name']) ?>
                 </a>
             </h3>
-            <div style="display: flex; align-items: center; gap: 8px; margin-top: 4px;">
+            <div class="component-post-card__meta">
                 <time datetime="<?= date('c', strtotime($post['created_at'])) ?>"
-                      style="font-size: 0.85rem; color: var(--htb-text-muted);"
+                      class="component-post-card__time"
                       aria-label="Posted <?= $timeAgo ?>">
                     <?= $timeAgo ?>
                 </time>
 
                 <?php if (!empty($post['visibility']) && $post['visibility'] !== 'public'): ?>
-                <span class="visibility-badge"
-                      style="font-size: 0.75rem; padding: 2px 8px; border-radius: 12px; background: rgba(99, 102, 241, 0.1); color: #6366f1;"
+                <span class="component-post-card__visibility-badge"
                       aria-label="Visibility: <?= htmlspecialchars($post['visibility']) ?>">
                     <i class="fa-solid fa-<?= $post['visibility'] === 'private' ? 'lock' : 'user-group' ?>" aria-hidden="true"></i>
                     <?= ucfirst($post['visibility']) ?>
@@ -89,9 +92,8 @@ if ($currentUserId) {
 
         <?php if ($isOwnPost): ?>
         <button type="button"
-                class="post-delete-btn"
+                class="component-post-card__delete-btn"
                 onclick="deletePost(<?= $post['id'] ?>)"
-                style="padding: 8px; background: transparent; border: none; color: var(--htb-text-muted); cursor: pointer; border-radius: 8px; transition: all 0.2s;"
                 aria-label="Delete this post"
                 title="Delete post">
             <i class="fa-solid fa-trash" aria-hidden="true"></i>
@@ -101,8 +103,7 @@ if ($currentUserId) {
 
     <!-- Post Content -->
     <?php if (!empty($post['content'])): ?>
-    <div class="post-content"
-         style="margin-bottom: 16px; line-height: 1.6; color: var(--htb-text-main); word-wrap: break-word;"
+    <div class="component-post-card__content"
          role="region"
          aria-label="Post content">
         <?= nl2br(htmlspecialchars($post['content'])) ?>
@@ -111,24 +112,22 @@ if ($currentUserId) {
 
     <!-- Post Image -->
     <?php if (!empty($post['image_url'])): ?>
-    <figure class="post-image" style="margin: 16px 0;">
-        <?= webp_image($post['image_url'], 'Post image', '', ['style' => 'width: 100%; max-height: 500px; object-fit: cover; border-radius: var(--htb-radius);']) ?>
+    <figure class="component-post-card__image">
+        <?= webp_image($post['image_url'], 'Post image', 'component-post-card__image-element') ?>
     </figure>
     <?php endif; ?>
 
     <?php if ($showActions): ?>
     <!-- Post Actions -->
-    <footer class="post-actions"
-            style="display: flex; align-items: center; gap: 16px; padding-top: 16px; border-top: 1px solid var(--htb-border-color);"
+    <footer class="component-post-card__actions"
             role="group"
             aria-label="Post interactions">
 
         <!-- Like Button -->
         <button type="button"
-                class="post-action-btn like-btn <?= $hasLiked ? 'active' : '' ?>"
+                class="<?= $likeClass ?>"
                 data-post-id="<?= $post['id'] ?>"
                 onclick="toggleLike(this, 'post', <?= $post['id'] ?>)"
-                style="display: flex; align-items: center; gap: 6px; padding: 8px 12px; background: transparent; border: none; border-radius: 8px; cursor: pointer; transition: all 0.2s; color: <?= $hasLiked ? '#ef4444' : 'var(--htb-text-muted)' ?>;"
                 aria-label="<?= $hasLiked ? 'Unlike' : 'Like' ?> this post. Currently <?= $post['likes_count'] ?? 0 ?> likes"
                 aria-pressed="<?= $hasLiked ? 'true' : 'false' ?>">
             <i class="fa-<?= $hasLiked ? 'solid' : 'regular' ?> fa-heart" aria-hidden="true"></i>
@@ -137,9 +136,8 @@ if ($currentUserId) {
 
         <!-- Comment Button -->
         <button type="button"
-                class="post-action-btn comment-btn"
+                class="component-post-card__action-btn component-post-card__comment-btn"
                 onclick="toggleComments(<?= $post['id'] ?>)"
-                style="display: flex; align-items: center; gap: 6px; padding: 8px 12px; background: transparent; border: none; border-radius: 8px; cursor: pointer; transition: all 0.2s; color: var(--htb-text-muted);"
                 aria-label="View comments for this post"
                 aria-expanded="false"
                 aria-controls="comments-<?= $post['id'] ?>">
@@ -149,9 +147,8 @@ if ($currentUserId) {
 
         <!-- Share Button -->
         <button type="button"
-                class="post-action-btn share-btn"
+                class="component-post-card__action-btn component-post-card__share-btn"
                 onclick="sharePost(<?= $post['id'] ?>)"
-                style="display: flex; align-items: center; gap: 6px; padding: 8px 12px; background: transparent; border: none; border-radius: 8px; cursor: pointer; transition: all 0.2s; color: var(--htb-text-muted);"
                 aria-label="Share this post">
             <i class="fa-solid fa-share" aria-hidden="true"></i>
             <span>Share</span>
@@ -160,8 +157,7 @@ if ($currentUserId) {
 
     <!-- Comments Section (Initially Hidden) -->
     <div id="comments-<?= $post['id'] ?>"
-         class="post-comments"
-         style="display: none; margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--htb-border-color);"
+         class="component-post-card__comments component-hidden"
          role="region"
          aria-label="Comments for this post"
          aria-hidden="true">

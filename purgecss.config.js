@@ -8,7 +8,7 @@ module.exports = {
     ],
 
     // CSS files to purge
-    // Auto-discovered: 2026-01-23
+    // Auto-discovered: 2026-01-24
     css: [
         'httpdocs/assets/css/accessibility.css',
         'httpdocs/assets/css/achievements.css',
@@ -52,6 +52,8 @@ module.exports = {
         'httpdocs/assets/css/bundles/features-social.css',
         'httpdocs/assets/css/bundles/mobile.css',
         'httpdocs/assets/css/bundles/modern-pages.css',
+        'httpdocs/assets/css/modern/components-library.css',
+        'httpdocs/assets/css/modern/preview.css',
         'httpdocs/assets/css/bundles/polish.css',
         'httpdocs/assets/css/bundles/utilities-accessibility.css',
         'httpdocs/assets/css/bundles/utilities-loading.css',
@@ -71,6 +73,7 @@ module.exports = {
         'httpdocs/assets/css/civicone-blog.css',
         'httpdocs/assets/css/civicone-bundle-compiled.css',
         'httpdocs/assets/css/civicone-consent-decline.css',
+        'httpdocs/assets/css/civicone-consent-required.css',
         'httpdocs/assets/css/civicone-contact.css',
         'httpdocs/assets/css/civicone-dashboard-nexus-score.css',
         'httpdocs/assets/css/civicone-dashboard.css',
@@ -90,6 +93,7 @@ module.exports = {
         'httpdocs/assets/css/civicone-footer.css',
         'httpdocs/assets/css/civicone-goals-delete.css',
         'httpdocs/assets/css/civicone-goals-edit.css',
+        'httpdocs/assets/css/civicone-goals-form.css',
         'httpdocs/assets/css/civicone-goals-show.css',
         'httpdocs/assets/css/civicone-govuk-buttons.css',
         'httpdocs/assets/css/civicone-govuk-components.css',
@@ -116,6 +120,7 @@ module.exports = {
         'httpdocs/assets/css/civicone-how-it-works.css',
         'httpdocs/assets/css/civicone-impact-summary.css',
         'httpdocs/assets/css/civicone-impersonation-banner.css',
+        'httpdocs/assets/css/civicone-layout-overrides.css',
         'httpdocs/assets/css/civicone-leaderboard.css',
         'httpdocs/assets/css/civicone-legal-hub.css',
         'httpdocs/assets/css/civicone-legal-volunteer-license.css',
@@ -222,6 +227,7 @@ module.exports = {
         'httpdocs/assets/css/loading-skeletons.css',
         'httpdocs/assets/css/master-dashboard.css',
         'httpdocs/assets/css/matches.css',
+        'httpdocs/assets/css/mega-menu-icons.css',
         'httpdocs/assets/css/members-directory-v1.6.css',
         'httpdocs/assets/css/messages-index.css',
         'httpdocs/assets/css/messages-thread.css',
