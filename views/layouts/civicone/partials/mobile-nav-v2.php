@@ -144,72 +144,9 @@ window.closeMobileNotifications = function() {
     });
 })();
 </script>
-<style>
-/* FIX: Remove transform from html that breaks position:fixed */
-html[data-layout] { transform: none !important; }
-
-/* Hide on desktop by default */
-.mobile-tab-bar { display: none; }
-
-/* CRITICAL: Hide ALL legacy navigation on mobile including drawer AND header hamburger */
-@media (max-width: 1024px) {
-    .nexus-native-nav,
-    .nexus-native-nav-inner,
-    .nexus-bottom-nav,
-    .nexus-quick-fab,
-    .nexus-native-drawer,
-    .nexus-native-drawer-overlay {
-        display: none !important;
-        visibility: hidden !important;
-        opacity: 0 !important;
-        pointer-events: none !important;
-        transform: translateX(-100%) !important;
-    }
-
-    /* Hide header hamburger menu buttons - we have Menu in bottom tab bar */
-    .nexus-menu-btn,
-    #civic-menu-toggle {
-        display: none !important;
-    }
-
-    /* Show mobile tab bar */
-    .mobile-tab-bar {
-        display: flex !important;
-        visibility: visible !important;
-        opacity: 1 !important;
-        position: fixed !important;
-        bottom: 0 !important;
-        left: 0 !important;
-        right: 0 !important;
-        z-index: 99999 !important;
-        height: 84px !important;
-        background: rgba(255, 255, 255, 0.98) !important;
-        border-top: 1px solid rgba(0, 0, 0, 0.1) !important;
-        -webkit-backdrop-filter: saturate(180%) blur(20px) !important;
-        backdrop-filter: saturate(180%) blur(20px) !important;
-    }
-    [data-theme="dark"] .mobile-tab-bar {
-        background: rgba(28, 28, 30, 0.98) !important;
-        border-top-color: rgba(255, 255, 255, 0.1) !important;
-    }
-    body {
-        padding-bottom: 90px !important;
-    }
-    /* Ensure menu button looks like other tab items */
-    .mobile-tab-item[type="button"],
-    button.mobile-tab-item {
-        background: none;
-        border: none;
-        cursor: pointer;
-        padding: 0;
-        margin: 0;
-        font-family: inherit;
-        outline: none;
-        -webkit-appearance: none;
-        appearance: none;
-    }
-}
-</style>
+<!-- Mobile Nav CSS (extracted per CLAUDE.md) -->
+<link rel="stylesheet" href="/assets/css/civicone-mobile-nav-v2-inline.css">
+<!-- Mobile nav inline styles removed -->
 <!-- Mobile Bottom Tab Bar -->
 <nav class="mobile-tab-bar" id="mobileTabBar" role="navigation" aria-label="Mobile navigation">
     <div class="mobile-tab-bar-inner">

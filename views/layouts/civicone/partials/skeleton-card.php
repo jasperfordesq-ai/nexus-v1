@@ -91,18 +91,5 @@ $count = $skeletonCount ?? 3;
     <?php endfor; ?>
 <?php endif; ?>
 
-<style>
-/* Accessibility: Announce loading state to screen readers */
-.civic-skeleton-container[aria-busy="true"]::before {
-    content: '';
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    padding: 0;
-    margin: -1px;
-    overflow: hidden;
-    clip: rect(0, 0, 0, 0);
-    white-space: nowrap;
-    border: 0;
-}
-</style>
+<!-- Skeleton Card CSS (extracted per CLAUDE.md) -->
+<link rel="stylesheet" href="/assets/css/civicone-skeleton-card.css">
