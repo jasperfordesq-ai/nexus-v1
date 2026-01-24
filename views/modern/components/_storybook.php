@@ -319,6 +319,7 @@ $componentRegistry = [
                 'name' => 'Toggle Switch',
                 'file' => 'forms/toggle-switch.php',
                 'description' => 'On/off toggle switch control.',
+                'usedOn' => ['settings', 'profile', 'admin configs', 'feature toggles'],
                 'props' => [
                     ['name' => 'name', 'type' => 'string', 'default' => "''", 'description' => 'Toggle name'],
                     ['name' => 'label', 'type' => 'string', 'default' => "''", 'description' => 'Label text'],
@@ -343,6 +344,7 @@ $componentRegistry = [
                 'name' => 'File Upload',
                 'file' => 'forms/file-upload.php',
                 'description' => 'Drag-and-drop file upload with preview.',
+                'usedOn' => ['settings', 'onboarding', 'compose', 'groups', 'listings', 'resources'],
                 'props' => [
                     ['name' => 'name', 'type' => 'string', 'default' => "''", 'description' => 'Input name'],
                     ['name' => 'accept', 'type' => 'string', 'default' => "'*'", 'description' => 'Accepted file types'],
@@ -354,6 +356,7 @@ $componentRegistry = [
                 'name' => 'Date Picker',
                 'file' => 'forms/date-picker.php',
                 'description' => 'Date input with calendar picker.',
+                'usedOn' => ['compose', 'events', 'polls', 'goals', 'volunteering', 'newsletters'],
                 'props' => [
                     ['name' => 'name', 'type' => 'string', 'default' => "''", 'description' => 'Input name (required)'],
                     ['name' => 'label', 'type' => 'string', 'default' => "''", 'description' => 'Label text'],
@@ -368,6 +371,7 @@ $componentRegistry = [
                 'name' => 'Time Picker',
                 'file' => 'forms/time-picker.php',
                 'description' => 'Time input with clock picker.',
+                'usedOn' => ['settings', 'compose', 'events', 'polls', 'volunteering', 'newsletter scheduling'],
                 'props' => [
                     ['name' => 'name', 'type' => 'string', 'default' => "''", 'description' => 'Input name (required)'],
                     ['name' => 'label', 'type' => 'string', 'default' => "''", 'description' => 'Label text'],
@@ -382,6 +386,7 @@ $componentRegistry = [
                 'name' => 'Range Slider',
                 'file' => 'forms/range-slider.php',
                 'description' => 'Range/slider input for numeric values.',
+                'usedOn' => ['members list', 'listings', 'matches preferences', 'admin configuration'],
                 'props' => [
                     ['name' => 'name', 'type' => 'string', 'default' => "''", 'description' => 'Input name (required)'],
                     ['name' => 'label', 'type' => 'string', 'default' => "''", 'description' => 'Label text'],
@@ -397,6 +402,7 @@ $componentRegistry = [
                 'name' => 'Rich Text Editor',
                 'file' => 'forms/rich-text-editor.php',
                 'description' => 'WYSIWYG text editor wrapper.',
+                'usedOn' => ['settings', 'profile edit', 'compose', 'admin newsletters', 'admin pages', 'admin blog'],
                 'props' => [
                     ['name' => 'name', 'type' => 'string', 'default' => "''", 'description' => 'Input name (required)'],
                     ['name' => 'label', 'type' => 'string', 'default' => "''", 'description' => 'Label text'],
@@ -619,6 +625,7 @@ $componentRegistry = [
                 'name' => 'Gallery',
                 'file' => 'media/gallery.php',
                 'description' => 'Image gallery with lightbox and carousel modes.',
+                'usedOn' => ['home', 'feed', 'members', 'federation', 'listings', 'blog', 'admin dashboards'],
                 'props' => [
                     ['name' => 'images', 'type' => 'array', 'default' => '[]', 'description' => "Images: ['src', 'alt', 'caption']"],
                     ['name' => 'variant', 'type' => 'string', 'default' => "'grid'", 'description' => "'grid', 'carousel', 'masonry'"],
@@ -632,6 +639,7 @@ $componentRegistry = [
                 'name' => 'Video Embed',
                 'file' => 'media/video-embed.php',
                 'description' => 'Embed video from YouTube, Vimeo, or direct URL.',
+                'usedOn' => ['feed', 'compose', 'resources', 'admin pages builder', 'newsletter forms'],
                 'props' => [
                     ['name' => 'url', 'type' => 'string', 'default' => "''", 'description' => 'Video URL'],
                     ['name' => 'title', 'type' => 'string', 'default' => "'Embedded video'", 'description' => 'Accessibility title'],
@@ -645,6 +653,7 @@ $componentRegistry = [
                 'name' => 'Code Block',
                 'file' => 'media/code-block.php',
                 'description' => 'Syntax-highlighted code display with copy button.',
+                'usedOn' => ['master dashboard', 'admin pages builder', 'native app', 'cron setup'],
                 'props' => [
                     ['name' => 'code', 'type' => 'string', 'default' => "''", 'description' => 'Code content (required)'],
                     ['name' => 'language', 'type' => 'string', 'default' => "'text'", 'description' => 'Language for highlighting'],
@@ -723,6 +732,7 @@ $componentRegistry = [
                 'name' => 'Timeline Item',
                 'file' => 'data/timeline-item.php',
                 'description' => 'Single item in a vertical timeline.',
+                'usedOn' => ['admin/activity_log', 'organizations/audit-log', 'federation/activity'],
                 'props' => [
                     ['name' => 'icon', 'type' => 'string', 'default' => "''", 'description' => 'FontAwesome icon'],
                     ['name' => 'title', 'type' => 'string', 'default' => "''", 'description' => 'Item title'],
@@ -741,6 +751,7 @@ $componentRegistry = [
                 'name' => 'Accordion',
                 'file' => 'interactive/accordion.php',
                 'description' => 'Collapsible accordion sections.',
+                'usedOn' => ['FAQ pages', 'settings', 'badge showcases', 'form sections'],
                 'props' => [
                     ['name' => 'items', 'type' => 'array', 'default' => '[]', 'description' => "Array of ['id', 'title', 'content', 'icon', 'expanded']"],
                     ['name' => 'allowMultiple', 'type' => 'bool', 'default' => 'false', 'description' => 'Allow multiple open sections'],
@@ -751,6 +762,7 @@ $componentRegistry = [
                 'name' => 'Tooltip',
                 'file' => 'interactive/tooltip.php',
                 'description' => 'Hover tooltip for additional info.',
+                'usedOn' => ['messages', 'admin dashboard', 'federation analytics', 'pages builder'],
                 'props' => [
                     ['name' => 'content', 'type' => 'string', 'default' => "''", 'description' => 'Tooltip content'],
                     ['name' => 'position', 'type' => 'string', 'default' => "'top'", 'description' => "'top', 'bottom', 'left', 'right'"],
@@ -761,6 +773,7 @@ $componentRegistry = [
                 'name' => 'Copy Button',
                 'file' => 'interactive/copy-button.php',
                 'description' => 'Button to copy text to clipboard.',
+                'usedOn' => ['post cards', 'blog', 'admin settings', 'pages builder', 'auth login'],
                 'props' => [
                     ['name' => 'text', 'type' => 'string', 'default' => "''", 'description' => 'Text to copy'],
                     ['name' => 'label', 'type' => 'string', 'default' => "'Copy'", 'description' => 'Button label'],
@@ -771,6 +784,7 @@ $componentRegistry = [
                 'name' => 'Share Button',
                 'file' => 'interactive/share-button.php',
                 'description' => 'Social sharing button with dropdown.',
+                'usedOn' => ['post cards', 'blog', 'pages builder', 'auth login'],
                 'props' => [
                     ['name' => 'url', 'type' => 'string', 'default' => "''", 'description' => 'URL to share'],
                     ['name' => 'title', 'type' => 'string', 'default' => "''", 'description' => 'Share title'],
@@ -781,6 +795,7 @@ $componentRegistry = [
                 'name' => 'Star Rating',
                 'file' => 'interactive/star-rating.php',
                 'description' => 'Interactive star rating input.',
+                'usedOn' => ['reviews/create', 'federation/review-form', 'profile reviews'],
                 'props' => [
                     ['name' => 'value', 'type' => 'int', 'default' => '0', 'description' => 'Current rating (0-5)'],
                     ['name' => 'readonly', 'type' => 'bool', 'default' => 'false', 'description' => 'Read-only mode'],
@@ -791,6 +806,7 @@ $componentRegistry = [
                 'name' => 'Poll Voting',
                 'file' => 'interactive/poll-voting.php',
                 'description' => 'Poll with voting options and results.',
+                'usedOn' => ['polls/show', 'polls embedded in feed'],
                 'props' => [
                     ['name' => 'options', 'type' => 'array', 'default' => '[]', 'description' => 'Poll options array'],
                     ['name' => 'showResults', 'type' => 'bool', 'default' => 'false', 'description' => 'Show results'],
@@ -801,6 +817,7 @@ $componentRegistry = [
                 'name' => 'Draggable List',
                 'file' => 'interactive/draggable-list.php',
                 'description' => 'Sortable/draggable list for reordering items.',
+                'usedOn' => ['admin menus builder', 'pages create', 'newsletters', 'blog builder'],
                 'props' => [
                     ['name' => 'items', 'type' => 'array', 'default' => '[]', 'description' => "Items: ['id', 'content', 'data']"],
                     ['name' => 'name', 'type' => 'string', 'default' => "'order'", 'description' => 'Hidden input name'],
@@ -819,6 +836,7 @@ $componentRegistry = [
                 'name' => 'Comment Section',
                 'file' => 'social/comment-section.php',
                 'description' => 'Complete comment section with form and list.',
+                'usedOn' => ['feed/show', 'polls/show', 'events/show', 'listings/show', 'volunteering/show', 'goals/show', 'groups/show'],
                 'props' => [
                     ['name' => 'contentType', 'type' => 'string', 'default' => "'post'", 'description' => 'Content type identifier'],
                     ['name' => 'contentId', 'type' => 'int', 'default' => '0', 'description' => 'Content ID'],
@@ -831,6 +849,7 @@ $componentRegistry = [
                 'name' => 'Notification Item',
                 'file' => 'social/notification-item.php',
                 'description' => 'Single notification list item.',
+                'usedOn' => ['notifications/index', 'dashboard notifications'],
                 'props' => [
                     ['name' => 'notification', 'type' => 'array', 'default' => '[]', 'description' => 'Notification data'],
                     ['name' => 'unread', 'type' => 'bool', 'default' => 'false', 'description' => 'Unread state'],
@@ -840,6 +859,7 @@ $componentRegistry = [
                 'name' => 'Profile Header',
                 'file' => 'social/profile-header.php',
                 'description' => 'User profile header with stats and actions.',
+                'usedOn' => ['profile/show', 'federation/member-profile', 'federation/partner-profile'],
                 'props' => [
                     ['name' => 'user', 'type' => 'array', 'default' => '[]', 'description' => 'User data object'],
                     ['name' => 'isOwn', 'type' => 'bool', 'default' => 'false', 'description' => 'Is own profile'],
@@ -1101,6 +1121,40 @@ $currentComponent = $_GET['component'] ?? '';
             font-weight: 500;
         }
 
+        .storybook__component-item-wrapper {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: var(--space-2, 8px);
+        }
+
+        .storybook__shared-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 3px;
+            font-size: 0.625rem;
+            font-weight: 600;
+            padding: 2px 6px;
+            border-radius: var(--radius-sm);
+            white-space: nowrap;
+        }
+
+        .storybook__shared-badge i {
+            font-size: 0.5rem;
+        }
+
+        /* Green badge for components in shared/ folder */
+        .storybook__shared-badge--folder {
+            color: var(--color-success-700);
+            background: var(--color-success-50);
+        }
+
+        /* Blue badge for components used in multiple places */
+        .storybook__shared-badge--usage {
+            color: var(--color-primary-700);
+            background: var(--color-primary-50);
+        }
+
         /* Main Content Styles */
         .storybook__header {
             margin-bottom: var(--space-8, 32px);
@@ -1283,6 +1337,43 @@ $currentComponent = $_GET['component'] ?? '';
             margin-bottom: var(--space-6, 24px);
         }
 
+        .storybook__used-on {
+            background: var(--color-surface);
+            border-radius: var(--radius-lg, 8px);
+            border: 1px solid var(--color-border);
+            overflow: hidden;
+            margin-bottom: var(--space-6, 24px);
+        }
+
+        .storybook__used-on-header {
+            padding: var(--space-3, 12px) var(--space-4, 16px);
+            background: var(--color-success-50);
+            border-bottom: 1px solid var(--color-success-100);
+            font-weight: 600;
+            font-size: 0.875rem;
+            color: var(--color-success-700);
+            display: flex;
+            align-items: center;
+            gap: var(--space-2, 8px);
+        }
+
+        .storybook__used-on-list {
+            padding: var(--space-4, 16px);
+            display: flex;
+            flex-wrap: wrap;
+            gap: var(--space-2, 8px);
+        }
+
+        .storybook__used-on-tag {
+            display: inline-flex;
+            align-items: center;
+            padding: var(--space-1, 4px) var(--space-3, 12px);
+            background: var(--color-surface-alt);
+            border-radius: var(--radius-full, 9999px);
+            font-size: 0.8125rem;
+            color: var(--color-text-muted);
+        }
+
         .storybook__variants-header {
             padding: var(--space-4, 16px);
             background: var(--color-surface-alt);
@@ -1437,13 +1528,30 @@ $currentComponent = $_GET['component'] ?? '';
                         </div>
                         <ul class="storybook__component-list" id="category-<?= e($categoryId) ?>">
                             <?php foreach ($category['components'] as $componentId => $component): ?>
+                                <?php
+                                $isFromSharedFolder = strpos($component['file'], 'shared/') === 0;
+                                $hasMultipleUses = !empty($component['usedOn']) && count($component['usedOn']) >= 3;
+                                ?>
                                 <li
                                     class="storybook__component-item <?= ($currentCategory === $categoryId && $currentComponent === $componentId) ? 'storybook__component-item--active' : '' ?>"
                                     onclick="window.location.href='?category=<?= e($categoryId) ?>&component=<?= e($componentId) ?>'"
                                     data-component="<?= e($componentId) ?>"
                                     data-name="<?= e(strtolower($component['name'])) ?>"
                                 >
-                                    <?= e($component['name']) ?>
+                                    <span class="storybook__component-item-wrapper">
+                                        <span><?= e($component['name']) ?></span>
+                                        <?php if ($isFromSharedFolder): ?>
+                                        <span class="storybook__shared-badge storybook__shared-badge--folder" title="From shared/ folder - designed for reuse across pages">
+                                            <i class="fa-solid fa-folder-open" aria-hidden="true"></i>
+                                            Shared
+                                        </span>
+                                        <?php elseif ($hasMultipleUses): ?>
+                                        <span class="storybook__shared-badge storybook__shared-badge--usage" title="Used in <?= count($component['usedOn']) ?> places: <?= e(implode(', ', $component['usedOn'])) ?>">
+                                            <i class="fa-solid fa-share-nodes" aria-hidden="true"></i>
+                                            <?= count($component['usedOn']) ?>
+                                        </span>
+                                        <?php endif; ?>
+                                    </span>
                                 </li>
                             <?php endforeach; ?>
                         </ul>
@@ -1658,6 +1766,20 @@ echo "\ninclude __DIR__ . '/views/modern/components/{$componentData['file']}';\n
                         </tbody>
                     </table>
                 </div>
+
+                <!-- Used On Section -->
+                <?php if (!empty($componentData['usedOn'])): ?>
+                <div class="storybook__used-on">
+                    <div class="storybook__used-on-header">
+                        <i class="fa-solid fa-share-nodes"></i> Used on <?= count($componentData['usedOn']) ?> pages
+                    </div>
+                    <div class="storybook__used-on-list">
+                        <?php foreach ($componentData['usedOn'] as $location): ?>
+                            <span class="storybook__used-on-tag"><?= e($location) ?></span>
+                        <?php endforeach; ?>
+                    </div>
+                </div>
+                <?php endif; ?>
 
                 <!-- Variants (for components with variants) -->
                 <?php if (in_array($currentComponent, ['button', 'alert', 'badge', 'avatar'])): ?>
