@@ -67,12 +67,16 @@ class UploadService
             ];
         }
 
+        // Get MIME type using finfo (replaces deprecated mime_content_type)
+        $finfo = new \finfo(FILEINFO_MIME_TYPE);
+        $mimeType = $finfo->file($filePath);
+
         $result = [
             'success' => true,
             'file_path' => $filePath,
             'filename' => $filename,
             'size' => filesize($filePath),
-            'mime_type' => mime_content_type($filePath)
+            'mime_type' => $mimeType
         ];
 
         // Auto-convert to WebP if enabled and it's an image
@@ -108,7 +112,8 @@ class UploadService
      */
     private function isConvertibleImage(string $filePath): bool
     {
-        $mimeType = mime_content_type($filePath);
+        $finfo = new \finfo(FILEINFO_MIME_TYPE);
+        $mimeType = $finfo->file($filePath);
         return in_array($mimeType, ['image/jpeg', 'image/png']);
     }
 

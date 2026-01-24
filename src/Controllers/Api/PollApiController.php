@@ -2,6 +2,7 @@
 
 namespace Nexus\Controllers\Api;
 
+use Nexus\Core\Csrf;
 use Nexus\Core\Database;
 use Nexus\Core\TenantContext;
 use Nexus\Core\ApiAuth;
@@ -60,6 +61,9 @@ class PollApiController
 
     public function vote()
     {
+        // Security: Verify CSRF token for session-based requests
+        Csrf::verifyOrDieJson();
+
         try {
             $userId = $this->getUserId();
             $input = json_decode(file_get_contents('php://input'), true);

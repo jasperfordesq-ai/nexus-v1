@@ -516,7 +516,7 @@ require __DIR__ . '/../../layouts/modern/header.php';
                 .catch(err => {
                     console.error('Nearby search error:', err);
                     spinner.style.display = 'none';
-                    status.innerHTML = '<span style="color: #ef4444;"><i class="fa-solid fa-exclamation-triangle"></i> ' + (err.message || 'Search failed. Please try again.') + '</span>';
+                    status.innerHTML = '<span style="color: #ef4444;"><i class="fa-solid fa-exclamation-triangle"></i> ' + escapeHtml(err.message || 'Search failed. Please try again.') + '</span>';
                 });
         }
 

@@ -9,6 +9,7 @@ require __DIR__ . '/../layouts/header.php';
         <p>Enter your email address and we will send you a link to reset your password.</p>
 
         <form action="<?= Nexus\Core\TenantContext::getBasePath() ?>/password/email" method="POST">
+            <?= Nexus\Core\Csrf::input() ?>
             <label for="email">Email Address</label>
             <input type="email" name="email" id="email" required placeholder="you@example.com">
 

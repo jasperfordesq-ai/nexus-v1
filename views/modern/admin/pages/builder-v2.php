@@ -517,6 +517,14 @@ const blockDefinitions = <?= json_encode($allBlocks) ?>;
 let blocks = <?= json_encode($blocks) ?>;
 let selectedBlockIndex = null;
 
+// Security: HTML escape function to prevent XSS
+function escapeHtml(text) {
+    if (text === null || text === undefined) return '';
+    const div = document.createElement('div');
+    div.textContent = String(text);
+    return div.innerHTML;
+}
+
 // Initialize
 renderCanvas();
 
@@ -627,29 +635,33 @@ function renderSettings() {
     // Render form fields
     for (const [fieldName, fieldConfig] of Object.entries(config.fields)) {
         const value = block.data[fieldName] ?? fieldConfig.default ?? '';
+        // Security: Escape user-controlled values to prevent XSS
+        const safeFieldName = escapeHtml(fieldName);
+        const safeValue = escapeHtml(value);
+        const safeLabel = escapeHtml(fieldConfig.label);
 
         html += `<div class="form-group">`;
-        html += `<label class="form-label">${fieldConfig.label}</label>`;
+        html += `<label class="form-label">${safeLabel}</label>`;
 
         switch (fieldConfig.type) {
             case 'text':
-                html += `<input type="text" class="form-input" data-field="${fieldName}" value="${value}" onchange="updateBlockData('${fieldName}', this.value)">`;
+                html += `<input type="text" class="form-input" data-field="${safeFieldName}" value="${safeValue}" onchange="updateBlockData('${safeFieldName}', this.value)">`;
                 break;
 
             case 'textarea':
             case 'wysiwyg':
-                html += `<textarea class="form-textarea" data-field="${fieldName}" onchange="updateBlockData('${fieldName}', this.value)" rows="${fieldConfig.rows || 4}">${value}</textarea>`;
+                html += `<textarea class="form-textarea" data-field="${safeFieldName}" onchange="updateBlockData('${safeFieldName}', this.value)" rows="${fieldConfig.rows || 4}">${safeValue}</textarea>`;
                 break;
 
             case 'number':
-                html += `<input type="number" class="form-input" data-field="${fieldName}" value="${value}" min="${fieldConfig.min || 1}" max="${fieldConfig.max || 100}" onchange="updateBlockData('${fieldName}', parseInt(this.value))">`;
+                html += `<input type="number" class="form-input" data-field="${safeFieldName}" value="${safeValue}" min="${fieldConfig.min || 1}" max="${fieldConfig.max || 100}" onchange="updateBlockData('${safeFieldName}', parseInt(this.value))">`;
                 break;
 
             case 'select':
-                html += `<select class="form-select" data-field="${fieldName}" onchange="updateBlockData('${fieldName}', this.value)">`;
+                html += `<select class="form-select" data-field="${safeFieldName}" onchange="updateBlockData('${safeFieldName}', this.value)">`;
                 for (const [optValue, optLabel] of Object.entries(fieldConfig.options)) {
                     const selected = value == optValue ? 'selected' : '';
-                    html += `<option value="${optValue}" ${selected}>${optLabel}</option>`;
+                    html += `<option value="${escapeHtml(optValue)}" ${selected}>${escapeHtml(optLabel)}</option>`;
                 }
                 html += `</select>`;
                 break;
@@ -657,14 +669,14 @@ function renderSettings() {
             case 'checkbox':
                 const checked = value ? 'checked' : '';
                 html += `<div class="form-checkbox-group">
-                    <input type="checkbox" class="form-checkbox" data-field="${fieldName}" ${checked} onchange="updateBlockData('${fieldName}', this.checked)">
-                    <span style="color: rgba(255,255,255,0.7); font-size: 0.85rem;">${fieldConfig.label}</span>
+                    <input type="checkbox" class="form-checkbox" data-field="${safeFieldName}" ${checked} onchange="updateBlockData('${safeFieldName}', this.checked)">
+                    <span style="color: rgba(255,255,255,0.7); font-size: 0.85rem;">${safeLabel}</span>
                 </div>`;
                 break;
 
             case 'range':
-                html += `<input type="range" class="form-input" data-field="${fieldName}" value="${value}" min="${fieldConfig.min}" max="${fieldConfig.max}" step="${fieldConfig.step}" onchange="updateBlockData('${fieldName}', this.value)">`;
-                html += `<div style="text-align: center; font-size: 0.75rem; color: rgba(255,255,255,0.5);">${value}</div>`;
+                html += `<input type="range" class="form-input" data-field="${safeFieldName}" value="${safeValue}" min="${fieldConfig.min}" max="${fieldConfig.max}" step="${fieldConfig.step}" onchange="updateBlockData('${safeFieldName}', this.value)">`;
+                html += `<div style="text-align: center; font-size: 0.75rem; color: rgba(255,255,255,0.5);">${safeValue}</div>`;
                 break;
         }
 

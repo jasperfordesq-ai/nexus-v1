@@ -108,7 +108,7 @@ class RateLimiter
     private static function cleanupOldAttempts(): void
     {
         // Only cleanup occasionally (1% of requests)
-        if (rand(1, 100) !== 1) {
+        if (random_int(1, 100) !== 1) {
             return;
         }
 

@@ -457,6 +457,14 @@ if (!isset($configJson)) {
 <?php endif; ?>
 
 <script>
+// Security: HTML escape function to prevent XSS
+function escapeHtml(text) {
+    if (text === null || text === undefined) return '';
+    const div = document.createElement('div');
+    div.textContent = String(text);
+    return div.innerHTML;
+}
+
 function regenerateMinifiedCSS() {
     var btn = document.getElementById('css-minify-btn');
     var resultSpan = document.getElementById('css-minify-result');
@@ -478,15 +486,15 @@ function regenerateMinifiedCSS() {
         btn.innerHTML = '<i class="fa-solid fa-compress"></i> Regenerate All CSS';
 
         if (data.success) {
-            resultSpan.innerHTML = '<span style="color: #22c55e;"><i class="fa-solid fa-check"></i> ' + data.message + '</span>';
+            resultSpan.innerHTML = '<span style="color: #22c55e;"><i class="fa-solid fa-check"></i> ' + escapeHtml(data.message) + '</span>';
         } else {
-            resultSpan.innerHTML = '<span style="color: #ef4444;"><i class="fa-solid fa-times"></i> ' + data.message + '</span>';
+            resultSpan.innerHTML = '<span style="color: #ef4444;"><i class="fa-solid fa-times"></i> ' + escapeHtml(data.message) + '</span>';
         }
     })
     .catch(function(error) {
         btn.disabled = false;
         btn.innerHTML = '<i class="fa-solid fa-compress"></i> Regenerate All CSS';
-        resultSpan.innerHTML = '<span style="color: #ef4444;"><i class="fa-solid fa-times"></i> Error: ' + error.message + '</span>';
+        resultSpan.innerHTML = '<span style="color: #ef4444;"><i class="fa-solid fa-times"></i> Error: ' + escapeHtml(error.message) + '</span>';
     });
 }
 
@@ -518,9 +526,9 @@ function testGmailConnection() {
     .then(function(response) { return response.json(); })
     .then(function(data) {
         if (data.success) {
-            resultSpan.innerHTML = '<span style="color: #22c55e;"><i class="fa-solid fa-check"></i> ' + data.message + '</span>';
+            resultSpan.innerHTML = '<span style="color: #22c55e;"><i class="fa-solid fa-check"></i> ' + escapeHtml(data.message) + '</span>';
         } else {
-            resultSpan.innerHTML = '<span style="color: #ef4444;"><i class="fa-solid fa-times"></i> ' + data.message + '</span>';
+            resultSpan.innerHTML = '<span style="color: #ef4444;"><i class="fa-solid fa-times"></i> ' + escapeHtml(data.message) + '</span>';
         }
     })
     .catch(function(error) {
