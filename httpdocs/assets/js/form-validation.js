@@ -552,7 +552,7 @@
             subtree: true
         });
 
-        console.log(`[FormValidation] Initialized ${forms.length} forms`);
+        console.warn(`[FormValidation] Initialized ${forms.length} forms`);
     }
 
     // Public API

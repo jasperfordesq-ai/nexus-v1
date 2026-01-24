@@ -21,7 +21,7 @@
             this.initSkeletonLoading();
             this.initTouchEnhancements();
 
-            console.log('[CivicOne] Mobile enhancements initialized');
+            console.warn('[CivicOne] Mobile enhancements initialized');
         },
 
         // ============================================
@@ -193,7 +193,7 @@
 
             // Use NexusNative.Network if available (Capacitor plugin - more reliable)
             if (window.NexusNative?.Network) {
-                console.log('[CivicOneMobile] Using Capacitor Network plugin for offline detection');
+                console.warn('[CivicOneMobile] Using Capacitor Network plugin for offline detection');
 
                 // Listen for network changes via the Capacitor bridge
                 this.networkUnsubscribe = window.NexusNative.Network.addListener((status, wasConnected) => {

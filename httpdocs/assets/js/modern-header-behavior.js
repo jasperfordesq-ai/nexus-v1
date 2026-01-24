@@ -82,12 +82,12 @@
             const match = link.getAttribute('data-nav-match');
             if (match && (match === activeSegment || (match === '/' && activeSegment === '/'))) {
                 link.classList.add('active');
-                console.log('[NAV] Active class added to:', match, link);
+                console.warn('[NAV] Active class added to:', match, link);
             } else {
                 link.classList.remove('active');
             }
         });
-        console.log('[NAV] Active segment:', activeSegment, 'from path:', window.location.pathname);
+        console.warn('[NAV] Active segment:', activeSegment, 'from path:', window.location.pathname);
     } catch (e) {
         console.error('[NAV] Error in active link detection:', e);
     }

@@ -342,7 +342,7 @@ class NexusPusher {
      */
     log(...args) {
         if (this.debug) {
-            console.log('[NexusPusher]', ...args);
+            console.warn('[NexusPusher]', ...args);
         }
     }
 
@@ -380,12 +380,12 @@ class NexusPusher {
 (function() {
     // Initialize if NEXUS_CONFIG has userId (set by footer for logged-in users)
     if (window.NEXUS_CONFIG?.userId) {
-        console.log('[NexusPusher] Initializing for user:', window.NEXUS_CONFIG.userId);
+        console.warn('[NexusPusher] Initializing for user:', window.NEXUS_CONFIG.userId);
         window.nexusPusher = new NexusPusher({
             debug: window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
         });
     } else {
-        console.log('[NexusPusher] No userId in NEXUS_CONFIG, skipping init');
+        console.warn('[NexusPusher] No userId in NEXUS_CONFIG, skipping init');
     }
 })();
 

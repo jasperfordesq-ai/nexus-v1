@@ -26,11 +26,11 @@
         init: function() {
             // Only run on native Capacitor apps
             if (!this.isNativeApp()) {
-                console.log('[AppUpdater] Not a native app, skipping');
+                console.warn('[AppUpdater] Not a native app, skipping');
                 return;
             }
 
-            console.log('[AppUpdater] Initializing, current version:', this.APP_VERSION);
+            console.warn('[AppUpdater] Initializing, current version:', this.APP_VERSION);
 
             // Check for updates (but not too frequently)
             this.checkForUpdateIfNeeded();
@@ -54,7 +54,7 @@
 
             // Check at most once per day
             if (now - lastCheck < this.CHECK_INTERVAL_MS) {
-                console.log('[AppUpdater] Checked recently, skipping');
+                console.warn('[AppUpdater] Checked recently, skipping');
                 return;
             }
 
@@ -66,7 +66,7 @@
          */
         checkForUpdate: async function() {
             try {
-                console.log('[AppUpdater] Checking for updates...');
+                console.warn('[AppUpdater] Checking for updates...');
 
                 const response = await fetch('/api/app/check-version', {
                     method: 'POST',
@@ -81,12 +81,12 @@
                 });
 
                 if (!response.ok) {
-                    console.log('[AppUpdater] Server returned error:', response.status);
+                    console.warn('[AppUpdater] Server returned error:', response.status);
                     return;
                 }
 
                 const data = await response.json();
-                console.log('[AppUpdater] Server response:', data);
+                console.warn('[AppUpdater] Server response:', data);
 
                 // Update last check time
                 localStorage.setItem(this.LAST_CHECK_KEY, Date.now().toString());
@@ -108,7 +108,7 @@
 
             // If user dismissed this version, don't prompt again (unless force update)
             if (!data.force_update && dismissedVersion === data.current_version) {
-                console.log('[AppUpdater] User dismissed this version, not prompting');
+                console.warn('[AppUpdater] User dismissed this version, not prompting');
                 return;
             }
 
@@ -184,7 +184,7 @@
          * Download the update
          */
         downloadUpdate: function(url) {
-            console.log('[AppUpdater] Downloading update from:', url);
+            console.warn('[AppUpdater] Downloading update from:', url);
 
             // Open in system browser for download
             if (typeof Capacitor !== 'undefined' && Capacitor.Plugins && Capacitor.Plugins.Browser) {
@@ -202,7 +202,7 @@
          * Dismiss the update prompt (user chose "Later")
          */
         dismissUpdate: function(version) {
-            console.log('[AppUpdater] User dismissed update for version:', version);
+            console.warn('[AppUpdater] User dismissed update for version:', version);
             localStorage.setItem(this.DISMISSED_VERSION_KEY, version);
 
             const modal = document.getElementById('app-update-modal');

@@ -97,7 +97,7 @@
         eventSource.addEventListener('connected', function(e) {
             updateConnectionStatus('connected');
             reconnectAttempts = 0;
-            console.log('[FedRealtime] SSE connected');
+            console.warn('[FedRealtime] SSE connected');
         });
 
         eventSource.addEventListener('heartbeat', function(e) {
@@ -141,7 +141,7 @@
             if (reconnectAttempts < maxReconnectAttempts) {
                 reconnectAttempts++;
                 const delay = Math.min(1000 * Math.pow(2, reconnectAttempts), 30000);
-                console.log('[FedRealtime] Reconnecting in ' + delay + 'ms (attempt ' + reconnectAttempts + ')');
+                console.warn('[FedRealtime] Reconnecting in ' + delay + 'ms (attempt ' + reconnectAttempts + ')');
                 setTimeout(initSSE, delay);
             }
         };

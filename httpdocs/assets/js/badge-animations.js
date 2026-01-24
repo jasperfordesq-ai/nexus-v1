@@ -304,7 +304,7 @@
             badgeValues.set(badge, count);
         });
 
-        console.log(`[BadgeAnimation] Initialized ${badges.length} badges`);
+        console.warn(`[BadgeAnimation] Initialized ${badges.length} badges`);
     }
 
     // Public API
