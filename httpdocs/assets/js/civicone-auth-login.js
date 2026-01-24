@@ -45,7 +45,7 @@ async function checkBiometricSupport() {
             if (promo) promo.classList.remove('hidden');
         }
     } catch (e) {
-        console.log('[WebAuthn] Biometric check failed:', e);
+        console.warn('[WebAuthn] Biometric check failed:', e);
     }
 }
 
