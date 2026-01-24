@@ -497,15 +497,11 @@ require dirname(__DIR__, 2) . '/layouts/civicone/header.php';
 
 <!-- Feed styles now loaded from external CSS file: /assets/css/civicone-feed.css -->
 
-<!-- GOV.UK Page Template Boilerplate (Section 10.0) -->
-<div class="govuk-width-container">
-    <main class="govuk-main-wrapper" id="main-content">
+<!-- Page Header (GOV.UK Typography) -->
+<h1 class="govuk-heading-xl">Community Pulse</h1>
+<p class="govuk-body-l">Stay connected with your community's latest updates and activities.</p>
 
-        <!-- Page Header (GOV.UK Typography) -->
-        <h1 class="govuk-heading-xl">Community Pulse</h1>
-        <p class="govuk-body-l">Stay connected with your community's latest updates and activities.</p>
-
-        <div class="civic-feed-container">
+<div class="civic-feed-container">
 
         <!-- Post Composer -->
         <?php if ($isLoggedIn): ?>
@@ -1017,10 +1013,7 @@ require dirname(__DIR__, 2) . '/layouts/civicone/header.php';
             </div>
         <?php endif; ?>
 
-        </div><!-- /civic-feed-container -->
-
-    </main>
-</div>
+</div><!-- /civic-feed-container -->
 
 <!-- Feed Announcements Live Region (WCAG 2.1 AA Compliance) -->
 <div aria-live="polite" aria-atomic="false" class="civicone-visually-hidden" id="feed-announcements"></div>
