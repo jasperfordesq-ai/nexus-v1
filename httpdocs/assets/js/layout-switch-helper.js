@@ -53,6 +53,9 @@
             this.showLoadingState();
 
             try {
+                // Get CSRF token from meta tag
+                const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+
                 // Send POST request to backend (session-based)
                 const response = await fetch(this.endpoint, {
                     method: 'POST',
@@ -60,7 +63,10 @@
                         'Content-Type': 'application/json',
                         'X-Requested-With': 'XMLHttpRequest'
                     },
-                    body: JSON.stringify({ layout: targetLayout })
+                    body: JSON.stringify({
+                        layout: targetLayout,
+                        csrf_token: csrfToken
+                    })
                 });
 
                 const data = await response.json();
