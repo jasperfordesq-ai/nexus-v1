@@ -828,3 +828,139 @@
 [data-theme="dark"] .demo-footer-cta__link {
     color: var(--color-blue-400);
 }
+
+/* ========================================
+   Two Column Variants
+   ======================================== */
+
+.demo-two-col--align-center {
+    align-items: center;
+}
+
+/* ========================================
+   Outcomes List (social prescribing)
+   ======================================== */
+
+.demo-outcomes-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    font-size: 1.05rem;
+}
+
+.demo-outcomes-list__item {
+    display: flex;
+    gap: var(--space-3);
+    margin-bottom: var(--space-5);
+    line-height: 1.6;
+}
+
+.demo-outcomes-list__icon {
+    flex-shrink: 0;
+    color: var(--skin-primary, var(--color-primary-500));
+    font-weight: bold;
+}
+
+/* ========================================
+   Testimonial Block
+   ======================================== */
+
+.demo-testimonial {
+    background: var(--color-primary-50);
+    padding: var(--space-6);
+    border-radius: var(--radius-lg);
+    border-left: 4px solid var(--skin-primary, var(--color-primary-500));
+    margin: 0;
+}
+
+[data-theme="dark"] .demo-testimonial {
+    background: var(--color-primary-900);
+}
+
+.demo-testimonial__quote {
+    font-style: italic;
+    font-size: 1.1rem;
+    line-height: 1.6;
+    color: var(--color-text-secondary);
+    margin: 0 0 var(--space-3);
+}
+
+.demo-testimonial__footer {
+    display: block;
+    text-align: right;
+}
+
+.demo-testimonial__author {
+    display: block;
+    font-weight: 700;
+    font-style: normal;
+    color: var(--skin-primary, var(--color-primary-500));
+}
+
+.demo-testimonial__source {
+    display: block;
+    font-size: 0.875rem;
+    color: var(--color-text-muted);
+}
+
+/* ========================================
+   Pathway Steps Grid (numbered steps)
+   ======================================== */
+
+.demo-pathway-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: var(--space-5);
+}
+
+@media (max-width: 900px) {
+    .demo-pathway-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 500px) {
+    .demo-pathway-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+.demo-pathway-step {
+    position: relative;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    padding: var(--space-12) var(--space-6) var(--space-6);
+    text-align: center;
+}
+
+.demo-pathway-step__number {
+    position: absolute;
+    top: calc(var(--space-5) * -1);
+    left: 50%;
+    transform: translateX(-50%);
+    width: 40px;
+    height: 40px;
+    background: var(--skin-primary, var(--color-primary-500));
+    color: var(--color-white);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 1.1rem;
+    box-shadow: 0 4px 6px var(--color-black-alpha-10);
+}
+
+.demo-pathway-step__title {
+    margin: 0 0 var(--space-3);
+    font-size: 1.1rem;
+    color: var(--color-text-primary);
+}
+
+.demo-pathway-step__desc {
+    margin: 0;
+    font-size: 0.95rem;
+    line-height: 1.5;
+    color: var(--color-text-secondary);
+}

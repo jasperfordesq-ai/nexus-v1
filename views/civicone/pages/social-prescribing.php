@@ -12,11 +12,13 @@ $pageTitle = 'Social Prescribing';
 require dirname(__DIR__, 2) . '/layouts/civicone/header.php';
 ?>
 
+<link rel="stylesheet" href="<?= \Nexus\Core\TenantContext::getBasePath() ?>/assets/css/civicone-demo-pages.css">
+
 <div class="civic-container">
 
     <!-- Header Section -->
     <div class="civic-card civic-mb-8 civic-text-center civic-p-8">
-        <h1 style="margin-top: 0; margin-bottom: 15px; color: var(--skin-primary);">Social Prescribing Partner</h1>
+        <h1 class="civic-text-primary civic-mt-0 civic-mb-4">Social Prescribing Partner</h1>
         <p class="civic-text-xl civic-text-medium civic-max-w-lg civic-mx-auto civic-leading-relaxed">
             Evidence-Based, Community-Led, and 100% Effective for Wellbeing.
         </p>
@@ -24,69 +26,71 @@ require dirname(__DIR__, 2) . '/layouts/civicone/header.php';
 
     <!-- Outcomes Section -->
     <div class="civic-card civic-p-10 civic-mb-10">
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 50px; align-items: center;">
+        <div class="demo-two-col demo-two-col--align-center">
             <div>
-                <h2 style="color: var(--skin-primary); margin-top: 0; margin-bottom: 20px;">Validated Outcomes</h2>
-                <ul class="civic-text-medium" style="list-style: none; padding: 0; font-size: 1.05rem;">
-                    <li style="margin-bottom: 20px; position: relative; padding-left: 30px;">
-                        <span style="position: absolute; left: 0; color: var(--skin-primary); font-weight: bold;">✔</span>
-                        <strong>100% Improved Wellbeing:</strong> Every member surveyed reported an improvement in emotional, physical, or mental wellbeing.
+                <h2 class="civic-text-primary civic-mt-0 civic-mb-5">Validated Outcomes</h2>
+                <ul class="demo-outcomes-list" role="list">
+                    <li class="demo-outcomes-list__item">
+                        <span class="demo-outcomes-list__icon" aria-hidden="true">✔</span>
+                        <span><strong>100% Improved Wellbeing:</strong> Every member surveyed reported an improvement in emotional, physical, or mental wellbeing.</span>
                     </li>
-                    <li style="margin-bottom: 20px; position: relative; padding-left: 30px;">
-                        <span style="position: absolute; left: 0; color: var(--skin-primary); font-weight: bold;">✔</span>
-                        <strong>95% Increased Connection:</strong> We are successfully tackling loneliness.
+                    <li class="demo-outcomes-list__item">
+                        <span class="demo-outcomes-list__icon" aria-hidden="true">✔</span>
+                        <span><strong>95% Increased Connection:</strong> We are successfully tackling loneliness.</span>
                     </li>
-                    <li style="margin-bottom: 20px; position: relative; padding-left: 30px;">
-                        <span style="position: absolute; left: 0; color: var(--skin-primary); font-weight: bold;">✔</span>
-                        <strong>Strategic Fit:</strong> "Could become part of a social prescribing offering for early intervention".
+                    <li class="demo-outcomes-list__item">
+                        <span class="demo-outcomes-list__icon" aria-hidden="true">✔</span>
+                        <span><strong>Strategic Fit:</strong> "Could become part of a social prescribing offering for early intervention".</span>
                     </li>
                 </ul>
             </div>
-            <div class="civic-p-6 civic-rounded" style="background: rgba(37, 99, 235, 0.05); border-left: 4px solid var(--skin-primary);">
-                <p class="civic-text-medium civic-text-lg civic-leading-relaxed civic-mb-3" style="font-style: italic;">
+            <blockquote class="demo-testimonial">
+                <p class="demo-testimonial__quote">
                     "Monica found out about TBI through the outreach mental health team... Since joining TBI, Monica 'feels much more connected to the community which has had a positive mental health impact'."
                 </p>
-                <div class="civic-text-right civic-font-bold" style="color: var(--skin-primary);">— Monica (Member)</div>
-                <div class="civic-text-right civic-text-sm civic-text-light">Source: 2023 Social Impact Study</div>
-            </div>
+                <footer class="demo-testimonial__footer">
+                    <cite class="demo-testimonial__author">— Monica (Member)</cite>
+                    <span class="demo-testimonial__source">Source: 2023 Social Impact Study</span>
+                </footer>
+            </blockquote>
         </div>
     </div>
 
     <!-- Referral Pathway -->
-    <div class="civic-mb-10">
+    <section class="civic-mb-10" aria-label="Referral pathway steps">
         <h2 class="civic-text-center civic-mb-8 civic-text-dark">The Managed Referral Pathway</h2>
 
-        <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px;">
+        <div class="demo-pathway-grid">
 
-            <div class="civic-card civic-text-center civic-p-6" style="position: relative; padding-top: 50px;">
-                <div style="position: absolute; top: -20px; left: 50%; transform: translateX(-50%); width: 40px; height: 40px; background: var(--skin-primary); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">1</div>
-                <h3 class="civic-text-dark civic-mb-3">Formal Referral</h3>
-                <p style="color: var(--civic-text-secondary, #4B5563); font-size: 0.95rem; line-height: 1.5;">Warm handover from Link Worker to our TBI Hub Coordinator.</p>
-            </div>
+            <article class="demo-pathway-step">
+                <span class="demo-pathway-step__number" aria-hidden="true">1</span>
+                <h3 class="demo-pathway-step__title">Formal Referral</h3>
+                <p class="demo-pathway-step__desc">Warm handover from Link Worker to our TBI Hub Coordinator.</p>
+            </article>
 
-            <div class="civic-card civic-text-center civic-p-6" style="position: relative; padding-top: 50px;">
-                <div style="position: absolute; top: -20px; left: 50%; transform: translateX(-50%); width: 40px; height: 40px; background: var(--skin-primary); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">2</div>
-                <h3 class="civic-text-dark civic-mb-3">Onboarding</h3>
-                <p style="color: var(--civic-text-secondary, #4B5563); font-size: 0.95rem; line-height: 1.5;">1-to-1 welcome to explain the model and identify skills.</p>
-            </div>
+            <article class="demo-pathway-step">
+                <span class="demo-pathway-step__number" aria-hidden="true">2</span>
+                <h3 class="demo-pathway-step__title">Onboarding</h3>
+                <p class="demo-pathway-step__desc">1-to-1 welcome to explain the model and identify skills.</p>
+            </article>
 
-            <div class="civic-card civic-text-center civic-p-6" style="position: relative; padding-top: 50px;">
-                <div style="position: absolute; top: -20px; left: 50%; transform: translateX(-50%); width: 40px; height: 40px; background: var(--skin-primary); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">3</div>
-                <h3 class="civic-text-dark civic-mb-3">Connection</h3>
-                <p style="color: var(--civic-text-secondary, #4B5563); font-size: 0.95rem; line-height: 1.5;">Active facilitation of first exchanges and group activities.</p>
-            </div>
+            <article class="demo-pathway-step">
+                <span class="demo-pathway-step__number" aria-hidden="true">3</span>
+                <h3 class="demo-pathway-step__title">Connection</h3>
+                <p class="demo-pathway-step__desc">Active facilitation of first exchanges and group activities.</p>
+            </article>
 
-            <div class="civic-card civic-text-center civic-p-6" style="position: relative; padding-top: 50px;">
-                <div style="position: absolute; top: -20px; left: 50%; transform: translateX(-50%); width: 40px; height: 40px; background: var(--skin-primary); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">4</div>
-                <h3 class="civic-text-dark civic-mb-3">Follow-up</h3>
-                <p style="color: var(--civic-text-secondary, #4B5563); font-size: 0.95rem; line-height: 1.5;">Feedback to Link Worker on engagement and outcomes.</p>
-            </div>
+            <article class="demo-pathway-step">
+                <span class="demo-pathway-step__number" aria-hidden="true">4</span>
+                <h3 class="demo-pathway-step__title">Follow-up</h3>
+                <p class="demo-pathway-step__desc">Feedback to Link Worker on engagement and outcomes.</p>
+            </article>
 
         </div>
-    </div>
+    </section>
 
     <!-- CTA -->
-    <div class="civic-card civic-text-center" style="padding: 60px;">
+    <div class="civic-card civic-text-center civic-p-12">
         <h2 class="civic-text-dark civic-mt-0 civic-mb-4">We are Seeking a Partner to Launch a Formal Pilot</h2>
         <p class="civic-text-lg civic-text-medium civic-max-w-md civic-mx-auto civic-mb-6 civic-leading-relaxed">
             We are seeking a public sector contract to secure the essential Hub Coordinator role, which is the <strong>lynchpin of the entire service</strong>.
