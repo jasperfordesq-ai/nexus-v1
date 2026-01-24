@@ -35,22 +35,22 @@ Last updated: 2026-01-24
 ### Authentication
 | File | Status | Notes |
 |------|--------|-------|
-| `civicone/auth/login.php` | ⬜ Not started | - |
-| `civicone/auth/register.php` | ⬜ Not started | - |
-| `civicone/auth/forgot_password.php` | ⬜ Not started | - |
-| `civicone/auth/reset_password.php` | ⬜ Not started | - |
+| `civicone/auth/login.php` | ✅ Polished | Full GOV.UK form pattern |
+| `civicone/auth/register.php` | ✅ Polished | Full GOV.UK form, checkboxes, fieldset |
+| `civicone/auth/forgot_password.php` | ✅ Polished | GOV.UK breadcrumbs, error summary, form |
+| `civicone/auth/reset_password.php` | ✅ Polished | GOV.UK breadcrumbs, form, password rules |
 
 ### Home/Dashboard
 | File | Status | Notes |
 |------|--------|-------|
-| `civicone/home.php` | ⬜ Not started | - |
-| `civicone/home-govuk-enhanced.php` | 🟡 Partial | Has govuk- notification classes |
-| `civicone/dashboard.php` | ⬜ Not started | - |
-| `civicone/dashboard/events.php` | ⬜ Not started | - |
-| `civicone/dashboard/hubs.php` | ⬜ Not started | - |
-| `civicone/dashboard/listings.php` | ⬜ Not started | - |
-| `civicone/dashboard/notifications.php` | ⬜ Not started | - |
-| `civicone/dashboard/wallet.php` | ⬜ Not started | - |
+| `civicone/home.php` | ✅ Polished | Full GOV.UK layout, 1000/1000 score |
+| `civicone/home-govuk-enhanced.php` | ✅ Polished | Has govuk- notification/components |
+| `civicone/dashboard.php` | ✅ Polished | GOV.UK breadcrumbs, grid, FAB |
+| `civicone/dashboard/events.php` | 🟡 Partial | Needs review |
+| `civicone/dashboard/hubs.php` | 🟡 Partial | Needs review |
+| `civicone/dashboard/listings.php` | 🟡 Partial | Needs review |
+| `civicone/dashboard/notifications.php` | 🟡 Partial | Needs review |
+| `civicone/dashboard/wallet.php` | 🟡 Partial | Needs review |
 
 ### Feed
 | File | Status | Notes |
