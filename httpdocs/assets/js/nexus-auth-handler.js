@@ -65,7 +65,7 @@
 
             // Only initialize for logged-in users
             if (!this.isLoggedIn()) {
-                console.log('[NexusAuth] Not logged in, skipping initialization');
+                console.warn('[NexusAuth] Not logged in, skipping initialization');
                 return;
             }
 
@@ -83,7 +83,7 @@
             this.setupNetworkHandler();
 
             const platform = this.isMobileDevice() ? 'mobile' : 'desktop';
-            console.log('[NexusAuth] Auth handler initialized for ' + platform + ' platform');
+            console.warn('[NexusAuth] Auth handler initialized for ' + platform + ' platform');
         },
 
         /**
@@ -94,7 +94,7 @@
         ensureSessionSync: async function() {
             const token = this.getToken();
             if (!token) {
-                console.log('[NexusAuth] No token for session sync');
+                console.warn('[NexusAuth] No token for session sync');
                 return;
             }
 
@@ -110,12 +110,12 @@
 
             // Only sync if page shows logged out OR we haven't synced recently
             if (!pageShowsLoggedOut && syncTime > fiveMinutesAgo) {
-                console.log('[NexusAuth] Session sync not needed (recently synced or page shows logged in)');
+                console.warn('[NexusAuth] Session sync not needed (recently synced or page shows logged in)');
                 return;
             }
 
             try {
-                console.log('[NexusAuth] Syncing PHP session with token...');
+                console.warn('[NexusAuth] Syncing PHP session with token...');
 
                 const headers = {
                     'Content-Type': 'application/json',
@@ -138,18 +138,18 @@
 
                 if (response.ok) {
                     const data = await response.json();
-                    console.log('[NexusAuth] Session synced successfully:', data);
+                    console.warn('[NexusAuth] Session synced successfully:', data);
 
                     // Mark that we synced
                     sessionStorage.setItem('nexus_session_synced', Date.now().toString());
 
                     // If page was showing logged out, reload to get logged-in view
                     if (pageShowsLoggedOut) {
-                        console.log('[NexusAuth] Page showed logged out, reloading to refresh...');
+                        console.warn('[NexusAuth] Page showed logged out, reloading to refresh...');
                         window.location.reload();
                     }
                 } else {
-                    console.log('[NexusAuth] Session sync failed:', response.status);
+                    console.warn('[NexusAuth] Session sync failed:', response.status);
                     // If token is invalid, try to refresh it
                     if (response.status === 401) {
                         const refreshed = await this.refreshAccessToken();
@@ -178,14 +178,14 @@
                 this.config.tokenRefreshInterval = 10 * 60 * 1000;   // 10 minutes
                 this.config.tokenRefreshThreshold = 86400;           // Refresh when < 1 day remaining
 
-                console.log('[NexusAuth] Mobile platform detected - using persistent login settings');
+                console.warn('[NexusAuth] Mobile platform detected - using persistent login settings');
             } else {
                 // Desktop configuration: More frequent checks for security
                 this.config.heartbeatInterval = 2 * 60 * 1000;       // 2 minutes
                 this.config.tokenRefreshInterval = 2 * 60 * 1000;    // 2 minutes
                 this.config.tokenRefreshThreshold = 600;             // Refresh when < 10 min remaining
 
-                console.log('[NexusAuth] Desktop platform detected - using standard settings');
+                console.warn('[NexusAuth] Desktop platform detected - using standard settings');
             }
 
             // Store platform preference
@@ -217,14 +217,14 @@
                 if (this.isNativeApp() && typeof Capacitor !== 'undefined' && Capacitor.Plugins.Preferences) {
                     this.capacitorPreferences = Capacitor.Plugins.Preferences;
                     this.useCapacitorStorage = true;
-                    console.log('[NexusAuth] Using Capacitor Preferences for persistent storage');
+                    console.warn('[NexusAuth] Using Capacitor Preferences for persistent storage');
                 } else {
                     this.useCapacitorStorage = false;
-                    console.log('[NexusAuth] Using localStorage (web mode)');
+                    console.warn('[NexusAuth] Using localStorage (web mode)');
                 }
             } catch (e) {
                 this.useCapacitorStorage = false;
-                console.log('[NexusAuth] Capacitor Preferences not available, using localStorage');
+                console.warn('[NexusAuth] Capacitor Preferences not available, using localStorage');
             }
 
             this.storageReady = true;
@@ -274,7 +274,7 @@
                 }
 
                 if (shouldRecover && prefToken) {
-                    console.log('[NexusAuth] Recovering tokens from Capacitor Preferences (' + reason + ')...');
+                    console.warn('[NexusAuth] Recovering tokens from Capacitor Preferences (' + reason + ')...');
                     localStorage.setItem(this.config.tokenStorageKey, prefToken);
 
                     if (prefRefresh) {
@@ -291,7 +291,7 @@
                         localStorage.setItem(this.config.userStorageKey, prefUser);
                     }
 
-                    console.log('[NexusAuth] Auth state recovered from persistent storage');
+                    console.warn('[NexusAuth] Auth state recovered from persistent storage');
                 }
 
                 // Always validate tokens after recovery (even if no recovery was needed)
@@ -300,7 +300,7 @@
                 const currentRefresh = this.getRefreshToken();
                 const remaining = this.getTokenTimeRemaining();
 
-                console.log('[NexusAuth] Post-recovery token state:', {
+                console.warn('[NexusAuth] Post-recovery token state:', {
                     hasToken: !!currentToken,
                     hasRefresh: !!currentRefresh,
                     remaining: remaining,
@@ -310,27 +310,27 @@
                 if (currentToken) {
                     if (remaining <= 0) {
                         // Token is expired - try to refresh
-                        console.log('[NexusAuth] Token expired, attempting refresh...');
+                        console.warn('[NexusAuth] Token expired, attempting refresh...');
                         const refreshed = await this.refreshAccessToken();
 
                         if (!refreshed) {
                             // Refresh failed - but DON'T clear tokens if we still have a refresh token
                             // The user might just be offline temporarily
                             if (!this.getRefreshToken()) {
-                                console.log('[NexusAuth] Token refresh failed and no refresh token, clearing tokens');
+                                console.warn('[NexusAuth] Token refresh failed and no refresh token, clearing tokens');
                                 await this.clearTokens();
                             } else {
-                                console.log('[NexusAuth] Token refresh failed but keeping refresh token for later retry');
+                                console.warn('[NexusAuth] Token refresh failed but keeping refresh token for later retry');
                             }
                         }
                     } else if (this.tokenNeedsRefresh()) {
                         // Token is close to expiry - refresh proactively
-                        console.log('[NexusAuth] Token needs refresh, refreshing...');
+                        console.warn('[NexusAuth] Token needs refresh, refreshing...');
                         await this.refreshAccessToken();
                     }
                 } else if (currentRefresh) {
                     // No access token but have refresh token - try to get new access token
-                    console.log('[NexusAuth] No access token but have refresh token, attempting refresh...');
+                    console.warn('[NexusAuth] No access token but have refresh token, attempting refresh...');
                     await this.refreshAccessToken();
                 }
             } catch (e) {
@@ -354,7 +354,7 @@
                     // Get initial status
                     Network.getStatus().then(status => {
                         self.networkConnected = status.connected;
-                        console.log('[NexusAuth] Initial network status:', status.connected ? 'online' : 'offline');
+                        console.warn('[NexusAuth] Initial network status:', status.connected ? 'online' : 'offline');
                     });
 
                     // Listen for changes
@@ -362,15 +362,15 @@
                         const wasOffline = !self.networkConnected;
                         self.networkConnected = status.connected;
 
-                        console.log('[NexusAuth] Network status changed:', status.connected ? 'online' : 'offline');
+                        console.warn('[NexusAuth] Network status changed:', status.connected ? 'online' : 'offline');
 
                         // If we just came back online, wait briefly then refresh auth state
                         // The delay helps ensure the network is actually stable
                         if (wasOffline && status.connected) {
-                            console.log('[NexusAuth] Back online, waiting for stable connection...');
+                            console.warn('[NexusAuth] Back online, waiting for stable connection...');
                             setTimeout(() => {
                                 if (self.networkConnected) {
-                                    console.log('[NexusAuth] Connection stable, refreshing auth...');
+                                    console.warn('[NexusAuth] Connection stable, refreshing auth...');
                                     self.checkAndRefreshToken();
                                     self.sendHeartbeat();
                                 }
@@ -378,7 +378,7 @@
                         }
                     });
                 } catch (e) {
-                    console.log('[NexusAuth] Network plugin not available');
+                    console.warn('[NexusAuth] Network plugin not available');
                 }
             }
 
@@ -386,14 +386,14 @@
             window.addEventListener('online', () => {
                 const wasOffline = !self.networkConnected;
                 self.networkConnected = true;
-                console.log('[NexusAuth] Browser online event');
+                console.warn('[NexusAuth] Browser online event');
 
                 // Only trigger auth refresh if we were actually offline
                 if (wasOffline) {
                     // Wait briefly for network to stabilize
                     setTimeout(() => {
                         if (self.networkConnected) {
-                            console.log('[NexusAuth] Network stable, refreshing auth...');
+                            console.warn('[NexusAuth] Network stable, refreshing auth...');
                             self.checkAndRefreshToken();
                             self.sendHeartbeat();
                         }
@@ -403,7 +403,7 @@
 
             window.addEventListener('offline', () => {
                 self.networkConnected = false;
-                console.log('[NexusAuth] Browser offline');
+                console.warn('[NexusAuth] Browser offline');
             });
         },
 
@@ -442,7 +442,7 @@
 
             // Don't start heartbeat if not logged in
             if (!this.isLoggedIn()) {
-                console.log('[NexusAuth] Not logged in, skipping heartbeat');
+                console.warn('[NexusAuth] Not logged in, skipping heartbeat');
                 return;
             }
 
@@ -454,7 +454,7 @@
             // Also send an immediate heartbeat
             this.sendHeartbeat();
 
-            console.log('[NexusAuth] Heartbeat started');
+            console.warn('[NexusAuth] Heartbeat started');
         },
 
         /**
@@ -464,7 +464,7 @@
             if (this.heartbeatTimer) {
                 clearInterval(this.heartbeatTimer);
                 this.heartbeatTimer = null;
-                console.log('[NexusAuth] Heartbeat stopped');
+                console.warn('[NexusAuth] Heartbeat stopped');
             }
         },
 
@@ -475,7 +475,7 @@
         sendHeartbeat: async function() {
             // Guard: prevent concurrent heartbeats (can cause race conditions)
             if (this._heartbeatInProgress) {
-                console.log('[NexusAuth] Heartbeat already in progress, skipping');
+                console.warn('[NexusAuth] Heartbeat already in progress, skipping');
                 return;
             }
             this._heartbeatInProgress = true;
@@ -483,7 +483,7 @@
             // Skip heartbeat if offline (do real-time check for reliability)
             const isOnline = await this.isNetworkAvailable();
             if (!isOnline) {
-                console.log('[NexusAuth] Skipping heartbeat - offline');
+                console.warn('[NexusAuth] Skipping heartbeat - offline');
                 this._heartbeatInProgress = false;
                 return;
             }
@@ -516,7 +516,7 @@
 
                 if (response.ok) {
                     const data = await response.json();
-                    console.log('[NexusAuth] Heartbeat OK, session valid');
+                    console.warn('[NexusAuth] Heartbeat OK, session valid');
 
                     // Reset ALL failure counts on success
                     this.heartbeatFailCount = 0;
@@ -530,7 +530,7 @@
                     // Check token status from heartbeat response
                     if (data.token) {
                         if (data.token.needs_refresh) {
-                            console.log('[NexusAuth] Heartbeat indicates token needs refresh');
+                            console.warn('[NexusAuth] Heartbeat indicates token needs refresh');
                             this.refreshAccessToken();
                         } else if (data.token.time_remaining) {
                             // Update local token expiry based on server response
@@ -542,13 +542,13 @@
                     // The heartbeat's job is to keep sessions alive, not to enforce logouts
                     // If the session is truly invalid, API requests will fail and the user
                     // can decide to login again. This prevents random unexpected logouts.
-                    console.log('[NexusAuth] Heartbeat 401 - session may have expired');
-                    console.log('[NexusAuth] Has token:', !!this.getToken(), 'Has refresh:', !!this.getRefreshToken());
+                    console.warn('[NexusAuth] Heartbeat 401 - session may have expired');
+                    console.warn('[NexusAuth] Has token:', !!this.getToken(), 'Has refresh:', !!this.getRefreshToken());
 
                     // Try token refresh (silently, don't count failures)
                     const refreshToken = this.getRefreshToken();
                     if (refreshToken) {
-                        console.log('[NexusAuth] Attempting silent token refresh...');
+                        console.warn('[NexusAuth] Attempting silent token refresh...');
                         await this.refreshAccessToken();
                     }
 
@@ -557,11 +557,11 @@
                     // when they try to do something that requires authentication
                 } else {
                     // Other error (500, etc.) - just log it, don't take any action
-                    console.log('[NexusAuth] Heartbeat server error: ' + response.status);
+                    console.warn('[NexusAuth] Heartbeat server error: ' + response.status);
                 }
             } catch (error) {
                 // Network error - just log it, don't take any action
-                console.log('[NexusAuth] Heartbeat network error:', error.message || error);
+                console.warn('[NexusAuth] Heartbeat network error:', error.message || error);
             } finally {
                 // Always clear the in-progress flag
                 this._heartbeatInProgress = false;
@@ -591,7 +591,7 @@
             document.addEventListener('visibilitychange', () => {
                 if (document.visibilityState === 'visible') {
                     // App came to foreground - send heartbeat AND check/refresh token
-                    console.log('[NexusAuth] App visible, checking auth status...');
+                    console.warn('[NexusAuth] App visible, checking auth status...');
                     self.sendHeartbeat();
                     self.checkAndRefreshToken();
                 }
@@ -604,14 +604,14 @@
                     if (App) {
                         App.addListener('appStateChange', (state) => {
                             if (state.isActive) {
-                                console.log('[NexusAuth] Native app active, checking auth status...');
+                                console.warn('[NexusAuth] Native app active, checking auth status...');
                                 self.sendHeartbeat();
                                 self.checkAndRefreshToken();
                             }
                         });
                     }
                 } catch (e) {
-                    console.log('[NexusAuth] Could not setup Capacitor app state listener');
+                    console.warn('[NexusAuth] Could not setup Capacitor app state listener');
                 }
             }
         },
@@ -627,7 +627,7 @@
             const refreshToken = this.getRefreshToken();
             const remaining = this.getTokenTimeRemaining();
 
-            console.log('[NexusAuth] isLoggedIn check:', {
+            console.warn('[NexusAuth] isLoggedIn check:', {
                 hasToken: !!token,
                 hasRefreshToken: !!refreshToken,
                 tokenTimeRemaining: remaining
@@ -862,7 +862,7 @@
                     await this.capacitorPreferences.remove({ key: this.config.refreshTokenStorageKey }).catch(() => {});
                     await this.capacitorPreferences.remove({ key: this.config.tokenExpiryKey }).catch(() => {});
                 }
-                console.log('[NexusAuth] Tokens cleared (user data preserved)');
+                console.warn('[NexusAuth] Tokens cleared (user data preserved)');
             } catch (e) {
                 console.error('[NexusAuth] Could not clear tokens:', e);
             }
@@ -889,9 +889,9 @@
                         'X-Requested-With': 'XMLHttpRequest'
                     }
                 });
-                console.log('[NexusAuth] Server logout successful');
+                console.warn('[NexusAuth] Server logout successful');
             } catch (e) {
-                console.log('[NexusAuth] Server logout failed (may already be logged out)');
+                console.warn('[NexusAuth] Server logout failed (may already be logged out)');
             }
         },
 
@@ -965,7 +965,7 @@
             // Also check immediately
             this.checkAndRefreshToken();
 
-            console.log('[NexusAuth] Token refresh timer started');
+            console.warn('[NexusAuth] Token refresh timer started');
         },
 
         /**
@@ -992,7 +992,7 @@
 
             // Check if token needs refresh
             if (this.tokenNeedsRefresh()) {
-                console.log('[NexusAuth] Token needs refresh, refreshing...');
+                console.warn('[NexusAuth] Token needs refresh, refreshing...');
                 await this.refreshAccessToken();
             }
         },
@@ -1004,13 +1004,13 @@
         refreshAccessToken: async function() {
             // Prevent concurrent refresh attempts
             if (this.isRefreshing) {
-                console.log('[NexusAuth] Refresh already in progress, waiting...');
+                console.warn('[NexusAuth] Refresh already in progress, waiting...');
                 return this.refreshPromise;
             }
 
             const refreshToken = this.getRefreshToken();
             if (!refreshToken) {
-                console.log('[NexusAuth] No refresh token available');
+                console.warn('[NexusAuth] No refresh token available');
                 return false;
             }
 
@@ -1047,31 +1047,31 @@
                             // Use server-provided expiry, with platform-appropriate fallback
                             const defaultExpiry = this.isMobileDevice() ? 31536000 : 7200;
                             this.setTokenExpiry(data.expires_in || defaultExpiry);
-                            console.log('[NexusAuth] Access token refreshed, expires_in:', data.expires_in || defaultExpiry);
+                            console.warn('[NexusAuth] Access token refreshed, expires_in:', data.expires_in || defaultExpiry);
                         }
 
                         // Update refresh token if a new one was provided
                         if (data.refresh_token) {
                             this.setRefreshToken(data.refresh_token);
-                            console.log('[NexusAuth] Refresh token updated');
+                            console.warn('[NexusAuth] Refresh token updated');
                         }
 
                         return true;
                     } else if (response.status === 401) {
                         // Refresh token is invalid/expired
                         // Log detailed info for debugging
-                        console.log('[NexusAuth] Refresh token rejected (401)');
+                        console.warn('[NexusAuth] Refresh token rejected (401)');
                         try {
                             const errorData = await response.json();
-                            console.log('[NexusAuth] Refresh error details:', errorData);
+                            console.warn('[NexusAuth] Refresh error details:', errorData);
                         } catch (_e) { /* ignore JSON parse errors */ }
 
                         // DON'T clear tokens immediately - the user might need to re-login
                         // but we shouldn't force logout silently
-                        console.log('[NexusAuth] NOT clearing tokens - user may need to re-login manually');
+                        console.warn('[NexusAuth] NOT clearing tokens - user may need to re-login manually');
                         return false;
                     } else {
-                        console.log('[NexusAuth] Token refresh failed:', response.status);
+                        console.warn('[NexusAuth] Token refresh failed:', response.status);
                         return false;
                     }
                 } catch (error) {
@@ -1113,10 +1113,10 @@
                 if (isApiRequest && !isAuthEndpoint) {
                     // Check if token needs refresh before making request
                     if (self.tokenNeedsRefresh() && self.getRefreshToken()) {
-                        console.log('[NexusAuth] Pre-flight token refresh...');
+                        console.warn('[NexusAuth] Pre-flight token refresh...');
                         const refreshed = await self.refreshAccessToken();
                         if (!refreshed) {
-                            console.log('[NexusAuth] Pre-flight refresh failed, proceeding without token');
+                            console.warn('[NexusAuth] Pre-flight refresh failed, proceeding without token');
                             // Don't block the request - let server decide what to do
                         }
                     }
@@ -1148,7 +1148,7 @@
 
                 // Handle 401 responses for API requests
                 if (response.status === 401 && isApiRequest && !isAuthEndpoint) {
-                    console.log('[NexusAuth] Got 401, attempting token refresh...');
+                    console.warn('[NexusAuth] Got 401, attempting token refresh...');
 
                     // Try to refresh the token
                     const refreshed = await self.refreshAccessToken();
@@ -1165,7 +1165,7 @@
                             }
                         }
 
-                        console.log('[NexusAuth] Retrying request with new token...');
+                        console.warn('[NexusAuth] Retrying request with new token...');
                         response = await originalFetch.call(window, input, init);
                     }
                 }
@@ -1173,7 +1173,7 @@
                 return response;
             };
 
-            console.log('[NexusAuth] Fetch interceptor installed');
+            console.warn('[NexusAuth] Fetch interceptor installed');
         },
 
         /**
@@ -1200,12 +1200,12 @@
             // Server sends platform-appropriate expiry (1 year mobile, 2 hours desktop)
             if (response.expires_in) {
                 this.setTokenExpiry(response.expires_in);
-                console.log('[NexusAuth] Token expiry set from server:', response.expires_in, 'seconds (~' + Math.round(response.expires_in / 86400) + ' days)');
+                console.warn('[NexusAuth] Token expiry set from server:', response.expires_in, 'seconds (~' + Math.round(response.expires_in / 86400) + ' days)');
             } else {
                 // Default based on platform if not specified
                 const defaultExpiry = this.isMobileDevice() ? 31536000 : 7200; // 1 year or 2 hours
                 this.setTokenExpiry(defaultExpiry);
-                console.log('[NexusAuth] Token expiry set to default:', defaultExpiry, 'seconds');
+                console.warn('[NexusAuth] Token expiry set to default:', defaultExpiry, 'seconds');
             }
 
             if (response.user) {
@@ -1219,7 +1219,7 @@
             this.startTokenRefreshTimer();
 
             const platform = this.isMobileDevice() ? 'mobile' : 'desktop';
-            console.log('[NexusAuth] Login successful on ' + platform + ', auth handler activated');
+            console.warn('[NexusAuth] Login successful on ' + platform + ', auth handler activated');
         }
     };
 

@@ -353,9 +353,10 @@ class UserController
         Csrf::verifyOrDie();
 
         try {
-            $userId = $_POST['user_id'];
-            $name = trim($_POST['badge_name']);
-            $icon = trim($_POST['badge_icon']);
+            // SECURITY: Cast user_id to int to prevent URL manipulation in redirects
+            $userId = (int)($_POST['user_id'] ?? 0);
+            $name = trim($_POST['badge_name'] ?? '');
+            $icon = trim($_POST['badge_icon'] ?? '');
 
             if ($userId && $name && $icon) {
                 // Use provided key (e.g., standard system badge) or generate custom one
@@ -406,7 +407,9 @@ class UserController
         } catch (\Throwable $e) {
             // Log the full error server-side but don't expose to user
             error_log("Add Badge Failed: " . $e->getMessage() . " | File: " . $e->getFile() . " | Line: " . $e->getLine());
-            header('Location: ' . TenantContext::getBasePath() . '/admin/users/' . $_POST['user_id'] . '/edit?error=badge_failed');
+            // SECURITY: Use already validated $userId (cast to int above) instead of raw POST data
+            $safeUserId = (int)($_POST['user_id'] ?? 0);
+            header('Location: ' . TenantContext::getBasePath() . '/admin/users/' . $safeUserId . '/edit?error=badge_failed');
             exit;
         }
     }
@@ -416,8 +419,9 @@ class UserController
         $this->requireAdmin();
         Csrf::verifyOrDie();
 
-        $userId = $_POST['user_id'];
-        $badgeKey = $_POST['badge_key'];
+        // SECURITY: Cast user_id to int to prevent URL manipulation in redirects
+        $userId = (int)($_POST['user_id'] ?? 0);
+        $badgeKey = $_POST['badge_key'] ?? '';
 
         if ($userId && $badgeKey) {
             // We need a remove method in UserBadge model, or execute query directly here for now as explicit model update wasn't planned but is needed.
@@ -437,7 +441,8 @@ class UserController
         $this->requireAdmin();
         Csrf::verifyOrDie();
 
-        $userId = $_POST['user_id'];
+        // SECURITY: Cast user_id to int to prevent URL manipulation in redirects
+        $userId = (int)($_POST['user_id'] ?? 0);
 
         if ($userId) {
             try {

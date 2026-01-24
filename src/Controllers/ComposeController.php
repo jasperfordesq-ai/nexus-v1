@@ -27,7 +27,13 @@ class ComposeController
 
         if (empty($_SESSION['user_id'])) {
             $basePath = TenantContext::getBasePath();
-            header("Location: {$basePath}/login?redirect=" . urlencode($_SERVER['REQUEST_URI']));
+            // SECURITY: Validate redirect URL to prevent open redirect attacks
+            $redirectUrl = $_SERVER['REQUEST_URI'] ?? '';
+            // Only allow relative paths starting with / and no protocol/host manipulation
+            if (!preg_match('#^/[^/]#', $redirectUrl) || preg_match('#[:\s]#', $redirectUrl)) {
+                $redirectUrl = $basePath . '/compose';
+            }
+            header("Location: {$basePath}/login?redirect=" . urlencode($redirectUrl));
             exit;
         }
 
