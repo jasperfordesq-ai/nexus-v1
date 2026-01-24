@@ -1,5 +1,5 @@
 <?php
-// Volunteering Index - Gold Standard Holographic Glassmorphism 2025
+// Volunteering Index - Refactored to use shared glass-* and nexus-* classes
 $pageTitle = "Volunteer Opportunities";
 $pageSubtitle = "Make a difference in your community";
 $hideHero = true;
@@ -8,180 +8,205 @@ Nexus\Core\SEO::setTitle('Volunteer Opportunities - Make a Difference in Your Co
 Nexus\Core\SEO::setDescription('Find meaningful volunteer opportunities in your community. Connect with organizations, share your skills, and make an impact.');
 
 require __DIR__ . '/../../layouts/modern/header.php';
+$base = Nexus\Core\TenantContext::getBasePath();
 ?>
 
-
-<!-- Holographic Background -->
-<div class="vol-page-bg"></div>
-
 <!-- Offline Banner -->
-<div class="vol-offline-banner" id="offlineBanner">
+<div class="offline-banner" id="offlineBanner" role="alert" aria-live="polite">
     <i class="fa-solid fa-wifi-slash"></i>
     <span>No internet connection</span>
 </div>
 
-<div class="vol-glass-container">
+<!-- Main content wrapper -->
+<div class="htb-container-full">
+<div id="volunteering-glass-wrapper">
 
-    <!-- Hero Section -->
-    <div class="vol-hero">
-        <h1 class="vol-hero-title">Volunteer Opportunities</h1>
-        <p class="vol-hero-subtitle">Discover meaningful ways to give back to your community. Share your skills, connect with organizations, and make a real impact.</p>
+    <!-- Smart Welcome Hero Section -->
+    <div class="nexus-welcome-hero">
+        <h1 class="nexus-welcome-title">Volunteer Opportunities</h1>
+        <p class="nexus-welcome-subtitle">Discover meaningful ways to give back to your community. Share your skills, connect with organizations, and make a real impact.</p>
 
-        <div class="vol-actions">
-            <a href="<?= Nexus\Core\TenantContext::getBasePath() ?>/volunteering" class="vol-action-btn vol-action-btn-primary">
+        <div class="nexus-smart-buttons">
+            <a href="<?= $base ?>/volunteering" class="nexus-smart-btn nexus-smart-btn-primary">
                 <i class="fa-solid fa-magnifying-glass"></i>
                 <span>Browse All</span>
             </a>
-            <a href="<?= Nexus\Core\TenantContext::getBasePath() ?>/volunteering/organizations" class="vol-action-btn vol-action-btn-secondary">
+            <a href="<?= $base ?>/volunteering/organizations" class="nexus-smart-btn nexus-smart-btn-secondary">
                 <i class="fa-solid fa-building-columns"></i>
                 <span>Organizations</span>
             </a>
             <?php if (isset($_SESSION['user_id'])): ?>
-            <a href="<?= Nexus\Core\TenantContext::getBasePath() ?>/volunteering/my-applications" class="vol-action-btn vol-action-btn-secondary">
+            <a href="<?= $base ?>/volunteering/my-applications" class="nexus-smart-btn nexus-smart-btn-secondary">
                 <i class="fa-solid fa-clipboard-list"></i>
                 <span>My Applications</span>
             </a>
             <?php endif; ?>
-            <a href="<?= Nexus\Core\TenantContext::getBasePath() ?>/volunteering/dashboard" class="vol-action-btn vol-action-btn-secondary">
+            <a href="<?= $base ?>/volunteering/dashboard" class="nexus-smart-btn nexus-smart-btn-outline">
                 <i class="fa-solid fa-building"></i>
                 <span>For Organizations</span>
             </a>
         </div>
     </div>
 
-    <!-- Search Section -->
-    <div class="vol-search-section">
-        <div class="vol-search-header">
-            <h2 class="vol-search-title">Find Opportunities</h2>
-            <span class="vol-search-count"><?= count($opportunities ?? []) ?> opportunities available</span>
+    <!-- Glass Search Card -->
+    <div class="glass-search-card">
+        <div class="glass-search-header">
+            <h2 class="glass-search-title">Find Opportunities</h2>
+            <span class="glass-search-count"><?= count($opportunities ?? []) ?> opportunities available</span>
         </div>
 
-        <form action="" method="GET" class="vol-search-form">
-            <div class="vol-search-input-wrap">
+        <form action="" method="GET" class="glass-search-form">
+            <div class="glass-search-input-wrap">
                 <i class="fa-solid fa-search"></i>
                 <input type="search" aria-label="Search" name="q" placeholder="Search by cause, skill, or organization..."
-                       value="<?= htmlspecialchars($query ?? '') ?>" class="vol-search-input">
+                       value="<?= htmlspecialchars($query ?? '') ?>" class="glass-search-input">
             </div>
 
-            <label for="vol-category-select" class="govuk-visually-hidden">Filter by category</label>
-            <select name="cat" id="vol-category-select" class="vol-search-select" aria-label="Filter by category">
-                <option value="">All Categories</option>
-                <?php if (!empty($categories)): ?>
-                    <?php foreach ($categories as $cat): ?>
-                        <option value="<?= $cat['id'] ?>" <?= (isset($activeCat) && $activeCat == $cat['id']) ? 'selected' : '' ?>>
-                            <?= htmlspecialchars($cat['name']) ?>
-                        </option>
-                    <?php endforeach; ?>
-                <?php endif; ?>
-            </select>
+            <div class="filter-row">
+                <label for="vol-category-select" class="visually-hidden">Filter by category</label>
+                <select name="cat" id="vol-category-select" class="glass-select" aria-label="Filter by category">
+                    <option value="">All Categories</option>
+                    <?php if (!empty($categories)): ?>
+                        <?php foreach ($categories as $cat): ?>
+                            <option value="<?= $cat['id'] ?>" <?= (isset($activeCat) && $activeCat == $cat['id']) ? 'selected' : '' ?>>
+                                <?= htmlspecialchars($cat['name']) ?>
+                            </option>
+                        <?php endforeach; ?>
+                    <?php endif; ?>
+                </select>
 
-            <label class="vol-search-checkbox">
-                <input type="checkbox" name="remote" value="1" <?= (isset($isRemote) && $isRemote) ? 'checked' : '' ?>>
-                <span>Remote Only</span>
-            </label>
+                <label class="glass-checkbox">
+                    <input type="checkbox" name="remote" value="1" <?= (isset($isRemote) && $isRemote) ? 'checked' : '' ?>>
+                    <span>Remote Only</span>
+                </label>
 
-            <button type="submit" class="vol-search-btn">
-                <i class="fa-solid fa-search"></i>
-                <span>Find</span>
-            </button>
+                <button type="submit" class="glass-btn-primary">
+                    <i class="fa-solid fa-search"></i>
+                    <span>Find</span>
+                </button>
+            </div>
         </form>
     </div>
 
+    <!-- Section Header -->
+    <div class="section-header">
+        <i class="fa-solid fa-hands-helping"></i>
+        <h2>Available Opportunities</h2>
+    </div>
+
     <!-- Opportunities Grid -->
-    <div class="vol-grid">
+    <div class="volunteering-grid" id="volunteeringGrid">
         <?php if (!empty($opportunities)): ?>
             <?php foreach ($opportunities as $opp): ?>
-                <a href="<?= Nexus\Core\TenantContext::getBasePath() ?>/volunteering/<?= $opp['id'] ?>" class="vol-card">
-                    <div class="vol-card-header">
-                        <i class="fa-solid fa-hands-helping vol-card-header-icon"></i>
+                <a href="<?= $base ?>/volunteering/<?= $opp['id'] ?>" class="glass-volunteer-card">
+                    <!-- Card Header with Icon -->
+                    <div class="card-icon-header">
+                        <i class="fa-solid fa-hands-helping"></i>
                     </div>
 
-                    <div class="vol-card-body">
-                        <div class="vol-org-row">
-                            <div class="vol-org-badge">
+                    <div class="card-body">
+                        <!-- Organization Info -->
+                        <div class="org-info">
+                            <div class="org-badge">
                                 <?= strtoupper(substr($opp['org_name'] ?? 'O', 0, 1)) ?>
                             </div>
-                            <div class="vol-org-info">
-                                <div class="vol-org-name"><?= htmlspecialchars($opp['org_name'] ?? 'Organization') ?></div>
-                                <div class="vol-org-location">
+                            <div class="org-details">
+                                <div class="org-name"><?= htmlspecialchars($opp['org_name'] ?? 'Organization') ?></div>
+                                <div class="org-location">
                                     <i class="fa-solid fa-location-dot"></i>
                                     <?= htmlspecialchars($opp['location'] ?? 'Remote') ?>
                                 </div>
                             </div>
                         </div>
 
-                        <h3 class="vol-card-title"><?= htmlspecialchars($opp['title']) ?></h3>
+                        <h3 class="card-title"><?= htmlspecialchars($opp['title']) ?></h3>
 
-                        <p class="vol-card-desc"><?= htmlspecialchars(substr($opp['description'] ?? '', 0, 150)) ?>...</p>
+                        <p class="card-desc"><?= htmlspecialchars(substr($opp['description'] ?? '', 0, 150)) ?>...</p>
 
                         <?php if (!empty($opp['skills_needed'])): ?>
-                            <div class="vol-skills">
+                            <div class="skill-tags">
                                 <?php foreach (array_slice(explode(',', $opp['skills_needed']), 0, 4) as $skill): ?>
-                                    <span class="vol-skill-tag"><?= trim(htmlspecialchars($skill)) ?></span>
+                                    <span class="skill-tag"><?= trim(htmlspecialchars($skill)) ?></span>
                                 <?php endforeach; ?>
                             </div>
                         <?php endif; ?>
+                    </div>
 
-                        <div class="vol-card-footer">
-                            <?php if (!empty($opp['credits_offered'])): ?>
-                                <span class="vol-credits">
-                                    <i class="fa-solid fa-coins"></i>
-                                    <?= $opp['credits_offered'] ?> credits
-                                </span>
-                            <?php else: ?>
-                                <span></span>
-                            <?php endif; ?>
-
-                            <span class="vol-view-link">
-                                View Details <i class="fa-solid fa-arrow-right"></i>
+                    <div class="card-footer">
+                        <?php if (!empty($opp['credits_offered'])): ?>
+                            <span class="credits-badge">
+                                <i class="fa-solid fa-coins"></i>
+                                <?= $opp['credits_offered'] ?> credits
                             </span>
-                        </div>
+                        <?php else: ?>
+                            <span></span>
+                        <?php endif; ?>
+
+                        <span class="view-link">
+                            View Details <i class="fa-solid fa-arrow-right"></i>
+                        </span>
                     </div>
                 </a>
             <?php endforeach; ?>
         <?php else: ?>
-            <div class="vol-empty">
-                <div class="vol-empty-icon">🔍</div>
-                <h3 class="vol-empty-title">No opportunities found</h3>
-                <p class="vol-empty-text">Check back later or adjust your search criteria.</p>
-                <a href="<?= Nexus\Core\TenantContext::getBasePath() ?>/volunteering" class="vol-action-btn vol-action-btn-primary">
+            <div class="glass-empty-state">
+                <div class="empty-icon">🔍</div>
+                <h3 class="empty-title">No opportunities found</h3>
+                <p class="empty-text">Check back later or adjust your search criteria.</p>
+                <a href="<?= $base ?>/volunteering" class="glass-btn-primary">
                     View All Opportunities
                 </a>
             </div>
         <?php endif; ?>
     </div>
 
+</div><!-- #volunteering-glass-wrapper -->
 </div>
 
 <script>
-// Offline Detection
-(function() {
+// Offline Indicator
+(function initOfflineIndicator() {
     const banner = document.getElementById('offlineBanner');
     if (!banner) return;
 
-    function updateStatus() {
-        if (!navigator.onLine) {
-            banner.classList.add('visible');
-        } else {
-            banner.classList.remove('visible');
-        }
+    function handleOffline() {
+        banner.classList.add('visible');
+        if (navigator.vibrate) navigator.vibrate(100);
     }
 
-    window.addEventListener('online', updateStatus);
-    window.addEventListener('offline', updateStatus);
-    updateStatus();
+    function handleOnline() {
+        banner.classList.remove('visible');
+    }
+
+    window.addEventListener('online', handleOnline);
+    window.addEventListener('offline', handleOffline);
+
+    if (!navigator.onLine) {
+        handleOffline();
+    }
 })();
 
-// Card hover effects with haptic feedback
-document.querySelectorAll('.vol-card').forEach(card => {
+// Button Press States
+document.querySelectorAll('.nexus-smart-btn, .glass-btn-primary, .view-link').forEach(btn => {
+    btn.addEventListener('pointerdown', function() {
+        this.style.transform = 'scale(0.96)';
+    });
+    btn.addEventListener('pointerup', function() {
+        this.style.transform = '';
+    });
+    btn.addEventListener('pointerleave', function() {
+        this.style.transform = '';
+    });
+});
+
+// Card hover effects
+document.querySelectorAll('.glass-volunteer-card').forEach(card => {
     card.addEventListener('pointerdown', function() {
         this.style.transform = 'scale(0.98)';
     });
-
     card.addEventListener('pointerup', function() {
         this.style.transform = '';
     });
-
     card.addEventListener('pointerleave', function() {
         this.style.transform = '';
     });

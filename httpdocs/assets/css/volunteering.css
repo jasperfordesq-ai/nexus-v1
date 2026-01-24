@@ -1,6 +1,600 @@
 /* Volunteering Module CSS - Extracted from PHP files 2026-01-19 */
 /* Source files: certificate.php, create_opp.php, dashboard.php, edit_opp.php, edit_org.php, index.php, my_applications.php, organizations.php, show.php, show_org.php */
 
+/* ============================================
+   VOLUNTEERING INDEX - Shared Glass Pattern
+   Uses nexus-* and glass-* classes for consistency
+   ============================================ */
+
+/* Volunteering wrapper - scoped styles */
+#volunteering-glass-wrapper {
+    padding: var(--space-6);
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+/* Welcome Hero - scoped to volunteering */
+#volunteering-glass-wrapper .nexus-welcome-hero {
+    background: linear-gradient(135deg,
+        rgba(16, 185, 129, 0.12) 0%,
+        rgba(5, 150, 105, 0.12) 50%,
+        rgba(4, 120, 87, 0.08) 100%);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    border-radius: var(--radius-xl);
+    padding: var(--space-8) var(--space-6);
+    margin-bottom: var(--space-8);
+    text-align: center;
+    box-shadow: 0 8px 32px rgba(16, 185, 129, 0.1);
+}
+
+[data-theme="dark"] #volunteering-glass-wrapper .nexus-welcome-hero {
+    background: linear-gradient(135deg,
+        rgba(16, 185, 129, 0.15) 0%,
+        rgba(5, 150, 105, 0.15) 50%,
+        rgba(4, 120, 87, 0.1) 100%);
+    border-color: rgba(255, 255, 255, 0.1);
+}
+
+#volunteering-glass-wrapper .nexus-welcome-title {
+    font-size: 2rem;
+    font-weight: 800;
+    background: linear-gradient(135deg, #10b981, #059669, #047857);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin: 0 0 var(--space-2) 0;
+    line-height: 1.2;
+}
+
+#volunteering-glass-wrapper .nexus-welcome-subtitle {
+    font-size: 0.95rem;
+    color: var(--htb-text-muted);
+    margin: 0 0 var(--space-5) 0;
+    line-height: 1.5;
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+/* Smart Buttons */
+#volunteering-glass-wrapper .nexus-smart-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-3);
+    justify-content: center;
+}
+
+#volunteering-glass-wrapper .nexus-smart-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    padding: var(--space-3) var(--space-5);
+    border-radius: var(--radius-full);
+    font-size: 0.9rem;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.2s ease;
+    border: 1px solid transparent;
+}
+
+#volunteering-glass-wrapper .nexus-smart-btn-primary {
+    background: linear-gradient(135deg, #10b981, #059669);
+    color: white;
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+}
+
+#volunteering-glass-wrapper .nexus-smart-btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);
+}
+
+#volunteering-glass-wrapper .nexus-smart-btn-secondary {
+    background: rgba(16, 185, 129, 0.1);
+    color: #10b981;
+    border-color: rgba(16, 185, 129, 0.3);
+}
+
+#volunteering-glass-wrapper .nexus-smart-btn-secondary:hover {
+    background: rgba(16, 185, 129, 0.2);
+}
+
+#volunteering-glass-wrapper .nexus-smart-btn-outline {
+    background: transparent;
+    color: var(--htb-text-main);
+    border-color: rgba(255, 255, 255, 0.2);
+}
+
+[data-theme="light"] #volunteering-glass-wrapper .nexus-smart-btn-outline {
+    border-color: rgba(0, 0, 0, 0.1);
+}
+
+#volunteering-glass-wrapper .nexus-smart-btn-outline:hover {
+    background: rgba(16, 185, 129, 0.1);
+    border-color: rgba(16, 185, 129, 0.3);
+    color: #10b981;
+}
+
+/* Glass Search Card */
+#volunteering-glass-wrapper .glass-search-card {
+    background: linear-gradient(135deg,
+        rgba(255, 255, 255, 0.7),
+        rgba(255, 255, 255, 0.5));
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    border-radius: var(--radius-xl);
+    padding: var(--space-6);
+    margin-bottom: var(--space-6);
+}
+
+[data-theme="dark"] #volunteering-glass-wrapper .glass-search-card {
+    background: linear-gradient(135deg,
+        rgba(15, 23, 42, 0.6),
+        rgba(30, 41, 59, 0.5));
+    border-color: rgba(255, 255, 255, 0.1);
+}
+
+/* Glass Select */
+#volunteering-glass-wrapper .glass-select {
+    padding: var(--space-3) var(--space-4);
+    border-radius: var(--radius-lg);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--htb-text-main);
+    font-size: 0.9rem;
+    min-width: 150px;
+    cursor: pointer;
+}
+
+[data-theme="light"] #volunteering-glass-wrapper .glass-select {
+    border-color: rgba(0, 0, 0, 0.1);
+    background: rgba(255, 255, 255, 0.8);
+}
+
+/* Glass Search Input */
+#volunteering-glass-wrapper .glass-search-input {
+    width: 100%;
+    padding: var(--space-4) var(--space-4) var(--space-4) var(--space-12);
+    border-radius: var(--radius-lg);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--htb-text-main);
+    font-size: 1rem;
+}
+
+[data-theme="light"] #volunteering-glass-wrapper .glass-search-input {
+    border-color: rgba(0, 0, 0, 0.1);
+    background: rgba(255, 255, 255, 0.8);
+}
+
+#volunteering-glass-wrapper .glass-search-input:focus {
+    outline: none;
+    border-color: #10b981;
+    box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+}
+
+/* Glass Button Primary */
+#volunteering-glass-wrapper .glass-btn-primary {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    padding: var(--space-3) var(--space-5);
+    border-radius: var(--radius-lg);
+    background: linear-gradient(135deg, #10b981, #059669);
+    color: white;
+    font-weight: 600;
+    font-size: 0.9rem;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-decoration: none;
+}
+
+#volunteering-glass-wrapper .glass-btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+}
+
+/* Glass Empty State */
+#volunteering-glass-wrapper .glass-empty-state {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: var(--space-12) var(--space-6);
+    background: linear-gradient(135deg,
+        rgba(255, 255, 255, 0.5),
+        rgba(255, 255, 255, 0.3));
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-radius: var(--radius-xl);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+[data-theme="dark"] #volunteering-glass-wrapper .glass-empty-state {
+    background: linear-gradient(135deg,
+        rgba(15, 23, 42, 0.5),
+        rgba(30, 41, 59, 0.4));
+    border-color: rgba(255, 255, 255, 0.1);
+}
+
+/* Mobile Responsive for Hero */
+@media (max-width: 768px) {
+    #volunteering-glass-wrapper .nexus-welcome-hero {
+        padding: var(--space-5) var(--space-4);
+        border-radius: var(--radius-lg);
+    }
+
+    #volunteering-glass-wrapper .nexus-welcome-title {
+        font-size: 1.5rem;
+    }
+
+    #volunteering-glass-wrapper .nexus-smart-buttons {
+        gap: var(--space-2);
+    }
+
+    #volunteering-glass-wrapper .nexus-smart-btn {
+        padding: var(--space-3) var(--space-4);
+        font-size: 0.8rem;
+    }
+
+    #volunteering-glass-wrapper .glass-search-card {
+        padding: var(--space-4);
+    }
+}
+
+@media (max-width: 768px) {
+    #volunteering-glass-wrapper {
+        padding: var(--space-4);
+    }
+}
+
+/* Volunteering Grid */
+#volunteering-glass-wrapper .volunteering-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: var(--space-6);
+    margin-top: var(--space-6);
+}
+
+@media (max-width: 768px) {
+    #volunteering-glass-wrapper .volunteering-grid {
+        grid-template-columns: 1fr;
+        gap: var(--space-4);
+    }
+}
+
+/* Volunteer Card - matches glass-event-card pattern */
+#volunteering-glass-wrapper .glass-volunteer-card {
+    display: flex;
+    flex-direction: column;
+    text-decoration: none;
+    background: linear-gradient(135deg,
+        rgba(255, 255, 255, 0.75),
+        rgba(255, 255, 255, 0.6));
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    border-radius: var(--radius-xl);
+    border: 1px solid rgba(16, 185, 129, 0.15);
+    overflow: hidden;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 4px 24px rgba(31, 38, 135, 0.1);
+}
+
+#volunteering-glass-wrapper .glass-volunteer-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 16px 48px rgba(31, 38, 135, 0.2),
+                0 0 0 1px rgba(16, 185, 129, 0.2),
+                0 0 24px rgba(16, 185, 129, 0.1);
+    text-decoration: none;
+}
+
+[data-theme="dark"] #volunteering-glass-wrapper .glass-volunteer-card {
+    background: linear-gradient(135deg,
+        rgba(15, 23, 42, 0.6),
+        rgba(30, 41, 59, 0.5));
+    border-color: rgba(16, 185, 129, 0.2);
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
+}
+
+[data-theme="dark"] #volunteering-glass-wrapper .glass-volunteer-card:hover {
+    box-shadow: 0 16px 48px rgba(0, 0, 0, 0.7),
+                0 0 0 1px rgba(16, 185, 129, 0.25),
+                0 0 24px rgba(16, 185, 129, 0.15);
+}
+
+/* Card Icon Header */
+#volunteering-glass-wrapper .card-icon-header {
+    background: linear-gradient(135deg, #10b981, #059669);
+    padding: var(--space-4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#volunteering-glass-wrapper .card-icon-header i {
+    font-size: 2rem;
+    color: white;
+}
+
+/* Card Body */
+#volunteering-glass-wrapper .glass-volunteer-card .card-body {
+    padding: var(--space-5);
+    flex: 1;
+}
+
+/* Organization Info */
+#volunteering-glass-wrapper .org-info {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    margin-bottom: var(--space-4);
+}
+
+#volunteering-glass-wrapper .org-badge {
+    width: 44px;
+    height: 44px;
+    border-radius: var(--radius-full);
+    background: linear-gradient(135deg, #10b981, #059669);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: 700;
+    font-size: 1.1rem;
+    flex-shrink: 0;
+}
+
+#volunteering-glass-wrapper .org-details {
+    min-width: 0;
+}
+
+#volunteering-glass-wrapper .org-name {
+    font-weight: 600;
+    font-size: 0.95rem;
+    color: var(--htb-text-main);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+#volunteering-glass-wrapper .org-location {
+    font-size: 0.85rem;
+    color: var(--htb-text-muted);
+    display: flex;
+    align-items: center;
+    gap: var(--space-1);
+}
+
+#volunteering-glass-wrapper .org-location i {
+    font-size: 0.75rem;
+    color: #10b981;
+}
+
+/* Card Title */
+#volunteering-glass-wrapper .glass-volunteer-card .card-title {
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: var(--htb-text-main);
+    margin-bottom: var(--space-2);
+    line-height: 1.3;
+}
+
+/* Card Description */
+#volunteering-glass-wrapper .glass-volunteer-card .card-desc {
+    font-size: 0.9rem;
+    color: var(--htb-text-muted);
+    line-height: 1.5;
+    margin-bottom: var(--space-4);
+}
+
+/* Skill Tags */
+#volunteering-glass-wrapper .skill-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+    margin-top: auto;
+}
+
+#volunteering-glass-wrapper .skill-tag {
+    background: rgba(16, 185, 129, 0.1);
+    color: #10b981;
+    padding: var(--space-1) var(--space-3);
+    border-radius: var(--radius-full);
+    font-size: 0.75rem;
+    font-weight: 600;
+    border: 1px solid rgba(16, 185, 129, 0.2);
+}
+
+[data-theme="dark"] #volunteering-glass-wrapper .skill-tag {
+    background: rgba(16, 185, 129, 0.15);
+    border-color: rgba(16, 185, 129, 0.3);
+}
+
+/* Card Footer */
+#volunteering-glass-wrapper .glass-volunteer-card .card-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--space-4) var(--space-5);
+    border-top: 1px solid rgba(0, 0, 0, 0.05);
+    background: rgba(0, 0, 0, 0.02);
+}
+
+[data-theme="dark"] #volunteering-glass-wrapper .glass-volunteer-card .card-footer {
+    border-top-color: rgba(255, 255, 255, 0.05);
+    background: rgba(0, 0, 0, 0.1);
+}
+
+/* Credits Badge */
+#volunteering-glass-wrapper .credits-badge {
+    display: flex;
+    align-items: center;
+    gap: var(--space-1);
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #f59e0b;
+}
+
+#volunteering-glass-wrapper .credits-badge i {
+    font-size: 0.9rem;
+}
+
+/* View Link */
+#volunteering-glass-wrapper .view-link {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #10b981;
+    display: flex;
+    align-items: center;
+    gap: var(--space-1);
+    transition: gap 0.2s ease;
+}
+
+#volunteering-glass-wrapper .glass-volunteer-card:hover .view-link {
+    gap: var(--space-2);
+}
+
+/* Glass Search Card Extensions */
+#volunteering-glass-wrapper .glass-search-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--space-4);
+    flex-wrap: wrap;
+    gap: var(--space-3);
+}
+
+#volunteering-glass-wrapper .glass-search-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--htb-text-main);
+    margin: 0;
+}
+
+#volunteering-glass-wrapper .glass-search-count {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--htb-text-muted);
+}
+
+#volunteering-glass-wrapper .glass-search-form {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+}
+
+#volunteering-glass-wrapper .glass-search-input-wrap {
+    position: relative;
+    width: 100%;
+}
+
+#volunteering-glass-wrapper .glass-search-input-wrap i {
+    position: absolute;
+    left: var(--space-4);
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--htb-text-muted);
+    font-size: 1rem;
+}
+
+#volunteering-glass-wrapper .glass-search-input-wrap .glass-search-input {
+    padding-left: var(--space-12);
+}
+
+#volunteering-glass-wrapper .filter-row {
+    display: flex;
+    gap: var(--space-4);
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+#volunteering-glass-wrapper .glass-checkbox {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    cursor: pointer;
+    font-size: 0.9rem;
+    color: var(--htb-text-main);
+}
+
+#volunteering-glass-wrapper .glass-checkbox input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    accent-color: #10b981;
+}
+
+/* Empty State Extensions */
+#volunteering-glass-wrapper .glass-empty-state .empty-icon {
+    font-size: 4rem;
+    margin-bottom: var(--space-5);
+}
+
+#volunteering-glass-wrapper .glass-empty-state .empty-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--htb-text-main);
+    margin-bottom: var(--space-3);
+}
+
+#volunteering-glass-wrapper .glass-empty-state .empty-text {
+    color: var(--htb-text-muted);
+    margin-bottom: var(--space-5);
+}
+
+/* Section Header */
+#volunteering-glass-wrapper .section-header {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    margin: var(--space-6) 0 var(--space-4);
+}
+
+#volunteering-glass-wrapper .section-header h2 {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--htb-text-main);
+    margin: 0;
+}
+
+#volunteering-glass-wrapper .section-header i {
+    color: #10b981;
+    font-size: 1.1rem;
+}
+
+/* Mobile Optimizations */
+@media (max-width: 768px) {
+    #volunteering-glass-wrapper .glass-volunteer-card:hover {
+        transform: none;
+    }
+
+    #volunteering-glass-wrapper .glass-volunteer-card {
+        backdrop-filter: blur(8px) saturate(110%);
+        -webkit-backdrop-filter: blur(8px) saturate(110%);
+    }
+
+    #volunteering-glass-wrapper .filter-row {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    #volunteering-glass-wrapper .glass-select,
+    #volunteering-glass-wrapper .glass-btn-primary {
+        width: 100%;
+    }
+}
+
+/* Reduced Motion */
+@media (prefers-reduced-motion: reduce) {
+    #volunteering-glass-wrapper .glass-volunteer-card {
+        transition: none;
+    }
+
+    #volunteering-glass-wrapper .glass-volunteer-card:hover {
+        transform: none;
+    }
+}
+
 /* ===== From: views/modern/volunteering/certificate.php ===== */
 /* ============================================
    MODERN HOLOGRAPHIC CERTIFICATE PAGE

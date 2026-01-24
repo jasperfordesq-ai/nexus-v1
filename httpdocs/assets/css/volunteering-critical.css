@@ -1,7 +1,18 @@
 /**
  * Volunteering Critical CSS - Prevents FOUC
  * This small file loads early and sets initial layout to prevent flash
+ * Hardcoded values used intentionally - no CSS variable dependencies
+ * Uses .volunteering-page class added to body by PHP (not :has() which is too slow)
  */
+
+/* Override body background for volunteering pages - class set by PHP on body tag */
+body.volunteering-page {
+    background: #0f172a;
+}
+
+[data-theme="light"] body.volunteering-page {
+    background: #f8fafc;
+}
 
 /* Background - immediately set so no white flash */
 .vol-page-bg {
@@ -9,24 +20,29 @@
     inset: 0;
     z-index: -1;
     pointer-events: none;
-    background: var(--color-slate-900, #0f172a);
+    background: #0f172a;
 }
 
 [data-theme="light"] .vol-page-bg {
-    background: var(--color-slate-50, #f8fafc);
+    background: #f8fafc;
 }
 
-/* Container - set layout immediately */
+/* Container - set layout immediately with full visual appearance */
 .vol-glass-container {
+    position: relative;
     margin: 100px auto 20px;
     max-width: 1200px;
     padding: 32px;
     border-radius: 24px;
-    background: var(--glass-bg-dark, rgba(15, 23, 42, 0.85));
+    background: rgba(15, 23, 42, 0.85);
+    backdrop-filter: blur(24px) saturate(180%);
+    -webkit-backdrop-filter: blur(24px) saturate(180%);
+    border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 [data-theme="light"] .vol-glass-container {
-    background: var(--glass-bg-light, rgba(255, 255, 255, 0.9));
+    background: rgba(255, 255, 255, 0.9);
+    border-color: rgba(0, 0, 0, 0.1);
 }
 
 /* Hero section base */
@@ -42,17 +58,17 @@
     display: none;
 }
 
-/* Organization page styles */
+/* Organization page styles - hardcoded values only */
 .org-profile-bg {
     position: fixed;
     inset: 0;
     z-index: -1;
     pointer-events: none;
-    background: var(--color-slate-900, #0f172a);
+    background: #0f172a;
 }
 
 [data-theme="light"] .org-profile-bg {
-    background: var(--color-slate-50, #f8fafc);
+    background: #f8fafc;
 }
 
 .org-profile-container {
@@ -62,11 +78,12 @@
 }
 
 .org-hero-banner {
+    position: relative;
     height: 240px;
     border-radius: 24px;
     margin-bottom: -80px;
-    background: linear-gradient(135deg, var(--color-emerald-500, #10b981), var(--color-primary-500, #6366f1));
-    opacity: 0.92;
+    background: linear-gradient(135deg, #10b981, #6366f1);
+    overflow: hidden;
 }
 
 /* Mobile adjustments */

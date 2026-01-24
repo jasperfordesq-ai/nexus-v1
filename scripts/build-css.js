@@ -82,6 +82,11 @@ async function buildCSS() {
             const outputPath = path.join(outputDir, `${baseName}.min.css`);
             fs.writeFileSync(outputPath, minifiedContent);
 
+            // Also copy to the same directory as the source file (for direct use)
+            const sourceDir = path.dirname(path.join(__dirname, '..', cssFile));
+            const directOutputPath = path.join(sourceDir, `${baseName}.min.css`);
+            fs.writeFileSync(directOutputPath, minifiedContent);
+
             // Calculate savings
             const savings = ((originalSize - minifiedSize) / originalSize * 100).toFixed(1);
 
