@@ -1333,6 +1333,14 @@ input:checked + .toggle-slider:before {
 </style>
 
 <script>
+// Security: HTML escape function to prevent XSS
+function escapeHtml(text) {
+    if (text === null || text === undefined) return '';
+    const div = document.createElement('div');
+    div.textContent = String(text);
+    return div.innerHTML;
+}
+
 // selectProvider function removed - now using standard dropdown instead of grid
 
 function togglePassword(btn) {
@@ -1381,11 +1389,11 @@ async function testCurrentProvider() {
             resultEl.innerHTML = msg;
         } else {
             resultEl.className = 'test-result error';
-            resultEl.innerHTML = '<i class="fa-solid fa-times-circle"></i> ' + (data.message || 'Connection failed');
+            resultEl.innerHTML = '<i class="fa-solid fa-times-circle"></i> ' + escapeHtml(data.message || 'Connection failed');
         }
     } catch (e) {
         resultEl.className = 'test-result error';
-        resultEl.innerHTML = '<i class="fa-solid fa-times-circle"></i> Error: ' + e.message;
+        resultEl.innerHTML = '<i class="fa-solid fa-times-circle"></i> Error: ' + escapeHtml(e.message);
     }
 }
 </script>

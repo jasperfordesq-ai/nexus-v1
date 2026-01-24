@@ -944,6 +944,14 @@ else {
 <script>
 console.log('Newsletter form.php script loaded - v2025-12-31');
 
+// Security: HTML escape function to prevent XSS
+function escapeHtmlPreview(text) {
+    if (text === null || text === undefined) return '';
+    const div = document.createElement('div');
+    div.textContent = String(text);
+    return div.innerHTML;
+}
+
 // ============================================
 // SEND TIME OPTIMIZATION
 // ============================================
@@ -1492,11 +1500,11 @@ function loadClientPreview(client) {
                     frame.style.height = '600px';
                 }
             } else {
-                frame.contentDocument.body.innerHTML = '<div style="padding: 20px; color: #dc2626;">Error loading preview: ' + (data.error || 'Unknown error') + '</div>';
+                frame.contentDocument.body.innerHTML = '<div style="padding: 20px; color: #dc2626;">Error loading preview: ' + escapeHtmlPreview(data.error || 'Unknown error') + '</div>';
             }
         })
         .catch(function(err) {
-            frame.contentDocument.body.innerHTML = '<div style="padding: 20px; color: #dc2626;">Error loading preview: ' + err.message + '</div>';
+            frame.contentDocument.body.innerHTML = '<div style="padding: 20px; color: #dc2626;">Error loading preview: ' + escapeHtmlPreview(err.message) + '</div>';
         });
     <?php else: ?>
     // For new newsletters, show a message that they need to save first
