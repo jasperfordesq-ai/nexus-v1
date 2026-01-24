@@ -458,3 +458,146 @@
 .report-bibliography-list li {
     margin-bottom: var(--space-3);
 }
+
+/* ========================================
+   Progress Bars (Age Bands, etc.)
+   ======================================== */
+
+.report-progress-container {
+    background: var(--color-gray-50);
+    padding: var(--space-4);
+    border-radius: var(--radius-lg);
+    margin: var(--space-5) 0;
+}
+
+.report-progress-title {
+    text-align: center;
+    margin: 0 0 var(--space-4);
+    font-weight: 600;
+}
+
+.report-progress-item {
+    margin-bottom: var(--space-4);
+}
+
+.report-progress-item:last-child {
+    margin-bottom: 0;
+}
+
+.report-progress-label {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--space-2);
+    font-size: 0.95rem;
+}
+
+.report-progress-value {
+    font-weight: 700;
+}
+
+.report-progress-bar {
+    background: var(--color-gray-200);
+    height: 10px;
+    border-radius: 5px;
+    overflow: hidden;
+}
+
+.report-progress-fill {
+    height: 100%;
+    border-radius: 5px;
+    transition: width 0.3s ease;
+}
+
+.report-progress-fill--primary {
+    background: var(--skin-primary, var(--color-primary-500));
+}
+
+.report-progress-fill--cyan {
+    background: var(--color-cyan-500);
+}
+
+.report-progress-fill--purple {
+    background: var(--color-purple-500);
+}
+
+/* ========================================
+   SROI Hero Section (Gradient)
+   ======================================== */
+
+.report-sroi-hero {
+    background: linear-gradient(135deg, var(--skin-primary, var(--color-primary-600)), var(--color-purple-800));
+    color: var(--color-white);
+    border-radius: var(--radius-xl);
+    padding: var(--space-8);
+}
+
+.report-sroi-hero h2 {
+    color: var(--color-white);
+    margin-top: 0;
+    border-bottom: 2px solid var(--color-white-alpha-20);
+    padding-bottom: var(--space-4);
+    margin-bottom: var(--space-5);
+}
+
+.report-sroi-hero h3 {
+    color: var(--color-white-alpha-90);
+    margin-top: var(--space-8);
+}
+
+.report-sroi-hero p {
+    color: var(--color-white-alpha-90);
+}
+
+.report-sroi-result {
+    text-align: center;
+    padding: var(--space-5);
+}
+
+.report-sroi-result__label {
+    font-size: 1.2rem;
+    opacity: 0.9;
+    margin: 0 0 var(--space-2);
+}
+
+.report-sroi-result__value {
+    font-size: 5rem;
+    font-weight: 700;
+    line-height: 1;
+    margin: 0;
+}
+
+.report-sroi-result__desc {
+    font-size: 1.2rem;
+    opacity: 0.9;
+    margin: var(--space-2) 0 0;
+}
+
+.report-sroi-result__note {
+    margin-top: var(--space-5);
+    font-style: italic;
+    opacity: 0.8;
+}
+
+/* Report Table Styling */
+.report-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: var(--space-8) 0;
+}
+
+.report-table th,
+.report-table td {
+    padding: var(--space-3);
+    text-align: left;
+    border-bottom: 1px solid var(--color-border);
+}
+
+.report-table thead tr {
+    background: var(--skin-primary, var(--color-primary-500));
+    color: var(--color-white);
+}
+
+.report-table tbody td:last-child {
+    font-weight: 700;
+}
