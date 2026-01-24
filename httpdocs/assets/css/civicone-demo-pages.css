@@ -461,4 +461,370 @@
     .demo-stat-card__value {
         font-size: 2.5rem;
     }
+
+    .demo-feature-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* ========================================
+   Feature Grid & Cards (council case study)
+   ======================================== */
+
+.demo-section {
+    margin-top: var(--space-10);
+}
+
+.demo-feature-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: var(--space-5);
+    margin-top: var(--space-8);
+}
+
+.demo-feature-card {
+    background: var(--color-gray-50);
+    padding: var(--space-6);
+    border-radius: var(--radius-lg);
+    border-left: 4px solid var(--skin-primary, var(--color-primary-500));
+}
+
+[data-theme="dark"] .demo-feature-card {
+    background: var(--color-gray-800);
+}
+
+.demo-feature-card strong {
+    display: block;
+    font-size: 1.1rem;
+    color: var(--color-text-primary);
+    margin-bottom: var(--space-2);
+}
+
+.demo-feature-card p {
+    font-size: 0.95rem;
+    color: var(--color-text-secondary);
+    line-height: 1.6;
+    margin: 0;
+}
+
+/* Feature Image (for case study diagrams) */
+.demo-feature-image {
+    width: 100%;
+    border-radius: var(--radius-lg);
+    box-shadow: 0 4px 6px -1px var(--color-black-alpha-10);
+}
+
+.demo-image-caption {
+    text-align: center;
+    font-size: 0.85rem;
+    color: var(--color-text-muted);
+    margin-top: var(--space-3);
+}
+
+/* ========================================
+   Header Variants
+   ======================================== */
+
+.demo-header--bordered {
+    border-bottom: 1px solid var(--color-border);
+    padding-bottom: var(--space-5);
+}
+
+/* Badge Labels */
+.demo-badge {
+    display: inline-block;
+    padding: var(--space-1) var(--space-3);
+    border-radius: var(--radius-full);
+    font-weight: 600;
+    font-size: 0.9rem;
+}
+
+.demo-badge--blue {
+    background: var(--color-blue-50);
+    color: var(--skin-primary, var(--color-govuk-blue));
+}
+
+[data-theme="dark"] .demo-badge--blue {
+    background: var(--color-blue-900);
+    color: var(--color-blue-300);
+}
+
+/* ========================================
+   Sidebar Layout (2fr 1fr grid)
+   ======================================== */
+
+.demo-sidebar-layout {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: var(--space-10);
+}
+
+@media (max-width: 768px) {
+    .demo-sidebar-layout {
+        grid-template-columns: 1fr;
+    }
+}
+
+.demo-sidebar-layout__main {
+    /* Main content column */
+}
+
+.demo-text-body--intro {
+    margin-bottom: var(--space-8);
+}
+
+/* Sidebar Card */
+.demo-sidebar {
+    background: var(--color-gray-50);
+    padding: var(--space-6);
+    border-radius: var(--radius-xl);
+    height: fit-content;
+    border: 1px solid var(--color-border);
+}
+
+[data-theme="dark"] .demo-sidebar {
+    background: var(--color-gray-800);
+}
+
+.demo-sidebar__title {
+    margin: 0 0 var(--space-4);
+    color: var(--color-govuk-blue, #002d72);
+    font-size: 1.1rem;
+}
+
+[data-theme="dark"] .demo-sidebar__title {
+    color: var(--color-blue-300);
+}
+
+.demo-sidebar__list {
+    padding-left: var(--space-5);
+    line-height: 1.8;
+    color: var(--color-text-secondary);
+    margin: 0 0 var(--space-5);
+}
+
+.demo-sidebar__btn {
+    display: block;
+    text-align: center;
+    padding: var(--space-2) var(--space-4);
+    background: var(--color-white);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    text-decoration: none;
+    font-weight: 600;
+    color: var(--color-text-primary);
+    transition: background 0.2s;
+}
+
+.demo-sidebar__btn:hover {
+    background: var(--color-gray-100);
+}
+
+.demo-sidebar__btn:focus {
+    outline: 3px solid var(--color-govuk-yellow, #ffdd00);
+    outline-offset: 2px;
+}
+
+[data-theme="dark"] .demo-sidebar__btn {
+    background: var(--color-gray-700);
+    border-color: var(--color-gray-600);
+}
+
+/* ========================================
+   Checklist Component (compliance page)
+   ======================================== */
+
+.demo-checklist {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.demo-checklist__item {
+    display: flex;
+    gap: var(--space-3);
+    margin-bottom: var(--space-8);
+}
+
+.demo-checklist__icon {
+    flex-shrink: 0;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--color-green-50);
+    color: var(--color-green-700);
+    font-weight: bold;
+}
+
+[data-theme="dark"] .demo-checklist__icon {
+    background: var(--color-green-900);
+    color: var(--color-green-300);
+}
+
+.demo-checklist__content h3 {
+    margin: 0 0 var(--space-2);
+    font-size: 1.1rem;
+    color: var(--color-text-primary);
+}
+
+.demo-checklist__content p {
+    margin: 0;
+    color: var(--color-text-secondary);
+    line-height: 1.6;
+}
+
+/* ========================================
+   Intro Box (demo home hero)
+   ======================================== */
+
+.demo-intro-box {
+    background: var(--color-blue-50);
+    border-radius: var(--radius-xl);
+    padding: var(--space-10);
+    margin-bottom: var(--space-10);
+    border-left: 6px solid var(--color-govuk-blue, #002d72);
+}
+
+[data-theme="dark"] .demo-intro-box {
+    background: var(--color-blue-900);
+}
+
+.demo-intro-box__title {
+    color: var(--color-govuk-blue, #002d72);
+    font-size: 2.5rem;
+    margin: 0 0 var(--space-5);
+}
+
+[data-theme="dark"] .demo-intro-box__title {
+    color: var(--color-blue-300);
+}
+
+.demo-intro-box__lead {
+    font-size: 1.2rem;
+    line-height: 1.6;
+    color: var(--color-text-primary);
+    max-width: 800px;
+    margin: 0;
+}
+
+.demo-intro-box__text {
+    font-size: 1.1rem;
+    line-height: 1.6;
+    color: var(--color-text-secondary);
+    max-width: 800px;
+    margin: var(--space-5) 0 0;
+}
+
+/* ========================================
+   Pillars Grid (demo home cards)
+   ======================================== */
+
+.demo-pillars {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: var(--space-8);
+    margin-bottom: var(--space-12);
+}
+
+.demo-pillar {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    padding: var(--space-8);
+    border-top: 4px solid;
+}
+
+.demo-pillar--green {
+    border-top-color: var(--color-emerald-600);
+}
+
+.demo-pillar--navy {
+    border-top-color: var(--color-govuk-blue, #002d72);
+}
+
+.demo-pillar--amber {
+    border-top-color: var(--color-amber-600);
+}
+
+.demo-pillar__title {
+    margin: 0 0 var(--space-4);
+    font-size: 1.5rem;
+}
+
+.demo-pillar__title--green {
+    color: var(--color-emerald-600);
+}
+
+.demo-pillar__title--navy {
+    color: var(--color-govuk-blue, #002d72);
+}
+
+.demo-pillar__title--amber {
+    color: var(--color-amber-600);
+}
+
+[data-theme="dark"] .demo-pillar__title--navy {
+    color: var(--color-blue-400);
+}
+
+.demo-pillar__text {
+    color: var(--color-text-secondary);
+    line-height: 1.6;
+    margin: 0 0 var(--space-5);
+}
+
+/* Amber button variant */
+.demo-cta__btn--amber {
+    background-color: var(--color-amber-600);
+    color: var(--color-white);
+}
+
+/* ========================================
+   Footer CTA Box
+   ======================================== */
+
+.demo-footer-cta {
+    text-align: center;
+    padding: var(--space-10);
+    background: var(--color-gray-50);
+    border-radius: var(--radius-xl);
+    margin-top: var(--space-12);
+}
+
+[data-theme="dark"] .demo-footer-cta {
+    background: var(--color-gray-800);
+}
+
+.demo-footer-cta__title {
+    margin: 0 0 var(--space-2);
+    color: var(--color-text-primary);
+}
+
+.demo-footer-cta__text {
+    color: var(--color-text-secondary);
+    margin: 0 0 var(--space-5);
+}
+
+.demo-footer-cta__link {
+    color: var(--color-govuk-blue, #002d72);
+    font-weight: 600;
+    text-decoration: underline;
+}
+
+.demo-footer-cta__link:hover {
+    text-decoration: none;
+}
+
+.demo-footer-cta__link:focus {
+    outline: 3px solid var(--color-govuk-yellow, #ffdd00);
+    outline-offset: 2px;
+    background: var(--color-govuk-yellow, #ffdd00);
+    color: var(--color-black);
+}
+
+[data-theme="dark"] .demo-footer-cta__link {
+    color: var(--color-blue-400);
 }
