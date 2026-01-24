@@ -270,6 +270,14 @@ $canEdit = ($isOwner || $isAdmin);
 <!-- JavaScript for Like/Comment Functionality - Using Master Platform Social Media Module -->
 <script>
 (function() {
+    // Security: HTML escape function to prevent XSS
+    function escapeHtml(text) {
+        if (text === null || text === undefined) return '';
+        const div = document.createElement('div');
+        div.textContent = String(text);
+        return div.innerHTML;
+    }
+
     const listingId = <?= $listingId ?>;
     const isLoggedIn = <?= $isLoggedIn ? 'true' : 'false' ?>;
     let isLiked = <?= $isLiked ? 'true' : 'false' ?>;
@@ -392,7 +400,7 @@ $canEdit = ($isOwner || $isAdmin);
             const data = await response.json();
 
             if (data.error) {
-                list.innerHTML = '<p class="listing-loading-text">Failed to load comments: ' + data.error + '</p>';
+                list.innerHTML = '<p class="listing-loading-text">Failed to load comments: ' + escapeHtml(data.error) + '</p>';
                 return;
             }
 

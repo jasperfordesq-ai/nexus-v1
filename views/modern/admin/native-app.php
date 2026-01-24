@@ -980,6 +980,14 @@ textarea.form-control {
 </style>
 
 <script>
+// Security: HTML escape function to prevent XSS
+function escapeHtml(text) {
+    if (text === null || text === undefined) return '';
+    const div = document.createElement('div');
+    div.textContent = String(text);
+    return div.innerHTML;
+}
+
 document.getElementById('testPushForm').addEventListener('submit', async function(e) {
     e.preventDefault();
 
@@ -1002,12 +1010,12 @@ document.getElementById('testPushForm').addEventListener('submit', async functio
         const result = await response.json();
 
         if (result.success) {
-            resultDiv.innerHTML = '<div class="test-result success"><i class="fa-solid fa-check-circle"></i> ' + result.message + '</div>';
+            resultDiv.innerHTML = '<div class="test-result success"><i class="fa-solid fa-check-circle"></i> ' + escapeHtml(result.message) + '</div>';
         } else {
-            resultDiv.innerHTML = '<div class="test-result error"><i class="fa-solid fa-times-circle"></i> ' + result.message + '</div>';
+            resultDiv.innerHTML = '<div class="test-result error"><i class="fa-solid fa-times-circle"></i> ' + escapeHtml(result.message) + '</div>';
         }
     } catch (error) {
-        resultDiv.innerHTML = '<div class="test-result error"><i class="fa-solid fa-times-circle"></i> Network error: ' + error.message + '</div>';
+        resultDiv.innerHTML = '<div class="test-result error"><i class="fa-solid fa-times-circle"></i> Network error: ' + escapeHtml(error.message) + '</div>';
     }
 
     btn.disabled = false;
