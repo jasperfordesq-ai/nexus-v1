@@ -44,16 +44,16 @@
         });
     });
 
-    // Button Press States
+    // Button Press States - using classList for GOV.UK compliance
     document.querySelectorAll('.glass-pill-btn, button').forEach(btn => {
         btn.addEventListener('pointerdown', function() {
-            this.style.transform = 'scale(0.96)';
+            this.classList.add('btn-pressed');
         });
         btn.addEventListener('pointerup', function() {
-            this.style.transform = '';
+            this.classList.remove('btn-pressed');
         });
         btn.addEventListener('pointerleave', function() {
-            this.style.transform = '';
+            this.classList.remove('btn-pressed');
         });
     });
 

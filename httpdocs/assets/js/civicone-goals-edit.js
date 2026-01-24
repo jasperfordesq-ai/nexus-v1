@@ -33,15 +33,15 @@ document.querySelectorAll('form').forEach(form => {
     });
 });
 
-// Button Touch Feedback
+// Button Touch Feedback - using classList for GOV.UK compliance
 document.querySelectorAll('.holo-btn').forEach(btn => {
     btn.addEventListener('pointerdown', function() {
-        this.style.transform = 'scale(0.97)';
+        this.classList.add('btn-pressed-sm');
     });
     btn.addEventListener('pointerup', function() {
-        this.style.transform = '';
+        this.classList.remove('btn-pressed-sm');
     });
     btn.addEventListener('pointerleave', function() {
-        this.style.transform = '';
+        this.classList.remove('btn-pressed-sm');
     });
 });

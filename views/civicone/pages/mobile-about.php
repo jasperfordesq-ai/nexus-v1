@@ -213,14 +213,14 @@ $appIcons = [
     <script>
         // Theme Toggle with smooth transition
         function toggleTheme() {
-            const html = document.documentElement;
-            const icon = document.getElementById('themeIcon');
-            const isDark = html.getAttribute('data-theme') === 'dark';
+            var html = document.documentElement;
+            var icon = document.getElementById('themeIcon');
+            var isDark = html.getAttribute('data-theme') === 'dark';
 
-            // Animate icon
-            icon.style.transform = 'rotate(360deg) scale(0)';
+            // Animate icon - use CSS class
+            icon.classList.add('theme-icon--rotating');
 
-            setTimeout(() => {
+            setTimeout(function() {
                 if (isDark) {
                     html.setAttribute('data-theme', 'light');
                     icon.classList.remove('fa-sun');
@@ -235,7 +235,7 @@ $appIcons = [
                     document.querySelector('meta[name="theme-color"]').content = '#0f172a';
                 }
 
-                icon.style.transform = 'rotate(0deg) scale(1)';
+                icon.classList.remove('theme-icon--rotating');
 
                 // Update icon glow shadows based on new theme
                 updateIconGlows(!isDark);
@@ -293,11 +293,7 @@ $appIcons = [
             }
         }, { passive: false });
 
-        // Smooth scroll container
-        const gridContainer = document.querySelector('.app-grid-container');
-        if (gridContainer) {
-            gridContainer.style.scrollBehavior = 'smooth';
-        }
+        // Smooth scroll container - handled by CSS
     </script>
 </body>
 </html>

@@ -97,9 +97,9 @@ async function sendMessageWithStreaming(message) {
     // Create abort controller for this request
     currentAbortController = new AbortController();
 
-    // Show stop button, hide send button
-    document.getElementById('sendBtn').style.display = 'none';
-    document.getElementById('stopBtn').style.display = 'flex';
+    // Show stop button, hide send button - using classList for GOV.UK compliance
+    document.getElementById('sendBtn').classList.add('hidden');
+    document.getElementById('stopBtn').classList.remove('hidden');
 
     // Create message bubble for streaming response
     const container = document.getElementById('messagesContainer');
@@ -200,9 +200,9 @@ async function sendMessageWithStreaming(message) {
             throw error;
         }
     } finally {
-        // Reset buttons
-        document.getElementById('sendBtn').style.display = 'flex';
-        document.getElementById('stopBtn').style.display = 'none';
+        // Reset buttons - using classList for GOV.UK compliance
+        document.getElementById('sendBtn').classList.remove('hidden');
+        document.getElementById('stopBtn').classList.add('hidden');
         currentAbortController = null;
     }
 }

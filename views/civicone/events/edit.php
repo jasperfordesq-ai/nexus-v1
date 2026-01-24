@@ -145,7 +145,7 @@ if (!empty($event['sdg_goals'])) {
                     <div class="sdg-grid">
                         <?php foreach ($sdgs as $id => $goal): ?>
                             <?php $isChecked = in_array($id, $selectedSDGs); ?>
-                            <label class="glass-sdg-card <?= $isChecked ? 'selected' : '' ?>" style="color: <?= $goal['color'] ?>;">
+                            <label class="glass-sdg-card <?= $isChecked ? 'selected' : '' ?>" style="--sdg-color: <?= $goal['color'] ?>;">
                                 <input type="checkbox" name="sdg_goals[]" value="<?= $id ?>" <?= $isChecked ? 'checked' : '' ?> class="hidden" onchange="toggleSDGClass(this)">
                                 <span class="sdg-card-icon"><?= $goal['icon'] ?></span>
                                 <span class="sdg-card-label"><?= $goal['label'] ?></span>

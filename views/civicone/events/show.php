@@ -21,7 +21,7 @@ require dirname(__DIR__, 2) . '/layouts/civicone/partials/breadcrumb.php';
 ?>
 
 <!-- Action Bar -->
-<div class="civic-action-bar" style="margin-bottom: 24px;">
+<div class="civic-action-bar civic-action-bar--spaced">
     <a href="<?= $basePath ?>/events" class="civic-btn civic-btn--outline">
         <span class="dashicons dashicons-arrow-left-alt2" aria-hidden="true"></span>
         Back to Events
@@ -93,7 +93,7 @@ require dirname(__DIR__, 2) . '/layouts/civicone/partials/breadcrumb.php';
 
             <!-- Attendees -->
             <?php if (!empty($attendees)): ?>
-                <section class="civic-card" style="margin-top: 24px;">
+                <section class="civic-card civic-card--section">
                     <h3 class="civic-section-subtitle">
                         <span class="dashicons dashicons-groups" aria-hidden="true"></span>
                         Going (<?= count($attendees) ?>)
@@ -145,8 +145,8 @@ require dirname(__DIR__, 2) . '/layouts/civicone/partials/breadcrumb.php';
                 <?php endif; ?>
 
                 <?php if (!empty($canInvite)): ?>
-                    <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid var(--civic-border);">
-                        <a href="<?= $basePath ?>/events/invite/<?= $event['id'] ?>" class="civic-btn" style="width: 100%;">
+                    <div class="civic-rsvp-invite">
+                        <a href="<?= $basePath ?>/events/invite/<?= $event['id'] ?>" class="civic-btn civic-btn--full-width">
                             <span class="dashicons dashicons-email" aria-hidden="true"></span>
                             Invite Members
                         </a>
@@ -155,7 +155,7 @@ require dirname(__DIR__, 2) . '/layouts/civicone/partials/breadcrumb.php';
             </div>
 
             <!-- Event Host -->
-            <div class="civic-card" style="margin-top: 16px;">
+            <div class="civic-card civic-card--host">
                 <h3 class="civic-section-subtitle">
                     <span class="dashicons dashicons-admin-users" aria-hidden="true"></span>
                     Event Host

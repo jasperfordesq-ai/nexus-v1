@@ -89,7 +89,7 @@ require __DIR__ . '/../components/govuk/tag.php';
                 </ul>
 
                 <!-- Empty State -->
-                <div class="civicone-empty-state" id="empty-state" style="<?= !empty($members) ? 'display: none;' : '' ?>">
+                <div class="civicone-empty-state<?= !empty($members) ? ' hidden' : '' ?>" id="empty-state">
                     <svg class="civicone-empty-icon" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
                         <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
                         <circle cx="9" cy="7" r="4"></circle>

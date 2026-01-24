@@ -7,28 +7,10 @@
  */
 
 // Skip to content link (include in header)
+// Styles in civicone-shared-accessibility-helpers.css
 function renderSkipLink() {
     ?>
     <a href="#main-content" class="skip-link">Skip to main content</a>
-    <style>
-    .skip-link {
-        position: absolute;
-        top: -40px;
-        left: 0;
-        background: #000;
-        color: #fff;
-        padding: 8px 16px;
-        text-decoration: none;
-        z-index: 10000;
-        border-radius: 0 0 4px 0;
-        font-weight: 600;
-    }
-    .skip-link:focus {
-        top: 0;
-        outline: 3px solid #6366f1;
-        outline-offset: 2px;
-    }
-    </style>
     <?php
 }
 

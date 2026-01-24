@@ -2468,6 +2468,11 @@
   margin-right: var(--space-1);
 }
 
+/* Small icon size - used by social_interactions.php */
+.civic-icon-sm {
+  font-size: 16px;
+}
+
 /* Pending state for async operations - used by civicone-dashboard.js */
 .civic-item--pending {
   opacity: 0.5;
@@ -2507,4 +2512,97 @@
     background-color: var(--color-primary-50);
     box-shadow: 0 4px 15px var(--color-primary-100);
   }
+}
+
+/* Alert with margin - used by compose/index.php */
+.md-alert--margin {
+  margin: 16px;
+}
+
+/* Link styled as button - used by compose/index.php */
+.md-link-btn {
+  text-decoration: none;
+  display: inline-flex;
+}
+
+/* Avatar without text fallback - used by compose/index.php */
+.md-avatar--no-text {
+  font-size: 0;
+}
+
+/* Muted/disabled appearance - used by compose/index.php */
+.md-muted {
+  opacity: 0.6;
+}
+
+/* Location error styling - used by compose/index.php */
+.md-location-error {
+  color: var(--md-danger, var(--color-red-500));
+}
+
+.md-location-error-icon {
+  background: var(--md-danger-light, var(--color-red-100));
+  color: var(--md-danger, var(--color-red-500));
+}
+
+/* ==========================================
+   Button Press Animation Classes
+   GOV.UK compliant - replaces inline style.transform
+   ========================================== */
+
+/* Standard button press - 96% scale */
+.btn-pressed {
+  transform: scale(0.96);
+}
+
+/* Small button press - 97% scale */
+.btn-pressed-sm {
+  transform: scale(0.97);
+}
+
+/* Subtle button press - 98% scale */
+.btn-pressed-xs {
+  transform: scale(0.98);
+}
+
+/* ==========================================
+   Body State Classes
+   ========================================== */
+
+/* Prevent body scroll when modal is open */
+.body-no-scroll {
+  overflow: hidden;
+}
+
+/* ==========================================
+   Fade Animation Classes
+   ========================================== */
+
+/* Fade out element */
+.fade-out {
+  opacity: 0;
+  transition: opacity 0.5s ease;
+}
+
+/* Fade in element */
+.fade-in {
+  opacity: 1;
+  transition: opacity 0.5s ease;
+}
+
+/* Section visible (for accordion/toggle patterns) */
+.section-visible {
+  display: block;
+}
+
+/* ==========================================
+   Button Disabled State
+   ========================================== */
+
+/* Disabled button styling via :disabled pseudo-class */
+button:disabled,
+input[type="submit"]:disabled,
+.btn-disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
