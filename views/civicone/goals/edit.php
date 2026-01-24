@@ -1,100 +1,110 @@
 <?php
-// Goal Edit View - Modern Holographic Glassmorphism Edition
-require __DIR__ . '/../../layouts/civicone/header.php';
+/**
+ * CivicOne View: Edit Goal
+ * GOV.UK Design System Compliant (WCAG 2.1 AA)
+ */
+$pageTitle = 'Edit Goal';
+require dirname(__DIR__, 2) . '/layouts/civicone/header.php';
+$basePath = \Nexus\Core\TenantContext::getBasePath();
 ?>
 
-<!-- Offline Banner -->
-<div class="holo-offline-banner" id="offlineBanner">
-    <i class="fa-solid fa-wifi-slash"></i>
-    <span>No internet connection</span>
-</div>
+<nav class="govuk-breadcrumbs govuk-!-margin-bottom-6" aria-label="Breadcrumb">
+    <ol class="govuk-breadcrumbs__list">
+        <li class="govuk-breadcrumbs__list-item">
+            <a class="govuk-breadcrumbs__link" href="<?= $basePath ?>">Home</a>
+        </li>
+        <li class="govuk-breadcrumbs__list-item">
+            <a class="govuk-breadcrumbs__link" href="<?= $basePath ?>/goals">Goals</a>
+        </li>
+        <li class="govuk-breadcrumbs__list-item">
+            <a class="govuk-breadcrumbs__link" href="<?= $basePath ?>/goals/<?= $goal['id'] ?>"><?= htmlspecialchars($goal['title']) ?></a>
+        </li>
+        <li class="govuk-breadcrumbs__list-item" aria-current="page">Edit</li>
+    </ol>
+</nav>
 
-<!-- Goals Edit CSS -->
-<link rel="stylesheet" href="<?= NexusCoreTenantContext::getBasePath() ?>/assets/css/purged/civicone-goals-edit.min.css">
+<a href="<?= $basePath ?>/goals/<?= $goal['id'] ?>" class="govuk-back-link govuk-!-margin-bottom-6">Back to Goal</a>
 
-<div class="holo-goal-page">
-    <!-- Floating Orbs -->
-    <div class="holo-orb holo-orb-1"></div>
-    <div class="holo-orb holo-orb-2"></div>
-    <div class="holo-orb holo-orb-3"></div>
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
 
-    <div class="holo-glass-card">
-        <div class="holo-header">
-            <div class="holo-header-icon">
-                <i class="fa-solid fa-pen-to-square"></i>
-            </div>
-            <h1 class="holo-title">Edit Goal</h1>
-            <p class="holo-subtitle">Update your commitment.</p>
-        </div>
+        <h1 class="govuk-heading-xl">
+            <i class="fa-solid fa-pen-to-square govuk-!-margin-right-2" aria-hidden="true"></i>
+            Edit Goal
+        </h1>
+        <p class="govuk-body-l govuk-!-margin-bottom-6">Update your commitment.</p>
 
-        <form action="<?= \Nexus\Core\TenantContext::getBasePath() ?>/goals/<?= $goal['id'] ?>/update" method="POST">
+        <form action="<?= $basePath ?>/goals/<?= $goal['id'] ?>/update" method="POST">
             <?= \Nexus\Core\Csrf::input() ?>
 
             <!-- Title -->
-            <div class="holo-form-group">
-                <label class="holo-label">Goal Title</label>
-                <input type="text" name="title" class="holo-input" required
-                       value="<?= htmlspecialchars($goal['title']) ?>">
+            <div class="govuk-form-group">
+                <label class="govuk-label" for="title">Goal Title</label>
+                <input class="govuk-input" type="text" name="title" id="title" value="<?= htmlspecialchars($goal['title']) ?>" required>
             </div>
 
             <!-- Description -->
-            <div class="holo-form-group">
-                <label class="holo-label">Description</label>
-                <textarea name="description" class="holo-input" rows="4" required><?= htmlspecialchars($goal['description']) ?></textarea>
+            <div class="govuk-form-group">
+                <label class="govuk-label" for="description">Description</label>
+                <textarea class="govuk-textarea" name="description" id="description" rows="4" required><?= htmlspecialchars($goal['description']) ?></textarea>
             </div>
 
             <!-- Target Date -->
-            <div class="holo-form-group">
-                <label class="holo-label">Target Date</label>
-                <input type="date" name="deadline" class="holo-input" value="<?= $goal['deadline'] ?>">
+            <div class="govuk-form-group">
+                <label class="govuk-label" for="deadline">
+                    Target Date <span class="govuk-hint govuk-!-display-inline">(optional)</span>
+                </label>
+                <input class="govuk-input govuk-input--width-10" type="date" name="deadline" id="deadline" value="<?= $goal['deadline'] ?>">
             </div>
 
-            <!-- Goal Buddy Card -->
-            <div class="holo-buddy-card">
-                <label class="holo-buddy-label">
-                    <input type="checkbox" name="is_public" value="1" class="holo-checkbox" <?= $goal['is_public'] ? 'checked' : '' ?>>
-                    <div class="holo-buddy-content">
-                        <div class="holo-buddy-title">
-                            <i class="fa-solid fa-user-group"></i>
-                            Public Goal
-                        </div>
-                        <div class="holo-buddy-desc">
-                            Allow others to see this goal and offer to be your Goal Buddy.
+            <!-- Public Goal Checkbox -->
+            <div class="govuk-form-group">
+                <fieldset class="govuk-fieldset">
+                    <legend class="govuk-fieldset__legend govuk-fieldset__legend--s">Visibility</legend>
+                    <div class="govuk-checkboxes" data-module="govuk-checkboxes">
+                        <div class="govuk-checkboxes__item">
+                            <input class="govuk-checkboxes__input" id="is_public" name="is_public" type="checkbox" value="1" <?= $goal['is_public'] ? 'checked' : '' ?>>
+                            <label class="govuk-label govuk-checkboxes__label" for="is_public">
+                                <strong>Make this goal public</strong>
+                                <span class="govuk-hint govuk-!-margin-bottom-0">Allow others to see this goal and offer to be your accountability partner.</span>
+                            </label>
                         </div>
                     </div>
-                </label>
+                </fieldset>
             </div>
 
-            <div class="holo-actions">
-                <button type="submit" class="holo-btn holo-btn-primary">
-                    <i class="fa-solid fa-check"></i>
+            <div class="govuk-button-group">
+                <button type="submit" class="govuk-button" data-module="govuk-button">
+                    <i class="fa-solid fa-check govuk-!-margin-right-1" aria-hidden="true"></i>
                     Save Changes
                 </button>
-                <a href="<?= \Nexus\Core\TenantContext::getBasePath() ?>/goals/<?= $goal['id'] ?>" class="holo-btn holo-btn-secondary">
-                    Cancel
-                </a>
+                <a href="<?= $basePath ?>/goals/<?= $goal['id'] ?>" class="govuk-link">Cancel</a>
             </div>
         </form>
 
         <!-- Danger Zone -->
-        <div class="holo-danger-zone">
-            <div class="holo-danger-label">
-                <i class="fa-solid fa-triangle-exclamation"></i>
+        <hr class="govuk-section-break govuk-section-break--xl govuk-section-break--visible">
+
+        <div class="govuk-!-padding-6" style="border: 2px solid #d4351c; background: #fef7f7;">
+            <h2 class="govuk-heading-m" style="color: #d4351c;">
+                <i class="fa-solid fa-triangle-exclamation govuk-!-margin-right-1" aria-hidden="true"></i>
                 Danger Zone
-            </div>
-            <form action="<?= \Nexus\Core\TenantContext::getBasePath() ?>/goals/<?= $goal['id'] ?>/delete" method="POST"
+            </h2>
+            <p class="govuk-body">
+                Permanently delete this goal. This action cannot be undone.
+            </p>
+
+            <form action="<?= $basePath ?>/goals/<?= $goal['id'] ?>/delete" method="POST"
                   onsubmit="return confirm('Are you sure you want to delete this goal? This action cannot be undone.');">
                 <?= \Nexus\Core\Csrf::input() ?>
-                <button type="submit" class="holo-btn holo-btn-danger">
-                    <i class="fa-solid fa-trash-can"></i>
+                <button type="submit" class="govuk-button govuk-button--warning" data-module="govuk-button">
+                    <i class="fa-solid fa-trash-can govuk-!-margin-right-1" aria-hidden="true"></i>
                     Delete Goal
                 </button>
             </form>
         </div>
+
     </div>
 </div>
 
-<!-- Goals Edit JavaScript -->
-<script src="<?= NexusCoreTenantContext::getBasePath() ?>/assets/js/civicone-goals-edit.min.js" defer></script>
-
-<?php require __DIR__ . '/../../layouts/civicone/footer.php'; ?>
+<?php require dirname(__DIR__, 2) . '/layouts/civicone/footer.php'; ?>

@@ -35,4 +35,4 @@ if (class_exists('\Nexus\Core\TenantContext')) {
 }
 ?>
 <!DOCTYPE html>
-<html lang="en" data-theme="<?= $mode ?>" data-layout="civicone">
+<html lang="en" class="govuk-template" data-theme="<?= $mode ?>" data-layout="civicone">

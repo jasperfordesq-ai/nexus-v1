@@ -1,65 +1,81 @@
 <?php
-// CivicOne View: Message Thread (Chat) - WCAG 2.1 AA Compliant
-// CSS extracted to civicone-messages.css
+/**
+ * CivicOne View: Message Thread (Chat)
+ * GOV.UK Design System Compliant (WCAG 2.1 AA)
+ */
 $pageTitle = 'Chat with ' . $otherUser['name'];
 require dirname(__DIR__, 2) . '/layouts/civicone/header.php';
+
+$basePath = Nexus\Core\TenantContext::getBasePath();
 ?>
 
-<div class="civic-container">
+<nav class="govuk-breadcrumbs govuk-!-margin-bottom-6" aria-label="Breadcrumb">
+    <ol class="govuk-breadcrumbs__list">
+        <li class="govuk-breadcrumbs__list-item">
+            <a class="govuk-breadcrumbs__link" href="<?= $basePath ?>">Home</a>
+        </li>
+        <li class="govuk-breadcrumbs__list-item">
+            <a class="govuk-breadcrumbs__link" href="<?= $basePath ?>/messages">Messages</a>
+        </li>
+        <li class="govuk-breadcrumbs__list-item" aria-current="page"><?= htmlspecialchars($otherUser['name']) ?></li>
+    </ol>
+</nav>
 
-    <div class="civic-thread-header">
-        <h1>
-            <a href="<?= Nexus\Core\TenantContext::getBasePath() ?>/messages"
-               class="civic-thread-back"
-               aria-label="Back to inbox">&larr;</a>
+<div class="govuk-grid-row govuk-!-margin-bottom-4">
+    <div class="govuk-grid-column-two-thirds">
+        <h1 class="govuk-heading-xl govuk-!-margin-bottom-0">
+            <i class="fa-solid fa-comment govuk-!-margin-right-2" aria-hidden="true"></i>
             <?= htmlspecialchars($otherUser['name']) ?>
         </h1>
-        <a href="<?= Nexus\Core\TenantContext::getBasePath() ?>/messages" class="civic-btn civic-inbox-btn">Inbox</a>
     </div>
+    <div class="govuk-grid-column-one-third govuk-!-text-align-right">
+        <a href="<?= $basePath ?>/messages" class="govuk-button govuk-button--secondary" data-module="govuk-button">
+            <i class="fa-solid fa-inbox govuk-!-margin-right-1" aria-hidden="true"></i> Back to Inbox
+        </a>
+    </div>
+</div>
 
-    <div class="civic-card civic-chat-container" role="log" aria-label="Message conversation with <?= htmlspecialchars($otherUser['name']) ?>">
+<div class="govuk-!-padding-4 govuk-!-margin-bottom-6" style="border: 1px solid #b1b4b6;" role="log" aria-label="Message conversation with <?= htmlspecialchars($otherUser['name']) ?>">
 
-        <!-- Messages Area -->
-        <div id="chat-messages" class="civic-chat-messages">
-            <?php foreach ($messages as $msg):
-                $isMe = $msg['sender_id'] == $_SESSION['user_id'];
-                $wrapperClass = $isMe ? 'civic-chat-bubble-wrapper civic-chat-bubble-wrapper--sent' : 'civic-chat-bubble-wrapper civic-chat-bubble-wrapper--received';
-                $bubbleClass = $isMe ? 'civic-chat-bubble civic-chat-bubble--sent' : 'civic-chat-bubble civic-chat-bubble--received';
-            ?>
-                <div class="<?= $wrapperClass ?>">
-                    <div class="<?= $bubbleClass ?>">
-                        <div class="civic-chat-sender">
-                            <?= $isMe ? 'You' : htmlspecialchars($otherUser['name']) ?>
-                            <time class="civic-chat-time" datetime="<?= $msg['created_at'] ?>"><?= date('H:i', strtotime($msg['created_at'])) ?></time>
-                        </div>
-                        <div class="civic-chat-text">
-                            <?= nl2br(htmlspecialchars($msg['body'])) ?>
-                        </div>
-                    </div>
+    <!-- Messages Area -->
+    <div id="chat-messages" class="govuk-!-margin-bottom-4" style="max-height: 400px; overflow-y: auto;">
+        <?php foreach ($messages as $msg):
+            $isMe = $msg['sender_id'] == $_SESSION['user_id'];
+        ?>
+            <div class="govuk-!-margin-bottom-3" style="display: flex; justify-content: <?= $isMe ? 'flex-end' : 'flex-start' ?>;">
+                <div class="govuk-!-padding-3" style="max-width: 70%; background: <?= $isMe ? '#1d70b8' : '#f3f2f1' ?>; color: <?= $isMe ? 'white' : '#0b0c0c' ?>; border-radius: 4px;">
+                    <p class="govuk-body-s govuk-!-margin-bottom-1" style="<?= $isMe ? 'color: rgba(255,255,255,0.8);' : 'color: #505a5f;' ?>">
+                        <strong><?= $isMe ? 'You' : htmlspecialchars($otherUser['name']) ?></strong>
+                        <time datetime="<?= $msg['created_at'] ?>" class="govuk-!-margin-left-2"><?= date('H:i', strtotime($msg['created_at'])) ?></time>
+                    </p>
+                    <p class="govuk-body govuk-!-margin-bottom-0">
+                        <?= nl2br(htmlspecialchars($msg['body'])) ?>
+                    </p>
                 </div>
-            <?php endforeach; ?>
-        </div>
-
-        <!-- Reply Form -->
-        <div class="civic-chat-reply">
-            <form action="<?= Nexus\Core\TenantContext::getBasePath() ?>/messages/store" method="POST" class="civic-chat-reply-form">
-                <?= Nexus\Core\Csrf::input() ?>
-                <input type="hidden" name="receiver_id" value="<?= $otherUser['id'] ?>">
-
-                <label for="message-body" class="visually-hidden">Write a message</label>
-                <textarea name="body" id="message-body" rows="2" placeholder="Write a message..." required class="civic-input civic-chat-textarea"></textarea>
-                <button type="submit" class="civic-btn civic-chat-send">Send</button>
-            </form>
-        </div>
-
+            </div>
+        <?php endforeach; ?>
     </div>
+
+    <!-- Reply Form -->
+    <form action="<?= $basePath ?>/messages/store" method="POST">
+        <?= Nexus\Core\Csrf::input() ?>
+        <input type="hidden" name="receiver_id" value="<?= $otherUser['id'] ?>">
+
+        <div class="govuk-form-group">
+            <label for="message-body" class="govuk-label">Write a message</label>
+            <textarea name="body" id="message-body" rows="3" class="govuk-textarea" placeholder="Type your message here..." required></textarea>
+        </div>
+        <button type="submit" class="govuk-button" data-module="govuk-button">
+            <i class="fa-solid fa-paper-plane govuk-!-margin-right-1" aria-hidden="true"></i> Send
+        </button>
+    </form>
 
 </div>
 
 <!-- Scroll to bottom script -->
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        const chatBox = document.getElementById('chat-messages');
+        var chatBox = document.getElementById('chat-messages');
         chatBox.scrollTop = chatBox.scrollHeight;
     });
 </script>

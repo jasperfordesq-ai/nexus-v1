@@ -1,7 +1,7 @@
 <?php
 /**
  * Federation Review Form
- * CivicOne Theme - WCAG 2.1 AA Compliant
+ * GOV.UK Design System (WCAG 2.1 AA)
  */
 $pageTitle = $pageTitle ?? 'Leave a Review';
 $hideHero = true;
@@ -19,203 +19,223 @@ $transactionId = $transactionId ?? 0;
 
 $receiverName = htmlspecialchars($receiver['first_name'] ?? $receiver['name'] ?? 'Member');
 $receiverAvatar = $receiver['avatar_url'] ?? null;
-$fallbackAvatar = 'https://ui-avatars.com/api/?name=' . urlencode($receiverName) . '&background=00796B&color=fff&size=200';
+$fallbackAvatar = 'https://ui-avatars.com/api/?name=' . urlencode($receiverName) . '&background=1d70b8&color=fff&size=200';
 $amount = number_format((float)($transaction['amount'] ?? 0), 2);
 $description = htmlspecialchars($transaction['description'] ?? 'Time exchange');
 $completedAt = $transaction['completed_at'] ?? $transaction['created_at'] ?? null;
 ?>
 
-<!-- Offline Banner -->
-<div class="civic-fed-offline-banner" id="offlineBanner" role="alert" aria-live="polite">
-    <i class="fa-solid fa-wifi-slash" aria-hidden="true"></i>
-    <span>No internet connection</span>
-</div>
+<div class="govuk-width-container">
+    <!-- Offline Banner -->
+    <div class="govuk-notification-banner govuk-notification-banner--warning govuk-!-display-none" id="offlineBanner" role="alert" aria-live="polite" data-module="govuk-notification-banner">
+        <div class="govuk-notification-banner__content">
+            <p class="govuk-notification-banner__heading">
+                <i class="fa-solid fa-wifi-slash govuk-!-margin-right-2" aria-hidden="true"></i>
+                No internet connection
+            </p>
+        </div>
+    </div>
 
-<div class="civic-container">
-    <!-- Back Button -->
-    <a href="<?= $basePath ?>/federation/transactions" class="civic-fed-back-link" aria-label="Return to transactions">
-        <i class="fa-solid fa-arrow-left" aria-hidden="true"></i>
+    <!-- Back Link -->
+    <a href="<?= $basePath ?>/federation/transactions" class="govuk-back-link govuk-!-margin-top-4">
         Back to Transactions
     </a>
 
-    <!-- Review Card -->
-    <article class="civic-fed-review-card" aria-labelledby="review-heading">
-        <!-- Header -->
-        <header class="civic-fed-review-header">
-            <h1 id="review-heading">
-                <i class="fa-solid fa-star" aria-hidden="true"></i>
-                Leave a Review
-            </h1>
-        </header>
+    <main class="govuk-main-wrapper govuk-!-padding-top-4" id="main-content" role="main">
+        <div class="govuk-grid-row">
+            <div class="govuk-grid-column-two-thirds">
+                <!-- Review Card -->
+                <div class="govuk-!-padding-6" style="background: #fff; border: 1px solid #b1b4b6; border-left: 5px solid #f47738;">
+                    <!-- Header -->
+                    <h1 class="govuk-heading-xl govuk-!-margin-bottom-6">
+                        <i class="fa-solid fa-star govuk-!-margin-right-2" style="color: #f47738;" aria-hidden="true"></i>
+                        Leave a Review
+                    </h1>
 
-        <!-- Receiver Info -->
-        <section class="civic-fed-review-recipient" aria-label="Review recipient">
-            <div class="civic-fed-avatar civic-fed-avatar--large" aria-hidden="true">
-                <?php if ($receiverAvatar): ?>
-                    <img src="<?= htmlspecialchars($receiverAvatar) ?>"
-                         onerror="this.src='<?= $fallbackAvatar ?>'"
-                         alt="">
-                <?php else: ?>
-                    <span><?= strtoupper(substr($receiverName, 0, 1)) ?></span>
-                <?php endif; ?>
-            </div>
-            <h3><?= $receiverName ?></h3>
-            <div class="civic-fed-badge civic-fed-badge--partner">
-                <i class="fa-solid fa-building" aria-hidden="true"></i>
-                <?= htmlspecialchars($receiverTimebank) ?>
-            </div>
-        </section>
+                    <!-- Receiver Info -->
+                    <div class="govuk-!-padding-4 govuk-!-margin-bottom-6 govuk-!-text-align-center" style="background: #f3f2f1;">
+                        <div style="width: 80px; height: 80px; border-radius: 50%; margin: 0 auto 16px; overflow: hidden; border: 3px solid #1d70b8;">
+                            <?php if ($receiverAvatar): ?>
+                                <img src="<?= htmlspecialchars($receiverAvatar) ?>"
+                                     onerror="this.src='<?= $fallbackAvatar ?>'"
+                                     alt=""
+                                     style="width: 100%; height: 100%; object-fit: cover;">
+                            <?php else: ?>
+                                <div style="width: 100%; height: 100%; background: #1d70b8; color: #fff; display: flex; align-items: center; justify-content: center; font-size: 32px; font-weight: bold;">
+                                    <?= strtoupper(substr($receiverName, 0, 1)) ?>
+                                </div>
+                            <?php endif; ?>
+                        </div>
+                        <p class="govuk-heading-m govuk-!-margin-bottom-2"><?= $receiverName ?></p>
+                        <span class="govuk-tag govuk-tag--grey">
+                            <i class="fa-solid fa-building govuk-!-margin-right-1" aria-hidden="true"></i>
+                            <?= htmlspecialchars($receiverTimebank) ?>
+                        </span>
+                    </div>
 
-        <!-- Transaction Summary -->
-        <section class="civic-fed-review-summary" aria-label="Transaction details">
-            <div class="civic-fed-review-summary-row">
-                <div class="civic-fed-review-summary-item">
-                    <div class="civic-fed-review-summary-label">Amount</div>
-                    <div class="civic-fed-review-summary-value"><?= $amount ?> hrs</div>
-                </div>
-                <div class="civic-fed-review-summary-item">
-                    <div class="civic-fed-review-summary-label">Completed</div>
-                    <div class="civic-fed-review-summary-value">
-                        <?php if ($completedAt): ?>
-                            <time datetime="<?= date('c', strtotime($completedAt)) ?>"><?= date('M j, Y', strtotime($completedAt)) ?></time>
-                        <?php else: ?>
-                            Recently
+                    <!-- Transaction Summary -->
+                    <dl class="govuk-summary-list govuk-!-margin-bottom-6">
+                        <div class="govuk-summary-list__row">
+                            <dt class="govuk-summary-list__key">Amount</dt>
+                            <dd class="govuk-summary-list__value">
+                                <strong style="color: #00703c;"><?= $amount ?> hrs</strong>
+                            </dd>
+                        </div>
+                        <div class="govuk-summary-list__row">
+                            <dt class="govuk-summary-list__key">Completed</dt>
+                            <dd class="govuk-summary-list__value">
+                                <?php if ($completedAt): ?>
+                                    <time datetime="<?= date('c', strtotime($completedAt)) ?>">
+                                        <?= date('M j, Y', strtotime($completedAt)) ?>
+                                    </time>
+                                <?php else: ?>
+                                    Recently
+                                <?php endif; ?>
+                            </dd>
+                        </div>
+                        <?php if ($description): ?>
+                            <div class="govuk-summary-list__row">
+                                <dt class="govuk-summary-list__key">Description</dt>
+                                <dd class="govuk-summary-list__value"><?= $description ?></dd>
+                            </div>
                         <?php endif; ?>
+                    </dl>
+
+                    <!-- Review Form -->
+                    <form method="POST" action="<?= $basePath ?>/federation/review/<?= $transactionId ?>" id="review-form">
+                        <?= \Nexus\Core\Csrf::input() ?>
+
+                        <!-- Star Rating -->
+                        <div class="govuk-form-group">
+                            <label class="govuk-label govuk-label--m" id="rating-label">
+                                <i class="fa-solid fa-star-half-stroke govuk-!-margin-right-2" style="color: #f47738;" aria-hidden="true"></i>
+                                How was your experience?
+                            </label>
+                            <div id="star-rating" role="radiogroup" aria-labelledby="rating-label" style="display: flex; gap: 8px; margin-top: 8px;">
+                                <?php for ($i = 1; $i <= 5; $i++): ?>
+                                    <button type="button"
+                                            class="govuk-button govuk-button--secondary"
+                                            data-rating="<?= $i ?>"
+                                            role="radio"
+                                            aria-checked="false"
+                                            aria-label="<?= $i ?> star<?= $i > 1 ? 's' : '' ?>"
+                                            style="width: 48px; height: 48px; padding: 0; margin-bottom: 0;">
+                                        <i class="far fa-star fa-lg" aria-hidden="true"></i>
+                                    </button>
+                                <?php endfor; ?>
+                            </div>
+                            <input type="hidden" name="rating" id="rating-input" value="0" required>
+                            <p class="govuk-hint govuk-!-margin-top-2" id="rating-text" aria-live="polite">Click to rate</p>
+                        </div>
+
+                        <!-- Comment -->
+                        <div class="govuk-form-group">
+                            <label class="govuk-label govuk-label--m" for="comment">
+                                <i class="fa-solid fa-comment-dots govuk-!-margin-right-2" style="color: #505a5f;" aria-hidden="true"></i>
+                                Share your experience (optional)
+                            </label>
+                            <p class="govuk-hint">
+                                How was working with <?= $receiverName ?>? Was the exchange smooth? Would you recommend them to others?
+                            </p>
+                            <textarea name="comment"
+                                      id="comment"
+                                      class="govuk-textarea"
+                                      rows="5"
+                                      maxlength="2000"
+                                      aria-describedby="char-count-text"></textarea>
+                            <p class="govuk-hint govuk-!-margin-top-1" id="char-count-text">
+                                <span id="char-count">0</span>/2000 characters
+                            </p>
+                        </div>
+
+                        <!-- Submit -->
+                        <button type="submit" class="govuk-button" style="background: #f47738;" id="submit-btn" disabled aria-disabled="true" data-module="govuk-button">
+                            <i class="fa-solid fa-paper-plane govuk-!-margin-right-2" aria-hidden="true"></i>
+                            Submit Review
+                        </button>
+                    </form>
+
+                    <!-- Guidelines -->
+                    <div class="govuk-inset-text govuk-!-margin-top-6">
+                        <p class="govuk-body govuk-!-margin-bottom-0">
+                            <i class="fa-solid fa-shield-heart govuk-!-margin-right-2" style="color: #1d70b8;" aria-hidden="true"></i>
+                            Reviews help build trust across timebanks. Please be honest and constructive in your feedback.
+                        </p>
                     </div>
                 </div>
             </div>
-            <?php if ($description): ?>
-                <div class="civic-fed-review-summary-desc">
-                    <div class="civic-fed-review-summary-label">Description</div>
-                    <div class="civic-fed-review-summary-text"><?= $description ?></div>
-                </div>
-            <?php endif; ?>
-        </section>
-
-        <!-- Review Form -->
-        <form method="POST" action="<?= $basePath ?>/federation/review/<?= $transactionId ?>" class="civic-fed-form" id="review-form">
-            <?= \Nexus\Core\Csrf::input() ?>
-
-            <!-- Star Rating -->
-            <div class="civic-fed-form-group">
-                <label class="civic-fed-label" id="rating-label">
-                    <i class="fa-solid fa-star-half-stroke" aria-hidden="true"></i>
-                    How was your experience?
-                </label>
-                <div class="civic-fed-star-rating" id="star-rating" role="radiogroup" aria-labelledby="rating-label">
-                    <?php for ($i = 1; $i <= 5; $i++): ?>
-                        <button type="button"
-                                class="civic-fed-star-btn"
-                                data-rating="<?= $i ?>"
-                                role="radio"
-                                aria-checked="false"
-                                aria-label="<?= $i ?> star<?= $i > 1 ? 's' : '' ?>">
-                            <i class="far fa-star" aria-hidden="true"></i>
-                        </button>
-                    <?php endfor; ?>
-                </div>
-                <input type="hidden" name="rating" id="rating-input" value="0" required>
-                <div class="civic-fed-rating-text" id="rating-text" aria-live="polite">Click to rate</div>
-            </div>
-
-            <!-- Comment -->
-            <div class="civic-fed-form-group">
-                <label for="comment" class="civic-fed-label">
-                    <i class="fa-solid fa-comment-dots" aria-hidden="true"></i>
-                    Share your experience (optional)
-                </label>
-                <textarea name="comment"
-                          id="comment"
-                          class="civic-fed-textarea"
-                          rows="5"
-                          placeholder="How was working with <?= $receiverName ?>? Was the exchange smooth? Would you recommend them to others?"
-                          maxlength="2000"
-                          aria-describedby="char-count-text"></textarea>
-                <div class="civic-fed-char-count" id="char-count-text">
-                    <span id="char-count">0</span>/2000 characters
-                </div>
-            </div>
-
-            <!-- Submit -->
-            <button type="submit" class="civic-fed-btn civic-fed-btn--primary civic-fed-btn--full" id="submit-btn" disabled aria-disabled="true">
-                <i class="fa-solid fa-paper-plane" aria-hidden="true"></i>
-                Submit Review
-            </button>
-        </form>
-
-        <!-- Guidelines -->
-        <aside class="civic-fed-notice" role="note">
-            <i class="fa-solid fa-shield-heart" aria-hidden="true"></i>
-            <div>
-                Reviews help build trust across timebanks. Please be honest and constructive in your feedback.
-            </div>
-        </aside>
-    </article>
+        </div>
+    </main>
 </div>
 
 <script>
-// Review form functionality
 (function() {
     'use strict';
 
-    const starRating = document.getElementById('star-rating');
-    const ratingInput = document.getElementById('rating-input');
-    const ratingText = document.getElementById('rating-text');
-    const submitBtn = document.getElementById('submit-btn');
-    const commentInput = document.getElementById('comment');
-    const charCount = document.getElementById('char-count');
+    var starRating = document.getElementById('star-rating');
+    var ratingInput = document.getElementById('rating-input');
+    var ratingText = document.getElementById('rating-text');
+    var submitBtn = document.getElementById('submit-btn');
+    var commentInput = document.getElementById('comment');
+    var charCount = document.getElementById('char-count');
 
-    const ratingLabels = ['', 'Poor', 'Fair', 'Good', 'Very Good', 'Excellent'];
+    var ratingLabels = ['', 'Poor', 'Fair', 'Good', 'Very Good', 'Excellent'];
 
     if (starRating) {
-        const stars = starRating.querySelectorAll('.civic-fed-star-btn');
+        var stars = starRating.querySelectorAll('button');
 
-        stars.forEach((star, index) => {
+        stars.forEach(function(star, index) {
             star.addEventListener('click', function() {
-                const rating = parseInt(this.dataset.rating);
+                var rating = parseInt(this.dataset.rating);
                 ratingInput.value = rating;
 
-                // Update stars
-                stars.forEach((s, i) => {
-                    const icon = s.querySelector('i');
+                stars.forEach(function(s, i) {
+                    var icon = s.querySelector('i');
                     s.setAttribute('aria-checked', i < rating ? 'true' : 'false');
-                    icon.className = i < rating ? 'fa-solid fa-star' : 'far fa-star';
+                    icon.className = i < rating ? 'fa-solid fa-star fa-lg' : 'far fa-star fa-lg';
+                    icon.style.color = i < rating ? '#f47738' : '';
                 });
 
-                // Update text
                 ratingText.textContent = ratingLabels[rating];
-
-                // Enable submit
                 submitBtn.disabled = false;
                 submitBtn.setAttribute('aria-disabled', 'false');
             });
 
-            // Hover effect
             star.addEventListener('mouseenter', function() {
-                const rating = parseInt(this.dataset.rating);
-                stars.forEach((s, i) => {
-                    const icon = s.querySelector('i');
-                    icon.className = i < rating ? 'fa-solid fa-star' : 'far fa-star';
+                var rating = parseInt(this.dataset.rating);
+                stars.forEach(function(s, i) {
+                    var icon = s.querySelector('i');
+                    icon.className = i < rating ? 'fa-solid fa-star fa-lg' : 'far fa-star fa-lg';
+                    icon.style.color = i < rating ? '#f47738' : '';
                 });
             });
         });
 
         starRating.addEventListener('mouseleave', function() {
-            const currentRating = parseInt(ratingInput.value);
-            stars.forEach((s, i) => {
-                const icon = s.querySelector('i');
-                icon.className = i < currentRating ? 'fa-solid fa-star' : 'far fa-star';
+            var currentRating = parseInt(ratingInput.value);
+            stars.forEach(function(s, i) {
+                var icon = s.querySelector('i');
+                icon.className = i < currentRating ? 'fa-solid fa-star fa-lg' : 'far fa-star fa-lg';
+                icon.style.color = i < currentRating ? '#f47738' : '';
             });
         });
     }
 
-    // Character counter
     if (commentInput && charCount) {
         commentInput.addEventListener('input', function() {
             charCount.textContent = this.value.length;
         });
     }
-<!-- Federation offline indicator -->
-<script src="<?= \Nexus\Core\TenantContext::getBasePath() ?>/assets/js/civicone-federation-offline.min.js" defer></script>
+
+    // Offline indicator
+    var banner = document.getElementById('offlineBanner');
+    function updateOffline(offline) {
+        if (banner) banner.classList.toggle('govuk-!-display-none', !offline);
+    }
+    window.addEventListener('online', function() { updateOffline(false); });
+    window.addEventListener('offline', function() { updateOffline(true); });
+    if (!navigator.onLine) updateOffline(true);
+})();
+</script>
 
 <?php require dirname(dirname(__DIR__)) . '/layouts/civicone/footer.php'; ?>

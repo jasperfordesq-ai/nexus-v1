@@ -1,56 +1,59 @@
 <?php
 /**
- * CivicOne Resources Create - Upload Resource Form
- * Template D: Form/Flow (Section 10.7)
- * File upload form with holographic glassmorphism design
- * WCAG 2.1 AA Compliant
+ * CivicOne View: Upload Resource
+ * GOV.UK Design System Compliant (WCAG 2.1 AA)
  */
-require __DIR__ . '/../../layouts/civicone/header.php';
+$pageTitle = 'Upload Resource';
+require dirname(__DIR__, 2) . '/layouts/civicone/header.php';
+$basePath = \Nexus\Core\TenantContext::getBasePath();
 ?>
-<link rel="stylesheet" href="<?= \Nexus\Core\TenantContext::getBasePath() ?>/assets/css/purged/civicone-resources-form.min.css?v=<?= time() ?>">
 
-<!-- Offline Banner -->
-<div class="holo-offline-banner" id="offlineBanner" role="alert" aria-live="polite">
-    <i class="fa-solid fa-wifi-slash" aria-hidden="true"></i>
-    <span>No internet connection</span>
-</div>
+<nav class="govuk-breadcrumbs govuk-!-margin-bottom-6" aria-label="Breadcrumb">
+    <ol class="govuk-breadcrumbs__list">
+        <li class="govuk-breadcrumbs__list-item">
+            <a class="govuk-breadcrumbs__link" href="<?= $basePath ?>">Home</a>
+        </li>
+        <li class="govuk-breadcrumbs__list-item">
+            <a class="govuk-breadcrumbs__link" href="<?= $basePath ?>/resources">Resource Library</a>
+        </li>
+        <li class="govuk-breadcrumbs__list-item" aria-current="page">Upload</li>
+    </ol>
+</nav>
 
-<div class="holo-resource-page">
-    <!-- Floating Orbs -->
-    <div class="holo-orb holo-orb-1" aria-hidden="true"></div>
-    <div class="holo-orb holo-orb-2" aria-hidden="true"></div>
-    <div class="holo-orb holo-orb-3" aria-hidden="true"></div>
+<a href="<?= $basePath ?>/resources" class="govuk-back-link govuk-!-margin-bottom-6">Back to Resource Library</a>
 
-    <div class="holo-glass-card">
-        <div class="holo-header">
-            <div class="holo-header-icon" aria-hidden="true">
-                <i class="fa-solid fa-cloud-arrow-up"></i>
-            </div>
-            <h1 class="holo-title">Upload Resource</h1>
-            <p class="holo-subtitle">Share useful documents, guides, or forms with the community.</p>
-        </div>
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
 
-        <form action="<?= Nexus\Core\TenantContext::getBasePath() ?>/resources/store" method="POST" enctype="multipart/form-data" id="uploadForm">
+        <h1 class="govuk-heading-xl">
+            <i class="fa-solid fa-cloud-arrow-up govuk-!-margin-right-2" aria-hidden="true"></i>
+            Upload Resource
+        </h1>
+        <p class="govuk-body-l govuk-!-margin-bottom-6">Share useful documents, guides, or forms with the community.</p>
+
+        <form action="<?= $basePath ?>/resources/store" method="POST" enctype="multipart/form-data">
             <?= \Nexus\Core\Csrf::input() ?>
 
             <!-- Title -->
-            <div class="holo-form-group">
-                <label for="title" class="holo-label">Document Title</label>
-                <input type="text" name="title" id="title" class="holo-input" required
-                       placeholder="e.g. Volunteer Guide 2025">
+            <div class="govuk-form-group">
+                <label class="govuk-label" for="title">Document Title</label>
+                <div id="title-hint" class="govuk-hint">For example, "Volunteer Guide 2025" or "Safety Checklist"</div>
+                <input class="govuk-input" type="text" name="title" id="title" aria-describedby="title-hint" required>
             </div>
 
             <!-- Description -->
-            <div class="holo-form-group">
-                <label for="description" class="holo-label">Description</label>
-                <textarea name="description" id="description" class="holo-input" rows="3"
-                          placeholder="Briefly describe what this file contains..."></textarea>
+            <div class="govuk-form-group">
+                <label class="govuk-label" for="description">
+                    Description <span class="govuk-hint govuk-!-display-inline">(optional)</span>
+                </label>
+                <div id="description-hint" class="govuk-hint">Briefly describe what this file contains</div>
+                <textarea class="govuk-textarea" name="description" id="description" rows="3" aria-describedby="description-hint"></textarea>
             </div>
 
             <!-- Category -->
-            <div class="holo-form-group">
-                <label for="category_id" class="holo-label">Category</label>
-                <select name="category_id" id="category_id" class="holo-select">
+            <div class="govuk-form-group">
+                <label class="govuk-label" for="category_id">Category</label>
+                <select class="govuk-select" name="category_id" id="category_id">
                     <option value="">-- Select Category --</option>
                     <?php foreach ($categories as $cat): ?>
                         <option value="<?= $cat['id'] ?>"><?= htmlspecialchars($cat['name']) ?></option>
@@ -59,32 +62,22 @@ require __DIR__ . '/../../layouts/civicone/header.php';
             </div>
 
             <!-- File Upload -->
-            <div class="holo-form-group">
-                <label for="fileInput" class="holo-label">Select File</label>
-                <div class="holo-upload-zone" id="uploadZone">
-                    <input type="file" name="file" required class="holo-file-input" id="fileInput">
-                    <div class="holo-upload-icon" aria-hidden="true">
-                        <i class="fa-solid fa-file-arrow-up"></i>
-                    </div>
-                    <div class="holo-upload-text">Click to select or drag and drop</div>
-                    <div class="holo-upload-hint">PDF, DOC, DOCX, ZIP, JPG (Max 5MB)</div>
-                    <div class="holo-file-name" id="fileName" aria-live="polite"></div>
-                </div>
+            <div class="govuk-form-group">
+                <label class="govuk-label" for="file">Select File</label>
+                <div id="file-hint" class="govuk-hint">PDF, DOC, DOCX, ZIP, JPG (Max 5MB)</div>
+                <input class="govuk-file-upload" type="file" name="file" id="file" aria-describedby="file-hint" required>
             </div>
 
-            <div class="holo-actions">
-                <button type="submit" class="holo-btn holo-btn-primary">
-                    <i class="fa-solid fa-cloud-arrow-up" aria-hidden="true"></i>
+            <div class="govuk-button-group">
+                <button type="submit" class="govuk-button" data-module="govuk-button">
+                    <i class="fa-solid fa-cloud-arrow-up govuk-!-margin-right-1" aria-hidden="true"></i>
                     Upload Document
                 </button>
-                <a href="<?= Nexus\Core\TenantContext::getBasePath() ?>/resources" class="holo-btn holo-btn-secondary">
-                    Cancel
-                </a>
+                <a href="<?= $basePath ?>/resources" class="govuk-link">Cancel</a>
             </div>
         </form>
+
     </div>
 </div>
 
-<script src="<?= Nexus\Core\TenantContext::getBasePath() ?>/assets/js/civicone-resources-form.js?v=<?= time() ?>"></script>
-
-<?php require __DIR__ . '/../../layouts/civicone/footer.php'; ?>
+<?php require dirname(__DIR__, 2) . '/layouts/civicone/footer.php'; ?>

@@ -1,9 +1,8 @@
 <?php
 /**
  * CivicOne Groups Shared Form Partial
+ * GOV.UK Design System Compliant (WCAG 2.1 AA)
  * Used by: create.php and edit.php
- * Template D: Form/Flow (Section 10.5)
- * GOV.UK Form Pattern
  *
  * Required variables:
  * - $formAction: URL to submit the form to
@@ -31,20 +30,20 @@ $isEdit = $isEdit ?? false;
     <?php endif; ?>
 
     <!-- Hub Name -->
-    <div class="civicone-form-group <?= isset($errors['name']) ? 'civicone-form-group--error' : '' ?>">
-        <label class="civicone-label" for="name">
+    <div class="govuk-form-group <?= isset($errors['name']) ? 'govuk-form-group--error' : '' ?>">
+        <label class="govuk-label" for="name">
             Hub name
         </label>
-        <div id="name-hint" class="civicone-hint">
+        <div id="name-hint" class="govuk-hint">
             <?= $isEdit ? 'The name of your hub' : 'For example, "West Cork Gardeners" or "Northside Book Club"' ?>
         </div>
         <?php if (isset($errors['name'])): ?>
-            <p id="name-error" class="civicone-error-message">
-                <span class="civicone-visually-hidden">Error:</span>
+            <p id="name-error" class="govuk-error-message">
+                <span class="govuk-visually-hidden">Error:</span>
                 <?= htmlspecialchars($errors['name']) ?>
             </p>
         <?php endif; ?>
-        <input class="civicone-input <?= isset($errors['name']) ? 'civicone-input--error' : '' ?>"
+        <input class="govuk-input <?= isset($errors['name']) ? 'govuk-input--error' : '' ?>"
                id="name"
                name="name"
                type="text"
@@ -54,20 +53,20 @@ $isEdit = $isEdit ?? false;
     </div>
 
     <!-- Description -->
-    <div class="civicone-form-group <?= isset($errors['description']) ? 'civicone-form-group--error' : '' ?>">
-        <label class="civicone-label" for="description">
+    <div class="govuk-form-group <?= isset($errors['description']) ? 'govuk-form-group--error' : '' ?>">
+        <label class="govuk-label" for="description">
             Description
         </label>
-        <div id="description-hint" class="civicone-hint">
+        <div id="description-hint" class="govuk-hint">
             Explain what your hub is about and who should join
         </div>
         <?php if (isset($errors['description'])): ?>
-            <p id="description-error" class="civicone-error-message">
-                <span class="civicone-visually-hidden">Error:</span>
+            <p id="description-error" class="govuk-error-message">
+                <span class="govuk-visually-hidden">Error:</span>
                 <?= htmlspecialchars($errors['description']) ?>
             </p>
         <?php endif; ?>
-        <textarea class="civicone-textarea <?= isset($errors['description']) ? 'civicone-textarea--error' : '' ?>"
+        <textarea class="govuk-textarea <?= isset($errors['description']) ? 'govuk-textarea--error' : '' ?>"
                   id="description"
                   name="description"
                   rows="5"
@@ -77,31 +76,29 @@ $isEdit = $isEdit ?? false;
 
     <!-- Visibility (Edit mode only) -->
     <?php if ($isEdit): ?>
-    <div class="civicone-form-group">
-        <fieldset class="civicone-fieldset">
-            <legend class="civicone-fieldset__legend civicone-label">
-                Visibility
+    <div class="govuk-form-group">
+        <fieldset class="govuk-fieldset">
+            <legend class="govuk-fieldset__legend govuk-fieldset__legend--m">
+                <h2 class="govuk-fieldset__heading">Visibility</h2>
             </legend>
-            <div class="civicone-hint" id="visibility-hint">
+            <div id="visibility-hint" class="govuk-hint">
                 Choose who can join your hub
             </div>
-            <div class="civicone-visibility-options" role="radiogroup" aria-describedby="visibility-hint">
-                <label class="civicone-visibility-option">
-                    <input type="radio" name="visibility" value="public" <?= ($oldInput['visibility'] ?? $group['visibility'] ?? 'public') === 'public' ? 'checked' : '' ?>>
-                    <div class="civicone-visibility-card">
-                        <span class="civicone-visibility-icon" aria-hidden="true">🌍</span>
-                        <div class="civicone-visibility-title">Public</div>
-                        <div class="civicone-visibility-desc">Anyone can join instantly</div>
-                    </div>
-                </label>
-                <label class="civicone-visibility-option">
-                    <input type="radio" name="visibility" value="private" <?= ($oldInput['visibility'] ?? $group['visibility'] ?? 'public') === 'private' ? 'checked' : '' ?>>
-                    <div class="civicone-visibility-card">
-                        <span class="civicone-visibility-icon" aria-hidden="true">🔒</span>
-                        <div class="civicone-visibility-title">Private</div>
-                        <div class="civicone-visibility-desc">Requires approval to join</div>
-                    </div>
-                </label>
+            <div class="govuk-radios" data-module="govuk-radios" aria-describedby="visibility-hint">
+                <div class="govuk-radios__item">
+                    <input class="govuk-radios__input" type="radio" name="visibility" id="visibility-public" value="public" <?= ($oldInput['visibility'] ?? $group['visibility'] ?? 'public') === 'public' ? 'checked' : '' ?>>
+                    <label class="govuk-label govuk-radios__label" for="visibility-public">
+                        <span aria-hidden="true">🌍</span> Public
+                        <span class="govuk-hint govuk-radios__hint">Anyone can join instantly</span>
+                    </label>
+                </div>
+                <div class="govuk-radios__item">
+                    <input class="govuk-radios__input" type="radio" name="visibility" id="visibility-private" value="private" <?= ($oldInput['visibility'] ?? $group['visibility'] ?? 'public') === 'private' ? 'checked' : '' ?>>
+                    <label class="govuk-label govuk-radios__label" for="visibility-private">
+                        <span aria-hidden="true">🔒</span> Private
+                        <span class="govuk-hint govuk-radios__hint">Requires approval to join</span>
+                    </label>
+                </div>
             </div>
         </fieldset>
     </div>
@@ -109,41 +106,41 @@ $isEdit = $isEdit ?? false;
 
     <!-- Featured Toggle (Site Admins Only - Edit mode only) -->
     <?php if ($isEdit && !empty($_SESSION['is_admin']) && $_SESSION['is_admin']): ?>
-    <div class="civicone-form-group">
-        <div class="civicone-checkboxes">
-            <div class="civicone-checkboxes__item">
-                <input class="civicone-checkboxes__input"
+    <div class="govuk-form-group">
+        <div class="govuk-checkboxes" data-module="govuk-checkboxes">
+            <div class="govuk-checkboxes__item">
+                <input class="govuk-checkboxes__input"
                        id="is_featured"
                        name="is_featured"
                        type="checkbox"
                        value="1"
                        <?= !empty($oldInput['is_featured']) || !empty($group['is_featured']) ? 'checked' : '' ?>>
-                <label class="civicone-label civicone-checkboxes__label" for="is_featured">
-                    Featured Hub
+                <label class="govuk-label govuk-checkboxes__label" for="is_featured">
+                    <span aria-hidden="true">⭐</span> Featured Hub
                 </label>
             </div>
         </div>
-        <div class="civicone-hint">
+        <div class="govuk-hint">
             Featured hubs appear in a special section at the top of the hubs page. Only site administrators can mark groups as featured.
         </div>
     </div>
     <?php endif; ?>
 
     <!-- Location (Optional) -->
-    <div class="civicone-form-group <?= isset($errors['location']) ? 'civicone-form-group--error' : '' ?>">
-        <label class="civicone-label" for="location">
-            Location <span class="civicone-label-hint">(optional)</span>
+    <div class="govuk-form-group <?= isset($errors['location']) ? 'govuk-form-group--error' : '' ?>">
+        <label class="govuk-label" for="location">
+            Location <span class="govuk-hint govuk-!-display-inline">(optional)</span>
         </label>
-        <div id="location-hint" class="civicone-hint">
+        <div id="location-hint" class="govuk-hint">
             Add a location to help members find local hubs near them
         </div>
         <?php if (isset($errors['location'])): ?>
-            <p id="location-error" class="civicone-error-message">
-                <span class="civicone-visually-hidden">Error:</span>
+            <p id="location-error" class="govuk-error-message">
+                <span class="govuk-visually-hidden">Error:</span>
                 <?= htmlspecialchars($errors['location']) ?>
             </p>
         <?php endif; ?>
-        <input class="civicone-input mapbox-location-input-v2 <?= isset($errors['location']) ? 'civicone-input--error' : '' ?>"
+        <input class="govuk-input mapbox-location-input-v2 <?= isset($errors['location']) ? 'govuk-input--error' : '' ?>"
                id="location"
                name="location"
                type="text"
@@ -156,30 +153,24 @@ $isEdit = $isEdit ?? false;
 
     <!-- Hub Avatar (Edit mode only) -->
     <?php if ($isEdit): ?>
-    <div class="civicone-form-group">
-        <label class="civicone-label" for="image">
-            Hub avatar <span class="civicone-label-hint">(optional)</span>
+    <div class="govuk-form-group">
+        <label class="govuk-label" for="image">
+            Hub avatar <span class="govuk-hint govuk-!-display-inline">(optional)</span>
         </label>
-        <div id="image-hint" class="civicone-hint">
+        <div id="image-hint" class="govuk-hint">
             Upload an image to represent your hub
         </div>
-        <div class="civicone-file-input-wrapper">
-            <input type="file" name="image" id="image" accept="image/*" aria-describedby="image-hint">
-            <div class="civicone-file-input-label">
-                <i class="fa-solid fa-image" aria-hidden="true"></i>
-                <span>Choose avatar image</span>
-            </div>
-        </div>
+        <input class="govuk-file-upload" type="file" name="image" id="image" accept="image/*" aria-describedby="image-hint">
         <?php if (!empty($group['image_url'])): ?>
-            <div class="civicone-current-image-preview">
-                <img src="<?= htmlspecialchars($group['image_url']) ?>" loading="lazy" alt="Current avatar">
-                <div class="civicone-image-preview-info">
-                    <span class="civicone-image-preview-label">Current Avatar</span>
-                    <span class="civicone-image-preview-hint">Upload new to replace</span>
+            <div class="govuk-!-margin-top-3 govuk-!-padding-3" style="border: 1px solid #b1b4b6; display: flex; align-items: center; gap: 1rem;">
+                <img src="<?= htmlspecialchars($group['image_url']) ?>" loading="lazy" alt="Current avatar" style="width: 60px; height: 60px; object-fit: cover; border-radius: 4px;">
+                <div>
+                    <p class="govuk-body-s govuk-!-margin-bottom-0"><strong>Current Avatar</strong></p>
+                    <p class="govuk-body-s govuk-!-margin-bottom-0" style="color: #505a5f;">Upload new to replace</p>
                 </div>
-                <label class="civicone-clear-image-btn" title="Remove avatar">
-                    <input type="checkbox" name="clear_avatar" value="1" class="hidden">
-                    <span class="clear-icon">×</span>
+                <label class="govuk-body-s" style="margin-left: auto;">
+                    <input type="checkbox" name="clear_avatar" value="1" class="govuk-checkboxes__input" style="width: auto;">
+                    Remove
                 </label>
             </div>
         <?php endif; ?>
@@ -188,30 +179,24 @@ $isEdit = $isEdit ?? false;
 
     <!-- Cover Image (Edit mode only) -->
     <?php if ($isEdit): ?>
-    <div class="civicone-form-group">
-        <label class="civicone-label" for="cover_image">
-            Cover image <span class="civicone-label-hint">(optional)</span>
+    <div class="govuk-form-group">
+        <label class="govuk-label" for="cover_image">
+            Cover image <span class="govuk-hint govuk-!-display-inline">(optional)</span>
         </label>
-        <div id="cover-image-hint" class="civicone-hint">
+        <div id="cover-image-hint" class="govuk-hint">
             Upload a banner image for your hub page
         </div>
-        <div class="civicone-file-input-wrapper">
-            <input type="file" name="cover_image" id="cover_image" accept="image/*" aria-describedby="cover-image-hint">
-            <div class="civicone-file-input-label">
-                <i class="fa-solid fa-panorama" aria-hidden="true"></i>
-                <span>Choose cover image</span>
-            </div>
-        </div>
+        <input class="govuk-file-upload" type="file" name="cover_image" id="cover_image" accept="image/*" aria-describedby="cover-image-hint">
         <?php if (!empty($group['cover_image_url'])): ?>
-            <div class="civicone-current-image-preview">
-                <img src="<?= htmlspecialchars($group['cover_image_url']) ?>" loading="lazy" alt="Current cover" class="cover-img">
-                <div class="civicone-image-preview-info">
-                    <span class="civicone-image-preview-label">Current Cover</span>
-                    <span class="civicone-image-preview-hint">Upload new to replace</span>
+            <div class="govuk-!-margin-top-3 govuk-!-padding-3" style="border: 1px solid #b1b4b6; display: flex; align-items: center; gap: 1rem;">
+                <img src="<?= htmlspecialchars($group['cover_image_url']) ?>" loading="lazy" alt="Current cover" style="width: 120px; height: 60px; object-fit: cover; border-radius: 4px;">
+                <div>
+                    <p class="govuk-body-s govuk-!-margin-bottom-0"><strong>Current Cover</strong></p>
+                    <p class="govuk-body-s govuk-!-margin-bottom-0" style="color: #505a5f;">Upload new to replace</p>
                 </div>
-                <label class="civicone-clear-image-btn" title="Remove cover">
-                    <input type="checkbox" name="clear_cover" value="1" class="hidden">
-                    <span class="clear-icon">×</span>
+                <label class="govuk-body-s" style="margin-left: auto;">
+                    <input type="checkbox" name="clear_cover" value="1" class="govuk-checkboxes__input" style="width: auto;">
+                    Remove
                 </label>
             </div>
         <?php endif; ?>
@@ -229,7 +214,7 @@ $isEdit = $isEdit ?? false;
     <?php endif; ?>
 
     <!-- Submit Button -->
-    <button type="submit" class="civicone-button" data-module="civicone-button">
+    <button type="submit" class="govuk-button" data-module="govuk-button">
         <?= htmlspecialchars($submitButtonText) ?>
     </button>
 

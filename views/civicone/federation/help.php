@@ -1,7 +1,7 @@
 <?php
 /**
  * Federation Help & FAQ
- * CivicOne Theme - WCAG 2.1 AA Compliant
+ * CivicOne Theme - GOV.UK Design System (WCAG 2.1 AA)
  */
 $pageTitle = $pageTitle ?? "Federation Help";
 $hideHero = true;
@@ -14,344 +14,367 @@ $userOptedIn = $userOptedIn ?? false;
 ?>
 
 <!-- Offline Banner -->
-<div class="civic-fed-offline-banner" id="offlineBanner" role="alert" aria-live="polite">
-    <i class="fa-solid fa-wifi-slash" aria-hidden="true"></i>
-    <span>No internet connection</span>
+<div class="govuk-notification-banner govuk-notification-banner--warning govuk-!-margin-bottom-4 hidden" id="offlineBanner" role="alert" aria-live="polite">
+    <div class="govuk-notification-banner__content">
+        <p class="govuk-body">
+            <i class="fa-solid fa-wifi-slash govuk-!-margin-right-2" aria-hidden="true"></i>
+            No internet connection
+        </p>
+    </div>
 </div>
 
-<div class="civic-container">
-    <!-- Back Link -->
-    <a href="<?= $basePath ?>/federation" class="civic-fed-back-link">
-        <i class="fa-solid fa-arrow-left" aria-hidden="true"></i>
-        Back to Federation Hub
-    </a>
+<nav class="govuk-breadcrumbs govuk-!-margin-bottom-6" aria-label="Breadcrumb">
+    <ol class="govuk-breadcrumbs__list">
+        <li class="govuk-breadcrumbs__list-item">
+            <a class="govuk-breadcrumbs__link" href="<?= $basePath ?>">Home</a>
+        </li>
+        <li class="govuk-breadcrumbs__list-item">
+            <a class="govuk-breadcrumbs__link" href="<?= $basePath ?>/federation">Federation</a>
+        </li>
+        <li class="govuk-breadcrumbs__list-item" aria-current="page">Help & FAQ</li>
+    </ol>
+</nav>
 
-    <!-- Page Header -->
-    <header class="civic-fed-header">
-        <h1>Federation Help & FAQ</h1>
-    </header>
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+        <h1 class="govuk-heading-xl govuk-!-margin-bottom-4">
+            <i class="fa-solid fa-circle-question govuk-!-margin-right-2" aria-hidden="true"></i>
+            Federation Help & FAQ
+        </h1>
+        <p class="govuk-body-l govuk-!-margin-bottom-6">
+            Learn about partner timebanks and how to connect with members from other communities.
+        </p>
+    </div>
+</div>
 
-    <p class="civic-fed-intro">
-        Learn about partner timebanks and how to connect with members from other communities.
-    </p>
+<?php $currentPage = 'help'; require dirname(__DIR__) . '/partials/federation-nav.php'; ?>
 
-    <?php $currentPage = 'help'; require dirname(__DIR__) . '/partials/federation-nav.php'; ?>
-
-    <!-- Quick Links -->
-    <nav class="civic-fed-quick-links" aria-label="Jump to section">
-        <a href="#getting-started" class="civic-fed-quick-link">Getting Started</a>
-        <a href="#privacy" class="civic-fed-quick-link">Privacy & Safety</a>
-        <a href="#features" class="civic-fed-quick-link">Features</a>
-        <a href="#troubleshooting" class="civic-fed-quick-link">Troubleshooting</a>
-    </nav>
+<!-- Quick Links -->
+<nav class="govuk-!-margin-bottom-6" aria-label="Jump to section">
+    <ul class="govuk-list" style="display: flex; flex-wrap: wrap; gap: 0.5rem;">
+        <li><a href="#getting-started" class="govuk-link govuk-!-padding-2" style="background: #f3f2f1; display: inline-block;">Getting Started</a></li>
+        <li><a href="#privacy" class="govuk-link govuk-!-padding-2" style="background: #f3f2f1; display: inline-block;">Privacy & Safety</a></li>
+        <li><a href="#features" class="govuk-link govuk-!-padding-2" style="background: #f3f2f1; display: inline-block;">Features</a></li>
+        <li><a href="#troubleshooting" class="govuk-link govuk-!-padding-2" style="background: #f3f2f1; display: inline-block;">Troubleshooting</a></li>
+    </ul>
+</nav>
 
     <!-- Getting Started -->
-    <section class="civic-fed-faq-section" id="getting-started" aria-labelledby="getting-started-heading">
-        <h2 id="getting-started-heading" class="civic-fed-faq-heading">
-            <i class="fa-solid fa-rocket" aria-hidden="true"></i>
+    <section class="govuk-!-margin-bottom-8" id="getting-started" aria-labelledby="getting-started-heading">
+        <h2 id="getting-started-heading" class="govuk-heading-l">
+            <i class="fa-solid fa-rocket govuk-!-margin-right-2" aria-hidden="true"></i>
             Getting Started
         </h2>
 
-        <div class="civic-fed-faq-item">
-            <button class="civic-fed-faq-question" aria-expanded="false" aria-controls="faq-1">
-                What is federation?
-                <i class="fa-solid fa-chevron-down" aria-hidden="true"></i>
-            </button>
-            <div class="civic-fed-faq-answer" id="faq-1">
-                <div class="civic-fed-faq-content">
-                    Federation allows different timebanks to connect and share resources while maintaining their independence. Members from partner timebanks can browse each other's profiles, listings, events, and groups - and even exchange time credits across communities.
+        <div class="govuk-accordion" data-module="govuk-accordion" id="accordion-getting-started">
+            <div class="govuk-accordion__section">
+                <div class="govuk-accordion__section-header">
+                    <h3 class="govuk-accordion__section-heading">
+                        <span class="govuk-accordion__section-button" id="accordion-heading-1">
+                            What is federation?
+                        </span>
+                    </h3>
+                </div>
+                <div id="accordion-content-1" class="govuk-accordion__section-content">
+                    <p class="govuk-body">
+                        Federation allows different timebanks to connect and share resources while maintaining their independence. Members from partner timebanks can browse each other's profiles, listings, events, and groups - and even exchange time credits across communities.
+                    </p>
                 </div>
             </div>
-        </div>
 
-        <div class="civic-fed-faq-item">
-            <button class="civic-fed-faq-question" aria-expanded="false" aria-controls="faq-2">
-                How do I enable federation for my account?
-                <i class="fa-solid fa-chevron-down" aria-hidden="true"></i>
-            </button>
-            <div class="civic-fed-faq-answer" id="faq-2">
-                <div class="civic-fed-faq-content">
-                    <ol>
-                        <li>Go to <a href="<?= $basePath ?>/settings?section=federation">Settings &rarr; Federation</a></li>
+            <div class="govuk-accordion__section">
+                <div class="govuk-accordion__section-header">
+                    <h3 class="govuk-accordion__section-heading">
+                        <span class="govuk-accordion__section-button" id="accordion-heading-2">
+                            How do I enable federation for my account?
+                        </span>
+                    </h3>
+                </div>
+                <div id="accordion-content-2" class="govuk-accordion__section-content">
+                    <ol class="govuk-list govuk-list--number">
+                        <li>Go to <a href="<?= $basePath ?>/settings?section=federation" class="govuk-link">Settings &rarr; Federation</a></li>
                         <li>Toggle "Enable Federation" to ON</li>
                         <li>Choose your privacy level (Discovery, Social, or Economic)</li>
                         <li>Save your settings</li>
                     </ol>
-                    Once enabled, you'll appear in partner timebank searches and can interact with their members.
+                    <p class="govuk-body">Once enabled, you'll appear in partner timebank searches and can interact with their members.</p>
                 </div>
             </div>
-        </div>
 
-        <div class="civic-fed-faq-item">
-            <button class="civic-fed-faq-question" aria-expanded="false" aria-controls="faq-3">
-                What are partner timebanks?
-                <i class="fa-solid fa-chevron-down" aria-hidden="true"></i>
-            </button>
-            <div class="civic-fed-faq-answer" id="faq-3">
-                <div class="civic-fed-faq-content">
-                    Partner timebanks are other timebanking communities that have established a formal partnership with your timebank. Administrators from both timebanks agree to share certain features (like member profiles, listings, or events) with each other's communities.
+            <div class="govuk-accordion__section">
+                <div class="govuk-accordion__section-header">
+                    <h3 class="govuk-accordion__section-heading">
+                        <span class="govuk-accordion__section-button" id="accordion-heading-3">
+                            What are partner timebanks?
+                        </span>
+                    </h3>
+                </div>
+                <div id="accordion-content-3" class="govuk-accordion__section-content">
+                    <p class="govuk-body">
+                        Partner timebanks are other timebanking communities that have established a formal partnership with your timebank. Administrators from both timebanks agree to share certain features (like member profiles, listings, or events) with each other's communities.
+                    </p>
                 </div>
             </div>
         </div>
     </section>
 
     <!-- Privacy & Safety -->
-    <section class="civic-fed-faq-section" id="privacy" aria-labelledby="privacy-heading">
-        <h2 id="privacy-heading" class="civic-fed-faq-heading">
-            <i class="fa-solid fa-shield-halved" aria-hidden="true"></i>
+    <section class="govuk-!-margin-bottom-8" id="privacy" aria-labelledby="privacy-heading">
+        <h2 id="privacy-heading" class="govuk-heading-l">
+            <i class="fa-solid fa-shield-halved govuk-!-margin-right-2" aria-hidden="true"></i>
             Privacy & Safety
         </h2>
 
-        <div class="civic-fed-faq-item">
-            <button class="civic-fed-faq-question" aria-expanded="false" aria-controls="faq-4">
-                What information is shared with partner timebanks?
-                <i class="fa-solid fa-chevron-down" aria-hidden="true"></i>
-            </button>
-            <div class="civic-fed-faq-answer" id="faq-4">
-                <div class="civic-fed-faq-content">
-                    You control what's shared through your privacy settings:
-                    <ul>
+        <div class="govuk-accordion" data-module="govuk-accordion" id="accordion-privacy">
+            <div class="govuk-accordion__section">
+                <div class="govuk-accordion__section-header">
+                    <h3 class="govuk-accordion__section-heading">
+                        <span class="govuk-accordion__section-button" id="accordion-heading-4">
+                            What information is shared with partner timebanks?
+                        </span>
+                    </h3>
+                </div>
+                <div id="accordion-content-4" class="govuk-accordion__section-content">
+                    <p class="govuk-body">You control what's shared through your privacy settings:</p>
+                    <ul class="govuk-list govuk-list--bullet">
                         <li><strong>Discovery Level:</strong> Name, avatar, and bio only</li>
                         <li><strong>Social Level:</strong> Plus skills, location (if enabled), and the ability to receive messages</li>
                         <li><strong>Economic Level:</strong> Plus the ability to receive/send time credit transactions</li>
                     </ul>
-                    You can change these settings at any time in your <a href="<?= $basePath ?>/settings?section=federation">Federation Settings</a>.
+                    <p class="govuk-body">You can change these settings at any time in your <a href="<?= $basePath ?>/settings?section=federation" class="govuk-link">Federation Settings</a>.</p>
                 </div>
             </div>
-        </div>
 
-        <div class="civic-fed-faq-item">
-            <button class="civic-fed-faq-question" aria-expanded="false" aria-controls="faq-5">
-                Can I hide my profile from partner timebanks?
-                <i class="fa-solid fa-chevron-down" aria-hidden="true"></i>
-            </button>
-            <div class="civic-fed-faq-answer" id="faq-5">
-                <div class="civic-fed-faq-content">
-                    Yes! You have complete control. You can:
-                    <ul>
+            <div class="govuk-accordion__section">
+                <div class="govuk-accordion__section-header">
+                    <h3 class="govuk-accordion__section-heading">
+                        <span class="govuk-accordion__section-button" id="accordion-heading-5">
+                            Can I hide my profile from partner timebanks?
+                        </span>
+                    </h3>
+                </div>
+                <div id="accordion-content-5" class="govuk-accordion__section-content">
+                    <p class="govuk-body">Yes! You have complete control. You can:</p>
+                    <ul class="govuk-list govuk-list--bullet">
                         <li>Disable federation entirely to be invisible to all partner timebanks</li>
                         <li>Hide specific information (location, skills, etc.)</li>
                         <li>Disable messaging or transactions from federated members</li>
                     </ul>
-                    Your local timebank profile is not affected by these settings.
+                    <p class="govuk-body">Your local timebank profile is not affected by these settings.</p>
                 </div>
             </div>
-        </div>
 
-        <div class="civic-fed-faq-item">
-            <button class="civic-fed-faq-question" aria-expanded="false" aria-controls="faq-6">
-                How do I report inappropriate behavior?
-                <i class="fa-solid fa-chevron-down" aria-hidden="true"></i>
-            </button>
-            <div class="civic-fed-faq-answer" id="faq-6">
-                <div class="civic-fed-faq-content">
-                    If you encounter inappropriate behavior from a member of a partner timebank, you can:
-                    <ul>
+            <div class="govuk-accordion__section">
+                <div class="govuk-accordion__section-header">
+                    <h3 class="govuk-accordion__section-heading">
+                        <span class="govuk-accordion__section-button" id="accordion-heading-6">
+                            How do I report inappropriate behavior?
+                        </span>
+                    </h3>
+                </div>
+                <div id="accordion-content-6" class="govuk-accordion__section-content">
+                    <p class="govuk-body">If you encounter inappropriate behavior from a member of a partner timebank, you can:</p>
+                    <ul class="govuk-list govuk-list--bullet">
                         <li>Block the user from their profile page</li>
                         <li>Report the message or interaction using the report button</li>
                         <li>Contact your local timebank administrators</li>
                     </ul>
-                    Reports are shared with both timebank's administrators for review.
+                    <p class="govuk-body">Reports are shared with both timebank's administrators for review.</p>
                 </div>
             </div>
         </div>
     </section>
 
     <!-- Features -->
-    <section class="civic-fed-faq-section" id="features" aria-labelledby="features-heading">
-        <h2 id="features-heading" class="civic-fed-faq-heading">
-            <i class="fa-solid fa-star" aria-hidden="true"></i>
+    <section class="govuk-!-margin-bottom-8" id="features" aria-labelledby="features-heading">
+        <h2 id="features-heading" class="govuk-heading-l">
+            <i class="fa-solid fa-star govuk-!-margin-right-2" aria-hidden="true"></i>
             Features
         </h2>
 
-        <div class="civic-fed-faq-item">
-            <button class="civic-fed-faq-question" aria-expanded="false" aria-controls="faq-7">
-                Can I send time credits to members of other timebanks?
-                <i class="fa-solid fa-chevron-down" aria-hidden="true"></i>
-            </button>
-            <div class="civic-fed-faq-answer" id="faq-7">
-                <div class="civic-fed-faq-content">
-                    Yes, if both timebanks have enabled federated transactions. Your time credits work the same way - 1 hour = 1 hour, regardless of which timebank the member belongs to. All federated transactions are logged for transparency.
+        <div class="govuk-accordion" data-module="govuk-accordion" id="accordion-features">
+            <div class="govuk-accordion__section">
+                <div class="govuk-accordion__section-header">
+                    <h3 class="govuk-accordion__section-heading">
+                        <span class="govuk-accordion__section-button" id="accordion-heading-7">
+                            Can I send time credits to members of other timebanks?
+                        </span>
+                    </h3>
+                </div>
+                <div id="accordion-content-7" class="govuk-accordion__section-content">
+                    <p class="govuk-body">
+                        Yes, if both timebanks have enabled federated transactions. Your time credits work the same way - 1 hour = 1 hour, regardless of which timebank the member belongs to. All federated transactions are logged for transparency.
+                    </p>
                 </div>
             </div>
-        </div>
 
-        <div class="civic-fed-faq-item">
-            <button class="civic-fed-faq-question" aria-expanded="false" aria-controls="faq-8">
-                How do I join a group from a partner timebank?
-                <i class="fa-solid fa-chevron-down" aria-hidden="true"></i>
-            </button>
-            <div class="civic-fed-faq-answer" id="faq-8">
-                <div class="civic-fed-faq-content">
-                    <ol>
-                        <li>Browse <a href="<?= $basePath ?>/federation/groups">Federated Groups</a></li>
+            <div class="govuk-accordion__section">
+                <div class="govuk-accordion__section-header">
+                    <h3 class="govuk-accordion__section-heading">
+                        <span class="govuk-accordion__section-button" id="accordion-heading-8">
+                            How do I join a group from a partner timebank?
+                        </span>
+                    </h3>
+                </div>
+                <div id="accordion-content-8" class="govuk-accordion__section-content">
+                    <ol class="govuk-list govuk-list--number">
+                        <li>Browse <a href="<?= $basePath ?>/federation/groups" class="govuk-link">Federated Groups</a></li>
                         <li>Find a group you're interested in</li>
                         <li>Click "Join Group" or "Request to Join"</li>
                         <li>Some groups require admin approval</li>
                     </ol>
-                    You'll receive a notification when you're accepted.
+                    <p class="govuk-body">You'll receive a notification when you're accepted.</p>
                 </div>
             </div>
-        </div>
 
-        <div class="civic-fed-faq-item">
-            <button class="civic-fed-faq-question" aria-expanded="false" aria-controls="faq-9">
-                Can I attend events from partner timebanks?
-                <i class="fa-solid fa-chevron-down" aria-hidden="true"></i>
-            </button>
-            <div class="civic-fed-faq-answer" id="faq-9">
-                <div class="civic-fed-faq-content">
-                    Yes! Browse <a href="<?= $basePath ?>/federation/events">Federated Events</a> to see upcoming events from partner timebanks. You can RSVP to events marked as "Open to Federation." Some events may be in-person at the partner timebank's location, while others may be virtual.
+            <div class="govuk-accordion__section">
+                <div class="govuk-accordion__section-header">
+                    <h3 class="govuk-accordion__section-heading">
+                        <span class="govuk-accordion__section-button" id="accordion-heading-9">
+                            Can I attend events from partner timebanks?
+                        </span>
+                    </h3>
+                </div>
+                <div id="accordion-content-9" class="govuk-accordion__section-content">
+                    <p class="govuk-body">
+                        Yes! Browse <a href="<?= $basePath ?>/federation/events" class="govuk-link">Federated Events</a> to see upcoming events from partner timebanks. You can RSVP to events marked as "Open to Federation." Some events may be in-person at the partner timebank's location, while others may be virtual.
+                    </p>
                 </div>
             </div>
         </div>
     </section>
 
     <!-- Troubleshooting -->
-    <section class="civic-fed-faq-section" id="troubleshooting" aria-labelledby="troubleshooting-heading">
-        <h2 id="troubleshooting-heading" class="civic-fed-faq-heading">
-            <i class="fa-solid fa-wrench" aria-hidden="true"></i>
+    <section class="govuk-!-margin-bottom-8" id="troubleshooting" aria-labelledby="troubleshooting-heading">
+        <h2 id="troubleshooting-heading" class="govuk-heading-l">
+            <i class="fa-solid fa-wrench govuk-!-margin-right-2" aria-hidden="true"></i>
             Troubleshooting
         </h2>
 
-        <div class="civic-fed-faq-item">
-            <button class="civic-fed-faq-question" aria-expanded="false" aria-controls="faq-10">
-                I can't see any partner timebanks
-                <i class="fa-solid fa-chevron-down" aria-hidden="true"></i>
-            </button>
-            <div class="civic-fed-faq-answer" id="faq-10">
-                <div class="civic-fed-faq-content">
-                    This could be because:
-                    <ul>
+        <div class="govuk-accordion" data-module="govuk-accordion" id="accordion-troubleshooting">
+            <div class="govuk-accordion__section">
+                <div class="govuk-accordion__section-header">
+                    <h3 class="govuk-accordion__section-heading">
+                        <span class="govuk-accordion__section-button" id="accordion-heading-10">
+                            I can't see any partner timebanks
+                        </span>
+                    </h3>
+                </div>
+                <div id="accordion-content-10" class="govuk-accordion__section-content">
+                    <p class="govuk-body">This could be because:</p>
+                    <ul class="govuk-list govuk-list--bullet">
                         <li>Your timebank doesn't have any active partnerships yet</li>
                         <li>Federation may not be enabled for your timebank (contact your admin)</li>
                         <li>You may need to enable federation in your personal settings</li>
                     </ul>
                 </div>
             </div>
-        </div>
 
-        <div class="civic-fed-faq-item">
-            <button class="civic-fed-faq-question" aria-expanded="false" aria-controls="faq-11">
-                A member from a partner timebank can't find me
-                <i class="fa-solid fa-chevron-down" aria-hidden="true"></i>
-            </button>
-            <div class="civic-fed-faq-answer" id="faq-11">
-                <div class="civic-fed-faq-content">
-                    Check your <a href="<?= $basePath ?>/settings?section=federation">Federation Settings</a> and make sure:
-                    <ul>
+            <div class="govuk-accordion__section">
+                <div class="govuk-accordion__section-header">
+                    <h3 class="govuk-accordion__section-heading">
+                        <span class="govuk-accordion__section-button" id="accordion-heading-11">
+                            A member from a partner timebank can't find me
+                        </span>
+                    </h3>
+                </div>
+                <div id="accordion-content-11" class="govuk-accordion__section-content">
+                    <p class="govuk-body">Check your <a href="<?= $basePath ?>/settings?section=federation" class="govuk-link">Federation Settings</a> and make sure:</p>
+                    <ul class="govuk-list govuk-list--bullet">
                         <li>"Enable Federation" is turned ON</li>
                         <li>"Appear in Federated Search" is enabled</li>
                         <li>Your profile visibility is set appropriately</li>
                     </ul>
                 </div>
             </div>
-        </div>
 
-        <div class="civic-fed-faq-item">
-            <button class="civic-fed-faq-question" aria-expanded="false" aria-controls="faq-12">
-                My transaction to a partner member failed
-                <i class="fa-solid fa-chevron-down" aria-hidden="true"></i>
-            </button>
-            <div class="civic-fed-faq-answer" id="faq-12">
-                <div class="civic-fed-faq-content">
-                    Transaction failures can occur if:
-                    <ul>
+            <div class="govuk-accordion__section">
+                <div class="govuk-accordion__section-header">
+                    <h3 class="govuk-accordion__section-heading">
+                        <span class="govuk-accordion__section-button" id="accordion-heading-12">
+                            My transaction to a partner member failed
+                        </span>
+                    </h3>
+                </div>
+                <div id="accordion-content-12" class="govuk-accordion__section-content">
+                    <p class="govuk-body">Transaction failures can occur if:</p>
+                    <ul class="govuk-list govuk-list--bullet">
                         <li>You don't have enough time credits</li>
                         <li>The recipient has disabled federated transactions</li>
                         <li>The partnership between timebanks has been suspended</li>
                         <li>There's a temporary network issue</li>
                     </ul>
-                    If the problem persists, contact your timebank administrator.
+                    <p class="govuk-body">If the problem persists, contact your timebank administrator.</p>
                 </div>
             </div>
         </div>
     </section>
 
     <!-- Quick Access Cards -->
-    <section class="civic-fed-section" aria-labelledby="quick-access-heading">
-        <h2 id="quick-access-heading" class="civic-fed-section-title">
-            <i class="fa-solid fa-link" aria-hidden="true"></i>
+    <section class="govuk-!-margin-bottom-8" aria-labelledby="quick-access-heading">
+        <h2 id="quick-access-heading" class="govuk-heading-l">
+            <i class="fa-solid fa-link govuk-!-margin-right-2" aria-hidden="true"></i>
             Quick Links
         </h2>
 
-        <div class="civic-fed-hub-grid civic-fed-hub-grid--small">
-            <a href="<?= $basePath ?>/settings?section=federation" class="civic-fed-hub-card">
-                <div class="civic-fed-hub-card-icon">
-                    <i class="fa-solid fa-cog" aria-hidden="true"></i>
-                </div>
-                <div class="civic-fed-hub-card-content">
-                    <h3>Federation Settings</h3>
-                    <p>Manage your privacy preferences and federation options.</p>
-                </div>
-            </a>
+        <div class="govuk-grid-row">
+            <div class="govuk-grid-column-one-third govuk-!-margin-bottom-4">
+                <a href="<?= $basePath ?>/settings?section=federation" class="govuk-link" style="text-decoration: none;">
+                    <div class="govuk-!-padding-4" style="border: 1px solid #b1b4b6; border-left: 5px solid #1d70b8; height: 100%;">
+                        <p class="govuk-body govuk-!-margin-bottom-2">
+                            <i class="fa-solid fa-cog fa-2x" style="color: #1d70b8;" aria-hidden="true"></i>
+                        </p>
+                        <h3 class="govuk-heading-s govuk-!-margin-bottom-2">Federation Settings</h3>
+                        <p class="govuk-body-s govuk-!-margin-bottom-0" style="color: #505a5f;">Manage your privacy preferences and federation options.</p>
+                    </div>
+                </a>
+            </div>
 
-            <a href="<?= $basePath ?>/federation" class="civic-fed-hub-card">
-                <div class="civic-fed-hub-card-icon">
-                    <i class="fa-solid fa-globe" aria-hidden="true"></i>
-                </div>
-                <div class="civic-fed-hub-card-content">
-                    <h3>Partner Timebanks</h3>
-                    <p>Browse all partner timebanks and their available features.</p>
-                </div>
-            </a>
+            <div class="govuk-grid-column-one-third govuk-!-margin-bottom-4">
+                <a href="<?= $basePath ?>/federation" class="govuk-link" style="text-decoration: none;">
+                    <div class="govuk-!-padding-4" style="border: 1px solid #b1b4b6; border-left: 5px solid #1d70b8; height: 100%;">
+                        <p class="govuk-body govuk-!-margin-bottom-2">
+                            <i class="fa-solid fa-globe fa-2x" style="color: #1d70b8;" aria-hidden="true"></i>
+                        </p>
+                        <h3 class="govuk-heading-s govuk-!-margin-bottom-2">Partner Timebanks</h3>
+                        <p class="govuk-body-s govuk-!-margin-bottom-0" style="color: #505a5f;">Browse all partner timebanks and their available features.</p>
+                    </div>
+                </a>
+            </div>
 
-            <a href="<?= $basePath ?>/federation/activity" class="civic-fed-hub-card">
-                <div class="civic-fed-hub-card-icon">
-                    <i class="fa-solid fa-bell" aria-hidden="true"></i>
-                </div>
-                <div class="civic-fed-hub-card-content">
-                    <h3>Activity Feed</h3>
-                    <p>View your recent federated messages, transactions, and updates.</p>
-                </div>
-            </a>
-        </div>
-    </section>
-
-    <!-- Contact Section -->
-    <section class="civic-fed-card civic-fed-card--accent" aria-labelledby="contact-heading">
-        <div class="civic-fed-card-body">
-            <div class="civic-fed-contact">
-                <h3 id="contact-heading">Still have questions?</h3>
-                <p>Our team is here to help you get the most out of federation.</p>
-                <a href="<?= $basePath ?>/help" class="civic-fed-btn civic-fed-btn--primary">
-                    <i class="fa-solid fa-headset" aria-hidden="true"></i>
-                    Contact Support
+            <div class="govuk-grid-column-one-third govuk-!-margin-bottom-4">
+                <a href="<?= $basePath ?>/federation/activity" class="govuk-link" style="text-decoration: none;">
+                    <div class="govuk-!-padding-4" style="border: 1px solid #b1b4b6; border-left: 5px solid #1d70b8; height: 100%;">
+                        <p class="govuk-body govuk-!-margin-bottom-2">
+                            <i class="fa-solid fa-bell fa-2x" style="color: #1d70b8;" aria-hidden="true"></i>
+                        </p>
+                        <h3 class="govuk-heading-s govuk-!-margin-bottom-2">Activity Feed</h3>
+                        <p class="govuk-body-s govuk-!-margin-bottom-0" style="color: #505a5f;">View your recent federated messages, transactions, and updates.</p>
+                    </div>
                 </a>
             </div>
         </div>
     </section>
+
+    <!-- Contact Section -->
+    <div class="govuk-inset-text govuk-!-margin-bottom-6" style="border-left-color: #1d70b8;">
+        <h3 class="govuk-heading-s govuk-!-margin-bottom-2" id="contact-heading">Still have questions?</h3>
+        <p class="govuk-body govuk-!-margin-bottom-4">Our team is here to help you get the most out of federation.</p>
+        <a href="<?= $basePath ?>/help" class="govuk-button" data-module="govuk-button">
+            <i class="fa-solid fa-headset govuk-!-margin-right-1" aria-hidden="true"></i>
+            Contact Support
+        </a>
+    </div>
 </div>
 
 <script>
-// FAQ Accordion
-document.querySelectorAll('.civic-fed-faq-question').forEach(function(button) {
-    button.addEventListener('click', function() {
-        const item = this.closest('.civic-fed-faq-item');
-        const isOpen = item.classList.contains('civic-fed-faq-item--open');
-        const answerId = this.getAttribute('aria-controls');
-
-        // Close all other items
-        document.querySelectorAll('.civic-fed-faq-item--open').forEach(function(openItem) {
-            if (openItem !== item) {
-                openItem.classList.remove('civic-fed-faq-item--open');
-                openItem.querySelector('.civic-fed-faq-question').setAttribute('aria-expanded', 'false');
-            }
-        });
-
-        // Toggle current item
-        item.classList.toggle('civic-fed-faq-item--open');
-        this.setAttribute('aria-expanded', !isOpen);
-    });
-});
-
 // Smooth scroll for quick links
-document.querySelectorAll('.civic-fed-quick-link').forEach(function(link) {
+document.querySelectorAll('a[href^="#"]').forEach(function(link) {
     link.addEventListener('click', function(e) {
-        const href = this.getAttribute('href');
-        if (href.startsWith('#')) {
+        var href = this.getAttribute('href');
+        if (href.startsWith('#') && href.length > 1) {
             e.preventDefault();
-            const target = document.querySelector(href);
+            var target = document.querySelector(href);
             if (target) {
                 target.scrollIntoView({ behavior: 'smooth', block: 'start' });
                 target.focus();
@@ -359,6 +382,7 @@ document.querySelectorAll('.civic-fed-quick-link').forEach(function(link) {
         }
     });
 });
+</script>
 <!-- Federation offline indicator -->
 <script src="<?= \Nexus\Core\TenantContext::getBasePath() ?>/assets/js/civicone-federation-offline.min.js" defer></script>
 

@@ -1,203 +1,196 @@
 <?php
 /**
- * Template G: Account Hub - Volunteering Dashboard
- *
- * Purpose: Manage organizations, opportunities, and applicants
- * Features: Organization cards, applicant management, opportunity listings
- * WCAG 2.1 AA: Semantic HTML, ARIA labels, keyboard navigation
+ * CivicOne View: Volunteering Dashboard
+ * GOV.UK Design System Compliant (WCAG 2.1 AA)
  */
-
-// CivicOne View: Volunteering Dashboard - MadeOpen Style
-$hTitle = 'Volunteering Dashboard';
-$hSubtitle = 'Manage your organization and opportunities';
-$hType = 'Dashboard';
-
+$pageTitle = 'Volunteering Dashboard';
 require __DIR__ . '/../../layouts/civicone/header.php';
 $basePath = \Nexus\Core\TenantContext::getBasePath();
 ?>
-<link rel="stylesheet" href="<?= $basePath ?>/assets/css/purged/civicone-volunteering-dashboard.min.css">
 
+<nav class="govuk-breadcrumbs govuk-!-margin-bottom-6" aria-label="Breadcrumb">
+    <ol class="govuk-breadcrumbs__list">
+        <li class="govuk-breadcrumbs__list-item">
+            <a class="govuk-breadcrumbs__link" href="<?= $basePath ?>">Home</a>
+        </li>
+        <li class="govuk-breadcrumbs__list-item">
+            <a class="govuk-breadcrumbs__link" href="<?= $basePath ?>/volunteering">Volunteering</a>
+        </li>
+        <li class="govuk-breadcrumbs__list-item" aria-current="page">Dashboard</li>
+    </ol>
+</nav>
 
-<!-- Action Bar -->
-<div class="civic-action-bar civic-action-bar--spaced">
-    <a href="<?= $basePath ?>/volunteering" class="civic-btn civic-btn--outline">
-        <span class="dashicons dashicons-arrow-left-alt2" aria-hidden="true"></span>
-        Back to Opportunities
-    </a>
-    <?php if (empty($myOrgs)): ?>
-        <a href="<?= $basePath ?>/volunteering/import-from-profile" class="civic-btn"
-           onclick="return confirm('Create organization from your profile details?');">
-            <span class="dashicons dashicons-plus" aria-hidden="true"></span>
-            Register Organization
+<div class="govuk-grid-row govuk-!-margin-bottom-6">
+    <div class="govuk-grid-column-two-thirds">
+        <h1 class="govuk-heading-xl">
+            <i class="fa-solid fa-hands-helping govuk-!-margin-right-2" aria-hidden="true"></i>
+            Volunteering Dashboard
+        </h1>
+        <p class="govuk-body-l">Manage your organization and opportunities</p>
+    </div>
+    <div class="govuk-grid-column-one-third govuk-!-text-align-right">
+        <a href="<?= $basePath ?>/volunteering" class="govuk-button govuk-button--secondary" data-module="govuk-button">
+            <i class="fa-solid fa-arrow-left govuk-!-margin-right-1" aria-hidden="true"></i>
+            Back to Opportunities
         </a>
-    <?php else: ?>
-        <a href="<?= $basePath ?>/volunteering/opp/create" class="civic-btn">
-            <span class="dashicons dashicons-plus" aria-hidden="true"></span>
-            Post Opportunity
-        </a>
-    <?php endif; ?>
+        <?php if (empty($myOrgs)): ?>
+            <a href="<?= $basePath ?>/volunteering/import-from-profile" class="govuk-button" data-module="govuk-button"
+               onclick="return confirm('Create organization from your profile details?');">
+                <i class="fa-solid fa-plus govuk-!-margin-right-1" aria-hidden="true"></i>
+                Register Organization
+            </a>
+        <?php else: ?>
+            <a href="<?= $basePath ?>/volunteering/opp/create" class="govuk-button" data-module="govuk-button">
+                <i class="fa-solid fa-plus govuk-!-margin-right-1" aria-hidden="true"></i>
+                Post Opportunity
+            </a>
+        <?php endif; ?>
+    </div>
 </div>
 
 <!-- Organizations Section -->
 <?php if (!empty($myOrgs)): ?>
-    <section class="civic-dashboard-section">
-        <h2 class="civic-section-title">
-            <span class="dashicons dashicons-building" aria-hidden="true"></span>
-            My Organizations
-        </h2>
-        <div class="civic-org-grid">
-            <?php foreach ($myOrgs as $org): ?>
-                <article class="civic-org-card">
-                    <div class="civic-org-icon">
-                        <span class="dashicons dashicons-building" aria-hidden="true"></span>
-                    </div>
-                    <h3 class="civic-org-name"><?= htmlspecialchars($org['name']) ?></h3>
-                    <p class="civic-org-description">
-                        <?= htmlspecialchars(substr($org['description'] ?? '', 0, 100)) ?><?= strlen($org['description'] ?? '') > 100 ? '...' : '' ?>
-                    </p>
-                    <a href="<?= $basePath ?>/volunteering/org/edit/<?= $org['id'] ?>" class="civic-btn civic-btn--outline civic-btn--sm">
-                        <span class="dashicons dashicons-edit" aria-hidden="true"></span>
-                        Edit Organization
-                    </a>
-                </article>
-            <?php endforeach; ?>
+<h2 class="govuk-heading-m">
+    <i class="fa-solid fa-building govuk-!-margin-right-2" aria-hidden="true"></i>
+    My Organizations
+</h2>
+<div class="govuk-grid-row govuk-!-margin-bottom-6">
+    <?php foreach ($myOrgs as $org): ?>
+    <div class="govuk-grid-column-one-third govuk-!-margin-bottom-4">
+        <div class="govuk-!-padding-4" style="border: 1px solid #b1b4b6; border-left: 5px solid #1d70b8; height: 100%;">
+            <h3 class="govuk-heading-s govuk-!-margin-bottom-2"><?= htmlspecialchars($org['name']) ?></h3>
+            <p class="govuk-body-s govuk-!-margin-bottom-4" style="color: #505a5f;">
+                <?= htmlspecialchars(substr($org['description'] ?? '', 0, 100)) ?><?= strlen($org['description'] ?? '') > 100 ? '...' : '' ?>
+            </p>
+            <a href="<?= $basePath ?>/volunteering/org/edit/<?= $org['id'] ?>" class="govuk-button govuk-button--secondary" data-module="govuk-button">
+                <i class="fa-solid fa-pen govuk-!-margin-right-1" aria-hidden="true"></i>
+                Edit Organization
+            </a>
         </div>
-    </section>
+    </div>
+    <?php endforeach; ?>
+</div>
 <?php endif; ?>
 
 <!-- Applicants Section -->
 <?php if (!empty($myApplications)): ?>
-    <section class="civic-dashboard-section">
-        <h2 class="civic-section-title">
-            <span class="dashicons dashicons-groups" aria-hidden="true"></span>
-            Applicants
-        </h2>
-        <div class="civic-table-card">
-            <table class="civic-table">
-                <thead>
-                    <tr>
-                        <th>Opportunity</th>
-                        <th>Applicant</th>
-                        <th>Status</th>
-                        <th>Action</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php foreach ($myApplications as $app): ?>
-                        <tr>
-                            <td>
-                                <strong><?= htmlspecialchars($app['opp_title']) ?></strong>
-                            </td>
-                            <td>
-                                <?= htmlspecialchars($app['applicant_name'] ?? 'User #' . $app['user_id']) ?>
-                            </td>
-                            <td>
-                                <?php
-                                $statusClass = match ($app['status']) {
-                                    'approved' => 'civic-status--approved',
-                                    'declined' => 'civic-status--declined',
-                                    default => 'civic-status--pending'
-                                };
-                                ?>
-                                <span class="civic-status <?= $statusClass ?>">
-                                    <?= ucfirst($app['status']) ?>
-                                </span>
-                            </td>
-                            <td>
-                                <?php if ($app['status'] === 'pending'): ?>
-                                    <form action="<?= $basePath ?>/volunteering/application/update" method="POST" class="civic-action-buttons">
-                                        <?= \Nexus\Core\Csrf::input() ?>
-                                        <input type="hidden" name="app_id" value="<?= $app['id'] ?>">
-                                        <button type="submit" name="status" value="approved" class="civic-btn civic-btn--sm civic-btn--success">
-                                            Approve
-                                        </button>
-                                        <button type="submit" name="status" value="declined" class="civic-btn civic-btn--sm civic-btn--danger">
-                                            Decline
-                                        </button>
-                                    </form>
-                                <?php else: ?>
-                                    <span class="civic-text-muted">—</span>
-                                <?php endif; ?>
-                            </td>
-                        </tr>
-                    <?php endforeach; ?>
-                </tbody>
-            </table>
-        </div>
-    </section>
+<h2 class="govuk-heading-m">
+    <i class="fa-solid fa-users govuk-!-margin-right-2" aria-hidden="true"></i>
+    Applicants
+</h2>
+<table class="govuk-table govuk-!-margin-bottom-6">
+    <thead class="govuk-table__head">
+        <tr class="govuk-table__row">
+            <th scope="col" class="govuk-table__header">Opportunity</th>
+            <th scope="col" class="govuk-table__header">Applicant</th>
+            <th scope="col" class="govuk-table__header">Status</th>
+            <th scope="col" class="govuk-table__header">Action</th>
+        </tr>
+    </thead>
+    <tbody class="govuk-table__body">
+        <?php foreach ($myApplications as $app): ?>
+        <tr class="govuk-table__row">
+            <td class="govuk-table__cell">
+                <strong><?= htmlspecialchars($app['opp_title']) ?></strong>
+            </td>
+            <td class="govuk-table__cell">
+                <?= htmlspecialchars($app['applicant_name'] ?? 'User #' . $app['user_id']) ?>
+            </td>
+            <td class="govuk-table__cell">
+                <?php
+                $tagColor = match ($app['status']) {
+                    'approved' => 'govuk-tag--green',
+                    'declined' => 'govuk-tag--red',
+                    default => 'govuk-tag--yellow'
+                };
+                ?>
+                <span class="govuk-tag <?= $tagColor ?>"><?= ucfirst($app['status']) ?></span>
+            </td>
+            <td class="govuk-table__cell">
+                <?php if ($app['status'] === 'pending'): ?>
+                <form action="<?= $basePath ?>/volunteering/application/update" method="POST" style="display: inline;">
+                    <?= \Nexus\Core\Csrf::input() ?>
+                    <input type="hidden" name="app_id" value="<?= $app['id'] ?>">
+                    <button type="submit" name="status" value="approved" class="govuk-button govuk-button--secondary govuk-!-margin-bottom-0" style="padding: 5px 10px;">
+                        Approve
+                    </button>
+                    <button type="submit" name="status" value="declined" class="govuk-button govuk-button--warning govuk-!-margin-bottom-0" style="padding: 5px 10px;">
+                        Decline
+                    </button>
+                </form>
+                <?php else: ?>
+                <span style="color: #505a5f;">—</span>
+                <?php endif; ?>
+            </td>
+        </tr>
+        <?php endforeach; ?>
+    </tbody>
+</table>
 <?php endif; ?>
 
 <!-- Manage Opportunities Section -->
 <?php if (!empty($myOrgs)): ?>
-    <section class="civic-dashboard-section">
-        <h2 class="civic-section-title">
-            <span class="dashicons dashicons-heart" aria-hidden="true"></span>
-            Manage Opportunities
-        </h2>
+<h2 class="govuk-heading-m">
+    <i class="fa-solid fa-heart govuk-!-margin-right-2" aria-hidden="true"></i>
+    Manage Opportunities
+</h2>
 
-        <?php if (empty($myOpps)): ?>
-            <div class="civic-empty-state">
-                <div class="civic-empty-state-icon">
-                    <span class="dashicons dashicons-megaphone civic-empty-icon-lg" aria-hidden="true"></span>
-                </div>
-                <h3 class="civic-empty-state-title">No opportunities yet</h3>
-                <p class="civic-empty-state-text">You haven't posted any volunteer opportunities yet.</p>
-                <a href="<?= $basePath ?>/volunteering/opp/create" class="civic-btn">
-                    <span class="dashicons dashicons-plus" aria-hidden="true"></span>
-                    Post Your First Opportunity
-                </a>
+<?php if (empty($myOpps)): ?>
+    <div class="govuk-inset-text govuk-!-margin-bottom-6">
+        <h3 class="govuk-heading-s govuk-!-margin-bottom-2">No opportunities yet</h3>
+        <p class="govuk-body govuk-!-margin-bottom-2">You haven't posted any volunteer opportunities yet.</p>
+        <a href="<?= $basePath ?>/volunteering/opp/create" class="govuk-button govuk-button--secondary" data-module="govuk-button">
+            <i class="fa-solid fa-plus govuk-!-margin-right-1" aria-hidden="true"></i>
+            Post Your First Opportunity
+        </a>
+    </div>
+<?php else: ?>
+    <ul class="govuk-list govuk-!-margin-bottom-6">
+        <?php foreach ($myOpps as $opp): ?>
+        <li class="govuk-!-padding-3 govuk-!-margin-bottom-2" style="border-left: 4px solid #1d70b8; background: #f8f8f8; display: flex; justify-content: space-between; align-items: center;">
+            <div>
+                <h3 class="govuk-heading-s govuk-!-margin-bottom-1">
+                    <a href="<?= $basePath ?>/volunteering/<?= $opp['id'] ?>" class="govuk-link">
+                        <?= htmlspecialchars($opp['title']) ?>
+                    </a>
+                </h3>
+                <p class="govuk-body-s govuk-!-margin-bottom-0" style="color: #505a5f;">
+                    <i class="fa-solid fa-building govuk-!-margin-right-1" aria-hidden="true"></i>
+                    <?= htmlspecialchars($opp['org_name'] ?? '') ?>
+                    <?php if (!empty($opp['start_date'])): ?>
+                        <span class="govuk-!-margin-left-2">
+                            <i class="fa-solid fa-calendar govuk-!-margin-right-1" aria-hidden="true"></i>
+                            <?= date('M j, Y', strtotime($opp['start_date'])) ?>
+                        </span>
+                    <?php endif; ?>
+                </p>
             </div>
-        <?php else: ?>
-            <div class="civic-opp-list">
-                <?php foreach ($myOpps as $opp): ?>
-                    <article class="civic-opp-item">
-                        <div class="civic-opp-info">
-                            <h3 class="civic-opp-title">
-                                <a href="<?= $basePath ?>/volunteering/<?= $opp['id'] ?>">
-                                    <?= htmlspecialchars($opp['title']) ?>
-                                </a>
-                            </h3>
-                            <p class="civic-opp-meta">
-                                <span class="dashicons dashicons-building" aria-hidden="true"></span>
-                                <?= htmlspecialchars($opp['org_name'] ?? '') ?>
-                                <?php if (!empty($opp['start_date'])): ?>
-                                    <span class="civic-opp-date">
-                                        <span class="dashicons dashicons-calendar-alt" aria-hidden="true"></span>
-                                        <?= date('M j, Y', strtotime($opp['start_date'])) ?>
-                                    </span>
-                                <?php endif; ?>
-                            </p>
-                        </div>
-                        <div class="civic-opp-actions">
-                            <a href="<?= $basePath ?>/volunteering/opp/edit/<?= $opp['id'] ?>" class="civic-btn civic-btn--outline civic-btn--sm">
-                                <span class="dashicons dashicons-edit" aria-hidden="true"></span>
-                                Edit
-                            </a>
-                        </div>
-                    </article>
-                <?php endforeach; ?>
-            </div>
-        <?php endif; ?>
-    </section>
+            <a href="<?= $basePath ?>/volunteering/opp/edit/<?= $opp['id'] ?>" class="govuk-button govuk-button--secondary govuk-!-margin-bottom-0" data-module="govuk-button">
+                <i class="fa-solid fa-pen govuk-!-margin-right-1" aria-hidden="true"></i>
+                Edit
+            </a>
+        </li>
+        <?php endforeach; ?>
+    </ul>
+<?php endif; ?>
 <?php endif; ?>
 
 <!-- Empty State for New Users -->
 <?php if (empty($myOrgs)): ?>
-    <div class="civic-empty-state">
-        <div class="civic-empty-state-icon">
-            <span class="dashicons dashicons-building civic-empty-icon-lg" aria-hidden="true"></span>
-        </div>
-        <h3 class="civic-empty-state-title">Get Started</h3>
-        <p class="civic-empty-state-text">
-            Register your organization to start posting volunteer opportunities and connecting with community members.
-        </p>
-        <a href="<?= $basePath ?>/volunteering/import-from-profile" class="civic-btn"
-           onclick="return confirm('Create organization from your profile details?');">
-            <span class="dashicons dashicons-plus" aria-hidden="true"></span>
-            Register Organization
-        </a>
-    </div>
+<div class="govuk-inset-text govuk-!-margin-bottom-6">
+    <h3 class="govuk-heading-s govuk-!-margin-bottom-2">
+        <i class="fa-solid fa-building govuk-!-margin-right-2" aria-hidden="true"></i>
+        Get Started
+    </h3>
+    <p class="govuk-body govuk-!-margin-bottom-2">
+        Register your organization to start posting volunteer opportunities and connecting with community members.
+    </p>
+    <a href="<?= $basePath ?>/volunteering/import-from-profile" class="govuk-button" data-module="govuk-button"
+       onclick="return confirm('Create organization from your profile details?');">
+        <i class="fa-solid fa-plus govuk-!-margin-right-1" aria-hidden="true"></i>
+        Register Organization
+    </a>
+</div>
 <?php endif; ?>
-
 
 <?php require __DIR__ . '/../../layouts/civicone/footer.php'; ?>

@@ -1,50 +1,40 @@
 <?php
 /**
  * Review Error Page
- * CivicOne Theme - WCAG 2.1 AA Compliant
+ * GOV.UK Design System (WCAG 2.1 AA)
  */
-$pageTitle = $pageTitle ?? 'Cannot Submit Review';
-$hideHero = true;
-
-Nexus\Core\SEO::setTitle('Cannot Submit Review - Federation');
-Nexus\Core\SEO::setDescription('Unable to submit your review at this time.');
+$pageTitle = 'Cannot Submit Review';
+\Nexus\Core\SEO::setTitle('Cannot Submit Review - Federation');
+\Nexus\Core\SEO::setDescription('Unable to submit your review at this time.');
 
 require dirname(dirname(__DIR__)) . '/layouts/civicone/header.php';
-$basePath = Nexus\Core\TenantContext::getBasePath();
+$basePath = \Nexus\Core\TenantContext::getBasePath();
 
 $error = $error ?? 'Unable to submit review';
 ?>
 
-<!-- Offline Banner -->
-<div class="civic-fed-offline-banner" id="offlineBanner" role="alert" aria-live="polite">
-    <i class="fa-solid fa-wifi-slash" aria-hidden="true"></i>
-    <span>No internet connection</span>
-</div>
-
-<div class="civic-container">
-    <div class="civic-fed-error-card" role="alert" aria-labelledby="error-title">
-        <div class="civic-fed-error-icon" aria-hidden="true">
-            <i class="fa-solid fa-exclamation-circle"></i>
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+        <div class="govuk-error-summary" aria-labelledby="error-summary-title" role="alert" tabindex="-1" data-module="govuk-error-summary">
+            <h1 class="govuk-error-summary__title" id="error-summary-title">
+                Cannot Submit Review
+            </h1>
+            <div class="govuk-error-summary__body">
+                <p class="govuk-body"><?= htmlspecialchars($error) ?></p>
+            </div>
         </div>
 
-        <h1 id="error-title" class="civic-fed-error-title">Cannot Submit Review</h1>
-
-        <p class="civic-fed-error-message"><?= htmlspecialchars($error) ?></p>
-
-        <div class="civic-fed-actions" aria-label="Error actions">
-            <a href="<?= $basePath ?>/federation/transactions" class="civic-fed-btn civic-fed-btn--primary">
-                <i class="fa-solid fa-arrow-left" aria-hidden="true"></i>
+        <div class="govuk-button-group">
+            <a href="<?= $basePath ?>/federation/transactions" class="govuk-button" data-module="govuk-button">
+                <i class="fa-solid fa-arrow-left govuk-!-margin-right-2" aria-hidden="true"></i>
                 Back to Transactions
             </a>
-            <a href="<?= $basePath ?>/federation/reviews/pending" class="civic-fed-btn civic-fed-btn--secondary">
-                <i class="fa-solid fa-star" aria-hidden="true"></i>
+            <a href="<?= $basePath ?>/federation/reviews/pending" class="govuk-button govuk-button--secondary" data-module="govuk-button">
+                <i class="fa-solid fa-star govuk-!-margin-right-2" aria-hidden="true"></i>
                 View Pending Reviews
             </a>
         </div>
     </div>
 </div>
-
-<!-- Federation offline indicator -->
-<script src="<?= \Nexus\Core\TenantContext::getBasePath() ?>/assets/js/civicone-federation-offline.min.js" defer></script>
 
 <?php require dirname(dirname(__DIR__)) . '/layouts/civicone/footer.php'; ?>

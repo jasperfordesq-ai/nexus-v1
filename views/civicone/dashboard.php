@@ -55,11 +55,11 @@ $basePath = \Nexus\Core\TenantContext::getBasePath();
 </div>
 
 <!-- Quick Actions FAB (Mobile) -->
-<div class="civic-fab" id="civicFab">
-    <button type="button" class="govuk-button" onclick="toggleCivicFab()" aria-label="Quick Actions" aria-expanded="false" style="border-radius: 50%; width: 56px; height: 56px; padding: 0; position: fixed; bottom: 80px; right: 20px; z-index: 1000;">
-        <span style="font-size: 24px;">+</span>
+<div id="govukFab" class="govuk-!-display-none-print" style="position: fixed; bottom: 80px; right: 20px; z-index: 1000;">
+    <button type="button" class="govuk-button" onclick="toggleGovukFab()" aria-label="Quick Actions" aria-expanded="false" aria-controls="govukFabMenu" style="border-radius: 50%; width: 56px; height: 56px; padding: 0;">
+        <span style="font-size: 24px;" aria-hidden="true">+</span>
     </button>
-    <div class="civic-fab-menu" id="civicFabMenu" hidden style="position: fixed; bottom: 150px; right: 20px; z-index: 999; background: white; padding: 1rem; border-radius: 4px; box-shadow: 0 2px 8px rgba(0,0,0,0.15);">
+    <div id="govukFabMenu" hidden style="position: absolute; bottom: 70px; right: 0; background: white; padding: 1rem; border: 1px solid #b1b4b6; border-radius: 4px; box-shadow: 0 2px 8px rgba(0,0,0,0.15); min-width: 160px;">
         <ul class="govuk-list govuk-!-margin-bottom-0">
             <li class="govuk-!-margin-bottom-2">
                 <a href="<?= $basePath ?>/wallet" class="govuk-link">Send Credits</a>
@@ -76,6 +76,15 @@ $basePath = \Nexus\Core\TenantContext::getBasePath();
 
 <script src="/assets/js/civicone-dashboard.js"></script>
 <script>
+// Toggle FAB menu
+function toggleGovukFab() {
+    const menu = document.getElementById('govukFabMenu');
+    const btn = document.querySelector('#govukFab button');
+    const isExpanded = btn.getAttribute('aria-expanded') === 'true';
+    menu.hidden = isExpanded;
+    btn.setAttribute('aria-expanded', !isExpanded);
+}
+
 // Initialize dashboard with basePath
 document.addEventListener('DOMContentLoaded', function() {
     if (typeof initCivicOneDashboard === 'function') {

@@ -1,7 +1,7 @@
 <?php
 /**
  * CivicOne Dashboard - Notifications Page
- * WCAG 2.1 AA Compliant
+ * GOV.UK Design System Compliant (WCAG 2.1 AA)
  * Template: Account Area Template (Template G)
  * Dedicated page for managing notifications (no longer a tab)
  */
@@ -29,154 +29,184 @@ if (!empty($notifSettings)) {
 }
 ?>
 
-<div class="civic-dashboard civicone-account-area">
+<nav class="govuk-breadcrumbs govuk-!-margin-bottom-6" aria-label="Breadcrumb">
+    <ol class="govuk-breadcrumbs__list">
+        <li class="govuk-breadcrumbs__list-item">
+            <a class="govuk-breadcrumbs__link" href="<?= $basePath ?>">Home</a>
+        </li>
+        <li class="govuk-breadcrumbs__list-item">
+            <a class="govuk-breadcrumbs__link" href="<?= $basePath ?>/dashboard">Dashboard</a>
+        </li>
+        <li class="govuk-breadcrumbs__list-item" aria-current="page">Notifications</li>
+    </ol>
+</nav>
 
-    <!-- Account Area Secondary Navigation -->
-    <?php require dirname(dirname(__DIR__)) . '/layouts/civicone/partials/account-navigation.php'; ?>
+<!-- Account Area Secondary Navigation -->
+<?php require dirname(dirname(__DIR__)) . '/layouts/civicone/partials/account-navigation.php'; ?>
 
-    <!-- NOTIFICATIONS CONTENT -->
-    <section class="civic-dash-card" aria-labelledby="all-notif-heading">
-        <div class="civic-dash-card-header civic-notif-header">
-            <h2 id="all-notif-heading" class="civic-dash-card-title">
-                <i class="fa-solid fa-bell" aria-hidden="true"></i>
+<!-- NOTIFICATIONS CONTENT -->
+<section aria-labelledby="all-notif-heading" class="govuk-!-margin-bottom-8">
+    <div class="govuk-grid-row govuk-!-margin-bottom-4">
+        <div class="govuk-grid-column-one-half">
+            <h2 id="all-notif-heading" class="govuk-heading-l">
+                <i class="fa-solid fa-bell govuk-!-margin-right-2" aria-hidden="true"></i>
                 All Notifications
             </h2>
-            <div class="civic-notif-actions">
-                <button type="button" onclick="openEventsModal()" class="civic-button civic-button--secondary">
-                    <i class="fa-solid fa-list-ul" aria-hidden="true"></i>
-                    <span class="btn-label">Events</span>
+        </div>
+        <div class="govuk-grid-column-one-half govuk-!-text-align-right">
+            <div class="govuk-button-group" style="justify-content: flex-end;">
+                <button type="button" onclick="openEventsModal()" class="govuk-button govuk-button--secondary" data-module="govuk-button">
+                    <i class="fa-solid fa-list-ul govuk-!-margin-right-1" aria-hidden="true"></i> Events
                 </button>
-                <button type="button" onclick="toggleNotifSettings()" class="civic-button civic-button--secondary">
-                    <i class="fa-solid fa-gear" aria-hidden="true"></i>
-                    <span class="btn-label">Settings</span>
+                <button type="button" onclick="toggleNotifSettings()" class="govuk-button govuk-button--secondary" data-module="govuk-button">
+                    <i class="fa-solid fa-gear govuk-!-margin-right-1" aria-hidden="true"></i> Settings
                 </button>
-                <button type="button" onclick="window.nexusNotifications.markAllRead(this)" class="civic-button civic-button--secondary">
-                    <i class="fa-solid fa-check-double" aria-hidden="true"></i>
-                    <span class="btn-label">Mark All Read</span>
+                <button type="button" onclick="window.nexusNotifications.markAllRead(this)" class="govuk-button govuk-button--secondary" data-module="govuk-button">
+                    <i class="fa-solid fa-check-double govuk-!-margin-right-1" aria-hidden="true"></i> Mark All Read
                 </button>
             </div>
         </div>
+    </div>
 
-        <!-- Events Modal -->
-        <dialog id="events-modal" class="civic-modal" aria-labelledby="events-modal-title">
-            <div class="civic-modal-header">
-                <h3 id="events-modal-title">Notification Triggers</h3>
-                <button type="button" onclick="document.getElementById('events-modal').close()" class="civic-button civic-button--secondary" aria-label="Close">
-                    <i class="fa-solid fa-times" aria-hidden="true"></i>
-                </button>
+    <!-- Events Modal -->
+    <dialog id="events-modal" class="govuk-!-padding-6" style="border: 1px solid #b1b4b6; max-width: 500px;" aria-labelledby="events-modal-title">
+        <div class="govuk-!-margin-bottom-4">
+            <h3 id="events-modal-title" class="govuk-heading-m">Notification Triggers</h3>
+            <button type="button" onclick="document.getElementById('events-modal').close()" class="govuk-button govuk-button--secondary" aria-label="Close" style="position: absolute; top: 1rem; right: 1rem;">
+                <i class="fa-solid fa-times" aria-hidden="true"></i>
+            </button>
+        </div>
+        <dl class="govuk-summary-list">
+            <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">Social Interactions</dt>
+                <dd class="govuk-summary-list__value">Posts, Replies, Mentions</dd>
             </div>
-            <div class="civic-modal-body">
-                <div class="civic-modal-section">
-                    <strong>Social Interactions</strong>
-                    <p>Posts, Replies, Mentions</p>
-                </div>
-                <div class="civic-modal-section">
-                    <strong>Connections</strong>
-                    <p>Friend Requests, Accepted</p>
-                </div>
-                <div class="civic-modal-section">
-                    <strong>Events</strong>
-                    <p>Invitations</p>
-                </div>
-                <div class="civic-modal-section">
-                    <strong>Wallet</strong>
-                    <p>Payments, Transfers</p>
-                </div>
-                <div class="civic-modal-section">
-                    <strong>Badges</strong>
-                    <p>Volunteering milestones, Credits earned</p>
-                </div>
+            <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">Connections</dt>
+                <dd class="govuk-summary-list__value">Friend Requests, Accepted</dd>
             </div>
-            <div class="civic-modal-footer">
-                <button type="button" onclick="document.getElementById('events-modal').close()" class="civic-button">Got it</button>
+            <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">Events</dt>
+                <dd class="govuk-summary-list__value">Invitations</dd>
             </div>
-        </dialog>
+            <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">Wallet</dt>
+                <dd class="govuk-summary-list__value">Payments, Transfers</dd>
+            </div>
+            <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">Badges</dt>
+                <dd class="govuk-summary-list__value">Volunteering milestones, Credits earned</dd>
+            </div>
+        </dl>
+        <div class="govuk-!-margin-top-4">
+            <button type="button" onclick="document.getElementById('events-modal').close()" class="govuk-button" data-module="govuk-button">Got it</button>
+        </div>
+    </dialog>
 
-        <!-- Settings Panel -->
-        <div id="notif-settings-panel" class="civic-settings-panel" hidden>
-            <div class="civic-settings-card">
-                <h3>Global Email Frequency</h3>
-                <p>Default for all notifications</p>
-                <label for="global-freq" class="visually-hidden">Email frequency</label>
-                <select id="global-freq" onchange="updateNotifSetting('global', 0, this.value)" class="civic-select">
-                    <option value="instant" <?= $globalFreq === 'instant' ? 'selected' : '' ?>>Instant (As it happens)</option>
-                    <option value="daily" <?= $globalFreq === 'daily' ? 'selected' : '' ?>>Daily Digest</option>
-                    <option value="weekly" <?= $globalFreq === 'weekly' ? 'selected' : '' ?>>Weekly Digest</option>
-                    <option value="off" <?= $globalFreq === 'off' ? 'selected' : '' ?>>Off (In-App Only)</option>
-                </select>
+    <!-- Settings Panel -->
+    <div id="notif-settings-panel" class="govuk-!-padding-4 govuk-!-margin-bottom-6" style="background: #f3f2f1; display: none;">
+        <div class="govuk-grid-row">
+            <div class="govuk-grid-column-one-half">
+                <div class="govuk-form-group">
+                    <h3 class="govuk-heading-s">Global Email Frequency</h3>
+                    <p class="govuk-body-s govuk-!-margin-bottom-2">Default for all notifications</p>
+                    <label for="global-freq" class="govuk-visually-hidden">Email frequency</label>
+                    <select id="global-freq" onchange="updateNotifSetting('global', 0, this.value)" class="govuk-select">
+                        <option value="instant" <?= $globalFreq === 'instant' ? 'selected' : '' ?>>Instant (As it happens)</option>
+                        <option value="daily" <?= $globalFreq === 'daily' ? 'selected' : '' ?>>Daily Digest</option>
+                        <option value="weekly" <?= $globalFreq === 'weekly' ? 'selected' : '' ?>>Weekly Digest</option>
+                        <option value="off" <?= $globalFreq === 'off' ? 'selected' : '' ?>>Off (In-App Only)</option>
+                    </select>
+                </div>
             </div>
 
             <?php if (!empty($myGroups)): ?>
-                <div class="civic-settings-card">
-                    <h3>Hub Overrides</h3>
-                    <p>Customize per hub</p>
-                    <div class="civic-hub-settings">
-                        <?php foreach ($myGroups as $grp):
-                            $gFreq = $groupSettings[$grp['id']] ?? 'default';
-                        ?>
-                            <div class="civic-hub-setting-item">
-                                <span class="civic-hub-setting-name"><?= htmlspecialchars($grp['name']) ?></span>
-                                <label for="hub-freq-<?= $grp['id'] ?>" class="visually-hidden">Frequency for <?= htmlspecialchars($grp['name']) ?></label>
-                                <select id="hub-freq-<?= $grp['id'] ?>" onchange="updateNotifSetting('group', <?= $grp['id'] ?>, this.value)" class="civic-select-sm">
-                                    <option value="default" <?= $gFreq === 'default' ? 'selected' : '' ?>>Use Global</option>
-                                    <option value="instant" <?= $gFreq === 'instant' ? 'selected' : '' ?>>Instant</option>
-                                    <option value="daily" <?= $gFreq === 'daily' ? 'selected' : '' ?>>Daily</option>
-                                    <option value="off" <?= $gFreq === 'off' ? 'selected' : '' ?>>Mute</option>
-                                </select>
-                            </div>
-                        <?php endforeach; ?>
-                    </div>
+                <div class="govuk-grid-column-one-half">
+                    <h3 class="govuk-heading-s">Hub Overrides</h3>
+                    <p class="govuk-body-s govuk-!-margin-bottom-2">Customize per hub</p>
+                    <?php foreach ($myGroups as $grp):
+                        $gFreq = $groupSettings[$grp['id']] ?? 'default';
+                    ?>
+                        <div class="govuk-form-group govuk-!-margin-bottom-2">
+                            <label for="hub-freq-<?= $grp['id'] ?>" class="govuk-label govuk-!-font-size-14"><?= htmlspecialchars($grp['name']) ?></label>
+                            <select id="hub-freq-<?= $grp['id'] ?>" onchange="updateNotifSetting('group', <?= $grp['id'] ?>, this.value)" class="govuk-select govuk-!-width-full">
+                                <option value="default" <?= $gFreq === 'default' ? 'selected' : '' ?>>Use Global</option>
+                                <option value="instant" <?= $gFreq === 'instant' ? 'selected' : '' ?>>Instant</option>
+                                <option value="daily" <?= $gFreq === 'daily' ? 'selected' : '' ?>>Daily</option>
+                                <option value="off" <?= $gFreq === 'off' ? 'selected' : '' ?>>Mute</option>
+                            </select>
+                        </div>
+                    <?php endforeach; ?>
                 </div>
             <?php endif; ?>
         </div>
+    </div>
 
-        <!-- Notification List -->
-        <?php
-        $allNotifs = $notifications ?? [];
-        ?>
-        <?php if (empty($allNotifs)): ?>
-            <div class="civic-empty-state civic-empty-large">
-                <div class="civic-empty-icon"><i class="fa-regular fa-bell-slash" aria-hidden="true"></i></div>
-                <h3>All caught up!</h3>
-                <p class="civic-empty-text">You have no notifications at this time.</p>
-            </div>
-        <?php else: ?>
-            <ul role="list" class="civic-notif-full-list">
-            <?php foreach ($allNotifs as $n): ?>
-                <li class="civic-notif-full-item <?= $n['is_read'] ? 'read' : 'unread' ?>" data-notif-id="<?= $n['id'] ?>">
-                    <div class="civic-notif-dot <?= $n['is_read'] ? 'read' : 'unread' ?>" aria-hidden="true"></div>
-                    <div class="civic-notif-body">
-                        <div class="civic-notif-message <?= $n['is_read'] ? '' : 'unread' ?>">
+    <!-- Notification List -->
+    <?php
+    $allNotifs = $notifications ?? [];
+    ?>
+    <?php if (empty($allNotifs)): ?>
+        <div class="govuk-inset-text">
+            <p class="govuk-body-l govuk-!-margin-bottom-2">
+                <i class="fa-regular fa-bell-slash govuk-!-margin-right-2" aria-hidden="true"></i>
+                <strong>All caught up!</strong>
+            </p>
+            <p class="govuk-body">You have no notifications at this time.</p>
+        </div>
+    <?php else: ?>
+        <ul class="govuk-list" role="list">
+        <?php foreach ($allNotifs as $n): ?>
+            <li class="govuk-!-margin-bottom-3 govuk-!-padding-4 <?= $n['is_read'] ? '' : 'govuk-!-font-weight-bold' ?>" style="border: 1px solid #b1b4b6; border-left: 5px solid <?= $n['is_read'] ? '#b1b4b6' : '#1d70b8' ?>;" data-notif-id="<?= $n['id'] ?>">
+                <div class="govuk-grid-row">
+                    <div class="govuk-grid-column-three-quarters">
+                        <p class="govuk-body govuk-!-margin-bottom-2">
                             <?= htmlspecialchars($n['message']) ?>
-                        </div>
-                        <div class="civic-notif-time">
-                            <i class="fa-regular fa-clock" aria-hidden="true"></i>
+                        </p>
+                        <p class="govuk-body-s govuk-!-margin-bottom-0" style="color: #505a5f;">
+                            <i class="fa-regular fa-clock govuk-!-margin-right-1" aria-hidden="true"></i>
                             <?= date('M j, Y \a\t g:i A', strtotime($n['created_at'])) ?>
-                        </div>
-                        <div class="civic-notif-item-actions">
+                        </p>
+                    </div>
+                    <div class="govuk-grid-column-one-quarter govuk-!-text-align-right">
+                        <div class="govuk-button-group" style="justify-content: flex-end;">
                             <?php if ($n['link']): ?>
-                                <a href="<?= htmlspecialchars($n['link']) ?>" onclick="window.nexusNotifications.markOneRead(<?= $n['id'] ?>)" class="civic-button" role="button">View</a>
+                                <a href="<?= htmlspecialchars($n['link']) ?>" onclick="window.nexusNotifications.markOneRead(<?= $n['id'] ?>)" class="govuk-button govuk-button--secondary" data-module="govuk-button">View</a>
                             <?php endif; ?>
                             <?php if (!$n['is_read']): ?>
-                                <button type="button" onclick="window.nexusNotifications.markOneRead(<?= $n['id'] ?>); this.closest('li').classList.add('read'); this.closest('li').classList.remove('unread'); this.remove();" class="civic-button civic-button--secondary">
-                                    <i class="fa-solid fa-check" aria-hidden="true"></i> Mark Read
+                                <button type="button" onclick="window.nexusNotifications.markOneRead(<?= $n['id'] ?>); this.closest('li').style.borderLeftColor='#b1b4b6'; this.closest('li').classList.remove('govuk-!-font-weight-bold'); this.remove();" class="govuk-button govuk-button--secondary" data-module="govuk-button">
+                                    <i class="fa-solid fa-check" aria-hidden="true"></i>
                                 </button>
                             <?php endif; ?>
-                            <button type="button" onclick="deleteNotificationDashboard(<?= $n['id'] ?>)" class="civic-button civic-button--warning" aria-label="Delete notification">
+                            <button type="button" onclick="deleteNotificationDashboard(<?= $n['id'] ?>)" class="govuk-button govuk-button--warning" data-module="govuk-button" aria-label="Delete notification">
                                 <i class="fa-solid fa-trash" aria-hidden="true"></i>
                             </button>
                         </div>
                     </div>
-                </li>
-            <?php endforeach; ?>
-            </ul>
-        <?php endif; ?>
-    </section>
-
-</div>
+                </div>
+            </li>
+        <?php endforeach; ?>
+        </ul>
+    <?php endif; ?>
+</section>
 
 <script src="/assets/js/civicone-dashboard.js"></script>
 <script>
+// Toggle settings panel
+function toggleNotifSettings() {
+    var panel = document.getElementById('notif-settings-panel');
+    if (panel.style.display === 'none') {
+        panel.style.display = 'block';
+    } else {
+        panel.style.display = 'none';
+    }
+}
+
+// Open events modal
+function openEventsModal() {
+    document.getElementById('events-modal').showModal();
+}
+
 // Initialize dashboard with basePath
 document.addEventListener('DOMContentLoaded', function() {
     if (typeof initCivicOneDashboard === 'function') {

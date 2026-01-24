@@ -1,16 +1,16 @@
 <?php
 /**
- * Federation Transaction Create
- * CivicOne Theme - WCAG 2.1 AA Compliant
+ * CivicOne View: Federation Transaction Create
+ * GOV.UK Design System Compliant (WCAG 2.1 AA)
  */
 $pageTitle = $pageTitle ?? "Send Hours";
 $hideHero = true;
 
-Nexus\Core\SEO::setTitle('Send Hours - Federated Transaction');
-Nexus\Core\SEO::setDescription('Send hours to a member from a partner timebank.');
+\Nexus\Core\SEO::setTitle('Send Hours - Federated Transaction');
+\Nexus\Core\SEO::setDescription('Send hours to a member from a partner timebank.');
 
 require dirname(dirname(dirname(__DIR__))) . '/layouts/civicone/header.php';
-$basePath = Nexus\Core\TenantContext::getBasePath();
+$basePath = \Nexus\Core\TenantContext::getBasePath();
 
 $recipient = $recipient ?? null;
 $recipientTenantId = $recipientTenantId ?? 0;
@@ -22,140 +22,149 @@ $recipientAvatar = !empty($recipient['avatar_url']) ? $recipient['avatar_url'] :
 $hasInsufficientBalance = $balance < 0.5;
 ?>
 
-<!-- Offline Banner -->
-<div class="civic-fed-offline-banner" id="offlineBanner" role="alert" aria-live="polite">
-    <i class="fa-solid fa-wifi-slash" aria-hidden="true"></i>
-    <span>No internet connection</span>
-</div>
+<nav class="govuk-breadcrumbs govuk-!-margin-bottom-6" aria-label="Breadcrumb">
+    <ol class="govuk-breadcrumbs__list">
+        <li class="govuk-breadcrumbs__list-item">
+            <a class="govuk-breadcrumbs__link" href="<?= $basePath ?>">Home</a>
+        </li>
+        <li class="govuk-breadcrumbs__list-item">
+            <a class="govuk-breadcrumbs__link" href="<?= $basePath ?>/federation">Federation</a>
+        </li>
+        <li class="govuk-breadcrumbs__list-item">
+            <a class="govuk-breadcrumbs__link" href="<?= $basePath ?>/federation/transactions">Transactions</a>
+        </li>
+        <li class="govuk-breadcrumbs__list-item" aria-current="page">Send Hours</li>
+    </ol>
+</nav>
 
-<div class="civic-container">
-    <!-- Back Link -->
-    <a href="<?= $basePath ?>/federation/members<?= $recipient ? '/' . $recipient['id'] : '' ?>" class="civic-fed-back-link" aria-label="Go back">
-        <i class="fa-solid fa-arrow-left" aria-hidden="true"></i>
-        Back
-    </a>
+<a href="<?= $basePath ?>/federation/members<?= $recipient ? '/' . $recipient['id'] : '' ?>" class="govuk-back-link govuk-!-margin-bottom-6">Back</a>
 
-    <div class="civic-fed-send-card" role="main">
-        <header class="civic-fed-send-header">
-            <h1>
-                <i class="fa-solid fa-paper-plane" aria-hidden="true"></i>
-                Send Hours
-            </h1>
-            <p class="civic-fed-balance-display" role="status" aria-live="polite">
-                Your balance: <strong><?= number_format($balance, 1) ?> hours</strong>
-            </p>
-        </header>
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+
+        <h1 class="govuk-heading-xl">
+            <i class="fa-solid fa-paper-plane govuk-!-margin-right-2" aria-hidden="true"></i>
+            Send Hours
+        </h1>
+
+        <p class="govuk-body-l" role="status" aria-live="polite">
+            Your balance: <strong><?= number_format($balance, 1) ?> hours</strong>
+        </p>
 
         <?php if ($recipient): ?>
             <!-- Recipient Info -->
-            <section class="civic-fed-recipient-section" aria-labelledby="recipient-heading">
-                <h2 id="recipient-heading" class="visually-hidden">Recipient</h2>
-                <div class="civic-fed-recipient-info">
+            <div class="govuk-!-padding-4 govuk-!-margin-bottom-6" style="border: 1px solid #b1b4b6; border-left: 5px solid #1d70b8;">
+                <div style="display: flex; align-items: center; gap: 1rem;">
                     <img src="<?= htmlspecialchars($recipientAvatar) ?>"
                          onerror="this.src='<?= $fallbackAvatar ?>'"
                          alt=""
-                         class="civic-fed-avatar"
+                         style="width: 60px; height: 60px; border-radius: 50%; object-fit: cover;"
                          loading="lazy">
-                    <div class="civic-fed-recipient-details">
-                        <h3><?= htmlspecialchars($recipientName) ?></h3>
-                        <span class="civic-fed-recipient-tenant">
-                            <i class="fa-solid fa-building" aria-hidden="true"></i>
+                    <div>
+                        <h2 class="govuk-heading-m govuk-!-margin-bottom-1"><?= htmlspecialchars($recipientName) ?></h2>
+                        <p class="govuk-body-s govuk-!-margin-bottom-0" style="color: #505a5f;">
+                            <i class="fa-solid fa-building govuk-!-margin-right-1" aria-hidden="true"></i>
                             <?= htmlspecialchars($recipient['tenant_name'] ?? 'Partner Timebank') ?>
-                        </span>
+                        </p>
                     </div>
                 </div>
-            </section>
+            </div>
+
+            <?php if ($hasInsufficientBalance): ?>
+                <div class="govuk-error-summary" data-module="govuk-error-summary">
+                    <div role="alert">
+                        <h2 class="govuk-error-summary__title">There is a problem</h2>
+                        <div class="govuk-error-summary__body">
+                            <p class="govuk-body">
+                                <i class="fa-solid fa-exclamation-triangle govuk-!-margin-right-1" aria-hidden="true"></i>
+                                Insufficient balance. You need at least 0.5 hours to send a transaction.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            <?php endif; ?>
 
             <!-- Send Form -->
-            <form action="<?= $basePath ?>/federation/transactions/send" method="POST" class="civic-fed-form" aria-label="Send hours form">
+            <form action="<?= $basePath ?>/federation/transactions/send" method="POST">
                 <input type="hidden" name="csrf_token" value="<?= \Nexus\Core\Csrf::token() ?>">
                 <input type="hidden" name="receiver_id" value="<?= $recipient['id'] ?>">
                 <input type="hidden" name="receiver_tenant_id" value="<?= $recipientTenantId ?>">
 
-                <div class="civic-fed-form-group">
-                    <label for="amount-input" class="civic-fed-label">Amount (Hours)</label>
-                    <div class="civic-fed-amount-wrapper">
-                        <input type="number"
-                               name="amount"
-                               id="amount-input"
-                               class="civic-fed-input civic-fed-input--amount"
-                               min="0.5"
-                               max="<?= max(0.5, min($balance, 100)) ?>"
-                               step="0.5"
-                               value="<?= min(1, $balance) ?>"
-                               required
-                               aria-describedby="<?= $hasInsufficientBalance ? 'balance-error' : 'amount-help' ?>"
-                               <?= $hasInsufficientBalance ? 'disabled aria-invalid="true"' : '' ?>>
-                        <span class="civic-fed-amount-suffix" aria-hidden="true">hours</span>
-                    </div>
+                <!-- Amount -->
+                <div class="govuk-form-group <?= $hasInsufficientBalance ? 'govuk-form-group--error' : '' ?>">
+                    <label class="govuk-label" for="amount-input">Amount (Hours)</label>
                     <?php if ($hasInsufficientBalance): ?>
-                    <div class="civic-fed-alert civic-fed-alert--error" id="balance-error" role="alert">
-                        <i class="fa-solid fa-exclamation-triangle" aria-hidden="true"></i>
-                        Insufficient balance. You need at least 0.5 hours to send a transaction.
-                    </div>
+                        <p id="amount-error" class="govuk-error-message">
+                            <span class="govuk-visually-hidden">Error:</span> You need at least 0.5 hours to send
+                        </p>
                     <?php else: ?>
-                    <div class="civic-fed-quick-amounts" id="amount-help" role="group" aria-label="Quick amount selection">
-                        <button type="button" class="civic-fed-quick-btn" aria-label="Set amount to 0.5 hours" onclick="setAmount(0.5)">0.5</button>
-                        <button type="button" class="civic-fed-quick-btn" aria-label="Set amount to 1 hour" onclick="setAmount(1)">1</button>
-                        <button type="button" class="civic-fed-quick-btn" aria-label="Set amount to 2 hours" onclick="setAmount(2)">2</button>
-                        <button type="button" class="civic-fed-quick-btn" aria-label="Set amount to 5 hours" onclick="setAmount(5)">5</button>
+                        <div id="amount-hint" class="govuk-hint">Enter the number of hours to send (minimum 0.5)</div>
+                    <?php endif; ?>
+                    <input type="number"
+                           name="amount"
+                           id="amount-input"
+                           class="govuk-input govuk-input--width-5 <?= $hasInsufficientBalance ? 'govuk-input--error' : '' ?>"
+                           min="0.5"
+                           max="<?= max(0.5, min($balance, 100)) ?>"
+                           step="0.5"
+                           value="<?= min(1, $balance) ?>"
+                           required
+                           aria-describedby="<?= $hasInsufficientBalance ? 'amount-error' : 'amount-hint' ?>"
+                           <?= $hasInsufficientBalance ? 'disabled' : '' ?>>
+
+                    <?php if (!$hasInsufficientBalance): ?>
+                    <div class="govuk-!-margin-top-2">
+                        <span class="govuk-body-s" style="color: #505a5f;">Quick amounts: </span>
+                        <button type="button" class="govuk-button govuk-button--secondary govuk-!-margin-bottom-0" style="padding: 5px 10px;" onclick="document.getElementById('amount-input').value = 0.5">0.5</button>
+                        <button type="button" class="govuk-button govuk-button--secondary govuk-!-margin-bottom-0" style="padding: 5px 10px;" onclick="document.getElementById('amount-input').value = 1">1</button>
+                        <button type="button" class="govuk-button govuk-button--secondary govuk-!-margin-bottom-0" style="padding: 5px 10px;" onclick="document.getElementById('amount-input').value = 2">2</button>
+                        <button type="button" class="govuk-button govuk-button--secondary govuk-!-margin-bottom-0" style="padding: 5px 10px;" onclick="document.getElementById('amount-input').value = 5">5</button>
                     </div>
                     <?php endif; ?>
                 </div>
 
-                <div class="civic-fed-form-group">
-                    <label for="description-input" class="civic-fed-label">Description (Optional)</label>
+                <!-- Description -->
+                <div class="govuk-form-group">
+                    <label class="govuk-label" for="description-input">
+                        Description <span class="govuk-hint govuk-!-display-inline">(optional)</span>
+                    </label>
+                    <div id="description-hint" class="govuk-hint">What is this payment for?</div>
                     <textarea name="description"
                               id="description-input"
-                              class="civic-fed-textarea"
-                              placeholder="What is this payment for?"
+                              class="govuk-textarea"
+                              rows="3"
                               maxlength="500"
-                              aria-describedby="description-help"></textarea>
-                    <span id="description-help" class="visually-hidden">Enter a description for this transaction, maximum 500 characters</span>
+                              aria-describedby="description-hint"></textarea>
                 </div>
 
                 <button type="submit"
-                        class="civic-fed-btn civic-fed-btn--primary civic-fed-btn--full"
-                        id="send-btn"
-                        <?= $hasInsufficientBalance ? 'disabled aria-disabled="true"' : '' ?>>
-                    <i class="fa-solid fa-paper-plane" aria-hidden="true"></i>
+                        class="govuk-button"
+                        data-module="govuk-button"
+                        <?= $hasInsufficientBalance ? 'disabled' : '' ?>>
+                    <i class="fa-solid fa-paper-plane govuk-!-margin-right-1" aria-hidden="true"></i>
                     Send Hours
                 </button>
 
-                <aside class="civic-fed-notice" role="note">
-                    <i class="fa-solid fa-shield-halved" aria-hidden="true"></i>
-                    <div>
+                <div class="govuk-inset-text govuk-!-margin-top-6">
+                    <p class="govuk-body govuk-!-margin-bottom-0">
+                        <i class="fa-solid fa-shield-halved govuk-!-margin-right-1" aria-hidden="true"></i>
                         <strong>Federated Transaction</strong><br>
                         This transfer will be recorded in both timebanks. Hours will be deducted from your balance immediately.
-                    </div>
-                </aside>
+                    </p>
+                </div>
             </form>
         <?php else: ?>
-            <div class="civic-fed-empty" role="status">
-                <div class="civic-fed-empty-icon" aria-hidden="true">
-                    <i class="fa-solid fa-user-slash"></i>
-                </div>
-                <h3>No Recipient Selected</h3>
-                <p>Please select a federated member to send hours to.</p>
-                <a href="<?= $basePath ?>/federation/members" class="civic-fed-btn civic-fed-btn--primary">
-                    <i class="fa-solid fa-users" aria-hidden="true"></i>
+            <div class="govuk-inset-text">
+                <h3 class="govuk-heading-s govuk-!-margin-bottom-2">No Recipient Selected</h3>
+                <p class="govuk-body govuk-!-margin-bottom-2">Please select a federated member to send hours to.</p>
+                <a href="<?= $basePath ?>/federation/members" class="govuk-button govuk-button--secondary" data-module="govuk-button">
+                    <i class="fa-solid fa-users govuk-!-margin-right-1" aria-hidden="true"></i>
                     Browse Members
                 </a>
             </div>
         <?php endif; ?>
+
     </div>
 </div>
-
-<script src="/assets/js/federation-send.js?v=<?= time() ?>"></script>
-<script>
-// Offline indicator
-(function() {
-    const banner = document.getElementById('offlineBanner');
-    if (!banner) return;
-    window.addEventListener('online', () => banner.classList.remove('civic-fed-offline-banner--visible'));
-    window.addEventListener('offline', () => banner.classList.add('civic-fed-offline-banner--visible'));
-    if (!navigator.onLine) banner.classList.add('civic-fed-offline-banner--visible');
-})();
-</script>
 
 <?php require dirname(dirname(dirname(__DIR__))) . '/layouts/civicone/footer.php'; ?>

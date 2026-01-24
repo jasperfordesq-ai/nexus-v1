@@ -1,7 +1,7 @@
 <?php
 /**
  * Federation Onboarding Wizard
- * CivicOne Theme - WCAG 2.1 AA Compliant
+ * CivicOne Theme - GOV.UK Design System (WCAG 2.1 AA)
  */
 $pageTitle = $pageTitle ?? "Get Started with Federation";
 $hideHero = true;
@@ -27,255 +27,280 @@ $displayName = $userProfile['name'] ?? trim(($userProfile['first_name'] ?? '') .
 ?>
 
 <!-- Offline Banner -->
-<div class="civic-fed-offline-banner" id="offlineBanner" role="alert" aria-live="polite">
-    <i class="fa-solid fa-wifi-slash" aria-hidden="true"></i>
-    <span>No internet connection</span>
+<div class="govuk-notification-banner govuk-notification-banner--warning govuk-!-margin-bottom-4 hidden" id="offlineBanner" role="alert" aria-live="polite">
+    <div class="govuk-notification-banner__content">
+        <p class="govuk-body">
+            <i class="fa-solid fa-wifi-slash govuk-!-margin-right-2" aria-hidden="true"></i>
+            No internet connection
+        </p>
+    </div>
 </div>
 
-<div class="civic-fed-onboarding-wrapper">
-    <div class="civic-fed-wizard">
-        <!-- Progress Bar -->
-        <nav class="civic-fed-wizard-progress" aria-label="Setup progress">
-            <div class="civic-fed-wizard-step civic-fed-wizard-step--active" data-step="1" aria-current="step">
-                <span class="visually-hidden">Step </span>1
-            </div>
-            <div class="civic-fed-wizard-line" data-line="1" aria-hidden="true"></div>
-            <div class="civic-fed-wizard-step" data-step="2">
-                <span class="visually-hidden">Step </span>2
-            </div>
-            <div class="civic-fed-wizard-line" data-line="2" aria-hidden="true"></div>
-            <div class="civic-fed-wizard-step" data-step="3">
-                <span class="visually-hidden">Step </span>3
-            </div>
-            <div class="civic-fed-wizard-line" data-line="3" aria-hidden="true"></div>
-            <div class="civic-fed-wizard-step" data-step="4">
-                <i class="fa-solid fa-check" aria-hidden="true"></i>
-                <span class="visually-hidden">Complete</span>
-            </div>
-        </nav>
+<div class="govuk-width-container govuk-!-padding-top-6 govuk-!-padding-bottom-9">
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-two-thirds-from-desktop" style="margin: 0 auto; float: none;">
+            <!-- Progress Bar -->
+            <nav class="govuk-!-margin-bottom-6" aria-label="Setup progress">
+                <ol class="govuk-list" style="display: flex; justify-content: center; align-items: center; gap: 0.5rem;">
+                    <li data-step="1" class="govuk-!-padding-2 govuk-!-font-weight-bold" style="background: #1d70b8; color: white; border-radius: 50%; width: 2rem; height: 2rem; display: flex; align-items: center; justify-content: center;" aria-current="step">
+                        <span class="govuk-visually-hidden">Step </span>1
+                    </li>
+                    <li data-line="1" style="width: 3rem; height: 2px; background: #b1b4b6;" aria-hidden="true"></li>
+                    <li data-step="2" class="govuk-!-padding-2" style="background: #f3f2f1; border-radius: 50%; width: 2rem; height: 2rem; display: flex; align-items: center; justify-content: center;">
+                        <span class="govuk-visually-hidden">Step </span>2
+                    </li>
+                    <li data-line="2" style="width: 3rem; height: 2px; background: #b1b4b6;" aria-hidden="true"></li>
+                    <li data-step="3" class="govuk-!-padding-2" style="background: #f3f2f1; border-radius: 50%; width: 2rem; height: 2rem; display: flex; align-items: center; justify-content: center;">
+                        <span class="govuk-visually-hidden">Step </span>3
+                    </li>
+                    <li data-line="3" style="width: 3rem; height: 2px; background: #b1b4b6;" aria-hidden="true"></li>
+                    <li data-step="4" class="govuk-!-padding-2" style="background: #f3f2f1; border-radius: 50%; width: 2rem; height: 2rem; display: flex; align-items: center; justify-content: center;">
+                        <i class="fa-solid fa-check" aria-hidden="true"></i>
+                        <span class="govuk-visually-hidden">Complete</span>
+                    </li>
+                </ol>
+            </nav>
 
-        <main class="civic-fed-wizard-card" role="main">
+            <div class="govuk-!-padding-6" style="border: 1px solid #b1b4b6;" role="main">
             <!-- Step 1: Welcome -->
-            <section class="civic-fed-wizard-panel civic-fed-wizard-panel--active" data-step="1" aria-labelledby="step1-title">
-                <div class="civic-fed-wizard-icon" aria-hidden="true">
-                    <i class="fa-solid fa-globe"></i>
+            <section data-step="1" aria-labelledby="step1-title" class="govuk-!-text-align-center">
+                <div class="govuk-!-margin-bottom-4" aria-hidden="true">
+                    <i class="fa-solid fa-globe fa-3x" style="color: #1d70b8;"></i>
                 </div>
-                <h1 id="step1-title" class="civic-fed-wizard-title">Connect Beyond Borders</h1>
-                <p class="civic-fed-wizard-desc">
+                <h1 id="step1-title" class="govuk-heading-l">Connect Beyond Borders</h1>
+                <p class="govuk-body-l govuk-!-margin-bottom-6">
                     Join <?= $partnerCount ?> partner timebank<?= $partnerCount !== 1 ? 's' : '' ?> and connect with members from communities around the world.
                 </p>
 
-                <div class="civic-fed-badge civic-fed-badge--large" role="status">
-                    <i class="fa-solid fa-handshake" aria-hidden="true"></i>
-                    <span><?= $partnerCount ?> Partner Timebank<?= $partnerCount !== 1 ? 's' : '' ?> Available</span>
+                <p class="govuk-!-margin-bottom-6">
+                    <span class="govuk-tag govuk-tag--blue">
+                        <i class="fa-solid fa-handshake govuk-!-margin-right-1" aria-hidden="true"></i>
+                        <?= $partnerCount ?> Partner Timebank<?= $partnerCount !== 1 ? 's' : '' ?> Available
+                    </span>
+                </p>
+
+                <div class="govuk-form-group govuk-!-text-align-left">
+                    <fieldset class="govuk-fieldset" aria-label="Federation choice">
+                        <legend class="govuk-visually-hidden">Would you like to enable federation?</legend>
+                        <div class="govuk-radios" data-module="govuk-radios">
+                            <div class="govuk-radios__item govuk-!-padding-4 govuk-!-margin-bottom-2" style="border: 2px solid #1d70b8; background: #f0f4f8;">
+                                <input class="govuk-radios__input" id="fed-yes" name="federation_choice" type="radio" value="yes" checked data-value="yes">
+                                <label class="govuk-label govuk-radios__label" for="fed-yes">
+                                    <strong>Yes, let's get started!</strong>
+                                    <i class="fa-solid fa-rocket govuk-!-margin-left-2" aria-hidden="true"></i>
+                                </label>
+                                <div class="govuk-hint govuk-radios__hint">
+                                    Enable federation and connect with partner communities
+                                </div>
+                            </div>
+                            <div class="govuk-radios__item govuk-!-padding-4" style="border: 1px solid #b1b4b6;">
+                                <input class="govuk-radios__input" id="fed-no" name="federation_choice" type="radio" value="no" data-value="no">
+                                <label class="govuk-label govuk-radios__label" for="fed-no">
+                                    <strong>Not right now</strong>
+                                    <i class="fa-solid fa-clock govuk-!-margin-left-2" aria-hidden="true"></i>
+                                </label>
+                                <div class="govuk-hint govuk-radios__hint">
+                                    You can enable this later in your settings
+                                </div>
+                            </div>
+                        </div>
+                    </fieldset>
                 </div>
 
-                <fieldset class="civic-fed-option-group" role="radiogroup" aria-label="Federation choice">
-                    <legend class="visually-hidden">Would you like to enable federation?</legend>
-
-                    <div class="civic-fed-option-card civic-fed-option-card--selected" data-value="yes" tabindex="0" role="radio" aria-checked="true">
-                        <div class="civic-fed-option-radio" aria-hidden="true"></div>
-                        <div class="civic-fed-option-content">
-                            <p class="civic-fed-option-title">Yes, let's get started!</p>
-                            <p class="civic-fed-option-desc">Enable federation and connect with partner communities</p>
-                        </div>
-                        <i class="fa-solid fa-rocket civic-fed-option-icon" aria-hidden="true"></i>
-                    </div>
-                    <div class="civic-fed-option-card" data-value="no" tabindex="0" role="radio" aria-checked="false">
-                        <div class="civic-fed-option-radio" aria-hidden="true"></div>
-                        <div class="civic-fed-option-content">
-                            <p class="civic-fed-option-title">Not right now</p>
-                            <p class="civic-fed-option-desc">You can enable this later in your settings</p>
-                        </div>
-                        <i class="fa-solid fa-clock civic-fed-option-icon" aria-hidden="true"></i>
-                    </div>
-                </fieldset>
-
-                <div class="civic-fed-wizard-buttons">
-                    <button type="button" class="civic-fed-btn civic-fed-btn--primary" id="step1Next">
-                        Continue <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
+                <div class="govuk-button-group govuk-!-margin-top-6">
+                    <button type="button" class="govuk-button" data-module="govuk-button" id="step1Next">
+                        Continue <i class="fa-solid fa-arrow-right govuk-!-margin-left-1" aria-hidden="true"></i>
                     </button>
                 </div>
 
-                <a href="<?= $basePath ?>/federation" class="civic-fed-skip-link">
-                    Skip for now
-                </a>
+                <p class="govuk-body govuk-!-margin-top-4">
+                    <a href="<?= $basePath ?>/federation" class="govuk-link">Skip for now</a>
+                </p>
             </section>
 
             <!-- Step 2: Privacy Level -->
-            <section class="civic-fed-wizard-panel" data-step="2" aria-labelledby="step2-title" hidden>
-                <div class="civic-fed-wizard-icon" aria-hidden="true">
-                    <i class="fa-solid fa-shield-halved"></i>
+            <section data-step="2" aria-labelledby="step2-title" hidden class="govuk-!-text-align-center">
+                <div class="govuk-!-margin-bottom-4" aria-hidden="true">
+                    <i class="fa-solid fa-shield-halved fa-3x" style="color: #1d70b8;"></i>
                 </div>
-                <h1 id="step2-title" class="civic-fed-wizard-title">Choose Your Privacy Level</h1>
-                <p class="civic-fed-wizard-desc">
+                <h1 id="step2-title" class="govuk-heading-l">Choose Your Privacy Level</h1>
+                <p class="govuk-body-l govuk-!-margin-bottom-6">
                     Control what partner timebank members can see and do.
                 </p>
 
-                <fieldset class="civic-fed-option-group" id="privacyOptions" role="radiogroup" aria-label="Privacy level">
-                    <legend class="visually-hidden">Select your privacy level</legend>
+                <div class="govuk-form-group govuk-!-text-align-left">
+                    <fieldset class="govuk-fieldset" id="privacyOptions" aria-label="Privacy level">
+                        <legend class="govuk-visually-hidden">Select your privacy level</legend>
+                        <div class="govuk-radios" data-module="govuk-radios">
+                            <div class="govuk-radios__item govuk-!-padding-4 govuk-!-margin-bottom-2" style="border: 1px solid #b1b4b6;" data-value="discovery">
+                                <input class="govuk-radios__input" id="privacy-discovery-wiz" name="privacy_level_wizard" type="radio" value="discovery">
+                                <label class="govuk-label govuk-radios__label" for="privacy-discovery-wiz">
+                                    <strong>Discovery</strong>
+                                    <i class="fa-solid fa-eye govuk-!-margin-left-2" aria-hidden="true"></i>
+                                </label>
+                                <div class="govuk-hint govuk-radios__hint">
+                                    Name, avatar, and bio visible. Browse only.
+                                </div>
+                            </div>
+                            <div class="govuk-radios__item govuk-!-padding-4 govuk-!-margin-bottom-2" style="border: 2px solid #1d70b8; background: #f0f4f8;" data-value="social">
+                                <input class="govuk-radios__input" id="privacy-social-wiz" name="privacy_level_wizard" type="radio" value="social" checked>
+                                <label class="govuk-label govuk-radios__label" for="privacy-social-wiz">
+                                    <strong>Social</strong> <span class="govuk-tag govuk-tag--green">Recommended</span>
+                                    <i class="fa-solid fa-comments govuk-!-margin-left-2" aria-hidden="true"></i>
+                                </label>
+                                <div class="govuk-hint govuk-radios__hint">
+                                    Plus skills, location, and messaging.
+                                </div>
+                            </div>
+                            <div class="govuk-radios__item govuk-!-padding-4" style="border: 1px solid #b1b4b6;" data-value="economic">
+                                <input class="govuk-radios__input" id="privacy-economic-wiz" name="privacy_level_wizard" type="radio" value="economic">
+                                <label class="govuk-label govuk-radios__label" for="privacy-economic-wiz">
+                                    <strong>Economic</strong>
+                                    <i class="fa-solid fa-coins govuk-!-margin-left-2" aria-hidden="true"></i>
+                                </label>
+                                <div class="govuk-hint govuk-radios__hint">
+                                    Full access including time credit exchanges.
+                                </div>
+                            </div>
+                        </div>
+                    </fieldset>
+                </div>
 
-                    <div class="civic-fed-option-card" data-value="discovery" tabindex="0" role="radio" aria-checked="false">
-                        <div class="civic-fed-option-radio" aria-hidden="true"></div>
-                        <div class="civic-fed-option-content">
-                            <p class="civic-fed-option-title">Discovery</p>
-                            <p class="civic-fed-option-desc">Name, avatar, and bio visible. Browse only.</p>
-                        </div>
-                        <i class="fa-solid fa-eye civic-fed-option-icon" aria-hidden="true"></i>
-                    </div>
-                    <div class="civic-fed-option-card civic-fed-option-card--selected" data-value="social" tabindex="0" role="radio" aria-checked="true">
-                        <div class="civic-fed-option-radio" aria-hidden="true"></div>
-                        <div class="civic-fed-option-content">
-                            <p class="civic-fed-option-title">Social (Recommended)</p>
-                            <p class="civic-fed-option-desc">Plus skills, location, and messaging.</p>
-                        </div>
-                        <i class="fa-solid fa-comments civic-fed-option-icon" aria-hidden="true"></i>
-                    </div>
-                    <div class="civic-fed-option-card" data-value="economic" tabindex="0" role="radio" aria-checked="false">
-                        <div class="civic-fed-option-radio" aria-hidden="true"></div>
-                        <div class="civic-fed-option-content">
-                            <p class="civic-fed-option-title">Economic</p>
-                            <p class="civic-fed-option-desc">Full access including time credit exchanges.</p>
-                        </div>
-                        <i class="fa-solid fa-coins civic-fed-option-icon" aria-hidden="true"></i>
-                    </div>
-                </fieldset>
-
-                <div class="civic-fed-wizard-buttons">
-                    <button type="button" class="civic-fed-btn civic-fed-btn--secondary" id="step2Back">
-                        <i class="fa-solid fa-arrow-left" aria-hidden="true"></i> Back
+                <div class="govuk-button-group govuk-!-margin-top-6">
+                    <button type="button" class="govuk-button govuk-button--secondary" data-module="govuk-button" id="step2Back">
+                        <i class="fa-solid fa-arrow-left govuk-!-margin-right-1" aria-hidden="true"></i> Back
                     </button>
-                    <button type="button" class="civic-fed-btn civic-fed-btn--primary" id="step2Next">
-                        Continue <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
+                    <button type="button" class="govuk-button" data-module="govuk-button" id="step2Next">
+                        Continue <i class="fa-solid fa-arrow-right govuk-!-margin-left-1" aria-hidden="true"></i>
                     </button>
                 </div>
             </section>
 
             <!-- Step 3: Fine-tune Settings -->
-            <section class="civic-fed-wizard-panel" data-step="3" aria-labelledby="step3-title" hidden>
-                <div class="civic-fed-wizard-icon" aria-hidden="true">
-                    <i class="fa-solid fa-sliders"></i>
+            <section data-step="3" aria-labelledby="step3-title" hidden class="govuk-!-text-align-center">
+                <div class="govuk-!-margin-bottom-4" aria-hidden="true">
+                    <i class="fa-solid fa-sliders fa-3x" style="color: #1d70b8;"></i>
                 </div>
-                <h1 id="step3-title" class="civic-fed-wizard-title">Fine-tune Your Settings</h1>
-                <p class="civic-fed-wizard-desc">
+                <h1 id="step3-title" class="govuk-heading-l">Fine-tune Your Settings</h1>
+                <p class="govuk-body-l govuk-!-margin-bottom-6">
                     Customize exactly what you share with partner timebanks.
                 </p>
 
-                <div class="civic-fed-toggle-list" role="group" aria-label="Sharing options">
-                    <div class="civic-fed-toggle-item">
-                        <div class="civic-fed-toggle-info">
-                            <p class="civic-fed-toggle-title" id="location-label">Show my location</p>
-                            <p class="civic-fed-toggle-desc" id="location-desc">City/region visible to partners</p>
+                <div class="govuk-form-group govuk-!-text-align-left">
+                    <fieldset class="govuk-fieldset" aria-label="Sharing options">
+                        <legend class="govuk-visually-hidden">Sharing options</legend>
+                        <div class="govuk-checkboxes govuk-checkboxes--small" data-module="govuk-checkboxes">
+                            <div class="govuk-checkboxes__item">
+                                <input class="govuk-checkboxes__input" id="toggleLocation" name="show_location" type="checkbox" <?= $showLocation ? 'checked' : '' ?>>
+                                <label class="govuk-label govuk-checkboxes__label" for="toggleLocation">
+                                    <strong>Show my location</strong>
+                                </label>
+                                <div class="govuk-hint govuk-checkboxes__hint">
+                                    City/region visible to partners
+                                </div>
+                            </div>
+                            <div class="govuk-checkboxes__item">
+                                <input class="govuk-checkboxes__input" id="toggleSkills" name="show_skills" type="checkbox" <?= $showSkills ? 'checked' : '' ?>>
+                                <label class="govuk-label govuk-checkboxes__label" for="toggleSkills">
+                                    <strong>Show my skills</strong>
+                                </label>
+                                <div class="govuk-hint govuk-checkboxes__hint">
+                                    Skills searchable by partners
+                                </div>
+                            </div>
+                            <div class="govuk-checkboxes__item">
+                                <input class="govuk-checkboxes__input" id="toggleMessaging" name="messaging_enabled" type="checkbox" <?= $messagingEnabled ? 'checked' : '' ?>>
+                                <label class="govuk-label govuk-checkboxes__label" for="toggleMessaging">
+                                    <strong>Allow messages</strong>
+                                </label>
+                                <div class="govuk-hint govuk-checkboxes__hint">
+                                    Receive messages from partners
+                                </div>
+                            </div>
+                            <div class="govuk-checkboxes__item">
+                                <input class="govuk-checkboxes__input" id="toggleTransactions" name="transactions_enabled" type="checkbox" <?= $transactionsEnabled ? 'checked' : '' ?>>
+                                <label class="govuk-label govuk-checkboxes__label" for="toggleTransactions">
+                                    <strong>Allow transactions</strong>
+                                </label>
+                                <div class="govuk-hint govuk-checkboxes__hint">
+                                    Exchange time credits across timebanks
+                                </div>
+                            </div>
                         </div>
-                        <label class="civic-fed-toggle">
-                            <input type="checkbox" id="toggleLocation" <?= $showLocation ? 'checked' : '' ?> aria-labelledby="location-label" aria-describedby="location-desc">
-                            <span class="civic-fed-toggle-slider" aria-hidden="true"></span>
-                        </label>
-                    </div>
-                    <div class="civic-fed-toggle-item">
-                        <div class="civic-fed-toggle-info">
-                            <p class="civic-fed-toggle-title" id="skills-label">Show my skills</p>
-                            <p class="civic-fed-toggle-desc" id="skills-desc">Skills searchable by partners</p>
-                        </div>
-                        <label class="civic-fed-toggle">
-                            <input type="checkbox" id="toggleSkills" <?= $showSkills ? 'checked' : '' ?> aria-labelledby="skills-label" aria-describedby="skills-desc">
-                            <span class="civic-fed-toggle-slider" aria-hidden="true"></span>
-                        </label>
-                    </div>
-                    <div class="civic-fed-toggle-item">
-                        <div class="civic-fed-toggle-info">
-                            <p class="civic-fed-toggle-title" id="messaging-label">Allow messages</p>
-                            <p class="civic-fed-toggle-desc" id="messaging-desc">Receive messages from partners</p>
-                        </div>
-                        <label class="civic-fed-toggle">
-                            <input type="checkbox" id="toggleMessaging" <?= $messagingEnabled ? 'checked' : '' ?> aria-labelledby="messaging-label" aria-describedby="messaging-desc">
-                            <span class="civic-fed-toggle-slider" aria-hidden="true"></span>
-                        </label>
-                    </div>
-                    <div class="civic-fed-toggle-item">
-                        <div class="civic-fed-toggle-info">
-                            <p class="civic-fed-toggle-title" id="transactions-label">Allow transactions</p>
-                            <p class="civic-fed-toggle-desc" id="transactions-desc">Exchange time credits across timebanks</p>
-                        </div>
-                        <label class="civic-fed-toggle">
-                            <input type="checkbox" id="toggleTransactions" <?= $transactionsEnabled ? 'checked' : '' ?> aria-labelledby="transactions-label" aria-describedby="transactions-desc">
-                            <span class="civic-fed-toggle-slider" aria-hidden="true"></span>
-                        </label>
-                    </div>
+                    </fieldset>
                 </div>
 
                 <!-- Profile Preview -->
-                <div class="civic-fed-profile-preview" aria-label="Profile preview">
-                    <div class="civic-fed-avatar civic-fed-avatar--large">
+                <div class="govuk-!-padding-4 govuk-!-margin-top-6 govuk-!-text-align-center" style="background: #f3f2f1;" aria-label="Profile preview">
+                    <div class="govuk-!-margin-bottom-2" style="width: 60px; height: 60px; border-radius: 50%; background: #1d70b8; display: inline-flex; align-items: center; justify-content: center; color: white; font-size: 1.5rem;">
                         <?php if (!empty($userProfile['avatar_url'])): ?>
-                            <img src="<?= htmlspecialchars($userProfile['avatar_url']) ?>" alt="" loading="lazy">
+                            <img src="<?= htmlspecialchars($userProfile['avatar_url']) ?>" alt="" loading="lazy" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">
                         <?php else: ?>
                             <span><?= strtoupper(substr($displayName, 0, 1)) ?></span>
                         <?php endif; ?>
                     </div>
-                    <p class="civic-fed-preview-name"><?= htmlspecialchars($displayName) ?></p>
-                    <div class="civic-fed-badge">
-                        <i class="fa-solid fa-globe" aria-hidden="true"></i>
+                    <p class="govuk-heading-s govuk-!-margin-bottom-1"><?= htmlspecialchars($displayName) ?></p>
+                    <span class="govuk-tag govuk-tag--blue">
+                        <i class="fa-solid fa-globe govuk-!-margin-right-1" aria-hidden="true"></i>
                         Federated Member
-                    </div>
+                    </span>
                 </div>
 
-                <div class="civic-fed-wizard-buttons">
-                    <button type="button" class="civic-fed-btn civic-fed-btn--secondary" id="step3Back">
-                        <i class="fa-solid fa-arrow-left" aria-hidden="true"></i> Back
+                <div class="govuk-button-group govuk-!-margin-top-6">
+                    <button type="button" class="govuk-button govuk-button--secondary" data-module="govuk-button" id="step3Back">
+                        <i class="fa-solid fa-arrow-left govuk-!-margin-right-1" aria-hidden="true"></i> Back
                     </button>
-                    <button type="button" class="civic-fed-btn civic-fed-btn--primary" id="step3Next">
-                        Finish Setup <i class="fa-solid fa-check" aria-hidden="true"></i>
+                    <button type="button" class="govuk-button" data-module="govuk-button" id="step3Next">
+                        Finish Setup <i class="fa-solid fa-check govuk-!-margin-left-1" aria-hidden="true"></i>
                     </button>
                 </div>
             </section>
 
             <!-- Step 4: Success -->
-            <section class="civic-fed-wizard-panel" data-step="4" aria-labelledby="step4-title" hidden>
-                <div class="civic-fed-wizard-success">
-                    <div class="civic-fed-wizard-success-icon" aria-hidden="true">
-                        <i class="fa-solid fa-check"></i>
-                    </div>
-                    <h1 id="step4-title" class="civic-fed-wizard-title">You're All Set!</h1>
-                    <p class="civic-fed-wizard-desc">
-                        Welcome to the federation! You can now connect with members from partner timebanks.
-                    </p>
+            <section data-step="4" aria-labelledby="step4-title" hidden class="govuk-!-text-align-center">
+                <div class="govuk-!-margin-bottom-4" aria-hidden="true" style="width: 80px; height: 80px; border-radius: 50%; background: #00703c; display: inline-flex; align-items: center; justify-content: center;">
+                    <i class="fa-solid fa-check fa-2x" style="color: white;"></i>
+                </div>
+                <h1 id="step4-title" class="govuk-heading-l">You're All Set!</h1>
+                <p class="govuk-body-l govuk-!-margin-bottom-6">
+                    Welcome to the federation! You can now connect with members from partner timebanks.
+                </p>
 
-                    <div class="civic-fed-wizard-buttons civic-fed-wizard-buttons--vertical">
-                        <a href="<?= $basePath ?>/federation/members" class="civic-fed-btn civic-fed-btn--primary">
-                            <i class="fa-solid fa-users" aria-hidden="true"></i> Browse Members
-                        </a>
-                        <a href="<?= $basePath ?>/federation" class="civic-fed-btn civic-fed-btn--secondary">
-                            <i class="fa-solid fa-home" aria-hidden="true"></i> Go to Hub
-                        </a>
-                    </div>
+                <div class="govuk-button-group" style="flex-direction: column; align-items: center;">
+                    <a href="<?= $basePath ?>/federation/members" class="govuk-button" data-module="govuk-button">
+                        <i class="fa-solid fa-users govuk-!-margin-right-1" aria-hidden="true"></i> Browse Members
+                    </a>
+                    <a href="<?= $basePath ?>/federation" class="govuk-button govuk-button--secondary" data-module="govuk-button">
+                        <i class="fa-solid fa-home govuk-!-margin-right-1" aria-hidden="true"></i> Go to Hub
+                    </a>
                 </div>
             </section>
 
             <!-- Declined Step -->
-            <section class="civic-fed-wizard-panel" data-step="declined" aria-labelledby="declined-title" hidden>
-                <div class="civic-fed-wizard-icon civic-fed-wizard-icon--muted" aria-hidden="true">
-                    <i class="fa-solid fa-clock"></i>
+            <section data-step="declined" aria-labelledby="declined-title" hidden class="govuk-!-text-align-center">
+                <div class="govuk-!-margin-bottom-4" aria-hidden="true">
+                    <i class="fa-solid fa-clock fa-3x" style="color: #505a5f;"></i>
                 </div>
-                <h1 id="declined-title" class="civic-fed-wizard-title">No Problem!</h1>
-                <p class="civic-fed-wizard-desc">
+                <h1 id="declined-title" class="govuk-heading-l">No Problem!</h1>
+                <p class="govuk-body-l govuk-!-margin-bottom-6">
                     You can enable federation anytime in your settings. Your local timebank experience remains unchanged.
                 </p>
 
-                <div class="civic-fed-wizard-buttons civic-fed-wizard-buttons--vertical">
-                    <a href="<?= $basePath ?>/federation" class="civic-fed-btn civic-fed-btn--primary">
-                        <i class="fa-solid fa-arrow-left" aria-hidden="true"></i> Back to Hub
+                <div class="govuk-button-group" style="flex-direction: column; align-items: center;">
+                    <a href="<?= $basePath ?>/federation" class="govuk-button" data-module="govuk-button">
+                        <i class="fa-solid fa-arrow-left govuk-!-margin-right-1" aria-hidden="true"></i> Back to Hub
                     </a>
-                    <a href="<?= $basePath ?>/settings?section=federation" class="civic-fed-btn civic-fed-btn--secondary">
-                        <i class="fa-solid fa-cog" aria-hidden="true"></i> Federation Settings
+                    <a href="<?= $basePath ?>/settings?section=federation" class="govuk-button govuk-button--secondary" data-module="govuk-button">
+                        <i class="fa-solid fa-cog govuk-!-margin-right-1" aria-hidden="true"></i> Federation Settings
                     </a>
                 </div>
             </section>
-        </main>
+            </div>
+        </div>
     </div>
 </div>
 
-<canvas class="civic-fed-confetti" id="confetti" aria-hidden="true"></canvas>
+<canvas id="confetti" aria-hidden="true" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 1000;"></canvas>
 
 <script src="/assets/js/federation-onboarding.js?v=<?= time() ?>"></script>
 <script>
