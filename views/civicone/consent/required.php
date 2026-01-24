@@ -1,16 +1,13 @@
 <?php
 /**
  * CivicOne Consent Re-acceptance Page
- * GOV.UK-inspired design for GDPR compliance
+ * GOV.UK Design System Compliant (WCAG 2.1 AA)
  */
 $pageTitle = 'Accept Updated Terms';
 $hero_title = 'Terms & Conditions Update';
 $hero_subtitle = 'Action required to continue';
 
 require dirname(__DIR__) . '/../layouts/civicone/header.php';
-?>
-<link rel="stylesheet" href="<?= $basePath ?? '' ?>/assets/css/civicone-consent-required.css">
-<?php
 
 $basePath = $basePath ?? \Nexus\Core\TenantContext::getBasePath();
 $consents = $consents ?? [];
@@ -19,128 +16,124 @@ $tenant = \Nexus\Core\TenantContext::get();
 $tenantName = $tenant['name'] ?? 'the platform';
 ?>
 
-<div class="consent-page">
-    <div class="consent-container">
-        <!-- Warning Banner -->
-        <div class="consent-alert consent-alert--warning">
-            <div class="consent-alert__icon">
-                <i class="fa-solid fa-triangle-exclamation"></i>
-            </div>
-            <div class="consent-alert__content">
-                <h2 class="consent-alert__title">Important: Updated Terms</h2>
-                <p>We've updated our terms and conditions. You must review and accept these changes to continue using <?= htmlspecialchars($tenantName) ?>.</p>
-            </div>
-        </div>
+<nav class="govuk-breadcrumbs govuk-!-margin-bottom-6" aria-label="Breadcrumb">
+    <ol class="govuk-breadcrumbs__list">
+        <li class="govuk-breadcrumbs__list-item">
+            <a class="govuk-breadcrumbs__link" href="<?= $basePath ?>">Home</a>
+        </li>
+        <li class="govuk-breadcrumbs__list-item" aria-current="page">Accept Updated Terms</li>
+    </ol>
+</nav>
 
-        <!-- Main Card -->
-        <div class="consent-card">
-            <div class="consent-card__header">
-                <h1 class="consent-card__title">Review and Accept</h1>
-            </div>
-
-            <div class="consent-card__body">
-                <p class="consent-lead">Please read each document carefully before accepting. These terms govern your use of our services and explain how we handle your personal data.</p>
-
-                <form id="consentForm" class="consent-form">
-                    <input type="hidden" name="csrf_token" id="csrf_token" value="<?= $csrfToken ?>">
-
-                    <div class="consent-items">
-                        <?php foreach ($consents as $consent): ?>
-                        <?php
-                            // Determine the correct URL for each consent type
-                            $docUrl = '#';
-                            if ($consent['slug'] === 'terms_of_service') {
-                                $docUrl = $basePath . '/terms';
-                            } elseif ($consent['slug'] === 'privacy_policy') {
-                                $docUrl = $basePath . '/privacy';
-                            }
-                        ?>
-                        <div class="consent-item">
-                            <div class="consent-item__header">
-                                <div class="consent-item__info">
-                                    <h3 class="consent-item__title"><?= htmlspecialchars($consent['name']) ?></h3>
-                                    <p class="consent-item__description"><?= htmlspecialchars($consent['description'] ?? '') ?></p>
-                                </div>
-                                <?php if (($consent['reason'] ?? '') === 'version_outdated'): ?>
-                                <span class="consent-tag consent-tag--warning">Updated</span>
-                                <?php else: ?>
-                                <span class="consent-tag consent-tag--info">Required</span>
-                                <?php endif; ?>
-                            </div>
-
-                            <div class="consent-item__actions">
-                                <a href="<?= $docUrl ?>" target="_blank" class="consent-link consent-link--external">
-                                    <i class="fa-solid fa-file-lines"></i>
-                                    Read full <?= htmlspecialchars($consent['name']) ?>
-                                    <i class="fa-solid fa-arrow-up-right-from-square"></i>
-                                </a>
-                            </div>
-
-                            <div class="consent-item__checkbox">
-                                <label class="consent-checkbox">
-                                    <input type="checkbox" name="consents[]" class="consent-check"
-                                           value="<?= htmlspecialchars($consent['slug']) ?>" required>
-                                    <span class="consent-checkbox__box"></span>
-                                    <span class="consent-checkbox__label">
-                                        I have read and agree to the <?= htmlspecialchars($consent['name']) ?>
-                                        <span class="consent-version">(Version <?= htmlspecialchars($consent['current_version']) ?>)</span>
-                                    </span>
-                                </label>
-                            </div>
-                        </div>
-                        <?php endforeach; ?>
-                    </div>
-
-                    <div class="consent-submit">
-                        <button type="submit" class="civic-btn civic-btn--primary civic-btn--large" id="acceptBtn" disabled>
-                            Accept and Continue
-                        </button>
-                        <p class="consent-submit__note">
-                            By clicking "Accept and Continue", you confirm that you have read and understood the documents above.
-                        </p>
-                    </div>
-                </form>
-            </div>
-        </div>
-
-        <!-- Help Section -->
-        <div class="consent-help">
-            <h3>Need help?</h3>
-            <p>If you have questions about these terms or need assistance, please <a href="<?= $basePath ?>/contact">contact our support team</a>.</p>
-            <p class="consent-help__decline">
-                If you do not agree to these terms, you will not be able to continue using your account.
-                <a href="<?= $basePath ?>/consent/decline">Learn more about your options</a>.
-            </p>
-        </div>
+<!-- Warning Banner -->
+<div class="govuk-notification-banner govuk-notification-banner--warning" role="alert" aria-labelledby="govuk-notification-banner-title" data-module="govuk-notification-banner">
+    <div class="govuk-notification-banner__header">
+        <h2 class="govuk-notification-banner__title" id="govuk-notification-banner-title">Important</h2>
+    </div>
+    <div class="govuk-notification-banner__content">
+        <p class="govuk-notification-banner__heading">
+            <i class="fa-solid fa-triangle-exclamation govuk-!-margin-right-2" aria-hidden="true"></i>
+            Updated Terms
+        </p>
+        <p class="govuk-body">We've updated our terms and conditions. You must review and accept these changes to continue using <?= htmlspecialchars($tenantName) ?>.</p>
     </div>
 </div>
 
+<h1 class="govuk-heading-xl">Review and Accept</h1>
+<p class="govuk-body-l govuk-!-margin-bottom-6">Please read each document carefully before accepting. These terms govern your use of our services and explain how we handle your personal data.</p>
+
+<form id="consentForm">
+    <input type="hidden" name="csrf_token" id="csrf_token" value="<?= $csrfToken ?>">
+
+    <fieldset class="govuk-fieldset govuk-!-margin-bottom-6">
+        <legend class="govuk-fieldset__legend govuk-fieldset__legend--l">
+            <h2 class="govuk-fieldset__heading">Terms to Accept</h2>
+        </legend>
+
+        <?php foreach ($consents as $consent): ?>
+            <?php
+            $docUrl = '#';
+            if ($consent['slug'] === 'terms_of_service') {
+                $docUrl = $basePath . '/terms';
+            } elseif ($consent['slug'] === 'privacy_policy') {
+                $docUrl = $basePath . '/privacy';
+            }
+            ?>
+            <div class="govuk-!-padding-4 govuk-!-margin-bottom-4" style="border: 1px solid #b1b4b6; border-left: 5px solid #1d70b8;">
+                <div class="govuk-grid-row govuk-!-margin-bottom-3">
+                    <div class="govuk-grid-column-two-thirds">
+                        <h3 class="govuk-heading-m govuk-!-margin-bottom-1"><?= htmlspecialchars($consent['name']) ?></h3>
+                        <p class="govuk-body-s govuk-!-margin-bottom-0" style="color: #505a5f;"><?= htmlspecialchars($consent['description'] ?? '') ?></p>
+                    </div>
+                    <div class="govuk-grid-column-one-third govuk-!-text-align-right">
+                        <?php if (($consent['reason'] ?? '') === 'version_outdated'): ?>
+                            <span class="govuk-tag govuk-tag--yellow">Updated</span>
+                        <?php else: ?>
+                            <span class="govuk-tag govuk-tag--blue">Required</span>
+                        <?php endif; ?>
+                    </div>
+                </div>
+
+                <p class="govuk-body govuk-!-margin-bottom-3">
+                    <a href="<?= $docUrl ?>" target="_blank" class="govuk-link" rel="noopener">
+                        <i class="fa-solid fa-file-lines govuk-!-margin-right-1" aria-hidden="true"></i>
+                        Read full <?= htmlspecialchars($consent['name']) ?>
+                        <i class="fa-solid fa-arrow-up-right-from-square govuk-!-margin-left-1" aria-hidden="true"></i>
+                    </a>
+                </p>
+
+                <div class="govuk-checkboxes" data-module="govuk-checkboxes">
+                    <div class="govuk-checkboxes__item">
+                        <input class="govuk-checkboxes__input consent-check" id="consent-<?= htmlspecialchars($consent['slug']) ?>" name="consents[]" type="checkbox" value="<?= htmlspecialchars($consent['slug']) ?>" required>
+                        <label class="govuk-label govuk-checkboxes__label" for="consent-<?= htmlspecialchars($consent['slug']) ?>">
+                            I have read and agree to the <?= htmlspecialchars($consent['name']) ?>
+                            <span class="govuk-hint govuk-!-margin-bottom-0">(Version <?= htmlspecialchars($consent['current_version']) ?>)</span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+        <?php endforeach; ?>
+    </fieldset>
+
+    <div class="govuk-!-margin-bottom-6">
+        <button type="submit" class="govuk-button" data-module="govuk-button" id="acceptBtn" disabled>
+            <i class="fa-solid fa-check govuk-!-margin-right-1" aria-hidden="true"></i> Accept and Continue
+        </button>
+        <p class="govuk-body-s" style="color: #505a5f;">By clicking "Accept and Continue", you confirm that you have read and understood the documents above.</p>
+    </div>
+</form>
+
+<div class="govuk-inset-text">
+    <h3 class="govuk-heading-s">Need help?</h3>
+    <p class="govuk-body govuk-!-margin-bottom-2">If you have questions about these terms or need assistance, please <a href="<?= $basePath ?>/contact" class="govuk-link">contact our support team</a>.</p>
+    <p class="govuk-body govuk-!-margin-bottom-0">If you do not agree to these terms, you will not be able to continue using your account. <a href="<?= $basePath ?>/consent/decline" class="govuk-link">Learn more about your options</a>.</p>
+</div>
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    const form = document.getElementById('consentForm');
-    const checkboxes = form.querySelectorAll('.consent-check');
-    const submitBtn = document.getElementById('acceptBtn');
+    var form = document.getElementById('consentForm');
+    var checkboxes = form.querySelectorAll('.consent-check');
+    var submitBtn = document.getElementById('acceptBtn');
 
     function updateButtonState() {
-        const allChecked = Array.from(checkboxes).every(cb => cb.checked);
+        var allChecked = Array.from(checkboxes).every(function(cb) { return cb.checked; });
         submitBtn.disabled = !allChecked;
     }
 
-    checkboxes.forEach(cb => cb.addEventListener('change', updateButtonState));
+    checkboxes.forEach(function(cb) { cb.addEventListener('change', updateButtonState); });
 
     form.addEventListener('submit', async function(e) {
         e.preventDefault();
 
-        const consents = Array.from(checkboxes)
-            .filter(cb => cb.checked)
-            .map(cb => cb.value);
+        var consents = Array.from(checkboxes)
+            .filter(function(cb) { return cb.checked; })
+            .map(function(cb) { return cb.value; });
 
         submitBtn.disabled = true;
         submitBtn.textContent = 'Processing...';
 
         try {
-            const response = await fetch('<?= $basePath ?>/consent/accept', {
+            var response = await fetch('<?= $basePath ?>/consent/accept', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -152,20 +145,20 @@ document.addEventListener('DOMContentLoaded', function() {
                 })
             });
 
-            const data = await response.json();
+            var data = await response.json();
 
             if (data.success) {
                 window.location.href = data.redirect;
             } else {
                 alert(data.error || 'Failed to save consent. Please try again.');
                 submitBtn.disabled = false;
-                submitBtn.textContent = 'Accept and Continue';
+                submitBtn.innerHTML = '<i class="fa-solid fa-check govuk-!-margin-right-1" aria-hidden="true"></i> Accept and Continue';
             }
         } catch (err) {
-            console.error('Consent submission error:', err);
+            console.warn('Consent submission error:', err);
             alert('An error occurred. Please try again.');
             submitBtn.disabled = false;
-            submitBtn.textContent = 'Accept and Continue';
+            submitBtn.innerHTML = '<i class="fa-solid fa-check govuk-!-margin-right-1" aria-hidden="true"></i> Accept and Continue';
         }
     });
 });
