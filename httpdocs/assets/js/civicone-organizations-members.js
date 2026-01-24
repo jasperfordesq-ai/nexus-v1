@@ -25,7 +25,7 @@
         document.getElementById('payAmount').value = '';
         document.getElementById('payDescription').value = '';
         modal.classList.add('active');
-        document.body.style.overflow = 'hidden';
+        document.body.classList.add('body-no-scroll');
 
         // Focus on amount field
         setTimeout(() => {
@@ -39,7 +39,7 @@
         if (!modal) return;
 
         modal.classList.remove('active');
-        document.body.style.overflow = '';
+        document.body.classList.remove('body-no-scroll');
     };
 
     // Close on Escape key
