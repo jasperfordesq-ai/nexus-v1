@@ -1,11 +1,10 @@
 <?php
 /**
  * Federation Listing Detail
- * CivicOne Theme - WCAG 2.1 AA Compliant
+ * GOV.UK Design System (WCAG 2.1 AA)
  */
 $pageTitle = $pageTitle ?? "Federated Listing";
 $hideHero = true;
-$bodyClass = 'civicone--federation';
 
 Nexus\Core\SEO::setTitle(($listing['title'] ?? 'Listing') . ' - Federated');
 Nexus\Core\SEO::setDescription('Listing details from a partner timebank in the federation network.');
@@ -17,121 +16,139 @@ $listing = $listing ?? [];
 $canMessage = $canMessage ?? false;
 
 $ownerName = $listing['owner_name'] ?? 'Unknown';
-$fallbackAvatar = 'https://ui-avatars.com/api/?name=' . urlencode($ownerName) . '&background=00796B&color=fff&size=200';
+$fallbackAvatar = 'https://ui-avatars.com/api/?name=' . urlencode($ownerName) . '&background=00703c&color=fff&size=200';
 $ownerAvatar = !empty($listing['owner_avatar']) ? $listing['owner_avatar'] : $fallbackAvatar;
 $type = $listing['type'] ?? 'offer';
+$typeColor = $type === 'offer' ? '#00703c' : '#1d70b8';
 ?>
 
-<!-- Offline Banner -->
-<div class="civic-fed-offline-banner" id="offlineBanner" role="alert" aria-live="polite">
-    <i class="fa-solid fa-wifi-slash" aria-hidden="true"></i>
-    <span>No internet connection</span>
-</div>
+<div class="govuk-width-container">
+    <!-- Offline Banner -->
+    <div class="govuk-notification-banner govuk-notification-banner--warning govuk-!-display-none" id="offlineBanner" role="alert" aria-live="polite" data-module="govuk-notification-banner">
+        <div class="govuk-notification-banner__content">
+            <p class="govuk-notification-banner__heading">
+                <i class="fa-solid fa-wifi-slash govuk-!-margin-right-2" aria-hidden="true"></i>
+                No internet connection
+            </p>
+        </div>
+    </div>
 
-<div class="civic-container">
     <!-- Back Link -->
-    <a href="<?= $basePath ?>/federation/listings" class="civic-fed-back-link" aria-label="Return to listings">
-        <i class="fa-solid fa-arrow-left" aria-hidden="true"></i>
+    <a href="<?= $basePath ?>/federation/listings" class="govuk-back-link govuk-!-margin-top-4">
         Back to Federated Listings
     </a>
 
-    <!-- Listing Card -->
-    <article class="civic-fed-detail-card" aria-labelledby="listing-title">
-        <header class="civic-fed-detail-header">
-            <div class="civic-fed-badges" role="group" aria-label="Listing details">
-                <span class="civic-fed-badge civic-fed-badge--<?= htmlspecialchars($type) ?>">
-                    <i class="fa-solid <?= $type === 'offer' ? 'fa-hand-holding-heart' : 'fa-hand-holding' ?>" aria-hidden="true"></i>
-                    <?= ucfirst($type) ?>
-                </span>
-                <span class="civic-fed-badge civic-fed-badge--partner">
-                    <i class="fa-solid fa-building" aria-hidden="true"></i>
-                    <?= htmlspecialchars($listing['tenant_name'] ?? 'Partner Timebank') ?>
-                </span>
-            </div>
-
-            <h1 id="listing-title" class="civic-fed-detail-title"><?= htmlspecialchars($listing['title'] ?? 'Untitled') ?></h1>
-
-            <?php if (!empty($listing['category_name'])): ?>
-                <span class="civic-fed-tag">
-                    <i class="fa-solid fa-tag" aria-hidden="true"></i>
-                    <?= htmlspecialchars($listing['category_name']) ?>
-                </span>
-            <?php endif; ?>
-        </header>
-
-        <div class="civic-fed-detail-body">
-            <?php if (!empty($listing['description'])): ?>
-                <section class="civic-fed-section" aria-labelledby="description-heading">
-                    <h3 id="description-heading" class="civic-fed-section-title">
-                        <i class="fa-solid fa-align-left" aria-hidden="true"></i>
-                        Description
-                    </h3>
-                    <div class="civic-fed-content">
-                        <?= nl2br(htmlspecialchars($listing['description'])) ?>
-                    </div>
-                </section>
-            <?php endif; ?>
-
-            <!-- Owner Section -->
-            <section class="civic-fed-section" aria-labelledby="owner-heading">
-                <h3 id="owner-heading" class="civic-fed-section-title">
-                    <i class="fa-solid fa-user" aria-hidden="true"></i>
-                    Posted By
-                </h3>
-                <div class="civic-fed-owner-info">
-                    <img src="<?= htmlspecialchars($ownerAvatar) ?>"
-                         onerror="this.src='<?= $fallbackAvatar ?>'"
-                         alt=""
-                         class="civic-fed-avatar"
-                         loading="lazy">
-                    <div class="civic-fed-owner-details">
-                        <h4><?= htmlspecialchars($ownerName) ?></h4>
-                        <span class="civic-fed-owner-tenant">
-                            <i class="fa-solid fa-building" aria-hidden="true"></i>
+    <main class="govuk-main-wrapper govuk-!-padding-top-4" id="main-content" role="main">
+        <div class="govuk-grid-row">
+            <div class="govuk-grid-column-two-thirds">
+                <!-- Listing Card -->
+                <article class="govuk-!-padding-6" style="background: #fff; border: 1px solid #b1b4b6; border-left: 5px solid <?= $typeColor ?>;" aria-labelledby="listing-title">
+                    <!-- Badges -->
+                    <div class="govuk-!-margin-bottom-4">
+                        <span class="govuk-tag" style="background: <?= $typeColor ?>;">
+                            <i class="fa-solid <?= $type === 'offer' ? 'fa-hand-holding-heart' : 'fa-hand-holding' ?> govuk-!-margin-right-1" aria-hidden="true"></i>
+                            <?= ucfirst($type) ?>
+                        </span>
+                        <span class="govuk-tag govuk-tag--grey govuk-!-margin-left-2">
+                            <i class="fa-solid fa-building govuk-!-margin-right-1" aria-hidden="true"></i>
                             <?= htmlspecialchars($listing['tenant_name'] ?? 'Partner Timebank') ?>
                         </span>
                     </div>
+
+                    <h1 class="govuk-heading-xl govuk-!-margin-bottom-4" id="listing-title">
+                        <?= htmlspecialchars($listing['title'] ?? 'Untitled') ?>
+                    </h1>
+
+                    <?php if (!empty($listing['category_name'])): ?>
+                        <p class="govuk-body govuk-!-margin-bottom-6">
+                            <span class="govuk-tag govuk-tag--blue">
+                                <i class="fa-solid fa-tag govuk-!-margin-right-1" aria-hidden="true"></i>
+                                <?= htmlspecialchars($listing['category_name']) ?>
+                            </span>
+                        </p>
+                    <?php endif; ?>
+
+                    <!-- Description -->
+                    <?php if (!empty($listing['description'])): ?>
+                        <h2 class="govuk-heading-m">
+                            <i class="fa-solid fa-align-left govuk-!-margin-right-2" style="color: #505a5f;" aria-hidden="true"></i>
+                            Description
+                        </h2>
+                        <p class="govuk-body-l govuk-!-margin-bottom-6">
+                            <?= nl2br(htmlspecialchars($listing['description'])) ?>
+                        </p>
+                    <?php endif; ?>
+
+                    <!-- Owner Section -->
+                    <h2 class="govuk-heading-m">
+                        <i class="fa-solid fa-user govuk-!-margin-right-2" style="color: #505a5f;" aria-hidden="true"></i>
+                        Posted By
+                    </h2>
+                    <div class="govuk-!-padding-4 govuk-!-margin-bottom-6" style="background: #f3f2f1; display: flex; align-items: center; gap: 16px;">
+                        <img src="<?= htmlspecialchars($ownerAvatar) ?>"
+                             onerror="this.src='<?= $fallbackAvatar ?>'"
+                             alt=""
+                             style="width: 64px; height: 64px; border-radius: 50%; object-fit: cover;"
+                             loading="lazy">
+                        <div>
+                            <p class="govuk-body-l govuk-!-font-weight-bold govuk-!-margin-bottom-1">
+                                <?= htmlspecialchars($ownerName) ?>
+                            </p>
+                            <p class="govuk-body-s govuk-!-margin-bottom-0" style="color: #505a5f;">
+                                <i class="fa-solid fa-building govuk-!-margin-right-1" aria-hidden="true"></i>
+                                <?= htmlspecialchars($listing['tenant_name'] ?? 'Partner Timebank') ?>
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Actions -->
+                    <div class="govuk-button-group">
+                        <?php if ($canMessage): ?>
+                            <a href="<?= $basePath ?>/federation/messages/<?= $listing['owner_id'] ?>?tenant=<?= $listing['owner_tenant_id'] ?>"
+                               class="govuk-button" data-module="govuk-button">
+                                <i class="fa-solid fa-envelope govuk-!-margin-right-2" aria-hidden="true"></i>
+                                Contact <?= htmlspecialchars(explode(' ', $ownerName)[0]) ?>
+                            </a>
+                        <?php else: ?>
+                            <span class="govuk-button govuk-button--disabled" aria-disabled="true">
+                                <i class="fa-solid fa-envelope govuk-!-margin-right-2" aria-hidden="true"></i>
+                                Messaging Unavailable
+                            </span>
+                        <?php endif; ?>
+
+                        <a href="<?= $basePath ?>/federation/members/<?= $listing['owner_id'] ?>"
+                           class="govuk-button govuk-button--secondary" data-module="govuk-button">
+                            <i class="fa-solid fa-user govuk-!-margin-right-2" aria-hidden="true"></i>
+                            View Profile
+                        </a>
+                    </div>
+                </article>
+
+                <!-- Privacy Notice -->
+                <div class="govuk-inset-text govuk-!-margin-top-6">
+                    <p class="govuk-body govuk-!-margin-bottom-0">
+                        <i class="fa-solid fa-shield-halved govuk-!-margin-right-2" style="color: #1d70b8;" aria-hidden="true"></i>
+                        <strong>Federated Listing</strong> — This listing is from <strong><?= htmlspecialchars($listing['tenant_name'] ?? 'a partner timebank') ?></strong>.
+                        Contact the poster to discuss terms and arrange an exchange.
+                    </p>
                 </div>
-            </section>
-
-            <!-- Actions -->
-            <div class="civic-fed-actions" role="group" aria-label="Listing actions">
-                <?php if ($canMessage): ?>
-                    <a href="<?= $basePath ?>/federation/messages/<?= $listing['owner_id'] ?>?tenant=<?= $listing['owner_tenant_id'] ?>"
-                       class="civic-fed-btn civic-fed-btn--primary"
-                       aria-label="Contact <?= htmlspecialchars($ownerName) ?>">
-                        <i class="fa-solid fa-envelope" aria-hidden="true"></i>
-                        Contact <?= htmlspecialchars(explode(' ', $ownerName)[0]) ?>
-                    </a>
-                <?php else: ?>
-                    <span class="civic-fed-btn civic-fed-btn--disabled" aria-disabled="true">
-                        <i class="fa-solid fa-envelope" aria-hidden="true"></i>
-                        Messaging Unavailable
-                    </span>
-                <?php endif; ?>
-
-                <a href="<?= $basePath ?>/federation/members/<?= $listing['owner_id'] ?>"
-                   class="civic-fed-btn civic-fed-btn--secondary"
-                   aria-label="View <?= htmlspecialchars($ownerName) ?>'s profile">
-                    <i class="fa-solid fa-user" aria-hidden="true"></i>
-                    View Profile
-                </a>
             </div>
-
-            <!-- Privacy Notice -->
-            <aside class="civic-fed-notice" role="note">
-                <i class="fa-solid fa-shield-halved" aria-hidden="true"></i>
-                <div>
-                    <strong>Federated Listing</strong><br>
-                    This listing is from <strong><?= htmlspecialchars($listing['tenant_name'] ?? 'a partner timebank') ?></strong>.
-                    Contact the poster to discuss terms and arrange an exchange.
-                </div>
-            </aside>
         </div>
-    </article>
+    </main>
 </div>
 
 <!-- Federation offline indicator -->
-<script src="<?= \Nexus\Core\TenantContext::getBasePath() ?>/assets/js/civicone-federation-offline.min.js" defer></script>
+<script>
+(function() {
+    'use strict';
+    var banner = document.getElementById('offlineBanner');
+    function updateOffline(offline) {
+        if (banner) banner.classList.toggle('govuk-!-display-none', !offline);
+    }
+    window.addEventListener('online', function() { updateOffline(false); });
+    window.addEventListener('offline', function() { updateOffline(true); });
+    if (!navigator.onLine) updateOffline(true);
+})();
+</script>
 
 <?php require dirname(dirname(__DIR__)) . '/layouts/civicone/footer.php'; ?>

@@ -1,19 +1,13 @@
 <?php
 /**
- * CivicOne Events Calendar - Monthly Grid View
- * Custom Template: Calendar Interface (Section 10.9)
- * Holographic glassmorphism design with responsive mobile list view
- * WCAG 2.1 AA Compliant
+ * CivicOne View: Events Calendar
+ * GOV.UK Design System Compliant (WCAG 2.1 AA)
  */
-$monthName = date('F', mktime(0, 0, 0, $month, 10));
-$heroTitle = "$monthName $year";
-$heroSub = "Community Schedule";
-$heroType = 'Event';
-$hideHero = true;
-
+$pageTitle = 'Events Calendar';
 require dirname(__DIR__, 2) . '/layouts/civicone/header.php';
 
 // Calendar Logic
+$monthName = date('F', mktime(0, 0, 0, $month, 10));
 $firstDayTimestamp = mktime(0, 0, 0, $month, 1, $year);
 $daysInMonth = date('t', $firstDayTimestamp);
 $dayOfWeek = date('w', $firstDayTimestamp); // 0 (Sun) - 6 (Sat)
@@ -36,98 +30,163 @@ $basePath = \Nexus\Core\TenantContext::getBasePath();
 $prevLink = "$basePath/events/calendar?month=$prevMonth&year=$prevYear";
 $nextLink = "$basePath/events/calendar?month=$nextMonth&year=$nextYear";
 ?>
-<link rel="stylesheet" href="/assets/css/purged/civicone-events-calendar.min.css?v=<?= time() ?>">
 
-<!-- GOV.UK Page Template Boilerplate (Section 10.0) -->
-<div class="civicone-width-container">
-    <main class="civicone-main-wrapper">
+<nav class="govuk-breadcrumbs govuk-!-margin-bottom-6" aria-label="Breadcrumb">
+    <ol class="govuk-breadcrumbs__list">
+        <li class="govuk-breadcrumbs__list-item">
+            <a class="govuk-breadcrumbs__link" href="<?= $basePath ?>">Home</a>
+        </li>
+        <li class="govuk-breadcrumbs__list-item">
+            <a class="govuk-breadcrumbs__link" href="<?= $basePath ?>/events">Events</a>
+        </li>
+        <li class="govuk-breadcrumbs__list-item" aria-current="page">Calendar</li>
+    </ol>
+</nav>
 
-        <!-- Offline Banner -->
-        <div class="holo-offline-banner" id="offlineBanner" role="alert" aria-live="polite">
-            <i class="fa-solid fa-wifi-slash" aria-hidden="true"></i>
-            <span>No internet connection</span>
+<!-- Header Row -->
+<div class="govuk-grid-row govuk-!-margin-bottom-6">
+    <div class="govuk-grid-column-one-quarter">
+        <a href="<?= $basePath ?>/events" class="govuk-button govuk-button--secondary" data-module="govuk-button">
+            <i class="fa-solid fa-list govuk-!-margin-right-1" aria-hidden="true"></i> List View
+        </a>
+    </div>
+    <div class="govuk-grid-column-one-half govuk-!-text-align-centre">
+        <div style="display: flex; align-items: center; justify-content: center; gap: 1rem;">
+            <a href="<?= $prevLink ?>" class="govuk-button govuk-button--secondary govuk-!-margin-bottom-0" data-module="govuk-button" aria-label="Previous Month">
+                <i class="fa-solid fa-chevron-left" aria-hidden="true"></i>
+            </a>
+            <h1 class="govuk-heading-l govuk-!-margin-bottom-0"><?= $monthName ?> <?= $year ?></h1>
+            <a href="<?= $nextLink ?>" class="govuk-button govuk-button--secondary govuk-!-margin-bottom-0" data-module="govuk-button" aria-label="Next Month">
+                <i class="fa-solid fa-chevron-right" aria-hidden="true"></i>
+            </a>
         </div>
+    </div>
+    <div class="govuk-grid-column-one-quarter govuk-!-text-align-right">
+        <a href="<?= $basePath ?>/events/create" class="govuk-button" data-module="govuk-button">
+            <i class="fa-solid fa-plus govuk-!-margin-right-1" aria-hidden="true"></i> Add Event
+        </a>
+    </div>
+</div>
 
-        <div class="holo-calendar-page">
-            <!-- Floating Orbs -->
-            <div class="holo-orb holo-orb-1" aria-hidden="true"></div>
-            <div class="holo-orb holo-orb-2" aria-hidden="true"></div>
-            <div class="holo-orb holo-orb-3" aria-hidden="true"></div>
+<!-- Calendar Grid -->
+<div class="govuk-!-padding-4" style="border: 1px solid #b1b4b6; overflow-x: auto;">
+    <table class="govuk-table" style="table-layout: fixed; width: 100%; min-width: 700px;">
+        <caption class="govuk-visually-hidden">Calendar for <?= $monthName ?> <?= $year ?></caption>
+        <thead class="govuk-table__head">
+            <tr class="govuk-table__row">
+                <th scope="col" class="govuk-table__header" style="width: 14.28%;">Sun</th>
+                <th scope="col" class="govuk-table__header" style="width: 14.28%;">Mon</th>
+                <th scope="col" class="govuk-table__header" style="width: 14.28%;">Tue</th>
+                <th scope="col" class="govuk-table__header" style="width: 14.28%;">Wed</th>
+                <th scope="col" class="govuk-table__header" style="width: 14.28%;">Thu</th>
+                <th scope="col" class="govuk-table__header" style="width: 14.28%;">Fri</th>
+                <th scope="col" class="govuk-table__header" style="width: 14.28%;">Sat</th>
+            </tr>
+        </thead>
+        <tbody class="govuk-table__body">
+            <?php
+            $cellCount = 0;
+            $totalCells = $dayOfWeek + $daysInMonth;
+            $totalRows = ceil($totalCells / 7);
 
-            <div class="holo-calendar-container">
-                <!-- Header -->
-                <div class="holo-calendar-header">
-                    <a href="<?= $basePath ?>/events" class="holo-nav-btn holo-nav-btn-secondary">
-                        <i class="fa-solid fa-list" aria-hidden="true"></i>
-                        <span>List View</span>
-                    </a>
+            echo '<tr class="govuk-table__row">';
 
-                    <div class="holo-month-nav">
-                        <a href="<?= $prevLink ?>" class="holo-nav-btn holo-nav-btn-secondary holo-nav-btn-arrow" aria-label="Previous Month">
-                            <i class="fa-solid fa-chevron-left" aria-hidden="true"></i>
-                        </a>
-                        <h1 class="holo-month-title"><?= $monthName ?> <?= $year ?></h1>
-                        <a href="<?= $nextLink ?>" class="holo-nav-btn holo-nav-btn-secondary holo-nav-btn-arrow" aria-label="Next Month">
-                            <i class="fa-solid fa-chevron-right" aria-hidden="true"></i>
-                        </a>
-                    </div>
+            // Empty cells for days before start of month
+            for ($i = 0; $i < $dayOfWeek; $i++) {
+                echo '<td class="govuk-table__cell" style="vertical-align: top; height: 100px; background: #f3f2f1;"></td>';
+                $cellCount++;
+            }
 
-                    <a href="<?= $basePath ?>/events/create" class="holo-nav-btn holo-nav-btn-primary">
-                        <i class="fa-solid fa-plus" aria-hidden="true"></i>
-                        <span>Add Event</span>
-                    </a>
+            // Days of Month
+            for ($day = 1; $day <= $daysInMonth; $day++) {
+                $isToday = ($day == date('j') && $month == date('m') && $year == date('Y'));
+                $dayEvents = $eventsByDay[$day] ?? [];
+
+                $bgStyle = $isToday ? 'background: #e6f0f7; border-left: 3px solid #1d70b8;' : '';
+
+                echo '<td class="govuk-table__cell" style="vertical-align: top; height: 100px; padding: 0.5rem; ' . $bgStyle . '">';
+                echo '<p class="govuk-body-s govuk-!-margin-bottom-1"><strong>' . $day . '</strong></p>';
+
+                if (!empty($dayEvents)) {
+                    foreach ($dayEvents as $ev) {
+                        $time = date('g:ia', strtotime($ev['start_time']));
+                        echo '<a href="' . $basePath . '/events/' . $ev['id'] . '" class="govuk-link govuk-body-s" style="display: block; margin-bottom: 0.25rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">';
+                        echo '<span class="govuk-tag govuk-tag--blue govuk-!-margin-right-1" style="font-size: 0.7rem;">' . $time . '</span>';
+                        echo htmlspecialchars(substr($ev['title'], 0, 15)) . (strlen($ev['title']) > 15 ? '...' : '');
+                        echo '</a>';
+                    }
+                }
+
+                echo '</td>';
+                $cellCount++;
+
+                // Start new row after Saturday
+                if ($cellCount % 7 == 0 && $day < $daysInMonth) {
+                    echo '</tr><tr class="govuk-table__row">';
+                }
+            }
+
+            // Fill remaining cells
+            $remainingCells = 7 - ($cellCount % 7);
+            if ($remainingCells < 7) {
+                for ($i = 0; $i < $remainingCells; $i++) {
+                    echo '<td class="govuk-table__cell" style="vertical-align: top; height: 100px; background: #f3f2f1;"></td>';
+                }
+            }
+
+            echo '</tr>';
+            ?>
+        </tbody>
+    </table>
+</div>
+
+<!-- Mobile List View -->
+<div class="govuk-!-margin-top-6" id="mobile-events-list">
+    <h2 class="govuk-heading-m">Events this month</h2>
+    <?php
+    $hasEvents = false;
+    for ($day = 1; $day <= $daysInMonth; $day++) {
+        $dayEvents = $eventsByDay[$day] ?? [];
+        if (!empty($dayEvents)) {
+            $hasEvents = true;
+            foreach ($dayEvents as $ev) {
+                $dateStr = date('l, F j', mktime(0, 0, 0, $month, $day, $year));
+                $time = date('g:i A', strtotime($ev['start_time']));
+                ?>
+                <div class="govuk-!-padding-4 govuk-!-margin-bottom-4" style="border: 1px solid #b1b4b6; border-left: 5px solid #1d70b8;">
+                    <p class="govuk-body-s govuk-!-margin-bottom-1" style="color: #505a5f;">
+                        <?= $dateStr ?> at <?= $time ?>
+                    </p>
+                    <p class="govuk-body govuk-!-margin-bottom-2">
+                        <a href="<?= $basePath ?>/events/<?= $ev['id'] ?>" class="govuk-link"><strong><?= htmlspecialchars($ev['title']) ?></strong></a>
+                    </p>
+                    <?php if (!empty($ev['location'])): ?>
+                        <p class="govuk-body-s govuk-!-margin-bottom-0" style="color: #505a5f;">
+                            <i class="fa-solid fa-location-dot govuk-!-margin-right-1" aria-hidden="true"></i>
+                            <?= htmlspecialchars($ev['location']) ?>
+                        </p>
+                    <?php endif; ?>
                 </div>
+                <?php
+            }
+        }
+    }
 
-                <!-- Calendar Grid -->
-                <div class="holo-glass-card">
-                    <div class="holo-calendar-grid">
-                        <!-- Header Row -->
-                        <div class="holo-cal-header">Sun</div>
-                        <div class="holo-cal-header">Mon</div>
-                        <div class="holo-cal-header">Tue</div>
-                        <div class="holo-cal-header">Wed</div>
-                        <div class="holo-cal-header">Thu</div>
-                        <div class="holo-cal-header">Fri</div>
-                        <div class="holo-cal-header">Sat</div>
-
-                        <?php
-                        // Empty cells for days before start of month
-                        for ($i = 0; $i < $dayOfWeek; $i++) {
-                            echo '<div class="holo-cal-day empty"></div>';
-                        }
-
-                        // Days of Month
-                        for ($day = 1; $day <= $daysInMonth; $day++) {
-                            $isToday = ($day == date('j') && $month == date('m') && $year == date('Y'));
-                            $dayEvents = $eventsByDay[$day] ?? [];
-
-                            echo '<div class="holo-cal-day ' . ($isToday ? 'today' : '') . '">';
-                            echo '<div class="holo-day-number">' . $day . '</div>';
-
-                            if (!empty($dayEvents)) {
-                                echo '<div class="holo-day-events">';
-                                foreach ($dayEvents as $ev) {
-                                    $color = $ev['category_color'] ?? '#f97316';
-                                    $time = date('g:ia', strtotime($ev['start_time']));
-                                    echo '<a href="' . $basePath . '/events/' . $ev['id'] . '" class="holo-cal-event" style="--event-color: ' . htmlspecialchars($color) . ';">';
-                                    echo '<span class="holo-ev-time">' . $time . '</span>';
-                                    echo '<span class="holo-ev-title">' . htmlspecialchars($ev['title']) . '</span>';
-                                    echo '</a>';
-                                }
-                                echo '</div>';
-                            }
-
-                            echo '</div>';
-                        }
-                        ?>
-                    </div>
-                </div>
-            </div>
+    if (!$hasEvents): ?>
+        <div class="govuk-inset-text">
+            <p class="govuk-body">No events scheduled for <?= $monthName ?> <?= $year ?>.</p>
+            <a href="<?= $basePath ?>/events/create" class="govuk-link">Create the first event</a>
         </div>
+    <?php endif; ?>
+</div>
 
-    </main>
-</div><!-- /civicone-width-container -->
-
-<script src="/assets/js/civicone-events-calendar.js?v=<?= time() ?>"></script>
+<style>
+@media (min-width: 769px) {
+    #mobile-events-list { display: none; }
+}
+@media (max-width: 768px) {
+    .govuk-table { display: none; }
+}
+</style>
 
 <?php require dirname(__DIR__, 2) . '/layouts/civicone/footer.php'; ?>

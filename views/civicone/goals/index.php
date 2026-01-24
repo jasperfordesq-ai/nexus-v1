@@ -1,43 +1,84 @@
 <?php
-// CivicOne View: Goals Index - WCAG 2.1 AA Compliant
-// CSS extracted to civicone-mini-modules.css
+/**
+ * CivicOne View: Goals Index
+ * GOV.UK Design System Compliant (WCAG 2.1 AA)
+ */
 $heroTitle = "Goal Buddy";
 $heroSub = "Track and share your personal goals.";
 $heroType = 'Self Improvement';
 
 require dirname(__DIR__, 2) . '/layouts/civicone/header.php';
+
+$basePath = Nexus\Core\TenantContext::getBasePath();
 ?>
 
-<div class="civic-container">
+<nav class="govuk-breadcrumbs govuk-!-margin-bottom-6" aria-label="Breadcrumb">
+    <ol class="govuk-breadcrumbs__list">
+        <li class="govuk-breadcrumbs__list-item">
+            <a class="govuk-breadcrumbs__link" href="<?= $basePath ?>">Home</a>
+        </li>
+        <li class="govuk-breadcrumbs__list-item" aria-current="page">Goals</li>
+    </ol>
+</nav>
 
-    <div class="civic-module-header">
-        <h2>Your Goals</h2>
-        <a href="<?= Nexus\Core\TenantContext::getBasePath() ?>/goals/create" class="civic-btn">+ New Goal</a>
+<div class="govuk-grid-row govuk-!-margin-bottom-6">
+    <div class="govuk-grid-column-two-thirds">
+        <h1 class="govuk-heading-xl">
+            <i class="fa-solid fa-bullseye govuk-!-margin-right-2" aria-hidden="true"></i>
+            Your Goals
+        </h1>
     </div>
-
-    <?php if (empty($goals)): ?>
-        <div class="civic-card civic-module-empty">
-            <p class="civic-module-empty-icon" aria-hidden="true">🎯</p>
-            <p class="civic-module-empty-title">No goals set yet.</p>
-            <p class="civic-module-empty-text">Set a goal to get started!</p>
-        </div>
-    <?php else: ?>
-        <div class="civic-module-grid" role="list">
-            <?php foreach ($goals as $goal): ?>
-                <article class="civic-card civic-goal-card" role="listitem">
-                    <h3><?= htmlspecialchars($goal['title']) ?></h3>
-                    <div class="civic-goal-progress-bar" role="progressbar" aria-valuenow="<?= $goal['progress'] ?? 0 ?>" aria-valuemin="0" aria-valuemax="100">
-                        <div class="civic-goal-progress-fill" style="width: <?= $goal['progress'] ?? 0 ?>%;"></div>
-                    </div>
-                    <p class="civic-goal-percent"><?= $goal['progress'] ?? 0 ?>% Complete</p>
-                    <a href="<?= Nexus\Core\TenantContext::getBasePath() ?>/goals/<?= $goal['id'] ?>"
-                       class="civic-btn civic-goal-btn-outline"
-                       aria-label="Update progress for: <?= htmlspecialchars($goal['title']) ?>">Update Progress</a>
-                </article>
-            <?php endforeach; ?>
-        </div>
-    <?php endif; ?>
-
+    <div class="govuk-grid-column-one-third govuk-!-text-align-right">
+        <a href="<?= $basePath ?>/goals/create" class="govuk-button" data-module="govuk-button">
+            <i class="fa-solid fa-plus govuk-!-margin-right-1" aria-hidden="true"></i> New Goal
+        </a>
+    </div>
 </div>
+
+<?php if (empty($goals)): ?>
+    <div class="govuk-inset-text">
+        <p class="govuk-body-l govuk-!-margin-bottom-2">
+            <span aria-hidden="true">🎯</span>
+            <strong>No goals set yet</strong>
+        </p>
+        <p class="govuk-body govuk-!-margin-bottom-4">Set a goal to get started!</p>
+        <a href="<?= $basePath ?>/goals/create" class="govuk-button govuk-button--start" data-module="govuk-button">
+            Create your first goal
+            <svg class="govuk-button__start-icon" xmlns="http://www.w3.org/2000/svg" width="17.5" height="19" viewBox="0 0 33 40" aria-hidden="true" focusable="false">
+                <path fill="currentColor" d="M0 0h13l20 20-20 20H0l20-20z"/>
+            </svg>
+        </a>
+    </div>
+<?php else: ?>
+    <div class="govuk-grid-row">
+        <?php foreach ($goals as $goal):
+            $progress = $goal['progress'] ?? 0;
+            $progressColor = $progress >= 80 ? '#00703c' : ($progress >= 50 ? '#1d70b8' : '#505a5f');
+        ?>
+            <div class="govuk-grid-column-one-third govuk-!-margin-bottom-6">
+                <div class="govuk-!-padding-4" style="border: 1px solid #b1b4b6; border-left: 5px solid <?= $progressColor ?>;">
+                    <h3 class="govuk-heading-m govuk-!-margin-bottom-3"><?= htmlspecialchars($goal['title']) ?></h3>
+
+                    <!-- Progress Bar -->
+                    <div class="govuk-!-margin-bottom-2" role="progressbar" aria-valuenow="<?= $progress ?>" aria-valuemin="0" aria-valuemax="100" aria-label="<?= $progress ?>% complete">
+                        <div style="height: 8px; background: #f3f2f1; border-radius: 4px; overflow: hidden;">
+                            <div style="width: <?= $progress ?>%; height: 100%; background: <?= $progressColor ?>;"></div>
+                        </div>
+                    </div>
+
+                    <p class="govuk-body-s govuk-!-margin-bottom-4">
+                        <span class="govuk-tag <?= $progress >= 80 ? 'govuk-tag--green' : ($progress >= 50 ? 'govuk-tag--blue' : 'govuk-tag--grey') ?>">
+                            <?= $progress ?>% Complete
+                        </span>
+                    </p>
+
+                    <a href="<?= $basePath ?>/goals/<?= $goal['id'] ?>" class="govuk-button govuk-button--secondary" data-module="govuk-button" aria-label="Update progress for: <?= htmlspecialchars($goal['title']) ?>">
+                        <i class="fa-solid fa-chart-line govuk-!-margin-right-1" aria-hidden="true"></i> Update Progress
+                    </a>
+                </div>
+            </div>
+        <?php endforeach; ?>
+    </div>
+<?php endif; ?>
 
 <?php require dirname(__DIR__, 2) . '/layouts/civicone/footer.php'; ?>

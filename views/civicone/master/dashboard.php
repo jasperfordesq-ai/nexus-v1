@@ -1,226 +1,252 @@
 <?php
-// Phoenix View: Master Dashboard (Super Admin)
-// Path: views/modern/master/dashboard.php
-
-$hTitle = 'Platform Master';
-$hSubtitle = 'Orchestrate Communities & Manage Logic';
-$hGradient = 'mt-hero-gradient-brand'; // Use brand gradient
-$hType = 'Super Admin';
-
+/**
+ * Master Dashboard - Platform Admin
+ * GOV.UK Design System (WCAG 2.1 AA)
+ */
+$pageTitle = 'Platform Master';
+$basePath = \Nexus\Core\TenantContext::getBasePath();
 require dirname(__DIR__, 2) . '/layouts/civicone/header.php';
+
+// Queue Stats
+$qPending = \Nexus\Core\Database::query("SELECT COUNT(*) FROM notification_queue WHERE status='pending'")->fetchColumn();
+$qFailed  = \Nexus\Core\Database::query("SELECT COUNT(*) FROM notification_queue WHERE status='failed'")->fetchColumn();
+$cronKey  = \Nexus\Core\Env::get('CRON_KEY') ?? 'Not Set (Insecure)';
 ?>
 
-<div class="super-admin-wrapper">
-
-    <!-- Centered Container -->
-    <div class="container-centered flex-col gap-40">
-
-        <!-- Overview Stats -->
-        <div class="grid-auto-fit-240">
-            <div class="nexus-card p-25 text-center border-l-4-sky">
-                <div class="stat-label">Total Tenants</div>
-                <div class="stat-value text-sky-500"><?= count($tenants) ?></div>
+<div class="govuk-width-container">
+    <main class="govuk-main-wrapper">
+        <!-- Header -->
+        <div class="govuk-grid-row govuk-!-margin-bottom-6">
+            <div class="govuk-grid-column-two-thirds">
+                <h1 class="govuk-heading-xl">
+                    <i class="fa-solid fa-shield-halved govuk-!-margin-right-2" style="color: #1d70b8;" aria-hidden="true"></i>
+                    Platform Master
+                </h1>
+                <p class="govuk-body-l">Orchestrate communities and manage platform logic</p>
             </div>
-            <div class="nexus-card p-25 text-center border-l-4-purple">
-                <div class="stat-label">Active Users</div>
-                <div class="stat-value text-purple-500">
-                    <?= $totalAllUsers ?? 'Active' ?>
+            <div class="govuk-grid-column-one-third govuk-!-text-align-right">
+                <strong class="govuk-tag" style="background: #912b88;">
+                    <i class="fa-solid fa-crown govuk-!-margin-right-1" aria-hidden="true"></i>
+                    Super Admin
+                </strong>
+            </div>
+        </div>
+
+        <!-- Stats Grid -->
+        <div class="govuk-grid-row govuk-!-margin-bottom-8">
+            <div class="govuk-grid-column-one-third">
+                <div class="govuk-!-padding-4 govuk-!-text-align-center" style="background: #f3f2f1; border-left: 5px solid #1d70b8;">
+                    <p class="govuk-heading-xl govuk-!-margin-bottom-1" style="color: #1d70b8;"><?= count($tenants) ?></p>
+                    <p class="govuk-body-s govuk-!-margin-bottom-0">Total Tenants</p>
                 </div>
-                <div class="mt-15 pt-15 border-t">
-                    <a href="<?= \Nexus\Core\TenantContext::getBasePath() ?>/super-admin/users" class="nexus-btn nexus-btn-sm nexus-btn-generic w-full btn-subtle">
+            </div>
+            <div class="govuk-grid-column-one-third">
+                <div class="govuk-!-padding-4 govuk-!-text-align-center" style="background: #f3f2f1; border-left: 5px solid #912b88;">
+                    <p class="govuk-heading-xl govuk-!-margin-bottom-1" style="color: #912b88;"><?= $totalAllUsers ?? 'N/A' ?></p>
+                    <p class="govuk-body-s govuk-!-margin-bottom-2">Active Users</p>
+                    <a href="<?= $basePath ?>/super-admin/users" class="govuk-button govuk-button--secondary govuk-!-margin-bottom-0" data-module="govuk-button" style="width: 100%;">
+                        <i class="fa-solid fa-users govuk-!-margin-right-2" aria-hidden="true"></i>
                         Manage Directory
                     </a>
                 </div>
             </div>
-
-            <?php
-            // Queue Stats (Direct Query for Speed)
-            $qPending = \Nexus\Core\Database::query("SELECT COUNT(*) FROM notification_queue WHERE status='pending'")->fetchColumn();
-            $qFailed  = \Nexus\Core\Database::query("SELECT COUNT(*) FROM notification_queue WHERE status='failed'")->fetchColumn();
-            $cronKey  = \Nexus\Core\Env::get('CRON_KEY') ?? 'Not Set (Insecure)';
-            ?>
-            <div class="nexus-card p-25 border-l-4-amber">
-                <div class="stat-label text-amber-700">Queue Health</div>
-                <div class="stat-value text-amber-500 line-height-1">
-                    <?= $qPending ?> <span class="text-md text-gray-500 font-medium">pending</span>
-                </div>
-                <div class="stat-subtext text-red-600 font-semibold"><?= $qFailed ?> failed</div>
-                <div class="mt-15 pt-15 border-t">
-                    <button onclick="window.open('/cron/process-queue?key=<?= $cronKey ?>', '_blank')" class="nexus-btn nexus-btn-secondary text-sm-85 py-8 px-12 w-full">
-                        ⚡ Run Queue Worker Now
+            <div class="govuk-grid-column-one-third">
+                <div class="govuk-!-padding-4 govuk-!-text-align-center" style="background: #f3f2f1; border-left: 5px solid #f47738;">
+                    <p class="govuk-heading-xl govuk-!-margin-bottom-1" style="color: #f47738;"><?= $qPending ?></p>
+                    <p class="govuk-body-s govuk-!-margin-bottom-0">Queue Pending</p>
+                    <?php if ($qFailed > 0): ?>
+                        <p class="govuk-body-s govuk-!-margin-top-1 govuk-!-margin-bottom-2" style="color: #d4351c;">
+                            <strong><?= $qFailed ?> failed</strong>
+                        </p>
+                    <?php endif; ?>
+                    <button type="button" onclick="window.open('/cron/process-queue?key=<?= $cronKey ?>', '_blank')" class="govuk-button govuk-button--secondary govuk-!-margin-bottom-0 govuk-!-margin-top-2" data-module="govuk-button" style="width: 100%;">
+                        <i class="fa-solid fa-bolt govuk-!-margin-right-2" aria-hidden="true"></i>
+                        Run Queue
                     </button>
-                    <div class="mt-10 text-sm text-gray-500 text-center">
-                        Opens in new tab to force process pending items.
-                    </div>
                 </div>
             </div>
         </div>
 
-        <!-- Cron Configuration Guide -->
-        <div class="nexus-card master-cron-card">
-            <div class="nexus-card-header card-header-bordered">
-                <h3 class="m-0 text-lg">Server Configuration & Cron Jobs</h3>
+        <!-- Cron Configuration -->
+        <div class="govuk-!-margin-bottom-8" style="background: #f3f2f1; border: 1px solid #b1b4b6;">
+            <div class="govuk-!-padding-4" style="background: white; border-bottom: 1px solid #b1b4b6;">
+                <h2 class="govuk-heading-m govuk-!-margin-bottom-0">
+                    <i class="fa-solid fa-terminal govuk-!-margin-right-2" style="color: #1d70b8;" aria-hidden="true"></i>
+                    Server Configuration & Cron Jobs
+                </h2>
             </div>
-            <div class="nexus-card-body card-body-padded">
-                <p class="m-0 mb-15 text-gray-600">To ensure notifications and digests run automatically, add these entries to your server's Crontab (<code>crontab -e</code>):</p>
+            <div class="govuk-!-padding-4">
+                <p class="govuk-body govuk-!-margin-bottom-4">
+                    To ensure notifications and digests run automatically, add these entries to your server's Crontab (<code>crontab -e</code>):
+                </p>
 
-                <div class="code-block mb-20">
-                    <div class="mb-10">
-                        <span class="text-gray-500"># 1. Process Instant Emails (Run every minute)</span><br>
-                        * * * * * curl -s "<?= \Nexus\Core\Env::get('APP_URL') ?>/cron/process-queue?key=<?= $cronKey ?>" >/dev/null 2>&1
+                <div class="govuk-!-padding-3 govuk-!-margin-bottom-4" style="background: #0b0c0c; color: #00ff00; font-family: monospace; font-size: 13px; overflow-x: auto;">
+                    <p class="govuk-!-margin-bottom-2" style="color: #6b7280;"># 1. Process Instant Emails (Run every minute)</p>
+                    <p class="govuk-!-margin-bottom-4">* * * * * curl -s "<?= \Nexus\Core\Env::get('APP_URL') ?>/cron/process-queue?key=<?= $cronKey ?>" >/dev/null 2>&1</p>
+                    <p class="govuk-!-margin-bottom-2" style="color: #6b7280;"># 2. Process Daily Digests (Run daily at 5 PM)</p>
+                    <p class="govuk-!-margin-bottom-0">0 17 * * * curl -s "<?= \Nexus\Core\Env::get('APP_URL') ?>/cron/daily-digest?key=<?= $cronKey ?>" >/dev/null 2>&1</p>
+                </div>
+
+                <div class="govuk-button-group">
+                    <a href="<?= $basePath ?>/sys_deploy_v2.php" target="_blank" class="govuk-button govuk-button--secondary" data-module="govuk-button">
+                        <i class="fa-solid fa-rocket govuk-!-margin-right-2" aria-hidden="true"></i>
+                        Deployment Script
+                    </a>
+                    <a href="<?= $basePath ?>/cron/weekly-digest?key=<?= $cronKey ?>" target="_blank" class="govuk-button govuk-button--secondary" data-module="govuk-button">
+                        <i class="fa-solid fa-play govuk-!-margin-right-2" aria-hidden="true"></i>
+                        Manual Trigger
+                    </a>
+                    <a href="<?= $basePath ?>/help" target="_blank" class="govuk-button govuk-button--secondary" data-module="govuk-button">
+                        <i class="fa-solid fa-book govuk-!-margin-right-2" aria-hidden="true"></i>
+                        Documentation
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Managed Communities -->
+        <div class="govuk-!-margin-bottom-8" style="border: 1px solid #b1b4b6;">
+            <div class="govuk-!-padding-4" style="background: #f3f2f1; border-bottom: 1px solid #b1b4b6;">
+                <div style="display: flex; align-items: center; gap: 12px;">
+                    <div style="width: 40px; height: 40px; border-radius: 8px; background: linear-gradient(135deg, #1d70b8, #00703c); display: flex; align-items: center; justify-content: center; color: white;">
+                        <i class="fa-solid fa-globe" aria-hidden="true"></i>
                     </div>
                     <div>
-                        <span class="text-gray-500"># 2. Process Daily Digests (Run daily at 5 PM)</span><br>
-                        0 17 * * * curl -s "<?= \Nexus\Core\Env::get('APP_URL') ?>/cron/daily-digest?key=<?= $cronKey ?>" >/dev/null 2>&1
+                        <h2 class="govuk-heading-m govuk-!-margin-bottom-0">Managed Communities</h2>
+                        <p class="govuk-body-s govuk-!-margin-bottom-0" style="color: #505a5f;">Platform-wide tenant overview</p>
                     </div>
                 </div>
-
-                <div class="flex-wrap-gap-20">
-                    <a href="<?= \Nexus\Core\TenantContext::getBasePath() ?>/sys_deploy_v2.php" target="_blank" class="nexus-btn nexus-btn-secondary no-underline border text-gray-700">
-                        📂 Run Deployment Script (V2)
-                    </a>
-                    <a href="<?= \Nexus\Core\TenantContext::getBasePath() ?>/cron/weekly-digest?key=nexus_secret_cron_key_123" target="_blank" class="nexus-btn nexus-btn-sm nexus-btn-secondary bg-white border-light no-underline text-slate-600">Run Manual Trigger</a>
-                    <a href="<?= \Nexus\Core\TenantContext::getBasePath() ?>/help" target="_blank" class="nexus-btn nexus-btn-secondary no-underline border text-gray-700">
-                        📘 View Documentation
-                    </a>
-                </div>
             </div>
-        </div>
 
-    </div>
+            <table class="govuk-table govuk-!-margin-bottom-0">
+                <thead class="govuk-table__head">
+                    <tr class="govuk-table__row">
+                        <th scope="col" class="govuk-table__header">Community</th>
+                        <th scope="col" class="govuk-table__header">URL Slug</th>
+                        <th scope="col" class="govuk-table__header">Active Modules</th>
+                        <th scope="col" class="govuk-table__header govuk-table__header--numeric">Action</th>
+                    </tr>
+                </thead>
+                <tbody class="govuk-table__body">
+                    <?php foreach ($tenants as $t): ?>
+                        <tr class="govuk-table__row">
+                            <td class="govuk-table__cell">
+                                <strong><?= htmlspecialchars($t['name']) ?></strong>
+                            </td>
+                            <td class="govuk-table__cell">
+                                <code style="background: #f3f2f1; padding: 2px 6px; border-radius: 3px;">/<?= htmlspecialchars($t['slug']) ?></code>
+                            </td>
+                            <td class="govuk-table__cell">
+                                <?php
+                                $f = json_decode($t['features'] ?? '{}', true);
+                                $active = [];
+                                if (!empty($f['listings'])) $active[] = '<strong class="govuk-tag govuk-tag--blue" style="font-size: 12px;">Listings</strong>';
+                                if (!empty($f['groups'])) $active[] = '<strong class="govuk-tag govuk-tag--purple" style="font-size: 12px;">Hubs</strong>';
+                                if (!empty($f['volunteering'])) $active[] = '<strong class="govuk-tag govuk-tag--green" style="font-size: 12px;">Vols</strong>';
+                                if (!empty($f['events'])) $active[] = '<strong class="govuk-tag govuk-tag--pink" style="font-size: 12px;">Events</strong>';
 
-    <!-- Managed Communities -->
-    <div class="nexus-card">
-        <header class="nexus-card-header card-header-bordered border-b-subtle">
-            <div class="flex-center-gap-12">
-                <div class="icon-40 rounded-xl bg-gradient-brand text-white text-xl">🌐</div>
-                <div>
-                    <h3 class="m-0 text-lg">Managed Communities</h3>
-                    <div class="text-sm-85 text-muted">Platform-wide tenant overview</div>
-                </div>
-            </div>
-        </header>
-
-        <div class="nexus-card-body card-body-lg">
-            <!-- Inner Box for Table -->
-            <div class="card-box overflow-hidden">
-                <table class="w-full table-collapse">
-                    <thead class="bg-slate-100 border-b-light">
-                        <tr>
-                            <th class="table-header-cell">Community</th>
-                            <th class="table-header-cell">URL Slug</th>
-                            <th class="table-header-cell">Active Modules</th>
-                            <th class="table-header-cell text-right">Action</th>
+                                if (empty($active)) {
+                                    echo '<span class="govuk-body-s" style="color: #505a5f; font-style: italic;">None</span>';
+                                } else {
+                                    echo implode(' ', array_slice($active, 0, 4));
+                                    if (count($active) > 4) echo ' <span class="govuk-body-s">+' . (count($active) - 4) . '</span>';
+                                }
+                                ?>
+                            </td>
+                            <td class="govuk-table__cell govuk-table__cell--numeric">
+                                <a href="/super-admin/tenant/edit?id=<?= $t['id'] ?>" class="govuk-button govuk-button--secondary govuk-!-margin-bottom-0" data-module="govuk-button" style="font-size: 14px; padding: 8px 12px;">
+                                    <i class="fa-solid fa-cog govuk-!-margin-right-1" aria-hidden="true"></i>
+                                    Configure
+                                </a>
+                            </td>
                         </tr>
-                    </thead>
-                    <tbody>
-                        <?php foreach ($tenants as $t): ?>
-                            <tr class="tenant-row border-b-light bg-white transition-bg">
-                                <td class="table-cell font-semibold text-gray-900">
-                                    <?= htmlspecialchars($t['name']) ?>
-                                </td>
-                                <td class="table-cell">
-                                    <span class="tag-mono">
-                                        /<?= htmlspecialchars($t['slug']) ?>
-                                    </span>
-                                </td>
-                                <td class="table-cell text-sm-85 text-slate-500">
-                                    <?php
-                                    // Safe JSON decode
-                                    $f = json_decode($t['features'] ?? '{}', true);
-                                    $active = [];
-                                    if (!empty($f['listings'])) $active[] = '<span class="text-blue-600">Listings</span>';
-                                    if (!empty($f['groups'])) $active[] = '<span class="text-violet-600">Hubs</span>';
-                                    if (!empty($f['volunteering'])) $active[] = '<span class="text-emerald-600">Vols</span>';
-                                    if (!empty($f['events'])) $active[] = '<span class="text-pink-600">Events</span>';
-
-                                    if (empty($active)) {
-                                        echo '<span class="opacity-50 italic">None</span>';
-                                    } else {
-                                        echo implode(' • ', array_slice($active, 0, 4));
-                                        if (count($active) > 4) echo ' + ' . (count($active) - 4);
-                                    }
-                                    ?>
-                                </td>
-                                <td class="table-cell text-right">
-                                    <a href="/super-admin/tenant/edit?id=<?= $t['id'] ?>" class="nexus-btn nexus-btn-sm nexus-btn-generic btn-subtle">
-                                        Configure
-                                    </a>
-                                </td>
-                            </tr>
-                        <?php endforeach; ?>
-                    </tbody>
-                </table>
-            </div>
+                    <?php endforeach; ?>
+                </tbody>
+            </table>
         </div>
-    </div>
 
-    <!-- Deploy New Instance -->
-    <div class="nexus-card">
-        <header class="nexus-card-header card-header-bordered border-b-subtle">
-            <div class="flex-center-gap-12">
-                <div class="btn-icon-gradient">🚀</div>
-                <div>
-                    <h3 class="m-0 text-lg">Deploy New Timebank</h3>
-                    <div class="text-sm-85 text-muted">Launch a new community instance on the platform</div>
+        <!-- Deploy New Instance -->
+        <div style="border: 1px solid #b1b4b6;">
+            <div class="govuk-!-padding-4" style="background: #f3f2f1; border-bottom: 1px solid #b1b4b6;">
+                <div style="display: flex; align-items: center; gap: 12px;">
+                    <div style="width: 40px; height: 40px; border-radius: 8px; background: linear-gradient(135deg, #f47738, #d4351c); display: flex; align-items: center; justify-content: center; color: white;">
+                        <i class="fa-solid fa-rocket" aria-hidden="true"></i>
+                    </div>
+                    <div>
+                        <h2 class="govuk-heading-m govuk-!-margin-bottom-0">Deploy New Timebank</h2>
+                        <p class="govuk-body-s govuk-!-margin-bottom-0" style="color: #505a5f;">Launch a new community instance on the platform</p>
+                    </div>
                 </div>
             </div>
-        </header>
 
-        <div class="nexus-card-body card-body-lg">
-            <form action="<?= \Nexus\Core\TenantContext::getBasePath() ?>/super-admin/create-tenant" method="POST">
+            <div class="govuk-!-padding-4">
+                <form action="<?= $basePath ?>/super-admin/create-tenant" method="POST">
 
-                <!-- Inner Box: Instance Details -->
-                <div class="card-box mb-25">
-                    <h4 class="stat-section-heading">Instance Details</h4>
+                    <!-- Instance Details -->
+                    <div class="govuk-!-margin-bottom-6 govuk-!-padding-4" style="background: #f3f2f1; border-left: 5px solid #1d70b8;">
+                        <h3 class="govuk-heading-s govuk-!-margin-bottom-4">
+                            <i class="fa-solid fa-building govuk-!-margin-right-2" style="color: #1d70b8;" aria-hidden="true"></i>
+                            Instance Details
+                        </h3>
 
-                    <div class="grid-2col mb-15">
-                        <div>
-                            <label class="form-label">Community Name</label>
-                            <input type="text" name="name" class="nexus-input" placeholder="e.g. Cork City Exchange" required>
-                        </div>
-                        <div>
-                            <label class="form-label">URL Slug (Unique)</label>
-                            <div class="flex-center">
-                                <span class="slug-prefix bg-white p-12 px-15 border border-light rounded-l-xl text-gray-500 font-mono">platform.url/</span>
-                                <input type="text" name="slug" class="nexus-input rounded-r-xl" placeholder="cork-city" required>
+                        <div class="govuk-grid-row">
+                            <div class="govuk-grid-column-one-half">
+                                <div class="govuk-form-group">
+                                    <label class="govuk-label" for="name">Community Name</label>
+                                    <input type="text" name="name" id="name" class="govuk-input" placeholder="e.g. Cork City Exchange" required>
+                                </div>
+                            </div>
+                            <div class="govuk-grid-column-one-half">
+                                <div class="govuk-form-group">
+                                    <label class="govuk-label" for="slug">URL Slug (Unique)</label>
+                                    <div style="display: flex;">
+                                        <span class="govuk-!-padding-2" style="background: white; border: 2px solid #0b0c0c; border-right: none; color: #505a5f; font-family: monospace;">platform.url/</span>
+                                        <input type="text" name="slug" id="slug" class="govuk-input" style="border-radius: 0;" placeholder="cork-city" required>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
 
-                <!-- Inner Box: Primary Admin -->
-                <div class="card-box-teal mb-30">
-                    <h4 class="stat-section-heading-teal">Primary Administrator</h4>
+                    <!-- Primary Administrator -->
+                    <div class="govuk-!-margin-bottom-6 govuk-!-padding-4" style="background: #f3f2f1; border-left: 5px solid #00703c;">
+                        <h3 class="govuk-heading-s govuk-!-margin-bottom-4">
+                            <i class="fa-solid fa-user-shield govuk-!-margin-right-2" style="color: #00703c;" aria-hidden="true"></i>
+                            Primary Administrator
+                        </h3>
 
-                    <div class="grid-3col">
-                        <div>
-                            <label class="form-label-teal">Full Name</label>
-                            <input type="text" name="admin_name" class="nexus-input" placeholder="Admin Name" required>
-                        </div>
-                        <div>
-                            <label class="form-label-teal">Email Address</label>
-                            <input type="email" name="admin_email" class="nexus-input" placeholder="admin@email.com" required>
-                        </div>
-                        <div>
-                            <label class="form-label-teal">Password</label>
-                            <input type="password" name="admin_password" class="nexus-input" placeholder="Create Password" required>
+                        <div class="govuk-grid-row">
+                            <div class="govuk-grid-column-one-third">
+                                <div class="govuk-form-group">
+                                    <label class="govuk-label" for="admin_name">Full Name</label>
+                                    <input type="text" name="admin_name" id="admin_name" class="govuk-input" placeholder="Admin Name" required>
+                                </div>
+                            </div>
+                            <div class="govuk-grid-column-one-third">
+                                <div class="govuk-form-group">
+                                    <label class="govuk-label" for="admin_email">Email Address</label>
+                                    <input type="email" name="admin_email" id="admin_email" class="govuk-input" placeholder="admin@email.com" required>
+                                </div>
+                            </div>
+                            <div class="govuk-grid-column-one-third">
+                                <div class="govuk-form-group">
+                                    <label class="govuk-label" for="admin_password">Password</label>
+                                    <input type="password" name="admin_password" id="admin_password" class="govuk-input" placeholder="Create Password" required>
+                                </div>
+                            </div>
                         </div>
                     </div>
-                </div>
 
-                <div class="flex-end">
-                    <button type="submit" class="nexus-btn nexus-btn-primary launch-btn p-12 px-30 text-md">
-                        🚀 Launch New Instance
-                    </button>
-                </div>
-
-            </form>
+                    <div class="govuk-!-text-align-right">
+                        <button type="submit" class="govuk-button" data-module="govuk-button">
+                            <i class="fa-solid fa-rocket govuk-!-margin-right-2" aria-hidden="true"></i>
+                            Launch New Instance
+                        </button>
+                    </div>
+                </form>
+            </div>
         </div>
-    </div>
-
-</div>
+    </main>
 </div>
 
-<!-- Master Dashboard CSS -->
-<link rel="stylesheet" href="<?= NexusCoreTenantContext::getBasePath() ?>/assets/css/purged/civicone-master-dashboard.min.css">
+<?php require dirname(__DIR__, 2) . '/layouts/civicone/footer.php'; ?>

@@ -471,7 +471,7 @@ require __DIR__ . '/../../layouts/civicone/header.php';
 </div><!-- /.govuk-grid-row -->
 
 <!-- Toast Notification -->
-<div class="civic-toast" id="civic-toast"></div>
+<div id="govuk-toast" role="status" aria-live="polite" style="position: fixed; bottom: 20px; right: 20px; z-index: 1000; display: none;"></div>
 
 <!-- External JavaScript for social interactions (CLAUDE.md compliant) -->
 <link rel="stylesheet" href="/assets/css/civicone-profile-show.css">

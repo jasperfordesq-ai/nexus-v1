@@ -1,13 +1,10 @@
 <?php
-$hTitle = 'My Achievements';
-$hSubtitle = 'Track your progress and unlock rewards';
-$hGradient = 'mt-hero-gradient-gamification';
-$hType = 'Gamification';
-
+/**
+ * CivicOne View: Achievements Dashboard
+ * GOV.UK Design System Compliant (WCAG 2.1 AA)
+ */
+$pageTitle = 'My Achievements';
 $basePath = \Nexus\Core\TenantContext::getBasePath();
-
-// Achievements styles are defined inline below - no external CSS needed
-$cssVersion = time();
 
 require dirname(__DIR__, 2) . '/layouts/civicone/header.php';
 
@@ -22,14 +19,49 @@ $stats = $dashboardData['stats'] ?? [];
 $recentXP = $dashboardData['recent_xp'] ?? [];
 ?>
 
+<nav class="govuk-breadcrumbs govuk-!-margin-bottom-6" aria-label="Breadcrumb">
+    <ol class="govuk-breadcrumbs__list">
+        <li class="govuk-breadcrumbs__list-item">
+            <a class="govuk-breadcrumbs__link" href="<?= $basePath ?>">Home</a>
+        </li>
+        <li class="govuk-breadcrumbs__list-item" aria-current="page">Achievements</li>
+    </ol>
+</nav>
+
+<div class="govuk-grid-row govuk-!-margin-bottom-6">
+    <div class="govuk-grid-column-two-thirds">
+        <h1 class="govuk-heading-xl">
+            <i class="fa-solid fa-trophy govuk-!-margin-right-2" aria-hidden="true"></i>
+            My Achievements
+        </h1>
+        <p class="govuk-body-l">Track your progress and unlock rewards.</p>
+    </div>
+    <div class="govuk-grid-column-one-third govuk-!-text-align-right">
+        <a href="<?= $basePath ?>/achievements/badges" class="govuk-button govuk-button--secondary" data-module="govuk-button">
+            <i class="fa-solid fa-medal govuk-!-margin-right-1" aria-hidden="true"></i> View All Badges
+        </a>
+    </div>
+</div>
+
+<!-- Achievement Navigation -->
+<nav class="govuk-!-margin-bottom-6" aria-label="Achievement sections">
+    <ul class="govuk-list" style="display: flex; gap: 0.5rem; flex-wrap: wrap; padding: 0; margin: 0;">
+        <li><a href="<?= $basePath ?>/achievements" class="govuk-button" data-module="govuk-button">Dashboard</a></li>
+        <li><a href="<?= $basePath ?>/achievements/badges" class="govuk-button govuk-button--secondary" data-module="govuk-button">All Badges</a></li>
+        <li><a href="<?= $basePath ?>/achievements/challenges" class="govuk-button govuk-button--secondary" data-module="govuk-button">Challenges</a></li>
+        <li><a href="<?= $basePath ?>/achievements/collections" class="govuk-button govuk-button--secondary" data-module="govuk-button">Collections</a></li>
+        <li><a href="<?= $basePath ?>/achievements/shop" class="govuk-button govuk-button--secondary" data-module="govuk-button">XP Shop</a></li>
+    </ul>
+</nav>
+
 <div class="achievements-wrapper">
     <div class="achievements-grid">
 
         <!-- Level & XP Card -->
         <div class="achievement-card">
             <div class="card-header">
-                <span class="icon">⭐</span>
-                <h3>Level & Experience</h3>
+                <span class="icon" aria-hidden="true">⭐</span>
+                <h2 class="govuk-heading-m govuk-!-margin-bottom-0">Level & Experience</h2>
             </div>
 
             <div class="level-display">
@@ -60,8 +92,8 @@ $recentXP = $dashboardData['recent_xp'] ?? [];
         <!-- Streaks Card -->
         <div class="achievement-card">
             <div class="card-header">
-                <span class="icon">🔥</span>
-                <h3>Streaks</h3>
+                <span class="icon" aria-hidden="true">🔥</span>
+                <h2 class="govuk-heading-m govuk-!-margin-bottom-0">Streaks</h2>
             </div>
 
             <div class="streaks-grid">
@@ -88,8 +120,8 @@ $recentXP = $dashboardData['recent_xp'] ?? [];
         <!-- Rankings Card -->
         <div class="achievement-card">
             <div class="card-header">
-                <span class="icon">🏆</span>
-                <h3>Leaderboard Rankings</h3>
+                <span class="icon" aria-hidden="true">🏆</span>
+                <h2 class="govuk-heading-m govuk-!-margin-bottom-0">Leaderboard Rankings</h2>
             </div>
 
             <div class="rankings-grid">
@@ -110,16 +142,16 @@ $recentXP = $dashboardData['recent_xp'] ?? [];
                 <?php endforeach; ?>
             </div>
 
-            <a href="<?= $basePath ?>/leaderboard" class="view-all-link">
-                View Leaderboards <i class="fa-solid fa-arrow-right"></i>
+            <a href="<?= $basePath ?>/leaderboard" class="govuk-link govuk-!-font-weight-bold">
+                View Leaderboards <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
             </a>
         </div>
 
         <!-- Badge Progress Card -->
         <div class="achievement-card two-thirds">
             <div class="card-header">
-                <span class="icon">🎯</span>
-                <h3>Next Badges to Unlock</h3>
+                <span class="icon" aria-hidden="true">🎯</span>
+                <h2 class="govuk-heading-m govuk-!-margin-bottom-0">Next Badges to Unlock</h2>
             </div>
 
             <?php if (!empty($badges['progress'])): ?>
@@ -140,22 +172,22 @@ $recentXP = $dashboardData['recent_xp'] ?? [];
             </div>
             <?php else: ?>
             <?php if ($badges['total_earned'] >= $badges['total_available']): ?>
-            <p class="civic-text-success civic-text-center civic-p-5">You've unlocked all available badges! Amazing!</p>
+            <p class="govuk-body govuk-!-text-align-centre govuk-!-padding-5" style="color: #00703c;">You've unlocked all available badges! Amazing!</p>
             <?php else: ?>
-            <p class="civic-text-muted civic-text-center civic-p-5">Keep participating to unlock your next badge!</p>
+            <p class="govuk-body govuk-!-text-align-centre govuk-!-padding-5" style="color: #505a5f;">Keep participating to unlock your next badge!</p>
             <?php endif; ?>
             <?php endif; ?>
 
-            <a href="<?= $basePath ?>/achievements/badges" class="view-all-link">
-                View All Badges <i class="fa-solid fa-arrow-right"></i>
+            <a href="<?= $basePath ?>/achievements/badges" class="govuk-link govuk-!-font-weight-bold">
+                View All Badges <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
             </a>
         </div>
 
         <!-- Earned Badges Card -->
         <div class="achievement-card">
             <div class="card-header">
-                <span class="icon">🏅</span>
-                <h3>Earned Badges (<?= $badges['total_earned'] ?>)</h3>
+                <span class="icon" aria-hidden="true">🏅</span>
+                <h2 class="govuk-heading-m govuk-!-margin-bottom-0">Earned Badges (<?= $badges['total_earned'] ?>)</h2>
             </div>
 
             <?php if (!empty($badges['earned'])): ?>
@@ -188,20 +220,20 @@ $recentXP = $dashboardData['recent_xp'] ?? [];
                 <?php endforeach; ?>
             </div>
             <?php if (count($badges['earned']) > 8): ?>
-            <a href="<?= $basePath ?>/achievements/badges" class="view-all-link">
-                +<?= count($badges['earned']) - 8 ?> more badges <i class="fa-solid fa-arrow-right"></i>
+            <a href="<?= $basePath ?>/achievements/badges" class="govuk-link govuk-!-font-weight-bold">
+                +<?= count($badges['earned']) - 8 ?> more badges <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
             </a>
             <?php endif; ?>
             <?php else: ?>
-            <p class="civic-text-muted civic-text-center civic-p-5">Start participating to earn your first badge!</p>
+            <p class="govuk-body govuk-!-text-align-centre govuk-!-padding-5" style="color: #505a5f;">Start participating to earn your first badge!</p>
             <?php endif; ?>
         </div>
 
         <!-- Recent XP Card -->
         <div class="achievement-card">
             <div class="card-header">
-                <span class="icon">📈</span>
-                <h3>Recent XP Activity</h3>
+                <span class="icon" aria-hidden="true">📈</span>
+                <h2 class="govuk-heading-m govuk-!-margin-bottom-0">Recent XP Activity</h2>
             </div>
 
             <?php if (!empty($recentXP)): ?>
@@ -217,15 +249,15 @@ $recentXP = $dashboardData['recent_xp'] ?? [];
                 <?php endforeach; ?>
             </div>
             <?php else: ?>
-            <p class="civic-text-muted civic-text-center civic-p-5">No XP activity yet. Start participating!</p>
+            <p class="govuk-body govuk-!-text-align-centre govuk-!-padding-5" style="color: #505a5f;">No XP activity yet. Start participating!</p>
             <?php endif; ?>
         </div>
 
         <!-- Stats Summary Card -->
         <div class="achievement-card full-width">
             <div class="card-header">
-                <span class="icon">📊</span>
-                <h3>Your Activity Stats</h3>
+                <span class="icon" aria-hidden="true">📊</span>
+                <h2 class="govuk-heading-m govuk-!-margin-bottom-0">Your Activity Stats</h2>
             </div>
 
             <div class="stats-summary">

@@ -1,26 +1,19 @@
 <?php
 /**
- * CivicOne Groups Edit Overlay - Two-Tab Modal (Edit Settings + Invite Members)
- * Overlay Template: Group Edit/Invite Modal (Section 10.13)
- * WCAG 2.1 AA Compliant
+ * Groups Edit Overlay - GOV.UK Design System
+ * WCAG 2.1 AA Compliant Two-Tab Modal
  *
  * Features:
- * - Desktop: Glassmorphism modal with holographic effects
- * - Mobile: Full-screen fixed overlay (100vw x 100vh)
+ * - Desktop: Modal overlay
+ * - Mobile: Full-screen overlay
  * - Two tabs: Edit Settings and Invite Members
- * - Horizontal scrollable pill navigation
- * - Dark mode by default
- * - Safe-area-inset support for notched devices
- * - PWA features: offline detection, haptic feedback
- * - Full accessibility: ARIA labels, keyboard navigation, focus trap
- * - All CSS and JS extracted to external files (gold standard compliance)
+ * - Accessibility: ARIA labels, keyboard navigation
  */
 
 $basePath = \Nexus\Core\TenantContext::getBasePath();
 $tenantId = \Nexus\Core\TenantContext::getId();
 $userId = $_SESSION['user_id'] ?? null;
 $userName = $_SESSION['user_name'] ?? 'User';
-$userAvatar = $_SESSION['user_avatar'] ?? '/assets/img/defaults/default_avatar.webp';
 
 // Get flash messages
 $error = $_SESSION['group_error'] ?? null;
@@ -28,337 +21,499 @@ $success = $_SESSION['group_success'] ?? null;
 unset($_SESSION['group_error'], $_SESSION['group_success']);
 
 $pageTitle = $pageTitle ?? 'Edit Group';
+$defaultTab = $defaultTab ?? 'edit';
 ?>
 <!DOCTYPE html>
-<html lang="en" data-theme="dark">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
-    <meta name="theme-color" content="#1e293b">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#1d70b8">
     <title><?= htmlspecialchars($pageTitle) ?></title>
-
-    <!-- Fonts & Icons -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-
-    <!-- Edit Overlay CSS -->
-    <link rel="stylesheet" href="/assets/css/purged/groups-edit-overlay.min.css?v=<?= time() ?>">
-
-    <!-- Edit Overlay JavaScript -->
-    <script src="/assets/js/groups-edit-overlay.min.js?v=<?= time() ?>" defer></script>
+    <link rel="stylesheet" href="/assets/css/govuk-frontend.min.css">
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: "GDS Transport", arial, sans-serif;
+            background: rgba(11, 12, 12, 0.7);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .overlay-container {
+            background: white;
+            max-width: 700px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        .overlay-header {
+            background: #1d70b8;
+            color: white;
+            padding: 16px 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+        .close-btn {
+            background: transparent;
+            border: 2px solid white;
+            color: white;
+            width: 36px;
+            height: 36px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .close-btn:hover { background: rgba(255,255,255,0.1); }
+        .overlay-header h1 {
+            font-size: 20px;
+            font-weight: 700;
+            margin: 0;
+            flex: 1;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .tab-nav {
+            display: flex;
+            border-bottom: 1px solid #b1b4b6;
+            background: #f3f2f1;
+        }
+        .tab-btn {
+            flex: 1;
+            padding: 14px 16px;
+            background: transparent;
+            border: none;
+            border-bottom: 4px solid transparent;
+            font-size: 16px;
+            font-weight: 400;
+            color: #505a5f;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: all 0.15s;
+        }
+        .tab-btn:hover { background: white; color: #0b0c0c; }
+        .tab-btn.active {
+            background: white;
+            border-bottom-color: #1d70b8;
+            color: #1d70b8;
+            font-weight: 700;
+        }
+        .tab-panel { display: none; padding: 20px; }
+        .tab-panel.active { display: block; }
+        .image-section { margin-bottom: 20px; }
+        .image-preview-box {
+            width: 100%;
+            height: 160px;
+            background: #f3f2f1;
+            border: 1px solid #b1b4b6;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            margin-bottom: 12px;
+        }
+        .image-preview-box img { width: 100%; height: 100%; object-fit: cover; }
+        .image-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+        .upload-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 12px;
+            background: #f3f2f1;
+            border: 1px solid #b1b4b6;
+            color: #0b0c0c;
+            font-size: 14px;
+            cursor: pointer;
+        }
+        .upload-btn:hover { background: #e5e5e5; }
+        .upload-btn input[type="file"] { display: none; }
+        .clear-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 12px;
+            background: #f3f2f1;
+            border: 1px solid #b1b4b6;
+            color: #d4351c;
+            font-size: 14px;
+            cursor: pointer;
+        }
+        .clear-btn input[type="checkbox"] { display: none; }
+        .user-list { max-height: 300px; overflow-y: auto; border: 1px solid #b1b4b6; }
+        .user-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px;
+            border-bottom: 1px solid #f3f2f1;
+            cursor: pointer;
+        }
+        .user-item:hover { background: #f3f2f1; }
+        .user-item:last-child { border-bottom: none; }
+        .user-item input[type="checkbox"] { width: 20px; height: 20px; }
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #1d70b8;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            overflow: hidden;
+        }
+        .user-avatar img { width: 100%; height: 100%; object-fit: cover; }
+        .user-info { flex: 1; }
+        .user-name { font-weight: 600; color: #0b0c0c; }
+        .user-email { font-size: 14px; color: #505a5f; }
+        .selected-count {
+            padding: 12px;
+            background: #f3f2f1;
+            text-align: center;
+            font-size: 14px;
+            color: #505a5f;
+        }
+        .no-users {
+            padding: 40px 20px;
+            text-align: center;
+            color: #505a5f;
+        }
+        .no-users i { font-size: 48px; color: #b1b4b6; margin-bottom: 12px; }
+        .add-directly-box {
+            margin-top: 16px;
+            padding: 12px;
+            background: #f3f2f1;
+            border-left: 4px solid #1d70b8;
+        }
+        .add-directly-box label { display: flex; gap: 12px; cursor: pointer; }
+        .add-directly-box input[type="checkbox"] { width: 20px; height: 20px; margin-top: 2px; }
+        .add-directly-title { font-weight: 600; color: #0b0c0c; }
+        .add-directly-desc { font-size: 14px; color: #505a5f; margin-top: 4px; }
+        @media (max-width: 640px) {
+            body { padding: 0; }
+            .overlay-container { max-height: 100vh; height: 100vh; }
+        }
+    </style>
 </head>
 <body>
-
-<!-- Offline Banner -->
-<div class="offline-banner" id="offlineBanner" role="alert" aria-live="polite">
-    <i class="fa-solid fa-wifi-slash"></i>
-    <span>No internet connection</span>
-</div>
-
-<!-- Backdrop with click-to-close on desktop -->
-<div class="edit-backdrop" onclick="if(event.target === this) closeEditOverlay()">
-    <!-- Main Overlay -->
-    <div class="edit-overlay">
-
+    <div class="overlay-container" role="dialog" aria-modal="true" aria-labelledby="overlay-title">
         <!-- Header -->
-        <header class="edit-header">
-            <div class="edit-header-left">
-                <button type="button" class="edit-close-btn" onclick="closeEditOverlay()" aria-label="Close overlay">
-                    <i class="fa-solid fa-xmark"></i>
-                </button>
-                <h1 class="edit-title"><?= htmlspecialchars($group['name']) ?></h1>
-            </div>
-        </header>
+        <div class="overlay-header">
+            <button type="button" class="close-btn" onclick="closeEditOverlay()" aria-label="Close overlay">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+            <h1 id="overlay-title"><?= htmlspecialchars($group['name']) ?></h1>
+        </div>
 
         <!-- Tab Navigation -->
-        <nav class="edit-tabs" role="tablist" aria-label="Group settings">
-            <div class="edit-tabs-inner">
-                <button type="button"
-                        class="edit-pill <?= $defaultTab === 'edit' ? 'active' : '' ?>"
-                        data-type="edit"
-                        role="tab"
-                        aria-selected="<?= $defaultTab === 'edit' ? 'true' : 'false' ?>"
-                        aria-controls="panel-edit"
-                        onclick="switchTab('edit')">
-                    <i class="fa-solid fa-pen-to-square"></i>
-                    Edit Settings
-                </button>
-                <button type="button"
-                        class="edit-pill <?= $defaultTab === 'invite' ? 'active' : '' ?>"
-                        data-type="invite"
-                        role="tab"
-                        aria-selected="<?= $defaultTab === 'invite' ? 'true' : 'false' ?>"
-                        aria-controls="panel-invite"
-                        onclick="switchTab('invite')">
-                    <i class="fa-solid fa-user-plus"></i>
-                    Invite Members
-                </button>
-            </div>
+        <nav class="tab-nav" role="tablist" aria-label="Group settings">
+            <button type="button"
+                    class="tab-btn <?= $defaultTab === 'edit' ? 'active' : '' ?>"
+                    role="tab"
+                    aria-selected="<?= $defaultTab === 'edit' ? 'true' : 'false' ?>"
+                    aria-controls="panel-edit"
+                    onclick="switchTab('edit')">
+                <i class="fa-solid fa-pen-to-square" aria-hidden="true"></i>
+                Edit Settings
+            </button>
+            <button type="button"
+                    class="tab-btn <?= $defaultTab === 'invite' ? 'active' : '' ?>"
+                    role="tab"
+                    aria-selected="<?= $defaultTab === 'invite' ? 'true' : 'false' ?>"
+                    aria-controls="panel-invite"
+                    onclick="switchTab('invite')">
+                <i class="fa-solid fa-user-plus" aria-hidden="true"></i>
+                Invite Members
+            </button>
         </nav>
 
-        <!-- Content Area -->
-        <main class="edit-content" id="contentArea">
-
-            <!-- ============================================
-                 PANEL 1: EDIT SETTINGS
-                 ============================================ -->
-            <div id="panel-edit"
-                 class="edit-panel <?= $defaultTab === 'edit' ? 'active' : '' ?>"
-                 role="tabpanel"
-                 aria-labelledby="edit-tab">
-                <form action="<?= $basePath ?>/groups/update"
-                      method="POST"
-                      enctype="multipart/form-data"
-                      aria-label="Edit group settings">
-                    <?= Nexus\Core\Csrf::input() ?>
-                    <input type="hidden" name="group_id" value="<?= $group['id'] ?>">
-
-                    <!-- Group Name -->
-                    <div class="ed-field">
-                        <label class="ed-label" for="name">Group Name</label>
-                        <input type="text"
-                               id="name"
-                               name="name"
-                               class="ed-input"
-                               value="<?= htmlspecialchars($group['name']) ?>"
-                               required
-                               aria-required="true">
-                    </div>
-
-                    <!-- Description -->
-                    <div class="ed-field">
-                        <label class="ed-label" for="description">Description</label>
-                        <textarea id="description"
-                                  name="description"
-                                  class="ed-textarea"
-                                  required
-                                  aria-required="true"><?= htmlspecialchars($group['description']) ?></textarea>
-                    </div>
-
-                    <!-- Location -->
-                    <div class="ed-field">
-                        <label class="ed-label" for="location">Location <span class="ed-label-hint">(Optional)</span></label>
-                        <input type="text"
-                               id="location"
-                               name="location"
-                               class="ed-input"
-                               value="<?= htmlspecialchars($group['location'] ?? '') ?>"
-                               placeholder="City, State or Region">
-                    </div>
-
-                    <!-- Group Type -->
-                    <div class="ed-field">
-                        <label class="ed-label" for="type_id">Group Type</label>
-                        <select id="type_id"
-                                name="type_id"
-                                class="ed-select"
-                                required
-                                aria-required="true">
-                            <?php foreach ($groupTypes as $type): ?>
-                                <option value="<?= $type['id'] ?>"
-                                        <?= $group['type_id'] == $type['id'] ? 'selected' : '' ?>>
-                                    <?= htmlspecialchars($type['name']) ?>
-                                </option>
-                            <?php endforeach; ?>
-                        </select>
-                    </div>
-
-                    <!-- Visibility -->
-                    <div class="ed-field">
-                        <label class="ed-label" for="visibility">Visibility</label>
-                        <select id="visibility"
-                                name="visibility"
-                                class="ed-select"
-                                required
-                                aria-required="true">
-                            <option value="public" <?= $group['visibility'] === 'public' ? 'selected' : '' ?>>Public</option>
-                            <option value="private" <?= $group['visibility'] === 'private' ? 'selected' : '' ?>>Private</option>
-                        </select>
-                        <div class="ed-hint">Public groups are visible to everyone. Private groups require approval to join.</div>
-                    </div>
-
-                    <!-- Featured Hub (Admin Only) -->
-                    <?php if ($isAdmin): ?>
-                    <div class="ed-checkbox-field">
-                        <input type="checkbox"
-                               id="is_featured"
-                               name="is_featured"
-                               value="1"
-                               <?= !empty($group['is_featured']) ? 'checked' : '' ?>>
-                        <div class="ed-checkbox-label">
-                            <div class="ed-checkbox-title">⭐ Featured Hub</div>
-                            <div class="ed-checkbox-desc">Featured hubs appear in a special section at the top of the hubs page. Only site administrators can mark groups as featured.</div>
-                        </div>
-                    </div>
-                    <?php endif; ?>
-
-                    <!-- Group Image -->
-                    <div class="ed-image-upload">
-                        <label class="ed-label">Group Image</label>
-                        <?php
-                            $groupImageSrc = !empty($group['image_url'])
-                                ? htmlspecialchars($group['image_url'])
-                                : "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 300'%3E%3Crect width='400' height='300' fill='%231e293b'/%3E%3Cg transform='translate(200,150)'%3E%3Ccircle r='50' fill='%23475569'/%3E%3Cpath d='M-20,-10 L-20,10 L0,0 Z M20,-10 L20,10 L0,0 Z' fill='%23cbd5e1'/%3E%3Ccircle cx='-15' cy='0' r='8' fill='%23cbd5e1'/%3E%3Ccircle cx='15' cy='0' r='8' fill='%23cbd5e1'/%3E%3C/g%3E%3Ctext x='200' y='270' text-anchor='middle' font-family='Arial' font-size='16' fill='%2394a3b8'%3EGroup Image%3C/text%3E%3C/svg%3E";
-                        ?>
-                        <img src="<?= $groupImageSrc ?>"
-                             loading="lazy"
-                             alt="Current group image"
-                             class="ed-image-preview"
-                             id="imagePreview"
-                             onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 400 300%27%3E%3Crect width=%27400%27 height=%27300%27 fill=%27%231e293b%27/%3E%3Cg transform=%27translate(200,150)%27%3E%3Ccircle r=%2750%27 fill=%27%23475569%27/%3E%3Cpath d=%27M-20,-10 L-20,10 L0,0 Z M20,-10 L20,10 L0,0 Z%27 fill=%27%23cbd5e1%27/%3E%3Ccircle cx=%27-15%27 cy=%270%27 r=%278%27 fill=%27%23cbd5e1%27/%3E%3Ccircle cx=%2715%27 cy=%270%27 r=%278%27 fill=%27%23cbd5e1%27/%3E%3C/g%3E%3Ctext x=%27200%27 y=%27270%27 text-anchor=%27middle%27 font-family=%27Arial%27 font-size=%2716%27 fill=%27%2394a3b8%27%3EGroup Image%3C/text%3E%3C/svg%3E'">
-                        <div class="ed-image-actions">
-                            <label class="ed-upload-btn">
-                                <i class="fa-solid fa-image"></i>
-                                Change Image
-                                <input type="file"
-                                       name="image"
-                                       accept="image/*"
-                                       onchange="previewImage(this, 'imagePreview')"
-                                       aria-label="Upload group image">
-                            </label>
-                            <?php if (!empty($group['image_url'])): ?>
-                            <label class="ed-clear-btn" title="Remove image">
-                                <input type="checkbox" name="clear_avatar" value="1">
-                                <i class="fa-solid fa-trash"></i>
-                                Clear
-                            </label>
-                            <?php endif; ?>
-                        </div>
-                    </div>
-
-                    <!-- Cover Image -->
-                    <div class="ed-image-upload">
-                        <label class="ed-label">Cover Image</label>
-                        <?php
-                            $coverImageSrc = !empty($group['cover_image_url'])
-                                ? htmlspecialchars($group['cover_image_url'])
-                                : "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 800 300'%3E%3Cdefs%3E%3ClinearGradient id='grad' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' style='stop-color:%231e293b;stop-opacity:1' /%3E%3Cstop offset='100%25' style='stop-color:%23334155;stop-opacity:1' /%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='800' height='300' fill='url(%23grad)'/%3E%3Cg transform='translate(400,120)'%3E%3Ccircle r='40' fill='%23475569' opacity='0.5'/%3E%3Cpath d='M-30,-20 L-10,-20 L0,-35 L10,-20 L30,-20 L30,20 L-30,20 Z' fill='%2364748b'/%3E%3Ccircle cx='-10' cy='-5' r='6' fill='%23fbbf24'/%3E%3C/g%3E%3Ctext x='400' y='270' text-anchor='middle' font-family='Arial' font-size='18' fill='%2394a3b8'%3ECover Image%3C/text%3E%3C/svg%3E";
-                        ?>
-                        <img src="<?= $coverImageSrc ?>"
-                             loading="lazy"
-                             alt="Current cover image"
-                             class="ed-image-preview"
-                             id="coverPreview"
-                             onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 800 300%27%3E%3Cdefs%3E%3ClinearGradient id=%27grad%27 x1=%270%25%27 y1=%270%25%27 x2=%27100%25%27 y2=%27100%25%27%3E%3Cstop offset=%270%25%27 style=%27stop-color:%231e293b;stop-opacity:1%27 /%3E%3Cstop offset=%27100%25%27 style=%27stop-color:%23334155;stop-opacity:1%27 /%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width=%27800%27 height=%27300%27 fill=%27url(%23grad)%27/%3E%3Cg transform=%27translate(400,120)%27%3E%3Ccircle r=%2740%27 fill=%27%23475569%27 opacity=%270.5%27/%3E%3Cpath d=%27M-30,-20 L-10,-20 L0,-35 L10,-20 L30,-20 L30,20 L-30,20 Z%27 fill=%27%2364748b%27/%3E%3Ccircle cx=%27-10%27 cy=%27-5%27 r=%276%27 fill=%27%23fbbf24%27/%3E%3C/g%3E%3Ctext x=%27400%27 y=%27270%27 text-anchor=%27middle%27 font-family=%27Arial%27 font-size=%2718%27 fill=%27%2394a3b8%27%3ECover Image%3C/text%3E%3C/svg%3E'">
-                        <div class="ed-image-actions">
-                            <label class="ed-upload-btn">
-                                <i class="fa-solid fa-image"></i>
-                                Change Cover
-                                <input type="file"
-                                       name="cover_image"
-                                       accept="image/*"
-                                       onchange="previewImage(this, 'coverPreview')"
-                                       aria-label="Upload cover image">
-                            </label>
-                            <?php if (!empty($group['cover_image_url'])): ?>
-                            <label class="ed-clear-btn" title="Remove cover">
-                                <input type="checkbox" name="clear_cover" value="1">
-                                <i class="fa-solid fa-trash"></i>
-                                Clear
-                            </label>
-                            <?php endif; ?>
-                        </div>
-                    </div>
-
-                    <!-- Submit -->
-                    <button type="submit" class="ed-submit">
-                        <i class="fa-solid fa-check"></i> Save Changes
-                    </button>
-                </form>
+        <!-- Edit Settings Panel -->
+        <div id="panel-edit" class="tab-panel <?= $defaultTab === 'edit' ? 'active' : '' ?>" role="tabpanel">
+            <?php if ($error): ?>
+            <div class="govuk-error-summary govuk-!-margin-bottom-4" role="alert" aria-labelledby="error-summary-title" tabindex="-1">
+                <h2 class="govuk-error-summary__title" id="error-summary-title">There is a problem</h2>
+                <div class="govuk-error-summary__body">
+                    <p class="govuk-body"><?= htmlspecialchars($error) ?></p>
+                </div>
             </div>
+            <?php endif; ?>
 
-            <!-- ============================================
-                 PANEL 2: INVITE MEMBERS
-                 ============================================ -->
-            <div id="panel-invite"
-                 class="edit-panel <?= $defaultTab === 'invite' ? 'active' : '' ?>"
-                 role="tabpanel"
-                 aria-labelledby="invite-tab">
-                <p class="text-center mb-2 text-ed-secondary">
-                    Select members to invite to <strong><?= htmlspecialchars($group['name']) ?></strong>
-                </p>
+            <?php if ($success): ?>
+            <div class="govuk-notification-banner govuk-notification-banner--success govuk-!-margin-bottom-4" role="alert">
+                <div class="govuk-notification-banner__header">
+                    <h2 class="govuk-notification-banner__title">Success</h2>
+                </div>
+                <div class="govuk-notification-banner__content">
+                    <p class="govuk-notification-banner__heading"><?= htmlspecialchars($success) ?></p>
+                </div>
+            </div>
+            <?php endif; ?>
 
-                <?php if (empty($availableUsers)): ?>
-                    <div class="no-users">
-                        <i class="fa-solid fa-user-check empty-state-icon"></i>
-                        <p>All community members are already in this group!</p>
-                    </div>
-                <?php else: ?>
-                    <form action="<?= $basePath ?>/groups/<?= $group['id'] ?>/invite"
-                          method="POST"
-                          id="inviteForm"
-                          aria-label="Invite members to group">
-                        <?= Nexus\Core\Csrf::input() ?>
+            <form action="<?= $basePath ?>/groups/update" method="POST" enctype="multipart/form-data">
+                <?= Nexus\Core\Csrf::input() ?>
+                <input type="hidden" name="group_id" value="<?= $group['id'] ?>">
 
-                        <input type="text"
-                               class="invite-search"
-                               id="userSearch"
-                               placeholder="Search members by name..."
-                               aria-label="Search members">
+                <!-- Group Name -->
+                <div class="govuk-form-group">
+                    <label class="govuk-label govuk-label--m" for="name">Group Name</label>
+                    <input type="text" id="name" name="name" class="govuk-input" value="<?= htmlspecialchars($group['name']) ?>" required>
+                </div>
 
-                        <div class="user-list" id="userList" role="list">
-                            <?php foreach ($availableUsers as $user): ?>
-                                <label class="user-item"
-                                       data-name="<?= strtolower(htmlspecialchars($user['name'])) ?>"
-                                       role="listitem">
-                                    <input type="checkbox"
-                                           name="user_ids[]"
-                                           value="<?= $user['id'] ?>"
-                                           aria-label="Select <?= htmlspecialchars($user['name']) ?>">
-                                    <?php
-                                        $avatarSrc = $user['avatar_url'] ?: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 128 128'%3E%3Ccircle cx='64' cy='64' r='64' fill='%23374151'/%3E%3Ccircle cx='64' cy='48' r='20' fill='%2394a3b8'/%3E%3Cellipse cx='64' cy='96' rx='32' ry='24' fill='%2394a3b8'/%3E%3C/svg%3E";
-                                    ?>
-                                    <img src="<?= htmlspecialchars($avatarSrc) ?>"
-                                         loading="lazy"
-                                         alt="<?= htmlspecialchars($user['name']) ?>"
-                                         class="user-avatar">
-                                    <div class="user-info">
-                                        <div class="user-name"><?= htmlspecialchars($user['name']) ?></div>
-                                        <?php if (!empty($user['email'])): ?>
-                                            <div class="user-email"><?= htmlspecialchars($user['email']) ?></div>
-                                        <?php endif; ?>
-                                    </div>
-                                </label>
-                            <?php endforeach; ?>
+                <!-- Description -->
+                <div class="govuk-form-group">
+                    <label class="govuk-label govuk-label--m" for="description">Description</label>
+                    <textarea id="description" name="description" class="govuk-textarea" rows="4" required><?= htmlspecialchars($group['description']) ?></textarea>
+                </div>
+
+                <!-- Location -->
+                <div class="govuk-form-group">
+                    <label class="govuk-label govuk-label--m" for="location">
+                        Location
+                        <span class="govuk-hint" style="display: inline; font-size: 16px;">(optional)</span>
+                    </label>
+                    <input type="text" id="location" name="location" class="govuk-input" value="<?= htmlspecialchars($group['location'] ?? '') ?>" placeholder="City, State or Region">
+                </div>
+
+                <!-- Group Type -->
+                <div class="govuk-form-group">
+                    <label class="govuk-label govuk-label--m" for="type_id">Group Type</label>
+                    <select id="type_id" name="type_id" class="govuk-select" required>
+                        <?php foreach ($groupTypes as $type): ?>
+                            <option value="<?= $type['id'] ?>" <?= $group['type_id'] == $type['id'] ? 'selected' : '' ?>>
+                                <?= htmlspecialchars($type['name']) ?>
+                            </option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+
+                <!-- Visibility -->
+                <div class="govuk-form-group">
+                    <label class="govuk-label govuk-label--m" for="visibility">Visibility</label>
+                    <select id="visibility" name="visibility" class="govuk-select" required>
+                        <option value="public" <?= $group['visibility'] === 'public' ? 'selected' : '' ?>>Public</option>
+                        <option value="private" <?= $group['visibility'] === 'private' ? 'selected' : '' ?>>Private</option>
+                    </select>
+                    <div class="govuk-hint">Public groups are visible to everyone. Private groups require approval to join.</div>
+                </div>
+
+                <!-- Featured Hub (Admin Only) -->
+                <?php if ($isAdmin): ?>
+                <div class="govuk-form-group">
+                    <div class="govuk-checkboxes" data-module="govuk-checkboxes">
+                        <div class="govuk-checkboxes__item">
+                            <input class="govuk-checkboxes__input" id="is_featured" name="is_featured" type="checkbox" value="1" <?= !empty($group['is_featured']) ? 'checked' : '' ?>>
+                            <label class="govuk-label govuk-checkboxes__label" for="is_featured">
+                                <strong>Featured Hub</strong>
+                            </label>
+                            <div class="govuk-hint govuk-checkboxes__hint">
+                                Featured hubs appear in a special section at the top of the hubs page.
+                            </div>
                         </div>
+                    </div>
+                </div>
+                <?php endif; ?>
 
-                        <div class="selected-count" id="selectedCount" aria-live="polite">0 members selected</div>
+                <!-- Group Image -->
+                <div class="govuk-form-group image-section">
+                    <label class="govuk-label govuk-label--m">Group Image</label>
+                    <?php
+                        $groupImageSrc = !empty($group['image_url'])
+                            ? htmlspecialchars($group['image_url'])
+                            : '/assets/img/defaults/group-placeholder.webp';
+                    ?>
+                    <div class="image-preview-box">
+                        <img src="<?= $groupImageSrc ?>" alt="Group image" id="imagePreview" loading="lazy">
+                    </div>
+                    <div class="image-actions">
+                        <label class="upload-btn">
+                            <i class="fa-solid fa-image" aria-hidden="true"></i>
+                            Change Image
+                            <input type="file" name="image" accept="image/*" onchange="previewImage(this, 'imagePreview')">
+                        </label>
+                        <?php if (!empty($group['image_url'])): ?>
+                        <label class="clear-btn">
+                            <input type="checkbox" name="clear_avatar" value="1">
+                            <i class="fa-solid fa-trash" aria-hidden="true"></i>
+                            Clear
+                        </label>
+                        <?php endif; ?>
+                    </div>
+                </div>
 
-                        <!-- Add Directly Option -->
-                        <div class="add-directly-box">
-                            <label>
-                                <input type="checkbox"
-                                       name="add_directly"
-                                       value="1"
-                                       id="addDirectlyCheckbox">
-                                <div>
-                                    <div class="add-directly-title">Add directly to group</div>
-                                    <div class="add-directly-desc">
-                                        Skip the invitation step and add selected members immediately. They'll receive a notification that they've been added.
-                                    </div>
+                <!-- Cover Image -->
+                <div class="govuk-form-group image-section">
+                    <label class="govuk-label govuk-label--m">Cover Image</label>
+                    <?php
+                        $coverImageSrc = !empty($group['cover_image_url'])
+                            ? htmlspecialchars($group['cover_image_url'])
+                            : '/assets/img/defaults/cover-placeholder.webp';
+                    ?>
+                    <div class="image-preview-box">
+                        <img src="<?= $coverImageSrc ?>" alt="Cover image" id="coverPreview" loading="lazy">
+                    </div>
+                    <div class="image-actions">
+                        <label class="upload-btn">
+                            <i class="fa-solid fa-image" aria-hidden="true"></i>
+                            Change Cover
+                            <input type="file" name="cover_image" accept="image/*" onchange="previewImage(this, 'coverPreview')">
+                        </label>
+                        <?php if (!empty($group['cover_image_url'])): ?>
+                        <label class="clear-btn">
+                            <input type="checkbox" name="clear_cover" value="1">
+                            <i class="fa-solid fa-trash" aria-hidden="true"></i>
+                            Clear
+                        </label>
+                        <?php endif; ?>
+                    </div>
+                </div>
+
+                <button type="submit" class="govuk-button" data-module="govuk-button">
+                    <i class="fa-solid fa-check govuk-!-margin-right-2" aria-hidden="true"></i>
+                    Save Changes
+                </button>
+            </form>
+        </div>
+
+        <!-- Invite Members Panel -->
+        <div id="panel-invite" class="tab-panel <?= $defaultTab === 'invite' ? 'active' : '' ?>" role="tabpanel">
+            <p class="govuk-body govuk-!-margin-bottom-4" style="text-align: center;">
+                Select members to invite to <strong><?= htmlspecialchars($group['name']) ?></strong>
+            </p>
+
+            <?php if (empty($availableUsers)): ?>
+                <div class="no-users">
+                    <i class="fa-solid fa-user-check"></i>
+                    <p class="govuk-body">All community members are already in this group!</p>
+                </div>
+            <?php else: ?>
+                <form action="<?= $basePath ?>/groups/<?= $group['id'] ?>/invite" method="POST" id="inviteForm">
+                    <?= Nexus\Core\Csrf::input() ?>
+
+                    <div class="govuk-form-group">
+                        <input type="text" class="govuk-input" id="userSearch" placeholder="Search members by name..." aria-label="Search members">
+                    </div>
+
+                    <div class="user-list" id="userList" role="list">
+                        <?php foreach ($availableUsers as $user): ?>
+                            <label class="user-item" data-name="<?= strtolower(htmlspecialchars($user['name'])) ?>" role="listitem">
+                                <input type="checkbox" name="user_ids[]" value="<?= $user['id'] ?>" aria-label="Select <?= htmlspecialchars($user['name']) ?>">
+                                <div class="user-avatar">
+                                    <?php if ($user['avatar_url']): ?>
+                                        <img src="<?= htmlspecialchars($user['avatar_url']) ?>" alt="" loading="lazy">
+                                    <?php else: ?>
+                                        <?= strtoupper(substr($user['name'], 0, 1)) ?>
+                                    <?php endif; ?>
+                                </div>
+                                <div class="user-info">
+                                    <div class="user-name"><?= htmlspecialchars($user['name']) ?></div>
+                                    <?php if (!empty($user['email'])): ?>
+                                        <div class="user-email"><?= htmlspecialchars($user['email']) ?></div>
+                                    <?php endif; ?>
                                 </div>
                             </label>
-                        </div>
+                        <?php endforeach; ?>
+                    </div>
 
-                        <button type="submit"
-                                class="ed-submit"
-                                id="submitBtn"
-                                disabled
-                                aria-live="polite">
-                            <i class="fa-solid fa-paper-plane"></i> Send Invitations
-                        </button>
-                    </form>
-                <?php endif; ?>
-            </div>
+                    <div class="selected-count" id="selectedCount" aria-live="polite">0 members selected</div>
 
-        </main>
+                    <div class="add-directly-box">
+                        <label>
+                            <input type="checkbox" name="add_directly" value="1" id="addDirectlyCheckbox">
+                            <div>
+                                <div class="add-directly-title">Add directly to group</div>
+                                <div class="add-directly-desc">
+                                    Skip the invitation step and add selected members immediately.
+                                </div>
+                            </div>
+                        </label>
+                    </div>
 
+                    <button type="submit" class="govuk-button govuk-!-margin-top-4" data-module="govuk-button" id="submitBtn" disabled>
+                        <i class="fa-solid fa-paper-plane govuk-!-margin-right-2" aria-hidden="true"></i>
+                        Send Invitations
+                    </button>
+                </form>
+            <?php endif; ?>
+        </div>
     </div>
-</div>
 
+    <script>
+        function closeEditOverlay() {
+            window.history.back();
+        }
+
+        function switchTab(tab) {
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                const isActive = btn.getAttribute('aria-controls') === 'panel-' + tab;
+                btn.classList.toggle('active', isActive);
+                btn.setAttribute('aria-selected', isActive ? 'true' : 'false');
+            });
+            document.querySelectorAll('.tab-panel').forEach(panel => {
+                panel.classList.toggle('active', panel.id === 'panel-' + tab);
+            });
+        }
+
+        function previewImage(input, previewId) {
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById(previewId).src = e.target.result;
+                };
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+
+        // User search
+        const searchInput = document.getElementById('userSearch');
+        if (searchInput) {
+            searchInput.addEventListener('input', function() {
+                const query = this.value.toLowerCase();
+                document.querySelectorAll('.user-item').forEach(item => {
+                    const name = item.dataset.name || '';
+                    item.style.display = name.includes(query) ? 'flex' : 'none';
+                });
+            });
+        }
+
+        // Selection counter
+        const userList = document.getElementById('userList');
+        if (userList) {
+            userList.addEventListener('change', updateSelectedCount);
+        }
+
+        function updateSelectedCount() {
+            const checked = document.querySelectorAll('.user-item input:checked').length;
+            const countEl = document.getElementById('selectedCount');
+            const submitBtn = document.getElementById('submitBtn');
+            if (countEl) countEl.textContent = checked + ' member' + (checked !== 1 ? 's' : '') + ' selected';
+            if (submitBtn) submitBtn.disabled = checked === 0;
+        }
+
+        // Close on Escape key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') closeEditOverlay();
+        });
+
+        // Click outside to close on desktop
+        document.body.addEventListener('click', function(e) {
+            if (e.target === document.body) closeEditOverlay();
+        });
+    </script>
 </body>
 </html>

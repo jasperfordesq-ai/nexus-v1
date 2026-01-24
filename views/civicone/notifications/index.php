@@ -1,6 +1,8 @@
 <?php
-// CivicOne View: Notifications - WCAG 2.1 AA Compliant
-// CSS extracted to civicone-messages.css
+/**
+ * CivicOne View: Notifications
+ * GOV.UK Design System Compliant (WCAG 2.1 AA)
+ */
 $hTitle = 'Notifications';
 $hSubtitle = 'Stay updated on your community activity';
 $hType = 'Dashboard';
@@ -9,110 +11,143 @@ require __DIR__ . '/../../layouts/civicone/header.php';
 $basePath = \Nexus\Core\TenantContext::getBasePath();
 ?>
 
-<!-- Action Bar -->
-<div class="civic-action-bar">
-    <a href="<?= $basePath ?>/dashboard" class="civic-btn civic-btn--outline">
-        <span class="dashicons dashicons-arrow-left-alt2" aria-hidden="true"></span>
-        Back to Dashboard
-    </a>
+<nav class="govuk-breadcrumbs govuk-!-margin-bottom-6" aria-label="Breadcrumb">
+    <ol class="govuk-breadcrumbs__list">
+        <li class="govuk-breadcrumbs__list-item">
+            <a class="govuk-breadcrumbs__link" href="<?= $basePath ?>">Home</a>
+        </li>
+        <li class="govuk-breadcrumbs__list-item">
+            <a class="govuk-breadcrumbs__link" href="<?= $basePath ?>/dashboard">Dashboard</a>
+        </li>
+        <li class="govuk-breadcrumbs__list-item" aria-current="page">Notifications</li>
+    </ol>
+</nav>
 
-    <?php if (!empty($notifications)): ?>
-        <form action="<?= $basePath ?>/notifications/mark-all-read" method="POST" class="civic-action-form">
-            <?= \Nexus\Core\Csrf::input() ?>
-            <button type="submit" class="civic-btn civic-btn--outline">
-                <span class="dashicons dashicons-yes-alt" aria-hidden="true"></span>
-                Mark All Read
-            </button>
-        </form>
-    <?php endif; ?>
+<div class="govuk-grid-row govuk-!-margin-bottom-6">
+    <div class="govuk-grid-column-two-thirds">
+        <h1 class="govuk-heading-xl">
+            <i class="fa-solid fa-bell govuk-!-margin-right-2" aria-hidden="true"></i>
+            Notifications
+        </h1>
+    </div>
+    <div class="govuk-grid-column-one-third govuk-!-text-align-right">
+        <div class="govuk-button-group" style="justify-content: flex-end;">
+            <a href="<?= $basePath ?>/dashboard" class="govuk-button govuk-button--secondary" data-module="govuk-button">
+                <i class="fa-solid fa-arrow-left govuk-!-margin-right-1" aria-hidden="true"></i> Back to Dashboard
+            </a>
+            <?php if (!empty($notifications)): ?>
+                <form action="<?= $basePath ?>/notifications/mark-all-read" method="POST" style="display: inline;">
+                    <?= \Nexus\Core\Csrf::input() ?>
+                    <button type="submit" class="govuk-button govuk-button--secondary" data-module="govuk-button">
+                        <i class="fa-solid fa-check-double govuk-!-margin-right-1" aria-hidden="true"></i> Mark All Read
+                    </button>
+                </form>
+            <?php endif; ?>
+        </div>
+    </div>
 </div>
 
 <?php if (empty($notifications)): ?>
-    <div class="civic-empty-state">
-        <div class="civic-empty-state-icon">
-            <span class="dashicons dashicons-bell icon-size-48" aria-hidden="true"></span>
-        </div>
-        <h3 class="civic-empty-state-title">No notifications yet</h3>
-        <p class="civic-empty-state-text">When you receive messages, connection requests, or other updates, they'll appear here.</p>
-        <a href="<?= $basePath ?>/listings" class="civic-btn">
-            <span class="dashicons dashicons-search" aria-hidden="true"></span>
+    <div class="govuk-inset-text">
+        <p class="govuk-body-l govuk-!-margin-bottom-2">
+            <i class="fa-solid fa-bell-slash govuk-!-margin-right-2" aria-hidden="true"></i>
+            <strong>No notifications yet</strong>
+        </p>
+        <p class="govuk-body govuk-!-margin-bottom-4">When you receive messages, connection requests, or other updates, they'll appear here.</p>
+        <a href="<?= $basePath ?>/listings" class="govuk-button govuk-button--start" data-module="govuk-button">
             Browse Listings
+            <svg class="govuk-button__start-icon" xmlns="http://www.w3.org/2000/svg" width="17.5" height="19" viewBox="0 0 33 40" aria-hidden="true" focusable="false">
+                <path fill="currentColor" d="M0 0h13l20 20-20 20H0l20-20z"/>
+            </svg>
         </a>
     </div>
 <?php else: ?>
-
-    <div class="civic-notifications-list">
+    <ul class="govuk-list" role="list">
         <?php foreach ($notifications as $notif): ?>
             <?php
             $isUnread = empty($notif['read_at']);
-            $cardClass = $isUnread ? 'civic-notification-card civic-notification--unread' : 'civic-notification-card';
 
             // Icon mapping
             $iconMap = [
-                'message' => 'dashicons-email-alt',
-                'connection_request' => 'dashicons-groups',
-                'connection_accepted' => 'dashicons-yes-alt',
-                'transaction' => 'dashicons-money-alt',
-                'review' => 'dashicons-star-filled',
-                'listing' => 'dashicons-format-aside',
-                'system' => 'dashicons-info',
+                'message' => 'fa-envelope',
+                'connection_request' => 'fa-user-plus',
+                'connection_accepted' => 'fa-user-check',
+                'transaction' => 'fa-coins',
+                'review' => 'fa-star',
+                'listing' => 'fa-list',
+                'system' => 'fa-info-circle',
             ];
-            $icon = $iconMap[$notif['type'] ?? 'system'] ?? 'dashicons-bell';
+            $icon = $iconMap[$notif['type'] ?? 'system'] ?? 'fa-bell';
             ?>
-            <article class="<?= $cardClass ?>">
-                <div class="civic-notification-icon">
-                    <span class="dashicons <?= $icon ?>" aria-hidden="true"></span>
+            <li class="govuk-!-margin-bottom-4 govuk-!-padding-4 <?= $isUnread ? 'govuk-!-font-weight-bold' : '' ?>" style="border: 1px solid #b1b4b6; border-left: 5px solid <?= $isUnread ? '#1d70b8' : '#b1b4b6' ?>;">
+                <div class="govuk-grid-row">
+                    <div class="govuk-grid-column-three-quarters">
+                        <p class="govuk-body govuk-!-margin-bottom-2">
+                            <i class="fa-solid <?= $icon ?> govuk-!-margin-right-2" aria-hidden="true"></i>
+                            <?= htmlspecialchars($notif['message']) ?>
+                        </p>
+                        <time class="govuk-body-s" datetime="<?= $notif['created_at'] ?>" style="color: #505a5f;">
+                            <i class="fa-regular fa-clock govuk-!-margin-right-1" aria-hidden="true"></i>
+                            <?= \Nexus\Helpers\Time::ago($notif['created_at']) ?>
+                        </time>
+                    </div>
+                    <div class="govuk-grid-column-one-quarter govuk-!-text-align-right">
+                        <div class="govuk-button-group" style="justify-content: flex-end;">
+                            <?php if (!empty($notif['link'])): ?>
+                                <a href="<?= htmlspecialchars($notif['link']) ?>" class="govuk-button govuk-button--secondary" data-module="govuk-button">
+                                    View
+                                </a>
+                            <?php endif; ?>
+                            <?php if ($isUnread): ?>
+                                <form action="<?= $basePath ?>/notifications/mark-read" method="POST" style="display: inline;">
+                                    <?= \Nexus\Core\Csrf::input() ?>
+                                    <input type="hidden" name="id" value="<?= $notif['id'] ?>">
+                                    <button type="submit" class="govuk-button govuk-button--secondary" data-module="govuk-button" title="Mark as read">
+                                        <i class="fa-solid fa-check" aria-hidden="true"></i>
+                                    </button>
+                                </form>
+                            <?php endif; ?>
+                        </div>
+                    </div>
                 </div>
-                <div class="civic-notification-content">
-                    <p class="civic-notification-message">
-                        <?= htmlspecialchars($notif['message']) ?>
-                    </p>
-                    <time class="civic-notification-time" datetime="<?= $notif['created_at'] ?>">
-                        <?= \Nexus\Helpers\Time::ago($notif['created_at']) ?>
-                    </time>
-                </div>
-                <div class="civic-notification-actions">
-                    <?php if (!empty($notif['link'])): ?>
-                        <a href="<?= htmlspecialchars($notif['link']) ?>" class="civic-btn civic-btn--sm civic-btn--outline">
-                            View
-                        </a>
-                    <?php endif; ?>
-                    <?php if ($isUnread): ?>
-                        <form action="<?= $basePath ?>/notifications/mark-read" method="POST" class="civic-action-form">
-                            <?= \Nexus\Core\Csrf::input() ?>
-                            <input type="hidden" name="id" value="<?= $notif['id'] ?>">
-                            <button type="submit" class="civic-btn civic-btn--sm civic-btn--outline" title="Mark as read">
-                                <span class="dashicons dashicons-yes" aria-hidden="true"></span>
-                            </button>
-                        </form>
-                    <?php endif; ?>
-                </div>
-            </article>
+            </li>
         <?php endforeach; ?>
-    </div>
+    </ul>
 
     <?php if (!empty($pagination) && $pagination['total_pages'] > 1): ?>
-        <nav class="civic-pagination" aria-label="Notification pages">
+        <nav class="govuk-pagination" aria-label="Notification pages">
             <?php if ($pagination['current_page'] > 1): ?>
-                <a href="?page=<?= $pagination['current_page'] - 1 ?>" class="civic-pagination-btn civic-pagination-prev">
-                    <span class="dashicons dashicons-arrow-left-alt2" aria-hidden="true"></span>
-                    Previous
-                </a>
+                <div class="govuk-pagination__prev">
+                    <a class="govuk-link govuk-pagination__link" href="?page=<?= $pagination['current_page'] - 1 ?>" rel="prev">
+                        <svg class="govuk-pagination__icon govuk-pagination__icon--prev" xmlns="http://www.w3.org/2000/svg" height="13" width="15" aria-hidden="true" focusable="false" viewBox="0 0 15 13">
+                            <path d="m6.5938-0.0078125-6.7266 6.7266 6.7441 6.4062 1.377-1.449-4.1856-3.9768h12.896v-2h-12.984l4.2931-4.293-1.414-1.414z"></path>
+                        </svg>
+                        <span class="govuk-pagination__link-title">Previous<span class="govuk-visually-hidden"> page</span></span>
+                    </a>
+                </div>
             <?php endif; ?>
 
-            <?php for ($i = 1; $i <= $pagination['total_pages']; $i++): ?>
-                <?php if ($i == $pagination['current_page']): ?>
-                    <span class="civic-pagination-btn civic-pagination-current" aria-current="page"><?= $i ?></span>
-                <?php else: ?>
-                    <a href="?page=<?= $i ?>" class="civic-pagination-btn"><?= $i ?></a>
-                <?php endif; ?>
-            <?php endfor; ?>
+            <ul class="govuk-pagination__list">
+                <?php for ($i = 1; $i <= $pagination['total_pages']; $i++): ?>
+                    <li class="govuk-pagination__item <?= $i == $pagination['current_page'] ? 'govuk-pagination__item--current' : '' ?>">
+                        <?php if ($i == $pagination['current_page']): ?>
+                            <a class="govuk-link govuk-pagination__link" href="?page=<?= $i ?>" aria-current="page"><?= $i ?></a>
+                        <?php else: ?>
+                            <a class="govuk-link govuk-pagination__link" href="?page=<?= $i ?>"><?= $i ?></a>
+                        <?php endif; ?>
+                    </li>
+                <?php endfor; ?>
+            </ul>
 
             <?php if ($pagination['current_page'] < $pagination['total_pages']): ?>
-                <a href="?page=<?= $pagination['current_page'] + 1 ?>" class="civic-pagination-btn civic-pagination-next">
-                    Next
-                    <span class="dashicons dashicons-arrow-right-alt2" aria-hidden="true"></span>
-                </a>
+                <div class="govuk-pagination__next">
+                    <a class="govuk-link govuk-pagination__link" href="?page=<?= $pagination['current_page'] + 1 ?>" rel="next">
+                        <span class="govuk-pagination__link-title">Next<span class="govuk-visually-hidden"> page</span></span>
+                        <svg class="govuk-pagination__icon govuk-pagination__icon--next" xmlns="http://www.w3.org/2000/svg" height="13" width="15" aria-hidden="true" focusable="false" viewBox="0 0 15 13">
+                            <path d="m8.107-0.0078125-1.4136 1.414 4.2926 4.293h-12.986v2h12.896l-4.1855 3.9766 1.377 1.4492 6.7441-6.4062-6.7246-6.7266z"></path>
+                        </svg>
+                    </a>
+                </div>
             <?php endif; ?>
         </nav>
     <?php endif; ?>
