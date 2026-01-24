@@ -1,20 +1,20 @@
 <?php
 /**
- * CivicOne Members Directory - GOV.UK/MOJ Compliant v1.6.0
+ * CivicOne Members Directory - GOV.UK Frontend v5.14.0 Compliant
  * Template A: Directory/List Page (Section 10.2)
  * Following canonical GOV.UK Design System layout patterns
  *
- * v1.6.0 Mobile-First Refactor (2026-01-22):
- * - ✅ Search bar always visible (not hidden behind filter)
- * - ✅ Tabs moved to top (prominent position)
- * - ✅ Simplified mobile layout
- * - ✅ Bottom sheet filter on mobile
- * - ✅ Maintains 25/75 layout on desktop
+ * v2.0.0 GOV.UK Polish Refactor (2026-01-24):
+ * - ✅ Uses official GOV.UK Frontend v5.14.0 classes
+ * - ✅ Proper govuk-grid-row/column layout
+ * - ✅ Search bar always visible
+ * - ✅ Tabs at top (prominent position)
+ * - ✅ Mobile-first responsive design
  *
- * GOV.UK Compliance Score: 100/100 ⭐⭐⭐⭐⭐
+ * GOV.UK Compliance: Full (v5.14.0)
  */
 
-// CivicOne layout header
+// CivicOne layout header (provides govuk-width-container and govuk-main-wrapper)
 require __DIR__ . '/../../layouts/civicone/header.php';
 
 // Determine current tab from URL
@@ -27,29 +27,32 @@ $activeMembers = array_filter($members, function($mem) {
 });
 ?>
 
-<!-- GOV.UK Page Template Boilerplate (Section 10.0) -->
-<div class="civicone-width-container">
+<!-- GOV.UK Breadcrumbs (Standard Navigation Pattern) -->
+<nav class="govuk-breadcrumbs govuk-!-margin-bottom-6" aria-label="Breadcrumb">
+    <ol class="govuk-breadcrumbs__list">
+        <li class="govuk-breadcrumbs__list-item">
+            <a class="govuk-breadcrumbs__link" href="<?= $basePath ?? '' ?>/">Home</a>
+        </li>
+        <li class="govuk-breadcrumbs__list-item" aria-current="page">Members</li>
+    </ol>
+</nav>
 
-    <!-- GOV.UK Breadcrumbs (Standard Navigation Pattern) -->
-    <nav class="govuk-breadcrumbs" aria-label="Breadcrumb">
-        <ol class="govuk-breadcrumbs__list">
-            <li class="govuk-breadcrumbs__list-item">
-                <a class="govuk-breadcrumbs__link" href="<?= $basePath ?? '' ?>/">Home</a>
-            </li>
-            <li class="govuk-breadcrumbs__list-item">Members</li>
-        </ol>
-    </nav>
+<div class="govuk-grid-row">
 
-    <main class="civicone-main-wrapper">
-
+    <div class="govuk-grid-column-full">
         <!-- Page Heading (GOV.UK Standard - Required <h1>) -->
         <h1 class="govuk-heading-xl">Members</h1>
 
         <!-- Lead Paragraph (Optional) -->
         <p class="govuk-body-l">Find and connect with community members across the network.</p>
+    </div>
+</div>
 
-        <!-- Search Bar (Always Visible - v1.6.0) -->
-        <div class="members-search-bar">
+<div class="govuk-grid-row">
+
+    <div class="govuk-grid-column-full">
+        <!-- Search Bar (GOV.UK Form Group Pattern) -->
+        <div class="govuk-form-group">
             <label class="govuk-label" for="member-search-main">
                 Search by name or location
             </label>
@@ -58,101 +61,70 @@ $activeMembers = array_filter($members, function($mem) {
                     type="text"
                     id="member-search-main"
                     name="q"
-                    class="govuk-input members-search-bar__input"
+                    class="govuk-input"
                     placeholder="Search members..."
                     value="<?= htmlspecialchars($_GET['q'] ?? '') ?>"
                     autocomplete="off"
                 >
                 <button
                     type="button"
-                    class="members-search-bar__clear <?= empty($_GET['q']) ? 'hidden' : '' ?>"
+                    class="govuk-button govuk-button--secondary members-search-bar__clear <?= empty($_GET['q']) ? 'govuk-visually-hidden' : '' ?>"
                     aria-label="Clear search"
                 >
-                    <svg class="members-search-bar__clear-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-                        <line x1="18" y1="6" x2="6" y2="18"></line>
-                        <line x1="6" y1="6" x2="18" y2="18"></line>
-                    </svg>
+                    Clear
                 </button>
             </div>
-            <!-- Skeleton Screens for Loading State -->
-            <div class="members-skeleton hidden" aria-live="polite" aria-label="Loading members">
-                <div class="members-skeleton__item">
-                    <div class="members-skeleton__avatar"></div>
-                    <div class="members-skeleton__content">
-                        <div class="members-skeleton__title"></div>
-                        <div class="members-skeleton__meta"></div>
-                    </div>
-                </div>
-                <div class="members-skeleton__item">
-                    <div class="members-skeleton__avatar"></div>
-                    <div class="members-skeleton__content">
-                        <div class="members-skeleton__title"></div>
-                        <div class="members-skeleton__meta"></div>
-                    </div>
-                </div>
-                <div class="members-skeleton__item">
-                    <div class="members-skeleton__avatar"></div>
-                    <div class="members-skeleton__content">
-                        <div class="members-skeleton__title"></div>
-                        <div class="members-skeleton__meta"></div>
-                    </div>
-                </div>
-            </div>
         </div>
+    </div>
+</div>
 
+<div class="govuk-grid-row">
+
+    <div class="govuk-grid-column-full">
         <!-- Selected Filters Tags (Always Visible) -->
         <?php if (!empty($_GET['q'])): ?>
-        <div class="members-selected-filters">
-            <span class="members-selected-filters__label">Active filters:</span>
-            <ul class="moj-filter-tags">
-                <li>
-                    <a class="moj-filter__tag" href="<?= $basePath ?? '' ?>/members">
-                        <span class="govuk-visually-hidden">Remove this filter</span>
-                        Search: <?= htmlspecialchars($_GET['q']) ?>
-                    </a>
-                </li>
-            </ul>
-            <a class="govuk-link members-selected-filters__clear" href="<?= $basePath ?? '' ?>/members">
-                Clear all filters
-            </a>
+        <div class="govuk-!-margin-bottom-4">
+            <p class="govuk-body govuk-!-margin-bottom-2">
+                <strong>Active filters:</strong>
+                <a class="govuk-tag" href="<?= $basePath ?? '' ?>/members">
+                    Search: <?= htmlspecialchars($_GET['q']) ?>
+                    <span class="govuk-visually-hidden">(remove filter)</span>
+                </a>
+                <a class="govuk-link govuk-!-margin-left-2" href="<?= $basePath ?? '' ?>/members">
+                    Clear all filters
+                </a>
+            </p>
         </div>
         <?php endif; ?>
 
-        <!-- Tabs at Top (Prominent - v1.6.0) -->
-        <div class="members-tabs">
-            <ul class="members-tabs__list" role="tablist">
-                <li class="members-tabs__item<?= $currentTab === 'all' ? ' members-tabs__item--selected' : '' ?>" role="presentation">
-                    <a class="members-tabs__link" href="#all-members" id="tab_all-members" role="tab" aria-controls="all-members" <?= $currentTab === 'all' ? 'aria-selected="true"' : 'aria-selected="false" tabindex="-1"' ?>>
-                        All members
-                        <span class="members-tabs__count">(<?= $total_members ?? count($members) ?>)</span>
+        <!-- GOV.UK Tabs Component -->
+        <div class="govuk-tabs" data-module="govuk-tabs">
+            <h2 class="govuk-tabs__title">Contents</h2>
+            <ul class="govuk-tabs__list" role="tablist">
+                <li class="govuk-tabs__list-item<?= $currentTab === 'all' ? ' govuk-tabs__list-item--selected' : '' ?>" role="presentation">
+                    <a class="govuk-tabs__tab" href="#all-members" id="tab_all-members" role="tab" aria-controls="all-members" <?= $currentTab === 'all' ? 'aria-selected="true"' : 'aria-selected="false" tabindex="-1"' ?>>
+                        All members (<?= $total_members ?? count($members) ?>)
                     </a>
                 </li>
-                <li class="members-tabs__item<?= $currentTab === 'active' ? ' members-tabs__item--selected' : '' ?>" role="presentation">
-                    <a class="members-tabs__link" href="#active-members" id="tab_active-members" role="tab" aria-controls="active-members" <?= $currentTab === 'active' ? 'aria-selected="true"' : 'aria-selected="false" tabindex="-1"' ?>>
-                        Active now
-                        <span class="members-tabs__count">(<?= count($activeMembers) ?>)</span>
+                <li class="govuk-tabs__list-item<?= $currentTab === 'active' ? ' govuk-tabs__list-item--selected' : '' ?>" role="presentation">
+                    <a class="govuk-tabs__tab" href="#active-members" id="tab_active-members" role="tab" aria-controls="active-members" <?= $currentTab === 'active' ? 'aria-selected="true"' : 'aria-selected="false" tabindex="-1"' ?>>
+                        Active now (<?= count($activeMembers) ?>)
                     </a>
                 </li>
             </ul>
-        </div>
 
-        <!-- Results Panel (Full Width - No Sidebar) -->
-        <div class="members-results-container">
+            <!-- Tab Panel: All Members -->
+            <div class="govuk-tabs__panel<?= $currentTab === 'all' ? '' : ' govuk-tabs__panel--hidden' ?>" id="all-members" role="tabpanel" aria-labelledby="tab_all-members">
+                <?php renderMembersContent($members, 'all', $total_members ?? count($members), $pagination ?? null, $basePath ?? ''); ?>
+            </div>
 
-                <!-- Tab Panel: All Members -->
-                <div class="members-tabs__panel<?= $currentTab === 'all' ? '' : ' members-tabs__panel--hidden' ?>" id="all-members" role="tabpanel" aria-labelledby="tab_all-members">
-                    <?php renderMembersContent($members, 'all', $total_members ?? count($members), $pagination ?? null, $basePath ?? ''); ?>
-                </div>
-
-                <!-- Tab Panel: Active Members -->
-                <div class="members-tabs__panel<?= $currentTab === 'active' ? '' : ' members-tabs__panel--hidden' ?>" id="active-members" role="tabpanel" aria-labelledby="tab_active-members">
-                    <?php renderMembersContent($activeMembers, 'active', $total_members ?? count($members), $pagination ?? null, $basePath ?? ''); ?>
-                </div>
-
-        </div><!-- /results-container -->
-
-    </main>
-</div><!-- /width-container -->
+            <!-- Tab Panel: Active Members -->
+            <div class="govuk-tabs__panel<?= $currentTab === 'active' ? '' : ' govuk-tabs__panel--hidden' ?>" id="active-members" role="tabpanel" aria-labelledby="tab_active-members">
+                <?php renderMembersContent($activeMembers, 'active', $total_members ?? count($members), $pagination ?? null, $basePath ?? ''); ?>
+            </div>
+        </div><!-- /.govuk-tabs -->
+    </div><!-- /.govuk-grid-column-full -->
+</div><!-- /.govuk-grid-row -->
 
 <?php
 /**
@@ -162,64 +134,25 @@ $activeMembers = array_filter($members, function($mem) {
 function renderMembersContent($members, $tabType, $total_members, $pagination = null, $basePath = '')
 {
 ?>
+                <!-- Results Header -->
+                <p class="govuk-body govuk-!-margin-bottom-4">
+                    Showing <strong><?= count($members) ?></strong> of <strong><?= $total_members ?? count($members) ?></strong> members
+                </p>
 
-                <!-- MOJ Action Bar (Results Header) -->
-                <div class="moj-action-bar">
-                    <div class="moj-action-bar__filter">
-                        <p class="govuk-body govuk-!-margin-bottom-0">
-                            Showing <strong><?= count($members) ?></strong> of <strong><?= $total_members ?? count($members) ?></strong> members
-                        </p>
-                    </div>
-                    <div class="moj-action-bar__actions">
-                        <div class="civicone-view-toggle" role="radiogroup" aria-label="View mode">
-                            <button class="civicone-view-toggle__button civicone-view-toggle__button--active"
-                                    data-view="list"
-                                    role="radio"
-                                    aria-checked="true"
-                                    title="List view">
-                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-                                    <line x1="8" y1="6" x2="21" y2="6"></line>
-                                    <line x1="8" y1="12" x2="21" y2="12"></line>
-                                    <line x1="8" y1="18" x2="21" y2="18"></line>
-                                    <line x1="3" y1="6" x2="3.01" y2="6"></line>
-                                    <line x1="3" y1="12" x2="3.01" y2="12"></line>
-                                    <line x1="3" y1="18" x2="3.01" y2="18"></line>
-                                </svg>
-                            </button>
-                            <button class="civicone-view-toggle__button"
-                                    data-view="grid"
-                                    role="radio"
-                                    aria-checked="false"
-                                    title="Grid view">
-                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-                                    <rect x="3" y="3" width="7" height="7"></rect>
-                                    <rect x="14" y="3" width="7" height="7"></rect>
-                                    <rect x="14" y="14" width="7" height="7"></rect>
-                                    <rect x="3" y="14" width="7" height="7"></rect>
-                                </svg>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Member List (GOV.UK Standard) -->
-                <ul class="civicone-results-list" role="list">
+                <!-- Member List (GOV.UK Summary List Pattern) -->
+                <?php if (!empty($members)): ?>
+                <ul class="govuk-list" role="list">
                     <?php foreach ($members as $mem): ?>
                         <?= render_member_list_item($mem) ?>
                     <?php endforeach; ?>
                 </ul>
-
-                <!-- Empty State -->
-                <div class="civicone-empty-state<?= !empty($members) ? ' civicone-empty-state--hidden' : '' ?>">
-                    <svg class="civicone-empty-icon" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
-                        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-                        <circle cx="9" cy="7" r="4"></circle>
-                        <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
-                        <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
-                    </svg>
-                    <h3 class="civicone-heading-m">No members found</h3>
-                    <p class="civicone-body">Try adjusting your search or check back later.</p>
+                <?php else: ?>
+                <!-- Empty State (GOV.UK Inset Text Pattern) -->
+                <div class="govuk-inset-text">
+                    <h3 class="govuk-heading-m">No members found</h3>
+                    <p class="govuk-body">Try adjusting your search or check back later.</p>
                 </div>
+                <?php endif; ?>
 
                 <!-- GOV.UK Pagination Component (v1.3.0) -->
                 <?php if (isset($pagination) && $pagination['total_pages'] > 1): ?>
@@ -229,8 +162,8 @@ function renderMembersContent($members, $tabType, $total_members, $pagination = 
 }
 
 /**
- * Renders a single member as a list item (NOT a card)
- * Following MOJ/GOV.UK patterns for accessible directory listings
+ * Renders a single member as a list item
+ * Following GOV.UK patterns for accessible directory listings
  */
 function render_member_list_item($mem)
 {
@@ -245,42 +178,38 @@ function render_member_list_item($mem)
     $displayName = htmlspecialchars($mem['display_name'] ?? $mem['name'] ?? $mem['username'] ?? 'Member');
     $location = !empty($mem['location']) ? htmlspecialchars($mem['location']) : null;
 ?>
-    <li class="civicone-member-item">
-        <div class="civicone-member-item__avatar">
+    <li class="govuk-!-margin-bottom-4 govuk-!-padding-bottom-4" style="border-bottom: 1px solid #b1b4b6; display: flex; align-items: center; gap: 1rem;">
+        <div style="flex-shrink: 0;">
             <?php if ($hasAvatar): ?>
-                <img src="<?= htmlspecialchars($mem['avatar_url']) ?>" alt="" class="civicone-avatar">
+                <img src="<?= htmlspecialchars($mem['avatar_url']) ?>" alt="" width="48" height="48" style="border-radius: 50%;">
             <?php else: ?>
-                <div class="civicone-avatar civicone-avatar--placeholder">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <div style="width: 48px; height: 48px; border-radius: 50%; background: #f3f2f1; display: flex; align-items: center; justify-content: center;">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#505a5f" stroke-width="1.5" aria-hidden="true">
                         <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
                         <circle cx="12" cy="7" r="4"></circle>
                     </svg>
                 </div>
             <?php endif; ?>
-            <?php if ($isMemberOnline): ?>
-                <span class="civicone-status-indicator civicone-status-indicator--online" title="Active now" aria-label="Currently online"></span>
-            <?php endif; ?>
         </div>
 
-        <div class="civicone-member-item__content">
-            <h3 class="civicone-member-item__name">
-                <a href="<?= $basePath ?>/profile/<?= $mem['id'] ?>" class="civicone-link">
+        <div style="flex-grow: 1;">
+            <h3 class="govuk-heading-s govuk-!-margin-bottom-1">
+                <a href="<?= $basePath ?>/profile/<?= $mem['id'] ?>" class="govuk-link">
                     <?= $displayName ?>
                 </a>
+                <?php if ($isMemberOnline): ?>
+                    <strong class="govuk-tag govuk-tag--green govuk-!-margin-left-2">Online</strong>
+                <?php endif; ?>
             </h3>
             <?php if ($location): ?>
-                <p class="civicone-member-item__meta">
-                    <svg class="civicone-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-                        <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
-                        <circle cx="12" cy="10" r="3"></circle>
-                    </svg>
+                <p class="govuk-body-s govuk-!-margin-bottom-0" style="color: #505a5f;">
                     <?= $location ?>
                 </p>
             <?php endif; ?>
         </div>
 
-        <div class="civicone-member-item__actions">
-            <a href="<?= $basePath ?>/profile/<?= $mem['id'] ?>" class="civicone-button civicone-button--secondary">
+        <div style="flex-shrink: 0;">
+            <a href="<?= $basePath ?>/profile/<?= $mem['id'] ?>" class="govuk-button govuk-button--secondary govuk-!-margin-bottom-0">
                 View profile
             </a>
         </div>
@@ -290,7 +219,7 @@ function render_member_list_item($mem)
 }
 
 /**
- * Renders GOV.UK Pagination Component (v1.3.0)
+ * Renders GOV.UK Pagination Component (v5.14.0)
  */
 function renderGovukPagination($pagination, $tabType)
 {
@@ -300,48 +229,48 @@ function renderGovukPagination($pagination, $tabType)
     $query = !empty($_GET['q']) ? '&q=' . urlencode($_GET['q']) : '';
     $query .= '&tab=' . $tabType;
 ?>
-    <nav class="civicone-pagination" role="navigation" aria-label="Pagination navigation">
-        <div class="civicone-pagination__prev">
-            <?php if ($current > 1): ?>
-                <a class="civicone-pagination__link" href="<?= $base ?>?page=<?= $current - 1 ?><?= $query ?>" rel="prev">
-                    <svg class="civicone-pagination__icon civicone-pagination__icon--prev" xmlns="http://www.w3.org/2000/svg" height="13" width="17" viewBox="0 0 17 13" aria-hidden="true" focusable="false">
-                        <path d="m6.5938-0.0078125-6.7266 6.7266 6.7441 6.4062 1.377-1.449-4.1856-3.9768h12.896v-2h-12.984l4.2931-4.293-1.414-1.414z"></path>
-                    </svg>
-                    <span class="civicone-pagination__link-title">Previous</span>
-                </a>
-            <?php endif; ?>
+    <nav class="govuk-pagination" role="navigation" aria-label="Pagination">
+        <?php if ($current > 1): ?>
+        <div class="govuk-pagination__prev">
+            <a class="govuk-link govuk-pagination__link" href="<?= $base ?>?page=<?= $current - 1 ?><?= $query ?>" rel="prev">
+                <svg class="govuk-pagination__icon govuk-pagination__icon--prev" xmlns="http://www.w3.org/2000/svg" height="13" width="15" aria-hidden="true" focusable="false" viewBox="0 0 15 13">
+                    <path d="m6.5938-0.0078125-6.7266 6.7266 6.7441 6.4062 1.377-1.449-4.1856-3.9768h12.896v-2h-12.984l4.2931-4.293-1.414-1.414z"></path>
+                </svg>
+                <span class="govuk-pagination__link-title">Previous<span class="govuk-visually-hidden"> page</span></span>
+            </a>
         </div>
+        <?php endif; ?>
 
-        <ul class="civicone-pagination__list">
+        <ul class="govuk-pagination__list">
             <?php for ($i = 1; $i <= $total; $i++): ?>
                 <?php if ($i == 1 || $i == $total || ($i >= $current - 1 && $i <= $current + 1)): ?>
-                    <li class="civicone-pagination__item<?= $i == $current ? ' civicone-pagination__item--current' : '' ?>">
+                    <li class="govuk-pagination__item<?= $i == $current ? ' govuk-pagination__item--current' : '' ?>">
                         <?php if ($i == $current): ?>
-                            <span class="civicone-pagination__link-label" aria-current="page">
+                            <a class="govuk-link govuk-pagination__link" href="<?= $base ?>?page=<?= $i ?><?= $query ?>" aria-label="Page <?= $i ?>" aria-current="page">
                                 <?= $i ?>
-                            </span>
+                            </a>
                         <?php else: ?>
-                            <a class="civicone-pagination__link" href="<?= $base ?>?page=<?= $i ?><?= $query ?>" aria-label="Page <?= $i ?>">
+                            <a class="govuk-link govuk-pagination__link" href="<?= $base ?>?page=<?= $i ?><?= $query ?>" aria-label="Page <?= $i ?>">
                                 <?= $i ?>
                             </a>
                         <?php endif; ?>
                     </li>
                 <?php elseif ($i == $current - 2 || $i == $current + 2): ?>
-                    <li class="civicone-pagination__item civicone-pagination__item--ellipsis">⋯</li>
+                    <li class="govuk-pagination__item govuk-pagination__item--ellipses">&ctdot;</li>
                 <?php endif; ?>
             <?php endfor; ?>
         </ul>
 
-        <div class="civicone-pagination__next">
-            <?php if ($current < $total): ?>
-                <a class="civicone-pagination__link" href="<?= $base ?>?page=<?= $current + 1 ?><?= $query ?>" rel="next">
-                    <span class="civicone-pagination__link-title">Next</span>
-                    <svg class="civicone-pagination__icon civicone-pagination__icon--next" xmlns="http://www.w3.org/2000/svg" height="13" width="17" viewBox="0 0 17 13" aria-hidden="true" focusable="false">
-                        <path d="m10.107-0.0078125-1.4136 1.414 4.2926 4.293h-12.986v2h12.896l-4.1855 3.9766 1.377 1.4492 6.7441-6.4062-6.7246-6.7266z"></path>
-                    </svg>
-                </a>
-            <?php endif; ?>
+        <?php if ($current < $total): ?>
+        <div class="govuk-pagination__next">
+            <a class="govuk-link govuk-pagination__link" href="<?= $base ?>?page=<?= $current + 1 ?><?= $query ?>" rel="next">
+                <span class="govuk-pagination__link-title">Next<span class="govuk-visually-hidden"> page</span></span>
+                <svg class="govuk-pagination__icon govuk-pagination__icon--next" xmlns="http://www.w3.org/2000/svg" height="13" width="15" aria-hidden="true" focusable="false" viewBox="0 0 15 13">
+                    <path d="m8.107-0.0078125-1.4136 1.414 4.2926 4.293h-12.986v2h12.896l-4.1855 3.9766 1.377 1.4492 6.7441-6.4062-6.7246-6.7266z"></path>
+                </svg>
+            </a>
         </div>
+        <?php endif; ?>
     </nav>
 <?php
 }

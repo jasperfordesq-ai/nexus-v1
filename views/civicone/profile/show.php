@@ -256,232 +256,219 @@ $headerTotalReviews = $headerTotalReviews ?? 0;
 require __DIR__ . '/../../layouts/civicone/header.php';
 ?>
 
-<!-- Profile Header Component (MOJ Identity Bar) -->
+<!-- Profile Header Component -->
 <?php require __DIR__ . '/components/profile-header.php'; ?>
 
+<!-- GOV.UK Breadcrumbs -->
+<nav class="govuk-breadcrumbs govuk-!-margin-bottom-6" aria-label="Breadcrumb">
+    <ol class="govuk-breadcrumbs__list">
+        <li class="govuk-breadcrumbs__list-item">
+            <a class="govuk-breadcrumbs__link" href="<?= $basePath ?>">Home</a>
+        </li>
+        <li class="govuk-breadcrumbs__list-item">
+            <a class="govuk-breadcrumbs__link" href="<?= $basePath ?>/members">Members</a>
+        </li>
+        <li class="govuk-breadcrumbs__list-item" aria-current="page">
+            <?= htmlspecialchars($displayName) ?>
+        </li>
+    </ol>
+</nav>
+
 <!-- Template C: Detail Page (2/3 + 1/3 layout) -->
-<div class="civicone-width-container">
-    <main class="civicone-main-wrapper">
+<div class="govuk-grid-row">
 
-        <!-- Breadcrumbs (GOV.UK Template C requirement - DP-004) -->
-        <nav class="civicone-breadcrumbs" aria-label="Breadcrumb">
-            <ol class="civicone-breadcrumbs__list">
-                <li class="civicone-breadcrumbs__list-item">
-                    <a class="civicone-breadcrumbs__link" href="<?= $basePath ?>">Home</a>
-                </li>
-                <li class="civicone-breadcrumbs__list-item">
-                    <a class="civicone-breadcrumbs__link" href="<?= $basePath ?>/members">Members</a>
-                </li>
-                <li class="civicone-breadcrumbs__list-item" aria-current="page">
-                    <?= htmlspecialchars($displayName) ?>
-                </li>
-            </ol>
-        </nav>
+    <!-- Main Content: 2/3 Column -->
+    <div class="govuk-grid-column-two-thirds">
 
-        <div class="civicone-grid-row">
+        <!-- GOV.UK Summary List: Profile Details -->
+        <h2 class="govuk-heading-l">Profile Information</h2>
 
-            <!-- Main Content: 2/3 Column -->
-            <div class="civicone-grid-column-two-thirds">
+        <dl class="govuk-summary-list">
+            <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">Full name</dt>
+                <dd class="govuk-summary-list__value"><?= htmlspecialchars($displayName) ?></dd>
+            </div>
 
-                <!-- GOV.UK Summary List: Profile Details -->
-                <h2 class="civicone-heading-l">Profile Information</h2>
+            <?php if (!empty($user['location'])): ?>
+            <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">Location</dt>
+                <dd class="govuk-summary-list__value"><?= htmlspecialchars($user['location']) ?></dd>
+            </div>
+            <?php endif; ?>
 
-                <dl class="civicone-summary-list">
-                    <div class="civicone-summary-list__row">
-                        <dt class="civicone-summary-list__key">Full name</dt>
-                        <dd class="civicone-summary-list__value"><?= htmlspecialchars($displayName) ?></dd>
-                    </div>
+            <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">Member since</dt>
+                <dd class="govuk-summary-list__value"><?= date('F Y', strtotime($user['created_at'])) ?></dd>
+            </div>
 
-                    <?php if (!empty($user['location'])): ?>
-                    <div class="civicone-summary-list__row">
-                        <dt class="civicone-summary-list__key">Location</dt>
-                        <dd class="civicone-summary-list__value"><?= htmlspecialchars($user['location']) ?></dd>
-                    </div>
-                    <?php endif; ?>
+            <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">Credit balance</dt>
+                <dd class="govuk-summary-list__value"><?= number_format($user['balance'] ?? 0) ?> Credits</dd>
+            </div>
 
-                    <div class="civicone-summary-list__row">
-                        <dt class="civicone-summary-list__key">Member since</dt>
-                        <dd class="civicone-summary-list__value"><?= date('F Y', strtotime($user['created_at'])) ?></dd>
-                    </div>
+            <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">Exchanges</dt>
+                <dd class="govuk-summary-list__value"><?= $exchangesCount ?? 0 ?></dd>
+            </div>
 
-                    <div class="civicone-summary-list__row">
-                        <dt class="civicone-summary-list__key">Credit balance</dt>
-                        <dd class="civicone-summary-list__value"><?= number_format($user['balance'] ?? 0) ?> Credits</dd>
-                    </div>
+            <?php if (!empty($user['bio'])): ?>
+            <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">About</dt>
+                <dd class="govuk-summary-list__value"><?= nl2br(htmlspecialchars($user['bio'])) ?></dd>
+            </div>
+            <?php endif; ?>
+        </dl>
 
-                    <div class="civicone-summary-list__row">
-                        <dt class="civicone-summary-list__key">Exchanges</dt>
-                        <dd class="civicone-summary-list__value"><?= $exchangesCount ?? 0 ?></dd>
-                    </div>
-
-                    <?php if (!empty($user['bio'])): ?>
-                    <div class="civicone-summary-list__row">
-                        <dt class="civicone-summary-list__key">About</dt>
-                        <dd class="civicone-summary-list__value"><?= nl2br(htmlspecialchars($user['bio'])) ?></dd>
-                    </div>
-                    <?php endif; ?>
-                </dl>
-
-                <!-- Post Composer (Owner only) -->
-                <?php if ($isOwner): ?>
-                <div class="civic-composer govuk-!-margin-top-6">
-                    <h2 class="civicone-heading-m">Share an update</h2>
-                    <form method="POST" enctype="multipart/form-data">
-                        <div class="civicone-form-group">
-                            <textarea name="content" class="civicone-textarea" rows="3" placeholder="What's on your mind?" required></textarea>
-                        </div>
-                        <div class="civic-composer-actions">
-                            <label class="civicone-button civicone-button--secondary">
-                                <i class="fa-solid fa-image" aria-hidden="true"></i> Add Photo
-                                <input type="file" name="image" accept="image/*" class="civicone-visually-hidden">
-                            </label>
-                            <button type="submit" class="civicone-button">Post</button>
-                        </div>
-                    </form>
+        <!-- Post Composer (Owner only) -->
+        <?php if ($isOwner): ?>
+        <div class="govuk-!-margin-top-6 govuk-!-padding-4" style="background: #f3f2f1;">
+            <h2 class="govuk-heading-m">Share an update</h2>
+            <form method="POST" enctype="multipart/form-data">
+                <div class="govuk-form-group">
+                    <textarea name="content" class="govuk-textarea" rows="3" placeholder="What's on your mind?" required></textarea>
                 </div>
-                <?php endif; ?>
-
-                <!-- Posts Section -->
-                <h2 class="civicone-heading-l govuk-!-margin-top-8">
-                    <?= $isOwner ? 'Your Posts' : htmlspecialchars($displayName) . "'s Posts" ?>
-                </h2>
-
-                <?php if (empty($posts)): ?>
-                    <div class="civicone-inset-text">
-                        No posts yet.
-                    </div>
-                <?php else: ?>
-                    <?php foreach ($posts as $post): ?>
-                        <div class="civic-post-card" id="post-<?= $post['id'] ?>">
-                            <!-- Post Header -->
-                            <div class="civic-post-header">
-                                <img src="<?= htmlspecialchars($post['author_avatar']) ?>" alt="" class="civic-avatar-sm">
-                                <div>
-                                    <div class="civicone-heading-s govuk-!-margin-bottom-1">
-                                        <?= htmlspecialchars($post['author_name']) ?>
-                                    </div>
-                                    <div class="civicone-body-s govuk-!-margin-bottom-0 civicone-text-secondary">
-                                        <?= date('j F Y \a\t g:i a', strtotime($post['created_at'])) ?>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Post Content -->
-                            <div class="civic-post-content civicone-body">
-                                <?= nl2br(htmlspecialchars($post['content'])) ?>
-                            </div>
-
-                            <?php if (!empty($post['image_url'])): ?>
-                                <img src="<?= htmlspecialchars($post['image_url']) ?>" alt="" class="civic-post-image">
-                            <?php endif; ?>
-
-                            <!-- Post Actions -->
-                            <div class="civic-post-actions">
-                                <button class="civic-action-btn <?= $post['is_liked'] ? 'liked' : '' ?>"
-                                        onclick="toggleLike('post', <?= $post['id'] ?>, this)">
-                                    <i class="<?= $post['is_liked'] ? 'fa-solid' : 'fa-regular' ?> fa-heart" aria-hidden="true"></i>
-                                    <span class="like-count"><?= (int)$post['likes_count'] ?></span> Like
-                                </button>
-                                <button class="civic-action-btn" onclick="toggleComments('post', <?= $post['id'] ?>)">
-                                    <i class="fa-regular fa-comment" aria-hidden="true"></i>
-                                    <span class="comment-count"><?= (int)$post['comments_count'] ?></span> Comment
-                                </button>
-                            </div>
-
-                            <!-- Comments Section -->
-                            <div class="civic-comments-section" id="comments-section-post-<?= $post['id'] ?>">
-                                <div class="comments-list">
-                                    <div class="civicone-body-s civic-loading-message">Click to load comments</div>
-                                </div>
-
-                                <?php if ($isLoggedIn): ?>
-                                <div class="civic-comment-form">
-                                    <input type="text" class="civic-comment-input civicone-input" placeholder="Write a comment..."
-                                           onkeydown="if(event.key === 'Enter') submitComment(this, 'post', <?= $post['id'] ?>)">
-                                    <button class="civicone-button civic-comment-submit" onclick="submitComment(this.previousElementSibling, 'post', <?= $post['id'] ?>)">Post</button>
-                                </div>
-                                <?php endif; ?>
-                            </div>
-                        </div>
-                    <?php endforeach; ?>
-                <?php endif; ?>
-
-                <!-- Reviews Section -->
-                <h2 class="civicone-heading-l govuk-!-margin-top-8" id="reviews-section">Reviews</h2>
-
-                <?php if (empty($reviews)): ?>
-                    <div class="civicone-inset-text">
-                        No reviews yet.
-                    </div>
-                <?php else: ?>
-                    <?php foreach ($reviews as $review): ?>
-                        <div class="civicone-summary-card">
-                            <div class="civicone-summary-card__title-wrapper">
-                                <h2 class="civicone-summary-card__title"><?= htmlspecialchars($review['reviewer_name'] ?? 'Anonymous') ?></h2>
-                                <div class="civicone-summary-card__actions">
-                                    <span class="civic-review-rating" aria-label="Rating: <?= $review['rating'] ?> out of 5 stars">
-                                        <?= str_repeat('★', $review['rating']) ?><?= str_repeat('☆', 5 - $review['rating']) ?>
-                                    </span>
-                                </div>
-                            </div>
-                            <div class="civicone-summary-card__content">
-                                <p class="civicone-body"><?= nl2br(htmlspecialchars($review['content'] ?? '')) ?></p>
-                                <p class="civicone-body-s civicone-text-secondary govuk-!-margin-top-2">
-                                    <?= date('j F Y', strtotime($review['created_at'])) ?>
-                                </p>
-                            </div>
-                        </div>
-                    <?php endforeach; ?>
-                <?php endif; ?>
-            </div>
-
-            <!-- Sidebar: 1/3 Column (Related Links/Actions) -->
-            <div class="civicone-grid-column-one-third">
-                <aside class="civicone-related-content">
-                    <h2 class="civicone-heading-m">Related content</h2>
-
-                    <nav role="navigation" aria-labelledby="subsection-title">
-                        <ul class="civicone-list govuk-!-font-size-16">
-                            <?php if ($isOwner): ?>
-                                <li><a class="civicone-link" href="<?= \Nexus\Core\TenantContext::getBasePath() ?>/profile/edit">Edit your profile</a></li>
-                                <li><a class="civicone-link" href="<?= \Nexus\Core\TenantContext::getBasePath() ?>/settings">Account settings</a></li>
-                                <?php if (\Nexus\Core\TenantContext::hasFeature('timebanking')): ?>
-                                <li><a class="civicone-link" href="<?= \Nexus\Core\TenantContext::getBasePath() ?>/wallet">View your wallet</a></li>
-                                <li><a class="civicone-link" href="<?= \Nexus\Core\TenantContext::getBasePath() ?>/wallet/insights">Wallet insights</a></li>
-                                <?php endif; ?>
-                            <?php else: ?>
-                                <li><a class="civicone-link" href="<?= \Nexus\Core\TenantContext::getBasePath() ?>/messages/create?to=<?= $user['id'] ?>">Send a message</a></li>
-                                <?php if (\Nexus\Core\TenantContext::hasFeature('timebanking')): ?>
-                                <li><a class="civicone-link" href="<?= \Nexus\Core\TenantContext::getBasePath() ?>/wallet?to=<?= $user['id'] ?>">Send credits</a></li>
-                                <?php endif; ?>
-                                <li><a class="civicone-link" href="<?= \Nexus\Core\TenantContext::getBasePath() ?>/members">Browse all members</a></li>
-                            <?php endif; ?>
-                        </ul>
-                    </nav>
-
-                    <?php if (!empty($userOrganizations)): ?>
-                    <h3 class="civicone-heading-s govuk-!-margin-top-6">Organizations</h3>
-                    <ul class="civicone-list govuk-!-font-size-16">
-                        <?php foreach ($userOrganizations as $org): ?>
-                            <li>
-                                <a class="civicone-link" href="<?= \Nexus\Core\TenantContext::getBasePath() ?>/organizations/<?= $org['id'] ?>">
-                                    <?= htmlspecialchars($org['name']) ?>
-                                    <?php if ($org['member_role'] === 'owner'): ?>
-                                        <span class="civicone-tag civicone-tag--yellow">Owner</span>
-                                    <?php elseif ($org['member_role'] === 'admin'): ?>
-                                        <span class="civicone-tag civicone-tag--purple">Admin</span>
-                                    <?php endif; ?>
-                                </a>
-                            </li>
-                        <?php endforeach; ?>
-                    </ul>
-                    <?php endif; ?>
-                </aside>
-            </div>
-
+                <div style="display: flex; gap: 10px;">
+                    <label class="govuk-button govuk-button--secondary govuk-!-margin-bottom-0">
+                        Add Photo
+                        <input type="file" name="image" accept="image/*" class="govuk-visually-hidden">
+                    </label>
+                    <button type="submit" class="govuk-button govuk-!-margin-bottom-0">Post</button>
+                </div>
+            </form>
         </div>
-    </main>
-</div>
+        <?php endif; ?>
+
+        <!-- Posts Section -->
+        <h2 class="govuk-heading-l govuk-!-margin-top-8">
+            <?= $isOwner ? 'Your Posts' : htmlspecialchars($displayName) . "'s Posts" ?>
+        </h2>
+
+        <?php if (empty($posts)): ?>
+            <div class="govuk-inset-text">
+                No posts yet.
+            </div>
+        <?php else: ?>
+            <?php foreach ($posts as $post): ?>
+                <div class="govuk-!-margin-bottom-6 govuk-!-padding-4" style="background: #f3f2f1; border-left: 5px solid #1d70b8;" id="post-<?= $post['id'] ?>">
+                    <!-- Post Header -->
+                    <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+                        <img src="<?= htmlspecialchars($post['author_avatar']) ?>" alt="" width="40" height="40" style="border-radius: 50%;">
+                        <div>
+                            <p class="govuk-body govuk-!-font-weight-bold govuk-!-margin-bottom-0">
+                                <?= htmlspecialchars($post['author_name']) ?>
+                            </p>
+                            <p class="govuk-body-s govuk-!-margin-bottom-0" style="color: #505a5f;">
+                                <?= date('j F Y \a\t g:i a', strtotime($post['created_at'])) ?>
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Post Content -->
+                    <p class="govuk-body">
+                        <?= nl2br(htmlspecialchars($post['content'])) ?>
+                    </p>
+
+                    <?php if (!empty($post['image_url'])): ?>
+                        <img src="<?= htmlspecialchars($post['image_url']) ?>" alt="" style="max-width: 100%; margin-bottom: 15px;">
+                    <?php endif; ?>
+
+                    <!-- Post Actions -->
+                    <div style="display: flex; gap: 15px; margin-top: 15px; padding-top: 15px; border-top: 1px solid #b1b4b6;">
+                        <button class="govuk-button govuk-button--secondary govuk-!-margin-bottom-0 <?= $post['is_liked'] ? 'liked' : '' ?>"
+                                onclick="toggleLike('post', <?= $post['id'] ?>, this)" style="font-size: 14px;">
+                            <span class="like-count"><?= (int)$post['likes_count'] ?></span> Like
+                        </button>
+                        <button class="govuk-button govuk-button--secondary govuk-!-margin-bottom-0" onclick="toggleComments('post', <?= $post['id'] ?>)" style="font-size: 14px;">
+                            <span class="comment-count"><?= (int)$post['comments_count'] ?></span> Comment
+                        </button>
+                    </div>
+
+                    <!-- Comments Section -->
+                    <div id="comments-section-post-<?= $post['id'] ?>" style="margin-top: 15px; display: none;">
+                        <div class="comments-list">
+                            <p class="govuk-body-s">Click to load comments</p>
+                        </div>
+
+                        <?php if ($isLoggedIn): ?>
+                        <div style="display: flex; gap: 10px; margin-top: 10px;">
+                            <input type="text" class="govuk-input" placeholder="Write a comment..." style="flex-grow: 1;"
+                                   onkeydown="if(event.key === 'Enter') submitComment(this, 'post', <?= $post['id'] ?>)">
+                            <button class="govuk-button govuk-!-margin-bottom-0" onclick="submitComment(this.previousElementSibling, 'post', <?= $post['id'] ?>)">Post</button>
+                        </div>
+                        <?php endif; ?>
+                    </div>
+                </div>
+            <?php endforeach; ?>
+        <?php endif; ?>
+
+        <!-- Reviews Section -->
+        <h2 class="govuk-heading-l govuk-!-margin-top-8" id="reviews-section">Reviews</h2>
+
+        <?php if (empty($reviews)): ?>
+            <div class="govuk-inset-text">
+                No reviews yet.
+            </div>
+        <?php else: ?>
+            <?php foreach ($reviews as $review): ?>
+                <div class="govuk-!-margin-bottom-4 govuk-!-padding-bottom-4" style="border-bottom: 1px solid #b1b4b6;">
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                        <h3 class="govuk-heading-s govuk-!-margin-bottom-2"><?= htmlspecialchars($review['reviewer_name'] ?? 'Anonymous') ?></h3>
+                        <span aria-label="Rating: <?= $review['rating'] ?> out of 5 stars" style="color: #f47738;">
+                            <?= str_repeat('★', $review['rating']) ?><?= str_repeat('☆', 5 - $review['rating']) ?>
+                        </span>
+                    </div>
+                    <p class="govuk-body"><?= nl2br(htmlspecialchars($review['content'] ?? '')) ?></p>
+                    <p class="govuk-body-s govuk-!-margin-bottom-0" style="color: #505a5f;">
+                        <?= date('j F Y', strtotime($review['created_at'])) ?>
+                    </p>
+                </div>
+            <?php endforeach; ?>
+        <?php endif; ?>
+    </div>
+
+    <!-- Sidebar: 1/3 Column (Related Links/Actions) -->
+    <div class="govuk-grid-column-one-third">
+        <aside class="govuk-!-padding-4" style="background: #f3f2f1;">
+            <h2 class="govuk-heading-m">Related content</h2>
+
+            <ul class="govuk-list">
+                <?php if ($isOwner): ?>
+                    <li><a class="govuk-link" href="<?= \Nexus\Core\TenantContext::getBasePath() ?>/profile/edit">Edit your profile</a></li>
+                    <li><a class="govuk-link" href="<?= \Nexus\Core\TenantContext::getBasePath() ?>/settings">Account settings</a></li>
+                    <?php if (\Nexus\Core\TenantContext::hasFeature('timebanking')): ?>
+                    <li><a class="govuk-link" href="<?= \Nexus\Core\TenantContext::getBasePath() ?>/wallet">View your wallet</a></li>
+                    <li><a class="govuk-link" href="<?= \Nexus\Core\TenantContext::getBasePath() ?>/wallet/insights">Wallet insights</a></li>
+                    <?php endif; ?>
+                <?php else: ?>
+                    <li><a class="govuk-link" href="<?= \Nexus\Core\TenantContext::getBasePath() ?>/messages/create?to=<?= $user['id'] ?>">Send a message</a></li>
+                    <?php if (\Nexus\Core\TenantContext::hasFeature('timebanking')): ?>
+                    <li><a class="govuk-link" href="<?= \Nexus\Core\TenantContext::getBasePath() ?>/wallet?to=<?= $user['id'] ?>">Send credits</a></li>
+                    <?php endif; ?>
+                    <li><a class="govuk-link" href="<?= \Nexus\Core\TenantContext::getBasePath() ?>/members">Browse all members</a></li>
+                <?php endif; ?>
+            </ul>
+
+            <?php if (!empty($userOrganizations)): ?>
+            <h3 class="govuk-heading-s govuk-!-margin-top-6">Organizations</h3>
+            <ul class="govuk-list">
+                <?php foreach ($userOrganizations as $org): ?>
+                    <li>
+                        <a class="govuk-link" href="<?= \Nexus\Core\TenantContext::getBasePath() ?>/organizations/<?= $org['id'] ?>">
+                            <?= htmlspecialchars($org['name']) ?>
+                            <?php if ($org['member_role'] === 'owner'): ?>
+                                <strong class="govuk-tag govuk-tag--yellow">Owner</strong>
+                            <?php elseif ($org['member_role'] === 'admin'): ?>
+                                <strong class="govuk-tag govuk-tag--purple">Admin</strong>
+                            <?php endif; ?>
+                        </a>
+                    </li>
+                <?php endforeach; ?>
+            </ul>
+            <?php endif; ?>
+        </aside>
+    </div>
+
+</div><!-- /.govuk-grid-row -->
 
 <!-- Toast Notification -->
 <div class="civic-toast" id="civic-toast"></div>

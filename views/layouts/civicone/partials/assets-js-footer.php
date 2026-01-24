@@ -1,3 +1,15 @@
+<!-- GOV.UK Frontend v5.14.0 JavaScript (Official Design System) -->
+<!-- Source: https://github.com/alphagov/govuk-frontend pinned to v5.14.0 -->
+<script src="/assets/govuk-frontend-5.14.0/govuk-frontend.min.js"></script>
+<script>
+    // Initialize GOV.UK Frontend components on DOM ready
+    document.addEventListener('DOMContentLoaded', function() {
+        if (typeof window.GOVUKFrontend !== 'undefined') {
+            window.GOVUKFrontend.initAll();
+        }
+    });
+</script>
+
 <!-- Nexus UI & Maps -->
 <!-- Mapbox: Lazy load only when needed (no preload - conditionally loaded) -->
 <script>
