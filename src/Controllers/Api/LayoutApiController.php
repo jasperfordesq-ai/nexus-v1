@@ -2,6 +2,7 @@
 
 namespace Nexus\Controllers\Api;
 
+use Nexus\Core\Csrf;
 use Nexus\Services\LayoutHelper;
 
 /**
@@ -32,6 +33,9 @@ class LayoutApiController
             ]);
             exit;
         }
+
+        // Security: Verify CSRF token for session-based requests
+        Csrf::verifyOrDieJson();
 
         // Verify AJAX request (optional but recommended)
         $isAjax = !empty($_SERVER['HTTP_X_REQUESTED_WITH']) &&
