@@ -36,18 +36,18 @@ $displayName = htmlspecialchars($user['first_name'] . ' ' . $user['last_name']);
     <main class="govuk-main-wrapper">
 
         <!-- Breadcrumbs (GOV.UK Template D requirement) -->
-        <nav class="civicone-breadcrumbs" aria-label="Breadcrumb">
-            <ol class="civicone-breadcrumbs__list">
-                <li class="civicone-breadcrumbs__list-item">
-                    <a class="civicone-breadcrumbs__link" href="<?= $basePath ?>">Home</a>
+        <nav class="govuk-breadcrumbs govuk-!-margin-bottom-6" aria-label="Breadcrumb">
+            <ol class="govuk-breadcrumbs__list">
+                <li class="govuk-breadcrumbs__list-item">
+                    <a class="govuk-breadcrumbs__link" href="<?= $basePath ?>">Home</a>
                 </li>
-                <li class="civicone-breadcrumbs__list-item">
-                    <a class="civicone-breadcrumbs__link" href="<?= $basePath ?>/members">Members</a>
+                <li class="govuk-breadcrumbs__list-item">
+                    <a class="govuk-breadcrumbs__link" href="<?= $basePath ?>/members">Members</a>
                 </li>
-                <li class="civicone-breadcrumbs__list-item">
-                    <a class="civicone-breadcrumbs__link" href="<?= $basePath ?>/profile/<?= $user['id'] ?>"><?= $displayName ?></a>
+                <li class="govuk-breadcrumbs__list-item">
+                    <a class="govuk-breadcrumbs__link" href="<?= $basePath ?>/profile/<?= $user['id'] ?>"><?= $displayName ?></a>
                 </li>
-                <li class="civicone-breadcrumbs__list-item" aria-current="page">
+                <li class="govuk-breadcrumbs__list-item" aria-current="page">
                     Edit Profile
                 </li>
             </ol>
@@ -85,7 +85,7 @@ $displayName = htmlspecialchars($user['first_name'] . ' ' . $user['last_name']);
                                 <h2 class="govuk-fieldset__heading">Profile picture</h2>
                             </legend>
 
-                            <div class="govuk-hint profile-avatar-hint">
+                            <div class="govuk-hint" id="avatar-hint">
                                 Upload a photo that's at least 400x400 pixels. JPG or PNG formats only.
                             </div>
 
@@ -95,11 +95,11 @@ $displayName = htmlspecialchars($user['first_name'] . ' ' . $user['last_name']);
                                 </p>
                             <?php endif; ?>
 
-                            <div class="profile-avatar-preview-container">
+                            <div class="govuk-!-margin-bottom-4">
                                 <img src="<?= htmlspecialchars($user['avatar_url'] ?? '/assets/images/default-avatar.svg') ?>"
                                      alt="Current profile photo"
                                      id="avatar-preview"
-                                     class="profile-avatar-preview">
+                                     style="width: 150px; height: 150px; border-radius: 50%; object-fit: cover; border: 3px solid #b1b4b6;">
                             </div>
 
                             <input type="file"
@@ -132,7 +132,8 @@ $displayName = htmlspecialchars($user['first_name'] . ' ' . $user['last_name']);
 
                     <!-- Organisation Name (conditional) -->
                     <div id="org_field_container"
-                         class="govuk-form-group <?= isset($errors['organization_name']) ? 'govuk-form-group--error' : '' ?> <?= ($oldInput['profile_type'] ?? $user['profile_type'] ?? 'individual') === 'organisation' ? 'profile-field-visible' : 'profile-field-hidden' ?>">
+                         class="govuk-form-group <?= isset($errors['organization_name']) ? 'govuk-form-group--error' : '' ?>"
+                         <?= ($oldInput['profile_type'] ?? $user['profile_type'] ?? 'individual') === 'organisation' ? '' : 'hidden' ?>>
                         <label class="govuk-label govuk-label--m" for="organization_name">
                             Organisation name
                         </label>

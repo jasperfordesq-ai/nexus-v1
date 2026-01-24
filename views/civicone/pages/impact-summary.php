@@ -1,6 +1,9 @@
 <?php
-// CivicOne View: Impact Summary
-// Tenant-specific: Hour Timebank only
+/**
+ * CivicOne View: Impact Summary
+ * GOV.UK Design System (WCAG 2.1 AA)
+ * Tenant-specific: Hour Timebank only
+ */
 $tSlug = \Nexus\Core\TenantContext::get()['slug'] ?? '';
 if ($tSlug !== 'hour-timebank' && $tSlug !== 'hour_timebank') {
     http_response_code(404);
@@ -9,80 +12,97 @@ if ($tSlug !== 'hour-timebank' && $tSlug !== 'hour_timebank') {
 }
 
 $pageTitle = 'Impact Summary';
+$basePath = \Nexus\Core\TenantContext::getBasePath();
 require dirname(__DIR__, 2) . '/layouts/civicone/header.php';
 ?>
 
-<link rel="stylesheet" href="<?= Nexus\Core\TenantContext::getBasePath() ?>/assets/css/civicone-impact-summary.css">
+<nav class="govuk-breadcrumbs govuk-!-margin-bottom-6" aria-label="Breadcrumb">
+    <ol class="govuk-breadcrumbs__list">
+        <li class="govuk-breadcrumbs__list-item">
+            <a class="govuk-breadcrumbs__link" href="<?= $basePath ?>">Home</a>
+        </li>
+        <li class="govuk-breadcrumbs__list-item" aria-current="page">Impact Summary</li>
+    </ol>
+</nav>
 
-<div class="civic-container">
-
-    <!-- Header Section -->
-    <div class="civic-card impact-summary-hero">
-        <h1>For Every €1 Invested, We Generate €16 in Social Value.</h1>
-        <div class="impact-summary-divider"></div>
-        <p>Independently validated by our 2023 Social Impact Study.</p>
+<!-- Header Section -->
+<div class="govuk-notification-banner govuk-notification-banner--success govuk-!-margin-bottom-6" role="region" aria-labelledby="impact-title">
+    <div class="govuk-notification-banner__header">
+        <h2 class="govuk-notification-banner__title" id="impact-title">Proven Social Impact</h2>
     </div>
+    <div class="govuk-notification-banner__content govuk-!-text-align-center">
+        <h1 class="govuk-notification-banner__heading">For Every €1 Invested, We Generate €16 in Social Value.</h1>
+        <p class="govuk-body-l">Independently validated by our 2023 Social Impact Study.</p>
+    </div>
+</div>
 
-    <!-- Main Content Grid -->
-    <div class="impact-summary-grid">
-
-        <!-- Wellbeing Section -->
-        <div class="civic-card impact-summary-card">
-            <h2>Profound Impact on Wellbeing</h2>
-            <ul class="impact-summary-list">
+<!-- Main Content Grid -->
+<div class="govuk-grid-row govuk-!-margin-bottom-6">
+    <!-- Wellbeing Section -->
+    <div class="govuk-grid-column-one-half govuk-!-margin-bottom-4">
+        <div class="govuk-!-padding-4" style="border: 1px solid #b1b4b6; border-left: 5px solid #00703c; height: 100%;">
+            <h2 class="govuk-heading-m">
+                <i class="fa-solid fa-heart govuk-!-margin-right-2" style="color: #00703c;" aria-hidden="true"></i>
+                Profound Impact on Wellbeing
+            </h2>
+            <ul class="govuk-list govuk-list--bullet">
                 <li>
-                    <span class="icon" aria-hidden="true">✔</span>
-                    <strong>100%</strong> of members reported improved mental and emotional wellbeing.
+                    <span class="govuk-tag govuk-tag--green govuk-!-margin-right-1">100%</span>
+                    of members reported improved mental and emotional wellbeing.
                 </li>
                 <li>
-                    <span class="icon" aria-hidden="true">✔</span>
-                    <strong>95%</strong> feel more socially connected, actively tackling loneliness.
+                    <span class="govuk-tag govuk-tag--green govuk-!-margin-right-1">95%</span>
+                    feel more socially connected, actively tackling loneliness.
                 </li>
-                <li>
-                    <span class="icon" aria-hidden="true">✔</span>
-                    Members describe TBI as "transformational and lifesaving".
-                </li>
+                <li>Members describe TBI as <strong>"transformational and lifesaving"</strong>.</li>
             </ul>
         </div>
+    </div>
 
-        <!-- Public Health Section -->
-        <div class="civic-card impact-summary-card">
-            <h2>A Public Health Solution</h2>
-            <p class="impact-summary-text">
+    <!-- Public Health Section -->
+    <div class="govuk-grid-column-one-half govuk-!-margin-bottom-4">
+        <div class="govuk-!-padding-4" style="border: 1px solid #b1b4b6; border-left: 5px solid #1d70b8; height: 100%;">
+            <h2 class="govuk-heading-m">
+                <i class="fa-solid fa-stethoscope govuk-!-margin-right-2" style="color: #1d70b8;" aria-hidden="true"></i>
+                A Public Health Solution
+            </h2>
+            <p class="govuk-body">
                 The study found our model is a highly efficient, effective, and scalable intervention for tackling social isolation.
             </p>
-            <p class="impact-summary-quote">
-                It explicitly concluded that Timebank Ireland "could become part of a social prescribing offering".
-            </p>
-        </div>
-
-    </div>
-
-    <!-- Documents Section -->
-    <div class="civic-card impact-summary-documents">
-        <h2>Our Strategic Documents</h2>
-
-        <div class="impact-summary-documents-grid">
-            <div class="impact-summary-doc-card">
-                <h3>2023 Impact Study</h3>
-                <p>Full independent validation of our SROI model and outcomes.</p>
-                <a href="<?= Nexus\Core\TenantContext::getBasePath() ?>/impact-report" class="civic-btn">Read Full Report</a>
-            </div>
-
-            <div class="impact-summary-doc-card">
-                <h3>Strategic Plan 2030</h3>
-                <p>Our roadmap for national scaling and sustainable growth.</p>
-                <a href="<?= Nexus\Core\TenantContext::getBasePath() ?>/strategic-plan" class="civic-btn impact-summary-doc-btn-secondary">Read Strategic Plan</a>
+            <div class="govuk-inset-text" style="border-left-color: #1d70b8;">
+                It explicitly concluded that Timebank Ireland <strong>"could become part of a social prescribing offering"</strong>.
             </div>
         </div>
     </div>
+</div>
 
-    <!-- CTA Section -->
-    <div class="civic-card impact-summary-cta">
-        <h2>Ready to Scale Our Impact?</h2>
-        <a href="<?= Nexus\Core\TenantContext::getBasePath() ?>/contact" class="civic-btn impact-summary-cta-btn">Contact Strategy Team</a>
+<!-- Documents Section -->
+<div class="govuk-!-padding-6 govuk-!-margin-bottom-6" style="background: #f3f2f1;">
+    <h2 class="govuk-heading-l govuk-!-text-align-center govuk-!-margin-bottom-6">Our Strategic Documents</h2>
+
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-one-half govuk-!-margin-bottom-4">
+            <div class="govuk-!-padding-4" style="background: white; height: 100%;">
+                <h3 class="govuk-heading-s">2023 Impact Study</h3>
+                <p class="govuk-body-s govuk-!-margin-bottom-4">Full independent validation of our SROI model and outcomes.</p>
+                <a href="<?= $basePath ?>/impact-report" class="govuk-button" data-module="govuk-button">Read Full Report</a>
+            </div>
+        </div>
+
+        <div class="govuk-grid-column-one-half govuk-!-margin-bottom-4">
+            <div class="govuk-!-padding-4" style="background: white; height: 100%;">
+                <h3 class="govuk-heading-s">Strategic Plan 2030</h3>
+                <p class="govuk-body-s govuk-!-margin-bottom-4">Our roadmap for national scaling and sustainable growth.</p>
+                <a href="<?= $basePath ?>/strategic-plan" class="govuk-button govuk-button--secondary" data-module="govuk-button">Read Strategic Plan</a>
+            </div>
+        </div>
     </div>
+</div>
 
+<!-- CTA Section -->
+<div class="govuk-!-padding-6 govuk-!-text-align-center" style="background: #1d70b8; color: white;">
+    <h2 class="govuk-heading-l" style="color: white;">Ready to Scale Our Impact?</h2>
+    <a href="<?= $basePath ?>/contact" class="govuk-button govuk-button--secondary" data-module="govuk-button">Contact Strategy Team</a>
 </div>
 
 <?php require dirname(__DIR__, 2) . '/layouts/civicone/footer.php'; ?>

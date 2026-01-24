@@ -1,202 +1,173 @@
 <?php
-// CivicOne View: Volunteering Opportunity Detail - WCAG 2.1 AA Compliant
-// CSS extracted to civicone-volunteering.css
-
+/**
+ * CivicOne View: Volunteering Opportunity Detail
+ * GOV.UK Design System Compliant (WCAG 2.1 AA)
+ */
 if (session_status() === PHP_SESSION_NONE) session_start();
 
 $isLoggedIn = !empty($_SESSION['user_id']);
 $userId = $_SESSION['user_id'] ?? 0;
 $opportunityId = $opportunity['id'] ?? 0;
 
-$hTitle = $opportunity['title'] ?? 'Volunteer Opportunity';
-$hSubtitle = "Volunteer with " . htmlspecialchars($opportunity['org_name'] ?? 'Organization');
-$hType = "Volunteering";
-
-require __DIR__ . '/../../layouts/civicone/header.php';
+$pageTitle = $opportunity['title'] ?? 'Volunteer Opportunity';
+require dirname(__DIR__, 2) . '/layouts/civicone/header.php';
 $basePath = \Nexus\Core\TenantContext::getBasePath();
 ?>
 
-<!-- Breadcrumb -->
-<nav class="civic-breadcrumb" aria-label="Breadcrumb">
-    <a href="<?= $basePath ?>/volunteering">
-        <span class="dashicons dashicons-arrow-left-alt2" aria-hidden="true"></span>
-        Back to Opportunities
-    </a>
+<nav class="govuk-breadcrumbs govuk-!-margin-bottom-6" aria-label="Breadcrumb">
+    <ol class="govuk-breadcrumbs__list">
+        <li class="govuk-breadcrumbs__list-item">
+            <a class="govuk-breadcrumbs__link" href="<?= $basePath ?>">Home</a>
+        </li>
+        <li class="govuk-breadcrumbs__list-item">
+            <a class="govuk-breadcrumbs__link" href="<?= $basePath ?>/volunteering">Volunteering</a>
+        </li>
+        <li class="govuk-breadcrumbs__list-item" aria-current="page">Opportunity</li>
+    </ol>
 </nav>
 
-<div class="civic-detail-layout">
+<a href="<?= $basePath ?>/volunteering" class="govuk-back-link govuk-!-margin-bottom-6">Back to Opportunities</a>
+
+<div class="govuk-grid-row">
     <!-- Main Content -->
-    <main class="civic-detail-main">
-        <!-- Organization Badge -->
-        <div class="civic-detail-card">
-            <div class="civic-detail-header">
-                <span class="civic-badge civic-badge--coordinator">
-                    <span class="dashicons dashicons-building" aria-hidden="true"></span>
-                    <?= htmlspecialchars($opportunity['org_name'] ?? 'Organization') ?>
-                </span>
-                <?php if (!empty($opportunity['location'])): ?>
-                    <span class="civic-detail-location">
-                        <span class="dashicons dashicons-location" aria-hidden="true"></span>
-                        <?= htmlspecialchars($opportunity['location']) ?>
-                    </span>
-                <?php endif; ?>
+    <div class="govuk-grid-column-two-thirds">
+
+        <span class="govuk-tag govuk-!-margin-bottom-4">Volunteer with <?= htmlspecialchars($opportunity['org_name'] ?? 'Organization') ?></span>
+
+        <h1 class="govuk-heading-xl"><?= htmlspecialchars($opportunity['title']) ?></h1>
+
+        <?php if (!empty($opportunity['location'])): ?>
+            <p class="govuk-body-l govuk-!-margin-bottom-6" style="color: #505a5f;">
+                <i class="fa-solid fa-location-dot govuk-!-margin-right-2" aria-hidden="true"></i>
+                <?= htmlspecialchars($opportunity['location']) ?>
+            </p>
+        <?php endif; ?>
+
+        <?php if (!empty($opportunity['org_website'])): ?>
+            <p class="govuk-body govuk-!-margin-bottom-6">
+                <a href="<?= htmlspecialchars($opportunity['org_website']) ?>" target="_blank" rel="noopener noreferrer" class="govuk-link">
+                    <i class="fa-solid fa-external-link-alt govuk-!-margin-right-1" aria-hidden="true"></i>
+                    Visit Organization Website
+                </a>
+            </p>
+        <?php endif; ?>
+
+        <!-- About the Role -->
+        <h2 class="govuk-heading-l">About the Role</h2>
+        <p class="govuk-body govuk-!-margin-bottom-6"><?= nl2br(htmlspecialchars($opportunity['description'] ?? '')) ?></p>
+
+        <!-- Details -->
+        <h2 class="govuk-heading-l">Details</h2>
+        <dl class="govuk-summary-list govuk-!-margin-bottom-6">
+            <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">Skills Needed</dt>
+                <dd class="govuk-summary-list__value"><?= htmlspecialchars($opportunity['skills_needed'] ?? 'None specified') ?></dd>
             </div>
-
-            <h2 class="civic-detail-title"><?= htmlspecialchars($opportunity['title']) ?></h2>
-
-            <?php if (!empty($opportunity['org_website'])): ?>
-                <p class="civic-detail-meta">
-                    <a href="<?= htmlspecialchars($opportunity['org_website']) ?>" target="_blank" rel="noopener noreferrer" class="civic-link">
-                        <span class="dashicons dashicons-external" aria-hidden="true"></span>
-                        Visit Organization Website
-                    </a>
-                </p>
+            <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">Dates</dt>
+                <dd class="govuk-summary-list__value">
+                    <?php if (!empty($opportunity['start_date'])): ?>
+                        <?= date('j F Y', strtotime($opportunity['start_date'])) ?>
+                        <?= !empty($opportunity['end_date']) ? ' - ' . date('j F Y', strtotime($opportunity['end_date'])) : ' (Ongoing)' ?>
+                    <?php else: ?>
+                        Flexible / Ongoing
+                    <?php endif; ?>
+                </dd>
+            </div>
+            <?php if (!empty($opportunity['commitment'])): ?>
+            <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">Time Commitment</dt>
+                <dd class="govuk-summary-list__value"><?= htmlspecialchars($opportunity['commitment']) ?></dd>
+            </div>
             <?php endif; ?>
-        </div>
-
-        <!-- Description -->
-        <div class="civic-detail-card">
-            <h3 class="civic-detail-section-title">
-                <span class="dashicons dashicons-info" aria-hidden="true"></span>
-                About the Role
-            </h3>
-            <div class="civic-detail-description">
-                <?= nl2br(htmlspecialchars($opportunity['description'] ?? '')) ?>
-            </div>
-        </div>
-
-        <!-- Details Grid -->
-        <div class="civic-detail-card">
-            <h3 class="civic-detail-section-title">
-                <span class="dashicons dashicons-list-view" aria-hidden="true"></span>
-                Details
-            </h3>
-            <div class="civic-info-grid">
-                <div class="civic-info-item">
-                    <span class="civic-info-icon dashicons dashicons-admin-tools" aria-hidden="true"></span>
-                    <div class="civic-info-content">
-                        <span class="civic-info-label">Skills Needed</span>
-                        <span class="civic-info-value"><?= htmlspecialchars($opportunity['skills_needed'] ?? 'None specified') ?></span>
-                    </div>
-                </div>
-                <div class="civic-info-item">
-                    <span class="civic-info-icon dashicons dashicons-calendar-alt" aria-hidden="true"></span>
-                    <div class="civic-info-content">
-                        <span class="civic-info-label">Dates</span>
-                        <span class="civic-info-value">
-                            <?php if (!empty($opportunity['start_date'])): ?>
-                                <?= date('M d, Y', strtotime($opportunity['start_date'])) ?>
-                                <?= !empty($opportunity['end_date']) ? ' - ' . date('M d, Y', strtotime($opportunity['end_date'])) : ' (Ongoing)' ?>
-                            <?php else: ?>
-                                Flexible / Ongoing
-                            <?php endif; ?>
-                        </span>
-                    </div>
-                </div>
-                <?php if (!empty($opportunity['commitment'])): ?>
-                <div class="civic-info-item">
-                    <span class="civic-info-icon dashicons dashicons-clock" aria-hidden="true"></span>
-                    <div class="civic-info-content">
-                        <span class="civic-info-label">Time Commitment</span>
-                        <span class="civic-info-value"><?= htmlspecialchars($opportunity['commitment']) ?></span>
-                    </div>
-                </div>
-                <?php endif; ?>
-            </div>
-        </div>
+        </dl>
 
         <!-- Social Interactions -->
-        <div class="civic-detail-card">
-            <?php
-            $targetType = 'volunteering';
-            $targetId = $opportunity['id'];
-            include dirname(__DIR__) . '/partials/social_interactions.php';
-            ?>
-        </div>
-    </main>
+        <?php
+        $targetType = 'volunteering';
+        $targetId = $opportunity['id'];
+        include dirname(__DIR__) . '/partials/social_interactions.php';
+        ?>
+
+    </div>
 
     <!-- Sidebar -->
-    <aside class="civic-detail-sidebar">
-        <div class="civic-sidebar-card">
+    <div class="govuk-grid-column-one-third">
+        <div class="govuk-!-padding-4" style="border: 1px solid #b1b4b6;">
+
             <!-- Organization Info -->
-            <div class="civic-sidebar-org">
-                <div class="civic-sidebar-org-icon">
-                    <span class="dashicons dashicons-building" aria-hidden="true"></span>
-                </div>
-                <h4 class="civic-sidebar-org-name"><?= htmlspecialchars($opportunity['org_name'] ?? 'Organization') ?></h4>
-                <p class="civic-sidebar-org-type">Community Organization</p>
-            </div>
+            <h2 class="govuk-heading-s">
+                <i class="fa-solid fa-building govuk-!-margin-right-2" aria-hidden="true"></i>
+                <?= htmlspecialchars($opportunity['org_name'] ?? 'Organization') ?>
+            </h2>
+            <p class="govuk-body-s govuk-!-margin-bottom-4" style="color: #505a5f;">Community Organization</p>
 
             <!-- Application Status / Form -->
             <?php if (isset($_GET['msg']) && $_GET['msg'] == 'applied'): ?>
-                <div class="civic-alert civic-alert--success">
-                    <span class="dashicons dashicons-yes-alt" aria-hidden="true"></span>
-                    <div>
-                        <strong>Application Sent!</strong>
-                        <p>The organization will contact you shortly.</p>
+                <div class="govuk-notification-banner govuk-notification-banner--success" role="alert" aria-labelledby="govuk-notification-banner-title" data-module="govuk-notification-banner">
+                    <div class="govuk-notification-banner__header">
+                        <h3 class="govuk-notification-banner__title" id="govuk-notification-banner-title">Success</h3>
+                    </div>
+                    <div class="govuk-notification-banner__content">
+                        <p class="govuk-notification-banner__heading">Application Sent!</p>
+                        <p class="govuk-body">The organization will contact you shortly.</p>
                     </div>
                 </div>
             <?php elseif (!empty($hasApplied)): ?>
-                <div class="civic-alert civic-alert--info">
-                    <span class="dashicons dashicons-clock" aria-hidden="true"></span>
-                    <div>
-                        <strong>Already Applied</strong>
-                        <p>You've applied for this opportunity.</p>
-                    </div>
+                <div class="govuk-inset-text">
+                    <p class="govuk-body govuk-!-font-weight-bold">Already Applied</p>
+                    <p class="govuk-body">You've applied for this opportunity.</p>
                 </div>
             <?php elseif ($isLoggedIn): ?>
-                <form action="<?= $basePath ?>/volunteering/apply" method="POST" class="civic-apply-form">
+                <form action="<?= $basePath ?>/volunteering/apply" method="POST">
                     <?= \Nexus\Core\Csrf::input() ?>
                     <input type="hidden" name="opportunity_id" value="<?= $opportunity['id'] ?>">
 
                     <?php if (!empty($shifts)): ?>
-                        <div class="civic-form-group">
-                            <label class="civic-label">
-                                <span class="dashicons dashicons-clock" aria-hidden="true"></span>
-                                Select a Shift
-                            </label>
-                            <div class="civic-shift-list">
-                                <?php foreach ($shifts as $shift): ?>
-                                    <label class="civic-shift-option">
-                                        <input type="radio" name="shift_id" value="<?= $shift['id'] ?>" required>
-                                        <span class="civic-shift-content">
-                                            <span class="civic-shift-date"><?= date('M d', strtotime($shift['start_time'])) ?></span>
-                                            <span class="civic-shift-time">
+                        <div class="govuk-form-group">
+                            <fieldset class="govuk-fieldset">
+                                <legend class="govuk-fieldset__legend govuk-fieldset__legend--s">
+                                    <h3 class="govuk-fieldset__heading">Select a Shift</h3>
+                                </legend>
+                                <div class="govuk-radios" data-module="govuk-radios">
+                                    <?php foreach ($shifts as $shift): ?>
+                                        <div class="govuk-radios__item">
+                                            <input class="govuk-radios__input" id="shift-<?= $shift['id'] ?>" name="shift_id" type="radio" value="<?= $shift['id'] ?>" required>
+                                            <label class="govuk-label govuk-radios__label" for="shift-<?= $shift['id'] ?>">
+                                                <?= date('j M', strtotime($shift['start_time'])) ?>:
                                                 <?= date('g:i A', strtotime($shift['start_time'])) ?> - <?= date('g:i A', strtotime($shift['end_time'])) ?>
-                                            </span>
-                                            <span class="civic-shift-capacity"><?= $shift['capacity'] ?> spots</span>
-                                        </span>
-                                    </label>
-                                <?php endforeach; ?>
-                            </div>
+                                                <span class="govuk-hint govuk-radios__hint"><?= $shift['capacity'] ?> spots available</span>
+                                            </label>
+                                        </div>
+                                    <?php endforeach; ?>
+                                </div>
+                            </fieldset>
                         </div>
                     <?php endif; ?>
 
-                    <div class="civic-form-group">
-                        <label for="apply-message" class="civic-label">
-                            <span class="dashicons dashicons-edit" aria-hidden="true"></span>
-                            Message (Optional)
+                    <div class="govuk-form-group">
+                        <label class="govuk-label" for="apply-message">
+                            Message <span class="govuk-hint govuk-!-display-inline">(optional)</span>
                         </label>
-                        <textarea name="message" id="apply-message" rows="3" class="civic-textarea"
+                        <textarea name="message" id="apply-message" rows="3" class="govuk-textarea"
                                   placeholder="Tell them why you'd like to volunteer..."></textarea>
                     </div>
 
-                    <button type="submit" class="civic-btn civic-btn--full">
-                        <span class="dashicons dashicons-yes" aria-hidden="true"></span>
+                    <button type="submit" class="govuk-button" data-module="govuk-button" style="width: 100%;">
+                        <i class="fa-solid fa-check govuk-!-margin-right-1" aria-hidden="true"></i>
                         Apply Now
                     </button>
                 </form>
             <?php else: ?>
-                <div class="civic-login-prompt">
-                    <span class="dashicons dashicons-lock" aria-hidden="true"></span>
-                    <p>Join our community to volunteer.</p>
-                    <a href="<?= $basePath ?>/login" class="civic-btn civic-btn--full">
+                <div class="govuk-inset-text">
+                    <p class="govuk-body"><i class="fa-solid fa-lock govuk-!-margin-right-1" aria-hidden="true"></i> Join our community to volunteer.</p>
+                    <a href="<?= $basePath ?>/login" class="govuk-button" data-module="govuk-button" style="width: 100%;">
                         Login to Apply
                     </a>
                 </div>
             <?php endif; ?>
         </div>
-    </aside>
+    </div>
 </div>
 
-<?php require __DIR__ . '/../../layouts/civicone/footer.php'; ?>
+<?php require dirname(__DIR__, 2) . '/layouts/civicone/footer.php'; ?>

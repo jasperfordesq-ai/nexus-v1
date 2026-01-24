@@ -1,63 +1,49 @@
 <?php
-// CivicOne Listing Create - WCAG 2.1 AA Compliant
-// GOV.UK Form Template (Template D)
+/**
+ * CivicOne View: Create Listing
+ * GOV.UK Design System Compliant (WCAG 2.1 AA)
+ */
 if (session_status() === PHP_SESSION_NONE) session_start();
 
-$hTitle = 'Post a New Listing';
-$hSubtitle = 'Share your skills or ask for help from the community';
-$hType = 'Listings';
-
+$pageTitle = 'Post a New Listing';
 require dirname(__DIR__, 2) . '/layouts/civicone/header.php';
 $basePath = \Nexus\Core\TenantContext::getBasePath();
 ?>
 
-<?php
-$breadcrumbs = [
-    ['label' => 'Home', 'url' => '/'],
-    ['label' => 'Offers & Requests', 'url' => '/listings'],
-    ['label' => 'Post New Listing']
-];
-require dirname(__DIR__, 2) . '/layouts/civicone/partials/breadcrumb.php';
-?>
+<nav class="govuk-breadcrumbs govuk-!-margin-bottom-6" aria-label="Breadcrumb">
+    <ol class="govuk-breadcrumbs__list">
+        <li class="govuk-breadcrumbs__list-item">
+            <a class="govuk-breadcrumbs__link" href="<?= $basePath ?>">Home</a>
+        </li>
+        <li class="govuk-breadcrumbs__list-item">
+            <a class="govuk-breadcrumbs__link" href="<?= $basePath ?>/listings">Offers & Requests</a>
+        </li>
+        <li class="govuk-breadcrumbs__list-item" aria-current="page">Post New Listing</li>
+    </ol>
+</nav>
 
-<!-- GOV.UK Page Template Boilerplate -->
-<div class="civicone-width-container civicone--govuk">
-    <main class="civicone-main-wrapper" role="main">
+<a href="<?= $basePath ?>/listings" class="govuk-back-link govuk-!-margin-bottom-6">Back to all listings</a>
 
-        <!-- Back Link (optional) -->
-        <a href="<?= $basePath ?>/listings" class="civicone-back-link">
-            Back to all listings
-        </a>
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
 
-        <!-- Page Header -->
-        <div class="civicone-grid-row">
-            <div class="civicone-grid-column-two-thirds">
-                <h1 class="civicone-heading-xl">Post a new listing</h1>
-                <p class="civicone-body-l">
-                    Share your skills, services, or items with the community, or request help with something you need.
-                </p>
-            </div>
-        </div>
+        <h1 class="govuk-heading-xl">Post a new listing</h1>
+        <p class="govuk-body-l govuk-!-margin-bottom-6">
+            Share your skills, services, or items with the community, or request help with something you need.
+        </p>
 
-        <!-- Form Container -->
-        <div class="civicone-grid-row">
-            <div class="civicone-grid-column-two-thirds">
+        <?php
+        // Variables for shared form partial
+        $listing = null;
+        $formAction = $basePath . '/listings/store';
+        $submitLabel = 'Post listing';
+        $isEdit = false;
 
-                <?php
-                // Variables for shared form partial
-                $listing = null; // No listing data for create mode
-                $formAction = $basePath . '/listings/store';
-                $submitLabel = 'Post listing';
-                $isEdit = false;
+        // Include shared form partial
+        require __DIR__ . '/_form.php';
+        ?>
 
-                // Include shared form partial
-                require __DIR__ . '/_form.php';
-                ?>
-
-            </div>
-        </div>
-
-    </main>
-</div><!-- /width-container -->
+    </div>
+</div>
 
 <?php require dirname(__DIR__, 2) . '/layouts/civicone/footer.php'; ?>

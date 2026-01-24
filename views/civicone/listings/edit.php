@@ -1,85 +1,76 @@
 <?php
-// CivicOne Listing Edit - WCAG 2.1 AA Compliant
-// GOV.UK Form Template (Template D)
+/**
+ * CivicOne View: Edit Listing
+ * GOV.UK Design System Compliant (WCAG 2.1 AA)
+ */
 if (session_status() === PHP_SESSION_NONE) session_start();
 
-$hTitle = 'Edit Listing';
-$hSubtitle = 'Update your offer or request details';
-$hType = 'Listings';
-
+$pageTitle = 'Edit Listing';
 require dirname(__DIR__, 2) . '/layouts/civicone/header.php';
 $basePath = \Nexus\Core\TenantContext::getBasePath();
 ?>
 
-<?php
-$breadcrumbs = [
-    ['label' => 'Home', 'url' => '/'],
-    ['label' => 'Offers & Requests', 'url' => '/listings'],
-    ['label' => htmlspecialchars($listing['title']), 'url' => '/listings/' . $listing['id']],
-    ['label' => 'Edit']
-];
-require dirname(__DIR__, 2) . '/layouts/civicone/partials/breadcrumb.php';
-?>
+<nav class="govuk-breadcrumbs govuk-!-margin-bottom-6" aria-label="Breadcrumb">
+    <ol class="govuk-breadcrumbs__list">
+        <li class="govuk-breadcrumbs__list-item">
+            <a class="govuk-breadcrumbs__link" href="<?= $basePath ?>">Home</a>
+        </li>
+        <li class="govuk-breadcrumbs__list-item">
+            <a class="govuk-breadcrumbs__link" href="<?= $basePath ?>/listings">Offers & Requests</a>
+        </li>
+        <li class="govuk-breadcrumbs__list-item">
+            <a class="govuk-breadcrumbs__link" href="<?= $basePath ?>/listings/<?= $listing['id'] ?>"><?= htmlspecialchars($listing['title']) ?></a>
+        </li>
+        <li class="govuk-breadcrumbs__list-item" aria-current="page">Edit</li>
+    </ol>
+</nav>
 
-<!-- GOV.UK Page Template Boilerplate -->
-<div class="civicone-width-container civicone--govuk">
-    <main class="civicone-main-wrapper" role="main">
+<a href="<?= $basePath ?>/listings/<?= $listing['id'] ?>" class="govuk-back-link govuk-!-margin-bottom-6">Back to listing</a>
 
-        <!-- Back Link (optional) -->
-        <a href="<?= $basePath ?>/listings/<?= $listing['id'] ?>" class="civicone-back-link">
-            Back to listing
-        </a>
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
 
-        <!-- Page Header -->
-        <div class="civicone-grid-row">
-            <div class="civicone-grid-column-two-thirds">
-                <h1 class="civicone-heading-xl">Edit listing</h1>
-                <p class="civicone-body-l">
-                    Update the details of your listing. Your changes will be visible to the community immediately.
-                </p>
-            </div>
+        <h1 class="govuk-heading-xl">Edit listing</h1>
+        <p class="govuk-body-l govuk-!-margin-bottom-6">
+            Update the details of your listing. Your changes will be visible to the community immediately.
+        </p>
+
+        <?php
+        // Variables for shared form partial
+        $formAction = $basePath . '/listings/update';
+        $submitLabel = 'Save changes';
+        $isEdit = true;
+
+        // Include shared form partial
+        require __DIR__ . '/_form.php';
+        ?>
+
+        <!-- Delete Section -->
+        <?php if ($listing['status'] !== 'deleted'): ?>
+        <hr class="govuk-section-break govuk-section-break--xl govuk-section-break--visible">
+
+        <div class="govuk-!-padding-6" style="border: 2px solid #d4351c; background: #fef7f7;">
+            <h2 class="govuk-heading-m" style="color: #d4351c;">
+                <i class="fa-solid fa-triangle-exclamation govuk-!-margin-right-1" aria-hidden="true"></i>
+                Delete this listing
+            </h2>
+            <p class="govuk-body">
+                Once you delete this listing, there is no going back. This action cannot be undone.
+            </p>
+
+            <form action="<?= $basePath ?>/listings/delete" method="POST"
+                  onsubmit="return confirm('Are you sure you want to delete this listing? This action cannot be undone.');">
+                <?= \Nexus\Core\Csrf::input() ?>
+                <input type="hidden" name="id" value="<?= $listing['id'] ?>">
+
+                <button type="submit" class="govuk-button govuk-button--warning" data-module="govuk-button">
+                    <i class="fa-solid fa-trash govuk-!-margin-right-1" aria-hidden="true"></i> Delete listing
+                </button>
+            </form>
         </div>
+        <?php endif; ?>
 
-        <!-- Form Container -->
-        <div class="civicone-grid-row">
-            <div class="civicone-grid-column-two-thirds">
-
-                <?php
-                // Variables for shared form partial
-                // $listing is already available from controller
-                $formAction = $basePath . '/listings/update';
-                $submitLabel = 'Save changes';
-                $isEdit = true;
-
-                // Include shared form partial
-                require __DIR__ . '/_form.php';
-                ?>
-
-                <!-- Delete Action - Separate Form -->
-                <?php if ($listing['status'] !== 'deleted'): ?>
-                <div class="civicone-form-section civicone-form-section--danger">
-                    <h2 class="civicone-heading-m">Delete this listing</h2>
-                    <p class="civicone-body">
-                        Once you delete this listing, there is no going back. This action cannot be undone.
-                    </p>
-
-                    <form action="<?= $basePath ?>/listings/delete" method="POST"
-                          onsubmit="return confirm('Are you sure you want to delete this listing? This action cannot be undone.');"
-                          class="civicone-form-delete">
-                        <?= \Nexus\Core\Csrf::input() ?>
-                        <input type="hidden" name="id" value="<?= $listing['id'] ?>">
-
-                        <button type="submit" class="civicone-button civicone-button--warning">
-                            Delete listing
-                        </button>
-                    </form>
-                </div>
-                <?php endif; ?>
-
-            </div>
-        </div>
-
-    </main>
-</div><!-- /width-container -->
+    </div>
+</div>
 
 <?php require dirname(__DIR__, 2) . '/layouts/civicone/footer.php'; ?>

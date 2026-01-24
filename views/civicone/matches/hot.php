@@ -1,7 +1,7 @@
 <?php
 /**
  * Hot Matches Page - Dedicated view for high-score matches (85%+)
- * CivicOne accessible version
+ * GOV.UK Design System Compliant (WCAG 2.1 AA)
  */
 $hTitle = $page_title ?? "Hot Matches";
 $hSubtitle = "High-compatibility matches nearby - act fast!";
@@ -14,40 +14,51 @@ $basePath = Nexus\Core\TenantContext::getBasePath();
 $matches = $matches ?? [];
 ?>
 
-<div class="hot-container">
-    <a href="<?= $basePath ?>/matches" class="back-link">
-        <i class="fa-solid fa-arrow-left" aria-hidden="true"></i>
-        Back to All Matches
-    </a>
+<nav class="govuk-breadcrumbs govuk-!-margin-bottom-6" aria-label="Breadcrumb">
+    <ol class="govuk-breadcrumbs__list">
+        <li class="govuk-breadcrumbs__list-item">
+            <a class="govuk-breadcrumbs__link" href="<?= $basePath ?>">Home</a>
+        </li>
+        <li class="govuk-breadcrumbs__list-item">
+            <a class="govuk-breadcrumbs__link" href="<?= $basePath ?>/matches">Matches</a>
+        </li>
+        <li class="govuk-breadcrumbs__list-item" aria-current="page">Hot Matches</li>
+    </ol>
+</nav>
 
-    <div class="hot-header">
-        <h1 class="hot-title">Hot Matches</h1>
-        <p class="hot-subtitle">These are your highest compatibility matches - 85% or above!</p>
-    </div>
+<a href="<?= $basePath ?>/matches" class="govuk-back-link govuk-!-margin-bottom-6">Back to All Matches</a>
 
-    <div class="hot-count-badge" role="status">
-        <span aria-hidden="true">🔥</span>
-        <?= count($matches) ?> Hot Match<?= count($matches) !== 1 ? 'es' : '' ?> Found
-    </div>
+<h1 class="govuk-heading-xl">
+    <span aria-hidden="true">🔥</span> Hot Matches
+</h1>
+<p class="govuk-body-l govuk-!-margin-bottom-6">These are your highest compatibility matches - 85% or above!</p>
 
-    <?php if (empty($matches)): ?>
-        <div class="empty-state" role="status">
-            <div class="empty-state-icon" aria-hidden="true">🔥</div>
-            <h2>No Hot Matches Yet</h2>
-            <p>Hot matches are listings with 85%+ compatibility and close proximity. Try adding more listings or expanding your preferences!</p>
-            <a href="<?= $basePath ?>/listings/create" class="btn btn-primary">
-                <i class="fa-solid fa-plus" aria-hidden="true"></i>
-                Create a Listing
-            </a>
-        </div>
-    <?php else: ?>
-        <div class="match-cards-grid" role="list" aria-label="Hot matches">
-            <?php foreach ($matches as $match): ?>
-                <?php include __DIR__ . '/_match_card.php'; ?>
-            <?php endforeach; ?>
-        </div>
-    <?php endif; ?>
+<div class="govuk-!-margin-bottom-6" role="status">
+    <span class="govuk-tag govuk-tag--green govuk-tag--large">
+        🔥 <?= count($matches) ?> Hot Match<?= count($matches) !== 1 ? 'es' : '' ?> Found
+    </span>
 </div>
+
+<?php if (empty($matches)): ?>
+    <div class="govuk-inset-text" role="status">
+        <p class="govuk-body-l govuk-!-margin-bottom-2">
+            <span aria-hidden="true">🔥</span>
+            <strong>No Hot Matches Yet</strong>
+        </p>
+        <p class="govuk-body govuk-!-margin-bottom-4">Hot matches are listings with 85%+ compatibility and close proximity. Try adding more listings or expanding your preferences!</p>
+        <a href="<?= $basePath ?>/listings/create" class="govuk-button" data-module="govuk-button">
+            <i class="fa-solid fa-plus govuk-!-margin-right-1" aria-hidden="true"></i> Create a Listing
+        </a>
+    </div>
+<?php else: ?>
+    <div class="govuk-grid-row" role="list" aria-label="Hot matches">
+        <?php foreach ($matches as $match): ?>
+            <div class="govuk-grid-column-one-third govuk-!-margin-bottom-6">
+                <?php include __DIR__ . '/_match_card.php'; ?>
+            </div>
+        <?php endforeach; ?>
+    </div>
+<?php endif; ?>
 
 <script>
 function trackMatchInteraction(listingId, action, matchScore, distance) {
@@ -60,7 +71,7 @@ function trackMatchInteraction(listingId, action, matchScore, distance) {
             match_score: matchScore,
             distance: distance
         })
-    }).catch(console.error);
+    }).catch(function(err) { console.warn('Track error:', err); });
 }
 </script>
 

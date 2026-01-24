@@ -1,191 +1,204 @@
 <?php
-// CivicOne View: User Insights Dashboard
-// GOV.UK Design System Compliant - text-only labels
-
-$hTitle = 'My Insights';
-$hSubtitle = 'Personal Transaction Analytics';
-$hGradient = 'htb-hero-gradient-wallet';
-$hType = 'Analytics';
+/**
+ * CivicOne View: User Insights Dashboard
+ * GOV.UK Design System Compliant (WCAG 2.1 AA)
+ */
+$pageTitle = 'My Insights';
 $hideHero = true;
 
 require dirname(__DIR__, 2) . '/layouts/civicone/header.php';
+$basePath = \Nexus\Core\TenantContext::getBasePath();
 ?>
 
-<div class="insights-bg"></div>
+<nav class="govuk-breadcrumbs govuk-!-margin-bottom-6" aria-label="Breadcrumb">
+    <ol class="govuk-breadcrumbs__list">
+        <li class="govuk-breadcrumbs__list-item">
+            <a class="govuk-breadcrumbs__link" href="<?= $basePath ?>">Home</a>
+        </li>
+        <li class="govuk-breadcrumbs__list-item">
+            <a class="govuk-breadcrumbs__link" href="<?= $basePath ?>/wallet">Wallet</a>
+        </li>
+        <li class="govuk-breadcrumbs__list-item" aria-current="page">Insights</li>
+    </ol>
+</nav>
 
-<div class="insights-container">
-    <!-- Header -->
-    <div class="insights-header">
-        <div class="insights-title">
-            <div>
-                <h1>My Insights</h1>
-                <div class="insights-title-sub">Your personal timebanking analytics</div>
-            </div>
-        </div>
-        <nav role="navigation" aria-label="Main navigation" class="insights-nav">
-            <a href="<?= \Nexus\Core\TenantContext::getBasePath() ?>/wallet" class="insights-nav-link">Wallet</a>
-            <a href="<?= \Nexus\Core\TenantContext::getBasePath() ?>/members" class="insights-nav-link">Find Members</a>
-        </nav>
+<div class="govuk-grid-row govuk-!-margin-bottom-6">
+    <div class="govuk-grid-column-two-thirds">
+        <h1 class="govuk-heading-xl">
+            <i class="fa-solid fa-chart-line govuk-!-margin-right-2" aria-hidden="true"></i>
+            My Insights
+        </h1>
+        <p class="govuk-body-l">Your personal timebanking analytics</p>
     </div>
+    <div class="govuk-grid-column-one-third govuk-!-text-align-right">
+        <a href="<?= $basePath ?>/wallet" class="govuk-button govuk-button--secondary" data-module="govuk-button">
+            <i class="fa-solid fa-wallet govuk-!-margin-right-1" aria-hidden="true"></i>
+            Wallet
+        </a>
+        <a href="<?= $basePath ?>/members" class="govuk-button govuk-button--secondary" data-module="govuk-button">
+            <i class="fa-solid fa-users govuk-!-margin-right-1" aria-hidden="true"></i>
+            Find Members
+        </a>
+    </div>
+</div>
 
-    <!-- Stats Grid -->
-    <div class="insights-stats-grid">
-        <div class="insights-glass-card insights-stat-card">
-            <div class="insights-stat-value positive">+<?= number_format($insights['total_received'] ?? 0, 1) ?></div>
-            <div class="insights-stat-label">Total Received</div>
+<!-- Stats Grid -->
+<div class="govuk-grid-row govuk-!-margin-bottom-6">
+    <div class="govuk-grid-column-one-quarter">
+        <div class="govuk-!-padding-4" style="background: #f3f2f1; text-align: center;">
+            <p class="govuk-heading-l govuk-!-margin-bottom-1" style="color: #00703c;">+<?= number_format($insights['total_received'] ?? 0, 1) ?></p>
+            <p class="govuk-body-s govuk-!-margin-bottom-0" style="color: #505a5f;">Total Received</p>
         </div>
-        <div class="insights-glass-card insights-stat-card">
-            <div class="insights-stat-value negative">-<?= number_format($insights['total_sent'] ?? 0, 1) ?></div>
-            <div class="insights-stat-label">Total Sent</div>
+    </div>
+    <div class="govuk-grid-column-one-quarter">
+        <div class="govuk-!-padding-4" style="background: #f3f2f1; text-align: center;">
+            <p class="govuk-heading-l govuk-!-margin-bottom-1" style="color: #d4351c;">-<?= number_format($insights['total_sent'] ?? 0, 1) ?></p>
+            <p class="govuk-body-s govuk-!-margin-bottom-0" style="color: #505a5f;">Total Sent</p>
         </div>
-        <div class="insights-glass-card insights-stat-card">
-            <div class="insights-stat-value"><?= $insights['transaction_count'] ?? 0 ?></div>
-            <div class="insights-stat-label">Transactions</div>
+    </div>
+    <div class="govuk-grid-column-one-quarter">
+        <div class="govuk-!-padding-4" style="background: #f3f2f1; text-align: center;">
+            <p class="govuk-heading-l govuk-!-margin-bottom-1"><?= $insights['transaction_count'] ?? 0 ?></p>
+            <p class="govuk-body-s govuk-!-margin-bottom-0" style="color: #505a5f;">Transactions</p>
         </div>
-        <div class="insights-glass-card insights-stat-card">
-            <div class="insights-stat-value <?= ($insights['net_change'] ?? 0) >= 0 ? 'positive' : 'negative' ?>">
+    </div>
+    <div class="govuk-grid-column-one-quarter">
+        <div class="govuk-!-padding-4" style="background: #f3f2f1; text-align: center;">
+            <p class="govuk-heading-l govuk-!-margin-bottom-1" style="color: <?= ($insights['net_change'] ?? 0) >= 0 ? '#00703c' : '#d4351c' ?>;">
                 <?= ($insights['net_change'] ?? 0) >= 0 ? '+' : '' ?><?= number_format($insights['net_change'] ?? 0, 1) ?>
-            </div>
-            <div class="insights-stat-label">Net Change</div>
+            </p>
+            <p class="govuk-body-s govuk-!-margin-bottom-0" style="color: #505a5f;">Net Change</p>
         </div>
     </div>
+</div>
 
-    <!-- Main Grid: Chart + Streak -->
-    <div class="insights-grid">
-        <!-- Monthly Trends Chart -->
-        <div class="insights-glass-card">
-            <div class="insights-section-header">
-                <h3 class="insights-section-title">Monthly Activity</h3>
-            </div>
-            <div class="insights-chart-container">
+<div class="govuk-grid-row govuk-!-margin-bottom-6">
+    <!-- Monthly Trends Chart -->
+    <div class="govuk-grid-column-two-thirds">
+        <div class="govuk-!-padding-4" style="border: 1px solid #b1b4b6;">
+            <h2 class="govuk-heading-m">
+                <i class="fa-solid fa-chart-area govuk-!-margin-right-2" aria-hidden="true"></i>
+                Monthly Activity
+            </h2>
+            <div style="height: 300px;">
                 <canvas id="trendsChart"></canvas>
             </div>
         </div>
+    </div>
 
-        <!-- Activity Streak -->
-        <div class="insights-glass-card">
-            <div class="insights-section-header">
-                <h3 class="insights-section-title">Activity Streak</h3>
-            </div>
-            <div class="streak-display">
-                <div class="streak-value"><?= $streak['current'] ?? 0 ?></div>
-                <div class="streak-label">
+    <!-- Activity Streak -->
+    <div class="govuk-grid-column-one-third">
+        <div class="govuk-!-padding-4" style="border: 1px solid #b1b4b6; height: 100%;">
+            <h2 class="govuk-heading-m">
+                <i class="fa-solid fa-fire govuk-!-margin-right-2" aria-hidden="true"></i>
+                Activity Streak
+            </h2>
+            <div style="text-align: center; padding: 2rem 0;">
+                <p class="govuk-heading-xl govuk-!-margin-bottom-1" style="color: #1d70b8;"><?= $streak['current'] ?? 0 ?></p>
+                <p class="govuk-body govuk-!-margin-bottom-2" style="color: #505a5f;">
                     <?= ($streak['current'] ?? 0) === 1 ? 'day' : 'days' ?> streak
-                </div>
+                </p>
                 <?php if (($streak['current'] ?? 0) >= 7): ?>
-                <div class="streak-message streak-message--hot">Great progress! Keep it up!</div>
+                    <span class="govuk-tag govuk-tag--green">Great progress!</span>
                 <?php elseif (($streak['current'] ?? 0) >= 3): ?>
-                <div class="streak-message streak-message--warm">Nice momentum!</div>
+                    <span class="govuk-tag govuk-tag--blue">Nice momentum!</span>
                 <?php elseif (($streak['current'] ?? 0) > 0): ?>
-                <div class="streak-message streak-message--growing">Growing strong!</div>
+                    <span class="govuk-tag govuk-tag--yellow">Growing strong!</span>
                 <?php else: ?>
-                <div class="streak-message streak-message--empty">Make a transaction to start your streak!</div>
+                    <span class="govuk-tag govuk-tag--grey">Start your streak!</span>
                 <?php endif; ?>
             </div>
-            <div class="streak-footer">
-                <div class="streak-footer-content">
-                    Longest streak: <strong class="streak-footer-value"><?= $streak['longest'] ?? 0 ?> days</strong>
-                </div>
-            </div>
+            <hr class="govuk-section-break govuk-section-break--visible">
+            <p class="govuk-body-s govuk-!-margin-top-2" style="color: #505a5f;">
+                Longest streak: <strong><?= $streak['longest'] ?? 0 ?> days</strong>
+            </p>
         </div>
     </div>
+</div>
 
-    <!-- Two Column: Partners -->
-    <div class="insights-grid-2">
-        <!-- People You've Helped -->
-        <div class="insights-glass-card">
-            <div class="insights-section-header">
-                <h3 class="insights-section-title">People You've Helped</h3>
-            </div>
+<!-- Partners Grid -->
+<div class="govuk-grid-row govuk-!-margin-bottom-6">
+    <!-- People You've Helped -->
+    <div class="govuk-grid-column-one-half">
+        <div class="govuk-!-padding-4" style="border: 1px solid #b1b4b6;">
+            <h2 class="govuk-heading-m">
+                <i class="fa-solid fa-hand-holding-heart govuk-!-margin-right-2" aria-hidden="true"></i>
+                People You've Helped
+            </h2>
             <?php if (empty($topGivingPartners)): ?>
-            <div class="insights-empty">
-                <p>Send credits to see who you've helped!</p>
-            </div>
+                <p class="govuk-body" style="color: #505a5f;">Send credits to see who you've helped!</p>
             <?php else: ?>
-            <div class="insights-partner-list">
-                <?php foreach ($topGivingPartners as $i => $partner): ?>
-                <div class="insights-partner-item">
-                    <div class="insights-partner-rank"><?= $i + 1 ?></div>
-                    <div class="insights-partner-avatar">
-                        <?php if (!empty($partner['avatar_url'])): ?>
-                            <img src="<?= htmlspecialchars($partner['avatar_url']) ?>" loading="lazy" alt="">
-                        <?php else: ?>
-                            <?= strtoupper(substr($partner['display_name'] ?? 'U', 0, 1)) ?>
-                        <?php endif; ?>
-                    </div>
-                    <div class="insights-partner-info">
-                        <div class="insights-partner-name"><?= htmlspecialchars($partner['display_name']) ?></div>
-                        <div class="insights-partner-count"><?= $partner['transaction_count'] ?> transactions</div>
-                    </div>
-                    <div class="insights-partner-amount given">-<?= number_format($partner['total_amount'], 1) ?></div>
-                </div>
-                <?php endforeach; ?>
-            </div>
-            <?php endif; ?>
-        </div>
-
-        <!-- People Who've Helped You -->
-        <div class="insights-glass-card">
-            <div class="insights-section-header">
-                <h3 class="insights-section-title">People Who've Helped You</h3>
-            </div>
-            <?php if (empty($topReceivingPartners)): ?>
-            <div class="insights-empty">
-                <p>Receive credits to see your helpers!</p>
-            </div>
-            <?php else: ?>
-            <div class="insights-partner-list">
-                <?php foreach ($topReceivingPartners as $i => $partner): ?>
-                <div class="insights-partner-item">
-                    <div class="insights-partner-rank"><?= $i + 1 ?></div>
-                    <div class="insights-partner-avatar">
-                        <?php if (!empty($partner['avatar_url'])): ?>
-                            <img src="<?= htmlspecialchars($partner['avatar_url']) ?>" loading="lazy" alt="">
-                        <?php else: ?>
-                            <?= strtoupper(substr($partner['display_name'] ?? 'U', 0, 1)) ?>
-                        <?php endif; ?>
-                    </div>
-                    <div class="insights-partner-info">
-                        <div class="insights-partner-name"><?= htmlspecialchars($partner['display_name']) ?></div>
-                        <div class="insights-partner-count"><?= $partner['transaction_count'] ?> transactions</div>
-                    </div>
-                    <div class="insights-partner-amount received">+<?= number_format($partner['total_amount'], 1) ?></div>
-                </div>
-                <?php endforeach; ?>
-            </div>
+                <ul class="govuk-list">
+                    <?php foreach ($topGivingPartners as $i => $partner): ?>
+                    <li class="govuk-!-padding-2 govuk-!-margin-bottom-2" style="background: #f8f8f8; display: flex; align-items: center; gap: 0.75rem;">
+                        <span class="govuk-tag govuk-tag--grey"><?= $i + 1 ?></span>
+                        <div style="flex-grow: 1;">
+                            <strong class="govuk-body-s govuk-!-margin-bottom-0"><?= htmlspecialchars($partner['display_name']) ?></strong>
+                            <p class="govuk-body-s govuk-!-margin-bottom-0" style="color: #505a5f;"><?= $partner['transaction_count'] ?> transactions</p>
+                        </div>
+                        <span class="govuk-body" style="color: #d4351c; font-weight: bold;">-<?= number_format($partner['total_amount'], 1) ?></span>
+                    </li>
+                    <?php endforeach; ?>
+                </ul>
             <?php endif; ?>
         </div>
     </div>
 
-    <!-- Community Impact -->
-    <div class="insights-glass-card">
-        <div class="insights-section-header">
-            <h3 class="insights-section-title">Your Community Impact</h3>
+    <!-- People Who've Helped You -->
+    <div class="govuk-grid-column-one-half">
+        <div class="govuk-!-padding-4" style="border: 1px solid #b1b4b6;">
+            <h2 class="govuk-heading-m">
+                <i class="fa-solid fa-hands-helping govuk-!-margin-right-2" aria-hidden="true"></i>
+                People Who've Helped You
+            </h2>
+            <?php if (empty($topReceivingPartners)): ?>
+                <p class="govuk-body" style="color: #505a5f;">Receive credits to see your helpers!</p>
+            <?php else: ?>
+                <ul class="govuk-list">
+                    <?php foreach ($topReceivingPartners as $i => $partner): ?>
+                    <li class="govuk-!-padding-2 govuk-!-margin-bottom-2" style="background: #f8f8f8; display: flex; align-items: center; gap: 0.75rem;">
+                        <span class="govuk-tag govuk-tag--grey"><?= $i + 1 ?></span>
+                        <div style="flex-grow: 1;">
+                            <strong class="govuk-body-s govuk-!-margin-bottom-0"><?= htmlspecialchars($partner['display_name']) ?></strong>
+                            <p class="govuk-body-s govuk-!-margin-bottom-0" style="color: #505a5f;"><?= $partner['transaction_count'] ?> transactions</p>
+                        </div>
+                        <span class="govuk-body" style="color: #00703c; font-weight: bold;">+<?= number_format($partner['total_amount'], 1) ?></span>
+                    </li>
+                    <?php endforeach; ?>
+                </ul>
+            <?php endif; ?>
         </div>
-        <div class="community-stats">
-            <div class="community-stat">
-                <div class="community-stat-value"><?= $partnerStats['unique_giving'] ?? 0 ?></div>
-                <div class="community-stat-label">People You've Helped</div>
-            </div>
-            <div class="community-stat">
-                <div class="community-stat-value"><?= $partnerStats['unique_receiving'] ?? 0 ?></div>
-                <div class="community-stat-label">People Who've Helped You</div>
-            </div>
-            <div class="community-stat">
-                <div class="community-stat-value"><?= ($partnerStats['unique_giving'] ?? 0) + ($partnerStats['unique_receiving'] ?? 0) ?></div>
-                <div class="community-stat-label">Total Connections</div>
-            </div>
-            <div class="community-stat">
-                <div class="community-stat-value"><?= number_format($insights['avg_transaction'] ?? 0, 1) ?></div>
-                <div class="community-stat-label">Avg Transaction Size</div>
-            </div>
+    </div>
+</div>
+
+<!-- Community Impact -->
+<div class="govuk-!-padding-4 govuk-!-margin-bottom-6" style="border: 1px solid #b1b4b6;">
+    <h2 class="govuk-heading-m">
+        <i class="fa-solid fa-heart govuk-!-margin-right-2" aria-hidden="true"></i>
+        Your Community Impact
+    </h2>
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-one-quarter" style="text-align: center;">
+            <p class="govuk-heading-l govuk-!-margin-bottom-1"><?= $partnerStats['unique_giving'] ?? 0 ?></p>
+            <p class="govuk-body-s" style="color: #505a5f;">People You've Helped</p>
+        </div>
+        <div class="govuk-grid-column-one-quarter" style="text-align: center;">
+            <p class="govuk-heading-l govuk-!-margin-bottom-1"><?= $partnerStats['unique_receiving'] ?? 0 ?></p>
+            <p class="govuk-body-s" style="color: #505a5f;">People Who've Helped You</p>
+        </div>
+        <div class="govuk-grid-column-one-quarter" style="text-align: center;">
+            <p class="govuk-heading-l govuk-!-margin-bottom-1"><?= ($partnerStats['unique_giving'] ?? 0) + ($partnerStats['unique_receiving'] ?? 0) ?></p>
+            <p class="govuk-body-s" style="color: #505a5f;">Total Connections</p>
+        </div>
+        <div class="govuk-grid-column-one-quarter" style="text-align: center;">
+            <p class="govuk-heading-l govuk-!-margin-bottom-1"><?= number_format($insights['avg_transaction'] ?? 0, 1) ?></p>
+            <p class="govuk-body-s" style="color: #505a5f;">Avg Transaction Size</p>
         </div>
     </div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-// Monthly Trends Chart
 const ctx = document.getElementById('trendsChart');
 if (ctx) {
     const isDark = document.documentElement.getAttribute('data-theme') === 'dark';

@@ -167,7 +167,7 @@ require __DIR__ . '/../layouts/civicone/header.php';
     <main class="govuk-main-wrapper" role="main">
 
         <!-- Page Header with Caption - GOV.UK page header pattern -->
-        <header class="civicone-page-header">
+        <header class="govuk-!-margin-bottom-6">
             <span class="govuk-caption-xl"><?= htmlspecialchars($tenantName) ?></span>
             <h1 class="govuk-heading-xl govuk-!-margin-bottom-4"><?= htmlspecialchars($hTitle) ?></h1>
             <p class="govuk-body-l govuk-!-margin-bottom-6"><?= htmlspecialchars($hSubtitle) ?></p>
@@ -209,17 +209,17 @@ require __DIR__ . '/../layouts/civicone/header.php';
                 <!-- Quick Actions for Members - GOV.UK task list pattern -->
                 <section aria-labelledby="actions-heading">
                     <h2 class="govuk-heading-m" id="actions-heading">What would you like to do?</h2>
-                    <ul class="govuk-list civicone-action-list" role="list">
-                        <li class="civicone-action-item">
-                            <a href="<?= $basePath ?>/compose?type=listing" class="govuk-link civicone-action-link">Post a listing</a>
+                    <ul class="govuk-list govuk-list--spaced" role="list">
+                        <li class="govuk-!-margin-bottom-4">
+                            <a href="<?= $basePath ?>/compose?type=listing" class="govuk-link govuk-!-font-weight-bold">Post a listing</a>
                             <p class="govuk-hint govuk-!-margin-top-1 govuk-!-margin-bottom-0">Offer your skills or request help from the community</p>
                         </li>
-                        <li class="civicone-action-item">
-                            <a href="<?= $basePath ?>/listings" class="govuk-link civicone-action-link">Browse listings</a>
+                        <li class="govuk-!-margin-bottom-4">
+                            <a href="<?= $basePath ?>/listings" class="govuk-link govuk-!-font-weight-bold">Browse listings</a>
                             <p class="govuk-hint govuk-!-margin-top-1 govuk-!-margin-bottom-0">See what others are offering or requesting</p>
                         </li>
-                        <li class="civicone-action-item">
-                            <a href="<?= $basePath ?>/members" class="govuk-link civicone-action-link">Find members</a>
+                        <li class="govuk-!-margin-bottom-4">
+                            <a href="<?= $basePath ?>/members" class="govuk-link govuk-!-font-weight-bold">Find members</a>
                             <p class="govuk-hint govuk-!-margin-top-1 govuk-!-margin-bottom-0">Connect with people in your area</p>
                         </li>
                     </ul>
@@ -246,10 +246,10 @@ require __DIR__ . '/../layouts/civicone/header.php';
                                 <?php foreach ($recentListings as $index => $listing): ?>
                                 <tr class="govuk-table__row">
                                     <td class="govuk-table__cell" data-label="Listing">
-                                        <a href="<?= $basePath ?>/listings/<?= (int)$listing['id'] ?>" class="govuk-link civicone-listing-title">
+                                        <a href="<?= $basePath ?>/listings/<?= (int)$listing['id'] ?>" class="govuk-link govuk-!-font-weight-bold">
                                             <?= htmlspecialchars($listing['title']) ?>
                                         </a>
-                                        <p class="civicone-listing-meta govuk-!-margin-bottom-0">
+                                        <p class="govuk-body-s govuk-!-margin-bottom-0" style="color: #505a5f;">
                                             <span class="govuk-visually-hidden">Posted by </span><?= htmlspecialchars($listing['author_name']) ?><?php if (!empty($listing['location'])): ?><span class="govuk-visually-hidden">, location:</span> · <?= htmlspecialchars($listing['location']) ?><?php endif; ?>
                                         </p>
                                     </td>
@@ -283,8 +283,8 @@ require __DIR__ . '/../layouts/civicone/header.php';
                         <div class="govuk-summary-list__row">
                             <dt class="govuk-summary-list__key">
                                 <time datetime="<?= date('Y-m-d\TH:i', strtotime($event['start_time'])) ?>">
-                                    <span class="civicone-event-date"><?= date('j M', strtotime($event['start_time'])) ?></span>
-                                    <span class="civicone-event-time"><?= date('g:ia', strtotime($event['start_time'])) ?></span>
+                                    <span class="govuk-!-font-weight-bold"><?= date('j M', strtotime($event['start_time'])) ?></span><br>
+                                    <span class="govuk-body-s" style="color: #505a5f;"><?= date('g:ia', strtotime($event['start_time'])) ?></span>
                                 </time>
                             </dt>
                             <dd class="govuk-summary-list__value">
@@ -292,7 +292,7 @@ require __DIR__ . '/../layouts/civicone/header.php';
                                     <?= htmlspecialchars($event['title']) ?>
                                 </a>
                                 <?php if (!empty($event['location'])): ?>
-                                <p class="civicone-event-location govuk-!-margin-bottom-0">
+                                <p class="govuk-body-s govuk-!-margin-bottom-0" style="color: #505a5f;">
                                     <span class="govuk-visually-hidden">Location: </span><?= htmlspecialchars($event['location']) ?>
                                 </p>
                                 <?php endif; ?>
@@ -314,35 +314,35 @@ require __DIR__ . '/../layouts/civicone/header.php';
             <div class="govuk-grid-column-one-third">
 
                 <!-- Community Stats - GOV.UK related content pattern -->
-                <aside class="civicone-stats-box" aria-labelledby="stats-heading" role="complementary">
+                <aside class="govuk-!-padding-4 govuk-!-margin-bottom-6" style="background: #f3f2f1;" aria-labelledby="stats-heading" role="complementary">
                     <h2 class="govuk-heading-s" id="stats-heading">Community at a glance</h2>
-                    <dl class="civicone-stats-list govuk-body-s">
-                        <div class="civicone-stat-row">
+                    <dl class="govuk-body-s govuk-!-margin-bottom-0">
+                        <div class="govuk-!-margin-bottom-2" style="display: flex; justify-content: space-between;">
                             <dt>Members:</dt>
-                            <dd><strong><?= number_format($memberCount) ?></strong></dd>
+                            <dd class="govuk-!-margin-left-0"><strong><?= number_format($memberCount) ?></strong></dd>
                         </div>
-                        <div class="civicone-stat-row">
+                        <div class="govuk-!-margin-bottom-2" style="display: flex; justify-content: space-between;">
                             <dt>Listings:</dt>
-                            <dd><strong><?= number_format($listingCount) ?></strong></dd>
+                            <dd class="govuk-!-margin-left-0"><strong><?= number_format($listingCount) ?></strong></dd>
                         </div>
-                        <div class="civicone-stat-row">
+                        <div style="display: flex; justify-content: space-between;">
                             <dt>Groups:</dt>
-                            <dd><strong><?= number_format($groupCount) ?></strong></dd>
+                            <dd class="govuk-!-margin-left-0"><strong><?= number_format($groupCount) ?></strong></dd>
                         </div>
                     </dl>
                 </aside>
 
                 <!-- Featured Groups -->
                 <?php if (!empty($featuredGroups)): ?>
-                <nav aria-labelledby="groups-heading" class="civicone-sidebar-nav">
+                <nav aria-labelledby="groups-heading" class="govuk-!-margin-bottom-6">
                     <h2 class="govuk-heading-s" id="groups-heading">Groups</h2>
                     <ul class="govuk-list" role="list">
                         <?php foreach ($featuredGroups as $group): ?>
-                        <li class="civicone-group-item">
+                        <li class="govuk-!-margin-bottom-3">
                             <a href="<?= $basePath ?>/group/<?= (int)$group['id'] ?>" class="govuk-link govuk-!-font-weight-bold">
                                 <?= htmlspecialchars($group['name']) ?>
                             </a>
-                            <p class="civicone-group-members govuk-!-margin-bottom-0">
+                            <p class="govuk-body-s govuk-!-margin-bottom-0" style="color: #505a5f;">
                                 <?= (int)($group['member_count'] ?? 0) ?> member<?= ($group['member_count'] ?? 0) != 1 ? 's' : '' ?>
                             </p>
                         </li>
@@ -356,9 +356,9 @@ require __DIR__ . '/../layouts/civicone/header.php';
 
                 <!-- Related Links - GOV.UK sidebar pattern -->
                 <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible" aria-hidden="true">
-                <nav class="civicone-help-section" aria-labelledby="related-heading">
+                <nav aria-labelledby="related-heading">
                     <h2 class="govuk-heading-s" id="related-heading">Related links</h2>
-                    <ul class="govuk-list civicone-help-list" role="list">
+                    <ul class="govuk-list govuk-list--spaced" role="list">
                         <li><a href="<?= $basePath ?>/about" class="govuk-link">About this community</a></li>
                         <li><a href="<?= $basePath ?>/help" class="govuk-link">How it works</a></li>
                         <li><a href="<?= $basePath ?>/contact" class="govuk-link">Contact us</a></li>
@@ -374,9 +374,9 @@ require __DIR__ . '/../layouts/civicone/header.php';
         </div><!-- /govuk-grid-row -->
 
         <!-- Back to top link - GOV.UK accessibility pattern -->
-        <div class="civicone-back-to-top">
+        <div class="govuk-!-margin-top-6 govuk-!-text-align-right">
             <a href="#main-content" class="govuk-link govuk-body-s">
-                <svg class="civicone-back-to-top-icon" xmlns="http://www.w3.org/2000/svg" width="13" height="17" viewBox="0 0 13 17" aria-hidden="true" focusable="false">
+                <svg xmlns="http://www.w3.org/2000/svg" width="13" height="17" viewBox="0 0 13 17" aria-hidden="true" focusable="false" style="vertical-align: middle; margin-right: 4px;">
                     <path fill="currentColor" d="M6.5 0L0 6.5 1.4 8l4.6-4.6v13h1.4V3.4L12 8l1.4-1.5L6.5 0z"/>
                 </svg>
                 Back to top

@@ -1,7 +1,7 @@
 <?php
 /**
  * Federation Messages Thread
- * CivicOne Theme - WCAG 2.1 AA Compliant
+ * GOV.UK Design System (WCAG 2.1 AA)
  */
 $pageTitle = $pageTitle ?? "Federated Chat";
 $hideHero = true;
@@ -19,120 +19,134 @@ $canMessage = $canMessage ?? false;
 $cannotMessageReason = $cannotMessageReason ?? '';
 
 $otherName = $otherUser['name'] ?? 'Member';
-$fallbackAvatar = 'https://ui-avatars.com/api/?name=' . urlencode($otherName) . '&background=00796B&color=fff&size=200';
+$fallbackAvatar = 'https://ui-avatars.com/api/?name=' . urlencode($otherName) . '&background=1d70b8&color=fff&size=200';
 $otherAvatar = !empty($otherUser['avatar_url']) ? $otherUser['avatar_url'] : $fallbackAvatar;
 $currentUserId = $_SESSION['user_id'] ?? 0;
 ?>
 
-<!-- Offline Banner -->
-<div class="civic-fed-offline-banner" id="offlineBanner" role="alert" aria-live="polite">
-    <i class="fa-solid fa-wifi-slash" aria-hidden="true"></i>
-    <span>No internet connection</span>
-</div>
+<div class="govuk-width-container">
+    <!-- Offline Banner -->
+    <div class="govuk-notification-banner govuk-notification-banner--warning govuk-!-display-none" id="offlineBanner" role="alert" aria-live="polite" data-module="govuk-notification-banner">
+        <div class="govuk-notification-banner__content">
+            <p class="govuk-notification-banner__heading">
+                <i class="fa-solid fa-wifi-slash govuk-!-margin-right-2" aria-hidden="true"></i>
+                No internet connection
+            </p>
+        </div>
+    </div>
 
-<div class="civic-container">
     <!-- Back Link -->
-    <a href="<?= $basePath ?>/federation/messages" class="civic-fed-back-link" aria-label="Return to inbox">
-        <i class="fa-solid fa-arrow-left" aria-hidden="true"></i>
+    <a href="<?= $basePath ?>/federation/messages" class="govuk-back-link govuk-!-margin-top-4">
         Back to Inbox
     </a>
 
-    <!-- Thread Header -->
-    <header class="civic-fed-thread-header">
-        <img src="<?= htmlspecialchars($otherAvatar) ?>"
-             onerror="this.src='<?= $fallbackAvatar ?>'"
-             alt=""
-             class="civic-fed-avatar"
-             loading="lazy">
-        <div class="civic-fed-thread-info">
-            <h1 class="civic-fed-thread-name"><?= htmlspecialchars($otherName) ?></h1>
-            <span class="civic-fed-thread-tenant">
-                <i class="fa-solid fa-building" aria-hidden="true"></i>
-                <?= htmlspecialchars($otherUser['tenant_name'] ?? 'Partner Timebank') ?>
-            </span>
-        </div>
-        <a href="<?= $basePath ?>/federation/members/<?= $otherUser['id'] ?? 0 ?>" class="civic-fed-btn civic-fed-btn--secondary" aria-label="View <?= htmlspecialchars($otherName) ?>'s profile">
-            <i class="fa-solid fa-user" aria-hidden="true"></i>
-            <span>View Profile</span>
-        </a>
-    </header>
-
-    <!-- Messages Container -->
-    <div class="civic-fed-messages-container" id="messages-container" role="log" aria-label="Message history" aria-live="polite">
-        <?php if (!empty($messages)): ?>
-            <?php
-            $lastType = null;
-            foreach ($messages as $msg):
-                $isSent = $msg['message_type'] === 'sent';
-                $groupClass = $isSent ? 'civic-fed-message-group--sent' : 'civic-fed-message-group--received';
-                $msgTime = strtotime($msg['created_at']);
-                $isoTime = date('c', $msgTime);
-                $displayTime = date('M j, g:i a', $msgTime);
-
-                // Start new group if direction changed
-                if ($lastType !== $groupClass):
-                    if ($lastType !== null) echo '</div>';
-            ?>
-                <div class="civic-fed-message-group <?= $groupClass ?>" role="group" aria-label="<?= $isSent ? 'Your messages' : 'Messages from ' . htmlspecialchars($otherName) ?>">
-            <?php
-                endif;
-                $lastType = $groupClass;
-            ?>
-                    <div class="civic-fed-message-bubble <?= $isSent ? 'civic-fed-message-bubble--sent' : 'civic-fed-message-bubble--received' ?>" aria-label="<?= $isSent ? 'You wrote' : htmlspecialchars($otherName) . ' wrote' ?>">
-                        <?= nl2br(htmlspecialchars($msg['body'] ?? '')) ?>
+    <main class="govuk-main-wrapper govuk-!-padding-top-4" id="main-content" role="main">
+        <div class="govuk-grid-row">
+            <div class="govuk-grid-column-two-thirds">
+                <!-- Thread Header -->
+                <div class="govuk-!-padding-4 govuk-!-margin-bottom-6" style="background: #fff; border: 1px solid #b1b4b6; border-left: 5px solid #1d70b8;">
+                    <div style="display: flex; align-items: center; gap: 16px;">
+                        <img src="<?= htmlspecialchars($otherAvatar) ?>"
+                             onerror="this.src='<?= $fallbackAvatar ?>'"
+                             alt=""
+                             style="width: 56px; height: 56px; border-radius: 50%; object-fit: cover;"
+                             loading="lazy">
+                        <div style="flex: 1;">
+                            <h1 class="govuk-heading-m govuk-!-margin-bottom-1"><?= htmlspecialchars($otherName) ?></h1>
+                            <p class="govuk-body-s govuk-!-margin-bottom-0" style="color: #505a5f;">
+                                <i class="fa-solid fa-building govuk-!-margin-right-1" aria-hidden="true"></i>
+                                <?= htmlspecialchars($otherUser['tenant_name'] ?? 'Partner Timebank') ?>
+                            </p>
+                        </div>
+                        <a href="<?= $basePath ?>/federation/members/<?= $otherUser['id'] ?? 0 ?>" class="govuk-button govuk-button--secondary govuk-!-margin-bottom-0" data-module="govuk-button">
+                            <i class="fa-solid fa-user govuk-!-margin-right-1" aria-hidden="true"></i>
+                            View Profile
+                        </a>
                     </div>
-                    <time class="civic-fed-message-time" datetime="<?= $isoTime ?>">
-                        <?= $displayTime ?>
-                    </time>
-            <?php endforeach; ?>
                 </div>
-        <?php else: ?>
-            <div class="civic-fed-empty civic-fed-empty--compact" role="status">
-                <i class="fa-solid fa-comment-dots" aria-hidden="true"></i>
-                <p>No messages yet. Start the conversation!</p>
+
+                <!-- Messages Container -->
+                <div class="govuk-!-padding-4 govuk-!-margin-bottom-4" style="background: #f3f2f1; min-height: 300px; max-height: 500px; overflow-y: auto;" id="messages-container" role="log" aria-label="Message history" aria-live="polite">
+                    <?php if (!empty($messages)): ?>
+                        <?php foreach ($messages as $msg):
+                            $isSent = $msg['message_type'] === 'sent';
+                            $msgTime = strtotime($msg['created_at']);
+                            $isoTime = date('c', $msgTime);
+                            $displayTime = date('M j, g:i a', $msgTime);
+                            $bgColor = $isSent ? '#1d70b8' : '#fff';
+                            $textColor = $isSent ? '#fff' : '#0b0c0c';
+                            $align = $isSent ? 'flex-end' : 'flex-start';
+                        ?>
+                            <div style="display: flex; flex-direction: column; align-items: <?= $align ?>; margin-bottom: 16px;">
+                                <div style="max-width: 80%; padding: 12px 16px; background: <?= $bgColor ?>; color: <?= $textColor ?>; border-radius: 8px; <?= $isSent ? '' : 'border: 1px solid #b1b4b6;' ?>">
+                                    <?= nl2br(htmlspecialchars($msg['body'] ?? '')) ?>
+                                </div>
+                                <time class="govuk-body-s" style="color: #505a5f; margin-top: 4px;" datetime="<?= $isoTime ?>">
+                                    <?= $displayTime ?>
+                                </time>
+                            </div>
+                        <?php endforeach; ?>
+                    <?php else: ?>
+                        <div class="govuk-!-padding-6 govuk-!-text-align-center" style="background: #fff; border: 1px solid #b1b4b6;">
+                            <i class="fa-solid fa-comment-dots fa-2x govuk-!-margin-bottom-2" style="color: #505a5f;" aria-hidden="true"></i>
+                            <p class="govuk-body govuk-!-margin-bottom-0">No messages yet. Start the conversation!</p>
+                        </div>
+                    <?php endif; ?>
+                </div>
+
+                <!-- Compose Form -->
+                <?php if ($canMessage): ?>
+                    <form action="<?= $basePath ?>/federation/messages/send" method="POST" class="govuk-!-margin-bottom-0">
+                        <input type="hidden" name="csrf_token" value="<?= \Nexus\Core\Csrf::token() ?>">
+                        <input type="hidden" name="receiver_id" value="<?= $otherUser['id'] ?? 0 ?>">
+                        <input type="hidden" name="receiver_tenant_id" value="<?= $otherTenantId ?>">
+
+                        <div class="govuk-form-group">
+                            <label class="govuk-label govuk-visually-hidden" for="message-input">Type your message</label>
+                            <div style="display: flex; gap: 12px;">
+                                <textarea name="body"
+                                          class="govuk-textarea govuk-!-margin-bottom-0"
+                                          style="flex: 1; resize: none;"
+                                          placeholder="Type your message..."
+                                          required
+                                          rows="2"
+                                          id="message-input"></textarea>
+                                <button type="submit" class="govuk-button govuk-!-margin-bottom-0" data-module="govuk-button" style="align-self: flex-end;">
+                                    <i class="fa-solid fa-paper-plane govuk-!-margin-right-1" aria-hidden="true"></i>
+                                    Send
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                <?php else: ?>
+                    <div class="govuk-warning-text">
+                        <span class="govuk-warning-text__icon" aria-hidden="true">!</span>
+                        <strong class="govuk-warning-text__text">
+                            <span class="govuk-visually-hidden">Warning</span>
+                            <?= htmlspecialchars($cannotMessageReason ?: 'Messaging is not available with this member.') ?>
+                        </strong>
+                    </div>
+                <?php endif; ?>
             </div>
-        <?php endif; ?>
-    </div>
-
-    <!-- Compose Form -->
-    <?php if ($canMessage): ?>
-        <form action="<?= $basePath ?>/federation/messages/send" method="POST" class="civic-fed-compose-form" aria-label="Compose message">
-            <input type="hidden" name="csrf_token" value="<?= \Nexus\Core\Csrf::token() ?>">
-            <input type="hidden" name="receiver_id" value="<?= $otherUser['id'] ?? 0 ?>">
-            <input type="hidden" name="receiver_tenant_id" value="<?= $otherTenantId ?>">
-
-            <label for="message-input" class="visually-hidden">Type your message</label>
-            <textarea name="body"
-                      class="civic-fed-compose-input"
-                      placeholder="Type your message..."
-                      required
-                      rows="1"
-                      id="message-input"
-                      aria-describedby="message-help"></textarea>
-            <span id="message-help" class="visually-hidden">Press Enter to send, Shift+Enter for new line</span>
-
-            <button type="submit" class="civic-fed-btn civic-fed-btn--primary" aria-label="Send message">
-                <i class="fa-solid fa-paper-plane" aria-hidden="true"></i>
-                <span>Send</span>
-            </button>
-        </form>
-    <?php else: ?>
-        <div class="civic-fed-alert civic-fed-alert--warning" role="alert">
-            <i class="fa-solid fa-ban" aria-hidden="true"></i>
-            <span><?= htmlspecialchars($cannotMessageReason ?: 'Messaging is not available with this member.') ?></span>
         </div>
-    <?php endif; ?>
+    </main>
 </div>
 
 <script src="/assets/js/federation-thread.js?v=<?= time() ?>"></script>
 <script>
-// Offline indicator
 (function() {
-    const banner = document.getElementById('offlineBanner');
-    if (!banner) return;
-    window.addEventListener('online', () => banner.classList.remove('civic-fed-offline-banner--visible'));
-    window.addEventListener('offline', () => banner.classList.add('civic-fed-offline-banner--visible'));
-    if (!navigator.onLine) banner.classList.add('civic-fed-offline-banner--visible');
+    'use strict';
+    var banner = document.getElementById('offlineBanner');
+    function updateOffline(offline) {
+        if (banner) banner.classList.toggle('govuk-!-display-none', !offline);
+    }
+    window.addEventListener('online', function() { updateOffline(false); });
+    window.addEventListener('offline', function() { updateOffline(true); });
+    if (!navigator.onLine) updateOffline(true);
+
+    // Scroll to bottom of messages
+    var container = document.getElementById('messages-container');
+    if (container) container.scrollTop = container.scrollHeight;
 })();
 </script>
 

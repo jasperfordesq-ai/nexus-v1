@@ -1,95 +1,101 @@
 <?php
-// Phoenix View: Global Users (Super Admin)
-$hTitle = 'Global User Directory';
-$hSubtitle = 'Manage Users Across All Tenants';
-$hGradient = 'mt-hero-gradient-brand';
-$hType = 'Super Admin';
-
+/**
+ * Super Admin: Global User Directory
+ * GOV.UK Design System (WCAG 2.1 AA)
+ */
+$pageTitle = 'Global User Directory';
+$basePath = \Nexus\Core\TenantContext::getBasePath();
 require dirname(__DIR__, 2) . '/layouts/civicone/header.php';
 ?>
 
-<div class="super-admin-wrapper">
-    <div class="master-users-container">
+<nav class="govuk-breadcrumbs govuk-!-margin-bottom-6" aria-label="Breadcrumb">
+    <ol class="govuk-breadcrumbs__list">
+        <li class="govuk-breadcrumbs__list-item">
+            <a class="govuk-breadcrumbs__link" href="<?= $basePath ?>">Home</a>
+        </li>
+        <li class="govuk-breadcrumbs__list-item">
+            <a class="govuk-breadcrumbs__link" href="<?= $basePath ?>/super-admin">Platform Master</a>
+        </li>
+        <li class="govuk-breadcrumbs__list-item" aria-current="page">Users</li>
+    </ol>
+</nav>
 
-        <div class="nexus-card">
-            <header class="nexus-card-header master-users-card-header">
-                <h3>All Users</h3>
-                <a href="<?= \Nexus\Core\TenantContext::getBasePath() ?>/super-admin" class="nexus-btn nexus-btn-secondary">
-                    &larr; Back to Dashboard
-                </a>
-            </header>
-            <div class="nexus-card-body master-users-card-body">
-                <table class="master-users-table">
-                    <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>User</th>
-                            <th>Tenant</th>
-                            <th>Role</th>
-                            <th>Status</th>
-                            <th>Joined</th>
-                            <th class="text-right">Action</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <?php foreach ($users as $u): ?>
-                            <tr>
-                                <td class="master-users-id">#<?= $u['id'] ?></td>
-                                <td>
-                                    <div class="master-users-name"><?= htmlspecialchars($u['first_name'] . ' ' . $u['last_name']) ?></div>
-                                    <div class="master-users-email"><?= htmlspecialchars($u['email']) ?></div>
-                                </td>
-                                <td>
-                                    <?php if ($u['tenant_id'] == 1): ?>
-                                        <span class="master-users-badge-platform">Platform</span>
-                                    <?php else: ?>
-                                        <span class="master-users-badge-tenant">
-                                            <?= htmlspecialchars($u['tenant_name'] ?? 'Unknown') ?>
-                                        </span>
-                                        <div class="master-users-tenant-slug">
-                                            /<?= htmlspecialchars($u['tenant_slug'] ?? '') ?>
-                                        </div>
-                                    <?php endif; ?>
-                                </td>
-                                <td>
-                                    <span class="master-users-role">
-                                        <?= htmlspecialchars($u['role']) ?>
-                                    </span>
-                                </td>
-                                <td>
-                                    <?php if (!empty($u['is_approved'])): ?>
-                                        <span class="master-users-status-active">Active</span>
-                                    <?php else: ?>
-                                        <span class="master-users-status-pending">Pending</span>
-                                    <?php endif; ?>
-                                </td>
-                                <td class="master-users-date">
-                                    <?= date('M j, Y', strtotime($u['created_at'])) ?>
-                                </td>
-                                <td class="text-right">
-                                    <?php if (empty($u['is_approved'])): ?>
-                                        <form action="<?= \Nexus\Core\TenantContext::getBasePath() ?>/super-admin/users/approve" method="POST" class="master-users-action-form">
-                                            <input type="hidden" name="user_id" value="<?= $u['id'] ?>">
-                                            <button type="submit" class="nexus-btn nexus-btn-sm nexus-btn-primary master-users-btn-approve">
-                                                Approve
-                                            </button>
-                                        </form>
-                                    <?php endif; ?>
-                                    <form action="<?= \Nexus\Core\TenantContext::getBasePath() ?>/super-admin/users/delete" method="POST" onsubmit="return confirm('Are you sure you want to PERMANENTLY delete this user? This cannot be undone.');" class="master-users-action-form">
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-full">
+        <div style="display: flex; justify-content: space-between; align-items: center;" class="govuk-!-margin-bottom-6">
+            <h1 class="govuk-heading-xl govuk-!-margin-bottom-0">Global User Directory</h1>
+            <a href="<?= $basePath ?>/super-admin" class="govuk-button govuk-button--secondary" data-module="govuk-button">
+                Back to Dashboard
+            </a>
+        </div>
+
+        <table class="govuk-table" aria-label="All users across tenants">
+            <caption class="govuk-table__caption govuk-visually-hidden">Users registered on all platform tenants</caption>
+            <thead class="govuk-table__head">
+                <tr class="govuk-table__row">
+                    <th scope="col" class="govuk-table__header">ID</th>
+                    <th scope="col" class="govuk-table__header">User</th>
+                    <th scope="col" class="govuk-table__header">Tenant</th>
+                    <th scope="col" class="govuk-table__header">Role</th>
+                    <th scope="col" class="govuk-table__header">Status</th>
+                    <th scope="col" class="govuk-table__header">Joined</th>
+                    <th scope="col" class="govuk-table__header govuk-table__header--numeric">Action</th>
+                </tr>
+            </thead>
+            <tbody class="govuk-table__body">
+                <?php foreach ($users as $u): ?>
+                    <tr class="govuk-table__row">
+                        <td class="govuk-table__cell">
+                            <span class="govuk-body-s" style="color: #505a5f;">#<?= $u['id'] ?></span>
+                        </td>
+                        <td class="govuk-table__cell">
+                            <strong><?= htmlspecialchars($u['first_name'] . ' ' . $u['last_name']) ?></strong><br>
+                            <span class="govuk-body-s" style="color: #505a5f;"><?= htmlspecialchars($u['email']) ?></span>
+                        </td>
+                        <td class="govuk-table__cell">
+                            <?php if ($u['tenant_id'] == 1): ?>
+                                <strong class="govuk-tag govuk-tag--purple">Platform</strong>
+                            <?php else: ?>
+                                <strong class="govuk-tag govuk-tag--blue"><?= htmlspecialchars($u['tenant_name'] ?? 'Unknown') ?></strong><br>
+                                <span class="govuk-body-s" style="color: #505a5f;">/<?= htmlspecialchars($u['tenant_slug'] ?? '') ?></span>
+                            <?php endif; ?>
+                        </td>
+                        <td class="govuk-table__cell">
+                            <span class="govuk-tag govuk-tag--grey"><?= htmlspecialchars($u['role']) ?></span>
+                        </td>
+                        <td class="govuk-table__cell">
+                            <?php if (!empty($u['is_approved'])): ?>
+                                <strong class="govuk-tag govuk-tag--green">Active</strong>
+                            <?php else: ?>
+                                <strong class="govuk-tag govuk-tag--yellow">Pending</strong>
+                            <?php endif; ?>
+                        </td>
+                        <td class="govuk-table__cell">
+                            <?= date('M j, Y', strtotime($u['created_at'])) ?>
+                        </td>
+                        <td class="govuk-table__cell govuk-table__cell--numeric">
+                            <div class="govuk-button-group" style="justify-content: flex-end; margin-bottom: 0;">
+                                <?php if (empty($u['is_approved'])): ?>
+                                    <form action="<?= $basePath ?>/super-admin/users/approve" method="POST" style="margin: 0;">
                                         <input type="hidden" name="user_id" value="<?= $u['id'] ?>">
-                                        <button type="submit" class="nexus-btn nexus-btn-sm nexus-btn-danger master-users-btn-delete">
-                                            Delete
+                                        <button type="submit" class="govuk-button govuk-button--secondary govuk-!-margin-bottom-0" data-module="govuk-button" style="font-size: 14px; padding: 8px 12px;">
+                                            Approve
                                         </button>
                                     </form>
-                                </td>
-                            </tr>
-                        <?php endforeach; ?>
-                    </tbody>
-                </table>
-            </div>
-        </div>
+                                <?php endif; ?>
+                                <form action="<?= $basePath ?>/super-admin/users/delete" method="POST" onsubmit="return confirm('Are you sure you want to PERMANENTLY delete this user? This cannot be undone.');" style="margin: 0;">
+                                    <input type="hidden" name="user_id" value="<?= $u['id'] ?>">
+                                    <button type="submit" class="govuk-button govuk-button--warning govuk-!-margin-bottom-0" data-module="govuk-button" style="font-size: 14px; padding: 8px 12px;">
+                                        Delete
+                                    </button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                <?php endforeach; ?>
+            </tbody>
+        </table>
     </div>
 </div>
 
-<!-- Master Users CSS -->
-<link rel="stylesheet" href="<?= NexusCoreTenantContext::getBasePath() ?>/assets/css/purged/civicone-master-users.min.css">
+<?php require dirname(__DIR__, 2) . '/layouts/civicone/footer.php'; ?>

@@ -1,8 +1,7 @@
 <?php
 /**
- * Modern Feed Post Detail - Gold Standard v2.0
- * Full Master Platform Social Media Module Integration
- * Holographic Glassmorphism Design System
+ * Feed Post Detail View
+ * GOV.UK Design System Compliant (WCAG 2.1 AA)
  */
 
 $userId = $_SESSION['user_id'] ?? 0;
@@ -16,137 +15,139 @@ $basePath = \Nexus\Core\TenantContext::getBasePath();
 $socialTargetType = 'post';
 $socialTargetId = $post['id'];
 
-require __DIR__ . '/../../layouts/header.php';
+require __DIR__ . '/../../layouts/civicone/header.php';
 ?>
 
-<!-- Feed Show CSS -->
-<link rel="stylesheet" href="<?= NexusCoreTenantContext::getBasePath() ?>/assets/css/purged/civicone-feed-show.min.css">
+<nav class="govuk-breadcrumbs govuk-!-margin-bottom-6" aria-label="Breadcrumb">
+    <ol class="govuk-breadcrumbs__list">
+        <li class="govuk-breadcrumbs__list-item">
+            <a class="govuk-breadcrumbs__link" href="<?= $basePath ?>">Home</a>
+        </li>
+        <li class="govuk-breadcrumbs__list-item">
+            <a class="govuk-breadcrumbs__link" href="<?= $basePath ?>/">Feed</a>
+        </li>
+        <li class="govuk-breadcrumbs__list-item" aria-current="page">Post</li>
+    </ol>
+</nav>
 
-<div class="post-detail-bg"></div>
+<a href="<?= $basePath ?>/" class="govuk-back-link govuk-!-margin-bottom-6">Back to Feed</a>
 
-<div class="post-detail-container">
+<!-- Post Card -->
+<div class="govuk-!-padding-6" style="border: 1px solid #b1b4b6; max-width: 800px;">
 
-    <!-- Back Button -->
-    <a href="<?= $basePath ?>/" class="glass-button">
-        <i class="fa-solid fa-arrow-left"></i>
-        <span>Back to Feed</span>
-    </a>
-
-    <!-- Post Card -->
-    <div class="glass-card">
-
-        <!-- Header -->
-        <div class="post-header">
-            <div class="post-author-info">
+    <!-- Header -->
+    <div class="govuk-grid-row govuk-!-margin-bottom-4">
+        <div class="govuk-grid-column-three-quarters">
+            <div style="display: flex; gap: 1rem; align-items: center;">
                 <a href="<?= $basePath ?>/profile/<?= $post['user_id'] ?>">
-                    <img src="<?= !empty($post['author_avatar']) ? htmlspecialchars($post['author_avatar']) : '/assets/img/defaults/default_avatar.webp' ?>" loading="lazy"
-                         alt="<?= htmlspecialchars($post['author_name']) ?>"
-                         class="post-avatar">
+                    <img src="<?= !empty($post['author_avatar']) ? htmlspecialchars($post['author_avatar']) : '/assets/img/defaults/default_avatar.webp' ?>"
+                         alt=""
+                         style="width: 48px; height: 48px; border-radius: 50%;">
                 </a>
-                <div class="post-meta">
-                    <div class="post-author-name">
-                        <?= htmlspecialchars($post['author_name']) ?>
-                    </div>
-                    <div class="post-timestamp">
-                        <i class="fa-regular fa-clock"></i>
+                <div>
+                    <p class="govuk-body govuk-!-margin-bottom-0">
+                        <strong><?= htmlspecialchars($post['author_name']) ?></strong>
+                    </p>
+                    <p class="govuk-body-s govuk-!-margin-bottom-0" style="color: #505a5f;">
+                        <i class="fa-regular fa-clock govuk-!-margin-right-1" aria-hidden="true"></i>
                         <?= date('M j, Y \a\t g:i a', strtotime($post['created_at'])) ?>
                         <?php if (isset($post['visibility'])): ?>
-                            <span class="post-visibility">
+                            <span class="govuk-!-margin-left-2">
                                 <?= $post['visibility'] === 'public' ? '<i class="fa-solid fa-globe"></i> Public' : '<i class="fa-solid fa-lock"></i> Private' ?>
                             </span>
                         <?php endif; ?>
-                    </div>
+                    </p>
                 </div>
             </div>
-            <button class="post-menu-btn" onclick="showPostMenu(<?= $post['id'] ?>)">
-                <i class="fa-solid fa-ellipsis"></i>
-            </button>
         </div>
+    </div>
 
-        <!-- Content -->
-        <div class="post-content">
-            <?php
-            $escapedContent = htmlspecialchars($post['content']);
-            $content = preg_replace_callback('/(https?:\/\/[^\s]+)/', function($m) {
-                $url = html_entity_decode($m[1], ENT_QUOTES, 'UTF-8');
-                return '<a href="' . htmlspecialchars($url, ENT_QUOTES, 'UTF-8') . '" target="_blank" rel="noopener">' . htmlspecialchars($url) . '</a>';
-            }, $escapedContent);
-            echo nl2br($content);
-            ?>
+    <!-- Content -->
+    <div class="govuk-body govuk-!-margin-bottom-4">
+        <?php
+        $escapedContent = htmlspecialchars($post['content']);
+        $content = preg_replace_callback('/(https?:\/\/[^\s]+)/', function($m) {
+            $url = html_entity_decode($m[1], ENT_QUOTES, 'UTF-8');
+            return '<a href="' . htmlspecialchars($url, ENT_QUOTES, 'UTF-8') . '" target="_blank" rel="noopener" class="govuk-link">' . htmlspecialchars($url) . '</a>';
+        }, $escapedContent);
+        echo nl2br($content);
+        ?>
+    </div>
+
+    <!-- Image -->
+    <?php if (!empty($post['image_url'])): ?>
+        <img src="<?= htmlspecialchars($post['image_url']) ?>" alt="Post image" class="govuk-!-margin-bottom-4" style="max-width: 100%; height: auto;">
+    <?php endif; ?>
+
+    <!-- Stats Bar -->
+    <div class="govuk-grid-row govuk-!-margin-bottom-4 govuk-!-padding-3" style="background: #f3f2f1;">
+        <div class="govuk-grid-column-one-half">
+            <p class="govuk-body-s govuk-!-margin-bottom-0">
+                <i class="fa-solid fa-heart govuk-!-margin-right-1" aria-hidden="true"></i>
+                <span id="likes-count-<?= $socialTargetId ?>"><?= $post['likes_count'] ?? 0 ?></span> Likes
+            </p>
         </div>
-
-        <!-- Image -->
-        <?php if (!empty($post['image_url'])): ?>
-            <img src="<?= htmlspecialchars($post['image_url']) ?>" loading="lazy" alt="Post image" class="post-image">
-        <?php endif; ?>
-
-        <!-- Stats Bar -->
-        <div class="post-stats">
-            <div class="stat-item" onclick="showLikers('<?= $socialTargetType ?>', <?= $socialTargetId ?>)">
-                <i class="fa-solid fa-heart"></i>
-                <span id="likes-count-<?= $socialTargetId ?>"><?= $post['likes_count'] ?? 0 ?></span>
-                <span>Likes</span>
-            </div>
-            <div class="stat-item" onclick="document.getElementById('comment-input').focus()">
-                <i class="fa-solid fa-comment"></i>
-                <span id="comments-count-<?= $socialTargetId ?>">0</span>
-                <span>Comments</span>
-            </div>
+        <div class="govuk-grid-column-one-half">
+            <p class="govuk-body-s govuk-!-margin-bottom-0">
+                <i class="fa-solid fa-comment govuk-!-margin-right-1" aria-hidden="true"></i>
+                <span id="comments-count-<?= $socialTargetId ?>">0</span> Comments
+            </p>
         </div>
+    </div>
 
-        <!-- Action Buttons -->
-        <div class="post-actions">
-            <button class="action-btn <?= ($post['is_liked'] ?? 0) ? 'liked' : '' ?>"
-                    onclick="toggleLike(this, '<?= $socialTargetType ?>', <?= $socialTargetId ?>)">
-                <i class="<?= ($post['is_liked'] ?? 0) ? 'fa-solid' : 'fa-regular' ?> fa-heart"></i>
-                <span>Like</span>
-            </button>
-            <button class="action-btn" onclick="toggleCommentSection('<?= $socialTargetType ?>', <?= $socialTargetId ?>)">
-                <i class="fa-regular fa-comment"></i>
-                <span>Comment</span>
-            </button>
-            <button class="action-btn" onclick="repostToFeed('<?= $socialTargetType ?>', <?= $socialTargetId ?>, '<?= addslashes($post['author_name']) ?>')">
-                <i class="fa-regular fa-share-from-square"></i>
-                <span>Share</span>
-            </button>
-        </div>
+    <!-- Action Buttons -->
+    <div class="govuk-button-group govuk-!-margin-bottom-6">
+        <button type="button" class="govuk-button govuk-button--secondary <?= ($post['is_liked'] ?? 0) ? 'liked' : '' ?>"
+                data-module="govuk-button"
+                onclick="toggleLike(this, '<?= $socialTargetType ?>', <?= $socialTargetId ?>)">
+            <i class="<?= ($post['is_liked'] ?? 0) ? 'fa-solid' : 'fa-regular' ?> fa-heart govuk-!-margin-right-1" aria-hidden="true"></i> Like
+        </button>
+        <button type="button" class="govuk-button govuk-button--secondary" data-module="govuk-button"
+                onclick="document.getElementById('comment-input').focus()">
+            <i class="fa-regular fa-comment govuk-!-margin-right-1" aria-hidden="true"></i> Comment
+        </button>
+        <button type="button" class="govuk-button govuk-button--secondary" data-module="govuk-button"
+                onclick="repostToFeed('<?= $socialTargetType ?>', <?= $socialTargetId ?>, '<?= addslashes($post['author_name']) ?>')">
+            <i class="fa-regular fa-share-from-square govuk-!-margin-right-1" aria-hidden="true"></i> Share
+        </button>
+    </div>
 
-        <!-- Comments Section -->
-        <div id="comments-section-<?= $socialTargetType ?>-<?= $socialTargetId ?>" class="comments-section">
-            <div class="comments-header">
-                <i class="fa-solid fa-comments"></i>
-                <span>Comments</span>
-            </div>
+    <!-- Comments Section -->
+    <div id="comments-section-<?= $socialTargetType ?>-<?= $socialTargetId ?>">
+        <h2 class="govuk-heading-m">
+            <i class="fa-solid fa-comments govuk-!-margin-right-2" aria-hidden="true"></i>
+            Comments
+        </h2>
 
-            <!-- Comment Compose -->
-            <?php if ($isLoggedIn): ?>
-            <div class="comment-compose">
-                <img src="<?= htmlspecialchars($userAvatar) ?>" loading="lazy" alt="Your avatar">
-                <div class="comment-input-wrapper">
+        <!-- Comment Compose -->
+        <?php if ($isLoggedIn): ?>
+        <div class="govuk-form-group govuk-!-margin-bottom-6">
+            <label class="govuk-label" for="comment-input">Write a comment</label>
+            <div style="display: flex; gap: 1rem;">
+                <img src="<?= htmlspecialchars($userAvatar) ?>" alt="" style="width: 40px; height: 40px; border-radius: 50%;">
+                <div style="flex: 1;">
                     <input type="text"
                            id="comment-input"
-                           class="comment-input"
+                           class="govuk-input"
                            placeholder="Write a comment..."
                            onkeydown="if(event.key === 'Enter' && !event.shiftKey) { event.preventDefault(); submitComment(this, '<?= $socialTargetType ?>', <?= $socialTargetId ?>); }">
-                    <button class="comment-send-btn" onclick="submitComment(document.getElementById('comment-input'), '<?= $socialTargetType ?>', <?= $socialTargetId ?>)">
-                        <i class="fa-solid fa-paper-plane"></i>
-                    </button>
                 </div>
-            </div>
-            <?php endif; ?>
-
-            <!-- Comments List -->
-            <div class="comments-list">
-                <div class="loading-skeleton skeleton-80"></div>
+                <button type="button" class="govuk-button" data-module="govuk-button"
+                        onclick="submitComment(document.getElementById('comment-input'), '<?= $socialTargetType ?>', <?= $socialTargetId ?>)">
+                    <i class="fa-solid fa-paper-plane" aria-hidden="true"></i>
+                </button>
             </div>
         </div>
+        <?php endif; ?>
 
+        <!-- Comments List -->
+        <div class="comments-list" id="comments-list-<?= $socialTargetId ?>">
+            <div class="govuk-inset-text">Loading comments...</div>
+        </div>
     </div>
 
 </div>
 
-<!-- Master Platform Social Media Module -->
-<!-- Feed Show JavaScript -->
-<script src="<?= NexusCoreTenantContext::getBasePath() ?>/assets/js/civicone-feed-show.min.js" defer></script>
+<script src="<?= $basePath ?>/assets/js/civicone-feed-show.min.js" defer></script>
 
-<?php require __DIR__ . '/../../layouts/footer.php'; ?>
+<?php require __DIR__ . '/../../layouts/civicone/footer.php'; ?>

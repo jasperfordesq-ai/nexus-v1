@@ -1,7 +1,7 @@
 <?php
 /**
  * Federation Transactions History
- * CivicOne Theme - WCAG 2.1 AA Compliant
+ * GOV.UK Design System (WCAG 2.1 AA)
  */
 $pageTitle = $pageTitle ?? "Federated Transactions";
 $hideHero = true;
@@ -17,155 +17,168 @@ $stats = $stats ?? [];
 $balance = $balance ?? 0;
 ?>
 
-<!-- Offline Banner -->
-<div class="civic-fed-offline-banner" id="offlineBanner" role="alert" aria-live="polite">
-    <i class="fa-solid fa-wifi-slash" aria-hidden="true"></i>
-    <span>No internet connection</span>
-</div>
-
-<div class="civic-container">
-    <!-- Back Link -->
-    <a href="<?= $basePath ?>/wallet" class="civic-fed-back-link" aria-label="Return to wallet">
-        <i class="fa-solid fa-arrow-left" aria-hidden="true"></i>
-        Back to Wallet
-    </a>
-
-    <!-- Header -->
-    <header class="civic-fed-header">
-        <h1>
-            <i class="fa-solid fa-globe" aria-hidden="true"></i>
-            Federated Transactions
-        </h1>
-    </header>
-
-    <!-- Stats Grid -->
-    <div class="civic-fed-stats-grid" role="region" aria-label="Transaction statistics">
-        <div class="civic-fed-stat-card civic-fed-stat-card--highlight">
-            <div class="civic-fed-stat-icon" aria-hidden="true">
-                <i class="fa-solid fa-wallet"></i>
-            </div>
-            <div class="civic-fed-stat-content">
-                <div class="civic-fed-stat-value"><?= number_format($balance, 1) ?></div>
-                <div class="civic-fed-stat-label">Current Balance</div>
-            </div>
-        </div>
-        <div class="civic-fed-stat-card">
-            <div class="civic-fed-stat-icon" aria-hidden="true">
-                <i class="fa-solid fa-arrow-up"></i>
-            </div>
-            <div class="civic-fed-stat-content">
-                <div class="civic-fed-stat-value"><?= number_format($stats['total_sent_hours'] ?? 0, 1) ?></div>
-                <div class="civic-fed-stat-label">Hours Sent</div>
-            </div>
-        </div>
-        <div class="civic-fed-stat-card">
-            <div class="civic-fed-stat-icon" aria-hidden="true">
-                <i class="fa-solid fa-arrow-down"></i>
-            </div>
-            <div class="civic-fed-stat-content">
-                <div class="civic-fed-stat-value"><?= number_format($stats['total_received_hours'] ?? 0, 1) ?></div>
-                <div class="civic-fed-stat-label">Hours Received</div>
-            </div>
-        </div>
-        <div class="civic-fed-stat-card">
-            <div class="civic-fed-stat-icon" aria-hidden="true">
-                <i class="fa-solid fa-exchange-alt"></i>
-            </div>
-            <div class="civic-fed-stat-content">
-                <div class="civic-fed-stat-value"><?= ($stats['total_sent_count'] ?? 0) + ($stats['total_received_count'] ?? 0) ?></div>
-                <div class="civic-fed-stat-label">Total Exchanges</div>
-            </div>
+<div class="govuk-width-container">
+    <!-- Offline Banner -->
+    <div class="govuk-notification-banner govuk-notification-banner--warning govuk-!-display-none" id="offlineBanner" role="alert" aria-live="polite" data-module="govuk-notification-banner">
+        <div class="govuk-notification-banner__content">
+            <p class="govuk-notification-banner__heading">
+                <i class="fa-solid fa-wifi-slash govuk-!-margin-right-2" aria-hidden="true"></i>
+                No internet connection
+            </p>
         </div>
     </div>
 
-    <!-- Transactions List -->
-    <?php if (!empty($transactions)): ?>
-        <div class="civic-fed-transactions-list" role="list" aria-label="Transaction history">
-            <?php foreach ($transactions as $tx): ?>
-                <?php
-                $isSent = ($tx['direction'] ?? '') === 'sent';
-                $iconClass = $isSent ? 'civic-fed-transaction--sent' : 'civic-fed-transaction--received';
-                $icon = $isSent ? 'fa-arrow-up' : 'fa-arrow-down';
-                $amountPrefix = $isSent ? '-' : '+';
-                $status = $tx['status'] ?? 'completed';
-                $isCompleted = ($status === 'completed');
+    <!-- Back Link -->
+    <a href="<?= $basePath ?>/wallet" class="govuk-back-link govuk-!-margin-top-4">
+        Back to Wallet
+    </a>
 
-                // Check if current user has reviewed this transaction
-                $hasReviewed = $isSent
-                    ? (($tx['sender_reviewed'] ?? 0) == 1)
-                    : (($tx['receiver_reviewed'] ?? 0) == 1);
-                ?>
-                <article class="civic-fed-transaction-card <?= $iconClass ?>" role="listitem" aria-label="<?= $isSent ? 'Sent' : 'Received' ?> <?= number_format($tx['amount'], 1) ?> hours <?= $isSent ? 'to' : 'from' ?> <?= htmlspecialchars($tx['other_user_name'] ?? 'Unknown') ?>">
-                    <div class="civic-fed-transaction-icon" aria-hidden="true">
-                        <i class="fa-solid <?= $icon ?>"></i>
-                    </div>
-                    <div class="civic-fed-transaction-details">
-                        <h3 class="civic-fed-transaction-user">
-                            <?= $isSent ? 'To' : 'From' ?>: <?= htmlspecialchars($tx['other_user_name'] ?? 'Unknown') ?>
-                        </h3>
-                        <span class="civic-fed-transaction-tenant">
-                            <i class="fa-solid fa-building" aria-hidden="true"></i>
-                            <?= htmlspecialchars($tx['other_tenant_name'] ?? 'Partner Timebank') ?>
-                        </span>
-                        <?php if (!empty($tx['description'])): ?>
-                            <p class="civic-fed-transaction-desc"><?= htmlspecialchars($tx['description']) ?></p>
-                        <?php endif; ?>
-                    </div>
-                    <div class="civic-fed-transaction-amount">
-                        <div class="civic-fed-amount <?= $isSent ? 'civic-fed-amount--sent' : 'civic-fed-amount--received' ?>" aria-label="<?= $isSent ? 'Sent' : 'Received' ?> <?= number_format($tx['amount'], 1) ?> hours">
-                            <?= $amountPrefix ?><?= number_format($tx['amount'], 1) ?> hrs
-                        </div>
-                        <time class="civic-fed-transaction-time" datetime="<?= date('Y-m-d', strtotime($tx['created_at'])) ?>">
-                            <?= date('M j, Y', strtotime($tx['created_at'])) ?>
-                        </time>
-                        <?php if (!$isCompleted): ?>
-                            <span class="civic-fed-status-badge civic-fed-status-badge--pending" role="status">
-                                <i class="fa-solid fa-clock" aria-hidden="true"></i>
-                                <?= ucfirst($status) ?>
-                            </span>
-                        <?php endif; ?>
-                    </div>
-                    <?php if ($isCompleted): ?>
-                        <div class="civic-fed-transaction-actions">
-                            <?php if ($hasReviewed): ?>
-                                <span class="civic-fed-btn civic-fed-btn--small civic-fed-btn--disabled" aria-label="Review submitted">
-                                    <i class="fa-solid fa-check" aria-hidden="true"></i>
-                                    Reviewed
-                                </span>
-                            <?php else: ?>
-                                <a href="<?= $basePath ?>/federation/review/<?= $tx['id'] ?>" class="civic-fed-btn civic-fed-btn--small civic-fed-btn--accent" aria-label="Leave a review for this transaction">
-                                    <i class="fa-solid fa-star" aria-hidden="true"></i>
-                                    Leave Review
-                                </a>
-                            <?php endif; ?>
-                        </div>
-                    <?php endif; ?>
-                </article>
-            <?php endforeach; ?>
-        </div>
-    <?php else: ?>
-        <div class="civic-fed-empty" role="status">
-            <div class="civic-fed-empty-icon" aria-hidden="true">
-                <i class="fa-solid fa-exchange-alt"></i>
+    <main class="govuk-main-wrapper govuk-!-padding-top-4" id="main-content" role="main">
+        <!-- Header -->
+        <h1 class="govuk-heading-xl govuk-!-margin-bottom-6">
+            <i class="fa-solid fa-globe govuk-!-margin-right-2" style="color: #1d70b8;" aria-hidden="true"></i>
+            Federated Transactions
+        </h1>
+
+        <!-- Stats Grid -->
+        <div class="govuk-grid-row govuk-!-margin-bottom-6" role="region" aria-label="Transaction statistics">
+            <div class="govuk-grid-column-one-quarter">
+                <div class="govuk-!-padding-4 govuk-!-text-align-center" style="background: #1d70b8; color: #fff;">
+                    <i class="fa-solid fa-wallet fa-lg govuk-!-margin-bottom-2" aria-hidden="true"></i>
+                    <p class="govuk-heading-l govuk-!-margin-bottom-1" style="color: #fff;">
+                        <?= number_format($balance, 1) ?>
+                    </p>
+                    <p class="govuk-body-s govuk-!-margin-bottom-0" style="color: #fff;">Current Balance</p>
+                </div>
             </div>
-            <h3>No Federated Transactions Yet</h3>
-            <p>Exchange hours with members from partner timebanks!</p>
-            <a href="<?= $basePath ?>/federation/members" class="civic-fed-btn civic-fed-btn--primary">
-                <i class="fa-solid fa-users" aria-hidden="true"></i>
-                Browse Federated Members
-            </a>
+            <div class="govuk-grid-column-one-quarter">
+                <div class="govuk-!-padding-4 govuk-!-text-align-center" style="background: #f3f2f1; border-top: 4px solid #d4351c;">
+                    <i class="fa-solid fa-arrow-up fa-lg govuk-!-margin-bottom-2" style="color: #d4351c;" aria-hidden="true"></i>
+                    <p class="govuk-heading-l govuk-!-margin-bottom-1" style="color: #d4351c;">
+                        <?= number_format($stats['total_sent_hours'] ?? 0, 1) ?>
+                    </p>
+                    <p class="govuk-body-s govuk-!-margin-bottom-0" style="color: #505a5f;">Hours Sent</p>
+                </div>
+            </div>
+            <div class="govuk-grid-column-one-quarter">
+                <div class="govuk-!-padding-4 govuk-!-text-align-center" style="background: #f3f2f1; border-top: 4px solid #00703c;">
+                    <i class="fa-solid fa-arrow-down fa-lg govuk-!-margin-bottom-2" style="color: #00703c;" aria-hidden="true"></i>
+                    <p class="govuk-heading-l govuk-!-margin-bottom-1" style="color: #00703c;">
+                        <?= number_format($stats['total_received_hours'] ?? 0, 1) ?>
+                    </p>
+                    <p class="govuk-body-s govuk-!-margin-bottom-0" style="color: #505a5f;">Hours Received</p>
+                </div>
+            </div>
+            <div class="govuk-grid-column-one-quarter">
+                <div class="govuk-!-padding-4 govuk-!-text-align-center" style="background: #f3f2f1; border-top: 4px solid #1d70b8;">
+                    <i class="fa-solid fa-exchange-alt fa-lg govuk-!-margin-bottom-2" style="color: #1d70b8;" aria-hidden="true"></i>
+                    <p class="govuk-heading-l govuk-!-margin-bottom-1" style="color: #1d70b8;">
+                        <?= ($stats['total_sent_count'] ?? 0) + ($stats['total_received_count'] ?? 0) ?>
+                    </p>
+                    <p class="govuk-body-s govuk-!-margin-bottom-0" style="color: #505a5f;">Total Exchanges</p>
+                </div>
+            </div>
         </div>
-    <?php endif; ?>
+
+        <div class="govuk-grid-row">
+            <div class="govuk-grid-column-two-thirds">
+                <!-- Transactions List -->
+                <?php if (!empty($transactions)): ?>
+                    <div role="list" aria-label="Transaction history">
+                        <?php foreach ($transactions as $tx): ?>
+                            <?php
+                            $isSent = ($tx['direction'] ?? '') === 'sent';
+                            $icon = $isSent ? 'fa-arrow-up' : 'fa-arrow-down';
+                            $amountPrefix = $isSent ? '-' : '+';
+                            $status = $tx['status'] ?? 'completed';
+                            $isCompleted = ($status === 'completed');
+                            $borderColor = $isSent ? '#d4351c' : '#00703c';
+                            $amountColor = $isSent ? '#d4351c' : '#00703c';
+
+                            $hasReviewed = $isSent
+                                ? (($tx['sender_reviewed'] ?? 0) == 1)
+                                : (($tx['receiver_reviewed'] ?? 0) == 1);
+                            ?>
+                            <article class="govuk-!-padding-4 govuk-!-margin-bottom-3" style="background: #fff; border: 1px solid #b1b4b6; border-left: 5px solid <?= $borderColor ?>;" role="listitem">
+                                <div style="display: flex; align-items: flex-start; gap: 16px; flex-wrap: wrap;">
+                                    <div style="width: 40px; height: 40px; border-radius: 50%; background: <?= $borderColor ?>; color: #fff; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                                        <i class="fa-solid <?= $icon ?>" aria-hidden="true"></i>
+                                    </div>
+                                    <div style="flex: 1; min-width: 200px;">
+                                        <p class="govuk-body govuk-!-font-weight-bold govuk-!-margin-bottom-1">
+                                            <?= $isSent ? 'To' : 'From' ?>: <?= htmlspecialchars($tx['other_user_name'] ?? 'Unknown') ?>
+                                        </p>
+                                        <p class="govuk-body-s govuk-!-margin-bottom-1" style="color: #505a5f;">
+                                            <i class="fa-solid fa-building govuk-!-margin-right-1" aria-hidden="true"></i>
+                                            <?= htmlspecialchars($tx['other_tenant_name'] ?? 'Partner Timebank') ?>
+                                        </p>
+                                        <?php if (!empty($tx['description'])): ?>
+                                            <p class="govuk-body-s govuk-!-margin-bottom-0" style="color: #505a5f;">
+                                                <?= htmlspecialchars($tx['description']) ?>
+                                            </p>
+                                        <?php endif; ?>
+                                    </div>
+                                    <div style="text-align: right;">
+                                        <p class="govuk-heading-m govuk-!-margin-bottom-1" style="color: <?= $amountColor ?>;">
+                                            <?= $amountPrefix ?><?= number_format($tx['amount'], 1) ?> hrs
+                                        </p>
+                                        <p class="govuk-body-s govuk-!-margin-bottom-0" style="color: #505a5f;">
+                                            <time datetime="<?= date('Y-m-d', strtotime($tx['created_at'])) ?>">
+                                                <?= date('M j, Y', strtotime($tx['created_at'])) ?>
+                                            </time>
+                                        </p>
+                                        <?php if (!$isCompleted): ?>
+                                            <span class="govuk-tag govuk-tag--yellow govuk-!-margin-top-1">
+                                                <i class="fa-solid fa-clock govuk-!-margin-right-1" aria-hidden="true"></i>
+                                                <?= ucfirst($status) ?>
+                                            </span>
+                                        <?php endif; ?>
+                                    </div>
+                                    <?php if ($isCompleted): ?>
+                                        <div style="width: 100%; border-top: 1px solid #b1b4b6; padding-top: 12px; margin-top: 4px;">
+                                            <?php if ($hasReviewed): ?>
+                                                <span class="govuk-tag govuk-tag--green">
+                                                    <i class="fa-solid fa-check govuk-!-margin-right-1" aria-hidden="true"></i>
+                                                    Reviewed
+                                                </span>
+                                            <?php else: ?>
+                                                <a href="<?= $basePath ?>/federation/review/<?= $tx['id'] ?>" class="govuk-button govuk-!-margin-bottom-0" style="background: #f47738;" data-module="govuk-button">
+                                                    <i class="fa-solid fa-star govuk-!-margin-right-1" aria-hidden="true"></i>
+                                                    Leave Review
+                                                </a>
+                                            <?php endif; ?>
+                                        </div>
+                                    <?php endif; ?>
+                                </div>
+                            </article>
+                        <?php endforeach; ?>
+                    </div>
+                <?php else: ?>
+                    <div class="govuk-!-padding-6 govuk-!-text-align-center" style="background: #f3f2f1; border-left: 5px solid #1d70b8;">
+                        <i class="fa-solid fa-exchange-alt fa-3x govuk-!-margin-bottom-4" style="color: #1d70b8;" aria-hidden="true"></i>
+                        <h2 class="govuk-heading-m">No Federated Transactions Yet</h2>
+                        <p class="govuk-body govuk-!-margin-bottom-4">Exchange hours with members from partner timebanks!</p>
+                        <a href="<?= $basePath ?>/federation/members" class="govuk-button" data-module="govuk-button">
+                            <i class="fa-solid fa-users govuk-!-margin-right-2" aria-hidden="true"></i>
+                            Browse Federated Members
+                        </a>
+                    </div>
+                <?php endif; ?>
+            </div>
+        </div>
+    </main>
 </div>
 
 <script>
-// Offline indicator
 (function() {
-    const banner = document.getElementById('offlineBanner');
-    if (!banner) return;
-    window.addEventListener('online', () => banner.classList.remove('civic-fed-offline-banner--visible'));
-    window.addEventListener('offline', () => banner.classList.add('civic-fed-offline-banner--visible'));
-    if (!navigator.onLine) banner.classList.add('civic-fed-offline-banner--visible');
+    'use strict';
+    var banner = document.getElementById('offlineBanner');
+    function updateOffline(offline) {
+        if (banner) banner.classList.toggle('govuk-!-display-none', !offline);
+    }
+    window.addEventListener('online', function() { updateOffline(false); });
+    window.addEventListener('offline', function() { updateOffline(true); });
+    if (!navigator.onLine) updateOffline(true);
 })();
 </script>
 

@@ -1,51 +1,106 @@
 <?php
-// CivicOne View: Create Poll
-$heroTitle = "Create Poll";
-$heroSub = "Ask the community a question.";
-$heroType = 'Governance';
-
+/**
+ * CivicOne View: Create Poll
+ * GOV.UK Design System Compliant (WCAG 2.1 AA)
+ */
+$pageTitle = 'Create Poll';
 require dirname(__DIR__, 2) . '/layouts/civicone/header.php';
+$basePath = \Nexus\Core\TenantContext::getBasePath();
 ?>
 
-<link rel="stylesheet" href="<?= Nexus\Core\TenantContext::getBasePath() ?>/assets/css/civicone-polls-show.css">
+<nav class="govuk-breadcrumbs govuk-!-margin-bottom-6" aria-label="Breadcrumb">
+    <ol class="govuk-breadcrumbs__list">
+        <li class="govuk-breadcrumbs__list-item">
+            <a class="govuk-breadcrumbs__link" href="<?= $basePath ?>">Home</a>
+        </li>
+        <li class="govuk-breadcrumbs__list-item">
+            <a class="govuk-breadcrumbs__link" href="<?= $basePath ?>/polls">Polls</a>
+        </li>
+        <li class="govuk-breadcrumbs__list-item" aria-current="page">Create Poll</li>
+    </ol>
+</nav>
 
-<div class="civic-container">
+<a href="<?= $basePath ?>/polls" class="govuk-back-link govuk-!-margin-bottom-6">Back to polls</a>
 
-    <h2 class="civic-border-bottom-black poll-create-heading">New Poll</h2>
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
 
-    <form action="<?= Nexus\Core\TenantContext::getBasePath() ?>/polls/store" method="POST" class="civic-card poll-create-form">
-        <?= Nexus\Core\Csrf::input() ?>
+        <h1 class="govuk-heading-xl">Create a new poll</h1>
+        <p class="govuk-body-l govuk-!-margin-bottom-6">Ask the community a question and gather their opinions.</p>
 
-        <label class="civic-label">Question</label>
-        <input type="text" name="question" class="civic-input" placeholder="e.g. Should we host a summer picnic?" required>
+        <form action="<?= $basePath ?>/polls/store" method="POST" id="create-poll-form">
+            <?= \Nexus\Core\Csrf::input() ?>
 
-        <label class="civic-label">Description (Optional)</label>
-        <textarea name="description" class="civic-input" rows="3"></textarea>
+            <!-- Question -->
+            <div class="govuk-form-group">
+                <label class="govuk-label" for="question">Question</label>
+                <div id="question-hint" class="govuk-hint">What would you like to ask the community?</div>
+                <input type="text" name="question" id="question" class="govuk-input" placeholder="e.g. Should we host a summer picnic?" aria-describedby="question-hint" required>
+            </div>
 
-        <label class="civic-label">Options (At least 2)</label>
-        <div id="poll-options">
-            <input type="text" name="options[]" class="civic-input poll-create-option-input" placeholder="Option 1" required>
-            <input type="text" name="options[]" class="civic-input poll-create-option-input" placeholder="Option 2" required>
-        </div>
-        <button type="button" onclick="addOption()" class="civic-poll-option poll-create-add-btn">+ Add Option</button>
+            <!-- Description -->
+            <div class="govuk-form-group">
+                <label class="govuk-label" for="description">
+                    Description <span class="govuk-hint govuk-!-display-inline">(optional)</span>
+                </label>
+                <div id="description-hint" class="govuk-hint">Provide more context for voters</div>
+                <textarea name="description" id="description" class="govuk-textarea" rows="3" aria-describedby="description-hint"></textarea>
+            </div>
 
-        <label class="civic-label">End Date (Optional)</label>
-        <input type="date" name="end_date" class="civic-input">
+            <!-- Options -->
+            <div class="govuk-form-group">
+                <fieldset class="govuk-fieldset">
+                    <legend class="govuk-fieldset__legend govuk-fieldset__legend--m">
+                        <h2 class="govuk-fieldset__heading">Voting options</h2>
+                    </legend>
+                    <div id="options-hint" class="govuk-hint">Add at least 2 options for voters to choose from</div>
 
-        <button type="submit" class="civic-btn poll-create-submit">Publish Poll</button>
-    </form>
+                    <div id="poll-options">
+                        <div class="govuk-form-group">
+                            <label class="govuk-label" for="option-1">Option 1</label>
+                            <input type="text" name="options[]" id="option-1" class="govuk-input" placeholder="Enter option" required>
+                        </div>
+                        <div class="govuk-form-group">
+                            <label class="govuk-label" for="option-2">Option 2</label>
+                            <input type="text" name="options[]" id="option-2" class="govuk-input" placeholder="Enter option" required>
+                        </div>
+                    </div>
 
+                    <button type="button" class="govuk-button govuk-button--secondary govuk-!-margin-top-2" data-module="govuk-button" onclick="addOption()">
+                        <i class="fa-solid fa-plus govuk-!-margin-right-1" aria-hidden="true"></i> Add another option
+                    </button>
+                </fieldset>
+            </div>
+
+            <!-- End Date -->
+            <div class="govuk-form-group">
+                <label class="govuk-label" for="end_date">
+                    End date <span class="govuk-hint govuk-!-display-inline">(optional)</span>
+                </label>
+                <div id="end-date-hint" class="govuk-hint">When should voting close?</div>
+                <input type="date" name="end_date" id="end_date" class="govuk-input govuk-input--width-10" aria-describedby="end-date-hint">
+            </div>
+
+            <button type="submit" class="govuk-button" data-module="govuk-button">
+                <i class="fa-solid fa-paper-plane govuk-!-margin-right-1" aria-hidden="true"></i>
+                Publish poll
+            </button>
+        </form>
+
+    </div>
 </div>
 
 <script>
-    function addOption() {
-        var div = document.createElement('input');
-        div.type = 'text';
-        div.name = 'options[]';
-        div.className = 'civic-input poll-create-option-input';
-        div.placeholder = 'New Option';
-        document.getElementById('poll-options').appendChild(div);
-    }
+var optionCount = 2;
+function addOption() {
+    optionCount++;
+    var container = document.getElementById('poll-options');
+    var div = document.createElement('div');
+    div.className = 'govuk-form-group';
+    div.innerHTML = '<label class="govuk-label" for="option-' + optionCount + '">Option ' + optionCount + '</label>' +
+                    '<input type="text" name="options[]" id="option-' + optionCount + '" class="govuk-input" placeholder="Enter option">';
+    container.appendChild(div);
+}
 </script>
 
 <?php require dirname(__DIR__, 2) . '/layouts/civicone/footer.php'; ?>
