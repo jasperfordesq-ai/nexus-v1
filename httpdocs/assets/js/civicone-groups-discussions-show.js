@@ -41,16 +41,16 @@ document.querySelectorAll('form').forEach(form => {
     });
 });
 
-// Button Press States
+// Button Press States - using classList for GOV.UK compliance
 document.querySelectorAll('.discussion-reply-btn, .discussion-action-btn, .discussion-back-btn, button').forEach(btn => {
     btn.addEventListener('pointerdown', function() {
-        this.style.transform = 'scale(0.96)';
+        this.classList.add('btn-pressed');
     });
     btn.addEventListener('pointerup', function() {
-        this.style.transform = '';
+        this.classList.remove('btn-pressed');
     });
     btn.addEventListener('pointerleave', function() {
-        this.style.transform = '';
+        this.classList.remove('btn-pressed');
     });
 });
 
