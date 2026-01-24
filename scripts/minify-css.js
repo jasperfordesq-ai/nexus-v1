@@ -222,6 +222,8 @@ const cssFiles = [
     'civicone-govuk-feedback.css',
     // GOV.UK navigation components (WCAG 2.2 AA - 2026-01-22)
     'civicone-govuk-navigation.css',
+    // CivicOne Service Navigation (GOV.UK 5.14.0 - 2026-01-24)
+    'civicone-service-navigation.css',
     // GOV.UK content components (WCAG 2.2 AA - 2026-01-22)
     'civicone-govuk-content.css',
     // GOV.UK tabs component (WCAG 2.2 AA - 2026-01-22)

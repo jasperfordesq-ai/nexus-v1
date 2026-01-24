@@ -124,9 +124,9 @@
         <link rel="stylesheet" href="/assets/css/members-directory-v1.6.min.css?v=<?= $cssVersion ?>">
     <?php endif; ?>
 
-    <!-- Cookie Consent (EU Compliance) -->
-    <link rel="stylesheet" href="/assets/css/civicone/cookie-banner.css?v=<?= $cssVersion ?>">
-    <script src="/assets/js/cookie-consent.js?v=<?= $cssVersion ?>"></script>
+    <!-- Cookie Consent (EU Compliance) - TEMPORARILY DISABLED -->
+    <!-- <link rel="stylesheet" href="/assets/css/civicone/cookie-banner.css?v=<?= $cssVersion ?>"> -->
+    <!-- <script src="/assets/js/cookie-consent.js?v=<?= $cssVersion ?>"> --></script>
 
     <!-- Mobile Sheets CSS (base styles always load, CSS handles desktop hiding) -->
     <link rel="stylesheet" href="/assets/css/mobile-sheets.min.css?v=<?= $cssVersion ?>">
@@ -153,6 +153,9 @@
     <!-- CivicOne Layout (includes grid system - must load for all pages) -->
     <link rel="stylesheet" href="/assets/css/civicone-header.min.css?v=<?= $cssVersion ?>">
     <link rel="stylesheet" href="/assets/css/civicone-footer.min.css?v=<?= $cssVersion ?>">
+
+    <!-- CivicOne Service Navigation (GOV.UK 5.14.0 categorized dropdown) -->
+    <link rel="stylesheet" href="/assets/css/civicone-service-navigation.min.css?v=<?= $cssVersion ?>">
 
     <!-- Account Area Navigation (MOJ Sub navigation pattern) -->
     <link rel="stylesheet" href="/assets/css/civicone-account-nav.min.css?v=<?= $cssVersion ?>">

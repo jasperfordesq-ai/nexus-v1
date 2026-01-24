@@ -7,59 +7,57 @@
  * Structure:
  * - Service name/logo (branding)
  * - Primary navigation links (max 5-6 visible)
- * - "More" dropdown for additional links (accessible)
+ * - "More" dropdown for additional links (accessible, organized by category)
  * - Mobile menu toggle
+ *
+ * Now uses NavigationConfig as single source of truth for all navigation items.
  */
 
-$basePath = \Nexus\Core\TenantContext::getBasePath();
+use Nexus\Core\TenantContext;
+use Nexus\Helpers\NavigationConfig;
+
+$basePath = TenantContext::getBasePath();
 $currentPath = $_SERVER['REQUEST_URI'] ?? '/';
 $isLoggedIn = isset($_SESSION['user_id']);
 
 // Get tenant/service name
-$serviceName = \Nexus\Core\TenantContext::get()['name'] ?? 'Project NEXUS';
-if (\Nexus\Core\TenantContext::getId() == 1) {
+$serviceName = TenantContext::get()['name'] ?? 'Project NEXUS';
+if (TenantContext::getId() == 1) {
     $serviceName = 'Project NEXUS';
 }
 
-// Primary navigation items - Top-level sections only
-$primaryNav = [
-    ['label' => 'Home', 'url' => '/', 'pattern' => '/'],
-    ['label' => 'Members', 'url' => '/members', 'pattern' => '/members'],
-    ['label' => 'Groups', 'url' => '/groups', 'pattern' => '/groups'],
-    ['label' => 'Listings', 'url' => '/listings', 'pattern' => '/listings'],
-];
+// Get primary navigation items from NavigationConfig
+$primaryNav = NavigationConfig::getPrimaryNav();
 
-// Conditionally add features
-if (\Nexus\Core\TenantContext::hasFeature('events')) {
+// Add some key community items to primary nav (to show more top-level items)
+$primaryNav[] = ['label' => 'Members', 'url' => '/members', 'pattern' => '/members'];
+$primaryNav[] = ['label' => 'Groups', 'url' => '/groups', 'pattern' => '/groups'];
+
+// Add Events if enabled
+if (TenantContext::hasFeature('events')) {
     $primaryNav[] = ['label' => 'Events', 'url' => '/events', 'pattern' => '/events'];
 }
 
-// Secondary navigation (goes in "More" dropdown)
-$secondaryNav = [];
+// Get categorized secondary navigation items for intelligent dropdown
+$secondaryNav = NavigationConfig::getSecondaryNav();
 
-if (\Nexus\Core\TenantContext::hasFeature('volunteering')) {
-    $secondaryNav[] = ['label' => 'Volunteering', 'url' => '/volunteering', 'pattern' => '/volunteering'];
-}
-
-if (\Nexus\Core\TenantContext::hasFeature('blog')) {
-    $secondaryNav[] = ['label' => 'News', 'url' => '/blog', 'pattern' => '/blog'];
-}
-
-if (\Nexus\Core\TenantContext::hasFeature('resources')) {
-    $secondaryNav[] = ['label' => 'Resources', 'url' => '/resources', 'pattern' => '/resources'];
-}
-
-// Add Help
-$secondaryNav[] = ['label' => 'Help', 'url' => '/help', 'pattern' => '/help'];
-
-// Add database-driven pages
-$dbPagesMain = \Nexus\Core\MenuGenerator::getMenuPages('main');
-foreach ($dbPagesMain as $mainPage) {
-    $secondaryNav[] = [
-        'label' => $mainPage['title'],
-        'url' => $mainPage['url'],
-        'pattern' => parse_url($mainPage['url'], PHP_URL_PATH) ?? $mainPage['url']
-    ];
+// Add database-driven pages to About section
+$dbPagesMain = NavigationConfig::getMenuPages('main');
+if (!empty($dbPagesMain)) {
+    if (!isset($secondaryNav['about'])) {
+        $secondaryNav['about'] = [
+            'title' => 'About',
+            'icon' => 'fa-circle-info',
+            'items' => []
+        ];
+    }
+    foreach ($dbPagesMain as $mainPage) {
+        $secondaryNav['about']['items'][] = [
+            'label' => $mainPage['title'],
+            'url' => $mainPage['url'],
+            'pattern' => parse_url($mainPage['url'], PHP_URL_PATH) ?? $mainPage['url'],
+        ];
+    }
 }
 
 // Helper: Check if nav item is active
@@ -76,10 +74,12 @@ function isNavActive($pattern, $currentPath, $basePath) {
 
 // Check if any secondary nav item is active
 $moreIsActive = false;
-foreach ($secondaryNav as $item) {
-    if (isNavActive($item['pattern'], $currentPath, $basePath)) {
-        $moreIsActive = true;
-        break;
+foreach ($secondaryNav as $category) {
+    foreach ($category['items'] as $item) {
+        if (isNavActive($item['pattern'] ?? $item['url'], $currentPath, $basePath)) {
+            $moreIsActive = true;
+            break 2;
+        }
     }
 }
 ?>
@@ -140,21 +140,32 @@ foreach ($secondaryNav as $item) {
                             </svg>
                         </button>
 
-                        <!-- More Dropdown Panel -->
+                        <!-- More Dropdown Panel (Categorized) -->
                         <div class="govuk-service-navigation__dropdown" id="more-navigation-panel" hidden>
-                            <ul class="govuk-service-navigation__dropdown-list">
-                                <?php foreach ($secondaryNav as $item):
-                                    $isActive = isNavActive($item['pattern'], $currentPath, $basePath);
+                            <div class="civicone-nav-dropdown-grid">
+                                <?php foreach ($secondaryNav as $categoryKey => $category):
+                                    if (empty($category['items'])) continue;
                                 ?>
-                                <li class="govuk-service-navigation__dropdown-item">
-                                    <a class="govuk-service-navigation__dropdown-link govuk-link"
-                                       href="<?= $basePath . htmlspecialchars($item['url']) ?>"
-                                       <?= $isActive ? 'aria-current="page"' : '' ?>>
-                                        <?= htmlspecialchars($item['label']) ?>
-                                    </a>
-                                </li>
+                                <div class="civicone-nav-dropdown-section">
+                                    <h3 class="civicone-nav-dropdown-heading">
+                                        <?= htmlspecialchars($category['title']) ?>
+                                    </h3>
+                                    <ul class="civicone-nav-dropdown-list">
+                                        <?php foreach ($category['items'] as $item):
+                                            $isActive = isNavActive($item['pattern'] ?? $item['url'], $currentPath, $basePath);
+                                        ?>
+                                        <li class="civicone-nav-dropdown-item">
+                                            <a class="govuk-service-navigation__dropdown-link"
+                                               href="<?= $basePath . htmlspecialchars($item['url']) ?>"
+                                               <?= $isActive ? 'aria-current="page"' : '' ?>>
+                                                <?= htmlspecialchars($item['label']) ?>
+                                            </a>
+                                        </li>
+                                        <?php endforeach; ?>
+                                    </ul>
+                                </div>
                                 <?php endforeach; ?>
-                            </ul>
+                            </div>
                         </div>
                     </li>
                     <?php endif; ?>
