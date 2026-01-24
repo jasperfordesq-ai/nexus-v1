@@ -6,10 +6,14 @@
  * Styles: https://github.com/alphagov/govuk-frontend/blob/main/packages/govuk-frontend/src/govuk/components/service-navigation/_index.scss
  * Documentation: https://design-system.service.gov.uk/components/service-navigation/
  *
- * This file implements the official GOV.UK service navigation component with:
- * - Light blue background (#f0f4f5) from GOV.UK Frontend v5.11.0+
- * - Darker blue links (#144e81) for better contrast (GOV.UK shade-25)
- * - 4px bottom border for active state (official pattern)
+ * EXACT GOV.UK FRONTEND VALUES (verified 2026-01-24):
+ * - Font size: 19px (1.1875rem) for navigation links
+ * - Line height: 1.526 (29/19 fractional line height)
+ * - Vertical padding: 15px (govuk-spacing(3))
+ * - Item spacing: 30px margin-right (govuk-spacing(6))
+ * - Active border: 5px (govuk-spacing(1))
+ * - Background: #f0f4f5 (light blue)
+ * - Link color: #144e81 (GOV.UK blue shade-25)
  * - Enhanced categorized dropdown (custom extension for multi-section navigation)
  *
  * CRITICAL: All styling decisions MUST reference the GOV.UK Frontend source code.
@@ -48,11 +52,13 @@
 
 .govuk-service-navigation__service-name .govuk-service-navigation__link {
     display: inline-block;
-    padding: var(--space-3, 12px) 0;
+    padding: 15px 0;
     font-weight: 700;
-    font-size: 1.125rem;
+    font-size: 1.1875rem;
+    line-height: 1.526;
     color: var(--color-govuk-black, #0b0c0c);
     text-decoration: none;
+    white-space: nowrap;
 }
 
 .govuk-service-navigation__service-name .govuk-service-navigation__link:hover {
@@ -80,16 +86,21 @@
     padding: 0;
 }
 
+.govuk-service-navigation__item:not(:last-child) {
+    margin-right: 30px;
+}
+
 .govuk-service-navigation__link {
     display: inline-block;
-    padding: var(--space-3, 12px) var(--space-4, 16px);
+    padding: 15px 0;
     color: #144e81;
     text-decoration: none;
     font-size: 1.1875rem;
-    line-height: 1.31579;
+    line-height: 1.526;
     font-weight: 400;
-    border-bottom: 4px solid transparent;
+    border-bottom: 5px solid transparent;
     transition: border-color 0.15s ease-in-out;
+    white-space: nowrap;
 }
 
 .govuk-service-navigation__link:hover {
@@ -108,6 +119,7 @@
 .govuk-service-navigation__item--active .govuk-service-navigation__link,
 .govuk-service-navigation__link[aria-current="page"] {
     border-bottom-color: #144e81;
+    border-bottom-width: 5px;
     font-weight: 700;
 }
 
