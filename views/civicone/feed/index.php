@@ -498,8 +498,8 @@ require dirname(__DIR__, 2) . '/layouts/civicone/header.php';
 <!-- Feed styles now loaded from external CSS file: /assets/css/civicone-feed.css -->
 
 <!-- GOV.UK Page Template Boilerplate (Section 10.0) -->
-<div class="civicone-width-container">
-    <main class="civicone-main-wrapper">
+<div class="govuk-width-container">
+    <main class="govuk-main-wrapper" id="main-content">
 
         <!-- Page Header (GOV.UK Typography) -->
         <h1 class="govuk-heading-xl">Community Pulse</h1>
