@@ -1,190 +1,68 @@
 <?php
-// Edit Event View - High-End Adaptive Holographic Glassmorphism Edition
-// ISOLATED LAYOUT: Uses #unique-glass-page-wrapper and html[data-theme] selectors.
+/**
+ * CivicOne View: Edit Event
+ * GOV.UK Design System Compliant (WCAG 2.1 AA)
+ */
+$pageTitle = 'Edit Event';
+require dirname(__DIR__, 2) . '/layouts/civicone/header.php';
+$basePath = \Nexus\Core\TenantContext::getBasePath();
 
-require __DIR__ . '/../../layouts/header.php';
-
-// PREPARATION LOGIC
-// 1. Extract Date/Time components for HTML5 inputs
-$startParts = explode(' ', $event['start_time']);
-$startDate = $startParts[0];
-$startTime = substr($startParts[1] ?? '00:00:00', 0, 5); // HH:MM
-
-$endDate = '';
-$endTime = '';
-if (!empty($event['end_time'])) {
-    $endParts = explode(' ', $event['end_time']);
-    $endDate = $endParts[0];
-    $endTime = substr($endParts[1] ?? '00:00:00', 0, 5);
-}
-
-// 2. Decode SDGs
-$selectedSDGs = [];
-if (!empty($event['sdg_goals'])) {
-    $selectedSDGs = json_decode($event['sdg_goals'], true) ?? [];
-}
+// Handle form errors from session
+$errors = $_SESSION['form_errors'] ?? [];
+$oldInput = $_SESSION['old_input'] ?? [];
+unset($_SESSION['form_errors'], $_SESSION['old_input']);
 ?>
 
-<!-- Offline Banner -->
-<div class="offline-banner" id="offlineBanner" role="alert" aria-live="polite">
-    <i class="fa-solid fa-wifi-slash"></i>
-    <span>No internet connection</span>
-</div>
+<nav class="govuk-breadcrumbs govuk-!-margin-bottom-6" aria-label="Breadcrumb">
+    <ol class="govuk-breadcrumbs__list">
+        <li class="govuk-breadcrumbs__list-item">
+            <a class="govuk-breadcrumbs__link" href="<?= $basePath ?>">Home</a>
+        </li>
+        <li class="govuk-breadcrumbs__list-item">
+            <a class="govuk-breadcrumbs__link" href="<?= $basePath ?>/events">Events</a>
+        </li>
+        <li class="govuk-breadcrumbs__list-item">
+            <a class="govuk-breadcrumbs__link" href="<?= $basePath ?>/events/<?= $event['id'] ?>"><?= htmlspecialchars($event['title']) ?></a>
+        </li>
+        <li class="govuk-breadcrumbs__list-item" aria-current="page">Edit</li>
+    </ol>
+</nav>
 
-<!-- Events Edit CSS -->
-<link rel="stylesheet" href="<?= NexusCoreTenantContext::getBasePath() ?>/assets/css/purged/civicone-events-edit.min.css">
+<a href="<?= $basePath ?>/events/<?= $event['id'] ?>" class="govuk-back-link govuk-!-margin-bottom-6">Back to event</a>
 
-<div id="unique-glass-page-wrapper">
-    <div class="glass-box">
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
 
-        <div class="page-header">
-            <h1>Edit Event</h1>
-            <div class="page-subtitle">Make changes to your gathering.</div>
+        <h1 class="govuk-heading-xl">Edit Event</h1>
+        <p class="govuk-body-l govuk-!-margin-bottom-6">Make changes to your event details.</p>
+
+        <!-- Error Summary -->
+        <?php if (!empty($errors)): ?>
+        <div class="govuk-error-summary" aria-labelledby="error-summary-title" role="alert" tabindex="-1" data-module="govuk-error-summary">
+            <h2 class="govuk-error-summary__title" id="error-summary-title">There is a problem</h2>
+            <div class="govuk-error-summary__body">
+                <ul class="govuk-list govuk-error-summary__list">
+                    <?php foreach ($errors as $field => $error): ?>
+                        <li><a href="#<?= htmlspecialchars($field) ?>"><?= htmlspecialchars($error) ?></a></li>
+                    <?php endforeach; ?>
+                </ul>
+            </div>
         </div>
+        <?php endif; ?>
 
-        <form action="<?= \Nexus\Core\TenantContext::getBasePath() ?>/events/<?= $event['id'] ?>/update" method="POST">
-            <?= \Nexus\Core\Csrf::input() ?>
+        <?php
+        // Include the shared form partial
+        $formAction = $basePath . '/events/' . $event['id'] . '/update';
+        $isEdit = true;
+        $submitButtonText = 'Save changes';
+        require __DIR__ . '/_form.php';
+        ?>
 
-            <!-- Title -->
-            <div class="form-group">
-                <label>Event Title</label>
-                <input type="text" name="title" id="title" value="<?= htmlspecialchars($event['title']) ?>" class="glass-input" required>
-            </div>
-
-            <!-- Location -->
-            <div class="form-group">
-                <label>Location</label>
-                <input type="text" name="location" value="<?= htmlspecialchars($event['location']) ?>" class="glass-input mapbox-location-input-v2" required>
-                <input type="hidden" name="latitude" value="<?= $event['latitude'] ?? '' ?>">
-                <input type="hidden" name="longitude" value="<?= $event['longitude'] ?? '' ?>">
-            </div>
-
-            <!-- Category -->
-            <div class="form-group">
-                <label>Category</label>
-                <select name="category_id" class="glass-input">
-                    <option value="">-- Select Category --</option>
-                    <?php if (!empty($categories)): ?>
-                        <?php foreach ($categories as $cat): ?>
-                            <option value="<?= $cat['id'] ?>" <?= ($event['category_id'] == $cat['id']) ? 'selected' : '' ?>>
-                                <?= htmlspecialchars($cat['name']) ?>
-                            </option>
-                        <?php endforeach; ?>
-                    <?php endif; ?>
-                </select>
-            </div>
-
-            <!-- Host as Group -->
-            <?php if (!empty($myGroups)): ?>
-                <div class="form-group">
-                    <label>Host as Hub (Optional)</label>
-                    <select name="group_id" class="glass-input">
-                        <option value="">-- Personal Event --</option>
-                        <?php foreach ($myGroups as $grp): ?>
-                            <option value="<?= $grp['id'] ?>" <?= ($event['group_id'] == $grp['id']) ? 'selected' : '' ?>>
-                                <?= htmlspecialchars($grp['name']) ?>
-                            </option>
-                        <?php endforeach; ?>
-                    </select>
-                </div>
-            <?php endif; ?>
-
-            <!-- Dates & Times -->
-            <div class="form-group dates-grid grid-2col">
-                <div>
-                    <label>Start Date</label>
-                    <input type="date" name="start_date" value="<?= $startDate ?>" class="glass-input" required>
-                </div>
-                <div>
-                    <label>Start Time</label>
-                    <input type="time" name="start_time" value="<?= $startTime ?>" class="glass-input" required>
-                </div>
-            </div>
-
-            <div class="form-group dates-grid grid-2col">
-                <div>
-                    <label>End Date (Optional)</label>
-                    <input type="date" name="end_date" value="<?= $endDate ?>" class="glass-input">
-                </div>
-                <div>
-                    <label>End Time (Optional)</label>
-                    <input type="time" name="end_time" value="<?= $endTime ?>" class="glass-input">
-                </div>
-            </div>
-
-            <!-- Description -->
-            <div class="form-group">
-                <label>Description</label>
-                <?php
-                $aiGenerateType = 'event';
-                $aiTitleField = 'title';
-                $aiDescriptionField = 'description';
-                $aiTypeField = null;
-                include __DIR__ . '/../../partials/ai-generate-button.php';
-                ?>
-                <textarea name="description" id="description" class="glass-input" rows="5" required><?= htmlspecialchars($event['description']) ?></textarea>
-            </div>
-
-            <!-- SDG Glass Accordion -->
-            <details <?= !empty($selectedSDGs) ? 'open' : '' ?>>
-                <summary>
-                    <span class="summary-content">
-                        Social Impact <span class="summary-optional">(Optional)</span>
-                    </span>
-                    <span class="summary-arrow">▼</span>
-                </summary>
-
-                <div class="sdg-content">
-                    <p class="sdg-hint">Tag which goals this event supports.</p>
-
-                    <?php
-                    require_once __DIR__ . '/../../../src/Helpers/SDG.php';
-                    $sdgs = \Nexus\Helpers\SDG::all();
-                    ?>
-
-                    <div class="sdg-grid">
-                        <?php foreach ($sdgs as $id => $goal): ?>
-                            <?php $isChecked = in_array($id, $selectedSDGs); ?>
-                            <label class="glass-sdg-card <?= $isChecked ? 'selected' : '' ?>" style="--sdg-color: <?= $goal['color'] ?>;">
-                                <input type="checkbox" name="sdg_goals[]" value="<?= $id ?>" <?= $isChecked ? 'checked' : '' ?> class="hidden" onchange="toggleSDGClass(this)">
-                                <span class="sdg-card-icon"><?= $goal['icon'] ?></span>
-                                <span class="sdg-card-label"><?= $goal['label'] ?></span>
-                            </label>
-                        <?php endforeach; ?>
-                    </div>
-                </div>
-            </details>
-
-            <script>
-                function toggleSDGClass(cb) {
-                    const card = cb.parentElement;
-                    if (cb.checked) {
-                        card.classList.add('selected');
-                    } else {
-                        card.classList.remove('selected');
-                    }
-                }
-            </script>
-
-            <!-- SEO Settings Accordion -->
-            <?php
-            $seo = $seo ?? \Nexus\Models\SeoMetadata::get('event', $event['id']);
-            $entityTitle = $event['title'] ?? '';
-            $entityUrl = \Nexus\Core\TenantContext::getBasePath() . '/events/' . $event['id'];
-            require __DIR__ . '/../../partials/seo-accordion.php';
-            ?>
-
-            <div class="actions-group">
-                <button type="submit" class="glass-btn-primary">Save Changes</button>
-                <a href="<?= \Nexus\Core\TenantContext::getBasePath() ?>/events/<?= $event['id'] ?>" class="glass-btn-secondary">Cancel</a>
-            </div>
-
-        </form>
+        <p class="govuk-body govuk-!-margin-top-4">
+            <a href="<?= $basePath ?>/events/<?= $event['id'] ?>" class="govuk-link">Cancel and return to event</a>
+        </p>
 
     </div>
 </div>
 
-<!-- Events Edit JavaScript -->
-<script src="<?= NexusCoreTenantContext::getBasePath() ?>/assets/js/civicone-events-edit.min.js" defer></script>
-
-<?php require __DIR__ . '/../../layouts/footer.php'; ?>
+<?php require dirname(__DIR__, 2) . '/layouts/civicone/footer.php'; ?>
