@@ -1,14 +1,19 @@
 <?php
 /**
  * CivicOne Layout Header - Government/Public Sector Theme
+ * GOV.UK Design System v5.14.0 Integration (govuk-template)
  *
  * Refactored 2026-01-20: Extracted into partials for maintainability
  * See docs/CIVICONE_WCAG21AA_SOURCE_OF_TRUTH.md for implementation details
  *
+ * GOV.UK Template Classes:
+ * - <html class="govuk-template"> in document-open.php
+ * - <body class="govuk-template__body"> in body-open.php
+ *
  * Partial Structure:
- * - document-open.php: DOCTYPE, html tag, PHP setup (variables, home detection)
+ * - document-open.php: DOCTYPE, html tag with govuk-template class, PHP setup
  * - assets-css.php: <head> section with all CSS/meta/fonts
- * - body-open.php: <body> tag with classes, early scripts, component CSS links
+ * - body-open.php: <body> tag with govuk-template__body class, early scripts
  * - skip-link-and-banner.php: WCAG skip link and experimental banner
  * - utility-bar.php: Top utility navigation (dropdowns, user menu, notifications)
  * - site-header.php: Main header with logo, nav, mega menu, search
