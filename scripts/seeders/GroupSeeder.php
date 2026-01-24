@@ -117,7 +117,8 @@ class GroupSeeder
             ]);
 
             // Update cached member count
-            $this->pdo->exec("UPDATE groups SET cached_member_count = cached_member_count + 1 WHERE id = {$groupId}");
+            $updateStmt = $this->pdo->prepare("UPDATE groups SET cached_member_count = cached_member_count + 1 WHERE id = ?");
+            $updateStmt->execute([$groupId]);
 
         } catch (Exception $e) {
             // Silently skip duplicates

@@ -176,7 +176,9 @@ try {
         $pdo->exec('SET FOREIGN_KEY_CHECKS = 0');
         foreach ($tables as $table) {
             try {
-                $pdo->exec("DELETE FROM {$table} WHERE tenant_id = {$config['tenant_id']}");
+                // Table name is from hardcoded array, tenant_id uses prepared statement
+                $stmt = $pdo->prepare("DELETE FROM `{$table}` WHERE tenant_id = ?");
+                $stmt->execute([$config['tenant_id']]);
                 success("  Cleared {$table}");
             } catch (Exception $e) {
                 warn("  Could not clear {$table}: " . $e->getMessage());
