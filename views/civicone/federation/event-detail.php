@@ -155,7 +155,7 @@ $spotsLeft = isset($event['max_attendees']) ? ($event['max_attendees'] - ($event
                         <i class="fa-solid fa-user govuk-!-margin-right-2" style="color: #505a5f;" aria-hidden="true"></i>
                         Organized By
                     </h2>
-                    <div class="govuk-!-padding-4 govuk-!-margin-bottom-6" style="background: #f3f2f1; display: flex; align-items: center; gap: 16px;">
+                    <div class="govuk-!-padding-4 govuk-!-margin-bottom-6 civicone-panel-bg" style="display: flex; align-items: center; gap: 16px;">
                         <img src="<?= htmlspecialchars($organizerAvatar) ?>"
                              onerror="this.src='<?= $fallbackAvatar ?>'"
                              alt=""

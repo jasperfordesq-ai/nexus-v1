@@ -35,13 +35,13 @@ $cronKey  = \Nexus\Core\Env::get('CRON_KEY') ?? 'Not Set (Insecure)';
         <!-- Stats Grid -->
         <div class="govuk-grid-row govuk-!-margin-bottom-8">
             <div class="govuk-grid-column-one-third">
-                <div class="govuk-!-padding-4 govuk-!-text-align-center" style="background: #f3f2f1; border-left: 5px solid #1d70b8;">
+                <div class="govuk-!-padding-4 govuk-!-text-align-center civicone-panel-bg" style="border-left: 5px solid #1d70b8;">
                     <p class="govuk-heading-xl govuk-!-margin-bottom-1" style="color: #1d70b8;"><?= count($tenants) ?></p>
                     <p class="govuk-body-s govuk-!-margin-bottom-0">Total Tenants</p>
                 </div>
             </div>
             <div class="govuk-grid-column-one-third">
-                <div class="govuk-!-padding-4 govuk-!-text-align-center" style="background: #f3f2f1; border-left: 5px solid #912b88;">
+                <div class="govuk-!-padding-4 govuk-!-text-align-center civicone-panel-bg" style="border-left: 5px solid #912b88;">
                     <p class="govuk-heading-xl govuk-!-margin-bottom-1" style="color: #912b88;"><?= $totalAllUsers ?? 'N/A' ?></p>
                     <p class="govuk-body-s govuk-!-margin-bottom-2">Active Users</p>
                     <a href="<?= $basePath ?>/super-admin/users" class="govuk-button govuk-button--secondary govuk-!-margin-bottom-0" data-module="govuk-button" style="width: 100%;">
@@ -51,7 +51,7 @@ $cronKey  = \Nexus\Core\Env::get('CRON_KEY') ?? 'Not Set (Insecure)';
                 </div>
             </div>
             <div class="govuk-grid-column-one-third">
-                <div class="govuk-!-padding-4 govuk-!-text-align-center" style="background: #f3f2f1; border-left: 5px solid #f47738;">
+                <div class="govuk-!-padding-4 govuk-!-text-align-center civicone-panel-bg" style="border-left: 5px solid #f47738;">
                     <p class="govuk-heading-xl govuk-!-margin-bottom-1" style="color: #f47738;"><?= $qPending ?></p>
                     <p class="govuk-body-s govuk-!-margin-bottom-0">Queue Pending</p>
                     <?php if ($qFailed > 0): ?>
@@ -68,7 +68,7 @@ $cronKey  = \Nexus\Core\Env::get('CRON_KEY') ?? 'Not Set (Insecure)';
         </div>
 
         <!-- Cron Configuration -->
-        <div class="govuk-!-margin-bottom-8" style="background: #f3f2f1; border: 1px solid #b1b4b6;">
+        <div class="govuk-!-margin-bottom-8 civicone-panel-bg" style="border: 1px solid #b1b4b6;">
             <div class="govuk-!-padding-4" style="background: white; border-bottom: 1px solid #b1b4b6;">
                 <h2 class="govuk-heading-m govuk-!-margin-bottom-0">
                     <i class="fa-solid fa-terminal govuk-!-margin-right-2" style="color: #1d70b8;" aria-hidden="true"></i>
@@ -106,7 +106,7 @@ $cronKey  = \Nexus\Core\Env::get('CRON_KEY') ?? 'Not Set (Insecure)';
 
         <!-- Managed Communities -->
         <div class="govuk-!-margin-bottom-8" style="border: 1px solid #b1b4b6;">
-            <div class="govuk-!-padding-4" style="background: #f3f2f1; border-bottom: 1px solid #b1b4b6;">
+            <div class="govuk-!-padding-4 civicone-panel-bg" style="border-bottom: 1px solid #b1b4b6;">
                 <div style="display: flex; align-items: center; gap: 12px;">
                     <div style="width: 40px; height: 40px; border-radius: 8px; background: linear-gradient(135deg, #1d70b8, #00703c); display: flex; align-items: center; justify-content: center; color: white;">
                         <i class="fa-solid fa-globe" aria-hidden="true"></i>
@@ -134,7 +134,7 @@ $cronKey  = \Nexus\Core\Env::get('CRON_KEY') ?? 'Not Set (Insecure)';
                                 <strong><?= htmlspecialchars($t['name']) ?></strong>
                             </td>
                             <td class="govuk-table__cell">
-                                <code style="background: #f3f2f1; padding: 2px 6px; border-radius: 3px;">/<?= htmlspecialchars($t['slug']) ?></code>
+                                <code class="civicone-panel-bg" style="padding: 2px 6px; border-radius: 3px;">/<?= htmlspecialchars($t['slug']) ?></code>
                             </td>
                             <td class="govuk-table__cell">
                                 <?php
@@ -167,7 +167,7 @@ $cronKey  = \Nexus\Core\Env::get('CRON_KEY') ?? 'Not Set (Insecure)';
 
         <!-- Deploy New Instance -->
         <div style="border: 1px solid #b1b4b6;">
-            <div class="govuk-!-padding-4" style="background: #f3f2f1; border-bottom: 1px solid #b1b4b6;">
+            <div class="govuk-!-padding-4 civicone-panel-bg" style="border-bottom: 1px solid #b1b4b6;">
                 <div style="display: flex; align-items: center; gap: 12px;">
                     <div style="width: 40px; height: 40px; border-radius: 8px; background: linear-gradient(135deg, #f47738, #d4351c); display: flex; align-items: center; justify-content: center; color: white;">
                         <i class="fa-solid fa-rocket" aria-hidden="true"></i>
@@ -183,7 +183,7 @@ $cronKey  = \Nexus\Core\Env::get('CRON_KEY') ?? 'Not Set (Insecure)';
                 <form action="<?= $basePath ?>/super-admin/create-tenant" method="POST">
 
                     <!-- Instance Details -->
-                    <div class="govuk-!-margin-bottom-6 govuk-!-padding-4" style="background: #f3f2f1; border-left: 5px solid #1d70b8;">
+                    <div class="govuk-!-margin-bottom-6 govuk-!-padding-4 civicone-panel-bg" style="border-left: 5px solid #1d70b8;">
                         <h3 class="govuk-heading-s govuk-!-margin-bottom-4">
                             <i class="fa-solid fa-building govuk-!-margin-right-2" style="color: #1d70b8;" aria-hidden="true"></i>
                             Instance Details
@@ -209,7 +209,7 @@ $cronKey  = \Nexus\Core\Env::get('CRON_KEY') ?? 'Not Set (Insecure)';
                     </div>
 
                     <!-- Primary Administrator -->
-                    <div class="govuk-!-margin-bottom-6 govuk-!-padding-4" style="background: #f3f2f1; border-left: 5px solid #00703c;">
+                    <div class="govuk-!-margin-bottom-6 govuk-!-padding-4 civicone-panel-bg" style="border-left: 5px solid #00703c;">
                         <h3 class="govuk-heading-s govuk-!-margin-bottom-4">
                             <i class="fa-solid fa-user-shield govuk-!-margin-right-2" style="color: #00703c;" aria-hidden="true"></i>
                             Primary Administrator

@@ -127,7 +127,7 @@ require __DIR__ . '/../../layouts/civicone/header.php';
 
             <!-- Sidebar -->
             <div class="govuk-grid-column-one-third">
-                <div class="govuk-!-padding-4" style="background: #f3f2f1; border-left: 5px solid #1d70b8;">
+                <div class="govuk-!-padding-4 civicone-panel-bg" style="border-left: 5px solid #1d70b8;">
                     <h3 class="govuk-heading-s">
                         <i class="fa-solid fa-circle-info govuk-!-margin-right-2" style="color: #1d70b8;" aria-hidden="true"></i>
                         Need help?
@@ -138,7 +138,7 @@ require __DIR__ . '/../../layouts/civicone/header.php';
                     <a href="<?= $basePath ?>/contact" class="govuk-link">Contact support</a>
                 </div>
 
-                <div class="govuk-!-padding-4 govuk-!-margin-top-4" style="background: #f3f2f1; border-left: 5px solid #00703c;">
+                <div class="govuk-!-padding-4 govuk-!-margin-top-4 civicone-panel-bg" style="border-left: 5px solid #00703c;">
                     <h3 class="govuk-heading-s">
                         <i class="fa-solid fa-shield-halved govuk-!-margin-right-2" style="color: #00703c;" aria-hidden="true"></i>
                         Your rights

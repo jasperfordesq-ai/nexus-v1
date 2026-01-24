@@ -42,7 +42,7 @@ $basePath = Nexus\Core\TenantContext::getBasePath();
     </div>
 <?php endif; ?>
 
-<div class="govuk-!-padding-6" style="background: #f3f2f1;">
+<div class="govuk-!-padding-6 civicone-panel-bg">
     <form action="<?= $basePath ?>/groups/<?= $group['id'] ?>/invite" method="POST" id="inviteForm" aria-label="Invite members to group">
         <?= Nexus\Core\Csrf::input() ?>
 

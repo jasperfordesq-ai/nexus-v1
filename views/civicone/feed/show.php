@@ -80,7 +80,7 @@ require __DIR__ . '/../../layouts/civicone/header.php';
     <?php endif; ?>
 
     <!-- Stats Bar -->
-    <div class="govuk-grid-row govuk-!-margin-bottom-4 govuk-!-padding-3" style="background: #f3f2f1;">
+    <div class="govuk-grid-row govuk-!-margin-bottom-4 govuk-!-padding-3 civicone-panel-bg">
         <div class="govuk-grid-column-one-half">
             <p class="govuk-body-s govuk-!-margin-bottom-0">
                 <i class="fa-solid fa-heart govuk-!-margin-right-1" aria-hidden="true"></i>

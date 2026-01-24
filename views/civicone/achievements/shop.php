@@ -31,7 +31,7 @@ require dirname(__DIR__, 2) . '/layouts/civicone/header.php';
         <p class="govuk-body-l">Redeem your XP for exclusive rewards.</p>
     </div>
     <div class="govuk-grid-column-one-third">
-        <div class="govuk-!-padding-4" style="border: 2px solid #1d70b8; background: #f3f2f1; text-align: center;">
+        <div class="govuk-!-padding-4 civicone-panel-bg" style="border: 2px solid #1d70b8; text-align: center;">
             <p class="govuk-body-s govuk-!-margin-bottom-1" style="color: #505a5f;">Your XP Balance</p>
             <p class="govuk-heading-l govuk-!-margin-bottom-0" style="color: #1d70b8;">
                 <i class="fa-solid fa-coins" aria-hidden="true"></i>

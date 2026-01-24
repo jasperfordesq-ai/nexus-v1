@@ -127,7 +127,7 @@ $isEndingSoon = $seasonData['is_ending_soon'] ?? false;
                             $isCurrentUser = isset($_SESSION['user_id']) && $entry['user_id'] == $_SESSION['user_id'];
                             $isTop3 = $position <= 3;
                         ?>
-                        <tr class="govuk-table__row <?= $isCurrentUser ? 'govuk-!-font-weight-bold' : '' ?>" <?= $isCurrentUser ? 'style="background: #f3f2f1;"' : '' ?>>
+                        <tr class="govuk-table__row <?= $isCurrentUser ? 'govuk-!-font-weight-bold civicone-panel-bg' : '' ?>"
                             <td class="govuk-table__cell">
                                 <?php if ($position === 1): ?>
                                     <i class="fa-solid fa-crown" aria-hidden="true" style="color: #f47738;"></i>

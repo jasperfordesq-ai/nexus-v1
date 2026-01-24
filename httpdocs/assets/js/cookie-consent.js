@@ -25,7 +25,7 @@ window.NexusCookieConsent = (function() {
         STORAGE_KEY: 'nexus_cookie_consent',
         CONSENT_DURATION: 365, // days
         CONSENT_VERSION: '1.0',
-        DEBUG: false
+        DEBUG: true // Enable debug logging temporarily
     };
 
     // State

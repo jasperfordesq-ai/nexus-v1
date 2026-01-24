@@ -326,7 +326,18 @@ $tenantName = $tenant['name'] ?? 'This Community';
 <script>
 // Handle Accept All
 async function handleAcceptAll() {
+    console.log('[Banner] Accept All clicked');
+    console.log('[Banner] NexusCookieConsent available:', typeof window.NexusCookieConsent);
+
+    if (!window.NexusCookieConsent) {
+        console.error('[Banner] NexusCookieConsent not loaded!');
+        showCookieToast('Error: Cookie system not loaded. Please refresh the page.', 'error');
+        return;
+    }
+
     const success = await window.NexusCookieConsent.acceptAll();
+    console.log('[Banner] Accept All result:', success);
+
     if (success) {
         showCookieToast('Your cookie preferences have been saved. All cookies enabled.');
     } else {

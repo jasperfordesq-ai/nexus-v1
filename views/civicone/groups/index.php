@@ -46,7 +46,7 @@ $basePath = \Nexus\Core\TenantContext::getBasePath();
 
     <!-- Filters Panel (1/3) -->
     <div class="govuk-grid-column-one-third">
-        <div class="govuk-!-padding-4" style="background: #f3f2f1; margin-bottom: 1.5rem;">
+        <div class="govuk-!-padding-4 civicone-panel-bg" style="margin-bottom: 1.5rem;">
             <h2 class="govuk-heading-m">Filter hubs</h2>
 
             <form method="get" action="<?= $basePath ?>/groups">
@@ -145,7 +145,7 @@ $basePath = \Nexus\Core\TenantContext::getBasePath();
                             <?php if ($hasImg): ?>
                                 <img src="<?= htmlspecialchars($group['image_path']) ?>" alt="" width="64" height="64" style="border-radius: 4px; object-fit: cover;">
                             <?php else: ?>
-                                <div style="width: 64px; height: 64px; border-radius: 4px; background: #f3f2f1; display: flex; align-items: center; justify-content: center;">
+                                <div class="civicone-panel-bg" style="width: 64px; height: 64px; border-radius: 4px; display: flex; align-items: center; justify-content: center;">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#505a5f" stroke-width="1.5" aria-hidden="true">
                                         <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
                                         <circle cx="9" cy="7" r="4"></circle>

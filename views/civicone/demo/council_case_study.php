@@ -47,7 +47,7 @@ require __DIR__ . '/../../layouts/civicone/header.php';
 
     <!-- Diagram -->
     <div class="govuk-grid-column-one-half">
-        <div class="govuk-!-padding-4" style="background: #f3f2f1; height: 100%;">
+        <div class="govuk-!-padding-4 civicone-panel-bg" style="height: 100%;">
             <img src="https://placehold.co/600x300/002d72/FFF?text=Multi-Hub+Architecture" alt="Diagram showing Hub and Spoke model" style="width: 100%; height: auto;">
             <p class="govuk-body-s govuk-!-margin-top-2 govuk-!-margin-bottom-0" style="color: #505a5f;">Fig 1. The Hub & Spoke Tenant Model</p>
         </div>

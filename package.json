@@ -1,12 +1,12 @@
 {
   "scripts": {
-    "build:css": "node scripts/build-css.js",
+    "build:css": "node scripts/build-css.js && node scripts/validate-design-tokens.js",
     "build:css:core": "node scripts/build-core-css.js",
     "build:css:purge": "node scripts/run-purgecss.js",
     "build:images": "node scripts/optimize-images.js",
     "css:discover": "node scripts/discover-css.js",
     "css:auto-config": "node scripts/auto-discover-css.js",
-    "minify:css": "node scripts/minify-css.js",
+    "minify:css": "node scripts/minify-css.js && node scripts/validate-design-tokens.js",
     "minify:js": "node scripts/minify-js.js",
     "minify:php": "php scripts/minify.php",
     "lint:css": "stylelint \"httpdocs/assets/css/**/*.css\" --ignore-pattern \"**/*.min.css\" --ignore-pattern \"**/_archived/**\"",
@@ -16,6 +16,7 @@
     "lint:php:styles": "php scripts/lint-inline-styles.php",
     "lint": "npm run lint:css && npm run lint:js && npm run lint:php:styles",
     "consolidate:css": "node scripts/consolidate-css.js",
+    "validate:design-tokens": "node scripts/validate-design-tokens.js",
     "deploy:preview": "bash scripts/claude-deploy.sh --last-commit --dry-run",
     "deploy": "bash scripts/claude-deploy.sh --last-commit --verify",
     "deploy:changed": "bash scripts/claude-deploy.sh --changed --verify",

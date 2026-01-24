@@ -502,6 +502,33 @@ if (file_exists($envPath)) {
 <!-- Mobile Navigation v2 (Full-Screen Native Style) -->
 <?php include __DIR__ . '/partials/mobile-nav-v2.php'; ?>
 
+<!-- EMERGENCY FIX: Force hide mobile menu on desktop with maximum specificity -->
+<style>
+@media (min-width: 1025px) {
+    .mobile-fullscreen-menu,
+    .mobile-notification-sheet,
+    #mobileMenu,
+    #mobileNotifications,
+    .mobile-tab-bar,
+    nav.mobile-tab-bar,
+    div.mobile-fullscreen-menu,
+    div.mobile-notification-sheet {
+        display: none !important;
+        visibility: hidden !important;
+        opacity: 0 !important;
+        pointer-events: none !important;
+        position: absolute !important;
+        left: -99999px !important;
+        top: -99999px !important;
+        width: 0 !important;
+        height: 0 !important;
+        overflow: hidden !important;
+        clip: rect(0,0,0,0) !important;
+        z-index: -9999 !important;
+    }
+}
+</style>
+
 <!-- Mobile Bottom Sheets (Comments, etc) -->
 <?php include __DIR__ . '/../../modern/partials/mobile-sheets.php'; ?>
 

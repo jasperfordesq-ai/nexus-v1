@@ -84,7 +84,7 @@ $typeColor = $type === 'offer' ? '#00703c' : '#1d70b8';
                         <i class="fa-solid fa-user govuk-!-margin-right-2" style="color: #505a5f;" aria-hidden="true"></i>
                         Posted By
                     </h2>
-                    <div class="govuk-!-padding-4 govuk-!-margin-bottom-6" style="background: #f3f2f1; display: flex; align-items: center; gap: 16px;">
+                    <div class="govuk-!-padding-4 govuk-!-margin-bottom-6 civicone-panel-bg" style="display: flex; align-items: center; gap: 16px;">
                         <img src="<?= htmlspecialchars($ownerAvatar) ?>"
                              onerror="this.src='<?= $fallbackAvatar ?>'"
                              alt=""

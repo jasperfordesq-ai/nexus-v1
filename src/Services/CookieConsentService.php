@@ -51,13 +51,16 @@ class CookieConsentService
 
         $validityDays = $tenantSettings['consent_validity_days'] ?? self::DEFAULT_VALIDITY_DAYS;
 
+        // Calculate expiry date
+        $expiresAt = date('Y-m-d H:i:s', strtotime("+{$validityDays} days"));
+
         // Insert consent record
         $stmt = Database::query(
             "INSERT INTO cookie_consents
              (session_id, user_id, tenant_id, essential, functional, analytics, marketing,
               ip_address, user_agent, consent_string, expires_at, consent_version, source,
               last_updated_by_user, created_at, updated_at)
-             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, DATE_ADD(NOW(), INTERVAL ? DAY), ?, ?, NOW(), NOW())",
+             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), NOW(), NOW())",
             [
                 $sessionId,
                 $userId,
@@ -69,7 +72,7 @@ class CookieConsentService
                 $_SERVER['REMOTE_ADDR'] ?? null,
                 $_SERVER['HTTP_USER_AGENT'] ?? null,
                 json_encode($categories),
-                $validityDays,
+                $expiresAt,
                 self::CONSENT_VERSION,
                 $data['source'] ?? 'web'
             ]
@@ -90,7 +93,7 @@ class CookieConsentService
             'functional' => $categories['functional'],
             'analytics' => $categories['analytics'],
             'marketing' => $categories['marketing'],
-            'expires_at' => date('Y-m-d H:i:s', strtotime("+{$validityDays} days")),
+            'expires_at' => $expiresAt,
             'version' => self::CONSENT_VERSION
         ];
     }

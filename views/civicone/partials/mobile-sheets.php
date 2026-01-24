@@ -22,6 +22,21 @@ $userName = $_SESSION['user_name'] ?? 'User';
 $basePath = class_exists('\Nexus\Core\TenantContext') ? \Nexus\Core\TenantContext::getBasePath() : '';
 ?>
 
+<!-- CRITICAL: Hide mobile sheets on desktop -->
+<style>
+@media (min-width: 1025px) {
+    .mobile-sheet-backdrop,
+    .mobile-sheet,
+    #commentBackdrop,
+    #commentSheet {
+        display: none !important;
+        visibility: hidden !important;
+        opacity: 0 !important;
+        pointer-events: none !important;
+    }
+}
+</style>
+
 <!-- Comment Sheet -->
 <div class="mobile-sheet-backdrop" id="commentBackdrop" onclick="closeMobileCommentSheet()"></div>
 <div class="mobile-sheet" id="commentSheet">

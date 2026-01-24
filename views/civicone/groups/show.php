@@ -23,7 +23,7 @@ $hasSubHubs = !empty($subGroups);
 </nav>
 
 <!-- Group Header -->
-<div class="govuk-!-margin-bottom-6 govuk-!-padding-6" style="background: #f3f2f1; border-left: 5px solid #1d70b8;">
+<div class="govuk-!-margin-bottom-6 govuk-!-padding-6 civicone-panel-bg" style="border-left: 5px solid #1d70b8;">
     <div class="govuk-grid-row">
         <div class="govuk-grid-column-two-thirds">
             <span class="govuk-tag govuk-tag--blue govuk-!-margin-bottom-3">Local Hub</span>
@@ -128,7 +128,7 @@ $hasSubHubs = !empty($subGroups);
                                     <?php if (!empty($mem['avatar_url'])): ?>
                                         <img src="<?= htmlspecialchars($mem['avatar_url']) ?>" alt="" style="width: 60px; height: 60px; border-radius: 50%; margin-bottom: 0.5rem;">
                                     <?php else: ?>
-                                        <div class="govuk-!-margin-bottom-2" style="width: 60px; height: 60px; border-radius: 50%; background: #f3f2f1; margin: 0 auto; display: flex; align-items: center; justify-content: center;">
+                                        <div class="govuk-!-margin-bottom-2 civicone-panel-bg" style="width: 60px; height: 60px; border-radius: 50%; margin: 0 auto; display: flex; align-items: center; justify-content: center;">
                                             <i class="fa-solid fa-user" style="font-size: 1.5rem; color: #505a5f;" aria-hidden="true"></i>
                                         </div>
                                     <?php endif; ?>
@@ -147,7 +147,7 @@ $hasSubHubs = !empty($subGroups);
 
     <!-- Sidebar -->
     <div class="govuk-grid-column-one-third">
-        <div class="govuk-!-padding-4" style="background: #f3f2f1;">
+        <div class="govuk-!-padding-4 civicone-panel-bg">
             <h2 class="govuk-heading-m">Hub Manager</h2>
             <p class="govuk-body govuk-!-margin-bottom-1"><strong><?= htmlspecialchars($group['owner_name'] ?? 'Organizer') ?></strong></p>
             <p class="govuk-body-s" style="color: #505a5f;">Organizer</p>

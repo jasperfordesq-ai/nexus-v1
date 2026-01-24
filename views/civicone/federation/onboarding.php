@@ -46,15 +46,15 @@ $displayName = $userProfile['name'] ?? trim(($userProfile['first_name'] ?? '') .
                         <span class="govuk-visually-hidden">Step </span>1
                     </li>
                     <li data-line="1" style="width: 3rem; height: 2px; background: #b1b4b6;" aria-hidden="true"></li>
-                    <li data-step="2" class="govuk-!-padding-2" style="background: #f3f2f1; border-radius: 50%; width: 2rem; height: 2rem; display: flex; align-items: center; justify-content: center;">
+                    <li data-step="2" class="govuk-!-padding-2 civicone-panel-bg" style="border-radius: 50%; width: 2rem; height: 2rem; display: flex; align-items: center; justify-content: center;">
                         <span class="govuk-visually-hidden">Step </span>2
                     </li>
                     <li data-line="2" style="width: 3rem; height: 2px; background: #b1b4b6;" aria-hidden="true"></li>
-                    <li data-step="3" class="govuk-!-padding-2" style="background: #f3f2f1; border-radius: 50%; width: 2rem; height: 2rem; display: flex; align-items: center; justify-content: center;">
+                    <li data-step="3" class="govuk-!-padding-2 civicone-panel-bg" style="border-radius: 50%; width: 2rem; height: 2rem; display: flex; align-items: center; justify-content: center;">
                         <span class="govuk-visually-hidden">Step </span>3
                     </li>
                     <li data-line="3" style="width: 3rem; height: 2px; background: #b1b4b6;" aria-hidden="true"></li>
-                    <li data-step="4" class="govuk-!-padding-2" style="background: #f3f2f1; border-radius: 50%; width: 2rem; height: 2rem; display: flex; align-items: center; justify-content: center;">
+                    <li data-step="4" class="govuk-!-padding-2 civicone-panel-bg" style="border-radius: 50%; width: 2rem; height: 2rem; display: flex; align-items: center; justify-content: center;">
                         <i class="fa-solid fa-check" aria-hidden="true"></i>
                         <span class="govuk-visually-hidden">Complete</span>
                     </li>
@@ -231,7 +231,7 @@ $displayName = $userProfile['name'] ?? trim(($userProfile['first_name'] ?? '') .
                 </div>
 
                 <!-- Profile Preview -->
-                <div class="govuk-!-padding-4 govuk-!-margin-top-6 govuk-!-text-align-center" style="background: #f3f2f1;" aria-label="Profile preview">
+                <div class="govuk-!-padding-4 govuk-!-margin-top-6 govuk-!-text-align-center civicone-panel-bg" aria-label="Profile preview">
                     <div class="govuk-!-margin-bottom-2" style="width: 60px; height: 60px; border-radius: 50%; background: #1d70b8; display: inline-flex; align-items: center; justify-content: center; color: white; font-size: 1.5rem;">
                         <?php if (!empty($userProfile['avatar_url'])): ?>
                             <img src="<?= htmlspecialchars($userProfile['avatar_url']) ?>" alt="" loading="lazy" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">

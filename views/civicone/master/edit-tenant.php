@@ -77,7 +77,7 @@ $modules = [
 
             <!-- General Settings -->
             <div class="govuk-!-margin-bottom-8" style="border: 1px solid #b1b4b6;">
-                <div class="govuk-!-padding-4" style="background: #f3f2f1; border-bottom: 1px solid #b1b4b6;">
+                <div class="govuk-!-padding-4 civicone-panel-bg" style="border-bottom: 1px solid #b1b4b6;">
                     <div style="display: flex; align-items: center; gap: 12px;">
                         <div style="width: 40px; height: 40px; border-radius: 8px; background: #1d70b8; display: flex; align-items: center; justify-content: center; color: white;">
                             <i class="fa-solid fa-cog" aria-hidden="true"></i>
@@ -91,7 +91,7 @@ $modules = [
 
                 <div class="govuk-!-padding-4">
                     <!-- Basic Information -->
-                    <div class="govuk-!-margin-bottom-6 govuk-!-padding-4" style="background: #f3f2f1; border-left: 5px solid #1d70b8;">
+                    <div class="govuk-!-margin-bottom-6 govuk-!-padding-4 civicone-panel-bg" style="border-left: 5px solid #1d70b8;">
                         <h3 class="govuk-heading-s govuk-!-margin-bottom-4">
                             <i class="fa-solid fa-info-circle govuk-!-margin-right-2" style="color: #1d70b8;" aria-hidden="true"></i>
                             Basic Information
@@ -137,7 +137,7 @@ $modules = [
                     </div>
 
                     <!-- Footer & Legal -->
-                    <div class="govuk-!-margin-bottom-6 govuk-!-padding-4" style="background: #f3f2f1; border-left: 5px solid #505a5f;">
+                    <div class="govuk-!-margin-bottom-6 govuk-!-padding-4 civicone-panel-bg" style="border-left: 5px solid #505a5f;">
                         <h3 class="govuk-heading-s govuk-!-margin-bottom-4">
                             <i class="fa-solid fa-file-contract govuk-!-margin-right-2" style="color: #505a5f;" aria-hidden="true"></i>
                             Footer & Legal Documents
@@ -167,7 +167,7 @@ $modules = [
                     </div>
 
                     <!-- Module Installation -->
-                    <div class="govuk-!-margin-bottom-4 govuk-!-padding-4" style="background: #f3f2f1; border-left: 5px solid #00703c;">
+                    <div class="govuk-!-margin-bottom-4 govuk-!-padding-4 civicone-panel-bg" style="border-left: 5px solid #00703c;">
                         <div style="display: flex; justify-content: space-between; align-items: center;" class="govuk-!-margin-bottom-4">
                             <h3 class="govuk-heading-s govuk-!-margin-bottom-0">
                                 <i class="fa-solid fa-puzzle-piece govuk-!-margin-right-2" style="color: #00703c;" aria-hidden="true"></i>
@@ -214,7 +214,7 @@ $modules = [
 
         <!-- Tenant Administrators -->
         <div class="govuk-!-margin-bottom-8" style="border: 1px solid #b1b4b6;">
-            <div class="govuk-!-padding-4" style="background: #f3f2f1; border-bottom: 1px solid #b1b4b6;">
+            <div class="govuk-!-padding-4 civicone-panel-bg" style="border-bottom: 1px solid #b1b4b6;">
                 <div style="display: flex; align-items: center; gap: 12px;">
                     <div style="width: 40px; height: 40px; border-radius: 8px; background: #00703c; display: flex; align-items: center; justify-content: center; color: white;">
                         <i class="fa-solid fa-user-shield" aria-hidden="true"></i>
@@ -241,7 +241,7 @@ $modules = [
                         <div class="govuk-grid-row">
                             <?php foreach ($admins as $a): ?>
                                 <div class="govuk-grid-column-one-third govuk-!-margin-bottom-4">
-                                    <div class="govuk-!-padding-3" style="background: #f3f2f1; border-left: 5px solid #00703c;">
+                                    <div class="govuk-!-padding-3 civicone-panel-bg" style="border-left: 5px solid #00703c;">
                                         <div style="display: flex; align-items: center; justify-content: space-between;">
                                             <div style="display: flex; align-items: center; gap: 12px;">
                                                 <div style="width: 40px; height: 40px; border-radius: 50%; background: #00703c; color: white; display: flex; align-items: center; justify-content: center; font-weight: bold;">
@@ -268,7 +268,7 @@ $modules = [
                 </div>
 
                 <!-- Add New Admin -->
-                <div class="govuk-!-padding-4" style="background: #f3f2f1; border-left: 5px solid #1d70b8;">
+                <div class="govuk-!-padding-4 civicone-panel-bg" style="border-left: 5px solid #1d70b8;">
                     <h3 class="govuk-heading-s govuk-!-margin-bottom-4">
                         <i class="fa-solid fa-user-plus govuk-!-margin-right-2" style="color: #1d70b8;" aria-hidden="true"></i>
                         Grant Access to New Admin

@@ -42,7 +42,7 @@ require dirname(__DIR__, 2) . '/layouts/civicone/header.php';
 <div class="govuk-grid-row">
     <!-- Sidebar TOC -->
     <div class="govuk-grid-column-one-third">
-        <nav class="govuk-!-padding-4 govuk-!-margin-bottom-6" style="background: #f3f2f1; position: sticky; top: 1rem;" aria-label="Page contents">
+        <nav class="govuk-!-padding-4 govuk-!-margin-bottom-6 civicone-panel-bg" style="position: sticky; top: 1rem;" aria-label="Page contents">
             <h3 class="govuk-heading-s govuk-!-margin-bottom-3">Table of Contents</h3>
             <ul class="govuk-list">
                 <li><a href="#introduction" class="govuk-link">1. Introduction & Context</a></li>
@@ -188,7 +188,7 @@ require dirname(__DIR__, 2) . '/layouts/civicone/header.php';
                 <h3 class="govuk-heading-m">Profile</h3>
                 <p class="govuk-body">Nearly 60% of respondents were aged 56 or older. This reflects the wider TBI membership, though a younger profile is emerging.</p>
 
-                <div class="govuk-!-padding-4 govuk-!-margin-bottom-6" style="background: #f3f2f1;">
+                <div class="govuk-!-padding-4 govuk-!-margin-bottom-6 civicone-panel-bg">
                     <h4 class="govuk-heading-s govuk-!-margin-bottom-4">Members Age Bands</h4>
 
                     <div class="govuk-!-margin-bottom-3">
@@ -225,13 +225,13 @@ require dirname(__DIR__, 2) . '/layouts/civicone/header.php';
                 <h3 class="govuk-heading-m">Outcomes</h3>
                 <div class="govuk-grid-row">
                     <div class="govuk-grid-column-one-half">
-                        <div class="govuk-!-padding-3 govuk-!-text-align-center govuk-!-margin-bottom-4" style="background: #f3f2f1;">
+                        <div class="govuk-!-padding-3 govuk-!-text-align-center govuk-!-margin-bottom-4 civicone-panel-bg">
                             <span class="govuk-tag govuk-tag--green govuk-!-margin-bottom-2">95%</span>
                             <p class="govuk-body-s govuk-!-margin-bottom-0">feel more socially connected</p>
                         </div>
                     </div>
                     <div class="govuk-grid-column-one-half">
-                        <div class="govuk-!-padding-3 govuk-!-text-align-center govuk-!-margin-bottom-4" style="background: #f3f2f1;">
+                        <div class="govuk-!-padding-3 govuk-!-text-align-center govuk-!-margin-bottom-4 civicone-panel-bg">
                             <span class="govuk-tag govuk-tag--green govuk-!-margin-bottom-2">100%</span>
                             <p class="govuk-body-s govuk-!-margin-bottom-0">felt wellbeing improved</p>
                         </div>

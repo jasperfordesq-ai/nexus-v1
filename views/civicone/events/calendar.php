@@ -93,7 +93,7 @@ $nextLink = "$basePath/events/calendar?month=$nextMonth&year=$nextYear";
 
             // Empty cells for days before start of month
             for ($i = 0; $i < $dayOfWeek; $i++) {
-                echo '<td class="govuk-table__cell" style="vertical-align: top; height: 100px; background: #f3f2f1;"></td>';
+                echo '<td class="govuk-table__cell civicone-panel-bg" style="vertical-align: top; height: 100px;"></td>';
                 $cellCount++;
             }
 
@@ -130,7 +130,7 @@ $nextLink = "$basePath/events/calendar?month=$nextMonth&year=$nextYear";
             $remainingCells = 7 - ($cellCount % 7);
             if ($remainingCells < 7) {
                 for ($i = 0; $i < $remainingCells; $i++) {
-                    echo '<td class="govuk-table__cell" style="vertical-align: top; height: 100px; background: #f3f2f1;"></td>';
+                    echo '<td class="govuk-table__cell civicone-panel-bg" style="vertical-align: top; height: 100px;"></td>';
                 }
             }
 

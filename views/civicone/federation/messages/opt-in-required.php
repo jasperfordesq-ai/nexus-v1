@@ -27,7 +27,7 @@ $basePath = Nexus\Core\TenantContext::getBasePath();
     <main class="govuk-main-wrapper" id="main-content" role="main">
         <div class="govuk-grid-row">
             <div class="govuk-grid-column-two-thirds">
-                <div class="govuk-!-padding-6 govuk-!-text-align-center" style="background: #f3f2f1; border-left: 5px solid #1d70b8;">
+                <div class="govuk-!-padding-6 govuk-!-text-align-center civicone-panel-bg" style="border-left: 5px solid #1d70b8;">
                     <i class="fa-solid fa-user-shield fa-3x govuk-!-margin-bottom-4" style="color: #1d70b8;" aria-hidden="true"></i>
 
                     <h1 class="govuk-heading-xl">Federation Opt-In Required</h1>

@@ -64,7 +64,7 @@ $basePath = \Nexus\Core\TenantContext::getBasePath();
                                 <p class="govuk-body govuk-!-margin-bottom-0"><?= $percent ?>% (<?= $opt['vote_count'] ?> votes)</p>
                             </div>
                         </div>
-                        <div style="height: 24px; background: #f3f2f1; border-radius: 4px; overflow: hidden;"
+                        <div class="civicone-panel-bg" style="height: 24px; border-radius: 4px; overflow: hidden;"
                              role="progressbar" aria-valuenow="<?= $percent ?>" aria-valuemin="0" aria-valuemax="100"
                              aria-label="<?= htmlspecialchars($opt['label']) ?>: <?= $percent ?> percent">
                             <div style="width: <?= $percent ?>%; height: 100%; background: <?= $barColor ?>; transition: width 0.3s;"></div>

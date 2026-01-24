@@ -66,7 +66,7 @@ $currentUserId = $_SESSION['user_id'] ?? 0;
                 </div>
 
                 <!-- Messages Container -->
-                <div class="govuk-!-padding-4 govuk-!-margin-bottom-4" style="background: #f3f2f1; min-height: 300px; max-height: 500px; overflow-y: auto;" id="messages-container" role="log" aria-label="Message history" aria-live="polite">
+                <div class="govuk-!-padding-4 govuk-!-margin-bottom-4 civicone-panel-bg" style="min-height: 300px; max-height: 500px; overflow-y: auto;" id="messages-container" role="log" aria-label="Message history" aria-live="polite">
                     <?php if (!empty($messages)): ?>
                         <?php foreach ($messages as $msg):
                             $isSent = $msg['message_type'] === 'sent';

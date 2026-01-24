@@ -33,7 +33,7 @@ $hasTimebanking = $hasTimebanking ?? \Nexus\Core\TenantContext::hasFeature('wall
         </div>
 
         <!-- Search Form -->
-        <div class="govuk-!-margin-bottom-6 govuk-!-padding-4" style="background: #f3f2f1; border-left: 5px solid #1d70b8;">
+        <div class="govuk-!-margin-bottom-6 govuk-!-padding-4 civicone-panel-bg" style="border-left: 5px solid #1d70b8;">
             <form method="GET" action="<?= $base ?>/volunteering/organizations">
                 <div class="govuk-form-group govuk-!-margin-bottom-0">
                     <label class="govuk-label govuk-!-font-weight-bold" for="search-query">
@@ -68,7 +68,7 @@ $hasTimebanking = $hasTimebanking ?? \Nexus\Core\TenantContext::hasFeature('wall
 
         <?php if (empty($organizations)): ?>
             <!-- Empty State -->
-            <div class="govuk-!-padding-6 govuk-!-text-align-center" style="background: #f3f2f1; border-left: 5px solid #1d70b8;">
+            <div class="govuk-!-padding-6 govuk-!-text-align-center civicone-panel-bg" style="border-left: 5px solid #1d70b8;">
                 <p class="govuk-body govuk-!-margin-bottom-4">
                     <i class="fa-solid fa-building-circle-xmark fa-3x" style="color: #1d70b8;" aria-hidden="true"></i>
                 </p>
@@ -92,7 +92,7 @@ $hasTimebanking = $hasTimebanking ?? \Nexus\Core\TenantContext::hasFeature('wall
                                 <div class="govuk-!-padding-4" style="border-bottom: 1px solid #f3f2f1;">
                                     <div style="display: flex; align-items: center; gap: 16px;">
                                         <!-- Logo -->
-                                        <div style="width: 60px; height: 60px; border-radius: 50%; background: #f3f2f1; display: flex; align-items: center; justify-content: center; flex-shrink: 0; overflow: hidden;">
+                                        <div class="civicone-panel-bg" style="width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; overflow: hidden;">
                                             <?php if (!empty($org['logo'])): ?>
                                                 <img src="<?= htmlspecialchars($org['logo']) ?>" loading="lazy" alt="<?= htmlspecialchars($org['name']) ?>" style="width: 100%; height: 100%; object-fit: cover;">
                                             <?php else: ?>
@@ -122,7 +122,7 @@ $hasTimebanking = $hasTimebanking ?? \Nexus\Core\TenantContext::hasFeature('wall
                                 </div>
 
                                 <!-- Stats -->
-                                <div class="govuk-!-padding-4" style="background: #f3f2f1;">
+                                <div class="govuk-!-padding-4 civicone-panel-bg">
                                     <div style="display: flex; gap: 20px;">
                                         <span class="govuk-body-s govuk-!-margin-bottom-0">
                                             <i class="fa-solid fa-briefcase govuk-!-margin-right-1" style="color: #00703c;" aria-hidden="true"></i>

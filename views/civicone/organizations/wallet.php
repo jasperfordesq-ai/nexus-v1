@@ -47,7 +47,7 @@ require dirname(__DIR__, 2) . '/layouts/civicone/header.php';
                 </div>
             </div>
             <div class="govuk-grid-column-one-quarter">
-                <div class="govuk-!-padding-4 govuk-!-text-align-center" style="background: #f3f2f1; border-left: 5px solid #00703c;">
+                <div class="govuk-!-padding-4 govuk-!-text-align-center civicone-panel-bg" style="border-left: 5px solid #00703c;">
                     <p class="govuk-heading-xl govuk-!-margin-bottom-1" style="color: #00703c;">
                         <i class="fa-solid fa-arrow-down govuk-!-margin-right-1" aria-hidden="true"></i>
                         <?= number_format($summary['total_received'], 1) ?>
@@ -56,7 +56,7 @@ require dirname(__DIR__, 2) . '/layouts/civicone/header.php';
                 </div>
             </div>
             <div class="govuk-grid-column-one-quarter">
-                <div class="govuk-!-padding-4 govuk-!-text-align-center" style="background: #f3f2f1; border-left: 5px solid #d4351c;">
+                <div class="govuk-!-padding-4 govuk-!-text-align-center civicone-panel-bg" style="border-left: 5px solid #d4351c;">
                     <p class="govuk-heading-xl govuk-!-margin-bottom-1" style="color: #d4351c;">
                         <i class="fa-solid fa-arrow-up govuk-!-margin-right-1" aria-hidden="true"></i>
                         <?= number_format($summary['total_paid_out'], 1) ?>
@@ -65,7 +65,7 @@ require dirname(__DIR__, 2) . '/layouts/civicone/header.php';
                 </div>
             </div>
             <div class="govuk-grid-column-one-quarter">
-                <div class="govuk-!-padding-4 govuk-!-text-align-center" style="background: #f3f2f1; border-left: 5px solid #1d70b8;">
+                <div class="govuk-!-padding-4 govuk-!-text-align-center civicone-panel-bg" style="border-left: 5px solid #1d70b8;">
                     <p class="govuk-heading-xl govuk-!-margin-bottom-1" style="color: #1d70b8;">
                         <i class="fa-solid fa-clock-rotate-left govuk-!-margin-right-1" aria-hidden="true"></i>
                         <?= $summary['transaction_count'] ?>
@@ -80,7 +80,7 @@ require dirname(__DIR__, 2) . '/layouts/civicone/header.php';
             <div class="govuk-grid-column-one-half">
                 <!-- Deposit Form -->
                 <div class="govuk-!-margin-bottom-6" style="border: 1px solid #b1b4b6;">
-                    <div class="govuk-!-padding-3" style="background: #f3f2f1; border-bottom: 1px solid #b1b4b6;">
+                    <div class="govuk-!-padding-3 civicone-panel-bg" style="border-bottom: 1px solid #b1b4b6;">
                         <h3 class="govuk-heading-s govuk-!-margin-bottom-0">
                             <i class="fa-solid fa-arrow-down-to-bracket govuk-!-margin-right-2" style="color: #00703c;" aria-hidden="true"></i>
                             Deposit to Organization
@@ -91,7 +91,7 @@ require dirname(__DIR__, 2) . '/layouts/civicone/header.php';
                             Deposit credits from your personal wallet to the organization's shared wallet.
                         </div>
 
-                        <div class="govuk-!-padding-3 govuk-!-margin-bottom-4" style="background: #f3f2f1; border-left: 5px solid #1d70b8;">
+                        <div class="govuk-!-padding-3 govuk-!-margin-bottom-4 civicone-panel-bg" style="border-left: 5px solid #1d70b8;">
                             <p class="govuk-body-s govuk-!-margin-bottom-0">
                                 <strong>Your Balance:</strong> <?= number_format($user['balance'], 1) ?> HRS
                             </p>
@@ -118,7 +118,7 @@ require dirname(__DIR__, 2) . '/layouts/civicone/header.php';
 
                 <!-- Request Transfer Form -->
                 <div class="govuk-!-margin-bottom-6" style="border: 1px solid #b1b4b6;">
-                    <div class="govuk-!-padding-3" style="background: #f3f2f1; border-bottom: 1px solid #b1b4b6;">
+                    <div class="govuk-!-padding-3 civicone-panel-bg" style="border-bottom: 1px solid #b1b4b6;">
                         <h3 class="govuk-heading-s govuk-!-margin-bottom-0">
                             <i class="fa-solid fa-hand-holding-dollar govuk-!-margin-right-2" style="color: #912b88;" aria-hidden="true"></i>
                             Request Transfer
@@ -219,7 +219,7 @@ require dirname(__DIR__, 2) . '/layouts/civicone/header.php';
                 <?php if ($isAdmin && !empty($pendingRequests)): ?>
                 <!-- Pending Requests (Admin) -->
                 <div class="govuk-!-margin-bottom-6" style="border: 1px solid #b1b4b6;">
-                    <div class="govuk-!-padding-3" style="background: #f3f2f1; border-bottom: 1px solid #b1b4b6;">
+                    <div class="govuk-!-padding-3 civicone-panel-bg" style="border-bottom: 1px solid #b1b4b6;">
                         <h3 class="govuk-heading-s govuk-!-margin-bottom-0">
                             <i class="fa-solid fa-inbox govuk-!-margin-right-2" style="color: #f47738;" aria-hidden="true"></i>
                             Pending Requests
@@ -266,7 +266,7 @@ require dirname(__DIR__, 2) . '/layouts/civicone/header.php';
 
                 <!-- Transaction History -->
                 <div style="border: 1px solid #b1b4b6;">
-                    <div class="govuk-!-padding-3" style="background: #f3f2f1; border-bottom: 1px solid #b1b4b6;">
+                    <div class="govuk-!-padding-3 civicone-panel-bg" style="border-bottom: 1px solid #b1b4b6;">
                         <div class="govuk-grid-row">
                             <div class="govuk-grid-column-two-thirds">
                                 <h3 class="govuk-heading-s govuk-!-margin-bottom-0">

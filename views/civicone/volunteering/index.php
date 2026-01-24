@@ -48,7 +48,7 @@ $basePath = \Nexus\Core\TenantContext::getBasePath();
 
     <!-- Filters Panel (1/3) -->
     <div class="govuk-grid-column-one-third">
-        <div class="govuk-!-padding-4" style="background: #f3f2f1; margin-bottom: 1.5rem;">
+        <div class="govuk-!-padding-4 civicone-panel-bg" style="margin-bottom: 1.5rem;">
             <h2 class="govuk-heading-m">Filter opportunities</h2>
 
             <form method="get" action="<?= $basePath ?>/volunteering">
@@ -138,7 +138,7 @@ $basePath = \Nexus\Core\TenantContext::getBasePath();
 
         <!-- Organization Dashboard Link -->
         <?php if (isset($_SESSION['user_id'])): ?>
-        <div class="govuk-!-padding-4" style="background: #f3f2f1;">
+        <div class="govuk-!-padding-4 civicone-panel-bg">
             <h3 class="govuk-heading-s">Organization dashboard</h3>
             <p class="govuk-body-s">Manage your opportunities and applications</p>
             <a href="<?= $basePath ?>/volunteering/dashboard" class="govuk-button govuk-button--secondary">

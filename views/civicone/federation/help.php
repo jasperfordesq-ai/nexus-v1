@@ -52,10 +52,10 @@ $userOptedIn = $userOptedIn ?? false;
 <!-- Quick Links -->
 <nav class="govuk-!-margin-bottom-6" aria-label="Jump to section">
     <ul class="govuk-list" style="display: flex; flex-wrap: wrap; gap: 0.5rem;">
-        <li><a href="#getting-started" class="govuk-link govuk-!-padding-2" style="background: #f3f2f1; display: inline-block;">Getting Started</a></li>
-        <li><a href="#privacy" class="govuk-link govuk-!-padding-2" style="background: #f3f2f1; display: inline-block;">Privacy & Safety</a></li>
-        <li><a href="#features" class="govuk-link govuk-!-padding-2" style="background: #f3f2f1; display: inline-block;">Features</a></li>
-        <li><a href="#troubleshooting" class="govuk-link govuk-!-padding-2" style="background: #f3f2f1; display: inline-block;">Troubleshooting</a></li>
+        <li><a href="#getting-started" class="govuk-link govuk-!-padding-2 civicone-panel-bg" style="display: inline-block;">Getting Started</a></li>
+        <li><a href="#privacy" class="govuk-link govuk-!-padding-2 civicone-panel-bg" style="display: inline-block;">Privacy & Safety</a></li>
+        <li><a href="#features" class="govuk-link govuk-!-padding-2 civicone-panel-bg" style="display: inline-block;">Features</a></li>
+        <li><a href="#troubleshooting" class="govuk-link govuk-!-padding-2 civicone-panel-bg" style="display: inline-block;">Troubleshooting</a></li>
     </ul>
 </nav>
 

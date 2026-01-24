@@ -92,25 +92,25 @@ function federationTimeAgo($datetime) {
 <!-- Stats Grid -->
 <div class="govuk-grid-row govuk-!-margin-bottom-6">
     <div class="govuk-grid-column-one-quarter">
-        <div class="govuk-!-padding-4" style="background: #f3f2f1; text-align: center;">
+        <div class="govuk-!-padding-4 civicone-panel-bg" style="text-align: center;">
             <p class="govuk-heading-l govuk-!-margin-bottom-1"><?= number_format($stats['hours_given'] ?? 0, 1) ?></p>
             <p class="govuk-body-s govuk-!-margin-bottom-0" style="color: #505a5f;">Hours Given</p>
         </div>
     </div>
     <div class="govuk-grid-column-one-quarter">
-        <div class="govuk-!-padding-4" style="background: #f3f2f1; text-align: center;">
+        <div class="govuk-!-padding-4 civicone-panel-bg" style="text-align: center;">
             <p class="govuk-heading-l govuk-!-margin-bottom-1"><?= number_format($stats['hours_received'] ?? 0, 1) ?></p>
             <p class="govuk-body-s govuk-!-margin-bottom-0" style="color: #505a5f;">Hours Received</p>
         </div>
     </div>
     <div class="govuk-grid-column-one-quarter">
-        <div class="govuk-!-padding-4" style="background: #f3f2f1; text-align: center;">
+        <div class="govuk-!-padding-4 civicone-panel-bg" style="text-align: center;">
             <p class="govuk-heading-l govuk-!-margin-bottom-1"><?= ($stats['messages_sent'] ?? 0) + ($stats['messages_received'] ?? 0) ?></p>
             <p class="govuk-body-s govuk-!-margin-bottom-0" style="color: #505a5f;">Messages</p>
         </div>
     </div>
     <div class="govuk-grid-column-one-quarter">
-        <div class="govuk-!-padding-4" style="background: #f3f2f1; text-align: center;">
+        <div class="govuk-!-padding-4 civicone-panel-bg" style="text-align: center;">
             <p class="govuk-heading-l govuk-!-margin-bottom-1"><?= ($stats['groups_joined'] ?? 0) + ($stats['events_attended'] ?? 0) ?></p>
             <p class="govuk-body-s govuk-!-margin-bottom-0" style="color: #505a5f;">Connections</p>
         </div>
@@ -125,7 +125,7 @@ function federationTimeAgo($datetime) {
 
 <div class="govuk-grid-row govuk-!-margin-bottom-6">
     <div class="govuk-grid-column-one-third">
-        <a href="<?= $basePath ?>/federation/messages" class="govuk-link" style="display: block; padding: 1rem; background: #f3f2f1; text-align: center; text-decoration: none;">
+        <a href="<?= $basePath ?>/federation/messages" class="govuk-link civicone-panel-bg" style="display: block; padding: 1rem; text-align: center; text-decoration: none;">
             <?php if ($unreadMessages > 0): ?>
                 <span class="govuk-tag govuk-tag--blue" style="position: relative; top: -0.5rem;"><?= $unreadMessages ?></span>
             <?php endif; ?>
@@ -134,13 +134,13 @@ function federationTimeAgo($datetime) {
         </a>
     </div>
     <div class="govuk-grid-column-one-third">
-        <a href="<?= $basePath ?>/federation/transactions/new" class="govuk-link" style="display: block; padding: 1rem; background: #f3f2f1; text-align: center; text-decoration: none;">
+        <a href="<?= $basePath ?>/federation/transactions/new" class="govuk-link civicone-panel-bg" style="display: block; padding: 1rem; text-align: center; text-decoration: none;">
             <i class="fa-solid fa-paper-plane" style="font-size: 1.5rem; display: block; margin-bottom: 0.5rem;" aria-hidden="true"></i>
             Send Credits
         </a>
     </div>
     <div class="govuk-grid-column-one-third">
-        <a href="<?= $basePath ?>/federation/members" class="govuk-link" style="display: block; padding: 1rem; background: #f3f2f1; text-align: center; text-decoration: none;">
+        <a href="<?= $basePath ?>/federation/members" class="govuk-link civicone-panel-bg" style="display: block; padding: 1rem; text-align: center; text-decoration: none;">
             <i class="fa-solid fa-user-group" style="font-size: 1.5rem; display: block; margin-bottom: 0.5rem;" aria-hidden="true"></i>
             Find Members
         </a>
@@ -149,19 +149,19 @@ function federationTimeAgo($datetime) {
 
 <div class="govuk-grid-row govuk-!-margin-bottom-6">
     <div class="govuk-grid-column-one-third">
-        <a href="<?= $basePath ?>/federation" class="govuk-link" style="display: block; padding: 1rem; background: #f3f2f1; text-align: center; text-decoration: none;">
+        <a href="<?= $basePath ?>/federation" class="govuk-link civicone-panel-bg" style="display: block; padding: 1rem; text-align: center; text-decoration: none;">
             <i class="fa-solid fa-globe" style="font-size: 1.5rem; display: block; margin-bottom: 0.5rem;" aria-hidden="true"></i>
             Browse Hub
         </a>
     </div>
     <div class="govuk-grid-column-one-third">
-        <a href="<?= $basePath ?>/federation/settings" class="govuk-link" style="display: block; padding: 1rem; background: #f3f2f1; text-align: center; text-decoration: none;">
+        <a href="<?= $basePath ?>/federation/settings" class="govuk-link civicone-panel-bg" style="display: block; padding: 1rem; text-align: center; text-decoration: none;">
             <i class="fa-solid fa-sliders" style="font-size: 1.5rem; display: block; margin-bottom: 0.5rem;" aria-hidden="true"></i>
             Settings
         </a>
     </div>
     <div class="govuk-grid-column-one-third">
-        <a href="<?= $basePath ?>/federation/help" class="govuk-link" style="display: block; padding: 1rem; background: #f3f2f1; text-align: center; text-decoration: none;">
+        <a href="<?= $basePath ?>/federation/help" class="govuk-link civicone-panel-bg" style="display: block; padding: 1rem; text-align: center; text-decoration: none;">
             <i class="fa-solid fa-circle-question" style="font-size: 1.5rem; display: block; margin-bottom: 0.5rem;" aria-hidden="true"></i>
             Help
         </a>

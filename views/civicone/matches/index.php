@@ -43,25 +43,25 @@ $preferences = $preferences ?? [];
 <!-- Stats Bar -->
 <div class="govuk-grid-row govuk-!-margin-bottom-6" role="region" aria-label="Match statistics">
     <div class="govuk-grid-column-one-quarter">
-        <div class="govuk-!-padding-4 govuk-!-text-align-centre" style="background: #f3f2f1;">
+        <div class="govuk-!-padding-4 govuk-!-text-align-centre civicone-panel-bg">
             <p class="govuk-heading-xl govuk-!-margin-bottom-1"><?= count($hotMatches) ?></p>
             <p class="govuk-body-s govuk-!-margin-bottom-0"><span aria-hidden="true">🔥</span> Hot Matches</p>
         </div>
     </div>
     <div class="govuk-grid-column-one-quarter">
-        <div class="govuk-!-padding-4 govuk-!-text-align-centre" style="background: #f3f2f1;">
+        <div class="govuk-!-padding-4 govuk-!-text-align-centre civicone-panel-bg">
             <p class="govuk-heading-xl govuk-!-margin-bottom-1"><?= count($mutualMatches) ?></p>
             <p class="govuk-body-s govuk-!-margin-bottom-0"><span aria-hidden="true">🤝</span> Mutual</p>
         </div>
     </div>
     <div class="govuk-grid-column-one-quarter">
-        <div class="govuk-!-padding-4 govuk-!-text-align-centre" style="background: #f3f2f1;">
+        <div class="govuk-!-padding-4 govuk-!-text-align-centre civicone-panel-bg">
             <p class="govuk-heading-xl govuk-!-margin-bottom-1"><?= count($goodMatches) ?></p>
             <p class="govuk-body-s govuk-!-margin-bottom-0"><span aria-hidden="true">⭐</span> Good Matches</p>
         </div>
     </div>
     <div class="govuk-grid-column-one-quarter">
-        <div class="govuk-!-padding-4 govuk-!-text-align-centre" style="background: #f3f2f1;">
+        <div class="govuk-!-padding-4 govuk-!-text-align-centre civicone-panel-bg">
             <p class="govuk-heading-xl govuk-!-margin-bottom-1"><?= $stats['total_matches'] ?? count($allMatches) ?></p>
             <p class="govuk-body-s govuk-!-margin-bottom-0"><span aria-hidden="true">📊</span> Total Found</p>
         </div>

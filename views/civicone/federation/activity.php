@@ -65,25 +65,25 @@ $userOptedIn = $userOptedIn ?? false;
             </div>
         </div>
         <div class="govuk-grid-column-one-fifth">
-            <div class="govuk-!-padding-3 govuk-!-text-align-center" style="background: #f3f2f1;">
+            <div class="govuk-!-padding-3 govuk-!-text-align-center civicone-panel-bg">
                 <p class="govuk-heading-l govuk-!-margin-bottom-1"><?= $stats['total_messages'] ?? 0 ?></p>
                 <p class="govuk-body-s govuk-!-margin-bottom-0" style="color: #505a5f;">Messages</p>
             </div>
         </div>
         <div class="govuk-grid-column-one-fifth">
-            <div class="govuk-!-padding-3 govuk-!-text-align-center" style="background: #f3f2f1;">
+            <div class="govuk-!-padding-3 govuk-!-text-align-center civicone-panel-bg">
                 <p class="govuk-heading-l govuk-!-margin-bottom-1" style="color: #d4351c;"><?= number_format($stats['hours_sent'] ?? 0, 1) ?></p>
                 <p class="govuk-body-s govuk-!-margin-bottom-0" style="color: #505a5f;">Hrs Sent</p>
             </div>
         </div>
         <div class="govuk-grid-column-one-fifth">
-            <div class="govuk-!-padding-3 govuk-!-text-align-center" style="background: #f3f2f1;">
+            <div class="govuk-!-padding-3 govuk-!-text-align-center civicone-panel-bg">
                 <p class="govuk-heading-l govuk-!-margin-bottom-1" style="color: #00703c;"><?= number_format($stats['hours_received'] ?? 0, 1) ?></p>
                 <p class="govuk-body-s govuk-!-margin-bottom-0" style="color: #505a5f;">Hrs Received</p>
             </div>
         </div>
         <div class="govuk-grid-column-one-fifth">
-            <div class="govuk-!-padding-3 govuk-!-text-align-center" style="background: #f3f2f1;">
+            <div class="govuk-!-padding-3 govuk-!-text-align-center civicone-panel-bg">
                 <p class="govuk-heading-l govuk-!-margin-bottom-1"><?= $stats['partner_count'] ?? 0 ?></p>
                 <p class="govuk-body-s govuk-!-margin-bottom-0" style="color: #505a5f;">Partners</p>
             </div>

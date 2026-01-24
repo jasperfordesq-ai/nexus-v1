@@ -72,7 +72,7 @@ $basePath = \Nexus\Core\TenantContext::getBasePath();
 
     <div class="govuk-grid-column-one-third">
         <!-- Sidebar -->
-        <div class="govuk-!-padding-4" style="background: #f3f2f1;">
+        <div class="govuk-!-padding-4 civicone-panel-bg">
             <h2 class="govuk-heading-s">Technical Specs</h2>
             <dl class="govuk-summary-list govuk-summary-list--no-border">
                 <div class="govuk-summary-list__row">
