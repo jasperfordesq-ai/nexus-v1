@@ -1,0 +1,1 @@
+.civic-date-range-grid{display:grid;grid-template-columns:1fr 1fr;gap:var(--space-5);margin-bottom:var(--space-5)}@media (max-width:500px){.civic-date-range-grid{grid-template-columns:1fr}}

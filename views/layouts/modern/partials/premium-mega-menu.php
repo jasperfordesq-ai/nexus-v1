@@ -2,7 +2,7 @@
 /**
  * Premium Glassmorphism Mega Menu
  * Ultra-premium holographic navigation system
- * Date: 2026-01-12
+ * Updated: 2026-01-24 - Extracted inline styles to CSS classes
  */
 
 $basePath = \Nexus\Core\TenantContext::getBasePath();
@@ -26,7 +26,7 @@ $userId = $_SESSION['user_id'] ?? null;
             </div>
 
             <a href="<?= $basePath ?>/community-groups" class="mega-menu-item">
-                <div class="mega-menu-item-icon" style="background: rgba(99, 102, 241, 0.1); color: #6366f1;">
+                <div class="mega-menu-item-icon mega-icon--community-groups">
                     <i class="fa-solid fa-users"></i>
                 </div>
                 <div class="mega-menu-item-content">
@@ -36,7 +36,7 @@ $userId = $_SESSION['user_id'] ?? null;
             </a>
 
             <a href="<?= $basePath ?>/groups" class="mega-menu-item">
-                <div class="mega-menu-item-icon" style="background: rgba(139, 92, 246, 0.1); color: #8b5cf6;">
+                <div class="mega-menu-item-icon mega-icon--local-hubs">
                     <i class="fa-solid fa-location-dot"></i>
                 </div>
                 <div class="mega-menu-item-content">
@@ -46,7 +46,7 @@ $userId = $_SESSION['user_id'] ?? null;
             </a>
 
             <a href="<?= $basePath ?>/members" class="mega-menu-item">
-                <div class="mega-menu-item-icon" style="background: rgba(236, 72, 153, 0.1); color: #ec4899;">
+                <div class="mega-menu-item-icon mega-icon--members">
                     <i class="fa-solid fa-user-group"></i>
                 </div>
                 <div class="mega-menu-item-content">
@@ -57,7 +57,7 @@ $userId = $_SESSION['user_id'] ?? null;
 
             <?php if (\Nexus\Core\TenantContext::hasFeature('events')): ?>
             <a href="<?= $basePath ?>/events" class="mega-menu-item">
-                <div class="mega-menu-item-icon" style="background: rgba(245, 158, 11, 0.1); color: #f59e0b;">
+                <div class="mega-menu-item-icon mega-icon--events">
                     <i class="fa-solid fa-calendar-days"></i>
                 </div>
                 <div class="mega-menu-item-content">
@@ -83,7 +83,7 @@ $userId = $_SESSION['user_id'] ?? null;
         <?php if ($isLoggedIn): ?>
         <div class="mega-menu-quick-actions">
             <a href="<?= $basePath ?>/compose" class="mega-menu-item">
-                <div class="mega-menu-item-icon" style="background: linear-gradient(135deg, #10b981, #059669); color: white;">
+                <div class="mega-menu-item-icon mega-icon--create">
                     <i class="fa-solid fa-plus-circle"></i>
                 </div>
                 <div class="mega-menu-item-content">
@@ -103,7 +103,7 @@ $userId = $_SESSION['user_id'] ?? null;
 
             <?php if (\Nexus\Core\TenantContext::hasFeature('goals')): ?>
             <a href="<?= $basePath ?>/goals" class="mega-menu-item">
-                <div class="mega-menu-item-icon" style="background: rgba(245, 158, 11, 0.1); color: #f59e0b;">
+                <div class="mega-menu-item-icon mega-icon--goals">
                     <i class="fa-solid fa-bullseye"></i>
                 </div>
                 <div class="mega-menu-item-content">
@@ -115,7 +115,7 @@ $userId = $_SESSION['user_id'] ?? null;
 
             <?php if (\Nexus\Core\TenantContext::hasFeature('polls')): ?>
             <a href="<?= $basePath ?>/polls" class="mega-menu-item">
-                <div class="mega-menu-item-icon" style="background: rgba(6, 182, 212, 0.1); color: #06b6d4;">
+                <div class="mega-menu-item-icon mega-icon--polls">
                     <i class="fa-solid fa-square-poll-vertical"></i>
                 </div>
                 <div class="mega-menu-item-content">
@@ -127,7 +127,7 @@ $userId = $_SESSION['user_id'] ?? null;
 
             <?php if (\Nexus\Core\TenantContext::hasFeature('resources')): ?>
             <a href="<?= $basePath ?>/resources" class="mega-menu-item">
-                <div class="mega-menu-item-icon" style="background: rgba(16, 185, 129, 0.1); color: #10b981;">
+                <div class="mega-menu-item-icon mega-icon--resources">
                     <i class="fa-solid fa-folder-open"></i>
                 </div>
                 <div class="mega-menu-item-content">
@@ -149,7 +149,7 @@ $userId = $_SESSION['user_id'] ?? null;
 
             <?php if ($isLoggedIn): ?>
             <a href="<?= $basePath ?>/nexus-score" class="mega-menu-item gamification-item">
-                <div class="mega-menu-item-icon" style="background: rgba(251, 191, 36, 0.15); color: #fbbf24;">
+                <div class="mega-menu-item-icon mega-icon--nexus-score">
                     <i class="fa-solid fa-star"></i>
                 </div>
                 <div class="mega-menu-item-content">
@@ -160,7 +160,7 @@ $userId = $_SESSION['user_id'] ?? null;
             <?php endif; ?>
 
             <a href="<?= $basePath ?>/leaderboard" class="mega-menu-item gamification-item">
-                <div class="mega-menu-item-icon" style="background: rgba(245, 158, 11, 0.15); color: #f59e0b;">
+                <div class="mega-menu-item-icon mega-icon--leaderboard">
                     <i class="fa-solid fa-trophy"></i>
                 </div>
                 <div class="mega-menu-item-content">
@@ -170,7 +170,7 @@ $userId = $_SESSION['user_id'] ?? null;
             </a>
 
             <a href="<?= $basePath ?>/achievements" class="mega-menu-item gamification-item">
-                <div class="mega-menu-item-icon" style="background: rgba(168, 85, 247, 0.15); color: #a855f7;">
+                <div class="mega-menu-item-icon mega-icon--achievements">
                     <i class="fa-solid fa-medal"></i>
                 </div>
                 <div class="mega-menu-item-content">
@@ -190,7 +190,7 @@ $userId = $_SESSION['user_id'] ?? null;
             </div>
 
             <a href="<?= $basePath ?>/matches" class="mega-menu-item">
-                <div class="mega-menu-item-icon" style="background: rgba(236, 72, 153, 0.1); color: #ec4899;">
+                <div class="mega-menu-item-icon mega-icon--matching">
                     <i class="fa-solid fa-wand-magic-sparkles"></i>
                 </div>
                 <div class="mega-menu-item-content">
@@ -200,7 +200,7 @@ $userId = $_SESSION['user_id'] ?? null;
             </a>
 
             <a href="<?= $basePath ?>/ai" class="mega-menu-item ai-highlight">
-                <div class="mega-menu-item-icon">
+                <div class="mega-menu-item-icon mega-icon--ai">
                     <i class="fa-solid fa-robot"></i>
                 </div>
                 <div class="mega-menu-item-content">
@@ -210,7 +210,7 @@ $userId = $_SESSION['user_id'] ?? null;
             </a>
 
             <a href="<?= $basePath ?>/mobile-download" class="mega-menu-item">
-                <div class="mega-menu-item-icon" style="background: rgba(99, 102, 241, 0.1); color: #6366f1;">
+                <div class="mega-menu-item-icon mega-icon--mobile-app">
                     <i class="fa-solid fa-mobile-screen-button"></i>
                 </div>
                 <div class="mega-menu-item-content">
@@ -241,7 +241,7 @@ $userId = $_SESSION['user_id'] ?? null;
 
             <?php if (\Nexus\Core\TenantContext::hasFeature('blog')): ?>
             <a href="<?= $basePath ?>/news" class="mega-menu-item">
-                <div class="mega-menu-item-icon" style="background: rgba(99, 102, 241, 0.18); color: #6366f1;">
+                <div class="mega-menu-item-icon mega-icon--news">
                     <i class="fa-solid fa-newspaper"></i>
                 </div>
                 <div class="mega-menu-item-content">
@@ -252,55 +252,35 @@ $userId = $_SESSION['user_id'] ?? null;
             <?php endif; ?>
 
             <?php
-            // Custom file-based pages with intelligent icon/color mapping
+            // Custom file-based pages with CSS class mapping
             $customPages = \Nexus\Core\TenantContext::getCustomPages('modern');
 
             // Pages to exclude from About menu
             $excludedPages = [
-                'about',
-                'privacy',
-                'terms',
-                'privacy policy',
-                'terms of service',
-                'terms and conditions',
-                'help',
-                'contact',
-                'contact us',
-                'accessibility',
-                'how it works',
-                'mobile download',
-                // Impact pages handled separately
-                'impact summary',
-                'impact report',
-                'strategic plan',
+                'about', 'privacy', 'terms', 'privacy policy', 'terms of service',
+                'terms and conditions', 'help', 'contact', 'contact us', 'accessibility',
+                'how it works', 'mobile download', 'impact summary', 'impact report', 'strategic plan',
             ];
 
             // Custom display order
             $pageOrder = [
-                'about us',
-                'our story',
-                'about story',
-                'timebanking guide',
-                'partner with us',
-                'partner',
-                'social prescribing',
-                'timebanking faqs',
-                'timebanking faq',
-                'faq',
+                'about us', 'our story', 'about story', 'timebanking guide',
+                'partner with us', 'partner', 'social prescribing',
+                'timebanking faqs', 'timebanking faq', 'faq',
             ];
 
-            // Icon and color mapping
+            // Icon and CSS class mapping
             $pageIconMap = [
-                'about us' => ['icon' => 'fa-solid fa-heart', 'color' => '#ec4899', 'desc' => 'Our story & mission'],
-                'our story' => ['icon' => 'fa-solid fa-heart', 'color' => '#ec4899', 'desc' => 'Learn about our journey'],
-                'about story' => ['icon' => 'fa-solid fa-heart', 'color' => '#ec4899', 'desc' => 'Learn about our journey'],
-                'timebanking guide' => ['icon' => 'fa-solid fa-book-open', 'color' => '#8b5cf6', 'desc' => 'How timebanking works'],
-                'partner' => ['icon' => 'fa-solid fa-handshake', 'color' => '#f59e0b', 'desc' => 'Collaborate with us'],
-                'partner with us' => ['icon' => 'fa-solid fa-handshake', 'color' => '#f59e0b', 'desc' => 'Collaborate with us'],
-                'social prescribing' => ['icon' => 'fa-solid fa-hand-holding-medical', 'color' => '#14b8a6', 'desc' => 'Healthcare integration'],
-                'faq' => ['icon' => 'fa-solid fa-circle-question', 'color' => '#06b6d4', 'desc' => 'Frequently asked questions'],
-                'timebanking faq' => ['icon' => 'fa-solid fa-circle-question', 'color' => '#06b6d4', 'desc' => 'Frequently asked questions'],
-                'timebanking faqs' => ['icon' => 'fa-solid fa-circle-question', 'color' => '#06b6d4', 'desc' => 'Frequently asked questions'],
+                'about us' => ['icon' => 'fa-solid fa-heart', 'class' => 'mega-icon--about', 'desc' => 'Our story & mission'],
+                'our story' => ['icon' => 'fa-solid fa-heart', 'class' => 'mega-icon--about', 'desc' => 'Learn about our journey'],
+                'about story' => ['icon' => 'fa-solid fa-heart', 'class' => 'mega-icon--about', 'desc' => 'Learn about our journey'],
+                'timebanking guide' => ['icon' => 'fa-solid fa-book-open', 'class' => 'mega-icon--guide', 'desc' => 'How timebanking works'],
+                'partner' => ['icon' => 'fa-solid fa-handshake', 'class' => 'mega-icon--partner', 'desc' => 'Collaborate with us'],
+                'partner with us' => ['icon' => 'fa-solid fa-handshake', 'class' => 'mega-icon--partner', 'desc' => 'Collaborate with us'],
+                'social prescribing' => ['icon' => 'fa-solid fa-hand-holding-medical', 'class' => 'mega-icon--social-prescribing', 'desc' => 'Healthcare integration'],
+                'faq' => ['icon' => 'fa-solid fa-circle-question', 'class' => 'mega-icon--faq', 'desc' => 'Frequently asked questions'],
+                'timebanking faq' => ['icon' => 'fa-solid fa-circle-question', 'class' => 'mega-icon--faq', 'desc' => 'Frequently asked questions'],
+                'timebanking faqs' => ['icon' => 'fa-solid fa-circle-question', 'class' => 'mega-icon--faq', 'desc' => 'Frequently asked questions'],
             ];
 
             // Sort pages according to custom order
@@ -321,17 +301,12 @@ $userId = $_SESSION['user_id'] ?? null;
 
                 $pageData = $pageIconMap[$pageName] ?? [
                     'icon' => 'fa-solid fa-file-lines',
-                    'color' => '#64748b',
+                    'class' => 'mega-icon--default',
                     'desc' => null
                 ];
-                $color = $pageData['color'];
-                $r = hexdec(substr($color, 1, 2));
-                $g = hexdec(substr($color, 3, 2));
-                $b = hexdec(substr($color, 5, 2));
-                $bgColor = "rgba($r, $g, $b, 0.15)";
             ?>
             <a href="<?= htmlspecialchars($page['url']) ?>" class="mega-menu-item">
-                <div class="mega-menu-item-icon" style="background: <?= $bgColor ?>; color: <?= $color ?>;">
+                <div class="mega-menu-item-icon <?= $pageData['class'] ?>">
                     <i class="<?= $pageData['icon'] ?>"></i>
                 </div>
                 <div class="mega-menu-item-content">
@@ -362,21 +337,16 @@ $userId = $_SESSION['user_id'] ?? null;
 
             <?php
             $impactIconMap = [
-                'impact summary' => ['icon' => 'fa-solid fa-leaf', 'color' => '#059669', 'desc' => 'Our community impact'],
-                'impact report' => ['icon' => 'fa-solid fa-file-contract', 'color' => '#2563eb', 'desc' => 'Detailed impact data'],
-                'strategic plan' => ['icon' => 'fa-solid fa-route', 'color' => '#7c3aed', 'desc' => 'Our roadmap forward'],
+                'impact summary' => ['icon' => 'fa-solid fa-leaf', 'class' => 'mega-icon--impact-summary', 'desc' => 'Our community impact'],
+                'impact report' => ['icon' => 'fa-solid fa-file-contract', 'class' => 'mega-icon--impact-report', 'desc' => 'Detailed impact data'],
+                'strategic plan' => ['icon' => 'fa-solid fa-route', 'class' => 'mega-icon--strategic-plan', 'desc' => 'Our roadmap forward'],
             ];
             foreach ($impactPages as $page):
                 $pageName = strtolower($page['name']);
-                $pageData = $impactIconMap[$pageName] ?? ['icon' => 'fa-solid fa-file-lines', 'color' => '#64748b', 'desc' => null];
-                $color = $pageData['color'];
-                $r = hexdec(substr($color, 1, 2));
-                $g = hexdec(substr($color, 3, 2));
-                $b = hexdec(substr($color, 5, 2));
-                $bgColor = "rgba($r, $g, $b, 0.15)";
+                $pageData = $impactIconMap[$pageName] ?? ['icon' => 'fa-solid fa-file-lines', 'class' => 'mega-icon--default', 'desc' => null];
             ?>
             <a href="<?= htmlspecialchars($page['url']) ?>" class="mega-menu-item">
-                <div class="mega-menu-item-icon" style="background: <?= $bgColor ?>; color: <?= $color ?>;">
+                <div class="mega-menu-item-icon <?= $pageData['class'] ?>">
                     <i class="<?= $pageData['icon'] ?>"></i>
                 </div>
                 <div class="mega-menu-item-content">
@@ -400,7 +370,7 @@ $userId = $_SESSION['user_id'] ?? null;
             </div>
 
             <a href="<?= $basePath ?>/help" class="mega-menu-item">
-                <div class="mega-menu-item-icon" style="background: rgba(249, 115, 22, 0.2); color: #f97316;">
+                <div class="mega-menu-item-icon mega-icon--help">
                     <i class="fa-solid fa-circle-question"></i>
                 </div>
                 <div class="mega-menu-item-content">
@@ -410,7 +380,7 @@ $userId = $_SESSION['user_id'] ?? null;
             </a>
 
             <a href="<?= $basePath ?>/contact" class="mega-menu-item">
-                <div class="mega-menu-item-icon" style="background: rgba(59, 130, 246, 0.2); color: #3b82f6;">
+                <div class="mega-menu-item-icon mega-icon--contact">
                     <i class="fa-solid fa-envelope"></i>
                 </div>
                 <div class="mega-menu-item-content">
@@ -420,7 +390,7 @@ $userId = $_SESSION['user_id'] ?? null;
             </a>
 
             <a href="<?= $basePath ?>/accessibility" class="mega-menu-item">
-                <div class="mega-menu-item-icon" style="background: rgba(16, 185, 129, 0.2); color: #10b981;">
+                <div class="mega-menu-item-icon mega-icon--accessibility">
                     <i class="fa-solid fa-universal-access"></i>
                 </div>
                 <div class="mega-menu-item-content">
@@ -432,83 +402,4 @@ $userId = $_SESSION['user_id'] ?? null;
     </div>
 </div>
 
-<script>
-// Mega menu interaction with hover delay
-document.addEventListener('DOMContentLoaded', function() {
-    const megaMenuWrappers = document.querySelectorAll('.mega-menu-wrapper');
-
-    megaMenuWrappers.forEach(wrapper => {
-        const trigger = wrapper.querySelector('.mega-menu-trigger');
-        const dropdown = wrapper.querySelector('.mega-menu-dropdown');
-
-        if (!trigger || !dropdown) return;
-
-        let hoverTimeout = null;
-
-        // Hover to open (immediate)
-        wrapper.addEventListener('mouseenter', () => {
-            // Clear any pending close timeout
-            if (hoverTimeout) {
-                clearTimeout(hoverTimeout);
-                hoverTimeout = null;
-            }
-
-            trigger.setAttribute('aria-expanded', 'true');
-            wrapper.classList.add('active');
-        });
-
-        // Hover to close (with delay)
-        wrapper.addEventListener('mouseleave', () => {
-            // Add 150ms delay before closing to prevent accidental closes
-            hoverTimeout = setTimeout(() => {
-                trigger.setAttribute('aria-expanded', 'false');
-                wrapper.classList.remove('active');
-            }, 150);
-        });
-
-        // Click support for touch devices
-        trigger.addEventListener('click', (e) => {
-            e.preventDefault();
-            const isActive = wrapper.classList.contains('active');
-
-            // Clear any pending timeouts
-            if (hoverTimeout) {
-                clearTimeout(hoverTimeout);
-                hoverTimeout = null;
-            }
-
-            // Close all other mega menus
-            megaMenuWrappers.forEach(w => {
-                if (w !== wrapper) {
-                    w.classList.remove('active');
-                    w.querySelector('.mega-menu-trigger')?.setAttribute('aria-expanded', 'false');
-                }
-            });
-
-            // Toggle this menu
-            wrapper.classList.toggle('active');
-            trigger.setAttribute('aria-expanded', !isActive);
-        });
-    });
-
-    // Close mega menus when clicking outside
-    document.addEventListener('click', (e) => {
-        if (!e.target.closest('.mega-menu-wrapper')) {
-            megaMenuWrappers.forEach(wrapper => {
-                wrapper.classList.remove('active');
-                wrapper.querySelector('.mega-menu-trigger')?.setAttribute('aria-expanded', 'false');
-            });
-        }
-    });
-
-    // Close on Escape key
-    document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape') {
-            megaMenuWrappers.forEach(wrapper => {
-                wrapper.classList.remove('active');
-                wrapper.querySelector('.mega-menu-trigger')?.setAttribute('aria-expanded', 'false');
-            });
-        }
-    });
-});
-</script>
+<!-- Mega Menu JS loaded externally in header.php for better caching -->

@@ -1,126 +1,158 @@
 /**
- * Modern Header Emergency Fixes
- * Extracted from inline styles in header.php (2026-01-21)
- * CRITICAL: These fixes ensure dropdowns appear above page content
+ * Modern Header Fixes
+ * Consolidated z-index scale and dropdown positioning
+ * Updated: 2026-01-24
  *
- * ROOT CAUSE:
- * - Header uses position:fixed which creates a stacking context
- * - Dropdowns inside need high z-index to escape the stacking context
- * - Base dropdown CSS had incorrect z-index values
+ * Z-INDEX SCALE (Documented):
+ * --z-base:       1      - Default stacking
+ * --z-dropdown:   100    - Dropdown menus
+ * --z-header:     150    - Utility bar
+ * --z-navbar:     140    - Main navbar
+ * --z-mega-menu:  200    - Mega menu dropdowns
+ * --z-modal:      1000   - Modals
+ * --z-tooltip:    1100   - Tooltips
+ * --z-max:        9999   - Emergency overlay
  */
 
 /* ==========================================
-   Z-INDEX FIX - Utility Bar must be above page content
+   Z-INDEX SCALE - CSS Custom Properties
+   ========================================== */
+:root {
+    --z-base: 1;
+    --z-dropdown: 100;
+    --z-navbar: 140;
+    --z-header: 150;
+    --z-mega-menu: 200;
+    --z-modal: 1000;
+    --z-tooltip: 1100;
+    --z-max: 9999;
+}
+
+/* ==========================================
+   UTILITY BAR - Fixed Header
    ========================================== */
 .nexus-utility-bar {
-    z-index: 150 !important;
+    z-index: var(--z-header);
+}
+
+/* Desktop: Force utility bar visible (above 1024px) */
+@media (min-width: 1025px) {
+    .nexus-utility-bar {
+        display: flex !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+    }
+}
+
+/* Mobile: Hide utility bar (1024px and below) */
+@media (max-width: 1024px) {
+    .nexus-utility-bar {
+        display: none !important;
+    }
+}
+
+.nexus-navbar {
+    z-index: var(--z-navbar);
 }
 
 /* ==========================================
-   UTILITY BAR DROPDOWNS - Z-INDEX & SIZING
-   Dropdowns must appear above everything including the header itself
+   UTILITY BAR DROPDOWNS
    ========================================== */
-.nexus-utility-bar .htb-dropdown .htb-dropdown-content,
-.nexus-utility-bar div.htb-dropdown-content,
-nav.nexus-utility-bar .htb-dropdown-content,
-.nexus-utility-bar .platform-dropdown,
-.nexus-utility-bar .federation-dropdown,
-.nexus-utility-bar .htb-dropdown-content.platform-dropdown,
-.nexus-utility-bar .htb-dropdown-content.federation-dropdown {
-    min-width: auto !important;
-    max-width: max-content !important;
-    width: auto !important;
-    padding: var(--space-2) 0 !important;
-    z-index: 9999 !important;
-    position: absolute !important;
-}
-
-/* Ensure dropdown wrapper doesn't create stacking context issues */
 .nexus-utility-bar .htb-dropdown {
-    position: relative !important;
-    z-index: auto !important;
+    position: relative;
+}
+
+.nexus-utility-bar .htb-dropdown .htb-dropdown-content,
+.nexus-utility-bar .platform-dropdown,
+.nexus-utility-bar .federation-dropdown {
+    min-width: auto;
+    max-width: max-content;
+    width: auto;
+    padding: var(--space-2, 8px) 0;
+    z-index: var(--z-mega-menu);
+    position: absolute;
+}
+
+/* Left-side dropdowns: align left */
+.nexus-utility-bar .left-utils .htb-dropdown-content {
+    left: 0;
+    right: auto;
+}
+
+/* Right-side dropdowns: align right */
+.nexus-utility-bar .right-header-utils .htb-dropdown-content {
+    right: 0;
+    left: auto;
+}
+
+/* Dropdown link styling */
+.nexus-utility-bar .htb-dropdown-content a {
+    white-space: nowrap;
+    padding: 10px 16px;
+    margin: 1px 6px;
+}
+
+.nexus-utility-bar .htb-dropdown-content a:first-child {
+    margin-top: 1px;
+}
+
+.nexus-utility-bar .htb-dropdown-content a:last-child {
+    margin-bottom: 1px;
 }
 
 /* ==========================================
-   MEGA MENU DROPDOWN FIXES
+   MEGA MENU DROPDOWNS
    ========================================== */
-.nexus-navbar .mega-menu-dropdown,
-.mega-menu-wrapper .mega-menu-dropdown,
-div.mega-menu-dropdown {
-    min-width: 360px !important;
-    max-width: 480px !important;
-    width: max-content !important;
-    background: linear-gradient(180deg, rgba(255, 255, 255, 0.98) 0%, rgba(255, 255, 255, 0.96) 100%) !important;
-}
-
-[data-theme="dark"] .mega-menu-dropdown {
-    background: linear-gradient(180deg, rgba(15, 23, 42, 0.98) 0%, rgba(30, 41, 59, 0.96) 100%) !important;
-}
-
-/* Mega menu wrapper positioning */
 .mega-menu-wrapper {
-    position: relative !important;
+    position: relative;
 }
 
+.mega-menu-dropdown {
+    z-index: var(--z-mega-menu);
+    min-width: 320px !important;
+    max-width: 420px !important;
+    width: max-content !important;
+}
+
+/* Ensure dropdown is hidden by default (reinforcement) */
+.mega-menu-dropdown:not(.mega-menu-wrapper.active .mega-menu-dropdown) {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+}
+
+/* Show when active */
+.mega-menu-wrapper.active .mega-menu-dropdown,
+.mega-menu-wrapper:hover .mega-menu-dropdown {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+}
+
+/* Center dropdown under trigger */
 .mega-menu-wrapper .mega-menu-dropdown {
-    left: 50% !important;
-    right: auto !important;
-    transform: translateX(-50%) translateZ(0) !important;
+    left: 50%;
+    right: auto;
+    transform: translateX(-50%) translateY(0);
 }
 
-.mega-menu-wrapper.active .mega-menu-dropdown {
-    transform: translateX(-50%) translateZ(0) !important;
+/* Light mode background */
+.mega-menu-dropdown {
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.98) 0%, rgba(255, 255, 255, 0.96) 100%);
 }
 
-/* ==========================================
-   DROPDOWN ALIGNMENT
-   ========================================== */
-
-/* Left-side dropdowns: Platform dropdown alignment */
-.nexus-utility-bar .left-utils .htb-dropdown .htb-dropdown-content,
-.nexus-utility-bar .left-utils div.htb-dropdown-content,
-nav.nexus-utility-bar .left-utils .htb-dropdown-content {
-    left: 0 !important;
-    right: auto !important;
-}
-
-/* Right-side dropdowns: Keep right alignment for Create, Federation, User dropdowns */
-.nexus-utility-bar .right-header-utils .htb-dropdown .htb-dropdown-content,
-.nexus-utility-bar .right-header-utils div.htb-dropdown-content,
-nav.nexus-utility-bar .right-header-utils .htb-dropdown-content {
-    right: 0 !important;
-    left: auto !important;
-}
-
-/* Ensure links use natural width with no wrapping */
-.nexus-utility-bar .htb-dropdown .htb-dropdown-content a,
-.nexus-utility-bar div.htb-dropdown-content a,
-nav.nexus-utility-bar .htb-dropdown-content a {
-    white-space: nowrap !important;
-    padding: 10px 16px !important;
-    margin: 1px 6px !important;
-}
-
-/* Remove extra spacing from first/last items */
-.nexus-utility-bar .htb-dropdown .htb-dropdown-content a:first-child,
-.nexus-utility-bar div.htb-dropdown-content a:first-child,
-nav.nexus-utility-bar .htb-dropdown-content a:first-child {
-    margin-top: 1px !important;
-}
-
-.nexus-utility-bar .htb-dropdown .htb-dropdown-content a:last-child,
-.nexus-utility-bar div.htb-dropdown-content a:last-child,
-nav.nexus-utility-bar .htb-dropdown-content a:last-child {
-    margin-bottom: 1px !important;
+/* Dark mode background */
+[data-theme="dark"] .mega-menu-dropdown {
+    background: linear-gradient(180deg, rgba(15, 23, 42, 0.98) 0%, rgba(30, 41, 59, 0.96) 100%);
 }
 
 /* ==========================================
    MODE SWITCHER - COMPACT SIZING
    ========================================== */
 .nexus-utility-bar .mode-switcher {
-    gap: var(--space-1);
+    gap: var(--space-1, 4px);
     padding: 2px 6px 2px 2px;
-    margin-left: var(--space-1);
+    margin-left: var(--space-1, 4px);
     border-radius: 16px;
     min-height: 28px;
 }
@@ -137,4 +169,44 @@ nav.nexus-utility-bar .htb-dropdown-content a:last-child {
 .nexus-utility-bar .mode-switcher .mode-label {
     font-size: 10px;
     letter-spacing: 0.2px;
+}
+
+/* ==========================================
+   ACCESSIBILITY - Focus States
+   ========================================== */
+.mega-menu-trigger:focus-visible,
+.mega-menu-item:focus-visible,
+.htb-dropdown .util-link:focus-visible {
+    outline: 2px solid var(--color-primary-500, #6366f1);
+    outline-offset: 2px;
+}
+
+/* ==========================================
+   ACTIVE NAV LINK STYLES (aria-current="page")
+   ========================================== */
+.nav-link[aria-current="page"] {
+    color: var(--color-primary-500, #6366f1);
+    font-weight: 600;
+    position: relative;
+}
+
+.nav-link[aria-current="page"]::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: var(--color-primary-500, #6366f1);
+    border-radius: 1px;
+}
+
+/* ==========================================
+   REDUCED MOTION
+   ========================================== */
+@media (prefers-reduced-motion: reduce) {
+    .mega-menu-dropdown,
+    .htb-dropdown-content {
+        transition: none;
+    }
 }
