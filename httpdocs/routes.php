@@ -763,7 +763,7 @@ $router->add('POST', '/profile/me', 'Nexus\Controllers\ProfileController@me'); /
 $router->add('POST', '/profile/update', 'Nexus\Controllers\ProfileController@update'); // Profile Edit Form (Advanced)
 $router->add('GET', '/profile/edit', function () {
     $base = \Nexus\Core\TenantContext::getBasePath();
-    header("Location: {$base}/settings");
+    header("Location: {$base}/settings?section=profile");
     exit;
 });
 $router->add('GET', '/profile/{id}', 'Nexus\Controllers\ProfileController@show');

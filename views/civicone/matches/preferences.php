@@ -79,14 +79,13 @@ unset($_SESSION['flash_success'], $_SESSION['flash_error']);
             <p class="govuk-body govuk-!-margin-bottom-2"><strong id="distance-value"><?= $maxDistance ?> km</strong></p>
             <input type="range"
                    name="max_distance_km"
-                   class="govuk-range"
+                   class="govuk-range input-full-width"
                    min="5"
                    max="100"
                    step="5"
                    value="<?= $maxDistance ?>"
                    id="distance-slider"
-                   aria-describedby="distance-hint"
-                   style="width: 100%;">
+                   aria-describedby="distance-hint">
             <div class="govuk-grid-row govuk-!-margin-top-1">
                 <div class="govuk-grid-column-one-third"><span class="govuk-body-s">5 km (Walking)</span></div>
                 <div class="govuk-grid-column-one-third govuk-!-text-align-centre"><span class="govuk-body-s">50 km (Regional)</span></div>
@@ -107,14 +106,13 @@ unset($_SESSION['flash_success'], $_SESSION['flash_error']);
             <p class="govuk-body govuk-!-margin-bottom-2"><strong id="score-value"><?= $minScore ?>%</strong></p>
             <input type="range"
                    name="min_match_score"
-                   class="govuk-range"
+                   class="govuk-range input-full-width"
                    min="30"
                    max="90"
                    step="5"
                    value="<?= $minScore ?>"
                    id="score-slider"
-                   aria-describedby="score-hint"
-                   style="width: 100%;">
+                   aria-describedby="score-hint">
             <div class="govuk-grid-row govuk-!-margin-top-1">
                 <div class="govuk-grid-column-one-third"><span class="govuk-body-s">30% (More matches)</span></div>
                 <div class="govuk-grid-column-one-third govuk-!-text-align-centre"><span class="govuk-body-s">60%</span></div>
@@ -190,15 +188,7 @@ unset($_SESSION['flash_success'], $_SESSION['flash_error']);
     </button>
 </form>
 
-<script>
-// Update slider value displays
-document.getElementById('distance-slider').addEventListener('input', function() {
-    document.getElementById('distance-value').textContent = this.value + ' km';
-});
-
-document.getElementById('score-slider').addEventListener('input', function() {
-    document.getElementById('score-value').textContent = this.value + '%';
-});
-</script>
+<!-- Slider handling in civicone-matches.js -->
+<script src="/assets/js/civicone-matches.min.js"></script>
 
 <?php require __DIR__ . '/../../layouts/civicone/footer.php'; ?>

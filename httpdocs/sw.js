@@ -3,7 +3,7 @@
  * Provides offline support, caching, and PWA functionality
  */
 
-const CACHE_NAME = 'nexus-v25'; // Force cache refresh for scroll fix
+const CACHE_NAME = 'nexus-v26'; // Force cache refresh for settings fix
 const OFFLINE_URL = '/offline.html';
 const FEDERATION_OFFLINE_URL = '/federation/offline';
 

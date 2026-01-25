@@ -145,15 +145,7 @@ require __DIR__ . '/../layouts/civicone/header.php';
 
 <div class="govuk-width-container">
 
-    <!-- Phase Banner - GOV.UK standard for beta services -->
-    <div class="govuk-phase-banner">
-        <p class="govuk-phase-banner__content">
-            <strong class="govuk-tag govuk-phase-banner__content__tag">Beta</strong>
-            <span class="govuk-phase-banner__text">
-                This is a new service. <a class="govuk-link" href="<?= $basePath ?>/contact">Give feedback</a> to help us improve it.
-            </span>
-        </p>
-    </div>
+    <!-- Phase Banner moved to layout (views/layouts/civicone/partials/skip-link-and-banner.php) -->
 
     <!-- Breadcrumbs - GOV.UK navigation pattern (home page shows current only) -->
     <nav class="govuk-breadcrumbs govuk-breadcrumbs--collapse-on-mobile" aria-label="Breadcrumb">

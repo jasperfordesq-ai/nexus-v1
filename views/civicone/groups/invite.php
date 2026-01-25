@@ -96,35 +96,7 @@ $basePath = Nexus\Core\TenantContext::getBasePath();
     </form>
 </div>
 
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    var checkboxes = document.querySelectorAll('#userList input[type="checkbox"]');
-    var selectedCount = document.getElementById('selectedCount');
-    var submitBtn = document.getElementById('submitBtn');
-    var searchInput = document.getElementById('userSearch');
-
-    function updateCount() {
-        var count = document.querySelectorAll('#userList input[type="checkbox"]:checked').length;
-        selectedCount.innerHTML = '<strong>' + count + '</strong> members selected';
-        if (submitBtn) {
-            submitBtn.disabled = count === 0;
-        }
-    }
-
-    checkboxes.forEach(function(cb) {
-        cb.addEventListener('change', updateCount);
-    });
-
-    if (searchInput) {
-        searchInput.addEventListener('input', function() {
-            var searchTerm = this.value.toLowerCase();
-            document.querySelectorAll('#userList .govuk-checkboxes__item').forEach(function(item) {
-                var name = item.getAttribute('data-name') || '';
-                item.style.display = name.includes(searchTerm) ? '' : 'none';
-            });
-        });
-    }
-});
-</script>
+<!-- Member selection and search handled by civicone-groups-invite.js -->
+<script src="/assets/js/civicone-groups-invite.js"></script>
 
 <?php require __DIR__ . '/../../layouts/civicone/footer.php'; ?>

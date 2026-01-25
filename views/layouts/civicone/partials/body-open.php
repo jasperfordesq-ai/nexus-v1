@@ -1,4 +1,4 @@
-<body class="govuk-template__body civicone nexus-skin-civicone <?= $skinClass ?> <?= $isHome ? 'nexus-home-page' : '' ?> <?= isset($_SESSION['user_id']) ? 'logged-in' : '' ?> <?= ((!empty($_SESSION['user_role']) && $_SESSION['user_role'] === 'admin') || !empty($_SESSION['is_super_admin'])) ? 'user-is-admin' : '' ?> <?= $bodyClass ?? '' ?>">
+<body class="govuk-template__body civicone civicone--govuk nexus-skin-civicone <?= $skinClass ?> <?= $isHome ? 'nexus-home-page' : '' ?> <?= isset($_SESSION['user_id']) ? 'logged-in' : '' ?> <?= ((!empty($_SESSION['user_role']) && $_SESSION['user_role'] === 'admin') || !empty($_SESSION['is_super_admin'])) ? 'user-is-admin' : '' ?> <?= $bodyClass ?? '' ?>">
 
     <!-- Layout switch link moved to utility bar - cleaner approach -->
 
@@ -67,39 +67,8 @@
         const mtBasePath = NEXUS_BASE; // Compatibility alias
     </script>
 
-    <!-- CivicOne Footer CSS (Footer content and styles - WCAG 2.1 AA) -->
-    <link rel="stylesheet" href="/assets/css/civicone-footer.css?v=<?= $cssVersion ?>">
-    <!-- CivicOne Events CSS (WCAG 2.1 AA 2026-01-19) -->
-    <link rel="stylesheet" href="/assets/css/civicone-events.css?v=<?= $cssVersion ?>">
-    <!-- CivicOne Profile CSS (WCAG 2.1 AA 2026-01-19) -->
-    <link rel="stylesheet" href="/assets/css/civicone-profile.css?v=<?= $cssVersion ?>">
-    <!-- CivicOne Groups CSS (WCAG 2.1 AA 2026-01-19) -->
-    <link rel="stylesheet" href="/assets/css/civicone-groups.css?v=<?= $cssVersion ?>">
-    <!-- CivicOne Groups Utilities (button alignment, spacing) -->
-    <link rel="stylesheet" href="/assets/css/civicone-groups-utilities.css?v=<?= $cssVersion ?>">
-    <!-- CivicOne Utilities (shared utility classes, WCAG fixes) -->
-    <link rel="stylesheet" href="/assets/css/civicone-utilities.css?v=<?= $cssVersion ?>">
-    <!-- CivicOne Volunteering CSS (WCAG 2.1 AA 2026-01-19) -->
-    <link rel="stylesheet" href="/assets/css/civicone-volunteering.css?v=<?= $cssVersion ?>">
-    <!-- CivicOne Mini Modules CSS (Polls, Goals, Resources - WCAG 2.1 AA 2026-01-19) -->
-    <link rel="stylesheet" href="/assets/css/civicone-mini-modules.css?v=<?= $cssVersion ?>">
-    <!-- CivicOne Messages & Notifications CSS (WCAG 2.1 AA 2026-01-19) -->
-    <link rel="stylesheet" href="/assets/css/civicone-messages.css?v=<?= $cssVersion ?>">
-    <!-- CivicOne Wallet & Insights CSS (WCAG 2.1 AA 2026-01-19) -->
-    <link rel="stylesheet" href="/assets/css/civicone-wallet.css?v=<?= $cssVersion ?>">
-    <!-- CivicOne Blog CSS (WCAG 2.1 AA 2026-01-19) -->
-    <link rel="stylesheet" href="/assets/css/civicone-blog.css?v=<?= $cssVersion ?>">
-    <!-- CivicOne Help & Settings CSS (WCAG 2.1 AA 2026-01-19) -->
-    <link rel="stylesheet" href="/assets/css/civicone-help.css?v=<?= $cssVersion ?>">
-    <!-- CivicOne Matches & Connections CSS (WCAG 2.1 AA 2026-01-19) -->
-    <link rel="stylesheet" href="/assets/css/civicone-matches.css?v=<?= $cssVersion ?>">
-    <!-- CivicOne Federation CSS (WCAG 2.1 AA 2026-01-20) -->
-    <link rel="stylesheet" href="/assets/css/civicone-federation.css?v=<?= $cssVersion ?>">
-    <!-- CivicOne Federation Shell - MOJ & GOV.UK Patterns (WCAG 2.1 AA 2026-01-20) -->
-    <link rel="stylesheet" href="/assets/css/civicone-federation-shell.css?v=<?= $cssVersion ?>">
-    <!-- CivicOne Members Directory - GOV.UK Pattern (WCAG 2.1 AA 2026-01-20) -->
-    <link rel="stylesheet" href="/assets/css/civicone-members-directory.css?v=<?= $cssVersion ?>">
-    <!-- CivicOne Listings Directory - GOV.UK Pattern (WCAG 2.1 AA 2026-01-20) -->
-    <link rel="stylesheet" href="/assets/css/civicone-listings-directory.css?v=<?= $cssVersion ?>">
-    <!-- CivicOne Feed/Activity Stream - Template F (WCAG 2.1 AA 2026-01-20) -->
-    <link rel="stylesheet" href="/assets/css/civicone-feed.css?v=<?= $cssVersion ?>">
+    <!--
+        NOTE: CivicOne page-specific CSS moved to assets-css.php (in <head>)
+        to prevent FOUC (Flash of Unstyled Content) - 2026-01-25
+        See: docs/VISUAL_FLASH_FIX_PLAN.md
+    -->

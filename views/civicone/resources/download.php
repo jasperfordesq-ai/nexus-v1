@@ -35,13 +35,13 @@ if (($resource['file_size'] ?? 0) > 1024 * 1024) {
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds">
 
-        <div class="govuk-!-padding-6 govuk-!-text-align-centre" style="border: 1px solid #b1b4b6;">
+        <div class="govuk-!-padding-6 govuk-!-text-align-centre civicone-border-standard">
 
-            <div style="font-size: 4rem;" aria-hidden="true"><?= $icon ?></div>
+            <div class="civicone-download-icon" aria-hidden="true"><?= $icon ?></div>
 
             <h1 class="govuk-heading-l govuk-!-margin-top-4"><?= htmlspecialchars($resource['title']) ?></h1>
 
-            <p class="govuk-body" style="color: #505a5f;">
+            <p class="govuk-body civicone-secondary-text">
                 <?= $size ?> &middot; <?= ($resource['downloads'] ?? 0) + 1 ?> downloads
             </p>
 
@@ -50,7 +50,7 @@ if (($resource['file_size'] ?? 0) > 1024 * 1024) {
                 <p class="govuk-body">Your download will start automatically...</p>
             </div>
 
-            <p class="govuk-body-s" id="downloadStatus" aria-live="polite" aria-atomic="true" style="color: #505a5f;">
+            <p class="govuk-body-s civicone-secondary-text" id="downloadStatus" aria-live="polite" aria-atomic="true">
                 Preparing your file...
             </p>
 
@@ -58,7 +58,7 @@ if (($resource['file_size'] ?? 0) > 1024 * 1024) {
 
             <a href="<?= $basePath ?>/resources" class="govuk-back-link">Back to Resources</a>
 
-            <p class="govuk-body-s govuk-!-margin-top-4" style="color: #505a5f;">
+            <p class="govuk-body-s govuk-!-margin-top-4 civicone-secondary-text">
                 Download not starting? <a href="<?= $basePath ?>/resources/<?= $resource['id'] ?>/file" id="manualDownload" class="govuk-link">Click here</a>
             </p>
         </div>
@@ -66,24 +66,6 @@ if (($resource['file_size'] ?? 0) > 1024 * 1024) {
     </div>
 </div>
 
-<script>
-(function() {
-    var countdown = 5;
-    var countdownEl = document.getElementById('countdown');
-    var statusEl = document.getElementById('downloadStatus');
-    var downloadUrl = '<?= $basePath ?>/resources/<?= $resource['id'] ?>/file';
-
-    var timer = setInterval(function() {
-        countdown--;
-        countdownEl.textContent = countdown;
-
-        if (countdown <= 0) {
-            clearInterval(timer);
-            statusEl.textContent = 'Download started!';
-            window.location.href = downloadUrl;
-        }
-    }, 1000);
-})();
-</script>
+<!-- Download countdown handled by civicone-resources-download.min.js -->
 
 <?php require dirname(__DIR__, 2) . '/layouts/civicone/footer.php'; ?>

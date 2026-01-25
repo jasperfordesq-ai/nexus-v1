@@ -55,11 +55,11 @@ $basePath = \Nexus\Core\TenantContext::getBasePath();
 </div>
 
 <!-- Quick Actions FAB (Mobile) -->
-<div id="govukFab" class="govuk-!-display-none-print" style="position: fixed; bottom: 80px; right: 20px; z-index: 1000;">
-    <button type="button" class="govuk-button" onclick="toggleGovukFab()" aria-label="Quick Actions" aria-expanded="false" aria-controls="govukFabMenu" style="border-radius: 50%; width: 56px; height: 56px; padding: 0;">
-        <span style="font-size: 24px;" aria-hidden="true">+</span>
+<div id="govukFab" class="govuk-!-display-none-print civicone-fab-container">
+    <button type="button" class="govuk-button civicone-fab-button" onclick="toggleGovukFab()" aria-label="Quick Actions" aria-expanded="false" aria-controls="govukFabMenu">
+        <span class="civicone-fab-icon" aria-hidden="true">+</span>
     </button>
-    <div id="govukFabMenu" hidden style="position: absolute; bottom: 70px; right: 0; background: white; padding: 1rem; border: 1px solid #b1b4b6; border-radius: 4px; box-shadow: 0 2px 8px rgba(0,0,0,0.15); min-width: 160px;">
+    <div id="govukFabMenu" hidden class="civicone-fab-menu">
         <ul class="govuk-list govuk-!-margin-bottom-0">
             <li class="govuk-!-margin-bottom-2">
                 <a href="<?= $basePath ?>/wallet" class="govuk-link">Send Credits</a>
@@ -74,23 +74,13 @@ $basePath = \Nexus\Core\TenantContext::getBasePath();
     </div>
 </div>
 
+<!-- Dashboard functions in civicone-dashboard.js -->
 <script src="/assets/js/civicone-dashboard.js"></script>
 <script>
-// Toggle FAB menu
-function toggleGovukFab() {
-    const menu = document.getElementById('govukFabMenu');
-    const btn = document.querySelector('#govukFab button');
-    const isExpanded = btn.getAttribute('aria-expanded') === 'true';
-    menu.hidden = isExpanded;
-    btn.setAttribute('aria-expanded', !isExpanded);
-}
-
-// Initialize dashboard with basePath
-document.addEventListener('DOMContentLoaded', function() {
+    // Initialize dashboard with basePath
     if (typeof initCivicOneDashboard === 'function') {
         initCivicOneDashboard('<?= $basePath ?>');
     }
-});
 </script>
 
 <?php require dirname(__DIR__) . '/layouts/civicone/footer.php'; ?>
