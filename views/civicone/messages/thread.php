@@ -35,16 +35,16 @@ $basePath = Nexus\Core\TenantContext::getBasePath();
     </div>
 </div>
 
-<div class="govuk-!-padding-4 govuk-!-margin-bottom-6" style="border: 1px solid #b1b4b6;" role="log" aria-label="Message conversation with <?= htmlspecialchars($otherUser['name']) ?>">
+<div class="govuk-!-padding-4 govuk-!-margin-bottom-6 civicone-card-bordered-simple" role="log" aria-label="Message conversation with <?= htmlspecialchars($otherUser['name']) ?>">
 
     <!-- Messages Area -->
-    <div id="chat-messages" class="govuk-!-margin-bottom-4" style="max-height: 400px; overflow-y: auto;">
+    <div id="chat-messages" class="govuk-!-margin-bottom-4 civicone-chat-area">
         <?php foreach ($messages as $msg):
             $isMe = $msg['sender_id'] == $_SESSION['user_id'];
         ?>
-            <div class="govuk-!-margin-bottom-3" style="display: flex; justify-content: <?= $isMe ? 'flex-end' : 'flex-start' ?>;">
-                <div class="govuk-!-padding-3" style="max-width: 70%; background: <?= $isMe ? '#1d70b8' : '#f3f2f1' ?>; color: <?= $isMe ? 'white' : '#0b0c0c' ?>; border-radius: 4px;">
-                    <p class="govuk-body-s govuk-!-margin-bottom-1" style="<?= $isMe ? 'color: rgba(255,255,255,0.8);' : 'color: #505a5f;' ?>">
+            <div class="govuk-!-margin-bottom-3 <?= $isMe ? 'civicone-chat-row-end' : 'civicone-chat-row-start' ?>">
+                <div class="govuk-!-padding-3 <?= $isMe ? 'civicone-chat-bubble-me' : 'civicone-chat-bubble-them' ?>">
+                    <p class="govuk-body-s govuk-!-margin-bottom-1 <?= $isMe ? 'civicone-chat-meta-me' : 'civicone-chat-meta-them' ?>">
                         <strong><?= $isMe ? 'You' : htmlspecialchars($otherUser['name']) ?></strong>
                         <time datetime="<?= $msg['created_at'] ?>" class="govuk-!-margin-left-2"><?= date('H:i', strtotime($msg['created_at'])) ?></time>
                     </p>

@@ -14,6 +14,11 @@
 <!-- Replaces: inline scripts from utility-bar.php, service-navigation.php, header-scripts.php -->
 <script src="/assets/js/civicone-header-v2.js"></script>
 
+<!-- CivicOne Common JavaScript (Extracted 2026-01-25) -->
+<!-- Replaces: inline scripts from federation pages, volunteering pages, messages -->
+<!-- Provides: offline banner, form protection, scroll-to-bottom, auto-dismiss, confirm delete, character counters -->
+<script src="/assets/js/civicone-common.min.js"></script>
+
 <!-- Nexus UI & Maps -->
 <!-- Mapbox: Lazy load only when needed (no preload - conditionally loaded) -->
 <script>

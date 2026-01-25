@@ -2212,7 +2212,8 @@
 }
 
 /* Star ratings - orange */
-.civicone-star-filled {
+.civicone-star-filled,
+.civicone-star-selected {
     color: #f47738;
 }
 
@@ -3813,4 +3814,1131 @@
 /* Inline form */
 .civicone-inline-form {
     display: inline;
+}
+
+/* ==========================================
+   FEDERATION REVIEWS COMPONENTS
+   Used for pending reviews and review cards
+   ========================================== */
+
+/* Review card */
+.civicone-review-card {
+    background: white;
+    border: 1px solid #b1b4b6;
+}
+
+/* Review row layout */
+.civicone-review-row {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    flex-wrap: wrap;
+}
+
+/* Large avatar circle */
+.civicone-avatar-lg {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 18px;
+}
+
+/* Avatar red variant */
+.civicone-avatar-red {
+    background: #d4351c;
+}
+
+/* Review party info */
+.civicone-review-party {
+    flex: 1;
+    min-width: 200px;
+}
+
+/* Review amount section */
+.civicone-review-amount {
+    text-align: right;
+}
+
+/* Orange button */
+.civicone-btn-orange {
+    background: #f47738;
+}
+
+.civicone-btn-orange:hover {
+    background: #e06023;
+}
+
+/* Review description */
+.civicone-review-description {
+    color: #505a5f;
+    padding-top: 15px;
+    border-top: 1px solid #b1b4b6;
+}
+
+/* ==========================================
+   ABOUT/VALUES COMPONENTS
+   Used for about pages and value cards
+   ========================================== */
+
+/* Card with blue left border */
+.civicone-card-border-left-blue {
+    border: 1px solid #b1b4b6;
+    border-left: 5px solid #1d70b8;
+}
+
+/* Value card - white bg, full height */
+.civicone-value-card {
+    background: white;
+    height: 100%;
+}
+
+/* Pink color variants */
+.civicone-icon-pink {
+    color: #d53880;
+}
+
+.civicone-heading-pink {
+    color: #d53880;
+}
+
+/* Rights card - bordered with blue accent */
+.civicone-rights-card {
+    border: 1px solid #b1b4b6;
+    border-left: 4px solid #1d70b8;
+}
+
+/* CTA text - white color */
+.civicone-cta-text {
+    color: white;
+}
+
+/* ==========================================
+   MESSAGES COMPONENTS
+   Used for federation messages and conversations
+   ========================================== */
+
+/* Conversation link card */
+.civicone-conversation-link {
+    display: block;
+    background: #fff;
+    border: 1px solid #b1b4b6;
+    text-decoration: none;
+    color: inherit;
+}
+
+/* Conversation row layout */
+.civicone-conversation-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+}
+
+/* Avatar wrapper with relative positioning */
+.civicone-avatar-wrapper {
+    position: relative;
+    flex-shrink: 0;
+}
+
+/* Medium avatar */
+.civicone-avatar-md {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+/* Unread indicator dot */
+.civicone-unread-dot {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 12px;
+    height: 12px;
+    background: #1d70b8;
+    border-radius: 50%;
+    border: 2px solid #fff;
+}
+
+/* Conversation content area */
+.civicone-conversation-content {
+    flex: 1;
+    min-width: 0;
+}
+
+/* Conversation header */
+.civicone-conversation-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 8px;
+}
+
+/* No wrap for timestamps */
+.civicone-nowrap {
+    white-space: nowrap;
+}
+
+/* Message preview truncation */
+.civicone-message-preview {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* Unread text style */
+.civicone-unread-text {
+    color: #0b0c0c;
+    font-weight: bold;
+}
+
+/* Border left variants */
+.civicone-border-left-grey {
+    border-left: 5px solid #b1b4b6;
+}
+
+/* ==========================================
+   MESSAGE THREAD COMPONENTS
+   Used for federation message threads
+   ========================================== */
+
+/* Thread header */
+.civicone-thread-header {
+    background: #fff;
+    border: 1px solid #b1b4b6;
+    border-left: 5px solid #1d70b8;
+}
+
+/* Thread header row */
+.civicone-thread-header-row {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+/* Large avatar image */
+.civicone-avatar-lg-img {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+/* Thread user info */
+.civicone-thread-user-info {
+    flex: 1;
+}
+
+/* Messages container with scroll */
+.civicone-messages-container {
+    min-height: 300px;
+    max-height: 500px;
+    overflow-y: auto;
+}
+
+/* Message row */
+.civicone-msg-row {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 16px;
+}
+
+.civicone-msg-row-right {
+    align-items: flex-end;
+}
+
+.civicone-msg-row-left {
+    align-items: flex-start;
+}
+
+/* Message bubble */
+.civicone-msg-bubble {
+    max-width: 80%;
+    padding: 12px 16px;
+    border-radius: 8px;
+}
+
+/* Sent message bubble */
+.civicone-msg-bubble-sent {
+    background: #1d70b8;
+    color: #fff;
+}
+
+/* Received message bubble */
+.civicone-msg-bubble-received {
+    background: #fff;
+    color: #0b0c0c;
+    border: 1px solid #b1b4b6;
+}
+
+/* Message timestamp */
+.civicone-msg-time {
+    color: #505a5f;
+    margin-top: 4px;
+}
+
+/* Empty messages state */
+.civicone-empty-messages {
+    background: #fff;
+    border: 1px solid #b1b4b6;
+}
+
+/* Compose row */
+.civicone-compose-row {
+    display: flex;
+    gap: 12px;
+}
+
+/* Compose textarea */
+.civicone-compose-textarea {
+    flex: 1;
+    resize: none;
+}
+
+/* Compose button alignment */
+.civicone-compose-btn {
+    align-self: flex-end;
+}
+
+/* ==========================================
+   REVIEW FORM COMPONENTS
+   Used for federation review forms
+   ========================================== */
+
+/* Extra large avatar wrapper */
+.civicone-avatar-xl-wrapper {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    margin: 0 auto 16px;
+    overflow: hidden;
+    border: 3px solid #1d70b8;
+}
+
+/* XL avatar image */
+.civicone-avatar-xl-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* XL avatar placeholder */
+.civicone-avatar-xl-placeholder {
+    width: 100%;
+    height: 100%;
+    background: #1d70b8;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 32px;
+    font-weight: bold;
+}
+
+/* Star rating row */
+.civicone-star-rating-row {
+    display: flex;
+    gap: 8px;
+    margin-top: 8px;
+}
+
+/* Star button */
+.civicone-star-btn {
+    width: 48px;
+    height: 48px;
+    padding: 0;
+    margin-bottom: 0;
+}
+
+/* Organizer row */
+.civicone-organizer-row {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+/* ==========================================
+   GROUP CARD COMPONENTS
+   Used for federated groups listings
+   ========================================== */
+
+/* Group card row */
+.civicone-group-card-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+}
+
+/* Group card content */
+.civicone-group-card-content {
+    flex: 1;
+}
+
+/* Group card actions */
+.civicone-group-card-actions {
+    text-align: right;
+}
+
+/* Small button */
+.civicone-btn-sm {
+    font-size: 14px;
+}
+
+/* ==========================================
+   CONNECTION COMPONENTS
+   Used for connections/friends pages
+   ========================================== */
+
+/* Card with orange left border */
+.civicone-card-border-left-orange {
+    border: 1px solid #b1b4b6;
+    border-left: 5px solid #f47738;
+}
+
+/* Connection row layout */
+.civicone-connection-row {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+}
+
+/* Connection info content */
+.civicone-connection-info {
+    flex: 1;
+}
+
+/* Member link with avatar */
+.civicone-member-link {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    text-decoration: none;
+}
+
+/* Small avatar image */
+.civicone-avatar-sm-img {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+}
+
+/* Status dot indicator */
+.civicone-status-dot {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    width: 12px;
+    height: 12px;
+    border: 2px solid white;
+    border-radius: 50%;
+}
+
+/* Online status */
+.civicone-status-online {
+    background: #00703c;
+}
+
+/* Recently active status */
+.civicone-status-recent {
+    background: #f47738;
+}
+
+/* ==========================================
+   PROFILE EDIT COMPONENTS
+   Used for profile editing forms
+   ========================================== */
+
+/* Avatar preview image - GOV.UK compliant
+   Source: GOV.UK border color #b1b4b6 from design tokens */
+.civicone-avatar-preview {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid #b1b4b6;
+}
+
+/* ==========================================
+   OFFLINE BANNER
+   Fixed position offline indicator
+   ========================================== */
+
+.civicone-offline-banner {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+    background: #d4351c;
+    color: white;
+    padding: 12px;
+    text-align: center;
+}
+
+/* ==========================================
+   FORM IMAGE PREVIEW COMPONENTS
+   Used for group/org image uploads
+   ========================================== */
+
+/* Image preview container */
+.civicone-image-preview-row {
+    border: 1px solid #b1b4b6;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+/* Avatar thumbnail (60x60) */
+.civicone-avatar-thumb {
+    width: 60px;
+    height: 60px;
+    object-fit: cover;
+    border-radius: 4px;
+}
+
+/* Cover image thumbnail (120x60) */
+.civicone-cover-thumb {
+    width: 120px;
+    height: 60px;
+    object-fit: cover;
+    border-radius: 4px;
+}
+
+/* Auto margin left */
+.civicone-ml-auto {
+    margin-left: auto;
+}
+
+/* Inline checkbox fix */
+.civicone-checkbox-inline {
+    width: auto;
+}
+
+/* ==========================================
+   GROUP/HUB CARD COMPONENTS
+   Used for my-groups and group listings
+   ========================================== */
+
+/* Card with grey border */
+.civicone-card-bordered {
+    border: 1px solid #b1b4b6;
+}
+
+/* Card image area with cover */
+.civicone-card-image-area {
+    height: 120px;
+    background-size: cover;
+    background-position: center;
+    position: relative;
+}
+
+/* Fallback card header (no image) */
+.civicone-card-header-blue {
+    height: 120px;
+    background: #1d70b8;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+}
+
+/* Large icon in card header */
+.civicone-card-icon-large {
+    font-size: 2.5rem;
+    color: white;
+}
+
+/* Positioned tag */
+.civicone-tag-positioned {
+    position: absolute;
+    top: 0.5rem;
+    right: 0.5rem;
+}
+
+/* Justify flex end */
+.civicone-justify-end {
+    justify-content: flex-end;
+}
+
+/* ==========================================
+   SETTINGS CARD COMPONENTS
+   Used for federation settings and forms
+   ========================================== */
+
+/* Settings section card - blue accent */
+.civicone-settings-card {
+    border: 1px solid #b1b4b6;
+    border-left: 5px solid #1d70b8;
+}
+
+/* Settings section card - green accent */
+.civicone-settings-card-green {
+    border: 1px solid #b1b4b6;
+    border-left: 5px solid #00703c;
+}
+
+/* Full height card */
+.civicone-card-full-height {
+    height: 100%;
+}
+
+/* White background card */
+.civicone-card-white {
+    background: white;
+}
+
+/* ==========================================
+   CTA/BANNER COMPONENTS
+   Used for call-to-action sections
+   ========================================== */
+
+/* Blue CTA background */
+.civicone-cta-blue {
+    background: #1d70b8;
+}
+
+/* White text heading */
+.civicone-cta-heading {
+    color: white;
+}
+
+/* Inset with blue border */
+.civicone-inset-blue {
+    border-left-color: #1d70b8;
+}
+
+/* Inset with green border */
+.civicone-inset-green {
+    border-left-color: #00703c;
+}
+
+/* ==========================================
+   LAYOUT UTILITIES
+   Flexbox and display utilities
+   ========================================== */
+
+/* Flex space-between with centered alignment */
+.civicone-flex-between {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+/* Inline display for form actions */
+.civicone-inline {
+    display: inline;
+}
+
+/* Inline-block display */
+.civicone-inline-block {
+    display: inline-block;
+}
+
+/* Zero margin */
+.civicone-m-0 {
+    margin: 0;
+}
+
+/* ==========================================
+   LIST ITEM COMPONENTS
+   Used for opportunity lists, etc.
+   ========================================== */
+
+/* List item with blue left border and background */
+.civicone-list-item {
+    border-left: 4px solid #1d70b8;
+    background: #f8f8f8;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+/* ==========================================
+   BUTTON SIZE MODIFIERS
+   ========================================== */
+
+/* Compact button for tables */
+.civicone-btn-compact {
+    padding: 5px 10px;
+}
+
+/* Small button for tables */
+.civicone-btn-sm {
+    font-size: 14px;
+    padding: 8px 12px;
+}
+
+/* ==========================================
+   ORGANIZATION COMPONENTS
+   Used for org utility bar, etc.
+   ========================================== */
+
+/* Organization logo container */
+.civicone-org-logo {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    overflow: hidden;
+    border: 2px solid #1d70b8;
+}
+
+/* Logo image */
+.civicone-org-logo img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* Logo initial letter */
+.civicone-org-logo-initial {
+    color: #1d70b8;
+}
+
+/* Flex row with gap */
+.civicone-flex-gap {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+/* Horizontal nav list */
+.civicone-nav-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+/* Table header fixed width */
+.civicone-th-narrow {
+    width: 60px;
+}
+
+/* ==========================================
+   ROLE TAG COLORS
+   Used for member role badges
+   ========================================== */
+
+/* Owner role - orange */
+.civicone-tag-owner {
+    background: #f47738;
+}
+
+/* Admin role - purple */
+.civicone-tag-admin {
+    background: #912b88;
+}
+
+/* Member role - blue */
+.civicone-tag-member {
+    background: #1d70b8;
+}
+
+/* Red notification badge */
+.civicone-tag-red {
+    background: #d4351c;
+}
+
+/* ==========================================
+   PANEL BORDER VARIATIONS
+   ========================================== */
+
+/* Panel with blue left border */
+.civicone-panel-border-blue {
+    border-left: 5px solid #1d70b8;
+}
+
+/* Panel with green left border */
+.civicone-panel-border-green {
+    border-left: 5px solid #00703c;
+}
+
+/* ==========================================
+   AVATAR COMPONENTS
+   Used for user avatars in various sizes
+   ========================================== */
+
+/* Medium avatar (60x60) */
+.civicone-avatar-md {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+/* ==========================================
+   NAV LIST VARIATIONS
+   ========================================== */
+
+/* Nav list with small gap */
+.civicone-nav-list-sm {
+    list-style: none;
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    padding: 0;
+    margin: 0;
+}
+
+/* ==========================================
+   CHALLENGE/REWARD COMPONENTS
+   ========================================== */
+
+/* Flex space between with aligned items */
+.civicone-flex-between-center {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+/* XP reward text */
+.civicone-xp-text {
+    color: #1d70b8;
+}
+
+/* ==========================================
+   DIALOG/MODAL COMPONENTS
+   ========================================== */
+
+/* Basic dialog border */
+.civicone-dialog {
+    border: 1px solid #b1b4b6;
+    max-width: 500px;
+}
+
+/* Close button positioned absolute */
+.civicone-dialog-close {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+}
+
+/* ==========================================
+   NOTIFICATION LIST ITEM
+   ========================================== */
+
+/* Unread notification */
+.civicone-notif-unread {
+    border: 1px solid #b1b4b6;
+    border-left: 5px solid #1d70b8;
+}
+
+/* Read notification */
+.civicone-notif-read {
+    border: 1px solid #b1b4b6;
+    border-left: 5px solid #b1b4b6;
+}
+
+/* ==========================================
+   DISCUSSION POST COMPONENTS
+   ========================================== */
+
+/* Post container (others) */
+.civicone-post {
+    border: 1px solid #b1b4b6;
+    border-left: 4px solid #505a5f;
+    background: white;
+}
+
+/* Post container (own post) */
+.civicone-post-own {
+    border: 1px solid #b1b4b6;
+    border-left: 4px solid #1d70b8;
+    background: #f3f2f1;
+}
+
+/* Post header row */
+.civicone-post-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 0.5rem;
+}
+
+/* Small avatar (36x36) */
+.civicone-avatar-sm {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+/* Avatar placeholder with initial */
+.civicone-avatar-placeholder {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: #1d70b8;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+}
+
+/* Bordered card simple */
+.civicone-card-bordered-simple {
+    border: 1px solid #b1b4b6;
+}
+
+/* ==========================================
+   OFFLINE BANNER
+   ========================================== */
+
+/* Fixed offline banner */
+.civicone-offline-banner-fixed {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+    background: #d4351c;
+    color: white;
+    padding: 12px;
+    text-align: center;
+}
+
+/* ==========================================
+   TAG VARIATIONS
+   ========================================== */
+
+/* Blue tag */
+.civicone-tag-blue {
+    background: #1d70b8;
+}
+
+/* ==========================================
+   CARD BACKGROUNDS
+   ========================================== */
+
+/* White card with border */
+.civicone-card-white-bordered {
+    background: white;
+    border: 1px solid #b1b4b6;
+}
+
+/* ==========================================
+   CHAT/MESSAGE COMPONENTS
+   ========================================== */
+
+/* Chat area scrollable */
+.civicone-chat-area {
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+/* Message thread chat row alignment */
+.civicone-chat-row-start {
+    display: flex;
+    justify-content: flex-start;
+}
+
+.civicone-chat-row-end {
+    display: flex;
+    justify-content: flex-end;
+}
+
+/* Message thread chat bubbles */
+.civicone-chat-bubble-me {
+    max-width: 70%;
+    background: #1d70b8;
+    color: white;
+    border-radius: 4px;
+}
+
+.civicone-chat-bubble-them {
+    max-width: 70%;
+    background: #f3f2f1;
+    color: #0b0c0c;
+    border-radius: 4px;
+}
+
+/* Chat bubble metadata text */
+.civicone-chat-meta-me {
+    color: rgba(255, 255, 255, 0.8);
+}
+
+.civicone-chat-meta-them {
+    color: #505a5f;
+}
+
+/* Discussion post styles */
+.civicone-post-me {
+    border: 1px solid #b1b4b6;
+    border-left: 4px solid #1d70b8;
+    background: #f3f2f1;
+}
+
+.civicone-post-other {
+    border: 1px solid #b1b4b6;
+    border-left: 4px solid #505a5f;
+    background: white;
+}
+
+/* ==========================================
+   ARTICLE/CARD CONTAINERS
+   ========================================== */
+
+/* White article with blue border */
+.civicone-article-blue {
+    background: #fff;
+    border: 1px solid #b1b4b6;
+    border-left: 5px solid #1d70b8;
+}
+
+/* White article with green border */
+.civicone-article-green {
+    background: #fff;
+    border: 1px solid #b1b4b6;
+    border-left: 5px solid #00703c;
+}
+
+/* White article with pink border */
+.civicone-article-pink {
+    background: #fff;
+    border: 1px solid #b1b4b6;
+    border-left: 5px solid #d53880;
+}
+
+/* Large avatar (64x64) */
+.civicone-avatar-lg {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+}
+
+/* ==========================================
+   BLOG/NEWS CARD STYLES
+   ========================================== */
+
+/* Blog card with blue top border */
+.civicone-blog-card {
+    border: 1px solid #b1b4b6;
+    border-top: 5px solid #1d70b8;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Blog card image container (negative margin to bleed) */
+.civicone-blog-card-image {
+    margin: -1rem -1rem 1rem -1rem;
+    overflow: hidden;
+}
+
+/* Blog card image sizing */
+.civicone-blog-card-img {
+    width: 100%;
+    height: 150px;
+    object-fit: cover;
+}
+
+/* Blog card excerpt area */
+.civicone-blog-card-excerpt {
+    flex-grow: 1;
+    color: #505a5f;
+}
+
+/* ==========================================
+   LISTING CARD STYLES
+   ========================================== */
+
+/* Listing card container */
+.civicone-listing-card {
+    border: 1px solid #b1b4b6;
+}
+
+/* Listing card image placeholder - offer */
+.civicone-listing-placeholder-offer {
+    height: 150px;
+    background: #00703c;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Listing card image placeholder - request */
+.civicone-listing-placeholder-request {
+    height: 150px;
+    background: #1d70b8;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Listing card large icon */
+.civicone-listing-icon-lg {
+    font-size: 3rem;
+    color: white;
+}
+
+/* Listing card background image (inline style required) */
+.civicone-listing-image {
+    height: 150px;
+    background-size: cover;
+    background-position: center;
+    object-fit: cover;
+}
+
+/* ==========================================
+   NAVIGATION STYLES
+   ========================================== */
+
+/* Flex nav list for achievement navigation etc */
+.civicone-flex-nav {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    padding: 0;
+    margin: 0;
+}
+
+/* ==========================================
+   EVENT/CONTENT CARDS
+   ========================================== */
+
+/* Event hosting card */
+.civicone-event-card-hosting {
+    border: 1px solid #b1b4b6;
+    border-left: 5px solid #00703c;
+}
+
+/* Attending event card container */
+.civicone-event-attending-card {
+    border: 1px solid #b1b4b6;
+    display: flex;
+    gap: 1rem;
+}
+
+/* Event date box */
+.civicone-event-date-box {
+    min-width: 60px;
+}
+
+/* Message thread unread indicator */
+.civicone-thread-unread {
+    border: 1px solid #b1b4b6;
+    border-left: 5px solid #1d70b8;
+}
+
+/* Message thread read indicator */
+.civicone-thread-read {
+    border: 1px solid #b1b4b6;
+    border-left: 5px solid #b1b4b6;
+}
+
+/* No text decoration for links */
+.civicone-link-no-underline {
+    text-decoration: none;
+    display: block;
 }

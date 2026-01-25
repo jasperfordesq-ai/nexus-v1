@@ -53,21 +53,21 @@ require __DIR__ . '/../../layouts/civicone/header.php';
     <div class="govuk-grid-row">
         <?php foreach ($pending as $req): ?>
             <div class="govuk-grid-column-one-half govuk-!-margin-bottom-4">
-                <div class="govuk-!-padding-4" style="border: 1px solid #b1b4b6; border-left: 5px solid #f47738;">
-                    <div style="display: flex; gap: 1rem; align-items: center;">
+                <div class="govuk-!-padding-4 civicone-card-border-left-orange">
+                    <div class="civicone-connection-row">
                         <a href="<?= $basePath ?>/profile/<?= $req['requester_id'] ?? $req['id'] ?>">
                             <img src="<?= htmlspecialchars($req['avatar_url'] ?: '/assets/img/defaults/default_avatar.webp') ?>"
                                  loading="lazy"
                                  alt=""
-                                 style="width: 48px; height: 48px; border-radius: 50%;">
+                                 class="civicone-avatar-md">
                         </a>
-                        <div style="flex: 1;">
+                        <div class="civicone-connection-info">
                             <p class="govuk-body govuk-!-margin-bottom-0">
                                 <a href="<?= $basePath ?>/profile/<?= $req['requester_id'] ?? $req['id'] ?>" class="govuk-link">
                                     <strong><?= htmlspecialchars($req['requester_name']) ?></strong>
                                 </a>
                             </p>
-                            <p class="govuk-body-s govuk-!-margin-bottom-0" style="color: #505a5f;">Wants to connect</p>
+                            <p class="govuk-body-s govuk-!-margin-bottom-0 civicone-secondary-text">Wants to connect</p>
                         </div>
                         <form action="<?= $basePath ?>/connections/accept" method="POST">
                             <?= \Nexus\Core\Csrf::input() ?>
@@ -122,16 +122,16 @@ require __DIR__ . '/../../layouts/civicone/header.php';
             ?>
                 <tr class="govuk-table__row">
                     <td class="govuk-table__cell">
-                        <a href="<?= $basePath ?>/profile/<?= $friend['id'] ?>" class="govuk-link" style="display: flex; align-items: center; gap: 0.75rem; text-decoration: none;">
-                            <span style="position: relative;">
+                        <a href="<?= $basePath ?>/profile/<?= $friend['id'] ?>" class="govuk-link civicone-member-link">
+                            <span class="civicone-avatar-wrapper">
                                 <img src="<?= htmlspecialchars($friend['avatar_url'] ?: '/assets/img/defaults/default_avatar.webp') ?>"
                                      loading="lazy"
                                      alt=""
-                                     style="width: 40px; height: 40px; border-radius: 50%;">
+                                     class="civicone-avatar-sm-img">
                                 <?php if ($friendIsOnline): ?>
-                                    <span style="position: absolute; bottom: 0; right: 0; width: 12px; height: 12px; background: #00703c; border: 2px solid white; border-radius: 50%;" aria-hidden="true"></span>
+                                    <span class="civicone-status-dot civicone-status-online" aria-hidden="true"></span>
                                 <?php elseif ($friendIsRecent): ?>
-                                    <span style="position: absolute; bottom: 0; right: 0; width: 12px; height: 12px; background: #f47738; border: 2px solid white; border-radius: 50%;" aria-hidden="true"></span>
+                                    <span class="civicone-status-dot civicone-status-recent" aria-hidden="true"></span>
                                 <?php endif; ?>
                             </span>
                             <strong><?= htmlspecialchars($friend['name']) ?></strong>
@@ -141,7 +141,7 @@ require __DIR__ . '/../../layouts/civicone/header.php';
                         <?php if (!empty($friend['location'])): ?>
                             <?= htmlspecialchars($friend['location']) ?>
                         <?php else: ?>
-                            <span style="color: #505a5f;">-</span>
+                            <span class="civicone-secondary-text">-</span>
                         <?php endif; ?>
                     </td>
                     <td class="govuk-table__cell">

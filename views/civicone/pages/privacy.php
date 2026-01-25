@@ -37,7 +37,7 @@ if (class_exists('Nexus\Core\TenantContext')) {
             Privacy Policy
         </h1>
         <p class="govuk-body-l govuk-!-margin-bottom-2">How we collect, use, and protect your personal information</p>
-        <p class="govuk-body-s govuk-!-margin-bottom-6" style="color: #505a5f;">
+        <p class="govuk-body-s govuk-!-margin-bottom-6 civicone-secondary-text">
             <i class="fa-solid fa-calendar govuk-!-margin-right-1" aria-hidden="true"></i>
             Last Updated: <?= date('j F Y') ?>
         </p>
@@ -60,7 +60,7 @@ if (class_exists('Nexus\Core\TenantContext')) {
     <div class="govuk-grid-column-two-thirds">
 
         <!-- Introduction -->
-        <div class="govuk-inset-text govuk-!-margin-bottom-6" style="border-left-color: #1d70b8;">
+        <div class="govuk-inset-text govuk-!-margin-bottom-6 civicone-inset-blue">
             <h2 class="govuk-heading-m">
                 <i class="fa-solid fa-handshake govuk-!-margin-right-2" aria-hidden="true"></i>
                 Our Commitment to Your Privacy
@@ -156,7 +156,7 @@ if (class_exists('Nexus\Core\TenantContext')) {
 
         <!-- Your Rights -->
         <section class="govuk-!-margin-bottom-8" id="your-rights">
-            <div class="govuk-inset-text govuk-!-margin-bottom-6" style="border-left-color: #00703c;">
+            <div class="govuk-inset-text govuk-!-margin-bottom-6 civicone-inset-green">
                 <h2 class="govuk-heading-l govuk-!-margin-bottom-4">
                     <i class="fa-solid fa-user-shield govuk-!-margin-right-2" aria-hidden="true"></i>
                     Your Privacy Rights
@@ -165,36 +165,36 @@ if (class_exists('Nexus\Core\TenantContext')) {
 
                 <div class="govuk-grid-row">
                     <div class="govuk-grid-column-one-half govuk-!-margin-bottom-4">
-                        <div class="govuk-!-padding-3" style="border: 1px solid #b1b4b6; border-left: 4px solid #1d70b8;">
+                        <div class="govuk-!-padding-3 civicone-rights-card">
                             <p class="govuk-body govuk-!-margin-bottom-1">
-                                <i class="fa-solid fa-eye" style="color: #1d70b8;" aria-hidden="true"></i>
+                                <i class="fa-solid fa-eye civicone-icon-blue" aria-hidden="true"></i>
                             </p>
                             <h3 class="govuk-heading-s govuk-!-margin-bottom-1">Right to Access</h3>
                             <p class="govuk-body-s govuk-!-margin-bottom-0">Request a copy of all personal data we hold about you</p>
                         </div>
                     </div>
                     <div class="govuk-grid-column-one-half govuk-!-margin-bottom-4">
-                        <div class="govuk-!-padding-3" style="border: 1px solid #b1b4b6; border-left: 4px solid #1d70b8;">
+                        <div class="govuk-!-padding-3 civicone-rights-card">
                             <p class="govuk-body govuk-!-margin-bottom-1">
-                                <i class="fa-solid fa-pen" style="color: #1d70b8;" aria-hidden="true"></i>
+                                <i class="fa-solid fa-pen civicone-icon-blue" aria-hidden="true"></i>
                             </p>
                             <h3 class="govuk-heading-s govuk-!-margin-bottom-1">Right to Rectification</h3>
                             <p class="govuk-body-s govuk-!-margin-bottom-0">Correct any inaccurate or incomplete information</p>
                         </div>
                     </div>
                     <div class="govuk-grid-column-one-half govuk-!-margin-bottom-4">
-                        <div class="govuk-!-padding-3" style="border: 1px solid #b1b4b6; border-left: 4px solid #1d70b8;">
+                        <div class="govuk-!-padding-3 civicone-rights-card">
                             <p class="govuk-body govuk-!-margin-bottom-1">
-                                <i class="fa-solid fa-trash" style="color: #1d70b8;" aria-hidden="true"></i>
+                                <i class="fa-solid fa-trash civicone-icon-blue" aria-hidden="true"></i>
                             </p>
                             <h3 class="govuk-heading-s govuk-!-margin-bottom-1">Right to Erasure</h3>
                             <p class="govuk-body-s govuk-!-margin-bottom-0">Request deletion of your account and associated data</p>
                         </div>
                     </div>
                     <div class="govuk-grid-column-one-half govuk-!-margin-bottom-4">
-                        <div class="govuk-!-padding-3" style="border: 1px solid #b1b4b6; border-left: 4px solid #1d70b8;">
+                        <div class="govuk-!-padding-3 civicone-rights-card">
                             <p class="govuk-body govuk-!-margin-bottom-1">
-                                <i class="fa-solid fa-download" style="color: #1d70b8;" aria-hidden="true"></i>
+                                <i class="fa-solid fa-download civicone-icon-blue" aria-hidden="true"></i>
                             </p>
                             <h3 class="govuk-heading-s govuk-!-margin-bottom-1">Right to Portability</h3>
                             <p class="govuk-body-s govuk-!-margin-bottom-0">Export your data in a machine-readable format</p>
@@ -236,12 +236,12 @@ if (class_exists('Nexus\Core\TenantContext')) {
         </section>
 
         <!-- Contact CTA -->
-        <div class="govuk-!-padding-6 govuk-!-margin-bottom-6" style="background: #1d70b8; color: white;">
-            <h2 class="govuk-heading-m" style="color: white;">
+        <div class="govuk-!-padding-6 govuk-!-margin-bottom-6 civicone-cta-blue">
+            <h2 class="govuk-heading-m civicone-cta-heading">
                 <i class="fa-solid fa-envelope govuk-!-margin-right-2" aria-hidden="true"></i>
                 Questions About Your Privacy?
             </h2>
-            <p class="govuk-body" style="color: white;">We're here to help. If you have any questions about this policy or want to exercise your data rights, please don't hesitate to reach out.</p>
+            <p class="govuk-body civicone-cta-text">We're here to help. If you have any questions about this policy or want to exercise your data rights, please don't hesitate to reach out.</p>
             <a href="<?= $basePath ?>/contact" class="govuk-button govuk-button--secondary" data-module="govuk-button">
                 <i class="fa-solid fa-paper-plane govuk-!-margin-right-1" aria-hidden="true"></i>
                 Contact Our Privacy Team

@@ -75,12 +75,12 @@ foreach ($my_listings as $ml) {
         <div class="govuk-grid-row">
             <?php foreach ($my_listings as $listing): ?>
                 <div class="govuk-grid-column-one-third govuk-!-margin-bottom-6" id="listing-<?= $listing['id'] ?>">
-                    <div class="govuk-!-padding-0" style="border: 1px solid #b1b4b6;">
+                    <div class="govuk-!-padding-0 civicone-listing-card">
                         <?php if (!empty($listing['image_url'])): ?>
-                            <div style="height: 150px; background-image: url('<?= htmlspecialchars($listing['image_url']) ?>'); background-size: cover; background-position: center;"></div>
+                            <div class="civicone-listing-image" style="background-image: url('<?= htmlspecialchars($listing['image_url']) ?>');"></div>
                         <?php else: ?>
-                            <div class="govuk-!-padding-6 govuk-!-text-align-centre" style="height: 150px; background: <?= $listing['type'] === 'offer' ? '#00703c' : '#1d70b8' ?>; display: flex; align-items: center; justify-content: center;">
-                                <i class="fa-solid fa-<?= $listing['type'] === 'offer' ? 'hand-holding-heart' : 'hand-holding' ?>" aria-hidden="true" style="font-size: 3rem; color: white;"></i>
+                            <div class="govuk-!-padding-6 govuk-!-text-align-centre <?= $listing['type'] === 'offer' ? 'civicone-listing-placeholder-offer' : 'civicone-listing-placeholder-request' ?>">
+                                <i class="fa-solid fa-<?= $listing['type'] === 'offer' ? 'hand-holding-heart' : 'hand-holding' ?> civicone-listing-icon-lg" aria-hidden="true"></i>
                             </div>
                         <?php endif; ?>
                         <div class="govuk-!-padding-4">
@@ -88,7 +88,7 @@ foreach ($my_listings as $ml) {
                                 <span class="govuk-tag govuk-tag--<?= $listing['type'] === 'offer' ? 'green' : 'blue' ?>">
                                     <?= strtoupper($listing['type']) ?>
                                 </span>
-                                <span style="color: #505a5f;"><?= date('M j, Y', strtotime($listing['created_at'])) ?></span>
+                                <span class="civicone-secondary-text"><?= date('M j, Y', strtotime($listing['created_at'])) ?></span>
                             </p>
                             <h3 class="govuk-heading-s govuk-!-margin-bottom-3">
                                 <a href="<?= $basePath ?>/listings/<?= $listing['id'] ?>" class="govuk-link"><?= htmlspecialchars($listing['title']) ?></a>

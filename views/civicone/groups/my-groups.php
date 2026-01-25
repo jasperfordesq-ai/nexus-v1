@@ -30,7 +30,7 @@ $basePath = Nexus\Core\TenantContext::getBasePath();
         <p class="govuk-body-l">Community hubs you have joined</p>
     </div>
     <div class="govuk-grid-column-one-third govuk-!-text-align-right">
-        <div class="govuk-button-group" style="justify-content: flex-end;">
+        <div class="govuk-button-group civicone-justify-end">
             <a href="<?= $basePath ?>/groups" class="govuk-button govuk-button--secondary" data-module="govuk-button">
                 <i class="fa-solid fa-compass govuk-!-margin-right-1" aria-hidden="true"></i> Browse All Hubs
             </a>
@@ -56,25 +56,25 @@ $basePath = Nexus\Core\TenantContext::getBasePath();
     <div class="govuk-grid-row">
         <?php foreach ($myGroups as $group): ?>
             <div class="govuk-grid-column-one-third govuk-!-margin-bottom-6">
-                <div class="govuk-!-padding-0" style="border: 1px solid #b1b4b6;">
+                <div class="govuk-!-padding-0 civicone-card-bordered">
                     <?php
                     $displayImage = !empty($group['cover_image_url']) ? $group['cover_image_url'] : ($group['image_url'] ?? '');
                     ?>
                     <?php if (!empty($displayImage)): ?>
-                        <div style="height: 120px; background-image: url('<?= htmlspecialchars($displayImage) ?>'); background-size: cover; background-position: center; position: relative;">
-                            <span class="govuk-tag govuk-tag--green" style="position: absolute; top: 0.5rem; right: 0.5rem;">MEMBER</span>
+                        <div class="civicone-card-image-area" style="background-image: url('<?= htmlspecialchars($displayImage) ?>');">
+                            <span class="govuk-tag govuk-tag--green civicone-tag-positioned">MEMBER</span>
                         </div>
                     <?php else: ?>
-                        <div class="govuk-!-padding-4 govuk-!-text-align-centre" style="height: 120px; background: #1d70b8; display: flex; align-items: center; justify-content: center; position: relative;">
-                            <i class="fa-solid fa-users-rectangle" aria-hidden="true" style="font-size: 2.5rem; color: white;"></i>
-                            <span class="govuk-tag govuk-tag--green" style="position: absolute; top: 0.5rem; right: 0.5rem;">MEMBER</span>
+                        <div class="govuk-!-padding-4 govuk-!-text-align-centre civicone-card-header-blue">
+                            <i class="fa-solid fa-users-rectangle civicone-card-icon-large" aria-hidden="true"></i>
+                            <span class="govuk-tag govuk-tag--green civicone-tag-positioned">MEMBER</span>
                         </div>
                     <?php endif; ?>
                     <div class="govuk-!-padding-4">
                         <h3 class="govuk-heading-s govuk-!-margin-bottom-2">
                             <a href="<?= $basePath ?>/groups/<?= $group['id'] ?>" class="govuk-link"><?= htmlspecialchars($group['name']) ?></a>
                         </h3>
-                        <p class="govuk-body-s govuk-!-margin-bottom-3" style="color: #505a5f;">
+                        <p class="govuk-body-s govuk-!-margin-bottom-3 civicone-secondary-text">
                             <?= htmlspecialchars(substr($group['description'] ?? 'A community hub for members to connect and collaborate.', 0, 80)) ?>...
                         </p>
                         <div class="govuk-grid-row">

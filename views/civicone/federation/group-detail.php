@@ -62,7 +62,7 @@ $creatorName = trim(($group['creator_first_name'] ?? '') . ' ' . ($group['creato
         <div class="govuk-grid-row">
             <div class="govuk-grid-column-two-thirds">
                 <!-- Group Card -->
-                <article class="govuk-!-padding-6" style="background: #fff; border: 1px solid #b1b4b6; border-left: 5px solid #1d70b8;" aria-labelledby="group-title">
+                <article class="govuk-!-padding-6 civicone-article-blue" aria-labelledby="group-title">
                     <!-- Badge -->
                     <div class="govuk-!-margin-bottom-4">
                         <span class="govuk-tag govuk-tag--grey">
@@ -79,7 +79,7 @@ $creatorName = trim(($group['creator_first_name'] ?? '') . ' ' . ($group['creato
                     <dl class="govuk-summary-list govuk-!-margin-bottom-6">
                         <div class="govuk-summary-list__row">
                             <dt class="govuk-summary-list__key">
-                                <i class="fa-solid fa-users govuk-!-margin-right-2" style="color: #1d70b8;" aria-hidden="true"></i>
+                                <i class="fa-solid fa-users govuk-!-margin-right-2 civicone-icon-blue" aria-hidden="true"></i>
                                 Members
                             </dt>
                             <dd class="govuk-summary-list__value"><?= (int)($group['member_count'] ?? 0) ?></dd>
@@ -87,7 +87,7 @@ $creatorName = trim(($group['creator_first_name'] ?? '') . ' ' . ($group['creato
 
                         <div class="govuk-summary-list__row">
                             <dt class="govuk-summary-list__key">
-                                <i class="fa-solid fa-user govuk-!-margin-right-2" style="color: #1d70b8;" aria-hidden="true"></i>
+                                <i class="fa-solid fa-user govuk-!-margin-right-2 civicone-icon-blue" aria-hidden="true"></i>
                                 Created By
                             </dt>
                             <dd class="govuk-summary-list__value"><?= htmlspecialchars($creatorName) ?></dd>
@@ -96,7 +96,7 @@ $creatorName = trim(($group['creator_first_name'] ?? '') . ' ' . ($group['creato
                         <?php if (!empty($group['created_at'])): ?>
                             <div class="govuk-summary-list__row">
                                 <dt class="govuk-summary-list__key">
-                                    <i class="fa-solid fa-calendar govuk-!-margin-right-2" style="color: #1d70b8;" aria-hidden="true"></i>
+                                    <i class="fa-solid fa-calendar govuk-!-margin-right-2 civicone-icon-blue" aria-hidden="true"></i>
                                     Created
                                 </dt>
                                 <dd class="govuk-summary-list__value">
@@ -111,7 +111,7 @@ $creatorName = trim(($group['creator_first_name'] ?? '') . ' ' . ($group['creato
                     <!-- Description -->
                     <?php if (!empty($group['description'])): ?>
                         <h2 class="govuk-heading-m">
-                            <i class="fa-solid fa-align-left govuk-!-margin-right-2" style="color: #505a5f;" aria-hidden="true"></i>
+                            <i class="fa-solid fa-align-left govuk-!-margin-right-2 civicone-secondary-text" aria-hidden="true"></i>
                             About This Group
                         </h2>
                         <p class="govuk-body-l govuk-!-margin-bottom-6">
@@ -121,7 +121,7 @@ $creatorName = trim(($group['creator_first_name'] ?? '') . ' ' . ($group['creato
 
                     <!-- Membership Section -->
                     <h2 class="govuk-heading-m">
-                        <i class="fa-solid fa-user-plus govuk-!-margin-right-2" style="color: #505a5f;" aria-hidden="true"></i>
+                        <i class="fa-solid fa-user-plus govuk-!-margin-right-2 civicone-secondary-text" aria-hidden="true"></i>
                         Membership
                     </h2>
 
@@ -184,7 +184,7 @@ $creatorName = trim(($group['creator_first_name'] ?? '') . ' ' . ($group['creato
                 <!-- Privacy Notice -->
                 <div class="govuk-inset-text govuk-!-margin-top-6">
                     <p class="govuk-body govuk-!-margin-bottom-0">
-                        <i class="fa-solid fa-shield-halved govuk-!-margin-right-2" style="color: #1d70b8;" aria-hidden="true"></i>
+                        <i class="fa-solid fa-shield-halved govuk-!-margin-right-2 civicone-icon-blue" aria-hidden="true"></i>
                         <strong>Federated Group</strong> — This group is hosted by <strong><?= htmlspecialchars($group['tenant_name'] ?? 'a partner timebank') ?></strong>.
                         When you join, your basic profile information will be visible to other group members.
                     </p>
@@ -194,18 +194,6 @@ $creatorName = trim(($group['creator_first_name'] ?? '') . ' ' . ($group['creato
     </main>
 </div>
 
-<!-- Federation offline indicator -->
-<script>
-(function() {
-    'use strict';
-    var banner = document.getElementById('offlineBanner');
-    function updateOffline(offline) {
-        if (banner) banner.classList.toggle('govuk-!-display-none', !offline);
-    }
-    window.addEventListener('online', function() { updateOffline(false); });
-    window.addEventListener('offline', function() { updateOffline(true); });
-    if (!navigator.onLine) updateOffline(true);
-})();
-</script>
+<!-- Offline indicator handled by civicone-common.js -->
 
 <?php require dirname(dirname(__DIR__)) . '/layouts/civicone/footer.php'; ?>

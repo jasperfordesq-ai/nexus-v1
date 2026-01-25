@@ -13,9 +13,9 @@ $basePath = \Nexus\Core\TenantContext::getBasePath();
 
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds">
-        <div class="govuk-!-padding-6 govuk-!-text-align-center civicone-panel-bg" style="border-left: 5px solid #1d70b8;">
+        <div class="govuk-!-padding-6 govuk-!-text-align-center civicone-panel-bg civicone-panel-border-blue">
             <p class="govuk-body govuk-!-margin-bottom-4">
-                <i class="fa-solid fa-network-wired fa-3x" style="color: #1d70b8;" aria-hidden="true"></i>
+                <i class="fa-solid fa-network-wired fa-3x civicone-icon-blue" aria-hidden="true"></i>
             </p>
 
             <h1 class="govuk-heading-xl">Federation Not Available</h1>
@@ -30,7 +30,7 @@ $basePath = \Nexus\Core\TenantContext::getBasePath();
                 Browse Local Members
             </a>
 
-            <div class="govuk-inset-text govuk-!-margin-top-6" style="text-align: left;">
+            <div class="govuk-inset-text govuk-!-margin-top-6 govuk-!-text-align-left">
                 <p class="govuk-body govuk-!-margin-bottom-0">
                     <i class="fa-solid fa-info-circle govuk-!-margin-right-2" aria-hidden="true"></i>
                     If you believe federation should be enabled, please contact your timebank administrator.

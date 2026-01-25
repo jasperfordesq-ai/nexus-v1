@@ -36,10 +36,10 @@ $groups = $groups ?? [];
         <div class="govuk-grid-row govuk-!-margin-bottom-6">
             <div class="govuk-grid-column-two-thirds">
                 <h1 class="govuk-heading-xl govuk-!-margin-bottom-2">
-                    <i class="fa-solid fa-user-group govuk-!-margin-right-2" style="color: #1d70b8;" aria-hidden="true"></i>
+                    <i class="fa-solid fa-user-group govuk-!-margin-right-2 civicone-icon-blue" aria-hidden="true"></i>
                     My Federated Groups
                 </h1>
-                <p class="govuk-body-l" style="color: #505a5f;">Groups you've joined from partner timebanks</p>
+                <p class="govuk-body-l civicone-secondary-text">Groups you've joined from partner timebanks</p>
             </div>
             <div class="govuk-grid-column-one-third govuk-!-text-align-right">
                 <a href="<?= $basePath ?>/federation/groups" class="govuk-button govuk-button--secondary" data-module="govuk-button">
@@ -74,8 +74,8 @@ $groups = $groups ?? [];
         <div class="govuk-grid-row">
             <div class="govuk-grid-column-two-thirds">
                 <?php if (empty($groups)): ?>
-                    <div class="govuk-!-padding-6 govuk-!-text-align-center civicone-panel-bg" style="border-left: 5px solid #1d70b8;">
-                        <i class="fa-solid fa-people-group fa-3x govuk-!-margin-bottom-4" style="color: #1d70b8;" aria-hidden="true"></i>
+                    <div class="govuk-!-padding-6 govuk-!-text-align-center civicone-panel-bg civicone-border-left-blue">
+                        <i class="fa-solid fa-people-group fa-3x govuk-!-margin-bottom-4 civicone-icon-blue" aria-hidden="true"></i>
                         <h2 class="govuk-heading-m">No Federated Groups Yet</h2>
                         <p class="govuk-body govuk-!-margin-bottom-4">
                             You haven't joined any groups from partner timebanks.<br>
@@ -89,18 +89,18 @@ $groups = $groups ?? [];
                 <?php else: ?>
                     <div role="list" aria-label="Your federated groups">
                         <?php foreach ($groups as $group): ?>
-                            <article class="govuk-!-padding-4 govuk-!-margin-bottom-4" style="background: #fff; border: 1px solid #b1b4b6; border-left: 5px solid #1d70b8;" role="listitem">
-                                <div style="display: flex; align-items: flex-start; gap: 16px;">
-                                    <div style="width: 48px; height: 48px; border-radius: 50%; background: #1d70b8; color: #fff; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                            <article class="govuk-!-padding-4 govuk-!-margin-bottom-4 civicone-card-border-left-blue" role="listitem">
+                                <div class="civicone-group-card-row">
+                                    <div class="civicone-avatar-lg civicone-avatar-blue">
                                         <i class="fa-solid fa-people-group" aria-hidden="true"></i>
                                     </div>
-                                    <div style="flex: 1;">
+                                    <div class="civicone-group-card-content">
                                         <h3 class="govuk-heading-s govuk-!-margin-bottom-2">
                                             <a href="<?= $basePath ?>/federation/groups/<?= $group['id'] ?>?tenant=<?= $group['tenant_id'] ?>" class="govuk-link">
                                                 <?= htmlspecialchars($group['name']) ?>
                                             </a>
                                         </h3>
-                                        <p class="govuk-body-s govuk-!-margin-bottom-2" style="color: #505a5f;">
+                                        <p class="govuk-body-s govuk-!-margin-bottom-2 civicone-secondary-text">
                                             <i class="fa-solid fa-building govuk-!-margin-right-1" aria-hidden="true"></i>
                                             <?= htmlspecialchars($group['tenant_name'] ?? 'Partner Timebank') ?>
                                             <span class="govuk-!-margin-left-3">
@@ -115,7 +115,7 @@ $groups = $groups ?? [];
                                             <?php endif; ?>
                                         </p>
                                     </div>
-                                    <div style="text-align: right;">
+                                    <div class="civicone-group-card-actions">
                                         <?php if (($group['membership_status'] ?? 'approved') === 'pending'): ?>
                                             <span class="govuk-tag govuk-tag--yellow govuk-!-margin-bottom-2">
                                                 <i class="fa-solid fa-clock govuk-!-margin-right-1" aria-hidden="true"></i>
@@ -128,7 +128,7 @@ $groups = $groups ?? [];
                                             </span>
                                         <?php endif; ?>
                                         <br>
-                                        <a href="<?= $basePath ?>/federation/groups/<?= $group['id'] ?>?tenant=<?= $group['tenant_id'] ?>" class="govuk-button govuk-button--secondary govuk-!-margin-bottom-0" data-module="govuk-button" style="font-size: 14px;">
+                                        <a href="<?= $basePath ?>/federation/groups/<?= $group['id'] ?>?tenant=<?= $group['tenant_id'] ?>" class="govuk-button govuk-button--secondary govuk-!-margin-bottom-0 civicone-btn-sm" data-module="govuk-button">
                                             <i class="fa-solid fa-eye govuk-!-margin-right-1" aria-hidden="true"></i>
                                             View
                                         </a>
@@ -143,18 +143,6 @@ $groups = $groups ?? [];
     </main>
 </div>
 
-<!-- Federation offline indicator -->
-<script>
-(function() {
-    'use strict';
-    var banner = document.getElementById('offlineBanner');
-    function updateOffline(offline) {
-        if (banner) banner.classList.toggle('govuk-!-display-none', !offline);
-    }
-    window.addEventListener('online', function() { updateOffline(false); });
-    window.addEventListener('offline', function() { updateOffline(true); });
-    if (!navigator.onLine) updateOffline(true);
-})();
-</script>
+<!-- Offline indicator handled by civicone-common.js -->
 
 <?php require dirname(dirname(__DIR__)) . '/layouts/civicone/footer.php'; ?>

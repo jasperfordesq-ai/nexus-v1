@@ -49,7 +49,7 @@ function timeAgo($datetime) {
         <div class="govuk-grid-row govuk-!-margin-bottom-6">
             <div class="govuk-grid-column-two-thirds">
                 <h1 class="govuk-heading-xl govuk-!-margin-bottom-2">
-                    <i class="fa-solid fa-globe govuk-!-margin-right-2" style="color: #1d70b8;" aria-hidden="true"></i>
+                    <i class="fa-solid fa-globe govuk-!-margin-right-2 civicone-icon-blue" aria-hidden="true"></i>
                     Federated Messages
                     <?php if ($unreadCount > 0): ?>
                         <span class="govuk-tag govuk-tag--red govuk-!-margin-left-2" role="status">
@@ -79,39 +79,38 @@ function timeAgo($datetime) {
                             $threadUrl = $basePath . '/federation/messages/' . $conv['sender_user_id'] . '?tenant=' . $conv['sender_tenant_id'];
                             $timeAgo = timeAgo($conv['created_at'] ?? '');
                             $senderName = $conv['sender_name'] ?? 'Unknown';
-                            $borderColor = $isUnread ? '#1d70b8' : '#b1b4b6';
+                            $borderClass = $isUnread ? 'civicone-border-left-blue' : 'civicone-border-left-grey';
                             ?>
                             <a href="<?= $threadUrl ?>"
-                               class="govuk-!-padding-4 govuk-!-margin-bottom-3"
-                               style="display: block; background: #fff; border: 1px solid #b1b4b6; border-left: 5px solid <?= $borderColor ?>; text-decoration: none; color: inherit;"
+                               class="govuk-!-padding-4 govuk-!-margin-bottom-3 civicone-conversation-link <?= $borderClass ?>"
                                role="listitem">
-                                <div style="display: flex; align-items: flex-start; gap: 16px;">
-                                    <div style="position: relative; flex-shrink: 0;">
+                                <div class="civicone-conversation-row">
+                                    <div class="civicone-avatar-wrapper">
                                         <img src="<?= htmlspecialchars($avatar) ?>"
                                              onerror="this.src='<?= $fallbackAvatar ?>'"
                                              alt=""
-                                             style="width: 48px; height: 48px; border-radius: 50%; object-fit: cover;"
+                                             class="civicone-avatar-md"
                                              loading="lazy">
                                         <?php if ($isUnread): ?>
-                                            <span style="position: absolute; top: 0; right: 0; width: 12px; height: 12px; background: #1d70b8; border-radius: 50%; border: 2px solid #fff;" aria-hidden="true"></span>
+                                            <span class="civicone-unread-dot" aria-hidden="true"></span>
                                         <?php endif; ?>
                                     </div>
-                                    <div style="flex: 1; min-width: 0;">
-                                        <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 8px;">
+                                    <div class="civicone-conversation-content">
+                                        <div class="civicone-conversation-header">
                                             <div>
-                                                <p class="govuk-body govuk-!-font-weight-bold govuk-!-margin-bottom-1" style="<?= $isUnread ? 'color: #0b0c0c;' : '' ?>">
+                                                <p class="govuk-body govuk-!-font-weight-bold govuk-!-margin-bottom-1<?= $isUnread ? '' : '' ?>">
                                                     <?= htmlspecialchars($senderName) ?>
                                                 </p>
-                                                <p class="govuk-body-s govuk-!-margin-bottom-2" style="color: #505a5f;">
+                                                <p class="govuk-body-s govuk-!-margin-bottom-2 civicone-secondary-text">
                                                     <i class="fa-solid fa-building govuk-!-margin-right-1" aria-hidden="true"></i>
                                                     <?= htmlspecialchars($conv['sender_tenant_name'] ?? 'Partner') ?>
                                                 </p>
                                             </div>
-                                            <time class="govuk-body-s" style="color: #505a5f; white-space: nowrap;" datetime="<?= htmlspecialchars($conv['created_at'] ?? '') ?>">
+                                            <time class="govuk-body-s civicone-secondary-text civicone-nowrap" datetime="<?= htmlspecialchars($conv['created_at'] ?? '') ?>">
                                                 <?= $timeAgo ?>
                                             </time>
                                         </div>
-                                        <p class="govuk-body-s govuk-!-margin-bottom-0" style="color: <?= $isUnread ? '#0b0c0c' : '#505a5f' ?>; <?= $isUnread ? 'font-weight: bold;' : '' ?> overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                                        <p class="govuk-body-s govuk-!-margin-bottom-0 civicone-message-preview <?= $isUnread ? 'civicone-unread-text' : 'civicone-secondary-text' ?>">
                                             <?= htmlspecialchars(mb_substr($conv['body'] ?? '', 0, 80)) ?><?= mb_strlen($conv['body'] ?? '') > 80 ? '...' : '' ?>
                                         </p>
                                     </div>
@@ -120,8 +119,8 @@ function timeAgo($datetime) {
                         <?php endforeach; ?>
                     </div>
                 <?php else: ?>
-                    <div class="govuk-!-padding-6 govuk-!-text-align-center civicone-panel-bg" style="border-left: 5px solid #1d70b8;">
-                        <i class="fa-solid fa-envelope-open fa-3x govuk-!-margin-bottom-4" style="color: #1d70b8;" aria-hidden="true"></i>
+                    <div class="govuk-!-padding-6 govuk-!-text-align-center civicone-panel-bg civicone-border-left-blue">
+                        <i class="fa-solid fa-envelope-open fa-3x govuk-!-margin-bottom-4 civicone-icon-blue" aria-hidden="true"></i>
                         <h2 class="govuk-heading-m">No Federated Messages Yet</h2>
                         <p class="govuk-body govuk-!-margin-bottom-4">Start connecting with members from partner timebanks!</p>
                         <a href="<?= $basePath ?>/federation/members" class="govuk-button" data-module="govuk-button">
@@ -136,17 +135,6 @@ function timeAgo($datetime) {
 </div>
 
 <script src="/assets/js/federation-messages.js?v=<?= time() ?>"></script>
-<script>
-(function() {
-    'use strict';
-    var banner = document.getElementById('offlineBanner');
-    function updateOffline(offline) {
-        if (banner) banner.classList.toggle('govuk-!-display-none', !offline);
-    }
-    window.addEventListener('online', function() { updateOffline(false); });
-    window.addEventListener('offline', function() { updateOffline(true); });
-    if (!navigator.onLine) updateOffline(true);
-})();
-</script>
+<!-- Offline indicator handled by civicone-common.js -->
 
 <?php require dirname(dirname(dirname(__DIR__))) . '/layouts/civicone/footer.php'; ?>

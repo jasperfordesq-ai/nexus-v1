@@ -45,8 +45,8 @@ require dirname(__DIR__, 2) . '/layouts/civicone/header.php';
 <div class="govuk-grid-row govuk-!-margin-bottom-6">
     <!-- Mission -->
     <div class="govuk-grid-column-one-half govuk-!-margin-bottom-4">
-        <div class="govuk-!-padding-4" style="border: 1px solid #b1b4b6; border-left: 5px solid #1d70b8; height: 100%;">
-            <h2 class="govuk-heading-m" style="color: #1d70b8;">
+        <div class="govuk-!-padding-4 civicone-card-border-left-blue civicone-full-height">
+            <h2 class="govuk-heading-m civicone-heading-blue">
                 <i class="fa-solid fa-flag govuk-!-margin-right-2" aria-hidden="true"></i>
                 Our Mission
             </h2>
@@ -58,8 +58,8 @@ require dirname(__DIR__, 2) . '/layouts/civicone/header.php';
 
     <!-- Vision -->
     <div class="govuk-grid-column-one-half govuk-!-margin-bottom-4">
-        <div class="govuk-!-padding-4" style="border: 1px solid #b1b4b6; border-left: 5px solid #00703c; height: 100%;">
-            <h2 class="govuk-heading-m" style="color: #00703c;">
+        <div class="govuk-!-padding-4 civicone-card-border-left-green civicone-full-height">
+            <h2 class="govuk-heading-m civicone-heading-green">
                 <i class="fa-solid fa-eye govuk-!-margin-right-2" aria-hidden="true"></i>
                 Our Vision
             </h2>
@@ -76,11 +76,11 @@ require dirname(__DIR__, 2) . '/layouts/civicone/header.php';
 
     <div class="govuk-grid-row">
         <div class="govuk-grid-column-one-third govuk-!-margin-bottom-4">
-            <div class="govuk-!-padding-4 govuk-!-text-align-center" style="background: white; height: 100%;">
+            <div class="govuk-!-padding-4 govuk-!-text-align-center civicone-value-card">
                 <p class="govuk-body govuk-!-margin-bottom-2">
-                    <i class="fa-solid fa-scale-balanced fa-2x" style="color: #1d70b8;" aria-hidden="true"></i>
+                    <i class="fa-solid fa-scale-balanced fa-2x civicone-icon-blue" aria-hidden="true"></i>
                 </p>
-                <h3 class="govuk-heading-s" style="color: #1d70b8;">Reciprocity & Equality</h3>
+                <h3 class="govuk-heading-s civicone-heading-blue">Reciprocity & Equality</h3>
                 <p class="govuk-body-s">
                     We believe in a two-way street; everyone has something to give. We honour the time and skills of all members equally—one hour equals one hour, no matter the service.
                 </p>
@@ -88,11 +88,11 @@ require dirname(__DIR__, 2) . '/layouts/civicone/header.php';
         </div>
 
         <div class="govuk-grid-column-one-third govuk-!-margin-bottom-4">
-            <div class="govuk-!-padding-4 govuk-!-text-align-center" style="background: white; height: 100%;">
+            <div class="govuk-!-padding-4 govuk-!-text-align-center civicone-value-card">
                 <p class="govuk-body govuk-!-margin-bottom-2">
-                    <i class="fa-solid fa-network-wired fa-2x" style="color: #d53880;" aria-hidden="true"></i>
+                    <i class="fa-solid fa-network-wired fa-2x civicone-icon-pink" aria-hidden="true"></i>
                 </p>
-                <h3 class="govuk-heading-s" style="color: #d53880;">Inclusion & Connection</h3>
+                <h3 class="govuk-heading-s civicone-heading-pink">Inclusion & Connection</h3>
                 <p class="govuk-body-s">
                     We welcome people of all ages, backgrounds, and abilities, celebrating everyone as a valuable asset. We exist to reduce isolation and build meaningful relationships.
                 </p>
@@ -100,11 +100,11 @@ require dirname(__DIR__, 2) . '/layouts/civicone/header.php';
         </div>
 
         <div class="govuk-grid-column-one-third govuk-!-margin-bottom-4">
-            <div class="govuk-!-padding-4 govuk-!-text-align-center" style="background: white; height: 100%;">
+            <div class="govuk-!-padding-4 govuk-!-text-align-center civicone-value-card">
                 <p class="govuk-body govuk-!-margin-bottom-2">
-                    <i class="fa-solid fa-hand-holding-heart fa-2x" style="color: #00703c;" aria-hidden="true"></i>
+                    <i class="fa-solid fa-hand-holding-heart fa-2x civicone-icon-green" aria-hidden="true"></i>
                 </p>
-                <h3 class="govuk-heading-s" style="color: #00703c;">Empowerment & Resilience</h3>
+                <h3 class="govuk-heading-s civicone-heading-green">Empowerment & Resilience</h3>
                 <p class="govuk-body-s">
                     We provide a platform for individuals to recognize their own value and actively participate in building community. This mechanism is proven to build resilience.
                 </p>
@@ -116,7 +116,7 @@ require dirname(__DIR__, 2) . '/layouts/civicone/header.php';
 <!-- Professional Foundation -->
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds">
-        <div class="govuk-!-padding-4 govuk-!-margin-bottom-6" style="border: 1px solid #b1b4b6; border-left: 5px solid #1d70b8;">
+        <div class="govuk-!-padding-4 govuk-!-margin-bottom-6 civicone-card-border-left-blue">
             <h2 class="govuk-heading-l">Our Professional Foundation</h2>
             <p class="govuk-body">
                 Our journey began in 2012 with the Clonakilty Favour Exchange. To ensure long-term stability and impact, the directors established hOUR Timebank CLG as a formal, registered Irish charity in 2017.

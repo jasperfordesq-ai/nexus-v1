@@ -27,8 +27,8 @@ $basePath = Nexus\Core\TenantContext::getBasePath();
     <main class="govuk-main-wrapper" id="main-content" role="main">
         <div class="govuk-grid-row">
             <div class="govuk-grid-column-two-thirds">
-                <div class="govuk-!-padding-6 govuk-!-text-align-center civicone-panel-bg" style="border-left: 5px solid #1d70b8;">
-                    <i class="fa-solid fa-user-shield fa-3x govuk-!-margin-bottom-4" style="color: #1d70b8;" aria-hidden="true"></i>
+                <div class="govuk-!-padding-6 govuk-!-text-align-center civicone-panel-bg civicone-panel-border-blue">
+                    <i class="fa-solid fa-user-shield fa-3x govuk-!-margin-bottom-4 civicone-icon-blue" aria-hidden="true"></i>
 
                     <h1 class="govuk-heading-xl">Federation Opt-In Required</h1>
 
@@ -43,9 +43,9 @@ $basePath = Nexus\Core\TenantContext::getBasePath();
                     </a>
                 </div>
 
-                <div class="govuk-!-margin-top-6 govuk-!-padding-4" style="border: 1px solid #b1b4b6; border-left: 5px solid #00703c;">
+                <div class="govuk-!-margin-top-6 govuk-!-padding-4 civicone-article-green">
                     <h2 class="govuk-heading-m">
-                        <i class="fa-solid fa-info-circle govuk-!-margin-right-2" style="color: #00703c;" aria-hidden="true"></i>
+                        <i class="fa-solid fa-info-circle govuk-!-margin-right-2 civicone-icon-green" aria-hidden="true"></i>
                         What is Federation?
                     </h2>
                     <ul class="govuk-list govuk-list--bullet govuk-list--spaced">
@@ -61,17 +61,6 @@ $basePath = Nexus\Core\TenantContext::getBasePath();
 </div>
 
 <script src="/assets/js/federation-common.js?v=<?= time() ?>"></script>
-<script>
-(function() {
-    'use strict';
-    var banner = document.getElementById('offlineBanner');
-    function updateOffline(offline) {
-        if (banner) banner.classList.toggle('govuk-!-display-none', !offline);
-    }
-    window.addEventListener('online', function() { updateOffline(false); });
-    window.addEventListener('offline', function() { updateOffline(true); });
-    if (!navigator.onLine) updateOffline(true);
-})();
-</script>
+<!-- Offline indicator handled by civicone-common.js -->
 
 <?php require dirname(dirname(dirname(__DIR__))) . '/layouts/civicone/footer.php'; ?>

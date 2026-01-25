@@ -197,25 +197,7 @@ $basePath = \Nexus\Core\TenantContext::getBasePath();
     </div>
 </div>
 
-<script>
-function openLogModal(orgId, oppId, orgName, oppTitle) {
-    document.getElementById('log_org_id').value = orgId;
-    document.getElementById('log_opp_id').value = oppId;
-    document.getElementById('log_org_name').textContent = orgName;
-    document.getElementById('log_opp_title').textContent = oppTitle;
-    document.getElementById('logHoursModal').classList.remove('govuk-!-display-none');
-    document.body.style.overflow = 'hidden';
-}
-
-function closeLogModal() {
-    document.getElementById('logHoursModal').classList.add('govuk-!-display-none');
-    document.body.style.overflow = '';
-}
-
-// Close modal on Escape key
-document.addEventListener('keydown', function(e) {
-    if (e.key === 'Escape') closeLogModal();
-});
-</script>
+<!-- Modal handling via external JS -->
+<script src="/assets/js/civicone-volunteering-my-applications.js"></script>
 
 <?php require __DIR__ . '/../../layouts/civicone/footer.php'; ?>

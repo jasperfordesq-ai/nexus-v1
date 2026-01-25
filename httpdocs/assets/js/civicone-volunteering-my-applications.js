@@ -1,18 +1,24 @@
-// Volunteering: My Applications - Modal Interactions
-// WCAG 2.1 AA Compliant
+/**
+ * Volunteering: My Applications - Modal Interactions
+ * WCAG 2.1 AA Compliant
+ */
 
 function openLogModal(orgId, oppId, orgName, oppTitle) {
+    var modal = document.getElementById('logHoursModal');
     document.getElementById('log_org_id').value = orgId;
     document.getElementById('log_opp_id').value = oppId;
-    document.getElementById('log_org_name').innerText = orgName;
-    document.getElementById('log_opp_title').innerText = oppTitle;
-    document.getElementById('logHoursModal').classList.add('active');
-    document.getElementById('logHoursModal').setAttribute('aria-hidden', 'false');
+    document.getElementById('log_org_name').textContent = orgName;
+    document.getElementById('log_opp_title').textContent = oppTitle;
+    modal.classList.remove('govuk-!-display-none');
+    modal.setAttribute('aria-hidden', 'false');
+    document.body.style.overflow = 'hidden';
 }
 
 function closeLogModal() {
-    document.getElementById('logHoursModal').classList.remove('active');
-    document.getElementById('logHoursModal').setAttribute('aria-hidden', 'true');
+    var modal = document.getElementById('logHoursModal');
+    modal.classList.add('govuk-!-display-none');
+    modal.setAttribute('aria-hidden', 'true');
+    document.body.style.overflow = '';
 }
 
 // Close on Escape key

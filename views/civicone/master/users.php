@@ -22,7 +22,7 @@ require dirname(__DIR__, 2) . '/layouts/civicone/header.php';
 
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-full">
-        <div style="display: flex; justify-content: space-between; align-items: center;" class="govuk-!-margin-bottom-6">
+        <div class="civicone-flex-between govuk-!-margin-bottom-6">
             <h1 class="govuk-heading-xl govuk-!-margin-bottom-0">Global User Directory</h1>
             <a href="<?= $basePath ?>/super-admin" class="govuk-button govuk-button--secondary" data-module="govuk-button">
                 Back to Dashboard
@@ -46,18 +46,18 @@ require dirname(__DIR__, 2) . '/layouts/civicone/header.php';
                 <?php foreach ($users as $u): ?>
                     <tr class="govuk-table__row">
                         <td class="govuk-table__cell">
-                            <span class="govuk-body-s" style="color: #505a5f;">#<?= $u['id'] ?></span>
+                            <span class="govuk-body-s civicone-secondary-text">#<?= $u['id'] ?></span>
                         </td>
                         <td class="govuk-table__cell">
                             <strong><?= htmlspecialchars($u['first_name'] . ' ' . $u['last_name']) ?></strong><br>
-                            <span class="govuk-body-s" style="color: #505a5f;"><?= htmlspecialchars($u['email']) ?></span>
+                            <span class="govuk-body-s civicone-secondary-text"><?= htmlspecialchars($u['email']) ?></span>
                         </td>
                         <td class="govuk-table__cell">
                             <?php if ($u['tenant_id'] == 1): ?>
                                 <strong class="govuk-tag govuk-tag--purple">Platform</strong>
                             <?php else: ?>
                                 <strong class="govuk-tag govuk-tag--light-blue"><?= htmlspecialchars($u['tenant_name'] ?? 'Unknown') ?></strong><br>
-                                <span class="govuk-body-s" style="color: #505a5f;">/<?= htmlspecialchars($u['tenant_slug'] ?? '') ?></span>
+                                <span class="govuk-body-s civicone-secondary-text">/<?= htmlspecialchars($u['tenant_slug'] ?? '') ?></span>
                             <?php endif; ?>
                         </td>
                         <td class="govuk-table__cell">
@@ -74,18 +74,18 @@ require dirname(__DIR__, 2) . '/layouts/civicone/header.php';
                             <?= date('M j, Y', strtotime($u['created_at'])) ?>
                         </td>
                         <td class="govuk-table__cell govuk-table__cell--numeric">
-                            <div class="govuk-button-group" style="justify-content: flex-end; margin-bottom: 0;">
+                            <div class="govuk-button-group civicone-justify-end civicone-m-0">
                                 <?php if (empty($u['is_approved'])): ?>
-                                    <form action="<?= $basePath ?>/super-admin/users/approve" method="POST" style="margin: 0;">
+                                    <form action="<?= $basePath ?>/super-admin/users/approve" method="POST" class="civicone-m-0">
                                         <input type="hidden" name="user_id" value="<?= $u['id'] ?>">
-                                        <button type="submit" class="govuk-button govuk-button--secondary govuk-!-margin-bottom-0" data-module="govuk-button" style="font-size: 14px; padding: 8px 12px;">
+                                        <button type="submit" class="govuk-button govuk-button--secondary govuk-!-margin-bottom-0 civicone-btn-sm" data-module="govuk-button">
                                             Approve
                                         </button>
                                     </form>
                                 <?php endif; ?>
-                                <form action="<?= $basePath ?>/super-admin/users/delete" method="POST" onsubmit="return confirm('Are you sure you want to PERMANENTLY delete this user? This cannot be undone.');" style="margin: 0;">
+                                <form action="<?= $basePath ?>/super-admin/users/delete" method="POST" onsubmit="return confirm('Are you sure you want to PERMANENTLY delete this user? This cannot be undone.');" class="civicone-m-0">
                                     <input type="hidden" name="user_id" value="<?= $u['id'] ?>">
-                                    <button type="submit" class="govuk-button govuk-button--warning govuk-!-margin-bottom-0" data-module="govuk-button" style="font-size: 14px; padding: 8px 12px;">
+                                    <button type="submit" class="govuk-button govuk-button--warning govuk-!-margin-bottom-0 civicone-btn-sm" data-module="govuk-button">
                                         Delete
                                     </button>
                                 </form>

@@ -34,7 +34,7 @@ require dirname(__DIR__, 2) . '/layouts/civicone/header.php';
 
 <!-- Achievement Navigation -->
 <nav class="govuk-!-margin-bottom-6" aria-label="Achievement sections">
-    <ul class="govuk-list" style="display: flex; gap: 0.5rem; flex-wrap: wrap; padding: 0; margin: 0;">
+    <ul class="govuk-list civicone-flex-nav">
         <li><a href="<?= $basePath ?>/achievements" class="govuk-button govuk-button--secondary" data-module="govuk-button">Dashboard</a></li>
         <li><a href="<?= $basePath ?>/achievements/badges" class="govuk-button govuk-button--secondary" data-module="govuk-button">All Badges</a></li>
         <li><a href="<?= $basePath ?>/achievements/challenges" class="govuk-button govuk-button--secondary" data-module="govuk-button">Challenges</a></li>
@@ -63,7 +63,7 @@ require dirname(__DIR__, 2) . '/layouts/civicone/header.php';
                     </div>
                     <div>
                         <h3 class="govuk-heading-s govuk-!-margin-bottom-1"><?= htmlspecialchars($collection['name']) ?></h3>
-                        <p class="govuk-body-s" style="color: #505a5f;"><?= htmlspecialchars($collection['description']) ?></p>
+                        <p class="govuk-body-s civicone-secondary-text"><?= htmlspecialchars($collection['description']) ?></p>
                     </div>
                 </div>
                 <div class="collection-stats">
@@ -72,9 +72,9 @@ require dirname(__DIR__, 2) . '/layouts/civicone/header.php';
                     </span>
                     <div class="govuk-body-s govuk-!-margin-top-2">
                         <?php if ($collection['is_completed']): ?>
-                            <span style="color: #00703c;"><i class="fa-solid fa-check-circle" aria-hidden="true"></i> +<?= $collection['bonus_xp'] ?> XP Claimed</span>
+                            <span class="civicone-icon-green"><i class="fa-solid fa-check-circle" aria-hidden="true"></i> +<?= $collection['bonus_xp'] ?> XP Claimed</span>
                         <?php else: ?>
-                            <span style="color: #1d70b8;"><i class="fa-solid fa-gift" aria-hidden="true"></i> +<?= $collection['bonus_xp'] ?> XP Bonus</span>
+                            <span class="civicone-icon-blue"><i class="fa-solid fa-gift" aria-hidden="true"></i> +<?= $collection['bonus_xp'] ?> XP Bonus</span>
                         <?php endif; ?>
                     </div>
                 </div>

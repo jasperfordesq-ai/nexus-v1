@@ -55,7 +55,7 @@ $basePath = \Nexus\Core\TenantContext::getBasePath();
             <?php else: ?>
                 <ul class="govuk-list" role="list">
                 <?php foreach ($hosting as $e): ?>
-                    <li class="govuk-!-margin-bottom-4 govuk-!-padding-4" style="border: 1px solid #b1b4b6; border-left: 5px solid #00703c;">
+                    <li class="govuk-!-margin-bottom-4 govuk-!-padding-4 civicone-event-card-hosting">
                         <div class="govuk-grid-row govuk-!-margin-bottom-2">
                             <div class="govuk-grid-column-one-half">
                                 <span class="govuk-body-s"><strong><?= date('M j @ g:i A', strtotime($e['start_time'])) ?></strong></span>
@@ -112,9 +112,9 @@ $basePath = \Nexus\Core\TenantContext::getBasePath();
                 <ul class="govuk-list" role="list">
                 <?php foreach ($attending as $e): ?>
                     <li class="govuk-!-margin-bottom-4">
-                        <a href="<?= $basePath ?>/events/<?= $e['id'] ?>" class="govuk-link" style="text-decoration: none;">
-                            <div class="govuk-!-padding-3" style="border: 1px solid #b1b4b6; display: flex; gap: 1rem;">
-                                <div class="govuk-!-padding-2 govuk-!-text-align-centre civicone-panel-bg" style="min-width: 60px;">
+                        <a href="<?= $basePath ?>/events/<?= $e['id'] ?>" class="govuk-link civicone-link-no-underline">
+                            <div class="govuk-!-padding-3 civicone-event-attending-card">
+                                <div class="govuk-!-padding-2 govuk-!-text-align-centre civicone-panel-bg civicone-event-date-box">
                                     <div class="govuk-body-s govuk-!-margin-bottom-0"><strong><?= date('M', strtotime($e['start_time'])) ?></strong></div>
                                     <div class="govuk-heading-m govuk-!-margin-bottom-0"><?= date('j', strtotime($e['start_time'])) ?></div>
                                 </div>

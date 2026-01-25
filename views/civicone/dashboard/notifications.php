@@ -54,7 +54,7 @@ if (!empty($notifSettings)) {
             </h2>
         </div>
         <div class="govuk-grid-column-one-half govuk-!-text-align-right">
-            <div class="govuk-button-group" style="justify-content: flex-end;">
+            <div class="govuk-button-group civicone-justify-end">
                 <button type="button" onclick="openEventsModal()" class="govuk-button govuk-button--secondary" data-module="govuk-button">
                     <i class="fa-solid fa-list-ul govuk-!-margin-right-1" aria-hidden="true"></i> Events
                 </button>
@@ -69,10 +69,10 @@ if (!empty($notifSettings)) {
     </div>
 
     <!-- Events Modal -->
-    <dialog id="events-modal" class="govuk-!-padding-6" style="border: 1px solid #b1b4b6; max-width: 500px;" aria-labelledby="events-modal-title">
+    <dialog id="events-modal" class="govuk-!-padding-6 civicone-dialog" aria-labelledby="events-modal-title">
         <div class="govuk-!-margin-bottom-4">
             <h3 id="events-modal-title" class="govuk-heading-m">Notification Triggers</h3>
-            <button type="button" onclick="document.getElementById('events-modal').close()" class="govuk-button govuk-button--secondary" aria-label="Close" style="position: absolute; top: 1rem; right: 1rem;">
+            <button type="button" onclick="document.getElementById('events-modal').close()" class="govuk-button govuk-button--secondary civicone-dialog-close" aria-label="Close">
                 <i class="fa-solid fa-times" aria-hidden="true"></i>
             </button>
         </div>
@@ -163,13 +163,13 @@ if (!empty($notifSettings)) {
                         <p class="govuk-body govuk-!-margin-bottom-2">
                             <?= htmlspecialchars($n['message']) ?>
                         </p>
-                        <p class="govuk-body-s govuk-!-margin-bottom-0" style="color: #505a5f;">
+                        <p class="govuk-body-s govuk-!-margin-bottom-0 civicone-secondary-text">
                             <i class="fa-regular fa-clock govuk-!-margin-right-1" aria-hidden="true"></i>
                             <?= date('M j, Y \a\t g:i A', strtotime($n['created_at'])) ?>
                         </p>
                     </div>
                     <div class="govuk-grid-column-one-quarter govuk-!-text-align-right">
-                        <div class="govuk-button-group" style="justify-content: flex-end;">
+                        <div class="govuk-button-group civicone-justify-end">
                             <?php if ($n['link']): ?>
                                 <a href="<?= htmlspecialchars($n['link']) ?>" onclick="window.nexusNotifications.markOneRead(<?= $n['id'] ?>)" class="govuk-button govuk-button--secondary" data-module="govuk-button">View</a>
                             <?php endif; ?>

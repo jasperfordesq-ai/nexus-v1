@@ -162,14 +162,14 @@ $isEdit = $isEdit ?? false;
         </div>
         <input class="govuk-file-upload" type="file" name="image" id="image" accept="image/*" aria-describedby="image-hint">
         <?php if (!empty($group['image_url'])): ?>
-            <div class="govuk-!-margin-top-3 govuk-!-padding-3" style="border: 1px solid #b1b4b6; display: flex; align-items: center; gap: 1rem;">
-                <img src="<?= htmlspecialchars($group['image_url']) ?>" loading="lazy" alt="Current avatar" style="width: 60px; height: 60px; object-fit: cover; border-radius: 4px;">
+            <div class="govuk-!-margin-top-3 govuk-!-padding-3 civicone-image-preview-row">
+                <img src="<?= htmlspecialchars($group['image_url']) ?>" loading="lazy" alt="Current avatar" class="civicone-avatar-thumb">
                 <div>
                     <p class="govuk-body-s govuk-!-margin-bottom-0"><strong>Current Avatar</strong></p>
-                    <p class="govuk-body-s govuk-!-margin-bottom-0" style="color: #505a5f;">Upload new to replace</p>
+                    <p class="govuk-body-s govuk-!-margin-bottom-0 civicone-secondary-text">Upload new to replace</p>
                 </div>
-                <label class="govuk-body-s" style="margin-left: auto;">
-                    <input type="checkbox" name="clear_avatar" value="1" class="govuk-checkboxes__input" style="width: auto;">
+                <label class="govuk-body-s civicone-ml-auto">
+                    <input type="checkbox" name="clear_avatar" value="1" class="govuk-checkboxes__input civicone-checkbox-inline">
                     Remove
                 </label>
             </div>
@@ -188,14 +188,14 @@ $isEdit = $isEdit ?? false;
         </div>
         <input class="govuk-file-upload" type="file" name="cover_image" id="cover_image" accept="image/*" aria-describedby="cover-image-hint">
         <?php if (!empty($group['cover_image_url'])): ?>
-            <div class="govuk-!-margin-top-3 govuk-!-padding-3" style="border: 1px solid #b1b4b6; display: flex; align-items: center; gap: 1rem;">
-                <img src="<?= htmlspecialchars($group['cover_image_url']) ?>" loading="lazy" alt="Current cover" style="width: 120px; height: 60px; object-fit: cover; border-radius: 4px;">
+            <div class="govuk-!-margin-top-3 govuk-!-padding-3 civicone-image-preview-row">
+                <img src="<?= htmlspecialchars($group['cover_image_url']) ?>" loading="lazy" alt="Current cover" class="civicone-cover-thumb">
                 <div>
                     <p class="govuk-body-s govuk-!-margin-bottom-0"><strong>Current Cover</strong></p>
-                    <p class="govuk-body-s govuk-!-margin-bottom-0" style="color: #505a5f;">Upload new to replace</p>
+                    <p class="govuk-body-s govuk-!-margin-bottom-0 civicone-secondary-text">Upload new to replace</p>
                 </div>
-                <label class="govuk-body-s" style="margin-left: auto;">
-                    <input type="checkbox" name="clear_cover" value="1" class="govuk-checkboxes__input" style="width: auto;">
+                <label class="govuk-body-s civicone-ml-auto">
+                    <input type="checkbox" name="clear_cover" value="1" class="govuk-checkboxes__input civicone-checkbox-inline">
                     Remove
                 </label>
             </div>
