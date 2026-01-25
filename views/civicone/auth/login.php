@@ -38,23 +38,23 @@ $basePath = \Nexus\Core\TenantContext::getBasePath();
         <?php endif; ?>
 
         <!-- Biometric Login Option -->
-        <div id="biometric-login-container" class="govuk-!-margin-bottom-6" style="display: none;">
+        <div id="biometric-login-container" class="govuk-!-margin-bottom-6 govuk-!-display-none">
             <button type="button" id="biometric-login-btn" class="govuk-button govuk-button--secondary" data-module="govuk-button" onclick="attemptBiometricLogin()">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="govuk-!-margin-right-2" aria-hidden="true">
                     <path d="M12 11c0 3.517-1.009 6.799-2.753 9.571m-3.44-2.04l.054-.09A13.916 13.916 0 008 11a4 4 0 118 0c0 1.017-.07 2.019-.203 3m-2.118 6.844A21.88 21.88 0 0015.171 17m3.839 1.132c.645-2.266.99-4.659.99-7.132A8 8 0 008 4.07M3 15.364c.64-1.319 1-2.8 1-4.364a6 6 0 0112 0c0 .894-.074 1.771-.214 2.626M5 11a7 7 0 1114 0"></path>
                 </svg>
                 Sign in with Biometrics
             </button>
-            <p class="govuk-body-s govuk-!-margin-top-2" style="color: #505a5f;">or sign in with your email</p>
+            <p class="govuk-body-s govuk-!-margin-top-2 civicone-secondary-text">or sign in with your email</p>
         </div>
 
         <!-- Biometric Feature Promo -->
-        <div id="biometric-promo" class="govuk-inset-text govuk-!-margin-bottom-6" style="display: none; border-left-color: #1d70b8;">
+        <div id="biometric-promo" class="govuk-inset-text govuk-!-margin-bottom-6 govuk-!-display-none civicone-inset-blue">
             <p class="govuk-body govuk-!-margin-bottom-0">
                 <i class="fa-solid fa-fingerprint govuk-!-margin-right-2" aria-hidden="true"></i>
                 <strong>Fingerprint & Face ID Available</strong>
             </p>
-            <p class="govuk-body-s govuk-!-margin-bottom-0" style="color: #505a5f;">Sign in faster after your first login</p>
+            <p class="govuk-body-s govuk-!-margin-bottom-0 civicone-secondary-text">Sign in faster after your first login</p>
         </div>
 
         <form action="<?= $basePath ?>/login" method="POST">

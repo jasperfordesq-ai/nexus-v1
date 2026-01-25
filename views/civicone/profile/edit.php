@@ -99,7 +99,7 @@ $displayName = htmlspecialchars($user['first_name'] . ' ' . $user['last_name']);
                                 <img src="<?= htmlspecialchars($user['avatar_url'] ?? '/assets/images/default-avatar.svg') ?>"
                                      alt="Current profile photo"
                                      id="avatar-preview"
-                                     style="width: 150px; height: 150px; border-radius: 50%; object-fit: cover; border: 3px solid #b1b4b6;">
+                                     class="civicone-avatar-preview">
                             </div>
 
                             <input type="file"

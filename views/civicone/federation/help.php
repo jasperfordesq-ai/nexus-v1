@@ -367,23 +367,7 @@ $userOptedIn = $userOptedIn ?? false;
     </div>
 </div>
 
-<script>
-// Smooth scroll for quick links
-document.querySelectorAll('a[href^="#"]').forEach(function(link) {
-    link.addEventListener('click', function(e) {
-        var href = this.getAttribute('href');
-        if (href.startsWith('#') && href.length > 1) {
-            e.preventDefault();
-            var target = document.querySelector(href);
-            if (target) {
-                target.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                target.focus();
-            }
-        }
-    });
-});
-</script>
-<!-- Federation offline indicator -->
-<script src="<?= \Nexus\Core\TenantContext::getBasePath() ?>/assets/js/civicone-federation-offline.min.js" defer></script>
+<!-- Smooth scroll handled by civicone-common.js initSmoothScroll() -->
+<!-- Offline indicator handled by civicone-common.js initOfflineBanner() -->
 
 <?php require dirname(dirname(__DIR__)) . '/layouts/civicone/footer.php'; ?>

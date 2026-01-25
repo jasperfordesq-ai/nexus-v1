@@ -170,17 +170,6 @@ $balance = $balance ?? 0;
     </main>
 </div>
 
-<script>
-(function() {
-    'use strict';
-    var banner = document.getElementById('offlineBanner');
-    function updateOffline(offline) {
-        if (banner) banner.classList.toggle('govuk-!-display-none', !offline);
-    }
-    window.addEventListener('online', function() { updateOffline(false); });
-    window.addEventListener('offline', function() { updateOffline(true); });
-    if (!navigator.onLine) updateOffline(true);
-})();
-</script>
+<!-- Offline indicator handled by civicone-common.js -->
 
 <?php require dirname(dirname(dirname(__DIR__))) . '/layouts/civicone/footer.php'; ?>

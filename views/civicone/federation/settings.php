@@ -85,7 +85,7 @@ $serviceReach = $userSettings['service_reach'] ?? 'local_only';
 
     <form id="settingsForm" aria-label="Federation settings form">
         <!-- Privacy Level -->
-        <div class="govuk-!-padding-4 govuk-!-margin-bottom-6" style="border: 1px solid #b1b4b6; border-left: 5px solid #1d70b8;">
+        <div class="govuk-!-padding-4 govuk-!-margin-bottom-6 civicone-settings-card">
             <h2 class="govuk-heading-m" id="privacy-heading">
                 <i class="fa-solid fa-shield-halved govuk-!-margin-right-2" aria-hidden="true"></i>
                 Privacy Level
@@ -129,7 +129,7 @@ $serviceReach = $userSettings['service_reach'] ?? 'local_only';
         </div>
 
         <!-- Visibility Options -->
-        <div class="govuk-!-padding-4 govuk-!-margin-bottom-6" style="border: 1px solid #b1b4b6; border-left: 5px solid #1d70b8;">
+        <div class="govuk-!-padding-4 govuk-!-margin-bottom-6 civicone-settings-card">
             <h2 class="govuk-heading-m" id="visibility-heading">
                 <i class="fa-solid fa-sliders govuk-!-margin-right-2" aria-hidden="true"></i>
                 Visibility Options
@@ -200,7 +200,7 @@ $serviceReach = $userSettings['service_reach'] ?? 'local_only';
         </div>
 
         <!-- AI Assistant Options -->
-        <div class="govuk-!-padding-4 govuk-!-margin-bottom-6" style="border: 1px solid #b1b4b6; border-left: 5px solid #1d70b8;">
+        <div class="govuk-!-padding-4 govuk-!-margin-bottom-6 civicone-settings-card">
             <h2 class="govuk-heading-m" id="ai-heading">
                 <i class="fa-solid fa-robot govuk-!-margin-right-2" aria-hidden="true"></i>
                 AI Assistant
@@ -226,7 +226,7 @@ $serviceReach = $userSettings['service_reach'] ?? 'local_only';
         </div>
 
         <!-- Service Reach -->
-        <div class="govuk-!-padding-4 govuk-!-margin-bottom-6" style="border: 1px solid #b1b4b6; border-left: 5px solid #1d70b8;">
+        <div class="govuk-!-padding-4 govuk-!-margin-bottom-6 civicone-settings-card">
             <h2 class="govuk-heading-m" id="reach-heading">
                 <i class="fa-solid fa-location-dot govuk-!-margin-right-2" aria-hidden="true"></i>
                 Service Reach
@@ -264,7 +264,7 @@ $serviceReach = $userSettings['service_reach'] ?? 'local_only';
         </div>
 
         <!-- Activity Summary -->
-        <div class="govuk-!-padding-4 govuk-!-margin-bottom-6" style="border: 1px solid #b1b4b6; border-left: 5px solid #1d70b8;">
+        <div class="govuk-!-padding-4 govuk-!-margin-bottom-6 civicone-settings-card">
             <h2 class="govuk-heading-m" id="activity-heading">
                 <i class="fa-solid fa-chart-simple govuk-!-margin-right-2" aria-hidden="true"></i>
                 Your Federation Activity
@@ -275,25 +275,25 @@ $serviceReach = $userSettings['service_reach'] ?? 'local_only';
                 <div class="govuk-grid-column-one-quarter">
                     <div class="govuk-!-padding-3 govuk-!-text-align-center civicone-panel-bg">
                         <p class="govuk-heading-l govuk-!-margin-bottom-1"><?= number_format(($stats['messages_sent'] ?? 0) + ($stats['messages_received'] ?? 0)) ?></p>
-                        <p class="govuk-body-s govuk-!-margin-bottom-0" style="color: #505a5f;">Messages Exchanged</p>
+                        <p class="govuk-body-s govuk-!-margin-bottom-0 civicone-secondary-text">Messages Exchanged</p>
                     </div>
                 </div>
                 <div class="govuk-grid-column-one-quarter">
                     <div class="govuk-!-padding-3 govuk-!-text-align-center civicone-panel-bg">
                         <p class="govuk-heading-l govuk-!-margin-bottom-1"><?= number_format($stats['transactions_count'] ?? 0) ?></p>
-                        <p class="govuk-body-s govuk-!-margin-bottom-0" style="color: #505a5f;">Transactions</p>
+                        <p class="govuk-body-s govuk-!-margin-bottom-0 civicone-secondary-text">Transactions</p>
                     </div>
                 </div>
                 <div class="govuk-grid-column-one-quarter">
                     <div class="govuk-!-padding-3 govuk-!-text-align-center civicone-panel-bg">
                         <p class="govuk-heading-l govuk-!-margin-bottom-1"><?= number_format($stats['hours_exchanged'] ?? 0, 1) ?></p>
-                        <p class="govuk-body-s govuk-!-margin-bottom-0" style="color: #505a5f;">Hours Exchanged</p>
+                        <p class="govuk-body-s govuk-!-margin-bottom-0 civicone-secondary-text">Hours Exchanged</p>
                     </div>
                 </div>
                 <div class="govuk-grid-column-one-quarter">
                     <div class="govuk-!-padding-3 govuk-!-text-align-center civicone-panel-bg">
                         <p class="govuk-heading-l govuk-!-margin-bottom-1"><?= $partnerCount ?></p>
-                        <p class="govuk-body-s govuk-!-margin-bottom-0" style="color: #505a5f;">Partner Timebanks</p>
+                        <p class="govuk-body-s govuk-!-margin-bottom-0 civicone-secondary-text">Partner Timebanks</p>
                     </div>
                 </div>
             </div>

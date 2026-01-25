@@ -38,7 +38,7 @@ $showcaseUpdated = isset($_GET['showcase_updated']);
 
 <!-- Achievement Navigation -->
 <nav class="govuk-!-margin-bottom-6" aria-label="Achievement sections">
-    <ul class="govuk-list" style="display: flex; gap: 0.5rem; flex-wrap: wrap; padding: 0; margin: 0;">
+    <ul class="govuk-list civicone-flex-nav">
         <li><a href="<?= $basePath ?>/achievements" class="govuk-button govuk-button--secondary" data-module="govuk-button">Dashboard</a></li>
         <li><a href="<?= $basePath ?>/achievements/badges" class="govuk-button" data-module="govuk-button">All Badges</a></li>
         <li><a href="<?= $basePath ?>/achievements/challenges" class="govuk-button govuk-button--secondary" data-module="govuk-button">Challenges</a></li>
@@ -100,7 +100,7 @@ $showcaseUpdated = isset($_GET['showcase_updated']);
                 <?= $percent ?>%
             </div>
         </div>
-        <p class="govuk-body-s govuk-!-margin-top-2" style="color: #505a5f;">
+        <p class="govuk-body-s govuk-!-margin-top-2 civicone-secondary-text">
             <?= $totalEarned ?> of <?= $totalAvailable ?> badges earned
         </p>
     </div>

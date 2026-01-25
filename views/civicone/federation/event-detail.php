@@ -69,7 +69,7 @@ $spotsLeft = isset($event['max_attendees']) ? ($event['max_attendees'] - ($event
         <div class="govuk-grid-row">
             <div class="govuk-grid-column-two-thirds">
                 <!-- Event Card -->
-                <article class="govuk-!-padding-6" style="background: #fff; border: 1px solid #b1b4b6; border-left: 5px solid #1d70b8;" aria-labelledby="event-title">
+                <article class="govuk-!-padding-6 civicone-card-border-left-blue" aria-labelledby="event-title">
                     <!-- Badges -->
                     <div class="govuk-!-margin-bottom-4">
                         <?php if ($eventDate): ?>
@@ -95,7 +95,7 @@ $spotsLeft = isset($event['max_attendees']) ? ($event['max_attendees'] - ($event
                         <?php if (!empty($event['location'])): ?>
                         <div class="govuk-summary-list__row">
                             <dt class="govuk-summary-list__key">
-                                <i class="fa-solid fa-location-dot govuk-!-margin-right-2" style="color: #1d70b8;" aria-hidden="true"></i>
+                                <i class="fa-solid fa-location-dot govuk-!-margin-right-2 civicone-icon-blue" aria-hidden="true"></i>
                                 Location
                             </dt>
                             <dd class="govuk-summary-list__value"><?= htmlspecialchars($event['location']) ?></dd>
@@ -105,7 +105,7 @@ $spotsLeft = isset($event['max_attendees']) ? ($event['max_attendees'] - ($event
                         <?php if ($eventDate): ?>
                         <div class="govuk-summary-list__row">
                             <dt class="govuk-summary-list__key">
-                                <i class="fa-solid fa-clock govuk-!-margin-right-2" style="color: #1d70b8;" aria-hidden="true"></i>
+                                <i class="fa-solid fa-clock govuk-!-margin-right-2 civicone-icon-blue" aria-hidden="true"></i>
                                 Date & Time
                             </dt>
                             <dd class="govuk-summary-list__value">
@@ -119,7 +119,7 @@ $spotsLeft = isset($event['max_attendees']) ? ($event['max_attendees'] - ($event
                         <?php if (isset($event['max_attendees'])): ?>
                         <div class="govuk-summary-list__row">
                             <dt class="govuk-summary-list__key">
-                                <i class="fa-solid fa-users govuk-!-margin-right-2" style="color: #1d70b8;" aria-hidden="true"></i>
+                                <i class="fa-solid fa-users govuk-!-margin-right-2 civicone-icon-blue" aria-hidden="true"></i>
                                 Capacity
                             </dt>
                             <dd class="govuk-summary-list__value">
@@ -131,7 +131,7 @@ $spotsLeft = isset($event['max_attendees']) ? ($event['max_attendees'] - ($event
                         <?php if (!empty($event['duration_hours'])): ?>
                         <div class="govuk-summary-list__row">
                             <dt class="govuk-summary-list__key">
-                                <i class="fa-solid fa-hourglass-half govuk-!-margin-right-2" style="color: #1d70b8;" aria-hidden="true"></i>
+                                <i class="fa-solid fa-hourglass-half govuk-!-margin-right-2 civicone-icon-blue" aria-hidden="true"></i>
                                 Duration
                             </dt>
                             <dd class="govuk-summary-list__value"><?= htmlspecialchars($event['duration_hours']) ?> hour(s)</dd>
@@ -142,7 +142,7 @@ $spotsLeft = isset($event['max_attendees']) ? ($event['max_attendees'] - ($event
                     <!-- Description -->
                     <?php if (!empty($event['description'])): ?>
                         <h2 class="govuk-heading-m">
-                            <i class="fa-solid fa-align-left govuk-!-margin-right-2" style="color: #505a5f;" aria-hidden="true"></i>
+                            <i class="fa-solid fa-align-left govuk-!-margin-right-2 civicone-icon-grey" aria-hidden="true"></i>
                             About This Event
                         </h2>
                         <p class="govuk-body-l govuk-!-margin-bottom-6">
@@ -152,20 +152,20 @@ $spotsLeft = isset($event['max_attendees']) ? ($event['max_attendees'] - ($event
 
                     <!-- Organizer Section -->
                     <h2 class="govuk-heading-m">
-                        <i class="fa-solid fa-user govuk-!-margin-right-2" style="color: #505a5f;" aria-hidden="true"></i>
+                        <i class="fa-solid fa-user govuk-!-margin-right-2 civicone-icon-grey" aria-hidden="true"></i>
                         Organized By
                     </h2>
-                    <div class="govuk-!-padding-4 govuk-!-margin-bottom-6 civicone-panel-bg" style="display: flex; align-items: center; gap: 16px;">
+                    <div class="govuk-!-padding-4 govuk-!-margin-bottom-6 civicone-panel-bg civicone-organizer-row">
                         <img src="<?= htmlspecialchars($organizerAvatar) ?>"
                              onerror="this.src='<?= $fallbackAvatar ?>'"
                              alt=""
-                             style="width: 64px; height: 64px; border-radius: 50%; object-fit: cover;"
+                             class="civicone-avatar-lg-img"
                              loading="lazy">
                         <div>
                             <p class="govuk-body-l govuk-!-font-weight-bold govuk-!-margin-bottom-1">
                                 <?= htmlspecialchars($organizerName) ?>
                             </p>
-                            <p class="govuk-body-s govuk-!-margin-bottom-0" style="color: #505a5f;">
+                            <p class="govuk-body-s govuk-!-margin-bottom-0 civicone-secondary-text">
                                 <i class="fa-solid fa-building govuk-!-margin-right-1" aria-hidden="true"></i>
                                 <?= htmlspecialchars($event['tenant_name'] ?? 'Partner Timebank') ?>
                             </p>
@@ -174,7 +174,7 @@ $spotsLeft = isset($event['max_attendees']) ? ($event['max_attendees'] - ($event
 
                     <!-- Registration Section -->
                     <h2 class="govuk-heading-m">
-                        <i class="fa-solid fa-ticket govuk-!-margin-right-2" style="color: #505a5f;" aria-hidden="true"></i>
+                        <i class="fa-solid fa-ticket govuk-!-margin-right-2 civicone-icon-grey" aria-hidden="true"></i>
                         Registration
                     </h2>
 
@@ -234,7 +234,7 @@ $spotsLeft = isset($event['max_attendees']) ? ($event['max_attendees'] - ($event
                 <!-- Privacy Notice -->
                 <div class="govuk-inset-text govuk-!-margin-top-6">
                     <p class="govuk-body govuk-!-margin-bottom-0">
-                        <i class="fa-solid fa-shield-halved govuk-!-margin-right-2" style="color: #1d70b8;" aria-hidden="true"></i>
+                        <i class="fa-solid fa-shield-halved govuk-!-margin-right-2 civicone-icon-blue" aria-hidden="true"></i>
                         <strong>Federated Event</strong> — This event is hosted by <strong><?= htmlspecialchars($event['tenant_name'] ?? 'a partner timebank') ?></strong>.
                         When you register, your basic profile information will be shared with the event organizer.
                     </p>
@@ -244,18 +244,6 @@ $spotsLeft = isset($event['max_attendees']) ? ($event['max_attendees'] - ($event
     </main>
 </div>
 
-<!-- Federation offline indicator -->
-<script>
-(function() {
-    'use strict';
-    var banner = document.getElementById('offlineBanner');
-    function updateOffline(offline) {
-        if (banner) banner.classList.toggle('govuk-!-display-none', !offline);
-    }
-    window.addEventListener('online', function() { updateOffline(false); });
-    window.addEventListener('offline', function() { updateOffline(true); });
-    if (!navigator.onLine) updateOffline(true);
-})();
-</script>
+<!-- Offline indicator handled by civicone-common.js -->
 
 <?php require dirname(dirname(__DIR__)) . '/layouts/civicone/footer.php'; ?>

@@ -71,7 +71,7 @@ $typeColor = $type === 'offer' ? '#00703c' : '#1d70b8';
                     <!-- Description -->
                     <?php if (!empty($listing['description'])): ?>
                         <h2 class="govuk-heading-m">
-                            <i class="fa-solid fa-align-left govuk-!-margin-right-2" style="color: #505a5f;" aria-hidden="true"></i>
+                            <i class="fa-solid fa-align-left govuk-!-margin-right-2 civicone-secondary-text" aria-hidden="true"></i>
                             Description
                         </h2>
                         <p class="govuk-body-l govuk-!-margin-bottom-6">
@@ -81,20 +81,20 @@ $typeColor = $type === 'offer' ? '#00703c' : '#1d70b8';
 
                     <!-- Owner Section -->
                     <h2 class="govuk-heading-m">
-                        <i class="fa-solid fa-user govuk-!-margin-right-2" style="color: #505a5f;" aria-hidden="true"></i>
+                        <i class="fa-solid fa-user govuk-!-margin-right-2 civicone-secondary-text" aria-hidden="true"></i>
                         Posted By
                     </h2>
-                    <div class="govuk-!-padding-4 govuk-!-margin-bottom-6 civicone-panel-bg" style="display: flex; align-items: center; gap: 16px;">
+                    <div class="govuk-!-padding-4 govuk-!-margin-bottom-6 civicone-panel-bg civicone-flex-gap">
                         <img src="<?= htmlspecialchars($ownerAvatar) ?>"
                              onerror="this.src='<?= $fallbackAvatar ?>'"
                              alt=""
-                             style="width: 64px; height: 64px; border-radius: 50%; object-fit: cover;"
+                             class="civicone-avatar-lg"
                              loading="lazy">
                         <div>
                             <p class="govuk-body-l govuk-!-font-weight-bold govuk-!-margin-bottom-1">
                                 <?= htmlspecialchars($ownerName) ?>
                             </p>
-                            <p class="govuk-body-s govuk-!-margin-bottom-0" style="color: #505a5f;">
+                            <p class="govuk-body-s govuk-!-margin-bottom-0 civicone-secondary-text">
                                 <i class="fa-solid fa-building govuk-!-margin-right-1" aria-hidden="true"></i>
                                 <?= htmlspecialchars($listing['tenant_name'] ?? 'Partner Timebank') ?>
                             </p>
@@ -127,7 +127,7 @@ $typeColor = $type === 'offer' ? '#00703c' : '#1d70b8';
                 <!-- Privacy Notice -->
                 <div class="govuk-inset-text govuk-!-margin-top-6">
                     <p class="govuk-body govuk-!-margin-bottom-0">
-                        <i class="fa-solid fa-shield-halved govuk-!-margin-right-2" style="color: #1d70b8;" aria-hidden="true"></i>
+                        <i class="fa-solid fa-shield-halved govuk-!-margin-right-2 civicone-icon-blue" aria-hidden="true"></i>
                         <strong>Federated Listing</strong> — This listing is from <strong><?= htmlspecialchars($listing['tenant_name'] ?? 'a partner timebank') ?></strong>.
                         Contact the poster to discuss terms and arrange an exchange.
                     </p>
@@ -137,18 +137,6 @@ $typeColor = $type === 'offer' ? '#00703c' : '#1d70b8';
     </main>
 </div>
 
-<!-- Federation offline indicator -->
-<script>
-(function() {
-    'use strict';
-    var banner = document.getElementById('offlineBanner');
-    function updateOffline(offline) {
-        if (banner) banner.classList.toggle('govuk-!-display-none', !offline);
-    }
-    window.addEventListener('online', function() { updateOffline(false); });
-    window.addEventListener('offline', function() { updateOffline(true); });
-    if (!navigator.onLine) updateOffline(true);
-})();
-</script>
+<!-- Offline indicator handled by civicone-common.js -->
 
 <?php require dirname(dirname(__DIR__)) . '/layouts/civicone/footer.php'; ?>

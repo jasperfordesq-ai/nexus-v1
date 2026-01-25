@@ -45,16 +45,15 @@ $basePath = Nexus\Core\TenantContext::getBasePath();
         ?>
             <li class="govuk-!-margin-bottom-3" role="listitem">
                 <a href="<?= $basePath ?>/messages/<?= $thread['other_user_id'] ?>"
-                   class="govuk-link"
-                   style="text-decoration: none; display: block;"
+                   class="govuk-link civicone-link-no-underline"
                    aria-label="Message thread with <?= htmlspecialchars($thread['other_user_name']) ?><?= $isUnread ? ' (unread)' : '' ?>">
-                    <div class="govuk-!-padding-4 <?= $isUnread ? 'govuk-!-font-weight-bold' : '' ?>" style="border: 1px solid #b1b4b6; border-left: 5px solid <?= $isUnread ? '#1d70b8' : '#b1b4b6' ?>;">
+                    <div class="govuk-!-padding-4 <?= $isUnread ? 'govuk-!-font-weight-bold civicone-thread-unread' : 'civicone-thread-read' ?>">
                         <div class="govuk-grid-row">
                             <div class="govuk-grid-column-three-quarters">
                                 <p class="govuk-body govuk-!-margin-bottom-1 <?= $isUnread ? 'govuk-!-font-weight-bold' : '' ?>">
                                     <?= htmlspecialchars($thread['other_user_name']) ?>
                                 </p>
-                                <p class="govuk-body-s govuk-!-margin-bottom-0" style="color: #505a5f;">
+                                <p class="govuk-body-s govuk-!-margin-bottom-0 civicone-secondary-text">
                                     <?= htmlspecialchars(mb_strimwidth($thread['body'], 0, 60, "...")) ?>
                                 </p>
                             </div>
@@ -62,7 +61,7 @@ $basePath = Nexus\Core\TenantContext::getBasePath();
                                 <?php if ($isUnread): ?>
                                     <span class="govuk-tag govuk-tag--light-blue govuk-!-margin-right-2">New</span>
                                 <?php endif; ?>
-                                <time class="govuk-body-s" datetime="<?= $thread['created_at'] ?>" style="color: #505a5f;">
+                                <time class="govuk-body-s civicone-secondary-text" datetime="<?= $thread['created_at'] ?>">
                                     <?= date('M j', strtotime($thread['created_at'])) ?>
                                 </time>
                             </div>

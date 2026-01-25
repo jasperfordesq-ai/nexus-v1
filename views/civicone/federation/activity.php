@@ -235,39 +235,7 @@ function formatActivityTime($timestamp) {
 }
 ?>
 
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    var filterTabs = document.querySelectorAll('.govuk-tabs__tab');
-    var activityItems = document.querySelectorAll('#activity-list li');
-
-    filterTabs.forEach(function(tab) {
-        tab.addEventListener('click', function() {
-            // Update active tab
-            document.querySelectorAll('.govuk-tabs__list-item').forEach(function(item) {
-                item.classList.remove('govuk-tabs__list-item--selected');
-            });
-            this.closest('.govuk-tabs__list-item').classList.add('govuk-tabs__list-item--selected');
-
-            filterTabs.forEach(function(t) {
-                t.setAttribute('aria-selected', 'false');
-            });
-            this.setAttribute('aria-selected', 'true');
-
-            var filter = this.dataset.filter;
-
-            // Filter items
-            activityItems.forEach(function(item) {
-                if (filter === 'all' || item.dataset.type === filter) {
-                    item.classList.remove('hidden');
-                } else {
-                    item.classList.add('hidden');
-                }
-            });
-        });
-    });
-});
-</script>
-<!-- Federation offline indicator -->
-<script src="<?= \Nexus\Core\TenantContext::getBasePath() ?>/assets/js/civicone-federation-offline.min.js" defer></script>
+<!-- Filter tabs handled by civicone-common.js initFilterTabs() -->
+<!-- Offline indicator handled by civicone-common.js initOfflineBanner() -->
 
 <?php require dirname(dirname(__DIR__)) . '/layouts/civicone/footer.php'; ?>

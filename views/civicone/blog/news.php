@@ -32,17 +32,17 @@ $basePath = \Nexus\Core\TenantContext::getBasePath();
     <div class="govuk-grid-row">
         <?php foreach ($posts as $post): ?>
         <div class="govuk-grid-column-one-third govuk-!-margin-bottom-6">
-            <div class="govuk-!-padding-4" style="border: 1px solid #b1b4b6; border-top: 5px solid #1d70b8; height: 100%; display: flex; flex-direction: column;">
+            <div class="govuk-!-padding-4 civicone-blog-card">
                 <?php if ($post['featured_image']): ?>
-                <div style="margin: -1rem -1rem 1rem -1rem; overflow: hidden;">
+                <div class="civicone-blog-card-image">
                     <img src="<?= htmlspecialchars($post['featured_image']) ?>"
                          alt=""
-                         style="width: 100%; height: 150px; object-fit: cover;"
+                         class="civicone-blog-card-img"
                          loading="lazy">
                 </div>
                 <?php endif; ?>
 
-                <p class="govuk-body-s govuk-!-margin-bottom-2" style="color: #505a5f;">
+                <p class="govuk-body-s govuk-!-margin-bottom-2 civicone-secondary-text">
                     <?= date('j F Y', strtotime($post['created_at'])) ?>
                 </p>
 
@@ -52,7 +52,7 @@ $basePath = \Nexus\Core\TenantContext::getBasePath();
                     </a>
                 </h3>
 
-                <p class="govuk-body-s govuk-!-margin-bottom-4" style="flex-grow: 1; color: #505a5f;">
+                <p class="govuk-body-s govuk-!-margin-bottom-4 civicone-blog-card-excerpt">
                     <?= htmlspecialchars(substr($post['excerpt'] ?: strip_tags($post['content']), 0, 150)) ?>...
                 </p>
 

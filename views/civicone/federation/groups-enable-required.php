@@ -13,9 +13,9 @@ $basePath = \Nexus\Core\TenantContext::getBasePath();
 
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds">
-        <div class="govuk-!-padding-6 govuk-!-text-align-center civicone-panel-bg" style="border-left: 5px solid #1d70b8;">
+        <div class="govuk-!-padding-6 govuk-!-text-align-center civicone-panel-bg civicone-panel-border-blue">
             <p class="govuk-body govuk-!-margin-bottom-4">
-                <i class="fa-solid fa-people-group fa-3x" style="color: #1d70b8;" aria-hidden="true"></i>
+                <i class="fa-solid fa-people-group fa-3x civicone-icon-blue" aria-hidden="true"></i>
             </p>
 
             <h1 class="govuk-heading-xl">Enable Federated Groups</h1>
@@ -31,9 +31,9 @@ $basePath = \Nexus\Core\TenantContext::getBasePath();
             </a>
         </div>
 
-        <div class="govuk-!-margin-top-6 govuk-!-padding-4" style="border: 1px solid #b1b4b6; border-left: 5px solid #00703c;">
+        <div class="govuk-!-margin-top-6 govuk-!-padding-4 civicone-article-green">
             <h2 class="govuk-heading-m">
-                <i class="fa-solid fa-info-circle govuk-!-margin-right-2" style="color: #00703c;" aria-hidden="true"></i>
+                <i class="fa-solid fa-info-circle govuk-!-margin-right-2 civicone-icon-green" aria-hidden="true"></i>
                 What are Federated Groups?
             </h2>
             <ul class="govuk-list govuk-list--bullet govuk-list--spaced">

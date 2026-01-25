@@ -26,17 +26,17 @@ $role = $role ?? 'member';
 $pendingCount = $pendingCount ?? 0;
 ?>
 
-<div class="govuk-!-margin-bottom-6 govuk-!-padding-4 civicone-panel-bg" style="border-left: 5px solid #1d70b8;">
+<div class="govuk-!-margin-bottom-6 govuk-!-padding-4 civicone-panel-bg civicone-panel-border-blue">
     <!-- Header with org identity and actions -->
     <div class="govuk-grid-row govuk-!-margin-bottom-4">
         <div class="govuk-grid-column-two-thirds">
-            <div style="display: flex; align-items: center; gap: 16px;">
+            <div class="civicone-flex-gap">
                 <!-- Logo -->
-                <div style="width: 60px; height: 60px; border-radius: 50%; background: white; display: flex; align-items: center; justify-content: center; flex-shrink: 0; overflow: hidden; border: 2px solid #1d70b8;">
+                <div class="civicone-org-logo">
                     <?php if (!empty($org['logo_url'])): ?>
-                        <img src="<?= htmlspecialchars($org['logo_url']) ?>" loading="lazy" alt="<?= htmlspecialchars($orgName) ?>" style="width: 100%; height: 100%; object-fit: cover;">
+                        <img src="<?= htmlspecialchars($org['logo_url']) ?>" loading="lazy" alt="<?= htmlspecialchars($orgName) ?>">
                     <?php else: ?>
-                        <span class="govuk-heading-m govuk-!-margin-bottom-0" style="color: #1d70b8;">
+                        <span class="govuk-heading-m govuk-!-margin-bottom-0 civicone-org-logo-initial">
                             <?= strtoupper(substr($orgName, 0, 1)) ?>
                         </span>
                     <?php endif; ?>
@@ -78,7 +78,7 @@ $pendingCount = $pendingCount ?? 0;
 
     <!-- Tab Navigation -->
     <nav role="navigation" aria-label="Organization navigation">
-        <ul style="list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 8px;">
+        <ul class="civicone-nav-list">
             <li>
                 <a href="<?= $base ?>/volunteering/organization/<?= $orgId ?>"
                    class="govuk-button <?= $activeTab === 'profile' ? '' : 'govuk-button--secondary' ?> govuk-!-margin-bottom-0"
@@ -119,7 +119,7 @@ $pendingCount = $pendingCount ?? 0;
                             <i class="fa-solid fa-inbox govuk-!-margin-right-2" aria-hidden="true"></i>
                             Requests
                             <?php if ($pendingCount > 0): ?>
-                                <strong class="govuk-tag govuk-!-margin-left-2" style="background: #d4351c;"><?= $pendingCount ?></strong>
+                                <strong class="govuk-tag govuk-!-margin-left-2 civicone-tag-red"><?= $pendingCount ?></strong>
                             <?php endif; ?>
                         </a>
                     </li>

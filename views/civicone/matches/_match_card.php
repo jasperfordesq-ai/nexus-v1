@@ -69,8 +69,8 @@ $basePath = Nexus\Core\TenantContext::getBasePath();
     </p>
 
     <!-- Header with Avatar -->
-    <div style="display: flex; gap: 1rem; margin-bottom: 1rem;">
-        <img src="<?= $avatarUrl ?>" loading="lazy" alt="" style="width: 48px; height: 48px; border-radius: 50%;">
+    <div class="civicone-flex-gap govuk-!-margin-bottom-3">
+        <img src="<?= $avatarUrl ?>" loading="lazy" alt="" class="civicone-avatar-md">
         <div>
             <h3 class="govuk-heading-s govuk-!-margin-bottom-1">
                 <a href="<?= $basePath ?>/listings/<?= $listingId ?>" class="govuk-link"><?= $title ?></a>
@@ -91,7 +91,7 @@ $basePath = Nexus\Core\TenantContext::getBasePath();
             <span class="govuk-tag govuk-tag--grey govuk-!-margin-right-1"><?= $categoryName ?></span>
         <?php endif; ?>
         <?php if ($timeAgo): ?>
-            <span style="color: #505a5f;"><?= $timeAgo ?></span>
+            <span class="civicone-secondary-text"><?= $timeAgo ?></span>
         <?php endif; ?>
     </p>
 

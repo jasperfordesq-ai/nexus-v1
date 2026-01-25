@@ -17,7 +17,7 @@ $basePath = \Nexus\Core\TenantContext::getBasePath();
 ?>
 
 <!-- Offline Banner -->
-<div id="offlineBanner" class="govuk-!-display-none" role="alert" aria-live="polite" style="position: fixed; top: 0; left: 0; right: 0; z-index: 1000; background: #d4351c; color: white; padding: 12px; text-align: center;">
+<div id="offlineBanner" class="govuk-!-display-none civicone-offline-banner-fixed" role="alert" aria-live="polite">
     <i class="fa-solid fa-wifi-slash govuk-!-margin-right-2" aria-hidden="true"></i>
     <strong>No internet connection</strong>
 </div>
@@ -29,7 +29,7 @@ $basePath = \Nexus\Core\TenantContext::getBasePath();
         <div class="govuk-grid-row">
             <div class="govuk-grid-column-two-thirds">
                 <h1 class="govuk-heading-xl">
-                    <i class="fa-solid fa-edit govuk-!-margin-right-2" style="color: #1d70b8;" aria-hidden="true"></i>
+                    <i class="fa-solid fa-edit govuk-!-margin-right-2 civicone-icon-blue" aria-hidden="true"></i>
                     Edit <?= htmlspecialchars($opp['title']) ?>
                 </h1>
 
@@ -137,9 +137,9 @@ $basePath = \Nexus\Core\TenantContext::getBasePath();
         <!-- Shifts Management -->
         <div class="govuk-grid-row govuk-!-margin-top-6">
             <div class="govuk-grid-column-two-thirds">
-                <div class="govuk-!-padding-4 civicone-panel-bg" style="border-left: 5px solid #1d70b8;">
+                <div class="govuk-!-padding-4 civicone-panel-bg civicone-panel-border-blue">
                     <h2 class="govuk-heading-m">
-                        <i class="fa-solid fa-calendar-alt govuk-!-margin-right-2" style="color: #1d70b8;" aria-hidden="true"></i>
+                        <i class="fa-solid fa-calendar-alt govuk-!-margin-right-2 civicone-icon-blue" aria-hidden="true"></i>
                         Manage Shifts
                     </h2>
                     <p class="govuk-hint">Add specific time slots for this opportunity.</p>
@@ -163,7 +163,7 @@ $basePath = \Nexus\Core\TenantContext::getBasePath();
                                             </span>
                                         </td>
                                         <td class="govuk-table__cell">
-                                            <strong class="govuk-tag" style="background: #1d70b8;">
+                                            <strong class="govuk-tag civicone-tag-blue">
                                                 <?= $shift['capacity'] ?> vols
                                             </strong>
                                         </td>
@@ -187,9 +187,9 @@ $basePath = \Nexus\Core\TenantContext::getBasePath();
                     <?php endif; ?>
 
                     <!-- Add New Shift -->
-                    <div class="govuk-!-padding-4" style="background: white; border: 1px solid #b1b4b6;">
+                    <div class="govuk-!-padding-4 civicone-card-white-bordered">
                         <h3 class="govuk-heading-s">
-                            <i class="fa-solid fa-plus govuk-!-margin-right-2" style="color: #00703c;" aria-hidden="true"></i>
+                            <i class="fa-solid fa-plus govuk-!-margin-right-2 civicone-icon-green" aria-hidden="true"></i>
                             Add New Shift
                         </h3>
                         <form action="<?= $basePath ?>/volunteering/shift/store" method="POST">
@@ -228,38 +228,12 @@ $basePath = \Nexus\Core\TenantContext::getBasePath();
     </main>
 </div>
 
+<!-- Offline indicator + form protection handled by civicone-common.js -->
 <script>
-// Offline Indicator
-(function() {
-    var banner = document.getElementById('offlineBanner');
-    if (!banner) return;
-
-    function handleOffline() {
-        banner.classList.remove('govuk-!-display-none');
-        if (navigator.vibrate) navigator.vibrate(100);
+    // Initialize form offline protection for this page
+    if (typeof CivicOne !== 'undefined') {
+        CivicOne.initFormOfflineProtection();
     }
-
-    function handleOnline() {
-        banner.classList.add('govuk-!-display-none');
-    }
-
-    window.addEventListener('online', handleOnline);
-    window.addEventListener('offline', handleOffline);
-
-    if (!navigator.onLine) {
-        handleOffline();
-    }
-})();
-
-// Form Submission Offline Protection
-document.querySelectorAll('form').forEach(function(form) {
-    form.addEventListener('submit', function(e) {
-        if (!navigator.onLine) {
-            e.preventDefault();
-            alert('You are offline. Please connect to the internet to save changes.');
-        }
-    });
-});
 </script>
 
 <?php require __DIR__ . '/../../layouts/civicone/footer.php'; ?>

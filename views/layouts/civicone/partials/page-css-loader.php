@@ -390,15 +390,21 @@ $pageSpecificCSS = [
         'files' => ['civicone-contact.css']
     ],
 
-    // Static pages - Privacy
+    // Static pages - Privacy (GOV.UK compliant - uses standard govuk classes)
     'privacy' => [
         'condition' => strpos($normPath, '/privacy') !== false,
         'files' => ['civicone-privacy.css']
     ],
 
+    // Static pages - Terms (GOV.UK compliant - uses standard govuk classes)
+    'terms' => [
+        'condition' => strpos($normPath, '/terms') !== false,
+        'files' => ['civicone-pages-legal.css']
+    ],
+
     // Static pages - Legal pages
     'legal' => [
-        'condition' => strpos($normPath, '/terms') !== false || strpos($normPath, '/legal') !== false,
+        'condition' => strpos($normPath, '/legal') !== false,
         'files' => [
             'civicone-legal-hub.css',
             'civicone-pages-legal.css'

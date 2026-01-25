@@ -53,16 +53,16 @@ $hasInsufficientBalance = $balance < 0.5;
 
         <?php if ($recipient): ?>
             <!-- Recipient Info -->
-            <div class="govuk-!-padding-4 govuk-!-margin-bottom-6" style="border: 1px solid #b1b4b6; border-left: 5px solid #1d70b8;">
-                <div style="display: flex; align-items: center; gap: 1rem;">
+            <div class="govuk-!-padding-4 govuk-!-margin-bottom-6 civicone-settings-card">
+                <div class="civicone-flex-gap">
                     <img src="<?= htmlspecialchars($recipientAvatar) ?>"
                          onerror="this.src='<?= $fallbackAvatar ?>'"
                          alt=""
-                         style="width: 60px; height: 60px; border-radius: 50%; object-fit: cover;"
+                         class="civicone-avatar-md"
                          loading="lazy">
                     <div>
                         <h2 class="govuk-heading-m govuk-!-margin-bottom-1"><?= htmlspecialchars($recipientName) ?></h2>
-                        <p class="govuk-body-s govuk-!-margin-bottom-0" style="color: #505a5f;">
+                        <p class="govuk-body-s govuk-!-margin-bottom-0 civicone-secondary-text">
                             <i class="fa-solid fa-building govuk-!-margin-right-1" aria-hidden="true"></i>
                             <?= htmlspecialchars($recipient['tenant_name'] ?? 'Partner Timebank') ?>
                         </p>
@@ -114,11 +114,11 @@ $hasInsufficientBalance = $balance < 0.5;
 
                     <?php if (!$hasInsufficientBalance): ?>
                     <div class="govuk-!-margin-top-2">
-                        <span class="govuk-body-s" style="color: #505a5f;">Quick amounts: </span>
-                        <button type="button" class="govuk-button govuk-button--secondary govuk-!-margin-bottom-0" style="padding: 5px 10px;" onclick="document.getElementById('amount-input').value = 0.5">0.5</button>
-                        <button type="button" class="govuk-button govuk-button--secondary govuk-!-margin-bottom-0" style="padding: 5px 10px;" onclick="document.getElementById('amount-input').value = 1">1</button>
-                        <button type="button" class="govuk-button govuk-button--secondary govuk-!-margin-bottom-0" style="padding: 5px 10px;" onclick="document.getElementById('amount-input').value = 2">2</button>
-                        <button type="button" class="govuk-button govuk-button--secondary govuk-!-margin-bottom-0" style="padding: 5px 10px;" onclick="document.getElementById('amount-input').value = 5">5</button>
+                        <span class="govuk-body-s civicone-secondary-text">Quick amounts: </span>
+                        <button type="button" class="govuk-button govuk-button--secondary govuk-!-margin-bottom-0 civicone-btn-compact" onclick="document.getElementById('amount-input').value = 0.5">0.5</button>
+                        <button type="button" class="govuk-button govuk-button--secondary govuk-!-margin-bottom-0 civicone-btn-compact" onclick="document.getElementById('amount-input').value = 1">1</button>
+                        <button type="button" class="govuk-button govuk-button--secondary govuk-!-margin-bottom-0 civicone-btn-compact" onclick="document.getElementById('amount-input').value = 2">2</button>
+                        <button type="button" class="govuk-button govuk-button--secondary govuk-!-margin-bottom-0 civicone-btn-compact" onclick="document.getElementById('amount-input').value = 5">5</button>
                     </div>
                     <?php endif; ?>
                 </div>

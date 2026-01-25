@@ -25,7 +25,7 @@ $basePath = \Nexus\Core\TenantContext::getBasePath();
                 <div class="govuk-grid-row govuk-!-margin-bottom-4">
                     <div class="govuk-grid-column-two-thirds">
                         <h2 class="govuk-heading-l govuk-!-margin-bottom-1">
-                            <i class="fa-solid fa-shield-halved govuk-!-margin-right-2" style="color: #1d70b8;" aria-hidden="true"></i>
+                            <i class="fa-solid fa-shield-halved govuk-!-margin-right-2 civicone-icon-blue" aria-hidden="true"></i>
                             Audit Log
                         </h2>
                         <p class="govuk-body"><?= number_format($totalCount) ?> entries found</p>
@@ -40,7 +40,7 @@ $basePath = \Nexus\Core\TenantContext::getBasePath();
                 </div>
 
                 <!-- Filters -->
-                <div class="govuk-!-margin-bottom-6 govuk-!-padding-4 civicone-panel-bg" style="border-left: 5px solid #1d70b8;">
+                <div class="govuk-!-margin-bottom-6 govuk-!-padding-4 civicone-panel-bg civicone-panel-border-blue">
                     <form method="GET">
                         <div class="govuk-grid-row">
                             <div class="govuk-grid-column-one-quarter">
@@ -102,9 +102,9 @@ $basePath = \Nexus\Core\TenantContext::getBasePath();
 
                 <!-- Log Entries -->
                 <?php if (empty($logs)): ?>
-                    <div class="govuk-!-padding-6 govuk-!-text-align-center civicone-panel-bg" style="border-left: 5px solid #1d70b8;">
+                    <div class="govuk-!-padding-6 govuk-!-text-align-center civicone-panel-bg civicone-panel-border-blue">
                         <p class="govuk-body govuk-!-margin-bottom-4">
-                            <i class="fa-solid fa-shield-halved fa-3x" style="color: #1d70b8;" aria-hidden="true"></i>
+                            <i class="fa-solid fa-shield-halved fa-3x civicone-icon-blue" aria-hidden="true"></i>
                         </p>
                         <h3 class="govuk-heading-m">No audit log entries found</h3>
                         <p class="govuk-body govuk-!-margin-bottom-0">
@@ -115,7 +115,7 @@ $basePath = \Nexus\Core\TenantContext::getBasePath();
                     <table class="govuk-table">
                         <thead class="govuk-table__head">
                             <tr class="govuk-table__row">
-                                <th scope="col" class="govuk-table__header" style="width: 60px;">Type</th>
+                                <th scope="col" class="govuk-table__header civicone-th-narrow">Type</th>
                                 <th scope="col" class="govuk-table__header">Action</th>
                                 <th scope="col" class="govuk-table__header">User</th>
                                 <th scope="col" class="govuk-table__header">Details</th>
@@ -159,7 +159,7 @@ $basePath = \Nexus\Core\TenantContext::getBasePath();
                                             <span><?= htmlspecialchars($log['user_name']) ?></span>
                                         <?php endif; ?>
                                         <?php if ($log['target_user_name']): ?>
-                                            <i class="fa-solid fa-arrow-right govuk-!-margin-left-1 govuk-!-margin-right-1" style="color: #505a5f;" aria-hidden="true"></i>
+                                            <i class="fa-solid fa-arrow-right govuk-!-margin-left-1 govuk-!-margin-right-1 civicone-secondary-text" aria-hidden="true"></i>
                                             <span><?= htmlspecialchars($log['target_user_name']) ?></span>
                                         <?php endif; ?>
                                     </td>
@@ -185,7 +185,7 @@ $basePath = \Nexus\Core\TenantContext::getBasePath();
                                         </span>
                                         <?php if ($log['ip_address']): ?>
                                             <span class="govuk-body-s govuk-!-display-block govuk-!-margin-top-1">
-                                                <i class="fa-solid fa-globe govuk-!-margin-right-1" style="color: #505a5f;" aria-hidden="true"></i>
+                                                <i class="fa-solid fa-globe govuk-!-margin-right-1 civicone-secondary-text" aria-hidden="true"></i>
                                                 <?= htmlspecialchars($log['ip_address']) ?>
                                             </span>
                                         <?php endif; ?>

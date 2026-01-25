@@ -480,9 +480,9 @@ $pageTitle = 'Create';
                 </button>
             </form>
             <?php else: ?>
-            <div class="govuk-!-padding-6 govuk-!-text-align-center civicone-panel-bg" style="border-left: 5px solid #1d70b8;">
+            <div class="govuk-!-padding-6 govuk-!-text-align-center civicone-panel-bg civicone-panel-border-blue">
                 <p class="govuk-body govuk-!-margin-bottom-4">
-                    <i class="fa-solid fa-building fa-3x" style="color: #1d70b8;" aria-hidden="true"></i>
+                    <i class="fa-solid fa-building fa-3x civicone-icon-blue" aria-hidden="true"></i>
                 </p>
                 <h3 class="govuk-heading-m">Register Your Organization</h3>
                 <p class="govuk-body">To post volunteer opportunities, you need to register and get your organization approved.</p>

@@ -17,7 +17,7 @@ $basePath = \Nexus\Core\TenantContext::getBasePath();
 ?>
 
 <!-- Offline Banner -->
-<div id="offlineBanner" class="govuk-!-display-none" role="alert" aria-live="polite" style="position: fixed; top: 0; left: 0; right: 0; z-index: 1000; background: #d4351c; color: white; padding: 12px; text-align: center;">
+<div id="offlineBanner" class="govuk-!-display-none civicone-offline-banner" role="alert" aria-live="polite">
     <i class="fa-solid fa-wifi-slash govuk-!-margin-right-2" aria-hidden="true"></i>
     <strong>No internet connection</strong>
 </div>
@@ -29,7 +29,7 @@ $basePath = \Nexus\Core\TenantContext::getBasePath();
         <div class="govuk-grid-row">
             <div class="govuk-grid-column-two-thirds">
                 <h1 class="govuk-heading-xl">
-                    <i class="fa-solid fa-building govuk-!-margin-right-2" style="color: #1d70b8;" aria-hidden="true"></i>
+                    <i class="fa-solid fa-building govuk-!-margin-right-2 civicone-icon-blue" aria-hidden="true"></i>
                     Edit <?= htmlspecialchars($org['name']) ?>
                 </h1>
 
@@ -40,7 +40,7 @@ $basePath = \Nexus\Core\TenantContext::getBasePath();
                     <!-- Organization Name -->
                     <div class="govuk-form-group">
                         <label class="govuk-label govuk-label--s" for="org-name">
-                            <i class="fa-solid fa-signature govuk-!-margin-right-1" style="color: #505a5f;" aria-hidden="true"></i>
+                            <i class="fa-solid fa-signature govuk-!-margin-right-1 civicone-icon-grey" aria-hidden="true"></i>
                             Organization Name
                         </label>
                         <input type="text"
@@ -55,7 +55,7 @@ $basePath = \Nexus\Core\TenantContext::getBasePath();
                     <!-- Contact Email -->
                     <div class="govuk-form-group">
                         <label class="govuk-label govuk-label--s" for="org-email">
-                            <i class="fa-solid fa-envelope govuk-!-margin-right-1" style="color: #505a5f;" aria-hidden="true"></i>
+                            <i class="fa-solid fa-envelope govuk-!-margin-right-1 civicone-icon-grey" aria-hidden="true"></i>
                             Contact Email
                         </label>
                         <input type="email"
@@ -70,7 +70,7 @@ $basePath = \Nexus\Core\TenantContext::getBasePath();
                     <!-- Website -->
                     <div class="govuk-form-group">
                         <label class="govuk-label govuk-label--s" for="org-website">
-                            <i class="fa-solid fa-globe govuk-!-margin-right-1" style="color: #505a5f;" aria-hidden="true"></i>
+                            <i class="fa-solid fa-globe govuk-!-margin-right-1 civicone-icon-grey" aria-hidden="true"></i>
                             Website
                         </label>
                         <span class="govuk-hint">Optional</span>
@@ -85,7 +85,7 @@ $basePath = \Nexus\Core\TenantContext::getBasePath();
                     <!-- Description -->
                     <div class="govuk-form-group">
                         <label class="govuk-label govuk-label--s" for="org-description">
-                            <i class="fa-solid fa-align-left govuk-!-margin-right-1" style="color: #505a5f;" aria-hidden="true"></i>
+                            <i class="fa-solid fa-align-left govuk-!-margin-right-1 civicone-icon-grey" aria-hidden="true"></i>
                             Description
                         </label>
                         <span class="govuk-hint">Describe your organization's mission and activities</span>
@@ -98,7 +98,7 @@ $basePath = \Nexus\Core\TenantContext::getBasePath();
 
                     <?php if (\Nexus\Core\TenantContext::hasFeature('wallet')): ?>
                         <!-- Auto-Pay Feature Box -->
-                        <div class="govuk-!-margin-bottom-6 govuk-!-padding-4 civicone-panel-bg" style="border-left: 5px solid #f47738;">
+                        <div class="govuk-!-margin-bottom-6 govuk-!-padding-4 civicone-panel-bg civicone-border-left-orange">
                             <div class="govuk-checkboxes" data-module="govuk-checkboxes">
                                 <div class="govuk-checkboxes__item">
                                     <input type="checkbox"
@@ -109,7 +109,7 @@ $basePath = \Nexus\Core\TenantContext::getBasePath();
                                            id="auto-pay">
                                     <label class="govuk-label govuk-checkboxes__label" for="auto-pay">
                                         <strong>
-                                            <i class="fa-solid fa-wand-magic-sparkles govuk-!-margin-right-1" style="color: #f47738;" aria-hidden="true"></i>
+                                            <i class="fa-solid fa-wand-magic-sparkles govuk-!-margin-right-1 civicone-icon-orange" aria-hidden="true"></i>
                                             Enable Auto-Pay Time Credits
                                         </strong>
                                     </label>
@@ -121,9 +121,9 @@ $basePath = \Nexus\Core\TenantContext::getBasePath();
                         </div>
 
                         <!-- Quick Actions -->
-                        <div class="govuk-!-margin-bottom-6 govuk-!-padding-4 civicone-panel-bg" style="border-left: 5px solid #1d70b8;">
+                        <div class="govuk-!-margin-bottom-6 govuk-!-padding-4 civicone-panel-bg civicone-border-left-blue">
                             <h3 class="govuk-heading-s govuk-!-margin-bottom-3">
-                                <i class="fa-solid fa-bolt govuk-!-margin-right-2" style="color: #1d70b8;" aria-hidden="true"></i>
+                                <i class="fa-solid fa-bolt govuk-!-margin-right-2 civicone-icon-blue" aria-hidden="true"></i>
                                 Quick Actions
                             </h3>
                             <div class="govuk-button-group">
@@ -155,36 +155,12 @@ $basePath = \Nexus\Core\TenantContext::getBasePath();
     </main>
 </div>
 
+<!-- Offline indicator + form protection handled by civicone-common.js -->
 <script>
-// Offline Indicator
-(function() {
-    var banner = document.getElementById('offlineBanner');
-    if (!banner) return;
-
-    function handleOffline() {
-        banner.classList.remove('govuk-!-display-none');
-        if (navigator.vibrate) navigator.vibrate(100);
+    // Initialize form offline protection for this page
+    if (typeof CivicOne !== 'undefined') {
+        CivicOne.initFormOfflineProtection();
     }
-
-    function handleOnline() {
-        banner.classList.add('govuk-!-display-none');
-    }
-
-    window.addEventListener('online', handleOnline);
-    window.addEventListener('offline', handleOffline);
-
-    if (!navigator.onLine) {
-        handleOffline();
-    }
-})();
-
-// Form Submission Offline Protection
-document.getElementById('editOrgForm').addEventListener('submit', function(e) {
-    if (!navigator.onLine) {
-        e.preventDefault();
-        alert('You are offline. Please connect to the internet to save changes.');
-    }
-});
 </script>
 
 <?php require __DIR__ . '/../../layouts/civicone/footer.php'; ?>

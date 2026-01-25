@@ -255,6 +255,12 @@ $pageSpecificCSS = [
         'files' => ['terms-page.css']
     ],
 
+    // Privacy page
+    'privacy' => [
+        'condition' => strpos($normPath, '/privacy') !== false,
+        'files' => ['privacy-page.css']
+    ],
+
     // Achievements (all pages) - Added Phase 4 CSS Refactoring 2026-01-25
     'achievements' => [
         'condition' => strpos($normPath, '/achievements') !== false,

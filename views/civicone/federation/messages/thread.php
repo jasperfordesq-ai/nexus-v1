@@ -44,16 +44,16 @@ $currentUserId = $_SESSION['user_id'] ?? 0;
         <div class="govuk-grid-row">
             <div class="govuk-grid-column-two-thirds">
                 <!-- Thread Header -->
-                <div class="govuk-!-padding-4 govuk-!-margin-bottom-6" style="background: #fff; border: 1px solid #b1b4b6; border-left: 5px solid #1d70b8;">
-                    <div style="display: flex; align-items: center; gap: 16px;">
+                <div class="govuk-!-padding-4 govuk-!-margin-bottom-6 civicone-thread-header">
+                    <div class="civicone-thread-header-row">
                         <img src="<?= htmlspecialchars($otherAvatar) ?>"
                              onerror="this.src='<?= $fallbackAvatar ?>'"
                              alt=""
-                             style="width: 56px; height: 56px; border-radius: 50%; object-fit: cover;"
+                             class="civicone-avatar-lg-img"
                              loading="lazy">
-                        <div style="flex: 1;">
+                        <div class="civicone-thread-user-info">
                             <h1 class="govuk-heading-m govuk-!-margin-bottom-1"><?= htmlspecialchars($otherName) ?></h1>
-                            <p class="govuk-body-s govuk-!-margin-bottom-0" style="color: #505a5f;">
+                            <p class="govuk-body-s govuk-!-margin-bottom-0 civicone-secondary-text">
                                 <i class="fa-solid fa-building govuk-!-margin-right-1" aria-hidden="true"></i>
                                 <?= htmlspecialchars($otherUser['tenant_name'] ?? 'Partner Timebank') ?>
                             </p>
@@ -66,29 +66,28 @@ $currentUserId = $_SESSION['user_id'] ?? 0;
                 </div>
 
                 <!-- Messages Container -->
-                <div class="govuk-!-padding-4 govuk-!-margin-bottom-4 civicone-panel-bg" style="min-height: 300px; max-height: 500px; overflow-y: auto;" id="messages-container" role="log" aria-label="Message history" aria-live="polite">
+                <div class="govuk-!-padding-4 govuk-!-margin-bottom-4 civicone-panel-bg civicone-messages-container" id="messages-container" role="log" aria-label="Message history" aria-live="polite">
                     <?php if (!empty($messages)): ?>
                         <?php foreach ($messages as $msg):
                             $isSent = $msg['message_type'] === 'sent';
                             $msgTime = strtotime($msg['created_at']);
                             $isoTime = date('c', $msgTime);
                             $displayTime = date('M j, g:i a', $msgTime);
-                            $bgColor = $isSent ? '#1d70b8' : '#fff';
-                            $textColor = $isSent ? '#fff' : '#0b0c0c';
-                            $align = $isSent ? 'flex-end' : 'flex-start';
+                            $bubbleClass = $isSent ? 'civicone-msg-bubble-sent' : 'civicone-msg-bubble-received';
+                            $alignClass = $isSent ? 'civicone-msg-row-right' : 'civicone-msg-row-left';
                         ?>
-                            <div style="display: flex; flex-direction: column; align-items: <?= $align ?>; margin-bottom: 16px;">
-                                <div style="max-width: 80%; padding: 12px 16px; background: <?= $bgColor ?>; color: <?= $textColor ?>; border-radius: 8px; <?= $isSent ? '' : 'border: 1px solid #b1b4b6;' ?>">
+                            <div class="civicone-msg-row <?= $alignClass ?>">
+                                <div class="civicone-msg-bubble <?= $bubbleClass ?>">
                                     <?= nl2br(htmlspecialchars($msg['body'] ?? '')) ?>
                                 </div>
-                                <time class="govuk-body-s" style="color: #505a5f; margin-top: 4px;" datetime="<?= $isoTime ?>">
+                                <time class="govuk-body-s civicone-msg-time" datetime="<?= $isoTime ?>">
                                     <?= $displayTime ?>
                                 </time>
                             </div>
                         <?php endforeach; ?>
                     <?php else: ?>
-                        <div class="govuk-!-padding-6 govuk-!-text-align-center" style="background: #fff; border: 1px solid #b1b4b6;">
-                            <i class="fa-solid fa-comment-dots fa-2x govuk-!-margin-bottom-2" style="color: #505a5f;" aria-hidden="true"></i>
+                        <div class="govuk-!-padding-6 govuk-!-text-align-center civicone-empty-messages">
+                            <i class="fa-solid fa-comment-dots fa-2x govuk-!-margin-bottom-2 civicone-icon-grey" aria-hidden="true"></i>
                             <p class="govuk-body govuk-!-margin-bottom-0">No messages yet. Start the conversation!</p>
                         </div>
                     <?php endif; ?>
@@ -103,15 +102,14 @@ $currentUserId = $_SESSION['user_id'] ?? 0;
 
                         <div class="govuk-form-group">
                             <label class="govuk-label govuk-visually-hidden" for="message-input">Type your message</label>
-                            <div style="display: flex; gap: 12px;">
+                            <div class="civicone-compose-row">
                                 <textarea name="body"
-                                          class="govuk-textarea govuk-!-margin-bottom-0"
-                                          style="flex: 1; resize: none;"
+                                          class="govuk-textarea govuk-!-margin-bottom-0 civicone-compose-textarea"
                                           placeholder="Type your message..."
                                           required
                                           rows="2"
                                           id="message-input"></textarea>
-                                <button type="submit" class="govuk-button govuk-!-margin-bottom-0" data-module="govuk-button" style="align-self: flex-end;">
+                                <button type="submit" class="govuk-button govuk-!-margin-bottom-0 civicone-compose-btn" data-module="govuk-button">
                                     <i class="fa-solid fa-paper-plane govuk-!-margin-right-1" aria-hidden="true"></i>
                                     Send
                                 </button>
@@ -133,21 +131,6 @@ $currentUserId = $_SESSION['user_id'] ?? 0;
 </div>
 
 <script src="/assets/js/federation-thread.js?v=<?= time() ?>"></script>
-<script>
-(function() {
-    'use strict';
-    var banner = document.getElementById('offlineBanner');
-    function updateOffline(offline) {
-        if (banner) banner.classList.toggle('govuk-!-display-none', !offline);
-    }
-    window.addEventListener('online', function() { updateOffline(false); });
-    window.addEventListener('offline', function() { updateOffline(true); });
-    if (!navigator.onLine) updateOffline(true);
-
-    // Scroll to bottom of messages
-    var container = document.getElementById('messages-container');
-    if (container) container.scrollTop = container.scrollHeight;
-})();
-</script>
+<!-- Offline indicator + scroll-to-bottom handled by civicone-common.js -->
 
 <?php require dirname(dirname(dirname(__DIR__))) . '/layouts/civicone/footer.php'; ?>

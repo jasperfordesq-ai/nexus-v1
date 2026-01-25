@@ -142,36 +142,12 @@ $isEdit = !empty($opp['id']);
     </main>
 </div>
 
+<!-- Offline indicator + form protection handled by civicone-common.js -->
 <script>
-// Offline Indicator
-(function() {
-    var banner = document.getElementById('offlineBanner');
-    if (!banner) return;
-
-    function handleOffline() {
-        banner.classList.remove('govuk-!-display-none');
-        if (navigator.vibrate) navigator.vibrate(100);
+    // Initialize form offline protection for this page
+    if (typeof CivicOne !== 'undefined') {
+        CivicOne.initFormOfflineProtection();
     }
-
-    function handleOnline() {
-        banner.classList.add('govuk-!-display-none');
-    }
-
-    window.addEventListener('online', handleOnline);
-    window.addEventListener('offline', handleOffline);
-
-    if (!navigator.onLine) {
-        handleOffline();
-    }
-})();
-
-// Form Submission Offline Protection
-document.getElementById('oppForm').addEventListener('submit', function(e) {
-    if (!navigator.onLine) {
-        e.preventDefault();
-        alert('You are offline. Please connect to the internet to save changes.');
-    }
-});
 </script>
 
 <?php require __DIR__ . '/../../layouts/civicone/footer.php'; ?>

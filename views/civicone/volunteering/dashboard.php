@@ -57,9 +57,9 @@ $basePath = \Nexus\Core\TenantContext::getBasePath();
 <div class="govuk-grid-row govuk-!-margin-bottom-6">
     <?php foreach ($myOrgs as $org): ?>
     <div class="govuk-grid-column-one-third govuk-!-margin-bottom-4">
-        <div class="govuk-!-padding-4" style="border: 1px solid #b1b4b6; border-left: 5px solid #1d70b8; height: 100%;">
+        <div class="govuk-!-padding-4 civicone-settings-card civicone-card-full-height">
             <h3 class="govuk-heading-s govuk-!-margin-bottom-2"><?= htmlspecialchars($org['name']) ?></h3>
-            <p class="govuk-body-s govuk-!-margin-bottom-4" style="color: #505a5f;">
+            <p class="govuk-body-s govuk-!-margin-bottom-4 civicone-secondary-text">
                 <?= htmlspecialchars(substr($org['description'] ?? '', 0, 100)) ?><?= strlen($org['description'] ?? '') > 100 ? '...' : '' ?>
             </p>
             <a href="<?= $basePath ?>/volunteering/org/edit/<?= $org['id'] ?>" class="govuk-button govuk-button--secondary" data-module="govuk-button">
@@ -108,18 +108,18 @@ $basePath = \Nexus\Core\TenantContext::getBasePath();
             </td>
             <td class="govuk-table__cell">
                 <?php if ($app['status'] === 'pending'): ?>
-                <form action="<?= $basePath ?>/volunteering/application/update" method="POST" style="display: inline;">
+                <form action="<?= $basePath ?>/volunteering/application/update" method="POST" class="civicone-inline">
                     <?= \Nexus\Core\Csrf::input() ?>
                     <input type="hidden" name="app_id" value="<?= $app['id'] ?>">
-                    <button type="submit" name="status" value="approved" class="govuk-button govuk-button--secondary govuk-!-margin-bottom-0" style="padding: 5px 10px;">
+                    <button type="submit" name="status" value="approved" class="govuk-button govuk-button--secondary govuk-!-margin-bottom-0 civicone-btn-compact">
                         Approve
                     </button>
-                    <button type="submit" name="status" value="declined" class="govuk-button govuk-button--warning govuk-!-margin-bottom-0" style="padding: 5px 10px;">
+                    <button type="submit" name="status" value="declined" class="govuk-button govuk-button--warning govuk-!-margin-bottom-0 civicone-btn-compact">
                         Decline
                     </button>
                 </form>
                 <?php else: ?>
-                <span style="color: #505a5f;">—</span>
+                <span class="civicone-secondary-text">—</span>
                 <?php endif; ?>
             </td>
         </tr>
@@ -147,14 +147,14 @@ $basePath = \Nexus\Core\TenantContext::getBasePath();
 <?php else: ?>
     <ul class="govuk-list govuk-!-margin-bottom-6">
         <?php foreach ($myOpps as $opp): ?>
-        <li class="govuk-!-padding-3 govuk-!-margin-bottom-2" style="border-left: 4px solid #1d70b8; background: #f8f8f8; display: flex; justify-content: space-between; align-items: center;">
+        <li class="govuk-!-padding-3 govuk-!-margin-bottom-2 civicone-list-item">
             <div>
                 <h3 class="govuk-heading-s govuk-!-margin-bottom-1">
                     <a href="<?= $basePath ?>/volunteering/<?= $opp['id'] ?>" class="govuk-link">
                         <?= htmlspecialchars($opp['title']) ?>
                     </a>
                 </h3>
-                <p class="govuk-body-s govuk-!-margin-bottom-0" style="color: #505a5f;">
+                <p class="govuk-body-s govuk-!-margin-bottom-0 civicone-secondary-text">
                     <i class="fa-solid fa-building govuk-!-margin-right-1" aria-hidden="true"></i>
                     <?= htmlspecialchars($opp['org_name'] ?? '') ?>
                     <?php if (!empty($opp['start_date'])): ?>

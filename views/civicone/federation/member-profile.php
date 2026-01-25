@@ -276,7 +276,7 @@ switch ($member['service_reach'] ?? 'local_only') {
                         <?php endif; ?>
 
                         <?php if ($pendingReviewTransaction): ?>
-                            <a href="<?= $basePath ?>/federation/review/<?= $pendingReviewTransaction ?>" class="govuk-button" style="background: #f47738;" data-module="govuk-button">
+                            <a href="<?= $basePath ?>/federation/review/<?= $pendingReviewTransaction ?>" class="govuk-button civicone-btn-orange" data-module="govuk-button">
                                 <i class="fa-solid fa-star govuk-!-margin-right-2" aria-hidden="true"></i>
                                 Leave a Review
                             </a>
@@ -297,18 +297,6 @@ switch ($member['service_reach'] ?? 'local_only') {
     </main>
 </div>
 
-<!-- Federation offline indicator -->
-<script>
-(function() {
-    'use strict';
-    var banner = document.getElementById('offlineBanner');
-    function updateOffline(offline) {
-        if (banner) banner.classList.toggle('govuk-!-display-none', !offline);
-    }
-    window.addEventListener('online', function() { updateOffline(false); });
-    window.addEventListener('offline', function() { updateOffline(true); });
-    if (!navigator.onLine) updateOffline(true);
-})();
-</script>
+<!-- Offline indicator handled by civicone-common.js -->
 
 <?php require dirname(dirname(__DIR__)) . '/layouts/civicone/footer.php'; ?>
