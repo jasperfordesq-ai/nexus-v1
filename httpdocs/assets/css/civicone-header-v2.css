@@ -99,21 +99,28 @@
 
 /* Service Name - GOV.UK govuk-link-style-text pattern */
 .govuk-service-navigation__service-name {
+    font-family: inherit;
     font-size: var(--govuk-nav-font-size);
     font-weight: 700;
 }
 
 .govuk-service-navigation__service-name .govuk-service-navigation__link {
-    color: var(--govuk-text);
+    color: var(--govuk-text); /* Black text, not blue */
     text-decoration: none;
+}
+
+.govuk-service-navigation__service-name .govuk-service-navigation__link:visited {
+    color: var(--govuk-text);
 }
 
 .govuk-service-navigation__service-name .govuk-service-navigation__link:hover {
     color: var(--govuk-text); /* NO color change on hover - text style */
     text-decoration: underline;
-    text-decoration-thickness: max(3px, 0.0625rem);
+    text-decoration-thickness: max(3px, 0.1875rem, 0.12em);
+    text-decoration-skip-ink: none;
 }
 
+.govuk-service-navigation__service-name .govuk-service-navigation__link:active,
 .govuk-service-navigation__service-name .govuk-service-navigation__link:focus {
     color: var(--govuk-text);
 }
@@ -164,21 +171,32 @@
     }
 }
 
-/* Links */
+/* Links - GOV.UK govuk-link-style-no-underline + govuk-link-style-no-visited-state */
 .govuk-service-navigation__link {
+    font-family: inherit;
     font-size: var(--govuk-nav-font-size);
     line-height: var(--govuk-nav-line-height);
-    text-decoration: none;
+    text-decoration: none; /* No underline by default - GOV.UK pattern */
 }
 
 .govuk-service-navigation__link:not(:hover):not(:focus) {
+    color: var(--govuk-nav-link); /* #16548a - blue shade-25 */
+}
+
+/* No visited state - stays same color as unvisited */
+.govuk-service-navigation__link:visited:not(:hover):not(:focus) {
     color: var(--govuk-nav-link);
 }
 
 .govuk-service-navigation__link:hover {
     text-decoration: underline;
-    text-decoration-thickness: max(3px, 0.0625rem);
+    text-decoration-thickness: max(3px, 0.1875rem, 0.12em);
+    text-decoration-skip-ink: none;
     text-underline-offset: 0.1578em;
+}
+
+.govuk-service-navigation__link:active {
+    color: var(--govuk-text);
 }
 
 .govuk-service-navigation__link:focus {
@@ -243,7 +261,16 @@
    This is a CivicOne extension following GOV.UK patterns:
    - Focus states match GOV.UK (yellow background, dual shadows)
    - Link styles match GOV.UK link patterns
-   - Typography uses GOV.UK service navigation values
+   - Typography uses GOV.UK values (16px body, 19px nav)
+
+   GOV.UK Official Colors Used:
+   - Link: #1d70b8 (blue primary)
+   - Link hover: #003078 (blue shade-50)
+   - Focus: #ffdd00 (yellow)
+   - Text: #0b0c0c (black)
+   - Secondary text: #505a5f (black tint-25)
+   - Border: #b1b4b6 (black tint-50)
+   - Light grey bg: #f3f2f1 (black tint-95)
    ============================================ */
 .civicone-nav-more {
     position: relative;
@@ -265,7 +292,8 @@
 
 .civicone-nav-more__btn:hover {
     text-decoration: underline;
-    text-decoration-thickness: max(3px, 0.0625rem);
+    text-decoration-thickness: max(3px, 0.1875rem, 0.12em);
+    text-decoration-skip-ink: none;
 }
 
 .civicone-nav-more__btn:focus {
@@ -281,7 +309,7 @@
     transform: rotate(180deg);
 }
 
-/* Dropdown Panel */
+/* Dropdown Panel - GOV.UK styled */
 .civicone-nav-dropdown {
     position: absolute;
     top: 100%;
@@ -289,11 +317,11 @@
     z-index: 1000;
     min-width: 480px;
     max-width: 640px;
-    margin-top: 10px;
-    background: var(--govuk-white);
-    border: 1px solid var(--govuk-border);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-    padding: 20px;
+    margin-top: 0; /* No gap - connects to nav */
+    background: #ffffff;
+    border: 1px solid #b1b4b6; /* GOV.UK border color */
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+    padding: 20px 25px; /* GOV.UK spacing */
 }
 
 .civicone-nav-dropdown[hidden] {
@@ -304,17 +332,21 @@
 .civicone-nav-dropdown__grid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    gap: 20px 30px;
+    gap: 25px 30px; /* GOV.UK spacing(5) and spacing(6) */
 }
 
-/* Dropdown Section */
+/* Dropdown Section Headers - GOV.UK secondary text style */
 .civicone-nav-dropdown__section h3 {
     margin: 0 0 10px 0;
-    padding: 0 0 8px 0;
-    font-size: 0.9375rem;
+    padding: 0 0 10px 0;
+    font-family: inherit;
+    font-size: 1rem; /* 16px - GOV.UK */
     font-weight: 700;
-    color: #505a5f;
-    border-bottom: 2px solid #f3f2f1;
+    line-height: 1.25;
+    color: #505a5f; /* GOV.UK secondary-text */
+    border-bottom: 1px solid #b1b4b6; /* GOV.UK border */
+    letter-spacing: 0;
+    text-transform: none;
 }
 
 .civicone-nav-dropdown__list {
@@ -323,30 +355,44 @@
     list-style: none;
 }
 
+/* Dropdown Links - GOV.UK link styles */
 .civicone-nav-dropdown__link {
     display: block;
     padding: 8px 0;
-    color: var(--govuk-link);
+    font-family: inherit;
+    font-size: 1rem; /* 16px - GOV.UK body */
+    line-height: 1.25;
+    color: #1d70b8; /* GOV.UK link color */
     text-decoration: underline;
-    font-size: 0.9375rem;
+    text-decoration-thickness: max(1px, 0.0625rem);
+    text-underline-offset: 0.1578em;
+}
+
+.civicone-nav-dropdown__link:visited {
+    color: #4c2c92; /* GOV.UK visited link */
 }
 
 .civicone-nav-dropdown__link:hover {
-    color: var(--govuk-link-hover);
-    text-decoration-thickness: 3px;
+    color: #003078; /* GOV.UK link-hover */
+    text-decoration-thickness: max(3px, 0.1875rem, 0.12em);
+    text-decoration-skip-ink: none;
+}
+
+.civicone-nav-dropdown__link:active {
+    color: #0b0c0c; /* GOV.UK link-active */
 }
 
 .civicone-nav-dropdown__link:focus {
     outline: 3px solid transparent;
-    color: var(--govuk-text);
-    background-color: var(--govuk-focus);
-    box-shadow: 0 -2px var(--govuk-focus), 0 4px var(--govuk-text);
+    color: #0b0c0c; /* GOV.UK focus-text */
+    background-color: #ffdd00; /* GOV.UK focus */
+    box-shadow: 0 -2px #ffdd00, 0 4px #0b0c0c;
     text-decoration: none;
 }
 
 .civicone-nav-dropdown__link[aria-current="page"] {
     font-weight: 700;
-    color: var(--govuk-text);
+    color: #0b0c0c;
     text-decoration: none;
 }
 
@@ -359,15 +405,15 @@
 
     .civicone-nav-dropdown__grid {
         grid-template-columns: 1fr;
-        gap: 16px;
+        gap: 20px;
     }
 }
 
 @media (max-width: 480px) {
     .civicone-nav-dropdown {
         position: fixed;
-        left: 16px;
-        right: 16px;
+        left: 15px;
+        right: 15px;
         min-width: auto;
         max-width: none;
     }

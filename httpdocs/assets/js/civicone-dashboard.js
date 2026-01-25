@@ -36,6 +36,18 @@ function toggleCivicFab() {
     btn.setAttribute('aria-expanded', !isOpen);
 }
 
+// GOV.UK FAB variant (uses govukFabMenu id)
+function toggleGovukFab() {
+    var menu = document.getElementById('govukFabMenu');
+    var btn = document.querySelector('#govukFab button');
+
+    if (!menu || !btn) return;
+
+    var isExpanded = btn.getAttribute('aria-expanded') === 'true';
+    menu.hidden = isExpanded;
+    btn.setAttribute('aria-expanded', !isExpanded);
+}
+
 // ============================================
 // Notification Settings
 // ============================================

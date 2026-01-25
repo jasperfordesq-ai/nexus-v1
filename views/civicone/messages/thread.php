@@ -72,12 +72,6 @@ $basePath = Nexus\Core\TenantContext::getBasePath();
 
 </div>
 
-<!-- Scroll to bottom script -->
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        var chatBox = document.getElementById('chat-messages');
-        chatBox.scrollTop = chatBox.scrollHeight;
-    });
-</script>
+<!-- Scroll to bottom handled by civicone-common.js initScrollToBottom() -->
 
 <?php require dirname(__DIR__, 2) . '/layouts/civicone/footer.php'; ?>

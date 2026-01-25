@@ -59,7 +59,10 @@ try {
 
 <head>
     <meta charset="UTF-8">
-    <!-- Critical scroll/layout styles - loaded first to prevent FOUC -->
+    <!-- Design Tokens MUST load first - CSS variables used by all other stylesheets -->
+    <!-- NOTE: Using non-minified - minified causes visual problems (2026-01-25) -->
+    <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/design-tokens.css?v=<?= $cssVersionTimestamp ?>">
+    <!-- Critical scroll/layout styles - loaded second to prevent FOUC -->
     <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/nexus-header-extracted.css?v=<?= $cssVersionTimestamp ?>">
     <meta name="csrf-token" content="<?= \Nexus\Core\Csrf::generate() ?>">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
@@ -86,9 +89,10 @@ try {
     <link rel="dns-prefetch" href="https://api.mapbox.com">
 
     <!-- Preload Critical CSS (above-the-fold) - Using non-minified for stability -->
-    <link rel="preload" as="style" href="<?= $assetBase ?>/assets/css/design-tokens.css?v=<?= $cssVersionTimestamp ?>">
+    <!-- Note: design-tokens.css already loaded sync above, no preload needed -->
     <link rel="preload" as="style" href="<?= $assetBase ?>/assets/css/nexus-phoenix.css?v=<?= $cssVersionTimestamp ?>">
     <link rel="preload" as="style" href="<?= $assetBase ?>/assets/css/bundles/core.css?v=<?= $cssVersionTimestamp ?>">
+
 
     <!-- Preload JavaScript (critical for interactivity) -->
     <link rel="preload" as="script" href="/assets/js/mobile-interactions.js?v=<?= $cssVersionTimestamp ?>">

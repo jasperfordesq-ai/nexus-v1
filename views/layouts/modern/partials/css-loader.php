@@ -49,9 +49,12 @@ if (!function_exists('syncCss')) {
 
 <!-- ==========================================
      1. CRITICAL CSS (Render-blocking)
-     NOTE: Using non-minified CSS for stability debugging
+     NOTE: design-tokens.css now loads FIRST in header.php
+     to ensure CSS variables are available immediately
+     Using non-minified CSS - minified causes visual problems
+     Updated: 2026-01-25 - See docs/VISUAL_FLASH_FIX_PLAN.md
      ========================================== -->
-<?= syncCss('/assets/css/design-tokens.css', $cssVersion, $assetBase) ?>
+<!-- design-tokens.css loaded in header.php (position 1) -->
 
 <?= syncCss('/assets/css/nexus-phoenix.css', $cssVersion, $assetBase) ?>
 

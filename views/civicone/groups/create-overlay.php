@@ -247,7 +247,7 @@ $isAdmin = $isAdmin ?? false;
             <div class="govuk-form-group">
                 <label class="govuk-label govuk-label--m" for="groupLocation">
                     Location
-                    <span class="govuk-hint" style="display: inline; font-size: 16px;">(optional)</span>
+                    <span class="govuk-hint civicone-hint-inline">(optional)</span>
                 </label>
                 <div class="govuk-hint" id="locationHint">Add a location to help people find your group.</div>
                 <input type="text" name="location" id="groupLocation" class="govuk-input" placeholder="City, Region, or Address" aria-describedby="locationHint">
@@ -270,7 +270,7 @@ $isAdmin = $isAdmin ?? false;
             <div class="govuk-form-group">
                 <label class="govuk-label govuk-label--m">
                     Group Image
-                    <span class="govuk-hint" style="display: inline; font-size: 16px;">(optional)</span>
+                    <span class="govuk-hint civicone-hint-inline">(optional)</span>
                 </label>
                 <div class="image-upload-area" id="uploadArea" onclick="document.getElementById('imageFile').click()" role="button" tabindex="0" aria-label="Click to upload group image" onkeypress="if(event.key==='Enter'||event.key===' ')document.getElementById('imageFile').click()">
                     <i class="fa-solid fa-image" aria-hidden="true"></i>
@@ -298,48 +298,7 @@ $isAdmin = $isAdmin ?? false;
         </div>
     </div>
 
-    <script>
-        function closeOverlay() {
-            window.history.back();
-        }
-
-        function selectType(typeId, isHub) {
-            document.getElementById('typeIdInput').value = typeId;
-            document.querySelectorAll('.type-pill').forEach(pill => {
-                const isActive = pill.dataset.typeId == typeId;
-                pill.classList.toggle('active', isActive);
-                pill.setAttribute('aria-pressed', isActive ? 'true' : 'false');
-            });
-        }
-
-        function previewImage(input) {
-            if (input.files && input.files[0]) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    document.getElementById('previewImg').src = e.target.result;
-                    document.getElementById('imagePreview').classList.add('show');
-                    document.getElementById('uploadArea').style.display = 'none';
-                };
-                reader.readAsDataURL(input.files[0]);
-            }
-        }
-
-        function removeImage(event) {
-            event.stopPropagation();
-            document.getElementById('imageFile').value = '';
-            document.getElementById('imagePreview').classList.remove('show');
-            document.getElementById('uploadArea').style.display = 'block';
-        }
-
-        // Close on Escape key
-        document.addEventListener('keydown', function(e) {
-            if (e.key === 'Escape') closeOverlay();
-        });
-
-        // Click outside to close on desktop
-        document.body.addEventListener('click', function(e) {
-            if (e.target === document.body) closeOverlay();
-        });
-    </script>
+    <!-- Overlay functions in external JS -->
+    <script src="/assets/js/civicone-groups-create-overlay.js"></script>
 </body>
 </html>

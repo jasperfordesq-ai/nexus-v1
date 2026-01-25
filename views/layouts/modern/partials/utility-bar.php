@@ -46,6 +46,14 @@ $protocol = $isSecure ? 'https://' : 'http://';
             <i class="fa-solid fa-chevron-right mode-arrow"></i>
         </button>
 
+        <?php if (!empty($GLOBALS['showLayoutSwitcher'])): ?>
+        <!-- Layout Switcher - Switch to Accessible Theme -->
+        <a href="#" data-layout-switcher="civicone" class="util-link layout-switcher-link" title="Switch to Accessible (GOV.UK) Theme">
+            <i class="fa-solid fa-universal-access"></i>
+            <span class="layout-switcher-label">Accessible</span>
+        </a>
+        <?php endif; ?>
+
         <?php
         // Federation menu - visible to all users (including guests) when federation is enabled
         $hasFederationUtilBar = false;

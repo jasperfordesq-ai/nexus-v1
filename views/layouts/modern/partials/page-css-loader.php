@@ -285,6 +285,8 @@ $pageSpecificCSS = [
 
 // =============================================================================
 // OUTPUT CSS LINKS
+// Note: Some page CSS (settings, scattered-singles) loads early in header.php
+// to prevent FOUC. This loader still runs but browsers dedupe duplicate links.
 // =============================================================================
 ?>
     <!-- Page-Specific CSS (Conditional Loading) -->

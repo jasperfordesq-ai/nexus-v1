@@ -13,6 +13,11 @@
     width: 100%;
 }
 
+/* Full width inputs (range sliders, etc.) */
+.input-full-width {
+    width: 100%;
+}
+
 /* Link without decoration */
 .link-no-decoration {
     text-decoration: none;
@@ -4941,4 +4946,109 @@
 .civicone-link-no-underline {
     text-decoration: none;
     display: block;
+}
+
+/* ==========================================
+   DOWNLOAD PAGE UTILITIES (2026-01-25)
+   ========================================== */
+
+/* Standard border for download cards */
+.civicone-border-standard {
+    border: 1px solid #b1b4b6;
+}
+
+/* Large icon display for downloads */
+.civicone-download-icon {
+    font-size: 4rem;
+}
+
+/* ==========================================
+   COMMENT COMPONENTS (GOV.UK Compliant)
+   ========================================== */
+
+/* Comment container base */
+.civicone-comment {
+    background: #f3f2f1;
+    border-radius: 0;
+    border: 1px solid #b1b4b6;
+}
+
+/* Comment depth indentation */
+.civicone-comment--depth-1 {
+    margin-left: 20px;
+}
+
+.civicone-comment--depth-2 {
+    margin-left: 40px;
+}
+
+.civicone-comment--depth-3 {
+    margin-left: 60px;
+}
+
+/* Clickable tag for reactions */
+.civicone-tag-clickable {
+    cursor: pointer;
+}
+
+.civicone-tag-clickable:hover {
+    opacity: 0.8;
+}
+
+/* Danger link style */
+.civicone-link-danger {
+    color: #d4351c;
+}
+
+.civicone-link-danger:hover {
+    color: #942514;
+}
+
+/* ==========================================
+   FLOATING ACTION BUTTON (FAB)
+   GOV.UK style mobile quick actions
+   ========================================== */
+
+/* FAB container - fixed position bottom right */
+.civicone-fab-container {
+    position: fixed;
+    bottom: 80px;
+    right: 20px;
+    z-index: 1000;
+}
+
+/* FAB button - round button */
+.civicone-fab-button {
+    border-radius: 50%;
+    width: 56px;
+    height: 56px;
+    padding: 0;
+}
+
+/* FAB icon inside button */
+.civicone-fab-icon {
+    font-size: 24px;
+}
+
+/* FAB dropdown menu */
+.civicone-fab-menu {
+    position: absolute;
+    bottom: 70px;
+    right: 0;
+    background: #fff;
+    padding: 1rem;
+    border: 1px solid #b1b4b6;
+    border-radius: 4px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    min-width: 160px;
+}
+
+/* ==========================================
+   FORM HINT UTILITIES
+   ========================================== */
+
+/* Inline hint for labels (e.g., "(optional)") */
+.civicone-hint-inline {
+    display: inline;
+    font-size: 1rem;
 }

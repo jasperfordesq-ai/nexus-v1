@@ -39,30 +39,30 @@ $basePath = \Nexus\Core\TenantContext::getBasePath();
         <div class="govuk-!-padding-6 civicone-sidebar-card">
             <h2 class="govuk-heading-m">Make a Transfer</h2>
 
-            <form action="<?= $basePath ?>/wallet/transfer" method="POST" id="civicWalletForm" onsubmit="return validateCivicWalletForm(this);">
+            <form action="<?= $basePath ?>/wallet/transfer" method="POST" id="civiconeWalletForm" onsubmit="return window.civiconeWallet.validateForm(this);">
                 <?= \Nexus\Core\Csrf::input() ?>
-                <input type="hidden" name="username" id="civicRecipientUsername" value="">
-                <input type="hidden" name="recipient_id" id="civicRecipientId" value="">
+                <input type="hidden" name="username" id="civiconeRecipientUsername" value="">
+                <input type="hidden" name="recipient_id" id="civiconeRecipientId" value="">
 
                 <!-- Selected User Display -->
-                <div class="govuk-!-padding-3 govuk-!-margin-bottom-4 civicone-panel-bg govuk-!-display-none" id="civicSelectedUser">
+                <div class="govuk-!-padding-3 govuk-!-margin-bottom-4 civicone-panel-bg" id="civiconeSelectedUser">
                     <div class="civicone-selected-user">
-                        <div id="civicSelectedAvatar" class="civicone-selected-avatar">?</div>
+                        <div id="civiconeSelectedAvatar" class="civicone-selected-avatar">?</div>
                         <div class="civicone-selected-info">
-                            <p class="govuk-body govuk-!-margin-bottom-0"><strong id="civicSelectedName">-</strong></p>
-                            <p class="govuk-body-s govuk-!-margin-bottom-0 civicone-secondary-text" id="civicSelectedUsername">-</p>
+                            <p class="govuk-body govuk-!-margin-bottom-0"><strong id="civiconeSelectedName">-</strong></p>
+                            <p class="govuk-body-s govuk-!-margin-bottom-0 civicone-secondary-text" id="civiconeSelectedUsername">-</p>
                         </div>
-                        <button type="button" onclick="clearCivicSelection()" class="govuk-button govuk-button--secondary" data-module="govuk-button" title="Clear selection">
+                        <button type="button" onclick="window.civiconeWallet.clearSelection()" class="govuk-button govuk-button--secondary" data-module="govuk-button" title="Clear selection">
                             <i class="fa-solid fa-times" aria-hidden="true"></i>
                         </button>
                     </div>
                 </div>
 
                 <!-- Search Input -->
-                <div class="govuk-form-group" id="civicSearchWrapper">
-                    <label class="govuk-label" for="civicUserSearch">Recipient</label>
-                    <input type="text" id="civicUserSearch" class="govuk-input" placeholder="Search by name or username..." autocomplete="off">
-                    <div id="civicUserResults" class="civicone-search-results govuk-!-display-none"></div>
+                <div class="govuk-form-group civicone-user-search-wrapper" id="civiconeSearchWrapper">
+                    <label class="govuk-label" for="civiconeUserSearch">Recipient</label>
+                    <input type="text" id="civiconeUserSearch" class="govuk-input" placeholder="Search by name or username..." autocomplete="off">
+                    <div id="civiconeUserResults" class="civicone-search-results"></div>
                 </div>
 
                 <div class="govuk-form-group">
@@ -75,7 +75,7 @@ $basePath = \Nexus\Core\TenantContext::getBasePath();
                     <input type="text" name="description" id="description" class="govuk-input" placeholder="Gardening help..." required>
                 </div>
 
-                <button type="submit" class="govuk-button" data-module="govuk-button" id="civicSubmitBtn">
+                <button type="submit" class="govuk-button" data-module="govuk-button" id="civiconeSubmitBtn">
                     <i class="fa-solid fa-paper-plane govuk-!-margin-right-1" aria-hidden="true"></i> Send Credits
                 </button>
             </form>
@@ -127,151 +127,17 @@ $basePath = \Nexus\Core\TenantContext::getBasePath();
     </table>
 <?php endif; ?>
 
-<script>
-(function() {
-    var searchTimeout = null;
-    var selectedIndex = -1;
-
-    var searchInput = document.getElementById('civicUserSearch');
-    var resultsDiv = document.getElementById('civicUserResults');
-    var selectedDiv = document.getElementById('civicSelectedUser');
-    var searchWrapper = document.getElementById('civicSearchWrapper');
-    var usernameInput = document.getElementById('civicRecipientUsername');
-    var recipientIdInput = document.getElementById('civicRecipientId');
-
-    if (!searchInput) return;
-
-    searchInput.addEventListener('input', function() {
-        var query = this.value.trim();
-        clearTimeout(searchTimeout);
-        selectedIndex = -1;
-
-        if (query.length < 1) {
-            resultsDiv.classList.add('govuk-!-display-none');
-            resultsDiv.innerHTML = '';
-            return;
-        }
-
-        searchTimeout = setTimeout(function() { searchCivicUsers(query); }, 200);
-    });
-
-    searchInput.addEventListener('keydown', function(e) {
-        var results = resultsDiv.querySelectorAll('.govuk-wallet-result');
-        if (!results.length) return;
-
-        if (e.key === 'ArrowDown') {
-            e.preventDefault();
-            selectedIndex = Math.min(selectedIndex + 1, results.length - 1);
-            updateResultsSelection(results);
-        } else if (e.key === 'ArrowUp') {
-            e.preventDefault();
-            selectedIndex = Math.max(selectedIndex - 1, 0);
-            updateResultsSelection(results);
-        } else if (e.key === 'Enter') {
-            e.preventDefault();
-            if (selectedIndex >= 0 && results[selectedIndex]) {
-                results[selectedIndex].click();
-            }
-        } else if (e.key === 'Escape') {
-            resultsDiv.classList.add('govuk-!-display-none');
-        }
-    });
-
-    document.addEventListener('click', function(e) {
-        if (!e.target.closest('#civicSearchWrapper')) {
-            resultsDiv.classList.add('govuk-!-display-none');
-        }
-    });
-
-    function updateResultsSelection(results) {
-        results.forEach(function(r, i) {
-            r.style.background = i === selectedIndex ? '#f3f2f1' : 'white';
-        });
-    }
-
-    window.searchCivicUsers = function(query) {
-        fetch('<?= $basePath ?>/api/wallet/user-search', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ query: query })
-        })
-        .then(function(res) { return res.json(); })
-        .then(function(data) {
-            selectedIndex = -1;
-
-            if (data.status === 'success' && data.users && data.users.length > 0) {
-                resultsDiv.innerHTML = data.users.map(function(user) {
-                    var initial = (user.display_name || '?')[0].toUpperCase();
-                    return '<div class="govuk-wallet-result civicone-search-result-item" onclick="selectCivicUser(\'' + escapeHtml(user.username || '') + '\', \'' + escapeHtml(user.display_name) + '\', \'' + escapeHtml(user.avatar_url || '') + '\', \'' + user.id + '\')">' +
-                        '<strong>' + escapeHtml(user.display_name) + '</strong>' +
-                        '<span class="civicone-secondary-text"> ' + (user.username ? '@' + escapeHtml(user.username) : '') + '</span>' +
-                    '</div>';
-                }).join('');
-                resultsDiv.classList.remove('govuk-!-display-none');
-            } else {
-                resultsDiv.innerHTML = '<div class="govuk-!-padding-3 civicone-secondary-text">No users found</div>';
-                resultsDiv.classList.remove('govuk-!-display-none');
-            }
-        })
-        .catch(function(err) {
-            console.warn('User search error:', err);
-        });
-    };
-
-    window.selectCivicUser = function(username, displayName, avatarUrl, userId) {
-        usernameInput.value = username;
-        recipientIdInput.value = userId || '';
-
-        document.getElementById('civicSelectedName').textContent = displayName;
-        document.getElementById('civicSelectedUsername').textContent = username ? '@' + username : 'No username';
-
-        selectedDiv.classList.remove('govuk-!-display-none');
-        searchWrapper.classList.add('govuk-!-display-none');
-        resultsDiv.classList.add('govuk-!-display-none');
-    };
-
-    window.clearCivicSelection = function() {
-        usernameInput.value = '';
-        recipientIdInput.value = '';
-        selectedDiv.classList.add('govuk-!-display-none');
-        searchWrapper.classList.remove('govuk-!-display-none');
-        searchInput.value = '';
-        searchInput.focus();
-    };
-
-    window.validateCivicWalletForm = function(form) {
-        var username = usernameInput.value.trim();
-        var recipientId = recipientIdInput.value.trim();
-
-        if (!username && !recipientId) {
-            alert('Please select a recipient from the search results.');
-            searchInput.focus();
-            return false;
-        }
-
-        var btn = document.getElementById('civicSubmitBtn');
-        btn.disabled = true;
-        btn.textContent = 'Sending...';
-
-        return true;
-    };
-
-    function escapeHtml(text) {
-        if (!text) return '';
-        var div = document.createElement('div');
-        div.textContent = text;
-        return div.innerHTML;
-    }
-
-    <?php if (!empty($prefillRecipient)): ?>
-    selectCivicUser(
-        <?= json_encode($prefillRecipient['username'] ?? '') ?>,
-        <?= json_encode($prefillRecipient['display_name'] ?? '') ?>,
-        <?= json_encode($prefillRecipient['avatar_url'] ?? '') ?>,
-        <?= json_encode($prefillRecipient['id'] ?? '') ?>
-    );
-    <?php endif; ?>
-})();
+<?php if (!empty($prefillRecipient)): ?>
+<!-- Prefill data for external JS -->
+<script type="application/json" id="civicone-prefill-data">
+<?= json_encode([
+    'username' => $prefillRecipient['username'] ?? '',
+    'display_name' => $prefillRecipient['display_name'] ?? '',
+    'avatar_url' => $prefillRecipient['avatar_url'] ?? '',
+    'id' => $prefillRecipient['id'] ?? ''
+]) ?>
 </script>
+<?php endif; ?>
+<!-- User search handled by civicone-wallet-index.min.js -->
 
 <?php require __DIR__ . '/../../layouts/civicone/footer.php'; ?>

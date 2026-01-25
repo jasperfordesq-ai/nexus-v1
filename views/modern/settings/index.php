@@ -30,6 +30,14 @@ if (file_exists($envPath)) {
 // Current Section
 $section = $_GET['section'] ?? 'profile';
 
+// Validate section - only allow known sections
+$validSections = ['profile', 'account', 'organizations', 'security', 'privacy', 'data_privacy', 'notifications', 'appearance', 'federation'];
+if (!in_array($section, $validSections)) {
+    // Redirect to profile if invalid section
+    header('Location: ' . TenantContext::getBasePath() . '/settings?section=profile');
+    exit;
+}
+
 // Flash Messages
 $success = $_GET['success'] ?? null;
 $error = $_GET['error'] ?? null;
@@ -37,6 +45,11 @@ $error = $_GET['error'] ?? null;
 // Hide hero section
 $hideHero = true;
 $pageTitle = 'Settings';
+
+// FOUC Prevention: Hide settings container until CSS loads
+// The full CSS in scattered-singles.css sets opacity:1 and proper layout
+// This prevents the unstyled flash while keeping CSS loading in normal position
+$additionalCSS = '<style id="settings-fouc-fix">.settings-container,.settings-ambient-bg{opacity:0;transition:opacity .15s}.settings-container.ready,.settings-ambient-bg.ready{opacity:1}</style>';
 
 require dirname(__DIR__, 2) . '/layouts/header.php';
 ?>
@@ -72,7 +85,7 @@ require dirname(__DIR__, 2) . '/layouts/header.php';
             ?>
             <?php foreach ($menu as $key => $item): ?>
                 <?php $isActive = ($section === $key); ?>
-                <a href="?section=<?= $key ?>" class="settings-nav-item <?= $isActive ? 'active' : '' ?>">
+                <a href="<?= TenantContext::getBasePath() ?>/settings?section=<?= $key ?>" class="settings-nav-item <?= $isActive ? 'active' : '' ?>">
                     <div class="settings-nav-icon">
                         <i class="fa-solid <?= $item['icon'] ?>"></i>
                     </div>
@@ -285,7 +298,7 @@ require dirname(__DIR__, 2) . '/layouts/header.php';
                 <div class="account-type-row">
                     <input type="text" value="<?= ucfirst($user['profile_type'] ?? 'Individual') ?><?= ($user['profile_type'] ?? '') === 'organisation' && !empty($user['organization_name']) ? ' (' . htmlspecialchars($user['organization_name']) . ')' : '' ?>"
                            class="settings-input account-type-input" disabled>
-                    <a href="?section=profile#profile_type_select" class="settings-btn settings-btn-secondary account-type-btn">
+                    <a href="<?= TenantContext::getBasePath() ?>/settings?section=profile#profile_type_select" class="settings-btn settings-btn-secondary account-type-btn">
                         <i class="fa-solid fa-pen"></i> Change
                     </a>
                 </div>
@@ -1851,5 +1864,13 @@ require dirname(__DIR__, 2) . '/layouts/header.php';
         <?php endif; ?>
     </main>
 </div>
+
+<script>
+// Reveal settings after CSS has loaded (FOUC prevention)
+// CSS is render-blocking so by the time this runs, styles are applied
+document.querySelectorAll('.settings-container,.settings-ambient-bg').forEach(function(el) {
+    el.classList.add('ready');
+});
+</script>
 
 <?php require dirname(__DIR__, 2) . '/layouts/footer.php'; ?>

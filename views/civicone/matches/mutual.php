@@ -65,19 +65,7 @@ $matches = $matches ?? [];
     </div>
 <?php endif; ?>
 
-<script>
-function trackMatchInteraction(listingId, action, matchScore, distance) {
-    fetch('<?= $basePath ?>/matches/interact', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-            listing_id: listingId,
-            action: action,
-            match_score: matchScore,
-            distance: distance
-        })
-    }).catch(function(err) { console.warn('Track error:', err); });
-}
-</script>
+<!-- Match tracking handled by civicone-matches.js -->
+<script src="/assets/js/civicone-matches.min.js"></script>
 
 <?php require __DIR__ . '/../../layouts/civicone/footer.php'; ?>

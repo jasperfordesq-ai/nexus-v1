@@ -116,11 +116,34 @@
     }
 
     // ============================================
+    // Preferences Sliders
+    // ============================================
+    function initPreferencesSliders() {
+        var distanceSlider = document.getElementById('distance-slider');
+        var distanceValue = document.getElementById('distance-value');
+        var scoreSlider = document.getElementById('score-slider');
+        var scoreValue = document.getElementById('score-value');
+
+        if (distanceSlider && distanceValue) {
+            distanceSlider.addEventListener('input', function() {
+                distanceValue.textContent = this.value + ' km';
+            });
+        }
+
+        if (scoreSlider && scoreValue) {
+            scoreSlider.addEventListener('input', function() {
+                scoreValue.textContent = this.value + '%';
+            });
+        }
+    }
+
+    // ============================================
     // Initialize All Features
     // ============================================
     function init() {
         initTabs();
         initViewTracking();
+        initPreferencesSliders();
     }
 
     // Run on page load
