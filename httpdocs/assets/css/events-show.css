@@ -76,9 +76,7 @@
             min-height: var(--space-12);
         }
     }
-</style>
-<style>
-    /* SCOPED STYLES for #unique-glass-page-wrapper ONLY */
+/* SCOPED STYLES for #unique-glass-page-wrapper ONLY */
     #unique-glass-page-wrapper {
         /* 
        --- DEFAULT / LIGHT MODE VARIABLES (Fallback) --- 

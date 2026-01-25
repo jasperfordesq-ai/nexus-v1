@@ -461,9 +461,7 @@
             min-height: var(--space-12);
         }
     }
-</style>
-<style>
-    /* Mobile-First Create Hub Form */
+/* Mobile-First Create Hub Form */
     .create-hub-wrapper {
         padding-top: calc(var(--space-20) * 1.5);
         padding-bottom: var(--space-10);
@@ -2174,9 +2172,7 @@
             min-height: var(--space-12);
         }
     }
-</style>
-<style>
-    .edit-wrapper {
+.edit-wrapper {
         padding-top: calc(var(--space-20) * 1.5);
         padding-bottom: calc(var(--space-20) + var(--space-5));
     }
@@ -2711,9 +2707,7 @@
             min-height: var(--space-12);
         }
     }
-</style>
-<style>
-    .invite-wrapper {
+.invite-wrapper {
         padding-top: calc(var(--space-20) * 1.5);
         padding-bottom: var(--space-10);
     }

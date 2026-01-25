@@ -142,19 +142,6 @@ body {
 }
 
 /* Animation removed for GOV.UK compliance */
-    20% {
-        transform: translate(3%, 2%) rotate(3deg) scale(1.02);
-    }
-    40% {
-        transform: translate(-2%, 4%) rotate(-2deg) scale(0.98);
-    }
-    60% {
-        transform: translate(4%, -2%) rotate(4deg) scale(1.03);
-    }
-    80% {
-        transform: translate(-3%, 3%) rotate(-3deg) scale(1.01);
-    }
-}
 
 /* ========================================
    MAIN CONTAINER
@@ -229,8 +216,6 @@ body {
 }
 
 /* Animation removed for GOV.UK compliance */
-    50% { background-position: 100% 50%; }
-}
 
 /* Theme toggle icon animation */
 .theme-icon {
@@ -282,8 +267,6 @@ body {
 }
 
 /* Animation removed for GOV.UK compliance */
-    50% { opacity: 0.6; }
-}
 
 .hero-logo {
     width: var(--space-14);
@@ -303,8 +286,6 @@ body {
 }
 
 /* Animation removed for GOV.UK compliance */
-    50% { background-position: 100% 50%; }
-}
 
 /* Inner glow ring */
 .hero-logo::after {
@@ -397,11 +378,6 @@ body {
 }
 
 /* Animation removed for GOV.UK compliance */
-    to {
-        opacity: 1;
-        transform: translateY(0) scale(1);
-    }
-}
 
 .app-icon:active {
     transform: scale(0.85);
@@ -441,8 +417,6 @@ body {
 }
 
 /* Animation removed for GOV.UK compliance */
-    50% { opacity: 0.5; transform: scale(1.05); }
-}
 
 [data-theme="dark"] .app-icon-circle .glow-ring {
     opacity: 0.4;
@@ -514,11 +488,6 @@ body {
 }
 
 /* Animation removed for GOV.UK compliance */
-    10% { transform: scale(1.1); }
-    20% { transform: scale(1); }
-    30% { transform: scale(1.08); }
-    40% { transform: scale(1); }
-}
 
 .app-icon:hover .app-icon-circle i.fa-heart {
     /* animation removed for GOV.UK compliance */
@@ -531,8 +500,6 @@ body {
 }
 
 /* Animation removed for GOV.UK compliance */
-    to { transform: rotate(360deg); }
-}
 
 .app-icon:hover .app-icon-circle i.fa-compass {
     /* animation removed for GOV.UK compliance */
@@ -579,8 +546,6 @@ body {
 }
 
 /* Animation removed for GOV.UK compliance */
-    100% { opacity: 0; transform: scale(2); }
-}
 
 /* Shimmer effect on hover */
 .app-icon-circle .shimmer {
@@ -604,8 +569,6 @@ body {
 }
 
 /* Animation removed for GOV.UK compliance */
-    100% { opacity: 0; transform: translateX(100%); }
-}
 
 /* ========================================
    DOCK BAR - FLOATING GLASSMORPHIC

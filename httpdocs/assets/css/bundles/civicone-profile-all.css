@@ -106,7 +106,6 @@
     border-radius: var(--radius-full);
     box-shadow: 0 2px 4px rgba(16, 185, 129, 0.4);
     /* animation removed for GOV.UK compliance */
-}
 
 [data-theme="dark"] .civic-online-indicator {
     border-color: var(--color-gray-800);
@@ -751,8 +750,6 @@
 }
 
 /* Animation removed for GOV.UK compliance */
-    50% { opacity: 0.5; }
-}
 
 .civicone .civicone-identity-bar__status-indicator--online {
     /* animation removed for GOV.UK compliance */
@@ -1658,7 +1655,6 @@
 .civicone .civic-toast.visible {
     display: block;
     /* animation removed for GOV.UK compliance */
-}
 
 .civicone .civic-toast.error {
     background: var(--color-govuk-red);

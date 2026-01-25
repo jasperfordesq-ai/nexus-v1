@@ -82,10 +82,7 @@
             min-height: var(--space-12);
         }
     }
-</style>
-
-<style>
-    /* SCOPED STYLES for #unique-glass-page-wrapper ONLY */
+/* SCOPED STYLES for #unique-glass-page-wrapper ONLY */
     #unique-glass-page-wrapper {
         /* 
        --- DEFAULT / LIGHT MODE VARIABLES (Fallback) --- 
@@ -191,9 +188,6 @@
 
         /* High-End Glass Effect */
         background: var(--glass-bg);
-        /* backdrop-filter removed for GOV.UK compliance */ saturate(200%);
-        -webkit-/* backdrop-filter removed for GOV.UK compliance */ saturate(200%);
-
         /* Holographic Borders & Shadows */
         border-radius: 28px;
         border: 1px solid var(--glass-border);
@@ -472,7 +466,6 @@
         border-radius: var(--radius-lg);
         box-shadow: 0 10px 25px var(--color-black-alpha-20);
         /* backdrop-filter removed for GOV.UK compliance */
-        -webkit-/* backdrop-filter removed for GOV.UK compliance */
         margin-top: var(--space-1);
         overflow: hidden;
     }

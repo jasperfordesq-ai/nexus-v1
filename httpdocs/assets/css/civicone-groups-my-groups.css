@@ -33,7 +33,6 @@
 
 #my-groups-glass-wrapper .group-card {
     /* animation removed for GOV.UK compliance */
-}
 
 .quick-action-btn:active,
 .visit-btn:active,
@@ -145,7 +144,6 @@ html {
     text-decoration: none;
     transition: all 0.3s ease;
     /* backdrop-filter removed for GOV.UK compliance */
-    -webkit-/* backdrop-filter removed for GOV.UK compliance */
 }
 
 [data-theme="light"] #my-groups-glass-wrapper .quick-action-btn {
@@ -182,8 +180,6 @@ html {
 #my-groups-glass-wrapper .group-card {
     border-radius: var(--radius-2xl);
     overflow: hidden;
-    /* backdrop-filter removed for GOV.UK compliance */ saturate(120%);
-    -webkit-/* backdrop-filter removed for GOV.UK compliance */ saturate(120%);
     transition: all 0.3s ease;
 }
 
@@ -334,8 +330,6 @@ html {
     text-align: center;
     padding: 4rem 2rem;
     border-radius: var(--radius-2xl);
-    /* backdrop-filter removed for GOV.UK compliance */ saturate(120%);
-    -webkit-/* backdrop-filter removed for GOV.UK compliance */ saturate(120%);
 }
 
 [data-theme="light"] #my-groups-glass-wrapper .empty-state {

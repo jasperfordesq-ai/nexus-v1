@@ -87,8 +87,6 @@
     padding: var(--space-4) var(--space-6);
     padding-top: calc(16px + var(--ob-safe-top));
     /* backdrop-filter removed for GOV.UK compliance */
-    -webkit-/* backdrop-filter removed for GOV.UK compliance */
-}
 
 .onboarding-header-content {
     max-width: 720px;

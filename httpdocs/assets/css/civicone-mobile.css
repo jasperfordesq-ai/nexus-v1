@@ -22,7 +22,6 @@
     z-index: 9000;
     padding: 0;
     padding-bottom: env(safe-area-inset-bottom, 0); /* iOS safe area */
-}
 
 .civic-bottom-nav-inner {
     display: flex;
@@ -485,10 +484,8 @@
 }
 
 /* Animation removed for GOV.UK compliance */
-}
 
 /* Animation removed for GOV.UK compliance */
-}
 
 .civic-toast.success {
     background: var(--civic-accent-green, var(--color-govuk-green));
@@ -864,14 +861,11 @@
 
 ::view-transition-old(root) {
     /* animation removed for GOV.UK compliance */
-}
 
 ::view-transition-new(root) {
     /* animation removed for GOV.UK compliance */
-}
 
 /* Animation removed for GOV.UK compliance */
-}
 
 /* Animation removed for GOV.UK compliance */
 }

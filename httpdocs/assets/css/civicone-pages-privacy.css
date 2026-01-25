@@ -16,7 +16,6 @@
     position: relative;
     min-height: 100vh;
     padding: 160px 1rem 4rem; /* Top padding for fixed header + utility bar on desktop */
-}
 
 @media (max-width: 900px) {
     #privacy-glass-wrapper {
@@ -175,8 +174,6 @@
 
 /* Privacy Section Card */
 #privacy-glass-wrapper .privacy-section {
-    /* backdrop-filter removed for GOV.UK compliance */ saturate(120%);
-    -webkit-/* backdrop-filter removed for GOV.UK compliance */ saturate(120%);
     border-radius: var(--radius-2xl);
     padding: 2rem;
     margin-bottom: 1.5rem;
@@ -414,8 +411,6 @@
     text-align: center;
     padding: 3rem 2rem;
     border-radius: var(--radius-2xl);
-    /* backdrop-filter removed for GOV.UK compliance */ saturate(120%);
-    -webkit-/* backdrop-filter removed for GOV.UK compliance */ saturate(120%);
     margin-top: 2rem;
 }
 

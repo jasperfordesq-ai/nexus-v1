@@ -97,7 +97,6 @@ html {
     padding: var(--space-2-5) var(--space-4-5);
     background: var(--color-white-alpha-90);
     /* backdrop-filter removed for GOV.UK compliance */
-    -webkit-/* backdrop-filter removed for GOV.UK compliance */
     border-radius: var(--radius-lg);
     color: var(--color-slate-500);
     text-decoration: none;

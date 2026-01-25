@@ -213,9 +213,6 @@ html[data-theme="dark"] #unique-glass-page-wrapper {
 
     /* High-End Glass Effect */
     background: var(--glass-bg);
-    /* backdrop-filter removed for GOV.UK compliance */ saturate(200%);
-    -webkit-/* backdrop-filter removed for GOV.UK compliance */ saturate(200%);
-
     /* Holographic Borders & Shadows */
     border-radius: var(--radius-2xl);
     border: 1px solid var(--glass-border);
@@ -303,7 +300,7 @@ html[data-theme="dark"] #unique-glass-page-wrapper {
     display: flex;
     flex-direction: column;
     /* Nested Blur not always needed if background is solid enough, but consistent here */
-    /* backdrop-filter removed for GOV.UK compliance */);
+    /* backdrop-filter removed for GOV.UK compliance */
     transition: all var(--transition-base);
 }
 

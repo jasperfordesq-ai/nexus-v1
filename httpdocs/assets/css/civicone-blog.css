@@ -71,7 +71,6 @@
 
 #news-holo-wrapper .news-hero-section {
     /* animation removed for GOV.UK compliance */
-}
 
 #news-holo-wrapper .news-card {
     /* animation removed for GOV.UK compliance */
@@ -322,7 +321,6 @@
     overflow: hidden;
     transition: all var(--transition-slow);
     /* backdrop-filter removed for GOV.UK compliance */
-    -webkit-/* backdrop-filter removed for GOV.UK compliance */
 }
 
 /* Holographic Border Glow */

@@ -32,7 +32,6 @@
     pointer-events: none;
     z-index: -1;
     /* animation removed for GOV.UK compliance */
-}
 
 [data-theme="dark"] .holo-calendar-page::before {
     background:
@@ -217,8 +216,6 @@
 /* Glass Card */
 .holo-glass-card {
     background: var(--color-white-alpha-70);
-    /* backdrop-filter removed for GOV.UK compliance */ saturate(180%);
-    -webkit-/* backdrop-filter removed for GOV.UK compliance */ saturate(180%);
     border-radius: var(--radius-2xl);
     border: 1px solid var(--color-white-alpha-50);
     box-shadow:

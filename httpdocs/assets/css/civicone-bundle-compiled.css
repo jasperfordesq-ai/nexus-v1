@@ -12,13 +12,11 @@
 html[data-layout="modern"] {
     /* Modern layout uses these CSS files exclusively */
     /* Prevent CivicOne styles from bleeding in */
-}
 
 /* CivicOne Layout Isolation */
 html[data-layout="civicone"] {
     /* CivicOne layout uses these CSS files exclusively */
     /* Prevent Modern styles from bleeding in */
-}
 
 /* === LAYOUT SWITCHING TRANSITIONS === */
 /* Smooth transition during layout switch to prevent flash of unstyled content */
@@ -65,7 +63,6 @@ html[data-layout] {
     -webkit-backface-visibility: hidden;
     backface-visibility: hidden;
     /* transform: translateZ(0) removed - breaks fixed positioning for bottom nav */
-}
 
 /* === MODERN LAYOUT SPECIFIC RESETS === */
 html[data-layout="modern"] {
@@ -203,9 +200,7 @@ body,
 [data-theme="dark"] .htb-dropdown-content {
     background: rgba(15, 23, 42, 0.85);
     border: 1px solid rgba(255, 255, 255, 0.1);
-    -webkit-/* backdrop-filter removed for GOV.UK compliance */
     /* backdrop-filter removed for GOV.UK compliance */
-}
 
 [data-theme="dark"] .htb-dropdown-content a {
     color: var(--color-slate-200) !important;
@@ -493,8 +488,6 @@ html {
         0 0 40px rgba(99, 102, 241, 0.06),
         0 0 80px rgba(168, 85, 247, 0.04),
         inset 0 1px 0 rgba(255, 255, 255, 0.8);
-    -webkit-/* backdrop-filter removed for GOV.UK compliance */ saturate(180%);
-    /* backdrop-filter removed for GOV.UK compliance */ saturate(180%);
     position: relative;
     overflow: hidden;
 }
@@ -540,7 +533,6 @@ html {
     margin-bottom: 0;
     padding: var(--space-10);
     /* Standardize padding */
-}
 
 .htb-type-badge {
     text-transform: uppercase;
@@ -580,7 +572,6 @@ html {
 .htb-card,
 .nexus-card {
     background: rgba(255, 255, 255, 0.70);
-    -webkit-/* backdrop-filter removed for GOV.UK compliance */
     /* backdrop-filter removed for GOV.UK compliance */
     border-radius: var(--htb-radius);
     box-shadow: var(--htb-shadow);
@@ -592,8 +583,7 @@ html {
 .nexus-glass,
 .nexus-card.nexus-glass {
     background: rgba(255, 255, 255, 0.65) !important;
-    -webkit-/* backdrop-filter removed for GOV.UK compliance */ !important;
-    /* backdrop-filter removed for GOV.UK compliance */ !important;
+    /* backdrop-filter removed for GOV.UK compliance */
     border: 1px solid rgba(255, 255, 255, 0.6) !important;
 }
 
@@ -957,7 +947,6 @@ table.htb-table tr:last-child td {
 .htb-tab-pane.active {
     display: block;
     /* animation removed for GOV.UK compliance */
-}
 
 /* AGENT FIX: Mobile Visibility Utilities */
 @media (max-width: 1024px) {
@@ -1047,7 +1036,6 @@ textarea.nexus-input {
     color: var(--color-slate-800);
     box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
     /* Subtle shadow polish */
-}
 
 .nexus-input:focus,
 .nexus-select:focus,
@@ -1055,7 +1043,6 @@ textarea.nexus-input:focus {
     border-color: var(--color-primary-500);
     box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.15);
     /* Softer, wider glow */
-}
 
 [data-theme='dark'] .nexus-input,
 [data-theme='dark'] .nexus-select,
@@ -1138,7 +1125,6 @@ body {
     /* Force cut-off of anything spilling over */
     position: relative;
     /* Stabilizes the overflow cut-off */
-}
 
 /* 3. Hero Header Containment */
 /* Sometimes the hero shape spills out too */
@@ -1519,7 +1505,6 @@ body {
     /* Slightly smaller to fit */
     white-space: nowrap;
     /* Prevent breaking */
-}
 
 /* Dark mode specific for semantic elements if variables aren't enough */
 body.dark-mode .civic-header {
@@ -3044,7 +3029,6 @@ body.dark-mode .civic-dropdown-content a:focus-visible {
     z-index: 9000;
     padding: 0;
     padding-bottom: env(safe-area-inset-bottom, 0); /* iOS safe area */
-}
 
 .civic-bottom-nav-inner {
     display: flex;
@@ -3512,10 +3496,8 @@ body.dark-mode .civic-skeleton {
 }
 
 /* Animation removed for GOV.UK compliance */
-}
 
 /* Animation removed for GOV.UK compliance */
-}
 
 .civic-toast.success {
     background: var(--civic-accent-green, var(--color-emerald-600));
@@ -3671,9 +3653,7 @@ body.dark-mode .civic-skeleton {
     z-index: 10001;
     opacity: 0;
     visibility: hidden;
-    -webkit-/* backdrop-filter removed for GOV.UK compliance */
     /* backdrop-filter removed for GOV.UK compliance */
-}
 
 .civic-loading-overlay.visible {
     opacity: 1;
@@ -3891,17 +3871,13 @@ body.is-offline .civic-header {
 
 ::view-transition-old(root) {
     /* animation removed for GOV.UK compliance */
-}
 
 ::view-transition-new(root) {
     /* animation removed for GOV.UK compliance */
-}
 
 /* Animation removed for GOV.UK compliance */
-}
 
 /* Animation removed for GOV.UK compliance */
-}
 
 /* Respect reduced motion for view transitions */
 @media (prefers-reduced-motion: reduce) {
@@ -4004,7 +3980,6 @@ body.is-offline .civic-header {
     cursor: pointer;
     transition: background 0.2s ease, transform 0.1s ease;
     min-height: var(--space-11); /* WCAG touch target */
-}
 
 .civic-pwa-btn-install:hover {
     background: var(--color-blue-700);
@@ -4171,9 +4146,7 @@ body.is-offline .civic-header {
     position: absolute;
     inset: 0;
     background: rgba(0, 0, 0, 0.5);
-    -webkit-/* backdrop-filter removed for GOV.UK compliance */
     /* backdrop-filter removed for GOV.UK compliance */
-}
 
 .civic-webauthn-modal-content {
     position: relative;
@@ -4323,7 +4296,6 @@ body.is-offline .civic-header {
 }
 
 /* Animation removed for GOV.UK compliance */
-}
 
 
 /* Biometric Button Styles */
@@ -4595,7 +4567,6 @@ body:not(.biometrics-available) .civic-biometric-btn {
 }
 
 /* Animation removed for GOV.UK compliance */
-}
 
 /* Card grid stagger */
 @media (prefers-reduced-motion: no-preference) {
@@ -4665,9 +4636,7 @@ body:not(.biometrics-available) .civic-biometric-btn {
     z-index: 9999;
     opacity: 0;
     visibility: hidden;
-    -webkit-/* backdrop-filter removed for GOV.UK compliance */
     /* backdrop-filter removed for GOV.UK compliance */
-}
 
 @media (prefers-reduced-motion: no-preference) {
     .civic-bottom-sheet-backdrop {
@@ -4703,9 +4672,7 @@ body.dark-mode .civic-bottom-sheet {
     inset: 0;
     background: rgba(0, 0, 0, 0.5);
     opacity: 0;
-    -webkit-/* backdrop-filter removed for GOV.UK compliance */
     /* backdrop-filter removed for GOV.UK compliance */
-}
 
 .nexus-share-sheet-content {
     position: relative;
@@ -5142,11 +5109,9 @@ body.turbo-loading .civic-btn {
 /* Default page transition - fade and slide */
 ::view-transition-old(root) {
     /* animation removed for GOV.UK compliance */
-}
 
 ::view-transition-new(root) {
     /* animation removed for GOV.UK compliance */
-}
 
 /* Animation removed for GOV.UK compliance */
     to {
@@ -5165,11 +5130,9 @@ body.turbo-loading .civic-btn {
 /* Back navigation - reverse direction */
 ::view-transition-old(root).back-nav {
     /* animation removed for GOV.UK compliance */
-}
 
 ::view-transition-new(root).back-nav {
     /* animation removed for GOV.UK compliance */
-}
 
 /* Animation removed for GOV.UK compliance */
     to {
@@ -5417,7 +5380,6 @@ body.dark-mode #civic-menu-toggle[aria-expanded="true"] .civic-hamburger {
     opacity: 0;
     visibility: hidden;
     /* Removed blur - was causing legibility issues with drawer content */
-}
 
 @media (prefers-reduced-motion: no-preference) {
     .civic-drawer-backdrop {
