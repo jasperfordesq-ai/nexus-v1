@@ -33,22 +33,22 @@ require __DIR__ . '/../../layouts/civicone/header.php';
 <a href="<?= $basePath ?>/" class="govuk-back-link govuk-!-margin-bottom-6">Back to Feed</a>
 
 <!-- Post Card -->
-<div class="govuk-!-padding-6" style="border: 1px solid #b1b4b6; max-width: 800px;">
+<div class="govuk-!-padding-6 civicone-sidebar-card" style="max-width: 800px;">
 
     <!-- Header -->
     <div class="govuk-grid-row govuk-!-margin-bottom-4">
         <div class="govuk-grid-column-three-quarters">
-            <div style="display: flex; gap: 1rem; align-items: center;">
+            <div class="civicone-feed-row">
                 <a href="<?= $basePath ?>/profile/<?= $post['user_id'] ?>">
                     <img src="<?= !empty($post['author_avatar']) ? htmlspecialchars($post['author_avatar']) : '/assets/img/defaults/default_avatar.webp' ?>"
                          alt=""
-                         style="width: 48px; height: 48px; border-radius: 50%;">
+                         class="civicone-avatar--48">
                 </a>
                 <div>
                     <p class="govuk-body govuk-!-margin-bottom-0">
                         <strong><?= htmlspecialchars($post['author_name']) ?></strong>
                     </p>
-                    <p class="govuk-body-s govuk-!-margin-bottom-0" style="color: #505a5f;">
+                    <p class="govuk-body-s govuk-!-margin-bottom-0 civicone-secondary-text">
                         <i class="fa-regular fa-clock govuk-!-margin-right-1" aria-hidden="true"></i>
                         <?= date('M j, Y \a\t g:i a', strtotime($post['created_at'])) ?>
                         <?php if (isset($post['visibility'])): ?>
@@ -76,7 +76,7 @@ require __DIR__ . '/../../layouts/civicone/header.php';
 
     <!-- Image -->
     <?php if (!empty($post['image_url'])): ?>
-        <img src="<?= htmlspecialchars($post['image_url']) ?>" alt="Post image" class="govuk-!-margin-bottom-4" style="max-width: 100%; height: auto;">
+        <img src="<?= htmlspecialchars($post['image_url']) ?>" alt="Post image" class="govuk-!-margin-bottom-4 civicone-responsive-image">
     <?php endif; ?>
 
     <!-- Stats Bar -->
@@ -123,9 +123,9 @@ require __DIR__ . '/../../layouts/civicone/header.php';
         <?php if ($isLoggedIn): ?>
         <div class="govuk-form-group govuk-!-margin-bottom-6">
             <label class="govuk-label" for="comment-input">Write a comment</label>
-            <div style="display: flex; gap: 1rem;">
-                <img src="<?= htmlspecialchars($userAvatar) ?>" alt="" style="width: 40px; height: 40px; border-radius: 50%;">
-                <div style="flex: 1;">
+            <div class="civicone-feed-row">
+                <img src="<?= htmlspecialchars($userAvatar) ?>" alt="" class="civicone-table-avatar">
+                <div class="civicone-flex-grow">
                     <input type="text"
                            id="comment-input"
                            class="govuk-input"

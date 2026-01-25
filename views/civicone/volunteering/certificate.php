@@ -93,7 +93,7 @@ require __DIR__ . '/../../layouts/civicone/header.php';
         <div class="govuk-grid-row no-print">
             <div class="govuk-grid-column-two-thirds">
                 <h1 class="govuk-heading-xl">
-                    <i class="fa-solid fa-award govuk-!-margin-right-2" style="color: #f47738;" aria-hidden="true"></i>
+                    <i class="fa-solid fa-award govuk-!-margin-right-2 civicone-icon-orange" aria-hidden="true"></i>
                     Volunteer Certificate
                 </h1>
                 <p class="govuk-body-l">Your verified volunteering record</p>
@@ -142,20 +142,20 @@ require __DIR__ . '/../../layouts/civicone/header.php';
         <!-- Stats Row -->
         <div class="govuk-grid-row govuk-!-margin-bottom-6 no-print">
             <div class="govuk-grid-column-one-third">
-                <div class="govuk-!-padding-4 govuk-!-text-align-center civicone-panel-bg" style="border-left: 5px solid #00703c;">
-                    <p class="govuk-heading-xl govuk-!-margin-bottom-1" style="color: #00703c;"><?= number_format($displayHours, 1) ?></p>
+                <div class="govuk-!-padding-4 govuk-!-text-align-center civicone-panel-bg civicone-border-left-green">
+                    <p class="govuk-heading-xl govuk-!-margin-bottom-1 civicone-heading-green"><?= number_format($displayHours, 1) ?></p>
                     <p class="govuk-body-s govuk-!-margin-bottom-0">Total Verified Hours</p>
                 </div>
             </div>
             <div class="govuk-grid-column-one-third">
-                <div class="govuk-!-padding-4 govuk-!-text-align-center civicone-panel-bg" style="border-left: 5px solid #1d70b8;">
-                    <p class="govuk-heading-xl govuk-!-margin-bottom-1" style="color: #1d70b8;"><?= $displayActivities ?></p>
+                <div class="govuk-!-padding-4 govuk-!-text-align-center civicone-panel-bg civicone-border-left-blue">
+                    <p class="govuk-heading-xl govuk-!-margin-bottom-1 civicone-heading-blue"><?= $displayActivities ?></p>
                     <p class="govuk-body-s govuk-!-margin-bottom-0">Activities Completed</p>
                 </div>
             </div>
             <div class="govuk-grid-column-one-third">
-                <div class="govuk-!-padding-4 govuk-!-text-align-center civicone-panel-bg" style="border-left: 5px solid #f47738;">
-                    <p class="govuk-heading-xl govuk-!-margin-bottom-1" style="color: #f47738;"><?= $displayOrgs ?></p>
+                <div class="govuk-!-padding-4 govuk-!-text-align-center civicone-panel-bg civicone-border-left-orange">
+                    <p class="govuk-heading-xl govuk-!-margin-bottom-1 civicone-heading-orange"><?= $displayOrgs ?></p>
                     <p class="govuk-body-s govuk-!-margin-bottom-0">Organizations Helped</p>
                 </div>
             </div>
@@ -163,17 +163,17 @@ require __DIR__ . '/../../layouts/civicone/header.php';
 
         <?php if ($totalHours > 0 || $previewMode): ?>
             <!-- Certificate Preview -->
-            <div class="govuk-!-margin-bottom-6" style="background: white; border: 1px solid #b1b4b6;">
-                <div class="govuk-!-padding-3 civicone-panel-bg" style="border-bottom: 1px solid #b1b4b6;">
+            <div class="govuk-!-margin-bottom-6 civicone-section-card">
+                <div class="govuk-!-padding-3 civicone-panel-bg civicone-section-card-header">
                     <div class="govuk-grid-row">
                         <div class="govuk-grid-column-two-thirds">
                             <h2 class="govuk-heading-s govuk-!-margin-bottom-0">
-                                <i class="fa-solid fa-scroll govuk-!-margin-right-2" style="color: #1d70b8;" aria-hidden="true"></i>
+                                <i class="fa-solid fa-scroll govuk-!-margin-right-2 civicone-icon-blue" aria-hidden="true"></i>
                                 Certificate Preview
                             </h2>
                         </div>
                         <div class="govuk-grid-column-one-third govuk-!-text-align-right">
-                            <strong class="govuk-tag" style="background: <?= $previewMode ? '#f47738' : '#00703c' ?>;">
+                            <strong class="govuk-tag <?= $previewMode ? 'govuk-tag--orange' : 'govuk-tag--green' ?>">
                                 <?= $previewMode ? 'Sample' : 'Official' ?>
                             </strong>
                         </div>
@@ -181,13 +181,13 @@ require __DIR__ . '/../../layouts/civicone/header.php';
                 </div>
 
                 <!-- Certificate Content -->
-                <div class="govuk-!-padding-6 certificate-print" style="text-align: center; border: 2px solid #1d70b8; margin: 20px;">
-                    <p class="govuk-body govuk-!-margin-bottom-2" style="color: #505a5f; text-transform: uppercase; letter-spacing: 3px;">Certificate</p>
-                    <h2 class="govuk-heading-l govuk-!-margin-bottom-4" style="color: #1d70b8;">Volunteer Service</h2>
+                <div class="govuk-!-padding-6 certificate-print civicone-certificate-content">
+                    <p class="govuk-body govuk-!-margin-bottom-2 civicone-certificate-subtitle">Certificate</p>
+                    <h2 class="govuk-heading-l govuk-!-margin-bottom-4 civicone-certificate-heading">Volunteer Service</h2>
 
                     <p class="govuk-body govuk-!-margin-bottom-2">This is to certify that</p>
 
-                    <p class="govuk-heading-m govuk-!-margin-bottom-4" style="border-bottom: 2px solid #1d70b8; display: inline-block; padding: 0 40px 8px;">
+                    <p class="govuk-heading-m govuk-!-margin-bottom-4 civicone-certificate-name">
                         <?= htmlspecialchars($userName) ?>
                     </p>
 
@@ -197,20 +197,20 @@ require __DIR__ . '/../../layouts/civicone/header.php';
                     </p>
 
                     <div class="govuk-!-margin-bottom-4">
-                        <span class="govuk-heading-xl" style="color: #00703c; display: inline;"><?= number_format($displayHours, 1) ?></span>
-                        <span class="govuk-heading-m" style="color: #00703c; display: inline;">Hours</span>
+                        <span class="govuk-heading-xl civicone-heading-green civicone-certificate-hours"><?= number_format($displayHours, 1) ?></span>
+                        <span class="govuk-heading-m civicone-heading-green civicone-certificate-hours">Hours</span>
                     </div>
 
                     <p class="govuk-body govuk-!-margin-bottom-6">of voluntary service.</p>
 
                     <div class="govuk-grid-row govuk-!-margin-top-8">
                         <div class="govuk-grid-column-one-half">
-                            <div style="border-top: 1px solid #b1b4b6; padding-top: 8px;">
+                            <div class="civicone-certificate-signature">
                                 <p class="govuk-body-s govuk-!-margin-bottom-0">Date: <?= $date ?></p>
                             </div>
                         </div>
                         <div class="govuk-grid-column-one-half">
-                            <div style="border-top: 1px solid #b1b4b6; padding-top: 8px;">
+                            <div class="civicone-certificate-signature">
                                 <p class="govuk-body-s govuk-!-font-weight-bold govuk-!-margin-bottom-0"><?= htmlspecialchars($tenantName) ?></p>
                                 <p class="govuk-body-s govuk-!-margin-bottom-0">Authorized Signature</p>
                             </div>
@@ -222,16 +222,16 @@ require __DIR__ . '/../../layouts/civicone/header.php';
             <!-- Print Tip -->
             <div class="govuk-inset-text no-print">
                 <p class="govuk-body govuk-!-margin-bottom-0">
-                    <i class="fa-solid fa-lightbulb govuk-!-margin-right-2" style="color: #f47738;" aria-hidden="true"></i>
+                    <i class="fa-solid fa-lightbulb govuk-!-margin-right-2 civicone-icon-orange" aria-hidden="true"></i>
                     <strong>Print Tip:</strong> For a clean certificate, click "More settings" in the print dialog and uncheck "Headers and footers". You can also save as PDF.
                 </p>
             </div>
 
         <?php else: ?>
             <!-- No Hours Message -->
-            <div class="govuk-!-padding-6 govuk-!-text-align-center civicone-panel-bg" style="border-left: 5px solid #1d70b8;">
+            <div class="govuk-!-padding-6 govuk-!-text-align-center civicone-panel-bg civicone-border-left-blue">
                 <p class="govuk-body govuk-!-margin-bottom-4">
-                    <i class="fa-solid fa-hourglass-half fa-3x" style="color: #1d70b8;" aria-hidden="true"></i>
+                    <i class="fa-solid fa-hourglass-half fa-3x civicone-icon-blue" aria-hidden="true"></i>
                 </p>
                 <h2 class="govuk-heading-l">No Verified Hours Yet</h2>
                 <p class="govuk-body govuk-!-margin-bottom-6">
@@ -248,7 +248,7 @@ require __DIR__ . '/../../layouts/civicone/header.php';
         <?php if (!empty($displayLogs)): ?>
             <div class="govuk-!-margin-top-6 no-print">
                 <h3 class="govuk-heading-m">
-                    <i class="fa-solid fa-clock-rotate-left govuk-!-margin-right-2" style="color: #1d70b8;" aria-hidden="true"></i>
+                    <i class="fa-solid fa-clock-rotate-left govuk-!-margin-right-2 civicone-icon-blue" aria-hidden="true"></i>
                     <?= $previewMode ? 'Sample Activity Log' : 'Verified Activity Log' ?>
                 </h3>
 
@@ -266,7 +266,7 @@ require __DIR__ . '/../../layouts/civicone/header.php';
                                 <td class="govuk-table__cell"><?= htmlspecialchars($log['org_name'] ?? 'Volunteer Activity') ?></td>
                                 <td class="govuk-table__cell"><?= date('M j, Y', strtotime($log['date_logged'])) ?></td>
                                 <td class="govuk-table__cell govuk-table__cell--numeric">
-                                    <strong class="govuk-tag" style="background: #00703c;"><?= $log['hours'] ?>h</strong>
+                                    <strong class="govuk-tag govuk-tag--green"><?= $log['hours'] ?>h</strong>
                                 </td>
                             </tr>
                         <?php endforeach; ?>

@@ -128,7 +128,7 @@ $appIcons = [
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
     <!-- GOV.UK Frontend -->
-    <link rel="stylesheet" href="/assets/css/govuk-frontend.min.css">
+    <link rel="stylesheet" href="/assets/govuk-frontend-5.14.0/govuk-frontend.min.css">
 
     <!-- Google Fonts - Inter -->
     <link rel="preconnect" href="https://fonts.googleapis.com">

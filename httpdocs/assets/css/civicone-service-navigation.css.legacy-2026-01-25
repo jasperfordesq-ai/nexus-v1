@@ -233,6 +233,65 @@
    Responsive Adjustments
    ============================================ */
 
+/* QUICK WIN #1: Mobile navigation stacking (GOV.UK official pattern) */
+@media (max-width: 640px) {
+    .govuk-service-navigation__container {
+        flex-direction: column !important;
+        align-items: flex-start !important;
+        gap: 0 !important;
+    }
+
+    .govuk-service-navigation__wrapper {
+        width: 100%;
+    }
+
+    .govuk-service-navigation__list {
+        flex-direction: column;
+        align-items: flex-start;
+        width: 100%;
+        gap: 0;
+    }
+
+    .govuk-service-navigation__item {
+        width: 100%;
+    }
+
+    .govuk-service-navigation__item:not(:last-child) {
+        margin-right: 0;
+        margin-bottom: 0;
+    }
+
+    .govuk-service-navigation__link {
+        padding: 10px 0;
+        line-height: 1.31579; /* Mobile: 25/19 exact */
+        border-bottom: 0;
+        border-left: 5px solid transparent;
+        padding-left: 15px;
+        margin-left: -15px;
+        width: 100%;
+    }
+
+    .govuk-service-navigation__link:hover {
+        border-bottom-color: transparent;
+        border-left-color: var(--color-gray-600, #505a5f);
+    }
+
+    .govuk-service-navigation__item--active .govuk-service-navigation__link,
+    .govuk-service-navigation__link[aria-current="page"] {
+        border-bottom-color: transparent;
+        border-left-color: #144e81;
+        border-left-width: 5px;
+    }
+
+    .govuk-service-navigation__service-name .govuk-service-navigation__link {
+        padding: 10px 0;
+        line-height: 1.31579;
+        border-left: 0;
+        padding-left: 0;
+        margin-left: 0;
+    }
+}
+
 /* Tablet - single column grid */
 @media (max-width: 768px) {
     .govuk-service-navigation__dropdown {

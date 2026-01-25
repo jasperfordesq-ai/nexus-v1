@@ -41,7 +41,7 @@ $basePath = \Nexus\Core\TenantContext::getBasePath();
 
             <!-- Filters Panel (1/3) -->
             <div class="govuk-grid-column-one-third">
-                <div class="govuk-!-padding-4 civicone-panel-bg" style="margin-bottom: 1.5rem;">
+                <div class="govuk-!-padding-4 govuk-!-margin-bottom-6 civicone-panel-bg">
                     <h2 class="govuk-heading-m">Filter events</h2>
 
                     <form method="get" action="<?= $basePath ?>/events">
@@ -167,13 +167,13 @@ $basePath = \Nexus\Core\TenantContext::getBasePath();
                             $organizerName = htmlspecialchars($ev['organizer_name'] ?? 'Organizer');
                             $attendeeCount = $ev['attendee_count'] ?? 0;
                             ?>
-                            <li class="govuk-!-margin-bottom-4 govuk-!-padding-bottom-4" style="border-bottom: 1px solid #b1b4b6;">
+                            <li class="govuk-!-margin-bottom-4 govuk-!-padding-bottom-4 civicone-listing-item">
                                 <!-- Date & Type -->
                                 <p class="govuk-body-s govuk-!-margin-bottom-1">
-                                    <strong class="govuk-tag <?= $isOnline ? 'govuk-tag--blue' : 'govuk-tag--green' ?>">
+                                    <strong class="govuk-tag <?= $isOnline ? 'govuk-tag--light-blue' : 'govuk-tag--green' ?>">
                                         <?= $isOnline ? 'Online' : 'In-person' ?>
                                     </strong>
-                                    <span style="color: #505a5f;">&middot; <?= $eventDateFormatted ?> at <?= $eventTime ?></span>
+                                    <span class="civicone-secondary-text">&middot; <?= $eventDateFormatted ?> at <?= $eventTime ?></span>
                                 </p>
 
                                 <!-- Title -->
@@ -187,7 +187,7 @@ $basePath = \Nexus\Core\TenantContext::getBasePath();
                                 <p class="govuk-body govuk-!-margin-bottom-2"><?= $eventDesc ?></p>
 
                                 <!-- Meta -->
-                                <p class="govuk-body-s govuk-!-margin-bottom-2" style="color: #505a5f;">
+                                <p class="govuk-body-s govuk-!-margin-bottom-2 civicone-secondary-text">
                                     <i class="fa-solid fa-location-dot govuk-!-margin-right-1" aria-hidden="true"></i>
                                     <?= $eventLocation ?>
                                     &middot; Hosted by <strong><?= $organizerName ?></strong>

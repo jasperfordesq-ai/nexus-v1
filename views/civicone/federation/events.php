@@ -217,7 +217,7 @@ if (isset($filters['upcoming_only']) && !$filters['upcoming_only']) {
                                             <dd class="govuk-summary-list__value">
                                                 <?= htmlspecialchars($event['location']) ?>
                                                 <?php if (!empty($event['allow_remote_attendance'])): ?>
-                                                    <span class="govuk-tag govuk-tag--blue govuk-!-margin-left-2">Remote OK</span>
+                                                    <span class="govuk-tag govuk-tag--light-blue govuk-!-margin-left-2">Remote OK</span>
                                                 <?php endif; ?>
                                             </dd>
                                         </div>

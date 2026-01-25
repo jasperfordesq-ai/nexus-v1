@@ -26,7 +26,7 @@ $basePath = \Nexus\Core\TenantContext::getBasePath();
         <div class="govuk-grid-row">
             <div class="govuk-grid-column-full">
                 <h2 class="govuk-heading-l">
-                    <i class="fa-solid fa-inbox govuk-!-margin-right-2" style="color: #1d70b8;" aria-hidden="true"></i>
+                    <i class="fa-solid fa-inbox govuk-!-margin-right-2 civicone-icon-blue" aria-hidden="true"></i>
                     Transfer Requests
                 </h2>
 
@@ -34,24 +34,24 @@ $basePath = \Nexus\Core\TenantContext::getBasePath();
                 <div class="govuk-!-margin-bottom-4">
                     <div class="govuk-button-group">
                         <button type="button" class="govuk-button filter-tab active" data-filter="all" onclick="filterRequests('all')">
-                            All <strong class="govuk-tag govuk-!-margin-left-2" style="background: #505a5f;"><?= count($requests) ?></strong>
+                            All <strong class="govuk-tag govuk-tag--grey govuk-!-margin-left-2"><?= count($requests) ?></strong>
                         </button>
                         <button type="button" class="govuk-button govuk-button--secondary filter-tab" data-filter="pending" onclick="filterRequests('pending')">
-                            Pending <strong class="govuk-tag govuk-!-margin-left-2" style="background: #1d70b8;"><?= count(array_filter($requests, fn($r) => $r['status'] === 'pending')) ?></strong>
+                            Pending <strong class="govuk-tag govuk-tag--blue govuk-!-margin-left-2"><?= count(array_filter($requests, fn($r) => $r['status'] === 'pending')) ?></strong>
                         </button>
                         <button type="button" class="govuk-button govuk-button--secondary filter-tab" data-filter="approved" onclick="filterRequests('approved')">
-                            Approved <strong class="govuk-tag govuk-!-margin-left-2" style="background: #00703c;"><?= count(array_filter($requests, fn($r) => $r['status'] === 'approved')) ?></strong>
+                            Approved <strong class="govuk-tag govuk-tag--green govuk-!-margin-left-2"><?= count(array_filter($requests, fn($r) => $r['status'] === 'approved')) ?></strong>
                         </button>
                         <button type="button" class="govuk-button govuk-button--secondary filter-tab" data-filter="rejected" onclick="filterRequests('rejected')">
-                            Rejected <strong class="govuk-tag govuk-!-margin-left-2" style="background: #d4351c;"><?= count(array_filter($requests, fn($r) => $r['status'] === 'rejected')) ?></strong>
+                            Rejected <strong class="govuk-tag govuk-tag--red govuk-!-margin-left-2"><?= count(array_filter($requests, fn($r) => $r['status'] === 'rejected')) ?></strong>
                         </button>
                     </div>
                 </div>
 
                 <?php if (empty($requests)): ?>
-                    <div class="govuk-!-padding-6 govuk-!-text-align-center civicone-panel-bg" style="border-left: 5px solid #1d70b8;">
+                    <div class="govuk-!-padding-6 govuk-!-text-align-center civicone-panel-bg civicone-border-left-blue">
                         <p class="govuk-body govuk-!-margin-bottom-4">
-                            <i class="fa-solid fa-inbox fa-3x" style="color: #1d70b8;" aria-hidden="true"></i>
+                            <i class="fa-solid fa-inbox fa-3x civicone-icon-blue" aria-hidden="true"></i>
                         </p>
                         <h3 class="govuk-heading-m">No transfer requests yet</h3>
                         <p class="govuk-body govuk-!-margin-bottom-0">
@@ -75,23 +75,23 @@ $basePath = \Nexus\Core\TenantContext::getBasePath();
                             <?php foreach ($requests as $request): ?>
                                 <tr class="govuk-table__row" data-status="<?= $request['status'] ?>">
                                     <td class="govuk-table__cell">
-                                        <div style="display: flex; align-items: center; gap: 8px;">
-                                            <div style="width: 32px; height: 32px; border-radius: 50%; background: #1d70b8; color: white; display: flex; align-items: center; justify-content: center; font-size: 14px;">
+                                        <div class="civicone-user-cell">
+                                            <div class="civicone-avatar-sm civicone-avatar-blue">
                                                 <?= strtoupper(substr($request['requester_name'] ?? 'U', 0, 1)) ?>
                                             </div>
                                             <span><?= htmlspecialchars($request['requester_name']) ?></span>
                                         </div>
                                     </td>
                                     <td class="govuk-table__cell">
-                                        <div style="display: flex; align-items: center; gap: 8px;">
-                                            <div style="width: 32px; height: 32px; border-radius: 50%; background: #00703c; color: white; display: flex; align-items: center; justify-content: center; font-size: 14px;">
+                                        <div class="civicone-user-cell">
+                                            <div class="civicone-avatar-sm civicone-avatar-green">
                                                 <?= strtoupper(substr($request['recipient_name'] ?? 'U', 0, 1)) ?>
                                             </div>
                                             <span><?= htmlspecialchars($request['recipient_name']) ?></span>
                                         </div>
                                     </td>
                                     <td class="govuk-table__cell govuk-table__cell--numeric">
-                                        <strong class="govuk-tag" style="background: #1d70b8;">
+                                        <strong class="govuk-tag govuk-tag--blue">
                                             <?= number_format($request['amount'], 1) ?> HRS
                                         </strong>
                                     </td>
@@ -102,15 +102,15 @@ $basePath = \Nexus\Core\TenantContext::getBasePath();
                                     </td>
                                     <td class="govuk-table__cell">
                                         <?php
-                                        $statusColors = [
-                                            'pending' => ['bg' => '#1d70b8', 'icon' => 'fa-clock'],
-                                            'approved' => ['bg' => '#00703c', 'icon' => 'fa-check'],
-                                            'rejected' => ['bg' => '#d4351c', 'icon' => 'fa-times'],
-                                            'cancelled' => ['bg' => '#505a5f', 'icon' => 'fa-ban']
+                                        $statusConfig = [
+                                            'pending' => ['class' => 'govuk-tag--blue', 'icon' => 'fa-clock'],
+                                            'approved' => ['class' => 'govuk-tag--green', 'icon' => 'fa-check'],
+                                            'rejected' => ['class' => 'govuk-tag--red', 'icon' => 'fa-times'],
+                                            'cancelled' => ['class' => 'govuk-tag--grey', 'icon' => 'fa-ban']
                                         ];
-                                        $statusInfo = $statusColors[$request['status']] ?? $statusColors['pending'];
+                                        $statusInfo = $statusConfig[$request['status']] ?? $statusConfig['pending'];
                                         ?>
-                                        <strong class="govuk-tag" style="background: <?= $statusInfo['bg'] ?>;">
+                                        <strong class="govuk-tag <?= $statusInfo['class'] ?>">
                                             <i class="fa-solid <?= $statusInfo['icon'] ?> govuk-!-margin-right-1" aria-hidden="true"></i>
                                             <?= ucfirst($request['status']) ?>
                                         </strong>
@@ -121,14 +121,14 @@ $basePath = \Nexus\Core\TenantContext::getBasePath();
                                     <td class="govuk-table__cell">
                                         <?php if ($request['status'] === 'pending'): ?>
                                             <div class="govuk-button-group">
-                                                <form action="<?= $basePath ?>/organizations/<?= $org['id'] ?>/wallet/approve/<?= $request['id'] ?>" method="POST" style="display: inline;">
+                                                <form action="<?= $basePath ?>/organizations/<?= $org['id'] ?>/wallet/approve/<?= $request['id'] ?>" method="POST" class="civicone-inline-form">
                                                     <?= \Nexus\Core\Csrf::input() ?>
-                                                    <button type="submit" class="govuk-button govuk-!-margin-bottom-0" data-module="govuk-button" style="background: #00703c;">
+                                                    <button type="submit" class="govuk-button civicone-btn-green govuk-!-margin-bottom-0" data-module="govuk-button">
                                                         <i class="fa-solid fa-check govuk-!-margin-right-1" aria-hidden="true"></i>
                                                         Approve
                                                     </button>
                                                 </form>
-                                                <form action="<?= $basePath ?>/organizations/<?= $org['id'] ?>/wallet/reject/<?= $request['id'] ?>" method="POST" style="display: inline;"
+                                                <form action="<?= $basePath ?>/organizations/<?= $org['id'] ?>/wallet/reject/<?= $request['id'] ?>" method="POST" class="civicone-inline-form"
                                                       onsubmit="return promptRejectReason(this, <?= $request['id'] ?>);">
                                                     <?= \Nexus\Core\Csrf::input() ?>
                                                     <input type="hidden" name="reason" id="rejectReason_<?= $request['id'] ?>">

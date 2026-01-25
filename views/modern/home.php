@@ -1267,12 +1267,7 @@ if (class_exists($dbClass)) {
 }
 
 // 5. LOAD MODERN HEADER
-// Add home feed CSS - standard load
-$cssVersion = '2.5.1';
-$additionalCSS = '
-<link rel="stylesheet" href="/assets/css/nexus-home.css?v=' . $cssVersion . '">
-<link rel="stylesheet" href="/assets/css/feed-empty-state.css?v=' . $cssVersion . '">
-<link rel="stylesheet" href="/assets/css/sidebar.css?v=' . $cssVersion . '">';
+// CSS now loaded via centralized page-css-loader.php (Phase 4 CSS Refactoring)
 require __DIR__ . '/../layouts/modern/header.php';
 ?>
 

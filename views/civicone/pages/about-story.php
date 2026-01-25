@@ -32,7 +32,7 @@ require dirname(__DIR__, 2) . '/layouts/civicone/header.php';
 <div class="govuk-notification-banner govuk-notification-banner--success govuk-!-margin-bottom-6" role="region" aria-labelledby="hero-title">
     <div class="govuk-notification-banner__header">
         <h2 class="govuk-notification-banner__title" id="hero-title">
-            <span class="govuk-tag govuk-tag--blue govuk-!-margin-right-2">HOUR TIMEBANK CLG</span>
+            <span class="govuk-tag govuk-tag--light-blue govuk-!-margin-right-2">HOUR TIMEBANK CLG</span>
         </h2>
     </div>
     <div class="govuk-notification-banner__content">
@@ -124,7 +124,7 @@ require dirname(__DIR__, 2) . '/layouts/civicone/header.php';
 
             <div class="govuk-!-margin-bottom-4">
                 <span class="govuk-tag govuk-tag--green govuk-!-margin-right-2">Registered Charity</span>
-                <span class="govuk-tag govuk-tag--blue govuk-!-margin-right-2">Rethink Ireland Awardee</span>
+                <span class="govuk-tag govuk-tag--light-blue govuk-!-margin-right-2">Rethink Ireland Awardee</span>
                 <span class="govuk-tag govuk-tag--purple">1:16 SROI Impact</span>
             </div>
         </div>

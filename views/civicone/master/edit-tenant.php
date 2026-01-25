@@ -16,17 +16,17 @@ require dirname(__DIR__, 2) . '/layouts/civicone/header.php';
 $feats = json_decode($targetTenant['features'] ?? '[]', true);
 $config = json_decode($targetTenant['configuration'] ?? '[]', true);
 
-// Module Definitions for UI
+// Module Definitions for UI (using CSS class suffixes)
 $modules = [
-    'listings' => ['icon' => 'fa-list', 'label' => 'Offers & Requests', 'color' => '#1d70b8'],
-    'groups' => ['icon' => 'fa-users', 'label' => 'Local Hubs', 'color' => '#912b88'],
-    'wallet' => ['icon' => 'fa-wallet', 'label' => 'Wallet & Transactions', 'color' => '#00703c'],
-    'volunteering' => ['icon' => 'fa-heart', 'label' => 'Volunteering', 'color' => '#f47738'],
-    'events' => ['icon' => 'fa-calendar', 'label' => 'Events', 'color' => '#d53880'],
-    'resources' => ['icon' => 'fa-book', 'label' => 'Resource Library', 'color' => '#5694ca'],
-    'polls' => ['icon' => 'fa-chart-bar', 'label' => 'Live Polls', 'color' => '#28a197'],
-    'goals' => ['icon' => 'fa-trophy', 'label' => 'Goal Buddy', 'color' => '#b58840'],
-    'blog' => ['icon' => 'fa-pen', 'label' => 'News / Blog', 'color' => '#4c2c92'],
+    'listings' => ['icon' => 'fa-list', 'label' => 'Offers & Requests', 'colorClass' => 'blue'],
+    'groups' => ['icon' => 'fa-users', 'label' => 'Local Hubs', 'colorClass' => 'purple'],
+    'wallet' => ['icon' => 'fa-wallet', 'label' => 'Wallet & Transactions', 'colorClass' => 'green'],
+    'volunteering' => ['icon' => 'fa-heart', 'label' => 'Volunteering', 'colorClass' => 'orange'],
+    'events' => ['icon' => 'fa-calendar', 'label' => 'Events', 'colorClass' => 'pink'],
+    'resources' => ['icon' => 'fa-book', 'label' => 'Resource Library', 'colorClass' => 'light-blue'],
+    'polls' => ['icon' => 'fa-chart-bar', 'label' => 'Live Polls', 'colorClass' => 'teal'],
+    'goals' => ['icon' => 'fa-trophy', 'label' => 'Goal Buddy', 'colorClass' => 'brown'],
+    'blog' => ['icon' => 'fa-pen', 'label' => 'News / Blog', 'colorClass' => 'dark-purple'],
 ];
 ?>
 
@@ -48,7 +48,7 @@ $modules = [
         <div class="govuk-grid-row govuk-!-margin-bottom-6">
             <div class="govuk-grid-column-two-thirds">
                 <h1 class="govuk-heading-xl">
-                    <i class="fa-solid fa-cog govuk-!-margin-right-2" style="color: #1d70b8;" aria-hidden="true"></i>
+                    <i class="fa-solid fa-cog govuk-!-margin-right-2 civicone-icon-blue" aria-hidden="true"></i>
                     Configure <?= $tName ?>
                 </h1>
                 <p class="govuk-body-l">Manage sub-account settings</p>
@@ -76,24 +76,24 @@ $modules = [
             <input type="hidden" name="id" value="<?= $targetTenant['id'] ?>">
 
             <!-- General Settings -->
-            <div class="govuk-!-margin-bottom-8" style="border: 1px solid #b1b4b6;">
-                <div class="govuk-!-padding-4 civicone-panel-bg" style="border-bottom: 1px solid #b1b4b6;">
-                    <div style="display: flex; align-items: center; gap: 12px;">
-                        <div style="width: 40px; height: 40px; border-radius: 8px; background: #1d70b8; display: flex; align-items: center; justify-content: center; color: white;">
+            <div class="govuk-!-margin-bottom-8 civicone-section-card">
+                <div class="govuk-!-padding-4 civicone-panel-bg civicone-section-card-header">
+                    <div class="civicone-section-header-flex">
+                        <div class="civicone-section-icon civicone-section-icon--blue">
                             <i class="fa-solid fa-cog" aria-hidden="true"></i>
                         </div>
                         <div>
                             <h2 class="govuk-heading-m govuk-!-margin-bottom-0">General Settings</h2>
-                            <p class="govuk-body-s govuk-!-margin-bottom-0" style="color: #505a5f;">Core configuration for this timebank</p>
+                            <p class="govuk-body-s govuk-!-margin-bottom-0 civicone-secondary-text">Core configuration for this timebank</p>
                         </div>
                     </div>
                 </div>
 
                 <div class="govuk-!-padding-4">
                     <!-- Basic Information -->
-                    <div class="govuk-!-margin-bottom-6 govuk-!-padding-4 civicone-panel-bg" style="border-left: 5px solid #1d70b8;">
+                    <div class="govuk-!-margin-bottom-6 govuk-!-padding-4 civicone-panel-bg civicone-border-left-blue">
                         <h3 class="govuk-heading-s govuk-!-margin-bottom-4">
-                            <i class="fa-solid fa-info-circle govuk-!-margin-right-2" style="color: #1d70b8;" aria-hidden="true"></i>
+                            <i class="fa-solid fa-info-circle govuk-!-margin-right-2 civicone-icon-blue" aria-hidden="true"></i>
                             Basic Information
                         </h3>
 
@@ -107,9 +107,9 @@ $modules = [
                             <div class="govuk-grid-column-one-half">
                                 <div class="govuk-form-group">
                                     <label class="govuk-label" for="slug">URL Slug</label>
-                                    <div style="display: flex;">
-                                        <span class="govuk-!-padding-2" style="background: white; border: 2px solid #0b0c0c; border-right: none; color: #505a5f; font-family: monospace;">platform.url/</span>
-                                        <input type="text" name="slug" id="slug" class="govuk-input" style="border-radius: 0;" value="<?= htmlspecialchars($targetTenant['slug']) ?>" required>
+                                    <div class="civicone-slug-group">
+                                        <span class="govuk-!-padding-2 civicone-slug-prefix">platform.url/</span>
+                                        <input type="text" name="slug" id="slug" class="govuk-input civicone-slug-input" value="<?= htmlspecialchars($targetTenant['slug']) ?>" required>
                                     </div>
                                 </div>
                             </div>
@@ -137,9 +137,9 @@ $modules = [
                     </div>
 
                     <!-- Footer & Legal -->
-                    <div class="govuk-!-margin-bottom-6 govuk-!-padding-4 civicone-panel-bg" style="border-left: 5px solid #505a5f;">
+                    <div class="govuk-!-margin-bottom-6 govuk-!-padding-4 civicone-panel-bg civicone-border-left-grey">
                         <h3 class="govuk-heading-s govuk-!-margin-bottom-4">
-                            <i class="fa-solid fa-file-contract govuk-!-margin-right-2" style="color: #505a5f;" aria-hidden="true"></i>
+                            <i class="fa-solid fa-file-contract govuk-!-margin-right-2 civicone-secondary-text" aria-hidden="true"></i>
                             Footer & Legal Documents
                         </h3>
 
@@ -167,10 +167,10 @@ $modules = [
                     </div>
 
                     <!-- Module Installation -->
-                    <div class="govuk-!-margin-bottom-4 govuk-!-padding-4 civicone-panel-bg" style="border-left: 5px solid #00703c;">
-                        <div style="display: flex; justify-content: space-between; align-items: center;" class="govuk-!-margin-bottom-4">
+                    <div class="govuk-!-margin-bottom-4 govuk-!-padding-4 civicone-panel-bg civicone-border-left-green">
+                        <div class="civicone-section-header-flex--between govuk-!-margin-bottom-4">
                             <h3 class="govuk-heading-s govuk-!-margin-bottom-0">
-                                <i class="fa-solid fa-puzzle-piece govuk-!-margin-right-2" style="color: #00703c;" aria-hidden="true"></i>
+                                <i class="fa-solid fa-puzzle-piece govuk-!-margin-right-2 civicone-icon-green" aria-hidden="true"></i>
                                 Module Installation
                             </h3>
                             <strong class="govuk-tag govuk-tag--grey">Click to toggle</strong>
@@ -179,18 +179,20 @@ $modules = [
                         <div class="govuk-grid-row">
                             <?php foreach ($modules as $key => $mod):
                                 $isActive = $feats[$key] ?? ($key === 'blog'); // Blog default true
+                                $borderClass = $isActive ? "civicone-border-left-{$mod['colorClass']}-sm" : 'civicone-border-left-grey-sm';
+                                $iconClass = $isActive ? "civicone-section-icon--{$mod['colorClass']}" : 'civicone-section-icon--grey';
                             ?>
                                 <div class="govuk-grid-column-one-third govuk-!-margin-bottom-4">
-                                    <label style="display: block; cursor: pointer;">
-                                        <div class="govuk-!-padding-3" style="background: <?= $isActive ? 'white' : '#f3f2f1' ?>; border: 2px solid <?= $isActive ? $mod['color'] : '#b1b4b6' ?>; border-left: 5px solid <?= $isActive ? $mod['color'] : '#b1b4b6' ?>;">
-                                            <input type="checkbox" name="feat_<?= $key ?>" <?= $isActive ? 'checked' : '' ?> style="position: absolute; opacity: 0;">
-                                            <div style="display: flex; align-items: center; gap: 12px;">
-                                                <div style="width: 36px; height: 36px; border-radius: 8px; background: <?= $isActive ? $mod['color'] : '#b1b4b6' ?>; display: flex; align-items: center; justify-content: center; color: white;">
+                                    <label class="civicone-module-card">
+                                        <div class="civicone-module-card-inner <?= $isActive ? 'civicone-module-card--active' : 'civicone-module-card--inactive' ?> <?= $borderClass ?>">
+                                            <input type="checkbox" name="feat_<?= $key ?>" <?= $isActive ? 'checked' : '' ?> class="civicone-checkbox-hidden">
+                                            <div class="civicone-section-header-flex">
+                                                <div class="civicone-section-icon civicone-section-icon--sm <?= $iconClass ?>">
                                                     <i class="fa-solid <?= $mod['icon'] ?>" aria-hidden="true"></i>
                                                 </div>
                                                 <div>
                                                     <p class="govuk-body-s govuk-!-font-weight-bold govuk-!-margin-bottom-0"><?= $mod['label'] ?></p>
-                                                    <p class="govuk-body-s govuk-!-margin-bottom-0" style="color: <?= $isActive ? '#00703c' : '#505a5f' ?>;">
+                                                    <p class="govuk-body-s govuk-!-margin-bottom-0 <?= $isActive ? 'civicone-text-success' : 'civicone-secondary-text' ?>">
                                                         <?= $isActive ? 'Active Module' : 'Not Installed' ?>
                                                     </p>
                                                 </div>
@@ -213,15 +215,15 @@ $modules = [
         </form>
 
         <!-- Tenant Administrators -->
-        <div class="govuk-!-margin-bottom-8" style="border: 1px solid #b1b4b6;">
-            <div class="govuk-!-padding-4 civicone-panel-bg" style="border-bottom: 1px solid #b1b4b6;">
-                <div style="display: flex; align-items: center; gap: 12px;">
-                    <div style="width: 40px; height: 40px; border-radius: 8px; background: #00703c; display: flex; align-items: center; justify-content: center; color: white;">
+        <div class="govuk-!-margin-bottom-8 civicone-section-card">
+            <div class="govuk-!-padding-4 civicone-panel-bg civicone-section-card-header">
+                <div class="civicone-section-header-flex">
+                    <div class="civicone-section-icon civicone-section-icon--green">
                         <i class="fa-solid fa-user-shield" aria-hidden="true"></i>
                     </div>
                     <div>
                         <h2 class="govuk-heading-m govuk-!-margin-bottom-0">Tenant Administrators</h2>
-                        <p class="govuk-body-s govuk-!-margin-bottom-0" style="color: #505a5f;">Manage access for this sub-account</p>
+                        <p class="govuk-body-s govuk-!-margin-bottom-0 civicone-secondary-text">Manage access for this sub-account</p>
                     </div>
                 </div>
             </div>
@@ -241,21 +243,21 @@ $modules = [
                         <div class="govuk-grid-row">
                             <?php foreach ($admins as $a): ?>
                                 <div class="govuk-grid-column-one-third govuk-!-margin-bottom-4">
-                                    <div class="govuk-!-padding-3 civicone-panel-bg" style="border-left: 5px solid #00703c;">
-                                        <div style="display: flex; align-items: center; justify-content: space-between;">
-                                            <div style="display: flex; align-items: center; gap: 12px;">
-                                                <div style="width: 40px; height: 40px; border-radius: 50%; background: #00703c; color: white; display: flex; align-items: center; justify-content: center; font-weight: bold;">
+                                    <div class="govuk-!-padding-3 civicone-panel-bg civicone-border-left-green">
+                                        <div class="civicone-admin-card">
+                                            <div class="civicone-admin-info">
+                                                <div class="civicone-admin-avatar">
                                                     <?= strtoupper(substr($a['name'], 0, 1)) ?>
                                                 </div>
                                                 <div>
                                                     <p class="govuk-body-s govuk-!-font-weight-bold govuk-!-margin-bottom-0"><?= htmlspecialchars($a['name']) ?></p>
-                                                    <p class="govuk-body-s govuk-!-margin-bottom-0" style="color: #505a5f;"><?= htmlspecialchars($a['email']) ?></p>
+                                                    <p class="govuk-body-s govuk-!-margin-bottom-0 civicone-secondary-text"><?= htmlspecialchars($a['email']) ?></p>
                                                 </div>
                                             </div>
                                             <form action="<?= $basePath ?>/super-admin/tenant/delete-admin" method="POST" onsubmit="return confirm('Revoke access for this admin?');">
                                                 <input type="hidden" name="tenant_id" value="<?= $targetTenant['id'] ?>">
                                                 <input type="hidden" name="admin_id" value="<?= $a['id'] ?>">
-                                                <button type="submit" class="govuk-button govuk-button--warning govuk-!-margin-bottom-0" data-module="govuk-button" style="padding: 6px 10px;" aria-label="Remove admin">
+                                                <button type="submit" class="govuk-button govuk-button--warning govuk-!-margin-bottom-0 civicone-btn-xs" data-module="govuk-button" aria-label="Remove admin">
                                                     <i class="fa-solid fa-times" aria-hidden="true"></i>
                                                 </button>
                                             </form>
@@ -268,9 +270,9 @@ $modules = [
                 </div>
 
                 <!-- Add New Admin -->
-                <div class="govuk-!-padding-4 civicone-panel-bg" style="border-left: 5px solid #1d70b8;">
+                <div class="govuk-!-padding-4 civicone-panel-bg civicone-border-left-blue">
                     <h3 class="govuk-heading-s govuk-!-margin-bottom-4">
-                        <i class="fa-solid fa-user-plus govuk-!-margin-right-2" style="color: #1d70b8;" aria-hidden="true"></i>
+                        <i class="fa-solid fa-user-plus govuk-!-margin-right-2 civicone-icon-blue" aria-hidden="true"></i>
                         Grant Access to New Admin
                     </h3>
 
@@ -299,7 +301,7 @@ $modules = [
                             <div class="govuk-grid-column-one-quarter">
                                 <div class="govuk-form-group">
                                     <label class="govuk-label">&nbsp;</label>
-                                    <button type="submit" class="govuk-button govuk-button--secondary govuk-!-margin-bottom-0" data-module="govuk-button" style="width: 100%;">
+                                    <button type="submit" class="govuk-button govuk-button--secondary govuk-!-margin-bottom-0 civicone-btn-full" data-module="govuk-button">
                                         <i class="fa-solid fa-plus govuk-!-margin-right-2" aria-hidden="true"></i>
                                         Grant Access
                                     </button>
@@ -312,14 +314,14 @@ $modules = [
         </div>
 
         <!-- Danger Zone -->
-        <div class="govuk-!-padding-4" style="background: #d4351c15; border: 2px solid #d4351c;">
-            <div style="display: flex; align-items: center; gap: 12px;">
-                <div style="width: 40px; height: 40px; border-radius: 8px; background: #d4351c; display: flex; align-items: center; justify-content: center; color: white;">
+        <div class="govuk-!-padding-4 civicone-danger-zone">
+            <div class="civicone-section-header-flex">
+                <div class="civicone-section-icon civicone-section-icon--red">
                     <i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i>
                 </div>
                 <div>
-                    <h2 class="govuk-heading-m govuk-!-margin-bottom-0" style="color: #d4351c;">Danger Zone</h2>
-                    <p class="govuk-body-s govuk-!-margin-bottom-0" style="color: #505a5f;">Tenant deletion is currently disabled. Contact system administrator.</p>
+                    <h2 class="govuk-heading-m govuk-!-margin-bottom-0 civicone-heading-red">Danger Zone</h2>
+                    <p class="govuk-body-s govuk-!-margin-bottom-0 civicone-secondary-text">Tenant deletion is currently disabled. Contact system administrator.</p>
                 </div>
             </div>
         </div>

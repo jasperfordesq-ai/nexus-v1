@@ -8,8 +8,8 @@
     <?php
     $basePath = class_exists('\Nexus\Core\TenantContext') ? \Nexus\Core\TenantContext::getBasePath() : '';
     ?>
-    <link href="<?= $basePath ?>/assets/css/nexus-phoenix.min.css" rel="stylesheet">
-    <link href="<?= $basePath ?>/assets/css/error-states.min.css" rel="stylesheet">
+    <link href="<?= $basePath ?>/assets/css/nexus-phoenix.css" rel="stylesheet">
+    <link href="<?= $basePath ?>/assets/css/error-states.css" rel="stylesheet">
     <style>
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;

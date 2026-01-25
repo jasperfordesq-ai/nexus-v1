@@ -55,6 +55,10 @@ const cssFiles = [
     'nexus-civicone.css',
     'civicone-mobile.css',
     'civicone-native.css',
+    // CivicOne mobile navigation - GOV.UK isolated (rebuilt 2026-01-25)
+    'civicone-mobile-nav-v2.css',
+    // Legacy inline CSS (kept for reference, no longer used)
+    'civicone-mobile-nav-v2-inline.css',
     // Extracted component CSS
     'feed-filter.css',
     'dashboard.css',
@@ -151,6 +155,7 @@ const cssFiles = [
     'civicone-dashboard.css',
     'civicone-achievements.css',
     'civicone-compose-index.css',
+    'civicone-compose.css',
     'civicone-profile-header.css',
     'civicone-profile-social.css',
     // Shared components

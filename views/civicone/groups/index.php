@@ -46,7 +46,7 @@ $basePath = \Nexus\Core\TenantContext::getBasePath();
 
     <!-- Filters Panel (1/3) -->
     <div class="govuk-grid-column-one-third">
-        <div class="govuk-!-padding-4 civicone-panel-bg" style="margin-bottom: 1.5rem;">
+        <div class="govuk-!-padding-4 govuk-!-margin-bottom-6 civicone-panel-bg">
             <h2 class="govuk-heading-m">Filter hubs</h2>
 
             <form method="get" action="<?= $basePath ?>/groups">
@@ -139,14 +139,14 @@ $basePath = \Nexus\Core\TenantContext::getBasePath();
                     $hasImg = !empty($group['image_path']);
                     $memberCount = $group['member_count'] ?? 0;
                     ?>
-                    <li class="govuk-!-margin-bottom-4 govuk-!-padding-bottom-4" style="border-bottom: 1px solid #b1b4b6; display: flex; align-items: flex-start; gap: 1rem;">
+                    <li class="govuk-!-margin-bottom-4 govuk-!-padding-bottom-4 civicone-listing-item civicone-card-row">
                         <!-- Group Image/Avatar -->
-                        <div style="flex-shrink: 0;">
+                        <div class="civicone-card-row__media">
                             <?php if ($hasImg): ?>
-                                <img src="<?= htmlspecialchars($group['image_path']) ?>" alt="" width="64" height="64" style="border-radius: 4px; object-fit: cover;">
+                                <img src="<?= htmlspecialchars($group['image_path']) ?>" alt="" width="64" height="64" class="civicone-card-row__image">
                             <?php else: ?>
-                                <div class="civicone-panel-bg" style="width: 64px; height: 64px; border-radius: 4px; display: flex; align-items: center; justify-content: center;">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#505a5f" stroke-width="1.5" aria-hidden="true">
+                                <div class="civicone-card-row__placeholder">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
                                         <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
                                         <circle cx="9" cy="7" r="4"></circle>
                                         <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
@@ -157,7 +157,7 @@ $basePath = \Nexus\Core\TenantContext::getBasePath();
                         </div>
 
                         <!-- Group Content -->
-                        <div style="flex-grow: 1;">
+                        <div class="civicone-card-row__content">
                             <h3 class="govuk-heading-s govuk-!-margin-bottom-1">
                                 <a href="<?= $basePath ?>/groups/<?= $group['id'] ?>" class="govuk-link">
                                     <?= $gName ?>
@@ -165,14 +165,14 @@ $basePath = \Nexus\Core\TenantContext::getBasePath();
                             </h3>
                             <p class="govuk-body-s govuk-!-margin-bottom-1"><?= $gDesc ?></p>
                             <?php if ($memberCount > 0): ?>
-                            <p class="govuk-body-s govuk-!-margin-bottom-0" style="color: #505a5f;">
+                            <p class="govuk-body-s govuk-!-margin-bottom-0 civicone-secondary-text">
                                 <?= $memberCount ?> <?= $memberCount === 1 ? 'member' : 'members' ?>
                             </p>
                             <?php endif; ?>
                         </div>
 
                         <!-- Group Actions -->
-                        <div style="flex-shrink: 0;">
+                        <div class="civicone-card-row__actions">
                             <a href="<?= $basePath ?>/groups/<?= $group['id'] ?>"
                                class="govuk-button govuk-button--secondary govuk-!-margin-bottom-0"
                                aria-label="Visit <?= $gName ?> hub">

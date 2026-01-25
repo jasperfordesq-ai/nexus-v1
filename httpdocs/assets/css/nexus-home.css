@@ -964,38 +964,54 @@ button.feed-action-pill:active {
     margin-top: 0 !important;
 }
 
-.fds-feed-container {
-    max-width: 680px;
+/* ==========================================
+   TWO-COLUMN LAYOUT WITH SIDEBAR
+   Consolidated here from modern-pages.css (2026-01-25)
+   Uses CSS variables from design-tokens.css for flexibility
+
+   IMPORTANT: Uses body.nexus-home-page for higher specificity
+   to override any conflicting styles from other CSS files
+   ========================================== */
+
+/* Home page specific - high specificity to override conflicts */
+body.nexus-home-page .fds-feed-container {
+    max-width: 100%;
     margin: 0 auto;
     position: relative;
     z-index: 1;
     padding: 0;
 }
 
-/* ==========================================
-   TWO-COLUMN LAYOUT WITH SIDEBAR
-   ========================================== */
-.home-two-column-grid {
+body.nexus-home-page .home-two-column-grid {
     display: grid;
-    grid-template-columns: 1fr 340px;
-    gap: var(--space-6);
-    max-width: 1100px;
+    grid-template-columns: 1fr 320px;
+    gap: var(--layout-grid-gap, var(--space-6));
+    max-width: 1200px;
     margin: 0 auto;
+    padding: 0 var(--space-4);
     align-items: start;
 }
 
-.home-feed-column {
-    min-width: 0;
+/* Wide desktop home feed container */
+body.nexus-home-page .home-feed-wrapper {
+    max-width: 1200px !important;
+    width: 100% !important;
+    margin: 0 auto !important;
 }
 
-.home-feed-column .fds-feed-container {
+body.nexus-home-page .home-feed-column {
+    min-width: 0; /* Prevent grid blowout from long content */
+}
+
+body.nexus-home-page .home-feed-column .fds-feed-container {
     max-width: 100%;
 }
 
-.home-sidebar-column {
+body.nexus-home-page .home-sidebar-column {
     display: flex;
     flex-direction: column;
     gap: var(--space-5);
+    position: relative;
 }
 
 /* Sidebar Cards */
@@ -1347,14 +1363,61 @@ button.feed-action-pill:active {
     background: rgba(99, 102, 241, 0.15) !important;
 }
 
-/* Responsive: Hide sidebar on mobile/tablet */
-@media (max-width: 1024px) {
-    .home-two-column-grid {
-        grid-template-columns: 1fr;
-        max-width: 680px;
+/* ==========================================
+   RESPONSIVE BREAKPOINTS FOR HOME LAYOUT
+   Uses body.nexus-home-page for specificity
+   - 1400px+: Full wide two-column layout (360px sidebar)
+   - 1200px-1400px: Standard two-column (320px sidebar)
+   - 1024px-1200px: Narrower sidebar (280px)
+   - <1024px: Single column, sidebar hidden
+   ========================================== */
+
+/* Large desktop: Wider sidebar */
+@media (min-width: 1401px) {
+    body.nexus-home-page .home-two-column-grid {
+        grid-template-columns: 1fr var(--layout-sidebar-width, 360px);
+        gap: var(--space-8);
+    }
+}
+
+/* Standard desktop: Medium sidebar */
+@media (max-width: 1200px) and (min-width: 1201px) {
+    body.nexus-home-page .home-two-column-grid {
+        grid-template-columns: 1fr var(--layout-sidebar-width-tablet, 320px);
+        gap: var(--space-6);
+        max-width: 1200px;
+    }
+}
+
+/* Intermediate breakpoint: Narrow sidebar on medium screens */
+@media (max-width: 1200px) and (min-width: 1025px) {
+    body.nexus-home-page .home-two-column-grid {
+        grid-template-columns: 1fr var(--layout-sidebar-width-min, 280px);
+        gap: var(--space-4);
+        max-width: 1100px;
     }
 
-    .home-sidebar-column {
+    body.nexus-home-page .sidebar-card-header,
+    body.nexus-home-page .sidebar-card-body {
+        padding-left: 16px;
+        padding-right: 16px;
+    }
+
+    body.nexus-home-page .sidebar-stats-grid {
+        gap: var(--space-2);
+    }
+}
+
+/* Mobile/Tablet: Hide sidebar, single column */
+@media (max-width: 1024px) {
+    body.nexus-home-page .home-two-column-grid {
+        grid-template-columns: 1fr;
+        max-width: 720px;
+        padding: 0 var(--space-3);
+        gap: var(--layout-grid-gap-mobile, var(--space-3));
+    }
+
+    body.nexus-home-page .home-sidebar-column {
         display: none;
     }
 }
@@ -5077,5 +5140,90 @@ body {
     .nexus-smart-btn span {
         display: inline;
         /* Keep text visible on mobile */
+    }
+}
+
+/* ==========================================
+   NUCLEAR FIX: HOME PAGE DESKTOP WIDTH
+   Added 2026-01-25 - Must be at END of file
+   Uses html prefix + !important for maximum specificity
+   ========================================== */
+
+/* Desktop: 1025px and above - MAXIMUM SPECIFICITY */
+@media screen and (min-width: 1025px) {
+    html body.nexus-home-page .htb-container,
+    html body.nexus-home-page .htb-container-full,
+    html body.nexus-home-page .home-feed-wrapper {
+        max-width: 1200px !important;
+        width: 100% !important;
+        padding-left: 24px !important;
+        padding-right: 24px !important;
+        margin-left: auto !important;
+        margin-right: auto !important;
+        box-sizing: border-box !important;
+    }
+
+    html body.nexus-home-page .home-two-column-grid {
+        display: grid !important;
+        max-width: 100% !important;
+        width: 100% !important;
+        grid-template-columns: 1fr 360px !important;
+        gap: 24px !important;
+        box-sizing: border-box !important;
+    }
+
+    html body.nexus-home-page .home-feed-column {
+        min-width: 0 !important;
+        max-width: 100% !important;
+    }
+
+    html body.nexus-home-page .home-feed-column .fds-feed-container {
+        max-width: 100% !important;
+        width: 100% !important;
+    }
+
+    html body.nexus-home-page .home-sidebar-column {
+        width: 360px !important;
+        min-width: 360px !important;
+        max-width: 360px !important;
+        flex-shrink: 0 !important;
+    }
+}
+
+/* Intermediate: 1025px to 1200px */
+@media screen and (min-width: 1025px) and (max-width: 1200px) {
+    html body.nexus-home-page .htb-container,
+    html body.nexus-home-page .htb-container-full,
+    html body.nexus-home-page .home-feed-wrapper {
+        max-width: 1100px !important;
+    }
+
+    html body.nexus-home-page .home-two-column-grid {
+        grid-template-columns: 1fr 280px !important;
+    }
+
+    html body.nexus-home-page .home-sidebar-column {
+        width: 280px !important;
+        min-width: 280px !important;
+        max-width: 280px !important;
+    }
+}
+
+/* Medium desktop: 1201px to 1400px */
+@media screen and (min-width: 1201px) and (max-width: 1200px) {
+    html body.nexus-home-page .htb-container,
+    html body.nexus-home-page .htb-container-full,
+    html body.nexus-home-page .home-feed-wrapper {
+        max-width: 1280px !important;
+    }
+
+    html body.nexus-home-page .home-two-column-grid {
+        grid-template-columns: 1fr 320px !important;
+    }
+
+    html body.nexus-home-page .home-sidebar-column {
+        width: 320px !important;
+        min-width: 320px !important;
+        max-width: 320px !important;
     }
 }

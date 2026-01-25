@@ -203,7 +203,7 @@ if (!empty($filters['search'])) {
                                     </h3>
                                     <div class="civicone-federation-badges">
                                         <!-- Type Badge -->
-                                        <span class="govuk-tag <?= ($listing['type'] ?? 'offer') === 'request' ? 'govuk-tag--blue' : '' ?>">
+                                        <span class="govuk-tag <?= ($listing['type'] ?? 'offer') === 'request' ? 'govuk-tag--light-blue' : '' ?>">
                                             <?= ucfirst($listing['type'] ?? 'offer') ?>
                                         </span>
                                         <!-- PROVENANCE LABEL (MANDATORY) -->

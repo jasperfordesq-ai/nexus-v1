@@ -56,7 +56,7 @@ require dirname(__DIR__, 2) . '/layouts/civicone/header.php';
                             <?php if ($u['tenant_id'] == 1): ?>
                                 <strong class="govuk-tag govuk-tag--purple">Platform</strong>
                             <?php else: ?>
-                                <strong class="govuk-tag govuk-tag--blue"><?= htmlspecialchars($u['tenant_name'] ?? 'Unknown') ?></strong><br>
+                                <strong class="govuk-tag govuk-tag--light-blue"><?= htmlspecialchars($u['tenant_name'] ?? 'Unknown') ?></strong><br>
                                 <span class="govuk-body-s" style="color: #505a5f;">/<?= htmlspecialchars($u['tenant_slug'] ?? '') ?></span>
                             <?php endif; ?>
                         </td>

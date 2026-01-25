@@ -164,7 +164,7 @@ require __DIR__ . '/../layouts/civicone/header.php';
         </ol>
     </nav>
 
-    <main class="govuk-main-wrapper" role="main">
+    <main class="govuk-main-wrapper" id="main-content" role="main">
 
         <!-- Page Header with Caption - GOV.UK page header pattern -->
         <header class="govuk-!-margin-bottom-6">
@@ -249,12 +249,12 @@ require __DIR__ . '/../layouts/civicone/header.php';
                                         <a href="<?= $basePath ?>/listings/<?= (int)$listing['id'] ?>" class="govuk-link govuk-!-font-weight-bold">
                                             <?= htmlspecialchars($listing['title']) ?>
                                         </a>
-                                        <p class="govuk-body-s govuk-!-margin-bottom-0" style="color: #505a5f;">
+                                        <p class="govuk-body-s govuk-!-margin-bottom-0 civicone-secondary-text">
                                             <span class="govuk-visually-hidden">Posted by </span><?= htmlspecialchars($listing['author_name']) ?><?php if (!empty($listing['location'])): ?><span class="govuk-visually-hidden">, location:</span> · <?= htmlspecialchars($listing['location']) ?><?php endif; ?>
                                         </p>
                                     </td>
                                     <td class="govuk-table__cell" data-label="Type">
-                                        <strong class="govuk-tag <?= $listing['type'] === 'offer' ? 'govuk-tag--green' : 'govuk-tag--blue' ?>">
+                                        <strong class="govuk-tag <?= $listing['type'] === 'offer' ? 'govuk-tag--green' : 'govuk-tag--grey' ?>">
                                             <?= ucfirst($listing['type']) ?>
                                         </strong>
                                     </td>
@@ -284,7 +284,7 @@ require __DIR__ . '/../layouts/civicone/header.php';
                             <dt class="govuk-summary-list__key">
                                 <time datetime="<?= date('Y-m-d\TH:i', strtotime($event['start_time'])) ?>">
                                     <span class="govuk-!-font-weight-bold"><?= date('j M', strtotime($event['start_time'])) ?></span><br>
-                                    <span class="govuk-body-s" style="color: #505a5f;"><?= date('g:ia', strtotime($event['start_time'])) ?></span>
+                                    <span class="govuk-body-s civicone-secondary-text"><?= date('g:ia', strtotime($event['start_time'])) ?></span>
                                 </time>
                             </dt>
                             <dd class="govuk-summary-list__value">
@@ -292,7 +292,7 @@ require __DIR__ . '/../layouts/civicone/header.php';
                                     <?= htmlspecialchars($event['title']) ?>
                                 </a>
                                 <?php if (!empty($event['location'])): ?>
-                                <p class="govuk-body-s govuk-!-margin-bottom-0" style="color: #505a5f;">
+                                <p class="govuk-body-s govuk-!-margin-bottom-0 civicone-secondary-text">
                                     <span class="govuk-visually-hidden">Location: </span><?= htmlspecialchars($event['location']) ?>
                                 </p>
                                 <?php endif; ?>
@@ -317,15 +317,15 @@ require __DIR__ . '/../layouts/civicone/header.php';
                 <aside class="govuk-!-padding-4 govuk-!-margin-bottom-6 civicone-panel-bg" aria-labelledby="stats-heading" role="complementary">
                     <h2 class="govuk-heading-s" id="stats-heading">Community at a glance</h2>
                     <dl class="govuk-body-s govuk-!-margin-bottom-0">
-                        <div class="govuk-!-margin-bottom-2" style="display: flex; justify-content: space-between;">
+                        <div class="govuk-!-margin-bottom-2 civicone-stat-row">
                             <dt>Members:</dt>
                             <dd class="govuk-!-margin-left-0"><strong><?= number_format($memberCount) ?></strong></dd>
                         </div>
-                        <div class="govuk-!-margin-bottom-2" style="display: flex; justify-content: space-between;">
+                        <div class="govuk-!-margin-bottom-2 civicone-stat-row">
                             <dt>Listings:</dt>
                             <dd class="govuk-!-margin-left-0"><strong><?= number_format($listingCount) ?></strong></dd>
                         </div>
-                        <div style="display: flex; justify-content: space-between;">
+                        <div class="civicone-stat-row">
                             <dt>Groups:</dt>
                             <dd class="govuk-!-margin-left-0"><strong><?= number_format($groupCount) ?></strong></dd>
                         </div>
@@ -342,7 +342,7 @@ require __DIR__ . '/../layouts/civicone/header.php';
                             <a href="<?= $basePath ?>/group/<?= (int)$group['id'] ?>" class="govuk-link govuk-!-font-weight-bold">
                                 <?= htmlspecialchars($group['name']) ?>
                             </a>
-                            <p class="govuk-body-s govuk-!-margin-bottom-0" style="color: #505a5f;">
+                            <p class="govuk-body-s govuk-!-margin-bottom-0 civicone-secondary-text">
                                 <?= (int)($group['member_count'] ?? 0) ?> member<?= ($group['member_count'] ?? 0) != 1 ? 's' : '' ?>
                             </p>
                         </li>
@@ -376,7 +376,7 @@ require __DIR__ . '/../layouts/civicone/header.php';
         <!-- Back to top link - GOV.UK accessibility pattern -->
         <div class="govuk-!-margin-top-6 govuk-!-text-align-right">
             <a href="#main-content" class="govuk-link govuk-body-s">
-                <svg xmlns="http://www.w3.org/2000/svg" width="13" height="17" viewBox="0 0 13 17" aria-hidden="true" focusable="false" style="vertical-align: middle; margin-right: 4px;">
+                <svg xmlns="http://www.w3.org/2000/svg" width="13" height="17" viewBox="0 0 13 17" aria-hidden="true" focusable="false" class="civicone-back-to-top-icon">
                     <path fill="currentColor" d="M6.5 0L0 6.5 1.4 8l4.6-4.6v13h1.4V3.4L12 8l1.4-1.5L6.5 0z"/>
                 </svg>
                 Back to top

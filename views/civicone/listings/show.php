@@ -28,7 +28,7 @@ $basePath = \Nexus\Core\TenantContext::getBasePath();
     <div class="govuk-grid-column-two-thirds">
         <h1 class="govuk-heading-xl govuk-!-margin-bottom-2"><?= htmlspecialchars($listing['title']) ?></h1>
         <p class="govuk-body-l">
-            <span class="govuk-tag <?= strtolower($listing['type'] ?? 'listing') === 'offer' ? 'govuk-tag--green' : 'govuk-tag--blue' ?>">
+            <span class="govuk-tag <?= strtolower($listing['type'] ?? 'listing') === 'offer' ? 'govuk-tag--green' : 'govuk-tag--light-blue' ?>">
                 <?= ucfirst($listing['type'] ?? 'Listing') ?>
             </span>
         </p>
@@ -100,7 +100,7 @@ $basePath = \Nexus\Core\TenantContext::getBasePath();
             <img src="<?= htmlspecialchars($listing['image_url']) ?>"
                  alt="<?= htmlspecialchars($listing['title']) ?>"
                  loading="lazy"
-                 style="max-width: 100%; height: auto;">
+                 class="civicone-responsive-image">
         </div>
         <?php endif; ?>
 
@@ -156,7 +156,7 @@ $basePath = \Nexus\Core\TenantContext::getBasePath();
     <div class="govuk-grid-column-one-third">
 
         <!-- Action Card -->
-        <div class="govuk-!-padding-6 govuk-!-margin-bottom-6" style="border: 1px solid #b1b4b6; border-left: 5px solid #1d70b8;">
+        <div class="govuk-!-padding-6 govuk-!-margin-bottom-6 civicone-action-card">
             <?php if (isset($_SESSION['user_id'])): ?>
                 <?php if ($_SESSION['user_id'] == $listing['user_id']): ?>
                     <!-- Owner Actions -->
@@ -165,12 +165,12 @@ $basePath = \Nexus\Core\TenantContext::getBasePath();
                         <p class="govuk-body-s govuk-!-margin-bottom-0">You can edit or manage your listing below.</p>
                     </div>
 
-                    <a href="<?= $basePath ?>/listings/edit/<?= $listing['id'] ?>" class="govuk-button" data-module="govuk-button" style="width: 100%;">
+                    <a href="<?= $basePath ?>/listings/edit/<?= $listing['id'] ?>" class="govuk-button civicone-button-full-width" data-module="govuk-button">
                         <i class="fa-solid fa-edit govuk-!-margin-right-1" aria-hidden="true"></i> Edit this listing
                     </a>
 
                     <?php if ($listing['status'] === 'active'): ?>
-                    <button type="button" class="govuk-button govuk-button--secondary govuk-!-margin-top-2" data-module="govuk-button" style="width: 100%;"
+                    <button type="button" class="govuk-button govuk-button--secondary govuk-!-margin-top-2 civicone-button-full-width" data-module="govuk-button"
                             onclick="if(confirm('Mark this listing as fulfilled?')) { /* Add close/fulfill logic */ }">
                         <i class="fa-solid fa-check govuk-!-margin-right-1" aria-hidden="true"></i> Mark as fulfilled
                     </button>
@@ -181,11 +181,11 @@ $basePath = \Nexus\Core\TenantContext::getBasePath();
                     <h2 class="govuk-heading-m">Contact</h2>
                     <p class="govuk-body-s">Send a message to the poster about this listing.</p>
 
-                    <a href="<?= $basePath ?>/messages/<?= $listing['user_id'] ?>?ref=<?= urlencode("Re: " . $listing['title']) ?>" class="govuk-button" data-module="govuk-button" style="width: 100%;">
+                    <a href="<?= $basePath ?>/messages/<?= $listing['user_id'] ?>?ref=<?= urlencode("Re: " . $listing['title']) ?>" class="govuk-button civicone-button-full-width" data-module="govuk-button">
                         <i class="fa-solid fa-envelope govuk-!-margin-right-1" aria-hidden="true"></i> Send message
                     </a>
 
-                    <button type="button" class="govuk-button govuk-button--secondary govuk-!-margin-top-2" data-module="govuk-button" style="width: 100%;">
+                    <button type="button" class="govuk-button govuk-button--secondary govuk-!-margin-top-2 civicone-button-full-width" data-module="govuk-button">
                         <i class="fa-solid fa-bookmark govuk-!-margin-right-1" aria-hidden="true"></i> Save this listing
                     </button>
                 <?php endif; ?>
@@ -196,21 +196,21 @@ $basePath = \Nexus\Core\TenantContext::getBasePath();
                     <p class="govuk-body-s govuk-!-margin-bottom-0">You need to be signed in to contact the poster or save this listing.</p>
                 </div>
 
-                <a href="<?= $basePath ?>/login?return=<?= urlencode('/listings/' . $listing['id']) ?>" class="govuk-button" data-module="govuk-button" style="width: 100%;">
+                <a href="<?= $basePath ?>/login?return=<?= urlencode('/listings/' . $listing['id']) ?>" class="govuk-button civicone-button-full-width" data-module="govuk-button">
                     Sign in
                 </a>
 
-                <a href="<?= $basePath ?>/register" class="govuk-button govuk-button--secondary govuk-!-margin-top-2" data-module="govuk-button" style="width: 100%;">
+                <a href="<?= $basePath ?>/register" class="govuk-button govuk-button--secondary govuk-!-margin-top-2 civicone-button-full-width" data-module="govuk-button">
                     Create account
                 </a>
             <?php endif; ?>
         </div>
 
         <!-- Share/Report -->
-        <div class="govuk-!-padding-6" style="border: 1px solid #b1b4b6;">
+        <div class="govuk-!-padding-6 civicone-sidebar-card">
             <h2 class="govuk-heading-s">Share</h2>
             <p class="govuk-body-s govuk-!-margin-bottom-4">
-                <button type="button" class="govuk-link" style="border: none; background: none; cursor: pointer; text-decoration: underline;"
+                <button type="button" class="civicone-share-button"
                         onclick="navigator.share ? navigator.share({title: '<?= htmlspecialchars(addslashes($listing['title'])) ?>', url: window.location.href}) : navigator.clipboard.writeText(window.location.href).then(() => alert('Link copied!'))">
                     <i class="fa-solid fa-copy govuk-!-margin-right-1" aria-hidden="true"></i> Copy link to this listing
                 </button>
@@ -236,14 +236,14 @@ $basePath = \Nexus\Core\TenantContext::getBasePath();
         <div class="govuk-grid-row">
             <?php foreach (array_slice($relatedListings, 0, 4) as $related): ?>
             <div class="govuk-grid-column-one-quarter govuk-!-margin-bottom-4">
-                <div class="govuk-!-padding-4" style="border: 1px solid #b1b4b6;">
+                <div class="govuk-!-padding-4 civicone-related-card">
                     <h3 class="govuk-heading-s govuk-!-margin-bottom-2">
                         <a href="<?= $basePath ?>/listings/<?= $related['id'] ?>" class="govuk-link">
                             <?= htmlspecialchars($related['title']) ?>
                         </a>
                     </h3>
-                    <p class="govuk-body-s govuk-!-margin-bottom-0" style="color: #505a5f;">
-                        <span class="govuk-tag govuk-tag--grey" style="font-size: 0.7rem;"><?= ucfirst($related['type']) ?></span>
+                    <p class="govuk-body-s govuk-!-margin-bottom-0 civicone-secondary-text">
+                        <span class="govuk-tag govuk-tag--grey civicone-tag-small"><?= ucfirst($related['type']) ?></span>
                         <?php if (!empty($related['location'])): ?>
                             · <?= htmlspecialchars($related['location']) ?>
                         <?php endif; ?>

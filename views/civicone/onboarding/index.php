@@ -34,8 +34,7 @@ $pageTitle = 'Complete your profile';
     <title><?= htmlspecialchars($pageTitle) ?> - Project NEXUS</title>
 
     <!-- GOV.UK Frontend CSS -->
-    <link rel="stylesheet" href="/assets/css/civicone/govuk-frontend-5.14.0.min.css">
-    <link rel="stylesheet" href="/assets/css/civicone/civicone-base.css">
+    <link rel="stylesheet" href="/assets/govuk-frontend-5.14.0/govuk-frontend.min.css">
 
     <!-- Onboarding CSS (extracted per CLAUDE.md) -->
     <link rel="stylesheet" href="/assets/css/civicone-onboarding-index.css?v=<?= filemtime($_SERVER['DOCUMENT_ROOT'] . '/assets/css/civicone-onboarding-index.css') ?>">

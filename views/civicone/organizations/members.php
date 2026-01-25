@@ -34,9 +34,9 @@ $basePath = \Nexus\Core\TenantContext::getBasePath();
 
         <?php if ($isAdmin): ?>
             <!-- Add Member Form -->
-            <div class="govuk-!-margin-bottom-6 govuk-!-padding-4 civicone-panel-bg" style="border-left: 5px solid #00703c;">
+            <div class="govuk-!-margin-bottom-6 govuk-!-padding-4 civicone-panel-bg civicone-border-left-green">
                 <h3 class="govuk-heading-s govuk-!-margin-bottom-3">
-                    <i class="fa-solid fa-user-plus govuk-!-margin-right-2" style="color: #00703c;" aria-hidden="true"></i>
+                    <i class="fa-solid fa-user-plus govuk-!-margin-right-2 civicone-icon-green" aria-hidden="true"></i>
                     Add Member
                 </h3>
                 <form action="<?= $basePath ?>/organizations/<?= $org['id'] ?>/members/invite" method="POST">
@@ -50,7 +50,7 @@ $basePath = \Nexus\Core\TenantContext::getBasePath();
                             </div>
                         </div>
                         <div class="govuk-grid-column-one-third">
-                            <button type="submit" class="govuk-button govuk-!-margin-bottom-0" data-module="govuk-button" style="background: #00703c;">
+                            <button type="submit" class="govuk-button govuk-!-margin-bottom-0" data-module="govuk-button">
                                 <i class="fa-solid fa-plus govuk-!-margin-right-2" aria-hidden="true"></i>
                                 Add Member
                             </button>
@@ -65,9 +65,9 @@ $basePath = \Nexus\Core\TenantContext::getBasePath();
 
         <?php if ($isOwner ?? false): ?>
             <!-- Transfer Ownership Section (Owner Only) -->
-            <div class="govuk-!-margin-bottom-6 govuk-!-padding-4 civicone-panel-bg" style="border-left: 5px solid #f47738;">
+            <div class="govuk-!-margin-bottom-6 govuk-!-padding-4 civicone-panel-bg civicone-border-left-orange">
                 <h3 class="govuk-heading-s govuk-!-margin-bottom-3">
-                    <i class="fa-solid fa-crown govuk-!-margin-right-2" style="color: #f47738;" aria-hidden="true"></i>
+                    <i class="fa-solid fa-crown govuk-!-margin-right-2 civicone-icon-orange" aria-hidden="true"></i>
                     Transfer Ownership
                 </h3>
                 <p class="govuk-hint govuk-!-margin-bottom-3">
@@ -113,41 +113,41 @@ $basePath = \Nexus\Core\TenantContext::getBasePath();
 
         <?php if ($isAdmin && !empty($pendingMembers)): ?>
             <!-- Pending Membership Requests -->
-            <div class="govuk-!-margin-bottom-6 govuk-!-padding-4 civicone-panel-bg" style="border-left: 5px solid #f47738;">
+            <div class="govuk-!-margin-bottom-6 govuk-!-padding-4 civicone-panel-bg civicone-border-left-orange">
                 <h3 class="govuk-heading-s govuk-!-margin-bottom-3">
-                    <i class="fa-solid fa-user-clock govuk-!-margin-right-2" style="color: #f47738;" aria-hidden="true"></i>
+                    <i class="fa-solid fa-user-clock govuk-!-margin-right-2 civicone-icon-orange" aria-hidden="true"></i>
                     Pending Requests
-                    <strong class="govuk-tag govuk-!-margin-left-2" style="background: #f47738;"><?= count($pendingMembers) ?></strong>
+                    <strong class="govuk-tag govuk-tag--orange govuk-!-margin-left-2"><?= count($pendingMembers) ?></strong>
                 </h3>
                 <div class="govuk-grid-row">
                     <?php foreach ($pendingMembers as $pending): ?>
                         <div class="govuk-grid-column-one-half govuk-!-margin-bottom-4">
-                            <div class="govuk-!-padding-3" style="background: white; border: 1px solid #b1b4b6;">
-                                <div style="display: flex; align-items: center; gap: 12px;">
-                                    <div style="width: 48px; height: 48px; border-radius: 50%; background: #f47738; color: white; display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0;">
+                            <div class="govuk-!-padding-3 civicone-member-card-v2">
+                                <div class="civicone-recipient-info">
+                                    <div class="civicone-member-avatar-lg civicone-bg-owner">
                                         <?php if (!empty($pending['avatar_url'])): ?>
-                                            <img src="<?= htmlspecialchars($pending['avatar_url']) ?>" loading="lazy" alt="" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">
+                                            <img src="<?= htmlspecialchars($pending['avatar_url']) ?>" loading="lazy" alt="">
                                         <?php else: ?>
                                             <?= strtoupper(substr($pending['display_name'] ?? 'U', 0, 1)) ?>
                                         <?php endif; ?>
                                     </div>
-                                    <div style="flex: 1; min-width: 0;">
+                                    <div class="civicone-member-info">
                                         <p class="govuk-body govuk-!-font-weight-bold govuk-!-margin-bottom-0"><?= htmlspecialchars($pending['display_name']) ?></p>
                                         <p class="govuk-hint govuk-!-margin-bottom-0"><?= htmlspecialchars($pending['email']) ?></p>
                                         <p class="govuk-body-s govuk-!-margin-bottom-0">
-                                            <i class="fa-solid fa-clock govuk-!-margin-right-1" style="color: #505a5f;" aria-hidden="true"></i>
+                                            <i class="fa-solid fa-clock govuk-!-margin-right-1 civicone-secondary-text" aria-hidden="true"></i>
                                             Requested <?= date('M d', strtotime($pending['created_at'])) ?>
                                         </p>
                                     </div>
-                                    <div class="govuk-button-group" style="flex-shrink: 0;">
-                                        <form action="<?= $basePath ?>/organizations/<?= $org['id'] ?>/members/approve" method="POST" style="display: inline;">
+                                    <div class="govuk-button-group civicone-member-actions">
+                                        <form action="<?= $basePath ?>/organizations/<?= $org['id'] ?>/members/approve" method="POST" class="civicone-inline-form">
                                             <?= \Nexus\Core\Csrf::input() ?>
                                             <input type="hidden" name="member_id" value="<?= $pending['user_id'] ?>">
-                                            <button type="submit" class="govuk-button govuk-!-margin-bottom-0" data-module="govuk-button" style="background: #00703c;">
+                                            <button type="submit" class="govuk-button govuk-!-margin-bottom-0" data-module="govuk-button">
                                                 <i class="fa-solid fa-check" aria-hidden="true"></i>
                                             </button>
                                         </form>
-                                        <form action="<?= $basePath ?>/organizations/<?= $org['id'] ?>/members/reject" method="POST" style="display: inline;">
+                                        <form action="<?= $basePath ?>/organizations/<?= $org['id'] ?>/members/reject" method="POST" class="civicone-inline-form">
                                             <?= \Nexus\Core\Csrf::input() ?>
                                             <input type="hidden" name="member_id" value="<?= $pending['user_id'] ?>">
                                             <button type="submit" class="govuk-button govuk-button--warning govuk-!-margin-bottom-0" data-module="govuk-button">
@@ -166,7 +166,7 @@ $basePath = \Nexus\Core\TenantContext::getBasePath();
         <!-- Members List -->
         <div class="govuk-!-margin-bottom-6">
             <h3 class="govuk-heading-m">
-                <i class="fa-solid fa-user-group govuk-!-margin-right-2" style="color: #1d70b8;" aria-hidden="true"></i>
+                <i class="fa-solid fa-user-group govuk-!-margin-right-2 civicone-icon-blue" aria-hidden="true"></i>
                 Active Members
             </h3>
 
@@ -178,35 +178,35 @@ $basePath = \Nexus\Core\TenantContext::getBasePath();
             ?>
             <div class="govuk-grid-row govuk-!-margin-bottom-4">
                 <div class="govuk-grid-column-one-quarter">
-                    <div class="govuk-!-padding-3 govuk-!-text-align-center civicone-panel-bg" style="border-left: 3px solid #1d70b8;">
-                        <p class="govuk-heading-m govuk-!-margin-bottom-0" style="color: #1d70b8;"><?= count($members) ?></p>
+                    <div class="govuk-!-padding-3 govuk-!-text-align-center civicone-panel-bg civicone-border-left-blue-sm">
+                        <p class="govuk-heading-m govuk-!-margin-bottom-0 civicone-heading-blue"><?= count($members) ?></p>
                         <p class="govuk-body-s govuk-!-margin-bottom-0">Total</p>
                     </div>
                 </div>
                 <div class="govuk-grid-column-one-quarter">
-                    <div class="govuk-!-padding-3 govuk-!-text-align-center civicone-panel-bg" style="border-left: 3px solid #f47738;">
-                        <p class="govuk-heading-m govuk-!-margin-bottom-0" style="color: #f47738;"><?= $ownerCount ?></p>
+                    <div class="govuk-!-padding-3 govuk-!-text-align-center civicone-panel-bg civicone-border-left-orange-sm">
+                        <p class="govuk-heading-m govuk-!-margin-bottom-0 civicone-heading-orange"><?= $ownerCount ?></p>
                         <p class="govuk-body-s govuk-!-margin-bottom-0">Owner</p>
                     </div>
                 </div>
                 <div class="govuk-grid-column-one-quarter">
-                    <div class="govuk-!-padding-3 govuk-!-text-align-center civicone-panel-bg" style="border-left: 3px solid #912b88;">
-                        <p class="govuk-heading-m govuk-!-margin-bottom-0" style="color: #912b88;"><?= $adminCount ?></p>
+                    <div class="govuk-!-padding-3 govuk-!-text-align-center civicone-panel-bg civicone-border-left-purple-sm">
+                        <p class="govuk-heading-m govuk-!-margin-bottom-0 civicone-heading-purple"><?= $adminCount ?></p>
                         <p class="govuk-body-s govuk-!-margin-bottom-0">Admins</p>
                     </div>
                 </div>
                 <div class="govuk-grid-column-one-quarter">
-                    <div class="govuk-!-padding-3 govuk-!-text-align-center civicone-panel-bg" style="border-left: 3px solid #505a5f;">
-                        <p class="govuk-heading-m govuk-!-margin-bottom-0" style="color: #505a5f;"><?= $memberCount ?></p>
+                    <div class="govuk-!-padding-3 govuk-!-text-align-center civicone-panel-bg civicone-border-left-grey-sm">
+                        <p class="govuk-heading-m govuk-!-margin-bottom-0 civicone-secondary-text"><?= $memberCount ?></p>
                         <p class="govuk-body-s govuk-!-margin-bottom-0">Members</p>
                     </div>
                 </div>
             </div>
 
             <?php if (empty($members)): ?>
-                <div class="govuk-!-padding-6 govuk-!-text-align-center civicone-panel-bg" style="border-left: 5px solid #1d70b8;">
+                <div class="govuk-!-padding-6 govuk-!-text-align-center civicone-panel-bg civicone-border-left-blue">
                     <p class="govuk-body govuk-!-margin-bottom-4">
-                        <i class="fa-solid fa-users-slash fa-3x" style="color: #1d70b8;" aria-hidden="true"></i>
+                        <i class="fa-solid fa-users-slash fa-3x civicone-icon-blue" aria-hidden="true"></i>
                     </p>
                     <h3 class="govuk-heading-m">No members yet</h3>
                 </div>
@@ -214,37 +214,37 @@ $basePath = \Nexus\Core\TenantContext::getBasePath();
                 <div class="govuk-grid-row">
                     <?php foreach ($members as $member): ?>
                         <?php
-                        $roleColors = [
-                            'owner' => '#f47738',
-                            'admin' => '#912b88',
-                            'member' => '#1d70b8'
+                        $roleClasses = [
+                            'owner' => ['border' => 'civicone-border-left-orange', 'bg' => 'civicone-bg-owner', 'tag' => 'govuk-tag--orange'],
+                            'admin' => ['border' => 'civicone-border-left-purple', 'bg' => 'civicone-bg-admin', 'tag' => 'govuk-tag--purple'],
+                            'member' => ['border' => 'civicone-border-left-blue', 'bg' => 'civicone-bg-member', 'tag' => 'govuk-tag--light-blue']
                         ];
-                        $roleColor = $roleColors[$member['role']] ?? '#1d70b8';
+                        $roleStyle = $roleClasses[$member['role']] ?? $roleClasses['member'];
                         ?>
                         <div class="govuk-grid-column-one-half govuk-!-margin-bottom-4">
-                            <div class="govuk-!-padding-4" style="background: white; border: 1px solid #b1b4b6; border-left: 5px solid <?= $roleColor ?>;">
-                                <div style="display: flex; align-items: center; gap: 12px;">
+                            <div class="govuk-!-padding-4 civicone-member-card-v2 <?= $roleStyle['border'] ?>">
+                                <div class="civicone-recipient-info">
                                     <!-- Avatar -->
-                                    <div style="width: 56px; height: 56px; border-radius: 50%; background: <?= $roleColor ?>; color: white; display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0;">
+                                    <div class="civicone-member-avatar-xl <?= $roleStyle['bg'] ?>">
                                         <?php if (!empty($member['avatar_url'])): ?>
-                                            <img src="<?= htmlspecialchars($member['avatar_url']) ?>" loading="lazy" alt="" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">
+                                            <img src="<?= htmlspecialchars($member['avatar_url']) ?>" loading="lazy" alt="">
                                         <?php else: ?>
                                             <?= strtoupper(substr($member['display_name'] ?? 'U', 0, 1)) ?>
                                         <?php endif; ?>
                                     </div>
 
                                     <!-- Info -->
-                                    <div style="flex: 1; min-width: 0;">
+                                    <div class="civicone-member-info">
                                         <p class="govuk-body govuk-!-font-weight-bold govuk-!-margin-bottom-1"><?= htmlspecialchars($member['display_name']) ?></p>
                                         <p class="govuk-hint govuk-!-margin-bottom-2"><?= htmlspecialchars($member['email']) ?></p>
-                                        <strong class="govuk-tag" style="background: <?= $roleColor ?>;">
+                                        <strong class="govuk-tag <?= $roleStyle['tag'] ?>">
                                             <?= ucfirst($member['role']) ?>
                                         </strong>
                                     </div>
 
                                     <?php if ($isAdmin): ?>
                                         <!-- Actions -->
-                                        <div style="flex-shrink: 0;">
+                                        <div class="civicone-member-actions">
                                             <!-- Pay Member Button -->
                                             <button type="button" class="govuk-button govuk-button--secondary govuk-!-margin-bottom-2"
                                                     data-module="govuk-button"
@@ -256,7 +256,7 @@ $basePath = \Nexus\Core\TenantContext::getBasePath();
                                             <?php if ($member['role'] !== 'owner'): ?>
                                                 <?php if ($member['role'] === 'member'): ?>
                                                     <!-- Promote to Admin -->
-                                                    <form action="<?= $basePath ?>/organizations/<?= $org['id'] ?>/members/role" method="POST" style="display: inline;">
+                                                    <form action="<?= $basePath ?>/organizations/<?= $org['id'] ?>/members/role" method="POST" class="civicone-inline-form">
                                                         <?= \Nexus\Core\Csrf::input() ?>
                                                         <input type="hidden" name="member_id" value="<?= $member['user_id'] ?>">
                                                         <input type="hidden" name="role" value="admin">
@@ -266,7 +266,7 @@ $basePath = \Nexus\Core\TenantContext::getBasePath();
                                                     </form>
                                                 <?php elseif ($member['role'] === 'admin'): ?>
                                                     <!-- Demote to Member -->
-                                                    <form action="<?= $basePath ?>/organizations/<?= $org['id'] ?>/members/role" method="POST" style="display: inline;">
+                                                    <form action="<?= $basePath ?>/organizations/<?= $org['id'] ?>/members/role" method="POST" class="civicone-inline-form">
                                                         <?= \Nexus\Core\Csrf::input() ?>
                                                         <input type="hidden" name="member_id" value="<?= $member['user_id'] ?>">
                                                         <input type="hidden" name="role" value="member">
@@ -277,7 +277,7 @@ $basePath = \Nexus\Core\TenantContext::getBasePath();
                                                 <?php endif; ?>
 
                                                 <!-- Remove -->
-                                                <form action="<?= $basePath ?>/organizations/<?= $org['id'] ?>/members/remove" method="POST" style="display: inline;"
+                                                <form action="<?= $basePath ?>/organizations/<?= $org['id'] ?>/members/remove" method="POST" class="civicone-inline-form"
                                                       onsubmit="return confirm('Remove this member from the organization?');">
                                                     <?= \Nexus\Core\Csrf::input() ?>
                                                     <input type="hidden" name="member_id" value="<?= $member['user_id'] ?>">
@@ -300,11 +300,11 @@ $basePath = \Nexus\Core\TenantContext::getBasePath();
 
 <?php if ($isAdmin): ?>
 <!-- Pay Member Modal -->
-<div id="payMemberModal" class="govuk-!-display-none" role="dialog" aria-labelledby="pay-modal-title" aria-modal="true" style="position: fixed; inset: 0; z-index: 1000;">
-    <div onclick="closePayModal()" style="position: absolute; inset: 0; background: rgba(0,0,0,0.5);"></div>
-    <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; width: 90%; max-width: 500px; max-height: 90vh; overflow-y: auto;">
-        <div class="govuk-!-padding-4" style="background: #1d70b8; color: white;">
-            <h3 id="pay-modal-title" class="govuk-heading-m" style="color: white; margin-bottom: 0;">
+<div id="payMemberModal" class="govuk-!-display-none civicone-modal-overlay" role="dialog" aria-labelledby="pay-modal-title" aria-modal="true">
+    <div onclick="closePayModal()" class="civicone-pay-modal-overlay"></div>
+    <div class="civicone-pay-modal-content">
+        <div class="govuk-!-padding-4 civicone-pay-modal-header">
+            <h3 id="pay-modal-title" class="govuk-heading-m">
                 <i class="fa-solid fa-coins govuk-!-margin-right-2" aria-hidden="true"></i>
                 Pay Member
             </h3>
@@ -315,8 +315,8 @@ $basePath = \Nexus\Core\TenantContext::getBasePath();
 
             <!-- Recipient Info -->
             <div class="govuk-inset-text govuk-!-margin-top-0">
-                <div style="display: flex; align-items: center; gap: 12px;">
-                    <div id="payRecipientAvatar" style="width: 48px; height: 48px; border-radius: 50%; background: #1d70b8; color: white; display: flex; align-items: center; justify-content: center; font-size: 18px;">U</div>
+                <div class="civicone-recipient-info">
+                    <div id="payRecipientAvatar" class="civicone-recipient-avatar">U</div>
                     <div>
                         <p class="govuk-body govuk-!-font-weight-bold govuk-!-margin-bottom-0" id="payRecipientName">-</p>
                         <p class="govuk-hint govuk-!-margin-bottom-0" id="payRecipientEmail">-</p>
@@ -325,9 +325,9 @@ $basePath = \Nexus\Core\TenantContext::getBasePath();
             </div>
 
             <!-- Wallet Balance -->
-            <div class="govuk-!-margin-bottom-4 govuk-!-padding-3 civicone-panel-bg" style="border-left: 3px solid #1d70b8;">
+            <div class="govuk-!-margin-bottom-4 govuk-!-padding-3 civicone-panel-bg civicone-border-left-blue-sm">
                 <p class="govuk-body-s govuk-!-margin-bottom-0">
-                    <i class="fa-solid fa-wallet govuk-!-margin-right-2" style="color: #1d70b8;" aria-hidden="true"></i>
+                    <i class="fa-solid fa-wallet govuk-!-margin-right-2 civicone-icon-blue" aria-hidden="true"></i>
                     Organization Balance: <strong><?= number_format($walletBalance ?? 0, 2) ?></strong> credits
                 </p>
             </div>

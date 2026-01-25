@@ -40,7 +40,7 @@ $currentScope = $currentScope ?? 'all';
                 <h1 class="govuk-heading-xl govuk-!-margin-bottom-2">Federated Messages</h1>
                 <?php if ($unreadCount > 0): ?>
                 <p class="govuk-body">
-                    <span class="govuk-tag govuk-tag--blue"><?= $unreadCount ?> unread message<?= $unreadCount !== 1 ? 's' : '' ?></span>
+                    <span class="govuk-tag govuk-tag--light-blue"><?= $unreadCount ?> unread message<?= $unreadCount !== 1 ? 's' : '' ?></span>
                 </p>
                 <?php endif; ?>
             </div>
@@ -72,7 +72,7 @@ $currentScope = $currentScope ?? 'all';
                             <div class="civicone-federation-badges">
                                 <!-- Unread Badge -->
                                 <?php if ($isUnread): ?>
-                                <span class="govuk-tag govuk-tag--blue">
+                                <span class="govuk-tag govuk-tag--light-blue">
                                     <?= $conv['unread_count'] ?> unread
                                 </span>
                                 <?php endif; ?>

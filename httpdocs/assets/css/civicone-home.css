@@ -78,11 +78,13 @@
 
 /* ==========================================================================
    Secondary Text (Author, Location, Meta)
-   Uses GOV.UK secondary text colour
+   Uses GOV.UK secondary text colour (#505a5f)
+   Source: https://github.com/alphagov/govuk-frontend - govuk-colour("dark-grey")
    ========================================================================== */
 
-.civicone-meta-text {
-    color: var(--govuk-colour-dark-grey);
+.civicone-meta-text,
+.civicone-secondary-text {
+    color: #505a5f; /* GOV.UK secondary-text-colour */
 }
 
 /* ==========================================================================

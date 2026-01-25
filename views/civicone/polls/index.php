@@ -56,10 +56,10 @@ $basePath = \Nexus\Core\TenantContext::getBasePath();
     <div class="govuk-grid-row">
         <?php foreach ($polls as $poll): ?>
             <div class="govuk-grid-column-one-half govuk-!-margin-bottom-6">
-                <div class="govuk-!-padding-6" style="border: 1px solid #b1b4b6; border-left: 5px solid #1d70b8; height: 100%;">
+                <div class="govuk-!-padding-6 civicone-sidebar-card civicone-highlight-panel civicone-card-full-height">
                     <h3 class="govuk-heading-m govuk-!-margin-bottom-3"><?= htmlspecialchars($poll['question']) ?></h3>
 
-                    <p class="govuk-body-s govuk-!-margin-bottom-4" style="color: #505a5f;">
+                    <p class="govuk-body-s govuk-!-margin-bottom-4 civicone-secondary-text">
                         Status:
                         <span class="govuk-tag <?= $poll['status'] === 'active' ? 'govuk-tag--green' : 'govuk-tag--grey' ?>">
                             <?= ucfirst($poll['status']) ?>

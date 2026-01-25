@@ -3,17 +3,16 @@
  * Used on: home.php, and potentially other pages with sidebars
  *
  * Dark mode support via CSS variables from theme
-  * Fully Migrated to Design Tokens: 2026-01-21 ✓
+ * Fully Migrated to Design Tokens: 2026-01-21 ✓
+ *
+ * NOTE: Grid layout for .home-sidebar-column is defined in nexus-home.css
+ * This file only contains sidebar card/component styles (consolidated 2026-01-25)
  */
 
 /* ============================================
    BASE SIDEBAR STYLES
+   Layout (.home-sidebar-column grid) is in nexus-home.css
    ============================================ */
-.home-sidebar-column {
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-4);
-}
 
 .sidebar-card {
     background: var(--bg-card, var(--color-white));
@@ -803,9 +802,5 @@
 
 /* ============================================
    RESPONSIVE
+   NOTE: Layout breakpoints (hiding sidebar) are in nexus-home.css
    ============================================ */
-@media (max-width: 1024px) {
-    .home-sidebar-column {
-        display: none;
-    }
-}

@@ -37,8 +37,8 @@ $cssVersion = file_exists(__DIR__ . '/../../../config/deployment-version.php')
     <title><?= htmlspecialchars($pageTitle) ?></title>
 
     <!-- Design Tokens & Core Styles -->
-    <link rel="preload" as="style" href="/assets/css/design-tokens.min.css?v=<?= $cssVersion ?>">
-    <link rel="stylesheet" href="/assets/css/design-tokens.min.css?v=<?= $cssVersion ?>">
+    <link rel="preload" as="style" href="/assets/css/design-tokens.css?v=<?= $cssVersion ?>">
+    <link rel="stylesheet" href="/assets/css/design-tokens.css?v=<?= $cssVersion ?>">
 
     <!-- Onboarding Specific Styles -->
     <link rel="stylesheet" href="/assets/css/modern-onboarding.css?v=<?= $cssVersion ?>">

@@ -28,8 +28,7 @@ $impactMetrics = $reportData['impact_metrics'] ?? [];
     <title><?= htmlspecialchars($title) ?> - Project NEXUS</title>
 
     <!-- GOV.UK Frontend CSS -->
-    <link rel="stylesheet" href="/assets/css/civicone/govuk-frontend-5.14.0.min.css">
-    <link rel="stylesheet" href="/assets/css/civicone/civicone-base.css">
+    <link rel="stylesheet" href="/assets/govuk-frontend-5.14.0/govuk-frontend.min.css">
 
     <!-- Impact Report CSS (extracted per CLAUDE.md) -->
     <link rel="stylesheet" href="/assets/css/civicone-nexus-impact-report.css?v=<?= filemtime($_SERVER['DOCUMENT_ROOT'] . '/assets/css/civicone-nexus-impact-report.css') ?>">

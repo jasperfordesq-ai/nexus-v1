@@ -29,26 +29,34 @@ require dirname(__DIR__, 2) . '/layouts/civicone/header.php';
         <?php include __DIR__ . '/_org-utility-bar.php'; ?>
 
         <!-- Stats Grid -->
+        <?php
+        $balanceStatusClasses = [
+            'critical' => ['bg' => 'civicone-balance-bg--critical', 'border' => 'civicone-border-left-red', 'heading' => 'civicone-heading-red', 'gauge' => 'civicone-balance-gauge-fill--critical', 'tag' => 'govuk-tag--red'],
+            'low' => ['bg' => 'civicone-balance-bg--low', 'border' => 'civicone-border-left-orange', 'heading' => 'civicone-heading-orange', 'gauge' => 'civicone-balance-gauge-fill--low', 'tag' => 'govuk-tag--orange'],
+            'healthy' => ['bg' => 'civicone-balance-bg--healthy', 'border' => 'civicone-border-left-green', 'heading' => 'civicone-heading-green', 'gauge' => 'civicone-balance-gauge-fill--healthy', 'tag' => 'govuk-tag--green']
+        ];
+        $statusStyle = $balanceStatusClasses[$balanceStatus['status']] ?? $balanceStatusClasses['healthy'];
+        ?>
         <div class="govuk-grid-row govuk-!-margin-bottom-6">
             <div class="govuk-grid-column-one-quarter">
-                <div class="govuk-!-padding-4 govuk-!-text-align-center" style="background: <?= $balanceStatus['status'] === 'critical' ? '#d4351c15' : ($balanceStatus['status'] === 'low' ? '#f4773815' : '#f3f2f1') ?>; border-left: 5px solid <?= $balanceStatus['status'] === 'critical' ? '#d4351c' : ($balanceStatus['status'] === 'low' ? '#f47738' : '#00703c') ?>;">
+                <div class="govuk-!-padding-4 govuk-!-text-align-center <?= $statusStyle['bg'] ?> <?= $statusStyle['border'] ?>">
                     <?php if ($balanceStatus['status'] !== 'healthy'): ?>
-                    <strong class="govuk-tag govuk-!-margin-bottom-2" style="background: <?= $balanceStatus['status'] === 'critical' ? '#d4351c' : '#f47738' ?>;">
+                    <strong class="govuk-tag govuk-!-margin-bottom-2 <?= $statusStyle['tag'] ?>">
                         <?= $balanceStatus['label'] ?>
                     </strong>
                     <?php endif; ?>
-                    <p class="govuk-heading-xl govuk-!-margin-bottom-1" id="balanceValue" style="color: <?= $balanceStatus['status'] === 'critical' ? '#d4351c' : ($balanceStatus['status'] === 'low' ? '#f47738' : '#00703c') ?>;" aria-live="polite">
+                    <p class="govuk-heading-xl govuk-!-margin-bottom-1 <?= $statusStyle['heading'] ?>" id="balanceValue" aria-live="polite">
                         <?= number_format($summary['balance'], 1) ?>
                     </p>
                     <p class="govuk-body-s govuk-!-margin-bottom-2">Current Balance</p>
-                    <div style="background: #b1b4b6; height: 8px; border-radius: 4px; overflow: hidden;">
-                        <div style="background: <?= $balanceStatus['status'] === 'critical' ? '#d4351c' : ($balanceStatus['status'] === 'low' ? '#f47738' : '#00703c') ?>; height: 100%; width: <?= $balancePercent ?>%;"></div>
+                    <div class="civicone-balance-gauge">
+                        <div class="civicone-balance-gauge-fill <?= $statusStyle['gauge'] ?>" style="width: <?= $balancePercent ?>%;"></div>
                     </div>
                 </div>
             </div>
             <div class="govuk-grid-column-one-quarter">
-                <div class="govuk-!-padding-4 govuk-!-text-align-center civicone-panel-bg" style="border-left: 5px solid #00703c;">
-                    <p class="govuk-heading-xl govuk-!-margin-bottom-1" style="color: #00703c;">
+                <div class="govuk-!-padding-4 govuk-!-text-align-center civicone-panel-bg civicone-border-left-green">
+                    <p class="govuk-heading-xl govuk-!-margin-bottom-1 civicone-heading-green">
                         <i class="fa-solid fa-arrow-down govuk-!-margin-right-1" aria-hidden="true"></i>
                         <?= number_format($summary['total_received'], 1) ?>
                     </p>
@@ -56,8 +64,8 @@ require dirname(__DIR__, 2) . '/layouts/civicone/header.php';
                 </div>
             </div>
             <div class="govuk-grid-column-one-quarter">
-                <div class="govuk-!-padding-4 govuk-!-text-align-center civicone-panel-bg" style="border-left: 5px solid #d4351c;">
-                    <p class="govuk-heading-xl govuk-!-margin-bottom-1" style="color: #d4351c;">
+                <div class="govuk-!-padding-4 govuk-!-text-align-center civicone-panel-bg civicone-border-left-red">
+                    <p class="govuk-heading-xl govuk-!-margin-bottom-1 civicone-heading-red">
                         <i class="fa-solid fa-arrow-up govuk-!-margin-right-1" aria-hidden="true"></i>
                         <?= number_format($summary['total_paid_out'], 1) ?>
                     </p>
@@ -65,8 +73,8 @@ require dirname(__DIR__, 2) . '/layouts/civicone/header.php';
                 </div>
             </div>
             <div class="govuk-grid-column-one-quarter">
-                <div class="govuk-!-padding-4 govuk-!-text-align-center civicone-panel-bg" style="border-left: 5px solid #1d70b8;">
-                    <p class="govuk-heading-xl govuk-!-margin-bottom-1" style="color: #1d70b8;">
+                <div class="govuk-!-padding-4 govuk-!-text-align-center civicone-panel-bg civicone-border-left-blue">
+                    <p class="govuk-heading-xl govuk-!-margin-bottom-1 civicone-heading-blue">
                         <i class="fa-solid fa-clock-rotate-left govuk-!-margin-right-1" aria-hidden="true"></i>
                         <?= $summary['transaction_count'] ?>
                     </p>
@@ -79,10 +87,10 @@ require dirname(__DIR__, 2) . '/layouts/civicone/header.php';
             <!-- Left Column: Actions -->
             <div class="govuk-grid-column-one-half">
                 <!-- Deposit Form -->
-                <div class="govuk-!-margin-bottom-6" style="border: 1px solid #b1b4b6;">
-                    <div class="govuk-!-padding-3 civicone-panel-bg" style="border-bottom: 1px solid #b1b4b6;">
+                <div class="govuk-!-margin-bottom-6 civicone-sidebar-card">
+                    <div class="govuk-!-padding-3 civicone-panel-bg civicone-section-header">
                         <h3 class="govuk-heading-s govuk-!-margin-bottom-0">
-                            <i class="fa-solid fa-arrow-down-to-bracket govuk-!-margin-right-2" style="color: #00703c;" aria-hidden="true"></i>
+                            <i class="fa-solid fa-arrow-down-to-bracket govuk-!-margin-right-2 civicone-icon-green" aria-hidden="true"></i>
                             Deposit to Organization
                         </h3>
                     </div>
@@ -91,7 +99,7 @@ require dirname(__DIR__, 2) . '/layouts/civicone/header.php';
                             Deposit credits from your personal wallet to the organization's shared wallet.
                         </div>
 
-                        <div class="govuk-!-padding-3 govuk-!-margin-bottom-4 civicone-panel-bg" style="border-left: 5px solid #1d70b8;">
+                        <div class="govuk-!-padding-3 govuk-!-margin-bottom-4 civicone-panel-bg civicone-border-left-blue">
                             <p class="govuk-body-s govuk-!-margin-bottom-0">
                                 <strong>Your Balance:</strong> <?= number_format($user['balance'], 1) ?> HRS
                             </p>
@@ -117,10 +125,10 @@ require dirname(__DIR__, 2) . '/layouts/civicone/header.php';
                 </div>
 
                 <!-- Request Transfer Form -->
-                <div class="govuk-!-margin-bottom-6" style="border: 1px solid #b1b4b6;">
-                    <div class="govuk-!-padding-3 civicone-panel-bg" style="border-bottom: 1px solid #b1b4b6;">
+                <div class="govuk-!-margin-bottom-6 civicone-sidebar-card">
+                    <div class="govuk-!-padding-3 civicone-panel-bg civicone-section-header">
                         <h3 class="govuk-heading-s govuk-!-margin-bottom-0">
-                            <i class="fa-solid fa-hand-holding-dollar govuk-!-margin-right-2" style="color: #912b88;" aria-hidden="true"></i>
+                            <i class="fa-solid fa-hand-holding-dollar govuk-!-margin-right-2 civicone-heading-purple" aria-hidden="true"></i>
                             Request Transfer
                         </h3>
                     </div>
@@ -141,10 +149,10 @@ require dirname(__DIR__, 2) . '/layouts/civicone/header.php';
                                 </select>
                             </div>
 
-                            <div class="govuk-form-group" id="memberSelectGroup" style="display: none;">
+                            <div class="govuk-form-group govuk-!-display-none" id="memberSelectGroup">
                                 <label class="govuk-label" for="memberSearch">Select Member</label>
                                 <input type="text" id="memberSearch" class="govuk-input" placeholder="Search members..." autocomplete="off">
-                                <div id="memberResults" style="border: 1px solid #b1b4b6; max-height: 200px; overflow-y: auto; display: none;"></div>
+                                <div id="memberResults" class="civicone-search-results govuk-!-display-none"></div>
                             </div>
 
                             <div class="govuk-form-group">
@@ -168,9 +176,9 @@ require dirname(__DIR__, 2) . '/layouts/civicone/header.php';
 
                 <?php if ($isAdmin): ?>
                 <!-- Direct Transfer (Admin Only) -->
-                <div class="govuk-!-margin-bottom-6" style="border: 1px solid #b1b4b6;">
-                    <div class="govuk-!-padding-3" style="background: #f47738; color: white; border-bottom: 1px solid #b1b4b6;">
-                        <h3 class="govuk-heading-s govuk-!-margin-bottom-0" style="color: white;">
+                <div class="govuk-!-margin-bottom-6 civicone-sidebar-card">
+                    <div class="govuk-!-padding-3 civicone-section-header--admin">
+                        <h3 class="govuk-heading-s govuk-!-margin-bottom-0">
                             <i class="fa-solid fa-bolt govuk-!-margin-right-2" aria-hidden="true"></i>
                             Direct Transfer (Admin)
                         </h3>
@@ -191,7 +199,7 @@ require dirname(__DIR__, 2) . '/layouts/civicone/header.php';
                             <div class="govuk-form-group">
                                 <label class="govuk-label" for="directMemberSearch">Recipient</label>
                                 <input type="text" id="directMemberSearch" class="govuk-input" placeholder="Search members..." autocomplete="off">
-                                <div id="directMemberResults" style="border: 1px solid #b1b4b6; max-height: 200px; overflow-y: auto; display: none;"></div>
+                                <div id="directMemberResults" class="civicone-search-results govuk-!-display-none"></div>
                             </div>
 
                             <div class="govuk-form-group">
@@ -218,40 +226,40 @@ require dirname(__DIR__, 2) . '/layouts/civicone/header.php';
             <div class="govuk-grid-column-one-half">
                 <?php if ($isAdmin && !empty($pendingRequests)): ?>
                 <!-- Pending Requests (Admin) -->
-                <div class="govuk-!-margin-bottom-6" style="border: 1px solid #b1b4b6;">
-                    <div class="govuk-!-padding-3 civicone-panel-bg" style="border-bottom: 1px solid #b1b4b6;">
+                <div class="govuk-!-margin-bottom-6 civicone-sidebar-card">
+                    <div class="govuk-!-padding-3 civicone-panel-bg civicone-section-header">
                         <h3 class="govuk-heading-s govuk-!-margin-bottom-0">
-                            <i class="fa-solid fa-inbox govuk-!-margin-right-2" style="color: #f47738;" aria-hidden="true"></i>
+                            <i class="fa-solid fa-inbox govuk-!-margin-right-2 civicone-icon-orange" aria-hidden="true"></i>
                             Pending Requests
-                            <strong class="govuk-tag govuk-!-margin-left-2" style="background: #f47738;"><?= count($pendingRequests) ?></strong>
+                            <strong class="govuk-tag govuk-tag--orange govuk-!-margin-left-2"><?= count($pendingRequests) ?></strong>
                         </h3>
                     </div>
 
                     <div class="govuk-!-padding-0">
                         <?php foreach ($pendingRequests as $request): ?>
-                        <div class="govuk-!-padding-3" style="border-bottom: 1px solid #f3f2f1;">
+                        <div class="govuk-!-padding-3 civicone-transaction-item">
                             <div class="govuk-grid-row">
                                 <div class="govuk-grid-column-two-thirds">
                                     <p class="govuk-body-s govuk-!-font-weight-bold govuk-!-margin-bottom-1">
                                         <?= htmlspecialchars($request['requester_name']) ?>
-                                        <i class="fa-solid fa-arrow-right govuk-!-margin-left-1 govuk-!-margin-right-1" style="color: #505a5f;" aria-hidden="true"></i>
+                                        <i class="fa-solid fa-arrow-right govuk-!-margin-left-1 govuk-!-margin-right-1 civicone-secondary-text" aria-hidden="true"></i>
                                         <?= htmlspecialchars($request['recipient_name']) ?>
                                     </p>
                                     <p class="govuk-body-s govuk-!-margin-bottom-1"><?= htmlspecialchars($request['description'] ?? 'No description') ?></p>
-                                    <p class="govuk-body-s govuk-!-margin-bottom-0" style="color: #505a5f;"><?= date('M d, Y g:i A', strtotime($request['created_at'])) ?></p>
+                                    <p class="govuk-body-s govuk-!-margin-bottom-0 civicone-secondary-text"><?= date('M d, Y g:i A', strtotime($request['created_at'])) ?></p>
                                 </div>
                                 <div class="govuk-grid-column-one-third govuk-!-text-align-right">
-                                    <strong class="govuk-tag" style="background: #1d70b8;"><?= number_format($request['amount'], 1) ?> HRS</strong>
+                                    <strong class="govuk-tag govuk-tag--light-blue"><?= number_format($request['amount'], 1) ?> HRS</strong>
                                     <div class="govuk-!-margin-top-2">
-                                        <form action="<?= $basePath ?>/organizations/<?= $org['id'] ?>/wallet/approve/<?= $request['id'] ?>" method="POST" style="display: inline;">
+                                        <form action="<?= $basePath ?>/organizations/<?= $org['id'] ?>/wallet/approve/<?= $request['id'] ?>" method="POST" class="civicone-inline-form">
                                             <?= \Nexus\Core\Csrf::input() ?>
-                                            <button type="submit" class="govuk-button govuk-button--secondary govuk-!-margin-bottom-0" style="font-size: 14px; padding: 5px 10px;">
+                                            <button type="submit" class="govuk-button govuk-button--secondary govuk-!-margin-bottom-0 civicone-btn-inline">
                                                 <i class="fa-solid fa-check" aria-hidden="true"></i>
                                             </button>
                                         </form>
-                                        <form action="<?= $basePath ?>/organizations/<?= $org['id'] ?>/wallet/reject/<?= $request['id'] ?>" method="POST" style="display: inline;">
+                                        <form action="<?= $basePath ?>/organizations/<?= $org['id'] ?>/wallet/reject/<?= $request['id'] ?>" method="POST" class="civicone-inline-form">
                                             <?= \Nexus\Core\Csrf::input() ?>
-                                            <button type="submit" class="govuk-button govuk-button--warning govuk-!-margin-bottom-0" style="font-size: 14px; padding: 5px 10px;">
+                                            <button type="submit" class="govuk-button govuk-button--warning govuk-!-margin-bottom-0 civicone-btn-inline">
                                                 <i class="fa-solid fa-times" aria-hidden="true"></i>
                                             </button>
                                         </form>
@@ -265,12 +273,12 @@ require dirname(__DIR__, 2) . '/layouts/civicone/header.php';
                 <?php endif; ?>
 
                 <!-- Transaction History -->
-                <div style="border: 1px solid #b1b4b6;">
-                    <div class="govuk-!-padding-3 civicone-panel-bg" style="border-bottom: 1px solid #b1b4b6;">
+                <div class="civicone-sidebar-card">
+                    <div class="govuk-!-padding-3 civicone-panel-bg civicone-section-header">
                         <div class="govuk-grid-row">
                             <div class="govuk-grid-column-two-thirds">
                                 <h3 class="govuk-heading-s govuk-!-margin-bottom-0">
-                                    <i class="fa-solid fa-clock-rotate-left govuk-!-margin-right-2" style="color: #00703c;" aria-hidden="true"></i>
+                                    <i class="fa-solid fa-clock-rotate-left govuk-!-margin-right-2 civicone-icon-green" aria-hidden="true"></i>
                                     Transaction History
                                 </h3>
                             </div>
@@ -285,11 +293,11 @@ require dirname(__DIR__, 2) . '/layouts/civicone/header.php';
                         </div>
                     </div>
 
-                    <div class="govuk-!-padding-0" style="max-height: 500px; overflow-y: auto;">
+                    <div class="govuk-!-padding-0 civicone-scrollable-list">
                         <?php if (empty($transactions)): ?>
                         <div class="govuk-!-padding-6 govuk-!-text-align-center">
                             <p class="govuk-body govuk-!-margin-bottom-4">
-                                <i class="fa-solid fa-receipt fa-3x" style="color: #b1b4b6;" aria-hidden="true"></i>
+                                <i class="fa-solid fa-receipt fa-3x civicone-secondary-text" aria-hidden="true"></i>
                             </p>
                             <h4 class="govuk-heading-s">No transactions yet</h4>
                             <p class="govuk-body-s">Start by depositing credits from your personal wallet.</p>
@@ -298,11 +306,11 @@ require dirname(__DIR__, 2) . '/layouts/civicone/header.php';
                             <?php foreach ($transactions as $tx):
                                 $isDeposit = ($tx['sender_type'] ?? '') === 'user' || ($tx['type'] ?? '') === 'deposit';
                             ?>
-                            <div class="govuk-!-padding-3" style="border-bottom: 1px solid #f3f2f1; display: flex; align-items: center; gap: 12px;">
-                                <div style="width: 36px; height: 36px; border-radius: 50%; background: <?= $isDeposit ? '#00703c' : '#d4351c' ?>; color: white; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                            <div class="govuk-!-padding-3 civicone-transaction-item">
+                                <div class="civicone-transaction-icon <?= $isDeposit ? 'civicone-transaction-icon--deposit' : 'civicone-transaction-icon--withdrawal' ?>">
                                     <i class="fa-solid <?= $isDeposit ? 'fa-arrow-down' : 'fa-arrow-up' ?>" aria-hidden="true"></i>
                                 </div>
-                                <div style="flex: 1;">
+                                <div class="civicone-transaction-content">
                                     <p class="govuk-body-s govuk-!-font-weight-bold govuk-!-margin-bottom-0">
                                         <?php if ($isDeposit): ?>
                                             Deposit from <?= htmlspecialchars($tx['sender_name'] ?? 'Member') ?>
@@ -310,15 +318,15 @@ require dirname(__DIR__, 2) . '/layouts/civicone/header.php';
                                             Transfer to <?= htmlspecialchars($tx['receiver_name'] ?? 'Member') ?>
                                         <?php endif; ?>
                                     </p>
-                                    <p class="govuk-body-s govuk-!-margin-bottom-0" style="color: #505a5f;">
+                                    <p class="govuk-body-s govuk-!-margin-bottom-0 civicone-secondary-text">
                                         <?= htmlspecialchars($tx['description'] ?? '-') ?>
                                     </p>
-                                    <p class="govuk-body-s govuk-!-margin-bottom-0" style="color: #505a5f; font-size: 12px;">
+                                    <p class="govuk-body-s govuk-!-margin-bottom-0 civicone-secondary-text civicone-text-tiny">
                                         <?= date('M d, Y g:i A', strtotime($tx['created_at'])) ?>
                                     </p>
                                 </div>
                                 <div>
-                                    <strong class="govuk-tag" style="background: <?= $isDeposit ? '#00703c' : '#d4351c' ?>;">
+                                    <strong class="govuk-tag <?= $isDeposit ? 'govuk-tag--green' : 'govuk-tag--red' ?>">
                                         <?= $isDeposit ? '+' : '-' ?><?= number_format($tx['amount'], 1) ?> HRS
                                     </strong>
                                 </div>
@@ -340,9 +348,9 @@ const orgId = <?= $org['id'] ?>;
 function toggleRecipientSelect(select) {
     const group = document.getElementById('memberSelectGroup');
     if (select.value === 'other') {
-        group.style.display = 'block';
+        group.classList.remove('govuk-!-display-none');
     } else {
-        group.style.display = 'none';
+        group.classList.add('govuk-!-display-none');
         document.getElementById('requestRecipientId').value = '0';
     }
 }
@@ -354,7 +362,7 @@ if (memberSearch) {
     memberSearch.addEventListener('input', function() {
         const query = this.value.toLowerCase().trim();
         if (query.length < 1) {
-            memberResults.style.display = 'none';
+            memberResults.classList.add('govuk-!-display-none');
             return;
         }
         const filtered = orgMembers.filter(m =>
@@ -363,15 +371,15 @@ if (memberSearch) {
         );
         if (filtered.length > 0) {
             memberResults.innerHTML = filtered.map(m => `
-                <div style="padding: 10px; cursor: pointer; border-bottom: 1px solid #f3f2f1;" onmouseover="this.style.background='#f3f2f1'" onmouseout="this.style.background='white'" onclick="selectMember(${m.user_id}, '${escapeHtml(m.display_name)}')">
+                <div class="civicone-search-result-item" onclick="selectMember(${m.user_id}, '${escapeHtml(m.display_name)}')">
                     <strong>${escapeHtml(m.display_name)}</strong>
-                    <span style="color: #505a5f; font-size: 12px;">${m.role}</span>
+                    <span class="civicone-secondary-text civicone-text-tiny">${m.role}</span>
                 </div>
             `).join('');
-            memberResults.style.display = 'block';
+            memberResults.classList.remove('govuk-!-display-none');
         } else {
-            memberResults.innerHTML = '<div style="padding: 10px; color: #505a5f;">No members found</div>';
-            memberResults.style.display = 'block';
+            memberResults.innerHTML = '<div class="govuk-!-padding-3 civicone-secondary-text">No members found</div>';
+            memberResults.classList.remove('govuk-!-display-none');
         }
     });
 }
@@ -379,7 +387,7 @@ if (memberSearch) {
 function selectMember(id, name) {
     document.getElementById('requestRecipientId').value = id;
     document.getElementById('memberSearch').value = name;
-    document.getElementById('memberResults').style.display = 'none';
+    memberResults.classList.add('govuk-!-display-none');
 }
 
 // Direct transfer member search (Admin)
@@ -389,7 +397,7 @@ if (directSearch) {
     directSearch.addEventListener('input', function() {
         const query = this.value.toLowerCase().trim();
         if (query.length < 1) {
-            directResults.style.display = 'none';
+            directResults.classList.add('govuk-!-display-none');
             return;
         }
         const filtered = orgMembers.filter(m =>
@@ -398,15 +406,15 @@ if (directSearch) {
         );
         if (filtered.length > 0) {
             directResults.innerHTML = filtered.map(m => `
-                <div style="padding: 10px; cursor: pointer; border-bottom: 1px solid #f3f2f1;" onmouseover="this.style.background='#f3f2f1'" onmouseout="this.style.background='white'" onclick="selectDirectMember(${m.user_id}, '${escapeHtml(m.display_name)}')">
+                <div class="civicone-search-result-item" onclick="selectDirectMember(${m.user_id}, '${escapeHtml(m.display_name)}')">
                     <strong>${escapeHtml(m.display_name)}</strong>
-                    <span style="color: #505a5f; font-size: 12px;">${m.role}</span>
+                    <span class="civicone-secondary-text civicone-text-tiny">${m.role}</span>
                 </div>
             `).join('');
-            directResults.style.display = 'block';
+            directResults.classList.remove('govuk-!-display-none');
         } else {
-            directResults.innerHTML = '<div style="padding: 10px; color: #505a5f;">No members found</div>';
-            directResults.style.display = 'block';
+            directResults.innerHTML = '<div class="govuk-!-padding-3 civicone-secondary-text">No members found</div>';
+            directResults.classList.remove('govuk-!-display-none');
         }
     });
 }
@@ -414,7 +422,7 @@ if (directSearch) {
 function selectDirectMember(id, name) {
     document.getElementById('directRecipientId').value = id;
     document.getElementById('directMemberSearch').value = name;
-    document.getElementById('directMemberResults').style.display = 'none';
+    directResults.classList.add('govuk-!-display-none');
 }
 
 function escapeHtml(text) {
@@ -427,10 +435,10 @@ function escapeHtml(text) {
 // Close dropdowns on outside click
 document.addEventListener('click', function(e) {
     if (!e.target.closest('#memberSearch') && !e.target.closest('#memberResults')) {
-        if (memberResults) memberResults.style.display = 'none';
+        if (memberResults) memberResults.classList.add('govuk-!-display-none');
     }
     if (!e.target.closest('#directMemberSearch') && !e.target.closest('#directMemberResults')) {
-        if (directResults) directResults.style.display = 'none';
+        if (directResults) directResults.classList.add('govuk-!-display-none');
     }
 });
 </script>

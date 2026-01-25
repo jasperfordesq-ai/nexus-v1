@@ -38,34 +38,34 @@ $displayName = $userProfile['name'] ?? trim(($userProfile['first_name'] ?? '') .
 
 <div class="govuk-width-container govuk-!-padding-top-6 govuk-!-padding-bottom-9">
     <div class="govuk-grid-row">
-        <div class="govuk-grid-column-two-thirds-from-desktop" style="margin: 0 auto; float: none;">
+        <div class="govuk-grid-column-two-thirds-from-desktop civicone-wizard-center">
             <!-- Progress Bar -->
             <nav class="govuk-!-margin-bottom-6" aria-label="Setup progress">
-                <ol class="govuk-list" style="display: flex; justify-content: center; align-items: center; gap: 0.5rem;">
-                    <li data-step="1" class="govuk-!-padding-2 govuk-!-font-weight-bold" style="background: #1d70b8; color: white; border-radius: 50%; width: 2rem; height: 2rem; display: flex; align-items: center; justify-content: center;" aria-current="step">
+                <ol class="govuk-list civicone-stepper">
+                    <li data-step="1" class="govuk-!-padding-2 govuk-!-font-weight-bold civicone-step-active" aria-current="step">
                         <span class="govuk-visually-hidden">Step </span>1
                     </li>
-                    <li data-line="1" style="width: 3rem; height: 2px; background: #b1b4b6;" aria-hidden="true"></li>
-                    <li data-step="2" class="govuk-!-padding-2 civicone-panel-bg" style="border-radius: 50%; width: 2rem; height: 2rem; display: flex; align-items: center; justify-content: center;">
+                    <li data-line="1" class="civicone-step-line" aria-hidden="true"></li>
+                    <li data-step="2" class="govuk-!-padding-2 civicone-panel-bg civicone-step-inactive">
                         <span class="govuk-visually-hidden">Step </span>2
                     </li>
-                    <li data-line="2" style="width: 3rem; height: 2px; background: #b1b4b6;" aria-hidden="true"></li>
-                    <li data-step="3" class="govuk-!-padding-2 civicone-panel-bg" style="border-radius: 50%; width: 2rem; height: 2rem; display: flex; align-items: center; justify-content: center;">
+                    <li data-line="2" class="civicone-step-line" aria-hidden="true"></li>
+                    <li data-step="3" class="govuk-!-padding-2 civicone-panel-bg civicone-step-inactive">
                         <span class="govuk-visually-hidden">Step </span>3
                     </li>
-                    <li data-line="3" style="width: 3rem; height: 2px; background: #b1b4b6;" aria-hidden="true"></li>
-                    <li data-step="4" class="govuk-!-padding-2 civicone-panel-bg" style="border-radius: 50%; width: 2rem; height: 2rem; display: flex; align-items: center; justify-content: center;">
+                    <li data-line="3" class="civicone-step-line" aria-hidden="true"></li>
+                    <li data-step="4" class="govuk-!-padding-2 civicone-panel-bg civicone-step-inactive">
                         <i class="fa-solid fa-check" aria-hidden="true"></i>
                         <span class="govuk-visually-hidden">Complete</span>
                     </li>
                 </ol>
             </nav>
 
-            <div class="govuk-!-padding-6" style="border: 1px solid #b1b4b6;" role="main">
+            <div class="govuk-!-padding-6 civicone-wizard-container" role="main">
             <!-- Step 1: Welcome -->
             <section data-step="1" aria-labelledby="step1-title" class="govuk-!-text-align-center">
                 <div class="govuk-!-margin-bottom-4" aria-hidden="true">
-                    <i class="fa-solid fa-globe fa-3x" style="color: #1d70b8;"></i>
+                    <i class="fa-solid fa-globe fa-3x civicone-icon-blue"></i>
                 </div>
                 <h1 id="step1-title" class="govuk-heading-l">Connect Beyond Borders</h1>
                 <p class="govuk-body-l govuk-!-margin-bottom-6">
@@ -73,7 +73,7 @@ $displayName = $userProfile['name'] ?? trim(($userProfile['first_name'] ?? '') .
                 </p>
 
                 <p class="govuk-!-margin-bottom-6">
-                    <span class="govuk-tag govuk-tag--blue">
+                    <span class="govuk-tag govuk-tag--light-blue">
                         <i class="fa-solid fa-handshake govuk-!-margin-right-1" aria-hidden="true"></i>
                         <?= $partnerCount ?> Partner Timebank<?= $partnerCount !== 1 ? 's' : '' ?> Available
                     </span>
@@ -83,7 +83,7 @@ $displayName = $userProfile['name'] ?? trim(($userProfile['first_name'] ?? '') .
                     <fieldset class="govuk-fieldset" aria-label="Federation choice">
                         <legend class="govuk-visually-hidden">Would you like to enable federation?</legend>
                         <div class="govuk-radios" data-module="govuk-radios">
-                            <div class="govuk-radios__item govuk-!-padding-4 govuk-!-margin-bottom-2" style="border: 2px solid #1d70b8; background: #f0f4f8;">
+                            <div class="govuk-radios__item govuk-!-padding-4 govuk-!-margin-bottom-2 civicone-radio-card--selected">
                                 <input class="govuk-radios__input" id="fed-yes" name="federation_choice" type="radio" value="yes" checked data-value="yes">
                                 <label class="govuk-label govuk-radios__label" for="fed-yes">
                                     <strong>Yes, let's get started!</strong>
@@ -93,7 +93,7 @@ $displayName = $userProfile['name'] ?? trim(($userProfile['first_name'] ?? '') .
                                     Enable federation and connect with partner communities
                                 </div>
                             </div>
-                            <div class="govuk-radios__item govuk-!-padding-4" style="border: 1px solid #b1b4b6;">
+                            <div class="govuk-radios__item govuk-!-padding-4 civicone-radio-card">
                                 <input class="govuk-radios__input" id="fed-no" name="federation_choice" type="radio" value="no" data-value="no">
                                 <label class="govuk-label govuk-radios__label" for="fed-no">
                                     <strong>Not right now</strong>
@@ -121,7 +121,7 @@ $displayName = $userProfile['name'] ?? trim(($userProfile['first_name'] ?? '') .
             <!-- Step 2: Privacy Level -->
             <section data-step="2" aria-labelledby="step2-title" hidden class="govuk-!-text-align-center">
                 <div class="govuk-!-margin-bottom-4" aria-hidden="true">
-                    <i class="fa-solid fa-shield-halved fa-3x" style="color: #1d70b8;"></i>
+                    <i class="fa-solid fa-shield-halved fa-3x civicone-icon-blue"></i>
                 </div>
                 <h1 id="step2-title" class="govuk-heading-l">Choose Your Privacy Level</h1>
                 <p class="govuk-body-l govuk-!-margin-bottom-6">
@@ -132,7 +132,7 @@ $displayName = $userProfile['name'] ?? trim(($userProfile['first_name'] ?? '') .
                     <fieldset class="govuk-fieldset" id="privacyOptions" aria-label="Privacy level">
                         <legend class="govuk-visually-hidden">Select your privacy level</legend>
                         <div class="govuk-radios" data-module="govuk-radios">
-                            <div class="govuk-radios__item govuk-!-padding-4 govuk-!-margin-bottom-2" style="border: 1px solid #b1b4b6;" data-value="discovery">
+                            <div class="govuk-radios__item govuk-!-padding-4 govuk-!-margin-bottom-2 civicone-radio-card" data-value="discovery">
                                 <input class="govuk-radios__input" id="privacy-discovery-wiz" name="privacy_level_wizard" type="radio" value="discovery">
                                 <label class="govuk-label govuk-radios__label" for="privacy-discovery-wiz">
                                     <strong>Discovery</strong>
@@ -142,7 +142,7 @@ $displayName = $userProfile['name'] ?? trim(($userProfile['first_name'] ?? '') .
                                     Name, avatar, and bio visible. Browse only.
                                 </div>
                             </div>
-                            <div class="govuk-radios__item govuk-!-padding-4 govuk-!-margin-bottom-2" style="border: 2px solid #1d70b8; background: #f0f4f8;" data-value="social">
+                            <div class="govuk-radios__item govuk-!-padding-4 govuk-!-margin-bottom-2 civicone-radio-card--selected" data-value="social">
                                 <input class="govuk-radios__input" id="privacy-social-wiz" name="privacy_level_wizard" type="radio" value="social" checked>
                                 <label class="govuk-label govuk-radios__label" for="privacy-social-wiz">
                                     <strong>Social</strong> <span class="govuk-tag govuk-tag--green">Recommended</span>
@@ -152,7 +152,7 @@ $displayName = $userProfile['name'] ?? trim(($userProfile['first_name'] ?? '') .
                                     Plus skills, location, and messaging.
                                 </div>
                             </div>
-                            <div class="govuk-radios__item govuk-!-padding-4" style="border: 1px solid #b1b4b6;" data-value="economic">
+                            <div class="govuk-radios__item govuk-!-padding-4 civicone-radio-card" data-value="economic">
                                 <input class="govuk-radios__input" id="privacy-economic-wiz" name="privacy_level_wizard" type="radio" value="economic">
                                 <label class="govuk-label govuk-radios__label" for="privacy-economic-wiz">
                                     <strong>Economic</strong>
@@ -179,7 +179,7 @@ $displayName = $userProfile['name'] ?? trim(($userProfile['first_name'] ?? '') .
             <!-- Step 3: Fine-tune Settings -->
             <section data-step="3" aria-labelledby="step3-title" hidden class="govuk-!-text-align-center">
                 <div class="govuk-!-margin-bottom-4" aria-hidden="true">
-                    <i class="fa-solid fa-sliders fa-3x" style="color: #1d70b8;"></i>
+                    <i class="fa-solid fa-sliders fa-3x civicone-icon-blue"></i>
                 </div>
                 <h1 id="step3-title" class="govuk-heading-l">Fine-tune Your Settings</h1>
                 <p class="govuk-body-l govuk-!-margin-bottom-6">
@@ -232,15 +232,15 @@ $displayName = $userProfile['name'] ?? trim(($userProfile['first_name'] ?? '') .
 
                 <!-- Profile Preview -->
                 <div class="govuk-!-padding-4 govuk-!-margin-top-6 govuk-!-text-align-center civicone-panel-bg" aria-label="Profile preview">
-                    <div class="govuk-!-margin-bottom-2" style="width: 60px; height: 60px; border-radius: 50%; background: #1d70b8; display: inline-flex; align-items: center; justify-content: center; color: white; font-size: 1.5rem;">
+                    <div class="govuk-!-margin-bottom-2 civicone-avatar-preview">
                         <?php if (!empty($userProfile['avatar_url'])): ?>
-                            <img src="<?= htmlspecialchars($userProfile['avatar_url']) ?>" alt="" loading="lazy" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">
+                            <img src="<?= htmlspecialchars($userProfile['avatar_url']) ?>" alt="" loading="lazy">
                         <?php else: ?>
                             <span><?= strtoupper(substr($displayName, 0, 1)) ?></span>
                         <?php endif; ?>
                     </div>
                     <p class="govuk-heading-s govuk-!-margin-bottom-1"><?= htmlspecialchars($displayName) ?></p>
-                    <span class="govuk-tag govuk-tag--blue">
+                    <span class="govuk-tag govuk-tag--light-blue">
                         <i class="fa-solid fa-globe govuk-!-margin-right-1" aria-hidden="true"></i>
                         Federated Member
                     </span>
@@ -258,15 +258,15 @@ $displayName = $userProfile['name'] ?? trim(($userProfile['first_name'] ?? '') .
 
             <!-- Step 4: Success -->
             <section data-step="4" aria-labelledby="step4-title" hidden class="govuk-!-text-align-center">
-                <div class="govuk-!-margin-bottom-4" aria-hidden="true" style="width: 80px; height: 80px; border-radius: 50%; background: #00703c; display: inline-flex; align-items: center; justify-content: center;">
-                    <i class="fa-solid fa-check fa-2x" style="color: white;"></i>
+                <div class="govuk-!-margin-bottom-4 civicone-success-circle" aria-hidden="true">
+                    <i class="fa-solid fa-check fa-2x"></i>
                 </div>
                 <h1 id="step4-title" class="govuk-heading-l">You're All Set!</h1>
                 <p class="govuk-body-l govuk-!-margin-bottom-6">
                     Welcome to the federation! You can now connect with members from partner timebanks.
                 </p>
 
-                <div class="govuk-button-group" style="flex-direction: column; align-items: center;">
+                <div class="govuk-button-group civicone-button-group-vertical">
                     <a href="<?= $basePath ?>/federation/members" class="govuk-button" data-module="govuk-button">
                         <i class="fa-solid fa-users govuk-!-margin-right-1" aria-hidden="true"></i> Browse Members
                     </a>
@@ -279,14 +279,14 @@ $displayName = $userProfile['name'] ?? trim(($userProfile['first_name'] ?? '') .
             <!-- Declined Step -->
             <section data-step="declined" aria-labelledby="declined-title" hidden class="govuk-!-text-align-center">
                 <div class="govuk-!-margin-bottom-4" aria-hidden="true">
-                    <i class="fa-solid fa-clock fa-3x" style="color: #505a5f;"></i>
+                    <i class="fa-solid fa-clock fa-3x civicone-icon-grey"></i>
                 </div>
                 <h1 id="declined-title" class="govuk-heading-l">No Problem!</h1>
                 <p class="govuk-body-l govuk-!-margin-bottom-6">
                     You can enable federation anytime in your settings. Your local timebank experience remains unchanged.
                 </p>
 
-                <div class="govuk-button-group" style="flex-direction: column; align-items: center;">
+                <div class="govuk-button-group civicone-button-group-vertical">
                     <a href="<?= $basePath ?>/federation" class="govuk-button" data-module="govuk-button">
                         <i class="fa-solid fa-arrow-left govuk-!-margin-right-1" aria-hidden="true"></i> Back to Hub
                     </a>
@@ -300,7 +300,7 @@ $displayName = $userProfile['name'] ?? trim(($userProfile['first_name'] ?? '') .
     </div>
 </div>
 
-<canvas id="confetti" aria-hidden="true" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 1000;"></canvas>
+<canvas id="confetti" aria-hidden="true" class="civicone-confetti-canvas"></canvas>
 
 <script src="/assets/js/federation-onboarding.js?v=<?= time() ?>"></script>
 <script>

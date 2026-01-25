@@ -768,7 +768,7 @@ if ($type === 'listing') {
         <?php endif; ?>
     </div>
 
-    <div id="comments-section-<?= $socialTargetType ?>-<?= $socialTargetId ?>" class="feed-comments-section" style="display:none;">
+    <div id="comments-section-<?= $socialTargetType ?>-<?= $socialTargetId ?>" class="feed-comments-section hidden">
         <?php if ($isLoggedIn ?? false): ?>
             <div class="feed-comment-composer">
                 <img src="<?= $_SESSION['user_avatar'] ?? '/assets/img/defaults/default_avatar.webp' ?>" loading="lazy" class="feed-shared-avatar feed-comment-avatar">

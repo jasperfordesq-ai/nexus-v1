@@ -22,8 +22,10 @@ $tenant = TenantContext::get();
 $tenantName = $tenant['name'] ?? 'This Service';
 ?>
 
-<!-- Cookie Consent Banner - GOV.UK Pattern -->
-<div id="nexus-cookie-banner" class="govuk-cookie-banner" role="region" aria-label="Cookie banner" aria-hidden="true">
+<!-- Cookie Consent Banner - GOV.UK Official Pattern -->
+<!-- Source: https://github.com/alphagov/govuk-frontend/tree/main/packages/govuk-frontend/src/govuk/components/cookie-banner -->
+<!-- Position: First element after <body>, before skip link -->
+<div id="nexus-cookie-banner" class="govuk-cookie-banner" data-nosnippet role="region" aria-label="Cookie banner" hidden>
     <div class="govuk-cookie-banner__message govuk-width-container">
         <div class="govuk-grid-row">
             <div class="govuk-grid-column-two-thirds">
@@ -78,7 +80,7 @@ $tenantName = $tenant['name'] ?? 'This Service';
 </div>
 
 <!-- Cookie Preferences Panel - GOV.UK Pattern -->
-<div id="cookie-preferences-modal" class="govuk-cookie-preferences-panel" style="display: none;" role="dialog" aria-labelledby="preferences-title" aria-modal="true">
+<div id="cookie-preferences-modal" class="govuk-cookie-preferences-panel" hidden role="dialog" aria-labelledby="preferences-title" aria-modal="true">
     <div class="govuk-width-container">
         <div class="govuk-grid-row">
             <div class="govuk-grid-column-two-thirds">
@@ -349,7 +351,8 @@ async function handleAcceptAll() {
     if (success) {
         showGovukNotification('You have accepted all cookies.');
     } else {
-        showGovukNotification('Failed to save preferences. Please try again.', 'error');
+        // Consent saved locally but API failed - show a softer message
+        showGovukNotification('Your cookie preferences have been saved.');
     }
 }
 
@@ -359,7 +362,8 @@ async function handleRejectAll() {
     if (success) {
         showGovukNotification('You have rejected optional cookies. Only essential cookies will be used.');
     } else {
-        showGovukNotification('Failed to save preferences. Please try again.', 'error');
+        // Consent saved locally but API failed - show a softer message
+        showGovukNotification('Your cookie preferences have been saved. Only essential cookies will be used.');
     }
 }
 
@@ -368,15 +372,14 @@ function openCookiePreferences() {
     const panel = document.getElementById('cookie-preferences-modal');
     const banner = document.getElementById('nexus-cookie-banner');
 
-    // Hide banner
+    // Hide banner (GOV.UK pattern: use hidden attribute)
     if (banner) {
-        banner.setAttribute('aria-hidden', 'true');
-        banner.style.display = 'none';
+        banner.setAttribute('hidden', '');
     }
 
     // Show panel
+    panel.removeAttribute('hidden');
     panel.style.display = 'block';
-    panel.setAttribute('aria-hidden', 'false');
     document.body.classList.add('govuk-cookie-preferences-open');
 
     // Load current preferences
@@ -410,15 +413,14 @@ function openCookiePreferences() {
 function closeCookiePreferences() {
     const panel = document.getElementById('cookie-preferences-modal');
     panel.style.display = 'none';
-    panel.setAttribute('aria-hidden', 'true');
+    panel.setAttribute('hidden', '');
     document.body.classList.remove('govuk-cookie-preferences-open');
 
     // If no consent exists, show banner again
     if (!window.NexusCookieConsent.hasConsent()) {
         const banner = document.getElementById('nexus-cookie-banner');
         if (banner) {
-            banner.setAttribute('aria-hidden', 'false');
-            banner.style.display = 'block';
+            banner.removeAttribute('hidden');
         }
     }
 }

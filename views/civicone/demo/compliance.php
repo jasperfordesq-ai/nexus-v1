@@ -23,7 +23,7 @@ $basePath = \Nexus\Core\TenantContext::getBasePath();
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds">
 
-        <span class="govuk-tag govuk-tag--blue govuk-!-margin-bottom-4">Security & Standards</span>
+        <span class="govuk-tag govuk-tag--light-blue govuk-!-margin-bottom-4">Security & Standards</span>
         <h1 class="govuk-heading-xl">Government-Grade Infrastructure</h1>
         <p class="govuk-body-l govuk-!-margin-bottom-6">Security That Meets National Standards.</p>
 
@@ -34,7 +34,7 @@ $basePath = \Nexus\Core\TenantContext::getBasePath();
         <!-- Compliance Checklist -->
         <dl class="govuk-summary-list govuk-!-margin-bottom-6">
             <div class="govuk-summary-list__row">
-                <dt class="govuk-summary-list__key" style="width: 40px;">
+                <dt class="govuk-summary-list__key civicone-summary-key-narrow">
                     <span class="govuk-tag govuk-tag--green">✓</span>
                 </dt>
                 <dd class="govuk-summary-list__value">
@@ -45,7 +45,7 @@ $basePath = \Nexus\Core\TenantContext::getBasePath();
                 </dd>
             </div>
             <div class="govuk-summary-list__row">
-                <dt class="govuk-summary-list__key" style="width: 40px;">
+                <dt class="govuk-summary-list__key civicone-summary-key-narrow">
                     <span class="govuk-tag govuk-tag--green">✓</span>
                 </dt>
                 <dd class="govuk-summary-list__value">
@@ -56,7 +56,7 @@ $basePath = \Nexus\Core\TenantContext::getBasePath();
                 </dd>
             </div>
             <div class="govuk-summary-list__row">
-                <dt class="govuk-summary-list__key" style="width: 40px;">
+                <dt class="govuk-summary-list__key civicone-summary-key-narrow">
                     <span class="govuk-tag govuk-tag--green">✓</span>
                 </dt>
                 <dd class="govuk-summary-list__value">
@@ -92,7 +92,7 @@ $basePath = \Nexus\Core\TenantContext::getBasePath();
                     <dd class="govuk-summary-list__value govuk-body-s">100% Irish Data Residency</dd>
                 </div>
             </dl>
-            <a href="<?= $basePath ?>/technical-specs" class="govuk-button govuk-button--secondary" data-module="govuk-button" style="width: 100%;">
+            <a href="<?= $basePath ?>/technical-specs" class="govuk-button govuk-button--secondary civicone-button-full-width" data-module="govuk-button">
                 View Full Proposal
             </a>
         </div>

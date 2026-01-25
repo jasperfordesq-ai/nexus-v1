@@ -34,8 +34,8 @@ require __DIR__ . '/../../layouts/civicone/header.php';
 <div class="govuk-grid-row govuk-!-margin-bottom-8">
     <!-- Scenario -->
     <div class="govuk-grid-column-one-half">
-        <div class="govuk-!-padding-4" style="border: 1px solid #b1b4b6; border-left: 5px solid #00703c; height: 100%;">
-            <h2 class="govuk-heading-l" style="color: #00703c;">The Scenario</h2>
+        <div class="govuk-!-padding-4 civicone-accent-card--green civicone-flex-card">
+            <h2 class="govuk-heading-l civicone-heading-green">The Scenario</h2>
             <p class="govuk-body">
                 GPs and Public Health Nurses often see patients whose primary complaints are rooted in isolation or lack of activity, rather than acute medical issues. The "Social Prescribing" model works, but tracking referrals and ensuring patient safety has historically been manual and paper-based.
             </p>
@@ -47,15 +47,15 @@ require __DIR__ . '/../../layouts/civicone/header.php';
 
     <!-- Solution -->
     <div class="govuk-grid-column-one-half">
-        <div class="govuk-!-padding-4" style="border: 1px solid #b1b4b6; border-left: 5px solid #1d70b8; height: 100%;">
-            <h2 class="govuk-heading-l" style="color: #1d70b8;">The Result</h2>
+        <div class="govuk-!-padding-4 civicone-action-card civicone-flex-card">
+            <h2 class="govuk-heading-l civicone-heading-blue">The Result</h2>
             <ul class="govuk-list govuk-list--spaced">
                 <li>
                     <strong class="govuk-tag govuk-tag--green govuk-!-margin-right-2">Direct Referral</strong>
                     Patients are referred directly to community garden projects or walking groups via the NEXUS portal.
                 </li>
                 <li>
-                    <strong class="govuk-tag govuk-tag--blue govuk-!-margin-right-2">Real-Time Data</strong>
+                    <strong class="govuk-tag govuk-tag--light-blue govuk-!-margin-right-2">Real-Time Data</strong>
                     The HSE can track engagement levels and "hours of support" generated.
                 </li>
                 <li>
@@ -68,9 +68,9 @@ require __DIR__ . '/../../layouts/civicone/header.php';
 </div>
 
 <!-- CTA Section -->
-<div class="govuk-!-padding-6 govuk-!-text-align-center" style="background: #00703c; color: white;">
-    <h2 class="govuk-heading-l" style="color: white;">See It In Action</h2>
-    <p class="govuk-body-l govuk-!-margin-bottom-4" style="color: white;">Experience the user journey for a potential volunteer.</p>
+<div class="govuk-!-padding-6 govuk-!-text-align-center civicone-hero-green">
+    <h2 class="govuk-heading-l">See It In Action</h2>
+    <p class="govuk-body-l govuk-!-margin-bottom-4">Experience the user journey for a potential volunteer.</p>
     <a href="<?= $basePath ?>/volunteering" class="govuk-button govuk-button--secondary" data-module="govuk-button">
         View Live Volunteer Opportunities
     </a>

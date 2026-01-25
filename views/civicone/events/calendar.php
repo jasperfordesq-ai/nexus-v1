@@ -51,7 +51,7 @@ $nextLink = "$basePath/events/calendar?month=$nextMonth&year=$nextYear";
         </a>
     </div>
     <div class="govuk-grid-column-one-half govuk-!-text-align-centre">
-        <div style="display: flex; align-items: center; justify-content: center; gap: 1rem;">
+        <div class="civicone-calendar-nav">
             <a href="<?= $prevLink ?>" class="govuk-button govuk-button--secondary govuk-!-margin-bottom-0" data-module="govuk-button" aria-label="Previous Month">
                 <i class="fa-solid fa-chevron-left" aria-hidden="true"></i>
             </a>
@@ -69,18 +69,18 @@ $nextLink = "$basePath/events/calendar?month=$nextMonth&year=$nextYear";
 </div>
 
 <!-- Calendar Grid -->
-<div class="govuk-!-padding-4" style="border: 1px solid #b1b4b6; overflow-x: auto;">
-    <table class="govuk-table" style="table-layout: fixed; width: 100%; min-width: 700px;">
+<div class="govuk-!-padding-4 civicone-sidebar-card civicone-calendar-wrapper">
+    <table class="govuk-table civicone-calendar-table">
         <caption class="govuk-visually-hidden">Calendar for <?= $monthName ?> <?= $year ?></caption>
         <thead class="govuk-table__head">
             <tr class="govuk-table__row">
-                <th scope="col" class="govuk-table__header" style="width: 14.28%;">Sun</th>
-                <th scope="col" class="govuk-table__header" style="width: 14.28%;">Mon</th>
-                <th scope="col" class="govuk-table__header" style="width: 14.28%;">Tue</th>
-                <th scope="col" class="govuk-table__header" style="width: 14.28%;">Wed</th>
-                <th scope="col" class="govuk-table__header" style="width: 14.28%;">Thu</th>
-                <th scope="col" class="govuk-table__header" style="width: 14.28%;">Fri</th>
-                <th scope="col" class="govuk-table__header" style="width: 14.28%;">Sat</th>
+                <th scope="col" class="govuk-table__header civicone-calendar-day-header">Sun</th>
+                <th scope="col" class="govuk-table__header civicone-calendar-day-header">Mon</th>
+                <th scope="col" class="govuk-table__header civicone-calendar-day-header">Tue</th>
+                <th scope="col" class="govuk-table__header civicone-calendar-day-header">Wed</th>
+                <th scope="col" class="govuk-table__header civicone-calendar-day-header">Thu</th>
+                <th scope="col" class="govuk-table__header civicone-calendar-day-header">Fri</th>
+                <th scope="col" class="govuk-table__header civicone-calendar-day-header">Sat</th>
             </tr>
         </thead>
         <tbody class="govuk-table__body">
@@ -93,7 +93,7 @@ $nextLink = "$basePath/events/calendar?month=$nextMonth&year=$nextYear";
 
             // Empty cells for days before start of month
             for ($i = 0; $i < $dayOfWeek; $i++) {
-                echo '<td class="govuk-table__cell civicone-panel-bg" style="vertical-align: top; height: 100px;"></td>';
+                echo '<td class="govuk-table__cell civicone-panel-bg civicone-calendar-cell"></td>';
                 $cellCount++;
             }
 
@@ -102,16 +102,16 @@ $nextLink = "$basePath/events/calendar?month=$nextMonth&year=$nextYear";
                 $isToday = ($day == date('j') && $month == date('m') && $year == date('Y'));
                 $dayEvents = $eventsByDay[$day] ?? [];
 
-                $bgStyle = $isToday ? 'background: #e6f0f7; border-left: 3px solid #1d70b8;' : '';
+                $todayClass = $isToday ? ' civicone-calendar-cell--today' : '';
 
-                echo '<td class="govuk-table__cell" style="vertical-align: top; height: 100px; padding: 0.5rem; ' . $bgStyle . '">';
+                echo '<td class="govuk-table__cell civicone-calendar-cell' . $todayClass . '">';
                 echo '<p class="govuk-body-s govuk-!-margin-bottom-1"><strong>' . $day . '</strong></p>';
 
                 if (!empty($dayEvents)) {
                     foreach ($dayEvents as $ev) {
                         $time = date('g:ia', strtotime($ev['start_time']));
-                        echo '<a href="' . $basePath . '/events/' . $ev['id'] . '" class="govuk-link govuk-body-s" style="display: block; margin-bottom: 0.25rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">';
-                        echo '<span class="govuk-tag govuk-tag--blue govuk-!-margin-right-1" style="font-size: 0.7rem;">' . $time . '</span>';
+                        echo '<a href="' . $basePath . '/events/' . $ev['id'] . '" class="govuk-link govuk-body-s civicone-calendar-event">';
+                        echo '<span class="govuk-tag govuk-tag--light-blue govuk-!-margin-right-1 civicone-calendar-time-tag">' . $time . '</span>';
                         echo htmlspecialchars(substr($ev['title'], 0, 15)) . (strlen($ev['title']) > 15 ? '...' : '');
                         echo '</a>';
                     }
@@ -130,7 +130,7 @@ $nextLink = "$basePath/events/calendar?month=$nextMonth&year=$nextYear";
             $remainingCells = 7 - ($cellCount % 7);
             if ($remainingCells < 7) {
                 for ($i = 0; $i < $remainingCells; $i++) {
-                    echo '<td class="govuk-table__cell civicone-panel-bg" style="vertical-align: top; height: 100px;"></td>';
+                    echo '<td class="govuk-table__cell civicone-panel-bg civicone-calendar-cell"></td>';
                 }
             }
 
@@ -153,15 +153,15 @@ $nextLink = "$basePath/events/calendar?month=$nextMonth&year=$nextYear";
                 $dateStr = date('l, F j', mktime(0, 0, 0, $month, $day, $year));
                 $time = date('g:i A', strtotime($ev['start_time']));
                 ?>
-                <div class="govuk-!-padding-4 govuk-!-margin-bottom-4" style="border: 1px solid #b1b4b6; border-left: 5px solid #1d70b8;">
-                    <p class="govuk-body-s govuk-!-margin-bottom-1" style="color: #505a5f;">
+                <div class="govuk-!-padding-4 govuk-!-margin-bottom-4 civicone-sidebar-card civicone-highlight-panel">
+                    <p class="govuk-body-s govuk-!-margin-bottom-1 civicone-secondary-text">
                         <?= $dateStr ?> at <?= $time ?>
                     </p>
                     <p class="govuk-body govuk-!-margin-bottom-2">
                         <a href="<?= $basePath ?>/events/<?= $ev['id'] ?>" class="govuk-link"><strong><?= htmlspecialchars($ev['title']) ?></strong></a>
                     </p>
                     <?php if (!empty($ev['location'])): ?>
-                        <p class="govuk-body-s govuk-!-margin-bottom-0" style="color: #505a5f;">
+                        <p class="govuk-body-s govuk-!-margin-bottom-0 civicone-secondary-text">
                             <i class="fa-solid fa-location-dot govuk-!-margin-right-1" aria-hidden="true"></i>
                             <?= htmlspecialchars($ev['location']) ?>
                         </p>
@@ -179,14 +179,5 @@ $nextLink = "$basePath/events/calendar?month=$nextMonth&year=$nextYear";
         </div>
     <?php endif; ?>
 </div>
-
-<style>
-@media (min-width: 769px) {
-    #mobile-events-list { display: none; }
-}
-@media (max-width: 768px) {
-    .govuk-table { display: none; }
-}
-</style>
 
 <?php require dirname(__DIR__, 2) . '/layouts/civicone/footer.php'; ?>

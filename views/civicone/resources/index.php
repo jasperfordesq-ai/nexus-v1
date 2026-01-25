@@ -59,25 +59,24 @@ $basePath = \Nexus\Core\TenantContext::getBasePath();
             if ($res['file_size'] > 1024 * 1024) $size = round($res['file_size'] / 1024 / 1024, 1) . ' MB';
             ?>
             <div class="govuk-grid-column-one-third govuk-!-margin-bottom-6">
-                <div class="govuk-!-padding-4" style="border: 1px solid #b1b4b6; border-left: 5px solid #1d70b8; height: 100%; display: flex; flex-direction: column;">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
-                        <span style="font-size: 1.5rem;" aria-hidden="true"><?= $icon ?></span>
+                <div class="govuk-!-padding-4 civicone-sidebar-card civicone-highlight-panel civicone-card-flex">
+                    <div class="civicone-card-header-row">
+                        <span class="civicone-resource-icon" aria-hidden="true"><?= $icon ?></span>
                         <span class="govuk-tag govuk-tag--grey"><?= $size ?></span>
                     </div>
 
                     <h3 class="govuk-heading-s govuk-!-margin-bottom-2"><?= htmlspecialchars($res['title']) ?></h3>
-                    <p class="govuk-body-s govuk-!-margin-bottom-4" style="color: #505a5f; flex-grow: 1;"><?= htmlspecialchars($res['description']) ?></p>
+                    <p class="govuk-body-s govuk-!-margin-bottom-4 civicone-secondary-text civicone-flex-grow"><?= htmlspecialchars($res['description']) ?></p>
 
-                    <p class="govuk-body-s govuk-!-margin-bottom-3" style="color: #505a5f;">
+                    <p class="govuk-body-s govuk-!-margin-bottom-3 civicone-secondary-text">
                         By <strong><?= htmlspecialchars($res['uploader_name']) ?></strong><br>
                         <?= $res['downloads'] ?> downloads
                     </p>
 
                     <a href="<?= $basePath ?>/resources/<?= $res['id'] ?>/download"
-                       class="govuk-button govuk-button--secondary"
+                       class="govuk-button govuk-button--secondary civicone-button-full-width"
                        data-module="govuk-button"
-                       aria-label="Download <?= htmlspecialchars($res['title']) ?>"
-                       style="width: 100%;">
+                       aria-label="Download <?= htmlspecialchars($res['title']) ?>">
                         <i class="fa-solid fa-download govuk-!-margin-right-1" aria-hidden="true"></i>
                         Download
                     </a>

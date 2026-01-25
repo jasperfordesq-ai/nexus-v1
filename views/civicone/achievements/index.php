@@ -45,7 +45,7 @@ $recentXP = $dashboardData['recent_xp'] ?? [];
 
 <!-- Achievement Navigation -->
 <nav class="govuk-!-margin-bottom-6" aria-label="Achievement sections">
-    <ul class="govuk-list" style="display: flex; gap: 0.5rem; flex-wrap: wrap; padding: 0; margin: 0;">
+    <ul class="govuk-list civicone-nav-button-list">
         <li><a href="<?= $basePath ?>/achievements" class="govuk-button" data-module="govuk-button">Dashboard</a></li>
         <li><a href="<?= $basePath ?>/achievements/badges" class="govuk-button govuk-button--secondary" data-module="govuk-button">All Badges</a></li>
         <li><a href="<?= $basePath ?>/achievements/challenges" class="govuk-button govuk-button--secondary" data-module="govuk-button">Challenges</a></li>
@@ -172,9 +172,9 @@ $recentXP = $dashboardData['recent_xp'] ?? [];
             </div>
             <?php else: ?>
             <?php if ($badges['total_earned'] >= $badges['total_available']): ?>
-            <p class="govuk-body govuk-!-text-align-centre govuk-!-padding-5" style="color: #00703c;">You've unlocked all available badges! Amazing!</p>
+            <p class="govuk-body govuk-!-text-align-centre govuk-!-padding-5" class="civicone-text-success">You've unlocked all available badges! Amazing!</p>
             <?php else: ?>
-            <p class="govuk-body govuk-!-text-align-centre govuk-!-padding-5" style="color: #505a5f;">Keep participating to unlock your next badge!</p>
+            <p class="govuk-body govuk-!-text-align-centre govuk-!-padding-5" class="civicone-secondary-text">Keep participating to unlock your next badge!</p>
             <?php endif; ?>
             <?php endif; ?>
 
@@ -225,7 +225,7 @@ $recentXP = $dashboardData['recent_xp'] ?? [];
             </a>
             <?php endif; ?>
             <?php else: ?>
-            <p class="govuk-body govuk-!-text-align-centre govuk-!-padding-5" style="color: #505a5f;">Start participating to earn your first badge!</p>
+            <p class="govuk-body govuk-!-text-align-centre govuk-!-padding-5" class="civicone-secondary-text">Start participating to earn your first badge!</p>
             <?php endif; ?>
         </div>
 
@@ -249,7 +249,7 @@ $recentXP = $dashboardData['recent_xp'] ?? [];
                 <?php endforeach; ?>
             </div>
             <?php else: ?>
-            <p class="govuk-body govuk-!-text-align-centre govuk-!-padding-5" style="color: #505a5f;">No XP activity yet. Start participating!</p>
+            <p class="govuk-body govuk-!-text-align-centre govuk-!-padding-5" class="civicone-secondary-text">No XP activity yet. Start participating!</p>
             <?php endif; ?>
         </div>
 

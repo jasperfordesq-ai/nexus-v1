@@ -41,7 +41,7 @@ $isEndingSoon = $seasonData['is_ending_soon'] ?? false;
 
 <!-- Achievement Navigation -->
 <nav class="govuk-!-margin-bottom-6" aria-label="Achievement sections">
-    <ul class="govuk-list" style="display: flex; gap: 0.5rem; flex-wrap: wrap; padding: 0; margin: 0;">
+    <ul class="govuk-list civicone-button-nav">
         <li><a href="<?= $basePath ?>/achievements" class="govuk-button govuk-button--secondary" data-module="govuk-button">Dashboard</a></li>
         <li><a href="<?= $basePath ?>/achievements/badges" class="govuk-button govuk-button--secondary" data-module="govuk-button">All Badges</a></li>
         <li><a href="<?= $basePath ?>/achievements/challenges" class="govuk-button govuk-button--secondary" data-module="govuk-button">Challenges</a></li>
@@ -63,10 +63,10 @@ $isEndingSoon = $seasonData['is_ending_soon'] ?? false;
     <?php else: ?>
 
     <div class="season-header govuk-!-margin-bottom-6">
-        <div class="season-title-row" style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 1rem;">
+        <div class="season-title-row civicone-season-title-row">
             <div>
                 <h2 class="govuk-heading-l govuk-!-margin-bottom-2">
-                    <i class="fa-solid fa-trophy govuk-!-margin-right-2" aria-hidden="true" style="color: #f47738;"></i>
+                    <i class="fa-solid fa-trophy govuk-!-margin-right-2 civicone-icon-orange" aria-hidden="true"></i>
                     <?= htmlspecialchars($season['name']) ?>
                 </h2>
                 <?php if ($isEndingSoon): ?>
@@ -79,10 +79,10 @@ $isEndingSoon = $seasonData['is_ending_soon'] ?? false;
                     </span>
                 <?php endif; ?>
             </div>
-            <div class="govuk-!-padding-4" style="border: 1px solid #b1b4b6; text-align: center;">
-                <p class="govuk-body-s govuk-!-margin-bottom-1" style="color: #505a5f;">Time Remaining</p>
+            <div class="govuk-!-padding-4 civicone-season-countdown">
+                <p class="govuk-body-s govuk-!-margin-bottom-1 civicone-secondary-text">Time Remaining</p>
                 <p class="govuk-heading-l govuk-!-margin-bottom-0"><?= $daysRemaining ?></p>
-                <p class="govuk-body-s" style="color: #505a5f;"><?= $daysRemaining === 1 ? 'day' : 'days' ?></p>
+                <p class="govuk-body-s civicone-secondary-text"><?= $daysRemaining === 1 ? 'day' : 'days' ?></p>
             </div>
         </div>
 
@@ -92,12 +92,12 @@ $isEndingSoon = $seasonData['is_ending_soon'] ?? false;
                 <h3 class="govuk-notification-banner__title" id="govuk-notification-banner-title">Your Position</h3>
             </div>
             <div class="govuk-notification-banner__content">
-                <p class="govuk-notification-banner__heading" style="display: flex; align-items: center; gap: 1rem;">
+                <p class="govuk-notification-banner__heading civicone-rank-heading">
                     <span class="govuk-heading-xl govuk-!-margin-bottom-0">#<?= $userRank['position'] ?></span>
                     <span>
                         Your current position<br>
-                        <span class="govuk-body-s" style="color: #505a5f;">
-                            <i class="fa-solid fa-star" aria-hidden="true" style="color: #f47738;"></i>
+                        <span class="govuk-body-s civicone-secondary-text">
+                            <i class="fa-solid fa-star civicone-icon-orange" aria-hidden="true"></i>
                             <?= number_format($userRank['season_xp']) ?> XP this season
                         </span>
                     </span>
@@ -109,13 +109,13 @@ $isEndingSoon = $seasonData['is_ending_soon'] ?? false;
 
     <div class="govuk-grid-row">
         <div class="govuk-grid-column-two-thirds">
-            <div class="govuk-!-padding-4 govuk-!-margin-bottom-6" style="border: 1px solid #b1b4b6;">
+            <div class="govuk-!-padding-4 govuk-!-margin-bottom-6 civicone-season-card">
                 <h3 class="govuk-heading-m"><i class="fa-solid fa-ranking-star govuk-!-margin-right-2" aria-hidden="true"></i> Season Leaderboard</h3>
 
                 <table class="govuk-table">
                     <thead class="govuk-table__head">
                         <tr class="govuk-table__row">
-                            <th scope="col" class="govuk-table__header" style="width: 60px;">Rank</th>
+                            <th scope="col" class="govuk-table__header civicone-table-col-narrow">Rank</th>
                             <th scope="col" class="govuk-table__header">Member</th>
                             <th scope="col" class="govuk-table__header govuk-table__header--numeric">XP</th>
                         </tr>
@@ -127,14 +127,14 @@ $isEndingSoon = $seasonData['is_ending_soon'] ?? false;
                             $isCurrentUser = isset($_SESSION['user_id']) && $entry['user_id'] == $_SESSION['user_id'];
                             $isTop3 = $position <= 3;
                         ?>
-                        <tr class="govuk-table__row <?= $isCurrentUser ? 'govuk-!-font-weight-bold civicone-panel-bg' : '' ?>"
+                        <tr class="govuk-table__row <?= $isCurrentUser ? 'govuk-!-font-weight-bold civicone-panel-bg' : '' ?>">
                             <td class="govuk-table__cell">
                                 <?php if ($position === 1): ?>
-                                    <i class="fa-solid fa-crown" aria-hidden="true" style="color: #f47738;"></i>
+                                    <i class="fa-solid fa-crown civicone-medal-gold" aria-hidden="true"></i>
                                 <?php elseif ($position === 2): ?>
-                                    <span style="color: #b1b4b6;"><strong><?= $position ?></strong></span>
+                                    <span class="civicone-medal-silver"><strong><?= $position ?></strong></span>
                                 <?php elseif ($position === 3): ?>
-                                    <span style="color: #cd7f32;"><strong><?= $position ?></strong></span>
+                                    <span class="civicone-medal-bronze"><strong><?= $position ?></strong></span>
                                 <?php else: ?>
                                     <?= $position ?>
                                 <?php endif; ?>
@@ -142,9 +142,9 @@ $isEndingSoon = $seasonData['is_ending_soon'] ?? false;
                             <td class="govuk-table__cell">
                                 <?= htmlspecialchars(($entry['first_name'] ?? '') . ' ' . ($entry['last_name'] ?? '')) ?>
                                 <?php if ($isCurrentUser): ?>
-                                    <span class="govuk-tag govuk-tag--blue">You</span>
+                                    <span class="govuk-tag govuk-tag--light-blue">You</span>
                                 <?php endif; ?>
-                                <br><span class="govuk-body-s" style="color: #505a5f;">Level <?= $entry['level'] ?? 1 ?></span>
+                                <br><span class="govuk-body-s civicone-secondary-text">Level <?= $entry['level'] ?? 1 ?></span>
                             </td>
                             <td class="govuk-table__cell govuk-table__cell--numeric"><?= number_format($entry['season_xp'] ?? 0) ?></td>
                         </tr>
@@ -155,14 +155,14 @@ $isEndingSoon = $seasonData['is_ending_soon'] ?? false;
         </div>
 
         <div class="govuk-grid-column-one-third">
-            <div class="govuk-!-padding-4 govuk-!-margin-bottom-6" style="border: 1px solid #b1b4b6;">
+            <div class="govuk-!-padding-4 govuk-!-margin-bottom-6 civicone-season-card">
                 <h3 class="govuk-heading-m"><i class="fa-solid fa-gift govuk-!-margin-right-2" aria-hidden="true"></i> Season Rewards</h3>
 
                 <dl class="govuk-summary-list govuk-summary-list--no-border">
                     <?php if (isset($rewards[1])): ?>
                     <div class="govuk-summary-list__row">
                         <dt class="govuk-summary-list__key">
-                            <i class="fa-solid fa-crown" aria-hidden="true" style="color: #f47738;"></i> 1st Place
+                            <i class="fa-solid fa-crown civicone-medal-gold" aria-hidden="true"></i> 1st Place
                         </dt>
                         <dd class="govuk-summary-list__value">
                             +<?= $rewards[1]['xp'] ?? 500 ?> XP
@@ -176,7 +176,7 @@ $isEndingSoon = $seasonData['is_ending_soon'] ?? false;
                     <?php if (isset($rewards[2])): ?>
                     <div class="govuk-summary-list__row">
                         <dt class="govuk-summary-list__key">
-                            <i class="fa-solid fa-medal" aria-hidden="true" style="color: #b1b4b6;"></i> 2nd Place
+                            <i class="fa-solid fa-medal civicone-medal-silver" aria-hidden="true"></i> 2nd Place
                         </dt>
                         <dd class="govuk-summary-list__value">+<?= $rewards[2]['xp'] ?? 300 ?> XP</dd>
                     </div>
@@ -185,7 +185,7 @@ $isEndingSoon = $seasonData['is_ending_soon'] ?? false;
                     <?php if (isset($rewards[3])): ?>
                     <div class="govuk-summary-list__row">
                         <dt class="govuk-summary-list__key">
-                            <i class="fa-solid fa-medal" aria-hidden="true" style="color: #cd7f32;"></i> 3rd Place
+                            <i class="fa-solid fa-medal civicone-medal-bronze" aria-hidden="true"></i> 3rd Place
                         </dt>
                         <dd class="govuk-summary-list__value">+<?= $rewards[3]['xp'] ?? 200 ?> XP</dd>
                     </div>
@@ -194,7 +194,7 @@ $isEndingSoon = $seasonData['is_ending_soon'] ?? false;
                     <?php if (isset($rewards['top10'])): ?>
                     <div class="govuk-summary-list__row">
                         <dt class="govuk-summary-list__key">
-                            <i class="fa-solid fa-award" aria-hidden="true" style="color: #1d70b8;"></i> Top 10
+                            <i class="fa-solid fa-award civicone-icon-blue" aria-hidden="true"></i> Top 10
                         </dt>
                         <dd class="govuk-summary-list__value">+<?= $rewards['top10']['xp'] ?? 100 ?> XP</dd>
                     </div>
@@ -203,7 +203,7 @@ $isEndingSoon = $seasonData['is_ending_soon'] ?? false;
                     <?php if (isset($rewards['participant'])): ?>
                     <div class="govuk-summary-list__row">
                         <dt class="govuk-summary-list__key">
-                            <i class="fa-solid fa-star" aria-hidden="true" style="color: #505a5f;"></i> Participants
+                            <i class="fa-solid fa-star civicone-icon-grey" aria-hidden="true"></i> Participants
                         </dt>
                         <dd class="govuk-summary-list__value">+<?= $rewards['participant']['xp'] ?? 25 ?> XP</dd>
                     </div>
@@ -222,9 +222,9 @@ $isEndingSoon = $seasonData['is_ending_soon'] ?? false;
         <?php foreach ($allSeasons as $pastSeason): ?>
             <?php if ($pastSeason['id'] === $season['id']) continue; ?>
             <div class="govuk-grid-column-one-third govuk-!-margin-bottom-4">
-                <div class="govuk-!-padding-4" style="border: 1px solid #b1b4b6;">
+                <div class="govuk-!-padding-4 civicone-season-card">
                     <h4 class="govuk-heading-s govuk-!-margin-bottom-2"><?= htmlspecialchars($pastSeason['name']) ?></h4>
-                    <p class="govuk-body-s govuk-!-margin-bottom-2" style="color: #505a5f;">
+                    <p class="govuk-body-s govuk-!-margin-bottom-2 civicone-secondary-text">
                         <?= date('M j', strtotime($pastSeason['start_date'])) ?> - <?= date('M j, Y', strtotime($pastSeason['end_date'])) ?>
                     </p>
                     <?php if ($pastSeason['status'] === 'completed'): ?>

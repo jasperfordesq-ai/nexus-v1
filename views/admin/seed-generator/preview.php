@@ -14,7 +14,7 @@ $preview = $_GET['preview'] ?? 'analysis';
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Seed Generator Preview | Nexus Admin</title>
-    <link rel="stylesheet" href="/assets/css/admin-gold-standard.min.css">
+    <link rel="stylesheet" href="/assets/css/admin-gold-standard.css">
     <style>
         body {
             margin: 0;

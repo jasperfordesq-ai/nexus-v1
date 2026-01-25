@@ -39,7 +39,7 @@ function civicone_govuk_task_list($args = []) {
     $statusConfig = [
         'completed' => ['tag' => 'Completed', 'class' => 'govuk-task-list__status--completed'],
         'in-progress' => ['tag' => 'In progress', 'class' => 'govuk-tag govuk-tag--light-blue'],
-        'not-started' => ['tag' => 'Not yet started', 'class' => 'govuk-tag govuk-tag--blue'],
+        'not-started' => ['tag' => 'Not yet started', 'class' => 'govuk-tag govuk-tag--light-blue'],
         'cannot-start' => ['tag' => 'Cannot start yet', 'class' => 'govuk-tag govuk-tag--grey'],
     ];
 

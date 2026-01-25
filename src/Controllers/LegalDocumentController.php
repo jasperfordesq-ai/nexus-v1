@@ -1,0 +1,369 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Nexus\Controllers;
+
+use Nexus\Core\Auth;
+use Nexus\Core\TenantContext;
+use Nexus\Core\View;
+use Nexus\Core\SEO;
+use Nexus\Services\LegalDocumentService;
+
+/**
+ * LegalDocumentController
+ *
+ * Handles public-facing legal document pages (Terms, Privacy, etc.)
+ * with version display and acceptance tracking.
+ *
+ * @package Nexus\Controllers
+ */
+class LegalDocumentController
+{
+    /**
+     * Display Terms of Service
+     */
+    public function terms(): void
+    {
+        $this->showDocument(LegalDocumentService::TYPE_TERMS, 'Terms of Service');
+    }
+
+    /**
+     * Display Privacy Policy
+     */
+    public function privacy(): void
+    {
+        $this->showDocument(LegalDocumentService::TYPE_PRIVACY, 'Privacy Policy');
+    }
+
+    /**
+     * Display Cookie Policy
+     */
+    public function cookies(): void
+    {
+        $this->showDocument(LegalDocumentService::TYPE_COOKIES, 'Cookie Policy');
+    }
+
+    /**
+     * Display Accessibility Statement
+     */
+    public function accessibility(): void
+    {
+        $this->showDocument(LegalDocumentService::TYPE_ACCESSIBILITY, 'Accessibility Statement');
+    }
+
+    /**
+     * Display Community Guidelines
+     */
+    public function communityGuidelines(): void
+    {
+        $this->showDocument(LegalDocumentService::TYPE_COMMUNITY_GUIDELINES, 'Community Guidelines');
+    }
+
+    /**
+     * Display Acceptable Use Policy
+     */
+    public function acceptableUse(): void
+    {
+        $this->showDocument(LegalDocumentService::TYPE_ACCEPTABLE_USE, 'Acceptable Use Policy');
+    }
+
+    /**
+     * Show a specific version of a document (for history/archive)
+     */
+    public function showVersion(int $versionId): void
+    {
+        $version = LegalDocumentService::getVersion($versionId);
+
+        if (!$version) {
+            http_response_code(404);
+            View::render('errors/404');
+            return;
+        }
+
+        // Verify tenant access
+        if ($version['tenant_id'] !== TenantContext::getId()) {
+            http_response_code(404);
+            View::render('errors/404');
+            return;
+        }
+
+        // Don't show drafts to public
+        if ($version['is_draft'] && !Auth::isAdmin()) {
+            http_response_code(404);
+            View::render('errors/404');
+            return;
+        }
+
+        SEO::setTitle($version['title'] . ' - Version ' . $version['version_number']);
+
+        View::render('legal/show-version', [
+            'document' => $version,
+            'version' => $version,
+            'isArchived' => !$version['is_current'],
+            'hideHero' => true
+        ]);
+    }
+
+    /**
+     * Show version history for terms
+     */
+    public function termsVersionHistory(): void
+    {
+        $this->versionHistory(LegalDocumentService::TYPE_TERMS);
+    }
+
+    /**
+     * Show version history for privacy
+     */
+    public function privacyVersionHistory(): void
+    {
+        $this->versionHistory(LegalDocumentService::TYPE_PRIVACY);
+    }
+
+    /**
+     * Show version history for a document (public archive)
+     */
+    public function versionHistory(string $type): void
+    {
+        $document = LegalDocumentService::getByType($type);
+
+        if (!$document) {
+            http_response_code(404);
+            View::render('errors/404');
+            return;
+        }
+
+        $versions = LegalDocumentService::getVersions($document['id']);
+
+        // Filter out drafts for non-admins
+        if (!Auth::isAdmin()) {
+            $versions = array_filter($versions, fn($v) => !$v['is_draft']);
+        }
+
+        SEO::setTitle($document['title'] . ' - Version History');
+
+        View::render('legal/version-history', [
+            'document' => $document,
+            'versions' => $versions,
+            'hideHero' => true
+        ]);
+    }
+
+    /**
+     * API: Accept a document
+     */
+    public function accept(): void
+    {
+        header('Content-Type: application/json');
+
+        if (!Auth::check()) {
+            http_response_code(401);
+            echo json_encode(['error' => 'Authentication required']);
+            return;
+        }
+
+        $input = json_decode(file_get_contents('php://input'), true);
+        $documentId = (int) ($input['document_id'] ?? 0);
+        $versionId = (int) ($input['version_id'] ?? 0);
+
+        if (!$documentId || !$versionId) {
+            http_response_code(400);
+            echo json_encode(['error' => 'Missing document_id or version_id']);
+            return;
+        }
+
+        // Verify the version exists and belongs to current tenant
+        $version = LegalDocumentService::getVersion($versionId);
+        if (!$version || $version['tenant_id'] !== TenantContext::getId()) {
+            http_response_code(404);
+            echo json_encode(['error' => 'Document version not found']);
+            return;
+        }
+
+        // Verify it's the current version
+        $document = LegalDocumentService::getById($documentId);
+        if (!$document || $document['current_version_id'] !== $versionId) {
+            http_response_code(400);
+            echo json_encode(['error' => 'This is not the current version']);
+            return;
+        }
+
+        try {
+            LegalDocumentService::recordAcceptanceFromRequest(
+                Auth::id(),
+                $documentId,
+                $versionId,
+                LegalDocumentService::ACCEPTANCE_SETTINGS
+            );
+
+            echo json_encode([
+                'success' => true,
+                'message' => 'Acceptance recorded',
+                'accepted_at' => date('c')
+            ]);
+        } catch (\Exception $e) {
+            http_response_code(500);
+            echo json_encode(['error' => 'Failed to record acceptance']);
+        }
+    }
+
+    /**
+     * API: Accept all required documents (for registration/login flow)
+     */
+    public function acceptAll(): void
+    {
+        header('Content-Type: application/json');
+
+        if (!Auth::check()) {
+            http_response_code(401);
+            echo json_encode(['error' => 'Authentication required']);
+            return;
+        }
+
+        $pending = LegalDocumentService::getDocumentsRequiringAcceptance(Auth::id());
+
+        if (empty($pending)) {
+            echo json_encode([
+                'success' => true,
+                'message' => 'No documents require acceptance',
+                'accepted' => []
+            ]);
+            return;
+        }
+
+        $accepted = [];
+        $errors = [];
+
+        foreach ($pending as $doc) {
+            if (!$doc['current_version_id']) {
+                continue;
+            }
+
+            try {
+                LegalDocumentService::recordAcceptanceFromRequest(
+                    Auth::id(),
+                    $doc['document_id'],
+                    $doc['current_version_id'],
+                    LegalDocumentService::ACCEPTANCE_LOGIN_PROMPT
+                );
+
+                $accepted[] = [
+                    'document_type' => $doc['document_type'],
+                    'version' => $doc['current_version']
+                ];
+            } catch (\Exception $e) {
+                $errors[] = $doc['document_type'];
+            }
+        }
+
+        if (!empty($errors)) {
+            http_response_code(500);
+            echo json_encode([
+                'error' => 'Failed to accept some documents',
+                'failed' => $errors,
+                'accepted' => $accepted
+            ]);
+            return;
+        }
+
+        echo json_encode([
+            'success' => true,
+            'message' => 'All documents accepted',
+            'accepted' => $accepted
+        ]);
+    }
+
+    /**
+     * API: Get user's acceptance status
+     */
+    public function status(): void
+    {
+        header('Content-Type: application/json');
+
+        if (!Auth::check()) {
+            http_response_code(401);
+            echo json_encode(['error' => 'Authentication required']);
+            return;
+        }
+
+        $status = LegalDocumentService::getUserAcceptanceStatus(Auth::id());
+
+        echo json_encode([
+            'success' => true,
+            'documents' => $status,
+            'has_pending' => LegalDocumentService::hasPendingAcceptances(Auth::id())
+        ]);
+    }
+
+    /**
+     * Common method to show a legal document
+     */
+    private function showDocument(string $type, string $fallbackTitle): void
+    {
+        $document = LegalDocumentService::getByType($type);
+
+        // If no versioned document exists, fall back to legacy file-based system
+        if (!$document || !$document['content']) {
+            $this->showLegacyDocument($type, $fallbackTitle);
+            return;
+        }
+
+        SEO::setTitle($document['title']);
+        SEO::setDescription("Read our {$document['title']} - Last updated " . date('F j, Y', strtotime($document['effective_date'])));
+
+        // Get current user's acceptance status
+        $acceptanceStatus = null;
+        if (Auth::check()) {
+            $acceptanceStatus = LegalDocumentService::hasAcceptedCurrent(Auth::id(), $type)
+                ? 'current'
+                : 'pending';
+        }
+
+        View::render('legal/show', [
+            'document' => $document,
+            'documentType' => $type,
+            'acceptanceStatus' => $acceptanceStatus,
+            'hideHero' => true
+        ]);
+    }
+
+    /**
+     * Fall back to legacy file-based documents
+     * This ensures backward compatibility during migration
+     */
+    private function showLegacyDocument(string $type, string $fallbackTitle): void
+    {
+        SEO::setTitle($fallbackTitle);
+
+        // Check for tenant-specific override first
+        $tenant = TenantContext::get();
+        $tenantSlug = $tenant['slug'] ?? '';
+        $layout = layout();
+
+        // Try tenant-specific file
+        $tenantFile = __DIR__ . "/../../views/tenants/{$tenantSlug}/{$layout}/pages/{$type}.php";
+        if (file_exists($tenantFile)) {
+            require $tenantFile;
+            return;
+        }
+
+        // Try layout-specific file
+        $layoutFile = __DIR__ . "/../../views/{$layout}/pages/{$type}.php";
+        if (file_exists($layoutFile)) {
+            require $layoutFile;
+            return;
+        }
+
+        // Try generic pages file
+        $genericFile = __DIR__ . "/../../views/pages/{$type}.php";
+        if (file_exists($genericFile)) {
+            require $genericFile;
+            return;
+        }
+
+        // 404 if nothing found
+        http_response_code(404);
+        View::render('errors/404');
+    }
+}

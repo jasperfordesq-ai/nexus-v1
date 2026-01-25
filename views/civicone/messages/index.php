@@ -60,7 +60,7 @@ $basePath = Nexus\Core\TenantContext::getBasePath();
                             </div>
                             <div class="govuk-grid-column-one-quarter govuk-!-text-align-right">
                                 <?php if ($isUnread): ?>
-                                    <span class="govuk-tag govuk-tag--blue govuk-!-margin-right-2">New</span>
+                                    <span class="govuk-tag govuk-tag--light-blue govuk-!-margin-right-2">New</span>
                                 <?php endif; ?>
                                 <time class="govuk-body-s" datetime="<?= $thread['created_at'] ?>" style="color: #505a5f;">
                                     <?= date('M j', strtotime($thread['created_at'])) ?>

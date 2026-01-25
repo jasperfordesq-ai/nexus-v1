@@ -39,8 +39,8 @@ require dirname(__DIR__, 2) . '/layouts/civicone/header.php';
 <!-- Outcomes Section -->
 <div class="govuk-grid-row govuk-!-margin-bottom-8">
     <div class="govuk-grid-column-one-half">
-        <div class="govuk-!-padding-4" style="border: 1px solid #b1b4b6; border-left: 5px solid #00703c; height: 100%;">
-            <h2 class="govuk-heading-l" style="color: #00703c;">
+        <div class="govuk-!-padding-4 civicone-card-border-left-green civicone-full-height">
+            <h2 class="govuk-heading-l civicone-heading-green">
                 <i class="fa-solid fa-check-circle govuk-!-margin-right-2" aria-hidden="true"></i>
                 Validated Outcomes
             </h2>
@@ -60,13 +60,13 @@ require dirname(__DIR__, 2) . '/layouts/civicone/header.php';
         </div>
     </div>
     <div class="govuk-grid-column-one-half">
-        <div class="govuk-inset-text" style="border-left-color: #1d70b8; height: 100%;">
-            <p class="govuk-body" style="font-style: italic;">
+        <div class="govuk-inset-text civicone-inset-blue civicone-full-height">
+            <p class="govuk-body civicone-text-italic">
                 "Monica found out about TBI through the outreach mental health team... Since joining TBI, Monica 'feels much more connected to the community which has had a positive mental health impact'."
             </p>
             <p class="govuk-body-s govuk-!-margin-bottom-0">
                 <strong>— Monica (Member)</strong><br>
-                <span style="color: #505a5f;">Source: 2023 Social Impact Study</span>
+                <span class="civicone-secondary-text">Source: 2023 Social Impact Study</span>
             </p>
         </div>
     </div>
@@ -78,32 +78,32 @@ require dirname(__DIR__, 2) . '/layouts/civicone/header.php';
 
     <div class="govuk-grid-row">
         <div class="govuk-grid-column-one-quarter govuk-!-margin-bottom-4">
-            <div class="govuk-!-padding-4 govuk-!-text-align-center" style="border: 1px solid #b1b4b6; border-top: 5px solid #1d70b8; height: 100%;">
-                <div class="govuk-!-margin-bottom-2" style="width: 40px; height: 40px; border-radius: 50%; background: #1d70b8; display: inline-flex; align-items: center; justify-content: center; color: white; font-weight: bold;">1</div>
+            <div class="govuk-!-padding-4 govuk-!-text-align-center civicone-pathway-card civicone-full-height">
+                <div class="govuk-!-margin-bottom-2 civicone-step-number">1</div>
                 <h3 class="govuk-heading-s">Formal Referral</h3>
                 <p class="govuk-body-s">Warm handover from Link Worker to our TBI Hub Coordinator.</p>
             </div>
         </div>
 
         <div class="govuk-grid-column-one-quarter govuk-!-margin-bottom-4">
-            <div class="govuk-!-padding-4 govuk-!-text-align-center" style="border: 1px solid #b1b4b6; border-top: 5px solid #1d70b8; height: 100%;">
-                <div class="govuk-!-margin-bottom-2" style="width: 40px; height: 40px; border-radius: 50%; background: #1d70b8; display: inline-flex; align-items: center; justify-content: center; color: white; font-weight: bold;">2</div>
+            <div class="govuk-!-padding-4 govuk-!-text-align-center civicone-pathway-card civicone-full-height">
+                <div class="govuk-!-margin-bottom-2 civicone-step-number">2</div>
                 <h3 class="govuk-heading-s">Onboarding</h3>
                 <p class="govuk-body-s">1-to-1 welcome to explain the model and identify skills.</p>
             </div>
         </div>
 
         <div class="govuk-grid-column-one-quarter govuk-!-margin-bottom-4">
-            <div class="govuk-!-padding-4 govuk-!-text-align-center" style="border: 1px solid #b1b4b6; border-top: 5px solid #1d70b8; height: 100%;">
-                <div class="govuk-!-margin-bottom-2" style="width: 40px; height: 40px; border-radius: 50%; background: #1d70b8; display: inline-flex; align-items: center; justify-content: center; color: white; font-weight: bold;">3</div>
+            <div class="govuk-!-padding-4 govuk-!-text-align-center civicone-pathway-card civicone-full-height">
+                <div class="govuk-!-margin-bottom-2 civicone-step-number">3</div>
                 <h3 class="govuk-heading-s">Connection</h3>
                 <p class="govuk-body-s">Active facilitation of first exchanges and group activities.</p>
             </div>
         </div>
 
         <div class="govuk-grid-column-one-quarter govuk-!-margin-bottom-4">
-            <div class="govuk-!-padding-4 govuk-!-text-align-center" style="border: 1px solid #b1b4b6; border-top: 5px solid #1d70b8; height: 100%;">
-                <div class="govuk-!-margin-bottom-2" style="width: 40px; height: 40px; border-radius: 50%; background: #1d70b8; display: inline-flex; align-items: center; justify-content: center; color: white; font-weight: bold;">4</div>
+            <div class="govuk-!-padding-4 govuk-!-text-align-center civicone-pathway-card civicone-full-height">
+                <div class="govuk-!-margin-bottom-2 civicone-step-number">4</div>
                 <h3 class="govuk-heading-s">Follow-up</h3>
                 <p class="govuk-body-s">Feedback to Link Worker on engagement and outcomes.</p>
             </div>
@@ -112,9 +112,9 @@ require dirname(__DIR__, 2) . '/layouts/civicone/header.php';
 </section>
 
 <!-- CTA -->
-<div class="govuk-!-padding-6 govuk-!-text-align-center" style="background: #1d70b8; color: white;">
-    <h2 class="govuk-heading-l" style="color: white;">We are Seeking a Partner to Launch a Formal Pilot</h2>
-    <p class="govuk-body-l govuk-!-margin-bottom-6" style="color: white; max-width: 600px; margin-left: auto; margin-right: auto;">
+<div class="govuk-!-padding-6 govuk-!-text-align-center civicone-cta-blue">
+    <h2 class="govuk-heading-l civicone-cta-heading">We are Seeking a Partner to Launch a Formal Pilot</h2>
+    <p class="govuk-body-l govuk-!-margin-bottom-6 civicone-cta-text civicone-cta-text-centered">
         We are seeking a public sector contract to secure the essential Hub Coordinator role, which is the <strong>lynchpin of the entire service</strong>.
     </p>
     <a href="/uploads/tenants/hour-timebank/THE-RECIPROCITY-PATHWAY_A-Pilot-Proposal.pdf" target="_blank" class="govuk-button govuk-button--secondary" data-module="govuk-button">

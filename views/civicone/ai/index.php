@@ -20,7 +20,7 @@ $currentConversationId = $conversation['id'] ?? null;
             <!-- Sidebar with conversations -->
             <aside class="govuk-grid-column-one-third" role="complementary" aria-label="Conversation history">
                 <div class="govuk-!-margin-bottom-4">
-                    <button type="button" class="govuk-button govuk-!-margin-bottom-0" data-module="govuk-button" onclick="startNewChat()" style="width: 100%;">
+                    <button type="button" class="govuk-button govuk-!-margin-bottom-0 civicone-button-full-width" data-module="govuk-button" onclick="startNewChat()">
                         <i class="fa-solid fa-plus govuk-!-margin-right-2" aria-hidden="true"></i>
                         New Chat
                     </button>
@@ -30,33 +30,32 @@ $currentConversationId = $conversation['id'] ?? null;
 
                 <div id="conversationsList" role="list" aria-label="Previous conversations">
                     <?php if (empty($conversations)): ?>
-                        <div class="govuk-!-padding-4 govuk-!-text-align-center civicone-panel-bg" style="border-left: 5px solid #1d70b8;">
+                        <div class="govuk-!-padding-4 govuk-!-text-align-center civicone-panel-bg civicone-action-card">
                             <p class="govuk-body-s govuk-!-margin-bottom-0">
                                 No conversations yet.<br>Start a new chat!
                             </p>
                         </div>
                     <?php else: ?>
                         <?php foreach ($conversations as $conv): ?>
-                            <div class="govuk-!-margin-bottom-2 govuk-!-padding-3 <?= ($conv['id'] ?? 0) == $currentConversationId ? '' : 'govuk-button--secondary' ?>"
-                                 style="background: <?= ($conv['id'] ?? 0) == $currentConversationId ? '#1d70b8' : '#f3f2f1' ?>; color: <?= ($conv['id'] ?? 0) == $currentConversationId ? 'white' : 'inherit' ?>; cursor: pointer; display: flex; align-items: center; gap: 10px; border-left: 5px solid <?= ($conv['id'] ?? 0) == $currentConversationId ? '#00703c' : '#b1b4b6' ?>;"
+                            <?php $isActive = ($conv['id'] ?? 0) == $currentConversationId; ?>
+                            <div class="govuk-!-margin-bottom-2 govuk-!-padding-3 civicone-conversation-item <?= $isActive ? 'civicone-conversation-item--active' : 'civicone-conversation-item--inactive' ?>"
                                  onclick="loadConversation(<?= $conv['id'] ?>)"
                                  data-id="<?= $conv['id'] ?>"
                                  role="button"
                                  tabindex="0"
                                  aria-label="Conversation: <?= htmlspecialchars($conv['title'] ?? 'New Chat') ?>">
                                 <i class="fa-solid fa-message" aria-hidden="true"></i>
-                                <div style="flex: 1; min-width: 0;">
-                                    <p class="govuk-body-s govuk-!-font-weight-bold govuk-!-margin-bottom-0" style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                                <div class="civicone-conversation-content">
+                                    <p class="govuk-body-s govuk-!-font-weight-bold govuk-!-margin-bottom-0 civicone-text-truncate">
                                         <?= htmlspecialchars($conv['title'] ?? 'New Chat') ?>
                                     </p>
-                                    <p class="govuk-body-s govuk-!-margin-bottom-0" style="opacity: 0.7;">
+                                    <p class="govuk-body-s govuk-!-margin-bottom-0 civicone-text-muted">
                                         <?= date('M j, g:i a', strtotime($conv['created_at'])) ?>
                                     </p>
                                 </div>
                                 <button type="button"
                                         onclick="event.stopPropagation(); deleteConversation(<?= $conv['id'] ?>)"
-                                        class="govuk-button govuk-button--warning govuk-!-margin-bottom-0"
-                                        style="padding: 4px 8px; min-width: 0;"
+                                        class="govuk-button govuk-button--warning govuk-!-margin-bottom-0 civicone-btn-delete-small"
                                         aria-label="Delete conversation"
                                         title="Delete">
                                     <i class="fa-solid fa-trash" aria-hidden="true"></i>
@@ -70,13 +69,13 @@ $currentConversationId = $conversation['id'] ?? null;
             <!-- Main Chat Area -->
             <div class="govuk-grid-column-two-thirds" role="main" aria-label="AI Chat">
                 <!-- Chat Header -->
-                <div class="govuk-!-margin-bottom-4 govuk-!-padding-4" style="background: #1d70b8; color: white;">
-                    <div style="display: flex; align-items: center; justify-content: space-between;">
-                        <h1 class="govuk-heading-m govuk-!-margin-bottom-0" style="color: white;">
+                <div class="govuk-!-margin-bottom-4 govuk-!-padding-4 civicone-chat-header">
+                    <div class="civicone-chat-footer">
+                        <h1 class="govuk-heading-m govuk-!-margin-bottom-0">
                             <i class="fa-solid fa-robot govuk-!-margin-right-2" aria-hidden="true"></i>
                             <span id="chatTitle"><?= htmlspecialchars($conversation['title'] ?? 'NEXUS AI Assistant') ?></span>
                         </h1>
-                        <strong class="govuk-tag" style="background: #00703c;">
+                        <strong class="govuk-tag govuk-tag--green">
                             <i class="fa-solid fa-brain govuk-!-margin-right-1" aria-hidden="true"></i>
                             <span id="providerName"><?= ucfirst($defaultProvider ?? 'Gemini') ?></span>
                         </strong>
@@ -88,20 +87,19 @@ $currentConversationId = $conversation['id'] ?? null;
                      role="log"
                      aria-live="polite"
                      aria-label="Chat messages"
-                     class="civicone-panel-bg"
-                     style="min-height: 400px; max-height: 500px; overflow-y: auto; padding: 20px; border: 1px solid #b1b4b6;">
+                     class="civicone-panel-bg civicone-chat-container">
                     <?php if (empty($messages)): ?>
                         <!-- Welcome State -->
                         <div id="welcomeState" class="govuk-!-text-align-center govuk-!-padding-6">
                             <p class="govuk-body govuk-!-margin-bottom-4">
-                                <i class="fa-solid fa-robot fa-3x" style="color: #1d70b8;" aria-hidden="true"></i>
+                                <i class="fa-solid fa-robot fa-3x civicone-icon-blue" aria-hidden="true"></i>
                             </p>
                             <h2 class="govuk-heading-l">Welcome to NEXUS AI</h2>
                             <p class="govuk-body-l govuk-!-margin-bottom-6">
                                 <?= nl2br(htmlspecialchars($welcomeMessage ?? "I'm your intelligent timebank assistant. I can help you find members, create listings, understand features, and more!")) ?>
                             </p>
 
-                            <div class="govuk-button-group" style="flex-wrap: wrap; justify-content: center;">
+                            <div class="govuk-button-group civicone-button-group-center">
                                 <button type="button" class="govuk-button govuk-button--secondary" data-module="govuk-button" onclick="sendSuggestion('How does timebanking work?')">
                                     How does timebanking work?
                                 </button>
@@ -118,16 +116,16 @@ $currentConversationId = $conversation['id'] ?? null;
                         </div>
                     <?php else: ?>
                         <?php foreach ($messages as $msg): ?>
-                            <div class="govuk-!-margin-bottom-4 govuk-!-padding-4" style="background: <?= $msg['role'] === 'assistant' ? 'white' : '#d4351c15' ?>; border-left: 5px solid <?= $msg['role'] === 'assistant' ? '#1d70b8' : '#00703c' ?>;">
-                                <div style="display: flex; align-items: flex-start; gap: 12px;">
-                                    <div style="width: 36px; height: 36px; border-radius: 50%; background: <?= $msg['role'] === 'assistant' ? '#1d70b8' : '#00703c' ?>; color: white; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                            <div class="govuk-!-margin-bottom-4 govuk-!-padding-4 <?= $msg['role'] === 'assistant' ? 'civicone-chat-bubble-assistant' : 'civicone-chat-bubble-user' ?>">
+                                <div class="civicone-chat-message">
+                                    <div class="civicone-chat-avatar <?= $msg['role'] === 'assistant' ? 'civicone-chat-avatar--assistant' : 'civicone-chat-avatar--user' ?>">
                                         <?php if ($msg['role'] === 'assistant'): ?>
                                             <i class="fa-solid fa-robot" aria-hidden="true"></i>
                                         <?php else: ?>
                                             <?= substr($_SESSION['user_name'] ?? 'U', 0, 1) ?>
                                         <?php endif; ?>
                                     </div>
-                                    <div style="flex: 1;">
+                                    <div class="civicone-flex-grow">
                                         <p class="govuk-body-s govuk-!-font-weight-bold govuk-!-margin-bottom-1">
                                             <?= $msg['role'] === 'assistant' ? 'AI Assistant' : ($_SESSION['user_name'] ?? 'You') ?>
                                         </p>
@@ -154,7 +152,7 @@ $currentConversationId = $conversation['id'] ?? null;
                             aria-label="Type your message"
                         ></textarea>
                     </div>
-                    <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px;">
+                    <div class="civicone-chat-footer">
                         <div class="govuk-button-group govuk-!-margin-bottom-0">
                             <button type="button" class="govuk-button govuk-!-margin-bottom-0" data-module="govuk-button" id="sendBtn" onclick="sendMessage()">
                                 <i class="fa-solid fa-paper-plane govuk-!-margin-right-2" aria-hidden="true"></i>
@@ -165,7 +163,7 @@ $currentConversationId = $conversation['id'] ?? null;
                                 Stop
                             </button>
                         </div>
-                        <p class="govuk-body-s govuk-!-margin-bottom-0" style="color: #505a5f;">
+                        <p class="govuk-body-s govuk-!-margin-bottom-0 civicone-secondary-text">
                             Daily: <strong id="dailyUsage"><?= $limits['daily_used'] ?? 0 ?></strong>/<?= $limits['daily_limit'] ?? 50 ?>
                             |
                             Monthly: <strong id="monthlyUsage"><?= $limits['monthly_used'] ?? 0 ?></strong>/<?= $limits['monthly_limit'] ?? 1000 ?>
@@ -286,18 +284,18 @@ function addMessage(role, content, id) {
     var container = document.getElementById('messagesContainer');
     var div = document.createElement('div');
     if (id) div.id = id;
-    div.className = 'govuk-!-margin-bottom-4 govuk-!-padding-4';
-    div.style.cssText = 'background: ' + (role === 'assistant' ? 'white' : '#d4351c15') + '; border-left: 5px solid ' + (role === 'assistant' ? '#1d70b8' : '#00703c') + ';';
+    div.className = 'govuk-!-margin-bottom-4 govuk-!-padding-4 ' + (role === 'assistant' ? 'civicone-chat-bubble-assistant' : 'civicone-chat-bubble-user');
 
     var avatar = role === 'assistant'
         ? '<i class="fa-solid fa-robot" aria-hidden="true"></i>'
         : '<?= substr($_SESSION['user_name'] ?? 'U', 0, 1) ?>';
     var name = role === 'assistant' ? 'AI Assistant' : '<?= addslashes($_SESSION['user_name'] ?? 'You') ?>';
+    var avatarClass = role === 'assistant' ? 'civicone-chat-avatar--assistant' : 'civicone-chat-avatar--user';
 
     div.innerHTML =
-        '<div style="display: flex; align-items: flex-start; gap: 12px;">' +
-        '<div style="width: 36px; height: 36px; border-radius: 50%; background: ' + (role === 'assistant' ? '#1d70b8' : '#00703c') + '; color: white; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">' + avatar + '</div>' +
-        '<div style="flex: 1;">' +
+        '<div class="civicone-chat-message">' +
+        '<div class="civicone-chat-avatar ' + avatarClass + '">' + avatar + '</div>' +
+        '<div class="civicone-flex-grow">' +
         '<p class="govuk-body-s govuk-!-font-weight-bold govuk-!-margin-bottom-1">' + name + '</p>' +
         '<p class="govuk-body govuk-!-margin-bottom-0">' + content.replace(/\n/g, '<br>') + '</p>' +
         '</div></div>';

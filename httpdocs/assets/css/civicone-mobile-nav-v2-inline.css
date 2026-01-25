@@ -5,6 +5,37 @@ html[data-layout] { transform: none !important; }
 .mobile-tab-bar { display: none; }
 
 /* CRITICAL: Hide mobile fullscreen menu and notification sheet on desktop */
+/* Nuclear option: absolute hide on desktop with max specificity */
+@media (min-width: 1025px) {
+    body .mobile-fullscreen-menu,
+    body .mobile-notification-sheet,
+    body #mobileMenu,
+    body #mobileNotifications,
+    body .mobile-tab-bar,
+    html body .mobile-fullscreen-menu,
+    html body .mobile-notification-sheet,
+    html body #mobileMenu,
+    html body #mobileNotifications,
+    html body .mobile-tab-bar,
+    nav.mobile-tab-bar,
+    div.mobile-fullscreen-menu,
+    div.mobile-notification-sheet {
+        display: none !important;
+        visibility: hidden !important;
+        opacity: 0 !important;
+        pointer-events: none !important;
+        position: absolute !important;
+        left: -99999px !important;
+        top: -99999px !important;
+        width: 0 !important;
+        height: 0 !important;
+        overflow: hidden !important;
+        clip: rect(0,0,0,0) !important;
+        z-index: -9999 !important;
+    }
+}
+
+/* Fallback: Hide on desktop by default (for browsers that don't support media queries) */
 .mobile-fullscreen-menu,
 .mobile-notification-sheet,
 #mobileMenu,

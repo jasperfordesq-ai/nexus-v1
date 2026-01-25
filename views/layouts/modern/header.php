@@ -85,10 +85,10 @@ try {
     <link rel="dns-prefetch" href="https://cdnjs.cloudflare.com">
     <link rel="dns-prefetch" href="https://api.mapbox.com">
 
-    <!-- Preload Critical CSS (above-the-fold) -->
-    <link rel="preload" as="style" href="<?= $assetBase ?>/assets/css/design-tokens.min.css?v=<?= $cssVersionTimestamp ?>">
-    <link rel="preload" as="style" href="<?= $assetBase ?>/assets/css/nexus-phoenix.min.css?v=<?= $cssVersionTimestamp ?>">
-    <link rel="preload" as="style" href="<?= $assetBase ?>/assets/css/bundles/core.min.css?v=<?= $cssVersionTimestamp ?>">
+    <!-- Preload Critical CSS (above-the-fold) - Using non-minified for stability -->
+    <link rel="preload" as="style" href="<?= $assetBase ?>/assets/css/design-tokens.css?v=<?= $cssVersionTimestamp ?>">
+    <link rel="preload" as="style" href="<?= $assetBase ?>/assets/css/nexus-phoenix.css?v=<?= $cssVersionTimestamp ?>">
+    <link rel="preload" as="style" href="<?= $assetBase ?>/assets/css/bundles/core.css?v=<?= $cssVersionTimestamp ?>">
 
     <!-- Preload JavaScript (critical for interactivity) -->
     <link rel="preload" as="script" href="/assets/js/mobile-interactions.js?v=<?= $cssVersionTimestamp ?>">
@@ -127,9 +127,9 @@ try {
     <!-- Mobile Interactions (ripple effects, haptic feedback, loading states) -->
     <script defer src="/assets/js/mobile-interactions.js?v=<?= $cssVersionTimestamp ?>"></script>
 
-    <!-- Cookie Consent Library (EU compliance) - TEMPORARILY DISABLED -->
-    <!-- <script src="/assets/js/cookie-consent.js?v=<?= $cssVersionTimestamp ?>"></script> -->
-    <!-- <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/cookie-banner.css?v=<?= $cssVersionTimestamp ?>"> -->
+    <!-- Cookie Consent Library (EU compliance) -->
+    <script src="/assets/js/cookie-consent.js?v=<?= $cssVersionTimestamp ?>"></script>
+    <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/cookie-banner.css?v=<?= $cssVersionTimestamp ?>">
 
     <!-- Global NEXUS_BASE for AJAX calls -->
     <script>const NEXUS_BASE = "<?= rtrim(\Nexus\Core\TenantContext::getBasePath(), '/') ?>";</script>
@@ -164,16 +164,8 @@ try {
     <!-- Admin Impersonation Banner -->
     <?php require __DIR__ . '/../../modern/partials/impersonation-banner.php'; ?>
 
-    <!-- Cookie Consent Banner (EU compliance) - TEMPORARILY DISABLED -->
-    <?php
-    // $cookieBannerPath = __DIR__ . '/../../modern/partials/cookie-banner.php';
-    // if (!file_exists($cookieBannerPath)) {
-    //     $cookieBannerPath = __DIR__ . '/../../civicone/partials/cookie-banner.php';
-    // }
-    // if (file_exists($cookieBannerPath)) {
-    //     require $cookieBannerPath;
-    // }
-    ?>
+    <!-- Cookie Consent Banner (EU compliance) -->
+    <?php require __DIR__ . '/../../modern/partials/cookie-banner.php'; ?>
 
     <!-- Main Content Area (for skip-link target) -->
     <main id="main-content" role="main">

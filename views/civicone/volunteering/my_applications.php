@@ -37,9 +37,9 @@ $basePath = \Nexus\Core\TenantContext::getBasePath();
 
         <?php if (empty($applications)): ?>
             <!-- Empty State -->
-            <div class="govuk-!-padding-6 govuk-!-text-align-center civicone-panel-bg" style="border-left: 5px solid #1d70b8;">
+            <div class="govuk-!-padding-6 govuk-!-text-align-center civicone-panel-bg civicone-border-left-blue">
                 <p class="govuk-body govuk-!-margin-bottom-4">
-                    <i class="fa-solid fa-clipboard fa-3x" style="color: #1d70b8;" aria-hidden="true"></i>
+                    <i class="fa-solid fa-clipboard fa-3x civicone-icon-blue" aria-hidden="true"></i>
                 </p>
                 <h2 class="govuk-heading-l">No applications yet</h2>
                 <p class="govuk-body govuk-!-margin-bottom-6">
@@ -54,16 +54,16 @@ $basePath = \Nexus\Core\TenantContext::getBasePath();
 
             <!-- Badges Section -->
             <?php if (!empty($badges)): ?>
-                <div class="govuk-!-margin-bottom-6 govuk-!-padding-4 civicone-panel-bg" style="border-left: 5px solid #f47738;">
+                <div class="govuk-!-margin-bottom-6 govuk-!-padding-4 civicone-panel-bg civicone-border-left-orange">
                     <h2 class="govuk-heading-m">
-                        <i class="fa-solid fa-award govuk-!-margin-right-2" style="color: #f47738;" aria-hidden="true"></i>
+                        <i class="fa-solid fa-award govuk-!-margin-right-2 civicone-icon-orange" aria-hidden="true"></i>
                         Achievements
                     </h2>
                     <div class="govuk-grid-row">
                         <?php foreach ($badges as $badge): ?>
                             <div class="govuk-grid-column-one-quarter govuk-!-margin-bottom-3">
-                                <div class="govuk-!-padding-3 govuk-!-text-align-center" style="background: white; border-radius: 4px;" title="<?= htmlspecialchars($badge['name']) ?> (<?= date('M Y', strtotime($badge['awarded_at'])) ?>)">
-                                    <span style="font-size: 24px;"><?= $badge['icon'] ?></span>
+                                <div class="govuk-!-padding-3 govuk-!-text-align-center civicone-badge-card" title="<?= htmlspecialchars($badge['name']) ?> (<?= date('M Y', strtotime($badge['awarded_at'])) ?>)">
+                                    <span class="civicone-badge-icon"><?= $badge['icon'] ?></span>
                                     <p class="govuk-body-s govuk-!-margin-top-2 govuk-!-margin-bottom-0">
                                         <?= htmlspecialchars($badge['name']) ?>
                                     </p>
@@ -76,25 +76,32 @@ $basePath = \Nexus\Core\TenantContext::getBasePath();
 
             <!-- Applications List -->
             <h2 class="govuk-heading-m">
-                <i class="fa-solid fa-clipboard-list govuk-!-margin-right-2" style="color: #1d70b8;" aria-hidden="true"></i>
+                <i class="fa-solid fa-clipboard-list govuk-!-margin-right-2 civicone-icon-blue" aria-hidden="true"></i>
                 My Applications (<?= count($applications) ?>)
             </h2>
 
             <?php foreach ($applications as $app): ?>
-                <div class="govuk-!-margin-bottom-4 govuk-!-padding-4" style="background: white; border: 1px solid #b1b4b6; border-left: 5px solid <?= $app['status'] === 'approved' ? '#00703c' : ($app['status'] === 'declined' ? '#d4351c' : '#1d70b8') ?>;">
+                <?php
+                $statusBorderClass = match($app['status']) {
+                    'approved' => 'civicone-border-left-green',
+                    'declined' => 'civicone-border-left-red',
+                    default => 'civicone-border-left-blue'
+                };
+                ?>
+                <div class="govuk-!-margin-bottom-4 govuk-!-padding-4 civicone-application-card <?= $statusBorderClass ?>">
                     <div class="govuk-grid-row">
                         <div class="govuk-grid-column-two-thirds">
                             <h3 class="govuk-heading-s govuk-!-margin-bottom-2">
                                 <?= htmlspecialchars($app['opp_title']) ?>
                             </h3>
                             <p class="govuk-body-s govuk-!-margin-bottom-2">
-                                <i class="fa-solid fa-building govuk-!-margin-right-1" style="color: #505a5f;" aria-hidden="true"></i>
+                                <i class="fa-solid fa-building govuk-!-margin-right-1 civicone-icon-grey" aria-hidden="true"></i>
                                 <?= htmlspecialchars($app['org_name']) ?>
                             </p>
 
                             <?php if (!empty($app['shift_start'])): ?>
                                 <p class="govuk-body-s govuk-!-margin-bottom-2">
-                                    <i class="fa-solid fa-calendar govuk-!-margin-right-1" style="color: #505a5f;" aria-hidden="true"></i>
+                                    <i class="fa-solid fa-calendar govuk-!-margin-right-1 civicone-icon-grey" aria-hidden="true"></i>
                                     <?= date('M d, Y \a\t g:i A', strtotime($app['shift_start'])) ?>
                                     <a href="<?= $basePath ?>/volunteering/ics/<?= $app['id'] ?>" class="govuk-link govuk-!-margin-left-2">
                                         Add to Calendar
@@ -108,14 +115,13 @@ $basePath = \Nexus\Core\TenantContext::getBasePath();
                         </div>
                         <div class="govuk-grid-column-one-third govuk-!-text-align-right">
                             <?php
-                            $statusColors = [
-                                'approved' => ['bg' => '#00703c', 'text' => 'white'],
-                                'declined' => ['bg' => '#d4351c', 'text' => 'white'],
-                                'pending' => ['bg' => '#1d70b8', 'text' => 'white']
-                            ];
-                            $statusColor = $statusColors[$app['status']] ?? $statusColors['pending'];
+                            $statusTagClass = match($app['status']) {
+                                'approved' => 'govuk-tag--green',
+                                'declined' => 'govuk-tag--red',
+                                default => 'govuk-tag--blue'
+                            };
                             ?>
-                            <strong class="govuk-tag" style="background: <?= $statusColor['bg'] ?>; color: <?= $statusColor['text'] ?>;">
+                            <strong class="govuk-tag <?= $statusTagClass ?>">
                                 <?= ucfirst($app['status']) ?>
                             </strong>
 
@@ -140,11 +146,11 @@ $basePath = \Nexus\Core\TenantContext::getBasePath();
 </div>
 
 <!-- Log Hours Modal -->
-<div id="logHoursModal" class="govuk-!-display-none" role="dialog" aria-labelledby="modal-title" aria-modal="true" style="position: fixed; inset: 0; z-index: 1000;">
-    <div onclick="closeLogModal()" style="position: absolute; inset: 0; background: rgba(0,0,0,0.5);"></div>
-    <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; width: 90%; max-width: 500px; max-height: 90vh; overflow-y: auto;">
-        <div class="govuk-!-padding-4" style="background: #1d70b8; color: white;">
-            <h3 id="modal-title" class="govuk-heading-m" style="color: white; margin-bottom: 0;">
+<div id="logHoursModal" class="govuk-!-display-none civicone-modal-overlay" role="dialog" aria-labelledby="modal-title" aria-modal="true">
+    <div onclick="closeLogModal()" class="civicone-modal-backdrop"></div>
+    <div class="civicone-modal-dialog">
+        <div class="govuk-!-padding-4 civicone-modal-header-blue">
+            <h3 id="modal-title" class="govuk-heading-m civicone-modal-title">
                 <i class="fa-solid fa-clock govuk-!-margin-right-2" aria-hidden="true"></i>
                 Log Volunteer Hours
             </h3>

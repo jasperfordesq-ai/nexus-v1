@@ -5,9 +5,12 @@
     left: 0;
     right: 0;
     bottom: 0;
+    width: 100%;
+    height: 100%;
     background: rgba(0, 0, 0, 0.75);
     backdrop-filter: blur(4px);
-    z-index: 10000;
+    -webkit-backdrop-filter: blur(4px);
+    z-index: 999999;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -138,50 +141,172 @@
     border-color: var(--color-gray-400);
 }
 
-/* Dark mode support */
+/* Dark mode support - via class selector (app controlled) */
+[data-theme="dark"] .dev-notice-modal,
+.dark-mode .dev-notice-modal,
+body.dark .dev-notice-modal {
+    background: #1f2937;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
+}
+
+[data-theme="dark"] .dev-notice-header,
+.dark-mode .dev-notice-header,
+body.dark .dev-notice-header {
+    background: linear-gradient(135deg, #4338ca 0%, #6366f1 100%);
+}
+
+[data-theme="dark"] .dev-notice-body,
+.dark-mode .dev-notice-body,
+body.dark .dev-notice-body {
+    color: #e5e7eb;
+}
+
+[data-theme="dark"] .dev-notice-body strong,
+.dark-mode .dev-notice-body strong,
+body.dark .dev-notice-body strong {
+    color: #ffffff;
+}
+
+[data-theme="dark"] .dev-notice-highlight,
+.dark-mode .dev-notice-highlight,
+body.dark .dev-notice-highlight {
+    background: rgba(251, 191, 36, 0.15);
+    border-left-color: #fbbf24;
+    color: #fcd34d;
+}
+
+[data-theme="dark"] .dev-notice-footer,
+.dark-mode .dev-notice-footer,
+body.dark .dev-notice-footer {
+    background: #111827;
+    border-top-color: #374151;
+}
+
+[data-theme="dark"] .dev-notice-btn-primary,
+.dark-mode .dev-notice-btn-primary,
+body.dark .dev-notice-btn-primary {
+    background: #6366f1;
+}
+
+[data-theme="dark"] .dev-notice-btn-primary:hover,
+.dark-mode .dev-notice-btn-primary:hover,
+body.dark .dev-notice-btn-primary:hover {
+    background: #818cf8;
+    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.5);
+}
+
+[data-theme="dark"] .dev-notice-btn-secondary,
+.dark-mode .dev-notice-btn-secondary,
+body.dark .dev-notice-btn-secondary {
+    background: #374151;
+    color: #e5e7eb;
+    border-color: #4b5563;
+}
+
+[data-theme="dark"] .dev-notice-btn-secondary:hover,
+.dark-mode .dev-notice-btn-secondary:hover,
+body.dark .dev-notice-btn-secondary:hover {
+    background: #4b5563;
+    border-color: #6b7280;
+}
+
+/* Dark mode support - via system preference (fallback) */
 @media (prefers-color-scheme: dark) {
     .dev-notice-modal {
-        background: var(--color-gray-800);
+        background: #1f2937;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
+    }
+
+    .dev-notice-header {
+        background: linear-gradient(135deg, #4338ca 0%, #6366f1 100%);
     }
 
     .dev-notice-body {
-        color: var(--color-gray-100);
+        color: #e5e7eb;
     }
 
     .dev-notice-body strong {
-        color: var(--color-white);
+        color: #ffffff;
     }
 
     .dev-notice-highlight {
         background: rgba(251, 191, 36, 0.15);
-        border-left-color: var(--color-amber-300);
-        color: var(--color-amber-100);
+        border-left-color: #fbbf24;
+        color: #fcd34d;
     }
 
     .dev-notice-footer {
-        background: var(--color-gray-900);
-        border-top-color: var(--color-gray-700);
+        background: #111827;
+        border-top-color: #374151;
+    }
+
+    .dev-notice-btn-primary {
+        background: #6366f1;
+    }
+
+    .dev-notice-btn-primary:hover {
+        background: #818cf8;
+        box-shadow: 0 4px 12px rgba(99, 102, 241, 0.5);
     }
 
     .dev-notice-btn-secondary {
-        background: var(--color-gray-700);
-        color: var(--color-gray-100);
-        border-color: var(--color-gray-600);
+        background: #374151;
+        color: #e5e7eb;
+        border-color: #4b5563;
     }
 
     .dev-notice-btn-secondary:hover {
-        background: var(--color-gray-600);
+        background: #4b5563;
+        border-color: #6b7280;
     }
 }
 
-/* Mobile responsiveness */
+/* Mobile responsiveness - Bottom sheet style */
 @media (max-width: 640px) {
+    .dev-notice-overlay {
+        align-items: flex-end;
+        padding: 0;
+    }
+
     .dev-notice-modal {
-        margin: 1rem;
+        margin: 0;
+        max-width: 100%;
+        border-radius: 20px 20px 0 0;
+        animation: slideUpMobile 0.4s cubic-bezier(0.32, 0.72, 0, 1);
+        max-height: 90vh;
+        overflow-y: auto;
+    }
+
+    @keyframes slideUpMobile {
+        from {
+            transform: translateY(100%);
+            opacity: 1;
+        }
+        to {
+            transform: translateY(0);
+            opacity: 1;
+        }
+    }
+
+    /* Handle bar indicator */
+    .dev-notice-modal::before {
+        content: '';
+        display: block;
+        width: 36px;
+        height: 4px;
+        background: rgba(128, 128, 128, 0.4);
+        border-radius: 2px;
+        margin: 8px auto 0;
     }
 
     .dev-notice-header {
-        padding: 1.25rem;
+        padding: 1rem 1.25rem 1.25rem;
+        border-radius: 0;
+    }
+
+    .dev-notice-icon {
+        font-size: 2rem;
+        margin-bottom: 0.25rem;
     }
 
     .dev-notice-header h2 {
@@ -189,16 +314,62 @@
     }
 
     .dev-notice-body {
-        padding: 1.5rem;
-        font-size: 0.95rem;
+        padding: 1.25rem;
+        font-size: 0.938rem;
+        line-height: 1.5;
+    }
+
+    .dev-notice-body p {
+        margin: 0 0 0.75rem 0;
+    }
+
+    .dev-notice-highlight {
+        padding: 0.625rem 0.875rem;
+        margin: 0.75rem 0;
+        font-size: 0.875rem;
     }
 
     .dev-notice-footer {
         flex-direction: column;
-        padding: 1.25rem 1.5rem;
+        padding: 1rem 1.25rem;
+        padding-bottom: calc(1rem + env(safe-area-inset-bottom, 0px));
+        gap: 0.75rem;
     }
 
     .dev-notice-btn {
         width: 100%;
+        padding: 0.875rem 1.5rem;
+        font-size: 1rem;
+        border-radius: 10px;
+        -webkit-tap-highlight-color: transparent;
+    }
+
+    .dev-notice-btn:active {
+        transform: scale(0.98);
+    }
+
+    .dev-notice-btn-primary {
+        order: 1;
+    }
+
+    .dev-notice-btn-secondary {
+        order: 2;
+    }
+}
+
+/* Extra small devices */
+@media (max-width: 375px) {
+    .dev-notice-body {
+        padding: 1rem;
+        font-size: 0.875rem;
+    }
+
+    .dev-notice-header h2 {
+        font-size: 1.125rem;
+    }
+
+    .dev-notice-footer {
+        padding: 0.875rem 1rem;
+        padding-bottom: calc(0.875rem + env(safe-area-inset-bottom, 0px));
     }
 }

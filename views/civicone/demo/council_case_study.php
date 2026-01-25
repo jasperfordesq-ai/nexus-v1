@@ -34,8 +34,8 @@ require __DIR__ . '/../../layouts/civicone/header.php';
 <div class="govuk-grid-row govuk-!-margin-bottom-8">
     <!-- Challenge -->
     <div class="govuk-grid-column-one-half">
-        <div class="govuk-!-padding-4" style="border: 1px solid #b1b4b6; border-left: 5px solid #d4351c; height: 100%;">
-            <h2 class="govuk-heading-l" style="color: #d4351c;">The Challenge</h2>
+        <div class="govuk-!-padding-4 civicone-accent-card--red civicone-flex-card">
+            <h2 class="govuk-heading-l civicone-heading-red">The Challenge</h2>
             <p class="govuk-body">
                 County Councils manage diverse towns, each with unique needs and identities. Centralised "one-size-fits-all" platforms often fail to engage local residents who feel disconnected from a county-wide system.
             </p>
@@ -47,9 +47,9 @@ require __DIR__ . '/../../layouts/civicone/header.php';
 
     <!-- Diagram -->
     <div class="govuk-grid-column-one-half">
-        <div class="govuk-!-padding-4 civicone-panel-bg" style="height: 100%;">
-            <img src="https://placehold.co/600x300/002d72/FFF?text=Multi-Hub+Architecture" alt="Diagram showing Hub and Spoke model" style="width: 100%; height: auto;">
-            <p class="govuk-body-s govuk-!-margin-top-2 govuk-!-margin-bottom-0" style="color: #505a5f;">Fig 1. The Hub & Spoke Tenant Model</p>
+        <div class="govuk-!-padding-4 civicone-panel-bg civicone-flex-card">
+            <img src="https://placehold.co/600x300/002d72/FFF?text=Multi-Hub+Architecture" alt="Diagram showing Hub and Spoke model" class="civicone-responsive-image">
+            <p class="govuk-body-s govuk-!-margin-top-2 govuk-!-margin-bottom-0 civicone-secondary-text">Fig 1. The Hub & Spoke Tenant Model</p>
         </div>
     </div>
 </div>
@@ -63,20 +63,20 @@ require __DIR__ . '/../../layouts/civicone/header.php';
 
     <div class="govuk-grid-row">
         <div class="govuk-grid-column-one-third govuk-!-margin-bottom-4">
-            <div class="govuk-!-padding-4" style="border: 1px solid #b1b4b6; border-top: 5px solid #1d70b8; height: 100%;">
-                <h3 class="govuk-heading-m" style="color: #1d70b8;">Local Skins</h3>
+            <div class="govuk-!-padding-4 civicone-top-accent--blue civicone-flex-card">
+                <h3 class="govuk-heading-m civicone-heading-blue">Local Skins</h3>
                 <p class="govuk-body">Each town maintains its unique identity, logo, and "Welcome" message. Residents feel they are joining <em>their</em> town's hub.</p>
             </div>
         </div>
         <div class="govuk-grid-column-one-third govuk-!-margin-bottom-4">
-            <div class="govuk-!-padding-4" style="border: 1px solid #b1b4b6; border-top: 5px solid #00703c; height: 100%;">
-                <h3 class="govuk-heading-m" style="color: #00703c;">Central Data</h3>
+            <div class="govuk-!-padding-4 civicone-top-accent--green civicone-flex-card">
+                <h3 class="govuk-heading-m civicone-heading-green">Central Data</h3>
                 <p class="govuk-body">The Council centralises data for grant reporting. "How many hours of volunteering happened in West Cork?" is answered in one click.</p>
             </div>
         </div>
         <div class="govuk-grid-column-one-third govuk-!-margin-bottom-4">
-            <div class="govuk-!-padding-4" style="border: 1px solid #b1b4b6; border-top: 5px solid #d53880; height: 100%;">
-                <h3 class="govuk-heading-m" style="color: #d53880;">Strategic Planning</h3>
+            <div class="govuk-!-padding-4 civicone-top-accent--pink civicone-flex-card">
+                <h3 class="govuk-heading-m civicone-heading-pink">Strategic Planning</h3>
                 <p class="govuk-body">Identify capability gaps. If Hub A has excess gardening tools and Hub B has none, facilitate the transfer.</p>
             </div>
         </div>
@@ -84,8 +84,8 @@ require __DIR__ . '/../../layouts/civicone/header.php';
 </section>
 
 <!-- CTA Section -->
-<div class="govuk-!-padding-6 govuk-!-text-align-center" style="background: #1d70b8; color: white;">
-    <h2 class="govuk-heading-l" style="color: white;">Learn More</h2>
+<div class="govuk-!-padding-6 govuk-!-text-align-center civicone-hero-blue">
+    <h2 class="govuk-heading-l">Learn More</h2>
     <a href="<?= $basePath ?>/technical-specs" class="govuk-button govuk-button--secondary" data-module="govuk-button">
         Review Technical Architecture
     </a>

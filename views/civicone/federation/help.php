@@ -51,11 +51,11 @@ $userOptedIn = $userOptedIn ?? false;
 
 <!-- Quick Links -->
 <nav class="govuk-!-margin-bottom-6" aria-label="Jump to section">
-    <ul class="govuk-list" style="display: flex; flex-wrap: wrap; gap: 0.5rem;">
-        <li><a href="#getting-started" class="govuk-link govuk-!-padding-2 civicone-panel-bg" style="display: inline-block;">Getting Started</a></li>
-        <li><a href="#privacy" class="govuk-link govuk-!-padding-2 civicone-panel-bg" style="display: inline-block;">Privacy & Safety</a></li>
-        <li><a href="#features" class="govuk-link govuk-!-padding-2 civicone-panel-bg" style="display: inline-block;">Features</a></li>
-        <li><a href="#troubleshooting" class="govuk-link govuk-!-padding-2 civicone-panel-bg" style="display: inline-block;">Troubleshooting</a></li>
+    <ul class="govuk-list civicone-quick-links-row">
+        <li><a href="#getting-started" class="govuk-link govuk-!-padding-2 civicone-panel-bg civicone-quick-link-item">Getting Started</a></li>
+        <li><a href="#privacy" class="govuk-link govuk-!-padding-2 civicone-panel-bg civicone-quick-link-item">Privacy & Safety</a></li>
+        <li><a href="#features" class="govuk-link govuk-!-padding-2 civicone-panel-bg civicone-quick-link-item">Features</a></li>
+        <li><a href="#troubleshooting" class="govuk-link govuk-!-padding-2 civicone-panel-bg civicone-quick-link-item">Troubleshooting</a></li>
     </ul>
 </nav>
 
@@ -319,37 +319,37 @@ $userOptedIn = $userOptedIn ?? false;
 
         <div class="govuk-grid-row">
             <div class="govuk-grid-column-one-third govuk-!-margin-bottom-4">
-                <a href="<?= $basePath ?>/settings?section=federation" class="govuk-link" style="text-decoration: none;">
-                    <div class="govuk-!-padding-4" style="border: 1px solid #b1b4b6; border-left: 5px solid #1d70b8; height: 100%;">
+                <a href="<?= $basePath ?>/settings?section=federation" class="govuk-link civicone-link-card">
+                    <div class="govuk-!-padding-4 civicone-report-section civicone-full-height">
                         <p class="govuk-body govuk-!-margin-bottom-2">
-                            <i class="fa-solid fa-cog fa-2x" style="color: #1d70b8;" aria-hidden="true"></i>
+                            <i class="fa-solid fa-cog fa-2x civicone-icon-blue" aria-hidden="true"></i>
                         </p>
                         <h3 class="govuk-heading-s govuk-!-margin-bottom-2">Federation Settings</h3>
-                        <p class="govuk-body-s govuk-!-margin-bottom-0" style="color: #505a5f;">Manage your privacy preferences and federation options.</p>
+                        <p class="govuk-body-s govuk-!-margin-bottom-0 civicone-secondary-text">Manage your privacy preferences and federation options.</p>
                     </div>
                 </a>
             </div>
 
             <div class="govuk-grid-column-one-third govuk-!-margin-bottom-4">
-                <a href="<?= $basePath ?>/federation" class="govuk-link" style="text-decoration: none;">
-                    <div class="govuk-!-padding-4" style="border: 1px solid #b1b4b6; border-left: 5px solid #1d70b8; height: 100%;">
+                <a href="<?= $basePath ?>/federation" class="govuk-link civicone-link-card">
+                    <div class="govuk-!-padding-4 civicone-report-section civicone-full-height">
                         <p class="govuk-body govuk-!-margin-bottom-2">
-                            <i class="fa-solid fa-globe fa-2x" style="color: #1d70b8;" aria-hidden="true"></i>
+                            <i class="fa-solid fa-globe fa-2x civicone-icon-blue" aria-hidden="true"></i>
                         </p>
                         <h3 class="govuk-heading-s govuk-!-margin-bottom-2">Partner Timebanks</h3>
-                        <p class="govuk-body-s govuk-!-margin-bottom-0" style="color: #505a5f;">Browse all partner timebanks and their available features.</p>
+                        <p class="govuk-body-s govuk-!-margin-bottom-0 civicone-secondary-text">Browse all partner timebanks and their available features.</p>
                     </div>
                 </a>
             </div>
 
             <div class="govuk-grid-column-one-third govuk-!-margin-bottom-4">
-                <a href="<?= $basePath ?>/federation/activity" class="govuk-link" style="text-decoration: none;">
-                    <div class="govuk-!-padding-4" style="border: 1px solid #b1b4b6; border-left: 5px solid #1d70b8; height: 100%;">
+                <a href="<?= $basePath ?>/federation/activity" class="govuk-link civicone-link-card">
+                    <div class="govuk-!-padding-4 civicone-report-section civicone-full-height">
                         <p class="govuk-body govuk-!-margin-bottom-2">
-                            <i class="fa-solid fa-bell fa-2x" style="color: #1d70b8;" aria-hidden="true"></i>
+                            <i class="fa-solid fa-bell fa-2x civicone-icon-blue" aria-hidden="true"></i>
                         </p>
                         <h3 class="govuk-heading-s govuk-!-margin-bottom-2">Activity Feed</h3>
-                        <p class="govuk-body-s govuk-!-margin-bottom-0" style="color: #505a5f;">View your recent federated messages, transactions, and updates.</p>
+                        <p class="govuk-body-s govuk-!-margin-bottom-0 civicone-secondary-text">View your recent federated messages, transactions, and updates.</p>
                     </div>
                 </a>
             </div>
@@ -357,7 +357,7 @@ $userOptedIn = $userOptedIn ?? false;
     </section>
 
     <!-- Contact Section -->
-    <div class="govuk-inset-text govuk-!-margin-bottom-6" style="border-left-color: #1d70b8;">
+    <div class="govuk-inset-text govuk-!-margin-bottom-6 civicone-inset-blue">
         <h3 class="govuk-heading-s govuk-!-margin-bottom-2" id="contact-heading">Still have questions?</h3>
         <p class="govuk-body govuk-!-margin-bottom-4">Our team is here to help you get the most out of federation.</p>
         <a href="<?= $basePath ?>/help" class="govuk-button" data-module="govuk-button">

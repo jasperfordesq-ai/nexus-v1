@@ -25,7 +25,7 @@ window.NexusCookieConsent = (function() {
         STORAGE_KEY: 'nexus_cookie_consent',
         CONSENT_DURATION: 365, // days
         CONSENT_VERSION: '1.0',
-        DEBUG: true // Enable debug logging temporarily
+        DEBUG: false
     };
 
     // State
@@ -170,6 +170,16 @@ window.NexusCookieConsent = (function() {
 
         debug('Saving consent:', payload);
 
+        // Build local consent data for localStorage fallback
+        const localConsentData = {
+            essential: true,
+            functional: choices.functional || false,
+            analytics: choices.analytics || false,
+            marketing: choices.marketing || false,
+            consent_version: CONFIG.CONSENT_VERSION,
+            expires_at: new Date(Date.now() + CONFIG.CONSENT_DURATION * 24 * 60 * 60 * 1000).toISOString()
+        };
+
         try {
             const response = await fetch(`${CONFIG.API_BASE}/api/cookie-consent`, {
                 method: 'POST',
@@ -200,6 +210,15 @@ window.NexusCookieConsent = (function() {
             console.error('[Cookie Consent] Save failed:', error);
         }
 
+        // Fallback: Save to localStorage even if API fails, and hide banner
+        // This ensures the user experience isn't broken by API issues
+        debug('API failed, using localStorage fallback');
+        consentData = localConsentData;
+        localStorage.setItem(CONFIG.STORAGE_KEY, JSON.stringify(consentData));
+        applyConsent();
+        hideBanner();
+
+        // Return false to indicate API failure (caller can show warning)
         return false;
     }
 
@@ -239,6 +258,7 @@ window.NexusCookieConsent = (function() {
 
     /**
      * Show cookie banner
+     * GOV.UK Pattern: Uses 'hidden' attribute (not aria-hidden)
      */
     function showBanner() {
         if (bannerShown) {
@@ -248,8 +268,7 @@ window.NexusCookieConsent = (function() {
 
         const banner = document.getElementById('nexus-cookie-banner');
         if (banner) {
-            banner.classList.add('visible');
-            banner.setAttribute('aria-hidden', 'false');
+            banner.removeAttribute('hidden');
             bannerShown = true;
             debug('Banner shown');
 
@@ -267,12 +286,12 @@ window.NexusCookieConsent = (function() {
 
     /**
      * Hide cookie banner
+     * GOV.UK Pattern: Uses 'hidden' attribute
      */
     function hideBanner() {
         const banner = document.getElementById('nexus-cookie-banner');
         if (banner) {
-            banner.classList.remove('visible');
-            banner.setAttribute('aria-hidden', 'true');
+            banner.setAttribute('hidden', '');
             debug('Banner hidden');
         }
     }

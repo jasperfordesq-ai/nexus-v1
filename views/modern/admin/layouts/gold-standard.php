@@ -169,7 +169,12 @@ $activeModule = getActiveModule($adminModules, $currentPath, $basePath);
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
     <!-- Gold Standard CSS -->
-    <link rel="stylesheet" href="<?= $basePath ?>/assets/css/admin-gold-standard.min.css?v=<?= time() ?>">
+    <?php
+    $deployVersion = file_exists(__DIR__ . '/../../../../config/deployment-version.php')
+        ? (require __DIR__ . '/../../../../config/deployment-version.php')['version'] ?? time()
+        : time();
+    ?>
+    <link rel="stylesheet" href="<?= $basePath ?>/assets/css/admin-gold-standard.css?v=<?= $deployVersion ?>">
 
     <?php if (isset($additionalCss)): ?>
     <?= $additionalCss ?>

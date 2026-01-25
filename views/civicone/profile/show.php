@@ -327,7 +327,7 @@ require __DIR__ . '/../../layouts/civicone/header.php';
                 <div class="govuk-form-group">
                     <textarea name="content" class="govuk-textarea" rows="3" placeholder="What's on your mind?" required></textarea>
                 </div>
-                <div style="display: flex; gap: 10px;">
+                <div class="civicone-button-row">
                     <label class="govuk-button govuk-button--secondary govuk-!-margin-bottom-0">
                         Add Photo
                         <input type="file" name="image" accept="image/*" class="govuk-visually-hidden">
@@ -349,15 +349,15 @@ require __DIR__ . '/../../layouts/civicone/header.php';
             </div>
         <?php else: ?>
             <?php foreach ($posts as $post): ?>
-                <div class="govuk-!-margin-bottom-6 govuk-!-padding-4 civicone-panel-bg" style="border-left: 5px solid #1d70b8;" id="post-<?= $post['id'] ?>">
+                <div class="govuk-!-margin-bottom-6 govuk-!-padding-4 civicone-panel-bg civicone-border-left-blue" id="post-<?= $post['id'] ?>">
                     <!-- Post Header -->
-                    <div style="display: flex; gap: 10px; margin-bottom: 15px;">
-                        <img src="<?= htmlspecialchars($post['author_avatar']) ?>" alt="" width="40" height="40" style="border-radius: 50%;">
+                    <div class="civicone-post-header">
+                        <img src="<?= htmlspecialchars($post['author_avatar']) ?>" alt="" width="40" height="40" class="civicone-avatar-round">
                         <div>
                             <p class="govuk-body govuk-!-font-weight-bold govuk-!-margin-bottom-0">
                                 <?= htmlspecialchars($post['author_name']) ?>
                             </p>
-                            <p class="govuk-body-s govuk-!-margin-bottom-0" style="color: #505a5f;">
+                            <p class="govuk-body-s govuk-!-margin-bottom-0 civicone-secondary-text">
                                 <?= date('j F Y \a\t g:i a', strtotime($post['created_at'])) ?>
                             </p>
                         </div>
@@ -369,29 +369,29 @@ require __DIR__ . '/../../layouts/civicone/header.php';
                     </p>
 
                     <?php if (!empty($post['image_url'])): ?>
-                        <img src="<?= htmlspecialchars($post['image_url']) ?>" alt="" style="max-width: 100%; margin-bottom: 15px;">
+                        <img src="<?= htmlspecialchars($post['image_url']) ?>" alt="" class="civicone-post-image">
                     <?php endif; ?>
 
                     <!-- Post Actions -->
-                    <div style="display: flex; gap: 15px; margin-top: 15px; padding-top: 15px; border-top: 1px solid #b1b4b6;">
-                        <button class="govuk-button govuk-button--secondary govuk-!-margin-bottom-0 <?= $post['is_liked'] ? 'liked' : '' ?>"
-                                onclick="toggleLike('post', <?= $post['id'] ?>, this)" style="font-size: 14px;">
+                    <div class="civicone-post-actions">
+                        <button class="govuk-button govuk-button--secondary govuk-!-margin-bottom-0 civicone-btn-sm <?= $post['is_liked'] ? 'liked' : '' ?>"
+                                onclick="toggleLike('post', <?= $post['id'] ?>, this)">
                             <span class="like-count"><?= (int)$post['likes_count'] ?></span> Like
                         </button>
-                        <button class="govuk-button govuk-button--secondary govuk-!-margin-bottom-0" onclick="toggleComments('post', <?= $post['id'] ?>)" style="font-size: 14px;">
+                        <button class="govuk-button govuk-button--secondary govuk-!-margin-bottom-0 civicone-btn-sm" onclick="toggleComments('post', <?= $post['id'] ?>)">
                             <span class="comment-count"><?= (int)$post['comments_count'] ?></span> Comment
                         </button>
                     </div>
 
                     <!-- Comments Section -->
-                    <div id="comments-section-post-<?= $post['id'] ?>" style="margin-top: 15px; display: none;">
+                    <div id="comments-section-post-<?= $post['id'] ?>" class="civicone-comments-section hidden">
                         <div class="comments-list">
                             <p class="govuk-body-s">Click to load comments</p>
                         </div>
 
                         <?php if ($isLoggedIn): ?>
-                        <div style="display: flex; gap: 10px; margin-top: 10px;">
-                            <input type="text" class="govuk-input" placeholder="Write a comment..." style="flex-grow: 1;"
+                        <div class="civicone-comment-input-row">
+                            <input type="text" class="govuk-input civicone-input-grow" placeholder="Write a comment..."
                                    onkeydown="if(event.key === 'Enter') submitComment(this, 'post', <?= $post['id'] ?>)">
                             <button class="govuk-button govuk-!-margin-bottom-0" onclick="submitComment(this.previousElementSibling, 'post', <?= $post['id'] ?>)">Post</button>
                         </div>
@@ -410,15 +410,15 @@ require __DIR__ . '/../../layouts/civicone/header.php';
             </div>
         <?php else: ?>
             <?php foreach ($reviews as $review): ?>
-                <div class="govuk-!-margin-bottom-4 govuk-!-padding-bottom-4" style="border-bottom: 1px solid #b1b4b6;">
-                    <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                <div class="govuk-!-margin-bottom-4 govuk-!-padding-bottom-4 civicone-list-item-border">
+                    <div class="civicone-review-header">
                         <h3 class="govuk-heading-s govuk-!-margin-bottom-2"><?= htmlspecialchars($review['reviewer_name'] ?? 'Anonymous') ?></h3>
-                        <span aria-label="Rating: <?= $review['rating'] ?> out of 5 stars" style="color: #f47738;">
+                        <span aria-label="Rating: <?= $review['rating'] ?> out of 5 stars" class="civicone-star-rating">
                             <?= str_repeat('★', $review['rating']) ?><?= str_repeat('☆', 5 - $review['rating']) ?>
                         </span>
                     </div>
                     <p class="govuk-body"><?= nl2br(htmlspecialchars($review['content'] ?? '')) ?></p>
-                    <p class="govuk-body-s govuk-!-margin-bottom-0" style="color: #505a5f;">
+                    <p class="govuk-body-s govuk-!-margin-bottom-0 civicone-secondary-text">
                         <?= date('j F Y', strtotime($review['created_at'])) ?>
                     </p>
                 </div>
@@ -471,7 +471,7 @@ require __DIR__ . '/../../layouts/civicone/header.php';
 </div><!-- /.govuk-grid-row -->
 
 <!-- Toast Notification -->
-<div id="govuk-toast" role="status" aria-live="polite" style="position: fixed; bottom: 20px; right: 20px; z-index: 1000; display: none;"></div>
+<div id="govuk-toast" class="civicone-toast hidden" role="status" aria-live="polite"></div>
 
 <!-- External JavaScript for social interactions (CLAUDE.md compliant) -->
 <link rel="stylesheet" href="/assets/css/civicone-profile-show.css">

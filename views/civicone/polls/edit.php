@@ -78,8 +78,8 @@ $basePath = \Nexus\Core\TenantContext::getBasePath();
         <!-- Delete Section -->
         <hr class="govuk-section-break govuk-section-break--xl govuk-section-break--visible">
 
-        <div class="govuk-!-padding-6" style="border: 2px solid #d4351c; background: #fef7f7;">
-            <h2 class="govuk-heading-m" style="color: #d4351c;">
+        <div class="govuk-!-padding-6 civicone-danger-zone">
+            <h2 class="govuk-heading-m civicone-danger-heading">
                 <i class="fa-solid fa-triangle-exclamation govuk-!-margin-right-1" aria-hidden="true"></i>
                 Delete this poll
             </h2>

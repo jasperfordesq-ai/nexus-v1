@@ -150,6 +150,11 @@ $router->add('DELETE', '/api/cookie-consent/{id}', 'Nexus\Controllers\Api\Cookie
 $router->add('GET', '/api/cookie-consent/inventory', 'Nexus\Controllers\Api\CookieConsentController@inventory');
 $router->add('GET', '/api/cookie-consent/check/{category}', 'Nexus\Controllers\Api\CookieConsentController@check');
 
+// Legal Documents API (User Acceptance Tracking)
+$router->add('POST', '/api/legal/accept', 'Nexus\Controllers\LegalDocumentController@accept');
+$router->add('POST', '/api/legal/accept-all', 'Nexus\Controllers\LegalDocumentController@acceptAll');
+$router->add('GET', '/api/legal/status', 'Nexus\Controllers\LegalDocumentController@status');
+
 // Nexus Score API
 $router->add('GET', '/api/nexus-score', 'Nexus\Controllers\NexusScoreController@apiGetScore');
 $router->add('POST', '/api/nexus-score/recalculate', 'Nexus\Controllers\NexusScoreController@apiRecalculateScores');
@@ -371,9 +376,13 @@ $router->add('GET', '/timebanking-guide', 'Nexus\Controllers\PageController@time
 $router->add('GET', '/impact-summary', 'Nexus\Controllers\PageController@impactSummary');
 $router->add('GET', '/impact-report', 'Nexus\Controllers\PageController@impactReport');
 $router->add('GET', '/strategic-plan', 'Nexus\Controllers\PageController@strategicPlan');
-$router->add('GET', '/terms', 'Nexus\Controllers\PageController@terms');
-$router->add('GET', '/privacy', 'Nexus\Controllers\PageController@privacy');
-$router->add('GET', '/accessibility', 'Nexus\Controllers\PageController@accessibility');
+// Legal Documents (versioned with acceptance tracking - falls back to legacy files if no DB content)
+$router->add('GET', '/terms', 'Nexus\Controllers\LegalDocumentController@terms');
+$router->add('GET', '/privacy', 'Nexus\Controllers\LegalDocumentController@privacy');
+$router->add('GET', '/accessibility', 'Nexus\Controllers\LegalDocumentController@accessibility');
+$router->add('GET', '/terms/versions', 'Nexus\Controllers\LegalDocumentController@termsVersionHistory');
+$router->add('GET', '/privacy/versions', 'Nexus\Controllers\LegalDocumentController@privacyVersionHistory');
+$router->add('GET', '/legal/version/{versionId}', 'Nexus\Controllers\LegalDocumentController@showVersion');
 $router->add('GET', '/sitemap.xml', 'Nexus\Controllers\SitemapController@index');
 $router->add('GET', '/robots.txt', 'Nexus\Controllers\RobotsController@index');
 
@@ -1111,6 +1120,26 @@ $router->add('POST', '/admin/api/pages/{id}/blocks', 'Nexus\Controllers\Admin\Pa
 $router->add('GET', '/admin/api/pages/{id}/blocks', 'Nexus\Controllers\Admin\PageController@getBlocks');
 $router->add('POST', '/admin/api/blocks/preview', 'Nexus\Controllers\Admin\PageController@previewBlock');
 $router->add('POST', '/admin/api/pages/{id}/settings', 'Nexus\Controllers\Admin\PageController@saveSettings');
+
+// Admin Legal Documents (Version-Controlled Terms/Privacy/etc.)
+$router->add('GET', '/admin/legal-documents', 'Nexus\Controllers\Admin\LegalDocumentsController@index');
+$router->add('GET', '/admin/legal-documents/create', 'Nexus\Controllers\Admin\LegalDocumentsController@create');
+$router->add('POST', '/admin/legal-documents', 'Nexus\Controllers\Admin\LegalDocumentsController@store');
+$router->add('GET', '/admin/legal-documents/compliance', 'Nexus\Controllers\Admin\LegalDocumentsController@compliance');
+$router->add('GET', '/admin/legal-documents/{id}', 'Nexus\Controllers\Admin\LegalDocumentsController@show');
+$router->add('GET', '/admin/legal-documents/{id}/edit', 'Nexus\Controllers\Admin\LegalDocumentsController@edit');
+$router->add('POST', '/admin/legal-documents/{id}', 'Nexus\Controllers\Admin\LegalDocumentsController@update');
+$router->add('GET', '/admin/legal-documents/{id}/versions/create', 'Nexus\Controllers\Admin\LegalDocumentsController@createVersion');
+$router->add('POST', '/admin/legal-documents/{id}/versions', 'Nexus\Controllers\Admin\LegalDocumentsController@storeVersion');
+$router->add('GET', '/admin/legal-documents/{id}/versions/{versionId}', 'Nexus\Controllers\Admin\LegalDocumentsController@showVersion');
+$router->add('GET', '/admin/legal-documents/{id}/versions/{versionId}/edit', 'Nexus\Controllers\Admin\LegalDocumentsController@editVersion');
+$router->add('POST', '/admin/legal-documents/{id}/versions/{versionId}', 'Nexus\Controllers\Admin\LegalDocumentsController@updateVersion');
+$router->add('POST', '/admin/legal-documents/{id}/versions/{versionId}/publish', 'Nexus\Controllers\Admin\LegalDocumentsController@publishVersion');
+$router->add('POST', '/admin/legal-documents/{id}/versions/{versionId}/delete', 'Nexus\Controllers\Admin\LegalDocumentsController@deleteVersion');
+$router->add('POST', '/admin/legal-documents/{id}/versions/{versionId}/notify', 'Nexus\Controllers\Admin\LegalDocumentsController@notifyUsers');
+$router->add('GET', '/admin/legal-documents/{id}/versions/{versionId}/acceptances', 'Nexus\Controllers\Admin\LegalDocumentsController@acceptances');
+$router->add('GET', '/admin/legal-documents/{id}/compare', 'Nexus\Controllers\Admin\LegalDocumentsController@compareVersions');
+$router->add('GET', '/admin/legal-documents/{id}/export', 'Nexus\Controllers\Admin\LegalDocumentsController@exportAcceptances');
 
 // Admin Menus (Menu Manager)
 $router->add('GET', '/admin/menus', 'Nexus\Controllers\Admin\MenuController@index');

@@ -33,7 +33,7 @@ $basePath = \Nexus\Core\TenantContext::getBasePath();
         <?php if ($goal['status'] === 'completed'): ?>
             <span class="govuk-tag govuk-tag--green govuk-!-margin-bottom-4">Completed</span>
         <?php else: ?>
-            <span class="govuk-tag govuk-tag--blue govuk-!-margin-bottom-4">Active Goal</span>
+            <span class="govuk-tag govuk-tag--light-blue govuk-!-margin-bottom-4">Active Goal</span>
         <?php endif; ?>
 
         <h1 class="govuk-heading-xl govuk-!-margin-bottom-4"><?= htmlspecialchars($goal['title']) ?></h1>
@@ -41,7 +41,7 @@ $basePath = \Nexus\Core\TenantContext::getBasePath();
         <?php if ($isAuthor): ?>
             <div class="govuk-button-group govuk-!-margin-bottom-6">
                 <?php if ($goal['status'] === 'active'): ?>
-                    <form action="<?= $basePath ?>/goals/<?= $goal['id'] ?>/complete" method="POST" style="display: inline;"
+                    <form action="<?= $basePath ?>/goals/<?= $goal['id'] ?>/complete" method="POST" class="civicone-inline-form"
                           onsubmit="return confirm('Mark as achieved? Great job!')">
                         <?= \Nexus\Core\Csrf::input() ?>
                         <button type="submit" class="govuk-button" data-module="govuk-button">
@@ -91,7 +91,7 @@ $basePath = \Nexus\Core\TenantContext::getBasePath();
                 </h3>
                 <p class="govuk-body govuk-!-margin-bottom-2">This goal is public. Waiting for a community member to offer support.</p>
                 <?php if (!$isAuthor && isset($_SESSION['user_id'])): ?>
-                    <form action="<?= $basePath ?>/goals/buddy" method="POST" style="display: inline;"
+                    <form action="<?= $basePath ?>/goals/buddy" method="POST" class="civicone-inline-form"
                           onsubmit="return confirm('Are you sure you want to be the accountability partner for this goal?');">
                         <?= \Nexus\Core\Csrf::input() ?>
                         <input type="hidden" name="goal_id" value="<?= $goal['id'] ?>">
@@ -145,7 +145,7 @@ $basePath = \Nexus\Core\TenantContext::getBasePath();
         </div>
 
         <!-- Comments Section -->
-        <div id="comments-section" class="govuk-!-margin-bottom-6" style="display: none;">
+        <div id="comments-section" class="govuk-!-margin-bottom-6" hidden>
             <?php if ($isLoggedIn): ?>
             <form onsubmit="goalSubmitComment(event)" class="govuk-!-margin-bottom-4">
                 <div class="govuk-form-group">
@@ -162,7 +162,7 @@ $basePath = \Nexus\Core\TenantContext::getBasePath();
             </p>
             <?php endif; ?>
             <div id="comments-list">
-                <p class="govuk-body" style="color: #505a5f;">Loading comments...</p>
+                <p class="govuk-body civicone-secondary-text">Loading comments...</p>
             </div>
         </div>
 
@@ -246,9 +246,9 @@ $basePath = \Nexus\Core\TenantContext::getBasePath();
         }
 
         const section = document.getElementById('comments-section');
-        const isHidden = section.style.display === 'none';
+        const isHidden = section.hidden;
 
-        section.style.display = isHidden ? 'block' : 'none';
+        section.hidden = !isHidden;
 
         if (isHidden && !commentsLoaded) {
             loadComments();
@@ -257,7 +257,7 @@ $basePath = \Nexus\Core\TenantContext::getBasePath();
 
     async function loadComments() {
         const list = document.getElementById('comments-list');
-        list.innerHTML = '<p class="govuk-body" style="color: #505a5f;">Loading comments...</p>';
+        list.innerHTML = '<p class="govuk-body civicone-secondary-text">Loading comments...</p>';
 
         try {
             const response = await fetch(API_BASE + '/comments', {
@@ -274,14 +274,14 @@ $basePath = \Nexus\Core\TenantContext::getBasePath();
             });
 
             if (!response.ok) {
-                list.innerHTML = '<p class="govuk-body" style="color: #505a5f;">Failed to load comments.</p>';
+                list.innerHTML = '<p class="govuk-body civicone-secondary-text">Failed to load comments.</p>';
                 return;
             }
 
             const data = await response.json();
 
             if (data.error) {
-                list.innerHTML = '<p class="govuk-body" style="color: #505a5f;">Failed to load comments.</p>';
+                list.innerHTML = '<p class="govuk-body civicone-secondary-text">Failed to load comments.</p>';
                 return;
             }
 
@@ -289,7 +289,7 @@ $basePath = \Nexus\Core\TenantContext::getBasePath();
             availableReactions = data.available_reactions || [];
 
             if (!data.comments || data.comments.length === 0) {
-                list.innerHTML = '<p class="govuk-body" style="color: #505a5f;">No comments yet. Be the first to comment!</p>';
+                list.innerHTML = '<p class="govuk-body civicone-secondary-text">No comments yet. Be the first to comment!</p>';
                 return;
             }
 
@@ -297,31 +297,31 @@ $basePath = \Nexus\Core\TenantContext::getBasePath();
 
         } catch (err) {
             console.error('Load comments error:', err);
-            list.innerHTML = '<p class="govuk-body" style="color: #505a5f;">Failed to load comments.</p>';
+            list.innerHTML = '<p class="govuk-body civicone-secondary-text">Failed to load comments.</p>';
         }
     }
 
     function renderComment(c, depth) {
-        const indentStyle = depth > 0 ? `margin-left: ${depth * 20}px;` : '';
-        const isEdited = c.is_edited ? '<span class="govuk-body-s" style="color: #505a5f;"> (edited)</span>' : '';
+        const depthClass = depth > 0 ? ` civicone-comment--depth-${Math.min(depth, 3)}` : '';
+        const isEdited = c.is_edited ? '<span class="govuk-body-s civicone-secondary-text"> (edited)</span>' : '';
         const ownerActions = c.is_owner ? `
             <a href="#" onclick="goalEditComment(${c.id}, '${escapeHtml(c.content).replace(/'/g, "\\'")}'); return false;" class="govuk-link govuk-body-s">Edit</a>
-            <a href="#" onclick="goalDeleteComment(${c.id}); return false;" class="govuk-link govuk-body-s" style="color: #d4351c;">Delete</a>
+            <a href="#" onclick="goalDeleteComment(${c.id}); return false;" class="govuk-link govuk-body-s civicone-link-danger">Delete</a>
         ` : '';
 
         const reactions = Object.entries(c.reactions || {}).map(([emoji, count]) => {
             const isUserReaction = (c.user_reactions || []).includes(emoji);
-            const activeClass = isUserReaction ? 'govuk-tag--blue' : 'govuk-tag--grey';
-            return `<span class="govuk-tag ${activeClass}" style="cursor: pointer;" onclick="goalToggleReaction(${c.id}, '${emoji}')">${emoji} ${count}</span>`;
+            const activeClass = isUserReaction ? 'govuk-tag--light-blue' : 'govuk-tag--grey';
+            return `<span class="govuk-tag ${activeClass} civicone-tag-clickable" onclick="goalToggleReaction(${c.id}, '${emoji}')">${emoji} ${count}</span>`;
         }).join(' ');
 
         const replies = (c.replies || []).map(r => renderComment(r, depth + 1)).join('');
 
         return `
-            <div class="govuk-!-padding-3 govuk-!-margin-bottom-3" style="border-left: 4px solid #1d70b8; background: #f8f8f8; ${indentStyle}">
+            <div class="govuk-!-padding-3 govuk-!-margin-bottom-3 civicone-comment${depthClass}">
                 <p class="govuk-body-s govuk-!-margin-bottom-1">
                     <strong>${escapeHtml(c.author_name)}</strong>${isEdited}
-                    <span style="color: #505a5f;">&middot; ${c.time_ago}</span>
+                    <span class="civicone-secondary-text">&middot; ${c.time_ago}</span>
                     ${ownerActions}
                 </p>
                 <p id="content-${c.id}" class="govuk-body govuk-!-margin-bottom-2">${escapeHtml(c.content)}</p>
@@ -329,7 +329,7 @@ $basePath = \Nexus\Core\TenantContext::getBasePath();
                     ${reactions}
                     <a href="#" onclick="goalShowReplyForm(${c.id}); return false;" class="govuk-link govuk-body-s">Reply</a>
                 </div>
-                <div id="reply-form-${c.id}" style="display: none;" class="govuk-!-margin-top-2">
+                <div id="reply-form-${c.id}" class="govuk-!-margin-top-2" hidden>
                     <input type="text" id="reply-input-${c.id}" placeholder="Write a reply..." class="govuk-input govuk-!-margin-bottom-2">
                     <button onclick="goalSubmitReply(${c.id})" class="govuk-button govuk-button--secondary govuk-button--small" data-module="govuk-button">Reply</button>
                 </div>
@@ -389,8 +389,8 @@ $basePath = \Nexus\Core\TenantContext::getBasePath();
 
     window.goalShowReplyForm = function(commentId) {
         const form = document.getElementById(`reply-form-${commentId}`);
-        const wasHidden = form.style.display === 'none';
-        form.style.display = wasHidden ? 'block' : 'none';
+        const wasHidden = form.hidden;
+        form.hidden = !wasHidden;
         if (wasHidden) {
             document.getElementById(`reply-input-${commentId}`).focus();
         }
@@ -418,7 +418,7 @@ $basePath = \Nexus\Core\TenantContext::getBasePath();
             const data = await response.json();
             if (data.error) { alert(data.error); return; }
             input.value = '';
-            document.getElementById(`reply-form-${parentId}`).style.display = 'none';
+            document.getElementById(`reply-form-${parentId}`).hidden = true;
             const countEl = document.getElementById('comment-count');
             countEl.textContent = parseInt(countEl.textContent) + 1;
             loadComments();

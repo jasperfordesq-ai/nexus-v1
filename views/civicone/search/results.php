@@ -42,7 +42,7 @@ $totalResults = count($results ?? []);
 
         <?php if (!empty($intent) && !empty($intent['ai_analyzed'])): ?>
             <p class="govuk-body-s">
-                <strong class="govuk-tag govuk-tag--blue">AI-Enhanced Search</strong>
+                <strong class="govuk-tag govuk-tag--light-blue">AI-Enhanced Search</strong>
                 <?php if (!empty($intent['location'])): ?>
                     <strong class="govuk-tag govuk-tag--grey"><?= htmlspecialchars($intent['location']) ?></strong>
                 <?php endif; ?>

@@ -20,7 +20,7 @@ $scoreTagClass = 'govuk-tag';
 if ($matchScore >= 85) {
     $scoreTagClass .= ' govuk-tag--green';
 } elseif ($matchScore >= 70) {
-    $scoreTagClass .= ' govuk-tag--blue';
+    $scoreTagClass .= ' govuk-tag--light-blue';
 } else {
     $scoreTagClass .= ' govuk-tag--grey';
 }
@@ -30,7 +30,7 @@ $distanceTagClass = 'govuk-tag govuk-tag--grey';
 if ($distanceKm !== null && $distanceKm <= 5) {
     $distanceTagClass = 'govuk-tag govuk-tag--green';
 } elseif ($distanceKm !== null && $distanceKm <= 15) {
-    $distanceTagClass = 'govuk-tag govuk-tag--blue';
+    $distanceTagClass = 'govuk-tag govuk-tag--light-blue';
 }
 
 // Avatar fallback
