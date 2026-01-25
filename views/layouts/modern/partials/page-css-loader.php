@@ -288,7 +288,7 @@ $pageSpecificCSS = [
 // =============================================================================
 ?>
     <!-- Page-Specific CSS (Conditional Loading) -->
-<?php foreach ($pageSpecificCSS as $section => $config): ?>
+<?php foreach ($pageSpecificCSS as $pageCssKey => $config): ?>
 <?php if ($config['condition']): ?>
 <?php foreach ($config['files'] as $cssFile): ?>
     <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/<?= $cssFile ?>?v=<?= $cssVersionTimestamp ?>">

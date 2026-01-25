@@ -453,7 +453,7 @@ $pageSpecificCSS = [
 // =============================================================================
 ?>
     <!-- Page-Specific CSS (Conditional Loading - CivicOne) -->
-<?php foreach ($pageSpecificCSS as $section => $config): ?>
+<?php foreach ($pageSpecificCSS as $pageCssKey => $config): ?>
 <?php if ($config['condition']): ?>
 <?php foreach ($config['files'] as $cssFile): ?>
     <link rel="stylesheet" href="/assets/css/<?= $cssFile ?>?v=<?= $cssVersion ?>">
