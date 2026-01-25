@@ -25,9 +25,9 @@ $basePath = \Nexus\Core\TenantContext::getBasePath();
 <div class="govuk-grid-row govuk-!-margin-bottom-6">
     <!-- Balance Card -->
     <div class="govuk-grid-column-one-half">
-        <div class="govuk-!-padding-6 civicone-panel-bg" style="border-left: 5px solid #00703c;">
+        <div class="govuk-!-padding-6 civicone-panel-bg civicone-border-left-green">
             <h2 class="govuk-heading-m">Current Balance</h2>
-            <p class="govuk-heading-xl govuk-!-margin-bottom-2" style="color: #00703c;">
+            <p class="govuk-heading-xl govuk-!-margin-bottom-2 civicone-heading-green">
                 <?= number_format($user['balance'] ?? 0) ?>
             </p>
             <p class="govuk-body"><strong>Time Credits</strong> available to spend.</p>
@@ -36,7 +36,7 @@ $basePath = \Nexus\Core\TenantContext::getBasePath();
 
     <!-- Transfer Card -->
     <div class="govuk-grid-column-one-half">
-        <div class="govuk-!-padding-6" style="border: 1px solid #b1b4b6;">
+        <div class="govuk-!-padding-6 civicone-sidebar-card">
             <h2 class="govuk-heading-m">Make a Transfer</h2>
 
             <form action="<?= $basePath ?>/wallet/transfer" method="POST" id="civicWalletForm" onsubmit="return validateCivicWalletForm(this);">
@@ -45,12 +45,12 @@ $basePath = \Nexus\Core\TenantContext::getBasePath();
                 <input type="hidden" name="recipient_id" id="civicRecipientId" value="">
 
                 <!-- Selected User Display -->
-                <div class="govuk-!-padding-3 govuk-!-margin-bottom-4 civicone-panel-bg" id="civicSelectedUser" style="display: none;">
-                    <div style="display: flex; gap: 1rem; align-items: center;">
-                        <div id="civicSelectedAvatar" style="width: 40px; height: 40px; border-radius: 50%; background: #1d70b8; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold;">?</div>
-                        <div style="flex: 1;">
+                <div class="govuk-!-padding-3 govuk-!-margin-bottom-4 civicone-panel-bg govuk-!-display-none" id="civicSelectedUser">
+                    <div class="civicone-selected-user">
+                        <div id="civicSelectedAvatar" class="civicone-selected-avatar">?</div>
+                        <div class="civicone-selected-info">
                             <p class="govuk-body govuk-!-margin-bottom-0"><strong id="civicSelectedName">-</strong></p>
-                            <p class="govuk-body-s govuk-!-margin-bottom-0" id="civicSelectedUsername" style="color: #505a5f;">-</p>
+                            <p class="govuk-body-s govuk-!-margin-bottom-0 civicone-secondary-text" id="civicSelectedUsername">-</p>
                         </div>
                         <button type="button" onclick="clearCivicSelection()" class="govuk-button govuk-button--secondary" data-module="govuk-button" title="Clear selection">
                             <i class="fa-solid fa-times" aria-hidden="true"></i>
@@ -62,7 +62,7 @@ $basePath = \Nexus\Core\TenantContext::getBasePath();
                 <div class="govuk-form-group" id="civicSearchWrapper">
                     <label class="govuk-label" for="civicUserSearch">Recipient</label>
                     <input type="text" id="civicUserSearch" class="govuk-input" placeholder="Search by name or username..." autocomplete="off">
-                    <div id="civicUserResults" style="border: 1px solid #b1b4b6; display: none; max-height: 200px; overflow-y: auto;"></div>
+                    <div id="civicUserResults" class="civicone-search-results govuk-!-display-none"></div>
                 </div>
 
                 <div class="govuk-form-group">
@@ -147,7 +147,7 @@ $basePath = \Nexus\Core\TenantContext::getBasePath();
         selectedIndex = -1;
 
         if (query.length < 1) {
-            resultsDiv.style.display = 'none';
+            resultsDiv.classList.add('govuk-!-display-none');
             resultsDiv.innerHTML = '';
             return;
         }
@@ -173,13 +173,13 @@ $basePath = \Nexus\Core\TenantContext::getBasePath();
                 results[selectedIndex].click();
             }
         } else if (e.key === 'Escape') {
-            resultsDiv.style.display = 'none';
+            resultsDiv.classList.add('govuk-!-display-none');
         }
     });
 
     document.addEventListener('click', function(e) {
         if (!e.target.closest('#civicSearchWrapper')) {
-            resultsDiv.style.display = 'none';
+            resultsDiv.classList.add('govuk-!-display-none');
         }
     });
 
@@ -202,15 +202,15 @@ $basePath = \Nexus\Core\TenantContext::getBasePath();
             if (data.status === 'success' && data.users && data.users.length > 0) {
                 resultsDiv.innerHTML = data.users.map(function(user) {
                     var initial = (user.display_name || '?')[0].toUpperCase();
-                    return '<div class="govuk-wallet-result govuk-!-padding-3" style="cursor: pointer; border-bottom: 1px solid #f3f2f1;" onclick="selectCivicUser(\'' + escapeHtml(user.username || '') + '\', \'' + escapeHtml(user.display_name) + '\', \'' + escapeHtml(user.avatar_url || '') + '\', \'' + user.id + '\')">' +
+                    return '<div class="govuk-wallet-result civicone-search-result-item" onclick="selectCivicUser(\'' + escapeHtml(user.username || '') + '\', \'' + escapeHtml(user.display_name) + '\', \'' + escapeHtml(user.avatar_url || '') + '\', \'' + user.id + '\')">' +
                         '<strong>' + escapeHtml(user.display_name) + '</strong>' +
-                        '<span style="color: #505a5f;"> ' + (user.username ? '@' + escapeHtml(user.username) : '') + '</span>' +
+                        '<span class="civicone-secondary-text"> ' + (user.username ? '@' + escapeHtml(user.username) : '') + '</span>' +
                     '</div>';
                 }).join('');
-                resultsDiv.style.display = 'block';
+                resultsDiv.classList.remove('govuk-!-display-none');
             } else {
-                resultsDiv.innerHTML = '<div class="govuk-!-padding-3" style="color: #505a5f;">No users found</div>';
-                resultsDiv.style.display = 'block';
+                resultsDiv.innerHTML = '<div class="govuk-!-padding-3 civicone-secondary-text">No users found</div>';
+                resultsDiv.classList.remove('govuk-!-display-none');
             }
         })
         .catch(function(err) {
@@ -225,16 +225,16 @@ $basePath = \Nexus\Core\TenantContext::getBasePath();
         document.getElementById('civicSelectedName').textContent = displayName;
         document.getElementById('civicSelectedUsername').textContent = username ? '@' + username : 'No username';
 
-        selectedDiv.style.display = 'block';
-        searchWrapper.style.display = 'none';
-        resultsDiv.style.display = 'none';
+        selectedDiv.classList.remove('govuk-!-display-none');
+        searchWrapper.classList.add('govuk-!-display-none');
+        resultsDiv.classList.add('govuk-!-display-none');
     };
 
     window.clearCivicSelection = function() {
         usernameInput.value = '';
         recipientIdInput.value = '';
-        selectedDiv.style.display = 'none';
-        searchWrapper.style.display = 'block';
+        selectedDiv.classList.add('govuk-!-display-none');
+        searchWrapper.classList.remove('govuk-!-display-none');
         searchInput.value = '';
         searchInput.focus();
     };

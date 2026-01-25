@@ -120,6 +120,7 @@ module.exports = {
         'httpdocs/assets/css/civicone-groups-utilities.css',
         'httpdocs/assets/css/civicone-groups.css',
         'httpdocs/assets/css/civicone-header.css',
+        'httpdocs/assets/css/civicone-header-v2.css',
         'httpdocs/assets/css/civicone-help.css',
         'httpdocs/assets/css/civicone-home.css',
         'httpdocs/assets/css/civicone-how-it-works.css',

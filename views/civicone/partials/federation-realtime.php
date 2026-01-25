@@ -28,7 +28,7 @@ $userChannel = FederationRealtimeService::getUserFederationChannel($currentUser[
 <div class="fed-toast-container" id="fedToastContainer" role="alert" aria-live="polite"></div>
 
 <!-- Federation Realtime CSS -->
-<link rel="stylesheet" href="/assets/css/federation-realtime.min.css">
+<link rel="stylesheet" href="/assets/css/federation-realtime.css">
 
 <!-- Connection Indicator -->
 <div class="fed-connection-indicator" id="fedConnectionIndicator" role="status" aria-live="polite">

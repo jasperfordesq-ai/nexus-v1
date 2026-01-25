@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Modern Layout - Consolidated CSS Loader
  * Optimized loading with proper categorization
@@ -28,48 +29,51 @@ $assetBase = $assetBase ?? '';
 
 // Helper function for async CSS loading (guard against redeclaration)
 if (!function_exists('asyncCss')) {
-    function asyncCss($href, $version, $assetBase = '') {
-        $fullHref = $assetBase . $href . '?v=' . $version;
-        return '<link rel="stylesheet" href="' . $fullHref . '" media="print" onload="this.media=\'all\'">';
-    }
+     function asyncCss($href, $version, $assetBase = '')
+     {
+          $fullHref = $assetBase . $href . '?v=' . $version;
+          return '<link rel="stylesheet" href="' . $fullHref . '" media="print" onload="this.media=\'all\'">';
+     }
 }
 
 // Helper for sync CSS (guard against redeclaration)
 if (!function_exists('syncCss')) {
-    function syncCss($href, $version, $assetBase = '', $media = null) {
-        $fullHref = $assetBase . $href . '?v=' . $version;
-        $mediaAttr = $media ? ' media="' . $media . '"' : '';
-        return '<link rel="stylesheet" href="' . $fullHref . '"' . $mediaAttr . '>';
-    }
+     function syncCss($href, $version, $assetBase = '', $media = null)
+     {
+          $fullHref = $assetBase . $href . '?v=' . $version;
+          $mediaAttr = $media ? ' media="' . $media . '"' : '';
+          return '<link rel="stylesheet" href="' . $fullHref . '"' . $mediaAttr . '>';
+     }
 }
 ?>
 
 <!-- ==========================================
      1. CRITICAL CSS (Render-blocking)
+     NOTE: Using non-minified CSS for stability debugging
      ========================================== -->
-<?= syncCss('/assets/css/design-tokens.min.css', $cssVersion, $assetBase) ?>
+<?= syncCss('/assets/css/design-tokens.css', $cssVersion, $assetBase) ?>
 
-<?= syncCss('/assets/css/nexus-phoenix.min.css', $cssVersion, $assetBase) ?>
+<?= syncCss('/assets/css/nexus-phoenix.css', $cssVersion, $assetBase) ?>
 
-<?= syncCss('/assets/css/bundles/core.min.css', $cssVersion, $assetBase) ?>
+<?= syncCss('/assets/css/bundles/core.css', $cssVersion, $assetBase) ?>
 
-<?= syncCss('/assets/css/bundles/components.min.css', $cssVersion, $assetBase) ?>
+<?= syncCss('/assets/css/bundles/components.css', $cssVersion, $assetBase) ?>
 
-<?= syncCss('/assets/css/theme-transitions.min.css', $cssVersion, $assetBase) ?>
+<?= syncCss('/assets/css/theme-transitions.css', $cssVersion, $assetBase) ?>
 
-<?= syncCss('/assets/css/modern-experimental-banner.min.css', $cssVersion, $assetBase) ?>
+<?= syncCss('/assets/css/modern-experimental-banner.css', $cssVersion, $assetBase) ?>
 
 
 <!-- ==========================================
      2. HEADER & NAVIGATION (Sync - above fold)
      ========================================== -->
-<?= syncCss('/assets/css/nexus-modern-header-v2.min.css', $cssVersion, $assetBase) ?>
+<?= syncCss('/assets/css/nexus-modern-header.css', $cssVersion, $assetBase) ?>
 
 <?= syncCss('/assets/css/nexus-premium-mega-menu.css', $cssVersion, $assetBase) ?>
 
 <?= syncCss('/assets/css/mega-menu-icons.css', $cssVersion, $assetBase) ?>
 
-<?= syncCss('/assets/css/nexus-native-nav-v2.min.css', $cssVersion, $assetBase) ?>
+<?= syncCss('/assets/css/nexus-native-nav-v2.css', $cssVersion, $assetBase) ?>
 
 <?= syncCss('/assets/css/mobile-nav-v2.css', $cssVersion, $assetBase) ?>
 
@@ -77,60 +81,66 @@ if (!function_exists('syncCss')) {
 
 <?= syncCss('/assets/css/modern-header-emergency-fixes.css', $cssVersion, $assetBase) ?>
 
+<!-- ==========================================
+     2b. MODERN PAGES BASE (Must load BEFORE page-specific)
+     Contains base styles that page-specific CSS overrides
+     ========================================== -->
+<?= syncCss('/assets/css/bundles/modern-pages.css', $cssVersion, $assetBase) ?>
+
 
 <!-- ==========================================
-     3. PAGE-SPECIFIC CSS (Conditional)
+     3. PAGE-SPECIFIC CSS (Conditional - loads LAST to override)
      ========================================== -->
 <?php require __DIR__ . '/page-css-loader.php'; ?>
 
 <!-- ==========================================
      4. COMPONENTS (Async - lazy loaded)
      ========================================== -->
-<?= asyncCss('/assets/css/bundles/components-navigation.min.css', $cssVersion, $assetBase) ?>
+<?= asyncCss('/assets/css/bundles/components-navigation.css', $cssVersion, $assetBase) ?>
 
-<?= asyncCss('/assets/css/bundles/components-buttons.min.css', $cssVersion, $assetBase) ?>
+<?= asyncCss('/assets/css/bundles/components-buttons.css', $cssVersion, $assetBase) ?>
 
-<?= asyncCss('/assets/css/bundles/components-forms.min.css', $cssVersion, $assetBase) ?>
+<?= asyncCss('/assets/css/bundles/components-forms.css', $cssVersion, $assetBase) ?>
 
-<?= asyncCss('/assets/css/bundles/components-cards.min.css', $cssVersion, $assetBase) ?>
+<?= asyncCss('/assets/css/bundles/components-cards.css', $cssVersion, $assetBase) ?>
 
-<?= asyncCss('/assets/css/bundles/components-modals.min.css', $cssVersion, $assetBase) ?>
+<?= asyncCss('/assets/css/bundles/components-modals.css', $cssVersion, $assetBase) ?>
 
-<?= asyncCss('/assets/css/bundles/components-notifications.min.css', $cssVersion, $assetBase) ?>
+<?= asyncCss('/assets/css/bundles/components-notifications.css', $cssVersion, $assetBase) ?>
 
 
 <!-- ==========================================
      5. UTILITIES (Async - lazy loaded)
      ========================================== -->
-<?= asyncCss('/assets/css/bundles/utilities-polish.min.css', $cssVersion, $assetBase) ?>
+<?= asyncCss('/assets/css/bundles/utilities-polish.css', $cssVersion, $assetBase) ?>
 
-<?= asyncCss('/assets/css/bundles/utilities-loading.min.css', $cssVersion, $assetBase) ?>
+<?= asyncCss('/assets/css/bundles/utilities-loading.css', $cssVersion, $assetBase) ?>
 
-<?= asyncCss('/assets/css/bundles/utilities-accessibility.min.css', $cssVersion, $assetBase) ?>
+<?= asyncCss('/assets/css/bundles/utilities-accessibility.css', $cssVersion, $assetBase) ?>
 
-<?= asyncCss('/assets/css/bundles/enhancements.min.css', $cssVersion, $assetBase) ?>
+<?= asyncCss('/assets/css/bundles/enhancements.css', $cssVersion, $assetBase) ?>
 
-<?= asyncCss('/assets/css/page-transitions.min.css', $cssVersion, $assetBase) ?>
+<?= asyncCss('/assets/css/page-transitions.css', $cssVersion, $assetBase) ?>
 
-<?= asyncCss('/assets/css/error-states.min.css', $cssVersion, $assetBase) ?>
+<?= asyncCss('/assets/css/error-states.css', $cssVersion, $assetBase) ?>
 
-<?= asyncCss('/assets/css/avatar-placeholders.min.css', $cssVersion, $assetBase) ?>
+<?= asyncCss('/assets/css/avatar-placeholders.css', $cssVersion, $assetBase) ?>
 
 
 <!-- ==========================================
      6. MOBILE CSS (Media query conditional)
      ========================================== -->
-<?= syncCss('/assets/css/mobile-design-tokens.min.css', $cssVersion, $assetBase, '(max-width: 768px)') ?>
+<?= syncCss('/assets/css/mobile-design-tokens.css', $cssVersion, $assetBase, '(max-width: 768px)') ?>
 
-<?= syncCss('/assets/css/nexus-mobile.min.css', $cssVersion, $assetBase, '(max-width: 768px)') ?>
+<?= syncCss('/assets/css/nexus-mobile.css', $cssVersion, $assetBase, '(max-width: 768px)') ?>
 
-<?= asyncCss('/assets/css/mobile-accessibility-fixes.min.css', $cssVersion, $assetBase) ?>
+<?= asyncCss('/assets/css/mobile-accessibility-fixes.css', $cssVersion, $assetBase) ?>
 
-<?= asyncCss('/assets/css/mobile-loading-states.min.css', $cssVersion, $assetBase) ?>
+<?= asyncCss('/assets/css/mobile-loading-states.css', $cssVersion, $assetBase) ?>
 
-<?= asyncCss('/assets/css/mobile-micro-interactions.min.css', $cssVersion, $assetBase) ?>
+<?= asyncCss('/assets/css/mobile-micro-interactions.css', $cssVersion, $assetBase) ?>
 
-<?= asyncCss('/assets/css/mobile-sheets.min.css', $cssVersion, $assetBase) ?>
+<?= asyncCss('/assets/css/mobile-sheets.css', $cssVersion, $assetBase) ?>
 
 <?= asyncCss('/assets/css/mobile-select-sheet.css', $cssVersion, $assetBase) ?>
 
@@ -140,25 +150,27 @@ if (!function_exists('syncCss')) {
 <!-- ==========================================
      7. DESKTOP CSS (Media query conditional)
      ========================================== -->
-<?= syncCss('/assets/css/desktop-design-tokens.min.css', $cssVersion, $assetBase, '(min-width: 769px)') ?>
+<?= syncCss('/assets/css/desktop-design-tokens.css', $cssVersion, $assetBase, '(min-width: 769px)') ?>
 
-<?= syncCss('/assets/css/desktop-hover-system.min.css', $cssVersion, $assetBase, '(min-width: 769px)') ?>
+<?= syncCss('/assets/css/desktop-hover-system.css', $cssVersion, $assetBase, '(min-width: 769px)') ?>
 
-<?= syncCss('/assets/css/desktop-loading-states.min.css', $cssVersion, $assetBase, '(min-width: 769px)') ?>
+<?= syncCss('/assets/css/desktop-loading-states.css', $cssVersion, $assetBase, '(min-width: 769px)') ?>
 
 
 <!-- ==========================================
      8. SHARED COMPONENTS & PARTIALS (Async)
      ========================================== -->
-<?= asyncCss('/assets/css/social-interactions.min.css', $cssVersion, $assetBase) ?>
+<?= asyncCss('/assets/css/social-interactions.css', $cssVersion, $assetBase) ?>
 
-<?= asyncCss('/assets/css/components.min.css', $cssVersion, $assetBase) ?>
+<?= asyncCss('/assets/css/components.css', $cssVersion, $assetBase) ?>
 
-<?= asyncCss('/assets/css/partials.min.css', $cssVersion, $assetBase) ?>
+<?= asyncCss('/assets/css/partials.css', $cssVersion, $assetBase) ?>
 
 <?= asyncCss('/assets/css/modern/components-library.css', $cssVersion, $assetBase) ?>
 
-<?= asyncCss('/assets/css/nexus-modern-footer.min.css', $cssVersion, $assetBase) ?>
+<?= asyncCss('/assets/css/nexus-modern-footer.css', $cssVersion, $assetBase) ?>
+
+<!-- modern-pages.css moved to section 2b (sync, before page-specific) -->
 
 
 <!-- ==========================================
@@ -168,7 +180,7 @@ if (!function_exists('syncCss')) {
 
 <?= asyncCss('/assets/css/civicone-utilities-extended.css', $cssVersion, $assetBase) ?>
 
-<?= asyncCss('/assets/css/nexus-performance-patch.min.css', $cssVersion, $assetBase) ?>
+<?= asyncCss('/assets/css/nexus-performance-patch.css', $cssVersion, $assetBase) ?>
 
 
 <!-- ==========================================
@@ -177,6 +189,8 @@ if (!function_exists('syncCss')) {
 <?= asyncCss('/assets/css/biometric-modal.css', $cssVersion, $assetBase) ?>
 
 <?= asyncCss('/assets/css/pwa-install-modal.css', $cssVersion, $assetBase) ?>
+
+<?= syncCss('/assets/css/dev-notice-modal.css', $cssVersion, $assetBase) ?>
 
 
 <!-- ==========================================
@@ -190,14 +204,14 @@ if (!function_exists('syncCss')) {
 <!-- ==========================================
      12. EMERGENCY OVERRIDES (Must be last)
      ========================================== -->
-<?= syncCss('/assets/css/scroll-fix-emergency.min.css', $cssVersion, $assetBase) ?>
+<?= syncCss('/assets/css/scroll-fix-emergency.css', $cssVersion, $assetBase) ?>
 
 
 <!-- Noscript fallbacks for critical async bundles -->
 <noscript>
-    <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/bundles/components-navigation.min.css?v=<?= $cssVersion ?>">
-    <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/bundles/components-buttons.min.css?v=<?= $cssVersion ?>">
-    <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/bundles/components-forms.min.css?v=<?= $cssVersion ?>">
-    <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/bundles/utilities-polish.min.css?v=<?= $cssVersion ?>">
-    <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/bundles/enhancements.min.css?v=<?= $cssVersion ?>">
+     <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/bundles/components-navigation.css?v=<?= $cssVersion ?>">
+     <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/bundles/components-buttons.css?v=<?= $cssVersion ?>">
+     <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/bundles/components-forms.css?v=<?= $cssVersion ?>">
+     <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/bundles/utilities-polish.css?v=<?= $cssVersion ?>">
+     <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/bundles/enhancements.css?v=<?= $cssVersion ?>">
 </noscript>

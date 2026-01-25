@@ -47,7 +47,7 @@ foreach ($my_listings as $ml) {
             </h2>
             <p class="govuk-body">
                 <span class="govuk-tag govuk-tag--green govuk-!-margin-right-2"><?= $offerCount ?> Offers</span>
-                <span class="govuk-tag govuk-tag--blue"><?= $reqCount ?> Requests</span>
+                <span class="govuk-tag govuk-tag--light-blue"><?= $reqCount ?> Requests</span>
             </p>
         </div>
         <div class="govuk-grid-column-one-third govuk-!-text-align-right">

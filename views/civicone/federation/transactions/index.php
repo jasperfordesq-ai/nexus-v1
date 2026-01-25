@@ -36,46 +36,46 @@ $balance = $balance ?? 0;
     <main class="govuk-main-wrapper govuk-!-padding-top-4" id="main-content" role="main">
         <!-- Header -->
         <h1 class="govuk-heading-xl govuk-!-margin-bottom-6">
-            <i class="fa-solid fa-globe govuk-!-margin-right-2" style="color: #1d70b8;" aria-hidden="true"></i>
+            <i class="fa-solid fa-globe govuk-!-margin-right-2 civicone-icon-blue" aria-hidden="true"></i>
             Federated Transactions
         </h1>
 
         <!-- Stats Grid -->
         <div class="govuk-grid-row govuk-!-margin-bottom-6" role="region" aria-label="Transaction statistics">
             <div class="govuk-grid-column-one-quarter">
-                <div class="govuk-!-padding-4 govuk-!-text-align-center" style="background: #1d70b8; color: #fff;">
+                <div class="govuk-!-padding-4 govuk-!-text-align-center civicone-stat-highlight">
                     <i class="fa-solid fa-wallet fa-lg govuk-!-margin-bottom-2" aria-hidden="true"></i>
-                    <p class="govuk-heading-l govuk-!-margin-bottom-1" style="color: #fff;">
+                    <p class="govuk-heading-l govuk-!-margin-bottom-1">
                         <?= number_format($balance, 1) ?>
                     </p>
-                    <p class="govuk-body-s govuk-!-margin-bottom-0" style="color: #fff;">Current Balance</p>
+                    <p class="govuk-body-s govuk-!-margin-bottom-0">Current Balance</p>
                 </div>
             </div>
             <div class="govuk-grid-column-one-quarter">
-                <div class="govuk-!-padding-4 govuk-!-text-align-center civicone-panel-bg" style="border-top: 4px solid #d4351c;">
-                    <i class="fa-solid fa-arrow-up fa-lg govuk-!-margin-bottom-2" style="color: #d4351c;" aria-hidden="true"></i>
-                    <p class="govuk-heading-l govuk-!-margin-bottom-1" style="color: #d4351c;">
+                <div class="govuk-!-padding-4 govuk-!-text-align-center civicone-panel-bg civicone-stat-card-top-border-red">
+                    <i class="fa-solid fa-arrow-up fa-lg govuk-!-margin-bottom-2 civicone-icon-red" aria-hidden="true"></i>
+                    <p class="govuk-heading-l govuk-!-margin-bottom-1 civicone-heading-red">
                         <?= number_format($stats['total_sent_hours'] ?? 0, 1) ?>
                     </p>
-                    <p class="govuk-body-s govuk-!-margin-bottom-0" style="color: #505a5f;">Hours Sent</p>
+                    <p class="govuk-body-s govuk-!-margin-bottom-0 civicone-secondary-text">Hours Sent</p>
                 </div>
             </div>
             <div class="govuk-grid-column-one-quarter">
-                <div class="govuk-!-padding-4 govuk-!-text-align-center civicone-panel-bg" style="border-top: 4px solid #00703c;">
-                    <i class="fa-solid fa-arrow-down fa-lg govuk-!-margin-bottom-2" style="color: #00703c;" aria-hidden="true"></i>
-                    <p class="govuk-heading-l govuk-!-margin-bottom-1" style="color: #00703c;">
+                <div class="govuk-!-padding-4 govuk-!-text-align-center civicone-panel-bg civicone-stat-card-top-border-green">
+                    <i class="fa-solid fa-arrow-down fa-lg govuk-!-margin-bottom-2 civicone-icon-green" aria-hidden="true"></i>
+                    <p class="govuk-heading-l govuk-!-margin-bottom-1 civicone-heading-green">
                         <?= number_format($stats['total_received_hours'] ?? 0, 1) ?>
                     </p>
-                    <p class="govuk-body-s govuk-!-margin-bottom-0" style="color: #505a5f;">Hours Received</p>
+                    <p class="govuk-body-s govuk-!-margin-bottom-0 civicone-secondary-text">Hours Received</p>
                 </div>
             </div>
             <div class="govuk-grid-column-one-quarter">
-                <div class="govuk-!-padding-4 govuk-!-text-align-center civicone-panel-bg" style="border-top: 4px solid #1d70b8;">
-                    <i class="fa-solid fa-exchange-alt fa-lg govuk-!-margin-bottom-2" style="color: #1d70b8;" aria-hidden="true"></i>
-                    <p class="govuk-heading-l govuk-!-margin-bottom-1" style="color: #1d70b8;">
+                <div class="govuk-!-padding-4 govuk-!-text-align-center civicone-panel-bg civicone-stat-card-top-border-blue">
+                    <i class="fa-solid fa-exchange-alt fa-lg govuk-!-margin-bottom-2 civicone-icon-blue" aria-hidden="true"></i>
+                    <p class="govuk-heading-l govuk-!-margin-bottom-1 civicone-heading-blue">
                         <?= ($stats['total_sent_count'] ?? 0) + ($stats['total_received_count'] ?? 0) ?>
                     </p>
-                    <p class="govuk-body-s govuk-!-margin-bottom-0" style="color: #505a5f;">Total Exchanges</p>
+                    <p class="govuk-body-s govuk-!-margin-bottom-0 civicone-secondary-text">Total Exchanges</p>
                 </div>
             </div>
         </div>
@@ -92,37 +92,38 @@ $balance = $balance ?? 0;
                             $amountPrefix = $isSent ? '-' : '+';
                             $status = $tx['status'] ?? 'completed';
                             $isCompleted = ($status === 'completed');
-                            $borderColor = $isSent ? '#d4351c' : '#00703c';
-                            $amountColor = $isSent ? '#d4351c' : '#00703c';
+                            $cardClass = $isSent ? 'civicone-tx-card--sent' : 'civicone-tx-card--received';
+                            $iconClass = $isSent ? 'civicone-tx-icon--sent' : 'civicone-tx-icon--received';
+                            $amountClass = $isSent ? 'civicone-heading-red' : 'civicone-heading-green';
 
                             $hasReviewed = $isSent
                                 ? (($tx['sender_reviewed'] ?? 0) == 1)
                                 : (($tx['receiver_reviewed'] ?? 0) == 1);
                             ?>
-                            <article class="govuk-!-padding-4 govuk-!-margin-bottom-3" style="background: #fff; border: 1px solid #b1b4b6; border-left: 5px solid <?= $borderColor ?>;" role="listitem">
-                                <div style="display: flex; align-items: flex-start; gap: 16px; flex-wrap: wrap;">
-                                    <div style="width: 40px; height: 40px; border-radius: 50%; background: <?= $borderColor ?>; color: #fff; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                            <article class="govuk-!-padding-4 govuk-!-margin-bottom-3 civicone-tx-card <?= $cardClass ?>" role="listitem">
+                                <div class="civicone-tx-card-content">
+                                    <div class="civicone-tx-icon <?= $iconClass ?>">
                                         <i class="fa-solid <?= $icon ?>" aria-hidden="true"></i>
                                     </div>
-                                    <div style="flex: 1; min-width: 200px;">
+                                    <div class="civicone-tx-details">
                                         <p class="govuk-body govuk-!-font-weight-bold govuk-!-margin-bottom-1">
                                             <?= $isSent ? 'To' : 'From' ?>: <?= htmlspecialchars($tx['other_user_name'] ?? 'Unknown') ?>
                                         </p>
-                                        <p class="govuk-body-s govuk-!-margin-bottom-1" style="color: #505a5f;">
+                                        <p class="govuk-body-s govuk-!-margin-bottom-1 civicone-secondary-text">
                                             <i class="fa-solid fa-building govuk-!-margin-right-1" aria-hidden="true"></i>
                                             <?= htmlspecialchars($tx['other_tenant_name'] ?? 'Partner Timebank') ?>
                                         </p>
                                         <?php if (!empty($tx['description'])): ?>
-                                            <p class="govuk-body-s govuk-!-margin-bottom-0" style="color: #505a5f;">
+                                            <p class="govuk-body-s govuk-!-margin-bottom-0 civicone-secondary-text">
                                                 <?= htmlspecialchars($tx['description']) ?>
                                             </p>
                                         <?php endif; ?>
                                     </div>
-                                    <div style="text-align: right;">
-                                        <p class="govuk-heading-m govuk-!-margin-bottom-1" style="color: <?= $amountColor ?>;">
+                                    <div class="civicone-tx-amount">
+                                        <p class="govuk-heading-m govuk-!-margin-bottom-1 <?= $amountClass ?>">
                                             <?= $amountPrefix ?><?= number_format($tx['amount'], 1) ?> hrs
                                         </p>
-                                        <p class="govuk-body-s govuk-!-margin-bottom-0" style="color: #505a5f;">
+                                        <p class="govuk-body-s govuk-!-margin-bottom-0 civicone-secondary-text">
                                             <time datetime="<?= date('Y-m-d', strtotime($tx['created_at'])) ?>">
                                                 <?= date('M j, Y', strtotime($tx['created_at'])) ?>
                                             </time>
@@ -135,14 +136,14 @@ $balance = $balance ?? 0;
                                         <?php endif; ?>
                                     </div>
                                     <?php if ($isCompleted): ?>
-                                        <div style="width: 100%; border-top: 1px solid #b1b4b6; padding-top: 12px; margin-top: 4px;">
+                                        <div class="civicone-tx-footer">
                                             <?php if ($hasReviewed): ?>
                                                 <span class="govuk-tag govuk-tag--green">
                                                     <i class="fa-solid fa-check govuk-!-margin-right-1" aria-hidden="true"></i>
                                                     Reviewed
                                                 </span>
                                             <?php else: ?>
-                                                <a href="<?= $basePath ?>/federation/review/<?= $tx['id'] ?>" class="govuk-button govuk-!-margin-bottom-0" style="background: #f47738;" data-module="govuk-button">
+                                                <a href="<?= $basePath ?>/federation/review/<?= $tx['id'] ?>" class="govuk-button govuk-!-margin-bottom-0 civicone-btn-orange" data-module="govuk-button">
                                                     <i class="fa-solid fa-star govuk-!-margin-right-1" aria-hidden="true"></i>
                                                     Leave Review
                                                 </a>
@@ -154,8 +155,8 @@ $balance = $balance ?? 0;
                         <?php endforeach; ?>
                     </div>
                 <?php else: ?>
-                    <div class="govuk-!-padding-6 govuk-!-text-align-center civicone-panel-bg" style="border-left: 5px solid #1d70b8;">
-                        <i class="fa-solid fa-exchange-alt fa-3x govuk-!-margin-bottom-4" style="color: #1d70b8;" aria-hidden="true"></i>
+                    <div class="govuk-!-padding-6 govuk-!-text-align-center civicone-panel-bg civicone-border-left-blue">
+                        <i class="fa-solid fa-exchange-alt fa-3x govuk-!-margin-bottom-4 civicone-icon-blue" aria-hidden="true"></i>
                         <h2 class="govuk-heading-m">No Federated Transactions Yet</h2>
                         <p class="govuk-body govuk-!-margin-bottom-4">Exchange hours with members from partner timebanks!</p>
                         <a href="<?= $basePath ?>/federation/members" class="govuk-button" data-module="govuk-button">

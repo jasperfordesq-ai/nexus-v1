@@ -317,11 +317,7 @@ if ((isset($_SESSION['user_id']) && $user['id'] == $_SESSION['user_id']) ||
 $hideHero = true;
 $pageTitle = $displayName . ' - Profile';
 
-// Load holographic glassmorphism profile CSS (use min version for production)
-$profileCssFile = defined('DEBUG_MODE') && DEBUG_MODE ? 'profile-holographic.css' : 'profile-holographic.min.css';
-$profileShowCssFile = defined('DEBUG_MODE') && DEBUG_MODE ? 'modern-profile-show.css' : 'modern-profile-show.min.css';
-$additionalCSS = '<link rel="stylesheet" href="/assets/css/' . $profileCssFile . '?v=' . time() . '">';
-$additionalCSS .= '<link rel="stylesheet" href="/assets/css/' . $profileShowCssFile . '?v=' . time() . '">';
+// CSS now loaded via centralized page-css-loader.php (Phase 4 CSS Refactoring)
 
 require dirname(__DIR__, 2) . '/layouts/header.php';
 ?>

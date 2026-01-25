@@ -38,10 +38,14 @@
        ========================================== */
     --layout-header-height: 56px;
     --layout-header-height-scrolled: 48px;
+    --layout-utility-bar-height: 44px;
+    --layout-total-header-height: calc(var(--layout-header-height) + var(--layout-utility-bar-height));
+    --layout-content-padding-top: calc(var(--layout-total-header-height) + var(--space-8));
     --layout-mobile-nav-height: 84px;
-    --layout-sidebar-width: 340px;
-    --layout-sidebar-width-tablet: 300px;
-    --layout-max-content-width: 1200px;
+    --layout-sidebar-width: 360px;
+    --layout-sidebar-width-tablet: 320px;
+    --layout-sidebar-width-min: 280px;
+    --layout-max-content-width: 1600px;
     --layout-grid-gap: var(--space-6);
     --layout-grid-gap-mobile: var(--space-3);
 

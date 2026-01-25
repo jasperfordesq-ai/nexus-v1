@@ -609,6 +609,130 @@
 }
 
 /* ==========================================
+   LISTING ITEM BORDER
+   GOV.UK mid-grey border for list items
+   Source: govuk-colour("mid-grey") = #b1b4b6
+   ========================================== */
+
+.civicone-listing-item {
+    border-bottom: 1px solid #b1b4b6;
+}
+
+/* ==========================================
+   SIDEBAR CARD
+   GOV.UK mid-grey border for sidebar panels
+   Source: govuk-colour("mid-grey") = #b1b4b6
+   ========================================== */
+
+.civicone-sidebar-card {
+    border: 1px solid #b1b4b6;
+}
+
+/* ==========================================
+   HIGHLIGHT PANEL
+   Panel with left border accent
+   Source: GOV.UK link color #1d70b8
+   ========================================== */
+
+.civicone-highlight-panel {
+    border-left: 5px solid #1d70b8;
+}
+
+/* ==========================================
+   MEMBER CARD
+   Small card for displaying member info
+   ========================================== */
+
+.civicone-member-card {
+    text-align: center;
+}
+
+.civicone-member-card__avatar {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    margin-bottom: 0.5rem;
+}
+
+.civicone-member-card__placeholder {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    margin: 0 auto 0.5rem auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #f3f2f1;
+    color: #505a5f;
+    font-size: 1.5rem;
+}
+
+/* ==========================================
+   BUTTON FULL WIDTH
+   Full width button utility
+   ========================================== */
+
+.civicone-button-full-width {
+    width: 100%;
+}
+
+/* ==========================================
+   CARD ROW LAYOUT
+   Horizontal card with media, content, actions
+   Used for groups, members, etc.
+   ========================================== */
+
+.civicone-card-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+}
+
+.civicone-card-row__media {
+    flex-shrink: 0;
+}
+
+.civicone-card-row__image {
+    border-radius: 4px;
+    object-fit: cover;
+}
+
+.civicone-card-row__placeholder {
+    width: 64px;
+    height: 64px;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #f3f2f1;
+    color: #505a5f;
+}
+
+.civicone-card-row__content {
+    flex-grow: 1;
+}
+
+.civicone-card-row__actions {
+    flex-shrink: 0;
+}
+
+/* Responsive: Stack on mobile */
+@media (max-width: 640px) {
+    .civicone-card-row {
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+
+    .civicone-card-row__actions {
+        width: 100%;
+    }
+
+    .civicone-card-row__actions .govuk-button {
+        width: 100%;
+    }
+}
+
+/* ==========================================
    UTILITY BAR (Account/Platform controls)
    ========================================== */
 
@@ -852,4 +976,2841 @@
     .civicone-drawer {
         max-width: 100%;
     }
+}
+
+/* ==========================================
+   CARD ROW VARIANT - CENTERED
+   Card row with vertically centered items
+   ========================================== */
+
+.civicone-card-row--centered {
+    align-items: center;
+}
+
+/* ==========================================
+   AVATAR COMPONENT
+   Circular avatars with size variants
+   Source: GOV.UK light-grey #f3f2f1
+   Source: GOV.UK dark-grey #505a5f
+   ========================================== */
+
+/* Avatar image */
+.civicone-avatar {
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.civicone-avatar--48 {
+    width: 48px;
+    height: 48px;
+}
+
+.civicone-avatar--60 {
+    width: 60px;
+    height: 60px;
+}
+
+/* Avatar placeholder (no image) */
+.civicone-avatar-placeholder {
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #f3f2f1;
+    color: #505a5f;
+}
+
+.civicone-avatar-placeholder--48 {
+    width: 48px;
+    height: 48px;
+}
+
+.civicone-avatar-placeholder--60 {
+    width: 60px;
+    height: 60px;
+}
+
+/* ==========================================
+   SECONDARY TEXT COLOR
+   GOV.UK dark grey for muted/secondary text
+   Source: govuk-colour("dark-grey") = #505a5f
+   ========================================== */
+
+.civicone-secondary-text {
+    color: #505a5f;
+}
+
+/* ==========================================
+   HIGHLIGHT PANEL VARIANTS
+   Colored left border accent panels
+   ========================================== */
+
+/* Green variant - GOV.UK green #00703c */
+.civicone-highlight-panel--green {
+    border-left: 5px solid #00703c;
+}
+
+/* ==========================================
+   AVATAR SIZE VARIANT - 40px
+   Used for avatar groups/lists
+   ========================================== */
+
+.civicone-avatar--40 {
+    width: 40px;
+    height: 40px;
+}
+
+/* ==========================================
+   AVATAR GROUP
+   Flexbox container for multiple avatars
+   ========================================== */
+
+.civicone-avatar-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+/* ==========================================
+   CALENDAR COMPONENTS
+   GOV.UK compliant calendar styles
+   ========================================== */
+
+/* Calendar navigation */
+.civicone-calendar-nav {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+}
+
+/* Calendar wrapper for overflow */
+.civicone-calendar-wrapper {
+    overflow-x: auto;
+}
+
+/* Calendar table */
+.civicone-calendar-table {
+    table-layout: fixed;
+    width: 100%;
+    min-width: 700px;
+}
+
+/* Day header cells (equal width) */
+.civicone-calendar-day-header {
+    width: 14.28%;
+}
+
+/* Calendar cell */
+.civicone-calendar-cell {
+    vertical-align: top;
+    height: 100px;
+    padding: 0.5rem;
+}
+
+/* Today's cell highlight */
+.civicone-calendar-cell--today {
+    background: #e6f0f7;
+    border-left: 3px solid #1d70b8;
+}
+
+/* Event link in calendar */
+.civicone-calendar-event {
+    display: block;
+    margin-bottom: 0.25rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* Time tag in calendar */
+.civicone-calendar-time-tag {
+    font-size: 0.7rem;
+}
+
+/* Responsive: hide calendar table on mobile, show list */
+@media (min-width: 769px) {
+    #mobile-events-list {
+        display: none;
+    }
+}
+
+@media (max-width: 768px) {
+    .civicone-calendar-table {
+        display: none;
+    }
+}
+
+/* ==========================================
+   GOAL CARD COMPONENTS
+   GOV.UK compliant goal cards with progress
+   ========================================== */
+
+/* Goal card with left border accent */
+.civicone-goal-card {
+    border-left: 5px solid #505a5f;
+}
+
+.civicone-goal-card--started {
+    border-left-color: #505a5f;
+}
+
+.civicone-goal-card--progress {
+    border-left-color: #1d70b8;
+}
+
+.civicone-goal-card--complete {
+    border-left-color: #00703c;
+}
+
+/* Progress bar */
+.civicone-progress-bar {
+    height: 8px;
+    border-radius: 4px;
+    overflow: hidden;
+    background-color: #f3f2f1;
+}
+
+.civicone-progress-bar__fill {
+    height: 100%;
+}
+
+.civicone-progress-bar--grey {
+    background-color: #505a5f;
+}
+
+.civicone-progress-bar--blue {
+    background-color: #1d70b8;
+}
+
+.civicone-progress-bar--green {
+    background-color: #00703c;
+}
+
+/* ==========================================
+   INLINE FORM
+   Form displayed inline with other elements
+   ========================================== */
+
+.civicone-inline-form {
+    display: inline;
+}
+
+/* ==========================================
+   COMMENT COMPONENTS
+   GOV.UK compliant comment styling
+   ========================================== */
+
+/* Comment block */
+.civicone-comment {
+    border-left: 4px solid #1d70b8;
+    background: #f8f8f8;
+}
+
+/* Comment depth indentation */
+.civicone-comment--depth-1 {
+    margin-left: 20px;
+}
+
+.civicone-comment--depth-2 {
+    margin-left: 40px;
+}
+
+.civicone-comment--depth-3 {
+    margin-left: 60px;
+}
+
+/* Danger link - GOV.UK red */
+.civicone-link-danger {
+    color: #d4351c;
+}
+
+.civicone-link-danger:hover {
+    color: #942514;
+}
+
+/* Clickable tag */
+.civicone-tag-clickable {
+    cursor: pointer;
+}
+
+/* ==========================================
+   POLL BAR COMPONENTS
+   Progress bars for poll results
+   Source: GOV.UK colors #00703c, #1d70b8, #505a5f
+   ========================================== */
+
+/* Poll progress bar container */
+.civicone-poll-bar {
+    height: 24px;
+    border-radius: 4px;
+    overflow: hidden;
+    background-color: #f3f2f1;
+}
+
+/* Poll progress bar fill */
+.civicone-poll-bar__fill {
+    height: 100%;
+    transition: width 0.3s;
+}
+
+/* Color variants */
+.civicone-poll-bar--grey {
+    background-color: #505a5f;
+}
+
+.civicone-poll-bar--blue {
+    background-color: #1d70b8;
+}
+
+.civicone-poll-bar--green {
+    background-color: #00703c;
+}
+
+/* ==========================================
+   DANGER ZONE COMPONENT
+   Delete confirmation section styling
+   Source: GOV.UK red #d4351c
+   ========================================== */
+
+.civicone-danger-zone {
+    border: 2px solid #d4351c;
+    background: #fef7f7;
+}
+
+.civicone-danger-heading {
+    color: #d4351c;
+}
+
+/* ==========================================
+   CARD LAYOUT COMPONENTS
+   Flexbox card utilities
+   ========================================== */
+
+/* Full height card */
+.civicone-card-full-height {
+    height: 100%;
+}
+
+/* Flex column card */
+.civicone-card-flex {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Card header row - space between */
+.civicone-card-header-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.5rem;
+}
+
+/* Flex grow utility */
+.civicone-flex-grow {
+    flex-grow: 1;
+}
+
+/* Resource icon size */
+.civicone-resource-icon {
+    font-size: 1.5rem;
+}
+
+/* ==========================================
+   STAT ROW COMPONENT
+   Flex row for key-value stat display
+   ========================================== */
+
+.civicone-stat-row {
+    display: flex;
+    justify-content: space-between;
+}
+
+/* ==========================================
+   BACK TO TOP ICON
+   Icon alignment for back-to-top link
+   ========================================== */
+
+.civicone-back-to-top-icon {
+    vertical-align: middle;
+    margin-right: 4px;
+}
+
+/* ==========================================
+   ACTION CARD
+   Card with left accent border (GOV.UK link blue)
+   For CTAs and important actions
+   ========================================== */
+
+.civicone-action-card {
+    border: 1px solid #b1b4b6;
+    border-left: 5px solid #1d70b8;
+}
+
+/* ==========================================
+   RESPONSIVE IMAGE
+   Ensures images scale correctly within containers
+   ========================================== */
+
+.civicone-responsive-image {
+    max-width: 100%;
+    height: auto;
+}
+
+/* ==========================================
+   RELATED CARD
+   Simple bordered card for related content
+   ========================================== */
+
+.civicone-related-card {
+    border: 1px solid #b1b4b6;
+}
+
+/* ==========================================
+   SHARE BUTTON
+   Styled as link but accessible as button
+   GOV.UK focus state compliant
+   ========================================== */
+
+.civicone-share-button {
+    display: inline;
+    border: none;
+    background: none;
+    padding: 0;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: inherit;
+    color: #1d70b8;
+    text-decoration: underline;
+}
+
+.civicone-share-button:hover {
+    color: #003078;
+    text-decoration-thickness: max(3px, .1875rem, .12em);
+}
+
+.civicone-share-button:focus {
+    outline: 3px solid transparent;
+    color: #0b0c0c;
+    background-color: #ffdd00;
+    box-shadow: 0 -2px #ffdd00, 0 4px #0b0c0c;
+    text-decoration: none;
+}
+
+/* ==========================================
+   SMALL TAG
+   Smaller font size for tags in compact contexts
+   ========================================== */
+
+.civicone-tag-small {
+    font-size: 0.7rem;
+}
+
+/* ==========================================
+   LEADERBOARD COMPONENTS
+   GOV.UK compliant table and card components
+   ========================================== */
+
+/* Table header width for rank column */
+.civicone-rank-column {
+    width: 80px;
+}
+
+/* Member row with avatar */
+.civicone-member-link {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    text-decoration: none;
+}
+
+/* Avatar in tables/lists */
+.civicone-table-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+}
+
+/* Streak panel with orange accent */
+.civicone-streak-panel {
+    border-left: 5px solid #f47738;
+}
+
+/* Stat card - bordered panel with centered text */
+.civicone-stat-card {
+    border: 1px solid #b1b4b6;
+    text-align: center;
+}
+
+/* Progress bar wrapper */
+.civicone-xp-progress-bar {
+    height: 8px;
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+/* Progress bar fill - blue */
+.civicone-xp-progress-fill {
+    height: 100%;
+    background: #1d70b8;
+}
+
+/* Navigation list - horizontal button list */
+.civicone-nav-button-list {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    padding: 0;
+    margin: 0;
+    list-style: none;
+}
+
+/* Text color - success green */
+.civicone-text-success {
+    color: #00703c;
+}
+
+/* ==========================================
+   ADDITIONAL COMMON PATTERNS
+   ========================================== */
+
+/* Accent card - green */
+.civicone-accent-card--green {
+    border: 1px solid #b1b4b6;
+    border-left: 5px solid #00703c;
+}
+
+/* Accent card - orange */
+.civicone-accent-card--orange {
+    border: 1px solid #b1b4b6;
+    border-left: 5px solid #f47738;
+}
+
+/* Accent card - red */
+.civicone-accent-card--red {
+    border: 1px solid #b1b4b6;
+    border-left: 5px solid #d4351c;
+}
+
+/* Top accent card - blue */
+.civicone-top-accent--blue {
+    border: 1px solid #b1b4b6;
+    border-top: 5px solid #1d70b8;
+}
+
+/* Top accent card - green */
+.civicone-top-accent--green {
+    border: 1px solid #b1b4b6;
+    border-top: 5px solid #00703c;
+}
+
+/* Top accent card - pink */
+.civicone-top-accent--pink {
+    border: 1px solid #b1b4b6;
+    border-top: 5px solid #d53880;
+}
+
+/* Icon color utilities */
+.civicone-icon-green { color: #00703c; }
+.civicone-icon-blue { color: #1d70b8; }
+.civicone-icon-red { color: #d4351c; }
+
+/* Text color - link blue */
+.civicone-text-blue {
+    color: #1d70b8;
+}
+
+/* Text color - red/warning */
+.civicone-text-red {
+    color: #d4351c;
+}
+
+/* Full height card */
+.civicone-height-full {
+    height: 100%;
+}
+
+/* Flex column with grow */
+.civicone-flex-col {
+    display: flex;
+    flex-direction: column;
+}
+
+/* Inline form */
+.civicone-inline {
+    display: inline;
+}
+
+/* Justify end */
+.civicone-justify-end {
+    justify-content: flex-end;
+}
+
+/* Flex row with center */
+.civicone-flex-row-center {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+/* Hero banner - green */
+.civicone-hero-green {
+    background: #00703c;
+    color: white;
+}
+
+/* Hero banner - blue */
+.civicone-hero-blue {
+    background: #1d70b8;
+    color: white;
+}
+
+/* Hero text should be white */
+.civicone-hero-green h1,
+.civicone-hero-green h2,
+.civicone-hero-green h3,
+.civicone-hero-green p,
+.civicone-hero-blue h1,
+.civicone-hero-blue h2,
+.civicone-hero-blue h3,
+.civicone-hero-blue p {
+    color: white;
+}
+
+/* Chat message container */
+.civicone-chat-container {
+    min-height: 400px;
+    max-height: 500px;
+    overflow-y: auto;
+    padding: 20px;
+    border: 1px solid #b1b4b6;
+}
+
+/* Notification item - unread */
+.civicone-notification-item {
+    border: 1px solid #b1b4b6;
+    border-left: 5px solid #b1b4b6;
+}
+
+.civicone-notification-item--unread {
+    border-left-color: #1d70b8;
+}
+
+/* Absolute positioned tag */
+.civicone-tag-positioned {
+    position: absolute;
+    top: 0.5rem;
+    right: 0.5rem;
+}
+
+/* Card with position relative */
+.civicone-card-relative {
+    position: relative;
+}
+
+/* Large icon size */
+.civicone-icon-large {
+    font-size: 3rem;
+}
+
+/* XL icon size */
+.civicone-icon-xl {
+    font-size: 2.5rem;
+}
+
+/* Form buttons compact */
+.civicone-btn-compact {
+    font-size: 14px;
+    padding: 8px 12px;
+}
+
+/* Border with highlight */
+.civicone-border-highlight {
+    border: 2px solid #1d70b8;
+}
+
+/* Avatar sizes */
+.civicone-avatar--48 {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+}
+
+.civicone-avatar--36 {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+}
+
+/* Feed item row */
+.civicone-feed-row {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+}
+
+/* Chat message bubble - user */
+.civicone-chat-bubble-user {
+    background: #d4351c15;
+    border-left: 5px solid #00703c;
+}
+
+/* Chat message bubble - assistant */
+.civicone-chat-bubble-assistant {
+    background: white;
+    border-left: 5px solid #1d70b8;
+}
+
+/* Chat avatar */
+.civicone-chat-avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    color: white;
+}
+
+.civicone-chat-avatar--user {
+    background: #00703c;
+}
+
+.civicone-chat-avatar--assistant {
+    background: #1d70b8;
+}
+
+/* Text truncate */
+.civicone-text-truncate {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* Opacity muted */
+.civicone-text-muted {
+    opacity: 0.7;
+}
+
+/* ==========================================
+   ICON COLORS
+   GOV.UK compliant icon color variants
+   ========================================== */
+
+/* Icon green - GOV.UK green */
+.civicone-icon-green {
+    color: #00703c;
+}
+
+/* Icon blue - GOV.UK link blue */
+.civicone-icon-blue {
+    color: #1d70b8;
+}
+
+/* Icon red - GOV.UK red */
+.civicone-icon-red {
+    color: #d4351c;
+}
+
+/* Icon orange - GOV.UK orange */
+.civicone-icon-orange {
+    color: #f47738;
+}
+
+/* Icon pink - GOV.UK pink */
+.civicone-icon-pink {
+    color: #d53880;
+}
+
+/* ==========================================
+   HEADING COLORS
+   GOV.UK compliant heading color variants
+   ========================================== */
+
+.civicone-heading-green {
+    color: #00703c;
+}
+
+.civicone-heading-blue {
+    color: #1d70b8;
+}
+
+.civicone-heading-red {
+    color: #d4351c;
+}
+
+.civicone-heading-orange {
+    color: #f47738;
+}
+
+.civicone-heading-pink {
+    color: #d53880;
+}
+
+/* ==========================================
+   FLEX CARD UTILITIES
+   Full-height flex containers for equal height cards
+   ========================================== */
+
+.civicone-flex-card {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.civicone-flex-grow {
+    flex-grow: 1;
+}
+
+/* ==========================================
+   TOP ACCENT CARDS
+   Cards with colored top border
+   ========================================== */
+
+.civicone-top-accent--green {
+    border: 1px solid #b1b4b6;
+    border-top: 5px solid #00703c;
+}
+
+.civicone-top-accent--pink {
+    border: 1px solid #b1b4b6;
+    border-top: 5px solid #d53880;
+}
+
+/* ==========================================
+   HERO SECTIONS
+   Full-width colored backgrounds with white text
+   ========================================== */
+
+.civicone-hero-blue {
+    background: #1d70b8;
+    color: white;
+}
+
+.civicone-hero-blue h2,
+.civicone-hero-blue p {
+    color: white;
+}
+
+/* ==========================================
+   TABLE WIDTH UTILITIES
+   Fixed-width columns for summary lists
+   ========================================== */
+
+.civicone-summary-key-narrow {
+    width: 40px;
+}
+
+/* ==========================================
+   BUTTON WIDTH UTILITIES
+   ========================================== */
+
+.civicone-button-full-width {
+    width: 100%;
+}
+
+/* ==========================================
+   AI CHAT COMPONENTS
+   GOV.UK compliant chat interface styles
+   ========================================== */
+
+/* Chat container with scroll */
+.civicone-chat-container {
+    min-height: 400px;
+    max-height: 500px;
+    overflow-y: auto;
+    padding: 20px;
+    border: 1px solid #b1b4b6;
+}
+
+/* Chat header bar */
+.civicone-chat-header {
+    background: #1d70b8;
+    color: white;
+}
+
+.civicone-chat-header h1 {
+    color: white;
+}
+
+/* Chat message wrapper */
+.civicone-chat-message {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+}
+
+/* Conversation item in sidebar */
+.civicone-conversation-item {
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.civicone-conversation-item--active {
+    background: #1d70b8;
+    color: white;
+    border-left: 5px solid #00703c;
+}
+
+.civicone-conversation-item--inactive {
+    background: #f3f2f1;
+    border-left: 5px solid #b1b4b6;
+}
+
+/* Conversation content wrapper */
+.civicone-conversation-content {
+    flex: 1;
+    min-width: 0;
+}
+
+/* Delete button in conversation item */
+.civicone-btn-delete-small {
+    padding: 4px 8px;
+    min-width: 0;
+}
+
+/* Button group with wrap */
+.civicone-button-group-center {
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+/* Footer with flex */
+.civicone-chat-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+/* Provider tag */
+.civicone-tag-provider {
+    background: #00703c;
+}
+
+/* ==========================================
+   SHOP COMPONENTS
+   GOV.UK compliant shop card styles
+   ========================================== */
+
+/* XP Balance card */
+.civicone-xp-balance-card {
+    border: 2px solid #1d70b8;
+    text-align: center;
+}
+
+/* Shop item card */
+.civicone-shop-item {
+    border: 1px solid #b1b4b6;
+    height: 100%;
+    position: relative;
+}
+
+.civicone-shop-item--owned {
+    border-color: #00703c;
+}
+
+/* Shop item price row */
+.civicone-shop-price-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+/* XP price text */
+.civicone-xp-price {
+    color: #1d70b8;
+}
+
+/* ==========================================
+   MODAL COMPONENTS
+   GOV.UK compliant modal styles
+   ========================================== */
+
+/* Modal overlay */
+.civicone-modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+}
+
+/* Modal content */
+.civicone-modal-content {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: white;
+    max-width: 400px;
+    width: 90%;
+}
+
+/* Modal button group centered */
+.civicone-modal-buttons {
+    justify-content: center;
+}
+
+/* ==========================================
+   STAT CARD COMPONENTS
+   GOV.UK compliant stat/balance cards
+   ========================================== */
+
+/* Text align center utility */
+.civicone-text-center {
+    text-align: center;
+}
+
+/* Left border accent variants */
+.civicone-border-left-green {
+    border-left: 5px solid #00703c;
+}
+
+.civicone-border-left-red {
+    border-left: 5px solid #d4351c;
+}
+
+.civicone-border-left-blue {
+    border-left: 5px solid #1d70b8;
+}
+
+.civicone-border-left-orange {
+    border-left: 5px solid #f47738;
+}
+
+.civicone-border-left-purple {
+    border-left: 5px solid #912b88;
+}
+
+.civicone-border-left-grey {
+    border-left: 5px solid #505a5f;
+}
+
+/* Small border variants (3px) */
+.civicone-border-left-green-sm {
+    border-left: 3px solid #00703c;
+}
+
+.civicone-border-left-red-sm {
+    border-left: 3px solid #d4351c;
+}
+
+.civicone-border-left-blue-sm {
+    border-left: 3px solid #1d70b8;
+}
+
+.civicone-border-left-orange-sm {
+    border-left: 3px solid #f47738;
+}
+
+.civicone-border-left-purple-sm {
+    border-left: 3px solid #912b88;
+}
+
+.civicone-border-left-grey-sm {
+    border-left: 3px solid #505a5f;
+}
+
+.civicone-border-left-pink-sm {
+    border-left: 3px solid #d53880;
+}
+
+.civicone-border-left-teal-sm {
+    border-left: 3px solid #28a197;
+}
+
+.civicone-border-left-brown-sm {
+    border-left: 3px solid #b58840;
+}
+
+.civicone-border-left-light-blue-sm {
+    border-left: 3px solid #5694ca;
+}
+
+.civicone-border-left-dark-purple-sm {
+    border-left: 3px solid #4c2c92;
+}
+
+/* Activity border (4px) */
+.civicone-border-left-blue-md {
+    border-left: 4px solid #1d70b8;
+}
+
+/* Chart container height */
+.civicone-chart-container {
+    height: 300px;
+}
+
+/* Streak card centered content */
+.civicone-streak-content {
+    text-align: center;
+    padding: 2rem 0;
+}
+
+/* ==========================================
+   PARTNER LIST COMPONENTS
+   List items with avatars and flex layout
+   ========================================== */
+
+/* Partner list item */
+.civicone-partner-item {
+    background: #f8f8f8;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+/* Flex utility */
+.civicone-flex-1 {
+    flex: 1;
+}
+
+/* ==========================================
+   PROFILE CARD COMPONENTS
+   Avatar + info + tags layout
+   ========================================== */
+
+/* Profile card header */
+.civicone-profile-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+/* Profile avatar - large circular */
+.civicone-profile-avatar {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: #1d70b8;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    flex-shrink: 0;
+}
+
+.civicone-profile-avatar img {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+/* Profile avatar sizes */
+.civicone-profile-avatar--md {
+    width: 40px;
+    height: 40px;
+    font-size: 1rem;
+}
+
+.civicone-profile-avatar--sm {
+    width: 36px;
+    height: 36px;
+    font-size: 0.875rem;
+}
+
+/* ==========================================
+   QUICK ACTION CARDS
+   Card grid actions
+   ========================================== */
+
+.civicone-quick-action {
+    display: block;
+    padding: 1rem;
+    text-align: center;
+    text-decoration: none;
+}
+
+.civicone-quick-action-icon {
+    font-size: 1.5rem;
+    display: block;
+    margin-bottom: 0.5rem;
+}
+
+/* Unread badge positioning */
+.civicone-badge-offset {
+    position: relative;
+    top: -0.5rem;
+}
+
+/* ==========================================
+   ACTIVITY LIST COMPONENTS
+   Timeline-style activity items
+   ========================================== */
+
+.civicone-activity-item {
+    border-left: 4px solid #1d70b8;
+    background: #f8f8f8;
+}
+
+/* ==========================================
+   FEDERATED MEMBER PROFILE
+   Profile page components
+   ========================================== */
+
+/* Profile card container */
+.civicone-profile-card {
+    background: #fff;
+    border: 1px solid #b1b4b6;
+}
+
+/* Profile avatar - extra large */
+.civicone-profile-avatar--xl {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 4px solid #1d70b8;
+}
+
+/* Trust score panel */
+.civicone-trust-panel {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.civicone-trust-score {
+    text-align: center;
+}
+
+/* Review item */
+.civicone-review-item {
+    display: flex;
+    gap: 12px;
+}
+
+.civicone-review-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: #1d70b8;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.civicone-review-avatar img {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.civicone-review-content {
+    flex: 1;
+}
+
+/* Star ratings - orange */
+.civicone-star-filled {
+    color: #f47738;
+}
+
+.civicone-star-empty {
+    color: #b1b4b6;
+}
+
+/* Verified check - green */
+.civicone-verified-check {
+    color: #00703c;
+}
+
+/* ==========================================
+   ORGANIZATION WALLET COMPONENTS
+   Stats, forms, and transaction history
+   ========================================== */
+
+/* Balance status backgrounds */
+.civicone-balance-bg--critical {
+    background: #d4351c15;
+}
+
+.civicone-balance-bg--low {
+    background: #f4773815;
+}
+
+.civicone-balance-bg--healthy {
+    background: #f3f2f1;
+}
+
+/* Balance gauge */
+.civicone-balance-gauge {
+    background: #b1b4b6;
+    height: 8px;
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.civicone-balance-gauge-fill {
+    height: 100%;
+}
+
+.civicone-balance-gauge-fill--critical {
+    background: #d4351c;
+}
+
+.civicone-balance-gauge-fill--low {
+    background: #f47738;
+}
+
+.civicone-balance-gauge-fill--healthy {
+    background: #00703c;
+}
+
+/* Section header bar */
+.civicone-section-header {
+    border-bottom: 1px solid #b1b4b6;
+}
+
+/* Admin header - orange */
+.civicone-section-header--admin {
+    background: #f47738;
+    color: white;
+}
+
+.civicone-section-header--admin h3 {
+    color: white;
+}
+
+/* Transaction item */
+.civicone-transaction-item {
+    border-bottom: 1px solid #f3f2f1;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+/* Transaction icon */
+.civicone-transaction-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.civicone-transaction-icon--deposit {
+    background: #00703c;
+}
+
+.civicone-transaction-icon--withdrawal {
+    background: #d4351c;
+}
+
+/* Transaction content */
+.civicone-transaction-content {
+    flex: 1;
+}
+
+/* Scrollable list container */
+.civicone-scrollable-list {
+    max-height: 500px;
+    overflow-y: auto;
+}
+
+/* Search results dropdown */
+.civicone-search-results {
+    border: 1px solid #b1b4b6;
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+/* Search result item */
+.civicone-search-result-item {
+    padding: 10px;
+    cursor: pointer;
+    border-bottom: 1px solid #f3f2f1;
+}
+
+.civicone-search-result-item:hover {
+    background: #f3f2f1;
+}
+
+/* Text size tiny */
+.civicone-text-tiny {
+    font-size: 12px;
+}
+
+/* ==========================================
+   ORGANIZATION MEMBERS COMPONENTS
+   Member cards and admin panels
+   ========================================== */
+
+/* Member card */
+.civicone-member-card-v2 {
+    background: white;
+    border: 1px solid #b1b4b6;
+}
+
+/* Member card avatar - large */
+.civicone-member-avatar-lg {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    flex-shrink: 0;
+    color: white;
+}
+
+.civicone-member-avatar-lg img {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+/* Member avatar XL - 56px */
+.civicone-member-avatar-xl {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    flex-shrink: 0;
+    color: white;
+}
+
+.civicone-member-avatar-xl img {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+/* Role color backgrounds */
+.civicone-bg-owner {
+    background: #f47738;
+}
+
+.civicone-bg-admin {
+    background: #912b88;
+}
+
+.civicone-bg-member {
+    background: #1d70b8;
+}
+
+/* Member info section */
+.civicone-member-info {
+    flex: 1;
+    min-width: 0;
+}
+
+/* Member actions section */
+.civicone-member-actions {
+    flex-shrink: 0;
+}
+
+/* Pay modal */
+.civicone-pay-modal-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+}
+
+.civicone-pay-modal-content {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: white;
+    width: 90%;
+    max-width: 500px;
+    max-height: 90vh;
+    overflow-y: auto;
+}
+
+.civicone-pay-modal-header {
+    background: #1d70b8;
+    color: white;
+}
+
+.civicone-pay-modal-header h3 {
+    color: white;
+    margin-bottom: 0;
+}
+
+/* Recipient info panel */
+.civicone-recipient-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.civicone-recipient-avatar {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: #1d70b8;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+}
+
+/* ==========================================
+   WALLET COMPONENTS
+   Transfer form and user search
+   ========================================== */
+
+/* Selected user display */
+.civicone-selected-user {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+}
+
+.civicone-selected-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: #1d70b8;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: bold;
+}
+
+.civicone-selected-info {
+    flex: 1;
+}
+
+/* ==========================================
+   HEADING COLOR - PURPLE
+   ========================================== */
+
+.civicone-heading-purple {
+    color: #912b88;
+}
+
+/* ==========================================
+   BUTTON INLINE
+   Inline form button
+   ========================================== */
+
+.civicone-btn-inline {
+    font-size: 14px;
+    padding: 5px 10px;
+}
+
+/* ==========================================
+   MASTER ADMIN - TENANT CONFIGURATION
+   Platform admin components
+   ========================================== */
+
+/* Section card with border */
+.civicone-section-card {
+    border: 1px solid #b1b4b6;
+}
+
+/* Section header with bottom border */
+.civicone-section-card-header {
+    border-bottom: 1px solid #b1b4b6;
+}
+
+/* Section icon badge */
+.civicone-section-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+}
+
+.civicone-section-icon--sm {
+    width: 36px;
+    height: 36px;
+}
+
+.civicone-section-icon--blue { background: #1d70b8; }
+.civicone-section-icon--green { background: #00703c; }
+.civicone-section-icon--red { background: #d4351c; }
+.civicone-section-icon--orange { background: #f47738; }
+.civicone-section-icon--purple { background: #912b88; }
+.civicone-section-icon--pink { background: #d53880; }
+.civicone-section-icon--teal { background: #28a197; }
+.civicone-section-icon--brown { background: #b58840; }
+.civicone-section-icon--grey { background: #b1b4b6; }
+.civicone-section-icon--light-blue { background: #5694ca; }
+.civicone-section-icon--dark-purple { background: #4c2c92; }
+
+/* Header flex layout */
+.civicone-section-header-flex {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.civicone-section-header-flex--between {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+/* Module toggle card */
+.civicone-module-card {
+    display: block;
+    cursor: pointer;
+}
+
+.civicone-module-card-inner {
+    padding: 15px;
+}
+
+.civicone-module-card--active {
+    background: white;
+}
+
+.civicone-module-card--inactive {
+    background: #f3f2f1;
+}
+
+/* URL slug input group */
+.civicone-slug-group {
+    display: flex;
+}
+
+.civicone-slug-prefix {
+    background: white;
+    border: 2px solid #0b0c0c;
+    border-right: none;
+    color: #505a5f;
+    font-family: monospace;
+}
+
+.civicone-slug-input {
+    border-radius: 0;
+}
+
+/* Admin avatar */
+.civicone-admin-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: #00703c;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+}
+
+/* Admin card layout */
+.civicone-admin-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.civicone-admin-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+/* Danger zone background */
+.civicone-danger-zone {
+    background: #d4351c15;
+    border: 2px solid #d4351c;
+}
+
+/* Button full width */
+.civicone-btn-full {
+    width: 100%;
+}
+
+/* Button small inline padding */
+.civicone-btn-xs {
+    padding: 6px 10px;
+}
+
+/* Hidden checkbox (visually) */
+.civicone-checkbox-hidden {
+    position: absolute;
+    opacity: 0;
+}
+
+/* Terminal code block */
+.civicone-terminal {
+    background: #0b0c0c;
+    color: #00ff00;
+    font-family: monospace;
+    font-size: 13px;
+    overflow-x: auto;
+}
+
+.civicone-terminal-comment {
+    color: #6b7280;
+}
+
+/* Code inline style */
+.civicone-code-inline {
+    padding: 2px 6px;
+    border-radius: 3px;
+}
+
+/* Tag small font */
+.civicone-tag-sm {
+    font-size: 12px;
+}
+
+/* Button small */
+.civicone-btn-sm {
+    font-size: 14px;
+    padding: 8px 12px;
+}
+
+/* Gradient backgrounds for icons */
+.civicone-section-icon--gradient-blue-green {
+    background: linear-gradient(135deg, #1d70b8, #00703c);
+}
+
+.civicone-section-icon--gradient-orange-red {
+    background: linear-gradient(135deg, #f47738, #d4351c);
+}
+
+/* Text italic */
+.civicone-text-italic {
+    font-style: italic;
+}
+
+/* ==========================================
+   CERTIFICATE COMPONENTS
+   Volunteering certificate styling
+   ========================================== */
+
+/* Certificate wrapper */
+.civicone-certificate-wrapper {
+    background: white;
+}
+
+/* Certificate content area */
+.civicone-certificate-content {
+    text-align: center;
+    border: 2px solid #1d70b8;
+    margin: 20px;
+}
+
+/* Certificate subtitle */
+.civicone-certificate-subtitle {
+    color: #505a5f;
+    text-transform: uppercase;
+    letter-spacing: 3px;
+}
+
+/* Certificate heading */
+.civicone-certificate-heading {
+    color: #1d70b8;
+}
+
+/* Certificate name underline */
+.civicone-certificate-name {
+    border-bottom: 2px solid #1d70b8;
+    display: inline-block;
+    padding: 0 40px 8px;
+}
+
+/* Certificate hours inline */
+.civicone-certificate-hours {
+    display: inline;
+}
+
+/* Certificate signature line */
+.civicone-certificate-signature {
+    border-top: 1px solid #b1b4b6;
+    padding-top: 8px;
+}
+
+/* ==========================================
+   ORGANIZATION PROFILE COMPONENTS
+   Volunteering organization page styling
+   ========================================== */
+
+/* Organization header card */
+.civicone-org-header {
+    background: white;
+    border: 1px solid #b1b4b6;
+    border-left: 5px solid #00703c;
+}
+
+.civicone-org-header-content {
+    display: flex;
+    align-items: flex-start;
+    gap: 24px;
+    flex-wrap: wrap;
+}
+
+/* Organization logo container */
+.civicone-org-logo {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    overflow: hidden;
+    border: 3px solid #00703c;
+}
+
+.civicone-org-logo img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* Organization info section */
+.civicone-org-info {
+    flex: 1;
+    min-width: 200px;
+}
+
+/* Title row with tags */
+.civicone-org-title-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+/* Meta info row */
+.civicone-org-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+}
+
+/* Opportunity card */
+.civicone-opp-card {
+    background: white;
+    border: 1px solid #b1b4b6;
+    border-left: 5px solid #1d70b8;
+    height: 100%;
+}
+
+.civicone-opp-card-link {
+    text-decoration: none;
+    color: inherit;
+    display: block;
+}
+
+/* Opportunity header with icon */
+.civicone-opp-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 12px;
+}
+
+/* Opportunity icon container */
+.civicone-opp-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Opportunity meta row */
+.civicone-opp-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+/* Inline form */
+.civicone-inline-form {
+    display: inline;
+}
+
+/* ==========================================
+   IMPACT REPORT COMPONENTS
+   Research report styling
+   ========================================== */
+
+/* Sticky sidebar TOC */
+.civicone-sticky-toc {
+    position: sticky;
+    top: 1rem;
+}
+
+/* Report section card */
+.civicone-report-section {
+    border: 1px solid #b1b4b6;
+    border-left: 5px solid #1d70b8;
+}
+
+.civicone-report-section--green {
+    border-left-color: #00703c;
+}
+
+/* SROI highlight section */
+.civicone-sroi-section {
+    background: #1d70b8;
+    color: white;
+}
+
+.civicone-sroi-section h2,
+.civicone-sroi-section h3 {
+    color: white;
+}
+
+.civicone-sroi-section .govuk-body {
+    color: white;
+}
+
+.civicone-sroi-result {
+    background: white;
+    border-radius: 4px;
+}
+
+/* Progress bar container */
+.civicone-progress-bar-row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 4px;
+}
+
+.civicone-progress-bar-track {
+    background: #dee0e2;
+    height: 8px;
+    border-radius: 4px;
+}
+
+.civicone-progress-bar-fill {
+    height: 100%;
+    border-radius: 4px;
+}
+
+.civicone-progress-bar-fill--blue { background: #1d70b8; }
+.civicone-progress-bar-fill--green { background: #00703c; }
+.civicone-progress-bar-fill--pink { background: #d53880; }
+
+/* Case study inset colors */
+.civicone-inset-green {
+    border-left-color: #00703c;
+}
+
+.civicone-inset-blue {
+    border-left-color: #1d70b8;
+}
+
+.civicone-inset-pink {
+    border-left-color: #d53880;
+}
+
+/* ==========================================
+   FEDERATION TRANSACTIONS COMPONENTS
+   Transaction history page styling
+   ========================================== */
+
+/* Stats highlight card (blue bg, white text) */
+.civicone-stat-highlight {
+    background: #1d70b8;
+    color: #fff;
+}
+
+.civicone-stat-highlight .govuk-heading-l,
+.civicone-stat-highlight .govuk-body-s {
+    color: #fff;
+}
+
+/* Stat card with top border */
+.civicone-stat-card-top-border-red {
+    border-top: 4px solid #d4351c;
+}
+
+.civicone-stat-card-top-border-green {
+    border-top: 4px solid #00703c;
+}
+
+.civicone-stat-card-top-border-blue {
+    border-top: 4px solid #1d70b8;
+}
+
+/* Transaction card */
+.civicone-tx-card {
+    background: #fff;
+    border: 1px solid #b1b4b6;
+}
+
+.civicone-tx-card--sent {
+    border-left: 5px solid #d4351c;
+}
+
+.civicone-tx-card--received {
+    border-left: 5px solid #00703c;
+}
+
+/* Transaction card layout */
+.civicone-tx-card-content {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    flex-wrap: wrap;
+}
+
+/* Transaction icon */
+.civicone-tx-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.civicone-tx-icon--sent { background: #d4351c; }
+.civicone-tx-icon--received { background: #00703c; }
+
+/* Transaction details */
+.civicone-tx-details {
+    flex: 1;
+    min-width: 200px;
+}
+
+/* Transaction amount column */
+.civicone-tx-amount {
+    text-align: right;
+}
+
+/* Transaction footer */
+.civicone-tx-footer {
+    width: 100%;
+    border-top: 1px solid #b1b4b6;
+    padding-top: 12px;
+    margin-top: 4px;
+}
+
+/* Review button orange */
+.civicone-btn-orange {
+    background: #f47738;
+}
+
+.civicone-btn-orange:hover {
+    background: #e56d2e;
+}
+
+/* ==========================================
+   DASHBOARD COMPONENTS
+   Dashboard overview page styling
+   ========================================== */
+
+/* Section header with space-between */
+.civicone-section-title-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+/* List item with bottom border separator */
+.civicone-list-item-border {
+    border-bottom: 1px solid #b1b4b6;
+}
+
+/* Activity list item with flex between */
+.civicone-activity-row {
+    display: flex;
+    justify-content: space-between;
+    border-bottom: 1px solid #b1b4b6;
+}
+
+/* Event date badge */
+.civicone-event-date-badge {
+    background: #1d70b8;
+    color: white;
+    padding: 5px 10px;
+    border-radius: 4px;
+    text-align: center;
+    min-width: 50px;
+}
+
+.civicone-event-date-month {
+    font-size: 10px;
+    text-transform: uppercase;
+}
+
+.civicone-event-date-day {
+    font-size: 18px;
+    font-weight: bold;
+}
+
+/* Event link row */
+.civicone-event-link {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+/* Match item with avatar */
+.civicone-match-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+/* Match avatar */
+.civicone-match-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: #b1b4b6;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    overflow: hidden;
+}
+
+.civicone-match-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.civicone-match-avatar-letter {
+    color: white;
+    font-weight: bold;
+}
+
+/* Match info */
+.civicone-match-info {
+    flex-grow: 1;
+    min-width: 0;
+}
+
+/* Match score tag small */
+.civicone-tag-score {
+    font-size: 11px;
+}
+
+/* Text nowrap */
+.civicone-text-nowrap {
+    white-space: nowrap;
+}
+
+/* ==========================================
+   WIZARD/STEPPER COMPONENTS
+   Multi-step form wizard styling
+   ========================================== */
+
+/* Stepper progress bar */
+.civicone-stepper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+/* Step indicator - active */
+.civicone-step-active {
+    background: #1d70b8;
+    color: white;
+    border-radius: 50%;
+    width: 2rem;
+    height: 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+}
+
+/* Step indicator - inactive */
+.civicone-step-inactive {
+    border-radius: 50%;
+    width: 2rem;
+    height: 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Step connector line */
+.civicone-step-line {
+    width: 3rem;
+    height: 2px;
+    background: #b1b4b6;
+}
+
+.civicone-step-line--active {
+    background: #1d70b8;
+}
+
+/* Wizard container */
+.civicone-wizard-container {
+    border: 1px solid #b1b4b6;
+}
+
+/* Wizard centered layout */
+.civicone-wizard-center {
+    margin: 0 auto;
+    float: none;
+}
+
+/* Radio card styles */
+.civicone-radio-card {
+    border: 1px solid #b1b4b6;
+}
+
+.civicone-radio-card--selected {
+    border: 2px solid #1d70b8;
+    background: #f0f4f8;
+}
+
+/* Avatar preview - medium */
+.civicone-avatar-preview {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: #1d70b8;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 1.5rem;
+}
+
+.civicone-avatar-preview img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 50%;
+}
+
+/* Success checkmark circle */
+.civicone-success-circle {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background: #00703c;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+}
+
+/* Icon color - grey/muted */
+.civicone-icon-grey {
+    color: #505a5f;
+}
+
+/* Button group vertical */
+.civicone-button-group-vertical {
+    flex-direction: column;
+    align-items: center;
+}
+
+/* Confetti canvas */
+.civicone-confetti-canvas {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 1000;
+}
+
+/* ==========================================
+   STAT CARD TOP BORDER VARIANTS
+   Cards with colored top accent borders
+   ========================================== */
+
+.civicone-stat-card-top-blue {
+    border: 1px solid #b1b4b6;
+    border-top: 5px solid #1d70b8;
+}
+
+.civicone-stat-card-top-pink {
+    border: 1px solid #b1b4b6;
+    border-top: 5px solid #d53880;
+}
+
+.civicone-stat-card-top-green {
+    border: 1px solid #b1b4b6;
+    border-top: 5px solid #00703c;
+}
+
+.civicone-stat-card-top-orange {
+    border: 1px solid #b1b4b6;
+    border-top: 5px solid #f47738;
+}
+
+/* ==========================================
+   STEP CARD COMPONENTS
+   Numbered step cards with icon circles
+   ========================================== */
+
+/* Step card white background */
+.civicone-step-card {
+    background: white;
+    height: 100%;
+}
+
+/* Step icon circle */
+.civicone-step-icon-circle {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+}
+
+.civicone-step-icon-circle--blue { background: #1d70b8; }
+.civicone-step-icon-circle--pink { background: #d53880; }
+.civicone-step-icon-circle--green { background: #00703c; }
+.civicone-step-icon-circle--orange { background: #f47738; }
+
+/* ==========================================
+   CTA SECTION COMPONENTS
+   Call to action hero sections
+   ========================================== */
+
+/* Blue CTA background */
+.civicone-cta-blue {
+    background: #1d70b8;
+    color: white;
+}
+
+.civicone-cta-blue h2 {
+    color: white;
+}
+
+.civicone-cta-blue .govuk-body-l {
+    color: white;
+}
+
+/* CTA text max width */
+.civicone-cta-text {
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+/* Pink heading color */
+.civicone-heading-pink {
+    color: #d53880;
+}
+
+/* ==========================================
+   NAVIGATION & TABS
+   Flex button group navigation
+   ========================================== */
+
+/* Button nav list */
+.civicone-button-nav {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    padding: 0;
+    margin: 0;
+}
+
+/* ==========================================
+   SEASON/RANK COMPONENTS
+   Leaderboard and season styling
+   ========================================== */
+
+/* Season title row */
+.civicone-season-title-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+/* Season countdown card */
+.civicone-season-countdown {
+    border: 1px solid #b1b4b6;
+    text-align: center;
+}
+
+/* Season section card */
+.civicone-season-card {
+    border: 1px solid #b1b4b6;
+}
+
+/* Rank notification heading */
+.civicone-rank-heading {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+/* Table column width */
+.civicone-table-col-narrow {
+    width: 60px;
+}
+
+/* Medal icons */
+.civicone-medal-gold { color: #f47738; }
+.civicone-medal-silver { color: #b1b4b6; }
+.civicone-medal-bronze { color: #cd7f32; }
+
+/* ==========================================
+   ACTIVITY FEED COMPONENTS
+   Federation activity feed styling
+   ========================================== */
+
+/* Stat card highlight (blue bg, white text) */
+.civicone-stat-blue-bg {
+    background: #1d70b8;
+    color: white;
+}
+
+.civicone-stat-blue-bg .govuk-heading-l,
+.civicone-stat-blue-bg .govuk-body-s {
+    color: white;
+}
+
+/* Activity card base */
+.civicone-activity-card {
+    border: 1px solid #b1b4b6;
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+}
+
+/* Activity card variants by type */
+.civicone-activity-card--blue { border-left: 5px solid #1d70b8; }
+.civicone-activity-card--red { border-left: 5px solid #d4351c; }
+.civicone-activity-card--green { border-left: 5px solid #00703c; }
+
+/* Activity card unread state */
+.civicone-activity-card--unread {
+    background: #f0f4f8;
+}
+
+/* Activity icon circle */
+.civicone-activity-icon-circle {
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.civicone-activity-icon-circle--blue { background: #1d70b815; }
+.civicone-activity-icon-circle--red { background: #d4351c15; }
+.civicone-activity-icon-circle--green { background: #00703c15; }
+
+/* Activity content */
+.civicone-activity-content {
+    flex-grow: 1;
+    min-width: 0;
+}
+
+/* Activity meta */
+.civicone-activity-meta {
+    flex-shrink: 0;
+    text-align: right;
+}
+
+/* Text italic - duplicate from line 2694, keeping for reference */
+
+/* ==========================================
+   ORGANIZATION DIRECTORY CARDS
+   Organization listing card components
+   ========================================== */
+
+/* Organization card */
+.civicone-org-card {
+    background: white;
+    border: 1px solid #b1b4b6;
+    border-left: 5px solid #00703c;
+    height: 100%;
+}
+
+/* Organization card link */
+.civicone-org-card-link {
+    text-decoration: none;
+    color: inherit;
+    display: block;
+}
+
+/* Organization card header */
+.civicone-org-card-header {
+    border-bottom: 1px solid #f3f2f1;
+}
+
+/* Organization card header layout */
+.civicone-org-card-header-content {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+/* Organization logo placeholder */
+.civicone-org-logo-sm {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    overflow: hidden;
+}
+
+.civicone-org-logo-sm img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* Organization title column */
+.civicone-org-card-title {
+    flex: 1;
+    min-width: 0;
+}
+
+/* Stats row */
+.civicone-org-stats-row {
+    display: flex;
+    gap: 20px;
+}
+
+/* ==========================================
+   STRATEGIC PLAN / REPORT PAGE COMPONENTS
+   Used for strategic plan, reports, etc.
+   ========================================== */
+
+/* Sticky sidebar TOC */
+.civicone-sticky-toc {
+    position: sticky;
+    top: 1rem;
+}
+
+/* Inset text border color variants */
+.civicone-inset-blue {
+    border-left-color: #1d70b8;
+}
+
+.civicone-inset-green {
+    border-left-color: #00703c;
+}
+
+/* SWOT card - 4px left border variant */
+.civicone-swot-card-green {
+    border-left: 4px solid #00703c;
+}
+
+.civicone-swot-card-red {
+    border-left: 4px solid #d4351c;
+}
+
+.civicone-swot-card-blue {
+    border-left: 4px solid #1d70b8;
+}
+
+.civicone-swot-card-orange {
+    border-left: 4px solid #f47738;
+}
+
+/* Heading color for orange (missing from standard set) */
+.civicone-heading-orange {
+    color: #f47738;
+}
+
+/* ==========================================
+   HELP PAGE / QUICK LINKS COMPONENTS
+   Used for help pages and quick navigation
+   ========================================== */
+
+/* Quick links horizontal row */
+.civicone-quick-links-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+/* Quick link item - inline block */
+.civicone-quick-link-item {
+    display: inline-block;
+}
+
+/* Link card - no text decoration */
+.civicone-link-card {
+    text-decoration: none;
+}
+
+/* Full height for card containers */
+.civicone-full-height {
+    height: 100%;
+}
+
+/* ==========================================
+   PROFILE PAGE COMPONENTS
+   Used for profile views and social posts
+   ========================================== */
+
+/* Button row - flex with gap */
+.civicone-button-row {
+    display: flex;
+    gap: 10px;
+}
+
+/* Post header layout */
+.civicone-post-header {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+/* Round avatar */
+.civicone-avatar-round {
+    border-radius: 50%;
+}
+
+/* Post image */
+.civicone-post-image {
+    max-width: 100%;
+    margin-bottom: 15px;
+}
+
+/* Post actions bar */
+.civicone-post-actions {
+    display: flex;
+    gap: 15px;
+    margin-top: 15px;
+    padding-top: 15px;
+    border-top: 1px solid #b1b4b6;
+}
+
+/* Small button font size */
+.civicone-btn-sm {
+    font-size: 14px;
+}
+
+/* Comments section */
+.civicone-comments-section {
+    margin-top: 15px;
+}
+
+/* Comment input row */
+.civicone-comment-input-row {
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+/* Growing input */
+.civicone-input-grow {
+    flex-grow: 1;
+}
+
+/* Review header - space between */
+.civicone-review-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
+/* Star rating color */
+.civicone-star-rating {
+    color: #f47738;
+}
+
+/* Toast notification */
+.civicone-toast {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    z-index: 1000;
+}
+
+/* ==========================================
+   VOLUNTEERING / BADGE COMPONENTS
+   Used for volunteer apps, badges, modals
+   ========================================== */
+
+/* Border left color - orange */
+.civicone-border-left-orange {
+    border-left: 5px solid #f47738;
+}
+
+/* Icon grey */
+.civicone-icon-grey {
+    color: #505a5f;
+}
+
+/* Badge card */
+.civicone-badge-card {
+    background: white;
+    border-radius: 4px;
+}
+
+/* Badge icon large */
+.civicone-badge-icon {
+    font-size: 24px;
+}
+
+/* Application card */
+.civicone-application-card {
+    background: white;
+    border: 1px solid #b1b4b6;
+}
+
+/* Modal overlay */
+.civicone-modal-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+}
+
+/* Modal backdrop */
+.civicone-modal-backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+}
+
+/* Modal dialog */
+.civicone-modal-dialog {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: white;
+    width: 90%;
+    max-width: 500px;
+    max-height: 90vh;
+    overflow-y: auto;
+}
+
+/* Modal header - blue */
+.civicone-modal-header-blue {
+    background: #1d70b8;
+    color: white;
+}
+
+/* Modal title */
+.civicone-modal-title {
+    color: white;
+    margin-bottom: 0;
+}
+
+/* ==========================================
+   SOCIAL PRESCRIBING / PATHWAY COMPONENTS
+   Used for pathway steps and CTA sections
+   ========================================== */
+
+/* Card with green left border */
+.civicone-card-border-left-green {
+    border: 1px solid #b1b4b6;
+    border-left: 5px solid #00703c;
+}
+
+/* Text italic */
+.civicone-text-italic {
+    font-style: italic;
+}
+
+/* Pathway step card */
+.civicone-pathway-card {
+    border: 1px solid #b1b4b6;
+    border-top: 5px solid #1d70b8;
+}
+
+/* Step number circle */
+.civicone-step-number {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: #1d70b8;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: bold;
+}
+
+/* CTA heading white */
+.civicone-cta-heading {
+    color: white;
+}
+
+/* CTA text centered with max-width */
+.civicone-cta-text-centered {
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+/* ==========================================
+   TRANSFER REQUESTS / TABLE COMPONENTS
+   Used for organization transfer requests
+   ========================================== */
+
+/* User cell - avatar + name */
+.civicone-user-cell {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* Small avatar */
+.civicone-avatar-sm {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 14px;
+}
+
+/* Avatar colors */
+.civicone-avatar-blue {
+    background: #1d70b8;
+}
+
+.civicone-avatar-green {
+    background: #00703c;
+}
+
+/* Green button */
+.civicone-btn-green {
+    background: #00703c;
+}
+
+.civicone-btn-green:hover {
+    background: #005a30;
+}
+
+/* Inline form */
+.civicone-inline-form {
+    display: inline;
 }

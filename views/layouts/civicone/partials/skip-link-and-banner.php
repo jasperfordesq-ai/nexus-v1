@@ -20,12 +20,14 @@ try {
 
 <?php if ($showLayoutBanner): ?>
     <!-- Phase Banner - GOV.UK Pattern -->
-    <div class="govuk-phase-banner govuk-width-container">
+    <div class="govuk-width-container">
+    <div class="govuk-phase-banner">
         <p class="govuk-phase-banner__content">
             <strong class="govuk-tag govuk-phase-banner__content__tag">Beta</strong>
             <span class="govuk-phase-banner__text">
                 This is a new accessible layout — <a class="govuk-link" href="#" data-layout-switcher="modern">switch to classic view</a> or <a class="govuk-link" href="<?= \Nexus\Core\TenantContext::getBasePath() ?>/help/feedback">give feedback</a>.
             </span>
         </p>
+    </div>
     </div>
 <?php endif; ?>

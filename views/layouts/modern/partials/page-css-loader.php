@@ -16,12 +16,15 @@
 // =============================================================================
 
 $pageSpecificCSS = [
-    // Home page
+    // Home page - Updated Phase 4 CSS Refactoring 2026-01-25
     'home' => [
         'condition' => $isHome,
         'files' => [
-            'post-box-home.min.css',
-            'feed-filter.min.css'
+            'nexus-home.css',
+            'post-box-home.css',
+            'feed-filter.css',
+            'feed-empty-state.css',
+            'sidebar.css'
         ]
     ],
 
@@ -29,7 +32,7 @@ $pageSpecificCSS = [
     'dashboard' => [
         'condition' => strpos($normPath, '/dashboard') !== false,
         'files' => [
-            'dashboard.min.css',
+            'dashboard.css',
             'modern-dashboard.css'
         ]
     ],
@@ -43,187 +46,187 @@ $pageSpecificCSS = [
     // Auth pages (login, register, password)
     'auth' => [
         'condition' => preg_match('/\/(login|register|password)/', $normPath),
-        'files' => ['auth.min.css']
+        'files' => ['auth.css']
     ],
 
     // Feed/Post/Profile pages - post cards
     'post-cards' => [
         'condition' => $isHome || strpos($normPath, '/feed') !== false || strpos($normPath, '/profile') !== false || strpos($normPath, '/post') !== false,
         'files' => [
-            'post-card.min.css',
-            'feed-item.min.css'
+            'post-card.css',
+            'feed-item.css'
         ]
     ],
 
     // Feed page
     'feed' => [
         'condition' => strpos($normPath, '/feed') !== false,
-        'files' => ['feed-page.min.css']
+        'files' => ['feed-page.css']
     ],
 
     // Feed/Post show (single item view)
     'feed-show' => [
         'condition' => preg_match('/\/feed\/\d+$/', $normPath) || preg_match('/\/post\/\d+$/', $normPath),
-        'files' => ['feed-show.min.css']
+        'files' => ['feed-show.css']
     ],
 
     // Profile edit
     'profile-edit' => [
         'condition' => strpos($normPath, '/profile/edit') !== false,
-        'files' => ['profile-edit.min.css']
+        'files' => ['profile-edit.css']
     ],
 
     // Messages
     'messages' => [
         'condition' => strpos($normPath, '/messages') !== false,
-        'files' => ['messages-index.min.css']
+        'files' => ['messages-index.css']
     ],
 
     // Messages thread (detail view)
     'messages-thread' => [
         'condition' => preg_match('#/messages/(\d+|thread/)#', $normPath),
-        'files' => ['messages-thread.min.css']
+        'files' => ['messages-thread.css']
     ],
 
     // Notifications
     'notifications' => [
         'condition' => strpos($normPath, '/notifications') !== false,
-        'files' => ['notifications.min.css']
+        'files' => ['notifications.css']
     ],
 
     // Groups index/show
     'groups-show' => [
         'condition' => ($normPath === '/groups' || preg_match('/\/groups$/', $normPath)) || preg_match('/\/groups\/\d+$/', $normPath),
         'files' => [
-            'groups-show.min.css',
-            'modern-groups-show.min.css'
+            'groups-show.css',
+            'modern-groups-show.css'
         ]
     ],
 
     // Events index
     'events-index' => [
         'condition' => $normPath === '/events' || preg_match('/\/events$/', $normPath),
-        'files' => ['events-index.min.css']
+        'files' => ['events-index.css']
     ],
 
     // Events calendar
     'events-calendar' => [
         'condition' => strpos($normPath, '/events/calendar') !== false,
-        'files' => ['events-calendar.min.css']
+        'files' => ['events-calendar.css']
     ],
 
     // Events create
     'events-create' => [
         'condition' => strpos($normPath, '/events/create') !== false,
-        'files' => ['events-create.min.css']
+        'files' => ['events-create.css']
     ],
 
     // Events show (detail view)
     'events-show' => [
         'condition' => preg_match('/\/events\/\d+$/', $normPath),
         'files' => [
-            'events-show.min.css',
-            'modern-events-show.min.css'
+            'events-show.css',
+            'modern-events-show.css'
         ]
     ],
 
     // Blog/News index
     'blog-index' => [
         'condition' => $normPath === '/news' || $normPath === '/blog' || preg_match('/\/(news|blog)$/', $normPath),
-        'files' => ['blog-index.min.css']
+        'files' => ['blog-index.css']
     ],
 
     // Blog/News show (detail view)
     'blog-show' => [
         'condition' => preg_match('/\/(news|blog)\/[^\/]+$/', $normPath) && !preg_match('/\/(news|blog)\/(create|edit)/', $normPath),
-        'files' => ['blog-show.min.css']
+        'files' => ['blog-show.css']
     ],
 
     // Listings index
     'listings-index' => [
         'condition' => $normPath === '/listings' || preg_match('/\/listings$/', $normPath),
-        'files' => ['listings-index.min.css']
+        'files' => ['listings-index.css']
     ],
 
     // Listings create
     'listings-create' => [
         'condition' => strpos($normPath, '/listings/create') !== false,
-        'files' => ['listings-create.min.css']
+        'files' => ['listings-create.css']
     ],
 
     // Listings show (detail view)
     'listings-show' => [
         'condition' => preg_match('/\/listings\/\d+$/', $normPath),
-        'files' => ['listings-show.min.css']
+        'files' => ['listings-show.css']
     ],
 
     // Federation/Transactions
     'federation' => [
         'condition' => strpos($normPath, '/federation') !== false || strpos($normPath, '/transactions') !== false,
-        'files' => ['federation.min.css']
+        'files' => ['federation.css']
     ],
 
     // Volunteering
     'volunteering' => [
         'condition' => strpos($normPath, '/volunteering') !== false,
         'files' => [
-            'volunteering.min.css',
-            'modern-volunteering-show.min.css'
+            'volunteering.css',
+            'modern-volunteering-show.css'
         ]
     ],
 
     // Groups (all routes)
     'groups-all' => [
         'condition' => strpos($normPath, '/groups') !== false || strpos($normPath, '/edit-group') !== false,
-        'files' => ['groups.min.css']
+        'files' => ['groups.css']
     ],
 
     // Goals
     'goals' => [
         'condition' => strpos($normPath, '/goals') !== false,
-        'files' => ['goals.min.css']
+        'files' => ['goals.css']
     ],
 
     // Polls
     'polls' => [
         'condition' => strpos($normPath, '/polls') !== false,
-        'files' => ['polls.min.css']
+        'files' => ['polls.css']
     ],
 
     // Resources
     'resources' => [
         'condition' => strpos($normPath, '/resources') !== false,
-        'files' => ['resources.min.css']
+        'files' => ['resources.css']
     ],
 
     // Matches
     'matches' => [
         'condition' => strpos($normPath, '/matches') !== false,
-        'files' => ['matches.min.css']
+        'files' => ['matches.css']
     ],
 
     // Organizations
     'organizations' => [
         'condition' => strpos($normPath, '/organizations') !== false,
-        'files' => ['organizations.min.css']
+        'files' => ['organizations.css']
     ],
 
     // Help
     'help' => [
         'condition' => strpos($normPath, '/help') !== false,
-        'files' => ['help.min.css']
+        'files' => ['help.css']
     ],
 
     // Wallet
     'wallet' => [
         'condition' => strpos($normPath, '/wallet') !== false,
-        'files' => ['wallet.min.css']
+        'files' => ['wallet.css']
     ],
 
     // Static pages
     'static-pages' => [
         'condition' => preg_match('/\/(about|accessibility|contact|how-it-works|legal|mobile-about|partner|privacy|terms|timebanking-guide)/', $normPath),
-        'files' => ['static-pages.min.css']
+        'files' => ['static-pages.css']
     ],
 
     // Scattered singles (ai, connections, leaderboard, members, etc.)
@@ -231,7 +234,7 @@ $pageSpecificCSS = [
         'condition' => preg_match('/\/(ai|connections|forgot-password|leaderboard|volunteer-license|members|onboarding|nexus-impact-report|reviews|search|settings|master)/', $normPath)
                        || (strpos($normPath, '/events') !== false && strpos($normPath, 'edit') !== false)
                        || (strpos($normPath, '/listings') !== false && strpos($normPath, 'edit') !== false),
-        'files' => ['scattered-singles.min.css']
+        'files' => ['scattered-singles.css']
     ],
 
     // Settings
@@ -250,6 +253,27 @@ $pageSpecificCSS = [
     'terms' => [
         'condition' => strpos($normPath, '/terms') !== false,
         'files' => ['terms-page.css']
+    ],
+
+    // Achievements (all pages) - Added Phase 4 CSS Refactoring 2026-01-25
+    'achievements' => [
+        'condition' => strpos($normPath, '/achievements') !== false,
+        'files' => ['achievements.css']
+    ],
+
+    // Profile show (detail view) - Added Phase 4 CSS Refactoring 2026-01-25
+    'profile-show' => [
+        'condition' => preg_match('/\/profile\/[^\/]+$/', $normPath) && strpos($normPath, '/edit') === false,
+        'files' => [
+            'profile-holographic.css',
+            'modern-profile-show.css'
+        ]
+    ],
+
+    // Groups index - Added Phase 4 CSS Refactoring 2026-01-25
+    'groups-index' => [
+        'condition' => $normPath === '/groups' || preg_match('/\/groups$/', $normPath),
+        'files' => ['nexus-groups.css']
     ]
 ];
 

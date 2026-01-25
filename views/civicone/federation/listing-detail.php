@@ -61,7 +61,7 @@ $typeColor = $type === 'offer' ? '#00703c' : '#1d70b8';
 
                     <?php if (!empty($listing['category_name'])): ?>
                         <p class="govuk-body govuk-!-margin-bottom-6">
-                            <span class="govuk-tag govuk-tag--blue">
+                            <span class="govuk-tag govuk-tag--light-blue">
                                 <i class="fa-solid fa-tag govuk-!-margin-right-1" aria-hidden="true"></i>
                                 <?= htmlspecialchars($listing['category_name']) ?>
                             </span>

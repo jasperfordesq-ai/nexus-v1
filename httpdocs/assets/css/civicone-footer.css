@@ -173,3 +173,27 @@
         display: none !important;
     }
 }
+
+/* ==========================================================================
+   GOV.UK Footer Extensions
+   CivicOne-specific classes for GOV.UK footer pattern
+   Source: site-footer.php uses govuk-footer component
+   ========================================================================== */
+
+/**
+ * Footer secondary text color
+ * GOV.UK uses #b1b4b6 (govuk-colour("mid-grey")) for footer secondary text
+ * Source: https://github.com/alphagov/govuk-frontend - govuk/components/footer
+ */
+.civicone-footer-text {
+    color: #b1b4b6;
+}
+
+/**
+ * Footer meta text (copyright line)
+ * Inherits color and removes default margin
+ */
+.civicone-footer-meta {
+    color: #b1b4b6;
+    margin-bottom: 0;
+}

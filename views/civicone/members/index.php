@@ -178,13 +178,13 @@ function render_member_list_item($mem)
     $displayName = htmlspecialchars($mem['display_name'] ?? $mem['name'] ?? $mem['username'] ?? 'Member');
     $location = !empty($mem['location']) ? htmlspecialchars($mem['location']) : null;
 ?>
-    <li class="govuk-!-margin-bottom-4 govuk-!-padding-bottom-4" style="border-bottom: 1px solid #b1b4b6; display: flex; align-items: center; gap: 1rem;">
-        <div style="flex-shrink: 0;">
+    <li class="govuk-!-margin-bottom-4 govuk-!-padding-bottom-4 civicone-listing-item civicone-card-row civicone-card-row--centered">
+        <div class="civicone-card-row__media">
             <?php if ($hasAvatar): ?>
-                <img src="<?= htmlspecialchars($mem['avatar_url']) ?>" alt="" width="48" height="48" style="border-radius: 50%;">
+                <img src="<?= htmlspecialchars($mem['avatar_url']) ?>" alt="" width="48" height="48" class="civicone-avatar civicone-avatar--48">
             <?php else: ?>
-                <div class="civicone-panel-bg" style="width: 48px; height: 48px; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#505a5f" stroke-width="1.5" aria-hidden="true">
+                <div class="civicone-avatar-placeholder civicone-avatar-placeholder--48">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
                         <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
                         <circle cx="12" cy="7" r="4"></circle>
                     </svg>
@@ -192,7 +192,7 @@ function render_member_list_item($mem)
             <?php endif; ?>
         </div>
 
-        <div style="flex-grow: 1;">
+        <div class="civicone-card-row__content">
             <h3 class="govuk-heading-s govuk-!-margin-bottom-1">
                 <a href="<?= $basePath ?>/profile/<?= $mem['id'] ?>" class="govuk-link">
                     <?= $displayName ?>
@@ -202,13 +202,13 @@ function render_member_list_item($mem)
                 <?php endif; ?>
             </h3>
             <?php if ($location): ?>
-                <p class="govuk-body-s govuk-!-margin-bottom-0" style="color: #505a5f;">
+                <p class="govuk-body-s govuk-!-margin-bottom-0 civicone-secondary-text">
                     <?= $location ?>
                 </p>
             <?php endif; ?>
         </div>
 
-        <div style="flex-shrink: 0;">
+        <div class="civicone-card-row__actions">
             <a href="<?= $basePath ?>/profile/<?= $mem['id'] ?>" class="govuk-button govuk-button--secondary govuk-!-margin-bottom-0">
                 View profile
             </a>

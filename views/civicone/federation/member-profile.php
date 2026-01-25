@@ -65,14 +65,13 @@ switch ($member['service_reach'] ?? 'local_only') {
         <div class="govuk-grid-row">
             <div class="govuk-grid-column-two-thirds">
                 <!-- Profile Card -->
-                <div class="govuk-!-padding-6" style="background: #fff; border: 1px solid #b1b4b6;">
+                <div class="govuk-!-padding-6 civicone-profile-card">
                     <!-- Header -->
                     <div class="govuk-!-text-align-center govuk-!-margin-bottom-6">
                         <img src="<?= htmlspecialchars($avatarUrl) ?>"
                              onerror="this.onerror=null; this.src='<?= $fallbackUrl ?>'"
                              alt="<?= htmlspecialchars($memberName) ?>"
-                             style="width: 120px; height: 120px; border-radius: 50%; object-fit: cover; border: 4px solid #1d70b8;"
-                             class="govuk-!-margin-bottom-4">
+                             class="govuk-!-margin-bottom-4 civicone-profile-avatar--xl">
 
                         <h1 class="govuk-heading-xl govuk-!-margin-bottom-2"><?= htmlspecialchars($memberName) ?></h1>
 
@@ -92,7 +91,7 @@ switch ($member['service_reach'] ?? 'local_only') {
                     <!-- About -->
                     <?php if (!empty($member['bio'])): ?>
                         <h2 class="govuk-heading-m">
-                            <i class="fa-solid fa-user govuk-!-margin-right-2" style="color: #505a5f;" aria-hidden="true"></i>
+                            <i class="fa-solid fa-user govuk-!-margin-right-2 civicone-secondary-text" aria-hidden="true"></i>
                             About
                         </h2>
                         <p class="govuk-body govuk-!-margin-bottom-6">
@@ -103,11 +102,11 @@ switch ($member['service_reach'] ?? 'local_only') {
                     <!-- Location -->
                     <?php if (!empty($member['location'])): ?>
                         <h2 class="govuk-heading-m">
-                            <i class="fa-solid fa-location-dot govuk-!-margin-right-2" style="color: #505a5f;" aria-hidden="true"></i>
+                            <i class="fa-solid fa-location-dot govuk-!-margin-right-2 civicone-secondary-text" aria-hidden="true"></i>
                             Location
                         </h2>
                         <p class="govuk-body govuk-!-margin-bottom-6">
-                            <i class="fa-solid fa-map-marker-alt govuk-!-margin-right-1" style="color: #1d70b8;" aria-hidden="true"></i>
+                            <i class="fa-solid fa-map-marker-alt govuk-!-margin-right-1 civicone-icon-blue" aria-hidden="true"></i>
                             <?= htmlspecialchars($member['location']) ?>
                         </p>
                     <?php endif; ?>
@@ -115,7 +114,7 @@ switch ($member['service_reach'] ?? 'local_only') {
                     <!-- Skills -->
                     <?php if (!empty($member['skills'])): ?>
                         <h2 class="govuk-heading-m">
-                            <i class="fa-solid fa-star govuk-!-margin-right-2" style="color: #505a5f;" aria-hidden="true"></i>
+                            <i class="fa-solid fa-star govuk-!-margin-right-2 civicone-secondary-text" aria-hidden="true"></i>
                             Skills & Services
                         </h2>
                         <div class="govuk-!-margin-bottom-6" role="list" aria-label="Skills">
@@ -126,7 +125,7 @@ switch ($member['service_reach'] ?? 'local_only') {
                             foreach ($skills as $skill):
                                 if (trim($skill)):
                             ?>
-                                <span class="govuk-tag govuk-tag--blue govuk-!-margin-right-1 govuk-!-margin-bottom-1" role="listitem">
+                                <span class="govuk-tag govuk-tag--light-blue govuk-!-margin-right-1 govuk-!-margin-bottom-1" role="listitem">
                                     <?= htmlspecialchars(trim($skill)) ?>
                                 </span>
                             <?php
@@ -138,17 +137,17 @@ switch ($member['service_reach'] ?? 'local_only') {
 
                     <!-- Trust Score -->
                     <?php if ($trustScore['score'] > 0): ?>
-                        <div class="govuk-!-padding-4 govuk-!-margin-bottom-6 civicone-panel-bg" style="border-left: 5px solid #00703c;">
-                            <div style="display: flex; align-items: center; gap: 16px;">
-                                <div style="text-align: center;">
-                                    <p class="govuk-heading-xl govuk-!-margin-bottom-0" style="color: #00703c;">
+                        <div class="govuk-!-padding-4 govuk-!-margin-bottom-6 civicone-panel-bg civicone-border-left-green">
+                            <div class="civicone-trust-panel">
+                                <div class="civicone-trust-score">
+                                    <p class="govuk-heading-xl govuk-!-margin-bottom-0 civicone-heading-green">
                                         <?= $trustScore['score'] ?>
                                     </p>
-                                    <p class="govuk-body-s govuk-!-margin-bottom-0" style="color: #505a5f;">/100</p>
+                                    <p class="govuk-body-s govuk-!-margin-bottom-0 civicone-secondary-text">/100</p>
                                 </div>
                                 <div>
                                     <p class="govuk-body-l govuk-!-font-weight-bold govuk-!-margin-bottom-1">Trust Score</p>
-                                    <p class="govuk-body govuk-!-margin-bottom-2" style="color: #00703c;">
+                                    <p class="govuk-body govuk-!-margin-bottom-2 civicone-text-success">
                                         <?php
                                         $levelLabels = [
                                             'excellent' => 'Excellent Member',
@@ -160,7 +159,7 @@ switch ($member['service_reach'] ?? 'local_only') {
                                         echo $levelLabels[$trustScore['level']] ?? 'Member';
                                         ?>
                                     </p>
-                                    <p class="govuk-body-s govuk-!-margin-bottom-0" style="color: #505a5f;">
+                                    <p class="govuk-body-s govuk-!-margin-bottom-0 civicone-secondary-text">
                                         <?php if (!empty($trustScore['details']['review_count'])): ?>
                                             <i class="fa-solid fa-star govuk-!-margin-right-1" aria-hidden="true"></i>
                                             <?= $trustScore['details']['review_count'] ?> reviews
@@ -186,12 +185,12 @@ switch ($member['service_reach'] ?? 'local_only') {
                     <!-- Reviews Section -->
                     <?php if ($reviewStats && $reviewStats['total'] > 0): ?>
                         <h2 class="govuk-heading-m">
-                            <i class="fa-solid fa-comments govuk-!-margin-right-2" style="color: #505a5f;" aria-hidden="true"></i>
+                            <i class="fa-solid fa-comments govuk-!-margin-right-2 civicone-secondary-text" aria-hidden="true"></i>
                             Reviews
-                            <span class="govuk-tag govuk-tag--blue govuk-!-margin-left-2">
+                            <span class="govuk-tag govuk-tag--light-blue govuk-!-margin-left-2">
                                 <?= number_format($reviewStats['average'], 1) ?> / 5
                             </span>
-                            <span class="govuk-body-s govuk-!-margin-left-2" style="color: #505a5f;">
+                            <span class="govuk-body-s govuk-!-margin-left-2 civicone-secondary-text">
                                 (<?= $reviewStats['total'] ?> review<?= $reviewStats['total'] !== 1 ? 's' : '' ?>)
                             </span>
                         </h2>
@@ -199,38 +198,38 @@ switch ($member['service_reach'] ?? 'local_only') {
                         <div role="list" aria-label="User reviews">
                             <?php foreach ($reviews as $review): ?>
                             <article class="govuk-!-padding-4 govuk-!-margin-bottom-4 civicone-panel-bg" role="listitem">
-                                <div style="display: flex; gap: 12px;">
-                                    <div style="width: 40px; height: 40px; border-radius: 50%; background: #1d70b8; color: #fff; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                                <div class="civicone-review-item">
+                                    <div class="civicone-review-avatar">
                                         <?php if (!empty($review['reviewer_avatar'])): ?>
-                                            <img src="<?= htmlspecialchars($review['reviewer_avatar']) ?>" alt="" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;" loading="lazy">
+                                            <img src="<?= htmlspecialchars($review['reviewer_avatar']) ?>" alt="" loading="lazy">
                                         <?php else: ?>
                                             <?= strtoupper(substr($review['reviewer_name'], 0, 1)) ?>
                                         <?php endif; ?>
                                     </div>
-                                    <div style="flex: 1;">
+                                    <div class="civicone-review-content">
                                         <p class="govuk-body govuk-!-font-weight-bold govuk-!-margin-bottom-1">
                                             <?= htmlspecialchars($review['reviewer_name']) ?>
                                             <?php if ($review['is_cross_tenant']): ?>
-                                                <span class="govuk-tag govuk-tag--grey" style="font-size: 12px;">
+                                                <span class="govuk-tag govuk-tag--grey civicone-text-tiny">
                                                     <i class="fa-solid fa-globe" aria-hidden="true"></i>
                                                     <?= htmlspecialchars($review['reviewer_timebank'] ?? 'Partner') ?>
                                                 </span>
                                             <?php endif; ?>
                                         </p>
-                                        <p class="govuk-body-s govuk-!-margin-bottom-2" style="color: #f47738;">
+                                        <p class="govuk-body-s govuk-!-margin-bottom-2">
                                             <?php for ($i = 1; $i <= 5; $i++): ?>
-                                                <i class="fa-solid fa-star<?= $i > $review['rating'] ? '' : '' ?>" style="color: <?= $i > $review['rating'] ? '#b1b4b6' : '#f47738' ?>;" aria-hidden="true"></i>
+                                                <i class="fa-solid fa-star <?= $i > $review['rating'] ? 'civicone-star-empty' : 'civicone-star-filled' ?>" aria-hidden="true"></i>
                                             <?php endfor; ?>
                                         </p>
                                         <?php if (!empty($review['comment'])): ?>
                                             <p class="govuk-body govuk-!-margin-bottom-2"><?= htmlspecialchars($review['comment']) ?></p>
                                         <?php endif; ?>
-                                        <p class="govuk-body-s govuk-!-margin-bottom-0" style="color: #505a5f;">
+                                        <p class="govuk-body-s govuk-!-margin-bottom-0 civicone-secondary-text">
                                             <i class="fa-regular fa-clock govuk-!-margin-right-1" aria-hidden="true"></i>
                                             <?= htmlspecialchars($review['time_ago']) ?>
                                             <?php if ($review['has_transaction']): ?>
                                                 <span class="govuk-!-margin-left-2">
-                                                    <i class="fa-solid fa-check-circle" style="color: #00703c;" aria-hidden="true"></i>
+                                                    <i class="fa-solid fa-check-circle civicone-verified-check" aria-hidden="true"></i>
                                                     Verified exchange
                                                 </span>
                                             <?php endif; ?>
@@ -242,9 +241,9 @@ switch ($member['service_reach'] ?? 'local_only') {
                         </div>
                     <?php elseif (!$reviewStats || $reviewStats['total'] === 0): ?>
                         <div class="govuk-!-padding-6 govuk-!-text-align-center govuk-!-margin-bottom-6 civicone-panel-bg">
-                            <i class="fa-regular fa-comments fa-2x govuk-!-margin-bottom-2" style="color: #505a5f;" aria-hidden="true"></i>
+                            <i class="fa-regular fa-comments fa-2x govuk-!-margin-bottom-2 civicone-secondary-text" aria-hidden="true"></i>
                             <p class="govuk-body govuk-!-margin-bottom-1">No reviews yet</p>
-                            <p class="govuk-body-s govuk-!-margin-bottom-0" style="color: #505a5f;">
+                            <p class="govuk-body-s govuk-!-margin-bottom-0 civicone-secondary-text">
                                 Be the first to leave a review after an exchange!
                             </p>
                         </div>
@@ -288,7 +287,7 @@ switch ($member['service_reach'] ?? 'local_only') {
                 <!-- Privacy Notice -->
                 <div class="govuk-inset-text govuk-!-margin-top-6">
                     <p class="govuk-body govuk-!-margin-bottom-0">
-                        <i class="fa-solid fa-shield-halved govuk-!-margin-right-2" style="color: #1d70b8;" aria-hidden="true"></i>
+                        <i class="fa-solid fa-shield-halved govuk-!-margin-right-2 civicone-icon-blue" aria-hidden="true"></i>
                         <strong>Federated Profile</strong> — This member is from <strong><?= htmlspecialchars($member['tenant_name'] ?? 'a partner timebank') ?></strong>.
                         Only information they've chosen to share with federated partners is displayed here.
                     </p>

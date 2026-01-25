@@ -67,21 +67,21 @@
     <!-- Stylesheets - Critical CSS loaded first for fastest paint -->
     <!-- Updated 2026-01-17: Using minified versions with dynamic cache busting -->
     <?php $cssVersion = time(); ?>
-    <link rel="stylesheet" href="/assets/css/nexus-phoenix.min.css?v=<?= $cssVersion ?>">
+    <link rel="stylesheet" href="/assets/css/nexus-phoenix.css?v=<?= $cssVersion ?>">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;600;700;800&family=Outfit:wght@400;500;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="/assets/css/nexus-mobile.min.css?v=<?= $cssVersion ?>">
-    <link rel="stylesheet" href="/assets/css/nexus-native-nav-v2.min.css?v=<?= $cssVersion ?>">
-    <link rel="stylesheet" href="/assets/css/nexus-polish.min.css?v=<?= $cssVersion ?>">
-    <link rel="stylesheet" href="/assets/css/nexus-interactions.min.css?v=<?= $cssVersion ?>">
+    <link rel="stylesheet" href="/assets/css/nexus-mobile.css?v=<?= $cssVersion ?>">
+    <link rel="stylesheet" href="/assets/css/nexus-native-nav-v2.css?v=<?= $cssVersion ?>">
+    <link rel="stylesheet" href="/assets/css/nexus-polish.css?v=<?= $cssVersion ?>">
+    <link rel="stylesheet" href="/assets/css/nexus-interactions.css?v=<?= $cssVersion ?>">
     <!-- Visual Polish Enhancements (loading states, micro-interactions, modals) -->
-    <link rel="stylesheet" href="/assets/css/loading-skeletons.min.css?v=<?= $cssVersion ?>">
-    <link rel="stylesheet" href="/assets/css/micro-interactions.min.css?v=<?= $cssVersion ?>">
-    <link rel="stylesheet" href="/assets/css/modal-polish.min.css?v=<?= $cssVersion ?>">
-    <link rel="stylesheet" href="/assets/css/nexus-shared-transitions.min.css?v=<?= $cssVersion ?>">
-    <link rel="stylesheet" href="/assets/css/post-box-home.min.css?v=<?= $cssVersion ?>">
+    <link rel="stylesheet" href="/assets/css/loading-skeletons.css?v=<?= $cssVersion ?>">
+    <link rel="stylesheet" href="/assets/css/micro-interactions.css?v=<?= $cssVersion ?>">
+    <link rel="stylesheet" href="/assets/css/modal-polish.css?v=<?= $cssVersion ?>">
+    <link rel="stylesheet" href="/assets/css/nexus-shared-transitions.css?v=<?= $cssVersion ?>">
+    <link rel="stylesheet" href="/assets/css/post-box-home.css?v=<?= $cssVersion ?>">
 
     <?php if (file_exists(__DIR__ . '/inline-styles.php')) require __DIR__ . '/inline-styles.php'; ?>
 

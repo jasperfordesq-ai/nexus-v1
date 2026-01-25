@@ -10,6 +10,10 @@
     });
 </script>
 
+<!-- CivicOne Header v2 JavaScript (Complete Rebuild - 2026-01-25) -->
+<!-- Replaces: inline scripts from utility-bar.php, service-navigation.php, header-scripts.php -->
+<script src="/assets/js/civicone-header-v2.js"></script>
+
 <!-- Nexus UI & Maps -->
 <!-- Mapbox: Lazy load only when needed (no preload - conditionally loaded) -->
 <script>
@@ -62,7 +66,11 @@ if (empty($mapboxToken) && class_exists('Nexus\Core\TenantContext')) {
         }
     }
 }
-$jsVersion = '2.5.13';
+// Use deployment version for cache busting (same as CSS)
+$deploymentVersion = file_exists(__DIR__ . '/../../../../config/deployment-version.php')
+    ? require __DIR__ . '/../../../../config/deployment-version.php'
+    : ['version' => time()];
+$jsVersion = $deploymentVersion['version'] ?? time();
 
 // Get VAPID public key for Web Push notifications
 $vapidPublicKey = '';
@@ -161,7 +169,7 @@ if (file_exists($envPath)) {
 <!-- Native features for PWA/mobile -->
 <script src="/assets/js/nexus-native-push.min.js?v=<?= $jsVersion ?>" defer></script>
 <script src="/assets/js/nexus-native-features.min.js?v=<?= $jsVersion ?>" defer></script>
-<script src="/assets/js/nexus-biometric.min.js?v=2.5.0" defer></script>
+<script src="/assets/js/nexus-biometric.min.js?v=<?= $jsVersion ?>" defer></script>
 <script src="/assets/js/mobile-select-sheet.js?v=<?= $jsVersion ?>" defer></script>
 <script src="/assets/js/mobile-search-overlay.js?v=<?= $jsVersion ?>" defer></script>
 
@@ -246,13 +254,13 @@ if (file_exists($envPath)) {
 <?php include __DIR__ . '/ai-chat-widget.php'; ?>
 
 <!-- Loading Fix Script - defer to avoid render blocking -->
-<script src="/assets/js/nexus-loading-fix.min.js?v=2.5.0" defer></script>
+<script src="/assets/js/nexus-loading-fix.min.js?v=<?= $jsVersion ?>" defer></script>
 
 <!-- Resize Handler (Prevents animation jank during resize) - defer to avoid render blocking -->
-<script src="/assets/js/nexus-resize-handler.min.js?v=2.5.0" defer></script>
+<script src="/assets/js/nexus-resize-handler.min.js?v=<?= $jsVersion ?>" defer></script>
 
 <!-- Visual Enhancements & Micro-Interactions -->
-<script src="/assets/js/nexus-transitions.min.js?v=2.5.0" defer></script>
+<script src="/assets/js/nexus-transitions.min.js?v=<?= $jsVersion ?>" defer></script>
 
 <!-- Flash Message Toast Handler -->
 <?php if (!empty($_SESSION['flash_message'])): ?>
@@ -289,3 +297,6 @@ if (file_exists($envPath)) {
     </script>
     <?php unset($_SESSION['_cleanup_refresh_param']); ?>
 <?php endif; ?>
+
+<!-- Development Notice Modal (Preview Mode Alert) -->
+<script src="/assets/js/dev-notice-modal.min.js?v=<?= $jsVersion ?>"></script>

@@ -7,11 +7,7 @@ $hideHero = true; // Use Glassmorphism design without hero
 Nexus\Core\SEO::setTitle('Community Hubs - Connect with Local Groups');
 Nexus\Core\SEO::setDescription('Discover and join local community hubs. Connect with neighbors, share resources, and build stronger communities together.');
 
-// Add groups CSS to header with preload hint for faster loading
-$cssVersion = time();
-$additionalCSS = '
-<link rel="preload" href="/assets/css/nexus-groups.min.css?v=' . $cssVersion . '" as="style">
-<link rel="stylesheet" href="/assets/css/nexus-groups.min.css?v=' . $cssVersion . '">';
+// CSS now loaded via centralized page-css-loader.php (Phase 4 CSS Refactoring)
 
 require __DIR__ . '/../../layouts/modern/header.php';
 ?>

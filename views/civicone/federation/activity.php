@@ -59,33 +59,33 @@ $userOptedIn = $userOptedIn ?? false;
     <?php if ($userOptedIn && !empty($stats)): ?>
     <div class="govuk-grid-row govuk-!-margin-bottom-6">
         <div class="govuk-grid-column-one-fifth">
-            <div class="govuk-!-padding-3 govuk-!-text-align-center" style="background: #1d70b8; color: white;">
-                <p class="govuk-heading-l govuk-!-margin-bottom-1" style="color: white;"><?= $stats['unread_messages'] ?? 0 ?></p>
-                <p class="govuk-body-s govuk-!-margin-bottom-0" style="color: white;">Unread</p>
+            <div class="govuk-!-padding-3 govuk-!-text-align-center civicone-stat-blue-bg">
+                <p class="govuk-heading-l govuk-!-margin-bottom-1"><?= $stats['unread_messages'] ?? 0 ?></p>
+                <p class="govuk-body-s govuk-!-margin-bottom-0">Unread</p>
             </div>
         </div>
         <div class="govuk-grid-column-one-fifth">
             <div class="govuk-!-padding-3 govuk-!-text-align-center civicone-panel-bg">
                 <p class="govuk-heading-l govuk-!-margin-bottom-1"><?= $stats['total_messages'] ?? 0 ?></p>
-                <p class="govuk-body-s govuk-!-margin-bottom-0" style="color: #505a5f;">Messages</p>
+                <p class="govuk-body-s govuk-!-margin-bottom-0 civicone-secondary-text">Messages</p>
             </div>
         </div>
         <div class="govuk-grid-column-one-fifth">
             <div class="govuk-!-padding-3 govuk-!-text-align-center civicone-panel-bg">
-                <p class="govuk-heading-l govuk-!-margin-bottom-1" style="color: #d4351c;"><?= number_format($stats['hours_sent'] ?? 0, 1) ?></p>
-                <p class="govuk-body-s govuk-!-margin-bottom-0" style="color: #505a5f;">Hrs Sent</p>
+                <p class="govuk-heading-l govuk-!-margin-bottom-1 civicone-heading-red"><?= number_format($stats['hours_sent'] ?? 0, 1) ?></p>
+                <p class="govuk-body-s govuk-!-margin-bottom-0 civicone-secondary-text">Hrs Sent</p>
             </div>
         </div>
         <div class="govuk-grid-column-one-fifth">
             <div class="govuk-!-padding-3 govuk-!-text-align-center civicone-panel-bg">
-                <p class="govuk-heading-l govuk-!-margin-bottom-1" style="color: #00703c;"><?= number_format($stats['hours_received'] ?? 0, 1) ?></p>
-                <p class="govuk-body-s govuk-!-margin-bottom-0" style="color: #505a5f;">Hrs Received</p>
+                <p class="govuk-heading-l govuk-!-margin-bottom-1 civicone-heading-green"><?= number_format($stats['hours_received'] ?? 0, 1) ?></p>
+                <p class="govuk-body-s govuk-!-margin-bottom-0 civicone-secondary-text">Hrs Received</p>
             </div>
         </div>
         <div class="govuk-grid-column-one-fifth">
             <div class="govuk-!-padding-3 govuk-!-text-align-center civicone-panel-bg">
                 <p class="govuk-heading-l govuk-!-margin-bottom-1"><?= $stats['partner_count'] ?? 0 ?></p>
-                <p class="govuk-body-s govuk-!-margin-bottom-0" style="color: #505a5f;">Partners</p>
+                <p class="govuk-body-s govuk-!-margin-bottom-0 civicone-secondary-text">Partners</p>
             </div>
         </div>
     </div>
@@ -148,38 +148,40 @@ $userOptedIn = $userOptedIn ?? false;
     <ul class="govuk-list govuk-!-margin-bottom-6" id="activity-list">
         <?php foreach ($activities as $activity): ?>
         <?php
-        $iconColor = '#1d70b8'; // Default blue
+        // Determine color variant based on type
+        $colorVariant = 'blue'; // Default blue
         if ($activity['type'] === 'message') {
-            $iconColor = '#1d70b8';
+            $colorVariant = 'blue';
         } elseif ($activity['type'] === 'transaction') {
-            $iconColor = ($activity['meta']['direction'] ?? '') === 'sent' ? '#d4351c' : '#00703c';
+            $colorVariant = ($activity['meta']['direction'] ?? '') === 'sent' ? 'red' : 'green';
         }
+        $isUnread = $activity['is_unread'] ?? false;
         ?>
         <li class="govuk-!-margin-bottom-2" data-type="<?= htmlspecialchars($activity['type']) ?>">
-            <a href="<?= $basePath . ($activity['link'] ?? '/federation') ?>" class="govuk-link" style="text-decoration: none;">
-                <div class="govuk-!-padding-3 <?= ($activity['is_unread'] ?? false) ? '' : '' ?>" style="border: 1px solid #b1b4b6; border-left: 5px solid <?= $iconColor ?>; display: flex; align-items: flex-start; gap: 1rem; <?= ($activity['is_unread'] ?? false) ? 'background: #f0f4f8;' : '' ?>">
-                    <div class="govuk-!-padding-2" style="background: <?= $iconColor ?>15; border-radius: 50%; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
-                        <i class="fa-solid <?= htmlspecialchars($activity['icon'] ?? 'fa-bell') ?>" style="color: <?= $iconColor ?>;" aria-hidden="true"></i>
+            <a href="<?= $basePath . ($activity['link'] ?? '/federation') ?>" class="govuk-link govuk-link--no-underline">
+                <div class="govuk-!-padding-3 civicone-activity-card civicone-activity-card--<?= $colorVariant ?><?= $isUnread ? ' civicone-activity-card--unread' : '' ?>">
+                    <div class="govuk-!-padding-2 civicone-activity-icon-circle civicone-activity-icon-circle--<?= $colorVariant ?>">
+                        <i class="fa-solid <?= htmlspecialchars($activity['icon'] ?? 'fa-bell') ?> civicone-icon-<?= $colorVariant ?>" aria-hidden="true"></i>
                     </div>
-                    <div style="flex-grow: 1; min-width: 0;">
+                    <div class="civicone-activity-content">
                         <p class="govuk-body govuk-!-font-weight-bold govuk-!-margin-bottom-1"><?= htmlspecialchars($activity['title'] ?? '') ?></p>
                         <?php if (!empty($activity['subtitle'])): ?>
-                        <p class="govuk-body-s govuk-!-margin-bottom-1" style="color: #505a5f;">
+                        <p class="govuk-body-s govuk-!-margin-bottom-1 civicone-secondary-text">
                             <i class="fa-solid fa-building govuk-!-margin-right-1" aria-hidden="true"></i>
                             <?= htmlspecialchars($activity['subtitle']) ?>
                         </p>
                         <?php endif; ?>
                         <?php if (!empty($activity['description'])): ?>
-                        <p class="govuk-body-s govuk-!-margin-bottom-0" style="color: #505a5f;"><?= htmlspecialchars($activity['description']) ?></p>
+                        <p class="govuk-body-s govuk-!-margin-bottom-0 civicone-secondary-text"><?= htmlspecialchars($activity['description']) ?></p>
                         <?php endif; ?>
                         <?php if (!empty($activity['preview'])): ?>
-                        <p class="govuk-body-s govuk-!-margin-bottom-0" style="color: #505a5f; font-style: italic;">"<?= htmlspecialchars($activity['preview']) ?>..."</p>
+                        <p class="govuk-body-s govuk-!-margin-bottom-0 civicone-secondary-text civicone-text-italic">"<?= htmlspecialchars($activity['preview']) ?>..."</p>
                         <?php endif; ?>
                     </div>
-                    <div class="govuk-!-text-align-right" style="flex-shrink: 0;">
-                        <p class="govuk-body-s govuk-!-margin-bottom-0" style="color: #505a5f;"><?= formatActivityTime($activity['timestamp'] ?? '') ?></p>
-                        <?php if ($activity['is_unread'] ?? false): ?>
-                        <span class="govuk-tag govuk-tag--blue govuk-!-margin-top-1">New</span>
+                    <div class="civicone-activity-meta">
+                        <p class="govuk-body-s govuk-!-margin-bottom-0 civicone-secondary-text"><?= formatActivityTime($activity['timestamp'] ?? '') ?></p>
+                        <?php if ($isUnread): ?>
+                        <span class="govuk-tag govuk-tag--light-blue govuk-!-margin-top-1">New</span>
                         <?php endif; ?>
                     </div>
                 </div>
@@ -190,7 +192,7 @@ $userOptedIn = $userOptedIn ?? false;
     <?php else: ?>
     <div class="govuk-inset-text govuk-!-margin-bottom-6 govuk-!-text-align-center">
         <p class="govuk-body govuk-!-margin-bottom-2">
-            <i class="fa-solid fa-bell-slash fa-2x" style="color: #505a5f;" aria-hidden="true"></i>
+            <i class="fa-solid fa-bell-slash fa-2x civicone-icon-grey" aria-hidden="true"></i>
         </p>
         <h3 class="govuk-heading-s govuk-!-margin-bottom-2">No Federation Activity Yet</h3>
         <p class="govuk-body govuk-!-margin-bottom-4">

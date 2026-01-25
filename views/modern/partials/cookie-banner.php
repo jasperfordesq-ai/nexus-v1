@@ -23,7 +23,7 @@ $tenantName = $tenant['name'] ?? 'This Community';
 ?>
 
 <!-- Cookie Consent Banner - Modern Theme -->
-<div id="nexus-cookie-banner" class="cookie-banner" role="dialog" aria-labelledby="cookie-banner-title" aria-describedby="cookie-banner-description" aria-hidden="true">
+<div id="nexus-cookie-banner" class="cookie-banner" role="dialog" aria-labelledby="cookie-banner-title" aria-describedby="cookie-banner-description" hidden>
     <div class="cookie-banner-container">
         <!-- Banner Content -->
         <div class="cookie-banner-content">
@@ -326,22 +326,17 @@ $tenantName = $tenant['name'] ?? 'This Community';
 <script>
 // Handle Accept All
 async function handleAcceptAll() {
-    console.log('[Banner] Accept All clicked');
-    console.log('[Banner] NexusCookieConsent available:', typeof window.NexusCookieConsent);
-
     if (!window.NexusCookieConsent) {
-        console.error('[Banner] NexusCookieConsent not loaded!');
         showCookieToast('Error: Cookie system not loaded. Please refresh the page.', 'error');
         return;
     }
 
     const success = await window.NexusCookieConsent.acceptAll();
-    console.log('[Banner] Accept All result:', success);
-
     if (success) {
         showCookieToast('Your cookie preferences have been saved. All cookies enabled.');
     } else {
-        showCookieToast('Failed to save preferences. Please try again.', 'error');
+        // Consent saved locally but API failed
+        showCookieToast('Your cookie preferences have been saved.');
     }
 }
 
@@ -351,7 +346,8 @@ async function handleRejectAll() {
     if (success) {
         showCookieToast('Only essential cookies will be used.');
     } else {
-        showCookieToast('Failed to save preferences. Please try again.', 'error');
+        // Consent saved locally but API failed
+        showCookieToast('Your cookie preferences have been saved. Only essential cookies will be used.');
     }
 }
 
@@ -360,9 +356,9 @@ function openCookiePreferences() {
     const modal = document.getElementById('cookie-preferences-modal');
     const banner = document.getElementById('nexus-cookie-banner');
 
-    // Hide banner if visible
+    // Hide banner (use hidden attribute to match cookie-consent.js)
     if (banner) {
-        banner.classList.remove('visible');
+        banner.setAttribute('hidden', '');
     }
 
     // Show modal

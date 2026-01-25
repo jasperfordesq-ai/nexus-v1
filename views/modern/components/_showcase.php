@@ -37,36 +37,36 @@ function safeInclude($path, $vars = []) {
 
     <!-- Core Framework CSS -->
     <link rel="stylesheet" href="<?= $basePath ?>/assets/css/design-tokens.css">
-    <link rel="stylesheet" href="<?= $basePath ?>/assets/css/nexus-phoenix.min.css">
-    <link rel="stylesheet" href="<?= $basePath ?>/assets/css/bundles/core.min.css">
-    <link rel="stylesheet" href="<?= $basePath ?>/assets/css/bundles/components.min.css">
+    <link rel="stylesheet" href="<?= $basePath ?>/assets/css/nexus-phoenix.css">
+    <link rel="stylesheet" href="<?= $basePath ?>/assets/css/bundles/core.css">
+    <link rel="stylesheet" href="<?= $basePath ?>/assets/css/bundles/components.css">
 
     <!-- Component CSS Bundles -->
-    <link rel="stylesheet" href="<?= $basePath ?>/assets/css/bundles/components-navigation.min.css">
-    <link rel="stylesheet" href="<?= $basePath ?>/assets/css/bundles/components-buttons.min.css">
-    <link rel="stylesheet" href="<?= $basePath ?>/assets/css/bundles/components-forms.min.css">
-    <link rel="stylesheet" href="<?= $basePath ?>/assets/css/bundles/components-cards.min.css">
-    <link rel="stylesheet" href="<?= $basePath ?>/assets/css/bundles/components-modals.min.css">
-    <link rel="stylesheet" href="<?= $basePath ?>/assets/css/bundles/components-notifications.min.css">
+    <link rel="stylesheet" href="<?= $basePath ?>/assets/css/bundles/components-navigation.css">
+    <link rel="stylesheet" href="<?= $basePath ?>/assets/css/bundles/components-buttons.css">
+    <link rel="stylesheet" href="<?= $basePath ?>/assets/css/bundles/components-forms.css">
+    <link rel="stylesheet" href="<?= $basePath ?>/assets/css/bundles/components-cards.css">
+    <link rel="stylesheet" href="<?= $basePath ?>/assets/css/bundles/components-modals.css">
+    <link rel="stylesheet" href="<?= $basePath ?>/assets/css/bundles/components-notifications.css">
 
     <!-- Utilities & Polish -->
-    <link rel="stylesheet" href="<?= $basePath ?>/assets/css/bundles/utilities-polish.min.css">
-    <link rel="stylesheet" href="<?= $basePath ?>/assets/css/bundles/enhancements.min.css">
-    <link rel="stylesheet" href="<?= $basePath ?>/assets/css/social-interactions.min.css">
-    <link rel="stylesheet" href="<?= $basePath ?>/assets/css/components.min.css">
-    <link rel="stylesheet" href="<?= $basePath ?>/assets/css/partials.min.css">
-    <link rel="stylesheet" href="<?= $basePath ?>/assets/css/avatar-placeholders.min.css">
+    <link rel="stylesheet" href="<?= $basePath ?>/assets/css/bundles/utilities-polish.css">
+    <link rel="stylesheet" href="<?= $basePath ?>/assets/css/bundles/enhancements.css">
+    <link rel="stylesheet" href="<?= $basePath ?>/assets/css/social-interactions.css">
+    <link rel="stylesheet" href="<?= $basePath ?>/assets/css/components.css">
+    <link rel="stylesheet" href="<?= $basePath ?>/assets/css/partials.css">
+    <link rel="stylesheet" href="<?= $basePath ?>/assets/css/avatar-placeholders.css">
 
     <!-- Card & Glass Styles -->
-    <link rel="stylesheet" href="<?= $basePath ?>/assets/css/glass.min.css">
-    <link rel="stylesheet" href="<?= $basePath ?>/assets/css/card-hover-states.min.css">
-    <link rel="stylesheet" href="<?= $basePath ?>/assets/css/post-card.min.css">
+    <link rel="stylesheet" href="<?= $basePath ?>/assets/css/glass.css">
+    <link rel="stylesheet" href="<?= $basePath ?>/assets/css/card-hover-states.css">
+    <link rel="stylesheet" href="<?= $basePath ?>/assets/css/post-card.css">
 
     <!-- Component Library Specific -->
     <link rel="stylesheet" href="<?= $basePath ?>/assets/css/modern/components-library.css">
 
     <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.css">
 
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">

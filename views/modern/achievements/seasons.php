@@ -6,8 +6,7 @@ $hType = 'Gamification';
 
 $basePath = \Nexus\Core\TenantContext::getBasePath();
 
-// Load achievements CSS
-$additionalCSS = '<link rel="stylesheet" href="/assets/css/achievements.min.css?v=' . time() . '">';
+// CSS now loaded via centralized page-css-loader.php (Phase 4 CSS Refactoring)
 
 require dirname(__DIR__, 2) . '/layouts/modern/header.php';
 

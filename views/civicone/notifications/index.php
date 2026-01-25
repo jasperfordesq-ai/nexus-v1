@@ -31,12 +31,12 @@ $basePath = \Nexus\Core\TenantContext::getBasePath();
         </h1>
     </div>
     <div class="govuk-grid-column-one-third govuk-!-text-align-right">
-        <div class="govuk-button-group" style="justify-content: flex-end;">
+        <div class="govuk-button-group civicone-justify-end">
             <a href="<?= $basePath ?>/dashboard" class="govuk-button govuk-button--secondary" data-module="govuk-button">
                 <i class="fa-solid fa-arrow-left govuk-!-margin-right-1" aria-hidden="true"></i> Back to Dashboard
             </a>
             <?php if (!empty($notifications)): ?>
-                <form action="<?= $basePath ?>/notifications/mark-all-read" method="POST" style="display: inline;">
+                <form action="<?= $basePath ?>/notifications/mark-all-read" method="POST" class="civicone-inline-form">
                     <?= \Nexus\Core\Csrf::input() ?>
                     <button type="submit" class="govuk-button govuk-button--secondary" data-module="govuk-button">
                         <i class="fa-solid fa-check-double govuk-!-margin-right-1" aria-hidden="true"></i> Mark All Read
@@ -79,27 +79,27 @@ $basePath = \Nexus\Core\TenantContext::getBasePath();
             ];
             $icon = $iconMap[$notif['type'] ?? 'system'] ?? 'fa-bell';
             ?>
-            <li class="govuk-!-margin-bottom-4 govuk-!-padding-4 <?= $isUnread ? 'govuk-!-font-weight-bold' : '' ?>" style="border: 1px solid #b1b4b6; border-left: 5px solid <?= $isUnread ? '#1d70b8' : '#b1b4b6' ?>;">
+            <li class="govuk-!-margin-bottom-4 govuk-!-padding-4 civicone-notification-item <?= $isUnread ? 'govuk-!-font-weight-bold civicone-notification-item--unread' : '' ?>">
                 <div class="govuk-grid-row">
                     <div class="govuk-grid-column-three-quarters">
                         <p class="govuk-body govuk-!-margin-bottom-2">
                             <i class="fa-solid <?= $icon ?> govuk-!-margin-right-2" aria-hidden="true"></i>
                             <?= htmlspecialchars($notif['message']) ?>
                         </p>
-                        <time class="govuk-body-s" datetime="<?= $notif['created_at'] ?>" style="color: #505a5f;">
+                        <time class="govuk-body-s civicone-secondary-text" datetime="<?= $notif['created_at'] ?>">
                             <i class="fa-regular fa-clock govuk-!-margin-right-1" aria-hidden="true"></i>
                             <?= \Nexus\Helpers\Time::ago($notif['created_at']) ?>
                         </time>
                     </div>
                     <div class="govuk-grid-column-one-quarter govuk-!-text-align-right">
-                        <div class="govuk-button-group" style="justify-content: flex-end;">
+                        <div class="govuk-button-group civicone-justify-end">
                             <?php if (!empty($notif['link'])): ?>
                                 <a href="<?= htmlspecialchars($notif['link']) ?>" class="govuk-button govuk-button--secondary" data-module="govuk-button">
                                     View
                                 </a>
                             <?php endif; ?>
                             <?php if ($isUnread): ?>
-                                <form action="<?= $basePath ?>/notifications/mark-read" method="POST" style="display: inline;">
+                                <form action="<?= $basePath ?>/notifications/mark-read" method="POST" class="civicone-inline-form">
                                     <?= \Nexus\Core\Csrf::input() ?>
                                     <input type="hidden" name="id" value="<?= $notif['id'] ?>">
                                     <button type="submit" class="govuk-button govuk-button--secondary" data-module="govuk-button" title="Mark as read">

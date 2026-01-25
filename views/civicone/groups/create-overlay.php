@@ -35,7 +35,7 @@ $isAdmin = $isAdmin ?? false;
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title><?= $pageTitle ?? 'Create Group' ?></title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="/assets/css/govuk-frontend.min.css">
+    <link rel="stylesheet" href="/assets/govuk-frontend-5.14.0/govuk-frontend.min.css">
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body {

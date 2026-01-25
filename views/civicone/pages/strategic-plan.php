@@ -43,7 +43,7 @@ require dirname(__DIR__, 2) . '/layouts/civicone/header.php';
 <div class="govuk-grid-row">
     <!-- Sidebar TOC -->
     <div class="govuk-grid-column-one-third">
-        <nav class="govuk-!-padding-4 govuk-!-margin-bottom-6 civicone-panel-bg" style="position: sticky; top: 1rem;" aria-label="Page contents">
+        <nav class="govuk-!-padding-4 govuk-!-margin-bottom-6 civicone-panel-bg civicone-sticky-toc" aria-label="Page contents">
             <h3 class="govuk-heading-s govuk-!-margin-bottom-3">Contents</h3>
             <ul class="govuk-list">
                 <li><a href="#executive-summary" class="govuk-link">1. Executive Summary</a></li>
@@ -60,7 +60,7 @@ require dirname(__DIR__, 2) . '/layouts/civicone/header.php';
 
             <!-- 1. Executive Summary -->
             <section id="executive-summary" class="govuk-!-margin-bottom-8">
-                <div class="govuk-!-padding-4" style="border: 1px solid #b1b4b6; border-left: 5px solid #1d70b8;">
+                <div class="govuk-!-padding-4 civicone-report-section">
                     <h2 class="govuk-heading-l">1. Executive Summary</h2>
                     <p class="govuk-body">This five-year strategic plan (2026-2030) outlines a clear and ambitious path for hOUR Timebank (TBI) to transition from a single, high-impact regional organisation into a resilient and scalable national network.</p>
                     <p class="govuk-body">Our strategy is built on a foundation of proven, exceptional social value. A 2023 Social Impact Study quantified our SROI at <strong>1:16</strong>—for every €1 invested, €16 in tangible social value is returned.</p>
@@ -75,15 +75,15 @@ require dirname(__DIR__, 2) . '/layouts/civicone/header.php';
 
             <!-- 2. Vision -->
             <section id="vision" class="govuk-!-margin-bottom-8">
-                <div class="govuk-!-padding-4" style="border: 1px solid #b1b4b6; border-left: 5px solid #1d70b8;">
+                <div class="govuk-!-padding-4 civicone-report-section">
                     <h2 class="govuk-heading-l">2. Our 2026 Vision</h2>
 
-                    <div class="govuk-inset-text govuk-!-margin-bottom-4" style="border-left-color: #1d70b8;">
+                    <div class="govuk-inset-text govuk-!-margin-bottom-4 civicone-inset-blue">
                         <h3 class="govuk-heading-s govuk-!-margin-bottom-2">Our Mission</h3>
                         <p class="govuk-body govuk-!-margin-bottom-0">To connect and empower Irish communities by facilitating the exchange of skills, talents, and support, where every hour given is an hour received.</p>
                     </div>
 
-                    <div class="govuk-inset-text" style="border-left-color: #00703c;">
+                    <div class="govuk-inset-text civicone-inset-green">
                         <h3 class="govuk-heading-s govuk-!-margin-bottom-2">Our Vision</h3>
                         <p class="govuk-body govuk-!-margin-bottom-0">An interconnected Ireland where every individual feels valued and supported, and where the power of shared time and talent creates strong, resilient communities.</p>
                     </div>
@@ -92,13 +92,13 @@ require dirname(__DIR__, 2) . '/layouts/civicone/header.php';
 
             <!-- 3. SWOT -->
             <section id="analysis" class="govuk-!-margin-bottom-8">
-                <div class="govuk-!-padding-4" style="border: 1px solid #b1b4b6; border-left: 5px solid #1d70b8;">
+                <div class="govuk-!-padding-4 civicone-report-section">
                     <h2 class="govuk-heading-l">3. SWOT Analysis</h2>
 
                     <div class="govuk-grid-row">
                         <div class="govuk-grid-column-one-half govuk-!-margin-bottom-4">
-                            <div class="govuk-!-padding-3 civicone-panel-bg" style="border-left: 4px solid #00703c;">
-                                <h4 class="govuk-heading-s" style="color: #00703c;">Strengths</h4>
+                            <div class="govuk-!-padding-3 civicone-panel-bg civicone-swot-card-green">
+                                <h4 class="govuk-heading-s civicone-heading-green">Strengths</h4>
                                 <ul class="govuk-list govuk-list--bullet govuk-body-s">
                                     <li><strong>Proven Impact:</strong> Independently validated 1:16 SROI.</li>
                                     <li><strong>Partnerships:</strong> WCDP and Rethink Ireland.</li>
@@ -107,8 +107,8 @@ require dirname(__DIR__, 2) . '/layouts/civicone/header.php';
                             </div>
                         </div>
                         <div class="govuk-grid-column-one-half govuk-!-margin-bottom-4">
-                            <div class="govuk-!-padding-3 civicone-panel-bg" style="border-left: 4px solid #d4351c;">
-                                <h4 class="govuk-heading-s" style="color: #d4351c;">Weaknesses</h4>
+                            <div class="govuk-!-padding-3 civicone-panel-bg civicone-swot-card-red">
+                                <h4 class="govuk-heading-s civicone-heading-red">Weaknesses</h4>
                                 <ul class="govuk-list govuk-list--bullet govuk-body-s">
                                     <li><strong>Financial Instability:</strong> Funding gap after shop closure.</li>
                                     <li><strong>Human Resources:</strong> Reliance on key individuals.</li>
@@ -117,8 +117,8 @@ require dirname(__DIR__, 2) . '/layouts/civicone/header.php';
                             </div>
                         </div>
                         <div class="govuk-grid-column-one-half govuk-!-margin-bottom-4">
-                            <div class="govuk-!-padding-3 civicone-panel-bg" style="border-left: 4px solid #1d70b8;">
-                                <h4 class="govuk-heading-s" style="color: #1d70b8;">Opportunities</h4>
+                            <div class="govuk-!-padding-3 civicone-panel-bg civicone-swot-card-blue">
+                                <h4 class="govuk-heading-s civicone-heading-blue">Opportunities</h4>
                                 <ul class="govuk-list govuk-list--bullet govuk-body-s">
                                     <li><strong>Public Sector Contracts:</strong> HSE Social Prescribing.</li>
                                     <li><strong>Hybrid Models:</strong> B2B Timebanking.</li>
@@ -127,8 +127,8 @@ require dirname(__DIR__, 2) . '/layouts/civicone/header.php';
                             </div>
                         </div>
                         <div class="govuk-grid-column-one-half govuk-!-margin-bottom-4">
-                            <div class="govuk-!-padding-3 civicone-panel-bg" style="border-left: 4px solid #f47738;">
-                                <h4 class="govuk-heading-s" style="color: #f47738;">Threats</h4>
+                            <div class="govuk-!-padding-3 civicone-panel-bg civicone-swot-card-orange">
+                                <h4 class="govuk-heading-s civicone-heading-orange">Threats</h4>
                                 <ul class="govuk-list govuk-list--bullet govuk-body-s">
                                     <li><strong>Funding Cliff:</strong> Securing long-term coordinator funding.</li>
                                     <li><strong>Volunteer Burnout:</strong> Unsustainable burden.</li>
@@ -141,10 +141,10 @@ require dirname(__DIR__, 2) . '/layouts/civicone/header.php';
 
             <!-- 4. Pillars -->
             <section id="pillars" class="govuk-!-margin-bottom-8">
-                <div class="govuk-!-padding-4" style="border: 1px solid #b1b4b6; border-left: 5px solid #1d70b8;">
+                <div class="govuk-!-padding-4 civicone-report-section">
                     <h2 class="govuk-heading-l">4. Strategic Pillars</h2>
 
-                    <h3 class="govuk-heading-m" style="color: #1d70b8;">Pillar 1: Roots & Reach (Growth)</h3>
+                    <h3 class="govuk-heading-m civicone-heading-blue">Pillar 1: Roots & Reach (Growth)</h3>
                     <table class="govuk-table govuk-!-margin-bottom-6">
                         <thead class="govuk-table__head">
                             <tr class="govuk-table__row">
@@ -167,7 +167,7 @@ require dirname(__DIR__, 2) . '/layouts/civicone/header.php';
                         </tbody>
                     </table>
 
-                    <h3 class="govuk-heading-m" style="color: #00703c;">Pillar 2: Financial Resilience</h3>
+                    <h3 class="govuk-heading-m civicone-heading-green">Pillar 2: Financial Resilience</h3>
                     <table class="govuk-table">
                         <thead class="govuk-table__head">
                             <tr class="govuk-table__row">
@@ -194,7 +194,7 @@ require dirname(__DIR__, 2) . '/layouts/civicone/header.php';
 
             <!-- 5. Roadmap -->
             <section id="roadmap" class="govuk-!-margin-bottom-8">
-                <div class="govuk-!-padding-4" style="border: 1px solid #b1b4b6; border-left: 5px solid #1d70b8;">
+                <div class="govuk-!-padding-4 civicone-report-section">
                     <h2 class="govuk-heading-l">5. Roadmap: Year 1</h2>
 
                     <table class="govuk-table">
@@ -210,7 +210,7 @@ require dirname(__DIR__, 2) . '/layouts/civicone/header.php';
                         <tbody class="govuk-table__body">
                             <tr class="govuk-table__row">
                                 <td class="govuk-table__cell"><strong>Fund Coordinator</strong></td>
-                                <td class="govuk-table__cell govuk-!-text-align-centre"><span class="govuk-tag govuk-tag--blue">SUBMIT</span></td>
+                                <td class="govuk-table__cell govuk-!-text-align-centre"><span class="govuk-tag govuk-tag--light-blue">SUBMIT</span></td>
                                 <td class="govuk-table__cell govuk-!-text-align-centre"><span class="govuk-tag govuk-tag--green">SECURE</span></td>
                                 <td class="govuk-table__cell"></td>
                                 <td class="govuk-table__cell"></td>
@@ -224,7 +224,7 @@ require dirname(__DIR__, 2) . '/layouts/civicone/header.php';
                             </tr>
                             <tr class="govuk-table__row">
                                 <td class="govuk-table__cell"><strong>Multi-Year Grants</strong></td>
-                                <td class="govuk-table__cell govuk-!-text-align-centre"><span class="govuk-tag govuk-tag--blue">SUBMIT</span></td>
+                                <td class="govuk-table__cell govuk-!-text-align-centre"><span class="govuk-tag govuk-tag--light-blue">SUBMIT</span></td>
                                 <td class="govuk-table__cell govuk-!-text-align-centre"><span class="govuk-tag govuk-tag--yellow">PITCH</span></td>
                                 <td class="govuk-table__cell govuk-!-text-align-centre"><span class="govuk-tag govuk-tag--green">SECURE</span></td>
                                 <td class="govuk-table__cell"></td>

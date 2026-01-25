@@ -109,12 +109,10 @@ body.no-ptr {
 
 /* ===========================================
    SIDEBAR POSITIONING FIX
+   RESOLVED: Now properly handled in nexus-home.css (2026-01-25)
+   The sidebar layout is consolidated in nexus-home.css with
+   position: relative set directly on .home-sidebar-column
    =========================================== */
-
-.home-sidebar-column {
-    position: relative !important;
-    top: auto !important;
-}
 
 /* ===========================================
    FAILSAFE: Remove any wheel event blockers via CSS

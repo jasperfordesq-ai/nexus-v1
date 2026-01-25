@@ -25,7 +25,7 @@ $hasTimebanking = $hasTimebanking ?? \Nexus\Core\TenantContext::hasFeature('wall
         <div class="govuk-grid-row">
             <div class="govuk-grid-column-two-thirds">
                 <h1 class="govuk-heading-xl">
-                    <i class="fa-solid fa-building-columns govuk-!-margin-right-2" style="color: #1d70b8;" aria-hidden="true"></i>
+                    <i class="fa-solid fa-building-columns govuk-!-margin-right-2 civicone-icon-blue" aria-hidden="true"></i>
                     Organizations
                 </h1>
                 <p class="govuk-body-l">Discover groups making a difference in your community</p>
@@ -33,7 +33,7 @@ $hasTimebanking = $hasTimebanking ?? \Nexus\Core\TenantContext::hasFeature('wall
         </div>
 
         <!-- Search Form -->
-        <div class="govuk-!-margin-bottom-6 govuk-!-padding-4 civicone-panel-bg" style="border-left: 5px solid #1d70b8;">
+        <div class="govuk-!-margin-bottom-6 govuk-!-padding-4 civicone-panel-bg civicone-border-left-blue">
             <form method="GET" action="<?= $base ?>/volunteering/organizations">
                 <div class="govuk-form-group govuk-!-margin-bottom-0">
                     <label class="govuk-label govuk-!-font-weight-bold" for="search-query">
@@ -68,9 +68,9 @@ $hasTimebanking = $hasTimebanking ?? \Nexus\Core\TenantContext::hasFeature('wall
 
         <?php if (empty($organizations)): ?>
             <!-- Empty State -->
-            <div class="govuk-!-padding-6 govuk-!-text-align-center civicone-panel-bg" style="border-left: 5px solid #1d70b8;">
+            <div class="govuk-!-padding-6 govuk-!-text-align-center civicone-panel-bg civicone-border-left-blue">
                 <p class="govuk-body govuk-!-margin-bottom-4">
-                    <i class="fa-solid fa-building-circle-xmark fa-3x" style="color: #1d70b8;" aria-hidden="true"></i>
+                    <i class="fa-solid fa-building-circle-xmark fa-3x civicone-icon-blue" aria-hidden="true"></i>
                 </p>
                 <h2 class="govuk-heading-l">No Organizations Found</h2>
                 <p class="govuk-body govuk-!-margin-bottom-6">
@@ -86,27 +86,27 @@ $hasTimebanking = $hasTimebanking ?? \Nexus\Core\TenantContext::hasFeature('wall
             <div class="govuk-grid-row">
                 <?php foreach ($organizations as $org): ?>
                     <div class="govuk-grid-column-one-half govuk-!-margin-bottom-6">
-                        <div style="background: white; border: 1px solid #b1b4b6; border-left: 5px solid #00703c; height: 100%;">
-                            <a href="<?= $base ?>/volunteering/organization/<?= $org['id'] ?>" style="text-decoration: none; color: inherit; display: block;">
+                        <div class="civicone-org-card">
+                            <a href="<?= $base ?>/volunteering/organization/<?= $org['id'] ?>" class="civicone-org-card-link">
                                 <!-- Card Header -->
-                                <div class="govuk-!-padding-4" style="border-bottom: 1px solid #f3f2f1;">
-                                    <div style="display: flex; align-items: center; gap: 16px;">
+                                <div class="govuk-!-padding-4 civicone-org-card-header">
+                                    <div class="civicone-org-card-header-content">
                                         <!-- Logo -->
-                                        <div class="civicone-panel-bg" style="width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; overflow: hidden;">
+                                        <div class="civicone-panel-bg civicone-org-logo-sm">
                                             <?php if (!empty($org['logo'])): ?>
-                                                <img src="<?= htmlspecialchars($org['logo']) ?>" loading="lazy" alt="<?= htmlspecialchars($org['name']) ?>" style="width: 100%; height: 100%; object-fit: cover;">
+                                                <img src="<?= htmlspecialchars($org['logo']) ?>" loading="lazy" alt="<?= htmlspecialchars($org['name']) ?>">
                                             <?php else: ?>
-                                                <span class="govuk-heading-m govuk-!-margin-bottom-0" style="color: #1d70b8;">
+                                                <span class="govuk-heading-m govuk-!-margin-bottom-0 civicone-heading-blue">
                                                     <?= strtoupper(substr($org['name'], 0, 1)) ?>
                                                 </span>
                                             <?php endif; ?>
                                         </div>
                                         <!-- Title -->
-                                        <div style="flex: 1; min-width: 0;">
-                                            <h3 class="govuk-heading-s govuk-!-margin-bottom-1" style="color: #1d70b8;">
+                                        <div class="civicone-org-card-title">
+                                            <h3 class="govuk-heading-s govuk-!-margin-bottom-1 civicone-heading-blue">
                                                 <?= htmlspecialchars($org['name']) ?>
                                             </h3>
-                                            <p class="govuk-body-s govuk-!-margin-bottom-0" style="color: #505a5f;">
+                                            <p class="govuk-body-s govuk-!-margin-bottom-0 civicone-secondary-text">
                                                 <i class="fa-solid fa-user govuk-!-margin-right-1" aria-hidden="true"></i>
                                                 <?= htmlspecialchars($org['owner_name'] ?? 'Unknown') ?>
                                             </p>
@@ -116,21 +116,21 @@ $hasTimebanking = $hasTimebanking ?? \Nexus\Core\TenantContext::hasFeature('wall
 
                                 <!-- Description -->
                                 <div class="govuk-!-padding-4">
-                                    <p class="govuk-body-s govuk-!-margin-bottom-0" style="color: #0b0c0c;">
+                                    <p class="govuk-body-s govuk-!-margin-bottom-0">
                                         <?= htmlspecialchars(substr($org['description'], 0, 200)) ?><?= strlen($org['description']) > 200 ? '...' : '' ?>
                                     </p>
                                 </div>
 
                                 <!-- Stats -->
                                 <div class="govuk-!-padding-4 civicone-panel-bg">
-                                    <div style="display: flex; gap: 20px;">
+                                    <div class="civicone-org-stats-row">
                                         <span class="govuk-body-s govuk-!-margin-bottom-0">
-                                            <i class="fa-solid fa-briefcase govuk-!-margin-right-1" style="color: #00703c;" aria-hidden="true"></i>
+                                            <i class="fa-solid fa-briefcase govuk-!-margin-right-1 civicone-icon-green" aria-hidden="true"></i>
                                             <strong><?= (int)($org['opportunity_count'] ?? 0) ?></strong> Opportunities
                                         </span>
                                         <?php if ($hasTimebanking && isset($org['member_count'])): ?>
                                             <span class="govuk-body-s govuk-!-margin-bottom-0">
-                                                <i class="fa-solid fa-users govuk-!-margin-right-1" style="color: #1d70b8;" aria-hidden="true"></i>
+                                                <i class="fa-solid fa-users govuk-!-margin-right-1 civicone-icon-blue" aria-hidden="true"></i>
                                                 <strong><?= (int)$org['member_count'] ?></strong> Members
                                             </span>
                                         <?php endif; ?>

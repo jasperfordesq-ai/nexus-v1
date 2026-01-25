@@ -74,7 +74,12 @@
     <!-- ============================================
          CIVICONE LAYOUT BUNDLE - Single optimized file
          ============================================ -->
-    <link rel="stylesheet" href="/assets/css/civicone-bundle-compiled.min.css?v=2.4.1">
+    <?php
+    $deployVersion = file_exists(__DIR__ . '/../../../../config/deployment-version.php')
+        ? (require __DIR__ . '/../../../../config/deployment-version.php')['version'] ?? time()
+        : time();
+    ?>
+    <link rel="stylesheet" href="/assets/css/civicone-bundle-compiled.css?v=<?= $deployVersion ?>">
 
     <!-- External CSS (Font Awesome, Fonts) -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous">

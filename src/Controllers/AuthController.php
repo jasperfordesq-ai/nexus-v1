@@ -5,6 +5,7 @@ namespace Nexus\Controllers;
 use Nexus\Models\User;
 use Nexus\Core\View;
 use Nexus\Services\LayoutHelper;
+use Nexus\Services\LegalDocumentService;
 
 class AuthController
 {
@@ -274,6 +275,38 @@ class AuthController
                         error_log("GDPR Consent Recording Failed: " . $e->getMessage());
                     }
                     // ------------------------------
+
+                    // --- LEGAL DOCUMENT ACCEPTANCE (Versioned) ---
+                    try {
+                        // Record acceptance of Terms of Service
+                        $termsDoc = LegalDocumentService::getByType(LegalDocumentService::TYPE_TERMS);
+                        if ($termsDoc && $termsDoc['current_version_id']) {
+                            LegalDocumentService::recordAcceptance(
+                                $newUser['id'],
+                                $termsDoc['id'],
+                                $termsDoc['current_version_id'],
+                                LegalDocumentService::ACCEPTANCE_REGISTRATION,
+                                $_SERVER['REMOTE_ADDR'] ?? null,
+                                $_SERVER['HTTP_USER_AGENT'] ?? null
+                            );
+                        }
+
+                        // Record acceptance of Privacy Policy
+                        $privacyDoc = LegalDocumentService::getByType(LegalDocumentService::TYPE_PRIVACY);
+                        if ($privacyDoc && $privacyDoc['current_version_id']) {
+                            LegalDocumentService::recordAcceptance(
+                                $newUser['id'],
+                                $privacyDoc['id'],
+                                $privacyDoc['current_version_id'],
+                                LegalDocumentService::ACCEPTANCE_REGISTRATION,
+                                $_SERVER['REMOTE_ADDR'] ?? null,
+                                $_SERVER['HTTP_USER_AGENT'] ?? null
+                            );
+                        }
+                    } catch (\Throwable $e) {
+                        error_log("Legal Document Acceptance Recording Failed: " . $e->getMessage());
+                    }
+                    // ----------------------------------------------
 
                     // --- NEWSLETTER SUBSCRIPTION (Internal) ---
                     try {

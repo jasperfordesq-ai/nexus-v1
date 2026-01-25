@@ -66,7 +66,7 @@ require_once __DIR__ . '/../../layouts/civicone/header.php';
                                         <small>Earned on <?php echo date('M j, Y', strtotime($achievement['date'])); ?></small>
                                     </div>
                                 </div>
-                                <span class="govuk-tag govuk-tag--blue">+<?php echo $achievement['points']; ?> pts</span>
+                                <span class="govuk-tag govuk-tag--light-blue">+<?php echo $achievement['points']; ?> pts</span>
                             </li>
                         <?php endforeach; ?>
                     </ul>

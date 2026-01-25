@@ -53,21 +53,23 @@ $basePath = Nexus\Core\TenantContext::getBasePath();
     <div class="govuk-grid-row">
         <?php foreach ($goals as $goal):
             $progress = $goal['progress'] ?? 0;
-            $progressColor = $progress >= 80 ? '#00703c' : ($progress >= 50 ? '#1d70b8' : '#505a5f');
+            $progressClass = $progress >= 80 ? 'civicone-goal-card--complete' : ($progress >= 50 ? 'civicone-goal-card--progress' : 'civicone-goal-card--started');
+            $progressBarClass = $progress >= 80 ? 'civicone-progress-bar--green' : ($progress >= 50 ? 'civicone-progress-bar--blue' : 'civicone-progress-bar--grey');
+            $tagClass = $progress >= 80 ? 'govuk-tag--green' : ($progress >= 50 ? 'govuk-tag--light-blue' : 'govuk-tag--grey');
         ?>
             <div class="govuk-grid-column-one-third govuk-!-margin-bottom-6">
-                <div class="govuk-!-padding-4" style="border: 1px solid #b1b4b6; border-left: 5px solid <?= $progressColor ?>;">
+                <div class="govuk-!-padding-4 civicone-sidebar-card civicone-goal-card <?= $progressClass ?>">
                     <h3 class="govuk-heading-m govuk-!-margin-bottom-3"><?= htmlspecialchars($goal['title']) ?></h3>
 
                     <!-- Progress Bar -->
                     <div class="govuk-!-margin-bottom-2" role="progressbar" aria-valuenow="<?= $progress ?>" aria-valuemin="0" aria-valuemax="100" aria-label="<?= $progress ?>% complete">
-                        <div class="civicone-panel-bg" style="height: 8px; border-radius: 4px; overflow: hidden;">
-                            <div style="width: <?= $progress ?>%; height: 100%; background: <?= $progressColor ?>;"></div>
+                        <div class="civicone-progress-bar">
+                            <div class="civicone-progress-bar__fill <?= $progressBarClass ?>" style="width: <?= $progress ?>%;"></div>
                         </div>
                     </div>
 
                     <p class="govuk-body-s govuk-!-margin-bottom-4">
-                        <span class="govuk-tag <?= $progress >= 80 ? 'govuk-tag--green' : ($progress >= 50 ? 'govuk-tag--blue' : 'govuk-tag--grey') ?>">
+                        <span class="govuk-tag <?= $tagClass ?>">
                             <?= $progress ?>% Complete
                         </span>
                     </p>

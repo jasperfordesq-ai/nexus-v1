@@ -57,7 +57,7 @@ require dirname(__DIR__, 2) . '/layouts/civicone/header.php';
         <?php foreach ($challenges as $challenge): ?>
         <div class="challenge-card <?= $challenge['is_completed'] ? 'completed' : '' ?>">
             <div class="challenge-header">
-                <span class="govuk-tag <?= $challenge['challenge_type'] === 'daily' ? 'govuk-tag--blue' : ($challenge['challenge_type'] === 'weekly' ? 'govuk-tag--purple' : 'govuk-tag--yellow') ?>">
+                <span class="govuk-tag <?= $challenge['challenge_type'] === 'daily' ? 'govuk-tag--light-blue' : ($challenge['challenge_type'] === 'weekly' ? 'govuk-tag--purple' : 'govuk-tag--yellow') ?>">
                     <?= ucfirst($challenge['challenge_type']) ?>
                 </span>
                 <span class="govuk-body-s" style="color: #505a5f;">

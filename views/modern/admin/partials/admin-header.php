@@ -55,9 +55,9 @@ $adminBreadcrumbs = generateAdminBreadcrumbs($adminModules, $currentPath, $baseP
     <!-- Design Tokens - MUST load first -->
     <link rel="stylesheet" href="/assets/css/design-tokens.css?v=<?= time() ?>">
     <!-- Admin CSS (combined) -->
-    <link rel="stylesheet" href="/assets/css/admin-gold-standard.min.css?v=<?= time() ?>">
+    <link rel="stylesheet" href="/assets/css/admin-gold-standard.css?v=<?= time() ?>">
     <!-- Admin Sidebar CSS -->
-    <link rel="stylesheet" href="/assets/css/admin-sidebar.min.css?v=<?= time() ?>">
+    <link rel="stylesheet" href="/assets/css/admin-sidebar.css?v=<?= time() ?>">
     <!-- Admin Menu Builder - Extracted inline styles -->
     <link rel="stylesheet" href="/assets/css/admin-menu-builder.css?v=<?= time() ?>">
     <!-- Admin Menu Index - Extracted inline styles -->

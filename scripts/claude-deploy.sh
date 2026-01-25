@@ -32,6 +32,7 @@ MODE="changed"
 SPECIFIC_FILE=""
 VERIFY=false
 SKIP_SYNTAX=false
+BUMP_VERSION=true
 
 while [[ $# -gt 0 ]]; do
     case $1 in
@@ -42,6 +43,7 @@ while [[ $# -gt 0 ]]; do
         --file) SPECIFIC_FILE="$2"; shift 2 ;;
         --verify) VERIFY=true; shift ;;
         --skip-syntax) SKIP_SYNTAX=true; shift ;;
+        --no-bump) BUMP_VERSION=false; shift ;;
         *) echo "Unknown option: $1"; exit 1 ;;
     esac
 done
@@ -188,6 +190,47 @@ verify_file() {
     fi
 }
 
+# Bump version (auto cache busting)
+bump_version() {
+    if [[ "$DRY_RUN" == "true" || "$BUMP_VERSION" == "false" ]]; then
+        return 0
+    fi
+
+    local version_file="$LOCAL_PATH/config/deployment-version.php"
+    if [[ -f "$version_file" ]]; then
+        # Generate new version: YYYY.MM.DD.BUILD
+        local date_part=$(date '+%Y.%m.%d')
+        local build_num=1
+
+        # Check if there's an existing version for today and increment build number
+        local current_version=$(grep -oP "version.*'\\K[0-9.]+(?=')" "$version_file" 2>/dev/null || echo "")
+        if [[ "$current_version" == "$date_part"* ]]; then
+            local current_build=$(echo "$current_version" | grep -oP '\d+$' || echo "0")
+            build_num=$((current_build + 1))
+        fi
+
+        local new_version="${date_part}.$(printf '%03d' $build_num)"
+        local timestamp=$(date '+%s')
+
+        cat > "$version_file" << EOF
+<?php
+/**
+ * Deployment Version - Cache Busting
+ *
+ * Auto-updated by claude-deploy.sh
+ * All CSS/JS files use this version to force browser cache refresh.
+ */
+
+return [
+    'version' => '$new_version',
+    'timestamp' => $timestamp,
+    'description' => 'Auto-deployed $(date '+%Y-%m-%d %H:%M:%S')'
+];
+EOF
+        log_success "Version bumped to $new_version"
+    fi
+}
+
 # Main
 echo "========================================"
 echo "  NEXUS Deployment"
@@ -261,6 +304,15 @@ if [[ "$SKIP_SYNTAX" == "false" ]]; then
     fi
     log_success "PHP syntax check passed"
     echo ""
+fi
+
+# Bump version before deploying
+bump_version
+
+# Add deployment-version.php to files if not already included
+version_file="config/deployment-version.php"
+if [[ ! " ${files[*]} " =~ " ${version_file} " ]]; then
+    files+=("$version_file")
 fi
 
 # Deploy files

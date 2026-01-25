@@ -53,7 +53,6 @@ $basePath = \Nexus\Core\TenantContext::getBasePath();
                 <?php foreach ($options as $index => $opt): ?>
                     <?php
                     $percent = $totalVotes > 0 ? round(($opt['vote_count'] / $totalVotes) * 100) : 0;
-                    $barColor = $percent >= 50 ? '#00703c' : ($percent >= 25 ? '#1d70b8' : '#505a5f');
                     ?>
                     <div class="govuk-!-margin-bottom-4">
                         <div class="govuk-grid-row govuk-!-margin-bottom-1">
@@ -64,15 +63,15 @@ $basePath = \Nexus\Core\TenantContext::getBasePath();
                                 <p class="govuk-body govuk-!-margin-bottom-0"><?= $percent ?>% (<?= $opt['vote_count'] ?> votes)</p>
                             </div>
                         </div>
-                        <div class="civicone-panel-bg" style="height: 24px; border-radius: 4px; overflow: hidden;"
+                        <div class="civicone-poll-bar"
                              role="progressbar" aria-valuenow="<?= $percent ?>" aria-valuemin="0" aria-valuemax="100"
                              aria-label="<?= htmlspecialchars($opt['label']) ?>: <?= $percent ?> percent">
-                            <div style="width: <?= $percent ?>%; height: 100%; background: <?= $barColor ?>; transition: width 0.3s;"></div>
+                            <div class="civicone-poll-bar__fill <?= $percent >= 50 ? 'civicone-poll-bar--green' : ($percent >= 25 ? 'civicone-poll-bar--blue' : 'civicone-poll-bar--grey') ?>" style="width: <?= $percent ?>%;"></div>
                         </div>
                     </div>
                 <?php endforeach; ?>
 
-                <p class="govuk-body govuk-!-margin-top-6" style="color: #505a5f;">
+                <p class="govuk-body govuk-!-margin-top-6 civicone-secondary-text">
                     <i class="fa-solid fa-users govuk-!-margin-right-1" aria-hidden="true"></i>
                     <strong>Total votes cast: <?= $totalVotes ?></strong>
                 </p>
@@ -128,7 +127,7 @@ $basePath = \Nexus\Core\TenantContext::getBasePath();
     </div>
 
     <div class="govuk-grid-column-one-third">
-        <div class="govuk-!-padding-6" style="border: 1px solid #b1b4b6;">
+        <div class="govuk-!-padding-6 civicone-sidebar-card">
             <h2 class="govuk-heading-s">Poll details</h2>
             <dl class="govuk-summary-list govuk-summary-list--no-border">
                 <div class="govuk-summary-list__row">
@@ -157,7 +156,7 @@ $basePath = \Nexus\Core\TenantContext::getBasePath();
 
             <?php if (isset($_SESSION['user_id']) && isset($poll['user_id']) && $_SESSION['user_id'] == $poll['user_id']): ?>
             <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible">
-            <a href="<?= $basePath ?>/polls/edit/<?= $poll['id'] ?>" class="govuk-button govuk-button--secondary" data-module="govuk-button" style="width: 100%;">
+            <a href="<?= $basePath ?>/polls/edit/<?= $poll['id'] ?>" class="govuk-button govuk-button--secondary civicone-button-full-width" data-module="govuk-button">
                 <i class="fa-solid fa-edit govuk-!-margin-right-1" aria-hidden="true"></i> Edit Poll
             </a>
             <?php endif; ?>

@@ -81,7 +81,7 @@ $basePath = \Nexus\Core\TenantContext::getBasePath();
         <caption class="govuk-table__caption govuk-visually-hidden">Community leaderboard rankings</caption>
         <thead class="govuk-table__head">
             <tr class="govuk-table__row">
-                <th scope="col" class="govuk-table__header" style="width: 80px;">Rank</th>
+                <th scope="col" class="govuk-table__header civicone-rank-column">Rank</th>
                 <th scope="col" class="govuk-table__header">Member</th>
                 <th scope="col" class="govuk-table__header govuk-table__header--numeric">Score</th>
             </tr>
@@ -114,18 +114,18 @@ $basePath = \Nexus\Core\TenantContext::getBasePath();
                         <?php endif; ?>
                     </td>
                     <td class="govuk-table__cell">
-                        <a href="<?= $profileUrl ?>" class="govuk-link" style="display: flex; align-items: center; gap: 0.75rem; text-decoration: none;">
+                        <a href="<?= $profileUrl ?>" class="govuk-link civicone-member-link">
                             <img src="<?= htmlspecialchars($avatarUrl) ?>"
                                  loading="lazy"
                                  alt=""
-                                 style="width: 40px; height: 40px; border-radius: 50%;">
+                                 class="civicone-table-avatar">
                             <span>
                                 <strong><?= htmlspecialchars($displayName) ?></strong>
                                 <?php if ($currentType === 'xp' && isset($entry['level'])): ?>
-                                    <br><span class="govuk-body-s" style="color: #505a5f;">Level <?= (int)$entry['level'] ?></span>
+                                    <br><span class="govuk-body-s civicone-secondary-text">Level <?= (int)$entry['level'] ?></span>
                                 <?php endif; ?>
                                 <?php if ($isCurrentUser): ?>
-                                    <span class="govuk-tag govuk-tag--blue govuk-!-margin-left-2">You</span>
+                                    <span class="govuk-tag govuk-tag--light-blue govuk-!-margin-left-2">You</span>
                                 <?php endif; ?>
                             </span>
                         </a>
@@ -151,12 +151,12 @@ $basePath = \Nexus\Core\TenantContext::getBasePath();
         $loginStreak = $userStreaks['login'];
         $streakIcon = \Nexus\Services\StreakService::getStreakIcon($loginStreak['current']);
         ?>
-        <div class="govuk-!-padding-4 govuk-!-margin-bottom-6 civicone-panel-bg" style="border-left: 5px solid #f47738;">
+        <div class="govuk-!-padding-4 govuk-!-margin-bottom-6 civicone-panel-bg civicone-streak-panel">
             <p class="govuk-body-l govuk-!-margin-bottom-0">
                 <span aria-hidden="true"><?= $streakIcon ?></span>
                 <strong><?= $loginStreak['current'] ?> day login streak</strong>
                 <?php if ($loginStreak['longest'] > $loginStreak['current']): ?>
-                    <span class="govuk-body-s govuk-!-margin-left-2" style="color: #505a5f;">
+                    <span class="govuk-body-s govuk-!-margin-left-2 civicone-secondary-text">
                         Best: <?= $loginStreak['longest'] ?> days
                     </span>
                 <?php endif; ?>
@@ -167,39 +167,39 @@ $basePath = \Nexus\Core\TenantContext::getBasePath();
     <div class="govuk-grid-row govuk-!-margin-bottom-6">
         <!-- Level & XP -->
         <div class="govuk-grid-column-one-quarter">
-            <div class="govuk-!-padding-4" style="border: 1px solid #b1b4b6; text-align: center;">
+            <div class="govuk-!-padding-4 civicone-stat-card">
                 <p class="govuk-body-s govuk-!-margin-bottom-1" aria-hidden="true">⭐</p>
                 <p class="govuk-heading-m govuk-!-margin-bottom-1">Level <?= $userStats['level'] ?></p>
-                <p class="govuk-body-s govuk-!-margin-bottom-3" style="color: #505a5f;"><?= number_format($userStats['xp']) ?> XP</p>
-                <div class="civicone-panel-bg" style="height: 8px; border-radius: 4px; overflow: hidden;" role="progressbar" aria-valuenow="<?= $userStats['level_progress'] ?>" aria-valuemin="0" aria-valuemax="100">
-                    <div style="width: <?= $userStats['level_progress'] ?>%; height: 100%; background: #1d70b8;"></div>
+                <p class="govuk-body-s govuk-!-margin-bottom-3 civicone-secondary-text"><?= number_format($userStats['xp']) ?> XP</p>
+                <div class="civicone-panel-bg civicone-xp-progress-bar" role="progressbar" aria-valuenow="<?= $userStats['level_progress'] ?>" aria-valuemin="0" aria-valuemax="100">
+                    <div class="civicone-xp-progress-fill" style="width: <?= $userStats['level_progress'] ?>%;"></div>
                 </div>
                 <?php if ($userStats['xp_for_next']): ?>
-                    <p class="govuk-body-s govuk-!-margin-top-2 govuk-!-margin-bottom-0" style="color: #505a5f;">
+                    <p class="govuk-body-s govuk-!-margin-top-2 govuk-!-margin-bottom-0 civicone-secondary-text">
                         <?= number_format($userStats['xp_for_next'] - $userStats['xp']) ?> XP to Level <?= $userStats['level'] + 1 ?>
                     </p>
                 <?php else: ?>
-                    <p class="govuk-body-s govuk-!-margin-top-2 govuk-!-margin-bottom-0" style="color: #00703c;">Max Level!</p>
+                    <p class="govuk-body-s govuk-!-margin-top-2 govuk-!-margin-bottom-0 civicone-text-success">Max Level!</p>
                 <?php endif; ?>
             </div>
         </div>
 
         <!-- Badges -->
         <div class="govuk-grid-column-one-quarter">
-            <div class="govuk-!-padding-4" style="border: 1px solid #b1b4b6; text-align: center;">
+            <div class="govuk-!-padding-4 civicone-stat-card">
                 <p class="govuk-body-s govuk-!-margin-bottom-1" aria-hidden="true">🏅</p>
                 <p class="govuk-heading-m govuk-!-margin-bottom-1"><?= $userStats['badges_count'] ?></p>
-                <p class="govuk-body-s govuk-!-margin-bottom-0" style="color: #505a5f;">Badges Earned</p>
+                <p class="govuk-body-s govuk-!-margin-bottom-0 civicone-secondary-text">Badges Earned</p>
             </div>
         </div>
 
         <?php if ($userStreaks && isset($userStreaks['activity'])): ?>
         <!-- Activity Streak -->
         <div class="govuk-grid-column-one-quarter">
-            <div class="govuk-!-padding-4" style="border: 1px solid #b1b4b6; text-align: center;">
+            <div class="govuk-!-padding-4 civicone-stat-card">
                 <p class="govuk-body-s govuk-!-margin-bottom-1" aria-hidden="true">🔥</p>
                 <p class="govuk-heading-m govuk-!-margin-bottom-1"><?= $userStreaks['activity']['current'] ?></p>
-                <p class="govuk-body-s govuk-!-margin-bottom-0" style="color: #505a5f;">Activity Streak</p>
+                <p class="govuk-body-s govuk-!-margin-bottom-0 civicone-secondary-text">Activity Streak</p>
             </div>
         </div>
         <?php endif; ?>
@@ -207,10 +207,10 @@ $basePath = \Nexus\Core\TenantContext::getBasePath();
         <?php if ($userStreaks && isset($userStreaks['giving'])): ?>
         <!-- Giving Streak -->
         <div class="govuk-grid-column-one-quarter">
-            <div class="govuk-!-padding-4" style="border: 1px solid #b1b4b6; text-align: center;">
+            <div class="govuk-!-padding-4 civicone-stat-card">
                 <p class="govuk-body-s govuk-!-margin-bottom-1" aria-hidden="true">💝</p>
                 <p class="govuk-heading-m govuk-!-margin-bottom-1"><?= $userStreaks['giving']['current'] ?></p>
-                <p class="govuk-body-s govuk-!-margin-bottom-0" style="color: #505a5f;">Giving Streak</p>
+                <p class="govuk-body-s govuk-!-margin-bottom-0 civicone-secondary-text">Giving Streak</p>
             </div>
         </div>
         <?php endif; ?>

@@ -41,7 +41,7 @@ $basePath = \Nexus\Core\TenantContext::getBasePath();
 <div class="govuk-grid-row govuk-!-margin-bottom-6">
     <div class="govuk-grid-column-two-thirds">
         <h1 class="govuk-heading-xl govuk-!-margin-bottom-2"><?= htmlspecialchars($event['title']) ?></h1>
-        <p class="govuk-body-l" style="color: #505a5f;">
+        <p class="govuk-body-l civicone-secondary-text">
             <i class="fa-solid fa-user govuk-!-margin-right-1" aria-hidden="true"></i>
             Hosted by <?= htmlspecialchars($event['user_name'] ?? 'Community Member') ?>
         </p>
@@ -60,7 +60,7 @@ $basePath = \Nexus\Core\TenantContext::getBasePath();
     <div class="govuk-grid-column-two-thirds">
 
         <!-- Event Description -->
-        <div class="govuk-!-padding-6 govuk-!-margin-bottom-6" style="border: 1px solid #b1b4b6;">
+        <div class="govuk-!-padding-6 govuk-!-margin-bottom-6 civicone-sidebar-card">
             <h2 class="govuk-heading-m">About this event</h2>
             <div class="govuk-body">
                 <?= nl2br(htmlspecialchars($event['description'])) ?>
@@ -68,7 +68,7 @@ $basePath = \Nexus\Core\TenantContext::getBasePath();
         </div>
 
         <!-- Event Details -->
-        <div class="govuk-!-padding-6 govuk-!-margin-bottom-6" style="border: 1px solid #b1b4b6; border-left: 5px solid #1d70b8;">
+        <div class="govuk-!-padding-6 govuk-!-margin-bottom-6 civicone-sidebar-card civicone-highlight-panel">
             <h2 class="govuk-heading-m">
                 <i class="fa-solid fa-info-circle govuk-!-margin-right-2" aria-hidden="true"></i>
                 Event Details
@@ -96,7 +96,7 @@ $basePath = \Nexus\Core\TenantContext::getBasePath();
                         <i class="fa-solid fa-tag govuk-!-margin-right-1" aria-hidden="true"></i> Category
                     </dt>
                     <dd class="govuk-summary-list__value">
-                        <span class="govuk-tag govuk-tag--blue"><?= htmlspecialchars($event['category_name']) ?></span>
+                        <span class="govuk-tag govuk-tag--light-blue"><?= htmlspecialchars($event['category_name']) ?></span>
                     </dd>
                 </div>
                 <?php endif; ?>
@@ -112,17 +112,17 @@ $basePath = \Nexus\Core\TenantContext::getBasePath();
 
         <!-- Attendees -->
         <?php if (!empty($attendees)): ?>
-        <div class="govuk-!-padding-6 govuk-!-margin-bottom-6" style="border: 1px solid #b1b4b6;">
+        <div class="govuk-!-padding-6 govuk-!-margin-bottom-6 civicone-sidebar-card">
             <h2 class="govuk-heading-m">
                 <i class="fa-solid fa-users govuk-!-margin-right-2" aria-hidden="true"></i>
                 Going (<?= count($attendees) ?>)
             </h2>
-            <div style="display: flex; flex-wrap: wrap; gap: 0.5rem;">
+            <div class="civicone-avatar-group">
                 <?php foreach ($attendees as $att): ?>
                     <a href="<?= $basePath ?>/profile/<?= $att['user_id'] ?>" title="<?= htmlspecialchars($att['name']) ?>">
                         <img src="<?= $att['avatar_url'] ?? '/assets/img/defaults/default_avatar.webp' ?>"
                              alt="<?= htmlspecialchars($att['name']) ?>"
-                             style="width: 40px; height: 40px; border-radius: 50%;">
+                             class="civicone-avatar civicone-avatar--40">
                     </a>
                 <?php endforeach; ?>
             </div>
@@ -135,7 +135,7 @@ $basePath = \Nexus\Core\TenantContext::getBasePath();
     <div class="govuk-grid-column-one-third">
 
         <!-- RSVP Card -->
-        <div class="govuk-!-padding-6 govuk-!-margin-bottom-6" style="border: 1px solid #b1b4b6; border-left: 5px solid #00703c;">
+        <div class="govuk-!-padding-6 govuk-!-margin-bottom-6 civicone-sidebar-card civicone-highlight-panel--green">
             <h2 class="govuk-heading-m">
                 <i class="fa-solid fa-calendar-check govuk-!-margin-right-2" aria-hidden="true"></i>
                 Your RSVP
@@ -169,7 +169,7 @@ $basePath = \Nexus\Core\TenantContext::getBasePath();
 
             <?php if (!empty($canInvite)): ?>
                 <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible">
-                <a href="<?= $basePath ?>/events/invite/<?= $event['id'] ?>" class="govuk-button govuk-button--secondary" data-module="govuk-button" style="width: 100%;">
+                <a href="<?= $basePath ?>/events/invite/<?= $event['id'] ?>" class="govuk-button govuk-button--secondary civicone-button-full-width" data-module="govuk-button">
                     <i class="fa-solid fa-envelope govuk-!-margin-right-1" aria-hidden="true"></i>
                     Invite Members
                 </a>
@@ -177,7 +177,7 @@ $basePath = \Nexus\Core\TenantContext::getBasePath();
         </div>
 
         <!-- Event Host Card -->
-        <div class="govuk-!-padding-6" style="border: 1px solid #b1b4b6;">
+        <div class="govuk-!-padding-6 civicone-sidebar-card">
             <h2 class="govuk-heading-m">
                 <i class="fa-solid fa-user govuk-!-margin-right-2" aria-hidden="true"></i>
                 Event Host

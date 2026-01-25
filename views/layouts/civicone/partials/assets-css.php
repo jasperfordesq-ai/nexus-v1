@@ -91,45 +91,32 @@
     ?>
     <!-- Updated 2026-01-17: All CSS now uses minified versions where available -->
     <!-- DESIGN TOKENS (Shared variables - must load first) -->
-    <link rel="stylesheet" href="/assets/css/design-tokens.min.css?v=<?= $cssVersion ?>">
+    <link rel="stylesheet" href="/assets/css/design-tokens.css?v=<?= $cssVersion ?>">
     <!-- LAYOUT ISOLATION (Prevent CSS conflicts) -->
-    <link rel="stylesheet" href="/assets/css/layout-isolation.min.css?v=<?= $cssVersion ?>">
+    <link rel="stylesheet" href="/assets/css/layout-isolation.css?v=<?= $cssVersion ?>">
     <!-- CORE FRAMEWORK (Layout & Logic) -->
-    <link rel="stylesheet" href="/assets/css/nexus-phoenix.min.css?v=<?= $cssVersion ?>">
+    <link rel="stylesheet" href="/assets/css/nexus-phoenix.css?v=<?= $cssVersion ?>">
     <!-- BRANDING (Global Styles - Must load BEFORE Skin) -->
-    <link rel="stylesheet" href="/assets/css/branding.min.css?v=<?= $cssVersion ?>">
+    <link rel="stylesheet" href="/assets/css/branding.css?v=<?= $cssVersion ?>">
     <!-- THEME OVERRIDE (Government Skin - Must load LAST) -->
-    <link rel="stylesheet" href="/assets/css/nexus-civicone.min.css?v=<?= $cssVersion ?>">
+    <link rel="stylesheet" href="/assets/css/nexus-civicone.css?v=<?= $cssVersion ?>">
     <!-- MOBILE ENHANCEMENTS (Bottom Nav, FAB, Skeletons) -->
-    <link rel="stylesheet" href="/assets/css/civicone-mobile.min.css?v=<?= $cssVersion ?>">
+    <link rel="stylesheet" href="/assets/css/civicone-mobile.css?v=<?= $cssVersion ?>">
     <!-- NATIVE EXPERIENCE (Animations, Gestures, Haptics) -->
-    <link rel="stylesheet" href="/assets/css/civicone-native.min.css?v=<?= $cssVersion ?>">
-    <!-- MOBILE NAV V2 (Tab Bar, Fullscreen Menu, Notifications Sheet) -->
-    <link rel="stylesheet" href="/assets/css/nexus-native-nav-v2.min.css?v=<?= $cssVersion ?>">
+    <link rel="stylesheet" href="/assets/css/civicone-native.css?v=<?= $cssVersion ?>">
+    <!-- MOBILE NAV V2 (Tab Bar, Fullscreen Menu, Notifications Sheet) - GOV.UK Isolated -->
+    <!-- Source: GOV.UK Frontend official (github.com/alphagov/govuk-frontend) -->
+    <link rel="stylesheet" href="/assets/css/civicone-mobile-nav-v2.css?v=<?= $cssVersion ?>">
 
-    <!-- Page-specific Component CSS -->
-    <?php if ($isHome): ?>
-        <link rel="stylesheet" href="/assets/css/feed-filter.min.css?v=<?= $cssVersion ?>">
-        <!-- CivicOne Home Page Styles (v3.1.0 - GOV.UK Full Compliance) -->
-        <link rel="stylesheet" href="/assets/css/civicone-home.css?v=<?= $cssVersion ?>">
-    <?php endif; ?>
-    <?php if (strpos($normPath, '/dashboard') !== false): ?>
-        <link rel="stylesheet" href="/assets/css/dashboard.min.css?v=<?= $cssVersion ?>">
-        <link rel="stylesheet" href="/assets/css/civicone-dashboard.min.css?v=<?= $cssVersion ?>">
-    <?php endif; ?>
-    <?php if (strpos($normPath, '/members') !== false): ?>
-        <!-- MOJ Filter Component for Members Directory v1.6.0 (GOV.UK/MOJ Compliance) -->
-        <link rel="stylesheet" href="/assets/css/moj-filter.min.css?v=<?= $cssVersion ?>">
-        <!-- Members Directory v1.6.0 (Mobile Bottom Sheet + Prominent Tabs) -->
-        <link rel="stylesheet" href="/assets/css/members-directory-v1.6.min.css?v=<?= $cssVersion ?>">
-    <?php endif; ?>
+    <!-- Page-specific Component CSS (Centralized Loader - Phase 3 CSS Refactoring) -->
+    <?php require __DIR__ . '/page-css-loader.php'; ?>
 
-    <!-- Cookie Consent (EU Compliance) - TEMPORARILY DISABLED -->
-    <!-- <link rel="stylesheet" href="/assets/css/civicone/cookie-banner.css?v=<?= $cssVersion ?>"> -->
-    <!-- <script src="/assets/js/cookie-consent.js?v=<?= $cssVersion ?>"> --></script>
+    <!-- Cookie Consent (EU Compliance) -->
+    <link rel="stylesheet" href="/assets/css/civicone/cookie-banner.min.css?v=<?= $cssVersion ?>">
+    <script src="/assets/js/cookie-consent.js?v=<?= $cssVersion ?>"></script>
 
     <!-- Mobile Sheets CSS (base styles always load, CSS handles desktop hiding) -->
-    <link rel="stylesheet" href="/assets/css/mobile-sheets.min.css?v=<?= $cssVersion ?>">
+    <link rel="stylesheet" href="/assets/css/mobile-sheets.css?v=<?= $cssVersion ?>">
     <link rel="stylesheet" href="/assets/css/pwa-install-modal.css?v=<?= $cssVersion ?>">
     <!-- Native app page enter animations (Capacitor only - uses .is-native class) -->
     <link rel="stylesheet" href="/assets/css/native-page-enter.css?v=<?= $cssVersion ?>">
@@ -141,44 +128,44 @@
     <link rel="stylesheet" href="/assets/css/mobile-search-overlay.css?v=<?= $cssVersion ?>">
 
     <!-- Social Interactions CSS -->
-    <link rel="stylesheet" href="/assets/css/social-interactions.min.css?v=<?= $cssVersion ?>">
+    <link rel="stylesheet" href="/assets/css/social-interactions.css?v=<?= $cssVersion ?>">
 
     <!-- GOV.UK Frontend v5.14.0 (Official Design System) - WCAG 2.1 AA Compliant -->
     <!-- Source: https://github.com/alphagov/govuk-frontend pinned to v5.14.0 -->
     <link rel="stylesheet" href="/assets/govuk-frontend-5.14.0/govuk-frontend.min.css?v=<?= $cssVersion ?>">
 
     <!-- GOV.UK Design System Extensions (Project-specific overrides) -->
-    <link rel="stylesheet" href="/assets/css/bundles/civicone-govuk-all.min.css?v=<?= $cssVersion ?>">
+    <link rel="stylesheet" href="/assets/css/bundles/civicone-govuk-all.css?v=<?= $cssVersion ?>">
 
-    <!-- CivicOne Layout (includes grid system - must load for all pages) -->
-    <link rel="stylesheet" href="/assets/css/civicone-header.min.css?v=<?= $cssVersion ?>">
-    <link rel="stylesheet" href="/assets/css/civicone-footer.min.css?v=<?= $cssVersion ?>">
+    <!-- CivicOne Header v2 (Complete Rebuild - 2026-01-25) -->
+    <!-- Replaces: civicone-header.css, civicone-service-navigation.css -->
+    <link rel="stylesheet" href="/assets/css/civicone-header-v2.min.css?v=<?= $cssVersion ?>">
 
-    <!-- CivicOne Service Navigation (GOV.UK 5.14.0 categorized dropdown) -->
-    <link rel="stylesheet" href="/assets/css/civicone-service-navigation.min.css?v=<?= $cssVersion ?>">
+    <!-- CivicOne Footer -->
+    <link rel="stylesheet" href="/assets/css/civicone-footer.css?v=<?= $cssVersion ?>">
 
     <!-- Account Area Navigation (MOJ Sub navigation pattern) -->
-    <link rel="stylesheet" href="/assets/css/civicone-account-nav.min.css?v=<?= $cssVersion ?>">
+    <link rel="stylesheet" href="/assets/css/civicone-account-nav.css?v=<?= $cssVersion ?>">
 
     <!-- Profile Components Bundle (Header + Social - Consolidated 2026-01-23) -->
-    <link rel="stylesheet" href="/assets/css/bundles/civicone-profile-all.min.css?v=<?= $cssVersion ?>">
+    <link rel="stylesheet" href="/assets/css/bundles/civicone-profile-all.css?v=<?= $cssVersion ?>">
 
     <!-- Directory Utilities (Extracted inline styles for events, listings, volunteering, feed - 2026-01-21) -->
-    <link rel="stylesheet" href="/assets/css/civicone-directory-utilities.min.css?v=<?= $cssVersion ?>">
+    <link rel="stylesheet" href="/assets/css/civicone-directory-utilities.css?v=<?= $cssVersion ?>">
 
     <!-- Extended Utilities (Extracted inline styles per CLAUDE.md - 2026-01-22) -->
     <link rel="stylesheet" href="/assets/css/civicone-utilities-extended.css?v=<?= $cssVersion ?>">
 
     <!-- Emergency Scroll Fix - MUST be last to override all other styles -->
-    <link rel="stylesheet" href="/assets/css/scroll-fix-emergency.min.css?v=<?= $cssVersion ?>">
+    <link rel="stylesheet" href="/assets/css/scroll-fix-emergency.css?v=<?= $cssVersion ?>">
     <!-- Development Notice Modal -->
-    <link rel="stylesheet" href="/assets/css/dev-notice-modal.min.css?v=<?= $cssVersion ?>">
+    <link rel="stylesheet" href="/assets/css/dev-notice-modal.css?v=<?= $cssVersion ?>">
     <!-- Development Banner (Prominent dev environment indicator) -->
-    <link rel="stylesheet" href="/assets/css/civicone-dev-banner.min.css?v=<?= $cssVersion ?>">
+    <link rel="stylesheet" href="/assets/css/civicone-dev-banner.css?v=<?= $cssVersion ?>">
     <!-- FONT AWESOME (Icons for mobile nav, buttons, etc.) - Async loaded -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous" media="print" onload="this.media='all'">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.css" crossorigin="anonymous" media="print" onload="this.media='all'">
     <noscript>
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.css" crossorigin="anonymous">
     </noscript>
     <!-- DASHICONS (WordPress icons - via unpkg CDN) - Async loaded -->
     <link rel="stylesheet" href="https://unpkg.com/@icon/dashicons@0.9.0/dashicons.css" crossorigin="anonymous" media="print" onload="this.media='all'">

@@ -87,7 +87,7 @@ require __DIR__ . '/../../layouts/civicone/header.php';
 <!-- Friends List -->
 <h2 class="govuk-heading-l">
     Friends
-    <span class="govuk-tag govuk-tag--blue govuk-!-margin-left-2"><?= count($friends) ?></span>
+    <span class="govuk-tag govuk-tag--light-blue govuk-!-margin-left-2"><?= count($friends) ?></span>
 </h2>
 
 <?php if (empty($friends)): ?>

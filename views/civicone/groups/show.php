@@ -23,10 +23,10 @@ $hasSubHubs = !empty($subGroups);
 </nav>
 
 <!-- Group Header -->
-<div class="govuk-!-margin-bottom-6 govuk-!-padding-6 civicone-panel-bg" style="border-left: 5px solid #1d70b8;">
+<div class="govuk-!-margin-bottom-6 govuk-!-padding-6 civicone-panel-bg civicone-highlight-panel">
     <div class="govuk-grid-row">
         <div class="govuk-grid-column-two-thirds">
-            <span class="govuk-tag govuk-tag--blue govuk-!-margin-bottom-3">Local Hub</span>
+            <span class="govuk-tag govuk-tag--light-blue govuk-!-margin-bottom-3">Local Hub</span>
             <h1 class="govuk-heading-xl govuk-!-margin-bottom-2"><?= htmlspecialchars($group['name']) ?></h1>
             <p class="govuk-body-l govuk-!-margin-bottom-0">
                 <strong><?= count($members) ?></strong> Members · Managed by <strong><?= htmlspecialchars($group['owner_name'] ?? 'Organizer') ?></strong>
@@ -87,7 +87,7 @@ $hasSubHubs = !empty($subGroups);
                 <div class="govuk-grid-row">
                     <?php foreach ($subGroups as $sub): ?>
                         <div class="govuk-grid-column-one-half govuk-!-margin-bottom-6">
-                            <div class="govuk-!-padding-4" style="border: 1px solid #b1b4b6;">
+                            <div class="govuk-!-padding-4 civicone-sidebar-card">
                                 <h3 class="govuk-heading-m govuk-!-margin-bottom-2">
                                     <a href="<?= $basePath ?>/groups/<?= $sub['id'] ?>" class="govuk-link"><?= htmlspecialchars($sub['name']) ?></a>
                                 </h3>
@@ -124,18 +124,18 @@ $hasSubHubs = !empty($subGroups);
                     <div class="govuk-grid-row">
                         <?php foreach ($members as $mem): ?>
                             <div class="govuk-grid-column-one-quarter govuk-!-margin-bottom-4">
-                                <div class="govuk-!-padding-3 govuk-!-text-align-centre" style="border: 1px solid #b1b4b6;">
+                                <div class="govuk-!-padding-3 civicone-sidebar-card civicone-member-card">
                                     <?php if (!empty($mem['avatar_url'])): ?>
-                                        <img src="<?= htmlspecialchars($mem['avatar_url']) ?>" alt="" style="width: 60px; height: 60px; border-radius: 50%; margin-bottom: 0.5rem;">
+                                        <img src="<?= htmlspecialchars($mem['avatar_url']) ?>" alt="" class="civicone-member-card__avatar">
                                     <?php else: ?>
-                                        <div class="govuk-!-margin-bottom-2 civicone-panel-bg" style="width: 60px; height: 60px; border-radius: 50%; margin: 0 auto; display: flex; align-items: center; justify-content: center;">
-                                            <i class="fa-solid fa-user" style="font-size: 1.5rem; color: #505a5f;" aria-hidden="true"></i>
+                                        <div class="civicone-member-card__placeholder">
+                                            <i class="fa-solid fa-user" aria-hidden="true"></i>
                                         </div>
                                     <?php endif; ?>
                                     <p class="govuk-body-s govuk-!-margin-bottom-1">
                                         <a href="<?= $basePath ?>/profile/<?= $mem['id'] ?>" class="govuk-link"><?= htmlspecialchars($mem['name']) ?></a>
                                     </p>
-                                    <p class="govuk-body-s govuk-!-margin-bottom-0" style="color: #505a5f;"><?= htmlspecialchars($mem['location'] ?? 'Member') ?></p>
+                                    <p class="govuk-body-s govuk-!-margin-bottom-0 civicone-secondary-text"><?= htmlspecialchars($mem['location'] ?? 'Member') ?></p>
                                 </div>
                             </div>
                         <?php endforeach; ?>
@@ -150,7 +150,7 @@ $hasSubHubs = !empty($subGroups);
         <div class="govuk-!-padding-4 civicone-panel-bg">
             <h2 class="govuk-heading-m">Hub Manager</h2>
             <p class="govuk-body govuk-!-margin-bottom-1"><strong><?= htmlspecialchars($group['owner_name'] ?? 'Organizer') ?></strong></p>
-            <p class="govuk-body-s" style="color: #505a5f;">Organizer</p>
+            <p class="govuk-body-s civicone-secondary-text">Organizer</p>
             <button type="button" class="govuk-button govuk-button--secondary govuk-!-margin-bottom-0" data-module="govuk-button" disabled aria-label="Contact hub manager (coming soon)">
                 Contact (Coming Soon)
             </button>

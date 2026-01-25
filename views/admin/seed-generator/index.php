@@ -10,8 +10,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Database Seed Generator | Nexus Admin</title>
-    <link rel="stylesheet" href="/assets/css/admin-gold-standard.min.css">
-    <link rel="stylesheet" href="/assets/css/nexus-phoenix.min.css">
+    <link rel="stylesheet" href="/assets/css/admin-gold-standard.css">
+    <link rel="stylesheet" href="/assets/css/nexus-phoenix.css">
     <style>
         .seed-generator-container {
             max-width: 1400px;

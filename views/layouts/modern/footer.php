@@ -178,7 +178,11 @@ if (empty($mapboxToken) && class_exists('Nexus\Core\TenantContext')) {
         }
     }
 }
-$jsVersion = '2.5.13';
+// Use deployment version for cache busting (same as CSS)
+$deploymentVersion = file_exists(__DIR__ . '/../../config/deployment-version.php')
+    ? require __DIR__ . '/../../config/deployment-version.php'
+    : ['version' => time()];
+$jsVersion = $deploymentVersion['version'] ?? time();
 ?>
 <script>
     window.NEXUS_MAPBOX_TOKEN = "<?= htmlspecialchars($mapboxToken ?? '') ?>";
@@ -204,8 +208,8 @@ $jsVersion = '2.5.13';
 <script src="/assets/js/nexus-mapbox.min.js?v=<?= $jsVersion ?>" defer></script>
 <script src="/assets/js/social-interactions.min.js?v=<?= $jsVersion ?>" defer></script>
 <script src="/assets/js/nexus-ui.min.js?v=<?= $jsVersion ?>" defer></script>
-<script src="/assets/js/nexus-turbo.min.js?v=2.5.0" defer></script>
-<script src="/assets/js/nexus-auth-handler.min.js?v=2.5.0" defer></script>
+<script src="/assets/js/nexus-turbo.min.js?v=<?= $jsVersion ?>" defer></script>
+<script src="/assets/js/nexus-auth-handler.min.js?v=<?= $jsVersion ?>" defer></script>
 <script src="/assets/js/nexus-app-updater.min.js?v=<?= $jsVersion ?>" defer></script>
 <script src="/assets/js/nexus-native.min.js?v=<?= $jsVersion ?>" defer></script>
 <script src="/assets/js/nexus-mobile.min.js?v=<?= $jsVersion ?>" defer></script>
@@ -307,7 +311,7 @@ if (file_exists($envPath)) {
 <!-- Native features for Capacitor/Android app (only runs if in native context) -->
 <script src="/assets/js/nexus-native-push.min.js?v=<?= $jsVersion ?>" defer></script>
 <script src="/assets/js/nexus-native-features.min.js?v=<?= $jsVersion ?>" defer></script>
-<script src="/assets/js/nexus-biometric.min.js?v=2.5.0" defer></script>
+<script src="/assets/js/nexus-biometric.min.js?v=<?= $jsVersion ?>" defer></script>
 
 <?php if (isset($_SESSION['user_id'])): ?>
     <!-- Pusher Real-Time WebSocket -->
@@ -502,33 +506,6 @@ if (file_exists($envPath)) {
 <!-- Mobile Navigation v2 (Full-Screen Native Style) -->
 <?php include __DIR__ . '/partials/mobile-nav-v2.php'; ?>
 
-<!-- EMERGENCY FIX: Force hide mobile menu on desktop with maximum specificity -->
-<style>
-@media (min-width: 1025px) {
-    .mobile-fullscreen-menu,
-    .mobile-notification-sheet,
-    #mobileMenu,
-    #mobileNotifications,
-    .mobile-tab-bar,
-    nav.mobile-tab-bar,
-    div.mobile-fullscreen-menu,
-    div.mobile-notification-sheet {
-        display: none !important;
-        visibility: hidden !important;
-        opacity: 0 !important;
-        pointer-events: none !important;
-        position: absolute !important;
-        left: -99999px !important;
-        top: -99999px !important;
-        width: 0 !important;
-        height: 0 !important;
-        overflow: hidden !important;
-        clip: rect(0,0,0,0) !important;
-        z-index: -9999 !important;
-    }
-}
-</style>
-
 <!-- Mobile Bottom Sheets (Comments, etc) -->
 <?php include __DIR__ . '/../../modern/partials/mobile-sheets.php'; ?>
 
@@ -538,15 +515,15 @@ if (file_exists($envPath)) {
 <!-- Layout Upgrade Prompt (removed - feature deprecated) -->
 
 <!-- CRITICAL: Loading Fix Script (defer to avoid render blocking) -->
-<script src="/assets/js/nexus-loading-fix.min.js?v=2.5.0" defer></script>
+<script src="/assets/js/nexus-loading-fix.min.js?v=<?= $jsVersion ?>" defer></script>
 
 <!-- Navigation Active Indicator Fix -->
 
 <!-- Resize Handler (Prevents animation jank during resize) -->
-<script src="/assets/js/nexus-resize-handler.min.js?v=2.5.0" defer></script>
+<script src="/assets/js/nexus-resize-handler.min.js?v=<?= $jsVersion ?>" defer></script>
 
 <!-- Visual Enhancements & Micro-Interactions -->
-<script src="/assets/js/nexus-transitions.min.js?v=2.5.0" defer></script>
+<script src="/assets/js/nexus-transitions.min.js?v=<?= $jsVersion ?>" defer></script>
 
 <!-- Flash Message Toast Handler -->
 <?php if (!empty($_SESSION['flash_message'])): ?>
@@ -583,6 +560,9 @@ if (file_exists($envPath)) {
     </script>
     <?php unset($_SESSION['_cleanup_refresh_param']); ?>
 <?php endif; ?>
+
+<!-- Development Notice Modal (Preview Mode Alert) -->
+<script src="/assets/js/dev-notice-modal.min.js?v=<?= $jsVersion ?>"></script>
 
 </body>
 

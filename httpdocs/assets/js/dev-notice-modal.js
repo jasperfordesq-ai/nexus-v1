@@ -7,7 +7,7 @@
     'use strict';
 
     const STORAGE_KEY = 'dev_notice_dismissed';
-    const STORAGE_VERSION = '1.0'; // Increment to show again to all users
+    const STORAGE_VERSION = '2.1'; // Increment to show again to all users
 
     function hasSeenNotice() {
         try {
@@ -47,7 +47,7 @@
                     <p><strong>Welcome!</strong> This site is still under active development and you're viewing it in preview mode.</p>
 
                     <div class="dev-notice-highlight">
-                        <strong>Rapid Deployment Phase:</strong> We're currently in a period of frequent updates. While this phase should be over soon, you may occasionally encounter bugs or unexpected behavior.
+                        <strong>Currently Working On:</strong> We're actively improving the mobile experience. If you're on a phone or tablet, you may notice some layout changes and improvements rolling out.
                     </div>
 
                     <p>Your feedback is invaluable! If you notice any issues, please use the <strong>bug report link</strong> at the bottom of the page. It helps us track and fix problems much faster.</p>

@@ -37,7 +37,7 @@ $basePath = \Nexus\Core\TenantContext::getBasePath();
         <h1 class="govuk-heading-xl"><?= htmlspecialchars($opportunity['title']) ?></h1>
 
         <?php if (!empty($opportunity['location'])): ?>
-            <p class="govuk-body-l govuk-!-margin-bottom-6" style="color: #505a5f;">
+            <p class="govuk-body-l govuk-!-margin-bottom-6 civicone-secondary-text">
                 <i class="fa-solid fa-location-dot govuk-!-margin-right-2" aria-hidden="true"></i>
                 <?= htmlspecialchars($opportunity['location']) ?>
             </p>
@@ -93,14 +93,14 @@ $basePath = \Nexus\Core\TenantContext::getBasePath();
 
     <!-- Sidebar -->
     <div class="govuk-grid-column-one-third">
-        <div class="govuk-!-padding-4" style="border: 1px solid #b1b4b6;">
+        <div class="govuk-!-padding-4 civicone-sidebar-card">
 
             <!-- Organization Info -->
             <h2 class="govuk-heading-s">
                 <i class="fa-solid fa-building govuk-!-margin-right-2" aria-hidden="true"></i>
                 <?= htmlspecialchars($opportunity['org_name'] ?? 'Organization') ?>
             </h2>
-            <p class="govuk-body-s govuk-!-margin-bottom-4" style="color: #505a5f;">Community Organization</p>
+            <p class="govuk-body-s govuk-!-margin-bottom-4 civicone-secondary-text">Community Organization</p>
 
             <!-- Application Status / Form -->
             <?php if (isset($_GET['msg']) && $_GET['msg'] == 'applied'): ?>
@@ -153,7 +153,7 @@ $basePath = \Nexus\Core\TenantContext::getBasePath();
                                   placeholder="Tell them why you'd like to volunteer..."></textarea>
                     </div>
 
-                    <button type="submit" class="govuk-button" data-module="govuk-button" style="width: 100%;">
+                    <button type="submit" class="govuk-button civicone-button-full-width" data-module="govuk-button">
                         <i class="fa-solid fa-check govuk-!-margin-right-1" aria-hidden="true"></i>
                         Apply Now
                     </button>
@@ -161,7 +161,7 @@ $basePath = \Nexus\Core\TenantContext::getBasePath();
             <?php else: ?>
                 <div class="govuk-inset-text">
                     <p class="govuk-body"><i class="fa-solid fa-lock govuk-!-margin-right-1" aria-hidden="true"></i> Join our community to volunteer.</p>
-                    <a href="<?= $basePath ?>/login" class="govuk-button" data-module="govuk-button" style="width: 100%;">
+                    <a href="<?= $basePath ?>/login" class="govuk-button civicone-button-full-width" data-module="govuk-button">
                         Login to Apply
                     </a>
                 </div>

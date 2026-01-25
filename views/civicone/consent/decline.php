@@ -40,10 +40,10 @@ $tenantName = $tenant['name'] ?? 'the platform';
 <h1 class="govuk-heading-xl">Your Options</h1>
 
 <!-- Option 1: Accept -->
-<div class="govuk-!-padding-6 govuk-!-margin-bottom-6" style="border: 1px solid #b1b4b6; border-left: 5px solid #00703c;">
+<div class="govuk-!-padding-6 govuk-!-margin-bottom-6 civicone-accent-card--green">
     <div class="govuk-grid-row">
         <div class="govuk-grid-column-one-quarter govuk-!-text-align-centre">
-            <i class="fa-solid fa-check-circle" style="font-size: 3rem; color: #00703c;" aria-hidden="true"></i>
+            <i class="fa-solid fa-check-circle civicone-icon-large civicone-icon-green" aria-hidden="true"></i>
         </div>
         <div class="govuk-grid-column-three-quarters">
             <h2 class="govuk-heading-m">Accept the Updated Terms</h2>
@@ -57,10 +57,10 @@ $tenantName = $tenant['name'] ?? 'the platform';
 </div>
 
 <!-- Option 2: Contact Support -->
-<div class="govuk-!-padding-6 govuk-!-margin-bottom-6" style="border: 1px solid #b1b4b6; border-left: 5px solid #1d70b8;">
+<div class="govuk-!-padding-6 govuk-!-margin-bottom-6 civicone-action-card">
     <div class="govuk-grid-row">
         <div class="govuk-grid-column-one-quarter govuk-!-text-align-centre">
-            <i class="fa-solid fa-comments" style="font-size: 3rem; color: #1d70b8;" aria-hidden="true"></i>
+            <i class="fa-solid fa-comments civicone-icon-large civicone-icon-blue" aria-hidden="true"></i>
         </div>
         <div class="govuk-grid-column-three-quarters">
             <h2 class="govuk-heading-m">Contact Support</h2>
@@ -73,10 +73,10 @@ $tenantName = $tenant['name'] ?? 'the platform';
 </div>
 
 <!-- Option 3: Delete Account -->
-<div class="govuk-!-padding-6 govuk-!-margin-bottom-6" style="border: 1px solid #b1b4b6; border-left: 5px solid #d4351c;">
+<div class="govuk-!-padding-6 govuk-!-margin-bottom-6 civicone-accent-card--red">
     <div class="govuk-grid-row">
         <div class="govuk-grid-column-one-quarter govuk-!-text-align-centre">
-            <i class="fa-solid fa-user-xmark" style="font-size: 3rem; color: #d4351c;" aria-hidden="true"></i>
+            <i class="fa-solid fa-user-xmark civicone-icon-large civicone-icon-red" aria-hidden="true"></i>
         </div>
         <div class="govuk-grid-column-three-quarters">
             <h2 class="govuk-heading-m">Request Account Deletion</h2>

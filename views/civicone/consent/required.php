@@ -59,17 +59,17 @@ $tenantName = $tenant['name'] ?? 'the platform';
                 $docUrl = $basePath . '/privacy';
             }
             ?>
-            <div class="govuk-!-padding-4 govuk-!-margin-bottom-4" style="border: 1px solid #b1b4b6; border-left: 5px solid #1d70b8;">
+            <div class="govuk-!-padding-4 govuk-!-margin-bottom-4 civicone-action-card">
                 <div class="govuk-grid-row govuk-!-margin-bottom-3">
                     <div class="govuk-grid-column-two-thirds">
                         <h3 class="govuk-heading-m govuk-!-margin-bottom-1"><?= htmlspecialchars($consent['name']) ?></h3>
-                        <p class="govuk-body-s govuk-!-margin-bottom-0" style="color: #505a5f;"><?= htmlspecialchars($consent['description'] ?? '') ?></p>
+                        <p class="govuk-body-s govuk-!-margin-bottom-0 civicone-secondary-text"><?= htmlspecialchars($consent['description'] ?? '') ?></p>
                     </div>
                     <div class="govuk-grid-column-one-third govuk-!-text-align-right">
                         <?php if (($consent['reason'] ?? '') === 'version_outdated'): ?>
                             <span class="govuk-tag govuk-tag--yellow">Updated</span>
                         <?php else: ?>
-                            <span class="govuk-tag govuk-tag--blue">Required</span>
+                            <span class="govuk-tag govuk-tag--light-blue">Required</span>
                         <?php endif; ?>
                     </div>
                 </div>
@@ -99,7 +99,7 @@ $tenantName = $tenant['name'] ?? 'the platform';
         <button type="submit" class="govuk-button" data-module="govuk-button" id="acceptBtn" disabled>
             <i class="fa-solid fa-check govuk-!-margin-right-1" aria-hidden="true"></i> Accept and Continue
         </button>
-        <p class="govuk-body-s" style="color: #505a5f;">By clicking "Accept and Continue", you confirm that you have read and understood the documents above.</p>
+        <p class="govuk-body-s civicone-secondary-text">By clicking "Accept and Continue", you confirm that you have read and understood the documents above.</p>
     </div>
 </form>
 

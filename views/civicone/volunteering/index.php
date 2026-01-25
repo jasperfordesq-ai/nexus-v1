@@ -48,7 +48,7 @@ $basePath = \Nexus\Core\TenantContext::getBasePath();
 
     <!-- Filters Panel (1/3) -->
     <div class="govuk-grid-column-one-third">
-        <div class="govuk-!-padding-4 civicone-panel-bg" style="margin-bottom: 1.5rem;">
+        <div class="govuk-!-padding-4 govuk-!-margin-bottom-6 civicone-panel-bg">
             <h2 class="govuk-heading-m">Filter opportunities</h2>
 
             <form method="get" action="<?= $basePath ?>/volunteering">
@@ -183,9 +183,9 @@ $basePath = \Nexus\Core\TenantContext::getBasePath();
                     $orgName = htmlspecialchars($opp['org_name'] ?? 'Organization');
                     $postedDate = !empty($opp['created_at']) ? date('j M Y', strtotime($opp['created_at'])) : '';
                     ?>
-                    <li class="govuk-!-margin-bottom-4 govuk-!-padding-bottom-4" style="border-bottom: 1px solid #b1b4b6;">
+                    <li class="govuk-!-margin-bottom-4 govuk-!-padding-bottom-4 civicone-listing-item">
                         <!-- Organization & Date -->
-                        <p class="govuk-body-s govuk-!-margin-bottom-1" style="color: #505a5f;">
+                        <p class="govuk-body-s govuk-!-margin-bottom-1 civicone-secondary-text">
                             <?= $orgName ?>
                             <?php if ($postedDate): ?>
                                 &middot; Posted <?= $postedDate ?>

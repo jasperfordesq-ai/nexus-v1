@@ -26,7 +26,7 @@ $description = htmlspecialchars($transaction['description'] ?? 'Time exchange');
 $completedAt = $transaction['completed_at'] ?? $transaction['created_at'] ?? null;
 ?>
 
-<link rel="stylesheet" href="<?= $basePath ?>/assets/css/federation-reviews.min.css?v=<?= time() ?>">
+<link rel="stylesheet" href="<?= $basePath ?>/assets/css/federation-reviews.css?v=<?= time() ?>">
 
 <!-- Offline Banner -->
 <div class="offline-banner" id="offlineBanner" role="alert" aria-live="polite">

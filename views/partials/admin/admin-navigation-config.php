@@ -183,6 +183,13 @@ function getAdminNavigationModules(): array
                     ],
                 ],
                 [
+                    'title' => 'Legal Documents',
+                    'items' => [
+                        ['label' => 'All Documents', 'url' => '/admin/legal-documents', 'icon' => 'fa-file-contract'],
+                        ['label' => 'Compliance Dashboard', 'url' => '/admin/legal-documents/compliance', 'icon' => 'fa-clipboard-check'],
+                    ],
+                ],
+                [
                     'title' => 'System Health',
                     'items' => [
                         ['label' => 'Monitoring Dashboard', 'url' => '/admin/enterprise/monitoring', 'icon' => 'fa-heart-pulse'],

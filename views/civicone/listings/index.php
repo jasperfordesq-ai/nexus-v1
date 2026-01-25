@@ -172,12 +172,12 @@ $basePath = \Nexus\Core\TenantContext::getBasePath();
                     $authorName = htmlspecialchars($listing['author_name'] ?? 'User');
                     $postedDate = !empty($listing['created_at']) ? date('j M Y', strtotime($listing['created_at'])) : '';
                     ?>
-                    <li class="govuk-!-margin-bottom-4 govuk-!-padding-bottom-4" style="border-bottom: 1px solid #b1b4b6;">
+                    <li class="govuk-!-margin-bottom-4 govuk-!-padding-bottom-4 civicone-listing-item">
                         <!-- Type Badge & Date -->
                         <p class="govuk-body-s govuk-!-margin-bottom-1">
-                            <strong class="govuk-tag <?= $isOffer ? 'govuk-tag--green' : 'govuk-tag--blue' ?>"><?= ucfirst($listingType) ?></strong>
+                            <strong class="govuk-tag <?= $isOffer ? 'govuk-tag--green' : 'govuk-tag--grey' ?>"><?= ucfirst($listingType) ?></strong>
                             <?php if ($postedDate): ?>
-                                <span style="color: #505a5f;">&middot; Posted <?= $postedDate ?></span>
+                                <span class="civicone-secondary-text">&middot; Posted <?= $postedDate ?></span>
                             <?php endif; ?>
                         </p>
 
@@ -192,7 +192,7 @@ $basePath = \Nexus\Core\TenantContext::getBasePath();
                         <p class="govuk-body govuk-!-margin-bottom-2"><?= $listingDesc ?></p>
 
                         <!-- Author -->
-                        <p class="govuk-body-s govuk-!-margin-bottom-2" style="color: #505a5f;">
+                        <p class="govuk-body-s govuk-!-margin-bottom-2 civicone-secondary-text">
                             By <strong><?= $authorName ?></strong>
                         </p>
 

@@ -353,24 +353,24 @@ html {
 
 /* CONTAINER & GRID */
 .htb-container {
-    max-width: 1140px;
+    max-width: var(--layout-max-content-width, 1400px);
     margin: 0 auto;
-    padding: 140px var(--space-5) var(--space-20) var(--space-5);
-    /* Top padding accounts for fixed header */
+    padding: var(--layout-content-padding-top, 140px) var(--space-6) var(--space-20) var(--space-6);
+    /* Top padding accounts for fixed header + utility bar */
     position: relative;
     z-index: 10;
     display: grid;
-    grid-template-columns: 1fr 360px;
+    grid-template-columns: 1fr var(--layout-sidebar-width, 360px);
     gap: var(--space-10);
 }
 
 .htb-container-full {
     display: grid;
     grid-template-columns: 1fr;
-    max-width: 1200px;
+    max-width: var(--layout-max-content-width, 1400px);
     margin: 0 auto;
-    padding: 140px var(--space-5) var(--space-20) var(--space-5);
-    /* Top padding accounts for fixed header */
+    padding: var(--layout-content-padding-top, 140px) var(--space-6) var(--space-20) var(--space-6);
+    /* Top padding accounts for fixed header + utility bar */
     position: relative;
     z-index: 10;
 }

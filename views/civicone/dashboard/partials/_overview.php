@@ -27,7 +27,7 @@
 
         <!-- Recent Notifications -->
         <section aria-labelledby="notif-preview-heading" class="govuk-!-margin-bottom-6">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+            <div class="civicone-section-title-row">
                 <h2 id="notif-preview-heading" class="govuk-heading-m govuk-!-margin-bottom-0">Recent Notifications</h2>
                 <a href="<?= $basePath ?>/dashboard/notifications" class="govuk-link">View all</a>
             </div>
@@ -44,13 +44,13 @@
             <?php else: ?>
                 <ul class="govuk-list" role="list">
                 <?php foreach ($previewNotifs as $n): ?>
-                    <li class="govuk-!-padding-bottom-2 govuk-!-margin-bottom-2" style="border-bottom: 1px solid #b1b4b6;">
-                        <a href="<?= htmlspecialchars($n['link'] ?: '#') ?>" class="govuk-link govuk-link--no-underline" style="display: block;">
+                    <li class="govuk-!-padding-bottom-2 govuk-!-margin-bottom-2 civicone-list-item-border">
+                        <a href="<?= htmlspecialchars($n['link'] ?: '#') ?>" class="govuk-link govuk-link--no-underline govuk-!-display-block">
                             <p class="govuk-body govuk-!-margin-bottom-1 <?= $n['is_read'] ? '' : 'govuk-!-font-weight-bold' ?>">
-                                <?= $n['is_read'] ? '' : '<strong class="govuk-tag govuk-tag--blue" style="font-size: 10px; margin-right: 5px;">NEW</strong>' ?>
+                                <?= $n['is_read'] ? '' : '<strong class="govuk-tag govuk-tag--light-blue civicone-tag-sm govuk-!-margin-right-1">NEW</strong>' ?>
                                 <?= htmlspecialchars($n['message']) ?>
                             </p>
-                            <p class="govuk-body-s govuk-!-margin-bottom-0" style="color: #505a5f;">
+                            <p class="govuk-body-s govuk-!-margin-bottom-0 civicone-secondary-text">
                                 <?= date('j M Y, g:i a', strtotime($n['created_at'])) ?>
                             </p>
                         </a>
@@ -70,14 +70,14 @@
             <?php else: ?>
                 <ul class="govuk-list" role="list">
                 <?php foreach ($activity_feed as $log): ?>
-                    <li class="govuk-!-padding-bottom-2 govuk-!-margin-bottom-2" style="border-bottom: 1px solid #b1b4b6; display: flex; justify-content: space-between;">
+                    <li class="govuk-!-padding-bottom-2 govuk-!-margin-bottom-2 civicone-activity-row">
                         <div>
                             <p class="govuk-body govuk-!-margin-bottom-0"><?= htmlspecialchars($log['action']) ?></p>
                             <?php if (!empty($log['details'])): ?>
-                            <p class="govuk-body-s govuk-!-margin-bottom-0" style="color: #505a5f;"><?= htmlspecialchars($log['details']) ?></p>
+                            <p class="govuk-body-s govuk-!-margin-bottom-0 civicone-secondary-text"><?= htmlspecialchars($log['details']) ?></p>
                             <?php endif; ?>
                         </div>
-                        <span class="govuk-body-s" style="color: #505a5f; white-space: nowrap;"><?= date('j M', strtotime($log['created_at'])) ?></span>
+                        <span class="govuk-body-s civicone-secondary-text civicone-text-nowrap"><?= date('j M', strtotime($log['created_at'])) ?></span>
                     </li>
                 <?php endforeach; ?>
                 </ul>
@@ -100,14 +100,14 @@
                 <ul class="govuk-list" role="list">
                 <?php foreach (array_slice($myEvents, 0, 3) as $ev): ?>
                     <li class="govuk-!-margin-bottom-2">
-                        <a href="<?= $basePath ?>/events/<?= $ev['id'] ?>" class="govuk-link govuk-link--no-underline" style="display: flex; align-items: center; gap: 10px;">
-                            <div style="background: #1d70b8; color: white; padding: 5px 10px; border-radius: 4px; text-align: center; min-width: 50px;">
-                                <div style="font-size: 10px; text-transform: uppercase;"><?= date('M', strtotime($ev['start_time'])) ?></div>
-                                <div style="font-size: 18px; font-weight: bold;"><?= date('d', strtotime($ev['start_time'])) ?></div>
+                        <a href="<?= $basePath ?>/events/<?= $ev['id'] ?>" class="govuk-link govuk-link--no-underline civicone-event-link">
+                            <div class="civicone-event-date-badge">
+                                <div class="civicone-event-date-month"><?= date('M', strtotime($ev['start_time'])) ?></div>
+                                <div class="civicone-event-date-day"><?= date('d', strtotime($ev['start_time'])) ?></div>
                             </div>
                             <div>
                                 <p class="govuk-body-s govuk-!-font-weight-bold govuk-!-margin-bottom-0"><?= htmlspecialchars($ev['title']) ?></p>
-                                <p class="govuk-body-s govuk-!-margin-bottom-0" style="color: #505a5f;"><?= htmlspecialchars($ev['location'] ?? 'TBA') ?></p>
+                                <p class="govuk-body-s govuk-!-margin-bottom-0 civicone-secondary-text"><?= htmlspecialchars($ev['location'] ?? 'TBA') ?></p>
                             </div>
                         </a>
                     </li>
@@ -127,13 +127,13 @@
         }
         ?>
         <section aria-labelledby="matches-heading" class="govuk-!-padding-4 govuk-!-margin-bottom-4 civicone-panel-bg">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+            <div class="civicone-section-title-row govuk-!-margin-bottom-2">
                 <h2 id="matches-heading" class="govuk-heading-s govuk-!-margin-bottom-0">Smart Matches</h2>
                 <a href="<?= $basePath ?>/matches" class="govuk-link govuk-body-s">View all</a>
             </div>
             <?php if (empty($dashboardMatches)): ?>
                 <p class="govuk-body-s">No hot matches yet.</p>
-                <p class="govuk-body-s" style="color: #505a5f;">Create listings to find compatible members nearby.</p>
+                <p class="govuk-body-s civicone-secondary-text">Create listings to find compatible members nearby.</p>
                 <a href="<?= $basePath ?>/listings/create" class="govuk-button govuk-!-margin-bottom-0">Create a Listing</a>
             <?php else: ?>
                 <ul class="govuk-list" role="list">
@@ -143,25 +143,25 @@
                     $tagColor = $matchScore >= 85 ? 'govuk-tag--green' : ($matchScore >= 70 ? 'govuk-tag--yellow' : 'govuk-tag--grey');
                     $distanceKm = $match['distance_km'] ?? null;
                     ?>
-                    <li class="govuk-!-margin-bottom-2 govuk-!-padding-bottom-2" style="border-bottom: 1px solid #b1b4b6;">
-                        <a href="<?= $basePath ?>/listings/<?= $match['id'] ?>" class="govuk-link govuk-link--no-underline" style="display: flex; align-items: center; gap: 10px;">
-                            <div style="width: 40px; height: 40px; border-radius: 50%; background: #b1b4b6; display: flex; align-items: center; justify-content: center; flex-shrink: 0; overflow: hidden;">
+                    <li class="govuk-!-margin-bottom-2 govuk-!-padding-bottom-2 civicone-list-item-border">
+                        <a href="<?= $basePath ?>/listings/<?= $match['id'] ?>" class="govuk-link govuk-link--no-underline civicone-match-item">
+                            <div class="civicone-match-avatar">
                                 <?php if (!empty($match['user_avatar'])): ?>
-                                    <img src="<?= htmlspecialchars($match['user_avatar']) ?>" alt="" style="width: 100%; height: 100%; object-fit: cover;">
+                                    <img src="<?= htmlspecialchars($match['user_avatar']) ?>" alt="">
                                 <?php else: ?>
-                                    <span style="color: white; font-weight: bold;"><?= strtoupper(substr($match['user_name'] ?? 'U', 0, 1)) ?></span>
+                                    <span class="civicone-match-avatar-letter"><?= strtoupper(substr($match['user_name'] ?? 'U', 0, 1)) ?></span>
                                 <?php endif; ?>
                             </div>
-                            <div style="flex-grow: 1; min-width: 0;">
-                                <p class="govuk-body-s govuk-!-font-weight-bold govuk-!-margin-bottom-0" style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap;"><?= htmlspecialchars($match['title'] ?? 'Listing') ?></p>
-                                <p class="govuk-body-s govuk-!-margin-bottom-0" style="color: #505a5f;">
+                            <div class="civicone-match-info">
+                                <p class="govuk-body-s govuk-!-font-weight-bold govuk-!-margin-bottom-0 civicone-text-truncate"><?= htmlspecialchars($match['title'] ?? 'Listing') ?></p>
+                                <p class="govuk-body-s govuk-!-margin-bottom-0 civicone-secondary-text">
                                     <?= htmlspecialchars($match['user_name'] ?? 'Unknown') ?>
                                     <?php if ($distanceKm !== null): ?>
                                         &middot; <?= number_format($distanceKm, 1) ?>km
                                     <?php endif; ?>
                                 </p>
                             </div>
-                            <strong class="govuk-tag <?= $tagColor ?>" style="font-size: 11px;"><?= $matchScore ?>%</strong>
+                            <strong class="govuk-tag <?= $tagColor ?> civicone-tag-score"><?= $matchScore ?>%</strong>
                         </a>
                     </li>
                 <?php endforeach; ?>
@@ -182,7 +182,7 @@
                         <a href="<?= $basePath ?>/groups/<?= $grp['id'] ?>" class="govuk-link">
                             <?= htmlspecialchars($grp['name']) ?>
                         </a>
-                        <p class="govuk-body-s govuk-!-margin-bottom-0" style="color: #505a5f;"><?= $grp['member_count'] ?? '0' ?> members</p>
+                        <p class="govuk-body-s govuk-!-margin-bottom-0 civicone-secondary-text"><?= $grp['member_count'] ?? '0' ?> members</p>
                     </li>
                 <?php endforeach; ?>
                 </ul>
@@ -193,13 +193,13 @@
         <section class="govuk-!-padding-4 civicone-panel-bg">
             <h2 class="govuk-heading-s">Quick Actions</h2>
             <p class="govuk-!-margin-bottom-2">
-                <a href="<?= $basePath ?>/achievements" class="govuk-button govuk-button--secondary govuk-!-margin-bottom-2" style="width: 100%;">View Achievements</a>
+                <a href="<?= $basePath ?>/achievements" class="govuk-button govuk-button--secondary govuk-!-margin-bottom-2 civicone-btn-full">View Achievements</a>
             </p>
             <p class="govuk-!-margin-bottom-2">
-                <a href="<?= $basePath ?>/listings/create" class="govuk-button govuk-!-margin-bottom-2" style="width: 100%;">Post Offer or Request</a>
+                <a href="<?= $basePath ?>/listings/create" class="govuk-button govuk-!-margin-bottom-2 civicone-btn-full">Post Offer or Request</a>
             </p>
             <p class="govuk-!-margin-bottom-0">
-                <a href="<?= $basePath ?>/groups" class="govuk-button govuk-button--secondary govuk-!-margin-bottom-0" style="width: 100%;">Browse Hubs</a>
+                <a href="<?= $basePath ?>/groups" class="govuk-button govuk-button--secondary govuk-!-margin-bottom-0 civicone-btn-full">Browse Hubs</a>
             </p>
         </section>
 
