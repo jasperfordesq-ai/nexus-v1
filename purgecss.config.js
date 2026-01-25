@@ -76,6 +76,7 @@ module.exports = {
         'httpdocs/assets/css/civicone-blog.css',
         'httpdocs/assets/css/civicone-breadcrumb.css',
         'httpdocs/assets/css/civicone-bundle-compiled.css',
+        'httpdocs/assets/css/civicone-compose.css',
         'httpdocs/assets/css/civicone-consent-decline.css',
         'httpdocs/assets/css/civicone-consent-required.css',
         'httpdocs/assets/css/civicone-contact.css',
@@ -119,7 +120,6 @@ module.exports = {
         'httpdocs/assets/css/civicone-groups-show.css',
         'httpdocs/assets/css/civicone-groups-utilities.css',
         'httpdocs/assets/css/civicone-groups.css',
-        'httpdocs/assets/css/civicone-header.css',
         'httpdocs/assets/css/civicone-header-v2.css',
         'httpdocs/assets/css/civicone-help.css',
         'httpdocs/assets/css/civicone-home.css',
@@ -142,6 +142,7 @@ module.exports = {
         'httpdocs/assets/css/civicone-mini-modules.css',
         'httpdocs/assets/css/civicone-mobile-about.css',
         'httpdocs/assets/css/civicone-mobile-nav-v2-inline.css',
+        'httpdocs/assets/css/civicone-mobile-nav-v2.css',
         'httpdocs/assets/css/civicone-mobile.css',
         'httpdocs/assets/css/civicone-native.css',
         'httpdocs/assets/css/civicone-nexus-impact-report.css',
@@ -172,7 +173,6 @@ module.exports = {
         'httpdocs/assets/css/civicone-report-pages.css',
         'httpdocs/assets/css/civicone-resources-form.css',
         'httpdocs/assets/css/civicone-reviews-create.css',
-        'httpdocs/assets/css/civicone-service-navigation.css',
         'httpdocs/assets/css/civicone-search-results.css',
         'httpdocs/assets/css/civicone-shared-accessibility-helpers.css',
         'httpdocs/assets/css/civicone-shared-post-card.css',
@@ -258,8 +258,6 @@ module.exports = {
         'httpdocs/assets/css/modern-bundle.css',
         'httpdocs/assets/css/modern-dashboard.css',
         'httpdocs/assets/css/modern-events-show.css',
-        'httpdocs/assets/css/modern-experimental-banner-v2.css',
-        'httpdocs/assets/css/modern-experimental-banner-v3.css',
         'httpdocs/assets/css/modern-experimental-banner.css',
         'httpdocs/assets/css/modern-groups-show.css',
         'httpdocs/assets/css/modern-header-emergency-fixes.css',
@@ -272,7 +270,7 @@ module.exports = {
         'httpdocs/assets/css/modern-volunteering-show.css',
         'httpdocs/assets/css/modern/components-library.css',
         'httpdocs/assets/css/modern/preview.css',
-        'httpdocs/assets/css/moj-filter.css',
+        // 'httpdocs/assets/css/moj-filter.css', // Excluded: contains GOV.UK Design System classes with ! in names (e.g., govuk-!-display-none)
         'httpdocs/assets/css/native-form-inputs.css',
         'httpdocs/assets/css/native-page-enter.css',
         'httpdocs/assets/css/nexus-civicone.css',
@@ -300,6 +298,7 @@ module.exports = {
         'httpdocs/assets/css/partials.css',
         'httpdocs/assets/css/polls.css',
         'httpdocs/assets/css/post-box-home.css',
+        'httpdocs/assets/css/privacy-page.css',
         'httpdocs/assets/css/post-card.css',
         'httpdocs/assets/css/premium-dropdowns.css',
         'httpdocs/assets/css/premium-search.css',
@@ -360,6 +359,20 @@ module.exports = {
             'nexus-header-compact', 'nexus-header-hidden', 'nexus-header-visible',
             'nexus-header-is-compact', 'nexus-header-is-hidden',
             'nexus-collapsing-header', 'back-nav',
+
+            // Form and input states
+            'form-row', 'form-group', 'form-label', 'form-input', 'form-note',
+            'form-label-row', 'flex-1', 'flex-2',
+
+            // Button base classes
+            'btn', 'btn-primary', 'btn-secondary', 'btn-link', 'btn-sm', 'btn-lg',
+
+            // Layout helpers
+            'container', 'wrapper', 'content', 'main', 'section',
+            'row', 'col', 'grid', 'flex',
+
+            // Visibility
+            'sr-only', 'visually-hidden', 'invisible', 'opacity-0', 'opacity-100',
         ],
 
         // Patterns to keep (regex)
@@ -379,11 +392,44 @@ module.exports = {
             /^feed-/, /^composer-/, /^compose-/, /^sidebar-/,
             /^profile-/, /^badge/, /^avatar/,
 
+            // Keep auth/login classes
+            /^auth-/, /^login-/, /^register-/, /^password-/,
+
+            // Keep biometric/security classes
+            /^biometric-/,
+
+            // Keep impersonation banner classes
+            /^impersonation-/,
+
+            // Keep holographic/calendar classes
+            /^holo-/, /^calendar-/,
+
+            // Keep skin/theme classes
+            /^skin-/, /^theme-/,
+
+            // Keep form classes
+            /^form-/, /^input-/, /^select-/, /^checkbox-/, /^radio-/,
+
+            // Keep button classes
+            /^btn-/, /^button-/,
+
+            // Keep blog classes
+            /^blog-/, /^article-/, /^post-/,
+
+            // Keep offline/status classes
+            /^offline-/, /^online-/, /^status-/,
+
+            // Keep GOV.UK Design System classes
+            /^govuk-/, /^moj-/,
+
             // Keep all CSS variables and pseudo-elements
             /^--/, /::before/, /::after/,
 
             // Keep state patterns
             /^is-/, /^has-/, /hover/, /focus/, /active/,
+
+            // Keep data attribute selectors
+            /\[data-/,
         ],
     },
 

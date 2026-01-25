@@ -16,56 +16,72 @@ const config = require(configPath);
 const projectRoot = path.resolve(__dirname, '..');
 config.output = path.resolve(projectRoot, config.output);
 
-// Run PurgeCSS
+// Run PurgeCSS - process files individually to handle errors gracefully
 (async () => {
-    try {
-        console.log('Running PurgeCSS...');
-        console.log(`Processing ${config.css.length} CSS files...`);
-        console.log('');
+    console.log('Running PurgeCSS...');
+    console.log(`Processing ${config.css.length} CSS files...`);
+    console.log('');
 
-        const startTime = Date.now();
-        const results = await new PurgeCSS().purge(config);
+    const startTime = Date.now();
+    let savedTotal = 0;
+    let successCount = 0;
+    let errorCount = 0;
+    const errors = [];
 
-        // Write output files
-        let savedTotal = 0;
-        for (const result of results) {
-            const fileName = path.basename(result.file);
-            const outputFileName = fileName.replace('.css', '.min.css');
-            const outputPath = path.join(config.output, outputFileName);
+    // Ensure output directory exists
+    fs.mkdirSync(config.output, { recursive: true });
 
-            // Ensure output directory exists
-            fs.mkdirSync(path.dirname(outputPath), { recursive: true });
+    // Process each CSS file individually
+    for (const cssFile of config.css) {
+        const fileName = path.basename(cssFile);
+        const outputFileName = fileName.replace('.css', '.min.css');
+        const outputPath = path.join(config.output, outputFileName);
 
-            // Write file
-            fs.writeFileSync(outputPath, result.css);
+        try {
+            // Process single file
+            const singleConfig = {
+                ...config,
+                css: [cssFile]
+            };
 
-            // Calculate savings
-            const original = fs.statSync(result.file).size;
-            const purged = Buffer.byteLength(result.css);
-            const saved = original - purged;
-            savedTotal += saved;
+            const results = await new PurgeCSS().purge(singleConfig);
 
-            console.log(`✓ ${fileName} → ${outputFileName}`);
+            if (results.length > 0) {
+                const result = results[0];
+
+                // Write file
+                fs.writeFileSync(outputPath, result.css);
+
+                // Calculate savings
+                const filePath = path.resolve(projectRoot, cssFile);
+                if (fs.existsSync(filePath)) {
+                    const original = fs.statSync(filePath).size;
+                    const purged = Buffer.byteLength(result.css);
+                    savedTotal += (original - purged);
+                }
+
+                console.log(`✓ ${fileName}`);
+                successCount++;
+            }
+        } catch (error) {
+            console.log(`✗ ${fileName} - ${error.reason || error.message}`);
+            errorCount++;
+            errors.push({ file: cssFile, error: error.message, line: error.line });
         }
+    }
 
-        const duration = ((Date.now() - startTime) / 1000).toFixed(1);
-        const savedMB = (savedTotal / 1048576).toFixed(2);
+    const duration = ((Date.now() - startTime) / 1000).toFixed(1);
+    const savedMB = (savedTotal / 1048576).toFixed(2);
 
-        console.log('');
-        console.log(`Completed in ${duration}s`);
-        console.log(`Saved ~${savedMB} MB`);
-        console.log('');
-        console.log(`Output: ${config.output}`);
+    console.log('');
+    console.log(`Completed in ${duration}s`);
+    console.log(`Success: ${successCount}, Errors: ${errorCount}`);
+    console.log(`Saved ~${savedMB} MB`);
+    console.log('');
+    console.log(`Output: ${config.output}`);
 
-    } catch (error) {
-        console.error('Error running PurgeCSS:', error.message);
-        if (error.file) {
-            console.error('File:', error.file);
-        }
-        if (error.line) {
-            console.error('Line:', error.line);
-        }
-        console.error('\nFull error:', error);
-        process.exit(1);
+    if (errorCount > 0) {
+        console.log('\nFiles with errors:');
+        errors.forEach(e => console.log(`  - ${e.file}${e.line ? `:${e.line}` : ''}`));
     }
 })();

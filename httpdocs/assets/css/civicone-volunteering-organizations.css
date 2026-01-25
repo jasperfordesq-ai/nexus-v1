@@ -7,8 +7,6 @@
             background: linear-gradient(135deg,
                 var(--color-white-alpha-85),
                 var(--color-white-alpha-70));
-            /* backdrop-filter removed for GOV.UK compliance */ saturate(120%);
-            -webkit-/* backdrop-filter removed for GOV.UK compliance */ saturate(120%);
             border: 1px solid var(--color-white-alpha-40);
             border-radius: var(--radius-2xl);
             padding: var(--space-8);
@@ -63,10 +61,6 @@
                 var(--color-teal-600-alpha-12) 0%, transparent 50%);
         }
 
-        /* Animation removed for GOV.UK compliance */
-            50% { background-position: 100% 50%; }
-        }
-
         /* Page Header */
         #org-glass-wrapper .org-page-header {
             text-align: center;
@@ -115,8 +109,6 @@
             background: linear-gradient(135deg,
                 var(--color-white-alpha-75),
                 var(--color-white-alpha-60));
-            /* backdrop-filter removed for GOV.UK compliance */ saturate(120%);
-            -webkit-/* backdrop-filter removed for GOV.UK compliance */ saturate(120%);
             border: 1px solid var(--color-white-alpha-30);
             box-shadow: 0 8px 32px var(--color-glass-shadow-15),
                         inset 0 0 0 1px var(--color-white-alpha-40);
@@ -127,8 +119,6 @@
             background: linear-gradient(135deg,
                 var(--color-slate-900-alpha-60),
                 var(--color-slate-alpha-50));
-            /* backdrop-filter removed for GOV.UK compliance */ saturate(150%);
-            -webkit-/* backdrop-filter removed for GOV.UK compliance */ saturate(150%);
             border: 1px solid var(--color-white-alpha-15);
             box-shadow: 0 8px 32px var(--color-black-alpha-50),
                         0 0 80px var(--color-indigo-alpha-10),
@@ -165,7 +155,6 @@
             font-size: 1rem;
             background: var(--color-white-alpha-60);
             /* backdrop-filter removed for GOV.UK compliance */
-            -webkit-/* backdrop-filter removed for GOV.UK compliance */
             box-shadow: 0 4px 12px var(--color-glass-shadow),
                         inset 0 1px 0 var(--color-white-alpha-60);
             transition: all 0.3s ease;
@@ -238,8 +227,6 @@
             background: linear-gradient(135deg,
                 var(--color-white-alpha-80),
                 var(--color-white-alpha-65));
-            /* backdrop-filter removed for GOV.UK compliance */ saturate(120%);
-            -webkit-/* backdrop-filter removed for GOV.UK compliance */ saturate(120%);
             border: 1px solid var(--color-white-alpha-35);
             border-radius: var(--radius-2xl);
             box-shadow: 0 8px 32px var(--color-glass-shadow-12),
@@ -390,7 +377,6 @@
                 var(--color-white-alpha-75),
                 var(--color-white-alpha-60));
             /* backdrop-filter removed for GOV.UK compliance */
-            -webkit-/* backdrop-filter removed for GOV.UK compliance */
             border-radius: var(--radius-2xl);
             border: 1px solid var(--color-white-alpha-30);
         }

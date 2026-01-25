@@ -1279,7 +1279,6 @@ body.dark-mode .civic-logo:focus-visible {
     background-color: var(--govuk-button-secondary-background);
     box-shadow: 0 2px 0 var(--govuk-button-secondary-shadow);
     color: var(--govuk-button-secondary-text) !important; /* Force black text for WCAG compliance */
-}
 
 .civic-button--secondary:hover,
 [data-layout="civicone"] .govuk-button--secondary:hover,

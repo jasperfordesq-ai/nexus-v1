@@ -1080,7 +1080,7 @@ textarea.holo-input {
         input[type="text"],
         input[type="email"],
         input[type="password"],
-        input[type="search" aria-label="Search"],
+        input[type="search"],
         input[type="tel"],
         input[type="url"],
         input[type="date"],
@@ -1864,9 +1864,7 @@ textarea.holo-input {
             min-height: 48px;
         }
     }
-</style>
-<style>
-    /* SCOPED STYLES for #unique-glass-page-wrapper ONLY */
+/* SCOPED STYLES for #unique-glass-page-wrapper ONLY */
     #unique-glass-page-wrapper {
         /* 
        --- DEFAULT / LIGHT MODE VARIABLES (Fallback) --- 

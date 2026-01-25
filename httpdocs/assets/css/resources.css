@@ -1226,7 +1226,7 @@ textarea.holo-input {
         input[type="text"],
         input[type="email"],
         input[type="password"],
-        input[type="search" aria-label="Search"],
+        input[type="search"],
         input[type="tel"],
         input[type="url"],
         input[type="date"],

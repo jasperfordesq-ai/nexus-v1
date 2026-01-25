@@ -67,8 +67,6 @@
         const mtBasePath = NEXUS_BASE; // Compatibility alias
     </script>
 
-    <!-- CivicOne Header CSS (Hero, Navigation, Utility Bar - WCAG 2.1 AA) -->
-    <link rel="stylesheet" href="/assets/css/civicone-header.css?v=<?= $cssVersion ?>">
     <!-- CivicOne Footer CSS (Footer content and styles - WCAG 2.1 AA) -->
     <link rel="stylesheet" href="/assets/css/civicone-footer.css?v=<?= $cssVersion ?>">
     <!-- CivicOne Events CSS (WCAG 2.1 AA 2026-01-19) -->

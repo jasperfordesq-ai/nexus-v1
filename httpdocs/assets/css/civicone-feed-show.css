@@ -61,7 +61,6 @@
         radial-gradient(ellipse at 80% 20%, var(--color-pink-alpha-10) 0%, transparent 45%),
         radial-gradient(ellipse at 60% 80%, var(--color-purple-alpha-10) 0%, transparent 50%);
     /* animation removed for GOV.UK compliance */
-}
 
 .post-detail-bg::after {
     content: '';
@@ -78,7 +77,6 @@
         transparent 40px
     );
     /* animation removed for GOV.UK compliance */
-}
 
 [data-theme="dark"] .post-detail-bg {
     background: linear-gradient(135deg, var(--color-slate-900) 0%, var(--color-slate-800) 50%, var(--color-slate-900) 100%);
@@ -108,7 +106,6 @@
     padding: var(--space-3) var(--space-5);
     background: var(--glass-bg);
     /* backdrop-filter removed for GOV.UK compliance */
-    -webkit-/* backdrop-filter removed for GOV.UK compliance */
     border: 1px solid var(--glass-border);
     border-radius: var(--radius-xl);
     color: var(--color-slate-500);
@@ -151,7 +148,6 @@
 .glass-card {
     background: var(--glass-bg);
     /* backdrop-filter removed for GOV.UK compliance */
-    -webkit-/* backdrop-filter removed for GOV.UK compliance */
     border: 1px solid var(--glass-border);
     border-radius: var(--radius-2xl);
     box-shadow: var(--glass-shadow);
@@ -174,7 +170,6 @@
         transparent 100%
     );
     /* animation removed for GOV.UK compliance */
-}
 
 /* Animation removed for GOV.UK compliance */
     50% { left: 150%; }
@@ -339,7 +334,6 @@
     background: var(--holographic-shimmer);
     background-size: 200% 100%;
     /* animation removed for GOV.UK compliance */
-}
 
 /* Animation removed for GOV.UK compliance */
     100% { background-position: -200% 0; }
@@ -501,7 +495,6 @@
     width: 100%;
     background: var(--color-white-alpha-90);
     /* backdrop-filter removed for GOV.UK compliance */
-    -webkit-/* backdrop-filter removed for GOV.UK compliance */
     border: 2px solid var(--color-indigo-alpha-20);
     border-radius: var(--radius-2xl);
     padding: var(--space-3) var(--space-14) var(--space-3) var(--space-5);
@@ -571,7 +564,6 @@
     padding: var(--space-4);
     background: var(--color-white-alpha-60);
     /* backdrop-filter removed for GOV.UK compliance */
-    -webkit-/* backdrop-filter removed for GOV.UK compliance */
     border-radius: var(--radius-xl);
     border: 1px solid var(--color-indigo-alpha-10);
     transition: all 0.3s ease;

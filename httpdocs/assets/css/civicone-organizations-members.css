@@ -25,7 +25,6 @@
         radial-gradient(ellipse at 20% 30%, var(--color-blue-alpha-12) 0%, transparent 50%),
         radial-gradient(ellipse at 80% 20%, var(--color-indigo-alpha-10) 0%, transparent 45%);
     /* animation removed for GOV.UK compliance */
-}
 
 [data-theme="dark"] .org-members-bg {
     background: linear-gradient(135deg, var(--color-slate-900) 0%, #1e3a5f 50%, var(--color-slate-900) 100%);
@@ -117,7 +116,6 @@
         var(--color-white-alpha-90) 0%,
         var(--color-white-alpha-75) 100%);
     /* backdrop-filter removed for GOV.UK compliance */
-    -webkit-/* backdrop-filter removed for GOV.UK compliance */
     border: 1px solid var(--color-white-alpha-50);
     border-radius: var(--radius-2xl);
     box-shadow: 0 8px 32px var(--color-glass-shadow);

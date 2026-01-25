@@ -13,7 +13,6 @@
         var(--color-white-alpha-95) 0%,
         var(--color-white-alpha-85) 100%);
     /* backdrop-filter removed for GOV.UK compliance */
-    -webkit-/* backdrop-filter removed for GOV.UK compliance */
     border: 1px solid var(--color-white-alpha-60);
     border-radius: var(--radius-xl);
     box-shadow: 0 4px 24px var(--color-black-alpha-8);
@@ -296,7 +295,6 @@
         top: var(--space-14);
         /* Reduce blur on mobile for performance */
         /* backdrop-filter removed for GOV.UK compliance */
-        -webkit-/* backdrop-filter removed for GOV.UK compliance */
     }
 
     .org-utility-header {

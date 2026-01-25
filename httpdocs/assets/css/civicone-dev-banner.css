@@ -56,7 +56,6 @@
         transparent 100%
     );
     /* animation removed for GOV.UK compliance */
-}
 
 
 .civicone-dev-banner-content {
@@ -97,7 +96,6 @@
     white-space: nowrap;
     flex-shrink: 0;
     /* animation removed for GOV.UK compliance */
-}
 
 /* Animation removed for GOV.UK compliance */
     50% {

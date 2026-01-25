@@ -80,10 +80,7 @@
             min-height: var(--space-12);
         }
     }
-</style>
-
-<style>
-    .edit-wrapper {
+.edit-wrapper {
         padding-top: 120px;
         padding-bottom: 100px;
     }

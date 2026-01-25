@@ -110,7 +110,6 @@
         var(--color-white-alpha-90) 0%,
         var(--color-white-alpha-75) 100%);
     /* backdrop-filter removed for GOV.UK compliance */
-    -webkit-/* backdrop-filter removed for GOV.UK compliance */
     border: 1px solid var(--color-white-alpha-50);
     border-radius: var(--radius-2xl);
     box-shadow: 0 8px 32px var(--color-glass-shadow);

@@ -1,1 +1,1 @@
-.civic-date-range-grid{display:grid;grid-template-columns:1fr 1fr;gap:var(--space-5);margin-bottom:var(--space-5)}@media (max-width:500px){.civic-date-range-grid{grid-template-columns:1fr}}
+.form-group{margin-bottom:var(--space-5)}.form-label{display:block;font-weight:bold;margin-bottom:var(--space-1)}.form-input-full{width:100%}.form-textarea{width:100%;font-family:inherit}.civic-date-range-grid{display:grid;grid-template-columns:1fr 1fr;gap:var(--space-5);margin-bottom:var(--space-5)}@media (max-width:500px){.civic-date-range-grid{grid-template-columns:1fr}}

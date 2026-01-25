@@ -20,7 +20,6 @@
     background: linear-gradient(135deg, var(--color-warning-500) 0%, var(--color-warning-400) 25%, var(--color-amber-300) 50%, var(--color-warning-500) 75%, var(--color-warning-600) 100%);
     background-size: 400% 400%;
     /* animation removed for GOV.UK compliance */
-}
 
 
 #story-glass-wrapper .story-inner {
@@ -75,8 +74,6 @@
 #story-glass-wrapper .story-glass-card {
     position: relative;
     background: var(--glass-bg);
-    /* backdrop-filter removed for GOV.UK compliance */ saturate(120%);
-    -webkit-/* backdrop-filter removed for GOV.UK compliance */ saturate(120%);
     border: 1px solid var(--glass-border);
     border-radius: var(--radius-2xl);
     box-shadow:
@@ -175,7 +172,6 @@
 #story-glass-wrapper .stat-chip {
     background: var(--color-white-alpha-20);
     /* backdrop-filter removed for GOV.UK compliance */
-    -webkit-/* backdrop-filter removed for GOV.UK compliance */
     border: 1px solid var(--color-white-alpha-30);
     border-radius: var(--radius-xl);
     padding: 1.25rem 1rem;

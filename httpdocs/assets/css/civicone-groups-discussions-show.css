@@ -101,7 +101,6 @@
         padding: var(--space-2-5) var(--space-4-5);
         background: var(--color-white-alpha-90);
         /* backdrop-filter removed for GOV.UK compliance */
-        -webkit-/* backdrop-filter removed for GOV.UK compliance */
         border-radius: var(--radius-lg);
         color: var(--color-slate-500);
         text-decoration: none;
@@ -135,7 +134,6 @@
         border-bottom: 1px solid var(--color-black-alpha-5);
         background: var(--color-white-alpha-90);
         /* backdrop-filter removed for GOV.UK compliance */
-        -webkit-/* backdrop-filter removed for GOV.UK compliance */
         display: flex;
         align-items: center;
         justify-content: space-between;
@@ -310,7 +308,6 @@
         padding: var(--space-3-5) 16px;
         background: var(--color-white-alpha-90);
         /* backdrop-filter removed for GOV.UK compliance */
-        -webkit-/* backdrop-filter removed for GOV.UK compliance */
         border-top: 1px solid var(--color-black-alpha-5);
         flex-shrink: 0;
     }
