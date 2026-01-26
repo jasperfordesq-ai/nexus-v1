@@ -1311,15 +1311,15 @@ body.is-offline header {
 
 /* Compact mode - smaller, more minimal */
 .nexus-collapsing-header.nexus-header-compact {
-    padding-top: var(--space-2) !important;
-    padding-bottom: var(--space-2) !important;
+    padding-top: var(--space-2);
+    padding-bottom: var(--space-2);
 }
 
 /* Compact mode for common header elements */
 .nexus-collapsing-header.nexus-header-compact .htb-header-title,
 .nexus-collapsing-header.nexus-header-compact .header-title,
 .nexus-collapsing-header.nexus-header-compact h1 {
-    font-size: var(--font-size-lg) !important;
+    font-size: var(--font-size-lg);
     margin: 0 !important;
 }
 
@@ -1347,7 +1347,7 @@ body.is-offline header {
 /* Reduce button sizes in compact mode */
 .nexus-collapsing-header.nexus-header-compact .htb-btn {
     padding: var(--space-1) var(--space-3) !important;
-    font-size: var(--font-size-sm) !important;
+    font-size: var(--font-size-sm);
 }
 
 /* Add shadow in compact mode for visual separation */
@@ -1386,13 +1386,13 @@ body.nexus-header-is-compact {
 
     .nexus-collapsing-header.nexus-header-compact .htb-header-title,
     .nexus-collapsing-header.nexus-header-compact h1 {
-        font-size: var(--font-size-base) !important;
+        font-size: var(--font-size-base);
     }
 
     /* Reduce icon sizes in compact mode on mobile */
     .nexus-collapsing-header.nexus-header-compact .htb-btn i,
     .nexus-collapsing-header.nexus-header-compact .header-icon {
-        font-size: var(--font-size-base) !important;
+        font-size: var(--font-size-base);
     }
 }
 
@@ -1444,12 +1444,12 @@ body.nexus-header-is-compact {
     [id$="-glass-wrapper"],
     [id*="glass-wrapper"] {
         margin-top: var(--layout-header-height) !important;
-        padding-top: var(--space-4) !important;
+        padding-top: var(--space-4);
     }
 
     /* Container full - uniform spacing */
     .htb-container-full {
-        padding-top: var(--space-4) !important;
+        padding-top: var(--space-4);
         margin-top: var(--layout-header-height) !important;
     }
 
@@ -1476,7 +1476,7 @@ body.nexus-header-is-compact {
     .htb-container .page-header,
     .htb-container-full .page-header {
         margin-top: 0 !important;
-        margin-bottom: var(--space-4) !important;
+        margin-bottom: var(--space-4);
         padding-top: 0 !important;
     }
 
@@ -1492,17 +1492,17 @@ body.nexus-header-is-compact {
     }
 
     .htb-main-title {
-        font-size: var(--font-size-3xl) !important;
+        font-size: var(--font-size-3xl);
     }
 
     .htb-sub-title {
-        font-size: var(--font-size-base) !important;
+        font-size: var(--font-size-base);
     }
 
     /* Cards that pull up into hero area */
     .htb-container[style*="margin-top: -80px"],
     .htb-container-full[style*="margin-top: -80px"] {
-        margin-top: var(--space-4) !important;
+        margin-top: var(--space-4);
     }
 
     /* Generic first-child content spacing */

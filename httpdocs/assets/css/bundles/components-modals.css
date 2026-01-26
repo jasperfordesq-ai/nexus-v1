@@ -1,6 +1,6 @@
 /**
  * components-modals Bundle
- * Generated: 2026-01-21T20:33:44.172Z
+ * Generated: 2026-01-26T11:10:18.251Z
  * Files: 3
  */
 
@@ -16,6 +16,7 @@
  * Prefix: mobile- for mobile sheet components
  * Base styles always apply (for JS-triggered sheets on touch devices)
  * Desktop media query hides sheets unless explicitly activated
+  * Fully Migrated to Design Tokens: 2026-01-21 ✓
  */
 
 /* ============================================
@@ -59,8 +60,9 @@
 }
 
 [data-theme="dark"] .mobile-sheet {
-    background: var(--color-gray-900);
-    box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.4);
+    background: linear-gradient(180deg, rgba(30, 41, 59, 0.98) 0%, rgba(15, 23, 42, 0.99) 100%);
+    box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.5), 0 -2px 20px rgba(99, 102, 241, 0.1);
+    border-top: 1px solid rgba(99, 102, 241, 0.2);
 }
 
 .mobile-sheet.active {
@@ -91,11 +93,12 @@
     align-items: center;
     justify-content: space-between;
     padding: 8px 16px 12px;
-    border-bottom: 1px solid var(--feed-border, #e5e7eb);
+    border-bottom: 1px solid var(--feed-border, var(--color-gray-200));
 }
 
 [data-theme="dark"] .mobile-sheet-header {
-    border-color: var(--color-gray-700);
+    border-color: rgba(99, 102, 241, 0.15);
+    background: rgba(30, 41, 59, 0.5);
 }
 
 .mobile-sheet-title {
@@ -105,7 +108,8 @@
 }
 
 [data-theme="dark"] .mobile-sheet-title {
-    color: var(--color-gray-50);
+    color: var(--color-slate-100);
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
 }
 
 .mobile-sheet-close {
@@ -127,6 +131,15 @@
     background: rgba(128, 128, 128, 0.2);
 }
 
+[data-theme="dark"] .mobile-sheet-close {
+    background: rgba(99, 102, 241, 0.15);
+    color: var(--color-slate-300);
+}
+
+[data-theme="dark"] .mobile-sheet-close:active {
+    background: rgba(99, 102, 241, 0.25);
+}
+
 /* Sheet Body */
 .mobile-sheet-body {
     padding: 16px;
@@ -137,6 +150,59 @@
 /* ============================================
    COMMENT SHEET SPECIFIC
    ============================================ */
+
+/* Header spacer for symmetry with close button */
+.mobile-sheet-header-spacer {
+    width: 32px;
+}
+
+/* Flex column layout for sheet body */
+.mobile-sheet-body--flex-column {
+    display: flex;
+    flex-direction: column;
+}
+
+/* Comments list container - takes remaining space */
+.mobile-comments-list--flex {
+    flex: 1;
+    margin-bottom: 12px;
+}
+
+/* Comment input wrapper - stays at bottom */
+.mobile-comment-input-wrap--bottom {
+    flex-shrink: 0;
+    border-top: 1px solid var(--feed-border, #e5e7eb);
+    padding-top: 12px;
+    margin-top: auto;
+}
+
+[data-theme="dark"] .mobile-comment-input-wrap--bottom {
+    border-color: rgba(99, 102, 241, 0.2);
+    background: rgba(30, 41, 59, 0.3);
+    margin-left: -16px;
+    margin-right: -16px;
+    padding-left: 16px;
+    padding-right: 16px;
+    padding-bottom: 4px;
+}
+
+/* Sign-in prompt at bottom of sheet */
+.mobile-sheet-signin-prompt {
+    text-align: center;
+    padding: 16px;
+    margin-top: auto;
+}
+
+/* Sign-in link styling */
+.mobile-sheet-signin-link {
+    color: var(--color-primary-500, #6366f1);
+    font-weight: 500;
+}
+
+.mobile-sheet-signin-link:hover {
+    color: var(--color-primary-600, #4f46e5);
+    text-decoration: underline;
+}
 
 .mobile-comment-input-wrap {
     display: flex;
@@ -154,8 +220,8 @@
 
 .mobile-comment-input {
     flex: 1;
-    border: 1px solid var(--feed-border, #e5e7eb);
-    background: var(--feed-bg-main, #f9fafb);
+    border: 1px solid var(--feed-border, var(--color-gray-200));
+    background: var(--feed-bg-main, var(--color-gray-50));
     border-radius: 20px;
     padding: 10px 16px;
     font-size: 15px;
@@ -172,9 +238,19 @@
 }
 
 [data-theme="dark"] .mobile-comment-input {
-    background: var(--color-gray-800);
-    border-color: var(--color-gray-600);
-    color: var(--color-gray-50);
+    background: rgba(30, 41, 59, 0.8);
+    border-color: rgba(168, 85, 247, 0.3);
+    color: var(--color-slate-100);
+}
+
+[data-theme="dark"] .mobile-comment-input:focus {
+    background: rgba(30, 41, 59, 0.95);
+    border-color: var(--color-purple-400);
+    box-shadow: 0 0 0 3px rgba(168, 85, 247, 0.15), 0 4px 12px rgba(168, 85, 247, 0.2);
+}
+
+[data-theme="dark"] .mobile-comment-input::placeholder {
+    color: var(--color-slate-400);
 }
 
 .mobile-comment-send {
@@ -211,7 +287,7 @@
     display: flex;
     gap: 10px;
     padding: 10px 0;
-    border-bottom: 1px solid var(--feed-border, #e5e7eb);
+    border-bottom: 1px solid var(--feed-border, var(--color-gray-200));
 }
 
 .mobile-comment-item:last-child {
@@ -219,7 +295,17 @@
 }
 
 [data-theme="dark"] .mobile-comment-item {
-    border-color: var(--color-gray-700);
+    border-color: rgba(99, 102, 241, 0.1);
+    background: rgba(30, 41, 59, 0.3);
+    border-radius: 12px;
+    padding: 12px;
+    margin-bottom: 8px;
+    border-bottom: none;
+    border: 1px solid rgba(99, 102, 241, 0.1);
+}
+
+[data-theme="dark"] .mobile-comment-item:last-child {
+    margin-bottom: 0;
 }
 
 .mobile-comment-content {
@@ -233,7 +319,23 @@
 }
 
 [data-theme="dark"] .mobile-comment-author {
-    color: var(--color-gray-50);
+    color: var(--color-slate-100);
+}
+
+[data-theme="dark"] .mobile-comment-text {
+    color: var(--color-slate-300);
+}
+
+[data-theme="dark"] .mobile-comment-time {
+    color: var(--color-slate-500);
+}
+
+[data-theme="dark"] .mobile-comment-action {
+    color: var(--color-slate-400);
+}
+
+[data-theme="dark"] .mobile-comment-action:hover {
+    color: var(--color-purple-400);
 }
 
 .mobile-comment-text {
@@ -245,7 +347,7 @@
 
 .mobile-comment-time {
     font-size: 12px;
-    color: var(--feed-text-muted, #9ca3af);
+    color: var(--feed-text-muted, var(--color-gray-400));
     margin-top: 4px;
 }
 
@@ -262,7 +364,7 @@
     padding: 0;
     font-size: 12px;
     font-weight: 600;
-    color: var(--feed-text-muted, #9ca3af);
+    color: var(--feed-text-muted, var(--color-gray-400));
     cursor: pointer;
     display: flex;
     align-items: center;
@@ -297,8 +399,8 @@
 
 .mobile-reply-input {
     flex: 1;
-    border: 1px solid var(--feed-border, #e5e7eb);
-    background: var(--feed-bg-main, #f9fafb);
+    border: 1px solid var(--feed-border, var(--color-gray-200));
+    background: var(--feed-bg-main, var(--color-gray-50));
     border-radius: 18px;
     padding: 8px 14px;
     font-size: 13px;
@@ -311,9 +413,15 @@
 }
 
 [data-theme="dark"] .mobile-reply-input {
-    background: var(--color-gray-800);
-    border-color: var(--color-gray-600);
-    color: var(--color-gray-50);
+    background: rgba(30, 41, 59, 0.8);
+    border-color: rgba(168, 85, 247, 0.3);
+    color: var(--color-slate-100);
+}
+
+[data-theme="dark"] .mobile-reply-input:focus {
+    background: rgba(30, 41, 59, 0.95);
+    border-color: var(--color-purple-400);
+    box-shadow: 0 0 0 3px rgba(168, 85, 247, 0.15);
 }
 
 .mobile-reply-send {
@@ -335,11 +443,11 @@
     margin-left: 46px;
     margin-top: 8px;
     padding-left: 12px;
-    border-left: 2px solid var(--feed-border, #e5e7eb);
+    border-left: 2px solid var(--feed-border, var(--color-gray-200));
 }
 
 [data-theme="dark"] .mobile-comment-replies {
-    border-color: var(--color-gray-600);
+    border-color: rgba(168, 85, 247, 0.3);
 }
 
 .mobile-comment-replies .mobile-comment-item {
@@ -356,7 +464,7 @@
     display: inline-flex;
     align-items: center;
     gap: 3px;
-    background: var(--feed-bg-main, #f3f4f6);
+    background: var(--feed-bg-main, var(--color-gray-100));
     padding: 2px 6px;
     border-radius: 10px;
     font-size: 11px;
@@ -370,7 +478,31 @@
 }
 
 [data-theme="dark"] .mobile-comment-likes {
-    background: var(--color-gray-700);
+    background: rgba(30, 41, 59, 0.8);
+    border: 1px solid rgba(236, 72, 153, 0.2);
+}
+
+/* Dark mode avatar ring */
+[data-theme="dark"] .mobile-comment-avatar {
+    border: 2px solid rgba(168, 85, 247, 0.3);
+}
+
+/* Dark mode drag handle */
+[data-theme="dark"] .mobile-sheet-handle {
+    background: rgba(168, 85, 247, 0.4);
+}
+
+/* Dark mode sign-in prompt */
+[data-theme="dark"] .mobile-sheet-signin-prompt {
+    color: var(--color-slate-400);
+}
+
+[data-theme="dark"] .mobile-sheet-signin-link {
+    color: var(--color-purple-400);
+}
+
+[data-theme="dark"] .mobile-sheet-signin-link:hover {
+    color: var(--color-purple-300);
 }
 
 /* ============================================

@@ -29,8 +29,16 @@ html[data-layout] {
 /* Only show these elements on mobile/tablet */
 @media (max-width: 1024px) {
     .mobile-fullscreen-menu,
+    #mobileMenu {
+        /* CRITICAL: Must be flex for scroll to work - menu-body needs flex: 1 */
+        display: flex !important;
+        flex-direction: column !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+        pointer-events: auto !important;
+    }
+
     .mobile-notification-sheet,
-    #mobileMenu,
     #mobileNotifications {
         display: block !important;
         visibility: visible !important;

@@ -15,6 +15,8 @@ $basePath = \Nexus\Core\TenantContext::getBasePath();
 $recipient = $recipient ?? null;
 $recipientTenantId = $recipientTenantId ?? 0;
 $balance = $balance ?? 0;
+$isExternalTransaction = $isExternalTransaction ?? (!empty($recipient['is_external']));
+$externalPartner = $externalPartner ?? null;
 
 $recipientName = $recipient['name'] ?? 'Unknown';
 $fallbackAvatar = 'https://ui-avatars.com/api/?name=' . urlencode($recipientName) . '&background=00796B&color=fff&size=200';
@@ -63,8 +65,11 @@ $hasInsufficientBalance = $balance < 0.5;
                     <div>
                         <h2 class="govuk-heading-m govuk-!-margin-bottom-1"><?= htmlspecialchars($recipientName) ?></h2>
                         <p class="govuk-body-s govuk-!-margin-bottom-0 civicone-secondary-text">
-                            <i class="fa-solid fa-building govuk-!-margin-right-1" aria-hidden="true"></i>
+                            <i class="fa-solid <?= $isExternalTransaction ? 'fa-globe' : 'fa-building' ?> govuk-!-margin-right-1" aria-hidden="true"></i>
                             <?= htmlspecialchars($recipient['tenant_name'] ?? 'Partner Timebank') ?>
+                            <?php if ($isExternalTransaction): ?>
+                            <span class="govuk-tag govuk-tag--blue" style="margin-left: 4px; font-size: 0.7em;">External</span>
+                            <?php endif; ?>
                         </p>
                     </div>
                 </div>
@@ -88,7 +93,12 @@ $hasInsufficientBalance = $balance < 0.5;
             <form action="<?= $basePath ?>/federation/transactions/send" method="POST">
                 <input type="hidden" name="csrf_token" value="<?= \Nexus\Core\Csrf::token() ?>">
                 <input type="hidden" name="receiver_id" value="<?= $recipient['id'] ?>">
-                <input type="hidden" name="receiver_tenant_id" value="<?= $recipientTenantId ?>">
+                <?php if ($isExternalTransaction && $externalPartner): ?>
+                    <input type="hidden" name="external_partner_id" value="<?= $externalPartner['id'] ?>">
+                    <input type="hidden" name="receiver_name" value="<?= htmlspecialchars($recipientName) ?>">
+                <?php else: ?>
+                    <input type="hidden" name="receiver_tenant_id" value="<?= $recipientTenantId ?>">
+                <?php endif; ?>
 
                 <!-- Amount -->
                 <div class="govuk-form-group <?= $hasInsufficientBalance ? 'govuk-form-group--error' : '' ?>">

@@ -6,6 +6,8 @@
 
 /* ============================================
    LAYOUT UTILITIES
+   Note: Common utilities (.hidden, .text-center, .flex-grow, etc.)
+   are defined in modern-settings.css to avoid duplication
    ============================================ */
 
 .inline-form {
@@ -14,18 +16,6 @@
 
 .form-no-margin {
     margin: 0;
-}
-
-.flex-grow {
-    flex: 1;
-}
-
-.text-center {
-    text-align: center;
-}
-
-.hidden {
-    display: none;
 }
 
 /* ============================================

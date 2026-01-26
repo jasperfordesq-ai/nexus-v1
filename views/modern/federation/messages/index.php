@@ -48,17 +48,34 @@ $unreadCount = $unreadCount ?? 0;
             <div class="conversations-list">
                 <?php foreach ($conversations as $conv): ?>
                     <?php
+                    $isExternal = !empty($conv['is_external']);
                     $isUnread = ($conv['unread_count'] ?? 0) > 0;
-                    $fallbackAvatar = 'https://ui-avatars.com/api/?name=' . urlencode($conv['sender_name'] ?? 'User') . '&background=8b5cf6&color=fff&size=100';
-                    $avatar = !empty($conv['sender_avatar']) ? $conv['sender_avatar'] : $fallbackAvatar;
-                    $threadUrl = $basePath . '/federation/messages/' . $conv['sender_user_id'] . '?tenant=' . $conv['sender_tenant_id'];
+
+                    // For external messages (outbound), use receiver info
+                    // For internal messages (inbound), use sender info
+                    if ($isExternal) {
+                        $displayName = $conv['receiver_name'] ?? $conv['external_receiver_name'] ?? 'External Member';
+                        $tenantName = $conv['external_partner_name'] ?? 'External Partner';
+                        $threadUrl = $basePath . '/federation/members/external/' . $conv['external_partner_id'] . '/' . $conv['receiver_user_id'];
+                        $avatar = null; // No avatar for external members
+                        $isOutbound = true;
+                    } else {
+                        $displayName = $conv['sender_name'] ?? 'Unknown';
+                        $tenantName = $conv['sender_tenant_name'] ?? 'Partner';
+                        $threadUrl = $basePath . '/federation/messages/' . $conv['sender_user_id'] . '?tenant=' . $conv['sender_tenant_id'];
+                        $avatar = $conv['sender_avatar'] ?? null;
+                        $isOutbound = false;
+                    }
+
+                    $fallbackAvatar = 'https://ui-avatars.com/api/?name=' . urlencode($displayName) . '&background=8b5cf6&color=fff&size=100';
+                    $avatarUrl = !empty($avatar) ? $avatar : $fallbackAvatar;
                     $timeAgo = timeAgo($conv['created_at'] ?? '');
                     ?>
                     <a href="<?= $threadUrl ?>" class="conversation-card <?= $isUnread ? 'unread' : '' ?>">
                         <div class="conv-avatar">
-                            <img src="<?= htmlspecialchars($avatar) ?>"
+                            <img src="<?= htmlspecialchars($avatarUrl) ?>"
                                  onerror="this.src='<?= $fallbackAvatar ?>'"
-                                 alt="<?= htmlspecialchars($conv['sender_name'] ?? 'User') ?>">
+                                 alt="<?= htmlspecialchars($displayName) ?>">
                             <?php if ($isUnread): ?>
                                 <span class="conv-unread-dot"></span>
                             <?php endif; ?>
@@ -66,15 +83,21 @@ $unreadCount = $unreadCount ?? 0;
                         <div class="conv-content">
                             <div class="conv-header">
                                 <div style="display: flex; align-items: center; gap: 8px; min-width: 0;">
-                                    <h3 class="conv-name"><?= htmlspecialchars($conv['sender_name'] ?? 'Unknown') ?></h3>
-                                    <span class="conv-tenant">
-                                        <i class="fa-solid fa-building"></i>
-                                        <?= htmlspecialchars($conv['sender_tenant_name'] ?? 'Partner') ?>
+                                    <h3 class="conv-name"><?= htmlspecialchars($displayName) ?></h3>
+                                    <span class="conv-tenant<?= $isExternal ? ' external' : '' ?>">
+                                        <i class="fa-solid <?= $isExternal ? 'fa-globe' : 'fa-building' ?>"></i>
+                                        <?= htmlspecialchars($tenantName) ?>
+                                        <?php if ($isExternal): ?>
+                                        <span class="external-tag">External</span>
+                                        <?php endif; ?>
                                     </span>
                                 </div>
                                 <span class="conv-time"><?= $timeAgo ?></span>
                             </div>
                             <p class="conv-preview <?= $isUnread ? 'unread' : '' ?>">
+                                <?php if ($isOutbound): ?>
+                                    <span class="sent-indicator"><i class="fa-solid fa-reply fa-flip-horizontal"></i> You:</span>
+                                <?php endif; ?>
                                 <?= htmlspecialchars(mb_substr($conv['body'] ?? '', 0, 80)) ?><?= mb_strlen($conv['body'] ?? '') > 80 ? '...' : '' ?>
                             </p>
                         </div>

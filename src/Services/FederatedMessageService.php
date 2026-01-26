@@ -154,6 +154,7 @@ class FederatedMessageService
 
     /**
      * Get federated inbox for a user
+     * Includes both internal federated messages AND external partner messages
      */
     public static function getInbox(int $userId, int $limit = 50, int $offset = 0): array
     {
@@ -161,12 +162,16 @@ class FederatedMessageService
         $db = Database::getConnection();
 
         try {
-            // Get inbound messages (received) grouped by sender
+            $allMessages = [];
+
+            // Get inbound messages (received from internal federated members) grouped by sender
             $stmt = $db->prepare("
                 SELECT fm.*,
                        u.name as sender_name,
                        u.avatar_url as sender_avatar,
                        t.name as sender_tenant_name,
+                       0 as is_external,
+                       NULL as external_partner_name,
                        (SELECT COUNT(*) FROM federation_messages fm2
                         WHERE fm2.receiver_tenant_id = fm.receiver_tenant_id
                         AND fm2.receiver_user_id = fm.receiver_user_id
@@ -180,20 +185,60 @@ class FederatedMessageService
                 WHERE fm.receiver_tenant_id = ?
                 AND fm.receiver_user_id = ?
                 AND fm.direction = 'inbound'
+                AND (fm.external_partner_id IS NULL OR fm.external_partner_id = 0)
                 AND fm.id IN (
                     SELECT MAX(id)
                     FROM federation_messages
                     WHERE receiver_tenant_id = ?
                     AND receiver_user_id = ?
                     AND direction = 'inbound'
+                    AND (external_partner_id IS NULL OR external_partner_id = 0)
                     GROUP BY sender_tenant_id, sender_user_id
                 )
-                ORDER BY fm.created_at DESC
-                LIMIT ? OFFSET ?
             ");
-            $stmt->execute([$tenantId, $userId, $tenantId, $userId, $limit, $offset]);
+            $stmt->execute([$tenantId, $userId, $tenantId, $userId]);
+            $inboundMessages = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+            $allMessages = array_merge($allMessages, $inboundMessages);
 
-            return $stmt->fetchAll(\PDO::FETCH_ASSOC);
+            // Get outbound messages to external partners (sent by this user)
+            $stmt = $db->prepare("
+                SELECT fm.*,
+                       fm.external_receiver_name as receiver_name,
+                       NULL as sender_avatar,
+                       COALESCE(fep.partner_name, fep.name) as external_partner_name,
+                       COALESCE(fep.partner_name, fep.name) as sender_tenant_name,
+                       1 as is_external,
+                       0 as unread_count
+                FROM federation_messages fm
+                INNER JOIN federation_external_partners fep ON fm.external_partner_id = fep.id
+                WHERE fm.sender_tenant_id = ?
+                AND fm.sender_user_id = ?
+                AND fm.direction = 'outbound'
+                AND fm.external_partner_id IS NOT NULL
+                AND fm.external_partner_id > 0
+                AND fm.id IN (
+                    SELECT MAX(id)
+                    FROM federation_messages
+                    WHERE sender_tenant_id = ?
+                    AND sender_user_id = ?
+                    AND direction = 'outbound'
+                    AND external_partner_id IS NOT NULL
+                    AND external_partner_id > 0
+                    GROUP BY external_partner_id, receiver_user_id
+                )
+            ");
+            $stmt->execute([$tenantId, $userId, $tenantId, $userId]);
+            $externalMessages = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+            $allMessages = array_merge($allMessages, $externalMessages);
+
+            // Sort by created_at descending
+            usort($allMessages, function($a, $b) {
+                return strtotime($b['created_at']) - strtotime($a['created_at']);
+            });
+
+            // Apply limit and offset
+            return array_slice($allMessages, $offset, $limit);
+
         } catch (\Exception $e) {
             error_log("FederatedMessageService::getInbox error: " . $e->getMessage());
             return [];
@@ -351,6 +396,81 @@ class FederatedMessageService
         }
 
         return ['name' => 'Unknown', 'tenant_name' => 'Partner Timebank'];
+    }
+
+    /**
+     * Store a message sent to an external partner (for local inbox display)
+     *
+     * External partner messages are sent via API but we need a local record
+     * so they appear in the user's federation messages inbox.
+     *
+     * @param int $senderId The sender's user ID (local user)
+     * @param int $externalPartnerId The external partner ID
+     * @param int $receiverId The receiver's user ID on the external system
+     * @param string $receiverName The receiver's display name
+     * @param string $partnerName The external partner's name
+     * @param string $subject Message subject
+     * @param string $body Message body
+     * @param string|null $externalMessageId Message ID returned from external API
+     * @return array Result with success status and local message ID
+     */
+    public static function storeExternalMessage(
+        int $senderId,
+        int $externalPartnerId,
+        int $receiverId,
+        string $receiverName,
+        string $partnerName,
+        string $subject,
+        string $body,
+        ?string $externalMessageId = null
+    ): array {
+        $senderTenantId = TenantContext::getId();
+        $db = Database::getConnection();
+
+        try {
+            // Store as outbound message with external partner reference
+            // We use negative external_partner_id as a "virtual tenant" to distinguish external messages
+            $stmt = $db->prepare("
+                INSERT INTO federation_messages
+                (sender_tenant_id, sender_user_id, receiver_tenant_id, receiver_user_id,
+                 subject, body, direction, status, external_partner_id, external_receiver_name,
+                 external_message_id, created_at)
+                VALUES (?, ?, 0, ?, ?, ?, 'outbound', 'delivered', ?, ?, ?, NOW())
+            ");
+            $stmt->execute([
+                $senderTenantId,
+                $senderId,
+                $receiverId,
+                $subject,
+                $body,
+                $externalPartnerId,
+                $receiverName,
+                $externalMessageId
+            ]);
+            $messageId = $db->lastInsertId();
+
+            // Log the federated action
+            FederationAuditService::log(
+                'external_message_sent',
+                $senderTenantId,
+                0, // No tenant ID for external partner
+                $senderId,
+                [
+                    'external_partner_id' => $externalPartnerId,
+                    'external_partner_name' => $partnerName,
+                    'receiver_id' => $receiverId,
+                    'receiver_name' => $receiverName,
+                    'message_id' => $messageId,
+                    'external_message_id' => $externalMessageId
+                ]
+            );
+
+            return ['success' => true, 'message_id' => $messageId];
+
+        } catch (\Exception $e) {
+            error_log("FederatedMessageService::storeExternalMessage error: " . $e->getMessage());
+            return ['success' => false, 'error' => 'Failed to store message locally'];
+        }
     }
 
     /**

@@ -10,6 +10,8 @@ use Nexus\Services\FederationFeatureService;
 use Nexus\Services\FederationPartnershipService;
 use Nexus\Services\FederationUserService;
 use Nexus\Services\FederationSearchService;
+use Nexus\Services\FederationExternalPartnerService;
+use Nexus\Services\FederationExternalApiClient;
 use Nexus\Services\ReviewService;
 
 /**
@@ -72,8 +74,8 @@ class FederatedMemberController
             'offset' => (int)($_GET['offset'] ?? 0),
         ];
 
-        // Use advanced search service
-        $searchResult = FederationSearchService::searchMembers($partnerTenantIds, $filters);
+        // Use combined search that includes both internal tenant partners AND external partners
+        $searchResult = FederationSearchService::searchAllFederatedMembers($partnerTenantIds, $tenantId, $filters);
         $members = $searchResult['members'];
 
         // Get partner tenant info for filter dropdown
@@ -152,13 +154,16 @@ class FederatedMemberController
             'offset' => max(0, (int)($_GET['offset'] ?? 0)),
         ];
 
-        $searchResult = FederationSearchService::searchMembers($partnerTenantIds, $filters);
+        // Use combined search that includes both internal tenant partners AND external partners
+        $searchResult = FederationSearchService::searchAllFederatedMembers($partnerTenantIds, $tenantId, $filters);
 
         echo json_encode([
             'success' => true,
             'members' => $searchResult['members'],
             'hasMore' => $searchResult['has_more'] ?? false,
             'filtersApplied' => $searchResult['filters_applied'] ?? [],
+            'internalCount' => $searchResult['internal_count'] ?? 0,
+            'externalCount' => $searchResult['external_count'] ?? 0,
         ]);
         exit;
     }
@@ -329,6 +334,112 @@ class FederatedMemberController
             'pendingReviewTransaction' => $pendingReviewTransaction,
             'pageTitle' => $member['display_name'] ?: ($member['name'] ?: 'Member Profile')
         ]);
+    }
+
+    /**
+     * View an external federated member's profile (from external partner via API)
+     */
+    public function showExternal($partnerId, $memberId)
+    {
+        if (!isset($_SESSION['user_id'])) {
+            header('Location: ' . TenantContext::getBasePath() . '/login');
+            exit;
+        }
+
+        $tenantId = TenantContext::getId();
+        $viewerId = $_SESSION['user_id'];
+        $partnerId = (int)$partnerId;
+        $memberId = (int)$memberId;
+
+        // Get the external partner
+        $partner = FederationExternalPartnerService::getById($partnerId, $tenantId);
+
+        if (!$partner || $partner['status'] !== 'active') {
+            http_response_code(404);
+            View::render('errors/404', [
+                'message' => 'External partner not found or inactive.'
+            ]);
+            return;
+        }
+
+        // Fetch member profile from external partner via API
+        try {
+            $client = new FederationExternalApiClient($partner);
+            $result = $client->getMember($memberId);
+
+            if (!$result['success']) {
+                http_response_code(404);
+                View::render('errors/404', [
+                    'message' => 'Member not found on external partner.'
+                ]);
+                return;
+            }
+
+            $member = $result['data']['member'] ?? $result['data'] ?? null;
+
+            if (!$member) {
+                http_response_code(404);
+                View::render('errors/404');
+                return;
+            }
+
+            // Ensure member ID is set from URL parameter (external API may not return it)
+            $member['id'] = $memberId;
+
+            // Extract external tenant/timebank ID from member data
+            $externalTenantId = $member['timebank']['id']
+                ?? $member['tenant_id']
+                ?? $member['timebank_id']
+                ?? 1; // Default to 1 if not found
+
+            // Add external partner info
+            $member['is_external'] = true;
+            $member['external_partner_id'] = $partner['id'];
+            $member['external_partner_name'] = $partner['partner_name'] ?: $partner['name'];
+            $member['external_partner_url'] = $partner['base_url'];
+            $member['external_tenant_id'] = $externalTenantId;
+            $member['tenant_name'] = $member['timebank']['name']
+                ?? $partner['partner_name']
+                ?: $partner['name'];
+
+            // Ensure display_name exists
+            if (empty($member['display_name'])) {
+                $member['display_name'] = $member['name'] ?? trim(($member['first_name'] ?? '') . ' ' . ($member['last_name'] ?? ''));
+            }
+
+            // Parse skills if string
+            if (!empty($member['skills']) && is_string($member['skills'])) {
+                $member['skills_array'] = array_map('trim', explode(',', $member['skills']));
+            } elseif (!empty($member['skills']) && is_array($member['skills'])) {
+                $member['skills_array'] = $member['skills'];
+            } else {
+                $member['skills_array'] = [];
+            }
+
+            // Check permissions from partner config
+            $canMessage = $partner['allow_messaging'] && ($member['messaging_enabled_federated'] ?? true);
+            $canTransact = $partner['allow_transactions'] && ($member['transactions_enabled_federated'] ?? true);
+
+            View::render('federation/member-profile', [
+                'member' => $member,
+                'canMessage' => $canMessage,
+                'canTransact' => $canTransact,
+                'reviews' => [],
+                'reviewStats' => null,
+                'trustScore' => $member['trust_score'] ?? null,
+                'pendingReviewTransaction' => null,
+                'isExternalMember' => true,
+                'externalPartner' => $partner,
+                'pageTitle' => $member['display_name'] ?: 'External Member Profile'
+            ]);
+
+        } catch (\Exception $e) {
+            error_log("FederatedMemberController::showExternal error: " . $e->getMessage());
+            http_response_code(500);
+            View::render('errors/500', [
+                'message' => 'Failed to fetch member profile from external partner.'
+            ]);
+        }
     }
 
     /**

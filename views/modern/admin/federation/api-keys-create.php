@@ -264,6 +264,34 @@ require __DIR__ . '/../partials/admin-header.php';
             </div>
 
             <div class="form-group">
+                <label for="platform_id">Platform ID (for External Partners)</label>
+                <input type="text" id="platform_id" name="platform_id" class="form-input"
+                       placeholder="e.g., exchangemembers-prod">
+                <p class="hint">Unique identifier for external platforms. Leave blank for internal partner keys.</p>
+            </div>
+
+            <div class="form-group">
+                <label>Authentication Method</label>
+                <div class="permissions-grid">
+                    <label class="permission-item">
+                        <input type="radio" name="auth_method" value="api_key" checked>
+                        <div class="permission-info">
+                            <strong>API Key Only</strong>
+                            <span>Simple bearer token authentication (recommended for internal use)</span>
+                        </div>
+                    </label>
+                    <label class="permission-item">
+                        <input type="radio" name="auth_method" value="hmac">
+                        <div class="permission-info">
+                            <strong>HMAC Signature</strong>
+                            <span>Request signing with shared secret (recommended for external partners)</span>
+                        </div>
+                    </label>
+                </div>
+                <p class="hint">HMAC provides additional security by signing each request with a shared secret.</p>
+            </div>
+
+            <div class="form-group">
                 <label for="expires_in">Expiration</label>
                 <select id="expires_in" name="expires_in" class="form-select">
                     <option value="">Never expires</option>

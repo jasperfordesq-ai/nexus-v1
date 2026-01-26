@@ -4,6 +4,11 @@
  * Admin interface for managing external partner API keys
  */
 
+// Ensure session is started before accessing session variables
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
 use Nexus\Core\TenantContext;
 use Nexus\Core\Csrf;
 
@@ -13,13 +18,20 @@ $adminPageTitle = 'Federation API Keys';
 $adminPageSubtitle = 'External Partner Integration';
 $adminPageIcon = 'fa-key';
 
+// Extract session data BEFORE including header (which also accesses session)
+$newApiKey = $_SESSION['new_api_key'] ?? null;
+$newSigningSecret = $_SESSION['new_signing_secret'] ?? null;
+$flashSuccess = $_SESSION['flash_success'] ?? null;
+$flashError = $_SESSION['flash_error'] ?? null;
+
+// Clear session variables after reading
+unset($_SESSION['new_api_key'], $_SESSION['new_signing_secret'], $_SESSION['flash_success'], $_SESSION['flash_error']);
+
 require __DIR__ . '/../partials/admin-header.php';
 
 // Extract data
 $apiKeys = $apiKeys ?? [];
 $recentActivity = $recentActivity ?? [];
-$newApiKey = $_SESSION['new_api_key'] ?? null;
-unset($_SESSION['new_api_key']);
 ?>
 
 <style>
@@ -359,19 +371,49 @@ unset($_SESSION['new_api_key']);
 }
 </style>
 
+<?php if ($flashSuccess): ?>
+<div style="background: rgba(16, 185, 129, 0.15); border: 1px solid rgba(16, 185, 129, 0.3); border-radius: 8px; padding: 1rem; margin-bottom: 1rem; color: #10b981; display: flex; align-items: center; gap: 0.5rem;">
+    <i class="fa-solid fa-circle-check"></i>
+    <span><?= htmlspecialchars($flashSuccess) ?></span>
+</div>
+<?php endif; ?>
+
+<?php if ($flashError): ?>
+<div style="background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.3); border-radius: 8px; padding: 1rem; margin-bottom: 1rem; color: #ef4444; display: flex; align-items: center; gap: 0.5rem;">
+    <i class="fa-solid fa-circle-exclamation"></i>
+    <span><?= htmlspecialchars($flashError) ?></span>
+</div>
+<?php endif; ?>
+
 <div class="api-keys-dashboard">
     <?php if ($newApiKey): ?>
     <div class="new-key-alert">
         <h3><i class="fa-solid fa-circle-check"></i> Your New API Key</h3>
+
+        <p style="margin: 0 0 0.5rem; color: var(--admin-text-secondary); font-size: 0.9rem;">API Key:</p>
         <div class="new-key-value" id="newKeyValue">
             <?= htmlspecialchars($newApiKey) ?>
-            <button class="copy-btn" onclick="copyApiKey()">
+            <button class="copy-btn" onclick="copyToClipboard('newKeyValue', this)">
                 <i class="fa-solid fa-copy"></i> Copy
             </button>
         </div>
-        <p class="new-key-warning">
+
+        <?php if ($newSigningSecret): ?>
+        <p style="margin: 1rem 0 0.5rem; color: var(--admin-text-secondary); font-size: 0.9rem;">HMAC Signing Secret:</p>
+        <div class="new-key-value" id="newSigningSecret" style="color: #f59e0b;">
+            <?= htmlspecialchars($newSigningSecret) ?>
+            <button class="copy-btn" onclick="copyToClipboard('newSigningSecret', this)" style="color: #f59e0b; border-color: rgba(245, 158, 11, 0.4); background: rgba(245, 158, 11, 0.2);">
+                <i class="fa-solid fa-copy"></i> Copy
+            </button>
+        </div>
+        <p style="margin: 0.5rem 0 0; font-size: 0.85rem; color: var(--admin-text-secondary);">
+            Use this secret to sign your API requests with HMAC-SHA256.
+        </p>
+        <?php endif; ?>
+
+        <p class="new-key-warning" style="margin-top: 1rem;">
             <i class="fa-solid fa-triangle-exclamation"></i>
-            This key will only be shown once. Make sure to copy and store it securely!
+            These credentials will only be shown once. Make sure to copy and store them securely!
         </p>
     </div>
     <?php endif; ?>
@@ -398,6 +440,7 @@ unset($_SESSION['new_api_key']);
                 <tr>
                     <th>Name</th>
                     <th>Key Prefix</th>
+                    <th>Auth</th>
                     <th>Status</th>
                     <th>Permissions</th>
                     <th>Requests</th>
@@ -416,6 +459,20 @@ unset($_SESSION['new_api_key']);
                         </small>
                     </td>
                     <td><code class="key-prefix"><?= htmlspecialchars($key['key_prefix']) ?>...</code></td>
+                    <td>
+                        <?php if (!empty($key['signing_enabled'])): ?>
+                        <span class="perm-badge" style="background: rgba(245, 158, 11, 0.15); color: #f59e0b;">
+                            <i class="fa-solid fa-shield-halved"></i> HMAC
+                        </span>
+                        <?php else: ?>
+                        <span class="perm-badge">
+                            <i class="fa-solid fa-key"></i> Key
+                        </span>
+                        <?php endif; ?>
+                        <?php if (!empty($key['platform_id'])): ?>
+                        <br><small style="color: #8b5cf6; font-size: 0.7rem;"><?= htmlspecialchars($key['platform_id']) ?></small>
+                        <?php endif; ?>
+                    </td>
                     <td>
                         <span class="key-status <?= $key['status'] ?>">
                             <?php if ($key['status'] === 'active'): ?>
@@ -501,17 +558,24 @@ unset($_SESSION['new_api_key']);
 </div>
 
 <script>
-function copyApiKey() {
-    const keyValue = document.getElementById('newKeyValue').textContent.trim();
-    navigator.clipboard.writeText(keyValue).then(() => {
-        const btn = document.querySelector('.copy-btn');
+function copyToClipboard(elementId, btn) {
+    const element = document.getElementById(elementId);
+    // Get just the text content, excluding the button text
+    const text = element.childNodes[0].textContent.trim();
+    navigator.clipboard.writeText(text).then(() => {
+        const originalHtml = btn.innerHTML;
         btn.innerHTML = '<i class="fa-solid fa-check"></i> Copied!';
         btn.classList.add('copied');
         setTimeout(() => {
-            btn.innerHTML = '<i class="fa-solid fa-copy"></i> Copy';
+            btn.innerHTML = originalHtml;
             btn.classList.remove('copied');
         }, 2000);
     });
+}
+
+// Legacy function
+function copyApiKey() {
+    copyToClipboard('newKeyValue', document.querySelector('#newKeyValue .copy-btn'));
 }
 </script>
 

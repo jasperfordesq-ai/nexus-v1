@@ -80,6 +80,21 @@ body.keyboard-open,
 body.menu-open {
     overflow: hidden !important;
     overflow-y: hidden !important;
+    /* CRITICAL: Override any position: fixed from other CSS - it breaks scroll inside panels */
+    position: static !important;
+    /* NOTE: Do NOT use touch-action:none - it blocks scroll inside menu panels */
+}
+
+/* ===========================================
+   MOBILE MENU SCROLL FIX
+   Ensure menu content can scroll when body is locked
+   =========================================== */
+.mobile-fullscreen-menu .mobile-menu-body,
+#mobileMenu .mobile-menu-body {
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    touch-action: pan-y !important;
+    min-height: 0 !important; /* Required for flexbox scroll */
 }
 
 /* ===========================================

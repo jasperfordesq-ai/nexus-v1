@@ -11,6 +11,7 @@ use Nexus\Services\FederationSearchService;
 use Nexus\Services\FederationUserService;
 use Nexus\Services\FederationAuditService;
 use Nexus\Services\FederationJwtService;
+use Nexus\Services\FederationExternalPartnerService;
 
 /**
  * FederationApiController
@@ -46,57 +47,100 @@ class FederationApiController
     /**
      * List available partner timebanks
      * GET /api/v1/federation/timebanks
+     *
+     * For external partners: Returns info about the tenant that owns the API key
+     * For internal partners: Returns list of partnered tenants
      */
     public function timebanks(): void
     {
         if (!FederationApiMiddleware::authenticate()) return;
         if (!FederationApiMiddleware::requirePermission('timebanks:read')) return;
 
+        $partner = FederationApiMiddleware::getPartner();
         $partnerTenantId = FederationApiMiddleware::getPartnerTenantId();
+        $isExternalPartner = !empty($partner['platform_id']);
         $db = Database::getInstance();
 
-        // Get active partnerships for this partner
-        $stmt = $db->prepare("
-            SELECT
-                t.id,
-                t.name,
-                t.tagline,
-                t.city,
-                t.country,
-                t.timezone,
-                fp.status as partnership_status,
-                fp.created_at as partnership_since,
-                (SELECT COUNT(*) FROM federation_user_settings fus
-                 WHERE fus.tenant_id = t.id AND fus.opted_in = 1) as member_count
-            FROM federation_partnerships fp
-            JOIN tenants t ON (
-                (fp.tenant_id = ? AND t.id = fp.partner_tenant_id) OR
-                (fp.partner_tenant_id = ? AND t.id = fp.tenant_id)
-            )
-            WHERE fp.status = 'active'
-            ORDER BY t.name ASC
-        ");
-        $stmt->execute([$partnerTenantId, $partnerTenantId]);
-        $timebanks = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+        if ($isExternalPartner) {
+            // External partners: Return info about the tenant that owns the API key
+            $stmt = $db->prepare("
+                SELECT
+                    t.id,
+                    t.name,
+                    t.tagline,
+                    t.location_name,
+                    t.country_code,
+                    t.created_at as partnership_since,
+                    (SELECT COUNT(*) FROM federation_user_settings fus
+                     JOIN users u ON u.id = fus.user_id
+                     WHERE u.tenant_id = t.id AND fus.federation_optin = 1 AND u.status = 'active') as member_count
+                FROM tenants t
+                WHERE t.id = ?
+            ");
+            $stmt->execute([$partnerTenantId]);
+            $timebanks = $stmt->fetchAll(\PDO::FETCH_ASSOC);
 
-        FederationApiMiddleware::sendSuccess([
-            'data' => array_map(function($tb) {
-                return [
-                    'id' => (int)$tb['id'],
-                    'name' => $tb['name'],
-                    'tagline' => $tb['tagline'],
-                    'location' => [
-                        'city' => $tb['city'],
-                        'country' => $tb['country'],
-                        'timezone' => $tb['timezone']
-                    ],
-                    'member_count' => (int)$tb['member_count'],
-                    'partnership_status' => $tb['partnership_status'],
-                    'partnership_since' => $tb['partnership_since']
-                ];
-            }, $timebanks),
-            'count' => count($timebanks)
-        ]);
+            // Format for external partners
+            FederationApiMiddleware::sendSuccess([
+                'data' => array_map(function($tb) {
+                    return [
+                        'id' => (int)$tb['id'],
+                        'name' => $tb['name'],
+                        'tagline' => $tb['tagline'],
+                        'location' => [
+                            'city' => $tb['location_name'],
+                            'country' => $tb['country_code']
+                        ],
+                        'member_count' => (int)$tb['member_count'],
+                        'partnership_status' => 'active',
+                        'partnership_since' => $tb['partnership_since']
+                    ];
+                }, $timebanks),
+                'count' => count($timebanks)
+            ]);
+        } else {
+            // Internal partners: Get active partnerships
+            $stmt = $db->prepare("
+                SELECT
+                    t.id,
+                    t.name,
+                    t.tagline,
+                    t.location_name,
+                    t.country_code,
+                    fp.status as partnership_status,
+                    fp.created_at as partnership_since,
+                    (SELECT COUNT(*) FROM federation_user_settings fus
+                     JOIN users u ON u.id = fus.user_id
+                     WHERE u.tenant_id = t.id AND fus.federation_optin = 1) as member_count
+                FROM federation_partnerships fp
+                JOIN tenants t ON (
+                    (fp.tenant_id = ? AND t.id = fp.partner_tenant_id) OR
+                    (fp.partner_tenant_id = ? AND t.id = fp.tenant_id)
+                )
+                WHERE fp.status = 'active'
+                ORDER BY t.name ASC
+            ");
+            $stmt->execute([$partnerTenantId, $partnerTenantId]);
+            $timebanks = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+
+            FederationApiMiddleware::sendSuccess([
+                'data' => array_map(function($tb) {
+                    return [
+                        'id' => (int)$tb['id'],
+                        'name' => $tb['name'],
+                        'tagline' => $tb['tagline'],
+                        'location' => [
+                            'city' => $tb['location_name'],
+                            'country' => $tb['country_code']
+                        ],
+                        'member_count' => (int)$tb['member_count'],
+                        'partnership_status' => $tb['partnership_status'],
+                        'partnership_since' => $tb['partnership_since']
+                    ];
+                }, $timebanks),
+                'count' => count($timebanks)
+            ]);
+        }
     }
 
     /**
@@ -110,13 +154,19 @@ class FederationApiController
      * - location: City/region filter
      * - page: Page number (default 1)
      * - per_page: Results per page (default 20, max 100)
+     *
+     * Behavior:
+     * - External partners (with platform_id): Get members FROM the tenant that issued the API key
+     * - Internal partners (other tenants): Get members from partnered tenants (via federation_partnerships)
      */
     public function members(): void
     {
         if (!FederationApiMiddleware::authenticate()) return;
         if (!FederationApiMiddleware::requirePermission('members:read')) return;
 
+        $partner = FederationApiMiddleware::getPartner();
         $partnerTenantId = FederationApiMiddleware::getPartnerTenantId();
+        $isExternalPartner = !empty($partner['platform_id']);
 
         // Parse query parameters
         $query = $_GET['q'] ?? '';
@@ -128,37 +178,62 @@ class FederationApiController
 
         $db = Database::getInstance();
 
-        // Build query for federated members
-        $sql = "
-            SELECT SQL_CALC_FOUND_ROWS
-                u.id,
-                u.username,
-                u.first_name,
-                u.last_name,
-                u.avatar,
-                u.city,
-                u.region,
-                u.country,
-                u.bio,
-                u.skills,
-                u.created_at,
-                fus.tenant_id,
-                fus.privacy_level,
-                fus.service_reach,
-                t.name as timebank_name
-            FROM users u
-            JOIN federation_user_settings fus ON fus.user_id = u.id
-            JOIN tenants t ON t.id = fus.tenant_id
-            JOIN federation_partnerships fp ON (
-                (fp.tenant_id = ? AND fp.partner_tenant_id = fus.tenant_id) OR
-                (fp.partner_tenant_id = ? AND fp.tenant_id = fus.tenant_id)
-            )
-            WHERE fus.opted_in = 1
-            AND fus.show_in_search = 1
-            AND fp.status = 'active'
-            AND fus.tenant_id != ?
-        ";
-        $params = [$partnerTenantId, $partnerTenantId, $partnerTenantId];
+        if ($isExternalPartner) {
+            // External partners: Return members FROM the tenant that owns the API key
+            // They want to see OUR members, not members from internal partnerships
+            $sql = "
+                SELECT SQL_CALC_FOUND_ROWS
+                    u.id,
+                    u.username,
+                    u.first_name,
+                    u.last_name,
+                    u.avatar_url as avatar,
+                    u.location,
+                    u.bio,
+                    u.skills,
+                    u.created_at,
+                    u.tenant_id,
+                    fus.service_reach,
+                    t.name as timebank_name
+                FROM users u
+                JOIN federation_user_settings fus ON fus.user_id = u.id
+                JOIN tenants t ON t.id = u.tenant_id
+                WHERE u.tenant_id = ?
+                AND fus.federation_optin = 1
+                AND fus.appear_in_federated_search = 1
+                AND u.status = 'active'
+            ";
+            $params = [$partnerTenantId];
+        } else {
+            // Internal partners: Use federation_partnerships to find members from partnered tenants
+            $sql = "
+                SELECT SQL_CALC_FOUND_ROWS
+                    u.id,
+                    u.username,
+                    u.first_name,
+                    u.last_name,
+                    u.avatar_url as avatar,
+                    u.location,
+                    u.bio,
+                    u.skills,
+                    u.created_at,
+                    u.tenant_id,
+                    fus.service_reach,
+                    t.name as timebank_name
+                FROM users u
+                JOIN federation_user_settings fus ON fus.user_id = u.id
+                JOIN tenants t ON t.id = u.tenant_id
+                JOIN federation_partnerships fp ON (
+                    (fp.tenant_id = ? AND fp.partner_tenant_id = u.tenant_id) OR
+                    (fp.partner_tenant_id = ? AND fp.tenant_id = u.tenant_id)
+                )
+                WHERE fus.federation_optin = 1
+                AND fus.appear_in_federated_search = 1
+                AND fp.status = 'active'
+                AND u.tenant_id != ?
+            ";
+            $params = [$partnerTenantId, $partnerTenantId, $partnerTenantId];
+        }
 
         // Apply filters
         if (!empty($query)) {
@@ -168,7 +243,7 @@ class FederationApiController
         }
 
         if ($timebankId) {
-            $sql .= " AND fus.tenant_id = ?";
+            $sql .= " AND u.tenant_id = ?";
             $params[] = $timebankId;
         }
 
@@ -180,9 +255,9 @@ class FederationApiController
         }
 
         if (!empty($location)) {
-            $sql .= " AND (u.city LIKE ? OR u.region LIKE ? OR u.country LIKE ?)";
+            $sql .= " AND u.location LIKE ?";
             $locationTerm = "%{$location}%";
-            $params = array_merge($params, [$locationTerm, $locationTerm, $locationTerm]);
+            $params[] = $locationTerm;
         }
 
         $sql .= " ORDER BY u.first_name ASC, u.last_name ASC";
@@ -198,25 +273,19 @@ class FederationApiController
 
         // Format response
         $formattedMembers = array_map(function($m) {
-            $showLocation = $m['privacy_level'] !== 'discovery';
             return [
                 'id' => (int)$m['id'],
                 'username' => $m['username'],
                 'name' => trim($m['first_name'] . ' ' . $m['last_name']),
-                'avatar' => $m['avatar'] ? "/uploads/avatars/{$m['avatar']}" : null,
+                'avatar' => $m['avatar'] ?: null,
                 'bio' => $m['bio'],
                 'skills' => $m['skills'] ? explode(',', $m['skills']) : [],
-                'location' => $showLocation ? [
-                    'city' => $m['city'],
-                    'region' => $m['region'],
-                    'country' => $m['country']
-                ] : null,
+                'location' => $m['location'],
                 'timebank' => [
                     'id' => (int)$m['tenant_id'],
                     'name' => $m['timebank_name']
                 ],
                 'service_reach' => $m['service_reach'],
-                'privacy_level' => $m['privacy_level'],
                 'joined' => $m['created_at']
             ];
         }, $members);
@@ -233,42 +302,72 @@ class FederationApiController
         if (!FederationApiMiddleware::authenticate()) return;
         if (!FederationApiMiddleware::requirePermission('members:read')) return;
 
+        $partner = FederationApiMiddleware::getPartner();
         $partnerTenantId = FederationApiMiddleware::getPartnerTenantId();
+        $isExternalPartner = !empty($partner['platform_id']);
         $db = Database::getInstance();
 
-        // Get member with federation settings
-        $stmt = $db->prepare("
-            SELECT
-                u.id,
-                u.username,
-                u.first_name,
-                u.last_name,
-                u.avatar,
-                u.city,
-                u.region,
-                u.country,
-                u.bio,
-                u.skills,
-                u.created_at,
-                fus.tenant_id,
-                fus.privacy_level,
-                fus.service_reach,
-                fus.accepts_messages,
-                fus.accepts_transactions,
-                t.name as timebank_name
-            FROM users u
-            JOIN federation_user_settings fus ON fus.user_id = u.id
-            JOIN tenants t ON t.id = fus.tenant_id
-            JOIN federation_partnerships fp ON (
-                (fp.tenant_id = ? AND fp.partner_tenant_id = fus.tenant_id) OR
-                (fp.partner_tenant_id = ? AND fp.tenant_id = fus.tenant_id)
-            )
-            WHERE u.id = ?
-            AND fus.opted_in = 1
-            AND fus.profile_visible = 1
-            AND fp.status = 'active'
-        ");
-        $stmt->execute([$partnerTenantId, $partnerTenantId, $id]);
+        if ($isExternalPartner) {
+            // External partners: Get member from the tenant that owns the API key
+            $stmt = $db->prepare("
+                SELECT
+                    u.id,
+                    u.username,
+                    u.first_name,
+                    u.last_name,
+                    u.avatar_url as avatar,
+                    u.location,
+                    u.bio,
+                    u.skills,
+                    u.created_at,
+                    u.tenant_id,
+                    fus.service_reach,
+                    fus.messaging_enabled_federated,
+                    fus.transactions_enabled_federated,
+                    t.name as timebank_name
+                FROM users u
+                JOIN federation_user_settings fus ON fus.user_id = u.id
+                JOIN tenants t ON t.id = u.tenant_id
+                WHERE u.id = ?
+                AND u.tenant_id = ?
+                AND fus.federation_optin = 1
+                AND fus.profile_visible_federated = 1
+                AND u.status = 'active'
+            ");
+            $stmt->execute([$id, $partnerTenantId]);
+        } else {
+            // Internal partners: Use federation_partnerships
+            $stmt = $db->prepare("
+                SELECT
+                    u.id,
+                    u.username,
+                    u.first_name,
+                    u.last_name,
+                    u.avatar_url as avatar,
+                    u.location,
+                    u.bio,
+                    u.skills,
+                    u.created_at,
+                    u.tenant_id,
+                    fus.service_reach,
+                    fus.messaging_enabled_federated,
+                    fus.transactions_enabled_federated,
+                    t.name as timebank_name
+                FROM users u
+                JOIN federation_user_settings fus ON fus.user_id = u.id
+                JOIN tenants t ON t.id = u.tenant_id
+                JOIN federation_partnerships fp ON (
+                    (fp.tenant_id = ? AND fp.partner_tenant_id = u.tenant_id) OR
+                    (fp.partner_tenant_id = ? AND fp.tenant_id = u.tenant_id)
+                )
+                WHERE u.id = ?
+                AND fus.federation_optin = 1
+                AND fus.profile_visible_federated = 1
+                AND fp.status = 'active'
+            ");
+            $stmt->execute([$partnerTenantId, $partnerTenantId, $id]);
+        }
+
         $member = $stmt->fetch(\PDO::FETCH_ASSOC);
 
         if (!$member) {
@@ -276,29 +375,22 @@ class FederationApiController
             return;
         }
 
-        $showLocation = $member['privacy_level'] !== 'discovery';
-
         FederationApiMiddleware::sendSuccess([
             'data' => [
                 'id' => (int)$member['id'],
                 'username' => $member['username'],
                 'name' => trim($member['first_name'] . ' ' . $member['last_name']),
-                'avatar' => $member['avatar'] ? "/uploads/avatars/{$member['avatar']}" : null,
+                'avatar' => $member['avatar'] ?: null,
                 'bio' => $member['bio'],
                 'skills' => $member['skills'] ? explode(',', $member['skills']) : [],
-                'location' => $showLocation ? [
-                    'city' => $member['city'],
-                    'region' => $member['region'],
-                    'country' => $member['country']
-                ] : null,
+                'location' => $member['location'],
                 'timebank' => [
                     'id' => (int)$member['tenant_id'],
                     'name' => $member['timebank_name']
                 ],
                 'service_reach' => $member['service_reach'],
-                'privacy_level' => $member['privacy_level'],
-                'accepts_messages' => (bool)$member['accepts_messages'],
-                'accepts_transactions' => (bool)$member['accepts_transactions'],
+                'accepts_messages' => (bool)$member['messaging_enabled_federated'],
+                'accepts_transactions' => (bool)$member['transactions_enabled_federated'],
                 'joined' => $member['created_at']
             ]
         ]);
@@ -314,13 +406,19 @@ class FederationApiController
      * - timebank_id: Filter by timebank
      * - category: Category filter
      * - page, per_page: Pagination
+     *
+     * Behavior:
+     * - External partners (with platform_id): Get listings FROM the tenant that issued the API key
+     * - Internal partners (other tenants): Get listings from partnered tenants (via federation_partnerships)
      */
     public function listings(): void
     {
         if (!FederationApiMiddleware::authenticate()) return;
         if (!FederationApiMiddleware::requirePermission('listings:read')) return;
 
+        $partner = FederationApiMiddleware::getPartner();
         $partnerTenantId = FederationApiMiddleware::getPartnerTenantId();
+        $isExternalPartner = !empty($partner['platform_id']);
 
         $query = $_GET['q'] ?? '';
         $type = $_GET['type'] ?? '';
@@ -331,35 +429,64 @@ class FederationApiController
 
         $db = Database::getInstance();
 
-        $sql = "
-            SELECT SQL_CALC_FOUND_ROWS
-                l.id,
-                l.title,
-                l.description,
-                l.type,
-                l.category,
-                l.rate,
-                l.created_at,
-                l.user_id,
-                u.first_name,
-                u.last_name,
-                u.avatar,
-                l.tenant_id,
-                t.name as timebank_name
-            FROM listings l
-            JOIN users u ON u.id = l.user_id
-            JOIN tenants t ON t.id = l.tenant_id
-            JOIN federation_user_settings fus ON fus.user_id = l.user_id AND fus.tenant_id = l.tenant_id
-            JOIN federation_partnerships fp ON (
-                (fp.tenant_id = ? AND fp.partner_tenant_id = l.tenant_id) OR
-                (fp.partner_tenant_id = ? AND fp.tenant_id = l.tenant_id)
-            )
-            WHERE l.status = 'active'
-            AND fus.opted_in = 1
-            AND fp.status = 'active'
-            AND l.tenant_id != ?
-        ";
-        $params = [$partnerTenantId, $partnerTenantId, $partnerTenantId];
+        if ($isExternalPartner) {
+            // External partners: Return listings FROM the tenant that owns the API key
+            $sql = "
+                SELECT SQL_CALC_FOUND_ROWS
+                    l.id,
+                    l.title,
+                    l.description,
+                    l.type,
+                    l.category,
+                    l.price as rate,
+                    l.created_at,
+                    l.user_id,
+                    u.first_name,
+                    u.last_name,
+                    u.avatar_url as avatar,
+                    l.tenant_id,
+                    t.name as timebank_name
+                FROM listings l
+                JOIN users u ON u.id = l.user_id
+                JOIN tenants t ON t.id = l.tenant_id
+                JOIN federation_user_settings fus ON fus.user_id = l.user_id
+                WHERE l.status = 'active'
+                AND l.tenant_id = ?
+                AND fus.federation_optin = 1
+            ";
+            $params = [$partnerTenantId];
+        } else {
+            // Internal partners: Use federation_partnerships
+            $sql = "
+                SELECT SQL_CALC_FOUND_ROWS
+                    l.id,
+                    l.title,
+                    l.description,
+                    l.type,
+                    l.category,
+                    l.price as rate,
+                    l.created_at,
+                    l.user_id,
+                    u.first_name,
+                    u.last_name,
+                    u.avatar_url as avatar,
+                    l.tenant_id,
+                    t.name as timebank_name
+                FROM listings l
+                JOIN users u ON u.id = l.user_id
+                JOIN tenants t ON t.id = l.tenant_id
+                JOIN federation_user_settings fus ON fus.user_id = l.user_id
+                JOIN federation_partnerships fp ON (
+                    (fp.tenant_id = ? AND fp.partner_tenant_id = l.tenant_id) OR
+                    (fp.partner_tenant_id = ? AND fp.tenant_id = l.tenant_id)
+                )
+                WHERE l.status = 'active'
+                AND fus.federation_optin = 1
+                AND fp.status = 'active'
+                AND l.tenant_id != ?
+            ";
+            $params = [$partnerTenantId, $partnerTenantId, $partnerTenantId];
+        }
 
         if (!empty($query)) {
             $sql .= " AND (l.title LIKE ? OR l.description LIKE ?)";
@@ -403,7 +530,7 @@ class FederationApiController
                 'owner' => [
                     'id' => (int)$l['user_id'],
                     'name' => trim($l['first_name'] . ' ' . $l['last_name']),
-                    'avatar' => $l['avatar'] ? "/uploads/avatars/{$l['avatar']}" : null
+                    'avatar' => $l['avatar'] ?: null
                 ],
                 'timebank' => [
                     'id' => (int)$l['tenant_id'],
@@ -425,31 +552,57 @@ class FederationApiController
         if (!FederationApiMiddleware::authenticate()) return;
         if (!FederationApiMiddleware::requirePermission('listings:read')) return;
 
+        $partner = FederationApiMiddleware::getPartner();
         $partnerTenantId = FederationApiMiddleware::getPartnerTenantId();
+        $isExternalPartner = !empty($partner['platform_id']);
         $db = Database::getInstance();
 
-        $stmt = $db->prepare("
-            SELECT
-                l.*,
-                u.first_name,
-                u.last_name,
-                u.avatar,
-                u.city,
-                t.name as timebank_name
-            FROM listings l
-            JOIN users u ON u.id = l.user_id
-            JOIN tenants t ON t.id = l.tenant_id
-            JOIN federation_user_settings fus ON fus.user_id = l.user_id AND fus.tenant_id = l.tenant_id
-            JOIN federation_partnerships fp ON (
-                (fp.tenant_id = ? AND fp.partner_tenant_id = l.tenant_id) OR
-                (fp.partner_tenant_id = ? AND fp.tenant_id = l.tenant_id)
-            )
-            WHERE l.id = ?
-            AND l.status = 'active'
-            AND fus.opted_in = 1
-            AND fp.status = 'active'
-        ");
-        $stmt->execute([$partnerTenantId, $partnerTenantId, $id]);
+        if ($isExternalPartner) {
+            // External partners: Get listing from the tenant that owns the API key
+            $stmt = $db->prepare("
+                SELECT
+                    l.*,
+                    u.first_name,
+                    u.last_name,
+                    u.avatar_url as avatar,
+                    u.location,
+                    t.name as timebank_name
+                FROM listings l
+                JOIN users u ON u.id = l.user_id
+                JOIN tenants t ON t.id = l.tenant_id
+                JOIN federation_user_settings fus ON fus.user_id = l.user_id
+                WHERE l.id = ?
+                AND l.tenant_id = ?
+                AND l.status = 'active'
+                AND fus.federation_optin = 1
+            ");
+            $stmt->execute([$id, $partnerTenantId]);
+        } else {
+            // Internal partners: Use federation_partnerships
+            $stmt = $db->prepare("
+                SELECT
+                    l.*,
+                    u.first_name,
+                    u.last_name,
+                    u.avatar_url as avatar,
+                    u.location,
+                    t.name as timebank_name
+                FROM listings l
+                JOIN users u ON u.id = l.user_id
+                JOIN tenants t ON t.id = l.tenant_id
+                JOIN federation_user_settings fus ON fus.user_id = l.user_id
+                JOIN federation_partnerships fp ON (
+                    (fp.tenant_id = ? AND fp.partner_tenant_id = l.tenant_id) OR
+                    (fp.partner_tenant_id = ? AND fp.tenant_id = l.tenant_id)
+                )
+                WHERE l.id = ?
+                AND l.status = 'active'
+                AND fus.federation_optin = 1
+                AND fp.status = 'active'
+            ");
+            $stmt->execute([$partnerTenantId, $partnerTenantId, $id]);
+        }
+
         $listing = $stmt->fetch(\PDO::FETCH_ASSOC);
 
         if (!$listing) {
@@ -468,8 +621,8 @@ class FederationApiController
                 'owner' => [
                     'id' => (int)$listing['user_id'],
                     'name' => trim($listing['first_name'] . ' ' . $listing['last_name']),
-                    'avatar' => $listing['avatar'] ? "/uploads/avatars/{$listing['avatar']}" : null,
-                    'city' => $listing['city']
+                    'avatar' => $listing['avatar'] ?: null,
+                    'location' => $listing['location']
                 ],
                 'timebank' => [
                     'id' => (int)$listing['tenant_id'],
@@ -490,13 +643,17 @@ class FederationApiController
      * - subject: Message subject
      * - body: Message content
      * - sender_id: Sender user ID (from partner timebank)
+     * - sender_name: Sender display name (optional, for external partners)
+     * - sender_email: Sender email (optional, for external partners)
      */
     public function sendMessage(): void
     {
         if (!FederationApiMiddleware::authenticate()) return;
         if (!FederationApiMiddleware::requirePermission('messages:write')) return;
 
+        $partner = FederationApiMiddleware::getPartner();
         $partnerTenantId = FederationApiMiddleware::getPartnerTenantId();
+        $isExternalPartner = !empty($partner['platform_id']);
         $input = json_decode(file_get_contents('php://input'), true);
 
         // Validate required fields
@@ -510,20 +667,35 @@ class FederationApiController
 
         $db = Database::getInstance();
 
-        // Verify recipient exists and accepts messages
-        $stmt = $db->prepare("
-            SELECT u.id, u.first_name, fus.tenant_id, fus.accepts_messages
-            FROM users u
-            JOIN federation_user_settings fus ON fus.user_id = u.id
-            JOIN federation_partnerships fp ON (
-                (fp.tenant_id = ? AND fp.partner_tenant_id = fus.tenant_id) OR
-                (fp.partner_tenant_id = ? AND fp.tenant_id = fus.tenant_id)
-            )
-            WHERE u.id = ?
-            AND fus.opted_in = 1
-            AND fp.status = 'active'
-        ");
-        $stmt->execute([$partnerTenantId, $partnerTenantId, $input['recipient_id']]);
+        if ($isExternalPartner) {
+            // External partners: Verify recipient is from the tenant that owns the API key
+            $stmt = $db->prepare("
+                SELECT u.id, u.first_name, u.tenant_id, fus.messaging_enabled_federated
+                FROM users u
+                JOIN federation_user_settings fus ON fus.user_id = u.id
+                WHERE u.id = ?
+                AND u.tenant_id = ?
+                AND fus.federation_optin = 1
+                AND u.status = 'active'
+            ");
+            $stmt->execute([$input['recipient_id'], $partnerTenantId]);
+        } else {
+            // Internal partners: Use federation_partnerships
+            $stmt = $db->prepare("
+                SELECT u.id, u.first_name, u.tenant_id, fus.messaging_enabled_federated
+                FROM users u
+                JOIN federation_user_settings fus ON fus.user_id = u.id
+                JOIN federation_partnerships fp ON (
+                    (fp.tenant_id = ? AND fp.partner_tenant_id = u.tenant_id) OR
+                    (fp.partner_tenant_id = ? AND fp.tenant_id = u.tenant_id)
+                )
+                WHERE u.id = ?
+                AND fus.federation_optin = 1
+                AND fp.status = 'active'
+            ");
+            $stmt->execute([$partnerTenantId, $partnerTenantId, $input['recipient_id']]);
+        }
+
         $recipient = $stmt->fetch(\PDO::FETCH_ASSOC);
 
         if (!$recipient) {
@@ -531,24 +703,45 @@ class FederationApiController
             return;
         }
 
-        if (!$recipient['accepts_messages']) {
+        if (!$recipient['messaging_enabled_federated']) {
             FederationApiMiddleware::sendError(403, 'Recipient does not accept federated messages', 'MESSAGES_DISABLED');
             return;
         }
 
         // Create the message
-        $stmt = $db->prepare("
-            INSERT INTO messages
-            (sender_id, recipient_id, subject, body, is_federated, sender_tenant_id, created_at)
-            VALUES (?, ?, ?, ?, 1, ?, NOW())
-        ");
-        $stmt->execute([
-            $input['sender_id'],
-            $input['recipient_id'],
-            $input['subject'],
-            $input['body'],
-            $partnerTenantId
-        ]);
+        // For external partners, we may need to store additional sender info
+        if ($isExternalPartner) {
+            // Store as external message with sender metadata
+            $stmt = $db->prepare("
+                INSERT INTO messages
+                (sender_id, recipient_id, subject, body, is_federated, sender_tenant_id,
+                 external_sender_name, external_sender_email, external_platform_id, created_at)
+                VALUES (?, ?, ?, ?, 1, ?, ?, ?, ?, NOW())
+            ");
+            $stmt->execute([
+                $input['sender_id'],
+                $input['recipient_id'],
+                $input['subject'],
+                $input['body'],
+                $partnerTenantId,
+                $input['sender_name'] ?? null,
+                $input['sender_email'] ?? null,
+                $partner['platform_id']
+            ]);
+        } else {
+            $stmt = $db->prepare("
+                INSERT INTO messages
+                (sender_id, recipient_id, subject, body, is_federated, sender_tenant_id, created_at)
+                VALUES (?, ?, ?, ?, 1, ?, NOW())
+            ");
+            $stmt->execute([
+                $input['sender_id'],
+                $input['recipient_id'],
+                $input['subject'],
+                $input['body'],
+                $partnerTenantId
+            ]);
+        }
         $messageId = $db->lastInsertId();
 
         // Log the action
@@ -556,8 +749,8 @@ class FederationApiController
             $partnerTenantId,
             $recipient['tenant_id'],
             'api_message_sent',
-            "API message sent to user {$input['recipient_id']}",
-            ['message_id' => $messageId]
+            "API message sent to user {$input['recipient_id']}" . ($isExternalPartner ? " (external: {$partner['platform_id']})" : ''),
+            ['message_id' => $messageId, 'external_partner' => $isExternalPartner]
         );
 
         FederationApiMiddleware::sendSuccess([
@@ -575,13 +768,17 @@ class FederationApiController
      * - amount: Hours to transfer
      * - description: Transaction description
      * - sender_id: Sender user ID
+     * - sender_name: Sender display name (optional, for external partners)
+     * - sender_email: Sender email (optional, for external partners)
      */
     public function createTransaction(): void
     {
         if (!FederationApiMiddleware::authenticate()) return;
         if (!FederationApiMiddleware::requirePermission('transactions:write')) return;
 
+        $partner = FederationApiMiddleware::getPartner();
         $partnerTenantId = FederationApiMiddleware::getPartnerTenantId();
+        $isExternalPartner = !empty($partner['platform_id']);
         $input = json_decode(file_get_contents('php://input'), true);
 
         // Validate required fields
@@ -601,21 +798,35 @@ class FederationApiController
 
         $db = Database::getInstance();
 
-        // Verify recipient accepts transactions
-        $stmt = $db->prepare("
-            SELECT u.id, u.first_name, fus.tenant_id, fus.accepts_transactions
-            FROM users u
-            JOIN federation_user_settings fus ON fus.user_id = u.id
-            JOIN federation_partnerships fp ON (
-                (fp.tenant_id = ? AND fp.partner_tenant_id = fus.tenant_id) OR
-                (fp.partner_tenant_id = ? AND fp.tenant_id = fus.tenant_id)
-            )
-            WHERE u.id = ?
-            AND fus.opted_in = 1
-            AND fus.privacy_level = 'economic'
-            AND fp.status = 'active'
-        ");
-        $stmt->execute([$partnerTenantId, $partnerTenantId, $input['recipient_id']]);
+        if ($isExternalPartner) {
+            // External partners: Verify recipient is from the tenant that owns the API key
+            $stmt = $db->prepare("
+                SELECT u.id, u.first_name, u.tenant_id, fus.transactions_enabled_federated
+                FROM users u
+                JOIN federation_user_settings fus ON fus.user_id = u.id
+                WHERE u.id = ?
+                AND u.tenant_id = ?
+                AND fus.federation_optin = 1
+                AND u.status = 'active'
+            ");
+            $stmt->execute([$input['recipient_id'], $partnerTenantId]);
+        } else {
+            // Internal partners: Use federation_partnerships
+            $stmt = $db->prepare("
+                SELECT u.id, u.first_name, u.tenant_id, fus.transactions_enabled_federated
+                FROM users u
+                JOIN federation_user_settings fus ON fus.user_id = u.id
+                JOIN federation_partnerships fp ON (
+                    (fp.tenant_id = ? AND fp.partner_tenant_id = u.tenant_id) OR
+                    (fp.partner_tenant_id = ? AND fp.tenant_id = u.tenant_id)
+                )
+                WHERE u.id = ?
+                AND fus.federation_optin = 1
+                AND fp.status = 'active'
+            ");
+            $stmt->execute([$partnerTenantId, $partnerTenantId, $input['recipient_id']]);
+        }
+
         $recipient = $stmt->fetch(\PDO::FETCH_ASSOC);
 
         if (!$recipient) {
@@ -623,41 +834,74 @@ class FederationApiController
             return;
         }
 
-        if (!$recipient['accepts_transactions']) {
+        if (!$recipient['transactions_enabled_federated']) {
             FederationApiMiddleware::sendError(403, 'Recipient does not accept federated transactions', 'TRANSACTIONS_DISABLED');
             return;
         }
 
         // Create pending transaction (requires confirmation flow in production)
-        $stmt = $db->prepare("
-            INSERT INTO transactions
-            (sender_id, receiver_id, amount, description, status, is_federated, sender_tenant_id, receiver_tenant_id, created_at)
-            VALUES (?, ?, ?, ?, 'pending', 1, ?, ?, NOW())
-        ");
-        $stmt->execute([
-            $input['sender_id'],
-            $input['recipient_id'],
-            $amount,
-            $input['description'],
-            $partnerTenantId,
-            $recipient['tenant_id']
-        ]);
+        // For external partners, we store the external sender info
+        if ($isExternalPartner) {
+            $stmt = $db->prepare("
+                INSERT INTO transactions
+                (sender_id, receiver_id, amount, description, status, is_federated, sender_tenant_id, receiver_tenant_id,
+                 external_sender_name, external_platform_id, created_at)
+                VALUES (?, ?, ?, ?, 'pending', 1, ?, ?, ?, ?, NOW())
+            ");
+            $stmt->execute([
+                $input['sender_id'],
+                $input['recipient_id'],
+                $amount,
+                $input['description'],
+                $partnerTenantId,
+                $recipient['tenant_id'],
+                $input['sender_name'] ?? null,
+                $partner['platform_id']
+            ]);
+        } else {
+            $stmt = $db->prepare("
+                INSERT INTO transactions
+                (sender_id, receiver_id, amount, description, status, is_federated, sender_tenant_id, receiver_tenant_id, created_at)
+                VALUES (?, ?, ?, ?, 'pending', 1, ?, ?, NOW())
+            ");
+            $stmt->execute([
+                $input['sender_id'],
+                $input['recipient_id'],
+                $amount,
+                $input['description'],
+                $partnerTenantId,
+                $recipient['tenant_id']
+            ]);
+        }
         $transactionId = $db->lastInsertId();
+
+        // Credit recipient's balance immediately for external transactions
+        // (The external partner should debit from their side)
+        if ($isExternalPartner) {
+            $stmt = $db->prepare("
+                UPDATE users SET balance = balance + ? WHERE id = ? AND tenant_id = ?
+            ");
+            $stmt->execute([$amount, $input['recipient_id'], $partnerTenantId]);
+
+            // Mark as completed since external partner handles their side
+            $stmt = $db->prepare("UPDATE transactions SET status = 'completed' WHERE id = ?");
+            $stmt->execute([$transactionId]);
+        }
 
         // Log the action
         FederationAuditService::log(
             $partnerTenantId,
             $recipient['tenant_id'],
             'api_transaction_initiated',
-            "API transaction initiated: {$amount} hours to user {$input['recipient_id']}",
-            ['transaction_id' => $transactionId, 'amount' => $amount]
+            "API transaction initiated: {$amount} hours to user {$input['recipient_id']}" . ($isExternalPartner ? " (external: {$partner['platform_id']})" : ''),
+            ['transaction_id' => $transactionId, 'amount' => $amount, 'external_partner' => $isExternalPartner]
         );
 
         FederationApiMiddleware::sendSuccess([
             'transaction_id' => (int)$transactionId,
-            'status' => 'pending',
+            'status' => $isExternalPartner ? 'completed' : 'pending',
             'amount' => $amount,
-            'note' => 'Transaction requires recipient confirmation'
+            'note' => $isExternalPartner ? 'Transaction completed successfully' : 'Transaction requires recipient confirmation'
         ], 201);
     }
 

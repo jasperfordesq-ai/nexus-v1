@@ -11,6 +11,9 @@ $basePath = Nexus\Core\TenantContext::getBasePath();
 
 $listing = $listing ?? [];
 $canMessage = $canMessage ?? false;
+$isExternalListing = $isExternalListing ?? (!empty($listing['is_external']));
+$externalPartnerId = $listing['external_partner_id'] ?? null;
+$externalTenantId = $listing['external_tenant_id'] ?? 1;
 
 $ownerName = $listing['owner_name'] ?? 'Unknown';
 $fallbackAvatar = 'https://ui-avatars.com/api/?name=' . urlencode($ownerName) . '&background=8b5cf6&color=fff&size=200';
@@ -41,9 +44,12 @@ $type = $listing['type'] ?? 'offer';
                         <i class="fa-solid <?= $type === 'offer' ? 'fa-hand-holding-heart' : 'fa-hand-holding' ?>"></i>
                         <?= ucfirst($type) ?>
                     </span>
-                    <span class="listing-tenant">
-                        <i class="fa-solid fa-building"></i>
+                    <span class="listing-tenant<?= $isExternalListing ? ' external' : '' ?>">
+                        <i class="fa-solid <?= $isExternalListing ? 'fa-globe' : 'fa-building' ?>"></i>
                         <?= htmlspecialchars($listing['tenant_name'] ?? 'Partner Timebank') ?>
+                        <?php if ($isExternalListing): ?>
+                        <span class="external-tag">External</span>
+                        <?php endif; ?>
                     </span>
                 </div>
 
@@ -92,11 +98,21 @@ $type = $listing['type'] ?? 'offer';
                 <!-- Actions -->
                 <div class="listing-actions">
                     <?php if ($canMessage): ?>
-                        <a href="<?= $basePath ?>/federation/messages/<?= $listing['owner_id'] ?>?tenant=<?= $listing['owner_tenant_id'] ?>"
-                           class="action-btn action-btn-primary">
-                            <i class="fa-solid fa-envelope"></i>
-                            Contact <?= htmlspecialchars(explode(' ', $ownerName)[0]) ?>
-                        </a>
+                        <?php if ($isExternalListing && $externalPartnerId): ?>
+                            <!-- External listing - use federated messaging with external partner -->
+                            <a href="<?= $basePath ?>/federation/messages/compose?external_partner=<?= $externalPartnerId ?>&member_id=<?= $listing['owner_id'] ?>&member_name=<?= urlencode($ownerName) ?>&external_tenant=<?= $externalTenantId ?>"
+                               class="action-btn action-btn-primary">
+                                <i class="fa-solid fa-envelope"></i>
+                                Contact <?= htmlspecialchars(explode(' ', $ownerName)[0]) ?>
+                            </a>
+                        <?php else: ?>
+                            <!-- Internal federated listing -->
+                            <a href="<?= $basePath ?>/federation/messages/compose?to=<?= $listing['owner_id'] ?>&tenant=<?= $listing['owner_tenant_id'] ?>"
+                               class="action-btn action-btn-primary">
+                                <i class="fa-solid fa-envelope"></i>
+                                Contact <?= htmlspecialchars(explode(' ', $ownerName)[0]) ?>
+                            </a>
+                        <?php endif; ?>
                     <?php else: ?>
                         <span class="action-btn action-btn-disabled" title="Messaging not available">
                             <i class="fa-solid fa-envelope"></i>
@@ -104,11 +120,20 @@ $type = $listing['type'] ?? 'offer';
                         </span>
                     <?php endif; ?>
 
-                    <a href="<?= $basePath ?>/federation/members/<?= $listing['owner_id'] ?>"
-                       class="action-btn" style="background: rgba(139, 92, 246, 0.1); color: #8b5cf6; border: 2px solid rgba(139, 92, 246, 0.3);">
-                        <i class="fa-solid fa-user"></i>
-                        View Profile
-                    </a>
+                    <?php if ($isExternalListing && $externalPartnerId): ?>
+                        <!-- External listing - link to external member profile -->
+                        <a href="<?= $basePath ?>/federation/members/external/<?= $externalPartnerId ?>/<?= $listing['owner_id'] ?>"
+                           class="action-btn" style="background: rgba(139, 92, 246, 0.1); color: #8b5cf6; border: 2px solid rgba(139, 92, 246, 0.3);">
+                            <i class="fa-solid fa-user"></i>
+                            View Profile
+                        </a>
+                    <?php else: ?>
+                        <a href="<?= $basePath ?>/federation/members/<?= $listing['owner_id'] ?>"
+                           class="action-btn" style="background: rgba(139, 92, 246, 0.1); color: #8b5cf6; border: 2px solid rgba(139, 92, 246, 0.3);">
+                            <i class="fa-solid fa-user"></i>
+                            View Profile
+                        </a>
+                    <?php endif; ?>
                 </div>
 
                 <!-- Privacy Notice -->

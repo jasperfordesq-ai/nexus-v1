@@ -47,8 +47,8 @@
 }
 
 .event-action-btn.liked {
-    background: rgba(239, 68, 68, 0.15);
-    border-color: rgba(239, 68, 68, 0.3);
+    background: var(--color-red-alpha-15);
+    border-color: var(--color-red-alpha-30);
 }
 
 /* ===========================================
@@ -106,7 +106,7 @@
    =========================================== */
 .event-invite-banner {
     border-color: var(--color-info);
-    background: rgba(59, 130, 246, 0.1);
+    background: var(--color-blue-alpha-10);
 }
 
 .event-invite-title {
@@ -201,7 +201,7 @@
     padding: var(--space-3) var(--space-4);
     border-radius: var(--radius-md);
     border: 1px solid var(--glass-border);
-    background: rgba(255, 255, 255, 0.5);
+    background: var(--color-white-alpha-50);
     margin-bottom: var(--space-4);
     color: var(--text-color);
     font-family: inherit;
@@ -347,8 +347,8 @@
 }
 
 .event-js-reaction.active {
-    background: rgba(99, 102, 241, 0.2);
-    border-color: rgba(99, 102, 241, 0.4);
+    background: var(--color-indigo-alpha-20);
+    border-color: var(--color-indigo-alpha-40);
 }
 
 .event-js-picker-toggle {
@@ -458,19 +458,9 @@
 
 /* ===========================================
    UTILITY CLASSES
+   Note: Common utilities (.hidden, .text-center, .flex-grow, etc.)
+   are defined in modern-settings.css to avoid duplication
    =========================================== */
-.hidden {
-    display: none;
-}
-
-.text-center {
-    text-align: center;
-}
-
-.text-muted {
-    color: var(--text-muted);
-}
-
 .full-width {
     width: 100%;
 }

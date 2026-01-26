@@ -270,7 +270,14 @@ function renderFederatedMemberCard($member, $basePath)
     $memberName = $member['name'] ?? 'Member';
     $fallbackUrl = 'https://ui-avatars.com/api/?name=' . urlencode($memberName) . '&background=8b5cf6&color=fff&size=200';
     $avatarUrl = !empty($member['avatar_url']) ? $member['avatar_url'] : $fallbackUrl;
-    $profileUrl = $basePath . '/federation/members/' . $member['id'];
+
+    // Use different URL for external vs internal members
+    $isExternal = !empty($member['is_external']);
+    if ($isExternal && !empty($member['external_partner_id'])) {
+        $profileUrl = $basePath . '/federation/members/external/' . $member['external_partner_id'] . '/' . $member['id'];
+    } else {
+        $profileUrl = $basePath . '/federation/members/' . $member['id'];
+    }
 
     $reachClass = '';
     $reachLabel = '';
@@ -305,9 +312,12 @@ function renderFederatedMemberCard($member, $basePath)
 
             <h3 class="member-name"><?= htmlspecialchars($memberName) ?></h3>
 
-            <div class="tenant-badge">
-                <i class="fa-solid fa-building"></i>
+            <div class="tenant-badge<?= $isExternal ? ' external' : '' ?>">
+                <i class="fa-solid <?= $isExternal ? 'fa-globe' : 'fa-building' ?>"></i>
                 <?= htmlspecialchars($member['tenant_name'] ?? 'Partner Timebank') ?>
+                <?php if ($isExternal): ?>
+                <span class="external-tag">External</span>
+                <?php endif; ?>
             </div>
 
             <div class="reach-badge <?= $reachClass ?>">
@@ -590,7 +600,14 @@ document.addEventListener('DOMContentLoaded', function() {
         const memberName = member.name || 'Member';
         const fallbackUrl = `https://ui-avatars.com/api/?name=${encodeURIComponent(memberName)}&background=8b5cf6&color=fff&size=200`;
         const avatarUrl = member.avatar_url || fallbackUrl;
-        const profileUrl = `${basePath}/federation/members/${member.id}`;
+
+        // Use different URL for external vs internal members
+        let profileUrl;
+        if (member.is_external && member.external_partner_id) {
+            profileUrl = `${basePath}/federation/members/external/${member.external_partner_id}/${member.id}`;
+        } else {
+            profileUrl = `${basePath}/federation/members/${member.id}`;
+        }
 
         let reachClass = 'local';
         let reachLabel = 'Local Only';
@@ -620,9 +637,10 @@ document.addEventListener('DOMContentLoaded', function() {
                          class="avatar-img">
                 </div>
                 <h3 class="member-name">${escapeHtml(memberName)}</h3>
-                <div class="tenant-badge">
-                    <i class="fa-solid fa-building"></i>
+                <div class="tenant-badge${member.is_external ? ' external' : ''}">
+                    <i class="fa-solid ${member.is_external ? 'fa-globe' : 'fa-building'}"></i>
                     ${escapeHtml(member.tenant_name || 'Partner Timebank')}
+                    ${member.is_external ? '<span class="external-tag">External</span>' : ''}
                 </div>
                 <div class="reach-badge ${reachClass}">
                     <i class="fa-solid ${reachIcon}"></i>

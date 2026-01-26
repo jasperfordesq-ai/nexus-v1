@@ -4,6 +4,8 @@ namespace Nexus\Services;
 
 use Nexus\Core\Database;
 use Nexus\Core\TenantContext;
+use Nexus\Services\FederationExternalPartnerService;
+use Nexus\Services\FederationExternalApiClient;
 
 /**
  * Federation Search Service
@@ -375,6 +377,246 @@ class FederationSearchService
                 'transactions_enabled' => 0
             ];
         }
+    }
+
+    /**
+     * Search members from external federation partners via API
+     *
+     * @param int $tenantId Current tenant ID
+     * @param array $filters Search filters
+     * @return array Members from external partners
+     */
+    public static function searchExternalMembers(int $tenantId, array $filters): array
+    {
+        $externalPartners = FederationExternalPartnerService::getActivePartners($tenantId);
+
+        if (empty($externalPartners)) {
+            return [
+                'members' => [],
+                'total' => 0,
+                'partners_queried' => 0,
+                'errors' => []
+            ];
+        }
+
+        $allMembers = [];
+        $errors = [];
+        $partnersQueried = 0;
+
+        foreach ($externalPartners as $partner) {
+            try {
+                $client = new FederationExternalApiClient($partner);
+
+                // Build API params from filters
+                $apiParams = [];
+                if (!empty($filters['search'])) {
+                    $apiParams['q'] = $filters['search'];
+                }
+                if (!empty($filters['skills'])) {
+                    $apiParams['skills'] = $filters['skills'];
+                }
+                if (!empty($filters['location'])) {
+                    $apiParams['location'] = $filters['location'];
+                }
+                if (!empty($filters['service_reach'])) {
+                    $apiParams['reach'] = $filters['service_reach'];
+                }
+                $apiParams['limit'] = $filters['limit'] ?? 30;
+
+                $result = $client->searchMembers($apiParams);
+                $partnersQueried++;
+
+                if ($result['success'] && !empty($result['data'])) {
+                    // Handle different response formats
+                    $members = $result['data']['members'] ?? $result['data']['data'] ?? $result['data'] ?? [];
+
+                    if (is_array($members)) {
+                        foreach ($members as &$member) {
+                            // Mark as external and add partner info
+                            $member['is_external'] = true;
+                            $member['external_partner_id'] = $partner['id'];
+                            $member['external_partner_name'] = $partner['partner_name'] ?: $partner['name'];
+                            $member['external_partner_url'] = $partner['base_url'];
+                            $member['tenant_name'] = $partner['partner_name'] ?: $partner['name'];
+
+                            // Ensure required fields exist
+                            if (empty($member['name'])) {
+                                $member['name'] = trim(($member['first_name'] ?? '') . ' ' . ($member['last_name'] ?? ''));
+                            }
+
+                            // Parse skills if string
+                            if (!empty($member['skills']) && is_string($member['skills'])) {
+                                $member['skills_array'] = array_map('trim', explode(',', $member['skills']));
+                            } elseif (!empty($member['skills']) && is_array($member['skills'])) {
+                                $member['skills_array'] = $member['skills'];
+                            } else {
+                                $member['skills_array'] = [];
+                            }
+
+                            $allMembers[] = $member;
+                        }
+                    }
+                } else {
+                    $errors[] = [
+                        'partner' => $partner['name'],
+                        'error' => $result['error'] ?? 'Unknown error'
+                    ];
+                }
+            } catch (\Exception $e) {
+                error_log("FederationSearchService::searchExternalMembers error for partner {$partner['id']}: " . $e->getMessage());
+                $errors[] = [
+                    'partner' => $partner['name'],
+                    'error' => $e->getMessage()
+                ];
+            }
+        }
+
+        return [
+            'members' => $allMembers,
+            'total' => count($allMembers),
+            'partners_queried' => $partnersQueried,
+            'errors' => $errors
+        ];
+    }
+
+    /**
+     * Combined search across internal tenant partners AND external partners
+     *
+     * @param array $partnerTenantIds Internal partner tenant IDs
+     * @param int $tenantId Current tenant ID (for external partner lookup)
+     * @param array $filters Search filters
+     * @return array Combined search results
+     */
+    public static function searchAllFederatedMembers(array $partnerTenantIds, int $tenantId, array $filters): array
+    {
+        // Get internal members
+        $internalResult = self::searchMembers($partnerTenantIds, $filters);
+        $internalMembers = $internalResult['members'];
+
+        // Mark internal members
+        foreach ($internalMembers as &$member) {
+            $member['is_external'] = false;
+        }
+
+        // Get external members
+        $externalResult = self::searchExternalMembers($tenantId, $filters);
+        $externalMembers = $externalResult['members'];
+
+        // Merge results
+        $allMembers = array_merge($internalMembers, $externalMembers);
+
+        // Apply sorting to combined results
+        $sort = $filters['sort'] ?? 'name';
+        usort($allMembers, function($a, $b) use ($sort) {
+            switch ($sort) {
+                case 'recent':
+                    return ($b['created_at'] ?? '') <=> ($a['created_at'] ?? '');
+                case 'active':
+                    return ($b['last_active'] ?? '') <=> ($a['last_active'] ?? '');
+                case 'name':
+                default:
+                    return strcasecmp($a['name'] ?? '', $b['name'] ?? '');
+            }
+        });
+
+        // Apply pagination to merged results (re-slice if needed)
+        $limit = min((int)($filters['limit'] ?? 30), 100);
+        $offset = max(0, (int)($filters['offset'] ?? 0));
+        $paginatedMembers = array_slice($allMembers, $offset, $limit);
+
+        return [
+            'members' => $paginatedMembers,
+            'total' => count($allMembers),
+            'internal_count' => count($internalMembers),
+            'external_count' => count($externalMembers),
+            'filters_applied' => $internalResult['filters_applied'] ?? [],
+            'has_more' => count($allMembers) > ($offset + $limit),
+            'external_partners_queried' => $externalResult['partners_queried'],
+            'external_errors' => $externalResult['errors']
+        ];
+    }
+
+    /**
+     * Search listings from external federation partners via API
+     *
+     * @param int $tenantId Current tenant ID
+     * @param array $filters Search filters
+     * @return array Listings from external partners
+     */
+    public static function searchExternalListings(int $tenantId, array $filters): array
+    {
+        $externalPartners = FederationExternalPartnerService::getActivePartnersForListings($tenantId);
+
+        if (empty($externalPartners)) {
+            return [
+                'listings' => [],
+                'total' => 0,
+                'partners_queried' => 0,
+                'errors' => []
+            ];
+        }
+
+        $allListings = [];
+        $errors = [];
+        $partnersQueried = 0;
+
+        foreach ($externalPartners as $partner) {
+            try {
+                $client = new FederationExternalApiClient($partner);
+
+                // Build API params from filters
+                $apiParams = [];
+                if (!empty($filters['search'])) {
+                    $apiParams['q'] = $filters['search'];
+                }
+                if (!empty($filters['type'])) {
+                    $apiParams['type'] = $filters['type'];
+                }
+                if (!empty($filters['category'])) {
+                    $apiParams['category'] = $filters['category'];
+                }
+                $apiParams['limit'] = $filters['limit'] ?? 30;
+
+                $result = $client->searchListings($apiParams);
+                $partnersQueried++;
+
+                if ($result['success'] && !empty($result['data'])) {
+                    // Handle different response formats
+                    $listings = $result['data']['listings'] ?? $result['data']['data'] ?? $result['data'] ?? [];
+
+                    if (is_array($listings)) {
+                        foreach ($listings as &$listing) {
+                            // Mark as external and add partner info
+                            $listing['is_external'] = true;
+                            $listing['external_partner_id'] = $partner['id'];
+                            $listing['external_partner_name'] = $partner['partner_name'] ?: $partner['name'];
+                            $listing['external_partner_url'] = $partner['base_url'];
+                            $listing['tenant_name'] = $partner['partner_name'] ?: $partner['name'];
+
+                            $allListings[] = $listing;
+                        }
+                    }
+                } else {
+                    $errors[] = [
+                        'partner' => $partner['name'],
+                        'error' => $result['error'] ?? 'Unknown error'
+                    ];
+                }
+            } catch (\Exception $e) {
+                error_log("FederationSearchService::searchExternalListings error for partner {$partner['id']}: " . $e->getMessage());
+                $errors[] = [
+                    'partner' => $partner['name'],
+                    'error' => $e->getMessage()
+                ];
+            }
+        }
+
+        return [
+            'listings' => $allListings,
+            'total' => count($allListings),
+            'partners_queried' => $partnersQueried,
+            'errors' => $errors
+        ];
     }
 
     /**

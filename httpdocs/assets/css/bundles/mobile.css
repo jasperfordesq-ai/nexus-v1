@@ -1848,10 +1848,10 @@ button.mobile-tab-item,
 }
 
 /* Prevent body scroll when menu is open */
+/* NOTE: Do NOT use position: fixed - it breaks scroll inside menu on iOS */
 body.mobile-menu-open {
     overflow: hidden;
-    position: fixed;
-    width: 100%;
+    touch-action: none;
 }
 
 /* Menu Header - Enhanced Full-Screen Design */

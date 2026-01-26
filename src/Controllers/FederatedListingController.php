@@ -7,6 +7,9 @@ use Nexus\Core\Database;
 use Nexus\Core\TenantContext;
 use Nexus\Services\FederationFeatureService;
 use Nexus\Services\FederationPartnershipService;
+use Nexus\Services\FederationSearchService;
+use Nexus\Services\FederationExternalPartnerService;
+use Nexus\Services\FederationExternalApiClient;
 
 /**
  * Federated Listing Controller
@@ -64,8 +67,23 @@ class FederatedListingController
             'offset' => (int)($_GET['offset'] ?? 0),
         ];
 
-        // Get federated listings
-        $listings = $this->getFederatedListings($partnerTenantIds, $filters);
+        // Get internal federated listings
+        $internalListings = $this->getFederatedListings($partnerTenantIds, $filters);
+
+        // Mark internal listings
+        foreach ($internalListings as &$listing) {
+            $listing['is_external'] = false;
+        }
+
+        // Get external partner listings
+        $externalResult = FederationSearchService::searchExternalListings($tenantId, $filters);
+        $externalListings = $externalResult['listings'];
+
+        // Merge and sort by created_at
+        $listings = array_merge($internalListings, $externalListings);
+        usort($listings, function($a, $b) {
+            return ($b['created_at'] ?? '') <=> ($a['created_at'] ?? '');
+        });
 
         // Get partner tenant info for filter dropdown
         $partnerTenants = $this->getPartnerTenantInfo($partnerTenantIds);
@@ -139,12 +157,30 @@ class FederatedListingController
             'offset' => max(0, (int)($_GET['offset'] ?? 0)),
         ];
 
-        $listings = $this->getFederatedListings($partnerTenantIds, $filters);
+        // Get internal federated listings
+        $internalListings = $this->getFederatedListings($partnerTenantIds, $filters);
+
+        // Mark internal listings
+        foreach ($internalListings as &$listing) {
+            $listing['is_external'] = false;
+        }
+
+        // Get external partner listings
+        $externalResult = FederationSearchService::searchExternalListings($tenantId, $filters);
+        $externalListings = $externalResult['listings'];
+
+        // Merge and sort by created_at
+        $listings = array_merge($internalListings, $externalListings);
+        usort($listings, function($a, $b) {
+            return ($b['created_at'] ?? '') <=> ($a['created_at'] ?? '');
+        });
 
         echo json_encode([
             'success' => true,
             'listings' => $listings,
             'hasMore' => count($listings) >= $filters['limit'],
+            'internalCount' => count($internalListings),
+            'externalCount' => count($externalListings),
         ]);
         exit;
     }
@@ -223,6 +259,92 @@ class FederatedListingController
             'canMessage' => $canMessage,
             'pageTitle' => $listing['title'] ?? 'Listing'
         ]);
+    }
+
+    /**
+     * View an external federated listing (from external partner via API)
+     */
+    public function showExternal($partnerId, $listingId)
+    {
+        if (!isset($_SESSION['user_id'])) {
+            header('Location: ' . TenantContext::getBasePath() . '/login');
+            exit;
+        }
+
+        $tenantId = TenantContext::getId();
+        $viewerId = $_SESSION['user_id'];
+        $partnerId = (int)$partnerId;
+        $listingId = (int)$listingId;
+
+        // Get the external partner
+        $partner = FederationExternalPartnerService::getById($partnerId, $tenantId);
+
+        if (!$partner || $partner['status'] !== 'active') {
+            http_response_code(404);
+            View::render('errors/404', [
+                'message' => 'External partner not found or inactive.'
+            ]);
+            return;
+        }
+
+        // Fetch listing from external partner via API
+        try {
+            $client = new FederationExternalApiClient($partner);
+            $result = $client->getListing($listingId);
+
+            if (!$result['success']) {
+                http_response_code(404);
+                View::render('errors/404', [
+                    'message' => 'Listing not found on external partner.'
+                ]);
+                return;
+            }
+
+            $listing = $result['data']['listing'] ?? $result['data']['data'] ?? $result['data'] ?? null;
+
+            if (!$listing) {
+                http_response_code(404);
+                View::render('errors/404');
+                return;
+            }
+
+            // Ensure listing ID is set from URL parameter
+            $listing['id'] = $listingId;
+
+            // Add external partner info
+            $listing['is_external'] = true;
+            $listing['external_partner_id'] = $partner['id'];
+            $listing['external_partner_name'] = $partner['partner_name'] ?: $partner['name'];
+            $listing['external_partner_url'] = $partner['base_url'];
+            $listing['tenant_name'] = $listing['timebank']['name']
+                ?? $partner['partner_name']
+                ?: $partner['name'];
+
+            // Extract owner info
+            $owner = $listing['owner'] ?? $listing['user'] ?? [];
+            $listing['owner_id'] = $owner['id'] ?? 0;
+            $listing['owner_name'] = $owner['name'] ?? trim(($owner['first_name'] ?? '') . ' ' . ($owner['last_name'] ?? '')) ?: 'Unknown';
+            $listing['owner_avatar'] = $owner['avatar_url'] ?? $owner['avatar'] ?? null;
+            $listing['external_tenant_id'] = $owner['timebank']['id'] ?? $listing['timebank']['id'] ?? 1;
+
+            // Check permissions from partner config
+            $canMessage = $partner['allow_messaging'];
+
+            View::render('federation/listing-detail', [
+                'listing' => $listing,
+                'canMessage' => $canMessage,
+                'isExternalListing' => true,
+                'externalPartner' => $partner,
+                'pageTitle' => $listing['title'] ?? 'External Listing'
+            ]);
+
+        } catch (\Exception $e) {
+            error_log("FederatedListingController::showExternal error: " . $e->getMessage());
+            http_response_code(500);
+            View::render('errors/500', [
+                'message' => 'Failed to fetch listing from external partner.'
+            ]);
+        }
     }
 
     /**

@@ -1,50 +1,52 @@
 /**
  * Modern Layout Experimental Banner
  * Sleek, minimalist design with glass-morphism effects
- * Position: Above fixed utility bar (z-index: 60)
- * MIGRATED TO DESIGN TOKENS v2.0
+ * Position: Above fixed utility bar
+ * MIGRATED TO DESIGN TOKENS v2.1 - 2026-01-26
  */
 
-.modern-experimental-banner {
-    background: var(--color-primary-500) !important;
-    background: linear-gradient(135deg, var(--color-primary-500) 0%, var(--color-primary-600) 50%, var(--color-purple-500) 100%) !important;
-    padding: var(--space-2) 0 !important;
-    box-shadow: var(--shadow-sm) !important;
-    position: relative !important;
-    z-index: 9999 !important;
-    width: 100% !important;
-    display: block !important;
-    visibility: visible !important;
-    opacity: 1 !important;
-    height: auto !important;
-    min-height: var(--space-10) !important;
+/* Base banner styles - use high specificity instead of !important */
+html[data-layout="modern"] .modern-experimental-banner {
+    background: linear-gradient(135deg, var(--color-primary-500) 0%, var(--color-primary-600) 50%, var(--color-purple-500) 100%);
+    padding: var(--space-2) 0;
+    box-shadow: var(--shadow-sm);
+    position: relative;
+    z-index: var(--z-navbar);
+    width: 100%;
+    display: block;
+    visibility: visible;
+    opacity: 1;
+    height: auto;
+    min-height: var(--space-10);
 }
 
 /* Only show banner on Modern layout */
 html[data-layout="civicone"] .modern-experimental-banner {
-    display: none !important;
+    display: none;
 }
 
 /* Push utility bar down to accommodate banner (40px height) */
-html[data-layout="modern"] .nexus-utility-bar {
-    top: var(--space-10) !important;
-    transition: top var(--transition-base) !important;
+/* Only apply when banner is actually present - uses .has-experimental-banner class on html */
+html[data-layout="modern"].has-experimental-banner .nexus-utility-bar {
+    top: var(--space-10);
+    transition: top var(--transition-base);
 }
 
 /* When banner is scrolled away, move utility bar to top */
-html[data-layout="modern"].banner-scrolled .nexus-utility-bar {
-    top: 0 !important;
+html[data-layout="modern"].has-experimental-banner.banner-scrolled .nexus-utility-bar {
+    top: 0;
 }
 
 /* Push main navbar down (40px to accommodate banner) */
-html[data-layout="modern"] .nexus-navbar {
-    margin-top: var(--space-10) !important;
-    transition: margin-top var(--transition-base) !important;
+/* Only apply when banner is actually present */
+html[data-layout="modern"].has-experimental-banner .nexus-navbar {
+    margin-top: var(--space-10);
+    transition: margin-top var(--transition-base);
 }
 
 /* When banner is scrolled away, remove navbar top margin */
-html[data-layout="modern"].banner-scrolled .nexus-navbar {
-    margin-top: 0 !important;
+html[data-layout="modern"].has-experimental-banner.banner-scrolled .nexus-navbar {
+    margin-top: 0;
 }
 
 .modern-banner-wrapper {
@@ -68,7 +70,7 @@ html[data-layout="modern"].banner-scrolled .nexus-navbar {
     display: inline-flex;
     align-items: center;
     gap: var(--space-2);
-    background: rgba(255, 255, 255, 0.25);
+    background: var(--color-white-alpha-25);
     backdrop-filter: blur(var(--glass-blur-subtle));
     padding: var(--space-1) var(--space-3);
     border-radius: var(--radius-md);
@@ -76,7 +78,7 @@ html[data-layout="modern"].banner-scrolled .nexus-navbar {
     font-weight: var(--font-weight-bold);
     letter-spacing: 0.3px;
     color: var(--color-white);
-    border: 1px solid rgba(255, 255, 255, 0.3);
+    border: 1px solid var(--color-white-alpha-30);
     box-shadow: var(--shadow-xs);
 }
 
@@ -86,7 +88,7 @@ html[data-layout="modern"].banner-scrolled .nexus-navbar {
 
 .modern-experimental-text {
     font-size: var(--font-size-xs);
-    color: rgba(255, 255, 255, 0.95);
+    color: var(--color-white-alpha-95);
     line-height: var(--line-height-tight);
 }
 
@@ -100,13 +102,13 @@ html[data-layout="modern"].banner-scrolled .nexus-navbar {
     align-items: center;
     gap: var(--space-1);
     padding: var(--space-1) var(--space-3);
-    background: rgba(255, 255, 255, 0.95);
+    background: var(--color-white-alpha-95);
     color: var(--color-primary-600);
     font-size: var(--font-size-xs);
     font-weight: var(--font-weight-semibold);
     text-decoration: none;
     border-radius: var(--radius-sm);
-    border: 1px solid rgba(255, 255, 255, 0.3);
+    border: 1px solid var(--color-white-alpha-30);
     transition: all var(--transition-fast);
     box-shadow: var(--shadow-sm);
     white-space: nowrap;
@@ -131,18 +133,18 @@ html[data-layout="modern"].banner-scrolled .nexus-navbar {
 
 /* Responsive Design - Hide banner on mobile/tablet and reset spacing */
 @media (max-width: 1024px) {
-    .modern-experimental-banner {
-        display: none !important;
+    html[data-layout="modern"] .modern-experimental-banner {
+        display: none;
     }
 
     /* Reset utility bar position on mobile */
-    html[data-layout="modern"] .nexus-utility-bar {
-        top: 0 !important;
+    html[data-layout="modern"].has-experimental-banner .nexus-utility-bar {
+        top: 0;
     }
 
     /* Reset navbar margin on mobile */
-    html[data-layout="modern"] .nexus-navbar {
-        margin-top: 0 !important;
+    html[data-layout="modern"].has-experimental-banner .nexus-navbar {
+        margin-top: 0;
     }
 
     .modern-banner-wrapper {
@@ -188,7 +190,8 @@ html[data-layout="modern"].banner-scrolled .nexus-navbar {
 }
 
 /* Dark mode adjustments */
-[data-theme="dark"] .modern-experimental-banner {
+[data-theme="dark"] html[data-layout="modern"] .modern-experimental-banner,
+html[data-layout="modern"][data-theme="dark"] .modern-experimental-banner {
     background: linear-gradient(135deg,
         var(--color-primary-700) 0%,
         var(--color-primary-800) 50%,
@@ -197,12 +200,12 @@ html[data-layout="modern"].banner-scrolled .nexus-navbar {
 }
 
 [data-theme="dark"] .modern-experimental-badge {
-    background: rgba(255, 255, 255, 0.2);
-    border-color: rgba(255, 255, 255, 0.25);
+    background: var(--color-white-alpha-20);
+    border-color: var(--color-white-alpha-25);
 }
 
 [data-theme="dark"] .modern-experimental-switch {
-    background: rgba(255, 255, 255, 0.9);
+    background: var(--color-white-alpha-90);
 }
 
 [data-theme="dark"] .modern-experimental-switch:hover {
