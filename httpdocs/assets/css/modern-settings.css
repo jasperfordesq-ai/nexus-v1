@@ -7,7 +7,7 @@
 /* ===========================================
    UTILITY CLASSES
    =========================================== */
-.hidden { display: none !important; }
+.hidden { display: none; }
 
 /* ===========================================
    ICON MARGINS
@@ -82,8 +82,12 @@
     display: none;
     margin-bottom: var(--space-8);
     padding: var(--space-6);
+    /* Fallback for browsers without color-mix() support */
+    background: linear-gradient(135deg, var(--color-indigo-alpha-10), var(--color-purple-alpha-8));
     background: linear-gradient(135deg, color-mix(in srgb, var(--color-primary-500) 10%, transparent), color-mix(in srgb, var(--color-purple-500) 8%, transparent));
     border-radius: var(--radius-xl);
+    /* Fallback for browsers without color-mix() support */
+    border: 1px solid var(--color-indigo-alpha-20);
     border: 1px solid color-mix(in srgb, var(--color-primary-500) 20%, transparent);
 }
 
@@ -104,6 +108,8 @@
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
+    /* Fallback for browsers without color-mix() support */
+    box-shadow: 0 4px 15px var(--color-indigo-alpha-40);
     box-shadow: 0 4px 15px color-mix(in srgb, var(--color-primary-500) 40%, transparent);
 }
 
@@ -138,6 +144,8 @@
 }
 
 .biometric-status-badge.active {
+    /* Fallback for browsers without color-mix() support */
+    background: var(--color-emerald-alpha-15);
     background: color-mix(in srgb, var(--color-success) 15%, transparent);
     color: var(--color-success);
 }
@@ -159,6 +167,8 @@
     cursor: pointer;
     font-size: 0.95rem;
     transition: var(--transition-base);
+    /* Fallback for browsers without color-mix() support */
+    box-shadow: 0 4px 15px var(--color-indigo-alpha-30);
     box-shadow: 0 4px 15px color-mix(in srgb, var(--color-primary-500) 30%, transparent);
 }
 
@@ -207,6 +217,8 @@
 
 .consent-required-badge {
     padding: 2px var(--space-2);
+    /* Fallback for browsers without color-mix() support */
+    background: var(--color-amber-alpha-15);
     background: color-mix(in srgb, var(--color-warning) 15%, transparent);
     color: var(--color-warning);
     border-radius: var(--radius-md);
@@ -233,17 +245,26 @@
 }
 
 .data-right-card-export {
+    /* Fallback for browsers without color-mix() support */
+    background: linear-gradient(135deg, var(--color-indigo-alpha-8), var(--color-purple-alpha-5));
     background: linear-gradient(135deg, color-mix(in srgb, var(--color-primary-500) 8%, transparent), color-mix(in srgb, var(--color-purple-500) 5%, transparent));
+    border: 1px solid var(--color-indigo-alpha-20);
     border: 1px solid color-mix(in srgb, var(--color-primary-500) 20%, transparent);
 }
 
 .data-right-card-portability {
+    /* Fallback for browsers without color-mix() support */
+    background: linear-gradient(135deg, var(--color-cyan-alpha-10), var(--color-sky-500-alpha-20));
     background: linear-gradient(135deg, color-mix(in srgb, var(--color-cyan-500) 8%, transparent), color-mix(in srgb, var(--color-sky-500) 5%, transparent));
+    border: 1px solid var(--color-cyan-alpha-20);
     border: 1px solid color-mix(in srgb, var(--color-cyan-500) 20%, transparent);
 }
 
 .data-right-card-delete {
+    /* Fallback for browsers without color-mix() support */
+    background: linear-gradient(135deg, var(--color-red-alpha-10), var(--color-red-600-alpha-10));
     background: linear-gradient(135deg, color-mix(in srgb, var(--color-danger) 8%, transparent), color-mix(in srgb, var(--color-red-600, #dc2626) 5%, transparent));
+    border: 1px solid var(--color-red-alpha-20);
     border: 1px solid color-mix(in srgb, var(--color-danger) 20%, transparent);
 }
 
@@ -618,6 +639,8 @@
 
 .theme-option.selected {
     border-color: var(--color-primary-500);
+    /* Fallback for browsers without color-mix() support */
+    box-shadow: 0 4px 20px var(--color-indigo-alpha-30);
     box-shadow: 0 4px 20px color-mix(in srgb, var(--color-primary-500) 30%, transparent);
 }
 
@@ -1028,7 +1051,6 @@ select.settings-input,
 .p-lg { padding: var(--space-6); }
 .p-xl { padding: var(--space-8); }
 
-.hidden { display: none; }
 .block { display: block; }
 .inline-flex { display: inline-flex; }
 

@@ -192,12 +192,19 @@ if (!empty($filters['search'])) {
                 <!-- Listings List -->
                 <?php if (!empty($listings)): ?>
                     <ul class="govuk-list">
-                        <?php foreach ($listings as $listing): ?>
+                        <?php foreach ($listings as $listing):
+                            $isExternal = !empty($listing['is_external']);
+                            if ($isExternal && !empty($listing['external_partner_id'])) {
+                                $listingUrl = $basePath . '/federation/listings/external/' . $listing['external_partner_id'] . '/' . $listing['id'];
+                            } else {
+                                $listingUrl = $basePath . '/federation/listings/' . $listing['id'];
+                            }
+                        ?>
                         <li class="govuk-!-margin-bottom-6">
                             <div class="govuk-summary-card">
                                 <div class="govuk-summary-card__title-wrapper">
                                     <h3 class="govuk-summary-card__title">
-                                        <a href="<?= $basePath ?>/federation/listings/<?= $listing['id'] ?>" class="govuk-link">
+                                        <a href="<?= $listingUrl ?>" class="govuk-link">
                                             <?= htmlspecialchars($listing['title'] ?? 'Untitled') ?>
                                         </a>
                                     </h3>
@@ -208,7 +215,13 @@ if (!empty($filters['search'])) {
                                         </span>
                                         <!-- PROVENANCE LABEL (MANDATORY) -->
                                         <span class="govuk-tag govuk-tag--grey">
+                                            <?php if ($isExternal): ?>
+                                            <i class="fa-solid fa-globe govuk-!-margin-right-1" aria-hidden="true"></i>
+                                            <?php endif; ?>
                                             Shared from <?= htmlspecialchars($listing['tenant_name'] ?? 'Partner') ?>
+                                            <?php if ($isExternal): ?>
+                                            <span class="govuk-tag govuk-tag--blue" style="margin-left: 4px; font-size: 0.75em;">External</span>
+                                            <?php endif; ?>
                                         </span>
                                     </div>
                                 </div>
@@ -260,7 +273,7 @@ if (!empty($filters['search'])) {
                                     </dl>
                                 </div>
                                 <div class="govuk-summary-card__actions">
-                                    <a href="<?= $basePath ?>/federation/listings/<?= $listing['id'] ?>" class="govuk-link">
+                                    <a href="<?= $listingUrl ?>" class="govuk-link">
                                         View listing<span class="govuk-visually-hidden"> for <?= htmlspecialchars($listing['title'] ?? 'listing') ?></span>
                                     </a>
                                 </div>

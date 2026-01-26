@@ -1,32 +1,22 @@
 /**
  * Modern Header Fixes
- * Consolidated z-index scale and dropdown positioning
- * Updated: 2026-01-24
+ * Dropdown positioning and layout fixes
+ * Updated: 2026-01-26
  *
- * Z-INDEX SCALE (Documented):
- * --z-base:       1      - Default stacking
- * --z-dropdown:   100    - Dropdown menus
- * --z-header:     150    - Utility bar
- * --z-navbar:     140    - Main navbar
- * --z-mega-menu:  200    - Mega menu dropdowns
- * --z-modal:      1000   - Modals
- * --z-tooltip:    1100   - Tooltips
- * --z-max:        9999   - Emergency overlay
+ * Z-INDEX SCALE: Uses design-tokens.css as single source of truth
+ * See: /httpdocs/assets/css/design-tokens.css (lines 1018-1050)
+ *
+ * Reference (DO NOT REDEFINE HERE):
+ * --z-base:       0      - Default stacking
+ * --z-header:     100    - Headers, sticky elements
+ * --z-sticky:     110    - Sticky elements
+ * --z-navbar:     120    - Main navbar
+ * --z-mega-menu:  130    - Mega menu dropdowns
+ * --z-dropdown:   200    - Dropdown menus
+ * --z-modal:      310    - Modals
+ * --z-tooltip:    410    - Tooltips
+ * --z-emergency:  9999   - Emergency overlay
  */
-
-/* ==========================================
-   Z-INDEX SCALE - CSS Custom Properties
-   ========================================== */
-:root {
-    --z-base: 1;
-    --z-dropdown: 100;
-    --z-navbar: 140;
-    --z-header: 150;
-    --z-mega-menu: 200;
-    --z-modal: 1000;
-    --z-tooltip: 1100;
-    --z-max: 9999;
-}
 
 /* ==========================================
    UTILITY BAR - Fixed Header

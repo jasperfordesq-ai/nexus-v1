@@ -128,7 +128,7 @@ body,
 }
 
 [data-theme="dark"] .htb-dropdown-content a {
-    color: var(--color-slate-200) !important;
+    color: var(--color-slate-200);
 }
 
 [data-theme="dark"] .htb-dropdown-content a:hover {
@@ -488,7 +488,7 @@ html {
 
 @media (max-width: 600px) {
     .htb-main-title {
-        font-size: var(--font-size-3xl) !important;
+        font-size: var(--font-size-3xl);
     }
 }
 
@@ -1037,8 +1037,8 @@ textarea.nexus-input:focus {
     .htb-container {
         width: 100% !important;
         overflow-x: hidden !important;
-        padding-left: var(--space-4) !important;
-        padding-right: var(--space-4) !important;
+        padding-left: var(--space-4);
+        padding-right: var(--space-4);
     }
 }
 
@@ -1304,7 +1304,7 @@ body.dark-mode *:focus-visible {
     padding: var(--space-3) var(--space-6);
     background: linear-gradient(135deg, rgba(99, 102, 241, 0.9), rgba(139, 92, 246, 0.9)) !important;
     border: none !important;
-    border-radius: var(--radius-md) !important;
+    border-radius: var(--radius-md);
     color: white !important;
     font-weight: 600;
     font-size: var(--font-size-sm);
@@ -1329,7 +1329,7 @@ body.dark-mode *:focus-visible {
 
 [data-theme="dark"] .glass-btn-secondary {
     background: rgba(255, 255, 255, 0.05) !important;
-    color: var(--color-slate-200) !important;
+    color: var(--color-slate-200);
 }
 
 .glass-btn-secondary:hover {
@@ -1425,8 +1425,8 @@ body.dark-mode *:focus-visible {
 [data-theme="dark"] .glass-profile-card p,
 [data-theme="dark"] .glass-profile-card label,
 [data-theme="dark"] .glass-profile-card strong {
-    color: var(--color-slate-200) !important;
-    -webkit-text-fill-color: var(--color-slate-200) !important;
+    color: var(--color-slate-200);
+    -webkit-text-fill-color: var(--color-slate-200);
 }
 
 /* Restore profile-display-name gradient */
@@ -1443,8 +1443,8 @@ body.dark-mode *:focus-visible {
 /* Links should be visible */
 [data-theme="dark"] .htb-container a,
 [data-theme="dark"] .glass-profile-card a {
-    color: var(--color-primary-400) !important;
-    -webkit-text-fill-color: var(--color-primary-400) !important;
+    color: var(--color-primary-400);
+    -webkit-text-fill-color: var(--color-primary-400);
 }
 
 /* Glass activity card */
@@ -1527,8 +1527,8 @@ body.dark-mode *:focus-visible {
 }
 
 [data-theme="dark"] .profile-section-header {
-    color: var(--color-slate-100) !important;
-    -webkit-text-fill-color: var(--color-slate-100) !important;
+    color: var(--color-slate-100);
+    -webkit-text-fill-color: var(--color-slate-100);
 }
 
 .profile-section-header i {
@@ -1547,8 +1547,8 @@ body.dark-mode *:focus-visible {
 }
 
 [data-theme="dark"] .profile-achievements-header {
-    color: var(--color-slate-100) !important;
-    -webkit-text-fill-color: var(--color-slate-100) !important;
+    color: var(--color-slate-100);
+    -webkit-text-fill-color: var(--color-slate-100);
 }
 
 .achievements-grid {
@@ -1573,7 +1573,7 @@ body.dark-mode *:focus-visible {
 [data-theme="dark"] .profile-about-content {
     background: rgba(30, 41, 59, 0.6) !important;
     border-color: rgba(255, 255, 255, 0.1) !important;
-    color: var(--color-slate-200) !important;
+    color: var(--color-slate-200);
 }
 
 /* Reviews Section */
@@ -1614,7 +1614,7 @@ body.dark-mode *:focus-visible {
 }
 
 [data-theme="dark"] .review-author-name {
-    color: var(--color-slate-100) !important;
+    color: var(--color-slate-100);
 }
 
 .review-content {
@@ -1629,7 +1629,7 @@ body.dark-mode *:focus-visible {
 
 [data-theme="dark"] .review-content {
     background: rgba(30, 41, 59, 0.5) !important;
-    color: var(--color-slate-300) !important;
+    color: var(--color-slate-300);
 }
 
 /* Activity Section */
@@ -1656,7 +1656,7 @@ body.dark-mode *:focus-visible {
 }
 
 [data-theme="dark"] .profile-empty-state {
-    color: var(--color-gray-400) !important;
+    color: var(--color-gray-400);
 }
 
 .profile-empty-state i {
@@ -1673,7 +1673,7 @@ body.dark-mode *:focus-visible {
 }
 
 [data-theme="dark"] .profile-empty-state h4 {
-    color: var(--color-slate-200) !important;
+    color: var(--color-slate-200);
 }
 
 .profile-empty-state p {
@@ -1682,7 +1682,7 @@ body.dark-mode *:focus-visible {
 }
 
 [data-theme="dark"] .profile-empty-state p {
-    color: var(--color-gray-400) !important;
+    color: var(--color-gray-400);
 }
 
 /* Two Column Layout for Profile */

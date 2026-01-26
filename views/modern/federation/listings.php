@@ -104,9 +104,16 @@ $filters = $filters ?? [];
             <?php if (!empty($listings)): ?>
                 <?php foreach ($listings as $listing): ?>
                     <?php
+                    $isExternal = !empty($listing['is_external']);
                     $fallbackAvatar = 'https://ui-avatars.com/api/?name=' . urlencode($listing['owner_name'] ?? 'User') . '&background=8b5cf6&color=fff&size=100';
                     $avatar = !empty($listing['owner_avatar']) ? $listing['owner_avatar'] : $fallbackAvatar;
-                    $listingUrl = $basePath . '/federation/listings/' . $listing['id'];
+
+                    // Use different URL for external vs internal listings
+                    if ($isExternal && !empty($listing['external_partner_id'])) {
+                        $listingUrl = $basePath . '/federation/listings/external/' . $listing['external_partner_id'] . '/' . $listing['id'];
+                    } else {
+                        $listingUrl = $basePath . '/federation/listings/' . $listing['id'];
+                    }
                     ?>
                     <a href="<?= $listingUrl ?>" class="listing-card">
                         <div class="listing-card-body">
@@ -115,9 +122,12 @@ $filters = $filters ?? [];
                                 <?= ucfirst($listing['type'] ?? 'Offer') ?>
                             </span>
 
-                            <div class="listing-tenant">
-                                <i class="fa-solid fa-building"></i>
+                            <div class="listing-tenant<?= $isExternal ? ' external' : '' ?>">
+                                <i class="fa-solid <?= $isExternal ? 'fa-globe' : 'fa-building' ?>"></i>
                                 <?= htmlspecialchars($listing['tenant_name'] ?? 'Partner') ?>
+                                <?php if ($isExternal): ?>
+                                <span class="external-tag">External</span>
+                                <?php endif; ?>
                             </div>
 
                             <h3 class="listing-title"><?= htmlspecialchars($listing['title'] ?? 'Untitled') ?></h3>
@@ -267,9 +277,18 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function createListingCard(listing) {
         const basePath = "<?= $basePath ?>";
+        const isExternal = listing.is_external;
         const fallbackAvatar = `https://ui-avatars.com/api/?name=${encodeURIComponent(listing.owner_name || 'User')}&background=8b5cf6&color=fff&size=100`;
         const avatar = listing.owner_avatar || fallbackAvatar;
-        const listingUrl = `${basePath}/federation/listings/${listing.id}`;
+
+        // Use different URL for external vs internal listings
+        let listingUrl;
+        if (isExternal && listing.external_partner_id) {
+            listingUrl = `${basePath}/federation/listings/external/${listing.external_partner_id}/${listing.id}`;
+        } else {
+            listingUrl = `${basePath}/federation/listings/${listing.id}`;
+        }
+
         const type = listing.type || 'offer';
         const typeIcon = type === 'offer' ? 'fa-hand-holding-heart' : 'fa-hand-holding';
 
@@ -282,9 +301,10 @@ document.addEventListener('DOMContentLoaded', function() {
                     <i class="fa-solid ${typeIcon}"></i>
                     ${type.charAt(0).toUpperCase() + type.slice(1)}
                 </span>
-                <div class="listing-tenant">
-                    <i class="fa-solid fa-building"></i>
+                <div class="listing-tenant${isExternal ? ' external' : ''}">
+                    <i class="fa-solid ${isExternal ? 'fa-globe' : 'fa-building'}"></i>
                     ${escapeHtml(listing.tenant_name || 'Partner')}
+                    ${isExternal ? '<span class="external-tag">External</span>' : ''}
                 </div>
                 <h3 class="listing-title">${escapeHtml(listing.title || 'Untitled')}</h3>
                 ${listing.description ? `<p class="listing-description">${escapeHtml(listing.description)}</p>` : ''}

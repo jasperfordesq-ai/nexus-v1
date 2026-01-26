@@ -339,6 +339,10 @@ button.mobile-tab-item,
     flex-direction: column;
     visibility: hidden;
     will-change: transform;
+    /* Ensure menu itself can contain scrollable content */
+    height: 100%;
+    height: 100dvh; /* Dynamic viewport height for mobile */
+    overflow: hidden; /* Menu container doesn't scroll, only menu-body does */
 }
 
 .mobile-fullscreen-menu.active {
@@ -350,8 +354,9 @@ button.mobile-tab-item,
 @media (max-width: 1024px) {
     body.mobile-menu-open {
         overflow: hidden;
-        position: fixed;
-        width: 100%;
+        /* NOTE: position: fixed breaks iOS scroll inside the menu panel.
+           Using overflow: hidden alone is sufficient to prevent body scroll. */
+        touch-action: none; /* Prevent touch scroll on body */
     }
 }
 
@@ -555,7 +560,13 @@ button.mobile-tab-item,
 .mobile-menu-body {
     flex: 1;
     overflow-y: auto;
+    overflow-x: hidden;
     overscroll-behavior-y: contain;
+    -webkit-overflow-scrolling: touch;
+    /* CRITICAL: Allow touch scrolling inside the menu (body has touch-action: none) */
+    touch-action: pan-y;
+    /* Minimum height to ensure flex child fills space */
+    min-height: 0; /* Required for flex children to scroll properly */
 }
 
 /* Menu Sections */

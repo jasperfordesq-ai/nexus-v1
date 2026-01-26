@@ -1,6 +1,6 @@
 /**
  * utilities-polish Bundle
- * Generated: 2026-01-21T20:33:44.185Z
+ * Generated: 2026-01-26T11:10:18.266Z
  * Files: 5
  */
 
@@ -619,6 +619,7 @@ button,
  * Nexus Interactions
  * Consolidated animations, micro-interactions, and skeleton loading
  * Replaces: nexus-10x-polish.css, nexus-ux-polish.css, nexus-micro-interactions.css
+  * Fully Migrated to Design Tokens: 2026-01-21 ✓
  */
 
 /* ============================================
@@ -775,7 +776,7 @@ button,
 /* Focus ring */
 @keyframes focusRing {
     0% { outline-color: transparent; outline-offset: 0; }
-    100% { outline-color: #6366f1; outline-offset: 2px; }
+    100% { outline-color: var(--color-primary-500); outline-offset: 2px; }
 }
 
 /* Optimistic UI */
@@ -1045,7 +1046,7 @@ button,
 }
 
 [data-theme="dark"] .nexus-page-skeleton {
-    background: #0f172a;
+    background: var(--color-slate-900);
 }
 
 .nexus-page-skeleton.visible {
@@ -1395,7 +1396,7 @@ main,
     transform: translateY(-50%);
     width: 3px; /* Specific size, no token */
     height: 60%;
-    background: #6366f1;
+    background: var(--color-primary-500);
     border-radius: var(--radius-sm); /* Design token not available for 2px */
     opacity: 0.5;
 }
@@ -1409,7 +1410,7 @@ main,
     left: 0;
     width: 0;
     height: 3px; /* Specific size, no token */
-    background: linear-gradient(90deg, #6366f1, #8b5cf6, #ec4899);
+    background: linear-gradient(90deg, var(--color-primary-500), var(--color-purple-500), var(--color-pink-500));
     z-index: var(--z-notification, 1700);
     transition: width var(--transition-base) var(--ease-out);
     box-shadow: 0 0 10px rgba(99, 102, 241, 0.5);
@@ -1652,7 +1653,7 @@ body {
    23. GRADIENT EFFECTS
    ============================================ */
 .gradient-animated {
-    background: linear-gradient(-45deg, #6366f1, #8b5cf6, #ec4899, #6366f1);
+    background: linear-gradient(-45deg, var(--color-primary-500), var(--color-purple-500), var(--color-pink-500), var(--color-primary-500));
     background-size: 400% 400%;
     animation: gradientShift 15s ease infinite;
 }
@@ -1669,7 +1670,7 @@ body {
     position: absolute;
     inset: -2px; /* Specific negative value, no token */
     border-radius: inherit;
-    background: linear-gradient(45deg, #6366f1, #8b5cf6, #ec4899, #6366f1);
+    background: linear-gradient(45deg, var(--color-primary-500), var(--color-purple-500), var(--color-pink-500), var(--color-primary-500));
     background-size: 400% 400%;
     animation: gradientShift 15s ease infinite;
     z-index: -1;
@@ -2734,6 +2735,7 @@ select:focus,
  * - 404, 500, and general error states
  * - Connection/offline states
  * - Dark mode support
+  * Fully Migrated to Design Tokens: 2026-01-21 ✓
  */
 
 /* ==========================================================================
@@ -3038,7 +3040,7 @@ select:focus,
     left: 0;
     right: 0;
     padding: var(--space-4);
-    background: linear-gradient(135deg, #fef3c7, #fde68a);
+    background: linear-gradient(135deg, var(--color-amber-100), var(--color-amber-200));
     color: #92400e;
     text-align: center;
     font-weight: var(--font-weight-medium);
@@ -3057,7 +3059,7 @@ select:focus,
 }
 
 .offline-banner--error {
-    background: linear-gradient(135deg, #fee2e2, #fecaca);
+    background: linear-gradient(135deg, var(--color-red-100), #fecaca);
     color: #991b1b;
     border-top-color: rgba(153, 27, 27, 0.2);
 }
@@ -3139,7 +3141,7 @@ select:focus,
 .permission-denied {
     padding: var(--space-12);
     text-align: center;
-    background: linear-gradient(135deg, #fef2f2, #fee2e2);
+    background: linear-gradient(135deg, var(--color-red-50), var(--color-red-100));
     border-radius: var(--radius-md);
     border: 1px solid rgba(239, 68, 68, 0.2);
 }
@@ -3260,7 +3262,7 @@ select:focus,
 }
 
 [data-theme="dark"] .empty-state-icon {
-    background: linear-gradient(135deg, #374151, var(--color-gray-800));
+    background: linear-gradient(135deg, var(--color-gray-700), var(--color-gray-800));
 }
 
 [data-theme="dark"] .empty-state-icon i {
@@ -3297,7 +3299,7 @@ select:focus,
 
 [data-theme="dark"] .offline-banner {
     background: linear-gradient(135deg, #422006, #78350f);
-    color: #fde68a;
+    color: var(--color-amber-200);
     border-top-color: rgba(253, 230, 138, 0.2);
 }
 

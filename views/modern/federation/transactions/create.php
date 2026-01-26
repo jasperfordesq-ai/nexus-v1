@@ -12,6 +12,8 @@ $basePath = Nexus\Core\TenantContext::getBasePath();
 $recipient = $recipient ?? null;
 $recipientTenantId = $recipientTenantId ?? 0;
 $balance = $balance ?? 0;
+$isExternalTransaction = $isExternalTransaction ?? (!empty($recipient['is_external']));
+$externalPartner = $externalPartner ?? null;
 
 $recipientName = $recipient['name'] ?? 'Unknown';
 $fallbackAvatar = 'https://ui-avatars.com/api/?name=' . urlencode($recipientName) . '&background=8b5cf6&color=fff&size=200';
@@ -55,9 +57,12 @@ $hasInsufficientBalance = $balance < 0.5;
                              class="recipient-avatar">
                         <div class="recipient-details">
                             <h3><?= htmlspecialchars($recipientName) ?></h3>
-                            <span class="recipient-tenant">
-                                <i class="fa-solid fa-building"></i>
+                            <span class="recipient-tenant<?= $isExternalTransaction ? ' external' : '' ?>">
+                                <i class="fa-solid <?= $isExternalTransaction ? 'fa-globe' : 'fa-building' ?>"></i>
                                 <?= htmlspecialchars($recipient['tenant_name'] ?? 'Partner Timebank') ?>
+                                <?php if ($isExternalTransaction): ?>
+                                <span class="external-tag">External</span>
+                                <?php endif; ?>
                             </span>
                         </div>
                     </div>
@@ -67,7 +72,12 @@ $hasInsufficientBalance = $balance < 0.5;
                 <form action="<?= $basePath ?>/federation/transactions/send" method="POST" class="send-form">
                     <input type="hidden" name="csrf_token" value="<?= \Nexus\Core\Csrf::token() ?>">
                     <input type="hidden" name="receiver_id" value="<?= $recipient['id'] ?>">
-                    <input type="hidden" name="receiver_tenant_id" value="<?= $recipientTenantId ?>">
+                    <?php if ($isExternalTransaction && $externalPartner): ?>
+                        <input type="hidden" name="external_partner_id" value="<?= $externalPartner['id'] ?>">
+                        <input type="hidden" name="receiver_name" value="<?= htmlspecialchars($recipientName) ?>">
+                    <?php else: ?>
+                        <input type="hidden" name="receiver_tenant_id" value="<?= $recipientTenantId ?>">
+                    <?php endif; ?>
 
                     <div class="form-group">
                         <label class="form-label">Amount (Hours)</label>

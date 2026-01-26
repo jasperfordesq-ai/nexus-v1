@@ -308,8 +308,12 @@ button.mobile-tab-item,
 
 @media (max-width: 1024px) {
     .mobile-fullscreen-menu {
-        display: block !important;
+        /* CRITICAL: Must be flex for scroll to work - menu-body needs flex: 1 */
+        display: flex !important;
+        flex-direction: column !important;
         visibility: visible !important;
+        opacity: 1 !important;
+        pointer-events: auto !important;
     }
 
     .mobile-fullscreen-menu:not(.active) {
@@ -779,13 +783,12 @@ button.mobile-tab-item,
 
 /* ============================================
    4. BODY SCROLL LOCK
+   NOTE: Do NOT use position: fixed - it breaks scroll inside menu on iOS
    ============================================ */
 body.mobile-menu-open,
 body.menu-open {
     overflow: hidden !important;
-    position: fixed;
-    width: 100%;
-    height: 100%;
+    touch-action: none;
 }
 
 /* ============================================

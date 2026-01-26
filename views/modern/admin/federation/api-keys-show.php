@@ -19,7 +19,9 @@ $apiKey = $apiKey ?? [];
 $stats = $stats ?? [];
 $logs = $logs ?? [];
 $newApiKey = $_SESSION['new_api_key'] ?? null;
+$newSigningSecret = $_SESSION['new_signing_secret'] ?? null;
 unset($_SESSION['new_api_key']);
+unset($_SESSION['new_signing_secret']);
 ?>
 
 <style>
@@ -357,16 +359,32 @@ unset($_SESSION['new_api_key']);
 
     <?php if ($newApiKey): ?>
     <div class="new-key-alert">
-        <h3><i class="fa-solid fa-circle-check"></i> Regenerated API Key</h3>
+        <h3><i class="fa-solid fa-circle-check"></i> API Key <?= $newSigningSecret ? 'Created' : 'Regenerated' ?></h3>
+
+        <p style="margin: 0 0 0.75rem; color: var(--admin-text-secondary);">API Key:</p>
         <div class="new-key-value" id="newKeyValue">
             <?= htmlspecialchars($newApiKey) ?>
-            <button class="copy-btn" onclick="copyApiKey()">
+            <button class="copy-btn" onclick="copyToClipboard('newKeyValue', this)">
                 <i class="fa-solid fa-copy"></i> Copy
             </button>
         </div>
-        <p class="new-key-warning">
+
+        <?php if ($newSigningSecret): ?>
+        <p style="margin: 1rem 0 0.75rem; color: var(--admin-text-secondary);">HMAC Signing Secret:</p>
+        <div class="new-key-value" id="newSigningSecret" style="color: #f59e0b;">
+            <?= htmlspecialchars($newSigningSecret) ?>
+            <button class="copy-btn" onclick="copyToClipboard('newSigningSecret', this)" style="color: #f59e0b; border-color: rgba(245, 158, 11, 0.4); background: rgba(245, 158, 11, 0.2);">
+                <i class="fa-solid fa-copy"></i> Copy
+            </button>
+        </div>
+        <p style="margin: 0.75rem 0 0; font-size: 0.85rem; color: var(--admin-text-secondary);">
+            Use this secret to sign your API requests with HMAC-SHA256.
+        </p>
+        <?php endif; ?>
+
+        <p class="new-key-warning" style="margin-top: 1rem;">
             <i class="fa-solid fa-triangle-exclamation"></i>
-            This key will only be shown once. Make sure to copy and store it securely!
+            These credentials will only be shown once. Make sure to copy and store them securely!
         </p>
     </div>
     <?php endif; ?>
@@ -414,6 +432,27 @@ unset($_SESSION['new_api_key']);
                 <?php endforeach; ?>
                 <?php if (empty($perms)): ?>
                 <span style="color: var(--admin-text-secondary);">No permissions assigned</span>
+                <?php endif; ?>
+            </div>
+        </div>
+
+        <div class="permissions-section">
+            <h3>Authentication</h3>
+            <div class="perm-list">
+                <?php if (!empty($apiKey['signing_enabled'])): ?>
+                <span class="perm-tag" style="background: rgba(245, 158, 11, 0.15); color: #f59e0b;">
+                    <i class="fa-solid fa-shield-halved"></i> HMAC Signing Enabled
+                </span>
+                <?php else: ?>
+                <span class="perm-tag">
+                    <i class="fa-solid fa-key"></i> API Key Only
+                </span>
+                <?php endif; ?>
+
+                <?php if (!empty($apiKey['platform_id'])): ?>
+                <span class="perm-tag" style="background: rgba(139, 92, 246, 0.15); color: #8b5cf6;">
+                    Platform: <?= htmlspecialchars($apiKey['platform_id']) ?>
+                </span>
                 <?php endif; ?>
             </div>
         </div>
@@ -497,15 +536,22 @@ unset($_SESSION['new_api_key']);
 </div>
 
 <script>
-function copyApiKey() {
-    const keyValue = document.getElementById('newKeyValue').textContent.trim();
-    navigator.clipboard.writeText(keyValue).then(() => {
-        const btn = document.querySelector('.copy-btn');
+function copyToClipboard(elementId, btn) {
+    const element = document.getElementById(elementId);
+    // Get just the text content, excluding the button text
+    const text = element.childNodes[0].textContent.trim();
+    navigator.clipboard.writeText(text).then(() => {
+        const originalHtml = btn.innerHTML;
         btn.innerHTML = '<i class="fa-solid fa-check"></i> Copied!';
         setTimeout(() => {
-            btn.innerHTML = '<i class="fa-solid fa-copy"></i> Copy';
+            btn.innerHTML = originalHtml;
         }, 2000);
     });
+}
+
+// Legacy function for backwards compatibility
+function copyApiKey() {
+    copyToClipboard('newKeyValue', document.querySelector('#newKeyValue .copy-btn'));
 }
 </script>
 

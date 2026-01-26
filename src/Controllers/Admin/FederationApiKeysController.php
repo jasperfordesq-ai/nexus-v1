@@ -82,6 +82,11 @@ class FederationApiKeysController
      */
     public function store(): void
     {
+        // Ensure session is started before we set session variables
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
+
         $user = Auth::requireAdmin();
         $tenantId = TenantContext::getId();
 
@@ -96,6 +101,8 @@ class FederationApiKeysController
         $permissions = $_POST['permissions'] ?? [];
         $rateLimit = (int)($_POST['rate_limit'] ?? 1000);
         $expiresIn = $_POST['expires_in'] ?? '';
+        $platformId = trim($_POST['platform_id'] ?? '');
+        $authMethod = $_POST['auth_method'] ?? 'api_key';
 
         // Validate
         if (empty($name)) {
@@ -108,6 +115,14 @@ class FederationApiKeysController
         $rawKey = 'fed_' . bin2hex(random_bytes(32)); // 64 hex chars + prefix
         $keyHash = hash('sha256', $rawKey);
         $keyPrefix = substr($rawKey, 0, 12); // Show first 12 chars for identification
+
+        // Generate signing secret if HMAC auth is enabled
+        $signingSecret = null;
+        $signingEnabled = false;
+        if ($authMethod === 'hmac') {
+            $signingSecret = bin2hex(random_bytes(32)); // 64 hex char secret
+            $signingEnabled = true;
+        }
 
         // Calculate expiry
         $expiresAt = null;
@@ -122,14 +137,17 @@ class FederationApiKeysController
         $db = Database::getInstance();
         $stmt = $db->prepare("
             INSERT INTO federation_api_keys
-            (tenant_id, name, key_hash, key_prefix, permissions, rate_limit, expires_at, created_by, created_at)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW())
+            (tenant_id, name, key_hash, key_prefix, signing_secret, signing_enabled, platform_id, permissions, rate_limit, expires_at, created_by, created_at)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())
         ");
         $stmt->execute([
             $tenantId,
             $name,
             $keyHash,
             $keyPrefix,
+            $signingSecret,
+            $signingEnabled ? 1 : 0,
+            $platformId ?: null,
             json_encode($permissions),
             $rateLimit,
             $expiresAt,
@@ -142,12 +160,18 @@ class FederationApiKeysController
             $tenantId,
             null,
             $user['id'],
-            ['key_name' => $name, 'key_prefix' => $keyPrefix]
+            ['key_name' => $name, 'key_prefix' => $keyPrefix, 'hmac_enabled' => $signingEnabled]
         );
 
         // Show the key once (won't be shown again)
         $_SESSION['new_api_key'] = $rawKey;
-        $_SESSION['flash_success'] = 'API key created successfully. Copy it now - it won\'t be shown again!';
+        if ($signingSecret) {
+            $_SESSION['new_signing_secret'] = $signingSecret;
+        }
+        $_SESSION['flash_success'] = 'API key created successfully. Copy the credentials now - they won\'t be shown again!';
+
+        // Ensure session data is written before redirect
+        session_write_close();
 
         header('Location: /admin/federation/api-keys');
         exit;
@@ -349,6 +373,11 @@ class FederationApiKeysController
      */
     public function regenerate(int $id): void
     {
+        // Ensure session is started before we set session variables
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
+
         $user = Auth::requireAdmin();
 
         // Validate CSRF
@@ -393,6 +422,9 @@ class FederationApiKeysController
 
         $_SESSION['new_api_key'] = $rawKey;
         $_SESSION['flash_success'] = 'API key regenerated. Copy it now - it won\'t be shown again!';
+
+        // Ensure session data is written before redirect
+        session_write_close();
 
         header('Location: /admin/federation/api-keys');
         exit;

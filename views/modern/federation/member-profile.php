@@ -17,6 +17,8 @@ $reviews = $reviews ?? [];
 $reviewStats = $reviewStats ?? null;
 $trustScore = $trustScore ?? ['score' => 0, 'level' => 'new'];
 $pendingReviewTransaction = $pendingReviewTransaction ?? null; // Transaction ID if user can review this member
+$isExternalMember = $isExternalMember ?? (!empty($member['is_external']));
+$externalPartner = $externalPartner ?? null;
 
 $memberName = $member['name'] ?? 'Member';
 $fallbackUrl = 'https://ui-avatars.com/api/?name=' . urlencode($memberName) . '&background=8b5cf6&color=fff&size=200';
@@ -72,9 +74,12 @@ switch ($member['service_reach'] ?? 'local_only') {
 
                 <h1 class="profile-name"><?= htmlspecialchars($memberName) ?></h1>
 
-                <div class="federation-badge">
-                    <i class="fa-solid fa-building"></i>
+                <div class="federation-badge<?= $isExternalMember ? ' external' : '' ?>">
+                    <i class="fa-solid <?= $isExternalMember ? 'fa-globe' : 'fa-building' ?>"></i>
                     <?= htmlspecialchars($member['tenant_name'] ?? 'Partner Timebank') ?>
+                    <?php if ($isExternalMember): ?>
+                    <span class="external-tag">External</span>
+                    <?php endif; ?>
                 </div>
 
                 <div class="reach-badge <?= $reachClass ?>">
@@ -264,10 +269,19 @@ switch ($member['service_reach'] ?? 'local_only') {
                 <!-- Action Buttons -->
                 <div class="action-buttons">
                     <?php if ($canMessage): ?>
-                        <a href="<?= $basePath ?>/messages/compose?to=<?= $member['id'] ?>&federated=1" class="action-btn action-btn-primary">
-                            <i class="fa-solid fa-envelope"></i>
-                            Send Message
-                        </a>
+                        <?php if ($isExternalMember && !empty($member['external_partner_id'])): ?>
+                            <!-- External member - use federated messaging with external partner -->
+                            <a href="<?= $basePath ?>/federation/messages/compose?external_partner=<?= $member['external_partner_id'] ?>&member_id=<?= $member['id'] ?>&member_name=<?= urlencode($member['name'] ?? $member['display_name'] ?? 'Member') ?>&external_tenant=<?= $member['external_tenant_id'] ?? 1 ?>" class="action-btn action-btn-primary">
+                                <i class="fa-solid fa-envelope"></i>
+                                Send Message
+                            </a>
+                        <?php else: ?>
+                            <!-- Internal federated member -->
+                            <a href="<?= $basePath ?>/federation/messages/compose?to=<?= $member['id'] ?>&tenant=<?= $member['tenant_id'] ?>" class="action-btn action-btn-primary">
+                                <i class="fa-solid fa-envelope"></i>
+                                Send Message
+                            </a>
+                        <?php endif; ?>
                     <?php else: ?>
                         <span class="action-btn action-btn-disabled" title="Messaging not enabled for this member">
                             <i class="fa-solid fa-envelope"></i>
@@ -276,10 +290,18 @@ switch ($member['service_reach'] ?? 'local_only') {
                     <?php endif; ?>
 
                     <?php if ($canTransact): ?>
-                        <a href="<?= $basePath ?>/transactions/new?with=<?= $member['id'] ?>&tenant=<?= $member['tenant_id'] ?>" class="action-btn action-btn-secondary">
-                            <i class="fa-solid fa-exchange-alt"></i>
-                            Start Transaction
-                        </a>
+                        <?php if ($isExternalMember && !empty($member['external_partner_id'])): ?>
+                            <!-- External member - transactions via external partner -->
+                            <a href="<?= $basePath ?>/federation/transactions/new?external_partner=<?= $member['external_partner_id'] ?>&member_id=<?= $member['id'] ?>&member_name=<?= urlencode($member['name'] ?? $member['display_name'] ?? 'Member') ?>" class="action-btn action-btn-secondary">
+                                <i class="fa-solid fa-exchange-alt"></i>
+                                Start Transaction
+                            </a>
+                        <?php else: ?>
+                            <a href="<?= $basePath ?>/transactions/new?with=<?= $member['id'] ?>&tenant=<?= $member['tenant_id'] ?>" class="action-btn action-btn-secondary">
+                                <i class="fa-solid fa-exchange-alt"></i>
+                                Start Transaction
+                            </a>
+                        <?php endif; ?>
                     <?php else: ?>
                         <span class="action-btn action-btn-disabled" title="Transactions not enabled for this member">
                             <i class="fa-solid fa-exchange-alt"></i>

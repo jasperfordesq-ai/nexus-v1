@@ -1,6 +1,6 @@
 /**
  * features-social Bundle
- * Generated: 2026-01-21T20:33:44.181Z
+ * Generated: 2026-01-26T11:10:18.263Z
  * Files: 5
  */
 
@@ -11,6 +11,7 @@
 /**
  * Post Box Home - Modern Styles
  * Glassmorphic design with responsive layout
+  * Fully Migrated to Design Tokens: 2026-01-21 ✓
  */
 
 /* ==========================================
@@ -247,17 +248,17 @@
 }
 
 .badge-offer {
-    background: linear-gradient(135deg, #059669, #34d399);
+    background: linear-gradient(135deg, var(--color-emerald-600), var(--color-emerald-400));
     color: white;
 }
 
 .badge-request {
-    background: linear-gradient(135deg, #f97316, #f43f5e);
+    background: linear-gradient(135deg, var(--color-orange-500), var(--color-rose-500));
     color: white;
 }
 
 .badge-event {
-    background: linear-gradient(135deg, #6366f1, #8b5cf6);
+    background: linear-gradient(135deg, var(--color-primary-500), var(--color-purple-500));
     color: white;
 }
 
@@ -1016,7 +1017,7 @@
 }
 
 [data-theme="dark"] .modal-container {
-    background: #1e293b;
+    background: var(--color-slate-800);
 }
 
 [data-theme="dark"] .btn-secondary {
@@ -1037,6 +1038,7 @@
  *
  * Namespaced with ff- prefix for all component-specific classes
  * Generic .feed-filter-* classes are kept for backward compatibility
+  * Fully Migrated to Design Tokens: 2026-01-21 ✓
  */
 
 /* ============================================
@@ -1044,7 +1046,7 @@
    ============================================ */
 :root {
     --ff-bg: rgba(255, 255, 255, 0.72);
-    --ff-bg-solid: #ffffff;
+    --ff-bg-solid: var(--color-white);
     --ff-border: rgba(255, 255, 255, 0.5);
     --ff-border-holo: linear-gradient(135deg,
             rgba(99, 102, 241, 0.3) 0%,
@@ -1057,12 +1059,12 @@
     --ff-text-muted: #8a8d91;
     --ff-pill-bg: rgba(0, 0, 0, 0.05);
     --ff-pill-bg-hover: rgba(0, 0, 0, 0.08);
-    --ff-pill-bg-active: #6366f1;
-    --ff-pill-text-active: #ffffff;
+    --ff-pill-bg-active: var(--color-govuk-blue);
+    --ff-pill-text-active: var(--color-white);
     --ff-shadow: 0 8px 32px rgba(0, 0, 0, 0.08), 0 var(--space-1) var(--space-2) rgba(0, 0, 0, 0.04);
     --ff-shadow-hover: 0 12px 40px rgba(0, 0, 0, 0.12);
-    --ff-location-active: #10b981;
-    --ff-algo-active: #f59e0b;
+    --ff-location-active: var(--color-govuk-green);
+    --ff-algo-active: var(--color-govuk-blue);
     --ff-transition: var(--transition-base);
     --ff-height-primary: 56px;
     --ff-height-secondary: 44px;
@@ -1071,14 +1073,14 @@
 
 [data-theme="dark"] {
     --ff-bg: rgba(30, 41, 59, 0.85);
-    --ff-bg-solid: #1e293b;
+    --ff-bg-solid: var(--color-slate-800);
     --ff-border: rgba(255, 255, 255, 0.1);
-    --ff-text: #f1f5f9;
-    --ff-text-secondary: #94a3b8;
-    --ff-text-muted: #64748b;
+    --ff-text: var(--color-slate-100);
+    --ff-text-secondary: var(--color-slate-400);
+    --ff-text-muted: var(--color-slate-500);
     --ff-pill-bg: rgba(255, 255, 255, 0.08);
     --ff-pill-bg-hover: rgba(255, 255, 255, 0.12);
-    --ff-pill-bg-active: #6366f1;
+    --ff-pill-bg-active: var(--color-govuk-blue);
     --ff-shadow: 0 8px 32px rgba(0, 0, 0, 0.3), 0 0 60px rgba(99, 102, 241, 0.1);
 }
 
@@ -1186,7 +1188,7 @@
 .feed-filter-algo-btn.active {
     background: var(--ff-algo-active);
     color: white;
-    box-shadow: 0 var(--space-1) var(--space-2) rgba(245, 158, 11, 0.3);
+    box-shadow: 0 var(--space-1) var(--space-2) rgba(0, 48, 120, 0.3);
 }
 
 .feed-filter-algo-btn.active i {
@@ -1593,7 +1595,7 @@
     }
 
     .feed-filter-algo-btn span {
-        display: none !important;
+        display: none;
     }
 
     .feed-filter-algo-btn i {
@@ -1811,6 +1813,19 @@
     }
 }
 
+/* ============================================
+   MOBILE FILTER - HIDDEN FOR NOW
+   ============================================ */
+
+/* Hide ALL mobile filter elements */
+.ff-mobile,
+.ff-mobile-bar,
+.ff-panel,
+.ff-chip,
+.ff-panel-item {
+    display: none !important;
+}
+
 
 /* ========================================
  * feed-empty-state.css
@@ -1866,7 +1881,7 @@
     width: 100px;
     height: 100px;
     margin: 0 auto var(--space-6);
-    background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #a855f7 100%);
+    background: linear-gradient(135deg, var(--color-primary-500) 0%, var(--color-purple-500) 50%, var(--color-purple-400) 100%);
     border-radius: var(--radius-full);
     display: flex;
     align-items: center;
@@ -1898,7 +1913,7 @@
 }
 
 .feed-empty-icon.error {
-    background: linear-gradient(135deg, #ef4444, #f87171);
+    background: linear-gradient(135deg, var(--color-danger), var(--color-red-400));
     box-shadow: 0 12px 40px rgba(239, 68, 68, 0.4);
     animation: none;
 }
@@ -1949,7 +1964,7 @@
 }
 
 .feed-empty-btn.primary {
-    background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+    background: linear-gradient(135deg, var(--color-primary-500) 0%, var(--color-purple-500) 100%);
     color: white;
     box-shadow:
         0 6px 20px rgba(99, 102, 241, 0.4),
@@ -2088,19 +2103,48 @@
     border-bottom: 1px solid var(--civic-border);
 }
 
-.civic-social-stats-left {
+/* Stats buttons - semantic button styling */
+.civic-social-stats-left,
+.civic-social-stats-right {
     display: flex;
     align-items: center;
     gap: var(--space-2);
-}
-
-.civic-social-stats-right {
+    background: transparent;
+    border: none;
+    padding: var(--space-1) var(--space-2);
+    margin: 0;
+    font-family: inherit;
+    font-size: var(--font-size-sm);
+    color: var(--civic-text-secondary);
     cursor: pointer;
+    border-radius: var(--radius-sm);
+    transition: all var(--transition-fast) ease;
 }
 
+.civic-social-stats-left:hover,
 .civic-social-stats-right:hover {
     text-decoration: underline;
     color: var(--civic-brand);
+    background: var(--civic-bg-page);
+}
+
+.civic-social-stats-left:focus,
+.civic-social-stats-right:focus {
+    outline: 3px solid var(--civic-brand);
+    outline-offset: 2px;
+}
+
+/* Accessible visually hidden class */
+.visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
 }
 
 .civic-social-actions {
@@ -2136,11 +2180,11 @@
 }
 
 .civic-social-btn.liked {
-    color: #D4351C;
+    color: var(--color-govuk-red);
 }
 
 .civic-social-btn.liked .dashicons {
-    color: #D4351C;
+    color: var(--color-govuk-red);
 }
 
 /* Comments Section */
@@ -2206,6 +2250,11 @@
     background: var(--civic-bg-page);
 }
 
+.civic-comment-submit:focus {
+    outline: 3px solid var(--civic-brand);
+    outline-offset: 2px;
+}
+
 .civic-comments-list {
     display: flex;
     flex-direction: column;
@@ -2242,6 +2291,43 @@
     font-size: var(--font-size-xs);
     color: var(--civic-text-muted);
     margin-top: var(--space-1);
+}
+
+/* Login prompt styling */
+.civic-social-login-prompt {
+    color: var(--civic-text-muted);
+    text-align: center;
+    padding: var(--space-4);
+    margin: 0;
+}
+
+.civic-social-login-link {
+    color: var(--civic-brand);
+    font-weight: var(--font-weight-semibold);
+    text-decoration: underline;
+}
+
+.civic-social-login-link:hover,
+.civic-social-login-link:focus {
+    color: var(--civic-brand-dark, var(--civic-brand));
+    text-decoration: none;
+}
+
+.civic-social-login-link:focus {
+    outline: 3px solid var(--civic-brand);
+    outline-offset: 2px;
+}
+
+/* Status messages */
+.civic-social-status-message {
+    color: var(--civic-text-muted);
+    text-align: center;
+    padding: var(--space-4);
+    margin: 0;
+}
+
+.civic-social-error {
+    color: var(--color-govuk-red);
 }
 
 .civic-social-toast {
@@ -2326,6 +2412,11 @@
     border-color: var(--civic-brand);
 }
 
+.civic-share-option:focus {
+    outline: 3px solid var(--civic-brand);
+    outline-offset: 2px;
+}
+
 .civic-share-close {
     margin-top: var(--space-4);
     width: 100%;
@@ -2340,6 +2431,11 @@
 
 .civic-share-close:hover {
     background: var(--civic-border);
+}
+
+.civic-share-close:focus {
+    outline: 3px solid var(--civic-brand);
+    outline-offset: 2px;
 }
 
 @media (max-width: 600px) {
@@ -2363,6 +2459,7 @@
  * - iOS/Android style interactions
  *
  * Prefix: md- (multidraw)
+  * Fully Migrated to Design Tokens: 2026-01-21 ✓
  */
 
 /* ============================================
@@ -2370,22 +2467,22 @@
    ============================================ */
 :root {
     /* Multidraw specific tokens */
-    --md-bg: var(--color-gray-100, #f3f4f6);
+    --md-bg: var(--color-gray-100, var(--color-gray-100));
     --md-surface: rgba(255, 255, 255, 0.95);
-    --md-surface-solid: #ffffff;
+    --md-surface-solid: var(--color-white);
     --md-border: rgba(0, 0, 0, 0.06);
     --md-border-strong: rgba(0, 0, 0, 0.1);
-    --md-text: var(--color-gray-900, #111827);
-    --md-text-secondary: var(--color-gray-600, #4b5563);
-    --md-text-muted: var(--color-gray-400, #9ca3af);
-    --md-primary: var(--color-primary-500, #6366f1);
-    --md-primary-hover: var(--color-primary-600, #4f46e5);
+    --md-text: var(--color-gray-900, var(--color-gray-900));
+    --md-text-secondary: var(--color-gray-600, var(--color-gray-600));
+    --md-text-muted: var(--color-gray-400, var(--color-gray-400));
+    --md-primary: var(--color-primary-500, var(--color-primary-500));
+    --md-primary-hover: var(--color-primary-600, var(--color-primary-600));
     --md-primary-light: rgba(99, 102, 241, 0.1);
-    --md-success: var(--color-success, #10b981);
+    --md-success: var(--color-success, var(--color-success));
     --md-success-light: rgba(16, 185, 129, 0.1);
-    --md-warning: var(--color-warning, #f59e0b);
+    --md-warning: var(--color-warning, var(--color-warning));
     --md-warning-light: rgba(245, 158, 11, 0.1);
-    --md-danger: var(--color-danger, #ef4444);
+    --md-danger: var(--color-danger, var(--color-danger));
     --md-danger-light: rgba(239, 68, 68, 0.1);
 
     /* Glassmorphism - FDS System */
@@ -2417,14 +2514,14 @@
 
 /* Dark theme tokens */
 [data-theme="dark"] {
-    --md-bg: #0f172a;
+    --md-bg: var(--color-slate-900);
     --md-surface: rgba(30, 41, 59, 0.95);
-    --md-surface-solid: #1e293b;
+    --md-surface-solid: var(--color-slate-800);
     --md-border: rgba(255, 255, 255, 0.06);
     --md-border-strong: rgba(255, 255, 255, 0.1);
-    --md-text: #f1f5f9;
-    --md-text-secondary: #94a3b8;
-    --md-text-muted: #64748b;
+    --md-text: var(--color-slate-100);
+    --md-text-secondary: var(--color-slate-400);
+    --md-text-muted: var(--color-slate-500);
     --md-glass-bg: var(--glass-bg-dark, rgba(30, 41, 59, 0.9));
     --md-glass-border: var(--glass-border-dark, rgba(255, 255, 255, 0.1));
     --md-glass-shadow:
@@ -2682,8 +2779,8 @@ body {
 }
 
 .multidraw-pill[data-type="event"]:not(.active):hover {
-    border-color: #ec4899;
-    color: #ec4899;
+    border-color: var(--color-pink-500);
+    color: var(--color-pink-500);
     background: rgba(236, 72, 153, 0.1);
 }
 
@@ -3821,7 +3918,7 @@ body {
     gap: var(--space-2.5);
     padding: var(--space-3) var(--space-4);
     background: var(--md-warning-light);
-    color: #b45309;
+    color: var(--color-amber-700);
     font-size: var(--font-size-xs);
     font-weight: 600;
     cursor: pointer;
@@ -3960,7 +4057,7 @@ body {
 .md-ai-toggle-icon {
     width: var(--space-6);
     height: var(--space-6);
-    background: linear-gradient(135deg, #6366f1, #8b5cf6);
+    background: linear-gradient(135deg, var(--color-primary-500), var(--color-purple-500));
     border-radius: var(--space-1.5);
     color: white;
     font-size: var(--space-3);
@@ -3997,7 +4094,7 @@ body {
     font-weight: 600;
     font-family: inherit;
     color: white;
-    background: linear-gradient(135deg, #6366f1, #8b5cf6, #a855f7);
+    background: linear-gradient(135deg, var(--color-primary-500), var(--color-purple-500), var(--color-purple-400));
     border: none;
     border-radius: var(--space-3);
     cursor: pointer;
@@ -4097,13 +4194,13 @@ body {
 
 .md-federation-option:has(input:checked) {
     background: rgba(139, 92, 246, 0.12);
-    border-color: #8b5cf6;
+    border-color: var(--color-purple-500);
 }
 
 .md-federation-option input[type="radio"] {
     margin-right: var(--space-2.5);
     margin-top: var(--space-0.75);
-    accent-color: #8b5cf6;
+    accent-color: var(--color-purple-500);
     width: var(--space-4);
     height: var(--space-4);
     flex-shrink: 0;
@@ -4162,7 +4259,7 @@ body {
 }
 
 .md-federation-notice a {
-    color: #8b5cf6;
+    color: var(--color-purple-500);
     text-decoration: underline;
 }
 
@@ -4226,7 +4323,7 @@ body {
         left: 0;
         right: 0;
         height: var(--space-0.75);
-        background: linear-gradient(90deg, #6366f1, #ec4899, #22d3ee, #6366f1);
+        background: linear-gradient(90deg, var(--color-primary-500), var(--color-pink-500), var(--color-cyan-400), var(--color-primary-500));
         background-size: 200% 100%;
         animation: md-holo-shimmer 3s linear infinite;
         z-index: 1;

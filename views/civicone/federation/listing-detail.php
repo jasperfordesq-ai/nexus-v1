@@ -14,6 +14,9 @@ $basePath = Nexus\Core\TenantContext::getBasePath();
 
 $listing = $listing ?? [];
 $canMessage = $canMessage ?? false;
+$isExternalListing = $isExternalListing ?? (!empty($listing['is_external']));
+$externalPartnerId = $listing['external_partner_id'] ?? null;
+$externalTenantId = $listing['external_tenant_id'] ?? 1;
 
 $ownerName = $listing['owner_name'] ?? 'Unknown';
 $fallbackAvatar = 'https://ui-avatars.com/api/?name=' . urlencode($ownerName) . '&background=00703c&color=fff&size=200';
@@ -50,8 +53,11 @@ $typeColor = $type === 'offer' ? '#00703c' : '#1d70b8';
                             <?= ucfirst($type) ?>
                         </span>
                         <span class="govuk-tag govuk-tag--grey govuk-!-margin-left-2">
-                            <i class="fa-solid fa-building govuk-!-margin-right-1" aria-hidden="true"></i>
+                            <i class="fa-solid <?= $isExternalListing ? 'fa-globe' : 'fa-building' ?> govuk-!-margin-right-1" aria-hidden="true"></i>
                             <?= htmlspecialchars($listing['tenant_name'] ?? 'Partner Timebank') ?>
+                            <?php if ($isExternalListing): ?>
+                            <span class="govuk-tag govuk-tag--blue" style="margin-left: 4px; font-size: 0.7em;">External</span>
+                            <?php endif; ?>
                         </span>
                     </div>
 
@@ -104,11 +110,21 @@ $typeColor = $type === 'offer' ? '#00703c' : '#1d70b8';
                     <!-- Actions -->
                     <div class="govuk-button-group">
                         <?php if ($canMessage): ?>
-                            <a href="<?= $basePath ?>/federation/messages/<?= $listing['owner_id'] ?>?tenant=<?= $listing['owner_tenant_id'] ?>"
-                               class="govuk-button" data-module="govuk-button">
-                                <i class="fa-solid fa-envelope govuk-!-margin-right-2" aria-hidden="true"></i>
-                                Contact <?= htmlspecialchars(explode(' ', $ownerName)[0]) ?>
-                            </a>
+                            <?php if ($isExternalListing && $externalPartnerId): ?>
+                                <!-- External listing - use federated messaging with external partner -->
+                                <a href="<?= $basePath ?>/federation/messages/compose?external_partner=<?= $externalPartnerId ?>&member_id=<?= $listing['owner_id'] ?>&member_name=<?= urlencode($ownerName) ?>&external_tenant=<?= $externalTenantId ?>"
+                                   class="govuk-button" data-module="govuk-button">
+                                    <i class="fa-solid fa-envelope govuk-!-margin-right-2" aria-hidden="true"></i>
+                                    Contact <?= htmlspecialchars(explode(' ', $ownerName)[0]) ?>
+                                </a>
+                            <?php else: ?>
+                                <!-- Internal federated listing -->
+                                <a href="<?= $basePath ?>/federation/messages/compose?to=<?= $listing['owner_id'] ?>&tenant=<?= $listing['owner_tenant_id'] ?>"
+                                   class="govuk-button" data-module="govuk-button">
+                                    <i class="fa-solid fa-envelope govuk-!-margin-right-2" aria-hidden="true"></i>
+                                    Contact <?= htmlspecialchars(explode(' ', $ownerName)[0]) ?>
+                                </a>
+                            <?php endif; ?>
                         <?php else: ?>
                             <span class="govuk-button govuk-button--disabled" aria-disabled="true">
                                 <i class="fa-solid fa-envelope govuk-!-margin-right-2" aria-hidden="true"></i>
@@ -116,11 +132,20 @@ $typeColor = $type === 'offer' ? '#00703c' : '#1d70b8';
                             </span>
                         <?php endif; ?>
 
-                        <a href="<?= $basePath ?>/federation/members/<?= $listing['owner_id'] ?>"
-                           class="govuk-button govuk-button--secondary" data-module="govuk-button">
-                            <i class="fa-solid fa-user govuk-!-margin-right-2" aria-hidden="true"></i>
-                            View Profile
-                        </a>
+                        <?php if ($isExternalListing && $externalPartnerId): ?>
+                            <!-- External listing - link to external member profile -->
+                            <a href="<?= $basePath ?>/federation/members/external/<?= $externalPartnerId ?>/<?= $listing['owner_id'] ?>"
+                               class="govuk-button govuk-button--secondary" data-module="govuk-button">
+                                <i class="fa-solid fa-user govuk-!-margin-right-2" aria-hidden="true"></i>
+                                View Profile
+                            </a>
+                        <?php else: ?>
+                            <a href="<?= $basePath ?>/federation/members/<?= $listing['owner_id'] ?>"
+                               class="govuk-button govuk-button--secondary" data-module="govuk-button">
+                                <i class="fa-solid fa-user govuk-!-margin-right-2" aria-hidden="true"></i>
+                                View Profile
+                            </a>
+                        <?php endif; ?>
                     </div>
                 </article>
 

@@ -653,10 +653,12 @@ $router->add('GET', '/federation/members', 'Nexus\Controllers\FederatedMemberCon
 $router->add('GET', '/federation/members/api', 'Nexus\Controllers\FederatedMemberController@api');
 $router->add('GET', '/federation/members/skills', 'Nexus\Controllers\FederatedMemberController@skillsApi');
 $router->add('GET', '/federation/members/locations', 'Nexus\Controllers\FederatedMemberController@locationsApi');
+$router->add('GET', '/federation/members/external/{partnerId}/{memberId}', 'Nexus\Controllers\FederatedMemberController@showExternal');
 $router->add('GET', '/federation/members/{id}', 'Nexus\Controllers\FederatedMemberController@show');
 
 // Federated Messaging (Cross-Tenant)
 $router->add('GET', '/federation/messages', 'Nexus\Controllers\FederatedMessageController@index');
+$router->add('GET', '/federation/messages/compose', 'Nexus\Controllers\FederatedMessageController@compose');
 $router->add('GET', '/federation/messages/api', 'Nexus\Controllers\FederatedMessageController@api');
 $router->add('GET', '/federation/messages/{id}', 'Nexus\Controllers\FederatedMessageController@thread');
 $router->add('POST', '/federation/messages/send', 'Nexus\Controllers\FederatedMessageController@send');
@@ -665,6 +667,7 @@ $router->add('POST', '/federation/messages/mark-read', 'Nexus\Controllers\Federa
 // Federated Listings (Cross-Tenant)
 $router->add('GET', '/federation/listings', 'Nexus\Controllers\FederatedListingController@index');
 $router->add('GET', '/federation/listings/api', 'Nexus\Controllers\FederatedListingController@api');
+$router->add('GET', '/federation/listings/external/{partnerId}/{listingId}', 'Nexus\Controllers\FederatedListingController@showExternal');
 $router->add('GET', '/federation/listings/{id}', 'Nexus\Controllers\FederatedListingController@show');
 
 // Federated Transactions (Cross-Tenant Hour Exchanges)
@@ -1027,6 +1030,17 @@ $router->add('GET', '/admin/federation/export/audit', 'Nexus\Controllers\Admin\F
 $router->add('GET', '/admin/federation/export/all', 'Nexus\Controllers\Admin\FederationExportController@exportAll');
 $router->add('POST', '/admin/federation/import/users', 'Nexus\Controllers\Admin\FederationImportController@importUsers');
 $router->add('GET', '/admin/federation/import/template', 'Nexus\Controllers\Admin\FederationImportController@downloadTemplate');
+
+// External Federation Partners (connections to servers outside this installation)
+$router->add('GET', '/admin/federation/external-partners', 'Nexus\Controllers\Admin\FederationExternalPartnersController@index');
+$router->add('GET', '/admin/federation/external-partners/create', 'Nexus\Controllers\Admin\FederationExternalPartnersController@create');
+$router->add('POST', '/admin/federation/external-partners/store', 'Nexus\Controllers\Admin\FederationExternalPartnersController@store');
+$router->add('GET', '/admin/federation/external-partners/{id}', 'Nexus\Controllers\Admin\FederationExternalPartnersController@show');
+$router->add('POST', '/admin/federation/external-partners/{id}/update', 'Nexus\Controllers\Admin\FederationExternalPartnersController@update');
+$router->add('POST', '/admin/federation/external-partners/{id}/test', 'Nexus\Controllers\Admin\FederationExternalPartnersController@test');
+$router->add('POST', '/admin/federation/external-partners/{id}/suspend', 'Nexus\Controllers\Admin\FederationExternalPartnersController@suspend');
+$router->add('POST', '/admin/federation/external-partners/{id}/activate', 'Nexus\Controllers\Admin\FederationExternalPartnersController@activate');
+$router->add('POST', '/admin/federation/external-partners/{id}/delete', 'Nexus\Controllers\Admin\FederationExternalPartnersController@delete');
 
 // Native App Management (FCM Push Notifications)
 $router->add('GET', '/admin/native-app', 'Nexus\Controllers\AdminController@nativeApp');

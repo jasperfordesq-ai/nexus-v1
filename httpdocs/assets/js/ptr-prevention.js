@@ -16,7 +16,8 @@
     }
 
     // Disable overscroll on html/body immediately
-    var style = 'overflow:hidden!important;overscroll-behavior:none!important;position:fixed!important;inset:0!important;';
+    // NOTE: Do NOT use position:fixed - it breaks scroll inside mobile menu panels
+    var style = 'overscroll-behavior:none!important;';
     document.documentElement.style.cssText += style;
     document.body.style.cssText += style;
 
