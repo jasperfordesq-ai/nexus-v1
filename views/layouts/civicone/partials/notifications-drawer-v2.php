@@ -15,15 +15,16 @@ use Nexus\Core\Auth;
 use Nexus\Core\TenantContext;
 use Nexus\Services\NotificationService;
 
-$user = Auth::user();
-if (empty($user)) {
+// Use $authUser to avoid overwriting view data (e.g., profile $user)
+$authUser = Auth::user();
+if (empty($authUser)) {
     return; // Don't render for logged-out users
 }
 
 $basePath = TenantContext::getBasePath();
 
 // Get recent notifications (limit to 10 for drawer)
-$notifications = NotificationService::getRecent($user['id'], 10);
+$notifications = NotificationService::getRecent($authUser['id'], 10);
 ?>
 <!-- Notifications Drawer Overlay -->
 <div id="notif-drawer-overlay" class="civicone-drawer-overlay" hidden></div>
@@ -84,9 +85,8 @@ $notifications = NotificationService::getRecent($user['id'], 10);
         <a href="<?= $basePath ?>/notifications" class="govuk-link">View all notifications</a>
         <?php if (!empty($notifications)): ?>
         <button type="button"
-                class="govuk-button govuk-button--secondary"
-                id="mark-all-read"
-                style="margin-bottom: 0;">
+                class="govuk-button govuk-button--secondary civicone-drawer__footer-btn"
+                id="mark-all-read">
             Mark all as read
         </button>
         <?php endif; ?>
