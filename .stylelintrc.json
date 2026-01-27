@@ -63,6 +63,7 @@
     "**/_archived/**",
     "**/vendor/**",
     "**/node_modules/**",
-    "**/*-compiled.css"
+    "**/*-compiled.css",
+    "**/civicone/**"
   ]
 }
