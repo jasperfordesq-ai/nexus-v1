@@ -1,8 +1,143 @@
-    /* ============================================
+/* ============================================
+   Blog skeleton + reveal fixes (27/01/2026)
+
+   Purpose: Override global .skeleton-container { display: none !important }
+   from modern-pages.css and provide missing transition classes for
+   the skeleton → content reveal that JS expects.
+
+   Scope: Blog page only (#news-holo-wrapper prefix)
+   ============================================ */
+
+/* Skeleton container: visible initially, overrides global hide */
+#news-holo-wrapper .skeleton-container {
+    display: grid !important;
+    opacity: 1;
+    transition: opacity 300ms ease;
+}
+
+/* When JS adds .hidden class after 300ms, fade out skeleton */
+#news-holo-wrapper .skeleton-container.hidden {
+    opacity: 0;
+    pointer-events: none;
+    visibility: hidden;
+}
+
+/* Grid hidden until JS marks it content-loaded */
+#news-holo-wrapper #news-grid-container {
+    opacity: 0;
+    transition: opacity 400ms ease;
+}
+
+#news-holo-wrapper #news-grid-container.content-loaded {
+    opacity: 1;
+}
+
+/* Empty state also hidden until content-loaded */
+#news-holo-wrapper .news-empty-state {
+    opacity: 0;
+    transition: opacity 400ms ease;
+}
+
+#news-holo-wrapper .news-empty-state.content-loaded {
+    opacity: 1;
+}
+
+/* News skeleton grid layout */
+#news-holo-wrapper .news-skeleton-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--space-8);
+}
+
+@media (max-width: 1200px) {
+    #news-holo-wrapper .news-skeleton-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 768px) {
+    #news-holo-wrapper .news-skeleton-grid {
+        grid-template-columns: 1fr;
+        gap: var(--space-6);
+    }
+}
+
+/* News card skeleton */
+#news-holo-wrapper .news-card-skeleton {
+    background: var(--effect-white-10);
+    backdrop-filter: blur(20px);
+    border-radius: var(--radius-2xl);
+    border: 1px solid var(--effect-white-15);
+    overflow: hidden;
+    box-shadow: 0 8px 32px var(--effect-purple-10);
+}
+
+[data-theme="dark"] #news-holo-wrapper .news-card-skeleton {
+    background: var(--effect-slate-60);
+    border-color: var(--effect-purple-20);
+}
+
+#news-holo-wrapper .news-card-skeleton .skeleton-image {
+    height: 200px;
+    background: linear-gradient(135deg,
+        var(--effect-purple-15) 0%,
+        var(--effect-primary-15) 100%);
+}
+
+#news-holo-wrapper .news-card-skeleton .skeleton-body {
+    padding: var(--space-6);
+}
+
+#news-holo-wrapper .news-card-skeleton .skeleton-date {
+    width: var(--space-20);
+    height: var(--font-size-sm);
+    margin-bottom: var(--space-3);
+}
+
+#news-holo-wrapper .news-card-skeleton .skeleton-title {
+    height: var(--space-6);
+    margin-bottom: var(--space-2);
+}
+
+#news-holo-wrapper .news-card-skeleton .skeleton-title:first-of-type {
+    width: 95%;
+}
+
+#news-holo-wrapper .news-card-skeleton .skeleton-title:last-of-type {
+    width: 60%;
+    margin-bottom: var(--space-4);
+}
+
+#news-holo-wrapper .news-card-skeleton .skeleton-excerpt {
+    height: var(--font-size-sm);
+    margin-bottom: var(--space-2);
+}
+
+#news-holo-wrapper .news-card-skeleton .skeleton-excerpt:last-of-type {
+    width: 70%;
+    margin-bottom: var(--space-5);
+}
+
+#news-holo-wrapper .news-card-skeleton .skeleton-btn {
+    width: 120px;
+    height: var(--space-10);
+    border-radius: var(--radius-md);
+}
+
+/* Reduced motion: instant transitions */
+@media (prefers-reduced-motion: reduce) {
+    #news-holo-wrapper .skeleton-container,
+    #news-holo-wrapper #news-grid-container,
+    #news-holo-wrapper .news-empty-state {
+        transition-duration: 0.01ms !important;
+    }
+}
+
+/* ============================================
    GOLD STANDARD - Native App Features
    ============================================ */
 
-    /* Offline Banner */
+/* Offline Banner */
     .offline-banner {
         position: fixed;
         top: 0;
