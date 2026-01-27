@@ -302,6 +302,10 @@ class SettingsController
         $emailOrgMembership = isset($_POST['email_org_membership']) ? 1 : 0;
         $emailOrgAdmin = isset($_POST['email_org_admin']) ? 1 : 0;
 
+        // Gamification notification preferences
+        $emailGamificationDigest = isset($_POST['email_gamification_digest']) ? 1 : 0;
+        $emailGamificationMilestones = isset($_POST['email_gamification_milestones']) ? 1 : 0;
+
         // Store notification preferences in user_preferences or users table
         // Using a simple JSON column approach if available, or individual columns
         $preferences = [
@@ -314,7 +318,10 @@ class SettingsController
             'email_org_payments' => $emailOrgPayments,
             'email_org_transfers' => $emailOrgTransfers,
             'email_org_membership' => $emailOrgMembership,
-            'email_org_admin' => $emailOrgAdmin
+            'email_org_admin' => $emailOrgAdmin,
+            // Gamification notifications
+            'email_gamification_digest' => $emailGamificationDigest,
+            'email_gamification_milestones' => $emailGamificationMilestones
         ];
 
         // Update user preferences
@@ -528,5 +535,22 @@ class SettingsController
 
         echo json_encode(['success' => $result]);
         exit;
+    }
+
+    /**
+     * Show Notifications Edit Form (for CivicOne theme)
+     */
+    public function notificationsEdit()
+    {
+        if (!isset($_SESSION['user_id'])) {
+            header('Location: ' . TenantContext::getBasePath() . '/login');
+            exit;
+        }
+
+        $user = User::findById($_SESSION['user_id']);
+
+        View::render('settings/notifications-edit', [
+            'user' => $user
+        ]);
     }
 }

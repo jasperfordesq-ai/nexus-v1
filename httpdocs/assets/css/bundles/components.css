@@ -1747,13 +1747,7 @@ img {
     transition: opacity 0.3s var(--ease-out);
 }
 
-img[loading="lazy"]:not(.loaded) {
-    opacity: 0;
-}
-
-img[loading="lazy"].loaded {
-    opacity: 1;
-}
+/* img[loading="lazy"] rules consolidated in bundles/core.css */
 
 /* ============================================
    17. SMOOTH SCROLL
@@ -2816,14 +2810,7 @@ img {
     transition: opacity 0.3s, filter 0.3s;
 }
 
-img[loading="lazy"] {
-    opacity: 0;
-}
-
-img[loading="lazy"].loaded,
-img:not([loading="lazy"]) {
-    opacity: 1;
-}
+/* img[loading="lazy"] rules consolidated in bundles/core.css */
 
 img.blur-up {
     filter: blur(20px);
@@ -3392,10 +3379,7 @@ img {
     image-rendering: -webkit-optimize-contrast;
 }
 
-img[loading="lazy"] {
-    /* Simpler fade-in */
-    transition: opacity 0.2s ease-in;
-}
+/* img[loading="lazy"] transition consolidated in bundles/core.css */
 
 /* ============================================
    10. REDUCE MOTION ENHANCEMENTS

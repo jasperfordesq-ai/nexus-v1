@@ -125,9 +125,17 @@ if (!function_exists('syncCss')) {
 <!-- ==========================================
      4. COMPONENTS (Async - lazy loaded)
      ========================================== -->
+<?php
+// PHASE 15B (2026-01-27): Skip nav+button bundles if already loaded sync in <head> for blog routes
+$cssAlreadyInHead = $GLOBALS['css_already_in_head'] ?? [];
+if (!in_array('components-navigation.css', $cssAlreadyInHead)):
+?>
 <?= asyncCss('/assets/css/bundles/components-navigation.css', $cssVersion, $assetBase) ?>
+<?php endif; ?>
 
+<?php if (!in_array('components-buttons.css', $cssAlreadyInHead)): ?>
 <?= asyncCss('/assets/css/bundles/components-buttons.css', $cssVersion, $assetBase) ?>
+<?php endif; ?>
 
 <?= asyncCss('/assets/css/bundles/components-forms.css', $cssVersion, $assetBase) ?>
 
@@ -141,7 +149,13 @@ if (!function_exists('syncCss')) {
 <!-- ==========================================
      5. UTILITIES (Async - lazy loaded)
      ========================================== -->
+<?php
+// PHASE 10 (2026-01-27): Skip utilities-polish.css if already loaded sync in <head> for blog routes
+// $cssAlreadyInHead already defined in section 4 (PHASE 15B)
+if (!in_array('utilities-polish.css', $cssAlreadyInHead)):
+?>
 <?= asyncCss('/assets/css/bundles/utilities-polish.css', $cssVersion, $assetBase) ?>
+<?php endif; ?>
 
 <?= asyncCss('/assets/css/bundles/utilities-loading.css', $cssVersion, $assetBase) ?>
 

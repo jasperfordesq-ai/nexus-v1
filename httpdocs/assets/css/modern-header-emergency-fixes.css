@@ -21,8 +21,11 @@
 /* ==========================================
    UTILITY BAR - Fixed Header
    ========================================== */
+/* 2026-01-27: Utility bar must be ABOVE navbar (z-navbar: 120) so its dropdowns
+   can appear above the navbar. backdrop-filter creates a stacking context,
+   meaning children can't escape parent's z-index. Using z-mega-menu (130). */
 .nexus-utility-bar {
-    z-index: var(--z-header);
+    z-index: var(--z-mega-menu);
 }
 
 /* Desktop: Force utility bar visible (above 1024px) */

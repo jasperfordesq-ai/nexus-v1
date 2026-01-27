@@ -22,7 +22,8 @@ body>* {
     left: 0;
     width: 100%;
     height: var(--layout-header-height);
-    z-index: var(--z-header, 100);
+    /* 2026-01-27: Must be ABOVE navbar (z-navbar:120) for dropdowns - backdrop-filter creates stacking context */
+    z-index: var(--z-mega-menu, 130);
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -681,9 +682,11 @@ body>* {
     color: var(--color-gray-200);
 }
 
+/* NOTE: Using explicit hex instead of var(--color-gray-700) because
+   design-tokens.css inverts gray values in dark mode */
 [data-theme="dark"] .htb-dropdown-content a:hover {
-    background: var(--color-gray-700);
-    color: var(--color-white);
+    background: rgba(99, 102, 241, 0.15); /* subtle primary tint */
+    color: #ffffff;
 }
 
 /* Notification Dropdown Dark Mode */

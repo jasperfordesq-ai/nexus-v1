@@ -833,10 +833,11 @@ class GamificationService
             // Award XP for earning badge
             self::awardXP($userId, self::XP_VALUES['earn_badge'], 'earn_badge', "Badge: {$def['name']}");
 
-            // Email Notification
-            try {
-                $user = \Nexus\Models\User::findById($userId);
-                if ($user && !empty($user['email'])) {
+            // Email Notification (only if user has milestones enabled)
+            if (\Nexus\Models\User::isGamificationEmailEnabled($userId, 'milestones')) {
+                try {
+                    $user = \Nexus\Models\User::findById($userId);
+                    if ($user && !empty($user['email'])) {
                     $mailer = new \Nexus\Core\Mailer();
                     $firstName = htmlspecialchars($user['first_name'] ?? 'Member');
                     $badgeName = htmlspecialchars($def['name']);
@@ -882,10 +883,11 @@ class GamificationService
 </body>
 </html>
 HTML;
-                    $mailer->send($user['email'], "You earned a new badge! {$badgeIcon} {$badgeName}", $body);
+                        $mailer->send($user['email'], "You earned a new badge! {$badgeIcon} {$badgeName}", $body);
+                    }
+                } catch (\Throwable $e) {
+                    error_log("Failed to send badge email: " . $e->getMessage());
                 }
-            } catch (\Throwable $e) {
-                error_log("Failed to send badge email: " . $e->getMessage());
             }
 
             return true;

@@ -141,11 +141,14 @@
     border-color: var(--color-gray-400);
 }
 
-/* Dark mode support - via class selector (app controlled) */
+/* Dark mode support - via class selector (app controlled)
+   NOTE: Using explicit hex colors because design-tokens.css inverts gray values
+   in dark mode (e.g., --color-gray-800 becomes light in dark mode for text).
+   This modal needs actual dark background colors, not inverted text colors. */
 [data-theme="dark"] .dev-notice-modal,
 .dark-mode .dev-notice-modal,
 body.dark .dev-notice-modal {
-    background: var(--color-gray-800);
+    background: #1f2937; /* gray-800 (actual dark value) */
     box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
 }
 
@@ -158,28 +161,28 @@ body.dark .dev-notice-header {
 [data-theme="dark"] .dev-notice-body,
 .dark-mode .dev-notice-body,
 body.dark .dev-notice-body {
-    color: var(--color-gray-200);
+    color: #e5e7eb; /* gray-200 (light text for dark bg) */
 }
 
 [data-theme="dark"] .dev-notice-body strong,
 .dark-mode .dev-notice-body strong,
 body.dark .dev-notice-body strong {
-    color: var(--color-white);
+    color: #ffffff;
 }
 
 [data-theme="dark"] .dev-notice-highlight,
 .dark-mode .dev-notice-highlight,
 body.dark .dev-notice-highlight {
     background: rgba(251, 191, 36, 0.15);
-    border-left-color: var(--color-amber-400);
+    border-left-color: #fbbf24; /* amber-400 */
     color: #fcd34d;
 }
 
 [data-theme="dark"] .dev-notice-footer,
 .dark-mode .dev-notice-footer,
 body.dark .dev-notice-footer {
-    background: var(--color-gray-900);
-    border-top-color: var(--color-gray-700);
+    background: #111827; /* gray-900 (actual dark value) */
+    border-top-color: #374151; /* gray-700 (actual dark value) */
 }
 
 [data-theme="dark"] .dev-notice-btn-primary,
@@ -198,66 +201,70 @@ body.dark .dev-notice-btn-primary:hover {
 [data-theme="dark"] .dev-notice-btn-secondary,
 .dark-mode .dev-notice-btn-secondary,
 body.dark .dev-notice-btn-secondary {
-    background: var(--color-gray-700);
-    color: var(--color-gray-200);
-    border-color: var(--color-gray-600);
+    background: #374151; /* gray-700 (actual dark value) */
+    color: #e5e7eb; /* gray-200 (light text) */
+    border-color: #4b5563; /* gray-600 (actual dark value) */
 }
 
 [data-theme="dark"] .dev-notice-btn-secondary:hover,
 .dark-mode .dev-notice-btn-secondary:hover,
 body.dark .dev-notice-btn-secondary:hover {
-    background: var(--color-gray-600);
-    border-color: var(--color-gray-500);
+    background: #4b5563; /* gray-600 (actual dark value) */
+    border-color: #6b7280; /* gray-500 (actual dark value) */
 }
 
-/* Dark mode support - via system preference (fallback) */
+/* Dark mode support - via system preference (fallback)
+   NOTE: This is a fallback for when data-theme is not set but system prefers dark.
+   However, if data-theme="light" is set, that takes precedence and these won't apply
+   because the :root vars won't be inverted. Using explicit colors for consistency. */
 @media (prefers-color-scheme: dark) {
-    .dev-notice-modal {
-        background: var(--color-gray-800);
+    /* Only apply if data-theme is not explicitly set to light */
+    html:not([data-theme="light"]) .dev-notice-modal {
+        background: #1f2937; /* gray-800 */
         box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
     }
 
-    .dev-notice-header {
+    html:not([data-theme="light"]) .dev-notice-header {
         background: linear-gradient(135deg, var(--color-primary-700) 0%, var(--color-primary-500) 100%);
     }
 
-    .dev-notice-body {
-        color: var(--color-gray-200);
+    html:not([data-theme="light"]) .dev-notice-body {
+        color: #e5e7eb; /* gray-200 */
     }
 
-    .dev-notice-body strong {
-        color: var(--color-white);
+    html:not([data-theme="light"]) .dev-notice-body strong {
+        color: #ffffff;
     }
 
-    .dev-notice-highlight {
+    html:not([data-theme="light"]) .dev-notice-highlight {
         background: rgba(251, 191, 36, 0.15);
-        border-left-color: var(--color-amber-400);
+        border-left-color: #fbbf24; /* amber-400 */
         color: #fcd34d;
     }
 
-    .dev-notice-footer {
-        background: var(--color-gray-900);
-        border-top-color: var(--color-gray-700);
+    html:not([data-theme="light"]) .dev-notice-footer {
+        background: #111827; /* gray-900 */
+        border-top-color: #374151; /* gray-700 */
     }
 
-    .dev-notice-btn-primary {
+    html:not([data-theme="light"]) .dev-notice-btn-primary {
         background: var(--color-primary-500);
     }
 
-    .dev-notice-btn-primary:hover {
+    html:not([data-theme="light"]) .dev-notice-btn-primary:hover {
         background: var(--color-primary-400);
         box-shadow: 0 4px 12px rgba(99, 102, 241, 0.5);
     }
 
-    .dev-notice-btn-secondary {
-        background: var(--color-gray-700);
-        color: var(--color-gray-200);
-        border-color: var(--color-gray-600);
+    html:not([data-theme="light"]) .dev-notice-btn-secondary {
+        background: #374151; /* gray-700 */
+        color: #e5e7eb; /* gray-200 */
+        border-color: #4b5563; /* gray-600 */
     }
 
-    .dev-notice-btn-secondary:hover {
-        background: var(--color-gray-600);
-        border-color: var(--color-gray-500);
+    html:not([data-theme="light"]) .dev-notice-btn-secondary:hover {
+        background: #4b5563; /* gray-600 */
+        border-color: #6b7280; /* gray-500 */
     }
 }
 

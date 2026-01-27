@@ -274,16 +274,12 @@
 /* ==============================================
    NATIVE LAZY LOADING ENHANCEMENT
    For browsers with loading="lazy" support
-   ============================================== */
-img[loading="lazy"] {
-    opacity: 0;
-    transition: opacity var(--transition-base);
-}
 
-img[loading="lazy"].loaded,
-img[loading="lazy"]:not(.lazy-image) {
-    opacity: 1;
-}
+   NOTE: The img[loading="lazy"] opacity rules are now
+   consolidated in bundles/core.css (lines 4831-4840).
+   Removed duplicate rules here to prevent cascade conflicts.
+   See: docs/modern-css-lazy-image-consolidation.md
+   ============================================== */
 
 /* ==============================================
    INTERSECTION OBSERVER FALLBACK INDICATOR

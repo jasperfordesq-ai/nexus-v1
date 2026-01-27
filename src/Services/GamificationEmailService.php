@@ -33,13 +33,13 @@ class GamificationEmailService
 
         // OPTIMIZATION: Only get users who actually earned XP (>0) or badges this week
         // This prevents processing thousands of inactive users
+        // Note: Preference check moved to PHP loop for cleaner migration handling
         $users = Database::query(
             "SELECT DISTINCT u.id, u.email, u.first_name, u.last_name, u.xp, u.level
              FROM users u
              WHERE u.tenant_id = ?
              AND u.is_approved = 1
              AND u.email IS NOT NULL
-             AND (u.email_preferences IS NULL OR JSON_EXTRACT(u.email_preferences, '$.gamification_digest') != false)
              AND (
                  EXISTS (SELECT 1 FROM xp_history xh WHERE xh.user_id = u.id AND xh.created_at >= ? AND xh.xp_amount > 0)
                  OR EXISTS (SELECT 1 FROM user_badges ub WHERE ub.user_id = u.id AND ub.awarded_at >= ?)
@@ -50,6 +50,12 @@ class GamificationEmailService
 
         foreach ($users as $user) {
             try {
+                // Check if user has digest emails enabled (handles legacy migration)
+                if (!\Nexus\Models\User::isGamificationEmailEnabled($user['id'], 'digest')) {
+                    $results['skipped']++;
+                    continue;
+                }
+
                 $digest = self::generateUserDigest($user['id']);
 
                 // Skip if somehow no activity (edge case)
@@ -815,6 +821,11 @@ HTML;
         )->fetch();
 
         if (!$user || empty($user['email'])) {
+            return false;
+        }
+
+        // Check if user has milestone emails enabled
+        if (!\Nexus\Models\User::isGamificationEmailEnabled($userId, 'milestones')) {
             return false;
         }
 
