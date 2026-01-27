@@ -227,12 +227,14 @@ class ImageHelper
      * @param string|null $avatarPath Avatar image path
      * @param string $userName User's name for alt text
      * @param int $size Size in pixels (default: 40)
+     * @param array $attributes Optional HTML attributes (e.g., ['loading' => 'eager'] for above-fold)
      * @return string HTML for avatar
      */
     public static function avatar(
         ?string $avatarPath,
         string $userName = 'User',
-        int $size = 40
+        int $size = 40,
+        array $attributes = []
     ): string {
         // Use default avatar if none provided or path is invalid
         // Trim and check for empty/whitespace-only paths
@@ -245,10 +247,13 @@ class ImageHelper
         $class = "avatar-img";
         $alt = htmlspecialchars($userName);
 
-        return self::webp($avatarPath, $alt, $class, [
+        // Merge size with any additional attributes
+        $attrs = array_merge([
             'width' => $size,
             'height' => $size
-        ]);
+        ], $attributes);
+
+        return self::webp($avatarPath, $alt, $class, $attrs);
     }
 
     /**
