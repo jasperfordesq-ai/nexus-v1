@@ -3,7 +3,7 @@
 /**
  * Modern Layout - Consolidated CSS Loader
  * Optimized loading with proper categorization
- * Updated: 2026-01-24
+ * Updated: 2026-01-26
  *
  * Performance Notes:
  * - Critical CSS: 5 files (sync) - Required for above-fold rendering
@@ -21,6 +21,16 @@
  * 4. Utilities (async) - Polish, accessibility, loading states
  * 5. Mobile (media query) - Mobile-specific styles
  * 6. Page-specific (conditional) - Loaded based on route
+ *
+ * THEME ISOLATION (2026-01-26):
+ * This file is ONLY for the Modern theme. Do NOT load civicone-*.css files here.
+ * CivicOne CSS is loaded separately via views/layouts/civicone/partials/assets-css.php
+ * Loading CivicOne CSS in Modern theme causes style conflicts and regression loops.
+ *
+ * TOKEN CONSOLIDATION (2026-01-26):
+ * modern-theme-tokens.css is loaded AFTER design-tokens.css and nexus-phoenix.css
+ * to override any conflicting :root variables. This is the SINGLE SOURCE OF TRUTH
+ * for Modern theme CSS variables, eliminating FOUC from cascading :root definitions.
  */
 
 // Use deployment version for cache busting
@@ -49,14 +59,30 @@ if (!function_exists('syncCss')) {
 
 <!-- ==========================================
      1. CRITICAL CSS (Render-blocking)
-     NOTE: design-tokens.css now loads FIRST in header.php
-     to ensure CSS variables are available immediately
-     Using non-minified CSS - minified causes visual problems
-     Updated: 2026-01-25 - See docs/VISUAL_FLASH_FIX_PLAN.md
+
+     CSS VARIABLE LOAD ORDER (2026-01-26):
+     1. design-tokens.css     - Loaded in header.php (base tokens)
+     2. nexus-phoenix.css     - HTB brand variables (below)
+     3. modern-theme-tokens.css - SINGLE SOURCE OF TRUTH (wins cascade)
+
+     This order ensures modern-theme-tokens.css overrides any
+     conflicting :root variables from the legacy files.
      ========================================== -->
 <!-- design-tokens.css loaded in header.php (position 1) -->
 
 <?= syncCss('/assets/css/nexus-phoenix.css', $cssVersion, $assetBase) ?>
+
+<!-- MODERN THEME TOKENS - Single Source of Truth (2026-01-26)
+     This file consolidates all :root variables for the Modern theme.
+     Loaded AFTER design-tokens.css and nexus-phoenix.css to win the cascade.
+     Eliminates FOUC caused by 188 files redefining :root variables. -->
+<?= syncCss('/assets/css/modern-theme-tokens.css', $cssVersion, $assetBase) ?>
+
+<!-- MODERN PRIMITIVES - Layout & Utility Classes (2026-01-27)
+     Token-driven layout primitives (.container, .stack, .cluster, .grid, .sidebar)
+     plus spacing, typography, and accessibility helpers.
+     See docs/modern-ui-primitives.md for usage. -->
+<?= syncCss('/assets/css/modern-primitives.css', $cssVersion, $assetBase) ?>
 
 <?= syncCss('/assets/css/bundles/core.css', $cssVersion, $assetBase) ?>
 
@@ -178,11 +204,18 @@ if (!function_exists('syncCss')) {
 
 <!-- ==========================================
      9. UTILITIES & POLISH (Async)
+
+     THEME ISOLATION FIX (2026-01-26):
+     REMOVED: civicone-utilities.css and civicone-utilities-extended.css
+
+     These CivicOne-specific files were incorrectly loaded here, causing:
+     - Style conflicts between Modern and CivicOne themes
+     - Regression loops where fixing one theme broke the other
+     - FOUC (Flash of Unstyled Content) due to conflicting CSS rules
+
+     CivicOne CSS is now ONLY loaded via:
+     views/layouts/civicone/partials/assets-css.php
      ========================================== -->
-<?= asyncCss('/assets/css/civicone-utilities.css', $cssVersion, $assetBase) ?>
-
-<?= asyncCss('/assets/css/civicone-utilities-extended.css', $cssVersion, $assetBase) ?>
-
 <?= asyncCss('/assets/css/nexus-performance-patch.css', $cssVersion, $assetBase) ?>
 
 

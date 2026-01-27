@@ -323,6 +323,38 @@
     /* ==========================================
        EFFECT TOKENS - Opacity-based Color Effects
        Phase 2 CSS Cleanup (2026-01-27)
+       Phase 3 Consolidation (2026-01-27)
+       ==========================================
+
+       TABLE OF CONTENTS:
+       1. White effects (0-100% opacity)
+       2. Black effects (0-80% opacity)
+       3. Primary/Indigo effects (99, 102, 241)
+       4. Purple family (purple, purple-300, purple-200, purple-100)
+       5. Violet effects (168, 85, 247)
+       6. Emerald family (emerald, emerald-600, emerald-700)
+       7. Teal family (teal, teal-500 aliases, teal-600)
+       8. Cyan family (cyan, cyan-300, cyan-400, cyan-100, cyan-200)
+       9. Red family (red, red-600, red-custom)
+       10. Amber family (amber, amber-300, amber-600)
+       11. Blue family (blue, blue-600)
+       12. Yellow effects
+       13. Green family (green, green-600)
+       14. Orange family (orange, orange-300, orange-400, orange-600, orange-custom)
+       15. Pink family (pink, pink-600)
+       16. Fuchsia effects
+       17. Sky effects
+       18. Slate family (slate-800, slate-900, slate-600, slate-500, slate-400, slate-200, slate-50)
+       19. Gray family (gray, gray-50, gray-100, gray-200, gray-300, gray-400, gray-500, gray-600)
+       20. Zinc effects
+       21. Indigo family (indigo-600, indigo-400, indigo-300, indigo-50)
+       22. Glass shadow effects
+       23. Specialty effects (gold, silver, bronze, warm-accent, neutral)
+       24. Aliases (backwards compatibility)
+
+       NAMING CONVENTION:
+       --effect-{color}-{opacity} where opacity is 0-100 (percentage)
+       --effect-{color}-{shade}-{opacity} for shade variants (e.g., purple-300-10)
        ========================================== */
 
     /* White effects (for overlays, glass borders, text) */
@@ -601,11 +633,11 @@
     --effect-glass-shadow-20: rgba(31, 38, 135, 0.2);
     --effect-glass-shadow-dark: rgba(31, 38, 135, 0.37);
 
-    /* Black opacity (alternative syntax without spaces) */
-    --effect-black-6-alt: rgba(0,0,0,0.06);
-    --effect-black-10-alt: rgba(0,0,0,0.1);
+    /* Black/White aliases (alternative syntax without spaces - for backwards compatibility) */
+    --effect-black-6-alt: var(--effect-black-6);
+    --effect-black-10-alt: var(--effect-black-10);
     --effect-black-70: rgba(0, 0, 0, 0.7);
-    --effect-white-12: rgba(255, 255, 255, 0.12);
+    /* --effect-white-12 defined earlier - DUPLICATE REMOVED */
 
     /* Primary color hover/active states */
     --color-primary-hover: #4f46e5;
@@ -622,9 +654,9 @@
     /* Glass shadow 12 (31, 38, 135) */
     --effect-glass-shadow-12: rgba(31, 38, 135, 0.12);
 
-    /* Teal-500 effects (20, 184, 166) */
-    --effect-teal-500-8: rgba(20, 184, 166, 0.08);
-    --effect-teal-500-10: rgba(20, 184, 166, 0.1);
+    /* Teal-500 aliases (same as teal base - 20, 184, 166) */
+    --effect-teal-500-8: var(--effect-teal-8);
+    --effect-teal-500-10: var(--effect-teal-10);
 
     /* Emerald high opacity (16, 185, 129) */
     --effect-emerald-50: rgba(16, 185, 129, 0.5);
@@ -665,9 +697,9 @@
     /* Black additional */
     --effect-black-12: rgba(0, 0, 0, 0.12);
 
-    /* White no-space variants */
-    --effect-white-1-alt: rgba(255,255,255,0.01);
-    --effect-white-3-alt: rgba(255,255,255,0.03);
+    /* White aliases (no-space variants for backwards compatibility) */
+    --effect-white-1-alt: var(--effect-white-1);
+    --effect-white-3-alt: var(--effect-white-3);
 
     /* Slate-800 additional (30, 41, 59) */
     --effect-slate-55: rgba(30, 41, 59, 0.55);
@@ -682,9 +714,9 @@
     --effect-gray-200-80: rgba(229, 231, 235, 0.8);
     --effect-slate-200-50: rgba(226, 232, 240, 0.5);
 
-    /* Teal-500 additional (20, 184, 166) */
-    --effect-teal-500-25: rgba(20, 184, 166, 0.25);
-    --effect-teal-500-35: rgba(20, 184, 166, 0.35);
+    /* Teal-500 aliases (same as teal base) */
+    --effect-teal-500-25: var(--effect-teal-25);
+    --effect-teal-500-35: var(--effect-teal-35);
 
     /* Emerald additional (16, 185, 129) */
     --effect-emerald-6: rgba(16, 185, 129, 0.06);
@@ -706,7 +738,7 @@
 
     /* Black high opacity */
     --effect-black-80: rgba(0, 0, 0, 0.8);
-    --effect-black-4: rgba(0, 0, 0, 0.04);
+    /* --effect-black-4 defined earlier - DUPLICATE REMOVED */
 
     /* Slate-800 additional (30, 41, 59) */
     --effect-slate-80: rgba(30, 41, 59, 0.8);
@@ -723,14 +755,12 @@
     /* Warm accent (255, 200, 100) */
     --effect-warm-accent-5: rgba(255, 200, 100, 0.05);
 
-    /* Teal-500 additional (20, 184, 166) */
-    --effect-teal-500-30: rgba(20, 184, 166, 0.3);
+    /* Teal-500 alias */
+    --effect-teal-500-30: var(--effect-teal-30);
 
-    /* Violet-500 additional (168, 85, 247) */
-    --effect-violet-20: rgba(168, 85, 247, 0.2);
+    /* --effect-violet-20 defined earlier - DUPLICATE REMOVED */
 
-    /* Slate-900 additional (15, 23, 42) */
-    --effect-slate-900-50: rgba(15, 23, 42, 0.5);
+    /* --effect-slate-900-50 defined earlier - DUPLICATE REMOVED */
 
     /* Slate-400 (148, 163, 184) */
     --effect-slate-400-10: rgba(148, 163, 184, 0.1);
@@ -739,8 +769,8 @@
     --effect-primary-2: rgba(99, 102, 241, 0.02);
     --effect-primary-3: rgba(99, 102, 241, 0.03);
     --effect-primary-4: rgba(99, 102, 241, 0.04);
-    --effect-primary-35: rgba(99, 102, 241, 0.35);
-    --effect-primary-45: rgba(99, 102, 241, 0.45);
+    /* --effect-primary-35 defined earlier - DUPLICATE REMOVED */
+    /* --effect-primary-45 defined earlier - DUPLICATE REMOVED */
 
     /* Cyan additional (6, 182, 212) */
     --effect-cyan-35: rgba(6, 182, 212, 0.35);
@@ -764,36 +794,28 @@
     /* Orange-300 (253, 186, 116) */
     --effect-orange-300-60: rgba(253, 186, 116, 0.6);
 
-    /* Amber-300 additional (251, 191, 36) */
-    --effect-amber-300-15: rgba(251, 191, 36, 0.15);
+    /* --effect-amber-300-15 defined earlier - DUPLICATE REMOVED */
 
     /* Orange-400 (251, 146, 60) */
     --effect-orange-400-15: rgba(251, 146, 60, 0.15);
     --effect-orange-400-60: rgba(251, 146, 60, 0.6);
 
-    /* Orange additional (249, 115, 22) */
-    --effect-orange-50: rgba(249, 115, 22, 0.5);
+    /* --effect-orange-50 defined earlier - DUPLICATE REMOVED */
 
-    /* Amber additional (245, 158, 11) */
-    --effect-amber-8: rgba(245, 158, 11, 0.08);
-    --effect-amber-25: rgba(245, 158, 11, 0.25);
-    --effect-amber-30: rgba(245, 158, 11, 0.3);
+    /* Amber duplicates removed - defined earlier */
+    /* --effect-amber-8, --effect-amber-25, --effect-amber-30 already exist */
 
     /* Red additional (239, 68, 68) */
     --effect-red-25: rgba(239, 68, 68, 0.25);
 
-    /* Blue additional (59, 130, 246) */
-    --effect-blue-20: rgba(59, 130, 246, 0.2);
+    /* --effect-blue-20 defined earlier - DUPLICATE REMOVED */
 
-    /* Slate-600 additional (51, 65, 85) */
-    --effect-slate-600-50: rgba(51, 65, 85, 0.5);
+    /* --effect-slate-600-50 defined earlier - DUPLICATE REMOVED */
 
     /* Slate-600 solid (71, 85, 105) */
     --effect-slate-500-100: rgba(71, 85, 105, 1);
 
-    /* White full/minimal */
-    --effect-white-1: rgba(255, 255, 255, 0.01);
-    --effect-white-100: rgba(255, 255, 255, 1);
+    /* --effect-white-1 and --effect-white-100 defined earlier - DUPLICATES REMOVED */
 
     /* Red-0 (transparent red for gradients) */
     --effect-red-0: rgba(239, 68, 68, 0);
@@ -818,9 +840,8 @@
     /* Cyan-100 (207, 250, 254) */
     --effect-cyan-100-8: rgba(207, 250, 254, 0.08);
 
+    /* --effect-violet-6, --effect-violet-35 defined earlier - DUPLICATES REMOVED */
     /* Violet-500 additional (168, 85, 247) */
-    --effect-violet-6: rgba(168, 85, 247, 0.06);
-    --effect-violet-35: rgba(168, 85, 247, 0.35);
     --effect-violet-60: rgba(168, 85, 247, 0.6);
 
     /* Cyan-200 (165, 243, 252) */
@@ -854,28 +875,14 @@
     --effect-violet-600-30: rgba(124, 58, 237, 0.3);
     --effect-violet-600-40: rgba(124, 58, 237, 0.4);
 
-    /* Indigo-400 additional (129, 140, 248) */
-    --effect-indigo-400-20: rgba(129, 140, 248, 0.2);
+    /* DUPLICATES REMOVED - all defined earlier:
+       --effect-indigo-400-20, --effect-purple-35, --effect-purple-60,
+       --effect-emerald-5, --effect-emerald-25, --effect-emerald-40,
+       --effect-slate-900-70, --effect-slate-900-85, --effect-slate-900-90,
+       --effect-sky-20 */
 
-    /* Purple additional (139, 92, 246) */
-    --effect-purple-35: rgba(139, 92, 246, 0.35);
-    --effect-purple-60: rgba(139, 92, 246, 0.6);
-
-    /* Emerald additional (16, 185, 129) */
-    --effect-emerald-5: rgba(16, 185, 129, 0.05);
-    --effect-emerald-25: rgba(16, 185, 129, 0.25);
-    --effect-emerald-40: rgba(16, 185, 129, 0.4);
-
-    /* Slate-900 additional (15, 23, 42) */
-    --effect-slate-900-70: rgba(15, 23, 42, 0.7);
-    --effect-slate-900-85: rgba(15, 23, 42, 0.85);
-    --effect-slate-900-90: rgba(15, 23, 42, 0.9);
-
-    /* Sky-500 additional (14, 165, 233) */
-    --effect-sky-20: rgba(14, 165, 233, 0.2);
-
-    /* Black no-space variant */
-    --effect-black-20-alt: rgba(0,0,0,0.2);
+    /* Black alias and additional */
+    --effect-black-20-alt: var(--effect-black-20);
     --effect-black-1: rgba(0, 0, 0, 0.01);
 
     /* Gray-100 additional (243, 244, 246) */
@@ -924,19 +931,18 @@
     --effect-pink-600-30: rgba(219, 39, 119, 0.3);
     --effect-pink-600-40: rgba(219, 39, 119, 0.4);
 
-    /* Violet-500 additional (168, 85, 247) */
-    --effect-violet-12: rgba(168, 85, 247, 0.12);
+    /* --effect-violet-12 defined earlier - DUPLICATE REMOVED */
 
     /* Gray-500 (107, 114, 128) */
     --effect-gray-500-20: rgba(107, 114, 128, 0.2);
 
+    /* --effect-pink-15 defined earlier - DUPLICATE REMOVED */
     /* Pink additional (236, 72, 153) */
-    --effect-pink-15: rgba(236, 72, 153, 0.15);
     --effect-pink-30: rgba(236, 72, 153, 0.3);
 
     /* Emerald-600 additional (5, 150, 105) */
     --effect-emerald-600-10: rgba(5, 150, 105, 0.1);
-    --effect-emerald-600-15: rgba(5, 150, 105, 0.15);
+    /* --effect-emerald-600-15 defined earlier - DUPLICATE REMOVED */
 
     /* Green-500 additional (34, 197, 94) */
     --effect-green-30: rgba(34, 197, 94, 0.3);
@@ -954,7 +960,7 @@
 
     /* Violet-500 additional (168, 85, 247) */
     --effect-violet-2: rgba(168, 85, 247, 0.02);
-    --effect-violet-8: rgba(168, 85, 247, 0.08);
+    /* --effect-violet-8 defined earlier - DUPLICATE REMOVED */
     --effect-violet-18: rgba(168, 85, 247, 0.18);
     --effect-violet-22: rgba(168, 85, 247, 0.22);
     --effect-violet-30: rgba(168, 85, 247, 0.3);
@@ -962,16 +968,14 @@
 
     /* Emerald additional (16, 185, 129) */
     --effect-emerald-0: rgba(16, 185, 129, 0);
-    --effect-emerald-30: rgba(16, 185, 129, 0.3);
-    --effect-emerald-35: rgba(16, 185, 129, 0.35);
+    /* --effect-emerald-30, --effect-emerald-35 defined earlier - DUPLICATES REMOVED */
     --effect-emerald-45: rgba(16, 185, 129, 0.45);
 
     /* Slate-900 additional (15, 23, 42) */
     --effect-slate-900-40: rgba(15, 23, 42, 0.4);
 
     /* Purple additional (139, 92, 246) */
-    --effect-purple-6: rgba(139, 92, 246, 0.06);
-    --effect-purple-45: rgba(139, 92, 246, 0.45);
+    /* --effect-purple-6, --effect-purple-45 defined earlier - DUPLICATES REMOVED */
     --effect-purple-90: rgba(139, 92, 246, 0.9);
     --effect-purple-95: rgba(139, 92, 246, 0.95);
 
@@ -979,7 +983,7 @@
     --effect-indigo-400-40: rgba(129, 140, 248, 0.4);
 
     /* Gray-500 additional (107, 114, 128) */
-    --effect-gray-500-10: rgba(107, 114, 128, 0.1);
+    --effect-gray-500-10: var(--effect-gray-10); /* Alias: same value */
     --effect-gray-500-15: rgba(107, 114, 128, 0.15);
     --effect-gray-500-70: rgba(107, 114, 128, 0.7);
 
@@ -996,17 +1000,15 @@
     /* Slate-500 solid (71, 85, 105) */
     --effect-slate-500-15: rgba(71, 85, 105, 0.15);
 
-    /* Cyan additional (6, 182, 212) */
-    --effect-cyan-50: rgba(6, 182, 212, 0.5);
+    /* --effect-cyan-50 defined earlier - DUPLICATE REMOVED */
 
     /* Blue additional (59, 130, 246) */
     --effect-blue-3: rgba(59, 130, 246, 0.03);
-    --effect-blue-10: rgba(59, 130, 246, 0.1);
+    /* --effect-blue-10 defined earlier - DUPLICATE REMOVED */
     --effect-blue-40: rgba(59, 130, 246, 0.4);
     --effect-blue-50: rgba(59, 130, 246, 0.5);
 
-    /* Slate-600 additional (51, 65, 85) */
-    --effect-slate-600-40: rgba(51, 65, 85, 0.4);
+    /* --effect-slate-600-40 defined earlier - DUPLICATE REMOVED */
 
     /* Blue-600 (37, 99, 235) */
     --effect-blue-600-15: rgba(37, 99, 235, 0.15);
@@ -1020,11 +1022,10 @@
     --effect-slate-50-70: rgba(248, 250, 252, 0.7);
     --effect-slate-50-95: rgba(248, 250, 252, 0.95);
 
-    /* Amber additional (245, 158, 11) */
-    --effect-amber-35: rgba(245, 158, 11, 0.35);
+    /* --effect-amber-35 defined earlier - DUPLICATE REMOVED */
 
-    /* Red additional (239, 68, 68) */
-    --effect-red-3: rgba(239, 68, 68, 0.3);
+    /* Red typo fix: --effect-red-3 was 0.3 opacity, should be --effect-red-30 */
+    /* --effect-red-30 defined earlier - this was a typo DUPLICATE REMOVED */
 
     /* Pink additional (236, 72, 153) */
     --effect-pink-2: rgba(236, 72, 153, 0.02);

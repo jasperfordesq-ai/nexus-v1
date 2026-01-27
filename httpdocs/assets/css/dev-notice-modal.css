@@ -93,7 +93,7 @@
     margin: 1rem 0;
     border-radius: 4px;
     font-size: 0.95rem;
-    color: #92400e;
+    color: var(--color-amber-800);
     font-weight: 500;
 }
 
@@ -145,119 +145,119 @@
 [data-theme="dark"] .dev-notice-modal,
 .dark-mode .dev-notice-modal,
 body.dark .dev-notice-modal {
-    background: #1f2937;
+    background: var(--color-gray-800);
     box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
 }
 
 [data-theme="dark"] .dev-notice-header,
 .dark-mode .dev-notice-header,
 body.dark .dev-notice-header {
-    background: linear-gradient(135deg, #4338ca 0%, #6366f1 100%);
+    background: linear-gradient(135deg, var(--color-primary-700) 0%, var(--color-primary-500) 100%);
 }
 
 [data-theme="dark"] .dev-notice-body,
 .dark-mode .dev-notice-body,
 body.dark .dev-notice-body {
-    color: #e5e7eb;
+    color: var(--color-gray-200);
 }
 
 [data-theme="dark"] .dev-notice-body strong,
 .dark-mode .dev-notice-body strong,
 body.dark .dev-notice-body strong {
-    color: #ffffff;
+    color: var(--color-white);
 }
 
 [data-theme="dark"] .dev-notice-highlight,
 .dark-mode .dev-notice-highlight,
 body.dark .dev-notice-highlight {
     background: rgba(251, 191, 36, 0.15);
-    border-left-color: #fbbf24;
+    border-left-color: var(--color-amber-400);
     color: #fcd34d;
 }
 
 [data-theme="dark"] .dev-notice-footer,
 .dark-mode .dev-notice-footer,
 body.dark .dev-notice-footer {
-    background: #111827;
-    border-top-color: #374151;
+    background: var(--color-gray-900);
+    border-top-color: var(--color-gray-700);
 }
 
 [data-theme="dark"] .dev-notice-btn-primary,
 .dark-mode .dev-notice-btn-primary,
 body.dark .dev-notice-btn-primary {
-    background: #6366f1;
+    background: var(--color-primary-500);
 }
 
 [data-theme="dark"] .dev-notice-btn-primary:hover,
 .dark-mode .dev-notice-btn-primary:hover,
 body.dark .dev-notice-btn-primary:hover {
-    background: #818cf8;
+    background: var(--color-primary-400);
     box-shadow: 0 4px 12px rgba(99, 102, 241, 0.5);
 }
 
 [data-theme="dark"] .dev-notice-btn-secondary,
 .dark-mode .dev-notice-btn-secondary,
 body.dark .dev-notice-btn-secondary {
-    background: #374151;
-    color: #e5e7eb;
-    border-color: #4b5563;
+    background: var(--color-gray-700);
+    color: var(--color-gray-200);
+    border-color: var(--color-gray-600);
 }
 
 [data-theme="dark"] .dev-notice-btn-secondary:hover,
 .dark-mode .dev-notice-btn-secondary:hover,
 body.dark .dev-notice-btn-secondary:hover {
-    background: #4b5563;
-    border-color: #6b7280;
+    background: var(--color-gray-600);
+    border-color: var(--color-gray-500);
 }
 
 /* Dark mode support - via system preference (fallback) */
 @media (prefers-color-scheme: dark) {
     .dev-notice-modal {
-        background: #1f2937;
+        background: var(--color-gray-800);
         box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
     }
 
     .dev-notice-header {
-        background: linear-gradient(135deg, #4338ca 0%, #6366f1 100%);
+        background: linear-gradient(135deg, var(--color-primary-700) 0%, var(--color-primary-500) 100%);
     }
 
     .dev-notice-body {
-        color: #e5e7eb;
+        color: var(--color-gray-200);
     }
 
     .dev-notice-body strong {
-        color: #ffffff;
+        color: var(--color-white);
     }
 
     .dev-notice-highlight {
         background: rgba(251, 191, 36, 0.15);
-        border-left-color: #fbbf24;
+        border-left-color: var(--color-amber-400);
         color: #fcd34d;
     }
 
     .dev-notice-footer {
-        background: #111827;
-        border-top-color: #374151;
+        background: var(--color-gray-900);
+        border-top-color: var(--color-gray-700);
     }
 
     .dev-notice-btn-primary {
-        background: #6366f1;
+        background: var(--color-primary-500);
     }
 
     .dev-notice-btn-primary:hover {
-        background: #818cf8;
+        background: var(--color-primary-400);
         box-shadow: 0 4px 12px rgba(99, 102, 241, 0.5);
     }
 
     .dev-notice-btn-secondary {
-        background: #374151;
-        color: #e5e7eb;
-        border-color: #4b5563;
+        background: var(--color-gray-700);
+        color: var(--color-gray-200);
+        border-color: var(--color-gray-600);
     }
 
     .dev-notice-btn-secondary:hover {
-        background: #4b5563;
-        border-color: #6b7280;
+        background: var(--color-gray-600);
+        border-color: var(--color-gray-500);
     }
 }
 
