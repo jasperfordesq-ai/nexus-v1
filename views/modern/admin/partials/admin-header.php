@@ -62,6 +62,8 @@ $adminBreadcrumbs = generateAdminBreadcrumbs($adminModules, $currentPath, $baseP
     <link rel="stylesheet" href="/assets/css/admin-menu-builder.css?v=<?= time() ?>">
     <!-- Admin Menu Index - Extracted inline styles -->
     <link rel="stylesheet" href="/assets/css/admin-menu-index.css?v=<?= time() ?>">
+    <!-- Federation External Partners -->
+    <link rel="stylesheet" href="/assets/css/admin/federation-external-partners.css?v=<?= time() ?>">
 </head>
 <body style="background:#0a0e1a;margin:0">
 <div class="admin-gold-wrapper">
