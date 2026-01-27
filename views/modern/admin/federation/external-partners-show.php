@@ -2,6 +2,8 @@
 /**
  * External Federation Partners - Show/Edit View
  * View and manage a single external federation partner
+ *
+ * Styles: /httpdocs/assets/css/admin/federation-external-partners.css
  */
 
 if (session_status() === PHP_SESSION_NONE) {
@@ -35,349 +37,7 @@ $statusColors = [
 $status = $statusColors[$partner['status']] ?? $statusColors['pending'];
 ?>
 
-<style>
-.partner-detail-page {
-    display: grid;
-    gap: 1.5rem;
-}
-
-/* Status Header */
-.status-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    background: var(--admin-card-bg, rgba(30, 41, 59, 0.5));
-    border: 1px solid var(--admin-border, rgba(255, 255, 255, 0.1));
-    border-radius: 12px;
-    padding: 1.25rem;
-}
-
-.status-info {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-}
-
-.status-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.35rem;
-    padding: 0.5rem 1rem;
-    border-radius: 20px;
-    font-size: 0.9rem;
-    font-weight: 600;
-}
-
-.status-details {
-    color: var(--admin-text-secondary, #94a3b8);
-    font-size: 0.9rem;
-}
-
-.status-actions {
-    display: flex;
-    gap: 0.5rem;
-}
-
-.action-btn {
-    padding: 0.5rem 1rem;
-    border-radius: 8px;
-    font-size: 0.85rem;
-    border: none;
-    cursor: pointer;
-    transition: all 0.2s;
-    display: inline-flex;
-    align-items: center;
-    gap: 0.35rem;
-}
-
-.action-btn.test {
-    background: rgba(16, 185, 129, 0.15);
-    color: #10b981;
-}
-
-.action-btn.suspend {
-    background: rgba(245, 158, 11, 0.15);
-    color: #f59e0b;
-}
-
-.action-btn.activate {
-    background: rgba(16, 185, 129, 0.15);
-    color: #10b981;
-}
-
-.action-btn.delete {
-    background: rgba(239, 68, 68, 0.15);
-    color: #ef4444;
-}
-
-.action-btn:hover {
-    transform: translateY(-1px);
-}
-
-/* Content Grid */
-.content-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 1.5rem;
-}
-
-@media (max-width: 1024px) {
-    .content-grid {
-        grid-template-columns: 1fr;
-    }
-}
-
-/* Form Section */
-.form-section {
-    background: var(--admin-card-bg, rgba(30, 41, 59, 0.5));
-    border: 1px solid var(--admin-border, rgba(255, 255, 255, 0.1));
-    border-radius: 12px;
-    padding: 1.5rem;
-}
-
-.form-section h3 {
-    font-size: 1rem;
-    font-weight: 600;
-    color: var(--admin-text, #fff);
-    margin: 0 0 1rem;
-    padding-bottom: 0.75rem;
-    border-bottom: 1px solid var(--admin-border, rgba(255, 255, 255, 0.1));
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-}
-
-.form-group {
-    margin-bottom: 1rem;
-}
-
-.form-label {
-    display: block;
-    font-size: 0.9rem;
-    font-weight: 500;
-    color: var(--admin-text, #fff);
-    margin-bottom: 0.5rem;
-}
-
-.form-hint {
-    font-size: 0.8rem;
-    color: var(--admin-text-secondary, #94a3b8);
-    margin-top: 0.35rem;
-}
-
-.form-input,
-.form-textarea,
-.form-select {
-    width: 100%;
-    padding: 0.75rem 1rem;
-    background: rgba(0, 0, 0, 0.3);
-    border: 1px solid var(--admin-border, rgba(255, 255, 255, 0.1));
-    border-radius: 8px;
-    color: var(--admin-text, #fff);
-    font-size: 0.95rem;
-    transition: all 0.2s;
-}
-
-.form-input:focus,
-.form-textarea:focus,
-.form-select:focus {
-    outline: none;
-    border-color: #8b5cf6;
-    box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.2);
-}
-
-.form-textarea {
-    min-height: 80px;
-    resize: vertical;
-}
-
-/* Permissions */
-.permissions-grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 0.5rem;
-}
-
-.permission-item {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 0.5rem;
-    background: rgba(0, 0, 0, 0.2);
-    border-radius: 6px;
-}
-
-.permission-item input[type="checkbox"] {
-    width: 16px;
-    height: 16px;
-    accent-color: #8b5cf6;
-}
-
-.permission-item label {
-    font-size: 0.85rem;
-    color: var(--admin-text, #fff);
-}
-
-/* Logs Section */
-.logs-section {
-    grid-column: 1 / -1;
-}
-
-.logs-table-wrapper {
-    overflow-x: auto;
-    max-height: 400px;
-    overflow-y: auto;
-}
-
-.logs-table {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 0.85rem;
-}
-
-.logs-table th,
-.logs-table td {
-    padding: 0.75rem;
-    text-align: left;
-    border-bottom: 1px solid var(--admin-border, rgba(255, 255, 255, 0.1));
-}
-
-.logs-table th {
-    background: rgba(0, 0, 0, 0.2);
-    font-weight: 600;
-    color: var(--admin-text-secondary, #94a3b8);
-    text-transform: uppercase;
-    font-size: 0.75rem;
-    letter-spacing: 0.5px;
-    position: sticky;
-    top: 0;
-}
-
-.logs-table tr:hover {
-    background: rgba(139, 92, 246, 0.05);
-}
-
-.log-method {
-    font-weight: 700;
-    padding: 0.2rem 0.5rem;
-    border-radius: 4px;
-    font-size: 0.75rem;
-}
-
-.log-method.GET { background: rgba(59, 130, 246, 0.2); color: #3b82f6; }
-.log-method.POST { background: rgba(16, 185, 129, 0.2); color: #10b981; }
-
-.log-endpoint {
-    font-family: monospace;
-    font-size: 0.8rem;
-    color: var(--admin-text-secondary, #94a3b8);
-    max-width: 300px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-}
-
-.log-status {
-    font-weight: 600;
-}
-
-.log-status.success { color: #10b981; }
-.log-status.error { color: #ef4444; }
-
-.log-time {
-    color: var(--admin-text-secondary, #64748b);
-    font-size: 0.8rem;
-}
-
-/* Buttons */
-.btn {
-    padding: 0.75rem 1.5rem;
-    border-radius: 8px;
-    font-size: 0.95rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.2s;
-    text-decoration: none;
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-    border: none;
-}
-
-.btn-primary {
-    background: linear-gradient(135deg, #8b5cf6, #7c3aed);
-    color: white;
-}
-
-.btn-primary:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(139, 92, 246, 0.4);
-}
-
-.btn-secondary {
-    background: rgba(100, 116, 139, 0.2);
-    color: var(--admin-text-secondary, #94a3b8);
-}
-
-/* Flash Messages */
-.flash-message {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 1rem;
-    border-radius: 8px;
-    margin-bottom: 1rem;
-}
-
-.flash-message.success {
-    background: rgba(16, 185, 129, 0.15);
-    border: 1px solid rgba(16, 185, 129, 0.3);
-    color: #10b981;
-}
-
-.flash-message.error {
-    background: rgba(239, 68, 68, 0.15);
-    border: 1px solid rgba(239, 68, 68, 0.3);
-    color: #ef4444;
-}
-
-/* Error Display */
-.error-display {
-    background: rgba(239, 68, 68, 0.1);
-    border: 1px solid rgba(239, 68, 68, 0.2);
-    border-radius: 8px;
-    padding: 1rem;
-    margin-top: 1rem;
-}
-
-.error-display h4 {
-    color: #ef4444;
-    font-size: 0.9rem;
-    margin: 0 0 0.5rem;
-}
-
-.error-display p {
-    color: var(--admin-text-secondary, #94a3b8);
-    font-size: 0.85rem;
-    margin: 0;
-    font-family: monospace;
-}
-
-/* Back Link */
-.back-link {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-    color: var(--admin-text-secondary, #94a3b8);
-    text-decoration: none;
-    font-size: 0.9rem;
-    margin-bottom: 1rem;
-}
-
-.back-link:hover {
-    color: #8b5cf6;
-}
-</style>
+<div class="federation-partners-page">
 
 <a href="/admin/federation/external-partners" class="back-link">
     <i class="fa-solid fa-arrow-left"></i> Back to External Partners
@@ -414,7 +74,7 @@ $status = $statusColors[$partner['status']] ?? $statusColors['pending'];
             </div>
         </div>
         <div class="status-actions">
-            <form method="POST" action="/admin/federation/external-partners/<?= $partner['id'] ?>/test" style="display:inline;">
+            <form method="POST" action="/admin/federation/external-partners/<?= $partner['id'] ?>/test" class="action-form-inline">
                 <input type="hidden" name="csrf_token" value="<?= Csrf::token() ?>">
                 <button type="submit" class="action-btn test">
                     <i class="fa-solid fa-plug"></i> Test Connection
@@ -422,14 +82,14 @@ $status = $statusColors[$partner['status']] ?? $statusColors['pending'];
             </form>
 
             <?php if ($partner['status'] === 'active'): ?>
-            <form method="POST" action="/admin/federation/external-partners/<?= $partner['id'] ?>/suspend" style="display:inline;">
+            <form method="POST" action="/admin/federation/external-partners/<?= $partner['id'] ?>/suspend" class="action-form-inline">
                 <input type="hidden" name="csrf_token" value="<?= Csrf::token() ?>">
                 <button type="submit" class="action-btn suspend" onclick="return confirm('Suspend this partner?')">
                     <i class="fa-solid fa-pause"></i> Suspend
                 </button>
             </form>
             <?php elseif ($partner['status'] === 'suspended'): ?>
-            <form method="POST" action="/admin/federation/external-partners/<?= $partner['id'] ?>/activate" style="display:inline;">
+            <form method="POST" action="/admin/federation/external-partners/<?= $partner['id'] ?>/activate" class="action-form-inline">
                 <input type="hidden" name="csrf_token" value="<?= Csrf::token() ?>">
                 <button type="submit" class="action-btn activate">
                     <i class="fa-solid fa-play"></i> Activate
@@ -437,7 +97,7 @@ $status = $statusColors[$partner['status']] ?? $statusColors['pending'];
             </form>
             <?php endif; ?>
 
-            <form method="POST" action="/admin/federation/external-partners/<?= $partner['id'] ?>/delete" style="display:inline;">
+            <form method="POST" action="/admin/federation/external-partners/<?= $partner['id'] ?>/delete" class="action-form-inline">
                 <input type="hidden" name="csrf_token" value="<?= Csrf::token() ?>">
                 <button type="submit" class="action-btn delete" onclick="return confirm('Delete this partner? This cannot be undone.')">
                     <i class="fa-solid fa-trash"></i> Delete
@@ -501,12 +161,19 @@ $status = $statusColors[$partner['status']] ?? $statusColors['pending'];
                         <option value="api_key" <?= ($partner['auth_method'] ?? 'api_key') === 'api_key' ? 'selected' : '' ?>>API Key (Bearer Token)</option>
                         <option value="hmac" <?= ($partner['auth_method'] ?? '') === 'hmac' ? 'selected' : '' ?>>HMAC-SHA256 Signing</option>
                     </select>
+                    <p class="form-hint">Choose how to authenticate with the external server</p>
                 </div>
 
                 <div class="form-group">
                     <label class="form-label">API Key</label>
                     <input type="password" name="api_key" class="form-input" placeholder="Enter new key to change (leave blank to keep current)">
-                    <p class="form-hint">Leave blank to keep the current API key</p>
+                    <p class="form-hint">Leave blank to keep the current API key - used for authentication</p>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Signing Secret</label>
+                    <input type="password" name="signing_secret" class="form-input" placeholder="Enter new secret to change (leave blank to keep current)">
+                    <p class="form-hint">Leave blank to keep the current signing secret - used for HMAC request signatures</p>
                 </div>
             </div>
 
@@ -541,7 +208,7 @@ $status = $statusColors[$partner['status']] ?? $statusColors['pending'];
                     </div>
                 </div>
 
-                <div style="margin-top: 1.5rem;">
+                <div class="form-save-wrapper">
                     <button type="submit" class="btn btn-primary">
                         <i class="fa-solid fa-save"></i> Save Changes
                     </button>
@@ -578,7 +245,7 @@ $status = $statusColors[$partner['status']] ?? $statusColors['pending'];
                 <h3><i class="fa-solid fa-clock-rotate-left"></i> Recent API Calls</h3>
 
                 <?php if (empty($logs)): ?>
-                <p style="color: var(--admin-text-secondary); text-align: center; padding: 2rem;">
+                <p class="empty-log-message">
                     No API calls yet. Test the connection to see activity.
                 </p>
                 <?php else: ?>
@@ -617,5 +284,7 @@ $status = $statusColors[$partner['status']] ?? $statusColors['pending'];
         </div>
     </form>
 </div>
+
+</div><!-- /.federation-partners-page -->
 
 <?php require __DIR__ . '/../partials/admin-footer.php'; ?>

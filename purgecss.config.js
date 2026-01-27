@@ -23,6 +23,7 @@ module.exports = {
         'httpdocs/assets/css/admin-menu-index.css',
         'httpdocs/assets/css/admin-settings.css',
         'httpdocs/assets/css/admin-sidebar.css',
+        'httpdocs/assets/css/admin/federation-external-partners.css',
         'httpdocs/assets/css/ai-chat-widget.css',
         'httpdocs/assets/css/auth.css',
         'httpdocs/assets/css/avatar-placeholders.css',
