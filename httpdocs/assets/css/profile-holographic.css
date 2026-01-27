@@ -13,10 +13,10 @@
     right: 0;
     bottom: 0;
     background:
-        radial-gradient(ellipse 80% 50% at 20% 20%, rgba(99, 102, 241, 0.15) 0%, transparent 50%),
-        radial-gradient(ellipse 60% 40% at 80% 30%, rgba(168, 85, 247, 0.12) 0%, transparent 50%),
-        radial-gradient(ellipse 70% 60% at 50% 80%, rgba(236, 72, 153, 0.1) 0%, transparent 50%),
-        radial-gradient(ellipse 50% 50% at 10% 90%, rgba(6, 182, 212, 0.08) 0%, transparent 50%);
+        radial-gradient(ellipse 80% 50% at 20% 20%, var(--effect-primary-15) 0%, transparent 50%),
+        radial-gradient(ellipse 60% 40% at 80% 30%, var(--effect-violet-12) 0%, transparent 50%),
+        radial-gradient(ellipse 70% 60% at 50% 80%, var(--effect-pink-10) 0%, transparent 50%),
+        radial-gradient(ellipse 50% 50% at 10% 90%, var(--effect-cyan-8) 0%, transparent 50%);
     pointer-events: none;
     z-index: -1;
     animation: holoShift 20s ease-in-out infinite;
@@ -52,7 +52,7 @@
 .holo-profile-bg::before {
     width: 400px;
     height: 400px;
-    background: radial-gradient(circle, rgba(99, 102, 241, 0.2) 0%, transparent 70%);
+    background: radial-gradient(circle, var(--effect-primary-20) 0%, transparent 70%);
     top: 10%;
     left: -5%;
     animation-delay: -5s;
@@ -61,7 +61,7 @@
 .holo-profile-bg::after {
     width: 350px;
     height: 350px;
-    background: radial-gradient(circle, rgba(236, 72, 153, 0.15) 0%, transparent 70%);
+    background: radial-gradient(circle, var(--effect-pink-15) 0%, transparent 70%);
     bottom: 20%;
     right: -5%;
     animation-delay: -10s;
@@ -77,10 +77,10 @@
 /* Dark mode adjustments */
 [data-theme="dark"] .holo-profile-bg {
     background:
-        radial-gradient(ellipse 80% 50% at 20% 20%, rgba(99, 102, 241, 0.2) 0%, transparent 50%),
-        radial-gradient(ellipse 60% 40% at 80% 30%, rgba(168, 85, 247, 0.18) 0%, transparent 50%),
-        radial-gradient(ellipse 70% 60% at 50% 80%, rgba(236, 72, 153, 0.15) 0%, transparent 50%),
-        radial-gradient(ellipse 50% 50% at 10% 90%, rgba(6, 182, 212, 0.12) 0%, transparent 50%);
+        radial-gradient(ellipse 80% 50% at 20% 20%, var(--effect-primary-20) 0%, transparent 50%),
+        radial-gradient(ellipse 60% 40% at 80% 30%, var(--effect-violet-18) 0%, transparent 50%),
+        radial-gradient(ellipse 70% 60% at 50% 80%, var(--effect-pink-15) 0%, transparent 50%),
+        radial-gradient(ellipse 50% 50% at 10% 90%, var(--effect-cyan-12) 0%, transparent 50%);
 }
 
 /* ============================================
@@ -111,15 +111,15 @@ main#main-content .htb-container > * {
    GLASS PROFILE CARD - MAIN HEADER
    ============================================ */
 .glass-profile-card {
-    background: rgba(255, 255, 255, 0.75);
+    background: var(--effect-white-75);
     backdrop-filter: blur(24px) saturate(180%);
     -webkit-backdrop-filter: blur(24px) saturate(180%);
     border-radius: 28px; /* Custom value for premium look */
-    border: 1px solid rgba(255, 255, 255, 0.5);
+    border: 1px solid var(--effect-white-50);
     box-shadow:
-        0 8px 32px rgba(99, 102, 241, 0.1),
-        0 4px 16px rgba(0, 0, 0, 0.05),
-        inset 0 1px 0 rgba(255, 255, 255, 0.8);
+        0 8px 32px var(--effect-primary-10),
+        0 4px 16px var(--effect-black-5),
+        inset 0 1px 0 var(--effect-white-80);
     padding: var(--space-8);
     margin-bottom: var(--space-6);
     position: relative;
@@ -138,7 +138,7 @@ main#main-content .htb-container > * {
     background: linear-gradient(
         90deg,
         transparent,
-        rgba(255, 255, 255, 0.4),
+        var(--effect-white-40),
         transparent
     );
     animation: shimmer 8s ease-in-out infinite;
@@ -153,9 +153,9 @@ main#main-content .htb-container > * {
 .glass-profile-card:hover {
     transform: translateY(-4px);
     box-shadow:
-        0 16px 48px rgba(99, 102, 241, 0.2),
-        0 8px 24px rgba(0, 0, 0, 0.08),
-        inset 0 1px 0 rgba(255, 255, 255, 0.9);
+        0 16px 48px var(--effect-primary-20),
+        0 8px 24px var(--effect-black-8),
+        inset 0 1px 0 var(--effect-white-90);
 }
 
 /* Rainbow border on hover */
@@ -167,10 +167,10 @@ main#main-content .htb-container > * {
     padding: 2px;
     background: linear-gradient(
         135deg,
-        rgba(99, 102, 241, 0.5),
-        rgba(168, 85, 247, 0.5),
-        rgba(236, 72, 153, 0.5),
-        rgba(6, 182, 212, 0.5)
+        var(--effect-primary-50),
+        var(--effect-violet-50),
+        var(--effect-pink-50),
+        var(--effect-cyan-50)
     );
     -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
     mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
@@ -187,20 +187,20 @@ main#main-content .htb-container > * {
 
 /* Dark mode profile card */
 [data-theme="dark"] .glass-profile-card {
-    background: rgba(30, 41, 59, 0.8);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: var(--effect-slate-80);
+    border: 1px solid var(--effect-white-10);
     box-shadow:
-        0 8px 32px rgba(0, 0, 0, 0.3),
-        0 4px 16px rgba(99, 102, 241, 0.1),
-        inset 0 1px 0 rgba(255, 255, 255, 0.05);
+        0 8px 32px var(--effect-black-30),
+        0 4px 16px var(--effect-primary-10),
+        inset 0 1px 0 var(--effect-white-5);
 }
 
 [data-theme="dark"] .glass-profile-card:hover {
     box-shadow:
-        0 16px 48px rgba(0, 0, 0, 0.4),
-        0 8px 24px rgba(99, 102, 241, 0.2),
-        0 0 60px rgba(139, 92, 246, 0.1),
-        inset 0 1px 0 rgba(255, 255, 255, 0.08);
+        0 16px 48px var(--effect-black-40),
+        0 8px 24px var(--effect-primary-20),
+        0 0 60px var(--effect-purple-10),
+        inset 0 1px 0 var(--effect-white-8);
 }
 
 /* ============================================
@@ -295,22 +295,22 @@ main#main-content .htb-container > * {
         linear-gradient(white, white) padding-box,
         linear-gradient(135deg, var(--color-primary-500), var(--color-purple-400), var(--color-pink-500)) border-box;
     box-shadow:
-        0 8px 32px rgba(99, 102, 241, 0.25),
-        0 0 0 4px rgba(255, 255, 255, 0.3);
+        0 8px 32px var(--effect-primary-25),
+        0 0 0 4px var(--effect-white-30);
     transition: transform 0.4s ease, box-shadow 0.4s ease;
     animation: avatarGlow 4s ease-in-out infinite;
 }
 
 @keyframes avatarGlow {
-    0%, 100% { box-shadow: 0 8px 32px rgba(99, 102, 241, 0.25), 0 0 0 4px rgba(255, 255, 255, 0.3); }
-    50% { box-shadow: 0 8px 40px rgba(139, 92, 246, 0.35), 0 0 0 4px rgba(255, 255, 255, 0.5); }
+    0%, 100% { box-shadow: 0 8px 32px var(--effect-primary-25), 0 0 0 4px var(--effect-white-30); }
+    50% { box-shadow: 0 8px 40px var(--effect-purple-35), 0 0 0 4px var(--effect-white-50); }
 }
 
 .glass-avatar:hover {
     transform: scale(1.05) rotate(3deg);
     box-shadow:
-        0 12px 40px rgba(99, 102, 241, 0.35),
-        0 0 0 6px rgba(255, 255, 255, 0.5);
+        0 12px 40px var(--effect-primary-35),
+        0 0 0 6px var(--effect-white-50);
 }
 
 [data-theme="dark"] .glass-avatar {
@@ -318,8 +318,8 @@ main#main-content .htb-container > * {
         linear-gradient(var(--color-slate-800), var(--color-slate-800)) padding-box,
         linear-gradient(135deg, var(--color-primary-500), var(--color-purple-400), var(--color-pink-500)) border-box;
     box-shadow:
-        0 8px 32px rgba(99, 102, 241, 0.3),
-        0 0 0 4px rgba(99, 102, 241, 0.2);
+        0 8px 32px var(--effect-primary-30),
+        0 0 0 4px var(--effect-primary-20);
 }
 
 /* Online indicator */
@@ -331,7 +331,7 @@ main#main-content .htb-container > * {
     height: 28px;
     border-radius: 50%;
     border: var(--space-1) solid white;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 2px 8px var(--effect-black-20);
 }
 
 [data-theme="dark"] .profile-online-indicator {
@@ -339,8 +339,8 @@ main#main-content .htb-container > * {
 }
 
 @keyframes pulse-online {
-    0%, 100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.5), 0 2px 8px rgba(0, 0, 0, 0.2); }
-    50% { box-shadow: 0 0 0 10px rgba(16, 185, 129, 0), 0 2px 8px rgba(0, 0, 0, 0.2); }
+    0%, 100% { box-shadow: 0 0 0 0 var(--effect-emerald-50), 0 2px 8px var(--effect-black-20); }
+    50% { box-shadow: 0 0 0 10px var(--effect-emerald-0), 0 2px 8px var(--effect-black-20); }
 }
 
 /* ============================================
@@ -383,34 +383,34 @@ h2.profile-display-name {
     align-items: center;
     gap: var(--space-2);
     padding: 10px var(--space-4);
-    background: rgba(255, 255, 255, 0.6);
+    background: var(--effect-white-60);
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
-    border: 1px solid rgba(255, 255, 255, 0.4);
+    border: 1px solid var(--effect-white-40);
     border-radius: var(--radius-full);
     font-size: var(--font-size-sm);
     font-weight: 500;
     color: var(--color-gray-700);
     transition: all 0.3s ease;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    box-shadow: 0 2px 8px var(--effect-black-5);
 }
 
 .glass-info-badge:hover {
     transform: translateY(-2px) scale(1.02);
-    background: rgba(99, 102, 241, 0.15);
-    border-color: rgba(99, 102, 241, 0.3);
-    box-shadow: 0 4px 16px rgba(99, 102, 241, 0.15);
+    background: var(--effect-primary-15);
+    border-color: var(--effect-primary-30);
+    box-shadow: 0 4px 16px var(--effect-primary-15);
 }
 
 [data-theme="dark"] .glass-info-badge {
-    background: rgba(255, 255, 255, 0.08);
-    border-color: rgba(255, 255, 255, 0.12);
+    background: var(--effect-white-8);
+    border-color: var(--effect-white-12);
     color: var(--color-slate-200);
 }
 
 [data-theme="dark"] .glass-info-badge:hover {
-    background: rgba(99, 102, 241, 0.2);
-    border-color: rgba(99, 102, 241, 0.4);
+    background: var(--effect-primary-20);
+    border-color: var(--effect-primary-40);
 }
 
 /* ============================================
@@ -432,8 +432,8 @@ h2.profile-display-name {
     cursor: pointer;
     transition: all 0.3s ease;
     box-shadow:
-        0 4px 15px rgba(99, 102, 241, 0.35),
-        inset 0 1px 0 rgba(255, 255, 255, 0.2);
+        0 4px 15px var(--effect-primary-35),
+        inset 0 1px 0 var(--effect-white-20);
     text-decoration: none;
     position: relative;
     overflow: hidden;
@@ -446,7 +446,7 @@ h2.profile-display-name {
     left: -100%;
     width: 100%;
     height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+    background: linear-gradient(90deg, transparent, var(--effect-white-30), transparent);
     transition: left 0.5s ease;
 }
 
@@ -454,9 +454,9 @@ h2.profile-display-name {
     transform: translateY(-3px) scale(1.02);
     background-position: 100% 50%;
     box-shadow:
-        0 8px 25px rgba(99, 102, 241, 0.45),
-        0 0 30px rgba(139, 92, 246, 0.2),
-        inset 0 1px 0 rgba(255, 255, 255, 0.3);
+        0 8px 25px var(--effect-primary-45),
+        0 0 30px var(--effect-purple-20),
+        inset 0 1px 0 var(--effect-white-30);
 }
 
 .glass-btn:hover::before {
@@ -468,39 +468,39 @@ h2.profile-display-name {
 }
 
 .glass-btn-secondary {
-    background: rgba(255, 255, 255, 0.7);
+    background: var(--effect-white-70);
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
     color: var(--color-gray-700);
-    border: 1px solid rgba(255, 255, 255, 0.5);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    border: 1px solid var(--effect-white-50);
+    box-shadow: 0 4px 12px var(--effect-black-8);
 }
 
 .glass-btn-secondary:hover {
-    background: rgba(99, 102, 241, 0.1);
-    border-color: rgba(99, 102, 241, 0.3);
+    background: var(--effect-primary-10);
+    border-color: var(--effect-primary-30);
     color: var(--color-primary-600);
-    box-shadow: 0 6px 20px rgba(99, 102, 241, 0.15);
+    box-shadow: 0 6px 20px var(--effect-primary-15);
 }
 
 [data-theme="dark"] .glass-btn-secondary {
-    background: rgba(255, 255, 255, 0.08);
-    border-color: rgba(255, 255, 255, 0.12);
+    background: var(--effect-white-8);
+    border-color: var(--effect-white-12);
     color: var(--color-slate-200);
 }
 
 [data-theme="dark"] .glass-btn-secondary:hover {
-    background: rgba(99, 102, 241, 0.2);
+    background: var(--effect-primary-20);
     color: var(--color-primary-300);
 }
 
 .glass-btn-success {
     background: linear-gradient(135deg, var(--color-success) 0%, var(--color-emerald-600) 100%);
-    box-shadow: 0 4px 15px rgba(16, 185, 129, 0.35);
+    box-shadow: 0 4px 15px var(--effect-emerald-35);
 }
 
 .glass-btn-success:hover {
-    box-shadow: 0 8px 25px rgba(16, 185, 129, 0.45);
+    box-shadow: 0 8px 25px var(--effect-emerald-45);
 }
 
 /* ============================================
@@ -511,9 +511,9 @@ h2.profile-display-name {
     background: linear-gradient(
         90deg,
         transparent 0%,
-        rgba(99, 102, 241, 0.3) 20%,
-        rgba(168, 85, 247, 0.4) 50%,
-        rgba(236, 72, 153, 0.3) 80%,
+        var(--effect-primary-30) 20%,
+        var(--effect-violet-40) 50%,
+        var(--effect-pink-30) 80%,
         transparent 100%
     );
     margin: 28px 0; /* Custom value for visual rhythm */
@@ -528,10 +528,10 @@ h2.profile-display-name {
     align-items: center;
     gap: 10px; /* Custom for visual balance */
     padding: var(--space-3) 18px;
-    background: rgba(255, 255, 255, 0.6);
+    background: var(--effect-white-60);
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
-    border: 1px solid rgba(255, 255, 255, 0.4);
+    border: 1px solid var(--effect-white-40);
     border-radius: var(--radius-lg);
     font-size: var(--font-size-sm);
     color: var(--color-gray-700);
@@ -541,29 +541,29 @@ h2.profile-display-name {
 
 .glass-badge:hover {
     transform: translateY(-4px) scale(1.03);
-    background: rgba(99, 102, 241, 0.15);
-    border-color: rgba(99, 102, 241, 0.35);
+    background: var(--effect-primary-15);
+    border-color: var(--effect-primary-35);
     box-shadow:
-        0 8px 24px rgba(99, 102, 241, 0.2),
-        0 0 20px rgba(139, 92, 246, 0.1);
+        0 8px 24px var(--effect-primary-20),
+        0 0 20px var(--effect-purple-10);
 }
 
 .featured-badge {
-    background: linear-gradient(135deg, rgba(245, 158, 11, 0.15) 0%, rgba(217, 119, 6, 0.1) 100%);
-    border: 2px solid rgba(245, 158, 11, 0.35);
+    background: linear-gradient(135deg, var(--effect-amber-15) 0%, var(--effect-amber-600-10) 100%);
+    border: 2px solid var(--effect-amber-35);
 }
 
 .featured-badge:hover {
-    background: linear-gradient(135deg, rgba(245, 158, 11, 0.25) 0%, rgba(217, 119, 6, 0.2) 100%);
-    border-color: rgba(245, 158, 11, 0.5);
+    background: linear-gradient(135deg, var(--effect-amber-25) 0%, var(--effect-amber-600-20) 100%);
+    border-color: var(--effect-amber-50);
     box-shadow:
-        0 8px 24px rgba(245, 158, 11, 0.25),
-        0 0 20px rgba(245, 158, 11, 0.1);
+        0 8px 24px var(--effect-amber-25),
+        0 0 20px var(--effect-amber-10);
 }
 
 [data-theme="dark"] .glass-badge {
-    background: rgba(255, 255, 255, 0.08);
-    border-color: rgba(255, 255, 255, 0.12);
+    background: var(--effect-white-8);
+    border-color: var(--effect-white-12);
     color: var(--color-slate-200);
 }
 
@@ -571,24 +571,24 @@ h2.profile-display-name {
    FRIENDS SECTION
    ============================================ */
 .profile-friends-card {
-    background: rgba(255, 255, 255, 0.7);
+    background: var(--effect-white-70);
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
     border-radius: var(--radius-xl);
-    border: 1px solid rgba(255, 255, 255, 0.4);
-    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.06);
+    border: 1px solid var(--effect-white-40);
+    box-shadow: 0 4px 24px var(--effect-black-6);
     padding: var(--space-6);
     margin-bottom: var(--space-6);
     transition: all 0.3s ease;
 }
 
 .profile-friends-card:hover {
-    box-shadow: 0 8px 32px rgba(99, 102, 241, 0.12);
+    box-shadow: 0 8px 32px var(--effect-primary-12);
 }
 
 [data-theme="dark"] .profile-friends-card {
-    background: rgba(30, 41, 59, 0.75);
-    border-color: rgba(255, 255, 255, 0.08);
+    background: var(--effect-slate-75);
+    border-color: var(--effect-white-8);
 }
 
 .profile-friends-header {
@@ -638,19 +638,19 @@ h2.profile-display-name {
     align-items: center;
     gap: var(--space-3);
     padding: var(--space-3);
-    background: rgba(255, 255, 255, 0.5);
+    background: var(--effect-white-50);
     border-radius: var(--radius-lg);
     text-decoration: none;
     transition: all 0.3s ease;
 }
 
 .profile-friend-item:hover {
-    background: rgba(99, 102, 241, 0.1);
+    background: var(--effect-primary-10);
     transform: translateY(-2px);
 }
 
 [data-theme="dark"] .profile-friend-item {
-    background: rgba(255, 255, 255, 0.05);
+    background: var(--effect-white-5);
 }
 
 .profile-friend-avatar {
@@ -706,12 +706,12 @@ h2.profile-display-name {
    COMPOSER CARD
    ============================================ */
 .glass-composer {
-    background: rgba(255, 255, 255, 0.7);
+    background: var(--effect-white-70);
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
     border-radius: var(--radius-xl);
-    border: 1px solid rgba(255, 255, 255, 0.4);
-    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.06);
+    border: 1px solid var(--effect-white-40);
+    box-shadow: 0 4px 24px var(--effect-black-6);
     padding: var(--space-6);
     margin-bottom: var(--space-6);
     cursor: pointer;
@@ -721,14 +721,14 @@ h2.profile-display-name {
 .glass-composer:hover {
     transform: translateY(-3px);
     box-shadow:
-        0 12px 32px rgba(99, 102, 241, 0.15),
-        0 0 20px rgba(139, 92, 246, 0.08);
-    border-color: rgba(99, 102, 241, 0.3);
+        0 12px 32px var(--effect-primary-15),
+        0 0 20px var(--effect-purple-8);
+    border-color: var(--effect-primary-30);
 }
 
 [data-theme="dark"] .glass-composer {
-    background: rgba(30, 41, 59, 0.75);
-    border-color: rgba(255, 255, 255, 0.08);
+    background: var(--effect-slate-75);
+    border-color: var(--effect-white-8);
 }
 
 [data-theme="dark"] .glass-composer h3 {
@@ -743,12 +743,12 @@ h2.profile-display-name {
    ACTIVITY CARD
    ============================================ */
 .glass-activity-card {
-    background: rgba(255, 255, 255, 0.7);
+    background: var(--effect-white-70);
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
     border-radius: var(--radius-xl);
-    border: 1px solid rgba(255, 255, 255, 0.4);
-    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.06);
+    border: 1px solid var(--effect-white-40);
+    box-shadow: 0 4px 24px var(--effect-black-6);
     padding: 28px; /* Custom value for emphasis */
     margin-bottom: var(--space-6);
 }
@@ -760,8 +760,8 @@ h2.profile-display-name {
 }
 
 [data-theme="dark"] .glass-activity-card {
-    background: rgba(30, 41, 59, 0.75);
-    border-color: rgba(255, 255, 255, 0.08);
+    background: var(--effect-slate-75);
+    border-color: var(--effect-white-8);
 }
 
 [data-theme="dark"] .glass-activity-card h3 {
@@ -772,10 +772,10 @@ h2.profile-display-name {
    REVIEW CARDS
    ============================================ */
 .glass-review-card {
-    background: rgba(255, 255, 255, 0.6);
+    background: var(--effect-white-60);
     backdrop-filter: blur(16px);
     -webkit-backdrop-filter: blur(16px);
-    border: 1px solid rgba(255, 255, 255, 0.35);
+    border: 1px solid var(--effect-white-35);
     border-radius: 18px; /* Custom value between lg and xl */
     padding: var(--space-6);
     transition: all 0.3s ease;
@@ -783,12 +783,12 @@ h2.profile-display-name {
 
 .glass-review-card:hover {
     transform: translateY(-2px);
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+    box-shadow: 0 8px 24px var(--effect-black-8);
 }
 
 [data-theme="dark"] .glass-review-card {
-    background: rgba(255, 255, 255, 0.05);
-    border-color: rgba(255, 255, 255, 0.08);
+    background: var(--effect-white-5);
+    border-color: var(--effect-white-8);
 }
 
 /* ============================================
@@ -821,10 +821,10 @@ h2.profile-display-name {
 .glass-activity-card .feed-card,
 .glass-activity-card .nexus-feed-card,
 .glass-activity-card .fb-card {
-    background: rgba(255, 255, 255, 0.5);
+    background: var(--effect-white-50);
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
-    border: 1px solid rgba(255, 255, 255, 0.35);
+    border: 1px solid var(--effect-white-35);
     border-radius: var(--radius-lg);
     margin-bottom: var(--space-4);
     overflow: hidden;
@@ -833,8 +833,8 @@ h2.profile-display-name {
 [data-theme="dark"] .glass-activity-card .feed-card,
 [data-theme="dark"] .glass-activity-card .nexus-feed-card,
 [data-theme="dark"] .glass-activity-card .fb-card {
-    background: rgba(255, 255, 255, 0.05);
-    border-color: rgba(255, 255, 255, 0.08);
+    background: var(--effect-white-5);
+    border-color: var(--effect-white-8);
 }
 
 /* ============================================
@@ -923,8 +923,8 @@ h2.profile-display-name {
    BADGE VARIANT STYLES
    ============================================ */
 .badge-online {
-    background: linear-gradient(135deg, rgba(16, 185, 129, 0.2), rgba(5, 150, 105, 0.1));
-    border-color: rgba(16, 185, 129, 0.3);
+    background: linear-gradient(135deg, var(--effect-emerald-20), var(--effect-emerald-600-10));
+    border-color: var(--effect-emerald-30);
 }
 
 .badge-online strong {
@@ -932,8 +932,8 @@ h2.profile-display-name {
 }
 
 .badge-recent {
-    background: linear-gradient(135deg, rgba(245, 158, 11, 0.15), rgba(217, 119, 6, 0.1));
-    border-color: rgba(245, 158, 11, 0.3);
+    background: linear-gradient(135deg, var(--effect-amber-15), var(--effect-amber-600-10));
+    border-color: var(--effect-amber-30);
 }
 
 .badge-recent i {
@@ -946,8 +946,8 @@ h2.profile-display-name {
 }
 
 .badge-credits {
-    background: linear-gradient(135deg, rgba(16, 185, 129, 0.2), rgba(5, 150, 105, 0.1));
-    border-color: rgba(16, 185, 129, 0.3);
+    background: linear-gradient(135deg, var(--effect-emerald-20), var(--effect-emerald-600-10));
+    border-color: var(--effect-emerald-30);
 }
 
 .badge-credits i {
@@ -955,8 +955,8 @@ h2.profile-display-name {
 }
 
 .badge-owner {
-    background: linear-gradient(135deg, rgba(251, 191, 36, 0.2), rgba(245, 158, 11, 0.15));
-    border-color: rgba(251, 191, 36, 0.4);
+    background: linear-gradient(135deg, var(--effect-amber-300-20), var(--effect-amber-15));
+    border-color: var(--effect-amber-300-40);
     text-decoration: none;
 }
 
@@ -969,8 +969,8 @@ h2.profile-display-name {
 }
 
 .badge-admin-role {
-    background: linear-gradient(135deg, rgba(139, 92, 246, 0.2), rgba(124, 58, 237, 0.15));
-    border-color: rgba(139, 92, 246, 0.4);
+    background: linear-gradient(135deg, var(--effect-purple-20), var(--effect-violet-600-15));
+    border-color: var(--effect-purple-40);
     text-decoration: none;
 }
 
@@ -983,8 +983,8 @@ h2.profile-display-name {
 }
 
 .badge-rating {
-    background: linear-gradient(135deg, rgba(245, 158, 11, 0.2), rgba(217, 119, 6, 0.1));
-    border-color: rgba(245, 158, 11, 0.3);
+    background: linear-gradient(135deg, var(--effect-amber-20), var(--effect-amber-600-10));
+    border-color: var(--effect-amber-30);
     text-decoration: none;
     cursor: pointer;
 }
@@ -1015,8 +1015,8 @@ h2.profile-display-name {
 }
 
 .badge-admin-phone {
-    background: linear-gradient(135deg, rgba(239, 68, 68, 0.2), rgba(220, 38, 38, 0.1));
-    border-color: rgba(239, 68, 68, 0.3);
+    background: linear-gradient(135deg, var(--effect-red-20), var(--effect-red-600-10));
+    border-color: var(--effect-red-3);
 }
 
 .badge-admin-phone i {
@@ -1042,7 +1042,7 @@ h2.profile-display-name {
 .btn-warning {
     background: #d4621f; /* WCAG 2.1 AA: 4.7:1 contrast */
     color: var(--color-white);
-    box-shadow: 0 4px 15px rgba(212, 98, 31, 0.35);
+    box-shadow: 0 4px 15px var(--effect-orange-custom-35);
 }
 
 .btn-warning span,
@@ -1052,22 +1052,22 @@ h2.profile-display-name {
 
 .btn-warning:hover {
     background: #b85316; /* Darker on hover */
-    box-shadow: 0 8px 25px rgba(212, 98, 31, 0.45);
+    box-shadow: 0 8px 25px var(--effect-orange-custom-45);
 }
 
 .btn-purple {
     background: linear-gradient(135deg, var(--color-purple-500) 0%, var(--color-purple-600) 100%);
-    box-shadow: 0 4px 15px rgba(139, 92, 246, 0.35);
+    box-shadow: 0 4px 15px var(--effect-purple-35);
 }
 
 .btn-purple:hover {
-    box-shadow: 0 8px 25px rgba(139, 92, 246, 0.45);
+    box-shadow: 0 8px 25px var(--effect-purple-45);
 }
 
 .btn-danger {
     background: #b91e0a; /* WCAG 2.1 AA: 6.8:1 contrast */
     color: var(--color-white);
-    box-shadow: 0 4px 15px rgba(185, 30, 10, 0.35);
+    box-shadow: 0 4px 15px var(--effect-red-custom-35);
 }
 
 .btn-danger span,
@@ -1077,7 +1077,7 @@ h2.profile-display-name {
 
 .btn-danger:hover {
     background: #9a1908; /* Darker on hover */
-    box-shadow: 0 8px 25px rgba(185, 30, 10, 0.45);
+    box-shadow: 0 8px 25px var(--effect-red-custom-45);
 }
 
 .btn-disabled {
@@ -1131,8 +1131,8 @@ h2.profile-display-name {
 }
 
 .featured-badge {
-    background: linear-gradient(135deg, rgba(245, 158, 11, 0.15), rgba(217, 119, 6, 0.1));
-    border: 2px solid rgba(245, 158, 11, 0.3);
+    background: linear-gradient(135deg, var(--effect-amber-15), var(--effect-amber-600-10));
+    border: 2px solid var(--effect-amber-30);
     border-radius: var(--radius-lg);
     padding: var(--space-4) var(--space-5);
     display: flex;
@@ -1145,8 +1145,8 @@ h2.profile-display-name {
 
 .featured-badge:hover {
     transform: translateY(-4px) scale(1.03);
-    box-shadow: 0 8px 24px rgba(245, 158, 11, 0.25);
-    border-color: rgba(245, 158, 11, 0.5);
+    box-shadow: 0 8px 24px var(--effect-amber-25);
+    border-color: var(--effect-amber-50);
 }
 
 .featured-badge .badge-icon {
@@ -1229,8 +1229,8 @@ h2.profile-display-name {
 .badge-preview-pill {
     width: 36px;
     height: 36px;
-    background: rgba(168, 85, 247, 0.1);
-    border: 1px solid rgba(168, 85, 247, 0.25);
+    background: var(--effect-violet-10);
+    border: 1px solid var(--effect-violet-25);
     border-radius: 10px; /* Custom between base and md */
     display: flex;
     align-items: center;
@@ -1239,15 +1239,15 @@ h2.profile-display-name {
 }
 
 .badges-section.featured .badge-preview-pill {
-    background: rgba(245, 158, 11, 0.1);
-    border-color: rgba(245, 158, 11, 0.25);
+    background: var(--effect-amber-10);
+    border-color: var(--effect-amber-25);
 }
 
 .badge-preview-count {
     width: 36px;
     height: 36px;
-    background: rgba(99, 102, 241, 0.1);
-    border: 1px solid rgba(99, 102, 241, 0.2);
+    background: var(--effect-primary-10);
+    border: 1px solid var(--effect-primary-20);
     border-radius: 10px; /* Custom between base and md */
     display: flex;
     align-items: center;
@@ -1265,7 +1265,7 @@ h2.profile-display-name {
     align-items: center;
     justify-content: center;
     border-radius: var(--radius-base);
-    background: rgba(99, 102, 241, 0.1);
+    background: var(--effect-primary-10);
     color: var(--color-primary-500);
     transition: all 0.3s ease;
     flex-shrink: 0;
@@ -1437,23 +1437,23 @@ h2.profile-display-name {
 
 /* Dark theme */
 [data-theme="dark"] .badge-preview-pill {
-    background: rgba(168, 85, 247, 0.15);
-    border-color: rgba(168, 85, 247, 0.3);
+    background: var(--effect-violet-15);
+    border-color: var(--effect-violet-30);
 }
 
 [data-theme="dark"] .badges-section.featured .badge-preview-pill {
-    background: rgba(245, 158, 11, 0.15);
-    border-color: rgba(245, 158, 11, 0.3);
+    background: var(--effect-amber-15);
+    border-color: var(--effect-amber-30);
 }
 
 [data-theme="dark"] .badge-preview-count {
-    background: rgba(99, 102, 241, 0.15);
-    border-color: rgba(99, 102, 241, 0.3);
+    background: var(--effect-primary-15);
+    border-color: var(--effect-primary-30);
     color: var(--color-primary-300);
 }
 
 [data-theme="dark"] .badges-accordion-toggle {
-    background: rgba(99, 102, 241, 0.15);
+    background: var(--effect-primary-15);
     color: var(--color-primary-300);
 }
 
@@ -1481,10 +1481,10 @@ h2.profile-display-name {
    ============================================ */
 @keyframes holoGlow {
     0%, 100% {
-        filter: drop-shadow(0 0 10px rgba(99, 102, 241, 0.3));
+        filter: drop-shadow(0 0 10px var(--effect-primary-30));
     }
     50% {
-        filter: drop-shadow(0 0 20px rgba(168, 85, 247, 0.4)) drop-shadow(0 0 30px rgba(236, 72, 153, 0.2));
+        filter: drop-shadow(0 0 20px var(--effect-violet-40)) drop-shadow(0 0 30px var(--effect-pink-20));
     }
 }
 
@@ -1528,7 +1528,7 @@ h2.profile-display-name {
    DARK MODE BADGE ADJUSTMENTS
    ============================================ */
 [data-theme="dark"] .badge-online {
-    background: linear-gradient(135deg, rgba(16, 185, 129, 0.25), rgba(5, 150, 105, 0.15));
+    background: linear-gradient(135deg, var(--effect-emerald-25), var(--effect-emerald-600-15));
 }
 
 [data-theme="dark"] .badge-online strong {
@@ -1540,7 +1540,7 @@ h2.profile-display-name {
 }
 
 [data-theme="dark"] .badge-credits {
-    background: linear-gradient(135deg, rgba(16, 185, 129, 0.25), rgba(5, 150, 105, 0.15));
+    background: linear-gradient(135deg, var(--effect-emerald-25), var(--effect-emerald-600-15));
 }
 
 [data-theme="dark"] .badge-rating strong,
@@ -1576,7 +1576,7 @@ h2.profile-display-name {
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
-    box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);
+    box-shadow: 0 4px 15px var(--effect-primary-30);
     transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
@@ -1587,7 +1587,7 @@ h2.profile-display-name {
 
 .glass-composer:hover .composer-icon {
     transform: scale(1.1) rotate(-5deg);
-    box-shadow: 0 6px 20px rgba(99, 102, 241, 0.4);
+    box-shadow: 0 6px 20px var(--effect-primary-40);
 }
 
 .composer-text {
@@ -1656,16 +1656,16 @@ h2.profile-display-name {
 .empty-state {
     text-align: center;
     padding: var(--space-12) var(--space-8);
-    background: linear-gradient(135deg, rgba(255, 255, 255, 0.4), rgba(255, 255, 255, 0.2));
+    background: linear-gradient(135deg, var(--effect-white-40), var(--effect-white-20));
     -webkit-backdrop-filter: blur(10px);
     backdrop-filter: blur(10px);
     border-radius: var(--radius-lg);
-    border: 1px solid rgba(255, 255, 255, 0.3);
+    border: 1px solid var(--effect-white-30);
 }
 
 [data-theme="dark"] .empty-state {
-    background: linear-gradient(135deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.03));
-    border-color: rgba(255, 255, 255, 0.1);
+    background: linear-gradient(135deg, var(--effect-white-8), var(--effect-white-3));
+    border-color: var(--effect-white-10);
 }
 
 .empty-emoji {
@@ -1715,16 +1715,16 @@ h2.profile-display-name {
     line-height: 1.8;
     font-size: var(--font-size-base);
     padding: var(--space-5);
-    background: rgba(255, 255, 255, 0.4);
+    background: var(--effect-white-40);
     -webkit-backdrop-filter: blur(8px);
     backdrop-filter: blur(8px);
     border-radius: var(--radius-lg);
-    border: 1px solid rgba(255, 255, 255, 0.3);
+    border: 1px solid var(--effect-white-30);
 }
 
 [data-theme="dark"] .bio-content {
-    background: rgba(255, 255, 255, 0.05);
-    border-color: rgba(255, 255, 255, 0.08);
+    background: var(--effect-white-5);
+    border-color: var(--effect-white-8);
     color: var(--color-slate-300);
 }
 
@@ -1761,8 +1761,8 @@ h2.profile-display-name {
     align-items: center;
     gap: var(--space-2);
     padding: var(--space-3) 18px;
-    background: linear-gradient(135deg, rgba(245, 158, 11, 0.15), rgba(217, 119, 6, 0.1));
-    border: 1px solid rgba(245, 158, 11, 0.3);
+    background: linear-gradient(135deg, var(--effect-amber-15), var(--effect-amber-600-10));
+    border: 1px solid var(--effect-amber-30);
     border-radius: var(--radius-lg);
 }
 
@@ -1803,10 +1803,10 @@ h2.profile-display-name {
 
 /* Review card enhancements */
 .glass-review-card {
-    background: rgba(255, 255, 255, 0.5);
+    background: var(--effect-white-50);
     -webkit-backdrop-filter: blur(12px);
     backdrop-filter: blur(12px);
-    border: 1px solid rgba(255, 255, 255, 0.3);
+    border: 1px solid var(--effect-white-30);
     border-radius: 18px; /* Custom value between lg and xl */
     padding: var(--space-6);
     transition: all 0.3s ease;
@@ -1814,16 +1814,16 @@ h2.profile-display-name {
 
 .glass-review-card:hover {
     transform: translateY(-2px);
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+    box-shadow: 0 8px 24px var(--effect-black-8);
 }
 
 [data-theme="dark"] .glass-review-card {
-    background: rgba(255, 255, 255, 0.05);
-    border-color: rgba(255, 255, 255, 0.08);
+    background: var(--effect-white-5);
+    border-color: var(--effect-white-8);
 }
 
 [data-theme="dark"] .glass-review-card:hover {
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 8px 24px var(--effect-black-30);
 }
 
 /* ============================================
@@ -1835,7 +1835,7 @@ h2.profile-display-name {
     position: fixed;
     inset: 0;
     z-index: 10000;
-    background: rgba(0, 0, 0, 0.6);
+    background: var(--effect-black-60);
     backdrop-filter: blur(8px);
     -webkit-backdrop-filter: blur(8px);
     align-items: center;
@@ -1850,15 +1850,15 @@ h2.profile-display-name {
 }
 
 .holo-review-card {
-    background: rgba(255, 255, 255, 0.95);
+    background: var(--effect-white-95);
     backdrop-filter: blur(24px) saturate(180%);
     -webkit-backdrop-filter: blur(24px) saturate(180%);
     border-radius: var(--radius-2xl);
-    border: 1px solid rgba(255, 255, 255, 0.5);
+    border: 1px solid var(--effect-white-50);
     box-shadow:
-        0 25px 50px -12px rgba(0, 0, 0, 0.25),
-        0 0 0 1px rgba(255, 255, 255, 0.1),
-        inset 0 1px 0 rgba(255, 255, 255, 0.8);
+        0 25px 50px -12px var(--effect-black-25),
+        0 0 0 1px var(--effect-white-10),
+        inset 0 1px 0 var(--effect-white-80);
     max-width: 480px;
     width: 100%;
     overflow: hidden;
@@ -1877,8 +1877,8 @@ h2.profile-display-name {
 }
 
 [data-theme="dark"] .holo-review-card {
-    background: rgba(30, 41, 59, 0.95);
-    border-color: rgba(255, 255, 255, 0.1);
+    background: var(--effect-slate-95);
+    border-color: var(--effect-white-10);
 }
 
 .holo-review-header {
@@ -1903,7 +1903,7 @@ h2.profile-display-name {
     width: 36px;
     height: 36px;
     border-radius: 50%;
-    background: rgba(255, 255, 255, 0.2) !important;
+    background: var(--effect-white-20) !important;
     border: none !important;
     color: white !important;
     display: flex;
@@ -1915,7 +1915,7 @@ h2.profile-display-name {
 }
 
 .modal-close-btn:hover {
-    background: rgba(255, 255, 255, 0.3) !important;
+    background: var(--effect-white-30) !important;
     transform: scale(1.1) !important;
 }
 
@@ -1958,7 +1958,7 @@ h2.profile-display-name {
     font-size: var(--font-size-2xl);
     cursor: pointer;
     transition: all 0.2s ease;
-    background: rgba(243, 244, 246, 0.8) !important;
+    background: var(--effect-gray-100-80) !important;
     border: 2px solid transparent !important;
     box-shadow: none !important;
 }
@@ -1968,15 +1968,15 @@ h2.profile-display-name {
 }
 
 .holo-star.active {
-    background: linear-gradient(135deg, rgba(245, 158, 11, 0.2), rgba(217, 119, 6, 0.15)) !important;
-    border-color: rgba(245, 158, 11, 0.4) !important;
+    background: linear-gradient(135deg, var(--effect-amber-20), var(--effect-amber-600-15)) !important;
+    border-color: var(--effect-amber-40) !important;
     color: var(--color-warning);
     transform: scale(1.1);
 }
 
 .holo-star:hover {
     transform: scale(1.15);
-    background: rgba(245, 158, 11, 0.15) !important;
+    background: var(--effect-amber-15) !important;
 }
 
 @keyframes starBounce {
@@ -2013,7 +2013,7 @@ h2.profile-display-name {
     font-size: var(--font-size-sm);
     color: var(--color-warning);
     padding: 4px 10px;
-    background: rgba(245, 158, 11, 0.15);
+    background: var(--effect-amber-15);
     border-radius: var(--radius-xl);
     transition: all 0.2s ease;
 }
@@ -2024,8 +2024,8 @@ h2.profile-display-name {
     min-height: 100px;
     padding: 14px var(--space-4);
     border-radius: var(--radius-lg);
-    border: 2px solid rgba(99, 102, 241, 0.2);
-    background: rgba(255, 255, 255, 0.8);
+    border: 2px solid var(--effect-primary-20);
+    background: var(--effect-white-80);
     font-size: var(--font-size-sm);
     font-family: inherit;
     resize: vertical;
@@ -2034,13 +2034,13 @@ h2.profile-display-name {
 
 .holo-textarea:focus {
     outline: none;
-    border-color: rgba(99, 102, 241, 0.5);
-    box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
+    border-color: var(--effect-primary-50);
+    box-shadow: 0 0 0 4px var(--effect-primary-10);
 }
 
 [data-theme="dark"] .holo-textarea {
-    background: rgba(255, 255, 255, 0.05);
-    border-color: rgba(255, 255, 255, 0.1);
+    background: var(--effect-white-5);
+    border-color: var(--effect-white-10);
     color: var(--color-slate-200);
 }
 
@@ -2055,8 +2055,8 @@ h2.profile-display-name {
     flex: 1;
     padding: 14px var(--space-5) !important;
     border-radius: 12px !important;
-    background: rgba(107, 114, 128, 0.1) !important;
-    border: 1px solid rgba(107, 114, 128, 0.2) !important;
+    background: var(--effect-gray-500-10) !important;
+    border: 1px solid var(--effect-gray-500-20) !important;
     color: var(--color-gray-500) !important;
     font-weight: 600;
     font-size: var(--font-size-sm);
@@ -2066,7 +2066,7 @@ h2.profile-display-name {
 }
 
 .holo-btn-cancel:hover {
-    background: rgba(107, 114, 128, 0.2) !important;
+    background: var(--effect-gray-500-20) !important;
     transform: translateY(-1px) !important;
 }
 
@@ -2081,12 +2081,12 @@ h2.profile-display-name {
     font-size: var(--font-size-sm);
     cursor: pointer;
     transition: all 0.2s ease;
-    box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3) !important;
+    box-shadow: 0 4px 15px var(--effect-primary-30) !important;
 }
 
 .holo-btn-submit:hover {
     transform: translateY(-2px) !important;
-    box-shadow: 0 8px 25px rgba(99, 102, 241, 0.4) !important;
+    box-shadow: 0 8px 25px var(--effect-primary-40) !important;
 }
 
 /* ============================================
@@ -2098,7 +2098,7 @@ h2.profile-display-name {
     position: fixed;
     inset: 0;
     z-index: 10000;
-    background: rgba(0, 0, 0, 0.5);
+    background: var(--effect-black-50);
     backdrop-filter: blur(4px);
     -webkit-backdrop-filter: blur(4px);
     align-items: flex-end;
@@ -2110,7 +2110,7 @@ h2.profile-display-name {
 }
 
 .badge-modal-content {
-    background: rgba(255, 255, 255, 0.98);
+    background: var(--effect-white-98);
     backdrop-filter: blur(24px);
     -webkit-backdrop-filter: blur(24px);
     border-radius: 24px 24px 0 0;
@@ -2119,7 +2119,7 @@ h2.profile-display-name {
     max-height: 85vh;
     overflow-y: auto;
     animation: drawerSlideUp 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
-    box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.15);
+    box-shadow: 0 -10px 40px var(--effect-black-15);
 }
 
 @keyframes drawerSlideUp {
@@ -2134,7 +2134,7 @@ h2.profile-display-name {
 }
 
 [data-theme="dark"] .badge-modal-content {
-    background: rgba(30, 41, 59, 0.98);
+    background: var(--effect-slate-98);
 }
 
 /* Desktop: center modal instead of drawer */
@@ -2165,13 +2165,13 @@ h2.profile-display-name {
 .badge-modal-handle {
     width: 40px;
     height: 5px;
-    background: rgba(0, 0, 0, 0.15);
+    background: var(--effect-black-15);
     border-radius: 3px;
     margin: 12px auto;
 }
 
 [data-theme="dark"] .badge-modal-handle {
-    background: rgba(255, 255, 255, 0.2);
+    background: var(--effect-white-20);
 }
 
 @media (min-width: 640px) {
@@ -2183,12 +2183,12 @@ h2.profile-display-name {
 .badge-modal-header {
     text-align: center;
     padding: var(--space-6) var(--space-6) var(--space-5);
-    background: linear-gradient(135deg, rgba(139, 92, 246, 0.1), rgba(99, 102, 241, 0.05));
+    background: linear-gradient(135deg, var(--effect-purple-10), var(--effect-primary-5));
     position: relative;
 }
 
 .badge-modal-header.featured {
-    background: linear-gradient(135deg, rgba(245, 158, 11, 0.15), rgba(217, 119, 6, 0.1));
+    background: linear-gradient(135deg, var(--effect-amber-15), var(--effect-amber-600-10));
 }
 
 .badge-modal-close {
@@ -2198,7 +2198,7 @@ h2.profile-display-name {
     width: 32px;
     height: 32px;
     border-radius: 50% !important;
-    background: rgba(0, 0, 0, 0.05) !important;
+    background: var(--effect-black-5) !important;
     border: none !important;
     color: var(--color-gray-500) !important;
     display: flex;
@@ -2210,12 +2210,12 @@ h2.profile-display-name {
 }
 
 .badge-modal-close:hover {
-    background: rgba(0, 0, 0, 0.1) !important;
+    background: var(--effect-black-10) !important;
     transform: scale(1.1) !important;
 }
 
 [data-theme="dark"] .badge-modal-close {
-    background: rgba(255, 255, 255, 0.1) !important;
+    background: var(--effect-white-10) !important;
     color: var(--color-slate-400) !important;
 }
 
@@ -2258,27 +2258,27 @@ h2.profile-display-name {
 }
 
 .badge-rarity-tag.common {
-    background: rgba(156, 163, 175, 0.2);
+    background: var(--effect-gray-400-20);
     color: var(--color-gray-500);
 }
 
 .badge-rarity-tag.uncommon {
-    background: rgba(34, 197, 94, 0.15);
+    background: var(--effect-green-15);
     color: var(--color-green-600);
 }
 
 .badge-rarity-tag.rare {
-    background: rgba(59, 130, 246, 0.15);
+    background: var(--effect-blue-15);
     color: var(--color-blue-600);
 }
 
 .badge-rarity-tag.epic {
-    background: rgba(139, 92, 246, 0.15);
+    background: var(--effect-purple-15);
     color: var(--color-purple-600);
 }
 
 .badge-rarity-tag.legendary {
-    background: linear-gradient(135deg, rgba(245, 158, 11, 0.2), rgba(217, 119, 6, 0.15));
+    background: linear-gradient(135deg, var(--effect-amber-20), var(--effect-amber-600-15));
     color: var(--color-amber-700);
 }
 
@@ -2322,7 +2322,7 @@ h2.profile-display-name {
 
 .badge-modal-text.description {
     padding: var(--space-3) var(--space-4);
-    background: rgba(99, 102, 241, 0.05);
+    background: var(--effect-primary-5);
     border-radius: var(--radius-md);
     border-left: var(--space-1) solid var(--color-primary-500);
 }
@@ -2332,19 +2332,19 @@ h2.profile-display-name {
 }
 
 [data-theme="dark"] .badge-modal-text.description {
-    background: rgba(99, 102, 241, 0.1);
+    background: var(--effect-primary-10);
 }
 
 .badge-rarity-bar {
     height: 8px;
-    background: rgba(0, 0, 0, 0.08);
+    background: var(--effect-black-8);
     border-radius: 4px;
     margin-top: 10px;
     overflow: hidden;
 }
 
 [data-theme="dark"] .badge-rarity-bar {
-    background: rgba(255, 255, 255, 0.1);
+    background: var(--effect-white-10);
 }
 
 .badge-rarity-fill {
@@ -2371,7 +2371,7 @@ h2.profile-display-name {
 
 .badge-rarity-fill.legendary {
     background: linear-gradient(90deg, var(--color-warning), var(--color-amber-600));
-    box-shadow: 0 0 10px rgba(245, 158, 11, 0.5);
+    box-shadow: 0 0 10px var(--effect-amber-50);
 }
 
 /* ============================================
@@ -2396,14 +2396,14 @@ h2.profile-display-name {
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    box-shadow: 0 4px 20px rgba(99, 102, 241, 0.4) !important;
+    box-shadow: 0 4px 20px var(--effect-primary-40) !important;
     transition: all 0.3s ease;
 }
 
 .profile-fab-main:hover,
 .profile-fab-main.active {
     transform: scale(1.1) !important;
-    box-shadow: 0 6px 25px rgba(99, 102, 241, 0.5) !important;
+    box-shadow: 0 6px 25px var(--effect-primary-50) !important;
 }
 
 .profile-fab-main.active {
@@ -2414,12 +2414,12 @@ h2.profile-display-name {
     position: absolute;
     bottom: 70px;
     right: 0;
-    background: rgba(255, 255, 255, 0.95);
+    background: var(--effect-white-95);
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
     border-radius: var(--radius-lg);
     padding: 8px;
-    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+    box-shadow: 0 10px 40px var(--effect-black-15);
     min-width: 180px;
     opacity: 0;
     visibility: hidden;
@@ -2434,7 +2434,7 @@ h2.profile-display-name {
 }
 
 [data-theme="dark"] .profile-fab-menu {
-    background: rgba(30, 41, 59, 0.95);
+    background: var(--effect-slate-95);
 }
 
 .profile-fab-item {
@@ -2457,7 +2457,7 @@ h2.profile-display-name {
 }
 
 .profile-fab-item:hover {
-    background: rgba(99, 102, 241, 0.1) !important;
+    background: var(--effect-primary-10) !important;
     transform: translateX(4px) !important;
 }
 

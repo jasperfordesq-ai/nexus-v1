@@ -1432,30 +1432,37 @@ body.nexus-home-page .home-sidebar-column {
     }
 }
 
-/* Smart Welcome Hero Section */
-.nexus-welcome-hero {
+/* ===================================
+   NEXUS WELCOME HERO - Gold Standard
+   Scoped to #home-glass-wrapper (matches /listings and /events pattern)
+   =================================== */
+#home-glass-wrapper .nexus-welcome-hero {
     background: linear-gradient(135deg,
-            rgba(99, 102, 241, 0.12) 0%,
-            rgba(139, 92, 246, 0.12) 50%,
-            rgba(236, 72, 153, 0.08) 100%);
-    -webkit-backdrop-filter: blur(20px);
+            color-mix(in srgb, var(--color-primary-500) 12%, transparent) 0%,
+            color-mix(in srgb, var(--color-purple-500) 12%, transparent) 50%,
+            color-mix(in srgb, var(--color-pink-500) 8%, transparent) 100%);
     backdrop-filter: blur(20px);
-    border: 1px solid rgba(255, 255, 255, 0.4);
-    border-radius: var(--radius-full);
-    padding: var(--space-7) var(--space-6);
-    margin-bottom: var(--space-5);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid color-mix(in srgb, white 40%, transparent);
+    border-radius: var(--radius-xl);
+    padding: 28px 24px;
+    margin-bottom: 20px;
     text-align: center;
-    box-shadow: 0 8px 32px rgba(99, 102, 241, 0.1);
+    box-shadow: 0 8px 32px color-mix(in srgb, var(--color-primary-500) 10%, transparent);
 }
 
-.nexus-welcome-content {
-    margin-bottom: var(--space-5);
+[data-theme="dark"] #home-glass-wrapper .nexus-welcome-hero {
+    background: linear-gradient(135deg,
+            color-mix(in srgb, var(--color-primary-500) 15%, transparent) 0%,
+            color-mix(in srgb, var(--color-purple-500) 15%, transparent) 50%,
+            color-mix(in srgb, var(--color-pink-500) 10%, transparent) 100%);
+    border-color: color-mix(in srgb, white 10%, transparent);
 }
 
-.nexus-welcome-title {
+#home-glass-wrapper .nexus-welcome-title {
     font-size: 1.75rem;
     font-weight: 800;
-    background: linear-gradient(135deg, var(--color-primary-600), var(--color-purple-600), var(--color-pink-600));
+    background: linear-gradient(135deg, var(--color-primary-600), var(--color-purple-500), var(--color-pink-500));
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -1463,35 +1470,155 @@ body.nexus-home-page .home-sidebar-column {
     line-height: 1.2;
 }
 
-.nexus-welcome-subtitle {
-    font-size: 0.95rem;
-    color: var(--color-slate-500);
-    margin: 0;
-    line-height: 1.5;
-    max-width: 500px;
-    margin-left: auto;
-    margin-right: auto;
-}
-
-/* Dark Mode - Better visibility */
-[data-theme="dark"] .nexus-welcome-hero {
-    background: linear-gradient(135deg,
-            rgba(99, 102, 241, 0.20) 0%,
-            rgba(139, 92, 246, 0.20) 50%,
-            rgba(236, 72, 153, 0.15) 100%);
-    border: 1px solid rgba(255, 255, 255, 0.15);
-    box-shadow: 0 8px 32px rgba(99, 102, 241, 0.2);
-}
-
-[data-theme="dark"] .nexus-welcome-title {
+[data-theme="dark"] #home-glass-wrapper .nexus-welcome-title {
     background: linear-gradient(135deg, var(--color-primary-400), var(--color-purple-400-alt), var(--color-pink-400));
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
 }
 
-[data-theme="dark"] .nexus-welcome-subtitle {
+#home-glass-wrapper .nexus-welcome-subtitle {
+    font-size: 0.95rem;
+    color: var(--color-slate-600);
+    margin: 0 0 var(--space-5) 0;
+    line-height: 1.5;
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+[data-theme="dark"] #home-glass-wrapper .nexus-welcome-subtitle {
     color: var(--color-slate-300);
+}
+
+/* ============================================
+   NEXUS SMART BUTTONS (Home Page)
+   Scoped to #home-glass-wrapper
+   ============================================ */
+#home-glass-wrapper .nexus-welcome-title {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-3);
+}
+
+#home-glass-wrapper .nexus-welcome-title i {
+    font-size: 1.5rem;
+    color: var(--color-primary-500);
+}
+
+[data-theme="dark"] #home-glass-wrapper .nexus-welcome-title i {
+    color: var(--color-primary-400);
+}
+
+#home-glass-wrapper .nexus-smart-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-3);
+    justify-content: center;
+    margin-top: 0;
+}
+
+#home-glass-wrapper .nexus-smart-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    padding: 12px 20px;
+    border-radius: var(--radius-full);
+    font-size: 0.9rem;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.2s ease;
+    border: 1px solid transparent;
+}
+
+#home-glass-wrapper .nexus-smart-btn i {
+    font-size: 0.95rem;
+}
+
+#home-glass-wrapper .nexus-smart-btn-primary {
+    background: linear-gradient(135deg, var(--color-primary-500), var(--color-purple-500));
+    color: white;
+    box-shadow: 0 4px 12px color-mix(in srgb, var(--color-primary-500) 30%, transparent);
+}
+
+#home-glass-wrapper .nexus-smart-btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px color-mix(in srgb, var(--color-primary-500) 40%, transparent);
+    color: white;
+}
+
+#home-glass-wrapper .nexus-smart-btn-secondary {
+    background: color-mix(in srgb, var(--color-primary-500) 10%, transparent);
+    color: var(--color-primary-600);
+    border-color: color-mix(in srgb, var(--color-primary-500) 30%, transparent);
+}
+
+#home-glass-wrapper .nexus-smart-btn-secondary:hover {
+    background: color-mix(in srgb, var(--color-primary-500) 20%, transparent);
+    color: var(--color-primary-600);
+}
+
+[data-theme="dark"] #home-glass-wrapper .nexus-smart-btn-secondary {
+    background: color-mix(in srgb, var(--color-primary-500) 15%, transparent);
+    color: var(--color-primary-400);
+    border-color: color-mix(in srgb, var(--color-primary-500) 30%, transparent);
+}
+
+[data-theme="dark"] #home-glass-wrapper .nexus-smart-btn-secondary:hover {
+    background: color-mix(in srgb, var(--color-primary-500) 25%, transparent);
+    color: var(--color-primary-300);
+}
+
+#home-glass-wrapper .nexus-smart-btn-outline {
+    background: color-mix(in srgb, white 50%, transparent);
+    color: var(--color-slate-700);
+    border-color: color-mix(in srgb, var(--color-primary-500) 30%, transparent);
+}
+
+#home-glass-wrapper .nexus-smart-btn-outline:hover {
+    background: linear-gradient(135deg, var(--color-primary-500), var(--color-purple-500));
+    color: white;
+    border-color: transparent;
+    transform: translateY(-2px);
+}
+
+[data-theme="dark"] #home-glass-wrapper .nexus-smart-btn-outline {
+    background: color-mix(in srgb, var(--color-slate-800) 50%, transparent);
+    color: var(--color-slate-300);
+    border-color: color-mix(in srgb, var(--color-primary-500) 40%, transparent);
+}
+
+[data-theme="dark"] #home-glass-wrapper .nexus-smart-btn-outline:hover {
+    background: linear-gradient(135deg, var(--color-primary-500), var(--color-purple-500));
+    color: white;
+    border-color: transparent;
+}
+
+/* Mobile: Smart buttons */
+@media (max-width: 640px) {
+    #home-glass-wrapper .nexus-welcome-hero {
+        padding: 20px 16px;
+        border-radius: 16px;
+    }
+
+    #home-glass-wrapper .nexus-welcome-title {
+        font-size: 1.35rem;
+        gap: var(--space-2);
+    }
+
+    #home-glass-wrapper .nexus-welcome-title i {
+        font-size: 1.25rem;
+    }
+
+    #home-glass-wrapper .nexus-smart-buttons {
+        gap: 8px;
+    }
+
+    #home-glass-wrapper .nexus-smart-btn {
+        padding: 10px 14px;
+        font-size: 0.8rem;
+    }
 }
 
 /* Feed Filter Buttons */
@@ -5219,22 +5346,88 @@ body {
     }
 }
 
-/* Medium desktop: 1201px to 1400px */
-@media screen and (min-width: 1201px) and (max-width: 1200px) {
+/* Large desktop: 1201px and above */
+@media screen and (min-width: 1201px) {
     html body.nexus-home-page .htb-container,
     html body.nexus-home-page .htb-container-full,
     html body.nexus-home-page .home-feed-wrapper {
-        max-width: 1280px !important;
+        max-width: 1400px !important;
     }
 
     html body.nexus-home-page .home-two-column-grid {
-        grid-template-columns: 1fr 320px !important;
+        grid-template-columns: 1fr 360px !important;
     }
 
     html body.nexus-home-page .home-sidebar-column {
-        width: 320px !important;
-        min-width: 320px !important;
-        max-width: 320px !important;
+        width: 360px !important;
+        min-width: 360px !important;
+        max-width: 360px !important;
+    }
+}
+
+/* ==========================================
+   EMERGENCY OVERRIDE - SINGLE SOURCE OF TRUTH
+   These rules use maximum specificity to prevent
+   any other CSS from overriding the home layout.
+   Added: 2026-01-26
+   ========================================== */
+
+/* Desktop (1025px+): Feed column should be ~800px minimum */
+@media screen and (min-width: 1025px) {
+    html[data-layout="modern"] body.nexus-home-page .home-two-column-grid {
+        display: grid !important;
+        grid-template-columns: minmax(600px, 1fr) 360px !important;
+        gap: 24px !important;
+        max-width: 100% !important;
+        width: 100% !important;
+    }
+
+    html[data-layout="modern"] body.nexus-home-page .home-feed-column {
+        min-width: 600px !important;
+        max-width: none !important;
+    }
+
+    html[data-layout="modern"] body.nexus-home-page .htb-container-full.home-feed-wrapper {
+        max-width: 1200px !important;
+        width: 100% !important;
+        margin: 0 auto !important;
+        padding-top: 136px !important; /* Clear header: utility bar (56px) + navbar (64px) + spacing (16px) */
+        padding-left: 24px !important;
+        padding-right: 24px !important;
+    }
+}
+
+/* Intermediate (1025-1200px): Narrower sidebar */
+@media screen and (min-width: 1025px) and (max-width: 1200px) {
+    html[data-layout="modern"] body.nexus-home-page .home-two-column-grid {
+        grid-template-columns: minmax(500px, 1fr) 280px !important;
+    }
+
+    html[data-layout="modern"] body.nexus-home-page .home-sidebar-column {
+        width: 280px !important;
+        min-width: 280px !important;
+        max-width: 280px !important;
+    }
+
+    html[data-layout="modern"] body.nexus-home-page .htb-container-full.home-feed-wrapper {
+        max-width: 1100px !important;
+    }
+}
+
+/* Wide desktop (1201px+): Wider layout */
+@media screen and (min-width: 1201px) {
+    html[data-layout="modern"] body.nexus-home-page .home-two-column-grid {
+        grid-template-columns: minmax(700px, 1fr) 360px !important;
+    }
+
+    html[data-layout="modern"] body.nexus-home-page .home-sidebar-column {
+        width: 360px !important;
+        min-width: 360px !important;
+        max-width: 360px !important;
+    }
+
+    html[data-layout="modern"] body.nexus-home-page .htb-container-full.home-feed-wrapper {
+        max-width: 1400px !important;
     }
 }
 

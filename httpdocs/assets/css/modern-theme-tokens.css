@@ -1,0 +1,1843 @@
+/**
+ * Modern Theme Tokens - SINGLE SOURCE OF TRUTH
+ * ==============================================
+ * Created: 2026-01-26
+ * Purpose: Consolidate all CSS variables for the Modern (Glassmorphic) theme
+ *          into ONE file to eliminate FOUC caused by cascading :root definitions.
+ *
+ * CRITICAL: This file should be loaded FIRST in the Modern theme's <head>
+ *           BEFORE any other CSS files. All other CSS files should REFERENCE
+ *           these variables, not redefine them.
+ *
+ * Sources consolidated:
+ * - design-tokens.css (primary source)
+ * - nexus-phoenix.css (htb-* brand variables)
+ *
+ * DO NOT load this file in CivicOne theme - use civicone-theme-tokens.css instead.
+ */
+
+:root {
+    /* ==========================================
+       SPACING SCALE - 8px base unit
+       ========================================== */
+    --space-0: 0;
+    --space-0-5: 2px;
+    --space-1: 4px;
+    --space-1-5: 6px;
+    --space-2: 8px;
+    --space-2-5: 10px;
+    --space-3: 12px;
+    --space-3-5: 14px;
+    --space-4: 16px;
+    --space-4-5: 18px;
+    --space-5: 20px;
+    --space-5-5: 22px;
+    --space-6: 24px;
+    --space-7: 28px;
+    --space-8: 32px;
+    --space-9: 36px;
+    --space-10: 40px;
+    --space-11: 44px;
+    --space-12: 48px;
+    --space-14: 56px;
+    --space-15: 60px;
+    --space-16: 64px;
+    --space-18: 72px;
+    --space-20: 80px;
+    --space-24: 96px;
+    --space-25: 100px;
+    --space-28: 112px;
+    --space-30: 120px;
+    --space-32: 128px;
+    --space-35: 140px;
+
+    /* ==========================================
+       LAYOUT DIMENSIONS
+       ========================================== */
+    --layout-header-height: 56px;
+    --layout-header-height-scrolled: 48px;
+    --layout-utility-bar-height: 44px;
+    --layout-total-header-height: calc(var(--layout-header-height) + var(--layout-utility-bar-height));
+    --layout-content-padding-top: calc(var(--layout-total-header-height) + var(--space-8));
+    --layout-mobile-nav-height: 84px;
+    --layout-sidebar-width: 360px;
+    --layout-sidebar-width-tablet: 320px;
+    --layout-sidebar-width-min: 280px;
+    --layout-max-content-width: 1600px;
+    --layout-grid-gap: var(--space-6);
+    --layout-grid-gap-mobile: var(--space-3);
+    --layout-navbar-height: var(--layout-header-height);
+
+    /* ==========================================
+       PRIMARY COLOR PALETTE
+       Modern theme uses Indigo as primary
+       ========================================== */
+    --color-primary-50: #eef2ff;
+    --color-primary-100: #e0e7ff;
+    --color-primary-200: #c7d2fe;
+    --color-primary-300: #a5b4fc;
+    --color-primary-400: #818cf8;
+    --color-primary-500: #6366f1;
+    --color-primary-600: #4f46e5;
+    --color-primary-700: #4338ca;
+    --color-primary-800: #3730a3;
+    --color-primary-900: #312e81;
+
+    /* Primary RGB values (for rgba() usage) */
+    --color-primary-rgb: 99, 102, 241;
+    --color-primary-500-rgb: 99, 102, 241;
+    --color-primary-400-rgb: 129, 140, 248;
+
+    /* ==========================================
+       SEMANTIC COLORS
+       ========================================== */
+    --color-success: #10b981;
+    --color-warning: #f59e0b;
+    --color-danger: #ef4444;
+    --color-info: #3b82f6;
+
+    /* ==========================================
+       EXTENDED COLOR PALETTE
+       ========================================== */
+
+    /* Gray scale */
+    --color-gray-50: #f9fafb;
+    --color-gray-75: #f7f7f7;
+    --color-gray-100: #f3f4f6;
+    --color-gray-150: #f0f0f0;
+    --color-gray-200: #e5e7eb;
+    --color-gray-300: #d1d5db;
+    --color-gray-400: #9ca3af;
+    --color-gray-500: #6b7280;
+    --color-gray-600: #4b5563;
+    --color-gray-700: #374151;
+    --color-gray-800: #1f2937;
+    --color-gray-900: #111827;
+
+    /* Slate scale */
+    --color-slate-50: #f8fafc;
+    --color-slate-100: #f1f5f9;
+    --color-slate-200: #e2e8f0;
+    --color-slate-300: #cbd5e1;
+    --color-slate-400: #94a3b8;
+    --color-slate-500: #64748b;
+    --color-slate-600: #475569;
+    --color-slate-700: #334155;
+    --color-slate-800: #1e293b;
+    --color-slate-900: #0f172a;
+    --color-slate-950: #020617;
+
+    /* Purple palette */
+    --color-purple-50: #faf5ff;
+    --color-purple-100: #f3e8ff;
+    --color-purple-200: #ddd6fe;
+    --color-purple-300: #c4b5fd;
+    --color-purple-400: #a855f7;
+    --color-purple-400-alt: #a78bfa;
+    --color-purple-500: #8b5cf6;
+    --color-purple-500-alt: #9333ea;
+    --color-purple-600: #7c3aed;
+    --color-purple-700: #6d28d9;
+    --color-purple-950: #2e1065;
+
+    /* Pink palette */
+    --color-pink-50: #fdf2f8;
+    --color-pink-100: #fce7f3;
+    --color-pink-200: #fbcfe8;
+    --color-pink-300: #f9a8d4;
+    --color-pink-400: #f472b6;
+    --color-pink-500: #ec4899;
+    --color-pink-600: #db2777;
+    --color-pink-700: #be185d;
+    --color-pink-800: #96206d;
+
+    /* Green palette */
+    --color-green-300: #86efac;
+    --color-green-400: #4ade80;
+    --color-green-500: #22c55e;
+    --color-green-600: #16a34a;
+    --color-green-700: #15803d;
+    --color-green-800: #166534;
+
+    /* Emerald palette */
+    --color-emerald-50: #ecfdf5;
+    --color-emerald-100: #d1fae5;
+    --color-emerald-200: #a7f3d0;
+    --color-emerald-300: #6ee7b7;
+    --color-emerald-400: #34d399;
+    --color-emerald-500: #10b981;
+    --color-emerald-600: #059669;
+    --color-emerald-700: #047857;
+    --color-emerald-800: #065f46;
+    --color-emerald-900: #064e3b;
+
+    /* Teal palette */
+    --color-teal-200: #99f6e4;
+    --color-teal-300: #5eead4;
+    --color-teal-400: #2dd4bf;
+    --color-teal-500: #14b8a6;
+    --color-teal-600: #0d9488;
+    --color-teal-700: #0f766e;
+    --color-teal-800: #115e59;
+    --color-teal-900: #004d40;
+
+    /* Cyan palette */
+    --color-cyan-300: #67e8f9;
+    --color-cyan-400: #22d3ee;
+    --color-cyan-500: #06b6d4;
+    --color-cyan-600: #0891b2;
+
+    /* Blue palette */
+    --color-blue-50: #eff6ff;
+    --color-blue-100: #dbeafe;
+    --color-blue-300: #93c5fd;
+    --color-blue-400: #60a5fa;
+    --color-blue-500: #3b82f6;
+    --color-blue-600: #2563eb;
+    --color-blue-700: #1d4ed8;
+    --color-blue-750: #1e40af;
+    --color-blue-800: #1e3a8a;
+    --color-blue-900: #1e3a8a;
+
+    /* Indigo extras */
+    --color-indigo-800: #5b21b6;
+    --color-indigo-950: #1e1b4b;
+
+    /* Sky palette */
+    --color-sky-500: #0ea5e9;
+    --color-sky-600: #0284c7;
+    --color-sky-700: #0369a1;
+    --color-sky-800: #075985;
+    --color-sky-900: #0c4a6e;
+
+    /* Lime palette */
+    --color-lime-200: #d9f99d;
+    --color-lime-300: #bef264;
+    --color-lime-400: #a3e635;
+    --color-lime-500: #84cc16;
+    --color-lime-600: #65a30d;
+
+    /* Amber palette */
+    --color-amber-50: #fffbeb;
+    --color-amber-100: #fef3c7;
+    --color-amber-200: #fde68a;
+    --color-amber-300: #fcd34d;
+    --color-amber-400: #fbbf24;
+    --color-amber-500: #f59e0b;
+    --color-amber-600: #d97706;
+    --color-amber-700: #b45309;
+    --color-amber-800: #854d0e;
+
+    /* Orange palette */
+    --color-orange-300: #fdba74;
+    --color-orange-500: #f97316;
+    --color-orange-600: #ea580c;
+
+    /* Yellow palette */
+    --color-yellow-200: #fef08a;
+    --color-yellow-400: #facc15;
+    --color-yellow-500: #eab308;
+    --color-yellow-600: #ca8a04;
+
+    /* Red palette */
+    --color-red-50: #fef2f2;
+    --color-red-100: #fee2e2;
+    --color-red-200: #fecaca;
+    --color-red-300: #fca5a5;
+    --color-red-400: #f87171;
+    --color-red-500: #ef4444;
+    --color-red-600: #dc2626;
+    --color-red-700: #b91c1c;
+    --color-red-800: #991b1b;
+    --color-red-900: #7f1d1d;
+
+    /* Rose palette */
+    --color-rose-300: #fda4af;
+    --color-rose-400: #fb7185;
+    --color-rose-500: #f43f5e;
+    --color-rose-600: #e11d48;
+    --color-rose-700: #be123c;
+    --color-rose-800: #9f1239;
+
+    /* Zinc palette */
+    --color-zinc-500: #71717a;
+    --color-zinc-600: #52525b;
+    --color-zinc-700: #3f3f46;
+    --color-zinc-800: #27272a;
+    --color-zinc-900: #18181b;
+
+    /* Core colors */
+    --color-white: #ffffff;
+    --color-black: #000000;
+    --color-neutral-50: #f3f2f1;
+    --color-text-dark: #1a1a1a;
+
+    /* Brand colors */
+    --color-brand-yellow: #ffdd00;
+
+    /* ==========================================
+       SEMANTIC BACKGROUND TOKENS (Light Theme)
+       ========================================== */
+    --bg-base: #f9fafb;
+    --bg-elevated: var(--color-white);
+    --bg-surface: #f3f4f6;
+    --bg-hover: #e5e7eb;
+
+    /* ==========================================
+       SEMANTIC TEXT TOKENS (Light Theme)
+       ========================================== */
+    --text-primary: #111827;
+    --text-secondary: #4b5563;
+    --text-muted: #6b7280;
+    --text-disabled: #9ca3af;
+
+    /* ==========================================
+       SEMANTIC BORDER TOKENS (Light Theme)
+       ========================================== */
+    --border-default: rgba(0, 0, 0, 0.1);
+    --border-subtle: rgba(0, 0, 0, 0.05);
+    --border-strong: rgba(0, 0, 0, 0.2);
+
+    /* ==========================================
+       GLASSMORPHISM SYSTEM
+       ========================================== */
+    --glass-blur: 24px;
+    --glass-blur-heavy: 40px;
+    --glass-blur-subtle: 12px;
+    --glass-saturation: 200%;
+    --glass-bg-light: rgba(255, 255, 255, 0.7);
+    --glass-bg-dark: rgba(30, 41, 59, 0.7);
+    --glass-border-light: rgba(255, 255, 255, 0.2);
+    --glass-border-dark: rgba(255, 255, 255, 0.1);
+    --glass-bg: rgba(255, 255, 255, 0.8);
+    --glass-bg-heavy: rgba(255, 255, 255, 0.95);
+    --glass-border: rgba(0, 0, 0, 0.08);
+    --glass-shadow: 0 8px 32px rgba(31, 38, 135, 0.15);
+
+    /* Surface overlays */
+    --overlay-light: rgba(0, 0, 0, 0.03);
+    --overlay-medium: rgba(0, 0, 0, 0.06);
+    --overlay-heavy: rgba(0, 0, 0, 0.1);
+    --overlay-bg: rgba(0, 0, 0, 0.5);
+
+    /* ==========================================
+       EFFECT TOKENS - Opacity-based Color Effects
+       Phase 2 CSS Cleanup (2026-01-27)
+       ========================================== */
+
+    /* White effects (for overlays, glass borders, text) */
+    --effect-white-0: rgba(255, 255, 255, 0);
+    --effect-white-2: rgba(255, 255, 255, 0.02);
+    --effect-white-3: rgba(255, 255, 255, 0.03);
+    --effect-white-4: rgba(255, 255, 255, 0.04);
+    --effect-white-5: rgba(255, 255, 255, 0.05);
+    --effect-white-6: rgba(255, 255, 255, 0.06);
+    --effect-white-7: rgba(255, 255, 255, 0.07);
+    --effect-white-8: rgba(255, 255, 255, 0.08);
+    --effect-white-10: rgba(255, 255, 255, 0.1);
+    --effect-white-12: rgba(255, 255, 255, 0.12);
+    --effect-white-15: rgba(255, 255, 255, 0.15);
+    --effect-white-18: rgba(255, 255, 255, 0.18);
+    --effect-white-20: rgba(255, 255, 255, 0.2);
+    --effect-white-25: rgba(255, 255, 255, 0.25);
+    --effect-white-30: rgba(255, 255, 255, 0.3);
+    --effect-white-35: rgba(255, 255, 255, 0.35);
+    --effect-white-40: rgba(255, 255, 255, 0.4);
+    --effect-white-45: rgba(255, 255, 255, 0.45);
+    --effect-white-50: rgba(255, 255, 255, 0.5);
+    --effect-white-55: rgba(255, 255, 255, 0.55);
+    --effect-white-60: rgba(255, 255, 255, 0.6);
+    --effect-white-65: rgba(255, 255, 255, 0.65);
+    --effect-white-70: rgba(255, 255, 255, 0.7);
+    --effect-white-75: rgba(255, 255, 255, 0.75);
+    --effect-white-80: rgba(255, 255, 255, 0.8);
+    --effect-white-85: rgba(255, 255, 255, 0.85);
+    --effect-white-90: rgba(255, 255, 255, 0.9);
+    --effect-white-92: rgba(255, 255, 255, 0.92);
+    --effect-white-95: rgba(255, 255, 255, 0.95);
+    --effect-white-98: rgba(255, 255, 255, 0.98);
+    --effect-white-100: rgba(255, 255, 255, 1);
+
+    /* Black effects (for shadows, borders, overlays) */
+    --effect-black-2: rgba(0, 0, 0, 0.02);
+    --effect-black-3: rgba(0, 0, 0, 0.03);
+    --effect-black-4: rgba(0, 0, 0, 0.04);
+    --effect-black-5: rgba(0, 0, 0, 0.05);
+    --effect-black-6: rgba(0, 0, 0, 0.06);
+    --effect-black-8: rgba(0, 0, 0, 0.08);
+    --effect-black-10: rgba(0, 0, 0, 0.1);
+    --effect-black-15: rgba(0, 0, 0, 0.15);
+    --effect-black-20: rgba(0, 0, 0, 0.2);
+    --effect-black-30: rgba(0, 0, 0, 0.3);
+    --effect-black-40: rgba(0, 0, 0, 0.4);
+    --effect-black-50: rgba(0, 0, 0, 0.5);
+    --effect-black-25: rgba(0, 0, 0, 0.25);
+    --effect-black-60: rgba(0, 0, 0, 0.6);
+
+    /* Primary/Indigo effects (99, 102, 241) */
+    --effect-primary-5: rgba(99, 102, 241, 0.05);
+    --effect-primary-8: rgba(99, 102, 241, 0.08);
+    --effect-primary-10: rgba(99, 102, 241, 0.1);
+    --effect-primary-15: rgba(99, 102, 241, 0.15);
+    --effect-primary-20: rgba(99, 102, 241, 0.2);
+    --effect-primary-25: rgba(99, 102, 241, 0.25);
+    --effect-primary-30: rgba(99, 102, 241, 0.3);
+    --effect-primary-35: rgba(99, 102, 241, 0.35);
+    --effect-primary-40: rgba(99, 102, 241, 0.4);
+    --effect-primary-45: rgba(99, 102, 241, 0.45);
+    --effect-primary-50: rgba(99, 102, 241, 0.5);
+
+    /* Purple effects (139, 92, 246) */
+    --effect-purple-3: rgba(139, 92, 246, 0.03);
+    --effect-purple-5: rgba(139, 92, 246, 0.05);
+    --effect-purple-6: rgba(139, 92, 246, 0.06);
+    --effect-purple-8: rgba(139, 92, 246, 0.08);
+    --effect-purple-10: rgba(139, 92, 246, 0.1);
+    --effect-purple-12: rgba(139, 92, 246, 0.12);
+    --effect-purple-15: rgba(139, 92, 246, 0.15);
+    --effect-purple-20: rgba(139, 92, 246, 0.2);
+    --effect-purple-25: rgba(139, 92, 246, 0.25);
+    --effect-purple-30: rgba(139, 92, 246, 0.3);
+    --effect-purple-35: rgba(139, 92, 246, 0.35);
+    --effect-purple-40: rgba(139, 92, 246, 0.4);
+    --effect-purple-45: rgba(139, 92, 246, 0.45);
+    --effect-purple-50: rgba(139, 92, 246, 0.5);
+    --effect-purple-60: rgba(139, 92, 246, 0.6);
+
+    /* Purple-300 effects (192, 132, 252) */
+    --effect-purple-300-6: rgba(192, 132, 252, 0.06);
+    --effect-purple-300-8: rgba(192, 132, 252, 0.08);
+    --effect-purple-300-10: rgba(192, 132, 252, 0.1);
+    --effect-purple-300-15: rgba(192, 132, 252, 0.15);
+
+    /* Purple-200 effects (216, 180, 254) */
+    --effect-purple-200-6: rgba(216, 180, 254, 0.06);
+
+    /* Purple-100 effects (233, 213, 255) */
+    --effect-purple-100-8: rgba(233, 213, 255, 0.08);
+
+    /* Violet effects (168, 85, 247) - purple-400 */
+    --effect-violet-5: rgba(168, 85, 247, 0.05);
+    --effect-violet-6: rgba(168, 85, 247, 0.06);
+    --effect-violet-8: rgba(168, 85, 247, 0.08);
+    --effect-violet-10: rgba(168, 85, 247, 0.1);
+    --effect-violet-12: rgba(168, 85, 247, 0.12);
+    --effect-violet-15: rgba(168, 85, 247, 0.15);
+    --effect-violet-20: rgba(168, 85, 247, 0.2);
+    --effect-violet-25: rgba(168, 85, 247, 0.25);
+    --effect-violet-35: rgba(168, 85, 247, 0.35);
+    --effect-violet-40: rgba(168, 85, 247, 0.4);
+
+    /* Emerald effects (16, 185, 129) */
+    --effect-emerald-5: rgba(16, 185, 129, 0.05);
+    --effect-emerald-8: rgba(16, 185, 129, 0.08);
+    --effect-emerald-10: rgba(16, 185, 129, 0.1);
+    --effect-emerald-12: rgba(16, 185, 129, 0.12);
+    --effect-emerald-15: rgba(16, 185, 129, 0.15);
+    --effect-emerald-20: rgba(16, 185, 129, 0.2);
+    --effect-emerald-25: rgba(16, 185, 129, 0.25);
+    --effect-emerald-30: rgba(16, 185, 129, 0.3);
+    --effect-emerald-35: rgba(16, 185, 129, 0.35);
+    --effect-emerald-40: rgba(16, 185, 129, 0.4);
+
+    /* Emerald-600 effects (5, 150, 105) */
+    --effect-emerald-600-5: rgba(5, 150, 105, 0.05);
+    --effect-emerald-600-12: rgba(5, 150, 105, 0.12);
+    --effect-emerald-600-15: rgba(5, 150, 105, 0.15);
+
+    /* Emerald-700 effects (4, 120, 87) */
+    --effect-emerald-700-8: rgba(4, 120, 87, 0.08);
+    --effect-emerald-700-10: rgba(4, 120, 87, 0.1);
+
+    /* Red-600 effects (220, 38, 38) */
+    --effect-red-600-5: rgba(220, 38, 38, 0.05);
+
+    /* Teal effects (20, 184, 166) - teal-500 */
+    --effect-teal-8: rgba(20, 184, 166, 0.08);
+    --effect-teal-10: rgba(20, 184, 166, 0.1);
+    --effect-teal-12: rgba(20, 184, 166, 0.12);
+    --effect-teal-15: rgba(20, 184, 166, 0.15);
+    --effect-teal-20: rgba(20, 184, 166, 0.2);
+    --effect-teal-25: rgba(20, 184, 166, 0.25);
+    --effect-teal-30: rgba(20, 184, 166, 0.3);
+    --effect-teal-35: rgba(20, 184, 166, 0.35);
+    --effect-teal-40: rgba(20, 184, 166, 0.4);
+    --effect-teal-50: rgba(20, 184, 166, 0.5);
+
+    /* Teal-600 effects (13, 148, 136) */
+    --effect-teal-600-5: rgba(13, 148, 136, 0.05);
+    --effect-teal-600-8: rgba(13, 148, 136, 0.08);
+    --effect-teal-600-10: rgba(13, 148, 136, 0.1);
+    --effect-teal-600-12: rgba(13, 148, 136, 0.12);
+    --effect-teal-600-15: rgba(13, 148, 136, 0.15);
+    --effect-teal-600-20: rgba(13, 148, 136, 0.2);
+    --effect-teal-600-25: rgba(13, 148, 136, 0.25);
+    --effect-teal-600-30: rgba(13, 148, 136, 0.3);
+    --effect-teal-600-40: rgba(13, 148, 136, 0.4);
+    --effect-teal-600-50: rgba(13, 148, 136, 0.5);
+
+    /* Cyan effects (6, 182, 212) */
+    --effect-cyan-8: rgba(6, 182, 212, 0.08);
+    --effect-cyan-10: rgba(6, 182, 212, 0.1);
+    --effect-cyan-12: rgba(6, 182, 212, 0.12);
+    --effect-cyan-15: rgba(6, 182, 212, 0.15);
+    --effect-cyan-20: rgba(6, 182, 212, 0.2);
+    --effect-cyan-25: rgba(6, 182, 212, 0.25);
+    --effect-cyan-30: rgba(6, 182, 212, 0.3);
+    --effect-cyan-40: rgba(6, 182, 212, 0.4);
+    --effect-cyan-50: rgba(6, 182, 212, 0.5);
+
+    /* Cyan-300 effects (34, 211, 238) */
+    --effect-cyan-300-8: rgba(34, 211, 238, 0.08);
+    --effect-cyan-300-12: rgba(34, 211, 238, 0.12);
+
+    /* Red effects (239, 68, 68) */
+    --effect-red-8: rgba(239, 68, 68, 0.08);
+    --effect-red-10: rgba(239, 68, 68, 0.1);
+    --effect-red-15: rgba(239, 68, 68, 0.15);
+    --effect-red-20: rgba(239, 68, 68, 0.2);
+    --effect-red-30: rgba(239, 68, 68, 0.3);
+    --effect-red-40: rgba(239, 68, 68, 0.4);
+
+    /* Amber effects (245, 158, 11) */
+    --effect-amber-8: rgba(245, 158, 11, 0.08);
+    --effect-amber-10: rgba(245, 158, 11, 0.1);
+    --effect-amber-15: rgba(245, 158, 11, 0.15);
+    --effect-amber-20: rgba(245, 158, 11, 0.2);
+    --effect-amber-25: rgba(245, 158, 11, 0.25);
+    --effect-amber-30: rgba(245, 158, 11, 0.3);
+    --effect-amber-35: rgba(245, 158, 11, 0.35);
+    --effect-amber-40: rgba(245, 158, 11, 0.4);
+    --effect-amber-45: rgba(245, 158, 11, 0.45);
+
+    /* Amber-300 effects (251, 191, 36) */
+    --effect-amber-300-5: rgba(251, 191, 36, 0.05);
+    --effect-amber-300-15: rgba(251, 191, 36, 0.15);
+    --effect-amber-300-25: rgba(251, 191, 36, 0.25);
+
+    /* Blue effects (59, 130, 246) */
+    --effect-blue-10: rgba(59, 130, 246, 0.1);
+    --effect-blue-15: rgba(59, 130, 246, 0.15);
+    --effect-blue-20: rgba(59, 130, 246, 0.2);
+    --effect-blue-25: rgba(59, 130, 246, 0.25);
+    --effect-blue-30: rgba(59, 130, 246, 0.3);
+
+    /* Yellow/Amber-400 effects (234, 179, 8) */
+    --effect-yellow-10: rgba(234, 179, 8, 0.1);
+    --effect-yellow-15: rgba(234, 179, 8, 0.15);
+    --effect-yellow-25: rgba(234, 179, 8, 0.25);
+    --effect-yellow-30: rgba(234, 179, 8, 0.3);
+
+    /* Green-500 effects (34, 197, 94) */
+    --effect-green-10: rgba(34, 197, 94, 0.1);
+    --effect-green-15: rgba(34, 197, 94, 0.15);
+    --effect-green-20: rgba(34, 197, 94, 0.2);
+
+    /* Green-600 effects (22, 163, 74) */
+    --effect-green-600-5: rgba(22, 163, 74, 0.05);
+    --effect-green-600-10: rgba(22, 163, 74, 0.1);
+
+    /* Gray-500 effects (107, 114, 128) */
+    --effect-gray-10: rgba(107, 114, 128, 0.1);
+
+    /* Neutral Gray effects (100, 100, 100) */
+    --effect-neutral-10: rgba(100, 100, 100, 0.1);
+
+    /* Orange effects (249, 115, 22) */
+    --effect-orange-5: rgba(249, 115, 22, 0.05);
+    --effect-orange-10: rgba(249, 115, 22, 0.1);
+    --effect-orange-15: rgba(249, 115, 22, 0.15);
+    --effect-orange-20: rgba(249, 115, 22, 0.2);
+    --effect-orange-30: rgba(249, 115, 22, 0.3);
+    --effect-orange-40: rgba(249, 115, 22, 0.4);
+    --effect-orange-50: rgba(249, 115, 22, 0.5);
+
+    /* Pink effects (236, 72, 153) */
+    --effect-pink-5: rgba(236, 72, 153, 0.05);
+    --effect-pink-8: rgba(236, 72, 153, 0.08);
+    --effect-pink-10: rgba(236, 72, 153, 0.1);
+    --effect-pink-12: rgba(236, 72, 153, 0.12);
+    --effect-pink-15: rgba(236, 72, 153, 0.15);
+    --effect-pink-25: rgba(236, 72, 153, 0.25);
+
+    /* Primary-600/Indigo-600 effects (79, 70, 229) */
+    --effect-indigo-600-8: rgba(79, 70, 229, 0.08);
+    --effect-indigo-600-10: rgba(79, 70, 229, 0.1);
+    --effect-indigo-600-15: rgba(79, 70, 229, 0.15);
+    --effect-indigo-600-25: rgba(79, 70, 229, 0.25);
+
+    /* Primary-300/Indigo-300 effects (165, 180, 252) */
+    --effect-indigo-300-50: rgba(165, 180, 252, 0.5);
+
+    /* Slate effects (30, 41, 59) - slate-800 */
+    --effect-slate-40: rgba(30, 41, 59, 0.4);
+    --effect-slate-50: rgba(30, 41, 59, 0.5);
+    --effect-slate-60: rgba(30, 41, 59, 0.6);
+    --effect-slate-70: rgba(30, 41, 59, 0.7);
+    --effect-slate-85: rgba(30, 41, 59, 0.85);
+    --effect-slate-90: rgba(30, 41, 59, 0.9);
+    --effect-slate-95: rgba(30, 41, 59, 0.95);
+
+    /* Slate-900 effects (15, 23, 42) */
+    --effect-slate-900-50: rgba(15, 23, 42, 0.5);
+    --effect-slate-900-60: rgba(15, 23, 42, 0.6);
+    --effect-slate-900-70: rgba(15, 23, 42, 0.7);
+    --effect-slate-900-80: rgba(15, 23, 42, 0.8);
+    --effect-slate-900-85: rgba(15, 23, 42, 0.85);
+    --effect-slate-900-90: rgba(15, 23, 42, 0.9);
+    --effect-slate-900-95: rgba(15, 23, 42, 0.95);
+
+    /* Slate-600 effects (51, 65, 85) */
+    --effect-slate-600-50: rgba(51, 65, 85, 0.5);
+    --effect-slate-600-60: rgba(51, 65, 85, 0.6);
+    --effect-slate-600-90: rgba(51, 65, 85, 0.9);
+
+    /* Indigo-400 effects (129, 140, 248) */
+    --effect-indigo-400-20: rgba(129, 140, 248, 0.2);
+
+    /* Glass shadow effects (31, 38, 135) */
+    --effect-glass-shadow: rgba(31, 38, 135, 0.1);
+    --effect-glass-shadow-heavy: rgba(31, 38, 135, 0.15);
+    --effect-glass-shadow-20: rgba(31, 38, 135, 0.2);
+    --effect-glass-shadow-dark: rgba(31, 38, 135, 0.37);
+
+    /* Black opacity (alternative syntax without spaces) */
+    --effect-black-6-alt: rgba(0,0,0,0.06);
+    --effect-black-10-alt: rgba(0,0,0,0.1);
+    --effect-black-70: rgba(0, 0, 0, 0.7);
+    --effect-white-12: rgba(255, 255, 255, 0.12);
+
+    /* Primary color hover/active states */
+    --color-primary-hover: #4f46e5;
+    --color-primary-active: #4338ca;
+
+    /* Additional primary effects */
+    --effect-primary-6: rgba(99, 102, 241, 0.06);
+    --effect-primary-12: rgba(99, 102, 241, 0.12);
+    --effect-primary-18: rgba(99, 102, 241, 0.18);
+    --effect-primary-22: rgba(99, 102, 241, 0.22);
+    --effect-primary-60: rgba(99, 102, 241, 0.6);
+    --effect-primary-88: rgba(99, 102, 241, 0.88);
+
+    /* Glass shadow 12 (31, 38, 135) */
+    --effect-glass-shadow-12: rgba(31, 38, 135, 0.12);
+
+    /* Teal-500 effects (20, 184, 166) */
+    --effect-teal-500-8: rgba(20, 184, 166, 0.08);
+    --effect-teal-500-10: rgba(20, 184, 166, 0.1);
+
+    /* Emerald high opacity (16, 185, 129) */
+    --effect-emerald-50: rgba(16, 185, 129, 0.5);
+    --effect-emerald-95: rgba(16, 185, 129, 0.95);
+
+    /* Cyan high opacity (6, 182, 212) */
+    --effect-cyan-90: rgba(6, 182, 212, 0.90);
+
+    /* Emerald-600 high opacity (5, 150, 105) */
+    --effect-emerald-600-92: rgba(5, 150, 105, 0.92);
+
+    /* Slate-800 additional (30, 41, 59) */
+    --effect-slate-65: rgba(30, 41, 59, 0.65);
+    --effect-slate-75: rgba(30, 41, 59, 0.75);
+    --effect-slate-92: rgba(30, 41, 59, 0.92);
+    --effect-slate-98: rgba(30, 41, 59, 0.98);
+
+    /* Slate-600 additional (51, 65, 85) */
+    --effect-slate-600-40: rgba(51, 65, 85, 0.4);
+    --effect-slate-600-80: rgba(51, 65, 85, 0.8);
+
+    /* Gray-600 effects (55, 65, 81) */
+    --effect-gray-600-80: rgba(55, 65, 81, 0.8);
+
+    /* Gray-500 effects (75, 85, 99) */
+    --effect-gray-500-60: rgba(75, 85, 99, 0.6);
+
+    /* Indigo-600 additional (79, 70, 229) */
+    --effect-indigo-600-35: rgba(79, 70, 229, 0.35);
+
+    /* Blue additional (59, 130, 246) */
+    --effect-blue-8: rgba(59, 130, 246, 0.08);
+    --effect-blue-12: rgba(59, 130, 246, 0.12);
+
+    /* Green-500 additional (34, 197, 94) */
+    --effect-green-8: rgba(34, 197, 94, 0.08);
+
+    /* Black additional */
+    --effect-black-12: rgba(0, 0, 0, 0.12);
+
+    /* White no-space variants */
+    --effect-white-1-alt: rgba(255,255,255,0.01);
+    --effect-white-3-alt: rgba(255,255,255,0.03);
+
+    /* Slate-800 additional (30, 41, 59) */
+    --effect-slate-55: rgba(30, 41, 59, 0.55);
+
+    /* Amber-300 additional (251, 191, 36) */
+    --effect-amber-300-20: rgba(251, 191, 36, 0.2);
+    --effect-amber-300-40: rgba(251, 191, 36, 0.4);
+
+    /* Light grays (slate-50, gray-100, gray-200, slate-200) */
+    --effect-slate-50-50: rgba(248, 250, 252, 0.5);
+    --effect-gray-100-90: rgba(243, 244, 246, 0.9);
+    --effect-gray-200-80: rgba(229, 231, 235, 0.8);
+    --effect-slate-200-50: rgba(226, 232, 240, 0.5);
+
+    /* Teal-500 additional (20, 184, 166) */
+    --effect-teal-500-25: rgba(20, 184, 166, 0.25);
+    --effect-teal-500-35: rgba(20, 184, 166, 0.35);
+
+    /* Emerald additional (16, 185, 129) */
+    --effect-emerald-6: rgba(16, 185, 129, 0.06);
+    --effect-emerald-18: rgba(16, 185, 129, 0.18);
+    --effect-emerald-60: rgba(16, 185, 129, 0.6);
+
+    /* Slate-900 additional (15, 23, 42) */
+    --effect-slate-900-65: rgba(15, 23, 42, 0.65);
+    --effect-slate-900-75: rgba(15, 23, 42, 0.75);
+    --effect-slate-900-98: rgba(15, 23, 42, 0.98);
+
+    /* Sky-500 effects (14, 165, 233) */
+    --effect-sky-12: rgba(14, 165, 233, 0.12);
+    --effect-sky-18: rgba(14, 165, 233, 0.18);
+    --effect-sky-20: rgba(14, 165, 233, 0.2);
+    --effect-sky-30: rgba(14, 165, 233, 0.3);
+    --effect-sky-40: rgba(14, 165, 233, 0.4);
+    --effect-sky-60: rgba(14, 165, 233, 0.6);
+
+    /* Black high opacity */
+    --effect-black-80: rgba(0, 0, 0, 0.8);
+    --effect-black-4: rgba(0, 0, 0, 0.04);
+
+    /* Slate-800 additional (30, 41, 59) */
+    --effect-slate-80: rgba(30, 41, 59, 0.8);
+
+    /* Zinc-900 effects (24, 24, 27) */
+    --effect-zinc-45: rgba(24, 24, 27, 0.45);
+    --effect-zinc-60: rgba(24, 24, 27, 0.6);
+    --effect-zinc-65: rgba(24, 24, 27, 0.65);
+    --effect-zinc-80: rgba(24, 24, 27, 0.8);
+
+    /* Dark neutral (30, 30, 30) */
+    --effect-neutral-dark-50: rgba(30, 30, 30, 0.5);
+
+    /* Warm accent (255, 200, 100) */
+    --effect-warm-accent-5: rgba(255, 200, 100, 0.05);
+
+    /* Teal-500 additional (20, 184, 166) */
+    --effect-teal-500-30: rgba(20, 184, 166, 0.3);
+
+    /* Violet-500 additional (168, 85, 247) */
+    --effect-violet-20: rgba(168, 85, 247, 0.2);
+
+    /* Slate-900 additional (15, 23, 42) */
+    --effect-slate-900-50: rgba(15, 23, 42, 0.5);
+
+    /* Slate-400 (148, 163, 184) */
+    --effect-slate-400-10: rgba(148, 163, 184, 0.1);
+
+    /* Primary additional */
+    --effect-primary-2: rgba(99, 102, 241, 0.02);
+    --effect-primary-3: rgba(99, 102, 241, 0.03);
+    --effect-primary-4: rgba(99, 102, 241, 0.04);
+    --effect-primary-35: rgba(99, 102, 241, 0.35);
+    --effect-primary-45: rgba(99, 102, 241, 0.45);
+
+    /* Cyan additional (6, 182, 212) */
+    --effect-cyan-35: rgba(6, 182, 212, 0.35);
+    --effect-cyan-45: rgba(6, 182, 212, 0.45);
+    --effect-cyan-60: rgba(6, 182, 212, 0.6);
+
+    /* Cyan-300 additional (34, 211, 238) */
+    --effect-cyan-300-20: rgba(34, 211, 238, 0.2);
+
+    /* Green-500 additional (34, 197, 94) */
+    --effect-green-25: rgba(34, 197, 94, 0.25);
+
+    /* Glass shadow additional (31, 38, 135) */
+    --effect-glass-shadow-15: rgba(31, 38, 135, 0.15);
+
+    /* Gold (255, 215, 0) */
+    --effect-gold-10: rgba(255, 215, 0, 0.1);
+    --effect-gold-30: rgba(255, 215, 0, 0.3);
+    --effect-gold-50: rgba(255, 215, 0, 0.5);
+
+    /* Orange-300 (253, 186, 116) */
+    --effect-orange-300-60: rgba(253, 186, 116, 0.6);
+
+    /* Amber-300 additional (251, 191, 36) */
+    --effect-amber-300-15: rgba(251, 191, 36, 0.15);
+
+    /* Orange-400 (251, 146, 60) */
+    --effect-orange-400-15: rgba(251, 146, 60, 0.15);
+    --effect-orange-400-60: rgba(251, 146, 60, 0.6);
+
+    /* Orange additional (249, 115, 22) */
+    --effect-orange-50: rgba(249, 115, 22, 0.5);
+
+    /* Amber additional (245, 158, 11) */
+    --effect-amber-8: rgba(245, 158, 11, 0.08);
+    --effect-amber-25: rgba(245, 158, 11, 0.25);
+    --effect-amber-30: rgba(245, 158, 11, 0.3);
+
+    /* Red additional (239, 68, 68) */
+    --effect-red-25: rgba(239, 68, 68, 0.25);
+
+    /* Blue additional (59, 130, 246) */
+    --effect-blue-20: rgba(59, 130, 246, 0.2);
+
+    /* Slate-600 additional (51, 65, 85) */
+    --effect-slate-600-50: rgba(51, 65, 85, 0.5);
+
+    /* Slate-600 solid (71, 85, 105) */
+    --effect-slate-500-100: rgba(71, 85, 105, 1);
+
+    /* White full/minimal */
+    --effect-white-1: rgba(255, 255, 255, 0.01);
+    --effect-white-100: rgba(255, 255, 255, 1);
+
+    /* Red-0 (transparent red for gradients) */
+    --effect-red-0: rgba(239, 68, 68, 0);
+
+    /* Yellow/Amber-400 additional (234, 179, 8) */
+    --effect-yellow-12: rgba(234, 179, 8, 0.12);
+    --effect-yellow-20: rgba(234, 179, 8, 0.2);
+
+    /* Slate-200 additional (226, 232, 240) */
+    --effect-slate-200-90: rgba(226, 232, 240, 0.9);
+
+    /* Green-600 additional (22, 163, 74) */
+    --effect-green-600-20: rgba(22, 163, 74, 0.2);
+
+    /* Fuchsia-500 (217, 70, 239) */
+    --effect-fuchsia-10: rgba(217, 70, 239, 0.1);
+    --effect-fuchsia-15: rgba(217, 70, 239, 0.15);
+
+    /* Amber-600 (217, 119, 6) */
+    --effect-amber-600-10: rgba(217, 119, 6, 0.1);
+
+    /* Cyan-100 (207, 250, 254) */
+    --effect-cyan-100-8: rgba(207, 250, 254, 0.08);
+
+    /* Violet-500 additional (168, 85, 247) */
+    --effect-violet-6: rgba(168, 85, 247, 0.06);
+    --effect-violet-35: rgba(168, 85, 247, 0.35);
+    --effect-violet-60: rgba(168, 85, 247, 0.6);
+
+    /* Cyan-200 (165, 243, 252) */
+    --effect-cyan-200-6: rgba(165, 243, 252, 0.06);
+
+    /* Bronze (205, 127, 50) */
+    --effect-bronze-10: rgba(205, 127, 50, 0.1);
+    --effect-bronze-30: rgba(205, 127, 50, 0.3);
+    --effect-bronze-50: rgba(205, 127, 50, 0.5);
+
+    /* Silver (192, 192, 192) */
+    --effect-silver-10: rgba(192, 192, 192, 0.1);
+    --effect-silver-30: rgba(192, 192, 192, 0.3);
+    --effect-silver-50: rgba(192, 192, 192, 0.5);
+
+    /* Purple-400 (192, 132, 252) */
+    --effect-purple-400-20: rgba(192, 132, 252, 0.2);
+    --effect-purple-400-30: rgba(192, 132, 252, 0.3);
+    --effect-purple-400-60: rgba(192, 132, 252, 0.6);
+
+    /* Cyan-400 (103, 232, 249) */
+    --effect-cyan-400-6: rgba(103, 232, 249, 0.06);
+    --effect-cyan-400-8: rgba(103, 232, 249, 0.08);
+    --effect-cyan-400-10: rgba(103, 232, 249, 0.1);
+
+    /* Slate-500 (100, 116, 139) */
+    --effect-slate-500-20: rgba(100, 116, 139, 0.2);
+
+    /* Violet-600 (124, 58, 237) */
+    --effect-violet-600-25: rgba(124, 58, 237, 0.25);
+    --effect-violet-600-30: rgba(124, 58, 237, 0.3);
+    --effect-violet-600-40: rgba(124, 58, 237, 0.4);
+
+    /* Indigo-400 additional (129, 140, 248) */
+    --effect-indigo-400-20: rgba(129, 140, 248, 0.2);
+
+    /* Purple additional (139, 92, 246) */
+    --effect-purple-35: rgba(139, 92, 246, 0.35);
+    --effect-purple-60: rgba(139, 92, 246, 0.6);
+
+    /* Emerald additional (16, 185, 129) */
+    --effect-emerald-5: rgba(16, 185, 129, 0.05);
+    --effect-emerald-25: rgba(16, 185, 129, 0.25);
+    --effect-emerald-40: rgba(16, 185, 129, 0.4);
+
+    /* Slate-900 additional (15, 23, 42) */
+    --effect-slate-900-70: rgba(15, 23, 42, 0.7);
+    --effect-slate-900-85: rgba(15, 23, 42, 0.85);
+    --effect-slate-900-90: rgba(15, 23, 42, 0.9);
+
+    /* Sky-500 additional (14, 165, 233) */
+    --effect-sky-20: rgba(14, 165, 233, 0.2);
+
+    /* Black no-space variant */
+    --effect-black-20-alt: rgba(0,0,0,0.2);
+    --effect-black-1: rgba(0, 0, 0, 0.01);
+
+    /* Gray-100 additional (243, 244, 246) */
+    --effect-gray-100-80: rgba(243, 244, 246, 0.8);
+
+    /* Gray-300 (209, 213, 219) */
+    --effect-gray-300-50: rgba(209, 213, 219, 0.5);
+
+    /* Primary additional */
+    --effect-primary-55: rgba(99, 102, 241, 0.55);
+    --effect-primary-70: rgba(99, 102, 241, 0.7);
+    --effect-primary-75: rgba(99, 102, 241, 0.75);
+    --effect-primary-80: rgba(99, 102, 241, 0.8);
+    --effect-primary-85: rgba(99, 102, 241, 0.85);
+    --effect-primary-90: rgba(99, 102, 241, 0.9);
+    --effect-primary-95: rgba(99, 102, 241, 0.95);
+
+    /* Purple additional (139, 92, 246) */
+    --effect-purple-55: rgba(139, 92, 246, 0.55);
+    --effect-purple-65: rgba(139, 92, 246, 0.65);
+    --effect-purple-70: rgba(139, 92, 246, 0.7);
+    --effect-purple-4: rgba(139, 92, 246, 0.04);
+
+    /* Gray-50 (249, 250, 251) */
+    --effect-gray-50-50: rgba(249, 250, 251, 0.5);
+    --effect-gray-50-60: rgba(249, 250, 251, 0.6);
+    --effect-gray-50-80: rgba(249, 250, 251, 0.8);
+    --effect-gray-50-90: rgba(249, 250, 251, 0.9);
+
+    /* Gray-200 additional (229, 231, 235) */
+    --effect-gray-200-90: rgba(229, 231, 235, 0.9);
+
+    /* Gray-300 additional (209, 213, 219) */
+    --effect-gray-300-60: rgba(209, 213, 219, 0.6);
+
+    /* Gray-100 additional (243, 244, 246) */
+    --effect-gray-100-60: rgba(243, 244, 246, 0.6);
+
+    /* Indigo-50 (238, 242, 255) */
+    --effect-indigo-50-90: rgba(238, 242, 255, 0.9);
+
+    /* Pink-600 (219, 39, 119) */
+    --effect-pink-600-15: rgba(219, 39, 119, 0.15);
+    --effect-pink-600-20: rgba(219, 39, 119, 0.2);
+    --effect-pink-600-25: rgba(219, 39, 119, 0.25);
+    --effect-pink-600-30: rgba(219, 39, 119, 0.3);
+    --effect-pink-600-40: rgba(219, 39, 119, 0.4);
+
+    /* Violet-500 additional (168, 85, 247) */
+    --effect-violet-12: rgba(168, 85, 247, 0.12);
+
+    /* Gray-500 (107, 114, 128) */
+    --effect-gray-500-20: rgba(107, 114, 128, 0.2);
+
+    /* Pink additional (236, 72, 153) */
+    --effect-pink-15: rgba(236, 72, 153, 0.15);
+    --effect-pink-30: rgba(236, 72, 153, 0.3);
+
+    /* Emerald-600 additional (5, 150, 105) */
+    --effect-emerald-600-10: rgba(5, 150, 105, 0.1);
+    --effect-emerald-600-15: rgba(5, 150, 105, 0.15);
+
+    /* Green-500 additional (34, 197, 94) */
+    --effect-green-30: rgba(34, 197, 94, 0.3);
+    --effect-green-40: rgba(34, 197, 94, 0.4);
+
+    /* Orange-400 additional (251, 146, 60) */
+    --effect-orange-400-30: rgba(251, 146, 60, 0.3);
+
+    /* Amber additional (245, 158, 11) */
+    --effect-amber-50: rgba(245, 158, 11, 0.5);
+
+    /* Amber-600 additional (217, 119, 6) */
+    --effect-amber-600-15: rgba(217, 119, 6, 0.15);
+    --effect-amber-600-20: rgba(217, 119, 6, 0.2);
+
+    /* Violet-500 additional (168, 85, 247) */
+    --effect-violet-2: rgba(168, 85, 247, 0.02);
+    --effect-violet-8: rgba(168, 85, 247, 0.08);
+    --effect-violet-18: rgba(168, 85, 247, 0.18);
+    --effect-violet-22: rgba(168, 85, 247, 0.22);
+    --effect-violet-30: rgba(168, 85, 247, 0.3);
+    --effect-violet-50: rgba(168, 85, 247, 0.5);
+
+    /* Emerald additional (16, 185, 129) */
+    --effect-emerald-0: rgba(16, 185, 129, 0);
+    --effect-emerald-30: rgba(16, 185, 129, 0.3);
+    --effect-emerald-35: rgba(16, 185, 129, 0.35);
+    --effect-emerald-45: rgba(16, 185, 129, 0.45);
+
+    /* Slate-900 additional (15, 23, 42) */
+    --effect-slate-900-40: rgba(15, 23, 42, 0.4);
+
+    /* Purple additional (139, 92, 246) */
+    --effect-purple-6: rgba(139, 92, 246, 0.06);
+    --effect-purple-45: rgba(139, 92, 246, 0.45);
+    --effect-purple-90: rgba(139, 92, 246, 0.9);
+    --effect-purple-95: rgba(139, 92, 246, 0.95);
+
+    /* Indigo-400 additional (129, 140, 248) */
+    --effect-indigo-400-40: rgba(129, 140, 248, 0.4);
+
+    /* Gray-500 additional (107, 114, 128) */
+    --effect-gray-500-10: rgba(107, 114, 128, 0.1);
+    --effect-gray-500-15: rgba(107, 114, 128, 0.15);
+    --effect-gray-500-70: rgba(107, 114, 128, 0.7);
+
+    /* Slate-500 additional (100, 116, 139) */
+    --effect-slate-500-10: rgba(100, 116, 139, 0.1);
+    --effect-slate-500-18: rgba(100, 116, 139, 0.18);
+
+    /* Black additional */
+    --effect-black-18: rgba(0, 0, 0, 0.18);
+
+    /* Indigo-600 additional (79, 70, 229) */
+    --effect-indigo-600-30: rgba(79, 70, 229, 0.3);
+
+    /* Slate-500 solid (71, 85, 105) */
+    --effect-slate-500-15: rgba(71, 85, 105, 0.15);
+
+    /* Cyan additional (6, 182, 212) */
+    --effect-cyan-50: rgba(6, 182, 212, 0.5);
+
+    /* Blue additional (59, 130, 246) */
+    --effect-blue-3: rgba(59, 130, 246, 0.03);
+    --effect-blue-10: rgba(59, 130, 246, 0.1);
+    --effect-blue-40: rgba(59, 130, 246, 0.4);
+    --effect-blue-50: rgba(59, 130, 246, 0.5);
+
+    /* Slate-600 additional (51, 65, 85) */
+    --effect-slate-600-40: rgba(51, 65, 85, 0.4);
+
+    /* Blue-600 (37, 99, 235) */
+    --effect-blue-600-15: rgba(37, 99, 235, 0.15);
+    --effect-blue-600-20: rgba(37, 99, 235, 0.2);
+
+    /* Gray-50 additional (249, 250, 251) */
+    --effect-gray-50-70: rgba(249, 250, 251, 0.7);
+    --effect-gray-50-100: rgba(249, 250, 251, 1);
+
+    /* Slate-50 additional (248, 250, 252) */
+    --effect-slate-50-70: rgba(248, 250, 252, 0.7);
+    --effect-slate-50-95: rgba(248, 250, 252, 0.95);
+
+    /* Amber additional (245, 158, 11) */
+    --effect-amber-35: rgba(245, 158, 11, 0.35);
+
+    /* Red additional (239, 68, 68) */
+    --effect-red-3: rgba(239, 68, 68, 0.3);
+
+    /* Pink additional (236, 72, 153) */
+    --effect-pink-2: rgba(236, 72, 153, 0.02);
+    --effect-pink-6: rgba(236, 72, 153, 0.06);
+    --effect-pink-20: rgba(236, 72, 153, 0.2);
+    --effect-pink-40: rgba(236, 72, 153, 0.4);
+    --effect-pink-50: rgba(236, 72, 153, 0.5);
+
+    /* Orange-600 (234, 88, 12) */
+    --effect-orange-600-20: rgba(234, 88, 12, 0.2);
+
+    /* Red-600 (220, 38, 38) */
+    --effect-red-600-10: rgba(220, 38, 38, 0.1);
+
+    /* Pink-600 additional (219, 39, 119) */
+    --effect-pink-600-35: rgba(219, 39, 119, 0.35);
+    --effect-pink-600-50: rgba(219, 39, 119, 0.5);
+    --effect-pink-600-60: rgba(219, 39, 119, 0.6);
+
+    /* Orange custom (212, 98, 31) */
+    --effect-orange-custom-35: rgba(212, 98, 31, 0.35);
+    --effect-orange-custom-45: rgba(212, 98, 31, 0.45);
+
+    /* Red custom (185, 30, 10) */
+    --effect-red-custom-35: rgba(185, 30, 10, 0.35);
+    --effect-red-custom-45: rgba(185, 30, 10, 0.45);
+
+    /* Gray-400 (156, 163, 175) */
+    --effect-gray-400-20: rgba(156, 163, 175, 0.2);
+
+    /* Slate-400 additional (148, 163, 184) */
+    --effect-slate-400-70: rgba(148, 163, 184, 0.7);
+
+    /* Violet-600 additional (124, 58, 237) */
+    --effect-violet-600-15: rgba(124, 58, 237, 0.15);
+
+    /* ==========================================
+       TYPOGRAPHY
+       ========================================== */
+    --font-family-primary: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    --font-family-display: "Outfit", var(--font-family-primary);
+
+    --font-size-xs: 0.75rem;
+    --font-size-sm: 0.875rem;
+    --font-size-base: 1rem;
+    --font-size-lg: 1.125rem;
+    --font-size-xl: 1.25rem;
+    --font-size-2xl: 1.5rem;
+    --font-size-3xl: 1.875rem;
+    --font-size-4xl: 2.25rem;
+
+    --font-weight-normal: 400;
+    --font-weight-medium: 500;
+    --font-weight-semibold: 600;
+    --font-weight-bold: 700;
+
+    --line-height-tight: 1.25;
+    --line-height-normal: 1.5;
+    --line-height-relaxed: 1.75;
+
+    /* ==========================================
+       TRANSITIONS & ANIMATIONS
+       ========================================== */
+    --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-base: 300ms cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-slow: 500ms cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-smooth: var(--transition-base);
+    --transition-normal: var(--transition-base);
+    --transition-spring: 300ms cubic-bezier(0.68, -0.55, 0.265, 1.55);
+
+    --duration-instant: 50ms;
+    --duration-fast: 150ms;
+    --duration-normal: 300ms;
+    --duration-slow: 500ms;
+
+    --ease-in: cubic-bezier(0.4, 0, 1, 1);
+    --ease-out: cubic-bezier(0, 0, 0.2, 1);
+    --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+    --ease-bounce: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    --ease-smooth: cubic-bezier(0.4, 0, 0.2, 1);
+    --ease-default: cubic-bezier(0.4, 0, 0.2, 1);
+    --ease-native: cubic-bezier(0.2, 0.8, 0.2, 1);
+    --ease-ios: cubic-bezier(0.25, 0.1, 0.25, 1);
+
+    --spring-bounce: cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    --spring-smooth: cubic-bezier(0.34, 1.56, 0.64, 1);
+    --spring-snappy: cubic-bezier(0.175, 0.885, 0.32, 1.275);
+
+    --hover-fast: 150ms var(--ease-smooth);
+    --hover-normal: 250ms var(--ease-smooth);
+    --hover-ease: var(--ease-smooth);
+    --hover-bounce: 300ms var(--spring-bounce);
+
+    /* ==========================================
+       SHADOWS
+       ========================================== */
+    --shadow-xs: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    --shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
+    --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+    --shadow-2xl: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    --shadow-glass: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+    --shadow-glass-inset: inset 0 0 0 1px rgba(255, 255, 255, 0.18);
+    --shadow-glow: 0 0 20px rgba(99, 102, 241, 0.2);
+    --shadow: var(--shadow-md);
+    --box-shadow: var(--shadow-md);
+
+    /* ==========================================
+       BORDER RADIUS
+       ========================================== */
+    --radius-none: 0;
+    --radius-sm: 4px;
+    --radius-base: 8px;
+    --radius-md: 12px;
+    --radius-lg: 16px;
+    --radius-xl: 20px;
+    --radius-2xl: 24px;
+    --radius-full: 9999px;
+    --radius-1: var(--radius-sm);
+    --radius-2: var(--radius-base);
+    --radius-3: var(--radius-md);
+
+    /* ==========================================
+       Z-INDEX SCALE
+       ========================================== */
+    --z-base: 0;
+    --z-raised: 1;
+    --z-above: 10;
+    --z-header: 100;
+    --z-sticky: 110;
+    --z-fixed: 110;
+    --z-navbar: 120;
+    --z-mega-menu: 130;
+    --z-dropdown: 200;
+    --z-popover: 210;
+    --z-drawer: 220;
+    --z-sidebar-overlay: 230;
+    --z-modal-backdrop: 300;
+    --z-modal: 310;
+    --z-mobile-sheet-backdrop: 320;
+    --z-mobile-sheet: 330;
+    --z-toast: 400;
+    --z-tooltip: 410;
+    --z-notification: 420;
+    --z-ai-widget: 500;
+    --z-loading-overlay: 510;
+    --z-emergency: 9999;
+
+    /* ==========================================
+       BREAKPOINTS (for JS usage)
+       ========================================== */
+    --breakpoint-sm: 480px;
+    --breakpoint-md: 768px;
+    --breakpoint-lg: 1024px;
+    --breakpoint-xl: 1280px;
+    --breakpoint-2xl: 1536px;
+
+    /* ==========================================
+       HTB (HOUR TIMEBANK) BRAND VARIABLES
+       From nexus-phoenix.css
+       ========================================== */
+    --htb-color-brand-primary: var(--color-primary-600);
+    --htb-color-brand-secondary: #d946ef;
+    --htb-color-brand-accent: var(--color-amber-300);
+    --htb-color-semantic-success: var(--color-green-500);
+    --htb-color-semantic-warning: var(--color-warning);
+    --htb-color-semantic-error: var(--color-danger);
+    --htb-color-semantic-info: var(--color-info);
+    --htb-color-neutral-50: var(--color-gray-50);
+    --htb-color-neutral-100: var(--color-gray-100);
+    --htb-color-neutral-200: var(--color-gray-200);
+    --htb-color-neutral-300: var(--color-gray-300);
+    --htb-color-neutral-400: var(--color-gray-400);
+    --htb-color-neutral-500: var(--color-gray-500);
+    --htb-color-neutral-600: var(--color-gray-600);
+    --htb-color-neutral-700: var(--color-gray-700);
+    --htb-color-neutral-800: var(--color-gray-800);
+    --htb-color-neutral-900: var(--color-gray-900);
+    --htb-spacing-xs: var(--space-1);
+    --htb-spacing-sm: var(--space-2);
+    --htb-spacing-md: var(--space-4);
+    --htb-spacing-lg: var(--space-6);
+    --htb-spacing-xl: var(--space-10);
+    --htb-radius-sm: var(--radius-sm);
+    --htb-radius-md: var(--radius-base);
+    --htb-radius-lg: var(--radius-lg);
+    --htb-radius-full: var(--radius-full);
+
+    /* HTB Theme variables */
+    --htb-bg-page: var(--color-gray-50);
+    --htb-bg-card: var(--color-white);
+    --htb-primary: linear-gradient(120deg, var(--color-primary-600) 0%, #d946ef 50%, var(--color-amber-300) 100%);
+    --htb-text-main: var(--color-gray-800);
+    --htb-text-muted: var(--color-gray-500);
+    --htb-text-secondary: var(--text-secondary);
+    --htb-radius: var(--radius-lg);
+    --htb-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.025);
+    --htb-border-color: var(--color-gray-200);
+    --htb-border: var(--border-default);
+    --htb-card-bg: var(--bg-elevated);
+    --htb-text: var(--text-primary);
+    --htb-accent: var(--color-primary-500);
+    --htb-glass-blur: var(--glass-blur);
+    --htb-primary-rgb: 99, 102, 241;
+
+    /* HTB Gradients */
+    --htb-gradient-brand: linear-gradient(120deg, var(--color-primary-600) 0%, #d946ef 50%, var(--color-amber-300) 100%);
+    --htb-gradient-front: linear-gradient(120deg, var(--color-blue-600) 0%, var(--color-purple-500-alt) 50%, var(--color-pink-400) 100%);
+    --htb-gradient-members: linear-gradient(120deg, var(--color-primary-600) 0%, var(--color-rose-600) 50%, var(--color-amber-300) 100%);
+    --htb-gradient-offers: linear-gradient(120deg, var(--color-emerald-600) 0%, var(--color-emerald-400) 50%, var(--color-lime-300) 100%);
+    --htb-gradient-requests: linear-gradient(120deg, var(--color-orange-500) 0%, var(--color-rose-500) 50%, var(--color-yellow-200) 100%);
+    --htb-gradient-wallet: linear-gradient(120deg, var(--color-primary-500) 0%, var(--color-purple-500) 50%, var(--color-purple-300) 100%);
+    --htb-gradient-profile: linear-gradient(120deg, var(--color-primary-600) 0%, var(--color-purple-500-alt) 50%, var(--color-pink-500) 100%);
+    --htb-gradient-hub: linear-gradient(120deg, var(--color-pink-600) 0%, var(--color-pink-400) 50%, var(--color-pink-200) 100%);
+    --htb-gradient-create: linear-gradient(120deg, var(--color-teal-700) 0%, var(--color-sky-500) 50%, var(--color-purple-400) 100%);
+
+    /* ==========================================
+       COMPONENT SEMANTIC TOKENS
+       ========================================== */
+
+    /* Card backgrounds */
+    --card-bg: var(--bg-elevated);
+    --card-background-color: var(--bg-elevated);
+
+    /* Input backgrounds */
+    --input-bg: var(--bg-elevated);
+    --input-focus-bg: var(--bg-elevated);
+
+    /* Header */
+    --header-height: var(--layout-header-height);
+    --header-bg: var(--bg-elevated);
+
+    /* Navigation */
+    --nav-bg-solid: var(--bg-elevated);
+    --nav-text-active: var(--color-primary-500);
+
+    /* Sidebar/Drawer */
+    --sidebar-bg: var(--bg-elevated);
+    --sidebar-border: var(--border-default);
+    --drawer-transition: var(--transition-base);
+    --drawer-width: 320px;
+
+    /* Pill/badge */
+    --pill-bg: var(--bg-surface);
+    --pill-border: var(--border-default);
+
+    /* Mobile navigation */
+    --mobile-nav-height: 84px;
+    --mobile-nav-bg: var(--color-white);
+    --mobile-nav-border: rgba(0, 0, 0, 0.08);
+    --mobile-nav-text: #8e8e93;
+    --mobile-nav-active: var(--color-primary-500);
+    --mobile-menu-bg: var(--color-white);
+    --mobile-menu-text: var(--color-slate-800);
+    --mobile-menu-text-secondary: var(--color-slate-500);
+    --mobile-menu-divider: var(--color-slate-100);
+    --mobile-menu-item-hover: var(--color-slate-50);
+
+    /* Focus ring system */
+    --focus-ring-color: var(--color-primary-500);
+    --focus-ring-color-strong: var(--color-primary-600);
+    --focus-ring-width: 3px;
+    --focus-ring-offset: 2px;
+
+    /* Border width */
+    --border-width: 1px;
+    --border-width-md: 2px;
+
+    /* Safe area insets (mobile) */
+    --safe-top: env(safe-area-inset-top, 0px);
+    --safe-bottom: env(safe-area-inset-bottom, 0px);
+
+    /* ==========================================
+       ALIAS VARIABLES (Backwards Compatibility)
+       ========================================== */
+
+    /* Primary aliases */
+    --primary: var(--color-primary-500);
+    --primary-color: var(--color-primary-500);
+    --primary-glow: 0 0 20px rgba(99, 102, 241, 0.3);
+    --primary-hover-glow: 0 0 25px rgba(99, 102, 241, 0.4);
+    --primary-gradient-start: var(--color-primary-500);
+    --primary-gradient-end: var(--color-purple-500);
+
+    /* Background aliases */
+    --bg-primary: var(--color-primary-500);
+    --bg-secondary: var(--bg-surface);
+    --bg-tertiary: var(--bg-hover);
+    --bg-muted: var(--bg-surface);
+    --bg-glass: var(--glass-bg);
+    --bg-glass-strong: var(--glass-bg-heavy);
+    --bg-card: var(--bg-elevated);
+    --background-color: var(--bg-base);
+    --hover-bg: var(--bg-hover);
+
+    /* Border aliases */
+    --border-color: var(--border-default);
+    --border-glass: var(--glass-border);
+    --border-light: var(--border-subtle);
+
+    /* Text aliases */
+    --text-color: var(--text-primary);
+    --text-main: var(--text-primary);
+    --text-tertiary: var(--text-disabled);
+    --color-text: var(--text-primary);
+    --color-text-muted: var(--text-muted);
+    --color-text-secondary: var(--text-secondary);
+    --color-text-primary: var(--text-primary);
+    --color-text-tertiary: var(--text-disabled);
+    --color-border: var(--border-default);
+    --color-surface: var(--bg-surface);
+    --color-background: var(--bg-base);
+    --color-focus: var(--color-primary-500);
+    --color-focus-bg: var(--color-primary-100);
+    --color-error: var(--color-danger);
+    --color-success-light: var(--color-emerald-100);
+
+    /* Accent aliases */
+    --accent-color: var(--color-primary-500);
+    --accent-purple: var(--color-purple-500);
+    --accent-purple-light: var(--color-purple-400);
+
+    /* Skin/theme colors */
+    --skin-primary: var(--color-primary-500);
+    --skin-primary-dark: var(--color-primary-600);
+    --skin-text-on-primary: var(--color-white);
+    --skin-secondary: var(--color-purple-500);
+
+    /* Gradients */
+    --gradient-brand: linear-gradient(135deg, var(--color-primary-500), var(--color-purple-500));
+    --gradient-hero: linear-gradient(135deg, var(--color-primary-600), var(--color-purple-600));
+    --gradient-text: linear-gradient(135deg, var(--color-primary-500), var(--color-pink-500));
+    --gradient-1: var(--gradient-brand);
+    --heading-gradient: var(--gradient-brand);
+    --icon-gradient: var(--gradient-brand);
+    --action-gradient: var(--gradient-brand);
+    --stat-gradient: linear-gradient(135deg, var(--color-emerald-500), var(--color-teal-500));
+
+    /* Holographic effects */
+    --holographic-glow: 0 0 20px rgba(99, 102, 241, 0.3);
+    --holographic-shimmer: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+
+    /* Blur utilities */
+    --blur-lg: 16px;
+    --blur-xl: 24px;
+
+    /* Hamburger menu */
+    --hamburger-transition: var(--transition-fast);
+
+    /* Page/theme transitions */
+    --page-transition-duration: 300ms;
+    --page-transition-easing: var(--ease-smooth);
+    --page-slide-distance: 20px;
+    --theme-transition-duration: 200ms;
+    --theme-transition-easing: var(--ease-smooth);
+
+    /* View transition names */
+    --vt-name: none;
+    --listing-vt-name: none;
+    --detail-vt-name: none;
+    --card-transition-name: none;
+
+    /* Animation */
+    --anim-delay: 0ms;
+    --toast-duration: 3000ms;
+
+    /* Mouse position (for effects) */
+    --mouse-x: 0;
+    --mouse-y: 0;
+
+    /* Transform translate */
+    --tx: 0;
+    --ty: 0;
+
+    /* Tracking */
+    --tracking-wider: 0.05em;
+
+    /* Progress */
+    --progress: 0;
+
+    /* ==========================================
+       HOLO (HOLOGRAPHIC) ALIASES
+       ========================================== */
+    --holo-primary: var(--color-primary-500);
+    --holo-primary-rgb: 99, 102, 241;
+    --holo-primary-light: var(--color-primary-400);
+    --holo-secondary: var(--color-purple-500);
+    --holo-text: var(--text-primary);
+    --holo-text-muted: var(--text-muted);
+    --holo-border: var(--border-default);
+    --holo-transition: var(--transition-base);
+    --holo-radius: var(--radius-base);
+    --holo-radius-xs: var(--radius-sm);
+    --holo-radius-sm: var(--radius-base);
+    --holo-danger: var(--color-danger);
+    --holo-success: var(--color-success);
+    --holo-blur: var(--glass-blur);
+    --holo-card-bg: var(--bg-elevated);
+    --holo-border-color: var(--border-default);
+    --holo-accent: var(--color-primary-500);
+
+    /* ==========================================
+       FEED ALIASES
+       ========================================== */
+    --feed-text-primary: var(--text-primary);
+    --feed-text-secondary: var(--text-secondary);
+    --feed-text-muted: var(--text-muted);
+    --feed-border: var(--border-default);
+    --feed-border-light: var(--border-subtle);
+    --feed-bg-card: var(--bg-elevated);
+    --feed-bg-main: var(--bg-base);
+    --feed-bg-section: var(--bg-surface);
+    --feed-bg-secondary: var(--bg-surface);
+
+    /* ==========================================
+       ADMIN ALIASES
+       ========================================== */
+    --admin-border: var(--border-default);
+    --admin-text-primary: var(--text-primary);
+    --admin-text-muted: var(--text-muted);
+    --admin-text-secondary: var(--text-secondary);
+    --admin-text: var(--text-primary);
+    --admin-space-xs: var(--space-2);
+    --admin-space-sm: var(--space-3);
+    --admin-space-md: var(--space-4);
+    --admin-space-lg: var(--space-6);
+    --admin-sidebar-border: var(--border-default);
+    --admin-sidebar-transition: var(--transition-base);
+    --admin-sidebar-text: var(--text-primary);
+    --admin-sidebar-text-muted: var(--text-muted);
+    --admin-transition-normal: var(--transition-base);
+    --admin-glass: var(--glass-bg);
+    --admin-radius-md: var(--radius-md);
+    --admin-primary: var(--color-primary-500);
+    --admin-danger: var(--color-danger);
+    --admin-gradient-primary: linear-gradient(135deg, var(--color-primary-500), var(--color-purple-500));
+    --admin-blur-md: var(--glass-blur);
+
+    /* ==========================================
+       MD (MODERN DESIGN) ALIASES
+       ========================================== */
+    --md-primary: var(--color-primary-500);
+    --md-primary-light: var(--color-primary-400);
+    --md-text: var(--text-primary);
+    --md-text-muted: var(--text-muted);
+    --md-text-secondary: var(--text-secondary);
+    --md-success: var(--color-success);
+    --md-success-light: var(--color-emerald-100);
+    --md-warning: var(--color-warning);
+    --md-warning-light: var(--color-amber-100);
+    --md-danger: var(--color-danger);
+    --md-danger-light: var(--color-red-100);
+    --md-border: var(--border-default);
+    --md-border-strong: var(--border-strong);
+    --md-surface: var(--bg-surface);
+    --md-surface-solid: var(--bg-elevated);
+    --md-bg: var(--bg-base);
+    --md-glass-blur: var(--glass-blur);
+    --md-glass-bg: var(--glass-bg);
+    --md-glass-border: var(--glass-border);
+    --md-glass-shadow: var(--shadow-glass);
+
+    /* ==========================================
+       SETTINGS ALIASES
+       ========================================== */
+    --settings-primary: var(--color-primary-500);
+    --settings-muted: var(--text-muted);
+    --settings-text: var(--text-primary);
+    --settings-surface: var(--bg-surface);
+    --settings-danger: var(--color-danger);
+    --settings-secondary: var(--text-secondary);
+    --settings-success: var(--color-success);
+    --settings-warning: var(--color-warning);
+
+    /* ==========================================
+       MESSAGE/CHAT ALIASES
+       ========================================== */
+    --msg-primary: var(--color-primary-500);
+    --msg-text: var(--text-primary);
+    --msg-text-muted: var(--text-muted);
+    --msg-surface: var(--bg-surface);
+    --msg-bg: var(--bg-base);
+    --msg-border: var(--border-default);
+    --msg-gradient: linear-gradient(135deg, var(--color-primary-500), var(--color-purple-500));
+    --msg-gradient-vibrant: linear-gradient(135deg, var(--color-primary-500), var(--color-pink-500));
+
+    --chat-primary: var(--color-primary-500);
+    --chat-text: var(--text-primary);
+    --chat-text-muted: var(--text-muted);
+    --chat-bg: var(--bg-base);
+    --chat-surface: var(--bg-surface);
+    --chat-border: var(--border-default);
+    --chat-gradient: linear-gradient(135deg, var(--color-primary-500), var(--color-purple-500));
+    --chat-radius: var(--radius-lg);
+    --chat-sent-bg: var(--color-primary-500);
+    --chat-sent-text: var(--color-white);
+    --chat-received-bg: var(--bg-surface);
+    --chat-received-text: var(--text-primary);
+
+    /* ==========================================
+       ONBOARDING ALIASES
+       ========================================== */
+    --ob-primary: var(--color-primary-500);
+    --ob-primary-light: var(--color-primary-400);
+    --ob-text: var(--text-primary);
+    --ob-text-muted: var(--text-muted);
+    --ob-text-secondary: var(--text-secondary);
+    --ob-text-primary: var(--text-primary);
+    --ob-border: var(--border-default);
+    --ob-bg: var(--bg-base);
+    --ob-bg-primary: var(--color-indigo-950);
+    --ob-bg-secondary: var(--bg-surface);
+    --ob-bg-elevated: var(--bg-elevated);
+    --ob-surface: var(--bg-surface);
+    --ob-accent: var(--color-primary-500);
+    --ob-pink: var(--color-pink-500);
+    --ob-success: var(--color-success);
+    --ob-gradient-start: var(--color-primary-600);
+    --ob-gradient-end: var(--color-purple-600);
+    --ob-safe-top: var(--safe-top);
+    --ob-safe-bottom: var(--safe-bottom);
+
+    /* ==========================================
+       FEED FILTER ALIASES
+       ========================================== */
+    --ff-transition: var(--transition-fast);
+    --ff-pill-bg: var(--bg-surface);
+    --ff-pill-bg-hover: var(--bg-hover);
+    --ff-pill-bg-active: var(--color-primary-100);
+    --ff-pill-text-active: var(--color-primary-600);
+    --ff-border: var(--border-default);
+    --ff-border-holo: var(--border-default);
+    --ff-text: var(--text-primary);
+    --ff-text-secondary: var(--text-secondary);
+    --ff-text-muted: var(--text-muted);
+    --ff-bg: var(--bg-base);
+    --ff-bg-solid: var(--bg-elevated);
+    --ff-shadow: var(--shadow-sm);
+    --ff-location-active: var(--color-emerald-500);
+    --ff-algo-active: var(--color-purple-500);
+    --ff-height-primary: 44px;
+    --ff-height-secondary: 36px;
+
+    /* ==========================================
+       LEGAL PAGE ALIASES
+       ========================================== */
+    --legal-accent: var(--color-primary-500);
+    --legal-title: var(--text-primary);
+    --legal-text: var(--text-primary);
+    --legal-muted: var(--text-muted);
+    --legal-border: var(--border-default);
+    --legal-section-bg: var(--bg-surface);
+    --legal-card-bg: var(--bg-elevated);
+    --legal-bg: var(--bg-base);
+    --legal-link: var(--color-primary-500);
+    --legal-shadow: var(--shadow-sm);
+    --legal-shadow-lg: var(--shadow-lg);
+    --privacy-theme: var(--color-primary-500);
+    --privacy-theme-dark: var(--color-primary-600);
+    --privacy-theme-light: var(--color-primary-400);
+    --privacy-theme-rgb: 99, 102, 241;
+    --terms-theme: var(--color-primary-500);
+    --terms-theme-dark: var(--color-primary-600);
+    --terms-theme-light: var(--color-primary-400);
+
+    /* ==========================================
+       NATIVE INPUT ALIASES
+       ========================================== */
+    --native-input-bg: var(--bg-elevated);
+    --native-input-border: var(--border-default);
+    --native-input-radius: var(--radius-base);
+    --native-input-text: var(--text-primary);
+    --native-input-padding: var(--space-3);
+    --native-input-border-focus: var(--color-primary-500);
+    --native-input-placeholder: var(--text-muted);
+    --native-label-color: var(--text-secondary);
+
+    /* ==========================================
+       SHARE COMPOSE ALIASES
+       ========================================== */
+    --sc-primary: var(--color-primary-500);
+    --sc-text: var(--text-primary);
+    --sc-text-muted: var(--text-muted);
+    --sc-text-secondary: var(--text-secondary);
+    --sc-border: var(--border-default);
+    --sc-border-strong: var(--border-strong);
+    --sc-surface-solid: var(--bg-elevated);
+    --sc-bg: var(--bg-base);
+    --sc-success: var(--color-success);
+
+    /* ==========================================
+       EDITOR ALIASES
+       ========================================== */
+    --ed-primary: var(--color-primary-500);
+    --ed-primary-light: var(--color-primary-400);
+    --ed-text: var(--text-primary);
+    --ed-text-muted: var(--text-muted);
+    --ed-text-secondary: var(--text-secondary);
+    --ed-border: var(--border-default);
+    --ed-surface: var(--bg-surface);
+    --ed-bg: var(--bg-base);
+    --ed-danger: var(--color-danger);
+    --ed-danger-light: var(--color-red-100);
+    --ed-pink: var(--color-pink-500);
+    --ed-pink-light: var(--color-pink-100);
+    --ed-success: var(--color-success);
+
+    /* ==========================================
+       AUTH ALIASES
+       ========================================== */
+    --auth-brand: var(--color-primary-500);
+    --auth-brand-hover: var(--color-primary-600);
+    --auth-link: var(--color-primary-500);
+    --auth-link-hover: var(--color-primary-600);
+    --auth-focus-ring: var(--color-primary-500);
+    --auth-focus-offset: 2px;
+    --auth-touch-min: 44px;
+
+    /* ==========================================
+       FEDERATION ALIASES
+       ========================================== */
+    --fed-focus-ring: var(--color-primary-500);
+    --fed-focus-offset: 2px;
+    --fed-focus-text: var(--text-primary);
+    --fed-touch-min: 44px;
+
+    /* ==========================================
+       POLL ALIASES
+       ========================================== */
+    --poll-primary: var(--color-purple-500);
+    --poll-secondary: var(--text-secondary);
+    --poll-accent: var(--color-purple-400);
+
+    /* ==========================================
+       SCORE/NEXUS SCORE ALIASES
+       ========================================== */
+    --score-primary: var(--color-primary-500);
+    --score-glow: 0 0 20px rgba(99, 102, 241, 0.3);
+    --score-percentage: 0;
+
+    /* ==========================================
+       PULL TO REFRESH ALIASES
+       ========================================== */
+    --ptr-bg: var(--bg-elevated);
+    --ptr-spinner-color: var(--color-primary-500);
+    --ptr-spinner-size: 24px;
+    --ptr-transition: var(--transition-base);
+    --ptr-rotation: 0deg;
+    --ptr-text-color: var(--text-muted);
+    --ptr-pull-distance: 60px;
+
+    /* ==========================================
+       NEWS/ARTICLE ALIASES
+       ========================================== */
+    --news-primary: var(--color-primary-500);
+    --news-secondary: var(--text-secondary);
+    --article-primary: var(--color-primary-500);
+    --article-secondary: var(--text-secondary);
+
+    /* ==========================================
+       STATUS BADGE ALIASES
+       ========================================== */
+    --status-blue-bg: var(--color-blue-100);
+    --status-blue-border: var(--color-blue-300);
+    --status-blue-text: var(--color-blue-700);
+    --status-amber-bg: var(--color-amber-100);
+    --status-amber-border: var(--color-amber-300);
+    --status-amber-text: var(--color-amber-700);
+    --status-gray-bg: var(--color-gray-100);
+    --status-gray-border: var(--color-gray-300);
+    --status-gray-text: var(--color-gray-700);
+
+    /* ==========================================
+       DATE BADGE ALIASES
+       ========================================== */
+    --date-badge-bg: var(--bg-surface);
+    --date-badge-border: var(--border-default);
+    --date-text: var(--text-primary);
+
+    /* ==========================================
+       MAGIC/MISC ALIASES
+       ========================================== */
+    --mg-theme: var(--color-purple-500);
+    --mg-theme-light: var(--color-purple-400);
+    --access-theme: var(--color-primary-500);
+    --contact-theme: var(--color-primary-500);
+    --hiw-theme: var(--color-primary-500);
+    --partner-theme: var(--color-primary-500);
+    --guide-theme: var(--color-primary-500);
+    --story-theme: var(--color-primary-500);
+
+    /* ==========================================
+       BADGE/CATEGORY DYNAMIC COLORS
+       ========================================== */
+    --badge-color: var(--color-primary-500);
+    --sdg-color: var(--color-emerald-500);
+    --cat-color: var(--color-gray-500);
+    --streak-color: var(--color-orange-500);
+    --rank-color: var(--color-amber-500);
+    --listing-color: var(--color-emerald-500);
+    --event-color: var(--color-orange-500);
+    --tier-color: var(--color-purple-500);
+
+    /* ==========================================
+       NEXUS ALIASES
+       ========================================== */
+    --nexus-text-muted: var(--text-muted);
+
+    /* ==========================================
+       GLASS HOVER SHADOW
+       ========================================== */
+    --glass-hover-shadow: var(--shadow-lg);
+}
+
+/* ==========================================
+   DARK THEME OVERRIDES
+   ========================================== */
+[data-theme="dark"] {
+    /* Inverted gray scale */
+    --color-gray-50: #111827;
+    --color-gray-100: #1f2937;
+    --color-gray-200: #374151;
+    --color-gray-300: #4b5563;
+    --color-gray-400: #6b7280;
+    --color-gray-500: #9ca3af;
+    --color-gray-600: #d1d5db;
+    --color-gray-700: #e5e7eb;
+    --color-gray-800: #f3f4f6;
+    --color-gray-900: #f9fafb;
+
+    /* Semantic backgrounds */
+    --bg-base: #0f172a;
+    --bg-elevated: #1e293b;
+    --bg-surface: #334155;
+    --bg-hover: #475569;
+
+    /* Semantic text */
+    --text-primary: #f8fafc;
+    --text-secondary: #cbd5e1;
+    --text-muted: #94a3b8;
+    --text-disabled: #64748b;
+
+    /* Semantic borders */
+    --border-default: rgba(255, 255, 255, 0.1);
+    --border-subtle: rgba(255, 255, 255, 0.05);
+    --border-strong: rgba(255, 255, 255, 0.2);
+
+    /* Glassmorphism */
+    --glass-bg-light: rgba(30, 41, 59, 0.7);
+    --glass-border-light: rgba(255, 255, 255, 0.1);
+    --glass-bg: rgba(30, 41, 59, 0.8);
+    --glass-bg-heavy: rgba(15, 23, 42, 0.9);
+    --glass-border: rgba(255, 255, 255, 0.08);
+    --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+
+    /* Surface overlays */
+    --overlay-light: rgba(255, 255, 255, 0.05);
+    --overlay-medium: rgba(255, 255, 255, 0.1);
+    --overlay-heavy: rgba(255, 255, 255, 0.15);
+    --overlay-bg: rgba(0, 0, 0, 0.7);
+
+    /* Primary color adjustments */
+    --color-primary-hover: #818cf8;
+    --color-primary-active: #a5b4fc;
+
+    /* HTB dark theme overrides */
+    --htb-bg-page: var(--color-slate-900);
+    --htb-bg-card: rgba(30, 41, 59, 0.4);
+    --htb-text-main: var(--color-slate-100);
+    --htb-text-muted: var(--color-slate-300);
+    --htb-border-color: rgba(255, 255, 255, 0.1);
+    --htb-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.5);
+    --htb-glass-blur: blur(24px);
+
+    /* Legacy alias overrides */
+    --feed-text-primary: var(--text-primary);
+    --feed-bg-card: var(--bg-elevated);
+    --feed-bg-main: var(--bg-base);
+    --holo-text: var(--text-primary);
+    --holo-text-muted: var(--text-muted);
+    --card-bg: var(--bg-elevated);
+    --pill-bg: var(--bg-surface);
+
+    /* Mobile navigation dark overrides */
+    --mobile-nav-bg: var(--color-black);
+    --mobile-nav-border: rgba(255, 255, 255, 0.1);
+    --mobile-nav-text: #8e8e93;
+    --mobile-nav-active: var(--color-primary-400);
+    --mobile-menu-bg: var(--color-black);
+    --mobile-menu-item-hover: #1c1c1e;
+    --mobile-menu-divider: #38383a;
+    --mobile-menu-text: var(--color-white);
+    --mobile-menu-text-secondary: #8e8e93;
+}
+
+/* ==========================================
+   REDUCED MOTION SUPPORT
+   ========================================== */
+@media (prefers-reduced-motion: reduce) {
+    :root {
+        --transition-fast: 0ms;
+        --transition-base: 0ms;
+        --transition-slow: 0ms;
+    }
+}
+
+/* ==========================================
+   PRINT OPTIMIZATIONS
+   ========================================== */
+@media print {
+    :root {
+        --glass-blur: 0px;
+        --shadow-glass: none;
+    }
+}
