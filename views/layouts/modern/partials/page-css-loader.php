@@ -280,6 +280,60 @@ $pageSpecificCSS = [
     'groups-index' => [
         'condition' => $normPath === '/groups' || preg_match('/\/groups$/', $normPath),
         'files' => ['nexus-groups.css']
+    ],
+
+    // Cookie policy page - Added Phase 1 Template Extraction 2026-01-27
+    'cookie-policy' => [
+        'condition' => strpos($normPath, '/cookie-policy') !== false,
+        'files' => ['modern-template-extracts.css']
+    ],
+
+    // Master/Super-admin pages - Added Phase 1 Template Extraction 2026-01-27
+    'master-pages' => [
+        'condition' => strpos($normPath, '/super-admin') !== false || strpos($normPath, '/master') !== false,
+        'files' => ['modern-template-extracts.css']
+    ],
+
+    // Admin pages with extracted styles - Added Phase 1 Template Extraction 2026-01-27
+    'admin-extracts' => [
+        'condition' => strpos($normPath, '/admin/') !== false,
+        'files' => ['modern-template-extracts.css']
+    ],
+
+    // Goals show page - Added Phase 1 Template Extraction 2026-01-27
+    'goals-extracts' => [
+        'condition' => preg_match('/\/goals\/\d+$/', $normPath),
+        'files' => ['modern-template-extracts.css']
+    ],
+
+    // Profile edit page - Added Phase 1 Template Extraction 2026-01-27
+    'profile-edit-extracts' => [
+        'condition' => strpos($normPath, '/profile/edit') !== false,
+        'files' => ['modern-template-extracts.css']
+    ],
+
+    // Volunteering edit - Added Phase 1 Template Extraction 2026-01-27
+    'volunteering-edit-extracts' => [
+        'condition' => strpos($normPath, '/volunteering/opp/edit') !== false,
+        'files' => ['modern-template-extracts.css']
+    ],
+
+    // Members index - Added Phase 1 Template Extraction 2026-01-27
+    'members-extracts' => [
+        'condition' => $normPath === '/members' || preg_match('/\/members$/', $normPath),
+        'files' => ['modern-template-extracts.css']
+    ],
+
+    // Profile show - Added Phase 1 Template Extraction 2026-01-27
+    'profile-show-extracts' => [
+        'condition' => preg_match('/\/profile\/\d+$/', $normPath),
+        'files' => ['modern-template-extracts.css']
+    ],
+
+    // Dashboard wallet - Added Phase 1 Template Extraction 2026-01-27
+    'dashboard-wallet-extracts' => [
+        'condition' => strpos($normPath, '/dashboard/wallet') !== false,
+        'files' => ['modern-template-extracts.css']
     ]
 ];
 

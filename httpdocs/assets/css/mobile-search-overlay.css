@@ -18,7 +18,7 @@
     position: fixed;
     inset: 0;
     z-index: 999999;
-    background: var(--bg-base, #fff);
+    background: var(--bg-base, var(--color-white));
     opacity: 0;
     visibility: hidden;
     transform: translateY(100%);
@@ -46,7 +46,7 @@
     gap: var(--space-3);
     padding: var(--space-3) var(--space-4);
     padding-top: calc(var(--space-3) + env(safe-area-inset-top, 0px));
-    background: var(--bg-surface, #fff);
+    background: var(--bg-surface, var(--color-white));
     border-bottom: 1px solid var(--border-default, var(--color-gray-200));
     flex-shrink: 0;
 }
@@ -106,7 +106,7 @@
 
 .mobile-search-input:focus {
     outline: none;
-    background: var(--bg-surface, #fff);
+    background: var(--bg-surface, var(--color-white));
     box-shadow: 0 0 0 2px var(--color-primary-500, var(--color-primary-500));
 }
 
@@ -349,7 +349,7 @@
 }
 
 [data-theme="dark"] .mobile-search-item-title {
-    color: #fff;
+    color: var(--color-white);
 }
 
 .mobile-search-item-subtitle {
@@ -425,7 +425,7 @@
 }
 
 [data-theme="dark"] .mobile-search-empty-title {
-    color: #fff;
+    color: var(--color-white);
 }
 
 .mobile-search-empty-text {
@@ -463,7 +463,7 @@
 
 [data-theme="dark"] .mobile-search-tag {
     background: #2c2c2e;
-    color: #fff;
+    color: var(--color-white);
 }
 
 [data-theme="dark"] .mobile-search-tag:active {

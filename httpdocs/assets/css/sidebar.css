@@ -347,7 +347,7 @@
 }
 
 .sidebar-listing-icon.offer {
-    background: linear-gradient(135deg, var(--color-success), #059669);
+    background: linear-gradient(135deg, var(--color-success), var(--color-emerald-600));
 }
 
 .sidebar-listing-icon.request {

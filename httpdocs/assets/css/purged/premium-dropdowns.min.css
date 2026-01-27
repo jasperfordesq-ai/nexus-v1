@@ -1,0 +1,40 @@
+/* ========================================
+   PREMIUM GLASSMORPHISM DROPDOWN BUTTONS
+   Extracted from header.php for better maintainability
+   ======================================== */
+
+/* Premium Dropdown Trigger Styling */
+
+/* Shimmer overlay effect - fixed positioning */
+
+/* Hover state - enhanced glow */
+
+/* Active/Open state */
+
+/* Premium Dropdown Container */
+
+/* Hide dropdown menu by default */
+
+/* Show dropdown menu on hover */
+
+/* Premium Dropdown Menu Styling */
+
+/* Dropdown menu items */
+
+/* Arrow styling for dropdown triggers */
+
+/* Focus state for accessibility */
+
+/* ========================================
+   LIGHT MODE PREMIUM DROPDOWN
+   ======================================== */
+
+/* ========================================
+   LIGHT MODE BRAND LOGO IN NAVBAR
+   ======================================== */
+[data-theme="light"] .nexus-navbar > a[href][style*="color: white"],
+[data-theme="light"] .nexus-navbar > a[href][style*="color:white"] {
+    color: var(--color-gray-800) !important;
+}
+
+/* Mobile adjustments */

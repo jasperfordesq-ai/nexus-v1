@@ -92,7 +92,30 @@ try {
     <!-- Note: design-tokens.css already loaded sync above, no preload needed -->
     <link rel="preload" as="style" href="<?= $assetBase ?>/assets/css/nexus-phoenix.css?v=<?= $cssVersionTimestamp ?>">
     <link rel="preload" as="style" href="<?= $assetBase ?>/assets/css/bundles/core.css?v=<?= $cssVersionTimestamp ?>">
+    <!-- FOUC FIX (2026-01-27): Preload async bundles that style above-fold navigation/buttons -->
+    <link rel="preload" as="style" href="<?= $assetBase ?>/assets/css/bundles/components-navigation.css?v=<?= $cssVersionTimestamp ?>">
+    <link rel="preload" as="style" href="<?= $assetBase ?>/assets/css/bundles/components-buttons.css?v=<?= $cssVersionTimestamp ?>">
 
+    <!-- FOUC FIX (2026-01-27): Preload page-specific CSS for high-traffic routes
+         This allows browsers to start fetching page CSS before parsing HTML body.
+         Only preloads the PRIMARY page file; secondary files load via page-css-loader. -->
+<?php if ($isHome): ?>
+    <link rel="preload" as="style" href="<?= $assetBase ?>/assets/css/nexus-home.css?v=<?= $cssVersionTimestamp ?>">
+<?php elseif (strpos($normPath, '/dashboard') !== false): ?>
+    <link rel="preload" as="style" href="<?= $assetBase ?>/assets/css/dashboard.css?v=<?= $cssVersionTimestamp ?>">
+<?php elseif (preg_match('/\/profile\/[^\/]+$/', $normPath) && strpos($normPath, '/edit') === false): ?>
+    <link rel="preload" as="style" href="<?= $assetBase ?>/assets/css/profile-holographic.css?v=<?= $cssVersionTimestamp ?>">
+<?php elseif (preg_match('/\/(login|register|password)/', $normPath)): ?>
+    <link rel="preload" as="style" href="<?= $assetBase ?>/assets/css/auth.css?v=<?= $cssVersionTimestamp ?>">
+<?php elseif ($normPath === '/events' || preg_match('/\/events$/', $normPath)): ?>
+    <link rel="preload" as="style" href="<?= $assetBase ?>/assets/css/events-index.css?v=<?= $cssVersionTimestamp ?>">
+<?php elseif ($normPath === '/groups' || preg_match('/\/groups$/', $normPath) || preg_match('/\/groups\/\d+$/', $normPath)): ?>
+    <link rel="preload" as="style" href="<?= $assetBase ?>/assets/css/groups-show.css?v=<?= $cssVersionTimestamp ?>">
+<?php elseif ($normPath === '/news' || $normPath === '/blog' || preg_match('/\/(news|blog)$/', $normPath)): ?>
+    <link rel="preload" as="style" href="<?= $assetBase ?>/assets/css/blog-index.css?v=<?= $cssVersionTimestamp ?>">
+<?php elseif (preg_match('/\/(news|blog)\/[^\/]+$/', $normPath) && !preg_match('/\/(news|blog)\/(create|edit)/', $normPath)): ?>
+    <link rel="preload" as="style" href="<?= $assetBase ?>/assets/css/blog-show.css?v=<?= $cssVersionTimestamp ?>">
+<?php endif; ?>
 
     <!-- Preload JavaScript (critical for interactivity) -->
     <link rel="preload" as="script" href="/assets/js/mobile-interactions.js?v=<?= $cssVersionTimestamp ?>">

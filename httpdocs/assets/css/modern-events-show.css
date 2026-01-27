@@ -370,7 +370,7 @@
     position: absolute;
     bottom: 100%;
     left: 0;
-    background: var(--card-bg, #fff);
+    background: var(--card-bg, var(--color-white));
     border: 1px solid var(--glass-border);
     border-radius: var(--radius-base);
     padding: var(--space-1);

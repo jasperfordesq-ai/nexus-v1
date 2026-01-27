@@ -25,7 +25,7 @@ $basePath = Nexus\Core\TenantContext::getBasePath();
         <div class="nexus-welcome-hero">
             <h1 class="nexus-welcome-title">Community Directory</h1>
             <?php if (\Nexus\Services\MemberRankingService::isEnabled()): ?>
-                <div style="display: inline-flex; align-items: center; gap: 6px; background: linear-gradient(135deg, rgba(16, 185, 129, 0.15), rgba(6, 182, 212, 0.15)); border: 1px solid rgba(16, 185, 129, 0.3); border-radius: 20px; padding: 4px 12px; font-size: 0.75rem; color: #10b981; margin-bottom: 8px;">
+                <div class="mte-members--rank-badge">
                     <i class="fa-solid fa-diagram-project"></i>
                     <span>CommunityRank Active</span>
                 </div>
@@ -59,7 +59,7 @@ $basePath = Nexus\Core\TenantContext::getBasePath();
                     && \Nexus\Services\FederationFeatureService::isTenantFederationEnabled($tenantId);
                 if ($federationEnabled && isset($_SESSION['user_id'])):
                 ?>
-                    <a href="<?= $basePath ?>/federation/members" class="nexus-smart-btn nexus-smart-btn-outline" style="border-color: rgba(139, 92, 246, 0.3); color: #8b5cf6;">
+                    <a href="<?= $basePath ?>/federation/members" class="nexus-smart-btn nexus-smart-btn-outline mte-members--federation-btn">
                         <i class="fa-solid fa-network-wired"></i>
                         <span>Partner Timebanks</span>
                     </a>
@@ -101,32 +101,32 @@ $basePath = Nexus\Core\TenantContext::getBasePath();
 
         <!-- Glass Search Card -->
         <div class="glass-search-card">
-            <div style="display: flex; flex-direction: column; gap: 15px;">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px; flex-wrap: wrap; gap: 10px;">
-                    <h2 style="font-size: 1.25rem; font-weight: 700; color: var(--htb-text-main); margin: 0;">Find Members</h2>
-                    <span id="members-count" style="font-size: 0.9rem; font-weight: 600; color: var(--htb-text-muted);">
+            <div class="mte-members--search-layout">
+                <div class="mte-members--search-header">
+                    <h2 class="mte-members--search-title">Find Members</h2>
+                    <span id="members-count" class="mte-members--search-count">
                         Showing <?= count($members) ?> of <?= $total_members ?? count($members) ?> members
                     </span>
                 </div>
 
-                <div style="position: relative; width: 100%;">
+                <div class="mte-members--search-wrapper">
                     <label for="member-search" class="visually-hidden">Search members</label>
                     <input type="text" id="member-search" placeholder="Search by name, bio, location, skills..."
                         class="glass-search-input" aria-label="Search by name, bio, location, or skills">
-                    <i class="fa-solid fa-search" style="position: absolute; left: 18px; top: 50%; transform: translateY(-50%); color: #9ca3af; font-size: 1rem;" aria-hidden="true"></i>
-                    <div id="search-spinner" class="spinner" style="display: none; position: absolute; right: 18px; top: 50%; transform: translateY(-50%);" aria-hidden="true"></div>
+                    <i class="fa-solid fa-search mte-members--search-icon" aria-hidden="true"></i>
+                    <div id="search-spinner" class="spinner mte-members--search-spinner hidden" aria-hidden="true"></div>
                 </div>
             </div>
         </div>
 
         <!-- Section Header -->
         <div class="section-header">
-            <i class="fa-solid fa-users" style="color: #06b6d4; font-size: 1.1rem;"></i>
+            <i class="fa-solid fa-users mte-members--section-icon"></i>
             <h2>Community Members</h2>
         </div>
 
         <!-- Members Grid Skeleton (shown during search/loading) -->
-        <div id="members-skeleton" class="members-grid" style="display: none;" aria-label="Loading members">
+        <div id="members-skeleton" class="members-grid mte-members--skeleton hidden" aria-label="Loading members">
             <?php for ($i = 0; $i < 6; $i++): ?>
             <div class="member-card-skeleton">
                 <div class="skeleton skeleton-avatar"></div>
@@ -148,18 +148,18 @@ $basePath = Nexus\Core\TenantContext::getBasePath();
                 <?php endforeach; ?>
             <?php else: ?>
                 <div class="glass-empty-state">
-                    <div style="font-size: 4rem; margin-bottom: 20px;">👥</div>
-                    <h3 style="font-size: 1.5rem; margin-bottom: 10px; color: var(--htb-text-main);">No members found</h3>
-                    <p style="color: var(--htb-text-muted);">Try adjusting your search criteria.</p>
+                    <div class="mte-members--empty-emoji">👥</div>
+                    <h3 class="mte-members--empty-title">No members found</h3>
+                    <p class="mte-members--empty-text">Try adjusting your search criteria.</p>
                 </div>
             <?php endif; ?>
         </div>
 
         <!-- Infinite Scroll Sentinel & Spinner -->
-        <div id="infinite-scroll-trigger" style="height: 20px; margin-bottom: 20px;"></div>
+        <div id="infinite-scroll-trigger" class="mte-members--scroll-trigger"></div>
 
-        <div id="load-more-spinner" style="display: none; justify-content: center; margin-bottom: 40px;">
-            <i class="fa-solid fa-spinner fa-spin" style="font-size: 24px; color: var(--htb-accent);"></i>
+        <div id="load-more-spinner" class="mte-members--load-spinner hidden">
+            <i class="fa-solid fa-spinner fa-spin mte-members--load-spinner-icon"></i>
         </div>
 
     </div><!-- #members-glass-wrapper -->
@@ -198,7 +198,7 @@ function render_glass_member_card($member, $basePath, $orgRoles = [])
                 <div class="avatar-ring"></div>
                 <?= webp_avatar($avatarUrl, $memberName, 80) ?>
                 <?php if ($isMemberOnline): ?>
-                    <span class="online-indicator" style="position:absolute;bottom:4px;right:4px;width:16px;height:16px;background:#10b981;border:3px solid white;border-radius:50%;box-shadow:0 2px 4px rgba(16,185,129,0.4);" title="Active now"></span>
+                    <span class="online-indicator mte-members--online-indicator" title="Active now"></span>
                 <?php endif; ?>
             </div>
 
@@ -207,30 +207,15 @@ function render_glass_member_card($member, $basePath, $orgRoles = [])
             </h3>
 
             <?php if (!empty($orgRoles)): ?>
-                <div class="member-org-roles" style="display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; margin-bottom: 10px;">
+                <div class="member-org-roles mte-members--org-roles">
                     <?php foreach (array_slice($orgRoles, 0, 2) as $org): ?>
-                        <span class="org-role-badge <?= $org['role'] ?>" style="
-                    display: inline-flex;
-                    align-items: center;
-                    gap: 4px;
-                    padding: 4px 10px;
-                    border-radius: 12px;
-                    font-size: 0.7rem;
-                    font-weight: 600;
-                    <?php if ($org['role'] === 'owner'): ?>
-                    background: linear-gradient(135deg, rgba(251, 191, 36, 0.15), rgba(245, 158, 11, 0.15));
-                    color: #b45309;
-                    <?php else: ?>
-                    background: linear-gradient(135deg, rgba(139, 92, 246, 0.15), rgba(124, 58, 237, 0.15));
-                    color: #7c3aed;
-                    <?php endif; ?>
-                ">
-                            <i class="fa-solid <?= $org['role'] === 'owner' ? 'fa-crown' : 'fa-shield' ?>" style="font-size: 0.65rem;"></i>
+                        <span class="org-role-badge mte-members--org-badge <?= $org['role'] === 'owner' ? 'mte-members--org-badge-owner' : 'mte-members--org-badge-admin' ?>">
+                            <i class="fa-solid <?= $org['role'] === 'owner' ? 'fa-crown' : 'fa-shield' ?> mte-members--org-badge-icon"></i>
                             <?= htmlspecialchars(strlen($org['org_name']) > 15 ? substr($org['org_name'], 0, 15) . '...' : $org['org_name']) ?>
                         </span>
                     <?php endforeach; ?>
                     <?php if (count($orgRoles) > 2): ?>
-                        <span style="font-size: 0.7rem; color: var(--htb-text-muted);">+<?= count($orgRoles) - 2 ?> more</span>
+                        <span class="mte-members--org-more">+<?= count($orgRoles) - 2 ?> more</span>
                     <?php endif; ?>
                 </div>
             <?php endif; ?>
@@ -241,7 +226,7 @@ function render_glass_member_card($member, $basePath, $orgRoles = [])
             </div>
 
             <div class="member-since">
-                <i class="fa-solid fa-calendar" style="margin-right: 6px;"></i>
+                <i class="fa-solid fa-calendar"></i>
                 Member since <?= !empty($member['created_at']) ? date('M Y', strtotime($member['created_at'])) : 'Unknown' ?>
             </div>
 
@@ -277,7 +262,7 @@ function render_glass_member_card($member, $basePath, $orgRoles = [])
             clearTimeout(debounceTimer);
             const query = e.target.value.trim();
 
-            spinner.style.display = 'block';
+            spinner.classList.remove('hidden');
 
             debounceTimer = setTimeout(() => {
                 fetchMembers(query);
@@ -320,13 +305,13 @@ function render_glass_member_card($member, $basePath, $orgRoles = [])
 
         function fetchNearbyMembers() {
             const radius = radiusSlider ? radiusSlider.value : 25;
-            spinner.style.display = 'block';
+            spinner.classList.remove('hidden');
             updateLocationStatus('detecting', 'Finding nearby members...');
 
             // Show skeleton during nearby search
             if (skeleton) {
-                skeleton.style.display = 'grid';
-                grid.style.display = 'none';
+                skeleton.classList.remove('hidden');
+                grid.classList.add('hidden');
             }
 
             const url = window.location.pathname + '?filter=nearby&radius=' + radius;
@@ -357,30 +342,30 @@ function render_glass_member_card($member, $basePath, $orgRoles = [])
                         renderNearbyGrid([]);
                         updateLocationStatus('success', 'No nearby members with coordinates');
                     }
-                    spinner.style.display = 'none';
+                    spinner.classList.add('hidden');
                     // Hide skeleton, show grid
                     if (skeleton) {
-                        skeleton.style.display = 'none';
-                        grid.style.display = 'grid';
+                        skeleton.classList.add('hidden');
+                        grid.classList.remove('hidden');
                     }
                 })
                 .catch(err => {
                     console.error('Nearby fetch error:', err);
-                    spinner.style.display = 'none';
+                    spinner.classList.add('hidden');
                     updateLocationStatus('error', 'Connection error');
                     // Hide skeleton on error
                     if (skeleton) {
-                        skeleton.style.display = 'none';
-                        grid.style.display = 'grid';
+                        skeleton.classList.add('hidden');
+                        grid.classList.remove('hidden');
                     }
                     // Show helpful error in grid
                     grid.innerHTML = `
                 <div class="glass-empty-state">
-                    <div style="font-size: 4rem; margin-bottom: 20px;">⚠️</div>
-                    <h3 style="font-size: 1.5rem; margin-bottom: 10px; color: var(--htb-text-main);">Connection Error</h3>
-                    <p style="color: var(--htb-text-muted); margin-bottom: 20px;">Unable to load nearby members. Please try again.</p>
-                    <button onclick="location.reload()" class="view-profile-btn" style="display: inline-block; padding: 12px 24px; background: linear-gradient(135deg, #06b6d4, #22d3ee); color: white; border: none; cursor: pointer;">
-                        <i class="fa-solid fa-refresh" style="margin-right: 6px;"></i> Retry
+                    <div class="mte-members--empty-emoji">⚠️</div>
+                    <h3 class="mte-members--empty-title">Connection Error</h3>
+                    <p class="mte-members--empty-text">Unable to load nearby members. Please try again.</p>
+                    <button onclick="location.reload()" class="view-profile-btn mte-members--retry-btn">
+                        <i class="fa-solid fa-refresh"></i> Retry
                     </button>
                 </div>
             `;
@@ -394,8 +379,8 @@ function render_glass_member_card($member, $basePath, $orgRoles = [])
 
             // Show skeleton, hide grid during search
             if (skeleton) {
-                skeleton.style.display = 'grid';
-                grid.style.display = 'none';
+                skeleton.classList.remove('hidden');
+                grid.classList.add('hidden');
             }
 
             fetch(url, {
@@ -418,20 +403,20 @@ function render_glass_member_card($member, $basePath, $orgRoles = [])
                     if (!data) return;
                     renderGrid(data.data);
                     countLabel.textContent = `Showing ${data.data.length} members`;
-                    spinner.style.display = 'none';
+                    spinner.classList.add('hidden');
                     // Hide skeleton, show grid
                     if (skeleton) {
-                        skeleton.style.display = 'none';
-                        grid.style.display = 'grid';
+                        skeleton.classList.add('hidden');
+                        grid.classList.remove('hidden');
                     }
                 })
                 .catch(err => {
                     console.error(err);
-                    spinner.style.display = 'none';
+                    spinner.classList.add('hidden');
                     // Hide skeleton on error too
                     if (skeleton) {
-                        skeleton.style.display = 'none';
-                        grid.style.display = 'grid';
+                        skeleton.classList.add('hidden');
+                        grid.classList.remove('hidden');
                     }
                 });
         }
@@ -443,9 +428,9 @@ function render_glass_member_card($member, $basePath, $orgRoles = [])
             if (members.length === 0) {
                 grid.innerHTML = `
                 <div class="glass-empty-state">
-                    <div style="font-size: 4rem; margin-bottom: 20px;">📍</div>
-                    <h3 style="font-size: 1.5rem; margin-bottom: 10px; color: var(--htb-text-main);">No nearby members found</h3>
-                    <p style="color: var(--htb-text-muted);">Try increasing your search radius or check back later.</p>
+                    <div class="mte-members--empty-emoji">📍</div>
+                    <h3 class="mte-members--empty-title">No nearby members found</h3>
+                    <p class="mte-members--empty-text">Try increasing your search radius or check back later.</p>
                 </div>
             `;
                 return;
@@ -469,7 +454,7 @@ function render_glass_member_card($member, $basePath, $orgRoles = [])
 
                 // Check online status - active within 5 minutes
                 const isOnline = member.last_active_at && (new Date(member.last_active_at) > new Date(Date.now() - 5 * 60 * 1000));
-                const onlineIndicator = isOnline ? `<span class="online-indicator" style="position:absolute;bottom:4px;right:4px;width:16px;height:16px;background:#10b981;border:3px solid white;border-radius:50%;box-shadow:0 2px 4px rgba(16,185,129,0.4);" title="Active now"></span>` : '';
+                const onlineIndicator = isOnline ? `<span class="online-indicator mte-members--online-indicator" title="Active now"></span>` : '';
 
                 const card = document.createElement('a');
                 card.href = profileUrl;
@@ -478,10 +463,10 @@ function render_glass_member_card($member, $basePath, $orgRoles = [])
                 <div class="card-body">
                     <div class="avatar-container">
                         <div class="avatar-ring"></div>
-                        <img src="${avatarUrl}" 
+                        <img src="${avatarUrl}"
                              onerror="this.onerror=null; this.src='${fallbackUrl}'"
-                             alt="${escapeHtml(memberName)}" 
-                             class="avatar-img" 
+                             alt="${escapeHtml(memberName)}"
+                             class="avatar-img"
                              loading="lazy">
                         ${onlineIndicator}
                     </div>
@@ -492,7 +477,7 @@ function render_glass_member_card($member, $basePath, $orgRoles = [])
                         ${escapeHtml(member.location || 'Unknown Location')}
                     </div>
                     <div class="member-since">
-                        <i class="fa-solid fa-calendar" style="margin-right: 6px;"></i>
+                        <i class="fa-solid fa-calendar"></i>
                         Member since ${dateStr}
                     </div>
                     <span class="view-profile-btn">View Profile</span>
@@ -510,9 +495,9 @@ function render_glass_member_card($member, $basePath, $orgRoles = [])
             if (members.length === 0 && !append) {
                 grid.innerHTML = `
                 <div class="glass-empty-state">
-                    <div style="font-size: 4rem; margin-bottom: 20px;">🔍</div>
-                    <h3 style="font-size: 1.5rem; margin-bottom: 10px; color: var(--htb-text-main);">No members found</h3>
-                    <p style="color: var(--htb-text-muted);">Try a different search term.</p>
+                    <div class="mte-members--empty-emoji">🔍</div>
+                    <h3 class="mte-members--empty-title">No members found</h3>
+                    <p class="mte-members--empty-text">Try a different search term.</p>
                 </div>
             `;
                 return;
@@ -534,7 +519,7 @@ function render_glass_member_card($member, $basePath, $orgRoles = [])
 
                 // Check online status - active within 5 minutes
                 const isOnline = member.last_active_at && (new Date(member.last_active_at) > new Date(Date.now() - 5 * 60 * 1000));
-                const onlineIndicator = isOnline ? `<span class="online-indicator" style="position:absolute;bottom:4px;right:4px;width:16px;height:16px;background:#10b981;border:3px solid white;border-radius:50%;box-shadow:0 2px 4px rgba(16,185,129,0.4);" title="Active now"></span>` : '';
+                const onlineIndicator = isOnline ? `<span class="online-indicator mte-members--online-indicator" title="Active now"></span>` : '';
 
                 const card = document.createElement('a');
                 card.href = profileUrl;
@@ -543,10 +528,10 @@ function render_glass_member_card($member, $basePath, $orgRoles = [])
                 <div class="card-body">
                     <div class="avatar-container">
                         <div class="avatar-ring"></div>
-                        <img src="${avatarUrl}" 
+                        <img src="${avatarUrl}"
                              onerror="this.onerror=null; this.src='${fallbackUrl}'"
-                             alt="${escapeHtml(memberName)}" 
-                             class="avatar-img" 
+                             alt="${escapeHtml(memberName)}"
+                             class="avatar-img"
                              loading="lazy">
                         ${onlineIndicator}
                     </div>
@@ -556,7 +541,7 @@ function render_glass_member_card($member, $basePath, $orgRoles = [])
                         ${escapeHtml(member.location || 'Unknown Location')}
                     </div>
                     <div class="member-since">
-                        <i class="fa-solid fa-calendar" style="margin-right: 6px;"></i>
+                        <i class="fa-solid fa-calendar"></i>
                         Member since ${dateStr}
                     </div>
                     <span class="view-profile-btn">View Profile</span>
@@ -570,14 +555,14 @@ function render_glass_member_card($member, $basePath, $orgRoles = [])
             updateLocationStatus('error', 'No location in profile');
             grid.innerHTML = `
             <div class="glass-empty-state">
-                <div style="font-size: 4rem; margin-bottom: 20px;">📍</div>
-                <h3 style="font-size: 1.5rem; margin-bottom: 10px; color: var(--htb-text-main);">Location Required</h3>
-                <p style="color: var(--htb-text-muted); margin-bottom: 20px;">Please add your location in your profile settings to find nearby members.</p>
-                <div style="display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;">
-                    <a href="<?= $basePath ?>/profile/edit" class="view-profile-btn" style="display: inline-block; padding: 12px 24px; background: linear-gradient(135deg, #06b6d4, #22d3ee); color: white; border: none;">
-                        <i class="fa-solid fa-user-pen" style="margin-right: 6px;"></i> Edit Profile
+                <div class="mte-members--empty-emoji">📍</div>
+                <h3 class="mte-members--empty-title">Location Required</h3>
+                <p class="mte-members--empty-text">Please add your location in your profile settings to find nearby members.</p>
+                <div class="mte-members--error-actions">
+                    <a href="<?= $basePath ?>/profile/edit" class="view-profile-btn mte-members--retry-btn">
+                        <i class="fa-solid fa-user-pen"></i> Edit Profile
                     </a>
-                    <a href="<?= $basePath ?>/members" class="view-profile-btn" style="display: inline-block; padding: 12px 24px;">
+                    <a href="<?= $basePath ?>/members" class="view-profile-btn">
                         View All Members
                     </a>
                 </div>
@@ -627,7 +612,7 @@ function render_glass_member_card($member, $basePath, $orgRoles = [])
 
             function loadMoreMembers() {
                 isLoading = true;
-                loadMoreSpinner.style.display = 'flex';
+                loadMoreSpinner.classList.remove('hidden');
 
                 const url = window.location.pathname + '?loadmore=1&offset=' + currentOffset + '&limit=' + batchSize;
 
@@ -638,7 +623,7 @@ function render_glass_member_card($member, $basePath, $orgRoles = [])
                     })
                     .then(res => res.json())
                     .then(data => {
-                        loadMoreSpinner.style.display = 'none';
+                        loadMoreSpinner.classList.add('hidden');
                         isLoading = false;
 
                         if (data && data.data && data.data.length > 0) {
@@ -659,7 +644,7 @@ function render_glass_member_card($member, $basePath, $orgRoles = [])
                     })
                     .catch(err => {
                         console.error('Infinite scroll error:', err);
-                        loadMoreSpinner.style.display = 'none';
+                        loadMoreSpinner.classList.add('hidden');
                         isLoading = false;
                     });
             }

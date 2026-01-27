@@ -125,7 +125,7 @@
         line-height: var(--line-height-normal);
 
         /* Background: Adaptive Mesh Gradient (Orange/Amber) */
-        background: radial-gradient(circle at 50% 0%, #fff7ed 0%, #ffedd5 100%);
+        background: radial-gradient(circle at 50% 0%, var(--color-white)7ed 0%, #ffedd5 100%);
         background-attachment: fixed;
     }
 
@@ -153,7 +153,7 @@
         --date-badge-border: 1px solid rgba(253, 186, 116, 0.5);
         --date-text: var(--color-govuk-red-dark);
 
-        background: radial-gradient(circle at 50% 0%, #fff7ed 0%, #ffedd5 100%);
+        background: radial-gradient(circle at 50% 0%, var(--color-white)7ed 0%, #ffedd5 100%);
     }
 
     /* DARK MODE EXPLICIT */

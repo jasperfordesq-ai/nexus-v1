@@ -113,14 +113,14 @@
 }
 
 .admin-sidebar-logo-icon i {
-    color: #fff;
+    color: var(--color-white);
     font-size: var(--font-size-base);
 }
 
 .admin-sidebar-logo-text {
     font-weight: var(--font-weight-semibold);
     font-size: var(--font-size-sm);
-    color: #fff;
+    color: var(--color-white);
     white-space: nowrap;
     opacity: 1;
     transition: opacity var(--admin-sidebar-transition);
@@ -143,7 +143,7 @@
 
 .admin-sidebar-toggle:hover {
     background: rgba(99, 102, 241, 0.2);
-    color: #fff;
+    color: var(--color-white);
 }
 
 .admin-sidebar-toggle i {
@@ -319,7 +319,7 @@
 
 .admin-sidebar-section-header.active {
     background: var(--admin-sidebar-item-active);
-    color: #fff;
+    color: var(--color-white);
 }
 
 .admin-sidebar-section-header i:first-child {
@@ -331,7 +331,7 @@
 }
 
 .admin-sidebar-section-header.active i:first-child {
-    color: #a78bfa;
+    color: var(--color-purple-400-alt);
 }
 
 .admin-sidebar-section-label {
@@ -364,7 +364,7 @@
 }
 
 .admin-sidebar-section.expanded .admin-sidebar-section-header i:first-child {
-    color: #a78bfa;
+    color: var(--color-purple-400-alt);
 }
 
 /* ==========================================================================
@@ -400,10 +400,10 @@
 }
 
 .admin-sidebar-item.active {
-    color: #fff;
+    color: var(--color-white);
     background: linear-gradient(90deg, rgba(139, 92, 246, 0.3) 0%, var(--admin-sidebar-item-active) 100%);
     font-weight: 600;
-    border-left: 2px solid #a78bfa;
+    border-left: 2px solid var(--color-purple-400-alt);
     margin-left: -1px;
 }
 
@@ -439,7 +439,7 @@
     font-size: var(--font-size-xs);
     font-weight: var(--font-weight-semibold);
     line-height: 1;
-    color: #fff;
+    color: var(--color-white);
     background: linear-gradient(135deg, var(--color-warning) 0%, var(--color-amber-600) 100%);
     border-radius: var(--radius-md);
     margin-left: auto;
@@ -538,7 +538,7 @@
 }
 
 .admin-sidebar-single.active i {
-    color: #a78bfa;
+    color: var(--color-purple-400-alt);
 }
 
 .admin-sidebar-single-label {
@@ -672,7 +672,7 @@
 
 .admin-layout.sidebar-collapsed .admin-sidebar-section-header:hover i:first-child,
 .admin-layout.sidebar-collapsed .admin-sidebar-single:hover i {
-    color: #a78bfa;
+    color: var(--color-purple-400-alt);
 }
 
 .admin-layout.sidebar-collapsed .admin-sidebar-super-admin:hover {
@@ -710,7 +710,7 @@
     background: rgba(15, 23, 42, 0.95);
     border: 1px solid var(--admin-sidebar-border);
     border-radius: 6px;
-    color: #fff;
+    color: var(--color-white);
     font-size: 0.8rem;
     font-weight: 500;
     white-space: nowrap;
@@ -819,7 +819,7 @@
 }
 
 .admin-sidebar-flyout .admin-sidebar-item.active {
-    color: #fff;
+    color: var(--color-white);
     background: var(--admin-sidebar-item-active);
 }
 
@@ -855,7 +855,7 @@
     left: 0;
     padding: var(--space-2) var(--space-4);
     background: var(--color-primary-500);
-    color: #fff;
+    color: var(--color-white);
     z-index: 300;
     border-radius: 0 0 var(--radius-base) 0;
 }
@@ -925,7 +925,7 @@
     justify-content: center;
     font-size: 0.8rem;
     font-weight: 600;
-    color: #fff;
+    color: var(--color-white);
     flex-shrink: 0;
     border: 2px solid rgba(139, 92, 246, 0.4);
 }
@@ -1017,7 +1017,7 @@
     background: rgba(15, 23, 42, 0.95);
     border: 1px solid var(--admin-sidebar-border);
     border-radius: 6px;
-    color: #fff;
+    color: var(--color-white);
     font-size: 0.8rem;
     font-weight: 500;
     white-space: nowrap;
@@ -1051,7 +1051,7 @@
     background: rgba(15, 23, 42, 0.95);
     border: 1px solid var(--admin-sidebar-border);
     border-radius: 6px;
-    color: #fff;
+    color: var(--color-white);
     font-size: 0.8rem;
     font-weight: 500;
     white-space: nowrap;
@@ -1088,7 +1088,7 @@
 
 .admin-sidebar-footer-btn:hover {
     background: rgba(99, 102, 241, 0.2);
-    color: #fff;
+    color: var(--color-white);
 }
 
 .admin-sidebar-footer-btn span {
@@ -1262,7 +1262,7 @@
     -webkit-backdrop-filter: blur(12px);
     border: 1px solid var(--admin-sidebar-border);
     border-radius: var(--radius-md);
-    color: #fff;
+    color: var(--color-white);
     font-size: var(--font-size-lg);
     cursor: pointer;
     z-index: 1001;
@@ -1350,7 +1350,7 @@
 
 .admin-breadcrumbs-current i {
     font-size: var(--font-size-xs);
-    color: #a78bfa;
+    color: var(--color-purple-400-alt);
 }
 
 /* Home icon link */

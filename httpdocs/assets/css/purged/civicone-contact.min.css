@@ -1,1 +1,45 @@
-.nexus-skin-civicone{}
+/**
+ * CivicOne Contact Page
+ * Template E: Content/Article (Section 10.6)
+ * Contact form with info sidebar
+ * WCAG 2.1 AA Compliant
+ */
+
+.nexus-skin-civicone {
+    /* Contact Hero */
+
+    /* Two Column Layout */
+    .contact-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: var(--space-8);
+    }
+
+    @media (max-width: 768px) {
+        .contact-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    /* Form Section */
+    .contact-form-card h2 {
+        margin-top: 0;
+        color: var(--civicone-brand);
+        margin-bottom: var(--space-5);
+        font-size: var(--font-size-2xl);
+    }
+
+    /* Info Section */
+    .contact-info-card {
+        margin-bottom: var(--space-6);
+    }
+
+    .contact-info-card h2 {
+        margin-top: 0;
+        color: var(--civicone-brand);
+        margin-bottom: var(--space-5);
+        font-size: var(--font-size-2xl);
+    }
+
+    /* Map Placeholder */
+}

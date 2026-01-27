@@ -172,8 +172,8 @@ main#main-content .htb-container > * {
         var(--effect-pink-50),
         var(--effect-cyan-50)
     );
-    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask: linear-gradient(var(--color-white) 0 0) content-box, linear-gradient(var(--color-white) 0 0);
+    mask: linear-gradient(var(--color-white) 0 0) content-box, linear-gradient(var(--color-white) 0 0);
     -webkit-mask-composite: xor;
     mask-composite: exclude;
     opacity: 0;
@@ -998,7 +998,7 @@ h2.profile-display-name {
 }
 
 .badge-count {
-    color: #92400e;
+    color: var(--color-amber-800);
     font-size: var(--font-size-xs);
 }
 
@@ -1155,7 +1155,7 @@ h2.profile-display-name {
 
 .featured-badge .badge-name {
     font-weight: 700;
-    color: #92400e;
+    color: var(--color-amber-800);
     font-size: var(--font-size-sm);
 }
 

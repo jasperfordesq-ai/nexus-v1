@@ -1354,6 +1354,7 @@ body.search-expanded .nexus-brand-link {
 /* ============================================
    CSS VARIABLES - Easing Curves
    ============================================ */
+/* DISABLED 2026-01-26: Conflicting with modern-theme-tokens.css
 :root {
     --ease-smooth: cubic-bezier(0.4, 0.0, 0.2, 1);
     --ease-out: cubic-bezier(0.0, 0.0, 0.2, 1);
@@ -1361,6 +1362,7 @@ body.search-expanded .nexus-brand-link {
     --spring-bounce: cubic-bezier(0.68, -0.55, 0.265, 1.55);
     --spring-smooth: cubic-bezier(0.34, 1.56, 0.64, 1);
 }
+*/
 
 /* ============================================
    1. GLOBAL TRANSITIONS

@@ -1,1 +1,496 @@
-@keyframes badge-pop{0%{transform:scale(1)}50%{transform:scale(1.3)}100%{transform:scale(1)}}@keyframes badge-bounce{0%,100%{transform:scale(1)}25%{transform:scale(1.2)}50%{transform:scale(0.9)}75%{transform:scale(1.1)}}@keyframes badge-pulse{0%{box-shadow:0 0 0 0 currentColor;opacity:1}70%{box-shadow:0 0 0 var(--space-3) transparent;opacity:0.7}100%{box-shadow:0 0 0 0 transparent;opacity:1}}@keyframes badge-shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-3px) rotate(-5deg)}50%{transform:translateX(3px) rotate(5deg)}75%{transform:translateX(-3px) rotate(-5deg)}}@keyframes badge-fade-in{from{opacity:0;transform:scale(0)}to{opacity:1;transform:scale(1)}}.badge{display:inline-flex;align-items:center;justify-content:center;font-weight:var(--font-weight-semibold);font-size:var(--font-size-xs);line-height:1;border-radius:var(--radius-full);transition:transform var(--transition-fast) var(--ease-bounce),background-color var(--transition-fast) var(--ease-out),color var(--transition-fast) var(--ease-out)}.badge-pop,.badge.pop{animation:badge-pop var(--transition-base) var(--ease-bounce)}.badge-bounce,.badge.bounce{animation:badge-bounce var(--transition-slow) var(--ease-bounce)}.badge-pulse,.badge.pulse{animation:badge-pulse 1.5s var(--ease-out) infinite}.badge-shake,.badge.shake{animation:badge-shake 0.4s var(--ease-out)}.badge-fade-in,.badge.fade-in{animation:badge-fade-in var(--transition-base) var(--ease-bounce)}.badge--dot,.badge-dot{width:var(--space-2);height:var(--space-2);min-width:var(--space-2);padding:0;font-size:0}.badge--sm,.badge-sm{min-width:var(--space-4);height:var(--space-4);padding:0 var(--space-1);font-size:var(--font-size-xs)}.badge,.badge--md,.badge-md{min-width:var(--space-5);height:var(--space-5);padding:0 var(--space-2);font-size:var(--font-size-xs)}.badge--lg,.badge-lg{min-width:var(--space-6);height:var(--space-6);padding:0 var(--space-2);font-size:var(--font-size-sm)}.badge,.badge--primary{background:var(--color-primary-500);color:white}.badge--secondary{background:var(--color-slate-500);color:white}.badge--success{background:var(--color-green-500);color:white}.badge--danger,.badge--error{background:var(--color-danger);color:white}.badge--warning{background:var(--color-warning);color:white}.badge--info{background:var(--color-info);color:white}.badge--outline{background:transparent;border:1.5px solid currentColor}.badge--outline.badge--primary{color:var(--color-primary-500)}.badge--outline.badge--success{color:var(--color-green-500)}.badge--outline.badge--danger{color:var(--color-danger)}.badge--outline.badge--warning{color:var(--color-warning)}.badge--outline.badge--info{color:var(--color-info)}.badge--soft{background:rgba(99,102,241,0.1);color:var(--color-primary-500)}.badge--soft.badge--success{background:rgba(34,197,94,0.1);color:var(--color-green-500)}.badge--soft.badge--danger{background:rgba(239,68,68,0.1);color:var(--color-danger)}.badge-container{position:relative;display:inline-flex}.badge-container .badge,.badge-positioned{position:absolute}.badge-container .badge,.badge--top-right{top:calc(-1 * var(--space-1));right:calc(-1 * var(--space-1))}.badge--top-left{top:calc(-1 * var(--space-1));left:calc(-1 * var(--space-1));right:auto}.badge--bottom-right{bottom:calc(-1 * var(--space-1));right:calc(-1 * var(--space-1));top:auto}.badge--bottom-left{bottom:calc(-1 * var(--space-1));left:calc(-1 * var(--space-1));top:auto;right:auto}.badge-container .badge{border:2px solid white;box-shadow:var(--shadow-xs)}.status-dot{width:var(--space-3);height:var(--space-3);border-radius:var(--radius-full);display:inline-block}.status-dot--online{background:var(--color-green-500);box-shadow:0 0 0 2px rgba(34,197,94,0.2)}.status-dot--offline{background:var(--color-gray-500)}.status-dot--busy{background:var(--color-danger);box-shadow:0 0 0 2px rgba(239,68,68,0.2)}.status-dot--away{background:var(--color-warning);box-shadow:0 0 0 2px rgba(245,158,11,0.2)}.status-dot--online.pulse{animation:badge-pulse 2s var(--ease-out) infinite}.badge:empty{display:none}.badge-progress{position:relative;background:rgba(99,102,241,0.2);overflow:hidden}.badge-progress::before{content:'';position:absolute;top:0;left:0;height:100%;width:var(--progress,0%);background:var(--color-primary-500);transition:width var(--transition-base) var(--ease-out);z-index:0}.badge-progress span{position:relative;z-index:1}@media (prefers-reduced-motion:reduce){.badge-pop,.badge.pop,.badge-bounce,.badge.bounce,.badge-shake,.badge.shake,.badge-fade-in,.badge.fade-in{animation:none}.badge-pulse,.badge.pulse,.status-dot--online.pulse{animation:none}}@media print{.badge--dot,.status-dot{display:none !important}}
+/**
+ * Badge/Counter Animations
+ * Pop effect when count changes, pulse for attention
+ * Version: 1.1 - 2026-01-21 - Migrated to design tokens
+ *
+ * Features:
+ * - Pop/bounce animation on count change
+ * - Pulse animation for new items
+ * - Count up/down transitions
+ * - Multiple badge styles
+ * - Dark mode support
+ */
+
+/* ==========================================================================
+   Animations
+   ========================================================================== */
+
+@keyframes badge-pop {
+    0% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.3);
+    }
+    100% {
+        transform: scale(1);
+    }
+}
+
+@keyframes badge-bounce {
+    0%, 100% {
+        transform: scale(1);
+    }
+    25% {
+        transform: scale(1.2);
+    }
+    50% {
+        transform: scale(0.9);
+    }
+    75% {
+        transform: scale(1.1);
+    }
+}
+
+@keyframes badge-pulse {
+    0% {
+        box-shadow: 0 0 0 0 currentColor;
+        opacity: 1;
+    }
+    70% {
+        box-shadow: 0 0 0 var(--space-3) transparent;
+        opacity: 0.7;
+    }
+    100% {
+        box-shadow: 0 0 0 0 transparent;
+        opacity: 1;
+    }
+}
+
+@keyframes badge-shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-3px) rotate(-5deg); }
+    50% { transform: translateX(3px) rotate(5deg); }
+    75% { transform: translateX(-3px) rotate(-5deg); }
+}
+
+@keyframes badge-fade-in {
+    from {
+        opacity: 0;
+        transform: scale(0);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+@keyframes badge-count-up {
+    0% {
+        transform: translateY(100%);
+        opacity: 0;
+    }
+    100% {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+@keyframes badge-count-down {
+    0% {
+        transform: translateY(-100%);
+        opacity: 0;
+    }
+    100% {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+/* ==========================================================================
+   Base Badge Styles
+   ========================================================================== */
+
+.badge,
+.counter,
+.notification-badge,
+.unread-count {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: var(--font-weight-semibold);
+    font-size: var(--font-size-xs);
+    line-height: 1;
+    border-radius: var(--radius-full);
+    transition:
+        transform var(--transition-fast) var(--ease-bounce),
+        background-color var(--transition-fast) var(--ease-out),
+        color var(--transition-fast) var(--ease-out);
+}
+
+/* ==========================================================================
+   Animation Trigger Classes
+   ========================================================================== */
+
+/* Pop animation on update */
+.badge-pop,
+.badge.pop {
+    animation: badge-pop var(--transition-base) var(--ease-bounce);
+}
+
+/* Bounce animation */
+.badge-bounce,
+.badge.bounce {
+    animation: badge-bounce var(--transition-slow) var(--ease-bounce);
+}
+
+/* Pulse for attention */
+.badge-pulse,
+.badge.pulse {
+    animation: badge-pulse 1.5s var(--ease-out) infinite;
+}
+
+/* Shake for urgent */
+.badge-shake,
+.badge.shake {
+    animation: badge-shake 0.4s var(--ease-out);
+}
+
+/* Fade in on appear */
+.badge-fade-in,
+.badge.fade-in {
+    animation: badge-fade-in var(--transition-base) var(--ease-bounce);
+}
+
+/* ==========================================================================
+   Counter with Slot Machine Effect
+   ========================================================================== */
+
+.counter-slot {
+    position: relative;
+    overflow: hidden;
+    display: inline-flex;
+    height: 1.2em;
+}
+
+.counter-slot-digit {
+    display: inline-block;
+    transition: transform var(--transition-base) var(--ease-bounce);
+}
+
+/* Count up animation */
+.counter-slot-digit.count-up {
+    animation: badge-count-up var(--transition-base) var(--ease-bounce);
+}
+
+/* Count down animation */
+.counter-slot-digit.count-down {
+    animation: badge-count-down var(--transition-base) var(--ease-bounce);
+}
+
+/* ==========================================================================
+   Badge Sizes
+   ========================================================================== */
+
+/* Dot (no text) */
+.badge--dot,
+.badge-dot {
+    width: var(--space-2);
+    height: var(--space-2);
+    min-width: var(--space-2);
+    padding: 0;
+    font-size: 0;
+}
+
+/* Small */
+.badge--sm,
+.badge-sm {
+    min-width: var(--space-4);
+    height: var(--space-4);
+    padding: 0 var(--space-1);
+    font-size: var(--font-size-xs);
+}
+
+/* Medium (default) */
+.badge,
+.badge--md,
+.badge-md {
+    min-width: var(--space-5);
+    height: var(--space-5);
+    padding: 0 var(--space-2);
+    font-size: var(--font-size-xs);
+}
+
+/* Large */
+.badge--lg,
+.badge-lg {
+    min-width: var(--space-6);
+    height: var(--space-6);
+    padding: 0 var(--space-2);
+    font-size: var(--font-size-sm);
+}
+
+/* ==========================================================================
+   Badge Colors
+   ========================================================================== */
+
+/* Primary (default) */
+.badge,
+.badge--primary {
+    background: var(--color-primary-500);
+    color: white;
+}
+
+/* Secondary */
+.badge--secondary {
+    background: var(--color-slate-500);
+    color: white;
+}
+
+/* Success */
+.badge--success {
+    background: var(--color-green-500);
+    color: white;
+}
+
+/* Danger/Error */
+.badge--danger,
+.badge--error {
+    background: var(--color-danger);
+    color: white;
+}
+
+/* Warning */
+.badge--warning {
+    background: var(--color-warning);
+    color: white;
+}
+
+/* Info */
+.badge--info {
+    background: var(--color-info);
+    color: white;
+}
+
+/* Outline variants */
+.badge--outline {
+    background: transparent;
+    border: 1.5px solid currentColor;
+}
+
+.badge--outline.badge--primary { color: var(--color-primary-500); }
+.badge--outline.badge--success { color: var(--color-green-500); }
+.badge--outline.badge--danger { color: var(--color-danger); }
+.badge--outline.badge--warning { color: var(--color-warning); }
+.badge--outline.badge--info { color: var(--color-info); }
+
+/* Soft/muted variants */
+.badge--soft {
+    background: rgba(99, 102, 241, 0.1);
+    color: var(--color-primary-500);
+}
+
+.badge--soft.badge--success {
+    background: rgba(34, 197, 94, 0.1);
+    color: var(--color-green-500);
+}
+
+.badge--soft.badge--danger {
+    background: rgba(239, 68, 68, 0.1);
+    color: var(--color-danger);
+}
+
+/* ==========================================================================
+   Positioned Badges (on icons/avatars)
+   ========================================================================== */
+
+.badge-container {
+    position: relative;
+    display: inline-flex;
+}
+
+.badge-container .badge,
+.badge-positioned {
+    position: absolute;
+}
+
+/* Top right (default) */
+.badge-container .badge,
+.badge--top-right {
+    top: calc(-1 * var(--space-1));
+    right: calc(-1 * var(--space-1));
+}
+
+/* Top left */
+.badge--top-left {
+    top: calc(-1 * var(--space-1));
+    left: calc(-1 * var(--space-1));
+    right: auto;
+}
+
+/* Bottom right */
+.badge--bottom-right {
+    bottom: calc(-1 * var(--space-1));
+    right: calc(-1 * var(--space-1));
+    top: auto;
+}
+
+/* Bottom left */
+.badge--bottom-left {
+    bottom: calc(-1 * var(--space-1));
+    left: calc(-1 * var(--space-1));
+    top: auto;
+    right: auto;
+}
+
+/* Border around badge */
+.badge-container .badge {
+    border: 2px solid white;
+    box-shadow: var(--shadow-xs);
+}
+
+/* ==========================================================================
+   Status Indicators
+   ========================================================================== */
+
+.status-dot {
+    width: var(--space-3);
+    height: var(--space-3);
+    border-radius: var(--radius-full);
+    display: inline-block;
+}
+
+.status-dot--online {
+    background: var(--color-green-500);
+    box-shadow: 0 0 0 2px rgba(34, 197, 94, 0.2);
+}
+
+.status-dot--offline {
+    background: var(--color-gray-500);
+}
+
+.status-dot--busy {
+    background: var(--color-danger);
+    box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.2);
+}
+
+.status-dot--away {
+    background: var(--color-warning);
+    box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.2);
+}
+
+/* Pulsing online status */
+.status-dot--online.pulse {
+    animation: badge-pulse 2s var(--ease-out) infinite;
+}
+
+/* ==========================================================================
+   Notification Badges
+   ========================================================================== */
+
+.notification-badge {
+    background: var(--color-danger);
+    color: white;
+    min-width: 18px;
+    height: 18px;
+    padding: 0 var(--space-1);
+    font-size: 11px;
+}
+
+/* Zero state - hidden */
+.notification-badge:empty,
+.notification-badge[data-count="0"],
+.badge:empty {
+    display: none;
+}
+
+/* 99+ overflow */
+
+/* ==========================================================================
+   Progress Badge
+   ========================================================================== */
+
+.badge-progress {
+    position: relative;
+    background: rgba(99, 102, 241, 0.2);
+    overflow: hidden;
+}
+
+.badge-progress::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: var(--progress, 0%);
+    background: var(--color-primary-500);
+    transition: width var(--transition-base) var(--ease-out);
+    z-index: 0;
+}
+
+.badge-progress span {
+    position: relative;
+    z-index: 1;
+}
+
+/* ==========================================================================
+   Dark Mode
+   ========================================================================== */
+
+[data-theme="dark"] .badge-container .badge {
+    border-color: var(--color-gray-800);
+}
+
+[data-theme="dark"] .badge--soft {
+    background: rgba(99, 102, 241, 0.2);
+    color: var(--color-primary-300);
+}
+
+[data-theme="dark"] .badge--soft.badge--success {
+    background: rgba(34, 197, 94, 0.2);
+    color: var(--color-green-300);
+}
+
+[data-theme="dark"] .badge--soft.badge--danger {
+    background: rgba(239, 68, 68, 0.2);
+    color: var(--color-red-500);
+}
+
+[data-theme="dark"] .badge--outline.badge--primary { color: var(--color-primary-300); }
+[data-theme="dark"] .badge--outline.badge--success { color: var(--color-green-300); }
+[data-theme="dark"] .badge--outline.badge--danger { color: var(--color-red-500); }
+
+[data-theme="dark"] .status-dot--online {
+    box-shadow: 0 0 0 2px rgba(34, 197, 94, 0.3);
+}
+
+[data-theme="dark"] .status-dot--busy {
+    box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.3);
+}
+
+/* ==========================================================================
+   Reduced Motion
+   ========================================================================== */
+
+@media (prefers-reduced-motion: reduce) {
+    .badge-pop,
+    .badge.pop,
+    .badge-bounce,
+    .badge.bounce,
+    .badge-shake,
+    .badge.shake,
+    .badge-fade-in,
+    .badge.fade-in,
+    .counter-slot-digit.count-up,
+    .counter-slot-digit.count-down {
+        animation: none;
+    }
+
+    .badge-pulse,
+    .badge.pulse,
+    .status-dot--online.pulse {
+        animation: none;
+    }
+}
+
+/* ==========================================================================
+   Print - Hide badges
+   ========================================================================== */
+
+@media print {
+    .badge--dot,
+    .notification-badge,
+    .status-dot {
+        display: none !important;
+    }
+}

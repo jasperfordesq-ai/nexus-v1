@@ -171,7 +171,7 @@
 }
 
 .premium-search:focus-within .search-input {
-    color: #fff;
+    color: var(--color-white);
 }
 
 /* Mobile responsive */

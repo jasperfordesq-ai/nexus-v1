@@ -1,1 +1,50 @@
-.civicone--govuk .civicone-grid-column-one-third{text-align:right}.civicone--govuk .groups-header .civicone-button{margin-top:var(--space-5)}.civicone--govuk .civicone-grid-column-one-third .civicone-button{margin-top:var(--space-0)}.civicone-width-container .civicone-button.civicone-button--primary{background-color:var(--color-govuk-green) !important;color:var(--color-white) !important;border-color:var(--color-govuk-green) !important}.civicone-width-container .civicone-button.civicone-button--primary:hover{background-color:var(--color-govuk-green-dark) !important;border-color:var(--color-govuk-green-dark) !important;color:var(--color-white) !important}.civicone-width-container .civicone-button.civicone-button--primary:focus{outline:var(--space-1) solid var(--color-brand-yellow) !important;outline-offset:var(--space-0) !important;background-color:var(--color-brand-yellow) !important;color:var(--color-govuk-black) !important;border-color:var(--color-govuk-black) !important}.civicone--govuk .groups-search-form .civicone-button{width:100%}
+/**
+ * CivicOne Groups Utilities
+ * Extracted from inline styles in views/civicone/groups/index.php
+  * Fully Migrated to Design Tokens: 2026-01-21 ✓
+ */
+
+/* Page header layout - right column alignment */
+.civicone--govuk .civicone-grid-column-one-third {
+    text-align: right;
+}
+
+/* Create group button spacing */
+.civicone--govuk .groups-header .civicone-button {
+    margin-top: var(--space-5);
+}
+
+/* Button alignment in header actions */
+.civicone--govuk .civicone-grid-column-one-third .civicone-button {
+    margin-top: var(--space-0);
+}
+
+/* WCAG AA Primary Button Override - Load order fix */
+/* This file loads AFTER civicone-members-directory.css, ensuring proper contrast */
+.civicone-width-container .civicone-button.civicone-button--primary,
+a.civicone-button.civicone-button--primary {
+    background-color: var(--color-govuk-green) !important; /* GOV.UK Green - 7.5:1 contrast */
+    color: var(--color-white) !important;
+    border-color: var(--color-govuk-green) !important;
+}
+
+.civicone-width-container .civicone-button.civicone-button--primary:hover,
+a.civicone-button.civicone-button--primary:hover {
+    background-color: var(--color-govuk-green-dark) !important;
+    border-color: var(--color-govuk-green-dark) !important;
+    color: var(--color-white) !important;
+}
+
+.civicone-width-container .civicone-button.civicone-button--primary:focus,
+a.civicone-button.civicone-button--primary:focus {
+    outline: var(--space-1) solid var(--color-brand-yellow) !important;
+    outline-offset: var(--space-0) !important;
+    background-color: var(--color-brand-yellow) !important;
+    color: var(--color-govuk-black) !important;
+    border-color: var(--color-govuk-black) !important;
+}
+
+/* Search form submit button */
+.civicone--govuk .groups-search-form .civicone-button {
+    width: 100%;
+}

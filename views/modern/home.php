@@ -1283,24 +1283,60 @@ require __DIR__ . '/../layouts/modern/header.php';
 
 <!-- Main content wrapper (main tag opened in header.php) -->
 <div class="htb-container htb-container-full home-feed-wrapper">
+    <div id="home-glass-wrapper">
 
     <div class="home-two-column-grid">
         <!-- Main Feed Column -->
         <div class="home-feed-column">
             <div class="fds-feed-container">
 
-        <!-- Smart Welcome Section with Dynamic Buttons -->
+        <!-- Smart Welcome Hero Section (matches /listings and /volunteering) -->
         <div class="nexus-welcome-hero">
-            <div class="nexus-welcome-content">
-                <?php if ($isLoggedIn): ?>
-                    <h1 class="nexus-welcome-title">Welcome back, <?= htmlspecialchars(explode(' ', $_SESSION['user_name'] ?? 'User')[0]) ?>!</h1>
-                    <p class="nexus-welcome-subtitle">What would you like to do today?</p>
-                <?php else: ?>
-                    <h1 class="nexus-welcome-title"><?= htmlspecialchars($hero_title ?? 'Community Exchange') ?></h1>
-                    <p class="nexus-welcome-subtitle"><?= htmlspecialchars($hero_subtitle ?? 'Share skills, build community, and exchange time.') ?></p>
-                <?php endif; ?>
-            </div>
+            <?php if ($isLoggedIn): ?>
+                <h1 class="nexus-welcome-title">
+                    <i class="fa-solid fa-house"></i> Welcome back, <?= htmlspecialchars(explode(' ', $_SESSION['user_name'] ?? 'User')[0]) ?>!
+                </h1>
+                <p class="nexus-welcome-subtitle">What would you like to do today?</p>
 
+                <div class="nexus-smart-buttons">
+                    <a href="<?= \Nexus\Core\TenantContext::getBasePath() ?>/compose" class="nexus-smart-btn nexus-smart-btn-primary">
+                        <i class="fa-solid fa-plus"></i>
+                        <span>Create Post</span>
+                    </a>
+                    <a href="<?= \Nexus\Core\TenantContext::getBasePath() ?>/listings" class="nexus-smart-btn nexus-smart-btn-secondary">
+                        <i class="fa-solid fa-handshake"></i>
+                        <span>Offers & Requests</span>
+                    </a>
+                    <a href="<?= \Nexus\Core\TenantContext::getBasePath() ?>/events" class="nexus-smart-btn nexus-smart-btn-secondary">
+                        <i class="fa-solid fa-calendar"></i>
+                        <span>Events</span>
+                    </a>
+                    <a href="<?= \Nexus\Core\TenantContext::getBasePath() ?>/messages" class="nexus-smart-btn nexus-smart-btn-outline">
+                        <i class="fa-solid fa-envelope"></i>
+                        <span>Messages</span>
+                    </a>
+                </div>
+            <?php else: ?>
+                <h1 class="nexus-welcome-title">
+                    <i class="fa-solid fa-users"></i> <?= htmlspecialchars($hero_title ?? 'Community Exchange') ?>
+                </h1>
+                <p class="nexus-welcome-subtitle"><?= htmlspecialchars($hero_subtitle ?? 'Share skills, build community, and exchange time.') ?></p>
+
+                <div class="nexus-smart-buttons">
+                    <a href="<?= \Nexus\Core\TenantContext::getBasePath() ?>/register" class="nexus-smart-btn nexus-smart-btn-primary">
+                        <i class="fa-solid fa-user-plus"></i>
+                        <span>Join Community</span>
+                    </a>
+                    <a href="<?= \Nexus\Core\TenantContext::getBasePath() ?>/login" class="nexus-smart-btn nexus-smart-btn-secondary">
+                        <i class="fa-solid fa-right-to-bracket"></i>
+                        <span>Log In</span>
+                    </a>
+                    <a href="<?= \Nexus\Core\TenantContext::getBasePath() ?>/listings" class="nexus-smart-btn nexus-smart-btn-outline">
+                        <i class="fa-solid fa-magnifying-glass"></i>
+                        <span>Browse Listings</span>
+                    </a>
+                </div>
+            <?php endif; ?>
         </div>
 
             <!-- Universal Feed Filter Component -->
@@ -1408,6 +1444,7 @@ require __DIR__ . '/../layouts/modern/header.php';
             <?php require __DIR__ . '/partials/home-sidebar.php'; ?>
         </aside>
     </div> <!-- /.home-two-column-grid -->
+    </div> <!-- /#home-glass-wrapper -->
 
 </div> <!-- /.htb-container -->
 <!-- End main content (main tag closed in footer.php) -->

@@ -50,7 +50,7 @@
 .preview-section {
     margin-bottom: var(--space-15, 60px);
     padding: var(--space-8, 30px);
-    background: var(--color-surface, #fff);
+    background: var(--color-surface, var(--color-white));
     border-radius: var(--radius-2xl, 16px);
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 }

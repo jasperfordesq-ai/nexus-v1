@@ -17,7 +17,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    color: #fff;
+    color: var(--color-white);
 }
 
 .error-container {
@@ -38,7 +38,7 @@
 
 /* Error type variants */
 .error-code--404 {
-    background: linear-gradient(135deg, #6366f1, #8b5cf6);
+    background: linear-gradient(135deg, var(--color-primary-500), #8b5cf6);
 }
 
 .error-code--403 {
@@ -46,7 +46,7 @@
 }
 
 .error-code--500 {
-    background: linear-gradient(135deg, #f59e0b, #d97706);
+    background: linear-gradient(135deg, var(--color-amber-500), #d97706);
 }
 
 .error-title {
@@ -68,7 +68,7 @@
 }
 
 .error-icon--404 {
-    color: #6366f1;
+    color: var(--color-primary-500);
 }
 
 .error-icon--403 {
@@ -76,7 +76,7 @@
 }
 
 .error-icon--500 {
-    color: #f59e0b;
+    color: var(--color-amber-500);
 }
 
 .error-page .btn {
@@ -84,8 +84,8 @@
     align-items: center;
     gap: 0.5rem;
     padding: 0.75rem 1.5rem;
-    background: #6366f1;
-    color: #fff;
+    background: var(--color-primary-500);
+    color: var(--color-white);
     text-decoration: none;
     border-radius: 8px;
     font-weight: 500;
@@ -100,9 +100,9 @@
 
 .error-page .btn-outline {
     background: transparent;
-    border: 1px solid #6366f1;
+    border: 1px solid var(--color-primary-500);
 }
 
 .error-page .btn-outline:hover {
-    background: #6366f1;
+    background: var(--color-primary-500);
 }

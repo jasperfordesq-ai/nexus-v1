@@ -1,6 +1,6 @@
 /**
  * Privacy Policy Page - Glassmorphism 2025
- * Theme Color: Indigo (#6366f1)
+ * Theme Color: Indigo (var(--color-primary-500))
  *
  * Used by: views/tenants/hour-timebank/shared/pages/privacy-content.php
  * Works on both Modern and CivicOne themes
@@ -8,14 +8,14 @@
 
 /* ============================================
    PRIVACY POLICY - GLASSMORPHISM 2025
-   Theme: Indigo (#6366f1)
+   Theme: Indigo (var(--color-primary-500))
    ============================================ */
 
 #privacy-glass-wrapper {
-    --privacy-theme: #6366f1;
+    --privacy-theme: var(--color-primary-500);
     --privacy-theme-rgb: 99, 102, 241;
-    --privacy-theme-light: #818cf8;
-    --privacy-theme-dark: #4f46e5;
+    --privacy-theme-light: var(--color-primary-400);
+    --privacy-theme-dark: var(--color-primary-600);
     position: relative;
     min-height: 100vh;
     padding: 160px 1rem 4rem;
@@ -84,7 +84,7 @@
 #privacy-glass-wrapper .privacy-page-header h1 {
     font-size: 2.5rem;
     font-weight: 800;
-    color: var(--htb-text-main, var(--color-text, #1e293b));
+    color: var(--htb-text-main, var(--color-text, var(--color-slate-800)));
     margin: 0 0 0.75rem 0;
     display: flex;
     align-items: center;
@@ -106,7 +106,7 @@
 }
 
 #privacy-glass-wrapper .privacy-page-header p {
-    color: var(--htb-text-muted, var(--color-text-muted, #64748b));
+    color: var(--htb-text-muted, var(--color-text-muted, var(--color-slate-500)));
     font-size: 1.15rem;
     margin: 0;
     max-width: 600px;
@@ -158,14 +158,14 @@
 
 [data-theme="light"] #privacy-glass-wrapper .privacy-nav-btn {
     background: rgba(255, 255, 255, 0.7);
-    color: var(--htb-text-main, var(--color-text, #1e293b));
+    color: var(--htb-text-main, var(--color-text, var(--color-slate-800)));
     border: 1px solid rgba(99, 102, 241, 0.2);
     box-shadow: 0 2px 8px rgba(99, 102, 241, 0.1);
 }
 
 [data-theme="dark"] #privacy-glass-wrapper .privacy-nav-btn {
     background: rgba(30, 41, 59, 0.7);
-    color: var(--htb-text-main, var(--color-text, #f1f5f9));
+    color: var(--htb-text-main, var(--color-text, var(--color-slate-100)));
     border: 1px solid rgba(99, 102, 241, 0.3);
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
 }
@@ -266,12 +266,12 @@
 #privacy-glass-wrapper .privacy-section .section-header h2 {
     font-size: 1.35rem;
     font-weight: 700;
-    color: var(--htb-text-main, var(--color-text, #1e293b));
+    color: var(--htb-text-main, var(--color-text, var(--color-slate-800)));
     margin: 0;
 }
 
 #privacy-glass-wrapper .privacy-section p {
-    color: var(--htb-text-muted, var(--color-text-muted, #64748b));
+    color: var(--htb-text-muted, var(--color-text-muted, var(--color-slate-500)));
     font-size: 1rem;
     line-height: 1.75;
     margin: 0 0 1rem 0;
@@ -282,7 +282,7 @@
 }
 
 #privacy-glass-wrapper .privacy-section strong {
-    color: var(--htb-text-main, var(--color-text, #1e293b));
+    color: var(--htb-text-main, var(--color-text, var(--color-slate-800)));
 }
 
 #privacy-glass-wrapper .privacy-section ul {
@@ -295,7 +295,7 @@
     position: relative;
     padding-left: 1.75rem;
     margin-bottom: 0.75rem;
-    color: var(--htb-text-muted, var(--color-text-muted, #64748b));
+    color: var(--htb-text-muted, var(--color-text-muted, var(--color-slate-500)));
     line-height: 1.6;
 }
 
@@ -349,13 +349,13 @@
 
 #privacy-glass-wrapper .entity-info dt {
     font-weight: 700;
-    color: var(--htb-text-main, var(--color-text, #1e293b));
+    color: var(--htb-text-main, var(--color-text, var(--color-slate-800)));
     font-size: 0.9rem;
 }
 
 #privacy-glass-wrapper .entity-info dd {
     margin: 0;
-    color: var(--htb-text-muted, var(--color-text-muted, #64748b));
+    color: var(--htb-text-muted, var(--color-text-muted, var(--color-slate-500)));
     font-size: 0.95rem;
 }
 
@@ -410,7 +410,7 @@
 }
 
 #privacy-glass-wrapper .data-table td {
-    color: var(--htb-text-muted, var(--color-text-muted, #64748b));
+    color: var(--htb-text-muted, var(--color-text-muted, var(--color-slate-500)));
     font-size: 0.95rem;
 }
 
@@ -469,13 +469,13 @@
 #privacy-glass-wrapper .right-card h4 {
     font-size: 1rem;
     font-weight: 700;
-    color: var(--htb-text-main, var(--color-text, #1e293b));
+    color: var(--htb-text-main, var(--color-text, var(--color-slate-800)));
     margin: 0 0 0.5rem 0;
 }
 
 #privacy-glass-wrapper .right-card p {
     font-size: 0.9rem;
-    color: var(--htb-text-muted, var(--color-text-muted, #64748b));
+    color: var(--htb-text-muted, var(--color-text-muted, var(--color-slate-500)));
     margin: 0;
     line-height: 1.5;
 }
@@ -518,14 +518,14 @@
 
 #privacy-glass-wrapper .legal-basis-item strong {
     display: block;
-    color: var(--htb-text-main, var(--color-text, #1e293b));
+    color: var(--htb-text-main, var(--color-text, var(--color-slate-800)));
     font-size: 0.95rem;
     margin-bottom: 0.25rem;
 }
 
 #privacy-glass-wrapper .legal-basis-item span {
     font-size: 0.85rem;
-    color: var(--htb-text-muted, var(--color-text-muted, #64748b));
+    color: var(--htb-text-muted, var(--color-text-muted, var(--color-slate-500)));
     line-height: 1.4;
 }
 
@@ -552,7 +552,7 @@
 #privacy-glass-wrapper .privacy-cta h2 {
     font-size: 1.75rem;
     font-weight: 800;
-    color: var(--htb-text-main, var(--color-text, #1e293b));
+    color: var(--htb-text-main, var(--color-text, var(--color-slate-800)));
     margin: 0 0 0.75rem 0;
     display: flex;
     align-items: center;
@@ -561,7 +561,7 @@
 }
 
 #privacy-glass-wrapper .privacy-cta p {
-    color: var(--htb-text-muted, var(--color-text-muted, #64748b));
+    color: var(--htb-text-muted, var(--color-text-muted, var(--color-slate-500)));
     font-size: 1.05rem;
     line-height: 1.6;
     max-width: 600px;
@@ -752,5 +752,5 @@
 [data-theme="dark"] #privacy-glass-wrapper .right-card h4,
 [data-theme="dark"] #privacy-glass-wrapper .legal-basis-item strong,
 [data-theme="dark"] #privacy-glass-wrapper .privacy-cta h2 {
-    color: #f1f5f9;
+    color: var(--color-slate-100);
 }

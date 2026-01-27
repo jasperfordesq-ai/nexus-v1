@@ -112,12 +112,13 @@ if (file_exists($envPath)) {
     window.closeLikersModal = window.closeLikersModal || function() {};
     <?php if (isset($_SESSION['user_id'])):
         // Get user email - from session or fetch from DB if not set
+        // Use $sessionUser to avoid overwriting view data (e.g., profile $user)
         $userEmail = $_SESSION['user_email'] ?? '';
         if (empty($userEmail)) {
             try {
-                $user = \Nexus\Models\User::findById($_SESSION['user_id']);
-                if ($user) {
-                    $userEmail = $user['email'] ?? '';
+                $sessionUser = \Nexus\Models\User::findById($_SESSION['user_id']);
+                if ($sessionUser) {
+                    $userEmail = $sessionUser['email'] ?? '';
                     $_SESSION['user_email'] = $userEmail;
                 }
             } catch (\Exception $e) {

@@ -1,1 +1,709 @@
-:root{--glass-bg:linear-gradient(135deg,var(--color-white-alpha-95) 0%,var(--color-white-alpha-85) 100%);--glass-border:var(--color-white-alpha-50);--glass-shadow:0 8px 32px var(--color-glass-shadow);--glass-hover-shadow:0 12px 40px var(--color-glass-shadow-15);--holographic-shimmer:linear-gradient( 135deg,var(--color-indigo-alpha-10) 0%,var(--color-purple-alpha-8) 25%,var(--color-pink-alpha-8) 50%,var(--color-purple-alpha-8) 75%,var(--color-indigo-alpha-10) 100% )}.post-detail-bg{position:fixed;top:0;left:0;right:0;bottom:0;z-index:-1;background:linear-gradient(135deg,var(--color-slate-50) 0%,var(--color-slate-100) 25%,var(--color-slate-200) 50%,var(--color-slate-100) 75%,var(--color-slate-50) 100%);overflow:hidden}.post-detail-bg::before{content:'';position:absolute;top:-50%;left:-50%;width:200%;height:200%;background:radial-gradient(ellipse at 20% 30%,var(--color-indigo-alpha-12) 0%,transparent 50%),radial-gradient(ellipse at 80% 20%,var(--color-pink-alpha-10) 0%,transparent 45%),radial-gradient(ellipse at 60% 80%,var(--color-purple-alpha-10) 0%,transparent 50%);.post-detail-bg::after{content:'';position:absolute;top:0;left:0;right:0;bottom:0;background:repeating-linear-gradient( 90deg,transparent 0px,var(--color-indigo-alpha-2) 1px,transparent 2px,transparent 40px );.post-detail-container{max-width:800px;margin:0 auto;padding:100px 16px 100px 16px;position:relative;z-index:1}.glass-button{display:inline-flex;align-items:center;gap:var(--space-2-5);padding:var(--space-3) var(--space-5);background:var(--glass-bg);border:1px solid var(--glass-border);border-radius:var(--radius-xl);color:var(--color-slate-500);text-decoration:none;font-weight:600;margin-bottom:var(--space-5);transition:all 0.3s cubic-bezier(0.4,0,0.2,1);box-shadow:var(--glass-shadow);position:relative;overflow:hidden}.glass-button::before{content:'';position:absolute;top:0;left:-100%;width:100%;height:100%;background:var(--holographic-shimmer);transition:left 0.5s ease}.glass-button:hover::before{left:100%}.glass-button:hover{color:var(--color-primary-500);transform:translateX(-4px) translateY(-2px);box-shadow:var(--glass-hover-shadow);border-color:var(--color-indigo-alpha-30)}.glass-card{background:var(--glass-bg);border:1px solid var(--glass-border);border-radius:var(--radius-2xl);box-shadow:var(--glass-shadow);overflow:hidden;margin-bottom:var(--space-6);position:relative}.glass-card::before{content:'';position:absolute;top:0;left:-100%;width:50%;height:100%;background:linear-gradient( 90deg,transparent 0%,var(--color-white-alpha-10) 50%,transparent 100% )}.post-header{display:flex;align-items:flex-start;justify-content:space-between;padding:var(--space-6);position:relative;z-index:1}.post-author-info{display:flex;gap:var(--space-3-5)}.post-avatar{width:var(--space-14);height:var(--space-14);border-radius:50%;object-fit:cover;border:3px solid var(--color-indigo-alpha-20);flex-shrink:0;box-shadow:0 4px 12px var(--color-indigo-alpha-15),inset 0 0 0 1px var(--color-white-alpha-20);transition:all 0.3s ease}.post-avatar:hover{transform:scale(1.05);border-color:var(--color-indigo-alpha-40);box-shadow:0 6px 16px var(--color-indigo-alpha-25)}.post-meta{display:flex;flex-direction:column;gap:var(--space-1)}.post-author-name{font-weight:700;font-size:1.15rem;color:var(--color-slate-800);line-height:1.2;background:linear-gradient(135deg,var(--color-slate-800) 0%,var(--color-slate-700) 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}.post-timestamp{font-size:0.9rem;color:var(--color-slate-400);display:flex;align-items:center;gap:var(--space-1-5)}.post-visibility{display:inline-flex;align-items:center;gap:var(--space-1);padding:var(--space-1) var(--space-2-5);background:var(--color-indigo-alpha-10);border-radius:var(--radius-md);font-size:0.8rem;color:var(--color-primary-500);font-weight:600;border:1px solid var(--color-indigo-alpha-20)}.post-menu-btn{background:none;border:none;color:var(--color-slate-400);padding:var(--space-2-5);cursor:pointer;border-radius:50%;transition:all 0.2s}.post-menu-btn:hover{background:var(--color-indigo-alpha-10);color:var(--color-primary-500)}.post-content{padding:0 var(--space-6) var(--space-6) 24px;font-size:1.05rem;line-height:1.7;color:var(--color-slate-700);position:relative;z-index:1}.post-content a{color:var(--color-primary-500);text-decoration:none;font-weight:500;position:relative;transition:all 0.2s}.post-content a::after{content:'';position:absolute;bottom:0;left:0;width:0;height:var(--space-0-5);background:linear-gradient(90deg,var(--color-primary-500),var(--color-purple-400));transition:width 0.3s ease}.post-content a:hover::after{width:100%}.post-image{width:100%;height:auto;display:block;border-top:1px solid var(--color-indigo-alpha-10);border-bottom:1px solid var(--color-indigo-alpha-10)}.post-stats{display:flex;justify-content:space-between;padding:var(--space-3-5) var(--space-6);font-size:0.95rem;color:var(--color-slate-500);border-bottom:1px solid var(--color-indigo-alpha-10);background:var(--holographic-shimmer);background-size:200% 100%}.post-stats .stat-item{display:flex;align-items:center;gap:var(--space-2);cursor:pointer;transition:all 0.2s;padding:var(--space-1-5) var(--space-3);border-radius:var(--radius-lg)}.post-stats .stat-item:hover{background:var(--color-indigo-alpha-15);color:var(--color-primary-500);transform:translateY(-2px)}.post-stats .stat-item i{color:var(--color-primary-500);font-size:1.1rem;filter:drop-shadow(0 2px 4px var(--color-indigo-alpha-30))}.post-actions{display:flex;padding:var(--space-1-5) var(--space-3);gap:var(--space-1)}}}@media (max-width:600px){.post-detail-container{padding:90px var(--space-3) 100px var(--space-3)}.glass-button{padding:var(--space-2-5) 16px;font-size:0.9rem}.glass-card{border-radius:var(--radius-2xl)}.post-header{padding:var(--space-5)}.post-avatar{width:var(--space-12);height:var(--space-12)}.post-author-name{font-size:1rem}.post-content{padding:0 var(--space-5) var(--space-5) 20px;font-size:1rem}.post-stats{padding:var(--space-3) var(--space-5)}}
+/**
+ * Feed Show
+ * CivicOne Theme
+ */
+
+/* ============================================
+   MODERN POST DETAIL - HOLOGRAPHIC GLASSMORPHISM
+   ============================================ */
+
+:root {
+    --glass-bg: linear-gradient(135deg, var(--color-white-alpha-95) 0%, var(--color-white-alpha-85) 100%);
+    --glass-border: var(--color-white-alpha-50);
+    --glass-shadow: 0 8px 32px var(--color-glass-shadow);
+    --glass-hover-shadow: 0 12px 40px var(--color-glass-shadow-15);
+    --holographic-shimmer: linear-gradient(
+        135deg,
+        var(--color-indigo-alpha-10) 0%,
+        var(--color-purple-alpha-8) 25%,
+        var(--color-pink-alpha-8) 50%,
+        var(--color-purple-alpha-8) 75%,
+        var(--color-indigo-alpha-10) 100%
+    );
+}
+
+[data-theme="dark"] {
+    --glass-bg: linear-gradient(135deg, var(--color-slate-alpha-95) 0%, var(--color-slate-alpha-85) 100%);
+    --glass-border: var(--color-white-alpha-10);
+    --glass-shadow: 0 8px 32px var(--color-black-alpha-30);
+    --glass-hover-shadow: 0 12px 40px var(--color-black-alpha-40);
+    --holographic-shimmer: linear-gradient(
+        135deg,
+        var(--color-indigo-alpha-15) 0%,
+        var(--color-purple-alpha-12) 25%,
+        var(--color-pink-alpha-12) 50%,
+        var(--color-purple-alpha-12) 75%,
+        var(--color-indigo-alpha-15) 100%
+    );
+}
+
+/* Animated Holographic Background */
+.post-detail-bg {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: -1;
+    background: linear-gradient(135deg, var(--color-slate-50) 0%, var(--color-slate-100) 25%, var(--color-slate-200) 50%, var(--color-slate-100) 75%, var(--color-slate-50) 100%);
+    overflow: hidden;
+}
+
+.post-detail-bg::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background:
+        radial-gradient(ellipse at 20% 30%, var(--color-indigo-alpha-12) 0%, transparent 50%),
+        radial-gradient(ellipse at 80% 20%, var(--color-pink-alpha-10) 0%, transparent 45%),
+        radial-gradient(ellipse at 60% 80%, var(--color-purple-alpha-10) 0%, transparent 50%);
+    /* animation removed for GOV.UK compliance */
+
+.post-detail-bg::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: repeating-linear-gradient(
+        90deg,
+        transparent 0px,
+        var(--color-indigo-alpha-2) 1px,
+        transparent 2px,
+        transparent 40px
+    );
+    /* animation removed for GOV.UK compliance */
+
+[data-theme="dark"] .post-detail-bg {
+    background: linear-gradient(135deg, var(--color-slate-900) 0%, var(--color-slate-800) 50%, var(--color-slate-900) 100%);
+}
+
+[data-theme="dark"] .post-detail-bg::before {
+    background:
+        radial-gradient(ellipse at 20% 30%, var(--color-indigo-alpha-20) 0%, transparent 50%),
+        radial-gradient(ellipse at 80% 20%, var(--color-pink-alpha-15) 0%, transparent 45%),
+        radial-gradient(ellipse at 60% 80%, var(--color-purple-alpha-15) 0%, transparent 50%);
+}
+
+
+.post-detail-container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 100px 16px 100px 16px;
+    position: relative;
+    z-index: 1;
+}
+
+/* Holographic Glass Button */
+.glass-button {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2-5);
+    padding: var(--space-3) var(--space-5);
+    background: var(--glass-bg);
+    /* backdrop-filter removed for GOV.UK compliance */
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius-xl);
+    color: var(--color-slate-500);
+    text-decoration: none;
+    font-weight: 600;
+    margin-bottom: var(--space-5);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: var(--glass-shadow);
+    position: relative;
+    overflow: hidden;
+}
+
+.glass-button::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: var(--holographic-shimmer);
+    transition: left 0.5s ease;
+}
+
+.glass-button:hover::before {
+    left: 100%;
+}
+
+.glass-button:hover {
+    color: var(--color-primary-500);
+    transform: translateX(-4px) translateY(-2px);
+    box-shadow: var(--glass-hover-shadow);
+    border-color: var(--color-indigo-alpha-30);
+}
+
+[data-theme="dark"] .glass-button:hover {
+    color: var(--color-purple-400);
+}
+
+/* Holographic Glass Card */
+.glass-card {
+    background: var(--glass-bg);
+    /* backdrop-filter removed for GOV.UK compliance */
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius-2xl);
+    box-shadow: var(--glass-shadow);
+    overflow: hidden;
+    margin-bottom: var(--space-6);
+    position: relative;
+}
+
+.glass-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 50%;
+    height: 100%;
+    background: linear-gradient(
+        90deg,
+        transparent 0%,
+        var(--color-white-alpha-10) 50%,
+        transparent 100%
+    )
+    /* animation removed for GOV.UK compliance */
+
+/* Animation removed for GOV.UK compliance */
+}
+
+/* Post Header */
+.post-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    padding: var(--space-6);
+    position: relative;
+    z-index: 1;
+}
+
+.post-author-info {
+    display: flex;
+    gap: var(--space-3-5);
+}
+
+.post-avatar {
+    width: var(--space-14);
+    height: var(--space-14);
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid var(--color-indigo-alpha-20);
+    flex-shrink: 0;
+    box-shadow: 0 4px 12px var(--color-indigo-alpha-15),
+                inset 0 0 0 1px var(--color-white-alpha-20);
+    transition: all 0.3s ease;
+}
+
+.post-avatar:hover {
+    transform: scale(1.05);
+    border-color: var(--color-indigo-alpha-40);
+    box-shadow: 0 6px 16px var(--color-indigo-alpha-25);
+}
+
+[data-theme="dark"] .post-avatar {
+    border-color: var(--color-purple-alpha-30);
+}
+
+.post-meta {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+}
+
+.post-author-name {
+    font-weight: 700;
+    font-size: 1.15rem;
+    color: var(--color-slate-800);
+    line-height: 1.2;
+    background: linear-gradient(135deg, var(--color-slate-800) 0%, var(--color-slate-700) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+[data-theme="dark"] .post-author-name {
+    background: linear-gradient(135deg, var(--color-slate-100) 0%, var(--color-slate-300) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.post-timestamp {
+    font-size: 0.9rem;
+    color: var(--color-slate-400);
+    display: flex;
+    align-items: center;
+    gap: var(--space-1-5);
+}
+
+.post-visibility {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-1);
+    padding: var(--space-1) var(--space-2-5);
+    background: var(--color-indigo-alpha-10);
+    border-radius: var(--radius-md);
+    font-size: 0.8rem;
+    color: var(--color-primary-500);
+    font-weight: 600;
+    border: 1px solid var(--color-indigo-alpha-20);
+}
+
+[data-theme="dark"] .post-visibility {
+    background: var(--color-purple-alpha-15);
+    color: var(--color-purple-400);
+    border-color: var(--color-purple-alpha-30);
+}
+
+.post-menu-btn {
+    background: none;
+    border: none;
+    color: var(--color-slate-400);
+    padding: var(--space-2-5);
+    cursor: pointer;
+    border-radius: 50%;
+    transition: all 0.2s;
+}
+
+.post-menu-btn:hover {
+    background: var(--color-indigo-alpha-10);
+    color: var(--color-primary-500);
+}
+
+/* Post Content */
+.post-content {
+    padding: 0 var(--space-6) var(--space-6) 24px;
+    font-size: 1.05rem;
+    line-height: 1.7;
+    color: var(--color-slate-700);
+    position: relative;
+    z-index: 1;
+}
+
+[data-theme="dark"] .post-content {
+    color: var(--color-slate-300);
+}
+
+.post-content a {
+    color: var(--color-primary-500);
+    text-decoration: none;
+    font-weight: 500;
+    position: relative;
+    transition: all 0.2s;
+}
+
+.post-content a::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 0;
+    height: var(--space-0-5);
+    background: linear-gradient(90deg, var(--color-primary-500), var(--color-purple-400));
+    transition: width 0.3s ease;
+}
+
+.post-content a:hover::after {
+    width: 100%;
+}
+
+.post-image {
+    width: 100%;
+    height: auto;
+    display: block;
+    border-top: 1px solid var(--color-indigo-alpha-10);
+    border-bottom: 1px solid var(--color-indigo-alpha-10);
+}
+
+/* Stats Bar with Holographic Accent */
+.post-stats {
+    display: flex;
+    justify-content: space-between;
+    padding: var(--space-3-5) var(--space-6);
+    font-size: 0.95rem;
+    color: var(--color-slate-500);
+    border-bottom: 1px solid var(--color-indigo-alpha-10);
+    background: var(--holographic-shimmer);
+    background-size: 200% 100%
+    /* animation removed for GOV.UK compliance */
+
+/* Animation removed for GOV.UK compliance */
+}
+
+.post-stats .stat-item {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    cursor: pointer;
+    transition: all 0.2s;
+    padding: var(--space-1-5) var(--space-3);
+    border-radius: var(--radius-lg);
+}
+
+.post-stats .stat-item:hover {
+    background: var(--color-indigo-alpha-15);
+    color: var(--color-primary-500);
+    transform: translateY(-2px);
+}
+
+.post-stats .stat-item i {
+    color: var(--color-primary-500);
+    font-size: 1.1rem;
+    filter: drop-shadow(0 2px 4px var(--color-indigo-alpha-30));
+}
+
+/* Action Buttons - Full Facebook Style */
+.post-actions {
+    display: flex;
+    padding: var(--space-1-5) var(--space-3);
+    gap: var(--space-1);
+}
+
+.action-btn {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-2-5);
+    padding: var(--space-3-5);
+    border-radius: 14px;
+    background: transparent;
+    border: none;
+    color: var(--color-slate-500);
+    font-weight: 600;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    min-height: 52px;
+    position: relative;
+    overflow: hidden;
+}
+
+.action-btn::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: radial-gradient(circle, var(--color-indigo-alpha-20), transparent);
+    transform: translate(-50%, -50%);
+    transition: width 0.6s, height 0.6s;
+}
+
+.action-btn:hover::before {
+    width: 300px;
+    height: 300px;
+}
+
+.action-btn:hover {
+    background: var(--color-indigo-alpha-8);
+    color: var(--color-primary-500);
+    transform: translateY(-2px);
+}
+
+.action-btn:active {
+    transform: scale(0.96);
+}
+
+.action-btn.liked {
+    color: var(--color-pink-500);
+}
+
+.action-btn.liked i {
+    /* animation removed for GOV.UK compliance */
+}
+
+/* Animation removed for GOV.UK compliance */
+}
+
+.action-btn i {
+    font-size: 1.2rem;
+    transition: transform 0.3s;
+}
+
+.action-btn:hover i {
+    transform: scale(1.1);
+}
+
+/* Comments Section - Premium Design */
+.comments-section {
+    padding: var(--space-6);
+    background: var(--color-indigo-alpha-2);
+    border-top: 1px solid var(--color-indigo-alpha-10);
+    position: relative;
+    z-index: 1;
+}
+
+[data-theme="dark"] .comments-section {
+    background: var(--color-indigo-alpha-5);
+}
+
+.comments-header {
+    font-weight: 700;
+    font-size: 1.1rem;
+    color: var(--color-slate-800);
+    margin-bottom: var(--space-5);
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+}
+
+[data-theme="dark"] .comments-header {
+    color: var(--color-slate-100);
+}
+
+.comments-header i {
+    color: var(--color-primary-500);
+    filter: drop-shadow(0 2px 4px var(--color-indigo-alpha-30));
+}
+
+/* Comment Compose - Holographic Style */
+.comment-compose {
+    display: flex;
+    gap: var(--space-3);
+    margin-bottom: var(--space-6);
+}
+
+.comment-compose img {
+    width: var(--space-10);
+    height: var(--space-10);
+    border-radius: 50%;
+    object-fit: cover;
+    flex-shrink: 0;
+    border: 2px solid var(--color-indigo-alpha-20);
+    box-shadow: 0 2px 8px var(--color-indigo-alpha-10);
+}
+
+.comment-input-wrapper {
+    flex: 1;
+    position: relative;
+}
+
+.comment-input {
+    width: 100%;
+    background: var(--color-white-alpha-90);
+    /* backdrop-filter removed for GOV.UK compliance */
+    border: 2px solid var(--color-indigo-alpha-20);
+    border-radius: var(--radius-2xl);
+    padding: var(--space-3) var(--space-14) var(--space-3) var(--space-5);
+    font-size: 0.95rem;
+    color: var(--color-slate-800);
+    transition: all 0.3s ease;
+    font-family: inherit;
+}
+
+.comment-input:focus {
+    outline: none;
+    border-color: var(--color-primary-500);
+    box-shadow: 0 0 0 4px var(--color-indigo-alpha-10), 0 8px 16px var(--color-indigo-alpha-15);
+    background: var(--color-white);
+}
+
+[data-theme="dark"] .comment-input {
+    background: var(--color-slate-alpha-80);
+    border-color: var(--color-purple-alpha-30);
+    color: var(--color-slate-100);
+}
+
+[data-theme="dark"] .comment-input:focus {
+    background: var(--color-slate-alpha-95);
+    border-color: var(--color-purple-400);
+    box-shadow: 0 0 0 4px var(--color-purple-alpha-15), 0 8px 16px var(--color-purple-alpha-20);
+}
+
+.comment-send-btn {
+    position: absolute;
+    right: var(--space-3);
+    top: 50%;
+    transform: translateY(-50%);
+    background: linear-gradient(135deg, var(--color-primary-500) 0%, var(--color-purple-500) 100%);
+    border: none;
+    color: white;
+    width: var(--space-9);
+    height: var(--space-9);
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 4px 12px var(--color-indigo-alpha-40);
+}
+
+.comment-send-btn:hover {
+    transform: translateY(-50%) scale(1.08) rotate(15deg);
+    box-shadow: 0 6px 20px var(--color-indigo-alpha-50);
+}
+
+.comment-send-btn:active {
+    transform: translateY(-50%) scale(0.95);
+}
+
+/* Comment Items - Glass Cards */
+.comments-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+}
+
+.comment-item {
+    display: flex;
+    gap: var(--space-3);
+    padding: var(--space-4);
+    background: var(--color-white-alpha-60);
+    /* backdrop-filter removed for GOV.UK compliance */
+    border-radius: var(--radius-xl);
+    border: 1px solid var(--color-indigo-alpha-10);
+    transition: all 0.3s ease;
+}
+
+.comment-item:hover {
+    background: var(--color-white-alpha-80);
+    box-shadow: 0 4px 12px var(--color-indigo-alpha-10);
+    transform: translateY(-2px);
+}
+
+[data-theme="dark"] .comment-item {
+    background: var(--color-slate-alpha-50);
+    border-color: var(--color-purple-alpha-20);
+}
+
+[data-theme="dark"] .comment-item:hover {
+    background: var(--color-slate-alpha-70);
+}
+
+.comment-avatar {
+    width: var(--space-9);
+    height: var(--space-9);
+    border-radius: 50%;
+    object-fit: cover;
+    flex-shrink: 0;
+    border: 2px solid var(--color-indigo-alpha-20);
+}
+
+.comment-body {
+    flex: 1;
+}
+
+.comment-author {
+    font-weight: 600;
+    font-size: 0.95rem;
+    color: var(--color-slate-800);
+    margin-bottom: var(--space-1);
+}
+
+[data-theme="dark"] .comment-author {
+    color: var(--color-slate-100);
+}
+
+.comment-text {
+    font-size: 0.95rem;
+    color: var(--color-slate-600);
+    line-height: 1.5;
+    margin-bottom: var(--space-1-5);
+}
+
+[data-theme="dark"] .comment-text {
+    color: var(--color-slate-300);
+}
+
+.comments-empty {
+    text-align: center;
+    padding: var(--space-10) var(--space-5);
+    color: var(--color-slate-400);
+}
+
+.comments-empty i {
+    font-size: 3rem;
+    margin-bottom: var(--space-3);
+    opacity: 0.3;
+    background: linear-gradient(135deg, var(--color-primary-500), var(--color-purple-400));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+/* Loading Skeleton with Holographic Shimmer */
+.loading-skeleton {
+    background: linear-gradient(90deg,
+        var(--color-indigo-alpha-5) 0%,
+        var(--color-purple-alpha-10) 50%,
+        var(--color-indigo-alpha-5) 100%
+    );
+    background-size: 200% 100%;
+    /* animation removed for GOV.UK compliance */
+    border-radius: var(--radius-md);
+}
+
+/* Animation removed for GOV.UK compliance */
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+    .post-detail-container {
+        padding: 90px var(--space-3) 100px var(--space-3);
+    }
+
+    .glass-button {
+        padding: var(--space-2-5) 16px;
+        font-size: 0.9rem;
+    }
+
+    .glass-card {
+        border-radius: var(--radius-2xl);
+    }
+
+    .post-header {
+        padding: var(--space-5);
+    }
+
+    .post-avatar {
+        width: var(--space-12);
+        height: var(--space-12);
+    }
+
+    .post-author-name {
+        font-size: 1rem;
+    }
+
+    .post-content {
+        padding: 0 var(--space-5) var(--space-5) 20px;
+        font-size: 1rem;
+    }
+
+    .post-stats {
+        padding: var(--space-3) var(--space-5);
+    }
+
+    .action-btn {
+        padding: var(--space-3);
+        font-size: 0.9rem;
+    }
+
+    .action-btn span {
+        display: none;
+    }
+
+    .comments-section {
+        padding: var(--space-5);
+    }
+
+    .comment-compose img {
+        width: var(--space-9);
+        height: var(--space-9);
+    }
+
+    .comment-input {
+        padding: var(--space-2-5) var(--space-12) var(--space-2-5) 16px;
+        font-size: 0.9rem;
+    }
+}

@@ -1,1 +1,395 @@
-.card-hover,.glass-card,.civic-card,.nexus-card,.feed-item,.post-card,.group-card,.resource-card,.blog-card{transition:transform var(--transition-base) cubic-bezier(0.34,1.56,0.64,1),box-shadow var(--transition-base) var(--ease-out),border-color var(--transition-base) var(--ease-out);will-change:transform,box-shadow}.card-hover:hover,.glass-card:hover,.civic-card:hover,.nexus-card:hover,.feed-item:hover,.post-card:hover,.group-card:hover,.resource-card:hover,.blog-card:hover{transform:translateY(-4px)}.card-hover:hover,.glass-card:hover,.civic-card:hover,.nexus-card:hover{box-shadow:0 12px 32px -8px rgba(0,0,0,0.12),0 6px 16px -4px rgba(0,0,0,0.08),0 2px 6px rgba(0,0,0,0.04)}.feed-item:hover,.post-card:hover,.blog-card:hover{box-shadow:0 10px 28px -8px rgba(0,0,0,0.1),0 4px 12px -2px rgba(0,0,0,0.06)}.group-card:hover{box-shadow:0 10px 24px -6px rgba(0,0,0,0.1),0 4px 10px -2px rgba(0,0,0,0.05)}.resource-card:hover{box-shadow:0 8px 20px -6px rgba(0,0,0,0.1),0 3px 8px rgba(0,0,0,0.04)}.card-hover.card-glow,[data-hover="glow"]{border:1px solid transparent}.card-hover.card-glow:hover,[data-hover="glow"]:hover{border-color:rgba(59,130,246,0.3);box-shadow:0 12px 32px -8px rgba(0,0,0,0.12),0 0 0 1px rgba(59,130,246,0.1),0 0 20px -4px rgba(59,130,246,0.15)}.card-hover .card-image,.card-hover .card-thumbnail,.blog-card .blog-image{overflow:hidden}.card-hover .card-image img,.card-hover .card-thumbnail img,.blog-card .blog-image img{transition:transform 400ms var(--ease-bounce)}.card-hover:hover .card-image img,.card-hover:hover .card-thumbnail img,.blog-card:hover .blog-image img{transform:scale(1.05)}.card-hover:hover .card-reveal,.glass-card:hover .card-reveal,.civic-card:hover .card-reveal,.nexus-card:hover .card-reveal{opacity:1;transform:translateY(0)}.card-hover:hover .card-actions,.glass-card:hover .card-actions,.civic-card:hover .card-actions,.nexus-card:hover .card-actions{opacity:1;visibility:visible}.glass-card{backdrop-filter:blur(var(--glass-blur-subtle));-webkit-backdrop-filter:blur(var(--glass-blur-subtle));transition:transform var(--transition-base) cubic-bezier(0.34,1.56,0.64,1),box-shadow var(--transition-base) var(--ease-out),backdrop-filter var(--transition-base) var(--ease-out),-webkit-backdrop-filter var(--transition-base) var(--ease-out)}.glass-card:hover{backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px)}.card-hover:focus-visible,.glass-card:focus-visible,.civic-card:focus-visible,.nexus-card:focus-visible{outline:2px solid var(--focus-ring-color,var(--color-blue-500));outline-offset:var(--space-1);transform:translateY(-4px)}@media (prefers-reduced-motion:reduce){.card-hover,.glass-card,.civic-card,.nexus-card,.feed-item,.post-card,.group-card,.resource-card,.blog-card{transition:box-shadow 200ms var(--ease-out),border-color 200ms var(--ease-out)}.card-hover:hover,.glass-card:hover,.civic-card:hover,.nexus-card:hover,.feed-item:hover,.post-card:hover,.group-card:hover,.resource-card:hover,.blog-card:hover{transform:none}.card-hover:hover .card-image img,.card-hover:hover .card-thumbnail img,.blog-card:hover .blog-image img{transform:none}}@media (hover:none){.card-hover:hover,.glass-card:hover,.civic-card:hover,.nexus-card:hover,.feed-item:hover,.post-card:hover,.group-card:hover,.resource-card:hover,.blog-card:hover{transform:none;box-shadow:inherit}}
+/**
+ * components-cards Bundle
+ * Generated: 2026-01-27T10:42:36.283Z
+ * Files: 3
+ */
+
+/* ========================================
+ * card-hover-states.css
+ * ======================================== */
+
+/**
+ * Card Hover States - Subtle Lift/Glow Effects
+ * Modern interactive card hover animations
+ * Version: 2.0 - 2026-01-21 - Migrated to design tokens
+ *
+ * Features:
+ * - Smooth translateY lift on hover
+ * - Soft glow/shadow enhancement
+ * - Glassmorphism integration
+ * - Dark mode support
+ * - Reduced motion respect
+ */
+
+/* ==========================================================================
+   Base Card Hover - Applied to common card classes
+   ========================================================================== */
+
+/* Generic card lift effect */
+.card-hover,
+.glass-card,
+.civic-card,
+.nexus-card,
+.feed-item,
+.post-card,
+.listing-card,
+.event-card,
+.group-card,
+.user-card,
+.resource-card,
+.blog-card,
+.notification-item {
+    transition:
+        transform var(--transition-base) cubic-bezier(0.34, 1.56, 0.64, 1),
+        box-shadow var(--transition-base) var(--ease-out),
+        border-color var(--transition-base) var(--ease-out);
+    will-change: transform, box-shadow;
+}
+
+.card-hover:hover,
+.glass-card:hover,
+.civic-card:hover,
+.nexus-card:hover,
+.feed-item:hover,
+.post-card:hover,
+.listing-card:hover,
+.event-card:hover,
+.group-card:hover,
+.user-card:hover,
+.resource-card:hover,
+.blog-card:hover,
+.notification-item:hover {
+    transform: translateY(-4px);
+}
+
+/* ==========================================================================
+   Shadow/Glow Enhancement on Hover
+   ========================================================================== */
+
+/* Light mode - Soft shadow lift */
+.card-hover:hover,
+.glass-card:hover,
+.civic-card:hover,
+.nexus-card:hover {
+    box-shadow:
+        0 12px 32px -8px rgba(0, 0, 0, 0.12),
+        0 6px 16px -4px rgba(0, 0, 0, 0.08),
+        0 2px 6px rgba(0, 0, 0, 0.04);
+}
+
+/* Feed/content cards */
+.feed-item:hover,
+.post-card:hover,
+.blog-card:hover {
+    box-shadow:
+        0 10px 28px -8px rgba(0, 0, 0, 0.1),
+        0 4px 12px -2px rgba(0, 0, 0, 0.06);
+}
+
+/* Listing/event cards - Slightly more prominent */
+.listing-card:hover,
+.event-card:hover {
+    box-shadow:
+        0 14px 36px -8px rgba(0, 0, 0, 0.14),
+        0 6px 18px -4px rgba(0, 0, 0, 0.08);
+}
+
+/* Group/user cards */
+.group-card:hover,
+.user-card:hover {
+    box-shadow:
+        0 10px 24px -6px rgba(0, 0, 0, 0.1),
+        0 4px 10px -2px rgba(0, 0, 0, 0.05);
+}
+
+/* Resource cards */
+.resource-card:hover {
+    box-shadow:
+        0 8px 20px -6px rgba(0, 0, 0, 0.1),
+        0 3px 8px rgba(0, 0, 0, 0.04);
+}
+
+/* Message/notification items - Subtle */
+
+.notification-item:hover {
+    box-shadow:
+        0 6px 16px -4px rgba(0, 0, 0, 0.08),
+        0 2px 6px rgba(0, 0, 0, 0.03);
+}
+
+/* ==========================================================================
+   Border Glow Effect
+   ========================================================================== */
+
+/* Cards with border glow on hover */
+
+.card-hover.card-glow,
+[data-hover="glow"] {
+    border: 1px solid transparent;
+}
+
+
+.card-hover.card-glow:hover,
+[data-hover="glow"]:hover {
+    border-color: rgba(59, 130, 246, 0.3);
+    box-shadow:
+        0 12px 32px -8px rgba(0, 0, 0, 0.12),
+        0 0 0 1px rgba(59, 130, 246, 0.1),
+        0 0 20px -4px rgba(59, 130, 246, 0.15);
+}
+
+/* ==========================================================================
+   Interactive Clickable Cards
+   ========================================================================== */
+
+/* Cards that are entirely clickable */
+
+a.glass-card,
+a.civic-card,
+a.nexus-card {
+    cursor: pointer;
+}
+
+
+a.glass-card:active,
+a.civic-card:active,
+a.nexus-card:active {
+    transform: translateY(-2px) scale(0.99);
+}
+
+/* ==========================================================================
+   Featured/Highlighted Cards
+   ========================================================================== */
+
+/* Featured card with enhanced glow */
+
+/* ==========================================================================
+   Card Image Zoom
+   ========================================================================== */
+
+/* Image zoom on card hover */
+.card-hover .card-image,
+.card-hover .card-thumbnail,
+.listing-card .listing-image,
+.event-card .event-image,
+.blog-card .blog-image {
+    overflow: hidden;
+}
+
+.card-hover .card-image img,
+.card-hover .card-thumbnail img,
+.listing-card .listing-image img,
+.event-card .event-image img,
+.blog-card .blog-image img {
+    transition: transform 400ms var(--ease-bounce);
+}
+
+.card-hover:hover .card-image img,
+.card-hover:hover .card-thumbnail img,
+.listing-card:hover .listing-image img,
+.event-card:hover .event-image img,
+.blog-card:hover .blog-image img {
+    transform: scale(1.05);
+}
+
+/* ==========================================================================
+   Card Content Reveal
+   ========================================================================== */
+
+/* Hidden content that reveals on hover */
+
+.card-hover:hover .card-reveal,
+.glass-card:hover .card-reveal,
+.civic-card:hover .card-reveal,
+.nexus-card:hover .card-reveal {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* Quick action buttons that appear on hover */
+
+.card-hover:hover .card-actions,
+.glass-card:hover .card-actions,
+.civic-card:hover .card-actions,
+.nexus-card:hover .card-actions {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* ==========================================================================
+   Stagger Animation for Card Grids
+   ========================================================================== */
+
+/* Cards in grid get staggered hover delay */
+
+/* ==========================================================================
+   Glassmorphism Card Enhancement
+   ========================================================================== */
+
+/* Glass cards get enhanced backdrop blur on hover */
+.glass-card {
+    backdrop-filter: blur(var(--glass-blur-subtle));
+    -webkit-backdrop-filter: blur(var(--glass-blur-subtle));
+    transition:
+        transform var(--transition-base) cubic-bezier(0.34, 1.56, 0.64, 1),
+        box-shadow var(--transition-base) var(--ease-out),
+        backdrop-filter var(--transition-base) var(--ease-out),
+        -webkit-backdrop-filter var(--transition-base) var(--ease-out);
+}
+
+.glass-card:hover {
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+}
+
+/* ==========================================================================
+   Dark Mode
+   ========================================================================== */
+
+[data-theme="dark"] .card-hover:hover,
+[data-theme="dark"] .glass-card:hover,
+[data-theme="dark"] .civic-card:hover,
+[data-theme="dark"] .nexus-card:hover {
+    box-shadow:
+        0 12px 32px -8px rgba(0, 0, 0, 0.4),
+        0 6px 16px -4px rgba(0, 0, 0, 0.3),
+        0 0 1px rgba(255, 255, 255, 0.1);
+}
+
+[data-theme="dark"] .feed-item:hover,
+[data-theme="dark"] .post-card:hover,
+[data-theme="dark"] .blog-card:hover {
+    box-shadow:
+        0 10px 28px -8px rgba(0, 0, 0, 0.35),
+        0 4px 12px -2px rgba(0, 0, 0, 0.25),
+        0 0 1px rgba(255, 255, 255, 0.08);
+}
+
+[data-theme="dark"] .listing-card:hover,
+[data-theme="dark"] .event-card:hover {
+    box-shadow:
+        0 14px 36px -8px rgba(0, 0, 0, 0.45),
+        0 6px 18px -4px rgba(0, 0, 0, 0.3),
+        0 0 1px rgba(255, 255, 255, 0.1);
+}
+
+[data-theme="dark"] .group-card:hover,
+[data-theme="dark"] .user-card:hover {
+    box-shadow:
+        0 10px 24px -6px rgba(0, 0, 0, 0.35),
+        0 4px 10px -2px rgba(0, 0, 0, 0.25);
+}
+
+
+[data-theme="dark"] .notification-item:hover {
+    box-shadow:
+        0 6px 16px -4px rgba(0, 0, 0, 0.3),
+        0 2px 6px rgba(0, 0, 0, 0.2);
+}
+
+/* Dark mode glow effect - Blue tint */
+
+[data-theme="dark"] .card-hover.card-glow:hover,
+[data-theme="dark"] [data-hover="glow"]:hover {
+    border-color: rgba(96, 165, 250, 0.4);
+    box-shadow:
+        0 12px 32px -8px rgba(0, 0, 0, 0.4),
+        0 0 0 1px rgba(96, 165, 250, 0.2),
+        0 0 24px -4px rgba(96, 165, 250, 0.2);
+}
+
+/* Dark mode featured glow */
+
+/* ==========================================================================
+   Focus States (Keyboard Navigation)
+   ========================================================================== */
+
+.card-hover:focus-visible,
+.glass-card:focus-visible,
+.civic-card:focus-visible,
+.nexus-card:focus-visible {
+    outline: 2px solid var(--focus-ring-color, var(--color-blue-500));
+    outline-offset: var(--space-1);
+    transform: translateY(-4px);
+}
+
+/* ==========================================================================
+   Reduced Motion
+   ========================================================================== */
+
+@media (prefers-reduced-motion: reduce) {
+    .card-hover,
+    .glass-card,
+    .civic-card,
+    .nexus-card,
+    .feed-item,
+    .post-card,
+    .listing-card,
+    .event-card,
+    .group-card,
+    .user-card,
+    .resource-card,
+    .blog-card,
+    .notification-item {
+        transition:
+            box-shadow 200ms var(--ease-out),
+            border-color 200ms var(--ease-out);
+    }
+
+    .card-hover:hover,
+    .glass-card:hover,
+    .civic-card:hover,
+    .nexus-card:hover,
+    .feed-item:hover,
+    .post-card:hover,
+    .listing-card:hover,
+    .event-card:hover,
+    .group-card:hover,
+    .user-card:hover,
+    .resource-card:hover,
+    .blog-card:hover,
+    .notification-item:hover {
+        transform: none;
+    }
+
+    .card-hover:hover .card-image img,
+    .card-hover:hover .card-thumbnail img,
+    .listing-card:hover .listing-image img,
+    .event-card:hover .event-image img,
+    .blog-card:hover .blog-image img {
+        transform: none;
+    }
+}
+
+/* ==========================================================================
+   Touch Devices - Disable hover lift (keeps active state)
+   ========================================================================== */
+
+@media (hover: none) {
+    .card-hover:hover,
+    .glass-card:hover,
+    .civic-card:hover,
+    .nexus-card:hover,
+    .feed-item:hover,
+    .post-card:hover,
+    .listing-card:hover,
+    .event-card:hover,
+    .group-card:hover,
+    .user-card:hover,
+    .resource-card:hover,
+    .blog-card:hover,
+    .notification-item:hover {
+        transform: none;
+        box-shadow: inherit;
+    }
+
+    /* Keep active state for touch feedback */
+    
+    a.glass-card:active,
+    a.civic-card:active,
+    a.nexus-card:active {
+        transform: scale(0.98);
+    }
+}
+
+

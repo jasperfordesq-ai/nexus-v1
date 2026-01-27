@@ -23,9 +23,9 @@ $currentPath = parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH);
 // Service name
 $serviceName = TenantContext::getSetting('site_name') ?? 'Community';
 
-// Auth state
-$user = Auth::user();
-$isLoggedIn = !empty($user);
+// Auth state - use $authUser to avoid overwriting view data (e.g., profile $user)
+$authUser = Auth::user();
+$isLoggedIn = !empty($authUser);
 
 /**
  * Check if a navigation item is active

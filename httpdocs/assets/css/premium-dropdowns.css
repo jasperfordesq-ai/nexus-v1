@@ -59,7 +59,7 @@
         0 0 0 3px rgba(99, 102, 241, 0.08),
         inset 0 1px 0 rgba(255, 255, 255, 0.15) !important;
     transform: translateY(-1px) !important;
-    color: #fff !important;
+    color: var(--color-white) !important;
 }
 
 /* Active/Open state */
@@ -147,7 +147,7 @@
     background: linear-gradient(90deg,
         rgba(99, 102, 241, 0.15) 0%,
         rgba(139, 92, 246, 0.08) 100%) !important;
-    color: #fff !important;
+    color: var(--color-white) !important;
     padding-left: var(--space-6) !important;
     text-shadow: 0 2px 8px rgba(99, 102, 241, 0.3) !important;
 }

@@ -402,20 +402,20 @@ foreach ($permsByCategory as $perms) {
         <?php if (!empty($user['avatar_url'])): ?>
             <img src="<?= htmlspecialchars($user['avatar_url']) ?>" loading="lazy" alt="Avatar" class="permissions-user-avatar">
         <?php else: ?>
-            <div class="permissions-user-avatar" style="background: var(--admin-primary); color: white; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; font-weight: 700;">
+            <div class="permissions-user-avatar mte-permissions--avatar-placeholder">
                 <?= strtoupper(substr($user['username'] ?? 'U', 0, 1)) ?>
             </div>
         <?php endif; ?>
         <div class="permissions-user-details">
             <h2><?= htmlspecialchars($user['username'] ?? 'Unknown User') ?></h2>
             <p><?= htmlspecialchars($user['email'] ?? '') ?></p>
-            <p style="font-size: 0.75rem; margin-top: 0.25rem;">
+            <p class="mte-permissions--user-meta">
                 User ID: <?= $userId ?> |
                 Role: <strong><?= htmlspecialchars($user['role'] ?? 'user') ?></strong>
             </p>
         </div>
     </div>
-    <div style="display: flex; gap: 0.75rem;">
+    <div class="mte-permissions--header-actions">
         <a href="<?= TenantContext::getBasePath() ?>/admin/users/<?= $userId ?>" class="admin-btn-secondary">
             <i class="fas fa-arrow-left"></i> Back to User
         </a>
@@ -443,7 +443,7 @@ foreach ($permsByCategory as $perms) {
             <span class="stat-card-label">Dangerous Permissions</span>
             <i class="fas fa-exclamation-triangle stat-card-icon"></i>
         </div>
-        <div class="stat-card-value" style="color: #ef4444;"><?= $totalDangerous ?></div>
+        <div class="stat-card-value mte-permissions--stat-dangerous"><?= $totalDangerous ?></div>
     </div>
     <div class="stat-card">
         <div class="stat-card-header">
@@ -570,13 +570,13 @@ foreach ($permsByCategory as $perms) {
     </div>
     <?php foreach ($revocations as $revocation): ?>
         <div class="revocation-item">
-            <div class="permission-name" style="color: #991b1b;">
+            <div class="permission-name mte-permissions--revocation-name">
                 <?= htmlspecialchars($revocation['name']) ?>
             </div>
-            <p class="permission-description" style="color: #7f1d1d;">
+            <p class="permission-description mte-permissions--revocation-desc">
                 <?= htmlspecialchars($revocation['display_name']) ?>
             </p>
-            <div class="permission-source" style="color: #991b1b;">
+            <div class="permission-source mte-permissions--revocation-source">
                 <i class="fas fa-user-slash"></i> Revoked by <?= htmlspecialchars($revocation['revoked_by_username'] ?? 'System') ?> on <?= date('M j, Y', strtotime($revocation['created_at'])) ?>
             </div>
         </div>
@@ -585,21 +585,21 @@ foreach ($permsByCategory as $perms) {
 <?php endif; ?>
 
 <!-- Assign Role Modal -->
-<div id="assignRoleModal" onclick="closeAssignRoleModal()" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 9999; align-items: center; justify-content: center;">
-    <div onclick="event.stopPropagation()" style="background: var(--admin-card-bg); border-radius: 12px; padding: 2rem; width: 90%; max-width: 500px; box-shadow: 0 20px 60px rgba(0,0,0,0.3);">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
-            <h3 style="margin: 0; color: var(--admin-text); font-size: 1.5rem;">
+<div id="assignRoleModal" onclick="closeAssignRoleModal()" class="mte-permissions--modal-overlay">
+    <div onclick="event.stopPropagation()" class="mte-permissions--modal">
+        <div class="mte-permissions--modal-header">
+            <h3 class="mte-permissions--modal-title">
                 <i class="fas fa-user-tag"></i> Assign Role
             </h3>
-            <button onclick="closeAssignRoleModal()" style="background: none; border: none; font-size: 1.5rem; color: var(--admin-text-muted); cursor: pointer; padding: 0; width: 32px; height: 32px;">&times;</button>
+            <button onclick="closeAssignRoleModal()" class="mte-permissions--modal-close">&times;</button>
         </div>
 
         <form id="assignRoleForm" onsubmit="event.preventDefault(); submitAssignRole();">
-            <div style="margin-bottom: 1.5rem;">
-                <label style="display: block; margin-bottom: 0.5rem; font-weight: 600; color: var(--admin-text);">
-                    Select Role <span style="color: #ef4444;">*</span>
+            <div class="mte-permissions--form-group">
+                <label class="mte-permissions--label">
+                    Select Role <span class="mte-permissions--required">*</span>
                 </label>
-                <select id="selectRole" required style="width: 100%; padding: 0.625rem; border: 1px solid var(--admin-border); border-radius: 6px; background: var(--admin-bg); color: var(--admin-text); font-size: 0.875rem;">
+                <select id="selectRole" required class="mte-permissions--select">
                     <option value="">-- Choose a role --</option>
                     <?php
                     $assignedRoleIds = array_column($userRoles, 'id');
@@ -611,22 +611,22 @@ foreach ($permsByCategory as $perms) {
                         </option>
                     <?php endforeach; ?>
                 </select>
-                <small style="display: block; margin-top: 0.5rem; color: var(--admin-text-muted);">
+                <small class="mte-permissions--hint">
                     Only showing roles not already assigned to this user
                 </small>
             </div>
 
-            <div style="margin-bottom: 1.5rem;">
-                <label style="display: block; margin-bottom: 0.5rem; font-weight: 600; color: var(--admin-text);">
+            <div class="mte-permissions--form-group">
+                <label class="mte-permissions--label">
                     Expires At (Optional)
                 </label>
-                <input type="datetime-local" id="roleExpiresAt" style="width: 100%; padding: 0.625rem; border: 1px solid var(--admin-border); border-radius: 6px; background: var(--admin-bg); color: var(--admin-text); font-size: 0.875rem;">
-                <small style="display: block; margin-top: 0.5rem; color: var(--admin-text-muted);">
+                <input type="datetime-local" id="roleExpiresAt" class="mte-permissions--input">
+                <small class="mte-permissions--hint">
                     Leave empty for permanent assignment
                 </small>
             </div>
 
-            <div style="display: flex; gap: 0.75rem; justify-content: flex-end;">
+            <div class="mte-permissions--modal-footer">
                 <button type="button" onclick="closeAssignRoleModal()" class="admin-btn admin-btn-secondary">
                     Cancel
                 </button>
@@ -639,28 +639,28 @@ foreach ($permsByCategory as $perms) {
 </div>
 
 <!-- Grant Permission Modal -->
-<div id="grantPermissionModal" onclick="closeGrantPermissionModal()" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 9999; align-items: center; justify-content: center;">
-    <div onclick="event.stopPropagation()" style="background: var(--admin-card-bg); border-radius: 12px; padding: 2rem; width: 90%; max-width: 600px; max-height: 90vh; overflow-y: auto; box-shadow: 0 20px 60px rgba(0,0,0,0.3);">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
-            <h3 style="margin: 0; color: var(--admin-text); font-size: 1.5rem;">
+<div id="grantPermissionModal" onclick="closeGrantPermissionModal()" class="mte-permissions--modal-overlay">
+    <div onclick="event.stopPropagation()" class="mte-permissions--modal mte-permissions--modal-lg">
+        <div class="mte-permissions--modal-header">
+            <h3 class="mte-permissions--modal-title">
                 <i class="fas fa-key"></i> Grant Permission
             </h3>
-            <button onclick="closeGrantPermissionModal()" style="background: none; border: none; font-size: 1.5rem; color: var(--admin-text-muted); cursor: pointer; padding: 0; width: 32px; height: 32px;">&times;</button>
+            <button onclick="closeGrantPermissionModal()" class="mte-permissions--modal-close">&times;</button>
         </div>
 
         <form id="grantPermissionForm" onsubmit="event.preventDefault(); submitGrantPermission();">
-            <div style="margin-bottom: 1rem;">
-                <label style="display: block; margin-bottom: 0.5rem; font-weight: 600; color: var(--admin-text);">
+            <div class="mte-permissions--form-group-sm">
+                <label class="mte-permissions--label">
                     Search Permissions
                 </label>
-                <input type="text" id="permissionSearch" placeholder="Search by name or description..." oninput="filterPermissions()" style="width: 100%; padding: 0.625rem; border: 1px solid var(--admin-border); border-radius: 6px; background: var(--admin-bg); color: var(--admin-text); font-size: 0.875rem;">
+                <input type="text" id="permissionSearch" placeholder="Search by name or description..." oninput="filterPermissions()" class="mte-permissions--input">
             </div>
 
-            <div style="margin-bottom: 1.5rem;">
-                <label style="display: block; margin-bottom: 0.5rem; font-weight: 600; color: var(--admin-text);">
+            <div class="mte-permissions--form-group">
+                <label class="mte-permissions--label">
                     Filter by Category
                 </label>
-                <select id="permissionCategory" onchange="filterPermissions()" style="width: 100%; padding: 0.625rem; border: 1px solid var(--admin-border); border-radius: 6px; background: var(--admin-bg); color: var(--admin-text); font-size: 0.875rem;">
+                <select id="permissionCategory" onchange="filterPermissions()" class="mte-permissions--select">
                     <option value="">All Categories</option>
                     <?php
                     // $allPermissions is already grouped by category, so keys are category names
@@ -671,34 +671,34 @@ foreach ($permsByCategory as $perms) {
                 </select>
             </div>
 
-            <div style="margin-bottom: 1.5rem;">
-                <label style="display: block; margin-bottom: 0.5rem; font-weight: 600; color: var(--admin-text);">
-                    Select Permission <span style="color: #ef4444;">*</span>
+            <div class="mte-permissions--form-group">
+                <label class="mte-permissions--label">
+                    Select Permission <span class="mte-permissions--required">*</span>
                 </label>
-                <div id="permissionListContainer" style="max-height: 300px; overflow-y: auto; border: 1px solid var(--admin-border); border-radius: 6px; background: var(--admin-bg);">
+                <div id="permissionListContainer" class="mte-permissions--list-container">
                     <?php
                     // $allPermissions is already grouped by category from getAllPermissions()
                     // Format: ['users' => [perm1, perm2], 'content' => [perm3, perm4]]
                     foreach ($allPermissions as $category => $perms):
                     ?>
-                        <div class="permission-group" style="border-bottom: 1px solid var(--admin-border);">
-                            <div style="background: var(--admin-bg-hover); padding: 0.5rem 0.75rem; font-weight: 600; font-size: 0.75rem; text-transform: uppercase; color: var(--admin-text-muted);">
+                        <div class="permission-group">
+                            <div class="mte-permissions--group-header">
                                 <?= ucfirst(htmlspecialchars($category)) ?>
                             </div>
                             <?php foreach ($perms as $perm): ?>
-                                <label class="permission-option" data-category="<?= htmlspecialchars($category) ?>" data-name="<?= htmlspecialchars($perm['name']) ?>" data-display="<?= htmlspecialchars($perm['display_name']) ?>" style="display: flex; align-items: flex-start; padding: 0.75rem; cursor: pointer; transition: background 0.2s; gap: 0.75rem;">
-                                    <input type="radio" name="permission" value="<?= $perm['id'] ?>" style="margin-top: 0.25rem; cursor: pointer;">
-                                    <div style="flex: 1; min-width: 0;">
-                                        <div style="font-weight: 600; color: var(--admin-text); word-wrap: break-word;">
+                                <label class="permission-option mte-permissions--option" data-category="<?= htmlspecialchars($category) ?>" data-name="<?= htmlspecialchars($perm['name']) ?>" data-display="<?= htmlspecialchars($perm['display_name']) ?>">
+                                    <input type="radio" name="permission" value="<?= $perm['id'] ?>" class="mte-permissions--option-radio">
+                                    <div class="mte-permissions--option-content">
+                                        <div class="mte-permissions--option-title">
                                             <?= htmlspecialchars($perm['display_name']) ?>
                                             <?php if ($perm['is_dangerous']): ?>
-                                                <span style="color: #ef4444;">⚠️</span>
+                                                <span class="mte-permissions--option-dangerous">⚠️</span>
                                             <?php endif; ?>
                                         </div>
-                                        <div style="font-size: 0.75rem; color: var(--admin-text-muted); font-family: monospace; margin-top: 0.25rem; word-break: break-all;">
+                                        <div class="mte-permissions--option-code">
                                             <?= htmlspecialchars($perm['name']) ?>
                                         </div>
-                                        <div style="font-size: 0.8125rem; color: var(--admin-text-muted); margin-top: 0.25rem; line-height: 1.4;">
+                                        <div class="mte-permissions--option-desc">
                                             <?= htmlspecialchars($perm['description']) ?>
                                         </div>
                                     </div>
@@ -710,36 +710,27 @@ foreach ($permsByCategory as $perms) {
                 <input type="hidden" id="selectPermission" required>
             </div>
 
-            <style>
-            .permission-option:hover {
-                background: var(--admin-bg-hover);
-            }
-            .permission-option input[type="radio"]:checked + div {
-                color: var(--admin-primary);
-            }
-            </style>
-
-            <div style="margin-bottom: 1.5rem;">
-                <label style="display: block; margin-bottom: 0.5rem; font-weight: 600; color: var(--admin-text);">
-                    Reason <span style="color: #ef4444;">*</span>
+            <div class="mte-permissions--form-group">
+                <label class="mte-permissions--label">
+                    Reason <span class="mte-permissions--required">*</span>
                 </label>
-                <textarea id="permReason" rows="3" required placeholder="Why is this permission being granted?" style="width: 100%; padding: 0.625rem; border: 1px solid var(--admin-border); border-radius: 6px; background: var(--admin-bg); color: var(--admin-text); font-size: 0.875rem; resize: vertical;"></textarea>
-                <small style="display: block; margin-top: 0.5rem; color: var(--admin-text-muted);">
+                <textarea id="permReason" rows="3" required placeholder="Why is this permission being granted?" class="mte-permissions--textarea"></textarea>
+                <small class="mte-permissions--hint">
                     This will be recorded in the audit log
                 </small>
             </div>
 
-            <div style="margin-bottom: 1.5rem;">
-                <label style="display: block; margin-bottom: 0.5rem; font-weight: 600; color: var(--admin-text);">
+            <div class="mte-permissions--form-group">
+                <label class="mte-permissions--label">
                     Expires At (Optional)
                 </label>
-                <input type="datetime-local" id="permExpiresAt" style="width: 100%; padding: 0.625rem; border: 1px solid var(--admin-border); border-radius: 6px; background: var(--admin-bg); color: var(--admin-text); font-size: 0.875rem;">
-                <small style="display: block; margin-top: 0.5rem; color: var(--admin-text-muted);">
+                <input type="datetime-local" id="permExpiresAt" class="mte-permissions--input">
+                <small class="mte-permissions--hint">
                     Leave empty for permanent grant
                 </small>
             </div>
 
-            <div style="display: flex; gap: 0.75rem; justify-content: flex-end;">
+            <div class="mte-permissions--modal-footer">
                 <button type="button" onclick="closeGrantPermissionModal()" class="admin-btn admin-btn-secondary">
                     Cancel
                 </button>
@@ -753,20 +744,20 @@ foreach ($permsByCategory as $perms) {
 
 <script>
 function openAssignRoleModal() {
-    document.getElementById('assignRoleModal').style.display = 'flex';
+    document.getElementById('assignRoleModal').dataset.open = 'true';
 }
 
 function closeAssignRoleModal() {
-    document.getElementById('assignRoleModal').style.display = 'none';
+    document.getElementById('assignRoleModal').dataset.open = 'false';
     document.getElementById('assignRoleForm').reset();
 }
 
 function openGrantPermissionModal() {
-    document.getElementById('grantPermissionModal').style.display = 'flex';
+    document.getElementById('grantPermissionModal').dataset.open = 'true';
 }
 
 function closeGrantPermissionModal() {
-    document.getElementById('grantPermissionModal').style.display = 'none';
+    document.getElementById('grantPermissionModal').dataset.open = 'false';
     document.getElementById('grantPermissionForm').reset();
 }
 
@@ -909,19 +900,19 @@ function filterPermissions() {
         const matchesCategory = !category || optCategory === category;
 
         if (matchesSearch && matchesCategory) {
-            option.style.display = 'flex';
+            option.classList.remove('hidden');
         } else {
-            option.style.display = 'none';
+            option.classList.add('hidden');
         }
     });
 
     // Hide empty groups
     groups.forEach(group => {
-        const visibleOptions = group.querySelectorAll('.permission-option[style*="display: flex"]');
+        const visibleOptions = group.querySelectorAll('.permission-option:not(.hidden)');
         if (visibleOptions.length === 0) {
-            group.style.display = 'none';
+            group.classList.add('hidden');
         } else {
-            group.style.display = 'block';
+            group.classList.remove('hidden');
         }
     });
 }
