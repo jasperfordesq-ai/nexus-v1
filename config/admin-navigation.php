@@ -213,6 +213,7 @@ return [
                 'children' => [
                     ['label' => 'Settings', 'url' => '/admin/federation', 'icon' => 'fa-sliders'],
                     ['label' => 'Partnerships', 'url' => '/admin/federation/partnerships', 'icon' => 'fa-handshake'],
+                    ['label' => 'External Partners', 'url' => '/admin/federation/external-partners', 'icon' => 'fa-server'],
                     ['label' => 'Discover', 'url' => '/admin/federation/directory', 'icon' => 'fa-compass'],
                     ['label' => 'My Listing', 'url' => '/admin/federation/directory/profile', 'icon' => 'fa-user-edit'],
                     ['label' => 'Analytics', 'url' => '/admin/federation/analytics', 'icon' => 'fa-chart-line'],
