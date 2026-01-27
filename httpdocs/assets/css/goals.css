@@ -2176,3 +2176,167 @@ textarea.holo-input {
         }
     }
 
+/* ===== Goals Comments System (27/01/2026) ===== */
+/* Extracted from inline styles in show.php */
+
+/* Loading/error/empty state messages */
+.goal-comment-status {
+    text-align: center;
+    color: var(--text-muted);
+}
+
+.goal-comment-status--with-padding {
+    padding: var(--space-5);
+}
+
+/* Comment wrapper */
+.goal-comment {
+    padding: var(--space-4);
+    margin-bottom: var(--space-3);
+    background: var(--pill-bg);
+    border-radius: var(--radius-md);
+    border: 1px solid var(--glass-border);
+}
+
+/* Comment header with avatar */
+.goal-comment__header {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    margin-bottom: var(--space-2);
+}
+
+.goal-comment__avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: var(--radius-full);
+    object-fit: cover;
+}
+
+.goal-comment__author {
+    color: var(--text-color);
+}
+
+.goal-comment__time {
+    font-size: var(--font-size-xs);
+    color: var(--text-muted);
+}
+
+.goal-comment__edited {
+    font-size: var(--font-size-xs);
+    color: var(--text-muted);
+}
+
+/* Comment content */
+.goal-comment__content {
+    color: var(--text-color);
+    margin-bottom: var(--space-3);
+}
+
+/* Comment actions row */
+.goal-comment__actions {
+    display: flex;
+    gap: var(--space-2);
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+/* Owner action buttons (edit/delete) */
+.goal-comment__owner-action {
+    cursor: pointer;
+    margin-left: var(--space-3);
+}
+
+.goal-comment__owner-action:first-of-type {
+    margin-left: var(--space-3);
+}
+
+.goal-comment__owner-action + .goal-comment__owner-action {
+    margin-left: var(--space-1);
+}
+
+/* Reaction buttons */
+.goal-comment__reaction {
+    cursor: pointer;
+    padding: var(--space-1) var(--space-2);
+    border-radius: var(--radius-md);
+    font-size: var(--font-size-sm);
+    background: var(--pill-bg);
+    border: 1px solid var(--glass-border);
+}
+
+.goal-comment__reaction--active {
+    background: rgba(219, 39, 119, 0.2);
+    border-color: rgba(219, 39, 119, 0.4);
+}
+
+/* Reply link */
+.goal-comment__reply-link {
+    cursor: pointer;
+    color: var(--accent-color);
+    font-size: var(--font-size-sm);
+}
+
+/* Reply form */
+.goal-comment__reply-form {
+    display: none;
+    margin-top: var(--space-3);
+}
+
+.goal-comment__reply-input {
+    width: 100%;
+    padding: var(--space-2) var(--space-3);
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--glass-border);
+    background: var(--pill-bg);
+    color: var(--text-color);
+}
+
+.goal-comment__reply-submit {
+    margin-top: var(--space-2);
+    padding: var(--space-2) var(--space-3);
+    font-size: var(--font-size-sm);
+}
+
+/* Edit form */
+.goal-comment__edit-form {
+    display: flex;
+    gap: var(--space-2);
+    flex-wrap: wrap;
+}
+
+.goal-comment__edit-input {
+    flex: 1;
+    min-width: 200px;
+    padding: var(--space-2) var(--space-3);
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--glass-border);
+    background: var(--pill-bg);
+    color: var(--text-color);
+}
+
+.goal-comment__edit-btn {
+    padding: var(--space-2) var(--space-3);
+}
+
+/* Reply form visible state */
+.goal-comment__reply-form.visible {
+    display: block;
+}
+
+/* Comment nesting - using data-indent attribute */
+.goal-comment[data-indent="1"] { margin-left: 20px; }
+.goal-comment[data-indent="2"] { margin-left: 40px; }
+.goal-comment[data-indent="3"] { margin-left: 60px; }
+.goal-comment[data-indent="4"] { margin-left: 80px; }
+.goal-comment[data-indent="5"] { margin-left: 100px; }
+
+/* Responsive: reduce indent on mobile */
+@media (max-width: 640px) {
+    .goal-comment[data-indent="1"] { margin-left: 10px; }
+    .goal-comment[data-indent="2"] { margin-left: 20px; }
+    .goal-comment[data-indent="3"] { margin-left: 30px; }
+    .goal-comment[data-indent="4"] { margin-left: 40px; }
+    .goal-comment[data-indent="5"] { margin-left: 50px; }
+}
+

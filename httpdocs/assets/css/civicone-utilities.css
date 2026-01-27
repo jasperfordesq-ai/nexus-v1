@@ -954,6 +954,10 @@
     background: #f3f2f1;
 }
 
+.civicone-drawer__footer-btn {
+    margin-bottom: 0;
+}
+
 .civicone-notification {
     padding: 10px 0;
     border-bottom: 1px solid #f3f2f1;

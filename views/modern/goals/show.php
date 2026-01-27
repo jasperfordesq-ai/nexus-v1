@@ -34,7 +34,7 @@ require __DIR__ . '/../../layouts/header.php';
             </div>
 
             <?php if ($isAuthor): ?>
-                <div style="display:flex; gap:10px; flex-wrap: wrap;">
+                <div class="mte-goals--header-actions">
                     <?php if ($goal['status'] === 'active'): ?>
                         <form action="<?= \Nexus\Core\TenantContext::getBasePath() ?>/goals/<?= $goal['id'] ?>/complete" method="POST" onsubmit="return confirm('Mark as achieved? Great job!')">
                             <?= \Nexus\Core\Csrf::input() ?>
@@ -53,16 +53,16 @@ require __DIR__ . '/../../layouts/header.php';
         <?php if ($hasMentor): ?>
             <!-- Matched State -->
             <div class="status-card status-matched">
-                <h3 style="margin: 0 0 10px 0; font-size: 1.25rem;">🤝 Matched with Buddy</h3>
-                <div style="display: flex; align-items: center; gap: 15px;">
-                    <div style="font-size: 2rem;">🎉</div>
+                <h3 class="mte-goals--status-title">🤝 Matched with Buddy</h3>
+                <div class="mte-goals--buddy-row">
+                    <div class="mte-goals--emoji-large">🎉</div>
                     <div>
-                        <div style="opacity: 0.8; font-size: 0.9rem;">Accountability Partner</div>
-                        <div style="font-weight: 700; font-size: 1.1rem;"><?= htmlspecialchars($goal['mentor_name']) ?></div>
+                        <div class="mte-goals--label-small">Accountability Partner</div>
+                        <div class="mte-goals--buddy-name"><?= htmlspecialchars($goal['mentor_name']) ?></div>
                     </div>
                     <?php if ($isAuthor || $isMentor): ?>
-                        <div style="margin-left: auto;">
-                            <a href="<?= Nexus\Core\TenantContext::getBasePath() ?>/messages?create=1&to=<?= $isAuthor ? $goal['mentor_id'] : $goal['user_id'] ?>" class="glass-pill-btn btn-primary" style="padding: 8px 16px; font-size: 0.85rem;">Message</a>
+                        <div class="mte-goals--message-btn-container">
+                            <a href="<?= Nexus\Core\TenantContext::getBasePath() ?>/messages?create=1&to=<?= $isAuthor ? $goal['mentor_id'] : $goal['user_id'] ?>" class="glass-pill-btn btn-primary mte-goals--message-btn">Message</a>
                         </div>
                     <?php endif; ?>
                 </div>
@@ -71,10 +71,10 @@ require __DIR__ . '/../../layouts/header.php';
         <?php elseif ($goal['is_public']): ?>
             <!-- Looking State -->
             <div class="status-card status-looking">
-                <div style="text-align: center;">
-                    <div style="font-size: 2rem; margin-bottom: 10px;">🔍</div>
-                    <h3 style="margin: 0 0 10px 0; font-size: 1.25rem;">Looking for a Buddy</h3>
-                    <p style="margin: 0 0 20px 0; opacity: 0.9;">This goal is public! Waiting for a community member to support you.</p>
+                <div class="mte-goals--looking-content">
+                    <div class="mte-goals--looking-emoji">🔍</div>
+                    <h3 class="mte-goals--status-title">Looking for a Buddy</h3>
+                    <p class="mte-goals--looking-desc">This goal is public! Waiting for a community member to support you.</p>
 
                     <?php if (!$isAuthor && isset($_SESSION['user_id'])): ?>
                         <form action="<?= Nexus\Core\TenantContext::getBasePath() ?>/goals/buddy" method="POST" onsubmit="return confirm('Are you sure you want to be the accountability partner for this goal?');">
@@ -89,11 +89,11 @@ require __DIR__ . '/../../layouts/header.php';
         <?php else: ?>
             <!-- Private State -->
             <div class="status-card status-private">
-                <div style="display: flex; align-items: center; gap: 15px;">
-                    <div style="font-size: 1.5rem;">🔒</div>
+                <div class="mte-goals--private-row">
+                    <div class="mte-goals--emoji-medium">🔒</div>
                     <div>
-                        <strong style="display:block;">Private Goal</strong>
-                        <span style="opacity: 0.8; font-size: 0.9rem;">Only you can see this goal.</span>
+                        <strong class="mte-goals--private-label">Private Goal</strong>
+                        <span class="mte-goals--private-sublabel">Only you can see this goal.</span>
                     </div>
                 </div>
             </div>
@@ -108,10 +108,10 @@ require __DIR__ . '/../../layouts/header.php';
         $isLiked = $isLiked ?? false;
         $isLoggedIn = $isLoggedIn ?? !empty($_SESSION['user_id']);
         ?>
-        <div style="margin-top: 40px; padding-top: 30px; border-top: 1px solid var(--glass-border);">
+        <div class="mte-goals--social-section">
             <!-- Like & Comment Buttons -->
-            <div style="display: flex; align-items: center; gap: 15px; flex-wrap: wrap; margin-bottom: 20px;">
-                <button id="like-btn" onclick="goalToggleLike()" class="glass-pill-btn <?= $isLiked ? 'btn-primary' : 'btn-secondary' ?>" style="<?= $isLiked ? '' : '' ?>">
+            <div class="mte-goals--social-buttons">
+                <button id="like-btn" onclick="goalToggleLike()" class="glass-pill-btn <?= $isLiked ? 'btn-primary' : 'btn-secondary' ?>">
                     <i class="<?= $isLiked ? 'fa-solid' : 'fa-regular' ?> fa-heart" id="like-icon"></i>
                     <span id="like-count"><?= $likesCount ?></span>
                     <span><?= $likesCount === 1 ? 'Like' : 'Likes' ?></span>
@@ -129,24 +129,24 @@ require __DIR__ . '/../../layouts/header.php';
             </div>
 
             <!-- Comments Section (Hidden by Default) -->
-            <div id="comments-section" style="display: none; margin-top: 20px;">
+            <div id="comments-section" class="mte-goals--comments-section">
                 <?php if ($isLoggedIn): ?>
-                <form onsubmit="goalSubmitComment(event)" style="margin-bottom: 20px;">
-                    <div style="display: flex; gap: 10px; align-items: flex-start;">
-                        <img src="<?= $_SESSION['user_avatar'] ?? '/assets/img/defaults/default_avatar.webp' ?>" loading="lazy" style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover; border: 1px solid var(--glass-border);">
-                        <div style="flex: 1;">
-                            <textarea id="comment-input" placeholder="Write a comment..." style="width: 100%; min-height: 80px; padding: 12px; border-radius: 12px; border: 1px solid var(--glass-border); background: var(--pill-bg); color: var(--text-color); font-size: 0.95rem; resize: vertical;"></textarea>
-                            <button type="submit" class="glass-pill-btn btn-primary" style="margin-top: 10px;">Post Comment</button>
+                <form onsubmit="goalSubmitComment(event)" class="mte-goals--comment-form">
+                    <div class="mte-goals--comment-form-row">
+                        <img src="<?= $_SESSION['user_avatar'] ?? '/assets/img/defaults/default_avatar.webp' ?>" loading="lazy" class="mte-goals--comment-avatar">
+                        <div class="mte-goals--comment-input-wrapper">
+                            <textarea id="comment-input" placeholder="Write a comment..." class="mte-goals--comment-textarea"></textarea>
+                            <button type="submit" class="glass-pill-btn btn-primary mte-goals--comment-submit">Post Comment</button>
                         </div>
                     </div>
                 </form>
                 <?php else: ?>
-                <p style="text-align: center; color: var(--text-muted); padding: 20px;">
-                    <a href="<?= Nexus\Core\TenantContext::getBasePath() ?>/login" style="color: var(--accent-color);">Log in</a> to leave a comment.
+                <p class="mte-goals--login-prompt">
+                    <a href="<?= Nexus\Core\TenantContext::getBasePath() ?>/login" class="mte-goals--login-link">Log in</a> to leave a comment.
                 </p>
                 <?php endif; ?>
                 <div id="comments-list">
-                    <p style="text-align: center; color: var(--text-muted);">Loading comments...</p>
+                    <p class="mte-goals--loading-text">Loading comments...</p>
                 </div>
             </div>
         </div>
@@ -317,18 +317,19 @@ document.querySelectorAll('.glass-pill-btn, button').forEach(btn => {
 
         // Desktop: use inline comments section
         const section = document.getElementById('comments-section');
-        const isHidden = section.style.display === 'none';
+        const isHidden = !section.classList.contains('visible');
 
-        section.style.display = isHidden ? 'block' : 'none';
-
-        if (isHidden && !commentsLoaded) {
-            loadComments();
+        if (isHidden) {
+            section.classList.add('visible');
+            if (!commentsLoaded) loadComments();
+        } else {
+            section.classList.remove('visible');
         }
     };
 
     async function loadComments() {
         const list = document.getElementById('comments-list');
-        list.innerHTML = '<p style="text-align: center; color: var(--text-muted);">Loading comments...</p>';
+        list.innerHTML = '<p class="goal-comment-status">Loading comments...</p>';
 
         try {
             const response = await fetch(API_BASE + '/comments', {
@@ -345,14 +346,14 @@ document.querySelectorAll('.glass-pill-btn, button').forEach(btn => {
             });
 
             if (!response.ok) {
-                list.innerHTML = '<p style="text-align: center; color: var(--text-muted);">Failed to load comments.</p>';
+                list.innerHTML = '<p class="goal-comment-status">Failed to load comments.</p>';
                 return;
             }
 
             const data = await response.json();
 
             if (data.error) {
-                list.innerHTML = '<p style="text-align: center; color: var(--text-muted);">Failed to load comments.</p>';
+                list.innerHTML = '<p class="goal-comment-status">Failed to load comments.</p>';
                 return;
             }
 
@@ -360,7 +361,7 @@ document.querySelectorAll('.glass-pill-btn, button').forEach(btn => {
             availableReactions = data.available_reactions || [];
 
             if (!data.comments || data.comments.length === 0) {
-                list.innerHTML = '<p style="text-align: center; color: var(--text-muted); padding: 20px;">No comments yet. Be the first to comment!</p>';
+                list.innerHTML = '<p class="goal-comment-status goal-comment-status--with-padding">No comments yet. Be the first to comment!</p>';
                 return;
             }
 
@@ -368,43 +369,44 @@ document.querySelectorAll('.glass-pill-btn, button').forEach(btn => {
 
         } catch (err) {
             console.error('Load comments error:', err);
-            list.innerHTML = '<p style="text-align: center; color: var(--text-muted);">Failed to load comments.</p>';
+            list.innerHTML = '<p class="goal-comment-status">Failed to load comments.</p>';
         }
     }
 
     function renderComment(c, depth) {
         const indent = depth * 20;
-        const isEdited = c.is_edited ? '<span style="font-size: 0.7rem; color: var(--text-muted);"> (edited)</span>' : '';
+        const isEdited = c.is_edited ? '<span class="goal-comment__edited"> (edited)</span>' : '';
         const ownerActions = c.is_owner ? `
-            <span onclick="goalEditComment(${c.id}, '${escapeHtml(c.content).replace(/'/g, "\\'")}')" style="cursor: pointer; margin-left: 10px;" title="Edit">✏️</span>
-            <span onclick="goalDeleteComment(${c.id})" style="cursor: pointer; margin-left: 5px;" title="Delete">🗑️</span>
+            <span onclick="goalEditComment(${c.id}, '${escapeHtml(c.content).replace(/'/g, "\\'")}')" class="goal-comment__owner-action" title="Edit">✏️</span>
+            <span onclick="goalDeleteComment(${c.id})" class="goal-comment__owner-action" title="Delete">🗑️</span>
         ` : '';
 
         const reactions = Object.entries(c.reactions || {}).map(([emoji, count]) => {
             const isUserReaction = (c.user_reactions || []).includes(emoji);
-            return `<span onclick="goalToggleReaction(${c.id}, '${emoji}')" style="cursor: pointer; padding: 2px 6px; border-radius: 12px; font-size: 0.8rem; background: ${isUserReaction ? 'rgba(219, 39, 119, 0.2)' : 'var(--pill-bg)'}; border: 1px solid ${isUserReaction ? 'rgba(219, 39, 119, 0.4)' : 'var(--glass-border)'};">${emoji} ${count}</span>`;
+            const activeClass = isUserReaction ? ' goal-comment__reaction--active' : '';
+            return `<span onclick="goalToggleReaction(${c.id}, '${emoji}')" class="goal-comment__reaction${activeClass}">${emoji} ${count}</span>`;
         }).join(' ');
 
         const replies = (c.replies || []).map(r => renderComment(r, depth + 1)).join('');
 
         return `
-            <div style="margin-left: ${indent}px; padding: 15px; margin-bottom: 10px; background: var(--pill-bg); border-radius: 12px; border: 1px solid var(--glass-border);">
-                <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px;">
-                    <img src="${c.avatar || '/assets/img/defaults/default_avatar.webp'}" style="width: 32px; height: 32px; border-radius: 50%; object-fit: cover;" loading="lazy">
+            <div class="goal-comment" data-indent="${depth}">
+                <div class="goal-comment__header">
+                    <img src="${c.avatar || '/assets/img/defaults/default_avatar.webp'}" class="goal-comment__avatar" loading="lazy">
                     <div>
-                        <strong style="color: var(--text-color);">${escapeHtml(c.author_name)}</strong>${isEdited}
-                        <div style="font-size: 0.75rem; color: var(--text-muted);">${c.time_ago}</div>
+                        <strong class="goal-comment__author">${escapeHtml(c.author_name)}</strong>${isEdited}
+                        <div class="goal-comment__time">${c.time_ago}</div>
                     </div>
                     ${ownerActions}
                 </div>
-                <div id="content-${c.id}" style="color: var(--text-color); margin-bottom: 10px;">${escapeHtml(c.content)}</div>
-                <div style="display: flex; gap: 8px; flex-wrap: wrap; align-items: center;">
+                <div id="content-${c.id}" class="goal-comment__content">${escapeHtml(c.content)}</div>
+                <div class="goal-comment__actions">
                     ${reactions}
-                    <span onclick="goalShowReplyForm(${c.id})" style="cursor: pointer; color: var(--accent-color); font-size: 0.85rem;">↩️ Reply</span>
+                    <span onclick="goalShowReplyForm(${c.id})" class="goal-comment__reply-link">↩️ Reply</span>
                 </div>
-                <div id="reply-form-${c.id}" style="display: none; margin-top: 10px;">
-                    <input type="text" id="reply-input-${c.id}" placeholder="Write a reply..." style="width: 100%; padding: 8px 12px; border-radius: 8px; border: 1px solid var(--glass-border); background: var(--pill-bg); color: var(--text-color);">
-                    <button onclick="goalSubmitReply(${c.id})" class="glass-pill-btn btn-primary" style="margin-top: 8px; padding: 6px 12px; font-size: 0.85rem;">Reply</button>
+                <div id="reply-form-${c.id}" class="goal-comment__reply-form">
+                    <input type="text" id="reply-input-${c.id}" placeholder="Write a reply..." class="goal-comment__reply-input">
+                    <button onclick="goalSubmitReply(${c.id})" class="glass-pill-btn btn-primary goal-comment__reply-submit">Reply</button>
                 </div>
                 ${replies}
             </div>
@@ -462,8 +464,9 @@ document.querySelectorAll('.glass-pill-btn, button').forEach(btn => {
 
     window.goalShowReplyForm = function(commentId) {
         const form = document.getElementById(`reply-form-${commentId}`);
-        form.style.display = form.style.display === 'none' ? 'block' : 'none';
-        if (form.style.display === 'block') {
+        const isHidden = !form.classList.contains('visible');
+        form.classList.toggle('visible', isHidden);
+        if (isHidden) {
             document.getElementById(`reply-input-${commentId}`).focus();
         }
     };
@@ -490,7 +493,7 @@ document.querySelectorAll('.glass-pill-btn, button').forEach(btn => {
             const data = await response.json();
             if (data.error) { alert(data.error); return; }
             input.value = '';
-            document.getElementById(`reply-form-${parentId}`).style.display = 'none';
+            document.getElementById(`reply-form-${parentId}`).classList.remove('visible');
             const countEl = document.getElementById('comment-count');
             countEl.textContent = parseInt(countEl.textContent) + 1;
             loadComments();
@@ -545,10 +548,10 @@ document.querySelectorAll('.glass-pill-btn, button').forEach(btn => {
         const originalHtml = contentEl.innerHTML;
 
         contentEl.innerHTML = `
-            <div style="display: flex; gap: 8px; flex-wrap: wrap;">
-                <input type="text" id="edit-input-${commentId}" value="${escapeHtml(currentContent)}" style="flex: 1; min-width: 200px; padding: 8px 12px; border-radius: 8px; border: 1px solid var(--glass-border); background: var(--pill-bg); color: var(--text-color);">
-                <button onclick="goalSaveEdit(${commentId})" class="glass-pill-btn btn-primary" style="padding: 6px 12px;">Save</button>
-                <button onclick="goalCancelEdit(${commentId}, '${escapeHtml(originalHtml).replace(/'/g, "\\'")}')" class="glass-pill-btn btn-secondary" style="padding: 6px 12px;">Cancel</button>
+            <div class="goal-comment__edit-form">
+                <input type="text" id="edit-input-${commentId}" value="${escapeHtml(currentContent)}" class="goal-comment__edit-input">
+                <button onclick="goalSaveEdit(${commentId})" class="glass-pill-btn btn-primary goal-comment__edit-btn">Save</button>
+                <button onclick="goalCancelEdit(${commentId}, '${escapeHtml(originalHtml).replace(/'/g, "\\'")}')" class="glass-pill-btn btn-secondary goal-comment__edit-btn">Cancel</button>
             </div>
         `;
         document.getElementById(`edit-input-${commentId}`).focus();
