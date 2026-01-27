@@ -1,1 +1,56 @@
-.form-group{margin-bottom:var(--space-5)}.form-label{display:block;font-weight:bold;margin-bottom:var(--space-1)}.form-input-full{width:100%}.form-textarea{width:100%;font-family:inherit}.civic-date-range-grid{display:grid;grid-template-columns:1fr 1fr;gap:var(--space-5);margin-bottom:var(--space-5)}@media (max-width:500px){.civic-date-range-grid{grid-template-columns:1fr}}
+/* Volunteering: Create Opportunity Form
+   Template D: Form Page
+   WCAG 2.1 AA Compliant */
+
+/* ==========================================================================
+   Page Header
+   ========================================================================== */
+
+/* ==========================================================================
+   Form Card
+   ========================================================================== */
+
+/* ==========================================================================
+   Form Groups
+   ========================================================================== */
+
+.form-group {
+    margin-bottom: var(--space-5);
+}
+
+.form-label {
+    display: block;
+    font-weight: bold;
+    margin-bottom: var(--space-1);
+}
+
+.form-input-full {
+    width: 100%;
+}
+
+.form-textarea {
+    width: 100%;
+    font-family: inherit;
+}
+
+/* ==========================================================================
+   Date Range Grid
+   ========================================================================== */
+
+.civic-date-range-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-5);
+    margin-bottom: var(--space-5);
+}
+
+/* Mobile responsive for date range */
+@media (max-width: 500px) {
+    .civic-date-range-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* ==========================================================================
+   Submit Button
+   ========================================================================== */

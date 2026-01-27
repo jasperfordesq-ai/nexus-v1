@@ -49,7 +49,7 @@
     font-size: var(--font-size-xl);
     font-weight: var(--font-weight-bold);
     margin: 0 0 var(--space-1);
-    color: var(--admin-text, #fff);
+    color: var(--admin-text, var(--color-white));
 }
 
 .fed-status-text p {
@@ -133,7 +133,7 @@
 .fed-stat-value {
     font-size: var(--font-size-3xl);
     font-weight: var(--font-weight-bold);
-    color: var(--admin-text, #fff);
+    color: var(--admin-text, var(--color-white));
     line-height: var(--line-height-tight);
 }
 
@@ -173,7 +173,7 @@
 .fed-admin-card-title {
     font-size: var(--font-size-base);
     font-weight: var(--font-weight-semibold);
-    color: var(--admin-text, #fff);
+    color: var(--admin-text, var(--color-white));
     margin: 0;
     display: flex;
     align-items: center;
@@ -225,7 +225,7 @@
 
 .admin-toggle-title {
     font-weight: var(--font-weight-semibold);
-    color: var(--admin-text, #fff);
+    color: var(--admin-text, var(--color-white));
 }
 
 .admin-toggle-desc {
@@ -357,7 +357,7 @@
 
 .fed-partnership-name {
     font-weight: var(--font-weight-semibold);
-    color: var(--admin-text, #fff);
+    color: var(--admin-text, var(--color-white));
     font-size: var(--font-size-sm);
     margin-bottom: var(--space-1);
 }
@@ -451,7 +451,7 @@
 
 .fed-activity-action {
     font-weight: var(--font-weight-semibold);
-    color: var(--admin-text, #fff);
+    color: var(--admin-text, var(--color-white));
     font-size: var(--font-size-sm);
 }
 
@@ -518,7 +518,7 @@
 
 .fed-top-user-name {
     font-weight: var(--font-weight-semibold);
-    color: var(--admin-text, #fff);
+    color: var(--admin-text, var(--color-white));
     font-size: var(--font-size-sm);
     white-space: nowrap;
     overflow: hidden;
@@ -634,7 +634,7 @@
 
 .admin-modal-header h3 {
     margin: 0;
-    color: var(--admin-text, #fff);
+    color: var(--admin-text, var(--color-white));
 }
 
 .admin-modal-body {
@@ -687,7 +687,7 @@
 .analytics-date-btn:hover {
     background: rgba(255, 255, 255, 0.1);
     border-color: rgba(139, 92, 246, 0.4);
-    color: #fff;
+    color: var(--color-white);
 }
 
 .analytics-date-btn.active {
@@ -747,7 +747,7 @@
 .analytics-metric-value {
     font-size: var(--font-size-2xl);
     font-weight: var(--font-weight-bold);
-    color: #fff;
+    color: var(--color-white);
 }
 
 .analytics-metric-label {
@@ -828,7 +828,7 @@
     margin: 0 0 var(--space-1);
     font-size: var(--font-size-base);
     font-weight: var(--font-weight-semibold);
-    color: var(--admin-text, #fff);
+    color: var(--admin-text, var(--color-white));
 }
 
 .fed-directory-info p {

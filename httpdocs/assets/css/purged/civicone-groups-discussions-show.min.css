@@ -1,1 +1,498 @@
-.offline-banner{position:fixed;top:0;left:0;right:0;z-index:10001;padding:var(--space-3) var(--space-5);background:linear-gradient(135deg,var(--color-danger),var(--color-red-600));color:white;font-size:0.9rem;font-weight:600;display:flex;align-items:center;justify-content:center;gap:var(--space-2);transform:translateY(-100%);transition:transform 0.3s cubic-bezier(0.4,0,0.2,1)}.offline-banner.visible{transform:translateY(0)}
+    /* ============================================
+       GOLD STANDARD - Native App Features
+       ============================================ */
+
+    /* Offline Banner */
+    .offline-banner {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        z-index: 10001;
+        padding: var(--space-3) var(--space-5);
+        background: linear-gradient(135deg, var(--color-danger), var(--color-red-600));
+        color: white;
+        font-size: 0.9rem;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: var(--space-2);
+        transform: translateY(-100%);
+        transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .offline-banner.visible {
+        transform: translateY(0);
+    }
+
+
+    .discussion-chat-card {
+        /* animation removed for GOV.UK compliance */
+    }
+
+    /* Button Press States */
+    .discussion-reply-btn:active,
+    .discussion-action-btn:active,
+    .discussion-back-btn:active,
+    button:active {
+        transform: scale(0.96) !important;
+        transition: transform 0.1s ease !important;
+    }
+
+    /* Touch Targets - WCAG 2.1 AA (44px minimum) */
+    .discussion-reply-btn,
+    .discussion-action-btn,
+    .discussion-back-btn,
+    .discussion-reply-input,
+    button {
+        min-height: var(--space-11);
+    }
+
+    .discussion-reply-input {
+        font-size: 16px !important; /* Prevent iOS zoom */
+    }
+
+    /* Focus Visible */
+    .discussion-reply-btn:focus-visible,
+    .discussion-action-btn:focus-visible,
+    .discussion-back-btn:focus-visible,
+    .discussion-reply-input:focus-visible,
+    button:focus-visible,
+    a:focus-visible {
+        outline: 3px solid var(--color-pink-600-alpha-50);
+        outline-offset: 2px;
+    }
+
+    /* Smooth Scroll */
+    html {
+        scroll-behavior: smooth;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    /* Mobile Responsive - Gold Standard */
+    @media (max-width: 768px) {
+        .discussion-reply-btn,
+        .discussion-back-btn,
+        button {
+            min-height: var(--space-12);
+        }
+    }
+
+    /* ============================================
+       DISCUSSION PAGE - MOBILE FIRST DESIGN
+       ============================================ */
+    .discussion-page-wrapper {
+        padding-top: 120px;
+        padding-bottom: var(--space-10);
+        max-width: 900px;
+        position: relative;
+        z-index: 20;
+    }
+
+    /* Back Navigation */
+    .discussion-back-nav {
+        margin-bottom: var(--space-4);
+    }
+
+    .discussion-back-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: var(--space-2);
+        padding: var(--space-2-5) var(--space-4-5);
+        background: var(--color-white-alpha-90);
+        /* backdrop-filter removed for GOV.UK compliance */
+        border-radius: var(--radius-lg);
+        color: var(--color-slate-500);
+        text-decoration: none;
+        font-size: 0.9rem;
+        font-weight: 600;
+        transition: all 0.2s ease;
+        -webkit-tap-highlight-color: transparent;
+    }
+
+    .discussion-back-btn:hover {
+        background: white;
+        color: var(--color-pink-600);
+    }
+
+    /* Chat Card Container */
+    .discussion-chat-card {
+        height: calc(100vh - 200px);
+        min-height: 400px;
+        max-height: 700px;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+        box-shadow: 0 20px 50px var(--color-black-alpha-10);
+        border: 1px solid var(--color-white-alpha-60);
+        border-radius: var(--radius-2xl);
+    }
+
+    /* Chat Header */
+    .discussion-header {
+        padding: var(--space-4) var(--space-5);
+        border-bottom: 1px solid var(--color-black-alpha-5);
+        background: var(--color-white-alpha-90);
+        /* backdrop-filter removed for GOV.UK compliance */
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: var(--space-3);
+        z-index: 10;
+        flex-shrink: 0;
+    }
+
+    .discussion-header-info {
+        flex: 1;
+        min-width: 0;
+    }
+
+    .discussion-title {
+        margin: 0;
+        font-size: 1.1rem;
+        font-weight: 800;
+        color: var(--color-slate-800);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .discussion-meta {
+        font-size: 0.8rem;
+        color: var(--color-slate-500);
+        margin-top: var(--space-1);
+    }
+
+    .discussion-header-actions {
+        display: flex;
+        gap: var(--space-2);
+        flex-shrink: 0;
+    }
+
+    .discussion-action-btn {
+        width: 38px;
+        height: 38px;
+        padding: 0;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: var(--color-slate-50);
+        border: none;
+        color: var(--color-slate-400);
+        cursor: pointer;
+        -webkit-tap-highlight-color: transparent;
+    }
+
+    /* Chat Stream */
+    .discussion-stream {
+        flex-grow: 1;
+        overflow-y: auto;
+        padding: var(--space-5);
+        background: var(--color-white-alpha-40);
+        display: flex;
+        flex-direction: column;
+        gap: var(--space-3);
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .discussion-stream::-webkit-scrollbar {
+        width: 4px;
+    }
+
+    .discussion-stream::-webkit-scrollbar-thumb {
+        background: var(--color-black-alpha-10);
+        border-radius: var(--radius-sm);
+    }
+
+    /* Chat Message */
+    .discussion-message {
+        display: flex;
+        gap: var(--space-2-5);
+        max-width: 85%;
+        width: 100%;
+    }
+
+    .discussion-message.me {
+        align-self: flex-end;
+        flex-direction: row-reverse;
+    }
+
+    .discussion-message.others {
+        align-self: flex-start;
+    }
+
+    .discussion-avatar {
+        flex-shrink: 0;
+        width: var(--space-9);
+        height: var(--space-9);
+        border-radius: var(--radius-md);
+        object-fit: cover;
+        box-shadow: 0 2px 8px var(--color-black-alpha-10);
+    }
+
+    .discussion-avatar-placeholder {
+        width: var(--space-9);
+        height: var(--space-9);
+        background: white;
+        color: var(--color-pink-600);
+        border-radius: var(--radius-md);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+        font-size: 0.9rem;
+        flex-shrink: 0;
+        box-shadow: 0 2px 8px var(--color-black-alpha-10);
+    }
+
+    .discussion-bubble-wrap {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .discussion-message.me .discussion-bubble-wrap {
+        align-items: flex-end;
+    }
+
+    .discussion-message.others .discussion-bubble-wrap {
+        align-items: flex-start;
+    }
+
+    .discussion-author {
+        font-size: 0.75rem;
+        font-weight: 600;
+        color: var(--color-slate-500);
+        margin-bottom: var(--space-1);
+        margin-left: var(--space-1);
+    }
+
+    .discussion-bubble {
+        padding: var(--space-3) 16px;
+        border-radius: var(--radius-xl);
+        font-size: 0.95rem;
+        line-height: 1.5;
+        box-shadow: 0 2px 8px var(--color-black-alpha-5);
+        word-wrap: break-word;
+    }
+
+    .discussion-bubble.me {
+        background: linear-gradient(135deg, var(--color-pink-600) 0%, var(--color-pink-700) 100%);
+        color: white;
+        border-bottom-right-radius: 4px;
+    }
+
+    .discussion-bubble.others {
+        background: white;
+        color: var(--color-slate-700);
+        border-bottom-left-radius: 4px;
+    }
+
+    .discussion-time {
+        font-size: 0.65rem;
+        margin-top: var(--space-1);
+        text-align: right;
+        opacity: 0.7;
+    }
+
+    .discussion-bubble.me .discussion-time {
+        color: var(--color-white-alpha-85);
+    }
+
+    .discussion-bubble.others .discussion-time {
+        color: var(--color-slate-400);
+    }
+
+    /* Reply Dock */
+    .discussion-reply-dock {
+        padding: var(--space-3-5) 16px;
+        background: var(--color-white-alpha-90);
+        /* backdrop-filter removed for GOV.UK compliance */
+        border-top: 1px solid var(--color-black-alpha-5);
+        flex-shrink: 0;
+    }
+
+    .discussion-reply-form {
+        display: flex;
+        gap: var(--space-2-5);
+        align-items: flex-end;
+    }
+
+    .discussion-reply-input {
+        flex-grow: 1;
+        width: 100%;
+        padding: var(--space-3) var(--space-4-5);
+        border-radius: var(--radius-2xl);
+        border: 2px solid transparent;
+        background: white;
+        box-shadow: 0 2px 10px var(--color-black-alpha-5);
+        resize: none;
+        min-height: var(--space-12);
+        max-height: 120px;
+        font-size: 0.95rem;
+        font-family: inherit;
+        outline: none;
+        box-sizing: border-box;
+        transition: all 0.2s ease;
+    }
+
+    .discussion-reply-input:focus {
+        border-color: var(--color-pink-200);
+        box-shadow: 0 0 0 4px var(--color-pink-600-alpha-10);
+    }
+
+    .discussion-reply-btn {
+        flex-shrink: 0;
+        width: var(--space-12);
+        height: var(--space-12);
+        background: linear-gradient(135deg, var(--color-pink-600), var(--color-pink-500));
+        border: none;
+        color: white;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        box-shadow: 0 4px 12px var(--color-pink-600-alpha-35);
+        -webkit-tap-highlight-color: transparent;
+        transition: transform 0.2s ease;
+    }
+
+    .discussion-reply-btn:active {
+        transform: scale(0.95);
+    }
+
+    .discussion-locked-msg {
+        text-align: center;
+        color: var(--color-slate-500);
+        padding: var(--space-3);
+        font-size: 0.9rem;
+    }
+
+    .discussion-locked-msg a {
+        color: var(--color-pink-600);
+        font-weight: 700;
+        text-decoration: none;
+    }
+
+    /* Mobile Optimizations */
+    @media (max-width: 768px) {
+        .discussion-page-wrapper {
+            padding: 100px var(--space-3) 30px var(--space-3);
+        }
+
+        .discussion-chat-card {
+            height: calc(100vh - 160px);
+            min-height: 350px;
+            max-height: none;
+            border-radius: var(--radius-xl);
+        }
+
+        .discussion-header {
+            padding: var(--space-3) var(--space-3-5);
+        }
+
+        .discussion-title {
+            font-size: 0.95rem;
+        }
+
+        .discussion-meta {
+            font-size: 0.75rem;
+        }
+
+        .discussion-header-actions {
+            gap: var(--space-1-5);
+        }
+
+        .discussion-action-btn {
+            width: 34px;
+            height: 34px;
+        }
+
+        .discussion-stream {
+            padding: var(--space-3-5);
+            gap: var(--space-2-5);
+        }
+
+        .discussion-message {
+            max-width: 90%;
+            gap: var(--space-2);
+        }
+
+        .discussion-avatar,
+        .discussion-avatar-placeholder {
+            width: var(--space-8);
+            height: var(--space-8);
+            font-size: 0.8rem;
+        }
+
+        .discussion-bubble {
+            padding: var(--space-2-5) var(--space-3-5);
+            font-size: 0.9rem;
+        }
+
+        .discussion-reply-dock {
+            padding: var(--space-3);
+            padding-bottom: max(var(--space-3), env(safe-area-inset-bottom));
+        }
+
+        .discussion-reply-input {
+            padding: var(--space-2-5) 16px;
+            min-height: var(--space-11);
+        }
+
+        .discussion-reply-btn {
+            width: var(--space-11);
+            height: var(--space-11);
+        }
+
+        .discussion-back-btn {
+            padding: var(--space-2) var(--space-3-5);
+            font-size: 0.85rem;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .discussion-page-wrapper {
+            padding: 95px 8px var(--space-5) 8px;
+        }
+
+        .discussion-avatar,
+        .discussion-avatar-placeholder {
+            width: var(--space-7);
+            height: var(--space-7);
+            border-radius: var(--radius-md);
+            font-size: 0.75rem;
+        }
+
+        .discussion-message {
+            gap: var(--space-1-5);
+        }
+    }
+
+    /* Dark Mode */
+    [data-theme="dark"] .discussion-chat-card {
+        border-color: var(--color-white-alpha-10);
+    }
+
+    [data-theme="dark"] .discussion-header {
+        background: var(--color-slate-alpha-95);
+    }
+
+    [data-theme="dark"] .discussion-stream {
+        background: var(--color-slate-900-alpha-60);
+    }
+
+    [data-theme="dark"] .discussion-bubble.others {
+        background: var(--color-slate-600-alpha-90);
+        color: var(--color-slate-200);
+    }
+
+    [data-theme="dark"] .discussion-reply-dock {
+        background: var(--color-slate-alpha-95);
+    }
+
+    [data-theme="dark"] .discussion-reply-input {
+        background: var(--color-slate-700-alpha-80);
+        color: var(--color-slate-200);
+    }

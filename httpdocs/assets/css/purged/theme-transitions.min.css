@@ -1,1 +1,459 @@
-:root{}@media (prefers-reduced-motion:reduce){:root{}}
+/**
+ * Theme Transitions & Dark Mode Refinements
+ * Smooth theme switching with consistent colors
+ * Version: 1.0 - 2026-01-19
+ *
+ * Features:
+ * - Smooth color transitions when switching themes
+ * - Consistent dark mode colors across all components
+ * - Reduced motion support
+ * - Color-scheme meta for native dark mode
+  * Fully Migrated to Design Tokens: 2026-01-21 ✓
+ */
+
+/* ==============================================
+   GLOBAL THEME TRANSITION
+   Apply smooth transitions to all color-related properties
+   ============================================== */
+:root {
+    /* Theme transition timing */
+    --theme-transition-duration: 300ms;
+    --theme-transition-easing: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Apply transitions to html element to catch all cascading changes */
+html {
+    transition:
+        background-color var(--theme-transition-duration) var(--theme-transition-easing),
+        color var(--theme-transition-duration) var(--theme-transition-easing);
+}
+
+/* Theme transition class - added temporarily during switch */
+html.theme-transitioning,
+html.theme-transitioning *,
+html.theme-transitioning *::before,
+html.theme-transitioning *::after {
+    transition:
+        background-color var(--theme-transition-duration) var(--theme-transition-easing),
+        border-color var(--theme-transition-duration) var(--theme-transition-easing),
+        color var(--theme-transition-duration) var(--theme-transition-easing),
+        fill var(--theme-transition-duration) var(--theme-transition-easing),
+        stroke var(--theme-transition-duration) var(--theme-transition-easing),
+        box-shadow var(--theme-transition-duration) var(--theme-transition-easing) !important;
+}
+
+/* ==============================================
+   DARK MODE COLOR REFINEMENTS
+   Consistent color palette for dark theme
+   ============================================== */
+[data-theme="dark"] {
+    /* Background hierarchy */
+    --bg-base: var(--color-slate-900);           /* Deepest background */
+    --bg-elevated: var(--color-slate-800);       /* Cards, elevated surfaces */
+    --bg-surface: var(--color-slate-700);        /* Interactive surfaces */
+    --bg-hover: var(--color-slate-600);          /* Hover states */
+
+    /* Text hierarchy */
+    --text-primary: var(--color-slate-50);      /* High emphasis */
+    --text-secondary: var(--color-slate-300);    /* Medium emphasis */
+    --text-muted: var(--color-slate-400);        /* Low emphasis */
+    --text-disabled: var(--color-slate-500);     /* Disabled state */
+
+    /* Border colors */
+    --border-default: rgba(255, 255, 255, 0.1);
+    --border-subtle: rgba(255, 255, 255, 0.05);
+    --border-strong: rgba(255, 255, 255, 0.2);
+
+    /* Glassmorphism refinements */
+    --glass-bg: rgba(30, 41, 59, 0.8);
+    --glass-bg-heavy: rgba(15, 23, 42, 0.9);
+    --glass-border: rgba(255, 255, 255, 0.08);
+    --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+
+    /* Primary color adjustments for dark mode */
+
+    /* Surface overlays */
+    --overlay-light: rgba(255, 255, 255, 0.05);
+
+    /* Color scheme for native elements */
+    color-scheme: dark;
+}
+
+/* ==============================================
+   BODY & ROOT ELEMENTS
+   ============================================== */
+[data-theme="dark"] body {
+    background-color: var(--bg-base);
+    color: var(--text-primary);
+}
+
+/* Scrollbar styling for dark mode */
+[data-theme="dark"] ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+[data-theme="dark"] ::-webkit-scrollbar-track {
+    background: var(--bg-base);
+}
+
+[data-theme="dark"] ::-webkit-scrollbar-thumb {
+    background: var(--bg-surface);
+    border-radius: 4px;
+}
+
+[data-theme="dark"] ::-webkit-scrollbar-thumb:hover {
+    background: var(--bg-hover);
+}
+
+/* Firefox scrollbar */
+[data-theme="dark"] * {
+    scrollbar-color: var(--bg-surface) var(--bg-base);
+    scrollbar-width: thin;
+}
+
+/* ==============================================
+   CARD & SURFACE REFINEMENTS
+   ============================================== */
+[data-theme="dark"] .glass-card,
+[data-theme="dark"] .card,
+[data-theme="dark"] .htb-card {
+    background: var(--glass-bg);
+    border-color: var(--glass-border);
+    box-shadow: var(--glass-shadow);
+}
+
+[data-theme="dark"] .glass-card:hover,
+[data-theme="dark"] .card:hover {
+    background: rgba(30, 41, 59, 0.9);
+    border-color: var(--border-default);
+}
+
+/* Feed items */
+[data-theme="dark"] .feed-item,
+[data-theme="dark"] .fds-feed-item,
+[data-theme="dark"] .post-card {
+    background: var(--glass-bg);
+    border-color: var(--glass-border);
+}
+
+/* Event cards */
+[data-theme="dark"] .glass-event-card,
+[data-theme="dark"] .event-card {
+    background: var(--glass-bg);
+    border-color: var(--glass-border);
+}
+
+/* Listing cards */
+[data-theme="dark"] .glass-listing-card,
+[data-theme="dark"] .listing-card {
+    background: var(--glass-bg);
+    border-color: var(--glass-border);
+}
+
+/* ==============================================
+   TEXT COLOR REFINEMENTS
+   ============================================== */
+[data-theme="dark"] h1,
+[data-theme="dark"] h2,
+[data-theme="dark"] h3,
+[data-theme="dark"] h4,
+[data-theme="dark"] h5,
+[data-theme="dark"] h6 {
+    color: var(--text-primary);
+}
+
+[data-theme="dark"] p,
+[data-theme="dark"] .text-muted,
+[data-theme="dark"] .description {
+    color: var(--text-secondary);
+}
+
+[data-theme="dark"] .text-secondary,
+[data-theme="dark"] .meta,
+[data-theme="dark"] .timestamp {
+    color: var(--text-muted);
+}
+
+/* ==============================================
+   FORM ELEMENTS
+   ============================================== */
+[data-theme="dark"] input,
+[data-theme="dark"] textarea,
+[data-theme="dark"] select {
+    background-color: var(--bg-elevated);
+    border-color: var(--border-default);
+    color: var(--text-primary);
+}
+
+[data-theme="dark"] input::placeholder,
+[data-theme="dark"] textarea::placeholder {
+    color: var(--text-disabled);
+}
+
+[data-theme="dark"] input:focus,
+[data-theme="dark"] textarea:focus,
+[data-theme="dark"] select:focus {
+    border-color: var(--color-primary-500);
+    background-color: var(--bg-surface);
+}
+
+/* Search inputs */
+[data-theme="dark"] .glass-search-input,
+[data-theme="dark"] .search-input {
+    background: var(--bg-elevated);
+    border-color: var(--border-default);
+    color: var(--text-primary);
+}
+
+[data-theme="dark"] .glass-search-input:focus,
+[data-theme="dark"] .search-input:focus {
+    background: var(--bg-surface);
+    border-color: var(--color-primary-500);
+}
+
+/* Select dropdowns */
+[data-theme="dark"] .glass-select,
+[data-theme="dark"] select.form-control {
+    background: var(--bg-elevated);
+    border-color: var(--border-default);
+    color: var(--text-primary);
+}
+
+/* ==============================================
+   BUTTON REFINEMENTS
+   ============================================== */
+[data-theme="dark"] .btn-secondary,
+[data-theme="dark"] .glass-btn-secondary {
+    background: var(--bg-surface);
+    border-color: var(--border-default);
+    color: var(--text-primary);
+}
+
+[data-theme="dark"] .btn-secondary:hover,
+[data-theme="dark"] .glass-btn-secondary:hover {
+    background: var(--bg-hover);
+    border-color: var(--border-strong);
+}
+
+[data-theme="dark"] .btn-outline,
+[data-theme="dark"] .glass-btn-outline {
+    border-color: var(--border-strong);
+    color: var(--text-primary);
+}
+
+[data-theme="dark"] .btn-outline:hover,
+[data-theme="dark"] .glass-btn-outline:hover {
+    background: var(--overlay-light);
+}
+
+/* ==============================================
+   NAVIGATION & HEADER
+   ============================================== */
+[data-theme="dark"] .nexus-modern-header,
+[data-theme="dark"] .nexus-navbar {
+    background: var(--glass-bg-heavy);
+    border-color: var(--glass-border);
+}
+
+[data-theme="dark"] .nav-link {
+    color: var(--text-secondary);
+}
+
+[data-theme="dark"] .nav-link:hover {
+    color: var(--text-primary);
+    background: var(--overlay-light);
+}
+
+[data-theme="dark"] .nav-link.active {
+    color: var(--color-primary-400);
+    background: rgba(99, 102, 241, 0.15);
+}
+
+/* Mobile navigation */
+[data-theme="dark"] .mobile-tab-bar {
+    background: var(--glass-bg-heavy);
+    border-top-color: var(--glass-border);
+}
+
+[data-theme="dark"] .mobile-tab-bar .tab-item {
+    color: var(--text-muted);
+}
+
+[data-theme="dark"] .mobile-tab-bar .tab-item.active {
+    color: var(--color-primary-400);
+}
+
+/* Dropdowns & menus */
+[data-theme="dark"] .dropdown-menu,
+[data-theme="dark"] .mega-menu {
+    background: var(--glass-bg-heavy);
+    border-color: var(--glass-border);
+    box-shadow: var(--glass-shadow);
+}
+
+[data-theme="dark"] .dropdown-item {
+    color: var(--text-secondary);
+}
+
+[data-theme="dark"] .dropdown-item:hover {
+    background: var(--overlay-light);
+    color: var(--text-primary);
+}
+
+/* ==============================================
+   MODAL & OVERLAY REFINEMENTS
+   ============================================== */
+
+[data-theme="dark"] .modal-content,
+[data-theme="dark"] .modal-dialog {
+    background: var(--bg-elevated);
+    border-color: var(--glass-border);
+    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
+}
+
+[data-theme="dark"] .modal-header,
+[data-theme="dark"] .modal-footer {
+    border-color: var(--border-subtle);
+}
+
+/* Bottom sheets */
+
+[data-theme="dark"] .mobile-sheet {
+    background: var(--bg-elevated);
+    border-color: var(--glass-border);
+}
+
+/* ==============================================
+   TABLE REFINEMENTS
+   ============================================== */
+[data-theme="dark"] table,
+[data-theme="dark"] .table {
+    color: var(--text-primary);
+}
+
+[data-theme="dark"] th {
+    background: var(--bg-surface);
+    color: var(--text-secondary);
+    border-color: var(--border-default);
+}
+
+[data-theme="dark"] td {
+    border-color: var(--border-subtle);
+}
+
+[data-theme="dark"] tr:hover td {
+    background: var(--overlay-light);
+}
+
+/* ==============================================
+   BADGE & TAG REFINEMENTS
+   ============================================== */
+[data-theme="dark"] .badge,
+[data-theme="dark"] .tag {
+    background: var(--bg-surface);
+    color: var(--text-secondary);
+    border-color: var(--border-default);
+}
+
+[data-theme="dark"] .badge-primary {
+    background: rgba(99, 102, 241, 0.2);
+    color: var(--color-primary-400);
+}
+
+[data-theme="dark"] .badge-success {
+    background: rgba(16, 185, 129, 0.2);
+    color: var(--color-emerald-400);
+}
+
+[data-theme="dark"] .badge-warning {
+    background: rgba(245, 158, 11, 0.2);
+    color: var(--color-amber-300);
+}
+
+[data-theme="dark"] .badge-danger {
+    background: rgba(239, 68, 68, 0.2);
+    color: var(--color-red-400);
+}
+
+/* ==============================================
+   DIVIDERS & BORDERS
+   ============================================== */
+[data-theme="dark"] hr,
+[data-theme="dark"] .divider {
+    border-color: var(--border-subtle);
+}
+
+[data-theme="dark"] .border,
+[data-theme="dark"] [class*="border-"] {
+    border-color: var(--border-default);
+}
+
+/* ==============================================
+   EMPTY STATES & PLACEHOLDERS
+   ============================================== */
+[data-theme="dark"] .empty-state,
+[data-theme="dark"] .placeholder {
+    color: var(--text-muted);
+}
+
+[data-theme="dark"] .empty-state-icon {
+    color: var(--text-disabled);
+}
+
+/* ==============================================
+   NOTIFICATION & TOAST
+   ============================================== */
+[data-theme="dark"] .toast,
+[data-theme="dark"] .notification {
+    background: var(--bg-elevated);
+    border-color: var(--glass-border);
+    box-shadow: var(--glass-shadow);
+}
+
+/* ==============================================
+   CODE & PRE BLOCKS
+   ============================================== */
+[data-theme="dark"] code {
+    background: var(--bg-surface);
+    color: var(--color-pink-400);
+}
+
+[data-theme="dark"] pre {
+    background: var(--bg-base);
+    border-color: var(--border-default);
+}
+
+/* ==============================================
+   REDUCED MOTION SUPPORT
+   ============================================== */
+@media (prefers-reduced-motion: reduce) {
+    html,
+    html.theme-transitioning,
+    html.theme-transitioning *,
+    html.theme-transitioning *::before,
+    html.theme-transitioning *::after {
+        transition: none !important;
+    }
+
+    :root {
+        --theme-transition-duration: 0ms;
+    }
+}
+
+/* ==============================================
+   PRINT - NO DARK MODE
+   ============================================== */
+@media print {
+    [data-theme="dark"] {
+        --bg-base: var(--color-white);
+        --bg-elevated: var(--color-white);
+        --text-primary: var(--color-black);
+        --text-secondary: #333333;
+    }
+
+    [data-theme="dark"] body {
+        background: white;
+        color: black;
+    }
+}

@@ -1,4 +1,11 @@
 <?php
+/**
+ * Deliverability View - Admin Panel
+ *
+ * CSS extracted to: httpdocs/assets/css/modern-template-extracts.css
+ * Section: views/modern/admin/deliverability/view.php
+ */
+
 use Nexus\Core\TenantContext;
 use Nexus\Core\Csrf;
 
@@ -16,6 +23,34 @@ $milestoneStats = $milestoneStats ?? [];
 $comments = $comments ?? [];
 $history = $history ?? [];
 $users = $users ?? [];
+
+// Priority colors mapping
+$priorityColors = [
+    'urgent' => '#ef4444',
+    'high' => '#f59e0b',
+    'medium' => '#06b6d4',
+    'low' => '#10b981'
+];
+
+// Risk colors mapping
+$riskColors = [
+    'critical' => '#dc2626',
+    'high' => '#ef4444',
+    'medium' => '#f59e0b',
+    'low' => '#10b981'
+];
+
+// Status colors mapping
+$statusColors = [
+    'draft' => 'secondary',
+    'ready' => 'info',
+    'in_progress' => 'active',
+    'blocked' => 'inactive',
+    'review' => 'pending',
+    'completed' => 'active',
+    'cancelled' => 'inactive',
+    'on_hold' => 'pending'
+];
 ?>
 
 <!-- Page Header -->
@@ -49,12 +84,12 @@ $users = $users ?? [];
 <?php unset($_SESSION['flash_success']); endif; ?>
 
 <!-- Main Content Grid -->
-<div style="display: grid; grid-template-columns: 1fr 350px; gap: 24px; margin-bottom: 30px;">
+<div class="mte-deliverability--grid">
 
     <!-- Left Column: Details & Content -->
     <div>
         <!-- Overview Card -->
-        <div class="admin-glass-card" style="margin-bottom: 24px;">
+        <div class="admin-glass-card mte-deliverability--card">
             <div class="admin-card-header">
                 <div class="admin-card-header-icon admin-card-header-icon-cyan">
                     <i class="fa-solid fa-info-circle"></i>
@@ -65,76 +100,64 @@ $users = $users ?? [];
             </div>
             <div class="admin-card-body">
                 <!-- Status and Priority Row -->
-                <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; margin-bottom: 24px;">
+                <div class="mte-deliverability--stats-row">
                     <div>
-                        <label style="display: block; font-size: 12px; color: rgba(255,255,255,0.5); margin-bottom: 6px; text-transform: uppercase;">Status</label>
-                        <?php
-                        $statusColors = [
-                            'draft' => 'secondary', 'ready' => 'info', 'in_progress' => 'active',
-                            'blocked' => 'inactive', 'review' => 'pending', 'completed' => 'active',
-                            'cancelled' => 'inactive', 'on_hold' => 'pending'
-                        ];
-                        ?>
+                        <label class="mte-deliverability--stat-label">Status</label>
                         <span class="admin-status-badge admin-status-<?= $statusColors[$deliverable['status']] ?? 'secondary' ?>">
                             <span class="admin-status-dot"></span> <?= ucwords(str_replace('_', ' ', $deliverable['status'])) ?>
                         </span>
                     </div>
                     <div>
-                        <label style="display: block; font-size: 12px; color: rgba(255,255,255,0.5); margin-bottom: 6px; text-transform: uppercase;">Priority</label>
-                        <?php
-                        $priorityColors = [
-                            'urgent' => '#ef4444', 'high' => '#f59e0b', 'medium' => '#06b6d4', 'low' => '#10b981'
-                        ];
-                        ?>
-                        <span style="padding: 6px 12px; border-radius: 4px; background: <?= $priorityColors[$deliverable['priority']] ?>; color: #fff; font-weight: 600; text-transform: uppercase; font-size: 12px;">
+                        <label class="mte-deliverability--stat-label">Priority</label>
+                        <span class="mte-deliverability--priority-badge" style="--mte-priority-color: <?= $priorityColors[$deliverable['priority']] ?? '#06b6d4' ?>">
                             <?= $deliverable['priority'] ?>
                         </span>
                     </div>
                     <div>
-                        <label style="display: block; font-size: 12px; color: rgba(255,255,255,0.5); margin-bottom: 6px; text-transform: uppercase;">Progress</label>
-                        <div style="display: flex; align-items: center; gap: 8px;">
-                            <div style="flex: 1; height: 8px; background: rgba(255,255,255,0.1); border-radius: 4px; overflow: hidden;">
-                                <div style="height: 100%; width: <?= min(100, $deliverable['progress_percentage'] ?? 0) ?>%; background: linear-gradient(135deg, #06b6d4, #6366f1);"></div>
+                        <label class="mte-deliverability--stat-label">Progress</label>
+                        <div class="mte-deliverability--progress-row">
+                            <div class="mte-deliverability--progress-track">
+                                <div class="mte-deliverability--progress-fill" style="--mte-progress: <?= min(100, $deliverable['progress_percentage'] ?? 0) ?>%"></div>
                             </div>
-                            <span style="font-weight: 700; color: #06b6d4; min-width: 45px;"><?= number_format($deliverable['progress_percentage'] ?? 0, 0) ?>%</span>
+                            <span class="mte-deliverability--progress-value"><?= number_format($deliverable['progress_percentage'] ?? 0, 0) ?>%</span>
                         </div>
                     </div>
                 </div>
 
                 <!-- Description -->
                 <?php if (!empty($deliverable['description'])): ?>
-                <div style="padding: 16px; background: rgba(255,255,255,0.03); border-radius: 8px; border-left: 3px solid #6366f1; margin-bottom: 16px;">
-                    <p style="margin: 0; line-height: 1.6; color: rgba(255,255,255,0.8);">
+                <div class="mte-deliverability--description-box">
+                    <p class="mte-deliverability--description-text">
                         <?= nl2br(htmlspecialchars($deliverable['description'])) ?>
                     </p>
                 </div>
                 <?php endif; ?>
 
                 <!-- Details Grid -->
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                <div class="mte-deliverability--details-grid">
                     <div>
-                        <strong style="color: rgba(255,255,255,0.6); display: block; margin-bottom: 4px;">Category</strong>
+                        <strong class="mte-deliverability--detail-label">Category</strong>
                         <span><?= htmlspecialchars($deliverable['category'] ?? 'general') ?></span>
                     </div>
                     <div>
-                        <strong style="color: rgba(255,255,255,0.6); display: block; margin-bottom: 4px;">Assigned To</strong>
+                        <strong class="mte-deliverability--detail-label">Assigned To</strong>
                         <?php if ($deliverable['assigned_to']): ?>
                             <?= htmlspecialchars($deliverable['assigned_first_name'] . ' ' . $deliverable['assigned_last_name']) ?>
                         <?php elseif ($deliverable['assigned_group_name']): ?>
                             <i class="fa-solid fa-users"></i> <?= htmlspecialchars($deliverable['assigned_group_name']) ?>
                         <?php else: ?>
-                            <span style="color: rgba(255,255,255,0.4);">Unassigned</span>
+                            <span class="mte-deliverability--unassigned">Unassigned</span>
                         <?php endif; ?>
                     </div>
                     <div>
-                        <strong style="color: rgba(255,255,255,0.6); display: block; margin-bottom: 4px;">Start Date</strong>
+                        <strong class="mte-deliverability--detail-label">Start Date</strong>
                         <?= $deliverable['start_date'] ? date('M j, Y', strtotime($deliverable['start_date'])) : 'Not set' ?>
                     </div>
                     <div>
-                        <strong style="color: rgba(255,255,255,0.6); display: block; margin-bottom: 4px;">Due Date</strong>
+                        <strong class="mte-deliverability--detail-label">Due Date</strong>
                         <?php if ($deliverable['due_date']): ?>
                             <?php $isOverdue = strtotime($deliverable['due_date']) < time() && !in_array($deliverable['status'], ['completed', 'cancelled']); ?>
-                            <span style="color: <?= $isOverdue ? '#ef4444' : '#fff' ?>;">
+                            <span class="<?= $isOverdue ? 'mte-deliverability--overdue' : '' ?>">
                                 <?= date('M j, Y', strtotime($deliverable['due_date'])) ?>
                                 <?php if ($isOverdue): ?><i class="fa-solid fa-exclamation-triangle"></i> Overdue<?php endif; ?>
                             </span>
@@ -144,13 +167,13 @@ $users = $users ?? [];
                     </div>
                     <?php if (!empty($deliverable['estimated_hours'])): ?>
                     <div>
-                        <strong style="color: rgba(255,255,255,0.6); display: block; margin-bottom: 4px;">Estimated Hours</strong>
+                        <strong class="mte-deliverability--detail-label">Estimated Hours</strong>
                         <?= number_format($deliverable['estimated_hours'], 1) ?> hrs
                     </div>
                     <?php endif; ?>
                     <?php if (!empty($deliverable['actual_hours'])): ?>
                     <div>
-                        <strong style="color: rgba(255,255,255,0.6); display: block; margin-bottom: 4px;">Actual Hours</strong>
+                        <strong class="mte-deliverability--detail-label">Actual Hours</strong>
                         <?= number_format($deliverable['actual_hours'], 1) ?> hrs
                     </div>
                     <?php endif; ?>
@@ -158,13 +181,11 @@ $users = $users ?? [];
 
                 <!-- Tags -->
                 <?php if (!empty($deliverable['tags'])): ?>
-                <div style="margin-top: 16px;">
-                    <strong style="color: rgba(255,255,255,0.6); display: block; margin-bottom: 8px;">Tags</strong>
-                    <div style="display: flex; gap: 6px; flex-wrap: wrap;">
+                <div class="mte-deliverability--tags-section">
+                    <strong class="mte-deliverability--tags-label">Tags</strong>
+                    <div class="mte-deliverability--tags-list">
                         <?php foreach ($deliverable['tags'] as $tag): ?>
-                        <span style="background: rgba(99,102,241,0.2); color: #a5b4fc; padding: 4px 10px; border-radius: 4px; font-size: 12px;">
-                            <?= htmlspecialchars($tag) ?>
-                        </span>
+                        <span class="mte-deliverability--tag"><?= htmlspecialchars($tag) ?></span>
                         <?php endforeach; ?>
                     </div>
                 </div>
@@ -173,7 +194,7 @@ $users = $users ?? [];
         </div>
 
         <!-- Milestones Card -->
-        <div class="admin-glass-card" style="margin-bottom: 24px;">
+        <div class="admin-glass-card mte-deliverability--card">
             <div class="admin-card-header">
                 <div class="admin-card-header-icon admin-card-header-icon-purple">
                     <i class="fa-solid fa-list-check"></i>
@@ -187,31 +208,31 @@ $users = $users ?? [];
             </div>
             <div class="admin-card-body">
                 <?php if (empty($milestones)): ?>
-                <div class="admin-empty-state" style="padding: 40px 20px;">
+                <div class="admin-empty-state">
                     <div class="admin-empty-icon"><i class="fa-solid fa-list-check"></i></div>
                     <p class="admin-empty-title">No Milestones Yet</p>
                     <p class="admin-empty-text">Break this deliverable into milestones to track progress.</p>
                 </div>
                 <?php else: ?>
-                <div style="display: flex; flex-direction: column; gap: 12px;">
+                <div class="mte-deliverability--milestone-list">
                     <?php foreach ($milestones as $milestone): ?>
-                    <div style="padding: 12px; background: rgba(255,255,255,0.03); border-radius: 8px; display: flex; align-items: center; gap: 12px;">
+                    <div class="mte-deliverability--milestone-item">
                         <input type="checkbox"
                                <?= $milestone['status'] === 'completed' ? 'checked' : '' ?>
                                onchange="completeMilestone(<?= $milestone['id'] ?>)"
-                               style="width: 18px; height: 18px; cursor: pointer;">
-                        <div style="flex: 1;">
-                            <div style="font-weight: 500; color: <?= $milestone['status'] === 'completed' ? 'rgba(255,255,255,0.5)' : '#fff' ?>; <?= $milestone['status'] === 'completed' ? 'text-decoration: line-through;' : '' ?>">
+                               class="mte-deliverability--milestone-checkbox">
+                        <div class="mte-deliverability--milestone-content">
+                            <div class="mte-deliverability--milestone-title" data-completed="<?= $milestone['status'] === 'completed' ? 'true' : 'false' ?>">
                                 <?= htmlspecialchars($milestone['title']) ?>
                             </div>
                             <?php if (!empty($milestone['description'])): ?>
-                            <div style="font-size: 12px; color: rgba(255,255,255,0.5); margin-top: 2px;">
+                            <div class="mte-deliverability--milestone-desc">
                                 <?= htmlspecialchars($milestone['description']) ?>
                             </div>
                             <?php endif; ?>
                         </div>
                         <?php if ($milestone['status'] === 'completed'): ?>
-                        <span style="font-size: 11px; color: #10b981;">
+                        <span class="mte-deliverability--milestone-done">
                             <i class="fa-solid fa-check-circle"></i> Done
                         </span>
                         <?php endif; ?>
@@ -235,13 +256,13 @@ $users = $users ?? [];
             </div>
             <div class="admin-card-body">
                 <!-- Add Comment Form -->
-                <form id="comment-form" style="margin-bottom: 24px;">
+                <form id="comment-form" class="mte-deliverability--comment-form">
                     <input type="hidden" name="csrf_token" value="<?= Csrf::generate() ?>">
                     <input type="hidden" name="deliverable_id" value="<?= $deliverable['id'] ?>">
-                    <div class="form-group" style="margin: 0;">
+                    <div class="form-group">
                         <textarea id="comment_text" name="comment_text" rows="3" placeholder="Add a comment..." required></textarea>
                     </div>
-                    <div style="margin-top: 12px; display: flex; justify-content: flex-end;">
+                    <div class="mte-deliverability--comment-submit-row">
                         <button type="submit" class="admin-btn admin-btn-primary admin-btn-sm">
                             <i class="fa-solid fa-paper-plane"></i> Add Comment
                         </button>
@@ -250,27 +271,27 @@ $users = $users ?? [];
 
                 <!-- Comments List -->
                 <?php if (empty($comments)): ?>
-                <div style="text-align: center; padding: 20px; color: rgba(255,255,255,0.5);">
-                    <i class="fa-solid fa-comments" style="font-size: 32px; opacity: 0.3; margin-bottom: 8px;"></i>
-                    <p style="margin: 0;">No comments yet. Be the first to comment!</p>
+                <div class="mte-deliverability--comments-empty">
+                    <i class="fa-solid fa-comments mte-deliverability--comments-empty-icon"></i>
+                    <p class="mte-deliverability--comments-empty-text">No comments yet. Be the first to comment!</p>
                 </div>
                 <?php else: ?>
-                <div id="comments-list" style="display: flex; flex-direction: column; gap: 16px;">
+                <div id="comments-list" class="mte-deliverability--comments-list">
                     <?php foreach ($comments as $comment): ?>
-                    <div style="padding: 12px; background: rgba(255,255,255,0.03); border-radius: 8px;">
-                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-                            <strong style="color: #06b6d4;">
+                    <div class="mte-deliverability--comment-item">
+                        <div class="mte-deliverability--comment-header">
+                            <strong class="mte-deliverability--comment-author">
                                 <?= htmlspecialchars($comment['first_name'] . ' ' . $comment['last_name']) ?>
                             </strong>
-                            <span style="font-size: 11px; color: rgba(255,255,255,0.4);">
+                            <span class="mte-deliverability--comment-time">
                                 <?= date('M j, Y g:i A', strtotime($comment['created_at'])) ?>
                             </span>
                         </div>
-                        <p style="margin: 0; color: rgba(255,255,255,0.8); line-height: 1.5;">
+                        <p class="mte-deliverability--comment-text">
                             <?= nl2br(htmlspecialchars($comment['comment_text'])) ?>
                         </p>
                         <?php if ($comment['comment_type'] !== 'general'): ?>
-                        <span style="display: inline-block; margin-top: 8px; padding: 2px 6px; background: rgba(99,102,241,0.2); color: #a5b4fc; border-radius: 3px; font-size: 11px;">
+                        <span class="mte-deliverability--comment-type-badge">
                             <?= ucfirst($comment['comment_type']) ?>
                         </span>
                         <?php endif; ?>
@@ -286,30 +307,30 @@ $users = $users ?? [];
     <div>
         <!-- Risk Assessment -->
         <?php if ($deliverable['risk_level'] !== 'low' || !empty($deliverable['risk_notes'])): ?>
-        <div class="admin-glass-card" style="margin-bottom: 24px; border: 1px solid rgba(239, 68, 68, 0.3);">
+        <div class="admin-glass-card mte-deliverability--card mte-deliverability--risk-card">
             <div class="admin-card-header">
-                <div class="admin-card-header-icon" style="background: rgba(239, 68, 68, 0.2);">
-                    <i class="fa-solid fa-triangle-exclamation" style="color: #ef4444;"></i>
+                <div class="admin-card-header-icon mte-deliverability--risk-icon-box">
+                    <i class="fa-solid fa-triangle-exclamation mte-deliverability--risk-icon"></i>
                 </div>
                 <div class="admin-card-header-content">
                     <h3 class="admin-card-title">Risk Assessment</h3>
                 </div>
             </div>
             <div class="admin-card-body">
-                <div style="margin-bottom: 12px;">
-                    <strong style="display: block; font-size: 12px; color: rgba(255,255,255,0.6); margin-bottom: 4px;">Risk Level</strong>
-                    <span style="padding: 4px 10px; border-radius: 4px; background: <?= $deliverable['risk_level'] === 'critical' ? '#dc2626' : ($deliverable['risk_level'] === 'high' ? '#ef4444' : '#f59e0b') ?>; color: #fff; font-weight: 600; text-transform: uppercase; font-size: 11px;">
+                <div class="mte-deliverability--risk-item">
+                    <strong class="mte-deliverability--risk-label">Risk Level</strong>
+                    <span class="mte-deliverability--risk-badge" style="--mte-risk-color: <?= $riskColors[$deliverable['risk_level']] ?? '#f59e0b' ?>">
                         <?= $deliverable['risk_level'] ?>
                     </span>
                 </div>
-                <div style="margin-bottom: 12px;">
-                    <strong style="display: block; font-size: 12px; color: rgba(255,255,255,0.6); margin-bottom: 4px;">Delivery Confidence</strong>
+                <div class="mte-deliverability--risk-item">
+                    <strong class="mte-deliverability--risk-label">Delivery Confidence</strong>
                     <span><?= ucfirst($deliverable['delivery_confidence']) ?></span>
                 </div>
                 <?php if (!empty($deliverable['risk_notes'])): ?>
                 <div>
-                    <strong style="display: block; font-size: 12px; color: rgba(255,255,255,0.6); margin-bottom: 4px;">Notes</strong>
-                    <p style="margin: 0; font-size: 13px; line-height: 1.5; color: rgba(255,255,255,0.7);">
+                    <strong class="mte-deliverability--risk-label">Notes</strong>
+                    <p class="mte-deliverability--risk-notes">
                         <?= nl2br(htmlspecialchars($deliverable['risk_notes'])) ?>
                     </p>
                 </div>
@@ -331,15 +352,15 @@ $users = $users ?? [];
             </div>
             <div class="admin-card-body">
                 <?php if (empty($history)): ?>
-                <p style="text-align: center; color: rgba(255,255,255,0.5); margin: 0;">No activity yet</p>
+                <p class="mte-deliverability--history-empty">No activity yet</p>
                 <?php else: ?>
-                <div style="display: flex; flex-direction: column; gap: 12px;">
+                <div class="mte-deliverability--history-list">
                     <?php foreach (array_slice($history, 0, 10) as $entry): ?>
-                    <div style="padding-left: 12px; border-left: 2px solid rgba(99,102,241,0.3);">
-                        <div style="font-size: 12px; color: rgba(255,255,255,0.8);">
+                    <div class="mte-deliverability--history-item">
+                        <div class="mte-deliverability--history-desc">
                             <?= htmlspecialchars($entry['change_description'] ?? $entry['action_type']) ?>
                         </div>
-                        <div style="font-size: 11px; color: rgba(255,255,255,0.4); margin-top: 2px;">
+                        <div class="mte-deliverability--history-meta">
                             <?= htmlspecialchars($entry['first_name'] ?? 'Unknown') ?> •
                             <?= date('M j, g:i A', strtotime($entry['action_timestamp'])) ?>
                         </div>

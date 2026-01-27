@@ -515,7 +515,7 @@ picture:has(.avatar-img) {
 [data-theme="light"] .fb-card .feed-action-pill.liked,
 [data-theme="light"] .fb-card button.feed-action-pill.liked {
     background: linear-gradient(135deg, var(--color-pink-500), var(--color-rose-500)) !important;
-    color: #fff !important;
+    color: var(--color-white) !important;
 }
 
 /* Light mode for feed-action-btn style buttons */
@@ -858,7 +858,7 @@ button.feed-action-pill.liked,
 .fb-card .feed-action-pill.liked,
 .fb-card button.feed-action-pill.liked {
     background: linear-gradient(135deg, var(--color-pink-500), var(--color-rose-500)) !important;
-    color: #fff !important;
+    color: var(--color-white) !important;
 }
 
 .feed-action-pill:hover:not(.liked),
@@ -893,7 +893,7 @@ button.feed-action-pill:active {
 .dark .feed-action-pill.liked {
     background: linear-gradient(135deg, var(--color-pink-500), var(--color-rose-500)) !important;
     border: none !important;
-    color: #fff !important;
+    color: var(--color-white) !important;
 }
 
 /* System dark mode for feed action pills */
@@ -915,7 +915,7 @@ button.feed-action-pill:active {
     body:not([data-theme="light"]) .feed-action-pill.liked {
         background: linear-gradient(135deg, var(--color-pink-500), var(--color-rose-500)) !important;
         border: none !important;
-        color: #fff !important;
+        color: var(--color-white) !important;
     }
 }
 
@@ -1734,8 +1734,8 @@ body.nexus-home-page .home-sidebar-column {
             var(--effect-primary-40));
     background-size: 300% 300%;
     animation: holographicShimmer 8s ease infinite;
-    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask: linear-gradient(var(--color-white) 0 0) content-box, linear-gradient(var(--color-white) 0 0);
+    mask: linear-gradient(var(--color-white) 0 0) content-box, linear-gradient(var(--color-white) 0 0);
     -webkit-mask-composite: xor;
     mask-composite: exclude;
     opacity: 0.6;
@@ -1795,8 +1795,8 @@ body.nexus-home-page .home-sidebar-column {
     height: 44px;
     border-radius: 50%;
     object-fit: cover;
-    background: #fff;
-    border: var(--space-0.5) solid #fff;
+    background: var(--color-white);
+    border: var(--space-0.5) solid var(--color-white);
 }
 
 .composer-avatar-ring.guest {
@@ -1867,7 +1867,7 @@ body.nexus-home-page .home-sidebar-column {
 
 .composer-action-btn.highlight {
     background: linear-gradient(135deg, var(--color-primary-500), var(--color-purple-500));
-    color: #fff;
+    color: var(--color-white);
 }
 
 .composer-action-btn.highlight:hover {
@@ -1955,7 +1955,7 @@ body.nexus-home-page .home-sidebar-column {
 
 .compose-quick-btn.highlight {
     background: linear-gradient(135deg, var(--color-primary-500), var(--color-purple-500));
-    color: #fff;
+    color: var(--color-white);
 }
 
 .compose-quick-btn.highlight:hover {
@@ -1965,7 +1965,7 @@ body.nexus-home-page .home-sidebar-column {
 }
 
 .compose-quick-btn.highlight i {
-    color: #fff !important;
+    color: var(--color-white) !important;
 }
 
 /* Dark mode for simple compose prompt */
@@ -2017,7 +2017,7 @@ body.nexus-home-page .home-sidebar-column {
     background: linear-gradient(135deg, var(--color-primary-500), var(--color-purple-500));
     border: none;
     border-radius: var(--radius-lg);
-    color: #fff;
+    color: var(--color-white);
     font-weight: 700;
     font-size: var(--font-size-base);
     cursor: pointer;
@@ -2161,7 +2161,7 @@ body.nexus-home-page .home-sidebar-column {
     background: linear-gradient(135deg, var(--color-primary-500), var(--color-purple-500));
     border: none;
     border-radius: var(--radius-full);
-    color: #fff;
+    color: var(--color-white);
     font-weight: 600;
     font-size: var(--font-size-sm);
     cursor: pointer;
@@ -2607,7 +2607,7 @@ body.nexus-home-page .home-sidebar-column {
     bottom: 55px;
     left: 0;
     z-index: 1000;
-    background: var(--card-bg, #fff);
+    background: var(--card-bg, var(--color-white));
     border: 1px solid var(--border-color, var(--effect-black-8));
     border-radius: var(--radius-full);
     box-shadow:
@@ -2636,7 +2636,7 @@ body.nexus-home-page .home-sidebar-column {
 .emoji-picker-header {
     padding: var(--space-3) 14px;
     border-bottom: 1px solid var(--border-color, var(--effect-black-6));
-    background: linear-gradient(180deg, var(--card-bg, #fff) 0%, var(--effect-gray-50-100) 100%);
+    background: linear-gradient(180deg, var(--card-bg, var(--color-white)) 0%, var(--effect-gray-50-100) 100%);
 }
 
 .emoji-tabs {
@@ -2668,7 +2668,7 @@ body.nexus-home-page .home-sidebar-column {
 }
 
 .emoji-tab.active {
-    background: #fff;
+    background: var(--color-white);
     box-shadow: 0 2px 8px var(--effect-black-10);
     transform: scale(1.05);
 }
@@ -3393,7 +3393,7 @@ body.nexus-home-page .home-sidebar-column {
             var(--effect-purple-95));
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
-    color: #fff;
+    color: var(--color-white);
     text-align: center;
     border-radius: var(--radius-md);
     padding: var(--space-4) 24px;
@@ -3546,7 +3546,7 @@ textarea:focus {
 
 .fb-card button.feed-action-pill.liked {
     background: linear-gradient(135deg, var(--color-pink-500), var(--color-rose-500)) !important;
-    color: #fff !important;
+    color: var(--color-white) !important;
 }
 
 .fb-card button.feed-action-pill:hover:not(.liked) {
@@ -3642,7 +3642,7 @@ textarea:focus {
 .dark .fb-card button.feed-action-pill.liked {
     background: linear-gradient(135deg, var(--color-pink-500), var(--color-rose-500)) !important;
     border: none !important;
-    color: #fff !important;
+    color: var(--color-white) !important;
 }
 
 [data-theme="dark"] .fb-card div[id^="comments-section"] {
@@ -4087,7 +4087,7 @@ textarea:focus {
 }
 
 .feed-event-box {
-    background: #fff0f6;
+    background: var(--color-white)0f6;
     border-left: var(--space-1) solid var(--color-pink-600);
 }
 
@@ -4481,7 +4481,7 @@ textarea:focus {
 }
 
 .feed-listing-request {
-    background: linear-gradient(135deg, #FFF4E3, #FFE3BF);
+    background: linear-gradient(135deg, var(--color-white)4E3, #FFE3BF);
     --listing-color: #F28B18;
 }
 
@@ -4545,7 +4545,7 @@ textarea:focus {
     right: 0;
     margin-top: var(--space-1);
     min-width: 280px;
-    background: var(--feed-bg-card, #fff);
+    background: var(--feed-bg-card, var(--color-white));
     border-radius: var(--radius-md);
     box-shadow: 0 4px 24px var(--effect-black-25), 0 0 0 1px var(--effect-black-8);
     z-index: var(--z-notification, 1700);
@@ -4660,9 +4660,9 @@ textarea:focus {
     align-items: center;
     justify-content: center;
     font-size: var(--font-size-xs);
-    color: #fff;
+    color: var(--color-white);
     margin-left: -4px;
-    border: var(--space-0.5) solid var(--feed-bg-card, #fff);
+    border: var(--space-0.5) solid var(--feed-bg-card, var(--color-white));
 }
 
 .feed-reaction-icon:first-child {

@@ -128,6 +128,11 @@ html[data-layout="civicone"] .modern-utility-bar {
 
 /* === nexus-phoenix.css === */
 /* generated-tokens.css - INLINED to eliminate render-blocking @import */
+
+/* DISABLED 2026-01-26: Conflicting with modern-theme-tokens.css
+   These :root blocks override the consolidated token file and cause FOUC.
+   Variables are now defined in: /assets/css/modern-theme-tokens.css
+
 :root {
     --htb-color-brand-primary: #4f46e5;
     --htb-color-brand-secondary: #d946ef;
@@ -156,26 +161,25 @@ html[data-layout="civicone"] .modern-utility-bar {
     --htb-radius-lg: 16px;
     --htb-radius-full: 9999px;
 }
+*/
 
 /* GLOBAL BOX-SIZING RESET */
 * {
     box-sizing: border-box;
 }
 
+/* DISABLED 2026-01-26: Conflicting with modern-theme-tokens.css
 :root {
     --htb-bg-page: #f9fafb;
     --htb-bg-card: #ffffff;
     --htb-primary: linear-gradient(120deg, #4f46e5 0%, #d946ef 50%, #fcd34d 100%);
-    /* Big Bang */
     --htb-text-main: #1f2937;
     --htb-text-muted: #6b7280;
     --htb-radius: 16px;
     --htb-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.025);
     --htb-border-color: #e5e7eb;
-    /* HOLOGRAPHIC TRI-TONE GRADIENTS (Unique per page) */
     --htb-gradient-brand: linear-gradient(120deg, #4f46e5 0%, #d946ef 50%, #fcd34d 100%);
     --htb-gradient-front: linear-gradient(120deg, #2563eb 0%, #9333ea 50%, #f472b6 100%);
-    /* Blue -> Purple -> Pink */
     --htb-gradient-members: linear-gradient(120deg, #4f46e5 0%, #e11d48 50%, #fbbf24 100%);
     --htb-gradient-offers: linear-gradient(120deg, #059669 0%, #34d399 50%, #bef264 100%);
     --htb-gradient-requests: linear-gradient(120deg, #f97316 0%, #f43f5e 50%, #fef08a 100%);
@@ -188,13 +192,13 @@ html[data-layout="civicone"] .modern-utility-bar {
 [data-theme="dark"] {
     --htb-bg-page: #0f172a;
     --htb-bg-card: rgba(30, 41, 59, 0.4);
-    /* More transparent */
     --htb-text-main: #f1f5f9;
     --htb-text-muted: #cbd5e1;
     --htb-border-color: rgba(255, 255, 255, 0.1);
     --htb-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.5);
     --htb-glass-blur: blur(24px);
 }
+END DISABLED BLOCK */
 
 /* SMOOTH THEME TRANSITIONS */
 html {

@@ -223,7 +223,7 @@
 /* Auth links */
 .auth-link--join {
     font-weight: var(--font-weight-bold);
-    color: #fff;
+    color: var(--color-white);
 }
 
 /* Desktop utilities layout */

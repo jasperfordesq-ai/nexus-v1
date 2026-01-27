@@ -51,12 +51,12 @@
 
 .mobile-select-search:focus {
     outline: none;
-    background-color: var(--feed-bg-card, #fff);
+    background-color: var(--feed-bg-card, var(--color-white));
 }
 
 [data-theme="dark"] .mobile-select-search {
     background-color: #2c2c2e;
-    color: #fff;
+    color: var(--color-white);
 }
 
 [data-theme="dark"] .mobile-select-search:focus {
@@ -106,7 +106,7 @@
 }
 
 [data-theme="dark"] .mobile-select-option {
-    color: #fff;
+    color: var(--color-white);
     border-color: #333;
 }
 

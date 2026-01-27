@@ -22,7 +22,7 @@
    ========================================== */
 .mega-icon--community-groups {
     background: rgba(99, 102, 241, 0.1);
-    color: #6366f1;
+    color: var(--color-primary-500);
 }
 
 .mega-icon--local-hubs {
@@ -37,7 +37,7 @@
 
 .mega-icon--events {
     background: rgba(245, 158, 11, 0.1);
-    color: #f59e0b;
+    color: var(--color-amber-500);
 }
 
 /* ==========================================
@@ -50,7 +50,7 @@
 
 .mega-icon--goals {
     background: rgba(245, 158, 11, 0.1);
-    color: #f59e0b;
+    color: var(--color-amber-500);
 }
 
 .mega-icon--polls {
@@ -71,7 +71,7 @@
 
 .mega-icon--leaderboard {
     background: rgba(245, 158, 11, 0.15);
-    color: #f59e0b;
+    color: var(--color-amber-500);
 }
 
 .mega-icon--achievements {
@@ -92,7 +92,7 @@
 
 .mega-icon--mobile-app {
     background: rgba(99, 102, 241, 0.1);
-    color: #6366f1;
+    color: var(--color-primary-500);
 }
 
 /* ==========================================
@@ -100,7 +100,7 @@
    ========================================== */
 .mega-icon--news {
     background: rgba(99, 102, 241, 0.18);
-    color: #6366f1;
+    color: var(--color-primary-500);
 }
 
 .mega-icon--about {
@@ -115,7 +115,7 @@
 
 .mega-icon--partner {
     background: rgba(245, 158, 11, 0.15);
-    color: #f59e0b;
+    color: var(--color-amber-500);
 }
 
 .mega-icon--social-prescribing {

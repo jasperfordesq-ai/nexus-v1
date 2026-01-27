@@ -1,0 +1,79 @@
+/**
+ * Skeleton Feed Loading State
+ * Shows placeholder cards while content loads
+ * CivicOne Theme - GOV.UK Design System Compliant
+ */
+
+.skeleton-feed-container {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    padding: 1rem 0;
+}
+
+.skeleton-feed-card {
+    background: var(--color-govuk-light-grey);
+    border: 1px solid var(--color-govuk-grey);
+    padding: 1.5rem;
+}
+
+.skeleton-feed-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.skeleton-feed-author {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0.375rem;
+}
+
+.skeleton-feed-content {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin-bottom: 0.75rem;
+}
+
+.skeleton-feed-actions {
+    display: flex;
+    gap: 1rem;
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--color-govuk-grey);
+}
+
+/* Skeleton text variants for header */
+.skeleton-text--author-name {
+    width: 140px;
+    height: 1.125rem;
+}
+
+.skeleton-text--author-date {
+    width: 90px;
+    height: 0.875rem;
+}
+
+/* Partial width text line */
+.skeleton-text--partial {
+    width: 70%;
+}
+
+/* Skeleton card image placeholder */
+.skeleton-card--image {
+    height: 250px;
+    margin-top: 0.75rem;
+}
+
+/* Skeleton action buttons */
+.skeleton-button--action {
+    width: 5rem;
+}
+
+/* Hide skeleton when content loads */
+.skeleton-feed-container.hidden {
+    display: none;
+}

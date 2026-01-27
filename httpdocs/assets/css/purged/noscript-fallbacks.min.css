@@ -1,1 +1,148 @@
-main,.feed-container{opacity:1 !important;visibility:visible !important}.feed-item,.post-card,.nexus-card,.glass-card{opacity:1 !important;animation:none !important;transform:none !important}.nexus-navbar,.nexus-utility-bar,.civic-header,.civic-utility-bar{opacity:1 !important;transform:translateY(var(--space-0)) !important;visibility:visible !important}.nexus-mobile-nav{opacity:1 !important}.htb-dropdown:hover .htb-dropdown-content,.civic-dropdown:hover .civic-dropdown-content{display:block !important;opacity:1 !important;visibility:visible !important}::view-transition-old(*),::view-transition-new(*){display:none !important}*:not(.modal):not(.toast):not(.drawer){animation-delay:var(--space-0) !important}
+/**
+ * Noscript Fallbacks
+ * Ensures content visibility when JavaScript is disabled
+ * 
+ * This file is loaded inside <noscript> tags to override styles
+ * that rely on JavaScript to reveal content (opacity: 0 -> 1 patterns)
+ * 
+ * CSS Audit 2026-01-18: Addresses JS-dependent visibility patterns
+ * Design Tokens Migration 2026-01-21: Migrated to use design tokens
+ */
+
+/* ============================================
+   1. CORE CONTENT VISIBILITY
+   ============================================ */
+
+/* Main content areas - must always be visible */
+body,
+main,
+.page-content,
+[role="main"],
+.main-content,
+.feed-container {
+    opacity: 1 !important;
+    visibility: visible !important;
+}
+
+/* ============================================
+   2. FEED ITEMS & CARDS
+   ============================================ */
+
+/* Feed items that normally fade in via JS animation */
+.feed-item,
+.post-card,
+.nexus-card,
+.glass-card,
+.listing-card,
+.event-card,
+.volunteer-card {
+    opacity: 1 !important;
+    animation: none !important;
+    transform: none !important;
+}
+
+/* ============================================
+   3. NAVIGATION ELEMENTS
+   ============================================ */
+
+/* Navigation must be fully visible without JS */
+.nexus-navbar,
+.nexus-utility-bar,
+.civic-header,
+.civic-utility-bar {
+    opacity: 1 !important;
+    transform: translateY(var(--space-0)) !important;
+    visibility: visible !important;
+}
+
+/* Mobile navigation (show basic nav, hide JS-dependent elements) */
+.nexus-mobile-nav,
+.mobile-tab-bar {
+    opacity: 1 !important;
+}
+
+/* ============================================
+   4. LAZY LOADED IMAGES
+   ============================================ */
+
+/* Images that wait for JS to reveal them */
+img[loading="lazy"],
+img.lazy {
+    opacity: 1 !important;
+}
+
+/* ============================================
+   5. SKELETON SCREENS
+   ============================================ */
+
+/* Hide skeleton screens - show real content instead */
+.skeleton,
+.skeleton-feed-container,
+.skeleton-card {
+    display: none !important;
+}
+
+/* ============================================
+   6. MODALS & OVERLAYS (Static Fallback)
+   ============================================ */
+
+/* Keep modals hidden since they require JS to interact */
+/* This is intentional - modals need JS to function */
+
+/* ============================================
+   7. DROPDOWNS
+   ============================================ */
+
+/* Show dropdown content on hover (CSS-only fallback) */
+.dropdown:hover .dropdown-menu,
+.htb-dropdown:hover .htb-dropdown-content,
+.civic-dropdown:hover .civic-dropdown-content {
+    display: block !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+}
+
+/* ============================================
+   8. VIEW TRANSITIONS
+   ============================================ */
+
+/* Disable view transitions without JS */
+::view-transition-old(*),
+::view-transition-new(*) {
+    display: none !important;
+}
+
+/* ============================================
+   9. TOAST & NOTIFICATIONS
+   ============================================ */
+
+/* These require JS - keep them as-is */
+
+/* ============================================
+   10. DISABLE ALL ANIMATIONS 
+   ============================================ */
+
+/* Remove animations that rely on JS timing */
+*:not(.modal):not(.toast):not(.drawer) {
+    animation-delay: var(--space-0) !important;
+}
+
+/* ============================================
+   11. HERO SECTIONS
+   ============================================ */
+
+
+.hero-title {
+    opacity: 1 !important;
+    transform: none !important;
+}
+
+/* ============================================
+   12. MEGA MENU (CSS-only hover)
+   ============================================ */
+
+.mega-menu-trigger:hover+.mega-menu,
+.mega-menu:hover {
+    display: block !important;
+    opacity: 1 !important;
+}

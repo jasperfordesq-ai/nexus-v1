@@ -3,30 +3,30 @@
    ============================================ */
 
 :root {
-    --msg-primary: #6366f1;
-    --msg-primary-light: #818cf8;
-    --msg-gradient: linear-gradient(135deg, #6366f1, #8b5cf6);
-    --msg-gradient-vibrant: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #a855f7 100%);
-    --msg-bg: #f8fafc;
+    --msg-primary: var(--color-primary-500);
+    --msg-primary-light: var(--color-primary-400);
+    --msg-gradient: linear-gradient(135deg, var(--color-primary-500), var(--color-purple-500));
+    --msg-gradient-vibrant: linear-gradient(135deg, var(--color-primary-500) 0%, var(--color-purple-500) 50%, #a855f7 100%);
+    --msg-bg: var(--color-slate-50);
     --msg-surface: var(--color-white);
-    --msg-border: rgba(0, 0, 0, 0.08);
-    --msg-text: #1e293b;
-    --msg-text-muted: #64748b;
-    --msg-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    --msg-border: var(--effect-black-8);
+    --msg-text: var(--color-slate-800);
+    --msg-text-muted: var(--color-slate-500);
+    --msg-shadow: 0 1px 3px var(--effect-black-10);
     --msg-radius: 12px;
-    --msg-avatar-glow: 0 4px 14px rgba(99, 102, 241, 0.3);
+    --msg-avatar-glow: 0 4px 14px var(--effect-primary-30);
     --safe-top: env(safe-area-inset-top, 0px);
     --safe-bottom: env(safe-area-inset-bottom, 0px);
 }
 
 [data-theme="dark"] {
-    --msg-bg: #0f172a;
-    --msg-surface: #1e293b;
+    --msg-bg: var(--color-slate-900);
+    --msg-surface: var(--color-slate-800);
     --msg-surface-elevated: #283548;
-    --msg-border: rgba(255, 255, 255, 0.08);
-    --msg-text: #f1f5f9;
-    --msg-text-muted: #94a3b8;
-    --msg-avatar-glow: 0 4px 20px rgba(99, 102, 241, 0.4);
+    --msg-border: var(--effect-white-8);
+    --msg-text: var(--color-slate-100);
+    --msg-text-muted: var(--color-slate-400);
+    --msg-avatar-glow: 0 4px 20px var(--effect-primary-40);
 }
 
 /* Prevent pull-to-refresh on messages page */
@@ -90,7 +90,7 @@ body.messages-page {
 
 [data-theme="dark"] .messages-header {
     background: linear-gradient(180deg, var(--msg-surface) 0%, rgba(30, 41, 59, 0.98) 100%);
-    border-bottom-color: rgba(255, 255, 255, 0.06);
+    border-bottom-color: var(--effect-white-6);
 }
 
 .messages-header-left {
@@ -106,7 +106,7 @@ body.messages-page {
     width: var(--space-10);
     height: var(--space-10);
     border-radius: var(--radius-md);
-    background: rgba(99, 102, 241, 0.08);
+    background: var(--effect-primary-8);
     border: none;
     color: var(--msg-primary);
     font-size: 1.1rem;
@@ -116,12 +116,12 @@ body.messages-page {
 }
 
 .messages-back:active {
-    background: rgba(99, 102, 241, 0.15);
+    background: var(--effect-primary-15);
     transform: scale(0.95);
 }
 
 [data-theme="dark"] .messages-back {
-    background: rgba(99, 102, 241, 0.15);
+    background: var(--effect-primary-15);
 }
 
 .messages-title {
@@ -133,7 +133,7 @@ body.messages-page {
 }
 
 [data-theme="dark"] .messages-title {
-    background: linear-gradient(135deg, #fff 0%, #c4b5fd 100%);
+    background: linear-gradient(135deg, var(--color-white) 0%, var(--color-purple-300) 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -157,7 +157,7 @@ body.messages-page {
     color: white;
     font-size: 1.2rem;
     cursor: pointer;
-    box-shadow: 0 4px 16px rgba(99, 102, 241, 0.4), 0 2px 4px rgba(99, 102, 241, 0.2);
+    box-shadow: 0 4px 16px var(--effect-primary-40), 0 2px 4px var(--effect-primary-20);
     -webkit-tap-highlight-color: transparent;
     transition: transform 0.15s ease, box-shadow 0.15s ease;
     position: relative;
@@ -172,9 +172,9 @@ body.messages-page {
     background: linear-gradient(
         105deg,
         transparent 40%,
-        rgba(255, 255, 255, 0.2) 45%,
-        rgba(255, 255, 255, 0.3) 50%,
-        rgba(255, 255, 255, 0.2) 55%,
+        var(--effect-white-20) 45%,
+        var(--effect-white-30) 50%,
+        var(--effect-white-20) 55%,
         transparent 60%
     );
     transform: translateX(-100%);
@@ -188,7 +188,7 @@ body.messages-page {
 
 .messages-new-btn:active {
     transform: scale(0.92);
-    box-shadow: 0 2px 8px rgba(99, 102, 241, 0.3);
+    box-shadow: 0 2px 8px var(--effect-primary-30);
 }
 
 .messages-new-btn:active::after {
@@ -233,11 +233,11 @@ body.messages-page {
 }
 
 [data-theme="dark"] .messages-search-input {
-    background: rgba(255, 255, 255, 0.06);
+    background: var(--effect-white-6);
 }
 
 [data-theme="dark"] .messages-search-input:focus {
-    background: rgba(99, 102, 241, 0.1);
+    background: var(--effect-primary-10);
 }
 
 /* ============================================
@@ -262,7 +262,7 @@ body.messages-page {
 }
 
 [data-theme="dark"] .messages-thread-wrap {
-    background: rgba(255, 255, 255, 0.04);
+    background: var(--effect-white-4);
 }
 
 .messages-thread {
@@ -279,17 +279,17 @@ body.messages-page {
 }
 
 .messages-thread:active {
-    background: rgba(99, 102, 241, 0.1);
+    background: var(--effect-primary-10);
 }
 
 .messages-thread-wrap.unread,
 .messages-thread.unread {
-    background: rgba(99, 102, 241, 0.08);
+    background: var(--effect-primary-8);
 }
 
 [data-theme="dark"] .messages-thread-wrap.unread,
 [data-theme="dark"] .messages-thread.unread {
-    background: rgba(99, 102, 241, 0.12);
+    background: var(--effect-primary-12);
 }
 
 .messages-avatar {
@@ -396,13 +396,13 @@ body.messages-page {
     width: 90px;
     height: 90px;
     border-radius: var(--radius-2xl);
-    background: linear-gradient(135deg, rgba(99, 102, 241, 0.12), rgba(139, 92, 246, 0.08));
-    border: 1px solid rgba(99, 102, 241, 0.15);
+    background: linear-gradient(135deg, var(--effect-primary-12), var(--effect-purple-8));
+    border: 1px solid var(--effect-primary-15);
     display: flex;
     align-items: center;
     justify-content: center;
     margin-bottom: var(--space-6);
-    box-shadow: 0 8px 32px rgba(99, 102, 241, 0.1);
+    box-shadow: 0 8px 32px var(--effect-primary-10);
     animation: floatIcon 4s ease-in-out infinite;
 }
 
@@ -448,20 +448,20 @@ body.messages-page {
     border-radius: var(--radius-lg);
     cursor: pointer;
     text-decoration: none;
-    box-shadow: 0 4px 16px rgba(99, 102, 241, 0.35), 0 2px 4px rgba(99, 102, 241, 0.2);
+    box-shadow: 0 4px 16px rgba(99, 102, 241, 0.35), 0 2px 4px var(--effect-primary-20);
     transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 .messages-empty-btn:active {
     transform: scale(0.96);
-    box-shadow: 0 2px 8px rgba(99, 102, 241, 0.3);
+    box-shadow: 0 2px 8px var(--effect-primary-30);
 }
 
 /* New Message Modal */
 .nm-overlay {
     position: fixed;
     inset: 0;
-    background: rgba(0, 0, 0, 0.6);
+    background: var(--effect-black-60);
     backdrop-filter: blur(4px);
     -webkit-backdrop-filter: blur(4px);
     z-index: 100010; /* Above messages-app (100000) */
@@ -482,7 +482,7 @@ body.messages-page {
     flex-direction: column;
     transform: translateY(100%);
     transition: transform 0.35s cubic-bezier(0.32, 0.72, 0, 1);
-    box-shadow: 0 -8px 40px rgba(0, 0, 0, 0.15);
+    box-shadow: 0 -8px 40px var(--effect-black-15);
 }
 
 .nm-overlay.active .nm-sheet {
@@ -492,13 +492,13 @@ body.messages-page {
 .nm-handle {
     width: var(--space-10);
     height: 5px;
-    background: rgba(0, 0, 0, 0.15);
+    background: var(--effect-black-15);
     border-radius: var(--radius-sm);
     margin: var(--space-3) auto 0;
 }
 
 [data-theme="dark"] .nm-handle {
-    background: rgba(255, 255, 255, 0.2);
+    background: var(--effect-white-20);
 }
 
 .nm-header {
@@ -533,8 +533,8 @@ body.messages-page {
 }
 
 .nm-close:active {
-    background: rgba(239, 68, 68, 0.1);
-    color: #ef4444;
+    background: var(--effect-red-10);
+    color: var(--color-red-500);
 }
 
 .nm-search {
@@ -555,7 +555,7 @@ body.messages-page {
 
 .nm-search input:focus {
     border-color: var(--msg-primary);
-    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+    box-shadow: 0 0 0 3px var(--effect-primary-10);
 }
 
 .nm-results {
@@ -575,7 +575,7 @@ body.messages-page {
 }
 
 .nm-user:active {
-    background: rgba(99, 102, 241, 0.08);
+    background: var(--effect-primary-8);
 }
 
 .nm-user-avatar {
@@ -590,7 +590,7 @@ body.messages-page {
     font-weight: 700;
     font-size: 1.05rem;
     overflow: hidden;
-    box-shadow: 0 2px 8px rgba(99, 102, 241, 0.2);
+    box-shadow: 0 2px 8px var(--effect-primary-20);
 }
 
 .nm-user-avatar img {
@@ -656,7 +656,7 @@ body.messages-page {
     display: flex;
     align-items: center;
     justify-content: center;
-    background: #ef4444;
+    background: var(--color-red-500);
     color: white;
     border: none;
     font-size: 1.2rem;
@@ -664,7 +664,7 @@ body.messages-page {
 }
 
 .msg-delete-action:active {
-    background: #dc2626;
+    background: var(--color-red-600);
 }
 
 /* Thread options button (for desktop) */
@@ -684,7 +684,7 @@ body.messages-page {
     opacity: 0;
     transition: all 0.2s ease;
     display: none;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 2px 8px var(--effect-black-10);
     z-index: 10;
 }
 
@@ -704,7 +704,7 @@ body.messages-page {
         border-color: var(--msg-primary);
         color: white;
         transform: translateY(-50%) scale(1.1);
-        box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+        box-shadow: 0 4px 12px var(--effect-primary-30);
     }
 
     .messages-thread-options:active {
@@ -730,7 +730,7 @@ body.messages-page {
 .thread-menu-overlay {
     position: fixed;
     inset: 0;
-    background: rgba(0, 0, 0, 0.5);
+    background: var(--effect-black-50);
     z-index: 100010; /* Above messages-app (100000) */
     display: none;
     align-items: center;
@@ -793,7 +793,7 @@ body.messages-page {
 }
 
 .thread-menu-btn.delete {
-    color: #ef4444;
+    color: var(--color-red-500);
 }
 
 .thread-menu-btn i {
@@ -805,7 +805,7 @@ body.messages-page {
 .delete-confirm-overlay {
     position: fixed;
     inset: 0;
-    background: rgba(0, 0, 0, 0.5);
+    background: var(--effect-black-50);
     z-index: 100015; /* Above thread-menu-overlay */
     display: none;
     align-items: center;
@@ -859,7 +859,7 @@ body.messages-page {
 }
 
 .delete-confirm-btn {
-    background: #ef4444;
+    background: var(--color-red-500);
     color: white;
 }
 
@@ -869,7 +869,7 @@ body.messages-page {
     bottom: 100px;
     left: 50%;
     transform: translateX(-50%) translateY(20px);
-    background: #1e293b;
+    background: var(--color-slate-800);
     color: white;
     padding: var(--space-3) var(--space-5);
     border-radius: var(--radius-base);
@@ -933,7 +933,7 @@ body.messages-page {
 
 /* ============================================
    DESKTOP HOLOGRAPHIC GLASSMORPHISM INTERFACE
-   Theme: Purple/Cyan Holographic (#8b5cf6 / #06b6d4)
+   Theme: Purple/Cyan Holographic (var(--color-purple-500) / var(--color-cyan-500))
    ============================================ */
 
 /* Hide mobile interface on desktop */
@@ -952,20 +952,20 @@ body.messages-page {
 
 /* Desktop Holographic Variables */
 .messages-desktop-holo {
-    --holo-primary: #8b5cf6;
+    --holo-primary: var(--color-purple-500);
     --holo-primary-rgb: 139, 92, 246;
-    --holo-secondary: #06b6d4;
+    --holo-secondary: var(--color-cyan-500);
     --holo-secondary-rgb: 6, 182, 212;
     --holo-accent: #f472b6;
     --holo-accent-rgb: 244, 114, 182;
-    --holo-success: #10b981;
-    --holo-danger: #ef4444;
-    --holo-text: #f1f5f9;
-    --holo-text-muted: #94a3b8;
+    --holo-success: var(--color-emerald-500);
+    --holo-danger: var(--color-red-500);
+    --holo-text: var(--color-slate-100);
+    --holo-text-muted: var(--color-slate-400);
     --holo-surface: rgba(15, 23, 42, 0.6);
     --holo-surface-hover: rgba(30, 41, 59, 0.8);
-    --holo-border: rgba(255, 255, 255, 0.08);
-    --holo-glow: rgba(139, 92, 246, 0.4);
+    --holo-border: var(--effect-white-8);
+    --holo-glow: var(--effect-purple-40);
 }
 
 /* Animated Holographic Background */
@@ -1014,7 +1014,7 @@ body.messages-page {
 .holo-orb-desktop-1 {
     width: 600px;
     height: 600px;
-    background: radial-gradient(circle, rgba(139, 92, 246, 0.5) 0%, transparent 70%);
+    background: radial-gradient(circle, var(--effect-purple-50) 0%, transparent 70%);
     top: -200px;
     left: -200px;
 }
@@ -1077,11 +1077,11 @@ body.messages-page {
     border-radius: var(--radius-2xl);
     padding: 1px;
     background: linear-gradient(135deg,
-        rgba(139, 92, 246, 0.3) 0%,
+        var(--effect-purple-30) 0%,
         rgba(6, 182, 212, 0.2) 50%,
         rgba(244, 114, 182, 0.3) 100%);
-    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask: linear-gradient(var(--color-white) 0 0) content-box, linear-gradient(var(--color-white) 0 0);
+    mask: linear-gradient(var(--color-white) 0 0) content-box, linear-gradient(var(--color-white) 0 0);
     -webkit-mask-composite: xor;
     mask-composite: exclude;
     pointer-events: none;
@@ -1107,7 +1107,7 @@ body.messages-page {
     width: 44px;
     height: 44px;
     border-radius: var(--radius-md);
-    background: rgba(255, 255, 255, 0.05);
+    background: var(--effect-white-5);
     border: 1px solid var(--holo-border);
     color: var(--holo-text-muted);
     text-decoration: none;
@@ -1115,8 +1115,8 @@ body.messages-page {
 }
 
 .holo-back-btn:hover {
-    background: rgba(139, 92, 246, 0.2);
-    border-color: rgba(139, 92, 246, 0.4);
+    background: var(--effect-purple-20);
+    border-color: var(--effect-purple-40);
     color: var(--holo-primary);
     transform: translateX(-3px);
 }
@@ -1125,7 +1125,7 @@ body.messages-page {
     font-size: 1.5rem;
     font-weight: 800;
     margin: 0;
-    background: linear-gradient(135deg, var(--color-white) 0%, #c4b5fd 50%, var(--color-cyan-300) 100%);
+    background: linear-gradient(135deg, var(--color-white) 0%, var(--color-purple-300) 50%, var(--color-cyan-300) 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -1149,12 +1149,12 @@ body.messages-page {
     font-size: 1.2rem;
     cursor: pointer;
     transition: all 0.3s ease;
-    box-shadow: 0 4px 20px rgba(139, 92, 246, 0.4);
+    box-shadow: 0 4px 20px var(--effect-purple-40);
 }
 
 .holo-new-btn:hover {
     transform: translateY(-2px) scale(1.05);
-    box-shadow: 0 6px 30px rgba(139, 92, 246, 0.5);
+    box-shadow: 0 6px 30px var(--effect-purple-50);
 }
 
 .holo-new-btn:active {
@@ -1184,7 +1184,7 @@ body.messages-page {
 .holo-search-input {
     width: 100%;
     padding: var(--space-4) var(--space-4) var(--space-4) 46px;
-    background: rgba(255, 255, 255, 0.03);
+    background: var(--effect-white-3);
     border: 1px solid var(--holo-border);
     border-radius: var(--radius-lg);
     color: var(--holo-text);
@@ -1199,8 +1199,8 @@ body.messages-page {
 
 .holo-search-input:focus {
     background: rgba(139, 92, 246, 0.05);
-    border-color: rgba(139, 92, 246, 0.4);
-    box-shadow: 0 0 20px rgba(139, 92, 246, 0.15);
+    border-color: var(--effect-purple-40);
+    box-shadow: 0 0 20px var(--effect-purple-15);
 }
 
 /* Thread List */
@@ -1220,12 +1220,12 @@ body.messages-page {
 }
 
 .holo-thread-list::-webkit-scrollbar-thumb {
-    background: rgba(139, 92, 246, 0.3);
+    background: var(--effect-purple-30);
     border-radius: var(--radius-sm);
 }
 
 .holo-thread-list::-webkit-scrollbar-thumb:hover {
-    background: rgba(139, 92, 246, 0.5);
+    background: var(--effect-purple-50);
 }
 
 /* Thread Item */
@@ -1235,7 +1235,7 @@ body.messages-page {
     gap: var(--space-4);
     padding: var(--space-4);
     margin-bottom: var(--space-2);
-    background: rgba(255, 255, 255, 0.02);
+    background: var(--effect-white-2);
     border: 1px solid transparent;
     border-radius: var(--radius-lg);
     cursor: pointer;
@@ -1246,15 +1246,15 @@ body.messages-page {
 }
 
 .holo-thread:hover {
-    background: rgba(139, 92, 246, 0.1);
-    border-color: rgba(139, 92, 246, 0.2);
+    background: var(--effect-purple-10);
+    border-color: var(--effect-purple-20);
     transform: translateX(4px);
 }
 
 .holo-thread.active {
-    background: linear-gradient(135deg, rgba(139, 92, 246, 0.15), rgba(6, 182, 212, 0.1));
-    border-color: rgba(139, 92, 246, 0.3);
-    box-shadow: 0 4px 20px rgba(139, 92, 246, 0.2);
+    background: linear-gradient(135deg, var(--effect-purple-15), rgba(6, 182, 212, 0.1));
+    border-color: var(--effect-purple-30);
+    box-shadow: 0 4px 20px var(--effect-purple-20);
 }
 
 .holo-thread.unread::before {
@@ -1299,7 +1299,7 @@ body.messages-page {
     width: var(--space-4);
     height: var(--space-4);
     background: var(--holo-success);
-    border: 3px solid #0f172a;
+    border: 3px solid var(--color-slate-900);
     border-radius: 50%;
 }
 
@@ -1368,7 +1368,7 @@ body.messages-page {
     justify-content: center;
     margin-left: auto;
     flex-shrink: 0;
-    box-shadow: 0 2px 10px rgba(139, 92, 246, 0.4);
+    box-shadow: 0 2px 10px var(--effect-purple-40);
 }
 
 /* Main Chat Area */
@@ -1394,10 +1394,10 @@ body.messages-page {
     padding: 1px;
     background: linear-gradient(135deg,
         rgba(6, 182, 212, 0.2) 0%,
-        rgba(139, 92, 246, 0.3) 50%,
+        var(--effect-purple-30) 50%,
         rgba(244, 114, 182, 0.2) 100%);
-    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask: linear-gradient(var(--color-white) 0 0) content-box, linear-gradient(var(--color-white) 0 0);
+    mask: linear-gradient(var(--color-white) 0 0) content-box, linear-gradient(var(--color-white) 0 0);
     -webkit-mask-composite: xor;
     mask-composite: exclude;
     pointer-events: none;
@@ -1418,8 +1418,8 @@ body.messages-page {
     width: 120px;
     height: 120px;
     border-radius: var(--radius-2xl);
-    background: linear-gradient(135deg, rgba(139, 92, 246, 0.15), rgba(6, 182, 212, 0.1));
-    border: 1px solid rgba(139, 92, 246, 0.2);
+    background: linear-gradient(135deg, var(--effect-purple-15), rgba(6, 182, 212, 0.1));
+    border: 1px solid var(--effect-purple-20);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -1444,7 +1444,7 @@ body.messages-page {
     font-size: 1.75rem;
     font-weight: 800;
     margin: 0 0 12px;
-    background: linear-gradient(135deg, var(--color-white) 0%, #c4b5fd 50%, var(--color-cyan-300) 100%);
+    background: linear-gradient(135deg, var(--color-white) 0%, var(--color-purple-300) 50%, var(--color-cyan-300) 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -1471,12 +1471,12 @@ body.messages-page {
     font-weight: 600;
     cursor: pointer;
     transition: all 0.3s ease;
-    box-shadow: 0 4px 25px rgba(139, 92, 246, 0.4);
+    box-shadow: 0 4px 25px var(--effect-purple-40);
 }
 
 .holo-welcome-btn:hover {
     transform: translateY(-3px);
-    box-shadow: 0 8px 35px rgba(139, 92, 246, 0.5);
+    box-shadow: 0 8px 35px var(--effect-purple-50);
 }
 
 .holo-welcome-btn:active {
@@ -1498,8 +1498,8 @@ body.messages-page {
     width: var(--space-20);
     height: var(--space-20);
     border-radius: var(--radius-xl);
-    background: linear-gradient(135deg, rgba(139, 92, 246, 0.15), rgba(6, 182, 212, 0.1));
-    border: 1px solid rgba(139, 92, 246, 0.2);
+    background: linear-gradient(135deg, var(--effect-purple-15), rgba(6, 182, 212, 0.1));
+    border: 1px solid var(--effect-purple-20);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -1537,19 +1537,19 @@ body.messages-page {
     font-weight: 600;
     cursor: pointer;
     transition: all 0.3s ease;
-    box-shadow: 0 4px 20px rgba(139, 92, 246, 0.4);
+    box-shadow: 0 4px 20px var(--effect-purple-40);
 }
 
 .holo-empty-btn:hover {
     transform: translateY(-2px);
-    box-shadow: 0 6px 25px rgba(139, 92, 246, 0.5);
+    box-shadow: 0 6px 25px var(--effect-purple-50);
 }
 
 /* Desktop New Message Modal */
 .holo-modal-overlay {
     position: fixed;
     inset: 0;
-    background: rgba(0, 0, 0, 0.6);
+    background: var(--effect-black-60);
     backdrop-filter: blur(8px);
     z-index: 100010; /* Above messages-desktop-holo (100000) */
     display: none;
@@ -1590,11 +1590,11 @@ body.messages-page {
     border-radius: var(--radius-2xl);
     padding: 1px;
     background: linear-gradient(135deg,
-        rgba(139, 92, 246, 0.4) 0%,
+        var(--effect-purple-40) 0%,
         rgba(6, 182, 212, 0.3) 50%,
         rgba(244, 114, 182, 0.4) 100%);
-    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask: linear-gradient(var(--color-white) 0 0) content-box, linear-gradient(var(--color-white) 0 0);
+    mask: linear-gradient(var(--color-white) 0 0) content-box, linear-gradient(var(--color-white) 0 0);
     -webkit-mask-composite: xor;
     mask-composite: exclude;
     pointer-events: none;
@@ -1612,7 +1612,7 @@ body.messages-page {
     margin: 0;
     font-size: 1.25rem;
     font-weight: 700;
-    background: linear-gradient(135deg, var(--color-white), #c4b5fd);
+    background: linear-gradient(135deg, var(--color-white), var(--color-purple-300));
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -1623,7 +1623,7 @@ body.messages-page {
     height: var(--space-10);
     border-radius: var(--radius-md);
     border: 1px solid var(--holo-border);
-    background: rgba(255, 255, 255, 0.05);
+    background: var(--effect-white-5);
     color: var(--holo-text-muted);
     font-size: var(--font-size-base);
     cursor: pointer;
@@ -1634,9 +1634,9 @@ body.messages-page {
 }
 
 .holo-modal-close:hover {
-    background: rgba(239, 68, 68, 0.2);
-    border-color: rgba(239, 68, 68, 0.4);
-    color: #ef4444;
+    background: var(--effect-red-20);
+    border-color: var(--effect-red-40);
+    color: var(--color-red-500);
 }
 
 .holo-modal-search {
@@ -1646,7 +1646,7 @@ body.messages-page {
 .holo-modal-search input {
     width: 100%;
     padding: var(--space-4) var(--space-4);
-    background: rgba(255, 255, 255, 0.03);
+    background: var(--effect-white-3);
     border: 1px solid var(--holo-border);
     border-radius: var(--radius-lg);
     color: var(--holo-text);
@@ -1657,8 +1657,8 @@ body.messages-page {
 
 .holo-modal-search input:focus {
     background: rgba(139, 92, 246, 0.05);
-    border-color: rgba(139, 92, 246, 0.4);
-    box-shadow: 0 0 20px rgba(139, 92, 246, 0.15);
+    border-color: var(--effect-purple-40);
+    box-shadow: 0 0 20px var(--effect-purple-15);
 }
 
 .holo-modal-search input::placeholder {
@@ -1680,7 +1680,7 @@ body.messages-page {
 }
 
 .holo-modal-results::-webkit-scrollbar-thumb {
-    background: rgba(139, 92, 246, 0.3);
+    background: var(--effect-purple-30);
     border-radius: var(--radius-sm);
 }
 
@@ -1690,7 +1690,7 @@ body.messages-page {
     gap: var(--space-4);
     padding: var(--space-4) var(--space-4);
     margin-bottom: var(--space-2);
-    background: rgba(255, 255, 255, 0.02);
+    background: var(--effect-white-2);
     border: 1px solid transparent;
     border-radius: var(--radius-lg);
     cursor: pointer;
@@ -1698,8 +1698,8 @@ body.messages-page {
 }
 
 .holo-modal-user:hover {
-    background: rgba(139, 92, 246, 0.1);
-    border-color: rgba(139, 92, 246, 0.2);
+    background: var(--effect-purple-10);
+    border-color: var(--effect-purple-20);
 }
 
 .holo-modal-user-avatar {
@@ -1750,7 +1750,7 @@ body.messages-page {
     left: 50%;
     transform: translateX(-50%) translateY(20px);
     background: rgba(15, 23, 42, 0.95);
-    border: 1px solid rgba(139, 92, 246, 0.3);
+    border: 1px solid var(--effect-purple-30);
     color: var(--holo-text);
     padding: var(--space-4) var(--space-8);
     border-radius: var(--radius-lg);
@@ -1760,7 +1760,7 @@ body.messages-page {
     transition: opacity 0.3s, transform 0.3s;
     pointer-events: none;
     backdrop-filter: blur(10px);
-    box-shadow: 0 4px 25px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 4px 25px var(--effect-black-30);
 }
 
 .holo-toast.show {
@@ -1866,7 +1866,7 @@ body.messages-page {
     height: var(--space-10);
     border-radius: var(--radius-md);
     border: 1px solid var(--holo-border);
-    background: rgba(255, 255, 255, 0.03);
+    background: var(--effect-white-3);
     color: var(--holo-text-muted);
     font-size: var(--font-size-base);
     cursor: pointer;
@@ -1877,14 +1877,14 @@ body.messages-page {
 }
 
 .holo-chat-action-btn:hover {
-    background: rgba(139, 92, 246, 0.1);
-    border-color: rgba(139, 92, 246, 0.3);
+    background: var(--effect-purple-10);
+    border-color: var(--effect-purple-30);
     color: var(--holo-primary);
 }
 
 .holo-chat-action-btn.danger:hover {
-    background: rgba(239, 68, 68, 0.1);
-    border-color: rgba(239, 68, 68, 0.3);
+    background: var(--effect-red-10);
+    border-color: var(--effect-red-30);
     color: var(--holo-danger);
 }
 
@@ -1908,7 +1908,7 @@ body.messages-page {
 }
 
 .holo-chat-messages::-webkit-scrollbar-thumb {
-    background: rgba(139, 92, 246, 0.3);
+    background: var(--effect-purple-30);
     border-radius: var(--radius-sm);
 }
 
@@ -1925,7 +1925,7 @@ body.messages-page {
     content: '';
     flex: 1;
     height: 1px;
-    background: linear-gradient(90deg, transparent, rgba(139, 92, 246, 0.2), transparent);
+    background: linear-gradient(90deg, transparent, var(--effect-purple-20), transparent);
 }
 
 .holo-date-sep span {
@@ -1934,7 +1934,7 @@ body.messages-page {
     text-transform: uppercase;
     letter-spacing: 0.5px;
     padding: var(--space-2) var(--space-4);
-    background: rgba(139, 92, 246, 0.1);
+    background: var(--effect-purple-10);
     border-radius: var(--radius-xl);
 }
 
@@ -1995,7 +1995,7 @@ body.messages-page {
 
 .holo-message-bubble {
     padding: var(--space-4) var(--space-5);
-    background: rgba(255, 255, 255, 0.05);
+    background: var(--effect-white-5);
     border: 1px solid var(--holo-border);
     border-radius: var(--radius-lg);
     border-top-left-radius: 4px;
@@ -2006,8 +2006,8 @@ body.messages-page {
 }
 
 .holo-message.sent .holo-message-bubble {
-    background: linear-gradient(135deg, rgba(139, 92, 246, 0.2), rgba(6, 182, 212, 0.15));
-    border-color: rgba(139, 92, 246, 0.3);
+    background: linear-gradient(135deg, var(--effect-purple-20), rgba(6, 182, 212, 0.15));
+    border-color: var(--effect-purple-30);
     border-radius: var(--radius-lg);
     border-top-right-radius: 4px;
 }
@@ -2040,7 +2040,7 @@ body.messages-page {
     display: flex;
     gap: var(--space-1);
     padding: var(--space-3) var(--space-4);
-    background: rgba(255, 255, 255, 0.05);
+    background: var(--effect-white-5);
     border: 1px solid var(--holo-border);
     border-radius: var(--radius-lg);
 }
@@ -2084,7 +2084,7 @@ body.messages-page {
     min-height: 48px;
     max-height: 150px;
     padding: var(--space-4) var(--space-5);
-    background: rgba(255, 255, 255, 0.03);
+    background: var(--effect-white-3);
     border: 1px solid var(--holo-border);
     border-radius: var(--radius-lg);
     color: var(--holo-text);
@@ -2102,8 +2102,8 @@ body.messages-page {
 
 .holo-chat-textarea:focus {
     background: rgba(139, 92, 246, 0.05);
-    border-color: rgba(139, 92, 246, 0.4);
-    box-shadow: 0 0 25px rgba(139, 92, 246, 0.1);
+    border-color: var(--effect-purple-40);
+    box-shadow: 0 0 25px var(--effect-purple-10);
 }
 
 .holo-send-btn {
@@ -2119,13 +2119,13 @@ body.messages-page {
     align-items: center;
     justify-content: center;
     transition: all 0.3s ease;
-    box-shadow: 0 4px 20px rgba(139, 92, 246, 0.4);
+    box-shadow: 0 4px 20px var(--effect-purple-40);
     flex-shrink: 0;
 }
 
 .holo-send-btn:hover {
     transform: translateY(-2px) scale(1.05);
-    box-shadow: 0 6px 30px rgba(139, 92, 246, 0.5);
+    box-shadow: 0 6px 30px var(--effect-purple-50);
 }
 
 .holo-send-btn:active {
@@ -2144,7 +2144,7 @@ body.messages-page {
     width: var(--space-12);
     height: var(--space-12);
     border-radius: var(--radius-lg);
-    background: rgba(255, 255, 255, 0.05);
+    background: var(--effect-white-5);
     border: 1px solid var(--holo-border);
     color: var(--holo-text-muted);
     font-size: 1.1rem;
@@ -2157,17 +2157,17 @@ body.messages-page {
 }
 
 .holo-voice-btn:hover {
-    background: rgba(239, 68, 68, 0.1);
-    border-color: rgba(239, 68, 68, 0.3);
-    color: #ef4444;
+    background: var(--effect-red-10);
+    border-color: var(--effect-red-30);
+    color: var(--color-red-500);
 }
 
 .holo-voice-btn.recording {
-    background: linear-gradient(135deg, #ef4444, #dc2626);
-    border-color: #ef4444;
+    background: linear-gradient(135deg, var(--color-red-500), var(--color-red-600));
+    border-color: var(--color-red-500);
     color: white;
     animation: voicePulse 1s ease-in-out infinite;
-    box-shadow: 0 4px 20px rgba(239, 68, 68, 0.4);
+    box-shadow: 0 4px 20px var(--effect-red-40);
 }
 
 @keyframes voicePulse {
@@ -2179,7 +2179,7 @@ body.messages-page {
 .holo-voice-overlay {
     position: fixed;
     inset: 0;
-    background: rgba(0, 0, 0, 0.8);
+    background: var(--effect-black-80);
     backdrop-filter: blur(12px);
     z-index: 100015; /* Above modals */
     display: none;
@@ -2197,8 +2197,8 @@ body.messages-page {
     width: 140px;
     height: 140px;
     border-radius: 50%;
-    background: linear-gradient(135deg, rgba(239, 68, 68, 0.2), rgba(220, 38, 38, 0.1));
-    border: 2px solid rgba(239, 68, 68, 0.4);
+    background: linear-gradient(135deg, var(--effect-red-20), rgba(220, 38, 38, 0.1));
+    border: 2px solid var(--effect-red-40);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -2207,20 +2207,20 @@ body.messages-page {
 
 @keyframes voiceRipple {
     0%, 100% {
-        box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4),
-                    0 0 0 20px rgba(239, 68, 68, 0.1),
+        box-shadow: 0 0 0 0 var(--effect-red-40),
+                    0 0 0 20px var(--effect-red-10),
                     0 0 0 40px rgba(239, 68, 68, 0.05);
     }
     50% {
-        box-shadow: 0 0 0 10px rgba(239, 68, 68, 0.3),
-                    0 0 0 30px rgba(239, 68, 68, 0.15),
+        box-shadow: 0 0 0 10px var(--effect-red-30),
+                    0 0 0 30px var(--effect-red-15),
                     0 0 0 50px rgba(239, 68, 68, 0.05);
     }
 }
 
 .holo-voice-visual i {
     font-size: 3.5rem;
-    color: #ef4444;
+    color: var(--color-red-500);
 }
 
 .holo-voice-time {
@@ -2256,18 +2256,18 @@ body.messages-page {
 }
 
 .holo-voice-cancel {
-    background: rgba(255, 255, 255, 0.1);
+    background: var(--effect-white-10);
     border: 1px solid var(--holo-border);
     color: var(--holo-text-muted);
 }
 
 .holo-voice-cancel:hover {
-    background: rgba(255, 255, 255, 0.15);
+    background: var(--effect-white-15);
     color: var(--holo-text);
 }
 
 .holo-voice-send {
-    background: linear-gradient(135deg, #10b981, #059669);
+    background: linear-gradient(135deg, var(--color-emerald-500), var(--color-emerald-600));
     color: white;
     box-shadow: 0 4px 20px rgba(16, 185, 129, 0.4);
 }
@@ -2283,8 +2283,8 @@ body.messages-page {
     align-items: center;
     gap: var(--space-3);
     padding: var(--space-3) var(--space-4);
-    background: rgba(139, 92, 246, 0.1);
-    border: 1px solid rgba(139, 92, 246, 0.2);
+    background: var(--effect-purple-10);
+    border: 1px solid var(--effect-purple-20);
     border-radius: var(--radius-lg);
     min-width: 200px;
 }
@@ -2312,7 +2312,7 @@ body.messages-page {
 
 .holo-voice-play-btn:hover {
     transform: scale(1.1);
-    box-shadow: 0 4px 15px rgba(139, 92, 246, 0.4);
+    box-shadow: 0 4px 15px var(--effect-purple-40);
 }
 
 .holo-voice-play-btn.playing i::before {
@@ -2410,8 +2410,8 @@ body.messages-page {
 }
 
 .holo-thread-delete:hover {
-    background: rgba(239, 68, 68, 0.15);
-    border-color: rgba(239, 68, 68, 0.3);
+    background: var(--effect-red-15);
+    border-color: var(--effect-red-30);
     color: var(--holo-danger);
 }
 
@@ -2424,7 +2424,7 @@ body.messages-page {
 .holo-delete-overlay {
     position: fixed;
     inset: 0;
-    background: rgba(0, 0, 0, 0.6);
+    background: var(--effect-black-60);
     backdrop-filter: blur(8px);
     z-index: 350;
     display: none;
@@ -2464,9 +2464,9 @@ body.messages-page {
     inset: 0;
     border-radius: var(--radius-xl);
     padding: 1px;
-    background: linear-gradient(135deg, rgba(239, 68, 68, 0.4), rgba(239, 68, 68, 0.1), rgba(244, 114, 182, 0.3));
-    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    background: linear-gradient(135deg, var(--effect-red-40), var(--effect-red-10), rgba(244, 114, 182, 0.3));
+    -webkit-mask: linear-gradient(var(--color-white) 0 0) content-box, linear-gradient(var(--color-white) 0 0);
+    mask: linear-gradient(var(--color-white) 0 0) content-box, linear-gradient(var(--color-white) 0 0);
     -webkit-mask-composite: xor;
     mask-composite: exclude;
     pointer-events: none;
@@ -2476,8 +2476,8 @@ body.messages-page {
     width: 60px;
     height: 60px;
     border-radius: var(--radius-lg);
-    background: rgba(239, 68, 68, 0.1);
-    border: 1px solid rgba(239, 68, 68, 0.2);
+    background: var(--effect-red-10);
+    border: 1px solid var(--effect-red-20);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -2520,24 +2520,24 @@ body.messages-page {
 }
 
 .holo-cancel-btn {
-    background: rgba(255, 255, 255, 0.05);
+    background: var(--effect-white-5);
     border: 1px solid var(--holo-border) !important;
     color: var(--holo-text);
 }
 
 .holo-cancel-btn:hover {
-    background: rgba(255, 255, 255, 0.1);
+    background: var(--effect-white-10);
 }
 
 .holo-delete-btn {
-    background: linear-gradient(135deg, #ef4444, #dc2626);
+    background: linear-gradient(135deg, var(--color-red-500), var(--color-red-600));
     color: white;
-    box-shadow: 0 4px 15px rgba(239, 68, 68, 0.3);
+    box-shadow: 0 4px 15px var(--effect-red-30);
 }
 
 .holo-delete-btn:hover {
     transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(239, 68, 68, 0.4);
+    box-shadow: 0 6px 20px var(--effect-red-40);
 }
 
 /* Context Menu for threads */
@@ -2554,7 +2554,7 @@ body.messages-page {
     transform: scale(0.95);
     transition: opacity 0.15s, transform 0.15s;
     pointer-events: none;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 8px 32px var(--effect-black-30);
 }
 
 .holo-context-menu.active {
@@ -2569,9 +2569,9 @@ body.messages-page {
     inset: 0;
     border-radius: var(--radius-lg);
     padding: 1px;
-    background: linear-gradient(135deg, rgba(139, 92, 246, 0.3), rgba(6, 182, 212, 0.2));
-    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    background: linear-gradient(135deg, var(--effect-purple-30), rgba(6, 182, 212, 0.2));
+    -webkit-mask: linear-gradient(var(--color-white) 0 0) content-box, linear-gradient(var(--color-white) 0 0);
+    mask: linear-gradient(var(--color-white) 0 0) content-box, linear-gradient(var(--color-white) 0 0);
     -webkit-mask-composite: xor;
     mask-composite: exclude;
     pointer-events: none;
@@ -2594,7 +2594,7 @@ body.messages-page {
 }
 
 .holo-context-item:hover {
-    background: rgba(139, 92, 246, 0.1);
+    background: var(--effect-purple-10);
 }
 
 .holo-context-item i {
@@ -2616,7 +2616,7 @@ body.messages-page {
 }
 
 .holo-context-item.danger:hover {
-    background: rgba(239, 68, 68, 0.1);
+    background: var(--effect-red-10);
 }
 
 .holo-context-divider {

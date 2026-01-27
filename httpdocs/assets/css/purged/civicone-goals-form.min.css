@@ -1,1 +1,158 @@
-.goal-form-header{margin-bottom:var(--space-8);border-bottom:4px solid var(--skin-primary,var(--color-primary-600));padding-bottom:var(--space-4);display:flex;justify-content:space-between;align-items:flex-end}.goal-form-title{margin:0;text-transform:uppercase;color:var(--skin-primary,var(--color-primary-600));font-size:var(--font-size-2xl);font-weight:var(--font-weight-bold)}.goal-form-cancel{font-size:var(--font-size-sm)}.goal-form-card{max-width:800px;margin:0 auto}.goal-form-group{margin-bottom:var(--space-5)}.goal-form-label{display:block;font-weight:var(--font-weight-bold);margin-bottom:var(--space-1);color:var(--color-text-primary)}.goal-form-input,.goal-form-textarea{width:100%}.goal-form-textarea{font-family:inherit;resize:vertical}.goal-form-hint{font-size:var(--font-size-sm);color:var(--color-text-secondary);margin-top:var(--space-1)}.goal-form-grid{display:grid;grid-template-columns:1fr 1fr;gap:var(--space-5);margin-bottom:var(--space-5)}@media (max-width:640px){.goal-form-grid{grid-template-columns:1fr}}.goal-form-checkbox-wrapper{display:flex;align-items:center;padding-top:var(--space-6)}@media (max-width:640px){.goal-form-checkbox-wrapper{padding-top:0}}.goal-form-checkbox-label{display:flex;align-items:center;cursor:pointer}.goal-form-checkbox{width:var(--space-5);height:var(--space-5);margin-right:var(--space-2-5);accent-color:var(--skin-primary,var(--color-primary-600))}.goal-form-checkbox:focus{outline:3px solid var(--color-govuk-yellow,#ffdd00);outline-offset:0}.goal-form-checkbox-title{display:block;font-weight:var(--font-weight-semibold);color:var(--color-text-primary)}.goal-form-checkbox-desc{font-size:var(--font-size-sm);color:var(--color-text-secondary)}.goal-form-actions{margin-top:var(--space-8);text-align:right}.goal-form-submit{padding:var(--space-3) var(--space-8);font-size:var(--font-size-lg)}.goal-form-input:focus,.goal-form-textarea:focus{outline:3px solid var(--color-govuk-yellow,#ffdd00);outline-offset:0;border-color:var(--color-govuk-black,#0b0c0c)}
+/**
+ * CivicOne Goals Form Styles
+ * Used by goals/create.php and goals/edit.php
+ * GOV.UK Design System compliant
+ * WCAG 2.1 AA Compliant
+ */
+
+/* ==========================================
+   Form Header
+   ========================================== */
+
+.goal-form-header {
+    margin-bottom: var(--space-8);
+    border-bottom: 4px solid var(--skin-primary, var(--color-primary-600));
+    padding-bottom: var(--space-4);
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+}
+
+.goal-form-title {
+    margin: 0;
+    text-transform: uppercase;
+    color: var(--skin-primary, var(--color-primary-600));
+    font-size: var(--font-size-2xl);
+    font-weight: var(--font-weight-bold);
+}
+
+.goal-form-cancel {
+    font-size: var(--font-size-sm);
+}
+
+/* ==========================================
+   Form Card Container
+   ========================================== */
+
+.goal-form-card {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+/* ==========================================
+   Form Groups
+   ========================================== */
+
+.goal-form-group {
+    margin-bottom: var(--space-5);
+}
+
+.goal-form-label {
+    display: block;
+    font-weight: var(--font-weight-bold);
+    margin-bottom: var(--space-1);
+    color: var(--color-text-primary);
+}
+
+.goal-form-input,
+.goal-form-textarea {
+    width: 100%;
+}
+
+.goal-form-textarea {
+    font-family: inherit;
+    resize: vertical;
+}
+
+.goal-form-hint {
+    font-size: var(--font-size-sm);
+    color: var(--color-text-secondary);
+    margin-top: var(--space-1);
+}
+
+/* ==========================================
+   Form Grid (2-column layout)
+   ========================================== */
+
+.goal-form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-5);
+    margin-bottom: var(--space-5);
+}
+
+@media (max-width: 640px) {
+    .goal-form-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* ==========================================
+   Checkbox Group
+   ========================================== */
+
+.goal-form-checkbox-wrapper {
+    display: flex;
+    align-items: center;
+    padding-top: var(--space-6);
+}
+
+@media (max-width: 640px) {
+    .goal-form-checkbox-wrapper {
+        padding-top: 0;
+    }
+}
+
+.goal-form-checkbox-label {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+}
+
+.goal-form-checkbox {
+    width: var(--space-5);
+    height: var(--space-5);
+    margin-right: var(--space-2-5);
+    accent-color: var(--skin-primary, var(--color-primary-600));
+}
+
+.goal-form-checkbox:focus {
+    outline: 3px solid var(--color-govuk-yellow, #ffdd00);
+    outline-offset: 0;
+}
+
+.goal-form-checkbox-title {
+    display: block;
+    font-weight: var(--font-weight-semibold);
+    color: var(--color-text-primary);
+}
+
+.goal-form-checkbox-desc {
+    font-size: var(--font-size-sm);
+    color: var(--color-text-secondary);
+}
+
+/* ==========================================
+   Form Actions
+   ========================================== */
+
+.goal-form-actions {
+    margin-top: var(--space-8);
+    text-align: right;
+}
+
+.goal-form-submit {
+    padding: var(--space-3) var(--space-8);
+    font-size: var(--font-size-lg);
+}
+
+/* ==========================================
+   Focus States (GOV.UK pattern)
+   ========================================== */
+
+.goal-form-input:focus,
+.goal-form-textarea:focus {
+    outline: 3px solid var(--color-govuk-yellow, #ffdd00);
+    outline-offset: 0;
+    border-color: var(--color-govuk-black, #0b0c0c);
+}

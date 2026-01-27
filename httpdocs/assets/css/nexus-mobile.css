@@ -786,7 +786,7 @@ html {
 }
 
 .nexus-share-option:nth-child(3) i {
-    background: #000;
+    background: var(--color-black);
 }
 
 .nexus-share-option:nth-child(4) i {
@@ -817,7 +817,7 @@ html {
     position: fixed;
     inset: 0;
     z-index: var(--z-modal, 1400);
-    background: #000;
+    background: var(--color-black);
     opacity: 0;
     visibility: hidden;
     transition: all var(--transition-base) var(--ease-in-out);
@@ -892,7 +892,7 @@ html {
 .nexus-camera-preview {
     position: absolute;
     inset: 0;
-    background: #000;
+    background: var(--color-black);
     display: none;
     flex-direction: column;
 }

@@ -1064,7 +1064,7 @@
 }
 
 .component-share__platform--twitter .component-share__option-icon {
-    color: #000;
+    color: var(--color-black);
 }
 
 .component-share__platform--linkedin .component-share__option-icon {
@@ -1138,7 +1138,7 @@
 }
 
 .component-share__platform--twitter.component-share__btn {
-    background: #000;
+    background: var(--color-black);
 }
 
 .component-share__platform--linkedin.component-share__btn {
@@ -3094,8 +3094,8 @@
 }
 
 .component-alert--warning-light {
-    background: #fffbeb;
-    color: #92400e;
+    background: var(--color-white)beb;
+    color: var(--color-amber-800);
 }
 
 .component-alert--danger-light {
@@ -4400,7 +4400,7 @@
 
 .component-badge--warning {
     background: #fef3c7;
-    color: #92400e;
+    color: var(--color-amber-800);
 }
 
 .component-badge--danger {

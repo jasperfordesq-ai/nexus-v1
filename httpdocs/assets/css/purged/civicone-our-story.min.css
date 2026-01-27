@@ -1,1 +1,100 @@
-.nexus-skin-civicone{}
+/**
+ * CivicOne Our Story Page
+ * Template E: Content/Article (Section 10.6)
+ * Timeline-based story with stats
+ * WCAG 2.1 AA Compliant
+ */
+
+.nexus-skin-civicone {
+    /* Story Wrapper */
+
+    /* Page Header */
+
+    /* Stats Bar */
+
+    /* Timeline */
+    .story-timeline {
+        position: relative;
+        padding-left: var(--space-8);
+    }
+
+    .story-timeline::before {
+        content: '';
+        position: absolute;
+        left: var(--space-4);
+        top: 0;
+        bottom: 0;
+        width: var(--space-1);
+        background: linear-gradient(180deg, var(--color-gray-300) 0%, var(--color-gray-200) 100%);
+        border-radius: 3px;
+    }
+
+    [data-theme="dark"] .story-timeline::before {
+        background: linear-gradient(180deg, var(--color-gray-600) 0%, var(--color-gray-700) 100%);
+    }
+
+    @media (max-width: 768px) {
+        .story-timeline {
+            padding-left: var(--space-6);
+        }
+
+        .story-timeline::before {
+            left: var(--space-2);
+        }
+    }
+
+    /* Timeline Card */
+    .story-card {
+        position: relative;
+        background: var(--civicone-bg-card);
+        border: 1px solid var(--color-gray-300);
+        border-radius: var(--radius-3);
+        overflow: hidden;
+        margin-bottom: var(--space-8);
+        transition: all 0.15s ease;
+    }
+
+    [data-theme="dark"] .story-card {
+        border-color: var(--color-gray-700);
+    }
+
+    .story-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 8px 24px var(--color-black-alpha-10);
+    }
+
+    [data-theme="dark"] .story-card:hover {
+        box-shadow: 0 8px 24px var(--color-black-alpha-30);
+    }
+
+    /* Timeline Dot */
+    .story-card::before {
+        content: '';
+        position: absolute;
+        left: calc(-1 * var(--space-8) - 7px);
+        top: var(--space-6);
+        width: 16px;
+        height: 16px;
+        background: var(--civicone-bg-page);
+        border: 3px solid var(--civicone-brand);
+        border-radius: 50%;
+        box-shadow: 0 2px 8px var(--color-black-alpha-15);
+        z-index: 2;
+    }
+
+    @media (max-width: 768px) {
+        .story-card::before {
+            left: calc(-1 * var(--space-6) - 7px);
+            width: var(--space-3-5);
+            height: var(--space-3-5);
+        }
+    }
+
+    /* Card Header */
+
+    /* Card Body */
+
+    /* Quote */
+
+    /* Mission Card */
+}

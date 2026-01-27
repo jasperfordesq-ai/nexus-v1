@@ -14,7 +14,7 @@ require __DIR__ . '/../../layouts/header.php';
     <span>No internet connection</span>
 </div>
 
-<div class="htb-container" style="max-width: 600px; margin-top: 50px;">
+<div class="htb-container mte-vol-edit--container">
     <div class="htb-card">
         <div class="htb-card-body">
             <h3>Edit <?= htmlspecialchars($opp['title']) ?></h3>
@@ -22,14 +22,14 @@ require __DIR__ . '/../../layouts/header.php';
                 <?= \Nexus\Core\Csrf::input() ?>
                 <input type="hidden" name="opp_id" value="<?= $opp['id'] ?>">
 
-                <div style="margin-bottom: 20px;">
-                    <label style="display: block; font-weight: bold; margin-bottom: 5px;">Role Title</label>
-                    <input type="text" name="title" value="<?= htmlspecialchars($opp['title']) ?>" required style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px;">
+                <div class="mte-vol-edit--form-group">
+                    <label class="mte-vol-edit--label">Role Title</label>
+                    <input type="text" name="title" value="<?= htmlspecialchars($opp['title']) ?>" required class="mte-vol-edit--input">
                 </div>
 
-                <div style="margin-bottom: 20px;">
-                    <label style="display: block; font-weight: bold; margin-bottom: 5px;">Category</label>
-                    <select name="category_id" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px;">
+                <div class="mte-vol-edit--form-group">
+                    <label class="mte-vol-edit--label">Category</label>
+                    <select name="category_id" class="mte-vol-edit--input">
                         <option value="">Select Category...</option>
                         <?php foreach ($categories as $cat): ?>
                             <option value="<?= $cat['id'] ?>" <?= $opp['category_id'] == $cat['id'] ? 'selected' : '' ?>><?= htmlspecialchars($cat['name']) ?></option>
@@ -37,36 +37,36 @@ require __DIR__ . '/../../layouts/header.php';
                     </select>
                 </div>
 
-                <div style="margin-bottom: 20px;">
-                    <label style="display: block; font-weight: bold; margin-bottom: 5px;">Location</label>
-                    <input type="text" name="location" value="<?= htmlspecialchars($opp['location']) ?>" required style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px;" class="mapbox-location-input-v2">
+                <div class="mte-vol-edit--form-group">
+                    <label class="mte-vol-edit--label">Location</label>
+                    <input type="text" name="location" value="<?= htmlspecialchars($opp['location']) ?>" required class="mte-vol-edit--input mapbox-location-input-v2">
                     <input type="hidden" name="latitude" value="<?= $opp['latitude'] ?? '' ?>">
                     <input type="hidden" name="longitude" value="<?= $opp['longitude'] ?? '' ?>">
                 </div>
 
-                <div style="margin-bottom: 20px;">
-                    <label style="display: block; font-weight: bold; margin-bottom: 5px;">Skills</label>
-                    <input type="text" name="skills" value="<?= htmlspecialchars($opp['skills_needed']) ?>" placeholder="Comma separated" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px;">
+                <div class="mte-vol-edit--form-group">
+                    <label class="mte-vol-edit--label">Skills</label>
+                    <input type="text" name="skills" value="<?= htmlspecialchars($opp['skills_needed']) ?>" placeholder="Comma separated" class="mte-vol-edit--input">
                 </div>
 
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px;">
+                <div class="mte-vol-edit--date-grid">
                     <div>
-                        <label style="display: block; font-weight: bold; margin-bottom: 5px;">Start Date</label>
-                        <input type="date" name="start_date" value="<?= $opp['start_date'] ?>" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px;">
+                        <label class="mte-vol-edit--label">Start Date</label>
+                        <input type="date" name="start_date" value="<?= $opp['start_date'] ?>" class="mte-vol-edit--input">
                     </div>
                     <div>
-                        <label style="display: block; font-weight: bold; margin-bottom: 5px;">End Date</label>
-                        <input type="date" name="end_date" value="<?= $opp['end_date'] ?>" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px;">
+                        <label class="mte-vol-edit--label">End Date</label>
+                        <input type="date" name="end_date" value="<?= $opp['end_date'] ?>" class="mte-vol-edit--input">
                     </div>
                 </div>
 
-                <div style="margin-bottom: 20px;">
-                    <label style="display: block; font-weight: bold; margin-bottom: 5px;">Description</label>
-                    <textarea name="description" rows="6" required style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px;"><?= htmlspecialchars($opp['description']) ?></textarea>
+                <div class="mte-vol-edit--form-group">
+                    <label class="mte-vol-edit--label">Description</label>
+                    <textarea name="description" rows="6" required class="mte-vol-edit--input"><?= htmlspecialchars($opp['description']) ?></textarea>
                 </div>
 
-                <div style="display: flex; gap: 10px;">
-                    <button class="htb-btn htb-btn-primary" style="flex: 1;">Save Changes</button>
+                <div class="mte-vol-edit--btn-row">
+                    <button class="htb-btn htb-btn-primary mte-vol-edit--btn-flex">Save Changes</button>
                     <a href="<?= Nexus\Core\TenantContext::getBasePath() ?>/volunteering/dashboard" class="htb-btn htb-btn-secondary">Cancel</a>
                 </div>
             </form>
@@ -74,35 +74,35 @@ require __DIR__ . '/../../layouts/header.php';
     </div>
 
     <!-- Shifts Management -->
-    <div class="htb-card" style="margin-top: 30px;">
+    <div class="htb-card mte-vol-edit--shifts-card">
         <div class="htb-card-body">
             <h3>Manage Shifts</h3>
-            <p style="color:#666; font-size:0.9rem;">Add specific time slots for this opportunity.</p>
+            <p class="mte-vol-edit--shifts-hint">Add specific time slots for this opportunity.</p>
 
             <?php if (!empty($shifts)): ?>
-                <table style="width: 100%; text-align: left; border-collapse: collapse; margin-bottom: 20px;">
+                <table class="mte-vol-edit--table">
                     <thead>
-                        <tr style="border-bottom: 1px solid #eee;">
-                            <th style="padding: 10px;">Time</th>
-                            <th style="padding: 10px;">Capacity</th>
-                            <th style="padding: 10px;">Action</th>
+                        <tr>
+                            <th>Time</th>
+                            <th>Capacity</th>
+                            <th>Action</th>
                         </tr>
                     </thead>
                     <tbody>
                         <?php foreach ($shifts as $shift): ?>
-                            <tr style="border-bottom: 1px solid #f9f9f9;">
-                                <td style="padding: 10px;">
+                            <tr>
+                                <td>
                                     <?= date('M d, Y', strtotime($shift['start_time'])) ?><br>
-                                    <span style="color:#666; font-size:0.85rem;">
+                                    <span class="mte-vol-edit--time-sub">
                                         <?= date('h:i A', strtotime($shift['start_time'])) ?> - <?= date('h:i A', strtotime($shift['end_time'])) ?>
                                     </span>
                                 </td>
-                                <td style="padding: 10px;"><?= $shift['capacity'] ?> vols</td>
-                                <td style="padding: 10px;">
+                                <td><?= $shift['capacity'] ?> vols</td>
+                                <td>
                                     <form action="<?= Nexus\Core\TenantContext::getBasePath() ?>/volunteering/shift/delete" method="POST" onsubmit="return confirm('Are you sure?');">
                                         <?= \Nexus\Core\Csrf::input() ?>
                                         <input type="hidden" name="shift_id" value="<?= $shift['id'] ?>">
-                                        <button style="border:none; background:none; cursor:pointer; color:#ef4444;" title="Delete">🗑️</button>
+                                        <button class="mte-vol-edit--delete-btn" title="Delete">🗑️</button>
                                     </form>
                                 </td>
                             </tr>
@@ -110,30 +110,30 @@ require __DIR__ . '/../../layouts/header.php';
                     </tbody>
                 </table>
             <?php else: ?>
-                <p style="margin-bottom: 20px; font-style: italic; color: #888;">No shifts added yet. This opportunity is "Flexible" by default.</p>
+                <p class="mte-vol-edit--no-shifts">No shifts added yet. This opportunity is "Flexible" by default.</p>
             <?php endif; ?>
 
-            <div style="background: #f9fafb; padding: 15px; border-radius: 6px; border: 1px solid #eee;">
-                <h5 style="margin-top:0;">Add New Shift</h5>
+            <div class="mte-vol-edit--add-shift-box">
+                <h5 class="mte-vol-edit--add-shift-title">Add New Shift</h5>
                 <form action="<?= Nexus\Core\TenantContext::getBasePath() ?>/volunteering/shift/store" method="POST">
                     <?= \Nexus\Core\Csrf::input() ?>
                     <input type="hidden" name="opp_id" value="<?= $opp['id'] ?>">
 
-                    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 10px;">
+                    <div class="mte-vol-edit--shift-grid">
                         <div>
-                            <label style="display: block; font-size: 0.8rem; font-weight: bold;">Start Time</label>
-                            <input type="datetime-local" name="start_time" required style="width: 100%; padding: 6px; border: 1px solid #ddd; border-radius: 4px;">
+                            <label class="mte-vol-edit--shift-label">Start Time</label>
+                            <input type="datetime-local" name="start_time" required class="mte-vol-edit--shift-input">
                         </div>
                         <div>
-                            <label style="display: block; font-size: 0.8rem; font-weight: bold;">End Time</label>
-                            <input type="datetime-local" name="end_time" required style="width: 100%; padding: 6px; border: 1px solid #ddd; border-radius: 4px;">
+                            <label class="mte-vol-edit--shift-label">End Time</label>
+                            <input type="datetime-local" name="end_time" required class="mte-vol-edit--shift-input">
                         </div>
                         <div>
-                            <label style="display: block; font-size: 0.8rem; font-weight: bold;">Capacity</label>
-                            <input type="number" name="capacity" value="1" min="1" required style="width: 100%; padding: 6px; border: 1px solid #ddd; border-radius: 4px;">
+                            <label class="mte-vol-edit--shift-label">Capacity</label>
+                            <input type="number" name="capacity" value="1" min="1" required class="mte-vol-edit--shift-input">
                         </div>
                     </div>
-                    <button class="htb-btn htb-btn-sm" style="background: #4f46e5; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer;">+ Add Shift</button>
+                    <button class="htb-btn htb-btn-sm mte-vol-edit--add-shift-btn">+ Add Shift</button>
                 </form>
             </div>
         </div>
@@ -181,13 +181,13 @@ document.querySelectorAll('form').forEach(form => {
 // Button Press States
 document.querySelectorAll('.htb-btn, button').forEach(btn => {
     btn.addEventListener('pointerdown', function() {
-        this.style.transform = 'scale(0.96)';
+        this.classList.add('pressed');
     });
     btn.addEventListener('pointerup', function() {
-        this.style.transform = '';
+        this.classList.remove('pressed');
     });
     btn.addEventListener('pointerleave', function() {
-        this.style.transform = '';
+        this.classList.remove('pressed');
     });
 });
 

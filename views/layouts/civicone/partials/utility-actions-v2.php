@@ -21,23 +21,23 @@ use Nexus\Services\NotificationService;
 use Nexus\Services\MessageService;
 
 // Get current user and tenant
-$user = Auth::user();
-$isLoggedIn = !empty($user);
+$authUser = Auth::user();
+$isLoggedIn = !empty($authUser);
 $basePath = TenantContext::getBasePath();
 
 // Get unread counts if logged in
 $msgUnread = 0;
 $notifUnread = 0;
 if ($isLoggedIn) {
-    $msgUnread = MessageService::getUnreadCount($user['id'] ?? 0);
-    $notifUnread = NotificationService::getUnreadCount($user['id'] ?? 0);
+    $msgUnread = MessageService::getUnreadCount($authUser['id'] ?? 0);
+    $notifUnread = NotificationService::getUnreadCount($authUser['id'] ?? 0);
 }
 
 // Check if user is god (can switch platforms)
 $isGod = !empty($_SESSION['is_god']);
 
 // Check if user is admin
-$isAdmin = !empty($user['is_admin']) || !empty($_SESSION['is_admin']);
+$isAdmin = !empty($authUser['is_admin']) || !empty($_SESSION['is_admin']);
 
 // Get available tenants for god users
 $tenants = [];
@@ -114,21 +114,21 @@ if ($isGod) {
                         aria-expanded="false"
                         aria-controls="account-dropdown"
                         aria-haspopup="menu">
-                    <?php if (!empty($user['avatar'])): ?>
-                    <img src="<?= htmlspecialchars($user['avatar']) ?>"
+                    <?php if (!empty($authUser['avatar'])): ?>
+                    <img src="<?= htmlspecialchars($authUser['avatar']) ?>"
                          alt=""
                          class="civicone-utility-avatar"
                          width="24"
                          height="24">
                     <?php endif; ?>
-                    <?= htmlspecialchars($user['first_name'] ?? 'Account') ?>
+                    <?= htmlspecialchars($authUser['first_name'] ?? 'Account') ?>
                     <svg class="civicone-chevron" width="10" height="6" viewBox="0 0 10 6" aria-hidden="true" focusable="false">
                         <path fill="currentColor" d="M0 0h10L5 6z"/>
                     </svg>
                 </button>
                 <ul class="civicone-utility-dropdown__panel" id="account-dropdown" role="menu" hidden>
                     <li role="none">
-                        <a href="<?= $basePath ?>/profile/<?= $user['id'] ?? '' ?>" role="menuitem">My profile</a>
+                        <a href="<?= $basePath ?>/profile/<?= $authUser['id'] ?? '' ?>" role="menuitem">My profile</a>
                     </li>
                     <li role="none">
                         <a href="<?= $basePath ?>/dashboard" role="menuitem">Dashboard</a>

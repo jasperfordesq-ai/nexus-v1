@@ -38,7 +38,7 @@
     bottom: 0;
     left: 0;
     right: 0;
-    background: var(--feed-bg-card, #fff);
+    background: var(--feed-bg-card, var(--color-white));
     border-radius: 20px 20px 0 0;
     z-index: 999999 !important;
     transform: translateY(100%);
@@ -161,7 +161,7 @@
 /* Comment input wrapper - stays at bottom */
 .mobile-comment-input-wrap--bottom {
     flex-shrink: 0;
-    border-top: 1px solid var(--feed-border, #e5e7eb);
+    border-top: 1px solid var(--feed-border, var(--color-gray-200));
     padding-top: 12px;
     margin-top: auto;
 }
@@ -185,12 +185,12 @@
 
 /* Sign-in link styling */
 .mobile-sheet-signin-link {
-    color: var(--color-primary-500, #6366f1);
+    color: var(--color-primary-500, var(--color-primary-500));
     font-weight: 500;
 }
 
 .mobile-sheet-signin-link:hover {
-    color: var(--color-primary-600, #4f46e5);
+    color: var(--color-primary-600, var(--color-primary-600));
     text-decoration: underline;
 }
 

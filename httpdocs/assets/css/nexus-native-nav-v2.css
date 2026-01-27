@@ -633,10 +633,10 @@ button.mobile-tab-item,
 /* Different gradient colors for menu items based on position */
 .mobile-menu-item:nth-child(1) i { background: linear-gradient(135deg, var(--color-danger) 0%, var(--color-red-400) 100%); box-shadow: 0 2px 8px rgba(239, 68, 68, 0.25); }
 .mobile-menu-item:nth-child(2) i { background: linear-gradient(135deg, var(--color-info) 0%, var(--color-blue-400) 100%); box-shadow: 0 2px 8px rgba(59, 130, 246, 0.25); }
-.mobile-menu-item:nth-child(3) i { background: linear-gradient(135deg, var(--color-purple-500) 0%, #a78bfa 100%); box-shadow: 0 2px 8px rgba(139, 92, 246, 0.25); }
-.mobile-menu-item:nth-child(4) i { background: linear-gradient(135deg, #14b8a6 0%, #2dd4bf 100%); box-shadow: 0 2px 8px rgba(20, 184, 166, 0.25); }
+.mobile-menu-item:nth-child(3) i { background: linear-gradient(135deg, var(--color-purple-500) 0%, var(--color-purple-400-alt) 100%); box-shadow: 0 2px 8px rgba(139, 92, 246, 0.25); }
+.mobile-menu-item:nth-child(4) i { background: linear-gradient(135deg, var(--color-teal-500) 0%, var(--color-teal-400) 100%); box-shadow: 0 2px 8px rgba(20, 184, 166, 0.25); }
 .mobile-menu-item:nth-child(5) i { background: linear-gradient(135deg, var(--color-warning) 0%, var(--color-amber-300) 100%); box-shadow: 0 2px 8px rgba(245, 158, 11, 0.25); }
-.mobile-menu-item:nth-child(6) i { background: linear-gradient(135deg, var(--color-success) 0%, #34d399 100%); box-shadow: 0 2px 8px rgba(16, 185, 129, 0.25); }
+.mobile-menu-item:nth-child(6) i { background: linear-gradient(135deg, var(--color-success) 0%, var(--color-emerald-400) 100%); box-shadow: 0 2px 8px rgba(16, 185, 129, 0.25); }
 .mobile-menu-item:nth-child(7) i { background: linear-gradient(135deg, var(--color-pink-500) 0%, var(--color-pink-400) 100%); box-shadow: 0 2px 8px rgba(236, 72, 153, 0.25); }
 .mobile-menu-item:nth-child(8) i { background: linear-gradient(135deg, var(--color-cyan-500) 0%, var(--color-cyan-400) 100%); box-shadow: 0 2px 8px rgba(6, 182, 212, 0.25); }
 
@@ -748,7 +748,7 @@ button.mobile-tab-item,
 }
 
 .mobile-menu-stat:nth-child(1) .mobile-menu-stat-value {
-    background: linear-gradient(135deg, var(--color-success) 0%, #34d399 100%);
+    background: linear-gradient(135deg, var(--color-success) 0%, var(--color-emerald-400) 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;

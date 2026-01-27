@@ -258,7 +258,7 @@
     left: 50%;
     transform: translateX(-50%);
     background: var(--civic-brand);
-    color: #fff;
+    color: var(--color-white);
     padding: var(--space-4) var(--space-8);
     border-radius: var(--radius-base);
     font-weight: var(--font-weight-semibold);
@@ -330,7 +330,7 @@
 
 .civic-share-option:hover {
     background: var(--civic-brand);
-    color: #fff;
+    color: var(--color-white);
     border-color: var(--civic-brand);
 }
 

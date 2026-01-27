@@ -1,18 +1,19 @@
 <?php
 // Phoenix View: Edit Tenant (Super Admin)
 // Path: views/modern/master/edit-tenant.php
+//
+// CSS extracted to: httpdocs/assets/css/modern-template-extracts.css
+// Section: views/modern/master/edit-tenant.php
 
-// Protect the target tenant data from Header/Context overwrites
 // Protect the target tenant data from Header/Context overwrites
 $targetTenant = $tenant;
 $controllerTenantId = $tenant['id'] ?? 'NULL';
 
 $tName = htmlspecialchars($targetTenant['name']);
 
-$tName = htmlspecialchars($targetTenant['name']);
 $hTitle = 'Configure ' . $tName;
 $hSubtitle = 'Manage Sub-Account Settings';
-$hGradient = 'mt-hero-gradient-brand'; // Use brand gradient
+$hGradient = 'mt-hero-gradient-brand';
 $hType = 'Super Admin';
 
 require dirname(__DIR__, 2) . '/layouts/modern/header.php';
@@ -36,22 +37,22 @@ $modules = [
 <div class="super-admin-wrapper">
 
     <!-- Centered Container for Intelligent Layout -->
-    <div style="max-width: 900px; margin: 0 auto; display: flex; flex-direction: column; gap: 40px;">
+    <div class="mte-edit-tenant--container">
 
         <!-- Main Configuration Card -->
         <div class="nexus-card">
-            <header class="nexus-card-header" style="display:flex; justify-content:space-between; align-items:center; border-bottom: 1px solid rgba(0,0,0,0.05);">
-                <div style="display:flex; align-items:center; gap:12px;">
-                    <div style="background:var(--primary); color:white; width:40px; height:40px; border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:1.2rem;">⚙️</div>
+            <header class="nexus-card-header mte-edit-tenant--card-header">
+                <div class="mte-edit-tenant--header-left">
+                    <div class="mte-edit-tenant--icon-box mte-edit-tenant--icon-box-primary">⚙️</div>
                     <div>
-                        <h3 style="margin:0; font-size:1.1rem;">General Settings</h3>
-                        <div style="font-size:0.85rem; color:var(--nexus-text-muted);">Core configuration for this timebank</div>
+                        <h3 class="mte-edit-tenant--header-title">General Settings</h3>
+                        <div class="mte-edit-tenant--header-subtitle">Core configuration for this timebank</div>
                     </div>
                 </div>
                 <a href="<?= \Nexus\Core\TenantContext::getBasePath() ?>/super-admin" class="nexus-btn nexus-btn-sm nexus-btn-secondary">Back to Dashboard</a>
             </header>
 
-            <div class="nexus-card-body" style="padding: 30px;">
+            <div class="nexus-card-body mte-edit-tenant--card-body">
                 <?php if (!empty($_GET['debug'])): ?>
                     <div class="nexus-alert nexus-alert-info">
                         <strong>Debug Config:</strong> <?= htmlspecialchars($targetTenant['configuration']) ?>
@@ -62,103 +63,93 @@ $modules = [
                     <input type="hidden" name="id" value="<?= $targetTenant['id'] ?>">
 
                     <!-- Inner Box: Basic Info -->
-                    <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 25px; margin-bottom: 30px;">
-                        <h4 style="margin:0 0 20px 0; color:#475569; font-size:0.95rem; text-transform:uppercase; letter-spacing:0.5px; border-bottom:1px solid #e2e8f0; padding-bottom:10px;">Basic Information</h4>
+                    <div class="mte-edit-tenant--inner-box">
+                        <h4 class="mte-edit-tenant--section-title">Basic Information</h4>
 
-                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px;">
+                        <div class="mte-edit-tenant--form-grid">
                             <div>
-                                <label style="font-weight: 600; font-size: 0.9rem; display: block; margin-bottom: 8px;">TimeBank Name</label>
+                                <label class="mte-edit-tenant--form-label">TimeBank Name</label>
                                 <input type="text" name="name" class="nexus-input" value="<?= $tName ?>" required>
                             </div>
                             <div>
-                                <label style="font-weight: 600; font-size: 0.9rem; display: block; margin-bottom: 8px;">URL Slug</label>
-                                <div style="display:flex; align-items:center;">
-                                    <span style="background:#fff; padding:12px 15px; border:1px solid #e2e8f0; border-right:0; border-radius:10px 0 0 10px; color:#6b7280; font-family: monospace;">platform.url/</span>
-                                    <input type="text" name="slug" class="nexus-input" value="<?= htmlspecialchars($targetTenant['slug']) ?>" required style="border-radius: 0 10px 10px 0;">
+                                <label class="mte-edit-tenant--form-label">URL Slug</label>
+                                <div class="mte-edit-tenant--input-group">
+                                    <span class="mte-edit-tenant--input-prefix">platform.url/</span>
+                                    <input type="text" name="slug" class="nexus-input mte-edit-tenant--input-suffix" value="<?= htmlspecialchars($targetTenant['slug']) ?>" required>
                                 </div>
                             </div>
                         </div>
 
-                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px;">
+                        <div class="mte-edit-tenant--form-grid">
                             <div>
-                                <label style="font-weight: 600; font-size: 0.9rem; display: block; margin-bottom: 8px;">Custom Domain (Optional)</label>
+                                <label class="mte-edit-tenant--form-label">Custom Domain (Optional)</label>
                                 <input type="text" name="domain" class="nexus-input" value="<?= htmlspecialchars($targetTenant['domain'] ?? '') ?>" placeholder="e.g. timebank.cork.ie">
                             </div>
 
                             <div>
-                                <label style="font-weight: 600; font-size: 0.9rem; display: block; margin-bottom: 8px;">Tagline</label>
+                                <label class="mte-edit-tenant--form-label">Tagline</label>
                                 <input type="text" name="tagline" class="nexus-input" value="<?= htmlspecialchars($targetTenant['tagline'] ?? '') ?>" placeholder="e.g. Connecting the community">
                             </div>
                         </div>
 
-                        <label style="font-weight: 600; font-size: 0.9rem; display: block; margin-bottom: 8px;">Description</label>
+                        <label class="mte-edit-tenant--form-label">Description</label>
                         <textarea name="description" class="nexus-input" rows="3"><?= htmlspecialchars($targetTenant['description'] ?? '') ?></textarea>
                     </div>
 
                     <?php $config = json_decode($targetTenant['configuration'] ?? '[]', true); ?>
-                    <div style="margin-top: 20px;">
-                        <label style="font-weight: 600; font-size: 0.9rem; display: block; margin-bottom: 8px;">Tenant Footer Text</label>
+                    <div>
+                        <label class="mte-edit-tenant--form-label">Tenant Footer Text</label>
                         <textarea name="footer_text" class="nexus-input" rows="2" placeholder="e.g. Registered Charity Number: 12345"><?= htmlspecialchars($config['footer_text'] ?? '') ?></textarea>
-                        <p style="font-size: 0.8rem; color: #6b7280; margin-top: 5px;">This text will appear above the footer on all public pages.</p>
+                        <p class="mte-edit-tenant--form-hint">This text will appear above the footer on all public pages.</p>
                     </div>
 
                     <!-- Legal Docs -->
-                    <div style="margin-top: 30px; border-top: 1px solid #e2e8f0; padding-top: 20px;">
-                        <h4 style="margin:0 0 20px 0; color:#475569; font-size:0.95rem; text-transform:uppercase; letter-spacing:0.5px;">Legal Documents</h4>
+                    <div class="mte-edit-tenant--section-divider">
+                        <h4 class="mte-edit-tenant--section-title">Legal Documents</h4>
 
-                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px;">
+                        <div class="mte-edit-tenant--form-grid">
                             <div>
-                                <label style="font-weight: 600; font-size: 0.9rem; display: block; margin-bottom: 8px;">Privacy Policy</label>
+                                <label class="mte-edit-tenant--form-label">Privacy Policy</label>
                                 <textarea name="privacy_text" class="nexus-input" rows="8" placeholder="Enter custom Privacy Policy text..."><?= htmlspecialchars($config['privacy_text'] ?? '') ?></textarea>
                             </div>
                             <div>
-                                <label style="font-weight: 600; font-size: 0.9rem; display: block; margin-bottom: 8px;">Terms of Service</label>
+                                <label class="mte-edit-tenant--form-label">Terms of Service</label>
                                 <textarea name="terms_text" class="nexus-input" rows="8" placeholder="Enter custom Terms of Service text..."><?= htmlspecialchars($config['terms_text'] ?? '') ?></textarea>
                             </div>
                         </div>
-                        <p style="font-size: 0.8rem; color: #6b7280; margin-top: 10px;">If left blank, the platform default legal pages will be displayed.</p>
+                        <p class="mte-edit-tenant--form-hint">If left blank, the platform default legal pages will be displayed.</p>
                     </div>
             </div>
 
             <!-- Module Grid -->
-            <div style="margin-bottom: 30px;">
-                <div style="display:flex; align-items:center; gap:10px; margin-bottom:15px; border-bottom:1px solid #eee; padding-bottom:10px;">
-                    <h4 style="margin:0; font-size:1rem;">📦 Module Installation</h4>
-                    <span style="font-size:0.8rem; background:#eff6ff; color:#1d4ed8; padding:2px 8px; border-radius:4px;">Drag & Drop Disabled</span>
+            <div class="mte-edit-tenant--module-section">
+                <div class="mte-edit-tenant--module-header">
+                    <h4 class="mte-edit-tenant--module-title">📦 Module Installation</h4>
+                    <span class="mte-edit-tenant--module-badge">Drag & Drop Disabled</span>
                 </div>
 
-                <div style="display:grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap:15px;">
+                <div class="mte-edit-tenant--module-grid">
                     <?php foreach ($modules as $key => $mod):
-                        $isActive = $feats[$key] ?? ($key === 'blog'); // Blog default true
+                        $isActive = $feats[$key] ?? ($key === 'blog');
                     ?>
-                        <label style="
-                                    display: flex; 
-                                    align-items: center; 
-                                    padding: 15px; 
-                                    border: 1px solid <?= $isActive ? '#4f46e5' : '#e5e7eb' ?>; 
-                                    border-radius: 12px; 
-                                    background: <?= $isActive ? 'rgba(79, 70, 229, 0.05)' : '#fff' ?>; 
-                                    cursor: pointer;
-                                    transition: all 0.2s;
-                                    box-shadow: 0 2px 4px rgba(0,0,0,0.02);
-                                ">
-                            <input type="checkbox" name="feat_<?= $key ?>" <?= $isActive ? 'checked' : '' ?> style="margin-right: 15px; width: 20px; height: 20px; accent-color: #4f46e5;">
-                            <div style="flex:1;">
-                                <div style="font-weight:600; font-size:0.95rem; color:#1f2937;"><?= $mod['label'] ?></div>
-                                <div style="font-size:0.8rem; color:<?= $isActive ? '#4f46e5' : '#9ca3af' ?>;">
+                        <label class="mte-edit-tenant--module-card" data-active="<?= $isActive ? 'true' : 'false' ?>">
+                            <input type="checkbox" name="feat_<?= $key ?>" <?= $isActive ? 'checked' : '' ?> class="mte-edit-tenant--module-checkbox">
+                            <div class="mte-edit-tenant--module-info">
+                                <div class="mte-edit-tenant--module-name"><?= $mod['label'] ?></div>
+                                <div class="mte-edit-tenant--module-status">
                                     <?= $isActive ? 'Active Module' : 'Not Installed' ?>
                                 </div>
                             </div>
-                            <div style="background:<?= $isActive ? '#e0e7ff' : '#f3f4f6' ?>; width:36px; height:36px; border-radius:8px; display:flex; align-items:center; justify-content:center;">
-                                <span class="dashicons dashicons-<?= $mod['icon'] ?>" style="font-size: 20px; color: <?= $isActive ? '#4f46e5' : '#9ca3af' ?>;"></span>
+                            <div class="mte-edit-tenant--module-icon-box">
+                                <span class="dashicons dashicons-<?= $mod['icon'] ?> mte-edit-tenant--module-icon"></span>
                             </div>
                         </label>
                     <?php endforeach; ?>
                 </div>
             </div>
 
-            <div style="text-align:right;">
-                <button type="submit" class="nexus-btn nexus-btn-primary" style="padding: 12px 30px; font-size:1rem; box-shadow: 0 4px 6px -1px rgba(79, 70, 229, 0.2);">
+            <div class="mte-edit-tenant--submit-row">
+                <button type="submit" class="nexus-btn nexus-btn-primary mte-edit-tenant--submit-btn">
                     Save Tenant Configuration
                 </button>
             </div>
@@ -166,42 +157,42 @@ $modules = [
         </div>
     </div>
 
-    <!-- Tenant Admins Section (Refactored to match) -->
+    <!-- Tenant Admins Section -->
     <div class="nexus-card">
-        <header class="nexus-card-header" style="border-bottom: 1px solid rgba(0,0,0,0.05);">
-            <div style="display:flex; align-items:center; gap:12px;">
-                <div style="background:#10b981; color:white; width:40px; height:40px; border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:1.2rem;">🛡️</div>
+        <header class="nexus-card-header mte-edit-tenant--card-header">
+            <div class="mte-edit-tenant--header-left">
+                <div class="mte-edit-tenant--icon-box mte-edit-tenant--icon-box-success">🛡️</div>
                 <div>
-                    <h3 style="margin:0; font-size:1.1rem;">Tenant Administrators</h3>
-                    <div style="font-size:0.85rem; color:var(--nexus-text-muted);">Manage access for this sub-account</div>
+                    <h3 class="mte-edit-tenant--header-title">Tenant Administrators</h3>
+                    <div class="mte-edit-tenant--header-subtitle">Manage access for this sub-account</div>
                 </div>
             </div>
         </header>
 
-        <div class="nexus-card-body" style="padding: 30px;">
+        <div class="nexus-card-body mte-edit-tenant--card-body">
             <!-- Inner Box for Admins -->
-            <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 20px; margin-bottom: 25px;">
-                <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 15px;">
+            <div class="mte-edit-tenant--inner-box">
+                <div class="mte-edit-tenant--admin-grid">
                     <?php if (empty($admins)): ?>
-                        <div style="grid-column: 1 / -1; padding: 15px; background: #fff1f2; color: #be123c; border-radius: 8px; font-size: 0.9rem; text-align: center; border:1px solid #fecdd3;">
+                        <div class="mte-edit-tenant--admin-empty">
                             No admins assigned! This TimeBank cannot be managed by anyone properly.
                         </div>
                     <?php else: ?>
                         <?php foreach ($admins as $a): ?>
-                            <div style="display: flex; justify-content: space-between; align-items: center; padding: 15px; background: #fff; border: 1px solid #e2e8f0; border-radius: 10px; box-shadow: 0 1px 2px rgba(0,0,0,0.02);">
-                                <div style="display:flex; align-items:center; gap:12px; overflow: hidden;">
-                                    <div style="width:36px; height:36px; background:#f3f4f6; border-radius:50%; display:flex; align-items:center; justify-content:center; color:#6b7280; font-weight:bold;">
+                            <div class="mte-edit-tenant--admin-card">
+                                <div class="mte-edit-tenant--admin-info">
+                                    <div class="mte-edit-tenant--admin-avatar">
                                         <?= strtoupper(substr($a['name'], 0, 1)) ?>
                                     </div>
                                     <div>
-                                        <div style="font-weight: 600; font-size: 0.95rem; color:#1f2937;"><?= htmlspecialchars($a['name']) ?></div>
-                                        <div style="font-size: 0.8rem; color: #6b7280; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;"><?= htmlspecialchars($a['email']) ?></div>
+                                        <div class="mte-edit-tenant--admin-name"><?= htmlspecialchars($a['name']) ?></div>
+                                        <div class="mte-edit-tenant--admin-email"><?= htmlspecialchars($a['email']) ?></div>
                                     </div>
                                 </div>
-                                <form action="<?= \Nexus\Core\TenantContext::getBasePath() ?>/super-admin/tenant/delete-admin" method="POST" onsubmit="return confirm('Revoke access for this admin?');" style="margin:0;">
+                                <form action="<?= \Nexus\Core\TenantContext::getBasePath() ?>/super-admin/tenant/delete-admin" method="POST" onsubmit="return confirm('Revoke access for this admin?');">
                                     <input type="hidden" name="tenant_id" value="<?= $targetTenant['id'] ?>">
                                     <input type="hidden" name="admin_id" value="<?= $a['id'] ?>">
-                                    <button type="submit" style="background:none; border:none; color:#ef4444; font-size:1.4rem; cursor:pointer; line-height: 1; padding:0 5px;">&times;</button>
+                                    <button type="submit" class="mte-edit-tenant--admin-delete-btn">&times;</button>
                                 </form>
                             </div>
                         <?php endforeach; ?>
@@ -209,24 +200,24 @@ $modules = [
                 </div>
             </div>
 
-            <div style="border-top: 1px solid #e5e7eb; padding-top: 25px;">
-                <h5 style="margin:0 0 15px 0; color:#374151;">Grant Access to New Admin</h5>
-                <form action="<?= \Nexus\Core\TenantContext::getBasePath() ?>/super-admin/admin/add" method="POST" style="background: #fff; padding: 20px; border:1px solid #e2e8f0; border-radius: 12px;">
+            <div class="mte-edit-tenant--add-admin-section">
+                <h5 class="mte-edit-tenant--add-admin-title">Grant Access to New Admin</h5>
+                <form action="<?= \Nexus\Core\TenantContext::getBasePath() ?>/super-admin/admin/add" method="POST" class="mte-edit-tenant--add-admin-form">
                     <input type="hidden" name="tenant_id" value="<?= $targetTenant['id'] ?>">
-                    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr auto; gap: 15px; align-items: end;">
+                    <div class="mte-edit-tenant--add-admin-grid">
                         <div>
-                            <label style="display:block; font-size:0.8rem; color:#6b7280; margin-bottom:5px;">Full Name</label>
+                            <label class="mte-edit-tenant--add-admin-label">Full Name</label>
                             <input type="text" name="name" class="nexus-input" placeholder="e.g. John Doe" required>
                         </div>
                         <div>
-                            <label style="display:block; font-size:0.8rem; color:#6b7280; margin-bottom:5px;">Email Address</label>
+                            <label class="mte-edit-tenant--add-admin-label">Email Address</label>
                             <input type="email" name="email" class="nexus-input" placeholder="john@example.com" required>
                         </div>
                         <div>
-                            <label style="display:block; font-size:0.8rem; color:#6b7280; margin-bottom:5px;">Password</label>
+                            <label class="mte-edit-tenant--add-admin-label">Password</label>
                             <input type="password" name="password" class="nexus-input" placeholder="Create generic password" required>
                         </div>
-                        <button type="submit" class="nexus-btn nexus-btn-secondary" style="height: 42px;">Grant Access</button>
+                        <button type="submit" class="nexus-btn nexus-btn-secondary mte-edit-tenant--add-admin-submit">Grant Access</button>
                     </div>
                 </form>
             </div>
@@ -234,10 +225,10 @@ $modules = [
     </div>
 
     <!-- Danger Zone -->
-    <div style="opacity: 0.7; transition: opacity 0.2s; text-align: center;">
-        <div style="display:inline-block; padding: 15px 30px; border: 1px dashed #ef4444; border-radius: 12px; background: #fef2f2;">
-            <div style="color: #991b1b; font-weight: 700; font-size: 0.9rem; margin-bottom: 5px;">⚠️ Danger Zone</div>
-            <div style="font-size: 0.8rem; color: #b91c1c;">Tenant deletion is currently disabled. Contact system administrator.</div>
+    <div class="mte-edit-tenant--danger-zone">
+        <div class="mte-edit-tenant--danger-box">
+            <div class="mte-edit-tenant--danger-title">⚠️ Danger Zone</div>
+            <div class="mte-edit-tenant--danger-text">Tenant deletion is currently disabled. Contact system administrator.</div>
         </div>
     </div>
 

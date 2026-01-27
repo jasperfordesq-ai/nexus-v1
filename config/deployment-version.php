@@ -7,7 +7,7 @@
  */
 
 return [
-    'version' => '2026.01.25.003',
-    'timestamp' => 1769369719,
-    'description' => 'Auto-deployed 2026-01-25 19:35:20'
+    'version' => '2026.01.27.001',
+    'timestamp' => 1769511795,
+    'description' => 'Auto-deployed 2026-01-27 11:03:15'
 ];

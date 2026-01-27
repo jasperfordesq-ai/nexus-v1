@@ -80,7 +80,7 @@
 }
 
 .ai-new-chat-btn:focus-visible {
-    outline: var(--space-0-5) solid #fff;
+    outline: var(--space-0-5) solid var(--color-white);
     outline-offset: var(--space-0-5);
 }
 
@@ -1547,7 +1547,7 @@
         line-height: 1.6;
 
         /* Background: Adaptive Mesh Gradient (Orange/Amber) */
-        background: radial-gradient(circle at 50% 0%, #fff7ed 0%, #ffedd5 100%);
+        background: radial-gradient(circle at 50% 0%, var(--color-white)7ed 0%, #ffedd5 100%);
         background-attachment: fixed;
     }
 
@@ -1570,7 +1570,7 @@
         --pill-bg: var(--effect-white-25);
         --input-bg: var(--effect-white-35);
 
-        background: radial-gradient(circle at 50% 0%, #fff7ed 0%, #ffedd5 100%);
+        background: radial-gradient(circle at 50% 0%, var(--color-white)7ed 0%, #ffedd5 100%);
     }
 
     /* DARK MODE EXPLICIT */
@@ -4013,7 +4013,7 @@ a.leaderboard-row {
         border-color: var(--effect-white-10) !important;
     }
 
-    [data-theme="dark"] table tr[style*="background: #fff"] {
+    [data-theme="dark"] table tr[style*="background: var(--color-white)"] {
         background: var(--effect-slate-40) !important;
     }
 
@@ -4083,7 +4083,7 @@ a.leaderboard-row {
         color: var(--color-slate-100) !important;
     }
 
-    [data-theme="dark"] span[style*="background:#fff"][style*="border:1px solid var(--color-slate-200)"] {
+    [data-theme="dark"] span[style*="background:var(--color-white)"][style*="border:1px solid var(--color-slate-200)"] {
         background: var(--effect-slate-60) !important;
         border-color: var(--effect-white-15) !important;
         color: var(--color-slate-400) !important;
@@ -4167,7 +4167,7 @@ a.leaderboard-row {
     }
 
     /* URL slug prefix */
-    [data-theme="dark"] span[style*="background:#fff"][style*="border:1px solid var(--color-slate-200)"] {
+    [data-theme="dark"] span[style*="background:var(--color-white)"][style*="border:1px solid var(--color-slate-200)"] {
         background: var(--effect-slate-60) !important;
         border-color: var(--effect-white-15) !important;
         color: var(--color-slate-400) !important;
@@ -4203,7 +4203,7 @@ a.leaderboard-row {
     }
 
     /* Module cards - inactive */
-    [data-theme="dark"] label[style*="border: 1px solid"][style*="var(--color-gray-200)"][style*="background:"][style*="#fff"] {
+    [data-theme="dark"] label[style*="border: 1px solid"][style*="var(--color-gray-200)"][style*="background:"][style*="var(--color-white)"] {
         background: var(--effect-slate-40) !important;
         border-color: var(--effect-white-10) !important;
     }
@@ -4235,7 +4235,7 @@ a.leaderboard-row {
     }
 
     /* Tenant Admins section */
-    [data-theme="dark"] div[style*="background: #fff"][style*="border: 1px solid var(--color-slate-200)"] {
+    [data-theme="dark"] div[style*="background: var(--color-white)"][style*="border: 1px solid var(--color-slate-200)"] {
         background: var(--effect-slate-40) !important;
         border-color: var(--effect-white-10) !important;
     }
@@ -4250,7 +4250,7 @@ a.leaderboard-row {
     }
 
     /* No admins warning */
-    [data-theme="dark"] div[style*="background: #fff1f2"][style*="color: var(--color-rose-700)"] {
+    [data-theme="dark"] div[style*="background: var(--color-white)1f2"][style*="color: var(--color-rose-700)"] {
         background: var(--effect-red-15) !important;
         border-color: var(--effect-red-30) !important;
         color: var(--color-red-300) !important;
@@ -4261,7 +4261,7 @@ a.leaderboard-row {
         color: var(--color-slate-200) !important;
     }
 
-    [data-theme="dark"] form[style*="background: #fff"][style*="border:1px solid var(--color-slate-200)"] {
+    [data-theme="dark"] form[style*="background: var(--color-white)"][style*="border:1px solid var(--color-slate-200)"] {
         background: var(--effect-slate-40) !important;
         border-color: var(--effect-white-10) !important;
     }
@@ -4276,7 +4276,7 @@ a.leaderboard-row {
         border-color: var(--effect-red-40) !important;
     }
 
-    [data-theme="dark"] div[style*="color: #991b1b"] {
+    [data-theme="dark"] div[style*="color: var(--color-red-800)"] {
         color: var(--color-red-300) !important;
     }
 

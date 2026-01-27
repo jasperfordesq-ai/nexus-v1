@@ -34,12 +34,12 @@
 
 @keyframes pwaIconGlow {
     0%, 100% {
-        box-shadow: 0 8px 32px rgba(99, 102, 241, 0.3),
-                    0 0 0 0 rgba(99, 102, 241, 0.2);
+        box-shadow: 0 8px 32px var(--effect-primary-30),
+                    0 0 0 0 var(--effect-primary-20);
     }
     50% {
-        box-shadow: 0 12px 48px rgba(99, 102, 241, 0.4),
-                    0 0 0 8px rgba(99, 102, 241, 0.1);
+        box-shadow: 0 12px 48px var(--effect-primary-40),
+                    0 0 0 8px var(--effect-primary-10);
     }
 }
 
@@ -82,7 +82,7 @@
     z-index: var(--z-toast, 400);
     transform: translateY(-100%);
     transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+    border-bottom: 1px solid var(--effect-white-20);
 }
 
 .nexus-pwa-update-banner.visible {
@@ -106,12 +106,12 @@
 
 .nexus-pwa-update-content span {
     font-weight: 600;
-    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+    text-shadow: 0 1px 2px var(--effect-black-10);
 }
 
 .nexus-pwa-update-btn {
     background: rgba(255, 255, 255, 0.95);
-    color: #6366f1;
+    color: var(--color-primary-500);
     border: none;
     padding: 8px 16px;
     border-radius: 10px;
@@ -119,12 +119,12 @@
     font-size: 0.875rem;
     cursor: pointer;
     transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 2px 8px var(--effect-black-10);
 }
 
 .nexus-pwa-update-btn:hover {
     transform: translateY(-2px) scale(1.02);
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+    box-shadow: 0 4px 16px var(--effect-black-15);
 }
 
 .nexus-pwa-update-btn:active {
@@ -160,8 +160,8 @@
     -webkit-backdrop-filter: blur(24px) saturate(180%);
     border-radius: 20px;
     padding: 20px;
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.12),
-                0 8px 24px rgba(99, 102, 241, 0.08),
+    box-shadow: 0 20px 60px var(--effect-black-12),
+                0 8px 24px var(--effect-primary-8),
                 inset 0 1px 0 rgba(255, 255, 255, 0.8);
     display: flex;
     flex-wrap: wrap;
@@ -175,7 +175,7 @@
 .nexus-notification-prompt-icon {
     width: 52px;
     height: 52px;
-    background: linear-gradient(135deg, #f59e0b 0%, #f97316 100%);
+    background: linear-gradient(135deg, var(--color-amber-500) 0%, #f97316 100%);
     border-radius: 14px;
     display: flex;
     align-items: center;
@@ -196,14 +196,14 @@
     margin: 0 0 4px;
     font-size: 1rem;
     font-weight: 700;
-    color: #111827;
+    color: var(--color-gray-900);
     letter-spacing: -0.01em;
 }
 
 .nexus-notification-prompt-text p {
     margin: 0;
     font-size: 0.875rem;
-    color: #6b7280;
+    color: var(--color-gray-500);
     line-height: 1.5;
 }
 
@@ -227,7 +227,7 @@
 
 .nexus-prompt-btn-secondary {
     background: rgba(107, 114, 128, 0.1);
-    color: #374151;
+    color: var(--color-gray-700);
 }
 
 .nexus-prompt-btn-secondary:hover {
@@ -236,14 +236,14 @@
 }
 
 .nexus-prompt-btn-primary {
-    background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+    background: linear-gradient(135deg, var(--color-primary-500) 0%, var(--color-purple-500) 100%);
     color: white;
-    box-shadow: 0 4px 14px rgba(99, 102, 241, 0.35);
+    box-shadow: 0 4px 14px var(--effect-primary-35);
 }
 
 .nexus-prompt-btn-primary:hover {
     transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(99, 102, 241, 0.45);
+    box-shadow: 0 6px 20px var(--effect-primary-45);
 }
 
 .nexus-prompt-btn-secondary:active,
@@ -294,8 +294,8 @@
     position: relative;
     transform: translateY(100%);
     transition: transform 0.5s cubic-bezier(0.32, 0.72, 0, 1);
-    box-shadow: 0 -20px 60px rgba(0, 0, 0, 0.15),
-                0 -8px 24px rgba(99, 102, 241, 0.1),
+    box-shadow: 0 -20px 60px var(--effect-black-15),
+                0 -8px 24px var(--effect-primary-10),
                 inset 0 1px 0 rgba(255, 255, 255, 0.9);
     border: 1px solid rgba(255, 255, 255, 0.8);
     border-bottom: none;
@@ -315,8 +315,8 @@
     height: 1px;
     background: linear-gradient(90deg,
         transparent 0%,
-        rgba(99, 102, 241, 0.3) 25%,
-        rgba(139, 92, 246, 0.5) 50%,
+        var(--effect-primary-30) 25%,
+        var(--effect-purple-50) 50%,
         rgba(236, 72, 153, 0.3) 75%,
         transparent 100%);
     background-size: 200% 100%;
@@ -330,9 +330,9 @@
     width: 40px;
     height: 5px;
     background: linear-gradient(90deg,
-        rgba(99, 102, 241, 0.3) 0%,
-        rgba(139, 92, 246, 0.4) 50%,
-        rgba(99, 102, 241, 0.3) 100%);
+        var(--effect-primary-30) 0%,
+        var(--effect-purple-40) 50%,
+        var(--effect-primary-30) 100%);
     border-radius: 3px;
     margin: 0 auto 20px;
 }
@@ -347,13 +347,13 @@
     background: rgba(107, 114, 128, 0.1);
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 255, 255, 0.3);
+    border: 1px solid var(--effect-white-30);
     border-radius: 50%;
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
-    color: #6b7280;
+    color: var(--color-gray-500);
     font-size: 1rem;
     transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
@@ -361,7 +361,7 @@
 .nexus-install-close:hover {
     background: rgba(107, 114, 128, 0.15);
     transform: scale(1.05);
-    color: #374151;
+    color: var(--color-gray-700);
 }
 
 .nexus-install-close:active {
@@ -378,8 +378,8 @@
     width: 88px;
     height: 88px;
     border-radius: 22px;
-    box-shadow: 0 16px 48px rgba(99, 102, 241, 0.3),
-                0 8px 24px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 16px 48px var(--effect-primary-30),
+                0 8px 24px var(--effect-black-10);
     animation: pwaIconFloat 4s ease-in-out infinite,
                pwaIconGlow 3s ease-in-out infinite;
     border: 3px solid rgba(255, 255, 255, 0.9);
@@ -390,7 +390,7 @@
     margin: 0 0 8px;
     font-size: 1.75rem;
     font-weight: 800;
-    background: linear-gradient(135deg, #111827 0%, #374151 100%);
+    background: linear-gradient(135deg, var(--color-gray-900) 0%, var(--color-gray-700) 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -402,7 +402,7 @@
 .nexus-install-description {
     margin: 0 0 24px;
     font-size: 1rem;
-    color: #6b7280;
+    color: var(--color-gray-500);
     line-height: 1.6;
     max-width: 320px;
     margin-left: auto;
@@ -427,7 +427,7 @@
     gap: 10px;
     font-size: 0.8125rem;
     font-weight: 600;
-    color: #4b5563;
+    color: var(--color-gray-600);
     transition: all 0.3s ease;
 }
 
@@ -439,19 +439,19 @@
     width: 56px;
     height: 56px;
     background: linear-gradient(135deg,
-        rgba(99, 102, 241, 0.12) 0%,
-        rgba(139, 92, 246, 0.15) 100%);
+        var(--effect-primary-12) 0%,
+        var(--effect-purple-15) 100%);
     backdrop-filter: blur(8px);
     -webkit-backdrop-filter: blur(8px);
     border-radius: 16px;
     display: flex;
     align-items: center;
     justify-content: center;
-    color: #6366f1;
+    color: var(--color-primary-500);
     font-size: 1.375rem;
-    border: 1px solid rgba(99, 102, 241, 0.2);
-    box-shadow: 0 4px 16px rgba(99, 102, 241, 0.1),
-                inset 0 1px 0 rgba(255, 255, 255, 0.5);
+    border: 1px solid var(--effect-primary-20);
+    box-shadow: 0 4px 16px var(--effect-primary-10),
+                inset 0 1px 0 var(--effect-white-50);
     transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
     position: relative;
     overflow: hidden;
@@ -467,7 +467,7 @@
     height: 100%;
     background: linear-gradient(90deg,
         transparent 0%,
-        rgba(255, 255, 255, 0.3) 50%,
+        var(--effect-white-30) 50%,
         transparent 100%);
     transition: left 0.5s ease;
     pointer-events: none;
@@ -479,8 +479,8 @@
 
 .nexus-install-feature:hover i {
     transform: scale(1.1);
-    box-shadow: 0 8px 24px rgba(99, 102, 241, 0.25);
-    border-color: rgba(99, 102, 241, 0.4);
+    box-shadow: 0 8px 24px var(--effect-primary-25);
+    border-color: var(--effect-primary-40);
 }
 
 /* ============================================
@@ -512,7 +512,7 @@
 
 .nexus-install-btn-secondary {
     background: rgba(107, 114, 128, 0.08);
-    color: #374151;
+    color: var(--color-gray-700);
     border: 1px solid rgba(107, 114, 128, 0.15);
 }
 
@@ -522,10 +522,10 @@
 }
 
 .nexus-install-btn-primary {
-    background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+    background: linear-gradient(135deg, var(--color-primary-500) 0%, var(--color-purple-500) 100%);
     color: white;
-    box-shadow: 0 8px 24px rgba(99, 102, 241, 0.4),
-                inset 0 1px 0 rgba(255, 255, 255, 0.2);
+    box-shadow: 0 8px 24px var(--effect-primary-40),
+                inset 0 1px 0 var(--effect-white-20);
 }
 
 /* Holographic shimmer on primary button */
@@ -538,7 +538,7 @@
     height: 100%;
     background: linear-gradient(90deg,
         transparent 0%,
-        rgba(255, 255, 255, 0.2) 50%,
+        var(--effect-white-20) 50%,
         transparent 100%);
     transition: left 0.5s ease;
 }
@@ -561,7 +561,7 @@
 .nexus-install-btn-text {
     background: none;
     border: none;
-    color: #9ca3af;
+    color: var(--color-gray-400);
     font-size: 0.875rem;
     font-weight: 500;
     cursor: pointer;
@@ -572,7 +572,7 @@
 }
 
 .nexus-install-btn-text:hover {
-    color: #6b7280;
+    color: var(--color-gray-500);
 }
 
 /* ============================================
@@ -597,17 +597,17 @@
     gap: 12px;
     padding: 16px;
     background: linear-gradient(135deg,
-        rgba(99, 102, 241, 0.08) 0%,
+        var(--effect-primary-8) 0%,
         rgba(139, 92, 246, 0.05) 100%);
     font-weight: 700;
     font-size: 1rem;
-    color: #111827;
-    border-bottom: 1px solid rgba(99, 102, 241, 0.1);
+    color: var(--color-gray-900);
+    border-bottom: 1px solid var(--effect-primary-10);
 }
 
 .nexus-install-section-header i {
     font-size: 1.25rem;
-    color: #6366f1;
+    color: var(--color-primary-500);
 }
 
 .nexus-install-section-apk .nexus-install-section-header {
@@ -618,7 +618,7 @@
 }
 
 .nexus-install-section-apk .nexus-install-section-header i {
-    color: #10b981;
+    color: var(--color-emerald-500);
 }
 
 .nexus-install-section-tag {
@@ -629,13 +629,13 @@
     letter-spacing: 0.5px;
     padding: 4px 10px;
     border-radius: 6px;
-    background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+    background: linear-gradient(135deg, var(--color-primary-500) 0%, var(--color-purple-500) 100%);
     color: white;
-    box-shadow: 0 2px 8px rgba(99, 102, 241, 0.3);
+    box-shadow: 0 2px 8px var(--effect-primary-30);
 }
 
 .nexus-install-section-tag-green {
-    background: linear-gradient(135deg, #10b981 0%, #34d399 100%);
+    background: linear-gradient(135deg, var(--color-emerald-500) 0%, var(--color-emerald-400) 100%);
     box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
 }
 
@@ -655,12 +655,12 @@
     gap: 12px;
     padding: 8px 0;
     font-size: 0.875rem;
-    color: #4b5563;
+    color: var(--color-gray-600);
     line-height: 1.5;
 }
 
 .nexus-install-benefits li i {
-    color: #10b981;
+    color: var(--color-emerald-500);
     font-size: 0.875rem;
     width: 20px;
     flex-shrink: 0;
@@ -675,7 +675,7 @@
     border: 1px solid rgba(245, 158, 11, 0.2);
     border-radius: 12px;
     font-size: 0.875rem;
-    color: #92400e;
+    color: var(--color-amber-800);
     margin-bottom: 16px;
     line-height: 1.5;
 }
@@ -683,7 +683,7 @@
 .nexus-install-apk-note i {
     flex-shrink: 0;
     margin-top: 2px;
-    color: #f59e0b;
+    color: var(--color-amber-500);
 }
 
 .nexus-install-section-btn {
@@ -693,7 +693,7 @@
     gap: 10px;
     width: 100%;
     padding: 14px 20px;
-    background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+    background: linear-gradient(135deg, var(--color-primary-500) 0%, var(--color-purple-500) 100%);
     color: white;
     border: none;
     border-radius: 12px;
@@ -702,12 +702,12 @@
     cursor: pointer;
     text-decoration: none;
     transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
-    box-shadow: 0 4px 16px rgba(99, 102, 241, 0.3);
+    box-shadow: 0 4px 16px var(--effect-primary-30);
 }
 
 .nexus-install-section-btn:hover {
     transform: translateY(-2px);
-    box-shadow: 0 8px 24px rgba(99, 102, 241, 0.4);
+    box-shadow: 0 8px 24px var(--effect-primary-40);
     color: white;
 }
 
@@ -716,7 +716,7 @@
 }
 
 .nexus-install-section-btn-green {
-    background: linear-gradient(135deg, #10b981 0%, #34d399 100%);
+    background: linear-gradient(135deg, var(--color-emerald-500) 0%, var(--color-emerald-400) 100%);
     box-shadow: 0 4px 16px rgba(16, 185, 129, 0.3);
 }
 
@@ -730,7 +730,7 @@
     align-items: center;
     gap: 16px;
     margin: 24px 0;
-    color: #9ca3af;
+    color: var(--color-gray-400);
     font-size: 0.8125rem;
     font-weight: 600;
     text-transform: uppercase;
@@ -763,7 +763,7 @@
     padding: 16px 0;
     border-bottom: 1px solid rgba(0, 0, 0, 0.06);
     font-size: 1rem;
-    color: #4b5563;
+    color: var(--color-gray-600);
     line-height: 1.5;
 }
 
@@ -774,7 +774,7 @@
 .nexus-install-ios-step-num {
     width: 36px;
     height: 36px;
-    background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+    background: linear-gradient(135deg, var(--color-primary-500) 0%, var(--color-purple-500) 100%);
     color: white;
     border-radius: 50%;
     display: flex;
@@ -783,16 +783,16 @@
     font-weight: 800;
     font-size: 0.875rem;
     flex-shrink: 0;
-    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+    box-shadow: 0 4px 12px var(--effect-primary-30);
 }
 
 .nexus-install-ios-step strong {
-    color: #111827;
+    color: var(--color-gray-900);
     font-weight: 700;
 }
 
 .nexus-install-ios-step i {
-    color: #3b82f6;
+    color: var(--color-blue-500);
 }
 
 /* ============================================
@@ -833,8 +833,8 @@
     text-align: center;
     transform: scale(0.9) translateY(20px);
     transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
-    box-shadow: 0 24px 64px rgba(0, 0, 0, 0.15),
-                0 8px 24px rgba(99, 102, 241, 0.1),
+    box-shadow: 0 24px 64px var(--effect-black-15),
+                0 8px 24px var(--effect-primary-10),
                 inset 0 1px 0 rgba(255, 255, 255, 0.9);
     border: 1px solid rgba(255, 255, 255, 0.8);
 }
@@ -846,7 +846,7 @@
 .nexus-biometric-icon {
     width: 96px;
     height: 96px;
-    background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+    background: linear-gradient(135deg, var(--color-primary-500) 0%, var(--color-purple-500) 100%);
     border-radius: 24px;
     display: flex;
     align-items: center;
@@ -854,7 +854,7 @@
     margin: 0 auto 24px;
     font-size: 2.5rem;
     color: white;
-    box-shadow: 0 16px 48px rgba(99, 102, 241, 0.35);
+    box-shadow: 0 16px 48px var(--effect-primary-35);
     animation: pwaIconGlow 3s ease-in-out infinite;
 }
 
@@ -862,14 +862,14 @@
     margin: 0 0 8px;
     font-size: 1.375rem;
     font-weight: 800;
-    color: #111827;
+    color: var(--color-gray-900);
     letter-spacing: -0.01em;
 }
 
 .nexus-biometric-card p {
     margin: 0 0 28px;
     font-size: 1rem;
-    color: #6b7280;
+    color: var(--color-gray-500);
     line-height: 1.6;
 }
 
@@ -892,7 +892,7 @@
 
 .nexus-biometric-btn-secondary {
     background: rgba(107, 114, 128, 0.08);
-    color: #374151;
+    color: var(--color-gray-700);
     border: 1px solid rgba(107, 114, 128, 0.15);
 }
 
@@ -901,14 +901,14 @@
 }
 
 .nexus-biometric-btn-primary {
-    background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+    background: linear-gradient(135deg, var(--color-primary-500) 0%, var(--color-purple-500) 100%);
     color: white;
-    box-shadow: 0 6px 20px rgba(99, 102, 241, 0.35);
+    box-shadow: 0 6px 20px var(--effect-primary-35);
 }
 
 .nexus-biometric-btn-primary:hover {
     transform: translateY(-2px);
-    box-shadow: 0 8px 28px rgba(99, 102, 241, 0.45);
+    box-shadow: 0 8px 28px var(--effect-primary-45);
 }
 
 .nexus-biometric-btn-secondary:active,
@@ -931,7 +931,7 @@
         padding: 36px 32px;
         transform: scale(0.9) translateY(30px);
         box-shadow: 0 32px 80px rgba(0, 0, 0, 0.18),
-                    0 12px 32px rgba(99, 102, 241, 0.12),
+                    0 12px 32px var(--effect-primary-12),
                     inset 0 1px 0 rgba(255, 255, 255, 0.9);
     }
 
@@ -971,8 +971,8 @@
 [data-theme="dark"] .nexus-notification-prompt-text h4,
 [data-theme="dark"] .nexus-install-title,
 [data-theme="dark"] .nexus-biometric-card h3 {
-    color: #f8fafc;
-    -webkit-text-fill-color: #f8fafc;
+    color: var(--color-slate-50);
+    -webkit-text-fill-color: var(--color-slate-50);
     background: none;
 }
 
@@ -999,9 +999,9 @@
 }
 
 [data-theme="dark"] .nexus-install-section-header {
-    background: rgba(99, 102, 241, 0.1);
-    color: #f8fafc;
-    border-bottom-color: rgba(99, 102, 241, 0.15);
+    background: var(--effect-primary-10);
+    color: var(--color-slate-50);
+    border-bottom-color: var(--effect-primary-15);
 }
 
 [data-theme="dark"] .nexus-install-section-apk .nexus-install-section-header {
@@ -1016,13 +1016,13 @@
 }
 
 [data-theme="dark"] .nexus-install-ios-step strong {
-    color: #f8fafc;
+    color: var(--color-slate-50);
 }
 
 [data-theme="dark"] .nexus-install-apk-note {
     background: rgba(245, 158, 11, 0.1);
     border-color: rgba(245, 158, 11, 0.2);
-    color: #fbbf24;
+    color: var(--color-amber-400);
 }
 
 [data-theme="dark"] .nexus-install-divider {
@@ -1042,8 +1042,8 @@
 }
 
 [data-theme="dark"] .nexus-install-feature i {
-    background: rgba(99, 102, 241, 0.15);
-    border-color: rgba(99, 102, 241, 0.25);
+    background: var(--effect-primary-15);
+    border-color: var(--effect-primary-25);
 }
 
 [data-theme="dark"] .nexus-prompt-btn-secondary,
@@ -1051,7 +1051,7 @@
 [data-theme="dark"] .nexus-biometric-btn-secondary {
     background: rgba(255, 255, 255, 0.08);
     border-color: rgba(255, 255, 255, 0.1);
-    color: #f8fafc;
+    color: var(--color-slate-50);
 }
 
 [data-theme="dark"] .nexus-prompt-btn-secondary:hover,
@@ -1061,7 +1061,7 @@
 }
 
 [data-theme="dark"] .nexus-install-btn-text {
-    color: rgba(255, 255, 255, 0.5);
+    color: var(--effect-white-50);
 }
 
 [data-theme="dark"] .nexus-install-btn-text:hover {

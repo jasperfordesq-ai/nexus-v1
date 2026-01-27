@@ -1,1 +1,402 @@
-.nexus-skin-civicone{.civicone-wallet-container{max-width:1200px;margin:0 auto;padding:var(--space-6) var(--space-4)}.civicone-wallet-header{margin-bottom:var(--space-6)}.civicone-wallet-header h1{margin:0 0 var(--space-2) 0;font-size:2rem;font-weight:700;color:var(--civicone-text-main)}.civicone-wallet-grid{display:grid;grid-template-columns:1fr 1fr;gap:var(--space-6);margin-bottom:var(--space-8)}@media (max-width:768px){.civicone-wallet-grid{grid-template-columns:1fr}}.civicone-balance-card{text-align:center;padding:var(--space-6) var(--space-4);background:linear-gradient(135deg,var(--civicone-brand),var(--civicone-brand-hover));color:var(--civicone-text-inverse);border-radius:var(--radius-2)}.civicone-balance-card h2{margin:0 0 var(--space-4) 0;font-size:1.125rem;font-weight:600;opacity:0.9}.civicone-balance-amount{font-size:3rem;font-weight:700;margin:0 0 var(--space-2) 0;line-height:1}.civicone-balance-label{font-size:1rem;opacity:0.9;margin:0}.civicone-transfer-form .civicone-form-group{margin-bottom:var(--space-4)}.civicone-user-search-wrapper{position:relative}.civicone-user-results{position:absolute;top:100%;left:0;right:0;background:var(--civicone-bg-card);border:2px solid var(--color-gray-200);border-top:none;border-radius:0 0 var(--radius-2) var(--radius-2);max-height:300px;overflow-y:auto;z-index:100;display:none;box-shadow:0 4px 12px var(--color-black-alpha-10)}.civicone-user-results.show{display:block}.civicone-user-result{display:flex;align-items:center;gap:var(--space-3);padding:var(--space-3);cursor:pointer;transition:background 0.2s ease;border-bottom:1px solid var(--color-gray-100)}.civicone-user-result:last-child{border-bottom:none}.civicone-user-result:hover,.civicone-user-result.selected{background:var(--color-gray-50)}.civicone-user-result:focus{outline:3px solid var(--color-focus);outline-offset:-3px;background:var(--color-focus)}.civicone-user-avatar{width:var(--space-10);height:var(--space-10);border-radius:50%;background:var(--civicone-brand);color:var(--civicone-text-inverse);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:1.125rem;flex-shrink:0;overflow:hidden}.civicone-user-avatar img{width:100%;height:100%;object-fit:cover}.civicone-user-info{flex:1;min-width:0}.civicone-user-name{font-weight:600;color:var(--civicone-text-main);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.civicone-user-username{font-size:0.875rem;color:var(--civicone-text-muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.civicone-user-no-results{padding:var(--space-4);text-align:center;color:var(--civicone-text-muted)}.civicone-selected-user{display:none;align-items:center;gap:var(--space-3);padding:var(--space-3);background:var(--color-gray-50);border:2px solid var(--civicone-brand);border-radius:var(--radius-2);margin-bottom:var(--space-4)}.civicone-selected-user.show{display:flex}.civicone-selected-clear{margin-left:auto;background:none;border:none;font-size:1.5rem;color:var(--civicone-text-muted);cursor:pointer;padding:var(--space-1);line-height:1;min-width:var(--space-11);min-height:var(--space-11);display:flex;align-items:center;justify-content:center}.civicone-selected-clear:hover{color:var(--color-danger)}.civicone-selected-clear:focus{outline:3px solid var(--color-focus);outline-offset:0;background:var(--color-focus);color:var(--color-focus-text)}.civicone-wallet-history-header{font-size:1.5rem;font-weight:700;color:var(--civicone-text-main);margin:var(--space-8) 0 var(--space-4) 0;padding-bottom:var(--space-3);border-bottom:4px solid var(--civicone-brand)}.civicone-wallet-table-wrapper{overflow-x:auto;margin-bottom:var(--space-6)}@media (max-width:768px){.civicone-wallet-table-wrapper{display:none}}.civicone-wallet-table{width:100%;border-collapse:collapse;background:var(--civicone-bg-card);border-radius:var(--radius-2);overflow:hidden}.civicone-wallet-table caption{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border-width:0}.civicone-wallet-table thead{background:var(--color-gray-100)}.civicone-wallet-table th{text-align:left;padding:var(--space-3) var(--space-4);font-weight:700;color:var(--civicone-text-main);border-bottom:var(--space-0-5) solid var(--color-gray-200)}.civicone-wallet-table td{padding:var(--space-3) var(--space-4);border-bottom:1px solid var(--color-gray-200)}.civicone-wallet-table tbody tr:last-child td{border-bottom:none}.civicone-wallet-table tbody tr:hover{background:var(--color-gray-50)}.civicone-wallet-amount-positive{color:var(--color-success);font-weight:700}.civicone-wallet-amount-negative{color:var(--color-danger);font-weight:700}.civicone-wallet-cards-mobile{display:none;flex-direction:column;gap:var(--space-3)}@media (max-width:768px){.civicone-wallet-cards-mobile{display:flex}}.civicone-wallet-card{padding:var(--space-4)}.civicone-wallet-card-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:var(--space-2)}.civicone-wallet-card-date{font-size:0.875rem;color:var(--civicone-text-muted)}.civicone-wallet-card-amount{font-size:1.25rem;font-weight:700}.civicone-wallet-card-amount.positive{color:var(--color-success)}.civicone-wallet-card-amount.negative{color:var(--color-danger)}.civicone-wallet-card-description{font-weight:600;color:var(--civicone-text-main);margin:0 0 var(--space-2) 0}.civicone-wallet-card-participant{font-size:0.875rem;color:var(--civicone-text-muted);margin:0}.civicone-wallet-empty{text-align:center;padding:var(--space-6);color:var(--civicone-text-muted)}}
+/**
+ * CivicOne Wallet Index Page Styles
+ * Template G: Account Area (Section 10.7)
+ * Time credits wallet with balance, transfer form, and transaction history
+ * WCAG 2.1 AA Compliant
+ */
+
+.nexus-skin-civicone {
+
+    /* ==========================================
+       Wallet Page Layout
+       ========================================== */
+
+    .civicone-wallet-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: var(--space-6) var(--space-4);
+    }
+
+    .civicone-wallet-header {
+        margin-bottom: var(--space-6);
+    }
+
+    .civicone-wallet-header h1 {
+        margin: 0 0 var(--space-2) 0;
+        font-size: 2rem;
+        font-weight: 700;
+        color: var(--civicone-text-main);
+    }
+
+    /* ==========================================
+       Wallet Grid (Balance + Transfer)
+       ========================================== */
+
+    .civicone-wallet-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: var(--space-6);
+        margin-bottom: var(--space-8);
+    }
+
+    @media (max-width: 768px) {
+        .civicone-wallet-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    /* ==========================================
+       Balance Card
+       ========================================== */
+
+    .civicone-balance-card {
+        text-align: center;
+        padding: var(--space-6) var(--space-4);
+        background: linear-gradient(135deg, var(--civicone-brand), var(--civicone-brand-hover));
+        color: var(--civicone-text-inverse);
+        border-radius: var(--radius-2);
+    }
+
+    .civicone-balance-card h2 {
+        margin: 0 0 var(--space-4) 0;
+        font-size: 1.125rem;
+        font-weight: 600;
+        opacity: 0.9;
+    }
+
+    .civicone-balance-amount {
+        font-size: 3rem;
+        font-weight: 700;
+        margin: 0 0 var(--space-2) 0;
+        line-height: 1;
+    }
+
+    .civicone-balance-label {
+        font-size: 1rem;
+        opacity: 0.9;
+        margin: 0;
+    }
+
+    /* ==========================================
+       Transfer Form
+       ========================================== */
+
+    .civicone-transfer-form .civicone-form-group {
+        margin-bottom: var(--space-4);
+    }
+
+    /* ==========================================
+       User Search Autocomplete
+       ========================================== */
+
+    .civicone-user-search-wrapper {
+        position: relative;
+    }
+
+    .civicone-user-results {
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        background: var(--civicone-bg-card);
+        border: 2px solid var(--color-gray-200);
+        border-top: none;
+        border-radius: 0 0 var(--radius-2) var(--radius-2);
+        max-height: 300px;
+        overflow-y: auto;
+        z-index: 100;
+        display: none;
+        box-shadow: 0 4px 12px var(--color-black-alpha-10);
+    }
+
+    .civicone-user-results.show {
+        display: block;
+    }
+
+    .civicone-user-result {
+        display: flex;
+        align-items: center;
+        gap: var(--space-3);
+        padding: var(--space-3);
+        cursor: pointer;
+        transition: background 0.2s ease;
+        border-bottom: 1px solid var(--color-gray-100);
+    }
+
+    .civicone-user-result:last-child {
+        border-bottom: none;
+    }
+
+    .civicone-user-result:hover,
+    .civicone-user-result.selected {
+        background: var(--color-gray-50);
+    }
+
+    .civicone-user-result:focus {
+        outline: 3px solid var(--color-focus);
+        outline-offset: -3px;
+        background: var(--color-focus);
+    }
+
+    [data-theme="dark"] .civicone-user-result:hover,
+    [data-theme="dark"] .civicone-user-result.selected {
+        background: var(--color-gray-800);
+    }
+
+    .civicone-user-avatar {
+        width: var(--space-10);
+        height: var(--space-10);
+        border-radius: 50%;
+        background: var(--civicone-brand);
+        color: var(--civicone-text-inverse);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+        font-size: 1.125rem;
+        flex-shrink: 0;
+        overflow: hidden;
+    }
+
+    .civicone-user-avatar img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .civicone-user-info {
+        flex: 1;
+        min-width: 0;
+    }
+
+    .civicone-user-name {
+        font-weight: 600;
+        color: var(--civicone-text-main);
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .civicone-user-username {
+        font-size: 0.875rem;
+        color: var(--civicone-text-muted);
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .civicone-user-no-results {
+        padding: var(--space-4);
+        text-align: center;
+        color: var(--civicone-text-muted);
+    }
+
+    /* ==========================================
+       Selected User Chip
+       ========================================== */
+
+    .civicone-selected-user {
+        display: none;
+        align-items: center;
+        gap: var(--space-3);
+        padding: var(--space-3);
+        background: var(--color-gray-50);
+        border: 2px solid var(--civicone-brand);
+        border-radius: var(--radius-2);
+        margin-bottom: var(--space-4);
+    }
+
+    .civicone-selected-user.show {
+        display: flex;
+    }
+
+    [data-theme="dark"] .civicone-selected-user {
+        background: var(--color-gray-800);
+    }
+
+    .civicone-selected-clear {
+        margin-left: auto;
+        background: none;
+        border: none;
+        font-size: 1.5rem;
+        color: var(--civicone-text-muted);
+        cursor: pointer;
+        padding: var(--space-1);
+        line-height: 1;
+        min-width: var(--space-11);
+        min-height: var(--space-11);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .civicone-selected-clear:hover {
+        color: var(--color-danger);
+    }
+
+    .civicone-selected-clear:focus {
+        outline: 3px solid var(--color-focus);
+        outline-offset: 0;
+        background: var(--color-focus);
+        color: var(--color-focus-text);
+    }
+
+    /* ==========================================
+       Transaction History
+       ========================================== */
+
+    .civicone-wallet-history-header {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: var(--civicone-text-main);
+        margin: var(--space-8) 0 var(--space-4) 0;
+        padding-bottom: var(--space-3);
+        border-bottom: 4px solid var(--civicone-brand);
+    }
+
+    /* ==========================================
+       Desktop Table View
+       ========================================== */
+
+    .civicone-wallet-table-wrapper {
+        overflow-x: auto;
+        margin-bottom: var(--space-6);
+    }
+
+    @media (max-width: 768px) {
+        .civicone-wallet-table-wrapper {
+            display: none;
+        }
+    }
+
+    .civicone-wallet-table {
+        width: 100%;
+        border-collapse: collapse;
+        background: var(--civicone-bg-card);
+        border-radius: var(--radius-2);
+        overflow: hidden;
+    }
+
+    .civicone-wallet-table caption {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        padding: 0;
+        margin: -1px;
+        overflow: hidden;
+        clip: rect(0, 0, 0, 0);
+        white-space: nowrap;
+        border-width: 0;
+    }
+
+    .civicone-wallet-table thead {
+        background: var(--color-gray-100);
+    }
+
+    [data-theme="dark"] .civicone-wallet-table thead {
+        background: var(--color-gray-800);
+    }
+
+    .civicone-wallet-table th {
+        text-align: left;
+        padding: var(--space-3) var(--space-4);
+        font-weight: 700;
+        color: var(--civicone-text-main);
+        border-bottom: var(--space-0-5) solid var(--color-gray-200);
+    }
+
+    .civicone-wallet-table td {
+        padding: var(--space-3) var(--space-4);
+        border-bottom: 1px solid var(--color-gray-200);
+    }
+
+    .civicone-wallet-table tbody tr:last-child td {
+        border-bottom: none;
+    }
+
+    .civicone-wallet-table tbody tr:hover {
+        background: var(--color-gray-50);
+    }
+
+    [data-theme="dark"] .civicone-wallet-table tbody tr:hover {
+        background: var(--color-gray-800);
+    }
+
+    .civicone-wallet-amount-positive {
+        color: var(--color-success);
+        font-weight: 700;
+    }
+
+    .civicone-wallet-amount-negative {
+        color: var(--color-danger);
+        font-weight: 700;
+    }
+
+    /* ==========================================
+       Mobile Card View
+       ========================================== */
+
+    .civicone-wallet-cards-mobile {
+        display: none;
+        flex-direction: column;
+        gap: var(--space-3);
+    }
+
+    @media (max-width: 768px) {
+        .civicone-wallet-cards-mobile {
+            display: flex;
+        }
+    }
+
+    .civicone-wallet-card {
+        padding: var(--space-4);
+    }
+
+    .civicone-wallet-card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: var(--space-2);
+    }
+
+    .civicone-wallet-card-date {
+        font-size: 0.875rem;
+        color: var(--civicone-text-muted);
+    }
+
+    .civicone-wallet-card-amount {
+        font-size: 1.25rem;
+        font-weight: 700;
+    }
+
+    .civicone-wallet-card-amount.positive {
+        color: var(--color-success);
+    }
+
+    .civicone-wallet-card-amount.negative {
+        color: var(--color-danger);
+    }
+
+    .civicone-wallet-card-description {
+        font-weight: 600;
+        color: var(--civicone-text-main);
+        margin: 0 0 var(--space-2) 0;
+    }
+
+    .civicone-wallet-card-participant {
+        font-size: 0.875rem;
+        color: var(--civicone-text-muted);
+        margin: 0;
+    }
+
+    /* ==========================================
+       Empty State
+       ========================================== */
+
+    .civicone-wallet-empty {
+        text-align: center;
+        padding: var(--space-6);
+        color: var(--civicone-text-muted);
+    }
+
+}

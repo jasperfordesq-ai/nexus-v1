@@ -14,7 +14,7 @@
        ========================================== */
 
     /* Page Background - Pure white (GOV.UK standard) */
-    --civic-bg-page: #ffffff;
+    --civic-bg-page: var(--color-white)fff;
     --civic-bg-card: var(--color-white);
 
     /* Text - Softer than pure black */
@@ -948,7 +948,7 @@ a:focus {
 .civic-badge--admin {
     background: var(--color-red-50);
     color: var(--color-red-700);
-    border: 1px solid var(--color-red-200, #fecaca);
+    border: 1px solid var(--color-red-200, var(--color-red-200));
 }
 
 .civic-badge--coordinator {

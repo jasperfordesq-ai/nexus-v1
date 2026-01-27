@@ -785,7 +785,7 @@ table.htb-table tr:last-child td {
 }
 
 .htb-step-icon-orange {
-    background: linear-gradient(135deg, #ffedd5 0%, #fff7ed 100%);
+    background: linear-gradient(135deg, #ffedd5 0%, var(--color-white)7ed 100%);
     color: var(--color-orange-600);
     box-shadow: 0 4px 10px rgba(234, 88, 12, 0.1);
 }
@@ -970,7 +970,7 @@ textarea.nexus-input {
     font-size: calc(var(--font-size-base) - 0.05rem);
     outline: none;
     transition: all 0.2s ease;
-    background: #fff;
+    background: var(--color-white);
     color: var(--color-slate-800);
     box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
     /* Subtle shadow polish */
@@ -2003,7 +2003,7 @@ html {
 }
 
 .nexus-share-option:nth-child(3) i {
-    background: #000;
+    background: var(--color-black);
 }
 
 .nexus-share-option:nth-child(4) i {
@@ -2034,7 +2034,7 @@ html {
     position: fixed;
     inset: 0;
     z-index: var(--z-modal, 1400);
-    background: #000;
+    background: var(--color-black);
     opacity: 0;
     visibility: hidden;
     transition: all 0.3s ease;
@@ -2109,7 +2109,7 @@ html {
 .nexus-camera-preview {
     position: absolute;
     inset: 0;
-    background: #000;
+    background: var(--color-black);
     display: none;
     flex-direction: column;
 }
@@ -5361,7 +5361,7 @@ body>* {
 [data-theme="dark"] .nexus-header-icon-btn {
     background: rgba(255, 255, 255, 0.08);
     border-color: rgba(255, 255, 255, 0.1);
-    color: #fff;
+    color: var(--color-white);
 }
 
 [data-theme="dark"] .nexus-header-icon-btn:hover {
@@ -5567,7 +5567,7 @@ body>* {
 
 [data-theme="dark"] .htb-dropdown-content a:hover {
     background: var(--color-gray-700);
-    color: #fff;
+    color: var(--color-white);
 }
 
 /* Notification Dropdown Dark Mode */
@@ -5622,7 +5622,7 @@ body>* {
     padding: var(--space-3) 16px;
     border-bottom: 1px solid var(--color-slate-100);
     text-decoration: none;
-    background: #fff;
+    background: var(--color-white);
     transition: background 0.15s ease;
 }
 
@@ -6084,8 +6084,8 @@ body>* {
 }
 
 /* Join button - keep white text on indigo background in light mode */
-[data-theme="light"] .util-link[style*="color:#fff"],
-[data-theme="light"] .util-link[style*="color: #fff"] {
+[data-theme="light"] .util-link[style*="color:var(--color-white)"],
+[data-theme="light"] .util-link[style*="color: var(--color-white)"] {
     background: linear-gradient(135deg, var(--color-primary-500), var(--color-purple-500)) !important;
     color: white !important;
     padding: 6px 14px !important;
@@ -6406,7 +6406,7 @@ body>* {
 .nexus-drawer-item-icon.icon-green { background: linear-gradient(135deg, #bbf7d0, var(--color-green-300)); color: var(--color-green-700); }
 .nexus-drawer-item-icon.icon-cyan { background: linear-gradient(135deg, #a5f3fc, var(--color-cyan-300)); color: #0e7490; }
 .nexus-drawer-item-icon.icon-amber { background: linear-gradient(135deg, var(--color-amber-200), var(--color-amber-300)); color: var(--color-amber-700); }
-.nexus-drawer-item-icon.icon-red { background: linear-gradient(135deg, #fecaca, var(--color-red-300)); color: var(--color-red-600); }
+.nexus-drawer-item-icon.icon-red { background: linear-gradient(135deg, var(--color-red-200), var(--color-red-300)); color: var(--color-red-600); }
 .nexus-drawer-item-icon.icon-emerald { background: linear-gradient(135deg, var(--color-emerald-200), var(--color-emerald-300)); color: var(--color-emerald-600); }
 .nexus-drawer-item-icon.icon-pink { background: linear-gradient(135deg, var(--color-pink-200), var(--color-pink-300)); color: var(--color-pink-600); }
 .nexus-drawer-item-icon.icon-yellow { background: linear-gradient(135deg, var(--color-yellow-200), #fde047); color: #a16207; }
@@ -6419,7 +6419,7 @@ body>* {
 [data-theme="dark"] .nexus-drawer-item-icon.icon-teal { background: rgba(20, 184, 166, 0.2); color: var(--color-teal-400); }
 [data-theme="dark"] .nexus-drawer-item-icon.icon-purple { background: rgba(139, 92, 246, 0.2); color: var(--color-purple-400-alt); }
 [data-theme="dark"] .nexus-drawer-item-icon.icon-indigo { background: rgba(99, 102, 241, 0.2); color: var(--color-primary-400); }
-[data-theme="dark"] .nexus-drawer-item-icon.icon-orange { background: rgba(249, 115, 22, 0.2); color: #fb923c; }
+[data-theme="dark"] .nexus-drawer-item-icon.icon-orange { background: rgba(249, 115, 22, 0.2); color: var(--color-orange-400); }
 [data-theme="dark"] .nexus-drawer-item-icon.icon-green { background: rgba(34, 197, 94, 0.2); color: var(--color-green-400); }
 [data-theme="dark"] .nexus-drawer-item-icon.icon-cyan { background: rgba(6, 182, 212, 0.2); color: var(--color-cyan-400); }
 [data-theme="dark"] .nexus-drawer-item-icon.icon-amber { background: rgba(245, 158, 11, 0.2); color: var(--color-amber-300); }
@@ -7028,7 +7028,7 @@ body>* {
 }
 
 .premium-search:focus-within .search-input {
-    color: #fff;
+    color: var(--color-white);
 }
 
 /* Mobile responsive */
@@ -7381,7 +7381,7 @@ body.search-expanded .nexus-brand-link {
         0 0 0 3px rgba(99, 102, 241, 0.08),
         inset 0 1px 0 rgba(255, 255, 255, 0.15) !important;
     transform: translateY(-1px) !important;
-    color: #fff !important;
+    color: var(--color-white) !important;
 }
 
 /* Active/Open state */
@@ -7469,7 +7469,7 @@ body.search-expanded .nexus-brand-link {
     background: linear-gradient(90deg,
         rgba(99, 102, 241, 0.15) 0%,
         rgba(139, 92, 246, 0.08) 100%) !important;
-    color: #fff !important;
+    color: var(--color-white) !important;
     padding-left: 24px !important;
     text-shadow: 0 2px 8px rgba(99, 102, 241, 0.3) !important;
 }
@@ -9252,7 +9252,7 @@ button,
 .nexus-page-skeleton {
     position: fixed;
     inset: 0;
-    background: var(--nav-bg-solid, #fff);
+    background: var(--nav-bg-solid, var(--color-white));
     z-index: 9998;
     display: flex;
     flex-direction: column;

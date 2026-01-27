@@ -46,17 +46,17 @@ $currentPath = $_SERVER['REQUEST_URI'] ?? '';
         </a>
     </div>
 
-    <div class="dash-wallet-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px;">
+    <div class="dash-wallet-grid mte-wallet--grid">
         <!-- Left: Balance & Actions -->
-        <div style="display: flex; flex-direction: column; gap: 30px;">
+        <div class="mte-wallet--col">
             <!-- Balance Card -->
-            <div class="htb-card" style="background: linear-gradient(135deg, #4f46e5, #818cf8); color: white;">
+            <div class="htb-card mte-wallet--balance-card">
                 <div class="htb-card-body">
-                    <div style="font-size: 0.85rem; opacity: 0.9; text-transform: uppercase; font-weight: 700; letter-spacing: 0.5px;">Current Balance</div>
-                    <div class="dash-wallet-balance-amount" style="font-size: 3.5rem; font-weight: 800; line-height: 1; margin: 10px 0;">
-                        <?= number_format($user['balance']) ?> <span style="font-size: 1.5rem; font-weight: 400; opacity: 0.8;">Credits</span>
+                    <div class="mte-wallet--balance-label">Current Balance</div>
+                    <div class="dash-wallet-balance-amount mte-wallet--balance-amount">
+                        <?= number_format($user['balance']) ?> <span class="mte-wallet--balance-unit">Credits</span>
                     </div>
-                    <div style="font-size: 0.85rem; opacity: 0.8;">
+                    <div class="mte-wallet--balance-note">
                         1 Credit = 1 Hour of Service
                     </div>
                 </div>
@@ -64,8 +64,8 @@ $currentPath = $_SERVER['REQUEST_URI'] ?? '';
 
             <!-- Transfer Widget -->
             <div class="htb-card">
-                <div class="htb-card-header" style="padding: 15px 20px; border-bottom: 1px solid #e2e8f0; font-weight: 700; color: #334155;">
-                    <i class="fa-solid fa-paper-plane" style="margin-right: 8px; color: #4f46e5;"></i> Send Credits
+                <div class="htb-card-header mte-wallet--card-header">
+                    <i class="fa-solid fa-paper-plane mte-wallet--card-header-icon"></i> Send Credits
                 </div>
                 <div class="htb-card-body">
                     <form id="transfer-form" class="dash-transfer-form" action="<?= $basePath ?>/wallet/transfer" method="POST" onsubmit="return validateDashTransfer(this);">
@@ -73,61 +73,61 @@ $currentPath = $_SERVER['REQUEST_URI'] ?? '';
                         <input type="hidden" name="username" id="dashRecipientUsername" value="">
                         <input type="hidden" name="recipient_id" id="dashRecipientId" value="">
 
-                        <div style="margin-bottom: 15px;">
-                            <label style="display: block; font-size: 0.85rem; font-weight: 600; color: #64748b; margin-bottom: 5px;">Recipient</label>
+                        <div class="mte-wallet--form-group">
+                            <label class="mte-wallet--label">Recipient</label>
 
                             <!-- Selected User Chip -->
-                            <div id="dashSelectedUser" style="display: none; align-items: center; gap: 10px; padding: 10px 14px; background: rgba(79, 70, 229, 0.1); border: 2px solid rgba(79, 70, 229, 0.3); border-radius: 8px; margin-bottom: 8px;">
-                                <div id="dashSelectedAvatar" style="width: 32px; height: 32px; border-radius: 50%; background: linear-gradient(135deg, #4f46e5, #7c3aed); display: flex; align-items: center; justify-content: center; color: white; font-weight: 600; font-size: 14px; flex-shrink: 0; overflow: hidden;">
+                            <div id="dashSelectedUser" class="mte-wallet--selected-user hidden">
+                                <div id="dashSelectedAvatar" class="mte-wallet--selected-avatar">
                                     <span id="dashSelectedInitial">?</span>
                                 </div>
-                                <div style="flex: 1; min-width: 0;">
-                                    <div id="dashSelectedName" style="font-weight: 600; color: #1f2937; font-size: 0.9rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">-</div>
-                                    <div id="dashSelectedUsername" style="font-size: 0.85rem; color: #6b7280;">-</div>
+                                <div class="mte-wallet--selected-info">
+                                    <div id="dashSelectedName" class="mte-wallet--selected-name">-</div>
+                                    <div id="dashSelectedUsername" class="mte-wallet--selected-username">-</div>
                                 </div>
-                                <button type="button" onclick="clearDashSelection()" style="width: 28px; height: 28px; border-radius: 50%; background: transparent; border: none; color: #6b7280; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.15s;" onmouseover="this.style.background='rgba(239, 68, 68, 0.1)'; this.style.color='#ef4444';" onmouseout="this.style.background='transparent'; this.style.color='#6b7280';" title="Clear">
+                                <button type="button" onclick="clearDashSelection()" class="mte-wallet--clear-btn" title="Clear">
                                     <i class="fa-solid fa-times"></i>
                                 </button>
                             </div>
 
                             <!-- Search Input -->
-                            <div id="dashSearchWrapper" style="position: relative;">
-                                <input type="text" id="dashUserSearch" placeholder="Search by name or username..." autocomplete="off" style="width: 100%; padding: 12px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 16px;">
-                                <div id="dashUserResults" style="position: absolute; top: 100%; left: 0; right: 0; background: white; border: 2px solid rgba(79, 70, 229, 0.2); border-top: none; border-radius: 0 0 8px 8px; max-height: 280px; overflow-y: auto; z-index: 100; display: none; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);"></div>
+                            <div id="dashSearchWrapper" class="mte-wallet--search-wrapper">
+                                <input type="text" id="dashUserSearch" placeholder="Search by name or username..." autocomplete="off" class="mte-wallet--input">
+                                <div id="dashUserResults" class="mte-wallet--search-results hidden"></div>
                             </div>
                         </div>
-                        <div style="margin-bottom: 15px;">
-                            <label style="display: block; font-size: 0.85rem; font-weight: 600; color: #64748b; margin-bottom: 5px;">Amount</label>
-                            <input type="number" name="amount" min="1" required placeholder="0" style="width: 100%; padding: 12px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 16px;">
+                        <div class="mte-wallet--form-group">
+                            <label class="mte-wallet--label">Amount</label>
+                            <input type="number" name="amount" min="1" required placeholder="0" class="mte-wallet--input">
                         </div>
-                        <div style="margin-bottom: 20px;">
-                            <label style="display: block; font-size: 0.85rem; font-weight: 600; color: #64748b; margin-bottom: 5px;">Description (Optional)</label>
-                            <textarea name="description" rows="2" placeholder="What is this for?" style="width: 100%; padding: 12px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 16px;"></textarea>
+                        <div class="mte-wallet--form-group-lg">
+                            <label class="mte-wallet--label">Description (Optional)</label>
+                            <textarea name="description" rows="2" placeholder="What is this for?" class="mte-wallet--input"></textarea>
                         </div>
-                        <button type="submit" id="transfer-btn" class="htb-btn htb-btn-primary" style="width: 100%; justify-content: center; padding: 14px 24px;"><i class="fa-solid fa-paper-plane"></i> Send Credits</button>
+                        <button type="submit" id="transfer-btn" class="htb-btn htb-btn-primary mte-wallet--submit-btn"><i class="fa-solid fa-paper-plane"></i> Send Credits</button>
                     </form>
                 </div>
             </div>
         </div>
 
         <!-- Right: Transaction History -->
-        <div class="htb-card" style="height: fit-content;">
-            <div class="htb-card-header" style="padding: 16px 20px; border-bottom: 1px solid #e2e8f0; font-weight: 700; color: #334155;">
-                <i class="fa-solid fa-clock-rotate-left" style="margin-right: 8px; color: #64748b;"></i> Recent Transactions
+        <div class="htb-card mte-wallet--tx-card">
+            <div class="htb-card-header mte-wallet--tx-header">
+                <i class="fa-solid fa-clock-rotate-left mte-wallet--card-header-icon-gray"></i> Recent Transactions
             </div>
             <div class="dash-transactions-table">
                 <?php if (empty($wallet_transactions)): ?>
-                    <div style="padding: 40px; text-align: center; color: #94a3b8;">
-                        <div style="font-size: 2.5rem; margin-bottom: 10px; opacity: 0.3;"><i class="fa-solid fa-receipt"></i></div>
+                    <div class="mte-wallet--empty">
+                        <div class="mte-wallet--empty-icon"><i class="fa-solid fa-receipt"></i></div>
                         <p>No transactions found.</p>
                     </div>
                 <?php else: ?>
-                    <table class="htb-table" style="width: 100%">
+                    <table class="htb-table mte-wallet--table">
                         <thead>
-                            <tr style="background: #f8fafc; font-size: 0.8rem; text-transform: uppercase;">
+                            <tr class="mte-wallet--table-head">
                                 <th>Date</th>
                                 <th>Description</th>
-                                <th style="text-align: right;">Amount</th>
+                                <th class="mte-wallet--table-amount">Amount</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -135,20 +135,20 @@ $currentPath = $_SERVER['REQUEST_URI'] ?? '';
                                 $isIncoming = $t['receiver_id'] == $_SESSION['user_id'];
                             ?>
                                 <tr>
-                                    <td style="font-size: 0.85rem; color: #64748b;">
+                                    <td class="mte-wallet--table-date">
                                         <?= date('M j, Y', strtotime($t['created_at'])) ?>
                                     </td>
                                     <td>
-                                        <div style="font-weight: 600; font-size: 0.9rem; color: #334155;">
+                                        <div class="mte-wallet--table-desc">
                                             <?= $isIncoming ? 'Received from ' . htmlspecialchars($t['sender_name']) : 'Sent to ' . htmlspecialchars($t['receiver_name']) ?>
                                         </div>
                                         <?php if (!empty($t['description'])): ?>
-                                            <div style="font-size: 0.8rem; color: #94a3b8; font-style: italic;">
+                                            <div class="mte-wallet--table-note">
                                                 "<?= htmlspecialchars($t['description']) ?>"
                                             </div>
                                         <?php endif; ?>
                                     </td>
-                                    <td style="text-align: right; font-weight: 700; color: <?= $isIncoming ? '#10b981' : '#ef4444' ?>;">
+                                    <td class="mte-wallet--table-amount <?= $isIncoming ? 'mte-wallet--amount-positive' : 'mte-wallet--amount-negative' ?>">
                                         <?= $isIncoming ? '+' : '-' ?><?= number_format($t['amount']) ?>
                                     </td>
                                 </tr>

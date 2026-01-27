@@ -315,7 +315,7 @@
     right: 0;
     padding: var(--space-4);
     background: linear-gradient(135deg, var(--color-amber-100), var(--color-amber-200));
-    color: #92400e;
+    color: var(--color-amber-800);
     text-align: center;
     font-weight: var(--font-weight-medium);
     display: flex;
@@ -333,7 +333,7 @@
 }
 
 .offline-banner--error {
-    background: linear-gradient(135deg, var(--color-red-100), #fecaca);
+    background: linear-gradient(135deg, var(--color-red-100), var(--color-red-200));
     color: #991b1b;
     border-top-color: rgba(153, 27, 27, 0.2);
 }
@@ -579,7 +579,7 @@
 
 [data-theme="dark"] .offline-banner--error {
     background: linear-gradient(135deg, #450a0a, #7f1d1d);
-    color: #fecaca;
+    color: var(--color-red-200);
 }
 
 [data-theme="dark"] .maintenance-page {
