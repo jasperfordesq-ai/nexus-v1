@@ -155,11 +155,11 @@
 
         #events-glass-wrapper .quick-action-btn {
             background: linear-gradient(135deg,
-                rgba(255, 255, 255, 0.75),
-                rgba(255, 255, 255, 0.6));
+                var(--effect-white-75),
+                var(--effect-white-60));
             backdrop-filter: blur(16px) saturate(120%);
             -webkit-backdrop-filter: blur(16px) saturate(120%);
-            border: var(--space-1) solid rgba(255, 255, 255, 0.3);
+            border: var(--space-1) solid var(--effect-white-30);
             border-radius: var(--radius-lg);
             padding: var(--space-4) var(--space-5);
             text-decoration: none;
@@ -168,7 +168,7 @@
             gap: var(--space-3);
             transition: all 0.3s ease;
             box-shadow: 0 4px 12px rgba(31, 38, 135, 0.1),
-                        inset 0 1px 0 rgba(255, 255, 255, 0.4);
+                        inset 0 1px 0 var(--effect-white-40);
             position: relative;
             overflow: hidden;
         }
@@ -194,15 +194,15 @@
             border-color: rgba(249, 115, 22, 0.4);
             box-shadow: 0 8px 20px rgba(249, 115, 22, 0.15),
                         0 0 0 1px rgba(249, 115, 22, 0.15),
-                        inset 0 1px 0 rgba(255, 255, 255, 0.5);
+                        inset 0 1px 0 var(--effect-white-50);
         }
 
         [data-theme="dark"] #events-glass-wrapper .quick-action-btn {
             background: linear-gradient(135deg,
                 rgba(15, 23, 42, 0.6),
-                rgba(30, 41, 59, 0.5));
-            border: var(--space-1) solid rgba(255, 255, 255, 0.12);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3),
+                var(--effect-slate-50));
+            border: var(--space-1) solid var(--effect-white-12);
+            box-shadow: 0 4px 12px var(--effect-black-30),
                         inset 0 1px 0 rgba(255, 255, 255, 0.06);
         }
 
@@ -234,40 +234,40 @@
             padding: var(--space-6);
             border-radius: var(--radius-xl);
             background: linear-gradient(135deg,
-                rgba(255, 255, 255, 0.75),
-                rgba(255, 255, 255, 0.6));
+                var(--effect-white-75),
+                var(--effect-white-60));
             backdrop-filter: blur(20px) saturate(120%);
             -webkit-backdrop-filter: blur(20px) saturate(120%);
-            border: var(--space-1) solid rgba(255, 255, 255, 0.3);
+            border: var(--space-1) solid var(--effect-white-30);
             box-shadow: 0 8px 32px rgba(31, 38, 135, 0.15),
-                        inset 0 0 0 1px rgba(255, 255, 255, 0.4);
+                        inset 0 0 0 1px var(--effect-white-40);
             transition: all 0.3s ease;
         }
 
         [data-theme="dark"] #events-glass-wrapper .glass-search-card {
             background: linear-gradient(135deg,
                 rgba(15, 23, 42, 0.6),
-                rgba(30, 41, 59, 0.5));
+                var(--effect-slate-50));
             backdrop-filter: blur(24px) saturate(150%);
             -webkit-backdrop-filter: blur(24px) saturate(150%);
-            border: var(--space-1) solid rgba(255, 255, 255, 0.15);
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5),
+            border: var(--space-1) solid var(--effect-white-15);
+            box-shadow: 0 8px 32px var(--effect-black-50),
                         0 0 80px rgba(249, 115, 22, 0.1),
-                        inset 0 1px 0 rgba(255, 255, 255, 0.1);
+                        inset 0 1px 0 var(--effect-white-10);
         }
 
         /* Glass Search Input */
         #events-glass-wrapper .glass-search-input {
             width: 100%;
             padding: var(--space-4) var(--space-5) var(--space-4) 50px;
-            border: var(--space-1) solid rgba(255, 255, 255, 0.4);
+            border: var(--space-1) solid var(--effect-white-40);
             border-radius: var(--radius-lg);
             font-size: var(--font-size-lg);
-            background: rgba(255, 255, 255, 0.6);
+            background: var(--effect-white-60);
             backdrop-filter: blur(10px);
             -webkit-backdrop-filter: blur(10px);
             box-shadow: 0 4px 12px rgba(31, 38, 135, 0.1),
-                        inset 0 1px 0 rgba(255, 255, 255, 0.6);
+                        inset 0 1px 0 var(--effect-white-60);
             transition: all 0.3s ease;
             box-sizing: border-box;
             color: var(--htb-text-main);
@@ -278,15 +278,15 @@
             box-shadow: 0 0 0 4px rgba(249, 115, 22, 0.15),
                         0 8px 24px rgba(249, 115, 22, 0.2);
             outline: none;
-            background: rgba(255, 255, 255, 0.8);
+            background: var(--effect-white-80);
         }
 
         [data-theme="dark"] #events-glass-wrapper .glass-search-input {
             background: rgba(15, 23, 42, 0.7);
-            border: var(--space-1) solid rgba(255, 255, 255, 0.2);
+            border: var(--space-1) solid var(--effect-white-20);
             color: var(--color-slate-50);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3),
-                        inset 0 1px 0 rgba(255, 255, 255, 0.1);
+            box-shadow: 0 4px 12px var(--effect-black-30),
+                        inset 0 1px 0 var(--effect-white-10);
         }
 
         [data-theme="dark"] #events-glass-wrapper .glass-search-input::placeholder {
@@ -303,10 +303,10 @@
         /* Glass Select */
         #events-glass-wrapper .glass-select {
             padding: var(--space-4) var(--space-10) var(--space-4) var(--space-4);
-            border: var(--space-1) solid rgba(255, 255, 255, 0.4);
+            border: var(--space-1) solid var(--effect-white-40);
             border-radius: var(--radius-md);
             font-size: var(--font-size-sm);
-            background: rgba(255, 255, 255, 0.6);
+            background: var(--effect-white-60);
             backdrop-filter: blur(10px);
             -webkit-backdrop-filter: blur(10px);
             box-shadow: 0 4px 12px rgba(31, 38, 135, 0.1);
@@ -328,7 +328,7 @@
 
         [data-theme="dark"] #events-glass-wrapper .glass-select {
             background-color: rgba(15, 23, 42, 0.7);
-            border: var(--space-1) solid rgba(255, 255, 255, 0.2);
+            border: var(--space-1) solid var(--effect-white-20);
             color: var(--color-slate-50);
         }
 
@@ -349,7 +349,7 @@
             cursor: pointer;
             transition: all 0.3s ease;
             box-shadow: 0 4px 16px rgba(249, 115, 22, 0.3),
-                        inset 0 1px 0 rgba(255, 255, 255, 0.2);
+                        inset 0 1px 0 var(--effect-white-20);
             text-decoration: none;
             display: inline-flex;
             align-items: center;
@@ -359,7 +359,7 @@
         #events-glass-wrapper .glass-btn-primary:hover {
             transform: translateY(-2px);
             box-shadow: 0 8px 24px rgba(249, 115, 22, 0.4),
-                        inset 0 1px 0 rgba(255, 255, 255, 0.3);
+                        inset 0 1px 0 var(--effect-white-30);
         }
 
         /* Section Headers */
@@ -382,14 +382,14 @@
         /* Glass Event Cards */
         #events-glass-wrapper .glass-event-card {
             background: linear-gradient(135deg,
-                rgba(255, 255, 255, 0.75),
-                rgba(255, 255, 255, 0.6));
+                var(--effect-white-75),
+                var(--effect-white-60));
             backdrop-filter: blur(20px) saturate(120%);
             -webkit-backdrop-filter: blur(20px) saturate(120%);
-            border: var(--space-1) solid rgba(255, 255, 255, 0.3);
+            border: var(--space-1) solid var(--effect-white-30);
             border-radius: var(--radius-xl);
             box-shadow: 0 8px 32px rgba(31, 38, 135, 0.12),
-                        inset 0 1px 0 rgba(255, 255, 255, 0.5);
+                        inset 0 1px 0 var(--effect-white-50);
             transition: all 0.3s ease;
             overflow: hidden;
             display: flex;
@@ -400,27 +400,27 @@
             transform: translateY(-8px);
             box-shadow: 0 16px 48px rgba(31, 38, 135, 0.2),
                         0 0 0 1px rgba(249, 115, 22, 0.2),
-                        inset 0 1px 0 rgba(255, 255, 255, 0.6);
+                        inset 0 1px 0 var(--effect-white-60);
         }
 
         [data-theme="dark"] #events-glass-wrapper .glass-event-card {
             background: linear-gradient(135deg,
                 rgba(15, 23, 42, 0.6),
-                rgba(30, 41, 59, 0.5));
+                var(--effect-slate-50));
             backdrop-filter: blur(24px) saturate(150%);
             -webkit-backdrop-filter: blur(24px) saturate(150%);
-            border: var(--space-1) solid rgba(255, 255, 255, 0.15);
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5),
+            border: var(--space-1) solid var(--effect-white-15);
+            box-shadow: 0 8px 32px var(--effect-black-50),
                         0 0 60px rgba(249, 115, 22, 0.08),
-                        inset 0 1px 0 rgba(255, 255, 255, 0.08);
+                        inset 0 1px 0 var(--effect-white-8);
         }
 
         [data-theme="dark"] #events-glass-wrapper .glass-event-card:hover {
             transform: translateY(-8px);
-            box-shadow: 0 16px 48px rgba(0, 0, 0, 0.7),
+            box-shadow: 0 16px 48px var(--effect-black-70),
                         0 0 0 1px rgba(249, 115, 22, 0.25),
                         0 0 80px rgba(251, 146, 60, 0.15),
-                        inset 0 1px 0 rgba(255, 255, 255, 0.12);
+                        inset 0 1px 0 var(--effect-white-12);
         }
 
         /* Card Date Header */
@@ -440,7 +440,7 @@
             position: absolute;
             width: 150px;
             height: 150px;
-            background: rgba(255, 255, 255, 0.1);
+            background: var(--effect-white-10);
             border-radius: 50%;
             top: -50px;
             right: -50px;
@@ -468,7 +468,7 @@
         }
 
         #events-glass-wrapper .time-location {
-            border-left: var(--space-1) solid rgba(255, 255, 255, 0.3);
+            border-left: var(--space-1) solid var(--effect-white-30);
             padding-left: var(--space-5);
             flex-grow: 1;
             position: relative;
@@ -544,7 +544,7 @@
         }
 
         [data-theme="dark"] #events-glass-wrapper .card-footer {
-            border-top-color: rgba(255, 255, 255, 0.1);
+            border-top-color: var(--effect-white-10);
         }
 
         #events-glass-wrapper .attendee-count {
@@ -576,7 +576,7 @@
         }
 
         [data-theme="dark"] #events-glass-wrapper .view-link {
-            color: #fb923c;
+            color: var(--color-orange-400);
         }
 
         /* Clickable Card Link Wrapper */
@@ -595,8 +595,8 @@
         /* Create Event Card */
         #events-glass-wrapper .glass-create-card {
             background: linear-gradient(135deg,
-                rgba(255, 255, 255, 0.5),
-                rgba(255, 255, 255, 0.3));
+                var(--effect-white-50),
+                var(--effect-white-30));
             backdrop-filter: blur(16px) saturate(120%);
             -webkit-backdrop-filter: blur(16px) saturate(120%);
             border: var(--space-1) dashed rgba(249, 115, 22, 0.3);
@@ -611,8 +611,8 @@
         #events-glass-wrapper .glass-create-card:hover {
             border-color: rgba(249, 115, 22, 0.5);
             background: linear-gradient(135deg,
-                rgba(255, 255, 255, 0.6),
-                rgba(255, 255, 255, 0.4));
+                var(--effect-white-60),
+                var(--effect-white-40));
             transform: translateY(-4px);
         }
 
@@ -627,7 +627,7 @@
             border-color: rgba(249, 115, 22, 0.6);
             background: linear-gradient(135deg,
                 rgba(15, 23, 42, 0.5),
-                rgba(30, 41, 59, 0.4));
+                var(--effect-slate-40));
         }
 
         /* Grid Layout */
@@ -643,11 +643,11 @@
             text-align: center;
             padding: 60px; /* Intentionally kept as 60px - no exact token match */
             background: linear-gradient(135deg,
-                rgba(255, 255, 255, 0.7),
-                rgba(255, 255, 255, 0.5));
+                var(--effect-white-70),
+                var(--effect-white-50));
             backdrop-filter: blur(20px);
             -webkit-backdrop-filter: blur(20px);
-            border: var(--space-1) solid rgba(255, 255, 255, 0.3);
+            border: var(--space-1) solid var(--effect-white-30);
             border-radius: var(--radius-xl);
             box-shadow: 0 8px 32px rgba(31, 38, 135, 0.12);
         }
@@ -655,9 +655,9 @@
         [data-theme="dark"] #events-glass-wrapper .glass-empty-state {
             background: linear-gradient(135deg,
                 rgba(15, 23, 42, 0.6),
-                rgba(30, 41, 59, 0.5));
-            border: var(--space-1) solid rgba(255, 255, 255, 0.15);
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+                var(--effect-slate-50));
+            border: var(--space-1) solid var(--effect-white-15);
+            box-shadow: 0 8px 32px var(--effect-black-50);
         }
 
         /* Responsive */
@@ -697,7 +697,7 @@
         @supports not (backdrop-filter: blur(10px)) {
             #events-glass-wrapper .glass-search-card,
             #events-glass-wrapper .glass-event-card {
-                background: rgba(255, 255, 255, 0.95);
+                background: var(--effect-white-95);
             }
 
             [data-theme="dark"] #events-glass-wrapper .glass-search-card,
@@ -716,7 +716,7 @@
                 rgba(253, 186, 116, 0.08) 100%);
             backdrop-filter: blur(20px);
             -webkit-backdrop-filter: blur(20px);
-            border: var(--space-1) solid rgba(255, 255, 255, 0.4);
+            border: var(--space-1) solid var(--effect-white-40);
             border-radius: var(--radius-xl);
             padding: var(--space-8) var(--space-6);
             margin-bottom: var(--space-8);
@@ -729,13 +729,13 @@
                 rgba(249, 115, 22, 0.15) 0%,
                 rgba(251, 146, 60, 0.15) 50%,
                 rgba(253, 186, 116, 0.1) 100%);
-            border-color: rgba(255, 255, 255, 0.1);
+            border-color: var(--effect-white-10);
         }
 
         #events-glass-wrapper .nexus-welcome-title {
             font-size: var(--font-size-3xl);
             font-weight: 800;
-            background: linear-gradient(135deg, var(--color-orange-600), var(--color-orange-500), #fb923c);
+            background: linear-gradient(135deg, var(--color-orange-600), var(--color-orange-500), var(--color-orange-400));
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
@@ -776,7 +776,7 @@
         #events-glass-wrapper .nexus-smart-btn i { font-size: 1rem; }
 
         #events-glass-wrapper .nexus-smart-btn-primary {
-            background: linear-gradient(135deg, var(--color-orange-500), #fb923c);
+            background: linear-gradient(135deg, var(--color-orange-500), var(--color-orange-400));
             color: white;
             box-shadow: 0 4px 14px rgba(249, 115, 22, 0.35);
         }
@@ -800,14 +800,14 @@
 
         #events-glass-wrapper .nexus-smart-btn-secondary:hover,
         #events-glass-wrapper .nexus-smart-btn-outline:hover {
-            background: linear-gradient(135deg, var(--color-orange-500), #fb923c);
+            background: linear-gradient(135deg, var(--color-orange-500), var(--color-orange-400));
             color: white;
             border-color: transparent;
             transform: translateY(-2px);
         }
 
         #events-glass-wrapper .nexus-smart-btn-outline {
-            background: rgba(255, 255, 255, 0.5);
+            background: var(--effect-white-50);
             color: var(--htb-text-main);
             border-color: rgba(249, 115, 22, 0.3);
         }

@@ -30,9 +30,9 @@
     right: 0;
     bottom: 0;
     background:
-        radial-gradient(ellipse 80% 50% at 20% 40%, rgba(139, 92, 246, 0.15) 0%, transparent 50%),
+        radial-gradient(ellipse 80% 50% at 20% 40%, var(--effect-purple-15) 0%, transparent 50%),
         radial-gradient(ellipse 60% 40% at 80% 60%, rgba(168, 85, 247, 0.12) 0%, transparent 50%),
-        radial-gradient(ellipse 50% 30% at 50% 80%, rgba(99, 102, 241, 0.1) 0%, transparent 50%);
+        radial-gradient(ellipse 50% 30% at 50% 80%, var(--effect-primary-10) 0%, transparent 50%);
     pointer-events: none;
     z-index: -1;
     animation: holoShift 20s ease-in-out infinite alternate;
@@ -40,9 +40,9 @@
 
 [data-theme="dark"] .holo-poll-page::before {
     background:
-        radial-gradient(ellipse 80% 50% at 20% 40%, rgba(139, 92, 246, 0.2) 0%, transparent 50%),
+        radial-gradient(ellipse 80% 50% at 20% 40%, var(--effect-purple-20) 0%, transparent 50%),
         radial-gradient(ellipse 60% 40% at 80% 60%, rgba(168, 85, 247, 0.15) 0%, transparent 50%),
-        radial-gradient(ellipse 50% 30% at 50% 80%, rgba(99, 102, 241, 0.12) 0%, transparent 50%);
+        radial-gradient(ellipse 50% 30% at 50% 80%, var(--effect-primary-12) 0%, transparent 50%);
 }
 
 @keyframes holoShift {
@@ -131,14 +131,14 @@
     justify-content: center;
     font-size: var(--font-size-4xl);
     box-shadow:
-        0 20px 40px rgba(139, 92, 246, 0.3),
-        0 0 60px rgba(139, 92, 246, 0.2);
+        0 20px 40px var(--effect-purple-30),
+        0 0 60px var(--effect-purple-20);
     animation: iconPulse 3s ease-in-out infinite;
 }
 
 @keyframes iconPulse {
-    0%, 100% { box-shadow: 0 20px 40px rgba(139, 92, 246, 0.3), 0 0 60px rgba(139, 92, 246, 0.2); }
-    50% { box-shadow: 0 25px 50px rgba(139, 92, 246, 0.4), 0 0 80px rgba(139, 92, 246, 0.3); }
+    0%, 100% { box-shadow: 0 20px 40px var(--effect-purple-30), 0 0 60px var(--effect-purple-20); }
+    50% { box-shadow: 0 25px 50px var(--effect-purple-40), 0 0 80px var(--effect-purple-30); }
 }
 
 .holo-page-title {
@@ -160,27 +160,27 @@
 
 /* Glass Card */
 .holo-glass-card {
-    background: rgba(255, 255, 255, 0.7);
+    background: var(--effect-white-70);
     backdrop-filter: blur(40px) saturate(180%);
     -webkit-backdrop-filter: blur(40px) saturate(180%);
     border-radius: var(--radius-2xl);
-    border: 1px solid rgba(255, 255, 255, 0.5);
+    border: 1px solid var(--effect-white-50);
     padding: var(--space-12) var(--space-10);
     box-shadow:
-        0 25px 50px rgba(0, 0, 0, 0.08),
-        0 0 100px rgba(139, 92, 246, 0.08),
-        inset 0 0 0 1px rgba(255, 255, 255, 0.3);
+        0 25px 50px var(--effect-black-8),
+        0 0 100px var(--effect-purple-8),
+        inset 0 0 0 1px var(--effect-white-30);
     position: relative;
     overflow: hidden;
 }
 
 [data-theme="dark"] .holo-glass-card {
-    background: rgba(15, 23, 42, 0.6);
-    border-color: rgba(255, 255, 255, 0.1);
+    background: var(--effect-slate-900-60);
+    border-color: var(--effect-white-10);
     box-shadow:
-        0 25px 50px rgba(0, 0, 0, 0.4),
-        0 0 100px rgba(139, 92, 246, 0.15),
-        inset 0 0 0 1px rgba(255, 255, 255, 0.05);
+        0 25px 50px var(--effect-black-40),
+        0 0 100px var(--effect-purple-15),
+        inset 0 0 0 1px var(--effect-white-5);
 }
 
 /* Card Shimmer Effect */
@@ -194,7 +194,7 @@
     background: linear-gradient(
         90deg,
         transparent,
-        rgba(255, 255, 255, 0.1),
+        var(--effect-white-10),
         transparent
     );
     animation: shimmer 8s ease-in-out infinite;
@@ -245,7 +245,7 @@
     content: '';
     flex: 1;
     height: 1px;
-    background: linear-gradient(90deg, rgba(139, 92, 246, 0.3), transparent);
+    background: linear-gradient(90deg, var(--effect-purple-30), transparent);
 }
 
 /* Form Labels */
@@ -278,7 +278,7 @@
     font-family: inherit;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     border: 2px solid rgba(0, 0, 0, 0.06);
-    background: rgba(255, 255, 255, 0.6);
+    background: var(--effect-white-60);
     color: var(--htb-text-main, var(--color-slate-900));
     outline: none;
     box-sizing: border-box;
@@ -286,27 +286,27 @@
 
 [data-theme="dark"] .holo-input,
 [data-theme="dark"] .holo-textarea {
-    background: rgba(0, 0, 0, 0.2);
-    border-color: rgba(255, 255, 255, 0.08);
+    background: var(--effect-black-20);
+    border-color: var(--effect-white-8);
     color: var(--color-slate-50);
 }
 
 .holo-input:focus,
 .holo-textarea:focus {
     border-color: var(--color-purple-500);
-    background: rgba(255, 255, 255, 0.9);
+    background: var(--effect-white-90);
     box-shadow:
-        0 0 0 4px rgba(139, 92, 246, 0.1),
-        0 8px 20px rgba(139, 92, 246, 0.1);
+        0 0 0 4px var(--effect-purple-10),
+        0 8px 20px var(--effect-purple-10);
 }
 
 [data-theme="dark"] .holo-input:focus,
 [data-theme="dark"] .holo-textarea:focus {
-    background: rgba(0, 0, 0, 0.3);
+    background: var(--effect-black-30);
     border-color: var(--color-purple-400-alt);
     box-shadow:
-        0 0 0 4px rgba(139, 92, 246, 0.15),
-        0 8px 20px rgba(139, 92, 246, 0.15);
+        0 0 0 4px var(--effect-purple-15),
+        0 8px 20px var(--effect-purple-15);
 }
 
 .holo-input::placeholder,
@@ -364,7 +364,7 @@
     width: 36px;
     height: 36px;
     border-radius: var(--radius-md);
-    background: rgba(239, 68, 68, 0.1);
+    background: var(--effect-red-10);
     border: none;
     color: var(--color-danger);
     cursor: pointer;
@@ -376,7 +376,7 @@
 }
 
 .holo-remove-option:hover {
-    background: rgba(239, 68, 68, 0.2);
+    background: var(--effect-red-20);
     transform: scale(1.05);
 }
 
@@ -390,8 +390,8 @@
     border-radius: var(--radius-md);
     font-size: var(--font-size-base);
     font-weight: 600;
-    background: rgba(139, 92, 246, 0.1);
-    border: 2px dashed rgba(139, 92, 246, 0.3);
+    background: var(--effect-purple-10);
+    border: 2px dashed var(--effect-purple-30);
     color: var(--color-purple-500);
     cursor: pointer;
     transition: all 0.3s ease;
@@ -399,13 +399,13 @@
 }
 
 .holo-add-option-btn:hover {
-    background: rgba(139, 92, 246, 0.15);
-    border-color: rgba(139, 92, 246, 0.5);
+    background: var(--effect-purple-15);
+    border-color: var(--effect-purple-50);
     transform: translateY(-2px);
 }
 
 [data-theme="dark"] .holo-add-option-btn {
-    background: rgba(139, 92, 246, 0.15);
+    background: var(--effect-purple-15);
     color: var(--color-purple-400-alt);
 }
 
@@ -425,8 +425,8 @@
     background: linear-gradient(135deg, var(--color-purple-500) 0%, var(--color-purple-600) 50%, var(--color-purple-700) 100%);
     color: white;
     box-shadow:
-        0 12px 30px rgba(139, 92, 246, 0.35),
-        0 0 50px rgba(139, 92, 246, 0.15);
+        0 12px 30px var(--effect-purple-35),
+        0 0 50px var(--effect-purple-15);
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     margin-top: var(--space-3);
 }
@@ -435,7 +435,7 @@
     transform: translateY(-3px);
     box-shadow:
         0 18px 40px rgba(139, 92, 246, 0.45),
-        0 0 60px rgba(139, 92, 246, 0.2);
+        0 0 60px var(--effect-purple-20);
 }
 
 .holo-submit-btn:active {
@@ -453,7 +453,7 @@
     background: linear-gradient(
         90deg,
         transparent,
-        rgba(255, 255, 255, 0.2),
+        var(--effect-white-20),
         transparent
     );
     transition: left 0.5s ease;
@@ -472,7 +472,7 @@
 /* Divider */
 .holo-divider {
     height: 1px;
-    background: linear-gradient(90deg, transparent, rgba(139, 92, 246, 0.2), transparent);
+    background: linear-gradient(90deg, transparent, var(--effect-purple-20), transparent);
     margin: var(--space-8) 0;
     border: none;
 }
@@ -547,9 +547,9 @@
     right: 0;
     bottom: 0;
     background:
-        radial-gradient(ellipse 80% 50% at 20% 40%, rgba(139, 92, 246, 0.15) 0%, transparent 50%),
+        radial-gradient(ellipse 80% 50% at 20% 40%, var(--effect-purple-15) 0%, transparent 50%),
         radial-gradient(ellipse 60% 40% at 80% 60%, rgba(168, 85, 247, 0.12) 0%, transparent 50%),
-        radial-gradient(ellipse 50% 30% at 50% 80%, rgba(99, 102, 241, 0.1) 0%, transparent 50%);
+        radial-gradient(ellipse 50% 30% at 50% 80%, var(--effect-primary-10) 0%, transparent 50%);
     pointer-events: none;
     z-index: -1;
     animation: holoShift 20s ease-in-out infinite alternate;
@@ -557,9 +557,9 @@
 
 [data-theme="dark"] .holo-poll-page::before {
     background:
-        radial-gradient(ellipse 80% 50% at 20% 40%, rgba(139, 92, 246, 0.2) 0%, transparent 50%),
+        radial-gradient(ellipse 80% 50% at 20% 40%, var(--effect-purple-20) 0%, transparent 50%),
         radial-gradient(ellipse 60% 40% at 80% 60%, rgba(168, 85, 247, 0.15) 0%, transparent 50%),
-        radial-gradient(ellipse 50% 30% at 50% 80%, rgba(99, 102, 241, 0.12) 0%, transparent 50%);
+        radial-gradient(ellipse 50% 30% at 50% 80%, var(--effect-primary-12) 0%, transparent 50%);
 }
 
 @keyframes holoShift {
@@ -648,14 +648,14 @@
     justify-content: center;
     font-size: var(--font-size-4xl);
     box-shadow:
-        0 20px 40px rgba(139, 92, 246, 0.3),
-        0 0 60px rgba(139, 92, 246, 0.2);
+        0 20px 40px var(--effect-purple-30),
+        0 0 60px var(--effect-purple-20);
     animation: iconPulse 3s ease-in-out infinite;
 }
 
 @keyframes iconPulse {
-    0%, 100% { box-shadow: 0 20px 40px rgba(139, 92, 246, 0.3), 0 0 60px rgba(139, 92, 246, 0.2); }
-    50% { box-shadow: 0 25px 50px rgba(139, 92, 246, 0.4), 0 0 80px rgba(139, 92, 246, 0.3); }
+    0%, 100% { box-shadow: 0 20px 40px var(--effect-purple-30), 0 0 60px var(--effect-purple-20); }
+    50% { box-shadow: 0 25px 50px var(--effect-purple-40), 0 0 80px var(--effect-purple-30); }
 }
 
 .holo-page-title {
@@ -677,27 +677,27 @@
 
 /* Glass Card */
 .holo-glass-card {
-    background: rgba(255, 255, 255, 0.7);
+    background: var(--effect-white-70);
     backdrop-filter: blur(40px) saturate(180%);
     -webkit-backdrop-filter: blur(40px) saturate(180%);
     border-radius: var(--radius-2xl);
-    border: 1px solid rgba(255, 255, 255, 0.5);
+    border: 1px solid var(--effect-white-50);
     padding: var(--space-12) var(--space-10);
     box-shadow:
-        0 25px 50px rgba(0, 0, 0, 0.08),
-        0 0 100px rgba(139, 92, 246, 0.08),
-        inset 0 0 0 1px rgba(255, 255, 255, 0.3);
+        0 25px 50px var(--effect-black-8),
+        0 0 100px var(--effect-purple-8),
+        inset 0 0 0 1px var(--effect-white-30);
     position: relative;
     overflow: hidden;
 }
 
 [data-theme="dark"] .holo-glass-card {
-    background: rgba(15, 23, 42, 0.6);
-    border-color: rgba(255, 255, 255, 0.1);
+    background: var(--effect-slate-900-60);
+    border-color: var(--effect-white-10);
     box-shadow:
-        0 25px 50px rgba(0, 0, 0, 0.4),
-        0 0 100px rgba(139, 92, 246, 0.15),
-        inset 0 0 0 1px rgba(255, 255, 255, 0.05);
+        0 25px 50px var(--effect-black-40),
+        0 0 100px var(--effect-purple-15),
+        inset 0 0 0 1px var(--effect-white-5);
 }
 
 /* Card Shimmer Effect */
@@ -711,7 +711,7 @@
     background: linear-gradient(
         90deg,
         transparent,
-        rgba(255, 255, 255, 0.1),
+        var(--effect-white-10),
         transparent
     );
     animation: shimmer 8s ease-in-out infinite;
@@ -776,7 +776,7 @@
     font-family: inherit;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     border: 2px solid rgba(0, 0, 0, 0.06);
-    background: rgba(255, 255, 255, 0.6);
+    background: var(--effect-white-60);
     color: var(--htb-text-main, var(--color-slate-900));
     outline: none;
     box-sizing: border-box;
@@ -784,27 +784,27 @@
 
 [data-theme="dark"] .holo-input,
 [data-theme="dark"] .holo-textarea {
-    background: rgba(0, 0, 0, 0.2);
-    border-color: rgba(255, 255, 255, 0.08);
+    background: var(--effect-black-20);
+    border-color: var(--effect-white-8);
     color: var(--color-slate-50);
 }
 
 .holo-input:focus,
 .holo-textarea:focus {
     border-color: var(--color-purple-500);
-    background: rgba(255, 255, 255, 0.9);
+    background: var(--effect-white-90);
     box-shadow:
-        0 0 0 4px rgba(139, 92, 246, 0.1),
-        0 8px 20px rgba(139, 92, 246, 0.1);
+        0 0 0 4px var(--effect-purple-10),
+        0 8px 20px var(--effect-purple-10);
 }
 
 [data-theme="dark"] .holo-input:focus,
 [data-theme="dark"] .holo-textarea:focus {
-    background: rgba(0, 0, 0, 0.3);
+    background: var(--effect-black-30);
     border-color: var(--color-purple-400-alt);
     box-shadow:
-        0 0 0 4px rgba(139, 92, 246, 0.15),
-        0 8px 20px rgba(139, 92, 246, 0.15);
+        0 0 0 4px var(--effect-purple-15),
+        0 8px 20px var(--effect-purple-15);
 }
 
 .holo-input::placeholder,
@@ -838,8 +838,8 @@
 }
 
 .holo-alert-warning {
-    background: linear-gradient(135deg, rgba(245, 158, 11, 0.1) 0%, rgba(251, 191, 36, 0.08) 100%);
-    border: 1px solid rgba(245, 158, 11, 0.2);
+    background: linear-gradient(135deg, var(--effect-amber-10) 0%, rgba(251, 191, 36, 0.08) 100%);
+    border: 1px solid var(--effect-amber-20);
 }
 
 .holo-alert-icon {
@@ -875,7 +875,7 @@
 
 .holo-alert-text {
     font-size: var(--font-size-sm);
-    color: #92400e;
+    color: var(--color-amber-800);
     line-height: 1.5;
 }
 
@@ -887,7 +887,7 @@
 /* Divider */
 .holo-divider {
     height: 1px;
-    background: linear-gradient(90deg, transparent, rgba(139, 92, 246, 0.2), transparent);
+    background: linear-gradient(90deg, transparent, var(--effect-purple-20), transparent);
     margin: var(--space-8) 0;
     border: none;
 }
@@ -924,24 +924,24 @@
     flex: 2;
     background: linear-gradient(135deg, var(--color-purple-500) 0%, var(--color-purple-600) 50%, var(--color-purple-700) 100%);
     color: white;
-    box-shadow: 0 8px 24px rgba(139, 92, 246, 0.3);
+    box-shadow: 0 8px 24px var(--effect-purple-30);
 }
 
 .holo-btn-primary:hover {
     transform: translateY(-2px);
-    box-shadow: 0 12px 32px rgba(139, 92, 246, 0.4);
+    box-shadow: 0 12px 32px var(--effect-purple-40);
 }
 
 .holo-btn-secondary {
     flex: 1;
     background: rgba(0, 0, 0, 0.03);
-    border: 2px solid rgba(0, 0, 0, 0.08);
+    border: 2px solid var(--effect-black-8);
     color: var(--htb-text-main, var(--color-gray-700));
 }
 
 [data-theme="dark"] .holo-btn-secondary {
-    background: rgba(255, 255, 255, 0.05);
-    border-color: rgba(255, 255, 255, 0.1);
+    background: var(--effect-white-5);
+    border-color: var(--effect-white-10);
     color: var(--color-slate-200);
 }
 
@@ -951,14 +951,14 @@
 }
 
 [data-theme="dark"] .holo-btn-secondary:hover {
-    background: rgba(255, 255, 255, 0.1);
+    background: var(--effect-white-10);
 }
 
 /* Danger Zone */
 .holo-danger-zone {
     margin-top: var(--space-8);
     padding-top: var(--space-8);
-    border-top: 1px solid rgba(239, 68, 68, 0.2);
+    border-top: 1px solid var(--effect-red-20);
 }
 
 .holo-btn-danger {
@@ -1083,7 +1083,7 @@
         input:focus-visible,
         .nexus-smart-btn:focus-visible,
         .glass-btn-primary:focus-visible {
-            outline: 3px solid rgba(139, 92, 246, 0.5);
+            outline: 3px solid var(--effect-purple-50);
             outline-offset: 2px;
         }
 
@@ -1125,7 +1125,7 @@
 
         [data-theme="light"] #polls-glass-wrapper::before {
             background: linear-gradient(135deg,
-                rgba(139, 92, 246, 0.08) 0%,
+                var(--effect-purple-8) 0%,
                 rgba(167, 139, 250, 0.08) 25%,
                 rgba(196, 181, 253, 0.06) 50%,
                 rgba(221, 214, 254, 0.06) 75%,
@@ -1136,7 +1136,7 @@
 
         [data-theme="dark"] #polls-glass-wrapper::before {
             background: radial-gradient(circle at 20% 30%,
-                rgba(139, 92, 246, 0.15) 0%, transparent 50%),
+                var(--effect-purple-15) 0%, transparent 50%),
             radial-gradient(circle at 80% 70%,
                 rgba(167, 139, 250, 0.12) 0%, transparent 50%);
         }
@@ -1168,11 +1168,11 @@
 
         #polls-glass-wrapper .quick-action-btn {
             background: linear-gradient(135deg,
-                rgba(255, 255, 255, 0.75),
-                rgba(255, 255, 255, 0.6));
+                var(--effect-white-75),
+                var(--effect-white-60));
             backdrop-filter: blur(16px) saturate(120%);
             -webkit-backdrop-filter: blur(16px) saturate(120%);
-            border: 2px solid rgba(255, 255, 255, 0.3);
+            border: 2px solid var(--effect-white-30);
             border-radius: var(--radius-lg);
             padding: var(--space-3) var(--space-5);
             text-decoration: none;
@@ -1181,7 +1181,7 @@
             gap: var(--space-2);
             transition: all 0.3s ease;
             box-shadow: 0 4px 12px rgba(31, 38, 135, 0.1),
-                        inset 0 1px 0 rgba(255, 255, 255, 0.4);
+                        inset 0 1px 0 var(--effect-white-40);
             position: relative;
             overflow: hidden;
         }
@@ -1193,7 +1193,7 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background: linear-gradient(135deg, rgba(139, 92, 246, 0.08), rgba(167, 139, 250, 0.08));
+            background: linear-gradient(135deg, var(--effect-purple-8), rgba(167, 139, 250, 0.08));
             opacity: 0;
             transition: opacity 0.3s ease;
         }
@@ -1204,25 +1204,25 @@
 
         #polls-glass-wrapper .quick-action-btn:hover {
             transform: translateY(-3px);
-            border-color: rgba(139, 92, 246, 0.4);
-            box-shadow: 0 8px 20px rgba(139, 92, 246, 0.15),
-                        0 0 0 1px rgba(139, 92, 246, 0.15),
-                        inset 0 1px 0 rgba(255, 255, 255, 0.5);
+            border-color: var(--effect-purple-40);
+            box-shadow: 0 8px 20px var(--effect-purple-15),
+                        0 0 0 1px var(--effect-purple-15),
+                        inset 0 1px 0 var(--effect-white-50);
         }
 
         [data-theme="dark"] #polls-glass-wrapper .quick-action-btn {
             background: linear-gradient(135deg,
-                rgba(15, 23, 42, 0.6),
-                rgba(30, 41, 59, 0.5));
-            border: 2px solid rgba(255, 255, 255, 0.12);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3),
+                var(--effect-slate-900-60),
+                var(--effect-slate-50));
+            border: 2px solid var(--effect-white-12);
+            box-shadow: 0 4px 12px var(--effect-black-30),
                         inset 0 1px 0 rgba(255, 255, 255, 0.06);
         }
 
         [data-theme="dark"] #polls-glass-wrapper .quick-action-btn:hover {
-            border-color: rgba(139, 92, 246, 0.3);
-            box-shadow: 0 8px 20px rgba(139, 92, 246, 0.25),
-                        0 0 0 1px rgba(139, 92, 246, 0.2),
+            border-color: var(--effect-purple-30);
+            box-shadow: 0 8px 20px var(--effect-purple-25),
+                        0 0 0 1px var(--effect-purple-20),
                         0 0 30px rgba(167, 139, 250, 0.12);
         }
 
@@ -1247,26 +1247,26 @@
             padding: var(--space-6);
             border-radius: var(--radius-xl);
             background: linear-gradient(135deg,
-                rgba(255, 255, 255, 0.75),
-                rgba(255, 255, 255, 0.6));
+                var(--effect-white-75),
+                var(--effect-white-60));
             backdrop-filter: blur(20px) saturate(120%);
             -webkit-backdrop-filter: blur(20px) saturate(120%);
-            border: 1px solid rgba(255, 255, 255, 0.3);
+            border: 1px solid var(--effect-white-30);
             box-shadow: 0 8px 32px rgba(31, 38, 135, 0.15),
-                        inset 0 0 0 1px rgba(255, 255, 255, 0.4);
+                        inset 0 0 0 1px var(--effect-white-40);
             transition: all 0.3s ease;
         }
 
         [data-theme="dark"] #polls-glass-wrapper .glass-search-card {
             background: linear-gradient(135deg,
-                rgba(15, 23, 42, 0.6),
-                rgba(30, 41, 59, 0.5));
+                var(--effect-slate-900-60),
+                var(--effect-slate-50));
             backdrop-filter: blur(24px) saturate(150%);
             -webkit-backdrop-filter: blur(24px) saturate(150%);
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5),
-                        0 0 80px rgba(139, 92, 246, 0.1),
-                        inset 0 1px 0 rgba(255, 255, 255, 0.1);
+            border: 1px solid var(--effect-white-15);
+            box-shadow: 0 8px 32px var(--effect-black-50),
+                        0 0 80px var(--effect-purple-10),
+                        inset 0 1px 0 var(--effect-white-10);
         }
 
         /* Glass Primary Button */
@@ -1280,8 +1280,8 @@
             font-weight: 700;
             cursor: pointer;
             transition: all 0.3s ease;
-            box-shadow: 0 4px 16px rgba(139, 92, 246, 0.3),
-                        inset 0 1px 0 rgba(255, 255, 255, 0.2);
+            box-shadow: 0 4px 16px var(--effect-purple-30),
+                        inset 0 1px 0 var(--effect-white-20);
             text-decoration: none;
             display: inline-flex;
             align-items: center;
@@ -1290,8 +1290,8 @@
 
         #polls-glass-wrapper .glass-btn-primary:hover {
             transform: translateY(-2px);
-            box-shadow: 0 8px 24px rgba(139, 92, 246, 0.4),
-                        inset 0 1px 0 rgba(255, 255, 255, 0.3);
+            box-shadow: 0 8px 24px var(--effect-purple-40),
+                        inset 0 1px 0 var(--effect-white-30);
         }
 
         /* Section Headers */
@@ -1322,14 +1322,14 @@
         /* Glass Poll Cards */
         #polls-glass-wrapper .glass-poll-card {
             background: linear-gradient(135deg,
-                rgba(255, 255, 255, 0.75),
-                rgba(255, 255, 255, 0.6));
+                var(--effect-white-75),
+                var(--effect-white-60));
             backdrop-filter: blur(20px) saturate(120%);
             -webkit-backdrop-filter: blur(20px) saturate(120%);
-            border: 1px solid rgba(255, 255, 255, 0.3);
+            border: 1px solid var(--effect-white-30);
             border-radius: var(--radius-xl);
             box-shadow: 0 8px 32px rgba(31, 38, 135, 0.12),
-                        inset 0 1px 0 rgba(255, 255, 255, 0.5);
+                        inset 0 1px 0 var(--effect-white-50);
             transition: all 0.3s ease;
             overflow: hidden;
             display: flex;
@@ -1340,28 +1340,28 @@
         #polls-glass-wrapper .glass-poll-card:hover {
             transform: translateY(-8px);
             box-shadow: 0 16px 48px rgba(31, 38, 135, 0.2),
-                        0 0 0 1px rgba(139, 92, 246, 0.2),
-                        inset 0 1px 0 rgba(255, 255, 255, 0.6);
+                        0 0 0 1px var(--effect-purple-20),
+                        inset 0 1px 0 var(--effect-white-60);
         }
 
         [data-theme="dark"] #polls-glass-wrapper .glass-poll-card {
             background: linear-gradient(135deg,
-                rgba(15, 23, 42, 0.6),
-                rgba(30, 41, 59, 0.5));
+                var(--effect-slate-900-60),
+                var(--effect-slate-50));
             backdrop-filter: blur(24px) saturate(150%);
             -webkit-backdrop-filter: blur(24px) saturate(150%);
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5),
-                        0 0 60px rgba(139, 92, 246, 0.08),
-                        inset 0 1px 0 rgba(255, 255, 255, 0.08);
+            border: 1px solid var(--effect-white-15);
+            box-shadow: 0 8px 32px var(--effect-black-50),
+                        0 0 60px var(--effect-purple-8),
+                        inset 0 1px 0 var(--effect-white-8);
         }
 
         [data-theme="dark"] #polls-glass-wrapper .glass-poll-card:hover {
             transform: translateY(-8px);
-            box-shadow: 0 16px 48px rgba(0, 0, 0, 0.7),
-                        0 0 0 1px rgba(139, 92, 246, 0.25),
+            box-shadow: 0 16px 48px var(--effect-black-70),
+                        0 0 0 1px var(--effect-purple-25),
                         0 0 80px rgba(167, 139, 250, 0.15),
-                        inset 0 1px 0 rgba(255, 255, 255, 0.12);
+                        inset 0 1px 0 var(--effect-white-12);
         }
 
         /* Card Header */
@@ -1377,7 +1377,7 @@
             position: absolute;
             width: 150px;
             height: 150px;
-            background: rgba(255, 255, 255, 0.1);
+            background: var(--effect-white-10);
             border-radius: 50%;
             top: -50px;
             right: -50px;
@@ -1394,7 +1394,7 @@
         #polls-glass-wrapper .card-header .poll-icon {
             width: 50px;
             height: 50px;
-            background: rgba(255, 255, 255, 0.2);
+            background: var(--effect-white-20);
             border-radius: var(--radius-md);
             display: flex;
             align-items: center;
@@ -1417,12 +1417,12 @@
         }
 
         #polls-glass-wrapper .status-badge.open {
-            background: rgba(255, 255, 255, 0.95);
+            background: var(--effect-white-95);
             color: var(--color-green-600);
         }
 
         #polls-glass-wrapper .status-badge.closed {
-            background: rgba(255, 255, 255, 0.8);
+            background: var(--effect-white-80);
             color: var(--color-gray-500);
         }
 
@@ -1478,7 +1478,7 @@
         }
 
         [data-theme="dark"] #polls-glass-wrapper .card-footer {
-            border-top-color: rgba(255, 255, 255, 0.1);
+            border-top-color: var(--effect-white-10);
         }
 
         #polls-glass-wrapper .vote-count {
@@ -1529,11 +1529,11 @@
         /* Create Poll Card */
         #polls-glass-wrapper .glass-create-card {
             background: linear-gradient(135deg,
-                rgba(255, 255, 255, 0.5),
-                rgba(255, 255, 255, 0.3));
+                var(--effect-white-50),
+                var(--effect-white-30));
             backdrop-filter: blur(16px) saturate(120%);
             -webkit-backdrop-filter: blur(16px) saturate(120%);
-            border: 2px dashed rgba(139, 92, 246, 0.3);
+            border: 2px dashed var(--effect-purple-30);
             border-radius: var(--radius-xl);
             display: flex;
             align-items: center;
@@ -1543,10 +1543,10 @@
         }
 
         #polls-glass-wrapper .glass-create-card:hover {
-            border-color: rgba(139, 92, 246, 0.5);
+            border-color: var(--effect-purple-50);
             background: linear-gradient(135deg,
-                rgba(255, 255, 255, 0.6),
-                rgba(255, 255, 255, 0.4));
+                var(--effect-white-60),
+                var(--effect-white-40));
             transform: translateY(-4px);
         }
 
@@ -1554,14 +1554,14 @@
             background: linear-gradient(135deg,
                 rgba(15, 23, 42, 0.4),
                 rgba(30, 41, 59, 0.3));
-            border: 2px dashed rgba(139, 92, 246, 0.4);
+            border: 2px dashed var(--effect-purple-40);
         }
 
         [data-theme="dark"] #polls-glass-wrapper .glass-create-card:hover {
-            border-color: rgba(139, 92, 246, 0.6);
+            border-color: var(--effect-purple-60);
             background: linear-gradient(135deg,
                 rgba(15, 23, 42, 0.5),
-                rgba(30, 41, 59, 0.4));
+                var(--effect-slate-40));
         }
 
         /* Grid Layout */
@@ -1577,21 +1577,21 @@
             text-align: center;
             padding: var(--space-16);
             background: linear-gradient(135deg,
-                rgba(255, 255, 255, 0.7),
-                rgba(255, 255, 255, 0.5));
+                var(--effect-white-70),
+                var(--effect-white-50));
             backdrop-filter: blur(20px);
             -webkit-backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.3);
+            border: 1px solid var(--effect-white-30);
             border-radius: var(--radius-xl);
             box-shadow: 0 8px 32px rgba(31, 38, 135, 0.12);
         }
 
         [data-theme="dark"] #polls-glass-wrapper .glass-empty-state {
             background: linear-gradient(135deg,
-                rgba(15, 23, 42, 0.6),
-                rgba(30, 41, 59, 0.5));
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+                var(--effect-slate-900-60),
+                var(--effect-slate-50));
+            border: 1px solid var(--effect-white-15);
+            box-shadow: 0 8px 32px var(--effect-black-50);
         }
 
         /* Responsive */
@@ -1627,7 +1627,7 @@
         @supports not (backdrop-filter: blur(10px)) {
             #polls-glass-wrapper .glass-search-card,
             #polls-glass-wrapper .glass-poll-card {
-                background: rgba(255, 255, 255, 0.95);
+                background: var(--effect-white-95);
             }
 
             [data-theme="dark"] #polls-glass-wrapper .glass-search-card,
@@ -1641,25 +1641,25 @@
            =================================== */
         #polls-glass-wrapper .nexus-welcome-hero {
             background: linear-gradient(135deg,
-                rgba(139, 92, 246, 0.12) 0%,
+                var(--effect-purple-12) 0%,
                 rgba(167, 139, 250, 0.12) 50%,
                 rgba(196, 181, 253, 0.08) 100%);
             backdrop-filter: blur(20px);
             -webkit-backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.4);
+            border: 1px solid var(--effect-white-40);
             border-radius: var(--radius-xl);
             padding: var(--space-6) 24px;
             margin-bottom: var(--space-8);
             text-align: center;
-            box-shadow: 0 8px 32px rgba(139, 92, 246, 0.1);
+            box-shadow: 0 8px 32px var(--effect-purple-10);
         }
 
         [data-theme="dark"] #polls-glass-wrapper .nexus-welcome-hero {
             background: linear-gradient(135deg,
-                rgba(139, 92, 246, 0.15) 0%,
+                var(--effect-purple-15) 0%,
                 rgba(167, 139, 250, 0.15) 50%,
                 rgba(196, 181, 253, 0.1) 100%);
-            border-color: rgba(255, 255, 255, 0.1);
+            border-color: var(--effect-white-10);
         }
 
         #polls-glass-wrapper .nexus-welcome-title {
@@ -1708,7 +1708,7 @@
         #polls-glass-wrapper .nexus-smart-btn-primary {
             background: linear-gradient(135deg, var(--color-purple-500), var(--color-purple-400-alt));
             color: white;
-            box-shadow: 0 4px 14px rgba(139, 92, 246, 0.35);
+            box-shadow: 0 4px 14px var(--effect-purple-35);
         }
 
         #polls-glass-wrapper .nexus-smart-btn-primary:hover {
@@ -1717,15 +1717,15 @@
         }
 
         #polls-glass-wrapper .nexus-smart-btn-secondary {
-            background: linear-gradient(135deg, rgba(139, 92, 246, 0.1), rgba(167, 139, 250, 0.1));
+            background: linear-gradient(135deg, var(--effect-purple-10), rgba(167, 139, 250, 0.1));
             color: var(--color-purple-600);
-            border-color: rgba(139, 92, 246, 0.3);
+            border-color: var(--effect-purple-30);
         }
 
         [data-theme="dark"] #polls-glass-wrapper .nexus-smart-btn-secondary {
-            background: linear-gradient(135deg, rgba(139, 92, 246, 0.2), rgba(167, 139, 250, 0.15));
+            background: linear-gradient(135deg, var(--effect-purple-20), rgba(167, 139, 250, 0.15));
             color: var(--color-purple-300);
-            border-color: rgba(139, 92, 246, 0.4);
+            border-color: var(--effect-purple-40);
         }
 
         #polls-glass-wrapper .nexus-smart-btn-secondary:hover,
@@ -1737,14 +1737,14 @@
         }
 
         #polls-glass-wrapper .nexus-smart-btn-outline {
-            background: rgba(255, 255, 255, 0.5);
+            background: var(--effect-white-50);
             color: var(--htb-text-main);
-            border-color: rgba(139, 92, 246, 0.3);
+            border-color: var(--effect-purple-30);
         }
 
         [data-theme="dark"] #polls-glass-wrapper .nexus-smart-btn-outline {
             background: rgba(15, 23, 42, 0.5);
-            border-color: rgba(139, 92, 246, 0.4);
+            border-color: var(--effect-purple-40);
         }
 
         @media (max-width: 640px) {
@@ -1831,7 +1831,7 @@
 #poll-holo-wrapper .share-btn:focus-visible,
 #poll-holo-wrapper a:focus-visible,
 #poll-holo-wrapper input:focus-visible {
-    outline: 3px solid rgba(139, 92, 246, 0.6);
+    outline: 3px solid var(--effect-purple-60);
     outline-offset: 3px;
 }
 
@@ -1895,7 +1895,7 @@ html {
     bottom: 0;
     z-index: -1;
     background:
-        radial-gradient(ellipse at 20% 0%, rgba(139, 92, 246, 0.3) 0%, transparent 50%),
+        radial-gradient(ellipse at 20% 0%, var(--effect-purple-30) 0%, transparent 50%),
         radial-gradient(ellipse at 80% 0%, rgba(6, 182, 212, 0.25) 0%, transparent 50%),
         radial-gradient(ellipse at 50% 100%, rgba(244, 114, 182, 0.2) 0%, transparent 50%);
     animation: holoShift 20s ease-in-out infinite alternate;
@@ -1921,7 +1921,7 @@ html {
 .holo-orb-1 {
     width: 500px;
     height: 500px;
-    background: radial-gradient(circle, rgba(139, 92, 246, 0.6) 0%, transparent 70%);
+    background: radial-gradient(circle, var(--effect-purple-60) 0%, transparent 70%);
     top: -150px;
     left: -150px;
 }
@@ -1929,7 +1929,7 @@ html {
 .holo-orb-2 {
     width: 400px;
     height: 400px;
-    background: radial-gradient(circle, rgba(6, 182, 212, 0.5) 0%, transparent 70%);
+    background: radial-gradient(circle, var(--effect-cyan-50) 0%, transparent 70%);
     top: 40%;
     right: -100px;
     animation-delay: -5s;
@@ -1970,10 +1970,10 @@ html {
     align-items: center;
     gap: var(--space-2);
     padding: var(--space-2) 20px;
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: var(--effect-white-5);
+    border: 1px solid var(--effect-white-10);
     border-radius: var(--radius-full);
-    color: rgba(255, 255, 255, 0.7);
+    color: var(--effect-white-70);
     font-size: var(--font-size-sm);
     font-weight: 600;
     text-decoration: none;
@@ -1983,8 +1983,8 @@ html {
 }
 
 .poll-back-link:hover {
-    background: rgba(139, 92, 246, 0.2);
-    border-color: rgba(139, 92, 246, 0.4);
+    background: var(--effect-purple-20);
+    border-color: var(--effect-purple-40);
     color: var(--color-purple-300);
     transform: translateX(-5px);
 }
@@ -2002,8 +2002,8 @@ html {
     align-items: center;
     gap: var(--space-2);
     padding: var(--space-2) 24px;
-    background: linear-gradient(135deg, rgba(139, 92, 246, 0.2), rgba(6, 182, 212, 0.15));
-    border: 1px solid rgba(139, 92, 246, 0.3);
+    background: linear-gradient(135deg, var(--effect-purple-20), var(--effect-cyan-15));
+    border: 1px solid var(--effect-purple-30);
     border-radius: var(--radius-full);
     color: var(--poll-secondary);
     font-size: var(--font-size-sm);
@@ -2027,12 +2027,12 @@ html {
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
-    text-shadow: 0 0 80px rgba(139, 92, 246, 0.5);
+    text-shadow: 0 0 80px var(--effect-purple-50);
 }
 
 .poll-description {
     font-size: var(--font-size-lg);
-    color: rgba(255, 255, 255, 0.7);
+    color: var(--effect-white-70);
     max-width: 600px;
     margin: 0 auto var(--space-6);
     line-height: 1.6;
@@ -2043,8 +2043,8 @@ html {
     align-items: center;
     gap: var(--space-2);
     padding: var(--space-3) 24px;
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.15);
+    background: var(--effect-white-5);
+    border: 1px solid var(--effect-white-15);
     border-radius: var(--radius-lg);
     color: var(--color-white);
     font-size: var(--font-size-sm);
@@ -2055,15 +2055,15 @@ html {
 }
 
 .poll-manage-btn:hover {
-    background: linear-gradient(135deg, rgba(139, 92, 246, 0.3), rgba(6, 182, 212, 0.2));
-    border-color: rgba(139, 92, 246, 0.4);
+    background: linear-gradient(135deg, var(--effect-purple-30), var(--effect-cyan-20));
+    border-color: var(--effect-purple-40);
     transform: translateY(-2px);
 }
 
 /* ===== POLL CONTENT CARD ===== */
 .poll-content-card {
     background: rgba(255, 255, 255, 0.03);
-    border: 1px solid rgba(255, 255, 255, 0.08);
+    border: 1px solid var(--effect-white-8);
     border-radius: var(--radius-2xl);
     padding: var(--space-12);
     backdrop-filter: blur(20px);
@@ -2080,11 +2080,11 @@ html {
     border-radius: var(--radius-2xl);
     padding: var(--space-0);
     background: linear-gradient(135deg,
-        rgba(139, 92, 246, 0.3) 0%,
-        rgba(6, 182, 212, 0.2) 50%,
+        var(--effect-purple-30) 0%,
+        var(--effect-cyan-20) 50%,
         rgba(244, 114, 182, 0.3) 100%);
-    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask: linear-gradient(var(--color-white) 0 0) content-box, linear-gradient(var(--color-white) 0 0);
+    mask: linear-gradient(var(--color-white) 0 0) content-box, linear-gradient(var(--color-white) 0 0);
     -webkit-mask-composite: xor;
     mask-composite: exclude;
     pointer-events: none;
@@ -2102,26 +2102,26 @@ html {
     align-items: center;
     padding: var(--space-5) 28px;
     background: rgba(255, 255, 255, 0.03);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    border: 1px solid var(--effect-white-10);
     border-radius: var(--radius-lg);
     cursor: pointer;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     position: relative;
     overflow: hidden;
-    color: rgba(255, 255, 255, 0.9);
+    color: var(--effect-white-90);
 }
 
 .poll-option-label::before {
     content: '';
     position: absolute;
     inset: 0;
-    background: linear-gradient(135deg, rgba(139, 92, 246, 0.1), rgba(6, 182, 212, 0.05));
+    background: linear-gradient(135deg, var(--effect-purple-10), rgba(6, 182, 212, 0.05));
     opacity: 0;
     transition: opacity 0.3s ease;
 }
 
 .poll-option-label:hover {
-    border-color: rgba(139, 92, 246, 0.4);
+    border-color: var(--effect-purple-40);
     transform: translateX(8px);
 }
 
@@ -2134,7 +2134,7 @@ html {
     -webkit-appearance: none;
     width: 24px;
     height: 24px;
-    border: 2px solid rgba(255, 255, 255, 0.3);
+    border: 2px solid var(--effect-white-30);
     border-radius: 50%;
     margin-right: var(--space-5);
     display: grid;
@@ -2152,14 +2152,14 @@ html {
     border-radius: 50%;
     transform: scale(0);
     transition: 0.2s transform cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    background: #fff;
-    box-shadow: 0 0 10px rgba(255, 255, 255, 0.8);
+    background: var(--color-white);
+    box-shadow: 0 0 10px var(--effect-white-80);
 }
 
 .poll-option-label input[type="radio"]:checked {
     border-color: var(--poll-primary);
     background: var(--poll-primary);
-    box-shadow: 0 0 20px rgba(139, 92, 246, 0.4);
+    box-shadow: 0 0 20px var(--effect-purple-40);
 }
 
 .poll-option-label input[type="radio"]:checked::before {
@@ -2167,8 +2167,8 @@ html {
 }
 
 .poll-option-label:has(input:checked) {
-    border-color: rgba(139, 92, 246, 0.5);
-    background: rgba(139, 92, 246, 0.1);
+    border-color: var(--effect-purple-50);
+    background: var(--effect-purple-10);
 }
 
 .option-text {
@@ -2182,7 +2182,7 @@ html {
 .poll-results-header {
     text-align: center;
     margin-bottom: 35px;
-    color: rgba(255, 255, 255, 0.9);
+    color: var(--effect-white-90);
     font-size: var(--font-size-xl);
     font-weight: 400;
 }
@@ -2202,7 +2202,7 @@ html {
     justify-content: space-between;
     margin-bottom: var(--space-2);
     font-size: var(--font-size-base);
-    color: rgba(255, 255, 255, 0.9);
+    color: var(--effect-white-90);
 }
 
 .result-label {
@@ -2216,11 +2216,11 @@ html {
 
 .progress-track {
     height: 16px;
-    background: rgba(255, 255, 255, 0.05);
+    background: var(--effect-white-5);
     border-radius: var(--radius-md);
     overflow: hidden;
     position: relative;
-    border: 1px solid rgba(255, 255, 255, 0.08);
+    border: 1px solid var(--effect-white-8);
 }
 
 .progress-fill {
@@ -2230,7 +2230,7 @@ html {
     animation: gradientShift 3s ease infinite;
     border-radius: var(--radius-md);
     position: relative;
-    box-shadow: 0 0 20px rgba(139, 92, 246, 0.4);
+    box-shadow: 0 0 20px var(--effect-purple-40);
     transition: width 1s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
@@ -2244,8 +2244,8 @@ html {
     text-align: center;
     margin-top: var(--space-10);
     padding-top: var(--space-6);
-    border-top: 1px solid rgba(255, 255, 255, 0.08);
-    color: rgba(255, 255, 255, 0.6);
+    border-top: 1px solid var(--effect-white-8);
+    color: var(--effect-white-60);
     font-size: var(--font-size-base);
 }
 
@@ -2262,7 +2262,7 @@ html {
 
 .poll-login-prompt p {
     font-size: var(--font-size-xl);
-    color: rgba(255, 255, 255, 0.8);
+    color: var(--effect-white-80);
     margin-bottom: var(--space-6);
 }
 
@@ -2282,14 +2282,14 @@ html {
     text-transform: uppercase;
     letter-spacing: 1px;
     cursor: pointer;
-    box-shadow: 0 10px 30px rgba(139, 92, 246, 0.4);
+    box-shadow: 0 10px 30px var(--effect-purple-40);
     transition: all 0.3s ease;
     text-decoration: none;
 }
 
 .poll-btn:hover {
     transform: translateY(-3px);
-    box-shadow: 0 15px 40px rgba(139, 92, 246, 0.5);
+    box-shadow: 0 15px 40px var(--effect-purple-50);
 }
 
 .poll-btn-block {
@@ -2302,7 +2302,7 @@ html {
 /* ===== SOCIAL SECTION ===== */
 .poll-social-section {
     background: rgba(255, 255, 255, 0.03);
-    border: 1px solid rgba(255, 255, 255, 0.08);
+    border: 1px solid var(--effect-white-8);
     border-radius: var(--radius-2xl);
     padding: var(--space-8) 40px;
     backdrop-filter: blur(20px);
@@ -2317,11 +2317,11 @@ html {
     border-radius: var(--radius-2xl);
     padding: var(--space-0);
     background: linear-gradient(135deg,
-        rgba(139, 92, 246, 0.2) 0%,
-        rgba(6, 182, 212, 0.15) 50%,
+        var(--effect-purple-20) 0%,
+        var(--effect-cyan-15) 50%,
         rgba(244, 114, 182, 0.2) 100%);
-    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask: linear-gradient(var(--color-white) 0 0) content-box, linear-gradient(var(--color-white) 0 0);
+    mask: linear-gradient(var(--color-white) 0 0) content-box, linear-gradient(var(--color-white) 0 0);
     -webkit-mask-composite: xor;
     mask-composite: exclude;
     pointer-events: none;
@@ -2340,10 +2340,10 @@ html {
     align-items: center;
     gap: var(--space-2);
     padding: var(--space-3) var(--space-5);
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: var(--effect-white-5);
+    border: 1px solid var(--effect-white-10);
     border-radius: var(--radius-lg);
-    color: rgba(255, 255, 255, 0.8);
+    color: var(--effect-white-80);
     font-size: var(--font-size-base);
     font-weight: 600;
     cursor: pointer;
@@ -2352,14 +2352,14 @@ html {
 }
 
 .social-btn:hover {
-    background: rgba(255, 255, 255, 0.1);
-    border-color: rgba(255, 255, 255, 0.2);
+    background: var(--effect-white-10);
+    border-color: var(--effect-white-20);
     transform: translateY(-2px);
 }
 
 .social-btn.liked {
-    background: rgba(239, 68, 68, 0.15);
-    border-color: rgba(239, 68, 68, 0.3);
+    background: var(--effect-red-15);
+    border-color: var(--effect-red-30);
     color: var(--color-red-300);
 }
 
@@ -2371,12 +2371,12 @@ html {
     width: 44px;
     height: 44px;
     border-radius: var(--radius-md);
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: var(--effect-white-5);
+    border: 1px solid var(--effect-white-10);
     display: flex;
     align-items: center;
     justify-content: center;
-    color: rgba(255, 255, 255, 0.7);
+    color: var(--effect-white-70);
     text-decoration: none;
     transition: all 0.3s ease;
     cursor: pointer;
@@ -2384,7 +2384,7 @@ html {
 
 .share-btn:hover {
     transform: translateY(-3px);
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 8px 20px var(--effect-black-30);
 }
 
 .share-btn.share-feed:hover {
@@ -2398,7 +2398,7 @@ html {
     display: none;
     margin-top: var(--space-6);
     padding-top: var(--space-6);
-    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    border-top: 1px solid var(--effect-white-8);
 }
 
 .comments-wrapper.visible {
@@ -2417,12 +2417,12 @@ html {
 }
 
 .comments-list::-webkit-scrollbar-track {
-    background: rgba(255, 255, 255, 0.05);
+    background: var(--effect-white-5);
     border-radius: var(--radius-sm);
 }
 
 .comments-list::-webkit-scrollbar-thumb {
-    background: rgba(139, 92, 246, 0.3);
+    background: var(--effect-purple-30);
     border-radius: var(--radius-sm);
 }
 
@@ -2445,7 +2445,7 @@ html {
     height: 40px;
     border-radius: 50%;
     object-fit: cover;
-    border: 2px solid rgba(139, 92, 246, 0.3);
+    border: 2px solid var(--effect-purple-30);
 }
 
 .comment-avatar-small {
@@ -2460,7 +2460,7 @@ html {
 .comment-author {
     font-weight: 600;
     font-size: var(--font-size-base);
-    color: rgba(255, 255, 255, 0.95);
+    color: var(--effect-white-95);
     margin-bottom: var(--space-1);
 }
 
@@ -2481,14 +2481,14 @@ html {
 }
 
 .comment-content {
-    color: rgba(255, 255, 255, 0.85);
+    color: var(--effect-white-85);
     line-height: 1.5;
     margin-bottom: var(--space-2);
 }
 
 .comment-meta {
     font-size: var(--font-size-xs);
-    color: rgba(255, 255, 255, 0.5);
+    color: var(--effect-white-50);
     display: flex;
     align-items: center;
     gap: var(--space-3);
@@ -2518,8 +2518,8 @@ html {
     align-items: center;
     gap: var(--space-1);
     padding: var(--space-1) 10px;
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: var(--effect-white-5);
+    border: 1px solid var(--effect-white-10);
     border-radius: var(--radius-xl);
     font-size: var(--font-size-sm);
     cursor: pointer;
@@ -2527,18 +2527,18 @@ html {
 }
 
 .reaction-badge.active {
-    background: rgba(99, 102, 241, 0.2);
-    border-color: rgba(99, 102, 241, 0.4);
+    background: var(--effect-primary-20);
+    border-color: var(--effect-primary-40);
 }
 
 .reaction-badge:hover {
-    background: rgba(255, 255, 255, 0.1);
+    background: var(--effect-white-10);
 }
 
 .reaction-picker-toggle {
     padding: var(--space-1) 10px;
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: var(--effect-white-5);
+    border: 1px solid var(--effect-white-10);
     border-radius: var(--radius-xl);
     cursor: pointer;
     font-size: var(--font-size-sm);
@@ -2546,7 +2546,7 @@ html {
 }
 
 .reaction-picker-toggle:hover {
-    background: rgba(255, 255, 255, 0.1);
+    background: var(--effect-white-10);
 }
 
 .reaction-picker-dropdown {
@@ -2555,7 +2555,7 @@ html {
     bottom: 100%;
     left: 0;
     background: rgba(30, 27, 75, 0.95);
-    border: 1px solid rgba(255, 255, 255, 0.15);
+    border: 1px solid var(--effect-white-15);
     border-radius: var(--radius-md);
     padding: var(--space-2);
     z-index: 100;
@@ -2577,7 +2577,7 @@ html {
 }
 
 .reaction-picker-dropdown span:hover {
-    background: rgba(255, 255, 255, 0.1);
+    background: var(--effect-white-10);
 }
 
 .reply-form {
@@ -2604,23 +2604,23 @@ html {
 .comment-input {
     flex: 1;
     padding: var(--space-3) var(--space-5);
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: var(--effect-white-5);
+    border: 1px solid var(--effect-white-10);
     border-radius: var(--radius-lg);
-    color: rgba(255, 255, 255, 0.9);
+    color: var(--effect-white-90);
     font-size: var(--font-size-base);
     transition: all 0.3s ease;
 }
 
 .comment-input:focus {
     outline: none;
-    border-color: rgba(139, 92, 246, 0.5);
-    background: rgba(255, 255, 255, 0.08);
-    box-shadow: 0 0 20px rgba(139, 92, 246, 0.15);
+    border-color: var(--effect-purple-50);
+    background: var(--effect-white-8);
+    box-shadow: 0 0 20px var(--effect-purple-15);
 }
 
 .comment-input::placeholder {
-    color: rgba(255, 255, 255, 0.4);
+    color: var(--effect-white-40);
 }
 
 .comment-submit-btn {
@@ -2637,12 +2637,12 @@ html {
 
 .comment-submit-btn:hover {
     transform: translateY(-2px);
-    box-shadow: 0 8px 20px rgba(139, 92, 246, 0.4);
+    box-shadow: 0 8px 20px var(--effect-purple-40);
 }
 
 .comment-login-prompt {
     text-align: center;
-    color: rgba(255, 255, 255, 0.6);
+    color: var(--effect-white-60);
 }
 
 .comment-login-prompt a {
@@ -2658,7 +2658,7 @@ html {
 .comments-empty {
     text-align: center;
     padding: var(--space-8);
-    color: rgba(255, 255, 255, 0.5);
+    color: var(--effect-white-50);
 }
 
 /* ===== LIGHT MODE ===== */
@@ -2668,7 +2668,7 @@ html {
 
 [data-theme="light"] #poll-holo-wrapper::after {
     background:
-        radial-gradient(ellipse at 20% 0%, rgba(139, 92, 246, 0.15) 0%, transparent 50%),
+        radial-gradient(ellipse at 20% 0%, var(--effect-purple-15) 0%, transparent 50%),
         radial-gradient(ellipse at 80% 0%, rgba(6, 182, 212, 0.12) 0%, transparent 50%),
         radial-gradient(ellipse at 50% 100%, rgba(244, 114, 182, 0.1) 0%, transparent 50%);
 }
@@ -2686,7 +2686,7 @@ html {
 
 [data-theme="light"] .poll-back-link,
 [data-theme="light"] .poll-description {
-    color: rgba(0, 0, 0, 0.6);
+    color: var(--effect-black-60);
 }
 
 [data-theme="light"] .poll-back-link:hover {
@@ -2694,33 +2694,33 @@ html {
 }
 
 [data-theme="light"] .poll-badge {
-    background: linear-gradient(135deg, rgba(139, 92, 246, 0.15), rgba(6, 182, 212, 0.1));
-    border-color: rgba(139, 92, 246, 0.25);
+    background: linear-gradient(135deg, var(--effect-purple-15), var(--effect-cyan-10));
+    border-color: var(--effect-purple-25);
 }
 
 [data-theme="light"] .poll-content-card,
 [data-theme="light"] .poll-social-section {
-    background: rgba(255, 255, 255, 0.7);
-    border-color: rgba(139, 92, 246, 0.15);
+    background: var(--effect-white-70);
+    border-color: var(--effect-purple-15);
 }
 
 [data-theme="light"] .poll-option-label {
-    background: rgba(255, 255, 255, 0.5);
-    border-color: rgba(139, 92, 246, 0.15);
+    background: var(--effect-white-50);
+    border-color: var(--effect-purple-15);
     color: var(--color-indigo-950);
 }
 
 [data-theme="light"] .poll-option-label:hover {
-    border-color: rgba(139, 92, 246, 0.4);
-    background: rgba(139, 92, 246, 0.05);
+    border-color: var(--effect-purple-40);
+    background: var(--effect-purple-5);
 }
 
 [data-theme="light"] .poll-option-label input[type="radio"] {
-    border-color: rgba(139, 92, 246, 0.4);
+    border-color: var(--effect-purple-40);
 }
 
 [data-theme="light"] .poll-option-label:has(input:checked) {
-    background: rgba(139, 92, 246, 0.1);
+    background: var(--effect-purple-10);
 }
 
 [data-theme="light"] .option-text {
@@ -2736,13 +2736,13 @@ html {
 }
 
 [data-theme="light"] .progress-track {
-    background: rgba(139, 92, 246, 0.1);
-    border-color: rgba(139, 92, 246, 0.15);
+    background: var(--effect-purple-10);
+    border-color: var(--effect-purple-15);
 }
 
 [data-theme="light"] .poll-total-votes {
-    border-color: rgba(139, 92, 246, 0.1);
-    color: rgba(0, 0, 0, 0.5);
+    border-color: var(--effect-purple-10);
+    color: var(--effect-black-50);
 }
 
 [data-theme="light"] .poll-login-prompt p {
@@ -2752,24 +2752,24 @@ html {
 [data-theme="light"] .poll-manage-btn,
 [data-theme="light"] .social-btn,
 [data-theme="light"] .share-btn {
-    background: rgba(255, 255, 255, 0.8);
-    border-color: rgba(139, 92, 246, 0.2);
+    background: var(--effect-white-80);
+    border-color: var(--effect-purple-20);
     color: #4c1d95;
 }
 
 [data-theme="light"] .social-btn.liked {
-    background: rgba(239, 68, 68, 0.1);
+    background: var(--effect-red-10);
     color: var(--color-red-600);
 }
 
 [data-theme="light"] .comment-input {
-    background: rgba(255, 255, 255, 0.8);
-    border-color: rgba(139, 92, 246, 0.2);
+    background: var(--effect-white-80);
+    border-color: var(--effect-purple-20);
     color: var(--color-indigo-950);
 }
 
 [data-theme="light"] .comment-input::placeholder {
-    color: rgba(0, 0, 0, 0.4);
+    color: var(--effect-black-40);
 }
 
 [data-theme="light"] .comment-author {
@@ -2781,31 +2781,31 @@ html {
 }
 
 [data-theme="light"] .comment-meta {
-    color: rgba(0, 0, 0, 0.5);
+    color: var(--effect-black-50);
 }
 
 [data-theme="light"] .comments-wrapper {
-    border-color: rgba(139, 92, 246, 0.1);
+    border-color: var(--effect-purple-10);
 }
 
 [data-theme="light"] .comment-item {
-    border-color: rgba(139, 92, 246, 0.08);
+    border-color: var(--effect-purple-8);
 }
 
 [data-theme="light"] .reaction-badge,
 [data-theme="light"] .reaction-picker-toggle {
-    background: rgba(139, 92, 246, 0.08);
-    border-color: rgba(139, 92, 246, 0.15);
+    background: var(--effect-purple-8);
+    border-color: var(--effect-purple-15);
 }
 
 [data-theme="light"] .reaction-picker-dropdown {
-    background: rgba(255, 255, 255, 0.95);
-    border-color: rgba(139, 92, 246, 0.2);
+    background: var(--effect-white-95);
+    border-color: var(--effect-purple-20);
 }
 
 [data-theme="light"] .comments-empty,
 [data-theme="light"] .comment-login-prompt {
-    color: rgba(0, 0, 0, 0.5);
+    color: var(--effect-black-50);
 }
 
 /* ===== RESPONSIVE ===== */
@@ -2869,7 +2869,7 @@ html {
 
     [data-theme="light"] .poll-content-card,
     [data-theme="light"] .poll-social-section {
-        background: rgba(255, 255, 255, 0.95);
+        background: var(--effect-white-95);
     }
 }
 

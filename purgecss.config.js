@@ -263,6 +263,7 @@ module.exports = {
         'httpdocs/assets/css/modern-header-emergency-fixes.css',
         'httpdocs/assets/css/modern-header-utilities.css',
         'httpdocs/assets/css/modern-onboarding.css',
+        'httpdocs/assets/css/modern-primitives.css',
         'httpdocs/assets/css/modern-profile-show.css',
         'httpdocs/assets/css/modern-search-results.css',
         'httpdocs/assets/css/modern-settings-holographic.css',
@@ -371,6 +372,17 @@ module.exports = {
             'container', 'wrapper', 'content', 'main', 'section',
             'row', 'col', 'grid', 'flex',
 
+            // Modern Primitives - Layout (Phase 7)
+            'stack', 'cluster', 'sidebar',
+            'container--narrow', 'container--wide',
+            'stack--sm', 'stack--md', 'stack--lg', 'stack--xl',
+            'cluster--start', 'cluster--center', 'cluster--end', 'cluster--between',
+            'grid--2', 'grid--3', 'grid--4',
+            'sidebar--right',
+
+            // Modern Primitives - Accessibility
+            'sr-only-focusable', 'focus-ring', 'no-focus-ring',
+
             // Visibility
             'sr-only', 'visually-hidden', 'invisible', 'opacity-0', 'opacity-100',
         ],
@@ -430,6 +442,29 @@ module.exports = {
 
             // Keep data attribute selectors
             /\[data-/,
+
+            // Modern Primitives - Spacing utilities (Phase 7.1)
+            /^gap-[1-8]$/,
+            /^p-[1-8]$/,
+            /^p[xy]-[2-6]$/,
+            /^m[tb]-[0-8]$/,
+
+            // Modern Primitives - Typography utilities (Phase 7.1)
+            /^text-(xs|sm|base|lg|xl|2xl)$/,
+            /^text-(primary|secondary|muted|accent|success|warning|danger)$/,
+            /^font-(normal|medium|semibold|bold)$/,
+
+            // Modern Primitives - Display/Flex utilities (Phase 7.1)
+            /^flex-(row|col|wrap|nowrap|1|auto|none|grow|shrink-0)$/,
+            /^items-(start|center|end|stretch)$/,
+            /^justify-(start|center|end|between|around)$/,
+
+            // Modern Primitives - Border radius utilities (Phase 7.1)
+            /^rounded(-none|-sm|-md|-lg|-xl|-full)?$/,
+
+            // Modern Primitives - Position utilities (Phase 7.1)
+            /^(relative|absolute|fixed|sticky)$/,
+            /^(top|right|bottom|left|inset)-0$/,
         ],
     },
 

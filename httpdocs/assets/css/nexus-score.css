@@ -43,7 +43,7 @@
 }
 
 [data-theme="dark"] .nexus-score-page-header h1 {
-    background: linear-gradient(135deg, var(--color-primary-400) 0%, #a78bfa 50%, var(--color-pink-400) 100%);
+    background: linear-gradient(135deg, var(--color-primary-400) 0%, var(--color-purple-400-alt) 50%, var(--color-pink-400) 100%);
     -webkit-background-clip: text;
     background-clip: text;
 }
@@ -53,16 +53,16 @@
    ================================================================= */
 .nexus-score-container {
     --score-primary: var(--color-primary-500);
-    --score-glow: rgba(99, 102, 241, 0.5);
-    --glass-bg: rgba(255, 255, 255, 0.85);
-    --glass-border: rgba(255, 255, 255, 0.5);
-    --glass-shadow: 0 8px 32px rgba(99, 102, 241, 0.12);
+    --score-glow: var(--effect-primary-50);
+    --glass-bg: var(--effect-white-85);
+    --glass-border: var(--effect-white-50);
+    --glass-shadow: 0 8px 32px var(--effect-primary-12);
 }
 
 [data-theme="dark"] .nexus-score-container {
-    --glass-bg: rgba(30, 41, 59, 0.6);
-    --glass-border: rgba(255, 255, 255, 0.1);
-    --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+    --glass-bg: var(--effect-slate-60);
+    --glass-border: var(--effect-white-10);
+    --glass-shadow: 0 8px 32px var(--effect-black-40);
 }
 
 /* =================================================================
@@ -75,7 +75,7 @@
     right: 0;
     bottom: 0;
     background:
-        radial-gradient(ellipse 80% 50% at 20% 20%, rgba(99, 102, 241, 0.08) 0%, transparent 50%),
+        radial-gradient(ellipse 80% 50% at 20% 20%, var(--effect-primary-8) 0%, transparent 50%),
         radial-gradient(ellipse 60% 40% at 80% 30%, rgba(168, 85, 247, 0.06) 0%, transparent 50%),
         radial-gradient(ellipse 70% 60% at 50% 80%, rgba(236, 72, 153, 0.05) 0%, transparent 50%);
     pointer-events: none;
@@ -85,9 +85,9 @@
 
 [data-theme="dark"] .nexus-score-page-bg {
     background:
-        radial-gradient(ellipse 80% 50% at 20% 20%, rgba(99, 102, 241, 0.15) 0%, transparent 50%),
+        radial-gradient(ellipse 80% 50% at 20% 20%, var(--effect-primary-15) 0%, transparent 50%),
         radial-gradient(ellipse 60% 40% at 80% 30%, rgba(168, 85, 247, 0.12) 0%, transparent 50%),
-        radial-gradient(ellipse 70% 60% at 50% 80%, rgba(236, 72, 153, 0.1) 0%, transparent 50%);
+        radial-gradient(ellipse 70% 60% at 50% 80%, var(--effect-pink-10) 0%, transparent 50%);
 }
 
 @keyframes holoShiftSubtle {
@@ -115,20 +115,20 @@
 .score-hero-card:hover {
     transform: translateY(-4px);
     box-shadow:
-        0 12px 40px rgba(99, 102, 241, 0.15),
-        0 0 60px rgba(99, 102, 241, 0.08);
+        0 12px 40px var(--effect-primary-15),
+        0 0 60px var(--effect-primary-8);
 }
 
 [data-theme="dark"] .score-hero-card {
-    background: linear-gradient(135deg, rgba(30, 41, 59, 0.8), rgba(15, 23, 42, 0.9));
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: linear-gradient(135deg, var(--effect-slate-80), rgba(15, 23, 42, 0.9));
+    border: 1px solid var(--effect-white-10);
 }
 
 [data-theme="dark"] .score-hero-card:hover {
-    border-color: rgba(255, 255, 255, 0.2);
+    border-color: var(--effect-white-20);
     box-shadow:
-        0 12px 40px rgba(0, 0, 0, 0.5),
-        0 0 60px rgba(99, 102, 241, 0.15),
+        0 12px 40px var(--effect-black-50),
+        0 0 60px var(--effect-primary-15),
         0 0 100px rgba(168, 85, 247, 0.1);
 }
 
@@ -143,7 +143,7 @@
     background: linear-gradient(
         90deg,
         transparent,
-        rgba(255, 255, 255, 0.3),
+        var(--effect-white-30),
         transparent
     );
     animation: shimmer 8s ease-in-out infinite;
@@ -154,7 +154,7 @@
     background: linear-gradient(
         90deg,
         transparent,
-        rgba(255, 255, 255, 0.08),
+        var(--effect-white-8),
         transparent
     );
 }
@@ -217,7 +217,7 @@
 }
 
 [data-theme="dark"] .score-circle-bg {
-    stroke: rgba(255, 255, 255, 0.1);
+    stroke: var(--effect-white-10);
 }
 
 .score-circle-fill {
@@ -283,27 +283,27 @@
     display: inline-flex;
     align-items: center;
     gap: var(--space-3);
-    background: linear-gradient(135deg, rgba(99, 102, 241, 0.15), rgba(168, 85, 247, 0.1));
-    border: 1px solid rgba(99, 102, 241, 0.25);
+    background: linear-gradient(135deg, var(--effect-primary-15), rgba(168, 85, 247, 0.1));
+    border: 1px solid var(--effect-primary-25);
     border-radius: var(--radius-lg);
     padding: var(--space-3) var(--space-5);
     font-size: var(--font-size-xl);
     font-weight: 700;
     color: var(--score-primary);
     width: fit-content;
-    box-shadow: 0 4px 16px rgba(99, 102, 241, 0.15);
+    box-shadow: 0 4px 16px var(--effect-primary-15);
     transition: all 0.3s ease;
 }
 
 .tier-badge:hover {
     transform: translateY(-2px);
-    box-shadow: 0 8px 24px rgba(99, 102, 241, 0.2);
+    box-shadow: 0 8px 24px var(--effect-primary-20);
 }
 
 [data-theme="dark"] .tier-badge {
-    background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05));
-    border: 1px solid rgba(255, 255, 255, 0.15);
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    background: linear-gradient(135deg, var(--effect-white-10), var(--effect-white-5));
+    border: 1px solid var(--effect-white-15);
+    box-shadow: 0 8px 32px var(--effect-black-30);
 }
 
 .tier-icon {
@@ -342,7 +342,7 @@
     background: linear-gradient(135deg, rgba(16, 185, 129, 0.08), rgba(6, 182, 212, 0.08));
     backdrop-filter: blur(16px);
     -webkit-backdrop-filter: blur(16px);
-    border: 1px solid rgba(16, 185, 129, 0.2);
+    border: 1px solid var(--effect-emerald-20);
     border-radius: var(--radius-xl);
     padding: var(--space-6);
     margin-bottom: var(--space-6);
@@ -353,13 +353,13 @@
 
 .milestone-card:hover {
     transform: translateY(-2px);
-    border-color: rgba(16, 185, 129, 0.4);
-    box-shadow: 0 8px 32px rgba(16, 185, 129, 0.15);
+    border-color: var(--effect-emerald-40);
+    box-shadow: 0 8px 32px var(--effect-emerald-15);
 }
 
 [data-theme="dark"] .milestone-card {
-    background: linear-gradient(135deg, rgba(16, 185, 129, 0.15), rgba(6, 182, 212, 0.12));
-    border: 1px solid rgba(16, 185, 129, 0.3);
+    background: linear-gradient(135deg, var(--effect-emerald-15), rgba(6, 182, 212, 0.12));
+    border: 1px solid var(--effect-emerald-30);
 }
 
 .milestone-header {
@@ -372,34 +372,34 @@
 .milestone-title {
     font-size: var(--font-size-lg);
     font-weight: 600;
-    color: #047857;
+    color: var(--color-emerald-700);
 }
 
 [data-theme="dark"] .milestone-title {
-    color: #34d399;
+    color: var(--color-emerald-400);
 }
 
 .milestone-remaining {
     font-size: var(--font-size-xl);
     font-weight: 800;
-    color: #047857;
+    color: var(--color-emerald-700);
 }
 
 [data-theme="dark"] .milestone-remaining {
-    color: #34d399;
+    color: var(--color-emerald-400);
 }
 
 .milestone-progress-bar {
     width: 100%;
     height: var(--space-3);
-    background: rgba(16, 185, 129, 0.15);
+    background: var(--effect-emerald-15);
     border-radius: var(--radius-base);
     overflow: hidden;
     margin-bottom: var(--space-3);
 }
 
 [data-theme="dark"] .milestone-progress-bar {
-    background: rgba(255, 255, 255, 0.1);
+    background: var(--effect-white-10);
 }
 
 .milestone-progress-fill {
@@ -463,7 +463,7 @@
     background: var(--glass-bg);
     backdrop-filter: blur(16px);
     -webkit-backdrop-filter: blur(16px);
-    border: 1px solid rgba(99, 102, 241, 0.15);
+    border: 1px solid var(--effect-primary-15);
     border-radius: var(--radius-lg);
     padding: var(--space-5);
     display: flex;
@@ -473,32 +473,32 @@
 
 .insight-card:hover {
     transform: translateX(4px);
-    border-color: rgba(99, 102, 241, 0.3);
+    border-color: var(--effect-primary-30);
 }
 
 [data-theme="dark"] .insight-card {
-    background: rgba(30, 41, 59, 0.6);
-    border: 1px solid rgba(99, 102, 241, 0.25);
+    background: var(--effect-slate-60);
+    border: 1px solid var(--effect-primary-25);
 }
 
 .insight-card.improvement {
-    border-color: rgba(245, 158, 11, 0.2);
+    border-color: var(--effect-amber-20);
     background: linear-gradient(135deg, rgba(245, 158, 11, 0.05), rgba(251, 191, 36, 0.03));
 }
 
 [data-theme="dark"] .insight-card.improvement {
     background: linear-gradient(135deg, rgba(245, 158, 11, 0.12), rgba(251, 191, 36, 0.08));
-    border-color: rgba(245, 158, 11, 0.3);
+    border-color: var(--effect-amber-30);
 }
 
 .insight-card.suggestion {
-    border-color: rgba(16, 185, 129, 0.2);
+    border-color: var(--effect-emerald-20);
     background: linear-gradient(135deg, rgba(16, 185, 129, 0.05), rgba(6, 182, 212, 0.03));
 }
 
 [data-theme="dark"] .insight-card.suggestion {
     background: linear-gradient(135deg, rgba(16, 185, 129, 0.12), rgba(6, 182, 212, 0.08));
-    border-color: rgba(16, 185, 129, 0.3);
+    border-color: var(--effect-emerald-30);
 }
 
 .insight-icon {
@@ -579,7 +579,7 @@
 
 .category-card:hover {
     transform: translateY(-4px);
-    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 12px 40px var(--effect-black-10);
 }
 
 .category-card:hover::before {
@@ -587,15 +587,15 @@
 }
 
 [data-theme="dark"] .category-card {
-    background: rgba(30, 41, 59, 0.6);
-    border: 1px solid rgba(255, 255, 255, 0.08);
+    background: var(--effect-slate-60);
+    border: 1px solid var(--effect-white-8);
 }
 
 [data-theme="dark"] .category-card:hover {
-    border-color: rgba(255, 255, 255, 0.15);
+    border-color: var(--effect-white-15);
     box-shadow:
-        0 12px 40px rgba(0, 0, 0, 0.4),
-        0 0 30px rgba(99, 102, 241, 0.1);
+        0 12px 40px var(--effect-black-40),
+        0 0 30px var(--effect-primary-10);
 }
 
 .category-header {
@@ -638,7 +638,7 @@
 }
 
 [data-theme="dark"] .category-progress {
-    background: rgba(255, 255, 255, 0.1);
+    background: var(--effect-white-10);
 }
 
 .category-progress-fill {
@@ -655,7 +655,7 @@
     left: 0;
     right: 0;
     bottom: 0;
-    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+    background: linear-gradient(90deg, transparent, var(--effect-white-30), transparent);
     animation: progressGlow 2s ease-in-out infinite;
 }
 
@@ -674,7 +674,7 @@
 }
 
 [data-theme="dark"] .category-details {
-    border-top-color: rgba(255, 255, 255, 0.08);
+    border-top-color: var(--effect-white-8);
 }
 
 .detail-item {
@@ -768,7 +768,7 @@
     border-radius: 50%;
     object-fit: cover;
     border: var(--space-1) solid var(--glass-border);
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+    box-shadow: 0 4px 16px var(--effect-black-15);
 }
 
 .podium-place.first .podium-avatar {
@@ -838,7 +838,7 @@
     font-weight: 800;
     font-size: var(--font-size-sm);
     color: white;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 2px 8px var(--effect-black-20);
 }
 
 .podium-place.first .podium-rank {
@@ -905,7 +905,7 @@
 .podium-place.first .podium-base {
     height: 80px;
     width: 100px;
-    background: linear-gradient(135deg, rgba(251, 191, 36, 0.15), rgba(245, 158, 11, 0.1));
+    background: linear-gradient(135deg, rgba(251, 191, 36, 0.15), var(--effect-amber-10));
     border-color: rgba(251, 191, 36, 0.3);
 }
 
@@ -922,12 +922,12 @@
 }
 
 [data-theme="dark"] .podium-base {
-    background: rgba(30, 41, 59, 0.6);
-    border-color: rgba(255, 255, 255, 0.1);
+    background: var(--effect-slate-60);
+    border-color: var(--effect-white-10);
 }
 
 [data-theme="dark"] .podium-place.first .podium-base {
-    background: linear-gradient(135deg, rgba(251, 191, 36, 0.2), rgba(245, 158, 11, 0.15));
+    background: linear-gradient(135deg, rgba(251, 191, 36, 0.2), var(--effect-amber-15));
     border-color: rgba(251, 191, 36, 0.4);
 }
 
@@ -959,11 +959,11 @@
 
 .category-card[data-category]:hover {
     border-color: var(--cat-color);
-    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.1), 0 0 20px color-mix(in srgb, var(--cat-color) 20%, transparent);
+    box-shadow: 0 12px 40px var(--effect-black-10), 0 0 20px color-mix(in srgb, var(--cat-color) 20%, transparent);
 }
 
 [data-theme="dark"] .category-card[data-category]:hover {
-    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4), 0 0 30px color-mix(in srgb, var(--cat-color) 30%, transparent);
+    box-shadow: 0 12px 40px var(--effect-black-40), 0 0 30px color-mix(in srgb, var(--cat-color) 30%, transparent);
 }
 
 /* Category icon styling */
@@ -973,7 +973,7 @@
 }
 
 [data-theme="dark"] .nexus-score-tabs .nav-tabs {
-    border-bottom-color: rgba(255, 255, 255, 0.1);
+    border-bottom-color: var(--effect-white-10);
 }
 
 /* Additional nav-link styling (display & align set in TABS STYLING section above) */
@@ -991,21 +991,21 @@
 
 .nexus-score-tabs .nav-tabs .nav-link:hover {
     color: var(--htb-color-brand-primary, var(--color-primary-600));
-    background: rgba(99, 102, 241, 0.05);
+    background: var(--effect-primary-5);
 }
 
 .nexus-score-tabs .nav-tabs .nav-link.active {
     color: var(--htb-color-brand-primary, var(--color-primary-600));
     border-bottom-color: var(--htb-color-brand-primary, var(--color-primary-600));
-    background: rgba(99, 102, 241, 0.08);
+    background: var(--effect-primary-8);
 }
 
 [data-theme="dark"] .nexus-score-tabs .nav-tabs .nav-link:hover {
-    background: rgba(99, 102, 241, 0.1);
+    background: var(--effect-primary-10);
 }
 
 [data-theme="dark"] .nexus-score-tabs .nav-tabs .nav-link.active {
-    background: rgba(99, 102, 241, 0.15);
+    background: var(--effect-primary-15);
 }
 
 /* =================================================================
@@ -1047,8 +1047,8 @@
 
 .achievement-card:hover {
     transform: translateY(-6px) scale(1.02);
-    box-shadow: 0 16px 48px rgba(99, 102, 241, 0.15);
-    border-color: rgba(99, 102, 241, 0.3);
+    box-shadow: 0 16px 48px var(--effect-primary-15);
+    border-color: var(--effect-primary-30);
 }
 
 .achievement-card:hover::before {
@@ -1056,20 +1056,20 @@
 }
 
 [data-theme="dark"] .achievement-card {
-    background: rgba(30, 41, 59, 0.7);
-    border-color: rgba(255, 255, 255, 0.08);
+    background: var(--effect-slate-70);
+    border-color: var(--effect-white-8);
 }
 
 [data-theme="dark"] .achievement-card:hover {
-    border-color: rgba(139, 92, 246, 0.4);
-    box-shadow: 0 16px 48px rgba(99, 102, 241, 0.25);
+    border-color: var(--effect-purple-40);
+    box-shadow: 0 16px 48px var(--effect-primary-25);
 }
 
 .achievement-card-icon {
     font-size: var(--space-12);
     margin-bottom: var(--space-4);
     animation: achievementPop 0.5s ease-out;
-    filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.1));
+    filter: drop-shadow(0 4px 8px var(--effect-black-10));
 }
 
 @keyframes achievementPop {
@@ -1108,11 +1108,11 @@
     justify-content: center;
     font-size: var(--font-size-sm);
     font-weight: 700;
-    background: linear-gradient(135deg, var(--color-primary-600), #7c3aed);
+    background: linear-gradient(135deg, var(--color-primary-600), var(--color-purple-600));
     color: white;
     padding: var(--space-2) var(--space-4);
     border-radius: var(--radius-xl);
-    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+    box-shadow: 0 4px 12px var(--effect-primary-30);
 }
 
 /* Legacy list styles - kept for backward compatibility */
@@ -1134,16 +1134,16 @@
 
 .achievement-list .list-group-item:hover {
     transform: translateX(8px);
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    box-shadow: 0 4px 20px var(--effect-black-8);
 }
 
 [data-theme="dark"] .achievement-list .list-group-item {
-    background: rgba(30, 41, 59, 0.6);
-    border-color: rgba(255, 255, 255, 0.08);
+    background: var(--effect-slate-60);
+    border-color: var(--effect-white-8);
 }
 
 [data-theme="dark"] .achievement-list .list-group-item:hover {
-    border-color: rgba(255, 255, 255, 0.15);
+    border-color: var(--effect-white-15);
 }
 
 .achievement-icon {
@@ -1155,7 +1155,7 @@
 .achievement-points {
     font-size: var(--font-size-sm);
     font-weight: 700;
-    background: linear-gradient(135deg, var(--color-primary-600), #7c3aed);
+    background: linear-gradient(135deg, var(--color-primary-600), var(--color-purple-600));
     color: white;
     padding: var(--space-2) var(--space-3);
 }
@@ -1181,17 +1181,17 @@
 
 .milestone-item:hover {
     transform: translateY(-4px) scale(1.01);
-    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 12px 40px var(--effect-black-10);
 }
 
 [data-theme="dark"] .milestone-item {
-    background: rgba(30, 41, 59, 0.6);
-    border-color: rgba(255, 255, 255, 0.08);
+    background: var(--effect-slate-60);
+    border-color: var(--effect-white-8);
 }
 
 [data-theme="dark"] .milestone-item:hover {
-    border-color: rgba(255, 255, 255, 0.15);
-    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
+    border-color: var(--effect-white-15);
+    box-shadow: 0 12px 40px var(--effect-black-40);
 }
 
 .milestone-item-icon {
@@ -1227,15 +1227,15 @@
 }
 
 [data-theme="dark"] .milestone-item-reward {
-    border-top-color: rgba(255, 255, 255, 0.08);
+    border-top-color: var(--effect-white-8);
 }
 
 /* =================================================================
    LEADERBOARD TABLE
    ================================================================= */
 .your-rank-alert {
-    background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(168, 85, 247, 0.08));
-    border: 1px solid rgba(99, 102, 241, 0.25);
+    background: linear-gradient(135deg, var(--effect-primary-10), rgba(168, 85, 247, 0.08));
+    border: 1px solid var(--effect-primary-25);
     border-radius: var(--radius-lg);
     color: var(--htb-text-main, var(--color-gray-800));
     padding: var(--space-4) var(--space-5);
@@ -1243,8 +1243,8 @@
 }
 
 [data-theme="dark"] .your-rank-alert {
-    background: linear-gradient(135deg, rgba(99, 102, 241, 0.2), rgba(168, 85, 247, 0.15));
-    border-color: rgba(99, 102, 241, 0.35);
+    background: linear-gradient(135deg, var(--effect-primary-20), rgba(168, 85, 247, 0.15));
+    border-color: var(--effect-primary-35);
     color: var(--color-slate-100);
 }
 
@@ -1259,8 +1259,8 @@
 }
 
 [data-theme="dark"] .leaderboard-table {
-    background: rgba(30, 41, 59, 0.6);
-    border-color: rgba(255, 255, 255, 0.08);
+    background: var(--effect-slate-60);
+    border-color: var(--effect-white-8);
 }
 
 .leaderboard-table .table {
@@ -1268,7 +1268,7 @@
 }
 
 .leaderboard-table .table th {
-    background: rgba(99, 102, 241, 0.05);
+    background: var(--effect-primary-5);
     font-weight: 700;
     color: var(--htb-text-main, var(--color-gray-800));
     border-bottom: 1px solid var(--htb-border-color, var(--color-gray-200));
@@ -1279,9 +1279,9 @@
 }
 
 [data-theme="dark"] .leaderboard-table .table th {
-    background: rgba(255, 255, 255, 0.05);
+    background: var(--effect-white-5);
     color: var(--color-slate-100);
-    border-color: rgba(255, 255, 255, 0.08);
+    border-color: var(--effect-white-8);
 }
 
 .leaderboard-table .table td {
@@ -1292,24 +1292,24 @@
 }
 
 [data-theme="dark"] .leaderboard-table .table td {
-    border-color: rgba(255, 255, 255, 0.05);
+    border-color: var(--effect-white-5);
     color: var(--color-slate-200);
 }
 
 .leaderboard-table .table tbody tr:hover {
-    background: rgba(99, 102, 241, 0.05);
+    background: var(--effect-primary-5);
 }
 
 [data-theme="dark"] .leaderboard-table .table tbody tr:hover {
-    background: rgba(255, 255, 255, 0.05);
+    background: var(--effect-white-5);
 }
 
 .leaderboard-table .table-primary {
-    background-color: rgba(99, 102, 241, 0.1) !important;
+    background-color: var(--effect-primary-10) !important;
 }
 
 [data-theme="dark"] .leaderboard-table .table-primary {
-    background-color: rgba(99, 102, 241, 0.2) !important;
+    background-color: var(--effect-primary-20) !important;
 }
 
 .leaderboard-rank-badge {
@@ -1329,7 +1329,7 @@
     object-fit: cover;
     margin-right: var(--space-3);
     border: var(--space-1) solid var(--glass-border);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 2px 8px var(--effect-black-10);
 }
 
 .avatar-placeholder {
@@ -1344,7 +1344,7 @@
     font-weight: 700;
     font-size: var(--font-size-sm);
     margin-right: var(--space-3);
-    box-shadow: 0 2px 8px rgba(99, 102, 241, 0.3);
+    box-shadow: 0 2px 8px var(--effect-primary-30);
 }
 
 .leaderboard-tier-badge {
@@ -1386,20 +1386,20 @@
 .badge-item:hover {
     transform: translateY(-6px) scale(1.02);
     box-shadow:
-        0 16px 48px rgba(0, 0, 0, 0.12),
-        0 0 24px rgba(99, 102, 241, 0.1);
+        0 16px 48px var(--effect-black-12),
+        0 0 24px var(--effect-primary-10);
 }
 
 [data-theme="dark"] .badge-item {
-    background: rgba(30, 41, 59, 0.6);
-    border-color: rgba(255, 255, 255, 0.08);
+    background: var(--effect-slate-60);
+    border-color: var(--effect-white-8);
 }
 
 [data-theme="dark"] .badge-item:hover {
-    border-color: rgba(255, 255, 255, 0.2);
+    border-color: var(--effect-white-20);
     box-shadow:
-        0 16px 48px rgba(0, 0, 0, 0.4),
-        0 0 40px rgba(99, 102, 241, 0.15);
+        0 16px 48px var(--effect-black-40),
+        0 0 40px var(--effect-primary-15);
 }
 
 .badge-item-icon {
@@ -1455,8 +1455,8 @@
 }
 
 [data-theme="dark"] .nexus-score-empty {
-    background: rgba(30, 41, 59, 0.4);
-    border-color: rgba(255, 255, 255, 0.15);
+    background: var(--effect-slate-40);
+    border-color: var(--effect-white-15);
 }
 
 .nexus-score-empty::before {
@@ -1467,7 +1467,7 @@
     right: 0;
     bottom: 0;
     background:
-        radial-gradient(circle at 20% 50%, rgba(99, 102, 241, 0.08) 0%, transparent 50%),
+        radial-gradient(circle at 20% 50%, var(--effect-primary-8) 0%, transparent 50%),
         radial-gradient(circle at 80% 50%, rgba(168, 85, 247, 0.06) 0%, transparent 50%);
     pointer-events: none;
 }
@@ -1527,7 +1527,7 @@
 
 .empty-state-cta:hover {
     transform: translateY(-2px);
-    box-shadow: 0 8px 24px rgba(99, 102, 241, 0.4);
+    box-shadow: 0 8px 24px var(--effect-primary-40);
     color: white;
 }
 
@@ -1546,9 +1546,9 @@
 
 [data-theme="dark"] .skeleton {
     background: linear-gradient(90deg,
-        rgba(255, 255, 255, 0.1) 25%,
-        rgba(255, 255, 255, 0.15) 50%,
-        rgba(255, 255, 255, 0.1) 75%);
+        var(--effect-white-10) 25%,
+        var(--effect-white-15) 50%,
+        var(--effect-white-10) 75%);
     background-size: 200% 100%;
 }
 
@@ -1725,7 +1725,7 @@
 }
 
 .confetti:nth-child(4n) {
-    background: linear-gradient(135deg, var(--color-success), #34d399);
+    background: linear-gradient(135deg, var(--color-success), var(--color-emerald-400));
     clip-path: polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%);
 }
 
@@ -1786,7 +1786,7 @@
 }
 
 .nexus-score-container[data-tier="expert"] .score-hero-card::after {
-    background: radial-gradient(circle, rgba(99, 102, 241, 0.5) 0%, transparent 70%);
+    background: radial-gradient(circle, var(--effect-primary-50) 0%, transparent 70%);
 }
 
 /* =================================================================

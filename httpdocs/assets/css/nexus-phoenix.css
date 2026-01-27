@@ -57,7 +57,7 @@ img.avatar-img {
     --htb-text-main: var(--color-gray-800);
     --htb-text-muted: var(--color-gray-500);
     --htb-radius: var(--radius-lg);
-    --htb-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.025);
+    --htb-shadow: 0 10px 15px -3px var(--effect-black-5), 0 4px 6px -2px rgba(0, 0, 0, 0.025);
     --htb-border-color: var(--color-gray-200);
     /* HOLOGRAPHIC TRI-TONE GRADIENTS (Unique per page) */
     --htb-gradient-brand: linear-gradient(120deg, var(--color-primary-600) 0%, #d946ef 50%, var(--color-amber-300) 100%);
@@ -74,12 +74,12 @@ img.avatar-img {
 
 [data-theme="dark"] {
     --htb-bg-page: var(--color-slate-900);
-    --htb-bg-card: rgba(30, 41, 59, 0.4);
+    --htb-bg-card: var(--effect-slate-40);
     /* More transparent */
     --htb-text-main: var(--color-slate-100);
     --htb-text-muted: var(--color-slate-300);
-    --htb-border-color: rgba(255, 255, 255, 0.1);
-    --htb-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.5);
+    --htb-border-color: var(--effect-white-10);
+    --htb-shadow: 0 10px 30px -5px var(--effect-black-50);
     --htb-glass-blur: blur(24px);
 }
 
@@ -103,7 +103,7 @@ body,
 [data-theme="dark"] .htb-card,
 [data-theme="dark"] .nexus-card {
     background: var(--htb-bg-card);
-    border: 1px solid rgba(255, 255, 255, 0.08);
+    border: 1px solid var(--effect-white-8);
     -webkit-backdrop-filter: var(--htb-glass-blur);
     backdrop-filter: var(--htb-glass-blur);
     box-shadow: var(--htb-shadow);
@@ -113,16 +113,16 @@ body,
 /* HOLOGRAPHIC GLOW ON HOVER */
 [data-theme="dark"] .htb-card:hover,
 [data-theme="dark"] .nexus-card:hover {
-    border-color: rgba(255, 255, 255, 0.3);
+    border-color: var(--effect-white-30);
     box-shadow:
-        0 0 20px rgba(79, 70, 229, 0.2),
-        0 0 40px rgba(236, 72, 153, 0.1);
+        0 0 20px var(--effect-primary-600-20),
+        0 0 40px var(--effect-pink-10);
     transform: translateY(-3px);
 }
 
 [data-theme="dark"] .htb-dropdown-content {
     background: rgba(15, 23, 42, 0.85);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    border: 1px solid var(--effect-white-10);
     -webkit-backdrop-filter: blur(20px);
     backdrop-filter: blur(20px);
 }
@@ -132,22 +132,22 @@ body,
 }
 
 [data-theme="dark"] .htb-dropdown-content a:hover {
-    background-color: rgba(255, 255, 255, 0.1);
+    background-color: var(--effect-white-10);
 }
 
 /* DARK MODE TABLES */
 [data-theme="dark"] table.htb-table tr {
-    background: rgba(255, 255, 255, 0.03);
+    background: var(--effect-white-3);
     transition: background var(--transition-fast);
 }
 
 [data-theme="dark"] table.htb-table tr:hover {
-    background: rgba(255, 255, 255, 0.08);
+    background: var(--effect-white-8);
 }
 
 [data-theme="dark"] table.htb-table td,
 [data-theme="dark"] table.htb-table th {
-    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    border-bottom: 1px solid var(--effect-white-5);
     color: var(--color-slate-300);
 }
 
@@ -155,8 +155,8 @@ body,
 [data-theme="dark"] input,
 [data-theme="dark"] textarea,
 [data-theme="dark"] select {
-    background: rgba(0, 0, 0, 0.2);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: var(--effect-black-20);
+    border: 1px solid var(--effect-white-10);
     color: white;
 }
 
@@ -165,31 +165,31 @@ body,
 [data-theme="dark"] select:focus {
     border-color: var(--color-primary-400);
     /* Indigo 400 */
-    background: rgba(0, 0, 0, 0.4);
+    background: var(--effect-black-40);
     outline: none;
-    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+    box-shadow: 0 0 0 3px var(--effect-primary-20);
 }
 
 /* DARK MODE: Header Box */
 [data-theme="dark"] .htb-header-box {
     background:
-        linear-gradient(135deg, rgba(99, 102, 241, 0.15) 0%, rgba(168, 85, 247, 0.12) 50%, rgba(236, 72, 153, 0.15) 100%),
-        linear-gradient(to bottom, rgba(30, 41, 59, 0.85), rgba(15, 23, 42, 0.9));
-    border: 1px solid rgba(255, 255, 255, 0.1);
+        linear-gradient(135deg, var(--effect-primary-15) 0%, var(--effect-purple-300-12) 50%, var(--effect-pink-15) 100%),
+        linear-gradient(to bottom, var(--effect-slate-85), rgba(15, 23, 42, 0.9));
+    border: 1px solid var(--effect-white-10);
     box-shadow:
-        0 4px 6px rgba(0, 0, 0, 0.3),
-        0 0 60px rgba(99, 102, 241, 0.15),
-        0 0 100px rgba(168, 85, 247, 0.1),
-        inset 0 1px 0 rgba(255, 255, 255, 0.05);
+        0 4px 6px var(--effect-black-30),
+        0 0 60px var(--effect-primary-15),
+        0 0 100px var(--effect-purple-300-10),
+        inset 0 1px 0 var(--effect-white-5);
 }
 
 [data-theme="dark"] .htb-header-box::before {
     background: linear-gradient(
         90deg,
         transparent 0%,
-        rgba(99, 102, 241, 0.2) 25%,
-        rgba(168, 85, 247, 0.15) 50%,
-        rgba(236, 72, 153, 0.2) 75%,
+        var(--effect-primary-20) 25%,
+        var(--effect-purple-300-15) 50%,
+        var(--effect-pink-20) 75%,
         transparent 100%
     );
 }
@@ -197,8 +197,8 @@ body,
 /* DARK MODE: Section Gray */
 [data-theme="dark"] .htb-section-gray {
     background-color: rgba(15, 23, 42, 0.6);
-    border-top-color: rgba(255, 255, 255, 0.05);
-    border-bottom-color: rgba(255, 255, 255, 0.05);
+    border-top-color: var(--effect-white-5);
+    border-bottom-color: var(--effect-white-5);
 }
 
 /* DARK MODE: Section Titles */
@@ -212,8 +212,8 @@ body,
 
 /* DARK MODE: Step Cards */
 [data-theme="dark"] .htb-step-card {
-    background: rgba(30, 41, 59, 0.6);
-    border: 1px solid rgba(255, 255, 255, 0.08);
+    background: var(--effect-slate-60);
+    border: 1px solid var(--effect-white-8);
 }
 
 [data-theme="dark"] .htb-step-title {
@@ -221,7 +221,7 @@ body,
 }
 
 [data-theme="dark"] .htb-step-icon-blue {
-    background: linear-gradient(135deg, rgba(37, 99, 235, 0.2) 0%, rgba(59, 130, 246, 0.15) 100%);
+    background: linear-gradient(135deg, rgba(37, 99, 235, 0.2) 0%, var(--effect-blue-15) 100%);
 }
 
 [data-theme="dark"] .htb-step-icon-green {
@@ -234,8 +234,8 @@ body,
 
 /* DARK MODE: Member Cards */
 [data-theme="dark"] .htb-member-card {
-    background: rgba(30, 41, 59, 0.6);
-    border: 1px solid rgba(255, 255, 255, 0.08);
+    background: var(--effect-slate-60);
+    border: 1px solid var(--effect-white-8);
 }
 
 [data-theme="dark"] .htb-member-name {
@@ -243,15 +243,15 @@ body,
 }
 
 [data-theme="dark"] .htb-member-avatar {
-    border-color: rgba(255, 255, 255, 0.15);
+    border-color: var(--effect-white-15);
 }
 
 /* DARK MODE: Buttons */
 [data-theme="dark"] .nexus-btn,
 [data-theme="dark"] .htb-btn {
-    background: rgba(30, 41, 59, 0.8);
+    background: var(--effect-slate-80);
     color: var(--color-slate-100);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    border: 1px solid var(--effect-white-10);
 }
 
 [data-theme="dark"] .nexus-btn-secondary {
@@ -406,16 +406,16 @@ html {
 .htb-header-box {
     text-align: center;
     background:
-        linear-gradient(135deg, rgba(99, 102, 241, 0.08) 0%, rgba(168, 85, 247, 0.08) 50%, rgba(236, 72, 153, 0.08) 100%),
-        linear-gradient(to bottom, rgba(255, 255, 255, 0.9), rgba(249, 250, 251, 0.85));
-    border: 1px solid rgba(255, 255, 255, 0.6);
+        linear-gradient(135deg, var(--effect-primary-8) 0%, var(--effect-purple-300-8) 50%, var(--effect-pink-8) 100%),
+        linear-gradient(to bottom, var(--effect-white-90), rgba(249, 250, 251, 0.85));
+    border: 1px solid var(--effect-white-60);
     border-radius: var(--radius-lg);
     padding: var(--space-8);
     box-shadow:
         0 4px 6px rgba(0, 0, 0, 0.02),
         0 0 40px rgba(99, 102, 241, 0.06),
         0 0 80px rgba(168, 85, 247, 0.04),
-        inset 0 1px 0 rgba(255, 255, 255, 0.8);
+        inset 0 1px 0 var(--effect-white-80);
     -webkit-backdrop-filter: blur(16px) saturate(180%);
     backdrop-filter: blur(16px) saturate(180%);
     position: relative;
@@ -432,9 +432,9 @@ html {
     background: linear-gradient(
         90deg,
         transparent 0%,
-        rgba(255, 255, 255, 0.4) 25%,
-        rgba(168, 85, 247, 0.1) 50%,
-        rgba(255, 255, 255, 0.4) 75%,
+        var(--effect-white-40) 25%,
+        var(--effect-purple-300-10) 50%,
+        var(--effect-white-40) 75%,
         transparent 100%
     );
     animation: holographic-shimmer 8s ease-in-out infinite;
@@ -497,7 +497,7 @@ html {
     font-weight: 400;
     margin: 0;
     opacity: 0.95;
-    color: rgba(255, 255, 255, 0.9);
+    color: var(--effect-white-90);
 }
 
 /* CARD SYSTEM (Glassmorphism Core) */
@@ -510,15 +510,15 @@ html {
     box-shadow: var(--htb-shadow);
     overflow: hidden;
     margin-bottom: var(--space-8);
-    border: 1px solid rgba(255, 255, 255, 0.4);
+    border: 1px solid var(--effect-white-40);
 }
 
 .nexus-glass,
 .nexus-card.nexus-glass {
-    background: rgba(255, 255, 255, 0.65) !important;
+    background: var(--effect-white-65) !important;
     -webkit-backdrop-filter: blur(16px) !important;
     backdrop-filter: blur(16px) !important;
-    border: 1px solid rgba(255, 255, 255, 0.6) !important;
+    border: 1px solid var(--effect-white-60) !important;
 }
 
 .htb-card-body {
@@ -570,7 +570,7 @@ html {
     transition: transform var(--transition-fast), box-shadow var(--transition-fast);
     background: white;
     color: var(--htb-text-main);
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+    box-shadow: 0 4px 6px var(--effect-black-5);
     border: none;
     cursor: pointer;
 }
@@ -596,7 +596,7 @@ html {
 .nexus-btn:hover,
 .htb-btn:hover {
     transform: translateY(-2px);
-    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 6px 12px var(--effect-black-10);
 }
 
 .nexus-badge {
@@ -690,8 +690,8 @@ table.htb-table tr:last-child td {
     width: 100%;
     padding: var(--space-16) 0;
     margin-bottom: var(--space-12);
-    border-top: 1px solid rgba(0, 0, 0, 0.05);
-    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    border-top: 1px solid var(--effect-black-5);
+    border-bottom: 1px solid var(--effect-black-5);
     position: relative;
     overflow: hidden;
 }
@@ -754,7 +754,7 @@ table.htb-table tr:last-child td {
     text-align: center;
     border: none;
     background: white;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+    box-shadow: 0 4px 6px -1px var(--effect-black-5);
     transition: transform var(--transition-base);
 }
 
@@ -782,7 +782,7 @@ table.htb-table tr:last-child td {
 }
 
 .htb-step-icon-orange {
-    background: linear-gradient(135deg, #ffedd5 0%, #fff7ed 100%);
+    background: linear-gradient(135deg, #ffedd5 0%, var(--color-white)7ed 100%);
     color: var(--color-orange-600);
     box-shadow: 0 4px 10px rgba(234, 88, 12, 0.1);
 }
@@ -812,7 +812,7 @@ table.htb-table tr:last-child td {
     font-size: var(--font-size-4xl);
     font-weight: 800;
     margin-bottom: var(--space-4);
-    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    text-shadow: 0 2px 10px var(--effect-black-10);
 }
 
 .htb-hub-desc {
@@ -917,7 +917,7 @@ table.htb-table tr:last-child td {
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(0, 0, 0, 0.3);
+    background: var(--effect-black-30);
     z-index: 1;
 }
 
@@ -933,7 +933,7 @@ table.htb-table tr:last-child td {
     font-weight: 800;
     margin: 0 0 var(--space-2);
     letter-spacing: -1px;
-    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+    text-shadow: 0 2px 10px var(--effect-black-20);
 }
 
 .htb-sub-title {
@@ -941,7 +941,7 @@ table.htb-table tr:last-child td {
     font-weight: 400;
     opacity: 0.9;
     margin: 0;
-    text-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
+    text-shadow: 0 1px 4px var(--effect-black-20);
 }
 
 .htb-hero-gradient-brand {
@@ -967,9 +967,9 @@ textarea.nexus-input {
     font-size: var(--font-size-base);
     outline: none;
     transition: all var(--transition-fast) var(--ease-in-out);
-    background: #fff;
+    background: var(--color-white);
     color: var(--color-slate-800);
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+    box-shadow: 0 1px 2px var(--effect-black-5);
     /* Subtle shadow polish */
 }
 
@@ -977,7 +977,7 @@ textarea.nexus-input {
 .nexus-select:focus,
 textarea.nexus-input:focus {
     border-color: var(--color-primary-500);
-    box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.15);
+    box-shadow: 0 0 0 4px var(--effect-primary-15);
     /* Softer, wider glow */
 }
 
@@ -1002,7 +1002,7 @@ textarea.nexus-input:focus {
 
 .nexus-card-header {
     padding: var(--space-4) var(--space-5);
-    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    border-bottom: 1px solid var(--effect-black-5);
 }
 
 .nexus-card-body {
@@ -1097,26 +1097,26 @@ body {
 /* Bridge: Apply all [data-theme="dark"] styles to body.dark-mode as well */
 body.dark-mode {
     --htb-bg-page: var(--color-slate-900);
-    --htb-bg-card: rgba(30, 41, 59, 0.4);
+    --htb-bg-card: var(--effect-slate-40);
     --htb-text-main: var(--color-slate-100);
     --htb-text-muted: var(--color-slate-300);
-    --htb-border-color: rgba(255, 255, 255, 0.1);
-    --htb-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.5);
+    --htb-border-color: var(--effect-white-10);
+    --htb-shadow: 0 10px 30px -5px var(--effect-black-50);
     --htb-glass-blur: blur(24px);
 }
 
 body.dark-mode .htb-card,
 body.dark-mode .nexus-card {
     background: var(--htb-bg-card);
-    border: 1px solid rgba(255, 255, 255, 0.08);
+    border: 1px solid var(--effect-white-8);
     -webkit-backdrop-filter: var(--htb-glass-blur);
     backdrop-filter: var(--htb-glass-blur);
     box-shadow: var(--htb-shadow);
 }
 
 body.dark-mode .htb-header-box {
-    background: linear-gradient(to bottom, rgba(30, 41, 59, 0.8), rgba(15, 23, 42, 0.9));
-    border-color: rgba(255, 255, 255, 0.1);
+    background: linear-gradient(to bottom, var(--effect-slate-80), rgba(15, 23, 42, 0.9));
+    border-color: var(--effect-white-10);
 }
 
 body.dark-mode .htb-section-gray {
@@ -1138,8 +1138,8 @@ body.dark-mode textarea.nexus-input {
 body.dark-mode input,
 body.dark-mode textarea,
 body.dark-mode select {
-    background: rgba(0, 0, 0, 0.2);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: var(--effect-black-20);
+    border: 1px solid var(--effect-white-10);
     color: white;
 }
 
@@ -1151,7 +1151,7 @@ body.dark-mode select {
 *:focus-visible {
     outline: 3px solid var(--color-primary-500);
     outline-offset: var(--space-1);
-    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+    box-shadow: 0 0 0 3px var(--effect-primary-20);
     transition: outline-offset var(--transition-fast) var(--ease-in-out);
 }
 
@@ -1171,7 +1171,7 @@ textarea:focus-visible,
 [tabindex]:not([tabindex="-1"]):focus-visible {
     outline: 3px solid var(--color-primary-500);
     outline-offset: var(--space-1);
-    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+    box-shadow: 0 0 0 3px var(--effect-primary-20);
 }
 
 /* Dark mode focus styles */
@@ -1214,19 +1214,19 @@ body.dark-mode *:focus-visible {
 
 /* Profile Card Container */
 .glass-profile-card {
-    background: var(--card-background-color, rgba(255, 255, 255, 0.7));
+    background: var(--card-background-color, var(--effect-white-70));
     -webkit-backdrop-filter: blur(20px);
     backdrop-filter: blur(20px);
     border-radius: var(--radius-2xl);
-    border: 1px solid rgba(255, 255, 255, 0.4);
+    border: 1px solid var(--effect-white-40);
     box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.1);
     padding: var(--space-8);
     margin-bottom: var(--space-6);
 }
 
 [data-theme="dark"] .glass-profile-card {
-    background: rgba(30, 41, 59, 0.8);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: var(--effect-slate-80);
+    border: 1px solid var(--effect-white-10);
 }
 
 /* Profile Avatar */
@@ -1235,8 +1235,8 @@ body.dark-mode *:focus-visible {
     height: 150px;
     border-radius: 50%;
     object-fit: cover;
-    border: 4px solid rgba(99, 102, 241, 0.3);
-    box-shadow: 0 8px 32px rgba(99, 102, 241, 0.2);
+    border: 4px solid var(--effect-primary-30);
+    box-shadow: 0 8px 32px var(--effect-primary-20);
 }
 
 /* Info Badges (Location, Joined, Credits, etc.) */
@@ -1245,8 +1245,8 @@ body.dark-mode *:focus-visible {
     align-items: center;
     gap: var(--space-2);
     padding: var(--space-2) var(--space-3);
-    background: rgba(255, 255, 255, 0.1);
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    background: var(--effect-white-10);
+    border: 1px solid var(--effect-white-20);
     border-radius: var(--radius-full);
     font-size: var(--font-size-sm);
     color: var(--text-color, var(--color-slate-800));
@@ -1254,14 +1254,14 @@ body.dark-mode *:focus-visible {
 }
 
 [data-theme="dark"] .glass-info-badge {
-    background: rgba(255, 255, 255, 0.05);
-    border-color: rgba(255, 255, 255, 0.1);
+    background: var(--effect-white-5);
+    border-color: var(--effect-white-10);
     color: var(--color-slate-200);
 }
 
 .glass-info-badge:hover {
-    background: rgba(99, 102, 241, 0.15);
-    border-color: rgba(99, 102, 241, 0.3);
+    background: var(--effect-primary-15);
+    border-color: var(--effect-primary-30);
 }
 
 /* Achievement/Badge Styles */
@@ -1270,8 +1270,8 @@ body.dark-mode *:focus-visible {
     align-items: center;
     gap: var(--space-2);
     padding: var(--space-2) var(--space-4);
-    background: rgba(255, 255, 255, 0.1);
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    background: var(--effect-white-10);
+    border: 1px solid var(--effect-white-20);
     border-radius: var(--radius-md);
     font-size: var(--font-size-sm);
     color: var(--text-color, var(--color-slate-800));
@@ -1280,16 +1280,16 @@ body.dark-mode *:focus-visible {
 }
 
 [data-theme="dark"] .glass-badge {
-    background: rgba(255, 255, 255, 0.05);
-    border-color: rgba(255, 255, 255, 0.1);
+    background: var(--effect-white-5);
+    border-color: var(--effect-white-10);
     color: var(--color-slate-200);
 }
 
 .glass-badge:hover {
-    background: rgba(99, 102, 241, 0.2);
-    border-color: rgba(99, 102, 241, 0.4);
+    background: var(--effect-primary-20);
+    border-color: var(--effect-primary-40);
     transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.2);
+    box-shadow: 0 4px 12px var(--effect-primary-20);
 }
 
 .glass-badge span {
@@ -1310,54 +1310,54 @@ body.dark-mode *:focus-visible {
     font-size: var(--font-size-sm);
     cursor: pointer;
     transition: all var(--transition-fast) var(--ease-in-out);
-    box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);
+    box-shadow: 0 4px 15px var(--effect-primary-30);
     text-decoration: none;
 }
 
 .glass-btn:hover {
     transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(99, 102, 241, 0.4);
+    box-shadow: 0 6px 20px var(--effect-primary-40);
     filter: brightness(1.05);
 }
 
 .glass-btn-secondary {
-    background: rgba(255, 255, 255, 0.1) !important;
-    border: 1px solid rgba(255, 255, 255, 0.2) !important;
+    background: var(--effect-white-10) !important;
+    border: 1px solid var(--effect-white-20) !important;
     color: var(--text-color, var(--color-slate-800)) !important;
     box-shadow: none;
 }
 
 [data-theme="dark"] .glass-btn-secondary {
-    background: rgba(255, 255, 255, 0.05) !important;
+    background: var(--effect-white-5) !important;
     color: var(--color-slate-200);
 }
 
 .glass-btn-secondary:hover {
-    background: rgba(99, 102, 241, 0.15) !important;
-    border-color: rgba(99, 102, 241, 0.3) !important;
+    background: var(--effect-primary-15) !important;
+    border-color: var(--effect-primary-30) !important;
 }
 
 /* Glass Divider */
 .glass-divider {
     height: 1px;
-    background: linear-gradient(90deg, transparent, rgba(99, 102, 241, 0.3), transparent);
+    background: linear-gradient(90deg, transparent, var(--effect-primary-30), transparent);
     margin: var(--space-6) 0;
 }
 
 /* Profile Friends Card */
 .profile-friends-card {
-    background: var(--card-background-color, rgba(255, 255, 255, 0.7));
+    background: var(--card-background-color, var(--effect-white-70));
     -webkit-backdrop-filter: blur(20px);
     backdrop-filter: blur(20px);
     border-radius: var(--radius-lg);
-    border: 1px solid rgba(255, 255, 255, 0.4);
+    border: 1px solid var(--effect-white-40);
     padding: var(--space-5);
     margin-bottom: var(--space-6);
 }
 
 [data-theme="dark"] .profile-friends-card {
-    background: rgba(30, 41, 59, 0.8);
-    border-color: rgba(255, 255, 255, 0.1);
+    background: var(--effect-slate-80);
+    border-color: var(--effect-white-10);
 }
 
 .profile-friends-header {
@@ -1449,14 +1449,14 @@ body.dark-mode *:focus-visible {
 
 /* Glass activity card */
 [data-theme="dark"] .glass-activity-card {
-    background: rgba(30, 41, 59, 0.8) !important;
-    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    background: var(--effect-slate-80) !important;
+    border: 1px solid var(--effect-white-10) !important;
 }
 
 /* Profile sections with white backgrounds - make them dark */
 [data-theme="dark"] .htb-container div[style*="background: rgba(255, 255, 255"],
 [data-theme="dark"] .glass-profile-card div[style*="background: rgba(255, 255, 255"] {
-    background: rgba(30, 41, 59, 0.6) !important;
+    background: var(--effect-slate-60) !important;
 }
 
 /* ============================================
@@ -1562,17 +1562,17 @@ body.dark-mode *:focus-visible {
     line-height: 1.8;
     font-size: var(--font-size-base);
     padding: var(--space-4);
-    background: rgba(255, 255, 255, 0.3);
+    background: var(--effect-white-30);
     -webkit-backdrop-filter: blur(8px);
     backdrop-filter: blur(8px);
     border-radius: var(--radius-md);
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    border: 1px solid var(--effect-white-20);
     color: var(--color-gray-700);
 }
 
 [data-theme="dark"] .profile-about-content {
-    background: rgba(30, 41, 59, 0.6) !important;
-    border-color: rgba(255, 255, 255, 0.1) !important;
+    background: var(--effect-slate-60) !important;
+    border-color: var(--effect-white-10) !important;
     color: var(--color-slate-200);
 }
 
@@ -1587,24 +1587,24 @@ body.dark-mode *:focus-visible {
 }
 
 .profile-review-card {
-    background: rgba(255, 255, 255, 0.5);
+    background: var(--effect-white-50);
     -webkit-backdrop-filter: blur(8px);
     backdrop-filter: blur(8px);
     border-radius: var(--radius-lg);
     padding: var(--space-5);
     margin-bottom: var(--space-4);
-    border: 1px solid rgba(255, 255, 255, 0.3);
+    border: 1px solid var(--effect-white-30);
     transition: all var(--transition-fast) var(--ease-in-out);
 }
 
 [data-theme="dark"] .profile-review-card {
-    background: rgba(30, 41, 59, 0.6) !important;
-    border-color: rgba(255, 255, 255, 0.1) !important;
+    background: var(--effect-slate-60) !important;
+    border-color: var(--effect-white-10) !important;
 }
 
 .profile-review-card:hover {
     transform: translateY(-2px);
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 8px 24px var(--effect-black-10);
 }
 
 .review-author-name {
@@ -1620,7 +1620,7 @@ body.dark-mode *:focus-visible {
 .review-content {
     font-size: var(--font-size-base);
     line-height: 1.6;
-    background: rgba(255, 255, 255, 0.4);
+    background: var(--effect-white-40);
     padding: var(--space-3) var(--space-4);
     border-radius: var(--radius-md);
     border-left: 4px solid rgba(245, 158, 11, 0.5);
@@ -1628,24 +1628,24 @@ body.dark-mode *:focus-visible {
 }
 
 [data-theme="dark"] .review-content {
-    background: rgba(30, 41, 59, 0.5) !important;
+    background: var(--effect-slate-50) !important;
     color: var(--color-slate-300);
 }
 
 /* Activity Section */
 .profile-activity-card {
-    background: rgba(255, 255, 255, 0.5);
+    background: var(--effect-white-50);
     -webkit-backdrop-filter: blur(8px);
     backdrop-filter: blur(8px);
     border-radius: var(--radius-lg);
     padding: var(--space-5);
     margin-bottom: var(--space-4);
-    border: 1px solid rgba(255, 255, 255, 0.3);
+    border: 1px solid var(--effect-white-30);
 }
 
 [data-theme="dark"] .profile-activity-card {
-    background: rgba(30, 41, 59, 0.6) !important;
-    border-color: rgba(255, 255, 255, 0.1) !important;
+    background: var(--effect-slate-60) !important;
+    border-color: var(--effect-white-10) !important;
 }
 
 /* Empty State */
@@ -1701,18 +1701,18 @@ body.dark-mode *:focus-visible {
 
 /* Sidebar Cards */
 .profile-sidebar-card {
-    background: var(--card-background-color, rgba(255, 255, 255, 0.7));
+    background: var(--card-background-color, var(--effect-white-70));
     -webkit-backdrop-filter: blur(20px);
     backdrop-filter: blur(20px);
     border-radius: var(--radius-lg);
-    border: 1px solid rgba(255, 255, 255, 0.4);
+    border: 1px solid var(--effect-white-40);
     padding: var(--space-5);
     margin-bottom: var(--space-4);
 }
 
 [data-theme="dark"] .profile-sidebar-card {
-    background: rgba(30, 41, 59, 0.8) !important;
-    border-color: rgba(255, 255, 255, 0.1) !important;
+    background: var(--effect-slate-80) !important;
+    border-color: var(--effect-white-10) !important;
 }
 
 /* Rating Stars */
@@ -1740,8 +1740,8 @@ body.dark-mode *:focus-visible {
     gap: var(--space-6);
     margin: var(--space-4) 0;
     padding: var(--space-4) 0;
-    border-top: 1px solid rgba(99, 102, 241, 0.1);
-    border-bottom: 1px solid rgba(99, 102, 241, 0.1);
+    border-top: 1px solid var(--effect-primary-10);
+    border-bottom: 1px solid var(--effect-primary-10);
 }
 
 .profile-stat-item {
@@ -1789,7 +1789,7 @@ body.dark-mode *:focus-visible {
 
 @keyframes pulse-online {
     0%, 100% {
-        box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4);
+        box-shadow: 0 0 0 0 var(--effect-emerald-40);
     }
     50% {
         box-shadow: 0 0 0 8px rgba(16, 185, 129, 0);
@@ -1798,21 +1798,21 @@ body.dark-mode *:focus-visible {
 
 /* Badge Color Variants */
 .glass-info-badge--success {
-    background: linear-gradient(135deg, rgba(16, 185, 129, 0.2), rgba(5, 150, 105, 0.1));
-    border-color: rgba(16, 185, 129, 0.3);
+    background: linear-gradient(135deg, var(--effect-emerald-20), rgba(5, 150, 105, 0.1));
+    border-color: var(--effect-emerald-30);
 }
 
 .glass-info-badge--warning {
-    background: linear-gradient(135deg, rgba(245, 158, 11, 0.2), rgba(217, 119, 6, 0.1));
-    border-color: rgba(245, 158, 11, 0.3);
+    background: linear-gradient(135deg, var(--effect-amber-20), rgba(217, 119, 6, 0.1));
+    border-color: var(--effect-amber-30);
 }
 
 .glass-info-badge--purple {
-    background: linear-gradient(135deg, rgba(139, 92, 246, 0.2), rgba(124, 58, 237, 0.15));
-    border-color: rgba(139, 92, 246, 0.4);
+    background: linear-gradient(135deg, var(--effect-purple-20), rgba(124, 58, 237, 0.15));
+    border-color: var(--effect-purple-40);
 }
 
 .glass-info-badge--danger {
-    background: linear-gradient(135deg, rgba(239, 68, 68, 0.2), rgba(220, 38, 38, 0.1));
-    border-color: rgba(239, 68, 68, 0.3);
+    background: linear-gradient(135deg, var(--effect-red-20), rgba(220, 38, 38, 0.1));
+    border-color: var(--effect-red-30);
 }

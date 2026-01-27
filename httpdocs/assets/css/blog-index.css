@@ -160,11 +160,11 @@
         bottom: 0;
         z-index: -1;
         background:
-            radial-gradient(ellipse at 20% 0%, rgba(139, 92, 246, 0.3) 0%, transparent 50%),
+            radial-gradient(ellipse at 20% 0%, var(--effect-purple-30) 0%, transparent 50%),
             radial-gradient(ellipse at 80% 0%, rgba(6, 182, 212, 0.25) 0%, transparent 50%),
             radial-gradient(ellipse at 50% 100%, rgba(244, 114, 182, 0.2) 0%, transparent 50%),
-            radial-gradient(ellipse at 0% 50%, rgba(139, 92, 246, 0.15) 0%, transparent 40%),
-            radial-gradient(ellipse at 100% 50%, rgba(6, 182, 212, 0.15) 0%, transparent 40%);
+            radial-gradient(ellipse at 0% 50%, var(--effect-purple-15) 0%, transparent 40%),
+            radial-gradient(ellipse at 100% 50%, var(--effect-cyan-15) 0%, transparent 40%);
         animation: holoShift 20s ease-in-out infinite alternate;
     }
 
@@ -208,7 +208,7 @@
     .holo-orb-2 {
         width: 500px;
         height: 500px;
-        background: radial-gradient(circle, rgba(6, 182, 212, 0.5) 0%, transparent 70%);
+        background: radial-gradient(circle, var(--effect-cyan-50) 0%, transparent 70%);
         top: 30%;
         right: -150px;
         animation-delay: -5s;
@@ -266,7 +266,7 @@
         transform: translate(-50%, -50%);
         width: 600px;
         height: 600px;
-        background: radial-gradient(circle, rgba(139, 92, 246, 0.15) 0%, transparent 60%);
+        background: radial-gradient(circle, var(--effect-purple-15) 0%, transparent 60%);
         pointer-events: none;
     }
 
@@ -275,8 +275,8 @@
         align-items: center;
         gap: var(--space-2);
         padding: var(--space-2) var(--space-5);
-        background: rgba(139, 92, 246, 0.2);
-        border: 1px solid rgba(139, 92, 246, 0.4);
+        background: var(--effect-purple-20);
+        border: 1px solid var(--effect-purple-40);
         border-radius: var(--radius-full);
         color: var(--color-purple-300);
         font-size: var(--font-size-xs);
@@ -296,12 +296,12 @@
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
         background-clip: text;
-        text-shadow: 0 0 var(--space-20) rgba(139, 92, 246, 0.5);
+        text-shadow: 0 0 var(--space-20) var(--effect-purple-50);
     }
 
     .news-hero-subtitle {
         font-size: var(--font-size-xl);
-        color: rgba(255, 255, 255, 0.7);
+        color: var(--effect-white-70);
         max-width: 600px;
         margin: 0 auto var(--space-8);
         line-height: var(--line-height-normal);
@@ -313,7 +313,7 @@
         background: linear-gradient(90deg, var(--news-primary), var(--news-secondary));
         border-radius: var(--radius-sm);
         margin: 0 auto;
-        box-shadow: 0 0 var(--space-5) rgba(139, 92, 246, 0.5);
+        box-shadow: 0 0 var(--space-5) var(--effect-purple-50);
     }
 
     /* ===== NEWS GRID ===== */
@@ -340,7 +340,7 @@
     .news-card {
         position: relative;
         background: rgba(255, 255, 255, 0.03);
-        border: 1px solid rgba(255, 255, 255, 0.08);
+        border: 1px solid var(--effect-white-8);
         border-radius: var(--radius-2xl);
         overflow: hidden;
         transition: all var(--transition-slow);
@@ -356,11 +356,11 @@
         border-radius: var(--radius-2xl);
         padding: 1px;
         background: linear-gradient(135deg,
-                rgba(139, 92, 246, 0.4) 0%,
-                rgba(6, 182, 212, 0.3) 50%,
+                var(--effect-purple-40) 0%,
+                var(--effect-cyan-30) 50%,
                 rgba(244, 114, 182, 0.4) 100%);
-        -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-        mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+        -webkit-mask: linear-gradient(var(--color-white) 0 0) content-box, linear-gradient(var(--color-white) 0 0);
+        mask: linear-gradient(var(--color-white) 0 0) content-box, linear-gradient(var(--color-white) 0 0);
         -webkit-mask-composite: xor;
         mask-composite: exclude;
         opacity: 0;
@@ -372,8 +372,8 @@
         background: rgba(255, 255, 255, 0.06);
         box-shadow:
             var(--shadow-2xl),
-            0 0 var(--space-10) rgba(139, 92, 246, 0.15),
-            inset 0 1px 0 rgba(255, 255, 255, 0.1);
+            0 0 var(--space-10) var(--effect-purple-15),
+            inset 0 1px 0 var(--effect-white-10);
     }
 
     .news-card:hover::before {
@@ -404,10 +404,10 @@
         align-items: center;
         justify-content: center;
         background: linear-gradient(135deg,
-                rgba(139, 92, 246, 0.2) 0%,
-                rgba(6, 182, 212, 0.15) 100%);
+                var(--effect-purple-20) 0%,
+                var(--effect-cyan-15) 100%);
         font-size: var(--font-size-4xl);
-        color: rgba(255, 255, 255, 0.3);
+        color: var(--effect-white-30);
     }
 
     /* Image Overlay Gradient */
@@ -447,7 +447,7 @@
 
     .news-card-category {
         padding: var(--space-1) var(--space-3);
-        background: rgba(139, 92, 246, 0.2);
+        background: var(--effect-purple-20);
         border-radius: var(--radius-full);
         font-size: var(--font-size-xs);
         font-weight: var(--font-weight-semibold);
@@ -479,7 +479,7 @@
 
     .news-card-excerpt {
         font-size: var(--font-size-sm);
-        color: rgba(255, 255, 255, 0.6);
+        color: var(--effect-white-60);
         line-height: var(--line-height-normal);
         margin-bottom: var(--space-5);
         display: -webkit-box;
@@ -494,7 +494,7 @@
         align-items: center;
         justify-content: space-between;
         padding-top: var(--space-4);
-        border-top: 1px solid rgba(255, 255, 255, 0.08);
+        border-top: 1px solid var(--effect-white-8);
     }
 
     .news-btn {
@@ -502,8 +502,8 @@
         align-items: center;
         gap: var(--space-2);
         padding: var(--space-3) var(--space-5);
-        background: linear-gradient(135deg, rgba(139, 92, 246, 0.3), rgba(6, 182, 212, 0.2));
-        border: 1px solid rgba(139, 92, 246, 0.3);
+        background: linear-gradient(135deg, var(--effect-purple-30), var(--effect-cyan-20));
+        border: 1px solid var(--effect-purple-30);
         border-radius: var(--radius-md);
         color: var(--color-white);
         font-size: var(--font-size-xs);
@@ -513,9 +513,9 @@
     }
 
     .news-btn:hover {
-        background: linear-gradient(135deg, rgba(139, 92, 246, 0.5), rgba(6, 182, 212, 0.4));
-        border-color: rgba(139, 92, 246, 0.5);
-        box-shadow: 0 var(--space-2) var(--space-5) rgba(139, 92, 246, 0.3);
+        background: linear-gradient(135deg, var(--effect-purple-50), var(--effect-cyan-40));
+        border-color: var(--effect-purple-50);
+        box-shadow: 0 var(--space-2) var(--space-5) var(--effect-purple-30);
         transform: translateX(var(--space-1));
     }
 
@@ -530,7 +530,7 @@
 
     .news-card-reading-time {
         font-size: var(--font-size-xs);
-        color: rgba(255, 255, 255, 0.4);
+        color: var(--effect-white-40);
         display: flex;
         align-items: center;
         gap: var(--space-1);
@@ -541,7 +541,7 @@
         text-align: center;
         padding: var(--space-20) var(--space-10);
         background: rgba(255, 255, 255, 0.03);
-        border: 1px solid rgba(255, 255, 255, 0.08);
+        border: 1px solid var(--effect-white-8);
         border-radius: var(--radius-2xl);
         backdrop-filter: blur(var(--space-5));
         max-width: 600px;
@@ -551,14 +551,14 @@
     .news-empty-icon {
         width: 100px;
         height: 100px;
-        background: linear-gradient(135deg, rgba(139, 92, 246, 0.2), rgba(6, 182, 212, 0.15));
+        background: linear-gradient(135deg, var(--effect-purple-20), var(--effect-cyan-15));
         border-radius: var(--radius-full);
         display: flex;
         align-items: center;
         justify-content: center;
         margin: 0 auto var(--space-6);
         font-size: var(--font-size-4xl);
-        color: rgba(255, 255, 255, 0.5);
+        color: var(--effect-white-50);
     }
 
     .news-empty-title {
@@ -570,7 +570,7 @@
 
     .news-empty-text {
         font-size: var(--font-size-base);
-        color: rgba(255, 255, 255, 0.6);
+        color: var(--effect-white-60);
         margin: 0;
     }
 
@@ -588,7 +588,7 @@
 
     [data-theme="light"] #news-holo-wrapper::after {
         background:
-            radial-gradient(ellipse at 20% 0%, rgba(139, 92, 246, 0.15) 0%, transparent 50%),
+            radial-gradient(ellipse at 20% 0%, var(--effect-purple-15) 0%, transparent 50%),
             radial-gradient(ellipse at 80% 0%, rgba(6, 182, 212, 0.12) 0%, transparent 50%),
             radial-gradient(ellipse at 50% 100%, rgba(244, 114, 182, 0.1) 0%, transparent 50%);
     }
@@ -601,24 +601,24 @@
     }
 
     [data-theme="light"] .news-hero-subtitle {
-        color: rgba(0, 0, 0, 0.6);
+        color: var(--effect-black-60);
     }
 
     [data-theme="light"] .news-hero-badge {
         color: var(--color-purple-700);
-        background: rgba(139, 92, 246, 0.15);
+        background: var(--effect-purple-15);
     }
 
     [data-theme="light"] .news-card {
-        background: rgba(255, 255, 255, 0.7);
-        border-color: rgba(139, 92, 246, 0.15);
+        background: var(--effect-white-70);
+        border-color: var(--effect-purple-15);
     }
 
     [data-theme="light"] .news-card:hover {
-        background: rgba(255, 255, 255, 0.9);
+        background: var(--effect-white-90);
         box-shadow:
-            0 25px 50px -12px rgba(139, 92, 246, 0.15),
-            0 0 var(--space-10) rgba(139, 92, 246, 0.1);
+            0 25px 50px -12px var(--effect-purple-15),
+            0 0 var(--space-10) var(--effect-purple-10);
     }
 
     [data-theme="light"] .news-card-title a {
@@ -630,11 +630,11 @@
     }
 
     [data-theme="light"] .news-card-excerpt {
-        color: rgba(0, 0, 0, 0.6);
+        color: var(--effect-black-60);
     }
 
     [data-theme="light"] .news-card-image::after {
-        background: linear-gradient(to top, rgba(255, 255, 255, 0.9), transparent);
+        background: linear-gradient(to top, var(--effect-white-90), transparent);
     }
 
     [data-theme="light"] .holo-orb {
@@ -677,6 +677,6 @@
         }
 
         [data-theme="light"] .news-card {
-            background: rgba(255, 255, 255, 0.95);
+            background: var(--effect-white-95);
         }
     }
