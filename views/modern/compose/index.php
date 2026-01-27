@@ -543,6 +543,7 @@ if (empty($mapboxToken)) {
             <!-- ==================== POST PANEL ==================== -->
             <div class="multidraw-panel <?= $defaultType === 'post' ? 'active' : '' ?>" id="panel-post" role="tabpanel">
                 <form id="form-post" action="<?= $basePath ?>/compose" method="POST">
+                    <?= \Nexus\Core\Csrf::input() ?>
                     <input type="hidden" name="post_type" value="post">
 
                     <div class="md-user-row">
@@ -591,6 +592,7 @@ if (empty($mapboxToken)) {
             <!-- ==================== LISTING PANEL ==================== -->
             <div class="multidraw-panel <?= $defaultType === 'listing' ? 'active' : '' ?>" id="panel-listing" role="tabpanel">
                 <form id="form-listing" action="<?= $basePath ?>/compose" method="POST" enctype="multipart/form-data">
+                    <?= \Nexus\Core\Csrf::input() ?>
                     <input type="hidden" name="post_type" value="listing">
                     <input type="hidden" name="listing_type" id="listing-type-input" value="offer">
 
@@ -809,6 +811,7 @@ if (empty($mapboxToken)) {
             <?php if ($hasEvents): ?>
             <div class="multidraw-panel <?= $defaultType === 'event' ? 'active' : '' ?>" id="panel-event" role="tabpanel">
                 <form id="form-event" action="<?= $basePath ?>/compose" method="POST">
+                    <?= \Nexus\Core\Csrf::input() ?>
                     <input type="hidden" name="post_type" value="event">
 
                     <div class="md-field">
@@ -960,6 +963,7 @@ if (empty($mapboxToken)) {
             <?php if ($hasPolls): ?>
             <div class="multidraw-panel <?= $defaultType === 'poll' ? 'active' : '' ?>" id="panel-poll" role="tabpanel">
                 <form id="form-poll" action="<?= $basePath ?>/compose" method="POST">
+                    <?= \Nexus\Core\Csrf::input() ?>
                     <input type="hidden" name="post_type" value="poll">
 
                     <div class="md-field">
@@ -1025,6 +1029,7 @@ if (empty($mapboxToken)) {
             <?php if ($hasGoals): ?>
             <div class="multidraw-panel <?= $defaultType === 'goal' ? 'active' : '' ?>" id="panel-goal" role="tabpanel">
                 <form id="form-goal" action="<?= $basePath ?>/compose" method="POST">
+                    <?= \Nexus\Core\Csrf::input() ?>
                     <input type="hidden" name="post_type" value="goal">
 
                     <div class="md-field">
@@ -1253,6 +1258,7 @@ if (empty($mapboxToken)) {
             <?php if (!empty($userGroups)): ?>
             <div class="multidraw-panel <?= $defaultType === 'group' ? 'active' : '' ?>" id="panel-group" role="tabpanel">
                 <form id="form-group" action="<?= $basePath ?>/compose" method="POST" enctype="multipart/form-data">
+                    <?= \Nexus\Core\Csrf::input() ?>
                     <input type="hidden" name="post_type" value="post">
                     <input type="hidden" name="group_id" id="selected-group-id" value="<?= $preselectedGroup ? (int)$preselectedGroup['id'] : '' ?>">
 

@@ -209,6 +209,7 @@ $pageTitle = 'Create';
         <!-- POST Panel -->
         <div class="tab-panel <?= $defaultType === 'post' ? 'active' : '' ?>" id="panel-post" role="tabpanel">
             <form id="form-post" action="<?= $basePath ?>/compose" method="POST">
+                <?= \Nexus\Core\Csrf::input() ?>
                 <input type="hidden" name="post_type" value="post">
 
                 <div class="govuk-form-group">
@@ -238,6 +239,7 @@ $pageTitle = 'Create';
         <!-- LISTING Panel -->
         <div class="tab-panel <?= $defaultType === 'listing' ? 'active' : '' ?>" id="panel-listing" role="tabpanel">
             <form id="form-listing" action="<?= $basePath ?>/compose" method="POST" enctype="multipart/form-data">
+                <?= \Nexus\Core\Csrf::input() ?>
                 <input type="hidden" name="post_type" value="listing">
                 <input type="hidden" name="listing_type" id="listing-type-input" value="offer">
 
@@ -297,6 +299,7 @@ $pageTitle = 'Create';
         <!-- EVENT Panel -->
         <div class="tab-panel <?= $defaultType === 'event' ? 'active' : '' ?>" id="panel-event" role="tabpanel">
             <form id="form-event" action="<?= $basePath ?>/compose" method="POST" enctype="multipart/form-data">
+                <?= \Nexus\Core\Csrf::input() ?>
                 <input type="hidden" name="post_type" value="event">
 
                 <div class="govuk-form-group">
@@ -358,6 +361,7 @@ $pageTitle = 'Create';
         <!-- POLL Panel -->
         <div class="tab-panel <?= $defaultType === 'poll' ? 'active' : '' ?>" id="panel-poll" role="tabpanel">
             <form id="form-poll" action="<?= $basePath ?>/compose" method="POST">
+                <?= \Nexus\Core\Csrf::input() ?>
                 <input type="hidden" name="post_type" value="poll">
 
                 <div class="govuk-form-group">
@@ -403,6 +407,7 @@ $pageTitle = 'Create';
         <!-- GOAL Panel -->
         <div class="tab-panel <?= $defaultType === 'goal' ? 'active' : '' ?>" id="panel-goal" role="tabpanel">
             <form id="form-goal" action="<?= $basePath ?>/compose" method="POST">
+                <?= \Nexus\Core\Csrf::input() ?>
                 <input type="hidden" name="post_type" value="goal">
 
                 <div class="govuk-form-group">
@@ -433,6 +438,7 @@ $pageTitle = 'Create';
         <div class="tab-panel <?= $defaultType === 'volunteering' ? 'active' : '' ?>" id="panel-volunteering" role="tabpanel">
             <?php if ($hasApprovedOrg): ?>
             <form id="form-volunteering" action="<?= $basePath ?>/compose" method="POST">
+                <?= \Nexus\Core\Csrf::input() ?>
                 <input type="hidden" name="post_type" value="volunteering">
 
                 <div class="govuk-form-group">
@@ -499,6 +505,7 @@ $pageTitle = 'Create';
         <!-- GROUP Panel -->
         <div class="tab-panel <?= $defaultType === 'group' ? 'active' : '' ?>" id="panel-group" role="tabpanel">
             <form id="form-group" action="<?= $basePath ?>/compose" method="POST">
+                <?= \Nexus\Core\Csrf::input() ?>
                 <input type="hidden" name="post_type" value="group_post">
 
                 <div class="govuk-form-group">
