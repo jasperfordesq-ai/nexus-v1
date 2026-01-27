@@ -30,9 +30,9 @@
     width: 200%;
     height: 200%;
     background:
-        radial-gradient(ellipse at 20% 30%, rgba(99, 102, 241, 0.12) 0%, transparent 50%),
-        radial-gradient(ellipse at 80% 20%, rgba(139, 92, 246, 0.1) 0%, transparent 45%),
-        radial-gradient(ellipse at 60% 80%, rgba(59, 130, 246, 0.08) 0%, transparent 50%);
+        radial-gradient(ellipse at 20% 30%, var(--effect-primary-12) 0%, transparent 50%),
+        radial-gradient(ellipse at 80% 20%, var(--effect-purple-10) 0%, transparent 45%),
+        radial-gradient(ellipse at 60% 80%, var(--effect-blue-8) 0%, transparent 50%);
     animation: dashFloat 20s ease-in-out infinite;
 }
 
@@ -42,8 +42,8 @@
 
 [data-theme="dark"] .dashboard-glass-bg::before {
     background:
-        radial-gradient(ellipse at 20% 30%, rgba(99, 102, 241, 0.2) 0%, transparent 50%),
-        radial-gradient(ellipse at 80% 20%, rgba(139, 92, 246, 0.15) 0%, transparent 45%);
+        radial-gradient(ellipse at 20% 30%, var(--effect-primary-20) 0%, transparent 50%),
+        radial-gradient(ellipse at 80% 20%, var(--effect-purple-15) 0%, transparent 45%);
 }
 
 @keyframes dashFloat {
@@ -68,27 +68,27 @@
 /* Glass Cards */
 .dash-glass-card {
     background: linear-gradient(135deg,
-            rgba(255, 255, 255, 0.85) 0%,
-            rgba(255, 255, 255, 0.7) 100%);
+            var(--effect-white-85) 0%,
+            var(--effect-white-70) 100%);
     backdrop-filter: blur(var(--glass-blur));
     -webkit-backdrop-filter: blur(var(--glass-blur));
-    border: 1px solid rgba(255, 255, 255, 0.5);
+    border: 1px solid var(--effect-white-50);
     border-radius: var(--radius-xl);
-    box-shadow: 0 8px 32px rgba(31, 38, 135, 0.1);
+    box-shadow: 0 8px 32px var(--effect-glass-shadow);
     overflow: hidden;
     transition: all var(--transition-base);
 }
 
 .dash-glass-card:hover {
     transform: translateY(-2px);
-    box-shadow: 0 12px 40px rgba(31, 38, 135, 0.15);
+    box-shadow: 0 12px 40px var(--effect-glass-shadow-15);
 }
 
 [data-theme="dark"] .dash-glass-card {
     background: linear-gradient(135deg,
-            rgba(30, 41, 59, 0.85) 0%,
-            rgba(30, 41, 59, 0.7) 100%);
-    border-color: rgba(255, 255, 255, 0.1);
+            var(--effect-slate-85) 0%,
+            var(--effect-slate-70) 100%);
+    border-color: var(--effect-white-10);
 }
 
 /* Balance Card Special */
@@ -97,7 +97,7 @@
     color: white;
     padding: var(--space-8);
     border-radius: var(--radius-xl);
-    box-shadow: 0 10px 40px rgba(79, 70, 229, 0.3);
+    box-shadow: 0 10px 40px var(--effect-indigo-600-30);
     margin-bottom: var(--space-6);
 }
 
@@ -110,11 +110,11 @@
 /* Tab Navigation Glass */
 .dash-tabs-glass {
     background: linear-gradient(135deg,
-            rgba(255, 255, 255, 0.7) 0%,
-            rgba(255, 255, 255, 0.5) 100%);
+            var(--effect-white-70) 0%,
+            var(--effect-white-50) 100%);
     backdrop-filter: blur(var(--glass-blur));
     -webkit-backdrop-filter: blur(var(--glass-blur));
-    border: 1px solid rgba(255, 255, 255, 0.3);
+    border: 1px solid var(--effect-white-30);
     border-radius: var(--radius-lg);
     padding: var(--space-2);
     margin-bottom: var(--space-6);
@@ -125,9 +125,9 @@
 
 [data-theme="dark"] .dash-tabs-glass {
     background: linear-gradient(135deg,
-            rgba(30, 41, 59, 0.8) 0%,
-            rgba(30, 41, 59, 0.6) 100%);
-    border-color: rgba(255, 255, 255, 0.1);
+            var(--effect-slate-80) 0%,
+            var(--effect-slate-60) 100%);
+    border-color: var(--effect-white-10);
 }
 
 .dash-tab-glass {
@@ -144,14 +144,14 @@
 }
 
 .dash-tab-glass:hover {
-    background: rgba(99, 102, 241, 0.1);
+    background: var(--effect-primary-10);
     color: var(--color-primary-500);
 }
 
 .dash-tab-glass.active {
     background: linear-gradient(135deg, var(--color-primary-500) 0%, var(--color-purple-500) 100%);
     color: white;
-    box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);
+    box-shadow: 0 4px 15px var(--effect-primary-30);
 }
 
 [data-theme="dark"] .dash-tab-glass {
@@ -159,7 +159,7 @@
 }
 
 [data-theme="dark"] .dash-tab-glass:hover {
-    background: rgba(99, 102, 241, 0.2);
+    background: var(--effect-primary-20);
     color: var(--color-primary-300);
 }
 
@@ -199,7 +199,7 @@
     color: white;
     font-size: var(--font-size-2xl);
     cursor: pointer;
-    box-shadow: 0 4px 20px rgba(99, 102, 241, 0.4);
+    box-shadow: 0 4px 20px var(--effect-primary-40);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -208,7 +208,7 @@
 
 .dash-fab-main:hover {
     transform: scale(1.1);
-    box-shadow: 0 6px 30px rgba(99, 102, 241, 0.5);
+    box-shadow: 0 6px 30px var(--effect-primary-50);
 }
 
 .dash-fab-main.active {
@@ -244,11 +244,11 @@
     align-items: center;
     gap: var(--space-3);
     padding: var(--space-3) var(--space-4);
-    background: rgba(255, 255, 255, 0.95);
+    background: var(--effect-white-95);
     -webkit-backdrop-filter: blur(var(--glass-blur));
     backdrop-filter: blur(var(--glass-blur));
     border-radius: var(--radius-md);
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+    box-shadow: 0 4px 20px var(--effect-black-15);
     text-decoration: none;
     color: var(--color-gray-800);
     font-weight: var(--font-weight-semibold);
@@ -285,7 +285,7 @@
 }
 
 [data-theme="dark"] .dash-fab-item {
-    background: rgba(30, 41, 59, 0.95);
+    background: var(--effect-slate-95);
     color: var(--color-slate-100);
 }
 
@@ -734,7 +734,7 @@
 
 .dash-notif-dot.unread {
     background: var(--color-danger);
-    box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.15);
+    box-shadow: 0 0 0 3px var(--effect-red-15);
 }
 
 .dash-notif-dot.read {
@@ -817,7 +817,7 @@
 }
 
 [data-theme="dark"] .dash-overview-notif-header {
-    border-color: rgba(255, 255, 255, 0.1);
+    border-color: var(--effect-white-10);
 }
 
 [data-theme="dark"] .dash-view-all-link {
@@ -825,11 +825,11 @@
 }
 
 [data-theme="dark"] .dash-notif-item {
-    border-color: rgba(255, 255, 255, 0.08);
+    border-color: var(--effect-white-8);
 }
 
 [data-theme="dark"] .dash-notif-item:hover {
-    background: rgba(51, 65, 85, 0.5);
+    background: var(--effect-slate-600-50);
 }
 
 [data-theme="dark"] .dash-notif-dot.read {
@@ -870,18 +870,18 @@
 
 /* Sidebar cards - Upcoming Events & My Hubs */
 [data-theme="dark"] .htb-card-header[style*="background: var(--color-slate-50)"] {
-    background: rgba(30, 41, 59, 0.6) !important;
-    border-color: rgba(255, 255, 255, 0.1) !important;
+    background: var(--effect-slate-60) !important;
+    border-color: var(--effect-white-10) !important;
     color: var(--color-slate-300) !important;
 }
 
 /* Event cards in sidebar */
 [data-theme="dark"] a[style*="border-bottom: 1px solid var(--color-slate-100)"] {
-    border-color: rgba(255, 255, 255, 0.08) !important;
+    border-color: var(--effect-white-8) !important;
 }
 
 [data-theme="dark"] a[style*="border-bottom: 1px solid var(--color-slate-100)"]:hover {
-    background: rgba(51, 65, 85, 0.4) !important;
+    background: var(--effect-slate-600-40) !important;
 }
 
 [data-theme="dark"] a[style*="border-bottom: 1px solid var(--color-slate-100)"] div[style*="color: var(--color-slate-800)"] {
@@ -898,7 +898,7 @@
 }
 
 [data-theme="dark"] a[style*="color: var(--color-slate-700)"]:hover {
-    background: rgba(51, 65, 85, 0.5) !important;
+    background: var(--effect-slate-600-50) !important;
 }
 
 [data-theme="dark"] a[style*="color: var(--color-slate-700)"] div[style*="color: var(--color-slate-400)"] {
@@ -907,9 +907,9 @@
 
 /* Quick Actions card */
 [data-theme="dark"] .htb-btn[style*="background: var(--color-slate-100)"] {
-    background: rgba(51, 65, 85, 0.6) !important;
+    background: var(--effect-slate-600-60) !important;
     color: var(--color-slate-200) !important;
-    border-color: rgba(255, 255, 255, 0.1) !important;
+    border-color: var(--effect-white-10) !important;
 }
 
 /* ============================================
@@ -1060,7 +1060,7 @@
 
 .notif-indicator.unread {
     background: var(--color-danger);
-    box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.2);
+    box-shadow: 0 0 0 3px var(--effect-red-20);
 }
 
 .notif-indicator.read {
