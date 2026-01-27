@@ -81,11 +81,12 @@ if (!function_exists('webp_avatar')) {
      * @param string|null $avatarPath Avatar image path (null for default)
      * @param string $userName User's name for alt text
      * @param int $size Size in pixels (default: 40)
+     * @param array $attributes Optional HTML attributes (e.g., ['loading' => 'eager'] for above-fold)
      * @return string HTML for avatar with WebP optimization
      */
-    function webp_avatar(?string $avatarPath, string $userName = 'User', int $size = 40): string
+    function webp_avatar(?string $avatarPath, string $userName = 'User', int $size = 40, array $attributes = []): string
     {
-        return \Nexus\Helpers\ImageHelper::avatar($avatarPath, $userName, $size);
+        return \Nexus\Helpers\ImageHelper::avatar($avatarPath, $userName, $size, $attributes);
     }
 }
 

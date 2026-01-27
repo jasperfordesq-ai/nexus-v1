@@ -142,9 +142,12 @@ $basePath = Nexus\Core\TenantContext::getBasePath();
         <!-- Members Grid -->
         <div id="members-grid" class="members-grid">
             <?php if (!empty($members)): ?>
+                <?php $memberIndex = 0; ?>
                 <?php foreach ($members as $member): ?>
                     <?php $memberOrgRoles = $orgLeadership[$member['id']] ?? []; ?>
-                    <?= render_glass_member_card($member, $basePath, $memberOrgRoles) ?>
+                    <?php // First 6 members are above-the-fold, use eager loading to prevent FOUC ?>
+                    <?= render_glass_member_card($member, $basePath, $memberOrgRoles, $memberIndex < 6) ?>
+                    <?php $memberIndex++; ?>
                 <?php endforeach; ?>
             <?php else: ?>
                 <div class="glass-empty-state">
@@ -166,7 +169,14 @@ $basePath = Nexus\Core\TenantContext::getBasePath();
 </div>
 
 <?php
-function render_glass_member_card($member, $basePath, $orgRoles = [])
+/**
+ * Render a glass-style member card
+ * @param array $member Member data
+ * @param string $basePath Base URL path
+ * @param array $orgRoles Organization roles for this member
+ * @param bool $eager Use loading="eager" for above-the-fold avatars (first ~6 visible)
+ */
+function render_glass_member_card($member, $basePath, $orgRoles = [], $eager = false)
 {
     ob_start();
 
@@ -191,12 +201,15 @@ function render_glass_member_card($member, $basePath, $orgRoles = [])
     // Check online status - active within 5 minutes
     $memberLastActive = $member['last_active_at'] ?? null;
     $isMemberOnline = $memberLastActive && (strtotime($memberLastActive) > strtotime('-5 minutes'));
+
+    // For above-the-fold avatars, use eager loading to prevent FOUC delay
+    $avatarAttrs = $eager ? ['loading' => 'eager', 'fetchpriority' => 'high'] : [];
 ?>
     <a href="<?= $profileUrl ?>" class="glass-member-card">
         <div class="card-body">
             <div class="avatar-container">
                 <div class="avatar-ring"></div>
-                <?= webp_avatar($avatarUrl, $memberName, 80) ?>
+                <?= webp_avatar($avatarUrl, $memberName, 80, $avatarAttrs) ?>
                 <?php if ($isMemberOnline): ?>
                     <span class="online-indicator mte-members--online-indicator" title="Active now"></span>
                 <?php endif; ?>

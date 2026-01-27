@@ -181,8 +181,11 @@ img.avatar-img:hover {
     box-shadow: 0 4px 12px var(--effect-purple-30);
 }
 
-/* Picture element wrapper - constrain avatar to proper size */
-picture:has(.avatar-img) {
+/* Picture element wrapper - constrain avatar to proper size
+   ONLY in feed/sidebar contexts. Do NOT apply globally - breaks members page avatars. */
+.feed-item-avatar-link picture:has(.avatar-img),
+.sidebar-card picture:has(.avatar-img),
+.composer-avatar-ring picture:has(.avatar-img) {
     display: inline-flex;
     flex-shrink: 0;
     width: 44px;

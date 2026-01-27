@@ -1,6 +1,13 @@
 /* Scattered Singles CSS - Extracted 2026-01-19 */
 /* Source: 16 scattered page files */
 
+/* ============================================
+   UTILITY CLASSES
+   ============================================ */
+.hidden {
+    display: none !important;
+}
+
 /* ===== From: views/modern/ai/index.php ===== */
 /* ============================================
    AI ASSISTANT PAGE STYLES
@@ -4824,11 +4831,15 @@ a.leaderboard-row {
                 }
             }
 
-            /* Picture element must fill container for webp_avatar() output */
+            /* Picture element must fill container for webp_avatar() output
+               CRITICAL FIX (2026-01-27): Override picture:has(.avatar-img) from modern-pages.css
+               which sets max-width/max-height: 44px, causing avatars to shrink */
             #members-glass-wrapper .avatar-container picture {
                 display: block;
-                width: 100%;
-                height: 100%;
+                width: 100% !important;
+                height: 100% !important;
+                max-width: 100% !important;
+                max-height: 100% !important;
                 position: relative;
                 z-index: 1;
             }
@@ -4845,7 +4856,9 @@ a.leaderboard-row {
                 position: relative;
                 z-index: 1;
                 box-sizing: border-box;
-                opacity: 1 !important; /* Fix for lazy-loaded images stuck at opacity 0 */
+                /* FOUC Fix: Override lazy-load opacity AND transition from core.css */
+                opacity: 1 !important;
+                transition: none !important;
             }
 
             [data-theme="dark"] #members-glass-wrapper .avatar-img {
