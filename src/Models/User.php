@@ -198,7 +198,10 @@ class User
             'email_org_payments' => 1,
             'email_org_transfers' => 1,
             'email_org_membership' => 1,
-            'email_org_admin' => 1
+            'email_org_admin' => 1,
+            // Gamification email preferences
+            'email_gamification_digest' => 1,
+            'email_gamification_milestones' => 1
         ];
 
         try {
@@ -216,6 +219,53 @@ class User
         }
 
         return $defaults;
+    }
+
+    /**
+     * Check if a specific gamification email preference is enabled
+     * Handles migration from legacy email_preferences column
+     *
+     * @param int $userId
+     * @param string $prefKey - 'digest' or 'milestones'
+     * @return bool
+     */
+    public static function isGamificationEmailEnabled(int $userId, string $prefKey): bool
+    {
+        $tenantId = TenantContext::getId();
+
+        // Map short keys to full keys
+        $keyMap = [
+            'digest' => 'email_gamification_digest',
+            'milestones' => 'email_gamification_milestones'
+        ];
+
+        $fullKey = $keyMap[$prefKey] ?? $prefKey;
+
+        // First, check notification_preferences (new location)
+        $prefs = self::getNotificationPreferences($userId);
+        if (isset($prefs[$fullKey])) {
+            return (bool) $prefs[$fullKey];
+        }
+
+        // Legacy fallback: check email_preferences.gamification_digest
+        if ($prefKey === 'digest') {
+            try {
+                $sql = "SELECT email_preferences FROM users WHERE id = ? AND tenant_id = ?";
+                $result = Database::query($sql, [$userId, $tenantId])->fetch(\PDO::FETCH_ASSOC);
+
+                if ($result && !empty($result['email_preferences'])) {
+                    $legacyPrefs = json_decode($result['email_preferences'], true);
+                    if (isset($legacyPrefs['gamification_digest'])) {
+                        return (bool) $legacyPrefs['gamification_digest'];
+                    }
+                }
+            } catch (\Exception $e) {
+                error_log('[User::isGamificationEmailEnabled] Legacy check error: ' . $e->getMessage());
+            }
+        }
+
+        // Default: enabled
+        return true;
     }
 
     /**

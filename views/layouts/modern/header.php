@@ -96,25 +96,58 @@ try {
     <link rel="preload" as="style" href="<?= $assetBase ?>/assets/css/bundles/components-navigation.css?v=<?= $cssVersionTimestamp ?>">
     <link rel="preload" as="style" href="<?= $assetBase ?>/assets/css/bundles/components-buttons.css?v=<?= $cssVersionTimestamp ?>">
 
-    <!-- FOUC FIX (2026-01-27): Preload page-specific CSS for high-traffic routes
-         This allows browsers to start fetching page CSS before parsing HTML body.
-         Only preloads the PRIMARY page file; secondary files load via page-css-loader. -->
-<?php if ($isHome): ?>
+    <!-- PHASE 8 FOUC FIX (2026-01-27): Load CRITICAL page CSS as real stylesheets in <head>
+         For blog/auth routes, preload is NOT enough - CSS must be applied before first paint.
+         These routes load their primary CSS here; page-css-loader.php skips them to avoid duplicates. -->
+<?php
+// Track which CSS files are loaded in <head> to prevent duplicates in page-css-loader.php
+$GLOBALS['css_already_in_head'] = [];
+
+// Blog index: /news, /blog (with tenant prefix variants)
+$isBlogIndex = $normPath === '/news' || $normPath === '/blog' || preg_match('/\/(news|blog)$/', $normPath);
+// Blog show: /news/{slug}, /blog/{slug}
+$isBlogShow = preg_match('/\/(news|blog)\/[^\/]+$/', $normPath) && !preg_match('/\/(news|blog)\/(create|edit)/', $normPath);
+// Auth pages: /login, /register, /password
+$isAuthPage = preg_match('/\/(login|register|password)/', $normPath);
+
+if ($isBlogIndex):
+    $GLOBALS['css_already_in_head'][] = 'blog-index.css';
+    $GLOBALS['css_already_in_head'][] = 'utilities-polish.css';
+    $GLOBALS['css_already_in_head'][] = 'components-navigation.css';
+    $GLOBALS['css_already_in_head'][] = 'components-buttons.css';
+?>
+    <!-- PHASE 11: Blog index CSS in <head> for content-first load (no skeleton swap) -->
+    <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/blog-index.css?v=<?= $cssVersionTimestamp ?>">
+    <!-- utilities-polish.css sync for consistent styling -->
+    <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/bundles/utilities-polish.css?v=<?= $cssVersionTimestamp ?>">
+    <!-- PHASE 15B: Sync nav+button bundles for blog to eliminate header/button snap -->
+    <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/bundles/components-navigation.css?v=<?= $cssVersionTimestamp ?>">
+    <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/bundles/components-buttons.css?v=<?= $cssVersionTimestamp ?>">
+<?php elseif ($isBlogShow):
+    $GLOBALS['css_already_in_head'][] = 'blog-show.css';
+    $GLOBALS['css_already_in_head'][] = 'components-navigation.css';
+    $GLOBALS['css_already_in_head'][] = 'components-buttons.css';
+?>
+    <!-- PHASE 8: Blog show CSS in <head> -->
+    <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/blog-show.css?v=<?= $cssVersionTimestamp ?>">
+    <!-- PHASE 15B: Sync nav+button bundles for blog to eliminate header/button snap -->
+    <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/bundles/components-navigation.css?v=<?= $cssVersionTimestamp ?>">
+    <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/bundles/components-buttons.css?v=<?= $cssVersionTimestamp ?>">
+<?php elseif ($isAuthPage):
+    $GLOBALS['css_already_in_head'][] = 'auth.css';
+?>
+    <!-- PHASE 8: Auth CSS in <head> -->
+    <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/auth.css?v=<?= $cssVersionTimestamp ?>">
+<?php elseif ($isHome): ?>
     <link rel="preload" as="style" href="<?= $assetBase ?>/assets/css/nexus-home.css?v=<?= $cssVersionTimestamp ?>">
 <?php elseif (strpos($normPath, '/dashboard') !== false): ?>
     <link rel="preload" as="style" href="<?= $assetBase ?>/assets/css/dashboard.css?v=<?= $cssVersionTimestamp ?>">
 <?php elseif (preg_match('/\/profile\/[^\/]+$/', $normPath) && strpos($normPath, '/edit') === false): ?>
     <link rel="preload" as="style" href="<?= $assetBase ?>/assets/css/profile-holographic.css?v=<?= $cssVersionTimestamp ?>">
-<?php elseif (preg_match('/\/(login|register|password)/', $normPath)): ?>
-    <link rel="preload" as="style" href="<?= $assetBase ?>/assets/css/auth.css?v=<?= $cssVersionTimestamp ?>">
 <?php elseif ($normPath === '/events' || preg_match('/\/events$/', $normPath)): ?>
     <link rel="preload" as="style" href="<?= $assetBase ?>/assets/css/events-index.css?v=<?= $cssVersionTimestamp ?>">
 <?php elseif ($normPath === '/groups' || preg_match('/\/groups$/', $normPath) || preg_match('/\/groups\/\d+$/', $normPath)): ?>
     <link rel="preload" as="style" href="<?= $assetBase ?>/assets/css/groups-show.css?v=<?= $cssVersionTimestamp ?>">
-<?php elseif ($normPath === '/news' || $normPath === '/blog' || preg_match('/\/(news|blog)$/', $normPath)): ?>
-    <link rel="preload" as="style" href="<?= $assetBase ?>/assets/css/blog-index.css?v=<?= $cssVersionTimestamp ?>">
-<?php elseif (preg_match('/\/(news|blog)\/[^\/]+$/', $normPath) && !preg_match('/\/(news|blog)\/(create|edit)/', $normPath)): ?>
-    <link rel="preload" as="style" href="<?= $assetBase ?>/assets/css/blog-show.css?v=<?= $cssVersionTimestamp ?>">
 <?php endif; ?>
 
     <!-- Preload JavaScript (critical for interactivity) -->
@@ -130,14 +163,26 @@ try {
          ========================================== -->
     <?php require __DIR__ . '/partials/css-loader.php'; ?>
 
-    <!-- Font Awesome (async) -->
+    <!-- Font Awesome -->
+<?php if ($isBlogIndex || $isBlogShow || $isAuthPage): ?>
+    <!-- PHASE 13 (2026-01-27): Sync FA for blog/auth routes to eliminate icon pop-in -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous">
+<?php else: ?>
+    <!-- Async FA for other routes (non-blocking) -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous" media="print" onload="this.media='all'">
     <noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous"></noscript>
+<?php endif; ?>
 
-    <!-- Google Fonts (async) -->
+    <!-- Google Fonts (Roboto) -->
+<?php if ($isBlogIndex || $isBlogShow || $isAuthPage): ?>
+    <!-- PHASE 14 (2026-01-27): Sync Roboto for blog/auth routes to eliminate font swap -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap">
+<?php else: ?>
+    <!-- Async Roboto for other routes (non-blocking) -->
     <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap">
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
     <noscript><link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet"></noscript>
+<?php endif; ?>
 
     <?php
     // PRIORITY: Load page-specific CSS if needed
@@ -147,8 +192,13 @@ try {
     }
     ?>
 
-    <!-- CRITICAL: Instant Load Script (deferred to not block CSS) -->
-    <script defer src="/assets/js/nexus-instant-load.min.js?v=<?= $cssVersionTimestamp ?>"></script>
+    <!-- PHASE 12 (2026-01-27): nexus-instant-load.js DISABLED
+         Root cause analysis (Phase 11 audit) identified this script as the PRIMARY cause of FOUC.
+         The script artificially hides body with opacity:0, then fades in after CSS check.
+         With Phases 8-11 CSS optimizations, sync CSS now loads before first paint - hiding is counterproductive.
+         To re-enable: uncomment the script tag below.
+    -->
+    <!-- <script defer src="/assets/js/nexus-instant-load.min.js?v=<?= $cssVersionTimestamp ?>"></script> -->
     <!-- Layout Switch Helper (prevents visual glitches) -->
     <script defer src="/assets/js/layout-switch-helper.min.js?v=<?= $cssVersionTimestamp ?>"></script>
     <!-- Mobile Interactions (ripple effects, haptic feedback, loading states) -->

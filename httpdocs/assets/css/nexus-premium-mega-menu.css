@@ -16,7 +16,8 @@
     left: 0;
     width: 100%;
     height: 50px;
-    z-index: var(--z-header);
+    /* 2026-01-27: Must be ABOVE navbar (z-navbar:120) for dropdowns - backdrop-filter creates stacking context */
+    z-index: var(--z-mega-menu);
     display: flex;
     justify-content: space-between;
     align-items: center;

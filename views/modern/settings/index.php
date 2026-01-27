@@ -1298,6 +1298,35 @@ require dirname(__DIR__, 2) . '/layouts/header.php';
                     </label>
                 </div>
 
+                <div class="settings-divider"></div>
+
+                <h4 class="settings-subheading">
+                    <i class="fa-solid fa-trophy settings-subheading-icon"></i>
+                    Gamification Notifications
+                </h4>
+
+                <div class="settings-toggle-row">
+                    <div class="settings-toggle-info">
+                        <h4>Weekly Progress Digest</h4>
+                        <p>Receive a weekly summary of your XP, badges, and achievements.</p>
+                    </div>
+                    <label class="settings-toggle">
+                        <input type="checkbox" name="email_gamification_digest" value="1" <?= ($notifPrefs['email_gamification_digest'] ?? 1) ? 'checked' : '' ?>>
+                        <span class="settings-toggle-slider"></span>
+                    </label>
+                </div>
+
+                <div class="settings-toggle-row">
+                    <div class="settings-toggle-info">
+                        <h4>Achievement Milestones</h4>
+                        <p>Get notified when you earn badges, level up, or hit streaks.</p>
+                    </div>
+                    <label class="settings-toggle">
+                        <input type="checkbox" name="email_gamification_milestones" value="1" <?= ($notifPrefs['email_gamification_milestones'] ?? 1) ? 'checked' : '' ?>>
+                        <span class="settings-toggle-slider"></span>
+                    </label>
+                </div>
+
                 <div class="settings-submit-section">
                     <button type="submit" class="settings-btn settings-btn-primary">
                         <i class="fa-solid fa-check"></i>

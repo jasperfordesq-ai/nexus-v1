@@ -341,13 +341,21 @@ $pageSpecificCSS = [
 // OUTPUT CSS LINKS
 // Note: Some page CSS (settings, scattered-singles) loads early in header.php
 // to prevent FOUC. This loader still runs but browsers dedupe duplicate links.
+//
+// PHASE 8 (2026-01-27): Skip files already loaded in <head> via $GLOBALS['css_already_in_head']
+// This prevents duplicate stylesheet tags for blog-index.css, blog-show.css, auth.css
 // =============================================================================
+
+// Get list of CSS files already loaded in <head> (set by header.php Phase 8)
+$cssAlreadyInHead = $GLOBALS['css_already_in_head'] ?? [];
 ?>
     <!-- Page-Specific CSS (Conditional Loading) -->
 <?php foreach ($pageSpecificCSS as $pageCssKey => $config): ?>
 <?php if ($config['condition']): ?>
 <?php foreach ($config['files'] as $cssFile): ?>
+<?php if (!in_array($cssFile, $cssAlreadyInHead)): ?>
     <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/<?= $cssFile ?>?v=<?= $cssVersionTimestamp ?>">
+<?php endif; ?>
 <?php endforeach; ?>
 <?php endif; ?>
 <?php endforeach; ?>

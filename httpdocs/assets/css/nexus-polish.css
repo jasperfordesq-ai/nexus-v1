@@ -399,13 +399,7 @@ img {
     transition: opacity var(--transition-base) var(--ease-out);
 }
 
-img[loading="lazy"]:not(.loaded) {
-    opacity: 0;
-}
-
-img[loading="lazy"].loaded {
-    opacity: 1;
-}
+/* img[loading="lazy"] rules consolidated in bundles/core.css */
 
 /* ============================================
    17. SMOOTH SCROLL

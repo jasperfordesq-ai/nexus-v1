@@ -47,16 +47,7 @@ img:not([width]):not([height]) {
     background: rgba(255, 255, 255, 0.05);
 }
 
-img[loading="lazy"] {
-    /* Smooth fade in when lazy images load */
-    opacity: 0;
-    transition: opacity var(--transition-base) var(--ease-in);
-}
-
-img[loading="lazy"].loaded,
-img[loading="lazy"][src] {
-    opacity: 1;
-}
+/* img[loading="lazy"] rules consolidated in bundles/core.css */
 
 /* ============================================
    4. SKELETON SCREENS - SMOOTH FADE OUT

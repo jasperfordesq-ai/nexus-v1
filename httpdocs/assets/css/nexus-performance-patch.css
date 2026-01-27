@@ -158,10 +158,7 @@ img {
     image-rendering: -webkit-optimize-contrast;
 }
 
-img[loading="lazy"] {
-    /* Simpler fade-in */
-    transition: opacity var(--transition-fast) ease-in;
-}
+/* img[loading="lazy"] transition consolidated in bundles/core.css */
 
 /* ============================================
    10. REDUCE MOTION ENHANCEMENTS

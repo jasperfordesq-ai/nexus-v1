@@ -32,22 +32,9 @@ $basePath = \Nexus\Core\TenantContext::getBasePath();
             <div class="news-hero-divider"></div>
         </section>
 
-        <!-- Skeleton Loader -->
-        <div class="news-skeleton-grid skeleton-container" id="newsSkeleton" aria-label="Loading news">
-            <?php for ($i = 0; $i < 6; $i++): ?>
-            <div class="news-card-skeleton">
-                <div class="skeleton skeleton-image"></div>
-                <div class="skeleton-body">
-                    <div class="skeleton skeleton-date"></div>
-                    <div class="skeleton skeleton-title"></div>
-                    <div class="skeleton skeleton-title"></div>
-                    <div class="skeleton skeleton-excerpt"></div>
-                    <div class="skeleton skeleton-excerpt"></div>
-                    <div class="skeleton skeleton-btn"></div>
-                </div>
-            </div>
-            <?php endfor; ?>
-        </div>
+        <!-- Phase 11 (2026-01-27): Initial skeleton removed for content-first load.
+             Server-rendered content displays immediately without swap.
+             Infinite scroll has its own loading indicator below. -->
 
         <?php if (empty($posts)): ?>
             <!-- Empty State -->
@@ -78,21 +65,8 @@ $basePath = \Nexus\Core\TenantContext::getBasePath();
     // GOLD STANDARD - Native App Features
     // ============================================
 
-    // Skeleton Loader Transition
-    (function initSkeletonLoader() {
-        const skeleton = document.getElementById('newsSkeleton');
-        const grid = document.getElementById('news-grid-container');
-        const emptyState = document.querySelector('.news-empty-state');
-
-        if (!skeleton) return;
-
-        // Hide skeleton and show content after short delay
-        setTimeout(function() {
-            skeleton.classList.add('hidden');
-            if (grid) grid.classList.add('content-loaded');
-            if (emptyState) emptyState.classList.add('content-loaded');
-        }, 300);
-    })();
+    // Phase 11 (2026-01-27): initSkeletonLoader() removed for content-first load.
+    // Server-rendered content is visible immediately without skeleton swap.
 
     // Offline Indicator
     (function initOfflineIndicator() {

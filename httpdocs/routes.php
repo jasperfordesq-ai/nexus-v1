@@ -633,6 +633,7 @@ $router->add('POST', '/settings/profile', 'Nexus\Controllers\SettingsController@
 $router->add('POST', '/settings/password', 'Nexus\Controllers\SettingsController@updatePassword'); // Route for password update
 $router->add('POST', '/settings/privacy', 'Nexus\Controllers\SettingsController@updatePrivacy'); // Route for privacy update
 $router->add('POST', '/settings/notifications', 'Nexus\Controllers\SettingsController@updateNotifications'); // Route for notification settings
+$router->add('GET', '/settings/notifications/edit', 'Nexus\Controllers\SettingsController@notificationsEdit'); // CivicOne notification edit form
 $router->add('POST', '/settings/consent', 'Nexus\Controllers\SettingsController@updateConsent'); // GDPR consent toggle
 $router->add('POST', '/settings/gdpr-request', 'Nexus\Controllers\SettingsController@submitGdprRequest'); // GDPR data request
 $router->add('POST', '/settings/federation/update', 'Nexus\Controllers\SettingsController@updateFederation'); // Federation settings

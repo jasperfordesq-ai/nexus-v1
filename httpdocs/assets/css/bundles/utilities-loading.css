@@ -57,16 +57,7 @@ img:not([width]):not([height]) {
     background: rgba(255, 255, 255, 0.05);
 }
 
-img[loading="lazy"] {
-    /* Smooth fade in when lazy images load */
-    opacity: 0;
-    transition: opacity var(--transition-base) var(--ease-in);
-}
-
-img[loading="lazy"].loaded,
-img[loading="lazy"][src] {
-    opacity: 1;
-}
+/* img[loading="lazy"] rules consolidated in bundles/core.css */
 
 /* ============================================
    4. SKELETON SCREENS - SMOOTH FADE OUT
@@ -636,16 +627,12 @@ button:not(:hover) {
 /* ==============================================
    NATIVE LAZY LOADING ENHANCEMENT
    For browsers with loading="lazy" support
-   ============================================== */
-img[loading="lazy"] {
-    opacity: 0;
-    transition: opacity var(--transition-base);
-}
 
-img[loading="lazy"].loaded,
-img[loading="lazy"]:not(.lazy-image) {
-    opacity: 1;
-}
+   NOTE: The img[loading="lazy"] opacity rules are now
+   consolidated in bundles/core.css (lines 4831-4840).
+   Removed duplicate rules here to prevent cascade conflicts.
+   See: docs/modern-css-lazy-image-consolidation.md
+   ============================================== */
 
 /* ==============================================
    INTERSECTION OBSERVER FALLBACK INDICATOR

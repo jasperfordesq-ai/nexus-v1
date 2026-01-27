@@ -409,13 +409,7 @@ img {
     transition: opacity var(--transition-base) var(--ease-out);
 }
 
-img[loading="lazy"]:not(.loaded) {
-    opacity: 0;
-}
-
-img[loading="lazy"].loaded {
-    opacity: 1;
-}
+/* img[loading="lazy"] rules consolidated in bundles/core.css */
 
 /* ============================================
    17. SMOOTH SCROLL
@@ -1482,14 +1476,7 @@ img {
     transition: opacity 0.3s, filter var(--transition-base);
 }
 
-img[loading="lazy"] {
-    opacity: 0;
-}
-
-img[loading="lazy"].loaded,
-img:not([loading="lazy"]) {
-    opacity: 1;
-}
+/* img[loading="lazy"] rules consolidated in bundles/core.css */
 
 img.blur-up {
     filter: blur(20px); /* Specific blur, no token */

@@ -181,14 +181,19 @@ $basePath = Nexus\Core\TenantContext::getBasePath();
             </div>
         </dl>
 
-        <!-- Notifications Section (if feature enabled) -->
-        <?php if (Nexus\Core\TenantContext::hasFeature('notifications')): ?>
+        <!-- Notifications Section -->
+        <?php
+        $notifPrefs = \Nexus\Models\User::getNotificationPreferences($user['id']);
+        $emailNotificationsOn = ($notifPrefs['email_messages'] ?? 1) || ($notifPrefs['email_connections'] ?? 1) || ($notifPrefs['email_transactions'] ?? 1);
+        $pushOn = $notifPrefs['push_enabled'] ?? 0;
+        $gamificationOn = ($notifPrefs['email_gamification_digest'] ?? 1) || ($notifPrefs['email_gamification_milestones'] ?? 1);
+        ?>
         <h2 class="govuk-heading-l govuk-!-margin-top-9">Notifications</h2>
         <dl class="govuk-summary-list">
             <div class="govuk-summary-list__row">
                 <dt class="govuk-summary-list__key">Email notifications</dt>
                 <dd class="govuk-summary-list__value">
-                    <?php if (!empty($user['email_notifications'])): ?>
+                    <?php if ($emailNotificationsOn): ?>
                         <strong class="govuk-tag govuk-tag--green">On</strong>
                     <?php else: ?>
                         <strong class="govuk-tag govuk-tag--grey">Off</strong>
@@ -202,9 +207,25 @@ $basePath = Nexus\Core\TenantContext::getBasePath();
             </div>
 
             <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">Achievement emails</dt>
+                <dd class="govuk-summary-list__value">
+                    <?php if ($gamificationOn): ?>
+                        <strong class="govuk-tag govuk-tag--green">On</strong>
+                    <?php else: ?>
+                        <strong class="govuk-tag govuk-tag--grey">Off</strong>
+                    <?php endif; ?>
+                </dd>
+                <dd class="govuk-summary-list__actions">
+                    <a class="govuk-link" href="<?= $basePath ?>/settings/notifications/edit">
+                        Change<span class="govuk-visually-hidden"> achievement notification settings</span>
+                    </a>
+                </dd>
+            </div>
+
+            <div class="govuk-summary-list__row">
                 <dt class="govuk-summary-list__key">Push notifications</dt>
                 <dd class="govuk-summary-list__value">
-                    <?php if (!empty($user['push_notifications'])): ?>
+                    <?php if ($pushOn): ?>
                         <strong class="govuk-tag govuk-tag--green">On</strong>
                     <?php else: ?>
                         <strong class="govuk-tag govuk-tag--grey">Off</strong>
@@ -217,7 +238,6 @@ $basePath = Nexus\Core\TenantContext::getBasePath();
                 </dd>
             </div>
         </dl>
-        <?php endif; ?>
 
         <!-- Account Management Section -->
         <h2 class="govuk-heading-l govuk-!-margin-top-9">Account management</h2>
