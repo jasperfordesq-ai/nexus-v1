@@ -73,8 +73,8 @@
         successBanners.forEach(function(banner) {
             var delay = parseInt(banner.getAttribute('data-auto-dismiss'), 10) || 5000;
             setTimeout(function() {
-                banner.style.transition = 'opacity 0.5s ease';
-                banner.style.opacity = '0';
+                // Use CSS classes instead of inline styles
+                banner.classList.add('js-transition-opacity-slow', 'js-banner-fade-out');
                 setTimeout(function() {
                     banner.remove();
                 }, 500);

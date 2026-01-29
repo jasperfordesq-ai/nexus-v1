@@ -129,35 +129,46 @@ class BadgeCollectionService
      */
     private static function awardCollectionCompletion($userId, $collection)
     {
-        // Record completion
-        Database::query(
-            "INSERT INTO user_collection_completions (user_id, collection_id, bonus_claimed) VALUES (?, ?, 1)",
-            [$userId, $collection['id']]
-        );
+        $db = Database::getInstance();
+        $db->beginTransaction();
 
-        // Award bonus XP
-        if ($collection['bonus_xp'] > 0) {
-            GamificationService::awardXP(
-                $userId,
-                $collection['bonus_xp'],
-                'collection_complete',
-                "Collection: {$collection['name']}"
+        try {
+            // Record completion
+            Database::query(
+                "INSERT INTO user_collection_completions (user_id, collection_id, bonus_claimed) VALUES (?, ?, 1)",
+                [$userId, $collection['id']]
             );
-        }
 
-        // Award bonus badge if specified
-        if (!empty($collection['bonus_badge_key'])) {
-            GamificationService::awardBadgeByKey($userId, $collection['bonus_badge_key']);
-        }
+            // Award bonus XP
+            if ($collection['bonus_xp'] > 0) {
+                GamificationService::awardXP(
+                    $userId,
+                    $collection['bonus_xp'],
+                    'collection_complete',
+                    "Collection: {$collection['name']}"
+                );
+            }
 
-        // Send notification
-        $basePath = TenantContext::getBasePath();
-        Notification::create(
-            $userId,
-            "Collection Complete! You finished '{$collection['name']}' and earned {$collection['bonus_xp']} bonus XP! {$collection['icon']}",
-            "{$basePath}/achievements/badges",
-            'achievement'
-        );
+            // Award bonus badge if specified
+            if (!empty($collection['bonus_badge_key'])) {
+                GamificationService::awardBadgeByKey($userId, $collection['bonus_badge_key']);
+            }
+
+            $db->commit();
+
+            // Send notification AFTER transaction completes (async operation)
+            $basePath = TenantContext::getBasePath();
+            Notification::create(
+                $userId,
+                "Collection Complete! You finished '{$collection['name']}' and earned {$collection['bonus_xp']} bonus XP! {$collection['icon']}",
+                "{$basePath}/achievements/badges",
+                'achievement'
+            );
+        } catch (\Exception $e) {
+            $db->rollBack();
+            error_log("Failed to award collection completion: " . $e->getMessage());
+            throw $e;
+        }
     }
 
     /**
@@ -274,30 +285,41 @@ class BadgeCollectionService
             ],
         ];
 
-        foreach ($collections as $col) {
-            // Check if exists
-            $existing = Database::query(
-                "SELECT id FROM badge_collections WHERE tenant_id = ? AND collection_key = ?",
-                [$tenantId, $col['key']]
-            )->fetch();
+        $db = Database::getInstance();
+        $db->beginTransaction();
 
-            if (!$existing) {
-                Database::query(
-                    "INSERT INTO badge_collections (tenant_id, collection_key, name, description, icon, bonus_xp)
-                     VALUES (?, ?, ?, ?, ?, ?)",
-                    [$tenantId, $col['key'], $col['name'], $col['description'], $col['icon'], $col['bonus_xp']]
-                );
-                $collectionId = Database::getInstance()->lastInsertId();
+        try {
+            foreach ($collections as $col) {
+                // Check if exists
+                $existing = Database::query(
+                    "SELECT id FROM badge_collections WHERE tenant_id = ? AND collection_key = ?",
+                    [$tenantId, $col['key']]
+                )->fetch();
 
-                // Add badges
-                $order = 0;
-                foreach ($col['badges'] as $badgeKey) {
+                if (!$existing) {
                     Database::query(
-                        "INSERT INTO badge_collection_items (collection_id, badge_key, display_order) VALUES (?, ?, ?)",
-                        [$collectionId, $badgeKey, $order++]
+                        "INSERT INTO badge_collections (tenant_id, collection_key, name, description, icon, bonus_xp)
+                         VALUES (?, ?, ?, ?, ?, ?)",
+                        [$tenantId, $col['key'], $col['name'], $col['description'], $col['icon'], $col['bonus_xp']]
                     );
+                    $collectionId = $db->lastInsertId();
+
+                    // Add badges
+                    $order = 0;
+                    foreach ($col['badges'] as $badgeKey) {
+                        Database::query(
+                            "INSERT INTO badge_collection_items (collection_id, badge_key, display_order) VALUES (?, ?, ?)",
+                            [$collectionId, $badgeKey, $order++]
+                        );
+                    }
                 }
             }
+
+            $db->commit();
+        } catch (\Exception $e) {
+            $db->rollBack();
+            error_log("Failed to initialize default collections: " . $e->getMessage());
+            throw $e;
         }
     }
 }

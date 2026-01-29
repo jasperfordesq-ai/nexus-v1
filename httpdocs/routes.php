@@ -255,22 +255,30 @@ $router->add('POST', '/api/webauthn/login/verify', 'Nexus\Controllers\Api\WebAut
 // AI ASSISTANT API
 // Chat, content generation, recommendations
 // ============================================
-$router->add('POST', '/api/ai/chat', 'Nexus\Controllers\Api\AiApiController@chat');
-$router->add('POST', '/api/ai/chat/stream', 'Nexus\Controllers\Api\AiApiController@streamChat');
-$router->add('GET', '/api/ai/conversations', 'Nexus\Controllers\Api\AiApiController@listConversations');
-$router->add('GET', '/api/ai/conversations/([0-9]+)', 'Nexus\Controllers\Api\AiApiController@getConversation');
-$router->add('POST', '/api/ai/conversations', 'Nexus\Controllers\Api\AiApiController@createConversation');
-$router->add('DELETE', '/api/ai/conversations/([0-9]+)', 'Nexus\Controllers\Api\AiApiController@deleteConversation');
-$router->add('GET', '/api/ai/providers', 'Nexus\Controllers\Api\AiApiController@getProviders');
-$router->add('GET', '/api/ai/limits', 'Nexus\Controllers\Api\AiApiController@getLimits');
-$router->add('POST', '/api/ai/test-provider', 'Nexus\Controllers\Api\AiApiController@testProvider');
-$router->add('POST', '/api/ai/generate/listing', 'Nexus\Controllers\Api\AiApiController@generateListing');
-$router->add('POST', '/api/ai/generate/event', 'Nexus\Controllers\Api\AiApiController@generateEvent');
-$router->add('POST', '/api/ai/generate/message', 'Nexus\Controllers\Api\AiApiController@generateMessage');
-$router->add('POST', '/api/ai/generate/bio', 'Nexus\Controllers\Api\AiApiController@generateBio');
-$router->add('POST', '/api/ai/generate/newsletter', 'Nexus\Controllers\Api\AiApiController@generateNewsletter');
-$router->add('POST', '/api/ai/generate/blog', 'Nexus\Controllers\Api\AiApiController@generateBlog');
-$router->add('POST', '/api/ai/generate/page', 'Nexus\Controllers\Api\AiApiController@generatePage');
+
+// AI Chat & Conversations
+$router->add('POST', '/api/ai/chat', 'Nexus\Controllers\Api\Ai\AiChatController@chat');
+$router->add('POST', '/api/ai/chat/stream', 'Nexus\Controllers\Api\Ai\AiChatController@streamChat');
+$router->add('GET', '/api/ai/conversations', 'Nexus\Controllers\Api\Ai\AiChatController@listConversations');
+$router->add('GET', '/api/ai/conversations/([0-9]+)', 'Nexus\Controllers\Api\Ai\AiChatController@getConversation');
+$router->add('POST', '/api/ai/conversations', 'Nexus\Controllers\Api\Ai\AiChatController@createConversation');
+$router->add('DELETE', '/api/ai/conversations/([0-9]+)', 'Nexus\Controllers\Api\Ai\AiChatController@deleteConversation');
+
+// AI Provider & Limits
+$router->add('GET', '/api/ai/providers', 'Nexus\Controllers\Api\Ai\AiProviderController@getProviders');
+$router->add('GET', '/api/ai/limits', 'Nexus\Controllers\Api\Ai\AiProviderController@getLimits');
+$router->add('POST', '/api/ai/test-provider', 'Nexus\Controllers\Api\Ai\AiProviderController@testProvider');
+
+// AI User Content Generation
+$router->add('POST', '/api/ai/generate/listing', 'Nexus\Controllers\Api\Ai\AiContentController@generateListing');
+$router->add('POST', '/api/ai/generate/event', 'Nexus\Controllers\Api\Ai\AiContentController@generateEvent');
+$router->add('POST', '/api/ai/generate/message', 'Nexus\Controllers\Api\Ai\AiContentController@generateMessage');
+$router->add('POST', '/api/ai/generate/bio', 'Nexus\Controllers\Api\Ai\AiContentController@generateBio');
+
+// AI Admin Content Generation
+$router->add('POST', '/api/ai/generate/newsletter', 'Nexus\Controllers\Api\Ai\AiAdminContentController@generateNewsletter');
+$router->add('POST', '/api/ai/generate/blog', 'Nexus\Controllers\Api\Ai\AiAdminContentController@generateBlog');
+$router->add('POST', '/api/ai/generate/page', 'Nexus\Controllers\Api\Ai\AiAdminContentController@generatePage');
 
 // AI Web Pages
 $router->add('GET', '/ai', 'Nexus\Controllers\AiController@index');
@@ -1463,71 +1471,79 @@ $router->add('GET', '/newsletter/track/click/{newsletterId}/{linkId}/{trackingTo
 // --------------------------------------------------------------------------
 // 12.95. ADMIN > ENTERPRISE FEATURES (GDPR, Monitoring, Config)
 // --------------------------------------------------------------------------
-$router->add('GET', '/admin/enterprise', 'Nexus\Controllers\Admin\EnterpriseController@dashboard');
+$router->add('GET', '/admin/enterprise', 'Nexus\Controllers\Admin\Enterprise\EnterpriseDashboardController@dashboard');
 
 // API Test Runner
 $router->add('GET', '/admin/tests', 'Nexus\Controllers\Admin\TestRunnerController@index');
 $router->add('POST', '/admin/tests/run', 'Nexus\Controllers\Admin\TestRunnerController@runTests');
 $router->add('GET', '/admin/tests/view', 'Nexus\Controllers\Admin\TestRunnerController@viewRun');
 
-// GDPR Compliance
-$router->add('GET', '/admin/enterprise/gdpr', 'Nexus\Controllers\Admin\EnterpriseController@gdprDashboard');
-$router->add('GET', '/admin/enterprise/gdpr/requests', 'Nexus\Controllers\Admin\EnterpriseController@gdprRequests');
-$router->add('GET', '/admin/enterprise/gdpr/requests/new', 'Nexus\Controllers\Admin\EnterpriseController@gdprRequestCreate');
-$router->add('GET', '/admin/enterprise/gdpr/requests/create', 'Nexus\Controllers\Admin\EnterpriseController@gdprRequestCreate');
-$router->add('POST', '/admin/enterprise/gdpr/requests', 'Nexus\Controllers\Admin\EnterpriseController@gdprRequestStore');
-$router->add('GET', '/admin/enterprise/gdpr/requests/{id}', 'Nexus\Controllers\Admin\EnterpriseController@gdprRequestView');
-$router->add('POST', '/admin/enterprise/gdpr/requests/{id}/process', 'Nexus\Controllers\Admin\EnterpriseController@gdprRequestProcess');
-$router->add('POST', '/admin/enterprise/gdpr/requests/{id}/complete', 'Nexus\Controllers\Admin\EnterpriseController@gdprRequestComplete');
-$router->add('POST', '/admin/enterprise/gdpr/requests/{id}/reject', 'Nexus\Controllers\Admin\EnterpriseController@gdprRequestReject');
-$router->add('POST', '/admin/enterprise/gdpr/requests/{id}/assign', 'Nexus\Controllers\Admin\EnterpriseController@gdprRequestAssign');
-$router->add('POST', '/admin/enterprise/gdpr/requests/{id}/notes', 'Nexus\Controllers\Admin\EnterpriseController@gdprRequestAddNote');
-$router->add('POST', '/admin/enterprise/gdpr/requests/{id}/generate-export', 'Nexus\Controllers\Admin\EnterpriseController@gdprGenerateExport');
-$router->add('POST', '/admin/enterprise/gdpr/requests/bulk-process', 'Nexus\Controllers\Admin\EnterpriseController@gdprBulkProcess');
-$router->add('GET', '/admin/enterprise/gdpr/consents', 'Nexus\Controllers\Admin\EnterpriseController@gdprConsents');
-$router->add('POST', '/admin/enterprise/gdpr/consents/types', 'Nexus\Controllers\Admin\EnterpriseController@gdprConsentTypeStore');
-$router->add('POST', '/admin/enterprise/gdpr/consents/backfill', 'Nexus\Controllers\Admin\EnterpriseController@gdprBackfillConsents');
-$router->add('GET', '/admin/enterprise/gdpr/consents/tenant-versions', 'Nexus\Controllers\Admin\EnterpriseController@gdprGetTenantConsentVersions');
-$router->add('POST', '/admin/enterprise/gdpr/consents/tenant-version', 'Nexus\Controllers\Admin\EnterpriseController@gdprUpdateTenantConsentVersion');
-$router->add('DELETE', '/admin/enterprise/gdpr/consents/tenant-version/{slug}', 'Nexus\Controllers\Admin\EnterpriseController@gdprRemoveTenantConsentVersion');
-$router->add('GET', '/admin/enterprise/gdpr/consents/{id}', 'Nexus\Controllers\Admin\EnterpriseController@gdprConsentDetail');
-$router->add('GET', '/admin/enterprise/gdpr/consents/export', 'Nexus\Controllers\Admin\EnterpriseController@gdprConsentsExport');
-$router->add('GET', '/admin/enterprise/gdpr/breaches', 'Nexus\Controllers\Admin\EnterpriseController@gdprBreaches');
-$router->add('GET', '/admin/enterprise/gdpr/breaches/report', 'Nexus\Controllers\Admin\EnterpriseController@gdprBreachReportForm');
-$router->add('POST', '/admin/enterprise/gdpr/breaches', 'Nexus\Controllers\Admin\EnterpriseController@gdprBreachReport');
-$router->add('GET', '/admin/enterprise/gdpr/breaches/{id}', 'Nexus\Controllers\Admin\EnterpriseController@gdprBreachView');
-$router->add('POST', '/admin/enterprise/gdpr/breaches/{id}/escalate', 'Nexus\Controllers\Admin\EnterpriseController@gdprBreachEscalate');
-$router->add('GET', '/admin/enterprise/gdpr/audit', 'Nexus\Controllers\Admin\EnterpriseController@gdprAuditLog');
-$router->add('GET', '/admin/enterprise/gdpr/audit/export', 'Nexus\Controllers\Admin\EnterpriseController@gdprAuditExport');
-$router->add('POST', '/admin/enterprise/gdpr/export-report', 'Nexus\Controllers\Admin\EnterpriseController@gdprExportReport');
+// GDPR Requests
+$router->add('GET', '/admin/enterprise/gdpr', 'Nexus\Controllers\Admin\Enterprise\GdprRequestController@dashboard');
+$router->add('GET', '/admin/enterprise/gdpr/requests', 'Nexus\Controllers\Admin\Enterprise\GdprRequestController@index');
+$router->add('GET', '/admin/enterprise/gdpr/requests/new', 'Nexus\Controllers\Admin\Enterprise\GdprRequestController@create');
+$router->add('GET', '/admin/enterprise/gdpr/requests/create', 'Nexus\Controllers\Admin\Enterprise\GdprRequestController@create');
+$router->add('POST', '/admin/enterprise/gdpr/requests', 'Nexus\Controllers\Admin\Enterprise\GdprRequestController@store');
+$router->add('GET', '/admin/enterprise/gdpr/requests/{id}', 'Nexus\Controllers\Admin\Enterprise\GdprRequestController@show');
+$router->add('POST', '/admin/enterprise/gdpr/requests/{id}/process', 'Nexus\Controllers\Admin\Enterprise\GdprRequestController@process');
+$router->add('POST', '/admin/enterprise/gdpr/requests/{id}/complete', 'Nexus\Controllers\Admin\Enterprise\GdprRequestController@complete');
+$router->add('POST', '/admin/enterprise/gdpr/requests/{id}/reject', 'Nexus\Controllers\Admin\Enterprise\GdprRequestController@reject');
+$router->add('POST', '/admin/enterprise/gdpr/requests/{id}/assign', 'Nexus\Controllers\Admin\Enterprise\GdprRequestController@assign');
+$router->add('POST', '/admin/enterprise/gdpr/requests/{id}/notes', 'Nexus\Controllers\Admin\Enterprise\GdprRequestController@addNote');
+$router->add('POST', '/admin/enterprise/gdpr/requests/{id}/generate-export', 'Nexus\Controllers\Admin\Enterprise\GdprRequestController@generateExport');
+$router->add('POST', '/admin/enterprise/gdpr/requests/bulk-process', 'Nexus\Controllers\Admin\Enterprise\GdprRequestController@bulkProcess');
+
+// GDPR Consents
+$router->add('GET', '/admin/enterprise/gdpr/consents', 'Nexus\Controllers\Admin\Enterprise\GdprConsentController@index');
+$router->add('POST', '/admin/enterprise/gdpr/consents/types', 'Nexus\Controllers\Admin\Enterprise\GdprConsentController@storeType');
+$router->add('POST', '/admin/enterprise/gdpr/consents/backfill', 'Nexus\Controllers\Admin\Enterprise\GdprConsentController@backfill');
+$router->add('GET', '/admin/enterprise/gdpr/consents/tenant-versions', 'Nexus\Controllers\Admin\Enterprise\GdprConsentController@getTenantVersions');
+$router->add('POST', '/admin/enterprise/gdpr/consents/tenant-version', 'Nexus\Controllers\Admin\Enterprise\GdprConsentController@updateTenantVersion');
+$router->add('DELETE', '/admin/enterprise/gdpr/consents/tenant-version/{slug}', 'Nexus\Controllers\Admin\Enterprise\GdprConsentController@removeTenantVersion');
+$router->add('GET', '/admin/enterprise/gdpr/consents/{id}', 'Nexus\Controllers\Admin\Enterprise\GdprConsentController@show');
+$router->add('GET', '/admin/enterprise/gdpr/consents/export', 'Nexus\Controllers\Admin\Enterprise\GdprConsentController@export');
+
+// GDPR Breaches
+$router->add('GET', '/admin/enterprise/gdpr/breaches', 'Nexus\Controllers\Admin\Enterprise\GdprBreachController@index');
+$router->add('GET', '/admin/enterprise/gdpr/breaches/report', 'Nexus\Controllers\Admin\Enterprise\GdprBreachController@create');
+$router->add('POST', '/admin/enterprise/gdpr/breaches', 'Nexus\Controllers\Admin\Enterprise\GdprBreachController@store');
+$router->add('GET', '/admin/enterprise/gdpr/breaches/{id}', 'Nexus\Controllers\Admin\Enterprise\GdprBreachController@show');
+$router->add('POST', '/admin/enterprise/gdpr/breaches/{id}/escalate', 'Nexus\Controllers\Admin\Enterprise\GdprBreachController@escalate');
+
+// GDPR Audit
+$router->add('GET', '/admin/enterprise/gdpr/audit', 'Nexus\Controllers\Admin\Enterprise\GdprAuditController@index');
+$router->add('GET', '/admin/enterprise/gdpr/audit/export', 'Nexus\Controllers\Admin\Enterprise\GdprAuditController@export');
+$router->add('POST', '/admin/enterprise/gdpr/export-report', 'Nexus\Controllers\Admin\Enterprise\GdprAuditController@complianceReport');
 
 // Monitoring & APM
-$router->add('GET', '/admin/enterprise/monitoring', 'Nexus\Controllers\Admin\EnterpriseController@monitoring');
-$router->add('GET', '/admin/enterprise/monitoring/health', 'Nexus\Controllers\Admin\EnterpriseController@healthCheck');
-$router->add('GET', '/admin/enterprise/monitoring/requirements', 'Nexus\Controllers\Admin\EnterpriseController@requirements');
-$router->add('GET', '/admin/enterprise/monitoring/logs', 'Nexus\Controllers\Admin\EnterpriseController@logs');
-$router->add('GET', '/admin/enterprise/monitoring/logs/download', 'Nexus\Controllers\Admin\EnterpriseController@logsDownload');
-$router->add('POST', '/admin/enterprise/monitoring/logs/clear', 'Nexus\Controllers\Admin\EnterpriseController@logsClear');
-$router->add('GET', '/admin/enterprise/monitoring/logs/{filename}', 'Nexus\Controllers\Admin\EnterpriseController@logView');
+$router->add('GET', '/admin/enterprise/monitoring', 'Nexus\Controllers\Admin\Enterprise\MonitoringController@dashboard');
+$router->add('GET', '/admin/enterprise/monitoring/health', 'Nexus\Controllers\Admin\Enterprise\MonitoringController@healthCheck');
+$router->add('GET', '/admin/enterprise/monitoring/requirements', 'Nexus\Controllers\Admin\Enterprise\MonitoringController@requirements');
+$router->add('GET', '/admin/enterprise/monitoring/logs', 'Nexus\Controllers\Admin\Enterprise\MonitoringController@logs');
+$router->add('GET', '/admin/enterprise/monitoring/logs/download', 'Nexus\Controllers\Admin\Enterprise\MonitoringController@logsDownload');
+$router->add('POST', '/admin/enterprise/monitoring/logs/clear', 'Nexus\Controllers\Admin\Enterprise\MonitoringController@logsClear');
+$router->add('GET', '/admin/enterprise/monitoring/logs/{filename}', 'Nexus\Controllers\Admin\Enterprise\MonitoringController@logView');
 
-// Real-Time Updates API
-$router->add('GET', '/admin/api/realtime', 'Nexus\Controllers\Admin\EnterpriseController@realtimeStream');
-$router->add('GET', '/admin/api/realtime/poll', 'Nexus\Controllers\Admin\EnterpriseController@realtimePoll');
+// Real-Time Updates API (keep in monitoring for now)
+$router->add('GET', '/admin/api/realtime', 'Nexus\Controllers\Admin\Enterprise\MonitoringController@realtimeStream');
+$router->add('GET', '/admin/api/realtime/poll', 'Nexus\Controllers\Admin\Enterprise\MonitoringController@realtimePoll');
 
-// Configuration & Secrets
-$router->add('GET', '/admin/enterprise/config', 'Nexus\Controllers\Admin\EnterpriseController@config');
-$router->add('POST', '/admin/enterprise/config/settings/{group}/{key}', 'Nexus\Controllers\Admin\EnterpriseController@configSettingUpdate');
-$router->add('GET', '/admin/enterprise/config/export', 'Nexus\Controllers\Admin\EnterpriseController@configExport');
-$router->add('POST', '/admin/enterprise/config/cache/clear', 'Nexus\Controllers\Admin\EnterpriseController@configCacheClear');
-$router->add('GET', '/admin/enterprise/config/validate', 'Nexus\Controllers\Admin\EnterpriseController@configValidate');
-$router->add('PATCH', '/admin/enterprise/config/features/{key}', 'Nexus\Controllers\Admin\EnterpriseController@featureFlagToggle');
-$router->add('POST', '/admin/enterprise/config/features/reset', 'Nexus\Controllers\Admin\EnterpriseController@featureFlagsReset');
-$router->add('GET', '/admin/enterprise/config/secrets', 'Nexus\Controllers\Admin\EnterpriseController@secrets');
-$router->add('POST', '/admin/enterprise/config/secrets', 'Nexus\Controllers\Admin\EnterpriseController@secretStore');
-$router->add('POST', '/admin/enterprise/config/secrets/{key}/value', 'Nexus\Controllers\Admin\EnterpriseController@secretView');
-$router->add('POST', '/admin/enterprise/config/secrets/{key}/rotate', 'Nexus\Controllers\Admin\EnterpriseController@secretRotate');
-$router->add('DELETE', '/admin/enterprise/config/secrets/{key}', 'Nexus\Controllers\Admin\EnterpriseController@secretDelete');
-$router->add('GET', '/admin/enterprise/config/vault/test', 'Nexus\Controllers\Admin\EnterpriseController@vaultTest');
+// Configuration
+$router->add('GET', '/admin/enterprise/config', 'Nexus\Controllers\Admin\Enterprise\ConfigController@dashboard');
+$router->add('POST', '/admin/enterprise/config/settings/{group}/{key}', 'Nexus\Controllers\Admin\Enterprise\ConfigController@updateSetting');
+$router->add('GET', '/admin/enterprise/config/export', 'Nexus\Controllers\Admin\Enterprise\ConfigController@export');
+$router->add('POST', '/admin/enterprise/config/cache/clear', 'Nexus\Controllers\Admin\Enterprise\ConfigController@clearCache');
+$router->add('GET', '/admin/enterprise/config/validate', 'Nexus\Controllers\Admin\Enterprise\ConfigController@validate');
+$router->add('PATCH', '/admin/enterprise/config/features/{key}', 'Nexus\Controllers\Admin\Enterprise\ConfigController@toggleFeature');
+$router->add('POST', '/admin/enterprise/config/features/reset', 'Nexus\Controllers\Admin\Enterprise\ConfigController@resetFeatures');
+
+// Secrets & Vault
+$router->add('GET', '/admin/enterprise/config/secrets', 'Nexus\Controllers\Admin\Enterprise\SecretsController@index');
+$router->add('POST', '/admin/enterprise/config/secrets', 'Nexus\Controllers\Admin\Enterprise\SecretsController@store');
+$router->add('POST', '/admin/enterprise/config/secrets/{key}/value', 'Nexus\Controllers\Admin\Enterprise\SecretsController@view');
+$router->add('POST', '/admin/enterprise/config/secrets/{key}/rotate', 'Nexus\Controllers\Admin\Enterprise\SecretsController@rotate');
+$router->add('DELETE', '/admin/enterprise/config/secrets/{key}', 'Nexus\Controllers\Admin\Enterprise\SecretsController@delete');
+$router->add('GET', '/admin/enterprise/config/vault/test', 'Nexus\Controllers\Admin\Enterprise\SecretsController@testVault');
 
 // Roles & Permissions Management
 $router->add('GET', '/admin/enterprise/roles', 'Nexus\Controllers\Admin\RolesController@index');

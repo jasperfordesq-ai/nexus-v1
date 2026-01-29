@@ -67,8 +67,7 @@
             // Add active class
             backdrop.classList.add('active');
             sheet.classList.add('active');
-            document.body.classList.add('mobile-sheet-open');
-            document.body.style.overflow = 'hidden';
+            document.body.classList.add('mobile-sheet-open', 'js-overflow-hidden');
 
             setTimeout(() => {
                 document.getElementById('mobileCommentInput')?.focus();
@@ -81,8 +80,7 @@
             haptic.light();
             document.getElementById('commentBackdrop').classList.remove('active');
             document.getElementById('commentSheet').classList.remove('active');
-            document.body.classList.remove('mobile-sheet-open');
-            document.body.style.overflow = '';
+            document.body.classList.remove('mobile-sheet-open', 'js-overflow-hidden');
             currentCommentTarget = {
                 type: null,
                 id: null

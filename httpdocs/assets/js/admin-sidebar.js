@@ -214,7 +214,7 @@
             if (this.backdrop) {
                 this.backdrop.classList.add('visible');
             }
-            document.body.style.overflow = 'hidden';
+            document.body.classList.add('js-overflow-hidden');
 
             // Update hamburger icon
             if (this.mobileBtn) {
@@ -234,7 +234,7 @@
             if (this.backdrop) {
                 this.backdrop.classList.remove('visible');
             }
-            document.body.style.overflow = '';
+            document.body.classList.remove('js-overflow-hidden');
 
             // Update hamburger icon
             if (this.mobileBtn) {
@@ -435,7 +435,7 @@
                 if (this.backdrop) {
                     this.backdrop.classList.remove('visible');
                 }
-                document.body.style.overflow = '';
+                document.body.classList.remove('js-overflow-hidden');
             }
         },
 

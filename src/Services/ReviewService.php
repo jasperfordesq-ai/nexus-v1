@@ -142,11 +142,17 @@ class ReviewService
             // Mark transaction as reviewed
             if ($federationTransactionId) {
                 $isSender = ($transaction['sender_user_id'] == $reviewerId);
-                $column = $isSender ? 'sender_reviewed' : 'receiver_reviewed';
-                Database::query(
-                    "UPDATE federation_transactions SET {$column} = 1 WHERE id = ?",
-                    [$federationTransactionId]
-                );
+                if ($isSender) {
+                    Database::query(
+                        "UPDATE federation_transactions SET sender_reviewed = 1 WHERE id = ?",
+                        [$federationTransactionId]
+                    );
+                } else {
+                    Database::query(
+                        "UPDATE federation_transactions SET receiver_reviewed = 1 WHERE id = ?",
+                        [$federationTransactionId]
+                    );
+                }
             }
 
             // Log to audit

@@ -62,6 +62,8 @@ try {
     <!-- Design Tokens MUST load first - CSS variables used by all other stylesheets -->
     <!-- NOTE: Using non-minified - minified causes visual problems (2026-01-25) -->
     <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/design-tokens.css?v=<?= $cssVersionTimestamp ?>">
+    <!-- JS utility classes - loaded early for JavaScript state management -->
+    <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/js-utility-classes.css?v=<?= $cssVersionTimestamp ?>">
     <!-- Critical scroll/layout styles - loaded second to prevent FOUC -->
     <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/nexus-header-extracted.css?v=<?= $cssVersionTimestamp ?>">
     <meta name="csrf-token" content="<?= \Nexus\Core\Csrf::generate() ?>">

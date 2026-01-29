@@ -195,7 +195,8 @@
 
         setTimeout(() => {
             if (onlineToast) {
-                onlineToast.style.opacity = '0';
+                onlineToast.classList.add('js-fade-out');
+                // eslint-disable-next-line no-restricted-syntax -- dynamic transform for slide-out animation
                 onlineToast.style.transform = 'translateX(-50%) translateY(20px)';
                 setTimeout(() => {
                     if (onlineToast) {

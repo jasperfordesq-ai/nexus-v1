@@ -11,14 +11,14 @@ function openLogModal(orgId, oppId, orgName, oppTitle) {
     document.getElementById('log_opp_title').textContent = oppTitle;
     modal.classList.remove('govuk-!-display-none');
     modal.setAttribute('aria-hidden', 'false');
-    document.body.style.overflow = 'hidden';
+    document.body.classList.add('js-overflow-hidden');
 }
 
 function closeLogModal() {
     var modal = document.getElementById('logHoursModal');
     modal.classList.add('govuk-!-display-none');
     modal.setAttribute('aria-hidden', 'true');
-    document.body.style.overflow = '';
+    document.body.classList.remove('js-overflow-hidden');
 }
 
 // Close on Escape key

@@ -74,8 +74,7 @@ class MenuBuilderDragDrop {
 
     handleDragStart(e, item) {
         this.draggedItem = item;
-        item.classList.add('dragging');
-        item.style.opacity = '0.5';
+        item.classList.add('dragging', 'js-dragging');
 
         // Set drag data
         e.dataTransfer.effectAllowed = 'move';
@@ -147,8 +146,7 @@ class MenuBuilderDragDrop {
     }
 
     handleDragEnd(e, item) {
-        item.style.opacity = '1';
-        item.classList.remove('dragging');
+        item.classList.remove('dragging', 'js-dragging');
 
         // Remove drag-over class from all items
         this.items.forEach(i => i.classList.remove('drag-over'));
@@ -247,7 +245,7 @@ class MenuBuilderDragDrop {
 
     hideLoadingIndicator(indicator) {
         if (indicator && indicator.parentNode) {
-            indicator.style.opacity = '0';
+            indicator.classList.add('js-fade-out');
             setTimeout(() => indicator.remove(), 300);
         }
     }
@@ -273,8 +271,10 @@ class MenuBuilderDragDrop {
         document.body.appendChild(message);
 
         setTimeout(() => {
-            message.style.opacity = '0';
+            message.classList.add('js-fade-out', 'js-transition-opacity');
+            // eslint-disable-next-line no-restricted-syntax -- dynamic transform for slide-out animation
             message.style.transform = 'translateX(100%)';
+            // eslint-disable-next-line no-restricted-syntax -- dynamic transition for slide-out animation
             message.style.transition = 'all 0.3s ease';
             setTimeout(() => message.remove(), 300);
         }, 2000);
@@ -304,8 +304,7 @@ class MenuBuilderDragDrop {
         document.body.appendChild(message);
 
         setTimeout(() => {
-            message.style.opacity = '0';
-            message.style.transition = 'opacity 0.3s ease';
+            message.classList.add('js-fade-out', 'js-transition-opacity');
             setTimeout(() => message.remove(), 300);
         }, 3000);
     }

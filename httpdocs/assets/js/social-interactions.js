@@ -141,13 +141,13 @@
 
         toast.innerText = message;
         toast.className = "show";
-        toast.style.visibility = "visible";
-        toast.style.opacity = "1";
+        toast.classList.add('js-toast-visible');
+        toast.classList.remove('js-toast-hidden');
 
         setTimeout(function() {
             toast.className = toast.className.replace("show", "");
-            toast.style.visibility = "hidden";
-            toast.style.opacity = "0";
+            toast.classList.remove('js-toast-visible');
+            toast.classList.add('js-toast-hidden');
         }, SocialInteractions.config.toastDuration);
     };
 
@@ -1058,7 +1058,7 @@
 
         // Show modal
         modal.classList.add('active');
-        document.body.style.overflow = 'hidden';
+        document.body.classList.add('js-overflow-hidden');
 
         // Fetch likers
         fetchLikers(type, id, 1, modalContent, loadMoreBtn, modalTitle);
@@ -1441,7 +1441,7 @@
         const modal = document.getElementById('likers-modal');
         if (modal) {
             modal.classList.remove('active');
-            document.body.style.overflow = '';
+            document.body.classList.remove('js-overflow-hidden');
         }
     };
 

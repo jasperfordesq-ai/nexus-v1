@@ -12,15 +12,34 @@ use Nexus\Core\TenantContext;
 class UrlHelper
 {
     /**
-     * Allowed hosts for redirects. Add production and staging domains here.
+     * Default allowed hosts for redirects.
+     * Can be overridden via ALLOWED_HOSTS environment variable.
      */
-    private static array $allowedHosts = [
+    private static array $defaultHosts = [
         'project-nexus.ie',
         'www.project-nexus.ie',
         'hour-timebank.ie',
         'www.hour-timebank.ie',
         'staging.timebank.local',
     ];
+
+    private static ?array $allowedHosts = null;
+
+    /**
+     * Get allowed hosts from environment or defaults.
+     */
+    private static function getConfiguredHosts(): array
+    {
+        if (self::$allowedHosts === null) {
+            $envHosts = getenv('ALLOWED_HOSTS') ?: ($_ENV['ALLOWED_HOSTS'] ?? '');
+            if (!empty($envHosts)) {
+                self::$allowedHosts = array_map('trim', explode(',', $envHosts));
+            } else {
+                self::$allowedHosts = self::$defaultHosts;
+            }
+        }
+        return self::$allowedHosts;
+    }
 
     /**
      * Validate and sanitize a redirect URL to prevent open redirect attacks.
@@ -97,14 +116,15 @@ class UrlHelper
     public static function isAllowedHost(string $host): bool
     {
         $host = strtolower($host);
+        $allowedHosts = self::getConfiguredHosts();
 
         // Direct match
-        if (in_array($host, self::$allowedHosts, true)) {
+        if (in_array($host, $allowedHosts, true)) {
             return true;
         }
 
         // Check for subdomain matches (e.g., tenant.project-nexus.ie)
-        foreach (self::$allowedHosts as $allowed) {
+        foreach ($allowedHosts as $allowed) {
             if (str_ends_with($host, '.' . $allowed)) {
                 return true;
             }
@@ -121,7 +141,8 @@ class UrlHelper
     public static function addAllowedHost(string $host): void
     {
         $host = strtolower(trim($host));
-        if (!empty($host) && !in_array($host, self::$allowedHosts, true)) {
+        $hosts = self::getConfiguredHosts();
+        if (!empty($host) && !in_array($host, $hosts, true)) {
             self::$allowedHosts[] = $host;
         }
     }

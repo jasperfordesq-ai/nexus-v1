@@ -351,7 +351,7 @@
 
             this.isOpen = true;
             this.overlay.classList.add('active');
-            document.body.style.overflow = 'hidden';
+            document.body.classList.add('js-overflow-hidden');
 
             // Show recent searches
             this.showRecentSearches();
@@ -370,7 +370,7 @@
 
             this.isOpen = false;
             this.overlay.classList.remove('active');
-            document.body.style.overflow = '';
+            document.body.classList.remove('js-overflow-hidden');
             this.input.blur();
 
             // Cancel any pending requests

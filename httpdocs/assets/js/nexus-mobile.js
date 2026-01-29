@@ -214,10 +214,13 @@
 
                 // Update indicator position
                 const indicatorX = Math.min(deltaX * 0.3, 60);
+                // eslint-disable-next-line no-restricted-syntax -- dynamic transform/opacity for swipe gesture
                 indicator.style.transform = `translateY(-50%) translateX(${indicatorX}px) scale(${0.8 + progress * 0.2})`;
+                // eslint-disable-next-line no-restricted-syntax -- dynamic opacity for swipe gesture
                 indicator.style.opacity = Math.min(progress * 1.5, 1);
 
                 // Update overlay opacity
+                // eslint-disable-next-line no-restricted-syntax -- dynamic opacity for swipe gesture
                 overlay.style.opacity = visualProgress * 0.3;
 
                 // Ready state when past threshold
@@ -254,7 +257,9 @@
                 self.haptic('success');
 
                 // Animate indicator off screen
+                // eslint-disable-next-line no-restricted-syntax -- dynamic transform for navigation animation
                 indicator.style.transform = 'translateY(-50%) translateX(80px) scale(1)';
+                // eslint-disable-next-line no-restricted-syntax -- dynamic opacity for navigation animation
                 overlay.style.opacity = '0.5';
 
                 // Small delay for visual feedback, then navigate
@@ -274,9 +279,12 @@
 
             function resetVisuals() {
                 indicator.classList.remove('visible', 'ready', 'navigating');
+                // eslint-disable-next-line no-restricted-syntax -- reset dynamic transform
                 indicator.style.transform = 'translateY(-50%) translateX(-60px) scale(0.8)';
+                // eslint-disable-next-line no-restricted-syntax -- reset dynamic opacity
                 indicator.style.opacity = '0';
                 overlay.classList.remove('visible');
+                // eslint-disable-next-line no-restricted-syntax -- reset dynamic opacity
                 overlay.style.opacity = '0';
             }
 

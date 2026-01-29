@@ -295,7 +295,7 @@ window.nexusNotifDrawer = {
 
         this.drawer.classList.add('open');
         this.overlay.classList.add('open');
-        document.body.style.overflow = 'hidden';
+        document.body.classList.add('js-overflow-hidden');
         this.isOpen = true;
     },
 
@@ -304,7 +304,7 @@ window.nexusNotifDrawer = {
 
         this.drawer.classList.remove('open');
         this.overlay.classList.remove('open');
-        document.body.style.overflow = '';
+        document.body.classList.remove('js-overflow-hidden');
         this.isOpen = false;
     },
 

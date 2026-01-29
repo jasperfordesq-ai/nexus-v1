@@ -177,21 +177,30 @@ if (file_exists(__DIR__ . '/../vendor/autoload.php')) {
     });
 }
 
-// 2. ROBUST ENVIRONMENT LOADER
-$envFile = $baseDir . '/.env';
-if (file_exists($envFile)) {
-    $lines = file($envFile, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
-    foreach ($lines as $line) {
-        if (strpos($line, '=') !== false && substr(trim($line), 0, 1) !== '#') {
-            list($key, $value) = explode('=', $line, 2);
-            $key = trim($key);
-            $value = trim($value);
-            if (substr($value, 0, 1) === '"' && substr($value, -1) === '"') {
-                $value = substr($value, 1, -1);
+// 2. ENVIRONMENT LOADER
+// Use the Env class for consistent loading (handles quotes, comments, no-override)
+if (class_exists('\Nexus\Core\Env')) {
+    \Nexus\Core\Env::load($baseDir . '/.env');
+} else {
+    // Fallback: Load .env manually if Env class not yet autoloaded
+    $envFile = $baseDir . '/.env';
+    if (file_exists($envFile)) {
+        $lines = file($envFile, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+        foreach ($lines as $line) {
+            if (strpos($line, '=') !== false && substr(trim($line), 0, 1) !== '#') {
+                list($key, $value) = explode('=', $line, 2);
+                $key = trim($key);
+                $value = trim($value);
+                if (substr($value, 0, 1) === '"' && substr($value, -1) === '"') {
+                    $value = substr($value, 1, -1);
+                }
+                // Only set if not already set (don't override system env)
+                if (getenv($key) === false) {
+                    putenv("$key=$value");
+                    $_ENV[$key] = $value;
+                    $_SERVER[$key] = $value;
+                }
             }
-            putenv("$key=$value");
-            $_ENV[$key] = $value;
-            $_SERVER[$key] = $value;
         }
     }
 }
@@ -214,8 +223,9 @@ header("X-Frame-Options: SAMEORIGIN");
 header("X-Content-Type-Options: nosniff");
 // XSS Protection (legacy browsers)
 header("X-XSS-Protection: 1; mode=block");
-// Content Security Policy (Legacy Compatible + Pusher WebSocket)
-header("Content-Security-Policy: default-src 'self' 'unsafe-inline' 'unsafe-eval' https: data: blob:; connect-src 'self' https: wss://*.pusher.com wss://ws-eu.pusher.com; img-src 'self' https: data: blob:; font-src 'self' https: data:;");
+// Content Security Policy (Tightened - removed unsafe-eval)
+// Note: 'unsafe-inline' still needed for inline event handlers in views
+header("Content-Security-Policy: default-src 'self' https: data: blob:; script-src 'self' 'unsafe-inline' https:; style-src 'self' 'unsafe-inline' https:; connect-src 'self' https: wss://*.pusher.com wss://ws-eu.pusher.com; img-src 'self' https: data: blob:; font-src 'self' https: data:; frame-ancestors 'self';");
 // Referrer Policy
 header("Referrer-Policy: strict-origin-when-cross-origin");
 // HSTS - Force HTTPS for all future requests (1 year, include subdomains)
@@ -248,11 +258,11 @@ if (!$isDownloadRequest && session_status() === PHP_SESSION_NONE) {
         strpos($userAgent, 'iPad') !== false
     );
 
-    // Session lifetime: Mobile gets 90 days (like Facebook/Instagram), Desktop gets 2 hours
-    // This creates an "install and forget" experience for mobile users
+    // Session lifetime: Mobile gets 14 days, Desktop gets 2 hours
+    // Reduced from 90 days for better security on shared/stolen devices
     if ($isMobileDevice) {
-        $sessionLifetime = 7776000; // 90 days for mobile (persistent login - matches native apps)
-        ini_set('session.gc_maxlifetime', 7776000);
+        $sessionLifetime = 1209600; // 14 days for mobile (balanced security/convenience)
+        ini_set('session.gc_maxlifetime', 1209600);
     } else {
         $sessionLifetime = 7200; // 2 hours for desktop (security-focused)
         ini_set('session.gc_maxlifetime', 7200);
