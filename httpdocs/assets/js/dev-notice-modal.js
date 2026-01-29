@@ -90,10 +90,11 @@
     }
 
     function closeModal(overlay) {
+        // eslint-disable-next-line no-restricted-syntax -- animation property for fade-out
         overlay.style.animation = 'fadeOut 0.2s ease-out';
         setTimeout(() => {
             overlay.remove();
-            document.body.style.overflow = '';
+            document.body.classList.remove('js-overflow-hidden');
         }, 200);
         markNoticeSeen();
     }
@@ -113,7 +114,7 @@
         // Create and show modal
         const overlay = createModal();
         document.body.appendChild(overlay);
-        document.body.style.overflow = 'hidden';
+        document.body.classList.add('js-overflow-hidden');
 
         // Add fadeOut animation to CSS if needed
         if (!document.querySelector('#dev-notice-fadeout-style')) {

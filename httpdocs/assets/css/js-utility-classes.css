@@ -1,0 +1,186 @@
+/**
+ * JavaScript Utility Classes
+ * CSS classes for common JavaScript state changes
+ * Use these instead of inline styles (element.style.property)
+ *
+ * Created: 2026-01-29
+ * Per CLAUDE.md: ESLint prohibits inline styles in JS
+ */
+
+/* ==========================================
+   VISIBILITY & DISPLAY
+   ========================================== */
+
+/* Hidden elements */
+.js-hidden {
+    display: none !important;
+}
+
+/* Visually hidden but accessible to screen readers */
+.js-visually-hidden {
+    position: absolute !important;
+    width: 1px !important;
+    height: 1px !important;
+    padding: 0 !important;
+    margin: -1px !important;
+    overflow: hidden !important;
+    clip: rect(0, 0, 0, 0) !important;
+    white-space: nowrap !important;
+    border: 0 !important;
+}
+
+/* ==========================================
+   OPACITY STATES
+   ========================================== */
+
+.js-opacity-0 {
+    opacity: 0 !important;
+}
+
+.js-opacity-50 {
+    opacity: 0.5 !important;
+}
+
+.js-opacity-70 {
+    opacity: 0.7 !important;
+}
+
+.js-opacity-100 {
+    opacity: 1 !important;
+}
+
+/* Fade transitions */
+.js-fade-out {
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.js-fade-in {
+    opacity: 1;
+    transition: opacity 0.3s ease;
+}
+
+.js-fade-out-slow {
+    opacity: 0;
+    transition: opacity 0.5s ease;
+}
+
+/* ==========================================
+   BODY SCROLL LOCK
+   Used when modals/overlays are open
+   ========================================== */
+
+body.js-overflow-hidden {
+    overflow: hidden !important;
+}
+
+body.js-scroll-locked {
+    overflow: hidden !important;
+    position: fixed;
+    width: 100%;
+    /* Note: JS should save/restore scroll position */
+}
+
+/* ==========================================
+   INTERACTIVE STATES
+   ========================================== */
+
+/* Disabled/loading appearance */
+.js-disabled {
+    opacity: 0.6 !important;
+    pointer-events: none !important;
+    cursor: not-allowed !important;
+}
+
+/* Dragging state */
+.js-dragging {
+    opacity: 0.5 !important;
+    cursor: grabbing !important;
+}
+
+/* Loading state opacity */
+.js-loading {
+    opacity: 0.3 !important;
+}
+
+/* ==========================================
+   FORM VALIDATION ICON STATES
+   ========================================== */
+
+.form-validation-icon.js-hidden-icon {
+    opacity: 0;
+    transform: scale(0.8);
+    transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.form-validation-icon.js-visible-icon {
+    opacity: 1;
+    transform: scale(1);
+}
+
+/* ==========================================
+   MESSAGE/BANNER FADE OUT
+   ========================================== */
+
+.js-banner-fade-out {
+    opacity: 0;
+    transition: opacity 0.5s ease;
+}
+
+/* ==========================================
+   TOAST/SNACKBAR STATES
+   ========================================== */
+
+.js-toast-visible {
+    visibility: visible !important;
+    opacity: 1 !important;
+}
+
+.js-toast-hidden {
+    visibility: hidden !important;
+    opacity: 0 !important;
+}
+
+/* ==========================================
+   CARD/ELEMENT PREVIEW STATES
+   ========================================== */
+
+.js-preview-loading {
+    opacity: 0.3 !important;
+}
+
+/* ==========================================
+   INDICATOR/PROGRESS STATES
+   These are for showing/hiding indicators
+   Note: Actual progress values are dynamic
+   ========================================== */
+
+.js-indicator-hidden {
+    opacity: 0;
+    pointer-events: none;
+}
+
+.js-indicator-visible {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+/* ==========================================
+   TRANSITION HELPERS
+   ========================================== */
+
+.js-transition-opacity {
+    transition: opacity 0.3s ease;
+}
+
+.js-transition-opacity-fast {
+    transition: opacity 0.15s ease;
+}
+
+.js-transition-opacity-slow {
+    transition: opacity 0.5s ease;
+}
+
+.js-no-transition {
+    transition: none !important;
+}

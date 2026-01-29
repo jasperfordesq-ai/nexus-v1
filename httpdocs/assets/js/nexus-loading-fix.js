@@ -95,7 +95,8 @@
         // Only animate on first load
         if (sessionStorage.getItem('feed_animated')) {
             document.querySelectorAll('.feed-item, .post-card').forEach(function(item) {
-                item.style.opacity = '1';
+                item.classList.add('js-opacity-100');
+                // eslint-disable-next-line no-restricted-syntax -- disable animation for already-loaded state
                 item.style.animation = 'none';
             });
             document.body.classList.add('feed-loaded');
@@ -191,14 +192,14 @@
 
     function openModal(modal) {
         modal.classList.add('active');
-        document.body.style.overflow = 'hidden';
+        document.body.classList.add('js-overflow-hidden');
     }
 
     function closeModal(modal) {
         modal.classList.add('closing');
         setTimeout(function() {
             modal.classList.remove('active', 'closing');
-            document.body.style.overflow = '';
+            document.body.classList.remove('js-overflow-hidden');
         }, 200);
     }
 

@@ -226,14 +226,17 @@ class SocialGamificationService
         )->fetchAll();
 
         foreach ($challenges as $challenge) {
-            $progressColumn = $challenge['challenger_id'] == $userId
-                ? 'challenger_progress'
-                : 'challenged_progress';
-
-            Database::query(
-                "UPDATE friend_challenges SET {$progressColumn} = {$progressColumn} + ? WHERE id = ?",
-                [$amount, $challenge['id']]
-            );
+            if ($challenge['challenger_id'] == $userId) {
+                Database::query(
+                    "UPDATE friend_challenges SET challenger_progress = challenger_progress + ? WHERE id = ?",
+                    [$amount, $challenge['id']]
+                );
+            } else {
+                Database::query(
+                    "UPDATE friend_challenges SET challenged_progress = challenged_progress + ? WHERE id = ?",
+                    [$amount, $challenge['id']]
+                );
+            }
 
             // Check if challenge is complete
             self::checkChallengeCompletion($challenge['id']);

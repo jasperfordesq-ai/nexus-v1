@@ -26,12 +26,13 @@
 
         // Only fix position if it's stuck as fixed
         if (computed.position === 'fixed' && !menuOpen && !notifOpen) {
+            // eslint-disable-next-line no-restricted-syntax -- reset position for scroll fix
             document.body.style.position = '';
         }
 
         // Only fix overflow if it's actually preventing scroll
         if ((computed.overflowY === 'hidden' || computed.overflowY === 'visible') && !menuOpen && !notifOpen) {
-            document.body.style.overflowY = '';
+            document.body.classList.remove('js-overflow-hidden');
         }
     }
 

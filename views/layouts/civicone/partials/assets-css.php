@@ -92,6 +92,8 @@
     <!-- Updated 2026-01-17: All CSS now uses minified versions where available -->
     <!-- DESIGN TOKENS (Shared variables - must load first) -->
     <link rel="stylesheet" href="/assets/css/design-tokens.css?v=<?= $cssVersion ?>">
+    <!-- JS UTILITY CLASSES (JavaScript state management - must load early) -->
+    <link rel="stylesheet" href="/assets/css/js-utility-classes.css?v=<?= $cssVersion ?>">
     <!-- LAYOUT ISOLATION (Prevent CSS conflicts) -->
     <link rel="stylesheet" href="/assets/css/layout-isolation.css?v=<?= $cssVersion ?>">
     <!-- CORE FRAMEWORK (Layout & Logic) -->

@@ -280,7 +280,7 @@ class NexusNotifications {
         if (btn) {
             originalText = btn.textContent;
             btn.textContent = 'Processing...';
-            btn.style.opacity = '0.6';
+            btn.classList.add('js-disabled');
         }
 
         try {
@@ -344,7 +344,7 @@ class NexusNotifications {
             }
             if (btn) {
                 btn.textContent = originalText;
-                btn.style.opacity = '1.0';
+                btn.classList.remove('js-disabled');
             }
             this.isProcessing = false;
         }

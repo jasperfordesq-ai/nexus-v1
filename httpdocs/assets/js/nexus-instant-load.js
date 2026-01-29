@@ -110,19 +110,25 @@
 
         // Fade in body smoothly
         if (document.body) {
+            // eslint-disable-next-line no-restricted-syntax -- critical page load timing
             document.body.style.opacity = '0';
+            // eslint-disable-next-line no-restricted-syntax -- critical page load timing
             document.body.style.visibility = 'visible';
-            document.body.style.overflow = '';
+            document.body.classList.remove('js-overflow-hidden');
 
             // Instant fade in with fast timing (reduced from 0.4s to 0.25s)
             requestAnimationFrame(function() {
+                // eslint-disable-next-line no-restricted-syntax -- critical page load timing
                 document.body.style.transition = 'opacity 0.25s cubic-bezier(0.4, 0.0, 0.2, 1)';
+                // eslint-disable-next-line no-restricted-syntax -- critical page load timing
                 document.body.style.opacity = '1';
 
                 // Fade in main content areas
                 const mainContent = document.querySelectorAll('main, .main-content, .page-content');
                 mainContent.forEach(function(element) {
+                    // eslint-disable-next-line no-restricted-syntax -- critical page load timing
                     element.style.transition = 'opacity 0.25s cubic-bezier(0.4, 0.0, 0.2, 1)';
+                    // eslint-disable-next-line no-restricted-syntax -- critical page load timing
                     element.style.opacity = '1';
                 });
             });
@@ -208,7 +214,9 @@
             }
 
             // CRITICAL: Force clear any scroll-blocking styles AND enable scrolling
+            // eslint-disable-next-line no-restricted-syntax -- critical scroll fix with !important
             document.documentElement.style.cssText = 'overflow-y: scroll !important; overflow-x: hidden !important; height: 100% !important;';
+            // eslint-disable-next-line no-restricted-syntax -- critical scroll fix with !important
             document.body.style.cssText = 'overflow-y: auto !important; overflow-x: hidden !important; height: auto !important; position: static !important;';
 
             // Remove any scroll-blocking event listeners
@@ -218,12 +226,14 @@
             document.ontouchmove = null;
 
             // Remove any stuck modal/drawer classes
-            document.body.classList.remove('drawer-open', 'modal-open', 'fds-sheet-open', 'menu-open', 'mobile-menu-open', 'keyboard-open');
+            document.body.classList.remove('drawer-open', 'modal-open', 'fds-sheet-open', 'menu-open', 'mobile-menu-open', 'keyboard-open', 'js-overflow-hidden');
 
             // Mark as loaded if not already
             if (!document.documentElement.classList.contains('content-loaded')) {
                 document.documentElement.classList.add('content-loaded');
+                // eslint-disable-next-line no-restricted-syntax -- critical page load visibility
                 document.body.style.opacity = '1';
+                // eslint-disable-next-line no-restricted-syntax -- critical page load visibility
                 document.body.style.visibility = 'visible';
             }
         }, 100);

@@ -216,7 +216,7 @@
 
     function openModal(modal) {
         modal.classList.add('active');
-        document.body.style.overflow = 'hidden';
+        document.body.classList.add('js-overflow-hidden');
 
         // Focus first focusable element
         const firstFocusable = modal.querySelector('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
@@ -233,7 +233,7 @@
 
         setTimeout(() => {
             modal.classList.remove('active', 'closing');
-            document.body.style.overflow = '';
+            document.body.classList.remove('js-overflow-hidden');
         }, 200);
     }
 
@@ -284,6 +284,7 @@
                 const rotateX = (y - centerY) / 20;
                 const rotateY = (centerX - x) / 20;
 
+                // eslint-disable-next-line no-restricted-syntax -- dynamic 3D tilt based on mouse position
                 card.style.transform = `
                     perspective(1000px)
                     rotateX(${rotateX}deg)
@@ -293,6 +294,7 @@
             });
 
             card.addEventListener('mouseleave', function() {
+                // eslint-disable-next-line no-restricted-syntax -- reset dynamic transform
                 card.style.transform = '';
             });
         });
@@ -347,6 +349,7 @@
                 const speed = element.getAttribute('data-parallax') || 0.5;
                 const yPos = -(scrolled * speed);
 
+                // eslint-disable-next-line no-restricted-syntax -- dynamic parallax based on scroll position
                 element.style.transform = `translateY(${yPos}px)`;
             });
         }, {

@@ -11,16 +11,34 @@ namespace Nexus\Helpers;
 class CorsHelper
 {
     /**
-     * Allowed origins for CORS requests.
-     * Includes production and staging domains.
+     * Default allowed origins for CORS requests.
+     * Can be overridden via ALLOWED_ORIGINS environment variable.
      */
-    private static array $allowedOrigins = [
+    private static array $defaultOrigins = [
         'https://project-nexus.ie',
         'https://www.project-nexus.ie',
         'https://hour-timebank.ie',
         'https://www.hour-timebank.ie',
         'http://staging.timebank.local',
     ];
+
+    private static ?array $allowedOrigins = null;
+
+    /**
+     * Get allowed origins from environment or defaults.
+     */
+    private static function getConfiguredOrigins(): array
+    {
+        if (self::$allowedOrigins === null) {
+            $envOrigins = getenv('ALLOWED_ORIGINS') ?: ($_ENV['ALLOWED_ORIGINS'] ?? '');
+            if (!empty($envOrigins)) {
+                self::$allowedOrigins = array_map('trim', explode(',', $envOrigins));
+            } else {
+                self::$allowedOrigins = self::$defaultOrigins;
+            }
+        }
+        return self::$allowedOrigins;
+    }
 
     /**
      * Set CORS headers for the current request.
@@ -44,7 +62,7 @@ class CorsHelper
         }
 
         // Build complete allowlist
-        $allowedOrigins = array_merge(self::$allowedOrigins, $additionalOrigins);
+        $allowedOrigins = array_merge(self::getConfiguredOrigins(), $additionalOrigins);
 
         // Check if origin is allowed
         if (!self::isOriginAllowed($origin, $allowedOrigins)) {
@@ -98,7 +116,7 @@ class CorsHelper
     public static function isOriginAllowed(string $origin, array $allowedOrigins = []): bool
     {
         if (empty($allowedOrigins)) {
-            $allowedOrigins = self::$allowedOrigins;
+            $allowedOrigins = self::getConfiguredOrigins();
         }
 
         // Direct match
@@ -136,7 +154,8 @@ class CorsHelper
     public static function addAllowedOrigin(string $origin): void
     {
         $origin = rtrim($origin, '/');
-        if (!empty($origin) && !in_array($origin, self::$allowedOrigins, true)) {
+        $origins = self::getConfiguredOrigins();
+        if (!empty($origin) && !in_array($origin, $origins, true)) {
             self::$allowedOrigins[] = $origin;
         }
     }
@@ -148,6 +167,6 @@ class CorsHelper
      */
     public static function getAllowedOrigins(): array
     {
-        return self::$allowedOrigins;
+        return self::getConfiguredOrigins();
     }
 }

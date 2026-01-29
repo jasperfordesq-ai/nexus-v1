@@ -144,10 +144,9 @@
             document.documentElement.classList.remove('messages-page');
             // Guard against body not being ready yet
             if (document.body) {
-                document.body.classList.remove('messages-page', 'messages-fullscreen', 'no-ptr');
-                document.body.style.overflow = '';
+                document.body.classList.remove('messages-page', 'messages-fullscreen', 'no-ptr', 'js-overflow-hidden');
             }
-            document.documentElement.style.overflow = '';
+            document.documentElement.classList.remove('js-overflow-hidden');
         }
     }
 

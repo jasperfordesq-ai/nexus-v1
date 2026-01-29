@@ -8,11 +8,7 @@ module.exports = {
     ],
 
     // CSS files to purge
-    // Auto-discovered: 2026-01-24
-    //
-    // ⚠️ IMPORTANT: Design token files are EXCLUDED from this list
-    // They contain CSS variables that PurgeCSS incorrectly removes
-    // See CSS_BUILD_RULES.md for details
+    // Auto-discovered: 2026-01-29
     css: [
         'httpdocs/assets/css/accessibility.css',
         'httpdocs/assets/css/achievements.css',
@@ -81,7 +77,6 @@ module.exports = {
         'httpdocs/assets/css/civicone-consent-decline.css',
         'httpdocs/assets/css/civicone-consent-required.css',
         'httpdocs/assets/css/civicone-contact.css',
-        'httpdocs/assets/css/civicone/cookie-banner.css',
         'httpdocs/assets/css/civicone-dashboard-nexus-score.css',
         'httpdocs/assets/css/civicone-dashboard.css',
         'httpdocs/assets/css/civicone-demo-pages.css',
@@ -195,21 +190,21 @@ module.exports = {
         'httpdocs/assets/css/civicone-volunteering.css',
         'httpdocs/assets/css/civicone-wallet-index.css',
         'httpdocs/assets/css/civicone-wallet.css',
+        'httpdocs/assets/css/civicone/cookie-banner.css',
         'httpdocs/assets/css/components.css',
         'httpdocs/assets/css/compose-multidraw.css',
         'httpdocs/assets/css/consent-required.css',
         'httpdocs/assets/css/cookie-banner.css',
         'httpdocs/assets/css/cookie-preferences.css',
         'httpdocs/assets/css/dashboard.css',
-        // EXCLUDED: Design tokens should NEVER be purged - they contain CSS variables
-        // 'httpdocs/assets/css/design-tokens.css',
-        // 'httpdocs/assets/css/desktop-design-tokens.css',
+        'httpdocs/assets/css/design-tokens.css',
+        'httpdocs/assets/css/desktop-design-tokens.css',
         'httpdocs/assets/css/desktop-hover-system.css',
         'httpdocs/assets/css/desktop-loading-states.css',
         'httpdocs/assets/css/dev-notice-modal.css',
         'httpdocs/assets/css/empty-states.css',
-        'httpdocs/assets/css/error-states.css',
         'httpdocs/assets/css/error-pages.css',
+        'httpdocs/assets/css/error-states.css',
         'httpdocs/assets/css/events-calendar.css',
         'httpdocs/assets/css/events-create.css',
         'httpdocs/assets/css/events-index.css',
@@ -234,6 +229,7 @@ module.exports = {
         'httpdocs/assets/css/help.css',
         'httpdocs/assets/css/hover-interactions.css',
         'httpdocs/assets/css/image-lazy-load.css',
+        'httpdocs/assets/css/js-utility-classes.css',
         'httpdocs/assets/css/layout-isolation.css',
         'httpdocs/assets/css/listings-create.css',
         'httpdocs/assets/css/listings-index.css',
@@ -247,7 +243,7 @@ module.exports = {
         'httpdocs/assets/css/messages-thread.css',
         'httpdocs/assets/css/micro-interactions.css',
         'httpdocs/assets/css/mobile-accessibility-fixes.css',
-        // 'httpdocs/assets/css/mobile-design-tokens.css', // EXCLUDED: Never purge design tokens
+        'httpdocs/assets/css/mobile-design-tokens.css',
         'httpdocs/assets/css/mobile-loading-states.css',
         'httpdocs/assets/css/mobile-micro-interactions.css',
         'httpdocs/assets/css/mobile-nav-v2.css',
@@ -269,10 +265,12 @@ module.exports = {
         'httpdocs/assets/css/modern-search-results.css',
         'httpdocs/assets/css/modern-settings-holographic.css',
         'httpdocs/assets/css/modern-settings.css',
+        'httpdocs/assets/css/modern-template-extracts.css',
+        'httpdocs/assets/css/modern-theme-tokens.css',
         'httpdocs/assets/css/modern-volunteering-show.css',
         'httpdocs/assets/css/modern/components-library.css',
         'httpdocs/assets/css/modern/preview.css',
-        // 'httpdocs/assets/css/moj-filter.css', // Excluded: contains GOV.UK Design System classes with ! in names (e.g., govuk-!-display-none)
+        'httpdocs/assets/css/moj-filter.css',
         'httpdocs/assets/css/native-form-inputs.css',
         'httpdocs/assets/css/native-page-enter.css',
         'httpdocs/assets/css/nexus-civicone.css',
@@ -300,10 +298,10 @@ module.exports = {
         'httpdocs/assets/css/partials.css',
         'httpdocs/assets/css/polls.css',
         'httpdocs/assets/css/post-box-home.css',
-        'httpdocs/assets/css/privacy-page.css',
         'httpdocs/assets/css/post-card.css',
         'httpdocs/assets/css/premium-dropdowns.css',
         'httpdocs/assets/css/premium-search.css',
+        'httpdocs/assets/css/privacy-page.css',
         'httpdocs/assets/css/profile-edit.css',
         'httpdocs/assets/css/profile-holographic.css',
         'httpdocs/assets/css/pull-to-refresh.css',
@@ -361,31 +359,6 @@ module.exports = {
             'nexus-header-compact', 'nexus-header-hidden', 'nexus-header-visible',
             'nexus-header-is-compact', 'nexus-header-is-hidden',
             'nexus-collapsing-header', 'back-nav',
-
-            // Form and input states
-            'form-row', 'form-group', 'form-label', 'form-input', 'form-note',
-            'form-label-row', 'flex-1', 'flex-2',
-
-            // Button base classes
-            'btn', 'btn-primary', 'btn-secondary', 'btn-link', 'btn-sm', 'btn-lg',
-
-            // Layout helpers
-            'container', 'wrapper', 'content', 'main', 'section',
-            'row', 'col', 'grid', 'flex',
-
-            // Modern Primitives - Layout (Phase 7)
-            'stack', 'cluster', 'sidebar',
-            'container--narrow', 'container--wide',
-            'stack--sm', 'stack--md', 'stack--lg', 'stack--xl',
-            'cluster--start', 'cluster--center', 'cluster--end', 'cluster--between',
-            'grid--2', 'grid--3', 'grid--4',
-            'sidebar--right',
-
-            // Modern Primitives - Accessibility
-            'sr-only-focusable', 'focus-ring', 'no-focus-ring',
-
-            // Visibility
-            'sr-only', 'visually-hidden', 'invisible', 'opacity-0', 'opacity-100',
         ],
 
         // Patterns to keep (regex)
@@ -405,67 +378,11 @@ module.exports = {
             /^feed-/, /^composer-/, /^compose-/, /^sidebar-/,
             /^profile-/, /^badge/, /^avatar/,
 
-            // Keep auth/login classes
-            /^auth-/, /^login-/, /^register-/, /^password-/,
-
-            // Keep biometric/security classes
-            /^biometric-/,
-
-            // Keep impersonation banner classes
-            /^impersonation-/,
-
-            // Keep holographic/calendar classes
-            /^holo-/, /^calendar-/,
-
-            // Keep skin/theme classes
-            /^skin-/, /^theme-/,
-
-            // Keep form classes
-            /^form-/, /^input-/, /^select-/, /^checkbox-/, /^radio-/,
-
-            // Keep button classes
-            /^btn-/, /^button-/,
-
-            // Keep blog classes
-            /^blog-/, /^article-/, /^post-/,
-
-            // Keep offline/status classes
-            /^offline-/, /^online-/, /^status-/,
-
-            // Keep GOV.UK Design System classes
-            /^govuk-/, /^moj-/,
-
             // Keep all CSS variables and pseudo-elements
             /^--/, /::before/, /::after/,
 
             // Keep state patterns
             /^is-/, /^has-/, /hover/, /focus/, /active/,
-
-            // Keep data attribute selectors
-            /\[data-/,
-
-            // Modern Primitives - Spacing utilities (Phase 7.1)
-            /^gap-[1-8]$/,
-            /^p-[1-8]$/,
-            /^p[xy]-[2-6]$/,
-            /^m[tb]-[0-8]$/,
-
-            // Modern Primitives - Typography utilities (Phase 7.1)
-            /^text-(xs|sm|base|lg|xl|2xl)$/,
-            /^text-(primary|secondary|muted|accent|success|warning|danger)$/,
-            /^font-(normal|medium|semibold|bold)$/,
-
-            // Modern Primitives - Display/Flex utilities (Phase 7.1)
-            /^flex-(row|col|wrap|nowrap|1|auto|none|grow|shrink-0)$/,
-            /^items-(start|center|end|stretch)$/,
-            /^justify-(start|center|end|between|around)$/,
-
-            // Modern Primitives - Border radius utilities (Phase 7.1)
-            /^rounded(-none|-sm|-md|-lg|-xl|-full)?$/,
-
-            // Modern Primitives - Position utilities (Phase 7.1)
-            /^(relative|absolute|fixed|sticky)$/,
-            /^(top|right|bottom|left|inset)-0$/,
         ],
     },
 

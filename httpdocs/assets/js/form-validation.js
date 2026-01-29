@@ -232,7 +232,8 @@
         const wrapper = field.closest('.form-validation-wrapper') || field.parentElement;
         const icon = wrapper.querySelector('.form-validation-icon');
         if (icon) {
-            icon.style.opacity = '0';
+            icon.classList.add('js-hidden-icon');
+            icon.classList.remove('js-visible-icon');
         }
 
         // Hide error message
