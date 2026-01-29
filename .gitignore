@@ -97,3 +97,12 @@ firebase-service-account.json
 C?temp*
 *tempcivicone_dirs.txt
 *tempmodern_dirs.txt
+
+# E2E Testing (Playwright)
+e2e/fixtures/.auth/
+e2e/test-results/
+e2e/reports/
+e2e/screenshots/
+e2e/.env.test
+playwright-report/
+test-results/

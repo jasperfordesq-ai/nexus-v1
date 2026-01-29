@@ -1,5 +1,17 @@
 {
   "scripts": {
+    "test:e2e": "npx playwright test",
+    "test:e2e:headed": "npx playwright test --headed",
+    "test:e2e:ui": "npx playwright test --ui",
+    "test:e2e:debug": "npx playwright test --debug",
+    "test:e2e:auth": "npx playwright test --project=unauthenticated",
+    "test:e2e:admin": "npx playwright test --project=admin",
+    "test:e2e:chrome": "npx playwright test --project=chromium-modern",
+    "test:e2e:firefox": "npx playwright test --project=firefox-modern",
+    "test:e2e:mobile": "npx playwright test --project=mobile-chrome",
+    "test:e2e:civicone": "npx playwright test --project=chromium-civicone",
+    "test:e2e:report": "npx playwright show-report e2e/reports/html",
+    "test:e2e:codegen": "npx playwright codegen http://staging.timebank.local/hour-timebank",
     "build:css": "node scripts/build-css.js && node scripts/validate-design-tokens.js",
     "build:css:core": "node scripts/build-core-css.js",
     "build:css:purge": "node scripts/run-purgecss.js",
@@ -31,6 +43,7 @@
     "build": "npm run minify:css && npm run minify:js && npm run build:css:core && npm run build:images"
   },
   "devDependencies": {
+    "@playwright/test": "^1.58.0",
     "cssnano": "^7.1.2",
     "eslint": "^8.57.0",
     "pa11y": "^9.0.1",
