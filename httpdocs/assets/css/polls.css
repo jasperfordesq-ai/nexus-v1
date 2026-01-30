@@ -1129,7 +1129,7 @@
                 var(--color-violet-300-alpha-8) 25%,
                 var(--color-violet-200-alpha-6) 50%,
                 var(--color-violet-100-alpha-6) 75%,
-                rgba(237, 233, 254, 0.08) 100%);
+                var(--color-violet-50-alpha-8) 100%);
             background-size: 400% 400%;
             animation: gradientShift 15s ease infinite;
         }
@@ -1138,7 +1138,7 @@
             background: radial-gradient(circle at 20% 30%,
                 var(--effect-purple-15) 0%, transparent 50%),
             radial-gradient(circle at 80% 70%,
-                rgba(167, 139, 250, 0.12) 0%, transparent 50%);
+                var(--color-violet-300-alpha-12) 0%, transparent 50%);
         }
 
         @keyframes gradientShift {
@@ -1180,7 +1180,7 @@
             align-items: center;
             gap: var(--space-2);
             transition: all 0.3s ease;
-            box-shadow: 0 4px 12px rgba(31, 38, 135, 0.1),
+            box-shadow: 0 4px 12px var(--color-glass-shadow),
                         inset 0 1px 0 var(--effect-white-40);
             position: relative;
             overflow: hidden;
@@ -1216,14 +1216,14 @@
                 var(--effect-slate-50));
             border: 2px solid var(--effect-white-12);
             box-shadow: 0 4px 12px var(--effect-black-30),
-                        inset 0 1px 0 rgba(255, 255, 255, 0.06);
+                        inset 0 1px 0 var(--color-white-alpha-6);
         }
 
         [data-theme="dark"] #polls-glass-wrapper .quick-action-btn:hover {
             border-color: var(--effect-purple-30);
             box-shadow: 0 8px 20px var(--effect-purple-25),
                         0 0 0 1px var(--effect-purple-20),
-                        0 0 30px rgba(167, 139, 250, 0.12);
+                        0 0 30px var(--color-violet-300-alpha-12);
         }
 
         #polls-glass-wrapper .quick-action-icon {
@@ -1252,7 +1252,7 @@
             backdrop-filter: blur(20px) saturate(120%);
             -webkit-backdrop-filter: blur(20px) saturate(120%);
             border: 1px solid var(--effect-white-30);
-            box-shadow: 0 8px 32px rgba(31, 38, 135, 0.15),
+            box-shadow: 0 8px 32px var(--color-glass-shadow-15),
                         inset 0 0 0 1px var(--effect-white-40);
             transition: all 0.3s ease;
         }
@@ -1328,7 +1328,7 @@
             -webkit-backdrop-filter: blur(20px) saturate(120%);
             border: 1px solid var(--effect-white-30);
             border-radius: var(--radius-xl);
-            box-shadow: 0 8px 32px rgba(31, 38, 135, 0.12),
+            box-shadow: 0 8px 32px var(--color-glass-shadow-12),
                         inset 0 1px 0 var(--effect-white-50);
             transition: all 0.3s ease;
             overflow: hidden;
@@ -1583,7 +1583,7 @@
             -webkit-backdrop-filter: blur(20px);
             border: 1px solid var(--effect-white-30);
             border-radius: var(--radius-xl);
-            box-shadow: 0 8px 32px rgba(31, 38, 135, 0.12);
+            box-shadow: 0 8px 32px var(--color-glass-shadow-12);
         }
 
         [data-theme="dark"] #polls-glass-wrapper .glass-empty-state {
@@ -1642,7 +1642,7 @@
         #polls-glass-wrapper .nexus-welcome-hero {
             background: linear-gradient(135deg,
                 var(--effect-purple-12) 0%,
-                rgba(167, 139, 250, 0.12) 50%,
+                var(--color-violet-300-alpha-12) 50%,
                 rgba(196, 181, 253, 0.08) 100%);
             backdrop-filter: blur(20px);
             -webkit-backdrop-filter: blur(20px);
@@ -2428,7 +2428,7 @@ html {
 
 .comment-item {
     padding: var(--space-4) 0;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    border-bottom: 1px solid var(--color-white-alpha-6);
 }
 
 .comment-item:last-child {

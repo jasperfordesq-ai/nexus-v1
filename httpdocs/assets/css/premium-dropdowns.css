@@ -185,7 +185,7 @@
     text-shadow: none !important;
     box-shadow:
         0 2px 12px var(--color-indigo-alpha-10),
-        inset 0 1px 0 rgba(255, 255, 255, 0.5) !important;
+        inset 0 1px 0 var(--color-white-alpha-50) !important;
 }
 
 [data-theme="light"] .premium-dropdown-trigger:hover {
@@ -201,15 +201,15 @@
     background: linear-gradient(135deg,
         var(--color-indigo-alpha-20) 0%,
         var(--color-violet-alpha-15) 100%) !important;
-    border-color: rgba(99, 102, 241, 0.4) !important;
+    border-color: var(--color-indigo-alpha-40) !important;
     color: var(--color-primary-700) !important;
 }
 
 [data-theme="light"] .premium-dropdown-menu {
-    background: rgba(255, 255, 255, 0.98) !important;
+    background: var(--color-white-alpha-98) !important;
     border: 1px solid var(--color-indigo-alpha-15) !important;
     box-shadow:
-        0 8px 32px rgba(0, 0, 0, 0.1),
+        0 8px 32px var(--color-black-alpha-10),
         0 12px 48px var(--color-indigo-alpha-8) !important;
 }
 
