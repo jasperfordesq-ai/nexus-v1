@@ -397,11 +397,11 @@
 }
 
 .vol-status-title--success {
-    color: #166534;
+    color: var(--color-green-800);
 }
 
 .vol-status-title--pending {
-    color: #1e40af;
+    color: var(--color-blue-700);
 }
 
 .vol-status-text {
@@ -410,11 +410,11 @@
 }
 
 .vol-status-text--success {
-    color: #15803d;
+    color: var(--color-green-700);
 }
 
 .vol-status-text--pending {
-    color: #1e3a8a;
+    color: var(--color-blue-800);
 }
 
 .vol-status-text--muted {

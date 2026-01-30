@@ -1686,7 +1686,7 @@
 .mte-vol-edit--input {
     width: 100%;
     padding: 10px;
-    border: 1px solid #ddd;
+    border: 1px solid var(--color-gray-300);
     border-radius: 6px;
 }
 
@@ -1714,7 +1714,7 @@
 }
 
 .mte-vol-edit--shifts-hint {
-    color: #666;
+    color: var(--color-gray-600);
     font-size: 0.9rem;
 }
 
@@ -1727,7 +1727,7 @@
 }
 
 .mte-vol-edit--table thead tr {
-    border-bottom: 1px solid #eee;
+    border-bottom: 1px solid var(--color-gray-200);
 }
 
 .mte-vol-edit--table th,
@@ -1736,11 +1736,11 @@
 }
 
 .mte-vol-edit--table tbody tr {
-    border-bottom: 1px solid #f9f9f9;
+    border-bottom: 1px solid var(--color-gray-50);
 }
 
 .mte-vol-edit--time-sub {
-    color: #666;
+    color: var(--color-gray-600);
     font-size: 0.85rem;
 }
 
@@ -1754,7 +1754,7 @@
 .mte-vol-edit--no-shifts {
     margin-bottom: 20px;
     font-style: italic;
-    color: #888;
+    color: var(--color-gray-500);
 }
 
 /* Add Shift Box */
@@ -1762,7 +1762,7 @@
     background: var(--color-gray-50);
     padding: 15px;
     border-radius: 6px;
-    border: 1px solid #eee;
+    border: 1px solid var(--color-gray-200);
 }
 
 .mte-vol-edit--add-shift-title {
@@ -1785,7 +1785,7 @@
 .mte-vol-edit--shift-input {
     width: 100%;
     padding: 6px;
-    border: 1px solid #ddd;
+    border: 1px solid var(--color-gray-300);
     border-radius: 4px;
 }
 

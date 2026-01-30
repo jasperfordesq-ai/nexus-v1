@@ -1,7 +1,7 @@
 /* generated-tokens.css - INLINED to eliminate render-blocking @import */
 :root {
     --htb-color-brand-primary: var(--color-primary-600);
-    --htb-color-brand-secondary: #d946ef;
+    --htb-color-brand-secondary: var(--color-fuchsia-500);
     --htb-color-brand-accent: var(--color-amber-300);
     --htb-color-semantic-success: var(--color-green-500);
     --htb-color-semantic-warning: var(--color-warning);
@@ -52,7 +52,7 @@ img.avatar-img {
 :root {
     --htb-bg-page: var(--color-gray-50);
     --htb-bg-card: var(--color-white);
-    --htb-primary: linear-gradient(120deg, var(--color-primary-600) 0%, #d946ef 50%, var(--color-amber-300) 100%);
+    --htb-primary: linear-gradient(120deg, var(--color-primary-600) 0%, var(--color-fuchsia-500) 50%, var(--color-amber-300) 100%);
     /* Big Bang */
     --htb-text-main: var(--color-gray-800);
     --htb-text-muted: var(--color-gray-500);
@@ -60,7 +60,7 @@ img.avatar-img {
     --htb-shadow: 0 10px 15px -3px var(--effect-black-5), 0 4px 6px -2px rgba(0, 0, 0, 0.025);
     --htb-border-color: var(--color-gray-200);
     /* HOLOGRAPHIC TRI-TONE GRADIENTS (Unique per page) */
-    --htb-gradient-brand: linear-gradient(120deg, var(--color-primary-600) 0%, #d946ef 50%, var(--color-amber-300) 100%);
+    --htb-gradient-brand: linear-gradient(120deg, var(--color-primary-600) 0%, var(--color-fuchsia-500) 50%, var(--color-amber-300) 100%);
     --htb-gradient-front: linear-gradient(120deg, var(--color-blue-600) 0%, var(--color-purple-500-alt) 50%, var(--color-pink-400) 100%);
     /* Blue -> Purple -> Pink */
     --htb-gradient-members: linear-gradient(120deg, var(--color-primary-600) 0%, var(--color-rose-600) 50%, var(--color-amber-300) 100%);
@@ -268,7 +268,7 @@ body,
 
 [data-theme="dark"] .nexus-badge-purple {
     background: rgba(147, 51, 234, 0.2);
-    color: #c084fc;
+    color: var(--color-purple-400);
 }
 
 /* DARK MODE: Gradient Text Fix */
@@ -615,7 +615,7 @@ html {
 }
 
 .nexus-badge-purple {
-    background: #f3e8ff;
+    background: var(--color-purple-100);
     color: var(--color-purple-500-alt);
 }
 
@@ -776,13 +776,13 @@ table.htb-table tr:last-child td {
 }
 
 .htb-step-icon-green {
-    background: linear-gradient(135deg, #dcfce7 0%, #f0fdf4 100%);
+    background: linear-gradient(135deg, var(--color-green-100) 0%, var(--color-green-50) 100%);
     color: var(--color-green-600);
     box-shadow: 0 4px 10px rgba(22, 163, 74, 0.1);
 }
 
 .htb-step-icon-orange {
-    background: linear-gradient(135deg, #ffedd5 0%, var(--color-white)7ed 100%);
+    background: linear-gradient(135deg, var(--color-orange-100) 0%, var(--color-white)7ed 100%);
     color: var(--color-orange-600);
     box-shadow: 0 4px 10px rgba(234, 88, 12, 0.1);
 }

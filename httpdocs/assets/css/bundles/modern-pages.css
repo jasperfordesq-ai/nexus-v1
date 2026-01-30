@@ -529,7 +529,7 @@ img.avatar-img:hover {
 [data-theme="light"] .fb-card .feed-action-pill.liked,
 [data-theme="light"] .fb-card button.feed-action-pill.liked {
     background: linear-gradient(135deg, var(--color-pink-500), var(--color-rose-500)) !important;
-    color: #fff !important;
+    color: var(--color-white) !important;
 }
 
 /* Light mode for feed-action-btn style buttons */
@@ -872,7 +872,7 @@ button.feed-action-pill.liked,
 .fb-card .feed-action-pill.liked,
 .fb-card button.feed-action-pill.liked {
     background: linear-gradient(135deg, var(--color-pink-500), var(--color-rose-500)) !important;
-    color: #fff !important;
+    color: var(--color-white) !important;
 }
 
 .feed-action-pill:hover:not(.liked),
@@ -907,7 +907,7 @@ button.feed-action-pill:active {
 .dark .feed-action-pill.liked {
     background: linear-gradient(135deg, var(--color-pink-500), var(--color-rose-500)) !important;
     border: none !important;
-    color: #fff !important;
+    color: var(--color-white) !important;
 }
 
 /* System dark mode for feed action pills */
@@ -929,7 +929,7 @@ button.feed-action-pill:active {
     body:not([data-theme="light"]) .feed-action-pill.liked {
         background: linear-gradient(135deg, var(--color-pink-500), var(--color-rose-500)) !important;
         border: none !important;
-        color: #fff !important;
+        color: var(--color-white) !important;
     }
 }
 
@@ -1809,8 +1809,8 @@ body.nexus-home-page .home-sidebar-column {
     height: 44px;
     border-radius: 50%;
     object-fit: cover;
-    background: #fff;
-    border: var(--space-0.5) solid #fff;
+    background: var(--color-white);
+    border: var(--space-0.5) solid var(--color-white);
 }
 
 .composer-avatar-ring.guest {
@@ -1881,7 +1881,7 @@ body.nexus-home-page .home-sidebar-column {
 
 .composer-action-btn.highlight {
     background: linear-gradient(135deg, var(--color-primary-500), var(--color-purple-500));
-    color: #fff;
+    color: var(--color-white);
 }
 
 .composer-action-btn.highlight:hover {
@@ -1969,7 +1969,7 @@ body.nexus-home-page .home-sidebar-column {
 
 .compose-quick-btn.highlight {
     background: linear-gradient(135deg, var(--color-primary-500), var(--color-purple-500));
-    color: #fff;
+    color: var(--color-white);
 }
 
 .compose-quick-btn.highlight:hover {
@@ -1979,7 +1979,7 @@ body.nexus-home-page .home-sidebar-column {
 }
 
 .compose-quick-btn.highlight i {
-    color: #fff !important;
+    color: var(--color-white) !important;
 }
 
 /* Dark mode for simple compose prompt */
@@ -2031,7 +2031,7 @@ body.nexus-home-page .home-sidebar-column {
     background: linear-gradient(135deg, var(--color-primary-500), var(--color-purple-500));
     border: none;
     border-radius: var(--radius-lg);
-    color: #fff;
+    color: var(--color-white);
     font-weight: 700;
     font-size: var(--font-size-base);
     cursor: pointer;
@@ -2175,7 +2175,7 @@ body.nexus-home-page .home-sidebar-column {
     background: linear-gradient(135deg, var(--color-primary-500), var(--color-purple-500));
     border: none;
     border-radius: var(--radius-full);
-    color: #fff;
+    color: var(--color-white);
     font-weight: 600;
     font-size: var(--font-size-sm);
     cursor: pointer;
@@ -2621,7 +2621,7 @@ body.nexus-home-page .home-sidebar-column {
     bottom: 55px;
     left: 0;
     z-index: 1000;
-    background: var(--card-bg, #fff);
+    background: var(--card-bg, var(--color-white));
     border: 1px solid var(--border-color, var(--effect-black-8));
     border-radius: var(--radius-full);
     box-shadow:
@@ -2650,7 +2650,7 @@ body.nexus-home-page .home-sidebar-column {
 .emoji-picker-header {
     padding: var(--space-3) 14px;
     border-bottom: 1px solid var(--border-color, var(--effect-black-6));
-    background: linear-gradient(180deg, var(--card-bg, #fff) 0%, var(--effect-gray-50-100) 100%);
+    background: linear-gradient(180deg, var(--card-bg, var(--color-white)) 0%, var(--effect-gray-50-100) 100%);
 }
 
 .emoji-tabs {
@@ -2682,7 +2682,7 @@ body.nexus-home-page .home-sidebar-column {
 }
 
 .emoji-tab.active {
-    background: #fff;
+    background: var(--color-white);
     box-shadow: 0 2px 8px var(--effect-black-10);
     transform: scale(1.05);
 }
@@ -2755,7 +2755,7 @@ body.nexus-home-page .home-sidebar-column {
 }
 
 [data-theme="dark"] .emoji-picker-container {
-    background: #1e1e2f;
+    background: var(--color-slate-950);
     border-color: var(--effect-white-8);
     box-shadow:
         0 12px 48px var(--effect-black-40),
@@ -2764,7 +2764,7 @@ body.nexus-home-page .home-sidebar-column {
 }
 
 [data-theme="dark"] .emoji-picker-header {
-    background: linear-gradient(180deg, #1e1e2f 0%, #1a1a28 100%);
+    background: linear-gradient(180deg, var(--color-slate-950) 0%, var(--color-slate-950) 100%);
     border-color: var(--effect-white-6);
 }
 
@@ -3407,7 +3407,7 @@ body.nexus-home-page .home-sidebar-column {
             var(--effect-purple-95));
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
-    color: #fff;
+    color: var(--color-white);
     text-align: center;
     border-radius: var(--radius-md);
     padding: var(--space-4) 24px;
@@ -3560,7 +3560,7 @@ textarea:focus {
 
 .fb-card button.feed-action-pill.liked {
     background: linear-gradient(135deg, var(--color-pink-500), var(--color-rose-500)) !important;
-    color: #fff !important;
+    color: var(--color-white) !important;
 }
 
 .fb-card button.feed-action-pill:hover:not(.liked) {
@@ -3656,7 +3656,7 @@ textarea:focus {
 .dark .fb-card button.feed-action-pill.liked {
     background: linear-gradient(135deg, var(--color-pink-500), var(--color-rose-500)) !important;
     border: none !important;
-    color: #fff !important;
+    color: var(--color-white) !important;
 }
 
 [data-theme="dark"] .fb-card div[id^="comments-section"] {
@@ -4101,7 +4101,7 @@ textarea:focus {
 }
 
 .feed-event-box {
-    background: #fff0f6;
+    background: var(--color-pink-50);
     border-left: var(--space-1) solid var(--color-pink-600);
 }
 
@@ -4485,18 +4485,18 @@ textarea:focus {
 }
 
 .feed-listing-default {
-    background: linear-gradient(135deg, #F0F2F5, #E4E6EB);
-    --listing-color: #65676B;
+    background: linear-gradient(135deg, var(--color-gray-100), var(--color-gray-200));
+    --listing-color: var(--color-gray-600);
 }
 
 .feed-listing-offer {
-    background: linear-gradient(135deg, #E7F3FF, #D0E9FF);
-    --listing-color: #1877F2;
+    background: linear-gradient(135deg, var(--color-listing-info-bg-start), var(--color-listing-info-bg-end));
+    --listing-color: var(--color-facebook);
 }
 
 .feed-listing-request {
-    background: linear-gradient(135deg, #FFF4E3, #FFE3BF);
-    --listing-color: #F28B18;
+    background: linear-gradient(135deg, var(--color-listing-warn-bg-start), var(--color-listing-warn-bg-end));
+    --listing-color: var(--color-listing-warn);
 }
 
 [data-theme="dark"] .feed-listing-default {
@@ -4559,7 +4559,7 @@ textarea:focus {
     right: 0;
     margin-top: var(--space-1);
     min-width: 280px;
-    background: var(--feed-bg-card, #fff);
+    background: var(--feed-bg-card, var(--color-white));
     border-radius: var(--radius-md);
     box-shadow: 0 4px 24px var(--effect-black-25), 0 0 0 1px var(--effect-black-8);
     z-index: var(--z-notification, 1700);
@@ -4674,9 +4674,9 @@ textarea:focus {
     align-items: center;
     justify-content: center;
     font-size: var(--font-size-xs);
-    color: #fff;
+    color: var(--color-white);
     margin-left: -4px;
-    border: var(--space-0.5) solid var(--feed-bg-card, #fff);
+    border: var(--space-0.5) solid var(--feed-bg-card, var(--color-white));
 }
 
 .feed-reaction-icon:first-child {
@@ -7195,7 +7195,7 @@ h2.profile-display-name {
 }
 
 .badge-count {
-    color: #92400e;
+    color: var(--color-amber-800);
     font-size: var(--font-size-xs);
 }
 
@@ -7237,7 +7237,7 @@ h2.profile-display-name {
    BUTTON VARIANT STYLES
    ============================================ */
 .btn-warning {
-    background: #d4621f; /* WCAG 2.1 AA: 4.7:1 contrast */
+    background: var(--color-button-warning); /* WCAG 2.1 AA: 4.7:1 contrast */
     color: var(--color-white);
     box-shadow: 0 4px 15px var(--effect-orange-custom-35);
 }
@@ -7248,7 +7248,7 @@ h2.profile-display-name {
 }
 
 .btn-warning:hover {
-    background: #b85316; /* Darker on hover */
+    background: var(--color-button-warning-hover); /* Darker on hover */
     box-shadow: 0 8px 25px var(--effect-orange-custom-45);
 }
 
@@ -7262,7 +7262,7 @@ h2.profile-display-name {
 }
 
 .btn-danger {
-    background: #b91e0a; /* WCAG 2.1 AA: 6.8:1 contrast */
+    background: var(--color-button-danger-wcag); /* WCAG 2.1 AA: 6.8:1 contrast */
     color: var(--color-white);
     box-shadow: 0 4px 15px var(--effect-red-custom-35);
 }
@@ -7273,7 +7273,7 @@ h2.profile-display-name {
 }
 
 .btn-danger:hover {
-    background: #9a1908; /* Darker on hover */
+    background: var(--color-button-danger-hover); /* Darker on hover */
     box-shadow: 0 8px 25px var(--effect-red-custom-45);
 }
 
@@ -7352,7 +7352,7 @@ h2.profile-display-name {
 
 .featured-badge .badge-name {
     font-weight: 700;
-    color: #92400e;
+    color: var(--color-amber-800);
     font-size: var(--font-size-sm);
 }
 
@@ -8977,7 +8977,7 @@ h2.profile-display-name {
 }
 
 .dash-fab-item .icon-send {
-    background: linear-gradient(135deg, var(--color-success), #059669);
+    background: linear-gradient(135deg, var(--color-success), var(--color-emerald-600));
 }
 
 .dash-fab-item .icon-listing {
@@ -9309,7 +9309,7 @@ h2.profile-display-name {
 }
 
 [data-theme="dark"] .notif-item-new.unread {
-    background: #1e3a5f;
+    background: var(--color-selected-user-bg-dark);
 }
 
 [data-theme="dark"] .notif-item-new:hover {
@@ -9333,7 +9333,7 @@ h2.profile-display-name {
 }
 
 [data-theme="dark"] .notif-delete-btn:hover {
-    background: #450a0a;
+    background: var(--color-red-950);
     color: var(--color-red-400);
 }
 
@@ -9741,7 +9741,7 @@ h2.profile-display-name {
 }
 
 .notif-item-new.unread {
-    background: #f0f9ff;
+    background: var(--color-sky-50);
 }
 
 .notif-item-new:hover {

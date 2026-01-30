@@ -95,16 +95,21 @@
     --color-pink-50: #fdf2f8;   /* Pink 50 - Goals background lightest */
     --color-purple-500: #8b5cf6; /* Purple - Used for polls, magic */
     --color-purple-400: #a855f7; /* Purple 400 - Used for accents */
+    --color-orange-50: #fff7ed;  /* Orange 50 - Background lightest */
+    --color-orange-100: #ffedd5; /* Orange 100 - Background light */
     --color-orange-500: #f97316; /* Orange - Used for help, alerts */
     --color-orange-600: #ea580c; /* Orange 600 - Used for admin sections */
 
     /* Green palette - Goals */
+    --color-green-50: #f0fdf4;   /* Green 50 - Success background lightest */
+    --color-green-100: #dcfce7;  /* Green 100 - Success background light */
+    --color-green-200: #bbf7d0;  /* Green 200 - Success background */
+    --color-green-300: #86efac;  /* Green 300 - Success lighter */
+    --color-green-400: #4ade80;  /* Green 400 - Success light */
     --color-green-500: #22c55e;  /* Green 500 - Success, goals buddy */
     --color-green-600: #16a34a;  /* Green 600 - Success dark */
     --color-green-700: #15803d;  /* Green 700 - Success darker */
     --color-green-800: #166534;  /* Green 800 - Success darkest */
-    --color-green-400: #4ade80;  /* Green 400 - Success light */
-    --color-green-300: #86efac;  /* Green 300 - Success lighter */
 
     /* Lime palette - Goals index */
     --color-lime-500: #84cc16;   /* Lime 500 - Goals growth theme */
@@ -163,6 +168,9 @@
     --color-red-500: #ef4444;
     --color-red-600: #dc2626;
     --color-red-700: #b91c1c;
+    --color-red-800: #991b1b;
+    --color-red-900: #7f1d1d;
+    --color-red-950: #450a0a;
 
     /* ==========================================
        HIGH-IMPACT EXTENDED PALETTE
@@ -740,6 +748,11 @@
     /* Glass shadow expanded (31, 38, 135) */
     --color-glass-shadow-12: rgba(31, 38, 135, 0.12);
 
+    /* Fuchsia palette - Brand accent, magic effects */
+    --color-fuchsia-500: #d946ef;
+    --color-fuchsia-400: #e879f9;
+    --color-fuchsia-600: #c026d3;
+
     /* Fuchsia-500 opacity variants (217, 70, 239 = #d946ef) */
     --color-fuchsia-alpha-10: rgba(217, 70, 239, 0.1);
     --color-fuchsia-alpha-15: rgba(217, 70, 239, 0.15);
@@ -769,11 +782,20 @@
     --color-rose-800: #9f1239;
 
     /* Sky palette - Information, communication */
+    --color-sky-50: #f0f9ff;
+    --color-sky-100: #e0f2fe;
+    --color-sky-200: #bae6fd;
+    --color-sky-300: #7dd3fc;
+    --color-sky-400: #38bdf8;
     --color-sky-500: #0ea5e9;
     --color-sky-600: #0284c7;
     --color-sky-700: #0369a1;
     --color-sky-800: #075985;
     --color-sky-900: #0c4a6e;
+
+    /* Brand colors - Social platforms */
+    --color-facebook: #1877f2;
+    --color-whatsapp: #25d366;
 
     /* Yellow palette - Highlights, attention */
     --color-yellow-200: #fef08a;
@@ -872,6 +894,11 @@
     /* Listing type colors */
     --color-listing-offer: #00A86B;
     --color-listing-request: #FF8C42;
+    --color-listing-info-bg-start: #E7F3FF;
+    --color-listing-info-bg-end: #D0E9FF;
+    --color-listing-warn-bg-start: #FFF4E3;
+    --color-listing-warn-bg-end: #FFE3BF;
+    --color-listing-warn: #F28B18;
 
     /* WCAG-compliant button colors */
     --color-button-warning: #d4621f;
