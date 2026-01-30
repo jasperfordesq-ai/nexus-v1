@@ -2,6 +2,8 @@
 /**
  * Keyboard Shortcuts for Power Users
  * LEGENDARY FEATURE: Quick access to layout switcher and other features
+ *
+ * CSS: /httpdocs/assets/css/keyboard-shortcuts-modal.css
  */
 ?>
 
@@ -82,78 +84,36 @@
         // Create modal
         const modal = document.createElement('div');
         modal.id = 'keyboard-shortcuts-modal';
-        modal.style.cssText = `
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.7);
-            z-index: 999999;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            animation: fadeIn 0.2s ease;
-        `;
+        modal.className = 'keyboard-shortcuts-modal';
 
         modal.innerHTML = `
-            <div style="
-                background: white;
-                border-radius: 16px;
-                padding: 32px;
-                max-width: 600px;
-                width: 90%;
-                max-height: 80vh;
-                overflow-y: auto;
-                box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-                animation: slideUp 0.3s ease;
-            ">
-                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px;">
-                    <h2 style="margin: 0; font-size: 24px; font-weight: 700; color: #1f2937;">
-                        <i class="fa-solid fa-keyboard" style="color: #6366f1;"></i> Keyboard Shortcuts
+            <div class="keyboard-shortcuts-modal__content">
+                <div class="keyboard-shortcuts-modal__header">
+                    <h2 class="keyboard-shortcuts-modal__title">
+                        <i class="fa-solid fa-keyboard"></i> Keyboard Shortcuts
                     </h2>
-                    <button onclick="this.closest('#keyboard-shortcuts-modal').remove()" style="
-                        background: none;
-                        border: none;
-                        font-size: 24px;
-                        color: #9ca3af;
-                        cursor: pointer;
-                        padding: 0;
-                        width: 32px;
-                        height: 32px;
-                        display: flex;
-                        align-items: center;
-                        justify-content: center;
-                        border-radius: 8px;
-                        transition: all 0.2s;
-                    " onmouseover="this.style.background='#f3f4f6'" onmouseout="this.style.background='none'">
+                    <button class="keyboard-shortcuts-modal__close" onclick="this.closest('#keyboard-shortcuts-modal').remove()">
                         <i class="fa-solid fa-times"></i>
                     </button>
                 </div>
 
-                <div style="color: #6b7280; margin-bottom: 24px;">
+                <div class="keyboard-shortcuts-modal__description">
                     Power user shortcuts for faster navigation
                 </div>
 
-                <div style="display: flex; flex-direction: column; gap: 16px;">
-                    ${createShortcutRow('Ctrl+Shift+L', 'Open Layout Switcher', '#6366f1')}
-                    ${createShortcutRow('Ctrl+Shift+P', 'Preview Next Layout', '#8b5cf6')}
-                    ${createShortcutRow('Ctrl+Shift+K', 'Toggle Mobile Menu', '#059669')}
-                    ${createShortcutRow('Ctrl+Shift+H', 'Go to Home', '#0866ff')}
-                    ${createShortcutRow('Ctrl+Shift+/', 'Show This Help', '#f59e0b')}
+                <div class="keyboard-shortcuts-modal__list">
+                    ${createShortcutRow('Ctrl+Shift+L', 'Open Layout Switcher', 'primary')}
+                    ${createShortcutRow('Ctrl+Shift+P', 'Preview Next Layout', 'purple')}
+                    ${createShortcutRow('Ctrl+Shift+K', 'Toggle Mobile Menu', 'success')}
+                    ${createShortcutRow('Ctrl+Shift+H', 'Go to Home', 'blue')}
+                    ${createShortcutRow('Ctrl+Shift+/', 'Show This Help', 'warning')}
                 </div>
 
-                <div style="
-                    margin-top: 24px;
-                    padding: 16px;
-                    background: rgba(99, 102, 241, 0.05);
-                    border-left: 4px solid #6366f1;
-                    border-radius: 8px;
-                ">
-                    <div style="font-size: 13px; color: #4f46e5; font-weight: 600; margin-bottom: 4px;">
+                <div class="keyboard-shortcuts-modal__tip">
+                    <div class="keyboard-shortcuts-modal__tip-title">
                         <i class="fa-solid fa-lightbulb"></i> Pro Tip
                     </div>
-                    <div style="font-size: 13px; color: #6b7280;">
+                    <div class="keyboard-shortcuts-modal__tip-text">
                         On Mac, use Cmd instead of Ctrl for all shortcuts
                     </div>
                 </div>
@@ -179,74 +139,19 @@
         document.addEventListener('keydown', closeOnEscape);
     }
 
-    function createShortcutRow(keys, description, color) {
+    function createShortcutRow(keys, description, colorClass) {
+        const keyParts = keys.split('+');
+        const keyBadges = keyParts.map(key =>
+            `<span class="keyboard-shortcuts-modal__key keyboard-shortcuts-modal__key--${colorClass}">${key}</span>`
+        ).join('<span class="keyboard-shortcuts-modal__key-separator">+</span>');
+
         return `
-            <div style="
-                display: flex;
-                align-items: center;
-                justify-content: space-between;
-                padding: 12px;
-                background: #f9fafb;
-                border-radius: 8px;
-                transition: all 0.2s;
-            " onmouseover="this.style.background='#f3f4f6'" onmouseout="this.style.background='#f9fafb'">
-                <span style="font-size: 14px; color: #1f2937; font-weight: 500;">
-                    ${description}
-                </span>
-                <div style="
-                    display: flex;
-                    gap: 4px;
-                    font-family: 'Courier New', monospace;
-                    font-size: 13px;
-                    font-weight: 600;
-                ">
-                    ${keys.split('+').map(key => `
-                        <span style="
-                            background: ${color};
-                            color: white;
-                            padding: 4px 8px;
-                            border-radius: 4px;
-                            min-width: 32px;
-                            text-align: center;
-                        ">${key.charAt(0).toUpperCase() + key.slice(1)}</span>
-                    `).join('<span style="color: #9ca3af; padding: 0 4px;">+</span>')}
-                </div>
+            <div class="keyboard-shortcuts-modal__row">
+                <span class="keyboard-shortcuts-modal__row-label">${description}</span>
+                <div class="keyboard-shortcuts-modal__keys">${keyBadges}</div>
             </div>
         `;
     }
-
-    // Add CSS animations
-    const style = document.createElement('style');
-    style.textContent = `
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-
-        @keyframes slideUp {
-            from {
-                transform: translateY(20px);
-                opacity: 0;
-            }
-            to {
-                transform: translateY(0);
-                opacity: 1;
-            }
-        }
-
-        /* Keyboard shortcut hint badge in layout switcher link */
-        .keyboard-hint-badge {
-            background: rgba(99, 102, 241, 0.1);
-            color: #6366f1;
-            font-size: 10px;
-            font-weight: 700;
-            padding: 2px 6px;
-            border-radius: 4px;
-            font-family: 'Courier New', monospace;
-            margin-left: 6px;
-        }
-    `;
-    document.head.appendChild(style);
 
     console.log('%c🚀 Keyboard Shortcuts Loaded!', 'color: #6366f1; font-weight: bold; font-size: 14px;');
     console.log('%cPress Ctrl+Shift+/ to view all shortcuts', 'color: #6b7280; font-size: 12px;');

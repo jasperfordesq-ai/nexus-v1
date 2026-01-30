@@ -1,6 +1,7 @@
 <?php
 // Modern Connections Page
 // Path: views/modern/connections/index.php
+// CSS: /httpdocs/assets/css/connection-status.css
 
 if (session_status() === PHP_SESSION_NONE) session_start();
 
@@ -30,14 +31,14 @@ require __DIR__ . '/../../layouts/modern/header.php';
     <div class="connections-card">
         <div class="connections-header">
             <h2>
-                <i class="fa-solid fa-clock" style="color: #f59e0b;"></i>
+                <i class="fa-solid fa-clock icon-pending"></i>
                 Pending Requests
             </h2>
             <span class="pending-badge"><?= count($pending) ?> pending</span>
         </div>
         <div class="connections-body">
             <?php foreach ($pending as $req): ?>
-                <div class="connection-item" style="cursor: default;">
+                <div class="connection-item connection-item--pending">
                     <a href="<?= $basePath ?>/profile/<?= $req['requester_id'] ?? $req['id'] ?>" class="connection-avatar">
                         <?= webp_avatar($req['avatar_url'] ?? null, $req['requester_name'], 56) ?>
                     </a>
@@ -50,7 +51,7 @@ require __DIR__ . '/../../layouts/modern/header.php';
                         </div>
                     </div>
                     <div class="connection-actions">
-                        <form action="<?= $basePath ?>/connections/accept" method="POST" style="margin: 0;">
+                        <form action="<?= $basePath ?>/connections/accept" method="POST">
                             <input type="hidden" name="connection_id" value="<?= $req['id'] ?>">
                             <button type="submit" class="btn-accept">
                                 <i class="fa-solid fa-check"></i> Accept
@@ -67,7 +68,7 @@ require __DIR__ . '/../../layouts/modern/header.php';
     <div class="connections-card">
         <div class="connections-header">
             <h2>
-                <i class="fa-solid fa-user-group" style="color: #6366f1;"></i>
+                <i class="fa-solid fa-user-group icon-primary"></i>
                 My Friends
             </h2>
             <span class="connections-count"><?= count($friends) ?></span>
@@ -94,9 +95,9 @@ require __DIR__ . '/../../layouts/modern/header.php';
                         <div class="connection-avatar">
                             <?= webp_avatar($friend['avatar_url'] ?? null, $friend['name'], 56) ?>
                             <?php if ($friendIsOnline): ?>
-                                <span class="connection-online" style="background: #10b981;" title="Online now"></span>
+                                <span class="connection-online connection-online--active" title="Online now"></span>
                             <?php elseif ($friendIsRecent): ?>
-                                <span class="connection-online" style="background: #f59e0b;" title="Active today"></span>
+                                <span class="connection-online connection-online--recent" title="Active today"></span>
                             <?php endif; ?>
                         </div>
                         <div class="connection-info">
@@ -106,7 +107,7 @@ require __DIR__ . '/../../layouts/modern/header.php';
                                     <span><i class="fa-solid fa-location-dot"></i> <?= htmlspecialchars($friend['location']) ?></span>
                                 <?php endif; ?>
                                 <?php if ($friendIsOnline): ?>
-                                    <span style="color: #10b981;"><i class="fa-solid fa-circle" style="font-size: 8px;"></i> Online</span>
+                                    <span class="status-online"><i class="fa-solid fa-circle"></i> Online</span>
                                 <?php endif; ?>
                             </div>
                         </div>

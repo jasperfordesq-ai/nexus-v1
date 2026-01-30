@@ -1737,6 +1737,13 @@
  * Extracted from admin-header.php inline styles to fix load glitch
  */
 
+/* Anti-flicker base styles - Applied to html/body on admin pages */
+html.admin-page,
+body.admin-page {
+    background: #0a0e1a;
+    margin: 0;
+}
+
 /* Base Reset - Scoped to admin wrapper */
 .admin-gold-wrapper *,
 .admin-gold-wrapper *::before,
@@ -2569,6 +2576,10 @@
 
 .admin-search-section {
     margin-bottom: 0.5rem;
+}
+
+.admin-search-section.hidden {
+    display: none;
 }
 
 .admin-search-section-title {

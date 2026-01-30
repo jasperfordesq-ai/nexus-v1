@@ -8,7 +8,7 @@ module.exports = {
     ],
 
     // CSS files to purge
-    // Auto-discovered: 2026-01-29
+    // Auto-discovered: 2026-01-30
     css: [
         'httpdocs/assets/css/accessibility.css',
         'httpdocs/assets/css/achievements.css',
@@ -193,6 +193,7 @@ module.exports = {
         'httpdocs/assets/css/civicone/cookie-banner.css',
         'httpdocs/assets/css/components.css',
         'httpdocs/assets/css/compose-multidraw.css',
+        'httpdocs/assets/css/connection-status.css',
         'httpdocs/assets/css/consent-required.css',
         'httpdocs/assets/css/cookie-banner.css',
         'httpdocs/assets/css/cookie-preferences.css',
@@ -230,7 +231,9 @@ module.exports = {
         'httpdocs/assets/css/hover-interactions.css',
         'httpdocs/assets/css/image-lazy-load.css',
         'httpdocs/assets/css/js-utility-classes.css',
+        'httpdocs/assets/css/keyboard-shortcuts-modal.css',
         'httpdocs/assets/css/layout-isolation.css',
+        'httpdocs/assets/css/layout-preview-banner.css',
         'httpdocs/assets/css/listings-create.css',
         'httpdocs/assets/css/listings-index.css',
         'httpdocs/assets/css/listings-show.css',

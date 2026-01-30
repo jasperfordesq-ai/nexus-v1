@@ -242,6 +242,12 @@ if (!in_array('utilities-polish.css', $cssAlreadyInHead)):
 
 <?= syncCss('/assets/css/dev-notice-modal.css', $cssVersion, $assetBase) ?>
 
+<?= asyncCss('/assets/css/keyboard-shortcuts-modal.css', $cssVersion, $assetBase) ?>
+
+<?= asyncCss('/assets/css/layout-preview-banner.css', $cssVersion, $assetBase) ?>
+
+<?= asyncCss('/assets/css/connection-status.css', $cssVersion, $assetBase) ?>
+
 
 <!-- ==========================================
      11. NATIVE APP CSS (Capacitor)
