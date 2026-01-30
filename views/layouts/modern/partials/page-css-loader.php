@@ -160,9 +160,57 @@ $pageSpecificCSS = [
         'files' => ['listings-show.css']
     ],
 
-    // Federation/Transactions
-    'federation' => [
-        'condition' => strpos($normPath, '/federation') !== false || strpos($normPath, '/transactions') !== false,
+    // Federation - Core (always load for all federation routes)
+    'federation-core' => [
+        'condition' => strpos($normPath, '/federation') !== false,
+        'files' => ['federation/federation-core.css']
+    ],
+
+    // Federation - Hub landing page
+    'federation-hub' => [
+        'condition' => $normPath === '/federation' || preg_match('/\/federation$/', $normPath) || strpos($normPath, '/federation/hub') !== false,
+        'files' => ['federation/federation-hub.css']
+    ],
+
+    // Federation - Dashboard
+    'federation-dashboard' => [
+        'condition' => strpos($normPath, '/federation/dashboard') !== false,
+        'files' => ['federation/federation-dashboard.css']
+    ],
+
+    // Federation - Members
+    'federation-members' => [
+        'condition' => strpos($normPath, '/federation/members') !== false || preg_match('/\/federation\/member\//', $normPath),
+        'files' => ['federation/federation-members.css']
+    ],
+
+    // Federation - Groups
+    'federation-groups' => [
+        'condition' => strpos($normPath, '/federation/groups') !== false || preg_match('/\/federation\/group\//', $normPath),
+        'files' => ['federation/federation-groups.css']
+    ],
+
+    // Federation - Listings
+    'federation-listings' => [
+        'condition' => strpos($normPath, '/federation/listings') !== false || preg_match('/\/federation\/listing\//', $normPath),
+        'files' => ['federation/federation-listings.css']
+    ],
+
+    // Federation - Messages
+    'federation-messages' => [
+        'condition' => strpos($normPath, '/federation/messages') !== false,
+        'files' => ['federation/federation-messages.css']
+    ],
+
+    // Federation - Transactions
+    'federation-transactions' => [
+        'condition' => strpos($normPath, '/federation/transactions') !== false || strpos($normPath, '/federation/send') !== false,
+        'files' => ['federation/federation-transactions.css']
+    ],
+
+    // Wallet/Transactions (non-federation) - still uses the main federation.css for now
+    'wallet-transactions' => [
+        'condition' => strpos($normPath, '/transactions') !== false && strpos($normPath, '/federation') === false,
         'files' => ['federation.css']
     ],
 

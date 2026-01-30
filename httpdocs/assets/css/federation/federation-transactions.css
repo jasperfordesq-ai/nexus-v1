@@ -1,0 +1,778 @@
+/**
+ * Federation Transactions CSS
+ * Transaction listing, send form, enable-required pages
+ * Split from federation.css for modular loading
+ * Source: views/modern/federation/transactions/*.php
+ */
+
+/* =============================================
+   Transaction Create/Send Page
+   ============================================= */
+
+#fed-send-wrapper {
+    animation: fadeInUp 0.4s ease-out;
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 20px 0;
+}
+
+.send-card {
+    background: linear-gradient(135deg,
+            var(--effect-white-75),
+            var(--effect-white-60));
+    backdrop-filter: blur(20px) saturate(120%);
+    -webkit-backdrop-filter: blur(20px) saturate(120%);
+    border: 1px solid var(--effect-white-30);
+    border-radius: var(--radius-xl);
+    box-shadow: 0 8px 32px var(--effect-glass-shadow-heavy);
+    overflow: hidden;
+}
+
+[data-theme="dark"] .send-card {
+    background: linear-gradient(135deg,
+            var(--effect-slate-900-60),
+            var(--effect-slate-50));
+    border: 1px solid var(--effect-white-15);
+}
+
+.send-header {
+    background: linear-gradient(135deg,
+            var(--effect-purple-12) 0%,
+            var(--effect-violet-12) 50%,
+            var(--effect-purple-300-8) 100%);
+    padding: 30px;
+    text-align: center;
+    border-bottom: 1px solid var(--effect-white-20);
+}
+
+.send-header h1 {
+    font-size: 1.5rem;
+    font-weight: 800;
+    background: linear-gradient(135deg, var(--color-purple-600), var(--color-purple-500), var(--color-purple-400-alt));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin: 0 0 var(--space-2) 0;
+}
+
+.send-header h1 i {
+    margin-right: var(--space-2);
+}
+
+.balance-display {
+    font-size: 0.9rem;
+    color: var(--htb-text-muted);
+}
+
+.balance-display strong {
+    color: var(--color-success);
+}
+
+/* Recipient Section */
+.recipient-section {
+    padding: var(--space-6) 30px;
+    border-bottom: 1px solid var(--effect-purple-10);
+}
+
+.recipient-info {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+}
+
+.recipient-avatar {
+    width: 64px;
+    height: 64px;
+    border-radius: var(--radius-full);
+    object-fit: cover;
+    border: 3px solid var(--effect-purple-30);
+}
+
+.recipient-details h3 {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--htb-text-main);
+    margin: 0 0 var(--space-1) 0;
+}
+
+.recipient-tenant {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-1.5);
+    padding: var(--space-1) var(--space-2.5);
+    background: var(--effect-purple-10);
+    border-radius: var(--space-2.5);
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--color-purple-500);
+}
+
+[data-theme="dark"] .recipient-tenant {
+    background: var(--effect-purple-20);
+    color: var(--color-purple-400-alt);
+}
+
+/* Send Form */
+.send-form {
+    padding: 30px;
+}
+
+.form-group {
+    margin-bottom: var(--space-6);
+}
+
+.form-label {
+    display: block;
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: var(--htb-text-main);
+    margin-bottom: var(--space-2);
+}
+
+.amount-input-wrapper {
+    position: relative;
+}
+
+.amount-input {
+    width: 100%;
+    padding: 18px var(--space-5);
+    padding-right: 80px;
+    border: 2px solid var(--effect-purple-20);
+    border-radius: var(--space-3.5);
+    font-size: 1.5rem;
+    font-weight: 700;
+    background: var(--effect-white-80);
+    color: var(--htb-text-main);
+    text-align: center;
+}
+
+.amount-input:focus {
+    outline: none;
+    border-color: var(--effect-purple-50);
+    box-shadow: 0 0 0 4px var(--effect-purple-10);
+}
+
+[data-theme="dark"] .amount-input {
+    background: var(--effect-slate-900-80);
+}
+
+.amount-suffix {
+    position: absolute;
+    right: var(--space-5);
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 1rem;
+    color: var(--htb-text-muted);
+    font-weight: 600;
+}
+
+.quick-amounts {
+    display: flex;
+    gap: var(--space-2.5);
+    margin-top: var(--space-3);
+    flex-wrap: wrap;
+}
+
+.quick-amount-btn {
+    flex: 1;
+    min-width: 60px;
+    padding: var(--space-2.5);
+    border: 2px solid var(--effect-purple-20);
+    border-radius: var(--space-2.5);
+    background: transparent;
+    color: var(--color-purple-500);
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.quick-amount-btn:hover {
+    background: var(--effect-purple-10);
+    border-color: var(--effect-purple-40);
+}
+
+.description-input {
+    width: 100%;
+    padding: var(--space-3.5) var(--font-size-lg);
+    border: 2px solid var(--effect-purple-20);
+    border-radius: var(--space-3.5);
+    font-size: 1rem;
+    background: var(--effect-white-80);
+    color: var(--htb-text-main);
+    resize: vertical;
+    min-height: 100px;
+}
+
+.description-input:focus {
+    outline: none;
+    border-color: var(--effect-purple-50);
+}
+
+[data-theme="dark"] .description-input {
+    background: var(--effect-slate-900-80);
+}
+
+.send-btn {
+    width: 100%;
+    padding: var(--space-4);
+    background: linear-gradient(135deg, var(--color-purple-500), var(--color-purple-400-alt));
+    color: white;
+    border: none;
+    border-radius: var(--space-3.5);
+    font-size: 1.1rem;
+    font-weight: 800;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-2.5);
+}
+
+.send-btn:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px var(--effect-purple-40);
+}
+
+.send-btn:disabled,
+.send-btn.send-btn-disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* Privacy Notice */
+.privacy-notice {
+    margin-top: var(--space-5);
+    padding: var(--space-4);
+    background: var(--effect-purple-5);
+    border: 1px solid var(--effect-purple-15);
+    border-radius: var(--radius-md);
+    font-size: 0.85rem;
+    color: var(--htb-text-muted);
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-2.5);
+}
+
+.privacy-notice i {
+    color: var(--color-purple-500);
+    margin-top: var(--space-0.5);
+}
+
+/* Balance Alert */
+.send-balance-alert {
+    margin-top: 0.5rem;
+    padding: 0.75rem;
+    border-radius: var(--radius-base);
+    background: var(--effect-amber-20);
+    border: 1px solid var(--effect-amber-40);
+    color: var(--color-amber-300);
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+}
+
+[data-theme="dark"] .send-balance-alert {
+    background: var(--effect-amber-15);
+    color: var(--color-amber-300);
+}
+
+/* No Recipient State */
+.no-recipient {
+    text-align: center;
+    padding: var(--space-10);
+}
+
+.no-recipient-icon {
+    font-size: 3rem;
+    color: var(--color-purple-500);
+    margin-bottom: var(--space-4);
+}
+
+.no-recipient h3 {
+    color: var(--htb-text-main);
+    margin: 0 0 var(--space-2.5) 0;
+}
+
+.no-recipient p {
+    color: var(--htb-text-muted);
+    margin: 0 0 var(--space-5) 0;
+}
+
+.no-recipient .send-btn {
+    display: inline-flex;
+    width: auto;
+    padding: 12px var(--space-6);
+}
+
+/* =============================================
+   Enable Required Page (Opt-in)
+   ============================================= */
+
+#enable-wrapper {
+    animation: fadeInUp 0.4s ease-out;
+    max-width: 600px;
+    margin: 60px auto;
+    text-align: center;
+}
+
+.enable-card {
+    background: linear-gradient(135deg,
+            var(--effect-white-75),
+            var(--effect-white-60));
+    backdrop-filter: blur(20px) saturate(120%);
+    -webkit-backdrop-filter: blur(20px) saturate(120%);
+    border: 1px solid var(--effect-white-30);
+    border-radius: var(--radius-xl);
+    box-shadow: 0 8px 32px var(--effect-glass-shadow-heavy);
+    padding: 60px var(--space-10);
+}
+
+[data-theme="dark"] .enable-card {
+    background: linear-gradient(135deg,
+            var(--effect-slate-900-60),
+            var(--effect-slate-50));
+    border: 1px solid var(--effect-white-15);
+}
+
+.enable-icon {
+    width: 100px;
+    height: 100px;
+    margin: 0 auto 30px auto;
+    background: linear-gradient(135deg, var(--effect-purple-15), var(--effect-violet-10));
+    border-radius: var(--radius-full);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.enable-icon i {
+    font-size: 3rem;
+    color: var(--color-purple-500);
+}
+
+.enable-title {
+    font-size: 1.75rem;
+    font-weight: 800;
+    color: var(--htb-text-main);
+    margin: 0 0 15px 0;
+}
+
+.enable-message {
+    font-size: 1rem;
+    color: var(--htb-text-muted);
+    line-height: 1.7;
+    margin: 0 0 30px 0;
+}
+
+.enable-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2.5);
+    padding: 14px var(--space-7);
+    background: linear-gradient(135deg, var(--color-purple-500), var(--color-purple-400-alt));
+    color: white;
+    text-decoration: none;
+    border-radius: var(--space-3.5);
+    font-weight: 700;
+    font-size: 0.95rem;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 14px var(--effect-purple-35);
+}
+
+.enable-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px var(--effect-purple-45);
+}
+
+.info-note {
+    margin-top: 30px;
+    padding: var(--space-4);
+    background: var(--effect-purple-5);
+    border: 1px solid var(--effect-purple-15);
+    border-radius: var(--radius-md);
+    font-size: 0.85rem;
+    color: var(--htb-text-muted);
+    text-align: left;
+}
+
+.info-note h4 {
+    color: var(--htb-text-main);
+    font-size: 0.9rem;
+    margin: 0 0 var(--space-2) 0;
+}
+
+.info-note ul {
+    margin: 0;
+    padding-left: var(--space-5);
+}
+
+.info-note li {
+    margin-bottom: var(--space-1);
+}
+
+/* =============================================
+   Transactions List Page
+   ============================================= */
+
+#fed-transactions-wrapper {
+    animation: fadeInUp 0.4s ease-out;
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 20px 0;
+}
+
+/* Header Card */
+.transactions-header {
+    background: linear-gradient(135deg,
+            var(--effect-purple-12) 0%,
+            var(--effect-violet-12) 50%,
+            var(--effect-purple-300-8) 100%);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid var(--effect-white-40);
+    border-radius: var(--space-5);
+    padding: var(--space-6);
+    margin-bottom: var(--space-6);
+}
+
+[data-theme="dark"] .transactions-header {
+    background: linear-gradient(135deg,
+            var(--effect-purple-15) 0%,
+            var(--effect-violet-15) 50%,
+            var(--effect-purple-300-10) 100%);
+    border-color: var(--effect-white-10);
+}
+
+.transactions-header h1 {
+    font-size: 1.5rem;
+    font-weight: 800;
+    background: linear-gradient(135deg, var(--color-purple-600), var(--color-purple-500), var(--color-purple-400-alt));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin: 0 0 var(--space-4) 0;
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+}
+
+/* Stats Grid */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: var(--space-4);
+}
+
+.stat-card {
+    background: var(--effect-white-50);
+    border-radius: var(--space-3.5);
+    padding: var(--space-4);
+    text-align: center;
+}
+
+[data-theme="dark"] .stat-card {
+    background: var(--effect-white-10);
+}
+
+.stat-value {
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: var(--color-purple-500);
+}
+
+.stat-label {
+    font-size: 0.8rem;
+    color: var(--htb-text-muted);
+    margin-top: var(--space-1);
+}
+
+.stat-card.balance .stat-value {
+    color: var(--color-success);
+}
+
+/* Transaction List */
+.transactions-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+}
+
+.transaction-card {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+    padding: var(--space-5);
+    background: linear-gradient(135deg,
+            var(--effect-white-75),
+            var(--effect-white-60));
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid var(--effect-white-30);
+    border-radius: var(--radius-lg);
+    transition: all 0.3s ease;
+}
+
+[data-theme="dark"] .transaction-card {
+    background: linear-gradient(135deg,
+            var(--effect-slate-900-60),
+            var(--effect-slate-50));
+    border: 1px solid var(--effect-white-15);
+}
+
+.transaction-icon {
+    width: var(--space-12);
+    height: var(--space-12);
+    border-radius: var(--radius-full);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    flex-shrink: 0;
+}
+
+.transaction-icon.sent {
+    background: var(--effect-red-15);
+    color: var(--color-danger);
+}
+
+.transaction-icon.received {
+    background: var(--effect-emerald-15);
+    color: var(--color-success);
+}
+
+.transaction-details {
+    flex: 1;
+    min-width: 0;
+}
+
+.transaction-user {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--htb-text-main);
+    margin: 0 0 var(--space-1) 0;
+}
+
+.transaction-tenant {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-1);
+    font-size: 0.75rem;
+    color: var(--color-purple-500);
+    background: var(--effect-purple-10);
+    padding: var(--space-0.5) var(--space-2);
+    border-radius: var(--radius-base);
+    margin-bottom: var(--space-1);
+}
+
+.transaction-desc {
+    font-size: 0.85rem;
+    color: var(--htb-text-muted);
+}
+
+.transaction-amount {
+    text-align: right;
+}
+
+.transaction-amount .amount {
+    font-size: 1.25rem;
+    font-weight: 800;
+}
+
+.transaction-amount .amount.sent {
+    color: var(--color-danger);
+}
+
+.transaction-amount .amount.received {
+    color: var(--color-success);
+}
+
+.transaction-amount .time {
+    font-size: 0.75rem;
+    color: var(--htb-text-muted);
+}
+
+/* Transaction Actions */
+.transaction-actions {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+    margin-left: var(--space-3);
+}
+
+.review-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-1.5);
+    padding: 8px var(--space-3.5);
+    background: linear-gradient(135deg, var(--color-warning), var(--color-amber-300));
+    color: #1a1a1a;
+    text-decoration: none;
+    border-radius: var(--space-2.5);
+    font-size: 0.8rem;
+    font-weight: 700;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+}
+
+.review-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px var(--effect-amber-40);
+    color: #1a1a1a;
+}
+
+.review-btn.reviewed {
+    background: linear-gradient(135deg, var(--color-success), var(--color-emerald-400));
+    color: white;
+    pointer-events: none;
+}
+
+.status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-1);
+    padding: var(--space-1) var(--space-2.5);
+    border-radius: var(--radius-base);
+    font-size: 0.7rem;
+    font-weight: 600;
+}
+
+.status-badge.completed {
+    background: var(--effect-emerald-15);
+    color: var(--color-success);
+}
+
+.status-badge.pending {
+    background: var(--effect-amber-15);
+    color: var(--color-warning);
+}
+
+/* Empty State */
+.empty-state {
+    text-align: center;
+    padding: 60px var(--space-5);
+    background: linear-gradient(135deg,
+            var(--effect-white-70),
+            var(--effect-white-50));
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid var(--effect-white-30);
+    border-radius: var(--space-5);
+}
+
+[data-theme="dark"] .empty-state {
+    background: linear-gradient(135deg,
+            var(--effect-slate-900-60),
+            var(--effect-slate-50));
+    border: 1px solid var(--effect-white-15);
+}
+
+.empty-state-icon {
+    font-size: 4rem;
+    color: var(--color-purple-500);
+    margin-bottom: var(--space-5);
+}
+
+.find-members-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    padding: 12px var(--space-6);
+    background: linear-gradient(135deg, var(--color-purple-500), var(--color-purple-400-alt));
+    color: white;
+    text-decoration: none;
+    border-radius: var(--radius-md);
+    font-weight: 700;
+    transition: all 0.3s ease;
+    margin-top: var(--space-4);
+}
+
+.find-members-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px var(--effect-purple-40);
+}
+
+/* =============================================
+   Shared Components
+   ============================================= */
+
+/* Back Link */
+.back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    color: var(--htb-text-muted);
+    text-decoration: none;
+    font-size: 0.9rem;
+    margin-bottom: var(--space-5);
+    transition: color 0.2s;
+}
+
+.back-link:hover {
+    color: var(--color-purple-500);
+}
+
+/* =============================================
+   Touch Targets & Accessibility
+   ============================================= */
+
+.send-btn,
+.quick-amount-btn,
+.amount-input,
+.description-input,
+.enable-btn,
+.find-members-btn,
+.review-btn {
+    min-height: 44px;
+}
+
+/* Prevent zoom on iOS */
+.amount-input,
+.description-input {
+    font-size: 16px !important;
+}
+
+/* Focus Visible States */
+.send-btn:focus-visible,
+.quick-amount-btn:focus-visible,
+.amount-input:focus-visible,
+.description-input:focus-visible,
+.back-link:focus-visible,
+.enable-btn:focus-visible,
+.find-members-btn:focus-visible {
+    outline: 3px solid var(--effect-purple-50);
+    outline-offset: var(--space-0.5);
+}
+
+/* =============================================
+   Responsive Styles
+   ============================================= */
+
+@media (max-width: 640px) {
+    #fed-send-wrapper {
+        padding: 15px;
+    }
+
+    .send-header,
+    .recipient-section,
+    .send-form {
+        padding: var(--space-5);
+    }
+
+    .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .transaction-card {
+        flex-wrap: wrap;
+    }
+
+    .transaction-amount {
+        width: 100%;
+        text-align: left;
+        margin-top: var(--space-2);
+        padding-top: var(--space-2);
+        border-top: 1px solid var(--effect-purple-10);
+    }
+}
