@@ -524,14 +524,18 @@ class GamificationService
 
     /**
      * Award XP to a user and check for level up
+     * Uses transaction to ensure data integrity
      */
     public static function awardXP($userId, $amount, $action, $description = '')
     {
         if ($amount <= 0) return;
 
-        try {
-            $tenantId = TenantContext::getId();
+        $tenantId = TenantContext::getId();
+        $levelInfo = null;
 
+        Database::beginTransaction();
+
+        try {
             // Check if user already has this specific XP (prevent duplicates for one-time actions)
             $oneTimeActions = ['complete_profile'];
             if (in_array($action, $oneTimeActions)) {
@@ -539,7 +543,10 @@ class GamificationService
                     "SELECT id FROM user_xp_log WHERE tenant_id = ? AND user_id = ? AND action = ?",
                     [$tenantId, $userId, $action]
                 )->fetch();
-                if ($existing) return;
+                if ($existing) {
+                    Database::rollback();
+                    return;
+                }
             }
 
             // Log XP
@@ -559,6 +566,9 @@ class GamificationService
                 'progress' => self::getLevelProgress((int)($user['xp'] ?? 0), (int)($user['level'] ?? 1)),
             ];
 
+            Database::commit();
+
+            // Non-critical operations OUTSIDE transaction
             // Broadcast XP gain via Pusher
             GamificationRealtimeService::broadcastXPGained($userId, $amount, $description ?: $action, $levelInfo);
 
@@ -566,6 +576,7 @@ class GamificationService
             self::checkLevelUp($userId);
 
         } catch (\Throwable $e) {
+            Database::rollback();
             error_log("XP Award Error: " . $e->getMessage());
         }
     }

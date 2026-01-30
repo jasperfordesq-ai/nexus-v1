@@ -10,34 +10,26 @@ use Nexus\Services\XPShopService;
 use Nexus\Services\GamificationService;
 use Nexus\Services\LeaderboardSeasonService;
 
-class GamificationApiController
+/**
+ * GamificationApiController - Gamification API endpoints
+ *
+ * Handles daily rewards, challenges, badges, XP shop, and leaderboards.
+ */
+class GamificationApiController extends BaseApiController
 {
     /**
      * Check and award daily reward
      */
     public function checkDailyReward()
     {
-        header('Content-Type: application/json');
-
-        if (!isset($_SESSION['user_id'])) {
-            http_response_code(401);
-            echo json_encode(['success' => false, 'error' => 'Not logged in']);
-            exit;
-        }
+        $userId = $this->getUserId();
+        $this->rateLimit('daily_reward', 10, 60);
 
         try {
-            $reward = DailyRewardService::checkAndAwardDailyReward($_SESSION['user_id']);
-
-            echo json_encode([
-                'success' => true,
-                'reward' => $reward // null if already claimed
-            ]);
+            $reward = DailyRewardService::checkAndAwardDailyReward($userId);
+            $this->success(['reward' => $reward]); // null if already claimed
         } catch (\Throwable $e) {
-            // Table might not exist yet
-            echo json_encode([
-                'success' => false,
-                'error' => 'Daily rewards not available'
-            ]);
+            $this->error('Daily rewards not available', 500, 'SERVICE_UNAVAILABLE');
         }
     }
 
@@ -46,19 +38,14 @@ class GamificationApiController
      */
     public function getDailyStatus()
     {
-        header('Content-Type: application/json');
-
-        if (!isset($_SESSION['user_id'])) {
-            http_response_code(401);
-            echo json_encode(['error' => 'Not logged in']);
-            exit;
-        }
+        $userId = $this->getUserId();
+        $this->rateLimit('daily_status', 30, 60);
 
         try {
-            $status = DailyRewardService::getTodayStatus($_SESSION['user_id']);
-            echo json_encode(['success' => true, 'status' => $status]);
+            $status = DailyRewardService::getTodayStatus($userId);
+            $this->success(['status' => $status]);
         } catch (\Throwable $e) {
-            echo json_encode(['success' => false, 'error' => $e->getMessage()]);
+            $this->error($e->getMessage(), 500, 'SERVER_ERROR');
         }
     }
 
@@ -67,19 +54,14 @@ class GamificationApiController
      */
     public function getChallenges()
     {
-        header('Content-Type: application/json');
-
-        if (!isset($_SESSION['user_id'])) {
-            http_response_code(401);
-            echo json_encode(['error' => 'Not logged in']);
-            exit;
-        }
+        $userId = $this->getUserId();
+        $this->rateLimit('challenges', 30, 60);
 
         try {
-            $challenges = ChallengeService::getChallengesWithProgress($_SESSION['user_id']);
-            echo json_encode(['success' => true, 'challenges' => $challenges]);
+            $challenges = ChallengeService::getChallengesWithProgress($userId);
+            $this->success(['challenges' => $challenges]);
         } catch (\Throwable $e) {
-            echo json_encode(['success' => false, 'error' => $e->getMessage()]);
+            $this->error($e->getMessage(), 500, 'SERVER_ERROR');
         }
     }
 
@@ -88,19 +70,14 @@ class GamificationApiController
      */
     public function getCollections()
     {
-        header('Content-Type: application/json');
-
-        if (!isset($_SESSION['user_id'])) {
-            http_response_code(401);
-            echo json_encode(['error' => 'Not logged in']);
-            exit;
-        }
+        $userId = $this->getUserId();
+        $this->rateLimit('collections', 30, 60);
 
         try {
-            $collections = BadgeCollectionService::getCollectionsWithProgress($_SESSION['user_id']);
-            echo json_encode(['success' => true, 'collections' => $collections]);
+            $collections = BadgeCollectionService::getCollectionsWithProgress($userId);
+            $this->success(['collections' => $collections]);
         } catch (\Throwable $e) {
-            echo json_encode(['success' => false, 'error' => $e->getMessage()]);
+            $this->error($e->getMessage(), 500, 'SERVER_ERROR');
         }
     }
 
@@ -109,19 +86,14 @@ class GamificationApiController
      */
     public function getShopItems()
     {
-        header('Content-Type: application/json');
-
-        if (!isset($_SESSION['user_id'])) {
-            http_response_code(401);
-            echo json_encode(['error' => 'Not logged in']);
-            exit;
-        }
+        $userId = $this->getUserId();
+        $this->rateLimit('shop_items', 30, 60);
 
         try {
-            $data = XPShopService::getItemsWithUserStatus($_SESSION['user_id']);
-            echo json_encode(['success' => true, 'data' => $data]);
+            $data = XPShopService::getItemsWithUserStatus($userId);
+            $this->success($data);
         } catch (\Throwable $e) {
-            echo json_encode(['success' => false, 'error' => $e->getMessage()]);
+            $this->error($e->getMessage(), 500, 'SERVER_ERROR');
         }
     }
 
@@ -130,26 +102,26 @@ class GamificationApiController
      */
     public function purchaseItem()
     {
-        header('Content-Type: application/json');
+        $userId = $this->getUserId();
+        $this->verifyCsrf();
+        $this->rateLimit('purchase', 10, 60);
 
-        if (!isset($_SESSION['user_id'])) {
-            http_response_code(401);
-            echo json_encode(['error' => 'Not logged in']);
-            exit;
-        }
-
-        $itemId = $_POST['item_id'] ?? $_GET['item_id'] ?? null;
+        $itemId = $this->input('item_id') ?? $this->query('item_id');
 
         if (!$itemId) {
-            echo json_encode(['success' => false, 'error' => 'Item ID required']);
-            return;
+            $this->error('Item ID required', 400, 'VALIDATION_ERROR');
         }
 
         try {
-            $result = XPShopService::purchase($_SESSION['user_id'], $itemId);
-            echo json_encode($result);
+            $result = XPShopService::purchase($userId, $itemId);
+
+            if ($result['success'] ?? false) {
+                $this->success($result);
+            } else {
+                $this->error($result['error'] ?? 'Purchase failed', 400, 'PURCHASE_FAILED');
+            }
         } catch (\Throwable $e) {
-            echo json_encode(['success' => false, 'error' => $e->getMessage()]);
+            $this->error($e->getMessage(), 500, 'SERVER_ERROR');
         }
     }
 
@@ -158,17 +130,10 @@ class GamificationApiController
      */
     public function getSummary()
     {
-        header('Content-Type: application/json');
-
-        if (!isset($_SESSION['user_id'])) {
-            http_response_code(401);
-            echo json_encode(['error' => 'Not logged in']);
-            exit;
-        }
+        $userId = $this->getUserId();
+        $this->rateLimit('summary', 60, 60);
 
         try {
-            $userId = $_SESSION['user_id'];
-
             // Get basic stats
             $user = \Nexus\Core\Database::query(
                 "SELECT xp, level FROM users WHERE id = ?",
@@ -177,20 +142,17 @@ class GamificationApiController
 
             $badges = \Nexus\Models\UserBadge::getForUser($userId);
 
-            echo json_encode([
-                'success' => true,
-                'summary' => [
-                    'xp' => (int)($user['xp'] ?? 0),
-                    'level' => (int)($user['level'] ?? 1),
-                    'badges_count' => count($badges),
-                    'level_progress' => GamificationService::getLevelProgress(
-                        (int)($user['xp'] ?? 0),
-                        (int)($user['level'] ?? 1)
-                    )
-                ]
+            $this->success([
+                'xp' => (int)($user['xp'] ?? 0),
+                'level' => (int)($user['level'] ?? 1),
+                'badges_count' => count($badges),
+                'level_progress' => GamificationService::getLevelProgress(
+                    (int)($user['xp'] ?? 0),
+                    (int)($user['level'] ?? 1)
+                )
             ]);
         } catch (\Throwable $e) {
-            echo json_encode(['success' => false, 'error' => $e->getMessage()]);
+            $this->error($e->getMessage(), 500, 'SERVER_ERROR');
         }
     }
 
@@ -199,21 +161,17 @@ class GamificationApiController
      */
     public function updateShowcase()
     {
-        header('Content-Type: application/json');
+        $userId = $this->getUserId();
+        $this->verifyCsrf();
+        $this->rateLimit('update_showcase', 10, 60);
 
-        if (!isset($_SESSION['user_id'])) {
-            http_response_code(401);
-            echo json_encode(['error' => 'Not logged in']);
-            exit;
-        }
-
-        $badgeKeys = $_POST['badge_keys'] ?? [];
+        $badgeKeys = $this->input('badge_keys', []);
 
         try {
-            \Nexus\Models\UserBadge::updateShowcase($_SESSION['user_id'], $badgeKeys);
-            echo json_encode(['success' => true]);
+            \Nexus\Models\UserBadge::updateShowcase($userId, $badgeKeys);
+            $this->success(['message' => 'Showcase updated']);
         } catch (\Throwable $e) {
-            echo json_encode(['success' => false, 'error' => $e->getMessage()]);
+            $this->error($e->getMessage(), 500, 'SERVER_ERROR');
         }
     }
 
@@ -222,13 +180,12 @@ class GamificationApiController
      */
     public function getShowcasedBadges()
     {
-        header('Content-Type: application/json');
+        $this->rateLimit('showcased_badges', 60, 60);
 
-        $userId = $_GET['user_id'] ?? $_SESSION['user_id'] ?? null;
+        $userId = $this->queryInt('user_id') ?? $this->getOptionalUserId();
 
         if (!$userId) {
-            echo json_encode(['success' => false, 'error' => 'User ID required']);
-            return;
+            $this->error('User ID required', 400, 'VALIDATION_ERROR');
         }
 
         try {
@@ -242,9 +199,9 @@ class GamificationApiController
                 }
             }
 
-            echo json_encode(['success' => true, 'badges' => $badges]);
+            $this->success(['badges' => $badges]);
         } catch (\Throwable $e) {
-            echo json_encode(['success' => false, 'error' => $e->getMessage()]);
+            $this->error($e->getMessage(), 500, 'SERVER_ERROR');
         }
     }
 
@@ -253,16 +210,11 @@ class GamificationApiController
      */
     public function shareAchievement()
     {
-        header('Content-Type: application/json');
+        $this->getUserId();
+        $this->rateLimit('share_achievement', 30, 60);
 
-        if (!isset($_SESSION['user_id'])) {
-            http_response_code(401);
-            echo json_encode(['error' => 'Not logged in']);
-            exit;
-        }
-
-        $type = $_GET['type'] ?? 'badge';
-        $key = $_GET['key'] ?? '';
+        $type = $this->query('type', 'badge');
+        $key = $this->query('key', '');
 
         $shareData = [
             'title' => '',
@@ -297,7 +249,7 @@ class GamificationApiController
                 break;
         }
 
-        echo json_encode(['success' => true, 'share' => $shareData]);
+        $this->success(['share' => $shareData]);
     }
 
     /**
@@ -305,13 +257,13 @@ class GamificationApiController
      */
     public function getSeasons()
     {
-        header('Content-Type: application/json');
+        $this->rateLimit('seasons', 30, 60);
 
         try {
             $seasons = LeaderboardSeasonService::getAllSeasons();
-            echo json_encode(['success' => true, 'seasons' => $seasons]);
+            $this->success(['seasons' => $seasons]);
         } catch (\Throwable $e) {
-            echo json_encode(['success' => false, 'error' => $e->getMessage()]);
+            $this->error($e->getMessage(), 500, 'SERVER_ERROR');
         }
     }
 
@@ -320,19 +272,14 @@ class GamificationApiController
      */
     public function getCurrentSeason()
     {
-        header('Content-Type: application/json');
-
-        if (!isset($_SESSION['user_id'])) {
-            http_response_code(401);
-            echo json_encode(['error' => 'Not logged in']);
-            exit;
-        }
+        $userId = $this->getUserId();
+        $this->rateLimit('current_season', 30, 60);
 
         try {
-            $data = LeaderboardSeasonService::getSeasonWithUserData($_SESSION['user_id']);
-            echo json_encode(['success' => true, 'data' => $data]);
+            $data = LeaderboardSeasonService::getSeasonWithUserData($userId);
+            $this->success($data);
         } catch (\Throwable $e) {
-            echo json_encode(['success' => false, 'error' => $e->getMessage()]);
+            $this->error($e->getMessage(), 500, 'SERVER_ERROR');
         }
     }
 }

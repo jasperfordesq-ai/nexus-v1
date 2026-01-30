@@ -106,3 +106,30 @@
 .error-page .btn-outline:hover {
     background: var(--color-primary-500);
 }
+
+/* Private Profile Error Page */
+.error-private-profile {
+    text-align: center;
+    padding: 100px 20px;
+}
+
+.error-private-profile__icon {
+    font-size: 64px;
+    color: var(--color-gray-500, #64748b);
+    margin-bottom: 20px;
+}
+
+.error-private-profile__title {
+    font-size: 2rem;
+    margin-bottom: 15px;
+}
+
+.error-private-profile__message {
+    font-size: 1.1rem;
+    color: var(--color-gray-500, #64748b);
+}
+
+.error-private-profile__action {
+    margin-top: 20px;
+    display: inline-block;
+}

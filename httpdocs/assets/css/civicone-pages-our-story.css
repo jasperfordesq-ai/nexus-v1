@@ -230,7 +230,6 @@
     color: var(--color-white-alpha-90);
     font-size: 1.15rem;
     line-height: 1.7;
-    margin: 0;
     max-width: 600px;
     margin: 0 auto;
 }

@@ -39,7 +39,6 @@ body.chat-page {
     height: 100dvh;
     height: 100vh; /* Fallback for older browsers */
     width: 100%;
-    touch-action: manipulation;
     padding-bottom: 0 !important; /* Override mobile nav padding */
     /* Prevent text selection on UI elements */
     -webkit-user-select: none;

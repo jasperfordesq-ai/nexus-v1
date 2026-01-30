@@ -17,14 +17,17 @@ export class AdminDashboardPage extends BasePage {
   constructor(page: Page, tenant?: string) {
     super(page, tenant);
 
-    this.statsCards = page.locator('.admin-stat-card, .admin-stat, .stats-card, [data-stat]');
-    this.recentActivity = page.locator('.admin-activity-log, .recent-activity, .activity-log');
-    this.quickActions = page.locator('.admin-page-header-actions, .quick-actions, .admin-actions');
-    this.userCount = page.locator('.admin-stat-card:has-text("Members") .admin-stat-value, [data-stat="users"], .user-count');
-    this.listingCount = page.locator('.admin-stat-card:has-text("Listings") .admin-stat-value, [data-stat="listings"], .listing-count');
-    this.eventCount = page.locator('.admin-stat-card:has-text("Events") .admin-stat-value, [data-stat="events"], .event-count');
-    this.transactionCount = page.locator('.admin-stat-card:has-text("Transactions") .admin-stat-value, [data-stat="transactions"], .transaction-count');
-    this.sidebarNav = page.locator('.admin-sidebar, .admin-nav, .sidebar-nav, nav');
+    // Admin dashboard uses .admin-stats-grid with .admin-stat-card elements
+    this.statsCards = page.locator('.admin-stats-grid .admin-stat-card, .admin-stat-card');
+    this.recentActivity = page.locator('.admin-activity-list, .admin-activity-log, .recent-activity');
+    this.quickActions = page.locator('.admin-page-header-actions, .admin-quick-actions');
+    // Match actual labels: "Total Members", "Active Listings", "Transactions"
+    this.userCount = page.locator('.admin-stat-card:has-text("Total Members") .admin-stat-value, .admin-stat-card:has-text("Members") .admin-stat-value');
+    this.listingCount = page.locator('.admin-stat-card:has-text("Active Listings") .admin-stat-value, .admin-stat-card:has-text("Listings") .admin-stat-value');
+    this.eventCount = page.locator('.admin-stat-card:has-text("Events") .admin-stat-value');
+    this.transactionCount = page.locator('.admin-stat-card:has-text("Transactions") .admin-stat-value');
+    // Sidebar navigation - actual sidebar element from admin-header.php
+    this.sidebarNav = page.locator('aside.admin-sidebar, .admin-sidebar');
   }
 
   /**
@@ -75,12 +78,13 @@ export class AdminUsersPage extends BasePage {
   constructor(page: Page, tenant?: string) {
     super(page, tenant);
 
-    this.userTable = page.locator('.admin-table, .user-table, table');
-    this.userRows = page.locator('.admin-table tbody tr, tbody tr, .user-row');
-    this.searchInput = page.locator('.admin-search-input, input[name="search"], input[name="q"], input[placeholder*="Search"]');
-    this.filterDropdown = page.locator('.admin-filter-select, select[name="filter"], select[name="status"], [data-filter]');
-    this.bulkActions = page.locator('.admin-bulk-actions, .bulk-actions, [data-bulk]');
-    this.createUserButton = page.locator('.admin-btn-primary:has-text("Create"), .create-user-btn, a[href*="create"]');
+    this.userTable = page.locator('.admin-table, .admin-data-table, table');
+    this.userRows = page.locator('.admin-table tbody tr, .admin-data-table tbody tr, table tbody tr');
+    // Admin uses inline search or filter on the users page (not the modal)
+    this.searchInput = page.locator('input[name="search"], input[placeholder*="Search"], .admin-filter input[type="text"]');
+    this.filterDropdown = page.locator('.admin-filter-select, select[name="filter"], select[name="status"]');
+    this.bulkActions = page.locator('.admin-bulk-actions, [data-bulk-action]');
+    this.createUserButton = page.locator('.admin-btn-primary:has-text("Create"), .admin-btn:has-text("Add"), a[href*="create"]');
     this.pagination = page.locator('.admin-pagination, .pagination');
   }
 

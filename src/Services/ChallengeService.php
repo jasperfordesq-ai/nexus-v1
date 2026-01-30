@@ -77,40 +77,54 @@ class ChallengeService
         $completed = [];
 
         foreach ($challenges as $challenge) {
-            // Get or create progress record
-            $progress = Database::query(
-                "SELECT * FROM user_challenge_progress WHERE user_id = ? AND challenge_id = ?",
-                [$userId, $challenge['id']]
-            )->fetch();
+            // Use transaction for each challenge progress update
+            Database::beginTransaction();
 
-            if (!$progress) {
-                Database::query(
-                    "INSERT INTO user_challenge_progress (tenant_id, user_id, challenge_id, current_count)
-                     VALUES (?, ?, ?, ?)",
-                    [$tenantId, $userId, $challenge['id'], $increment]
-                );
-                $newCount = $increment;
-            } else {
-                if ($progress['completed_at']) {
-                    continue; // Already completed
-                }
-                $newCount = $progress['current_count'] + $increment;
-                Database::query(
-                    "UPDATE user_challenge_progress SET current_count = ? WHERE id = ?",
-                    [$newCount, $progress['id']]
-                );
-            }
-
-            // Check if just completed
-            if ($newCount >= $challenge['target_count']) {
-                Database::query(
-                    "UPDATE user_challenge_progress SET completed_at = NOW() WHERE user_id = ? AND challenge_id = ?",
+            try {
+                // Get or create progress record
+                $progress = Database::query(
+                    "SELECT * FROM user_challenge_progress WHERE user_id = ? AND challenge_id = ?",
                     [$userId, $challenge['id']]
-                );
+                )->fetch();
 
-                // Award rewards
-                self::awardChallengeReward($userId, $challenge);
-                $completed[] = $challenge;
+                if (!$progress) {
+                    Database::query(
+                        "INSERT INTO user_challenge_progress (tenant_id, user_id, challenge_id, current_count)
+                         VALUES (?, ?, ?, ?)",
+                        [$tenantId, $userId, $challenge['id'], $increment]
+                    );
+                    $newCount = $increment;
+                } else {
+                    if ($progress['completed_at']) {
+                        Database::commit();
+                        continue; // Already completed
+                    }
+                    $newCount = $progress['current_count'] + $increment;
+                    Database::query(
+                        "UPDATE user_challenge_progress SET current_count = ? WHERE id = ?",
+                        [$newCount, $progress['id']]
+                    );
+                }
+
+                // Check if just completed
+                if ($newCount >= $challenge['target_count']) {
+                    Database::query(
+                        "UPDATE user_challenge_progress SET completed_at = NOW() WHERE user_id = ? AND challenge_id = ?",
+                        [$userId, $challenge['id']]
+                    );
+
+                    Database::commit();
+
+                    // Award rewards outside transaction (non-critical)
+                    self::awardChallengeReward($userId, $challenge);
+                    $completed[] = $challenge;
+                } else {
+                    Database::commit();
+                }
+            } catch (\Throwable $e) {
+                Database::rollback();
+                error_log("ChallengeService::updateProgress error: " . $e->getMessage());
+                // Continue to next challenge
             }
         }
 
@@ -181,11 +195,15 @@ class ChallengeService
     }
 
     /**
-     * Get challenge by ID
+     * Get challenge by ID (with tenant scoping for security)
      */
     public static function getById($id)
     {
-        return Database::query("SELECT * FROM challenges WHERE id = ?", [$id])->fetch();
+        $tenantId = TenantContext::getId();
+        return Database::query(
+            "SELECT * FROM challenges WHERE id = ? AND tenant_id = ?",
+            [$id, $tenantId]
+        )->fetch();
     }
 
     /**

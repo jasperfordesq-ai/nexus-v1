@@ -290,7 +290,7 @@ textarea.admin-input {
     border-radius: 26px;
 }
 
-.admin-slider:before {
+.admin-slider::before {
     position: absolute;
     content: "";
     height: 20px;
@@ -306,7 +306,7 @@ textarea.admin-input {
     background: linear-gradient(135deg, var(--color-primary-500), var(--color-primary-600));
 }
 
-.admin-switch input:checked + .admin-slider:before {
+.admin-switch input:checked + .admin-slider::before {
     transform: translateX(24px);
 }
 

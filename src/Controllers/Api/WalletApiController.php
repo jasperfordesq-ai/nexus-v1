@@ -6,39 +6,39 @@ use Nexus\Core\Database;
 use Nexus\Models\Transaction;
 use Nexus\Models\User;
 use Nexus\Core\TenantContext;
-use Nexus\Core\ApiAuth;
 
-class WalletApiController
+/**
+ * WalletApiController - Financial operations API
+ *
+ * Handles balance queries, transfers, and transaction history.
+ * All financial operations are rate-limited for security.
+ */
+class WalletApiController extends BaseApiController
 {
-    use ApiAuth;
-
-    private function jsonResponse($data, $status = 200)
-    {
-        header('Content-Type: application/json');
-        http_response_code($status);
-        echo json_encode($data);
-        exit;
-    }
-
-    private function getUserId()
-    {
-        // Unified auth supporting both session and Bearer token
-        return $this->requireAuth();
-    }
-
+    /**
+     * GET /api/wallet/balance
+     * Get current user's balance
+     */
     public function balance()
     {
         $userId = $this->getUserId();
-        // Direct query or User model? User model has balance.
+        $this->rateLimit('wallet_balance', 60, 60);
+
         $user = User::findById($userId);
-        $this->jsonResponse(['balance' => $user['balance'] ?? 0]);
+        $this->success(['balance' => $user['balance'] ?? 0]);
     }
 
+    /**
+     * GET /api/wallet/transactions
+     * Get transaction history
+     */
     public function transactions()
     {
         $userId = $this->getUserId();
+        $this->rateLimit('wallet_transactions', 30, 60);
+
         $history = Transaction::getHistory($userId);
-        $this->jsonResponse(['data' => $history]);
+        $this->success($history);
     }
 
     /**
@@ -49,11 +49,12 @@ class WalletApiController
     public function userSearch()
     {
         $userId = $this->getUserId();
-        $input = json_decode(file_get_contents('php://input'), true);
-        $query = trim($input['query'] ?? '');
+        $this->rateLimit('wallet_user_search', 30, 60);
+
+        $query = trim($this->input('query', ''));
 
         if (strlen($query) < 1) {
-            $this->jsonResponse(['status' => 'success', 'users' => []]);
+            $this->success(['users' => []]);
         }
 
         $users = User::searchForWallet($query, $userId, 10);
@@ -68,26 +69,31 @@ class WalletApiController
             ];
         }, $users);
 
-        $this->jsonResponse(['status' => 'success', 'users' => $results]);
+        $this->success(['users' => $results]);
     }
 
+    /**
+     * POST /api/wallet/transfer
+     * Transfer time credits to another user
+     */
     public function transfer()
     {
         $senderId = $this->getUserId();
-        $input = json_decode(file_get_contents('php://input'), true);
+        $this->verifyCsrf();
+        $this->rateLimit('wallet_transfer', 10, 60); // Strict rate limit for transfers
 
         // Support both username (new) and email (legacy) for backwards compatibility
-        $recipientUsername = $input['username'] ?? null;
-        $recipientEmail = $input['email'] ?? null;
-        $amount = $input['amount'] ?? 0;
-        $description = $input['description'] ?? '';
+        $recipientUsername = $this->input('username');
+        $recipientEmail = $this->input('email');
+        $amount = $this->inputInt('amount', 0, 1);
+        $description = trim($this->input('description', ''));
 
-        if ((!$recipientUsername && !$recipientEmail) || !$amount) {
-            $this->jsonResponse(['error' => 'Missing fields'], 400);
+        if (!$recipientUsername && !$recipientEmail) {
+            $this->error('Recipient username or email required', 400, 'VALIDATION_ERROR');
         }
 
-        if ($amount <= 0) {
-            $this->jsonResponse(['error' => 'Invalid amount'], 400);
+        if (!$amount || $amount <= 0) {
+            $this->error('Invalid amount', 400, 'VALIDATION_ERROR');
         }
 
         // Find Recipient - prefer username over email
@@ -99,24 +105,25 @@ class WalletApiController
         }
 
         if (!$recipient) {
-            $this->jsonResponse(['error' => 'User not found'], 404);
+            $this->error('User not found', 404, 'USER_NOT_FOUND');
         }
 
         if ($recipient['id'] == $senderId) {
-            $this->jsonResponse(['error' => 'Cannot send to self'], 400);
+            $this->error('Cannot send to self', 400, 'VALIDATION_ERROR');
         }
 
         // Check Balance
         $sender = User::findById($senderId);
         if ($sender['balance'] < $amount) {
-            $this->jsonResponse(['error' => 'Insufficient funds'], 400);
+            $this->error('Insufficient funds', 400, 'INSUFFICIENT_FUNDS');
         }
 
         try {
             Transaction::create($senderId, $recipient['id'], $amount, $description);
-            $this->jsonResponse(['success' => true, 'message' => 'Transfer successful']);
+            $this->success(['message' => 'Transfer successful']);
         } catch (\Exception $e) {
-            $this->jsonResponse(['error' => $e->getMessage()], 500);
+            error_log("Wallet transfer error: " . $e->getMessage());
+            $this->error('Transfer failed', 500, 'TRANSFER_FAILED');
         }
     }
 
@@ -127,36 +134,39 @@ class WalletApiController
      */
     public function pendingCount()
     {
-        $userId = $this->getUserId();
+        $this->getUserId();
+        $this->rateLimit('wallet_pending', 60, 60);
 
         // Currently all transactions are instant (no pending status)
         // This endpoint exists for future pending transaction feature
-        // For now, return 0 to satisfy the badge API call
-        $this->jsonResponse(['count' => 0]);
+        $this->success(['count' => 0]);
     }
 
+    /**
+     * POST /api/wallet/delete
+     * Delete a transaction (soft delete from user's view)
+     */
     public function delete()
     {
         $userId = $this->getUserId();
-        $input = json_decode(file_get_contents('php://input'), true);
-        $id = $input['id'] ?? null;
+        $this->verifyCsrf();
+        $this->rateLimit('wallet_delete', 10, 60);
+
+        $id = $this->inputInt('id');
 
         if (!$id) {
-            $this->jsonResponse(['error' => 'Missing ID'], 400);
+            $this->error('Missing transaction ID', 400, 'VALIDATION_ERROR');
         }
 
-        // Verify ownership (Sender OR Receiver can delete?)
-        // Let's assume either party can delete the log from their view (HARD DELETE for POC)
-        // Ideally Soft Delete, but Hard Delete requested.
-        // SECURITY: Ensure user is part of the transaction
+        // SECURITY: Verify user is part of the transaction
         $sql = "SELECT * FROM transactions WHERE id = ? AND (sender_id = ? OR receiver_id = ?)";
         $trx = Database::query($sql, [$id, $userId, $userId])->fetch();
 
         if (!$trx) {
-            $this->jsonResponse(['error' => 'Transaction not found or denied'], 404);
+            $this->error('Transaction not found', 404, 'NOT_FOUND');
         }
 
-        Transaction::delete($id, $userId); // Pass userId for Soft Delete
-        $this->jsonResponse(['success' => true]);
+        Transaction::delete($id, $userId);
+        $this->success(['message' => 'Transaction deleted']);
     }
 }

@@ -259,7 +259,7 @@
     border-radius: 26px;
 }
 
-.admin-switch-slider:before {
+.admin-switch-slider::before {
     position: absolute;
     content: "";
     height: var(--space-5);
@@ -275,7 +275,7 @@
     background-color: var(--admin-success, var(--color-success));
 }
 
-.admin-switch input:checked + .admin-switch-slider:before {
+.admin-switch input:checked + .admin-switch-slider::before {
     transform: translateX(24px);
 }
 

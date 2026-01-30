@@ -573,7 +573,6 @@
 }
 
 .civic-settings-nav-link {
-    display: block;
     padding: var(--civic-help-spacing-sm) var(--civic-help-spacing-lg);
     text-decoration: none;
     color: var(--civic-help-text-primary);

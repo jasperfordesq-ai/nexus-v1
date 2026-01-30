@@ -108,7 +108,6 @@
 #privacy-glass-wrapper .privacy-page-header p {
     color: var(--htb-text-muted, var(--color-text-muted, var(--color-slate-500)));
     font-size: 1.15rem;
-    margin: 0;
     max-width: 600px;
     margin: 0 auto;
 }

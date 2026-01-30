@@ -11,46 +11,78 @@ class BadgeCollectionService
 {
     /**
      * Get all collections with user progress
+     *
+     * OPTIMIZED: Uses batch queries instead of N+1 pattern
+     * Before: 1 + N + (N*M) queries where N=collections, M=badges per collection
+     * After: 4 queries total regardless of collection/badge count
      */
     public static function getCollectionsWithProgress($userId)
     {
         $tenantId = TenantContext::getId();
 
-        // Get all collections
+        // Query 1: Get all collections
         $collections = Database::query(
             "SELECT * FROM badge_collections WHERE tenant_id = ? ORDER BY display_order ASC",
             [$tenantId]
         )->fetchAll();
 
-        // Get user's earned badges
-        $userBadges = UserBadge::getForUser($userId);
-        $earnedKeys = array_column($userBadges, 'badge_key');
+        if (empty($collections)) {
+            return [];
+        }
 
-        // Get user's completed collections
+        // Query 2: Get ALL collection items in a single query
+        $collectionIds = array_column($collections, 'id');
+        $placeholders = implode(',', array_fill(0, count($collectionIds), '?'));
+
+        $allItems = Database::query(
+            "SELECT collection_id, badge_key, display_order
+             FROM badge_collection_items
+             WHERE collection_id IN ({$placeholders})
+             ORDER BY collection_id, display_order ASC",
+            $collectionIds
+        )->fetchAll();
+
+        // Group items by collection_id for O(1) lookup
+        $itemsByCollection = [];
+        $allBadgeKeys = [];
+        foreach ($allItems as $item) {
+            $itemsByCollection[$item['collection_id']][] = $item;
+            $allBadgeKeys[$item['badge_key']] = true;
+        }
+
+        // Query 3: Get user's earned badges
+        $userBadges = UserBadge::getForUser($userId);
+        $earnedKeys = array_flip(array_column($userBadges, 'badge_key'));
+
+        // Query 4: Get user's completed collections
         $completedCollections = Database::query(
             "SELECT collection_id FROM user_collection_completions WHERE user_id = ?",
             [$userId]
         )->fetchAll(\PDO::FETCH_COLUMN);
+        $completedMap = array_flip($completedCollections ?: []);
 
+        // Build badge definitions map (in-memory, no DB query - uses cached definitions)
+        $badgeDefsMap = self::getBadgeDefinitionsMap(array_keys($allBadgeKeys));
+
+        // Assemble collections with progress using O(1) lookups
         foreach ($collections as &$collection) {
-            // Get badges in this collection
-            $badges = Database::query(
-                "SELECT bci.badge_key, bci.display_order FROM badge_collection_items bci
-                 WHERE bci.collection_id = ?
-                 ORDER BY bci.display_order ASC",
-                [$collection['id']]
-            )->fetchAll();
+            $collectionId = $collection['id'];
+            $items = $itemsByCollection[$collectionId] ?? [];
 
             $collection['badges'] = [];
             $collection['earned_count'] = 0;
-            $collection['total_count'] = count($badges);
+            $collection['total_count'] = count($items);
 
-            foreach ($badges as $badge) {
-                $badgeDef = GamificationService::getBadgeByKey($badge['badge_key']);
+            foreach ($items as $item) {
+                $badgeKey = $item['badge_key'];
+                $badgeDef = $badgeDefsMap[$badgeKey] ?? null;
+
                 if ($badgeDef) {
-                    $badgeDef['earned'] = in_array($badge['badge_key'], $earnedKeys);
+                    $isEarned = isset($earnedKeys[$badgeKey]);
+                    $badgeDef['earned'] = $isEarned;
                     $collection['badges'][] = $badgeDef;
-                    if ($badgeDef['earned']) {
+
+                    if ($isEarned) {
                         $collection['earned_count']++;
                     }
                 }
@@ -60,55 +92,99 @@ class BadgeCollectionService
                 ? round(($collection['earned_count'] / $collection['total_count']) * 100)
                 : 0;
             $collection['is_completed'] = $collection['earned_count'] >= $collection['total_count'] && $collection['total_count'] > 0;
-            $collection['bonus_claimed'] = in_array($collection['id'], $completedCollections);
+            $collection['bonus_claimed'] = isset($completedMap[$collectionId]);
         }
 
         return $collections;
     }
 
     /**
+     * Build a map of badge definitions for fast O(1) lookup
+     *
+     * @param array $keys Badge keys to include (uses all if empty)
+     * @return array Map of badge_key => definition
+     */
+    private static function getBadgeDefinitionsMap(array $keys = []): array
+    {
+        $allDefs = GamificationService::getBadgeDefinitions();
+        $map = [];
+        $keysToFind = empty($keys) ? null : array_flip($keys);
+
+        foreach ($allDefs as $def) {
+            if ($keysToFind === null || isset($keysToFind[$def['key']])) {
+                $map[$def['key']] = $def;
+            }
+        }
+
+        return $map;
+    }
+
+    /**
      * Check and award collection completion
+     *
+     * OPTIMIZED: Batch queries instead of per-collection queries
      */
     public static function checkCollectionCompletion($userId)
     {
         $tenantId = TenantContext::getId();
         $completedCollections = [];
 
-        // Get all collections
+        // Query 1: Get all collections
         $collections = Database::query(
             "SELECT * FROM badge_collections WHERE tenant_id = ?",
             [$tenantId]
         )->fetchAll();
 
-        // Get user's earned badges
+        if (empty($collections)) {
+            return [];
+        }
+
+        // Query 2: Get user's earned badges (uses O(1) lookup)
         $userBadges = UserBadge::getForUser($userId);
-        $earnedKeys = array_column($userBadges, 'badge_key');
+        $earnedKeys = array_flip(array_column($userBadges, 'badge_key'));
 
+        // Query 3: Get ALL already-completed collections for this user in one query
+        $alreadyCompleted = Database::query(
+            "SELECT collection_id FROM user_collection_completions WHERE user_id = ?",
+            [$userId]
+        )->fetchAll(\PDO::FETCH_COLUMN);
+        $completedMap = array_flip($alreadyCompleted ?: []);
+
+        // Query 4: Get ALL badge collection items in one batch
+        $collectionIds = array_column($collections, 'id');
+        $placeholders = implode(',', array_fill(0, count($collectionIds), '?'));
+
+        $allItems = Database::query(
+            "SELECT collection_id, badge_key FROM badge_collection_items WHERE collection_id IN ({$placeholders})",
+            $collectionIds
+        )->fetchAll();
+
+        // Group badges by collection for O(1) lookup
+        $badgesByCollection = [];
+        foreach ($allItems as $item) {
+            $badgesByCollection[$item['collection_id']][] = $item['badge_key'];
+        }
+
+        // Check each collection using pre-fetched data
         foreach ($collections as $collection) {
-            // Check if already completed
-            $existing = Database::query(
-                "SELECT id FROM user_collection_completions WHERE user_id = ? AND collection_id = ?",
-                [$userId, $collection['id']]
-            )->fetch();
+            $collectionId = $collection['id'];
 
-            if ($existing) {
+            // Skip if already completed
+            if (isset($completedMap[$collectionId])) {
                 continue;
             }
 
-            // Get badges in collection
-            $badges = Database::query(
-                "SELECT badge_key FROM badge_collection_items WHERE collection_id = ?",
-                [$collection['id']]
-            )->fetchAll(\PDO::FETCH_COLUMN);
+            // Get badges for this collection from pre-fetched map
+            $badges = $badgesByCollection[$collectionId] ?? [];
 
             if (empty($badges)) {
                 continue;
             }
 
-            // Check if all badges earned
+            // Check if all badges earned (O(1) lookup per badge)
             $allEarned = true;
             foreach ($badges as $badgeKey) {
-                if (!in_array($badgeKey, $earnedKeys)) {
+                if (!isset($earnedKeys[$badgeKey])) {
                     $allEarned = false;
                     break;
                 }
@@ -219,11 +295,15 @@ class BadgeCollectionService
     }
 
     /**
-     * Get collection by ID
+     * Get collection by ID (with tenant scoping for security)
      */
     public static function getById($id)
     {
-        $collection = Database::query("SELECT * FROM badge_collections WHERE id = ?", [$id])->fetch();
+        $tenantId = TenantContext::getId();
+        $collection = Database::query(
+            "SELECT * FROM badge_collections WHERE id = ? AND tenant_id = ?",
+            [$id, $tenantId]
+        )->fetch();
 
         if ($collection) {
             $collection['badges'] = Database::query(

@@ -364,7 +364,6 @@
         flex: 1;
         padding: var(--space-3);
         border-radius: var(--radius-md);
-        border: none;
         font-weight: var(--font-weight-semibold);
         cursor: pointer;
         font-size: var(--font-size-sm);
