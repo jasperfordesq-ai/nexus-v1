@@ -26,9 +26,9 @@
     right: 0;
     bottom: 0;
     background:
-        radial-gradient(ellipse 80% 50% at 20% 40%, rgba(249, 115, 22, 0.15) 0%, transparent 50%),
-        radial-gradient(ellipse 60% 40% at 80% 60%, rgba(234, 88, 12, 0.12) 0%, transparent 50%),
-        radial-gradient(ellipse 50% 30% at 50% 80%, rgba(251, 191, 36, 0.1) 0%, transparent 50%);
+        radial-gradient(ellipse 80% 50% at 20% 40%, var(--color-orange-alpha-15) 0%, transparent 50%),
+        radial-gradient(ellipse 60% 40% at 80% 60%, var(--color-orange-600-alpha-12) 0%, transparent 50%),
+        radial-gradient(ellipse 50% 30% at 50% 80%, var(--color-amber-alpha-10) 0%, transparent 50%);
     pointer-events: none;
     z-index: -1;
     animation: holoShift 20s ease-in-out infinite alternate;
@@ -36,9 +36,9 @@
 
 [data-theme="dark"] .holo-calendar-page::before {
     background:
-        radial-gradient(ellipse 80% 50% at 20% 40%, rgba(249, 115, 22, 0.2) 0%, transparent 50%),
-        radial-gradient(ellipse 60% 40% at 80% 60%, rgba(234, 88, 12, 0.15) 0%, transparent 50%),
-        radial-gradient(ellipse 50% 30% at 50% 80%, rgba(251, 191, 36, 0.12) 0%, transparent 50%);
+        radial-gradient(ellipse 80% 50% at 20% 40%, var(--color-orange-alpha-20) 0%, transparent 50%),
+        radial-gradient(ellipse 60% 40% at 80% 60%, var(--color-orange-600-alpha-15) 0%, transparent 50%),
+        radial-gradient(ellipse 50% 30% at 50% 80%, var(--color-amber-alpha-12) 0%, transparent 50%);
 }
 
 @keyframes holoShift {
@@ -143,9 +143,9 @@
 }
 
 .holo-nav-btn-secondary {
-    background: rgba(255, 255, 255, 0.6);
+    background: var(--color-white-alpha-60);
     color: var(--htb-text-main, var(--color-slate-800));
-    border: 1px solid rgba(0, 0, 0, 0.08);
+    border: 1px solid var(--color-black-alpha-8);
 }
 
 [data-theme="dark"] .holo-nav-btn-secondary {
