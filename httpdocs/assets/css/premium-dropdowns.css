@@ -8,20 +8,20 @@
     position: relative !important;
     display: inline-block !important;
     background: linear-gradient(135deg,
-        rgba(99, 102, 241, 0.15) 0%,
-        rgba(139, 92, 246, 0.12) 100%) !important;
+        var(--color-indigo-alpha-15) 0%,
+        var(--color-violet-alpha-12) 100%) !important;
     backdrop-filter: blur(16px) saturate(160%) !important;
     -webkit-backdrop-filter: blur(16px) saturate(160%) !important;
-    border: 1px solid rgba(139, 92, 246, 0.25) !important;
+    border: 1px solid var(--color-violet-alpha-25) !important;
     border-radius: var(--radius-base) !important;
     padding: var(--space-2) var(--space-4) !important;
     font-weight: var(--font-weight-semibold) !important;
-    color: rgba(255, 255, 255, 0.95) !important;
-    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.15) !important;
+    color: var(--color-white-alpha-95) !important;
+    text-shadow: 0 2px 8px var(--color-black-alpha-15) !important;
     box-shadow:
-        0 2px 12px rgba(99, 102, 241, 0.12),
-        0 4px 20px rgba(139, 92, 246, 0.08),
-        inset 0 1px 0 rgba(255, 255, 255, 0.1) !important;
+        0 2px 12px var(--color-indigo-alpha-12),
+        0 4px 20px var(--color-violet-alpha-8),
+        inset 0 1px 0 var(--color-white-alpha-10) !important;
     transition: all 0.35s var(--ease-in-out) !important;
     overflow: visible !important;
 }
@@ -36,7 +36,7 @@
     height: 100% !important;
     background: linear-gradient(90deg,
         transparent,
-        rgba(255, 255, 255, 0.12),
+        var(--color-white-alpha-12),
         transparent) !important;
     transition: left var(--transition-slow) ease !important;
     pointer-events: none !important;
@@ -50,14 +50,14 @@
 /* Hover state - enhanced glow */
 .premium-dropdown-trigger:hover {
     background: linear-gradient(135deg,
-        rgba(99, 102, 241, 0.22) 0%,
-        rgba(139, 92, 246, 0.18) 100%) !important;
-    border-color: rgba(139, 92, 246, 0.35) !important;
+        var(--color-indigo-alpha-22) 0%,
+        var(--color-violet-alpha-18) 100%) !important;
+    border-color: var(--color-violet-alpha-35) !important;
     box-shadow:
-        0 4px 20px rgba(99, 102, 241, 0.2),
-        0 6px 32px rgba(139, 92, 246, 0.15),
-        0 0 0 3px rgba(99, 102, 241, 0.08),
-        inset 0 1px 0 rgba(255, 255, 255, 0.15) !important;
+        0 4px 20px var(--color-indigo-alpha-20),
+        0 6px 32px var(--color-violet-alpha-15),
+        0 0 0 3px var(--color-indigo-alpha-8),
+        inset 0 1px 0 var(--color-white-alpha-15) !important;
     transform: translateY(-1px) !important;
     color: var(--color-white) !important;
 }
@@ -66,14 +66,14 @@
 .premium-dropdown:hover .premium-dropdown-trigger,
 .premium-dropdown-trigger:active {
     background: linear-gradient(135deg,
-        rgba(99, 102, 241, 0.28) 0%,
-        rgba(139, 92, 246, 0.24) 100%) !important;
-    border-color: rgba(139, 92, 246, 0.45) !important;
+        var(--color-indigo-alpha-28) 0%,
+        var(--color-violet-alpha-24) 100%) !important;
+    border-color: var(--color-violet-alpha-45) !important;
     box-shadow:
-        0 6px 28px rgba(99, 102, 241, 0.25),
-        0 8px 40px rgba(139, 92, 246, 0.2),
-        0 0 0 4px rgba(99, 102, 241, 0.1),
-        inset 0 1px 0 rgba(255, 255, 255, 0.2) !important;
+        0 6px 28px var(--color-indigo-alpha-25),
+        0 8px 40px var(--color-violet-alpha-20),
+        0 0 0 4px var(--color-indigo-alpha-10),
+        inset 0 1px 0 var(--color-white-alpha-20) !important;
     transform: translateY(-2px) scale(1.02) !important;
 }
 
@@ -99,17 +99,17 @@
 /* Premium Dropdown Menu Styling */
 .premium-dropdown-menu {
     background: linear-gradient(135deg,
-        rgba(30, 41, 59, 0.98) 0%,
-        rgba(51, 65, 85, 0.96) 100%) !important;
+        var(--color-slate-800-alpha-98) 0%,
+        var(--color-slate-600-alpha-96) 100%) !important;
     backdrop-filter: blur(28px) saturate(180%) !important;
     -webkit-backdrop-filter: blur(28px) saturate(180%) !important;
-    border: 1px solid rgba(139, 92, 246, 0.2) !important;
+    border: 1px solid var(--color-violet-alpha-20) !important;
     border-radius: var(--radius-md) !important;
     box-shadow:
-        0 8px 32px rgba(0, 0, 0, 0.3),
-        0 12px 48px rgba(99, 102, 241, 0.15),
-        0 0 0 1px rgba(255, 255, 255, 0.05),
-        inset 0 1px 0 rgba(255, 255, 255, 0.08) !important;
+        0 8px 32px var(--color-black-alpha-30),
+        0 12px 48px var(--color-indigo-alpha-15),
+        0 0 0 1px var(--color-white-alpha-5),
+        inset 0 1px 0 var(--color-white-alpha-8) !important;
     margin-top: var(--space-3) !important;
     padding: var(--space-2) 0 !important;
     min-width: 200px !important;
@@ -118,7 +118,7 @@
 
 /* Dropdown menu items */
 .premium-dropdown-menu a {
-    color: rgba(255, 255, 255, 0.9) !important;
+    color: var(--color-white-alpha-90) !important;
     padding: var(--space-2) var(--space-5) !important;
     transition: all var(--transition-base) var(--ease-in-out) !important;
     position: relative !important;
@@ -133,8 +133,8 @@
     height: 100% !important;
     width: 3px !important;
     background: linear-gradient(180deg,
-        rgba(99, 102, 241, 0.8),
-        rgba(139, 92, 246, 0.8)) !important;
+        var(--color-indigo-alpha-80),
+        var(--color-violet-alpha-80)) !important;
     transform: scaleY(0) !important;
     transition: transform var(--transition-base) !important;
 }
@@ -145,11 +145,11 @@
 
 .premium-dropdown-menu a:hover {
     background: linear-gradient(90deg,
-        rgba(99, 102, 241, 0.15) 0%,
-        rgba(139, 92, 246, 0.08) 100%) !important;
+        var(--color-indigo-alpha-15) 0%,
+        var(--color-violet-alpha-8) 100%) !important;
     color: var(--color-white) !important;
     padding-left: var(--space-6) !important;
-    text-shadow: 0 2px 8px rgba(99, 102, 241, 0.3) !important;
+    text-shadow: 0 2px 8px var(--color-indigo-alpha-30) !important;
 }
 
 /* Arrow styling for dropdown triggers */
@@ -167,10 +167,10 @@
 .premium-dropdown-trigger:focus {
     outline: none !important;
     box-shadow:
-        0 6px 28px rgba(99, 102, 241, 0.25),
-        0 8px 40px rgba(139, 92, 246, 0.2),
-        0 0 0 4px rgba(99, 102, 241, 0.15),
-        inset 0 1px 0 rgba(255, 255, 255, 0.2) !important;
+        0 6px 28px var(--color-indigo-alpha-25),
+        0 8px 40px var(--color-violet-alpha-20),
+        0 0 0 4px var(--color-indigo-alpha-15),
+        inset 0 1px 0 var(--color-white-alpha-20) !important;
 }
 
 /* ========================================
@@ -178,39 +178,39 @@
    ======================================== */
 [data-theme="light"] .premium-dropdown-trigger {
     background: linear-gradient(135deg,
-        rgba(99, 102, 241, 0.1) 0%,
-        rgba(139, 92, 246, 0.08) 100%) !important;
-    border: 1px solid rgba(99, 102, 241, 0.2) !important;
+        var(--color-indigo-alpha-10) 0%,
+        var(--color-violet-alpha-8) 100%) !important;
+    border: 1px solid var(--color-indigo-alpha-20) !important;
     color: var(--color-primary-600) !important;
     text-shadow: none !important;
     box-shadow:
-        0 2px 12px rgba(99, 102, 241, 0.1),
+        0 2px 12px var(--color-indigo-alpha-10),
         inset 0 1px 0 rgba(255, 255, 255, 0.5) !important;
 }
 
 [data-theme="light"] .premium-dropdown-trigger:hover {
     background: linear-gradient(135deg,
-        rgba(99, 102, 241, 0.15) 0%,
-        rgba(139, 92, 246, 0.12) 100%) !important;
-    border-color: rgba(99, 102, 241, 0.3) !important;
+        var(--color-indigo-alpha-15) 0%,
+        var(--color-violet-alpha-12) 100%) !important;
+    border-color: var(--color-indigo-alpha-30) !important;
     color: var(--color-primary-700) !important;
 }
 
 [data-theme="light"] .premium-dropdown:hover .premium-dropdown-trigger,
 [data-theme="light"] .premium-dropdown-trigger:active {
     background: linear-gradient(135deg,
-        rgba(99, 102, 241, 0.2) 0%,
-        rgba(139, 92, 246, 0.15) 100%) !important;
+        var(--color-indigo-alpha-20) 0%,
+        var(--color-violet-alpha-15) 100%) !important;
     border-color: rgba(99, 102, 241, 0.4) !important;
     color: var(--color-primary-700) !important;
 }
 
 [data-theme="light"] .premium-dropdown-menu {
     background: rgba(255, 255, 255, 0.98) !important;
-    border: 1px solid rgba(99, 102, 241, 0.15) !important;
+    border: 1px solid var(--color-indigo-alpha-15) !important;
     box-shadow:
         0 8px 32px rgba(0, 0, 0, 0.1),
-        0 12px 48px rgba(99, 102, 241, 0.08) !important;
+        0 12px 48px var(--color-indigo-alpha-8) !important;
 }
 
 [data-theme="light"] .premium-dropdown-menu a {
@@ -219,7 +219,7 @@
 
 [data-theme="light"] .premium-dropdown-menu a:hover {
     background: linear-gradient(90deg,
-        rgba(99, 102, 241, 0.1) 0%,
+        var(--color-indigo-alpha-10) 0%,
         rgba(139, 92, 246, 0.05) 100%) !important;
     color: var(--color-primary-600) !important;
     text-shadow: none !important;

@@ -1,5 +1,20 @@
-    <!-- Skip Link for Accessibility (WCAG 2.4.1) - GOV.UK Pattern -->
-    <a href="#main-content" class="govuk-skip-link" data-module="govuk-skip-link">Skip to main content</a>
+<?php
+/**
+ * Skip Link and Phase Banner - GOV.UK Pattern
+ *
+ * Skip Link: WCAG 2.4.1 Bypass Blocks - MUST be first focusable element
+ * Phase Banner: Indicates service status (alpha/beta/live)
+ *
+ * SOURCE:
+ * - Skip Link: https://design-system.service.gov.uk/components/skip-link/
+ * - Phase Banner: https://design-system.service.gov.uk/components/phase-banner/
+ */
+
+// Load the skip-link component
+require_once __DIR__ . '/../../../civicone/components/govuk/skip-link.php';
+?>
+    <!-- Skip Link for Accessibility (WCAG 2.4.1) - MUST be first focusable element -->
+    <?= civicone_govuk_skip_link() ?>
 
     <!-- Phase Banner - GOV.UK Pattern (with integrated layout switcher) -->
     <!-- Border extends full width, content is constrained by width-container inside -->

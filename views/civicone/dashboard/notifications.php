@@ -12,6 +12,7 @@ $hGradient = 'civic-hero-gradient';
 $hType = 'Dashboard';
 
 require dirname(dirname(__DIR__)) . '/layouts/civicone/header.php';
+require_once dirname(__DIR__) . '/components/govuk/breadcrumbs.php';
 
 $basePath = \Nexus\Core\TenantContext::getBasePath();
 
@@ -29,17 +30,14 @@ if (!empty($notifSettings)) {
 }
 ?>
 
-<nav class="govuk-breadcrumbs govuk-!-margin-bottom-6" aria-label="Breadcrumb">
-    <ol class="govuk-breadcrumbs__list">
-        <li class="govuk-breadcrumbs__list-item">
-            <a class="govuk-breadcrumbs__link" href="<?= $basePath ?>">Home</a>
-        </li>
-        <li class="govuk-breadcrumbs__list-item">
-            <a class="govuk-breadcrumbs__link" href="<?= $basePath ?>/dashboard">Dashboard</a>
-        </li>
-        <li class="govuk-breadcrumbs__list-item" aria-current="page">Notifications</li>
-    </ol>
-</nav>
+<?= civicone_govuk_breadcrumbs([
+    'items' => [
+        ['text' => 'Home', 'href' => $basePath],
+        ['text' => 'Dashboard', 'href' => $basePath . '/dashboard'],
+        ['text' => 'Notifications']
+    ],
+    'class' => 'govuk-!-margin-bottom-6'
+]) ?>
 
 <!-- Account Area Secondary Navigation -->
 <?php require dirname(dirname(__DIR__)) . '/layouts/civicone/partials/account-navigation.php'; ?>

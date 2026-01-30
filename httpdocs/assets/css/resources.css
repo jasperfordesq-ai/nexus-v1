@@ -41,7 +41,7 @@
 .holo-orb-2 {
     width: 350px;
     height: 350px;
-    background: radial-gradient(circle, rgba(20, 184, 166, 0.35) 0%, transparent 70%);
+    background: radial-gradient(circle, var(--color-teal-500-alpha-35) 0%, transparent 70%);
     top: 40%;
     right: -80px;
     animation-delay: -7s;
@@ -92,7 +92,7 @@
 }
 
 [data-theme="dark"] .holo-glass-card {
-    background: rgba(24, 24, 27, 0.6);
+    background: var(--color-zinc-900-alpha-60);
     border-color: var(--effect-white-10);
     box-shadow:
         0 25px 50px -12px var(--effect-black-40),
@@ -132,9 +132,9 @@
     height: 2px;
     background: linear-gradient(90deg,
         transparent,
-        rgba(13, 148, 136, 0.6),
-        rgba(6, 182, 212, 0.6),
-        rgba(20, 184, 166, 0.6),
+        var(--color-teal-600-alpha-60),
+        var(--color-cyan-alpha-60),
+        var(--color-teal-500-alpha-60),
         transparent
     );
 }
@@ -241,7 +241,7 @@
 [data-theme="dark"] .holo-select:focus {
     background: var(--effect-white-12);
     border-color: var(--color-teal-400);
-    box-shadow: 0 0 0 4px rgba(45, 212, 191, 0.15);
+    box-shadow: 0 0 0 4px var(--color-teal-400-alpha-15);
 }
 
 [data-theme="dark"] .holo-input::placeholder {
@@ -265,13 +265,13 @@ textarea.holo-input {
     border: 2px dashed var(--effect-teal-600-30);
     border-radius: var(--radius-xl);
     text-align: center;
-    background: linear-gradient(135deg, var(--effect-teal-600-5) 0%, rgba(20, 184, 166, 0.05) 100%);
+    background: linear-gradient(135deg, var(--effect-teal-600-5) 0%, var(--color-teal-500-alpha-5) 100%);
     transition: all 0.3s ease;
     cursor: pointer;
 }
 
 .holo-upload-zone:hover {
-    border-color: rgba(13, 148, 136, 0.5);
+    border-color: var(--color-teal-600-alpha-50);
     background: linear-gradient(135deg, var(--effect-teal-600-8) 0%, var(--effect-teal-8) 100%);
 }
 
@@ -282,12 +282,12 @@ textarea.holo-input {
 }
 
 [data-theme="dark"] .holo-upload-zone {
-    border-color: rgba(45, 212, 191, 0.2);
-    background: linear-gradient(135deg, var(--effect-teal-600-10) 0%, rgba(20, 184, 166, 0.05) 100%);
+    border-color: var(--color-teal-400-alpha-20);
+    background: linear-gradient(135deg, var(--effect-teal-600-10) 0%, var(--color-teal-500-alpha-5) 100%);
 }
 
 [data-theme="dark"] .holo-upload-zone:hover {
-    border-color: rgba(45, 212, 191, 0.4);
+    border-color: var(--color-teal-400-alpha-40);
 }
 
 .holo-upload-icon {
@@ -305,7 +305,7 @@ textarea.holo-input {
 
 [data-theme="dark"] .holo-upload-icon {
     color: var(--color-teal-400);
-    background: rgba(45, 212, 191, 0.15);
+    background: var(--color-teal-400-alpha-15);
 }
 
 .holo-upload-text {
@@ -348,7 +348,7 @@ textarea.holo-input {
 }
 
 [data-theme="dark"] .holo-file-name {
-    background: rgba(45, 212, 191, 0.15);
+    background: var(--color-teal-400-alpha-15);
     color: var(--color-teal-400);
 }
 
@@ -380,12 +380,12 @@ textarea.holo-input {
 .holo-btn-primary {
     background: linear-gradient(135deg, var(--color-teal-600) 0%, var(--color-teal-700) 100%);
     color: white;
-    box-shadow: 0 8px 24px rgba(13, 148, 136, 0.35);
+    box-shadow: 0 8px 24px var(--color-teal-600-alpha-35);
 }
 
 .holo-btn-primary:hover {
     transform: translateY(-2px);
-    box-shadow: 0 12px 32px rgba(13, 148, 136, 0.45);
+    box-shadow: 0 12px 32px var(--color-teal-600-alpha-45);
 }
 
 .holo-btn-primary:active {
@@ -395,11 +395,11 @@ textarea.holo-input {
 .holo-btn-secondary {
     background: transparent;
     color: var(--color-slate-500);
-    border: 2px solid rgba(100, 116, 139, 0.2);
+    border: 2px solid var(--color-slate-500-alpha-20);
 }
 
 .holo-btn-secondary:hover {
-    background: rgba(100, 116, 139, 0.08);
+    background: var(--color-slate-500-alpha-8);
     color: var(--color-slate-600);
 }
 
@@ -480,7 +480,7 @@ textarea.holo-input {
         -webkit-backdrop-filter: blur(20px) saturate(120%);
         border: 1px solid var(--effect-white-40);
         border-radius: var(--radius-2xl);
-        box-shadow: 0 12px 48px rgba(31, 38, 135, 0.15);
+        box-shadow: 0 12px 48px var(--color-glass-shadow-15);
         max-width: 500px;
         width: 100%;
         text-align: center;
@@ -489,7 +489,7 @@ textarea.holo-input {
 
     [data-theme="dark"] .download-card {
         background: linear-gradient(135deg,
-            rgba(15, 23, 42, 0.7),
+            var(--color-slate-900-alpha-70),
             var(--effect-slate-60));
         border: 1px solid var(--effect-white-15);
         box-shadow: 0 12px 48px var(--effect-black-50);
@@ -646,7 +646,7 @@ textarea.holo-input {
         font-size: var(--font-size-base);
         text-decoration: none;
         transition: all 0.2s ease;
-        background: linear-gradient(135deg, var(--effect-primary-10), rgba(129, 140, 248, 0.1));
+        background: linear-gradient(135deg, var(--effect-primary-10), var(--color-indigo-300-alpha-10));
         color: var(--color-primary-500);
         border: 2px solid var(--effect-primary-30);
     }
@@ -725,7 +725,7 @@ textarea.holo-input {
 .holo-orb-2 {
     width: 350px;
     height: 350px;
-    background: radial-gradient(circle, rgba(20, 184, 166, 0.35) 0%, transparent 70%);
+    background: radial-gradient(circle, var(--color-teal-500-alpha-35) 0%, transparent 70%);
     top: 40%;
     right: -80px;
     animation-delay: -7s;
@@ -776,7 +776,7 @@ textarea.holo-input {
 }
 
 [data-theme="dark"] .holo-glass-card {
-    background: rgba(24, 24, 27, 0.6);
+    background: var(--color-zinc-900-alpha-60);
     border-color: var(--effect-white-10);
     box-shadow:
         0 25px 50px -12px var(--effect-black-40),
@@ -816,9 +816,9 @@ textarea.holo-input {
     height: 2px;
     background: linear-gradient(90deg,
         transparent,
-        rgba(13, 148, 136, 0.6),
-        rgba(6, 182, 212, 0.6),
-        rgba(20, 184, 166, 0.6),
+        var(--color-teal-600-alpha-60),
+        var(--color-cyan-alpha-60),
+        var(--color-teal-500-alpha-60),
         transparent
     );
 }
@@ -925,7 +925,7 @@ textarea.holo-input {
 [data-theme="dark"] .holo-select:focus {
     background: var(--effect-white-12);
     border-color: var(--color-teal-400);
-    box-shadow: 0 0 0 4px rgba(45, 212, 191, 0.15);
+    box-shadow: 0 0 0 4px var(--color-teal-400-alpha-15);
 }
 
 [data-theme="dark"] .holo-input::placeholder {
@@ -949,8 +949,8 @@ textarea.holo-input {
     align-items: center;
     gap: 14px;
     padding: var(--space-4) var(--space-5);
-    background: linear-gradient(135deg, var(--effect-teal-600-8) 0%, rgba(20, 184, 166, 0.05) 100%);
-    border: 2px solid rgba(13, 148, 136, 0.2);
+    background: linear-gradient(135deg, var(--effect-teal-600-8) 0%, var(--color-teal-500-alpha-5) 100%);
+    border: 2px solid var(--color-teal-600-alpha-20);
     border-radius: var(--radius-lg);
     margin-bottom: var(--space-6);
 }
@@ -998,7 +998,7 @@ textarea.holo-input {
 
 [data-theme="dark"] .holo-file-display {
     background: linear-gradient(135deg, var(--effect-teal-600-15) 0%, var(--effect-teal-8) 100%);
-    border-color: rgba(45, 212, 191, 0.2);
+    border-color: var(--color-teal-400-alpha-20);
 }
 
 /* Buttons */
@@ -1029,12 +1029,12 @@ textarea.holo-input {
     flex: 2;
     background: linear-gradient(135deg, var(--color-teal-600) 0%, var(--color-teal-700) 100%);
     color: white;
-    box-shadow: 0 8px 24px rgba(13, 148, 136, 0.35);
+    box-shadow: 0 8px 24px var(--color-teal-600-alpha-35);
 }
 
 .holo-btn-primary:hover {
     transform: translateY(-2px);
-    box-shadow: 0 12px 32px rgba(13, 148, 136, 0.45);
+    box-shadow: 0 12px 32px var(--color-teal-600-alpha-45);
 }
 
 .holo-btn-primary:active {
@@ -1045,7 +1045,7 @@ textarea.holo-input {
     flex: 1;
     background: var(--effect-white-50);
     color: var(--color-slate-500);
-    border: 2px solid rgba(100, 116, 139, 0.2);
+    border: 2px solid var(--color-slate-500-alpha-20);
 }
 
 .holo-btn-secondary:hover {
@@ -1285,10 +1285,10 @@ textarea.holo-input {
         [data-theme="light"] #resources-glass-wrapper::before {
             background: linear-gradient(135deg,
                 var(--effect-primary-8) 0%,
-                rgba(129, 140, 248, 0.08) 25%,
-                rgba(165, 180, 252, 0.06) 50%,
-                rgba(199, 210, 254, 0.06) 75%,
-                rgba(224, 231, 255, 0.08) 100%);
+                var(--color-indigo-300-alpha-8) 25%,
+                var(--color-indigo-200-alpha-6) 50%,
+                var(--color-indigo-100-alpha-6) 75%,
+                var(--color-indigo-50-alpha-8) 100%);
             background-size: 400% 400%;
             animation: gradientShift 15s ease infinite;
         }
@@ -1297,7 +1297,7 @@ textarea.holo-input {
             background: radial-gradient(circle at 20% 30%,
                 var(--effect-primary-15) 0%, transparent 50%),
             radial-gradient(circle at 80% 70%,
-                rgba(129, 140, 248, 0.12) 0%, transparent 50%);
+                var(--color-indigo-300-alpha-12) 0%, transparent 50%);
         }
 
         @keyframes gradientShift {
@@ -1339,7 +1339,7 @@ textarea.holo-input {
             align-items: center;
             gap: var(--space-3);
             transition: all 0.3s ease;
-            box-shadow: 0 4px 12px rgba(31, 38, 135, 0.1),
+            box-shadow: 0 4px 12px var(--color-glass-shadow),
                         inset 0 1px 0 var(--effect-white-40);
             position: relative;
             overflow: hidden;
@@ -1352,7 +1352,7 @@ textarea.holo-input {
             left: 0;
             right: 0;
             bottom: 0;
-            background: linear-gradient(135deg, var(--effect-primary-8), rgba(129, 140, 248, 0.08));
+            background: linear-gradient(135deg, var(--effect-primary-8), var(--color-indigo-300-alpha-8));
             opacity: 0;
             transition: opacity 0.3s ease;
         }
@@ -1371,7 +1371,7 @@ textarea.holo-input {
 
         [data-theme="dark"] #resources-glass-wrapper .quick-action-btn {
             background: linear-gradient(135deg,
-                rgba(15, 23, 42, 0.6),
+                var(--color-slate-900-alpha-60),
                 var(--effect-slate-50));
             border: 2px solid var(--effect-white-12);
             box-shadow: 0 4px 12px var(--effect-black-30),
@@ -1382,7 +1382,7 @@ textarea.holo-input {
             border-color: var(--effect-primary-30);
             box-shadow: 0 8px 20px var(--effect-primary-25),
                         0 0 0 1px var(--effect-primary-20),
-                        0 0 30px rgba(129, 140, 248, 0.12);
+                        0 0 30px var(--color-indigo-300-alpha-12);
         }
 
         #resources-glass-wrapper .quick-action-icon {
@@ -1411,14 +1411,14 @@ textarea.holo-input {
             backdrop-filter: blur(20px) saturate(120%);
             -webkit-backdrop-filter: blur(20px) saturate(120%);
             border: 1px solid var(--effect-white-30);
-            box-shadow: 0 8px 32px rgba(31, 38, 135, 0.15),
+            box-shadow: 0 8px 32px var(--color-glass-shadow-15),
                         inset 0 0 0 1px var(--effect-white-40);
             transition: all 0.3s ease;
         }
 
         [data-theme="dark"] #resources-glass-wrapper .glass-search-card {
             background: linear-gradient(135deg,
-                rgba(15, 23, 42, 0.6),
+                var(--color-slate-900-alpha-60),
                 var(--effect-slate-50));
             backdrop-filter: blur(24px) saturate(150%);
             -webkit-backdrop-filter: blur(24px) saturate(150%);
@@ -1460,7 +1460,7 @@ textarea.holo-input {
         }
 
         [data-theme="dark"] #resources-glass-wrapper .category-pill {
-            background: rgba(15, 23, 42, 0.5);
+            background: var(--color-slate-900-alpha-50);
             border: 1px solid var(--effect-white-15);
         }
 
@@ -1520,7 +1520,7 @@ textarea.holo-input {
             -webkit-backdrop-filter: blur(20px) saturate(120%);
             border: 1px solid var(--effect-white-30);
             border-radius: var(--radius-xl);
-            box-shadow: 0 8px 32px rgba(31, 38, 135, 0.12),
+            box-shadow: 0 8px 32px var(--color-glass-shadow-12),
                         inset 0 1px 0 var(--effect-white-50);
             transition: all 0.3s ease;
             overflow: hidden;
@@ -1531,14 +1531,14 @@ textarea.holo-input {
 
         #resources-glass-wrapper .glass-resource-card:hover {
             transform: translateY(-8px);
-            box-shadow: 0 16px 48px rgba(31, 38, 135, 0.2),
+            box-shadow: 0 16px 48px var(--color-glass-shadow-20),
                         0 0 0 1px var(--effect-primary-20),
                         inset 0 1px 0 var(--effect-white-60);
         }
 
         [data-theme="dark"] #resources-glass-wrapper .glass-resource-card {
             background: linear-gradient(135deg,
-                rgba(15, 23, 42, 0.6),
+                var(--color-slate-900-alpha-60),
                 var(--effect-slate-50));
             backdrop-filter: blur(24px) saturate(150%);
             -webkit-backdrop-filter: blur(24px) saturate(150%);
@@ -1552,7 +1552,7 @@ textarea.holo-input {
             transform: translateY(-8px);
             box-shadow: 0 16px 48px var(--effect-black-70),
                         0 0 0 1px var(--effect-primary-25),
-                        0 0 80px rgba(129, 140, 248, 0.15),
+                        0 0 80px var(--color-indigo-300-alpha-15),
                         inset 0 1px 0 var(--effect-white-12);
         }
 
@@ -1678,7 +1678,7 @@ textarea.holo-input {
             padding: var(--space-4);
             background: linear-gradient(135deg,
                 var(--effect-primary-10),
-                rgba(129, 140, 248, 0.05));
+                var(--color-indigo-300-alpha-5));
             border-top: 1px solid var(--effect-black-6);
             color: var(--color-primary-500);
             font-weight: 700;
@@ -1694,7 +1694,7 @@ textarea.holo-input {
         [data-theme="dark"] #resources-glass-wrapper .download-btn {
             background: linear-gradient(135deg,
                 var(--effect-primary-15),
-                rgba(129, 140, 248, 0.1));
+                var(--color-indigo-300-alpha-10));
             border-top-color: var(--effect-white-10);
             color: var(--color-primary-400);
         }
@@ -1725,15 +1725,15 @@ textarea.holo-input {
 
         [data-theme="dark"] #resources-glass-wrapper .glass-upload-card {
             background: linear-gradient(135deg,
-                rgba(15, 23, 42, 0.4),
-                rgba(30, 41, 59, 0.3));
+                var(--color-slate-900-alpha-40),
+                var(--color-slate-alpha-30));
             border: 2px dashed var(--effect-primary-40);
         }
 
         [data-theme="dark"] #resources-glass-wrapper .glass-upload-card:hover {
-            border-color: rgba(99, 102, 241, 0.6);
+            border-color: var(--color-indigo-alpha-60);
             background: linear-gradient(135deg,
-                rgba(15, 23, 42, 0.5),
+                var(--color-slate-900-alpha-50),
                 var(--effect-slate-40));
         }
 
@@ -1756,12 +1756,12 @@ textarea.holo-input {
             -webkit-backdrop-filter: blur(20px);
             border: 1px solid var(--effect-white-30);
             border-radius: var(--radius-xl);
-            box-shadow: 0 8px 32px rgba(31, 38, 135, 0.12);
+            box-shadow: 0 8px 32px var(--color-glass-shadow-12);
         }
 
         [data-theme="dark"] #resources-glass-wrapper .glass-empty-state {
             background: linear-gradient(135deg,
-                rgba(15, 23, 42, 0.6),
+                var(--color-slate-900-alpha-60),
                 var(--effect-slate-50));
             border: 1px solid var(--effect-white-15);
             box-shadow: 0 8px 32px var(--effect-black-50);
@@ -1805,7 +1805,7 @@ textarea.holo-input {
 
             [data-theme="dark"] #resources-glass-wrapper .glass-search-card,
             [data-theme="dark"] #resources-glass-wrapper .glass-resource-card {
-                background: rgba(15, 23, 42, 0.95);
+                background: var(--color-slate-900-alpha-95);
             }
         }
 
@@ -1815,8 +1815,8 @@ textarea.holo-input {
         #resources-glass-wrapper .nexus-welcome-hero {
             background: linear-gradient(135deg,
                 var(--effect-primary-12) 0%,
-                rgba(129, 140, 248, 0.12) 50%,
-                rgba(165, 180, 252, 0.08) 100%);
+                var(--color-indigo-300-alpha-12) 50%,
+                var(--color-indigo-200-alpha-8) 100%);
             backdrop-filter: blur(20px);
             -webkit-backdrop-filter: blur(20px);
             border: 1px solid var(--effect-white-40);
@@ -1830,8 +1830,8 @@ textarea.holo-input {
         [data-theme="dark"] #resources-glass-wrapper .nexus-welcome-hero {
             background: linear-gradient(135deg,
                 var(--effect-primary-15) 0%,
-                rgba(129, 140, 248, 0.15) 50%,
-                rgba(165, 180, 252, 0.1) 100%);
+                var(--color-indigo-300-alpha-15) 50%,
+                var(--color-indigo-200-alpha-10) 100%);
             border-color: var(--effect-white-10);
         }
 
@@ -1890,13 +1890,13 @@ textarea.holo-input {
         }
 
         #resources-glass-wrapper .nexus-smart-btn-secondary {
-            background: linear-gradient(135deg, var(--effect-primary-10), rgba(129, 140, 248, 0.1));
+            background: linear-gradient(135deg, var(--effect-primary-10), var(--color-indigo-300-alpha-10));
             color: var(--color-primary-600);
             border-color: var(--effect-primary-30);
         }
 
         [data-theme="dark"] #resources-glass-wrapper .nexus-smart-btn-secondary {
-            background: linear-gradient(135deg, var(--effect-primary-20), rgba(129, 140, 248, 0.15));
+            background: linear-gradient(135deg, var(--effect-primary-20), var(--color-indigo-300-alpha-15));
             color: var(--color-primary-300);
             border-color: var(--effect-primary-40);
         }
@@ -1916,7 +1916,7 @@ textarea.holo-input {
         }
 
         [data-theme="dark"] #resources-glass-wrapper .nexus-smart-btn-outline {
-            background: rgba(15, 23, 42, 0.5);
+            background: var(--color-slate-900-alpha-50);
             border-color: var(--effect-primary-40);
         }
 

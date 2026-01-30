@@ -13,9 +13,9 @@
     padding: var(--space-4) var(--space-5);
     border-radius: var(--radius-lg);
     margin-bottom: var(--space-6);
-    background: rgba(15, 23, 42, 0.6);
+    background: var(--color-slate-900-alpha-60);
     backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    border: 1px solid var(--color-white-alpha-10);
 }
 
 .admin-alert i {
@@ -39,7 +39,7 @@
 .settings-section-title {
     font-size: var(--text-sm);
     font-weight: var(--font-weight-bold);
-    color: rgba(255, 255, 255, 0.5);
+    color: var(--color-white-alpha-50);
     text-transform: uppercase;
     letter-spacing: var(--tracking-wider);
     margin: 0 0 var(--space-4) 0;
@@ -59,41 +59,41 @@
     padding: var(--space-6);
     border-radius: var(--radius-lg);
     margin-bottom: var(--space-4);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    border: 1px solid var(--color-white-alpha-10);
 }
 
 .settings-module-default {
-    background: rgba(30, 41, 59, 0.5);
+    background: var(--color-slate-alpha-50);
 }
 
 .settings-module-purple {
-    background: rgba(139, 92, 246, 0.15);
-    border-color: rgba(139, 92, 246, 0.3);
+    background: var(--color-violet-alpha-15);
+    border-color: var(--color-violet-alpha-30);
 }
 
 .settings-module-blue {
-    background: rgba(59, 130, 246, 0.15);
-    border-color: rgba(59, 130, 246, 0.3);
+    background: var(--color-blue-alpha-15);
+    border-color: var(--color-blue-alpha-30);
 }
 
 .settings-module-yellow {
-    background: rgba(250, 204, 21, 0.15);
-    border-color: rgba(250, 204, 21, 0.3);
+    background: var(--color-yellow-400-alpha-15);
+    border-color: var(--color-yellow-400-alpha-30);
 }
 
 .settings-module-cyan {
-    background: rgba(34, 211, 238, 0.15);
-    border-color: rgba(34, 211, 238, 0.3);
+    background: var(--color-cyan-400-alpha-15);
+    border-color: var(--color-cyan-400-alpha-30);
 }
 
 .settings-module-orange {
-    background: rgba(251, 146, 60, 0.15);
-    border-color: rgba(251, 146, 60, 0.3);
+    background: var(--color-orange-400-alpha-15);
+    border-color: var(--color-orange-400-alpha-30);
 }
 
 .settings-module-red {
-    background: rgba(239, 68, 68, 0.15);
-    border-color: rgba(239, 68, 68, 0.3);
+    background: var(--color-red-alpha-15);
+    border-color: var(--color-red-alpha-30);
 }
 
 .settings-module-icon {
@@ -105,7 +105,7 @@
     justify-content: center;
     font-size: var(--text-2xl);
     flex-shrink: 0;
-    background: rgba(255, 255, 255, 0.1);
+    background: var(--color-white-alpha-10);
 }
 
 .settings-module-purple .settings-module-icon {
@@ -152,25 +152,25 @@
 
 .settings-module-desc {
     font-size: var(--text-sm);
-    color: rgba(255, 255, 255, 0.6);
+    color: var(--color-white-alpha-60);
     margin: 0;
 }
 
 .settings-module-options {
     padding-top: var(--space-4);
     margin-top: var(--space-4);
-    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    border-top: 1px solid var(--color-white-alpha-10);
 }
 
 .settings-description {
     font-size: var(--text-sm);
-    color: rgba(255, 255, 255, 0.6);
+    color: var(--color-white-alpha-60);
     margin: 0 0 var(--space-3) 0;
 }
 
 .settings-hint {
     font-size: var(--text-xs);
-    color: rgba(255, 255, 255, 0.5);
+    color: var(--color-white-alpha-50);
     margin-top: var(--space-2);
     margin-bottom: 0;
 }
@@ -204,12 +204,12 @@
     padding: var(--space-2);
     border-radius: var(--radius-md);
     transition: background var(--transition-normal);
-    color: rgba(255, 255, 255, 0.8);
+    color: var(--color-white-alpha-80);
     font-weight: var(--font-weight-medium);
 }
 
 .settings-checkbox-label:hover {
-    background: rgba(255, 255, 255, 0.05);
+    background: var(--color-white-alpha-5);
 }
 
 .settings-checkbox-label input[type="checkbox"] {
@@ -221,7 +221,7 @@
     display: block;
     font-size: var(--text-sm);
     font-weight: var(--font-weight-semibold);
-    color: rgba(255, 255, 255, 0.8);
+    color: var(--color-white-alpha-80);
     margin-bottom: var(--space-2);
 }
 
@@ -229,7 +229,7 @@
 .admin-select {
     width: 100%;
     padding: var(--space-3) var(--space-4);
-    background: rgba(15, 23, 42, 0.6);
+    background: var(--color-slate-900-alpha-60);
     border: 1px solid var(--color-primary-200);
     border-radius: var(--radius-md);
     color: var(--color-white);
@@ -241,11 +241,11 @@
 .admin-select:focus {
     outline: none;
     border-color: var(--color-primary-400);
-    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+    box-shadow: 0 0 0 3px var(--color-indigo-alpha-10);
 }
 
 .admin-input::placeholder {
-    color: rgba(255, 255, 255, 0.4);
+    color: var(--color-white-alpha-40);
 }
 
 .admin-select {
@@ -285,7 +285,7 @@ textarea.admin-input {
     left: 0;
     right: 0;
     bottom: 0;
-    background: rgba(255, 255, 255, 0.15);
+    background: var(--color-white-alpha-15);
     transition: var(--transition-smooth);
     border-radius: 26px;
 }
@@ -337,14 +337,14 @@ textarea.admin-input {
 }
 
 .admin-btn-danger {
-    background: rgba(239, 68, 68, 0.15);
+    background: var(--color-red-alpha-15);
     color: var(--color-danger-400);
-    border: 1px solid rgba(239, 68, 68, 0.3);
+    border: 1px solid var(--color-red-alpha-30);
 }
 
 .admin-btn-danger:hover {
-    background: rgba(239, 68, 68, 0.25);
-    border-color: rgba(239, 68, 68, 0.5);
+    background: var(--color-red-alpha-25);
+    border-color: var(--color-red-alpha-50);
 }
 
 .admin-btn-warning {

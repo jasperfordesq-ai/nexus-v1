@@ -8,6 +8,7 @@ $hero_title = 'Terms & Conditions Update';
 $hero_subtitle = 'Action required to continue';
 
 require dirname(__DIR__) . '/../layouts/civicone/header.php';
+require_once __DIR__ . '/../components/govuk/breadcrumbs.php';
 
 $basePath = $basePath ?? \Nexus\Core\TenantContext::getBasePath();
 $consents = $consents ?? [];
@@ -16,14 +17,13 @@ $tenant = \Nexus\Core\TenantContext::get();
 $tenantName = $tenant['name'] ?? 'the platform';
 ?>
 
-<nav class="govuk-breadcrumbs govuk-!-margin-bottom-6" aria-label="Breadcrumb">
-    <ol class="govuk-breadcrumbs__list">
-        <li class="govuk-breadcrumbs__list-item">
-            <a class="govuk-breadcrumbs__link" href="<?= $basePath ?>">Home</a>
-        </li>
-        <li class="govuk-breadcrumbs__list-item" aria-current="page">Accept Updated Terms</li>
-    </ol>
-</nav>
+<?= civicone_govuk_breadcrumbs([
+    'items' => [
+        ['text' => 'Home', 'href' => $basePath],
+        ['text' => 'Accept Updated Terms']
+    ],
+    'class' => 'govuk-!-margin-bottom-6'
+]) ?>
 
 <!-- Warning Banner -->
 <div class="govuk-notification-banner govuk-notification-banner--warning" role="alert" aria-labelledby="govuk-notification-banner-title" data-module="govuk-notification-banner">

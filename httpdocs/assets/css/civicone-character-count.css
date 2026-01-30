@@ -1,0 +1,42 @@
+/**
+ * CivicOne GOV.UK Character Count Component
+ * Source: https://github.com/alphagov/govuk-frontend/blob/main/packages/govuk-frontend/src/govuk/components/character-count/_character-count.scss
+ * Reference: https://design-system.service.gov.uk/components/character-count/
+ *
+ * WCAG 2.1 AA Compliant
+ */
+
+/* Character count message */
+.govuk-character-count__message {
+    margin-top: 5px;
+    margin-bottom: 0;
+}
+
+/* Hide message when disabled (below threshold) */
+.govuk-character-count__message--disabled {
+    visibility: hidden;
+}
+
+/* Visually hidden status for screen readers */
+.govuk-character-count__sr-status {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+/* Error state for the message */
+.govuk-character-count__message.govuk-error-message {
+    color: var(--color-govuk-red);
+    font-weight: var(--font-weight-bold);
+}
+
+/* Ensure textarea maintains proper styling in character count context */
+.govuk-character-count .govuk-textarea {
+    margin-bottom: 0;
+}

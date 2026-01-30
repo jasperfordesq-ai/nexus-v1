@@ -11,22 +11,19 @@
 
 $pageTitle = 'Account Settings';
 require dirname(__DIR__, 2) . '/layouts/civicone/header.php';
+require_once __DIR__ . '/../components/govuk/breadcrumbs.php';
 
 $basePath = Nexus\Core\TenantContext::getBasePath();
 ?>
 
-<!-- GOV.UK Breadcrumbs -->
-<nav class="govuk-breadcrumbs govuk-!-margin-bottom-6" aria-label="Breadcrumb">
-    <ol class="govuk-breadcrumbs__list">
-        <li class="govuk-breadcrumbs__list-item">
-            <a class="govuk-breadcrumbs__link" href="<?= $basePath ?>">Home</a>
-        </li>
-        <li class="govuk-breadcrumbs__list-item">
-            <a class="govuk-breadcrumbs__link" href="<?= $basePath ?>/dashboard">Dashboard</a>
-        </li>
-        <li class="govuk-breadcrumbs__list-item" aria-current="page">Settings</li>
-    </ol>
-</nav>
+<?= civicone_govuk_breadcrumbs([
+    'items' => [
+        ['text' => 'Home', 'href' => $basePath],
+        ['text' => 'Dashboard', 'href' => $basePath . '/dashboard'],
+        ['text' => 'Settings']
+    ],
+    'class' => 'govuk-!-margin-bottom-6'
+]) ?>
 
 <!-- Page heading -->
 <h1 class="govuk-heading-xl">Account Settings</h1>

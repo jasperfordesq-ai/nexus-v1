@@ -1,290 +1,303 @@
 /**
- * CivicOne Header v2.1
+ * CivicOne Header v2.2 - GOV.UK Frontend v5.14.0 Exact Match
  *
- * COMPLETE REBUILD - Pure GOV.UK structure (no utility bar)
- * Account/auth links are in the service navigation (GOV.UK pattern)
+ * REBUILT 2026-01-30: Extracted exact values from govuk-frontend.min.css
+ * SOURCE: https://github.com/alphagov/govuk-frontend v5.14.0
  *
- * SOURCE: https://github.com/alphagov/govuk-frontend/tree/main/packages/govuk-frontend/src/govuk/components/service-navigation
+ * This file provides overrides for the GOV.UK service navigation loaded from
+ * /assets/govuk-frontend-5.14.0/govuk-frontend.min.css
  *
- * EXACT VALUES FROM GOV.UK FRONTEND (verified 2026-01-25):
- * - Background: #f4f8fb (blue tint-95)
- * - Link color: #16548a (blue shade-25)
- * - Border: #8eb8dc (blue tint-50)
- * - Spacing(1): 5px
- * - Spacing(2): 10px
- * - Spacing(3): 15px
- * - Spacing(6): 30px
- * - Tablet breakpoint: 641px
- * - Font size: 19px
- * - Line height: 29/19 = 1.526315789
- * - Focus color: #ffdd00
+ * EXACT VALUES FROM GOV.UK FRONTEND v5.14.0 (govuk-template--rebranded):
+ * ─────────────────────────────────────────────────────────────────────────
+ * Background:        #f4f8fb (blue tint-95, rebranded)
+ * Border:            #8eb8dc (rebranded border on blue tint-95)
+ * Link color:        #1a65a6 (blue shade-25, darker for contrast)
+ * Link hover:        #003078 (blue shade-50)
+ * Link active:       #0b0c0c (black)
+ * Focus background:  #fd0 (yellow)
+ * Focus text:        #0b0c0c (black)
+ * Focus shadow:      0 -2px #fd0, 0 4px #0b0c0c
+ *
+ * Spacing:
+ * - spacing(1): 5px
+ * - spacing(2): 10px
+ * - spacing(3): 15px
+ * - spacing(6): 30px (responsive margin-right)
+ *
+ * Typography:
+ * - Font size: 1.1875rem (19px) at tablet+
+ * - Line height: 1.5263157895 (rebranded)
+ * - Font weight: 700 (bold) for service name and toggle
+ *
+ * Breakpoints:
+ * - Tablet: 40.0625em (641px)
+ *
+ * Active indicator:
+ * - Mobile: 5px left border, -15px margin-left, 10px padding-left
+ * - Desktop: 5px bottom border, 10px padding-bottom (rebranded)
  */
 
 /* ============================================
-   Design Tokens (GOV.UK Frontend Exact)
+   REBRANDED SERVICE NAVIGATION OVERRIDES
+   Apply GOV.UK v5.14.0 rebranded styles
    ============================================ */
-:root {
-    /* Service Navigation */
-    --govuk-nav-bg: #f4f8fb;
-    --govuk-nav-link: #16548a;
-    --govuk-nav-border: #8eb8dc;
-    --govuk-nav-active-border: 5px;
-    --govuk-nav-padding: 15px;
-    --govuk-nav-gap: 30px;
-    --govuk-nav-font-size: 1.1875rem;
-    --govuk-nav-line-height: 1.526315789;
 
-    /* Core Colors */
-    --govuk-focus: #ffdd00;
-    --govuk-text: #0b0c0c;
-    --govuk-link: #1d70b8;
-    --govuk-link-hover: #003078;
-    --govuk-white: #ffffff;
-    --govuk-border: #b1b4b6;
-
-    /* Breakpoints */
-    --govuk-tablet: 641px;
-}
-
-/* Chevron icon (for More dropdown) */
-.civicone-chevron {
-    transition: transform 0.15s ease-in-out;
-}
-
-/* ============================================
-   1. SERVICE NAVIGATION (GOV.UK Exact)
-   ============================================ */
+/* Ensure rebranded class is applied */
 .govuk-service-navigation {
-    border-bottom: 1px solid var(--govuk-nav-border);
-    background-color: var(--govuk-nav-bg);
+    border-bottom-color: #8eb8dc;
+    background-color: #f4f8fb;
 }
 
+/* Container - no horizontal padding here, use govuk-width-container */
 .govuk-service-navigation__container {
     display: flex;
     flex-direction: column;
     align-items: start;
-    padding: 0 15px;
 }
 
-@media (min-width: 641px) {
+@media (min-width: 40.0625em) {
     .govuk-service-navigation__container {
         flex-direction: row;
         flex-wrap: wrap;
     }
 }
 
-/* Service Name & Nav Items - Shared styles */
+/* Items and Service Name - shared positioning styles */
 .govuk-service-navigation__item,
 .govuk-service-navigation__service-name {
     position: relative;
     margin: 10px 0;
-    border: 0 solid var(--govuk-nav-link);
+    border: 0 solid #1a65a6;
 }
 
-@media (min-width: 641px) {
+@media (min-width: 40.0625em) {
     .govuk-service-navigation__item,
     .govuk-service-navigation__service-name {
         display: inline-block;
         margin-top: 0;
         margin-bottom: 0;
-        padding: var(--govuk-nav-padding) 0;
-        line-height: var(--govuk-nav-line-height);
+        padding: 15px 0;
+        line-height: 1.5263157895;
     }
 
     .govuk-service-navigation__item:not(:last-child),
-    .govuk-service-navigation__service-name {
-        margin-right: var(--govuk-nav-gap);
+    .govuk-service-navigation__service-name:not(:last-child) {
+        margin-right: 30px;
     }
 }
 
-/* Service Name - GOV.UK govuk-link-style-text pattern */
+/* Service Name - bold, black text */
 .govuk-service-navigation__service-name {
-    font-family: inherit;
-    font-size: var(--govuk-nav-font-size);
     font-weight: 700;
+    font-size: 1rem;
+    line-height: 1.25;
 }
 
-.govuk-service-navigation__service-name .govuk-service-navigation__link {
-    color: var(--govuk-text); /* Black text, not blue */
-    text-decoration: none;
+@media (min-width: 40.0625em) {
+    .govuk-service-navigation__service-name {
+        font-size: 1.1875rem;
+        line-height: 1.3157894737;
+    }
 }
 
+/* Service Name Link - text style (black, no decoration until hover) */
+.govuk-service-navigation__service-name .govuk-service-navigation__link:link,
 .govuk-service-navigation__service-name .govuk-service-navigation__link:visited {
-    color: var(--govuk-text);
+    color: #0b0c0c;
 }
 
 .govuk-service-navigation__service-name .govuk-service-navigation__link:hover {
-    color: var(--govuk-text); /* NO color change on hover - text style */
-    text-decoration: underline;
-    text-decoration-thickness: max(3px, 0.1875rem, 0.12em);
-    text-decoration-skip-ink: none;
+    color: rgba(11, 12, 12, 0.99);
 }
 
 .govuk-service-navigation__service-name .govuk-service-navigation__link:active,
 .govuk-service-navigation__service-name .govuk-service-navigation__link:focus {
-    color: var(--govuk-text);
+    color: #0b0c0c;
 }
 
-/* Active State - Mobile (left border) */
-@media (max-width: 640px) {
+/* Active State - Mobile: left border */
+@media (max-width: 40.0525em) {
     .govuk-service-navigation__item--active {
-        margin-left: calc((10px + var(--govuk-nav-active-border)) * -1);
+        margin-left: -15px;
         padding-left: 10px;
-        border-left-width: var(--govuk-nav-active-border);
+        border-left-width: 5px;
     }
 }
 
-/* Active State - Desktop (bottom border) */
-@media (min-width: 641px) {
+/* Active State - Desktop: bottom border (rebranded padding) */
+@media (min-width: 40.0625em) {
     .govuk-service-navigation__item--active {
-        padding-bottom: calc(var(--govuk-nav-padding) - var(--govuk-nav-active-border));
-        border-bottom-width: var(--govuk-nav-active-border);
+        padding-bottom: 10px;
+        border-bottom-width: 5px;
     }
 }
 
-/* Navigation Wrapper */
+/* Navigation Wrapper - flex grow */
 .govuk-service-navigation__wrapper {
     flex-grow: 1;
-    width: 100%;
-}
-
-@media (min-width: 641px) {
-    .govuk-service-navigation__wrapper {
-        width: auto;
-    }
 }
 
 /* Navigation List */
 .govuk-service-navigation__list {
-    margin: 0;
-    margin-bottom: 15px; /* GOV.UK: govuk-spacing(3) on mobile */
+    font-weight: 400;
+    font-size: 1rem;
+    line-height: 1.25;
+    margin: 0 0 15px;
     padding: 0;
     list-style: none;
-    font-size: var(--govuk-nav-font-size);
 }
 
-@media (min-width: 641px) {
+@media (min-width: 40.0625em) {
     .govuk-service-navigation__list {
+        font-size: 1.1875rem;
+        line-height: 1.3157894737;
         display: flex;
         flex-wrap: wrap;
         margin-bottom: 0;
     }
 }
 
-/* Links - GOV.UK govuk-link-style-no-underline + govuk-link-style-no-visited-state */
+/* Links - GOV.UK exact styles */
 .govuk-service-navigation__link {
-    font-family: inherit;
-    font-size: var(--govuk-nav-font-size);
-    line-height: var(--govuk-nav-line-height);
-    text-decoration: none; /* No underline by default - GOV.UK pattern */
-}
-
-.govuk-service-navigation__link:not(:hover):not(:focus) {
-    color: var(--govuk-nav-link); /* #16548a - blue shade-25 */
-}
-
-/* No visited state - stays same color as unvisited */
-.govuk-service-navigation__link:visited:not(:hover):not(:focus) {
-    color: var(--govuk-nav-link);
-}
-
-.govuk-service-navigation__link:hover {
     text-decoration: underline;
-    text-decoration-thickness: max(3px, 0.1875rem, 0.12em);
-    text-decoration-skip-ink: none;
+    text-decoration-thickness: max(1px, 0.0625rem);
     text-underline-offset: 0.1578em;
 }
 
-.govuk-service-navigation__link:active {
-    color: var(--govuk-text);
+.govuk-service-navigation__link:hover {
+    text-decoration-thickness: max(3px, 0.1875rem, 0.12em);
+    text-decoration-skip-ink: none;
+    text-decoration-skip: none;
 }
 
 .govuk-service-navigation__link:focus {
-    outline: 3px solid var(--govuk-focus);
-    outline-offset: 0;
-    background-color: var(--govuk-focus);
-    color: var(--govuk-text);
-    box-shadow: 0 -2px var(--govuk-focus), 0 4px var(--govuk-text);
+    outline: 3px solid transparent;
+    background-color: #fd0;
+    box-shadow: 0 -2px #fd0, 0 4px #0b0c0c;
     text-decoration: none;
 }
 
-/* Active Fallback (for non-CSS) */
+.govuk-service-navigation__link:not(:hover):not(:active) {
+    text-decoration: none;
+}
+
+.govuk-service-navigation__link:link,
+.govuk-service-navigation__link:visited {
+    color: #1d70b8;
+}
+
+.govuk-service-navigation__link:hover {
+    color: #003078;
+}
+
+.govuk-service-navigation__link:active,
+.govuk-service-navigation__link:focus {
+    color: #0b0c0c;
+}
+
+/* Override for service nav specific link color (darker blue) */
+.govuk-service-navigation__link:not(:hover):not(:focus) {
+    color: #1a65a6;
+}
+
+/* Active Fallback */
 .govuk-service-navigation__active-fallback {
     font-weight: inherit;
 }
 
-/* Mobile Toggle Button */
+/* Mobile Toggle Button - GOV.UK exact */
 .govuk-service-navigation__toggle {
+    font-weight: 700;
+    font-size: 1rem;
+    line-height: 1.25;
     display: inline-flex;
-    align-items: center;
     margin: 10px 0;
     padding: 0;
     border: 0;
-    font-size: var(--govuk-nav-font-size);
-    font-weight: 700;
-    color: var(--govuk-nav-link);
+    color: #1a65a6;
     background: none;
+    word-break: break-all;
     cursor: pointer;
+    align-items: center;
 }
 
-.govuk-service-navigation__toggle::after {
-    content: "";
-    display: inline-block;
-    margin-left: 5px;
-    border-style: solid;
-    border-color: transparent;
-    border-top-color: currentColor;
-    border-width: 5px 5px 0;
-}
-
-.govuk-service-navigation__toggle[aria-expanded="true"]::after {
-    border-width: 0 5px 5px;
-    border-top-color: transparent;
-    border-bottom-color: currentColor;
+@media (min-width: 40.0625em) {
+    .govuk-service-navigation__toggle {
+        font-size: 1.1875rem;
+        line-height: 1.3157894737;
+    }
 }
 
 .govuk-service-navigation__toggle:focus {
-    outline: 3px solid var(--govuk-focus);
-    outline-offset: 0;
-    background-color: var(--govuk-focus);
-    color: var(--govuk-text);
+    outline: 3px solid transparent;
+    color: #0b0c0c;
+    background-color: #fd0;
+    box-shadow: 0 -2px #fd0, 0 4px #0b0c0c;
+    text-decoration: none;
+}
+
+/* Toggle Arrow - GOV.UK clip-path polygon */
+.govuk-service-navigation__toggle::after {
+    display: inline-block;
+    width: 0;
+    height: 0;
+    clip-path: polygon(0 0, 50% 100%, 100% 0);
+    border-color: transparent;
+    border-style: solid;
+    border-width: 8.66px 5px 0;
+    border-top-color: inherit;
+    content: "";
+    margin-left: 5px;
+}
+
+.govuk-service-navigation__toggle[aria-expanded="true"]::after {
+    clip-path: polygon(50% 0, 0 100%, 100% 100%);
+    border-width: 0 5px 8.66px;
+    border-top-color: transparent;
+    border-bottom-color: inherit;
 }
 
 .govuk-service-navigation__toggle[hidden] {
     display: none;
 }
 
+/* Remove margin-top when following service name */
+.govuk-service-navigation__service-name + .govuk-service-navigation__wrapper .govuk-service-navigation__toggle {
+    margin-top: 0;
+}
+
 /* ============================================
-   2. "MORE" DROPDOWN (CivicOne Extension)
+   "MORE" DROPDOWN - CivicOne Extension
+   ============================================
+   NOTE: GOV.UK Frontend does NOT have a dropdown/mega-menu component.
+   This is a CivicOne extension that follows GOV.UK patterns:
 
-   NOTE: GOV.UK Frontend does NOT have a dropdown component.
-   This is a CivicOne extension following GOV.UK patterns:
-   - Focus states match GOV.UK (yellow background, dual shadows)
-   - Link styles match GOV.UK link patterns
-   - Typography uses GOV.UK values (16px body, 19px nav)
+   - Focus states: #fd0 background, 0 -2px #fd0, 0 4px #0b0c0c shadow
+   - Link colors: #1d70b8 (unvisited), #4c2c92 (visited), #003078 (hover)
+   - Typography: 16px body (1rem), 19px nav (1.1875rem)
+   - Spacing: GOV.UK spacing scale (5px, 10px, 15px, 20px, 25px, 30px)
+   - Border: #b1b4b6 (mid-grey)
 
-   GOV.UK Official Colors Used:
-   - Link: #1d70b8 (blue primary)
-   - Link hover: #003078 (blue shade-50)
-   - Focus: #ffdd00 (yellow)
-   - Text: #0b0c0c (black)
-   - Secondary text: #505a5f (black tint-25)
-   - Border: #b1b4b6 (black tint-50)
-   - Light grey bg: #f3f2f1 (black tint-95)
+   Keyboard navigation is handled by civicone-header-v2.js:
+   - Arrow keys navigate within dropdown
+   - Escape closes dropdown and returns focus to trigger
+   - Tab moves out of dropdown
    ============================================ */
+
 .civicone-nav-more {
     position: relative;
 }
 
+/* More Button - matches GOV.UK service nav link style */
 .civicone-nav-more__btn {
     display: inline-flex;
     align-items: center;
-    gap: 6px;
+    gap: 5px;
     padding: 0;
     border: 0;
-    font-size: var(--govuk-nav-font-size);
-    line-height: var(--govuk-nav-line-height);
-    color: var(--govuk-nav-link);
+    font-size: 1.1875rem;
+    line-height: 1.5263157895;
+    color: #1a65a6;
     background: none;
     cursor: pointer;
     text-decoration: none;
@@ -297,19 +310,29 @@
 }
 
 .civicone-nav-more__btn:focus {
-    outline: 3px solid var(--govuk-focus);
-    outline-offset: 0;
-    background-color: var(--govuk-focus);
-    color: var(--govuk-text);
-    box-shadow: 0 -2px var(--govuk-focus), 0 4px var(--govuk-text);
+    outline: 3px solid transparent;
+    background-color: #fd0;
+    color: #0b0c0c;
+    box-shadow: 0 -2px #fd0, 0 4px #0b0c0c;
     text-decoration: none;
+}
+
+/* Chevron icon */
+.civicone-chevron {
+    transition: transform 0.15s ease-in-out;
 }
 
 .civicone-nav-more__btn[aria-expanded="true"] .civicone-chevron {
     transform: rotate(180deg);
 }
 
-/* Dropdown Panel - GOV.UK styled */
+@media (prefers-reduced-motion: reduce) {
+    .civicone-chevron {
+        transition: none;
+    }
+}
+
+/* Dropdown Panel */
 .civicone-nav-dropdown {
     position: absolute;
     top: 100%;
@@ -317,34 +340,33 @@
     z-index: 1000;
     min-width: 480px;
     max-width: 640px;
-    margin-top: 0; /* No gap - connects to nav */
+    margin-top: 0;
     background: #ffffff;
-    border: 1px solid #b1b4b6; /* GOV.UK border color */
+    border: 1px solid #b1b4b6;
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
-    padding: 20px 25px; /* GOV.UK spacing */
+    padding: 20px 25px;
 }
 
 .civicone-nav-dropdown[hidden] {
     display: none;
 }
 
-/* Dropdown Grid */
+/* Dropdown Grid - 2 columns */
 .civicone-nav-dropdown__grid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    gap: 25px 30px; /* GOV.UK spacing(5) and spacing(6) */
+    gap: 25px 30px;
 }
 
-/* Dropdown Section Headers - GOV.UK secondary text style */
+/* Section Headers - GOV.UK secondary text color */
 .civicone-nav-dropdown__section h3 {
     margin: 0 0 10px 0;
     padding: 0 0 10px 0;
-    font-family: inherit;
-    font-size: 1rem; /* 16px - GOV.UK */
+    font-size: 1rem;
     font-weight: 700;
     line-height: 1.25;
-    color: #505a5f; /* GOV.UK secondary-text */
-    border-bottom: 1px solid #b1b4b6; /* GOV.UK border */
+    color: #505a5f;
+    border-bottom: 1px solid #b1b4b6;
     letter-spacing: 0;
     text-transform: none;
 }
@@ -355,38 +377,37 @@
     list-style: none;
 }
 
-/* Dropdown Links - GOV.UK link styles */
+/* Dropdown Links - GOV.UK standard link style */
 .civicone-nav-dropdown__link {
     display: block;
     padding: 8px 0;
-    font-family: inherit;
-    font-size: 1rem; /* 16px - GOV.UK body */
+    font-size: 1rem;
     line-height: 1.25;
-    color: #1d70b8; /* GOV.UK link color */
+    color: #1d70b8;
     text-decoration: underline;
     text-decoration-thickness: max(1px, 0.0625rem);
     text-underline-offset: 0.1578em;
 }
 
 .civicone-nav-dropdown__link:visited {
-    color: #4c2c92; /* GOV.UK visited link */
+    color: #4c2c92;
 }
 
 .civicone-nav-dropdown__link:hover {
-    color: #003078; /* GOV.UK link-hover */
+    color: #003078;
     text-decoration-thickness: max(3px, 0.1875rem, 0.12em);
     text-decoration-skip-ink: none;
 }
 
 .civicone-nav-dropdown__link:active {
-    color: #0b0c0c; /* GOV.UK link-active */
+    color: #0b0c0c;
 }
 
 .civicone-nav-dropdown__link:focus {
     outline: 3px solid transparent;
-    color: #0b0c0c; /* GOV.UK focus-text */
-    background-color: #ffdd00; /* GOV.UK focus */
-    box-shadow: 0 -2px #ffdd00, 0 4px #0b0c0c;
+    color: #0b0c0c;
+    background-color: #fd0;
+    box-shadow: 0 -2px #fd0, 0 4px #0b0c0c;
     text-decoration: none;
 }
 
@@ -420,71 +441,21 @@
 }
 
 /* ============================================
-   3. RIGHT-ALIGNED ACCOUNT LINKS
+   RIGHT-ALIGNED ACCOUNT LINKS
    ============================================ */
-@media (min-width: 641px) {
+@media (min-width: 40.0625em) {
     .govuk-service-navigation__item--right {
         margin-left: auto;
         margin-right: 0;
     }
 
     .govuk-service-navigation__item--right + .govuk-service-navigation__item--right {
-        margin-left: var(--govuk-nav-gap);
+        margin-left: 30px;
     }
 }
 
 /* ============================================
-   4. SEARCH (in header)
-   ============================================ */
-.civicone-search {
-    display: flex;
-    align-items: center;
-    gap: 0;
-}
-
-.civicone-search__input {
-    width: 200px;
-    padding: 8px 12px;
-    font-size: 1rem;
-    border: 2px solid var(--govuk-text);
-    border-right: 0;
-}
-
-.civicone-search__input:focus {
-    outline: 3px solid var(--govuk-focus);
-    outline-offset: 0;
-}
-
-.civicone-search__btn {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 44px;
-    height: 40px;
-    padding: 0;
-    background: var(--govuk-text);
-    border: 2px solid var(--govuk-text);
-    color: var(--govuk-white);
-    cursor: pointer;
-}
-
-.civicone-search__btn:hover {
-    background: #484949;
-}
-
-.civicone-search__btn:focus {
-    outline: 3px solid var(--govuk-focus);
-    outline-offset: 0;
-}
-
-@media (max-width: 640px) {
-    .civicone-search {
-        display: none;
-    }
-}
-
-/* ============================================
-   5. ACCESSIBILITY
+   ACCESSIBILITY ENHANCEMENTS
    ============================================ */
 
 /* High Contrast Mode */
@@ -492,26 +463,23 @@
     .govuk-service-navigation__item--active {
         border-color: CanvasText;
     }
-}
 
-/* Reduced Motion */
-@media (prefers-reduced-motion: reduce) {
-    .civicone-chevron {
-        transition: none;
+    .civicone-nav-dropdown {
+        border: 2px solid CanvasText;
     }
 }
 
-/* Print */
+/* Print - hide interactive elements */
 @media print {
     .govuk-service-navigation__toggle,
-    .civicone-nav-dropdown,
-    .civicone-search {
+    .civicone-nav-more,
+    .civicone-nav-dropdown {
         display: none !important;
     }
 }
 
 /* ============================================
-   6. HIGH CONTRAST TOGGLE STATE
+   HIGH CONTRAST TOGGLE (Custom Feature)
    ============================================ */
 html.high-contrast .govuk-service-navigation {
     background: #000000;
@@ -525,4 +493,18 @@ html.high-contrast .govuk-service-navigation__link {
 
 html.high-contrast .govuk-service-navigation__link:hover {
     background: #333333;
+}
+
+html.high-contrast .civicone-nav-dropdown {
+    background: #000000;
+    border-color: #ffffff;
+}
+
+html.high-contrast .civicone-nav-dropdown__link {
+    color: #ffffff;
+}
+
+html.high-contrast .civicone-nav-dropdown__section h3 {
+    color: #ffffff;
+    border-color: #ffffff;
 }

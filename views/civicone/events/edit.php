@@ -5,6 +5,7 @@
  */
 $pageTitle = 'Edit Event';
 require dirname(__DIR__, 2) . '/layouts/civicone/header.php';
+require_once __DIR__ . '/../components/govuk/breadcrumbs.php';
 $basePath = \Nexus\Core\TenantContext::getBasePath();
 
 // Handle form errors from session
@@ -13,20 +14,15 @@ $oldInput = $_SESSION['old_input'] ?? [];
 unset($_SESSION['form_errors'], $_SESSION['old_input']);
 ?>
 
-<nav class="govuk-breadcrumbs govuk-!-margin-bottom-6" aria-label="Breadcrumb">
-    <ol class="govuk-breadcrumbs__list">
-        <li class="govuk-breadcrumbs__list-item">
-            <a class="govuk-breadcrumbs__link" href="<?= $basePath ?>">Home</a>
-        </li>
-        <li class="govuk-breadcrumbs__list-item">
-            <a class="govuk-breadcrumbs__link" href="<?= $basePath ?>/events">Events</a>
-        </li>
-        <li class="govuk-breadcrumbs__list-item">
-            <a class="govuk-breadcrumbs__link" href="<?= $basePath ?>/events/<?= $event['id'] ?>"><?= htmlspecialchars($event['title']) ?></a>
-        </li>
-        <li class="govuk-breadcrumbs__list-item" aria-current="page">Edit</li>
-    </ol>
-</nav>
+<?= civicone_govuk_breadcrumbs([
+    'items' => [
+        ['text' => 'Home', 'href' => $basePath],
+        ['text' => 'Events', 'href' => $basePath . '/events'],
+        ['text' => htmlspecialchars($event['title']), 'href' => $basePath . '/events/' . $event['id']],
+        ['text' => 'Edit']
+    ],
+    'class' => 'govuk-!-margin-bottom-6'
+]) ?>
 
 <a href="<?= $basePath ?>/events/<?= $event['id'] ?>" class="govuk-back-link govuk-!-margin-bottom-6">Back to event</a>
 

@@ -1,0 +1,133 @@
+/**
+ * CivicOne Header - Dark Blue Bar (GOV.UK Pattern)
+ *
+ * This follows the GOV.UK Header STRUCTURE and CSS patterns but with CivicOne branding.
+ * We use the GOV.UK Frontend CSS values but NOT their logo or branding.
+ *
+ * SOURCE PATTERNS: https://github.com/alphagov/govuk-frontend/blob/main/packages/govuk-frontend/src/govuk/components/header/_index.scss
+ *
+ * EXACT VALUES FROM GOV.UK FRONTEND v5.14.0:
+ * ─────────────────────────────────────────────────────────────────────────
+ * Background:        #1d70b8 (blue primary - brand color)
+ * Text/Icons:        #ffffff (white)
+ * Focus background:  #fd0 (yellow)
+ * Focus text:        #0b0c0c (black)
+ * Link underline:    3px solid (on hover)
+ *
+ * Spacing:
+ * - Logo padding: 16px top, 12px bottom
+ * - Desktop: 33.33% width for logo column
+ *
+ * Breakpoints:
+ * - Desktop: 61.875em (990px)
+ */
+
+/* ============================================
+   CIVICONE HEADER - Dark Blue Bar
+   ============================================ */
+
+.govuk-header {
+    font-family: "GDS Transport", arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    font-weight: 700;
+    font-size: 1rem;
+    line-height: 1;
+    border-bottom: 1px solid transparent;
+    color: #ffffff;
+    background: #1d70b8;
+}
+
+@media print {
+    .govuk-header {
+        font-family: sans-serif;
+    }
+}
+
+/* Logo Container */
+.govuk-header__logo {
+    box-sizing: border-box;
+    padding-top: 10px;
+    padding-bottom: 10px;
+}
+
+@media (min-width: 61.875em) {
+    .govuk-header__logo {
+        width: auto;
+        padding-right: 15px;
+        float: none;
+        vertical-align: top;
+    }
+}
+
+/* Homepage Link - Site Name Link Styling */
+.govuk-header__homepage-link {
+    display: inline-block;
+    font-size: 1.5rem;
+    font-weight: 700;
+    text-decoration: none;
+    line-height: 1.25;
+}
+
+@media (min-width: 40.0625em) {
+    .govuk-header__homepage-link {
+        font-size: 1.875rem;
+    }
+}
+
+.govuk-header__homepage-link:link,
+.govuk-header__homepage-link:visited {
+    color: #ffffff;
+    text-decoration: none;
+}
+
+.govuk-header__homepage-link:hover {
+    text-decoration: underline;
+    text-decoration-thickness: 3px;
+    text-underline-offset: 0.1578em;
+}
+
+.govuk-header__homepage-link:focus {
+    outline: 3px solid transparent;
+    color: #0b0c0c;
+    background-color: #fd0;
+    box-shadow: 0 -2px #fd0, 0 4px #0b0c0c;
+    text-decoration: none;
+}
+
+/* Logotype - Text-based site name */
+.govuk-header__logotype {
+    display: inline-block;
+    vertical-align: middle;
+}
+
+/* ============================================
+   PRINT STYLES
+   ============================================ */
+
+@media print {
+    .govuk-header {
+        border-bottom-width: 0;
+        color: #0b0c0c;
+        background: transparent;
+    }
+
+    .govuk-header__homepage-link:link,
+    .govuk-header__homepage-link:visited {
+        color: #0b0c0c;
+    }
+}
+
+/* ============================================
+   HIGH CONTRAST MODE (CivicOne Custom Feature)
+   ============================================ */
+
+html.high-contrast .govuk-header {
+    background: #000000;
+    border-color: #ffffff;
+}
+
+html.high-contrast .govuk-header__homepage-link:link,
+html.high-contrast .govuk-header__homepage-link:visited {
+    color: #ffffff;
+}

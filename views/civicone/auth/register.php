@@ -28,13 +28,13 @@ $basePath = \Nexus\Core\TenantContext::getBasePath();
             <!-- Name Fields -->
             <div class="govuk-form-group">
                 <label class="govuk-label" for="first_name">First name</label>
-                <input type="text" name="first_name" id="first_name" class="govuk-input govuk-input--width-20" required autocomplete="given-name">
+                <input type="text" name="first_name" id="first_name" class="govuk-input govuk-input--width-20" required autocomplete="given-name" spellcheck="false">
             </div>
 
             <div class="govuk-form-group">
                 <label class="govuk-label" for="last_name">Last name</label>
-                <div class="govuk-hint">Visible only to site administrators</div>
-                <input type="text" name="last_name" id="last_name" class="govuk-input govuk-input--width-20" required autocomplete="family-name">
+                <div id="last_name-hint" class="govuk-hint">Visible only to site administrators</div>
+                <input type="text" name="last_name" id="last_name" class="govuk-input govuk-input--width-20" required autocomplete="family-name" aria-describedby="last_name-hint" spellcheck="false">
             </div>
 
             <!-- Profile Type -->
@@ -55,8 +55,8 @@ $basePath = \Nexus\Core\TenantContext::getBasePath();
             <!-- Location -->
             <div class="govuk-form-group">
                 <label class="govuk-label" for="location">Location</label>
-                <div class="govuk-hint">Start typing your town or city</div>
-                <input type="text" name="location" id="location" class="govuk-input mapbox-location-input-v2" required autocomplete="address-level2">
+                <div id="location-hint" class="govuk-hint">Start typing your town or city</div>
+                <input type="text" name="location" id="location" class="govuk-input mapbox-location-input-v2" required autocomplete="address-level2" aria-describedby="location-hint">
                 <input type="hidden" name="latitude" id="location_lat">
                 <input type="hidden" name="longitude" id="location_lng">
             </div>
@@ -64,8 +64,8 @@ $basePath = \Nexus\Core\TenantContext::getBasePath();
             <!-- Phone -->
             <div class="govuk-form-group">
                 <label class="govuk-label" for="phone">Phone number (optional)</label>
-                <div class="govuk-hint">Only visible to administrators</div>
-                <input type="tel" name="phone" id="phone" class="govuk-input govuk-input--width-20" autocomplete="tel">
+                <div id="phone-hint" class="govuk-hint">Only visible to administrators</div>
+                <input type="tel" name="phone" id="phone" class="govuk-input govuk-input--width-20" autocomplete="tel" aria-describedby="phone-hint">
             </div>
 
             <!-- Email -->
@@ -77,8 +77,8 @@ $basePath = \Nexus\Core\TenantContext::getBasePath();
             <!-- Password -->
             <div class="govuk-form-group">
                 <label class="govuk-label" for="password">Password</label>
-                <div class="govuk-hint">Must be at least 12 characters with uppercase, lowercase, number and special character</div>
-                <input type="password" name="password" id="password" class="govuk-input" required autocomplete="new-password" onkeyup="checkPasswordStrength()">
+                <div id="password-hint" class="govuk-hint">Must be at least 12 characters with uppercase, lowercase, number and special character</div>
+                <input type="password" name="password" id="password" class="govuk-input" required autocomplete="new-password" aria-describedby="password-hint password-rules" onkeyup="checkPasswordStrength()">
 
                 <!-- Password Strength Indicator -->
                 <div id="password-rules" class="govuk-!-margin-top-3" role="status" aria-live="polite">

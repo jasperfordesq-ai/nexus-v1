@@ -12,9 +12,10 @@
  * - Point 36: 27px mobile → 36px desktop (M headings)
  * - Point 27: 21px mobile → 27px desktop (S headings)
  * - Point 24: 18px mobile → 24px desktop (Lead text)
- * - Point 19: 16px mobile → 19px desktop (Body)
+ * - Point 19: 16px mobile → 19px desktop (Body, Caption)
  * - Point 16: 14px mobile → 16px desktop (Small)
- * - Point 14: 12px mobile → 14px desktop (Caption)
+ *
+ * Note: Caption elevated to Point 19 for WCAG 2.1 AA compliance (min 16px)
  *
  * Line heights:
  * - Headings: 1.09375 (tight)
@@ -262,11 +263,11 @@ body.nexus-skin-civicone {
     }
 }
 
-/* Caption text - GOV.UK Point 14 */
+/* Caption text - GOV.UK Point 19 (minimum 16px for WCAG 2.1 AA) */
 [data-layout="civicone"] .caption,
 .civicone .caption,
 .civic-caption {
-    font-size: var(--font-size-xs); /* 12px mobile */
+    font-size: var(--font-size-base); /* 16px - WCAG 2.1 AA minimum */
     line-height: var(--govuk-line-height-body);
     color: var(--civicone-text-secondary);
 }
@@ -275,7 +276,7 @@ body.nexus-skin-civicone {
     [data-layout="civicone"] .caption,
     .civicone .caption,
     .civic-caption {
-        font-size: var(--font-size-sm); /* 14px desktop */
+        font-size: 1.1875rem; /* 19px desktop - matches GOV.UK body */
     }
 }
 

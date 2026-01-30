@@ -317,7 +317,7 @@
 .biometric-promo {
     margin-bottom: var(--space-5);
     padding: var(--space-4);
-    background: linear-gradient(135deg, rgba(99, 102, 241, 0.08), rgba(139, 92, 246, 0.08));
+    background: linear-gradient(135deg, var(--color-indigo-alpha-8), var(--color-violet-alpha-8));
     border-radius: var(--radius-md);
     border: 1px solid var(--color-primary-500);
     border-opacity: 0.2;
@@ -357,7 +357,7 @@
 }
 
 .biometric-promo-badge {
-    background: rgba(99, 102, 241, 0.1);
+    background: var(--color-indigo-alpha-10);
     color: var(--color-primary-500);
     padding: var(--space-1) var(--space-2);
     border-radius: var(--radius-md);
@@ -485,9 +485,9 @@
    ======================================== */
 
 [data-theme="dark"] .auth-card {
-    background: rgba(30, 41, 59, 0.85);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+    background: var(--color-slate-alpha-85);
+    border: 1px solid var(--color-white-alpha-10);
+    box-shadow: 0 10px 40px var(--color-black-alpha-40);
 }
 
 /* Headings */
@@ -501,21 +501,21 @@
 
 /* Messages */
 [data-theme="dark"] .auth-message-success {
-    background: rgba(16, 185, 129, 0.15);
-    border-color: rgba(16, 185, 129, 0.3);
+    background: var(--color-emerald-alpha-15);
+    border-color: var(--color-emerald-alpha-30);
     color: var(--color-success);
 }
 
 [data-theme="dark"] .auth-message-error {
-    background: rgba(239, 68, 68, 0.15);
-    border-color: rgba(239, 68, 68, 0.3);
+    background: var(--color-red-alpha-15);
+    border-color: var(--color-red-alpha-30);
     color: var(--color-danger);
 }
 
 /* Biometric promo */
 [data-theme="dark"] .biometric-promo {
-    background: linear-gradient(135deg, rgba(99, 102, 241, 0.15), rgba(139, 92, 246, 0.15));
-    border-color: rgba(99, 102, 241, 0.3);
+    background: linear-gradient(135deg, var(--color-indigo-alpha-15), var(--color-violet-alpha-15));
+    border-color: var(--color-indigo-alpha-30);
 }
 
 [data-theme="dark"] .biometric-promo-title {
@@ -537,8 +537,8 @@
 
 /* Form inputs */
 [data-theme="dark"] .form-input {
-    background: rgba(15, 23, 42, 0.6);
-    border-color: rgba(255, 255, 255, 0.15);
+    background: var(--color-slate-900-alpha-60);
+    border-color: var(--color-white-alpha-15);
     color: var(--color-gray-900);
 }
 
@@ -548,7 +548,7 @@
 
 [data-theme="dark"] .form-input:focus {
     border-color: var(--color-primary-500) !important;
-    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+    box-shadow: 0 0 0 3px var(--color-indigo-alpha-20);
 }
 
 [data-theme="dark"] .form-note {
@@ -557,9 +557,9 @@
 
 /* Password rules */
 [data-theme="dark"] .password-rules {
-    background: rgba(15, 23, 42, 0.6);
+    background: var(--color-slate-900-alpha-60);
     color: var(--color-gray-400);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    border: 1px solid var(--color-white-alpha-10);
 }
 
 [data-theme="dark"] .rules-title {
@@ -594,8 +594,8 @@
 
 /* Data protection notice */
 [data-theme="dark"] .data-protection-notice {
-    background: rgba(15, 23, 42, 0.6);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: var(--color-slate-900-alpha-60);
+    border: 1px solid var(--color-white-alpha-10);
 }
 
 [data-theme="dark"] .data-protection-notice p:first-child {
@@ -609,7 +609,7 @@
 
 /* Select dropdown */
 [data-theme="dark"] select.form-input {
-    background: rgba(15, 23, 42, 0.6);
+    background: var(--color-slate-900-alpha-60);
     color: var(--color-gray-900);
 }
 
@@ -630,22 +630,22 @@
 
 /* Success message - inline style override */
 [data-theme="dark"] .auth-card div[style*="background:#f0fdf4"] {
-    background: rgba(16, 185, 129, 0.15) !important;
-    border-color: rgba(16, 185, 129, 0.3) !important;
+    background: var(--color-emerald-alpha-15) !important;
+    border-color: var(--color-emerald-alpha-30) !important;
     color: var(--color-success) !important;
 }
 
 /* Error message - inline style override */
 [data-theme="dark"] .auth-card div[style*="background:var(--color-red-50)"] {
-    background: rgba(239, 68, 68, 0.15) !important;
-    border-color: rgba(239, 68, 68, 0.3) !important;
+    background: var(--color-red-alpha-15) !important;
+    border-color: var(--color-red-alpha-30) !important;
     color: var(--color-danger) !important;
 }
 
 /* Biometric promo box - inline style override */
 [data-theme="dark"] #biometric-promo {
-    background: linear-gradient(135deg, rgba(99, 102, 241, 0.15), rgba(139, 92, 246, 0.15)) !important;
-    border-color: rgba(99, 102, 241, 0.3) !important;
+    background: linear-gradient(135deg, var(--color-indigo-alpha-15), var(--color-violet-alpha-15)) !important;
+    border-color: var(--color-indigo-alpha-30) !important;
 }
 
 [data-theme="dark"] #biometric-promo div[style*="color:var(--color-primary-600)"] {
@@ -671,8 +671,8 @@
 [data-theme="dark"] .auth-card input[type="password"],
 [data-theme="dark"] .auth-card input[type="text"],
 [data-theme="dark"] .auth-card input[type="tel"] {
-    background: rgba(15, 23, 42, 0.6) !important;
-    border-color: rgba(255, 255, 255, 0.15) !important;
+    background: var(--color-slate-900-alpha-60) !important;
+    border-color: var(--color-white-alpha-15) !important;
     color: var(--color-gray-900) !important;
 }
 
@@ -682,7 +682,7 @@
 
 [data-theme="dark"] .auth-card input:focus {
     border-color: var(--color-primary-500) !important;
-    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+    box-shadow: 0 0 0 3px var(--color-indigo-alpha-20);
 }
 
 /* Links - inline style override */
@@ -711,8 +711,8 @@
 
 /* Data Protection Notice Box - inline style override */
 [data-theme="dark"] div[style*="background: var(--color-gray-50)"][style*="border-radius: var(--radius-base)"] {
-    background: rgba(15, 23, 42, 0.6) !important;
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: var(--color-slate-900-alpha-60) !important;
+    border: 1px solid var(--color-white-alpha-10);
 }
 
 [data-theme="dark"] div[style*="background: var(--color-gray-50)"] p[style*="color: var(--color-gray-700)"] {

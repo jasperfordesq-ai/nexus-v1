@@ -68,18 +68,18 @@
     left: 0;
     right: 0;
     z-index: var(--z-fixed, 1200);
-    background: rgba(255, 255, 255, 0.95);
+    background: var(--color-white-alpha-95);
     -webkit-backdrop-filter: blur(20px);
     backdrop-filter: blur(20px);
     border-top: 1px solid var(--border-subtle);
     padding: var(--space-2) 0;
     padding-bottom: max(var(--space-2), env(safe-area-inset-bottom));
-    box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.08);
+    box-shadow: 0 -4px 20px var(--color-black-alpha-8);
 }
 
 [data-theme="dark"] .nexus-bottom-nav {
-    background: rgba(15, 23, 42, 0.95);
-    border-top-color: rgba(255, 255, 255, 0.1);
+    background: var(--color-slate-900-alpha-95);
+    border-top-color: var(--color-white-alpha-10);
 }
 
 .nexus-bottom-nav-inner {
@@ -261,14 +261,14 @@
 /* Skeleton card component */
 .skeleton-card-full {
     padding: var(--space-5);
-    background: rgba(255, 255, 255, 0.8);
+    background: var(--color-white-alpha-80);
     border-radius: var(--radius-lg);
-    border: 1px solid rgba(0, 0, 0, 0.05);
+    border: 1px solid var(--color-black-alpha-5);
 }
 
 [data-theme="dark"] .skeleton-card-full {
-    background: rgba(30, 41, 59, 0.8);
-    border-color: rgba(255, 255, 255, 0.1);
+    background: var(--color-slate-800-alpha-80);
+    border-color: var(--color-white-alpha-10);
 }
 
 .skeleton-card-full .skeleton-header {
@@ -315,8 +315,8 @@
     justify-content: center;
     opacity: 0;
     box-shadow:
-        0 4px 20px rgba(0, 0, 0, 0.15),
-        0 0 0 1px rgba(0, 0, 0, 0.05);
+        0 4px 20px var(--color-black-alpha-15),
+        0 0 0 1px var(--color-black-alpha-5);
     z-index: var(--z-modal, 1400);
     pointer-events: none;
     transition: opacity var(--transition-fast) var(--ease-in-out), transform var(--transition-fast) var(--ease-in-out);
@@ -326,8 +326,8 @@
 [data-theme="dark"] .nexus-swipe-back-indicator {
     background: var(--color-slate-800);
     box-shadow:
-        0 4px 20px rgba(0, 0, 0, 0.3),
-        0 0 0 1px rgba(255, 255, 255, 0.1);
+        0 4px 20px var(--color-black-alpha-30),
+        0 0 0 1px var(--color-white-alpha-10);
 }
 
 .nexus-swipe-back-indicator.visible {
@@ -337,8 +337,8 @@
 .nexus-swipe-back-indicator.ready {
     background: linear-gradient(135deg, var(--color-primary-500), var(--color-purple-500));
     box-shadow:
-        0 4px 24px rgba(99, 102, 241, 0.4),
-        0 0 0 4px rgba(99, 102, 241, 0.1);
+        0 4px 24px var(--color-indigo-alpha-40),
+        0 0 0 4px var(--color-indigo-alpha-10);
 }
 
 .nexus-swipe-back-indicator.ready i {
@@ -553,7 +553,7 @@ html {
 }
 
 .nexus-toast {
-    background: rgba(15, 23, 42, 0.95);
+    background: var(--color-slate-900-alpha-95);
     -webkit-backdrop-filter: blur(10px);
     backdrop-filter: blur(10px);
     color: white;
@@ -561,7 +561,7 @@ html {
     border-radius: var(--radius-md);
     font-size: var(--font-size-sm);
     font-weight: 500;
-    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 10px 40px var(--color-black-alpha-30);
     display: flex;
     align-items: center;
     gap: var(--space-3);
@@ -570,15 +570,15 @@ html {
 }
 
 .nexus-toast.success {
-    background: rgba(16, 185, 129, 0.95);
+    background: var(--color-emerald-alpha-95);
 }
 
 .nexus-toast.error {
-    background: rgba(239, 68, 68, 0.95);
+    background: var(--color-red-alpha-95);
 }
 
 .nexus-toast.warning {
-    background: rgba(245, 158, 11, 0.95);
+    background: var(--color-amber-500-alpha-95);
 }
 
 .nexus-toast.exit {
@@ -617,7 +617,7 @@ html {
 .nexus-loading-overlay {
     position: fixed;
     inset: 0;
-    background: rgba(255, 255, 255, 0.9);
+    background: var(--color-white-alpha-90);
     -webkit-backdrop-filter: blur(10px);
     backdrop-filter: blur(10px);
     display: flex;
@@ -631,7 +631,7 @@ html {
 }
 
 [data-theme="dark"] .nexus-loading-overlay {
-    background: rgba(15, 23, 42, 0.9);
+    background: var(--color-slate-900-alpha-90);
 }
 
 .nexus-loading-overlay.visible {
@@ -642,7 +642,7 @@ html {
 .nexus-loading-spinner {
     width: var(--space-12);
     height: var(--space-12);
-    border: 4px solid rgba(99, 102, 241, 0.2);
+    border: 4px solid var(--color-indigo-alpha-20);
     border-top-color: var(--color-primary-500);
     border-radius: 50%;
     animation: loading-spin var(--transition-slow) linear infinite;
@@ -682,7 +682,7 @@ html {
 .nexus-share-sheet-backdrop {
     position: absolute;
     inset: 0;
-    background: rgba(0, 0, 0, 0.5);
+    background: var(--color-black-alpha-50);
     -webkit-backdrop-filter: blur(4px);
     backdrop-filter: blur(4px);
 }
@@ -712,7 +712,7 @@ html {
     justify-content: space-between;
     align-items: center;
     padding: var(--space-4) var(--space-5);
-    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+    border-bottom: 1px solid var(--color-black-alpha-10);
 }
 
 .nexus-share-sheet-header h3 {
@@ -725,7 +725,7 @@ html {
     width: var(--space-8);
     height: var(--space-8);
     border-radius: 50%;
-    background: rgba(0, 0, 0, 0.05);
+    background: var(--color-black-alpha-5);
     border: none;
     font-size: var(--font-size-xl);
     cursor: pointer;
@@ -735,7 +735,7 @@ html {
 }
 
 [data-theme="dark"] .nexus-share-close {
-    background: rgba(255, 255, 255, 0.1);
+    background: var(--color-white-alpha-10);
     color: white;
 }
 
@@ -756,7 +756,7 @@ html {
     gap: var(--space-2);
     padding: var(--space-4) var(--space-2);
     border: none;
-    background: rgba(0, 0, 0, 0.03);
+    background: var(--color-black-alpha-3);
     border-radius: var(--radius-lg);
     text-decoration: none;
     color: inherit;
@@ -766,7 +766,7 @@ html {
 
 .nexus-share-option:active {
     transform: scale(0.95);
-    background: rgba(99, 102, 241, 0.1);
+    background: var(--color-indigo-alpha-10);
 }
 
 .nexus-share-option i {
@@ -804,7 +804,7 @@ html {
 }
 
 [data-theme="dark"] .nexus-share-option {
-    background: rgba(255, 255, 255, 0.05);
+    background: var(--color-white-alpha-5);
     color: white;
 }
 
@@ -852,7 +852,7 @@ html {
     align-items: center;
     padding: var(--space-8) var(--space-10);
     padding-bottom: calc(30px + env(safe-area-inset-bottom));
-    background: linear-gradient(transparent, rgba(0, 0, 0, 0.7));
+    background: linear-gradient(transparent, var(--color-black-alpha-70));
 }
 
 .nexus-camera-btn {
@@ -860,7 +860,7 @@ html {
     height: 56px;
     border-radius: 50%;
     border: none;
-    background: rgba(255, 255, 255, 0.2);
+    background: var(--color-white-alpha-20);
     -webkit-backdrop-filter: blur(10px);
     backdrop-filter: blur(10px);
     color: white;
@@ -882,7 +882,7 @@ html {
     background: white;
     color: var(--color-gray-800);
     font-size: var(--font-size-2xl);
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 4px 20px var(--color-black-alpha-30);
 }
 
 .nexus-camera-capture:active {

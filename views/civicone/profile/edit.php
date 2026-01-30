@@ -28,6 +28,7 @@ $oldInput = $_SESSION['old_input'] ?? [];
 unset($_SESSION['form_errors'], $_SESSION['old_input']);
 
 require __DIR__ . '/../../layouts/civicone/header.php';
+require_once __DIR__ . '/../components/govuk/breadcrumbs.php';
 $basePath = \Nexus\Core\TenantContext::getBasePath();
 $displayName = htmlspecialchars($user['first_name'] . ' ' . $user['last_name']);
 ?>
@@ -35,23 +36,16 @@ $displayName = htmlspecialchars($user['first_name'] . ' ' . $user['last_name']);
 <div class="govuk-width-container">
     <main class="govuk-main-wrapper">
 
-        <!-- Breadcrumbs (GOV.UK Template D requirement) -->
-        <nav class="govuk-breadcrumbs govuk-!-margin-bottom-6" aria-label="Breadcrumb">
-            <ol class="govuk-breadcrumbs__list">
-                <li class="govuk-breadcrumbs__list-item">
-                    <a class="govuk-breadcrumbs__link" href="<?= $basePath ?>">Home</a>
-                </li>
-                <li class="govuk-breadcrumbs__list-item">
-                    <a class="govuk-breadcrumbs__link" href="<?= $basePath ?>/members">Members</a>
-                </li>
-                <li class="govuk-breadcrumbs__list-item">
-                    <a class="govuk-breadcrumbs__link" href="<?= $basePath ?>/profile/<?= $user['id'] ?>"><?= $displayName ?></a>
-                </li>
-                <li class="govuk-breadcrumbs__list-item" aria-current="page">
-                    Edit Profile
-                </li>
-            </ol>
-        </nav>
+        <?= civicone_govuk_breadcrumbs([
+            'items' => [
+                ['text' => 'Home', 'href' => $basePath],
+                ['text' => 'Members', 'href' => $basePath . '/members'],
+                ['text' => $displayName, 'href' => $basePath . '/profile/' . $user['id']],
+                ['text' => 'Edit Profile']
+            ],
+            'class' => 'govuk-!-margin-bottom-6'
+        ]) ?>
+
         <div class="govuk-grid-row">
             <div class="govuk-grid-column-two-thirds">
 

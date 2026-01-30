@@ -151,6 +151,7 @@ const cssFiles = [
     // Admin sidebar
     'admin-sidebar.css',
     // CivicOne components
+    'civicone-govuk-header.css',  // GOV.UK Header (dark blue bar - 2026-01-30)
     'civicone-footer.css',
     'civicone-dashboard.css',
     'civicone-achievements.css',

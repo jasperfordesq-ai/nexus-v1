@@ -5,23 +5,19 @@
  */
 $pageTitle = 'Edit Poll';
 require __DIR__ . '/../../layouts/civicone/header.php';
+require_once __DIR__ . '/../components/govuk/breadcrumbs.php';
 $basePath = \Nexus\Core\TenantContext::getBasePath();
 ?>
 
-<nav class="govuk-breadcrumbs govuk-!-margin-bottom-6" aria-label="Breadcrumb">
-    <ol class="govuk-breadcrumbs__list">
-        <li class="govuk-breadcrumbs__list-item">
-            <a class="govuk-breadcrumbs__link" href="<?= $basePath ?>">Home</a>
-        </li>
-        <li class="govuk-breadcrumbs__list-item">
-            <a class="govuk-breadcrumbs__link" href="<?= $basePath ?>/polls">Polls</a>
-        </li>
-        <li class="govuk-breadcrumbs__list-item">
-            <a class="govuk-breadcrumbs__link" href="<?= $basePath ?>/polls/<?= $poll['id'] ?>">Poll</a>
-        </li>
-        <li class="govuk-breadcrumbs__list-item" aria-current="page">Edit</li>
-    </ol>
-</nav>
+<?= civicone_govuk_breadcrumbs([
+    'items' => [
+        ['text' => 'Home', 'href' => $basePath],
+        ['text' => 'Polls', 'href' => $basePath . '/polls'],
+        ['text' => 'Poll', 'href' => $basePath . '/polls/' . $poll['id']],
+        ['text' => 'Edit']
+    ],
+    'class' => 'govuk-!-margin-bottom-6'
+]) ?>
 
 <a href="<?= $basePath ?>/polls/<?= $poll['id'] ?>" class="govuk-back-link govuk-!-margin-bottom-6">Back to poll</a>
 

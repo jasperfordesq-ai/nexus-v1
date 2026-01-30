@@ -11,14 +11,14 @@
     --admin-sidebar-width: 280px;
     --admin-sidebar-collapsed-width: 72px;
     --admin-sidebar-transition: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-    --admin-sidebar-bg: rgba(10, 14, 26, 0.98);
-    --admin-sidebar-border: rgba(99, 102, 241, 0.2);
-    --admin-sidebar-item-hover: rgba(99, 102, 241, 0.15);
-    --admin-sidebar-item-active: rgba(99, 102, 241, 0.25);
-    --admin-sidebar-group-color: rgba(139, 92, 246, 0.9);
-    --admin-sidebar-text: rgba(255, 255, 255, 0.85);
-    --admin-sidebar-text-muted: rgba(255, 255, 255, 0.5);
-    --admin-sidebar-scrollbar: rgba(99, 102, 241, 0.3);
+    --admin-sidebar-bg: var(--color-slate-900-alpha-95);
+    --admin-sidebar-border: var(--color-indigo-alpha-20);
+    --admin-sidebar-item-hover: var(--color-indigo-alpha-15);
+    --admin-sidebar-item-active: var(--color-indigo-alpha-25);
+    --admin-sidebar-group-color: var(--color-violet-alpha-60);
+    --admin-sidebar-text: var(--color-white-alpha-85);
+    --admin-sidebar-text-muted: var(--color-white-alpha-50);
+    --admin-sidebar-scrollbar: var(--color-indigo-alpha-30);
 }
 
 /* ==========================================================================
@@ -69,7 +69,7 @@
     content: '';
     position: absolute;
     inset: 0;
-    background: linear-gradient(180deg, rgba(99, 102, 241, 0.05) 0%, transparent 50%);
+    background: linear-gradient(180deg, var(--color-indigo-alpha-5) 0%, transparent 50%);
     pointer-events: none;
 }
 
@@ -132,7 +132,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    background: rgba(99, 102, 241, 0.1);
+    background: var(--color-indigo-alpha-10);
     border: 1px solid var(--admin-sidebar-border);
     border-radius: 8px;
     color: var(--admin-sidebar-text-muted);
@@ -142,7 +142,7 @@
 }
 
 .admin-sidebar-toggle:hover {
-    background: rgba(99, 102, 241, 0.2);
+    background: var(--color-indigo-alpha-20);
     color: var(--color-white);
 }
 
@@ -164,7 +164,7 @@
     align-items: center;
     width: 100%;
     padding: var(--space-2) var(--space-3);
-    background: rgba(99, 102, 241, 0.08);
+    background: var(--color-indigo-alpha-8);
     border: 1px solid var(--admin-sidebar-border);
     border-radius: var(--radius-base);
     color: var(--admin-sidebar-text-muted);
@@ -175,8 +175,8 @@
 }
 
 .admin-sidebar-search-btn:hover {
-    background: rgba(99, 102, 241, 0.15);
-    border-color: rgba(99, 102, 241, 0.4);
+    background: var(--color-indigo-alpha-15);
+    border-color: var(--color-indigo-alpha-40);
     color: var(--admin-sidebar-text);
 }
 
@@ -195,9 +195,9 @@
 .admin-sidebar-search-kbd {
     font-size: var(--font-size-xs);
     padding: var(--space-1) var(--space-2);
-    background: rgba(99, 102, 241, 0.15);
+    background: var(--color-indigo-alpha-15);
     border-radius: var(--radius-sm);
-    color: rgba(255, 255, 255, 0.6);
+    color: var(--color-white-alpha-60);
     font-family: inherit;
     opacity: 1;
     transition: opacity var(--admin-sidebar-transition);
@@ -211,8 +211,8 @@
     align-items: center;
     margin: var(--space-2) var(--space-3);
     padding: var(--space-2) var(--space-3);
-    background: linear-gradient(135deg, rgba(245, 158, 11, 0.15) 0%, rgba(234, 88, 12, 0.1) 100%);
-    border: 1px solid rgba(245, 158, 11, 0.3);
+    background: linear-gradient(135deg, var(--color-amber-500-alpha-15) 0%, var(--color-orange-600-alpha-12) 100%);
+    border: 1px solid var(--color-amber-500-alpha-30);
     border-radius: var(--radius-base);
     color: var(--color-amber-300);
     text-decoration: none;
@@ -223,8 +223,8 @@
 }
 
 .admin-sidebar-super-admin:hover {
-    background: linear-gradient(135deg, rgba(245, 158, 11, 0.25) 0%, rgba(234, 88, 12, 0.2) 100%);
-    border-color: rgba(245, 158, 11, 0.5);
+    background: linear-gradient(135deg, var(--color-amber-500-alpha-20) 0%, var(--color-orange-600-alpha-15) 100%);
+    border-color: var(--color-amber-500-alpha-40);
 }
 
 .admin-sidebar-super-admin i {
@@ -262,7 +262,7 @@
 }
 
 .admin-sidebar-nav::-webkit-scrollbar-thumb:hover {
-    background: rgba(99, 102, 241, 0.5);
+    background: var(--color-indigo-alpha-50);
 }
 
 /* ==========================================================================
@@ -327,7 +327,7 @@
     text-align: center;
     font-size: var(--font-size-sm);
     flex-shrink: 0;
-    color: rgba(139, 92, 246, 0.9);
+    color: var(--color-violet-alpha-60);
 }
 
 .admin-sidebar-section-header.active i:first-child {
@@ -358,7 +358,7 @@
 
 /* Visual indicator for expanded section header */
 .admin-sidebar-section.expanded .admin-sidebar-section-header {
-    background: rgba(99, 102, 241, 0.08);
+    background: var(--color-indigo-alpha-8);
     border-left: 2px solid var(--color-purple-500);
     margin-left: -2px;
 }
@@ -401,14 +401,14 @@
 
 .admin-sidebar-item.active {
     color: var(--color-white);
-    background: linear-gradient(90deg, rgba(139, 92, 246, 0.3) 0%, var(--admin-sidebar-item-active) 100%);
+    background: linear-gradient(90deg, var(--color-violet-alpha-30) 0%, var(--admin-sidebar-item-active) 100%);
     font-weight: 600;
     border-left: 2px solid var(--color-purple-400-alt);
     margin-left: -1px;
 }
 
 .admin-sidebar-item.active i {
-    color: #c4b5fd;
+    color: var(--color-purple-300);
 }
 
 .admin-sidebar-item i {
@@ -444,7 +444,7 @@
     border-radius: var(--radius-md);
     margin-left: auto;
     flex-shrink: 0;
-    box-shadow: 0 2px 4px rgba(245, 158, 11, 0.3);
+    box-shadow: 0 2px 4px var(--color-amber-500-alpha-30);
     animation: admin-badge-pulse 2s ease-in-out infinite;
 }
 
@@ -456,18 +456,18 @@
 /* Badge variants */
 .admin-sidebar-badge--danger {
     background: linear-gradient(135deg, var(--color-danger) 0%, var(--color-red-600) 100%);
-    box-shadow: 0 2px 4px rgba(239, 68, 68, 0.3);
+    box-shadow: 0 2px 4px var(--color-red-alpha-30);
 }
 
 .admin-sidebar-badge--success {
-    background: linear-gradient(135deg, var(--color-success) 0%, #059669 100%);
-    box-shadow: 0 2px 4px rgba(16, 185, 129, 0.3);
+    background: linear-gradient(135deg, var(--color-success) 0%, var(--color-emerald-600) 100%);
+    box-shadow: 0 2px 4px var(--color-emerald-alpha-30);
     animation: none; /* Success badges don't pulse */
 }
 
 .admin-sidebar-badge--info {
     background: linear-gradient(135deg, var(--color-primary-500) 0%, var(--color-primary-600) 100%);
-    box-shadow: 0 2px 4px rgba(99, 102, 241, 0.3);
+    box-shadow: 0 2px 4px var(--color-indigo-alpha-30);
     animation: none;
 }
 
@@ -525,15 +525,15 @@
 }
 
 .admin-sidebar-single.active {
-    background: linear-gradient(135deg, rgba(99, 102, 241, 0.3) 0%, rgba(139, 92, 246, 0.2) 100%);
-    border: 1px solid rgba(99, 102, 241, 0.3);
+    background: linear-gradient(135deg, var(--color-indigo-alpha-30) 0%, var(--color-violet-alpha-20) 100%);
+    border: 1px solid var(--color-indigo-alpha-30);
 }
 
 .admin-sidebar-single i {
     width: 20px;
     text-align: center;
     font-size: var(--font-size-base);
-    color: rgba(139, 92, 246, 0.9);
+    color: var(--color-violet-alpha-60);
     flex-shrink: 0;
 }
 
@@ -707,7 +707,7 @@
     top: 50%;
     transform: translateY(-50%) translateX(-4px);
     padding: 0.5rem 0.75rem;
-    background: rgba(15, 23, 42, 0.95);
+    background: var(--color-slate-900-alpha-95);
     border: 1px solid var(--admin-sidebar-border);
     border-radius: 6px;
     color: var(--color-white);
@@ -720,7 +720,7 @@
     transition: opacity 0.15s ease, visibility 0s linear 0.15s, transform 0.15s ease;
     z-index: 200;
     pointer-events: none;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 4px 12px var(--color-black-alpha-30);
 }
 
 .admin-layout.sidebar-collapsed .admin-sidebar-section-header:hover::after,
@@ -742,11 +742,11 @@
     top: 0;
     margin-left: var(--space-2);
     min-width: 200px;
-    background: rgba(15, 23, 42, 0.98);
+    background: var(--color-slate-900-alpha-95);
     border: 1px solid var(--admin-sidebar-border);
     border-radius: var(--radius-base);
     padding: var(--space-2);
-    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 10px 40px var(--color-black-alpha-30);
     z-index: 200;
     opacity: 0;
     visibility: hidden;
@@ -884,7 +884,7 @@
     align-items: center;
     gap: var(--space-2);
     padding: var(--space-2);
-    background: rgba(15, 23, 42, 0.5);
+    background: var(--color-slate-900-alpha-50);
     border-radius: var(--radius-md);
     border: 1px solid var(--admin-sidebar-border);
 }
@@ -903,7 +903,7 @@
 }
 
 .admin-sidebar-user-info:hover {
-    background: rgba(99, 102, 241, 0.1);
+    background: var(--color-indigo-alpha-10);
 }
 
 .admin-sidebar-user-avatar {
@@ -911,7 +911,7 @@
     height: 36px;
     border-radius: 50%;
     object-fit: cover;
-    border: 2px solid rgba(139, 92, 246, 0.4);
+    border: 2px solid var(--color-violet-alpha-40);
     flex-shrink: 0;
 }
 
@@ -927,7 +927,7 @@
     font-weight: 600;
     color: var(--color-white);
     flex-shrink: 0;
-    border: 2px solid rgba(139, 92, 246, 0.4);
+    border: 2px solid var(--color-violet-alpha-40);
 }
 
 .admin-sidebar-user-details {
@@ -966,7 +966,7 @@
 }
 
 .admin-sidebar-logout:hover {
-    background: rgba(239, 68, 68, 0.15);
+    background: var(--color-red-alpha-15);
     color: var(--color-danger);
 }
 
@@ -1014,7 +1014,7 @@
     top: 50%;
     transform: translateY(-50%) translateX(-4px);
     padding: 0.5rem 0.75rem;
-    background: rgba(15, 23, 42, 0.95);
+    background: var(--color-slate-900-alpha-95);
     border: 1px solid var(--admin-sidebar-border);
     border-radius: 6px;
     color: var(--color-white);
@@ -1026,7 +1026,7 @@
     transition: opacity 0.15s ease, visibility 0s linear 0.15s, transform 0.15s ease;
     z-index: 200;
     pointer-events: none;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 4px 12px var(--color-black-alpha-30);
 }
 
 .admin-layout.sidebar-collapsed .admin-sidebar-user-info:hover::after {
@@ -1048,7 +1048,7 @@
     top: 50%;
     transform: translateY(-50%) translateX(-4px);
     padding: 0.5rem 0.75rem;
-    background: rgba(15, 23, 42, 0.95);
+    background: var(--color-slate-900-alpha-95);
     border: 1px solid var(--admin-sidebar-border);
     border-radius: 6px;
     color: var(--color-white);
@@ -1060,7 +1060,7 @@
     transition: opacity 0.15s ease, visibility 0s linear 0.15s, transform 0.15s ease;
     z-index: 200;
     pointer-events: none;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 4px 12px var(--color-black-alpha-30);
 }
 
 .admin-layout.sidebar-collapsed .admin-sidebar-logout:hover::after {
@@ -1076,7 +1076,7 @@
     justify-content: center;
     width: 100%;
     padding: var(--space-2);
-    background: rgba(99, 102, 241, 0.1);
+    background: var(--color-indigo-alpha-10);
     border: 1px solid var(--admin-sidebar-border);
     border-radius: var(--radius-base);
     color: var(--admin-sidebar-text-muted);
@@ -1087,7 +1087,7 @@
 }
 
 .admin-sidebar-footer-btn:hover {
-    background: rgba(99, 102, 241, 0.2);
+    background: var(--color-indigo-alpha-20);
     color: var(--color-white);
 }
 
@@ -1230,7 +1230,7 @@
     .admin-sidebar-backdrop {
         position: fixed;
         inset: 0;
-        background: rgba(0, 0, 0, 0.6);
+        background: var(--color-black-alpha-60);
         backdrop-filter: blur(4px);
         -webkit-backdrop-filter: blur(4px);
         opacity: 0;
@@ -1257,7 +1257,7 @@
     height: 44px;
     align-items: center;
     justify-content: center;
-    background: rgba(15, 23, 42, 0.95);
+    background: var(--color-slate-900-alpha-95);
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
     border: 1px solid var(--admin-sidebar-border);
@@ -1267,12 +1267,12 @@
     cursor: pointer;
     z-index: 1001;
     transition: all 0.2s ease;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 4px 20px var(--color-black-alpha-30);
 }
 
 .admin-mobile-menu-btn:hover {
-    background: rgba(99, 102, 241, 0.2);
-    border-color: rgba(99, 102, 241, 0.4);
+    background: var(--color-indigo-alpha-20);
+    border-color: var(--color-indigo-alpha-40);
 }
 
 @media (max-width: 1024px) {
@@ -1289,7 +1289,7 @@
     align-items: center;
     gap: var(--space-2);
     padding: var(--space-3) var(--space-6);
-    background: rgba(15, 23, 42, 0.4);
+    background: var(--color-slate-900-alpha-40);
     border-bottom: 1px solid var(--admin-sidebar-border);
     font-size: var(--font-size-sm);
     min-height: 44px;
@@ -1324,7 +1324,7 @@
 
 .admin-breadcrumbs-link:hover {
     color: var(--admin-sidebar-text);
-    background: rgba(99, 102, 241, 0.1);
+    background: var(--color-indigo-alpha-10);
 }
 
 .admin-breadcrumbs-link i {
@@ -1367,7 +1367,7 @@
 
 .admin-breadcrumbs-home:hover {
     color: var(--admin-sidebar-text);
-    background: rgba(99, 102, 241, 0.15);
+    background: var(--color-indigo-alpha-15);
 }
 
 .admin-breadcrumbs-home i {
@@ -1425,7 +1425,7 @@
 .admin-skeleton-title {
     height: 28px;
     width: 200px;
-    background: linear-gradient(90deg, rgba(99, 102, 241, 0.1) 25%, rgba(99, 102, 241, 0.2) 50%, rgba(99, 102, 241, 0.1) 75%);
+    background: linear-gradient(90deg, var(--color-indigo-alpha-10) 25%, var(--color-indigo-alpha-20) 50%, var(--color-indigo-alpha-10) 75%);
     background-size: 200% 100%;
     animation: admin-skeleton-shimmer 1.5s infinite;
     border-radius: var(--radius-sm);
@@ -1435,7 +1435,7 @@
     height: 16px;
     width: 300px;
     margin-top: var(--space-2);
-    background: linear-gradient(90deg, rgba(99, 102, 241, 0.08) 25%, rgba(99, 102, 241, 0.15) 50%, rgba(99, 102, 241, 0.08) 75%);
+    background: linear-gradient(90deg, var(--color-indigo-alpha-8) 25%, var(--color-indigo-alpha-15) 50%, var(--color-indigo-alpha-8) 75%);
     background-size: 200% 100%;
     animation: admin-skeleton-shimmer 1.5s infinite;
     border-radius: 4px;
@@ -1449,15 +1449,15 @@
 .admin-skeleton-btn {
     height: 36px;
     width: 100px;
-    background: linear-gradient(90deg, rgba(99, 102, 241, 0.1) 25%, rgba(99, 102, 241, 0.2) 50%, rgba(99, 102, 241, 0.1) 75%);
+    background: linear-gradient(90deg, var(--color-indigo-alpha-10) 25%, var(--color-indigo-alpha-20) 50%, var(--color-indigo-alpha-10) 75%);
     background-size: 200% 100%;
     animation: admin-skeleton-shimmer 1.5s infinite;
     border-radius: var(--radius-base);
 }
 
 .admin-skeleton-card {
-    background: rgba(15, 23, 42, 0.5);
-    border: 1px solid rgba(99, 102, 241, 0.15);
+    background: var(--color-slate-900-alpha-50);
+    border: 1px solid var(--color-indigo-alpha-15);
     border-radius: var(--radius-md);
     padding: var(--space-5);
     margin-bottom: var(--space-4);
@@ -1468,7 +1468,7 @@
     align-items: center;
     gap: var(--space-4);
     padding: var(--space-3) 0;
-    border-bottom: 1px solid rgba(99, 102, 241, 0.1);
+    border-bottom: 1px solid var(--color-indigo-alpha-10);
 }
 
 .admin-skeleton-row:last-child {
@@ -1479,7 +1479,7 @@
     width: 40px;
     height: 40px;
     border-radius: 50%;
-    background: linear-gradient(90deg, rgba(99, 102, 241, 0.1) 25%, rgba(99, 102, 241, 0.2) 50%, rgba(99, 102, 241, 0.1) 75%);
+    background: linear-gradient(90deg, var(--color-indigo-alpha-10) 25%, var(--color-indigo-alpha-20) 50%, var(--color-indigo-alpha-10) 75%);
     background-size: 200% 100%;
     animation: admin-skeleton-shimmer 1.5s infinite;
     flex-shrink: 0;
@@ -1491,7 +1491,7 @@
 
 .admin-skeleton-line {
     height: 14px;
-    background: linear-gradient(90deg, rgba(99, 102, 241, 0.08) 25%, rgba(99, 102, 241, 0.15) 50%, rgba(99, 102, 241, 0.08) 75%);
+    background: linear-gradient(90deg, var(--color-indigo-alpha-8) 25%, var(--color-indigo-alpha-15) 50%, var(--color-indigo-alpha-8) 75%);
     background-size: 200% 100%;
     animation: admin-skeleton-shimmer 1.5s infinite;
     border-radius: var(--radius-sm);

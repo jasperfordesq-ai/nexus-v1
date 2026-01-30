@@ -7,6 +7,7 @@ $pageTitle = 'My Achievements';
 $basePath = \Nexus\Core\TenantContext::getBasePath();
 
 require dirname(__DIR__, 2) . '/layouts/civicone/header.php';
+require_once __DIR__ . '/../components/govuk/breadcrumbs.php';
 
 // Due to EXTR_SKIP in View::render(), $data remains the full array passed to render()
 // The dashboard data is nested under $data['data'] key
@@ -19,14 +20,13 @@ $stats = $dashboardData['stats'] ?? [];
 $recentXP = $dashboardData['recent_xp'] ?? [];
 ?>
 
-<nav class="govuk-breadcrumbs govuk-!-margin-bottom-6" aria-label="Breadcrumb">
-    <ol class="govuk-breadcrumbs__list">
-        <li class="govuk-breadcrumbs__list-item">
-            <a class="govuk-breadcrumbs__link" href="<?= $basePath ?>">Home</a>
-        </li>
-        <li class="govuk-breadcrumbs__list-item" aria-current="page">Achievements</li>
-    </ol>
-</nav>
+<?= civicone_govuk_breadcrumbs([
+    'items' => [
+        ['text' => 'Home', 'href' => $basePath],
+        ['text' => 'Achievements']
+    ],
+    'class' => 'govuk-!-margin-bottom-6'
+]) ?>
 
 <div class="govuk-grid-row govuk-!-margin-bottom-6">
     <div class="govuk-grid-column-two-thirds">

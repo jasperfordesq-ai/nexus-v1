@@ -16,19 +16,17 @@ $socialTargetType = 'post';
 $socialTargetId = $post['id'];
 
 require __DIR__ . '/../../layouts/civicone/header.php';
+require_once __DIR__ . '/../components/govuk/breadcrumbs.php';
 ?>
 
-<nav class="govuk-breadcrumbs govuk-!-margin-bottom-6" aria-label="Breadcrumb">
-    <ol class="govuk-breadcrumbs__list">
-        <li class="govuk-breadcrumbs__list-item">
-            <a class="govuk-breadcrumbs__link" href="<?= $basePath ?>">Home</a>
-        </li>
-        <li class="govuk-breadcrumbs__list-item">
-            <a class="govuk-breadcrumbs__link" href="<?= $basePath ?>/">Feed</a>
-        </li>
-        <li class="govuk-breadcrumbs__list-item" aria-current="page">Post</li>
-    </ol>
-</nav>
+<?= civicone_govuk_breadcrumbs([
+    'items' => [
+        ['text' => 'Home', 'href' => $basePath],
+        ['text' => 'Feed', 'href' => $basePath . '/feed'],
+        ['text' => 'Post']
+    ],
+    'class' => 'govuk-!-margin-bottom-6'
+]) ?>
 
 <a href="<?= $basePath ?>/" class="govuk-back-link govuk-!-margin-bottom-6">Back to Feed</a>
 

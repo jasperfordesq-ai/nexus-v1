@@ -5,22 +5,20 @@
  */
 $pageTitle = htmlspecialchars($group['name']) . ' - Nexus TimeBank';
 require __DIR__ . '/../../layouts/civicone/header.php';
+require_once __DIR__ . '/../components/govuk/breadcrumbs.php';
 
 $basePath = \Nexus\Core\TenantContext::getBasePath();
 $hasSubHubs = !empty($subGroups);
 ?>
 
-<nav class="govuk-breadcrumbs govuk-!-margin-bottom-6" aria-label="Breadcrumb">
-    <ol class="govuk-breadcrumbs__list">
-        <li class="govuk-breadcrumbs__list-item">
-            <a class="govuk-breadcrumbs__link" href="<?= $basePath ?>">Home</a>
-        </li>
-        <li class="govuk-breadcrumbs__list-item">
-            <a class="govuk-breadcrumbs__link" href="<?= $basePath ?>/groups">Hubs</a>
-        </li>
-        <li class="govuk-breadcrumbs__list-item" aria-current="page"><?= htmlspecialchars($group['name']) ?></li>
-    </ol>
-</nav>
+<?= civicone_govuk_breadcrumbs([
+    'items' => [
+        ['text' => 'Home', 'href' => $basePath],
+        ['text' => 'Hubs', 'href' => $basePath . '/groups'],
+        ['text' => htmlspecialchars($group['name'])]
+    ],
+    'class' => 'govuk-!-margin-bottom-6'
+]) ?>
 
 <!-- Group Header -->
 <div class="govuk-!-margin-bottom-6 govuk-!-padding-6 civicone-panel-bg civicone-highlight-panel">

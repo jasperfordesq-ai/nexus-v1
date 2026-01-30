@@ -59,8 +59,10 @@
     --civicone-section-spacing: var(--govuk-spacing-9);
 }
 
-/* Tablet+ responsive overrides */
-@media (min-width: var(--govuk-breakpoint-tablet)) {
+/* Tablet+ responsive overrides
+   NOTE: CSS variables cannot be used in media query conditions.
+   Using hardcoded breakpoint values (40.0625em = 650px tablet, 61.875em = 990px desktop) */
+@media (min-width: 40.0625em) {
     :root {
         --govuk-spacing-4: var(--space-5);
         --govuk-spacing-5: 25px;
@@ -248,7 +250,7 @@
     padding-bottom: var(--civicone-spacing-7);
 }
 
-@media (min-width: var(--govuk-breakpoint-tablet)) {
+@media (min-width: 40.0625em) {
     .civic-section {
         padding-top: var(--civicone-spacing-9);
         padding-bottom: var(--civicone-spacing-9);
@@ -260,7 +262,7 @@
     padding-bottom: var(--civicone-spacing-5);
 }
 
-@media (min-width: var(--govuk-breakpoint-tablet)) {
+@media (min-width: 40.0625em) {
     .civic-section-sm {
         padding-top: var(--civicone-spacing-6);
         padding-bottom: var(--civicone-spacing-6);
@@ -278,7 +280,7 @@
     padding-right: var(--civicone-gutter-half);
 }
 
-@media (min-width: var(--govuk-breakpoint-tablet)) {
+@media (min-width: 40.0625em) {
     .civic-container {
         padding-left: var(--civicone-gutter);
         padding-right: var(--civicone-gutter);
@@ -305,7 +307,7 @@
     grid-template-columns: 1fr;
 }
 
-@media (min-width: var(--govuk-breakpoint-tablet)) {
+@media (min-width: 40.0625em) {
     .civic-grid-2 {
         grid-template-columns: repeat(2, 1fr);
     }
@@ -315,13 +317,13 @@
     grid-template-columns: 1fr;
 }
 
-@media (min-width: var(--govuk-breakpoint-tablet)) {
+@media (min-width: 40.0625em) {
     .civic-grid-3 {
         grid-template-columns: repeat(2, 1fr);
     }
 }
 
-@media (min-width: var(--govuk-breakpoint-desktop)) {
+@media (min-width: 61.875em) {
     .civic-grid-3 {
         grid-template-columns: repeat(3, 1fr);
     }
@@ -331,13 +333,13 @@
     grid-template-columns: 1fr;
 }
 
-@media (min-width: var(--govuk-breakpoint-tablet)) {
+@media (min-width: 40.0625em) {
     .civic-grid-4 {
         grid-template-columns: repeat(2, 1fr);
     }
 }
 
-@media (min-width: var(--govuk-breakpoint-desktop)) {
+@media (min-width: 61.875em) {
     .civic-grid-4 {
         grid-template-columns: repeat(4, 1fr);
     }
@@ -348,7 +350,7 @@
     grid-template-columns: 1fr;
 }
 
-@media (min-width: var(--govuk-breakpoint-tablet)) {
+@media (min-width: 40.0625em) {
     .civic-grid-2-1 {
         grid-template-columns: 2fr 1fr;
     }
@@ -358,7 +360,7 @@
     grid-template-columns: 1fr;
 }
 
-@media (min-width: var(--govuk-breakpoint-tablet)) {
+@media (min-width: 40.0625em) {
     .civic-grid-1-2 {
         grid-template-columns: 1fr 2fr;
     }
