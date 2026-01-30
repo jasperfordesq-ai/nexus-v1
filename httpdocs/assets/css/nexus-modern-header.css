@@ -31,7 +31,7 @@ body>* {
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
     background: linear-gradient(135deg,
             var(--effect-white-92) 0%,
-            rgba(249, 250, 251, 0.88) 100%);
+            var(--color-gray-100-alpha-88) 100%);
     backdrop-filter: blur(24px) saturate(200%);
     -webkit-backdrop-filter: blur(24px) saturate(200%);
 
@@ -61,24 +61,24 @@ body>* {
 [data-theme="light"] .nexus-utility-bar {
     background: linear-gradient(135deg,
             var(--effect-white-95) 0%,
-            rgba(249, 250, 251, 0.9) 100%);
+            var(--color-gray-100-alpha-90) 100%);
     border-bottom: 1px solid var(--effect-primary-10);
 }
 
 [data-theme="dark"] .nexus-utility-bar {
     background: linear-gradient(135deg,
-            rgba(15, 23, 42, 0.95) 0%,
+            var(--color-slate-900-alpha-95) 0%,
             var(--effect-slate-90) 100%);
     backdrop-filter: blur(24px) saturate(200%);
     -webkit-backdrop-filter: blur(24px) saturate(200%);
-    border-bottom: 1px solid rgba(148, 163, 184, 0.1);
+    border-bottom: 1px solid var(--color-slate-400-alpha-10);
     box-shadow: 0 1px 3px var(--effect-black-20),
         0 8px 32px var(--effect-black-30);
 }
 
 [data-theme="dark"] .nexus-utility-bar.scrolled {
     background: linear-gradient(135deg,
-            rgba(15, 23, 42, 0.98) 0%,
+            var(--color-slate-900-alpha-98) 0%,
             var(--effect-slate-95) 100%);
 }
 
@@ -136,7 +136,7 @@ body>* {
 }
 
 [data-theme="dark"] .util-link {
-    color: rgba(248, 250, 252, 0.9);
+    color: var(--color-slate-50-alpha-90);
 }
 
 [data-theme="dark"] .util-link:hover {
@@ -295,16 +295,16 @@ body>* {
 
 [data-theme="light"] .mode-switcher {
     background: linear-gradient(135deg,
-            rgba(15, 23, 42, 0.08) 0%,
-            rgba(15, 23, 42, 0.04) 100%);
-    border-color: rgba(15, 23, 42, 0.15);
+            var(--color-slate-900-alpha-08) 0%,
+            var(--color-slate-900-alpha-04) 100%);
+    border-color: var(--color-slate-900-alpha-15);
 }
 
 [data-theme="light"] .mode-switcher:hover {
     background: linear-gradient(135deg,
-            rgba(15, 23, 42, 0.12) 0%,
-            rgba(15, 23, 42, 0.06) 100%);
-    border-color: rgba(15, 23, 42, 0.2);
+            var(--color-slate-900-alpha-12) 0%,
+            var(--color-slate-900-alpha-06) 100%);
+    border-color: var(--color-slate-900-alpha-20);
 }
 
 /* Arrow indicator */
@@ -315,7 +315,7 @@ body>* {
 }
 
 [data-theme="light"] .mode-arrow {
-    color: rgba(15, 23, 42, 0.5);
+    color: var(--color-slate-900-alpha-50);
 }
 
 .mode-switcher:hover .mode-arrow {
@@ -324,7 +324,7 @@ body>* {
 }
 
 [data-theme="light"] .mode-switcher:hover .mode-arrow {
-    color: rgba(15, 23, 42, 0.8);
+    color: var(--color-slate-900-alpha-80);
 }
 
 /* Responsive: Hide label on smaller screens */
@@ -371,7 +371,7 @@ body>* {
 
 .mode-drawer-icon.light-mode {
     background: linear-gradient(135deg, var(--color-amber-300), var(--color-warning));
-    box-shadow: 0 0 12px rgba(251, 191, 36, 0.4);
+    box-shadow: 0 0 12px var(--color-amber-alpha-40);
 }
 
 .mode-drawer-icon.dark-mode {
@@ -483,7 +483,7 @@ body>* {
 }
 
 [data-theme="dark"] .nexus-header-icon-badge {
-    border-color: rgba(0, 0, 0, 0.9);
+    border-color: var(--color-black-alpha-90);
 }
 
 /* --- UPGRADED NAVBAR --- */
@@ -501,12 +501,12 @@ body>* {
     align-items: center;
     box-sizing: border-box;
     background: linear-gradient(135deg,
-            rgba(255, 255, 255, 0.88) 0%,
-            rgba(249, 250, 251, 0.82) 100%);
+            var(--color-white-alpha-88) 0%,
+            var(--color-gray-100-alpha-82) 100%);
     backdrop-filter: blur(24px) saturate(200%);
     -webkit-backdrop-filter: blur(24px) saturate(200%);
     border-bottom: 1px solid var(--effect-primary-8);
-    box-shadow: 0 4px 24px rgba(99, 102, 241, 0.06);
+    box-shadow: 0 4px 24px var(--color-indigo-alpha-06);
     transition: all var(--transition-slow) var(--ease-in-out);
 }
 
@@ -521,15 +521,15 @@ body>* {
 [data-theme="light"] .nexus-navbar {
     background: linear-gradient(135deg,
             var(--effect-white-92) 0%,
-            rgba(249, 250, 251, 0.88) 100%);
+            var(--color-gray-100-alpha-88) 100%);
     border-bottom: 1px solid var(--effect-primary-8);
 }
 
 [data-theme="dark"] .nexus-navbar {
     background: linear-gradient(135deg,
-            rgba(15, 23, 42, 0.9) 0%,
+            var(--color-slate-900-alpha-90) 0%,
             var(--effect-slate-85) 100%);
-    border-bottom: 1px solid rgba(148, 163, 184, 0.08);
+    border-bottom: 1px solid var(--color-slate-400-alpha-08);
     box-shadow: 0 4px 24px var(--effect-black-20);
 }
 
@@ -554,7 +554,7 @@ body>* {
     position: absolute;
     inset: 0;
     border-radius: var(--radius-md);
-    background: linear-gradient(135deg, var(--effect-primary-10), rgba(139, 92, 246, 0.06));
+    background: linear-gradient(135deg, var(--effect-primary-10), var(--color-violet-alpha-06));
     opacity: 0;
     transition: opacity var(--transition-base) var(--ease-in-out);
 }
@@ -581,7 +581,7 @@ body>* {
 }
 
 [data-theme="dark"] .nav-link {
-    color: rgba(248, 250, 252, 0.95);
+    color: var(--color-slate-50-alpha-95);
     text-shadow: 0 1px 3px var(--effect-black-20);
 }
 
@@ -685,7 +685,7 @@ body>* {
 /* NOTE: Using explicit hex instead of var(--color-gray-700) because
    design-tokens.css inverts gray values in dark mode */
 [data-theme="dark"] .htb-dropdown-content a:hover {
-    background: rgba(99, 102, 241, 0.15); /* subtle primary tint */
+    background: var(--color-indigo-alpha-15); /* subtle primary tint */
     color: #ffffff;
 }
 
@@ -1073,7 +1073,7 @@ body>* {
 }
 
 .notif-drawer-footer button:hover {
-    background: rgba(79, 70, 229, 0.1);
+    background: var(--color-primary-600-alpha-10);
     color: var(--color-primary-700);
 }
 
@@ -1095,7 +1095,7 @@ body>* {
 }
 
 [data-theme="dark"] .notif-drawer-footer button:hover {
-    background: rgba(96, 165, 250, 0.1);
+    background: var(--color-blue-400-alpha-10);
     color: var(--color-blue-300);
 }
 
@@ -1150,7 +1150,7 @@ body>* {
 }
 
 .htb-search-box:not(.premium-search) input::placeholder {
-    color: rgba(100, 116, 139, 0.7) !important;
+    color: var(--color-slate-500-alpha-70) !important;
     opacity: 1;
 }
 
@@ -1171,7 +1171,7 @@ body>* {
 }
 
 [data-theme="light"] .htb-search-box:not(.premium-search) input::placeholder {
-    color: rgba(100, 116, 139, 0.7) !important;
+    color: var(--color-slate-500-alpha-70) !important;
 }
 
 /* Dark mode search box */
@@ -1236,7 +1236,7 @@ body>* {
 [data-theme="light"] .nexus-navbar {
     background: linear-gradient(180deg,
             var(--effect-white-95) 0%,
-            rgba(249, 250, 251, 0.9) 100%) !important;
+            var(--color-gray-100-alpha-90) 100%) !important;
     border-bottom: 1px solid var(--effect-primary-10) !important;
 }
 
@@ -1256,7 +1256,7 @@ body>* {
 /* Header search box */
 [data-theme="light"] .htb-search-box,
 [data-theme="light"] .premium-search {
-    background: rgba(243, 244, 246, 0.8) !important;
+    background: var(--color-gray-100-alpha-80) !important;
     border: 1px solid var(--effect-primary-15) !important;
 }
 
@@ -1291,7 +1291,7 @@ body>* {
 /* Dropdown menus */
 [data-theme="light"] .htb-dropdown-content {
     background: var(--effect-white-98) !important;
-    border: 1px solid rgba(209, 213, 219, 0.5) !important;
+    border: 1px solid var(--color-gray-300-alpha-50) !important;
     box-shadow: 0 10px 40px var(--effect-black-10) !important;
 }
 
@@ -1532,22 +1532,22 @@ body>* {
 .nexus-drawer-item-icon.icon-sky { background: linear-gradient(135deg, #bae6fd, #7dd3fc); color: var(--color-sky-700); }
 .nexus-drawer-item-icon.icon-violet { background: linear-gradient(135deg, var(--color-purple-200), var(--color-purple-300)); color: var(--color-purple-700); }
 
-[data-theme="dark"] .nexus-drawer-item-icon.icon-rose { background: rgba(244, 63, 94, 0.2); color: var(--color-rose-400); }
+[data-theme="dark"] .nexus-drawer-item-icon.icon-rose { background: var(--color-rose-500-alpha-20); color: var(--color-rose-400); }
 [data-theme="dark"] .nexus-drawer-item-icon.icon-blue { background: var(--effect-blue-20); color: var(--color-blue-400); }
 [data-theme="dark"] .nexus-drawer-item-icon.icon-teal { background: var(--effect-teal-20); color: var(--color-teal-400); }
 [data-theme="dark"] .nexus-drawer-item-icon.icon-purple { background: var(--effect-purple-20); color: var(--color-purple-400-alt); }
 [data-theme="dark"] .nexus-drawer-item-icon.icon-indigo { background: var(--effect-primary-20); color: var(--color-primary-400); }
-[data-theme="dark"] .nexus-drawer-item-icon.icon-orange { background: rgba(249, 115, 22, 0.2); color: var(--color-orange-400); }
-[data-theme="dark"] .nexus-drawer-item-icon.icon-green { background: rgba(34, 197, 94, 0.2); color: var(--color-green-400); }
+[data-theme="dark"] .nexus-drawer-item-icon.icon-orange { background: var(--color-orange-alpha-20); color: var(--color-orange-400); }
+[data-theme="dark"] .nexus-drawer-item-icon.icon-green { background: var(--color-green-500-alpha-20); color: var(--color-green-400); }
 [data-theme="dark"] .nexus-drawer-item-icon.icon-cyan { background: var(--effect-cyan-20); color: var(--color-cyan-400); }
 [data-theme="dark"] .nexus-drawer-item-icon.icon-amber { background: var(--effect-amber-20); color: var(--color-amber-300); }
 [data-theme="dark"] .nexus-drawer-item-icon.icon-red { background: var(--effect-red-20); color: var(--color-red-400); }
 [data-theme="dark"] .nexus-drawer-item-icon.icon-emerald { background: var(--effect-emerald-20); color: var(--color-emerald-400); }
-[data-theme="dark"] .nexus-drawer-item-icon.icon-pink { background: rgba(236, 72, 153, 0.2); color: var(--color-pink-400); }
-[data-theme="dark"] .nexus-drawer-item-icon.icon-yellow { background: rgba(234, 179, 8, 0.2); color: var(--color-yellow-400); }
-[data-theme="dark"] .nexus-drawer-item-icon.icon-lime { background: rgba(132, 204, 22, 0.2); color: var(--color-lime-400); }
-[data-theme="dark"] .nexus-drawer-item-icon.icon-sky { background: rgba(14, 165, 233, 0.2); color: #38bdf8; }
-[data-theme="dark"] .nexus-drawer-item-icon.icon-violet { background: rgba(124, 58, 237, 0.2); color: var(--color-purple-400-alt); }
+[data-theme="dark"] .nexus-drawer-item-icon.icon-pink { background: var(--color-pink-alpha-20); color: var(--color-pink-400); }
+[data-theme="dark"] .nexus-drawer-item-icon.icon-yellow { background: var(--color-yellow-500-alpha-20); color: var(--color-yellow-400); }
+[data-theme="dark"] .nexus-drawer-item-icon.icon-lime { background: var(--color-lime-500-alpha-20); color: var(--color-lime-400); }
+[data-theme="dark"] .nexus-drawer-item-icon.icon-sky { background: var(--color-sky-500-alpha-20); color: #38bdf8; }
+[data-theme="dark"] .nexus-drawer-item-icon.icon-violet { background: var(--color-purple-600-alpha-20); color: var(--color-purple-400-alt); }
 
 .nexus-drawer-item-text {
     flex: 1;
@@ -1774,12 +1774,12 @@ body>* {
         height: 60px;
         background: linear-gradient(135deg,
                 var(--effect-white-95) 0%,
-                rgba(249, 250, 251, 0.92) 100%);
+                var(--color-gray-100-alpha-92) 100%);
     }
 
     [data-theme="dark"] .nexus-navbar {
         background: linear-gradient(135deg,
-                rgba(15, 23, 42, 0.98) 0%,
+                var(--color-slate-900-alpha-98) 0%,
                 var(--effect-slate-95) 100%);
     }
 
@@ -1906,8 +1906,8 @@ body>* {
 
 .htb-btn-primary {
     background: linear-gradient(135deg,
-            rgba(99, 102, 241, 0.95) 0%,
-            rgba(139, 92, 246, 0.95) 100%);
+            var(--color-indigo-alpha-95) 0%,
+            var(--color-violet-alpha-95) 100%);
     color: white;
     border: 1px solid var(--effect-white-25);
     backdrop-filter: blur(10px);
@@ -1916,8 +1916,8 @@ body>* {
 
 .htb-btn-primary:hover {
     background: linear-gradient(135deg,
-            rgba(99, 102, 241, 1) 0%,
-            rgba(139, 92, 246, 1) 100%);
+            var(--color-indigo-alpha-100) 0%,
+            var(--color-violet-alpha-100) 100%);
     transform: translateY(-3px);
     box-shadow: 0 8px 25px var(--effect-primary-50);
 }
@@ -1934,7 +1934,7 @@ body>* {
 
 .htb-btn-secondary:hover {
     background: linear-gradient(135deg,
-            rgba(255, 255, 255, 1) 0%,
+            var(--color-white-alpha-100) 0%,
             var(--effect-white-95) 100%);
     transform: translateY(-3px);
     box-shadow: 0 8px 25px var(--effect-primary-25);

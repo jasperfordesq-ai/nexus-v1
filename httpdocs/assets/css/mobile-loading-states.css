@@ -81,7 +81,7 @@
 .mobile-infinite-loader-spinner {
     width: 32px;
     height: 32px;
-    border: 3px solid rgba(99, 102, 241, 0.1);
+    border: 3px solid var(--color-indigo-alpha-10);
     border-top-color: var(--color-primary-500);
     border-radius: var(--radius-full);
     animation: mobile-spin 0.8s linear infinite;
@@ -96,7 +96,7 @@
 
 /* Dark mode */
 [data-theme="dark"] .mobile-infinite-loader-spinner {
-    border-color: rgba(129, 140, 248, 0.2);
+    border-color: var(--color-indigo-alpha-20);
     border-top-color: var(--color-primary-400);
 }
 
@@ -130,9 +130,9 @@
     border-radius: var(--radius-full);
     background: linear-gradient(
         90deg,
-        rgba(229, 231, 235, 1) 0%,
-        rgba(243, 244, 246, 1) 50%,
-        rgba(229, 231, 235, 1) 100%
+        var(--color-gray-200) 0%,
+        var(--color-gray-100) 50%,
+        var(--color-gray-200) 100%
     );
     background-size: 200% 100%;
     animation: shimmer 1.5s infinite;
@@ -149,9 +149,9 @@
     height: 12px;
     background: linear-gradient(
         90deg,
-        rgba(229, 231, 235, 1) 0%,
-        rgba(243, 244, 246, 1) 50%,
-        rgba(229, 231, 235, 1) 100%
+        var(--color-gray-200) 0%,
+        var(--color-gray-100) 50%,
+        var(--color-gray-200) 100%
     );
     background-size: 200% 100%;
     animation: shimmer 1.5s infinite;
@@ -191,9 +191,9 @@
     border-radius: var(--radius-base);
     background: linear-gradient(
         90deg,
-        rgba(229, 231, 235, 1) 0%,
-        rgba(243, 244, 246, 1) 50%,
-        rgba(229, 231, 235, 1) 100%
+        var(--color-gray-200) 0%,
+        var(--color-gray-100) 50%,
+        var(--color-gray-200) 100%
     );
     background-size: 200% 100%;
     animation: shimmer 1.5s infinite;
@@ -209,9 +209,9 @@
 [data-theme="dark"] .mobile-sheet-loading-item-icon {
     background: linear-gradient(
         90deg,
-        rgba(55, 65, 81, 1) 0%,
-        rgba(75, 85, 99, 1) 50%,
-        rgba(55, 65, 81, 1) 100%
+        var(--color-gray-700) 0%,
+        var(--color-gray-600) 50%,
+        var(--color-gray-700) 100%
     );
     background-size: 200% 100%;
 }
@@ -245,7 +245,7 @@
     height: 20px;
     margin-top: -10px;
     margin-left: -10px;
-    border: 2px solid rgba(255, 255, 255, 0.3);
+    border: 2px solid var(--color-white-alpha-30);
     border-top-color: var(--color-white);
     border-radius: var(--radius-full);
     animation: mobile-spin 0.6s linear infinite;
@@ -253,13 +253,13 @@
 
 /* Primary button variant */
 .mobile-btn-loading.btn-primary::after {
-    border-color: rgba(255, 255, 255, 0.3);
+    border-color: var(--color-white-alpha-30);
     border-top-color: var(--color-white);
 }
 
 /* Secondary button variant */
 .mobile-btn-loading.btn-secondary::after {
-    border-color: rgba(99, 102, 241, 0.3);
+    border-color: var(--color-indigo-alpha-30);
     border-top-color: var(--color-primary-500);
 }
 
@@ -276,7 +276,7 @@
     width: 16px;
     height: 16px;
     margin-top: -8px;
-    border: 2px solid rgba(99, 102, 241, 0.3);
+    border: 2px solid var(--color-indigo-alpha-30);
     border-top-color: var(--color-primary-500);
     border-radius: var(--radius-full);
     animation: mobile-spin 0.6s linear infinite;
@@ -318,9 +318,9 @@
     border-radius: var(--radius-full);
     background: linear-gradient(
         90deg,
-        rgba(229, 231, 235, 1) 0%,
-        rgba(243, 244, 246, 1) 50%,
-        rgba(229, 231, 235, 1) 100%
+        var(--color-gray-200) 0%,
+        var(--color-gray-100) 50%,
+        var(--color-gray-200) 100%
     );
     background-size: 200% 100%;
     animation: shimmer 1.5s infinite;
@@ -339,9 +339,9 @@
     width: 70%;
     background: linear-gradient(
         90deg,
-        rgba(229, 231, 235, 1) 0%,
-        rgba(243, 244, 246, 1) 50%,
-        rgba(229, 231, 235, 1) 100%
+        var(--color-gray-200) 0%,
+        var(--color-gray-100) 50%,
+        var(--color-gray-200) 100%
     );
     background-size: 200% 100%;
     animation: shimmer 1.5s infinite;
@@ -353,9 +353,9 @@
     width: 50%;
     background: linear-gradient(
         90deg,
-        rgba(229, 231, 235, 1) 0%,
-        rgba(243, 244, 246, 1) 50%,
-        rgba(229, 231, 235, 1) 100%
+        var(--color-gray-200) 0%,
+        var(--color-gray-100) 50%,
+        var(--color-gray-200) 100%
     );
     background-size: 200% 100%;
     animation: shimmer 1.5s infinite;
@@ -372,9 +372,9 @@
 [data-theme="dark"] .mobile-search-result-subtitle {
     background: linear-gradient(
         90deg,
-        rgba(55, 65, 81, 1) 0%,
-        rgba(75, 85, 99, 1) 50%,
-        rgba(55, 65, 81, 1) 100%
+        var(--color-gray-700) 0%,
+        var(--color-gray-600) 50%,
+        var(--color-gray-700) 100%
     );
     background-size: 200% 100%;
 }
@@ -499,9 +499,9 @@
     border-radius: var(--radius-full);
     background: linear-gradient(
         90deg,
-        rgba(229, 231, 235, 1) 0%,
-        rgba(243, 244, 246, 1) 50%,
-        rgba(229, 231, 235, 1) 100%
+        var(--color-gray-200) 0%,
+        var(--color-gray-100) 50%,
+        var(--color-gray-200) 100%
     );
     background-size: 200% 100%;
     animation: shimmer 1.5s infinite;
@@ -520,9 +520,9 @@
     width: 40%;
     background: linear-gradient(
         90deg,
-        rgba(229, 231, 235, 1) 0%,
-        rgba(243, 244, 246, 1) 50%,
-        rgba(229, 231, 235, 1) 100%
+        var(--color-gray-200) 0%,
+        var(--color-gray-100) 50%,
+        var(--color-gray-200) 100%
     );
     background-size: 200% 100%;
     animation: shimmer 1.5s infinite;
@@ -534,9 +534,9 @@
     width: 80%;
     background: linear-gradient(
         90deg,
-        rgba(229, 231, 235, 1) 0%,
-        rgba(243, 244, 246, 1) 50%,
-        rgba(229, 231, 235, 1) 100%
+        var(--color-gray-200) 0%,
+        var(--color-gray-100) 50%,
+        var(--color-gray-200) 100%
     );
     background-size: 200% 100%;
     animation: shimmer 1.5s infinite;
@@ -554,9 +554,9 @@
 [data-theme="dark"] .mobile-comment-loading-text {
     background: linear-gradient(
         90deg,
-        rgba(55, 65, 81, 1) 0%,
-        rgba(75, 85, 99, 1) 50%,
-        rgba(55, 65, 81, 1) 100%
+        var(--color-gray-700) 0%,
+        var(--color-gray-600) 50%,
+        var(--color-gray-700) 100%
     );
     background-size: 200% 100%;
 }
@@ -582,7 +582,7 @@
 .mobile-pull-to-refresh-spinner {
     width: 24px;
     height: 24px;
-    border: 2px solid rgba(99, 102, 241, 0.2);
+    border: 2px solid var(--color-indigo-alpha-20);
     border-top-color: var(--color-primary-500);
     border-radius: var(--radius-full);
     animation: mobile-spin 0.8s linear infinite;
@@ -657,7 +657,7 @@
     left: 0;
     right: 0;
     bottom: 0;
-    background: rgba(255, 255, 255, 0.8);
+    background: var(--color-white-alpha-80);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -666,7 +666,7 @@
 }
 
 [data-theme="dark"] .mobile-loading-overlay {
-    background: rgba(31, 41, 55, 0.8);
+    background: var(--color-gray-800-alpha-80);
 }
 
 .mobile-loading-center {
