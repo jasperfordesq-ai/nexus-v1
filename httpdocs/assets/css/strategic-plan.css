@@ -1,7 +1,7 @@
 /**
  * Strategic Plan Page - Modern Theme
  * Styles for the strategic plan 2026-2030 page
-  * Fully Migrated to Design Tokens: 2026-01-21 ✓
+ * Fully Migrated to Design Tokens: 2026-01-30 ✓
  */
 
 /* ============================================
@@ -31,15 +31,15 @@
 
 [data-theme="light"] .strategic-plan-wrapper::before {
     background: linear-gradient(135deg,
-        rgba(37, 99, 235, 0.08) 0%,
-        rgba(59, 130, 246, 0.08) 50%,
-        rgba(37, 99, 235, 0.08) 100%);
+        var(--color-blue-600-alpha-8) 0%,
+        var(--color-blue-alpha-8) 50%,
+        var(--color-blue-600-alpha-8) 100%);
 }
 
 [data-theme="dark"] .strategic-plan-wrapper::before {
     background:
-        radial-gradient(ellipse at 20% 20%, rgba(37, 99, 235, 0.15) 0%, transparent 50%),
-        radial-gradient(ellipse at 80% 80%, rgba(59, 130, 246, 0.1) 0%, transparent 50%);
+        radial-gradient(ellipse at 20% 20%, var(--color-blue-600-alpha-15) 0%, transparent 50%),
+        radial-gradient(ellipse at 80% 80%, var(--color-blue-alpha-10) 0%, transparent 50%);
 }
 
 .strategic-plan-inner {
@@ -60,15 +60,15 @@
 }
 
 [data-theme="light"] .strategic-plan-header {
-    background: rgba(255, 255, 255, 0.7);
-    border: 1px solid rgba(37, 99, 235, 0.15);
-    box-shadow: 0 8px 32px rgba(37, 99, 235, 0.1);
+    background: var(--color-white-alpha-70);
+    border: 1px solid var(--color-blue-600-alpha-15);
+    box-shadow: 0 8px 32px var(--color-blue-600-alpha-10);
 }
 
 [data-theme="dark"] .strategic-plan-header {
-    background: rgba(30, 41, 59, 0.6);
-    border: 1px solid rgba(37, 99, 235, 0.2);
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    background: var(--color-slate-800-alpha-60);
+    border: 1px solid var(--color-blue-600-alpha-20);
+    box-shadow: 0 8px 32px var(--color-black-alpha-30);
 }
 
 .strategic-plan-header h1 {
@@ -114,7 +114,7 @@
 }
 
 [data-theme="dark"] .strategic-plan-header .download-btn {
-    background: rgba(37, 99, 235, 0.1);
+    background: var(--color-blue-600-alpha-10);
     border: 2px solid var(--htb-accent, var(--color-blue-600));
     color: var(--htb-accent, var(--color-blue-600));
 }
@@ -153,15 +153,15 @@
 }
 
 [data-theme="light"] .strategic-plan-toc {
-    background: rgba(255, 255, 255, 0.7);
-    border: 1px solid rgba(37, 99, 235, 0.15);
-    box-shadow: 0 8px 32px rgba(37, 99, 235, 0.1);
+    background: var(--color-white-alpha-70);
+    border: 1px solid var(--color-blue-600-alpha-15);
+    box-shadow: 0 8px 32px var(--color-blue-600-alpha-10);
 }
 
 [data-theme="dark"] .strategic-plan-toc {
-    background: rgba(30, 41, 59, 0.6);
-    border: 1px solid rgba(37, 99, 235, 0.2);
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    background: var(--color-slate-800-alpha-60);
+    border: 1px solid var(--color-blue-600-alpha-20);
+    box-shadow: 0 8px 32px var(--color-black-alpha-30);
 }
 
 @media (max-width: 900px) {
@@ -175,7 +175,7 @@
     color: var(--htb-accent, var(--color-blue-600));
     margin: 0 0 var(--space-4) 0;
     padding-bottom: var(--space-3);
-    border-bottom: 1px solid var(--htb-border, rgba(0, 0, 0, 0.1));
+    border-bottom: 1px solid var(--htb-border, var(--color-black-alpha-10));
     font-size: var(--font-size-base);
     font-weight: var(--font-weight-bold);
 }
@@ -215,22 +215,22 @@
 }
 
 [data-theme="light"] .strategic-plan-section {
-    background: rgba(255, 255, 255, 0.7);
-    border: 1px solid rgba(37, 99, 235, 0.15);
-    box-shadow: 0 8px 32px rgba(37, 99, 235, 0.1);
+    background: var(--color-white-alpha-70);
+    border: 1px solid var(--color-blue-600-alpha-15);
+    box-shadow: 0 8px 32px var(--color-blue-600-alpha-10);
 }
 
 [data-theme="dark"] .strategic-plan-section {
-    background: rgba(30, 41, 59, 0.6);
-    border: 1px solid rgba(37, 99, 235, 0.2);
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    background: var(--color-slate-800-alpha-60);
+    border: 1px solid var(--color-blue-600-alpha-20);
+    box-shadow: 0 8px 32px var(--color-black-alpha-30);
 }
 
 .strategic-plan-section h2 {
     color: var(--htb-accent, var(--color-blue-600));
     margin: 0 0 var(--space-5) 0;
     padding-bottom: var(--space-3);
-    border-bottom: 2px solid var(--htb-border, rgba(0, 0, 0, 0.05));
+    border-bottom: 2px solid var(--htb-border, var(--color-black-alpha-5));
     font-size: var(--font-size-2xl);
     font-weight: var(--font-weight-bold);
 }
@@ -285,23 +285,23 @@
 }
 
 [data-theme="light"] .strategic-plan-highlight--mission {
-    background: rgba(238, 242, 255, 0.8);
-    border: 1px solid rgba(37, 99, 235, 0.2);
+    background: var(--color-indigo-50-alpha-80);
+    border: 1px solid var(--color-blue-600-alpha-20);
 }
 
 [data-theme="dark"] .strategic-plan-highlight--mission {
-    background: rgba(37, 99, 235, 0.1);
-    border: 1px solid rgba(37, 99, 235, 0.2);
+    background: var(--color-blue-600-alpha-10);
+    border: 1px solid var(--color-blue-600-alpha-20);
 }
 
 [data-theme="light"] .strategic-plan-highlight--vision {
-    background: rgba(236, 254, 255, 0.8);
-    border: 1px solid rgba(6, 182, 212, 0.2);
+    background: var(--color-cyan-50-alpha-80);
+    border: 1px solid var(--color-cyan-alpha-20);
 }
 
 [data-theme="dark"] .strategic-plan-highlight--vision {
-    background: rgba(6, 182, 212, 0.1);
-    border: 1px solid rgba(6, 182, 212, 0.2);
+    background: var(--color-cyan-alpha-10);
+    border: 1px solid var(--color-cyan-alpha-20);
 }
 
 /* ============================================
@@ -342,12 +342,12 @@
 
 /* Strengths */
 [data-theme="light"] .strategic-plan-swot-item--strengths {
-    background: rgba(240, 253, 244, 0.9);
+    background: var(--color-green-50-alpha-90);
     border-top-color: var(--color-success);
 }
 
 [data-theme="dark"] .strategic-plan-swot-item--strengths {
-    background: rgba(16, 185, 129, 0.1);
+    background: var(--color-emerald-alpha-10);
     border-top-color: var(--color-success);
 }
 
@@ -361,12 +361,12 @@
 
 /* Weaknesses */
 [data-theme="light"] .strategic-plan-swot-item--weaknesses {
-    background: rgba(254, 242, 242, 0.9);
+    background: var(--color-red-50-alpha-90);
     border-top-color: var(--color-danger);
 }
 
 [data-theme="dark"] .strategic-plan-swot-item--weaknesses {
-    background: rgba(239, 68, 68, 0.1);
+    background: var(--color-red-alpha-10);
     border-top-color: var(--color-danger);
 }
 
@@ -380,12 +380,12 @@
 
 /* Opportunities */
 [data-theme="light"] .strategic-plan-swot-item--opportunities {
-    background: rgba(239, 246, 255, 0.9);
+    background: var(--color-blue-50-alpha-90);
     border-top-color: var(--color-blue-600);
 }
 
 [data-theme="dark"] .strategic-plan-swot-item--opportunities {
-    background: rgba(37, 99, 235, 0.1);
+    background: var(--color-blue-600-alpha-10);
     border-top-color: var(--color-blue-600);
 }
 
@@ -399,12 +399,12 @@
 
 /* Threats */
 [data-theme="light"] .strategic-plan-swot-item--threats {
-    background: rgba(255, 251, 235, 0.9);
+    background: var(--color-amber-50-alpha-90);
     border-top-color: var(--color-warning);
 }
 
 [data-theme="dark"] .strategic-plan-swot-item--threats {
-    background: rgba(245, 158, 11, 0.1);
+    background: var(--color-amber-500-alpha-10);
     border-top-color: var(--color-warning);
 }
 
@@ -438,16 +438,16 @@
 }
 
 [data-theme="light"] .strategic-plan-table th {
-    background: rgba(0, 0, 0, 0.03);
+    background: var(--color-black-alpha-3);
 }
 
 [data-theme="dark"] .strategic-plan-table th {
-    background: rgba(255, 255, 255, 0.05);
+    background: var(--color-white-alpha-5);
 }
 
 .strategic-plan-table td {
     color: var(--htb-text-muted);
-    border-bottom: 1px solid var(--htb-border, rgba(0, 0, 0, 0.05));
+    border-bottom: 1px solid var(--htb-border, var(--color-black-alpha-5));
 }
 
 .strategic-plan-table td strong {
