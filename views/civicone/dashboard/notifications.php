@@ -102,7 +102,7 @@ if (!empty($notifSettings)) {
     </dialog>
 
     <!-- Settings Panel -->
-    <div id="notif-settings-panel" class="govuk-!-padding-4 govuk-!-margin-bottom-6 civicone-panel-bg" style="display: none;">
+    <div id="notif-settings-panel" class="govuk-!-padding-4 govuk-!-margin-bottom-6 civicone-panel-bg hidden">
         <div class="govuk-grid-row">
             <div class="govuk-grid-column-one-half">
                 <div class="govuk-form-group">
@@ -155,7 +155,7 @@ if (!empty($notifSettings)) {
     <?php else: ?>
         <ul class="govuk-list" role="list">
         <?php foreach ($allNotifs as $n): ?>
-            <li class="govuk-!-margin-bottom-3 govuk-!-padding-4 <?= $n['is_read'] ? '' : 'govuk-!-font-weight-bold' ?>" style="border: 1px solid #b1b4b6; border-left: 5px solid <?= $n['is_read'] ? '#b1b4b6' : '#1d70b8' ?>;" data-notif-id="<?= $n['id'] ?>">
+            <li class="govuk-!-margin-bottom-3 govuk-!-padding-4 civicone-notification-item <?= $n['is_read'] ? '' : 'civicone-notification-item--unread govuk-!-font-weight-bold' ?>" data-notif-id="<?= $n['id'] ?>">
                 <div class="govuk-grid-row">
                     <div class="govuk-grid-column-three-quarters">
                         <p class="govuk-body govuk-!-margin-bottom-2">
@@ -172,7 +172,7 @@ if (!empty($notifSettings)) {
                                 <a href="<?= htmlspecialchars($n['link']) ?>" onclick="window.nexusNotifications.markOneRead(<?= $n['id'] ?>)" class="govuk-button govuk-button--secondary" data-module="govuk-button">View</a>
                             <?php endif; ?>
                             <?php if (!$n['is_read']): ?>
-                                <button type="button" onclick="window.nexusNotifications.markOneRead(<?= $n['id'] ?>); this.closest('li').style.borderLeftColor='#b1b4b6'; this.closest('li').classList.remove('govuk-!-font-weight-bold'); this.remove();" class="govuk-button govuk-button--secondary" data-module="govuk-button">
+                                <button type="button" onclick="window.nexusNotifications.markOneRead(<?= $n['id'] ?>); this.closest('li').classList.remove('civicone-notification-item--unread', 'govuk-!-font-weight-bold'); this.remove();" class="govuk-button govuk-button--secondary" data-module="govuk-button">
                                     <i class="fa-solid fa-check" aria-hidden="true"></i>
                                 </button>
                             <?php endif; ?>
@@ -193,11 +193,7 @@ if (!empty($notifSettings)) {
 // Toggle settings panel
 function toggleNotifSettings() {
     var panel = document.getElementById('notif-settings-panel');
-    if (panel.style.display === 'none') {
-        panel.style.display = 'block';
-    } else {
-        panel.style.display = 'none';
-    }
+    panel.classList.toggle('hidden');
 }
 
 // Open events modal

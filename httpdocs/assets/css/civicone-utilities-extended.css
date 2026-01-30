@@ -622,3 +622,77 @@
     padding: 2rem 1rem;
     font-size: 0.875rem;
 }
+
+/* ============================================
+   CIVICONE INLINE STYLE FIXES
+   Added to comply with pre-commit hook
+   ============================================ */
+
+/* Honeypot field - hidden off-screen for bot protection */
+.civicone-honeypot {
+    position: absolute;
+    left: -9999px;
+}
+
+/* GOV.UK styled card with left accent border */
+.civicone-card-bordered-accent {
+    border: 1px solid #b1b4b6;
+    border-left: 5px solid #1d70b8;
+}
+
+/* GOV.UK styled card with simple border (legal hub) */
+.civicone-card-bordered-full {
+    border: 1px solid #b1b4b6;
+    height: 100%;
+}
+
+/* Danger zone section styling */
+.civicone-danger-zone {
+    border: 2px solid #d4351c;
+    background: #fef7f7;
+}
+
+/* Danger zone heading color */
+.civicone-danger-heading {
+    color: #d4351c;
+}
+
+/* Secondary text color (GOV.UK grey) */
+.civicone-text-secondary {
+    color: #505a5f;
+}
+
+/* Max width container for feed posts */
+.civicone-max-width-800 {
+    max-width: 800px;
+}
+
+/* Tag inline styling for external badge */
+.civicone-tag-inline-small {
+    margin-left: 4px;
+    font-size: 0.7em;
+}
+
+/* Notification item with dynamic border (unread state) */
+.civicone-notification-item {
+    border: 1px solid #b1b4b6;
+    border-left: 5px solid #b1b4b6;
+}
+
+/* Notification item - unread state (blue accent) */
+.civicone-notification-item--unread {
+    border-left-color: #1d70b8;
+}
+
+/* Progress bar fill colors for impact report */
+.civicone-progress-bar-fill--blue {
+    background-color: #1d70b8;
+}
+
+.civicone-progress-bar-fill--green {
+    background-color: #00703c;
+}
+
+.civicone-progress-bar-fill--pink {
+    background-color: #d53880;
+}

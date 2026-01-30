@@ -3,11 +3,11 @@
     --primary: var(--color-primary-500);
     --primary-hover: var(--color-primary-600);
     --background-color: var(--color-slate-50);
-    --card-background-color: rgba(255, 255, 255, 0.7);
+    --card-background-color: var(--color-white-alpha-70);
     --text-color: var(--color-slate-800);
-    --border-color: rgba(255, 255, 255, 0.5);
-    --shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.1);
-    --glass-border: 1px solid rgba(255, 255, 255, 0.4);
+    --border-color: var(--color-white-alpha-50);
+    --shadow: 0 8px 32px 0 var(--color-glass-shadow);
+    --glass-border: 1px solid var(--color-white-alpha-40);
 
     /* Holographic Gradients */
     --gradient-1: linear-gradient(135deg, var(--color-primary-500) 0%, var(--color-purple-400) 50%, var(--color-pink-500) 100%);
@@ -16,11 +16,11 @@
 
 [data-theme="dark"] {
     --background-color: var(--color-slate-900);
-    --card-background-color: rgba(15, 23, 42, 0.6);
+    --card-background-color: var(--color-slate-900-alpha-60);
     --text-color: var(--color-slate-100);
-    --border-color: rgba(255, 255, 255, 0.1);
-    --shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5);
-    --glass-border: 1px solid rgba(255, 255, 255, 0.05);
+    --border-color: var(--color-white-alpha-10);
+    --shadow: 0 8px 32px 0 var(--color-black-alpha-50);
+    --glass-border: 1px solid var(--color-white-alpha-5);
 }
 
 body {
@@ -56,7 +56,7 @@ body {
 
 .glass-panel:hover {
     transform: translateY(-2px);
-    box-shadow: 0 12px 40px 0 rgba(31, 38, 135, 0.15);
+    box-shadow: 0 12px 40px 0 var(--color-glass-shadow-15);
 }
 
 /* Gradient Text */
@@ -78,14 +78,14 @@ button,
     border: none !important;
     border-radius: var(--radius-full) !important;
     /* Pill shape */
-    box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4);
+    box-shadow: 0 4px 15px var(--color-indigo-alpha-40);
     transition: all var(--transition-base);
 }
 
 button:hover,
 [role="button"]:hover {
     transform: scale(1.05);
-    box-shadow: 0 6px 20px rgba(99, 102, 241, 0.6);
+    box-shadow: 0 6px 20px var(--color-indigo-alpha-60);
     filter: brightness(1.1);
 }
 
@@ -101,15 +101,15 @@ button.contrast,
 [role="button"].contrast {
     background: var(--color-slate-700) !important;
     /* Slate 700 */
-    box-shadow: 0 4px 15px rgba(51, 65, 85, 0.4);
+    box-shadow: 0 4px 15px var(--color-slate-700-alpha-40);
 }
 
 /* Navbar */
 nav {
-    background: rgba(255, 255, 255, 0.1);
+    background: var(--color-white-alpha-10);
     -webkit-backdrop-filter: blur(10px);
     backdrop-filter: blur(10px);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    border-bottom: 1px solid var(--color-white-alpha-10);
     padding: 0;
     position: sticky;
     top: 0;
@@ -124,7 +124,7 @@ nav .container {
 }
 
 [data-theme="dark"] nav {
-    background: rgba(0, 0, 0, 0.2);
+    background: var(--color-black-alpha-20);
 }
 
 /* Tables */
@@ -134,7 +134,7 @@ table {
 }
 
 tr {
-    background: rgba(255, 255, 255, 0.05);
+    background: var(--color-white-alpha-5);
     border-radius: var(--radius-base);
 }
 
@@ -160,7 +160,7 @@ td:last-child {
     text-align: center;
     border-radius: 0 0 30px 30px;
     margin-bottom: var(--space-8);
-    box-shadow: 0 10px 30px -10px rgba(99, 102, 241, 0.5);
+    box-shadow: 0 10px 30px -10px var(--color-indigo-alpha-50);
     position: relative;
     overflow: hidden;
 }
@@ -172,7 +172,7 @@ td:last-child {
     left: 0;
     right: 0;
     bottom: 0;
-    background: radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.2) 0%, transparent 70%);
+    background: radial-gradient(circle at 50% 50%, var(--color-white-alpha-20) 0%, transparent 70%);
     pointer-events: none;
 }
 
@@ -180,14 +180,14 @@ td:last-child {
     color: white;
     font-size: var(--font-size-4xl);
     margin-bottom: var(--space-2);
-    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+    text-shadow: 0 2px 10px var(--color-black-alpha-20);
     -webkit-text-fill-color: initial;
     /* Reset gradient text for hero */
     background: none;
 }
 
 .hero-content p {
-    color: rgba(255, 255, 255, 0.9);
+    color: var(--color-white-alpha-90);
     font-size: var(--font-size-xl);
     font-weight: var(--font-weight-medium);
 }
@@ -223,8 +223,8 @@ td:last-child {
 }
 
 [data-theme="dark"] .glass-profile-card {
-    background: rgba(30, 41, 59, 0.8);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: var(--color-slate-800-alpha-80);
+    border: 1px solid var(--color-white-alpha-10);
 }
 
 /* Profile Avatar */
@@ -233,8 +233,8 @@ td:last-child {
     height: 150px;
     border-radius: 50%;
     object-fit: cover;
-    border: 4px solid rgba(99, 102, 241, 0.3);
-    box-shadow: 0 8px 32px rgba(99, 102, 241, 0.2);
+    border: 4px solid var(--color-indigo-alpha-30);
+    box-shadow: 0 8px 32px var(--color-indigo-alpha-20);
 }
 
 /* Info Badges (Location, Joined, Credits, etc.) */
@@ -243,8 +243,8 @@ td:last-child {
     align-items: center;
     gap: var(--space-2);
     padding: var(--space-2) var(--space-4);
-    background: rgba(255, 255, 255, 0.1);
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    background: var(--color-white-alpha-10);
+    border: 1px solid var(--color-white-alpha-20);
     border-radius: var(--radius-full);
     font-size: var(--font-size-sm);
     color: var(--text-color);
@@ -252,14 +252,14 @@ td:last-child {
 }
 
 [data-theme="dark"] .glass-info-badge {
-    background: rgba(255, 255, 255, 0.05);
-    border-color: rgba(255, 255, 255, 0.1);
+    background: var(--color-white-alpha-5);
+    border-color: var(--color-white-alpha-10);
     color: var(--color-slate-200);
 }
 
 .glass-info-badge:hover {
-    background: rgba(99, 102, 241, 0.15);
-    border-color: rgba(99, 102, 241, 0.3);
+    background: var(--color-indigo-alpha-15);
+    border-color: var(--color-indigo-alpha-30);
 }
 
 /* Achievement/Badge Styles */
@@ -268,8 +268,8 @@ td:last-child {
     align-items: center;
     gap: var(--space-2);
     padding: var(--space-3) var(--space-4);
-    background: rgba(255, 255, 255, 0.1);
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    background: var(--color-white-alpha-10);
+    border: 1px solid var(--color-white-alpha-20);
     border-radius: var(--radius-md);
     font-size: var(--font-size-sm);
     color: var(--text-color);
@@ -278,16 +278,16 @@ td:last-child {
 }
 
 [data-theme="dark"] .glass-badge {
-    background: rgba(255, 255, 255, 0.05);
-    border-color: rgba(255, 255, 255, 0.1);
+    background: var(--color-white-alpha-5);
+    border-color: var(--color-white-alpha-10);
     color: var(--color-slate-200);
 }
 
 .glass-badge:hover {
-    background: rgba(99, 102, 241, 0.2);
-    border-color: rgba(99, 102, 241, 0.4);
+    background: var(--color-indigo-alpha-20);
+    border-color: var(--color-indigo-alpha-40);
     transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.2);
+    box-shadow: 0 4px 12px var(--color-indigo-alpha-20);
 }
 
 .glass-badge span {
@@ -300,7 +300,7 @@ td:last-child {
     align-items: center;
     gap: var(--space-2);
     padding: var(--space-3) var(--space-6);
-    background: linear-gradient(135deg, rgba(99, 102, 241, 0.9), rgba(139, 92, 246, 0.9)) !important;
+    background: linear-gradient(135deg, var(--color-indigo-alpha-90), var(--color-violet-alpha-90)) !important;
     border: none !important;
     border-radius: var(--radius-md) !important;
     color: white !important;
@@ -308,37 +308,37 @@ td:last-child {
     font-size: var(--font-size-sm);
     cursor: pointer;
     transition: all var(--transition-fast);
-    box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);
+    box-shadow: 0 4px 15px var(--color-indigo-alpha-30);
     text-decoration: none;
 }
 
 .glass-btn:hover {
     transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(99, 102, 241, 0.4);
+    box-shadow: 0 6px 20px var(--color-indigo-alpha-40);
     filter: brightness(1.05);
 }
 
 .glass-btn-secondary {
-    background: rgba(255, 255, 255, 0.1) !important;
-    border: 1px solid rgba(255, 255, 255, 0.2) !important;
+    background: var(--color-white-alpha-10) !important;
+    border: 1px solid var(--color-white-alpha-20) !important;
     color: var(--text-color) !important;
     box-shadow: none;
 }
 
 [data-theme="dark"] .glass-btn-secondary {
-    background: rgba(255, 255, 255, 0.05) !important;
+    background: var(--color-white-alpha-5) !important;
     color: var(--color-slate-200) !important;
 }
 
 .glass-btn-secondary:hover {
-    background: rgba(99, 102, 241, 0.15) !important;
-    border-color: rgba(99, 102, 241, 0.3) !important;
+    background: var(--color-indigo-alpha-15) !important;
+    border-color: var(--color-indigo-alpha-30) !important;
 }
 
 /* Glass Divider */
 .glass-divider {
     height: 1px;
-    background: linear-gradient(90deg, transparent, rgba(99, 102, 241, 0.3), transparent);
+    background: linear-gradient(90deg, transparent, var(--color-indigo-alpha-30), transparent);
     margin: var(--space-6) 0;
 }
 
@@ -357,9 +357,9 @@ td:last-child {
     right: 0;
     bottom: 0;
     background:
-        radial-gradient(ellipse at 20% 20%, rgba(99, 102, 241, 0.1) 0%, transparent 50%),
-        radial-gradient(ellipse at 80% 80%, rgba(168, 85, 247, 0.1) 0%, transparent 50%),
-        radial-gradient(ellipse at 50% 50%, rgba(236, 72, 153, 0.05) 0%, transparent 70%);
+        radial-gradient(ellipse at 20% 20%, var(--color-indigo-alpha-10) 0%, transparent 50%),
+        radial-gradient(ellipse at 80% 80%, var(--color-purple-alpha-10) 0%, transparent 50%),
+        radial-gradient(ellipse at 50% 50%, var(--color-pink-alpha-5) 0%, transparent 70%);
     pointer-events: none;
     z-index: -1;
 }
@@ -367,10 +367,10 @@ td:last-child {
 /* Online Indicator Pulse */
 @keyframes pulse-online {
     0%, 100% {
-        box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4);
+        box-shadow: 0 0 0 0 var(--color-emerald-alpha-40);
     }
     50% {
-        box-shadow: 0 0 0 8px rgba(16, 185, 129, 0);
+        box-shadow: 0 0 0 8px transparent;
     }
 }
 
@@ -386,8 +386,8 @@ td:last-child {
 }
 
 [data-theme="dark"] .profile-friends-card {
-    background: rgba(30, 41, 59, 0.8);
-    border-color: rgba(255, 255, 255, 0.1);
+    background: var(--color-slate-800-alpha-80);
+    border-color: var(--color-white-alpha-10);
 }
 
 .profile-friends-header {

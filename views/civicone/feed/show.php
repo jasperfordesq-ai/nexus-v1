@@ -31,7 +31,7 @@ require_once __DIR__ . '/../components/govuk/breadcrumbs.php';
 <a href="<?= $basePath ?>/" class="govuk-back-link govuk-!-margin-bottom-6">Back to Feed</a>
 
 <!-- Post Card -->
-<div class="govuk-!-padding-6 civicone-sidebar-card" style="max-width: 800px;">
+<div class="govuk-!-padding-6 civicone-sidebar-card civicone-max-width-800">
 
     <!-- Header -->
     <div class="govuk-grid-row govuk-!-margin-bottom-4">

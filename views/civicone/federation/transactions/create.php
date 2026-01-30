@@ -64,7 +64,7 @@ $hasInsufficientBalance = $balance < 0.5;
                             <i class="fa-solid <?= $isExternalTransaction ? 'fa-globe' : 'fa-building' ?> govuk-!-margin-right-1" aria-hidden="true"></i>
                             <?= htmlspecialchars($recipient['tenant_name'] ?? 'Partner Timebank') ?>
                             <?php if ($isExternalTransaction): ?>
-                            <span class="govuk-tag govuk-tag--blue" style="margin-left: 4px; font-size: 0.7em;">External</span>
+                            <span class="govuk-tag govuk-tag--blue civicone-tag-inline-small">External</span>
                             <?php endif; ?>
                         </p>
                     </div>

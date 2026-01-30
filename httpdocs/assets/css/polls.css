@@ -1339,7 +1339,7 @@
 
         #polls-glass-wrapper .glass-poll-card:hover {
             transform: translateY(-8px);
-            box-shadow: 0 16px 48px rgba(31, 38, 135, 0.2),
+            box-shadow: 0 16px 48px var(--color-glass-shadow-20),
                         0 0 0 1px var(--effect-purple-20),
                         inset 0 1px 0 var(--effect-white-60);
         }
@@ -1360,7 +1360,7 @@
             transform: translateY(-8px);
             box-shadow: 0 16px 48px var(--effect-black-70),
                         0 0 0 1px var(--effect-purple-25),
-                        0 0 80px rgba(167, 139, 250, 0.15),
+                        0 0 80px var(--color-violet-300-alpha-15),
                         inset 0 1px 0 var(--effect-white-12);
         }
 
@@ -1552,15 +1552,15 @@
 
         [data-theme="dark"] #polls-glass-wrapper .glass-create-card {
             background: linear-gradient(135deg,
-                rgba(15, 23, 42, 0.4),
-                rgba(30, 41, 59, 0.3));
+                var(--color-slate-900-alpha-40),
+                var(--color-slate-800-alpha-30));
             border: 2px dashed var(--effect-purple-40);
         }
 
         [data-theme="dark"] #polls-glass-wrapper .glass-create-card:hover {
             border-color: var(--effect-purple-60);
             background: linear-gradient(135deg,
-                rgba(15, 23, 42, 0.5),
+                var(--color-slate-900-alpha-50),
                 var(--effect-slate-40));
         }
 
@@ -1632,7 +1632,7 @@
 
             [data-theme="dark"] #polls-glass-wrapper .glass-search-card,
             [data-theme="dark"] #polls-glass-wrapper .glass-poll-card {
-                background: rgba(15, 23, 42, 0.95);
+                background: var(--color-slate-900-alpha-95);
             }
         }
 
@@ -1643,7 +1643,7 @@
             background: linear-gradient(135deg,
                 var(--effect-purple-12) 0%,
                 var(--color-violet-300-alpha-12) 50%,
-                rgba(196, 181, 253, 0.08) 100%);
+                var(--color-violet-200-alpha-8) 100%);
             backdrop-filter: blur(20px);
             -webkit-backdrop-filter: blur(20px);
             border: 1px solid var(--effect-white-40);
@@ -1657,8 +1657,8 @@
         [data-theme="dark"] #polls-glass-wrapper .nexus-welcome-hero {
             background: linear-gradient(135deg,
                 var(--effect-purple-15) 0%,
-                rgba(167, 139, 250, 0.15) 50%,
-                rgba(196, 181, 253, 0.1) 100%);
+                var(--color-violet-300-alpha-15) 50%,
+                var(--color-violet-200-alpha-10) 100%);
             border-color: var(--effect-white-10);
         }
 
@@ -1717,13 +1717,13 @@
         }
 
         #polls-glass-wrapper .nexus-smart-btn-secondary {
-            background: linear-gradient(135deg, var(--effect-purple-10), rgba(167, 139, 250, 0.1));
+            background: linear-gradient(135deg, var(--effect-purple-10), var(--color-violet-300-alpha-10));
             color: var(--color-purple-600);
             border-color: var(--effect-purple-30);
         }
 
         [data-theme="dark"] #polls-glass-wrapper .nexus-smart-btn-secondary {
-            background: linear-gradient(135deg, var(--effect-purple-20), rgba(167, 139, 250, 0.15));
+            background: linear-gradient(135deg, var(--effect-purple-20), var(--color-violet-300-alpha-15));
             color: var(--color-purple-300);
             border-color: var(--effect-purple-40);
         }
@@ -1743,7 +1743,7 @@
         }
 
         [data-theme="dark"] #polls-glass-wrapper .nexus-smart-btn-outline {
-            background: rgba(15, 23, 42, 0.5);
+            background: var(--color-slate-900-alpha-50);
             border-color: var(--effect-purple-40);
         }
 
@@ -1896,8 +1896,8 @@ html {
     z-index: -1;
     background:
         radial-gradient(ellipse at 20% 0%, var(--effect-purple-30) 0%, transparent 50%),
-        radial-gradient(ellipse at 80% 0%, rgba(6, 182, 212, 0.25) 0%, transparent 50%),
-        radial-gradient(ellipse at 50% 100%, rgba(244, 114, 182, 0.2) 0%, transparent 50%);
+        radial-gradient(ellipse at 80% 0%, var(--color-cyan-alpha-25) 0%, transparent 50%),
+        radial-gradient(ellipse at 50% 100%, var(--color-pink-400-alpha-20) 0%, transparent 50%);
     animation: holoShift 20s ease-in-out infinite alternate;
 }
 
@@ -1938,7 +1938,7 @@ html {
 .holo-orb-3 {
     width: 350px;
     height: 350px;
-    background: radial-gradient(circle, rgba(244, 114, 182, 0.4) 0%, transparent 70%);
+    background: radial-gradient(circle, var(--color-pink-400-alpha-40) 0%, transparent 70%);
     bottom: 10%;
     left: 20%;
     animation-delay: -10s;
@@ -2062,7 +2062,7 @@ html {
 
 /* ===== POLL CONTENT CARD ===== */
 .poll-content-card {
-    background: rgba(255, 255, 255, 0.03);
+    background: var(--color-white-alpha-3);
     border: 1px solid var(--effect-white-8);
     border-radius: var(--radius-2xl);
     padding: var(--space-12);
@@ -2082,7 +2082,7 @@ html {
     background: linear-gradient(135deg,
         var(--effect-purple-30) 0%,
         var(--effect-cyan-20) 50%,
-        rgba(244, 114, 182, 0.3) 100%);
+        var(--color-pink-400-alpha-30) 100%);
     -webkit-mask: linear-gradient(var(--color-white) 0 0) content-box, linear-gradient(var(--color-white) 0 0);
     mask: linear-gradient(var(--color-white) 0 0) content-box, linear-gradient(var(--color-white) 0 0);
     -webkit-mask-composite: xor;
@@ -2101,7 +2101,7 @@ html {
     display: flex;
     align-items: center;
     padding: var(--space-5) 28px;
-    background: rgba(255, 255, 255, 0.03);
+    background: var(--color-white-alpha-3);
     border: 1px solid var(--effect-white-10);
     border-radius: var(--radius-lg);
     cursor: pointer;
@@ -2115,7 +2115,7 @@ html {
     content: '';
     position: absolute;
     inset: 0;
-    background: linear-gradient(135deg, var(--effect-purple-10), rgba(6, 182, 212, 0.05));
+    background: linear-gradient(135deg, var(--effect-purple-10), var(--color-cyan-alpha-5));
     opacity: 0;
     transition: opacity 0.3s ease;
 }
@@ -2301,7 +2301,7 @@ html {
 
 /* ===== SOCIAL SECTION ===== */
 .poll-social-section {
-    background: rgba(255, 255, 255, 0.03);
+    background: var(--color-white-alpha-3);
     border: 1px solid var(--effect-white-8);
     border-radius: var(--radius-2xl);
     padding: var(--space-8) 40px;
@@ -2319,7 +2319,7 @@ html {
     background: linear-gradient(135deg,
         var(--effect-purple-20) 0%,
         var(--effect-cyan-15) 50%,
-        rgba(244, 114, 182, 0.2) 100%);
+        var(--color-pink-400-alpha-20) 100%);
     -webkit-mask: linear-gradient(var(--color-white) 0 0) content-box, linear-gradient(var(--color-white) 0 0);
     mask: linear-gradient(var(--color-white) 0 0) content-box, linear-gradient(var(--color-white) 0 0);
     -webkit-mask-composite: xor;
@@ -2554,7 +2554,7 @@ html {
     position: absolute;
     bottom: 100%;
     left: 0;
-    background: rgba(30, 27, 75, 0.95);
+    background: var(--color-dark-purple-alt-bg);
     border: 1px solid var(--effect-white-15);
     border-radius: var(--radius-md);
     padding: var(--space-2);
@@ -2669,8 +2669,8 @@ html {
 [data-theme="light"] #poll-holo-wrapper::after {
     background:
         radial-gradient(ellipse at 20% 0%, var(--effect-purple-15) 0%, transparent 50%),
-        radial-gradient(ellipse at 80% 0%, rgba(6, 182, 212, 0.12) 0%, transparent 50%),
-        radial-gradient(ellipse at 50% 100%, rgba(244, 114, 182, 0.1) 0%, transparent 50%);
+        radial-gradient(ellipse at 80% 0%, var(--color-cyan-alpha-12) 0%, transparent 50%),
+        radial-gradient(ellipse at 50% 100%, var(--color-pink-400-alpha-10) 0%, transparent 50%);
 }
 
 [data-theme="light"] .holo-orb {
@@ -2864,7 +2864,7 @@ html {
 @supports not (backdrop-filter: blur(20px)) {
     .poll-content-card,
     .poll-social-section {
-        background: rgba(30, 27, 75, 0.95);
+        background: var(--color-dark-purple-alt-bg);
     }
 
     [data-theme="light"] .poll-content-card,

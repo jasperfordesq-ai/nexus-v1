@@ -40,9 +40,9 @@
         height: 16px;
         background: linear-gradient(
             90deg,
-            rgba(203, 213, 225, 0.3) 0%,
-            rgba(203, 213, 225, 0.6) 50%,
-            rgba(203, 213, 225, 0.3) 100%
+            var(--color-slate-300-alpha-30) 0%,
+            var(--color-slate-300-alpha-60) 50%,
+            var(--color-slate-300-alpha-30) 100%
         );
         background-size: 200% 100%;
         animation: shimmer 1.5s ease-in-out infinite;
@@ -62,16 +62,16 @@
         padding: var(--space-5);
         background: white;
         border-radius: var(--radius-md);
-        box-shadow: var(--desktop-shadow-sm, 0 2px 4px rgba(0, 0, 0, 0.06));
+        box-shadow: var(--desktop-shadow-sm, 0 2px 4px var(--color-black-alpha-6));
     }
 
     .skeleton-table-cell {
         height: 20px;
         background: linear-gradient(
             90deg,
-            rgba(226, 232, 240, 0.3) 0%,
-            rgba(226, 232, 240, 0.6) 50%,
-            rgba(226, 232, 240, 0.3) 100%
+            var(--color-slate-200-alpha-30) 0%,
+            var(--color-slate-200-alpha-60) 50%,
+            var(--color-slate-200-alpha-30) 100%
         );
         background-size: 200% 100%;
         animation: shimmer 1.5s ease-in-out infinite;
@@ -103,9 +103,9 @@
     [data-theme="dark"] .skeleton-table-cell {
         background: linear-gradient(
             90deg,
-            rgba(55, 65, 81, 0.3) 0%,
-            rgba(55, 65, 81, 0.6) 50%,
-            rgba(55, 65, 81, 0.3) 100%
+            var(--color-gray-700-alpha-30) 0%,
+            var(--color-gray-700-alpha-60) 50%,
+            var(--color-gray-700-alpha-30) 100%
         );
         background-size: 200% 100%;
     }
@@ -125,14 +125,14 @@
         height: 280px;
         background: linear-gradient(
             90deg,
-            rgba(226, 232, 240, 0.2) 0%,
-            rgba(226, 232, 240, 0.4) 50%,
-            rgba(226, 232, 240, 0.2) 100%
+            var(--color-slate-200-alpha-20) 0%,
+            var(--color-slate-200-alpha-40) 50%,
+            var(--color-slate-200-alpha-20) 100%
         );
         background-size: 200% 100%;
         animation: shimmer 1.5s ease-in-out infinite;
         border-radius: var(--radius-lg);
-        box-shadow: var(--desktop-shadow, 0 4px 8px rgba(0, 0, 0, 0.08));
+        box-shadow: var(--desktop-shadow, 0 4px 8px var(--color-black-alpha-8));
     }
 
     .skeleton-grid-item:nth-child(2) {
@@ -167,9 +167,9 @@
     [data-theme="dark"] .skeleton-grid-item {
         background: linear-gradient(
             90deg,
-            rgba(55, 65, 81, 0.2) 0%,
-            rgba(55, 65, 81, 0.4) 50%,
-            rgba(55, 65, 81, 0.2) 100%
+            var(--color-gray-700-alpha-20) 0%,
+            var(--color-gray-700-alpha-40) 50%,
+            var(--color-gray-700-alpha-20) 100%
         );
         background-size: 200% 100%;
     }
@@ -193,9 +193,9 @@
         height: 48px;
         background: linear-gradient(
             90deg,
-            rgba(203, 213, 225, 0.3) 0%,
-            rgba(203, 213, 225, 0.6) 50%,
-            rgba(203, 213, 225, 0.3) 100%
+            var(--color-slate-300-alpha-30) 0%,
+            var(--color-slate-300-alpha-60) 50%,
+            var(--color-slate-300-alpha-30) 100%
         );
         background-size: 200% 100%;
         animation: shimmer 1.5s ease-in-out infinite;
@@ -206,9 +206,9 @@
         height: 40px;
         background: linear-gradient(
             90deg,
-            rgba(226, 232, 240, 0.3) 0%,
-            rgba(226, 232, 240, 0.6) 50%,
-            rgba(226, 232, 240, 0.3) 100%
+            var(--color-slate-200-alpha-30) 0%,
+            var(--color-slate-200-alpha-60) 50%,
+            var(--color-slate-200-alpha-30) 100%
         );
         background-size: 200% 100%;
         animation: shimmer 1.5s ease-in-out infinite;
@@ -236,9 +236,9 @@
     [data-theme="dark"] .skeleton-sidebar-item {
         background: linear-gradient(
             90deg,
-            rgba(55, 65, 81, 0.3) 0%,
-            rgba(55, 65, 81, 0.6) 50%,
-            rgba(55, 65, 81, 0.3) 100%
+            var(--color-gray-700-alpha-30) 0%,
+            var(--color-gray-700-alpha-60) 50%,
+            var(--color-gray-700-alpha-30) 100%
         );
         background-size: 200% 100%;
     }
@@ -256,7 +256,7 @@
         padding: var(--space-2);
         background: white;
         border-radius: var(--radius-md);
-        box-shadow: var(--desktop-shadow-lg, 0 10px 20px rgba(0, 0, 0, 0.12));
+        box-shadow: var(--desktop-shadow-lg, 0 10px 20px var(--color-black-alpha-12));
         z-index: var(--desktop-z-dropdown, 100);
     }
 
@@ -265,9 +265,9 @@
         margin-bottom: var(--space-1);
         background: linear-gradient(
             90deg,
-            rgba(226, 232, 240, 0.3) 0%,
-            rgba(226, 232, 240, 0.6) 50%,
-            rgba(226, 232, 240, 0.3) 100%
+            var(--color-slate-200-alpha-30) 0%,
+            var(--color-slate-200-alpha-60) 50%,
+            var(--color-slate-200-alpha-30) 100%
         );
         background-size: 200% 100%;
         animation: shimmer 1.5s ease-in-out infinite;
@@ -286,9 +286,9 @@
     [data-theme="dark"] .skeleton-dropdown-item {
         background: linear-gradient(
             90deg,
-            rgba(55, 65, 81, 0.3) 0%,
-            rgba(55, 65, 81, 0.6) 50%,
-            rgba(55, 65, 81, 0.3) 100%
+            var(--color-gray-700-alpha-30) 0%,
+            var(--color-gray-700-alpha-60) 50%,
+            var(--color-gray-700-alpha-30) 100%
         );
         background-size: 200% 100%;
     }
@@ -310,9 +310,9 @@
         width: 80px;
         background: linear-gradient(
             90deg,
-            rgba(226, 232, 240, 0.3) 0%,
-            rgba(226, 232, 240, 0.6) 50%,
-            rgba(226, 232, 240, 0.3) 100%
+            var(--color-slate-200-alpha-30) 0%,
+            var(--color-slate-200-alpha-60) 50%,
+            var(--color-slate-200-alpha-30) 100%
         );
         background-size: 200% 100%;
         animation: shimmer 1.5s ease-in-out infinite;
@@ -322,7 +322,7 @@
     .skeleton-breadcrumb-separator {
         width: 8px;
         height: 8px;
-        background: rgba(203, 213, 225, 0.5);
+        background: var(--color-slate-300-alpha-50);
         border-radius: 50%;
     }
 
@@ -343,9 +343,9 @@
         height: 40px;
         background: linear-gradient(
             90deg,
-            rgba(226, 232, 240, 0.3) 0%,
-            rgba(226, 232, 240, 0.6) 50%,
-            rgba(226, 232, 240, 0.3) 100%
+            var(--color-slate-200-alpha-30) 0%,
+            var(--color-slate-200-alpha-60) 50%,
+            var(--color-slate-200-alpha-30) 100%
         );
         background-size: 200% 100%;
         animation: shimmer 1.5s ease-in-out infinite;
@@ -363,7 +363,7 @@
         padding: var(--space-8);
         background: white;
         border-radius: var(--radius-xl);
-        box-shadow: var(--desktop-shadow-2xl, 0 24px 48px rgba(0, 0, 0, 0.16));
+        box-shadow: var(--desktop-shadow-2xl, 0 24px 48px var(--color-black-alpha-16));
     }
 
     .skeleton-modal-header {
@@ -372,9 +372,9 @@
         margin-bottom: var(--space-5);
         background: linear-gradient(
             90deg,
-            rgba(203, 213, 225, 0.3) 0%,
-            rgba(203, 213, 225, 0.6) 50%,
-            rgba(203, 213, 225, 0.3) 100%
+            var(--color-slate-300-alpha-30) 0%,
+            var(--color-slate-300-alpha-60) 50%,
+            var(--color-slate-300-alpha-30) 100%
         );
         background-size: 200% 100%;
         animation: shimmer 1.5s ease-in-out infinite;
@@ -391,9 +391,9 @@
         height: 16px;
         background: linear-gradient(
             90deg,
-            rgba(226, 232, 240, 0.3) 0%,
-            rgba(226, 232, 240, 0.6) 50%,
-            rgba(226, 232, 240, 0.3) 100%
+            var(--color-slate-200-alpha-30) 0%,
+            var(--color-slate-200-alpha-60) 50%,
+            var(--color-slate-200-alpha-30) 100%
         );
         background-size: 200% 100%;
         animation: shimmer 1.5s ease-in-out infinite;
@@ -417,9 +417,9 @@
     [data-theme="dark"] .skeleton-modal-line {
         background: linear-gradient(
             90deg,
-            rgba(55, 65, 81, 0.3) 0%,
-            rgba(55, 65, 81, 0.6) 50%,
-            rgba(55, 65, 81, 0.3) 100%
+            var(--color-gray-700-alpha-30) 0%,
+            var(--color-gray-700-alpha-60) 50%,
+            var(--color-gray-700-alpha-30) 100%
         );
         background-size: 200% 100%;
     }

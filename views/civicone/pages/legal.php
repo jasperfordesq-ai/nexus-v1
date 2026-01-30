@@ -56,7 +56,7 @@ require_once __DIR__ . '/../components/govuk/breadcrumbs.php';
 
                     <!-- Privacy Policy -->
                     <div class="govuk-grid-column-one-third govuk-!-margin-bottom-6">
-                        <div class="govuk-!-padding-4" style="border: 1px solid #b1b4b6; height: 100%;">
+                        <div class="govuk-!-padding-4 civicone-card-bordered-full">
                             <h2 class="govuk-heading-m govuk-!-margin-bottom-2">
                                 <a href="<?= $basePath ?>/privacy" class="govuk-link">Privacy Policy</a>
                             </h2>
@@ -68,7 +68,7 @@ require_once __DIR__ . '/../components/govuk/breadcrumbs.php';
 
                     <!-- Terms of Service -->
                     <div class="govuk-grid-column-one-third govuk-!-margin-bottom-6">
-                        <div class="govuk-!-padding-4" style="border: 1px solid #b1b4b6; height: 100%;">
+                        <div class="govuk-!-padding-4 civicone-card-bordered-full">
                             <h2 class="govuk-heading-m govuk-!-margin-bottom-2">
                                 <a href="<?= $basePath ?>/terms" class="govuk-link">Terms of Service</a>
                             </h2>
@@ -80,7 +80,7 @@ require_once __DIR__ . '/../components/govuk/breadcrumbs.php';
 
                     <!-- Accessibility -->
                     <div class="govuk-grid-column-one-third govuk-!-margin-bottom-6">
-                        <div class="govuk-!-padding-4" style="border: 1px solid #b1b4b6; height: 100%;">
+                        <div class="govuk-!-padding-4 civicone-card-bordered-full">
                             <h2 class="govuk-heading-m govuk-!-margin-bottom-2">
                                 <a href="<?= $basePath ?>/accessibility" class="govuk-link">Accessibility Statement</a>
                             </h2>
@@ -92,7 +92,7 @@ require_once __DIR__ . '/../components/govuk/breadcrumbs.php';
 
                     <!-- Cookie Policy -->
                     <div class="govuk-grid-column-one-third govuk-!-margin-bottom-6">
-                        <div class="govuk-!-padding-4" style="border: 1px solid #b1b4b6; height: 100%;">
+                        <div class="govuk-!-padding-4 civicone-card-bordered-full">
                             <h2 class="govuk-heading-m govuk-!-margin-bottom-2">
                                 <a href="<?= $basePath ?>/cookies" class="govuk-link">Cookie Policy</a>
                             </h2>
@@ -104,7 +104,7 @@ require_once __DIR__ . '/../components/govuk/breadcrumbs.php';
 
                     <!-- Contact -->
                     <div class="govuk-grid-column-one-third govuk-!-margin-bottom-6">
-                        <div class="govuk-!-padding-4" style="border: 1px solid #b1b4b6; height: 100%;">
+                        <div class="govuk-!-padding-4 civicone-card-bordered-full">
                             <h2 class="govuk-heading-m govuk-!-margin-bottom-2">
                                 <a href="<?= $basePath ?>/contact" class="govuk-link">Contact Us</a>
                             </h2>
@@ -116,7 +116,7 @@ require_once __DIR__ . '/../components/govuk/breadcrumbs.php';
 
                     <!-- Help Centre -->
                     <div class="govuk-grid-column-one-third govuk-!-margin-bottom-6">
-                        <div class="govuk-!-padding-4" style="border: 1px solid #b1b4b6; height: 100%;">
+                        <div class="govuk-!-padding-4 civicone-card-bordered-full">
                             <h2 class="govuk-heading-m govuk-!-margin-bottom-2">
                                 <a href="<?= $basePath ?>/help" class="govuk-link">Help Centre</a>
                             </h2>

@@ -6,9 +6,9 @@
 .skeleton {
     background: linear-gradient(
         90deg,
-        rgba(226, 232, 240, 0.2) 0%,
-        rgba(226, 232, 240, 0.4) 50%,
-        rgba(226, 232, 240, 0.2) 100%
+        var(--color-slate-200-alpha-20) 0%,
+        var(--color-slate-200-alpha-40) 50%,
+        var(--color-slate-200-alpha-20) 100%
     );
     background-size: 200% 100%;
     animation: shimmer 1.5s ease-in-out infinite;
@@ -20,9 +20,9 @@
 [data-theme="dark"] .skeleton {
     background: linear-gradient(
         90deg,
-        rgba(51, 65, 85, 0.2) 0%,
-        rgba(51, 65, 85, 0.4) 50%,
-        rgba(51, 65, 85, 0.2) 100%
+        var(--color-slate-600-alpha-20) 0%,
+        var(--color-slate-600-alpha-40) 50%,
+        var(--color-slate-600-alpha-20) 100%
     );
 }
 
@@ -82,11 +82,11 @@
     background: white;
     border-radius: var(--radius-lg);
     margin-bottom: var(--space-4);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+    box-shadow: 0 2px 8px var(--color-black-alpha-4);
 }
 
 [data-theme="dark"] .feed-skeleton {
-    background: rgba(30, 41, 59, 0.5);
+    background: var(--color-slate-800-alpha-50);
 }
 
 .feed-skeleton-header {
@@ -103,15 +103,15 @@
 /* Match card skeleton */
 .match-skeleton {
     padding: var(--space-6);
-    background: rgba(255, 255, 255, 0.9);
+    background: var(--color-white-alpha-90);
     backdrop-filter: blur(20px);
     border-radius: var(--radius-xl);
-    border: 1px solid rgba(255, 255, 255, 0.5);
+    border: 1px solid var(--color-white-alpha-50);
 }
 
 [data-theme="dark"] .match-skeleton {
-    background: rgba(30, 41, 59, 0.9);
-    border-color: rgba(255, 255, 255, 0.1);
+    background: var(--color-slate-800-alpha-90);
+    border-color: var(--color-white-alpha-10);
 }
 
 .match-skeleton-header {
@@ -126,11 +126,11 @@
     grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
     gap: var(--space-4);
     padding: var(--space-4) 0;
-    border-bottom: 1px solid rgba(229, 231, 235, 0.3);
+    border-bottom: 1px solid var(--color-gray-200-alpha-30);
 }
 
 [data-theme="dark"] .table-skeleton-row {
-    border-bottom-color: rgba(255, 255, 255, 0.05);
+    border-bottom-color: var(--color-white-alpha-5);
 }
 
 /* Smooth fade in when content loads */
@@ -175,12 +175,12 @@
     align-items: center;
     gap: var(--space-3);
     padding: var(--space-3);
-    background: rgba(255, 255, 255, 0.5);
+    background: var(--color-white-alpha-50);
     border-radius: var(--radius-md);
 }
 
 [data-theme="dark"] .list-skeleton-item {
-    background: rgba(30, 41, 59, 0.5);
+    background: var(--color-slate-800-alpha-50);
 }
 
 /* Grid skeleton */
@@ -193,16 +193,16 @@
 /* Member card skeleton */
 .member-card-skeleton {
     padding: var(--space-6);
-    background: rgba(255, 255, 255, 0.9);
+    background: var(--color-white-alpha-90);
     backdrop-filter: blur(20px);
     border-radius: var(--radius-xl);
-    border: 1px solid rgba(255, 255, 255, 0.5);
+    border: 1px solid var(--color-white-alpha-50);
     text-align: center;
 }
 
 [data-theme="dark"] .member-card-skeleton {
-    background: rgba(30, 41, 59, 0.9);
-    border-color: rgba(255, 255, 255, 0.1);
+    background: var(--color-slate-800-alpha-90);
+    border-color: var(--color-white-alpha-10);
 }
 
 .member-card-skeleton .skeleton-avatar {
@@ -302,7 +302,7 @@
     align-items: flex-start;
     gap: var(--space-4);
     padding: var(--space-4) 20px;
-    border-bottom: 1px solid rgba(229, 231, 235, 0.1);
+    border-bottom: 1px solid var(--color-gray-200-alpha-10);
 }
 
 .notification-skeleton .skeleton-icon {
@@ -337,17 +337,17 @@
    For events index page
    ============================================== */
 .event-card-skeleton {
-    background: rgba(255, 255, 255, 0.9);
+    background: var(--color-white-alpha-90);
     backdrop-filter: blur(20px);
     border-radius: var(--radius-xl);
-    border: 1px solid rgba(255, 255, 255, 0.5);
+    border: 1px solid var(--color-white-alpha-50);
     overflow: hidden;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+    box-shadow: 0 8px 32px var(--color-black-alpha-8);
 }
 
 [data-theme="dark"] .event-card-skeleton {
-    background: rgba(30, 41, 59, 0.9);
-    border-color: rgba(255, 255, 255, 0.1);
+    background: var(--color-slate-800-alpha-90);
+    border-color: var(--color-white-alpha-10);
 }
 
 .event-card-skeleton .skeleton-date-header {
@@ -355,11 +355,11 @@
     align-items: center;
     gap: var(--space-4);
     padding: var(--space-5);
-    border-bottom: 1px solid rgba(229, 231, 235, 0.2);
+    border-bottom: 1px solid var(--color-gray-200-alpha-20);
 }
 
 [data-theme="dark"] .event-card-skeleton .skeleton-date-header {
-    border-bottom-color: rgba(255, 255, 255, 0.05);
+    border-bottom-color: var(--color-white-alpha-5);
 }
 
 .event-card-skeleton .skeleton-date-box {
@@ -407,11 +407,11 @@
     justify-content: space-between;
     align-items: center;
     padding: var(--space-4) 20px;
-    border-top: 1px solid rgba(229, 231, 235, 0.2);
+    border-top: 1px solid var(--color-gray-200-alpha-20);
 }
 
 [data-theme="dark"] .event-card-skeleton .skeleton-footer {
-    border-top-color: rgba(255, 255, 255, 0.05);
+    border-top-color: var(--color-white-alpha-5);
 }
 
 /* Events grid skeleton container */
@@ -426,24 +426,24 @@
    For listings index page
    ============================================== */
 .listing-card-skeleton {
-    background: rgba(255, 255, 255, 0.9);
+    background: var(--color-white-alpha-90);
     backdrop-filter: blur(20px);
     border-radius: var(--radius-xl);
-    border: 1px solid rgba(255, 255, 255, 0.5);
+    border: 1px solid var(--color-white-alpha-50);
     overflow: hidden;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+    box-shadow: 0 8px 32px var(--color-black-alpha-8);
 }
 
 [data-theme="dark"] .listing-card-skeleton {
-    background: rgba(30, 41, 59, 0.9);
-    border-color: rgba(255, 255, 255, 0.1);
+    background: var(--color-slate-800-alpha-90);
+    border-color: var(--color-white-alpha-10);
 }
 
 .listing-card-skeleton .skeleton-image {
     height: 180px;
     background: linear-gradient(135deg,
-        rgba(99, 102, 241, 0.2) 0%,
-        rgba(139, 92, 246, 0.2) 100%);
+        var(--color-indigo-alpha-20) 0%,
+        var(--color-violet-alpha-20) 100%);
     position: relative;
 }
 
@@ -497,11 +497,11 @@
     justify-content: space-between;
     align-items: center;
     padding-top: var(--space-4);
-    border-top: 1px solid rgba(229, 231, 235, 0.2);
+    border-top: 1px solid var(--color-gray-200-alpha-20);
 }
 
 [data-theme="dark"] .listing-card-skeleton .skeleton-footer {
-    border-top-color: rgba(255, 255, 255, 0.05);
+    border-top-color: var(--color-white-alpha-5);
 }
 
 .listing-card-skeleton .skeleton-author {
@@ -528,24 +528,24 @@
    For blog index page
    ============================================== */
 .news-card-skeleton {
-    background: rgba(255, 255, 255, 0.1);
+    background: var(--color-white-alpha-10);
     backdrop-filter: blur(20px);
     border-radius: var(--radius-2xl);
-    border: 1px solid rgba(255, 255, 255, 0.15);
+    border: 1px solid var(--color-white-alpha-15);
     overflow: hidden;
-    box-shadow: 0 8px 32px rgba(139, 92, 246, 0.1);
+    box-shadow: 0 8px 32px var(--color-violet-alpha-10);
 }
 
 [data-theme="dark"] .news-card-skeleton {
-    background: rgba(30, 41, 59, 0.6);
-    border-color: rgba(139, 92, 246, 0.2);
+    background: var(--color-slate-800-alpha-60);
+    border-color: var(--color-violet-alpha-20);
 }
 
 .news-card-skeleton .skeleton-image {
     height: 200px;
     background: linear-gradient(135deg,
-        rgba(139, 92, 246, 0.15) 0%,
-        rgba(99, 102, 241, 0.15) 100%);
+        var(--color-violet-alpha-15) 0%,
+        var(--color-indigo-alpha-15) 100%);
 }
 
 .news-card-skeleton .skeleton-body {
@@ -652,11 +652,11 @@
 @media (prefers-reduced-motion: reduce) {
     .skeleton {
         animation: none;
-        background: rgba(226, 232, 240, 0.3);
+        background: var(--color-slate-200-alpha-30);
     }
 
     [data-theme="dark"] .skeleton {
-        background: rgba(51, 65, 85, 0.3);
+        background: var(--color-slate-600-alpha-30);
     }
 
     .skeleton-pulse {
