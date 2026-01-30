@@ -3,7 +3,8 @@
  * 500% Premium Holographic Design
  * Date: 2026-01-12
  * Migrated to design tokens: 2026-01-21
-  * Fully Migrated to Design Tokens: 2026-01-21 ✓
+ * Fully Migrated to Design Tokens: 2026-01-21
+ * RGBA to CSS Variables Migration: 2026-01-30 (56 replacements)
  */
 
 /* ==========================================
@@ -26,15 +27,15 @@
 
     /* PREMIUM GLASSMORPHISM */
     background: linear-gradient(135deg,
-            rgba(255, 255, 255, 0.08) 0%,
-            rgba(255, 255, 255, 0.03) 100%);
+            var(--color-white-alpha-8) 0%,
+            var(--color-white-alpha-3) 100%);
     backdrop-filter: blur(var(--glass-blur-heavy)) saturate(var(--glass-saturation));
     -webkit-backdrop-filter: blur(var(--glass-blur-heavy)) saturate(var(--glass-saturation));
 
-    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-    box-shadow: 0 4px var(--space-6) rgba(0, 0, 0, 0.04),
-        0 0 1px rgba(255, 255, 255, 0.1) inset,
-        0 0 var(--space-20) rgba(99, 102, 241, 0.03);
+    border-bottom: 1px solid var(--color-white-alpha-8);
+    box-shadow: 0 4px var(--space-6) var(--color-black-alpha-4),
+        0 0 1px var(--color-white-alpha-10) inset,
+        0 0 var(--space-20) var(--color-indigo-alpha-3);
 
     transition: all var(--transition-slow);
 }
@@ -42,12 +43,12 @@
 /* Dark Mode Utility Bar */
 [data-theme="dark"] .nexus-utility-bar {
     background: linear-gradient(135deg,
-            rgba(15, 23, 42, 0.85) 0%,
-            rgba(30, 41, 59, 0.8) 100%);
-    border-bottom: 1px solid rgba(148, 163, 184, 0.1);
-    box-shadow: 0 4px var(--space-6) rgba(0, 0, 0, 0.2),
-        0 0 1px rgba(255, 255, 255, 0.05) inset,
-        0 0 var(--space-20) rgba(99, 102, 241, 0.08);
+            var(--color-slate-900-alpha-85) 0%,
+            var(--color-slate-alpha-80) 100%);
+    border-bottom: 1px solid var(--color-slate-400-alpha-10);
+    box-shadow: 0 4px var(--space-6) var(--color-black-alpha-20),
+        0 0 1px var(--color-white-alpha-5) inset,
+        0 0 var(--space-20) var(--color-indigo-alpha-8);
 }
 
 /* Scrolled state */
@@ -66,24 +67,24 @@
     border-radius: var(--radius-base);
     transition: all var(--transition-base);
     position: relative;
-    color: rgba(255, 255, 255, 0.7);
+    color: var(--color-white-alpha-70);
     text-transform: uppercase;
     letter-spacing: 0.3px;
 }
 
 .nexus-utility-bar .util-link:hover {
-    color: rgba(255, 255, 255, 0.95);
-    background: rgba(255, 255, 255, 0.08);
+    color: var(--color-white-alpha-95);
+    background: var(--color-white-alpha-8);
     transform: translateY(-1px);
 }
 
 [data-theme="dark"] .nexus-utility-bar .util-link {
-    color: rgba(248, 250, 252, 0.7);
+    color: var(--color-slate-50-alpha-70);
 }
 
 [data-theme="dark"] .nexus-utility-bar .util-link:hover {
-    color: rgba(248, 250, 252, 0.95);
-    background: rgba(255, 255, 255, 0.06);
+    color: var(--color-slate-50-alpha-95);
+    background: var(--color-white-alpha-6);
 }
 
 /* ==========================================
@@ -105,15 +106,15 @@
 
     /* ULTRA PREMIUM GLASSMORPHISM */
     background: linear-gradient(180deg,
-            rgba(255, 255, 255, 0.75) 0%,
-            rgba(255, 255, 255, 0.65) 100%);
+            var(--color-white-alpha-75) 0%,
+            var(--color-white-alpha-65) 100%);
     backdrop-filter: blur(60px) saturate(var(--glass-saturation)) brightness(1.05);
     -webkit-backdrop-filter: blur(60px) saturate(var(--glass-saturation)) brightness(1.05);
 
-    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
-    box-shadow: 0 var(--space-2) var(--space-8) rgba(31, 38, 135, 0.07),
-        0 0 1px rgba(255, 255, 255, 0.3) inset,
-        0 var(--space-5) var(--space-20) rgba(99, 102, 241, 0.05);
+    border-bottom: 1px solid var(--color-white-alpha-20);
+    box-shadow: 0 var(--space-2) var(--space-8) var(--color-glass-shadow-7),
+        0 0 1px var(--color-white-alpha-30) inset,
+        0 var(--space-5) var(--space-20) var(--color-indigo-alpha-5);
 
     transition: all var(--transition-slow);
 }
@@ -121,12 +122,12 @@
 /* Dark Mode Navbar */
 [data-theme="dark"] .nexus-navbar {
     background: linear-gradient(180deg,
-            rgba(15, 23, 42, 0.75) 0%,
-            rgba(30, 41, 59, 0.7) 100%);
-    border-bottom: 1px solid rgba(148, 163, 184, 0.1);
-    box-shadow: 0 var(--space-2) var(--space-8) rgba(0, 0, 0, 0.3),
-        0 0 1px rgba(255, 255, 255, 0.08) inset,
-        0 var(--space-5) var(--space-20) rgba(99, 102, 241, 0.12);
+            var(--color-slate-900-alpha-75) 0%,
+            var(--color-slate-alpha-70) 100%);
+    border-bottom: 1px solid var(--color-slate-400-alpha-10);
+    box-shadow: 0 var(--space-2) var(--space-8) var(--color-black-alpha-30),
+        0 0 1px var(--color-white-alpha-8) inset,
+        0 var(--space-5) var(--space-20) var(--color-indigo-alpha-12);
 }
 
 .nexus-navbar.scrolled {
@@ -163,9 +164,9 @@
     inset: 0;
     border-radius: var(--radius-lg);
     background: linear-gradient(135deg,
-            rgba(99, 102, 241, 0.12),
-            rgba(139, 92, 246, 0.08),
-            rgba(236, 72, 153, 0.06));
+            var(--color-indigo-alpha-12),
+            var(--color-violet-alpha-8),
+            var(--color-pink-alpha-6));
     opacity: 0;
     transition: opacity 0.35s var(--ease-in-out);
 }
@@ -189,7 +190,7 @@
 }
 
 [data-theme="dark"] .nav-link {
-    color: rgba(248, 250, 252, 0.9);
+    color: var(--color-white-alpha-90);
 }
 
 [data-theme="dark"] .nav-link:hover {
@@ -200,9 +201,9 @@
 .nav-link.active {
     color: var(--color-primary-500) !important;
     background: linear-gradient(135deg,
-            rgba(99, 102, 241, 0.15),
-            rgba(139, 92, 246, 0.1)) !important;
-    box-shadow: 0 var(--space-1) var(--space-3) rgba(99, 102, 241, 0.2);
+            var(--color-indigo-alpha-15),
+            var(--color-violet-alpha-10)) !important;
+    box-shadow: 0 var(--space-1) var(--space-3) var(--color-indigo-alpha-20);
 }
 
 /* ==========================================
@@ -238,8 +239,8 @@
             #f093fb 100%);
     background-size: 200% 200%;
 
-    box-shadow: 0 var(--space-2) var(--space-6) rgba(102, 126, 234, 0.35),
-        0 0 1px rgba(255, 255, 255, 0.4) inset;
+    box-shadow: 0 var(--space-2) var(--space-6) var(--color-gradient-blue-alpha-35),
+        0 0 1px var(--color-white-alpha-40) inset;
 
     transition: all var(--transition-slow);
     animation: gradientShift 6s ease infinite;
@@ -259,9 +260,9 @@
 
 .mega-menu-trigger:hover {
     transform: translateY(-3px) scale(1.02);
-    box-shadow: 0 var(--space-3) 36px rgba(102, 126, 234, 0.45),
-        0 0 1px rgba(255, 255, 255, 0.6) inset,
-        0 0 var(--space-10) rgba(102, 126, 234, 0.3);
+    box-shadow: 0 var(--space-3) 36px var(--color-gradient-blue-alpha-45),
+        0 0 1px var(--color-white-alpha-60) inset,
+        0 0 var(--space-10) var(--color-gradient-blue-alpha-30);
 }
 
 .mega-menu-trigger:active {
@@ -294,9 +295,9 @@
 
     /* ULTRA PREMIUM GLASSMORPHISM */
     background: linear-gradient(180deg,
-            rgba(255, 255, 255, 0.95) 0%,
+            var(--color-white-alpha-95) 0%,
             /* Increased opacity to reduce repaint flickers */
-            rgba(255, 255, 255, 0.90) 100%);
+            var(--color-white-alpha-90) 100%);
     backdrop-filter: blur(var(--space-20)) saturate(var(--glass-saturation)) brightness(1.1);
     -webkit-backdrop-filter: blur(var(--space-20)) saturate(var(--glass-saturation)) brightness(1.1);
 
@@ -306,10 +307,10 @@
     padding: var(--space-4);
 
     /* HOLOGRAPHIC SHADOW - Adjusted for no border */
-    box-shadow: 0 var(--space-6) var(--space-20) rgba(31, 38, 135, 0.15),
-        0 0 1px rgba(255, 255, 255, 0.6) inset,
-        0 var(--space-10) 120px rgba(99, 102, 241, 0.15),
-        0 0 0 1px rgba(99, 102, 241, 0.08);
+    box-shadow: 0 var(--space-6) var(--space-20) var(--color-glass-shadow-15),
+        0 0 1px var(--color-white-alpha-60) inset,
+        0 var(--space-10) 120px var(--color-indigo-alpha-15),
+        0 0 0 1px var(--color-indigo-alpha-8);
     /* Simulated border via shadow */
 
     /* FIX: Force GPU */
@@ -326,12 +327,12 @@
 /* Dark Mode Mega Menu */
 [data-theme="dark"] .mega-menu-dropdown {
     background: linear-gradient(180deg,
-            rgba(15, 23, 42, 0.92) 0%,
-            rgba(30, 41, 59, 0.88) 100%);
-    border: 1px solid rgba(148, 163, 184, 0.2);
-    box-shadow: 0 var(--space-6) var(--space-20) rgba(0, 0, 0, 0.4),
-        0 0 1px rgba(255, 255, 255, 0.1) inset,
-        0 var(--space-10) 120px rgba(99, 102, 241, 0.25);
+            var(--color-slate-900-alpha-92) 0%,
+            var(--color-slate-alpha-88) 100%);
+    border: 1px solid var(--color-slate-400-alpha-20);
+    box-shadow: 0 var(--space-6) var(--space-20) var(--color-black-alpha-40),
+        0 0 1px var(--color-white-alpha-10) inset,
+        0 var(--space-10) 120px var(--color-indigo-alpha-25);
 }
 
 /* Show mega menu */
@@ -361,7 +362,7 @@
 }
 
 .mega-menu-dropdown::-webkit-scrollbar-track {
-    background: rgba(0, 0, 0, 0.05);
+    background: var(--color-black-alpha-5);
     border-radius: var(--radius-md);
 }
 
@@ -377,11 +378,11 @@
 /* Firefox scrollbar support */
 .mega-menu-dropdown {
     scrollbar-width: thin;
-    scrollbar-color: #764ba2 rgba(0, 0, 0, 0.05);
+    scrollbar-color: #764ba2 var(--color-black-alpha-5);
 }
 
 [data-theme="dark"] .mega-menu-dropdown {
-    scrollbar-color: #667eea rgba(255, 255, 255, 0.05);
+    scrollbar-color: #667eea var(--color-white-alpha-5);
 }
 
 /* ==========================================
@@ -401,7 +402,7 @@
     font-weight: var(--font-weight-bold);
     text-transform: uppercase;
     letter-spacing: 0.8px;
-    color: rgba(100, 116, 139, 0.8);
+    color: var(--color-slate-500-alpha-80);
     padding: var(--space-3) var(--space-4) var(--space-2);
     display: flex;
     align-items: center;
@@ -409,7 +410,7 @@
 }
 
 [data-theme="dark"] .mega-menu-section-title {
-    color: rgba(148, 163, 184, 0.7);
+    color: var(--color-slate-400-alpha-70);
 }
 
 .mega-menu-section-title i {
@@ -441,9 +442,9 @@
     inset: 0;
     border-radius: var(--radius-lg);
     background: linear-gradient(135deg,
-            rgba(99, 102, 241, 0.08),
-            rgba(139, 92, 246, 0.06),
-            rgba(236, 72, 153, 0.04));
+            var(--color-indigo-alpha-8),
+            var(--color-violet-alpha-6),
+            var(--color-pink-alpha-4));
     opacity: 0;
     transition: opacity var(--transition-base);
 }
@@ -484,7 +485,7 @@
     justify-content: center;
     font-size: var(--font-size-lg);
     border-radius: var(--radius-md);
-    background: rgba(99, 102, 241, 0.08);
+    background: var(--color-indigo-alpha-8);
     transition: all var(--transition-base);
     position: relative;
     z-index: 1;
@@ -517,13 +518,13 @@
 
 .mega-menu-item-desc {
     font-size: var(--font-size-sm);
-    color: rgba(100, 116, 139, 0.8);
+    color: var(--color-slate-500-alpha-80);
     line-height: var(--line-height-tight);
     margin-top: var(--space-1);
 }
 
 [data-theme="dark"] .mega-menu-item-desc {
-    color: rgba(148, 163, 184, 0.7);
+    color: var(--color-slate-400-alpha-70);
 }
 
 /* ==========================================
@@ -532,15 +533,15 @@
 
 /* Gamification Section Highlight */
 .mega-menu-item.gamification-item:hover .mega-menu-item-icon {
-    box-shadow: 0 0 var(--space-5) rgba(251, 191, 36, 0.3);
+    box-shadow: 0 0 var(--space-5) var(--color-amber-alpha-30);
 }
 
 /* AI Assistant - Special Premium Highlight */
 .mega-menu-item.ai-highlight {
     background: linear-gradient(135deg,
-            rgba(99, 102, 241, 0.08),
-            rgba(139, 92, 246, 0.06)) !important;
-    border: 1px solid rgba(99, 102, 241, 0.15);
+            var(--color-indigo-alpha-8),
+            var(--color-violet-alpha-6)) !important;
+    border: 1px solid var(--color-indigo-alpha-15);
 }
 
 .mega-menu-item.ai-highlight::before {
@@ -550,11 +551,11 @@
 .mega-menu-item.ai-highlight .mega-menu-item-icon {
     background: linear-gradient(135deg, #667eea, #764ba2);
     color: white;
-    box-shadow: 0 var(--space-1) var(--space-3) rgba(102, 126, 234, 0.3);
+    box-shadow: 0 var(--space-1) var(--space-3) var(--color-indigo-alpha-30);
 }
 
 .mega-menu-item.ai-highlight:hover .mega-menu-item-icon {
-    box-shadow: 0 var(--space-2) var(--space-5) rgba(102, 126, 234, 0.5);
+    box-shadow: 0 var(--space-2) var(--space-5) var(--color-indigo-alpha-50);
     transform: scale(1.12) rotate(-8deg);
 }
 
@@ -563,7 +564,7 @@
     height: 1px;
     background: linear-gradient(90deg,
             transparent 0%,
-            rgba(148, 163, 184, 0.2) 50%,
+            var(--color-slate-400-alpha-20) 50%,
             transparent 100%);
     margin: var(--space-3) 0;
 }
@@ -574,8 +575,8 @@
 
 .mega-menu-quick-actions {
     background: linear-gradient(135deg,
-            rgba(243, 244, 246, 0.6),
-            rgba(229, 231, 235, 0.5));
+            var(--color-gray-100-alpha-60),
+            var(--color-gray-200-alpha-50));
     border-radius: var(--radius-lg);
     padding: var(--space-3);
     margin-bottom: var(--space-3);
@@ -583,8 +584,8 @@
 
 [data-theme="dark"] .mega-menu-quick-actions {
     background: linear-gradient(135deg,
-            rgba(30, 41, 59, 0.5),
-            rgba(51, 65, 85, 0.4));
+            var(--color-slate-alpha-50),
+            var(--color-slate-700-alpha-40));
 }
 
 .mega-menu-quick-actions .mega-menu-item {

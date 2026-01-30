@@ -254,25 +254,20 @@ $headerTotalReviews = $headerTotalReviews ?? 0;
 
 // Load header
 require __DIR__ . '/../../layouts/civicone/header.php';
+require_once __DIR__ . '/../components/govuk/breadcrumbs.php';
 ?>
 
 <!-- Profile Header Component -->
 <?php require __DIR__ . '/components/profile-header.php'; ?>
 
-<!-- GOV.UK Breadcrumbs -->
-<nav class="govuk-breadcrumbs govuk-!-margin-bottom-6" aria-label="Breadcrumb">
-    <ol class="govuk-breadcrumbs__list">
-        <li class="govuk-breadcrumbs__list-item">
-            <a class="govuk-breadcrumbs__link" href="<?= $basePath ?>">Home</a>
-        </li>
-        <li class="govuk-breadcrumbs__list-item">
-            <a class="govuk-breadcrumbs__link" href="<?= $basePath ?>/members">Members</a>
-        </li>
-        <li class="govuk-breadcrumbs__list-item" aria-current="page">
-            <?= htmlspecialchars($displayName) ?>
-        </li>
-    </ol>
-</nav>
+<?= civicone_govuk_breadcrumbs([
+    'items' => [
+        ['text' => 'Home', 'href' => $basePath],
+        ['text' => 'Members', 'href' => $basePath . '/members'],
+        ['text' => htmlspecialchars($displayName)]
+    ],
+    'class' => 'govuk-!-margin-bottom-6'
+]) ?>
 
 <!-- Template C: Detail Page (2/3 + 1/3 layout) -->
 <div class="govuk-grid-row">

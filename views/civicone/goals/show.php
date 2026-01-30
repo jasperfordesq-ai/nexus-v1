@@ -9,20 +9,18 @@ $hasMentor = !empty($goal['mentor_id']);
 $isMentor = isset($_SESSION['user_id']) && $_SESSION['user_id'] == $goal['mentor_id'];
 
 require dirname(__DIR__, 2) . '/layouts/civicone/header.php';
+require_once __DIR__ . '/../components/govuk/breadcrumbs.php';
 $basePath = \Nexus\Core\TenantContext::getBasePath();
 ?>
 
-<nav class="govuk-breadcrumbs govuk-!-margin-bottom-6" aria-label="Breadcrumb">
-    <ol class="govuk-breadcrumbs__list">
-        <li class="govuk-breadcrumbs__list-item">
-            <a class="govuk-breadcrumbs__link" href="<?= $basePath ?>">Home</a>
-        </li>
-        <li class="govuk-breadcrumbs__list-item">
-            <a class="govuk-breadcrumbs__link" href="<?= $basePath ?>/goals">Goals</a>
-        </li>
-        <li class="govuk-breadcrumbs__list-item" aria-current="page"><?= htmlspecialchars($goal['title']) ?></li>
-    </ol>
-</nav>
+<?= civicone_govuk_breadcrumbs([
+    'items' => [
+        ['text' => 'Home', 'href' => $basePath],
+        ['text' => 'Goals', 'href' => $basePath . '/goals'],
+        ['text' => htmlspecialchars($goal['title'])]
+    ],
+    'class' => 'govuk-!-margin-bottom-6'
+]) ?>
 
 <a href="<?= $basePath ?>/goals" class="govuk-back-link govuk-!-margin-bottom-6">Back to Goals</a>
 

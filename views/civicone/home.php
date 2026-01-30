@@ -138,6 +138,7 @@ if ($memberCount > 0) {
 
 // 5. LOAD HEADER
 require __DIR__ . '/../layouts/civicone/header.php';
+require_once __DIR__ . '/components/govuk/breadcrumbs.php';
 ?>
 
 <!-- Structured Data for SEO -->
@@ -147,14 +148,12 @@ require __DIR__ . '/../layouts/civicone/header.php';
 
     <!-- Phase Banner moved to layout (views/layouts/civicone/partials/skip-link-and-banner.php) -->
 
-    <!-- Breadcrumbs - GOV.UK navigation pattern (home page shows current only) -->
-    <nav class="govuk-breadcrumbs govuk-breadcrumbs--collapse-on-mobile" aria-label="Breadcrumb">
-        <ol class="govuk-breadcrumbs__list">
-            <li class="govuk-breadcrumbs__list-item" aria-current="page">
-                Home
-            </li>
-        </ol>
-    </nav>
+    <?= civicone_govuk_breadcrumbs([
+        'items' => [
+            ['text' => 'Home']
+        ],
+        'collapseOnMobile' => true
+    ]) ?>
 
     <main class="govuk-main-wrapper" id="main-content" role="main">
 

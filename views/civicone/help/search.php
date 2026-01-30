@@ -14,6 +14,7 @@ $basePath = TenantContext::getBasePath();
 $pageTitle = !empty($query) ? 'Search results for "' . htmlspecialchars($query) . '"' : 'Search Help Centre';
 
 require dirname(__DIR__, 2) . '/layouts/civicone/header.php';
+require_once __DIR__ . '/../components/govuk/breadcrumbs.php';
 
 // Module display names (GOV.UK compliant - no icons)
 $moduleNames = [
@@ -67,20 +68,14 @@ function highlightExcerpt(string $content, string $query, int $maxLength = 200):
 
 <div class="govuk-width-container">
 
-    <!-- Breadcrumbs -->
-    <nav class="govuk-breadcrumbs" aria-label="Breadcrumb">
-        <ol class="govuk-breadcrumbs__list">
-            <li class="govuk-breadcrumbs__list-item">
-                <a class="govuk-breadcrumbs__link" href="<?= $basePath ?>">Home</a>
-            </li>
-            <li class="govuk-breadcrumbs__list-item">
-                <a class="govuk-breadcrumbs__link" href="<?= $basePath ?>/help">Help Centre</a>
-            </li>
-            <li class="govuk-breadcrumbs__list-item" aria-current="page">
-                Search
-            </li>
-        </ol>
-    </nav>
+    <?= civicone_govuk_breadcrumbs([
+        'items' => [
+            ['text' => 'Home', 'href' => $basePath],
+            ['text' => 'Help Centre', 'href' => $basePath . '/help'],
+            ['text' => 'Search']
+        ],
+        'class' => 'govuk-!-margin-bottom-6'
+    ]) ?>
 
     <main class="govuk-main-wrapper" role="main">
 

@@ -17,4 +17,4 @@
     <!-- GOV.UK Page Template Structure (v5.14.0 compliant) -->
     <!-- govuk-template marker for Stop hook validation -->
     <div class="govuk-width-container govuk-template">
-        <main class="govuk-main-wrapper" id="main-content" role="main">
+        <main class="govuk-main-wrapper" id="main-content" role="main" tabindex="-1">

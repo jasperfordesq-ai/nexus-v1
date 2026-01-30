@@ -7,20 +7,18 @@ if (session_status() === PHP_SESSION_NONE) session_start();
 
 $pageTitle = $poll['question'];
 require __DIR__ . '/../../layouts/civicone/header.php';
+require_once __DIR__ . '/../components/govuk/breadcrumbs.php';
 $basePath = \Nexus\Core\TenantContext::getBasePath();
 ?>
 
-<nav class="govuk-breadcrumbs govuk-!-margin-bottom-6" aria-label="Breadcrumb">
-    <ol class="govuk-breadcrumbs__list">
-        <li class="govuk-breadcrumbs__list-item">
-            <a class="govuk-breadcrumbs__link" href="<?= $basePath ?>">Home</a>
-        </li>
-        <li class="govuk-breadcrumbs__list-item">
-            <a class="govuk-breadcrumbs__link" href="<?= $basePath ?>/polls">Polls</a>
-        </li>
-        <li class="govuk-breadcrumbs__list-item" aria-current="page">Poll</li>
-    </ol>
-</nav>
+<?= civicone_govuk_breadcrumbs([
+    'items' => [
+        ['text' => 'Home', 'href' => $basePath],
+        ['text' => 'Polls', 'href' => $basePath . '/polls'],
+        ['text' => 'Poll']
+    ],
+    'class' => 'govuk-!-margin-bottom-6'
+]) ?>
 
 <a href="<?= $basePath ?>/polls" class="govuk-back-link govuk-!-margin-bottom-6">Back to polls</a>
 

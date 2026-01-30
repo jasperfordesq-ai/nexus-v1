@@ -945,8 +945,60 @@
     /* --effect-emerald-600-15 defined earlier - DUPLICATE REMOVED */
 
     /* Green-500 additional (34, 197, 94) */
+    --effect-green-12: rgba(34, 197, 94, 0.12);
     --effect-green-30: rgba(34, 197, 94, 0.3);
     --effect-green-40: rgba(34, 197, 94, 0.4);
+
+    /* Green-300 (134, 239, 172) */
+    --effect-green-300-80: rgba(134, 239, 172, 0.8);
+
+    /* Lime-500 (132, 204, 22) - Goals growth theme */
+    --effect-lime-6: rgba(132, 204, 22, 0.06);
+    --effect-lime-8: rgba(132, 204, 22, 0.08);
+    --effect-lime-10: rgba(132, 204, 22, 0.1);
+    --effect-lime-12: rgba(132, 204, 22, 0.12);
+    --effect-lime-15: rgba(132, 204, 22, 0.15);
+    --effect-lime-20: rgba(132, 204, 22, 0.2);
+    --effect-lime-25: rgba(132, 204, 22, 0.25);
+    --effect-lime-30: rgba(132, 204, 22, 0.3);
+    --effect-lime-35: rgba(132, 204, 22, 0.35);
+    --effect-lime-40: rgba(132, 204, 22, 0.4);
+    --effect-lime-45: rgba(132, 204, 22, 0.45);
+    --effect-lime-50: rgba(132, 204, 22, 0.5);
+    --effect-lime-60: rgba(132, 204, 22, 0.6);
+
+    /* Lime-400 (163, 230, 53) */
+    --effect-lime-400-8: rgba(163, 230, 53, 0.08);
+    --effect-lime-400-10: rgba(163, 230, 53, 0.1);
+    --effect-lime-400-12: rgba(163, 230, 53, 0.12);
+    --effect-lime-400-15: rgba(163, 230, 53, 0.15);
+
+    /* Lime-300 (190, 242, 100) */
+    --effect-lime-300-6: rgba(190, 242, 100, 0.06);
+    --effect-lime-300-8: rgba(190, 242, 100, 0.08);
+    --effect-lime-300-10: rgba(190, 242, 100, 0.1);
+
+    /* Lime-200 (217, 249, 157) */
+    --effect-lime-200-6: rgba(217, 249, 157, 0.06);
+
+    /* Lime-100 (236, 252, 203) */
+    --effect-lime-100-8: rgba(236, 252, 203, 0.08);
+
+    /* Pink-400 (244, 114, 182) - Goals holo effect */
+    --effect-pink-400-15: rgba(244, 114, 182, 0.15);
+    --effect-pink-400-25: rgba(244, 114, 182, 0.25);
+    --effect-pink-400-35: rgba(244, 114, 182, 0.35);
+    --effect-pink-400-60: rgba(244, 114, 182, 0.6);
+
+    /* Pink-600 additional (219, 39, 119) */
+    --effect-pink-600-10: rgba(219, 39, 119, 0.1);
+    --effect-pink-600-45: rgba(219, 39, 119, 0.45);
+
+    /* Glass shadow (31, 38, 135) */
+    --effect-glass-shadow-10: rgba(31, 38, 135, 0.1);
+    --effect-glass-shadow-12: rgba(31, 38, 135, 0.12);
+    --effect-glass-shadow-15: rgba(31, 38, 135, 0.15);
+    --effect-glass-shadow-20: rgba(31, 38, 135, 0.2);
 
     /* Orange-400 additional (251, 146, 60) */
     --effect-orange-400-30: rgba(251, 146, 60, 0.3);
@@ -1044,6 +1096,17 @@
     --effect-pink-600-35: rgba(219, 39, 119, 0.35);
     --effect-pink-600-50: rgba(219, 39, 119, 0.5);
     --effect-pink-600-60: rgba(219, 39, 119, 0.6);
+    --effect-pink-600-85: rgba(219, 39, 119, 0.85);
+    --effect-pink-600-90: rgba(219, 39, 119, 0.9);
+
+    /* Pink-500 additional (236, 72, 153) */
+    --effect-pink-500-85: rgba(236, 72, 153, 0.85);
+
+    /* Red-500 additional (239, 68, 68) */
+    --effect-red-90: rgba(239, 68, 68, 0.9);
+
+    /* Red-600 additional (220, 38, 38) */
+    --effect-red-600-90: rgba(220, 38, 38, 0.9);
 
     /* Orange custom (212, 98, 31) */
     --effect-orange-custom-35: rgba(212, 98, 31, 0.35);

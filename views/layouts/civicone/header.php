@@ -1,17 +1,34 @@
 <?php
 /**
- * CivicOne Layout Header v2.1 - Pure GOV.UK Compliance
+ * CivicOne Layout Header v2.4 - GOV.UK Service Navigation Pattern
  *
  * REBUILT 2026-01-25: 100% GOV.UK Frontend structure
- * SOURCE: https://github.com/alphagov/govuk-frontend
+ * UPDATED 2026-01-30: Simplified to use only Service Navigation (standard pattern)
  *
- * Structure (matches GOV.UK exactly):
- * - Skip link (WCAG 2.4.1)
- * - Phase banner (optional)
- * - Service Navigation (includes account links - GOV.UK pattern)
+ * SOURCE REFERENCES:
+ * - GOV.UK Frontend: https://github.com/alphagov/govuk-frontend
+ * - Service Navigation: https://design-system.service.gov.uk/components/service-navigation/
+ * - Skip Link: https://design-system.service.gov.uk/components/skip-link/
+ * - Phase Banner: https://design-system.service.gov.uk/components/phase-banner/
+ * - Cookie Banner: https://design-system.service.gov.uk/components/cookie-banner/
  *
- * NO utility bar - account/sign in moved to service navigation
- * NO notifications drawer - notifications accessed via dedicated page
+ * IMPORTANT NOTE ON GOV.UK PATTERNS:
+ * The gov.uk HOMEPAGE has a custom mega-menu that is NOT part of GOV.UK Frontend.
+ * GOV.UK Frontend provides two separate components:
+ * - Header: Simple dark blue bar with logo (for official government sites only)
+ * - Service Navigation: Light blue bar with service name and nav links
+ *
+ * For CivicOne (non-government service), we use only the Service Navigation
+ * component which is the standard pattern for GOV.UK-style services.
+ *
+ * DOCUMENT STRUCTURE (GOV.UK order):
+ * 1. Cookie banner (before skip link - GOV.UK pattern)
+ * 2. Skip link (WCAG 2.4.1 - first focusable element)
+ * 3. Phase banner (optional - for beta/alpha services)
+ * 4. Service Navigation (service name, nav items, mobile Menu toggle)
+ *
+ * CSS: /assets/css/civicone-header-v2.css (Service Navigation)
+ * JS:  /assets/js/civicone-header-v2.js
  */
 
 // Document opening (DOCTYPE, html, PHP setup)
@@ -30,10 +47,18 @@ require __DIR__ . '/../../../views/civicone/partials/cookie-banner.php';
 // Skip link and experimental banner (WCAG 2.4.1)
 require __DIR__ . '/partials/skip-link-and-banner.php';
 
-// Service navigation with account links (GOV.UK compliant) - v2.1
+// Service Navigation - GOV.UK compliant header
+// Note: The gov.uk homepage mega-menu is custom code NOT in GOV.UK Frontend.
+// We use the standard Service Navigation component which has:
+// - Service name on left
+// - Navigation links
+// - Mobile "Menu" toggle that shows/hides the nav list
 ?>
 <header class="govuk-template__header" role="banner">
-    <?php require __DIR__ . '/partials/service-navigation-v2.php'; ?>
+    <?php
+    // Service Navigation - the standard GOV.UK header pattern for services
+    require __DIR__ . '/partials/service-navigation-v2.php';
+    ?>
 </header>
 <?php
 

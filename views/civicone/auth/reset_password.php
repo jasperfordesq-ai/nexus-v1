@@ -16,24 +16,21 @@ $basePath = TenantContext::getBasePath();
 $pageTitle = 'Create a new password';
 
 require dirname(__DIR__, 2) . '/layouts/civicone/header.php';
+
+// Load GOV.UK components
+require_once __DIR__ . '/../components/govuk/error-summary.php';
+require_once __DIR__ . '/../components/govuk/breadcrumbs.php';
 ?>
 
 <div class="govuk-width-container">
 
-    <!-- Breadcrumbs -->
-    <nav class="govuk-breadcrumbs" aria-label="Breadcrumb">
-        <ol class="govuk-breadcrumbs__list">
-            <li class="govuk-breadcrumbs__list-item">
-                <a class="govuk-breadcrumbs__link" href="<?= $basePath ?>">Home</a>
-            </li>
-            <li class="govuk-breadcrumbs__list-item">
-                <a class="govuk-breadcrumbs__link" href="<?= $basePath ?>/login">Sign in</a>
-            </li>
-            <li class="govuk-breadcrumbs__list-item" aria-current="page">
-                Create new password
-            </li>
-        </ol>
-    </nav>
+    <?= civicone_govuk_breadcrumbs([
+        'items' => [
+            ['text' => 'Home', 'href' => $basePath],
+            ['text' => 'Sign in', 'href' => $basePath . '/login'],
+            ['text' => 'Create new password']
+        ]
+    ]) ?>
 
     <main class="govuk-main-wrapper" role="main">
 
@@ -41,28 +38,21 @@ require dirname(__DIR__, 2) . '/layouts/civicone/header.php';
             <div class="govuk-grid-column-two-thirds">
 
                 <?php if (isset($_GET['error'])): ?>
-                <div class="govuk-error-summary" aria-labelledby="error-summary-title" role="alert" data-module="govuk-error-summary">
-                    <h2 class="govuk-error-summary__title" id="error-summary-title">There is a problem</h2>
-                    <div class="govuk-error-summary__body">
-                        <ul class="govuk-list govuk-error-summary__list">
-                            <li>
-                                <a href="#password"><?= htmlspecialchars($_GET['error'] ?? 'Please check your password') ?></a>
-                            </li>
-                        </ul>
-                    </div>
-                </div>
+                <?= civicone_govuk_error_summary([
+                    'errors' => [
+                        ['text' => $_GET['error'] ?? 'Please check your password', 'href' => '#password']
+                    ]
+                ]) ?>
                 <?php endif; ?>
 
                 <?php if (isset($_GET['expired'])): ?>
-                <div class="govuk-error-summary" aria-labelledby="error-summary-title" role="alert" data-module="govuk-error-summary">
-                    <h2 class="govuk-error-summary__title" id="error-summary-title">Reset link has expired</h2>
-                    <div class="govuk-error-summary__body">
-                        <p class="govuk-body">Password reset links are valid for 1 hour.</p>
-                        <p class="govuk-body">
-                            <a href="<?= $basePath ?>/password/forgot" class="govuk-link">Request a new reset link</a>
-                        </p>
-                    </div>
-                </div>
+                <?= civicone_govuk_error_summary([
+                    'title' => 'Reset link has expired',
+                    'description' => 'Password reset links are valid for 1 hour.',
+                    'errors' => [
+                        ['text' => 'Request a new reset link', 'href' => $basePath . '/password/forgot']
+                    ]
+                ]) ?>
                 <?php endif; ?>
 
                 <h1 class="govuk-heading-xl">Create a new password</h1>

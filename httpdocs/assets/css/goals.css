@@ -33,7 +33,7 @@
 .holo-orb-1 {
     width: 400px;
     height: 400px;
-    background: radial-gradient(circle, rgba(219, 39, 119, 0.4) 0%, transparent 70%);
+    background: radial-gradient(circle, var(--effect-pink-600-40) 0%, transparent 70%);
     top: -100px;
     left: -100px;
     animation-delay: 0s;
@@ -42,7 +42,7 @@
 .holo-orb-2 {
     width: 350px;
     height: 350px;
-    background: radial-gradient(circle, rgba(244, 114, 182, 0.35) 0%, transparent 70%);
+    background: radial-gradient(circle, var(--effect-pink-400-35) 0%, transparent 70%);
     top: 40%;
     right: -80px;
     animation-delay: -7s;
@@ -51,22 +51,22 @@
 .holo-orb-3 {
     width: 300px;
     height: 300px;
-    background: radial-gradient(circle, rgba(168, 85, 247, 0.3) 0%, transparent 70%);
+    background: radial-gradient(circle, var(--effect-purple-30) 0%, transparent 70%);
     bottom: -50px;
     left: 30%;
     animation-delay: -14s;
 }
 
 [data-theme="dark"] .holo-orb-1 {
-    background: radial-gradient(circle, rgba(219, 39, 119, 0.3) 0%, transparent 70%);
+    background: radial-gradient(circle, var(--effect-pink-600-30) 0%, transparent 70%);
 }
 
 [data-theme="dark"] .holo-orb-2 {
-    background: radial-gradient(circle, rgba(244, 114, 182, 0.25) 0%, transparent 70%);
+    background: radial-gradient(circle, var(--effect-pink-400-25) 0%, transparent 70%);
 }
 
 [data-theme="dark"] .holo-orb-3 {
-    background: radial-gradient(circle, rgba(168, 85, 247, 0.2) 0%, transparent 70%);
+    background: radial-gradient(circle, var(--effect-purple-20) 0%, transparent 70%);
 }
 
 @keyframes floatOrb {
@@ -93,7 +93,7 @@
 }
 
 [data-theme="dark"] .holo-glass-card {
-    background: rgba(24, 24, 27, 0.6);
+    background: var(--color-zinc-900-alpha-60);
     border-color: var(--effect-white-10);
     box-shadow:
         0 25px 50px -12px var(--effect-black-40),
@@ -133,9 +133,9 @@
     height: 2px;
     background: linear-gradient(90deg,
         transparent,
-        rgba(219, 39, 119, 0.6),
-        rgba(168, 85, 247, 0.6),
-        rgba(244, 114, 182, 0.6),
+        var(--effect-pink-600-60),
+        var(--effect-purple-60),
+        var(--effect-pink-400-60),
         transparent
     );
 }
@@ -157,7 +157,7 @@
     justify-content: center;
     font-size: 1.8rem;
     color: white;
-    box-shadow: 0 10px 30px rgba(219, 39, 119, 0.3);
+    box-shadow: 0 10px 30px var(--effect-pink-600-30);
 }
 
 .holo-title {
@@ -209,7 +209,7 @@
     width: 100%;
     padding: 16px 20px;
     border-radius: 16px;
-    border: 2px solid rgba(219, 39, 119, 0.15);
+    border: 2px solid var(--effect-pink-600-15);
     background: var(--effect-white-60);
     color: var(--color-slate-800);
     font-size: 1rem;
@@ -222,7 +222,7 @@
     outline: none;
     border-color: var(--color-pink-600);
     background: var(--effect-white-90);
-    box-shadow: 0 0 0 4px rgba(219, 39, 119, 0.1);
+    box-shadow: 0 0 0 4px var(--effect-pink-600-10);
 }
 
 .holo-input::placeholder {
@@ -238,7 +238,7 @@
 [data-theme="dark"] .holo-input:focus {
     background: var(--effect-white-12);
     border-color: var(--color-pink-400);
-    box-shadow: 0 0 0 4px rgba(244, 114, 182, 0.15);
+    box-shadow: 0 0 0 4px var(--effect-pink-400-15);
 }
 
 [data-theme="dark"] .holo-input::placeholder {
@@ -262,8 +262,8 @@ textarea.holo-input {
 
 /* Goal Buddy Card */
 .holo-buddy-card {
-    background: linear-gradient(135deg, rgba(34, 197, 94, 0.1) 0%, var(--effect-emerald-10) 100%);
-    border: 2px solid rgba(34, 197, 94, 0.25);
+    background: linear-gradient(135deg, var(--effect-green-10) 0%, var(--effect-emerald-10) 100%);
+    border: 2px solid var(--effect-green-25);
     border-radius: 18px;
     padding: 20px 24px;
     margin-bottom: 30px;
@@ -271,12 +271,12 @@ textarea.holo-input {
 }
 
 .holo-buddy-card:hover {
-    border-color: rgba(34, 197, 94, 0.4);
+    border-color: var(--effect-green-40);
 }
 
 [data-theme="dark"] .holo-buddy-card {
-    background: linear-gradient(135deg, rgba(34, 197, 94, 0.12) 0%, rgba(16, 185, 129, 0.08) 100%);
-    border-color: rgba(34, 197, 94, 0.2);
+    background: linear-gradient(135deg, var(--effect-green-12) 0%, var(--effect-emerald-8) 100%);
+    border-color: var(--effect-green-20);
 }
 
 .holo-buddy-label {
@@ -325,7 +325,7 @@ textarea.holo-input {
 }
 
 [data-theme="dark"] .holo-buddy-desc {
-    color: rgba(134, 239, 172, 0.8);
+    color: var(--effect-green-300-80);
 }
 
 /* Buttons */
@@ -356,12 +356,12 @@ textarea.holo-input {
 .holo-btn-primary {
     background: linear-gradient(135deg, var(--color-pink-600) 0%, var(--color-pink-700) 100%);
     color: white;
-    box-shadow: 0 8px 24px rgba(219, 39, 119, 0.35);
+    box-shadow: 0 8px 24px var(--effect-pink-600-35);
 }
 
 .holo-btn-primary:hover {
     transform: translateY(-2px);
-    box-shadow: 0 12px 32px rgba(219, 39, 119, 0.45);
+    box-shadow: 0 12px 32px var(--effect-pink-600-45);
 }
 
 .holo-btn-primary:active {
@@ -371,11 +371,11 @@ textarea.holo-input {
 .holo-btn-secondary {
     background: transparent;
     color: var(--color-slate-500);
-    border: 2px solid rgba(100, 116, 139, 0.2);
+    border: 2px solid var(--color-slate-500-alpha-20);
 }
 
 .holo-btn-secondary:hover {
-    background: rgba(100, 116, 139, 0.08);
+    background: var(--color-slate-500-alpha-8);
     color: var(--color-slate-600);
 }
 
@@ -490,7 +490,7 @@ textarea.holo-input {
     .htb-btn:focus-visible,
     button:focus-visible,
     a:focus-visible {
-        outline: 3px solid rgba(239, 68, 68, 0.5);
+        outline: 3px solid var(--color-red-alpha-50);
         outline-offset: 2px;
     }
 
@@ -526,7 +526,7 @@ textarea.holo-input {
     }
 
     [data-theme="dark"] .htb-btn-secondary {
-        background: rgba(51, 65, 85, 0.6) !important;
+        background: var(--effect-slate-600-60) !important;
         border-color: var(--effect-white-15) !important;
         color: var(--color-slate-200) !important;
     }
@@ -562,7 +562,7 @@ textarea.holo-input {
 .holo-orb-1 {
     width: 400px;
     height: 400px;
-    background: radial-gradient(circle, rgba(219, 39, 119, 0.4) 0%, transparent 70%);
+    background: radial-gradient(circle, var(--effect-pink-600-40) 0%, transparent 70%);
     top: -100px;
     left: -100px;
     animation-delay: 0s;
@@ -571,7 +571,7 @@ textarea.holo-input {
 .holo-orb-2 {
     width: 350px;
     height: 350px;
-    background: radial-gradient(circle, rgba(244, 114, 182, 0.35) 0%, transparent 70%);
+    background: radial-gradient(circle, var(--effect-pink-400-35) 0%, transparent 70%);
     top: 40%;
     right: -80px;
     animation-delay: -7s;
@@ -580,22 +580,22 @@ textarea.holo-input {
 .holo-orb-3 {
     width: 300px;
     height: 300px;
-    background: radial-gradient(circle, rgba(168, 85, 247, 0.3) 0%, transparent 70%);
+    background: radial-gradient(circle, var(--effect-purple-30) 0%, transparent 70%);
     bottom: -50px;
     left: 30%;
     animation-delay: -14s;
 }
 
 [data-theme="dark"] .holo-orb-1 {
-    background: radial-gradient(circle, rgba(219, 39, 119, 0.3) 0%, transparent 70%);
+    background: radial-gradient(circle, var(--effect-pink-600-30) 0%, transparent 70%);
 }
 
 [data-theme="dark"] .holo-orb-2 {
-    background: radial-gradient(circle, rgba(244, 114, 182, 0.25) 0%, transparent 70%);
+    background: radial-gradient(circle, var(--effect-pink-400-25) 0%, transparent 70%);
 }
 
 [data-theme="dark"] .holo-orb-3 {
-    background: radial-gradient(circle, rgba(168, 85, 247, 0.2) 0%, transparent 70%);
+    background: radial-gradient(circle, var(--effect-purple-20) 0%, transparent 70%);
 }
 
 @keyframes floatOrb {
@@ -622,7 +622,7 @@ textarea.holo-input {
 }
 
 [data-theme="dark"] .holo-glass-card {
-    background: rgba(24, 24, 27, 0.6);
+    background: var(--color-zinc-900-alpha-60);
     border-color: var(--effect-white-10);
     box-shadow:
         0 25px 50px -12px var(--effect-black-40),
@@ -662,9 +662,9 @@ textarea.holo-input {
     height: 2px;
     background: linear-gradient(90deg,
         transparent,
-        rgba(219, 39, 119, 0.6),
-        rgba(168, 85, 247, 0.6),
-        rgba(244, 114, 182, 0.6),
+        var(--effect-pink-600-60),
+        var(--effect-purple-60),
+        var(--effect-pink-400-60),
         transparent
     );
 }
@@ -686,7 +686,7 @@ textarea.holo-input {
     justify-content: center;
     font-size: 1.8rem;
     color: white;
-    box-shadow: 0 10px 30px rgba(219, 39, 119, 0.3);
+    box-shadow: 0 10px 30px var(--effect-pink-600-30);
 }
 
 .holo-title {
@@ -738,7 +738,7 @@ textarea.holo-input {
     width: 100%;
     padding: 16px 20px;
     border-radius: 16px;
-    border: 2px solid rgba(219, 39, 119, 0.15);
+    border: 2px solid var(--effect-pink-600-15);
     background: var(--effect-white-60);
     color: var(--color-slate-800);
     font-size: 1rem;
@@ -751,7 +751,7 @@ textarea.holo-input {
     outline: none;
     border-color: var(--color-pink-600);
     background: var(--effect-white-90);
-    box-shadow: 0 0 0 4px rgba(219, 39, 119, 0.1);
+    box-shadow: 0 0 0 4px var(--effect-pink-600-10);
 }
 
 .holo-input::placeholder {
@@ -767,7 +767,7 @@ textarea.holo-input {
 [data-theme="dark"] .holo-input:focus {
     background: var(--effect-white-12);
     border-color: var(--color-pink-400);
-    box-shadow: 0 0 0 4px rgba(244, 114, 182, 0.15);
+    box-shadow: 0 0 0 4px var(--effect-pink-400-15);
 }
 
 [data-theme="dark"] .holo-input::placeholder {
@@ -791,8 +791,8 @@ textarea.holo-input {
 
 /* Goal Buddy Card */
 .holo-buddy-card {
-    background: linear-gradient(135deg, rgba(34, 197, 94, 0.1) 0%, var(--effect-emerald-10) 100%);
-    border: 2px solid rgba(34, 197, 94, 0.25);
+    background: linear-gradient(135deg, var(--effect-green-10) 0%, var(--effect-emerald-10) 100%);
+    border: 2px solid var(--effect-green-25);
     border-radius: 18px;
     padding: 20px 24px;
     margin-bottom: 30px;
@@ -800,12 +800,12 @@ textarea.holo-input {
 }
 
 .holo-buddy-card:hover {
-    border-color: rgba(34, 197, 94, 0.4);
+    border-color: var(--effect-green-40);
 }
 
 [data-theme="dark"] .holo-buddy-card {
-    background: linear-gradient(135deg, rgba(34, 197, 94, 0.12) 0%, rgba(16, 185, 129, 0.08) 100%);
-    border-color: rgba(34, 197, 94, 0.2);
+    background: linear-gradient(135deg, var(--effect-green-12) 0%, var(--effect-emerald-8) 100%);
+    border-color: var(--effect-green-20);
 }
 
 .holo-buddy-label {
@@ -854,7 +854,7 @@ textarea.holo-input {
 }
 
 [data-theme="dark"] .holo-buddy-desc {
-    color: rgba(134, 239, 172, 0.8);
+    color: var(--effect-green-300-80);
 }
 
 /* Buttons */
@@ -885,12 +885,12 @@ textarea.holo-input {
     flex: 2;
     background: linear-gradient(135deg, var(--color-pink-600) 0%, var(--color-pink-700) 100%);
     color: white;
-    box-shadow: 0 8px 24px rgba(219, 39, 119, 0.35);
+    box-shadow: 0 8px 24px var(--effect-pink-600-35);
 }
 
 .holo-btn-primary:hover {
     transform: translateY(-2px);
-    box-shadow: 0 12px 32px rgba(219, 39, 119, 0.45);
+    box-shadow: 0 12px 32px var(--effect-pink-600-45);
 }
 
 .holo-btn-primary:active {
@@ -901,7 +901,7 @@ textarea.holo-input {
     flex: 1;
     background: var(--effect-white-50);
     color: var(--color-slate-500);
-    border: 2px solid rgba(100, 116, 139, 0.2);
+    border: 2px solid var(--color-slate-500-alpha-20);
 }
 
 .holo-btn-secondary:hover {
@@ -1096,7 +1096,7 @@ textarea.holo-input {
         .quick-action-btn:focus-visible,
         button:focus-visible,
         a:focus-visible {
-            outline: 3px solid rgba(132, 204, 22, 0.5);
+            outline: 3px solid var(--effect-lime-50);
             outline-offset: 2px;
         }
 
@@ -1158,20 +1158,20 @@ textarea.holo-input {
 
         [data-theme="light"] #goals-glass-wrapper::before {
             background: linear-gradient(135deg,
-                rgba(132, 204, 22, 0.08) 0%,
-                rgba(163, 230, 53, 0.08) 25%,
-                rgba(190, 242, 100, 0.06) 50%,
-                rgba(217, 249, 157, 0.06) 75%,
-                rgba(236, 252, 203, 0.08) 100%);
+                var(--effect-lime-8) 0%,
+                var(--effect-lime-400-8) 25%,
+                var(--effect-lime-300-6) 50%,
+                var(--effect-lime-200-6) 75%,
+                var(--effect-lime-100-8) 100%);
             background-size: 400% 400%;
             animation: gradientShift 15s ease infinite;
         }
 
         [data-theme="dark"] #goals-glass-wrapper::before {
             background: radial-gradient(circle at 20% 30%,
-                rgba(132, 204, 22, 0.15) 0%, transparent 50%),
+                var(--effect-lime-15) 0%, transparent 50%),
             radial-gradient(circle at 80% 70%,
-                rgba(163, 230, 53, 0.12) 0%, transparent 50%);
+                var(--effect-lime-400-12) 0%, transparent 50%);
         }
 
         @keyframes gradientShift {
@@ -1213,7 +1213,7 @@ textarea.holo-input {
             align-items: center;
             gap: 10px;
             transition: all 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
-            box-shadow: 0 4px 12px rgba(31, 38, 135, 0.1),
+            box-shadow: 0 4px 12px var(--effect-glass-shadow-10),
                         inset 0 1px 0 var(--effect-white-40);
             position: relative;
             overflow: hidden;
@@ -1226,7 +1226,7 @@ textarea.holo-input {
             left: 0;
             right: 0;
             bottom: 0;
-            background: linear-gradient(135deg, rgba(132, 204, 22, 0.08), rgba(163, 230, 53, 0.08));
+            background: linear-gradient(135deg, var(--effect-lime-8), var(--effect-lime-400-8));
             opacity: 0;
             transition: opacity 0.3s ease;
         }
@@ -1237,17 +1237,17 @@ textarea.holo-input {
 
         #goals-glass-wrapper .quick-action-btn:hover {
             transform: translateY(-3px);
-            border-color: rgba(132, 204, 22, 0.4);
-            box-shadow: 0 8px 20px rgba(132, 204, 22, 0.15),
-                        0 0 0 1px rgba(132, 204, 22, 0.15),
+            border-color: var(--effect-lime-40);
+            box-shadow: 0 8px 20px var(--effect-lime-15),
+                        0 0 0 1px var(--effect-lime-15),
                         inset 0 1px 0 var(--effect-white-50);
         }
 
         #goals-glass-wrapper .quick-action-btn.active {
-            border-color: rgba(132, 204, 22, 0.5);
+            border-color: var(--effect-lime-50);
             background: linear-gradient(135deg,
-                rgba(132, 204, 22, 0.15),
-                rgba(163, 230, 53, 0.1));
+                var(--effect-lime-15),
+                var(--effect-lime-400-10));
         }
 
         [data-theme="dark"] #goals-glass-wrapper .quick-action-btn {
@@ -1256,21 +1256,21 @@ textarea.holo-input {
                 var(--effect-slate-50));
             border: 2px solid var(--effect-white-12);
             box-shadow: 0 4px 12px var(--effect-black-30),
-                        inset 0 1px 0 rgba(255, 255, 255, 0.06);
+                        inset 0 1px 0 var(--color-white-alpha-6);
         }
 
         [data-theme="dark"] #goals-glass-wrapper .quick-action-btn:hover {
-            border-color: rgba(132, 204, 22, 0.3);
-            box-shadow: 0 8px 20px rgba(132, 204, 22, 0.25),
-                        0 0 0 1px rgba(132, 204, 22, 0.2),
-                        0 0 30px rgba(163, 230, 53, 0.12);
+            border-color: var(--effect-lime-30);
+            box-shadow: 0 8px 20px var(--effect-lime-25),
+                        0 0 0 1px var(--effect-lime-20),
+                        0 0 30px var(--effect-lime-400-12);
         }
 
         [data-theme="dark"] #goals-glass-wrapper .quick-action-btn.active {
-            border-color: rgba(132, 204, 22, 0.4);
+            border-color: var(--effect-lime-40);
             background: linear-gradient(135deg,
-                rgba(132, 204, 22, 0.2),
-                rgba(163, 230, 53, 0.15));
+                var(--effect-lime-20),
+                var(--effect-lime-400-15));
         }
 
         #goals-glass-wrapper .quick-action-icon {
@@ -1299,7 +1299,7 @@ textarea.holo-input {
             backdrop-filter: blur(20px) saturate(120%);
             -webkit-backdrop-filter: blur(20px) saturate(120%);
             border: 1px solid var(--effect-white-30);
-            box-shadow: 0 8px 32px rgba(31, 38, 135, 0.15),
+            box-shadow: 0 8px 32px var(--effect-glass-shadow-15),
                         inset 0 0 0 1px var(--effect-white-40);
             transition: all 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
         }
@@ -1312,7 +1312,7 @@ textarea.holo-input {
             -webkit-backdrop-filter: blur(24px) saturate(150%);
             border: 1px solid var(--effect-white-15);
             box-shadow: 0 8px 32px var(--effect-black-50),
-                        0 0 80px rgba(132, 204, 22, 0.1),
+                        0 0 80px var(--effect-lime-10),
                         inset 0 1px 0 var(--effect-white-10);
         }
 
@@ -1327,7 +1327,7 @@ textarea.holo-input {
             font-weight: 700;
             cursor: pointer;
             transition: all 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
-            box-shadow: 0 4px 16px rgba(132, 204, 22, 0.3),
+            box-shadow: 0 4px 16px var(--effect-lime-30),
                         inset 0 1px 0 var(--effect-white-20);
             text-decoration: none;
             display: inline-flex;
@@ -1337,7 +1337,7 @@ textarea.holo-input {
 
         #goals-glass-wrapper .glass-btn-primary:hover {
             transform: translateY(-2px);
-            box-shadow: 0 8px 24px rgba(132, 204, 22, 0.4),
+            box-shadow: 0 8px 24px var(--effect-lime-40),
                         inset 0 1px 0 var(--effect-white-30);
         }
 
@@ -1367,7 +1367,7 @@ textarea.holo-input {
             -webkit-backdrop-filter: blur(20px) saturate(120%);
             border: 1px solid var(--effect-white-30);
             border-radius: 20px;
-            box-shadow: 0 8px 32px rgba(31, 38, 135, 0.12),
+            box-shadow: 0 8px 32px var(--effect-glass-shadow-12),
                         inset 0 1px 0 var(--effect-white-50);
             transition: all 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
             overflow: hidden;
@@ -1378,8 +1378,8 @@ textarea.holo-input {
 
         #goals-glass-wrapper .glass-goal-card:hover {
             transform: translateY(-8px);
-            box-shadow: 0 16px 48px rgba(31, 38, 135, 0.2),
-                        0 0 0 1px rgba(132, 204, 22, 0.2),
+            box-shadow: 0 16px 48px var(--effect-glass-shadow-20),
+                        0 0 0 1px var(--effect-lime-20),
                         inset 0 1px 0 var(--effect-white-60);
         }
 
@@ -1391,15 +1391,15 @@ textarea.holo-input {
             -webkit-backdrop-filter: blur(24px) saturate(150%);
             border: 1px solid var(--effect-white-15);
             box-shadow: 0 8px 32px var(--effect-black-50),
-                        0 0 60px rgba(132, 204, 22, 0.08),
+                        0 0 60px var(--effect-lime-8),
                         inset 0 1px 0 var(--effect-white-8);
         }
 
         [data-theme="dark"] #goals-glass-wrapper .glass-goal-card:hover {
             transform: translateY(-8px);
             box-shadow: 0 16px 48px var(--effect-black-70),
-                        0 0 0 1px rgba(132, 204, 22, 0.25),
-                        0 0 80px rgba(163, 230, 53, 0.15),
+                        0 0 0 1px var(--effect-lime-25),
+                        0 0 80px var(--effect-lime-400-15),
                         inset 0 1px 0 var(--effect-white-12);
         }
 
@@ -1518,7 +1518,7 @@ textarea.holo-input {
 
         /* Card Footer */
         #goals-glass-wrapper .card-footer {
-            border-top: 1px solid rgba(0, 0, 0, 0.06);
+            border-top: 1px solid var(--color-black-alpha-6);
             padding: 16px 24px;
             display: flex;
             justify-content: space-between;
@@ -1571,7 +1571,7 @@ textarea.holo-input {
                 var(--effect-white-30));
             backdrop-filter: blur(16px) saturate(120%);
             -webkit-backdrop-filter: blur(16px) saturate(120%);
-            border: 2px dashed rgba(132, 204, 22, 0.3);
+            border: 2px dashed var(--effect-lime-30);
             border-radius: 20px;
             display: flex;
             align-items: center;
@@ -1581,7 +1581,7 @@ textarea.holo-input {
         }
 
         #goals-glass-wrapper .glass-create-card:hover {
-            border-color: rgba(132, 204, 22, 0.5);
+            border-color: var(--effect-lime-50);
             background: linear-gradient(135deg,
                 var(--effect-white-60),
                 var(--effect-white-40));
@@ -1590,15 +1590,15 @@ textarea.holo-input {
 
         [data-theme="dark"] #goals-glass-wrapper .glass-create-card {
             background: linear-gradient(135deg,
-                rgba(15, 23, 42, 0.4),
-                rgba(30, 41, 59, 0.3));
-            border: 2px dashed rgba(132, 204, 22, 0.4);
+                var(--effect-slate-900-40),
+                var(--effect-slate-30));
+            border: 2px dashed var(--effect-lime-40);
         }
 
         [data-theme="dark"] #goals-glass-wrapper .glass-create-card:hover {
-            border-color: rgba(132, 204, 22, 0.6);
+            border-color: var(--effect-lime-60);
             background: linear-gradient(135deg,
-                rgba(15, 23, 42, 0.5),
+                var(--effect-slate-900-50),
                 var(--effect-slate-40));
         }
 
@@ -1621,7 +1621,7 @@ textarea.holo-input {
             -webkit-backdrop-filter: blur(20px);
             border: 1px solid var(--effect-white-30);
             border-radius: 20px;
-            box-shadow: 0 8px 32px rgba(31, 38, 135, 0.12);
+            box-shadow: 0 8px 32px var(--effect-glass-shadow-12);
         }
 
         [data-theme="dark"] #goals-glass-wrapper .glass-empty-state {
@@ -1670,7 +1670,7 @@ textarea.holo-input {
 
             [data-theme="dark"] #goals-glass-wrapper .glass-info-card,
             [data-theme="dark"] #goals-glass-wrapper .glass-goal-card {
-                background: rgba(15, 23, 42, 0.95);
+                background: var(--effect-slate-900-95);
             }
         }
 
@@ -1679,9 +1679,9 @@ textarea.holo-input {
            =================================== */
         #goals-glass-wrapper .nexus-welcome-hero {
             background: linear-gradient(135deg,
-                rgba(132, 204, 22, 0.12) 0%,
-                rgba(163, 230, 53, 0.12) 50%,
-                rgba(190, 242, 100, 0.08) 100%);
+                var(--effect-lime-12) 0%,
+                var(--effect-lime-400-12) 50%,
+                var(--effect-lime-300-8) 100%);
             backdrop-filter: blur(20px);
             -webkit-backdrop-filter: blur(20px);
             border: 1px solid var(--effect-white-40);
@@ -1689,14 +1689,14 @@ textarea.holo-input {
             padding: 28px 24px;
             margin-bottom: 30px;
             text-align: center;
-            box-shadow: 0 8px 32px rgba(132, 204, 22, 0.1);
+            box-shadow: 0 8px 32px var(--effect-lime-10);
         }
 
         [data-theme="dark"] #goals-glass-wrapper .nexus-welcome-hero {
             background: linear-gradient(135deg,
-                rgba(132, 204, 22, 0.15) 0%,
-                rgba(163, 230, 53, 0.15) 50%,
-                rgba(190, 242, 100, 0.1) 100%);
+                var(--effect-lime-15) 0%,
+                var(--effect-lime-400-15) 50%,
+                var(--effect-lime-300-10) 100%);
             border-color: var(--effect-white-10);
         }
 
@@ -1746,24 +1746,24 @@ textarea.holo-input {
         #goals-glass-wrapper .nexus-smart-btn-primary {
             background: linear-gradient(135deg, var(--color-lime-500), var(--color-lime-400));
             color: white;
-            box-shadow: 0 4px 14px rgba(132, 204, 22, 0.35);
+            box-shadow: 0 4px 14px var(--effect-lime-35);
         }
 
         #goals-glass-wrapper .nexus-smart-btn-primary:hover {
             transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(132, 204, 22, 0.45);
+            box-shadow: 0 6px 20px var(--effect-lime-45);
         }
 
         #goals-glass-wrapper .nexus-smart-btn-secondary {
-            background: linear-gradient(135deg, rgba(132, 204, 22, 0.1), rgba(163, 230, 53, 0.1));
+            background: linear-gradient(135deg, var(--effect-lime-10), var(--effect-lime-400-10));
             color: var(--color-lime-600);
-            border-color: rgba(132, 204, 22, 0.3);
+            border-color: var(--effect-lime-30);
         }
 
         [data-theme="dark"] #goals-glass-wrapper .nexus-smart-btn-secondary {
-            background: linear-gradient(135deg, rgba(132, 204, 22, 0.2), rgba(163, 230, 53, 0.15));
+            background: linear-gradient(135deg, var(--effect-lime-20), var(--effect-lime-400-15));
             color: var(--color-lime-300);
-            border-color: rgba(132, 204, 22, 0.4);
+            border-color: var(--effect-lime-40);
         }
 
         #goals-glass-wrapper .nexus-smart-btn-secondary:hover,
@@ -1777,12 +1777,12 @@ textarea.holo-input {
         #goals-glass-wrapper .nexus-smart-btn-outline {
             background: var(--effect-white-50);
             color: var(--htb-text-main);
-            border-color: rgba(132, 204, 22, 0.3);
+            border-color: var(--effect-lime-30);
         }
 
         [data-theme="dark"] #goals-glass-wrapper .nexus-smart-btn-outline {
-            background: rgba(15, 23, 42, 0.5);
-            border-color: rgba(132, 204, 22, 0.4);
+            background: var(--effect-slate-900-50);
+            border-color: var(--effect-lime-40);
         }
 
         @media (max-width: 640px) {
@@ -1847,7 +1847,7 @@ textarea.holo-input {
     .glass-pill-btn:focus-visible,
     button:focus-visible,
     a:focus-visible {
-        outline: 3px solid rgba(219, 39, 119, 0.5);
+        outline: 3px solid var(--effect-pink-600-50);
         outline-offset: 2px;
     }
 
@@ -1880,10 +1880,10 @@ textarea.holo-input {
 
         /* Subtle iridescent shadow for light mode */
         --box-shadow:
-            0 8px 32px 0 rgba(31, 38, 135, 0.1),
+            0 8px 32px 0 var(--effect-glass-shadow-10),
             inset 0 0 0 1px var(--effect-white-20);
 
-        --holographic-glow: 0 0 20px rgba(255, 0, 128, 0.05), 0 0 40px rgba(255, 100, 200, 0.05);
+        --holographic-glow: 0 0 20px var(--color-magenta-alpha-5), 0 0 40px var(--color-rose-glow-alpha-5);
 
         /* Form Fields & Pills */
         --pill-bg: var(--effect-white-25);
@@ -1899,8 +1899,8 @@ textarea.holo-input {
         --status-amber-border: var(--effect-amber-30);
         --status-amber-text: var(--color-amber-700);
 
-        --status-gray-bg: rgba(148, 163, 184, 0.15);
-        --status-gray-border: rgba(148, 163, 184, 0.3);
+        --status-gray-bg: var(--color-slate-400-alpha-15);
+        --status-gray-border: var(--color-slate-400-alpha-30);
         --status-gray-text: var(--color-slate-600);
 
         /* Layout & Alignment */
@@ -1935,9 +1935,9 @@ textarea.holo-input {
         --text-muted: var(--color-slate-600);
         --heading-gradient: linear-gradient(135deg, var(--color-pink-700) 0%, var(--color-pink-600) 100%);
         --box-shadow:
-            0 8px 32px 0 rgba(31, 38, 135, 0.1),
+            0 8px 32px 0 var(--effect-glass-shadow-10),
             inset 0 0 0 1px var(--effect-white-20);
-        --holographic-glow: 0 0 20px rgba(255, 0, 128, 0.05), 0 0 40px rgba(255, 100, 200, 0.05);
+        --holographic-glow: 0 0 20px var(--color-magenta-alpha-5), 0 0 40px var(--color-rose-glow-alpha-5);
         --pill-bg: var(--effect-white-25);
 
         --status-blue-bg: var(--effect-blue-15);
@@ -1948,8 +1948,8 @@ textarea.holo-input {
         --status-amber-border: var(--effect-amber-30);
         --status-amber-text: var(--color-amber-700);
 
-        --status-gray-bg: rgba(148, 163, 184, 0.15);
-        --status-gray-border: rgba(148, 163, 184, 0.3);
+        --status-gray-bg: var(--color-slate-400-alpha-15);
+        --status-gray-border: var(--color-slate-400-alpha-30);
         --status-gray-text: var(--color-slate-600);
 
         background: radial-gradient(circle at 50% 0%, var(--color-pink-50) 0%, var(--color-pink-100) 100%);
@@ -1957,7 +1957,7 @@ textarea.holo-input {
 
     /* DARK MODE EXPLICIT */
     html[data-theme="dark"] #unique-glass-page-wrapper {
-        --glass-bg: rgba(24, 24, 27, 0.45);
+        --glass-bg: var(--color-zinc-900-alpha-45);
         --glass-border: var(--effect-white-15);
         --text-color: var(--color-pink-100);
         --text-muted: var(--effect-white-70);
@@ -1971,22 +1971,22 @@ textarea.holo-input {
 
         --holographic-glow:
             0 0 30px var(--effect-pink-15),
-            0 0 60px rgba(168, 85, 247, 0.15);
+            0 0 60px var(--effect-purple-15);
 
-        --pill-bg: rgba(24, 24, 27, 0.65);
+        --pill-bg: var(--color-zinc-900-alpha-65);
         --pill-border: 2px solid var(--effect-white-10);
 
         /* Dark Mode Status Cards */
-        --status-blue-bg: rgba(30, 58, 138, 0.3);
+        --status-blue-bg: var(--color-blue-900-alpha-30);
         --status-blue-border: var(--effect-blue-30);
         --status-blue-text: var(--color-blue-300);
 
-        --status-amber-bg: rgba(120, 53, 15, 0.3);
+        --status-amber-bg: var(--color-amber-900-alpha-30);
         --status-amber-border: var(--effect-amber-30);
         --status-amber-text: var(--color-amber-300);
 
-        --status-gray-bg: rgba(30, 41, 59, 0.3);
-        --status-gray-border: rgba(148, 163, 184, 0.2);
+        --status-gray-bg: var(--effect-slate-30);
+        --status-gray-border: var(--color-slate-400-alpha-20);
         --status-gray-text: var(--color-slate-400);
 
         background: radial-gradient(circle at 50% 0%, rgb(39, 10, 25) 0%, rgb(20, 10, 20) 90%);
@@ -2024,7 +2024,7 @@ textarea.holo-input {
         left: 0;
         right: 0;
         height: 1px;
-        background: linear-gradient(90deg, transparent, rgba(244, 114, 182, 0.6), rgba(168, 85, 247, 0.6), transparent);
+        background: linear-gradient(90deg, transparent, var(--effect-pink-400-60), var(--effect-purple-60), transparent);
         z-index: 10;
     }
 
@@ -2266,8 +2266,8 @@ textarea.holo-input {
 }
 
 .goal-comment__reaction--active {
-    background: rgba(219, 39, 119, 0.2);
-    border-color: rgba(219, 39, 119, 0.4);
+    background: var(--effect-pink-600-20);
+    border-color: var(--effect-pink-600-40);
 }
 
 /* Reply link */

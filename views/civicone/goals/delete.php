@@ -15,27 +15,20 @@ $basePath = TenantContext::getBasePath();
 $pageTitle = 'Delete goal';
 
 require dirname(__DIR__, 2) . '/layouts/civicone/header.php';
+require_once __DIR__ . '/../components/govuk/breadcrumbs.php';
 ?>
 
 <div class="govuk-width-container">
 
-    <!-- Breadcrumbs -->
-    <nav class="govuk-breadcrumbs" aria-label="Breadcrumb">
-        <ol class="govuk-breadcrumbs__list">
-            <li class="govuk-breadcrumbs__list-item">
-                <a class="govuk-breadcrumbs__link" href="<?= $basePath ?>">Home</a>
-            </li>
-            <li class="govuk-breadcrumbs__list-item">
-                <a class="govuk-breadcrumbs__link" href="<?= $basePath ?>/goals">Goals</a>
-            </li>
-            <li class="govuk-breadcrumbs__list-item">
-                <a class="govuk-breadcrumbs__link" href="<?= $basePath ?>/goals/<?= htmlspecialchars($goal['id']) ?>"><?= htmlspecialchars($goal['title']) ?></a>
-            </li>
-            <li class="govuk-breadcrumbs__list-item" aria-current="page">
-                Delete
-            </li>
-        </ol>
-    </nav>
+    <?= civicone_govuk_breadcrumbs([
+        'items' => [
+            ['text' => 'Home', 'href' => $basePath],
+            ['text' => 'Goals', 'href' => $basePath . '/goals'],
+            ['text' => htmlspecialchars($goal['title']), 'href' => $basePath . '/goals/' . $goal['id']],
+            ['text' => 'Delete']
+        ],
+        'class' => 'govuk-!-margin-bottom-6'
+    ]) ?>
 
     <main class="govuk-main-wrapper" role="main">
 

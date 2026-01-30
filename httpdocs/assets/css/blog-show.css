@@ -65,7 +65,7 @@
 #article-holo-wrapper .article-btn:focus-visible,
 #article-holo-wrapper .share-btn:focus-visible,
 #article-holo-wrapper a:focus-visible {
-    outline: 3px solid rgba(139, 92, 246, 0.6);
+    outline: 3px solid var(--color-violet-alpha-60);
     outline-offset: 3px;
 }
 
@@ -126,9 +126,9 @@ html {
     bottom: 0;
     z-index: -1;
     background:
-        radial-gradient(ellipse at 20% 0%, rgba(139, 92, 246, 0.3) 0%, transparent 50%),
-        radial-gradient(ellipse at 80% 0%, rgba(6, 182, 212, 0.25) 0%, transparent 50%),
-        radial-gradient(ellipse at 50% 100%, rgba(244, 114, 182, 0.2) 0%, transparent 50%);
+        radial-gradient(ellipse at 20% 0%, var(--color-violet-alpha-30) 0%, transparent 50%),
+        radial-gradient(ellipse at 80% 0%, var(--color-cyan-alpha-25) 0%, transparent 50%),
+        radial-gradient(ellipse at 50% 100%, var(--color-pink-400-alpha-20) 0%, transparent 50%);
     animation: holoShift 20s ease-in-out infinite alternate;
 }
 
@@ -152,7 +152,7 @@ html {
 .holo-orb-1 {
     width: 500px;
     height: 500px;
-    background: radial-gradient(circle, rgba(139, 92, 246, 0.6) 0%, transparent 70%);
+    background: radial-gradient(circle, var(--color-violet-alpha-60) 0%, transparent 70%);
     top: -150px;
     left: -150px;
 }
@@ -160,7 +160,7 @@ html {
 .holo-orb-2 {
     width: 400px;
     height: 400px;
-    background: radial-gradient(circle, rgba(6, 182, 212, 0.5) 0%, transparent 70%);
+    background: radial-gradient(circle, var(--color-cyan-alpha-50) 0%, transparent 70%);
     top: 40%;
     right: -100px;
     animation-delay: -5s;
@@ -169,7 +169,7 @@ html {
 .holo-orb-3 {
     width: 350px;
     height: 350px;
-    background: radial-gradient(circle, rgba(244, 114, 182, 0.4) 0%, transparent 70%);
+    background: radial-gradient(circle, var(--color-pink-400-alpha-40) 0%, transparent 70%);
     bottom: 10%;
     left: 20%;
     animation-delay: -10s;
@@ -201,10 +201,10 @@ html {
     align-items: center;
     gap: var(--space-2);
     padding: var(--space-2) var(--space-5);
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: var(--color-white-alpha-5);
+    border: 1px solid var(--color-white-alpha-10);
     border-radius: var(--radius-full);
-    color: rgba(255, 255, 255, 0.7);
+    color: var(--color-white-alpha-70);
     font-size: var(--font-size-sm);
     font-weight: var(--font-weight-semibold);
     text-decoration: none;
@@ -214,8 +214,8 @@ html {
 }
 
 .article-back-link:hover {
-    background: rgba(139, 92, 246, 0.2);
-    border-color: rgba(139, 92, 246, 0.4);
+    background: var(--color-violet-alpha-20);
+    border-color: var(--color-violet-alpha-40);
     color: var(--color-purple-300);
     transform: translateX(-5px);
 }
@@ -253,7 +253,7 @@ html {
     align-items: center;
     gap: var(--space-2);
     font-size: var(--font-size-xs);
-    color: rgba(255, 255, 255, 0.6);
+    color: var(--color-white-alpha-60);
 }
 
 .article-author {
@@ -261,7 +261,7 @@ html {
     align-items: center;
     gap: var(--space-2);
     font-size: var(--font-size-sm);
-    color: rgba(255, 255, 255, 0.7);
+    color: var(--color-white-alpha-70);
 }
 
 .article-author-avatar {
@@ -286,7 +286,7 @@ html {
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
-    text-shadow: 0 0 80px rgba(139, 92, 246, 0.5);
+    text-shadow: 0 0 80px var(--color-violet-alpha-50);
 }
 
 /* ===== FEATURED IMAGE ===== */
@@ -297,7 +297,7 @@ html {
     margin-bottom: var(--space-10);
     box-shadow:
         var(--shadow-2xl),
-        0 0 var(--space-10) rgba(139, 92, 246, 0.15);
+        0 0 var(--space-10) var(--color-violet-alpha-15);
 }
 
 .article-featured-image img {
@@ -313,9 +313,9 @@ html {
     border-radius: var(--radius-2xl);
     padding: 2px;
     background: linear-gradient(135deg,
-        rgba(139, 92, 246, 0.5) 0%,
-        rgba(6, 182, 212, 0.3) 50%,
-        rgba(244, 114, 182, 0.5) 100%);
+        var(--color-violet-alpha-50) 0%,
+        var(--color-cyan-alpha-30) 50%,
+        var(--color-pink-400-alpha-40) 100%);
     -webkit-mask: linear-gradient(var(--color-white) 0 0) content-box, linear-gradient(var(--color-white) 0 0);
     mask: linear-gradient(var(--color-white) 0 0) content-box, linear-gradient(var(--color-white) 0 0);
     -webkit-mask-composite: xor;
@@ -325,8 +325,8 @@ html {
 
 /* ===== CONTENT CARD ===== */
 .article-content-card {
-    background: rgba(255, 255, 255, 0.03);
-    border: 1px solid rgba(255, 255, 255, 0.08);
+    background: var(--color-white-alpha-3);
+    border: 1px solid var(--color-white-alpha-8);
     border-radius: var(--radius-2xl);
     padding: var(--space-12);
     backdrop-filter: blur(var(--space-5));
@@ -342,9 +342,9 @@ html {
     border-radius: var(--radius-2xl);
     padding: 1px;
     background: linear-gradient(135deg,
-        rgba(139, 92, 246, 0.3) 0%,
-        rgba(6, 182, 212, 0.2) 50%,
-        rgba(244, 114, 182, 0.3) 100%);
+        var(--color-violet-alpha-30) 0%,
+        var(--color-cyan-alpha-20) 50%,
+        var(--color-pink-400-alpha-30) 100%);
     -webkit-mask: linear-gradient(var(--color-white) 0 0) content-box, linear-gradient(var(--color-white) 0 0);
     mask: linear-gradient(var(--color-white) 0 0) content-box, linear-gradient(var(--color-white) 0 0);
     -webkit-mask-composite: xor;
@@ -356,7 +356,7 @@ html {
 .article-body {
     font-size: var(--font-size-lg);
     line-height: 1.85;
-    color: rgba(255, 255, 255, 0.9);
+    color: var(--color-white-alpha-90);
 }
 
 .article-body h2 {
@@ -388,7 +388,7 @@ html {
 .article-body a {
     color: var(--article-secondary);
     text-decoration: underline;
-    text-decoration-color: rgba(6, 182, 212, 0.4);
+    text-decoration-color: var(--color-cyan-alpha-40);
     text-underline-offset: 3px;
     transition: all var(--transition-fast);
 }
@@ -410,13 +410,13 @@ html {
 
 .article-body blockquote {
     position: relative;
-    background: rgba(139, 92, 246, 0.1);
+    background: var(--color-violet-alpha-10);
     border-left: 4px solid var(--article-primary);
     padding: var(--space-6) var(--space-8);
     margin: 2rem 0;
     border-radius: 0 var(--radius-lg) var(--radius-lg) 0;
     font-style: italic;
-    color: rgba(255, 255, 255, 0.85);
+    color: var(--color-white-alpha-85);
 }
 
 .article-body blockquote::before {
@@ -425,7 +425,7 @@ html {
     top: var(--space-2);
     left: var(--space-4);
     font-size: 3rem;
-    color: rgba(139, 92, 246, 0.3);
+    color: var(--color-violet-alpha-30);
     font-family: Georgia, serif;
     line-height: 1;
 }
@@ -434,12 +434,12 @@ html {
     max-width: 100%;
     border-radius: var(--radius-lg);
     margin: 2rem 0;
-    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 15px 40px var(--color-black-alpha-30);
 }
 
 .article-body pre,
 .article-body code {
-    background: rgba(0, 0, 0, 0.3);
+    background: var(--color-black-alpha-30);
     border-radius: var(--radius-base);
     font-family: 'Fira Code', 'Monaco', monospace;
 }
@@ -465,7 +465,7 @@ html {
 .article-footer {
     margin-top: var(--space-12);
     padding-top: var(--space-8);
-    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    border-top: 1px solid var(--color-white-alpha-10);
 }
 
 .article-footer-inner {
@@ -481,8 +481,8 @@ html {
     align-items: center;
     gap: var(--space-2);
     padding: var(--space-3) var(--space-6);
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.15);
+    background: var(--color-white-alpha-5);
+    border: 1px solid var(--color-white-alpha-15);
     border-radius: var(--radius-md);
     color: var(--color-white);
     font-size: var(--font-size-sm);
@@ -493,8 +493,8 @@ html {
 }
 
 .article-btn:hover {
-    background: linear-gradient(135deg, rgba(139, 92, 246, 0.3), rgba(6, 182, 212, 0.2));
-    border-color: rgba(139, 92, 246, 0.4);
+    background: linear-gradient(135deg, var(--color-violet-alpha-30), var(--color-cyan-alpha-20));
+    border-color: var(--color-violet-alpha-40);
     transform: translateX(-5px);
 }
 
@@ -516,7 +516,7 @@ html {
 .share-label {
     font-size: var(--font-size-sm);
     font-weight: var(--font-weight-semibold);
-    color: rgba(255, 255, 255, 0.6);
+    color: var(--color-white-alpha-60);
 }
 
 .share-buttons {
@@ -528,12 +528,12 @@ html {
     width: 44px;
     height: 44px;
     border-radius: var(--radius-md);
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: var(--color-white-alpha-5);
+    border: 1px solid var(--color-white-alpha-10);
     display: flex;
     align-items: center;
     justify-content: center;
-    color: rgba(255, 255, 255, 0.7);
+    color: var(--color-white-alpha-70);
     text-decoration: none;
     transition: all var(--transition-base);
     cursor: pointer;
@@ -541,7 +541,7 @@ html {
 
 .share-btn:hover {
     transform: translateY(-3px);
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 8px 20px var(--color-black-alpha-30);
 }
 
 .share-btn.facebook:hover {
@@ -575,8 +575,8 @@ html {
 }
 
 .share-btn.copy:hover {
-    background: rgba(255, 255, 255, 0.2);
-    border-color: rgba(255, 255, 255, 0.3);
+    background: var(--color-white-alpha-20);
+    border-color: var(--color-white-alpha-30);
     color: white;
 }
 
@@ -593,9 +593,9 @@ html {
 
 [data-theme="light"] #article-holo-wrapper::after {
     background:
-        radial-gradient(ellipse at 20% 0%, rgba(139, 92, 246, 0.15) 0%, transparent 50%),
-        radial-gradient(ellipse at 80% 0%, rgba(6, 182, 212, 0.12) 0%, transparent 50%),
-        radial-gradient(ellipse at 50% 100%, rgba(244, 114, 182, 0.1) 0%, transparent 50%);
+        radial-gradient(ellipse at 20% 0%, var(--color-violet-alpha-15) 0%, transparent 50%),
+        radial-gradient(ellipse at 80% 0%, var(--color-cyan-alpha-12) 0%, transparent 50%),
+        radial-gradient(ellipse at 50% 100%, var(--color-pink-400-alpha-10) 0%, transparent 50%);
 }
 
 [data-theme="light"] .article-title {
@@ -609,12 +609,12 @@ html {
 [data-theme="light"] .article-date,
 [data-theme="light"] .article-reading-time,
 [data-theme="light"] .article-author {
-    color: rgba(0, 0, 0, 0.6);
+    color: var(--color-black-alpha-60);
 }
 
 [data-theme="light"] .article-content-card {
-    background: rgba(255, 255, 255, 0.7);
-    border-color: rgba(139, 92, 246, 0.15);
+    background: var(--color-white-alpha-70);
+    border-color: var(--color-violet-alpha-15);
 }
 
 [data-theme="light"] .article-body {
@@ -638,13 +638,13 @@ html {
 
 [data-theme="light"] .article-btn,
 [data-theme="light"] .share-btn {
-    background: rgba(255, 255, 255, 0.8);
-    border-color: rgba(139, 92, 246, 0.2);
+    background: var(--color-white-alpha-80);
+    border-color: var(--color-violet-alpha-20);
     color: #4c1d95;
 }
 
 [data-theme="light"] .share-label {
-    color: rgba(0, 0, 0, 0.5);
+    color: var(--color-black-alpha-50);
 }
 
 [data-theme="light"] .holo-orb {
@@ -690,10 +690,10 @@ html {
 /* Browser Fallback */
 @supports not (backdrop-filter: blur(var(--space-5))) {
     .article-content-card {
-        background: rgba(30, 27, 75, 0.95);
+        background: var(--color-dark-purple-alt-bg);
     }
 
     [data-theme="light"] .article-content-card {
-        background: rgba(255, 255, 255, 0.95);
+        background: var(--color-white-alpha-95);
     }
 }

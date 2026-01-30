@@ -6,6 +6,9 @@
 $pageTitle = 'Sign In';
 require __DIR__ . '/../../layouts/civicone/header.php';
 
+// Load GOV.UK error summary component
+require_once __DIR__ . '/../components/govuk/error-summary.php';
+
 $basePath = \Nexus\Core\TenantContext::getBasePath();
 ?>
 
@@ -29,12 +32,11 @@ $basePath = \Nexus\Core\TenantContext::getBasePath();
         <?php endif; ?>
 
         <?php if (isset($error)): ?>
-            <div class="govuk-error-summary" role="alert" aria-labelledby="error-summary-title" data-module="govuk-error-summary">
-                <h2 class="govuk-error-summary__title" id="error-summary-title">There is a problem</h2>
-                <div class="govuk-error-summary__body">
-                    <p><?= htmlspecialchars($error) ?></p>
-                </div>
-            </div>
+            <?= civicone_govuk_error_summary([
+                'errors' => [
+                    ['text' => $error, 'href' => '#login-email']
+                ]
+            ]) ?>
         <?php endif; ?>
 
         <!-- Biometric Login Option -->
@@ -62,19 +64,18 @@ $basePath = \Nexus\Core\TenantContext::getBasePath();
 
             <div class="govuk-form-group">
                 <label class="govuk-label" for="login-email">Email address</label>
-                <input type="email" name="email" id="login-email" class="govuk-input" required placeholder="you@example.com" autocomplete="email webauthn">
+                <div id="login-email-hint" class="govuk-hint">
+                    Enter the email address you registered with
+                </div>
+                <input type="email" name="email" id="login-email" class="govuk-input" required autocomplete="email webauthn" aria-describedby="login-email-hint" spellcheck="false">
             </div>
 
             <div class="govuk-form-group">
-                <div class="govuk-grid-row">
-                    <div class="govuk-grid-column-one-half">
-                        <label class="govuk-label" for="login-password">Password</label>
-                    </div>
-                    <div class="govuk-grid-column-one-half govuk-!-text-align-right">
-                        <a href="<?= $basePath ?>/password/forgot" class="govuk-link govuk-body-s">Forgot password?</a>
-                    </div>
+                <label class="govuk-label" for="login-password">Password</label>
+                <div id="login-password-hint" class="govuk-hint">
+                    <a href="<?= $basePath ?>/password/forgot" class="govuk-link">Forgot your password?</a>
                 </div>
-                <input type="password" name="password" id="login-password" class="govuk-input" required autocomplete="current-password">
+                <input type="password" name="password" id="login-password" class="govuk-input" required autocomplete="current-password" aria-describedby="login-password-hint">
             </div>
 
             <button type="submit" class="govuk-button" data-module="govuk-button">

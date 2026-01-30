@@ -139,8 +139,12 @@
     <!-- GOV.UK Design System Extensions (Project-specific overrides) -->
     <link rel="stylesheet" href="/assets/css/bundles/civicone-govuk-all.css?v=<?= $cssVersion ?>">
 
-    <!-- CivicOne Header v2 (Complete Rebuild - 2026-01-25) -->
-    <!-- Replaces: civicone-header.css, civicone-service-navigation.css -->
+    <!-- GOV.UK Header Component (Dark Blue Bar with Logo - 2026-01-30) -->
+    <!-- Source: https://github.com/alphagov/govuk-frontend/tree/main/packages/govuk-frontend/src/govuk/components/header -->
+    <link rel="stylesheet" href="/assets/css/civicone-govuk-header.min.css?v=<?= $cssVersion ?>">
+
+    <!-- CivicOne Header v2 (Service Navigation - Light Blue Bar) -->
+    <!-- Source: https://github.com/alphagov/govuk-frontend/tree/main/packages/govuk-frontend/src/govuk/components/service-navigation -->
     <link rel="stylesheet" href="/assets/css/civicone-header-v2.min.css?v=<?= $cssVersion ?>">
 
     <!-- CivicOne Footer -->

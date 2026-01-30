@@ -228,7 +228,9 @@
     /* Indigo/Primary opacity variants (99, 102, 241 = #6366f1) */
     --color-indigo-alpha-2: rgba(99, 102, 241, 0.02);
     --color-indigo-alpha-3: rgba(99, 102, 241, 0.03);
+    --color-indigo-alpha-4: rgba(99, 102, 241, 0.04);
     --color-indigo-alpha-5: rgba(99, 102, 241, 0.05);
+    --color-indigo-alpha-6: rgba(99, 102, 241, 0.06);
     --color-indigo-alpha-8: rgba(99, 102, 241, 0.08);
     --color-indigo-alpha-10: rgba(99, 102, 241, 0.1);
     --color-indigo-alpha-12: rgba(99, 102, 241, 0.12);
@@ -238,6 +240,7 @@
     --color-indigo-alpha-30: rgba(99, 102, 241, 0.3);
     --color-indigo-alpha-40: rgba(99, 102, 241, 0.4);
     --color-indigo-alpha-50: rgba(99, 102, 241, 0.5);
+    --color-indigo-alpha-95: rgba(99, 102, 241, 0.95);
 
     /* Purple opacity variants (168, 85, 247 = #a855f7) */
     --color-purple-alpha-5: rgba(168, 85, 247, 0.05);
@@ -252,6 +255,10 @@
     --color-purple-alpha-35: rgba(168, 85, 247, 0.35);
     --color-purple-alpha-40: rgba(168, 85, 247, 0.4);
     --color-purple-alpha-60: rgba(168, 85, 247, 0.6);
+
+    /* Purple-300 opacity variants (196, 181, 253 = #c4b5fd) */
+    --color-purple-300-alpha-8: rgba(196, 181, 253, 0.08);
+    --color-purple-300-alpha-10: rgba(196, 181, 253, 0.1);
 
     /* Pink opacity variants (236, 72, 153 = #ec4899) */
     --color-pink-alpha-8: rgba(236, 72, 153, 0.08);
@@ -273,6 +280,7 @@
     --color-emerald-alpha-40: rgba(16, 185, 129, 0.4);
     --color-emerald-alpha-50: rgba(16, 185, 129, 0.5);
     --color-emerald-alpha-60: rgba(16, 185, 129, 0.6);
+    --color-emerald-alpha-95: rgba(16, 185, 129, 0.95);
 
     /* Emerald-600 opacity variants (5, 150, 105 = #059669) */
     --color-emerald-600-alpha-10: rgba(5, 150, 105, 0.1);
@@ -281,11 +289,15 @@
     --color-emerald-600-alpha-30: rgba(5, 150, 105, 0.3);
 
     /* Emerald-300 opacity variants (52, 211, 153 = #34d399) */
+    --color-emerald-300-alpha-5: rgba(52, 211, 153, 0.05);
     --color-emerald-300-alpha-8: rgba(52, 211, 153, 0.08);
+    --color-emerald-300-alpha-12: rgba(52, 211, 153, 0.12);
 
     /* Red/Error opacity variants (239, 68, 68 = #ef4444) */
     --color-red-alpha-0: rgba(239, 68, 68, 0);
+    --color-red-alpha-8: rgba(239, 68, 68, 0.08);
     --color-red-alpha-10: rgba(239, 68, 68, 0.1);
+    --color-red-alpha-12: rgba(239, 68, 68, 0.12);
     --color-red-alpha-15: rgba(239, 68, 68, 0.15);
     --color-red-alpha-20: rgba(239, 68, 68, 0.2);
     --color-red-alpha-25: rgba(239, 68, 68, 0.25);
@@ -293,6 +305,13 @@
     --color-red-alpha-35: rgba(239, 68, 68, 0.35);
     --color-red-alpha-40: rgba(239, 68, 68, 0.4);
     --color-red-alpha-50: rgba(239, 68, 68, 0.5);
+    --color-red-alpha-90: rgba(239, 68, 68, 0.9);
+    --color-red-alpha-95: rgba(239, 68, 68, 0.95);
+
+    /* Red-400 opacity variants (248, 113, 113 = #f87171) */
+    --color-red-400-alpha-8: rgba(248, 113, 113, 0.08);
+    --color-red-400-alpha-10: rgba(248, 113, 113, 0.1);
+    --color-red-400-alpha-12: rgba(248, 113, 113, 0.12);
 
     /* Orange opacity variants (249, 115, 22 = #f97316) */
     --color-orange-alpha-3: rgba(249, 115, 22, 0.03);
@@ -302,16 +321,32 @@
     --color-orange-alpha-12: rgba(249, 115, 22, 0.12);
     --color-orange-alpha-15: rgba(249, 115, 22, 0.15);
     --color-orange-alpha-20: rgba(249, 115, 22, 0.2);
+    --color-orange-alpha-25: rgba(249, 115, 22, 0.25);
     --color-orange-alpha-30: rgba(249, 115, 22, 0.3);
+    --color-orange-alpha-35: rgba(249, 115, 22, 0.35);
     --color-orange-alpha-40: rgba(249, 115, 22, 0.4);
+    --color-orange-alpha-45: rgba(249, 115, 22, 0.45);
     --color-orange-alpha-50: rgba(249, 115, 22, 0.5);
+    --color-orange-alpha-60: rgba(249, 115, 22, 0.6);
 
     /* Orange-400 opacity variants (251, 146, 60 = #fb923c) */
+    --color-orange-400-alpha-8: rgba(251, 146, 60, 0.08);
+    --color-orange-400-alpha-10: rgba(251, 146, 60, 0.1);
+    --color-orange-400-alpha-12: rgba(251, 146, 60, 0.12);
     --color-orange-400-alpha-15: rgba(251, 146, 60, 0.15);
     --color-orange-400-alpha-60: rgba(251, 146, 60, 0.6);
 
     /* Orange-300 opacity variants (253, 186, 116 = #fdba74) */
+    --color-orange-300-alpha-6: rgba(253, 186, 116, 0.06);
+    --color-orange-300-alpha-8: rgba(253, 186, 116, 0.08);
+    --color-orange-300-alpha-10: rgba(253, 186, 116, 0.1);
     --color-orange-300-alpha-60: rgba(253, 186, 116, 0.6);
+
+    /* Orange-200 opacity variants (254, 215, 170 = #fed7aa) */
+    --color-orange-200-alpha-6: rgba(254, 215, 170, 0.06);
+
+    /* Orange-100 opacity variants (255, 237, 213 = #ffedd5) */
+    --color-orange-100-alpha-8: rgba(255, 237, 213, 0.08);
 
     /* Amber-200 glow variant (255, 200, 100) */
     --color-amber-glow-alpha-5: rgba(255, 200, 100, 0.05);
@@ -327,8 +362,11 @@
     --color-blue-alpha-12: rgba(59, 130, 246, 0.12);
     --color-blue-alpha-15: rgba(59, 130, 246, 0.15);
     --color-blue-alpha-20: rgba(59, 130, 246, 0.2);
+    --color-blue-alpha-25: rgba(59, 130, 246, 0.25);
     --color-blue-alpha-30: rgba(59, 130, 246, 0.3);
+    --color-blue-alpha-35: rgba(59, 130, 246, 0.35);
     --color-blue-alpha-40: rgba(59, 130, 246, 0.4);
+    --color-blue-alpha-50: rgba(59, 130, 246, 0.5);
 
     /* Amber/Warning opacity variants (251, 191, 36 = #fbbf24) */
     --color-amber-alpha-5: rgba(251, 191, 36, 0.05);
@@ -339,6 +377,7 @@
     --color-amber-alpha-20: rgba(251, 191, 36, 0.2);
     --color-amber-alpha-30: rgba(251, 191, 36, 0.3);
     --color-amber-alpha-40: rgba(251, 191, 36, 0.4);
+    --color-amber-alpha-60: rgba(251, 191, 36, 0.6);
     --color-amber-alpha-80: rgba(251, 191, 36, 0.8);
 
     /* White opacity variants */
@@ -357,6 +396,7 @@
     --color-white-alpha-85: rgba(255, 255, 255, 0.85);
     --color-white-alpha-90: rgba(255, 255, 255, 0.9);
     --color-white-alpha-95: rgba(255, 255, 255, 0.95);
+    --color-white-alpha-98: rgba(255, 255, 255, 0.98);
 
     /* Slate/Dark opacity variants (30, 41, 59 = #1e293b) */
     --color-slate-alpha-30: rgba(30, 41, 59, 0.3);
@@ -374,10 +414,18 @@
     --color-slate-alpha-95: rgba(30, 41, 59, 0.95);
 
     /* Slate-900 opacity variants (15, 23, 42 = #0f172a) */
+    --color-slate-900-alpha-0: rgba(15, 23, 42, 0);
     --color-slate-900-alpha-50: rgba(15, 23, 42, 0.5);
+    --color-slate-900-alpha-92: rgba(15, 23, 42, 0.92);
+
+    /* Slate-50 opacity variants (248, 250, 252 = #f8fafc) */
+    --color-slate-50-alpha-70: rgba(248, 250, 252, 0.7);
+    --color-slate-50-alpha-90: rgba(248, 250, 252, 0.9);
 
     /* Black opacity variants */
     --color-black-alpha-5: rgba(0, 0, 0, 0.05);
+    --color-black-alpha-6: rgba(0, 0, 0, 0.06);
+    --color-black-alpha-18: rgba(0, 0, 0, 0.18);
     --color-black-alpha-8: rgba(0, 0, 0, 0.08);
     --color-black-alpha-10: rgba(0, 0, 0, 0.1);
     --color-black-alpha-12: rgba(0, 0, 0, 0.12);
@@ -388,16 +436,22 @@
     --color-black-alpha-50: rgba(0, 0, 0, 0.5);
 
     /* Gray opacity variants (107, 114, 128 = #6b7280) */
+    --color-gray-alpha-8: rgba(107, 114, 128, 0.08);
     --color-gray-alpha-10: rgba(107, 114, 128, 0.1);
+    --color-gray-alpha-12: rgba(107, 114, 128, 0.12);
+    --color-gray-alpha-15: rgba(107, 114, 128, 0.15);
     --color-gray-alpha-20: rgba(107, 114, 128, 0.2);
     --color-gray-alpha-30: rgba(107, 114, 128, 0.3);
 
     /* Violet opacity variants (139, 92, 246 = #8b5cf6) */
+    --color-violet-alpha-5: rgba(139, 92, 246, 0.05);
+    --color-violet-alpha-6: rgba(139, 92, 246, 0.06);
     --color-violet-alpha-8: rgba(139, 92, 246, 0.08);
     --color-violet-alpha-10: rgba(139, 92, 246, 0.1);
     --color-violet-alpha-12: rgba(139, 92, 246, 0.12);
     --color-violet-alpha-20: rgba(139, 92, 246, 0.2);
     --color-violet-alpha-30: rgba(139, 92, 246, 0.3);
+    --color-violet-alpha-95: rgba(139, 92, 246, 0.95);
 
     /* Cyan opacity variants (6, 182, 212 = #06b6d4) */
     --color-cyan-alpha-15: rgba(6, 182, 212, 0.15);
@@ -407,7 +461,22 @@
     --color-indigo-300-alpha-8: rgba(129, 140, 248, 0.08);
 
     /* Violet-300 opacity variants (167, 139, 250 = #a78bfa) */
+    --color-violet-300-alpha-6: rgba(167, 139, 250, 0.06);
     --color-violet-300-alpha-8: rgba(167, 139, 250, 0.08);
+    --color-violet-300-alpha-10: rgba(167, 139, 250, 0.1);
+    --color-violet-300-alpha-12: rgba(167, 139, 250, 0.12);
+    --color-violet-300-alpha-15: rgba(167, 139, 250, 0.15);
+
+    /* Violet-200 opacity variants (196, 181, 253 = #c4b5fd) */
+    --color-violet-200-alpha-6: rgba(196, 181, 253, 0.06);
+    --color-violet-200-alpha-8: rgba(196, 181, 253, 0.08);
+    --color-violet-200-alpha-10: rgba(196, 181, 253, 0.1);
+
+    /* Violet-100 opacity variants (221, 214, 254 = #ddd6fe) */
+    --color-violet-100-alpha-6: rgba(221, 214, 254, 0.06);
+
+    /* Violet-50 opacity variants (237, 233, 254 = #ede9fe) */
+    --color-violet-50-alpha-8: rgba(237, 233, 254, 0.08);
 
     /* Gray-200 border opacity variants (229, 231, 235 = #e5e7eb) */
     --color-gray-border-alpha-30: rgba(229, 231, 235, 0.3);
@@ -419,27 +488,50 @@
 
     /* Gray-50 opacity variants (249, 250, 251 = #f9fafb) */
     --color-gray-50-alpha-50: rgba(249, 250, 251, 0.5);
+    --color-gray-50-alpha-60: rgba(249, 250, 251, 0.6);
+    --color-gray-50-alpha-80: rgba(249, 250, 251, 0.8);
+    --color-gray-50-alpha-95: rgba(249, 250, 251, 0.95);
+
+    /* Gray-100 opacity variants (243, 244, 246 = #f3f4f6) */
+    --color-gray-100-alpha-60: rgba(243, 244, 246, 0.6);
+    --color-gray-100-alpha-80: rgba(243, 244, 246, 0.8);
 
     /* Amber-500 opacity variants (245, 158, 11 = #f59e0b) */
     --color-amber-500-alpha-5: rgba(245, 158, 11, 0.05);
+    --color-amber-500-alpha-8: rgba(245, 158, 11, 0.08);
     --color-amber-500-alpha-10: rgba(245, 158, 11, 0.1);
     --color-amber-500-alpha-15: rgba(245, 158, 11, 0.15);
     --color-amber-500-alpha-18: rgba(245, 158, 11, 0.18);
     --color-amber-500-alpha-20: rgba(245, 158, 11, 0.2);
     --color-amber-500-alpha-30: rgba(245, 158, 11, 0.3);
+    --color-amber-500-alpha-35: rgba(245, 158, 11, 0.35);
     --color-amber-500-alpha-40: rgba(245, 158, 11, 0.4);
     --color-amber-500-alpha-85: rgba(245, 158, 11, 0.85);
+    --color-amber-500-alpha-60: rgba(245, 158, 11, 0.6);
+    --color-amber-500-alpha-90: rgba(245, 158, 11, 0.9);
+    --color-amber-500-alpha-95: rgba(245, 158, 11, 0.95);
     /* Amber-100 opacity variants (254, 243, 199 = #fef3c7) */
     --color-amber-100-alpha-80: rgba(254, 243, 199, 0.8);
     --color-amber-100-alpha-85: rgba(254, 243, 199, 0.85);
 
+    /* Slate-100 opacity variants (241, 245, 249 = #f1f5f9) */
+    --color-slate-100-alpha-85: rgba(241, 245, 249, 0.85);
+    --color-slate-100-alpha-90: rgba(241, 245, 249, 0.9);
+
+    /* Slate-600/Slate-Dark opacity variants (71, 85, 105 = #475569) */
+    --color-slate-dark-alpha-60: rgba(71, 85, 105, 0.6);
+    --color-slate-dark-alpha-85: rgba(71, 85, 105, 0.85);
+
     /* Sky-500 opacity variants (14, 165, 233 = #0ea5e9) */
     --color-sky-500-alpha-20: rgba(14, 165, 233, 0.2);
+    --color-sky-500-alpha-35: rgba(14, 165, 233, 0.35);
     --color-sky-500-alpha-40: rgba(14, 165, 233, 0.4);
 
     /* Glass effect variants (31, 38, 135) */
     --color-glass-shadow: rgba(31, 38, 135, 0.1);
+    --color-glass-shadow-12: rgba(31, 38, 135, 0.12);
     --color-glass-shadow-15: rgba(31, 38, 135, 0.15);
+    --color-glass-shadow-20: rgba(31, 38, 135, 0.2);
 
     /* Cyan opacity variants expanded (6, 182, 212 = #06b6d4) */
     --color-cyan-alpha-10: rgba(6, 182, 212, 0.1);
@@ -492,6 +584,7 @@
     /* Blue-600 opacity variants (37, 99, 235 = #2563eb) */
     --color-blue-600-alpha-3: rgba(37, 99, 235, 0.03);
     --color-blue-600-alpha-5: rgba(37, 99, 235, 0.05);
+    --color-blue-600-alpha-8: rgba(37, 99, 235, 0.08);
     --color-blue-600-alpha-10: rgba(37, 99, 235, 0.1);
     --color-blue-600-alpha-30: rgba(37, 99, 235, 0.3);
     --color-blue-600-alpha-40: rgba(37, 99, 235, 0.4);
@@ -510,8 +603,10 @@
     --color-green-600-alpha-20: rgba(22, 163, 74, 0.2);
 
     /* Green-500 opacity variants (34, 197, 94 = #22c55e) */
+    --color-green-500-alpha-8: rgba(34, 197, 94, 0.08);
     --color-green-500-alpha-10: rgba(34, 197, 94, 0.1);
     --color-green-500-alpha-12: rgba(34, 197, 94, 0.12);
+    --color-green-500-alpha-15: rgba(34, 197, 94, 0.15);
     --color-green-500-alpha-20: rgba(34, 197, 94, 0.2);
     --color-green-500-alpha-25: rgba(34, 197, 94, 0.25);
     --color-green-500-alpha-30: rgba(34, 197, 94, 0.3);
@@ -527,6 +622,7 @@
     --color-emerald-300-alpha-30: rgba(52, 211, 153, 0.3);
 
     /* Slate-800 opacity variants (30, 41, 59 = #1e293b) */
+    --color-slate-800-alpha-30: rgba(30, 41, 59, 0.3);
     --color-slate-800-alpha-40: rgba(30, 41, 59, 0.4);
     --color-slate-800-alpha-50: rgba(30, 41, 59, 0.5);
     --color-slate-800-alpha-60: rgba(30, 41, 59, 0.6);
@@ -535,14 +631,21 @@
     --color-slate-800-alpha-85: rgba(30, 41, 59, 0.85);
     --color-slate-800-alpha-90: rgba(30, 41, 59, 0.9);
     --color-slate-800-alpha-95: rgba(30, 41, 59, 0.95);
+    --color-slate-800-alpha-98: rgba(30, 41, 59, 0.98);
 
     /* Slate-900 opacity variants (15, 23, 42 = #0f172a) */
+    --color-slate-900-alpha-40: rgba(15, 23, 42, 0.4);
     --color-slate-900-alpha-60: rgba(15, 23, 42, 0.6);
+    --color-slate-900-alpha-70: rgba(15, 23, 42, 0.7);
+    --color-slate-900-alpha-75: rgba(15, 23, 42, 0.75);
+    --color-slate-900-alpha-80: rgba(15, 23, 42, 0.8);
+    --color-slate-900-alpha-85: rgba(15, 23, 42, 0.85);
 
     /* Slate-600 opacity variants (51, 65, 85 = #334155) */
     --color-slate-600-alpha-50: rgba(51, 65, 85, 0.5);
     --color-slate-600-alpha-60: rgba(51, 65, 85, 0.6);
     --color-slate-600-alpha-90: rgba(51, 65, 85, 0.9);
+    --color-slate-600-alpha-96: rgba(51, 65, 85, 0.96);
 
     /* Medal/Ranking colors */
     /* Gold (255, 215, 0 = #ffd700) */
@@ -593,6 +696,9 @@
     --color-teal-300-alpha-15: rgba(94, 234, 212, 0.15);
 
     /* Blue-400 opacity variants (96, 165, 250 = #60a5fa) */
+    --color-blue-400-alpha-5: rgba(96, 165, 250, 0.05);
+    --color-blue-400-alpha-8: rgba(96, 165, 250, 0.08);
+    --color-blue-400-alpha-12: rgba(96, 165, 250, 0.12);
     --color-blue-400-alpha-30: rgba(96, 165, 250, 0.3);
 
     /* Green-pure opacity variants (0, 128, 0 = #008000) */
@@ -647,6 +753,8 @@
     --color-black-alpha-25: rgba(0, 0, 0, 0.25);
     --color-black-alpha-60: rgba(0, 0, 0, 0.6);
     --color-black-alpha-70: rgba(0, 0, 0, 0.7);
+    --color-black-alpha-80: rgba(0, 0, 0, 0.8);
+    --color-black-alpha-85: rgba(0, 0, 0, 0.85);
 
     /* Indigo-300 opacity variants (165, 180, 252 = #a5b4fc) */
     --color-indigo-300-alpha-20: rgba(165, 180, 252, 0.2);
@@ -663,6 +771,8 @@
     /* Slate-500 opacity variants (100, 116, 139 = #64748b) */
     --color-slate-500-alpha-8: rgba(100, 116, 139, 0.08);
     --color-slate-500-alpha-20: rgba(100, 116, 139, 0.2);
+    --color-slate-500-alpha-30: rgba(100, 116, 139, 0.3);
+    --color-slate-500-alpha-35: rgba(100, 116, 139, 0.35);
 
     /* Slate-700 opacity variants (51, 65, 85 = #334155) */
     --color-slate-700-alpha-50: rgba(51, 65, 85, 0.5);
@@ -711,12 +821,33 @@
 
     /* Indigo expanded opacity variants (99, 102, 241 = #6366f1) */
     --color-indigo-alpha-18: rgba(99, 102, 241, 0.18);
+    --color-indigo-alpha-22: rgba(99, 102, 241, 0.22);
+    --color-indigo-alpha-28: rgba(99, 102, 241, 0.28);
     --color-indigo-alpha-35: rgba(99, 102, 241, 0.35);
     --color-indigo-alpha-45: rgba(99, 102, 241, 0.45);
     --color-indigo-alpha-60: rgba(99, 102, 241, 0.6);
+    --color-indigo-alpha-80: rgba(99, 102, 241, 0.8);
+
+    /* Indigo-50 opacity variants (238, 242, 255 = #eef2ff) */
+    --color-indigo-50-alpha-85: rgba(238, 242, 255, 0.85);
+
+    /* Blue-50 opacity variants (239, 246, 255 = #eff6ff) */
+    --color-blue-50-alpha-90: rgba(239, 246, 255, 0.9);
+
+    /* Blue-950 opacity variants (23, 37, 84 = #172554) */
+    --color-blue-950-alpha-88: rgba(23, 37, 84, 0.88);
+
+    /* Dark purple alt background variants (30, 27, 75) */
+    --color-dark-purple-alt-alpha-88: rgba(30, 27, 75, 0.88);
 
     /* Violet expanded opacity variants (139, 92, 246 = #8b5cf6) */
+    --color-violet-alpha-18: rgba(139, 92, 246, 0.18);
+    --color-violet-alpha-24: rgba(139, 92, 246, 0.24);
+    --color-violet-alpha-28: rgba(139, 92, 246, 0.28);
     --color-violet-alpha-35: rgba(139, 92, 246, 0.35);
+    --color-violet-alpha-45: rgba(139, 92, 246, 0.45);
+    --color-violet-alpha-80: rgba(139, 92, 246, 0.8);
+    --color-violet-alpha-90: rgba(139, 92, 246, 0.9);
 
     /* Pink expanded opacity variants (236, 72, 153 = #ec4899) */
     --color-pink-alpha-25: rgba(236, 72, 153, 0.25);
@@ -726,6 +857,7 @@
     --color-red-600-alpha-15: rgba(220, 38, 38, 0.15);
     --color-red-600-alpha-20: rgba(220, 38, 38, 0.2);
     --color-red-600-alpha-30: rgba(220, 38, 38, 0.3);
+    --color-red-600-alpha-90: rgba(220, 38, 38, 0.9);
 
     /* Amber expanded opacity variants (251, 191, 36 = #fbbf24) */
     --color-amber-alpha-25: rgba(251, 191, 36, 0.25);
@@ -758,8 +890,10 @@
     --color-fuchsia-alpha-15: rgba(217, 70, 239, 0.15);
 
     /* Purple-600 opacity variants (124, 58, 237 = #7c3aed) */
+    --color-purple-600-alpha-15: rgba(124, 58, 237, 0.15);
     --color-purple-600-alpha-30: rgba(124, 58, 237, 0.3);
     --color-purple-600-alpha-40: rgba(124, 58, 237, 0.4);
+    --color-purple-600-alpha-90: rgba(124, 58, 237, 0.9);
 
     /* Red-700 opacity variants (185, 28, 28 = #b91c1c) */
     --color-red-700-alpha-35: rgba(185, 28, 28, 0.35);
@@ -769,6 +903,7 @@
 
     /* Amber-600 opacity variants (217, 119, 6 = #d97706) */
     --color-amber-600-alpha-35: rgba(217, 119, 6, 0.35);
+    --color-amber-600-alpha-90: rgba(217, 119, 6, 0.9);
 
     /* Blue-700 opacity variants (29, 78, 216 = #1d4ed8) */
     --color-blue-700-alpha-35: rgba(29, 78, 216, 0.35);
@@ -815,6 +950,7 @@
     --color-zinc-900-alpha-60: rgba(24, 24, 27, 0.6);
     --color-zinc-900-alpha-65: rgba(24, 24, 27, 0.65);
     --color-zinc-900-alpha-80: rgba(24, 24, 27, 0.8);
+    --color-zinc-900-alpha-95: rgba(24, 24, 27, 0.95);
 
     /* Blue-750 opacity variants (30, 64, 175 = #1e40af) */
     --color-blue-750-alpha-20: rgba(30, 64, 175, 0.2);
@@ -824,6 +960,58 @@
 
     /* Amber-900 opacity variants (120, 53, 15 = #78350f) */
     --color-amber-900-alpha-30: rgba(120, 53, 15, 0.3);
+
+
+    /* Lime-500 opacity variants (132, 204, 22 = #84cc16) - Goals growth theme */
+    --color-lime-500-alpha-6: rgba(132, 204, 22, 0.06);
+    --color-lime-500-alpha-8: rgba(132, 204, 22, 0.08);
+    --color-lime-500-alpha-10: rgba(132, 204, 22, 0.1);
+    --color-lime-500-alpha-12: rgba(132, 204, 22, 0.12);
+    --color-lime-500-alpha-15: rgba(132, 204, 22, 0.15);
+    --color-lime-500-alpha-20: rgba(132, 204, 22, 0.2);
+    --color-lime-500-alpha-25: rgba(132, 204, 22, 0.25);
+    --color-lime-500-alpha-30: rgba(132, 204, 22, 0.3);
+    --color-lime-500-alpha-35: rgba(132, 204, 22, 0.35);
+    --color-lime-500-alpha-40: rgba(132, 204, 22, 0.4);
+    --color-lime-500-alpha-45: rgba(132, 204, 22, 0.45);
+    --color-lime-500-alpha-50: rgba(132, 204, 22, 0.5);
+    --color-lime-500-alpha-60: rgba(132, 204, 22, 0.6);
+
+    /* Lime-400 opacity variants (163, 230, 53 = #a3e635) - Goals light */
+    --color-lime-400-alpha-8: rgba(163, 230, 53, 0.08);
+    --color-lime-400-alpha-10: rgba(163, 230, 53, 0.1);
+    --color-lime-400-alpha-12: rgba(163, 230, 53, 0.12);
+    --color-lime-400-alpha-15: rgba(163, 230, 53, 0.15);
+    --color-lime-400-alpha-20: rgba(163, 230, 53, 0.2);
+    --color-lime-400-alpha-25: rgba(163, 230, 53, 0.25);
+
+    /* Lime-300 opacity variants (190, 242, 100 = #bef264) - Goals lighter */
+    --color-lime-300-alpha-6: rgba(190, 242, 100, 0.06);
+    --color-lime-300-alpha-8: rgba(190, 242, 100, 0.08);
+    --color-lime-300-alpha-10: rgba(190, 242, 100, 0.1);
+
+    /* Lime-200 opacity variants (217, 249, 157 = #d9f99d) - Goals lightest */
+    --color-lime-200-alpha-6: rgba(217, 249, 157, 0.06);
+
+    /* Lime-100 opacity variants (236, 252, 203 = #ecfccb) - Goals background */
+    --color-lime-100-alpha-8: rgba(236, 252, 203, 0.08);
+
+    /* Pink-600 extended opacity variants (219, 39, 119 = #db2777) */
+    --color-pink-600-alpha-35: rgba(219, 39, 119, 0.35);
+    --color-pink-600-alpha-40: rgba(219, 39, 119, 0.4);
+    --color-pink-600-alpha-45: rgba(219, 39, 119, 0.45);
+    --color-pink-600-alpha-50: rgba(219, 39, 119, 0.5);
+    --color-pink-600-alpha-60: rgba(219, 39, 119, 0.6);
+
+    /* Glass shadow (31, 38, 135) extended opacity variants */
+    --color-glass-shadow-7: rgba(31, 38, 135, 0.07);
+    --color-glass-shadow-10: rgba(31, 38, 135, 0.1);
+    --color-glass-shadow-15: rgba(31, 38, 135, 0.15);
+
+    /* Gradient blue-purple (102, 126, 234 = #667eea) opacity variants */
+    --color-gradient-blue-alpha-30: rgba(102, 126, 234, 0.3);
+    --color-gradient-blue-alpha-35: rgba(102, 126, 234, 0.35);
+    --color-gradient-blue-alpha-45: rgba(102, 126, 234, 0.45);
 
     /* Holographic/Glow effect colors */
     --color-magenta-alpha-5: rgba(255, 0, 128, 0.05);

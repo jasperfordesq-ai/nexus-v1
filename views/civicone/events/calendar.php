@@ -5,6 +5,7 @@
  */
 $pageTitle = 'Events Calendar';
 require dirname(__DIR__, 2) . '/layouts/civicone/header.php';
+require_once __DIR__ . '/../components/govuk/breadcrumbs.php';
 
 // Calendar Logic
 $monthName = date('F', mktime(0, 0, 0, $month, 10));
@@ -31,17 +32,14 @@ $prevLink = "$basePath/events/calendar?month=$prevMonth&year=$prevYear";
 $nextLink = "$basePath/events/calendar?month=$nextMonth&year=$nextYear";
 ?>
 
-<nav class="govuk-breadcrumbs govuk-!-margin-bottom-6" aria-label="Breadcrumb">
-    <ol class="govuk-breadcrumbs__list">
-        <li class="govuk-breadcrumbs__list-item">
-            <a class="govuk-breadcrumbs__link" href="<?= $basePath ?>">Home</a>
-        </li>
-        <li class="govuk-breadcrumbs__list-item">
-            <a class="govuk-breadcrumbs__link" href="<?= $basePath ?>/events">Events</a>
-        </li>
-        <li class="govuk-breadcrumbs__list-item" aria-current="page">Calendar</li>
-    </ol>
-</nav>
+<?= civicone_govuk_breadcrumbs([
+    'items' => [
+        ['text' => 'Home', 'href' => $basePath],
+        ['text' => 'Events', 'href' => $basePath . '/events'],
+        ['text' => 'Calendar']
+    ],
+    'class' => 'govuk-!-margin-bottom-6'
+]) ?>
 
 <!-- Header Row -->
 <div class="govuk-grid-row govuk-!-margin-bottom-6">

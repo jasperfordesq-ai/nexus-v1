@@ -74,8 +74,8 @@
     left: 0;
     right: 0;
     background: linear-gradient(135deg,
-        rgba(99, 102, 241, 0.95) 0%,
-        rgba(139, 92, 246, 0.95) 100%);
+        var(--color-indigo-alpha-95) 0%,
+        var(--color-violet-alpha-95) 100%);
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
     color: white;
@@ -110,7 +110,7 @@
 }
 
 .nexus-pwa-update-btn {
-    background: rgba(255, 255, 255, 0.95);
+    background: var(--color-white-alpha-95);
     color: var(--color-primary-500);
     border: none;
     padding: 8px 16px;
@@ -154,22 +154,22 @@
 
 .nexus-notification-prompt-content {
     background: linear-gradient(135deg,
-        rgba(255, 255, 255, 0.95) 0%,
-        rgba(255, 255, 255, 0.85) 100%);
+        var(--color-white-alpha-95) 0%,
+        var(--color-white-alpha-85) 100%);
     backdrop-filter: blur(24px) saturate(180%);
     -webkit-backdrop-filter: blur(24px) saturate(180%);
     border-radius: 20px;
     padding: 20px;
     box-shadow: 0 20px 60px var(--effect-black-12),
                 0 8px 24px var(--effect-primary-8),
-                inset 0 1px 0 rgba(255, 255, 255, 0.8);
+                inset 0 1px 0 var(--color-white-alpha-80);
     display: flex;
     flex-wrap: wrap;
     align-items: center;
     gap: 16px;
     max-width: 400px;
     margin: 0 auto;
-    border: 1px solid rgba(255, 255, 255, 0.6);
+    border: 1px solid var(--color-white-alpha-60);
 }
 
 .nexus-notification-prompt-icon {
@@ -183,7 +183,7 @@
     color: white;
     font-size: 1.5rem;
     flex-shrink: 0;
-    box-shadow: 0 8px 20px rgba(245, 158, 11, 0.35);
+    box-shadow: 0 8px 20px var(--color-amber-500-alpha-35);
     animation: pwaFeaturePulse 3s ease-in-out infinite;
 }
 
@@ -226,12 +226,12 @@
 }
 
 .nexus-prompt-btn-secondary {
-    background: rgba(107, 114, 128, 0.1);
+    background: var(--color-gray-alpha-10);
     color: var(--color-gray-700);
 }
 
 .nexus-prompt-btn-secondary:hover {
-    background: rgba(107, 114, 128, 0.15);
+    background: var(--color-gray-alpha-15);
     transform: translateY(-1px);
 }
 
@@ -257,7 +257,7 @@
 .nexus-install-prompt {
     position: fixed;
     inset: 0;
-    background: rgba(15, 23, 42, 0);
+    background: var(--color-slate-900-alpha-0);
     z-index: var(--z-modal-backdrop, 300);
     display: flex;
     align-items: flex-end;
@@ -270,7 +270,7 @@
 .nexus-install-prompt.visible {
     opacity: 1;
     visibility: visible;
-    background: rgba(15, 23, 42, 0.6);
+    background: var(--color-slate-900-alpha-60);
     backdrop-filter: blur(8px);
     -webkit-backdrop-filter: blur(8px);
 }
@@ -280,8 +280,8 @@
    ============================================ */
 .nexus-install-prompt-card {
     background: linear-gradient(180deg,
-        rgba(255, 255, 255, 0.98) 0%,
-        rgba(249, 250, 251, 0.95) 100%);
+        var(--color-white-alpha-98) 0%,
+        var(--color-gray-50-alpha-95) 100%);
     backdrop-filter: blur(40px) saturate(200%);
     -webkit-backdrop-filter: blur(40px) saturate(200%);
     border-radius: 28px 28px 0 0;
@@ -296,8 +296,8 @@
     transition: transform 0.5s cubic-bezier(0.32, 0.72, 0, 1);
     box-shadow: 0 -20px 60px var(--effect-black-15),
                 0 -8px 24px var(--effect-primary-10),
-                inset 0 1px 0 rgba(255, 255, 255, 0.9);
-    border: 1px solid rgba(255, 255, 255, 0.8);
+                inset 0 1px 0 var(--color-white-alpha-90);
+    border: 1px solid var(--color-white-alpha-80);
     border-bottom: none;
 }
 
@@ -317,7 +317,7 @@
         transparent 0%,
         var(--effect-primary-30) 25%,
         var(--effect-purple-50) 50%,
-        rgba(236, 72, 153, 0.3) 75%,
+        var(--color-pink-500-alpha-30) 75%,
         transparent 100%);
     background-size: 200% 100%;
     animation: pwaHolographicShimmer 3s linear infinite;
@@ -344,7 +344,7 @@
     right: 16px;
     width: 40px;
     height: 40px;
-    background: rgba(107, 114, 128, 0.1);
+    background: var(--color-gray-alpha-10);
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
     border: 1px solid var(--effect-white-30);
@@ -359,7 +359,7 @@
 }
 
 .nexus-install-close:hover {
-    background: rgba(107, 114, 128, 0.15);
+    background: var(--color-gray-alpha-15);
     transform: scale(1.05);
     color: var(--color-gray-700);
 }
@@ -382,7 +382,7 @@
                 0 8px 24px var(--effect-black-10);
     animation: pwaIconFloat 4s ease-in-out infinite,
                pwaIconGlow 3s ease-in-out infinite;
-    border: 3px solid rgba(255, 255, 255, 0.9);
+    border: 3px solid var(--color-white-alpha-90);
 }
 
 /* Title - Premium typography */
@@ -511,13 +511,13 @@
 }
 
 .nexus-install-btn-secondary {
-    background: rgba(107, 114, 128, 0.08);
+    background: var(--color-gray-alpha-8);
     color: var(--color-gray-700);
-    border: 1px solid rgba(107, 114, 128, 0.15);
+    border: 1px solid var(--color-gray-alpha-15);
 }
 
 .nexus-install-btn-secondary:hover {
-    background: rgba(107, 114, 128, 0.12);
+    background: var(--color-gray-alpha-12);
     transform: translateY(-2px);
 }
 
@@ -549,7 +549,7 @@
 
 .nexus-install-btn-primary:hover {
     transform: translateY(-3px) scale(1.02);
-    box-shadow: 0 12px 32px rgba(99, 102, 241, 0.5);
+    box-shadow: 0 12px 32px var(--color-indigo-alpha-50);
 }
 
 .nexus-install-btn-secondary:active,
@@ -580,9 +580,9 @@
    ============================================ */
 .nexus-install-section {
     background: linear-gradient(135deg,
-        rgba(249, 250, 251, 0.8) 0%,
-        rgba(243, 244, 246, 0.6) 100%);
-    border: 1px solid rgba(0, 0, 0, 0.06);
+        var(--color-gray-50-alpha-80) 0%,
+        var(--color-gray-100-alpha-60) 100%);
+    border: 1px solid var(--color-black-alpha-6);
     border-radius: 18px;
     overflow: hidden;
     text-align: left;
@@ -598,7 +598,7 @@
     padding: 16px;
     background: linear-gradient(135deg,
         var(--effect-primary-8) 0%,
-        rgba(139, 92, 246, 0.05) 100%);
+        var(--color-violet-alpha-5) 100%);
     font-weight: 700;
     font-size: 1rem;
     color: var(--color-gray-900);
@@ -612,9 +612,9 @@
 
 .nexus-install-section-apk .nexus-install-section-header {
     background: linear-gradient(135deg,
-        rgba(16, 185, 129, 0.1) 0%,
-        rgba(52, 211, 153, 0.05) 100%);
-    border-bottom-color: rgba(16, 185, 129, 0.1);
+        var(--color-emerald-alpha-10) 0%,
+        var(--color-emerald-300-alpha-5) 100%);
+    border-bottom-color: var(--color-emerald-alpha-10);
 }
 
 .nexus-install-section-apk .nexus-install-section-header i {
@@ -636,7 +636,7 @@
 
 .nexus-install-section-tag-green {
     background: linear-gradient(135deg, var(--color-emerald-500) 0%, var(--color-emerald-400) 100%);
-    box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
+    box-shadow: 0 2px 8px var(--color-emerald-alpha-30);
 }
 
 .nexus-install-section-body {
@@ -671,8 +671,8 @@
     align-items: flex-start;
     gap: 12px;
     padding: 12px 16px;
-    background: rgba(245, 158, 11, 0.08);
-    border: 1px solid rgba(245, 158, 11, 0.2);
+    background: var(--color-amber-500-alpha-8);
+    border: 1px solid var(--color-amber-500-alpha-20);
     border-radius: 12px;
     font-size: 0.875rem;
     color: var(--color-amber-800);
@@ -717,11 +717,11 @@
 
 .nexus-install-section-btn-green {
     background: linear-gradient(135deg, var(--color-emerald-500) 0%, var(--color-emerald-400) 100%);
-    box-shadow: 0 4px 16px rgba(16, 185, 129, 0.3);
+    box-shadow: 0 4px 16px var(--color-emerald-alpha-30);
 }
 
 .nexus-install-section-btn-green:hover {
-    box-shadow: 0 8px 24px rgba(16, 185, 129, 0.4);
+    box-shadow: 0 8px 24px var(--color-emerald-alpha-40);
 }
 
 /* Divider */
@@ -744,7 +744,7 @@
     height: 1px;
     background: linear-gradient(90deg,
         transparent 0%,
-        rgba(156, 163, 175, 0.3) 50%,
+        var(--color-slate-400-alpha-30) 50%,
         transparent 100%);
 }
 
@@ -761,7 +761,7 @@
     align-items: center;
     gap: 16px;
     padding: 16px 0;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+    border-bottom: 1px solid var(--color-black-alpha-6);
     font-size: 1rem;
     color: var(--color-gray-600);
     line-height: 1.5;
@@ -801,7 +801,7 @@
 .nexus-biometric-prompt {
     position: fixed;
     inset: 0;
-    background: rgba(15, 23, 42, 0);
+    background: var(--color-slate-900-alpha-0);
     z-index: var(--z-modal-backdrop, 300);
     display: flex;
     align-items: center;
@@ -815,15 +815,15 @@
 .nexus-biometric-prompt.visible {
     opacity: 1;
     visibility: visible;
-    background: rgba(15, 23, 42, 0.6);
+    background: var(--color-slate-900-alpha-60);
     backdrop-filter: blur(8px);
     -webkit-backdrop-filter: blur(8px);
 }
 
 .nexus-biometric-card {
     background: linear-gradient(180deg,
-        rgba(255, 255, 255, 0.98) 0%,
-        rgba(249, 250, 251, 0.95) 100%);
+        var(--color-white-alpha-98) 0%,
+        var(--color-gray-50-alpha-95) 100%);
     backdrop-filter: blur(40px) saturate(200%);
     -webkit-backdrop-filter: blur(40px) saturate(200%);
     border-radius: 28px;
@@ -835,8 +835,8 @@
     transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
     box-shadow: 0 24px 64px var(--effect-black-15),
                 0 8px 24px var(--effect-primary-10),
-                inset 0 1px 0 rgba(255, 255, 255, 0.9);
-    border: 1px solid rgba(255, 255, 255, 0.8);
+                inset 0 1px 0 var(--color-white-alpha-90);
+    border: 1px solid var(--color-white-alpha-80);
 }
 
 .nexus-biometric-prompt.visible .nexus-biometric-card {
@@ -891,13 +891,13 @@
 }
 
 .nexus-biometric-btn-secondary {
-    background: rgba(107, 114, 128, 0.08);
+    background: var(--color-gray-alpha-8);
     color: var(--color-gray-700);
-    border: 1px solid rgba(107, 114, 128, 0.15);
+    border: 1px solid var(--color-gray-alpha-15);
 }
 
 .nexus-biometric-btn-secondary:hover {
-    background: rgba(107, 114, 128, 0.12);
+    background: var(--color-gray-alpha-12);
 }
 
 .nexus-biometric-btn-primary {
@@ -930,9 +930,9 @@
         max-width: 440px;
         padding: 36px 32px;
         transform: scale(0.9) translateY(30px);
-        box-shadow: 0 32px 80px rgba(0, 0, 0, 0.18),
+        box-shadow: 0 32px 80px var(--color-black-alpha-18),
                     0 12px 32px var(--effect-primary-12),
-                    inset 0 1px 0 rgba(255, 255, 255, 0.9);
+                    inset 0 1px 0 var(--color-white-alpha-90);
     }
 
     .nexus-install-prompt.visible .nexus-install-prompt-card {
@@ -960,12 +960,12 @@
 [data-theme="dark"] .nexus-install-prompt-card,
 [data-theme="dark"] .nexus-biometric-card {
     background: linear-gradient(180deg,
-        rgba(30, 41, 59, 0.95) 0%,
-        rgba(15, 23, 42, 0.92) 100%);
-    border-color: rgba(255, 255, 255, 0.08);
-    box-shadow: 0 24px 64px rgba(0, 0, 0, 0.4),
-                0 8px 24px rgba(0, 0, 0, 0.2),
-                inset 0 1px 0 rgba(255, 255, 255, 0.05);
+        var(--color-slate-alpha-95) 0%,
+        var(--color-slate-900-alpha-92) 100%);
+    border-color: var(--color-white-alpha-8);
+    box-shadow: 0 24px 64px var(--color-black-alpha-40),
+                0 8px 24px var(--color-black-alpha-20),
+                inset 0 1px 0 var(--color-white-alpha-5);
 }
 
 [data-theme="dark"] .nexus-notification-prompt-text h4,
@@ -979,23 +979,23 @@
 [data-theme="dark"] .nexus-notification-prompt-text p,
 [data-theme="dark"] .nexus-install-description,
 [data-theme="dark"] .nexus-biometric-card p {
-    color: rgba(248, 250, 252, 0.7);
+    color: var(--color-slate-50-alpha-70);
 }
 
 [data-theme="dark"] .nexus-install-close {
-    background: rgba(255, 255, 255, 0.08);
-    border-color: rgba(255, 255, 255, 0.1);
-    color: rgba(255, 255, 255, 0.7);
+    background: var(--color-white-alpha-8);
+    border-color: var(--color-white-alpha-10);
+    color: var(--color-white-alpha-70);
 }
 
 [data-theme="dark"] .nexus-install-close:hover {
-    background: rgba(255, 255, 255, 0.12);
-    color: rgba(255, 255, 255, 0.9);
+    background: var(--color-white-alpha-12);
+    color: var(--color-white-alpha-90);
 }
 
 [data-theme="dark"] .nexus-install-section {
-    background: rgba(255, 255, 255, 0.03);
-    border-color: rgba(255, 255, 255, 0.06);
+    background: var(--color-white-alpha-3);
+    border-color: var(--color-white-alpha-6);
 }
 
 [data-theme="dark"] .nexus-install-section-header {
@@ -1005,14 +1005,14 @@
 }
 
 [data-theme="dark"] .nexus-install-section-apk .nexus-install-section-header {
-    background: rgba(16, 185, 129, 0.1);
-    border-bottom-color: rgba(16, 185, 129, 0.15);
+    background: var(--color-emerald-alpha-10);
+    border-bottom-color: var(--color-emerald-alpha-15);
 }
 
 [data-theme="dark"] .nexus-install-benefits li,
 [data-theme="dark"] .nexus-install-ios-step,
 [data-theme="dark"] .nexus-install-feature {
-    color: rgba(248, 250, 252, 0.7);
+    color: var(--color-slate-50-alpha-70);
 }
 
 [data-theme="dark"] .nexus-install-ios-step strong {
@@ -1020,25 +1020,25 @@
 }
 
 [data-theme="dark"] .nexus-install-apk-note {
-    background: rgba(245, 158, 11, 0.1);
-    border-color: rgba(245, 158, 11, 0.2);
+    background: var(--color-amber-500-alpha-10);
+    border-color: var(--color-amber-500-alpha-20);
     color: var(--color-amber-400);
 }
 
 [data-theme="dark"] .nexus-install-divider {
-    color: rgba(255, 255, 255, 0.4);
+    color: var(--color-white-alpha-40);
 }
 
 [data-theme="dark"] .nexus-install-divider::before,
 [data-theme="dark"] .nexus-install-divider::after {
     background: linear-gradient(90deg,
         transparent 0%,
-        rgba(255, 255, 255, 0.1) 50%,
+        var(--color-white-alpha-10) 50%,
         transparent 100%);
 }
 
 [data-theme="dark"] .nexus-install-ios-step {
-    border-color: rgba(255, 255, 255, 0.06);
+    border-color: var(--color-white-alpha-6);
 }
 
 [data-theme="dark"] .nexus-install-feature i {
@@ -1049,15 +1049,15 @@
 [data-theme="dark"] .nexus-prompt-btn-secondary,
 [data-theme="dark"] .nexus-install-btn-secondary,
 [data-theme="dark"] .nexus-biometric-btn-secondary {
-    background: rgba(255, 255, 255, 0.08);
-    border-color: rgba(255, 255, 255, 0.1);
+    background: var(--color-white-alpha-8);
+    border-color: var(--color-white-alpha-10);
     color: var(--color-slate-50);
 }
 
 [data-theme="dark"] .nexus-prompt-btn-secondary:hover,
 [data-theme="dark"] .nexus-install-btn-secondary:hover,
 [data-theme="dark"] .nexus-biometric-btn-secondary:hover {
-    background: rgba(255, 255, 255, 0.12);
+    background: var(--color-white-alpha-12);
 }
 
 [data-theme="dark"] .nexus-install-btn-text {
@@ -1065,7 +1065,7 @@
 }
 
 [data-theme="dark"] .nexus-install-btn-text:hover {
-    color: rgba(255, 255, 255, 0.7);
+    color: var(--color-white-alpha-70);
 }
 
 /* ============================================

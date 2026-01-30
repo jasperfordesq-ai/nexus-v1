@@ -14,24 +14,19 @@ $basePath = TenantContext::getBasePath();
 $pageTitle = $article['title'] ?? 'Help Article';
 
 require dirname(__DIR__, 2) . '/layouts/civicone/header.php';
+require_once __DIR__ . '/../components/govuk/breadcrumbs.php';
 ?>
 
 <div class="govuk-width-container">
 
-    <!-- Breadcrumbs -->
-    <nav class="govuk-breadcrumbs" aria-label="Breadcrumb">
-        <ol class="govuk-breadcrumbs__list">
-            <li class="govuk-breadcrumbs__list-item">
-                <a class="govuk-breadcrumbs__link" href="<?= $basePath ?>">Home</a>
-            </li>
-            <li class="govuk-breadcrumbs__list-item">
-                <a class="govuk-breadcrumbs__link" href="<?= $basePath ?>/help">Help Centre</a>
-            </li>
-            <li class="govuk-breadcrumbs__list-item" aria-current="page">
-                <?= htmlspecialchars(mb_substr($article['title'] ?? 'Article', 0, 30)) ?>...
-            </li>
-        </ol>
-    </nav>
+    <?= civicone_govuk_breadcrumbs([
+        'items' => [
+            ['text' => 'Home', 'href' => $basePath],
+            ['text' => 'Help Centre', 'href' => $basePath . '/help'],
+            ['text' => htmlspecialchars(mb_substr($article['title'] ?? 'Article', 0, 30)) . '...']
+        ],
+        'class' => 'govuk-!-margin-bottom-6'
+    ]) ?>
 
     <main class="govuk-main-wrapper" role="main">
 

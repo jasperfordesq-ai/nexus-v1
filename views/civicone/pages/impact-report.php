@@ -14,19 +14,17 @@ if ($tSlug !== 'hour-timebank' && $tSlug !== 'hour_timebank') {
 $pageTitle = 'Social Impact Report';
 $basePath = \Nexus\Core\TenantContext::getBasePath();
 require dirname(__DIR__, 2) . '/layouts/civicone/header.php';
+require_once __DIR__ . '/../components/govuk/breadcrumbs.php';
 ?>
 
-<nav class="govuk-breadcrumbs govuk-!-margin-bottom-6" aria-label="Breadcrumb">
-    <ol class="govuk-breadcrumbs__list">
-        <li class="govuk-breadcrumbs__list-item">
-            <a class="govuk-breadcrumbs__link" href="<?= $basePath ?>">Home</a>
-        </li>
-        <li class="govuk-breadcrumbs__list-item">
-            <a class="govuk-breadcrumbs__link" href="<?= $basePath ?>/impact-summary">Impact</a>
-        </li>
-        <li class="govuk-breadcrumbs__list-item" aria-current="page">Full Report</li>
-    </ol>
-</nav>
+<?= civicone_govuk_breadcrumbs([
+    'items' => [
+        ['text' => 'Home', 'href' => $basePath],
+        ['text' => 'Impact', 'href' => $basePath . '/impact-summary'],
+        ['text' => 'Full Report']
+    ],
+    'class' => 'govuk-!-margin-bottom-6'
+]) ?>
 
 <!-- Header Section -->
 <div class="govuk-notification-banner govuk-notification-banner--success govuk-!-margin-bottom-6" role="region" aria-labelledby="report-title">

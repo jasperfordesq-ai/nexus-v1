@@ -5,6 +5,7 @@
  */
 $pageTitle = 'Leaderboards';
 require dirname(__DIR__, 2) . '/layouts/civicone/header.php';
+require_once __DIR__ . '/../components/govuk/breadcrumbs.php';
 
 // Data passed from controller
 $leaderboard = $leaderboard ?? [];
@@ -18,14 +19,13 @@ $userStreaks = $userStreaks ?? null;
 $basePath = \Nexus\Core\TenantContext::getBasePath();
 ?>
 
-<nav class="govuk-breadcrumbs govuk-!-margin-bottom-6" aria-label="Breadcrumb">
-    <ol class="govuk-breadcrumbs__list">
-        <li class="govuk-breadcrumbs__list-item">
-            <a class="govuk-breadcrumbs__link" href="<?= $basePath ?>">Home</a>
-        </li>
-        <li class="govuk-breadcrumbs__list-item" aria-current="page">Leaderboards</li>
-    </ol>
-</nav>
+<?= civicone_govuk_breadcrumbs([
+    'items' => [
+        ['text' => 'Home', 'href' => $basePath],
+        ['text' => 'Leaderboards']
+    ],
+    'class' => 'govuk-!-margin-bottom-6'
+]) ?>
 
 <h1 class="govuk-heading-xl">
     <i class="fa-solid fa-trophy govuk-!-margin-right-2" aria-hidden="true"></i>

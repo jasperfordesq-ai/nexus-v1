@@ -233,7 +233,7 @@
 
         .image-upload-area:hover {
             border-color: var(--color-pink-500);
-            background: rgba(236, 72, 153, 0.05);
+            background: var(--color-pink-500-alpha-5);
         }
 
         .image-upload-area i {
@@ -311,12 +311,12 @@
         .btn-primary {
             background: linear-gradient(135deg, var(--color-pink-500), var(--color-pink-400));
             color: white;
-            box-shadow: 0 var(--space-1) calc(var(--space-3) + var(--space-1) / 2) rgba(236, 72, 153, 0.3);
+            box-shadow: 0 var(--space-1) calc(var(--space-3) + var(--space-1) / 2) var(--color-pink-500-alpha-30);
         }
 
         .btn-primary:hover {
             transform: translateY(-2px);
-            box-shadow: 0 var(--space-2) var(--space-6) rgba(236, 72, 153, 0.4);
+            box-shadow: 0 var(--space-2) var(--space-6) var(--color-pink-500-alpha-40);
         }
 
         .btn-primary:disabled {
@@ -342,9 +342,9 @@
         }
 
         .alert-success {
-            background: rgba(34, 197, 94, 0.1);
+            background: var(--color-green-500-alpha-10);
             color: var(--color-green-500);
-            border: 1px solid rgba(34, 197, 94, 0.3);
+            border: 1px solid var(--color-green-500-alpha-30);
         }
 
         /* Mobile Styles */
@@ -444,7 +444,7 @@
     .create-hub-input:focus-visible,
     button:focus-visible,
     a:focus-visible {
-        outline: calc(var(--space-1) * 0.75) solid rgba(219, 39, 119, 0.5);
+        outline: calc(var(--space-1) * 0.75) solid var(--color-pink-600-alpha-50);
         outline-offset: calc(var(--space-1) / 2);
     }
 
@@ -492,7 +492,7 @@
     .create-hub-input:focus {
         outline: none;
         border-color: var(--color-pink-600);
-        box-shadow: 0 0 0 var(--space-1) rgba(219, 39, 119, 0.1);
+        box-shadow: 0 0 0 var(--space-1) var(--color-pink-600-alpha-10);
     }
 
     .create-hub-input::placeholder {
@@ -522,7 +522,7 @@
         color: white;
         font-weight: 700;
         cursor: pointer;
-        box-shadow: 0 var(--space-1) calc(var(--space-3) + var(--space-1) / 2) rgba(219, 39, 119, 0.3);
+        box-shadow: 0 var(--space-1) calc(var(--space-3) + var(--space-1) / 2) var(--color-pink-600-alpha-30);
         transition: all 0.2s ease;
         -webkit-tap-highlight-color: transparent;
     }
@@ -559,7 +559,7 @@
         margin-bottom: calc(var(--space-6) + var(--space-1));
         padding: var(--space-6);
         border-radius: var(--radius-lg);
-        background: linear-gradient(135deg, var(--effect-purple-5) 0%, rgba(99, 102, 241, 0.03) 100%);
+        background: linear-gradient(135deg, var(--effect-purple-5) 0%, var(--color-indigo-alpha-3) 100%);
         border: 1px solid var(--effect-purple-15);
     }
 
@@ -749,7 +749,7 @@
     .discussion-form-input:focus-visible,
     button:focus-visible,
     a:focus-visible {
-        outline: calc(var(--space-1) * 0.75) solid rgba(219, 39, 119, 0.5);
+        outline: calc(var(--space-1) * 0.75) solid var(--color-pink-600-alpha-50);
         outline-offset: calc(var(--space-1) / 2);
     }
 
@@ -859,7 +859,7 @@
     .discussion-form-input:focus {
         outline: none;
         border-color: var(--color-pink-600);
-        box-shadow: 0 0 0 var(--space-1) rgba(219, 39, 119, 0.1);
+        box-shadow: 0 0 0 var(--space-1) var(--color-pink-600-alpha-10);
     }
 
     .discussion-form-input::placeholder {
@@ -913,7 +913,7 @@
         font-weight: 600;
         color: white;
         border-radius: var(--radius-md);
-        box-shadow: 0 var(--space-1) 15px rgba(219, 39, 119, 0.3);
+        box-shadow: 0 var(--space-1) 15px var(--color-pink-600-alpha-30);
         cursor: pointer;
         transition: all 0.2s ease;
         -webkit-tap-highlight-color: transparent;
@@ -1046,7 +1046,7 @@
     .discussion-reply-input:focus-visible,
     button:focus-visible,
     a:focus-visible {
-        outline: calc(var(--space-1) * 0.75) solid rgba(219, 39, 119, 0.5);
+        outline: calc(var(--space-1) * 0.75) solid var(--color-pink-600-alpha-50);
         outline-offset: calc(var(--space-1) / 2);
     }
 
@@ -1328,7 +1328,7 @@
 
     .discussion-reply-input:focus {
         border-color: var(--color-pink-200);
-        box-shadow: 0 0 0 var(--space-1) rgba(219, 39, 119, 0.1);
+        box-shadow: 0 0 0 var(--space-1) var(--color-pink-600-alpha-10);
     }
 
     .discussion-reply-btn {
@@ -1343,7 +1343,7 @@
         align-items: center;
         justify-content: center;
         cursor: pointer;
-        box-shadow: 0 var(--space-1) var(--space-3) rgba(219, 39, 119, 0.35);
+        box-shadow: 0 var(--space-1) var(--space-3) var(--color-pink-600-alpha-35);
         -webkit-tap-highlight-color: transparent;
         transition: transform 0.2s ease;
     }
@@ -1470,11 +1470,11 @@
     }
 
     [data-theme="dark"] .discussion-stream {
-        background: rgba(15, 23, 42, 0.6);
+        background: var(--color-slate-900-alpha-60);
     }
 
     [data-theme="dark"] .discussion-bubble.others {
-        background: rgba(51, 65, 85, 0.9);
+        background: var(--color-slate-600-alpha-90);
         color: var(--color-slate-200);
     }
 
@@ -1483,7 +1483,7 @@
     }
 
     [data-theme="dark"] .discussion-reply-input {
-        background: rgba(51, 65, 85, 0.8);
+        background: var(--color-slate-700-alpha-80);
         color: var(--color-slate-200);
     }
 
@@ -1984,7 +1984,7 @@
     .add-directly-box {
         margin: var(--space-5) 0;
         padding: var(--space-4);
-        background: linear-gradient(135deg, var(--effect-emerald-10), rgba(16, 185, 129, 0.05));
+        background: linear-gradient(135deg, var(--effect-emerald-10), var(--color-emerald-alpha-5));
         border: calc(var(--space-1) / 2) solid var(--ed-success);
         border-radius: var(--radius-md);
     }
@@ -2155,7 +2155,7 @@
     .edit-select:focus-visible,
     button:focus-visible,
     a:focus-visible {
-        outline: calc(var(--space-1) * 0.75) solid rgba(219, 39, 119, 0.5);
+        outline: calc(var(--space-1) * 0.75) solid var(--color-pink-600-alpha-50);
         outline-offset: calc(var(--space-1) / 2);
     }
 
@@ -2238,7 +2238,7 @@
     .edit-select:focus {
         outline: none;
         border-color: var(--color-pink-600);
-        box-shadow: 0 0 0 var(--space-1) rgba(219, 39, 119, 0.1);
+        box-shadow: 0 0 0 var(--space-1) var(--color-pink-600-alpha-10);
     }
 
     [data-theme="dark"] .edit-input,
@@ -2274,7 +2274,7 @@
         color: white;
         font-weight: 700;
         cursor: pointer;
-        box-shadow: 0 var(--space-1) calc(var(--space-3) + var(--space-1) / 2) rgba(219, 39, 119, 0.3);
+        box-shadow: 0 var(--space-1) calc(var(--space-3) + var(--space-1) / 2) var(--color-pink-600-alpha-30);
         transition: all 0.2s ease;
         -webkit-tap-highlight-color: transparent;
         margin-top: calc(var(--space-2) + var(--space-1) / 2);
@@ -2282,7 +2282,7 @@
 
     .edit-submit:hover {
         transform: translateY(-2px);
-        box-shadow: 0 calc(var(--space-1) * 1.5) var(--space-5) rgba(219, 39, 119, 0.4);
+        box-shadow: 0 calc(var(--space-1) * 1.5) var(--space-5) var(--color-pink-600-alpha-40);
     }
 
     .edit-submit:active {
@@ -2336,11 +2336,11 @@
 
     .visibility-option input:checked + .visibility-option-card {
         border-color: var(--color-pink-600);
-        background: linear-gradient(135deg, rgba(219, 39, 119, 0.05), rgba(236, 72, 153, 0.05));
+        background: linear-gradient(135deg, var(--color-pink-600-alpha-5), var(--color-pink-500-alpha-5));
     }
 
     [data-theme="dark"] .visibility-option input:checked + .visibility-option-card {
-        background: rgba(219, 39, 119, 0.15);
+        background: var(--color-pink-600-alpha-15);
     }
 
     .visibility-option-icon {
@@ -2394,7 +2394,7 @@
 
     .file-input-wrapper:hover .file-input-label {
         border-color: var(--color-pink-600);
-        background: rgba(219, 39, 119, 0.05);
+        background: var(--color-pink-600-alpha-5);
         color: var(--color-pink-600);
     }
 
@@ -2454,7 +2454,7 @@
     }
 
     [data-theme="dark"] .clear-image-btn:hover {
-        background: rgba(220, 38, 38, 0.15);
+        background: var(--color-red-600-alpha-15);
         color: var(--color-red-400);
     }
 
@@ -2477,8 +2477,8 @@
     }
 
     [data-theme="dark"] .current-image-preview:has(.clear-image-btn input:checked) {
-        background: rgba(220, 38, 38, 0.1);
-        border-color: rgba(220, 38, 38, 0.3);
+        background: var(--color-red-600-alpha-10);
+        border-color: var(--color-red-600-alpha-30);
     }
 
     /* Federation Section */
@@ -2486,7 +2486,7 @@
         margin-bottom: var(--space-5);
         padding: var(--space-6);
         border-radius: var(--radius-lg);
-        background: linear-gradient(135deg, var(--effect-purple-5) 0%, rgba(99, 102, 241, 0.03) 100%);
+        background: linear-gradient(135deg, var(--effect-purple-5) 0%, var(--color-indigo-alpha-3) 100%);
         border: 1px solid var(--effect-purple-15);
     }
 
@@ -2689,7 +2689,7 @@
     button:focus-visible,
     a:focus-visible,
     input:focus-visible {
-        outline: calc(var(--space-1) * 0.75) solid rgba(219, 39, 119, 0.5);
+        outline: calc(var(--space-1) * 0.75) solid var(--color-pink-600-alpha-50);
         outline-offset: calc(var(--space-1) / 2);
     }
 
@@ -2737,7 +2737,7 @@
     .invite-search:focus {
         outline: none;
         border-color: var(--color-pink-600);
-        box-shadow: 0 0 0 var(--space-1) rgba(219, 39, 119, 0.1);
+        box-shadow: 0 0 0 var(--space-1) var(--color-pink-600-alpha-10);
     }
 
     .user-list {
@@ -2809,7 +2809,7 @@
         color: white;
         font-weight: 700;
         cursor: pointer;
-        box-shadow: 0 var(--space-1) calc(var(--space-3) + var(--space-1) / 2) rgba(219, 39, 119, 0.3);
+        box-shadow: 0 var(--space-1) calc(var(--space-3) + var(--space-1) / 2) var(--color-pink-600-alpha-30);
         transition: all 0.2s ease;
         -webkit-tap-highlight-color: transparent;
     }
@@ -2875,11 +2875,11 @@
     }
 
     [data-theme="dark"] .user-item:hover {
-        background: rgba(219, 39, 119, 0.1);
+        background: var(--color-pink-600-alpha-10);
     }
 
     [data-theme="dark"] .user-item.selected {
-        background: rgba(219, 39, 119, 0.2);
+        background: var(--color-pink-600-alpha-20);
     }
 
     @media (max-width: 768px) {
@@ -2964,7 +2964,7 @@
         .browse-btn:focus-visible,
         button:focus-visible,
         a:focus-visible {
-            outline: calc(var(--space-1) * 0.75) solid rgba(219, 39, 119, 0.5);
+            outline: calc(var(--space-1) * 0.75) solid var(--color-pink-600-alpha-50);
             outline-offset: calc(var(--space-1) / 2);
         }
 
@@ -3013,18 +3013,18 @@
 
         [data-theme="light"] #my-groups-glass-wrapper::before {
             background: linear-gradient(135deg,
-                rgba(219, 39, 119, 0.08) 0%,
-                rgba(236, 72, 153, 0.08) 25%,
+                var(--color-pink-600-alpha-8) 0%,
+                var(--color-pink-alpha-8) 25%,
                 var(--effect-purple-8) 50%,
                 var(--effect-primary-8) 75%,
-                rgba(168, 85, 247, 0.08) 100%);
+                var(--color-purple-alpha-8) 100%);
             background-size: 400% 400%;
             animation: mgGradientShift 15s ease infinite;
         }
 
         [data-theme="dark"] #my-groups-glass-wrapper::before {
             background: radial-gradient(circle at 20% 30%,
-                rgba(219, 39, 119, 0.15) 0%, transparent 50%),
+                var(--color-pink-600-alpha-15) 0%, transparent 50%),
             radial-gradient(circle at 80% 70%,
                 var(--effect-purple-12) 0%, transparent 50%);
         }
@@ -3082,13 +3082,13 @@
 
         [data-theme="light"] #my-groups-glass-wrapper .quick-action-btn {
             background: var(--effect-white-80);
-            border: 1px solid rgba(219, 39, 119, 0.2);
+            border: 1px solid var(--color-pink-600-alpha-20);
             color: var(--mg-theme);
         }
 
         [data-theme="dark"] #my-groups-glass-wrapper .quick-action-btn {
             background: var(--effect-slate-60);
-            border: 1px solid rgba(219, 39, 119, 0.3);
+            border: 1px solid var(--color-pink-600-alpha-30);
             color: var(--mg-theme-light);
         }
 
@@ -3098,22 +3098,22 @@
         }
 
         [data-theme="light"] #my-groups-glass-wrapper .quick-action-btn:hover {
-            box-shadow: 0 var(--space-2) var(--space-6) rgba(219, 39, 119, 0.15);
+            box-shadow: 0 var(--space-2) var(--space-6) var(--color-pink-600-alpha-15);
         }
 
         [data-theme="dark"] #my-groups-glass-wrapper .quick-action-btn:hover {
-            box-shadow: 0 var(--space-2) var(--space-6) rgba(219, 39, 119, 0.25);
+            box-shadow: 0 var(--space-2) var(--space-6) var(--color-pink-600-alpha-25);
         }
 
         #my-groups-glass-wrapper .quick-action-btn.primary {
             background: linear-gradient(135deg, var(--mg-theme) 0%, var(--mg-theme-light) 100%);
             color: white;
             border: none;
-            box-shadow: 0 var(--space-1) var(--space-4) rgba(219, 39, 119, 0.3);
+            box-shadow: 0 var(--space-1) var(--space-4) var(--color-pink-600-alpha-30);
         }
 
         #my-groups-glass-wrapper .quick-action-btn.primary:hover {
-            box-shadow: 0 var(--space-2) var(--space-6) rgba(219, 39, 119, 0.4);
+            box-shadow: 0 var(--space-2) var(--space-6) var(--color-pink-600-alpha-40);
         }
 
         /* Groups Grid */
@@ -3134,13 +3134,13 @@
 
         [data-theme="light"] #my-groups-glass-wrapper .group-card {
             background: var(--effect-white-75);
-            border: 1px solid rgba(219, 39, 119, 0.15);
-            box-shadow: 0 var(--space-2) var(--space-8) rgba(219, 39, 119, 0.1);
+            border: 1px solid var(--color-pink-600-alpha-15);
+            box-shadow: 0 var(--space-2) var(--space-8) var(--color-pink-600-alpha-10);
         }
 
         [data-theme="dark"] #my-groups-glass-wrapper .group-card {
             background: var(--effect-slate-60);
-            border: 1px solid rgba(219, 39, 119, 0.2);
+            border: 1px solid var(--color-pink-600-alpha-20);
             box-shadow: 0 var(--space-2) var(--space-8) var(--effect-black-30);
         }
 
@@ -3149,13 +3149,13 @@
         }
 
         [data-theme="light"] #my-groups-glass-wrapper .group-card:hover {
-            box-shadow: 0 var(--space-4) var(--space-12) rgba(219, 39, 119, 0.2);
-            border-color: rgba(219, 39, 119, 0.3);
+            box-shadow: 0 var(--space-4) var(--space-12) var(--color-pink-600-alpha-20);
+            border-color: var(--color-pink-600-alpha-30);
         }
 
         [data-theme="dark"] #my-groups-glass-wrapper .group-card:hover {
             box-shadow: 0 var(--space-4) var(--space-12) var(--effect-black-40);
-            border-color: rgba(219, 39, 119, 0.4);
+            border-color: var(--color-pink-600-alpha-40);
         }
 
         /* Card Cover */
@@ -3230,7 +3230,7 @@
             align-items: center;
             justify-content: space-between;
             padding-top: 1rem;
-            border-top: 1px solid rgba(219, 39, 119, 0.1);
+            border-top: 1px solid var(--color-pink-600-alpha-10);
         }
 
         #my-groups-glass-wrapper .member-count {
@@ -3262,7 +3262,7 @@
 
         #my-groups-glass-wrapper .visit-btn:hover {
             transform: translateX(calc(var(--space-1) * 0.75));
-            box-shadow: 0 var(--space-1) var(--space-3) rgba(219, 39, 119, 0.3);
+            box-shadow: 0 var(--space-1) var(--space-3) var(--color-pink-600-alpha-30);
         }
 
         /* Clickable Card Link Wrapper */
@@ -3289,12 +3289,12 @@
 
         [data-theme="light"] #my-groups-glass-wrapper .empty-state {
             background: var(--effect-white-70);
-            border: 1px solid rgba(219, 39, 119, 0.15);
+            border: 1px solid var(--color-pink-600-alpha-15);
         }
 
         [data-theme="dark"] #my-groups-glass-wrapper .empty-state {
             background: var(--effect-slate-60);
-            border: 1px solid rgba(219, 39, 119, 0.2);
+            border: 1px solid var(--color-pink-600-alpha-20);
         }
 
         #my-groups-glass-wrapper .empty-state .empty-icon {
@@ -3326,13 +3326,13 @@
             text-decoration: none;
             background: linear-gradient(135deg, var(--mg-theme) 0%, var(--mg-theme-light) 100%);
             color: white;
-            box-shadow: 0 var(--space-1) var(--space-4) rgba(219, 39, 119, 0.3);
+            box-shadow: 0 var(--space-1) var(--space-4) var(--color-pink-600-alpha-30);
             transition: all 0.3s ease;
         }
 
         #my-groups-glass-wrapper .empty-state .browse-btn:hover {
             transform: translateY(-2px);
-            box-shadow: 0 var(--space-2) var(--space-6) rgba(219, 39, 119, 0.4);
+            box-shadow: 0 var(--space-2) var(--space-6) var(--color-pink-600-alpha-40);
         }
 
         /* Responsive */

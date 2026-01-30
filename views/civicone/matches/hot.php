@@ -9,22 +9,20 @@ $hGradient = 'mt-hero-gradient-accent';
 $hType = 'Matches';
 
 require __DIR__ . '/../../layouts/civicone/header.php';
+require_once __DIR__ . '/../components/govuk/breadcrumbs.php';
 
 $basePath = Nexus\Core\TenantContext::getBasePath();
 $matches = $matches ?? [];
 ?>
 
-<nav class="govuk-breadcrumbs govuk-!-margin-bottom-6" aria-label="Breadcrumb">
-    <ol class="govuk-breadcrumbs__list">
-        <li class="govuk-breadcrumbs__list-item">
-            <a class="govuk-breadcrumbs__link" href="<?= $basePath ?>">Home</a>
-        </li>
-        <li class="govuk-breadcrumbs__list-item">
-            <a class="govuk-breadcrumbs__link" href="<?= $basePath ?>/matches">Matches</a>
-        </li>
-        <li class="govuk-breadcrumbs__list-item" aria-current="page">Hot Matches</li>
-    </ol>
-</nav>
+<?= civicone_govuk_breadcrumbs([
+    'items' => [
+        ['text' => 'Home', 'href' => $basePath],
+        ['text' => 'Matches', 'href' => $basePath . '/matches'],
+        ['text' => 'Hot Matches']
+    ],
+    'class' => 'govuk-!-margin-bottom-6'
+]) ?>
 
 <a href="<?= $basePath ?>/matches" class="govuk-back-link govuk-!-margin-bottom-6">Back to All Matches</a>
 

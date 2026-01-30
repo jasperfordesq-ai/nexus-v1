@@ -5,6 +5,7 @@
  */
 $pageTitle = 'Download Resource';
 require dirname(__DIR__, 2) . '/layouts/civicone/header.php';
+require_once __DIR__ . '/../components/govuk/breadcrumbs.php';
 $basePath = \Nexus\Core\TenantContext::getBasePath();
 
 // Determine file icon
@@ -20,17 +21,14 @@ if (($resource['file_size'] ?? 0) > 1024 * 1024) {
 }
 ?>
 
-<nav class="govuk-breadcrumbs govuk-!-margin-bottom-6" aria-label="Breadcrumb">
-    <ol class="govuk-breadcrumbs__list">
-        <li class="govuk-breadcrumbs__list-item">
-            <a class="govuk-breadcrumbs__link" href="<?= $basePath ?>">Home</a>
-        </li>
-        <li class="govuk-breadcrumbs__list-item">
-            <a class="govuk-breadcrumbs__link" href="<?= $basePath ?>/resources">Resource Library</a>
-        </li>
-        <li class="govuk-breadcrumbs__list-item" aria-current="page">Download</li>
-    </ol>
-</nav>
+<?= civicone_govuk_breadcrumbs([
+    'items' => [
+        ['text' => 'Home', 'href' => $basePath],
+        ['text' => 'Resource Library', 'href' => $basePath . '/resources'],
+        ['text' => 'Download']
+    ],
+    'class' => 'govuk-!-margin-bottom-6'
+]) ?>
 
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds">
