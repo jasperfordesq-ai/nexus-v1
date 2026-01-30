@@ -173,7 +173,6 @@ body {
     width: var(--space-10);
     height: var(--space-10);
     border-radius: var(--radius-lg);
-    border: none;
     display: flex;
     align-items: center;
     justify-content: center;

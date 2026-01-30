@@ -6,39 +6,31 @@ use Nexus\Models\User;
 use Nexus\Models\Listing;
 use Nexus\Models\Group;
 use Nexus\Core\TenantContext;
-use Nexus\Core\ApiAuth;
+use Nexus\Core\Database;
 
-class CoreApiController
+/**
+ * CoreApiController - Core platform API endpoints
+ *
+ * Provides fundamental API endpoints for members, listings, groups,
+ * messages, and notifications.
+ */
+class CoreApiController extends BaseApiController
 {
-    use ApiAuth;
-
-    private function jsonResponse($data, $status = 200)
-    {
-        header('Content-Type: application/json');
-        http_response_code($status);
-        echo json_encode($data);
-        exit;
-    }
-
-    private function getUserId()
-    {
-        // Use unified auth that supports both session and Bearer token
-        return $this->requireAuth();
-    }
-
     // /api/members
     // Backward compatible: Returns all members when no parameters
     // Enhanced: Supports search with ?q=query and ?active=true
     public function members()
     {
         $this->getUserId();
-        $db = \Nexus\Core\Database::getConnection();
+        $this->rateLimit('members', 60, 60);
 
-        $tenantId = TenantContext::getId();
-        $query = isset($_GET['q']) ? trim($_GET['q']) : '';
-        $activeOnly = isset($_GET['active']) && $_GET['active'] === 'true';
-        $limit = min(500, max(1, (int) ($_GET['limit'] ?? 100)));
-        $offset = max(0, (int) ($_GET['offset'] ?? 0));
+        $db = Database::getConnection();
+        $tenantId = $this->getTenantId();
+
+        $query = trim($this->query('q', ''));
+        $activeOnly = $this->query('active') === 'true';
+        $limit = $this->queryInt('limit', 100, 1, 500);
+        $offset = $this->queryInt('offset', 0, 0);
 
         // Base query - IMPORTANT: Always include last_active_at for "Active Now" filtering
         // Only show members with avatars (consistent with User::count() and directory policy)
@@ -78,7 +70,6 @@ class CoreApiController
             $members = $stmt->fetchAll();
 
             // Get total count for pagination (without LIMIT)
-            // Only count members with avatars (consistent with User::count())
             $countSql = "SELECT COUNT(*) FROM users WHERE tenant_id = ? AND avatar_url IS NOT NULL AND LENGTH(avatar_url) > 0";
             $countParams = [$tenantId];
 
@@ -97,25 +88,15 @@ class CoreApiController
 
             $countStmt = $db->prepare($countSql);
             $countStmt->execute($countParams);
-            $totalCount = $countStmt->fetchColumn();
+            $totalCount = (int) $countStmt->fetchColumn();
 
-            // Enhanced response format (backward compatible)
-            $this->jsonResponse([
-                'data' => $members,
-                'meta' => [
-                    'total' => (int)$totalCount,
-                    'showing' => count($members),
-                    'limit' => $limit,
-                    'offset' => $offset
-                ]
-            ]);
+            // Use standardized paginated response
+            $page = ($offset / $limit) + 1;
+            $this->paginated($members, $totalCount, $page, $limit);
 
         } catch (\Exception $e) {
             error_log("Members API error: " . $e->getMessage());
-            $this->jsonResponse([
-                'error' => 'Failed to retrieve members',
-                'message' => 'An error occurred while searching members'
-            ], 500);
+            $this->error('Failed to retrieve members', 500, 'SERVER_ERROR');
         }
     }
 
@@ -123,76 +104,84 @@ class CoreApiController
     public function listings()
     {
         $this->getUserId();
-        $db = \Nexus\Core\Database::getConnection();
-        // Fix: Generic SELECT * is risky. Let's assume schema matches or we fix later.
-        // If listings has 'image_url', alias it.
-        // Safe Check:
+        $this->rateLimit('listings', 60, 60);
+
+        $db = Database::getConnection();
         $stmt = $db->prepare("SELECT id, title, description, price, type, created_at, image_url as image, user_id FROM listings WHERE tenant_id = ? ORDER BY created_at DESC");
-        $stmt->execute([TenantContext::getId()]);
+        $stmt->execute([$this->getTenantId()]);
         $listings = $stmt->fetchAll();
-        $this->jsonResponse(['data' => $listings]);
+
+        $this->success($listings);
     }
 
     // /api/groups
     public function groups()
     {
         $this->getUserId();
-        $db = \Nexus\Core\Database::getConnection();
-        // Fix: Group image alias
+        $this->rateLimit('groups', 60, 60);
+
+        $db = Database::getConnection();
         $stmt = $db->prepare("SELECT id, name, description, image_url as image FROM groups WHERE tenant_id = ?");
-        $stmt->execute([TenantContext::getId()]);
+        $stmt->execute([$this->getTenantId()]);
         $groups = $stmt->fetchAll();
+
         foreach ($groups as &$g) {
             $g['members'] = $db->query("SELECT COUNT(*) FROM group_members WHERE group_id = ?", [$g['id']])->fetchColumn();
         }
-        $this->jsonResponse(['data' => $groups]);
+
+        $this->success($groups);
     }
 
     // /api/messages
     public function messages()
     {
         $userId = $this->getUserId();
-        $db = \Nexus\Core\Database::getConnection();
-        // Fix: Sender matches User model, so avatar_url -> sender_avatar
+        $this->rateLimit('messages', 60, 60);
+
+        $db = Database::getConnection();
         $stmt = $db->prepare("
-            SELECT m.*, u.name as sender_name, u.avatar_url as sender_avatar 
-            FROM messages m 
-            JOIN users u ON m.sender_id = u.id 
-            WHERE m.recipient_id = ? 
-            GROUP BY m.sender_id 
+            SELECT m.*, u.name as sender_name, u.avatar_url as sender_avatar
+            FROM messages m
+            JOIN users u ON m.sender_id = u.id
+            WHERE m.recipient_id = ?
+            GROUP BY m.sender_id
             ORDER BY m.created_at DESC
         ");
         $stmt->execute([$userId]);
         $messages = $stmt->fetchAll();
-        $this->jsonResponse(['data' => $messages]);
+
+        $this->success($messages);
     }
 
     // /api/notifications
     public function notifications()
     {
         $userId = $this->getUserId();
-        $db = \Nexus\Core\Database::getConnection();
+        $this->rateLimit('notifications', 120, 60);
+
+        $db = Database::getConnection();
         $stmt = $db->prepare("SELECT * FROM notifications WHERE user_id = ? ORDER BY created_at DESC LIMIT 50");
         $stmt->execute([$userId]);
         $notifs = $stmt->fetchAll();
-        $this->jsonResponse(['data' => $notifs]);
+
+        $this->success($notifs);
     }
 
     // /api/notifications/check (Polling)
     public function checkNotifications()
     {
         $userId = $this->getUserId();
-        // Use the Model if available, or direct query
-        // Model was audited in Step 14605: Nexus\Models\Notification::countUnread($userId)
-        $count = \Nexus\Models\Notification::countUnread($userId);
+        $this->rateLimit('check_notifications', 120, 60);
 
-        $this->jsonResponse(['unread_count' => $count]);
+        $count = \Nexus\Models\Notification::countUnread($userId);
+        $this->success(['unread_count' => $count]);
     }
 
     // /api/notifications/unread-count (For badge updates)
     public function unreadCount()
     {
         $userId = $this->getUserId();
+        $this->rateLimit('unread_count', 120, 60);
 
         // Get unread messages count
         $messagesCount = 0;
@@ -212,43 +201,50 @@ class CoreApiController
         // Get unread notifications count
         $notificationsCount = \Nexus\Models\Notification::countUnread($userId);
 
-        $this->jsonResponse([
+        $this->success([
             'messages' => $messagesCount,
             'notifications' => $notificationsCount,
             'total' => $messagesCount + $notificationsCount
         ]);
     }
+
     // /api/notifications/read
     public function markRead()
     {
         $userId = $this->getUserId();
-        $input = json_decode(file_get_contents('php://input'), true);
-        $db = \Nexus\Core\Database::getConnection();
+        $this->verifyCsrf();
 
-        if (isset($input['all']) && $input['all'] === true) {
+        $db = Database::getConnection();
+
+        if ($this->inputBool('all')) {
             $stmt = $db->prepare("UPDATE notifications SET is_read = 1 WHERE user_id = ?");
             $stmt->execute([$userId]);
-            $this->jsonResponse(['success' => true, 'message' => 'All marked read']);
-        } elseif (isset($input['id'])) {
-            $stmt = $db->prepare("UPDATE notifications SET is_read = 1 WHERE id = ? AND user_id = ?");
-            $stmt->execute([$input['id'], $userId]);
-            $this->jsonResponse(['success' => true, 'message' => 'Marked read']);
+            $this->success(['message' => 'All marked read']);
         }
 
-        $this->jsonResponse(['error' => 'Invalid request'], 400);
+        $id = $this->inputInt('id');
+        if ($id) {
+            $stmt = $db->prepare("UPDATE notifications SET is_read = 1 WHERE id = ? AND user_id = ?");
+            $stmt->execute([$id, $userId]);
+            $this->success(['message' => 'Marked read']);
+        }
+
+        $this->error('Invalid request', 400, 'VALIDATION_ERROR');
     }
 
     // /api/messages/poll - Polling fallback for real-time chat
     public function pollMessages()
     {
         $userId = $this->getUserId();
-        $db = \Nexus\Core\Database::getConnection();
+        $this->rateLimit('poll_messages', 120, 60);
 
-        $otherUserId = isset($_GET['other_user_id']) ? (int)$_GET['other_user_id'] : 0;
-        $afterId = isset($_GET['after']) ? (int)$_GET['after'] : 0;
+        $db = Database::getConnection();
+
+        $otherUserId = $this->queryInt('other_user_id', 0, 1);
+        $afterId = $this->queryInt('after', 0, 0);
 
         if (!$otherUserId) {
-            $this->jsonResponse(['error' => 'Missing other_user_id'], 400);
+            $this->error('Missing other_user_id', 400, 'VALIDATION_ERROR');
         }
 
         // Get new messages between these two users after the given ID
@@ -270,13 +266,14 @@ class CoreApiController
         $stmt->execute($params);
         $messages = $stmt->fetchAll(\PDO::FETCH_ASSOC);
 
-        $this->jsonResponse(['messages' => $messages]);
+        $this->success($messages);
     }
 
     // /api/messages/unread-count - Get unread message count
     public function unreadMessagesCount()
     {
         $userId = $this->getUserId();
+        $this->rateLimit('unread_messages', 120, 60);
 
         $count = 0;
         try {
@@ -292,38 +289,35 @@ class CoreApiController
             $count = 0;
         }
 
-        $this->jsonResponse(['count' => $count]);
+        $this->success(['count' => $count]);
     }
 
     // /api/messages/send - Send a message via AJAX (for real-time chat)
     public function sendMessage()
     {
         $userId = $this->getUserId();
-        $db = \Nexus\Core\Database::getConnection();
+        $this->verifyCsrf();
+        $this->rateLimit('send_message', 30, 60);
 
-        // Get JSON body or form data
-        $input = json_decode(file_get_contents('php://input'), true);
-        if (!$input) {
-            $input = $_POST;
-        }
+        $db = Database::getConnection();
 
-        $receiverId = isset($input['receiver_id']) ? (int)$input['receiver_id'] : 0;
-        $body = isset($input['body']) ? trim($input['body']) : '';
+        $receiverId = $this->inputInt('receiver_id', 0, 1);
+        $body = trim($this->input('body', ''));
 
         if (!$receiverId) {
-            $this->jsonResponse(['error' => 'Missing receiver_id'], 400);
+            $this->error('Missing receiver_id', 400, 'VALIDATION_ERROR');
         }
 
         if (empty($body)) {
-            $this->jsonResponse(['error' => 'Message body is required'], 400);
+            $this->error('Message body is required', 400, 'VALIDATION_ERROR');
         }
 
         // Don't allow messaging yourself
         if ($receiverId === $userId) {
-            $this->jsonResponse(['error' => 'Cannot send message to yourself'], 400);
+            $this->error('Cannot send message to yourself', 400, 'VALIDATION_ERROR');
         }
 
-        $tenantId = TenantContext::getId();
+        $tenantId = $this->getTenantId();
 
         try {
             // Insert message
@@ -344,7 +338,6 @@ class CoreApiController
                 try {
                     \Nexus\Services\RealtimeService::broadcastMessage($userId, $receiverId, $message);
                 } catch (\Exception $e) {
-                    // Pusher failed, but message was saved - continue
                     error_log("Pusher notification failed: " . $e->getMessage());
                 }
             }
@@ -364,18 +357,14 @@ class CoreApiController
                     );
                 }
             } catch (\Exception $e) {
-                // Notification failed but message was saved
                 error_log("Message notification failed: " . $e->getMessage());
             }
 
-            $this->jsonResponse([
-                'success' => true,
-                'message' => $message
-            ]);
+            $this->created(['message' => $message]);
 
         } catch (\Exception $e) {
             error_log("Send message error: " . $e->getMessage());
-            $this->jsonResponse(['error' => 'Failed to send message'], 500);
+            $this->error('Failed to send message', 500, 'SERVER_ERROR');
         }
     }
 
@@ -383,32 +372,26 @@ class CoreApiController
     public function typing()
     {
         $userId = $this->getUserId();
+        $this->rateLimit('typing', 60, 60);
 
-        // Get JSON body or form data
-        $input = json_decode(file_get_contents('php://input'), true);
-        if (!$input) {
-            $input = $_POST;
-        }
-
-        $receiverId = isset($input['receiver_id']) ? (int)$input['receiver_id'] : 0;
+        $receiverId = $this->inputInt('receiver_id', 0, 1);
 
         if (!$receiverId) {
-            $this->jsonResponse(['error' => 'Missing receiver_id'], 400);
+            $this->error('Missing receiver_id', 400, 'VALIDATION_ERROR');
         }
 
         // Trigger Pusher typing event if available
         if (class_exists('Nexus\Services\RealtimeService')) {
             try {
                 \Nexus\Services\RealtimeService::broadcastTyping($userId, $receiverId, true);
-                $this->jsonResponse(['success' => true]);
+                $this->success(['note' => 'Typing broadcast']);
             } catch (\Exception $e) {
-                // Pusher failed - not critical
                 error_log("Pusher typing notification failed: " . $e->getMessage());
-                $this->jsonResponse(['success' => true, 'note' => 'Realtime disabled']);
+                $this->success(['note' => 'Realtime disabled']);
             }
         }
 
         // No Pusher - just acknowledge
-        $this->jsonResponse(['success' => true, 'note' => 'Realtime not configured']);
+        $this->success(['note' => 'Realtime not configured']);
     }
 }

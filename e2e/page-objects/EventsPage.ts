@@ -22,11 +22,12 @@ export class EventsPage extends BasePage {
     this.calendarView = page.locator('.calendar-view, .fc, [data-view="calendar"], .fullcalendar, .fc-daygrid');
     this.listView = page.locator('.list-view, [data-view="list"], .events-list, #eventsGrid');
     // Create event button - can be /compose?type=event or /events/create or "Host Event" text
-    this.createEventButton = page.locator('a[href*="compose?type=event"], a[href*="events/create"], .create-event-btn, a:has-text("Host Event"), a:has-text("Create Event"), .nexus-smart-btn:has-text("Host")');
+    this.createEventButton = page.locator('a[href*="compose?type=event"], a[href*="events/create"], .create-event-btn').first();
     this.filterButtons = page.locator('.filter-btn, [data-filter], .tab-btn, .nexus-smart-btn');
-    this.searchInput = page.locator('.glass-search-input, input[type="search"], input[name="search"], input[name="q"], input[placeholder*="Search"]');
-    this.categoryFilter = page.locator('#event-category-filter, select[name="category"], select[name="category_id"], .glass-select');
-    this.dateFilter = page.locator('#event-date-filter, select[name="date"], input[name="date"], input[type="date"], [data-date-filter]');
+    // Search input - the form has input[type="search"][name="search"] with class glass-search-input
+    this.searchInput = page.locator('input[type="search"][name="search"], input.glass-search-input, input[name="search"]').first();
+    this.categoryFilter = page.locator('#event-category-filter, select[name="category"], select[name="category_id"], .glass-select').first();
+    this.dateFilter = page.locator('#event-date-filter, select[name="date"], input[name="date"], input[type="date"], [data-date-filter]').first();
     this.noEventsMessage = page.locator('.glass-empty-state, .no-events, .empty-state, .no-results');
   }
 
@@ -97,6 +98,20 @@ export class EventsPage extends BasePage {
   async getEventTitles(): Promise<string[]> {
     const titles = await this.eventCards.locator('.event-title, h3, h4').allTextContents();
     return titles.map(t => t.trim());
+  }
+
+  /**
+   * Check if search is available
+   */
+  async hasSearch(): Promise<boolean> {
+    return await this.searchInput.count() > 0;
+  }
+
+  /**
+   * Check if create button is available
+   */
+  async hasCreateButton(): Promise<boolean> {
+    return await this.createEventButton.count() > 0;
   }
 }
 
@@ -196,6 +211,14 @@ export class CreateEventPage extends BasePage {
   async submit(): Promise<void> {
     await this.submitButton.click();
     await this.page.waitForLoadState('domcontentloaded');
+  }
+
+  /**
+   * Check if form has errors
+   */
+  async hasErrors(): Promise<boolean> {
+    const errorMessage = this.page.locator('.error, .alert-danger, .form-error, .validation-error, .govuk-error-message');
+    return await errorMessage.count() > 0;
   }
 }
 

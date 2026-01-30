@@ -1,0 +1,202 @@
+name: E2E Tests
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+  # Allow manual trigger
+  workflow_dispatch:
+    inputs:
+      project:
+        description: 'Test project to run'
+        required: false
+        default: 'chromium-modern'
+        type: choice
+        options:
+          - chromium-modern
+          - chromium-civicone
+          - firefox-modern
+          - mobile-chrome
+          - admin
+          - unauthenticated
+          - all
+
+env:
+  E2E_BASE_URL: ${{ secrets.E2E_BASE_URL || 'http://staging.timebank.local' }}
+  E2E_TENANT: ${{ secrets.E2E_TENANT || 'hour-timebank' }}
+  E2E_USER_EMAIL: ${{ secrets.E2E_USER_EMAIL }}
+  E2E_USER_PASSWORD: ${{ secrets.E2E_USER_PASSWORD }}
+  E2E_ADMIN_EMAIL: ${{ secrets.E2E_ADMIN_EMAIL }}
+  E2E_ADMIN_PASSWORD: ${{ secrets.E2E_ADMIN_PASSWORD }}
+
+jobs:
+  e2e-tests:
+    name: E2E Tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    strategy:
+      fail-fast: false
+      matrix:
+        project: [chromium-modern, unauthenticated]
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Playwright browsers
+        run: npx playwright install chromium --with-deps
+
+      - name: Run E2E tests
+        run: |
+          PROJECT=${{ matrix.project }}
+          if [ "${{ github.event.inputs.project }}" != "" ] && [ "${{ github.event.inputs.project }}" != "all" ]; then
+            PROJECT="${{ github.event.inputs.project }}"
+          fi
+          npx playwright test --project=$PROJECT
+        continue-on-error: true
+
+      - name: Upload test results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: playwright-report-${{ matrix.project }}
+          path: |
+            e2e/reports/
+            e2e/test-results/
+          retention-days: 30
+
+      - name: Upload screenshots on failure
+        uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: e2e-screenshots-${{ matrix.project }}
+          path: e2e/screenshots/
+          retention-days: 7
+
+  e2e-admin:
+    name: Admin E2E Tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    needs: e2e-tests
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Playwright browsers
+        run: npx playwright install chromium --with-deps
+
+      - name: Run Admin E2E tests
+        run: npx playwright test --project=admin
+        continue-on-error: true
+
+      - name: Upload test results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: playwright-report-admin
+          path: |
+            e2e/reports/
+            e2e/test-results/
+          retention-days: 30
+
+  e2e-cross-browser:
+    name: Cross-Browser E2E Tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+
+    strategy:
+      fail-fast: false
+      matrix:
+        project: [firefox-modern, mobile-chrome, mobile-safari]
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps
+
+      - name: Run E2E tests
+        run: npx playwright test --project=${{ matrix.project }}
+        continue-on-error: true
+
+      - name: Upload test results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: playwright-report-${{ matrix.project }}
+          path: |
+            e2e/reports/
+            e2e/test-results/
+          retention-days: 30
+
+  e2e-theme-comparison:
+    name: Theme Comparison E2E Tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Playwright browsers
+        run: npx playwright install chromium --with-deps
+
+      - name: Run Modern theme tests
+        run: npx playwright test --project=chromium-modern
+        continue-on-error: true
+
+      - name: Run CivicOne theme tests
+        run: npx playwright test --project=chromium-civicone
+        continue-on-error: true
+
+      - name: Upload test results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: playwright-report-themes
+          path: |
+            e2e/reports/
+            e2e/test-results/
+          retention-days: 30

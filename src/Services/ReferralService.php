@@ -153,19 +153,31 @@ class ReferralService
             return false;
         }
 
-        // Record the referral
-        Database::query(
-            "INSERT INTO referral_tracking (tenant_id, referrer_id, referred_id, status, created_at)
-             VALUES (?, ?, ?, 'pending', NOW())",
-            [$tenantId, $referrerId, $newUserId]
-        );
+        // Use transaction for the critical database operations
+        Database::beginTransaction();
 
-        // Update referred user's record
-        Database::query(
-            "UPDATE users SET referred_by = ? WHERE id = ?",
-            [$referrerId, $newUserId]
-        );
+        try {
+            // Record the referral
+            Database::query(
+                "INSERT INTO referral_tracking (tenant_id, referrer_id, referred_id, status, created_at)
+                 VALUES (?, ?, ?, 'pending', NOW())",
+                [$tenantId, $referrerId, $newUserId]
+            );
 
+            // Update referred user's record
+            Database::query(
+                "UPDATE users SET referred_by = ? WHERE id = ?",
+                [$referrerId, $newUserId]
+            );
+
+            Database::commit();
+        } catch (\Throwable $e) {
+            Database::rollback();
+            error_log("ReferralService::trackReferral error: " . $e->getMessage());
+            return false;
+        }
+
+        // Non-critical operations outside transaction
         // Award signup XP to referrer
         GamificationService::awardXP(
             $referrerId,
@@ -203,13 +215,13 @@ class ReferralService
             return false;
         }
 
-        // Update status
+        // Update status (single operation, transaction not strictly needed but keeping for consistency)
         Database::query(
             "UPDATE referral_tracking SET status = 'active', activated_at = NOW() WHERE id = ?",
             [$referral['id']]
         );
 
-        // Award XP to referrer
+        // Non-critical operations - Award XP to referrer
         GamificationService::awardXP(
             $referral['referrer_id'],
             self::REFERRAL_XP['active'],

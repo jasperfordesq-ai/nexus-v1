@@ -155,35 +155,47 @@ class XPShopService
             return ['success' => false, 'error' => $reason ?? 'Cannot purchase'];
         }
 
-        // Deduct XP
-        Database::query(
-            "UPDATE users SET xp = xp - ? WHERE id = ? AND xp >= ?",
-            [$item['xp_cost'], $userId, $item['xp_cost']]
-        );
+        // Use transaction to ensure atomicity of XP deduction and purchase recording
+        Database::beginTransaction();
 
-        // Check if XP was actually deducted
-        $affected = Database::getInstance()->rowCount ?? 1; // Fallback
-        if ($affected == 0) {
-            return ['success' => false, 'error' => 'Not enough XP'];
+        try {
+            // Deduct XP
+            Database::query(
+                "UPDATE users SET xp = xp - ? WHERE id = ? AND xp >= ?",
+                [$item['xp_cost'], $userId, $item['xp_cost']]
+            );
+
+            // Check if XP was actually deducted
+            $affected = Database::getInstance()->rowCount ?? 1; // Fallback
+            if ($affected == 0) {
+                Database::rollback();
+                return ['success' => false, 'error' => 'Not enough XP'];
+            }
+
+            // Record purchase
+            $expiresAt = null;
+            if ($item['item_type'] === 'perk') {
+                // Perks expire in 30 days by default
+                $expiresAt = date('Y-m-d H:i:s', strtotime('+30 days'));
+            }
+
+            Database::query(
+                "INSERT INTO user_xp_purchases (tenant_id, user_id, item_id, xp_spent, expires_at)
+                 VALUES (?, ?, ?, ?, ?)",
+                [$tenantId, $userId, $itemId, $item['xp_cost'], $expiresAt]
+            );
+
+            Database::commit();
+        } catch (\Throwable $e) {
+            Database::rollback();
+            error_log("XPShopService::purchase error: " . $e->getMessage());
+            return ['success' => false, 'error' => 'Purchase failed'];
         }
 
-        // Record purchase
-        $expiresAt = null;
-        if ($item['item_type'] === 'perk') {
-            // Perks expire in 30 days by default
-            $expiresAt = date('Y-m-d H:i:s', strtotime('+30 days'));
-        }
-
-        Database::query(
-            "INSERT INTO user_xp_purchases (tenant_id, user_id, item_id, xp_spent, expires_at)
-             VALUES (?, ?, ?, ?, ?)",
-            [$tenantId, $userId, $itemId, $item['xp_cost'], $expiresAt]
-        );
-
-        // Apply item effect
+        // Apply item effect (outside transaction - non-critical)
         self::applyItemEffect($userId, $item);
 
-        // Send notification
+        // Send notification (outside transaction - non-critical)
         $basePath = TenantContext::getBasePath();
         Notification::create(
             $userId,

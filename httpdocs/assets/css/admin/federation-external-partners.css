@@ -116,7 +116,7 @@
 }
 
 .permission-item:hover {
-    background: rgba(139, 92, 246, 0.1);
+    background: var(--color-purple-alpha-10, rgba(139, 92, 246, 0.1));
 }
 
 .permission-item input[type="checkbox"] {
@@ -155,13 +155,13 @@
 }
 
 .federation-partners-page .btn-primary {
-    background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+    background: linear-gradient(135deg, var(--color-purple-500), var(--color-purple-600));
     color: white;
 }
 
 .federation-partners-page .btn-primary:hover {
     transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(139, 92, 246, 0.4);
+    box-shadow: 0 4px 12px var(--color-purple-alpha-40, rgba(139, 92, 246, 0.4));
 }
 
 .federation-partners-page .btn-secondary {
@@ -180,7 +180,7 @@
     border-radius: 8px;
     padding: 1rem;
     margin-bottom: 1.5rem;
-    color: #60a5fa;
+    color: var(--color-blue-400);
     font-size: 0.9rem;
     display: flex;
     align-items: flex-start;
@@ -222,7 +222,7 @@
     align-items: center;
     gap: 0.5rem;
     padding: 0.75rem 1.25rem;
-    background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+    background: linear-gradient(135deg, var(--color-purple-500), var(--color-purple-600));
     border: none;
     border-radius: 10px;
     color: white;
@@ -233,7 +233,7 @@
 
 .add-partner-btn:hover {
     transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(139, 92, 246, 0.4);
+    box-shadow: 0 4px 12px var(--color-purple-alpha-40, rgba(139, 92, 246, 0.4));
 }
 
 /* Partner Cards Grid */
@@ -252,7 +252,7 @@
 }
 
 .partner-card:hover {
-    border-color: rgba(139, 92, 246, 0.3);
+    border-color: var(--color-purple-alpha-30, rgba(139, 92, 246, 0.3));
     transform: translateY(-2px);
 }
 
@@ -326,13 +326,13 @@
     font-size: 0.7rem;
     padding: 0.2rem 0.5rem;
     background: rgba(59, 130, 246, 0.15);
-    color: #3b82f6;
+    color: var(--color-blue-500);
     border-radius: 4px;
 }
 
 .perm-badge.disabled {
     background: rgba(100, 116, 139, 0.15);
-    color: #64748b;
+    color: var(--color-slate-500);
     text-decoration: line-through;
 }
 
@@ -358,12 +358,12 @@
 
 .partner-action-btn.view {
     background: rgba(59, 130, 246, 0.15);
-    color: #3b82f6;
+    color: var(--color-blue-500);
 }
 
 .partner-action-btn.test {
     background: rgba(16, 185, 129, 0.15);
-    color: #10b981;
+    color: var(--color-success, #10b981);
 }
 
 .partner-action-btn:hover {
@@ -410,7 +410,7 @@
 }
 
 .info-box h4 {
-    color: #3b82f6;
+    color: var(--color-blue-500);
     font-size: 0.95rem;
     font-weight: 600;
     margin: 0 0 0.5rem;
@@ -439,13 +439,13 @@
 .federation-partners-page .flash-message.success {
     background: rgba(16, 185, 129, 0.15);
     border: 1px solid rgba(16, 185, 129, 0.3);
-    color: #10b981;
+    color: var(--color-success, #10b981);
 }
 
 .federation-partners-page .flash-message.error {
     background: rgba(239, 68, 68, 0.15);
     border: 1px solid rgba(239, 68, 68, 0.3);
-    color: #ef4444;
+    color: var(--color-error, #ef4444);
 }
 
 /* ============================================
@@ -508,22 +508,22 @@
 
 .action-btn.test {
     background: rgba(16, 185, 129, 0.15);
-    color: #10b981;
+    color: var(--color-success, #10b981);
 }
 
 .action-btn.suspend {
     background: rgba(245, 158, 11, 0.15);
-    color: #f59e0b;
+    color: var(--color-amber-500);
 }
 
 .action-btn.activate {
     background: rgba(16, 185, 129, 0.15);
-    color: #10b981;
+    color: var(--color-success, #10b981);
 }
 
 .action-btn.delete {
     background: rgba(239, 68, 68, 0.15);
-    color: #ef4444;
+    color: var(--color-error, #ef4444);
 }
 
 .action-btn:hover {
@@ -573,7 +573,7 @@
 }
 
 .logs-table tr:hover {
-    background: rgba(139, 92, 246, 0.05);
+    background: var(--color-purple-alpha-5, rgba(139, 92, 246, 0.05));
 }
 
 .log-method {
@@ -585,12 +585,12 @@
 
 .log-method.GET {
     background: rgba(59, 130, 246, 0.2);
-    color: #3b82f6;
+    color: var(--color-blue-500);
 }
 
 .log-method.POST {
     background: rgba(16, 185, 129, 0.2);
-    color: #10b981;
+    color: var(--color-success, #10b981);
 }
 
 .log-endpoint {
@@ -608,11 +608,11 @@
 }
 
 .log-status.success {
-    color: #10b981;
+    color: var(--color-success, #10b981);
 }
 
 .log-status.error {
-    color: #ef4444;
+    color: var(--color-error, #ef4444);
 }
 
 .log-time {
@@ -630,7 +630,7 @@
 }
 
 .error-display h4 {
-    color: #ef4444;
+    color: var(--color-error, #ef4444);
     font-size: 0.9rem;
     margin: 0 0 0.5rem;
 }

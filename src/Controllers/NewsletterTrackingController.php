@@ -129,10 +129,54 @@ class NewsletterTrackingController
             if (!$url || !filter_var($url, FILTER_VALIDATE_URL)) {
                 return null;
             }
+
+            // Security: Validate URL is safe to redirect to (prevent open redirect attacks)
+            if (!$this->isUrlSafeForRedirect($url)) {
+                return null;
+            }
+
             return $url;
         } catch (\Exception $e) {
             return null;
         }
+    }
+
+    /**
+     * Check if URL is safe to redirect to (prevent open redirect attacks)
+     * Only allows internal URLs or whitelisted external domains
+     */
+    private function isUrlSafeForRedirect($url)
+    {
+        $parsedUrl = parse_url($url);
+        if (!$parsedUrl || !isset($parsedUrl['host'])) {
+            return false;
+        }
+
+        $host = strtolower($parsedUrl['host']);
+
+        // Allow internal domains
+        $internalDomains = [
+            'project-nexus.ie',
+            'hour-timebank.ie',
+            'staging.timebank.local',
+            'localhost',
+        ];
+
+        foreach ($internalDomains as $domain) {
+            if ($host === $domain || str_ends_with($host, '.' . $domain)) {
+                return true;
+            }
+        }
+
+        // Block javascript: and data: URLs
+        $scheme = strtolower($parsedUrl['scheme'] ?? '');
+        if (!in_array($scheme, ['http', 'https'])) {
+            return false;
+        }
+
+        // Allow any HTTPS URL (newsletter links may point to external sites legitimately)
+        // This is a trade-off: newsletters often link externally
+        return $scheme === 'https';
     }
 
     /**

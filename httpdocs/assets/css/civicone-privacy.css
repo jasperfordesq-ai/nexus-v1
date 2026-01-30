@@ -70,7 +70,6 @@
     #privacy-wrapper .privacy-page-header p {
         color: var(--civicone-text-muted);
         font-size: var(--font-size-lg);
-        margin: 0;
         max-width: 600px;
         margin: 0 auto;
     }

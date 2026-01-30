@@ -4,7 +4,6 @@ namespace Nexus\Controllers\Api;
 
 use Nexus\Core\Database;
 use Nexus\Core\TenantContext;
-use Nexus\Core\ApiAuth;
 use Nexus\Services\CommentService;
 use Nexus\Services\SocialNotificationService;
 use Nexus\Models\FeedPost;
@@ -31,12 +30,13 @@ use Nexus\Models\FeedPost;
  * - POST /api/social/mention-search - Search users for @mention
  * - POST /api/social/feed          - Load feed items (pagination)
  *
+ * Refactored 2026-01-30: Now extends BaseApiController to eliminate code duplication
+ * Methods inherited from BaseApiController: jsonResponse, input, verifyCsrf, getUserId, getTenantId
+ *
  * @package Nexus\Modules\Social
  */
-class SocialApiController
+class SocialApiController extends BaseApiController
 {
-    use ApiAuth;
-
     // ============================================
     // DEBUG TEST ENDPOINT
     // ============================================
@@ -54,10 +54,7 @@ class SocialApiController
 
         // SECURITY: Require admin authentication for debug endpoints
         if (empty($_SESSION['user_role']) || !in_array($_SESSION['user_role'], ['admin', 'super_admin'])) {
-            header('Content-Type: application/json');
-            http_response_code(403);
-            echo json_encode(['error' => 'Access denied. Admin authentication required.']);
-            exit;
+            $this->error('Access denied. Admin authentication required.', 403);
         }
 
         $debug = [
@@ -73,81 +70,25 @@ class SocialApiController
             $debug['likes_error'] = 'Database error';
         }
 
-        header('Content-Type: application/json');
-        echo json_encode($debug, JSON_PRETTY_PRINT);
-        exit;
+        $this->jsonResponse($debug);
     }
 
     // ============================================
-    // UTILITY METHODS
+    // UTILITY METHODS (local helpers)
     // ============================================
 
-    private $inputData = null;
-
     /**
-     * Get input data from either JSON body or POST
+     * Get input value - wrapper for BaseApiController::input()
+     * Kept for backward compatibility with existing code
      */
     private function getInput($key, $default = null)
     {
-        // Parse JSON input once
-        if ($this->inputData === null) {
-            // Check multiple possible header keys for Content-Type
-            $contentType = $_SERVER['CONTENT_TYPE']
-                ?? $_SERVER['HTTP_CONTENT_TYPE']
-                ?? ($_SERVER['HTTP_CONTENT_TYPE'] ?? '');
-
-            // Also try to detect JSON by checking the raw body
-            $rawBody = file_get_contents('php://input');
-
-            if (strpos($contentType, 'application/json') !== false ||
-                (strlen($rawBody) > 0 && $rawBody[0] === '{')) {
-                $this->inputData = json_decode($rawBody, true) ?? [];
-            } else {
-                $this->inputData = $_POST;
-            }
-        }
-        return $this->inputData[$key] ?? $default;
-    }
-
-    private function jsonResponse($data, $status = 200)
-    {
-        header('Content-Type: application/json');
-        http_response_code($status);
-        echo json_encode($data);
-        exit;
+        return $this->input($key, $default);
     }
 
     /**
-     * Verify CSRF token for session-based requests (not token-based API calls)
+     * Check if current user is super admin
      */
-    private function verifyCsrf()
-    {
-        // Skip CSRF check for Bearer token authentication (API clients)
-        if (!empty($_SERVER['HTTP_AUTHORIZATION']) && strpos($_SERVER['HTTP_AUTHORIZATION'], 'Bearer ') === 0) {
-            return;
-        }
-        // For session-based requests, verify CSRF token
-        \Nexus\Core\Csrf::verifyOrDieJson();
-    }
-
-    private function getUserId($required = true)
-    {
-        // Use unified auth supporting both session and Bearer token
-        $userId = $this->getAuthenticatedUserId();
-        if (!$userId) {
-            if ($required) {
-                $this->jsonResponse(['error' => 'Login required'], 401);
-            }
-            return 0;
-        }
-        return $userId;
-    }
-
-    private function getTenantId()
-    {
-        return TenantContext::get()['id'] ?? ($_SESSION['current_tenant_id'] ?? 1);
-    }
-
     private function isSuperAdmin()
     {
         // Check both old and new session key names for compatibility

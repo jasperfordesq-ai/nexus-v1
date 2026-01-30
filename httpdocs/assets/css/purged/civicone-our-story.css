@@ -260,7 +260,6 @@
         color: var(--civicone-text-muted);
         font-size: var(--font-size-lg);
         line-height: 1.7;
-        margin: 0;
         max-width: 600px;
         margin: 0 auto;
     }

@@ -246,7 +246,7 @@ class AdminAuth
         }
 
         header('HTTP/1.0 403 Forbidden');
-        $basePath = TenantContext::getBasePath();
+        $basePath = htmlspecialchars(TenantContext::getBasePath(), ENT_QUOTES, 'UTF-8');
         echo "<h1>403 Forbidden</h1><p>You do not have permission to access this area.</p><a href='{$basePath}/dashboard'>Go Home</a>";
         exit;
     }

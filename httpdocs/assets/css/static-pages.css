@@ -1505,7 +1505,6 @@
             width: 40px;
             height: 40px;
             border-radius: var(--radius-md);
-            border: none;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -2435,7 +2434,6 @@
 #privacy-glass-wrapper .privacy-page-header p {
     color: var(--htb-text-muted);
     font-size: var(--font-size-lg);
-    margin: 0;
     max-width: 600px;
     margin: 0 auto;
 }
@@ -3054,7 +3052,6 @@
 #terms-glass-wrapper .terms-page-header p {
     color: var(--htb-text-muted);
     font-size: var(--font-size-lg);
-    margin: 0;
     max-width: 600px;
     margin: 0 auto;
 }
@@ -3827,7 +3824,6 @@
 #guide-wrapper .values-list {
     list-style: none;
     padding: 0;
-    margin: 0;
     max-width: 800px;
     margin: 0 auto;
 }

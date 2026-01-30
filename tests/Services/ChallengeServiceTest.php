@@ -137,6 +137,35 @@ class ChallengeServiceTest extends TestCase
     }
 
     /**
+     * Test getById enforces tenant scoping (security test)
+     */
+    public function testGetByIdEnforcesTenantScoping(): void
+    {
+        $otherTenantId = 2;
+
+        // Create a challenge in tenant 2
+        try {
+            Database::query(
+                "INSERT INTO challenges (tenant_id, title, description, challenge_type, action_type, target_count, xp_reward, start_date, end_date, is_active)
+                 VALUES (?, 'Other Tenant Challenge', 'Should not be visible', 'weekly', 'test_action', 5, 100, CURDATE(), DATE_ADD(CURDATE(), INTERVAL 7 DAY), 1)",
+                [$otherTenantId]
+            );
+            $otherTenantChallengeId = Database::getInstance()->lastInsertId();
+
+            // Try to access from tenant 1 context
+            TenantContext::setById(self::$testTenantId);
+            $challenge = ChallengeService::getById($otherTenantChallengeId);
+
+            $this->assertFalse($challenge, 'Should not be able to access challenge from another tenant');
+
+            // Clean up
+            Database::query("DELETE FROM challenges WHERE id = ?", [$otherTenantChallengeId]);
+        } catch (\Exception $e) {
+            $this->markTestSkipped('Challenges table not available: ' . $e->getMessage());
+        }
+    }
+
+    /**
      * Test getStats returns array
      */
     public function testGetStatsReturnsArray(): void

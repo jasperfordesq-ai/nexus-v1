@@ -2158,7 +2158,6 @@
     cursor: pointer;
     transition: all 0.2s ease;
     text-decoration: none;
-    display: inline-block;
     position: relative;
     z-index: 10;
     min-height: 44px;
@@ -7250,7 +7249,7 @@ footer, footer p, footer a {
                     transition: 0.3s;
                     border-radius: var(--space-8);
                 }
-                .settings-toggle-slider:before {
+                .settings-toggle-slider::before {
                     position: absolute;
                     content: "";
                     height: var(--space-6);
@@ -7265,7 +7264,7 @@ footer, footer p, footer a {
                 .settings-toggle input:checked + .settings-toggle-slider {
                     background: linear-gradient(135deg, rgb(var(--settings-primary)), rgb(var(--settings-secondary)));
                 }
-                .settings-toggle input:checked + .settings-toggle-slider:before {
+                .settings-toggle input:checked + .settings-toggle-slider::before {
                     transform: translateX(26px);
                 }
 
