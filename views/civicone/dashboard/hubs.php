@@ -62,7 +62,7 @@ $basePath = \Nexus\Core\TenantContext::getBasePath();
         <div class="govuk-grid-row">
             <?php foreach ($myGroups as $grp): ?>
                 <div class="govuk-grid-column-one-third govuk-!-margin-bottom-6">
-                    <div class="govuk-!-padding-4" style="border: 1px solid #b1b4b6; border-left: 5px solid #1d70b8;">
+                    <div class="govuk-!-padding-4 civicone-card-bordered-accent">
                         <h3 class="govuk-heading-m govuk-!-margin-bottom-2">
                             <a href="<?= $basePath ?>/groups/<?= $grp['id'] ?>" class="govuk-link"><?= htmlspecialchars($grp['name']) ?></a>
                         </h3>

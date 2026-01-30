@@ -99,9 +99,9 @@
 }
 
 .match-stat-card {
-    background: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0.7) 100%);
+    background: linear-gradient(135deg, var(--color-white-alpha-90) 0%, var(--color-white-alpha-70) 100%);
     backdrop-filter: blur(20px);
-    border: 1px solid rgba(255, 255, 255, 0.5);
+    border: 1px solid var(--color-white-alpha-50);
     border-radius: 16px;
     padding: 20px;
     text-align: center;
@@ -110,12 +110,12 @@
 
 .match-stat-card:hover {
     transform: translateY(-4px);
-    box-shadow: 0 12px 40px rgba(99, 102, 241, 0.15);
+    box-shadow: 0 12px 40px var(--color-indigo-alpha-15);
 }
 
 [data-theme="dark"] .match-stat-card {
-    background: linear-gradient(135deg, rgba(30, 41, 59, 0.9) 0%, rgba(30, 41, 59, 0.7) 100%);
-    border-color: rgba(255, 255, 255, 0.1);
+    background: linear-gradient(135deg, var(--color-slate-alpha-90) 0%, var(--color-slate-alpha-70) 100%);
+    border-color: var(--color-white-alpha-10);
 }
 
 .match-stat-icon {
@@ -156,9 +156,9 @@
 .matches-tabs {
     display: flex;
     gap: 8px;
-    background: linear-gradient(135deg, rgba(255, 255, 255, 0.8) 0%, rgba(255, 255, 255, 0.6) 100%);
+    background: linear-gradient(135deg, var(--color-white-alpha-80) 0%, var(--color-white-alpha-60) 100%);
     backdrop-filter: blur(20px);
-    border: 1px solid rgba(255, 255, 255, 0.4);
+    border: 1px solid var(--color-white-alpha-40);
     border-radius: 16px;
     padding: 8px;
     margin-bottom: 32px;
@@ -167,8 +167,8 @@
 }
 
 [data-theme="dark"] .matches-tabs {
-    background: linear-gradient(135deg, rgba(30, 41, 59, 0.9) 0%, rgba(30, 41, 59, 0.7) 100%);
-    border-color: rgba(255, 255, 255, 0.1);
+    background: linear-gradient(135deg, var(--color-slate-alpha-90) 0%, var(--color-slate-alpha-70) 100%);
+    border-color: var(--color-white-alpha-10);
 }
 
 .match-tab {
@@ -202,7 +202,7 @@
 }
 
 .match-tab-badge {
-    background: rgba(255, 255, 255, 0.2);
+    background: var(--color-white-alpha-20);
     padding: 2px 8px;
     border-radius: 20px;
     font-size: 0.8rem;
@@ -210,7 +210,7 @@
 }
 
 .match-tab.active .match-tab-badge {
-    background: rgba(255, 255, 255, 0.3);
+    background: var(--color-white-alpha-30);
 }
 
 /* Match Sections */
@@ -272,9 +272,9 @@
 
 /* Match Card */
 .match-card {
-    background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.85) 100%);
+    background: linear-gradient(135deg, var(--color-white-alpha-95) 0%, var(--color-white-alpha-85) 100%);
     backdrop-filter: blur(20px);
-    border: 1px solid rgba(255, 255, 255, 0.5);
+    border: 1px solid var(--color-white-alpha-50);
     border-radius: 20px;
     overflow: hidden;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -283,12 +283,12 @@
 
 .match-card:hover {
     transform: translateY(-6px);
-    box-shadow: 0 20px 50px rgba(99, 102, 241, 0.15);
+    box-shadow: 0 20px 50px var(--color-indigo-alpha-15);
 }
 
 [data-theme="dark"] .match-card {
-    background: linear-gradient(135deg, rgba(30, 41, 59, 0.95) 0%, rgba(30, 41, 59, 0.85) 100%);
-    border-color: rgba(255, 255, 255, 0.1);
+    background: linear-gradient(135deg, var(--color-slate-alpha-95) 0%, var(--color-slate-alpha-85) 100%);
+    border-color: var(--color-white-alpha-10);
 }
 
 /* Hot Match Glow */
@@ -382,7 +382,7 @@
     border-radius: 16px;
     object-fit: cover;
     border: 3px solid white;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 12px var(--color-black-alpha-10);
     flex-shrink: 0;
 }
 
@@ -462,11 +462,11 @@
     display: flex;
     gap: 12px;
     padding-top: 16px;
-    border-top: 1px solid rgba(0, 0, 0, 0.05);
+    border-top: 1px solid var(--color-black-alpha-5);
 }
 
 [data-theme="dark"] .match-actions {
-    border-top-color: rgba(255, 255, 255, 0.05);
+    border-top-color: var(--color-white-alpha-5);
 }
 
 .match-action-btn {
@@ -508,15 +508,15 @@
 .matches-empty {
     text-align: center;
     padding: 60px 20px;
-    background: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0.7) 100%);
+    background: linear-gradient(135deg, var(--color-white-alpha-90) 0%, var(--color-white-alpha-70) 100%);
     backdrop-filter: blur(20px);
     border-radius: 24px;
-    border: 1px solid rgba(255, 255, 255, 0.5);
+    border: 1px solid var(--color-white-alpha-50);
 }
 
 [data-theme="dark"] .matches-empty {
-    background: linear-gradient(135deg, rgba(30, 41, 59, 0.9) 0%, rgba(30, 41, 59, 0.7) 100%);
-    border-color: rgba(255, 255, 255, 0.1);
+    background: linear-gradient(135deg, var(--color-slate-alpha-90) 0%, var(--color-slate-alpha-70) 100%);
+    border-color: var(--color-white-alpha-10);
 }
 
 .matches-empty-icon {
@@ -774,9 +774,9 @@
 
 /* Include all match-card styles */
 .match-card {
-    background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.85) 100%);
+    background: linear-gradient(135deg, var(--color-white-alpha-95) 0%, var(--color-white-alpha-85) 100%);
     backdrop-filter: blur(20px);
-    border: 1px solid rgba(255, 255, 255, 0.5);
+    border: 1px solid var(--color-white-alpha-50);
     border-radius: 20px;
     overflow: hidden;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -789,12 +789,12 @@
 }
 
 [data-theme="dark"] .match-card {
-    background: linear-gradient(135deg, rgba(30, 41, 59, 0.95) 0%, rgba(30, 41, 59, 0.85) 100%);
-    border-color: rgba(255, 255, 255, 0.1);
+    background: linear-gradient(135deg, var(--color-slate-alpha-95) 0%, var(--color-slate-alpha-85) 100%);
+    border-color: var(--color-white-alpha-10);
 }
 
 .match-card.hot-match {
-    border-color: rgba(249, 115, 22, 0.3);
+    border-color: var(--color-orange-alpha-30);
 }
 
 .match-card.hot-match::before {
@@ -847,7 +847,7 @@
     border-radius: 16px;
     object-fit: cover;
     border: 3px solid white;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 12px var(--color-black-alpha-10);
     flex-shrink: 0;
 }
 
@@ -906,7 +906,7 @@
     display: flex;
     gap: 12px;
     padding-top: 16px;
-    border-top: 1px solid rgba(0, 0, 0, 0.05);
+    border-top: 1px solid var(--color-black-alpha-5);
 }
 
 .match-action-btn {
@@ -962,15 +962,15 @@
 .hot-empty {
     text-align: center;
     padding: 60px 20px;
-    background: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0.7) 100%);
+    background: linear-gradient(135deg, var(--color-white-alpha-90) 0%, var(--color-white-alpha-70) 100%);
     backdrop-filter: blur(20px);
     border-radius: 24px;
-    border: 1px solid rgba(255, 255, 255, 0.5);
+    border: 1px solid var(--color-white-alpha-50);
 }
 
 [data-theme="dark"] .hot-empty {
-    background: linear-gradient(135deg, rgba(30, 41, 59, 0.9) 0%, rgba(30, 41, 59, 0.7) 100%);
-    border-color: rgba(255, 255, 255, 0.1);
+    background: linear-gradient(135deg, var(--color-slate-alpha-90) 0%, var(--color-slate-alpha-70) 100%);
+    border-color: var(--color-white-alpha-10);
 }
 
 .hot-empty-icon {
@@ -1184,9 +1184,9 @@
 }
 
 .match-card {
-    background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.85) 100%);
+    background: linear-gradient(135deg, var(--color-white-alpha-95) 0%, var(--color-white-alpha-85) 100%);
     backdrop-filter: blur(20px);
-    border: 1px solid rgba(255, 255, 255, 0.5);
+    border: 1px solid var(--color-white-alpha-50);
     border-radius: 20px;
     overflow: hidden;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -1199,12 +1199,12 @@
 }
 
 [data-theme="dark"] .match-card {
-    background: linear-gradient(135deg, rgba(30, 41, 59, 0.95) 0%, rgba(30, 41, 59, 0.85) 100%);
-    border-color: rgba(255, 255, 255, 0.1);
+    background: linear-gradient(135deg, var(--color-slate-alpha-95) 0%, var(--color-slate-alpha-85) 100%);
+    border-color: var(--color-white-alpha-10);
 }
 
 .match-card.mutual-match {
-    border-color: rgba(16, 185, 129, 0.3);
+    border-color: var(--color-emerald-alpha-30);
 }
 
 .match-card.mutual-match::before {
@@ -1265,7 +1265,7 @@
     border-radius: 16px;
     object-fit: cover;
     border: 3px solid white;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 12px var(--color-black-alpha-10);
     flex-shrink: 0;
 }
 
@@ -1329,7 +1329,7 @@
     display: flex;
     gap: 12px;
     padding-top: 16px;
-    border-top: 1px solid rgba(0, 0, 0, 0.05);
+    border-top: 1px solid var(--color-black-alpha-5);
 }
 
 .match-action-btn {
@@ -1385,15 +1385,15 @@
 .mutual-empty {
     text-align: center;
     padding: 60px 20px;
-    background: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0.7) 100%);
+    background: linear-gradient(135deg, var(--color-white-alpha-90) 0%, var(--color-white-alpha-70) 100%);
     backdrop-filter: blur(20px);
     border-radius: 24px;
-    border: 1px solid rgba(255, 255, 255, 0.5);
+    border: 1px solid var(--color-white-alpha-50);
 }
 
 [data-theme="dark"] .mutual-empty {
-    background: linear-gradient(135deg, rgba(30, 41, 59, 0.9) 0%, rgba(30, 41, 59, 0.7) 100%);
-    border-color: rgba(255, 255, 255, 0.1);
+    background: linear-gradient(135deg, var(--color-slate-alpha-90) 0%, var(--color-slate-alpha-70) 100%);
+    border-color: var(--color-white-alpha-10);
 }
 
 .mutual-empty-icon {
@@ -1518,18 +1518,18 @@
 
 /* Form Card */
 .prefs-card {
-    background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.85) 100%);
+    background: linear-gradient(135deg, var(--color-white-alpha-95) 0%, var(--color-white-alpha-85) 100%);
     backdrop-filter: blur(20px);
-    border: 1px solid rgba(255, 255, 255, 0.5);
+    border: 1px solid var(--color-white-alpha-50);
     border-radius: 24px;
     padding: 32px;
     margin-bottom: 24px;
-    box-shadow: 0 8px 32px rgba(31, 38, 135, 0.1);
+    box-shadow: 0 8px 32px var(--color-glass-shadow);
 }
 
 [data-theme="dark"] .prefs-card {
-    background: linear-gradient(135deg, rgba(30, 41, 59, 0.95) 0%, rgba(30, 41, 59, 0.85) 100%);
-    border-color: rgba(255, 255, 255, 0.1);
+    background: linear-gradient(135deg, var(--color-slate-alpha-95) 0%, var(--color-slate-alpha-85) 100%);
+    border-color: var(--color-white-alpha-10);
 }
 
 .prefs-card-title {
@@ -1754,7 +1754,7 @@
     background: white;
     border-radius: 50%;
     transition: 0.3s;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 2px 4px var(--color-black-alpha-10);
 }
 
 .toggle-switch input:checked + .toggle-slider {

@@ -19,7 +19,7 @@ $basePath = \Nexus\Core\TenantContext::getBasePath();
             <?= \Nexus\Core\Csrf::input() ?>
 
             <!-- BOT PROTECTION: Honeypot & Timestamp -->
-            <div style="position: absolute; left: -9999px;" aria-hidden="true">
+            <div class="civicone-honeypot" aria-hidden="true">
                 <label for="website">Website</label>
                 <input type="text" name="website" id="website" tabindex="-1" autocomplete="off">
             </div>
@@ -47,7 +47,7 @@ $basePath = \Nexus\Core\TenantContext::getBasePath();
             </div>
 
             <!-- Organisation Name (Dynamic) -->
-            <div class="govuk-form-group" id="org_field_container" style="display: none;">
+            <div class="govuk-form-group hidden" id="org_field_container">
                 <label class="govuk-label" for="organization_name">Organisation name</label>
                 <input type="text" name="organization_name" id="organization_name" class="govuk-input">
             </div>
@@ -138,7 +138,11 @@ $basePath = \Nexus\Core\TenantContext::getBasePath();
 function toggleOrgField() {
     var type = document.getElementById('profile_type_select').value;
     var container = document.getElementById('org_field_container');
-    container.style.display = type === 'organisation' ? 'block' : 'none';
+    if (type === 'organisation') {
+        container.classList.remove('hidden');
+    } else {
+        container.classList.add('hidden');
+    }
 }
 
 function checkPasswordStrength() {

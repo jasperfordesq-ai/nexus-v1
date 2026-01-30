@@ -35,7 +35,7 @@ $basePath = \Nexus\Core\TenantContext::getBasePath();
                 <i class="fa-solid fa-file-lines govuk-!-margin-right-2" aria-hidden="true"></i>
                 <?= htmlspecialchars($resource['file_name'] ?? $resource['title']) ?>
             </p>
-            <p class="govuk-body-s" style="color: #505a5f;">File cannot be changed. Upload a new resource instead.</p>
+            <p class="govuk-body-s civicone-text-secondary">File cannot be changed. Upload a new resource instead.</p>
         </div>
 
         <form action="<?= $basePath ?>/resources/<?= $resource['id'] ?>/update" method="POST">
@@ -80,8 +80,8 @@ $basePath = \Nexus\Core\TenantContext::getBasePath();
         <!-- Danger Zone -->
         <hr class="govuk-section-break govuk-section-break--xl govuk-section-break--visible">
 
-        <div class="govuk-!-padding-6" style="border: 2px solid #d4351c; background: #fef7f7;">
-            <h2 class="govuk-heading-m" style="color: #d4351c;">
+        <div class="govuk-!-padding-6 civicone-danger-zone">
+            <h2 class="govuk-heading-m civicone-danger-heading">
                 <i class="fa-solid fa-triangle-exclamation govuk-!-margin-right-1" aria-hidden="true"></i>
                 Danger Zone
             </h2>

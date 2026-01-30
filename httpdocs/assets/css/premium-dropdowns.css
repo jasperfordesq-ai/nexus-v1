@@ -220,7 +220,7 @@
 [data-theme="light"] .premium-dropdown-menu a:hover {
     background: linear-gradient(90deg,
         var(--color-indigo-alpha-10) 0%,
-        rgba(139, 92, 246, 0.05) 100%) !important;
+        var(--color-violet-alpha-5) 100%) !important;
     color: var(--color-primary-600) !important;
     text-shadow: none !important;
 }
