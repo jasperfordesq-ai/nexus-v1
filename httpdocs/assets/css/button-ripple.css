@@ -18,10 +18,6 @@
 /* Elements that should have ripple effect */
 .ripple,
 .btn,
-.glass-btn,
-.glass-btn-primary,
-.glass-btn-secondary,
-.glass-btn-outline,
 .nexus-smart-btn,
 .nav-link,
 .tab-item,
@@ -120,7 +116,7 @@
 
 /* Primary buttons - light ripple */
 .btn-primary .ripple-effect,
-.glass-btn-primary .ripple-effect,
+.btn--primary .ripple-effect,
 .nexus-smart-btn-primary .ripple-effect {
     background: var(--color-white-alpha-35);
 }
@@ -128,8 +124,8 @@
 /* Secondary/outline buttons - primary color ripple */
 .btn-secondary .ripple-effect,
 .btn-outline .ripple-effect,
-.glass-btn-secondary .ripple-effect,
-.glass-btn-outline .ripple-effect {
+.btn--secondary .ripple-effect,
+.btn--ghost .ripple-effect {
     background: color-mix(in srgb, var(--color-primary-500) 20%, transparent);
 }
 
@@ -158,8 +154,8 @@
 
 [data-theme="dark"] .btn-secondary .ripple-effect,
 [data-theme="dark"] .btn-outline .ripple-effect,
-[data-theme="dark"] .glass-btn-secondary .ripple-effect,
-[data-theme="dark"] .glass-btn-outline .ripple-effect {
+[data-theme="dark"] .btn--secondary .ripple-effect,
+[data-theme="dark"] .btn--ghost .ripple-effect {
     background: color-mix(in srgb, var(--color-primary-400) 25%, transparent);
 }
 

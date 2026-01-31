@@ -1,1 +1,205 @@
-.nexus-utility-bar{z-index:var(--z-mega-menu)}@media (min-width:1025px){.nexus-utility-bar{display:flex !important;visibility:visible !important;opacity:1 !important}}@media (max-width:1024px){.nexus-utility-bar{display:none !important}}.nexus-navbar{z-index:var(--z-navbar)}.nexus-utility-bar .htb-dropdown{position:relative}.nexus-utility-bar .htb-dropdown .htb-dropdown-content,.nexus-utility-bar .platform-dropdown,.nexus-utility-bar .federation-dropdown{min-width:auto;max-width:max-content;width:auto;padding:var(--space-2,8px) 0;z-index:var(--z-mega-menu);position:absolute}.nexus-utility-bar .left-utils .htb-dropdown-content{left:0;right:auto}.nexus-utility-bar .right-header-utils .htb-dropdown-content{right:0;left:auto}.nexus-utility-bar .htb-dropdown-content a{white-space:nowrap;padding:10px 16px;margin:1px 6px}.nexus-utility-bar .htb-dropdown-content a:first-child{margin-top:1px}.nexus-utility-bar .htb-dropdown-content a:last-child{margin-bottom:1px}.nexus-utility-bar .mode-switcher{gap:var(--space-1,4px);padding:2px 6px 2px 2px;margin-left:var(--space-1,4px);border-radius:16px;min-height:28px}.nexus-utility-bar .mode-switcher .mode-icon-container{width:24px;height:24px}.nexus-utility-bar .mode-switcher .mode-icon{font-size:11px}.nexus-utility-bar .mode-switcher .mode-label{font-size:10px;letter-spacing:0.2px}.htb-dropdown .util-link:focus-visible{outline:2px solid var(--color-primary-500,var(--color-primary-500));outline-offset:2px}@media (prefers-reduced-motion:reduce){.htb-dropdown-content{transition:none}}
+/**
+ * Modern Header Fixes
+ * Dropdown positioning and layout fixes
+ * Updated: 2026-01-26
+ *
+ * Z-INDEX SCALE: Uses design-tokens.css as single source of truth
+ * See: /httpdocs/assets/css/design-tokens.css (lines 1018-1050)
+ *
+ * Reference (DO NOT REDEFINE HERE):
+ * --z-base:       0      - Default stacking
+ * --z-header:     100    - Headers, sticky elements
+ * --z-sticky:     110    - Sticky elements
+ * --z-navbar:     120    - Main navbar
+ * --z-mega-menu:  130    - Mega menu dropdowns
+ * --z-dropdown:   200    - Dropdown menus
+ * --z-modal:      310    - Modals
+ * --z-tooltip:    410    - Tooltips
+ * --z-emergency:  9999   - Emergency overlay
+ */
+
+/* ==========================================
+   UTILITY BAR - Fixed Header
+   ========================================== */
+/* 2026-01-27: Utility bar must be ABOVE navbar (z-navbar: 120) so its dropdowns
+   can appear above the navbar. backdrop-filter creates a stacking context,
+   meaning children can't escape parent's z-index. Using z-mega-menu (130). */
+.nexus-utility-bar {
+    z-index: var(--z-mega-menu);
+}
+
+/* Desktop: Force utility bar visible (above 1024px) */
+@media (min-width: 1025px) {
+    .nexus-utility-bar {
+        display: flex !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+    }
+}
+
+/* Mobile: Hide utility bar (1024px and below) */
+@media (max-width: 1024px) {
+    .nexus-utility-bar {
+        display: none !important;
+    }
+}
+
+.nexus-navbar {
+    z-index: var(--z-navbar);
+}
+
+/* ==========================================
+   UTILITY BAR DROPDOWNS
+   ========================================== */
+.nexus-utility-bar .htb-dropdown {
+    position: relative;
+}
+
+.nexus-utility-bar .htb-dropdown .htb-dropdown-content,
+.nexus-utility-bar .platform-dropdown,
+.nexus-utility-bar .federation-dropdown {
+    min-width: auto;
+    max-width: max-content;
+    width: auto;
+    padding: var(--space-2, 8px) 0;
+    z-index: var(--z-mega-menu);
+    position: absolute;
+}
+
+/* Left-side dropdowns: align left */
+.nexus-utility-bar .left-utils .htb-dropdown-content {
+    left: 0;
+    right: auto;
+}
+
+/* Right-side dropdowns: align right */
+.nexus-utility-bar .right-header-utils .htb-dropdown-content {
+    right: 0;
+    left: auto;
+}
+
+/* Dropdown link styling */
+.nexus-utility-bar .htb-dropdown-content a {
+    white-space: nowrap;
+    padding: 10px 16px;
+    margin: 1px 6px;
+}
+
+.nexus-utility-bar .htb-dropdown-content a:first-child {
+    margin-top: 1px;
+}
+
+.nexus-utility-bar .htb-dropdown-content a:last-child {
+    margin-bottom: 1px;
+}
+
+/* ==========================================
+   MEGA MENU DROPDOWNS
+   ========================================== */
+.mega-menu-wrapper {
+    position: relative;
+}
+
+.mega-menu-dropdown {
+    z-index: var(--z-mega-menu);
+    min-width: 320px !important;
+    max-width: 420px !important;
+    width: max-content !important;
+}
+
+/* Ensure dropdown is hidden by default (reinforcement) */
+.mega-menu-dropdown:not(.mega-menu-wrapper.active .mega-menu-dropdown) {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+}
+
+/* Show when active */
+.mega-menu-wrapper.active .mega-menu-dropdown,
+.mega-menu-wrapper:hover .mega-menu-dropdown {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+}
+
+/* Center dropdown under trigger */
+.mega-menu-wrapper .mega-menu-dropdown {
+    left: 50%;
+    right: auto;
+    transform: translateX(-50%) translateY(0);
+}
+
+/* Light mode background */
+.mega-menu-dropdown {
+    background: linear-gradient(180deg, var(--color-white-alpha-98) 0%, var(--color-white-alpha-96) 100%);
+}
+
+/* Dark mode background */
+[data-theme="dark"] .mega-menu-dropdown {
+    background: linear-gradient(180deg, var(--color-slate-900-alpha-98) 0%, var(--color-slate-800-alpha-96) 100%);
+}
+
+/* ==========================================
+   MODE SWITCHER - COMPACT SIZING
+   ========================================== */
+.nexus-utility-bar .mode-switcher {
+    gap: var(--space-1, 4px);
+    padding: 2px 6px 2px 2px;
+    margin-left: var(--space-1, 4px);
+    border-radius: 16px;
+    min-height: 28px;
+}
+
+.nexus-utility-bar .mode-switcher .mode-icon-container {
+    width: 24px;
+    height: 24px;
+}
+
+.nexus-utility-bar .mode-switcher .mode-icon {
+    font-size: 11px;
+}
+
+.nexus-utility-bar .mode-switcher .mode-label {
+    font-size: 10px;
+    letter-spacing: 0.2px;
+}
+
+/* ==========================================
+   ACCESSIBILITY - Focus States
+   ========================================== */
+.mega-menu-trigger:focus-visible,
+.mega-menu-item:focus-visible,
+.htb-dropdown .util-link:focus-visible {
+    outline: 2px solid var(--color-primary-500, var(--color-primary-500));
+    outline-offset: 2px;
+}
+
+/* ==========================================
+   ACTIVE NAV LINK STYLES (aria-current="page")
+   ========================================== */
+.nav-link[aria-current="page"] {
+    color: var(--color-primary-500, var(--color-primary-500));
+    font-weight: 600;
+    position: relative;
+}
+
+.nav-link[aria-current="page"]::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: var(--color-primary-500, var(--color-primary-500));
+    border-radius: 1px;
+}
+
+/* ==========================================
+   REDUCED MOTION
+   ========================================== */
+@media (prefers-reduced-motion: reduce) {
+    .mega-menu-dropdown,
+    .htb-dropdown-content {
+        transition: none;
+    }
+}

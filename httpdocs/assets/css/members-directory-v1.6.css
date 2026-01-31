@@ -713,7 +713,7 @@ body.moj-filter--open {
 .members-skeleton__avatar {
     width: 60px;
     height: 60px;
-    border-radius: 50%;
+    border-radius: var(--radius-full);
     background: linear-gradient(
         90deg,
         var(--color-gray-200, var(--color-gray-200)) 25%,

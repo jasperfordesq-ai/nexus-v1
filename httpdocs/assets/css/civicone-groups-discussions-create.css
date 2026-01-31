@@ -121,7 +121,7 @@ html {
 .discussion-create-header {
     background: linear-gradient(135deg, var(--color-pink-200) 0%, var(--color-pink-400) 100%);
     padding: var(--space-6);
-    color: #831843;
+    color: var(--color-pink-900, #831843);
 }
 
 .discussion-create-header h2 {

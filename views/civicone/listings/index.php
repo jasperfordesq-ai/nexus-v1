@@ -45,96 +45,10 @@ $basePath = \Nexus\Core\TenantContext::getBasePath();
 
     <!-- Filters Panel (1/3) -->
     <div class="govuk-grid-column-one-third">
-        <div class="civicone-panel-bg">
-            <h2 class="govuk-heading-m">Filter listings</h2>
-
-            <form method="get" action="<?= $basePath ?>/listings">
-                <!-- Search Input -->
-                <div class="govuk-form-group">
-                    <label class="govuk-label" for="listing-search">
-                        Search by title or description
-                    </label>
-                    <input
-                        type="text"
-                        id="listing-search"
-                        name="q"
-                        class="govuk-input"
-                        placeholder="Enter keywords..."
-                        value="<?= htmlspecialchars($_GET['q'] ?? '') ?>"
-                    >
-                </div>
-
-                <!-- Type Checkboxes -->
-                <div class="govuk-form-group">
-                    <fieldset class="govuk-fieldset">
-                        <legend class="govuk-fieldset__legend">Type</legend>
-                        <div class="govuk-checkboxes govuk-checkboxes--small" data-module="govuk-checkboxes">
-                            <div class="govuk-checkboxes__item">
-                                <input type="checkbox" id="type-offer" name="type[]" value="offer" class="govuk-checkboxes__input" <?= in_array('offer', $_GET['type'] ?? []) ? 'checked' : '' ?>>
-                                <label class="govuk-label govuk-checkboxes__label" for="type-offer">Offers</label>
-                            </div>
-                            <div class="govuk-checkboxes__item">
-                                <input type="checkbox" id="type-request" name="type[]" value="request" class="govuk-checkboxes__input" <?= in_array('request', $_GET['type'] ?? []) ? 'checked' : '' ?>>
-                                <label class="govuk-label govuk-checkboxes__label" for="type-request">Requests</label>
-                            </div>
-                        </div>
-                    </fieldset>
-                </div>
-
-                <?php if (!empty($categories)): ?>
-                <!-- Category Checkboxes -->
-                <div class="govuk-form-group">
-                    <fieldset class="govuk-fieldset">
-                        <legend class="govuk-fieldset__legend">Category</legend>
-                        <div class="govuk-checkboxes govuk-checkboxes--small" data-module="govuk-checkboxes">
-                            <?php foreach ($categories as $category): ?>
-                            <div class="govuk-checkboxes__item">
-                                <input type="checkbox"
-                                       id="category-<?= htmlspecialchars($category['slug'] ?? $category['id']) ?>"
-                                       name="category[]"
-                                       value="<?= htmlspecialchars($category['slug'] ?? $category['id']) ?>"
-                                       class="govuk-checkboxes__input"
-                                       <?= in_array($category['slug'] ?? $category['id'], $_GET['category'] ?? []) ? 'checked' : '' ?>>
-                                <label class="govuk-label govuk-checkboxes__label" for="category-<?= htmlspecialchars($category['slug'] ?? $category['id']) ?>">
-                                    <?= htmlspecialchars($category['name']) ?>
-                                </label>
-                            </div>
-                            <?php endforeach; ?>
-                        </div>
-                    </fieldset>
-                </div>
-                <?php endif; ?>
-
-                <button type="submit" class="govuk-button govuk-button--secondary">
-                    Apply filters
-                </button>
-            </form>
-
-            <!-- Selected Filters -->
-            <?php
-            $hasFilters = !empty($_GET['q']) || !empty($_GET['type']) || !empty($_GET['category']);
-            if ($hasFilters):
-            ?>
-            <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible">
-            <h3 class="govuk-heading-s">Active filters</h3>
-            <p class="govuk-body">
-                <?php if (!empty($_GET['q'])): ?>
-                    <strong class="govuk-tag">Search: <?= htmlspecialchars($_GET['q']) ?></strong>
-                <?php endif; ?>
-                <?php if (!empty($_GET['type'])): ?>
-                    <?php foreach ($_GET['type'] as $type): ?>
-                        <strong class="govuk-tag govuk-tag--grey">Type: <?= htmlspecialchars(ucfirst($type)) ?></strong>
-                    <?php endforeach; ?>
-                <?php endif; ?>
-                <?php if (!empty($_GET['category'])): ?>
-                    <?php foreach ($_GET['category'] as $cat): ?>
-                        <strong class="govuk-tag govuk-tag--grey">Category: <?= htmlspecialchars(ucfirst($cat)) ?></strong>
-                    <?php endforeach; ?>
-                <?php endif; ?>
-            </p>
-            <a href="<?= $basePath ?>/listings" class="govuk-link">Clear all filters</a>
-            <?php endif; ?>
-        </div>
+        <?php
+        $filterAction = $basePath . '/listings';
+        require __DIR__ . '/../partials/listings-filter.php';
+        ?>
     </div>
 
     <!-- Results Panel (2/3) -->

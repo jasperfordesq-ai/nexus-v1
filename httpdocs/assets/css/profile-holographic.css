@@ -44,7 +44,7 @@
 .holo-profile-bg::after {
     content: '';
     position: absolute;
-    border-radius: 50%;
+    border-radius: var(--radius-full);
     filter: blur(60px);
     animation: floatOrb 15s ease-in-out infinite;
 }
@@ -288,7 +288,7 @@ main#main-content .htb-container > * {
 .glass-avatar {
     width: 140px;
     height: 140px;
-    border-radius: 50%;
+    border-radius: var(--radius-full);
     object-fit: cover;
     border: 4px solid transparent;
     background:
@@ -329,7 +329,7 @@ main#main-content .htb-container > * {
     right: var(--space-2);
     width: 28px;
     height: 28px;
-    border-radius: 50%;
+    border-radius: var(--radius-full);
     border: var(--space-1) solid white;
     box-shadow: 0 2px 8px var(--effect-black-20);
 }
@@ -411,96 +411,6 @@ h2.profile-display-name {
 [data-theme="dark"] .glass-info-badge:hover {
     background: var(--effect-primary-20);
     border-color: var(--effect-primary-40);
-}
-
-/* ============================================
-   GLASS BUTTONS - HOLOGRAPHIC GRADIENT
-   ============================================ */
-.glass-btn {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: var(--space-2);
-    padding: var(--space-3) var(--space-6);
-    background: linear-gradient(135deg, var(--color-primary-500) 0%, var(--color-purple-500) 50%, var(--color-purple-400) 100%);
-    background-size: 200% 200%;
-    border: none;
-    border-radius: var(--radius-lg);
-    color: white;
-    font-weight: 600;
-    font-size: var(--font-size-sm);
-    cursor: pointer;
-    transition: all 0.3s ease;
-    box-shadow:
-        0 4px 15px var(--effect-primary-35),
-        inset 0 1px 0 var(--effect-white-20);
-    text-decoration: none;
-    position: relative;
-    overflow: hidden;
-}
-
-.glass-btn::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: -100%;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(90deg, transparent, var(--effect-white-30), transparent);
-    transition: left 0.5s ease;
-}
-
-.glass-btn:hover {
-    transform: translateY(-3px) scale(1.02);
-    background-position: 100% 50%;
-    box-shadow:
-        0 8px 25px var(--effect-primary-45),
-        0 0 30px var(--effect-purple-20),
-        inset 0 1px 0 var(--effect-white-30);
-}
-
-.glass-btn:hover::before {
-    left: 100%;
-}
-
-.glass-btn:active {
-    transform: translateY(-1px) scale(0.98);
-}
-
-.glass-btn-secondary {
-    background: var(--effect-white-70);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    color: var(--color-gray-700);
-    border: 1px solid var(--effect-white-50);
-    box-shadow: 0 4px 12px var(--effect-black-8);
-}
-
-.glass-btn-secondary:hover {
-    background: var(--effect-primary-10);
-    border-color: var(--effect-primary-30);
-    color: var(--color-primary-600);
-    box-shadow: 0 6px 20px var(--effect-primary-15);
-}
-
-[data-theme="dark"] .glass-btn-secondary {
-    background: var(--effect-white-8);
-    border-color: var(--effect-white-12);
-    color: var(--color-slate-200);
-}
-
-[data-theme="dark"] .glass-btn-secondary:hover {
-    background: var(--effect-primary-20);
-    color: var(--color-primary-300);
-}
-
-.glass-btn-success {
-    background: linear-gradient(135deg, var(--color-success) 0%, var(--color-emerald-600) 100%);
-    box-shadow: 0 4px 15px var(--effect-emerald-35);
-}
-
-.glass-btn-success:hover {
-    box-shadow: 0 8px 25px var(--effect-emerald-45);
 }
 
 /* ============================================
@@ -661,7 +571,7 @@ h2.profile-display-name {
 .profile-friend-avatar img {
     width: 48px;
     height: 48px;
-    border-radius: 50%;
+    border-radius: var(--radius-full);
     object-fit: cover;
 }
 
@@ -671,7 +581,7 @@ h2.profile-display-name {
     right: 0;
     width: 14px;
     height: 14px;
-    border-radius: 50%;
+    border-radius: var(--radius-full);
     border: 2px solid white;
 }
 
@@ -865,7 +775,7 @@ h2.profile-display-name {
         font-size: var(--font-size-sm);
     }
 
-    .glass-btn {
+    .btn--glass {
         padding: 10px 18px; /* Custom for button balance */
         font-size: var(--font-size-sm);
         width: 100%;
@@ -891,7 +801,7 @@ h2.profile-display-name {
     }
 
     .glass-profile-card,
-    .glass-btn,
+    .btn--glass,
     .glass-badge,
     .glass-info-badge,
     .profile-friend-item {
@@ -1027,7 +937,7 @@ h2.profile-display-name {
 .status-dot {
     width: 8px;
     height: 8px;
-    border-radius: 50%;
+    border-radius: var(--radius-full);
     display: inline-block;
 }
 
@@ -1513,7 +1423,7 @@ h2.profile-display-name {
     transform: scale(0.98);
 }
 
-.glass-btn:focus-visible {
+.btn--glass:focus-visible {
     outline: 2px solid var(--color-primary-500);
     outline-offset: 2px;
 }
@@ -1570,7 +1480,7 @@ h2.profile-display-name {
 .composer-icon {
     width: 52px;
     height: 52px;
-    border-radius: 50%;
+    border-radius: var(--radius-full);
     background: linear-gradient(135deg, var(--color-primary-500), var(--color-purple-500));
     display: flex;
     align-items: center;
@@ -1902,7 +1812,7 @@ h2.profile-display-name {
     right: var(--space-4);
     width: 36px;
     height: 36px;
-    border-radius: 50%;
+    border-radius: var(--radius-full);
     background: var(--effect-white-20) !important;
     border: none !important;
     color: white !important;
@@ -1951,7 +1861,7 @@ h2.profile-display-name {
 .holo-star {
     width: 48px;
     height: 48px;
-    border-radius: 50% !important;
+    border-radius: var(--radius-full) !important;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -2197,7 +2107,7 @@ h2.profile-display-name {
     right: var(--space-4);
     width: 32px;
     height: 32px;
-    border-radius: 50% !important;
+    border-radius: var(--radius-full) !important;
     background: var(--effect-black-5) !important;
     border: none !important;
     color: var(--color-gray-500) !important;
@@ -2387,7 +2297,7 @@ h2.profile-display-name {
 .profile-fab-main {
     width: 56px;
     height: 56px;
-    border-radius: 50% !important;
+    border-radius: var(--radius-full) !important;
     background: linear-gradient(135deg, var(--color-primary-500), var(--color-purple-500)) !important;
     border: none !important;
     color: white !important;

@@ -208,7 +208,7 @@
 .level-ring {
     width: var(--space-16);
     height: var(--space-16);
-    border-radius: 50%;
+    border-radius: var(--radius-full);
     background: conic-gradient(
         var(--color-primary-500) calc(var(--progress) * 3.6deg),
         var(--effect-primary-15) calc(var(--progress) * 3.6deg)
@@ -224,7 +224,7 @@
     position: absolute;
     inset: var(--space-1);
     background: white;
-    border-radius: 50%;
+    border-radius: var(--radius-full);
 }
 
 .level-number {
@@ -566,7 +566,7 @@
     width: var(--space-3);
     height: var(--space-3);
     background: linear-gradient(135deg, var(--color-success), var(--color-success));
-    border-radius: 50%;
+    border-radius: var(--radius-full);
     margin-top: var(--space-2);
     flex-shrink: 0;
     box-shadow: 0 0 0 3px var(--effect-emerald-15);
@@ -891,7 +891,7 @@
     width: 100px;
     height: 100px;
     background: linear-gradient(135deg, var(--color-primary-500), var(--color-purple-500));
-    border-radius: 50%;
+    border-radius: var(--radius-full);
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -1245,7 +1245,7 @@
     right: var(--space-4);
     width: var(--space-8);
     height: var(--space-8);
-    border-radius: 50%;
+    border-radius: var(--radius-full);
     border: none;
     background: var(--effect-black-10);
     color: var(--color-gray-500);
@@ -1779,7 +1779,7 @@
     .badge-preview-count .preview-dot {
         width: var(--space-2);
         height: var(--space-2);
-        border-radius: 50%;
+        border-radius: var(--radius-full);
         background: var(--color-purple-alpha-40);
     }
 
@@ -1941,7 +1941,7 @@
     color: white;
     width: var(--space-6);
     height: var(--space-6);
-    border-radius: 50%;
+    border-radius: var(--radius-full);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -2463,7 +2463,7 @@
 .rank-badge {
     width: 36px;
     height: 36px;
-    border-radius: 50%;
+    border-radius: var(--radius-full);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -2491,7 +2491,7 @@
 .user-avatar {
     width: var(--space-10);
     height: var(--space-10);
-    border-radius: 50%;
+    border-radius: var(--radius-full);
     object-fit: cover;
     background: var(--color-gray-200);
 }
@@ -2557,7 +2557,7 @@
 .tier-icon {
     width: var(--space-10);
     height: var(--space-10);
-    border-radius: 50%;
+    border-radius: var(--radius-full);
     display: flex;
     align-items: center;
     justify-content: center;

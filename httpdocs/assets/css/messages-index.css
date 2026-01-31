@@ -295,7 +295,7 @@ body.messages-page {
 .messages-avatar {
     width: var(--space-12);
     height: var(--space-12);
-    border-radius: 50%;
+    border-radius: var(--radius-full);
     background: var(--msg-gradient);
     display: flex;
     align-items: center;
@@ -616,7 +616,7 @@ body.messages-page {
     height: var(--space-8);
     border: 3px solid var(--msg-border);
     border-top-color: var(--msg-primary);
-    border-radius: 50%;
+    border-radius: var(--radius-full);
     animation: spin 0.8s linear infinite;
     margin: 0 auto var(--space-3);
 }
@@ -675,7 +675,7 @@ body.messages-page {
     transform: translateY(-50%);
     width: 36px;
     height: 36px;
-    border-radius: 50%;
+    border-radius: var(--radius-full);
     border: 1px solid var(--msg-border);
     background: var(--msg-surface);
     color: var(--msg-text-muted);
@@ -1003,7 +1003,7 @@ body.messages-page {
 /* Floating Holographic Orbs */
 .holo-orb-desktop {
     position: absolute;
-    border-radius: 50%;
+    border-radius: var(--radius-full);
     filter: blur(100px);
     opacity: 0.3;
     pointer-events: none;
@@ -1300,7 +1300,7 @@ body.messages-page {
     height: var(--space-4);
     background: var(--holo-success);
     border: 3px solid var(--color-slate-900);
-    border-radius: 50%;
+    border-radius: var(--radius-full);
 }
 
 /* Thread Info */
@@ -1738,7 +1738,7 @@ body.messages-page {
     height: 36px;
     border: 3px solid var(--holo-border);
     border-top-color: var(--holo-primary);
-    border-radius: 50%;
+    border-radius: var(--radius-full);
     animation: spin 0.8s linear infinite;
     margin: 0 auto 16px;
 }
@@ -1837,7 +1837,7 @@ body.messages-page {
     height: var(--space-3);
     background: var(--holo-success);
     border: 2px solid var(--color-slate-900-alpha-80);
-    border-radius: 50%;
+    border-radius: var(--radius-full);
 }
 
 .holo-chat-info h3 {
@@ -2049,7 +2049,7 @@ body.messages-page {
     width: var(--space-2);
     height: var(--space-2);
     background: var(--holo-text-muted);
-    border-radius: 50%;
+    border-radius: var(--radius-full);
     animation: typingBounce 1.4s ease-in-out infinite;
 }
 
@@ -2196,7 +2196,7 @@ body.messages-page {
 .holo-voice-visual {
     width: 140px;
     height: 140px;
-    border-radius: 50%;
+    border-radius: var(--radius-full);
     background: linear-gradient(135deg, var(--effect-red-20), var(--color-red-alpha-10));
     border: 2px solid var(--effect-red-40);
     display: flex;
@@ -2245,7 +2245,7 @@ body.messages-page {
 .holo-voice-send {
     width: var(--space-16);
     height: var(--space-16);
-    border-radius: 50%;
+    border-radius: var(--radius-full);
     border: none;
     font-size: 1.5rem;
     cursor: pointer;
@@ -2297,7 +2297,7 @@ body.messages-page {
 .holo-voice-play-btn {
     width: var(--space-10);
     height: var(--space-10);
-    border-radius: 50%;
+    border-radius: var(--radius-full);
     background: linear-gradient(135deg, var(--holo-primary), var(--holo-secondary));
     border: none;
     color: white;
@@ -2366,7 +2366,7 @@ body.messages-page {
     height: var(--space-12);
     border: 3px solid var(--holo-border);
     border-top-color: var(--holo-primary);
-    border-radius: 50%;
+    border-radius: var(--radius-full);
     animation: spin 0.8s linear infinite;
 }
 

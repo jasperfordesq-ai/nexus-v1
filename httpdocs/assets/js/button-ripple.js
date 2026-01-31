@@ -20,10 +20,10 @@
         selectors: [
             '.ripple',
             '.btn',
-            '.glass-btn',
-            '.glass-btn-primary',
-            '.glass-btn-secondary',
-            '.glass-btn-outline',
+            '.btn--primary',
+            '.btn--secondary',
+            '.btn--ghost',
+            '.btn--glass',
             '.nexus-smart-btn',
             '.nav-link',
             '.tab-item',
@@ -98,7 +98,7 @@
 
         // Primary buttons get light ripple
         if (element.classList.contains('btn-primary') ||
-            element.classList.contains('glass-btn-primary') ||
+            element.classList.contains('btn--primary') ||
             element.classList.contains('nexus-smart-btn-primary') ||
             element.classList.contains('btn-danger') ||
             element.classList.contains('btn-success')) {

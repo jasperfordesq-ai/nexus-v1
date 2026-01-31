@@ -466,15 +466,24 @@
   background-color: var(--color-govuk-green-darker);
 }
 
-/* Secondary button (grey) */
+/* Secondary button - GOV.UK Design System compliant
+   https://design-system.service.gov.uk/components/button/ */
 .civicone--govuk .govuk-button--secondary {
-  background-color: var(--color-govuk-grey-dark);
-  box-shadow: 0 2px 0 var(--color-black-alpha-20);
-  color: var(--color-white);
+  background-color: var(--color-govuk-light-grey, #f3f2f1);
+  box-shadow: 0 2px 0 var(--color-govuk-grey-shadow, #929191);
+  color: var(--color-govuk-black, #0b0c0c);
 }
 
 .civicone--govuk .govuk-button--secondary:hover {
-  background-color: var(--color-govuk-grey-darker);
+  background-color: var(--color-govuk-grey-hover, #dbdad9);
+}
+
+.civicone--govuk .govuk-button--secondary:focus {
+  outline: 3px solid var(--color-govuk-yellow, #ffdd00);
+  outline-offset: 0;
+  background-color: var(--color-govuk-yellow, #ffdd00);
+  color: var(--color-govuk-black, #0b0c0c);
+  box-shadow: 0 2px 0 var(--color-govuk-black, #0b0c0c);
 }
 
 /* Warning button (red) */
@@ -710,6 +719,74 @@
 }
 
 .civicone--govuk .govuk-checkboxes__input:focus + .govuk-checkboxes__label::before {
+  outline: 3px solid var(--color-brand-yellow);
+  outline-offset: 0;
+  box-shadow: 0 0 0 4px var(--color-govuk-black);
+}
+
+/* Checkboxes - Small variant
+   Source: https://unpkg.com/govuk-frontend@5.4.0/dist/govuk/govuk-frontend.min.css
+   Small checkboxes are 24px visible but maintain 44px touch target for accessibility
+   Key difference from base: uses flexbox layout, checkbox ::before at top:10px */
+.civicone--govuk .govuk-checkboxes--small .govuk-checkboxes__item {
+  display: flex;
+  flex-wrap: wrap;
+  position: relative;
+  min-height: 0;
+  margin-bottom: 0;
+  margin-left: 10px;
+  padding-left: 0;
+}
+
+.civicone--govuk .govuk-checkboxes--small .govuk-checkboxes__input {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 44px;
+  height: 44px;
+  cursor: pointer;
+  margin: 0;
+  margin-left: -10px;
+  opacity: 0;
+  z-index: 1;
+}
+
+.civicone--govuk .govuk-checkboxes--small .govuk-checkboxes__label {
+  display: inline-block;
+  padding: 11px 15px 10px 34px;
+  font-size: 1rem;
+  line-height: 1.25;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+.civicone--govuk .govuk-checkboxes--small .govuk-checkboxes__label::before {
+  content: "";
+  position: absolute;
+  top: 10px;
+  left: 0;
+  width: 24px;
+  height: 24px;
+  border: 2px solid var(--color-govuk-black);
+  background: var(--color-white);
+  box-sizing: border-box;
+}
+
+.civicone--govuk .govuk-checkboxes--small .govuk-checkboxes__input:checked + .govuk-checkboxes__label::after {
+  content: "";
+  position: absolute;
+  top: 17px;
+  left: 6px;
+  width: 12px;
+  height: 6.5px;
+  transform: rotate(-45deg);
+  border: solid;
+  border-width: 0 0 3px 3px;
+  border-color: var(--color-govuk-black);
+  background: transparent;
+}
+
+.civicone--govuk .govuk-checkboxes--small .govuk-checkboxes__input:focus + .govuk-checkboxes__label::before {
   outline: 3px solid var(--color-brand-yellow);
   outline-offset: 0;
   box-shadow: 0 0 0 4px var(--color-govuk-black);
@@ -2050,21 +2127,44 @@
     margin-bottom: 0;
     border-bottom: 1px solid var(--color-govuk-grey);
   }
+
+  /* Clearfix for floated tabs */
+  .civicone--govuk .govuk-tabs__list::after {
+    content: "";
+    display: block;
+    clear: both;
+  }
 }
 
 .civicone--govuk .govuk-tabs__list-item {
-  margin-left: var(--space-6);
+  margin-left: 25px;
 }
 
+/* Mobile fallback: em-dash before each tab link */
+.civicone--govuk .govuk-tabs__list-item::before {
+  content: "—";
+  color: var(--color-govuk-black);
+  margin-left: -25px;
+  padding-right: 5px;
+}
+
+/* Desktop: horizontal tabs when JS is supported */
 @media (min-width: 40.0625em) {
   .civicone--govuk .govuk-tabs__list-item {
     display: inline-block;
     position: relative;
-    margin-right: var(--space-1);
+    margin-right: 5px;
     margin-bottom: 0;
     margin-left: 0;
-    padding: var(--space-2) var(--space-4);
-    background-color: var(--color-gray-100);
+    padding: 10px 20px;
+    float: left;
+    background-color: var(--color-govuk-light-grey);
+    text-align: center;
+  }
+
+  /* Remove em-dash on desktop */
+  .civicone--govuk .govuk-tabs__list-item::before {
+    content: none;
   }
 }
 
@@ -2074,15 +2174,17 @@
 
 @media (min-width: 40.0625em) {
   .civicone--govuk .govuk-tabs__list-item--selected {
+    position: relative;
     margin-top: -5px;
     margin-bottom: -1px;
-    padding-top: calc(var(--space-2) + 5px);
-    padding-right: calc(var(--space-4) - 1px);
-    padding-bottom: calc(var(--space-2) + 1px);
-    padding-left: calc(var(--space-4) - 1px);
+    padding: 14px 19px 16px;
     border: 1px solid var(--color-govuk-grey);
-    border-bottom: 1px solid var(--color-white);
+    border-bottom: 0;
     background-color: var(--color-white);
+  }
+
+  .civicone--govuk .govuk-tabs__list-item--selected .govuk-tabs__tab {
+    text-decoration: none;
   }
 }
 
@@ -2095,18 +2197,39 @@
   font-size: var(--font-size-base);
   line-height: 1.25;
   display: inline-block;
-  padding-top: var(--space-2);
-  padding-bottom: var(--space-2);
+  margin-bottom: 10px;
   color: var(--color-govuk-blue-light);
   text-decoration: underline;
   text-decoration-thickness: max(1px, 0.0625rem);
   text-underline-offset: 0.1578em;
 }
 
+.civicone--govuk .govuk-tabs__tab:link,
+.civicone--govuk .govuk-tabs__tab:visited {
+  color: var(--color-govuk-blue-light);
+}
+
 @media (min-width: 40.0625em) {
   .civicone--govuk .govuk-tabs__tab {
     font-size: var(--font-size-lg);
     margin-bottom: 0;
+  }
+
+  /* On desktop, tabs have black text (not link blue) */
+  .civicone--govuk .govuk-tabs__tab:link,
+  .civicone--govuk .govuk-tabs__tab:visited {
+    color: var(--color-govuk-black);
+    text-decoration: none;
+  }
+
+  /* Clickable area extends to full tab */
+  .civicone--govuk .govuk-tabs__tab::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
   }
 }
 
@@ -2389,12 +2512,12 @@
 
 /* Organization role tags - GOV.UK compliant solid background */
 .govuk-tag--role-owner {
-  background-color: #f47738; /* GOV.UK orange */
+  background-color: var(--color-govuk-orange, #f47738);
   color: var(--color-white);
 }
 
 .govuk-tag--role-admin {
-  background-color: #912b88; /* GOV.UK pink/magenta */
+  background-color: var(--color-govuk-pink, #912b88);
   color: var(--color-white);
 }
 

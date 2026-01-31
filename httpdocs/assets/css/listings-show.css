@@ -227,7 +227,7 @@
     #listing-show-glass-wrapper .glass-avatar {
         width: var(--space-16);
         height: var(--space-16);
-        border-radius: 50%;
+        border-radius: var(--radius-full);
         object-fit: cover;
         border: 2px solid var(--effect-white-50);
         box-shadow: 0 var(--space-1) var(--space-3) var(--color-glass-shadow-20);

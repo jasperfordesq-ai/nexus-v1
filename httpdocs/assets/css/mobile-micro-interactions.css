@@ -106,7 +106,7 @@
 
 .mobile-ripple {
     position: absolute;
-    border-radius: 50%;
+    border-radius: var(--radius-full);
     background: var(--color-white-alpha-60);
     pointer-events: none;
     animation: mobile-ripple 0.6s ease-out;
@@ -294,7 +294,7 @@
     width: 25px;
     height: 25px;
     background: white;
-    border-radius: 50%;
+    border-radius: var(--radius-full);
     transition: all var(--mobile-transition-normal, 0.2s) cubic-bezier(0.68, -0.55, 0.265, 1.55);
     box-shadow: 0 2px 4px var(--color-black-alpha-20);
 }
@@ -404,7 +404,7 @@
     width: 20px;
     height: 20px;
     border: 2px solid var(--color-gray-400, var(--color-gray-400));
-    border-radius: 50%;
+    border-radius: var(--radius-full);
     transition: all var(--mobile-transition-fast, 0.15s) ease-out;
     cursor: pointer;
 }
@@ -422,7 +422,7 @@
     width: 10px;
     height: 10px;
     background: var(--color-primary-500, var(--color-primary-500));
-    border-radius: 50%;
+    border-radius: var(--radius-full);
     transition: transform var(--mobile-transition-fast, 0.15s) cubic-bezier(0.68, -0.55, 0.265, 1.55);
 }
 
@@ -458,7 +458,7 @@
     height: 20px;
     background: white;
     border: 2px solid var(--color-primary-500, var(--color-primary-500));
-    border-radius: 50%;
+    border-radius: var(--radius-full);
     box-shadow: 0 2px 4px var(--color-black-alpha-20);
     transition: all var(--mobile-transition-fast, 0.15s) ease-out;
     cursor: grab;
@@ -549,7 +549,7 @@
     right: var(--mobile-space-4, 16px);
     width: 56px;
     height: 56px;
-    border-radius: 50%;
+    border-radius: var(--radius-full);
     background: var(--color-primary-500, var(--color-primary-500));
     box-shadow: 0 4px 12px var(--color-indigo-alpha-40);
     display: flex;

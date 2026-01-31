@@ -90,7 +90,7 @@ $base = Nexus\Core\TenantContext::getBasePath();
                         <option value="month" <?= (isset($selectedDate) && $selectedDate == 'month') ? 'selected' : '' ?>>This Month</option>
                     </select>
 
-                    <button type="submit" class="glass-btn-primary">
+                    <button type="submit" class="btn btn--primary">
                         <i class="fa-solid fa-search"></i> Search
                     </button>
                 </div>
@@ -187,7 +187,7 @@ $base = Nexus\Core\TenantContext::getBasePath();
                 <div style="font-size: 4rem; margin-bottom: 20px;">📅</div>
                 <h3 style="font-size: 1.5rem; margin-bottom: 10px; color: var(--htb-text-main);">No upcoming events</h3>
                 <p style="color: var(--htb-text-muted); margin-bottom: 20px;">Be the first to create an event for your community!</p>
-                <a href="<?= $base ?>/compose?type=event" class="glass-btn-primary">
+                <a href="<?= $base ?>/compose?type=event" class="btn btn--primary">
                     <i class="fa-solid fa-plus"></i> Create Event
                 </a>
             </div>
@@ -249,7 +249,7 @@ document.querySelectorAll('form').forEach(form => {
 });
 
 // Button Press States
-document.querySelectorAll('.htb-btn, button, .nexus-smart-btn, .glass-btn-primary, .view-link').forEach(btn => {
+document.querySelectorAll('.htb-btn, button, .nexus-smart-btn, .btn--primary, .view-link').forEach(btn => {
     btn.addEventListener('pointerdown', function() {
         this.style.transform = 'scale(0.96)';
     });

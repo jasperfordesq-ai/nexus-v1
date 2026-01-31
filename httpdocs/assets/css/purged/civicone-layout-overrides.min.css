@@ -1,1 +1,94 @@
-:root{--civic-gov-blue:var(--color-govuk-blue);--civic-hse-green:var(--color-govuk-green)}.civic-btn{border-radius:0 !important;font-weight:600;letter-spacing:0.5px;text-transform:none;box-shadow:0 1px 2px var(--color-black-alpha-10,rgba(0,0,0,0.1))}.civic-btn-primary{background-color:var(--civic-gov-blue) !important;border-color:var(--civic-gov-blue) !important}.civic-btn-accent{background-color:var(--civic-hse-green) !important;border-color:var(--civic-hse-green) !important}.civic-nav-link.active{border-bottom:2px solid var(--civic-gov-blue);color:var(--civic-gov-blue) !important;font-weight:700}.civic-logo{font-family:'Roboto',sans-serif;letter-spacing:-0.5px}
+/**
+ * CivicOne Layout Overrides
+ * GOV.UK Design System color variables and button refinements
+ * Extracted from assets-css.php per CLAUDE.md guidelines
+ *
+ * @version 1.0.0
+ * @since 2026-01-24
+ */
+
+/* ==========================================
+   GOV.UK Color Variables
+   ========================================== */
+
+:root {
+    /* Using official GOV.UK palette from design-tokens.css */
+    --civic-gov-blue: var(--color-govuk-blue); /* #003078 - Official GOV.UK blue */
+    --civic-hse-green: var(--color-govuk-green); /* #00703c - Official GOV.UK green */
+}
+
+/* ==========================================
+   Button Refinements - GOV.UK Pattern
+   ========================================== */
+
+.civic-btn {
+    border-radius: 0 !important; /* GOV.UK Design System: square corners */
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    text-transform: none;
+    box-shadow: 0 1px 2px var(--color-black-alpha-10, rgba(0, 0, 0, 0.1));
+}
+
+.civic-btn-primary {
+    background-color: var(--civic-gov-blue) !important;
+    border-color: var(--civic-gov-blue) !important;
+}
+
+.civic-btn-accent {
+    background-color: var(--civic-hse-green) !important;
+    border-color: var(--civic-hse-green) !important;
+}
+
+/* ==========================================
+   Navigation Active State
+   ========================================== */
+
+.civic-nav-link.active {
+    border-bottom: 2px solid var(--civic-gov-blue);
+    color: var(--civic-gov-blue) !important;
+    font-weight: 700;
+}
+
+/* ==========================================
+   Logo Typography
+   ========================================== */
+
+.civic-logo {
+    font-family: 'Roboto', sans-serif;
+    letter-spacing: -0.5px;
+}
+
+/* ==========================================
+   Layout Stability Lock
+   Prevents animation during theme transitions
+   ========================================== */
+
+html[data-layout-stable] * {
+    transition-duration: 0ms !important;
+    animation-duration: 0ms !important;
+}
+
+/* ==========================================
+   Offline Banner Visibility
+   Only show when verified offline
+   ========================================== */
+
+.offline-banner,
+#offlineBanner {
+    display: none !important;
+}
+
+.offline-banner.verified-offline,
+#offlineBanner.verified-offline {
+    display: flex !important;
+}
+
+/* Hide offline banner on desktop (unreliable navigator.onLine) */
+@media (min-width: 769px) {
+    .offline-banner,
+    #offlineBanner,
+    .offline-banner.verified-offline,
+    #offlineBanner.verified-offline {
+        display: none !important;
+    }
+}

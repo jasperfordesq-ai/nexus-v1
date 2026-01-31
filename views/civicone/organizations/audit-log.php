@@ -124,32 +124,32 @@ $basePath = \Nexus\Core\TenantContext::getBasePath();
                         </thead>
                         <tbody class="govuk-table__body">
                             <?php foreach ($logs as $log):
-                                // Determine icon and color
+                                // Determine icon and color class (GOV.UK compliant)
                                 $iconClass = 'fa-cog';
-                                $iconColor = '#505a5f';
+                                $iconColorClass = 'civicone-icon-grey';
                                 if (str_contains($log['action'], 'deposit')) {
                                     $iconClass = 'fa-arrow-down';
-                                    $iconColor = '#00703c';
+                                    $iconColorClass = 'civicone-icon-green';
                                 } elseif (str_contains($log['action'], 'withdrawal')) {
                                     $iconClass = 'fa-arrow-up';
-                                    $iconColor = '#d4351c';
+                                    $iconColorClass = 'civicone-icon-red';
                                 } elseif (str_contains($log['action'], 'transfer')) {
                                     $iconClass = 'fa-exchange-alt';
-                                    $iconColor = '#1d70b8';
+                                    $iconColorClass = 'civicone-icon-blue';
                                 } elseif (str_contains($log['action'], 'member')) {
                                     $iconClass = 'fa-user';
-                                    $iconColor = '#1d70b8';
+                                    $iconColorClass = 'civicone-icon-blue';
                                 } elseif (str_contains($log['action'], 'ownership')) {
                                     $iconClass = 'fa-crown';
-                                    $iconColor = '#f47738';
+                                    $iconColorClass = 'civicone-icon-orange';
                                 } elseif (str_contains($log['action'], 'bulk')) {
                                     $iconClass = 'fa-layer-group';
-                                    $iconColor = '#912b88';
+                                    $iconColorClass = 'civicone-icon-purple';
                                 }
                             ?>
                                 <tr class="govuk-table__row">
                                     <td class="govuk-table__cell">
-                                        <i class="fa-solid <?= $iconClass ?>" style="color: <?= $iconColor ?>; font-size: 18px;" aria-hidden="true"></i>
+                                        <i class="fa-solid <?= $iconClass ?> <?= $iconColorClass ?>" aria-hidden="true"></i>
                                     </td>
                                     <td class="govuk-table__cell">
                                         <strong><?= \Nexus\Services\AuditLogService::getActionLabel($log['action']) ?></strong>

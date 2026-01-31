@@ -1216,7 +1216,7 @@ body.dark-mode *:focus-visible {
 @media (max-width: 900px) {
     button,
     a.btn,
-    a.glass-btn,
+    a.btn--glass,
     input[type="button"],
     input[type="submit"],
     [role="button"] {
@@ -1315,7 +1315,7 @@ body.dark-mode *:focus-visible {
 }
 
 /* Glass Buttons */
-.glass-btn {
+.btn--glass {
     display: inline-flex;
     align-items: center;
     gap: var(--space-2);
@@ -1332,25 +1332,25 @@ body.dark-mode *:focus-visible {
     text-decoration: none;
 }
 
-.glass-btn:hover {
+.btn--glass:hover {
     transform: translateY(-2px);
     box-shadow: 0 6px 20px var(--effect-primary-40);
     filter: brightness(1.05);
 }
 
-.glass-btn-secondary {
+.btn--secondary {
     background: var(--effect-white-10) !important;
     border: 1px solid var(--effect-white-20) !important;
     color: var(--text-color, var(--color-slate-800)) !important;
     box-shadow: none;
 }
 
-[data-theme="dark"] .glass-btn-secondary {
+[data-theme="dark"] .btn--secondary {
     background: var(--effect-white-5) !important;
     color: var(--color-slate-200);
 }
 
-.glass-btn-secondary:hover {
+.btn--secondary:hover {
     background: var(--effect-primary-15) !important;
     border-color: var(--effect-primary-30) !important;
 }
@@ -5083,7 +5083,7 @@ html.loading .nexus-navbar {
 
 button,
 .btn,
-.glass-btn {
+.btn--glass {
     position: relative;
     overflow: hidden;
 }
@@ -5224,7 +5224,7 @@ button:not(:hover) {
 /* Only add transitions to specific elements that need them */
 button,
 .btn,
-.glass-btn,
+.btn--glass,
 .nav-link,
 a,
 .nexus-card,
@@ -8904,7 +8904,7 @@ body.search-expanded .nexus-brand-link {
    ============================================ */
 button,
 .btn,
-.glass-btn {
+.btn--glass {
     transition: transform var(--transition-fast),
                 box-shadow var(--transition-fast),
                 background-color var(--transition-fast);
@@ -8915,19 +8915,19 @@ button,
 
 button:hover,
 .btn:hover,
-.glass-btn:hover {
+.btn--glass:hover {
     will-change: transform;
 }
 
 button:not(:hover),
 .btn:not(:hover),
-.glass-btn:not(:hover) {
+.btn--glass:not(:hover) {
     will-change: auto;
 }
 
 button:active,
 .btn:active,
-.glass-btn:active {
+.btn--glass:active {
     transition-duration: 0.05s;
 }
 
@@ -9919,7 +9919,7 @@ button,
    ============================================ */
 button,
 .btn,
-.glass-btn,
+.btn--glass,
 .nexus-btn,
 a[role="button"] {
     position: relative;
@@ -9931,7 +9931,7 @@ a[role="button"] {
 
 button:hover,
 .btn:hover,
-.glass-btn:hover,
+.btn--glass:hover,
 .nexus-btn:hover,
 a[role="button"]:hover {
     transform: translateY(-2px);
@@ -9940,7 +9940,7 @@ a[role="button"]:hover {
 
 button:active,
 .btn:active,
-.glass-btn:active,
+.btn--glass:active,
 .nexus-btn:active,
 a[role="button"]:active {
     transform: translateY(0) scale(0.98);
@@ -9950,7 +9950,7 @@ a[role="button"]:active {
 /* Ripple effect */
 button::after,
 .btn::after,
-.glass-btn::after {
+.btn--glass::after {
     content: '';
     position: absolute;
     top: 50%;
@@ -9966,7 +9966,7 @@ button::after,
 
 button:active::after,
 .btn:active::after,
-.glass-btn:active::after {
+.btn--glass:active::after {
     animation: ripple var(--transition-slow) var(--ease-out);
 }
 
@@ -10314,7 +10314,7 @@ a {
     transition: color var(--transition-fast);
 }
 
-a:not(.btn):not(.glass-btn):not(.nav-link):not(.nexus-native-nav-item):not(.nexus-drawer-item)::after {
+a:not(.btn):not(.btn--glass):not(.nav-link):not(.nexus-native-nav-item):not(.nexus-drawer-item)::after {
     content: '';
     position: absolute;
     bottom: -2px; /* Specific negative value, no token */
@@ -10325,7 +10325,7 @@ a:not(.btn):not(.glass-btn):not(.nav-link):not(.nexus-native-nav-item):not(.nexu
     transition: width var(--transition-base) var(--ease-in-out);
 }
 
-a:not(.btn):not(.glass-btn):not(.nav-link):not(.nexus-native-nav-item):not(.nexus-drawer-item):hover::after {
+a:not(.btn):not(.btn--glass):not(.nav-link):not(.nexus-native-nav-item):not(.nexus-drawer-item):hover::after {
     width: 100%;
 }
 
@@ -10545,7 +10545,7 @@ body {
 
 button,
 .btn,
-.glass-btn,
+.btn--glass,
 .nexus-card,
 .glass-card,
 .modal,

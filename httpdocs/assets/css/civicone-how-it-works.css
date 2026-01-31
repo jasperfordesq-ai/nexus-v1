@@ -82,7 +82,7 @@
 
     [data-theme="dark"] .how-it-works-step-icon.step-3 {
         background: var(--color-orange-alpha-20);
-        color: #fb923c;
+        color: var(--color-orange-400, #fb923c);
     }
 
     .how-it-works-step:hover .how-it-works-step-icon {

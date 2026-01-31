@@ -27,9 +27,9 @@
    BUTTON HOVER - Lift Effect
    ============================================== */
 .btn,
-.glass-btn,
-.glass-btn-primary,
-.glass-btn-secondary,
+.btn--glass,
+.btn--primary,
+.btn--secondary,
 .nexus-smart-btn,
 .htb-btn,
 .civic-btn,
@@ -41,9 +41,9 @@
 }
 
 .btn:hover,
-.glass-btn:hover,
-.glass-btn-primary:hover,
-.glass-btn-secondary:hover,
+.btn--glass:hover,
+.btn--primary:hover,
+.btn--secondary:hover,
 .nexus-smart-btn:hover,
 .htb-btn:hover,
 .civic-btn:hover,
@@ -53,9 +53,9 @@
 }
 
 .btn:active,
-.glass-btn:active,
-.glass-btn-primary:active,
-.glass-btn-secondary:active,
+.btn--glass:active,
+.btn--primary:active,
+.btn--secondary:active,
 .nexus-smart-btn:active,
 .htb-btn:active,
 .civic-btn:active,
@@ -445,7 +445,7 @@ select:focus,
 @media (hover: none) and (pointer: coarse) {
     /* Remove hover transforms on mobile */
     .btn:hover,
-    .glass-btn:hover,
+    .btn--glass:hover,
     .glass-card:hover,
     .member-card:hover,
     .fab:hover {
@@ -454,7 +454,7 @@ select:focus,
 
     /* Keep active states */
     .btn:active,
-    .glass-btn:active,
+    .btn--glass:active,
     .fab:active {
         transform: scale(0.95);
     }

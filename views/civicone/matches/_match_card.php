@@ -25,6 +25,16 @@ if ($matchScore >= 85) {
     $scoreTagClass .= ' govuk-tag--grey';
 }
 
+// Match card border class (replaces inline border style)
+$matchCardClass = 'civicone-match-card';
+if ($matchScore >= 85) {
+    $matchCardClass .= ' civicone-match-card--high';
+} elseif ($matchScore >= 70) {
+    $matchCardClass .= ' civicone-match-card--medium';
+} else {
+    $matchCardClass .= ' civicone-match-card--low';
+}
+
 // Distance tag
 $distanceTagClass = 'govuk-tag govuk-tag--grey';
 if ($distanceKm !== null && $distanceKm <= 5) {
@@ -52,7 +62,7 @@ if ($createdAt) {
 $basePath = Nexus\Core\TenantContext::getBasePath();
 ?>
 
-<div class="govuk-!-padding-4" style="border: 1px solid #b1b4b6; border-left: 5px solid <?= $matchScore >= 85 ? '#00703c' : ($matchScore >= 70 ? '#1d70b8' : '#b1b4b6') ?>;"
+<div class="<?= $matchCardClass ?>"
      data-listing-id="<?= $listingId ?>"
      data-match-score="<?= $matchScore ?>"
      data-distance="<?= $distanceKm ?>">

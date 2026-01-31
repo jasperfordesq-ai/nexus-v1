@@ -255,7 +255,7 @@
     left: 4px;
     bottom: 4px;
     background: white;
-    border-radius: 50%;
+    border-radius: var(--radius-full);
     transition: transform 0.3s ease, box-shadow 0.3s ease;
     box-shadow: 0 2px 4px var(--color-black-alpha-20);
 }

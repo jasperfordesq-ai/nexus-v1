@@ -1,1 +1,637 @@
-.nexus-utility-bar{position:fixed;top:0;left:0;width:100%;height:50px;z-index:var(--z-mega-menu);display:flex;justify-content:space-between;align-items:center;padding:0 var(--space-6);font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;background:linear-gradient(135deg,var(--color-white-alpha-8) 0%,var(--color-white-alpha-3) 100%);backdrop-filter:blur(var(--glass-blur-heavy)) saturate(var(--glass-saturation));-webkit-backdrop-filter:blur(var(--glass-blur-heavy)) saturate(var(--glass-saturation));border-bottom:1px solid var(--color-white-alpha-8);box-shadow:0 4px var(--space-6) var(--color-black-alpha-4),0 0 1px var(--color-white-alpha-10) inset,0 0 var(--space-20) var(--color-indigo-alpha-3);transition:all var(--transition-slow)}.nexus-utility-bar.scrolled{height:44px;backdrop-filter:blur(50px) saturate(var(--glass-saturation));-webkit-backdrop-filter:blur(50px) saturate(var(--glass-saturation))}.nexus-utility-bar .util-link{font-size:var(--font-size-xs);font-weight:var(--font-weight-semibold);padding:var(--space-2) var(--space-3);margin:0 var(--space-1);border-radius:var(--radius-base);transition:all var(--transition-base);position:relative;color:var(--color-white-alpha-70);text-transform:uppercase;letter-spacing:0.3px}.nexus-utility-bar .util-link:hover{color:var(--color-white-alpha-95);background:var(--color-white-alpha-8);transform:translateY(-1px)}.nexus-navbar{position:fixed;top:50px;left:0;width:100%;height:72px;z-index:var(--z-navbar);padding:0 var(--space-8);display:flex;justify-content:space-between;align-items:center;box-sizing:border-box;background:linear-gradient(180deg,var(--color-white-alpha-75) 0%,var(--color-white-alpha-65) 100%);backdrop-filter:blur(60px) saturate(var(--glass-saturation)) brightness(1.05);-webkit-backdrop-filter:blur(60px) saturate(var(--glass-saturation)) brightness(1.05);border-bottom:1px solid var(--color-white-alpha-20);box-shadow:0 var(--space-2) var(--space-8) var(--color-glass-shadow-7),0 0 1px var(--color-white-alpha-30) inset,0 var(--space-5) var(--space-20) var(--color-indigo-alpha-5);transition:all var(--transition-slow)}.nexus-navbar.scrolled{top:44px;height:64px;backdrop-filter:blur(70px) saturate(var(--glass-saturation)) brightness(1.08);-webkit-backdrop-filter:blur(70px) saturate(var(--glass-saturation)) brightness(1.08)}@media (max-width:1024px){.nexus-utility-bar{display:none !important}.nexus-navbar{top:0 !important;height:60px;padding:var(--space-3) 16px}}@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:0.01ms !important;animation-iteration-count:1 !important;transition-duration:0.01ms !important}}
+/**
+ * NEXUS PREMIUM GLASSMORPHISM MEGA MENU
+ * 500% Premium Holographic Design
+ * Date: 2026-01-12
+ * Migrated to design tokens: 2026-01-21
+ * Fully Migrated to Design Tokens: 2026-01-21
+ * RGBA to CSS Variables Migration: 2026-01-30 (56 replacements)
+ */
+
+/* ==========================================
+   UTILITY BAR - MINIMIZED & PREMIUM
+   ========================================== */
+
+.nexus-utility-bar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 50px;
+    /* 2026-01-27: Must be ABOVE navbar (z-navbar:120) for dropdowns - backdrop-filter creates stacking context */
+    z-index: var(--z-mega-menu);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 var(--space-6);
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+
+    /* PREMIUM GLASSMORPHISM */
+    background: linear-gradient(135deg,
+            var(--color-white-alpha-8) 0%,
+            var(--color-white-alpha-3) 100%);
+    backdrop-filter: blur(var(--glass-blur-heavy)) saturate(var(--glass-saturation));
+    -webkit-backdrop-filter: blur(var(--glass-blur-heavy)) saturate(var(--glass-saturation));
+
+    border-bottom: 1px solid var(--color-white-alpha-8);
+    box-shadow: 0 4px var(--space-6) var(--color-black-alpha-4),
+        0 0 1px var(--color-white-alpha-10) inset,
+        0 0 var(--space-20) var(--color-indigo-alpha-3);
+
+    transition: all var(--transition-slow);
+}
+
+/* Dark Mode Utility Bar */
+[data-theme="dark"] .nexus-utility-bar {
+    background: linear-gradient(135deg,
+            var(--color-slate-900-alpha-85) 0%,
+            var(--color-slate-alpha-80) 100%);
+    border-bottom: 1px solid var(--color-slate-400-alpha-10);
+    box-shadow: 0 4px var(--space-6) var(--color-black-alpha-20),
+        0 0 1px var(--color-white-alpha-5) inset,
+        0 0 var(--space-20) var(--color-indigo-alpha-8);
+}
+
+/* Scrolled state */
+.nexus-utility-bar.scrolled {
+    height: 44px;
+    backdrop-filter: blur(50px) saturate(var(--glass-saturation));
+    -webkit-backdrop-filter: blur(50px) saturate(var(--glass-saturation));
+}
+
+/* Utility Bar Links - Minimal */
+.nexus-utility-bar .util-link {
+    font-size: var(--font-size-xs);
+    font-weight: var(--font-weight-semibold);
+    padding: var(--space-2) var(--space-3);
+    margin: 0 var(--space-1);
+    border-radius: var(--radius-base);
+    transition: all var(--transition-base);
+    position: relative;
+    color: var(--color-white-alpha-70);
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+}
+
+.nexus-utility-bar .util-link:hover {
+    color: var(--color-white-alpha-95);
+    background: var(--color-white-alpha-8);
+    transform: translateY(-1px);
+}
+
+[data-theme="dark"] .nexus-utility-bar .util-link {
+    color: var(--color-slate-50-alpha-70);
+}
+
+[data-theme="dark"] .nexus-utility-bar .util-link:hover {
+    color: var(--color-slate-50-alpha-95);
+    background: var(--color-white-alpha-6);
+}
+
+/* ==========================================
+   MAIN NAVBAR - PREMIUM GLASSMORPHISM
+   ========================================== */
+
+.nexus-navbar {
+    position: fixed;
+    top: 50px;
+    left: 0;
+    width: 100%;
+    height: 72px;
+    z-index: var(--z-navbar);
+    padding: 0 var(--space-8);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-sizing: border-box;
+
+    /* ULTRA PREMIUM GLASSMORPHISM */
+    background: linear-gradient(180deg,
+            var(--color-white-alpha-75) 0%,
+            var(--color-white-alpha-65) 100%);
+    backdrop-filter: blur(60px) saturate(var(--glass-saturation)) brightness(1.05);
+    -webkit-backdrop-filter: blur(60px) saturate(var(--glass-saturation)) brightness(1.05);
+
+    border-bottom: 1px solid var(--color-white-alpha-20);
+    box-shadow: 0 var(--space-2) var(--space-8) var(--color-glass-shadow-7),
+        0 0 1px var(--color-white-alpha-30) inset,
+        0 var(--space-5) var(--space-20) var(--color-indigo-alpha-5);
+
+    transition: all var(--transition-slow);
+}
+
+/* Dark Mode Navbar */
+[data-theme="dark"] .nexus-navbar {
+    background: linear-gradient(180deg,
+            var(--color-slate-900-alpha-75) 0%,
+            var(--color-slate-alpha-70) 100%);
+    border-bottom: 1px solid var(--color-slate-400-alpha-10);
+    box-shadow: 0 var(--space-2) var(--space-8) var(--color-black-alpha-30),
+        0 0 1px var(--color-white-alpha-8) inset,
+        0 var(--space-5) var(--space-20) var(--color-indigo-alpha-12);
+}
+
+.nexus-navbar.scrolled {
+    top: 44px;
+    height: 64px;
+    backdrop-filter: blur(70px) saturate(var(--glass-saturation)) brightness(1.08);
+    -webkit-backdrop-filter: blur(70px) saturate(var(--glass-saturation)) brightness(1.08);
+}
+
+/* ==========================================
+   NAV LINKS - HOLOGRAPHIC STYLE
+   ========================================== */
+
+.nav-link {
+    position: relative;
+    font-size: var(--font-size-base);
+    font-weight: var(--font-weight-semibold);
+    padding: var(--space-3) var(--space-5);
+    margin: 0 var(--space-1);
+    border-radius: var(--radius-lg);
+    color: var(--color-gray-700);
+    text-decoration: none;
+    transition: all 0.35s var(--ease-in-out);
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    overflow: hidden;
+}
+
+/* Holographic shimmer effect */
+.nav-link::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: var(--radius-lg);
+    background: linear-gradient(135deg,
+            var(--color-indigo-alpha-12),
+            var(--color-violet-alpha-8),
+            var(--color-pink-alpha-6));
+    opacity: 0;
+    transition: opacity 0.35s var(--ease-in-out);
+}
+
+/* Shimmer effect removed by request */
+.nav-link::after {
+    display: none;
+}
+
+.nav-link:hover {
+    color: var(--color-primary-500);
+    transform: translateY(-2px);
+}
+
+.nav-link:hover::before {
+    opacity: 1;
+}
+
+.nav-link:hover::after {
+    display: none;
+}
+
+[data-theme="dark"] .nav-link {
+    color: var(--color-white-alpha-90);
+}
+
+[data-theme="dark"] .nav-link:hover {
+    color: var(--color-primary-300);
+}
+
+/* Active nav link */
+.nav-link.active {
+    color: var(--color-primary-500) !important;
+    background: linear-gradient(135deg,
+            var(--color-indigo-alpha-15),
+            var(--color-violet-alpha-10)) !important;
+    box-shadow: 0 var(--space-1) var(--space-3) var(--color-indigo-alpha-20);
+}
+
+/* ==========================================
+   PREMIUM MEGA MENU BUTTON
+   ========================================== */
+
+.mega-menu-wrapper {
+    position: relative;
+    display: inline-block;
+    z-index: 101;
+}
+
+.mega-menu-trigger {
+    position: relative;
+    font-size: var(--font-size-base);
+    font-weight: var(--font-weight-bold);
+    padding: var(--space-3) var(--space-6) var(--space-3) var(--space-5);
+    margin: 0 var(--space-1);
+    border-radius: var(--radius-lg);
+    color: white;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-3);
+    cursor: pointer;
+    overflow: hidden;
+    border: none;
+
+    /* Gradient background */
+    background: linear-gradient(135deg,
+            #667eea 0%,
+            #764ba2 50%,
+            #f093fb 100%);
+    background-size: 200% 200%;
+
+    box-shadow: 0 var(--space-2) var(--space-6) var(--color-gradient-blue-alpha-35),
+        0 0 1px var(--color-white-alpha-40) inset;
+
+    transition: all var(--transition-slow);
+    animation: gradientShift 6s ease infinite;
+}
+
+@keyframes gradientShift {
+
+    0%,
+    100% {
+        background-position: 0% 50%;
+    }
+
+    50% {
+        background-position: 100% 50%;
+    }
+}
+
+.mega-menu-trigger:hover {
+    transform: translateY(-3px) scale(1.02);
+    box-shadow: 0 var(--space-3) 36px var(--color-gradient-blue-alpha-45),
+        0 0 1px var(--color-white-alpha-60) inset,
+        0 0 var(--space-10) var(--color-gradient-blue-alpha-30);
+}
+
+.mega-menu-trigger:active {
+    transform: translateY(-1px) scale(0.98);
+}
+
+/* Arrow animation */
+.mega-menu-trigger .arrow {
+    font-size: var(--font-size-xs);
+    transition: transform var(--transition-base);
+}
+
+.mega-menu-trigger:hover .arrow,
+.mega-menu-trigger.active .arrow {
+    transform: rotate(180deg);
+}
+
+/* ==========================================
+   MEGA MENU DROPDOWN - HOLOGRAPHIC GLASS
+   ========================================== */
+
+.mega-menu-dropdown {
+    position: absolute;
+    top: calc(100% + var(--space-2));
+    left: 50%;
+    min-width: 320px;
+    max-width: 420px;
+    max-height: calc(100vh - 180px);
+    overflow-y: auto;
+
+    /* ULTRA PREMIUM GLASSMORPHISM */
+    background: linear-gradient(180deg,
+            var(--color-white-alpha-95) 0%,
+            /* Increased opacity to reduce repaint flickers */
+            var(--color-white-alpha-90) 100%);
+    backdrop-filter: blur(var(--space-20)) saturate(var(--glass-saturation)) brightness(1.1);
+    -webkit-backdrop-filter: blur(var(--space-20)) saturate(var(--glass-saturation)) brightness(1.1);
+
+    /* FIX: Replace hard border with shadow ring */
+    border: none;
+    border-radius: var(--radius-2xl);
+    padding: var(--space-4);
+
+    /* HOLOGRAPHIC SHADOW - Adjusted for no border */
+    box-shadow: 0 var(--space-6) var(--space-20) var(--color-glass-shadow-15),
+        0 0 1px var(--color-white-alpha-60) inset,
+        0 var(--space-10) 120px var(--color-indigo-alpha-15),
+        0 0 0 1px var(--color-indigo-alpha-8);
+    /* Simulated border via shadow */
+
+    /* FIX: Force GPU */
+    transform: translateX(-50%) translateY(-10px) translateZ(0);
+    will-change: transform, opacity, visibility;
+
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition: all 0.35s var(--ease-in-out);
+    z-index: var(--z-mega-menu);
+}
+
+/* Dark Mode Mega Menu */
+[data-theme="dark"] .mega-menu-dropdown {
+    background: linear-gradient(180deg,
+            var(--color-slate-900-alpha-92) 0%,
+            var(--color-slate-alpha-88) 100%);
+    border: 1px solid var(--color-slate-400-alpha-20);
+    box-shadow: 0 var(--space-6) var(--space-20) var(--color-black-alpha-40),
+        0 0 1px var(--color-white-alpha-10) inset,
+        0 var(--space-10) 120px var(--color-indigo-alpha-25);
+}
+
+/* Show mega menu */
+.mega-menu-wrapper:hover .mega-menu-dropdown,
+.mega-menu-wrapper.active .mega-menu-dropdown {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: all;
+    transform: translateX(-50%) translateY(0);
+}
+
+/* Bridge gap between button and dropdown */
+.mega-menu-wrapper::before {
+    content: '';
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    height: var(--space-5);
+    background: transparent;
+    z-index: 99;
+}
+
+/* Smooth custom scrollbar - Webkit (Chrome, Safari, Edge) */
+.mega-menu-dropdown::-webkit-scrollbar {
+    width: var(--space-2);
+}
+
+.mega-menu-dropdown::-webkit-scrollbar-track {
+    background: var(--color-black-alpha-5);
+    border-radius: var(--radius-md);
+}
+
+.mega-menu-dropdown::-webkit-scrollbar-thumb {
+    background: linear-gradient(180deg, #667eea, #764ba2);
+    border-radius: var(--radius-md);
+}
+
+.mega-menu-dropdown::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(180deg, #764ba2, #f093fb);
+}
+
+/* Firefox scrollbar support */
+.mega-menu-dropdown {
+    scrollbar-width: thin;
+    scrollbar-color: #764ba2 var(--color-black-alpha-5);
+}
+
+[data-theme="dark"] .mega-menu-dropdown {
+    scrollbar-color: #667eea var(--color-white-alpha-5);
+}
+
+/* ==========================================
+   MEGA MENU SECTIONS
+   ========================================== */
+
+.mega-menu-section {
+    margin-bottom: var(--space-3);
+}
+
+.mega-menu-section:last-child {
+    margin-bottom: 0;
+}
+
+.mega-menu-section-title {
+    font-size: var(--font-size-xs);
+    font-weight: var(--font-weight-bold);
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    color: var(--color-slate-500-alpha-80);
+    padding: var(--space-3) var(--space-4) var(--space-2);
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+}
+
+[data-theme="dark"] .mega-menu-section-title {
+    color: var(--color-slate-400-alpha-70);
+}
+
+.mega-menu-section-title i {
+    font-size: var(--font-size-xs);
+}
+
+/* ==========================================
+   MEGA MENU ITEMS - HOLOGRAPHIC
+   ========================================== */
+
+.mega-menu-item {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+    padding: var(--space-4) var(--space-4);
+    margin: var(--space-1) 0;
+    border-radius: var(--radius-lg);
+    text-decoration: none;
+    color: var(--color-slate-800);
+    transition: all var(--transition-base);
+    position: relative;
+    overflow: hidden;
+}
+
+/* Holographic hover effect */
+.mega-menu-item::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: var(--radius-lg);
+    background: linear-gradient(135deg,
+            var(--color-indigo-alpha-8),
+            var(--color-violet-alpha-6),
+            var(--color-pink-alpha-4));
+    opacity: 0;
+    transition: opacity var(--transition-base);
+}
+
+/* Shimmer removed */
+.mega-menu-item::after {
+    display: none;
+}
+
+.mega-menu-item:hover {
+    transform: translateX(var(--space-1));
+    color: var(--color-primary-500);
+}
+
+.mega-menu-item:hover::before {
+    opacity: 1;
+}
+
+.mega-menu-item:hover::after {
+    display: none;
+}
+
+[data-theme="dark"] .mega-menu-item {
+    color: var(--color-slate-200);
+}
+
+[data-theme="dark"] .mega-menu-item:hover {
+    color: var(--color-primary-300);
+}
+
+/* Icon styling */
+.mega-menu-item-icon {
+    width: var(--space-10);
+    height: var(--space-10);
+    min-width: var(--space-10);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: var(--font-size-lg);
+    border-radius: var(--radius-md);
+    background: var(--color-indigo-alpha-8);
+    transition: all var(--transition-base);
+    position: relative;
+    z-index: 1;
+}
+
+.mega-menu-item:hover .mega-menu-item-icon {
+    transform: scale(1.08) rotate(-5deg);
+    filter: brightness(1.1);
+}
+
+/* Icon font rendering */
+.mega-menu-item-icon i {
+    font-style: normal;
+    display: inline-block;
+}
+
+/* Content */
+.mega-menu-item-content {
+    flex: 1;
+    position: relative;
+    z-index: 1;
+}
+
+.mega-menu-item-label {
+    font-size: var(--font-size-base);
+    font-weight: var(--font-weight-semibold);
+    line-height: var(--line-height-tight);
+    display: block;
+}
+
+.mega-menu-item-desc {
+    font-size: var(--font-size-sm);
+    color: var(--color-slate-500-alpha-80);
+    line-height: var(--line-height-tight);
+    margin-top: var(--space-1);
+}
+
+[data-theme="dark"] .mega-menu-item-desc {
+    color: var(--color-slate-400-alpha-70);
+}
+
+/* ==========================================
+   SPECIAL HIGHLIGHTS
+   ========================================== */
+
+/* Gamification Section Highlight */
+.mega-menu-item.gamification-item:hover .mega-menu-item-icon {
+    box-shadow: 0 0 var(--space-5) var(--color-amber-alpha-30);
+}
+
+/* AI Assistant - Special Premium Highlight */
+.mega-menu-item.ai-highlight {
+    background: linear-gradient(135deg,
+            var(--color-indigo-alpha-8),
+            var(--color-violet-alpha-6)) !important;
+    border: 1px solid var(--color-indigo-alpha-15);
+}
+
+.mega-menu-item.ai-highlight::before {
+    opacity: 1;
+}
+
+.mega-menu-item.ai-highlight .mega-menu-item-icon {
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: white;
+    box-shadow: 0 var(--space-1) var(--space-3) var(--color-indigo-alpha-30);
+}
+
+.mega-menu-item.ai-highlight:hover .mega-menu-item-icon {
+    box-shadow: 0 var(--space-2) var(--space-5) var(--color-indigo-alpha-50);
+    transform: scale(1.12) rotate(-8deg);
+}
+
+/* Section Dividers */
+.mega-menu-divider {
+    height: 1px;
+    background: linear-gradient(90deg,
+            transparent 0%,
+            var(--color-slate-400-alpha-20) 50%,
+            transparent 100%);
+    margin: var(--space-3) 0;
+}
+
+/* ==========================================
+   QUICK ACTIONS (Top of Mega Menu)
+   ========================================== */
+
+.mega-menu-quick-actions {
+    background: linear-gradient(135deg,
+            var(--color-gray-100-alpha-60),
+            var(--color-gray-200-alpha-50));
+    border-radius: var(--radius-lg);
+    padding: var(--space-3);
+    margin-bottom: var(--space-3);
+}
+
+[data-theme="dark"] .mega-menu-quick-actions {
+    background: linear-gradient(135deg,
+            var(--color-slate-alpha-50),
+            var(--color-slate-700-alpha-40));
+}
+
+.mega-menu-quick-actions .mega-menu-item {
+    padding: var(--space-3) var(--space-3);
+    margin: var(--space-1) 0;
+}
+
+/* ==========================================
+   RESPONSIVE
+   ========================================== */
+
+@media (max-width: 1024px) {
+    .nexus-utility-bar {
+        display: none !important;
+    }
+
+    .nexus-navbar {
+        top: 0 !important;
+        height: 60px;
+        padding: var(--space-3) 16px;
+    }
+
+    .mega-menu-trigger {
+        display: none;
+    }
+}
+
+/* ==========================================
+   ACCESSIBILITY
+   ========================================== */
+
+.mega-menu-item:focus-visible,
+.mega-menu-trigger:focus-visible,
+.nav-link:focus-visible {
+    outline: 2px solid var(--color-primary-500);
+    outline-offset: 2px;
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}

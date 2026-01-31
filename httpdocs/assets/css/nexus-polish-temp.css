@@ -36,7 +36,7 @@
    ============================================ */
 button,
 .btn,
-.glass-btn {
+.btn--glass {
     transition: transform 0.15s var(--ease-smooth),
                 box-shadow 0.15s var(--ease-smooth),
                 background-color 0.15s var(--ease-smooth);
@@ -46,19 +46,19 @@ button,
 
 button:hover,
 .btn:hover,
-.glass-btn:hover {
+.btn--glass:hover {
     will-change: transform;
 }
 
 button:not(:hover),
 .btn:not(:hover),
-.glass-btn:not(:hover) {
+.btn--glass:not(:hover) {
     will-change: auto;
 }
 
 button:active,
 .btn:active,
-.glass-btn:active {
+.btn--glass:active {
     transition-duration: 0.05s;
 }
 
@@ -382,7 +382,7 @@ i:hover,
 .user-menu-avatar {
     width: var(--space-8);
     height: var(--space-8);
-    border-radius: 50%;
+    border-radius: var(--radius-full);
     object-fit: cover;
     border: 2px solid var(--color-indigo-alpha-30);
     transition: border-color 0.2s;

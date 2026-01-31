@@ -46,15 +46,9 @@ $pendingCount = $pendingCount ?? 0;
                     <h1 class="govuk-heading-l govuk-!-margin-bottom-1"><?= htmlspecialchars($orgName) ?></h1>
                     <?php if ($isMember): ?>
                         <?php
-                        $roleColors = [
-                            'owner' => '#f47738',
-                            'admin' => '#912b88',
-                            'member' => '#1d70b8'
-                        ];
-                        $roleColor = $roleColors[$role] ?? '#1d70b8';
                         $roleIcon = $role === 'owner' ? 'fa-crown' : ($role === 'admin' ? 'fa-shield' : 'fa-user');
                         ?>
-                        <strong class="govuk-tag" style="background: <?= $roleColor ?>;">
+                        <strong class="govuk-tag govuk-tag--role-<?= htmlspecialchars($role) ?>">
                             <i class="fa-solid <?= $roleIcon ?> govuk-!-margin-right-1" aria-hidden="true"></i>
                             <?= ucfirst($role) ?>
                         </strong>

@@ -1,0 +1,90 @@
+/**
+ * Master Dashboard
+ * CivicOne Theme
+ */
+
+    .super-admin-wrapper {
+        position: relative;
+        z-index: 20;
+        padding: 0 var(--space-10) 60px;
+    }
+
+    /* Desktop spacing */
+    @media (min-width: 601px) {
+        .super-admin-wrapper {
+            padding-top: 140px;
+        }
+    }
+
+    /* Mobile responsiveness */
+    @media (max-width: 600px) {
+        .super-admin-wrapper {
+            padding: 120px var(--space-4) 100px var(--space-4);
+        }
+
+        .super-admin-wrapper [style*="grid-template-columns"] {
+            grid-template-columns: 1fr !important;
+        }
+
+        .super-admin-wrapper .nexus-card {
+            border-radius: var(--radius-lg);
+        }
+    }
+
+    /* ========================================
+       DARK MODE FOR MASTER DASHBOARD
+       ======================================== */
+
+    [data-theme="dark"] .nexus-card {
+        background: var(--color-slate-alpha-85);
+        border: 1px solid var(--color-white-alpha-10);
+    }
+
+    [data-theme="dark"] .nexus-card-header {
+        border-color: var(--color-white-alpha-10) !important;
+    }
+
+    [data-theme="dark"] .nexus-card-header h3 {
+        color: var(--color-slate-100);
+    }
+
+    [data-theme="dark"] .nexus-card-header div[style*="color:var(--nexus-text-muted)"] {
+        color: var(--color-slate-400) !important;
+    }
+
+    /* Stat cards labels */
+
+    /* Inner boxes */
+
+    /* Table */
+
+    /* Buttons */
+    [data-theme="dark"] .nexus-btn-secondary {
+        background: var(--color-slate-600-alpha-60) !important;
+        border-color: var(--color-white-alpha-15) !important;
+        color: var(--color-slate-200) !important;
+    }
+
+    [data-theme="dark"] .nexus-btn-generic[style*="background:white"] {
+        background: var(--color-slate-600-alpha-60) !important;
+        border-color: var(--color-white-alpha-15) !important;
+        color: var(--color-slate-200) !important;
+    }
+
+    /* Card body text */
+    [data-theme="dark"] .nexus-card-body p[style*="color: var(--color-govuk-grey-dark)"] {
+        color: var(--color-slate-400) !important;
+    }
+
+    /* Muted text */
+
+    /* Border top dividers */
+
+    /* Primary admin box */
+
+    /* Form inputs */
+    [data-theme="dark"] .nexus-input {
+        background: var(--color-slate-900-alpha-60) !important;
+        border-color: var(--color-white-alpha-15) !important;
+        color: var(--color-slate-100) !important;
+    }

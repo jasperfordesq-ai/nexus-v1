@@ -38,12 +38,12 @@ body>* {
     justify-content: space-between;
     align-items: center;
     padding: 0 var(--space-6);
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    font-family: var(--font-family-primary);
     background: linear-gradient(135deg,
             rgba(255, 255, 255, 0.92) 0%,
             rgba(249, 250, 251, 0.88) 100%);
-    backdrop-filter: blur(24px) saturate(200%);
-    -webkit-backdrop-filter: blur(24px) saturate(200%);
+    backdrop-filter: blur(var(--blur-heavy)) saturate(200%);
+    -webkit-backdrop-filter: blur(var(--blur-heavy)) saturate(200%);
 
     /* FIX: Soften border and add hardware acceleration */
     border-bottom: 1px solid rgba(99, 102, 241, 0.08);
@@ -79,8 +79,8 @@ body>* {
     background: linear-gradient(135deg,
             rgba(15, 23, 42, 0.95) 0%,
             rgba(30, 41, 59, 0.9) 100%);
-    backdrop-filter: blur(24px) saturate(200%);
-    -webkit-backdrop-filter: blur(24px) saturate(200%);
+    backdrop-filter: blur(var(--blur-heavy)) saturate(200%);
+    -webkit-backdrop-filter: blur(var(--blur-heavy)) saturate(200%);
     border-bottom: 1px solid rgba(148, 163, 184, 0.1);
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2),
         0 8px 32px rgba(0, 0, 0, 0.3);
@@ -223,7 +223,7 @@ body>* {
     position: relative;
     width: 24px;
     height: 24px;
-    border-radius: 50%;
+    border-radius: var(--radius-full);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -345,7 +345,7 @@ body>* {
 
     .mode-switcher {
         padding: var(--space-2);
-        border-radius: 50%;
+        border-radius: var(--radius-full);
     }
 
     .mode-arrow {
@@ -375,7 +375,7 @@ body>* {
     justify-content: center;
     width: 28px;
     height: 28px;
-    border-radius: 50%;
+    border-radius: var(--radius-full);
     transition: all var(--transition-base) var(--ease-in-out);
 }
 
@@ -513,8 +513,8 @@ body>* {
     background: linear-gradient(135deg,
             rgba(255, 255, 255, 0.88) 0%,
             rgba(249, 250, 251, 0.82) 100%);
-    backdrop-filter: blur(24px) saturate(200%);
-    -webkit-backdrop-filter: blur(24px) saturate(200%);
+    backdrop-filter: blur(var(--blur-heavy)) saturate(200%);
+    -webkit-backdrop-filter: blur(var(--blur-heavy)) saturate(200%);
     border-bottom: 1px solid rgba(99, 102, 241, 0.08);
     box-shadow: 0 4px 24px rgba(99, 102, 241, 0.06);
     transition: all var(--transition-slow) var(--ease-in-out);
@@ -628,8 +628,8 @@ body>* {
     max-width: calc(100vw - 32px); /* Prevent viewport overflow */
     white-space: nowrap;
     background: rgba(255, 255, 255, 0.85);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
+    backdrop-filter: blur(var(--blur-standard));
+    -webkit-backdrop-filter: blur(var(--blur-standard));
     border: 1px solid rgba(255, 255, 255, 0.3);
     border-radius: var(--radius-lg);
     box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
@@ -1446,7 +1446,7 @@ body>* {
 .nexus-drawer-close {
     width: 36px;
     height: 36px;
-    border-radius: 50%;
+    border-radius: var(--radius-full);
     border: none;
     background: rgba(255, 255, 255, 0.2);
     color: white;
@@ -1755,7 +1755,7 @@ body>* {
     color: white;
     width: 36px;
     height: 36px;
-    border-radius: 50%;
+    border-radius: var(--radius-full);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -1892,7 +1892,7 @@ body>* {
     left: 50%;
     width: 0;
     height: 0;
-    border-radius: 50%;
+    border-radius: var(--radius-full);
     background: rgba(255, 255, 255, 0.2);
     transform: translate(-50%, -50%);
     transition: width 0.6s, height var(--transition-slow);
@@ -4015,8 +4015,8 @@ html[data-layout-stable] * {
     background: linear-gradient(135deg,
         rgba(99, 102, 241, 0.15) 0%,
         rgba(139, 92, 246, 0.12) 100%) !important;
-    backdrop-filter: blur(16px) saturate(160%) !important;
-    -webkit-backdrop-filter: blur(16px) saturate(160%) !important;
+    backdrop-filter: blur(var(--blur-subtle)) saturate(160%) !important;
+    -webkit-backdrop-filter: blur(var(--blur-subtle)) saturate(160%) !important;
     border: 1px solid rgba(139, 92, 246, 0.25) !important;
     border-radius: var(--radius-base) !important;
     padding: var(--space-2) var(--space-4) !important;
@@ -4279,7 +4279,7 @@ html[data-layout-stable] * {
     justify-content: space-between;
     align-items: center;
     padding: 0 var(--space-6);
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    font-family: var(--font-family-primary);
 
     /* PREMIUM GLASSMORPHISM */
     background: linear-gradient(135deg,

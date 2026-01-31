@@ -1,1 +1,18 @@
-.nexus-skin-civicone{}
+/**
+ * CivicOne About Story Page (Mission & Vision)
+ * Template E: Content/Article (Section 10.6)
+ * Tenant-specific: Hour Timebank only
+ * Mission, vision, values and professional foundation
+ * WCAG 2.1 AA Compliant
+  * Fully Migrated to Design Tokens: 2026-01-21 ✓
+ */
+
+.nexus-skin-civicone {
+    /* Hero Section */
+
+    /* Mission & Vision Grid */
+
+    /* Values Section */
+
+    /* Professional Foundation Section */
+}

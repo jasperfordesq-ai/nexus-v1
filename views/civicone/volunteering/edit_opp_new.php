@@ -18,7 +18,7 @@ $isEdit = !empty($opp['id']);
 ?>
 
 <!-- Offline Banner -->
-<div id="offlineBanner" class="govuk-!-display-none" role="alert" aria-live="polite" style="position: fixed; top: 0; left: 0; right: 0; z-index: 1000; background: #d4351c; color: white; padding: 12px; text-align: center;">
+<div id="offlineBanner" class="govuk-!-display-none civicone-offline-banner" role="alert" aria-live="polite">
     <i class="fa-solid fa-wifi-slash govuk-!-margin-right-2" aria-hidden="true"></i>
     <strong>No internet connection</strong>
 </div>
@@ -30,7 +30,7 @@ $isEdit = !empty($opp['id']);
         <div class="govuk-grid-row">
             <div class="govuk-grid-column-two-thirds">
                 <h1 class="govuk-heading-xl">
-                    <i class="fa-solid fa-<?= $isEdit ? 'edit' : 'plus-circle' ?> govuk-!-margin-right-2" style="color: #1d70b8;" aria-hidden="true"></i>
+                    <i class="fa-solid fa-<?= $isEdit ? 'edit' : 'plus-circle' ?> govuk-!-margin-right-2 civicone-icon-blue" aria-hidden="true"></i>
                     <?= $isEdit ? 'Edit ' . htmlspecialchars($opp['title']) : 'Create New Opportunity' ?>
                 </h1>
 

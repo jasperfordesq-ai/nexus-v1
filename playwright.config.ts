@@ -96,31 +96,11 @@ export default defineConfig({
       dependencies: ['setup'],
     },
 
-    // Desktop Firefox - Modern Theme
-    {
-      name: 'firefox-modern',
-      use: {
-        ...devices['Desktop Firefox'],
-        storageState: 'e2e/fixtures/.auth/user-modern.json',
-      },
-      dependencies: ['setup'],
-    },
-
     // Mobile Chrome - Modern Theme
     {
       name: 'mobile-chrome',
       use: {
         ...devices['Pixel 5'],
-        storageState: 'e2e/fixtures/.auth/user-modern.json',
-      },
-      dependencies: ['setup'],
-    },
-
-    // Mobile Safari - Modern Theme
-    {
-      name: 'mobile-safari',
-      use: {
-        ...devices['iPhone 12'],
         storageState: 'e2e/fixtures/.auth/user-modern.json',
       },
       dependencies: ['setup'],

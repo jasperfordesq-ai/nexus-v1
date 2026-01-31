@@ -790,7 +790,7 @@
 .podium-avatar {
     width: 72px;
     height: 72px;
-    border-radius: 50%;
+    border-radius: var(--radius-full);
     object-fit: cover;
     border: var(--space-1) solid var(--glass-border);
     box-shadow: 0 4px 16px var(--effect-black-15);
@@ -816,7 +816,7 @@
 .podium-avatar-placeholder {
     width: 72px;
     height: 72px;
-    border-radius: 50%;
+    border-radius: var(--radius-full);
     background: linear-gradient(135deg, var(--color-primary-500), var(--color-purple-500));
     display: flex;
     align-items: center;
@@ -856,7 +856,7 @@
     transform: translateX(-50%);
     width: 28px;
     height: 28px;
-    border-radius: 50%;
+    border-radius: var(--radius-full);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -1350,7 +1350,7 @@
 .leaderboard-user-avatar {
     width: 40px;
     height: 40px;
-    border-radius: 50%;
+    border-radius: var(--radius-full);
     object-fit: cover;
     margin-right: var(--space-3);
     border: var(--space-1) solid var(--glass-border);
@@ -1360,7 +1360,7 @@
 .avatar-placeholder {
     width: 40px;
     height: 40px;
-    border-radius: 50%;
+    border-radius: var(--radius-full);
     background: linear-gradient(135deg, var(--color-primary-500), var(--color-purple-500));
     display: flex;
     align-items: center;
@@ -1585,7 +1585,7 @@
 .skeleton-circle {
     width: 180px;
     height: 180px;
-    border-radius: 50%;
+    border-radius: var(--radius-full);
 }
 
 .skeleton-text {
@@ -1736,7 +1736,7 @@
 
 .confetti:nth-child(odd) {
     background: linear-gradient(135deg, var(--color-primary-500), var(--color-purple-500));
-    border-radius: 50%;
+    border-radius: var(--radius-full);
 }
 
 .confetti:nth-child(even) {

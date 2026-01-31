@@ -402,7 +402,7 @@
     width: var(--space-20);
     height: var(--space-20);
     background: var(--effect-primary-10);
-    border-radius: 50%;
+    border-radius: var(--radius-full);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -784,7 +784,7 @@
     width: 72px;
     height: 72px;
     background: var(--effect-primary-10);
-    border-radius: 50%;
+    border-radius: var(--radius-full);
     display: flex;
     align-items: center;
     justify-content: center;

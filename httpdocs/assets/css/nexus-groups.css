@@ -198,7 +198,7 @@
 /* ============================================
    PRIMARY BUTTON
    ============================================ */
-.glass-btn-primary {
+.btn--primary {
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -219,12 +219,12 @@
     min-height: var(--space-12);
 }
 
-.glass-btn-primary:hover {
+.btn--primary:hover {
     transform: translateY(-2px);
     box-shadow: 0 6px 20px var(--primary-hover-glow, var(--effect-pink-600-40));
 }
 
-.glass-btn-primary:active {
+.btn--primary:active {
     transform: scale(0.98);
 }
 
@@ -623,7 +623,7 @@
         text-align: center;
     }
 
-    .glass-btn-primary {
+    .btn--primary {
         width: 100%;
         justify-content: center;
     }
@@ -680,7 +680,7 @@
         font-size: var(--font-size-xl);
     }
 
-    .glass-btn-primary {
+    .btn--primary {
         padding: var(--space-3) var(--space-5);
         font-size: var(--font-size-sm);
     }
@@ -695,7 +695,7 @@
    ============================================ */
 
 /* Touch targets (WCAG 2.1) */
-.glass-btn-primary,
+.btn--primary,
 .glass-search-input,
 .glass-select,
 .glass-group-card {
@@ -703,7 +703,7 @@
 }
 
 @media (max-width: 768px) {
-    .glass-btn-primary,
+    .btn--primary,
     .glass-search-input,
     .glass-select {
         min-height: var(--space-12);
@@ -711,7 +711,7 @@
 }
 
 /* Focus visible states */
-.glass-btn-primary:focus-visible,
+.btn--primary:focus-visible,
 .glass-search-input:focus-visible,
 .glass-select:focus-visible,
 .glass-group-card:focus-visible {
@@ -730,7 +730,7 @@
 /* Reduced motion */
 @media (prefers-reduced-motion: reduce) {
     .glass-group-card,
-    .glass-btn-primary,
+    .btn--primary,
     .group-image,
     .badge-featured {
         transition: none;

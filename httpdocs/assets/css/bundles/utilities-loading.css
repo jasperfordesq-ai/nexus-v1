@@ -230,7 +230,7 @@ html.loading .nexus-navbar {
 
 button,
 .btn,
-.glass-btn {
+.btn--glass {
     position: relative;
     overflow: hidden;
 }

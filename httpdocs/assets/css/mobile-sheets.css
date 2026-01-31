@@ -105,7 +105,7 @@
 .mobile-sheet-close {
     width: 32px;
     height: 32px;
-    border-radius: 50%;
+    border-radius: var(--radius-full);
     background: var(--color-gray-alpha-10);
     border: none;
     display: flex;
@@ -203,7 +203,7 @@
 .mobile-comment-avatar {
     width: 36px;
     height: 36px;
-    border-radius: 50%;
+    border-radius: var(--radius-full);
     object-fit: cover;
     flex-shrink: 0;
 }
@@ -246,7 +246,7 @@
 .mobile-comment-send {
     width: 40px;
     height: 40px;
-    border-radius: 50%;
+    border-radius: var(--radius-full);
     background: linear-gradient(135deg, var(--color-primary-500), var(--color-primary-400));
     color: white;
     border: none;
@@ -417,7 +417,7 @@
 .mobile-reply-send {
     width: 32px;
     height: 32px;
-    border-radius: 50%;
+    border-radius: var(--radius-full);
     background: linear-gradient(135deg, var(--color-primary-500), var(--color-primary-400));
     color: white;
     border: none;

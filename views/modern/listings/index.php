@@ -330,7 +330,7 @@ require __DIR__ . '/../../layouts/modern/header.php';
                     <div style="font-size: 4rem; margin-bottom: 20px;">🛒</div>
                     <h3 style="font-size: 1.5rem; margin-bottom: 10px; color: var(--htb-text-main);">No listings yet</h3>
                     <p style="color: var(--htb-text-muted); margin-bottom: 20px;">Be the first to post an offer or request!</p>
-                    <a href="<?= Nexus\Core\TenantContext::getBasePath() ?>/listings/create" class="glass-btn-primary" style="display: inline-flex; align-items: center; gap: 8px; padding: 14px 24px; background: linear-gradient(135deg, #6366f1, #8b5cf6); color: white; border-radius: 12px; text-decoration: none; font-weight: 600;">
+                    <a href="<?= Nexus\Core\TenantContext::getBasePath() ?>/listings/create" class="btn btn--primary" style="display: inline-flex; align-items: center; gap: 8px; padding: 14px 24px; background: linear-gradient(135deg, #6366f1, #8b5cf6); color: white; border-radius: 12px; text-decoration: none; font-weight: 600;">
                         <i class="fa-solid fa-plus"></i> Create Listing
                     </a>
                 </div>

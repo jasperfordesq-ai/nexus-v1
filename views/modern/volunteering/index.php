@@ -80,7 +80,7 @@ $base = Nexus\Core\TenantContext::getBasePath();
                     <span>Remote Only</span>
                 </label>
 
-                <button type="submit" class="glass-btn-primary">
+                <button type="submit" class="btn btn--primary">
                     <i class="fa-solid fa-search"></i>
                     <span>Find</span>
                 </button>
@@ -153,7 +153,7 @@ $base = Nexus\Core\TenantContext::getBasePath();
                 <div class="empty-icon">🔍</div>
                 <h3 class="empty-title">No opportunities found</h3>
                 <p class="empty-text">Check back later or adjust your search criteria.</p>
-                <a href="<?= $base ?>/volunteering" class="glass-btn-primary">
+                <a href="<?= $base ?>/volunteering" class="btn btn--primary">
                     View All Opportunities
                 </a>
             </div>
@@ -187,7 +187,7 @@ $base = Nexus\Core\TenantContext::getBasePath();
 })();
 
 // Button Press States
-document.querySelectorAll('.nexus-smart-btn, .glass-btn-primary, .view-link').forEach(btn => {
+document.querySelectorAll('.nexus-smart-btn, .btn--primary, .view-link').forEach(btn => {
     btn.addEventListener('pointerdown', function() {
         this.style.transform = 'scale(0.96)';
     });

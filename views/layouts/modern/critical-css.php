@@ -67,7 +67,14 @@ body{font-family:var(--font-family-primary);font-size:16px;line-height:1.6;color
    LAYOUT STRUCTURE - Prevents CLS
    ========================================== */
 .layout-container{min-height:100vh;display:flex;flex-direction:column}
-main,.main-content{margin-top:var(--layout-header-height);flex:1;width:100%}
+main,.main-content{margin-top:0;flex:1;width:100%}
+
+/* Desktop header clearance - utility bar (56px) + navbar (64px) + spacing (16px) = 136px */
+@media(min-width:1025px){
+.htb-container,.htb-container-full{padding-top:136px !important}
+}
+/* Home page content offset - highest specificity */
+.home-content-offset{padding-top:136px !important}
 
 /* Grid Layout - Pre-defined */
 .post-box-grid,.home-two-column-grid{

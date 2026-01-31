@@ -223,8 +223,8 @@ if (!empty($event['sdg_goals'])) {
             ?>
 
             <div class="actions-group">
-                <button type="submit" class="glass-btn-primary">Save Changes</button>
-                <a href="<?= \Nexus\Core\TenantContext::getBasePath() ?>/events/<?= $event['id'] ?>" class="glass-btn-secondary">Cancel</a>
+                <button type="submit" class="btn btn--primary">Save Changes</button>
+                <a href="<?= \Nexus\Core\TenantContext::getBasePath() ?>/events/<?= $event['id'] ?>" class="btn btn--secondary">Cancel</a>
             </div>
 
         </form>
@@ -271,7 +271,7 @@ document.querySelectorAll('form').forEach(form => {
 });
 
 // Button Press States
-document.querySelectorAll('.glass-btn-primary, .glass-btn-secondary, button').forEach(btn => {
+document.querySelectorAll('.btn--primary, .btn--secondary, button').forEach(btn => {
     btn.addEventListener('pointerdown', function() {
         this.style.transform = 'scale(0.96)';
     });

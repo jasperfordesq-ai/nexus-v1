@@ -27,17 +27,17 @@ $avatarUrl = !empty($member['avatar_url']) ? $member['avatar_url'] : $fallbackUr
 
 $reachLabel = '';
 $reachIcon = '';
-$reachColor = '#505a5f';
+$reachClass = 'govuk-tag--reach-local';
 switch ($member['service_reach'] ?? 'local_only') {
     case 'remote_ok':
         $reachLabel = 'Offers Remote Services';
         $reachIcon = 'fa-laptop-house';
-        $reachColor = '#1d70b8';
+        $reachClass = 'govuk-tag--reach-remote';
         break;
     case 'travel_ok':
         $reachLabel = 'Will Travel for Services';
         $reachIcon = 'fa-car';
-        $reachColor = '#00703c';
+        $reachClass = 'govuk-tag--reach-travel';
         break;
     default:
         $reachLabel = 'Local Services Only';
@@ -82,7 +82,7 @@ switch ($member['service_reach'] ?? 'local_only') {
                             </span>
                         </div>
 
-                        <span class="govuk-tag" style="background: <?= $reachColor ?>;">
+                        <span class="govuk-tag <?= $reachClass ?>">
                             <i class="fa-solid <?= $reachIcon ?> govuk-!-margin-right-1" aria-hidden="true"></i>
                             <?= $reachLabel ?>
                         </span>

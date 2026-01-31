@@ -870,7 +870,7 @@
     width: 80px;
     height: 80px;
     margin: 0 auto var(--space-6);
-    border-radius: 50%;
+    border-radius: var(--radius-full);
     background: linear-gradient(135deg, color-mix(in srgb, var(--color-gray-500, var(--color-gray-500)) 15%, transparent), color-mix(in srgb, var(--color-gray-500, var(--color-gray-500)) 10%, transparent));
     display: flex;
     align-items: center;

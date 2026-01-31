@@ -35,11 +35,11 @@
     text-align: center;
     /* GOV.UK warning button colors */
     background-color: var(--color-govuk-red);
-    box-shadow: 0 2px 0 #55160c;
+    box-shadow: 0 2px 0 var(--color-govuk-red-shadow, #55150b);
 }
 
 .govuk-exit-this-page__button:hover {
-    background-color: #aa2a16;
+    background-color: var(--color-govuk-red-darker, #aa2a16);
 }
 
 .govuk-exit-this-page__button:focus {

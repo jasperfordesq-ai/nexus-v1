@@ -49,7 +49,7 @@
 /* Floating Orbs */
 .holo-orb {
     position: fixed;
-    border-radius: 50%;
+    border-radius: var(--radius-full);
     filter: blur(80px);
     pointer-events: none;
     z-index: -1;

@@ -212,7 +212,7 @@
         const MAX_RIPPLES = 5;
 
         document.addEventListener('click', function(e) {
-            const button = e.target.closest('button, .btn, .glass-btn');
+            const button = e.target.closest('button, .btn, .btn--glass');
             if (!button || button.classList.contains('no-ripple')) return;
 
             // Limit concurrent ripples

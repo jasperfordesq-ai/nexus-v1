@@ -278,38 +278,34 @@ require __DIR__ . '/../../layouts/civicone/header.php';
 </div>
 
 <!-- Print-only certificate -->
-<div class="print-only certificate-print">
-    <p style="color: #505a5f; text-transform: uppercase; letter-spacing: 3px; text-align: center;">Certificate</p>
-    <h1 style="color: #1d70b8; text-align: center; margin-bottom: 30px;">Volunteer Service</h1>
+<div class="civicone-certificate-print-only certificate-print">
+    <p class="civicone-certificate-subtitle">Certificate</p>
+    <h1 class="civicone-certificate-heading">Volunteer Service</h1>
 
-    <p style="text-align: center;">This is to certify that</p>
+    <p class="govuk-body govuk-!-text-align-centre">This is to certify that</p>
 
-    <p style="text-align: center; font-size: 24px; font-weight: bold; border-bottom: 2px solid #1d70b8; display: inline-block; width: 100%; padding-bottom: 10px; margin: 20px 0;">
+    <p class="civicone-certificate-name">
         <?= htmlspecialchars($userName) ?>
     </p>
 
-    <p style="text-align: center; margin: 20px 0;">
+    <p class="govuk-body govuk-!-text-align-centre govuk-!-margin-top-4 govuk-!-margin-bottom-4">
         has generously dedicated their time and effort to support the community,
         contributing a verified total of
     </p>
 
-    <p style="text-align: center; font-size: 36px; font-weight: bold; color: #00703c; margin: 30px 0;">
+    <p class="civicone-certificate-hours">
         <?= number_format($displayHours, 1) ?> Hours
     </p>
 
-    <p style="text-align: center;">of voluntary service.</p>
+    <p class="govuk-body govuk-!-text-align-centre">of voluntary service.</p>
 
-    <div style="display: flex; justify-content: space-between; margin-top: 60px; padding-top: 20px;">
-        <div style="text-align: center; width: 45%;">
-            <div style="border-top: 1px solid #000; padding-top: 10px;">
-                Date: <?= $date ?>
-            </div>
+    <div class="civicone-certificate-signatures">
+        <div class="civicone-certificate-signature">
+            Date: <?= $date ?>
         </div>
-        <div style="text-align: center; width: 45%;">
-            <div style="border-top: 1px solid #000; padding-top: 10px;">
-                <strong><?= htmlspecialchars($tenantName) ?></strong><br>
-                Authorized Signature
-            </div>
+        <div class="civicone-certificate-signature">
+            <strong><?= htmlspecialchars($tenantName) ?></strong><br>
+            Authorized Signature
         </div>
     </div>
 </div>

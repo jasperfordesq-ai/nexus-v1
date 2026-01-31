@@ -45,7 +45,7 @@
    ============================================ */
 button,
 .btn,
-.glass-btn {
+.btn--glass {
     transition: transform var(--transition-fast),
                 box-shadow var(--transition-fast),
                 background-color var(--transition-fast);
@@ -56,19 +56,19 @@ button,
 
 button:hover,
 .btn:hover,
-.glass-btn:hover {
+.btn--glass:hover {
     will-change: transform;
 }
 
 button:not(:hover),
 .btn:not(:hover),
-.glass-btn:not(:hover) {
+.btn--glass:not(:hover) {
     will-change: auto;
 }
 
 button:active,
 .btn:active,
-.glass-btn:active {
+.btn--glass:active {
     transition-duration: 0.05s;
 }
 
@@ -1059,7 +1059,7 @@ button,
    ============================================ */
 button,
 .btn,
-.glass-btn,
+.btn--glass,
 .nexus-btn,
 a[role="button"] {
     position: relative;
@@ -1071,7 +1071,7 @@ a[role="button"] {
 
 button:hover,
 .btn:hover,
-.glass-btn:hover,
+.btn--glass:hover,
 .nexus-btn:hover,
 a[role="button"]:hover {
     transform: translateY(-2px);
@@ -1080,7 +1080,7 @@ a[role="button"]:hover {
 
 button:active,
 .btn:active,
-.glass-btn:active,
+.btn--glass:active,
 .nexus-btn:active,
 a[role="button"]:active {
     transform: translateY(0) scale(0.98);
@@ -1090,7 +1090,7 @@ a[role="button"]:active {
 /* Ripple effect */
 button::after,
 .btn::after,
-.glass-btn::after {
+.btn--glass::after {
     content: '';
     position: absolute;
     top: 50%;
@@ -1106,7 +1106,7 @@ button::after,
 
 button:active::after,
 .btn:active::after,
-.glass-btn:active::after {
+.btn--glass:active::after {
     animation: ripple var(--transition-slow) var(--ease-out);
 }
 
@@ -1454,7 +1454,7 @@ a {
     transition: color var(--transition-fast);
 }
 
-a:not(.btn):not(.glass-btn):not(.nav-link):not(.nexus-native-nav-item):not(.nexus-drawer-item)::after {
+a:not(.btn):not(.btn--glass):not(.nav-link):not(.nexus-native-nav-item):not(.nexus-drawer-item)::after {
     content: '';
     position: absolute;
     bottom: -2px; /* Specific negative value, no token */
@@ -1465,7 +1465,7 @@ a:not(.btn):not(.glass-btn):not(.nav-link):not(.nexus-native-nav-item):not(.nexu
     transition: width var(--transition-base) var(--ease-in-out);
 }
 
-a:not(.btn):not(.glass-btn):not(.nav-link):not(.nexus-native-nav-item):not(.nexus-drawer-item):hover::after {
+a:not(.btn):not(.btn--glass):not(.nav-link):not(.nexus-native-nav-item):not(.nexus-drawer-item):hover::after {
     width: 100%;
 }
 
@@ -1685,7 +1685,7 @@ body {
 
 button,
 .btn,
-.glass-btn,
+.btn--glass,
 .nexus-card,
 .glass-card,
 .modal,
@@ -1918,9 +1918,9 @@ button,
    BUTTON HOVER - Lift Effect
    ============================================== */
 .btn,
-.glass-btn,
-.glass-btn-primary,
-.glass-btn-secondary,
+.btn--glass,
+.btn--primary,
+.btn--secondary,
 .nexus-smart-btn,
 .htb-btn,
 .civic-btn,
@@ -1932,9 +1932,9 @@ button,
 }
 
 .btn:hover,
-.glass-btn:hover,
-.glass-btn-primary:hover,
-.glass-btn-secondary:hover,
+.btn--glass:hover,
+.btn--primary:hover,
+.btn--secondary:hover,
 .nexus-smart-btn:hover,
 .htb-btn:hover,
 .civic-btn:hover,
@@ -1944,9 +1944,9 @@ button,
 }
 
 .btn:active,
-.glass-btn:active,
-.glass-btn-primary:active,
-.glass-btn-secondary:active,
+.btn--glass:active,
+.btn--primary:active,
+.btn--secondary:active,
 .nexus-smart-btn:active,
 .htb-btn:active,
 .civic-btn:active,
@@ -2336,7 +2336,7 @@ select:focus,
 @media (hover: none) and (pointer: coarse) {
     /* Remove hover transforms on mobile */
     .btn:hover,
-    .glass-btn:hover,
+    .btn--glass:hover,
     .glass-card:hover,
     .member-card:hover,
     .fab:hover {
@@ -2345,7 +2345,7 @@ select:focus,
 
     /* Keep active states */
     .btn:active,
-    .glass-btn:active,
+    .btn--glass:active,
     .fab:active {
         transform: scale(0.95);
     }

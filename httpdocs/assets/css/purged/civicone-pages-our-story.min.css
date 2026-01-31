@@ -1,0 +1,130 @@
+/**
+ * Our Story Page
+ * CivicOne Theme
+ */
+
+/* ========================================
+   OUR STORY - GLASSMORPHISM 2025
+   Theme: Amber/Gold (var(--color-warning-500))
+   ======================================== */
+
+#story-glass-wrapper {
+    min-height: 100vh;
+    padding: 0;
+    margin: -2rem -1rem;
+    background: linear-gradient(135deg, var(--color-warning-500) 0%, var(--color-warning-400) 25%, var(--color-amber-300) 50%, var(--color-warning-500) 75%, var(--color-warning-600) 100%);
+    background-size: 400% 400%;
+    /* animation removed for GOV.UK compliance */
+
+/* Page Header */
+
+/* Timeline Line */
+#story-glass-wrapper .story-timeline {
+    position: relative;
+    padding-left: var(--space-10);
+}
+
+#story-glass-wrapper .story-timeline::before {
+    content: '';
+    position: absolute;
+    left: var(--space-4);
+    top: 0;
+    bottom: 0;
+    width: var(--space-1);
+    background: linear-gradient(180deg, var(--color-white-alpha-60) 0%, var(--color-white-alpha-20) 100%);
+    border-radius: 3px;
+}
+
+/* Glass Card */
+
+/* Timeline Dot */
+
+/* Card Header */
+#story-glass-wrapper .card-header {
+    background: linear-gradient(135deg, var(--color-white-alpha-25) 0%, var(--color-white-alpha-10) 100%);
+    padding: 1.25rem 1.5rem;
+    border-bottom: 1px solid var(--color-white-alpha-20);
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+}
+
+#story-glass-wrapper .card-header .icon {
+    font-size: 1.5rem;
+    filter: drop-shadow(0 2px 4px var(--color-black-alpha-15));
+}
+
+#story-glass-wrapper .card-header h2 {
+    color: white;
+    font-size: 1.4rem;
+    font-weight: 700;
+    margin: 0;
+    text-shadow: 0 1px 3px var(--color-black-alpha-15);
+}
+
+/* Card Body */
+#story-glass-wrapper .card-body {
+    padding: 1.5rem;
+}
+
+#story-glass-wrapper .card-body p {
+    color: var(--color-white-alpha-90);
+    font-size: 1.05rem;
+    line-height: 1.7;
+    margin: 0 0 1rem 0;
+}
+
+#story-glass-wrapper .card-body p:last-child {
+    margin-bottom: 0;
+}
+
+/* Highlight Quote */
+
+/* Stats Bar */
+
+/* Mission Card - Special */
+
+/* ========================================
+   DARK MODE
+   ======================================== */
+[data-theme="dark"] #story-glass-wrapper {
+    background: linear-gradient(135deg, var(--color-warning-800) 0%, var(--color-warning-700) 25%, var(--color-warning-600) 50%, var(--color-warning-500) 75%, var(--color-warning-700) 100%);
+    background-size: 400% 400%;
+}
+
+[data-theme="dark"] #story-glass-wrapper .story-timeline::before {
+    background: linear-gradient(180deg, var(--color-white-alpha-30) 0%, var(--color-white-alpha-10) 100%);
+}
+
+
+[data-theme="dark"] #story-glass-wrapper .card-header h2 {
+    color: var(--color-amber-100);
+}
+
+
+[data-theme="dark"] #story-glass-wrapper .card-body p {
+    color: var(--color-amber-100-alpha-85);
+}
+
+[data-theme="dark"] #story-glass-wrapper .card-header {
+    background: linear-gradient(135deg, var(--color-white-alpha-10) 0%, var(--color-white-alpha-5) 100%);
+}
+
+/* ========================================
+   RESPONSIVE
+   ======================================== */
+@media (max-width: 768px) {
+
+    #story-glass-wrapper .story-timeline {
+        padding-left: var(--space-8);
+    }
+
+    #story-glass-wrapper .story-timeline::before {
+        left: var(--space-2-5);
+    }
+
+    /* Animation removed for GOV.UK compliance */
+    }
+}
+
+/* Browser Fallback */

@@ -99,21 +99,23 @@ $nextMilestone = $scoreData['next_milestone'] ?? null;
         <h3 class="score-section-heading">📊 Score Breakdown</h3>
         <div class="score-breakdown-grid">
             <?php
+            // Category names - colors now handled by CSS classes
             $categories = [
-                'engagement' => ['name' => '🤝 Community Engagement', 'color' => '#6366f1'],
-                'quality' => ['name' => '⭐ Contribution Quality', 'color' => '#8b5cf6'],
-                'volunteer' => ['name' => '💪 Volunteer Hours', 'color' => '#06b6d4'],
-                'activity' => ['name' => '🚀 Platform Activity', 'color' => '#10b981'],
-                'badges' => ['name' => '🏆 Badges & Achievements', 'color' => '#f59e0b'],
-                'impact' => ['name' => '🌟 Social Impact', 'color' => '#ec4899']
+                'engagement' => '🤝 Community Engagement',
+                'quality' => '⭐ Contribution Quality',
+                'volunteer' => '💪 Volunteer Hours',
+                'activity' => '🚀 Platform Activity',
+                'badges' => '🏆 Badges & Achievements',
+                'impact' => '🌟 Social Impact'
             ];
 
-            foreach ($categories as $key => $cat):
+            foreach ($categories as $key => $name):
                 $data = $breakdown[$key] ?? ['score' => 0, 'max' => 100, 'percentage' => 0, 'details' => []];
+                $percentage = isset($data['percentage']) ? $data['percentage'] : round(($data['score'] / $data['max']) * 100, 1);
             ?>
             <div class="category-card">
                 <div class="category-header">
-                    <div class="category-name"><?php echo $cat['name']; ?></div>
+                    <div class="category-name"><?php echo $name; ?></div>
                     <div class="category-score">
                         <?php echo number_format($data['score'], 1); ?>
                         <span class="category-score-max">/<?php echo $data['max']; ?></span>
@@ -121,7 +123,7 @@ $nextMilestone = $scoreData['next_milestone'] ?? null;
                 </div>
 
                 <div class="category-progress">
-                    <div class="category-progress-fill" style="width: <?php echo isset($data['percentage']) ? $data['percentage'] : round(($data['score'] / $data['max']) * 100, 1); ?>%; background: linear-gradient(90deg, <?php echo $cat['color']; ?>, <?php echo $cat['color']; ?>cc);"></div>
+                    <div class="category-progress-fill category-progress-fill--<?php echo $key; ?>" style="width: <?php echo $percentage; ?>%;"></div>
                 </div>
 
                 <?php if (!$isPublic && !empty($data['details'])): ?>

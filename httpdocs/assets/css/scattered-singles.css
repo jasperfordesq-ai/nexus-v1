@@ -1466,16 +1466,16 @@
     }
 
     /* Button Press States */
-    .glass-btn-primary:active,
-    .glass-btn-secondary:active,
+    .btn--primary:active,
+    .btn--secondary:active,
     button:active {
         transform: scale(0.96) !important;
         transition: transform 0.1s ease !important;
     }
 
     /* Touch Targets - WCAG 2.1 AA (44px minimum) */
-    .glass-btn-primary,
-    .glass-btn-secondary,
+    .btn--primary,
+    .btn--secondary,
     button,
     .glass-input,
     select.glass-input {
@@ -1488,8 +1488,8 @@
     }
 
     /* Focus Visible */
-    .glass-btn-primary:focus-visible,
-    .glass-btn-secondary:focus-visible,
+    .btn--primary:focus-visible,
+    .btn--secondary:focus-visible,
     button:focus-visible,
     a:focus-visible,
     .glass-input:focus-visible {
@@ -1505,8 +1505,8 @@
 
     /* Mobile Responsive Enhancements */
     @media (max-width: 768px) {
-        .glass-btn-primary,
-        .glass-btn-secondary,
+        .btn--primary,
+        .btn--secondary,
         button,
         .glass-input {
             min-height: var(--space-12);
@@ -1805,7 +1805,7 @@
         margin-top: var(--space-5);
     }
 
-    #unique-glass-page-wrapper .glass-btn-primary {
+    #unique-glass-page-wrapper .btn--primary {
         padding: var(--space-4) var(--space-7);
         border-radius: var(--space-12);
         border: none;
@@ -1823,7 +1823,7 @@
         color: white;
     }
 
-    #unique-glass-page-wrapper .glass-btn-secondary {
+    #unique-glass-page-wrapper .btn--secondary {
         padding: var(--space-4) var(--space-7);
         border-radius: var(--space-12);
         font-weight: 600;
@@ -1840,12 +1840,12 @@
         color: var(--text-muted);
     }
 
-    #unique-glass-page-wrapper .glass-btn-primary:hover {
+    #unique-glass-page-wrapper .btn--primary:hover {
         transform: translateY(-2px);
         box-shadow: 0 var(--space-2) var(--space-6) var(--effect-orange-40);
     }
 
-    #unique-glass-page-wrapper .glass-btn-secondary:hover {
+    #unique-glass-page-wrapper .btn--secondary:hover {
         background: var(--effect-white-20);
         color: var(--text-color);
     }
@@ -2049,8 +2049,8 @@
             flex-direction: column;
         }
 
-        #unique-glass-page-wrapper .glass-btn-primary,
-        #unique-glass-page-wrapper .glass-btn-secondary {
+        #unique-glass-page-wrapper .btn--primary,
+        #unique-glass-page-wrapper .btn--secondary {
             flex: auto;
             width: 100%;
         }

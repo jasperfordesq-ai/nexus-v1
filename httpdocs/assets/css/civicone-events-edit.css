@@ -154,7 +154,7 @@
     html[data-theme="dark"] #unique-glass-page-wrapper {
         --glass-bg: var(--color-zinc-900-alpha-45);
         --glass-border: var(--color-white-alpha-15);
-        --text-color: #ffedd5;
+        --text-color: var(--color-orange-100, #ffedd5);
         --text-muted: var(--color-white-alpha-70);
         --accent-color: var(--color-orange-300);
         --heading-gradient: linear-gradient(135deg, var(--color-white) 0%, var(--color-orange-300) 100%);

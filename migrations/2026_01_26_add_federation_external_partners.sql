@@ -4,8 +4,8 @@
 
 -- External partners table (servers outside this installation)
 CREATE TABLE IF NOT EXISTS federation_external_partners (
-    id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-    tenant_id INT UNSIGNED NOT NULL COMMENT 'Which tenant owns this external partner connection',
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    tenant_id INT NOT NULL COMMENT 'Which tenant owns this external partner connection',
 
     -- Partner identification
     name VARCHAR(255) NOT NULL COMMENT 'Display name for this partner',
@@ -28,12 +28,12 @@ CREATE TABLE IF NOT EXISTS federation_external_partners (
     verified_at DATETIME NULL COMMENT 'When connection was last verified',
     last_sync_at DATETIME NULL COMMENT 'When data was last synced from partner',
     last_error TEXT NULL COMMENT 'Last error message if connection failed',
-    error_count INT UNSIGNED DEFAULT 0 COMMENT 'Number of consecutive errors',
+    error_count INT DEFAULT 0 COMMENT 'Number of consecutive errors',
 
     -- Partner metadata (cached from their API)
     partner_name VARCHAR(255) NULL COMMENT 'Partner timebank name from their API',
     partner_version VARCHAR(50) NULL COMMENT 'Partner API version',
-    partner_member_count INT UNSIGNED NULL COMMENT 'Cached member count from partner',
+    partner_member_count INT NULL COMMENT 'Cached member count from partner',
     partner_metadata JSON NULL COMMENT 'Additional metadata from partner API',
 
     -- Permissions (what we allow from/to this partner)
@@ -45,7 +45,7 @@ CREATE TABLE IF NOT EXISTS federation_external_partners (
     allow_groups TINYINT(1) DEFAULT 0 COMMENT 'Allow group federation',
 
     -- Audit
-    created_by INT UNSIGNED NULL COMMENT 'User who added this partner',
+    created_by INT NULL COMMENT 'User who added this partner',
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME NULL ON UPDATE CURRENT_TIMESTAMP,
 
@@ -62,8 +62,8 @@ CREATE TABLE IF NOT EXISTS federation_external_partners (
 
 -- Log table for external partner API calls
 CREATE TABLE IF NOT EXISTS federation_external_partner_logs (
-    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-    partner_id INT UNSIGNED NOT NULL,
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    partner_id INT NOT NULL,
 
     -- Request details
     endpoint VARCHAR(500) NOT NULL,
@@ -73,7 +73,7 @@ CREATE TABLE IF NOT EXISTS federation_external_partner_logs (
     -- Response details
     response_code INT NULL,
     response_body TEXT NULL,
-    response_time_ms INT UNSIGNED NULL COMMENT 'Response time in milliseconds',
+    response_time_ms INT NULL COMMENT 'Response time in milliseconds',
 
     -- Status
     success TINYINT(1) DEFAULT 0,

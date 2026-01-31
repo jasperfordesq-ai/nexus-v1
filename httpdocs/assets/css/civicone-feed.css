@@ -507,23 +507,23 @@
 }
 
 .nexus-skin-civicone .civic-type-banner-event {
-    background: var(--color-pink-100);
-    border-left: 4px solid var(--color-pink-600);
+    background: var(--color-govuk-light-grey);
+    border-left: 4px solid var(--color-govuk-pink, #912b88);
 }
 
 .nexus-skin-civicone .civic-type-banner-goal {
-    background: var(--color-emerald-100);
+    background: var(--color-govuk-light-grey);
     border-left: 4px solid var(--color-govuk-green);
 }
 
 .nexus-skin-civicone .civic-type-banner-poll {
-    background: var(--color-blue-50);
+    background: var(--color-govuk-light-grey);
     border-left: 4px solid var(--color-govuk-blue-light);
 }
 
 .nexus-skin-civicone .civic-type-banner-volunteering {
-    background: var(--color-blue-100);
-    border-left: 4px solid var(--color-govuk-black);
+    background: var(--color-govuk-light-grey);
+    border-left: 4px solid var(--color-govuk-blue);
 }
 
 body.dark-mode .nexus-skin-civicone .civic-type-banner-listing {
@@ -535,7 +535,7 @@ body.dark-mode .nexus-skin-civicone .civic-type-banner-listing.request {
 }
 
 body.dark-mode .nexus-skin-civicone .civic-type-banner-event {
-    background: var(--color-pink-800);
+    background: var(--color-govuk-pink, #912b88);
 }
 
 body.dark-mode .nexus-skin-civicone .civic-type-banner-goal {
@@ -937,11 +937,11 @@ body.dark-mode .nexus-skin-civicone .civic-type-badge {
     right: 16px;
     width: 56px;
     height: 56px;
-    border-radius: var(--radius-xl);
-    background: linear-gradient(135deg, var(--color-primary-500), var(--color-purple-500));
+    border-radius: 0;
+    background: var(--color-govuk-green);
     color: var(--color-white);
     border: none;
-    box-shadow: 0 4px 12px var(--color-indigo-alpha-40);
+    box-shadow: 0 2px 0 var(--color-govuk-green-shadow);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -950,7 +950,7 @@ body.dark-mode .nexus-skin-civicone .civic-type-badge {
 }
 
 .feed-fab-fallback:hover {
-    box-shadow: 0 6px 16px var(--color-indigo-alpha-50);
+    background: var(--color-govuk-green-dark);
 }
 
 .feed-fab-fallback:focus {

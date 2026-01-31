@@ -1,0 +1,400 @@
+/**
+ * Nexus Leaderboard Component
+ * Display engagement rankings and scores
+ * CivicOne Theme - GOV.UK Design System Compliant
+ * Updated: 2026-01-31 - Full GOV.UK compliance
+ */
+
+.leaderboard-container {
+    background: var(--color-white);
+    border: 1px solid var(--color-govuk-grey);
+    padding: var(--space-6);
+}
+
+.leaderboard-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--space-6);
+    flex-wrap: wrap;
+    gap: var(--space-4);
+    border-bottom: 1px solid var(--color-govuk-grey);
+    padding-bottom: var(--space-4);
+}
+
+.leaderboard-title {
+    font-size: var(--font-size-2xl);
+    font-weight: var(--font-weight-bold);
+    color: var(--color-govuk-black);
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    margin: 0;
+}
+
+.leaderboard-filters {
+    display: flex;
+    gap: var(--space-2);
+}
+
+/* GOV.UK compliant filter buttons */
+.filter-button {
+    padding: var(--space-2) var(--space-4);
+    background: var(--color-govuk-light-grey);
+    border: 2px solid var(--color-govuk-grey);
+    color: var(--color-govuk-black);
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-normal);
+    cursor: pointer;
+    transition: background-color 0.15s, border-color 0.15s;
+}
+
+.filter-button:hover {
+    background: var(--color-white);
+    border-color: var(--color-govuk-black);
+}
+
+.filter-button:focus {
+    outline: 3px solid var(--color-govuk-yellow);
+    outline-offset: 0;
+    background-color: var(--color-govuk-yellow);
+    color: var(--color-govuk-black);
+    border-color: var(--color-govuk-black);
+}
+
+.filter-button.active {
+    background: var(--color-govuk-blue-light);
+    border-color: var(--color-govuk-blue-light);
+    color: var(--color-white);
+}
+
+.filter-button.active:focus {
+    outline: 3px solid var(--color-govuk-yellow);
+    outline-offset: 0;
+    background-color: var(--color-govuk-yellow);
+    color: var(--color-govuk-black);
+    border-color: var(--color-govuk-black);
+}
+
+/* User rank card */
+.user-rank-card {
+    background: var(--color-govuk-light-grey);
+    border-left: 4px solid var(--color-govuk-green);
+    padding: var(--space-5);
+    margin-bottom: var(--space-6);
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    gap: var(--space-5);
+    align-items: center;
+}
+
+.rank-badge {
+    width: var(--space-16);
+    height: var(--space-16);
+    background: var(--color-govuk-green);
+    border-radius: 50%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.rank-number {
+    font-size: var(--font-size-2xl);
+    font-weight: var(--font-weight-bold);
+    color: var(--color-white);
+    line-height: 1;
+}
+
+.rank-label {
+    font-size: var(--font-size-xs);
+    color: var(--color-white);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.rank-details {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+}
+
+.rank-name {
+    font-size: var(--font-size-lg);
+    font-weight: var(--font-weight-semibold);
+    color: var(--color-govuk-black);
+}
+
+.rank-score-bar {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+}
+
+.rank-progress {
+    flex: 1;
+    height: 8px;
+    background: var(--color-govuk-grey);
+    overflow: hidden;
+}
+
+.rank-progress-fill {
+    height: 100%;
+    background: var(--color-govuk-green);
+}
+
+.rank-score-value {
+    font-size: var(--font-size-xl);
+    font-weight: var(--font-weight-bold);
+    color: var(--color-govuk-green);
+}
+
+.comparison-stat {
+    text-align: center;
+    padding: var(--space-4);
+    background: var(--color-white);
+    border: 1px solid var(--color-govuk-grey);
+}
+
+.comparison-value {
+    font-size: var(--font-size-xl);
+    font-weight: var(--font-weight-bold);
+    color: var(--color-govuk-green);
+}
+
+.comparison-label {
+    font-size: var(--font-size-xs);
+    color: var(--color-govuk-grey-dark);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-top: var(--space-1);
+}
+
+/* Leaderboard list */
+.leaderboard-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+}
+
+.leader-item {
+    background: var(--color-white);
+    border: 1px solid var(--color-govuk-grey);
+    padding: var(--space-4) var(--space-5);
+    display: grid;
+    grid-template-columns: 60px 1fr auto;
+    gap: var(--space-5);
+    align-items: center;
+    transition: background-color 0.15s;
+}
+
+.leader-item:hover {
+    background: var(--color-govuk-light-grey);
+}
+
+/* Gold/Silver/Bronze rankings */
+.leader-item.rank-1 {
+    border-left: 4px solid var(--color-gold, #b58900);
+    background: var(--color-govuk-light-grey);
+}
+
+.leader-item.rank-2 {
+    border-left: 4px solid var(--color-govuk-grey-dark);
+    background: var(--color-govuk-light-grey);
+}
+
+.leader-item.rank-3 {
+    border-left: 4px solid var(--color-bronze, #cd7f32);
+    background: var(--color-govuk-light-grey);
+}
+
+.leader-rank-display {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: var(--space-12);
+    height: var(--space-12);
+    background: var(--color-govuk-light-grey);
+    border: 2px solid var(--color-govuk-grey);
+    font-size: var(--font-size-xl);
+    font-weight: var(--font-weight-bold);
+    color: var(--color-govuk-black);
+}
+
+.leader-item.rank-1 .leader-rank-display {
+    background: var(--color-gold, #b58900);
+    border-color: var(--color-gold, #b58900);
+    color: var(--color-white);
+}
+
+.leader-item.rank-2 .leader-rank-display {
+    background: var(--color-govuk-grey-dark);
+    border-color: var(--color-govuk-grey-dark);
+    color: var(--color-white);
+}
+
+.leader-item.rank-3 .leader-rank-display {
+    background: var(--color-bronze, #cd7f32);
+    border-color: var(--color-bronze, #cd7f32);
+    color: var(--color-white);
+}
+
+.leader-info {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+}
+
+.leader-name {
+    font-size: var(--font-size-lg);
+    font-weight: var(--font-weight-semibold);
+    color: var(--color-govuk-black);
+}
+
+.leader-tier {
+    font-size: var(--font-size-sm);
+    color: var(--color-govuk-grey-dark);
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+}
+
+.leader-score-display {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: var(--space-1);
+}
+
+.leader-score-value {
+    font-size: var(--font-size-xl);
+    font-weight: var(--font-weight-bold);
+    color: var(--color-govuk-blue-light);
+}
+
+.leader-score-label {
+    font-size: var(--font-size-xs);
+    color: var(--color-govuk-grey-dark);
+}
+
+/* Average line indicator */
+.average-line {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+    padding: var(--space-4);
+    background: var(--color-govuk-light-grey);
+    border-left: 4px solid var(--color-govuk-orange, #f47738);
+    margin: var(--space-4) 0;
+}
+
+.average-icon {
+    font-size: var(--font-size-xl);
+    color: var(--color-govuk-orange, #f47738);
+}
+
+.average-text {
+    flex: 1;
+    font-size: var(--font-size-base);
+    color: var(--color-govuk-black);
+}
+
+.average-score {
+    font-size: var(--font-size-lg);
+    font-weight: var(--font-weight-bold);
+    color: var(--color-govuk-orange, #f47738);
+}
+
+/* Load more button - GOV.UK compliant */
+.load-more-button {
+    width: 100%;
+    padding: var(--space-3) var(--space-4);
+    background: var(--color-govuk-light-grey);
+    border: 2px solid var(--color-govuk-grey);
+    color: var(--color-govuk-black);
+    font-size: var(--font-size-base);
+    font-weight: var(--font-weight-semibold);
+    cursor: pointer;
+    transition: background-color 0.15s, border-color 0.15s;
+    margin-top: var(--space-4);
+}
+
+.load-more-button:hover {
+    background: var(--color-white);
+    border-color: var(--color-govuk-black);
+}
+
+.load-more-button:focus {
+    outline: 3px solid var(--color-govuk-yellow);
+    outline-offset: 0;
+    background-color: var(--color-govuk-yellow);
+    color: var(--color-govuk-black);
+    border-color: var(--color-govuk-black);
+}
+
+/* Empty state styles */
+.leaderboard-empty-state {
+    text-align: center;
+    padding: var(--space-12) var(--space-4);
+    background: var(--color-govuk-light-grey);
+    border: 1px solid var(--color-govuk-grey);
+}
+
+.leaderboard-empty-icon {
+    font-size: var(--font-size-4xl);
+    color: var(--color-govuk-grey-dark);
+    margin-bottom: var(--space-4);
+}
+
+.leaderboard-empty-title {
+    font-size: var(--font-size-lg);
+    font-weight: var(--font-weight-semibold);
+    color: var(--color-govuk-black);
+    margin-bottom: var(--space-2);
+}
+
+.leaderboard-empty-description {
+    font-size: var(--font-size-base);
+    color: var(--color-govuk-grey-dark);
+}
+
+/* Mobile responsive */
+@media (max-width: 768px) {
+    .leaderboard-container {
+        padding: var(--space-4);
+    }
+
+    .user-rank-card {
+        grid-template-columns: auto 1fr;
+    }
+
+    .comparison-stat {
+        grid-column: span 2;
+    }
+
+    .leader-item {
+        grid-template-columns: 48px 1fr;
+        gap: var(--space-4);
+    }
+
+    .leader-score-display {
+        grid-column: 2;
+        align-items: flex-start;
+        margin-top: var(--space-2);
+    }
+
+    .leaderboard-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .leaderboard-filters {
+        width: 100%;
+        flex-wrap: wrap;
+    }
+
+    .filter-button {
+        flex: 1;
+        text-align: center;
+    }
+}

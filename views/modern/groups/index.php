@@ -36,7 +36,7 @@ require __DIR__ . '/../../layouts/modern/header.php';
                 </p>
             </div>
             <?php if ($canCreateGroup ?? false): ?>
-                <a href="<?= \Nexus\Core\TenantContext::getBasePath() ?>/groups/create" class="glass-btn-primary">
+                <a href="<?= \Nexus\Core\TenantContext::getBasePath() ?>/groups/create" class="btn btn--primary">
                     <i class="fa-solid fa-plus"></i>
                     Create <?= $isHubsPage ? 'Hub' : 'Group' ?>
                 </a>
@@ -70,7 +70,7 @@ require __DIR__ . '/../../layouts/modern/header.php';
                     <?php endforeach; ?>
                 </select>
             <?php endif; ?>
-            <button type="submit" class="glass-btn-primary">
+            <button type="submit" class="btn btn--primary">
                 <i class="fa-solid fa-search"></i> Search
             </button>
         </form>
@@ -116,7 +116,7 @@ require __DIR__ . '/../../layouts/modern/header.php';
                     <?php endif; ?>
                 </p>
                 <?php if ($canCreateGroup ?? false): ?>
-                    <a href="<?= \Nexus\Core\TenantContext::getBasePath() ?>/groups/create" class="glass-btn-primary">
+                    <a href="<?= \Nexus\Core\TenantContext::getBasePath() ?>/groups/create" class="btn btn--primary">
                         <i class="fa-solid fa-plus"></i>
                         Create <?= $isHubsPage ? 'Hub' : 'Group' ?>
                     </a>
@@ -220,7 +220,7 @@ document.querySelectorAll('form').forEach(form => {
 });
 
 // Button Press States
-document.querySelectorAll('.glass-btn-primary, .nexus-smart-btn, .quick-action-btn, button').forEach(btn => {
+document.querySelectorAll('.btn--primary, .nexus-smart-btn, .quick-action-btn, button').forEach(btn => {
     btn.addEventListener('pointerdown', function() {
         this.style.transform = 'scale(0.96)';
     });

@@ -81,14 +81,14 @@
     }
 }
 
-/* Balance Card */
+/* Balance Card - GOV.UK Design System */
 .civic-balance-card {
-    background: linear-gradient(135deg, var(--civic-brand, var(--color-blue-600)) 0%, var(--color-blue-700) 100%);
+    background: var(--color-govuk-blue-light);
     color: var(--color-white);
-    border-radius: var(--radius-lg);
+    border-radius: 0;
     padding: var(--space-6);
     margin-bottom: var(--space-6);
-    box-shadow: 0 10px 25px -5px var(--color-blue-600-alpha-30);
+    box-shadow: none;
 }
 
 .civic-balance-card-inner {
@@ -623,8 +623,8 @@
 .civic-match-avatar {
     width: var(--space-11);
     height: var(--space-11);
-    border-radius: var(--radius-md);
-    background: linear-gradient(135deg, var(--color-primary-500), var(--color-purple-500));
+    border-radius: 50%;
+    background: var(--color-govuk-blue-light);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -634,7 +634,7 @@
     flex-shrink: 0;
     overflow: hidden;
     border: 2px solid var(--color-white);
-    box-shadow: 0 2px 8px var(--color-black-alpha-10);
+    box-shadow: none;
 }
 
 .civic-match-avatar img {

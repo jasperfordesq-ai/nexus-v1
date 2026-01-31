@@ -1,0 +1,289 @@
+/* ============================================
+   GOLD STANDARD - Native App Features
+   ============================================ */
+
+/* Offline Banner */
+.offline-banner {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 10001;
+    padding: var(--space-3) var(--space-5);
+    background: linear-gradient(135deg, var(--color-danger), var(--color-red-600));
+    color: white;
+    font-size: 0.9rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-2);
+    transform: translateY(-100%);
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.offline-banner.visible {
+    transform: translateY(0);
+}
+
+
+.discussion-create-card {
+    /* animation removed for GOV.UK compliance */
+}
+
+/* Button Press States */
+.discussion-submit-btn:active,
+.discussion-back-btn:active,
+.discussion-cancel-btn:active,
+button:active {
+    transform: scale(0.96) !important;
+    transition: transform 0.1s ease !important;
+}
+
+/* Touch Targets - WCAG 2.1 AA (44px minimum) */
+.discussion-submit-btn,
+.discussion-back-btn,
+.discussion-cancel-btn,
+.discussion-form-input,
+button {
+    min-height: var(--space-11);
+}
+
+.discussion-form-input {
+    font-size: 16px !important; /* Prevent iOS zoom */
+}
+
+/* Focus Visible */
+.discussion-submit-btn:focus-visible,
+.discussion-back-btn:focus-visible,
+.discussion-cancel-btn:focus-visible,
+.discussion-form-input:focus-visible,
+button:focus-visible,
+a:focus-visible {
+    outline: 3px solid var(--color-pink-600-alpha-50);
+    outline-offset: 2px;
+}
+
+/* Smooth Scroll */
+html {
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
+}
+
+/* Mobile Responsive - Gold Standard */
+@media (max-width: 768px) {
+    .discussion-submit-btn,
+    .discussion-back-btn,
+    .discussion-cancel-btn,
+    button {
+        min-height: var(--space-12);
+    }
+}
+
+/* ============================================
+   CREATE DISCUSSION - MOBILE FIRST
+   ============================================ */
+.discussion-create-wrapper {
+    padding-top: 120px;
+    padding-bottom: var(--space-10);
+    max-width: 800px;
+    position: relative;
+    z-index: 20;
+}
+
+.discussion-back-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    padding: var(--space-2-5) var(--space-4-5);
+    background: var(--color-white-alpha-90);
+    /* backdrop-filter removed for GOV.UK compliance */
+    border-radius: var(--radius-lg);
+    color: var(--color-slate-500);
+    text-decoration: none;
+    font-size: 0.9rem;
+    font-weight: 600;
+    margin-bottom: var(--space-4);
+    transition: all 0.2s ease;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.discussion-back-btn:hover {
+    background: white;
+    color: var(--color-pink-600);
+}
+
+.discussion-create-card {
+    overflow: hidden;
+    box-shadow: 0 10px 30px var(--color-black-alpha-10);
+    border-radius: var(--radius-2xl);
+}
+
+.discussion-create-header {
+    background: linear-gradient(135deg, var(--color-pink-200) 0%, var(--color-pink-400) 100%);
+    padding: var(--space-6);
+    color: var(--color-pink-900, #831843);
+}
+
+.discussion-create-header h2 {
+    margin: 0;
+    font-weight: 800;
+    font-size: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: var(--space-2-5);
+}
+
+.discussion-create-header p {
+    margin: var(--space-1-5) 0 0 0;
+    opacity: 0.8;
+    font-size: 0.9rem;
+}
+
+.discussion-create-body {
+    padding: var(--space-6);
+}
+
+.discussion-form-label {
+    display: block;
+    font-weight: 600;
+    color: var(--htb-text-main);
+    margin-bottom: var(--space-2);
+    font-size: 0.95rem;
+}
+
+.discussion-form-input {
+    width: 100%;
+    padding: var(--space-3-5) 16px;
+    font-size: 1rem;
+    border: 2px solid var(--color-gray-200);
+    border-radius: var(--radius-lg);
+    font-family: inherit;
+    box-sizing: border-box;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    background: white;
+    color: var(--htb-text-main);
+    -webkit-appearance: none;
+}
+
+.discussion-form-input:focus {
+    outline: none;
+    border-color: var(--color-pink-600);
+    box-shadow: 0 0 0 4px var(--color-pink-600-alpha-10);
+}
+
+.discussion-form-input::placeholder {
+    color: var(--color-gray-400);
+}
+
+textarea.discussion-form-input {
+    resize: vertical;
+    min-height: 140px;
+    line-height: 1.6;
+}
+
+.discussion-form-hint {
+    font-size: 0.8rem;
+    color: var(--color-gray-500);
+    margin-top: var(--space-1-5);
+    text-align: right;
+}
+
+.discussion-form-actions {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: var(--space-3);
+    padding-top: var(--space-5);
+    border-top: 1px solid var(--color-gray-100);
+}
+
+.discussion-cancel-btn {
+    text-decoration: none;
+    color: var(--color-gray-500);
+    font-weight: 600;
+    padding: var(--space-3) var(--space-5);
+    border-radius: var(--radius-lg);
+    transition: all 0.2s ease;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.discussion-cancel-btn:hover {
+    background: var(--color-gray-100);
+}
+
+.discussion-submit-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    background: linear-gradient(135deg, var(--color-pink-600), var(--color-pink-500));
+    border: none;
+    padding: var(--space-3-5) var(--space-7);
+    font-size: 1rem;
+    font-weight: 600;
+    color: white;
+    border-radius: var(--radius-lg);
+    box-shadow: 0 4px 15px var(--color-pink-600-alpha-30);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.discussion-submit-btn:active {
+    transform: scale(0.98);
+}
+
+[data-theme="dark"] .discussion-form-input {
+    background: var(--color-slate-alpha-80);
+    border-color: var(--color-white-alpha-15);
+    color: var(--color-slate-100);
+}
+
+[data-theme="dark"] .discussion-back-btn {
+    background: var(--color-slate-alpha-90);
+    color: var(--color-slate-300);
+}
+
+/* Mobile Optimizations */
+@media (max-width: 768px) {
+    .discussion-create-wrapper {
+        padding: 100px var(--space-3) 100px var(--space-3);
+    }
+
+    .discussion-create-card {
+        border-radius: var(--radius-xl);
+    }
+
+    .discussion-create-header {
+        padding: var(--space-5) 16px;
+    }
+
+    .discussion-create-header h2 {
+        font-size: 1.25rem;
+    }
+
+    .discussion-create-body {
+        padding: var(--space-5) 16px;
+    }
+
+    .discussion-form-input {
+        padding: var(--space-3) var(--space-3-5);
+        font-size: 16px; /* Prevents iOS zoom */
+    }
+
+    .discussion-form-actions {
+        flex-direction: column-reverse;
+        gap: var(--space-2-5);
+    }
+
+    .discussion-cancel-btn,
+    .discussion-submit-btn {
+        width: 100%;
+        justify-content: center;
+        text-align: center;
+    }
+
+    .discussion-back-btn {
+        padding: var(--space-2) var(--space-3-5);
+        font-size: 0.85rem;
+    }
+}

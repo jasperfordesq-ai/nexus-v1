@@ -1203,7 +1203,7 @@ textarea.holo-input {
 
         /* Button Press States */
         .htb-btn:active,
-        .glass-btn-primary:active,
+        .btn--primary:active,
         .nexus-smart-btn:active,
         .quick-action-btn:active,
         .download-btn:active,
@@ -1214,7 +1214,7 @@ textarea.holo-input {
 
         /* Touch Targets - WCAG 2.1 AA (44px minimum) */
         .htb-btn,
-        .glass-btn-primary,
+        .btn--primary,
         .nexus-smart-btn,
         .quick-action-btn,
         .download-btn,
@@ -1237,7 +1237,7 @@ textarea.holo-input {
 
         /* Focus Visible */
         .htb-btn:focus-visible,
-        .glass-btn-primary:focus-visible,
+        .btn--primary:focus-visible,
         .nexus-smart-btn:focus-visible,
         .quick-action-btn:focus-visible,
         .download-btn:focus-visible,
@@ -1256,7 +1256,7 @@ textarea.holo-input {
         /* Mobile Responsive Enhancements */
         @media (max-width: 768px) {
             .htb-btn,
-            .glass-btn-primary,
+            .btn--primary,
             .nexus-smart-btn,
             .quick-action-btn,
             .download-btn,
@@ -1470,7 +1470,7 @@ textarea.holo-input {
         }
 
         /* Glass Primary Button */
-        #resources-glass-wrapper .glass-btn-primary {
+        #resources-glass-wrapper .btn--primary {
             background: linear-gradient(135deg, var(--color-primary-500) 0%, var(--color-primary-600) 100%);
             color: white;
             border: none;
@@ -1488,7 +1488,7 @@ textarea.holo-input {
             gap: var(--space-2);
         }
 
-        #resources-glass-wrapper .glass-btn-primary:hover {
+        #resources-glass-wrapper .btn--primary:hover {
             transform: translateY(-2px);
             box-shadow: 0 8px 24px var(--effect-primary-40),
                         inset 0 1px 0 var(--effect-white-30);

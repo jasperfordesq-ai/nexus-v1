@@ -53,7 +53,7 @@
 /* Floating Orbs */
 .holo-orb {
     position: fixed;
-    border-radius: 50%;
+    border-radius: var(--radius-full);
     filter: blur(80px);
     pointer-events: none;
     z-index: -1;
@@ -570,7 +570,7 @@
 /* Floating Orbs */
 .holo-orb {
     position: fixed;
-    border-radius: 50%;
+    border-radius: var(--radius-full);
     filter: blur(80px);
     pointer-events: none;
     z-index: -1;
@@ -1055,7 +1055,7 @@
         .htb-btn:active,
         button:active,
         .nexus-smart-btn:active,
-        .glass-btn-primary:active,
+        .btn--primary:active,
         .vote-link:active {
             transform: scale(0.96) !important;
             transition: transform 0.1s ease !important;
@@ -1065,7 +1065,7 @@
         .htb-btn,
         button,
         .nexus-smart-btn,
-        .glass-btn-primary,
+        .btn--primary,
         input[type="text"],
         input[type="search"] {
             min-height: 44px;
@@ -1082,7 +1082,7 @@
         a:focus-visible,
         input:focus-visible,
         .nexus-smart-btn:focus-visible,
-        .glass-btn-primary:focus-visible {
+        .btn--primary:focus-visible {
             outline: 3px solid var(--effect-purple-50);
             outline-offset: 2px;
         }
@@ -1101,7 +1101,7 @@
 
             .htb-btn,
             .nexus-smart-btn,
-            .glass-btn-primary {
+            .btn--primary {
                 min-height: 48px;
             }
         }
@@ -1270,7 +1270,7 @@
         }
 
         /* Glass Primary Button */
-        #polls-glass-wrapper .glass-btn-primary {
+        #polls-glass-wrapper .btn--primary {
             background: linear-gradient(135deg, var(--color-purple-500) 0%, var(--color-purple-600) 100%);
             color: white;
             border: none;
@@ -1288,7 +1288,7 @@
             gap: var(--space-2);
         }
 
-        #polls-glass-wrapper .glass-btn-primary:hover {
+        #polls-glass-wrapper .btn--primary:hover {
             transform: translateY(-2px);
             box-shadow: 0 8px 24px var(--effect-purple-40),
                         inset 0 1px 0 var(--effect-white-30);
@@ -1378,7 +1378,7 @@
             width: 150px;
             height: 150px;
             background: var(--effect-white-10);
-            border-radius: 50%;
+            border-radius: var(--radius-full);
             top: -50px;
             right: -50px;
         }
@@ -1910,7 +1910,7 @@ html {
 /* Floating Holographic Orbs */
 .holo-orb {
     position: fixed;
-    border-radius: 50%;
+    border-radius: var(--radius-full);
     filter: blur(80px);
     opacity: 0.4;
     pointer-events: none;
@@ -2135,7 +2135,7 @@ html {
     width: 24px;
     height: 24px;
     border: 2px solid var(--effect-white-30);
-    border-radius: 50%;
+    border-radius: var(--radius-full);
     margin-right: var(--space-5);
     display: grid;
     place-content: center;
@@ -2149,7 +2149,7 @@ html {
     content: "";
     width: 12px;
     height: 12px;
-    border-radius: 50%;
+    border-radius: var(--radius-full);
     transform: scale(0);
     transition: 0.2s transform cubic-bezier(0.175, 0.885, 0.32, 1.275);
     background: var(--color-white);
@@ -2443,7 +2443,7 @@ html {
 .comment-avatar {
     width: 40px;
     height: 40px;
-    border-radius: 50%;
+    border-radius: var(--radius-full);
     object-fit: cover;
     border: 2px solid var(--effect-purple-30);
 }

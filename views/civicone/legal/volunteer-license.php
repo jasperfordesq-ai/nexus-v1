@@ -21,7 +21,7 @@ require __DIR__ . '/../../layouts/civicone/header.php';
         <div class="govuk-grid-row">
             <div class="govuk-grid-column-two-thirds">
                 <h1 class="govuk-heading-xl">
-                    <i class="fa-solid fa-handshake govuk-!-margin-right-2" style="color: #00703c;" aria-hidden="true"></i>
+                    <i class="fa-solid fa-handshake govuk-!-margin-right-2 govuk-icon--green" aria-hidden="true"></i>
                     Volunteer Agreement
                 </h1>
 
@@ -109,7 +109,7 @@ require __DIR__ . '/../../layouts/civicone/header.php';
 
                 <hr class="govuk-section-break govuk-section-break--l govuk-section-break--visible">
 
-                <p class="govuk-body-s" style="color: #505a5f;">
+                <p class="govuk-body-s govuk-text--secondary">
                     Last updated: <?= date('F Y') ?>
                 </p>
 
@@ -127,9 +127,9 @@ require __DIR__ . '/../../layouts/civicone/header.php';
 
             <!-- Sidebar -->
             <div class="govuk-grid-column-one-third">
-                <div class="govuk-!-padding-4 civicone-panel-bg" style="border-left: 5px solid #1d70b8;">
+                <div class="govuk-!-padding-4 civicone-panel-bg govuk-panel--blue-border">
                     <h3 class="govuk-heading-s">
-                        <i class="fa-solid fa-circle-info govuk-!-margin-right-2" style="color: #1d70b8;" aria-hidden="true"></i>
+                        <i class="fa-solid fa-circle-info govuk-!-margin-right-2 govuk-icon--blue" aria-hidden="true"></i>
                         Need help?
                     </h3>
                     <p class="govuk-body-s">
@@ -138,9 +138,9 @@ require __DIR__ . '/../../layouts/civicone/header.php';
                     <a href="<?= $basePath ?>/contact" class="govuk-link">Contact support</a>
                 </div>
 
-                <div class="govuk-!-padding-4 govuk-!-margin-top-4 civicone-panel-bg" style="border-left: 5px solid #00703c;">
+                <div class="govuk-!-padding-4 govuk-!-margin-top-4 civicone-panel-bg govuk-panel--green-border">
                     <h3 class="govuk-heading-s">
-                        <i class="fa-solid fa-shield-halved govuk-!-margin-right-2" style="color: #00703c;" aria-hidden="true"></i>
+                        <i class="fa-solid fa-shield-halved govuk-!-margin-right-2 govuk-icon--green" aria-hidden="true"></i>
                         Your rights
                     </h3>
                     <ul class="govuk-list govuk-list--bullet govuk-body-s">

@@ -1,1 +1,106 @@
-:root{}
+/**
+ * Mobile Design Tokens
+ * Centralized scale system for spacing, typography, border-radius, and transitions
+ * Apply to mobile-specific components for visual consistency
+ * Version: 1.0 - 2026-01-21
+ *
+ * Usage: Import this file in mobile CSS or use CSS variables
+ */
+
+:root {
+    /* ============================================
+       SPACING SCALE (8px base)
+       Use these for padding, margin, gap
+       ============================================ */    /* Extra small - tight spacing */    /* Small - compact spacing */   /* Medium - standard spacing */   /* Large - comfortable spacing */   /* Extra large - generous spacing */   /* 2XL - section spacing */   /* 3XL - major sections */  /* 4XL - hero spacing */  /* 5XL - large headers */
+
+    /* ============================================
+       BORDER RADIUS SCALE
+       Use these for consistent rounded corners
+       ============================================ */    /* Subtle rounding */    /* Small elements */    /* Cards, buttons */   /* Larger cards */   /* Feature cards */  /* Sheets, modals */  /* Circular elements */ /* Pill buttons */
+
+    /* ============================================
+       TYPOGRAPHY SCALE
+       Mobile-optimized font sizes
+       ============================================ */
+
+    /* Font Sizes */     /* Tiny labels, badges */     /* Small labels, captions */   /* Body text, standard UI */     /* Emphasized body text */     /* Large body, input text */     /* Sheet titles, headers */    /* Section headings */    /* Page titles */    /* Large headings */    /* Hero text */
+
+    /* Font Weights */
+
+    /* Line Heights */
+
+    /* ============================================
+       TRANSITION TIMING
+       Consistent animation durations and easing
+       ============================================ */
+
+    /* Durations */
+
+    /* Easing Functions */  /* iOS-like smooth */  /* Bounce effect */
+
+    /* Common Transitions */
+
+    /* ============================================
+       TOUCH TARGET SIZES
+       WCAG 2.1 AAA compliance (44x44px minimum)
+       ============================================ */   /* Small buttons (use sparingly) */ /* Standard minimum */   /* Comfortable size */   /* Large buttons */
+
+    /* ============================================
+       Z-INDEX SCALE
+       Layering system for mobile components
+       ============================================ */
+
+    /* ============================================
+       MOBILE-SPECIFIC MEASUREMENTS
+       ============================================ */
+
+    /* Navigation Heights */
+
+    /* Safe Areas (iOS notch support) */
+}
+
+/* ============================================
+   UTILITY CLASSES
+   Quick-apply design tokens
+   ============================================ */
+
+/* Spacing Utilities */
+
+/* Border Radius Utilities */
+
+/* Typography Utilities */
+
+/* Touch Target Utilities */
+
+/* Transition Utilities */
+
+/* ============================================
+   USAGE EXAMPLES & MIGRATION GUIDE
+   ============================================ */
+
+/*
+OLD (Inconsistent):
+.button {
+    padding: 10px 16px;
+    border-radius: 18px;
+    font-size: 15px;
+    transition: 0.2s;
+}
+
+NEW (With Design Tokens):
+.button {
+    padding: var(--mobile-space-3) var(--mobile-space-4);
+    border-radius: var(--mobile-radius-2xl);
+    font-size: var(--mobile-text-md);
+    transition: var(--mobile-transition-color), var(--mobile-transition-bg);
+    min-width: var(--mobile-touch-base);
+    min-height: var(--mobile-touch-base);
+}
+
+BENEFITS:
+- Consistent spacing across all mobile components
+- Easy global adjustments (change one variable, update everywhere)
+- Better maintainability
+- Accessibility compliance (touch targets)
+- Professional, cohesive mobile experience
+*/

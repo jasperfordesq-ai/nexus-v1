@@ -176,7 +176,7 @@
 }
 
 /* Glass Button Primary */
-#volunteering-glass-wrapper .glass-btn-primary {
+#volunteering-glass-wrapper .btn--primary {
     display: inline-flex;
     align-items: center;
     gap: var(--space-2);
@@ -192,7 +192,7 @@
     text-decoration: none;
 }
 
-#volunteering-glass-wrapper .glass-btn-primary:hover {
+#volunteering-glass-wrapper .btn--primary:hover {
     transform: translateY(-2px);
     box-shadow: 0 4px 12px var(--effect-emerald-30);
 }
@@ -579,7 +579,7 @@
     }
 
     #volunteering-glass-wrapper .glass-select,
-    #volunteering-glass-wrapper .glass-btn-primary {
+    #volunteering-glass-wrapper .btn--primary {
         width: 100%;
     }
 }
@@ -5005,7 +5005,7 @@ html {
             background: var(--effect-slate-900-85);
         }
 
-        #org-glass-wrapper .glass-btn-primary {
+        #org-glass-wrapper .btn--primary {
             background: linear-gradient(135deg, var(--color-primary-500) 0%, var(--color-purple-500) 100%);
             color: white;
             border: none;
@@ -5022,7 +5022,7 @@ html {
             gap: var(--space-2);
         }
 
-        #org-glass-wrapper .glass-btn-primary:hover {
+        #org-glass-wrapper .btn--primary:hover {
             transform: translateY(-var(--space-0.5));
             box-shadow: 0 var(--space-2) var(--space-6) var(--effect-primary-40),
                         inset 0 1px 0 var(--effect-white-30);
@@ -5389,7 +5389,7 @@ html {
     }
 
     /* Glass Button Primary */
-    #vol-show-glass-wrapper .glass-btn-primary {
+    #vol-show-glass-wrapper .btn--primary {
         background: linear-gradient(135deg, var(--color-teal-500), var(--color-teal-600));
         color: var(--color-white);
         padding: var(--space-3.5) var(--space-7);
@@ -5403,7 +5403,7 @@ html {
         box-shadow: 0 var(--space-1) var(--space-4) var(--effect-teal-30);
     }
 
-    #vol-show-glass-wrapper .glass-btn-primary:hover {
+    #vol-show-glass-wrapper .btn--primary:hover {
         transform: translateY(-var(--space-0.5));
         box-shadow: 0 var(--space-2) var(--space-6) var(--effect-teal-40);
     }
@@ -5519,7 +5519,7 @@ html {
     }
 
     /* Button Press States */
-    #vol-show-glass-wrapper .glass-btn-primary:active,
+    #vol-show-glass-wrapper .btn--primary:active,
     #vol-show-glass-wrapper button:active,
     #vol-show-glass-wrapper a:active {
         transform: scale(0.96) !important;
@@ -5551,7 +5551,7 @@ html {
 
     /* Touch Targets - WCAG 2.1 AA (44px minimum) */
     #vol-show-glass-wrapper button,
-    #vol-show-glass-wrapper .glass-btn-primary,
+    #vol-show-glass-wrapper .btn--primary,
     #vol-show-glass-wrapper a[href] {
         min-height: 44px;
     }
@@ -5572,7 +5572,7 @@ html {
 
     /* Focus Visible */
     #vol-show-glass-wrapper button:focus-visible,
-    #vol-show-glass-wrapper .glass-btn-primary:focus-visible,
+    #vol-show-glass-wrapper .btn--primary:focus-visible,
     #vol-show-glass-wrapper a:focus-visible,
     #vol-show-glass-wrapper textarea:focus-visible,
     #vol-show-glass-wrapper input:focus-visible,
@@ -5601,7 +5601,7 @@ html {
             padding-bottom: 100px;
         }
 
-        #vol-show-glass-wrapper .glass-btn-primary {
+        #vol-show-glass-wrapper .btn--primary {
             min-height: 52px;
             font-size: 1.1rem;
         }

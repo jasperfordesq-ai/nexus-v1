@@ -39,11 +39,11 @@
             typeInput.value = typeId;
         }
 
-        // Update active pill
-        document.querySelectorAll('.type-pill').forEach(pill => {
+        // Update active pill (support both old and new class names)
+        document.querySelectorAll('.type-pill, .govuk-overlay-type-pill').forEach(pill => {
             pill.classList.remove('active');
         });
-        const selectedPill = document.querySelector(`.type-pill[data-type-id="${typeId}"]`);
+        const selectedPill = document.querySelector(`.govuk-overlay-type-pill[data-type-id="${typeId}"], .type-pill[data-type-id="${typeId}"]`);
         if (selectedPill) {
             selectedPill.classList.add('active');
         }
@@ -59,8 +59,8 @@
                 const imagePreview = document.getElementById('imagePreview');
 
                 if (previewImg) previewImg.src = e.target.result;
-                if (uploadArea) uploadArea.classList.add('hidden');
-                if (imagePreview) imagePreview.classList.remove('hidden');
+                if (uploadArea) uploadArea.classList.add('govuk-hidden');
+                if (imagePreview) imagePreview.classList.add('show');
             };
             reader.readAsDataURL(input.files[0]);
         }
@@ -74,8 +74,8 @@
         const imagePreview = document.getElementById('imagePreview');
 
         if (imageFile) imageFile.value = '';
-        if (uploadArea) uploadArea.classList.remove('hidden');
-        if (imagePreview) imagePreview.classList.add('hidden');
+        if (uploadArea) uploadArea.classList.remove('govuk-hidden');
+        if (imagePreview) imagePreview.classList.remove('show');
     };
 
     // Initialize event listeners

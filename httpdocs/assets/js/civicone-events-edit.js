@@ -41,7 +41,7 @@ document.querySelectorAll('form').forEach(form => {
 });
 
 // Button Press States - using classList for GOV.UK compliance
-document.querySelectorAll('.glass-btn-primary, .glass-btn-secondary, button').forEach(btn => {
+document.querySelectorAll('.btn--primary, .btn--secondary, button').forEach(btn => {
     btn.addEventListener('pointerdown', function() {
         this.classList.add('btn-pressed');
     });

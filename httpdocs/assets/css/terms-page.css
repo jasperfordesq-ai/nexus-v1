@@ -303,7 +303,7 @@
     top: 0.5rem;
     width: 8px;
     height: 8px;
-    border-radius: 50%;
+    border-radius: var(--radius-full);
     background: var(--terms-theme);
 }
 

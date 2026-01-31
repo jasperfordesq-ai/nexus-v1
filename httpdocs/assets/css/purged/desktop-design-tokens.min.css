@@ -1,1 +1,209 @@
-@media (min-width:768px){:root{--desktop-transition-normal:250ms;--desktop-ease-smooth:cubic-bezier(0.4,0,0.2,1);--desktop-transition-transform:transform var(--desktop-transition-normal) var(--desktop-ease-smooth);--desktop-transition-shadow:box-shadow var(--desktop-transition-normal) var(--desktop-ease-smooth);--desktop-hover-lift:-4px;--desktop-hover-lift-lg:-8px;--desktop-hover-scale:1.05;--desktop-shadow-hover:0 12px 32px rgba(0,0,0,0.12)}}@media (min-width:1280px){:root{}}@media (min-width:1536px){:root{}}@media (min-width:768px){.desktop-shadow-hover{box-shadow:var(--desktop-shadow-hover)}}@media (hover:hover) and (pointer:fine){.desktop-hover-lift{transition:var(--desktop-transition-transform)}.desktop-hover-lift:hover{transform:translateY(var(--desktop-hover-lift))}.desktop-hover-lift-lg{transition:var(--desktop-transition-transform)}.desktop-hover-lift-lg:hover{transform:translateY(var(--desktop-hover-lift-lg))}.desktop-hover-scale{transition:var(--desktop-transition-transform)}.desktop-hover-scale:hover{transform:scale(var(--desktop-hover-scale))}.desktop-hover-shadow{transition:var(--desktop-transition-shadow)}.desktop-hover-shadow:hover{box-shadow:var(--desktop-shadow-hover)}}@media (prefers-reduced-motion:reduce){:root{--desktop-transition-normal:0ms}}
+/**
+ * Desktop Design Tokens
+ * Unified design system for desktop/tablet experiences
+ * Version: 1.0 - 2026-01-21
+ *
+ * PRIORITY: HIGH
+ * Brings desktop to same polish level as mobile
+ * Complements mobile-design-tokens.css
+ */
+
+/* ============================================
+   DESKTOP-SPECIFIC DESIGN TOKENS
+   Applied only on larger screens (768px+)
+   ============================================ */
+
+@media (min-width: 768px) {
+    :root {
+        /* ==========================================
+           SPACING SCALE
+           Slightly more generous than mobile for desktop layouts
+           ========================================== */   /* Larger than mobile's 12px */   /* Mobile uses 16px */
+
+        /* Grid gaps for desktop layouts */
+
+        /* ==========================================
+           BORDER RADIUS SCALE
+           Slightly larger than mobile for desktop feel
+           ========================================== */    /* Mobile: 4px */   /* Mobile: 8px */   /* Mobile: 12px */   /* Mobile: 16px */  /* Mobile: 20px */
+
+        /* Semantic radius tokens */
+
+        /* ==========================================
+           TYPOGRAPHY SCALE
+           Larger base sizes for desktop readability
+           ========================================== */
+
+        /* Font weights */
+
+        /* Line heights */
+
+        /* ==========================================
+           TRANSITION TIMING
+           Consistent animation durations
+           ========================================== */
+        --desktop-transition-normal: 250ms;
+
+        /* Easing functions */
+        --desktop-ease-smooth: cubic-bezier(0.4, 0, 0.2, 1);  /* Primary easing */
+
+        /* Semantic transition tokens */
+        --desktop-transition-transform: transform var(--desktop-transition-normal) var(--desktop-ease-smooth);
+        --desktop-transition-shadow: box-shadow var(--desktop-transition-normal) var(--desktop-ease-smooth);
+
+        /* ==========================================
+           HOVER EFFECTS
+           Consistent hover transformations
+           ========================================== */
+
+        /* Lift amounts */
+        --desktop-hover-lift: -4px;
+        --desktop-hover-lift-lg: -8px;
+
+        /* Scale amounts */
+        --desktop-hover-scale: 1.05;
+
+        /* Rotation */
+
+        /* ==========================================
+           CLICK TARGETS
+           Smaller than mobile (no fat fingers) but still accessible
+           ========================================== */
+
+        /* ==========================================
+           SHADOWS
+           Desktop-appropriate shadow depths
+           ========================================== */
+
+        /* Hover shadows */
+        --desktop-shadow-hover: 0 12px 32px rgba(0, 0, 0, 0.12);
+
+        /* Focus shadows */
+
+        /* ==========================================
+           Z-INDEX SCALE
+           Consistent layering system
+           ========================================== */
+
+        /* ==========================================
+           LAYOUT DIMENSIONS
+           Desktop-specific layout constraints
+           ========================================== */
+
+        /* Grid columns */
+
+        /* ==========================================
+           BACKDROP BLUR
+           Glassmorphism effects for desktop
+           ========================================== */
+
+        /* ==========================================
+           OPACITY SCALE
+           Consistent transparency levels
+           ========================================== */
+
+        /* ==========================================
+           CURSOR STYLES
+           Desktop-appropriate cursor feedback
+           ========================================== */
+    }
+}
+
+/* ==========================================
+   LARGE DESKTOP (1280px+)
+   Enhanced spacing for extra-large screens
+   ========================================== */
+
+@media (min-width: 1280px) {
+    :root {
+        /* Increase spacing for large screens */
+
+        /* Larger gaps */
+
+        /* Wider layouts */
+    }
+}
+
+/* ==========================================
+   EXTRA LARGE DESKTOP (1536px+)
+   Maximum spacing for ultra-wide displays
+   ========================================== */
+
+@media (min-width: 1536px) {
+    :root {
+        /* Maximum spacing */
+
+        /* Ultra-wide layouts */
+    }
+}
+
+/* ==========================================
+   UTILITY CLASSES
+   Pre-built classes using design tokens
+   ========================================== */
+
+@media (min-width: 768px) {
+    /* Spacing utilities */
+
+    /* Border radius utilities */
+
+    /* Typography utilities */
+
+    /* Shadow utilities */
+    .desktop-shadow-hover { box-shadow: var(--desktop-shadow-hover); }
+
+    /* Transition utilities */
+}
+
+/* ==========================================
+   HOVER UTILITIES
+   Desktop-only (pointer device detection)
+   ========================================== */
+
+@media (hover: hover) and (pointer: fine) {
+    /* Hover lift */
+    .desktop-hover-lift {
+        transition: var(--desktop-transition-transform);
+    }
+
+    .desktop-hover-lift:hover {
+        transform: translateY(var(--desktop-hover-lift));
+    }
+
+    .desktop-hover-lift-lg {
+        transition: var(--desktop-transition-transform);
+    }
+
+    .desktop-hover-lift-lg:hover {
+        transform: translateY(var(--desktop-hover-lift-lg));
+    }
+
+    /* Hover scale */
+    .desktop-hover-scale {
+        transition: var(--desktop-transition-transform);
+    }
+
+    .desktop-hover-scale:hover {
+        transform: scale(var(--desktop-hover-scale));
+    }
+
+    /* Hover shadow */
+    .desktop-hover-shadow {
+        transition: var(--desktop-transition-shadow);
+    }
+
+    .desktop-hover-shadow:hover {
+        box-shadow: var(--desktop-shadow-hover);
+    }
+}
+
+/* ==========================================
+   ACCESSIBILITY
+   Reduced motion support
+   ========================================== */
+
+@media (prefers-reduced-motion: reduce) {
+    :root {
+        --desktop-transition-normal: 0ms;
+    }
+}

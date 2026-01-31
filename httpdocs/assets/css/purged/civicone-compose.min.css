@@ -1,1 +1,269 @@
-.compose-modal-context *{box-sizing:border-box;margin:0;padding:0}.compose-page-body{font-family:"GDS Transport",arial,sans-serif;background:var(--color-govuk-black-alpha-85);min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px}.compose-container{background:white;max-width:680px;width:100%;max-height:90vh;overflow-y:auto}.compose-header{background:var(--color-govuk-blue-light);color:white;padding:16px 20px;display:flex;align-items:center;gap:16px;position:sticky;top:0;z-index:10}.compose-header h1{flex:1;font-size:24px;font-weight:700;margin:0}.poll-option{display:flex;gap:8px;margin-bottom:8px;align-items:center}.poll-option input{flex:1}.poll-option button{width:36px;height:36px;background:var(--color-govuk-red);border:none;color:white;cursor:pointer}.poll-option button:hover{background:var(--color-govuk-red-darker)}@media (max-width:640px){.compose-page-body{padding:0}.compose-container{max-height:100vh;height:100vh}}
+/**
+ * CivicOne Compose Modal CSS
+ * GOV.UK Design System compliant compose/create modal
+ * Extracted from inline styles (Phase 5 CSS Architecture Refactoring)
+ *
+ * Colors follow GOV.UK Design System using design tokens:
+ * - var(--color-govuk-black): GOV.UK black (text)
+ * - var(--color-govuk-blue-light): GOV.UK link blue
+ * - var(--color-govuk-green): GOV.UK green (offers)
+ * - var(--color-govuk-purple): GOV.UK purple (requests)
+ * - var(--color-govuk-light-grey): GOV.UK light grey
+ * - var(--color-govuk-grey): GOV.UK mid grey
+ * - var(--color-govuk-red): GOV.UK red (destructive)
+ *
+ * Created: 2026-01-25
+ * Updated: 2026-01-31 - Migrated to design tokens
+ */
+
+/* Reset for compose modal context */
+.compose-modal-context * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+/* Body styles for compose page */
+.compose-page-body {
+    font-family: "GDS Transport", arial, sans-serif;
+    background: var(--color-govuk-black-alpha-85);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+/* Container */
+.compose-container {
+    background: white;
+    max-width: 680px;
+    width: 100%;
+    max-height: 90vh;
+    overflow-y: auto;
+}
+
+/* Header */
+.compose-header {
+    background: var(--color-govuk-blue-light);
+    color: white;
+    padding: 16px 20px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+.compose-header h1 {
+    flex: 1;
+    font-size: 24px;
+    font-weight: 700;
+    margin: 0;
+}
+
+/* Close button */
+.close-btn {
+    background: transparent;
+    border: 2px solid white;
+    color: white;
+    width: 40px;
+    height: 40px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.close-btn:hover {
+    background: var(--color-white-alpha-10);
+}
+
+.close-btn:focus {
+    outline: 3px solid var(--color-govuk-yellow);
+    outline-offset: 0;
+    background-color: var(--color-govuk-yellow);
+    color: var(--color-govuk-black);
+    border-color: var(--color-govuk-black);
+}
+
+/* Tab navigation */
+.tab-nav {
+    display: flex;
+    gap: 8px;
+    padding: 12px 20px;
+    background: var(--color-govuk-light-grey);
+    border-bottom: 1px solid var(--color-govuk-grey);
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+.tab-nav::-webkit-scrollbar {
+    display: none;
+}
+
+/* Tab buttons */
+.tab-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 10px 16px;
+    background: white;
+    border: 2px solid var(--color-govuk-grey);
+    color: var(--color-govuk-black);
+    font-size: 14px;
+    font-weight: 400;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all 0.15s;
+}
+
+.tab-btn:hover {
+    border-color: var(--color-govuk-black);
+}
+
+.tab-btn:focus {
+    outline: 3px solid var(--color-govuk-yellow);
+    outline-offset: 0;
+    background-color: var(--color-govuk-yellow);
+    color: var(--color-govuk-black);
+    border-color: var(--color-govuk-black);
+}
+
+.tab-btn.active {
+    background: var(--color-govuk-blue-light);
+    border-color: var(--color-govuk-blue-light);
+    color: white;
+}
+
+.tab-btn.active:focus {
+    outline: 3px solid var(--color-govuk-yellow);
+    outline-offset: 0;
+    background-color: var(--color-govuk-yellow);
+    color: var(--color-govuk-black);
+    border-color: var(--color-govuk-black);
+}
+
+/* Tab panels */
+.tab-panel {
+    display: none;
+    padding: 20px;
+}
+
+.tab-panel.active {
+    display: block;
+}
+
+/* Type toggle (offer/request) */
+.type-toggle {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 20px;
+}
+
+.type-btn {
+    flex: 1;
+    padding: 12px;
+    background: var(--color-govuk-light-grey);
+    border: 2px solid var(--color-govuk-grey);
+    color: var(--color-govuk-black);
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.type-btn:hover {
+    background: white;
+}
+
+.type-btn:focus {
+    outline: 3px solid var(--color-govuk-yellow);
+    outline-offset: 0;
+    background-color: var(--color-govuk-yellow);
+    color: var(--color-govuk-black);
+    border-color: var(--color-govuk-black);
+}
+
+.type-btn.active {
+    background: var(--color-govuk-blue-light);
+    border-color: var(--color-govuk-blue-light);
+    color: white;
+}
+
+.type-btn.active:focus {
+    outline: 3px solid var(--color-govuk-yellow);
+    outline-offset: 0;
+    background-color: var(--color-govuk-yellow);
+    color: var(--color-govuk-black);
+    border-color: var(--color-govuk-black);
+}
+
+/* Offer type button - GOV.UK green */
+.type-btn.offer.active {
+    background: var(--color-govuk-green);
+    border-color: var(--color-govuk-green);
+}
+
+/* Request type button - GOV.UK pink */
+.type-btn.request.active {
+    background: var(--color-govuk-pink, #912b88);
+    border-color: var(--color-govuk-pink, #912b88);
+}
+
+/* Step indicator */
+
+/* Steps */
+.step {
+    display: none;
+}
+
+.step.active {
+    display: block;
+}
+
+/* Poll options */
+.poll-option {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 8px;
+    align-items: center;
+}
+
+.poll-option input {
+    flex: 1;
+}
+
+.poll-option button {
+    width: 36px;
+    height: 36px;
+    background: var(--color-govuk-red);
+    border: none;
+    color: white;
+    cursor: pointer;
+}
+
+.poll-option button:hover {
+    background: var(--color-govuk-red-darker);
+}
+
+/* Mobile responsive */
+@media (max-width: 640px) {
+    .compose-page-body {
+        padding: 0;
+    }
+
+    .compose-container {
+        max-height: 100vh;
+        height: 100vh;
+    }
+
+    .tab-btn {
+        font-size: 13px;
+        padding: 8px 12px;
+    }
+}

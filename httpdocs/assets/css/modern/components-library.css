@@ -268,7 +268,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    border-radius: 50%;
+    border-radius: var(--radius-full);
     font-size: 0.625rem;
     color: white;
     border: 2px solid white;
@@ -280,7 +280,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    border-radius: 50%;
+    border-radius: var(--radius-full);
     font-size: 1rem;
     color: white;
 }
@@ -357,7 +357,7 @@
     width: 8px;
     height: 8px;
     background: var(--color-primary-500);
-    border-radius: 50%;
+    border-radius: var(--radius-full);
 }
 
 .component-notification__actions {
@@ -428,7 +428,7 @@
     height: 16px;
     background: var(--color-success);
     border: 3px solid white;
-    border-radius: 50%;
+    border-radius: var(--radius-full);
 }
 
 .component-profile__info {
@@ -466,7 +466,7 @@
     width: 6px;
     height: 6px;
     background: white;
-    border-radius: 50%;
+    border-radius: var(--radius-full);
 }
 
 .component-profile__meta {
@@ -1442,7 +1442,7 @@
     justify-content: center;
     background: rgba(255, 255, 255, 0.9);
     border: none;
-    border-radius: 50%;
+    border-radius: var(--radius-full);
     cursor: pointer;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
     transition: background 0.2s;
@@ -1475,7 +1475,7 @@
     padding: 0;
     background: rgba(255, 255, 255, 0.5);
     border: none;
-    border-radius: 50%;
+    border-radius: var(--radius-full);
     cursor: pointer;
     transition: background 0.2s;
 }
@@ -1505,7 +1505,7 @@
     justify-content: center;
     background: rgba(255, 255, 255, 0.1);
     border: none;
-    border-radius: 50%;
+    border-radius: var(--radius-full);
     color: white;
     font-size: 1.5rem;
     cursor: pointer;
@@ -1527,7 +1527,7 @@
     justify-content: center;
     background: rgba(255, 255, 255, 0.1);
     border: none;
-    border-radius: 50%;
+    border-radius: var(--radius-full);
     color: white;
     font-size: 1.25rem;
     cursor: pointer;
@@ -1620,7 +1620,7 @@
     justify-content: center;
     background: rgba(0, 0, 0, 0.7);
     border: none;
-    border-radius: 50%;
+    border-radius: var(--radius-full);
     color: white;
     font-size: 1.75rem;
     cursor: pointer;
@@ -2163,7 +2163,7 @@
     width: 20px;
     height: 20px;
     background: white;
-    border-radius: 50%;
+    border-radius: var(--radius-full);
     box-shadow: var(--shadow-sm);
     transition: transform 0.2s;
 }
@@ -2254,7 +2254,7 @@
     justify-content: center;
     background: var(--color-gray-100);
     border: none;
-    border-radius: 50%;
+    border-radius: var(--radius-full);
     color: var(--color-gray-500);
     cursor: pointer;
     transition: background 0.2s;
@@ -3325,7 +3325,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    border-radius: 50%;
+    border-radius: var(--radius-full);
     color: white;
     flex-shrink: 0;
 }
@@ -3416,7 +3416,7 @@
 .component-skeleton--avatar {
     width: 40px;
     height: 40px;
-    border-radius: 50%;
+    border-radius: var(--radius-full);
 }
 
 .component-skeleton--avatar-lg {
@@ -3453,7 +3453,7 @@
     height: 40px;
     border: 3px solid var(--color-gray-200);
     border-top-color: var(--color-primary-500);
-    border-radius: 50%;
+    border-radius: var(--radius-full);
     animation: spinner-rotate 0.8s linear infinite;
 }
 
@@ -3490,7 +3490,7 @@
     width: 8px;
     height: 8px;
     background: var(--color-primary-500);
-    border-radius: 50%;
+    border-radius: var(--radius-full);
     animation: dots-bounce 0.6s infinite alternate;
 }
 
@@ -3520,7 +3520,7 @@
     width: 40px;
     height: 40px;
     background: var(--color-primary-500);
-    border-radius: 50%;
+    border-radius: var(--radius-full);
     animation: pulse-scale 1s ease-in-out infinite;
 }
 
@@ -3809,7 +3809,7 @@
     height: 16px;
     border: 2px solid currentColor;
     border-top-color: transparent;
-    border-radius: 50%;
+    border-radius: var(--radius-full);
     animation: spinner-rotate 0.8s linear infinite;
 }
 
@@ -3890,7 +3890,7 @@
     background: var(--color-primary-500);
     color: white;
     border: none;
-    border-radius: 50%;
+    border-radius: var(--radius-full);
     font-size: 1.5rem;
     cursor: pointer;
     box-shadow: var(--shadow-lg);
@@ -4253,7 +4253,7 @@
     height: 16px;
     background: var(--color-primary-500);
     border: 3px solid var(--color-surface);
-    border-radius: 50%;
+    border-radius: var(--radius-full);
 }
 
 .component-timeline__marker--success {
@@ -4303,7 +4303,7 @@
     align-items: center;
     justify-content: center;
     background: var(--color-gray-200);
-    border-radius: 50%;
+    border-radius: var(--radius-full);
     overflow: hidden;
     flex-shrink: 0;
 }
@@ -4331,7 +4331,7 @@
     width: 12px;
     height: 12px;
     border: 2px solid var(--color-surface);
-    border-radius: 50%;
+    border-radius: var(--radius-full);
 }
 
 .component-avatar__status--online {
@@ -4367,7 +4367,7 @@
     margin-left: -10px;
     background: var(--color-gray-200);
     border: 2px solid var(--color-surface);
-    border-radius: 50%;
+    border-radius: var(--radius-full);
     font-size: var(--font-size-xs);
     font-weight: var(--font-weight-semibold);
     color: var(--color-text-muted);
@@ -4473,7 +4473,7 @@
 }
 
 .component-image--circle {
-    border-radius: 50%;
+    border-radius: var(--radius-full);
 }
 
 .component-image--cover {

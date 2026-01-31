@@ -12,9 +12,10 @@
  * - Point 36: 27px mobile → 36px desktop (M headings)
  * - Point 27: 21px mobile → 27px desktop (S headings)
  * - Point 24: 18px mobile → 24px desktop (Lead text)
- * - Point 19: 16px mobile → 19px desktop (Body)
+ * - Point 19: 16px mobile → 19px desktop (Body, Caption)
  * - Point 16: 14px mobile → 16px desktop (Small)
- * - Point 14: 12px mobile → 14px desktop (Caption)
+ *
+ * Note: Caption elevated to Point 19 for WCAG 2.1 AA compliance (min 16px)
  *
  * Line heights:
  * - Headings: 1.09375 (tight)
@@ -48,7 +49,7 @@
     --govuk-secondary-text-colour: var(--color-govuk-grey-dark);
     --govuk-link-colour: var(--color-govuk-blue-light);
     --govuk-link-hover-colour: var(--color-govuk-blue);
-    --govuk-link-visited-colour: #4c2c92;
+    --govuk-link-visited-colour: var(--color-govuk-link-visited);
 
     /* CivicOne mappings */
     --civicone-font-family: var(--govuk-font-family);
@@ -262,11 +263,11 @@ body.nexus-skin-civicone {
     }
 }
 
-/* Caption text - GOV.UK Point 14 */
+/* Caption text - GOV.UK Point 19 (minimum 16px for WCAG 2.1 AA) */
 [data-layout="civicone"] .caption,
 .civicone .caption,
 .civic-caption {
-    font-size: var(--font-size-xs); /* 12px mobile */
+    font-size: var(--font-size-base); /* 16px - WCAG 2.1 AA minimum */
     line-height: var(--govuk-line-height-body);
     color: var(--civicone-text-secondary);
 }
@@ -275,7 +276,7 @@ body.nexus-skin-civicone {
     [data-layout="civicone"] .caption,
     .civicone .caption,
     .civic-caption {
-        font-size: var(--font-size-sm); /* 14px desktop */
+        font-size: 1.1875rem; /* 19px desktop - matches GOV.UK body */
     }
 }
 
@@ -399,13 +400,14 @@ body.nexus-skin-civicone {
 
 /* ===========================================
    Dark Mode Adjustments
+   Scoped to .civicone per GR-016
    =========================================== */
-body.dark-mode [data-layout="civicone"],
-body.dark-mode.nexus-skin-civicone {
+.civicone.dark-mode [data-layout="civicone"],
+.civicone.dark-mode.nexus-skin-civicone {
     --civicone-text: var(--color-white);
     --civicone-text-secondary: var(--color-govuk-grey);
-    --civicone-link: #8eb4e8;
-    --civicone-link-hover: #b8d4f1;
+    --civicone-link: var(--color-govuk-link-dark-mode);
+    --civicone-link-hover: var(--color-govuk-link-dark-mode-hover);
 }
 
 /* ===========================================
@@ -497,8 +499,10 @@ body.dark-mode.nexus-skin-civicone {
     --civicone-section-spacing: var(--govuk-spacing-9);
 }
 
-/* Tablet+ responsive overrides */
-@media (min-width: var(--govuk-breakpoint-tablet)) {
+/* Tablet+ responsive overrides
+   NOTE: CSS variables cannot be used in media query conditions.
+   Using hardcoded breakpoint values (40.0625em = 650px tablet, 61.875em = 990px desktop) */
+@media (min-width: 40.0625em) {
     :root {
         --govuk-spacing-4: var(--space-5);
         --govuk-spacing-5: 25px;
@@ -686,7 +690,7 @@ body.dark-mode.nexus-skin-civicone {
     padding-bottom: var(--civicone-spacing-7);
 }
 
-@media (min-width: var(--govuk-breakpoint-tablet)) {
+@media (min-width: 40.0625em) {
     .civic-section {
         padding-top: var(--civicone-spacing-9);
         padding-bottom: var(--civicone-spacing-9);
@@ -698,7 +702,7 @@ body.dark-mode.nexus-skin-civicone {
     padding-bottom: var(--civicone-spacing-5);
 }
 
-@media (min-width: var(--govuk-breakpoint-tablet)) {
+@media (min-width: 40.0625em) {
     .civic-section-sm {
         padding-top: var(--civicone-spacing-6);
         padding-bottom: var(--civicone-spacing-6);
@@ -716,7 +720,7 @@ body.dark-mode.nexus-skin-civicone {
     padding-right: var(--civicone-gutter-half);
 }
 
-@media (min-width: var(--govuk-breakpoint-tablet)) {
+@media (min-width: 40.0625em) {
     .civic-container {
         padding-left: var(--civicone-gutter);
         padding-right: var(--civicone-gutter);
@@ -743,7 +747,7 @@ body.dark-mode.nexus-skin-civicone {
     grid-template-columns: 1fr;
 }
 
-@media (min-width: var(--govuk-breakpoint-tablet)) {
+@media (min-width: 40.0625em) {
     .civic-grid-2 {
         grid-template-columns: repeat(2, 1fr);
     }
@@ -753,13 +757,13 @@ body.dark-mode.nexus-skin-civicone {
     grid-template-columns: 1fr;
 }
 
-@media (min-width: var(--govuk-breakpoint-tablet)) {
+@media (min-width: 40.0625em) {
     .civic-grid-3 {
         grid-template-columns: repeat(2, 1fr);
     }
 }
 
-@media (min-width: var(--govuk-breakpoint-desktop)) {
+@media (min-width: 61.875em) {
     .civic-grid-3 {
         grid-template-columns: repeat(3, 1fr);
     }
@@ -769,13 +773,13 @@ body.dark-mode.nexus-skin-civicone {
     grid-template-columns: 1fr;
 }
 
-@media (min-width: var(--govuk-breakpoint-tablet)) {
+@media (min-width: 40.0625em) {
     .civic-grid-4 {
         grid-template-columns: repeat(2, 1fr);
     }
 }
 
-@media (min-width: var(--govuk-breakpoint-desktop)) {
+@media (min-width: 61.875em) {
     .civic-grid-4 {
         grid-template-columns: repeat(4, 1fr);
     }
@@ -786,7 +790,7 @@ body.dark-mode.nexus-skin-civicone {
     grid-template-columns: 1fr;
 }
 
-@media (min-width: var(--govuk-breakpoint-tablet)) {
+@media (min-width: 40.0625em) {
     .civic-grid-2-1 {
         grid-template-columns: 2fr 1fr;
     }
@@ -796,7 +800,7 @@ body.dark-mode.nexus-skin-civicone {
     grid-template-columns: 1fr;
 }
 
-@media (min-width: var(--govuk-breakpoint-tablet)) {
+@media (min-width: 40.0625em) {
     .civic-grid-1-2 {
         grid-template-columns: 1fr 2fr;
     }
@@ -941,10 +945,11 @@ body.dark-mode.nexus-skin-civicone {
 .civic-dropdown-content a:focus-visible,
 .civic-dropdown-content button:focus,
 .civic-dropdown-content button:focus-visible {
-    outline: none !important;
+    outline: 3px solid var(--civicone-focus-text) !important;
+    outline-offset: -3px !important;
     background-color: var(--civicone-focus) !important;
     color: var(--civicone-focus-text) !important;
-    box-shadow: inset 0 0 0 3px var(--civicone-focus-text) !important;
+    box-shadow: none !important;
 }
 
 /* ===========================================
@@ -962,7 +967,7 @@ body.dark-mode.nexus-skin-civicone {
     text-decoration: none !important;
     outline: 3px solid var(--civicone-focus-text) !important;
     outline-offset: 0 !important;
-    box-shadow: 0 var(--space-1) var(--space-2) rgba(0, 0, 0, 0.3) !important;
+    box-shadow: 0 var(--space-1) var(--space-2) var(--color-black-alpha-30) !important;
 }
 
 /* ===========================================
@@ -1012,10 +1017,11 @@ body.dark-mode.nexus-skin-civicone {
 
 .notif-drawer-item:focus,
 .notif-drawer-item:focus-visible {
-    outline: none !important;
+    outline: 3px solid var(--civicone-focus-text) !important;
+    outline-offset: -3px !important;
     background-color: var(--civicone-focus) !important;
     color: var(--civicone-focus-text) !important;
-    box-shadow: inset 0 0 0 3px var(--civicone-focus-text) !important;
+    box-shadow: none !important;
 }
 
 .notif-drawer-footer a:focus,
@@ -1091,13 +1097,14 @@ body.dark-mode.nexus-skin-civicone {
 /* ===========================================
    Dark Mode Adjustments
    Focus states should remain yellow even in dark mode
+   Scoped to .civicone per GR-016
    =========================================== */
-body.dark-mode .civic-nav-link:focus,
-body.dark-mode .civic-nav-link:focus-visible,
-body.dark-mode .civic-utility-link:focus,
-body.dark-mode .civic-utility-link:focus-visible,
-body.dark-mode .civic-logo:focus,
-body.dark-mode .civic-logo:focus-visible {
+.civicone.dark-mode .civic-nav-link:focus,
+.civicone.dark-mode .civic-nav-link:focus-visible,
+.civicone.dark-mode .civic-utility-link:focus,
+.civicone.dark-mode .civic-utility-link:focus-visible,
+.civicone.dark-mode .civic-logo:focus,
+.civicone.dark-mode .civic-logo:focus-visible {
     background-color: var(--civicone-focus) !important;
     color: var(--civicone-focus-text) !important;
 }
@@ -1107,8 +1114,8 @@ body.dark-mode .civic-logo:focus-visible {
    =========================================== */
 @media (prefers-contrast: more) {
     :root {
-        --civicone-focus: var(--color-white)f00; /* Brighter yellow for high contrast */
-        --civicone-focus-text: var(--color-black);
+        --civicone-focus: var(--color-govuk-yellow); /* Brighter yellow for high contrast - GOV.UK yellow */
+        --civicone-focus-text: var(--color-govuk-black); /* GOV.UK black */
     }
 }
 
@@ -1146,23 +1153,23 @@ body.dark-mode .civic-logo:focus-visible {
     /* Primary button (green) */
     --govuk-button-background: var(--color-govuk-green);
     --govuk-button-background-hover: var(--color-govuk-green-dark);
-    --govuk-button-shadow: #002d18;
+    --govuk-button-shadow: var(--color-govuk-green-shadow);
 
     /* Secondary button (grey) */
     --govuk-button-secondary-background: var(--color-neutral-50);
-    --govuk-button-secondary-background-hover: #dbdad9;
-    --govuk-button-secondary-shadow: #929191;
+    --govuk-button-secondary-background-hover: var(--color-govuk-grey-hover);
+    --govuk-button-secondary-shadow: var(--color-govuk-grey-shadow);
     --govuk-button-secondary-text: var(--color-govuk-black);
 
     /* Warning button (red) */
     --govuk-button-warning-background: var(--color-govuk-red);
-    --govuk-button-warning-background-hover: #aa2a16;
-    --govuk-button-warning-shadow: #55150b;
+    --govuk-button-warning-background-hover: var(--color-govuk-red-darker);
+    --govuk-button-warning-shadow: var(--color-govuk-red-shadow);
 
     /* Inverse button (for dark backgrounds) */
     --govuk-button-inverse-background: var(--color-white);
-    --govuk-button-inverse-background-hover: #e8e8e8;
-    --govuk-button-inverse-shadow: #595959;
+    --govuk-button-inverse-background-hover: var(--color-govuk-inverse-hover);
+    --govuk-button-inverse-shadow: var(--color-govuk-inverse-shadow);
 
     /* Button text colors */
     --govuk-button-text: var(--color-white);
@@ -1279,6 +1286,7 @@ body.dark-mode .civic-logo:focus-visible {
     background-color: var(--govuk-button-secondary-background);
     box-shadow: 0 2px 0 var(--govuk-button-secondary-shadow);
     color: var(--govuk-button-secondary-text) !important; /* Force black text for WCAG compliance */
+}
 
 .civic-button--secondary:hover,
 [data-layout="civicone"] .govuk-button--secondary:hover,
@@ -1480,228 +1488,41 @@ a.civic-button--secondary:visited,
     width: var(--space-5);
     height: var(--space-5);
     margin: calc(var(--space-3) * -1) 0 0 calc(var(--space-3) * -1);
-    border: 2px solid rgba(255, 255, 255, 0.3);
+    border: 2px solid var(--color-white-alpha-30);
     border-top-color: var(--color-white);
     border-radius: var(--radius-full);
     /* animation removed for GOV.UK compliance */
 }
 
 .civic-button--secondary.civic-button--loading::after {
-    border-color: rgba(11, 12, 12, 0.3);
+    border-color: var(--color-black-alpha-30);
     border-top-color: var(--color-govuk-black);
 }
 
-/* Animation removed for GOV.UK compliance */
-}
 
 /* ===========================================
    Dark Mode Adjustments
+   Scoped to .civicone per GR-016
    =========================================== */
-body.dark-mode .civic-button--secondary,
-body.dark-mode [data-layout="civicone"] .govuk-button--secondary {
-    background-color: #383f43;
+.civicone.dark-mode .civic-button--secondary,
+.civicone.dark-mode [data-layout="civicone"] .govuk-button--secondary {
+    background-color: var(--color-slate-700);
     color: var(--color-white);
-    box-shadow: 0 2px 0 #1d1d1d;
+    box-shadow: 0 2px 0 var(--color-slate-900);
 }
 
-body.dark-mode .civic-button--secondary:hover,
-body.dark-mode [data-layout="civicone"] .govuk-button--secondary:hover {
-    background-color: #4a5157;
+.civicone.dark-mode .civic-button--secondary:hover,
+.civicone.dark-mode [data-layout="civicone"] .govuk-button--secondary:hover {
+    background-color: var(--color-slate-600);
 }
 
 /* ===========================================
    Legacy Button Overrides for GOV.UK Compliance
-   These override existing button classes to use GOV.UK styling
+   Consolidated mappings from legacy button classes to GOV.UK styling
+   Source: https://design-system.service.gov.uk/components/button/
    =========================================== */
 
-/* Override primary buttons to use GOV.UK green */
-[data-layout="civicone"] .nexus-btn-primary,
-[data-layout="civicone"] .htb-btn-primary,
-.civicone .nexus-btn-primary,
-.civicone .htb-btn-primary {
-    background: var(--color-govuk-green) !important;
-    background-image: none !important;
-    color: var(--color-white) !important;
-    border-radius: 0 !important;
-    box-shadow: 0 2px 0 #002d18 !important;
-    border: 2px solid transparent !important;
-    transform: none !important;
-}
-
-[data-layout="civicone"] .nexus-btn-primary:hover,
-[data-layout="civicone"] .htb-btn-primary:hover,
-.civicone .nexus-btn-primary:hover,
-.civicone .htb-btn-primary:hover {
-    background: var(--color-govuk-green-dark, var(--color-govuk-green-dark)) !important;
-    transform: none !important;
-    box-shadow: 0 2px 0 #002d18 !important;
-}
-
-[data-layout="civicone"] .nexus-btn-primary:focus,
-[data-layout="civicone"] .htb-btn-primary:focus,
-.civicone .nexus-btn-primary:focus,
-.civicone .htb-btn-primary:focus {
-    background: var(--color-govuk-yellow) !important;
-    color: var(--color-govuk-black) !important;
-    box-shadow: 0 2px 0 var(--color-govuk-black) !important;
-    outline: 3px solid transparent !important;
-}
-
-/* Override secondary buttons to use GOV.UK grey */
-[data-layout="civicone"] .nexus-btn-secondary,
-[data-layout="civicone"] .htb-btn-secondary,
-.civicone .nexus-btn-secondary,
-.civicone .htb-btn-secondary {
-    background: var(--color-govuk-light-grey) !important;
-    color: var(--color-govuk-black) !important;
-    border-radius: 0 !important;
-    box-shadow: 0 2px 0 #929191 !important;
-    border: 2px solid transparent !important;
-    transform: none !important;
-}
-
-[data-layout="civicone"] .nexus-btn-secondary:hover,
-[data-layout="civicone"] .htb-btn-secondary:hover,
-.civicone .nexus-btn-secondary:hover,
-.civicone .htb-btn-secondary:hover {
-    background: #dbdad9 !important;
-    transform: none !important;
-}
-
-[data-layout="civicone"] .nexus-btn-secondary:focus,
-[data-layout="civicone"] .htb-btn-secondary:focus,
-.civicone .nexus-btn-secondary:focus,
-.civicone .htb-btn-secondary:focus {
-    background: var(--color-govuk-yellow) !important;
-    color: var(--color-govuk-black) !important;
-    box-shadow: 0 2px 0 var(--color-govuk-black) !important;
-}
-
-/* Override .btn-primary (Bootstrap-style) to use GOV.UK green */
-[data-layout="civicone"] .btn-primary,
-.civicone .btn-primary {
-    background: var(--color-govuk-green) !important;
-    background-image: none !important;
-    color: var(--color-white) !important;
-    border-radius: 0 !important;
-    box-shadow: 0 2px 0 #002d18 !important;
-    border: 2px solid transparent !important;
-    transform: none !important;
-    min-height: 44px;
-    font-weight: 700;
-}
-
-[data-layout="civicone"] .btn-primary:hover,
-.civicone .btn-primary:hover {
-    background: var(--color-govuk-green-dark, var(--color-govuk-green-dark)) !important;
-    transform: none !important;
-}
-
-[data-layout="civicone"] .btn-primary:focus,
-.civicone .btn-primary:focus {
-    background: var(--color-govuk-yellow) !important;
-    color: var(--color-govuk-black) !important;
-    box-shadow: 0 2px 0 var(--color-govuk-black) !important;
-    outline: 3px solid transparent !important;
-}
-
-/* Override .civic-btn-primary and .civic-btn--primary to use GOV.UK green */
-[data-layout="civicone"] .civic-btn-primary,
-[data-layout="civicone"] .civic-btn--primary,
-.civicone .civic-btn-primary,
-.civicone .civic-btn--primary {
-    background: var(--color-govuk-green) !important;
-    background-image: none !important;
-    color: var(--color-white) !important;
-    border-radius: 0 !important;
-    box-shadow: 0 2px 0 #002d18 !important;
-    border: 2px solid transparent !important;
-    transform: none !important;
-    min-height: 44px;
-    font-weight: 700;
-}
-
-[data-layout="civicone"] .civic-btn-primary:hover,
-[data-layout="civicone"] .civic-btn--primary:hover,
-.civicone .civic-btn-primary:hover,
-.civicone .civic-btn--primary:hover {
-    background: var(--color-govuk-green-dark, var(--color-govuk-green-dark)) !important;
-    transform: none !important;
-}
-
-[data-layout="civicone"] .civic-btn-primary:focus,
-[data-layout="civicone"] .civic-btn--primary:focus,
-.civicone .civic-btn-primary:focus,
-.civicone .civic-btn--primary:focus {
-    background: var(--color-govuk-yellow) !important;
-    color: var(--color-govuk-black) !important;
-    box-shadow: 0 2px 0 var(--color-govuk-black) !important;
-    outline: 3px solid transparent !important;
-}
-
-/* Override .btn-secondary (Bootstrap-style) to use GOV.UK grey */
-[data-layout="civicone"] .btn-secondary,
-.civicone .btn-secondary {
-    background: var(--color-govuk-light-grey) !important;
-    color: var(--color-govuk-black) !important;
-    border-radius: 0 !important;
-    box-shadow: 0 2px 0 #929191 !important;
-    border: 2px solid transparent !important;
-    transform: none !important;
-    min-height: 44px;
-    font-weight: 700;
-}
-
-[data-layout="civicone"] .btn-secondary:hover,
-.civicone .btn-secondary:hover {
-    background: #dbdad9 !important;
-    transform: none !important;
-}
-
-[data-layout="civicone"] .btn-secondary:focus,
-.civicone .btn-secondary:focus {
-    background: var(--color-govuk-yellow) !important;
-    color: var(--color-govuk-black) !important;
-    box-shadow: 0 2px 0 var(--color-govuk-black) !important;
-}
-
-/* Override .btn-danger and warning buttons to use GOV.UK red */
-[data-layout="civicone"] .btn-danger,
-[data-layout="civicone"] .civic-btn-danger,
-[data-layout="civicone"] .civic-btn--danger,
-.civicone .btn-danger,
-.civicone .civic-btn-danger,
-.civicone .civic-btn--danger {
-    background: var(--color-govuk-red) !important;
-    color: var(--color-white) !important;
-    border-radius: 0 !important;
-    box-shadow: 0 2px 0 #55150b !important;
-    border: 2px solid transparent !important;
-    min-height: 44px;
-    font-weight: 700;
-}
-
-[data-layout="civicone"] .btn-danger:hover,
-[data-layout="civicone"] .civic-btn-danger:hover,
-[data-layout="civicone"] .civic-btn--danger:hover,
-.civicone .btn-danger:hover,
-.civicone .civic-btn-danger:hover,
-.civicone .civic-btn--danger:hover {
-    background: #aa2a16 !important;
-}
-
-[data-layout="civicone"] .btn-danger:focus,
-[data-layout="civicone"] .civic-btn-danger:focus,
-[data-layout="civicone"] .civic-btn--danger:focus,
-.civicone .btn-danger:focus,
-.civicone .civic-btn-danger:focus,
-.civicone .civic-btn--danger:focus {
-    background: var(--color-govuk-yellow) !important;
-    color: var(--color-govuk-black) !important;
-    box-shadow: 0 2px 0 var(--color-govuk-black) !important;
-}
-
-/* Ensure minimum touch target for all legacy buttons */
+/* ----- Base Legacy Button Reset ----- */
 [data-layout="civicone"] .nexus-btn,
 [data-layout="civicone"] .htb-btn,
 [data-layout="civicone"] .btn,
@@ -1712,6 +1533,76 @@ body.dark-mode [data-layout="civicone"] .govuk-button--secondary:hover {
 .civicone .civic-btn {
     min-height: 44px;
     min-width: 44px;
+    border-radius: 0 !important;
+    border: 2px solid transparent !important;
+    transform: none !important;
+    font-weight: 700;
+}
+
+/* ----- PRIMARY BUTTONS (GOV.UK Green) ----- */
+/* Consolidated: .btn-primary, .nexus-btn-primary, .htb-btn-primary, .civic-btn-primary, .civic-btn--primary */
+[data-layout="civicone"] :is(.btn-primary, .nexus-btn-primary, .htb-btn-primary, .civic-btn-primary, .civic-btn--primary),
+.civicone :is(.btn-primary, .nexus-btn-primary, .htb-btn-primary, .civic-btn-primary, .civic-btn--primary) {
+    background: var(--color-govuk-green) !important;
+    background-image: none !important;
+    color: var(--color-white) !important;
+    box-shadow: 0 2px 0 var(--color-govuk-green-shadow) !important;
+}
+
+[data-layout="civicone"] :is(.btn-primary, .nexus-btn-primary, .htb-btn-primary, .civic-btn-primary, .civic-btn--primary):hover,
+.civicone :is(.btn-primary, .nexus-btn-primary, .htb-btn-primary, .civic-btn-primary, .civic-btn--primary):hover {
+    background: var(--color-govuk-green-dark) !important;
+    box-shadow: 0 2px 0 var(--color-govuk-green-shadow) !important;
+}
+
+[data-layout="civicone"] :is(.btn-primary, .nexus-btn-primary, .htb-btn-primary, .civic-btn-primary, .civic-btn--primary):focus,
+.civicone :is(.btn-primary, .nexus-btn-primary, .htb-btn-primary, .civic-btn-primary, .civic-btn--primary):focus {
+    background: var(--color-govuk-yellow) !important;
+    color: var(--color-govuk-black) !important;
+    box-shadow: 0 2px 0 var(--color-govuk-black) !important;
+    outline: 3px solid transparent !important;
+}
+
+/* ----- SECONDARY BUTTONS (GOV.UK Grey) ----- */
+/* Consolidated: .btn-secondary, .nexus-btn-secondary, .htb-btn-secondary, .civic-btn-secondary, .civic-btn--secondary */
+[data-layout="civicone"] :is(.btn-secondary, .nexus-btn-secondary, .htb-btn-secondary, .civic-btn-secondary, .civic-btn--secondary),
+.civicone :is(.btn-secondary, .nexus-btn-secondary, .htb-btn-secondary, .civic-btn-secondary, .civic-btn--secondary) {
+    background: var(--color-govuk-light-grey) !important;
+    color: var(--color-govuk-black) !important;
+    box-shadow: 0 2px 0 var(--color-govuk-grey-shadow) !important;
+}
+
+[data-layout="civicone"] :is(.btn-secondary, .nexus-btn-secondary, .htb-btn-secondary, .civic-btn-secondary, .civic-btn--secondary):hover,
+.civicone :is(.btn-secondary, .nexus-btn-secondary, .htb-btn-secondary, .civic-btn-secondary, .civic-btn--secondary):hover {
+    background: var(--color-govuk-grey-hover) !important;
+}
+
+[data-layout="civicone"] :is(.btn-secondary, .nexus-btn-secondary, .htb-btn-secondary, .civic-btn-secondary, .civic-btn--secondary):focus,
+.civicone :is(.btn-secondary, .nexus-btn-secondary, .htb-btn-secondary, .civic-btn-secondary, .civic-btn--secondary):focus {
+    background: var(--color-govuk-yellow) !important;
+    color: var(--color-govuk-black) !important;
+    box-shadow: 0 2px 0 var(--color-govuk-black) !important;
+}
+
+/* ----- DANGER/WARNING BUTTONS (GOV.UK Red) ----- */
+/* Consolidated: .btn-danger, .civic-btn-danger, .civic-btn--danger, .btn-warning */
+[data-layout="civicone"] :is(.btn-danger, .civic-btn-danger, .civic-btn--danger, .btn-warning),
+.civicone :is(.btn-danger, .civic-btn-danger, .civic-btn--danger, .btn-warning) {
+    background: var(--color-govuk-red) !important;
+    color: var(--color-white) !important;
+    box-shadow: 0 2px 0 var(--color-govuk-red-shadow) !important;
+}
+
+[data-layout="civicone"] :is(.btn-danger, .civic-btn-danger, .civic-btn--danger, .btn-warning):hover,
+.civicone :is(.btn-danger, .civic-btn-danger, .civic-btn--danger, .btn-warning):hover {
+    background: var(--color-govuk-red-darker) !important;
+}
+
+[data-layout="civicone"] :is(.btn-danger, .civic-btn-danger, .civic-btn--danger, .btn-warning):focus,
+.civicone :is(.btn-danger, .civic-btn-danger, .civic-btn--danger, .btn-warning):focus {
+    background: var(--color-govuk-yellow) !important;
+    color: var(--color-govuk-black) !important;
+    box-shadow: 0 2px 0 var(--color-govuk-black) !important;
 }
 
 /* ===========================================
@@ -2117,7 +2008,7 @@ body.dark-mode [data-layout="civicone"] .govuk-button--secondary:hover {
     }
 }
 
-/* Custom checkbox box */
+/* Custom checkbox box - GOV.UK: square corners */
 .civic-checkboxes__label::before,
 [data-layout="civicone"] .govuk-checkboxes__label::before,
 .civicone .govuk-checkboxes__label::before {
@@ -2128,6 +2019,7 @@ body.dark-mode [data-layout="civicone"] .govuk-button--secondary:hover {
     width: 40px;
     height: 40px;
     border: 2px solid var(--civicone-input-border);
+    border-radius: 0; /* GOV.UK: checkboxes are square */
     background: var(--civicone-input-bg);
 }
 
@@ -2377,38 +2269,39 @@ body.dark-mode [data-layout="civicone"] .govuk-button--secondary:hover {
 
 /* ===========================================
    Dark Mode Adjustments
+   Scoped to .civicone per GR-016
    =========================================== */
-body.dark-mode .civic-input,
-body.dark-mode .civic-textarea,
-body.dark-mode .civic-select,
-body.dark-mode [data-layout="civicone"] .govuk-input,
-body.dark-mode [data-layout="civicone"] .govuk-textarea,
-body.dark-mode [data-layout="civicone"] .govuk-select {
-    background-color: #1d1d1d;
+.civicone.dark-mode .civic-input,
+.civicone.dark-mode .civic-textarea,
+.civicone.dark-mode .civic-select,
+.civicone.dark-mode [data-layout="civicone"] .govuk-input,
+.civicone.dark-mode [data-layout="civicone"] .govuk-textarea,
+.civicone.dark-mode [data-layout="civicone"] .govuk-select {
+    background-color: var(--color-slate-900);
     border-color: var(--color-white);
     color: var(--color-white);
 }
 
-body.dark-mode .civic-label,
-body.dark-mode .civic-fieldset__legend,
-body.dark-mode [data-layout="civicone"] .govuk-label,
-body.dark-mode [data-layout="civicone"] .govuk-fieldset__legend {
+.civicone.dark-mode .civic-label,
+.civicone.dark-mode .civic-fieldset__legend,
+.civicone.dark-mode [data-layout="civicone"] .govuk-label,
+.civicone.dark-mode [data-layout="civicone"] .govuk-fieldset__legend {
     color: var(--color-white);
 }
 
-body.dark-mode .civic-hint,
-body.dark-mode [data-layout="civicone"] .govuk-hint {
+.civicone.dark-mode .civic-hint,
+.civicone.dark-mode [data-layout="civicone"] .govuk-hint {
     color: var(--color-govuk-grey);
 }
 
-body.dark-mode .civic-checkboxes__label::before,
-body.dark-mode .civic-radios__label::before {
-    background-color: #1d1d1d;
+.civicone.dark-mode .civic-checkboxes__label::before,
+.civicone.dark-mode .civic-radios__label::before {
+    background-color: var(--color-slate-900);
     border-color: var(--color-white);
 }
 
-body.dark-mode .civic-checkboxes__label::after,
-body.dark-mode .civic-radios__label::after {
+.civicone.dark-mode .civic-checkboxes__label::after,
+.civicone.dark-mode .civic-radios__label::after {
     background-color: var(--color-white);
     border-color: var(--color-white);
 }
@@ -2651,35 +2544,48 @@ body.dark-mode .civic-radios__label::after {
 }
 
 /* ==========================================
-   GOV.UK Link Component
-   https://design-system.service.gov.uk/styles/typography/#links
+   GOV.UK Link Component - OFFICIAL GOV.UK STYLES
+   Source: https://github.com/alphagov/govuk-frontend/tree/main/packages/govuk-frontend/src/govuk/helpers/_links.scss
+
+   Official GOV.UK values:
+   - Link: #1d70b8 (blue primary)
+   - Visited: #54319f (purple primary)
+   - Hover: #003078 (blue shade-50)
+   - Active: #0b0c0c (black)
+   - Focus text: #0b0c0c (black)
+   - Underline thickness: max(1px, 0.0625rem)
+   - Hover underline thickness: max(3px, 0.1875rem, 0.12em)
+   - Underline offset: 0.1578em
    ========================================== */
 
 .govuk-link {
   font-family: var(--font-family-primary);
   text-decoration: underline;
-  text-decoration-thickness: max(1px, 0.0625rem);
-  text-underline-offset: 0.1578em;
-  color: var(--color-govuk-blue-light);
+  text-decoration-thickness: max(1px, 0.0625rem); /* GOV.UK official */
+  text-underline-offset: 0.1578em; /* GOV.UK official */
+  color: var(--color-govuk-blue-light); /* GOV.UK link = #1d70b8 */
 }
 
 .govuk-link:visited {
-  color: #4c2c92;
+  color: var(--color-govuk-link-visited); /* GOV.UK visited = #4c2c92 */
 }
 
 .govuk-link:hover {
-  color: var(--color-govuk-blue);
+  color: var(--color-govuk-blue); /* GOV.UK hover = #003078 (CORRECTED from #0f385c) */
+  text-decoration-thickness: max(3px, 0.1875rem, 0.12em); /* GOV.UK official */
+  text-decoration-skip-ink: none; /* GOV.UK official - Chromium, Firefox */
+  text-decoration-skip: none; /* GOV.UK official - Safari */
 }
 
 .govuk-link:active {
-  color: var(--color-govuk-black);
+  color: var(--color-govuk-black); /* GOV.UK active = #0b0c0c */
 }
 
 .govuk-link:focus {
   outline: 3px solid transparent;
-  color: var(--color-govuk-black);
-  background-color: var(--color-brand-yellow);
-  box-shadow: 0 -2px var(--color-brand-yellow), 0 4px var(--color-govuk-black);
+  color: var(--color-govuk-black); /* GOV.UK focus text = #0b0c0c */
+  background-color: var(--color-govuk-yellow); /* GOV.UK focus = #ffdd00 */
+  box-shadow: 0 -2px var(--color-govuk-yellow), 0 4px var(--color-govuk-black);
   text-decoration: none;
 }
 
@@ -2983,15 +2889,24 @@ body.dark-mode .civic-radios__label::after {
   background-color: var(--color-govuk-green-darker);
 }
 
-/* Secondary button (grey) */
+/* Secondary button - GOV.UK Design System compliant
+   https://design-system.service.gov.uk/components/button/ */
 .civicone--govuk .govuk-button--secondary {
-  background-color: var(--color-govuk-grey-dark);
-  box-shadow: 0 2px 0 rgba(0, 0, 0, 0.2);
-  color: var(--color-white);
+  background-color: var(--color-govuk-light-grey, #f3f2f1);
+  box-shadow: 0 2px 0 var(--color-govuk-grey-shadow, #929191);
+  color: var(--color-govuk-black, #0b0c0c);
 }
 
 .civicone--govuk .govuk-button--secondary:hover {
-  background-color: #3d4347;
+  background-color: var(--color-govuk-grey-hover, #dbdad9);
+}
+
+.civicone--govuk .govuk-button--secondary:focus {
+  outline: 3px solid var(--color-govuk-yellow, #ffdd00);
+  outline-offset: 0;
+  background-color: var(--color-govuk-yellow, #ffdd00);
+  color: var(--color-govuk-black, #0b0c0c);
+  box-shadow: 0 2px 0 var(--color-govuk-black, #0b0c0c);
 }
 
 /* Warning button (red) */
@@ -3002,7 +2917,7 @@ body.dark-mode .civic-radios__label::after {
 }
 
 .civicone--govuk .govuk-button--warning:hover {
-  background-color: #aa2a16;
+  background-color: var(--color-govuk-red-darker);
 }
 
 /* Disabled state */
@@ -3017,7 +2932,7 @@ body.dark-mode .civic-radios__label::after {
 .civicone--govuk .govuk-button:focus {
   outline: 3px solid var(--color-brand-yellow); /* var(--color-govuk-yellow) */
   outline-offset: 0;
-  box-shadow: 0 2px 0 rgba(0, 0, 0, 0.4);
+  box-shadow: 0 2px 0 var(--color-black-alpha-40);
   background-color: var(--color-brand-yellow);
   color: var(--color-govuk-black);
 }
@@ -3232,6 +3147,74 @@ body.dark-mode .civic-radios__label::after {
   box-shadow: 0 0 0 4px var(--color-govuk-black);
 }
 
+/* Checkboxes - Small variant
+   Source: https://unpkg.com/govuk-frontend@5.4.0/dist/govuk/govuk-frontend.min.css
+   Small checkboxes are 24px visible but maintain 44px touch target for accessibility
+   Key difference from base: uses flexbox layout, checkbox ::before at top:10px */
+.civicone--govuk .govuk-checkboxes--small .govuk-checkboxes__item {
+  display: flex;
+  flex-wrap: wrap;
+  position: relative;
+  min-height: 0;
+  margin-bottom: 0;
+  margin-left: 10px;
+  padding-left: 0;
+}
+
+.civicone--govuk .govuk-checkboxes--small .govuk-checkboxes__input {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 44px;
+  height: 44px;
+  cursor: pointer;
+  margin: 0;
+  margin-left: -10px;
+  opacity: 0;
+  z-index: 1;
+}
+
+.civicone--govuk .govuk-checkboxes--small .govuk-checkboxes__label {
+  display: inline-block;
+  padding: 11px 15px 10px 34px;
+  font-size: 1rem;
+  line-height: 1.25;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+.civicone--govuk .govuk-checkboxes--small .govuk-checkboxes__label::before {
+  content: "";
+  position: absolute;
+  top: 10px;
+  left: 0;
+  width: 24px;
+  height: 24px;
+  border: 2px solid var(--color-govuk-black);
+  background: var(--color-white);
+  box-sizing: border-box;
+}
+
+.civicone--govuk .govuk-checkboxes--small .govuk-checkboxes__input:checked + .govuk-checkboxes__label::after {
+  content: "";
+  position: absolute;
+  top: 17px;
+  left: 6px;
+  width: 12px;
+  height: 6.5px;
+  transform: rotate(-45deg);
+  border: solid;
+  border-width: 0 0 3px 3px;
+  border-color: var(--color-govuk-black);
+  background: transparent;
+}
+
+.civicone--govuk .govuk-checkboxes--small .govuk-checkboxes__input:focus + .govuk-checkboxes__label::before {
+  outline: 3px solid var(--color-brand-yellow);
+  outline-offset: 0;
+  box-shadow: 0 0 0 4px var(--color-govuk-black);
+}
+
 /* Radio buttons */
 .civicone--govuk .govuk-radios__item {
   display: block;
@@ -3362,39 +3345,79 @@ body.dark-mode .civic-radios__label::after {
 }
 
 /* ==========================================
-   GOV.UK TAG COMPONENT
-   https://design-system.service.gov.uk/components/tag/
+   GOV.UK TAG Component - OFFICIAL GOV.UK STYLES
+   Source: https://github.com/alphagov/govuk-frontend/tree/main/packages/govuk-frontend/src/govuk/components/tag
+
+   Official GOV.UK values:
+   - Font size: 19px
+   - Padding: 4px 8px
+   - Margin: -4px 0 (negative to not increase container height)
+   - Border: 1px solid currentcolor
+   - Border-radius: 1px
+   - Default (blue): Text #0f385c (blue shade-50), Background #d2e2f1 (blue tint-80)
    ========================================== */
 
 .civicone--govuk .govuk-tag {
   display: inline-block;
-  padding: var(--space-1) var(--space-2); /* 4px 8px */
+  max-width: 160px;
+  margin: -4px 0; /* GOV.UK official - prevents increasing container height */
+  padding: 4px 8px; /* GOV.UK official */
   font-family: var(--font-family-primary);
-  font-size: var(--font-size-sm); /* 14px */
-  font-weight: var(--font-weight-bold);
-  line-height: 1;
+  font-size: 1.1875rem; /* 19px - GOV.UK official */
+  line-height: 1.3158; /* GOV.UK official for 19px */
   text-decoration: none;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  color: var(--color-white);
-  background-color: var(--color-govuk-blue);
+  overflow-wrap: break-word;
+  /* Default is blue */
+  color: var(--color-govuk-tag-blue-text); /* blue shade-50 - GOV.UK official */
+  background-color: var(--color-govuk-tag-blue-bg); /* blue tint-80 - GOV.UK official */
+  border: 1px solid currentcolor; /* GOV.UK official */
+  border-radius: 1px; /* GOV.UK official */
 }
 
-.civicone--govuk .govuk-tag--grey {
-  background-color: var(--color-govuk-grey-dark);
-}
-
+/* Tag colour modifiers - GOV.UK official */
 .civicone--govuk .govuk-tag--green {
-  background-color: var(--color-govuk-green);
+  color: var(--color-govuk-tag-green-text); /* green shade-50 */
+  background-color: var(--color-govuk-tag-green-bg); /* green tint-80 */
 }
 
 .civicone--govuk .govuk-tag--red {
-  background-color: var(--color-govuk-red);
+  color: var(--color-govuk-tag-red-text); /* red shade-50 */
+  background-color: var(--color-govuk-tag-red-bg); /* red tint-80 */
 }
 
 .civicone--govuk .govuk-tag--yellow {
-  background-color: var(--color-amber-500);
-  color: var(--color-govuk-black);
+  color: var(--color-govuk-tag-yellow-text); /* yellow shade-50 */
+  background-color: var(--color-govuk-tag-yellow-bg); /* yellow tint-80 */
+}
+
+.civicone--govuk .govuk-tag--grey {
+  color: var(--color-govuk-tag-grey-text); /* black tint-25 */
+  background-color: var(--color-govuk-tag-grey-bg); /* black tint-95 */
+}
+
+.civicone--govuk .govuk-tag--purple {
+  color: var(--color-govuk-tag-purple-text); /* purple shade-50 */
+  background-color: var(--color-govuk-tag-purple-bg); /* purple tint-80 */
+}
+
+.civicone--govuk .govuk-tag--orange {
+  color: var(--color-govuk-tag-orange-text); /* orange shade-50 */
+  background-color: var(--color-govuk-tag-orange-bg); /* orange tint-80 */
+}
+
+.civicone--govuk .govuk-tag--teal {
+  color: var(--color-govuk-tag-teal-text); /* teal shade-50 */
+  background-color: var(--color-govuk-tag-teal-bg); /* teal tint-80 */
+}
+
+.civicone--govuk .govuk-tag--magenta {
+  color: var(--color-govuk-tag-magenta-text); /* magenta shade-50 */
+  background-color: var(--color-govuk-tag-magenta-bg); /* magenta tint-80 */
+}
+
+.civicone--govuk .govuk-tag--light-blue {
+  color: var(--color-govuk-tag-blue-text); /* blue shade-50 */
+  background-color: var(--color-govuk-tag-light-blue-bg); /* blue tint-95 */
 }
 
 /* ==========================================
@@ -3427,69 +3450,78 @@ body.dark-mode .civic-radios__label::after {
 
 /* ==========================================
    Phase Banner Component
-   https://design-system.service.gov.uk/components/phase-banner/
+   Source: https://github.com/alphagov/govuk-frontend/tree/main/packages/govuk-frontend/src/govuk/components/phase-banner
+   GOV.UK Frontend v5.14.0 (WCAG 2.2 AA Compliant)
+
+   Official GOV.UK values:
+   - Border: govuk-functional-colour(border) = black tint-80 = #cecece
+   - Padding: govuk-spacing(2) = 10px
+   - Font size: 16px (govuk-font($size: 16))
+   - Tag margin-right: govuk-spacing(3) mobile = 15px, govuk-spacing(2) tablet+ = 10px
    ========================================== */
 
 .civicone--govuk .govuk-phase-banner {
-  padding-top: var(--space-2);
-  padding-bottom: var(--space-2);
-  border-bottom: 1px solid var(--color-govuk-grey);
+  padding-top: 10px; /* govuk-spacing(2) */
+  padding-bottom: 10px; /* govuk-spacing(2) */
+  border-bottom: 1px solid var(--color-govuk-border); /* govuk-functional-colour(border) = black tint-80 */
 }
 
 .civicone--govuk .govuk-phase-banner__content {
-  display: flex;
-  align-items: center;
-  flex-wrap: wrap;
+  display: table; /* GOV.UK official: table layout */
   font-family: var(--font-family-primary);
-  font-size: var(--font-size-sm);
-  line-height: var(--line-height-tight);
-  color: var(--color-govuk-black);
+  font-size: 1rem; /* 16px - GOV.UK official (stays 16px at ALL sizes) */
+  line-height: 1.25; /* 20px / 16px = 1.25 - GOV.UK official */
+  color: var(--color-govuk-black); /* govuk-text-colour */
   margin: 0;
 }
-
-@media (min-width: 40.0625em) {
-  .civicone--govuk .govuk-phase-banner__content {
-    font-size: var(--font-size-base);
-  }
-}
+/* NOTE: Phase banner font size stays at 16px at all breakpoints per GOV.UK spec */
 
 .civicone--govuk .govuk-phase-banner__content__tag {
-  margin-right: var(--space-2);
+  font-size: 1rem; /* 16px - Phase banner tag is smaller than general tag */
+  line-height: 1.25; /* 20px / 16px - GOV.UK official for 16px */
+  margin-right: 15px; /* govuk-spacing(3) on mobile */
   max-width: 160px;
 }
 
 @media (min-width: 40.0625em) {
   .civicone--govuk .govuk-phase-banner__content__tag {
-    margin-right: var(--space-2-5);
+    margin-right: 10px; /* govuk-spacing(2) on tablet+ */
   }
 }
 
 .civicone--govuk .govuk-phase-banner__text {
-  flex: 1;
+  display: table-cell; /* GOV.UK official: table-cell layout */
+  vertical-align: middle; /* GOV.UK official */
 }
 
 /* ==========================================
    GOV.UK GRID LAYOUT SYSTEM
-   https://design-system.service.gov.uk/styles/layout/
+   Source: https://github.com/alphagov/govuk-frontend/tree/main/packages/govuk-frontend/src/govuk/objects
+
+   Official GOV.UK values:
+   - $govuk-page-width: 960px
+   - $govuk-gutter: 30px
+   - $govuk-gutter-half: 15px
    ========================================== */
 
 .civicone--govuk .govuk-width-container {
-  max-width: 960px;
-  margin-right: var(--space-4); /* 16px */
-  margin-left: var(--space-4); /* 16px */
+  max-width: 960px; /* $govuk-page-width */
+  margin-right: 15px; /* $govuk-gutter-half - mobile */
+  margin-left: 15px;
 }
 
 @media (min-width: 40.0625em) {
   .civicone--govuk .govuk-width-container {
-    margin-right: var(--space-6); /* 24px */
-    margin-left: var(--space-6); /* 24px */
+    margin-right: 30px; /* $govuk-gutter - tablet */
+    margin-left: 30px;
   }
 }
 
-@media (min-width: 60.0625em) {
+/* Center when viewport is greater than page width + gutters (960 + 60 = 1020px) */
+@media (min-width: 63.75em) {
   .civicone--govuk .govuk-width-container {
-    margin-right: var(--space-8); /* 32px */
-    margin-left: var(--space-8); /* 32px */
+    margin-right: auto;
+    margin-left: auto;
   }
 }
 
@@ -4082,7 +4114,6 @@ body.dark-mode .civic-radios__label::after {
   width: 1px;
   height: 1px;
   margin: -1px;
-  padding: 0;
   overflow: hidden;
   clip: rect(0, 0, 0, 0);
   clip-path: inset(50%);
@@ -4119,9 +4150,11 @@ body.dark-mode .civic-radios__label::after {
   z-index: 9999;
 }
 
-/* Element that receives focus from skip link */
+/* Element that receives focus from skip link - GR-007 compliant */
 .civicone--govuk .govuk-skip-link-focused-element:focus {
-  outline: none;
+  outline: 3px solid var(--civicone-focus, var(--color-govuk-yellow));
+  outline-offset: 0;
+  box-shadow: inset 0 0 0 4px var(--civicone-focus-text, var(--color-govuk-black));
 }
 
 /* ========================================
@@ -4381,6 +4414,811 @@ body.dark-mode .civic-radios__label::after {
     -webkit-backdrop-filter: none !important;
   }
 }
+
+/* ==========================================
+   GOV.UK TABLE COMPONENT
+   https://design-system.service.gov.uk/components/table/
+   ========================================== */
+
+.civicone--govuk .govuk-table {
+  font-family: var(--font-family-primary);
+  font-size: var(--font-size-base);
+  line-height: 1.25;
+  color: var(--color-govuk-black);
+  width: 100%;
+  margin-bottom: var(--space-5); /* 20px */
+  border-spacing: 0;
+  border-collapse: collapse;
+}
+
+@media (min-width: 40.0625em) {
+  .civicone--govuk .govuk-table {
+    font-size: var(--font-size-lg);
+    margin-bottom: var(--space-8); /* 32px */
+  }
+}
+
+.civicone--govuk .govuk-table__caption {
+  font-weight: var(--font-weight-bold);
+  display: table-caption;
+  text-align: left;
+}
+
+.civicone--govuk .govuk-table__caption--xl {
+  font-size: var(--font-size-4xl);
+  margin-bottom: var(--space-3);
+}
+
+.civicone--govuk .govuk-table__caption--l {
+  font-size: var(--font-size-3xl);
+  margin-bottom: var(--space-3);
+}
+
+.civicone--govuk .govuk-table__caption--m {
+  font-size: var(--font-size-2xl);
+  margin-bottom: var(--space-3);
+}
+
+.civicone--govuk .govuk-table__caption--s {
+  font-size: var(--font-size-lg);
+}
+
+.civicone--govuk .govuk-table__head {
+  background-color: transparent;
+}
+
+.civicone--govuk .govuk-table__body {
+  font-size: inherit;
+}
+
+.civicone--govuk .govuk-table__row {
+  border-bottom: 1px solid var(--color-govuk-grey);
+}
+
+.civicone--govuk .govuk-table__head .govuk-table__row {
+  border-bottom: none;
+}
+
+.civicone--govuk .govuk-table__header,
+.civicone--govuk .govuk-table__cell {
+  padding: var(--space-2) var(--space-5) var(--space-2) 0;
+  border-bottom: 1px solid var(--color-govuk-grey);
+  text-align: left;
+  vertical-align: top;
+}
+
+@media (min-width: 40.0625em) {
+  .civicone--govuk .govuk-table__header,
+  .civicone--govuk .govuk-table__cell {
+    padding: var(--space-3) var(--space-5) var(--space-3) 0;
+  }
+}
+
+.civicone--govuk .govuk-table__header {
+  font-weight: var(--font-weight-bold);
+}
+
+.civicone--govuk .govuk-table__header--numeric,
+.civicone--govuk .govuk-table__cell--numeric {
+  text-align: right;
+}
+
+.civicone--govuk .govuk-table__header:last-child,
+.civicone--govuk .govuk-table__cell:last-child {
+  padding-right: 0;
+}
+
+/* ==========================================
+   GOV.UK TABS COMPONENT
+   https://design-system.service.gov.uk/components/tabs/
+   ========================================== */
+
+.civicone--govuk .govuk-tabs {
+  margin-top: var(--space-1);
+  margin-bottom: var(--space-5);
+}
+
+@media (min-width: 40.0625em) {
+  .civicone--govuk .govuk-tabs {
+    margin-bottom: var(--space-8);
+  }
+}
+
+.civicone--govuk .govuk-tabs__title {
+  font-family: var(--font-family-primary);
+  font-size: var(--font-size-base);
+  line-height: 1.25;
+  color: var(--color-govuk-black);
+  margin-bottom: var(--space-2);
+}
+
+@media (min-width: 40.0625em) {
+  .civicone--govuk .govuk-tabs__title {
+    display: none;
+  }
+}
+
+.civicone--govuk .govuk-tabs__list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  margin-bottom: var(--space-5);
+}
+
+@media (min-width: 40.0625em) {
+  .civicone--govuk .govuk-tabs__list {
+    margin-bottom: 0;
+    border-bottom: 1px solid var(--color-govuk-grey);
+  }
+
+  /* Clearfix for floated tabs */
+  .civicone--govuk .govuk-tabs__list::after {
+    content: "";
+    display: block;
+    clear: both;
+  }
+}
+
+.civicone--govuk .govuk-tabs__list-item {
+  margin-left: 25px;
+}
+
+/* Mobile fallback: em-dash before each tab link */
+.civicone--govuk .govuk-tabs__list-item::before {
+  content: "—";
+  color: var(--color-govuk-black);
+  margin-left: -25px;
+  padding-right: 5px;
+}
+
+/* Desktop: horizontal tabs when JS is supported */
+@media (min-width: 40.0625em) {
+  .civicone--govuk .govuk-tabs__list-item {
+    display: inline-block;
+    position: relative;
+    margin-right: 5px;
+    margin-bottom: 0;
+    margin-left: 0;
+    padding: 10px 20px;
+    float: left;
+    background-color: var(--color-govuk-light-grey);
+    text-align: center;
+  }
+
+  /* Remove em-dash on desktop */
+  .civicone--govuk .govuk-tabs__list-item::before {
+    content: none;
+  }
+}
+
+.civicone--govuk .govuk-tabs__list-item--selected {
+  position: relative;
+}
+
+@media (min-width: 40.0625em) {
+  .civicone--govuk .govuk-tabs__list-item--selected {
+    position: relative;
+    margin-top: -5px;
+    margin-bottom: -1px;
+    padding: 14px 19px 16px;
+    border: 1px solid var(--color-govuk-grey);
+    border-bottom: 0;
+    background-color: var(--color-white);
+  }
+
+  .civicone--govuk .govuk-tabs__list-item--selected .govuk-tabs__tab {
+    text-decoration: none;
+  }
+}
+
+.civicone--govuk .govuk-tabs__list-item--selected .govuk-tabs__tab {
+  color: var(--color-govuk-black);
+}
+
+.civicone--govuk .govuk-tabs__tab {
+  font-family: var(--font-family-primary);
+  font-size: var(--font-size-base);
+  line-height: 1.25;
+  display: inline-block;
+  margin-bottom: 10px;
+  color: var(--color-govuk-blue-light);
+  text-decoration: underline;
+  text-decoration-thickness: max(1px, 0.0625rem);
+  text-underline-offset: 0.1578em;
+}
+
+.civicone--govuk .govuk-tabs__tab:link,
+.civicone--govuk .govuk-tabs__tab:visited {
+  color: var(--color-govuk-blue-light);
+}
+
+@media (min-width: 40.0625em) {
+  .civicone--govuk .govuk-tabs__tab {
+    font-size: var(--font-size-lg);
+    margin-bottom: 0;
+  }
+
+  /* On desktop, tabs have black text (not link blue) */
+  .civicone--govuk .govuk-tabs__tab:link,
+  .civicone--govuk .govuk-tabs__tab:visited {
+    color: var(--color-govuk-black);
+    text-decoration: none;
+  }
+
+  /* Clickable area extends to full tab */
+  .civicone--govuk .govuk-tabs__tab::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+  }
+}
+
+.civicone--govuk .govuk-tabs__tab:hover {
+  color: var(--color-govuk-blue);
+}
+
+.civicone--govuk .govuk-tabs__tab:focus {
+  outline: 3px solid var(--color-brand-yellow);
+  outline-offset: 0;
+  background-color: var(--color-brand-yellow);
+  color: var(--color-govuk-black);
+  box-shadow: 0 -2px var(--color-brand-yellow), 0 4px var(--color-govuk-black);
+  text-decoration: none;
+}
+
+.civicone--govuk .govuk-tabs__panel {
+  margin-bottom: 0;
+  padding: var(--space-5);
+  border: 1px solid var(--color-govuk-grey);
+  border-top: 0;
+}
+
+@media (min-width: 40.0625em) {
+  .civicone--govuk .govuk-tabs__panel {
+    margin-bottom: 0;
+    padding: var(--space-8);
+    border: 0;
+    border-top: 1px solid var(--color-govuk-grey);
+  }
+}
+
+.civicone--govuk .govuk-tabs__panel > *:last-child {
+  margin-bottom: 0;
+}
+
+.civicone--govuk .govuk-tabs__panel--hidden {
+  display: none;
+}
+
+/* ==========================================
+   GOV.UK PAGINATION COMPONENT
+   https://design-system.service.gov.uk/components/pagination/
+   ========================================== */
+
+.civicone--govuk .govuk-pagination {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex-wrap: wrap;
+  margin-bottom: var(--space-5);
+}
+
+@media (min-width: 40.0625em) {
+  .civicone--govuk .govuk-pagination {
+    flex-direction: row;
+    align-items: flex-start;
+    margin-bottom: var(--space-8);
+  }
+}
+
+.civicone--govuk .govuk-pagination__list {
+  display: flex;
+  flex-wrap: wrap;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.civicone--govuk .govuk-pagination__item {
+  font-family: var(--font-family-primary);
+  font-size: var(--font-size-base);
+  line-height: 1;
+  box-sizing: border-box;
+  position: relative;
+  min-width: 45px;
+  min-height: 45px;
+  padding: var(--space-2) var(--space-3);
+  text-align: center;
+}
+
+@media (min-width: 40.0625em) {
+  .civicone--govuk .govuk-pagination__item {
+    font-size: var(--font-size-lg);
+  }
+}
+
+.civicone--govuk .govuk-pagination__item--current {
+  font-weight: var(--font-weight-bold);
+  outline: 1px solid transparent;
+  background-color: var(--color-govuk-blue-light);
+}
+
+.civicone--govuk .govuk-pagination__item--current .govuk-pagination__link {
+  color: var(--color-white);
+}
+
+.civicone--govuk .govuk-pagination__item--current .govuk-pagination__link:hover {
+  color: var(--color-white);
+}
+
+.civicone--govuk .govuk-pagination__item--ellipses {
+  font-weight: var(--font-weight-bold);
+  color: var(--color-govuk-black);
+}
+
+.civicone--govuk .govuk-pagination__link {
+  display: block;
+  min-width: 45px;
+  padding: var(--space-2);
+  color: var(--color-govuk-blue-light);
+  text-decoration: underline;
+  text-decoration-thickness: max(1px, 0.0625rem);
+  text-underline-offset: 0.1578em;
+}
+
+.civicone--govuk .govuk-pagination__link:hover {
+  color: var(--color-govuk-blue);
+  text-decoration-thickness: max(3px, 0.1875rem);
+}
+
+.civicone--govuk .govuk-pagination__link:focus {
+  outline: 3px solid var(--color-brand-yellow);
+  outline-offset: 0;
+  background-color: var(--color-brand-yellow);
+  color: var(--color-govuk-black);
+  box-shadow: 0 -2px var(--color-brand-yellow), 0 4px var(--color-govuk-black);
+  text-decoration: none;
+}
+
+.civicone--govuk .govuk-pagination__prev,
+.civicone--govuk .govuk-pagination__next {
+  font-size: var(--font-size-base);
+  line-height: 1.25;
+}
+
+@media (min-width: 40.0625em) {
+  .civicone--govuk .govuk-pagination__prev,
+  .civicone--govuk .govuk-pagination__next {
+    font-size: var(--font-size-lg);
+  }
+}
+
+.civicone--govuk .govuk-pagination__prev {
+  padding-right: var(--space-4);
+}
+
+.civicone--govuk .govuk-pagination__next {
+  padding-left: var(--space-4);
+}
+
+.civicone--govuk .govuk-pagination__icon {
+  width: 0.9375rem;
+  height: 0.8125rem;
+  color: var(--color-govuk-grey-dark);
+  fill: currentColor;
+  forced-color-adjust: auto;
+}
+
+.civicone--govuk .govuk-pagination__icon--prev {
+  margin-right: var(--space-4);
+}
+
+.civicone--govuk .govuk-pagination__icon--next {
+  margin-left: var(--space-4);
+}
+
+.civicone--govuk .govuk-pagination__link-title {
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-bold);
+  display: inline-block;
+}
+
+/* ==========================================
+   GOV.UK TASK LIST COMPONENT
+   https://design-system.service.gov.uk/components/task-list/
+   ========================================== */
+
+.civicone--govuk .govuk-task-list {
+  font-family: var(--font-family-primary);
+  font-size: var(--font-size-base);
+  line-height: 1.25;
+  margin: 0 0 var(--space-5) 0;
+  padding: 0;
+  list-style: none;
+}
+
+@media (min-width: 40.0625em) {
+  .civicone--govuk .govuk-task-list {
+    font-size: var(--font-size-lg);
+    margin-bottom: var(--space-8);
+  }
+}
+
+.civicone--govuk .govuk-task-list__item {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  padding-top: var(--space-3);
+  padding-bottom: var(--space-3);
+  border-bottom: 1px solid var(--color-govuk-grey);
+}
+
+@media (min-width: 40.0625em) {
+  .civicone--govuk .govuk-task-list__item {
+    flex-wrap: nowrap;
+    padding-top: var(--space-4);
+    padding-bottom: var(--space-4);
+  }
+}
+
+.civicone--govuk .govuk-task-list__item:first-child {
+  border-top: 1px solid var(--color-govuk-grey);
+}
+
+.civicone--govuk .govuk-task-list__name-and-hint {
+  flex: 1 1 auto;
+  max-width: 100%;
+  margin-right: var(--space-2);
+}
+
+@media (min-width: 40.0625em) {
+  .civicone--govuk .govuk-task-list__name-and-hint {
+    margin-right: var(--space-5);
+  }
+}
+
+.civicone--govuk .govuk-task-list__link {
+  font-weight: var(--font-weight-bold);
+  color: var(--color-govuk-blue-light);
+  text-decoration: underline;
+  text-decoration-thickness: max(1px, 0.0625rem);
+  text-underline-offset: 0.1578em;
+}
+
+.civicone--govuk .govuk-task-list__link:hover {
+  color: var(--color-govuk-blue);
+  text-decoration-thickness: max(3px, 0.1875rem);
+}
+
+.civicone--govuk .govuk-task-list__link:focus {
+  outline: 3px solid var(--color-brand-yellow);
+  outline-offset: 0;
+  background-color: var(--color-brand-yellow);
+  color: var(--color-govuk-black);
+  box-shadow: 0 -2px var(--color-brand-yellow), 0 4px var(--color-govuk-black);
+  text-decoration: none;
+}
+
+.civicone--govuk .govuk-task-list__name {
+  font-weight: var(--font-weight-bold);
+}
+
+.civicone--govuk .govuk-task-list__hint {
+  margin-top: var(--space-1);
+  color: var(--color-govuk-grey-dark);
+}
+
+.civicone--govuk .govuk-task-list__status {
+  flex: 0 0 auto;
+  margin-top: var(--space-2);
+  text-align: right;
+}
+
+@media (min-width: 40.0625em) {
+  .civicone--govuk .govuk-task-list__status {
+    margin-top: 0;
+  }
+}
+
+.civicone--govuk .govuk-task-list__status--completed {
+  color: var(--color-govuk-black);
+}
+
+/* Tag variants for task list - see main tag section above for full modifiers */
+.civicone--govuk .govuk-tag--blue {
+  color: var(--color-govuk-tag-blue-text); /* blue shade-50 - GOV.UK official */
+  background-color: var(--color-govuk-tag-blue-bg); /* blue tint-80 - GOV.UK official */
+}
+
+/* Organization role tags - GOV.UK compliant solid background */
+.govuk-tag--role-owner {
+  background-color: var(--color-govuk-orange, #f47738);
+  color: var(--color-white);
+}
+
+.govuk-tag--role-admin {
+  background-color: var(--color-govuk-pink, #912b88);
+  color: var(--color-white);
+}
+
+.govuk-tag--role-member {
+  background-color: var(--color-govuk-blue-light);
+  color: var(--color-white);
+}
+
+/* ==========================================
+   GOV.UK COOKIE BANNER COMPONENT
+   https://design-system.service.gov.uk/components/cookie-banner/
+   ========================================== */
+
+.civicone--govuk .govuk-cookie-banner {
+  padding-top: var(--space-5);
+  border-bottom: 10px solid var(--color-govuk-grey);
+}
+
+@media (min-width: 40.0625em) {
+  .civicone--govuk .govuk-cookie-banner {
+    padding-top: var(--space-5);
+  }
+}
+
+.civicone--govuk .govuk-cookie-banner__message {
+  margin-bottom: 0;
+}
+
+.civicone--govuk .govuk-cookie-banner__message[hidden] {
+  display: none;
+}
+
+.civicone--govuk .govuk-cookie-banner__heading {
+  font-family: var(--font-family-primary);
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-bold);
+  line-height: 1.25;
+  margin-top: 0;
+  margin-bottom: var(--space-4);
+}
+
+.civicone--govuk .govuk-cookie-banner__content {
+  font-family: var(--font-family-primary);
+  font-size: var(--font-size-lg);
+  line-height: 1.25;
+  margin-bottom: var(--space-4);
+}
+
+.civicone--govuk .govuk-cookie-banner__content > *:last-child {
+  margin-bottom: 0;
+}
+
+.civicone--govuk .govuk-button-group {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  margin-bottom: calc(-1 * var(--space-3));
+  gap: var(--space-3);
+}
+
+@media (min-width: 40.0625em) {
+  .civicone--govuk .govuk-button-group {
+    gap: var(--space-4);
+  }
+}
+
+/* ==========================================
+   GOV.UK EXIT THIS PAGE COMPONENT
+   https://design-system.service.gov.uk/components/exit-this-page/
+   ========================================== */
+
+.civicone--govuk .govuk-exit-this-page {
+  position: fixed;
+  top: 0;
+  right: 0;
+  z-index: 1000;
+  padding: var(--space-3);
+}
+
+.civicone--govuk .govuk-exit-this-page__button {
+  display: inline-block;
+  padding: var(--space-3) var(--space-4);
+  font-family: var(--font-family-primary);
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-bold);
+  line-height: 1;
+  text-decoration: none;
+  color: var(--color-white);
+  background-color: var(--color-govuk-red);
+  border: 0;
+  cursor: pointer;
+}
+
+.civicone--govuk .govuk-exit-this-page__button:hover {
+  background-color: var(--color-govuk-red-dark);
+}
+
+.civicone--govuk .govuk-exit-this-page__button:focus {
+  outline: 3px solid var(--color-brand-yellow);
+  outline-offset: 0;
+  background-color: var(--color-brand-yellow);
+  color: var(--color-govuk-black);
+  box-shadow: 0 4px var(--color-govuk-black);
+}
+
+.civicone--govuk .govuk-exit-this-page__indicator {
+  display: block;
+  width: 12px;
+  height: 12px;
+  margin-left: var(--space-2);
+  background-color: var(--color-white);
+  border-radius: 50%;
+}
+
+/* Keyboard shortcut feedback */
+.civicone--govuk .govuk-exit-this-page--active .govuk-exit-this-page__indicator {
+  animation: govuk-exit-this-page-pulse 0.5s ease-in-out infinite;
+}
+
+@keyframes govuk-exit-this-page-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}
+
+/* ==========================================
+   GOV.UK Compliant Utility Classes
+   Added for JS interaction support (2026-01-23)
+   ========================================== */
+
+/* Touch feedback state - used by civicone-events-calendar.js */
+.active-pressed {
+  transform: scale(0.97);
+  transition: transform 0.1s ease-out;
+}
+
+/* Inline icon spacing - used by civicone-compose-index.js */
+.civic-icon-inline {
+  margin-right: var(--space-1);
+}
+
+/* Small icon size - used by social_interactions.php */
+.civic-icon-sm {
+  font-size: 16px;
+}
+
+/* Pending state for async operations - used by civicone-dashboard.js */
+.civic-item--pending {
+  opacity: 0.5;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+}
+
+/* Search no results message - used by civicone-organizations-wallet.js */
+.civic-search-no-results {
+  padding: var(--space-3);
+  text-align: center;
+  color: var(--color-text-secondary);
+}
+
+/* ==========================================
+   Compose Page Utilities
+   Used by compose/index.php JavaScript
+   ========================================== */
+
+/* Form input error state - validation feedback */
+.md-input--error {
+  border-color: var(--color-red-500) !important;
+  box-shadow: 0 0 0 3px var(--color-red-100);
+}
+
+/* SDG card selected state - uses CSS custom property for dynamic color */
+.holo-sdg-card.sdg-selected {
+  border-color: var(--sdg-color, var(--color-primary-500));
+  background-color: color-mix(in srgb, var(--sdg-color, var(--color-primary-500)) 10%, transparent);
+  box-shadow: 0 4px 15px color-mix(in srgb, var(--sdg-color, var(--color-primary-500)) 20%, transparent);
+}
+
+/* Fallback for browsers without color-mix support */
+@supports not (background-color: color-mix(in srgb, red 50%, blue)) {
+  .holo-sdg-card.sdg-selected {
+    border-color: var(--sdg-color, var(--color-primary-500));
+    background-color: var(--color-primary-50);
+    box-shadow: 0 4px 15px var(--color-primary-100);
+  }
+}
+
+/* Alert with margin - used by compose/index.php */
+.md-alert--margin {
+  margin: 16px;
+}
+
+/* Link styled as button - used by compose/index.php */
+.md-link-btn {
+  text-decoration: none;
+  display: inline-flex;
+}
+
+/* Avatar without text fallback - used by compose/index.php */
+.md-avatar--no-text {
+  font-size: 0;
+}
+
+/* Muted/disabled appearance - used by compose/index.php */
+.md-muted {
+  opacity: 0.6;
+}
+
+/* Location error styling - used by compose/index.php */
+.md-location-error {
+  color: var(--md-danger, var(--color-red-500));
+}
+
+.md-location-error-icon {
+  background: var(--md-danger-light, var(--color-red-100));
+  color: var(--md-danger, var(--color-red-500));
+}
+
+/* ==========================================
+   Button Press Animation Classes
+   GOV.UK compliant - replaces inline style.transform
+   ========================================== */
+
+/* Standard button press - 96% scale */
+.btn-pressed {
+  transform: scale(0.96);
+}
+
+/* Small button press - 97% scale */
+.btn-pressed-sm {
+  transform: scale(0.97);
+}
+
+/* Subtle button press - 98% scale */
+.btn-pressed-xs {
+  transform: scale(0.98);
+}
+
+/* ==========================================
+   Body State Classes
+   ========================================== */
+
+/* Prevent body scroll when modal is open */
+.body-no-scroll {
+  overflow: hidden;
+}
+
+/* ==========================================
+   Fade Animation Classes
+   ========================================== */
+
+/* Fade out element */
+.fade-out {
+  opacity: 0;
+  transition: opacity 0.5s ease;
+}
+
+/* Fade in element */
+.fade-in {
+  opacity: 1;
+  transition: opacity 0.5s ease;
+}
+
+/* Section visible (for accordion/toggle patterns) */
+.section-visible {
+  display: block;
+}
+
+/* ==========================================
+   Button Disabled State
+   ========================================== */
+
+/* Disabled button styling via :disabled pseudo-class */
+button:disabled,
+input[type="submit"]:disabled,
+.btn-disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
 /**
  * CivicOne GOV.UK Feedback Components
  * Source: GOV.UK Frontend v5.14.0 (WCAG 2.2 AA Compliant)
@@ -4500,7 +5338,7 @@ body.dark-mode .civic-radios__label::after {
 }
 
 .civicone-notification-banner--success .civicone-notification-banner__link:hover {
-    color: #004e2a;
+    color: var(--color-govuk-green-dark);
 }
 
 .civicone-notification-banner--success .civicone-notification-banner__link:focus {
@@ -5101,6 +5939,118 @@ body.dark-mode .civic-radios__label::after {
 
 .civicone-back-link--inverse::before {
     border-color: currentcolor;
+}
+
+/* ==========================================
+   SERVICE NAVIGATION DROPDOWN (MORE MENU)
+   Custom extension for GOV.UK Service Navigation
+   ========================================== */
+
+.govuk-service-navigation__link--more {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font: inherit;
+    padding: inherit;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5em;
+}
+
+.govuk-service-navigation__link--more:hover {
+    text-decoration-thickness: max(3px, 0.1875rem, 0.12em);
+}
+
+.govuk-service-navigation__chevron {
+    transition: transform 0.15s ease-in-out;
+}
+
+.govuk-service-navigation__link--more[aria-expanded="true"] .govuk-service-navigation__chevron {
+    transform: rotate(180deg);
+}
+
+.govuk-service-navigation__dropdown {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    z-index: 100;
+    min-width: 200px;
+    max-width: 300px;
+    background: var(--color-white);
+    border: 1px solid var(--color-govuk-grey);
+    box-shadow: 0 2px 6px var(--color-black-alpha-16);
+    display: none;
+}
+
+/* Show dropdown when More button is expanded */
+.govuk-service-navigation__item--more[aria-expanded="true"] .govuk-service-navigation__dropdown,
+.govuk-service-navigation__link--more[aria-expanded="true"] + .govuk-service-navigation__dropdown {
+    display: block;
+}
+
+.govuk-service-navigation__dropdown-list {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.govuk-service-navigation__dropdown-item {
+    margin: 0;
+    padding: 0;
+    border-bottom: 1px solid var(--color-govuk-light-grey);
+}
+
+.govuk-service-navigation__dropdown-item:last-child {
+    border-bottom: none;
+}
+
+.govuk-service-navigation__dropdown-link {
+    display: block;
+    padding: 10px 15px;
+    color: var(--color-govuk-black);
+    text-decoration: none;
+}
+
+.govuk-service-navigation__dropdown-link:hover {
+    background-color: var(--color-govuk-light-grey);
+    text-decoration: underline;
+}
+
+.govuk-service-navigation__dropdown-link:focus {
+    outline: 3px solid transparent;
+    color: var(--color-govuk-black);
+    background-color: var(--color-govuk-yellow);
+    box-shadow: 0 -2px var(--color-govuk-yellow), 0 4px var(--color-govuk-black);
+    text-decoration: none;
+}
+
+.govuk-service-navigation__dropdown-link[aria-current="page"] {
+    font-weight: 700;
+    background-color: var(--color-govuk-light-grey);
+}
+
+/* Position the dropdown container relatively */
+.govuk-service-navigation__item {
+    position: relative;
+}
+
+/* Ensure dropdown parent doesn't clip */
+.govuk-service-navigation__list {
+    overflow: visible;
+}
+
+.govuk-service-navigation__wrapper {
+    overflow: visible;
+}
+
+.govuk-service-navigation__container {
+    overflow: visible;
+}
+
+/* Increase z-index for service nav dropdown */
+.govuk-service-navigation {
+    position: relative;
+    z-index: 10;
 }
 
 /* ==========================================
@@ -5929,11 +6879,11 @@ body.dark-mode .civic-radios__label::after {
     }
 
     html[data-theme="dark"] .civicone-tabs__tab {
-        color: var(--color-blue-400, #60a5fa);
+        color: var(--color-blue-400, var(--color-blue-400));
     }
 
     html[data-theme="dark"] .civicone-tabs__tab:hover {
-        color: var(--color-blue-300, #93c5fd);
+        color: var(--color-blue-300, var(--color-blue-300));
     }
 
     html[data-theme="dark"] .civicone-tabs__tab:visited {

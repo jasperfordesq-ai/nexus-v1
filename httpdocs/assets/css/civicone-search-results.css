@@ -57,52 +57,60 @@
     margin-left: var(--space-2);
 }
 
-/* Filter Tabs */
+/* Filter Tabs - GOV.UK Design System Compliant */
 .htb-search-tabs {
     display: flex;
     gap: var(--space-1);
-    background: white;
+    background: var(--color-white);
     padding: var(--space-1);
-    border-radius: var(--radius-lg);
     flex-wrap: wrap;
-    border: 1px solid var(--color-gray-200);
-    box-shadow: 0 4px 6px -1px var(--color-black-alpha-5);
+    border: 1px solid var(--color-govuk-grey, #b1b4b6);
 }
 
 [data-theme="dark"] .htb-search-tabs {
-    background: var(--color-slate-alpha-80);
-    border-color: var(--color-white-alpha-10);
+    background: var(--color-govuk-grey-dark, #505a5f);
+    border-color: var(--color-govuk-grey, #b1b4b6);
 }
 
 .htb-tab {
-    border: none;
+    border: 2px solid transparent;
     cursor: pointer;
     padding: var(--space-1-5) 16px;
-    border-radius: var(--radius-md);
     background: transparent;
-    color: var(--color-gray-500);
+    color: var(--color-govuk-black, #0b0c0c);
     font-weight: 600;
-    transition: all 0.2s ease;
+    transition: background-color 0.15s, border-color 0.15s;
+}
+
+.htb-tab:hover {
+    background: var(--color-govuk-light-grey, #f3f2f1);
 }
 
 .htb-tab.active {
-    background: var(--color-blue-50);
-    color: var(--htb-primary);
+    background: var(--color-govuk-blue-light, #1d70b8);
+    color: var(--color-white);
     font-weight: 700;
 }
 
+.htb-tab:focus {
+    outline: 3px solid var(--color-govuk-yellow, #ffdd00);
+    outline-offset: 0;
+    background-color: var(--color-govuk-yellow, #ffdd00);
+    color: var(--color-govuk-black, #0b0c0c);
+    border-color: var(--color-govuk-black, #0b0c0c);
+}
+
 [data-theme="dark"] .htb-tab {
-    color: var(--color-slate-400);
+    color: var(--color-white);
+}
+
+[data-theme="dark"] .htb-tab:hover {
+    background: var(--color-govuk-black, #0b0c0c);
 }
 
 [data-theme="dark"] .htb-tab.active {
-    background: var(--color-indigo-alpha-20);
-    color: var(--color-primary-300);
-}
-
-[data-theme="dark"] .htb-tab:not(.active):hover {
-    background: var(--color-slate-600-alpha-60);
-    color: var(--color-slate-200);
+    background: var(--color-govuk-blue-light, #1d70b8);
+    color: var(--color-white);
 }
 
 /* Empty State */
@@ -172,32 +180,37 @@
     gap: var(--space-5);
 }
 
-/* Search Result Card */
+/* Search Result Card - GOV.UK Design System Compliant */
 .htb-search-result {
     text-decoration: none;
     color: inherit;
-    transition: all 0.2s ease;
+    transition: background-color 0.15s, border-color 0.15s;
     position: relative;
     overflow: hidden;
     padding: var(--space-5);
-    border: 1px solid var(--color-black-alpha-5);
-    background: white;
+    border: 1px solid var(--color-govuk-grey, #b1b4b6);
+    background: var(--color-white);
 }
 
 [data-theme="dark"] .htb-search-result {
-    background: var(--color-slate-alpha-85);
-    border-color: var(--color-white-alpha-10);
+    background: var(--color-govuk-grey-dark, #505a5f);
+    border-color: var(--color-govuk-grey, #b1b4b6);
 }
 
 .htb-search-result:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 10px 20px var(--color-black-alpha-8);
-    border-color: rgba(var(--htb-primary-rgb), 0.3);
+    background: var(--color-govuk-light-grey, #f3f2f1);
+    border-color: var(--color-govuk-black, #0b0c0c);
 }
 
 [data-theme="dark"] .htb-search-result:hover {
-    border-color: var(--color-indigo-alpha-40);
-    box-shadow: 0 10px 20px var(--color-black-alpha-30);
+    background: var(--color-govuk-black, #0b0c0c);
+    border-color: var(--color-white);
+}
+
+.htb-search-result:focus {
+    outline: 3px solid var(--color-govuk-yellow, #ffdd00);
+    outline-offset: 0;
+    background-color: var(--color-govuk-yellow, #ffdd00);
 }
 
 .htb-search-result:hover .arrow-indicator {

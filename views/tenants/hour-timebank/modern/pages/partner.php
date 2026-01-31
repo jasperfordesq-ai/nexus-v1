@@ -55,16 +55,16 @@ $basePath = \Nexus\Core\TenantContext::getBasePath();
 
 /* Button Press States */
 .quick-action-btn:active,
-.glass-btn-primary:active,
-.glass-btn-secondary:active {
+.btn--primary:active,
+.btn--secondary:active {
     transform: scale(0.96) !important;
     transition: transform 0.1s ease !important;
 }
 
 /* Touch Targets - WCAG 2.1 AA (44px minimum) */
 .quick-action-btn,
-.glass-btn-primary,
-.glass-btn-secondary {
+.btn--primary,
+.btn--secondary {
     min-height: 44px !important;
 }
 
@@ -77,8 +77,8 @@ textarea {
 
 /* Focus Visible */
 .quick-action-btn:focus-visible,
-.glass-btn-primary:focus-visible,
-.glass-btn-secondary:focus-visible,
+.btn--primary:focus-visible,
+.btn--secondary:focus-visible,
 a:focus-visible {
     outline: 3px solid rgba(124, 58, 237, 0.5);
     outline-offset: 2px;
@@ -93,8 +93,8 @@ html {
 /* Mobile Responsive Enhancements */
 @media (max-width: 768px) {
     .quick-action-btn,
-    .glass-btn-primary,
-    .glass-btn-secondary {
+    .btn--primary,
+    .btn--secondary {
         min-height: 48px !important;
     }
 }
@@ -637,7 +637,7 @@ html {
         }
 
         /* Glass Primary Button */
-        #partner-glass-wrapper .glass-btn-primary {
+        #partner-glass-wrapper .btn--primary {
             background: linear-gradient(135deg, #7c3aed 0%, #8b5cf6 100%);
             color: white;
             border: none;
@@ -655,13 +655,13 @@ html {
             gap: 8px;
         }
 
-        #partner-glass-wrapper .glass-btn-primary:hover {
+        #partner-glass-wrapper .btn--primary:hover {
             transform: translateY(-2px);
             box-shadow: 0 8px 24px rgba(124, 58, 237, 0.4),
                         inset 0 1px 0 rgba(255, 255, 255, 0.3);
         }
 
-        #partner-glass-wrapper .glass-btn-secondary {
+        #partner-glass-wrapper .btn--secondary {
             background: linear-gradient(135deg,
                 rgba(255, 255, 255, 0.75),
                 rgba(255, 255, 255, 0.6));
@@ -681,20 +681,20 @@ html {
             gap: 8px;
         }
 
-        #partner-glass-wrapper .glass-btn-secondary:hover {
+        #partner-glass-wrapper .btn--secondary:hover {
             transform: translateY(-2px);
             border-color: rgba(124, 58, 237, 0.5);
             background: rgba(255, 255, 255, 0.85);
         }
 
-        [data-theme="dark"] #partner-glass-wrapper .glass-btn-secondary {
+        [data-theme="dark"] #partner-glass-wrapper .btn--secondary {
             background: linear-gradient(135deg,
                 rgba(15, 23, 42, 0.6),
                 rgba(30, 41, 59, 0.5));
             border-color: rgba(124, 58, 237, 0.4);
         }
 
-        [data-theme="dark"] #partner-glass-wrapper .glass-btn-secondary:hover {
+        [data-theme="dark"] #partner-glass-wrapper .btn--secondary:hover {
             background: rgba(15, 23, 42, 0.8);
         }
 
@@ -828,10 +828,10 @@ html {
                 <h3>Let's Discuss Your Investment</h3>
                 <p>Join us in building a more connected, resilient Ireland. We're seeking strategic partners who share our vision for community empowerment.</p>
                 <div style="display: flex; gap: 16px; justify-content: center; flex-wrap: wrap;">
-                    <a href="<?= $basePath ?>/contact" class="glass-btn-primary">
+                    <a href="<?= $basePath ?>/contact" class="btn btn--primary">
                         📧 Contact Strategy Team
                     </a>
-                    <a href="<?= $basePath ?>/strategic-plan" class="glass-btn-secondary">
+                    <a href="<?= $basePath ?>/strategic-plan" class="btn btn--secondary">
                         📋 View Strategic Plan
                     </a>
                 </div>
@@ -886,7 +886,7 @@ html {
 })();
 
 // Button Press States
-document.querySelectorAll('.quick-action-btn, .glass-btn-primary, .glass-btn-secondary').forEach(btn => {
+document.querySelectorAll('.quick-action-btn, .btn--primary, .btn--secondary').forEach(btn => {
     btn.addEventListener('pointerdown', function() {
         this.style.transform = 'scale(0.96)';
     });

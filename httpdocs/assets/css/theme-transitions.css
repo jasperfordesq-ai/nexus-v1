@@ -228,26 +228,26 @@ html.theme-transitioning *::after {
    BUTTON REFINEMENTS
    ============================================== */
 [data-theme="dark"] .btn-secondary,
-[data-theme="dark"] .glass-btn-secondary {
+[data-theme="dark"] .btn--secondary {
     background: var(--bg-surface);
     border-color: var(--border-default);
     color: var(--text-primary);
 }
 
 [data-theme="dark"] .btn-secondary:hover,
-[data-theme="dark"] .glass-btn-secondary:hover {
+[data-theme="dark"] .btn--secondary:hover {
     background: var(--bg-hover);
     border-color: var(--border-strong);
 }
 
 [data-theme="dark"] .btn-outline,
-[data-theme="dark"] .glass-btn-outline {
+[data-theme="dark"] .btn--ghost {
     border-color: var(--border-strong);
     color: var(--text-primary);
 }
 
 [data-theme="dark"] .btn-outline:hover,
-[data-theme="dark"] .glass-btn-outline:hover {
+[data-theme="dark"] .btn--ghost:hover {
     background: var(--overlay-light);
 }
 

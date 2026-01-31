@@ -368,6 +368,7 @@
 
 /* --------------------------------------------
    Wallet Insights Page
+   GOV.UK Design System Compliant
    -------------------------------------------- */
 .insights-bg {
     position: fixed;
@@ -376,31 +377,11 @@
     right: 0;
     bottom: 0;
     z-index: -1;
-    background: linear-gradient(135deg, var(--color-slate-50) 0%, var(--color-purple-50) 25%, var(--color-purple-100) 50%, var(--color-purple-50) 75%, var(--color-slate-50) 100%);
-}
-
-.insights-bg::before {
-    content: '';
-    position: absolute;
-    top: -50%;
-    left: -50%;
-    width: 200%;
-    height: 200%;
-    background:
-        radial-gradient(ellipse at 20% 30%, var(--color-purple-alpha-12) 0%, transparent 50%),
-        radial-gradient(ellipse at 80% 20%, var(--color-violet-alpha-10) 0%, transparent 45%),
-        radial-gradient(ellipse at 50% 80%, var(--color-purple-400-alpha-8) 0%, transparent 50%);
-    /* animation removed for GOV.UK compliance */
+    background: var(--color-govuk-light-grey, #f3f2f1);
 }
 
 [data-theme="dark"] .insights-bg {
-    background: linear-gradient(135deg, var(--color-slate-900) 0%, var(--color-purple-950) 50%, var(--color-slate-900) 100%);
-}
-
-[data-theme="dark"] .insights-bg::before {
-    background:
-        radial-gradient(ellipse at 20% 30%, var(--color-purple-alpha-20) 0%, transparent 50%),
-        radial-gradient(ellipse at 80% 20%, var(--color-violet-alpha-15) 0%, transparent 45%);
+    background: var(--color-govuk-black, #0b0c0c);
 }
 
 
@@ -434,12 +415,11 @@
 .insights-title-icon {
     width: var(--space-14);
     height: var(--space-14);
-    background: linear-gradient(135deg, var(--color-purple-400) 0%, var(--color-primary-700) 100%);
-    border-radius: var(--radius-lg);
+    background: var(--color-govuk-blue-light, #1d70b8);
     display: flex;
     align-items: center;
     justify-content: center;
-    color: white;
+    color: var(--color-white);
     font-size: var(--font-size-2xl);
 }
 
@@ -463,15 +443,13 @@
 
 .insights-nav-link {
     padding: var(--space-3) var(--space-5);
-    background: var(--color-white-alpha-80);
-    /* backdrop-filter removed for GOV.UK compliance */
-    border: 1px solid var(--color-purple-alpha-20);
-    border-radius: var(--radius-md);
-    color: var(--civic-wallet-text-secondary);
+    background: var(--color-govuk-light-grey, #f3f2f1);
+    border: 2px solid var(--color-govuk-grey, #b1b4b6);
+    color: var(--color-govuk-black, #0b0c0c);
     font-weight: 600;
     font-size: var(--font-size-sm);
     text-decoration: none;
-    transition: all 0.2s;
+    transition: background-color 0.15s, border-color 0.15s;
     display: flex;
     align-items: center;
     gap: var(--space-2);
@@ -479,7 +457,8 @@
 }
 
 .insights-nav-link:hover {
-    background: var(--color-purple-alpha-10);
+    background: var(--color-white);
+    border-color: var(--color-govuk-black, #0b0c0c);
 }
 
 .insights-nav-link:focus {
@@ -492,31 +471,29 @@
 }
 
 [data-theme="dark"] .insights-nav-link {
-    background: var(--color-slate-800-alpha-80);
-    border-color: var(--color-purple-alpha-30);
-    color: var(--color-slate-200);
+    background: var(--color-govuk-grey-dark, #505a5f);
+    border-color: var(--color-govuk-grey, #b1b4b6);
+    color: var(--color-white);
+}
+
+[data-theme="dark"] .insights-nav-link:hover {
+    background: var(--color-govuk-black, #0b0c0c);
+    border-color: var(--color-white);
 }
 
 
 /* --------------------------------------------
-   Glass Cards
+   Cards - GOV.UK Design System Compliant
    -------------------------------------------- */
 .insights-glass-card {
-    background: linear-gradient(135deg,
-        var(--color-white-alpha-90) 0%,
-        var(--color-white-alpha-75) 100%);
-    /* backdrop-filter removed for GOV.UK compliance */
-    border: 1px solid var(--color-white-alpha-50);
-    border-radius: var(--radius-xl);
-    box-shadow: 0 8px 32px var(--color-glass-shadow);
+    background: var(--color-white);
+    border: 1px solid var(--color-govuk-grey, #b1b4b6);
     overflow: hidden;
 }
 
 [data-theme="dark"] .insights-glass-card {
-    background: linear-gradient(135deg,
-        var(--color-slate-800-alpha-90) 0%,
-        var(--color-slate-800-alpha-75) 100%);
-    border-color: var(--color-white-alpha-10);
+    background: var(--color-govuk-grey-dark, #505a5f);
+    border-color: var(--color-govuk-grey, #b1b4b6);
 }
 
 
@@ -537,17 +514,7 @@
     overflow: hidden;
 }
 
-.insights-stat-card::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    right: 0;
-    width: 60px;
-    height: 60px;
-    border-radius: 50%;
-    background: linear-gradient(135deg, var(--color-purple-alpha-10), transparent);
-    transform: translate(var(--space-5), calc(-1 * var(--space-5)));
-}
+/* Decorative element removed for GOV.UK compliance */
 
 .insights-stat-icon {
     width: var(--space-12);
@@ -560,16 +527,17 @@
     font-size: 1.25rem;
 }
 
-.insights-stat-icon.green { background: var(--color-emerald-alpha-15); color: var(--color-success); }
-.insights-stat-icon.red { background: var(--color-red-alpha-15); color: var(--color-danger); }
-.insights-stat-icon.blue { background: var(--color-blue-alpha-15); color: var(--color-info); }
-.insights-stat-icon.purple { background: var(--color-purple-alpha-15); color: var(--color-purple-400); }
-.insights-stat-icon.orange { background: var(--color-amber-alpha-15); color: var(--color-warning); }
+/* GOV.UK compliant stat icon colors */
+.insights-stat-icon.green { background: var(--color-govuk-light-grey, #f3f2f1); color: var(--color-govuk-green, #00703c); }
+.insights-stat-icon.red { background: var(--color-govuk-light-grey, #f3f2f1); color: var(--color-govuk-red, #d4351c); }
+.insights-stat-icon.blue { background: var(--color-govuk-light-grey, #f3f2f1); color: var(--color-govuk-blue-light, #1d70b8); }
+.insights-stat-icon.purple { background: var(--color-govuk-light-grey, #f3f2f1); color: var(--color-govuk-pink, #912b88); }
+.insights-stat-icon.orange { background: var(--color-govuk-light-grey, #f3f2f1); color: var(--color-govuk-orange, #f47738); }
 
-[data-theme="dark"] .insights-stat-icon.green { background: var(--color-emerald-alpha-20); color: var(--color-success-400); }
-[data-theme="dark"] .insights-stat-icon.red { background: var(--color-red-alpha-20); color: var(--color-red-400); }
-[data-theme="dark"] .insights-stat-icon.blue { background: var(--color-blue-alpha-20); color: var(--color-blue-400); }
-[data-theme="dark"] .insights-stat-icon.purple { background: var(--color-purple-alpha-20); color: var(--color-purple-400); }
+[data-theme="dark"] .insights-stat-icon.green { background: var(--color-govuk-grey-dark, #505a5f); color: var(--color-govuk-green, #00703c); }
+[data-theme="dark"] .insights-stat-icon.red { background: var(--color-govuk-grey-dark, #505a5f); color: var(--color-govuk-red, #d4351c); }
+[data-theme="dark"] .insights-stat-icon.blue { background: var(--color-govuk-grey-dark, #505a5f); color: var(--color-govuk-blue-light, #1d70b8); }
+[data-theme="dark"] .insights-stat-icon.purple { background: var(--color-govuk-grey-dark, #505a5f); color: var(--color-govuk-pink, #912b88); }
 
 .insights-stat-value {
     font-size: var(--font-size-4xl);
@@ -617,11 +585,11 @@
     align-items: center;
     justify-content: space-between;
     padding: var(--space-5) var(--space-6);
-    border-bottom: 1px solid var(--color-purple-alpha-10);
+    border-bottom: 1px solid var(--color-govuk-grey, #b1b4b6);
 }
 
 [data-theme="dark"] .insights-section-header {
-    border-bottom-color: var(--color-white-alpha-10);
+    border-bottom-color: var(--color-govuk-grey, #b1b4b6);
 }
 
 .insights-section-title {
@@ -655,13 +623,13 @@
     display: flex;
     align-items: center;
     padding: var(--space-3) 0;
-    border-bottom: 1px solid var(--color-purple-alpha-8);
+    border-bottom: 1px solid var(--color-govuk-grey, #b1b4b6);
     gap: var(--space-3);
     min-height: var(--civic-wallet-touch-min);
 }
 
 [data-theme="dark"] .insights-partner-item {
-    border-bottom-color: var(--color-white-alpha-5);
+    border-bottom-color: var(--color-govuk-grey, #b1b4b6);
 }
 
 .insights-partner-item:last-child {
@@ -671,25 +639,25 @@
 .insights-partner-rank {
     width: var(--space-6);
     height: var(--space-6);
-    border-radius: var(--radius-sm);
-    background: var(--color-purple-alpha-10);
+    background: var(--color-govuk-light-grey, #f3f2f1);
+    border: 1px solid var(--color-govuk-grey, #b1b4b6);
     display: flex;
     align-items: center;
     justify-content: center;
     font-weight: 700;
     font-size: var(--font-size-xs);
-    color: var(--color-purple-400);
+    color: var(--color-govuk-black, #0b0c0c);
 }
 
 .insights-partner-avatar {
     width: var(--space-10);
     height: var(--space-10);
     border-radius: 50%;
-    background: linear-gradient(135deg, var(--color-purple-400), var(--color-primary-700));
+    background: var(--color-govuk-blue-light, #1d70b8);
     display: flex;
     align-items: center;
     justify-content: center;
-    color: white;
+    color: var(--color-white);
     font-weight: 600;
     font-size: var(--font-size-sm);
     flex-shrink: 0;
@@ -758,18 +726,18 @@
 
 .streak-message {
     font-size: var(--font-size-sm);
-    color: var(--color-warning);
+    color: var(--color-govuk-orange, #f47738);
     margin-top: var(--space-3);
     padding: var(--space-2) var(--space-4);
-    background: var(--color-amber-alpha-10);
-    border-radius: var(--radius-xl);
+    background: var(--color-govuk-light-grey, #f3f2f1);
+    border-left: 4px solid var(--color-govuk-orange, #f47738);
     display: inline-block;
 }
 
 .streak-footer {
     padding: 0 var(--space-6) var(--space-6);
     text-align: center;
-    border-top: 1px solid var(--color-purple-alpha-10);
+    border-top: 1px solid var(--color-govuk-grey, #b1b4b6);
 }
 
 .streak-footer-content {
@@ -797,18 +765,19 @@
 .community-stat {
     text-align: center;
     padding: var(--space-4);
-    background: var(--color-purple-500-alpha-5);
-    border-radius: var(--radius-md);
+    background: var(--color-govuk-light-grey, #f3f2f1);
+    border: 1px solid var(--color-govuk-grey, #b1b4b6);
 }
 
 [data-theme="dark"] .community-stat {
-    background: var(--color-purple-alpha-10);
+    background: var(--color-govuk-grey-dark, #505a5f);
+    border-color: var(--color-govuk-grey, #b1b4b6);
 }
 
 .community-stat-value {
     font-size: var(--font-size-2xl);
     font-weight: 800;
-    color: var(--color-purple-400);
+    color: var(--color-govuk-blue-light, #1d70b8);
 }
 
 .community-stat-label {

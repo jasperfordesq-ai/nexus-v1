@@ -9326,13 +9326,13 @@ if (class_exists('Nexus\\Core\\SmartBlockRenderer')) {
     box-shadow: 0 8px 24px rgba(139, 92, 246, 0.4);
 }
 
-.glass-btn-outline {
+.btn--ghost {
     background: transparent;
     border: 2px solid var(--glass-border);
     color: var(--glass-text-primary);
 }
 
-.glass-btn-outline:hover {
+.btn--ghost:hover {
     border-color: var(--glass-primary);
     color: var(--glass-primary);
     box-shadow: none;

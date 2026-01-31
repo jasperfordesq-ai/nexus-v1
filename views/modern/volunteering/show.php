@@ -262,7 +262,7 @@ $accentColor = '#14b8a6'; // Teal for volunteering
                             <textarea name="message" rows="3" placeholder="Tell them why you'd like to volunteer..." class="vol-form-textarea"></textarea>
                         </div>
 
-                        <button type="submit" class="glass-btn-primary">
+                        <button type="submit" class="btn btn--primary">
                             <i class="fa-solid fa-paper-plane"></i> Apply Now
                         </button>
                     </form>
@@ -270,7 +270,7 @@ $accentColor = '#14b8a6'; // Teal for volunteering
                     <div class="vol-status-card vol-status-card--login">
                         <i class="fa-solid fa-user-lock vol-status-icon vol-status-icon--locked"></i>
                         <p class="vol-status-text vol-status-text--muted">Join our community to volunteer.</p>
-                        <a href="<?= Nexus\Core\TenantContext::getBasePath() ?>/login" class="glass-btn-primary vol-login-btn">
+                        <a href="<?= Nexus\Core\TenantContext::getBasePath() ?>/login" class="btn btn--primary vol-login-btn">
                             Login to Apply
                         </a>
                     </div>
@@ -778,7 +778,7 @@ $accentColor = '#14b8a6'; // Teal for volunteering
 
     // Button Press States
     document.addEventListener('DOMContentLoaded', function() {
-        document.querySelectorAll('#vol-show-glass-wrapper button, #vol-show-glass-wrapper .glass-btn-primary').forEach(btn => {
+        document.querySelectorAll('#vol-show-glass-wrapper button, #vol-show-glass-wrapper .btn--primary').forEach(btn => {
             btn.addEventListener('pointerdown', function() {
                 this.style.transform = 'scale(0.96)';
             });

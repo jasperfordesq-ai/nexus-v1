@@ -41,7 +41,7 @@ $hasTimebanking = $hasTimebanking ?? \Nexus\Core\TenantContext::hasFeature('wall
                        placeholder="Search organizations by name or cause..."
                        value="<?= htmlspecialchars($query ?? '') ?>">
             </div>
-            <button type="submit" class="glass-btn-primary">
+            <button type="submit" class="btn btn--primary">
                 <i class="fa-solid fa-search"></i>
                 Search
             </button>

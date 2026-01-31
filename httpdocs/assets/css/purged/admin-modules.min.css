@@ -1,1 +1,149 @@
-.admin-empty-state .admin-btn{margin-top:var(--space-4)}.admin-modal--hidden{display:none}.admin-alert--spaced{margin-bottom:var(--space-6)}.menu-status-active{margin-left:var(--space-4);color:var(--color-warning)}.admin-glass-card--spaced{margin-bottom:var(--space-8)}
+/**
+ * admin-modules Bundle
+ * Generated: 2026-01-27T10:42:36.289Z
+ * Files: 2
+ */
+
+/* ========================================
+ * admin-menu-builder.css
+ * ======================================== */
+
+/**
+ * Admin Menu Builder Styles
+ * Extracted from inline styles in views/modern/admin/menus/builder.php
+ */
+
+/* Card body zero padding for menu items list */
+.menu-builder-layout .admin-card-body--no-padding {
+    padding: var(--space-0);
+}
+
+/* Empty state button spacing */
+.admin-empty-state .admin-btn {
+    margin-top: var(--space-4);
+}
+
+/* Menu item row indentation - dynamic via data attribute */
+.menu-item-row[data-depth="0"] {
+    padding-left: var(--space-0);
+}
+
+.menu-item-row[data-depth="1"] {
+    padding-left: var(--space-8);
+}
+
+.menu-item-row[data-depth="2"] {
+    padding-left: var(--space-16);
+}
+
+.menu-item-row[data-depth="3"] {
+    padding-left: 6rem;
+}
+
+.menu-item-row[data-depth="4"] {
+    padding-left: 8rem;
+}
+
+/* Modal hidden state */
+.admin-modal--hidden {
+    display: none;
+}
+
+/* Form field conditional display */
+.form-group--hidden {
+    display: none;
+}
+
+/* Visibility settings summary */
+.visibility-settings-summary {
+    cursor: pointer;
+    padding: var(--space-2) var(--space-0);
+    font-weight: var(--font-weight-semibold);
+}
+
+.visibility-settings-content {
+    padding: var(--space-4) var(--space-0);
+}
+
+
+/* ========================================
+ * admin-menu-index.css
+ * ======================================== */
+
+/**
+ * Admin Menu Index Styles
+ * Extracted from inline styles in views/modern/admin/menus/index.php
+ * Migrated to design tokens for consistency
+ */
+
+/* Alert spacing */
+.admin-alert--spaced {
+    margin-bottom: var(--space-6);
+}
+
+/* Known issues details */
+.known-issues-summary {
+    cursor: pointer;
+    font-weight: var(--font-weight-semibold);
+}
+
+.known-issues-details {
+    margin-top: var(--space-3);
+}
+
+.known-issues-list {
+    margin: var(--space-2) 0 0 var(--space-6);
+    line-height: var(--line-height-relaxed);
+}
+
+.known-issues-actions {
+    margin-top: var(--space-4);
+    display: flex;
+    gap: var(--space-4);
+}
+
+/* Beta info paragraph */
+.beta-info-text {
+    margin: var(--space-2) 0 0;
+}
+
+/* Menu status indicator */
+.menu-status-wrapper {
+    margin-top: var(--space-4);
+}
+
+.menu-status-active {
+    margin-left: var(--space-4);
+    color: var(--color-warning);
+}
+
+/* Plan features grid */
+.plan-features-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: var(--space-4);
+}
+
+/* Success text color */
+.text-success {
+    color: var(--color-success);
+}
+
+/* Card body zero padding for menu list */
+
+/* Create menu button spacing */
+.menu-list-actions .admin-btn {
+    margin-top: var(--space-4);
+}
+
+/* Glass card spacing */
+.admin-glass-card--spaced {
+    margin-bottom: var(--space-8);
+}
+
+/* Bulk actions hidden by default */
+.bulk-actions--hidden {
+    display: none;
+}
+
+

@@ -202,6 +202,13 @@ if (ctx) {
     const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
     const trendsData = <?= json_encode($trends) ?>;
 
+    // Get GOV.UK colors from CSS variables with fallbacks
+    const styles = getComputedStyle(document.documentElement);
+    const govukGreen = styles.getPropertyValue('--color-govuk-green').trim() || '#00703c';
+    const govukRed = styles.getPropertyValue('--color-govuk-red').trim() || '#d4351c';
+    const govukGrey = styles.getPropertyValue('--color-govuk-grey').trim() || '#b1b4b6';
+    const govukGreyDark = styles.getPropertyValue('--color-govuk-grey-dark').trim() || '#505a5f';
+
     new Chart(ctx, {
         type: 'line',
         data: {
@@ -209,16 +216,16 @@ if (ctx) {
             datasets: [{
                 label: 'Received',
                 data: trendsData.map(d => d.received || 0),
-                borderColor: '#00703c',
-                backgroundColor: 'rgba(0, 112, 60, 0.1)',
+                borderColor: govukGreen,
+                backgroundColor: govukGreen + '1a', // ~10% opacity
                 fill: true,
                 tension: 0.4,
                 borderWidth: 3,
             }, {
                 label: 'Sent',
                 data: trendsData.map(d => d.sent || 0),
-                borderColor: '#d4351c',
-                backgroundColor: 'rgba(212, 53, 28, 0.1)',
+                borderColor: govukRed,
+                backgroundColor: govukRed + '1a', // ~10% opacity
                 fill: true,
                 tension: 0.4,
                 borderWidth: 3,
@@ -235,7 +242,7 @@ if (ctx) {
                 legend: {
                     position: 'bottom',
                     labels: {
-                        color: isDark ? '#b1b4b6' : '#505a5f',
+                        color: isDark ? govukGrey : govukGreyDark,
                         padding: 20,
                     }
                 }
@@ -247,7 +254,7 @@ if (ctx) {
                         color: isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)'
                     },
                     ticks: {
-                        color: isDark ? '#b1b4b6' : '#505a5f'
+                        color: isDark ? govukGrey : govukGreyDark
                     }
                 },
                 x: {
@@ -255,7 +262,7 @@ if (ctx) {
                         display: false
                     },
                     ticks: {
-                        color: isDark ? '#b1b4b6' : '#505a5f'
+                        color: isDark ? govukGrey : govukGreyDark
                     }
                 }
             }
