@@ -532,6 +532,27 @@ button.mobile-tab-item,
 /* AI Chat item - special styling */
 .mobile-menu-item-ai {
     background: var(--govuk-blue-tint-95);
+    font-weight: 600;
+}
+
+/* Icon color utilities - semantic colors for menu items */
+.mobile-menu-item i.icon-blue { color: var(--govuk-blue); }
+.mobile-menu-item i.icon-green { color: var(--govuk-green); }
+.mobile-menu-item i.icon-red { color: var(--govuk-red); }
+.mobile-menu-item i.icon-orange { color: #f47738; } /* GOV.UK orange */
+.mobile-menu-item i.icon-purple { color: #4c2c92; } /* GOV.UK purple */
+.mobile-menu-item i.icon-pink { color: #d53880; } /* GOV.UK pink */
+.mobile-menu-item i.icon-yellow { color: #ffdd00; } /* GOV.UK focus yellow */
+
+/* Admin section title - orange for emphasis */
+.mobile-menu-section-title-admin {
+    color: #f47738;
+}
+
+/* Arrow icon in user header */
+.mobile-menu-user-info p i {
+    font-size: 11px;
+    margin-right: 4px;
 }
 
 /* Menu Footer */

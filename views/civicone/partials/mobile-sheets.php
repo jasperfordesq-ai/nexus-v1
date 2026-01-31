@@ -50,16 +50,16 @@ $basePath = class_exists('\Nexus\Core\TenantContext') ? \Nexus\Core\TenantContex
     </div>
     <div class="mobile-sheet-body mobile-sheet-body--flex-column">
         <!-- Comments list ABOVE the input (like Facebook) -->
-        <div class="mobile-comments-list mobile-comments-list--flex" id="mobileCommentsList">
+        <div class="mobile-comments-list mobile-comments-list--flex" id="mobileCommentsList" role="region" aria-label="Comments" aria-live="polite">
             <!-- Comments loaded dynamically -->
         </div>
 
         <?php if ($isLoggedIn): ?>
             <div class="mobile-comment-input-wrap mobile-comment-input-wrap--bottom">
                 <img src="<?= htmlspecialchars($userAvatar) ?>" loading="lazy" alt="" class="mobile-comment-avatar">
-                <textarea class="mobile-comment-input" id="mobileCommentInput" placeholder="Write a comment..." rows="1" oninput="autoResizeCommentInput(this)"></textarea>
-                <button type="button" class="mobile-comment-send" id="mobileCommentSend" onclick="submitMobileComment()">
-                    <i class="fa-solid fa-paper-plane"></i>
+                <textarea class="mobile-comment-input" id="mobileCommentInput" placeholder="Write a comment..." rows="1" oninput="autoResizeCommentInput(this)" aria-label="Write a comment"></textarea>
+                <button type="button" class="mobile-comment-send" id="mobileCommentSend" onclick="submitMobileComment()" aria-label="Send comment">
+                    <i class="fa-solid fa-paper-plane" aria-hidden="true"></i>
                 </button>
             </div>
         <?php else: ?>

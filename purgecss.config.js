@@ -167,6 +167,7 @@ module.exports = {
         'httpdocs/assets/css/civicone-profile-show.css',
         'httpdocs/assets/css/civicone-profile-social.css',
         'httpdocs/assets/css/civicone-profile.css',
+        'httpdocs/assets/css/civicone-preview-banner.css',
         'httpdocs/assets/css/civicone-report-pages.css',
         'httpdocs/assets/css/civicone-resources-form.css',
         'httpdocs/assets/css/civicone-reviews-create.css',

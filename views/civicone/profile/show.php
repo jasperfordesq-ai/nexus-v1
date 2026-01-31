@@ -434,6 +434,8 @@ require_once __DIR__ . '/../components/govuk/breadcrumbs.php';
                     <li><a class="govuk-link" href="<?= \Nexus\Core\TenantContext::getBasePath() ?>/wallet">View your wallet</a></li>
                     <li><a class="govuk-link" href="<?= \Nexus\Core\TenantContext::getBasePath() ?>/wallet/insights">Wallet insights</a></li>
                     <?php endif; ?>
+                    <li><a class="govuk-link" href="<?= \Nexus\Core\TenantContext::getBasePath() ?>/achievements">Your achievements</a></li>
+                    <li><a class="govuk-link" href="<?= \Nexus\Core\TenantContext::getBasePath() ?>/leaderboard">Leaderboards</a></li>
                 <?php else: ?>
                     <li><a class="govuk-link" href="<?= \Nexus\Core\TenantContext::getBasePath() ?>/messages/create?to=<?= $user['id'] ?>">Send a message</a></li>
                     <?php if (\Nexus\Core\TenantContext::hasFeature('timebanking')): ?>

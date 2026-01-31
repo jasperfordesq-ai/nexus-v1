@@ -298,6 +298,65 @@ class NavigationConfig
     }
 
     /**
+     * Get Explore menu items for CivicOne theme (excludes gamification)
+     *
+     * CivicOne theme follows GOV.UK Design System patterns where gamification
+     * features are accessed via user dashboard/profile rather than primary navigation.
+     *
+     * @return array Navigation items without gamification category
+     */
+    public static function getExploreNavCivicOne(): array
+    {
+        return array_filter(self::getExploreNav(), function ($item) {
+            return ($item['category'] ?? '') !== 'gamification';
+        });
+    }
+
+    /**
+     * Get secondary navigation for CivicOne theme (excludes gamification from explore)
+     *
+     * @return array Grouped navigation items
+     */
+    public static function getSecondaryNavCivicOne(): array
+    {
+        return [
+            'community' => [
+                'title' => 'Community',
+                'icon' => 'fa-users',
+                'items' => self::getCommunityNav(),
+            ],
+            'explore' => [
+                'title' => 'Explore',
+                'icon' => 'fa-compass',
+                'items' => self::getExploreNavCivicOne(),
+            ],
+            'about' => [
+                'title' => 'About',
+                'icon' => 'fa-circle-info',
+                'items' => self::getAboutNav(),
+            ],
+            'help' => [
+                'title' => 'Help & Support',
+                'icon' => 'fa-life-ring',
+                'items' => self::getHelpNav(),
+            ],
+        ];
+    }
+
+    /**
+     * Get gamification navigation items only
+     * For use in dashboard/profile sections
+     *
+     * @return array Gamification nav items (Leaderboard, Achievements)
+     */
+    public static function getGamificationNav(): array
+    {
+        return array_filter(self::getExploreNav(), function ($item) {
+            return ($item['category'] ?? '') === 'gamification';
+        });
+    }
+
+    /**
      * Get custom file-based pages for a tenant
      * Wrapper around TenantContext::getCustomPages() for consistency
      *

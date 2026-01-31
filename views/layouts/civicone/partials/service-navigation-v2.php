@@ -21,8 +21,10 @@ use Nexus\Core\TenantContext;
 use Nexus\Core\Auth;
 
 // Get navigation data
+// CivicOne uses a modified secondary nav that excludes gamification from primary navigation
+// Gamification features (Leaderboard, Achievements) are accessible via user dashboard/profile
 $primaryNav = NavigationConfig::getPrimaryNav();
-$secondaryNav = NavigationConfig::getSecondaryNav();
+$secondaryNav = NavigationConfig::getSecondaryNavCivicOne();
 
 // Get base path and current URL
 $basePath = TenantContext::getBasePath();
@@ -112,12 +114,14 @@ function isNavItemActive(string $itemUrl, string $currentPath, string $basePath)
                     <?php endforeach; ?>
 
                     <!-- "More" Dropdown for Secondary Navigation -->
-                    <?php if (!empty($secondaryNav)): ?>
+                    <?php if (!empty($secondaryNav)):
+                        $moreNavPanelId = 'more-nav-panel-' . uniqid();
+                    ?>
                     <li class="govuk-service-navigation__item civicone-nav-more">
                         <button type="button"
                                 class="civicone-nav-more__btn"
                                 aria-expanded="false"
-                                aria-controls="more-nav-panel-<?= uniqid() ?>"
+                                aria-controls="<?= $moreNavPanelId ?>"
                                 aria-haspopup="menu">
                             More
                             <svg class="civicone-chevron" width="12" height="8" viewBox="0 0 12 8" aria-hidden="true" focusable="false">
@@ -125,7 +129,7 @@ function isNavItemActive(string $itemUrl, string $currentPath, string $basePath)
                             </svg>
                         </button>
 
-                        <div class="civicone-nav-dropdown" id="more-nav-panel-<?= uniqid() ?>" role="menu" hidden>
+                        <div class="civicone-nav-dropdown" id="<?= $moreNavPanelId ?>" role="menu" hidden>
                             <div class="civicone-nav-dropdown__grid">
                                 <?php foreach ($secondaryNav as $sectionKey => $section):
                                     if (empty($section['items'])) continue;
@@ -183,85 +187,4 @@ function isNavItemActive(string $itemUrl, string $currentPath, string $basePath)
     </div>
 </section>
 
-<!-- Service Navigation JavaScript for Mobile Toggle and Dropdown -->
-<script>
-(function() {
-    'use strict';
-
-    // Mobile menu toggle
-    const toggleButtons = document.querySelectorAll('.govuk-js-service-navigation-toggle');
-    toggleButtons.forEach(function(button) {
-        // Show the button (remove hidden attribute set for no-JS fallback)
-        button.hidden = false;
-        button.removeAttribute('aria-hidden');
-
-        const targetId = button.getAttribute('aria-controls');
-        const target = document.getElementById(targetId);
-
-        if (target) {
-            button.addEventListener('click', function() {
-                const isExpanded = button.getAttribute('aria-expanded') === 'true';
-                button.setAttribute('aria-expanded', !isExpanded);
-                target.classList.toggle('govuk-service-navigation__list--open');
-            });
-        }
-    });
-
-    // "More" dropdown toggle
-    const moreButtons = document.querySelectorAll('.civicone-nav-more__btn');
-    moreButtons.forEach(function(button) {
-        const targetId = button.getAttribute('aria-controls');
-        const target = document.getElementById(targetId);
-
-        if (target) {
-            button.addEventListener('click', function(e) {
-                e.stopPropagation();
-                const isExpanded = button.getAttribute('aria-expanded') === 'true';
-                button.setAttribute('aria-expanded', !isExpanded);
-                target.hidden = isExpanded;
-
-                // Focus first link when opening
-                if (!isExpanded) {
-                    const firstLink = target.querySelector('a');
-                    if (firstLink) {
-                        setTimeout(function() { firstLink.focus(); }, 100);
-                    }
-                }
-            });
-
-            // Keyboard navigation within dropdown
-            target.addEventListener('keydown', function(e) {
-                if (e.key === 'Escape') {
-                    button.setAttribute('aria-expanded', 'false');
-                    target.hidden = true;
-                    button.focus();
-                }
-
-                // Arrow key navigation
-                if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
-                    e.preventDefault();
-                    const links = Array.from(target.querySelectorAll('a'));
-                    const currentIndex = links.indexOf(document.activeElement);
-                    let nextIndex;
-
-                    if (e.key === 'ArrowDown') {
-                        nextIndex = currentIndex < links.length - 1 ? currentIndex + 1 : 0;
-                    } else {
-                        nextIndex = currentIndex > 0 ? currentIndex - 1 : links.length - 1;
-                    }
-
-                    links[nextIndex].focus();
-                }
-            });
-
-            // Close dropdown when clicking outside
-            document.addEventListener('click', function(e) {
-                if (!button.contains(e.target) && !target.contains(e.target)) {
-                    button.setAttribute('aria-expanded', 'false');
-                    target.hidden = true;
-                }
-            });
-        }
-    });
-})();
-</script>
+<!-- Service Navigation JS handled by civicone-header-v2.js (mobile toggle + More dropdown with keyboard nav) -->
