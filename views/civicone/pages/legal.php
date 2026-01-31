@@ -94,7 +94,7 @@ require_once __DIR__ . '/../components/govuk/breadcrumbs.php';
                     <div class="govuk-grid-column-one-third govuk-!-margin-bottom-6">
                         <div class="govuk-!-padding-4 civicone-card-bordered-full">
                             <h2 class="govuk-heading-m govuk-!-margin-bottom-2">
-                                <a href="<?= $basePath ?>/cookies" class="govuk-link">Cookie Policy</a>
+                                <a href="<?= $basePath ?>/privacy#cookies" class="govuk-link">Cookie Policy</a>
                             </h2>
                             <p class="govuk-body-s">
                                 How we use cookies and similar technologies.
