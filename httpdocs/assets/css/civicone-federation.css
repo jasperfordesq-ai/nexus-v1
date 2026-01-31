@@ -2488,3 +2488,93 @@
     background: var(--color-govuk-green, #00703c);
     color: var(--color-white);
 }
+
+/* ============================================
+   FEDERATION TABS (GOV.UK Tabs Override)
+   Added: 2026-01-31 - GOV.UK Tabs with icons
+   ============================================ */
+
+/* Federation-specific tabs navigation with icons */
+.civicone-federation-tabs {
+    margin-bottom: var(--space-6);
+}
+
+.civicone-federation-tabs .govuk-tabs__list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0;
+    border-bottom: 1px solid var(--color-govuk-grey);
+    margin: 0;
+    padding: 0;
+}
+
+.civicone-federation-tabs .govuk-tabs__list-item {
+    margin: 0;
+    margin-bottom: -1px;
+}
+
+.civicone-federation-tabs .govuk-tabs__tab {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    padding: var(--space-3) var(--space-4);
+    min-height: 44px;
+    color: var(--color-govuk-link, #1d70b8);
+    text-decoration: none;
+    border: 1px solid transparent;
+    border-bottom: none;
+    background: transparent;
+    font-weight: 400;
+}
+
+.civicone-federation-tabs .govuk-tabs__tab:hover {
+    color: var(--color-govuk-link-hover, #003078);
+    background: var(--color-gray-50);
+}
+
+.civicone-federation-tabs .govuk-tabs__tab:focus {
+    outline: 3px solid var(--color-govuk-focus, #ffdd00);
+    outline-offset: 0;
+    background-color: var(--color-govuk-focus, #ffdd00);
+    color: var(--color-govuk-black, #0b0c0c);
+    box-shadow: 0 -2px var(--color-govuk-focus, #ffdd00), 0 4px var(--color-govuk-black, #0b0c0c);
+}
+
+.civicone-federation-tabs .govuk-tabs__list-item--selected .govuk-tabs__tab {
+    background: var(--color-white);
+    border-color: var(--color-govuk-grey);
+    border-bottom-color: var(--color-white);
+    color: var(--color-govuk-black, #0b0c0c);
+    font-weight: 700;
+    position: relative;
+}
+
+/* Icon styling within tabs */
+.civicone-federation-tabs .govuk-tabs__tab i {
+    font-size: 1rem;
+    width: 1.25rem;
+    text-align: center;
+}
+
+/* Mobile responsive: stack tabs */
+@media (max-width: 640px) {
+    .civicone-federation-tabs .govuk-tabs__list {
+        flex-direction: column;
+        border-bottom: none;
+    }
+
+    .civicone-federation-tabs .govuk-tabs__list-item {
+        margin-bottom: 0;
+        border-bottom: 1px solid var(--color-govuk-grey);
+    }
+
+    .civicone-federation-tabs .govuk-tabs__list-item--selected .govuk-tabs__tab {
+        border-bottom-color: var(--color-govuk-grey);
+        border-left: 4px solid var(--color-govuk-blue, #1d70b8);
+    }
+
+    .civicone-federation-tabs .govuk-tabs__tab {
+        width: 100%;
+        justify-content: flex-start;
+    }
+}

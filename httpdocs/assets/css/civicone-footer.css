@@ -198,3 +198,71 @@
     color: var(--color-govuk-grey);
     margin-bottom: 0;
 }
+
+/**
+ * Service ownership disclaimer
+ * CRITICAL: Required for non-government services using GOV.UK Design System
+ * Must be prominently displayed to avoid confusion with government services
+ */
+.civicone-footer-disclaimer {
+    color: var(--color-govuk-grey);
+    margin-bottom: var(--space-4);
+    padding: var(--space-3);
+    background-color: var(--color-gray-100);
+    border-left: 4px solid var(--govuk-border-colour, #b1b4b6);
+}
+
+.civicone-footer-disclaimer strong {
+    color: var(--govuk-text-colour, #0b0c0c);
+}
+
+/* ==========================================================================
+   GOV.UK Footer Focus States
+   WCAG 2.4.7 Focus Visible
+   ========================================================================== */
+
+[data-layout="civicone"] .govuk-footer__link:focus,
+[data-layout="civicone"] .govuk-footer__link:focus-visible {
+    outline: 3px solid transparent;
+    background-color: var(--govuk-focus-colour, #ffdd00);
+    box-shadow: 0 -2px var(--govuk-focus-colour, #ffdd00), 0 4px var(--govuk-focus-text-colour, #0b0c0c);
+    text-decoration: none;
+    color: var(--govuk-focus-text-colour, #0b0c0c);
+}
+
+/* ==========================================================================
+   GOV.UK Footer Responsive Adjustments
+   ========================================================================== */
+
+@media (max-width: 48.0625em) {
+    [data-layout="civicone"] .govuk-footer__navigation {
+        display: block;
+    }
+
+    [data-layout="civicone"] .govuk-footer__section {
+        width: 100%;
+        max-width: none;
+        margin-bottom: var(--space-6);
+    }
+}
+
+/* ==========================================================================
+   Print Styles
+   ========================================================================== */
+
+@media print {
+    [data-layout="civicone"] .govuk-footer {
+        border-top: 1px solid #000;
+        padding-top: var(--space-4);
+    }
+
+    [data-layout="civicone"] .govuk-footer__link {
+        text-decoration: none;
+        color: #000;
+    }
+
+    .civicone-footer-disclaimer {
+        border-left-color: #000;
+        background-color: transparent;
+    }
+}

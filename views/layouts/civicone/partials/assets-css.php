@@ -96,6 +96,8 @@
     <link rel="stylesheet" href="/assets/css/js-utility-classes.css?v=<?= $cssVersion ?>">
     <!-- LAYOUT ISOLATION (Prevent CSS conflicts) -->
     <link rel="stylesheet" href="/assets/css/layout-isolation.css?v=<?= $cssVersion ?>">
+    <!-- THEME SCOPE GUARDRAILS (Hard isolation between themes) -->
+    <link rel="stylesheet" href="/assets/css/theme-scope-guardrails.css?v=<?= $cssVersion ?>">
     <!-- CORE FRAMEWORK (Layout & Logic) -->
     <link rel="stylesheet" href="/assets/css/nexus-phoenix.css?v=<?= $cssVersion ?>">
     <!-- BRANDING (Global Styles - Must load BEFORE Skin) -->
@@ -147,6 +149,9 @@
     <!-- Source: https://github.com/alphagov/govuk-frontend/tree/main/packages/govuk-frontend/src/govuk/components/service-navigation -->
     <link rel="stylesheet" href="/assets/css/civicone-header-v2.min.css?v=<?= $cssVersion ?>">
 
+    <!-- Service Navigation CSS (GOV.UK Compliant - 2026-01-31) -->
+    <link rel="stylesheet" href="/assets/css/civicone-service-navigation.css?v=<?= $cssVersion ?>">
+
     <!-- CivicOne Footer -->
     <link rel="stylesheet" href="/assets/css/civicone-footer.css?v=<?= $cssVersion ?>">
 
@@ -161,6 +166,9 @@
 
     <!-- Extended Utilities (Extracted inline styles per CLAUDE.md - 2026-01-22) -->
     <link rel="stylesheet" href="/assets/css/civicone-utilities-extended.css?v=<?= $cssVersion ?>">
+
+    <!-- Accessibility Enforcement (WCAG 2.1 AA Compliance - 2026-01-31) -->
+    <link rel="stylesheet" href="/assets/css/civicone-accessibility-enforcement.css?v=<?= $cssVersion ?>">
 
     <!-- Emergency Scroll Fix - MUST be last to override all other styles -->
     <link rel="stylesheet" href="/assets/css/scroll-fix-emergency.css?v=<?= $cssVersion ?>">

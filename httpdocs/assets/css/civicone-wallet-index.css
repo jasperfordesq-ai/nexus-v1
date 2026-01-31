@@ -332,6 +332,27 @@
         font-weight: 700;
     }
 
+    /* GOV.UK Table Amount Styling (2026-01-31) */
+    .civicone-amount-incoming {
+        color: var(--govuk-success-colour, #00703c);
+        font-weight: 700;
+    }
+
+    .civicone-amount-outgoing {
+        color: var(--govuk-error-colour, #d4351c);
+        font-weight: 700;
+    }
+
+    /* GOV.UK Table in Wallet Context */
+    .civicone-transactions-table {
+        font-size: 0.875rem;
+    }
+
+    .civicone-transactions-table .govuk-table__header,
+    .civicone-transactions-table .govuk-table__cell {
+        padding: var(--space-2) var(--space-3);
+    }
+
     /* ==========================================
        Mobile Card View
        ========================================== */

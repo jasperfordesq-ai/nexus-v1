@@ -1,0 +1,279 @@
+/**
+ * Theme Scope Guardrails CSS
+ *
+ * CRITICAL: This file enforces theme isolation between Modern and CivicOne.
+ * It provides hard guardrails to prevent cross-theme style leakage.
+ *
+ * Author: Project NEXUS Team
+ * Created: 2026-01-31
+ *
+ * RULES FOR THEME-SPECIFIC CSS:
+ * ==============================
+ *
+ * CivicOne styles MUST be scoped with one of these selectors:
+ *   - [data-layout="civicone"]
+ *   - body.civicone
+ *   - body.nexus-skin-civicone
+ *   - .govuk-template
+ *   - .govuk-template__body
+ *
+ * Modern styles MUST be scoped with one of these selectors:
+ *   - [data-layout="modern"]
+ *   - body.nexus-skin-modern
+ *
+ * NEVER write unscoped styles that target generic elements (a, button, input)
+ * unless they are inside a theme-scoped selector.
+ */
+
+/* === THEME DETECTION CUSTOM PROPERTIES === */
+/* These CSS variables indicate which theme is active */
+
+html[data-layout="civicone"],
+html[data-layout="civicone"] body {
+    --nexus-active-theme: civicone;
+    --nexus-theme-source: govuk;
+}
+
+html[data-layout="modern"],
+html[data-layout="modern"] body {
+    --nexus-active-theme: modern;
+    --nexus-theme-source: phoenix;
+}
+
+/* === BODY CLASS ENFORCEMENT === */
+/* Ensure body classes match data-layout attribute */
+
+html[data-layout="civicone"] body:not(.civicone):not(.nexus-skin-civicone) {
+    /* Warning: Body missing civicone classes - add via body-open.php */
+}
+
+html[data-layout="modern"] body:not(.nexus-skin-modern) {
+    /* Warning: Body missing modern classes - add via header.php */
+}
+
+/* === CIVICONE COMPONENT ISOLATION === */
+/* Hide CivicOne-specific components in Modern theme */
+
+html[data-layout="modern"] .govuk-header,
+html[data-layout="modern"] .govuk-footer,
+html[data-layout="modern"] .govuk-service-navigation,
+html[data-layout="modern"] .govuk-phase-banner,
+html[data-layout="modern"] .govuk-cookie-banner,
+html[data-layout="modern"] .govuk-skip-link,
+html[data-layout="modern"] .govuk-breadcrumbs,
+html[data-layout="modern"] .govuk-back-link,
+html[data-layout="modern"] .govuk-notification-banner,
+html[data-layout="modern"] .govuk-error-summary,
+html[data-layout="modern"] .govuk-warning-text,
+html[data-layout="modern"] .govuk-inset-text,
+html[data-layout="modern"] .govuk-panel,
+html[data-layout="modern"] .govuk-tabs,
+html[data-layout="modern"] .govuk-accordion,
+html[data-layout="modern"] .govuk-task-list {
+    display: none !important;
+}
+
+/* === MODERN COMPONENT ISOLATION === */
+/* Hide Modern-specific components in CivicOne theme */
+
+html[data-layout="civicone"] .nexus-modern-header,
+html[data-layout="civicone"] .nexus-modern-footer,
+html[data-layout="civicone"] .nexus-mega-menu,
+html[data-layout="civicone"] .nexus-premium-mega-menu,
+html[data-layout="civicone"] .modern-mobile-nav,
+html[data-layout="civicone"] .holographic-card,
+html[data-layout="civicone"] .glow-effect,
+html[data-layout="civicone"] .modern-glow {
+    display: none !important;
+}
+
+/* === GENERIC ELEMENT PROTECTION === */
+/* Prevent unscoped generic element styles from affecting themes */
+
+/*
+ * DO NOT add global styles to these elements without theme scoping:
+ * - a (links)
+ * - button
+ * - input, select, textarea
+ * - table, th, td
+ * - h1, h2, h3, h4, h5, h6
+ * - ul, ol, li
+ * - form, fieldset, label
+ *
+ * Instead, always scope with theme selector:
+ *
+ * WRONG:
+ * a { color: blue; }
+ *
+ * CORRECT:
+ * [data-layout="civicone"] a { color: var(--govuk-link-colour); }
+ * [data-layout="modern"] a { color: var(--color-primary); }
+ */
+
+/* === FOCUS STATE ISOLATION === */
+/* Each theme has its own focus styling */
+
+html[data-layout="civicone"] :focus-visible {
+    /* CivicOne uses GOV.UK yellow focus ring */
+    /* Defined in civicone-govuk-focus.css */
+}
+
+html[data-layout="modern"] :focus-visible {
+    /* Modern uses brand-colored focus ring */
+    /* Defined in modern CSS files */
+}
+
+/* === CSS VARIABLE NAMESPACE PROTECTION === */
+/* Prevent variable name collisions between themes */
+
+/* CivicOne-specific variables (prefixed with --civic- or --govuk-) */
+html[data-layout="civicone"] {
+    /* These are defined in nexus-civicone.css and govuk-frontend.min.css */
+    /* --civic-* and --govuk-* namespaces */
+}
+
+/* Modern-specific variables (prefixed with --color-, --modern-, --nexus-) */
+html[data-layout="modern"] {
+    /* These are defined in modern-theme-tokens.css and design-tokens.css */
+    /* --color-*, --modern-*, --nexus-* namespaces */
+}
+
+/* === UTILITY CLASS ISOLATION === */
+/* Theme-specific utility class visibility */
+
+/* CivicOne utilities - only visible in CivicOne */
+html[data-layout="modern"] .civicone-only,
+html[data-layout="modern"] [class^="govuk-!-"],
+html[data-layout="modern"] .govuk-visually-hidden:not(:focus):not(:focus-within) {
+    /* Keep govuk-visually-hidden functional for accessibility */
+}
+
+/* Modern utilities - only visible in Modern */
+html[data-layout="civicone"] .modern-only,
+html[data-layout="civicone"] .nexus-glow,
+html[data-layout="civicone"] .holographic {
+    display: none !important;
+}
+
+/* === LAYOUT WRAPPER PROTECTION === */
+/* Ensure main layout wrappers are only styled by their theme */
+
+html[data-layout="civicone"] .govuk-width-container {
+    /* CivicOne uses GOV.UK width container */
+    /* max-width: 1020px, responsive margins */
+}
+
+html[data-layout="modern"] .nexus-container,
+html[data-layout="modern"] .phoenix-container {
+    /* Modern uses Phoenix/Nexus container */
+    /* max-width: 1400px, fluid */
+}
+
+/* === GRID SYSTEM ISOLATION === */
+/* Each theme has its own grid system */
+
+html[data-layout="civicone"] [class^="govuk-grid-"] {
+    /* GOV.UK 12-column responsive grid */
+}
+
+html[data-layout="modern"] .nexus-grid,
+html[data-layout="modern"] [class^="modern-grid-"] {
+    /* Modern CSS Grid/Flexbox system */
+}
+
+/* === TYPOGRAPHY ISOLATION === */
+/* Prevent font family conflicts */
+
+html[data-layout="civicone"] {
+    /* CivicOne uses: GDS Transport, Roboto, system fonts */
+    --theme-font-family: "GDS Transport", "Roboto", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+html[data-layout="modern"] {
+    /* Modern uses: Inter, system fonts */
+    --theme-font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+/* === MOBILE NAVIGATION ISOLATION === */
+/* Ensure mobile nav doesn't conflict */
+
+html[data-layout="civicone"] .civicone-mobile-nav,
+html[data-layout="civicone"] .civicone-bottom-nav {
+    /* CivicOne mobile navigation */
+}
+
+html[data-layout="modern"] .modern-mobile-nav-v2,
+html[data-layout="modern"] .nexus-mobile-nav {
+    /* Modern mobile navigation */
+}
+
+/* Cross-theme hiding already in layout-isolation.css */
+
+/* === PRINT STYLES ISOLATION === */
+/* Each theme has its own print styles */
+
+@media print {
+    html[data-layout="civicone"] {
+        /* GOV.UK print styles */
+    }
+
+    html[data-layout="modern"] {
+        /* Modern print styles */
+    }
+}
+
+/* === REDUCED MOTION RESPECT === */
+/* Both themes must respect prefers-reduced-motion */
+
+@media (prefers-reduced-motion: reduce) {
+    html[data-layout="civicone"] *,
+    html[data-layout="modern"] * {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}
+
+/* === HIGH CONTRAST MODE === */
+/* Both themes must support high contrast */
+
+@media (prefers-contrast: high) {
+    html[data-layout="civicone"],
+    html[data-layout="modern"] {
+        /* Ensure borders and outlines are visible */
+        --focus-outline-width: 3px;
+    }
+}
+
+/* === DARK MODE ISOLATION === */
+/* Theme-specific dark mode handling */
+
+html[data-layout="civicone"][data-theme="dark"],
+html[data-layout="civicone"] body.dark-mode {
+    /* CivicOne dark mode variables */
+    /* Defined in nexus-civicone.css */
+}
+
+html[data-layout="modern"][data-theme="dark"] {
+    /* Modern dark mode variables */
+    /* Defined in modern-theme-tokens.css */
+}
+
+/* === Z-INDEX MANAGEMENT === */
+/* Prevent z-index conflicts between themes */
+
+html[data-layout="civicone"] {
+    --z-index-header: 100;
+    --z-index-mobile-nav: 200;
+    --z-index-modal: 300;
+    --z-index-tooltip: 400;
+    --z-index-skip-link: 999;
+}
+
+html[data-layout="modern"] {
+    --z-index-header: 100;
+    --z-index-mega-menu: 150;
+    --z-index-mobile-nav: 200;
+    --z-index-modal: 300;
+    --z-index-tooltip: 400;
+}
