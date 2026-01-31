@@ -2,6 +2,7 @@
 /**
  * Federation Navigation Tab Bar - CivicOne Version
  * WCAG 2.1 AA Compliant - GOV.UK Design Patterns
+ * Updated: 2026-01-31 - Migrated to GOV.UK Tabs pattern
  *
  * Required variables:
  * - $basePath: The tenant base path
@@ -9,46 +10,46 @@
  *
  * Optional:
  * - $userOptedIn: Whether user has opted into federation (default: false)
+ *
+ * GOV.UK Design System Reference:
+ * https://design-system.service.gov.uk/components/tabs/
  */
 
 $currentPage = $currentPage ?? '';
 $userOptedIn = $userOptedIn ?? false;
 $basePath = $basePath ?? '';
+
+// Build navigation items dynamically based on user state
+$navItems = [
+    ['id' => 'hub', 'label' => 'Hub', 'icon' => 'fa-globe', 'url' => '/federation', 'always' => true],
+    ['id' => 'dashboard', 'label' => 'Dashboard', 'icon' => 'fa-gauge-high', 'url' => '/federation/dashboard', 'always' => false],
+    ['id' => 'settings', 'label' => 'Settings', 'icon' => 'fa-sliders', 'url' => '/federation/settings', 'always' => true],
+    ['id' => 'activity', 'label' => 'Activity', 'icon' => 'fa-bell', 'url' => '/federation/activity', 'always' => false],
+    ['id' => 'help', 'label' => 'Help', 'icon' => 'fa-circle-question', 'url' => '/federation/help', 'always' => true],
+];
 ?>
 
-<nav class="civic-fed-tabs" role="navigation" aria-label="Federation navigation">
-    <a href="<?= htmlspecialchars($basePath) ?>/federation"
-       class="civic-fed-tab <?= $currentPage === 'hub' ? 'civic-fed-tab--active' : '' ?>"
-       <?= $currentPage === 'hub' ? 'aria-current="page"' : '' ?>>
-        <i class="fa-solid fa-globe" aria-hidden="true"></i>
-        <span>Hub</span>
-    </a>
-    <?php if ($userOptedIn): ?>
-    <a href="<?= htmlspecialchars($basePath) ?>/federation/dashboard"
-       class="civic-fed-tab <?= $currentPage === 'dashboard' ? 'civic-fed-tab--active' : '' ?>"
-       <?= $currentPage === 'dashboard' ? 'aria-current="page"' : '' ?>>
-        <i class="fa-solid fa-gauge-high" aria-hidden="true"></i>
-        <span>Dashboard</span>
-    </a>
-    <?php endif; ?>
-    <a href="<?= htmlspecialchars($basePath) ?>/federation/settings"
-       class="civic-fed-tab <?= $currentPage === 'settings' ? 'civic-fed-tab--active' : '' ?>"
-       <?= $currentPage === 'settings' ? 'aria-current="page"' : '' ?>>
-        <i class="fa-solid fa-sliders" aria-hidden="true"></i>
-        <span>Settings</span>
-    </a>
-    <?php if ($userOptedIn): ?>
-    <a href="<?= htmlspecialchars($basePath) ?>/federation/activity"
-       class="civic-fed-tab <?= $currentPage === 'activity' ? 'civic-fed-tab--active' : '' ?>"
-       <?= $currentPage === 'activity' ? 'aria-current="page"' : '' ?>>
-        <i class="fa-solid fa-bell" aria-hidden="true"></i>
-        <span>Activity</span>
-    </a>
-    <?php endif; ?>
-    <a href="<?= htmlspecialchars($basePath) ?>/federation/help"
-       class="civic-fed-tab <?= $currentPage === 'help' ? 'civic-fed-tab--active' : '' ?>"
-       <?= $currentPage === 'help' ? 'aria-current="page"' : '' ?>>
-        <i class="fa-solid fa-circle-question" aria-hidden="true"></i>
-        <span>Help</span>
-    </a>
+<nav class="govuk-tabs civicone-federation-tabs" data-module="govuk-tabs" aria-label="Federation navigation">
+    <h2 class="govuk-tabs__title govuk-visually-hidden">Federation sections</h2>
+    <ul class="govuk-tabs__list" role="tablist">
+        <?php foreach ($navItems as $item):
+            // Skip items that require opt-in if user hasn't opted in
+            if (!$item['always'] && !$userOptedIn) continue;
+
+            $isActive = $currentPage === $item['id'];
+            $itemUrl = htmlspecialchars($basePath . $item['url']);
+        ?>
+        <li class="govuk-tabs__list-item<?= $isActive ? ' govuk-tabs__list-item--selected' : '' ?>" role="presentation">
+            <a class="govuk-tabs__tab"
+               href="<?= $itemUrl ?>"
+               role="tab"
+               aria-selected="<?= $isActive ? 'true' : 'false' ?>"
+               <?= $isActive ? 'aria-current="page"' : '' ?>
+               tabindex="<?= $isActive ? '0' : '-1' ?>">
+                <i class="fa-solid <?= htmlspecialchars($item['icon']) ?>" aria-hidden="true"></i>
+                <span><?= htmlspecialchars($item['label']) ?></span>
+            </a>
+        </li>
+        <?php endforeach; ?>
+    </ul>
 </nav>

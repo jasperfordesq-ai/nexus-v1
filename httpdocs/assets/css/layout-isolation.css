@@ -2,6 +2,11 @@
  * Layout Isolation CSS
  * Prevents visual glitches during layout switching by scoping layout-specific styles
  * and ensuring clean transitions between Modern and CivicOne layouts
+ *
+ * Author: Project NEXUS Team
+ * Updated: 2026-01-31
+ *
+ * This file works in conjunction with theme-scope-guardrails.css
  */
 
 /* === LAYOUT SCOPING === */
@@ -11,12 +16,14 @@
 html[data-layout="modern"] {
     /* Modern layout uses these CSS files exclusively */
     /* Prevent CivicOne styles from bleeding in */
+    --layout-name: "modern";
 }
 
 /* CivicOne Layout Isolation */
 html[data-layout="civicone"] {
     /* CivicOne layout uses these CSS files exclusively */
     /* Prevent Modern styles from bleeding in */
+    --layout-name: "civicone";
 }
 
 /* === LAYOUT SWITCHING TRANSITIONS === */
@@ -38,6 +45,12 @@ body {
 
 /* Reset conflicting styles between layouts */
 html[data-layout="modern"] .civic-only,
+html[data-layout="civicone"] .modern-only {
+    display: none !important;
+}
+
+/* Theme-specific visibility classes */
+html[data-layout="modern"] .civicone-only,
 html[data-layout="civicone"] .modern-only {
     display: none !important;
 }
@@ -86,13 +99,13 @@ html[data-layout="civicone"] {
 .layout-transition-guard {
     visibility: hidden;
     opacity: 0;
-    transition: opacity var(--transition-fast) var(--ease-in-out), visibility 0s var(--transition-fast);
+    transition: opacity var(--transition-fast, 150ms) var(--ease-in-out, ease-in-out), visibility 0s var(--transition-fast, 150ms);
 }
 
 .layout-transition-guard.loaded {
     visibility: visible;
     opacity: 1;
-    transition: opacity var(--transition-fast) var(--ease-in-out);
+    transition: opacity var(--transition-fast, 150ms) var(--ease-in-out, ease-in-out);
 }
 
 /* === HEADER ISOLATION === */
@@ -112,11 +125,121 @@ html[data-layout="civicone"] .modern-nav {
 }
 
 /* === MOBILE BOTTOM NAV ISOLATION === */
-html[data-layout="modern"] .civicone-bottom-nav {
+html[data-layout="modern"] .civicone-bottom-nav,
+html[data-layout="modern"] .civicone-mobile-nav {
+    display: none !important;
+}
+
+html[data-layout="civicone"] .modern-bottom-nav,
+html[data-layout="civicone"] .nexus-mobile-nav-v2 {
     display: none !important;
 }
 
 /* === UTILITY BAR ISOLATION === */
 html[data-layout="civicone"] .modern-utility-bar {
     display: none !important;
+}
+
+/* === FOOTER ISOLATION === */
+html[data-layout="modern"] .govuk-footer,
+html[data-layout="civicone"] .nexus-modern-footer {
+    display: none !important;
+}
+
+/* === MEGA MENU ISOLATION === */
+html[data-layout="civicone"] .nexus-premium-mega-menu,
+html[data-layout="civicone"] .nexus-mega-menu {
+    display: none !important;
+}
+
+/* === SERVICE NAVIGATION ISOLATION === */
+html[data-layout="modern"] .govuk-service-navigation {
+    display: none !important;
+}
+
+/* === COOKIE BANNER ISOLATION === */
+html[data-layout="modern"] .govuk-cookie-banner {
+    display: none !important;
+}
+
+/* === PHASE BANNER ISOLATION === */
+html[data-layout="modern"] .govuk-phase-banner {
+    display: none !important;
+}
+
+/* === SKIP LINK ISOLATION === */
+/* Each theme has its own skip link implementation */
+html[data-layout="modern"] .govuk-skip-link {
+    display: none !important;
+}
+
+/* === BREADCRUMB ISOLATION === */
+html[data-layout="modern"] .govuk-breadcrumbs {
+    display: none !important;
+}
+
+/* === FORM COMPONENT ISOLATION === */
+/* Prevent GOV.UK form components from appearing in Modern */
+html[data-layout="modern"] .govuk-form-group,
+html[data-layout="modern"] .govuk-label,
+html[data-layout="modern"] .govuk-hint,
+html[data-layout="modern"] .govuk-error-message {
+    /* Don't hide - these may be used in shared components */
+    /* Instead, ensure Modern styles override them */
+}
+
+/* === NOTIFICATION ISOLATION === */
+html[data-layout="modern"] .govuk-notification-banner,
+html[data-layout="modern"] .govuk-error-summary {
+    display: none !important;
+}
+
+/* === CARD/PANEL ISOLATION === */
+html[data-layout="modern"] .govuk-panel,
+html[data-layout="modern"] .govuk-inset-text {
+    display: none !important;
+}
+
+/* === WARNING TEXT ISOLATION === */
+html[data-layout="modern"] .govuk-warning-text {
+    display: none !important;
+}
+
+/* === BUTTON CLASS CONFLICT PREVENTION === */
+/* Both themes may have .btn class - ensure proper styling */
+html[data-layout="civicone"] .btn:not(.govuk-button) {
+    /* CivicOne may use .btn - but prefer .govuk-button */
+}
+
+html[data-layout="modern"] .govuk-button {
+    /* If GOV.UK button accidentally appears in Modern, hide it */
+    display: none !important;
+}
+
+/* === AI CHAT WIDGET ISOLATION === */
+/* Each theme has its own AI chat widget styling */
+html[data-layout="civicone"] .ai-chat-widget {
+    /* CivicOne AI chat styling */
+}
+
+html[data-layout="modern"] .ai-chat-widget {
+    /* Modern AI chat styling */
+}
+
+/* === PRINT ISOLATION === */
+@media print {
+    html[data-layout="modern"] .civicone-only,
+    html[data-layout="civicone"] .modern-only {
+        display: none !important;
+    }
+}
+
+/* === ACCESSIBILITY: SKIP LINK POSITIONING === */
+/* Ensure skip links don't overlap between themes */
+html[data-layout="civicone"] .govuk-skip-link {
+    z-index: 9999;
+}
+
+html[data-layout="modern"] .modern-skip-link {
+    z-index: 9999;
 }

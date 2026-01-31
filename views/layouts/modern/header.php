@@ -64,6 +64,10 @@ try {
     <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/design-tokens.css?v=<?= $cssVersionTimestamp ?>">
     <!-- JS utility classes - loaded early for JavaScript state management -->
     <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/js-utility-classes.css?v=<?= $cssVersionTimestamp ?>">
+    <!-- Layout Isolation - Prevents cross-theme CSS conflicts -->
+    <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/layout-isolation.css?v=<?= $cssVersionTimestamp ?>">
+    <!-- Theme Scope Guardrails - Hard isolation between themes -->
+    <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/theme-scope-guardrails.css?v=<?= $cssVersionTimestamp ?>">
     <!-- Critical scroll/layout styles - loaded second to prevent FOUC -->
     <link rel="stylesheet" href="<?= $assetBase ?>/assets/css/nexus-header-extracted.css?v=<?= $cssVersionTimestamp ?>">
     <meta name="csrf-token" content="<?= \Nexus\Core\Csrf::generate() ?>">

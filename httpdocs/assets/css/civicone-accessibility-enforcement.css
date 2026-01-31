@@ -1,0 +1,372 @@
+/**
+ * CivicOne Accessibility Enforcement CSS
+ * WCAG 2.1 AA Compliance Enforcement Layer
+ *
+ * This file enforces accessibility patterns across all CivicOne pages.
+ * It provides fallback styles and ensures consistent focus states,
+ * color contrast, and interactive element visibility.
+ *
+ * Author: Project NEXUS Team
+ * Created: 2026-01-31
+ *
+ * WCAG 2.1 AA Requirements Addressed:
+ * - 1.4.3 Contrast (Minimum) - 4.5:1 for text, 3:1 for large text
+ * - 1.4.11 Non-text Contrast - 3:1 for UI components
+ * - 2.1.1 Keyboard - All functionality keyboard accessible
+ * - 2.4.7 Focus Visible - Visible focus indicator
+ * - 2.5.5 Target Size - Minimum 44x44 CSS pixels
+ *
+ * This file is ONLY loaded for CivicOne theme.
+ * All selectors are scoped to [data-layout="civicone"] for safety.
+ */
+
+/* ===========================================
+   GOV.UK Focus Color Variables
+   Source: https://design-system.service.gov.uk/styles/focus-state/
+   =========================================== */
+
+[data-layout="civicone"] {
+    --govuk-focus-colour: #ffdd00;
+    --govuk-focus-text-colour: #0b0c0c;
+    --govuk-error-colour: #d4351c;
+    --govuk-link-colour: #1d70b8;
+    --govuk-link-hover-colour: #003078;
+    --govuk-link-visited-colour: #4c2c92;
+    --govuk-text-colour: #0b0c0c;
+    --govuk-secondary-text-colour: #505a5f;
+    --govuk-border-colour: #b1b4b6;
+}
+
+/* ===========================================
+   Universal Focus Visible States
+   WCAG 2.4.7 Focus Visible (Level AA)
+   =========================================== */
+
+/* All focusable elements get GOV.UK focus styling */
+[data-layout="civicone"] a:focus-visible,
+[data-layout="civicone"] button:focus-visible,
+[data-layout="civicone"] [role="button"]:focus-visible,
+[data-layout="civicone"] input:focus-visible,
+[data-layout="civicone"] select:focus-visible,
+[data-layout="civicone"] textarea:focus-visible,
+[data-layout="civicone"] [tabindex]:not([tabindex="-1"]):focus-visible,
+[data-layout="civicone"] summary:focus-visible,
+[data-layout="civicone"] details:focus-visible {
+    outline: 3px solid var(--govuk-focus-colour);
+    outline-offset: 0;
+}
+
+/* Link-specific focus: yellow background + black underline */
+[data-layout="civicone"] a:focus-visible {
+    background-color: var(--govuk-focus-colour);
+    color: var(--govuk-focus-text-colour);
+    text-decoration: none;
+    box-shadow: 0 -2px var(--govuk-focus-colour), 0 4px var(--govuk-focus-text-colour);
+}
+
+/* Button-specific focus: yellow outline + inset shadow */
+[data-layout="civicone"] button:focus-visible,
+[data-layout="civicone"] [role="button"]:focus-visible,
+[data-layout="civicone"] .govuk-button:focus-visible {
+    outline: 3px solid var(--govuk-focus-colour);
+    outline-offset: 0;
+    box-shadow: inset 0 0 0 2px var(--govuk-focus-text-colour);
+}
+
+/* Form input focus: thicker border + yellow outline */
+[data-layout="civicone"] input:focus-visible,
+[data-layout="civicone"] select:focus-visible,
+[data-layout="civicone"] textarea:focus-visible {
+    outline: 3px solid var(--govuk-focus-colour);
+    outline-offset: 0;
+    border-color: var(--govuk-focus-text-colour);
+}
+
+/* ===========================================
+   Error State Styling
+   WCAG 3.3.1 Error Identification (Level A)
+   =========================================== */
+
+/* Error field highlighting */
+[data-layout="civicone"] .govuk-input--error,
+[data-layout="civicone"] .govuk-select--error,
+[data-layout="civicone"] .govuk-textarea--error,
+[data-layout="civicone"] input[aria-invalid="true"],
+[data-layout="civicone"] select[aria-invalid="true"],
+[data-layout="civicone"] textarea[aria-invalid="true"] {
+    border: 4px solid var(--govuk-error-colour);
+}
+
+/* Error message styling */
+[data-layout="civicone"] .govuk-error-message,
+[data-layout="civicone"] [role="alert"] {
+    color: var(--govuk-error-colour);
+    font-weight: 700;
+}
+
+/* Error summary focus trap */
+[data-layout="civicone"] .govuk-error-summary:focus {
+    outline: 3px solid var(--govuk-focus-colour);
+}
+
+/* ===========================================
+   Target Size Enforcement
+   WCAG 2.5.5 Target Size (Level AAA) / 2.5.8 (Level AA)
+   Minimum 44x44 CSS pixels for touch targets
+   =========================================== */
+
+/* Enforce minimum touch target size */
+[data-layout="civicone"] button,
+[data-layout="civicone"] [role="button"],
+[data-layout="civicone"] a.govuk-button,
+[data-layout="civicone"] input[type="submit"],
+[data-layout="civicone"] input[type="button"],
+[data-layout="civicone"] input[type="reset"] {
+    min-height: 44px;
+    min-width: 44px;
+}
+
+/* Navigation links need adequate spacing */
+[data-layout="civicone"] nav a,
+[data-layout="civicone"] .govuk-service-navigation__link,
+[data-layout="civicone"] .govuk-footer__link {
+    padding: 10px;
+    display: inline-block;
+}
+
+/* ===========================================
+   Color Contrast Enforcement
+   WCAG 1.4.3 Contrast (Minimum) (Level AA)
+   =========================================== */
+
+/* Ensure body text has sufficient contrast */
+[data-layout="civicone"] body {
+    color: var(--govuk-text-colour);
+}
+
+/* Secondary text minimum contrast */
+[data-layout="civicone"] .govuk-body-s,
+[data-layout="civicone"] .govuk-hint,
+[data-layout="civicone"] .govuk-caption-m,
+[data-layout="civicone"] .govuk-caption-l {
+    color: var(--govuk-secondary-text-colour);
+}
+
+/* Link colors with sufficient contrast */
+[data-layout="civicone"] a:not([class*="govuk-button"]) {
+    color: var(--govuk-link-colour);
+}
+
+[data-layout="civicone"] a:visited:not([class*="govuk-button"]) {
+    color: var(--govuk-link-visited-colour);
+}
+
+[data-layout="civicone"] a:hover:not([class*="govuk-button"]) {
+    color: var(--govuk-link-hover-colour);
+}
+
+/* ===========================================
+   Skip Link Enforcement
+   WCAG 2.4.1 Bypass Blocks (Level A)
+   =========================================== */
+
+/* Ensure skip link is visible on focus */
+[data-layout="civicone"] .govuk-skip-link:focus,
+[data-layout="civicone"] .skip-link:focus {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    z-index: 999999 !important;
+    padding: 15px !important;
+    background-color: var(--govuk-focus-colour) !important;
+    color: var(--govuk-focus-text-colour) !important;
+    font-weight: 700 !important;
+    text-decoration: none !important;
+    outline: 3px solid var(--govuk-focus-text-colour) !important;
+    outline-offset: 0 !important;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.25) !important;
+    clip: auto !important;
+    width: auto !important;
+    height: auto !important;
+    overflow: visible !important;
+}
+
+/* ===========================================
+   Heading Hierarchy Helpers
+   WCAG 1.3.1 Info and Relationships (Level A)
+   =========================================== */
+
+/* Visual consistency for heading levels */
+[data-layout="civicone"] h1,
+[data-layout="civicone"] .govuk-heading-xl {
+    font-size: 3rem;
+    line-height: 1.04;
+    font-weight: 700;
+}
+
+[data-layout="civicone"] h2,
+[data-layout="civicone"] .govuk-heading-l {
+    font-size: 2.25rem;
+    line-height: 1.11;
+    font-weight: 700;
+}
+
+[data-layout="civicone"] h3,
+[data-layout="civicone"] .govuk-heading-m {
+    font-size: 1.5rem;
+    line-height: 1.25;
+    font-weight: 700;
+}
+
+[data-layout="civicone"] h4,
+[data-layout="civicone"] .govuk-heading-s {
+    font-size: 1.1875rem;
+    line-height: 1.32;
+    font-weight: 700;
+}
+
+/* ===========================================
+   Screen Reader Only Content
+   For content that should be accessible but not visible
+   =========================================== */
+
+[data-layout="civicone"] .govuk-visually-hidden:not(:focus):not(:focus-within),
+[data-layout="civicone"] .sr-only:not(:focus):not(:focus-within) {
+    position: absolute !important;
+    width: 1px !important;
+    height: 1px !important;
+    padding: 0 !important;
+    margin: -1px !important;
+    overflow: hidden !important;
+    clip: rect(0, 0, 0, 0) !important;
+    white-space: nowrap !important;
+    border: 0 !important;
+}
+
+/* ===========================================
+   Interactive State Indicators
+   Ensure state changes are perceivable
+   =========================================== */
+
+/* Disabled state */
+[data-layout="civicone"] [disabled],
+[data-layout="civicone"] [aria-disabled="true"] {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* Loading state */
+[data-layout="civicone"] [aria-busy="true"] {
+    cursor: wait;
+}
+
+/* Expanded/collapsed state */
+[data-layout="civicone"] [aria-expanded="true"] {
+    /* Visual indicator handled by component */
+}
+
+[data-layout="civicone"] [aria-expanded="false"] {
+    /* Visual indicator handled by component */
+}
+
+/* ===========================================
+   High Contrast Mode Support
+   WCAG 1.4.11 Non-text Contrast (Level AA)
+   =========================================== */
+
+@media (prefers-contrast: high) {
+    [data-layout="civicone"] {
+        --govuk-focus-colour: #ff0;
+        --govuk-error-colour: #f00;
+        --govuk-link-colour: #00f;
+    }
+
+    [data-layout="civicone"] a:focus-visible,
+    [data-layout="civicone"] button:focus-visible {
+        outline: 3px solid currentColor !important;
+        outline-offset: 2px !important;
+    }
+
+    [data-layout="civicone"] .govuk-button {
+        border: 2px solid currentColor;
+    }
+}
+
+/* Windows High Contrast Mode */
+@media (forced-colors: active) {
+    [data-layout="civicone"] a:focus-visible,
+    [data-layout="civicone"] button:focus-visible {
+        outline: 3px solid CanvasText !important;
+    }
+
+    [data-layout="civicone"] .govuk-button {
+        border: 2px solid ButtonText;
+    }
+}
+
+/* ===========================================
+   Reduced Motion Support
+   WCAG 2.3.3 Animation from Interactions (Level AAA)
+   =========================================== */
+
+@media (prefers-reduced-motion: reduce) {
+    [data-layout="civicone"] *,
+    [data-layout="civicone"] *::before,
+    [data-layout="civicone"] *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+    }
+}
+
+/* ===========================================
+   Table Accessibility
+   WCAG 1.3.1 Info and Relationships (Level A)
+   =========================================== */
+
+/* Ensure table headers are distinguishable */
+[data-layout="civicone"] table th {
+    font-weight: 700;
+    text-align: left;
+}
+
+/* Row hover for better tracking */
+[data-layout="civicone"] table tbody tr:hover {
+    background-color: var(--color-gray-50, #f8f8f8);
+}
+
+/* ===========================================
+   Form Label Association
+   WCAG 1.3.1 Info and Relationships (Level A)
+   =========================================== */
+
+/* Required field indicator */
+[data-layout="civicone"] label[required]::after,
+[data-layout="civicone"] .govuk-label--required::after {
+    content: " *";
+    color: var(--govuk-error-colour);
+}
+
+/* ===========================================
+   Print Accessibility
+   Ensure printed content is accessible
+   =========================================== */
+
+@media print {
+    [data-layout="civicone"] a[href]::after {
+        content: " (" attr(href) ")";
+        font-size: 0.875rem;
+        color: #505a5f;
+    }
+
+    [data-layout="civicone"] a[href^="#"]::after,
+    [data-layout="civicone"] a[href^="javascript"]::after {
+        content: "";
+    }
+
+    [data-layout="civicone"] .govuk-button,
+    [data-layout="civicone"] button {
+        border: 1px solid #000;
+    }
+}
