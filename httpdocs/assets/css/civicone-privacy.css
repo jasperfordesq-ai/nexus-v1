@@ -64,7 +64,7 @@
         justify-content: center;
         font-size: var(--font-size-2xl);
         color: white;
-        box-shadow: 0 8px 24px rgba(var(--privacy-theme-rgb), 0.4);
+        box-shadow: 0 8px 24px var(--color-indigo-alpha-40);
     }
 
     #privacy-wrapper .privacy-page-header p {
@@ -88,7 +88,7 @@
     }
 
     [data-theme="dark"] #privacy-wrapper .privacy-page-header .last-updated {
-        background: rgba(var(--privacy-theme-rgb), 0.2);
+        background: var(--color-indigo-alpha-20);
         color: var(--privacy-theme-light);
     }
 
@@ -128,7 +128,7 @@
     #privacy-wrapper .privacy-nav-btn:hover {
         transform: translateY(-2px);
         border-color: var(--privacy-theme);
-        box-shadow: 0 4px 16px rgba(var(--privacy-theme-rgb), 0.2);
+        box-shadow: 0 4px 16px var(--color-indigo-alpha-20);
     }
 
     /* Privacy Section Card */
@@ -172,7 +172,7 @@
     }
 
     [data-theme="dark"] #privacy-wrapper .privacy-section .section-icon {
-        background: rgba(var(--privacy-theme-rgb), 0.25);
+        background: var(--color-indigo-alpha-25);
         color: var(--privacy-theme-light);
     }
 
@@ -226,7 +226,7 @@
     /* Highlight Section */
     #privacy-wrapper .privacy-section.highlight {
         border-left: 4px solid var(--privacy-theme);
-        background: linear-gradient(135deg, rgba(var(--privacy-theme-rgb), 0.05) 0%, var(--civicone-bg-card) 100%);
+        background: linear-gradient(135deg, var(--color-indigo-alpha-5) 0%, var(--civicone-bg-card) 100%);
     }
 
     /* Data Table */
@@ -260,7 +260,7 @@
     }
 
     [data-theme="dark"] #privacy-wrapper .data-table th {
-        background: rgba(var(--privacy-theme-rgb), 0.2);
+        background: var(--color-indigo-alpha-20);
         color: var(--privacy-theme-light);
     }
 
@@ -274,7 +274,7 @@
     }
 
     [data-theme="dark"] #privacy-wrapper .data-table tr:nth-child(even) td {
-        background: rgba(var(--privacy-theme-rgb), 0.05);
+        background: var(--color-indigo-alpha-5);
     }
 
     /* Rights Grid */
@@ -294,13 +294,13 @@
     }
 
     [data-theme="dark"] #privacy-wrapper .right-card {
-        background: rgba(var(--privacy-theme-rgb), 0.1);
-        border-color: rgba(var(--privacy-theme-rgb), 0.3);
+        background: var(--color-indigo-alpha-10);
+        border-color: var(--color-indigo-alpha-30);
     }
 
     #privacy-wrapper .right-card:hover {
         transform: translateY(-2px);
-        box-shadow: 0 4px 16px rgba(var(--privacy-theme-rgb), 0.1);
+        box-shadow: 0 4px 16px var(--color-indigo-alpha-10);
     }
 
     #privacy-wrapper .right-card .right-icon {
@@ -330,12 +330,12 @@
         padding: var(--space-8) var(--space-6);
         border-radius: var(--radius-3);
         margin-top: var(--space-8);
-        background: linear-gradient(135deg, rgba(var(--privacy-theme-rgb), 0.1) 0%, rgba(var(--privacy-theme-rgb), 0.05) 100%);
+        background: linear-gradient(135deg, var(--color-indigo-alpha-10) 0%, var(--color-indigo-alpha-5) 100%);
         border: 1px solid var(--color-primary-200);
     }
 
     [data-theme="dark"] #privacy-wrapper .privacy-cta {
-        border-color: rgba(var(--privacy-theme-rgb), 0.3);
+        border-color: var(--color-indigo-alpha-30);
     }
 
     #privacy-wrapper .privacy-cta h2 {
@@ -369,7 +369,7 @@
         transition: all 0.3s ease;
         background: linear-gradient(135deg, var(--privacy-theme) 0%, var(--privacy-theme-dark) 100%);
         color: white;
-        box-shadow: 0 4px 16px rgba(var(--privacy-theme-rgb), 0.4);
+        box-shadow: 0 4px 16px var(--color-indigo-alpha-40);
         min-height: var(--space-11);
     }
 
@@ -381,7 +381,7 @@
 
     #privacy-wrapper .privacy-cta-btn:hover {
         transform: translateY(-2px);
-        box-shadow: 0 8px 24px rgba(var(--privacy-theme-rgb), 0.5);
+        box-shadow: 0 8px 24px var(--color-indigo-alpha-50);
     }
 
     /* Back to Legal Link */
@@ -490,6 +490,6 @@
     #privacy-wrapper .privacy-nav-btn:focus-visible,
     #privacy-wrapper .privacy-cta-btn:focus-visible,
     #privacy-wrapper .back-link:focus-visible {
-        outline: 3px solid rgba(var(--privacy-theme-rgb), 0.5);
+        outline: 3px solid var(--color-indigo-alpha-50);
         outline-offset: 2px;
     }

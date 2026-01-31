@@ -101,7 +101,7 @@
     #news-holo-wrapper .news-btn:focus-visible,
     #news-holo-wrapper .news-card:focus-visible,
     #news-holo-wrapper a:focus-visible {
-        outline: 3px solid rgba(139, 92, 246, 0.6);
+        outline: 3px solid var(--color-violet-alpha-60);
         outline-offset: 3px;
     }
 
@@ -162,8 +162,8 @@
         z-index: -1;
         background:
             radial-gradient(ellipse at 20% 0%, var(--effect-purple-30) 0%, transparent 50%),
-            radial-gradient(ellipse at 80% 0%, rgba(6, 182, 212, 0.25) 0%, transparent 50%),
-            radial-gradient(ellipse at 50% 100%, rgba(244, 114, 182, 0.2) 0%, transparent 50%),
+            radial-gradient(ellipse at 80% 0%, var(--color-cyan-alpha-25) 0%, transparent 50%),
+            radial-gradient(ellipse at 50% 100%, var(--color-pink-400-alpha-20) 0%, transparent 50%),
             radial-gradient(ellipse at 0% 50%, var(--effect-purple-15) 0%, transparent 40%),
             radial-gradient(ellipse at 100% 50%, var(--effect-cyan-15) 0%, transparent 40%);
         animation: holoShift 20s ease-in-out infinite alternate;
@@ -200,7 +200,7 @@
     .holo-orb-1 {
         width: 600px;
         height: 600px;
-        background: radial-gradient(circle, rgba(139, 92, 246, 0.6) 0%, transparent 70%);
+        background: radial-gradient(circle, var(--color-violet-alpha-60) 0%, transparent 70%);
         top: -200px;
         left: -200px;
         animation-delay: 0s;
@@ -218,7 +218,7 @@
     .holo-orb-3 {
         width: 400px;
         height: 400px;
-        background: radial-gradient(circle, rgba(244, 114, 182, 0.4) 0%, transparent 70%);
+        background: radial-gradient(circle, var(--color-pink-400-alpha-40) 0%, transparent 70%);
         bottom: -100px;
         left: 30%;
         animation-delay: -10s;
@@ -340,7 +340,7 @@
     /* ===== NEWS CARD ===== */
     .news-card {
         position: relative;
-        background: rgba(255, 255, 255, 0.03);
+        background: var(--color-white-alpha-3);
         border: 1px solid var(--effect-white-8);
         border-radius: var(--radius-2xl);
         overflow: hidden;
@@ -359,7 +359,7 @@
         background: linear-gradient(135deg,
                 var(--effect-purple-40) 0%,
                 var(--effect-cyan-30) 50%,
-                rgba(244, 114, 182, 0.4) 100%);
+                var(--color-pink-400-alpha-40) 100%);
         -webkit-mask: linear-gradient(var(--color-white) 0 0) content-box, linear-gradient(var(--color-white) 0 0);
         mask: linear-gradient(var(--color-white) 0 0) content-box, linear-gradient(var(--color-white) 0 0);
         -webkit-mask-composite: xor;
@@ -370,7 +370,7 @@
 
     .news-card:hover {
         transform: translateY(calc(-1 * var(--space-2))) scale(1.02);
-        background: rgba(255, 255, 255, 0.06);
+        background: var(--color-white-alpha-6);
         box-shadow:
             var(--shadow-2xl),
             0 0 var(--space-10) var(--effect-purple-15),
@@ -419,7 +419,7 @@
         left: 0;
         right: 0;
         height: var(--space-20);
-        background: linear-gradient(to top, rgba(15, 12, 41, 0.9), transparent);
+        background: linear-gradient(to top, var(--color-dark-purple-bg), transparent);
         pointer-events: none;
     }
 
@@ -541,7 +541,7 @@
     .news-empty-state {
         text-align: center;
         padding: var(--space-20) var(--space-10);
-        background: rgba(255, 255, 255, 0.03);
+        background: var(--color-white-alpha-3);
         border: 1px solid var(--effect-white-8);
         border-radius: var(--radius-2xl);
         backdrop-filter: blur(var(--space-5));
@@ -590,8 +590,8 @@
     [data-theme="light"] #news-holo-wrapper::after {
         background:
             radial-gradient(ellipse at 20% 0%, var(--effect-purple-15) 0%, transparent 50%),
-            radial-gradient(ellipse at 80% 0%, rgba(6, 182, 212, 0.12) 0%, transparent 50%),
-            radial-gradient(ellipse at 50% 100%, rgba(244, 114, 182, 0.1) 0%, transparent 50%);
+            radial-gradient(ellipse at 80% 0%, var(--color-cyan-alpha-12) 0%, transparent 50%),
+            radial-gradient(ellipse at 50% 100%, var(--color-pink-400-alpha-10) 0%, transparent 50%);
     }
 
     [data-theme="light"] .news-hero-title {
@@ -674,7 +674,7 @@
     /* Browser Fallback */
     @supports not (backdrop-filter: blur(var(--space-5))) {
         .news-card {
-            background: rgba(30, 27, 75, 0.95);
+            background: var(--color-dark-purple-alt-bg);
         }
 
         [data-theme="light"] .news-card {

@@ -49,7 +49,7 @@
     --govuk-secondary-text-colour: var(--color-govuk-grey-dark);
     --govuk-link-colour: var(--color-govuk-blue-light);
     --govuk-link-hover-colour: var(--color-govuk-blue);
-    --govuk-link-visited-colour: #4c2c92;
+    --govuk-link-visited-colour: var(--color-govuk-link-visited);
 
     /* CivicOne mappings */
     --civicone-font-family: var(--govuk-font-family);
@@ -406,8 +406,8 @@ body.nexus-skin-civicone {
 .civicone.dark-mode.nexus-skin-civicone {
     --civicone-text: var(--color-white);
     --civicone-text-secondary: var(--color-govuk-grey);
-    --civicone-link: #8eb4e8;
-    --civicone-link-hover: #b8d4f1;
+    --civicone-link: var(--color-govuk-link-dark-mode);
+    --civicone-link-hover: var(--color-govuk-link-dark-mode-hover);
 }
 
 /* ===========================================

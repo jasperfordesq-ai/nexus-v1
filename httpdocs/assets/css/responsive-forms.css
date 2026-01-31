@@ -80,7 +80,7 @@ textarea:focus,
 select:focus {
     outline: none;
     border-color: var(--color-primary-500);
-    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+    box-shadow: 0 0 0 3px var(--color-indigo-alpha-15);
 }
 
 /* Dark mode */
@@ -107,7 +107,7 @@ select:focus {
 [data-theme="dark"] textarea:focus,
 [data-theme="dark"] select:focus {
     border-color: var(--color-primary-400);
-    box-shadow: 0 0 0 3px rgba(129, 140, 248, 0.2);
+    box-shadow: 0 0 0 3px var(--color-primary-400-alpha-20);
 }
 
 /* Placeholder styling */
@@ -195,7 +195,7 @@ input[type="submit"]:active {
 button:focus-visible,
 .btn:focus-visible {
     outline: none;
-    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.4);
+    box-shadow: 0 0 0 3px var(--color-indigo-alpha-40);
 }
 
 /* ==========================================
@@ -289,7 +289,7 @@ select.is-invalid {
 input.is-invalid:focus,
 textarea.is-invalid:focus,
 select.is-invalid:focus {
-    box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.15);
+    box-shadow: 0 0 0 3px var(--color-red-alpha-15);
 }
 
 .form-error {

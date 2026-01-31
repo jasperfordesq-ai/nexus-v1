@@ -36,7 +36,7 @@
 
 [data-theme="dark"] .help-center-page::before {
     background:
-        radial-gradient(ellipse 80% 50% at 20% 30%, rgba(99, 102, 241, 0.18) 0%, transparent 50%),
+        radial-gradient(ellipse 80% 50% at 20% 30%, var(--color-indigo-alpha-18) 0%, transparent 50%),
         radial-gradient(ellipse 60% 40% at 80% 70%, var(--effect-emerald-15) 0%, transparent 50%),
         radial-gradient(ellipse 50% 30% at 50% 90%, var(--effect-purple-12) 0%, transparent 50%);
 }
@@ -534,7 +534,7 @@
     bottom: 0;
     background:
         radial-gradient(ellipse 80% 50% at 20% 30%, var(--effect-primary-10) 0%, transparent 50%),
-        radial-gradient(ellipse 60% 40% at 80% 70%, rgba(16, 185, 129, 0.08) 0%, transparent 50%);
+        radial-gradient(ellipse 60% 40% at 80% 70%, var(--color-emerald-alpha-8) 0%, transparent 50%);
     pointer-events: none;
     z-index: -1;
 }
@@ -542,7 +542,7 @@
 [data-theme="dark"] .help-search-page::before {
     background:
         radial-gradient(ellipse 80% 50% at 20% 30%, var(--effect-primary-15) 0%, transparent 50%),
-        radial-gradient(ellipse 60% 40% at 80% 70%, rgba(16, 185, 129, 0.12) 0%, transparent 50%);
+        radial-gradient(ellipse 60% 40% at 80% 70%, var(--color-emerald-alpha-12) 0%, transparent 50%);
 }
 
 .help-search-container {
@@ -881,7 +881,7 @@
     bottom: 0;
     background:
         radial-gradient(ellipse 80% 50% at 20% 30%, var(--effect-primary-10) 0%, transparent 50%),
-        radial-gradient(ellipse 60% 40% at 80% 70%, rgba(16, 185, 129, 0.08) 0%, transparent 50%);
+        radial-gradient(ellipse 60% 40% at 80% 70%, var(--color-emerald-alpha-8) 0%, transparent 50%);
     pointer-events: none;
     z-index: -1;
 }
@@ -889,7 +889,7 @@
 [data-theme="dark"] .help-article-page::before {
     background:
         radial-gradient(ellipse 80% 50% at 20% 30%, var(--effect-primary-15) 0%, transparent 50%),
-        radial-gradient(ellipse 60% 40% at 80% 70%, rgba(16, 185, 129, 0.12) 0%, transparent 50%);
+        radial-gradient(ellipse 60% 40% at 80% 70%, var(--color-emerald-alpha-12) 0%, transparent 50%);
 }
 
 .help-article-container {
@@ -1212,11 +1212,11 @@
 
 .help-feedback-btn.no {
     color: var(--color-rose-500);
-    border-color: rgba(244, 63, 94, 0.3);
+    border-color: var(--color-rose-500-alpha-30);
 }
 
 .help-feedback-btn.no:hover {
-    background: rgba(244, 63, 94, 0.1);
+    background: var(--color-rose-500-alpha-10);
     border-color: var(--color-rose-500);
 }
 

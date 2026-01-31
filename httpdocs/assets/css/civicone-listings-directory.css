@@ -444,7 +444,7 @@
 }
 
 .civicone--govuk .civicone-details__summary:hover {
-    color: var(--civic-brand-dark, #0f385c);
+    color: var(--civic-brand-dark, var(--color-govuk-blue));
 }
 
 .civicone--govuk .civicone-details__summary:focus {

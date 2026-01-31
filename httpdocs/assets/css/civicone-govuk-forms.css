@@ -389,7 +389,7 @@
     }
 }
 
-/* Custom checkbox box */
+/* Custom checkbox box - GOV.UK: square corners */
 .civic-checkboxes__label::before,
 [data-layout="civicone"] .govuk-checkboxes__label::before,
 .civicone .govuk-checkboxes__label::before {
@@ -400,6 +400,7 @@
     width: 40px;
     height: 40px;
     border: 2px solid var(--civicone-input-border);
+    border-radius: 0; /* GOV.UK: checkboxes are square */
     background: var(--civicone-input-bg);
 }
 

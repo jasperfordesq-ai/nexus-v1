@@ -50,8 +50,8 @@
 }
 
 [data-theme="dark"] .feed-shared-card {
-    background: rgba(30, 41, 59, 0.5);
-    border-color: rgba(99, 102, 241, 0.2);
+    background: var(--color-slate-alpha-50);
+    border-color: var(--color-indigo-alpha-20);
 }
 
 /* Shared Group Banner */
@@ -60,14 +60,14 @@
     align-items: center;
     gap: var(--space-2.5);
     padding: var(--space-2.5) var(--space-3);
-    background: linear-gradient(135deg, rgba(99, 102, 241, 0.08), rgba(168, 85, 247, 0.08));
+    background: linear-gradient(135deg, var(--color-indigo-alpha-8), var(--color-purple-alpha-8));
     border-bottom: 1px solid var(--feed-border, var(--color-gray-200));
     text-decoration: none;
     transition: background 0.2s;
 }
 
 .feed-shared-group-banner:hover {
-    background: linear-gradient(135deg, rgba(99, 102, 241, 0.12), rgba(168, 85, 247, 0.12));
+    background: linear-gradient(135deg, var(--color-indigo-alpha-12), var(--color-purple-alpha-12));
 }
 
 .feed-shared-group-banner-img {
@@ -75,7 +75,7 @@
     height: 32px;
     border-radius: var(--radius-base);
     object-fit: cover;
-    border: 1px solid rgba(99, 102, 241, 0.2);
+    border: 1px solid var(--color-indigo-alpha-20);
 }
 
 .feed-shared-group-banner-info {
@@ -197,8 +197,8 @@
 }
 
 [data-theme="dark"] .feed-error-fallback {
-    background: rgba(127, 29, 29, 0.2);
-    border-color: rgba(248, 113, 113, 0.3);
+    background: var(--color-red-900-alpha-20);
+    border-color: var(--color-red-400-alpha-30);
     color: var(--color-red-300);
 }
 
@@ -294,7 +294,7 @@
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.5px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    box-shadow: 0 2px 8px var(--color-black-alpha-15);
 }
 
 .feed-listing-badge-overlay.offer {
@@ -348,8 +348,8 @@
 }
 
 [data-theme="dark"] .feed-section-box {
-    background: rgba(30, 41, 59, 0.5);
-    border-color: rgba(99, 102, 241, 0.15);
+    background: var(--color-slate-alpha-50);
+    border-color: var(--color-indigo-alpha-15);
 }
 
 /* Goal Box */
@@ -418,8 +418,8 @@
 
 /* Volunteering Box */
 .feed-volunteer-box {
-    background: linear-gradient(135deg, rgba(59, 130, 246, 0.05), rgba(59, 130, 246, 0.02));
-    border-color: rgba(59, 130, 246, 0.2);
+    background: linear-gradient(135deg, var(--color-blue-alpha-5), var(--color-blue-alpha-2));
+    border-color: var(--color-blue-alpha-20);
 }
 
 .feed-volunteer-header {
@@ -458,8 +458,8 @@
 
 /* Event Box */
 .feed-event-box {
-    background: linear-gradient(135deg, rgba(236, 72, 153, 0.05), rgba(236, 72, 153, 0.02));
-    border-color: rgba(236, 72, 153, 0.2);
+    background: linear-gradient(135deg, var(--color-pink-alpha-5), var(--color-pink-alpha-2));
+    border-color: var(--color-pink-alpha-20);
 }
 
 .feed-event-header {
@@ -504,8 +504,8 @@
    REVIEW BOX
    ============================================ */
 .feed-review-box {
-    background: linear-gradient(135deg, rgba(251, 191, 36, 0.08), rgba(245, 158, 11, 0.05));
-    border: 1px solid rgba(251, 191, 36, 0.2);
+    background: linear-gradient(135deg, var(--color-amber-alpha-8), var(--color-amber-500-alpha-5));
+    border: 1px solid var(--color-amber-alpha-20);
     border-radius: var(--radius-md);
     padding: var(--space-4);
 }
@@ -522,7 +522,7 @@
     height: 48px;
     border-radius: 50%;
     object-fit: cover;
-    border: 2px solid rgba(251, 191, 36, 0.3);
+    border: 2px solid var(--color-amber-alpha-30);
     flex-shrink: 0;
 }
 
@@ -564,7 +564,7 @@
 }
 
 .feed-review-stars i.inactive {
-    color: rgba(255, 255, 255, 0.3);
+    color: var(--color-white-alpha-30);
 }
 
 .feed-review-stars-value {
@@ -604,14 +604,14 @@
     align-items: center;
     gap: var(--space-1.5);
     background: var(--feed-bg-card, var(--color-white));
-    border: 1px solid rgba(251, 191, 36, 0.3);
+    border: 1px solid var(--color-amber-alpha-30);
 }
 
 /* ============================================
    DARK MODE OVERRIDES
    ============================================ */
 [data-theme="dark"] .feed-volunteer-box {
-    background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(59, 130, 246, 0.05));
+    background: linear-gradient(135deg, var(--color-blue-alpha-10), var(--color-blue-alpha-5));
 }
 
 [data-theme="dark"] .feed-volunteer-label {
@@ -619,12 +619,12 @@
 }
 
 [data-theme="dark"] .feed-volunteer-credits {
-    background: rgba(30, 41, 59, 0.8);
-    border-color: rgba(59, 130, 246, 0.3);
+    background: var(--color-slate-alpha-80);
+    border-color: var(--color-blue-alpha-30);
 }
 
 [data-theme="dark"] .feed-event-box {
-    background: linear-gradient(135deg, rgba(236, 72, 153, 0.1), rgba(236, 72, 153, 0.05));
+    background: linear-gradient(135deg, var(--color-pink-alpha-10), var(--color-pink-alpha-5));
 }
 
 [data-theme="dark"] .feed-event-label {
@@ -632,20 +632,20 @@
 }
 
 [data-theme="dark"] .feed-event-date-badge {
-    background: rgba(30, 41, 59, 0.8);
-    border-color: rgba(236, 72, 153, 0.3);
+    background: var(--color-slate-alpha-80);
+    border-color: var(--color-pink-alpha-30);
 }
 
 [data-theme="dark"] .feed-review-box {
-    background: linear-gradient(135deg, rgba(251, 191, 36, 0.1), rgba(245, 158, 11, 0.05));
+    background: linear-gradient(135deg, var(--color-amber-alpha-10), var(--color-amber-500-alpha-5));
 }
 
 [data-theme="dark"] .feed-review-quote {
-    background: rgba(30, 41, 59, 0.8);
+    background: var(--color-slate-alpha-80);
 }
 
 [data-theme="dark"] .feed-review-action a {
-    background: rgba(30, 41, 59, 0.8);
+    background: var(--color-slate-alpha-80);
 }
 
 /* ============================================

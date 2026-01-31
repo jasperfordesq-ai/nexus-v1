@@ -32,7 +32,7 @@
 }
 
 [data-theme="dark"] .consent-alert--warning {
-    background: rgba(245, 158, 11, 0.15);
+    background: var(--color-amber-500-alpha-15);
 }
 
 .consent-alert__icon {
@@ -70,7 +70,7 @@
     border: 1px solid var(--color-gray-200, #e5e7eb);
     border-radius: var(--radius-lg, 12px);
     overflow: hidden;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 6px -1px var(--color-black-alpha-10);
 }
 
 [data-theme="dark"] .consent-card {
@@ -136,7 +136,7 @@
 
 .consent-item:hover {
     border-color: var(--color-primary-300, #a5b4fc);
-    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+    box-shadow: 0 0 0 3px var(--color-indigo-alpha-10);
 }
 
 .consent-item__header {
@@ -193,12 +193,12 @@
 }
 
 [data-theme="dark"] .consent-tag--warning {
-    background: rgba(245, 158, 11, 0.2);
+    background: var(--color-amber-500-alpha-20);
     color: var(--color-warning-400, #fbbf24);
 }
 
 [data-theme="dark"] .consent-tag--info {
-    background: rgba(99, 102, 241, 0.2);
+    background: var(--color-indigo-alpha-20);
     color: var(--color-primary-400, #818cf8);
 }
 
@@ -293,7 +293,7 @@
 }
 
 .consent-checkbox input:focus + .consent-checkbox__box {
-    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.3);
+    box-shadow: 0 0 0 3px var(--color-indigo-alpha-30);
 }
 
 .consent-checkbox__label {

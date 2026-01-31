@@ -60,24 +60,24 @@ html.theme-transitioning *::after {
     --text-disabled: var(--color-slate-500);     /* Disabled state */
 
     /* Border colors */
-    --border-default: rgba(255, 255, 255, 0.1);
-    --border-subtle: rgba(255, 255, 255, 0.05);
-    --border-strong: rgba(255, 255, 255, 0.2);
+    --border-default: var(--color-white-alpha-10);
+    --border-subtle: var(--color-white-alpha-5);
+    --border-strong: var(--color-white-alpha-20);
 
     /* Glassmorphism refinements */
-    --glass-bg: rgba(30, 41, 59, 0.8);
-    --glass-bg-heavy: rgba(15, 23, 42, 0.9);
-    --glass-border: rgba(255, 255, 255, 0.08);
-    --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+    --glass-bg: var(--color-slate-800-alpha-80);
+    --glass-bg-heavy: var(--color-slate-900-alpha-90);
+    --glass-border: var(--color-white-alpha-8);
+    --glass-shadow: 0 8px 32px var(--color-black-alpha-40);
 
     /* Primary color adjustments for dark mode */
     --color-primary-hover: var(--color-primary-400);
     --color-primary-active: var(--color-primary-300);
 
     /* Surface overlays */
-    --overlay-light: rgba(255, 255, 255, 0.05);
-    --overlay-medium: rgba(255, 255, 255, 0.1);
-    --overlay-heavy: rgba(255, 255, 255, 0.15);
+    --overlay-light: var(--color-white-alpha-5);
+    --overlay-medium: var(--color-white-alpha-10);
+    --overlay-heavy: var(--color-white-alpha-15);
 
     /* Color scheme for native elements */
     color-scheme: dark;
@@ -129,7 +129,7 @@ html.theme-transitioning *::after {
 
 [data-theme="dark"] .glass-card:hover,
 [data-theme="dark"] .card:hover {
-    background: rgba(30, 41, 59, 0.9);
+    background: var(--color-slate-800-alpha-90);
     border-color: var(--border-default);
 }
 
@@ -271,7 +271,7 @@ html.theme-transitioning *::after {
 
 [data-theme="dark"] .nav-link.active {
     color: var(--color-primary-400);
-    background: rgba(99, 102, 241, 0.15);
+    background: var(--color-primary-500-alpha-15);
 }
 
 /* Mobile navigation */
@@ -311,14 +311,14 @@ html.theme-transitioning *::after {
    ============================================== */
 [data-theme="dark"] .modal-backdrop,
 [data-theme="dark"] .overlay-backdrop {
-    background: rgba(0, 0, 0, 0.7);
+    background: var(--color-black-alpha-70);
 }
 
 [data-theme="dark"] .modal-content,
 [data-theme="dark"] .modal-dialog {
     background: var(--bg-elevated);
     border-color: var(--glass-border);
-    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 25px 50px var(--color-black-alpha-50);
 }
 
 [data-theme="dark"] .modal-header,
@@ -366,22 +366,22 @@ html.theme-transitioning *::after {
 }
 
 [data-theme="dark"] .badge-primary {
-    background: rgba(99, 102, 241, 0.2);
+    background: var(--color-primary-500-alpha-20);
     color: var(--color-primary-400);
 }
 
 [data-theme="dark"] .badge-success {
-    background: rgba(16, 185, 129, 0.2);
+    background: var(--color-emerald-alpha-20);
     color: var(--color-emerald-400);
 }
 
 [data-theme="dark"] .badge-warning {
-    background: rgba(245, 158, 11, 0.2);
+    background: var(--color-amber-500-alpha-20);
     color: var(--color-amber-300);
 }
 
 [data-theme="dark"] .badge-danger {
-    background: rgba(239, 68, 68, 0.2);
+    background: var(--color-red-alpha-20);
     color: var(--color-red-400);
 }
 

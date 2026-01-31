@@ -278,3 +278,36 @@
 .civicone.dark-mode .civic-legal-guidelines-header {
     background: var(--civic-bg-page, var(--color-govuk-black));
 }
+
+/* ===========================================
+   GOV.UK Icon & Panel Utility Classes
+   Replaces inline styles per CLAUDE.md rules
+   Source: https://design-system.service.gov.uk/styles/colour/
+   =========================================== */
+
+/* Icon colors - GOV.UK compliant */
+.govuk-icon--green {
+    color: var(--color-govuk-green);
+}
+
+.govuk-icon--blue {
+    color: var(--color-govuk-blue-light);
+}
+
+.govuk-icon--grey {
+    color: var(--color-govuk-dark-grey);
+}
+
+/* Panel left border styles - GOV.UK inset text pattern */
+.govuk-panel--blue-border {
+    border-left: 5px solid var(--color-govuk-blue-light);
+}
+
+.govuk-panel--green-border {
+    border-left: 5px solid var(--color-govuk-green);
+}
+
+/* Meta text - GOV.UK secondary text color */
+.govuk-text--secondary {
+    color: var(--color-govuk-dark-grey);
+}

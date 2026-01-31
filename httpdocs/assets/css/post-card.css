@@ -67,7 +67,7 @@
     font-size: var(--font-size-xs);
     padding: var(--space-1) var(--space-2);
     border-radius: var(--radius-md);
-    background: rgba(99, 102, 241, 0.1);
+    background: var(--color-indigo-alpha-10);
     color: var(--color-primary-500);
 }
 
@@ -86,7 +86,7 @@
 }
 
 .post-delete-btn:hover {
-    background: rgba(239, 68, 68, 0.1);
+    background: var(--color-red-alpha-10);
     color: var(--color-danger);
 }
 
@@ -146,7 +146,7 @@
 }
 
 .post-action-btn:hover {
-    background: rgba(99, 102, 241, 0.1);
+    background: var(--color-indigo-alpha-10);
     color: var(--color-primary-500);
 }
 
@@ -211,8 +211,8 @@
    ======================================== */
 
 [data-theme="dark"] .post-card {
-    background: rgba(30, 41, 59, 0.6);
-    border-color: rgba(255, 255, 255, 0.1);
+    background: var(--color-slate-alpha-60);
+    border-color: var(--color-white-alpha-10);
 }
 
 [data-theme="dark"] .post-author-link {
@@ -224,7 +224,7 @@
 }
 
 [data-theme="dark"] .visibility-badge {
-    background: rgba(99, 102, 241, 0.2);
+    background: var(--color-indigo-alpha-20);
     color: var(--color-primary-300);
 }
 
@@ -233,7 +233,7 @@
 }
 
 [data-theme="dark"] .post-delete-btn:hover {
-    background: rgba(239, 68, 68, 0.2);
+    background: var(--color-red-alpha-20);
     color: var(--color-red-500);
 }
 
@@ -242,7 +242,7 @@
 }
 
 [data-theme="dark"] .post-actions {
-    border-top-color: rgba(255, 255, 255, 0.1);
+    border-top-color: var(--color-white-alpha-10);
 }
 
 [data-theme="dark"] .post-action-btn {
@@ -250,7 +250,7 @@
 }
 
 [data-theme="dark"] .post-action-btn:hover {
-    background: rgba(99, 102, 241, 0.2);
+    background: var(--color-indigo-alpha-20);
     color: var(--color-primary-300);
 }
 
@@ -263,5 +263,5 @@
 }
 
 [data-theme="dark"] .post-comments {
-    border-top-color: rgba(255, 255, 255, 0.1);
+    border-top-color: var(--color-white-alpha-10);
 }

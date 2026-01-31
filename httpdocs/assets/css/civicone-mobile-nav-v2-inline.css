@@ -102,14 +102,14 @@ html[data-layout] { transform: none !important; }
         right: 0 !important;
         z-index: 99999 !important;
         height: 84px !important;
-        background: rgba(255, 255, 255, 0.98) !important;
-        border-top: 1px solid rgba(0, 0, 0, 0.1) !important;
+        background: var(--color-white-alpha-98) !important;
+        border-top: 1px solid var(--color-black-alpha-10) !important;
         -webkit-backdrop-filter: saturate(180%) blur(20px) !important;
         backdrop-filter: saturate(180%) blur(20px) !important;
     }
     [data-theme="dark"] .mobile-tab-bar {
-        background: rgba(28, 28, 30, 0.98) !important;
-        border-top-color: rgba(255, 255, 255, 0.1) !important;
+        background: var(--color-ios-dark-alpha-98) !important;
+        border-top-color: var(--color-white-alpha-10) !important;
     }
     body {
         padding-bottom: 90px !important;

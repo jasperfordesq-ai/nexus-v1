@@ -282,7 +282,7 @@
     left: 0;
     right: 0;
     bottom: 0;
-    background: rgba(0,0,0,0.5);
+    background: var(--color-black-alpha-50);
     z-index: var(--z-modal-backdrop);
     align-items: center;
     justify-content: center;
@@ -381,7 +381,7 @@
 
 .connections-request-item {
     padding: 10px;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    border-bottom: 1px solid var(--color-white-alpha-10);
     display: flex;
     align-items: center;
     justify-content: space-between;

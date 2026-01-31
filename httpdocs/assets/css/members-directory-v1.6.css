@@ -241,7 +241,7 @@
         transform: translateY(100%);
         transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         border-radius: 16px 16px 0 0;
-        box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.15);
+        box-shadow: 0 -4px 16px var(--color-black-alpha-15);
     }
 
     .moj-filter--bottom-sheet.moj-filter--visible {
@@ -316,7 +316,7 @@
     right: 0;
     bottom: 0;
     z-index: 999;
-    background: rgba(0, 0, 0, 0.5);
+    background: var(--color-black-alpha-50);
     opacity: 0;
     transition: opacity 0.3s ease;
 }
@@ -547,7 +547,7 @@ body.moj-filter--open {
 .civicone-view-toggle__button--active {
     background: var(--color-white);
     color: var(--color-primary-500, #1d70b8);
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 1px 2px var(--color-black-alpha-10);
 }
 
 /* Results list base styles */
@@ -585,7 +585,7 @@ body.moj-filter--open {
 
 .civicone-results-list--grid .civicone-member-item:hover {
     transform: translateY(-2px);
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    box-shadow: 0 4px 6px -1px var(--color-black-alpha-10), 0 2px 4px -1px var(--color-black-alpha-6);
     border-color: var(--color-primary-500, #1d70b8);
 }
 
@@ -872,7 +872,7 @@ body.moj-filter--open {
 }
 
 [data-theme="dark"] .members-filter-backdrop {
-    background: rgba(0, 0, 0, 0.75);
+    background: var(--color-black-alpha-75);
 }
 
 [data-theme="dark"] .moj-filter--bottom-sheet {

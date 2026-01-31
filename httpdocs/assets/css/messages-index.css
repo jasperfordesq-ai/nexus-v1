@@ -1031,7 +1031,7 @@ body.messages-page {
 .holo-orb-desktop-3 {
     width: 400px;
     height: 400px;
-    background: radial-gradient(circle, rgba(244, 114, 182, 0.35) 0%, transparent 70%);
+    background: radial-gradient(circle, var(--color-pink-400-alpha-35) 0%, transparent 70%);
     bottom: -100px;
     left: 30%;
     animation-delay: -20s;
@@ -1060,7 +1060,7 @@ body.messages-page {
     flex-shrink: 0;
     display: flex;
     flex-direction: column;
-    background: rgba(15, 23, 42, 0.5);
+    background: var(--color-slate-900-alpha-50);
     border: 1px solid var(--holo-border);
     border-radius: var(--radius-2xl);
     backdrop-filter: blur(20px);
@@ -1078,8 +1078,8 @@ body.messages-page {
     padding: 1px;
     background: linear-gradient(135deg,
         var(--effect-purple-30) 0%,
-        rgba(6, 182, 212, 0.2) 50%,
-        rgba(244, 114, 182, 0.3) 100%);
+        var(--color-cyan-alpha-20) 50%,
+        var(--color-pink-400-alpha-30) 100%);
     -webkit-mask: linear-gradient(var(--color-white) 0 0) content-box, linear-gradient(var(--color-white) 0 0);
     mask: linear-gradient(var(--color-white) 0 0) content-box, linear-gradient(var(--color-white) 0 0);
     -webkit-mask-composite: xor;
@@ -1198,7 +1198,7 @@ body.messages-page {
 }
 
 .holo-search-input:focus {
-    background: rgba(139, 92, 246, 0.05);
+    background: var(--color-violet-alpha-5);
     border-color: var(--effect-purple-40);
     box-shadow: 0 0 20px var(--effect-purple-15);
 }
@@ -1252,7 +1252,7 @@ body.messages-page {
 }
 
 .holo-thread.active {
-    background: linear-gradient(135deg, var(--effect-purple-15), rgba(6, 182, 212, 0.1));
+    background: linear-gradient(135deg, var(--effect-purple-15), var(--color-cyan-alpha-10));
     border-color: var(--effect-purple-30);
     box-shadow: 0 4px 20px var(--effect-purple-20);
 }
@@ -1351,7 +1351,7 @@ body.messages-page {
 }
 
 .holo-thread.unread .holo-thread-preview {
-    color: rgba(255, 255, 255, 0.8);
+    color: var(--color-white-alpha-80);
 }
 
 .holo-thread-badge {
@@ -1376,7 +1376,7 @@ body.messages-page {
     flex: 1;
     display: flex;
     flex-direction: column;
-    background: rgba(15, 23, 42, 0.4);
+    background: var(--color-slate-900-alpha-40);
     border: 1px solid var(--holo-border);
     border-radius: var(--radius-2xl);
     backdrop-filter: blur(20px);
@@ -1393,9 +1393,9 @@ body.messages-page {
     border-radius: var(--radius-2xl);
     padding: 1px;
     background: linear-gradient(135deg,
-        rgba(6, 182, 212, 0.2) 0%,
+        var(--color-cyan-alpha-20) 0%,
         var(--effect-purple-30) 50%,
-        rgba(244, 114, 182, 0.2) 100%);
+        var(--color-pink-400-alpha-20) 100%);
     -webkit-mask: linear-gradient(var(--color-white) 0 0) content-box, linear-gradient(var(--color-white) 0 0);
     mask: linear-gradient(var(--color-white) 0 0) content-box, linear-gradient(var(--color-white) 0 0);
     -webkit-mask-composite: xor;
@@ -1418,7 +1418,7 @@ body.messages-page {
     width: 120px;
     height: 120px;
     border-radius: var(--radius-2xl);
-    background: linear-gradient(135deg, var(--effect-purple-15), rgba(6, 182, 212, 0.1));
+    background: linear-gradient(135deg, var(--effect-purple-15), var(--color-cyan-alpha-10));
     border: 1px solid var(--effect-purple-20);
     display: flex;
     align-items: center;
@@ -1498,7 +1498,7 @@ body.messages-page {
     width: var(--space-20);
     height: var(--space-20);
     border-radius: var(--radius-xl);
-    background: linear-gradient(135deg, var(--effect-purple-15), rgba(6, 182, 212, 0.1));
+    background: linear-gradient(135deg, var(--effect-purple-15), var(--color-cyan-alpha-10));
     border: 1px solid var(--effect-purple-20);
     display: flex;
     align-items: center;
@@ -1566,7 +1566,7 @@ body.messages-page {
     width: 100%;
     max-width: 480px;
     max-height: 80vh;
-    background: rgba(15, 23, 42, 0.95);
+    background: var(--color-slate-900-alpha-92);
     border: 1px solid var(--holo-border);
     border-radius: var(--radius-2xl);
     backdrop-filter: blur(20px);
@@ -1591,8 +1591,8 @@ body.messages-page {
     padding: 1px;
     background: linear-gradient(135deg,
         var(--effect-purple-40) 0%,
-        rgba(6, 182, 212, 0.3) 50%,
-        rgba(244, 114, 182, 0.4) 100%);
+        var(--color-cyan-alpha-30) 50%,
+        var(--color-pink-400-alpha-40) 100%);
     -webkit-mask: linear-gradient(var(--color-white) 0 0) content-box, linear-gradient(var(--color-white) 0 0);
     mask: linear-gradient(var(--color-white) 0 0) content-box, linear-gradient(var(--color-white) 0 0);
     -webkit-mask-composite: xor;
@@ -1656,7 +1656,7 @@ body.messages-page {
 }
 
 .holo-modal-search input:focus {
-    background: rgba(139, 92, 246, 0.05);
+    background: var(--color-violet-alpha-5);
     border-color: var(--effect-purple-40);
     box-shadow: 0 0 20px var(--effect-purple-15);
 }
@@ -1749,7 +1749,7 @@ body.messages-page {
     bottom: var(--space-10);
     left: 50%;
     transform: translateX(-50%) translateY(20px);
-    background: rgba(15, 23, 42, 0.95);
+    background: var(--color-slate-900-alpha-92);
     border: 1px solid var(--effect-purple-30);
     color: var(--holo-text);
     padding: var(--space-4) var(--space-8);
@@ -1799,7 +1799,7 @@ body.messages-page {
     justify-content: space-between;
     padding: var(--space-5) var(--space-6);
     border-bottom: 1px solid var(--holo-border);
-    background: rgba(15, 23, 42, 0.3);
+    background: var(--color-slate-900-alpha-40);
 }
 
 .holo-chat-user {
@@ -1836,7 +1836,7 @@ body.messages-page {
     width: var(--space-3);
     height: var(--space-3);
     background: var(--holo-success);
-    border: 2px solid rgba(15, 23, 42, 0.8);
+    border: 2px solid var(--color-slate-900-alpha-80);
     border-radius: 50%;
 }
 
@@ -2006,7 +2006,7 @@ body.messages-page {
 }
 
 .holo-message.sent .holo-message-bubble {
-    background: linear-gradient(135deg, var(--effect-purple-20), rgba(6, 182, 212, 0.15));
+    background: linear-gradient(135deg, var(--effect-purple-20), var(--color-cyan-alpha-15));
     border-color: var(--effect-purple-30);
     border-radius: var(--radius-lg);
     border-top-right-radius: 4px;
@@ -2065,7 +2065,7 @@ body.messages-page {
 .holo-chat-input-wrap {
     padding: var(--space-5) var(--space-6);
     border-top: 1px solid var(--holo-border);
-    background: rgba(15, 23, 42, 0.3);
+    background: var(--color-slate-900-alpha-40);
 }
 
 .holo-chat-input-row {
@@ -2101,7 +2101,7 @@ body.messages-page {
 }
 
 .holo-chat-textarea:focus {
-    background: rgba(139, 92, 246, 0.05);
+    background: var(--color-violet-alpha-5);
     border-color: var(--effect-purple-40);
     box-shadow: 0 0 25px var(--effect-purple-10);
 }
@@ -2197,7 +2197,7 @@ body.messages-page {
     width: 140px;
     height: 140px;
     border-radius: 50%;
-    background: linear-gradient(135deg, var(--effect-red-20), rgba(220, 38, 38, 0.1));
+    background: linear-gradient(135deg, var(--effect-red-20), var(--color-red-alpha-10));
     border: 2px solid var(--effect-red-40);
     display: flex;
     align-items: center;
@@ -2209,12 +2209,12 @@ body.messages-page {
     0%, 100% {
         box-shadow: 0 0 0 0 var(--effect-red-40),
                     0 0 0 20px var(--effect-red-10),
-                    0 0 0 40px rgba(239, 68, 68, 0.05);
+                    0 0 0 40px var(--color-red-alpha-0);
     }
     50% {
         box-shadow: 0 0 0 10px var(--effect-red-30),
                     0 0 0 30px var(--effect-red-15),
-                    0 0 0 50px rgba(239, 68, 68, 0.05);
+                    0 0 0 50px var(--color-red-alpha-0);
     }
 }
 
@@ -2269,12 +2269,12 @@ body.messages-page {
 .holo-voice-send {
     background: linear-gradient(135deg, var(--color-emerald-500), var(--color-emerald-600));
     color: white;
-    box-shadow: 0 4px 20px rgba(16, 185, 129, 0.4);
+    box-shadow: 0 4px 20px var(--color-emerald-alpha-40);
 }
 
 .holo-voice-send:hover {
     transform: scale(1.1);
-    box-shadow: 0 6px 30px rgba(16, 185, 129, 0.5);
+    box-shadow: 0 6px 30px var(--color-emerald-alpha-50);
 }
 
 /* Voice Message Bubble */
@@ -2290,8 +2290,8 @@ body.messages-page {
 }
 
 .holo-message.sent .holo-voice-message {
-    background: rgba(6, 182, 212, 0.1);
-    border-color: rgba(6, 182, 212, 0.2);
+    background: var(--color-cyan-alpha-10);
+    border-color: var(--color-cyan-alpha-20);
 }
 
 .holo-voice-play-btn {
@@ -2440,7 +2440,7 @@ body.messages-page {
 .holo-delete-modal {
     width: 100%;
     max-width: 380px;
-    background: rgba(15, 23, 42, 0.95);
+    background: var(--color-slate-900-alpha-92);
     border: 1px solid var(--holo-border);
     border-radius: var(--radius-xl);
     backdrop-filter: blur(20px);
@@ -2464,7 +2464,7 @@ body.messages-page {
     inset: 0;
     border-radius: var(--radius-xl);
     padding: 1px;
-    background: linear-gradient(135deg, var(--effect-red-40), var(--effect-red-10), rgba(244, 114, 182, 0.3));
+    background: linear-gradient(135deg, var(--effect-red-40), var(--effect-red-10), var(--color-pink-400-alpha-30));
     -webkit-mask: linear-gradient(var(--color-white) 0 0) content-box, linear-gradient(var(--color-white) 0 0);
     mask: linear-gradient(var(--color-white) 0 0) content-box, linear-gradient(var(--color-white) 0 0);
     -webkit-mask-composite: xor;
@@ -2543,7 +2543,7 @@ body.messages-page {
 /* Context Menu for threads */
 .holo-context-menu {
     position: fixed;
-    background: rgba(15, 23, 42, 0.95);
+    background: var(--color-slate-900-alpha-92);
     border: 1px solid var(--holo-border);
     border-radius: var(--radius-lg);
     backdrop-filter: blur(20px);
@@ -2569,7 +2569,7 @@ body.messages-page {
     inset: 0;
     border-radius: var(--radius-lg);
     padding: 1px;
-    background: linear-gradient(135deg, var(--effect-purple-30), rgba(6, 182, 212, 0.2));
+    background: linear-gradient(135deg, var(--effect-purple-30), var(--color-cyan-alpha-20));
     -webkit-mask: linear-gradient(var(--color-white) 0 0) content-box, linear-gradient(var(--color-white) 0 0);
     mask: linear-gradient(var(--color-white) 0 0) content-box, linear-gradient(var(--color-white) 0 0);
     -webkit-mask-composite: xor;

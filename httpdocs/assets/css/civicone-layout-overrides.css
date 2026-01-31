@@ -12,8 +12,9 @@
    ========================================== */
 
 :root {
-    --civic-gov-blue: #002d72;
-    --civic-hse-green: #007b5f;
+    /* Using official GOV.UK palette from design-tokens.css */
+    --civic-gov-blue: var(--color-govuk-blue); /* #003078 - Official GOV.UK blue */
+    --civic-hse-green: var(--color-govuk-green); /* #00703c - Official GOV.UK green */
     --civic-primary: var(--civic-gov-blue);
     --civic-accent: var(--civic-hse-green);
 }
@@ -23,7 +24,7 @@
    ========================================== */
 
 .civic-btn {
-    border-radius: 4px !important;
+    border-radius: 0 !important; /* GOV.UK Design System: square corners */
     font-weight: 600;
     letter-spacing: 0.5px;
     text-transform: none;

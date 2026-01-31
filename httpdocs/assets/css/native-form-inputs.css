@@ -16,8 +16,8 @@
    CSS VARIABLES (matching compose-multidraw)
    ============================================== */
 :root {
-    --native-input-bg: rgba(255, 255, 255, 0.08);
-    --native-input-border: rgba(255, 255, 255, 0.15);
+    --native-input-bg: var(--color-white-alpha-8);
+    --native-input-border: var(--color-white-alpha-15);
     --native-input-border-focus: var(--color-primary-500, var(--color-primary-500));
     --native-input-text: var(--text-primary, var(--color-gray-800));
     --native-input-placeholder: var(--text-tertiary, var(--color-gray-400));
@@ -28,8 +28,8 @@
 
 /* Dark mode variables */
 [data-theme="dark"] {
-    --native-input-bg: rgba(255, 255, 255, 0.06);
-    --native-input-border: rgba(255, 255, 255, 0.12);
+    --native-input-bg: var(--color-white-alpha-6);
+    --native-input-border: var(--color-white-alpha-12);
     --native-input-text: var(--text-primary, var(--color-gray-50));
     --native-input-placeholder: var(--text-tertiary, var(--color-gray-500));
 }
@@ -83,8 +83,8 @@
 .is-native:not(.messages-page) select:focus {
     outline: none;
     border-color: var(--native-input-border-focus);
-    box-shadow: 0 0 0 var(--space-1) rgba(99, 102, 241, 0.15);
-    background: rgba(255, 255, 255, 0.12);
+    box-shadow: 0 0 0 var(--space-1) var(--color-indigo-alpha-15);
+    background: var(--color-white-alpha-12);
 }
 
 /* Placeholder styling */
@@ -172,8 +172,8 @@
     body:not(.is-native):not(.messages-page) select:focus {
         outline: none;
         border-color: var(--native-input-border-focus);
-        box-shadow: 0 0 0 var(--space-1) rgba(99, 102, 241, 0.15);
-        background: rgba(255, 255, 255, 0.12);
+        box-shadow: 0 0 0 var(--space-1) var(--color-indigo-alpha-15);
+        background: var(--color-white-alpha-12);
     }
 
     body:not(.is-native):not(.messages-page) input::placeholder,
@@ -220,7 +220,7 @@
 .is-native:not(.messages-page) select:disabled {
     opacity: 0.5;
     cursor: not-allowed;
-    background: rgba(128, 128, 128, 0.1);
+    background: var(--color-gray-alpha-10);
 }
 
 @media (max-width: 768px) {
@@ -229,7 +229,7 @@
     body:not(.is-native):not(.messages-page) select:disabled {
         opacity: 0.5;
         cursor: not-allowed;
-        background: rgba(128, 128, 128, 0.1);
+        background: var(--color-gray-alpha-10);
     }
 }
 
@@ -252,7 +252,7 @@
 .is-native:not(.messages-page) textarea.is-invalid:focus,
 .is-native:not(.messages-page) select.error:focus,
 .is-native:not(.messages-page) select.is-invalid:focus {
-    box-shadow: 0 0 0 var(--space-1) rgba(239, 68, 68, 0.15);
+    box-shadow: 0 0 0 var(--space-1) var(--color-red-alpha-15);
 }
 
 @media (max-width: 768px) {
@@ -271,7 +271,7 @@
     body:not(.is-native):not(.messages-page) textarea.is-invalid:focus,
     body:not(.is-native):not(.messages-page) select.error:focus,
     body:not(.is-native):not(.messages-page) select.is-invalid:focus {
-        box-shadow: 0 0 0 var(--space-1) rgba(239, 68, 68, 0.15);
+        box-shadow: 0 0 0 var(--space-1) var(--color-red-alpha-15);
     }
 }
 
@@ -293,7 +293,7 @@
 .is-native:not(.messages-page) textarea.is-valid:focus,
 .is-native:not(.messages-page) select.success:focus,
 .is-native:not(.messages-page) select.is-valid:focus {
-    box-shadow: 0 0 0 var(--space-1) rgba(16, 185, 129, 0.15);
+    box-shadow: 0 0 0 var(--space-1) var(--color-emerald-alpha-15);
 }
 
 @media (max-width: 768px) {
@@ -312,7 +312,7 @@
     body:not(.is-native):not(.messages-page) textarea.is-valid:focus,
     body:not(.is-native):not(.messages-page) select.success:focus,
     body:not(.is-native):not(.messages-page) select.is-valid:focus {
-        box-shadow: 0 0 0 var(--space-1) rgba(16, 185, 129, 0.15);
+        box-shadow: 0 0 0 var(--space-1) var(--color-emerald-alpha-15);
     }
 }
 

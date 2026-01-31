@@ -7,7 +7,7 @@
     bottom: 0;
     width: 100%;
     height: 100%;
-    background: rgba(0, 0, 0, 0.75);
+    background: var(--color-black-alpha-75);
     backdrop-filter: blur(4px);
     -webkit-backdrop-filter: blur(4px);
     z-index: 999999;
@@ -32,7 +32,7 @@
     border-radius: 12px;
     max-width: 500px;
     width: 100%;
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 20px 60px var(--color-black-alpha-30);
     animation: slideUp 0.4s ease-out;
     overflow: hidden;
 }
@@ -118,7 +118,7 @@
 }
 
 .dev-notice-btn-primary {
-    background: var(--color-primary-600);
+    background: var(--color-primary-700); /* WCAG AA: 4.5:1 contrast ratio */
     color: white;
     font-weight: 700;
 }
@@ -126,7 +126,7 @@
 .dev-notice-btn-primary:hover {
     background: var(--color-primary-700);
     transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(79, 70, 229, 0.4);
+    box-shadow: 0 4px 12px var(--color-primary-600-alpha-40);
 }
 
 .dev-notice-btn-secondary {
@@ -149,7 +149,7 @@
 .dark-mode .dev-notice-modal,
 body.dark .dev-notice-modal {
     background: #1f2937; /* gray-800 (actual dark value) */
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
+    box-shadow: 0 20px 60px var(--color-black-alpha-60);
 }
 
 [data-theme="dark"] .dev-notice-header,
@@ -173,7 +173,7 @@ body.dark .dev-notice-body strong {
 [data-theme="dark"] .dev-notice-highlight,
 .dark-mode .dev-notice-highlight,
 body.dark .dev-notice-highlight {
-    background: rgba(251, 191, 36, 0.15);
+    background: var(--color-amber-alpha-15);
     border-left-color: #fbbf24; /* amber-400 */
     color: #fcd34d;
 }
@@ -195,7 +195,7 @@ body.dark .dev-notice-btn-primary {
 .dark-mode .dev-notice-btn-primary:hover,
 body.dark .dev-notice-btn-primary:hover {
     background: var(--color-primary-400);
-    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.5);
+    box-shadow: 0 4px 12px var(--color-indigo-alpha-50);
 }
 
 [data-theme="dark"] .dev-notice-btn-secondary,
@@ -221,7 +221,7 @@ body.dark .dev-notice-btn-secondary:hover {
     /* Only apply if data-theme is not explicitly set to light */
     html:not([data-theme="light"]) .dev-notice-modal {
         background: #1f2937; /* gray-800 */
-        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
+        box-shadow: 0 20px 60px var(--color-black-alpha-60);
     }
 
     html:not([data-theme="light"]) .dev-notice-header {
@@ -237,7 +237,7 @@ body.dark .dev-notice-btn-secondary:hover {
     }
 
     html:not([data-theme="light"]) .dev-notice-highlight {
-        background: rgba(251, 191, 36, 0.15);
+        background: var(--color-amber-alpha-15);
         border-left-color: #fbbf24; /* amber-400 */
         color: #fcd34d;
     }
@@ -253,7 +253,7 @@ body.dark .dev-notice-btn-secondary:hover {
 
     html:not([data-theme="light"]) .dev-notice-btn-primary:hover {
         background: var(--color-primary-400);
-        box-shadow: 0 4px 12px rgba(99, 102, 241, 0.5);
+        box-shadow: 0 4px 12px var(--color-indigo-alpha-50);
     }
 
     html:not([data-theme="light"]) .dev-notice-btn-secondary {
@@ -301,7 +301,7 @@ body.dark .dev-notice-btn-secondary:hover {
         display: block;
         width: 36px;
         height: 4px;
-        background: rgba(128, 128, 128, 0.4);
+        background: var(--color-gray-alpha-40);
         border-radius: 2px;
         margin: 8px auto 0;
     }

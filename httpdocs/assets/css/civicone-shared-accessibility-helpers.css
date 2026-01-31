@@ -36,11 +36,12 @@
     border-width: 0;
 }
 
-/* Focus visible for keyboard navigation */
+/* Focus visible for keyboard navigation - GOV.UK Design System
+   Source: https://design-system.service.gov.uk/get-started/focus-states/ */
 *:focus-visible {
-    outline: 3px solid var(--color-primary-500);
-    outline-offset: 2px;
-    box-shadow: 0 0 0 3px var(--color-indigo-alpha-20);
+    outline: 3px solid var(--color-govuk-yellow);
+    outline-offset: 0;
+    box-shadow: inset 0 0 0 2px var(--color-govuk-black);
 }
 
 /* Remove outline for mouse users */
@@ -48,15 +49,15 @@
     outline: none;
 }
 
-/* Better button/link focus */
+/* Better button/link focus - GOV.UK standard yellow focus ring */
 button:focus-visible,
 a:focus-visible,
 input:focus-visible,
 select:focus-visible,
 textarea:focus-visible {
-    outline: 3px solid var(--color-primary-500);
-    outline-offset: 2px;
-    box-shadow: 0 0 0 3px var(--color-indigo-alpha-20);
+    outline: 3px solid var(--color-govuk-yellow);
+    outline-offset: 0;
+    box-shadow: inset 0 0 0 2px var(--color-govuk-black);
 }
 
 /* Minimum touch target sizes for mobile */

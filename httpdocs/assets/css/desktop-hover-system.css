@@ -158,7 +158,7 @@
     .sidebar-item:hover,
     [role="menuitem"]:hover,
     [role="option"]:hover {
-        background-color: rgba(var(--color-primary-rgb, 99, 102, 241), 0.06);
+        background-color: var(--color-indigo-alpha-6);
         transform: translateX(var(--space-1));
     }
 
@@ -280,7 +280,7 @@
 
     .avatar-interactive:hover {
         transform: scale(1.1);
-        box-shadow: 0 0 0 var(--space-1) rgba(var(--color-primary-rgb, 99, 102, 241), 0.3);
+        box-shadow: 0 0 0 var(--space-1) var(--color-indigo-alpha-30);
     }
 
     /* ==========================================
@@ -344,7 +344,7 @@
     }
 
     .accordion-header:hover {
-        background-color: rgba(var(--color-primary-rgb, 99, 102, 241), 0.03);
+        background-color: var(--color-indigo-alpha-3);
     }
 
     /* ==========================================

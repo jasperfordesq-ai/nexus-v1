@@ -9,9 +9,9 @@
     background: linear-gradient(135deg,
         var(--effect-primary-8) 0%,
         var(--effect-purple-8) 25%,
-        rgba(236, 72, 153, 0.06) 50%,
-        rgba(59, 130, 246, 0.08) 75%,
-        rgba(16, 185, 129, 0.06) 100%);
+        var(--color-pink-alpha-6) 50%,
+        var(--color-blue-alpha-8) 75%,
+        var(--color-emerald-alpha-6) 100%);
     background-size: 400% 400%;
     animation: gradientShift 20s ease infinite;
     z-index: -1;
@@ -46,8 +46,8 @@
     -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturation));
     border: 1px solid var(--effect-white-40);
     border-radius: var(--radius-2xl);
-    box-shadow: 0 8px 32px rgba(31, 38, 135, 0.12),
-                0 2px 8px rgba(0, 0, 0, 0.06);
+    box-shadow: 0 8px 32px var(--color-glass-shadow-12),
+                0 2px 8px var(--color-black-alpha-6);
     padding: 28px var(--space-8);
     margin-bottom: var(--space-6);
 }
@@ -108,13 +108,13 @@
 .notif-filter-btn:not(.active) {
     background: var(--effect-white-60);
     color: var(--color-slate-500);
-    border-color: rgba(148, 163, 184, 0.2);
+    border-color: var(--color-slate-400-alpha-20);
 }
 
 .notif-filter-btn:not(.active):hover {
     background: var(--effect-white-90);
     color: var(--color-slate-600);
-    border-color: rgba(148, 163, 184, 0.4);
+    border-color: var(--color-slate-400-alpha-40);
     transform: translateY(-1px);
 }
 
@@ -145,8 +145,8 @@
 
 .notif-action-btn.primary {
     background: linear-gradient(135deg,
-        rgba(99, 102, 241, 0.9),
-        rgba(139, 92, 246, 0.9));
+        var(--color-indigo-alpha-90),
+        var(--color-violet-alpha-95));
     color: white;
     box-shadow: 0 4px 16px var(--effect-primary-30);
 }
@@ -158,13 +158,13 @@
 }
 
 .notif-action-btn.danger {
-    background: rgba(254, 226, 226, 0.8);
+    background: var(--color-red-100-alpha-80);
     color: var(--color-red-700);
-    border: 1px solid rgba(252, 165, 165, 0.5);
+    border: 1px solid var(--color-red-300-alpha-50);
 }
 
 .notif-action-btn.danger:hover {
-    background: rgba(254, 202, 202, 0.9);
+    background: var(--color-red-200-alpha-90);
     transform: translateY(-1px);
 }
 
@@ -177,7 +177,7 @@
     -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturation));
     border: 1px solid var(--effect-white-40);
     border-radius: var(--radius-2xl);
-    box-shadow: 0 8px 32px rgba(31, 38, 135, 0.1),
+    box-shadow: 0 8px 32px var(--color-glass-shadow),
                 0 2px 8px var(--effect-black-5);
     overflow: hidden;
 }
@@ -228,7 +228,7 @@
     align-items: flex-start;
     gap: var(--space-4);
     padding: var(--space-5) var(--space-6);
-    border-bottom: 1px solid rgba(226, 232, 240, 0.6);
+    border-bottom: 1px solid var(--color-slate-200-alpha-60);
     text-decoration: none;
     color: inherit;
     transition: all var(--transition-fast);
@@ -240,13 +240,13 @@
 }
 
 .notif-item:hover {
-    background: rgba(99, 102, 241, 0.04);
+    background: var(--color-indigo-alpha-4);
 }
 
 .notif-item.unread {
     background: linear-gradient(90deg,
         var(--effect-primary-8) 0%,
-        rgba(255, 255, 255, 0) 100%);
+        var(--color-white-alpha-0) 100%);
 }
 
 .notif-item.unread::before {
@@ -273,7 +273,7 @@
 }
 
 .notif-icon.like {
-    background: linear-gradient(135deg, var(--effect-red-15), rgba(244, 63, 94, 0.15));
+    background: linear-gradient(135deg, var(--effect-red-15), var(--color-rose-500-alpha-15));
     color: var(--color-danger);
 }
 
@@ -283,27 +283,27 @@
 }
 
 .notif-icon.message {
-    background: linear-gradient(135deg, var(--effect-emerald-15), rgba(34, 197, 94, 0.15));
+    background: linear-gradient(135deg, var(--effect-emerald-15), var(--color-green-500-alpha-15));
     color: var(--color-success);
 }
 
 .notif-icon.event {
-    background: linear-gradient(135deg, var(--effect-amber-15), rgba(234, 88, 12, 0.15));
+    background: linear-gradient(135deg, var(--effect-amber-15), var(--color-orange-600-alpha-15));
     color: var(--color-warning);
 }
 
 .notif-icon.wallet {
-    background: linear-gradient(135deg, var(--effect-emerald-15), rgba(5, 150, 105, 0.15));
+    background: linear-gradient(135deg, var(--effect-emerald-15), var(--color-emerald-600-alpha-15));
     color: var(--color-success);
 }
 
 .notif-icon.group {
-    background: linear-gradient(135deg, var(--effect-purple-15), rgba(168, 85, 247, 0.15));
+    background: linear-gradient(135deg, var(--effect-purple-15), var(--color-purple-alpha-15));
     color: var(--color-purple-500);
 }
 
 .notif-icon.default {
-    background: linear-gradient(135deg, rgba(100, 116, 139, 0.12), rgba(71, 85, 105, 0.12));
+    background: linear-gradient(135deg, var(--color-slate-500-alpha-12), var(--color-slate-600-alpha-12));
     color: var(--color-slate-500);
 }
 
@@ -430,16 +430,16 @@
     background: linear-gradient(135deg,
         var(--effect-primary-12) 0%,
         var(--effect-purple-12) 25%,
-        rgba(236, 72, 153, 0.08) 50%,
-        rgba(59, 130, 246, 0.12) 75%,
-        rgba(16, 185, 129, 0.08) 100%);
+        var(--color-pink-alpha-8) 50%,
+        var(--color-blue-alpha-12) 75%,
+        var(--color-emerald-alpha-8) 100%);
 }
 
 /* Glass Header Card */
 [data-theme="dark"] .notif-header-card {
     background: linear-gradient(135deg,
         var(--effect-slate-85),
-        rgba(30, 41, 59, 0.65));
+        var(--color-slate-alpha-65));
     border-color: var(--effect-white-10);
     box-shadow: 0 8px 32px var(--effect-black-30),
                 0 2px 8px var(--effect-black-20);
@@ -472,20 +472,20 @@
 }
 
 [data-theme="dark"] .notif-filter-btn:not(.active):hover {
-    background: rgba(51, 65, 85, 0.8);
+    background: var(--color-slate-600-alpha-80);
     color: var(--color-slate-200);
     border-color: var(--effect-white-20);
 }
 
 /* Action Buttons */
 [data-theme="dark"] .notif-action-btn.danger {
-    background: rgba(185, 28, 28, 0.2);
+    background: var(--color-red-700-alpha-20);
     color: var(--color-red-400);
     border-color: var(--effect-red-30);
 }
 
 [data-theme="dark"] .notif-action-btn.danger:hover {
-    background: rgba(185, 28, 28, 0.3);
+    background: var(--color-red-700-alpha-30);
 }
 
 /* Glass Notifications List */
@@ -529,7 +529,7 @@
 [data-theme="dark"] .notif-item.unread {
     background: linear-gradient(90deg,
         var(--effect-primary-15) 0%,
-        rgba(30, 41, 59, 0) 100%);
+        var(--color-slate-800-alpha-0) 100%);
 }
 
 /* Notification Content */
@@ -551,7 +551,7 @@
 
 /* Notification Icons - Dark Mode */
 [data-theme="dark"] .notif-icon.like {
-    background: linear-gradient(135deg, var(--effect-red-20), rgba(244, 63, 94, 0.2));
+    background: linear-gradient(135deg, var(--effect-red-20), var(--color-rose-500-alpha-20));
 }
 
 [data-theme="dark"] .notif-icon.comment {
@@ -559,23 +559,23 @@
 }
 
 [data-theme="dark"] .notif-icon.message {
-    background: linear-gradient(135deg, var(--effect-emerald-20), rgba(34, 197, 94, 0.2));
+    background: linear-gradient(135deg, var(--effect-emerald-20), var(--color-green-500-alpha-20));
 }
 
 [data-theme="dark"] .notif-icon.event {
-    background: linear-gradient(135deg, var(--effect-amber-20), rgba(234, 88, 12, 0.2));
+    background: linear-gradient(135deg, var(--effect-amber-20), var(--color-orange-600-alpha-20));
 }
 
 [data-theme="dark"] .notif-icon.wallet {
-    background: linear-gradient(135deg, var(--effect-emerald-20), rgba(5, 150, 105, 0.2));
+    background: linear-gradient(135deg, var(--effect-emerald-20), var(--color-emerald-600-alpha-20));
 }
 
 [data-theme="dark"] .notif-icon.group {
-    background: linear-gradient(135deg, var(--effect-purple-20), rgba(168, 85, 247, 0.2));
+    background: linear-gradient(135deg, var(--effect-purple-20), var(--color-purple-alpha-20));
 }
 
 [data-theme="dark"] .notif-icon.default {
-    background: linear-gradient(135deg, rgba(100, 116, 139, 0.2), rgba(71, 85, 105, 0.2));
+    background: linear-gradient(135deg, var(--color-slate-500-alpha-20), var(--color-slate-600-alpha-20));
 }
 
 /* Delete Button */

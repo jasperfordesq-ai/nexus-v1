@@ -28,13 +28,13 @@
 /* Success pulse */
 @keyframes successPulse {
     0% {
-        box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
+        box-shadow: 0 0 0 0 var(--color-emerald-alpha-70);
     }
     70% {
-        box-shadow: 0 0 0 var(--space-5) rgba(16, 185, 129, 0);
+        box-shadow: 0 0 0 var(--space-5) var(--color-emerald-alpha-0);
     }
     100% {
-        box-shadow: 0 0 0 0 rgba(16, 185, 129, 0);
+        box-shadow: 0 0 0 0 var(--color-emerald-alpha-0);
     }
 }
 
@@ -124,7 +124,7 @@
     width: 0;
     height: 0;
     border-radius: var(--radius-full);
-    background: rgba(255, 255, 255, 0.5);
+    background: var(--color-white-alpha-50);
     transform: translate(-var(--radius-full), -var(--radius-full));
     transition: width 0.6s, height 0.6s;
 }
@@ -177,16 +177,16 @@
 
 .card-lift:hover {
     transform: translateY(calc(var(--space-1) * -1));
-    box-shadow: 0 var(--space-3) var(--space-10) rgba(0, 0, 0, 0.12);
+    box-shadow: 0 var(--space-3) var(--space-10) var(--color-black-alpha-12);
 }
 
 /* Card glow effect */
 @keyframes cardGlow {
     0%, 100% {
-        box-shadow: 0 0 var(--space-5) rgba(99, 102, 241, 0.3);
+        box-shadow: 0 0 var(--space-5) var(--color-indigo-alpha-30);
     }
     var(--radius-full) {
-        box-shadow: 0 0 var(--space-10) rgba(99, 102, 241, 0.6);
+        box-shadow: 0 0 var(--space-10) var(--color-indigo-alpha-60);
     }
 }
 
@@ -344,12 +344,12 @@
 /* Focus ring (custom, accessible) */
 .focus-ring:focus {
     outline: none;
-    box-shadow: 0 0 0 var(--space-1) rgba(99, 102, 241, 0.3);
+    box-shadow: 0 0 0 var(--space-1) var(--color-indigo-alpha-30);
     transition: box-shadow var(--transition-fast);
 }
 
 [data-theme="dark"] .focus-ring:focus {
-    box-shadow: 0 0 0 var(--space-1) rgba(139, 92, 246, 0.4);
+    box-shadow: 0 0 0 var(--space-1) var(--color-violet-alpha-40);
 }
 
 /* ========================================

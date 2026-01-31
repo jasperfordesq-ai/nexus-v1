@@ -8,18 +8,13 @@
  *
  * EXACT VALUES FROM GOV.UK FRONTEND v5.14.0:
  * ─────────────────────────────────────────────────────────────────────────
- * Background:        #1d70b8 (blue primary - brand color)
- * Text/Icons:        #ffffff (white)
- * Focus background:  #fd0 (yellow)
- * Focus text:        #0b0c0c (black)
+ * Background:        var(--color-govuk-blue-light) (#1d70b8)
+ * Text/Icons:        var(--color-white) (#ffffff)
+ * Focus background:  var(--color-govuk-yellow) (#fd0)
+ * Focus text:        var(--color-govuk-black) (#0b0c0c)
  * Link underline:    3px solid (on hover)
  *
- * Spacing:
- * - Logo padding: 16px top, 12px bottom
- * - Desktop: 33.33% width for logo column
- *
- * Breakpoints:
- * - Desktop: 61.875em (990px)
+ * Updated: 2026-01-31 - Migrated to design tokens
  */
 
 /* ============================================
@@ -34,8 +29,8 @@
     font-size: 1rem;
     line-height: 1;
     border-bottom: 1px solid transparent;
-    color: #ffffff;
-    background: #1d70b8;
+    color: var(--color-white);
+    background: var(--color-govuk-blue-light);
 }
 
 @media print {
@@ -77,7 +72,7 @@
 
 .govuk-header__homepage-link:link,
 .govuk-header__homepage-link:visited {
-    color: #ffffff;
+    color: var(--color-white);
     text-decoration: none;
 }
 
@@ -89,9 +84,9 @@
 
 .govuk-header__homepage-link:focus {
     outline: 3px solid transparent;
-    color: #0b0c0c;
-    background-color: #fd0;
-    box-shadow: 0 -2px #fd0, 0 4px #0b0c0c;
+    color: var(--color-govuk-black);
+    background-color: var(--color-govuk-yellow);
+    box-shadow: 0 -2px var(--color-govuk-yellow), 0 4px var(--color-govuk-black);
     text-decoration: none;
 }
 
@@ -108,13 +103,13 @@
 @media print {
     .govuk-header {
         border-bottom-width: 0;
-        color: #0b0c0c;
+        color: var(--color-govuk-black);
         background: transparent;
     }
 
     .govuk-header__homepage-link:link,
     .govuk-header__homepage-link:visited {
-        color: #0b0c0c;
+        color: var(--color-govuk-black);
     }
 }
 
@@ -123,11 +118,11 @@
    ============================================ */
 
 html.high-contrast .govuk-header {
-    background: #000000;
-    border-color: #ffffff;
+    background: var(--color-govuk-black);
+    border-color: var(--color-white);
 }
 
 html.high-contrast .govuk-header__homepage-link:link,
 html.high-contrast .govuk-header__homepage-link:visited {
-    color: #ffffff;
+    color: var(--color-white);
 }

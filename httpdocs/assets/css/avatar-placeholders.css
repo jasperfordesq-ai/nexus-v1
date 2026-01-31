@@ -456,7 +456,7 @@
     background: linear-gradient(
         90deg,
         transparent 0%,
-        rgba(255, 255, 255, 0.4) 50%,
+        var(--color-white-alpha-40) 50%,
         transparent 100%
     );
     animation: avatar-shimmer 1.5s ease-in-out infinite;
@@ -469,7 +469,7 @@
     background: linear-gradient(
         90deg,
         transparent 0%,
-        rgba(255, 255, 255, 0.1) 50%,
+        var(--color-white-alpha-10) 50%,
         transparent 100%
     );
 }

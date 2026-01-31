@@ -16,17 +16,17 @@
     max-width: 900px;
     padding: 40px;
     border-radius: 24px;
-    background: rgba(255, 255, 255, 0.85);
+    background: var(--color-white-alpha-85);
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
-    border: 1px solid rgba(255, 255, 255, 0.6);
-    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.05);
+    border: 1px solid var(--color-white-alpha-60);
+    box-shadow: 0 20px 50px var(--color-black-alpha-5);
 }
 
 /* Header */
 .search-header {
     margin-bottom: 30px;
-    border-bottom: 2px solid rgba(0, 0, 0, 0.05);
+    border-bottom: 2px solid var(--color-black-alpha-5);
     padding-bottom: 20px;
     display: flex;
     align-items: flex-end;
@@ -55,7 +55,7 @@
 .search-tabs {
     display: flex;
     gap: 5px;
-    background: rgba(0, 0, 0, 0.05);
+    background: var(--color-black-alpha-5);
     padding: 5px;
     border-radius: 12px;
     flex-wrap: wrap;
@@ -76,7 +76,7 @@
     background: white;
     color: var(--htb-primary);
     font-weight: 700;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    box-shadow: 0 2px 4px var(--color-black-alpha-5);
 }
 
 /* Empty state */
@@ -86,7 +86,7 @@
 }
 
 .search-empty-icon {
-    background: rgba(var(--htb-primary-rgb), 0.1);
+    background: var(--color-indigo-alpha-10);
     width: 100px;
     height: 100px;
     border-radius: 50%;
@@ -135,15 +135,15 @@
     position: relative;
     overflow: hidden;
     padding: 20px;
-    border: 1px solid rgba(0, 0, 0, 0.05);
+    border: 1px solid var(--color-black-alpha-5);
     background: white;
     display: block;
 }
 
 .search-result-card:hover {
     transform: translateY(-3px);
-    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.08);
-    border-color: rgba(var(--htb-primary-rgb), 0.3);
+    box-shadow: 0 10px 20px var(--color-black-alpha-8);
+    border-color: var(--color-indigo-alpha-30);
 }
 
 .search-result-card:hover .search-result-arrow {
@@ -168,7 +168,7 @@
     height: 50px;
     border-radius: 12px;
     object-fit: cover;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+    box-shadow: 0 4px 6px var(--color-black-alpha-5);
 }
 
 .search-result-icon {
@@ -256,13 +256,13 @@
 
 /* Dark Mode */
 [data-theme="dark"] .search-glass-panel {
-    background: rgba(30, 41, 59, 0.85);
-    border-color: rgba(255, 255, 255, 0.08);
+    background: var(--color-slate-alpha-85);
+    border-color: var(--color-white-alpha-8);
 }
 
 [data-theme="dark"] .search-result-card {
-    background: rgba(255, 255, 255, 0.03);
-    border-color: rgba(255, 255, 255, 0.05);
+    background: var(--color-white-alpha-3);
+    border-color: var(--color-white-alpha-5);
 }
 
 [data-theme="dark"] .search-result-title {
@@ -274,7 +274,7 @@
 }
 
 [data-theme="dark"] .search-tabs {
-    background: rgba(255, 255, 255, 0.05);
+    background: var(--color-white-alpha-5);
 }
 
 [data-theme="dark"] .search-tab.active {
