@@ -13,7 +13,7 @@
 $pageTitle = 'Privacy Policy';
 $hideHero = true;
 
-require __DIR__ . '/../../../../../layouts/civicone/header.php';
+require __DIR__ . '/../../../../layouts/civicone/header.php';
 
 $basePath = class_exists('\Nexus\Core\TenantContext') ? \Nexus\Core\TenantContext::getBasePath() : '';
 ?>
@@ -307,4 +307,4 @@ $basePath = class_exists('\Nexus\Core\TenantContext') ? \Nexus\Core\TenantContex
     </div>
 </div>
 
-<?php require __DIR__ . '/../../../../../layouts/civicone/footer.php'; ?>
+<?php require __DIR__ . '/../../../../layouts/civicone/footer.php'; ?>
