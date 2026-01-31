@@ -196,7 +196,7 @@ window.closeMobileNotifications = function() {
             </div>
             <div class="mobile-menu-user-info">
                 <h3><?= htmlspecialchars($userName) ?></h3>
-                <p><i class="fa-solid fa-arrow-right" style="font-size: 11px; margin-right: 4px;"></i>View profile</p>
+                <p><i class="fa-solid fa-arrow-right"></i>View profile</p>
             </div>
         </a>
         <?php else: ?>
@@ -209,7 +209,7 @@ window.closeMobileNotifications = function() {
             </div>
             <div class="mobile-menu-user-info">
                 <h3>Welcome</h3>
-                <p><i class="fa-solid fa-arrow-right" style="font-size: 11px; margin-right: 4px;"></i>Sign in to get started</p>
+                <p><i class="fa-solid fa-arrow-right"></i>Sign in to get started</p>
             </div>
         </a>
         <?php endif; ?>
@@ -287,19 +287,11 @@ window.closeMobileNotifications = function() {
                 Goals
             </a>
             <?php endif; ?>
-            <a href="<?= $base ?>/leaderboard" class="mobile-menu-item" onclick="closeMobileMenu()">
-                <i class="fa-solid fa-trophy"></i>
-                Leaderboards
-            </a>
-            <a href="<?= $base ?>/achievements" class="mobile-menu-item" onclick="closeMobileMenu()">
-                <i class="fa-solid fa-medal"></i>
-                Achievements
-            </a>
             <a href="<?= $base ?>/matches" class="mobile-menu-item" onclick="closeMobileMenu()">
                 <i class="fa-solid fa-wand-magic-sparkles"></i>
                 Smart Matching
             </a>
-            <a href="<?= $base ?>/ai" class="mobile-menu-item" style="background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(139, 92, 246, 0.1)); font-weight:600;" onclick="closeMobileMenu()">
+            <a href="<?= $base ?>/ai" class="mobile-menu-item mobile-menu-item-ai" onclick="closeMobileMenu()">
                 <i class="fa-solid fa-robot"></i>
                 AI Assistant
             </a>
@@ -348,7 +340,7 @@ window.closeMobileNotifications = function() {
         <?php if ($isLoggedIn && ((!empty($_SESSION['user_role']) && $_SESSION['user_role'] === 'admin') || !empty($_SESSION['is_super_admin']))): ?>
         <!-- Admin Section -->
         <div class="mobile-menu-section">
-            <div class="mobile-menu-section-title" style="color: #ea580c;">Admin Tools</div>
+            <div class="mobile-menu-section-title mobile-menu-section-title-admin">Admin Tools</div>
             <a href="<?= $base ?>/admin" class="mobile-menu-item" onclick="closeMobileMenu()">
                 <i class="fa-solid fa-gauge-high"></i>
                 Admin Dashboard
@@ -361,34 +353,34 @@ window.closeMobileNotifications = function() {
         <div class="mobile-menu-section">
             <div class="mobile-menu-section-title">Create</div>
             <a href="<?= $base ?>/compose?tab=post" class="mobile-menu-item" onclick="closeMobileMenu()">
-                <i class="fa-solid fa-pen-to-square" style="color: #3b82f6;"></i>
+                <i class="fa-solid fa-pen-to-square icon-blue"></i>
                 New Post
             </a>
             <a href="<?= $base ?>/compose?tab=listing" class="mobile-menu-item" onclick="closeMobileMenu()">
-                <i class="fa-solid fa-hand-holding-heart" style="color: #10b981;"></i>
+                <i class="fa-solid fa-hand-holding-heart icon-green"></i>
                 New Listing
             </a>
             <?php if (\Nexus\Core\TenantContext::hasFeature('events')): ?>
             <a href="<?= $base ?>/compose?tab=event" class="mobile-menu-item" onclick="closeMobileMenu()">
-                <i class="fa-solid fa-calendar-plus" style="color: #f59e0b;"></i>
+                <i class="fa-solid fa-calendar-plus icon-orange"></i>
                 New Event
             </a>
             <?php endif; ?>
             <?php if (\Nexus\Core\TenantContext::hasFeature('volunteering')): ?>
             <a href="<?= $base ?>/compose?tab=volunteer" class="mobile-menu-item" onclick="closeMobileMenu()">
-                <i class="fa-solid fa-hands-helping" style="color: #ec4899;"></i>
+                <i class="fa-solid fa-hands-helping icon-pink"></i>
                 Volunteer Opportunity
             </a>
             <?php endif; ?>
             <?php if (\Nexus\Core\TenantContext::hasFeature('polls')): ?>
             <a href="<?= $base ?>/compose?tab=poll" class="mobile-menu-item" onclick="closeMobileMenu()">
-                <i class="fa-solid fa-chart-bar" style="color: #8b5cf6;"></i>
+                <i class="fa-solid fa-chart-bar icon-purple"></i>
                 New Poll
             </a>
             <?php endif; ?>
             <?php if (\Nexus\Core\TenantContext::hasFeature('goals')): ?>
             <a href="<?= $base ?>/compose?tab=goal" class="mobile-menu-item" onclick="closeMobileMenu()">
-                <i class="fa-solid fa-bullseye" style="color: #ef4444;"></i>
+                <i class="fa-solid fa-bullseye icon-red"></i>
                 New Goal
             </a>
             <?php endif; ?>
@@ -409,6 +401,14 @@ window.closeMobileNotifications = function() {
                 <i class="fa-solid fa-wallet"></i>
                 Wallet
             </a>
+            <a href="<?= $base ?>/leaderboard" class="mobile-menu-item" onclick="closeMobileMenu()">
+                <i class="fa-solid fa-trophy"></i>
+                Leaderboards
+            </a>
+            <a href="<?= $base ?>/achievements" class="mobile-menu-item" onclick="closeMobileMenu()">
+                <i class="fa-solid fa-medal"></i>
+                Achievements
+            </a>
             <a href="<?= $base ?>/settings" class="mobile-menu-item" onclick="closeMobileMenu()">
                 <i class="fa-solid fa-gear"></i>
                 Settings
@@ -421,15 +421,15 @@ window.closeMobileNotifications = function() {
         <div class="mobile-menu-section">
             <div class="mobile-menu-section-title">Help & Support</div>
             <a href="<?= $base ?>/help" class="mobile-menu-item" onclick="closeMobileMenu()">
-                <i class="fa-solid fa-circle-question" style="color: #f97316;"></i>
+                <i class="fa-solid fa-circle-question icon-orange"></i>
                 Help Center
             </a>
             <a href="<?= $base ?>/contact" class="mobile-menu-item" onclick="closeMobileMenu()">
-                <i class="fa-solid fa-envelope" style="color: #3b82f6;"></i>
+                <i class="fa-solid fa-envelope icon-blue"></i>
                 Contact Us
             </a>
             <a href="<?= $base ?>/accessibility" class="mobile-menu-item" onclick="closeMobileMenu()">
-                <i class="fa-solid fa-universal-access" style="color: #10b981;"></i>
+                <i class="fa-solid fa-universal-access icon-green"></i>
                 Accessibility
             </a>
         </div>

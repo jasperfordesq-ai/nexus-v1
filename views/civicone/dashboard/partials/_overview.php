@@ -189,12 +189,30 @@
             <?php endif; ?>
         </section>
 
+        <!-- Gamification -->
+        <section aria-labelledby="gamification-heading" class="govuk-!-padding-4 govuk-!-margin-bottom-4 civicone-panel-bg">
+            <h2 id="gamification-heading" class="govuk-heading-s">Your Progress</h2>
+            <ul class="govuk-list">
+                <li class="govuk-!-margin-bottom-2">
+                    <a href="<?= $basePath ?>/achievements" class="govuk-link">
+                        <i class="fa-solid fa-medal govuk-!-margin-right-1" aria-hidden="true"></i>
+                        Achievements &amp; Badges
+                    </a>
+                    <p class="govuk-body-s govuk-!-margin-bottom-0 civicone-secondary-text">Unlock badges and track your progress</p>
+                </li>
+                <li>
+                    <a href="<?= $basePath ?>/leaderboard" class="govuk-link">
+                        <i class="fa-solid fa-trophy govuk-!-margin-right-1" aria-hidden="true"></i>
+                        Leaderboards
+                    </a>
+                    <p class="govuk-body-s govuk-!-margin-bottom-0 civicone-secondary-text">See top community contributors</p>
+                </li>
+            </ul>
+        </section>
+
         <!-- Quick Actions -->
         <section class="govuk-!-padding-4 civicone-panel-bg">
             <h2 class="govuk-heading-s">Quick Actions</h2>
-            <p class="govuk-!-margin-bottom-2">
-                <a href="<?= $basePath ?>/achievements" class="govuk-button govuk-button--secondary govuk-!-margin-bottom-2 civicone-btn-full">View Achievements</a>
-            </p>
             <p class="govuk-!-margin-bottom-2">
                 <a href="<?= $basePath ?>/listings/create" class="govuk-button govuk-!-margin-bottom-2 civicone-btn-full">Post Offer or Request</a>
             </p>

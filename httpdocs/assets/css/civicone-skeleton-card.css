@@ -1,3 +1,23 @@
+/**
+ * CivicOne Skeleton Loading Cards
+ * WCAG 2.1 AA Compliant Loading Placeholders
+ *
+ * Used for loading states in listings, members, events views.
+ */
+
+/* Base skeleton animation */
+.civic-skeleton {
+    background: linear-gradient(90deg, var(--color-gray-200) 25%, var(--color-gray-100) 50%, var(--color-gray-200) 75%);
+    background-size: 200% 100%;
+    animation: civic-skeleton-shimmer 1.5s infinite;
+    border-radius: var(--radius-sm);
+}
+
+@keyframes civic-skeleton-shimmer {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+}
+
 /* Accessibility: Announce loading state to screen readers */
 .civic-skeleton-container[aria-busy="true"]::before {
     content: '';
@@ -10,4 +30,169 @@
     clip: rect(0, 0, 0, 0);
     white-space: nowrap;
     border: 0;
+}
+
+/* Card skeleton */
+.civic-skeleton-card {
+    padding: var(--space-4);
+    background: var(--color-white);
+    border: 1px solid var(--color-gray-200);
+    margin-bottom: var(--space-4);
+}
+
+/* Header with avatar */
+.civic-skeleton-card-header {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    margin-bottom: var(--space-4);
+}
+
+.civic-skeleton-avatar {
+    width: 48px;
+    height: 48px;
+    border-radius: var(--radius-full);
+    flex-shrink: 0;
+}
+
+.civic-skeleton-card-meta {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+}
+
+/* Text elements */
+.civic-skeleton-title {
+    height: 24px;
+    width: 100%;
+    margin-bottom: var(--space-2);
+}
+
+.civic-skeleton-text {
+    height: 16px;
+    width: 100%;
+    margin-bottom: var(--space-2);
+}
+
+/* Width utilities for skeleton text */
+.civic-skeleton-w-40 { width: 40%; }
+.civic-skeleton-w-50 { width: 50%; }
+.civic-skeleton-w-60 { width: 60%; }
+.civic-skeleton-w-70 { width: 70%; }
+.civic-skeleton-w-80 { width: 80%; }
+.civic-skeleton-w-85 { width: 85%; }
+
+/* Button skeleton */
+.civic-skeleton-button {
+    height: 40px;
+    width: 120px;
+    border-radius: 0; /* GOV.UK buttons are square */
+}
+
+/* Body section */
+.civic-skeleton-card-body {
+    margin-bottom: var(--space-4);
+}
+
+/* Actions row */
+.civic-skeleton-actions {
+    display: flex;
+    gap: var(--space-3);
+    margin-top: var(--space-4);
+}
+
+.civic-skeleton-actions--centered {
+    justify-content: center;
+}
+
+/* Member card skeleton */
+.civic-skeleton-member {
+    text-align: center;
+    padding: var(--space-4);
+}
+
+.civic-skeleton-member .civic-skeleton-avatar {
+    width: 80px;
+    height: 80px;
+    margin: 0 auto var(--space-3);
+}
+
+.civic-skeleton-member .civic-skeleton-title {
+    width: 70%;
+    margin: 0 auto var(--space-2);
+}
+
+.civic-skeleton-member .civic-skeleton-text {
+    width: 50%;
+    margin: 0 auto;
+}
+
+/* Stats row for member cards */
+.civic-skeleton-stats {
+    display: flex;
+    justify-content: center;
+    gap: var(--space-4);
+    margin-top: var(--space-4);
+}
+
+.civic-skeleton-stat {
+    text-align: center;
+}
+
+.civic-skeleton-stat-value {
+    width: 40px;
+    height: 24px;
+    margin: 0 auto var(--space-1);
+}
+
+.civic-skeleton-stat-label {
+    width: 50px;
+    height: 12px;
+}
+
+/* Event card skeleton */
+.civic-skeleton-event {
+    border-left: 4px solid var(--color-gray-200);
+}
+
+.civic-skeleton-event-layout {
+    display: flex;
+    gap: var(--space-4);
+}
+
+.civic-skeleton-date {
+    text-align: center;
+    min-width: 60px;
+}
+
+.civic-skeleton-date-month {
+    width: 50px;
+    height: 20px;
+    margin-bottom: var(--space-1);
+}
+
+.civic-skeleton-date-day {
+    width: 40px;
+    height: 32px;
+    margin: 0 auto;
+}
+
+.civic-skeleton-event-content {
+    flex: 1;
+}
+
+/* Flex utilities */
+.civic-skeleton-flex { display: flex; }
+.civic-skeleton-flex-1 { flex: 1; }
+.civic-skeleton-gap-3 { gap: var(--space-3); }
+.civic-skeleton-gap-4 { gap: var(--space-4); }
+.civic-skeleton-mt-4 { margin-top: var(--space-4); }
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+    .civic-skeleton {
+        animation: none;
+        background: var(--color-gray-200);
+    }
 }

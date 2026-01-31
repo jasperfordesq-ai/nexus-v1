@@ -3,8 +3,10 @@
  * CivicOne Account Area Secondary Navigation
  * GOV.UK Frontend v5.14.0 Compliant
  *
- * Pattern: GOV.UK Service Navigation style
- * Based on: https://design-system.service.gov.uk/components/tabs/
+ * Pattern: MOJ Sub-navigation
+ * Based on: https://design-patterns.service.justice.gov.uk/components/sub-navigation/
+ *
+ * CSS: /assets/css/civicone-account-nav.css
  */
 
 $basePath = \Nexus\Core\TenantContext::getBasePath();
@@ -56,9 +58,9 @@ if (\Nexus\Core\TenantContext::hasFeature('events')) {
 }
 ?>
 
-<!-- GOV.UK Service Navigation (Account Area) -->
-<nav class="govuk-!-margin-bottom-6" aria-label="Account sections" style="border-bottom: 1px solid #b1b4b6;">
-    <ul class="govuk-list" style="display: flex; flex-wrap: wrap; gap: 0; margin: 0; padding: 0; list-style: none;">
+<!-- MOJ Sub-navigation (Account Area) -->
+<nav class="moj-sub-navigation govuk-!-margin-bottom-6" aria-label="Account sections">
+    <ul class="moj-sub-navigation__list">
         <?php foreach ($accountNavItems as $item): ?>
             <?php
             // Check if current page (remove query params for matching)
@@ -66,16 +68,13 @@ if (\Nexus\Core\TenantContext::hasFeature('events')) {
             $isActive = ($cleanPath === $basePath . $item['pattern']) ||
                         (rtrim($cleanPath, '/') === rtrim($basePath . $item['pattern'], '/'));
             ?>
-            <li style="margin: 0;">
-                <a class="govuk-link govuk-link--no-underline"
+            <li class="moj-sub-navigation__item<?= $isActive ? ' moj-sub-navigation__item--active' : '' ?>">
+                <a class="moj-sub-navigation__link"
                    href="<?= $basePath ?><?= $item['url'] ?>"
-                   <?= $isActive ? 'aria-current="page"' : '' ?>
-                   style="display: block; padding: 10px 20px; color: #0b0c0c; font-weight: <?= $isActive ? '700' : '400' ?>; text-decoration: none; <?= $isActive ? 'border-bottom: 4px solid #1d70b8; margin-bottom: -1px;' : '' ?>">
+                   <?= $isActive ? 'aria-current="page"' : '' ?>>
                     <?= htmlspecialchars($item['label']) ?>
                     <?php if (!empty($item['badge']) && $item['badge'] > 0): ?>
-                        <strong class="govuk-tag govuk-tag--red" style="margin-left: 5px; font-size: 12px; vertical-align: middle;">
-                            <?= $item['badge'] > 99 ? '99+' : $item['badge'] ?>
-                        </strong>
+                        <span class="moj-notification-badge"><?= $item['badge'] > 99 ? '99+' : $item['badge'] ?></span>
                     <?php endif; ?>
                 </a>
             </li>
