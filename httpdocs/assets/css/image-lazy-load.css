@@ -1,7 +1,7 @@
 /**
  * Image Lazy Loading - Progressive Blur-Up Effect
  * Smooth transition from blurred placeholder to full image
- * Version: 1.1 - 2026-01-21 - Migrated to design tokens
+ * Version: 1.2 - 2026-01-31 - Completed migration to design tokens (all rgba values)
  *
  * Usage:
  * <div class="lazy-image-container">
@@ -21,14 +21,14 @@
     position: relative;
     overflow: hidden;
     background: linear-gradient(135deg,
-        rgba(226, 232, 240, 0.5) 0%,
-        rgba(241, 245, 249, 0.5) 100%);
+        var(--color-slate-200-alpha-50) 0%,
+        var(--color-slate-100-alpha-50) 100%);
 }
 
 [data-theme="dark"] .lazy-image-container {
     background: linear-gradient(135deg,
-        rgba(30, 41, 59, 0.5) 0%,
-        rgba(51, 65, 85, 0.5) 100%);
+        var(--color-slate-800-alpha-50) 0%,
+        var(--color-slate-600-alpha-50) 100%);
 }
 
 /* Aspect ratio presets */
@@ -94,9 +94,9 @@
     inset: 0;
     background: linear-gradient(
         90deg,
-        rgba(226, 232, 240, 0) 0%,
-        rgba(226, 232, 240, 0.5) 50%,
-        rgba(226, 232, 240, 0) 100%
+        var(--color-slate-200-alpha-0) 0%,
+        var(--color-slate-200-alpha-50) 50%,
+        var(--color-slate-200-alpha-0) 100%
     );
     background-size: 200% 100%;
     animation: lazyShimmer 1.5s ease-in-out infinite;
@@ -109,9 +109,9 @@
 [data-theme="dark"] .lazy-image-container::before {
     background: linear-gradient(
         90deg,
-        rgba(51, 65, 85, 0) 0%,
-        rgba(71, 85, 105, 0.5) 50%,
-        rgba(51, 65, 85, 0) 100%
+        var(--color-slate-600-alpha-0) 0%,
+        var(--color-slate-dark-alpha-50) 50%,
+        var(--color-slate-600-alpha-0) 100%
     );
     background-size: 200% 100%;
 }
@@ -140,14 +140,14 @@
     border-radius: var(--radius-full);
     overflow: hidden;
     background: linear-gradient(135deg,
-        rgba(226, 232, 240, 0.5) 0%,
-        rgba(241, 245, 249, 0.5) 100%);
+        var(--color-slate-200-alpha-50) 0%,
+        var(--color-slate-100-alpha-50) 100%);
 }
 
 [data-theme="dark"] .lazy-avatar-container {
     background: linear-gradient(135deg,
-        rgba(30, 41, 59, 0.5) 0%,
-        rgba(51, 65, 85, 0.5) 100%);
+        var(--color-slate-800-alpha-50) 0%,
+        var(--color-slate-600-alpha-50) 100%);
 }
 
 .lazy-avatar {
@@ -205,7 +205,7 @@
     height: 60%;
     background: linear-gradient(
         to top,
-        rgba(0, 0, 0, 0.4) 0%,
+        var(--color-black-alpha-40) 0%,
         transparent 100%
     );
     pointer-events: none;
@@ -224,11 +224,11 @@
     position: relative;
     overflow: hidden;
     border-radius: var(--radius-md);
-    background: rgba(226, 232, 240, 0.3);
+    background: var(--color-slate-200-alpha-30);
 }
 
 [data-theme="dark"] .lazy-gallery-item {
-    background: rgba(51, 65, 85, 0.3);
+    background: var(--color-slate-600-alpha-30);
 }
 
 .lazy-gallery-item img {

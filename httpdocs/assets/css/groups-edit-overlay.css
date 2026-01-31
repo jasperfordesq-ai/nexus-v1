@@ -1,5 +1,479 @@
 /* Groups Edit Overlay - Full Page Modal Styles */
 /* This file contains styles specific to the edit-group overlay modal */
+/* Updated: 2026-01-31 - Added GOV.UK Design System styles using design tokens */
+
+/* ============================================
+   GOV.UK CIVICONE THEME OVERLAY STYLES
+   ============================================ */
+
+/* GOV.UK Body/Container Styles */
+.govuk-overlay-body {
+    font-family: "GDS Transport", arial, sans-serif;
+    background: var(--color-black-alpha-70, rgba(11, 12, 12, 0.7));
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--space-5);
+}
+
+.govuk-overlay-container {
+    background: var(--color-white);
+    max-width: 700px;
+    width: 100%;
+    max-height: 90vh;
+    overflow-y: auto;
+}
+
+/* GOV.UK Overlay Header */
+.govuk-overlay-header {
+    background: var(--color-govuk-blue-light);
+    color: var(--color-white);
+    padding: 16px 20px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+.govuk-overlay-header h1 {
+    font-size: 20px;
+    font-weight: 700;
+    margin: 0;
+    flex: 1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* GOV.UK Close Button */
+.govuk-overlay-close-btn {
+    background: transparent;
+    border: 2px solid var(--color-white);
+    color: var(--color-white);
+    width: 36px;
+    height: 36px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.govuk-overlay-close-btn:hover {
+    background: var(--color-white-alpha-10, rgba(255, 255, 255, 0.1));
+}
+
+.govuk-overlay-close-btn:focus {
+    outline: 3px solid var(--color-govuk-yellow);
+    outline-offset: 0;
+    background-color: var(--color-govuk-yellow);
+    color: var(--color-govuk-black);
+    border-color: var(--color-govuk-black);
+}
+
+/* GOV.UK Tab Navigation */
+.govuk-overlay-tab-nav {
+    display: flex;
+    border-bottom: 1px solid var(--color-govuk-grey);
+    background: var(--color-govuk-light-grey);
+}
+
+.govuk-overlay-tab-btn {
+    flex: 1;
+    padding: 14px 16px;
+    background: transparent;
+    border: none;
+    border-bottom: 4px solid transparent;
+    font-size: 16px;
+    font-weight: 400;
+    color: var(--color-govuk-grey-dark);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: all 0.15s;
+}
+
+.govuk-overlay-tab-btn:hover {
+    background: var(--color-white);
+    color: var(--color-govuk-black);
+}
+
+.govuk-overlay-tab-btn:focus {
+    outline: 3px solid var(--color-govuk-yellow);
+    outline-offset: 0;
+    background-color: var(--color-govuk-yellow);
+    color: var(--color-govuk-black);
+}
+
+.govuk-overlay-tab-btn.active {
+    background: var(--color-white);
+    border-bottom-color: var(--color-govuk-blue-light);
+    color: var(--color-govuk-blue-light);
+    font-weight: 700;
+}
+
+/* GOV.UK Tab Panels */
+.govuk-overlay-tab-panel {
+    display: none;
+    padding: 20px;
+}
+
+.govuk-overlay-tab-panel.active {
+    display: block;
+}
+
+/* GOV.UK Image Section */
+.govuk-overlay-image-section {
+    margin-bottom: 20px;
+}
+
+.govuk-overlay-image-preview-box {
+    width: 100%;
+    height: 160px;
+    background: var(--color-govuk-light-grey);
+    border: 1px solid var(--color-govuk-grey);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    margin-bottom: 12px;
+}
+
+.govuk-overlay-image-preview-box img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.govuk-overlay-image-actions {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+/* GOV.UK Upload/Clear Buttons */
+.govuk-overlay-upload-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 12px;
+    background: var(--color-govuk-light-grey);
+    border: 1px solid var(--color-govuk-grey);
+    color: var(--color-govuk-black);
+    font-size: 14px;
+    cursor: pointer;
+}
+
+.govuk-overlay-upload-btn:hover {
+    background: var(--color-govuk-grey-light-bg, #e5e5e5);
+}
+
+.govuk-overlay-upload-btn:focus {
+    outline: 3px solid var(--color-govuk-yellow);
+    outline-offset: 0;
+    background-color: var(--color-govuk-yellow);
+    color: var(--color-govuk-black);
+}
+
+.govuk-overlay-upload-btn input[type="file"] {
+    display: none;
+}
+
+.govuk-overlay-clear-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 12px;
+    background: var(--color-govuk-light-grey);
+    border: 1px solid var(--color-govuk-grey);
+    color: var(--color-govuk-red);
+    font-size: 14px;
+    cursor: pointer;
+}
+
+.govuk-overlay-clear-btn:focus {
+    outline: 3px solid var(--color-govuk-yellow);
+    outline-offset: 0;
+    background-color: var(--color-govuk-yellow);
+    color: var(--color-govuk-black);
+}
+
+.govuk-overlay-clear-btn input[type="checkbox"] {
+    display: none;
+}
+
+/* GOV.UK User List (Invite Tab) */
+.govuk-overlay-user-list {
+    max-height: 300px;
+    overflow-y: auto;
+    border: 1px solid var(--color-govuk-grey);
+}
+
+.govuk-overlay-user-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px;
+    border-bottom: 1px solid var(--color-govuk-light-grey);
+    cursor: pointer;
+}
+
+.govuk-overlay-user-item:hover {
+    background: var(--color-govuk-light-grey);
+}
+
+.govuk-overlay-user-item:last-child {
+    border-bottom: none;
+}
+
+.govuk-overlay-user-item input[type="checkbox"] {
+    width: 20px;
+    height: 20px;
+}
+
+.govuk-overlay-user-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: var(--color-govuk-blue-light);
+    color: var(--color-white);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    overflow: hidden;
+}
+
+.govuk-overlay-user-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.govuk-overlay-user-info {
+    flex: 1;
+}
+
+.govuk-overlay-user-name {
+    font-weight: 600;
+    color: var(--color-govuk-black);
+}
+
+.govuk-overlay-user-email {
+    font-size: 14px;
+    color: var(--color-govuk-grey-dark);
+}
+
+.govuk-overlay-selected-count {
+    padding: 12px;
+    background: var(--color-govuk-light-grey);
+    text-align: center;
+    font-size: 14px;
+    color: var(--color-govuk-grey-dark);
+}
+
+.govuk-overlay-no-users {
+    padding: 40px 20px;
+    text-align: center;
+    color: var(--color-govuk-grey-dark);
+}
+
+.govuk-overlay-no-users i {
+    font-size: 48px;
+    color: var(--color-govuk-grey);
+    margin-bottom: 12px;
+}
+
+/* GOV.UK Add Directly Box */
+.govuk-overlay-add-directly-box {
+    margin-top: 16px;
+    padding: 12px;
+    background: var(--color-govuk-light-grey);
+    border-left: 4px solid var(--color-govuk-blue-light);
+}
+
+.govuk-overlay-add-directly-box label {
+    display: flex;
+    gap: 12px;
+    cursor: pointer;
+}
+
+.govuk-overlay-add-directly-box input[type="checkbox"] {
+    width: 20px;
+    height: 20px;
+    margin-top: 2px;
+}
+
+.govuk-overlay-add-directly-title {
+    font-weight: 600;
+    color: var(--color-govuk-black);
+}
+
+.govuk-overlay-add-directly-desc {
+    font-size: 14px;
+    color: var(--color-govuk-grey-dark);
+    margin-top: 4px;
+}
+
+/* GOV.UK Mobile Responsive */
+@media (max-width: 640px) {
+    .govuk-overlay-body {
+        padding: 0;
+    }
+
+    .govuk-overlay-container {
+        max-height: 100vh;
+        height: 100vh;
+    }
+}
+
+/* Utility - hidden class for JS toggle */
+.govuk-hidden {
+    display: none !important;
+}
+
+/* ============================================
+   CREATE OVERLAY SPECIFIC STYLES
+   ============================================ */
+
+/* Type Pills Navigation */
+.govuk-overlay-type-pills {
+    display: flex;
+    gap: 8px;
+    padding: 16px 20px;
+    background: var(--color-govuk-light-grey);
+    border-bottom: 1px solid var(--color-govuk-grey);
+    flex-wrap: wrap;
+}
+
+.govuk-overlay-type-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 16px;
+    background: var(--color-white);
+    border: 2px solid var(--color-govuk-grey);
+    color: var(--color-govuk-black);
+    font-size: 16px;
+    font-weight: 400;
+    cursor: pointer;
+    transition: all 0.15s;
+}
+
+.govuk-overlay-type-pill:hover {
+    border-color: var(--color-govuk-black);
+}
+
+.govuk-overlay-type-pill:focus {
+    outline: 3px solid var(--color-govuk-yellow);
+    outline-offset: 0;
+    background-color: var(--color-govuk-yellow);
+    color: var(--color-govuk-black);
+}
+
+.govuk-overlay-type-pill.active {
+    background: var(--color-govuk-blue-light);
+    border-color: var(--color-govuk-blue-light);
+    color: var(--color-white);
+}
+
+.govuk-overlay-admin-badge {
+    background: var(--color-govuk-purple, #912b88);
+    color: var(--color-white);
+    padding: 2px 6px;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+/* Overlay Content Area */
+.govuk-overlay-content {
+    padding: 20px;
+}
+
+/* Overlay Footer */
+.govuk-overlay-footer {
+    padding: 20px;
+    background: var(--color-govuk-light-grey);
+    border-top: 1px solid var(--color-govuk-grey);
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    position: sticky;
+    bottom: 0;
+}
+
+/* Image Upload Area */
+.govuk-overlay-image-upload-area {
+    border: 3px dashed var(--color-govuk-grey);
+    padding: 40px 20px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.15s;
+    background: var(--color-govuk-light-grey);
+}
+
+.govuk-overlay-image-upload-area:hover {
+    border-color: var(--color-govuk-blue-light);
+    background: var(--color-white);
+}
+
+.govuk-overlay-image-upload-area:focus {
+    outline: 3px solid var(--color-govuk-yellow);
+    outline-offset: 0;
+}
+
+.govuk-overlay-image-upload-area i {
+    font-size: 48px;
+    color: var(--color-govuk-grey-dark);
+    margin-bottom: 12px;
+}
+
+/* Image Preview */
+.govuk-overlay-image-preview {
+    display: none;
+    position: relative;
+    margin-top: 12px;
+}
+
+.govuk-overlay-image-preview.show {
+    display: block;
+}
+
+.govuk-overlay-image-preview img {
+    width: 100%;
+    max-height: 200px;
+    object-fit: cover;
+    border: 1px solid var(--color-govuk-grey);
+}
+
+.govuk-overlay-image-preview .remove-btn {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    background: var(--color-govuk-red);
+    color: var(--color-white);
+    border: none;
+    width: 32px;
+    height: 32px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.govuk-overlay-image-preview .remove-btn:focus {
+    outline: 3px solid var(--color-govuk-yellow);
+    outline-offset: 0;
+}
+
+/* File Input Hidden */
+.govuk-file-input-hidden {
+    display: none;
+}
 
 /* ============================================
    RESET & BASE (scoped to body to avoid conflicts)
@@ -18,19 +492,19 @@ body * {
 
     /* Dark theme colors */
     --ed-bg: var(--color-slate-900);
-    --ed-surface: rgba(30, 41, 59, 0.95);
-    --ed-border: rgba(255, 255, 255, 0.1);
+    --ed-surface: var(--color-slate-800-alpha-95);
+    --ed-border: var(--color-white-alpha-10);
     --ed-text: var(--color-slate-100);
     --ed-text-secondary: var(--color-slate-300);
     --ed-text-muted: var(--color-slate-400);
     --ed-primary: var(--color-primary-500);
-    --ed-primary-light: rgba(99, 102, 241, 0.15);
+    --ed-primary-light: var(--color-indigo-alpha-15);
     --ed-success: var(--color-success);
-    --ed-success-light: rgba(16, 185, 129, 0.15);
+    --ed-success-light: var(--color-emerald-alpha-15);
     --ed-danger: var(--color-danger);
-    --ed-danger-light: rgba(239, 68, 68, 0.15);
+    --ed-danger-light: var(--color-red-alpha-15);
     --ed-pink: var(--color-pink-500);
-    --ed-pink-light: rgba(236, 72, 153, 0.15);
+    --ed-pink-light: var(--color-pink-alpha-15);
 }
 
 /* REMOVED: Global overflow:hidden was breaking page scroll on all pages
@@ -117,7 +591,7 @@ body * {
     width: 36px;
     height: 36px;
     border-radius: var(--radius-full);
-    background: rgba(255, 255, 255, 0.05);
+    background: var(--color-white-alpha-5);
     border: none;
     color: var(--ed-text-secondary);
     font-size: var(--font-size-xl);
@@ -129,7 +603,7 @@ body * {
 }
 
 .edit-close-btn:hover {
-    background: rgba(255, 255, 255, 0.1);
+    background: var(--color-white-alpha-10);
     color: var(--ed-text);
 }
 
@@ -187,7 +661,7 @@ body * {
 }
 
 .edit-pill:hover {
-    background: rgba(255, 255, 255, 0.05);
+    background: var(--color-white-alpha-5);
     border-color: var(--ed-primary);
     color: var(--ed-text);
 }
@@ -257,7 +731,7 @@ body * {
     padding: var(--space-3) var(--space-4);
     border-radius: var(--radius-md);
     border: 2px solid var(--ed-border);
-    background: rgba(255, 255, 255, 0.03);
+    background: var(--color-white-alpha-3);
     color: var(--ed-text);
     font-size: var(--font-size-base);
     font-family: inherit;
@@ -267,7 +741,7 @@ body * {
 .ed-input:focus, .ed-textarea:focus, .ed-select:focus {
     outline: none;
     border-color: var(--ed-primary);
-    background: rgba(255, 255, 255, 0.05);
+    background: var(--color-white-alpha-5);
 }
 
 .ed-textarea {
@@ -290,7 +764,7 @@ body * {
     gap: var(--space-3);
     padding: var(--space-4);
     border-radius: var(--radius-md);
-    background: rgba(255, 255, 255, 0.03);
+    background: var(--color-white-alpha-3);
     margin-bottom: var(--space-6);
 }
 
@@ -330,7 +804,7 @@ body * {
     object-fit: cover;
     border-radius: var(--radius-md);
     margin-bottom: var(--space-3);
-    background: rgba(255, 255, 255, 0.03);
+    background: var(--color-white-alpha-3);
 }
 
 .ed-image-actions {
@@ -343,7 +817,7 @@ body * {
     padding: var(--space-3) var(--space-4);
     border-radius: var(--space-2);
     border: 2px solid var(--ed-border);
-    background: rgba(255, 255, 255, 0.03);
+    background: var(--color-white-alpha-3);
     color: var(--ed-text);
     font-weight: var(--font-weight-semibold);
     cursor: pointer;
@@ -355,7 +829,7 @@ body * {
 }
 
 .ed-upload-btn:hover, .ed-clear-btn:hover {
-    background: rgba(255, 255, 255, 0.08);
+    background: var(--color-white-alpha-8);
     border-color: var(--ed-primary);
 }
 
@@ -366,13 +840,13 @@ body * {
 .ed-clear-btn {
     flex: 0 0 auto;
     padding: var(--space-3) var(--space-5);
-    background: rgba(239, 68, 68, 0.1);
+    background: var(--color-red-alpha-10);
     border-color: var(--ed-danger);
     color: var(--ed-danger);
 }
 
 .ed-clear-btn:hover {
-    background: rgba(239, 68, 68, 0.2);
+    background: var(--color-red-alpha-20);
 }
 
 /* ============================================
@@ -398,7 +872,7 @@ body * {
 
 .ed-submit:hover {
     transform: translateY(-2px);
-    box-shadow: 0 8px 24px rgba(99, 102, 241, 0.4);
+    box-shadow: 0 8px 24px var(--color-indigo-alpha-40);
 }
 
 .ed-submit:active {
@@ -419,7 +893,7 @@ body * {
     padding: var(--space-3) var(--space-4) 14px 44px;
     border-radius: var(--radius-md);
     border: 2px solid var(--ed-border);
-    background: rgba(255, 255, 255, 0.03) url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="%2394a3b8" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>') no-repeat 14px center;
+    background: var(--color-white-alpha-3) url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="%2394a3b8" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>') no-repeat 14px center;
     color: var(--ed-text);
     font-size: var(--font-size-base);
     font-family: inherit;
@@ -429,7 +903,7 @@ body * {
 .invite-search:focus {
     outline: none;
     border-color: var(--ed-primary);
-    background-color: rgba(255, 255, 255, 0.05);
+    background-color: var(--color-white-alpha-5);
 }
 
 .user-list {
@@ -447,14 +921,14 @@ body * {
     gap: var(--space-3);
     padding: var(--space-3);
     border-radius: var(--radius-md);
-    background: rgba(255, 255, 255, 0.03);
+    background: var(--color-white-alpha-3);
     border: 2px solid transparent;
     cursor: pointer;
     transition: all var(--transition-fast);
 }
 
 .user-item:hover {
-    background: rgba(255, 255, 255, 0.06);
+    background: var(--color-white-alpha-6);
     border-color: var(--ed-border);
 }
 
@@ -504,8 +978,8 @@ body * {
 .add-directly-box {
     padding: var(--space-4);
     border-radius: var(--radius-md);
-    background: rgba(16, 185, 129, 0.1);
-    border: 2px solid rgba(16, 185, 129, 0.2);
+    background: var(--color-emerald-alpha-10);
+    border: 2px solid var(--color-emerald-alpha-20);
     margin-bottom: var(--space-6);
 }
 
@@ -553,7 +1027,7 @@ body * {
    ============================================ */
 @media (min-width: 768px) {
     .edit-backdrop {
-        background: rgba(0, 0, 0, 0.7);
+        background: var(--color-black-alpha-70);
         backdrop-filter: blur(8px);
         align-items: center;
         justify-content: center;
@@ -565,7 +1039,7 @@ body * {
         max-width: 700px;
         max-height: 90vh;
         border-radius: var(--space-5);
-        box-shadow: 0 var(--space-6) 70px rgba(0, 0, 0, 0.5);
+        box-shadow: 0 var(--space-6) 70px var(--color-black-alpha-50);
         overflow: hidden;
     }
 

@@ -57,12 +57,12 @@
 
 /* Light ripple (for dark backgrounds) */
 .ripple-effect.ripple-light {
-    background: rgba(255, 255, 255, 0.35);
+    background: var(--color-white-alpha-35);
 }
 
 /* Dark ripple (for light backgrounds) */
 .ripple-effect.ripple-dark {
-    background: rgba(0, 0, 0, 0.12);
+    background: var(--color-black-alpha-12);
 }
 
 /* Primary color ripple */
@@ -122,7 +122,7 @@
 .btn-primary .ripple-effect,
 .glass-btn-primary .ripple-effect,
 .nexus-smart-btn-primary .ripple-effect {
-    background: rgba(255, 255, 255, 0.35);
+    background: var(--color-white-alpha-35);
 }
 
 /* Secondary/outline buttons - primary color ripple */
@@ -135,12 +135,12 @@
 
 /* Danger buttons */
 .btn-danger .ripple-effect {
-    background: rgba(255, 255, 255, 0.35);
+    background: var(--color-white-alpha-35);
 }
 
 /* Success buttons */
 .btn-success .ripple-effect {
-    background: rgba(255, 255, 255, 0.35);
+    background: var(--color-white-alpha-35);
 }
 
 /* Ghost/text buttons */
@@ -153,7 +153,7 @@
    DARK MODE ADJUSTMENTS
    ============================================== */
 [data-theme="dark"] .ripple-effect.ripple-dark {
-    background: rgba(255, 255, 255, 0.15);
+    background: var(--color-white-alpha-15);
 }
 
 [data-theme="dark"] .btn-secondary .ripple-effect,
@@ -165,7 +165,7 @@
 
 [data-theme="dark"] .nav-link .ripple-effect,
 [data-theme="dark"] .dropdown-item .ripple-effect {
-    background: rgba(255, 255, 255, 0.1);
+    background: var(--color-white-alpha-10);
 }
 
 /* ==============================================
@@ -207,12 +207,12 @@ a.glass-card .ripple-effect {
 .list-item .ripple-effect,
 .dropdown-item .ripple-effect,
 .menu-item .ripple-effect {
-    background: rgba(0, 0, 0, 0.08);
+    background: var(--color-black-alpha-8);
 }
 
 [data-theme="dark"] .list-item .ripple-effect,
 [data-theme="dark"] .menu-item .ripple-effect {
-    background: rgba(255, 255, 255, 0.08);
+    background: var(--color-white-alpha-8);
 }
 
 /* ==============================================
@@ -277,7 +277,7 @@ a.glass-card .ripple-effect {
    FLOATING ACTION BUTTON
    ============================================== */
 .fab .ripple-effect {
-    background: rgba(255, 255, 255, 0.3);
+    background: var(--color-white-alpha-30);
 }
 
 /* ==============================================

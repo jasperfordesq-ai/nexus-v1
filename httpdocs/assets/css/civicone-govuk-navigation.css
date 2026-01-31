@@ -472,9 +472,9 @@
     z-index: 100;
     min-width: 200px;
     max-width: 300px;
-    background: #ffffff;
-    border: 1px solid #b1b4b6;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+    background: var(--color-white);
+    border: 1px solid var(--color-govuk-grey);
+    box-shadow: 0 2px 6px var(--color-black-alpha-16);
     display: none;
 }
 
@@ -493,7 +493,7 @@
 .govuk-service-navigation__dropdown-item {
     margin: 0;
     padding: 0;
-    border-bottom: 1px solid #f3f2f1;
+    border-bottom: 1px solid var(--color-govuk-light-grey);
 }
 
 .govuk-service-navigation__dropdown-item:last-child {
@@ -503,26 +503,26 @@
 .govuk-service-navigation__dropdown-link {
     display: block;
     padding: 10px 15px;
-    color: #0b0c0c;
+    color: var(--color-govuk-black);
     text-decoration: none;
 }
 
 .govuk-service-navigation__dropdown-link:hover {
-    background-color: #f3f2f1;
+    background-color: var(--color-govuk-light-grey);
     text-decoration: underline;
 }
 
 .govuk-service-navigation__dropdown-link:focus {
     outline: 3px solid transparent;
-    color: #0b0c0c;
-    background-color: #ffdd00;
-    box-shadow: 0 -2px #ffdd00, 0 4px #0b0c0c;
+    color: var(--color-govuk-black);
+    background-color: var(--color-govuk-yellow);
+    box-shadow: 0 -2px var(--color-govuk-yellow), 0 4px var(--color-govuk-black);
     text-decoration: none;
 }
 
 .govuk-service-navigation__dropdown-link[aria-current="page"] {
     font-weight: 700;
-    background-color: #f3f2f1;
+    background-color: var(--color-govuk-light-grey);
 }
 
 /* Position the dropdown container relatively */

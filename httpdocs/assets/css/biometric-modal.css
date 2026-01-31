@@ -9,7 +9,7 @@
     position: fixed;
     inset: 0;
     z-index: 10001;
-    background: rgba(0, 0, 0, 0.6);
+    background: var(--color-black-alpha-60);
     backdrop-filter: blur(var(--space-1));
     -webkit-backdrop-filter: blur(var(--space-1));
 }
@@ -35,7 +35,7 @@
 .biometric-modal-handle {
     width: var(--space-10);
     height: var(--space-1);
-    background: rgba(255, 255, 255, 0.2);
+    background: var(--color-white-alpha-20);
     border-radius: var(--radius-sm);
     margin: 0 auto var(--space-5);
 }

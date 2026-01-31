@@ -51,7 +51,7 @@
     /* Focus - High visibility */
     --civic-focus: var(--color-amber-300);
     /* Warm yellow */
-    --civic-focus-ring: 0 0 0 3px rgba(251, 191, 36, 0.5);
+    --civic-focus-ring: 0 0 0 3px var(--color-amber-alpha-50);
 
     /* Spacing */
     --civic-pad: var(--space-6);
@@ -72,9 +72,9 @@
     --civic-success-bg: var(--color-emerald-50);
 
     /* Shadows - Soft depth */
-    --civic-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
-    --civic-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-    --civic-shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    --civic-shadow-sm: 0 1px 2px var(--color-black-alpha-5);
+    --civic-shadow: 0 4px 6px -1px var(--color-black-alpha-10), 0 2px 4px -1px var(--color-black-alpha-6);
+    --civic-shadow-lg: 0 10px 15px -3px var(--color-black-alpha-10), 0 4px 6px -2px var(--color-black-alpha-5);
 }
 
 /* Dark Mode Overrides */
@@ -115,9 +115,9 @@ body.dark-mode {
     --civic-success-bg: #064E3B;
 
     /* Shadows - more subtle in dark mode */
-    --civic-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
-    --civic-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.4);
-    --civic-shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
+    --civic-shadow-sm: 0 1px 2px var(--color-black-alpha-30);
+    --civic-shadow: 0 4px 6px -1px var(--color-black-alpha-40);
+    --civic-shadow-lg: 0 10px 15px -3px var(--color-black-alpha-50);
 }
 
 body {
@@ -376,7 +376,7 @@ a:focus {
     background: var(--civic-bg-card);
     padding: var(--civic-pad);
     border: 1px solid var(--civic-border);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+    box-shadow: 0 4px 12px var(--color-black-alpha-6);
     border-radius: var(--radius-base);
     margin-bottom: var(--space-5);
 }
@@ -535,7 +535,7 @@ a:focus {
     border-bottom: 4px solid var(--civic-brand);
     padding: var(--space-4) 0 84px 0;
     margin-bottom: 0;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    box-shadow: 0 4px 12px var(--color-black-alpha-8);
 }
 
 .civic-nav {
@@ -1208,7 +1208,7 @@ a:focus {
 .civic-search-input:focus {
     border-color: var(--civic-brand);
     outline: none;
-    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+    box-shadow: 0 0 0 3px var(--color-blue-600-alpha-10);
 }
 
 .civic-search-icon {
@@ -1237,7 +1237,7 @@ a:focus {
 .civic-filter-select:focus {
     border-color: var(--civic-brand);
     outline: none;
-    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+    box-shadow: 0 0 0 3px var(--color-blue-600-alpha-10);
 }
 
 /* Filter pills/tabs */
@@ -1455,7 +1455,7 @@ body.skin-torfaen .civic-filter-tab.active:hover {
 a:focus-visible {
     outline: 3px solid var(--civic-focus, var(--color-amber-300));
     outline-offset: 2px;
-    background-color: rgba(251, 191, 36, 0.1);
+    background-color: var(--color-amber-alpha-10);
     border-radius: var(--radius-sm);
 }
 
@@ -1464,7 +1464,7 @@ a:focus-visible {
 button:focus-visible {
     outline: 3px solid var(--civic-focus, var(--color-amber-300));
     outline-offset: 2px;
-    box-shadow: 0 0 0 6px rgba(251, 191, 36, 0.3);
+    box-shadow: 0 0 0 6px var(--color-amber-alpha-30);
 }
 
 /* Form inputs - clear focus state */
@@ -1475,7 +1475,7 @@ select:focus-visible,
     outline: 3px solid var(--civic-focus, var(--color-amber-300));
     outline-offset: 0;
     border-color: var(--civic-brand, var(--color-blue-600));
-    box-shadow: 0 0 0 4px rgba(251, 191, 36, 0.2);
+    box-shadow: 0 0 0 4px var(--color-amber-alpha-20);
 }
 
 /* Checkboxes and radios */
@@ -1496,7 +1496,7 @@ input[type="radio"]:focus-visible {
 .civic-dropdown-trigger:focus-visible {
     outline: 3px solid var(--civic-focus, var(--color-amber-300));
     outline-offset: 2px;
-    background-color: rgba(251, 191, 36, 0.15);
+    background-color: var(--color-amber-alpha-15);
     border-radius: var(--radius-sm);
 }
 
@@ -1504,7 +1504,7 @@ input[type="radio"]:focus-visible {
 .civic-footer a:focus-visible {
     outline: 2px solid var(--color-white);
     outline-offset: 2px;
-    background-color: rgba(255, 255, 255, 0.1);
+    background-color: var(--color-white-alpha-10);
     border-radius: var(--radius-sm);
 }
 
@@ -1512,7 +1512,7 @@ input[type="radio"]:focus-visible {
 .civic-footer-social a:focus-visible {
     outline: 3px solid var(--color-white);
     outline-offset: 2px;
-    background-color: rgba(255, 255, 255, 0.3);
+    background-color: var(--color-white-alpha-30);
 }
 
 /* Breadcrumb links */
@@ -1553,7 +1553,7 @@ body.dark-mode :focus-visible {
 }
 
 body.dark-mode a:focus-visible {
-    background-color: rgba(251, 191, 36, 0.2);
+    background-color: var(--color-amber-alpha-20);
 }
 
 body.dark-mode .civic-dropdown-content a:focus-visible {
@@ -1574,7 +1574,7 @@ body.dark-mode .civic-dropdown-content a:focus-visible {
     font-size: var(--font-size-lg);
     text-decoration: none;
     border-radius: var(--radius-sm);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 4px 12px var(--color-black-alpha-30);
 }
 
 /* ===========================================

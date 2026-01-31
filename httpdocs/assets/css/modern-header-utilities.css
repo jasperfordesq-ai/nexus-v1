@@ -163,7 +163,7 @@
     background: var(--color-danger);
     border-radius: var(--radius-full);
     border: 2px solid var(--header-bg, var(--color-indigo-950));
-    box-shadow: 0 0 0 1px rgba(239, 68, 68, 0.3);
+    box-shadow: 0 0 0 1px var(--color-red-alpha-30);
 }
 
 /* User dropdown */
@@ -256,7 +256,7 @@
 
 /* Explore menu highlight */
 .menu-item--highlighted {
-    background: rgba(99, 102, 241, 0.1);
+    background: var(--color-indigo-alpha-10);
 }
 
 /* Collapsible search */

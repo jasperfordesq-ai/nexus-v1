@@ -140,29 +140,29 @@
   text-decoration: underline;
   text-decoration-thickness: max(1px, 0.0625rem); /* GOV.UK official */
   text-underline-offset: 0.1578em; /* GOV.UK official */
-  color: #1d70b8; /* govuk-functional-colour(link) = blue primary */
+  color: var(--color-govuk-blue-light); /* GOV.UK link = #1d70b8 */
 }
 
 .govuk-link:visited {
-  color: #54319f; /* govuk-functional-colour(link-visited) = purple primary */
+  color: var(--color-govuk-link-visited); /* GOV.UK visited = #4c2c92 */
 }
 
 .govuk-link:hover {
-  color: #0f385c; /* govuk-functional-colour(link-hover) = blue shade-50 */
+  color: var(--color-govuk-blue); /* GOV.UK hover = #003078 (CORRECTED from #0f385c) */
   text-decoration-thickness: max(3px, 0.1875rem, 0.12em); /* GOV.UK official */
   text-decoration-skip-ink: none; /* GOV.UK official - Chromium, Firefox */
   text-decoration-skip: none; /* GOV.UK official - Safari */
 }
 
 .govuk-link:active {
-  color: #0b0c0c; /* govuk-functional-colour(link-active) = black */
+  color: var(--color-govuk-black); /* GOV.UK active = #0b0c0c */
 }
 
 .govuk-link:focus {
   outline: 3px solid transparent;
-  color: #0b0c0c; /* govuk-functional-colour(focus-text) = black */
-  background-color: #ffdd00; /* govuk-functional-colour(focus) = yellow */
-  box-shadow: 0 -2px #ffdd00, 0 4px #0b0c0c;
+  color: var(--color-govuk-black); /* GOV.UK focus text = #0b0c0c */
+  background-color: var(--color-govuk-yellow); /* GOV.UK focus = #ffdd00 */
+  box-shadow: 0 -2px var(--color-govuk-yellow), 0 4px var(--color-govuk-black);
   text-decoration: none;
 }
 
@@ -868,56 +868,56 @@
   text-decoration: none;
   overflow-wrap: break-word;
   /* Default is blue */
-  color: #0f385c; /* blue shade-50 - GOV.UK official */
-  background-color: #d2e2f1; /* blue tint-80 - GOV.UK official */
+  color: var(--color-govuk-tag-blue-text); /* blue shade-50 - GOV.UK official */
+  background-color: var(--color-govuk-tag-blue-bg); /* blue tint-80 - GOV.UK official */
   border: 1px solid currentcolor; /* GOV.UK official */
   border-radius: 1px; /* GOV.UK official */
 }
 
 /* Tag colour modifiers - GOV.UK official */
 .civicone--govuk .govuk-tag--green {
-  color: #09442d; /* green shade-50 */
-  background-color: #cfe7de; /* green tint-80 */
+  color: var(--color-govuk-tag-green-text); /* green shade-50 */
+  background-color: var(--color-govuk-tag-green-bg); /* green tint-80 */
 }
 
 .civicone--govuk .govuk-tag--red {
-  color: #651b1b; /* red shade-50 */
-  background-color: #f4d7d7; /* red tint-80 */
+  color: var(--color-govuk-tag-red-text); /* red shade-50 */
+  background-color: var(--color-govuk-tag-red-bg); /* red tint-80 */
 }
 
 .civicone--govuk .govuk-tag--yellow {
-  color: #806f00; /* yellow shade-50 */
-  background-color: #fff8cc; /* yellow tint-80 */
+  color: var(--color-govuk-tag-yellow-text); /* yellow shade-50 */
+  background-color: var(--color-govuk-tag-yellow-bg); /* yellow tint-80 */
 }
 
 .civicone--govuk .govuk-tag--grey {
-  color: #484949; /* black tint-25 */
-  background-color: #f3f3f3; /* black tint-95 */
+  color: var(--color-govuk-tag-grey-text); /* black tint-25 */
+  background-color: var(--color-govuk-tag-grey-bg); /* black tint-95 */
 }
 
 .civicone--govuk .govuk-tag--purple {
-  color: #2a1950; /* purple shade-50 */
-  background-color: #ddd6ec; /* purple tint-80 */
+  color: var(--color-govuk-tag-purple-text); /* purple shade-50 */
+  background-color: var(--color-govuk-tag-purple-bg); /* purple tint-80 */
 }
 
 .civicone--govuk .govuk-tag--orange {
-  color: #7a3c1c; /* orange shade-50 */
-  background-color: #fde4d7; /* orange tint-80 */
+  color: var(--color-govuk-tag-orange-text); /* orange shade-50 */
+  background-color: var(--color-govuk-tag-orange-bg); /* orange tint-80 */
 }
 
 .civicone--govuk .govuk-tag--teal {
-  color: #0b4144; /* teal shade-50 */
-  background-color: #d0e6e7; /* teal tint-80 */
+  color: var(--color-govuk-tag-teal-text); /* teal shade-50 */
+  background-color: var(--color-govuk-tag-teal-bg); /* teal tint-80 */
 }
 
 .civicone--govuk .govuk-tag--magenta {
-  color: #651b3e; /* magenta shade-50 */
-  background-color: #f4d7e5; /* magenta tint-80 */
+  color: var(--color-govuk-tag-magenta-text); /* magenta shade-50 */
+  background-color: var(--color-govuk-tag-magenta-bg); /* magenta tint-80 */
 }
 
 .civicone--govuk .govuk-tag--light-blue {
-  color: #0f385c; /* blue shade-50 */
-  background-color: #f4f8fb; /* blue tint-95 */
+  color: var(--color-govuk-tag-blue-text); /* blue shade-50 */
+  background-color: var(--color-govuk-tag-light-blue-bg); /* blue tint-95 */
 }
 
 /* ==========================================
@@ -963,7 +963,7 @@
 .civicone--govuk .govuk-phase-banner {
   padding-top: 10px; /* govuk-spacing(2) */
   padding-bottom: 10px; /* govuk-spacing(2) */
-  border-bottom: 1px solid #cecece; /* govuk-functional-colour(border) = black tint-80 */
+  border-bottom: 1px solid var(--color-govuk-border); /* govuk-functional-colour(border) = black tint-80 */
 }
 
 .civicone--govuk .govuk-phase-banner__content {
@@ -971,7 +971,7 @@
   font-family: var(--font-family-primary);
   font-size: 1rem; /* 16px - GOV.UK official (stays 16px at ALL sizes) */
   line-height: 1.25; /* 20px / 16px = 1.25 - GOV.UK official */
-  color: #0b0c0c; /* govuk-text-colour */
+  color: var(--color-govuk-black); /* govuk-text-colour */
   margin: 0;
 }
 /* NOTE: Phase banner font size stays at 16px at all breakpoints per GOV.UK spec */
@@ -1652,9 +1652,9 @@
 
 /* Element that receives focus from skip link - GR-007 compliant */
 .civicone--govuk .govuk-skip-link-focused-element:focus {
-  outline: 3px solid var(--civicone-focus, #ffdd00);
+  outline: 3px solid var(--civicone-focus, var(--color-govuk-yellow));
   outline-offset: 0;
-  box-shadow: inset 0 0 0 4px var(--civicone-focus-text, #0b0c0c);
+  box-shadow: inset 0 0 0 4px var(--civicone-focus-text, var(--color-govuk-black));
 }
 
 /* ========================================
@@ -2383,8 +2383,24 @@
 
 /* Tag variants for task list - see main tag section above for full modifiers */
 .civicone--govuk .govuk-tag--blue {
-  color: #0f385c; /* blue shade-50 - GOV.UK official */
-  background-color: #d2e2f1; /* blue tint-80 - GOV.UK official */
+  color: var(--color-govuk-tag-blue-text); /* blue shade-50 - GOV.UK official */
+  background-color: var(--color-govuk-tag-blue-bg); /* blue tint-80 - GOV.UK official */
+}
+
+/* Organization role tags - GOV.UK compliant solid background */
+.govuk-tag--role-owner {
+  background-color: #f47738; /* GOV.UK orange */
+  color: var(--color-white);
+}
+
+.govuk-tag--role-admin {
+  background-color: #912b88; /* GOV.UK pink/magenta */
+  color: var(--color-white);
+}
+
+.govuk-tag--role-member {
+  background-color: var(--color-govuk-blue-light);
+  color: var(--color-white);
 }
 
 /* ==========================================

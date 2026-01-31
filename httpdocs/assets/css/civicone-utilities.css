@@ -839,7 +839,7 @@
     list-style: none;
     background: #ffffff;
     border: 1px solid #b1b4b6;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+    box-shadow: 0 2px 6px var(--color-black-alpha-15);
 }
 
 .civicone-utility-dropdown--right {
@@ -886,7 +886,7 @@
     position: fixed;
     inset: 0;
     z-index: 998;
-    background: rgba(0, 0, 0, 0.5);
+    background: var(--color-black-alpha-50);
 }
 
 .civicone-drawer {
@@ -898,7 +898,7 @@
     width: 100%;
     max-width: 400px;
     background: #ffffff;
-    box-shadow: -2px 0 10px rgba(0, 0, 0, 0.2);
+    box-shadow: -2px 0 10px var(--color-black-alpha-20);
     display: flex;
     flex-direction: column;
 }
@@ -1946,7 +1946,7 @@
     display: none;
     position: fixed;
     inset: 0;
-    background: rgba(0, 0, 0, 0.5);
+    background: var(--color-black-alpha-50);
     z-index: 1000;
 }
 
@@ -2433,7 +2433,7 @@
 .civicone-pay-modal-overlay {
     position: absolute;
     inset: 0;
-    background: rgba(0, 0, 0, 0.5);
+    background: var(--color-black-alpha-50);
 }
 
 .civicone-pay-modal-content {
@@ -3703,7 +3703,7 @@
 .civicone-modal-backdrop {
     position: absolute;
     inset: 0;
-    background: rgba(0, 0, 0, 0.5);
+    background: var(--color-black-alpha-50);
 }
 
 /* Modal dialog */
@@ -4774,7 +4774,7 @@
 
 /* Chat bubble metadata text */
 .civicone-chat-meta-me {
-    color: rgba(255, 255, 255, 0.8);
+    color: var(--color-white-alpha-80);
 }
 
 .civicone-chat-meta-them {
@@ -5043,7 +5043,7 @@
     padding: 1rem;
     border: 1px solid #b1b4b6;
     border-radius: 4px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    box-shadow: 0 2px 8px var(--color-black-alpha-15);
     min-width: 160px;
 }
 
@@ -5055,4 +5055,260 @@
 .civicone-hint-inline {
     display: inline;
     font-size: 1rem;
+}
+
+/* ==========================================
+   GOV.UK ICON COLOR UTILITIES
+   Replaces inline style="color: #xxx" attributes
+   Source: https://design-system.service.gov.uk/styles/colour/
+   ========================================== */
+
+.civicone-icon-green {
+    color: var(--color-govuk-green);
+}
+
+.civicone-icon-blue {
+    color: var(--color-govuk-blue-light);
+}
+
+.civicone-icon-orange {
+    color: var(--color-govuk-orange, #f47738);
+}
+
+.civicone-icon-red {
+    color: var(--color-govuk-red);
+}
+
+.civicone-icon-purple {
+    color: var(--color-govuk-link-visited);
+}
+
+.civicone-icon-grey {
+    color: var(--color-govuk-dark-grey);
+}
+
+/* ==========================================
+   GOV.UK HEADING COLOR UTILITIES
+   ========================================== */
+
+.civicone-heading-green {
+    color: var(--color-govuk-green);
+}
+
+.civicone-heading-blue {
+    color: var(--color-govuk-blue-light);
+}
+
+.civicone-heading-orange {
+    color: var(--color-govuk-orange, #f47738);
+}
+
+/* ==========================================
+   GOV.UK PANEL BORDER UTILITIES
+   Replaces inline border-left styles
+   ========================================== */
+
+.civicone-border-left-green {
+    border-left: 5px solid var(--color-govuk-green);
+}
+
+.civicone-border-left-blue {
+    border-left: 5px solid var(--color-govuk-blue-light);
+}
+
+.civicone-border-left-orange {
+    border-left: 5px solid var(--color-govuk-orange, #f47738);
+}
+
+.civicone-border-left-red {
+    border-left: 5px solid var(--color-govuk-red);
+}
+
+.civicone-border-left-grey {
+    border-left: 5px solid var(--color-govuk-grey);
+}
+
+/* ==========================================
+   GOV.UK SECTION CARD COMPONENTS
+   ========================================== */
+
+.civicone-section-card {
+    border: 1px solid var(--color-govuk-grey);
+    background: var(--color-white);
+}
+
+.civicone-section-card-header {
+    border-bottom: 1px solid var(--color-govuk-grey);
+}
+
+/* ==========================================
+   CERTIFICATE PRINT STYLES
+   GOV.UK compliant certificate formatting
+   ========================================== */
+
+.civicone-certificate-content {
+    text-align: center;
+}
+
+.civicone-certificate-subtitle {
+    color: var(--color-govuk-dark-grey);
+    text-transform: uppercase;
+    letter-spacing: 3px;
+    text-align: center;
+}
+
+.civicone-certificate-heading {
+    color: var(--color-govuk-blue-light);
+    text-align: center;
+}
+
+.civicone-certificate-name {
+    border-bottom: 2px solid var(--color-govuk-blue-light);
+    display: inline-block;
+    width: 100%;
+    padding-bottom: var(--space-2);
+    text-align: center;
+}
+
+.civicone-certificate-hours {
+    display: inline;
+}
+
+.civicone-certificate-signature {
+    text-align: center;
+    border-top: 1px solid var(--color-govuk-black);
+    padding-top: var(--space-2);
+}
+
+/* Print-only certificate wrapper */
+@media print {
+    .civicone-certificate-print-only {
+        display: block !important;
+    }
+
+    .civicone-certificate-print-only .civicone-certificate-subtitle {
+        color: #505a5f;
+    }
+
+    .civicone-certificate-print-only .civicone-certificate-heading {
+        color: #1d70b8;
+        margin-bottom: 30px;
+    }
+
+    .civicone-certificate-print-only .civicone-certificate-name {
+        font-size: 24px;
+        font-weight: bold;
+        border-bottom: 2px solid #1d70b8;
+        padding-bottom: 10px;
+        margin: 20px 0;
+    }
+
+    .civicone-certificate-print-only .civicone-certificate-hours {
+        font-size: 36px;
+        font-weight: bold;
+        color: #00703c;
+        margin: 30px 0;
+    }
+
+    .civicone-certificate-print-only .civicone-certificate-signatures {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 60px;
+        padding-top: 20px;
+    }
+
+    .civicone-certificate-print-only .civicone-certificate-signature {
+        text-align: center;
+        width: 45%;
+        border-top: 1px solid #000;
+        padding-top: 10px;
+    }
+}
+
+@media screen {
+    .civicone-certificate-print-only {
+        display: none;
+    }
+}
+
+/* ==========================================
+   AUDIT LOG ICON COLORS
+   Dynamic icon colors for action types
+   ========================================== */
+
+.civicone-audit-icon--settings {
+    color: var(--color-govuk-dark-grey);
+}
+
+.civicone-audit-icon--member {
+    color: var(--color-govuk-blue-light);
+}
+
+.civicone-audit-icon--ownership {
+    color: var(--color-govuk-orange, #f47738);
+}
+
+.civicone-audit-icon--bulk {
+    color: #912b88; /* GOV.UK purple */
+}
+
+/* ==========================================
+   FEDERATION OFFLINE PAGE UTILITIES
+   ========================================== */
+
+.civicone-offline-panel {
+    background: var(--color-white);
+    border-left: 5px solid var(--color-govuk-green);
+    text-align: left;
+}
+
+.civicone-button-group-center {
+    justify-content: center;
+}
+
+/* ==========================================
+   EXTERNAL TAG STYLES
+   ========================================== */
+
+.civicone-tag-external {
+    margin-left: var(--space-1);
+    font-size: 0.75em;
+}
+
+/* ==========================================
+   OFFLINE BANNER
+   ========================================== */
+
+.civicone-offline-banner {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+    background: var(--color-govuk-red);
+    color: var(--color-white);
+    padding: var(--space-3);
+    text-align: center;
+}
+
+/* ==========================================
+   MATCH CARD BORDERS
+   Dynamic border based on match score
+   ========================================== */
+
+.civicone-match-card {
+    border: 1px solid var(--color-govuk-grey);
+    padding: var(--space-4);
+}
+
+.civicone-match-card--high {
+    border-left: 5px solid var(--color-govuk-green);
+}
+
+.civicone-match-card--medium {
+    border-left: 5px solid var(--color-govuk-blue-light);
+}
+
+.civicone-match-card--low {
+    border-left: 5px solid var(--color-govuk-grey);
 }

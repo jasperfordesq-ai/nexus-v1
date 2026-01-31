@@ -11,7 +11,7 @@
     left: 0;
     right: 0;
     bottom: 0;
-    background: rgba(0, 0, 0, 0.6);
+    background: var(--color-black-alpha-60);
     backdrop-filter: blur(var(--glass-blur-subtle));
     -webkit-backdrop-filter: blur(var(--glass-blur-subtle));
     z-index: 9998;
@@ -24,7 +24,7 @@
 }
 
 [data-theme="dark"] .modal-overlay {
-    background: rgba(0, 0, 0, 0.8);
+    background: var(--color-black-alpha-80);
 }
 
 @keyframes modalFadeIn {
@@ -56,7 +56,7 @@
 .modal {
     background: white;
     border-radius: var(--radius-xl);
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 20px 60px var(--color-black-alpha-30);
     max-width: 500px;
     width: 100%;
     max-height: 90vh;
@@ -70,7 +70,7 @@
 
 [data-theme="dark"] .modal {
     background: var(--color-slate-800);
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
+    box-shadow: 0 20px 60px var(--color-black-alpha-60);
 }
 
 @keyframes modalSlideUp {
@@ -120,17 +120,17 @@
 
 .modal-header {
     padding: var(--space-5) var(--space-6);
-    border-bottom: 1px solid rgba(229, 231, 235, 0.8);
+    border-bottom: 1px solid var(--color-gray-200-alpha-80);
     display: flex;
     align-items: center;
     justify-content: space-between;
     flex-shrink: 0;
-    background: linear-gradient(135deg, rgba(99, 102, 241, 0.05) 0%, transparent 100%);
+    background: linear-gradient(135deg, var(--color-indigo-alpha-5) 0%, transparent 100%);
 }
 
 [data-theme="dark"] .modal-header {
-    border-bottom-color: rgba(255, 255, 255, 0.1);
-    background: linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, transparent 100%);
+    border-bottom-color: var(--color-white-alpha-10);
+    background: linear-gradient(135deg, var(--color-indigo-alpha-10) 0%, transparent 100%);
 }
 
 .modal-title {
@@ -149,7 +149,7 @@
     height: 36px;
     border-radius: var(--radius-full);
     border: none;
-    background: rgba(107, 114, 128, 0.1);
+    background: var(--color-gray-alpha-10);
     color: var(--color-gray-500);
     cursor: pointer;
     display: flex;
@@ -160,7 +160,7 @@
 }
 
 .modal-close:hover {
-    background: rgba(107, 114, 128, 0.2);
+    background: var(--color-gray-alpha-20);
     transform: rotate(90deg);
 }
 
@@ -169,12 +169,12 @@
 }
 
 [data-theme="dark"] .modal-close {
-    background: rgba(148, 163, 184, 0.1);
+    background: var(--color-slate-400-alpha-10);
     color: var(--color-slate-400);
 }
 
 [data-theme="dark"] .modal-close:hover {
-    background: rgba(148, 163, 184, 0.2);
+    background: var(--color-slate-400-alpha-20);
 }
 
 /* ========================================
@@ -193,29 +193,29 @@
 }
 
 .modal-body::-webkit-scrollbar-track {
-    background: rgba(0, 0, 0, 0.05);
+    background: var(--color-black-alpha-5);
     border-radius: var(--radius-sm);
 }
 
 .modal-body::-webkit-scrollbar-thumb {
-    background: rgba(0, 0, 0, 0.2);
+    background: var(--color-black-alpha-20);
     border-radius: var(--radius-sm);
 }
 
 .modal-body::-webkit-scrollbar-thumb:hover {
-    background: rgba(0, 0, 0, 0.3);
+    background: var(--color-black-alpha-30);
 }
 
 [data-theme="dark"] .modal-body::-webkit-scrollbar-track {
-    background: rgba(255, 255, 255, 0.05);
+    background: var(--color-white-alpha-5);
 }
 
 [data-theme="dark"] .modal-body::-webkit-scrollbar-thumb {
-    background: rgba(255, 255, 255, 0.2);
+    background: var(--color-white-alpha-20);
 }
 
 [data-theme="dark"] .modal-body::-webkit-scrollbar-thumb:hover {
-    background: rgba(255, 255, 255, 0.3);
+    background: var(--color-white-alpha-30);
 }
 
 /* ========================================
@@ -224,7 +224,7 @@
 
 .modal-footer {
     padding: var(--space-4) var(--space-6);
-    border-top: 1px solid rgba(229, 231, 235, 0.8);
+    border-top: 1px solid var(--color-gray-200-alpha-80);
     display: flex;
     gap: var(--space-3);
     justify-content: flex-end;
@@ -232,7 +232,7 @@
 }
 
 [data-theme="dark"] .modal-footer {
-    border-top-color: rgba(255, 255, 255, 0.1);
+    border-top-color: var(--color-white-alpha-10);
 }
 
 /* ========================================
@@ -245,7 +245,7 @@
     left: 0;
     right: 0;
     bottom: 0;
-    background: rgba(0, 0, 0, 0.6);
+    background: var(--color-black-alpha-60);
     backdrop-filter: blur(var(--glass-blur-subtle));
     -webkit-backdrop-filter: blur(var(--glass-blur-subtle));
     z-index: 9998;
@@ -254,7 +254,7 @@
 }
 
 [data-theme="dark"] .drawer-overlay {
-    background: rgba(0, 0, 0, 0.8);
+    background: var(--color-black-alpha-80);
 }
 
 .drawer {
@@ -265,7 +265,7 @@
     width: 400px;
     max-width: 90vw;
     background: white;
-    box-shadow: -4px 0 24px rgba(0, 0, 0, 0.2);
+    box-shadow: -4px 0 24px var(--color-black-alpha-20);
     z-index: 9999;
     display: flex;
     flex-direction: column;
@@ -274,7 +274,7 @@
 
 [data-theme="dark"] .drawer {
     background: var(--color-slate-800);
-    box-shadow: -4px 0 24px rgba(0, 0, 0, 0.6);
+    box-shadow: -4px 0 24px var(--color-black-alpha-60);
 }
 
 @keyframes drawerSlideIn {
@@ -304,11 +304,11 @@
     left: 0;
     right: auto;
     animation: drawerSlideInLeft 0.3s var(--ease-in-out);
-    box-shadow: 4px 0 24px rgba(0, 0, 0, 0.2);
+    box-shadow: 4px 0 24px var(--color-black-alpha-20);
 }
 
 [data-theme="dark"] .drawer.left {
-    box-shadow: 4px 0 24px rgba(0, 0, 0, 0.6);
+    box-shadow: 4px 0 24px var(--color-black-alpha-60);
 }
 
 @keyframes drawerSlideInLeft {
@@ -343,7 +343,7 @@
     left: 0;
     right: 0;
     bottom: 0;
-    background: rgba(0, 0, 0, 0.6);
+    background: var(--color-black-alpha-60);
     backdrop-filter: blur(var(--glass-blur-subtle));
     -webkit-backdrop-filter: blur(var(--glass-blur-subtle));
     z-index: 9998;
@@ -359,7 +359,7 @@
     max-height: 80vh;
     background: white;
     border-radius: var(--radius-2xl) var(--radius-2xl) 0 0;
-    box-shadow: 0 -4px 24px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 -4px 24px var(--color-black-alpha-20);
     z-index: 9999;
     display: flex;
     flex-direction: column;
@@ -368,7 +368,7 @@
 
 [data-theme="dark"] .bottom-sheet {
     background: var(--color-slate-800);
-    box-shadow: 0 -4px 24px rgba(0, 0, 0, 0.6);
+    box-shadow: 0 -4px 24px var(--color-black-alpha-60);
 }
 
 @keyframes sheetSlideUp {
@@ -397,14 +397,14 @@
 .bottom-sheet-handle {
     width: 40px;
     height: 4px;
-    background: rgba(107, 114, 128, 0.3);
+    background: var(--color-gray-alpha-30);
     border-radius: var(--radius-sm);
     margin: 12px auto 8px;
     flex-shrink: 0;
 }
 
 [data-theme="dark"] .bottom-sheet-handle {
-    background: rgba(148, 163, 184, 0.3);
+    background: var(--color-slate-400-alpha-30);
 }
 
 /* ========================================

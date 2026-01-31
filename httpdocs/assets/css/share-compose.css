@@ -17,17 +17,17 @@
 :root {
     /* Share compose specific tokens */
     --sc-bg: var(--color-gray-100, var(--color-gray-100));
-    --sc-surface: rgba(255, 255, 255, 0.95);
+    --sc-surface: var(--color-white-alpha-95);
     --sc-surface-solid: var(--color-white);
-    --sc-border: rgba(0, 0, 0, 0.06);
-    --sc-border-strong: rgba(0, 0, 0, 0.1);
+    --sc-border: var(--color-black-alpha-6);
+    --sc-border-strong: var(--color-black-alpha-10);
     --sc-text: var(--color-gray-900, var(--color-gray-900));
     --sc-text-secondary: var(--color-gray-600, var(--color-gray-600));
     --sc-text-muted: var(--color-gray-400, var(--color-gray-400));
     --sc-primary: var(--color-primary-500, var(--color-primary-500));
-    --sc-primary-light: rgba(99, 102, 241, 0.1);
+    --sc-primary-light: var(--color-indigo-alpha-10);
     --sc-success: var(--color-success, var(--color-success));
-    --sc-success-light: rgba(16, 185, 129, 0.1);
+    --sc-success-light: var(--color-emerald-alpha-10);
 
     /* Native spring animations */
     --spring-bounce: cubic-bezier(0.175, 0.885, 0.32, 1.275);
@@ -47,10 +47,10 @@
 /* Dark theme tokens */
 [data-theme="dark"] {
     --sc-bg: var(--color-slate-900);
-    --sc-surface: rgba(30, 41, 59, 0.95);
+    --sc-surface: var(--color-slate-alpha-95);
     --sc-surface-solid: var(--color-slate-800);
-    --sc-border: rgba(255, 255, 255, 0.06);
-    --sc-border-strong: rgba(255, 255, 255, 0.1);
+    --sc-border: var(--color-white-alpha-6);
+    --sc-border-strong: var(--color-white-alpha-10);
     --sc-text: var(--color-slate-100);
     --sc-text-secondary: var(--color-slate-400);
     --sc-text-muted: var(--color-slate-500);
@@ -122,7 +122,7 @@
     padding: var(--space-4);
     margin-bottom: var(--space-6);
     border: var(--border-width) solid var(--sc-border-strong);
-    box-shadow: 0 var(--space-1) var(--space-3) rgba(0, 0, 0, 0.05);
+    box-shadow: 0 var(--space-1) var(--space-3) var(--color-black-alpha-5);
     animation: sc-card-enter var(--duration-normal) var(--ease-native) 0.1s backwards;
 }
 
@@ -238,14 +238,14 @@
     text-align: left;
     font-size: var(--font-size-base);
     font-family: inherit;
-    box-shadow: 0 var(--space-0.5) var(--space-2) rgba(0, 0, 0, 0.04);
+    box-shadow: 0 var(--space-0.5) var(--space-2) var(--color-black-alpha-4);
     -webkit-tap-highlight-color: transparent;
     touch-action: manipulation;
 }
 
 .share-action-btn:hover {
     transform: translateY(calc(-1 * var(--space-1)));
-    box-shadow: 0 var(--space-2) var(--space-4) rgba(0, 0, 0, 0.12);
+    box-shadow: 0 var(--space-2) var(--space-4) var(--color-black-alpha-12);
     border-color: var(--sc-primary);
 }
 
@@ -271,17 +271,17 @@
 }
 
 .share-action-post i {
-    background: rgba(59, 130, 246, 0.12);
+    background: var(--color-blue-alpha-12);
     color: var(--color-info);
 }
 
 .share-action-message i {
-    background: rgba(16, 185, 129, 0.12);
+    background: var(--color-emerald-alpha-12);
     color: var(--sc-success);
 }
 
 .share-action-listing i {
-    background: rgba(168, 85, 247, 0.12);
+    background: var(--color-purple-alpha-12);
     color: var(--color-purple-400);
 }
 

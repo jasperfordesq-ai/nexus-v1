@@ -14,7 +14,7 @@
 }
 
 .showcase-section {
-    background: linear-gradient(135deg, rgba(15, 23, 42, 0.95), var(--effect-slate-90));
+    background: linear-gradient(135deg, var(--effect-slate-900-95), var(--effect-slate-90));
     backdrop-filter: blur(20px);
     border: 1px solid var(--effect-white-10);
     border-radius: var(--radius-xl);
@@ -167,22 +167,22 @@
 }
 
 .badge-card.rare {
-    background: linear-gradient(135deg, rgba(251, 191, 36, 0.15), var(--effect-amber-15));
-    border-color: rgba(251, 191, 36, 0.4);
+    background: linear-gradient(135deg, var(--effect-amber-300-15), var(--effect-amber-15));
+    border-color: var(--effect-amber-300-40);
 }
 
 .badge-card.legendary {
-    background: linear-gradient(135deg, rgba(168, 85, 247, 0.15), rgba(217, 70, 239, 0.15));
-    border-color: rgba(168, 85, 247, 0.4);
+    background: linear-gradient(135deg, var(--effect-violet-15), var(--effect-fuchsia-15));
+    border-color: var(--effect-violet-40);
     animation: shimmer 3s ease-in-out infinite;
 }
 
 @keyframes shimmer {
     0%, 100% {
-        box-shadow: 0 0 20px rgba(168, 85, 247, 0.3);
+        box-shadow: 0 0 20px var(--effect-violet-30);
     }
     50% {
-        box-shadow: 0 0 40px rgba(168, 85, 247, 0.6);
+        box-shadow: 0 0 40px var(--effect-violet-60);
     }
 }
 
@@ -414,7 +414,7 @@
    Source: views/modern/components/nexus-leaderboard.php
    ============================================ */
 .leaderboard-container {
-    background: linear-gradient(135deg, rgba(15, 23, 42, 0.95), var(--effect-slate-90));
+    background: linear-gradient(135deg, var(--effect-slate-900-95), var(--effect-slate-90));
     backdrop-filter: blur(20px);
     border: 1px solid var(--effect-white-10);
     border-radius: var(--radius-xl);
@@ -464,7 +464,7 @@
 }
 
 .user-rank-card {
-    background: linear-gradient(135deg, var(--effect-emerald-20), rgba(5, 150, 105, 0.2));
+    background: linear-gradient(135deg, var(--effect-emerald-20), var(--color-emerald-600-alpha-20));
     border: 2px solid var(--effect-emerald-40);
     border-radius: var(--radius-lg);
     padding: var(--space-6);
@@ -531,7 +531,7 @@
     height: 100%;
     background: linear-gradient(90deg, var(--color-success), var(--color-cyan-500));
     border-radius: var(--radius-sm);
-    box-shadow: 0 0 10px rgba(16, 185, 129, 0.5);
+    box-shadow: 0 0 10px var(--effect-emerald-50);
 }
 
 .rank-score-value {
@@ -586,18 +586,18 @@
 }
 
 .leader-item.rank-1 {
-    background: linear-gradient(135deg, rgba(255, 215, 0, 0.15), rgba(255, 193, 7, 0.15));
-    border-color: rgba(255, 215, 0, 0.4);
+    background: linear-gradient(135deg, var(--color-gold-alpha-15), var(--color-yellow-500-alt-alpha-15));
+    border-color: var(--color-gold-alpha-40);
 }
 
 .leader-item.rank-2 {
-    background: linear-gradient(135deg, rgba(192, 192, 192, 0.15), rgba(169, 169, 169, 0.15));
-    border-color: rgba(192, 192, 192, 0.4);
+    background: linear-gradient(135deg, var(--color-silver-alpha-15), var(--color-darkgray-alpha-15));
+    border-color: var(--color-silver-alpha-40);
 }
 
 .leader-item.rank-3 {
-    background: linear-gradient(135deg, rgba(205, 127, 50, 0.15), rgba(184, 115, 51, 0.15));
-    border-color: rgba(205, 127, 50, 0.4);
+    background: linear-gradient(135deg, var(--color-bronze-alpha-15), var(--color-bronze-dark-alpha-15));
+    border-color: var(--color-bronze-alpha-40);
 }
 
 .leader-rank-display {
@@ -674,8 +674,8 @@
     align-items: center;
     gap: var(--space-4);
     padding: var(--space-4);
-    background: linear-gradient(135deg, rgba(251, 191, 36, 0.1), var(--effect-amber-10));
-    border: 1px dashed rgba(251, 191, 36, 0.4);
+    background: linear-gradient(135deg, var(--color-amber-alpha-10), var(--effect-amber-10));
+    border: 1px dashed var(--effect-amber-300-40);
     border-radius: var(--radius-md);
     margin: var(--space-4) 0;
 }
@@ -746,7 +746,7 @@
 }
 
 .chart-card {
-    background: linear-gradient(135deg, rgba(15, 23, 42, 0.95), var(--effect-slate-90));
+    background: linear-gradient(135deg, var(--effect-slate-900-95), var(--effect-slate-90));
     backdrop-filter: blur(20px);
     border: 1px solid var(--effect-white-10);
     border-radius: var(--radius-xl);
@@ -873,7 +873,7 @@
     width: 3px;
     height: 80%;
     background: var(--color-amber-300);
-    box-shadow: 0 0 10px rgba(251, 191, 36, 0.8);
+    box-shadow: 0 0 10px var(--color-amber-alpha-80);
     z-index: 10;
 }
 
@@ -976,7 +976,7 @@
 .nexus-score-widget {
     background: linear-gradient(135deg,
         var(--effect-slate-95) 0%,
-        rgba(15, 23, 42, 0.9) 100%);
+        var(--effect-slate-900-90) 100%);
     backdrop-filter: blur(20px);
     border-radius: var(--radius-xl);
     padding: 28px; /* Between space-6 (24px) and space-8 (32px) */
@@ -1206,7 +1206,7 @@
     align-items: center;
     gap: var(--space-3);
     padding: var(--space-5) var(--space-6);
-    border-bottom: 1px solid rgba(229, 231, 235, 0.5);
+    border-bottom: 1px solid var(--color-gray-border-alpha-50);
 }
 
 [data-theme="dark"] .org-modal-header {
@@ -1273,7 +1273,7 @@
 .org-modal-input {
     width: 100%;
     padding: var(--space-3) var(--space-4);
-    border: 2px solid rgba(107, 114, 128, 0.2);
+    border: 2px solid var(--color-gray-alpha-20);
     border-radius: 10px; /* Between radius-base (8px) and radius-md (12px) */
     font-size: 0.95rem; /* Between font-size-sm (14px) and font-size-base (16px) */
     background: white;
@@ -1288,7 +1288,7 @@
 }
 
 [data-theme="dark"] .org-modal-input {
-    background: rgba(15, 23, 42, 0.5);
+    background: var(--effect-slate-900-50);
     border-color: var(--effect-white-10);
     color: var(--color-slate-100);
 }
@@ -1297,12 +1297,12 @@
     display: flex;
     gap: var(--space-3);
     padding: var(--space-4) var(--space-6);
-    background: rgba(249, 250, 251, 0.5);
-    border-top: 1px solid rgba(229, 231, 235, 0.5);
+    background: var(--effect-gray-50-50);
+    border-top: 1px solid var(--color-gray-border-alpha-50);
 }
 
 [data-theme="dark"] .org-modal-footer {
-    background: rgba(15, 23, 42, 0.5);
+    background: var(--effect-slate-900-50);
     border-top-color: var(--effect-white-10);
 }
 
@@ -1322,12 +1322,12 @@
 }
 
 .org-modal-btn.cancel {
-    background: rgba(107, 114, 128, 0.1);
+    background: var(--effect-gray-10);
     color: var(--color-gray-500);
 }
 
 .org-modal-btn.cancel:hover {
-    background: rgba(107, 114, 128, 0.2);
+    background: var(--color-gray-alpha-20);
 }
 
 .org-modal-btn.confirm {
@@ -1403,9 +1403,9 @@
 /* Skeleton loading */
 .org-skeleton {
     background: linear-gradient(90deg,
-        rgba(229, 231, 235, 0.5) 0%,
-        rgba(229, 231, 235, 0.8) 50%,
-        rgba(229, 231, 235, 0.5) 100%);
+        var(--color-gray-border-alpha-50) 0%,
+        var(--color-gray-200-alpha-80) 50%,
+        var(--color-gray-border-alpha-50) 100%);
     background-size: 200% 100%;
     animation: orgSkeletonShimmer 1.5s ease-in-out infinite;
     border-radius: var(--radius-base);
@@ -1413,9 +1413,9 @@
 
 [data-theme="dark"] .org-skeleton {
     background: linear-gradient(90deg,
-        rgba(51, 65, 85, 0.5) 0%,
-        rgba(51, 65, 85, 0.8) 50%,
-        rgba(51, 65, 85, 0.5) 100%);
+        var(--effect-slate-600-50) 0%,
+        var(--effect-slate-600-80) 50%,
+        var(--effect-slate-600-50) 100%);
     background-size: 200% 100%;
 }
 
@@ -1547,7 +1547,7 @@
 }
 
 .org-toast-close:hover {
-    background: rgba(107, 114, 128, 0.1);
+    background: var(--effect-gray-10);
     color: var(--color-gray-500);
 }
 
@@ -1605,7 +1605,7 @@
     width: 120px;
     height: 120px;
     margin: 0 auto var(--space-6);
-    background: linear-gradient(135deg, var(--effect-emerald-10), rgba(16, 185, 129, 0.05));
+    background: linear-gradient(135deg, var(--effect-emerald-10), var(--effect-emerald-5));
     border-radius: var(--radius-full);
     display: flex;
     align-items: center;
@@ -1687,12 +1687,12 @@
 }
 
 .org-empty-btn.secondary {
-    background: rgba(107, 114, 128, 0.1);
+    background: var(--effect-gray-10);
     color: var(--color-gray-500);
 }
 
 .org-empty-btn.secondary:hover {
-    background: rgba(107, 114, 128, 0.2);
+    background: var(--color-gray-alpha-20);
 }
 
 /* CHECKBOX SELECTION */
@@ -1705,7 +1705,7 @@
 .org-checkbox {
     width: 20px;
     height: 20px;
-    border: 2px solid rgba(107, 114, 128, 0.3);
+    border: 2px solid var(--color-gray-alpha-30);
     border-radius: 6px; /* Between radius-sm (4px) and radius-base (8px) */
     appearance: none;
     -webkit-appearance: none;
@@ -1742,7 +1742,7 @@
     align-items: center;
     justify-content: space-between;
     padding: var(--space-3) var(--space-5);
-    background: linear-gradient(135deg, var(--effect-emerald-10), rgba(16, 185, 129, 0.05));
+    background: linear-gradient(135deg, var(--effect-emerald-10), var(--effect-emerald-5));
     border-bottom: 1px solid var(--effect-emerald-20);
     gap: var(--space-4);
 }
@@ -1794,7 +1794,7 @@
     position: relative;
     width: 100%;
     height: 8px;
-    background: rgba(107, 114, 128, 0.2);
+    background: var(--color-gray-alpha-20);
     border-radius: var(--radius-sm);
     overflow: hidden;
     margin-top: var(--space-3);

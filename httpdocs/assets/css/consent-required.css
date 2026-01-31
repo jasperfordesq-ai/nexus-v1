@@ -14,7 +14,7 @@
 .consent-container {
     background: var(--color-surface, var(--color-white));
     border-radius: var(--radius-lg);
-    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 10px 40px var(--color-black-alpha-10);
     max-width: 700px;
     width: 100%;
     padding: var(--space-10);
@@ -22,7 +22,7 @@
 
 [data-theme="dark"] .consent-container {
     background: var(--color-gray-800, var(--color-gray-800));
-    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 10px 40px var(--color-black-alpha-30);
 }
 
 .consent-header {
@@ -124,12 +124,12 @@
 }
 
 [data-theme="dark"] .consent-badge.updated {
-    background: rgba(245, 158, 11, 0.2);
+    background: var(--color-amber-500-alpha-20);
     color: var(--color-warning, var(--color-amber-500));
 }
 
 [data-theme="dark"] .consent-badge.new {
-    background: rgba(99, 102, 241, 0.2);
+    background: var(--color-indigo-alpha-20);
     color: var(--color-primary-400, var(--color-primary-400));
 }
 
@@ -357,12 +357,12 @@
 }
 
 [data-theme="dark"] .option-icon {
-    background: rgba(99, 102, 241, 0.2);
+    background: var(--color-indigo-alpha-20);
     color: var(--color-primary-400, var(--color-primary-400));
 }
 
 [data-theme="dark"] .option-icon.warning {
-    background: rgba(239, 68, 68, 0.2);
+    background: var(--color-red-alpha-20);
     color: var(--color-danger-400, var(--color-red-400));
 }
 

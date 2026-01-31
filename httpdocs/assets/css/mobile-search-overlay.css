@@ -3,12 +3,12 @@
  * Full-screen search experience like Instagram/TikTok
  * Following compose-multidraw pattern
  *
- * Version: 1.1 - 2026-01-21
- * Migrated to design tokens (spacing, border-radius, font-size, transitions)
+ * Version: 1.2 - 2026-01-31
+ * Migrated to design tokens (spacing, border-radius, font-size, transitions, rgba colors)
  *
  * Mobile: Full-screen, immersive search
  * Desktop: Hidden (uses normal search)
-  * Fully Migrated to Design Tokens: 2026-01-21 ✓
+ * Fully Migrated to Design Tokens: 2026-01-31 (including rgba alpha colors)
  */
 
 /* ==============================================
@@ -74,7 +74,7 @@
 }
 
 .mobile-search-back:active {
-    background: rgba(128, 128, 128, 0.1);
+    background: var(--color-gray-alpha-10);
 }
 
 [data-theme="dark"] .mobile-search-back {
@@ -294,7 +294,7 @@
 }
 
 .mobile-search-item:active {
-    background: rgba(128, 128, 128, 0.05);
+    background: var(--color-gray-alpha-5);
     margin: 0 calc(var(--space-4) * -1);
     padding: var(--space-3) var(--space-4);
 }
@@ -377,7 +377,7 @@
 }
 
 .mobile-search-item-remove:active {
-    background: rgba(128, 128, 128, 0.1);
+    background: var(--color-gray-alpha-10);
 }
 
 /* ==============================================
@@ -474,14 +474,14 @@
    HIGHLIGHT MATCHING TEXT
    ============================================== */
 .mobile-search-highlight {
-    background: rgba(99, 102, 241, 0.2);
+    background: var(--color-indigo-alpha-20);
     color: var(--color-primary-600, var(--color-primary-600));
     border-radius: var(--radius-sm);
     padding: 0 var(--space-1);
 }
 
 [data-theme="dark"] .mobile-search-highlight {
-    background: rgba(99, 102, 241, 0.3);
+    background: var(--color-indigo-alpha-30);
     color: var(--color-primary-400, var(--color-primary-400));
 }
 

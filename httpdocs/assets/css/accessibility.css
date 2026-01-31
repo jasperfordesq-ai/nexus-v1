@@ -32,7 +32,7 @@ button:focus-visible,
 .htb-btn:focus-visible {
     outline: 2px solid var(--color-primary-500);
     outline-offset: var(--space-1);
-    box-shadow: 0 0 0 var(--space-2) rgba(var(--color-primary-rgb, 99, 102, 241), 0.2);
+    box-shadow: 0 0 0 var(--space-2) var(--color-primary-500-alpha-20);
 }
 
 /* Link focus rings */
@@ -49,7 +49,7 @@ a:focus-visible {
 [role="button"]:focus-visible {
     outline: 2px solid var(--color-primary-500);
     outline-offset: var(--space-1);
-    box-shadow: 0 0 0 var(--space-2) rgba(var(--color-primary-rgb, 99, 102, 241), 0.15);
+    box-shadow: 0 0 0 var(--space-2) var(--color-primary-500-alpha-15);
 }
 
 /* Dark mode focus rings - higher contrast */
@@ -59,7 +59,7 @@ a:focus-visible {
 
 [data-theme="dark"] button:focus-visible,
 [data-theme="dark"] .btn:focus-visible {
-    box-shadow: 0 0 0 var(--space-2) rgba(var(--color-primary-400-rgb, 129, 140, 248), 0.25);
+    box-shadow: 0 0 0 var(--space-2) var(--color-indigo-alpha-25);
 }
 
 /* ============================================
@@ -177,17 +177,17 @@ a:focus-visible {
    ============================================ */
 
 .form-group:focus-within {
-    background: rgba(var(--color-primary-rgb, 99, 102, 241), 0.03);
+    background: var(--color-indigo-alpha-3);
     border-radius: var(--radius-base);
 }
 
 .input-group:focus-within {
-    box-shadow: 0 0 0 var(--space-2) rgba(var(--color-primary-rgb, 99, 102, 241), 0.1);
+    box-shadow: 0 0 0 var(--space-2) var(--color-primary-500-alpha-10);
     border-radius: var(--radius-base);
 }
 
 [data-theme="dark"] .form-group:focus-within {
-    background: rgba(var(--color-primary-400-rgb, 129, 140, 248), 0.05);
+    background: var(--color-indigo-alpha-5);
 }
 
 /* ============================================
@@ -242,7 +242,7 @@ button:active:not(:disabled),
 
 [aria-invalid="true"]:focus-visible {
     outline-color: var(--color-danger);
-    box-shadow: 0 0 0 var(--space-2) rgba(var(--color-danger-rgb, 239, 68, 68), 0.15);
+    box-shadow: 0 0 0 var(--space-2) var(--color-red-alpha-15);
 }
 
 /* Required field indicator */

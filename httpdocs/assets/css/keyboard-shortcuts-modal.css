@@ -27,7 +27,7 @@
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(0, 0, 0, 0.7);
+    background: var(--color-black-alpha-70);
     z-index: 999999;
     display: flex;
     align-items: center;
@@ -44,7 +44,7 @@
     width: 90%;
     max-height: 80vh;
     overflow-y: auto;
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 20px 60px var(--color-black-alpha-30);
     animation: ks-slideUp 0.3s ease;
 }
 
@@ -169,7 +169,7 @@
 .keyboard-shortcuts-modal__tip {
     margin-top: 24px;
     padding: 16px;
-    background: rgba(99, 102, 241, 0.05);
+    background: var(--color-indigo-alpha-5);
     border-left: 4px solid var(--color-primary-500, #6366f1);
     border-radius: 8px;
 }
@@ -188,7 +188,7 @@
 
 /* Keyboard Hint Badge (used in layout switcher) */
 .keyboard-hint-badge {
-    background: rgba(99, 102, 241, 0.1);
+    background: var(--color-indigo-alpha-10);
     color: var(--color-primary-500, #6366f1);
     font-size: 10px;
     font-weight: 700;

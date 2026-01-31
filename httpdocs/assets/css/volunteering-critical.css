@@ -34,15 +34,15 @@ body.volunteering-page {
     max-width: 1200px;
     padding: 32px;
     border-radius: 24px;
-    background: rgba(15, 23, 42, 0.85);
+    background: var(--color-slate-900-alpha-85);
     backdrop-filter: blur(24px) saturate(180%);
     -webkit-backdrop-filter: blur(24px) saturate(180%);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    border: 1px solid var(--color-white-alpha-10);
 }
 
 [data-theme="light"] .vol-glass-container {
-    background: rgba(255, 255, 255, 0.9);
-    border-color: rgba(0, 0, 0, 0.1);
+    background: var(--color-white-alpha-90);
+    border-color: var(--color-black-alpha-10);
 }
 
 /* Hero section base */

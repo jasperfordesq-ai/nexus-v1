@@ -120,14 +120,14 @@ html[data-layout-stable] * {
     background: linear-gradient(135deg, var(--color-primary-200) 0%, var(--color-primary-300) 50%, var(--color-primary-400) 100%);
     -webkit-background-clip: text;
     background-clip: text;
-    filter: drop-shadow(0 var(--space-1) var(--space-2) rgba(99, 102, 241, 0.4));
+    filter: drop-shadow(0 var(--space-1) var(--space-2) var(--color-indigo-alpha-40));
 }
 
 .nexus-brand-link:hover .brand-secondary {
     background: linear-gradient(135deg, var(--color-amber-300) 0%, var(--color-amber-300) 100%);
     -webkit-background-clip: text;
     background-clip: text;
-    filter: drop-shadow(0 var(--space-1) var(--space-2) rgba(251, 191, 36, 0.4));
+    filter: drop-shadow(0 var(--space-1) var(--space-2) var(--color-amber-alpha-40));
 }
 
 /* Light mode - deeper colors for contrast */
@@ -185,7 +185,7 @@ html[data-layout-stable] * {
 
 .nexus-notif-btn:hover,
 .nexus-notif-btn:focus {
-    background: rgba(255, 255, 255, 0.1);
+    background: var(--color-white-alpha-10);
 }
 
 .nexus-notif-badge {
@@ -223,7 +223,7 @@ html[data-layout-stable] * {
 
 [data-theme="light"] .nexus-notif-btn:hover,
 [data-theme="light"] .nexus-notif-btn:focus {
-    background: rgba(99, 102, 241, 0.1) !important;
+    background: var(--color-indigo-alpha-10) !important;
     color: var(--color-primary-600) !important;
 }
 

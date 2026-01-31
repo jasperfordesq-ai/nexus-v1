@@ -50,19 +50,19 @@
 
 @keyframes mobile-pulse-success {
     0% {
-        box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.7);
+        box-shadow: 0 0 0 0 var(--color-green-500-alpha-70);
     }
     100% {
-        box-shadow: 0 0 0 10px rgba(34, 197, 94, 0);
+        box-shadow: 0 0 0 10px var(--color-green-500-alpha-0);
     }
 }
 
 @keyframes mobile-pulse-error {
     0% {
-        box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7);
+        box-shadow: 0 0 0 0 var(--color-red-alpha-70);
     }
     100% {
-        box-shadow: 0 0 0 10px rgba(239, 68, 68, 0);
+        box-shadow: 0 0 0 10px var(--color-red-alpha-0);
     }
 }
 
@@ -107,24 +107,24 @@
 .mobile-ripple {
     position: absolute;
     border-radius: 50%;
-    background: rgba(255, 255, 255, 0.6);
+    background: var(--color-white-alpha-60);
     pointer-events: none;
     animation: mobile-ripple 0.6s ease-out;
 }
 
 /* Primary button ripple */
 .mobile-ripple.primary {
-    background: rgba(255, 255, 255, 0.4);
+    background: var(--color-white-alpha-40);
 }
 
 /* Secondary button ripple */
 .mobile-ripple.secondary {
-    background: rgba(99, 102, 241, 0.3);
+    background: var(--color-indigo-alpha-30);
 }
 
 /* Dark button ripple */
 .mobile-ripple.dark {
-    background: rgba(0, 0, 0, 0.2);
+    background: var(--color-black-alpha-20);
 }
 
 /* ============================================
@@ -157,7 +157,7 @@
 
 .mobile-fab-press:active {
     transform: scale(0.92);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    box-shadow: 0 2px 8px var(--color-black-alpha-15);
 }
 
 /* List items */
@@ -181,7 +181,7 @@
 
 .mobile-card-press:active {
     transform: scale(0.97);
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 1px 3px var(--color-black-alpha-10);
 }
 
 /* ============================================
@@ -296,7 +296,7 @@
     background: white;
     border-radius: 50%;
     transition: all var(--mobile-transition-normal, 0.2s) cubic-bezier(0.68, -0.55, 0.265, 1.55);
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 2px 4px var(--color-black-alpha-20);
 }
 
 .mobile-toggle-switch.active .mobile-toggle-thumb {
@@ -459,7 +459,7 @@
     background: white;
     border: 2px solid var(--color-primary-500, var(--color-primary-500));
     border-radius: 50%;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 2px 4px var(--color-black-alpha-20);
     transition: all var(--mobile-transition-fast, 0.15s) ease-out;
     cursor: grab;
 }
@@ -467,7 +467,7 @@
 .mobile-slider-thumb:active {
     transform: translate(-50%, -50%) scale(1.3);
     cursor: grabbing;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 4px 8px var(--color-black-alpha-30);
 }
 
 /* ============================================
@@ -551,7 +551,7 @@
     height: 56px;
     border-radius: 50%;
     background: var(--color-primary-500, var(--color-primary-500));
-    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4);
+    box-shadow: 0 4px 12px var(--color-indigo-alpha-40);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -563,7 +563,7 @@
 
 .mobile-fab:active {
     transform: scale(0.9);
-    box-shadow: 0 2px 8px rgba(99, 102, 241, 0.4);
+    box-shadow: 0 2px 8px var(--color-indigo-alpha-40);
 }
 
 .mobile-fab.extended {
@@ -594,7 +594,7 @@
     background: var(--color-gray-900, var(--color-gray-900));
     color: white;
     border-radius: var(--mobile-radius-lg, 12px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 4px 12px var(--color-black-alpha-30);
     z-index: var(--mobile-z-toast, 1000000);
     animation: mobile-slide-bounce 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
 }

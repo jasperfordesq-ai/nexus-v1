@@ -9,7 +9,7 @@
 .notif-drawer-overlay {
     position: fixed;
     inset: 0;
-    background: rgba(0, 0, 0, 0.4);
+    background: var(--color-black-alpha-40);
     z-index: var(--z-drawer);
     opacity: 0;
     visibility: hidden;
@@ -31,7 +31,7 @@
     height: 100vh;
     height: 100dvh;
     background: var(--bg-elevated);
-    box-shadow: -4px 0 var(--space-6) rgba(0, 0, 0, 0.15);
+    box-shadow: -4px 0 var(--space-6) var(--color-black-alpha-15);
     z-index: calc(var(--z-drawer) + 1);
     display: flex;
     flex-direction: column;
@@ -45,7 +45,7 @@
 
 [data-theme="dark"] .notif-drawer {
     background: var(--bg-base);
-    box-shadow: -4px 0 var(--space-6) rgba(0, 0, 0, 0.4);
+    box-shadow: -4px 0 var(--space-6) var(--color-black-alpha-40);
 }
 
 /* Header */
@@ -228,7 +228,7 @@
 }
 
 .notif-drawer-footer button:hover {
-    background: rgba(79, 70, 229, 0.1);
+    background: var(--color-primary-600-alpha-10);
     color: var(--color-primary-700);
 }
 
@@ -250,7 +250,7 @@
 }
 
 [data-theme="dark"] .notif-drawer-footer button:hover {
-    background: rgba(96, 165, 250, 0.1);
+    background: var(--color-blue-400-alpha-10);
     color: var(--color-blue-300);
 }
 

@@ -19,14 +19,14 @@
     --ptr-threshold: 80px;
     --ptr-max-pull: 140px;
     --ptr-spinner-size: var(--space-10);
-    --ptr-bg: rgba(255, 255, 255, 0.98);
+    --ptr-bg: var(--color-white-alpha-98);
     --ptr-spinner-color: var(--color-primary-500);
     --ptr-text-color: var(--text-muted);
     --ptr-transition: var(--ease-in-out);
 }
 
 [data-theme="dark"] {
-    --ptr-bg: rgba(30, 41, 59, 0.98);
+    --ptr-bg: var(--color-slate-800-alpha-98);
 }
 
 /* ==============================================
@@ -55,8 +55,8 @@
     background: var(--ptr-bg);
     border-radius: var(--radius-2xl);
     box-shadow:
-        0 4px 20px rgba(0, 0, 0, 0.15),
-        0 0 0 1px rgba(0, 0, 0, 0.05);
+        0 4px 20px var(--color-black-alpha-15),
+        0 0 0 1px var(--color-black-alpha-5);
     opacity: 0;
     pointer-events: none;
     transition:
@@ -69,8 +69,8 @@
 
 [data-theme="dark"] .ptr-indicator {
     box-shadow:
-        0 4px 20px rgba(0, 0, 0, 0.4),
-        0 0 0 1px rgba(255, 255, 255, 0.1);
+        0 4px 20px var(--color-black-alpha-40),
+        0 0 0 1px var(--color-white-alpha-10);
 }
 
 /* Visible state */
@@ -125,7 +125,7 @@
 }
 
 [data-theme="dark"] .ptr-spinner-track {
-    border-color: rgba(255, 255, 255, 0.15);
+    border-color: var(--color-white-alpha-15);
 }
 
 /* Progress arc */

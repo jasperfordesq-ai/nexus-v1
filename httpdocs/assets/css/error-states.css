@@ -1,7 +1,7 @@
 /**
  * Error State Polish
  * Friendly error pages with animations
- * Version: 1.1 - 2026-01-21 - Migrated to design tokens
+ * Version: 1.2 - 2026-01-31 - Complete rgba() to design tokens migration
  *
  * Features:
  * - Animated error illustrations
@@ -9,7 +9,7 @@
  * - 404, 500, and general error states
  * - Connection/offline states
  * - Dark mode support
-  * Fully Migrated to Design Tokens: 2026-01-21 ✓
+ * Fully Migrated to Design Tokens: 2026-01-31 ✓
  */
 
 /* ==========================================================================
@@ -127,7 +127,7 @@
     width: 120px;
     height: 120px;
     margin: 0 auto var(--space-6);
-    background: linear-gradient(135deg, rgba(239, 68, 68, 0.1), rgba(239, 68, 68, 0.2));
+    background: linear-gradient(135deg, var(--color-red-alpha-10), var(--color-red-alpha-20));
     border-radius: var(--radius-full);
     display: flex;
     align-items: center;
@@ -142,7 +142,7 @@
 
 /* Warning variant */
 .error-icon-circle--warning {
-    background: linear-gradient(135deg, rgba(245, 158, 11, 0.1), rgba(245, 158, 11, 0.2));
+    background: linear-gradient(135deg, var(--color-amber-500-alpha-10), var(--color-amber-500-alpha-20));
 }
 
 .error-icon-circle--warning i {
@@ -151,7 +151,7 @@
 
 /* Info variant */
 .error-icon-circle--info {
-    background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(59, 130, 246, 0.2));
+    background: linear-gradient(135deg, var(--color-blue-alpha-10), var(--color-blue-alpha-20));
 }
 
 .error-icon-circle--info i {
@@ -250,7 +250,7 @@
 
 .error-btn--primary:hover {
     transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4);
+    box-shadow: 0 4px 12px var(--color-indigo-alpha-40);
 }
 
 .error-btn--secondary {
@@ -324,7 +324,7 @@
     gap: var(--space-3);
     z-index: var(--z-notification);
     animation: error-slide-up var(--transition-base) var(--ease-out);
-    border-top: 1px solid rgba(146, 64, 14, 0.2);
+    border-top: 1px solid var(--color-amber-800-alpha-20);
 }
 
 .offline-banner i {
@@ -335,7 +335,7 @@
 .offline-banner--error {
     background: linear-gradient(135deg, var(--color-red-100), var(--color-red-200));
     color: #991b1b;
-    border-top-color: rgba(153, 27, 27, 0.2);
+    border-top-color: var(--color-red-800-alpha-20);
 }
 
 .online-toast {
@@ -353,7 +353,7 @@
     gap: var(--space-2);
     z-index: var(--z-notification);
     animation: error-slide-up var(--transition-base) var(--ease-out);
-    box-shadow: 0 4px 12px rgba(34, 197, 94, 0.3);
+    box-shadow: 0 4px 12px var(--color-green-500-alpha-30);
 }
 
 /* ==========================================================================
@@ -417,14 +417,14 @@
     text-align: center;
     background: linear-gradient(135deg, var(--color-red-50), var(--color-red-100));
     border-radius: var(--radius-md);
-    border: 1px solid rgba(239, 68, 68, 0.2);
+    border: 1px solid var(--color-red-alpha-20);
 }
 
 .permission-denied-icon {
     width: 64px;
     height: 64px;
     margin: 0 auto var(--space-6);
-    background: rgba(239, 68, 68, 0.1);
+    background: var(--color-red-alpha-10);
     border-radius: var(--radius-full);
     display: flex;
     align-items: center;
@@ -443,7 +443,7 @@
 .session-expired {
     position: fixed;
     inset: 0;
-    background: rgba(0, 0, 0, 0.5);
+    background: var(--color-black-alpha-50);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -564,7 +564,7 @@
 
 [data-theme="dark"] .permission-denied {
     background: linear-gradient(135deg, #1f1818, #2d1f1f);
-    border-color: rgba(239, 68, 68, 0.3);
+    border-color: var(--color-red-alpha-30);
 }
 
 [data-theme="dark"] .session-expired-modal {
@@ -574,7 +574,7 @@
 [data-theme="dark"] .offline-banner {
     background: linear-gradient(135deg, #422006, #78350f);
     color: var(--color-amber-200);
-    border-top-color: rgba(253, 230, 138, 0.2);
+    border-top-color: var(--color-amber-200-alpha-20);
 }
 
 [data-theme="dark"] .offline-banner--error {

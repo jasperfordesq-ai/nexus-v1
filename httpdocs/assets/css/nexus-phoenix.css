@@ -57,7 +57,7 @@ img.avatar-img {
     --htb-text-main: var(--color-gray-800);
     --htb-text-muted: var(--color-gray-500);
     --htb-radius: var(--radius-lg);
-    --htb-shadow: 0 10px 15px -3px var(--effect-black-5), 0 4px 6px -2px rgba(0, 0, 0, 0.025);
+    --htb-shadow: 0 10px 15px -3px var(--effect-black-5), 0 4px 6px -2px var(--color-black-alpha-3);
     --htb-border-color: var(--color-gray-200);
     /* HOLOGRAPHIC TRI-TONE GRADIENTS (Unique per page) */
     --htb-gradient-brand: linear-gradient(120deg, var(--color-primary-600) 0%, var(--color-fuchsia-500) 50%, var(--color-amber-300) 100%);
@@ -121,7 +121,7 @@ body,
 }
 
 [data-theme="dark"] .htb-dropdown-content {
-    background: rgba(15, 23, 42, 0.85);
+    background: var(--color-slate-900-alpha-85);
     border: 1px solid var(--effect-white-10);
     -webkit-backdrop-filter: blur(20px);
     backdrop-filter: blur(20px);
@@ -174,7 +174,7 @@ body,
 [data-theme="dark"] .htb-header-box {
     background:
         linear-gradient(135deg, var(--effect-primary-15) 0%, var(--effect-purple-300-12) 50%, var(--effect-pink-15) 100%),
-        linear-gradient(to bottom, var(--effect-slate-85), rgba(15, 23, 42, 0.9));
+        linear-gradient(to bottom, var(--effect-slate-85), var(--color-slate-900-alpha-90));
     border: 1px solid var(--effect-white-10);
     box-shadow:
         0 4px 6px var(--effect-black-30),
@@ -196,7 +196,7 @@ body,
 
 /* DARK MODE: Section Gray */
 [data-theme="dark"] .htb-section-gray {
-    background-color: rgba(15, 23, 42, 0.6);
+    background-color: var(--color-slate-900-alpha-60);
     border-top-color: var(--effect-white-5);
     border-bottom-color: var(--effect-white-5);
 }
@@ -221,15 +221,15 @@ body,
 }
 
 [data-theme="dark"] .htb-step-icon-blue {
-    background: linear-gradient(135deg, rgba(37, 99, 235, 0.2) 0%, var(--effect-blue-15) 100%);
+    background: linear-gradient(135deg, var(--color-blue-600-alpha-20) 0%, var(--effect-blue-15) 100%);
 }
 
 [data-theme="dark"] .htb-step-icon-green {
-    background: linear-gradient(135deg, rgba(22, 163, 74, 0.2) 0%, rgba(34, 197, 94, 0.15) 100%);
+    background: linear-gradient(135deg, var(--color-green-600-alpha-20) 0%, var(--color-green-500-alpha-15) 100%);
 }
 
 [data-theme="dark"] .htb-step-icon-orange {
-    background: linear-gradient(135deg, rgba(234, 88, 12, 0.2) 0%, rgba(249, 115, 22, 0.15) 100%);
+    background: linear-gradient(135deg, var(--color-orange-600-alpha-20) 0%, var(--color-orange-alpha-15) 100%);
 }
 
 /* DARK MODE: Member Cards */
@@ -262,12 +262,12 @@ body,
 
 /* DARK MODE: Badges */
 [data-theme="dark"] .nexus-badge-primary {
-    background: rgba(37, 99, 235, 0.2);
+    background: var(--color-blue-600-alpha-20);
     color: var(--color-blue-400);
 }
 
 [data-theme="dark"] .nexus-badge-purple {
-    background: rgba(147, 51, 234, 0.2);
+    background: var(--color-purple-alpha-20);
     color: var(--color-purple-400);
 }
 
@@ -407,14 +407,14 @@ html {
     text-align: center;
     background:
         linear-gradient(135deg, var(--effect-primary-8) 0%, var(--effect-purple-300-8) 50%, var(--effect-pink-8) 100%),
-        linear-gradient(to bottom, var(--effect-white-90), rgba(249, 250, 251, 0.85));
+        linear-gradient(to bottom, var(--effect-white-90), var(--color-gray-50-alpha-85));
     border: 1px solid var(--effect-white-60);
     border-radius: var(--radius-lg);
     padding: var(--space-8);
     box-shadow:
-        0 4px 6px rgba(0, 0, 0, 0.02),
-        0 0 40px rgba(99, 102, 241, 0.06),
-        0 0 80px rgba(168, 85, 247, 0.04),
+        0 4px 6px var(--color-black-alpha-2),
+        0 0 40px var(--color-indigo-alpha-6),
+        0 0 80px var(--color-purple-alpha-5),
         inset 0 1px 0 var(--effect-white-80);
     -webkit-backdrop-filter: blur(16px) saturate(180%);
     backdrop-filter: blur(16px) saturate(180%);
@@ -503,7 +503,7 @@ html {
 /* CARD SYSTEM (Glassmorphism Core) */
 .htb-card,
 .nexus-card {
-    background: rgba(255, 255, 255, 0.70);
+    background: var(--color-white-alpha-70);
     -webkit-backdrop-filter: blur(16px);
     backdrop-filter: blur(16px);
     border-radius: var(--htb-radius);
@@ -675,7 +675,7 @@ table.htb-table tr:last-child td {
 .htb-hero-buttons .htb-btn-primary {
     font-size: var(--font-size-lg);
     padding: var(--space-3) var(--space-8);
-    box-shadow: 0 10px 20px rgba(79, 70, 229, 0.3);
+    box-shadow: 0 10px 20px var(--color-primary-600-alpha-30);
 }
 
 .htb-hero-buttons .htb-btn-secondary {
@@ -702,7 +702,7 @@ table.htb-table tr:last-child td {
     right: -50px;
     width: 200px;
     height: 200px;
-    background: rgba(79, 70, 229, 0.05);
+    background: var(--color-primary-600-alpha-5);
     border-radius: 50%;
     filter: blur(40px);
 }
@@ -772,19 +772,19 @@ table.htb-table tr:last-child td {
 .htb-step-icon-blue {
     background: linear-gradient(135deg, var(--color-blue-100) 0%, var(--color-blue-50) 100%);
     color: var(--color-blue-600);
-    box-shadow: 0 4px 10px rgba(37, 99, 235, 0.1);
+    box-shadow: 0 4px 10px var(--color-blue-600-alpha-10);
 }
 
 .htb-step-icon-green {
     background: linear-gradient(135deg, var(--color-green-100) 0%, var(--color-green-50) 100%);
     color: var(--color-green-600);
-    box-shadow: 0 4px 10px rgba(22, 163, 74, 0.1);
+    box-shadow: 0 4px 10px var(--color-green-600-alpha-10);
 }
 
 .htb-step-icon-orange {
     background: linear-gradient(135deg, var(--color-orange-100) 0%, var(--color-white)7ed 100%);
     color: var(--color-orange-600);
-    box-shadow: 0 4px 10px rgba(234, 88, 12, 0.1);
+    box-shadow: 0 4px 10px var(--color-orange-600-alpha-10);
 }
 
 .htb-step-title {
@@ -993,7 +993,7 @@ textarea.nexus-input:focus {
 [data-theme='dark'] .nexus-select:focus,
 [data-theme='dark'] textarea.nexus-input:focus {
     border-color: var(--color-primary-400);
-    box-shadow: 0 0 0 4px rgba(129, 140, 248, 0.15);
+    box-shadow: 0 0 0 4px var(--color-indigo-alpha-15);
 }
 
 [data-theme='dark'] .nexus-input::placeholder {
@@ -1115,12 +1115,12 @@ body.dark-mode .nexus-card {
 }
 
 body.dark-mode .htb-header-box {
-    background: linear-gradient(to bottom, var(--effect-slate-80), rgba(15, 23, 42, 0.9));
+    background: linear-gradient(to bottom, var(--effect-slate-80), var(--color-slate-900-alpha-90));
     border-color: var(--effect-white-10);
 }
 
 body.dark-mode .htb-section-gray {
-    background-color: rgba(15, 23, 42, 0.6);
+    background-color: var(--color-slate-900-alpha-60);
 }
 
 body.dark-mode .htb-section-title {
@@ -1178,7 +1178,7 @@ textarea:focus-visible,
 [data-theme="dark"] *:focus-visible,
 body.dark-mode *:focus-visible {
     outline-color: var(--color-primary-400);
-    box-shadow: 0 0 0 3px rgba(129, 140, 248, 0.3);
+    box-shadow: 0 0 0 3px var(--color-indigo-alpha-30);
 }
 
 /* Screen reader only utility */
@@ -1219,7 +1219,7 @@ body.dark-mode *:focus-visible {
     backdrop-filter: blur(20px);
     border-radius: var(--radius-2xl);
     border: 1px solid var(--effect-white-40);
-    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.1);
+    box-shadow: 0 8px 32px 0 var(--color-glass-shadow);
     padding: var(--space-8);
     margin-bottom: var(--space-6);
 }
@@ -1302,7 +1302,7 @@ body.dark-mode *:focus-visible {
     align-items: center;
     gap: var(--space-2);
     padding: var(--space-3) var(--space-6);
-    background: linear-gradient(135deg, rgba(99, 102, 241, 0.9), rgba(139, 92, 246, 0.9)) !important;
+    background: linear-gradient(135deg, var(--color-indigo-alpha-90), var(--color-violet-alpha-90)) !important;
     border: none !important;
     border-radius: var(--radius-md);
     color: white !important;
@@ -1623,7 +1623,7 @@ body.dark-mode *:focus-visible {
     background: var(--effect-white-40);
     padding: var(--space-3) var(--space-4);
     border-radius: var(--radius-md);
-    border-left: 4px solid rgba(245, 158, 11, 0.5);
+    border-left: 4px solid var(--color-amber-500-alpha-50);
     color: var(--color-gray-600);
 }
 
@@ -1778,13 +1778,13 @@ body.dark-mode *:focus-visible {
 
 .profile-online-dot--active {
     background: var(--color-success);
-    box-shadow: 0 0 12px rgba(16, 185, 129, 0.6);
+    box-shadow: 0 0 12px var(--color-emerald-alpha-60);
     animation: pulse-online 2s infinite;
 }
 
 .profile-online-dot--recent {
     background: var(--color-warning);
-    box-shadow: 0 0 12px rgba(245, 158, 11, 0.6);
+    box-shadow: 0 0 12px var(--color-amber-500-alpha-60);
 }
 
 @keyframes pulse-online {
@@ -1792,27 +1792,27 @@ body.dark-mode *:focus-visible {
         box-shadow: 0 0 0 0 var(--effect-emerald-40);
     }
     50% {
-        box-shadow: 0 0 0 8px rgba(16, 185, 129, 0);
+        box-shadow: 0 0 0 8px var(--color-emerald-alpha-0);
     }
 }
 
 /* Badge Color Variants */
 .glass-info-badge--success {
-    background: linear-gradient(135deg, var(--effect-emerald-20), rgba(5, 150, 105, 0.1));
+    background: linear-gradient(135deg, var(--effect-emerald-20), var(--color-emerald-600-alpha-10));
     border-color: var(--effect-emerald-30);
 }
 
 .glass-info-badge--warning {
-    background: linear-gradient(135deg, var(--effect-amber-20), rgba(217, 119, 6, 0.1));
+    background: linear-gradient(135deg, var(--effect-amber-20), var(--color-amber-600-alpha-10));
     border-color: var(--effect-amber-30);
 }
 
 .glass-info-badge--purple {
-    background: linear-gradient(135deg, var(--effect-purple-20), rgba(124, 58, 237, 0.15));
+    background: linear-gradient(135deg, var(--effect-purple-20), var(--color-purple-600-alpha-15));
     border-color: var(--effect-purple-40);
 }
 
 .glass-info-badge--danger {
-    background: linear-gradient(135deg, var(--effect-red-20), rgba(220, 38, 38, 0.1));
+    background: linear-gradient(135deg, var(--effect-red-20), var(--color-red-600-alpha-10));
     border-color: var(--effect-red-30);
 }

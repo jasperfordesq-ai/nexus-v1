@@ -64,9 +64,9 @@
 .civic-card:hover,
 .nexus-card:hover {
     box-shadow:
-        0 12px 32px -8px rgba(0, 0, 0, 0.12),
-        0 6px 16px -4px rgba(0, 0, 0, 0.08),
-        0 2px 6px rgba(0, 0, 0, 0.04);
+        0 12px 32px -8px var(--color-black-alpha-12),
+        0 6px 16px -4px var(--color-black-alpha-8),
+        0 2px 6px var(--color-black-alpha-4);
 }
 
 /* Feed/content cards */
@@ -74,39 +74,39 @@
 .post-card:hover,
 .blog-card:hover {
     box-shadow:
-        0 10px 28px -8px rgba(0, 0, 0, 0.1),
-        0 4px 12px -2px rgba(0, 0, 0, 0.06);
+        0 10px 28px -8px var(--color-black-alpha-10),
+        0 4px 12px -2px var(--color-black-alpha-6);
 }
 
 /* Listing/event cards - Slightly more prominent */
 .listing-card:hover,
 .event-card:hover {
     box-shadow:
-        0 14px 36px -8px rgba(0, 0, 0, 0.14),
-        0 6px 18px -4px rgba(0, 0, 0, 0.08);
+        0 14px 36px -8px var(--color-black-alpha-14),
+        0 6px 18px -4px var(--color-black-alpha-8);
 }
 
 /* Group/user cards */
 .group-card:hover,
 .user-card:hover {
     box-shadow:
-        0 10px 24px -6px rgba(0, 0, 0, 0.1),
-        0 4px 10px -2px rgba(0, 0, 0, 0.05);
+        0 10px 24px -6px var(--color-black-alpha-10),
+        0 4px 10px -2px var(--color-black-alpha-5);
 }
 
 /* Resource cards */
 .resource-card:hover {
     box-shadow:
-        0 8px 20px -6px rgba(0, 0, 0, 0.1),
-        0 3px 8px rgba(0, 0, 0, 0.04);
+        0 8px 20px -6px var(--color-black-alpha-10),
+        0 3px 8px var(--color-black-alpha-4);
 }
 
 /* Message/notification items - Subtle */
 .message-preview:hover,
 .notification-item:hover {
     box-shadow:
-        0 6px 16px -4px rgba(0, 0, 0, 0.08),
-        0 2px 6px rgba(0, 0, 0, 0.03);
+        0 6px 16px -4px var(--color-black-alpha-8),
+        0 2px 6px var(--color-black-alpha-3);
 }
 
 /* ==========================================================================
@@ -123,11 +123,11 @@
 .card-glow:hover,
 .card-hover.card-glow:hover,
 [data-hover="glow"]:hover {
-    border-color: rgba(59, 130, 246, 0.3);
+    border-color: var(--color-blue-alpha-30);
     box-shadow:
-        0 12px 32px -8px rgba(0, 0, 0, 0.12),
-        0 0 0 1px rgba(59, 130, 246, 0.1),
-        0 0 20px -4px rgba(59, 130, 246, 0.15);
+        0 12px 32px -8px var(--color-black-alpha-12),
+        0 0 0 1px var(--color-blue-alpha-10),
+        0 0 20px -4px var(--color-blue-alpha-15);
 }
 
 /* ==========================================================================
@@ -172,9 +172,9 @@ a.nexus-card:active,
     inset: -1px;
     border-radius: inherit;
     background: linear-gradient(135deg,
-        rgba(59, 130, 246, 0.4),
-        rgba(139, 92, 246, 0.4),
-        rgba(236, 72, 153, 0.3)
+        var(--color-blue-alpha-40),
+        var(--color-violet-alpha-40),
+        var(--color-pink-alpha-30)
     );
     opacity: 0;
     transition: opacity var(--transition-base) var(--ease-out);
@@ -295,51 +295,51 @@ a.nexus-card:active,
 [data-theme="dark"] .civic-card:hover,
 [data-theme="dark"] .nexus-card:hover {
     box-shadow:
-        0 12px 32px -8px rgba(0, 0, 0, 0.4),
-        0 6px 16px -4px rgba(0, 0, 0, 0.3),
-        0 0 1px rgba(255, 255, 255, 0.1);
+        0 12px 32px -8px var(--color-black-alpha-40),
+        0 6px 16px -4px var(--color-black-alpha-30),
+        0 0 1px var(--color-white-alpha-10);
 }
 
 [data-theme="dark"] .feed-item:hover,
 [data-theme="dark"] .post-card:hover,
 [data-theme="dark"] .blog-card:hover {
     box-shadow:
-        0 10px 28px -8px rgba(0, 0, 0, 0.35),
-        0 4px 12px -2px rgba(0, 0, 0, 0.25),
-        0 0 1px rgba(255, 255, 255, 0.08);
+        0 10px 28px -8px var(--color-black-alpha-35),
+        0 4px 12px -2px var(--color-black-alpha-25),
+        0 0 1px var(--color-white-alpha-8);
 }
 
 [data-theme="dark"] .listing-card:hover,
 [data-theme="dark"] .event-card:hover {
     box-shadow:
-        0 14px 36px -8px rgba(0, 0, 0, 0.45),
-        0 6px 18px -4px rgba(0, 0, 0, 0.3),
-        0 0 1px rgba(255, 255, 255, 0.1);
+        0 14px 36px -8px var(--color-black-alpha-45),
+        0 6px 18px -4px var(--color-black-alpha-30),
+        0 0 1px var(--color-white-alpha-10);
 }
 
 [data-theme="dark"] .group-card:hover,
 [data-theme="dark"] .user-card:hover {
     box-shadow:
-        0 10px 24px -6px rgba(0, 0, 0, 0.35),
-        0 4px 10px -2px rgba(0, 0, 0, 0.25);
+        0 10px 24px -6px var(--color-black-alpha-35),
+        0 4px 10px -2px var(--color-black-alpha-25);
 }
 
 [data-theme="dark"] .message-preview:hover,
 [data-theme="dark"] .notification-item:hover {
     box-shadow:
-        0 6px 16px -4px rgba(0, 0, 0, 0.3),
-        0 2px 6px rgba(0, 0, 0, 0.2);
+        0 6px 16px -4px var(--color-black-alpha-30),
+        0 2px 6px var(--color-black-alpha-20);
 }
 
 /* Dark mode glow effect - Blue tint */
 [data-theme="dark"] .card-glow:hover,
 [data-theme="dark"] .card-hover.card-glow:hover,
 [data-theme="dark"] [data-hover="glow"]:hover {
-    border-color: rgba(96, 165, 250, 0.4);
+    border-color: var(--color-blue-400-alpha-40);
     box-shadow:
-        0 12px 32px -8px rgba(0, 0, 0, 0.4),
-        0 0 0 1px rgba(96, 165, 250, 0.2),
-        0 0 24px -4px rgba(96, 165, 250, 0.2);
+        0 12px 32px -8px var(--color-black-alpha-40),
+        0 0 0 1px var(--color-blue-400-alpha-20),
+        0 0 24px -4px var(--color-blue-400-alpha-20);
 }
 
 /* Dark mode featured glow */
@@ -348,9 +348,9 @@ a.nexus-card:active,
 [data-theme="dark"] .event-featured::before,
 [data-theme="dark"] [data-featured="true"]::before {
     background: linear-gradient(135deg,
-        rgba(96, 165, 250, 0.5),
-        rgba(167, 139, 250, 0.5),
-        rgba(244, 114, 182, 0.4)
+        var(--color-blue-400-alpha-50),
+        var(--color-violet-300-alpha-50),
+        var(--color-pink-400-alpha-40)
     );
 }
 

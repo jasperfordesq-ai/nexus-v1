@@ -17,7 +17,7 @@
 .mobile-sheet-backdrop {
     position: fixed !important;
     inset: 0;
-    background: rgba(0, 0, 0, 0);
+    background: transparent;
     z-index: 999998 !important;
     opacity: 0;
     visibility: hidden;
@@ -29,7 +29,7 @@
 .mobile-sheet-backdrop.active {
     opacity: 1;
     visibility: visible;
-    background: rgba(0, 0, 0, 0.5);
+    background: var(--color-black-alpha-50);
 }
 
 /* Sheet Container - must be above everything */
@@ -45,14 +45,14 @@
     transition: transform 0.3s cubic-bezier(0.32, 0.72, 0, 1);
     max-height: 90vh;
     overflow: hidden;
-    box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.15);
+    box-shadow: 0 -10px 40px var(--color-black-alpha-15);
     isolation: isolate;
 }
 
 [data-theme="dark"] .mobile-sheet {
-    background: linear-gradient(180deg, rgba(30, 41, 59, 0.98) 0%, rgba(15, 23, 42, 0.99) 100%);
-    box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.5), 0 -2px 20px rgba(99, 102, 241, 0.1);
-    border-top: 1px solid rgba(99, 102, 241, 0.2);
+    background: linear-gradient(180deg, var(--color-slate-800-alpha-98) 0%, var(--color-slate-900-alpha-98) 100%);
+    box-shadow: 0 -10px 40px var(--color-black-alpha-50), 0 -2px 20px var(--color-indigo-alpha-10);
+    border-top: 1px solid var(--color-indigo-alpha-20);
 }
 
 .mobile-sheet.active {
@@ -67,7 +67,7 @@
 .mobile-sheet-handle {
     width: 36px;
     height: 5px;
-    background: rgba(128, 128, 128, 0.3);
+    background: var(--color-gray-alpha-30);
     border-radius: 3px;
     margin: 10px auto 6px;
     cursor: grab;
@@ -87,8 +87,8 @@
 }
 
 [data-theme="dark"] .mobile-sheet-header {
-    border-color: rgba(99, 102, 241, 0.15);
-    background: rgba(30, 41, 59, 0.5);
+    border-color: var(--color-indigo-alpha-15);
+    background: var(--color-slate-800-alpha-50);
 }
 
 .mobile-sheet-title {
@@ -99,14 +99,14 @@
 
 [data-theme="dark"] .mobile-sheet-title {
     color: var(--color-slate-100);
-    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+    text-shadow: 0 1px 2px var(--color-black-alpha-20);
 }
 
 .mobile-sheet-close {
     width: 32px;
     height: 32px;
     border-radius: 50%;
-    background: rgba(128, 128, 128, 0.1);
+    background: var(--color-gray-alpha-10);
     border: none;
     display: flex;
     align-items: center;
@@ -118,16 +118,16 @@
 }
 
 .mobile-sheet-close:active {
-    background: rgba(128, 128, 128, 0.2);
+    background: var(--color-gray-alpha-20);
 }
 
 [data-theme="dark"] .mobile-sheet-close {
-    background: rgba(99, 102, 241, 0.15);
+    background: var(--color-indigo-alpha-15);
     color: var(--color-slate-300);
 }
 
 [data-theme="dark"] .mobile-sheet-close:active {
-    background: rgba(99, 102, 241, 0.25);
+    background: var(--color-indigo-alpha-25);
 }
 
 /* Sheet Body */
@@ -167,8 +167,8 @@
 }
 
 [data-theme="dark"] .mobile-comment-input-wrap--bottom {
-    border-color: rgba(99, 102, 241, 0.2);
-    background: rgba(30, 41, 59, 0.3);
+    border-color: var(--color-indigo-alpha-20);
+    background: var(--color-slate-800-alpha-30);
     margin-left: -16px;
     margin-right: -16px;
     padding-left: 16px;
@@ -228,15 +228,15 @@
 }
 
 [data-theme="dark"] .mobile-comment-input {
-    background: rgba(30, 41, 59, 0.8);
-    border-color: rgba(168, 85, 247, 0.3);
+    background: var(--color-slate-800-alpha-80);
+    border-color: var(--color-purple-alpha-30);
     color: var(--color-slate-100);
 }
 
 [data-theme="dark"] .mobile-comment-input:focus {
-    background: rgba(30, 41, 59, 0.95);
+    background: var(--color-slate-800-alpha-95);
     border-color: var(--color-purple-400);
-    box-shadow: 0 0 0 3px rgba(168, 85, 247, 0.15), 0 4px 12px rgba(168, 85, 247, 0.2);
+    box-shadow: 0 0 0 3px var(--color-purple-alpha-15), 0 4px 12px var(--color-purple-alpha-20);
 }
 
 [data-theme="dark"] .mobile-comment-input::placeholder {
@@ -285,13 +285,13 @@
 }
 
 [data-theme="dark"] .mobile-comment-item {
-    border-color: rgba(99, 102, 241, 0.1);
-    background: rgba(30, 41, 59, 0.3);
+    border-color: var(--color-indigo-alpha-10);
+    background: var(--color-slate-800-alpha-30);
     border-radius: 12px;
     padding: 12px;
     margin-bottom: 8px;
     border-bottom: none;
-    border: 1px solid rgba(99, 102, 241, 0.1);
+    border: 1px solid var(--color-indigo-alpha-10);
 }
 
 [data-theme="dark"] .mobile-comment-item:last-child {
@@ -403,15 +403,15 @@
 }
 
 [data-theme="dark"] .mobile-reply-input {
-    background: rgba(30, 41, 59, 0.8);
-    border-color: rgba(168, 85, 247, 0.3);
+    background: var(--color-slate-800-alpha-80);
+    border-color: var(--color-purple-alpha-30);
     color: var(--color-slate-100);
 }
 
 [data-theme="dark"] .mobile-reply-input:focus {
-    background: rgba(30, 41, 59, 0.95);
+    background: var(--color-slate-800-alpha-95);
     border-color: var(--color-purple-400);
-    box-shadow: 0 0 0 3px rgba(168, 85, 247, 0.15);
+    box-shadow: 0 0 0 3px var(--color-purple-alpha-15);
 }
 
 .mobile-reply-send {
@@ -437,7 +437,7 @@
 }
 
 [data-theme="dark"] .mobile-comment-replies {
-    border-color: rgba(168, 85, 247, 0.3);
+    border-color: var(--color-purple-alpha-30);
 }
 
 .mobile-comment-replies .mobile-comment-item {
@@ -468,18 +468,18 @@
 }
 
 [data-theme="dark"] .mobile-comment-likes {
-    background: rgba(30, 41, 59, 0.8);
-    border: 1px solid rgba(236, 72, 153, 0.2);
+    background: var(--color-slate-800-alpha-80);
+    border: 1px solid var(--color-pink-alpha-20);
 }
 
 /* Dark mode avatar ring */
 [data-theme="dark"] .mobile-comment-avatar {
-    border: 2px solid rgba(168, 85, 247, 0.3);
+    border: 2px solid var(--color-purple-alpha-30);
 }
 
 /* Dark mode drag handle */
 [data-theme="dark"] .mobile-sheet-handle {
-    background: rgba(168, 85, 247, 0.4);
+    background: var(--color-purple-alpha-40);
 }
 
 /* Dark mode sign-in prompt */

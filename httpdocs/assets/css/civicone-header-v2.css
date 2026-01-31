@@ -2,6 +2,7 @@
  * CivicOne Header v2.2 - GOV.UK Frontend v5.14.0 Exact Match
  *
  * REBUILT 2026-01-30: Extracted exact values from govuk-frontend.min.css
+ * UPDATED 2026-01-31: Migrated to design tokens
  * SOURCE: https://github.com/alphagov/govuk-frontend v5.14.0
  *
  * This file provides overrides for the GOV.UK service navigation loaded from
@@ -12,11 +13,10 @@
  * Background:        #f4f8fb (blue tint-95, rebranded)
  * Border:            #8eb8dc (rebranded border on blue tint-95)
  * Link color:        #1a65a6 (blue shade-25, darker for contrast)
- * Link hover:        #003078 (blue shade-50)
- * Link active:       #0b0c0c (black)
- * Focus background:  #fd0 (yellow)
- * Focus text:        #0b0c0c (black)
- * Focus shadow:      0 -2px #fd0, 0 4px #0b0c0c
+ * Link hover:        #003078 (blue shade-50) → var(--color-govuk-blue)
+ * Link active:       #0b0c0c (black) → var(--color-govuk-black)
+ * Focus background:  #fd0 (yellow) → var(--color-govuk-yellow)
+ * Focus text:        #0b0c0c (black) → var(--color-govuk-black)
  *
  * Spacing:
  * - spacing(1): 5px
@@ -44,8 +44,8 @@
 
 /* Ensure rebranded class is applied */
 .govuk-service-navigation {
-    border-bottom-color: #8eb8dc;
-    background-color: #f4f8fb;
+    border-bottom-color: var(--color-govuk-header-border, #8eb8dc);
+    background-color: var(--color-govuk-header-bg, #f4f8fb);
 }
 
 /* Container - no horizontal padding here, use govuk-width-container */
@@ -67,7 +67,7 @@
 .govuk-service-navigation__service-name {
     position: relative;
     margin: 10px 0;
-    border: 0 solid #1a65a6;
+    border: 0 solid var(--color-govuk-header-link, #1a65a6);
 }
 
 @media (min-width: 40.0625em) {
@@ -103,7 +103,7 @@
 /* Service Name Link - text style (black, no decoration until hover) */
 .govuk-service-navigation__service-name .govuk-service-navigation__link:link,
 .govuk-service-navigation__service-name .govuk-service-navigation__link:visited {
-    color: #0b0c0c;
+    color: var(--color-govuk-black);
 }
 
 .govuk-service-navigation__service-name .govuk-service-navigation__link:hover {
@@ -112,7 +112,7 @@
 
 .govuk-service-navigation__service-name .govuk-service-navigation__link:active,
 .govuk-service-navigation__service-name .govuk-service-navigation__link:focus {
-    color: #0b0c0c;
+    color: var(--color-govuk-black);
 }
 
 /* Active State - Mobile: left border */
@@ -172,8 +172,8 @@
 
 .govuk-service-navigation__link:focus {
     outline: 3px solid transparent;
-    background-color: #fd0;
-    box-shadow: 0 -2px #fd0, 0 4px #0b0c0c;
+    background-color: var(--color-govuk-yellow);
+    box-shadow: 0 -2px var(--color-govuk-yellow), 0 4px var(--color-govuk-black);
     text-decoration: none;
 }
 
@@ -183,21 +183,21 @@
 
 .govuk-service-navigation__link:link,
 .govuk-service-navigation__link:visited {
-    color: #1d70b8;
+    color: var(--color-govuk-blue-light);
 }
 
 .govuk-service-navigation__link:hover {
-    color: #003078;
+    color: var(--color-govuk-blue);
 }
 
 .govuk-service-navigation__link:active,
 .govuk-service-navigation__link:focus {
-    color: #0b0c0c;
+    color: var(--color-govuk-black);
 }
 
 /* Override for service nav specific link color (darker blue) */
 .govuk-service-navigation__link:not(:hover):not(:focus) {
-    color: #1a65a6;
+    color: var(--color-govuk-header-link, #1a65a6);
 }
 
 /* Active Fallback */
@@ -214,7 +214,7 @@
     margin: 10px 0;
     padding: 0;
     border: 0;
-    color: #1a65a6;
+    color: var(--color-govuk-header-link, #1a65a6);
     background: none;
     word-break: break-all;
     cursor: pointer;
@@ -230,9 +230,9 @@
 
 .govuk-service-navigation__toggle:focus {
     outline: 3px solid transparent;
-    color: #0b0c0c;
-    background-color: #fd0;
-    box-shadow: 0 -2px #fd0, 0 4px #0b0c0c;
+    color: var(--color-govuk-black);
+    background-color: var(--color-govuk-yellow);
+    box-shadow: 0 -2px var(--color-govuk-yellow), 0 4px var(--color-govuk-black);
     text-decoration: none;
 }
 
@@ -272,11 +272,11 @@
    NOTE: GOV.UK Frontend does NOT have a dropdown/mega-menu component.
    This is a CivicOne extension that follows GOV.UK patterns:
 
-   - Focus states: #fd0 background, 0 -2px #fd0, 0 4px #0b0c0c shadow
-   - Link colors: #1d70b8 (unvisited), #4c2c92 (visited), #003078 (hover)
+   - Focus states: yellow background, GOV.UK focus shadow
+   - Link colors: GOV.UK blue-light (unvisited), link-visited (visited), blue (hover)
    - Typography: 16px body (1rem), 19px nav (1.1875rem)
    - Spacing: GOV.UK spacing scale (5px, 10px, 15px, 20px, 25px, 30px)
-   - Border: #b1b4b6 (mid-grey)
+   - Border: GOV.UK grey (mid-grey)
 
    Keyboard navigation is handled by civicone-header-v2.js:
    - Arrow keys navigate within dropdown
@@ -297,7 +297,7 @@
     border: 0;
     font-size: 1.1875rem;
     line-height: 1.5263157895;
-    color: #1a65a6;
+    color: var(--color-govuk-header-link, #1a65a6);
     background: none;
     cursor: pointer;
     text-decoration: none;
@@ -311,9 +311,9 @@
 
 .civicone-nav-more__btn:focus {
     outline: 3px solid transparent;
-    background-color: #fd0;
-    color: #0b0c0c;
-    box-shadow: 0 -2px #fd0, 0 4px #0b0c0c;
+    background-color: var(--color-govuk-yellow);
+    color: var(--color-govuk-black);
+    box-shadow: 0 -2px var(--color-govuk-yellow), 0 4px var(--color-govuk-black);
     text-decoration: none;
 }
 
@@ -341,9 +341,9 @@
     min-width: 480px;
     max-width: 640px;
     margin-top: 0;
-    background: #ffffff;
-    border: 1px solid #b1b4b6;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+    background: var(--color-white);
+    border: 1px solid var(--color-govuk-grey);
+    box-shadow: 0 2px 6px var(--color-black-alpha-16);
     padding: 20px 25px;
 }
 
@@ -365,8 +365,8 @@
     font-size: 1rem;
     font-weight: 700;
     line-height: 1.25;
-    color: #505a5f;
-    border-bottom: 1px solid #b1b4b6;
+    color: var(--color-govuk-grey-dark);
+    border-bottom: 1px solid var(--color-govuk-grey);
     letter-spacing: 0;
     text-transform: none;
 }
@@ -383,37 +383,37 @@
     padding: 8px 0;
     font-size: 1rem;
     line-height: 1.25;
-    color: #1d70b8;
+    color: var(--color-govuk-blue-light);
     text-decoration: underline;
     text-decoration-thickness: max(1px, 0.0625rem);
     text-underline-offset: 0.1578em;
 }
 
 .civicone-nav-dropdown__link:visited {
-    color: #4c2c92;
+    color: var(--color-govuk-link-visited);
 }
 
 .civicone-nav-dropdown__link:hover {
-    color: #003078;
+    color: var(--color-govuk-blue);
     text-decoration-thickness: max(3px, 0.1875rem, 0.12em);
     text-decoration-skip-ink: none;
 }
 
 .civicone-nav-dropdown__link:active {
-    color: #0b0c0c;
+    color: var(--color-govuk-black);
 }
 
 .civicone-nav-dropdown__link:focus {
     outline: 3px solid transparent;
-    color: #0b0c0c;
-    background-color: #fd0;
-    box-shadow: 0 -2px #fd0, 0 4px #0b0c0c;
+    color: var(--color-govuk-black);
+    background-color: var(--color-govuk-yellow);
+    box-shadow: 0 -2px var(--color-govuk-yellow), 0 4px var(--color-govuk-black);
     text-decoration: none;
 }
 
 .civicone-nav-dropdown__link[aria-current="page"] {
     font-weight: 700;
-    color: #0b0c0c;
+    color: var(--color-govuk-black);
     text-decoration: none;
 }
 
@@ -482,29 +482,29 @@
    HIGH CONTRAST TOGGLE (Custom Feature)
    ============================================ */
 html.high-contrast .govuk-service-navigation {
-    background: #000000;
-    color: #ffffff;
-    border-color: #ffffff;
+    background: var(--color-govuk-black);
+    color: var(--color-white);
+    border-color: var(--color-white);
 }
 
 html.high-contrast .govuk-service-navigation__link {
-    color: #ffffff;
+    color: var(--color-white);
 }
 
 html.high-contrast .govuk-service-navigation__link:hover {
-    background: #333333;
+    background: var(--color-gray-800);
 }
 
 html.high-contrast .civicone-nav-dropdown {
-    background: #000000;
-    border-color: #ffffff;
+    background: var(--color-govuk-black);
+    border-color: var(--color-white);
 }
 
 html.high-contrast .civicone-nav-dropdown__link {
-    color: #ffffff;
+    color: var(--color-white);
 }
 
 html.high-contrast .civicone-nav-dropdown__section h3 {
-    color: #ffffff;
-    border-color: #ffffff;
+    color: var(--color-white);
+    border-color: var(--color-white);
 }

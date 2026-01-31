@@ -239,8 +239,8 @@
         justify-content: space-between;
         width: 100%;
         padding: 14px var(--space-4);
-        background: rgba(255, 255, 255, 0.08);
-        border: 1.5px solid rgba(255, 255, 255, 0.15);
+        background: var(--color-white-alpha-8);
+        border: 1.5px solid var(--color-white-alpha-15);
         border-radius: var(--radius-md);
         font-size: var(--font-size-base);
         color: var(--text-primary, var(--color-gray-800));

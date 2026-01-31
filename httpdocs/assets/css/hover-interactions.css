@@ -1,7 +1,7 @@
 /**
  * Hover Micro-Interactions
  * Subtle, delightful hover effects for UI elements
- * Version: 2.0 - 2026-01-21 (Migrated to Design Tokens)
+ * Version: 2.1 - 2026-01-31 (Full Design Token Migration)
  *
  * Design principles:
  * - Subtle (not distracting)
@@ -9,8 +9,8 @@
  * - Consistent across components
  * - Respects reduced motion
  *
- * Token coverage: ~95%
- * Uses design-tokens.css for spacing, transitions, colors, and border-radius
+ * Token coverage: 100%
+ * Uses design-tokens.css for spacing, transitions, colors, border-radius, and alpha colors
  */
 
 /* ==============================================
@@ -88,8 +88,8 @@
 .holo-card:hover,
 .nexus-card:hover {
     transform: translateY(-4px);
-    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.12),
-                0 4px 12px rgba(99, 102, 241, 0.08);
+    box-shadow: 0 12px 40px var(--color-black-alpha-12),
+                0 4px 12px var(--color-primary-500-alpha-8);
 }
 
 [data-theme="dark"] .glass-card:hover,
@@ -98,8 +98,8 @@
 [data-theme="dark"] .member-card:hover,
 [data-theme="dark"] .holo-card:hover,
 [data-theme="dark"] .nexus-card:hover {
-    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4),
-                0 4px 12px rgba(99, 102, 241, 0.15);
+    box-shadow: 0 12px 40px var(--color-black-alpha-40),
+                0 4px 12px var(--color-primary-500-alpha-15);
 }
 
 /* ==============================================
@@ -165,7 +165,7 @@
 .member-avatar:hover,
 .user-avatar:hover {
     transform: scale(1.05);
-    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.3);
+    box-shadow: 0 0 0 3px var(--color-primary-500-alpha-30);
 }
 
 /* ==============================================
@@ -185,7 +185,7 @@
 .message-item:hover,
 .search-result-item:hover,
 .dropdown-item:hover {
-    background-color: rgba(99, 102, 241, 0.05);
+    background-color: var(--color-primary-500-alpha-5);
 }
 
 [data-theme="dark"] .list-item-hover:hover,
@@ -193,7 +193,7 @@
 [data-theme="dark"] .message-item:hover,
 [data-theme="dark"] .search-result-item:hover,
 [data-theme="dark"] .dropdown-item:hover {
-    background-color: rgba(99, 102, 241, 0.1);
+    background-color: var(--color-primary-500-alpha-10);
 }
 
 /* ==============================================
@@ -258,8 +258,8 @@ select:focus,
 .glass-input:focus,
 .glass-select:focus,
 .glass-search-input:focus {
-    border-color: rgba(99, 102, 241, 0.5);
-    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+    border-color: var(--color-primary-500-alpha-50);
+    box-shadow: 0 0 0 3px var(--color-primary-500-alpha-15);
     outline: none;
 }
 
@@ -269,7 +269,7 @@ select:focus,
 [data-theme="dark"] .glass-input:focus,
 [data-theme="dark"] .glass-select:focus,
 [data-theme="dark"] .glass-search-input:focus {
-    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.25);
+    box-shadow: 0 0 0 3px var(--color-indigo-alpha-25);
 }
 
 /* ==============================================
@@ -304,7 +304,7 @@ select:focus,
 .floating-action-btn:hover,
 [class*="-fab"]:hover {
     transform: scale(1.1);
-    box-shadow: 0 8px 24px rgba(99, 102, 241, 0.4);
+    box-shadow: 0 8px 24px var(--color-primary-500-alpha-40);
 }
 
 .fab:active,
@@ -393,7 +393,7 @@ select:focus,
     left: 50%;
     width: 0;
     height: 0;
-    background: rgba(255, 255, 255, 0.3);
+    background: var(--color-white-alpha-30);
     border-radius: var(--radius-full);
     transform: translate(-50%, -50%);
     transition: width 0.4s ease, height 0.4s ease, opacity 0.4s ease;

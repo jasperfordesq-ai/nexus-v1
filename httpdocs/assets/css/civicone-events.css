@@ -38,9 +38,9 @@
     --civic-event-text-secondary: var(--color-gray-200);
     --civic-event-text-muted: var(--color-gray-300);
     --civic-event-brand: var(--color-teal-300);
-    --civic-event-brand-hover: #99F6E4;
-    --civic-event-link: #7DD3FC;
-    --civic-event-link-hover: #BAE6FD;
+    --civic-event-brand-hover: var(--color-teal-200);
+    --civic-event-link: var(--color-blue-300);
+    --civic-event-link-hover: var(--color-blue-200);
     --civic-event-success: var(--color-emerald-400);
     --civic-event-success-bg: var(--color-emerald-alpha-15);
     --civic-event-danger: var(--color-red-400);
@@ -431,7 +431,7 @@
 }
 
 .civic-btn--danger:hover {
-    background: #991B1B !important;
+    background: var(--color-red-800) !important;
 }
 
 .civic-btn--danger:focus {

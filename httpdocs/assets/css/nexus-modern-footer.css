@@ -16,23 +16,23 @@
     overflow: hidden;
     /* Light mode default - glass effect with subtle gradient */
     background: linear-gradient(180deg,
-            rgba(249, 250, 251, 0.02) 0%,
-            rgba(243, 244, 246, 0.95) 30%,
-            rgba(229, 231, 235, 0.98) 100%);
+            var(--color-gray-50-alpha-2) 0%,
+            var(--color-gray-100-alpha-95) 30%,
+            var(--color-gray-200-alpha-98) 100%);
 }
 
 [data-theme="light"] .nexus-modern-footer {
     background: linear-gradient(180deg,
-            rgba(249, 250, 251, 0.02) 0%,
-            rgba(243, 244, 246, 0.95) 30%,
-            rgba(229, 231, 235, 0.98) 100%);
+            var(--color-gray-50-alpha-2) 0%,
+            var(--color-gray-100-alpha-95) 30%,
+            var(--color-gray-200-alpha-98) 100%);
 }
 
 [data-theme="dark"] .nexus-modern-footer {
     background: linear-gradient(180deg,
-            rgba(0, 0, 0, 0.02) 0%,
-            rgba(15, 23, 42, 0.98) 30%,
-            rgba(0, 0, 0, 0.99) 100%);
+            var(--color-black-alpha-2) 0%,
+            var(--color-slate-900-alpha-98) 30%,
+            var(--color-black-alpha-99) 100%);
 }
 
 .nexus-footer-glow {
@@ -109,7 +109,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    box-shadow: 0 var(--space-2) var(--space-6) rgba(99, 102, 241, 0.3);
+    box-shadow: 0 var(--space-2) var(--space-6) var(--color-indigo-alpha-30);
 }
 
 .nexus-footer-logo-icon img {
@@ -150,8 +150,8 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: var(--color-white-alpha-5);
+    border: 1px solid var(--color-white-alpha-10);
     border-radius: var(--radius-md);
     color: var(--color-slate-400);
     font-size: var(--font-size-lg);
@@ -160,8 +160,8 @@
 }
 
 .nexus-footer-social a:hover {
-    background: rgba(99, 102, 241, 0.2);
-    border-color: rgba(99, 102, 241, 0.4);
+    background: var(--color-indigo-alpha-20);
+    border-color: var(--color-indigo-alpha-40);
     color: var(--color-primary-300);
     transform: translateY(-3px);
 }
@@ -206,9 +206,9 @@
 /* Custom Tenant Message */
 .nexus-footer-message {
     background: linear-gradient(135deg,
-            rgba(99, 102, 241, 0.1) 0%,
-            rgba(139, 92, 246, 0.1) 100%);
-    border: 1px solid rgba(99, 102, 241, 0.2);
+            var(--color-indigo-alpha-10) 0%,
+            var(--color-violet-alpha-10) 100%);
+    border: 1px solid var(--color-indigo-alpha-20);
     border-radius: var(--radius-lg);
     padding: var(--space-5) var(--space-6);
     margin-bottom: var(--space-10);
@@ -228,7 +228,7 @@
     justify-content: space-between;
     align-items: center;
     padding-top: var(--space-8);
-    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    border-top: 1px solid var(--color-white-alpha-8);
 }
 
 @media (max-width: 768px) {
@@ -291,14 +291,14 @@
 }
 
 [data-theme="light"] .nexus-footer-social a {
-    background: rgba(99, 102, 241, 0.08);
-    border-color: rgba(99, 102, 241, 0.15);
+    background: var(--color-indigo-alpha-8);
+    border-color: var(--color-indigo-alpha-15);
     color: var(--color-primary-500);
 }
 
 [data-theme="light"] .nexus-footer-social a:hover {
-    background: rgba(99, 102, 241, 0.15);
-    border-color: rgba(99, 102, 241, 0.3);
+    background: var(--color-indigo-alpha-15);
+    border-color: var(--color-indigo-alpha-30);
     color: var(--color-primary-600);
 }
 
@@ -316,9 +316,9 @@
 
 [data-theme="light"] .nexus-footer-message {
     background: linear-gradient(135deg,
-            rgba(99, 102, 241, 0.08) 0%,
-            rgba(139, 92, 246, 0.06) 100%);
-    border-color: rgba(99, 102, 241, 0.15);
+            var(--color-indigo-alpha-8) 0%,
+            var(--color-violet-alpha-6) 100%);
+    border-color: var(--color-indigo-alpha-15);
 }
 
 [data-theme="light"] .nexus-footer-message p {
@@ -326,7 +326,7 @@
 }
 
 [data-theme="light"] .nexus-footer-bottom {
-    border-top-color: rgba(99, 102, 241, 0.1);
+    border-top-color: var(--color-indigo-alpha-10);
 }
 
 [data-theme="light"] .nexus-footer-copyright {

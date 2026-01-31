@@ -25,7 +25,7 @@
     top: 0;
     bottom: 0;
     width: var(--space-8);
-    background: linear-gradient(to left, rgba(0,0,0,0.05), transparent);
+    background: linear-gradient(to left, var(--color-black-alpha-5), transparent);
     pointer-events: none;
     opacity: 0;
     transition: opacity var(--transition-fast, 150ms);
@@ -280,17 +280,17 @@
 }
 
 .table-cards .status-badge.status-active {
-    background-color: rgba(16, 185, 129, 0.1);
+    background-color: var(--color-emerald-alpha-10);
     color: var(--color-success, var(--color-success));
 }
 
 .table-cards .status-badge.status-pending {
-    background-color: rgba(245, 158, 11, 0.1);
+    background-color: var(--color-amber-500-alpha-10);
     color: var(--color-warning, var(--color-warning));
 }
 
 .table-cards .status-badge.status-inactive {
-    background-color: rgba(239, 68, 68, 0.1);
+    background-color: var(--color-red-alpha-10);
     color: var(--color-danger, var(--color-danger));
 }
 

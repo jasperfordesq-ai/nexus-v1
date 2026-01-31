@@ -60,7 +60,7 @@
 .admin-header-bar {
     position: relative;
     z-index: 10;
-    background: rgba(15, 23, 42, 0.9);
+    background: var(--color-slate-900-alpha-90);
     border: 1px solid var(--effect-primary-30);
     border-radius: var(--radius-md);
     padding: var(--space-3) var(--space-4);
@@ -176,23 +176,23 @@
     font-size: var(--font-size-sm);
     font-weight: var(--font-weight-bold);
     transition: all var(--transition-fast);
-    box-shadow: 0 4px 15px rgba(147, 51, 234, 0.3);
+    box-shadow: 0 4px 15px var(--color-purple-500-alt-alpha-30);
     animation: superAdminGlow 3s ease-in-out infinite;
 }
 
 .admin-super-admin-btn:hover {
     transform: translateY(-2px);
-    box-shadow: 0 6px 25px rgba(147, 51, 234, 0.5);
+    box-shadow: 0 6px 25px var(--color-purple-500-alt-alpha-50);
 }
 
 .admin-super-admin-btn i {
     color: var(--color-amber-300);
-    filter: drop-shadow(0 0 2px rgba(251, 191, 36, 0.5));
+    filter: drop-shadow(0 0 2px var(--color-amber-alpha-50));
 }
 
 @keyframes superAdminGlow {
-    0%, 100% { box-shadow: 0 4px 15px rgba(147, 51, 234, 0.3); }
-    50% { box-shadow: 0 4px 20px rgba(236, 72, 153, 0.4); }
+    0%, 100% { box-shadow: 0 4px 15px var(--color-purple-500-alt-alpha-30); }
+    50% { box-shadow: 0 4px 20px var(--color-pink-alpha-40); }
 }
 
 .admin-header-avatar {
@@ -212,7 +212,7 @@
 .admin-smart-nav {
     position: relative;
     z-index: 100;
-    background: rgba(15, 23, 42, 0.95);
+    background: var(--color-slate-900-alpha-95);
     border: 1px solid var(--effect-primary-30);
     border-radius: var(--radius-md);
     padding: var(--space-2);
@@ -398,7 +398,7 @@
     font-weight: var(--font-weight-bold);
     text-transform: uppercase;
     letter-spacing: 0.05em;
-    color: rgba(99, 102, 241, 0.8);
+    color: var(--color-indigo-alpha-80);
     padding: var(--space-1) var(--space-3);
     border-bottom: 1px solid var(--effect-primary-20);
     margin-bottom: var(--space-1);
@@ -461,7 +461,7 @@
 
 /* Glass cards */
 .admin-glass-card {
-    background: rgba(15, 23, 42, 0.85);
+    background: var(--color-slate-900-alpha-85);
     border: 1px solid var(--effect-primary-20);
     border-radius: var(--radius-md);
     overflow: hidden;
@@ -520,7 +520,7 @@
         display: block;
         padding: var(--space-3) 15px;
         margin: var(--space-1) 0;
-        background: rgba(15, 23, 42, 0.6);
+        background: var(--color-slate-900-alpha-60);
         border: 1px solid var(--effect-primary-20);
         border-radius: var(--radius-base);
         color: var(--color-white);
@@ -551,7 +551,7 @@
         font-weight: var(--font-weight-bold);
         text-transform: uppercase;
         letter-spacing: 0.1em;
-        color: rgba(139, 92, 246, 0.9);
+        color: var(--color-violet-alpha-90);
         border-bottom: 2px solid var(--effect-purple-30);
     }
 
@@ -598,7 +598,7 @@
     gap: var(--space-2);
     padding: var(--space-3) var(--space-4);
     margin-bottom: var(--space-6);
-    background: rgba(15, 23, 42, 0.6);
+    background: var(--color-slate-900-alpha-60);
     border: 1px solid var(--effect-primary-15);
     border-radius: var(--radius-md);
     font-size: var(--font-size-sm);
@@ -989,7 +989,7 @@
     position: fixed;
     bottom: 1rem;
     right: 1rem;
-    background: rgba(15, 23, 42, 0.95);
+    background: var(--color-slate-900-alpha-95);
     border: 1px solid var(--effect-primary-20);
     border-radius: var(--radius-md);
     padding: var(--space-2) var(--space-3);
